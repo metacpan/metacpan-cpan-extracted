@@ -1,0 +1,36 @@
+---
+abstract: 'System and service checks for Zabbix'
+author:
+  - 'Orkun Karaduman <orkunkaraduman@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.16, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Zabbix-Check
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Cwd: '0'
+  File::Basename: '0'
+  File::Slurp: '0'
+  FindBin: '0'
+  JSON: '0'
+  Lazy::Utils: '1.04'
+  Net::NTP: '0'
+  Switch: '0'
+  perl: '5.014'
+resources:
+  bugtracker: https://github.com/orkunkaraduman/Zabbix-Check/issues
+  homepage: https://metacpan.org/release/Zabbix-Check
+  license: https://www.gnu.org/licenses/gpl-3.0.html
+  repository: git://git@github.com:orkunkaraduman/Zabbix-Check.git
+version: '1.10'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

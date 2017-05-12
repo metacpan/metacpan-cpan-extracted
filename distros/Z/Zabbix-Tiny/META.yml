@@ -1,0 +1,50 @@
+---
+abstract: 'A small module to eliminate boilerplate overhead when using the Zabbix API'
+author:
+  - ', Ben Kaufman.'
+build_requires:
+  Test::Exception: '0.35'
+  Test::LWP::UserAgent: '0'
+  Test::More: '0.98'
+  Test::Most: '0.35'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Zabbix-Tiny
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Zabbix::Tiny:
+    file: lib/Zabbix/Tiny.pm
+    version: '1.09'
+requires:
+  JSON: '0'
+  LWP: '0'
+  LWP::Protocol::https: '0'
+  Moo: '0'
+  String::Random: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/whosgonna/Zabbix-Tiny.pm/issues
+  homepage: https://github.com/whosgonna/Zabbix-Tiny.pm
+  repository: git://github.com/whosgonna/Zabbix-Tiny.pm.git
+version: '1.09'
+x_contributors:
+  - 'whosgonna <ben.whosgonna.com@gmail.com>'
+  - 'richlv <richlv@nakts.net>'
+  - 'Ben Kaufman <whosgonna@users.noreply.github.com>'
+  - 'ben <ben.kaufman@altigen.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html 
+	PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+ <head>
+  <title>SRU form for the IRSpy database</title>
+ </head>
+ <body>
+  <h1>SRU form for the IRSpy database</h1>
+  <form method="get" action="http://localhost:8018/IR-Explain---1">
+   <table>
+    <tr>
+     <td align="right">
+      Query:
+     </td>
+     <td>
+      <input type="hidden" name="version" value="1.1"/>
+      <input type="hidden" name="operation" value="searchRetrieve"/>
+      <input type="text" name="query" size="40"/>
+     </td>
+    </tr>
+    <tr>
+     <td align="right">
+      First record to fetch:
+     </td>
+     <td>
+      <input type="text" name="startRecord" size="10" value="1"/>
+     </td>
+    </tr>
+    <tr>
+     <td align="right">
+      Number of records:
+     </td>
+     <td>
+      <input type="text" name="maximumRecords" size="10" value="1"/>
+     </td>
+    </tr>
+    <tr>
+     <td align="right">
+      Schema:
+     </td>
+     <td>
+      <select name="recordSchema" size="1">
+       <option value="zeerex" selected="selected">ZeeRex</option>
+       <option value="index">Indexing</option>
+      </select>
+     </td>
+    </tr>
+    <tr>
+     <td></td>
+     <td align="right">
+      <input type="submit" value="Search"/>
+     </td>
+    </tr>
+   </table>
+  </form>
+ </body>
+</html>

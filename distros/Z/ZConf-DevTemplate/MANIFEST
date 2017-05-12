@@ -1,0 +1,13 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+bin/zcdev
+lib/ZConf/DevTemplate.pm
+lib/ZConf/template.pm
+lib/ZConf/template/GUI.pm
+t/00-load.t
+t/01-load.t
+t/02-load.t
+t/pod-coverage.t
+t/pod.t

@@ -1,0 +1,39 @@
+Revision history for ZConf-GUI
+
+1.1.0	 2012-07-23/00:00
+		 -Now uses Error::Helper.
+
+1.0.3	2010-06-26/03:10
+		-Fix modules dependencies.
+
+1.0.2	2009-10-29/02:30
+		-If the new method errors, it is permanent.
+		-Clean up the error warning code.
+		-Correct method used in which.
+		-Remove the autoinit function from the new method. It now always will.
+		-Sets now have to be set after initilization via new.
+		-Correct the help info in the scripts.
+
+1.0.1	2009-10-23/02:30
+		-Update the pod on what should be implemented and etc.
+		-Pod cleanup.
+
+1.0.0	2009-10-11/02:30
+		Aadd support for "appendOthers".
+		-"which" now behaves as documented instead of returning a list
+			of available modules.
+		-Clean up error reporting.
+		-No longer requires "Gtk2" as a prerequisite... was never used.
+
+0.1.0	2009-05-18/13:00
+		-Fixed 'getPreferred'.
+		-Implement useX.
+		-Add 'bin/zcgui-gux'.
+		-Add 'bin/zcgui-sux'.
+		-Add the pod for 'bin/zcgui-set'.
+
+0.0.0	2009-05-13/07:00
+		-Initial release.
+		
+			
+

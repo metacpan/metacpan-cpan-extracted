@@ -1,0 +1,48 @@
+---
+abstract: 'Dist::Zilla Mixed Up'
+author:
+  - 'Ingy döt Net <ingy@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Zilla-Dist
+no_index:
+  directory:
+    - example
+    - inc
+    - t
+    - xt
+requires:
+  CPAN::Uploader: '0.103007'
+  Dist::Zilla: '5.029'
+  Dist::Zilla::Plugin::ChangesFromYaml: '0.004'
+  Dist::Zilla::Plugin::GithubMeta: '0.46'
+  Dist::Zilla::Plugin::ReadmeFromPod: '0.30'
+  Dist::Zilla::Plugin::TestBaseIncluder: '0.09'
+  Dist::Zilla::Plugin::TestMLIncluder: '0.12'
+  Dist::Zilla::PluginBundle::Git: '2.029'
+  ExtUtils::MakeMaker: '6.98'
+  File::Share: '0.25'
+  Hash::Merge: '0.200'
+  IO::All: '0.86'
+  JSON: '2.90'
+  Swim: v0.1.35
+  Swim::Plugin::badge: v0.1.8
+  Swim::Plugin::cpan: v0.0.5
+  Template::Toolkit::Simple: '0.31'
+  Test::Pod: '1.48'
+  YAML::XS: '0.55'
+  perl: v5.8.1
+  version: '0.9908'
+resources:
+  bugtracker: https://github.com/ingydotnet/zilla-dist-pm/issues
+  homepage: https://github.com/ingydotnet/zilla-dist-pm
+  repository: https://github.com/ingydotnet/zilla-dist-pm.git
+version: 0.0.196

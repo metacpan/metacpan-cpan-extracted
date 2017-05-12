@@ -1,0 +1,72 @@
+ZConf-Mail
+
+Handles storing and retrieving mail account settings, creating connections for
+maildir, mbox, IMAP, POP3, and SMTP, creating simple email messages, delivery via
+exec, and sending email messages.
+
+SSL is supported for IMAP, POP3, and SMTP.
+
+ZConf is used for storing the configuration settings.
+
+It currently makes a very useful for getmail.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+REQUIREMENTS
+
+Test::More
+Config::Tiny
+Email::Simple
+Email::Simple::Creator
+Mail::IMAPTalk
+Mail::POP3Client
+Net::SMTP_auth
+Net::SMTP::TLS
+Mail::Box::Manager
+IO::MultiPipe
+ZConf
+Email::Abstract
+File::MimeInfo::Magic
+Email::Date
+MIME::Lite
+String::ShellQuote
+Sys::Hostname
+MIME::QuotedPrint
+Text::Autoformat
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc ZConf::Mail
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=ZConf-Mail
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/ZConf-Mail
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/ZConf-Mail
+
+    Search CPAN
+        http://search.cpan.org/dist/ZConf-Mail
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011 Zane C. Bowers-Hadley
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

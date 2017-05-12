@@ -1,0 +1,843 @@
+#!/usr/bin/perl
+#Copyright (c) 2011, Zane C. Bowers-Hadley
+#All rights reserved.
+#
+#Redistribution and use in source and binary forms, with or without modification,
+#are permitted provided that the following conditions are met:
+#
+#   * Redistributions of source code must retain the above copyright notice,
+#    this list of conditions and the following disclaimer.
+#   * Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#
+#THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+#ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
+#WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+#IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+#INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
+#BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
+#DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+#LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+#OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+#THE POSSIBILITY OF SUCH DAMAGE.
+
+use warnings;
+use strict;
+use ZConf::Mail;
+use Getopt::Std;
+use Config::Tiny;
+
+$Getopt::Std::STANDARD_HELP_VERSION=1;
+
+#version function
+sub main::VERSION_MESSAGE {
+        print "zcmailaccount 0.0.0\n";
+};
+
+#print help
+sub main::HELP_MESSAGE {
+        print "\n".
+		      "-a <account>\n".
+			  "-A <action>\n".
+			  "-z <ZConf config>\n".
+			  "-s <config set>\n".
+			  "-f <file>\n".
+			  "\n".
+			  "Actions:".
+			  "add\n".
+			  "edit\n".
+			  "list\n".
+			  "remove\n".
+			  "show\n".
+			  "template\n".
+			  "";
+		exit 1;
+}
+
+#edits it
+sub addORedit{
+	my $account=$_[0];
+	my $mail=$_[1];
+	my $file=$_[2];
+	my $action=$_[3];
+
+	#determines if ulink should be done later or not
+	my $nounlink=0;
+	if (defined($file)) {
+		$nounlink=1;
+	}
+
+	my %args;
+
+	if ( $action eq 'edit' ) {
+		%args=$mail->getAccountArgs($account);
+		if ($mail->error) {
+			warn('zcmailaccount: delAccount failed. error="'.
+				 $mail->error.'" errorString="'.$mail->errorString.'"');
+			
+			exit $mail->error;
+		}
+	}
+
+	my $fh;
+	my $ini;
+
+	if (!defined($file)) {
+		$ini=createINI(\%args, $account);
+		if (!defined($ini)) {
+			warn('zcmailaccount: createINI failed for some unexpected reason');
+			exit 254;
+		}
+	
+		$file="/tmp/".$$.rand(33).$$;
+		if (!open( $fh, ">", $file )) {
+			warn('zcmailaccount: Failed to open a temp file, "'.$file.'", for passing to the editor');
+			exit 254;
+		}
+		print $fh $ini;
+		close $fh;
+		
+		system($ENV{EDITOR}.' '.$file);
+		my $exit=$?;
+		if ($exit ne '0') {
+			warn('zcmailaccount: Failed to execute "'.$ENV{EDITOR}.' '.$file.'". exit="'.$exit.'"');
+			exit 254;
+		}
+	}
+	
+	if (!open( $fh, "<", $file )) {
+		warn('zcmailaccount: Failed to open a temp file, "'.$file.'", for passing to the editor');
+		exit 254;
+	}
+	$ini=join('', <$fh>);
+	close $fh;
+	
+	my %newargs=iniTOargs($ini);
+
+	(my $type, my $accountname)=split(/\//, $account);
+	$newargs{type}=$type;
+	$newargs{account}=$accountname;
+
+	if ($action eq 'edit') {
+		$mail->modAccount(\%newargs);
+		if ($mail->error) {
+			warn('zcmailaccount: readSet failed. error="'.
+				 $mail->error.'" errorString="'.$mail->errorString.'"');
+			
+			exit $mail->error;
+		}
+	}
+
+	if ($action eq 'add') {
+		$mail->createAccount(\%newargs);
+		if ($mail->error) {
+			warn('zcmailaccount: readSet failed. error="'.
+				 $mail->error.'" errorString="'.$mail->errorString.'"');
+			
+			exit $mail->error;
+		}		
+	}
+
+	if (!$nounlink) {
+		unlink($file);
+	}
+
+	exit 0;
+}
+
+#shows it
+sub show{
+	my $account=$_[0];
+	my $mail=$_[1];
+
+	my %args=$mail->getAccountArgs($account);
+	if ($mail->error) {
+		warn('zcmailaccount: delAccount failed. error="'.
+			 $mail->error.'" errorString="'.$mail->errorString.'"');
+		
+		exit $mail->error;
+	}
+
+	my $ini=createINI(\%args, $account);
+	if (!defined($ini)) {
+		warn('zcmailaccount: createINI failed for some unexpected reason');
+		exit 254;
+	}
+	print $ini;
+
+	exit 0;
+}
+
+#creates the ini
+sub createINI{
+	my %args;
+	if(defined($_[0])){
+		%args=%{$_[0]};
+	}
+	my $account=$_[1];
+
+	my $ini="; This is a INI formated file.\n".
+	"; Any thing starting with a ';' or a '#' is a comment.\n\n";
+
+	if ($account =~ /^exec\// ) {
+		$ini=$ini."; exec: The command to use for delivery.\n".
+		"; required: yes\n\n".
+		"; Deliver it via Dovecot...\n".
+		"; deliver=/usr/local/libexec/dovecot/deliver\n\n".
+		"; Deliver it via Dovecot, after filtering it through spamassassin...\n".
+		"; deliver=/usr/local/bin/spamc -s 55000000 | /usr/local/libexec/dovecot/deliver\n\n".
+		"deliver=";
+		if (defined($args{deliver})) {
+			$ini=$ini.$args{deliver};
+		}
+		$ini=$ini."\n";
+
+		return $ini;
+	}
+
+	if ($account =~ /^imap\// ) {
+		$ini=$ini."; server: The server to use.\n".
+		"server=";
+		if (defined($args{server})) {
+			$ini=$ini.$args{server};
+		}
+		$ini=$ini."\n\n; port: The port to use for connecting to the server.\n".
+		"port=";
+		if (defined($args{port})) {
+			$ini=$ini.$args{port};
+		}else {
+			$ini=$ini."143";
+		}
+		$ini=$ini."\n\n".
+		"; timeout: The timeout in seconds.\n".
+		"timeout=";
+		if (defined($args{timeout})) {
+			$ini=$ini.$args{timeout};
+		}else {
+			$ini=$ini."10";
+		}
+		$ini=$ini."\n\n; user: The user to authenticate using.\n".
+		"user=";
+		if (defined($args{user})) {
+			$ini=$ini.$args{user};
+		}
+		$ini=$ini."\n\n".
+		"; pass: The pass word to use when authenticating.\n".
+		"pass=";
+		if (defined($args{pass})) {
+			$ini=$ini.$args{pass};
+		}
+		$ini=$ini."\n\n".
+		"; useSSL: A boolean value indicating wether SSL should be used or not.\n".
+		"; 0 = false     1 = true\n".
+		"useSSL=";
+		if (defined($args{useSSL})) {
+			$ini=$ini.$args{useSSL};
+		}else {
+			$ini=$ini."0";
+		}
+		$ini=$ini."\n\n".
+		"; fetchable: Wether or not it should be fetchable(activated).\n".
+		"; 0 = false     1 = true\n".
+		"fetchable=";
+		if (defined($args{fetchable})) {
+			$ini=$ini.$args{fetchable};
+		}else {
+			$ini=$ini."1";
+		}
+		$ini=$ini."\n\n".
+		"; deliverTo: The account to deliver to when fetching mail from this account.\n".
+		"; example: deliverTo: imap/whatever\n".
+		"deliverTo=";
+		if (defined($args{deliverTo})) {
+			$ini=$ini.$args{deliverTo};
+		}
+		$ini=$ini."\n\n".
+		"; deliverToFolder: The folder to deliver a new message to for the deliverTo account.\n".
+		"; example: deliverToFolder=Inbox".
+		"deliverToFolder=";
+		if (defined($args{deliverToFolder})) {
+			$ini=$ini.$args{deliverToFolder};
+		}
+		$ini=$ini."\n\n".
+		"; inbox: The inbox for the IMAP account.\n".
+		"inbox=";
+		if (defined($args{inbox})) {
+			$ini=$ini.$args{inbox};
+		}else {
+			$ini=$ini."INBOX";
+		}
+		$ini=$ini."\n";
+		return $ini;
+	}
+
+	if ($account =~ /^maildir\// ) {
+		$ini=$ini."; maildir: The mail directory in question.\n".
+		"maildir=\n\n".
+		"; fetchable: Wether or not it should be fetchable(activated).\n".
+		"; 0 = false     1 = true\n".
+		"fetchable=";
+		if (defined($args{fetchable})) {
+			$ini=$ini.$args{fetchable};
+		}else {
+			$ini=$ini."1";
+		}
+		$ini=$ini."\n\n".
+		"; deliverTo: The account to deliver to when fetching mail from this account.\n".
+		"; example: deliverTo: imap/whatever\n".
+		"deliverTo=";
+		if (defined($args{deliverTo})) {
+			$ini=$ini.$args{deliverTo};
+		}
+		$ini=$ini."\n\n".
+		"; deliverToFolder: The folder to deliver a new message to for the deliverTo account.\n".
+		"; example: deliverToFolder=Inbox".
+		"deliverToFolder=";
+		if (defined($args{deliverToFolder})) {
+			$ini=$ini.$args{deliverToFolder};
+		}
+		$ini=$ini."\n\n";
+		return $ini;
+	}
+
+	if ($account =~ /^mbox\// ) {
+		$ini=$ini."; mbox: The mail box in question.\n".
+		"mbox=\n\n".
+		"; fetchable: Wether or not it should be fetchable(activated).\n".
+		"; 0 = false     1 = true\n".
+		"fetchable=";
+		if (defined($args{fetchable})) {
+			$ini=$ini.$args{fetchable};
+		}else {
+			$ini=$ini."1";
+		}
+		$ini=$ini."\n\n".
+		"; deliverTo: The account to deliver to when fetching mail from this account.\n".
+		"; example: deliverTo: imap/whatever\n".
+		"deliverTo=";
+		if (defined($args{deliverTo})) {
+			$ini=$ini.$args{deliverTo};
+		}
+		$ini=$ini."\n\n".
+		"; deliverToFolder: The folder to deliver a new message to for the deliverTo account.\n".
+		"; example: deliverToFolder=Inbox".
+		"deliverToFolder=";
+		if (defined($args{deliverToFolder})) {
+			$ini=$ini.$args{deliverToFolder};
+		}
+		$ini=$ini."\n\n";
+		return $ini;
+	}
+
+	if ($account =~ /^pop3\// ) {
+		$ini=$ini."; server: The server to use.\n".
+		"server=";
+		if (defined($args{server})) {
+			$ini=$ini.$args{server};
+		}
+		$ini=$ini."\n\n".
+		"; port: The port to use for connecting to the server.\n".
+		"port=";
+		if (defined($args{port})) {
+			$ini=$ini.$args{port};
+		}else {
+			$ini=$ini."110";
+		}
+		$ini=$ini."\n\n".
+		"; timeout: The timeout in seconds.\n".
+		"timeout=";
+		if (defined($args{timeout})) {
+			$ini=$ini.$args{timeout};
+		}else {
+			$ini=$ini."10";
+		}
+		$ini=$ini."\n\n".
+		"; user: The user to authenticate using.\n".
+		"user=";
+		if (defined($args{user})) {
+			$ini=$ini.$args{user};
+		}
+		$ini=$ini."\n\n".
+		"; pass: The pass word to use when authenticating.\n".
+		"pass=";
+		if (defined($args{pass})) {
+			$ini=$ini.$args{pass};
+		}
+		$ini=$ini."\n\n".
+		"; useSSL: A boolean value indicating wether SSL should be used or not.\n".
+		"; 0 = false     1 = true\n".
+		"useSSL=";
+		if (defined($args{useSSL})) {
+			$ini=$ini.$args{useSSL};
+		}else {
+			$ini=$ini."0";
+		}
+		$ini=$ini."\n\n".
+		"; fetchable: Wether or not it should be fetchable(activated).\n".
+		"; 0 = false     1 = true\n".
+		"fetchable=";
+		if (defined($args{fetchable})) {
+			$ini=$ini.$args{fetchable};
+		}else {
+			$ini=$ini."1";
+		}
+		$ini=$ini."\n\n".
+		"; deliverTo: The account to deliver to when fetching mail from this account.\n".
+		"; example: deliverTo: imap/whatever\n".
+		"deliverTo=";
+		if (defined($args{deliverTo})) {
+			$ini=$ini.$args{deliverTo};
+		}
+		$ini=$ini."\n\n".
+		"; deliverToFolder: The folder to deliver a new message to for the deliverTo account.\n".
+		"; example: deliverToFolder=Inbox".
+		"deliverToFolder=";
+		if (defined($args{deliverToFolder})) {
+			$ini=$ini.$args{deliverToFolder};
+		}
+		$ini=$ini."\n\n";
+		return $ini;
+	}
+
+	if ($account =~ /^smtp\// ) {
+		$ini=$ini."; server: The server to use.\n".
+		"server=";
+		if (defined($args{server})) {
+			$ini=$ini.$args{server};
+		}
+		$ini=$ini."\n\n".
+		"; port: The port to use for connecting to the server.\n".
+		"port=";
+		if (defined($args{port})) {
+			$ini=$ini.$args{port};
+		}else {
+			$ini=$ini."25";
+		}
+		$ini=$ini."\n\n".
+		"; timeout: The timeout in seconds.\n".
+		"timeout=";
+		if (defined($args{timeout})) {
+			$ini=$ini.$args{timeout};
+		}else {
+			$ini=$ini."30";
+		}
+		$ini=$ini."\n\n".
+		"; user: The user to authenticate using.\n".
+		"user=";
+		if (defined($args{user})) {
+			$ini=$ini.$args{user};
+		}
+		$ini=$ini."\n\n".
+		"; pass: The pass word to use when authenticating.\n".
+		"pass=";
+		if (defined($args{pass})) {
+			$ini=$ini.$args{pass};
+		}
+		$ini=$ini."\n\n".
+		"; useSSL: A boolean value indicating wether SSL should be used or not.\n".
+		"; 0 = false     1 = true\n".
+		"useSSL=";
+		if (defined($args{useSSL})) {
+			$ini=$ini.$args{useSSL};
+		}else {
+			$ini=$ini."0";
+		}
+		$ini=$ini."\n\n".
+		"; name: The name for use with this account.\n".
+		"name=";
+		if (defined($args{name})) {
+			$ini=$ini.$args{name};
+		}
+		$ini=$ini."\n\n".
+		"; from: The from address for this account.\n".
+		"from=";
+		if (defined($args{from})) {
+			$ini=$ini.$args{from};
+		}
+		$ini=$ini."\n\n".
+		"; saveTo: The account to save the message to post sending.\n".
+		"; example: saveTo=imap/whatever\n".
+		"saveTo=";
+		if (defined($args{saveTo})) {
+			$ini=$ini.$args{saveTo};
+		}
+		$ini=$ini."\n\n".
+		"; saveToFolder: The folder to save to.\n".
+		"; example: saveToFolder=Sent\n".
+		"saveToFolder=";
+		if (defined($args{saveToFolder})) {
+			$ini=$ini.$args{saveToFolder};
+		}else {
+			$ini=$ini."Sent";
+		}
+		$ini=$ini."\n\n".
+		"; usePGP: Where or not PGP should be used or not. This is a boolean value.\n".
+		"; 0 = false    1 = true\n".
+		"usePGP=";
+		if (defined($args{usePGP})) {
+			$ini=$ini.$args{usePGP};
+		}else {
+			$ini=$ini."0";
+		}
+		$ini=$ini."\n\n".
+		"; pgpType: The signing type for the message.\n".
+		"; clearsign: Clear sign the message.\n".
+		"; mimesign: Attach the signature as a attachment.\n".
+		"pgpType=";
+		if (defined($args{pgpType})) {
+			$ini=$ini.$args{pgpType};
+		}else {
+			$ini=$ini."clearsign";
+		}
+		$ini=$ini."\n\n".
+		"; PGPkey: The PGP to use. A list can be found using 'gpg -K'.\n".
+		"PGPkey=";
+		if (defined($args{PGPkey})) {
+			$ini=$ini.$args{PGPkey};
+		}
+		$ini=$ini."\n\n".
+		"; PGPdigestAlgo: The digest algorithym to use.\n".
+		"; To find what out what your version supports, run 'gpg --version'.\n".
+		"PGPdigestAlgo=";
+		if (defined($args{PGPdigestAlgo})) {
+			$ini=$ini.$args{PGPdigestAlgo};
+		}
+		$ini=$ini."\n";
+		
+		return $ini;
+	}
+
+	
+	#account type was not matched
+	return undef;
+}
+
+#breaks it down from $ini->{_}
+sub iniTOargs{
+	my $raw=$_[0];
+	
+	my $ini=Config::Tiny->read_string($raw);
+
+	my @keys=keys(%{ $ini->{_} });
+
+	my %args;
+	my $int=0;
+	while (defined( $keys[$int] )) {
+		$args{ $keys[$int] }=$ini->{_}->{ $keys[$int] };
+		$int++;
+	}
+
+	return %args;
+}
+
+#gets the options
+my %opts=();
+getopts('a:A:z:s:f:', \%opts);
+my %args;
+
+#makes sure we have a account specified
+if (! defined($opts{a}) ) {
+	warn('zcmailaccount: No account, -a, specified');
+	exit 254;
+}
+
+#make sure we have a action.
+if (! defined($opts{A}) ) {
+	warn('zcmailaccount: No action, -A, specified');
+	exit 254;
+}
+
+#makes sure -f points to a file
+if (
+	(defined($opts{f})) &&
+	(! -f $opts{f})
+	) {
+	warn('zcmailaccount: "'.$opts{f}.'" does not exist or it not a file');
+	exit 254;
+}
+
+#make sure it is a valid account type
+if (
+	( $opts{a} !~ /^pop3\// ) &&
+	( $opts{a} !~ /^imap\// ) &&
+	( $opts{a} !~ /^mbox\// ) &&
+	( $opts{a} !~ /^maildir\// ) &&
+	( $opts{a} !~ /^smtp\// ) &&
+	( $opts{a} !~ /^exec\// ) &&
+	( $opts{A} ne 'list' )
+	) {
+	warn('zcmailaccount: No valid account type specified');
+	exit 254;
+}
+
+#make sure the action is supported
+if (
+	($opts{A} ne "add") &&
+	($opts{A} ne "edit") &&
+	($opts{A} ne "list") &&
+	($opts{A} ne "remove") &&
+	($opts{A} ne "show") &&
+	($opts{A} ne "template")
+	) {
+	warn('zcmailaccount: No valid action specified');
+	exit 254;
+}
+
+#make sure a editor is present for editing or adding
+#as long as -f is not present
+if (
+	(
+	 ($opts{A} eq "add") && (!defined( $opts{f} )) ||
+	 ($opts{A} eq "edit") && (!defined( $opts{f} ))
+	 ) &&
+	( !defined($ENV{EDITOR}) )
+	) {
+	warn('zcmailaccount: $ENV{EDITOR} not defined.');
+	exit 254;
+}
+
+#create a custom ZConf object if needed
+my $zconf;
+if (defined($opts{z})) {
+	$zconf=ZConf->new({file=>$opts{z}});
+	if ($zconf->error) {
+		warn('zcmailaccount: Failed to start ZConf using the config file "'.$opts{z}.'"');
+		exit $zconf->error;
+	}
+}
+
+#initializes it
+my $mail=ZConf::Mail->new({zconf=>$zconf});
+
+#change set if requests
+if (defined($opts{s})) {
+	$mail->readSet($opts{s});
+	if ($mail->error) {
+		warn('zcmailaccount: readSet failed. error="'.
+			 $mail->error.'" errorString="'.$mail->errorString.'"');
+
+		exit $mail->error;
+	}
+}
+
+#makes sure it exists if it is edit, remove, or show
+if (
+	($opts{A} eq 'edit') ||
+	($opts{A} eq 'remove') ||
+	($opts{A} eq 'show')
+) {
+	my $exists=$mail->accountExists($opts{a});
+	if (!$exists) {
+		warn('zcmailaccount: The account does not exist');
+		exit 254;
+	}
+}
+
+#handle it if it is a add
+if ( $opts{A} eq 'add' ) {
+	addORedit($opts{a}, $mail, $opts{f}, 'add');
+	exit 0;
+}
+
+#handle it if it is a add
+if ( $opts{A} eq 'edit' ) {
+	addORedit($opts{a}, $mail, $opts{f}, 'edit');
+	exit 0;
+}
+
+#handle it if it is a show
+if ( $opts{A} eq 'list' ) {
+	my @accounts=$mail->getAccounts;
+	if ($mail->error) {
+		warn('zcmailaccount: delAccount failed. error="'.
+			 $mail->error.'" errorString="'.$mail->errorString.'"');
+		
+		exit $mail->error;
+	}
+	print join("\n", @accounts)."\n";
+	exit 0;
+}
+
+#handle it if it is a remove
+if ( $opts{A} eq 'remove' ) {
+	$mail->delAccount($opts{a});
+	if ($mail->error) {
+		warn('zcmailaccount: delAccount failed. error="'.
+			 $mail->error.'" errorString="'.$mail->errorString.'"');
+		
+		exit $mail->error;
+	}
+	exit 0;
+}
+
+#handle it if it is a show
+if ( $opts{A} eq 'show' ) {
+	show($opts{a}, $mail);
+	exit 0;
+}
+
+#handle it if it is a show
+if ( $opts{A} eq 'template' ) {
+	print createINI({}, $opts{a});
+
+	exit 0;
+}
+
+#we should never get here... there is a bug some place above
+warn('zcmailaccount: Something is wrong. Never matched a action');
+exit 254;
+
+=head1 NAME
+
+zcmailaccount - Manages ZConf::Mail accounts.
+
+=head1 SYNOPSIS
+
+zcmailaccount B<-a> <account> B<-A> add [B<-f> <file>] [B<-s> <set>] [B<-z> <ZConf config>]
+
+zcmailaccount B<-a> <account> B<-A> edit [B<-f> <file>] [B<-s> <set>] [B<-z> <ZConf config>]
+
+zcmailaccount B<-A> list [B<-s> <set>] [B<-z> <ZConf config>]
+
+zcmailaccount B<-a> <account> B<-A> remove [B<-s> <set>] [B<-z> <ZConf config>]
+
+zcmailaccount B<-a> <account> B<-A> show
+
+zcmailaccount B<-a> <account> B<-A> template [B<-s> <set>] [B<-z> <ZConf config>]
+
+=head1 DESCRIPTION
+
+This allows easy managing for ZC::Mail accounts.
+
+It uses a INI formated file for editing, adding, or showing accounts.
+
+=head1 SWITCHES
+
+=head2 -a
+
+This is the account to work on.
+
+=head2 -A
+
+The action to perform.
+
+=head2 -f
+
+The file to use, instead of invoking $ENV{EDITOR}.
+
+=head2 -s
+
+The ZConf set to use.
+
+=head2 -z
+
+The ZConf config to use.
+
+=head1 Actions
+
+=head2 add
+
+This adds a new account.
+
+It will invoke $ENV{EDITOR} for editing a create INI file that
+will provide description etc for the account.
+
+The -f arguement may be used to provide a INI file for it, instead
+of invoking a editor.
+
+=head2 edit
+
+This edits a existing account.
+
+It will invoke $ENV{EDITOR} for editing a create INI file that
+will provide description etc for the account.
+
+The -f arguement may be used to provide a INI file for it, instead
+of invoking a editor.
+
+=head2 list
+
+This lists the various accounts.
+
+=head2 remove
+
+This removes a specified account.
+
+=head2 show
+
+This dumps a account to a INI file, with descriptions.
+
+=head2 template
+
+This creates a for a account, but does not file it out, like with show.
+
+=head1 ACCOUNT NAMING
+
+All accounts are in the formats as of below.
+
+    $type/$name
+
+The name may not have a "/" in it.
+
+The supported types are as below.
+
+    exec
+    imap
+    pop3
+    smtp
+
+For more information, see ZConf::Mail.
+
+=head1 EXIT CODES
+
+Sucess means a exit code of zero.
+
+Any thing else indicates an error.
+
+254 means it something with in this script. Any thing else
+is the ZConf::Mail error code.
+
+=head1 AUTHOR
+
+Copyright (c) 2011, Zame C. Bowers-Hadley <vvelox@vvelox.net>
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+     this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+xFOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS` OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=head1 SCRIPT CATEGORIES
+
+Desktop
+Mail
+
+=head1 OSNAMES
+
+any
+
+=head1 README
+
+zcgetmail - Fetches mail for a ZConf::Mail account.
+
+=cut
+
+=cut
+

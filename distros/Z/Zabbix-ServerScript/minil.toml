@@ -1,0 +1,5 @@
+name = "Zabbix-ServerScript"
+# badges = ["travis"]
+#module_maker="ModuleBuildTiny"
+module_maker="ModuleBuild"
+authors_from="lib/Zabbix/ServerScript.pm"

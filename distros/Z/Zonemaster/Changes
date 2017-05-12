@@ -1,0 +1,148 @@
+Revision history for Perl module Zonemaster.
+
+v1.0.16 2016-12-12
+
+- Updated and added Swedish translations (#249, #248, #216, #196, partially #127)
+- Corrected installation instructions for Debian/Ubuntu (#240)
+- If one nameserver is "lame" then the Basic test could halt on that and not
+  continue with next nameserver. Fixed in #239.
+- Added test for NSEC3 OPT-OUT (#226).
+- Using different IP address in unit test to avoid false fail (#219).
+- Remove dependency on Net::IP::XS (#174).
+- Updated the algorithm for discovering open resolvers to be more correct (#171).
+
+v1.0.15 2016-10-14
+
+- DNSSEC:EXTRA_PROCESSING_BROKEN when not authoritative #210
+- Remove dependency on Net::IP::XS, use Net::IP (#174)
+- remove-JSON-XS-from-installation (#208)
+- Add filters to hostnames / messages (#206)
+- Bug in comparison between parent and child (dotse/zonemaster#439)
+- Fixing can't call method "rcode" on an undefined value at (dotse/zonemaster#463)
+- Fixing french FAQ last version (dotse/zonemaster#210)
+- Modify the "Notice" information when DNSSEC not signed (#193)
+- Fixing CONNECTIVITY:NAMESERVER_NO_UDP_53 (and TCP) when ns not authoritative (#209)
+- Fix perl warning about unquoted 'refs' (#229)
+- Fixing issue while running "make test" in "CentOS Linux (#230)
+- Add missing dependency in dotse/zonemaster-engine/docs/installation.md
+
+
+v1.0.14 2016-06-15
+
+ - Make it possible to run tests without network (pull request #166)
+ - Error in status message (Zone category) issue #175
+ - Fixed Swedish translation, issue #176 
+ - no public symbols defined for Zonemaster::NSArray issue #446 
+ - uninitialized value $tld (issue #179)
+ - Would be nice to add a count of name servers #453  
+ - Partly resolved "JSON/JSON::XS usage and requirement", see issue #165 
+ - nameserver03 test should not perform network requests, issue #168 
+ - Locale files are not generated nor installed #173
+ - ASN test should only look at authoritative nameservers at the child, issue #441 
+ - Modify the "Notice" information when DNSSEC not signed, issue #193
+ - Implement updated test case dnssec02, issue #187
+ - Log issues (pull request #203)
+ - Delegation::ARE_AUTHORITATIVE display too many name servers + translation, issue #186 
+ - False positive on open recursive name server, issue #171
+
+v1.0.13 2016-01-27
+ - Updates to MANIFEST.skip
+
+v1.0.12 2015-12-22
+ - Fixed pod testing
+ - Fixed links in pods
+ - Update CPAN dependencies for centos
+
+v1.0.11 2015-12-17
+ - Added IANA profile
+ - Fixed a spelling error
+
+v1.0.10 2015-11-18
+ - Proper Makefile regex in MANIFEST.SKIP
+
+v1.0.9 2015-11-17
+ - Removed files from distribution, added to MANIFEST.SKIP, #153 #154
+
+v1.0.8 2015-11-16
+ - Make test should work much better, #149 #137 #139 #121
+ - Translation fixes for French and Swedish #144
+ - Better output for ASN debug messages #138
+ - Fixes for Upper and lower case queries, #128
+ - Fixes in output of arrays in log messages
+ - Increase EDNS0_BAD_QUERY message severity level
+
+v1.0.7 2015-10-01
+ - ASN in logs are now arrays
+ - Make test witout IPv6 connectivity works, fixes #121
+ - Now requires Net::Socket::IP
+ - Fixes malformed log messages
+
+v1.0.6 2015-09-16
+ - Fix for removal of Text::Capitalize
+
+v1.0.5 2015-09-10
+ - Removes dependency on Text::Capitalize (issue #110 and #109)
+ - Split the ns and address args fields in the log (continuing work), including RECURSE_QUERY
+ - Added get_max_level() to Zonemaster::Logger
+ - Added blacklisting functionality for non-responding name servers (issue #96)
+ - Removed GOST functionality
+ - Improved test coverage
+ - Fixed the test nameserver08 (issue #93 and issue #94)
+
+v1.0.4 2015-06-24
+ - Fixed NSEC3 iterations evaluation, issue #77
+ - Key size info on DNSKEY records, issue #79
+ - Signature expiration info, issue #13
+ - Added new test case, nameserver08, QNAME case insensitivity
+ - Fixed English log entry on open recursors, issue #76
+ - Added new test case, nameserver07, upward referrals
+ - Fixed nameserver response times, issue cli #20
+ - Fix empty key list crash, issue zonemaster #320
+ - Logging improvements, work on issue #60
+ - Improvements on JSON output
+ - Fixed locale problems
+
+v1.0.3 2015-04-07
+ - Add message stating clearly that a name is not a domain.
+ - Check more thoroughly that answers are answers when building zone NS
+   list.
+ - Source address settable by nameserver object with a global default.
+ - Documentation updates.
+ - Log information on how and when a test was started.
+ - Fix capitalization bug in consistency04.
+ - Cache was not properly cleared.
+ - Fix for crash bug.
+ - Updated DNSSEC policy
+ - Refer to overview page from Zonemaster page.
+ - Fix missed corner case in parent-finding algorithm.
+ - CNAME handling accidentally left outside check for packet existence.
+ - Clearer message when failling signature checks because GOST support is
+   not present.
+
+v1.0.2 2015-02-24
+ - Run most DNSSEC tests even when there is no DS.
+ - Raise Net::LDNS requirement to v0.71. Closes #17. Closes #18.
+ - Document policy data.
+ - Make it so the policy can decide which test cases should be run by
+   default.
+ - Make sure dnssec11 emits one and only one message.
+ - [BugFix] Classless in-addr.arpa #14
+
+v1.0.1 2014-12-30
+ - Raise version numbers for changed modules.
+ - Change level of open AXFR message to NOTICE.
+ - CNAME was not handled correctly when looking up addresses for names.
+ - Faked DS response packets should have AA set.
+ - Add and/or adjust Swedish translations to match en.po.
+ - Fix NSEC3PARAM issue reported by Jakob Schlyter.
+
+v1.0.0 2014-12-11 Public beta release.
+
+v0.1.0 2014-11-17 Alpha test release.
+
+v0.0.8 2014-11-04 Developer release.
+
+v0.0.7 2014-10-30 Developer release.
+
+v0.0.2 2014-05-25 Initial developer release.
+

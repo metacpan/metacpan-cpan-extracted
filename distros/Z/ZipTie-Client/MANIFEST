@@ -1,0 +1,13 @@
+AUTHORS
+MANIFEST
+LICENSE
+README
+Makefile.PL
+lib/ZipTie/Client.pm
+backup.pl
+config.pl
+discover.pl
+import.pl
+inventory.pl
+t/Basic.t
+META.yml                                 Module meta-data (added by MakeMaker)

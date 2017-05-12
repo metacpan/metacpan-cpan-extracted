@@ -1,0 +1,25 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/ZMQ/Constants.pm
+lib/ZMQ/Constants/V2_1_11.pm
+lib/ZMQ/Constants/V3_1_1.pm
+lib/ZMQ/Constants/V3_1_2.pm
+lib/ZMQ/Constants/V4_0_4.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+t/000_basic.t
+t/001_v3.1.1.t
+t/002_v3.1.2.t
+t/003_v2.1.11.t
+t/004_v4.0.4.t
+tools/extract_missing.pl
+xt/999_pod-coverage.t
+xt/999_pod.t

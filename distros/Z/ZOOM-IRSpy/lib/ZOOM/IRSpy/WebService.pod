@@ -1,0 +1,333 @@
+
+package ZOOM::IRSpy::WebService;
+
+=head1 NAME
+
+ZOOM::IRSpy::WebService - Accessing the IRSpy database as a Web Service
+
+=head1 INTRODUCTION
+
+Because IRSpy keeps its information about targets as ZeeRex records in
+a Zebra database, that information is available via the SRU and SRW
+web services.  These two services are very closely related: the former
+REST-like, based on HTTP GET URLs, and the latter SOAP-based.  Both
+use the same query language (CQL) and the same XML-based result
+formats.
+
+(In addition, Zebra provides ANSI/NISO Z39.50 services, but these are
+not further discussed here.)
+
+=head1 EXAMPLE
+
+Here is a example SRU URL that accesses the IRSpy database of the live
+system (although it will not be accessible to most clients due to
+firewall issues.  It is broken across lines for clarity:
+
+	http://irspy.indexdata.com:8018/IR-Explain---1?
+		version=1.1&
+		operation=searchRetrieve&
+		query=net.port=3950&
+		maximumRecords=10&
+		recordSchema=zeerex
+
+=cut
+
+# http://irspy.indexdata.com:8018/IR-Explain---1?version=1.1&operation=searchRetrieve&query=net.port=3950&maximumRecords=10&recordSchema=zeerex
+
+=pod
+
+It is beyond the scope of this document to provide a full SRU
+tutorial, but briefly, the URL above consists of the following parts:
+
+=over 4
+
+=item http://irspy.indexdata.com:8018
+
+The base-URL of the SRU server.
+
+=item IR-Explain---1
+
+The name of the SRU database.
+
+=item version=1.1, operation=searchRetrieve, etc.
+
+SRU parameters specifying the operation requested.
+
+=back
+
+The parameters are as follows:
+
+=over 4
+
+=item version=1.1
+
+Mandatory - SRU requests must contain an explicit version identifier,
+and Zebra supports only version 1.1.
+
+=item operation=searchRetrieve
+
+Mandatory - SRU requests must contain an operation.  Zebra supports
+several, as discussed below.
+
+=item query=net.port=3950
+
+When the operation is C<searchRetrieve>, a query must be specified.
+The query is always expressed in CQL (Common Query Language), which
+Zebra's IRSpy database supports as described below.
+
+=item maximumRecords=10
+
+Optional.  Specifies how many records to include in a search
+response.  When omitted, defaults to zero: the response includes a
+hit-count but no records.
+
+=item recordSchema=zeerex
+
+Optional.  Specifies what format the included XML records, if any,
+should be in.  If omitted, defaults to "dc" (Dublin Core).  Zebra's
+IRSpy database supports several schemas as described below.
+
+=back
+
+=head1 SUPPORT
+
+=head2 SUPPORTED OPERATIONS
+
+Zebra supports the following SRU operations:
+
+=over 4
+
+=item explain
+
+This operation requires no further parameters, and returns a ZeeRex
+record describing the IRSpy database itself.
+
+=item searchRetrieve
+
+This is the principle operation of SRU, combining searching of the
+database and retrieval of the records that are found.  Its behaviour
+is specified primarily by the C<query> parameter, support for which is
+described below, but also by C<startRecord>, C<maximumRecords> and
+C<recordSchema>.
+
+=item scan
+
+This operation scans an index of the database and returns a list of
+candidate search terms for that index, including hit-counts.  Its
+behaviour is specified primarily by the C<scanClause> parameter, but
+also by C<maximumTerms> and C<responsePosition>.
+
+Here is an example SRU Scan URL:
+
+	http://irspy.indexdata.com:8018/IR-Explain---1?
+		version=1.1&
+		operation=scan&
+		scanClause=dc.title=fish
+
+This lists all words occurring in titles, in alphabetical order,
+beginning with "fish" or, if that word does not occur in any title,
+the word that immediately follows it alphabetically.
+
+The C<scanClause> parameter is a tiny query, consisting only an
+index-name, a relation (usually "=") and a term.  The supported index
+names are the same as those listed below.
+
+=back
+
+=head2 CQL SUPPORT
+
+The following CQL context sets are supported, and are recognised in
+queries by the specified prefixes:
+
+=over 4
+
+=item cql
+
+The CQL context set.
+http://www.loc.gov/standards/sru/cql/cql-context-set.html
+
+=item rec
+
+The Record Metadata context set.
+http://srw.cheshire3.org/contextSets/rec/1.1/
+
+=item net
+
+The Network context set.
+http://srw.cheshire3.org/contextSets/net/
+
+=item dc
+
+The Dublin Core context set.
+http://www.loc.gov/standards/sru/cql/dc-context-set.html
+
+=item zeerex
+
+The ZeeRex context set.
+http://srw.cheshire3.org/contextSets/ZeeRex/
+
+=back
+
+Within those sets, the following indexes are supported:
+
+=over 4
+
+=item cql.anywhere
+
+=item cql.allRecords
+
+=item rec.id
+
+=item net.protocol
+
+=item net.version
+
+=item net.method
+
+=item net.host
+
+=item net.port
+
+=item net.path
+
+=item dc.title
+
+=item dc.creator
+
+=item zeerex.numberOfRecords
+
+=item zeerex.set
+
+=item zeerex.index
+
+=item zeerex.attributeType
+
+=item zeerex.attributeValue
+
+=item zeerex.schema
+
+=item zeerex.recordSyntax
+
+=item zeerex.supports_relation
+
+=item zeerex.supports_relationModifier
+
+=item zeerex.supports_maskingCharacter
+
+=item zeerex.default_contextSet
+
+=item zeerex.default_index
+
+=back
+
+These indexes may in general be used with all the relations
+C<<>,
+C<<=>,
+C<=>,
+C<E<gt>=>,
+C<E<gt>>,
+C<<E<gt>>
+and
+C<exact>,
+although of course not all combinations of index and relation make
+sense.
+The masking characters
+C<*>
+and
+C<?>
+may be used in all appropriate circumstances, as may the
+word-anchoring character C<^>.
+
+Finally, sorting criteria may be specified within the query itself.
+Since YAZ's CQL parser does not yet implement the recently approved
+CQL 1.2 sorting extension described at
+http://zing.z3950.org/cql/sorting.html a different scheme is used
+involving special relation modifiers, C<sort>, C<sort-desc> and
+C<numeric>.
+
+When a search-term that carries either the C<sort> or C<sort-desc>
+relation-modifier is C<or>'d with a query, the results of that query
+are sorted according to the value associated with the specified index
+- for example, sorted by title if the query is C<or>'d with
+C<dc.title=/sort 0>.  In such sort-specification query terms, the term
+itself (C<0> in this example) is the precendence of the sort-key, with
+zero being highest.  Further less significant sort keys may also be
+specified, using higher-valued terms.  By default, sorting is
+lexicographical (alphabetical); however, if the additional relation
+modified C<numeric> is also specified, then numeric sorting is used.
+
+For example, the query:
+
+ net.host = *.edu and dc.title=^a* or net.port=/sort/numeric 0
+
+Finds records describing services hosted in the C<.edu> domain and
+whose titles' first words begin with the letter C<a>, and sorts the
+results in numeric order of the port number that they run on.  And the
+query:
+
+ net.host = *.edu or net.port=/sort/numeric 0 or net.path=/sort-desc 1
+
+Sorts all the C<.edu>-hosted services numerically by port; and further
+sorts each equivalence class of services running the same port
+alphabetically, descending, by database name.
+
+=head2 RECORD SCHEMAS
+
+The IRSpy Zebra database supports record retrieval using the following
+schemas:
+
+=over 4
+
+=item dc
+
+Dublin Core records (title, creator, description, etc.)
+
+=item zeerex
+
+ZeeRex records, the definitive version of the information that drives
+the database.  These records use an extended version of the ZeeRex 2.0
+schema that also includes an <irspy:status> element at the end of the
+record.
+
+=item index
+
+An XML format that prescribes how the record is indexed for
+searching.  This is useful for debugging, but not likely to be very
+exciting for casual passers-by.
+
+=back
+
+=head1 SEE ALSO
+
+C<ZOOM::IRSpy>
+
+The specifications for SRU (REST-like Web Service) at
+http://www.loc.gov/sru
+
+The specifications for SRW (SOAP-based Web Service) at
+http://www.loc.gov/srw
+
+The Z39.50 specifications at
+http://lcweb.loc.gov/z3950/agency/
+
+The ZeeRex specifications at
+http://explain.z3950.org/
+
+The Zebra database at
+http://indexdata.com/zebra
+
+=head1 AUTHOR
+
+Mike Taylor, E<lt>mike@indexdata.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2006 by Index Data ApS.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.7 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut
+
+1;

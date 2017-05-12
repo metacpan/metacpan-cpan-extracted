@@ -1,0 +1,7 @@
+<%args>
+$op
+$id => undef
+</%args>
+<& /chrome/layout.mc, %ARGS,
+    title => ucfirst($op) . " target record",
+    component => "/details/edit.mc" &>

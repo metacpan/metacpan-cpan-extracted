@@ -1,0 +1,12 @@
+Revision history for ZConf-DBI
+
+0.1.0	 2012-05-30/15:00
+		 -Now uses Error::Helper.
+		 -Now uses Error::Helper in regards to checking ZConf methods.
+
+0.0.1	2010-03-12/03:30
+		-Correct use the password for the passwod instead of the user in the
+			method 'connect'.
+
+0.0.0	2010-03-12/23:50
+		-Initial release.

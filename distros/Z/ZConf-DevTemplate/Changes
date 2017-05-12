@@ -1,0 +1,19 @@
+Revision history for ZConf-DevTemplate
+
+0.1.1	2010-08-16/17:00
+		-Added a missing dependency.
+
+0.1.0	2010-07-17/00:32
+		-Clean up any instance of the word 'function'.
+		-Increased sanity checking.
+		-Better error checking.
+		-Improved examples in regards to error handling.
+
+0.0.2	2009-10-31/15:20
+		-The GUI module created will now check to make sure a backend is updated.
+
+0.0.1	2009-10-23/14:40
+		-Correct initilization in the template.
+
+0.0.0   2009-10-23/14:00
+		-Initial release.

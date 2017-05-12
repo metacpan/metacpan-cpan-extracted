@@ -1,0 +1,45 @@
+---
+abstract: 'Remote execution shell over SSH'
+author:
+  - 'SiYu Zhao <zuyis@cpan.org>'
+build_requires:
+  Test::More: '0.96'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.044, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Zed
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  AnyEvent: '0'
+  AnyEvent::Socket: '0'
+  Data::Printer: '0'
+  File::Spec: '0'
+  Module::Runtime: '0'
+  Net::OpenSSH: '0'
+  Path::Tiny: '0'
+  Pod::Find: '0'
+  Pod::Usage: '0'
+  Term::ANSIColor: '0'
+  Term::ReadLine: '0'
+  Term::ReadLine::Gnu: '0'
+  Term::ReadPassword: '0'
+  YAML::XS: '0'
+resources:
+  bugtracker: https://github.com/sawater/Zed/issues
+  homepage: https://github.com/sawater/Zed
+  repository: https://github.com/sawater/Zed.git
+version: '0.03'
+x_contributors:
+  - 'milkwine <d.chaser.zsy@gmail.com>'

@@ -1,0 +1,67 @@
+Revision history for ZMQx::Class
+
+0.006   2014-10-02T03:57:49+0200
+    - added task distribution example (David Schmidt)
+    - Only close open sockets in close(), updated dependency reference from ZMQ::LibZMQ3 to ZMQ::FFI (Michael Kröll)
+    - lazy_pirate socket reset (Thomas Klausner)
+    - Confess instead of die, cleanup (Klaus Ita)
+    - Better diagnostics when (failing to) decode payloads garbled on the wire. (Nicholas Clark)
+    - Flag-day re-ordering of on_error's parameters to be consistent with return's. (Nicholas Clark)
+    - Change rpc_bind() from an exported subroutine to a method. (Nicholas Clark)
+    - A much simpler structure for creating client/server tests. (Nicholas Clark)
+    - Refactor the RPC test to avoid using timers. (Nicholas Clark)
+    - Fix the RPC::Message::Response escape hatch. (Nicholas Clark)
+    - Handle ROUTER sockets properly. (Nicholas Clark)
+    - coverted Loop.pm to parametric role; store allowed comands in dispatch table; passthrough mode via payload=>raw (Thomas Klausner)
+    - finished message/header objects, loop, some tests (Thomas Klausner)
+    - added ZMQx::RPC::Message with first test (Thomas Klausner)
+    - Ensure that send() always passes strings as sequences of UTF-8 to ZMQ::FFI (Nicholas Clark)
+    - Add a send_bytes method, for when you really need to send raw bytes. (Nicholas Clark)
+    - Update send() to reflect the (non-)return value from ZMQ::FFI::send(). (Nicholas Clark)
+    - Create a proper test case showing the UTF-8 / zmq issue (Klaus Ita)
+    - Call the correct ->socket  (RT63106_Building_deb_for_0mq_4) (Klaus Ita)
+    - ZMQx::Class for ZMQ::FFI module (Klaus Ita)
+    - added ZMQ_LAST_ENDPOINT helper (Thomas Klausner)
+
+
+0.005   2013-08-05T15:57:14+0200
+    - removed ZMQx::Class::AnyEvent in favour of $socket->anyevent_watcher
+      (Thomas Klausner)
+    - implemented $socket->send($string) (Thomas Klausner)
+    - croak if cannot bind/connect (Thomas Klausner)
+    - inproc push/pull (Thomas Klausner)
+    - better fork safety (Klaus Ita)
+    - use fd internally (Klaus Ita)
+    - started with docs, added a pub/sub example (Thomas Klausner)
+    - deprecated receive_multipart(), replaced by receive() (Thomas Klausner)
+    - removed  wait_for_message (suggested by Marc Lehmann) (Thomas Klausner)
+    - removed receive_all_multipart_messages (Thomas Klausner)
+    - proper & working implementation of receive_multipart (Thomas Klausner)
+    - aded get_events (Thomas Klausner)
+
+
+0.004   2013-02-19T22:07:43+0100
+    - warn when trying to set a sockopt after connecting (Thomas Klausner)
+    - pass sockopts to ZMQx::Class->socket (Thomas Klausner)
+    - ZMQx::Class->socket now works without $context (gets it from singleton)
+
+
+0.003   2013-01-18T09:43:30+0100
+    - smarter send method that can handle single, multipart and
+      flags (Thomas Klausner)
+    - added tests (Thomas Klausner)
+    - added get_sockopt helper methods (Thomas Klausner)
+    - use zmq_msg_send instead of zmq_sendmsg (Thomas Klausner)
+    - new_context, context (Klaus Ita)
+    - added wait_for_message (Thomas Klausner)
+
+
+0.002   2013-01-07T15:13:24+0100
+    - create set_SOCKOPT shortcut methods
+    - use random port numbers to avoid clashes in tests
+    - added ZMQx::Class->context
+
+
+0.001
+    - started new dist
+

@@ -1,0 +1,48 @@
+Revision history for Zenoss
+
+1.00        Sun Dec  5 02:11:38 EST 2010
+            - Initial release of Zenoss Perl module
+
+1.01        Mon Dec  6 12:07:12 EST 2010
+            - Fixed some documentation issues
+            - Generating using make dist, so now we have META.yml
+
+1.02        Mon Dec  6 12:54:23 EST 2010
+            - Fixed some more documentation issues
+            - Added some additional documentation
+
+1.03        Mon Dec  6 15:36:24 EST 2010
+            - Changed MOOSE to Moose for prerequisites
+
+1.04        Mon Dec  6 17:21:18 EST 2010
+            - CPAN recommended I change the name of the module to Zenoss from Zenoss::API
+
+1.05        Tue Dec  7 12:25:01 EST 2010
+            - Found some other bits on the documentation that required clarification.
+
+1.06        Fri Dec 10 17:16:21 EST 2010
+            - Zenoss::Response hash() was renamed to decoded().  This is because JSON can return an ARRAYREF as well
+            - Zenoss::Response hash(), now called decoded(), now only returns the result JSON data structure, unless result doesnt exist
+            - New attributes in Zenoss::Response received_tid and send_tid
+
+1.07        Mon Dec 13 10:10:59 EST 2010
+            - Adjusted Perl version requirement to >= 5.8.3 from 5.8.9.  This is essentially the requirement of Moose as well.
+            - Updated some documentation
+
+1.08        Sun Jan 16 02:16:59 EST 2011
+            - Updated Zenoss.pm to process login to Zenoss upon establishing object.  This will allow for better upfront error checking
+            - Fixed some documentation errors in Zenoss::Router::Device
+
+1.09        Sun Aug 14 14:15:32 EDT 2011
+            - rt.cpan.org # 70143 - Documentation fixes
+            - rt.cpan.org # 70064 - Add API features that were not documented by Zenoss - Zenoss::Router::Search
+
+1.10        Sun Aug 14 20:10:37 EDT 2011
+            - Didn't include Zenoss::Router::Search in the MANIFEST, thus PAUSE didn't process the new file for distribution.  Fixed in this version.
+
+1.11        Wed Oct 19 22:44:06 EDT 2011
+            - Due to the differing versions of Zenoss a new internal method will now detect if the API call is available for the Zenoss version.
+            - Updated Zenoss::Router::Device to support new API methods in Zenoss 3.2
+            - Updated Zenoss::Router::Mib to support new API methods in Zenoss 3.2
+            - Updated Zenoss::Router::Network to support new API methods in Zenoss 3.2
+            - Fixed bug with Zenoss::Router::Device::device_bindOrUnbindTemplate

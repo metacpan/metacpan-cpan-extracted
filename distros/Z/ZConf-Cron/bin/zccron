@@ -1,0 +1,139 @@
+#!/usr/bin/perl
+#Copyright (c) 2012, Zane C. Bowers-Hadley
+#All rights reserved.
+#
+#Redistribution and use in source and binary forms, with or without modification,
+#are permitted provided that the following conditions are met:
+#
+#   * Redistributions of source code must retain the above copyright notice,
+#    this list of conditions and the following disclaimer.
+#   * Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#
+#THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+#ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
+#WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+#IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+#INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
+#BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
+#DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+#LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+#OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+#THE POSSIBILITY OF SUCH DAMAGE.
+
+use strict;
+use warnings;
+use Getopt::Std;
+use ZConf::Cron;
+
+$Getopt::Std::STANDARD_HELP_VERSION = 1;
+
+#version function
+sub main::VERSION_MESSAGE {
+	print "zccron 0.1.0\n";
+};
+
+#print help
+sub main::HELP_MESSAGE {
+	print "\n".
+		"-s <zconf set>  The zconf set to use.\n".
+		"-t <tab>  The tab to use.\n\n".
+		"See 'perldoc zccron' for more info.\n";
+}
+
+# within_interval is copied from http://datetime.perl.org/index.cgi?FAQSampleCalculations
+sub within_interval {
+    my ($dt1, $dt2, $interval) = @_;
+
+    # Make sure $dt1 is less than $dt2
+    ($dt1, $dt2) = ($dt2, $dt1) if $dt1 > $dt2;
+
+    # If the older date is more recent than the newer date once we
+    # subtract the interval then the dates are closer than the
+    # interval
+    if ($dt2 - $interval < $dt1) {
+        return 1;
+    } else {
+        return 0;
+    };
+}
+
+#gets the options
+my %opts=();
+getopts('s:t:', \%opts);
+
+if (!defined($opts{t})) {
+	$opts{t}="default";
+}
+
+#inits ZConf::Cron
+my $zccron=ZConf::Cron->new;
+if ( $zccron->error ){
+	exit $zccron->error;
+}
+if ( defined( $opts{s} ) ){
+	$zccron->setSet( $opts{s} );
+	if ( $zccron->error ){
+		exit $zccron->error;
+	}
+}
+
+$zccron->runTab( $opts{t} );
+if ( ! $zccron->error ){
+	exit $zccron->error;
+}
+
+exit 0;
+
+=head1 NAME
+
+zccron - A cron like tool largely aimed at bringing up my web comics in the
+morning with a single command.
+
+=head1 SYNOPSIS
+
+zccron [B<-s> <ZConf set>] -f <tab>
+
+=head1 USAGE
+
+This will act on any cronfile it is pointed at. For it to run the command, the
+last or next time it will be will have to be within a minute. For most usages,
+you will want to have the hour and minute set to *. This allows a user to do
+something how ever many times they want any time during the period it is active.
+
+After running through every entry in the crontab, it then exits.
+
+You need to use the full path for specifying the command.
+
+=head1 AUTHOR
+
+Copyright (c) 2012, Zame C. Bowers-Hadley <vvelox@vvelox.net>
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+     this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS` OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=head1 README
+
+zccron - A single pass cron that uses ZConf as a backend.
+
+=cut

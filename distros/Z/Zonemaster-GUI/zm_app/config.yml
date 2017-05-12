@@ -1,0 +1,9 @@
+# This is the main configuration file of your Dancer app
+# env-related settings should go to environments/$env.yml
+# all the settings in this file will be loaded at Dancer's startup.
+
+appname: "zonemaster"
+charset: "UTF-8"
+template: "template_toolkit"
+server_tokens: 0
+require_environment: 1

@@ -1,0 +1,8 @@
+# Example crontab file for a weekly update cycle, testing 1/7 of the 
+# database every day. 
+#
+# m h  dom mon dow   command
+# a full update on Monday morning
+6 0 * * 1 /usr/local/src/git/irspy/bin/irspy-update.sh
+# a quick update on Wed/Fri
+6 0 * * 3,5 env irspy_test=Quick /usr/local/src/git/irspy/bin/irspy-update.sh

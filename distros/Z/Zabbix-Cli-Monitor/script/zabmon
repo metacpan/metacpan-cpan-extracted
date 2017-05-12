@@ -1,0 +1,11 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use lib 'lib';
+
+use Zabbix::Cli::Monitor;
+
+
+my $z = Zabbix::Cli::Monitor->new_with_options();
+$z->say_current_issues();

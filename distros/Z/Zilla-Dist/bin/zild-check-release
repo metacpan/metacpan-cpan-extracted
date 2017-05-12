@@ -1,0 +1,138 @@
+#!/usr/bin/env bash
+
+: "${PERL:=$(which perl)}"
+ZILD="$PERL -S zild"
+
+# Setup variables:
+{
+  META_VERSION="$($ZILD meta version)"
+  CHANGES_VERSION="$($ZILD changes version)"
+  [ -n "$CHANGES_VERSION" ] || CHANGES_VERSION=0
+}
+
+LIBPATH="$($ZILD meta =zild/libname)"
+LIBPATH="${LIBPATH:-"$($ZILD meta name)"}"
+LIBPATH="${LIBPATH//-//}"
+LIBPATH="lib/${LIBPATH//:://}.pm"
+
+NO_CHANGES_YAML="$($ZILD meta =zild/no_changes_yaml)"
+
+# Define a error reporting function:
+{
+  OK=0
+  error() {
+    echo "Error, can't release: $1" >&2
+    OK=1
+  }
+}
+
+# Make sure Meta version is also in Changes file:
+{
+  if [ -z "$NO_CHANGES_YAML" ]; then
+    if ! (grep "^version: $META_VERSION" Changes &>/dev/null); then
+      if ! (grep "^version: '$META_VERSION'" Changes &>/dev/null); then
+        if ! (grep "^- $META_VERSION" Changes &>/dev/null); then
+          error "No Changes entry for version '$META_VERSION'"
+        fi
+      fi
+    fi
+  fi
+}
+
+# Make sure Changes doesn't have empty entry:
+{
+  if (grep "^- $" Changes &>/dev/null); then
+    error "Changes has empty message"
+  fi
+}
+
+# Make sure current Meta, Changes and lib/<module> versions match:
+{
+  if [ -z "$NO_CHANGES_YAML" ]; then
+    if [ "$META_VERSION" != "$CHANGES_VERSION" ]; then
+      error "Changes version ($CHANGES_VERSION) and Meta version ($META_VERSION) do not match"
+    fi
+  fi
+
+  # Make sure this is a new version:
+  git tag | grep -E "^v?${META_VERSION//./\\.}$" &>/dev/null &&
+    error "Version '$META_VERSION' already tagged as released"
+
+  if [ "$OK" -ne 0 ] && [ -n "$PERL_ZILLA_DIST_AUTO_VIM_META_CHANGES" ]; then
+    vim Changes Meta -O -c 'normal gg4j'
+  fi
+
+  if [ -z "$(grep -r 'VERSION' lib | grep "$META_VERSION")" ]; then
+    error "No '\$VERSION = $META_VERSION' statement in lib/"
+  fi
+
+  if [ -z "$(grep -r 'VERSION' "$LIBPATH" | grep "$META_VERSION")" ]; then
+    error "No '\$VERSION = $META_VERSION' statement in $LIBPATH"
+  fi
+}
+
+# Make sure we are on the right branch:
+{
+  branch_name=$(git symbolic-ref -q HEAD)
+  branch_name=${branch_name##refs/heads/}
+  branch_name=${branch_name:-HEAD}
+
+  if [ -z "$RELEASE_BRANCH" ]; then
+    error "Can't determine RELEASE_BRANCH"
+  elif [ "$branch_name" != "$RELEASE_BRANCH" ]; then
+    error "Not on '$RELEASE_BRANCH' branch"
+  fi
+}
+
+# Make sure the `cpan-upload` is installed and configured:
+{
+  if [ -z "$(which cpan-upload)" ]; then
+    error "'cpan-upload' not installed. Run 'cpanm CPAN::Uploader'"
+  elif [ ! -e ~/.pause ]; then
+    error "No ~/.pause file. See https://metacpan.org/pod/distribution/CPAN-Uploader/bin/cpan-upload#CONFIGURATION"
+  fi
+}
+
+# Check for common Meta errors:
+{
+  if [[ "$($ZILD meta name)" =~ :: ]]; then
+    error "Meta name contains '::'. Change to '-'"
+  fi
+  if [[ "$($ZILD meta devel/git)" =~ ^git@ ]]; then
+    error "Meta devel/git begins with git@. Change to https://"
+  fi
+  if [[ "$($ZILD meta devel/git)" =~ github\.org ]]; then
+    error "Meta devel/git has github.ORG. Change to .com"
+  fi
+  if [[ "$($ZILD meta devel/bug)" =~ /$ ]]; then
+    error "Meta devel/bug ends with a /. Please remove"
+  fi
+  if [[ "$($ZILD meta devel/irc)" =~ / ]]; then
+    error "Meta devel/irc contains a /. Please change to #"
+  fi
+  if [[ "$($ZILD meta author/email)" == "you@your.name" ]]; then
+    error "Please update author email"
+  fi
+}
+
+year=$(date '+%Y')
+if [ -z "$(grep "$year" Meta)" ]; then
+  error "Meta file does not have copyright year '$year'"
+fi
+
+# Exit if any errors have been found:
+[ "$OK" -ne 0 ] && exit $OK
+
+# Make sure there are no files unaccounted for:
+# Need more `git status` verification here:
+{
+  if [ -n "$(git status -s)" ]; then
+    git status
+    if [[ "$(git status)" =~ $'\n'\#\ Untracked ]]; then
+      error "Untracked files."
+    fi
+  fi
+}
+
+# Exit with status code:
+exit $OK

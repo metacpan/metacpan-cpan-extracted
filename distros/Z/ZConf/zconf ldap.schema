@@ -1,0 +1,72 @@
+#Copyright (c) 2011, Zane C. Bowers-Hadley
+#All rights reserved.
+#
+#Redistribution and use in source and binary forms, with or without modification,
+#are permitted provided that the following conditions are met:
+#
+#   * Redistributions of source code must retain the above copyright notice,
+#    this list of conditions and the following disclaimer.
+#   * Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#
+#THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+#ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
+#WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+#IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+#INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
+#BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
+#DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+#LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+#OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+#THE POSSIBILITY OF SUCH DAMAGE.
+
+
+# 1.3.6.1.4.1.26481 Zane C. Bowers-Hadley
+#  .2 ldap
+#   .7 zconf
+#    .0 zconfData
+#    .1 zconfChooser
+#    .2 zconfSet
+#    .3 zconfRev
+
+attributeType ( 1.3.6.1.4.1.26481.2.7.0
+    NAME 'zconfData'
+    DESC 'Data attribute for a zconf entry.'
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+    EQUALITY caseExactMatch
+    )
+
+attributeType ( 1.3.6.1.4.1.26481.2.7.1
+    NAME 'zconfChooser'
+    DESC 'Chooser attribute for a zconf entry.'
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+    EQUALITY caseExactMatch
+    )
+
+attributeType ( 1.3.6.1.4.1.26481.2.7.2
+    NAME 'zconfSet'
+    DESC 'A zconf set name available in a entry.'
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+    EQUALITY caseExactMatch
+    )
+
+attributeType ( 1.3.6.1.4.1.26481.2.7.3
+    NAME 'zconfRev'
+    DESC 'The revision number for a ZConf config. Bumped with each update.'
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+    EQUALITY caseExactMatch
+    )
+
+attributeType ( 1.3.6.1.4.1.26481.2.7.4
+    NAME 'zconfLock'
+    DESC 'If this is present, this config is locked.'
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+    EQUALITY caseExactMatch
+    )
+
+objectclass ( 1.3.6.1.4.1.26481.2.7
+    NAME 'zconf'
+    DESC 'A zconf entry.'
+    MAY ( cn $ zconfData $ zconfChooser $ zconfSet $ zconfRev $ zconfLock )
+    )

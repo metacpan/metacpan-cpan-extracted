@@ -1,0 +1,1259 @@
+#!/usr/bin/env perl
+# vim: ts=8 sts=4 et sw=4 sr sta
+use strict;
+use warnings;
+use Data::Dump qw( pp );
+
+use Carp;
+use Getopt::Long;
+use Digest::MD5 qw(md5_hex);
+use File::Basename;
+use File::Copy;
+use File::Rsync;
+use File::Slurp qw(read_file write_file);
+use File::stat;
+use File::Temp qw/ tempfile /;
+use LWP::UserAgent;
+use Path::Class qw(dir);
+use Pod::Usage;
+use Readonly;
+use Template;
+use YAML;
+
+# FTP modules
+use Net::FTP;
+use File::Find;
+
+Readonly my $CONFIG_FILE => $ENV{HOME} . q{/.ttsite};
+
+# function prototypes
+sub main();
+sub process_config();
+sub get_config($$);
+sub file_checksum($);
+sub file_modified($$);
+sub same_file($$);
+sub ignore_file($$$);
+sub template_file($$);
+sub process_site($$);
+sub process_directory($$$);
+sub process_file($$$$);
+sub remote_sync($$$);
+sub read_line(;$);
+sub directory_contents($);
+sub relative_path_from_full($$);
+
+my($site_config, %cli_option, $template);
+
+# me likey worky
+main();
+
+sub main() {
+    my ($global,$cliopt) = process_config();
+    my $siteconf = get_config($global,$cliopt);
+
+    # only process files if we're NOT --rsync-only or --fsync-only
+    if (not ($cliopt->{'rsync-only'} or $cliopt->{'fsync-only'})) {
+        process_site( $siteconf, $cliopt );
+    }
+    else {
+        if ($cliopt->{verbose}) {
+            warn "Skipping template processing phase\n";
+        }
+    }
+
+    # if any of the rsync options are set, do a remote-sync
+    if (grep { /^rsync/ } keys(%{$cliopt})) {
+        print "Starting Remote Sync\n";
+        remote_sync( $cliopt, $siteconf->{output_dir}, $siteconf->{rsync} );
+    }
+
+    # if any of the ftp options are set, do an ftp-sync
+    if (grep { /^fsync/ } keys(%{$cliopt})) {
+        $cliopt->{'ftp-debug'}=1;
+        print "Starting fsync:\n";
+        do_ftpsync( $siteconf, $cliopt );
+    }
+}
+
+
+
+################################################################################
+sub process_config() {
+        my $global;
+        my $cliopt;        # load config from $CONFIG_FILE
+        eval {
+            $global = YAML::LoadFile($CONFIG_FILE);
+        };
+
+        if ($@) {
+            create_config();
+        }
+
+        $cliopt = {
+            site    => $global->{default_site} || 'default',
+            verbose => 0,
+        };
+
+        # get over-riding options from cli
+        GetOptions (
+            $cliopt,
+            'dryrun',
+            'force',
+            'fsync+',
+            'fsync-only+',
+            'ftp',
+            'ftp-only',
+            'ftp-debug',
+            'help',
+            'quiet',
+            'rsync',
+            'rsync-only',
+            'showdestination',
+            'showpath',
+            'site=s',
+            'sites',
+            'verbose+',
+        );
+
+        if ($cliopt->{help}) {
+            pod2usage();
+            exit;
+        }
+
+        return ( $global, $cliopt );
+}
+
+sub create_config {
+    my ($input);
+
+    $input = read_line(
+        qq{$CONFIG_FILE doesn't exist. Would you like it to be created now? [Y/n] }
+    );
+
+    # only create the config file if the respose was Y, y or <nothing>
+    if ($input =~ m{\A([Yy]|\z)}) {
+        # don't overwrite an existing file
+        if (-e $CONFIG_FILE) {
+            warn qq{$CONFIG_FILE already exists\n};
+            exit;
+        }
+
+        # open a file for writing
+        open (CONFFILE, ">$CONFIG_FILE")
+            or die $!;
+
+        # write out a sample config file
+        while (my $line = <DATA>) {
+            print CONFFILE <DATA>;
+        }
+        close CONFFILE;
+
+        # double-check to make sure the file exists
+        if (not -e "$CONFIG_FILE") {
+            warn qq{failed to create $CONFIG_FILE\n};
+            exit;
+        }
+
+        warn qq{$CONFIG_FILE created\n};
+    }
+    # for some reason they didn't want to create the config file
+    else {
+        warn qq{$CONFIG_FILE was NOT created\n};
+        exit;
+    }
+
+    exit;
+}
+
+sub get_config($$) {
+    my ($global, $cliopt) = @_;
+
+    if ($cliopt->{sites}) {
+        my @site_list = keys %{ $global->{site} };
+        if (not @site_list) {
+            print "No sites defined\n";
+        } else {
+            print
+                'Defined site labels: '
+                . join(q{, }, sort @site_list)
+                . "\n"
+            ;
+        }
+        exit;
+    }
+
+    # make sure site is valid
+    if (not exists $global->{site}{ $cliopt->{site} }) {
+        die "'$cliopt->{site}' is not a valid site label\n"
+            . "    sites: " .  join(',', keys %{$global->{site}}) . "\n";
+    }
+
+    if (not sane_site_config($global->{site}{ $cliopt->{site} })) {
+        warn qq{configuration problems for site section: $cliopt->{site}\n};
+        exit;
+    }
+
+
+    my $siteconf = $global->{site}{ $cliopt->{site} };
+    print Dumper($global)   if ($cliopt->{verbose} > 3);
+    print Dumper($cliopt)   if ($cliopt->{verbose} > 3);
+    print Dumper($siteconf) if ($cliopt->{verbose} > 3);
+
+    # set site config
+    return $siteconf;
+}
+
+# a quick check to raise any obvious errors with a given site-config
+sub sane_site_config {
+    my $site_config = shift;
+    my $errors = 0;
+
+    # these entries should all exist (as top-level keys) in the site-config
+    foreach my $required_key (qw[
+        source_dir
+        includes_dir
+        output_dir
+        template_files
+        ignore_dirs
+        ignore_files
+        tags
+        rsync
+    ]) {
+        if (not exists $site_config->{$required_key}) {
+            warn qq{** configuration option missing: $required_key\n};
+            $errors++;
+        }
+    }
+
+    # these directories should exist
+    foreach my $required_dir (qw[source_dir includes_dir output_dir]) {
+        # dir should exist
+        if (not -d $site_config->{$required_dir}) {
+            warn qq{** directory missing: $site_config->{$required_dir}\n};
+            $errors++;
+        }
+    }
+
+    return (not $errors);
+}
+
+sub file_checksum($) {
+    my $file = shift;
+    my ($md5);
+
+    # try to open the file
+    open(FILE,$file) or do {
+        warn "Can't open $file: $!";
+        return undef;
+    };
+    binmode(FILE);
+
+    $md5 = Digest::MD5->new->addfile(*FILE)->hexdigest;
+
+    return $md5;
+}
+
+sub file_modified($$) {
+    my ($template_file, $templated_file) = @_;
+    my ($template_stat, $templated_stat);
+
+    # if the destination file doesn't exist, it's "modified"
+    if (not -e $templated_file) {
+        return 1;
+    }
+
+    # get stat info for each file
+    $template_stat  = stat( $template_file)   or die "no file: $!\n";
+    $templated_stat = stat($templated_file)   or die "no file: $!\n";
+
+    # return true if the templated file is OLDER than the template itself
+    # i.e. the source has been altered since we last generated the final result
+    return ($templated_stat->mtime < $template_stat->mtime);
+}
+
+sub same_file($$) {
+    my ($file1, $file2) = @_;
+
+    if (! -f $file2 or ! -f $file2) {
+        return 0;
+    }
+
+    if (file_checksum($file1) eq file_checksum($file2)) {
+        return 1;
+    }
+
+    return 0;
+}
+
+sub ignore_file($$$) {
+    my ($cliopt,$config,$filename) = @_;
+
+    foreach my $ignore_me (@{ $config->{ignore_files} }) {
+        my $regex = qr/ $ignore_me /x;
+
+        if ($filename =~ $regex) {
+            warn "Ignoring '$filename'. Match on '$regex'. Ignoring.\n"
+                if ($cliopt->{verbose} > 1);
+            return 1;
+        }
+    }
+
+    return;
+}
+
+sub template_file($$) {
+    my ($config,$filename) = @_;
+
+    foreach my $ignore_me (@{ $config->{template_files} }) {
+        my $regex = qr/ $ignore_me /x;
+
+        if ($filename =~ $regex) {
+            return 1;
+        }
+    }
+
+    return;
+}
+
+sub relative_path_from_full($$) {
+    my ($config, $directory) = @_;
+    my ($relpath);
+
+    # get the relative path from the full srcdir path
+    $relpath = $directory;
+    # remove source_dir from directory path
+    $relpath =~ s:^$config->{source_dir}::;
+    # remove leading / (if any)
+    $relpath =~ s:^/::;
+
+    return $relpath;
+}
+
+sub directory_contents($) {
+    my $directory = shift;
+    my (@list);
+
+    # get a list of everything (except . and ..) in $directory
+    opendir(DIR, $directory)
+        or die("can't open '$directory': $!\n");
+
+    @list = grep { $_ !~ /^\.\.?$/ } readdir(DIR);
+
+    return @list;
+}
+
+sub item_name($$$$) {
+    my ($config, $cliopt, $directory, $item) = @_;
+    my ($filename);
+
+    # default case - just the item name
+    $filename = $item;
+
+    # if we want to see the relative path
+    if ($cliopt->{showpath}) {
+        # get the full path to the file
+        $filename = "$directory/$item";
+        # remove path to sourcedir
+        $filename =~ s{\A$config->{source_dir}/}{}xms;
+    }
+
+    return $filename;
+}
+
+sub show_destination($$$$) {
+    my ($config, $cliopt, $directory, $item) = @_;
+    my ($relpath);
+
+    # get the relative path for the directory
+    $relpath = relative_path_from_full($config, $directory);
+
+    if ($cliopt->{showdestination}) {
+        if ($relpath) {
+            warn(qq{  --> $config->{output_dir}/$relpath/$item\n});
+        }
+        # top-level files don't have a relpath and we'd prefer not to have '//' in the path
+        else {
+            warn(qq{  --> $config->{output_dir}/$item\n});
+        }
+    }
+
+    return;
+}
+
+sub process_file($$$$) {
+    my ($config, $cliopt, $directory, $item) = @_;
+    my ($relpath);
+
+    # get the relative path
+    $relpath = relative_path_from_full($config, $directory);
+
+    # set $section and $specific_section used later in the H::T filter
+    my $specific_section = $relpath || 'root';
+    $specific_section =~ s:/:_:;
+    my ($section) = ($relpath =~ /^([^\/]+)/);
+    $section = (defined $section) ? $section : 'root';
+
+    # push the section name into the vars to replace
+    my $site_vars = {
+        section     => $section,
+        source_dir  => $config->{source_dir},
+        %{ $config->{tags} }
+    };
+
+    # some files should be run through TT
+    if (template_file($config,$item)) {
+
+        # only create the template object once - it's stupid to create
+        # a new one for each file we template
+        if (not defined $template) {
+            my $tt_config = {
+                ABSOLUTE        => 1,
+                EVAL_PERL       => 0,
+                INCLUDE_PATH    => "$config->{source_dir}:$config->{includes_dir}",
+            };
+            if (defined $config->{plugin_base}) {
+                $tt_config->{PLUGIN_BASE} = $config->{plugin_base};
+            }
+
+            $template = Template->new( $tt_config );
+        }
+
+        # if the template and the destination have the same timestamp, nothing's changed
+        # HOWEVER, we only care if we're not forcing the template-output to be regenerated
+        if (not $cliopt->{force}) {
+            if (not file_modified("$directory/$item", "$config->{output_dir}/$relpath/$item")) {
+                warn "unchanged: $item\n" if ($cliopt->{verbose});
+                return;
+            }
+        }
+
+        warn (q{Templating: } . item_name($config, $cliopt, $directory, $item) . qq{\n});
+        show_destination($config, $cliopt, $directory, $item);
+
+        $template->process("$directory/$item", $site_vars, "$config->{output_dir}/$relpath/$item")
+            or Carp::croak ("\n" . $template->error());
+    }
+    # others should be copied (if they've changed
+    else {
+        # only copy files if the MD5 hasn't changed
+        if (not same_file("$directory/$item", "$config->{output_dir}/$relpath/$item")) {
+            warn (q{Copying: } . item_name($config, $cliopt, $directory, $item) . qq{\n});
+            copy("$directory/$item", "$config->{output_dir}/$relpath/$item");
+            show_destination($config, $cliopt, $directory, $item);
+        }
+    }
+}
+
+sub process_directory($$$) {
+    my ($config, $cliopt, $directory) = @_;
+    my (@list, $relpath);
+
+    @list = directory_contents($directory);
+    $relpath = relative_path_from_full($config, $directory);
+
+    # loop through the list and act 'accordingly'
+    foreach my $item (@list) {
+        # process files
+        if ( -f "$directory/$item") {
+            # skip ignored files
+            if (ignore_file($cliopt,$config,$item)) {
+                next;
+            }
+
+            process_file($config, $cliopt, $directory, $item);
+            next;
+        }
+
+        # process directories
+        elsif ( -d "$directory/$item") {
+            # skip ignored dirs
+            if ( grep { /\A$item\z/ } @{ $config->{ignore_dirs} } ) {
+                warn "Ignoring '$directory/$item'\n" if ($cliopt->{verbose});
+                next;
+            }
+
+            my $outdir = "$config->{output_dir}/$relpath/$item";
+            # make sure the directory exists in the output tree
+            if (! -d $outdir) {
+                warn "'$outdir' does not exist\n";
+                if (not mkdir($outdir)) {
+                    carp "couldn't create output directory: $!";
+                    exit;
+                }
+            }
+
+            # process the subdirectory
+            process_directory($config, $cliopt, "$directory/$item");
+            next;
+        }
+
+        # not a file ... not a directory?
+        else {
+            warn "????: $directory/$item\n";
+        }
+    }
+
+    return;
+}
+
+sub process_site($$) {
+    my ($config, $cliopt) = @_;
+    my $directory = $config->{source_dir};
+
+    process_directory($config, $cliopt, $directory);
+    return;
+}
+
+sub remote_sync($$$) {
+    my ($cliopt,$local_dir, $rsync_data) = @_;
+
+    # we need a remote host and a path
+    foreach my $required (qw[ hostname path ]) {
+        if (not exists $rsync_data->{$required}) {
+            warn "missing rsync option '$required'. rsync aborted\n";
+            return;
+        }
+    }
+
+    my $syncer = File::Rsync->new(
+        {
+            verbose         => 1,
+            recursive       => 1,
+            compress        => 1,
+            'dry-run'       => 0,
+        }
+    );
+
+    if (not defined $syncer) {
+        die "can't create syncer";
+    }
+
+    $syncer->exec(
+        {
+            src     => "$local_dir/",
+            dest    => "$rsync_data->{hostname}:$rsync_data->{path}/",
+        }
+    );
+
+    if ($cliopt->{verbose}) {
+        print $syncer->out();
+    }
+
+    if ($syncer->err()) {
+        print $syncer->err();
+    }
+
+    return;
+}
+
+sub read_line(;$) {
+    my($message) = @_;
+    my ($term, $stdout, $input);
+
+    # try to use Term::ReadLine for input
+    eval {require Term::ReadLine};
+
+    # if we have errors, fallback to simpler input method
+    if ($@) {
+        print $message if (defined $message);
+
+        my $input = (<STDIN>); chomp $input;
+        $input =~ s/^\s+//; $input =~ s/\s+$//;
+    }
+
+    # otherwise, use Term::ReadLine for input
+    else {
+        $term = Term::ReadLine->new('Foo');
+        $stdout = $term->OUT || \*STDOUT;
+        $input = $term->readline($message);
+    }
+
+    return $input;
+}
+
+#sub file_type {
+#    my ($path) = @_;
+#
+#    if (not -e $path) { return;     }
+#    if (-f $path) {     return 'f'; };
+#    if (-d $path) {     return 'd'; };
+#    if (-l $path) {     return 'l'; };
+#
+#    return '?';
+#}
+
+sub ftp_client {
+    my ($config, $cliopt, $ftp) = @_;
+
+    $config->{ftp}{hostname}    ||= 'localhost';
+    $config->{ftp}{passive}     ||= 0;
+    $config->{ftp}{username}    ||= 'anonymous';
+    $config->{ftp}{password}    ||= 'coward';
+
+    # if we have an existing FTP object - use it
+    if (defined $ftp and ref($ftp) eq 'Net::FTP') {
+        warn qq{using existing FTP object} if ($cliopt->{verbose} > 3);
+    }
+    else {
+        if (not chdir($config->{output_dir})) {
+            die qq{could not chdir to: $config->{output_dir}\n};
+        }
+
+        warn qq{creating new FTP object} if ($cliopt->{verbose} > 1);
+        $ftp = Net::FTP->new(
+            $config->{ftp}{hostname},
+            Debug   => ($cliopt->{'ftp-debug'} || 0),
+            Passive => $config->{ftp}{passive},
+        );
+        # make sure we've got a usable FTP object
+        if (not defined $ftp) {
+            warn(qq{Failed to connect to server [$config->{ftp}{hostname}]: $!\n});
+            return;
+        };
+        # try to login
+        if (not $ftp->login(
+                $config->{ftp}{username},
+                $config->{ftp}{password}
+            )
+        ) {
+            warn(qq{Failed to login as $config->{ftp}{username}\n});
+            return;
+        }
+        # try to cwd, if required
+        if (defined $config->{ftp}{working_dir}) {
+            if (not $ftp->cwd( $config->{ftp}{working_dir} ) ) {
+                warn(qq{Cannot change directory to $config->{ftp}{working_dir}\n});
+                return;
+            }
+        }
+        # use binary transfer mode
+        if (not $ftp->binary()) {
+            warn(qq{Failed to set binary mode\n});
+            return;
+        }
+    }
+
+    return $ftp;
+}
+
+#sub ftp_remote_files {
+#    my ($config, $cliopt, $ftp, $path, $rrem) = @_;
+#    my $rdir = length($path) ? $ftp->dir($path) : $ftp->dir();
+#
+#    unless ($rdir and @$rdir) {
+#        warn qq{just returning ...\n};
+#        return;
+#    }
+#
+#    foreach my $f (@$rdir) {
+#        if ($f =~ m{^d.+\s\.\.?$/}) {
+#            warn(qq{Skipping remote path: $f\n});
+#            next;
+#        }
+#
+#        my $n = (split(m{\s+}, $f, 9))[8];
+#        if (not defined $n) {
+#            warn(qq{Skipping remote path (split failed on): $f\n});
+#            next;
+#        }
+#
+#        my $name;
+#        if ($path) {
+#            $name = $path .q{/};
+#        }
+#        $name .= $n;
+#
+#        if (exists $rrem->{$name}) {
+#            next;
+#        }
+#
+#        # no point fetching size and mtime for dirs
+#        my ($type, $mdtm, $size) = (undef, 0, 0);
+#        $type = substr($f, 0, 1);
+#        $type =~ s{-}{f};
+#        if ($type ne 'd') {
+#            $mdtm = ($ftp->mdtm($name) || 0);
+#            $size = ($ftp->size($name) || 0);
+#        }
+#
+#        if ($cliopt->{verbose} > 1) {
+#            warn (
+#                  qq{ftp: adding }
+#                . $name
+#                . q{ (}
+#                . $mdtm
+#                . q{, }
+#                . $size
+#                . q{, }
+#                . $type
+#                . qq{)\n}
+#            );
+#        }
+#
+#        # store the details of the remote file
+#        $rrem->{$name} = {
+#            mdtm    => $mdtm,
+#            size    => $size,
+#            type    => $type,
+#        };
+#
+#        if ($type eq 'd') {
+#            # skip ignored dirs
+#            if ( grep { /\A$n\z/ } @{ $config->{ftp_ignore_dirs} } ) {
+#                warn "ftp: ignoring '$name'\n" if ($cliopt->{verbose});
+#                next;
+#            }
+#
+#            if ($cliopt->{verbose}) {
+#                warn qq{ftp: descending into: $name\n};
+#            }
+#            ftp_remote_files($config, $cliopt, $ftp, $name, $rrem);
+#        }
+#    }
+#
+#    return;
+#}
+
+
+#sub ftp_local_files {
+#    my ($config, $cliopt) = @_;
+#    my %loc = ();
+#
+#    # we chdir() so paths are relative locally - so we can compare with remote
+#    if (not chdir($config->{output_dir})) {
+#        die qq{could not chdir to: $config->{output_dir}\n};
+#    }
+#
+#
+#    # scan local path to see what we have
+#    find(
+#        {
+#            no_chdir    => 1,
+#            follow      => 0,   # no symlinks, please
+#            wanted => sub {
+#                if ($File::Find::name eq q{.}) {
+#                    return;
+#                }
+#
+#                my $item_name = basename($File::Find::dir);
+#                if ( grep { /\A${item_name}\z/ } @{ $config->{ftp_ignore_dirs} } ) {
+#                    warn "local: ignoring '$File::Find::name'\n" if ($cliopt->{verbose} > 1);
+#                    $File::Find::prune = 1;
+#                    return;
+#                }
+#
+#                # remove leading "./" from path/filename
+#                $File::Find::name =~ s{\A\./}{};
+#
+#                my $stat = stat( $File::Find::name );
+#
+#                my $r = $loc{$File::Find::name} = {
+#                    mdtm    => $stat->mtime,
+#                    size    => $stat->size,
+#                    type    => file_type($File::Find::name),
+#                };
+#
+#                if ($cliopt->{verbose} > 2) {
+#                    print q{local: adding }
+#                        . $File::Find::name
+#                        . q{ (}
+#                        . $r->{mdtm}
+#                        . q{, }
+#                        . $r->{size}
+#                        . q{, }
+#                        . $r->{type}
+#                        . qq{)\n}
+#                    ;
+#                }
+#            }
+#        },
+#        #$config->{output_dir}
+#        q{.}
+#    );
+#
+#    return \%loc;
+#}
+
+#sub upload_missing_files {
+#    my ($config, $cliopt, $ftp, $local, $remote) = @_;
+#
+#    my @files = sort { length($a) <=> length($b) } keys %{$local};
+#
+#    foreach my $l (@files) {
+#        #warn qq{checking for upload: $l};
+#
+#        # warn about softlinks
+#        if ($local->{$l}{type} eq 'l') {
+#            warn(qq{symbolic link not supported: $l\n});
+#            next;
+#        }
+#
+#        # deal with directories
+#        if ($local->{$l}{type} eq 'd') {
+#            if (exists $remote->{$l}) {
+#                # directory already exists remotely
+#                next;
+#            }
+#            die qq{$l dir missing in the FTP repository\n}
+#                if ($cliopt->{verbose});
+#            if ($cliopt->{dryrun}) {
+#                print "MKDIR $l\n";
+#            }
+#            else {
+#                $ftp->mkdir($l)
+#                    or die "failed to MKDIR $l\n";
+#            }
+#        }
+#
+#        # deal with everything else (files)
+#        else {
+#            if (
+#                # file exists on server
+#                exists $remote->{$l}
+#                    and
+#                # remote file was modified after local file - no need to update
+#                ($remote->{$l}{mdtm} >= $local->{$l}{mdtm})
+#            ) {
+#                warn qq{$l: remote and ($remote->{$l}{mdtm} < $local->{$l}{mdtm})\n}
+#                    if ($cliopt->{verbose} > 1);
+#                next;
+#            }
+#            else {
+#                # put, or dry-run the file
+#                if ($cliopt->{dryrun}) {
+#                    print "PUT $l $l\n";
+#                }
+#                else {
+#                    $ftp->put($l, $l)
+#                        or die "Failed to PUT $l\n";
+#                }
+#            }
+#        }
+#    }
+#}
+
+#sub delete_missing_files {
+#    my ($config, $cliopt, $ftp, $local, $remote) = @_;
+#
+#    my @files = sort { length($a) <=> length($b) } keys %{$local};
+#
+#    foreach my $r (@files) {
+#        # warn about softlinks
+#        if ($local->{$r}{type} eq 'l') {
+#            warn(qq{symbolic link not supported: $r\n});
+#            next;
+#        }
+#
+#        # don't DELETE remote item if exists locally
+#        if (exists $local->{$r}) {
+#            next;
+#        }
+#
+#        # put, or dry-run the file
+#        if ($cliopt->{dryrun}) {
+#            print "DELETE $r\n";
+#        }
+#        else {
+#            $ftp->delete($r)
+#                or die "Failed to DELETE $r\n";
+#        }
+#    }
+#}
+
+#sub do_ftp {
+#    my ($config, $cliopt, $ftp) = @_;
+#    my ($local_files, $remote_files);
+#
+#    # get a new ftp client object
+#    $ftp = ftp_client($config, $cliopt, $ftp);
+#    if (not defined $ftp) {
+#        warn(qq{Failed to connect to remote FTP server. Aborting upload.\n});
+#        return;
+#    }
+#
+#    # get a list of local files
+#    warn qq{fetching list of local files...\n} if $cliopt->{verbose};
+#    $local_files = ftp_local_files($config, $cliopt);
+##die pp($local_files);
+#    # get a list of remote files
+#    $remote_files = {}; # pre-init variable to an empty hash
+#    warn qq{fetching list of remote files...\n} if $cliopt->{verbose};
+#    ftp_remote_files($config, $cliopt, $ftp, '', $remote_files);
+##warn pp($remote_files);
+#
+#    upload_missing_files($config, $cliopt, $ftp, $local_files, $remote_files);
+#    #delete_missing_files($config, $cliopt, $ftp, $local_files, $remote_files);
+#}
+
+################################################################################
+# new remote-ftp-sync code
+################################################################################
+sub do_ftpsync {
+    my ($config, $cliopt, $ftp) = @_;
+    my (@md5strings, $transfer_actions);
+
+    # get a new ftp client object
+    $ftp = ftp_client($config, $cliopt, $ftp);
+    if (not defined $ftp) {
+        warn(qq{Failed to connect to remote FTP server. Aborting upload.\n});
+        return;
+    }
+
+    # regenerate (local) md5s
+    find( sub{wanted($config,\@md5strings);}, $config->{output_dir} );
+    write_file(qq{$config->{output_dir}/digest.md5}, @md5strings);
+
+    # get the remote digest
+    fetch_remote_digest($config);
+
+    # work out what needs to happen
+    $transfer_actions = build_transfer_actions(
+        qq{$config->{output_dir}/digest.md5},
+        $config->{tmp_remote_digest},
+    );
+
+    # do the remote update
+    my $ftp_root = $config->{'ftp'}{'path'} || '/';
+    do_remote_update($transfer_actions, $ftp, $ftp_root);
+
+    # remove the temp file
+    unlink( $config->{tmp_remote_digest} );
+}
+
+
+sub wanted {
+    my ($config, $md5string_list) = @_;
+
+    if (
+        -f $_
+            and
+        $_ ne q{digest.md5}
+            and
+        $_ !~ m{\.sw?}
+    ) {
+        push @{$md5string_list}, md5file($File::Find::name, $config->{output_dir}) . qq{\n};
+    }
+}
+
+sub md5file {
+    my ($file, $dir_prefix) = @_;
+    my ($filedata, $md5sum, $rel_filename, $md5data);
+
+    # slurp the file
+    $filedata = read_file($file)
+        or die "$file: $!";
+    # get the md5sum of the file
+    $md5sum = md5_hex($filedata);
+    # trim off any leading directories - making filename relative)
+    if (defined $dir_prefix) {
+        $rel_filename = $file;
+        $rel_filename =~ s{\A${dir_prefix}/}{};
+    }
+
+    # return an md5 string
+    return "$md5sum    $rel_filename";
+}
+
+sub parse_md5file {
+    my ($file) = @_;
+    my (%md5_of, @lines);
+
+    # read in the file
+    @lines = read_file($file)
+        or die "$file: $!";
+
+    # parse/split each line
+    foreach my $line (@lines) {
+        chomp($line);
+        if ($line =~ m{\A([a-z0-9]{32})\s+(.+)\z}xms) {
+            $md5_of{$2} = $1;
+        }
+    }
+
+    return \%md5_of;
+}
+
+sub build_transfer_actions {
+    my ($local_digest_file, $remote_digest_file) = @_;
+    my ($local_md5_of, $remote_md5_of, %transfer_action_of);
+
+    $local_md5_of   = parse_md5file($local_digest_file);
+    $remote_md5_of  = parse_md5file($remote_digest_file);
+
+    # run through the list of files we have locally
+    foreach my $relpath (sort keys %{$local_md5_of}) {
+        my $dirname = dirname($relpath);
+
+        # does the file live in the server?
+        if (exists $remote_md5_of->{$relpath}) {
+            # if the MD5s match - nothing to do
+            if ($local_md5_of->{$relpath} eq $remote_md5_of->{$relpath}) {
+                delete $local_md5_of->{$relpath};
+                delete $remote_md5_of->{$relpath};
+                next;
+            }
+
+            push @{$transfer_action_of{$dirname}},
+            {
+                action  => 'update',
+                relname => $relpath,
+            };
+            delete $local_md5_of->{$relpath};
+            delete $remote_md5_of->{$relpath};
+        }
+        # ... it's a new file to put on the server
+        else {
+            push @{$transfer_action_of{$dirname}},
+            {
+                action  => 'new',
+                relname => $relpath,
+            };
+            delete $local_md5_of->{$relpath};
+        }
+    }
+
+    # anything left in remote is a file we don't have locally
+    # we'll store actions (remove) for these, but won't act on the
+    # action until specifically asked
+    foreach my $relpath (sort keys %{$remote_md5_of}) {
+        my $dirname = dirname($relpath);
+        push @{$transfer_action_of{$dirname}},
+        {
+            action  => 'remove',
+            relname => $relpath,
+        };
+        delete $remote_md5_of->{$relpath};
+    }
+
+    # make sure we didn't miss anything
+    if (keys %{$local_md5_of}) {
+        warn qq{Some local files were not processed};
+        warn qq{Local:   } . pp($local_md5_of);
+    }
+    if (keys %{$remote_md5_of}) {
+        warn qq{Some remote files were not processed};
+        warn qq{Remote:   } . pp($remote_md5_of);
+    }
+
+    return \%transfer_action_of;
+}
+
+sub do_remote_update {
+    my $transfer_actions = shift;
+    my $ftp              = shift;
+    my $ftp_root         = shift;
+    my $errors           = 0;
+
+    if (not defined $ftp) {
+        warn(qq{No FTP server defined. Aborting upload.\n});
+        return;
+    }
+
+    # do transfer actions shortest dirname first
+    my @remote_dirs = sort {
+        length($a) <=> length($b)
+    } keys %{$transfer_actions};
+
+    my $ftp_root_status = $ftp->cwd($ftp_root);
+    if (not $ftp_root_status) {
+        die "$ftp_root: couldn't CWD to remote directory\n";
+    }
+    my $default_dir = $ftp->pwd();
+    if ($default_dir !~ m{/\z}xms) {
+        $default_dir .= q{/};
+    }
+
+    # make missing (remote) directories
+    warn "checking remote directories...\n";
+    foreach my $dir (@remote_dirs) {
+        my $status = $ftp->cwd($default_dir . $dir);
+        if (not $status) {
+            $ftp->mkdir($default_dir . $dir)
+                or warn qq{failed to create $dir};
+        }
+    }
+    # return to the default location
+    $ftp->cwd($default_dir);
+
+    # now run through everything and take the appropriate action for files
+    warn "transferring files...\n";
+    foreach my $dir (@remote_dirs) {
+        # run through the actions for the directory
+        foreach my $action ( @{$transfer_actions->{$dir}} ) {
+            #warn pp($action);
+            if ($action->{action} =~ m{\A(?:new|update)\z}) {
+                if (not $ftp->put( $action->{relname}, $action->{relname} )) {
+                    $errors++;
+                    warn "failed to upload $action->{relname}\n";
+                }
+            }
+        }
+    }
+
+    # if we didn't have any errors, upload the digest
+    if (not $errors) {
+        $ftp->put('digest.md5');
+    }
+}
+
+sub fetch_remote_digest {
+    my ($config) = @_;
+
+    # fetch the remote digest (if it exists)
+    # open it, return path to it
+    my ($fh, $filename, $ua, $response);
+
+    # if website isn't defined in the config - barf
+    if (not defined $config->{website}) {
+        die qq{'website' is not defined in .ttsite; can't fetch remote digest.md5\n};
+    }
+
+    # a temporary file to use
+    ($fh, $filename) = tempfile();
+    $config->{tmp_remote_digest} = $filename;
+
+    # get the remote file
+    $ua = LWP::UserAgent->new;
+    $ua->timeout(10);
+    $response = $ua->get($config->{website} . q{digest.md5});
+
+    # if we couldn't get it - write an empty one
+    if (not $response->is_success) {
+        warn "No remote digest";
+        print $fh "\n";
+        close $fh;
+        return;
+    }
+
+    # write the remote file for local use (in the temp file)
+    print $fh $response->content;
+    close $fh;
+
+    return $filename;
+}
+
+1;
+
+################################################################################
+
+=pod
+
+=head1 NAME
+
+ttsite - Chisel's site templater
+
+=head1 SYNOPSIS
+
+ttsite [options]
+
+  Options:
+    --site=X        process site labelled X
+
+    --rsync         after templating, perform an rsync to the remote server
+    --rsync-only    rsync existing site to the remote server
+
+    --fsync         after templating, perform an ftp-sync to the remote server
+    --fsync-only    ftp-sync existing site to the remote server
+
+    --ftp           after templating, use ftp to sync files on the
+                    remote server [DEPRECATED, use --fsync]
+    --ftp-only      skip templating, use ftp to sync files on the
+                    remote server [DEPRECATED, use --fsync-only]
+    --dryrun        show FTP commands but don't perform action
+
+    --force         force templates to be regenerated regardless of
+                    modification times
+    --showpath      when templating files, show relative path
+                    from <source_dir>
+    --showdest      when templating or copying files, show where
+                    the file was written to
+
+    --help          show brief help message
+    --verbose       increase the verbosity of the script
+
+=head1 AUTHOR
+
+Chisel Wright C<< <chisel@herlpacker.co.uk> >>
+Jason Tang C<< <jason@dragor.net> >> Modification/Refactoring
+
+=cut
+
+__DATA__
+---
+
+# which site configuration to use if none are specified on the command line
+default_site:   'default'
+
+# site configurations
+site:
+    # default site configuration - simply an example of the format
+    default:
+        source_dir:     '/path/to/tt_templates'
+        includes_dir:   '/path/to/tt_includes'
+        output_dir:     '/var/www/default_site/html'
+
+        template_files:
+            -   '\.html\z'
+
+        ignore_dirs:
+            -   'CVS'
+            -   '.svn'
+            -   'stats'
+            -   'tmp'
+
+        ignore_files:
+            -   '\.swp\z'
+
+        ftp_ignore_dirs:
+            -   '.svn'
+            -   'tmp'
+
+        tags:
+            author:     'Joe Bloggs'
+            email:      'joe@localhost'
+            copyright:  '&copy; 2000-2006 Joe Bloggs. All rights reserved.'
+
+        rsync:
+            hostname:   'remote.site'
+            path:       '/home/joe.bloggs'
+
+        ftp:
+            hostname:   'remote.ftp.site'
+            username:   'joe.bloggs'
+            password:   'sekrit'
+            path:       '/htdocs/'
+
+
+    # a second site definition - to demonstrate how to define multiple sites
+    my-site:
+        source_dir:     '/path/to/tt_templates'
+        includes_dir:   '/path/to/tt_includes'
+        output_dir:     '/var/www/default_site/html'
+        website:        'http://my.site.com/'
+
+        template_files:
+            -   '\.html\z'
+
+        ignore_dirs:
+            -   'CVS'
+            -   '.svn'
+            -   'stats'
+            -   'tmp'
+
+        ignore_files:
+            -   '\.swp\z'
+
+        ftp_ignore_dirs:
+            -   '.svn'
+            -   'tmp'
+
+        tags:
+            author:     'Joe Bloggs'
+            email:      'joe@localhost'
+            copyright:  '&copy; 2000-2006 Joe Bloggs. All rights reserved.'
+
+        rsync:
+            hostname:   remote.ftp.site
+            path:       /home/joe.bloggs
+

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<yazgfs>
+ <listen id="tcp8018">tcp:@:8018</listen>
+ <server id="alvis" listenref="tcp8018">
+  <directory>./</directory>
+  <config>zebra.cfg</config>
+  <cql2rpn>pqf.properties</cql2rpn>
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="zeerex.xml">
+   <xi:fallback>
+    <explain xmlns="http://explain.z3950.org/dtd/2.0/">
+     <serverInfo>
+      <host>localhost</host>
+      <port>8018</port>
+      <database>IR-Explain---1</database>
+     </serverInfo>
+    </explain>
+   </xi:fallback>
+  </xi:include>
+ </server>
+</yazgfs>

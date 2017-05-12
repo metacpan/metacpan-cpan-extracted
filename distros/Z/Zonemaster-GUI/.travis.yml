@@ -1,0 +1,44 @@
+addons:
+  postgresql: "9.3"
+  
+env:
+    - TARGET=PostreSQL ZONEMASTER_ENVIRONMENT=TRAVIS ZONEMASTER_BACKEND_PORT=5000 
+    
+language: perl
+
+perl:
+    - "5.20"
+    - "5.18"
+    - "5.16"
+    - "5.14"
+ 
+before_script:
+    - export BASE_DIR=`dirname "$TRAVIS_BUILD_DIR"`
+    - export ZONEMASTER_BACKEND_CONFIG_FILE=$BASE_DIR/zonemaster-backend/share/travis_postgresql_backend_config.ini
+    - export URL=localhost:5080
+
+    - starman --error-log=/tmp/zm_front.log --workers=2 --listen=127.0.0.1:5080 -I./lib zm_app/bin/app.pl &
+    
+    - cd ..
+    - git clone https://github.com/dotse/zonemaster-backend.git
+    - cd zonemaster-backend
+    - cpanm --quiet --installdeps --notest .
+    - if [[ "$TARGET" == "PostreSQL" ]]; then psql -c "create user travis_zonemaster WITH PASSWORD 'travis_zonemaster';" -U postgres; fi
+    - if [[ "$TARGET" == "PostreSQL" ]]; then psql -c 'create database travis_zonemaster OWNER travis_zonemaster;' -U postgres; fi
+    - if [[ "$TARGET" == "PostreSQL" ]]; then cpanm --quiet --notest DBD::Pg; fi
+    - if [[ "$TARGET" == "PostreSQL" ]]; then perl -I./lib ./script/create_db_postgresql_9.3.pl; fi
+    - starman --error-log=/tmp/zm_back.log --workers=2 --listen=127.0.0.1:5000 -I./lib/ ./script/zonemaster_webbackend.psgi &
+    - perl -I./lib ./script/zm_wb_daemon start
+    
+    - cd ..
+    - cd zonemaster-gui
+script:
+    - perl Makefile.PL && make test
+    - perl -I$BASE_DIR/zonemaster-backend/CodeSnippets/ $BASE_DIR/zonemaster-backend/CodeSnippets/sample_api_call__version_info.pl
+    - phantomjs --version
+    - phantomjs --web-security=no --local-to-remote-url-access=yes --ignore-ssl-errors=yes t/wait_for_version_string.js $URL
+    - phantomjs --web-security=no --local-to-remote-url-access=yes --ignore-ssl-errors=yes t/run_a_simple_zonemaster_test.js $URL
+    - phantomjs --web-security=no --local-to-remote-url-access=yes --ignore-ssl-errors=yes t/run_a_predelegated_zonemaster_test.js $URL
+    - cat $BASE_DIR/zonemaster-gui/zm_app/logs/deployment.log 
+    - cat /tmp/zm_front.log
+    - cat /tmp/zm_back.log

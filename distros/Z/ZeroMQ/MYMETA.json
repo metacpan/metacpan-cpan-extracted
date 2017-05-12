@@ -1,0 +1,67 @@
+{
+   "abstract" : "A ZeroMQ2 wrapper for Perl (DEPRECATED)",
+   "author" : [
+      "Daisuke Maki <daisuke@endeworks.jp>",
+      "Steffen Mueller <smueller@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Install version 1.06, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "ZeroMQ",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Devel::CheckLib" : "0.4",
+            "Devel::PPPort" : "3.19",
+            "ExtUtils::MakeMaker" : "6.59",
+            "ExtUtils::ParseXS" : "2.21",
+            "Test::Fatal" : "0",
+            "Test::More" : "0.98",
+            "Test::Requires" : "0",
+            "Test::TCP" : "1.08"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Devel::CheckLib" : "0.4",
+            "Devel::PPPort" : "3.19",
+            "ExtUtils::MakeMaker" : "6.59",
+            "ExtUtils::ParseXS" : "2.21"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "JSON" : "2.00"
+         },
+         "requires" : {
+            "Task::Weaken" : "0",
+            "XSLoader" : "0.02",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/lestrrat/ZeroMQ-Perl"
+      }
+   },
+   "version" : "0.22",
+   "x_module_name" : "ZeroMQ"
+}

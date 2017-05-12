@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/ZConf/Cron/GUI/GTK.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+bin/gtk-gzccrontab
+bin/gtk-zccron-tray

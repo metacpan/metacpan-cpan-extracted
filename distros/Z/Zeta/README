@@ -1,0 +1,51 @@
+Zeta
+
+A basic app and web-app set of modules that have proven useful over the years.
+Not quite enough to call it a framework, but has been the underpinning of 
+several utilities and web applications throughout the years.
+
+While previous versions were released as part of other packages, programs,
+or code in other projects, it was never released directly on CPAN. I'm 
+reviewing the code and pulling it together for CPAN release in the Zeta module. 
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Zeta::Util
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Zeta
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Zeta
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Zeta
+
+    Search CPAN
+        http://search.cpan.org/dist/Zeta/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 1995-2012 Gregory S. Youngblood
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

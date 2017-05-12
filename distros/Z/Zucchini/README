@@ -1,0 +1,85 @@
+NAME
+    Zucchini - turn templates into static websites
+
+VERSION
+    version 0.0.21
+
+SYNOPSIS
+      $ zucchini --create-config    # create a default config
+
+      $ perldoc Zucchini::Config    # information for configuring Zucchini
+
+      $ perldoc zucchini            # the worker script
+
+DESCRIPTION
+    You have a hosted website. It's static. Your website has the same
+    headers, footers, menu, etc.
+
+    Copying the same change from the header section in one file into the
+    other fifty-eight files in your site is boring. It's also prone to
+    error.
+
+    Ideally the site would be written using some kind of templating system,
+    so header files et al only needed to be updated once.
+
+    This is where Zucchini comes in. Zucchini processes a directory of
+    templates (written using Template::Toolkit markup) and outputs a static
+    copy of each processed template.
+
+    You now have the source for a staic website, waiting to be uploaded to
+    your remote server - which, conveniently, Zucchini can do for you; using
+    rsync or ftp.
+
+    Zucchini is usually invoked through the "zucchini" script, which is
+    installed as part of the package.
+
+METHODS
+  new
+    Creates a new instance of the top-level Zucchini object:
+
+      # create a new zucchini object
+      $zucchini = Zucchini->new(
+        \%cliopt
+      );
+
+  gogogo
+    This function is called from the "zucchini" script and decides what
+    actions to perform based on the command-line options passed to new()
+
+      # work out what to do, and Just Do It
+      $zucchini->gogogo;
+
+  process_templates
+    This function processes the template directories and outputs the static
+    website source files.
+
+      # generate the static site
+      $zucchini->process_templates;
+
+  ftp_sync
+    This function transfers the static website source files to the remote
+    server using an FTP solution.
+
+      # transfer files to remote FTP site
+      $zucchini->ftp_sync;
+
+  remote_sync
+    This function transfers the static website source files to the remote
+    server using an rsync solution.
+
+      # transfer files to remote server, using rsync
+      $zucchini->remote_sync;
+
+SEE ALSO
+    Zucchini::Config, Zucchini::Fsync, Zucchini::Rsync, Zucchini::Template,
+    Template
+
+AUTHOR
+    Chisel <chisel@chizography.net>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Chisel Wright.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

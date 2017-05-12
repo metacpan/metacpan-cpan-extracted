@@ -1,0 +1,18 @@
+Changes
+'conf/Template CPAN Zabbix-Check.xml'
+conf/zabbix_agentd.conf
+lib/Zabbix/Check.pm
+lib/Zabbix/Check/Disk.pm
+lib/Zabbix/Check/RabbitMQ.pm
+lib/Zabbix/Check/Supervisor.pm
+lib/Zabbix/Check/Systemd.pm
+lib/Zabbix/Check/Time.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+README.md
+t/Zabbix-Check.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

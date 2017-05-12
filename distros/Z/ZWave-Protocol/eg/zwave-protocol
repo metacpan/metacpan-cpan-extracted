@@ -1,0 +1,78 @@
+#!/usr/local/bin/perl
+use strict;
+use warnings;
+use lib "../lib";
+use ZWave::Protocol;
+use Getopt::Long;
+use Log::Log4perl qw(:easy);
+
+GetOptions( \my %opts, "nodeid=s", "verbose" );
+
+if( $opts{ verbose } ) {
+    Log::Log4perl->easy_init($DEBUG);
+} else {
+    Log::Log4perl->easy_init($ERROR);
+}
+
+my $zwave = ZWave::Protocol->new;
+$zwave->connect;
+
+my( $mode ) = @ARGV;
+
+if( !defined $mode or $mode !~ /^on|off$/ ) {
+    die "usage: $0 --nodeid=id [on|off]";
+}
+
+my $state = 0;
+if( $mode eq "on" ) {
+    $state = 255;
+}
+
+$zwave->payload_transmit( 0, 0x13, $opts{ nodeid }, 
+    0x03, 0x20, 0x01, $state, 0x05 );
+    
+__END__
+
+=head1 NAME
+
+    zwave-protocol - Simple ZWave::Protocol Example 
+
+=head1 SYNOPSIS
+
+    $ zwave-protocol --nodeid=3 on
+    $ zwave-protocol --nodeid=3 off
+
+=head1 DESCRIPTION
+
+C<zwave-protocol> handles the ZWave protocol rigamarole 
+to turn an ZWave Energy Switch on and off.
+
+Passing the C<--verbose> command line switch enables Log4perl's debug
+level and the output shows the bits flying back and forth:
+
+    $ zwave-protocol --node=3 --verbose on
+    2015/12/07 19:18:19 Checksum of [ 01 09 00 13 03 03 20 01 ff 05 ] is [ 3e ]
+    2015/12/07 19:18:19 Sending request: [ 01 09 00 13 03 03 20 01 ff 05 3e ]
+    2015/12/07 19:18:19 Waiting for ACK
+    2015/12/07 19:18:19 Read 1 bytes: [ 06 ]
+    2015/12/07 19:18:19 Read 1 bytes: [ 01 ]
+    2015/12/07 19:18:19 Read 1 bytes: [ 04 ]
+    2015/12/07 19:18:19 Read 1 bytes: [ 01 ]
+    2015/12/07 19:18:19 Read 1 bytes: [ 13 ]
+    2015/12/07 19:18:19 Read 1 bytes: [ 01 ]
+    2015/12/07 19:18:19 Read 1 bytes: [ e8 ]
+    2015/12/07 19:18:19 Read 0 bytes: [  ]
+    2015/12/07 19:18:19 Read packet: [ 06 01 04 01 13 01 e8 ]
+    2015/12/07 19:18:19 ACK bytes: [ 06 01 04 01 13 01 e8 ]
+    2015/12/07 19:18:19 Received ACK
+    2015/12/07 19:18:19 Sending ACK
+
+=head1 LEGALESE
+
+Copyright 2015 by Mike Schilli, all rights reserved.
+This program is free software, you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+2015, Mike Schilli <cpan@perlmeister.com>

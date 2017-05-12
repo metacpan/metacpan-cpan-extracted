@@ -1,0 +1,248 @@
+#!/usr/bin/perl
+#Copyright (c) 2009, Zane C. Bowers
+#All rights reserved.
+#
+#Redistribution and use in source and binary forms, with or without modification,
+#are permitted provided that the following conditions are met:
+#
+#   * Redistributions of source code must retain the above copyright notice,
+#    this list of conditions and the following disclaimer.
+#   * Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#
+#THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+#ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
+#WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+#IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+#INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
+#BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
+#DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+#LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+#OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+#THE POSSIBILITY OF SUCH DAMAGE.
+
+use strict;
+use warnings;
+use Getopt::Std;
+use ZConf::Runner;
+
+$Getopt::Std::STANDARD_HELP_VERSION = 1;
+
+#version function
+sub main::VERSION_MESSAGE {
+        print "zccrunner 0.0.0\n";
+}
+
+#print help
+sub main::HELP_MESSAGE {
+        print "\n".
+              "-a action   The action to call on the object.\n".
+			  "-o object   The object for use.  \n".
+			  "-A bolean   A perl boolean value for if it should ask or not.\n".
+			  "-n   Call ask instead of do to add or change an object.\n".
+			  "-r   Remove the action for the mimetype specified by '-m'.\n".
+			  "-m mimetype\n".
+			  "-l   List actions for a mimetype specified by '-m'\n".
+			  "-L   List configured mimetypes.\n".
+			  "-g   Get information for the specified action and mimetype.\n".
+			  "\n".
+			  "If no action is defined, it is set to 'view'.\n".
+			  "\n".
+			  "If nothing is specified for '-A', it is set to '1'.\n";
+}
+
+#gets the options
+my %opts=();
+getopts('rnglLm:a:o:A:', \%opts);
+
+#sets the action to view if it is not set
+if (!defined($opts{a})) {
+	$opts{a}='view';
+}
+
+#always ask if nothing is specified
+if (!defined($opts{A})) {
+	$opts{A}='1';
+}
+
+#create the ZConf::Runner object and error upon failure
+my $zcr=ZConf::Runner->new();
+if (!defined($zcr) || $zcr->{error}) {
+	warn('zcrunner:2: ZConf::Runner->new() failed');
+	exit 2;
+}
+
+#removes an action if '-r' is specified
+if ($opts{r}) {
+	#
+	if (!defined($opts{m})) {
+		warn('zcrunner:3: No mimetpye specified using "-m"');
+		exit 3;
+	}
+	
+	#removes it
+	$zcr->removeAction($opts{m}, $opts{a});
+    if($zcr->{error}){
+        warn('zcrunner:4: $zcr->removeAction("'.$opts{m}.'", "'.$opts{a}.'") errored.');
+		exit 4;
+    }
+	exit 0;
+}
+
+#lists configured action if '-l' is given
+if (defined($opts{g})) {
+	#
+	if (!defined($opts{m})) {
+		warn('zcrunner:3: No mimetpye specified using "-m"');
+		exit 3;
+	}
+
+	my %action=$zcr->getAction($opts{m}, $opts{a});
+	if ($zcr->{error}) {
+		warn('zcrunner:4: $zcr->getAction("'.$opts{m}.'", "'.$opts{a}.'") errored');
+		exit 4;
+	}
+
+	print 'type: '.$action{type}."\n".
+	      'do: '.$action{do}."\n";
+
+	exit 0;
+}
+
+#lists configured action if '-l' is given
+if (defined($opts{l})) {
+	#
+	if (!defined($opts{m})) {
+		warn('zcrunner:3: No mimetpye specified using "-m"');
+		exit 3;
+	}
+
+	my @actions=$zcr->listActions($opts{m});
+	if ($zcr->{error}) {
+		warn('zcrunner:4: $zcr->listActions("'.$opts{m}.'") errored');
+		exit 4;
+	}
+
+	#print each one
+	my $int=0;
+	while (defined($actions[$int])) {
+		print $actions[$int]."\n";
+		$int++;
+	}
+	exit 0;
+}
+
+#lists configured action if '-L' is given
+if (defined($opts{L})) {
+	my @mimetypes=$zcr->listMimetypes();
+	if ($zcr->{error}) {
+		warn('zcrunner:5: $zcr->listMimetypes() errored');
+		exit 5;
+	}
+
+	#print each one
+	my $int=0;
+	while (defined($mimetypes[$int])) {
+		print $mimetypes[$int]."\n";
+		$int++;
+	}
+	exit 0;
+}
+
+#make sure an object was specified
+if (!defined($opts{o})) {
+	if (!defined($ARGV[0])) {
+		warn('zcrunner:1: No object defined');
+		exit 1;
+	}
+	$opts{o}=$ARGV[0];
+}
+
+if ($opts{n}) {
+	$zcr->ask($opts{a}, $opts{o}, {useX=>1});
+}
+
+#exec is set to 1 as we don't do any thing beyond this
+$zcr->do($opts{a}, $opts{o}, {ask=>$opts{A}, exec=>1});
+
+=head1 NAME
+
+zcrunner - Run a file using a choosen method, desktop entry or mimetype.
+
+=head1 SYNOPSIS
+
+zcrunner B<-o> <object> [B<-a> <action>] [B<-n>] [B<-A> <boolean>]
+zcrunner B<-L>
+zcrunner B<-l> B<-m> <mimetype> [B<-a> <action>]
+zcrunner B<-r> B<-m> <mimetype> [B<-a> <action>]
+zcrunner B<-g> B<-m> <mimetype> [B<-a> <action>]
+
+=head1 DESCRIPTION
+
+=head1 SWITCHES
+
+=head2 -a <action>
+
+This is the action to use. If it is not defined,
+it defaults to 'view'.
+
+=head2 -A <perl boolean value>
+
+A perl boolean value for if it should ask or not if a
+mimetype and action has not been setup previously.
+
+=head2 -g
+
+Print information for the specified mimetype and action.
+This requires '-m' be specified.
+
+=head2 -l
+
+List all actions for the mimetype specified by '-m'.
+
+=head2 -L
+
+List the mimetypes that have been setup.
+
+=head2 -m <mimetype>
+
+Specified a mimetype to operate on.
+
+=nead2 -n
+
+Setup an action instead of running an object. This requires
+'-o' to be specified.
+
+=head2 -o <obeject>
+
+This is the object that to run or ask about.
+
+=head2 -r
+
+Remove the specified action for the mimetype specified by '-m'.
+
+=head1 EXIT CODES
+
+=head2 1
+
+No object specified using '-o'.
+
+=head2 2
+
+Failed to create a new ZConf::Runner object.
+
+=head2 3
+
+No mimetype specified. Using '-m'.
+
+=head2 4
+
+Removing action for the specified mimetype failed.
+
+=head2 5
+
+Listing the available mimetypes failed.
+
+=cut
+

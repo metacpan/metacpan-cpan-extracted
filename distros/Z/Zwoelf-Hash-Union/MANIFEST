@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Zwoelf-Hash-Union.t
+lib/Zwoelf/Hash/Union.pm

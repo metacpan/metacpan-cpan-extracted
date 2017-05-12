@@ -1,0 +1,7 @@
+<%args>
+@id
+$test => undef
+</%args>
+<& /chrome/layout.mc, %ARGS, component => "/details/check.mc",
+    title => ((@id > 1 ? "Test targets" : "Test a target") .
+              (defined $test ? ": $test" : "")) &>

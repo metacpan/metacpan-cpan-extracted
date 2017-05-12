@@ -1,0 +1,23 @@
+<%args>
+$id
+</%args>
+<%once>
+use ZOOM;
+use ZOOM::IRSpy;
+use ZOOM::IRSpy::Utils qw(cql_target xml_encode);
+</%once>
+<%perl>
+my $db = ZOOM::IRSpy::connect_to_registry();
+my $conn = new ZOOM::Connection($db);
+$conn->option(elementSetName => "zeerexNoAuth");
+my $rs = $conn->search(new ZOOM::Query::CQL(cql_target($id)));
+my $n = $rs->size();
+if ($n == 0) {
+    $m->comp("/chrome/layout.mc", component => "/details/error.mc",
+	     title => "Error", message => xml_encode("No such ID '$id'"));
+} else {
+    my $xml = $rs->record(0)->render();
+    $r->content_type("text/xml");
+    print $xml;
+}
+</%perl>

@@ -1,0 +1,23 @@
+#!/usr/bin/perl
+
+use strict;
+use IO::All;
+use YAML::XS;
+
+my $yaml = YAML::XS::LoadFile('Meta');
+my $version =
+    $yaml->{'=zild'}{version} ||
+    $yaml->{version} ||
+    die "Can't determine 'version' from 'Meta' file";
+
+for my $module (io->dir('lib')->All_Files) {
+    next unless "$module" =~ /\.pm$/;
+    my $code = $module->all;
+    my $new = $code;
+    my $s = '[\ \t]';
+    $new =~ s/^((?:our$s)?$s*\$[\w\:]*VERSION$s*=$s*)(['"]).*?(['"])(.*);/$1$2$version$3$4;/gm;
+    if ($new ne $code) {
+        print "Module '$module' changed version to '$version'.\n";
+        $module->print($new);
+    }
+}

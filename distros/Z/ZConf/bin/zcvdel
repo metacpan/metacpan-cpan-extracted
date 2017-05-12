@@ -1,0 +1,292 @@
+#!/usr/bin/perl
+#Copyright (c) 2011, Zane C. Bowers-Hadley
+#All rights reserved.
+#
+#Redistribution and use in source and binary forms, with or without modification,
+#are permitted provided that the following conditions are met:
+#
+#   * Redistributions of source code must retain the above copyright notice,
+#    this list of conditions and the following disclaimer.
+#   * Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#
+#THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+#ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
+#WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+#IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+#INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
+#BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
+#DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+#LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+#OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+#THE POSSIBILITY OF SUCH DAMAGE.
+
+use strict;
+use warnings;
+use Getopt::Std;
+use ZConf;
+
+$Getopt::Std::STANDARD_HELP_VERSION = 1;
+
+#version function
+sub main::VERSION_MESSAGE {
+	print "zcvdel 0.0.0\n";
+}
+
+#print help
+sub main::HELP_MESSAGE {
+	print "\n".
+	      "-c <config>  The config to operate on.\n".
+		  "-C  Operate on comments.\n".
+		  "-k <key>  The key to be operated on.\n".
+		  "-K <key>  The secondary key for comments or metas.\n".
+		  "-m  Operate on metas.\n".
+		  "-p  Print the removed ones.".
+		  "-s <set>  The set to operate on.\n";
+}
+
+#print the vars
+sub varprint{
+	my %hash=%{$_[0]};
+	my $sechash=$_[1];
+	my $sectype=$_[2];
+	my $zmlprint=$_[3];
+
+	my @vars=keys(%hash);
+
+	@vars=sort(@vars);
+
+	my $varsInt=0;
+	while (defined( $vars[$varsInt] )) {
+		if ($sechash) {
+			#it is a meta/comment
+			my @seckeys=keys( %{ $hash{$vars[$varsInt]} } );
+
+			@seckeys=sort(@seckeys);
+
+			#process stuff in the secondary hash
+			my $seckeysInt=0;
+			while (defined( $seckeys[$seckeysInt] )) {
+				#it is a regular var
+				if ($zmlprint) {
+					print $vars[$varsInt].'='.$seckeys[$seckeysInt].'=';
+					$hash{ $vars[$varsInt] }{ $seckeys[$seckeysInt] }=~s/\n/\n /g;
+					print $hash{ $vars[$varsInt] }{ $seckeys[$seckeysInt] }."\n"
+				}else {
+					print $hash{ $vars[$varsInt] }."\n";
+				}
+				
+				$seckeysInt++;
+			}
+		}else {
+			#it is a regular var
+			if ($zmlprint) {
+				print $vars[$varsInt].'=';
+				$hash{$vars[$varsInt]}=~s/\n/\n /g;
+				print $hash{$vars[$varsInt]}."\n"
+			}else {
+				print $hash{$vars[$varsInt]}."\n";
+			}
+		}
+
+		$varsInt++;
+	}
+
+}
+
+#gets the options
+my %opts=();
+getopts('c:Ck:K:mps:S:', \%opts);
+
+#makes sure that -c is set
+if (!defined($opts{c})) {
+	warn('zcvdel: -c not defined');
+	exit 1;
+}
+
+#handles misc stuff for comments
+if (defined($opts{C})) {
+	if (!defined($opts{K})) {
+		warn('zcget: -K not defined');
+		exit 254;
+	}
+
+	if (!defined($opts{r})) {
+		$opts{k}='^'.$opts{k}.'$';
+		$opts{K}='^'.$opts{K}.'$';
+	}
+}
+
+#handles misc stuff for metas
+if (defined($opts{m})) {
+	if (!defined($opts{K})) {
+		warn('zcget: -K not defined');
+		exit 254;
+	}
+
+	if (!defined($opts{r})) {
+		$opts{k}='^'.$opts{k}.'$';
+		$opts{K}='^'.$opts{K}.'$';
+	}
+}
+
+#makes sure that -k is set
+if (!defined($opts{k})) {
+	$opts{k}='.';
+}
+
+#if -f is set, read it
+
+#inits zconf
+my $zconf = ZConf->new();
+if($zconf->{error}){
+	exit 1;
+}
+
+#sets up the arguement hash that will be passed for reading it
+my %args;
+$args{config}=$opts{c};
+#if a set is specified, set it
+if (defined($opts{s})) {
+	$args{set}=$opts{s};
+}
+
+#reads it
+$zconf->read(\%args);
+if(defined($zconf->{error})){
+	exit 1;
+}
+
+#removes them
+my @keys=$zconf->regexVarDel($opts{c}, $opts{k});
+#exit upon error
+if (defined($zconf->{error})) {
+	exit 1;
+}
+
+#handle it if it is a comment search
+my %hash;
+my $sechash=undef;
+my $sectype='';
+if (defined($opts{C})) {
+	%hash=$zconf->regexCommentGet({
+								   config=>$opts{c},
+								   varRegex=>$opts{k},
+								   commentRegex=>$opts{K}
+								   });
+	if(defined($zconf->{error})){
+		exit $zconf->{error};
+	}
+	$sechash=1;
+	my $sectype='##';
+}else {
+	#handle it if it is a comment search
+	if (defined($opts{m})) {
+		%hash=$zconf->regexMetaGet({
+								   config=>$opts{c},
+								   varRegex=>$opts{k},
+								   metaRegex=>$opts{K}
+								   });
+		if(defined($zconf->{error})){
+			exit $zconf->{error};
+		}
+		$sechash=1;
+		my $sectype='#!';
+	}else {
+		%hash=$zconf->regexVarGet($opts{c}, $opts{k});
+		if(defined($zconf->{error})){
+			exit $zconf->{error};
+		}
+		$sechash=0;		
+	}
+}
+
+#prints it if -p is given
+if (defined($opts{p})){
+	varprint(\%hash, $sechash, $sectype, $opts{p});
+}
+
+#writes it
+$zconf->writeSetFromLoadedConfig(\%args);
+if(defined($zconf->{error})){
+	exit 1;
+}
+
+=head1 NAME
+
+zcvdel - Remove a variable from a ZConf config.
+
+=head1 SYNOPSIS
+
+zcvls [B<-p>] [B<-s> <set>] B<-c> <config> [B<-k> <key regex>]
+
+=head1 SWTICHES
+
+=head2 -c <config>
+
+This is the configuration to operate on.
+
+=head2 -k <key>
+
+This is the key to operate on. This is a regex. If not defined,
+it defaults to '.'.
+
+=head2 -p
+
+Print the removed variables.
+
+=head2 -s <set>
+
+The set to operate on. This is the only optional switch. If it is now defined,
+The choosen/default config will be used.
+
+=head1 AUTHOR
+
+Copyright (c) 2011, Zame C. Bowers-Hadley <vvelox@vvelox.net>
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+     this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS` OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=head1 Changelog
+
+=head2 2009-07-08/1:00 0.1.0
+
+Add sys mode.
+
+=head2 2008-10-06/3:30 0.0.0
+
+Initial release.
+
+=head1 SCRIPT CATEGORIES
+
+Desktop
+
+=head1 OSNAMES
+
+any
+
+=head1 README
+
+zcvdel - Remove a variable from a ZConf config.
+
+=cut

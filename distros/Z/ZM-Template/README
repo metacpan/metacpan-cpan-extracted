@@ -1,0 +1,373 @@
+NAME
+    ZM::Template - Merges runtime data with static HTML or Plain Text
+    template file.
+
+VERSION
+     Template.pm v 0.7.2
+
+SYNOPSIS
+    How to merge data with a template.
+
+    The template :
+
+     <html><head><title>parser Example 1</title></head>
+     <body bgcolor=beige>
+     My name is __firstname__ __surname__ but my friends call me __nickname__.
+     <hr>
+     </body>
+     </html>
+
+    The code :
+
+     use ZM::Template;
+
+     # Create a template object and load the template source.
+     $templ = new ZM::Template;
+     $templ->src('example1.html');
+
+     # Set values for tokens within the page
+     $templ->surname('Smyth');
+     $templ->firstname('Arthur');
+     $templ->nickname('Art!');
+
+     # Send the merged page and data to the web server as a standard text/html mime
+     #   type document
+     $templ->output('Content-Type: text/html');
+
+    Produces this output :
+
+     <html><head><title>parser Example 1</title></head>
+     <body bgcolor=beige>
+     My name is Arthur Smyth but my friends call me Art!.
+     <hr>
+     </body>
+     </html>
+
+DESCRIPTION
+    In an ideal web system, the HTML used to build a web page would be kept
+    distinct from the application logic populating the web page. This module
+    tries to achieve this by taking over the chore of merging runtime data
+    with a static html template. Template can contain SSI derectives like
+    <!--#include file="..." --> and <!--#exec cgi="..." --> It is used
+    ZM::SSI for SSI parsing. If module ZM::SSI not installed SSI derectives
+    will be ignoring.
+
+    The ZM::Template module can address the following template scenarios :
+
+    *  Single values assigned to tokens
+
+    *  Multiple values assigned to tokens (as in html table rows)
+
+    *  Single pages built from multiple templates (ie: header, footer, body)
+
+    *  html tables with runtime determined number of columns
+
+    An template consists of 2 parts; the boilerplate and the tokens (place
+    holders) where the variable data will sit.
+
+    A token has the format __tokenName__ and can be placed anywhere within
+    the template file. If it occurs in more than one location, when the data
+    is merged with the template, all occurences of the token will be
+    replaced.
+
+     <p>
+     My name is __userName__ and I am aged __age__.
+     My friends often call me __nickName__ although my name is __userName__.
+
+    When an html table is being populated, it will be necessary to output
+    several values for each token. This will result in multiple rows in the
+    table. However, this will only work if the tokens appear within a
+    repeating block.
+
+    To mark a section of the template as repeating, it needs to be enclosed
+    within a matching pair of repeating block tokens. These have the format
+    __x_blockName__. They must always come in pairs.
+
+     and I have the following friends
+     <table>
+     __x_friends__
+     <tr>
+         <td>__friendName__</td><td>__friendNickName__</td>
+     </tr>
+     __x_friends__
+     </table>
+
+    For interleave data in loop used __z_ token
+
+     and I have the following friends
+     <table>
+     __x_friends__
+     <tr>
+         <td bgcolor="#FEFEFE">__friendName__</td><td>__friendNickName__</td>
+     </tr>
+     __z_friends__
+     <tr>
+         <td bgcolor="#FFFFFF">__friendName__</td><td>__friendNickName__</td>
+     </tr>
+     __x_friends__
+     </table>
+
+    Count of __z_ token is UNLIMITED.
+
+    Template engine understand inner loops like this
+
+     List of companies:
+     __x_companies__
+     Company name: __name__
+     Company address: __address__
+     Company e-mails:
+      __x_emails__
+      __email__
+      __x_emails__
+     Company web: __web__
+     __x_companies__
+ 
+    For condition __if_ token. They must always come in pairs.
+
+     List of companies:
+     __x_companies__
+     Company name: __name__
+     Company address: __address__
+     Company e-mails:
+      __x_emails__
+      __email__
+      __x_emails__
+     __if_company_web__
+     Company web: __web__
+     __if_company_web__
+     __x_companies__
+ 
+    Template engine understand __else_ token within __if_ token.
+
+     List of companies:
+     __x_companies__
+     Company name: __name__
+     Company address: __address__
+     Company e-mails:
+      __x_emails__
+      __email__
+      __x_emails__
+     __if_company_web__
+     Company web: __web__
+     __else_company_web__
+     Company have not web site
+     __if_company_web__
+     __x_companies__
+
+METHODS
+    src($)
+
+    The single parameter specifies the name of the template file to use.
+
+    srcString($)
+
+    If the template is within a string rather than a file, use this method
+    to populate the template object.
+
+    output(@)
+
+    Merges the data already passed to the ZM::Template instance with the
+    template file specified in src(). The optional parameter is output
+    first, followed by a blank line. These form the HTTP headers.
+
+    htmlString()
+
+    Returns a string of html produced by merging the data passed to the
+    ZM::Template instance with the template specified in the src() method.
+    No http headers are sent to the output string.
+
+    listAllTokens()
+
+    Returns an array. The array contains the names of all tokens found
+    within the template specifed to src() method.
+
+    tokenName($)
+
+    Assigns to the 'tokenName' token the value specified as parameter.
+
+    tokenName($$)
+
+    Assigns to the 'tokenName' token, within the repeating block specified
+    in 2nd parameter, the value specified as the first parameter.
+
+    setif(tokenName)
+
+    Set true for __if_ token type.
+
+    fromfile($$)
+
+    Assigns to the token specified as parameter the content of file
+    specified in 2nd parameter.
+
+    fromfile($$$)
+
+    Assigns to the token specified as parameter, within the repeating block
+    specified in 3nd parameter, the value specified in 2nd parameter.
+
+EXAMPLES
+  Example 1.
+    A simple template with single values assigned to each token.
+
+    The template :
+
+     <html><head><title>parser Example 1</title></head>
+     <body bgcolor=beige>
+     My name is __firstname__ __surname__ but my friends call me __nickname__.
+     <hr>
+     </body>
+     </html>
+
+    The code :
+
+     use ZM::Template;
+
+     # Create a template object and load the template source.
+     $templ = new ZM::Template;
+     $templ->src('example1.html');
+
+     # Set values for tokens within the page
+     $templ->surname('Smyth');
+     $templ->firstname('Arthur');
+     $templ->nickname('Art!');
+
+     # Send the merged page and data to the web server as a standard text/html mime
+     #   type document
+     $templ->output('Content-Type: text/html');
+
+    Produces this output :
+
+     <html><head><title>parser Example 1</title></head>
+     <body bgcolor=beige>
+     My name is Arthur Smyth but my friends call me Art!.
+     <hr>
+     </body>
+     </html>
+
+  Example 2
+    Produces an html table with a variable number of rows.
+
+    The template :
+
+     <html><head><title>Example 2 - blocks</title></head>
+     <body bgcolor=beige>
+     <table border=1>
+     __x_details__
+     <tr>
+            <td>__id__</td>
+            <td>__name__</td>
+            <td>__desc__</td>
+     </tr>
+     __x_details__
+     </table>
+     <ul>
+     __x_customer_det__
+            <li>__customer__</li>
+     __x_customer_det__
+     </ul>
+     <br>
+     <hr>
+     </body>
+     </html>
+
+    The code :
+
+     use ZM::Template;
+
+     # Create the template object and load it.
+     $templ = new ZM::Template;
+     $templ->src('example2.html');
+
+     # Simulate obtaining data from database, etc and populate 300 blocks.
+
+     for ($i=0; $i<300; $i++)
+     {
+         # Ensure that the token is qualified by the name of the block and load
+         #       values for the tokens.
+         $templ->id($i, 'x_details');
+         $templ->name("the name is $i", 'x_details');
+         $templ->desc("the desc for $i", 'x_details');
+     }
+
+     for ($i=0; $i<4; $i++)
+     {
+         $templ->customer("And more $i", 'x_customer_det');
+     }
+
+     #    Send the completed html document to the web server.
+     $templ->output('Content-Type: text/html');
+
+  Example 3.
+    Uses 2 seperate templates to produce a single web page :
+
+    The overall page template :
+
+     <html>
+     <head><title>Example 5 - sub templates</title></head>
+     <body bgcolor=blue>
+
+     Surname : __surname__
+     First Name : __firstname__
+     My friends (both of them) call me : __nickname__
+
+     Now to include a sub template...
+     __guts__
+
+     And this is the end of the outer template.
+     <hr>
+     </body>
+     </html>
+
+    The subtemplate which will be slotted into the 'guts' token position :
+
+     <table border=1>
+     <tr>
+         <td>__widget__</td>
+         <td>__wodget__</td>
+     </tr>
+     </table>
+
+    The code :
+
+     use ZM::Template;
+
+     # Create a template object and load the template source.
+     my($templ) = new ZM::Template;
+     $templ->src('example5.html');
+
+     # Set values for tokens within the page
+     $templ->surname('Smyth');
+     $templ->firstname('Arthur');
+     $templ->nickname('Art!');
+
+     my $subTmpl = new ZM::Template;
+     $subTmpl->src('example5a.html');
+     $subTmpl->widget('this is widget');
+     $subTmpl->wodget('this is wodget');
+
+     $templ->guts($subTmpl->htmlString);
+
+     # Send the merged page and data to the web server as a standard text/html mime
+     #       type document
+     $templ->output('Content-Type: text/html');
+
+HISTORY
+     Jun 2009       Version 0.7.2   Added setCache, getCache, rmCache, clearCache methods.
+     Apr 2007       Version 0.5.3   Perfomance fixes.
+     Jun 2004       Version 0.5.2   Parse SSI before template parsing.
+     Oct 2003       Version 0.5.0   Added __else_ token type.
+     Oct 2003       Version 0.4.1   Fixed some errors with __z_ token type.
+     Oct 2003       Version 0.4.0   Added __if_ token type.
+     Oct 2003       Version 0.3.1   Fixed some errors.
+     Oct 2003       Version 0.3.0   Added SSI parsing inside template.
+     Oct 2003       Version 0.2.0   Added fromfile method.
+     Oct 2003       Version 0.1.1   Some fixes in documentation, messages and code.
+     Oct 2003       Version 0.1.0   Added __z_ token type.
+     Oct 2003       Version 0.0.3   First release.
+
+AUTHOR
+     Zet Maximum ltd.
+     Maxim Kashliak
+     Aleksey V. Ivanov
+     http://www.zmaximum.ru/
+     http://perl.zmaximum.ru
+ 

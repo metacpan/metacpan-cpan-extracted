@@ -1,0 +1,21 @@
+2014-05-08 - rplessl - Changed Interface to named Parameter Interface
+                       Added callLegacy() and callFriendlyLegacy() for old API
+
+2014-05-07 - rplessl - added more functions in ZimbraManager::SOAP::Friendly
+
+2014-05-01 - rplessl - fix RHEL init file 
+                       fix GetOpt parameter parsing
+
+
+2014-04-29 - rplessl - Added ZimbraManager::SOAP::Friendly and improve API
+
+2014-03-19 - rplessl - initial Mojo App
+
+2014-03-19 - rplessl - rewritten tool to run faster
+                       faster will be done by using and daemon
+                       idea: use Mojolicious Perl daemon and 
+                       communicate with REST interface to communicator
+                        
+
+2014-03-19 - rplessl - initial SOAP tool 
+		       proof of concept

@@ -1,0 +1,10 @@
+Changes
+lib/ZCS/LocalConfig/Command.pm
+lib/ZCS/LocalConfig/File.pm
+lib/ZCS/LocalConfig/_base.pm
+lib/ZCS/LocalConfig.pm
+Makefile.PL
+MANIFEST
+README
+t/00_load.t
+META.yml                                 Module meta-data (added by MakeMaker)

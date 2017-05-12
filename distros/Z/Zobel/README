@@ -1,0 +1,98 @@
+              =================================================
+                     LiveGe'ez Remote Processing Protocol 
+                                -=* Zobel *=-
+                           -----------------------
+
+
+
+README file for the Zobel LiveGe'ez RPP Implementation.
+
+	Zobel is a collection of modules and a front end CGI script that
+	implement the LiveGe'ez Remote Processing Protocol specification.
+	At this stage Zobel implements on the CGI query services fully
+	and will (soon) be compliant with the HTML markup specification.
+	Latest Zobel hype/summary:   http://libeth.netpedia.net/Zobel/
+
+ 	Definitive info on the LiveGe'ez Remote Processing Protocol is
+ 	found at:  http://libeth.netpedia.net/LiveGeez.html
+
+	If you do not intend to process Ethiopic web documents on remote
+	servers, this package will not be very useful for you.
+
+	Prerequisites for Zobel are the modules  LWP::Simple, HTML::Entities,
+	Convert::Ethiopic, and the old chestnut "cgi-lib.pl" and "cookies.pl"
+	which have been included in the "bin" directory.
+
+
+	Module LiveGeez::Request
+
+		Instantiates an object that contains a parsed LiveGe'ez query.
+		The request object is required by any other LiveGe'ez function
+		of object.
+
+	Module LiveGeez::Services
+
+		Services.pm provides request processing services for a LiveGe'ez
+		query as specified in the LiveGe'ez Remote Processing Protocol.
+		"ProcessRequest" takes a LiveGe'ez LiveGeez::Request object and
+		performs the appropriate service.
+	
+	Module LiveGeez::File
+
+		Instantiates an object for processing an Ethiopic text or HTML
+		document.  The constructor requires a LiveGeez::Request object
+		as an argument.
+
+	Module LiveGeez::Cgi
+
+		Instantiates an object for processing an Ethiopic text or HTML
+
+	Program LiveGeez::HTML
+
+		Provides the routines for conversion of HTML document content
+		between Ethiopic encoding systems and for pre-interpretation of
+		HTML markups for compliance with the LiveGe'ez Remote Processing
+		Protocol.
+
+	Program LiveGeez::CacheAsSERA
+
+		Provides the routines for conversion of HTML document content
+		from Ethiopic encoding systems into SERA for document caching and
+		later conversion into other Ethiopic systems.
+
+	Program LiveGeez::Local
+
+		The required module by all other LiveGe'ez modules.  Local.pm
+		contains site specific settings for default encoding systems,
+		language, and paths.
+
+	Program Z.pl:
+
+		The front end of the "Zobel" implementation of the LiveGe'ez Remote
+		Processing Protocol.  The expected and intended use is via CGI query,
+		however the Z.pl script is serviceable at the command line as well.
+
+
+Installation:
+	Obtain and install Convert::Ethiopic from where you found Zobel.
+    LibEth is required:  http://libeth.netpedia.net
+
+	Download the tar.gz, unpack it, change to the Zobel-*
+	directory. Then do
+
+		Edit LiveGeez/Local.pm and bin/cookies.pl
+		perl Makefile.PL
+		make
+		make install
+
+	The scripts in "bin" are not automatically installed - you will probably
+	want to install it in the appropriate place for CGI service on your system
+	(vs /usr/local/bin etc.)
+
+Available:
+	ftp://ftp.ethiopic.org/pub/perl-unicode/ and from your
+	favorite CPAN site in the authors/id/D/DY/DYACOB/ directory.
+	
+Copyright: (c) 1999 Daniel Yacob, Yacob@EthiopiaOnline.Net. All rights
+	reserved. This library is free software; you can redistribute
+	it and/or modify it under the same terms as Perl itself.

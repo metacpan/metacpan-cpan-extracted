@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+set -e
+
+main() {
+  test_function="${1:?Command requires function name}"
+  for repo in *-pm; do
+    [ -e "$repo/Meta" ] || continue
+    local text='' title="$repo"
+    (
+      cd "$repo"
+      $test_function || exit 0
+      echo-line
+      echo "$title"
+      echo-line
+      echo "$text"
+      echo-line
+      git status
+      echo-line
+      echo
+      bash
+      if [ $? -eq 9 ]; then
+        echo 'Bailing out'
+        exit 1
+      fi
+    ) || break
+  done
+}
+
+echo-line() {
+  echo "---------------------------------------------------------------"
+}
+
+[ "$BASH_SOURCE" == "$0" ] && main "$@"

@@ -1,0 +1,226 @@
+#!/usr/bin/perl
+#Copyright (c) 2008, Zane C. Bowers
+#All rights reserved.
+#
+#Redistribution and use in source and binary forms, with or without modification,
+#are permitted provided that the following conditions are met:
+#
+#   * Redistributions of source code must retain the above copyright notice,
+#    this list of conditions and the following disclaimer.
+#   * Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#
+#THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+#ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
+#WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+#IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+#INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
+#BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
+#DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+#LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+#OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+#THE POSSIBILITY OF SUCH DAMAGE.
+
+use strict;
+use warnings;
+use Getopt::Std;
+use ZConf::BGSet;
+use Image::Size::FillFullSelect;
+use X11::Resolution;
+use Imager::AverageGray;
+use String::ShellQuote;
+
+$Getopt::Std::STANDARD_HELP_VERSION=1;
+
+#version function
+sub main::VERSION_MESSAGE {
+	print "zbgset-pt 0.0.0\n";
+};
+
+#print help
+sub main::HELP_MESSAGE {
+	print "\n".
+		  "-d <dir>\n".
+	      "-f <fill type>\n".
+		  "-g <min gray>\n".
+		  "-G <max gray>\n".
+		  "-p <path>\n";
+		  "-s <set>\n".
+};
+
+#gets the options
+my %opts=();
+getopts('s:p:f:d:g:G:', \%opts);
+
+#make sure we have the specified switches
+if (!defined($opts{p})) {
+	warn('zbgset-pt: No path defined.');
+	exit 254;
+}
+if (!defined($opts{d})) {
+	warn('zbgset-pt: No directory defined.');
+	exit 254;
+}
+if (!defined($opts{f})) {
+	warn('zbgset-pt: No fill type defined.');
+	exit 254;
+}
+
+my $path=shell_quote($opts{d});
+my @files=`find $path -type f`;
+
+my $x11res=X11::Resolution->new;
+my ($xres, $yres)=$x11res->getResolution;
+
+my @matched;
+
+#init FillFullSelect
+my $iffs = Image::Size::FillFullSelect->new();
+
+#get default settings for average gray
+my $ag;
+if (defined($opts{g}) || $opts{G}) {
+	if (!defined($opts{g})) {
+		$opts{g}=0;
+	}
+
+	if (!defined($opts{G})) {
+		$opts{G}=255;
+	}
+
+	$ag=Imager::AverageGray->new;
+}
+
+#process the files
+my $int=0;
+while (defined($files[$int])) {
+	chomp($files[$int]);
+
+	#get the fill type for the file in question
+	my $filltype = $iffs->select($files[$int], undef, undef, $xres, $yres);
+
+	#if it worked, process it
+	if (defined($filltype)) {
+		#continue if it is the specified file type
+		if ($opts{f} eq $filltype) {
+			if (defined($opts{g})) {
+				my $ag=$ag->fromFile($files[$int]);
+				if (($ag >= $opts{g}) && ($ag <= $opts{G})) {
+					push(@matched, $files[$int]);
+				}
+			}else {
+				push(@matched, $files[$int]);
+			}
+		}
+	}
+
+
+	$int++;
+}
+
+#init ZConf::BGSet
+my $zbg=ZConf::BGSet->new();
+if ($zbg->{error}) {
+	warn('zbgset-pt: Coult not initialize ZConf::BGSet');
+	exit $zbg->{error};
+}
+
+#read the specified set
+if (defined($opts{s})) {
+	$zbg->readSet($opts{s});
+	if ($zbg->{error}) {
+		warn('zbgset-pt: Could not read the specified set');
+		exit $zbg->{error};
+	}
+}
+
+#set the path
+$zbg->setPath($opts{p}, \@matched);
+if ($zbg->{error}) {
+	warn('zbgset-pt: setPath errored');
+	exit $zbg->{error};
+}
+
+exit 1;
+
+=head1 NAME
+
+zbgset-pt - Automatically populate a path using average gray or fill type.
+
+=head1 SYNOPSIS
+
+zbgset-pt B<-p> <path> B<-d> <dir> B<-f> <fill type> [B<-g> <min gray>] [B<-G> <max gray>]
+[B<-s> <set>]
+
+=head1 SWTICHES
+
+=head2 -d <dir>
+
+The directory to process.
+
+=head2 -f <fill type>
+
+The fill type.
+
+This should be either fill or full.
+
+=head2 -g <min gray>
+
+This is the min average gray.
+
+=head2 -G <max gray>
+
+This is the max average gray.
+
+=head2 -p <path>
+
+This is the path that will be files will be dumped into.
+
+=head2 -s <set>
+
+This is the ZConf set to use.
+
+=head1 EXIT CODES
+
+If a exit code is not listed below, it is what ever error value ZConf::BGSet returned.
+
+=head2 254
+
+'-r', '-p', and '-d' have not been specified.
+
+=head1 AUTHOR
+
+Copyright (c) 2009, Zame C. Bowers <vvelox@vvelox.net>
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+     this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS` OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=head1 OSNAMES
+
+any
+
+=head1 README
+
+zbgset-pt - Automatically populate a path using average gray or fill type.
+
+=cut

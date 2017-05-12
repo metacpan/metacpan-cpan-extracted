@@ -1,0 +1,29 @@
+---
+abstract: 'A Mojolicious application to manage Zimbra with SOAP'
+author:
+  - 'Roman Plessl <rplessl@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.016, CPAN::Meta::Converter version 2.141170'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: ZimbraManager
+requires:
+  HTTP::CookieJar::LWP: 0
+  IO::Socket::SSL: 0
+  Mojo::Base: 0
+  Mojo::JSON: 0
+  Mojo::Log: 0
+  Mojo::Util: 0
+  XML::Compile::SOAP11: 0
+  XML::Compile::SOAP::Trace: 0
+  XML::Compile::Transport::SOAPHTTP: 0
+  XML::Compile::WSDL11: 0
+resources:
+  bugtracker: https://github.com/rplessl/ZimbraManager/issues
+  repository: git://github.com/rplessl/ZimbraManager.git
+version: 0.15

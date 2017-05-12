@@ -1,0 +1,119 @@
+{
+   "abstract" : "Access the JSON-RPC API of a Zabbix server",
+   "author" : [
+      "Fabrice Gabolde <fabrice.gabolde@uperto.com>",
+      "Marc Dequenes <marc.dequenes@uperto.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Zabbix-API",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.36_14"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON" : "0",
+            "LWP" : "0",
+            "Params::Validate" : "0",
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "provides" : {
+      "Zabbix::API" : {
+         "file" : "lib/Zabbix/API.pm",
+         "version" : "0.009"
+      },
+      "Zabbix::API::Action" : {
+         "file" : "lib/Zabbix/API/Action.pm",
+         "version" : 0
+      },
+      "Zabbix::API::CRUDE" : {
+         "file" : "lib/Zabbix/API/CRUDE.pm",
+         "version" : 0
+      },
+      "Zabbix::API::Graph" : {
+         "file" : "lib/Zabbix/API/Graph.pm",
+         "version" : 0
+      },
+      "Zabbix::API::Host" : {
+         "file" : "lib/Zabbix/API/Host.pm",
+         "version" : 0
+      },
+      "Zabbix::API::HostGroup" : {
+         "file" : "lib/Zabbix/API/HostGroup.pm",
+         "version" : 0
+      },
+      "Zabbix::API::Item" : {
+         "file" : "lib/Zabbix/API/Item.pm",
+         "version" : 0
+      },
+      "Zabbix::API::Macro" : {
+         "file" : "lib/Zabbix/API/Macro.pm",
+         "version" : 0
+      },
+      "Zabbix::API::Map" : {
+         "file" : "lib/Zabbix/API/Map.pm",
+         "version" : 0
+      },
+      "Zabbix::API::MediaType" : {
+         "file" : "lib/Zabbix/API/MediaType.pm",
+         "version" : 0
+      },
+      "Zabbix::API::Proxy" : {
+         "file" : "lib/Zabbix/API/Proxy.pm",
+         "version" : 0
+      },
+      "Zabbix::API::Screen" : {
+         "file" : "lib/Zabbix/API/Screen.pm",
+         "version" : 0
+      },
+      "Zabbix::API::Template" : {
+         "file" : "lib/Zabbix/API/Template.pm",
+         "version" : 0
+      },
+      "Zabbix::API::Trigger" : {
+         "file" : "lib/Zabbix/API/Trigger.pm",
+         "version" : 0
+      },
+      "Zabbix::API::User" : {
+         "file" : "lib/Zabbix/API/User.pm",
+         "version" : 0
+      },
+      "Zabbix::API::UserGroup" : {
+         "file" : "lib/Zabbix/API/UserGroup.pm",
+         "version" : 0
+      },
+      "Zabbix::API::Utils" : {
+         "file" : "lib/Zabbix/API/Utils.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.gnu.org/licenses/gpl-3.0.txt"
+      ],
+      "repository" : {
+         "url" : "git://github.com/fgabolde/Zabbix-API.git"
+      }
+   },
+   "version" : "0.009"
+}

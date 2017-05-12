@@ -1,0 +1,6 @@
+Revision history for Perl extension Zwoelf::Hash::Union.
+
+0.01  Fri Apr 29 12:01:31 2016
+	- original version; created by h2xs 1.23 with options
+		-AX Zwoelf::Hash::Union
+

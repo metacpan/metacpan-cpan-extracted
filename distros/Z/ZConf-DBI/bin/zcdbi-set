@@ -1,0 +1,187 @@
+#!/usr/bin/perl
+
+use ZConf::DBI;
+use strict;
+use warnings;
+use Getopt::Std;
+use Term::ReadKey;
+
+$Getopt::Std::STANDARD_HELP_VERSION = 1;
+
+#version function
+sub main::VERSION_MESSAGE {
+        print "zcdbi-set 0.0.0\n";
+}
+
+#print help
+sub main::HELP_MESSAGE {
+        print "\n".
+		      "-s <set>\n".
+			  "-n <data source name>\n".
+			  "-d <data source>\n",
+			  "-u <user>\n".
+			  "-p <pass>\n".
+			  "-P  Ask the password.\n".
+			  "-a <attribute>\n".
+			  "-A <attribute value>\n";
+}
+
+#gets the options
+my %opts=();
+getopts('as:n:d:u:p:', \%opts);
+
+#asks the password if asked for
+if ($opts{P}) {
+	#ask for the password
+	ReadMode(4);
+	print 'password:';
+	my $pass1=<STDIN>;
+	print "\npassword:";
+	my $pass2=<STDIN>;
+	print "\n";
+	ReadMode(0);
+
+	#makes sure it is the same
+	if ($pass1 ne $pass2) {
+        warn('zcdbi-set:254: The passwords are not the same');
+		exit 254;
+	}
+	chomp($pass1);
+	$opts{p}=$pass1;
+}
+
+#initilize it
+my $zcdbi=ZConf::DBI->new;
+
+#read the specified set if requested
+if (defined($opts{s})) {
+	$zcdbi->readset($opts{s});
+	if ($zcdbi->error) {
+		warn('zcdbi-set:'.$zcdbi->error.': '.$zcdbi->errorString);
+		exit $zcdbi->error;
+	}
+}
+
+#handles changing the data source
+if (defined($opts{d})) {
+	$zcdbi->setDS($opts{n}, $opts{n});
+	if ($zcdbi->error) {
+		warn('zcdbi-set:'.$zcdbi->error.': '.$zcdbi->errorString);
+		exit $zcdbi->error;
+	}
+}
+
+#handles changing the user
+if (defined($opts{u})) {
+	$zcdbi->setDSuser($opts{n}, $opts{u});
+	if ($zcdbi->error) {
+		warn('zcdbi-set:'.$zcdbi->error.': '.$zcdbi->errorString);
+		exit $zcdbi->error;
+	}
+}
+
+#handles changing the user
+if (defined($opts{p})) {
+	$zcdbi->setDSattr($opts{n}, $opts{p});
+	if ($zcdbi->error) {
+		warn('zcdbi-set:'.$zcdbi->error.': '.$zcdbi->errorString);
+		exit $zcdbi->error;
+	}
+}
+
+#handles changing the attribute
+if (defined($opts{a})) {
+	$zcdbi->setDSpass($opts{n}, $opts{a}, $opts{A});
+	if ($zcdbi->error) {
+		warn('zcdbi-set:'.$zcdbi->error.': '.$zcdbi->errorString);
+		exit $zcdbi->error;
+	}
+}
+
+exit 0;
+
+=head1 NAME
+
+zcdbi-set - Modify a existing data source.
+
+=head1 SYNOPSIS
+
+zcdbi-set [B<-s> <set>] B<-n> <data source name> [B<-d> <data source>] [B<-u> <user>] [B<-p> <pass>] [B<-P>] [B<-a> <attribute name>] [B<-A> <attribute value>]
+
+=head1 SWTICHES
+
+=head2 -a <attribute name>
+
+The attribute name to modify.
+
+If "-A" is not specified, it is removed.
+
+=head2 -A <attribute value>
+
+The attribute value.
+
+=head2 -d <data source>
+
+The DBI data source string.
+
+=head2 -n <data source name>
+
+The name of the data source to add.
+
+=head2 -p <password>
+
+Specifiy the password via a switch.
+
+=head2 -P
+
+Specifiy the password via standard input. It will be asked for twice.
+
+=head2 -s <set>
+
+The set to load.
+
+=head2 -u <user>
+
+The user name to use with the data source.
+
+=head1 EXIT CODES
+
+Any non-zero exit codes, not listed below, are the error codes returned by ZConf.
+
+=head2 254
+
+The -a switch was used and the passwords did not match.
+
+=head1 AUTHOR
+
+Copyright (c) 2010, Zame C. Bowers <vvelox@vvelox.net>
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+     this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS` OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=head1 Changelog
+
+=head2 2010-03-12/15:00
+
+Initial release.
+
+=cut

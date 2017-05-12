@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+set -e
+
+: "${PERL:=$(which perl)}"
+ZILD="$PERL -S zild"
+VERSION="$($ZILD meta version)"
+
+git commit -am "CPAN Release $VERSION"$'\n'$'\n'"$(
+  perl -p0e 's/\A.*?\nchanges:\n(.*?\n)(?:---|\Z).*/$1/s' Changes
+)"

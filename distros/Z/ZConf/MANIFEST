@@ -1,0 +1,27 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+TODO
+lib/ZConf.pm
+lib/ZConf/backends/file.pm
+lib/ZConf/backends/ldap.pm
+t/00-load.t
+t/01-load.t
+t/02-load.t
+t/pod-coverage.t
+t/pod.t
+t/boilerplate.t
+bin/zcchooser-edit
+bin/zcchooser-get
+bin/zcchooser-run
+bin/zcchooser-set
+bin/zccreate
+bin/zcget
+bin/zcls
+bin/zcrm
+bin/zcset
+bin/zcvdel
+bin/zcvls
+bin/zccdump
+zconf ldap.schema

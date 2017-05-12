@@ -1,0 +1,43 @@
+NAME
+    Zabbix::Reporter - Zabbix dashboard
+
+METHODS
+  fetch_n_store
+    Fetch a result from cache or DB.
+
+  fetch
+    Fetch a result directly from DB.
+
+  triggers
+    Retrieve all matching triggers.
+
+  acks
+    Retrieve all matching acknowlegements.
+
+  disabled_actions
+    Retrieve all disabled actions.
+
+  enable_actions
+    Enables all actions.
+
+  unsupported_items
+    Retrieve all unsupported items.
+
+  unattended_alarms
+    Retrieve all unsupported items.
+
+  history
+    Retrieve all triggers.
+
+NAME
+    Zabbix::Reporter - Zabbix dashboard
+
+AUTHOR
+    Dominik Schulz <dominik.schulz@gauner.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Dominik Schulz.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

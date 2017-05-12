@@ -1,0 +1,81 @@
+{
+   "abstract" : "version agnostic Perl bindings for zeromq using ffi",
+   "author" : [
+      "Dylan Cali <calid1984@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "ZMQ-FFI",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "FFI::CheckLib" : "0.11",
+            "FFI::Platypus" : "0.33"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::XSAccessor" : "1.18",
+            "Exporter" : "0",
+            "FFI::Platypus" : "0.33",
+            "FFI::Platypus::Buffer" : "0",
+            "FFI::Platypus::Memory" : "0",
+            "Import::Into" : "0",
+            "Math::BigInt" : "1.997",
+            "Moo" : "1.004005",
+            "Moo::Role" : "0",
+            "Sub::Exporter" : "0",
+            "Try::Tiny" : "0",
+            "bytes" : "0",
+            "feature" : "0",
+            "if" : "0",
+            "namespace::clean" : "0",
+            "perl" : "5.010",
+            "strict" : "0",
+            "threads" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "List::Util" : "0",
+            "Math::BigInt" : "1.997",
+            "POSIX" : "0",
+            "Scalar::Util" : "0",
+            "Sub::Override" : "0",
+            "Sys::SigAction" : "0",
+            "Test::Deep" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "Test::NoWarnings" : "0",
+            "Test::Warnings" : "0",
+            "Time::HiRes" : "0",
+            "locale" : "0",
+            "utf8" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/calid/zmq-ffi/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/calid/zmq-ffi.git",
+         "web" : "https://github.com/calid/zmq-ffi"
+      }
+   },
+   "version" : "1.11"
+}
+

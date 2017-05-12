@@ -1,0 +1,101 @@
+This file documents the revision history for Zucchini
+
+0.0.21    2014-03-05 21:48:33+00:00 UTC
+ - fix $fh/*FILE usage in ::Template
+ - add $VERSION to script/zucchini
+
+0.0.20    2014-01-27 00:03:50+00:00 Europe/London
+ - update preferred Bugtracker to point to github
+ - don't manually specify test deps in dist.ini
+ - move tests from t/testlib/ to t/lib (RT#92333)
+ - use MetaJSON dzil plugin
+ - sort input/output file lists in Zucchini::Test::compare_input_output
+
+0.0.19    2014-01-18 09:54:38UTC+0000 UTC
+    - Tell dzil that abby.jpg is 'bytes' not UTF-8
+    - Add optional support for html5 linting
+    - dist.ini: add Commit/Push at the end of the file
+
+0.0.18_02 2012-04-12 14:37:31 UTC
+    - disable badly written and unfinished rsync test
+
+0.0.18_01 2012-04-12 13:49:34 UTC
+    - switch to Moo
+    - start using Dist::Zilla for distribution management
+
+0.0.17  Thu Mar 19 22:42:41 GMT 2009
+    - removed "use Data::Dump" from t/04.zucchini.template.t
+
+0.0.16  Wed Mar 18 19:12:05 GMT 2009
+    - add Config::General as a requirement for builds/tests
+    - only do the rsync if we don't (appear to) require a password
+
+0.0.15  Sun Mar  8 10:30:18 GMT 2009
+    Maintenance Tweak Release
+       Module::Install no longer supports Build.PL.
+       It was impossible to maintain duel backends, and has been deprecated.
+       Please remove all Build.PL files and only use the Makefile.PL installer.
+
+0.0.14  Fri Mar  6 19:17:39 GMT 2009
+    - replace hard-coded path to config with object accessor that defaults to
+      our previously hard-coded value
+    - add --config switch to script/zucchini
+    - add "always_process" functionality
+
+0.0.13  Tue Mar  3 20:48:25 GMT 2009
+    - update copyright date
+    - add tt_option to config (passed thorugh as Template::Toolkit options)
+    - added Zucchini presentation to the distribution
+
+0.0.12  Sun Nov 30 14:40:01 GMT 2008
+    - make moose packages immutable
+    - added cli_defaults to .zucchini configuration file
+
+0.0.11  Tue Aug 26 08:44:09 BST 2008
+    - removed Class::Std dependency
+    - added "use warnings" to tutorial POD file
+    - force stringification of Path::Class file() results to resolve
+      File::Copy::_eq() issue that's appeared in perl-5.10
+
+0.0.10  Sun Aug 24 20:30:54 BST 2008
+    - added missing build dependency to Makefile.PL
+
+0.0.9   Fri Aug 22 19:26:30 BST 2008
+    - added missing t/testdata file
+
+0.0.8   Fri Aug 22 19:16:30 BST 2008
+    - converted from Class:Std to Moose base objects
+    - extended/improved test suite
+    - refactored common test code into ::Test module
+
+0.0.7   Tue Aug  5 20:10:56 BST 2008
+    - added HTML error checking (HTML::Lint)
+    - added missing --options to script/zucchini POD usage
+
+0.0.6   Thu May 22 08:56:06 BST 2008
+    - only show missing digest warnings if we're verbose enough
+    - only try to prepare remote FTP connection once
+    - better handling when trying to process a site that's not defined
+    - made some improvements for some cases that occur with new users
+    - added tutorial
+
+0.0.5   Fri May 16 09:10:57 BST 2008
+    - fixed fsync transfer with non-root 'path'
+
+0.0.4   Thu May 15 22:55:07 BST 2008
+    - added Contributors
+    - added lots of documentation for modules
+
+0.0.3   Wed May 14 20:24:15 BST 2008
+    - moved ttsite.original to legacy/
+    - no_index added for legacy/
+    - --version option added to script/zucchini
+    - added --create-config
+    - fixed tests to work with ::TestConfig
+
+0.0.2   2008-05-13 23:17:50 +0100
+    - fixed MANIFEST omissions
+
+0.0.1   2008-05-13 22:54:12 +0100
+    - Initial project release
+

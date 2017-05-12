@@ -1,0 +1,369 @@
+NAME
+
+    Zilla::Dist - Dist::Zilla Mixed Up
+
+VERSION
+
+    This document describes Zilla::Dist version 0.0.196.
+
+SYNOPSIS
+
+        > zild Meta
+        > # Edit the Meta file.
+        > zild release
+
+DESCRIPTION
+
+    This module is a formalization of a Perl package directory layout and
+    release process that I have been evolving for some time. I use the same
+    layout for Bash, Ruby, Python and Node.js package publishing.
+
+    Zilla::Dist provides a Makefile and set of scripts that take a modern
+    code layout and transform it into something that looks like a standard
+    old Perl distribution. Under the hood zild generates everything that
+    Dist::Zilla wants and lets dzil do the heavy lifting, but you never
+    need to interact with Dist::Zilla stuff directly.
+
+ Directory Layout
+
+    A fully stacked top level CPAN package repository might look like this:
+
+        Changes         # History in YAML
+        Contributing    # A generated instruction file for contributing
+        Meta            # Meta info for all metadata needs (including dzil)
+        ReadMe.pod      # Generated from `doc/Module.swim`
+        .travis.yml     # Travis file (generated)
+        bin/            # Scripts
+        doc/            # Swim docs
+        ext/            # External repos (subrepos)
+        eg/             # Examples
+        lib/            # Perl `.pm` code
+        pkg/            # Packaging related files
+        note/           # Project notes, todo lists, ideas, specs, etc
+        share/          # Shared files to distribute
+        test/           # Test suite
+
+    Note a few things:
+
+      * Sane/Readable names
+
+      * Directories are lowercase. Never plural
+
+      * Files are TitleCase
+
+      * No file extensions (if possible)
+
+      * No extra meta files like dist.ini, .travis.yml, bower.json etc
+
+    These are the best of from all the package systems I've used. They make
+    me happy, and not tied to poor legacy standards.
+
+ Zilla::Dist
+
+    Zilla::Dist uses a Makefile to do everything, but you never see it. You
+    run commands like:
+
+        zild make test
+
+    Run zild make help to get a list of all the targets.
+
+    The most common targets don't require you to type make. For instance,
+    you can simply:
+
+        zild test
+
+    Here are the most important targets:
+
+    zild release
+
+      Build the dist, then cpan-upload it.
+
+    zild test
+
+      Run the test suite.
+
+    zild install
+
+      Build and install the software. Same as install from CPAN.
+
+    zild update
+
+      Rebuild the ReadMe.pod and other generated files.
+
+    zild prereqs
+
+      Install the prereqs from CPAN that are listed in the Meta file's
+      requires: field.
+
+    zild cpan
+
+      Turn repo into a Dist::Zilla ready subdirectory called ./cpan/. This
+      directory has a dist.ini file.
+
+    zild dist
+
+      Basically the same as zild cpan; cd cpan; dzil build.
+
+USAGE
+
+    Start by running:
+
+        cp `zild sharedir`/Meta .
+
+    and you'll get a Meta file template. You need to customize the Meta
+    file with information specific to your project.
+
+    To do a release, just set a new version in the Meta file and add a
+    Changes section using the same version. Then run:
+
+        zild release
+
+    This will:
+
+      * Make sure things are ready for release.
+
+      * Update the modules with $VERSION to the new version.
+
+      * Make a dzil ready directory of your stuff called ./cpan/.
+
+      * Call dzil build.
+
+      * Call cpan-upload to send the dist to CPAN.
+
+      * Tag the git repo with the version string.
+
+      * git push the repo and tag upstream.
+
+ Release in Depth
+
+    This section lists all the things that actually happen during the zild
+    release step.
+
+    …to be completed…
+
+RATIONALE RANTING
+
+    I've published a lot of packages in a lot of programming languages. I
+    like taking the best ideas and spreading them around. I like reusing
+    ideas and code and tools as much as possible between these packages.
+
+    I trust dzil to DTRT with regard to the CPAN release process. I use
+    almost the exact same dist.ini for some 50 CPAN packages that I've
+    converted so far.
+
+    I don't like cluttered repos and adding new metadata files for each new
+    tool that needs one. The dist.ini file is not bad, but I can generate
+    it from metadata easily. So I do.
+
+    As much as these great new ideas differ from the norm, I want my CPAN
+    publishings to be normal to normal mongers (if there's such a thing).
+    The zild release process does just that. End users would have to look
+    hard to know this wasn't a "normal" dzil release.
+
+    I'm packaging this packaging process as Zilla::Dist for others to use.
+    It's also a decent example of a CPAN package packaged with itself.
+
+NOTES
+
+    Some of the tools in Zilla::Dist are Bash, some are Perl. I'm doing a
+    lot in the area of Bash Package packaging. See http://bpan.org.
+
+    I use the term Package where CPAN people have used the term
+    Distribution. Perl is the only language (in my packaging experience) to
+    do so.
+
+    The name t/ is another outlier. The most common is test/ followed by
+    tests/.
+
+    I don't like plural directory names. Try singular. I think you'll like
+    it too.
+
+    ALLCAPSFILENAMES ARE TOO LOUD! ChillOut.
+
+ Commiting Generated Code/Files
+
+    People think that committing generated code/files is a bad idea and in
+    general I concur, but there are exceptions.
+
+    Sometimes tools like Travis-CI require you to commit a config file.
+    Zilla::Dist generates these files from metadata, which is a whole lot
+    easier than maintaining them yourself, but you end up commiting
+    generated code.
+
+    The dist.ini file is only needed locally, however, during dist build
+    time, so no need to commit that.
+
+    In general, when an external tool requires files, and it's easiest to
+    generate those files, it's OK to commit generated code.
+
+ Modules Published to CPAN w/ zild
+
+      * https://github.com/ingydotnet/acme-pm
+
+      * https://github.com/ingydotnet/acme-ybfod-pm
+
+      * https://github.com/ingydotnet/akefile-pm
+
+      * https://github.com/ingydotnet/alt-pm
+
+      * https://github.com/ingydotnet/alt-sex-ingy-pm
+
+      * https://github.com/ingydotnet/app-aycabtu-pm
+
+      * https://github.com/ingydotnet/boolean-pm
+
+      * https://github.com/ingydotnet/class-field-pm
+
+      * https://github.com/ingydotnet/convert-base32-crockford-pm
+
+      * https://github.com/ingydotnet/devel-local-pm
+
+      * https://github.com/ingydotnet/dist-zilla-plugin-testbaseincluder-pm
+
+      * https://github.com/ingydotnet/dist-zilla-plugin-testmlincluder-pm
+
+      * https://github.com/ingydotnet/error-errors-pm
+
+      * https://github.com/ingydotnet/file-share-pm
+
+      * https://github.com/ingydotnet/gloom-pm
+
+      * https://github.com/ingydotnet/inline-pm
+
+      * https://github.com/ingydotnet/inline-c-pm
+
+      * https://github.com/ingydotnet/inline-module-pm
+
+      * https://github.com/ingydotnet/io-all-pm
+
+      * https://github.com/ingydotnet/jsony-pm
+
+      * https://github.com/ingydotnet/js-pm
+
+      * https://github.com/ingydotnet/jsync-pm
+
+      * https://github.com/ingydotnet/kwim-pm
+
+      * https://github.com/ingydotnet/kwim-plugin-badge-pm
+
+      * https://github.com/ingydotnet/language-snusp-pm
+
+      * https://github.com/ingydotnet/lexicals-pm
+
+      * https://github.com/ingydotnet/module-compile-pm
+
+      * https://github.com/ingydotnet/module-install-ackxxx-pm
+
+      * https://github.com/ingydotnet/module-install-manifestskip-pm
+
+      * https://github.com/ingydotnet/module-install-requireslist-pm
+
+      * https://github.com/ingydotnet/module-install-versioncheck-pm
+
+      * https://github.com/ingydotnet/module-manifest-skip-pm
+
+      * https://github.com/ingydotnet/moos-pm
+
+      * https://github.com/ingydotnet/lexicals-pm
+
+      * https://github.com/ingydotnet/orz-pm
+
+      * https://github.com/ingydotnet/package-pm
+
+      * https://github.com/ingydotnet/parse-sqloutput-pm
+
+      * https://github.com/ingydotnet/pegex-pm
+
+      * https://github.com/ingydotnet/pegex-chess-pm
+
+      * https://github.com/ingydotnet/pegex-cmd-pm
+
+      * https://github.com/ingydotnet/pegex-cpan-packages-pm
+
+      * https://github.com/ingydotnet/pegex-crontab-pm
+
+      * https://github.com/ingydotnet/pegex-forth-pm
+
+      * https://github.com/ingydotnet/pegex-json-pm
+
+      * https://github.com/ingydotnet/pegex-vcard-pm
+
+      * https://github.com/ingydotnet/perl5-pm
+
+      * https://github.com/ingydotnet/perl5-i-pm
+
+      * https://github.com/ingydotnet/perl5-ingy-pm
+
+      * https://github.com/ingydotnet/plack-middleware-cache-pm
+
+      * https://github.com/ingydotnet/plack-middleware-proxymap-pm
+
+      * https://github.com/ingydotnet/pquery-pm
+
+      * https://github.com/ingydotnet/rosettacode-pm
+
+      * https://github.com/ingydotnet/spiffy-pm
+
+      * https://github.com/ingydotnet/stackato-stackrad-pm
+
+      * https://github.com/ingydotnet/stump-pm
+
+      * https://github.com/ingydotnet/swim-pm
+
+      * https://github.com/ingydotnet/swim-plugin-badge-pm
+
+      * https://github.com/ingydotnet/swim-plugin-cpan-pm
+
+      * https://github.com/ingydotnet/template-toolkit-simple-pm
+
+      * https://github.com/ingydotnet/template-plugin-yamlval-pm
+
+      * https://github.com/ingydotnet/test-base-pm
+
+      * https://github.com/ingydotnet/test-yaml-pm
+
+      * https://github.com/ingydotnet/testml-pm
+
+      * https://github.com/ingydotnet/testml-script-pm
+
+      * https://github.com/ingydotnet/testml-tiny-pm
+
+      * https://github.com/ingydotnet/tiny-yaml-pm
+
+      * https://github.com/ingydotnet/vroom-pm
+
+      * https://github.com/ingydotnet/worky-pm
+
+      * https://github.com/ingydotnet/xxx-pm
+
+      * https://github.com/ingydotnet/yaml-pm
+
+      * https://github.com/ingydotnet/yaml-full-pm
+
+      * https://github.com/ingydotnet/yaml-libyaml-pm
+
+      * https://github.com/ingydotnet/yaml-old-pm
+
+      * https://github.com/ingydotnet/yaml-pegex-pm
+
+      * https://github.com/ingydotnet/yaml-shell-pm
+
+      * https://github.com/ingydotnet/yamltime-pm
+
+      * https://github.com/ingydotnet/yamltime-git-pm
+
+      * https://github.com/ingydotnet/zilla-dist-pm !!
+
+AUTHOR
+
+    Ingy döt Net <ingy@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    Copyright 2014-2017. Ingy döt Net.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See http://www.perl.com/perl/misc/Artistic.html
+

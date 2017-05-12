@@ -1,0 +1,22 @@
+NAME
+    ZM::SSI - SSI parser for CGI
+
+VERSION
+    SSI.pm v 0.0.5
+
+DESCRIPTION
+    Parsing SSI from Perl script. Understand: <!--#include file="..." -->
+    <!--#exec cgi="..." -->
+
+METHODS
+    The following public methods are availible:
+
+    ZM::SSI::parse($string);
+        Parsing string with HTML code.
+
+COPYRIGHT
+    Copyright 2002 Zet Maximum
+
+AUTHOR
+    Zet Maximum ltd. http://www.zmaximum.ru/
+

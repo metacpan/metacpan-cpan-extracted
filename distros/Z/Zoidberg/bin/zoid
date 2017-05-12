@@ -1,0 +1,418 @@
+#!/usr/bin/env perl
+
+# ############################################################## #
+# Copyright (c) 2011 Jaap G Karssenberg and Joel Berger.         #
+# All rights reserved. This program is free software; you can    #
+# redistribute it and/or modify it under the same terms as Perl  #
+# itself.                                                        #
+#                                                                #
+# This script is a frontend to the Zoidberg module, it starts    #
+# the Zoidberg perl shell.                                       #
+#                                                                #
+# mailto:joel.a.berger@gmail.com                                 #
+# http://github.com/jberger/Zoidberg                             #
+# ############################################################## #
+
+use strict;
+use Cwd qw/cwd/;
+use Pod::Usage;
+
+our $VERSION = '0.981';
+
+my @inc = (); # You can list custom includes here
+my $cwd = cwd;
+
+unshift @INC, map { m!^/! ? $_ : "$cwd/$_" } @inc;
+
+$0 =~ s!(.*/)!!;
+if (defined $1) {
+	my $dir = $1;
+	$dir = "$cwd/$_" unless $dir =~ m!^/!;
+	$Zoidberg::_base_dir = $dir;
+	unshift @INC, "$dir/lib" if -d "$dir/lib";
+}
+else { $Zoidberg::_base_dir = '' }
+
+# ########### #
+# Get Options #
+# ########### #
+
+eval q#use Zoidberg::Utils::GetOpt 'getopt'; 1# or die $@;
+
+my ($opts, $args) = eval { getopt( '
+	help,h,usage,u version,V config,C
+	exec,e@ command,c@ stdin,s
+	interactive,i login,l plug,p@
+	debug,-D,D verbose,v include,-I@
+	-I* -D* +o@ -o@ -m* -M*
+	@', @ARGV ) } ;
+if ($@) { # renice error message
+	print STDERR ref($@) ? $@->stringify(format => 'gnu') : $@;
+	exit 1;
+}
+
+# TODO -q
+#     Quiet (usually without argument). Suppress normal result or 
+#     diagnostic output. This is very common. Examples: ci(1), co(1), make(1).
+# TODO find switch to set mode / include plugins
+
+if ($$opts{help}) { # pre-emptive #1
+	pod2usage(
+		-verbose => 1,
+		-exitval => 0,
+	);
+}
+
+if ($$opts{_opts}) { # special switches
+	for (grep /^-[IDMm]./, @{$$opts{_opts}}) {
+		if ( s/^-I// ) { push @inc, $_ }
+		elsif ( s/^-D// ) {
+			no strict 'refs';
+			${$_.'::DEBUG'}++;
+		}
+		else {
+			my $import = /^-M/ ? 1 : 0 ;
+			my $use =
+				/-[Mm](\S+)=(.*)/ ? "use $1 split(/,/,q{$2}); " :
+				s/^-M//           ? "use $_; "  : "use $_ (); " ;
+			$use =~ s/^use -/no /;
+			$$opts{use} .= $use;
+		}
+	}
+}
+
+# ############### #
+# set environment #
+# ############### #
+
+my @user_info = getpwuid($>);
+$ENV{USER} ||= $user_info[0];
+$ENV{HOME} ||= $user_info[7];
+$ENV{ZOID} = $0; # _Don't_ change this to ENV{SHELL} !
+
+# fix environment
+$$opts{login} = 1 unless $ENV{PWD}; # FIXME a better check ?
+if ($$opts{login}) {
+	$ENV{LOGNAME} = $ENV{USER} = $user_info[0];
+	$ENV{HOME} = $user_info[7];
+	$ENV{PWD} = $ENV{HOME} || '/';
+	chdir $ENV{PWD} ;
+}
+else { $ENV{PWD} = $cwd }
+
+# ############# #
+# Load includes #
+# ############# #
+
+# parse includes
+unshift @INC,
+	map { m!^/! ? $_ : "$cwd/$_" }
+	grep s/^-I//, @{ $$opts{_opts} } if $$opts{_opts};
+
+# load Zoidberg.pm
+eval q#require Zoidberg# or die $@;
+
+if ($$opts{version}) { # pre-emptive #2
+	print "zoid $VERSION\n$Zoidberg::LONG_VERSION\n";
+	exit 0;
+}
+
+# ############## #
+# Parse settings #
+# ############## #
+
+my %settings;
+
+if ($$opts{'-o'}) {
+	for ( @{$$opts{'-o'}} ) {
+		my ($opt, $arg) = split '=', $_, 2;
+		$settings{$opt} = defined($arg) ? $arg : 1;
+	}
+}
+if ($$opts{'+o'}) {
+	for ( @{$$opts{'+o'}} ) {
+		my ($opt, $arg) = split '=', $_, 2;
+		$settings{$opt} = defined($arg) ? $arg : 0;
+	}
+}
+
+for (qw/data_dirs rcfiles/) { # arrays
+	$settings{$_} = [ split /:/, $settings{$_} ]
+		if defined $settings{$_} and ! ref $settings{$_};
+}
+
+for (qw/verbose debug login/) { # options
+	$settings{$_} = $$opts{$_} if defined $$opts{$_};
+}
+
+if ($$opts{config}) { # pre-emptive #3
+	%settings = (%Zoidberg::_settings, %settings);
+	for (sort keys %settings) {
+		next unless defined $settings{$_};
+		my $val = $settings{$_};
+		if (ref($val) eq 'ARRAY') { $val = join ', ', @$val }
+		elsif (ref($val) eq 'HASH') {
+			$val = join ', ', map "$_ => $$val{$_}", sort keys %$val;
+		}
+		print "$_ = $val\n"
+	}
+	exit 0;
+} # FIXME shouldn't this be a machine parsable format ? -- Yes it should !
+
+# ################## #
+# prepare for launch #
+# ################## #
+
+my $exec_string = 
+	$$opts{exec}    ? join(' ', @{$$opts{exec}})    :
+	$$opts{command} ? join(' ', @{$$opts{command}}) : '' ;
+
+# rest ARGV should be files
+for (@$args) { complain($_, 3) unless -f $_ }
+
+my $interact = $$opts{interactive} ||
+	(@$args || $exec_string || $$opts{stdin}) ? 0 : (-t STDIN and -t STDOUT) ;
+
+$settings{interactive} = $interact;
+
+# ############## #
+# AND Lift-off ! #
+# ############## #
+
+my $cube = Zoidberg->new( settings => \%settings );
+
+eval qq{
+	package # hide from pause indexer
+		Zoidberg::Eval;
+	$$opts{use}
+} if $$opts{use};
+
+if ($$opts{plug}) { $cube->plug($_) for @{$$opts{plug}} }
+
+if ($exec_string) {
+#	if ($args{command}) { $cube->{ipc}->do($exec_string) }
+#	else { 
+		$cube->shell_string($exec_string)
+#	}
+}
+
+$cube->source($_) for @$args;
+
+if ( $$opts{stdin} || -p STDIN || (!$interact && !$exec_string) ) {
+	while (<STDIN>) { $cube->shell_string($_) }
+	# FIXME do something like set nobuffer and let zoid read STDIN
+	# then it can also pull from it
+}
+
+$cube->main_loop if $interact;
+
+my $exit = 0;
+$exit = ref($$cube{error}) ? ($$cube{error}{exit_status} || 1) : 1
+	unless $interact or ! $$cube{error};
+
+$cube->round_up;
+
+exit $exit;
+
+# ############ #
+# sub routines #
+# ############ #
+
+sub complain {
+	my $opt = shift;
+	my $m = shift || 1;
+	
+	my $bn = $0;
+	$bn =~ s|^(.*/)*||;
+	if ($m == 1) { print STDERR "$bn: unrecognized option '$opt'"; }
+	elsif ($m == 2) { print STDERR "$bn: option '$opt' requires an argument"; }
+	elsif ($m == 3) { print STDERR "$bn: $opt: No such file or directory\n"; }
+	
+	if ($m < 3) {print "\nTry '$bn --help' for more information.\n"}
+	exit $m;	
+}
+
+__END__
+__POD__
+=head1 NAME
+
+zoid - a modular perl shell
+
+=head1 SYNOPSIS
+
+zoid [options] [-] [files]
+
+=head1 DESCRIPTION
+
+Zoidberg provides a modular Perl shell written, configured, and operated entirely
+in Perl. It aspires to be a fully operational login shell with all the features
+one normally expects. But it also gives direct access to Perl objects and data
+structures from the command line, and allows you to run Perl code within the
+scope of your commandline. Although Zoidberg does not do the language
+interpreting itself -- it uses perl to do this -- it supplies powerful language
+extensions aimed at creating an easy to use interface.
+
+By default B<zoid> runs an interactive commandline when both STDIN and STDOUT
+are terminal devices, or reads from STDIN till End Of Line and execute each 
+line like it was entered interactively. 
+When an I<action> is specified by one of the commandline options this will 
+suppress the default behavior and exit after executing that action.
+If any file names are given, these will be interpreted as source scripts and 
+suppress default behavior. 
+Be aware that these source scripts are expected to be Perl scripts and are
+B<NOT> interpreted or executed the same way as normal input.
+
+This document only describes the commandline script B<zoid>, see L<zoiduser>(1)
+and L<zoidfaq>(1) for help on using the zoidberg shell.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-e> I<command>, B<--exec>=I<command>
+
+Execute a string as interpreted by zoidberg. If non-interactive exits with
+exit status of command string. Multiple commands may be given to build up 
+a multi-line script.  Make sure to use semicolons where you would in a 
+normal multi-line script.
+
+=item B<-C>, B<--config>
+
+Print a list of configuration variable of this installation and exit.
+Most importantly this tells you where B<zoid> will search for it's configuration
+and data files.
+
+=item B<-c> I<command>, B<--command>=I<command> 
+
+Does the same as B<--exec> but this is bound to change.
+
+=item B<-D>, B<-D>I<Class> B<--debug>
+
+Set either the global debug bit or set the debug bit for the given class.
+Using the global variant makes B<zoid> output a lot of debug information.
+
+=item B<-h>, B<--help>
+
+=item B<-u>, B<--usage>
+
+Print a help message and exits.
+
+=item B<-I>I<dir>[,I<dir>, ...]
+
+The specified directories are added to the module search path  
+C<@INC>.
+
+=item B<-i>, B<--interactive>
+
+Start an interactive shell. This is the default if no other options are
+supplied.
+
+=item B<-l>, B<--login>
+
+Force login behavior, this will reset your current working directory.
+This variable is also available to plugins and scripts, which might act on it.
+
+=item B<-m>I<module>
+
+=item B<-M>I<module>
+
+=item B<-M>I<module>=I<args>[,I<arg>, ...]
+
+Import I<module> into the eval namespace.
+With B<-m> explicit import empty list, with B<-M> default arguments or 
+specified arguments. Details like the equivalent perl option, see L<perlrun>(1).
+
+=item B<-o> I<setting>
+
+=item B<-o> I<setting>=I<value>
+
+=item B<+o> I<setting>
+
+Set (B<-o>) or unset (B<+o>) one or more settings.
+
+=item B<-s>, B<--stdin>
+
+Read input from stdin. This is the default if no other options are supplied and 
+neither stdin or stdout are terminal devices.
+
+=item B<-V>, B<--version>
+
+Display version information. 
+
+=item B<-v>, B<--verbose>
+
+Sets the shell in verbose mode. This will cause each command to be echoed to STDERR.
+
+=back
+
+=head1 ENVIRONMENT
+
+The variables $PWD, $HOME and $USER are set to default values if not yet set by
+the parent process.
+
+The variable $ZOID will point to the location of the B<zoid> executable, it is similar
+to $SHELL for POSIX compliant shells. B<zoid> uses a different variable because
+some programs seem to expect $SHELL to point to a POSIX compliant shell.
+
+To switch off ansi colours on the terminal set $CLICOLOR to 0 (null).
+
+=head1 FILES
+
+Zoidberg uses rc files, data files and plugin files, use the B<--config> switch
+to check the search paths used.
+
+Which rcfiles are loaded is controlled be the 'rcfiles' and 'norc' settings,
+try C<zoid -o norc> to skip all rcfiles or C<zoid -o rcfiles=file1:file2:file3>
+to use files other then the default.
+
+The runtime search path for plugins etc. can be controlled with the 'data_dirs'
+setting, try C<zoid -o data_dirs=dir1:dir2:dir3>.
+
+=head1 DIAGNOSTICS
+
+Error messages may be issued either by B<perl> or by one any of the
+modules in use. The B<zoid> utility itself will only complain when the commandline
+options are wrong. If the error was thrown by one of zoid's core modules, the error 
+message will either start with the module name or the name of the command that went wrong.
+
+=head1 RESTRICTIONS
+
+Source files and command input are I<NOT> interpreted the same way.
+
+Use B<-e> _or_ B<-c>, do not mix them.
+
+=head1 BUGS
+
+To submit bug reports visit http://rt.cpan.org or mail the author.
+
+=head1 SEE ALSO
+
+L<perl>(1),
+L<zoiduser>(1),
+L<zoidbuiltins>(1),
+L<zoiddevel>(1),
+L<zoidfaq>(1),
+L<Zoidberg>(3),
+L<http://github.com/jberger/Zoidberg>
+
+=head1 AUTHORS
+
+Jaap Karssenberg || Pardus [Larus] E<lt>pardus@cpan.orgE<gt>
+
+R.L. Zwart, E<lt>rlzwart@cpan.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2011 Jaap G Karssenberg and Joel Berger and RL Zwart. All 
+rights reserved. This program is free software; you can 
+redistribute it and/or modify it under the same terms as Perl.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See either
+the GNU General Public License or the Artistic License for
+more details.
+
+See L<http://www.perl.com/language/misc/Artistic.html>
+and L<http://www.gnu.org/copyleft/gpl.html>
+

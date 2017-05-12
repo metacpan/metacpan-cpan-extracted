@@ -1,0 +1,13 @@
+Revision history for Zeta
+
+0.04	2012-04-15
+	Fix some tests that weren't working as expected on different systems.
+
+0.03	2012-04-14
+	Set minimum version of Test::More to 0.96 and correct NAME line in
+	POD so abstract could be read cleanly by Makefile.PL. 
+
+0.01    2012-04-14
+	Initial release, rebuilding from internal versions not released
+	to CPAN before. First component added is Utils module, underlying
+	functions that provide some basic data type and string checks.

@@ -1,0 +1,31 @@
+Revision history for ZConf-Cron
+
+2.0.0	 2012-06-09/09:00
+		 -Now uses Error::Helper.
+		 -Properly checks ZConf for errors now.
+		 -Pull the config name from within the module.
+		 -Update POD.
+		 -Use quotemeta.
+		 -The bin scripts now actually use ZConf::Cron.
+		 -Now uses Term::CallEditor.		 
+
+1.1.1	2010-05-28/05:00
+		-Correct writing of the set via the save method.
+
+1.1.0	2010-05-20/03:00
+		-Add 'readSet'.
+		-Correct dependencies in "Makefile.PL".
+
+1.0.1	2009-10-24/00:40
+		-More cleanup.
+		-Writetab now works.
+
+1.0.0	2009-10-11/23:30
+		-Misc cleanups.
+		-Add ZConf::Cron::GUI.
+
+0.0.1	2008-12-09/20:00
+		-correct where it says comiccron in the zccrontab POD
+
+0.0.0    2008-12-09/10:00
+	     -initial release

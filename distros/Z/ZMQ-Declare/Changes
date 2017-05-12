@@ -1,0 +1,12 @@
+Revision history for Perl extension ZMQ::Declare.
+
+0.03  Fri May  2 15:00:00 2014
+  - Test fix. (Slaven Rezic)
+
+0.02  Tue Apr  3 08:10:00 2012
+  - router/dealer support in dsl
+  - dsl device names default to app name
+
+0.01  Fri Oct  7 18:09:00 2011
+  - original version
+

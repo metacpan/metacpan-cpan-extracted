@@ -1,0 +1,42 @@
+---
+abstract: 'A ZeroMQ2 wrapper for Perl (DEPRECATED)'
+author:
+  - 'Daisuke Maki <daisuke@endeworks.jp>'
+  - 'Steffen Mueller <smueller@cpan.org>'
+build_requires:
+  Devel::CheckLib: 0.4
+  Devel::PPPort: 3.19
+  ExtUtils::MakeMaker: 6.59
+  Test::Fatal: 0
+  Test::More: 0.98
+  Test::Requires: 0
+  Test::TCP: 1.08
+configure_requires:
+  Devel::CheckLib: 0.4
+  Devel::PPPort: 3.19
+  ExtUtils::MakeMaker: 6.59
+  ExtUtils::ParseXS: 2.21
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: ZeroMQ
+name: ZeroMQ
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+recommends:
+  JSON: 2.00
+requires:
+  Task::Weaken: 0
+  XSLoader: 0.02
+  perl: 5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/lestrrat/ZeroMQ-Perl
+version: 0.23

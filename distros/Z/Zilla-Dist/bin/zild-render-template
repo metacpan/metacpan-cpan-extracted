@@ -1,0 +1,64 @@
+#!/usr/bin/perl
+
+use strict;
+use Cwd;
+use File::Share;
+use Hash::Merge 'merge';
+use IO::All;
+use JSON;
+use Template::Toolkit::Simple;
+use YAML::XS;
+use Zilla::Dist;
+
+my ($template, $target, $json) = @ARGV;
+
+$target ||= $template;
+$json ||= '{}';
+
+if (-e "pkg/$template") {
+  my $text = io->file("pkg/$template")->all;
+  io->file($target)->print($text);
+}
+else {
+  my $meta = Load io->file('Meta')->all;
+  my $cpan = delete($meta->{'=zild'}) || {};
+  my $data = merge($cpan, $meta);
+  $data->{zilla_dist}{version} = $Zilla::Dist::VERSION;
+  $data->{layout} = +{
+    map {
+      my $name = $_->name;
+      $name =~ s!./!!;
+      $name =~ s![^\w]!_!g;
+      $name =~ s!^_+!!;
+      ($name, 1);
+    } io('.')->all
+  };
+  if ($template ne 'dist.ini') {
+    my $travis = delete($meta->{'=travis'}) || {};
+    $travis->{type} ||= $data->{language};
+    exit unless $travis->{type} eq 'perl';
+    $data = merge($travis, $data);
+  }
+  $data->{RequiredModules} = [];
+  if (my $r = $data->{requires}) {
+    push @{$data->{RequiredModules}}, keys %$r;
+  }
+  if (my $r = $data->{test}{requires}) {
+    push @{$data->{RequiredModules}}, keys %$r;
+  }
+  if (my $r = $data->{recommends}) {
+    push @{$data->{RequiredModules}}, keys %$r;
+  }
+  ($data->{namepath} = $data->{libname} || $data->{name})
+    =~ s/(?:-|::)/\//g;
+  $data->{sharedir} = 1 if -d 'share';
+  $data->{author} = [ $data->{author} ]
+    unless ref($data->{author}) eq 'ARRAY';
+
+  my $text = tt
+    ->path([File::Share::dist_dir('Zilla-Dist')])
+    ->data($data)
+    ->render($template);
+
+  io->file($target)->print($text);
+}

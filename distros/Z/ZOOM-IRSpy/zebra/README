@@ -1,0 +1,113 @@
+
+What's what in this directory:
+
+README -- This file
+
+yazserver.xml -- The primary configuration file that controls how
+	Zebra runs (as a YAZ GFS application) in order to serve the
+	ZeeRex database.  This specifies where to find this database's
+	own ZeeRex record (zeerex.xml), the configuration for
+	translating CQL queries into Z39.50 Type-1 (pqf.properties),
+	and the Zebra-specific configuration (zebra.cfg).
+
+zeerex.xml -- The static ZeeRex record for this database of ZeeRex
+	records.  It describes what a ZeeRex database looks like, and
+	how it behaves.  (Life would be better if Zebra could at least
+	partially work this out for itself, but for now we have to go
+	the long way round.)
+
+zeerex-2.0.xsd -- The XML Schema describing ZeeRex records, as
+	downloaded from the official ZeeRex site at:
+		http://explain.z3950.org/dtd/zeerex-2.0.xsd
+	Originally, this was used to validate both our own static
+	ZeeRex record and the records created by IRSpy, using:
+		xmllint --noout --schema zeerex-2.0.xsd zeerex.xml
+	However, it can no longer be used for this purpose, as the
+	records now carry IRSpy-specific extensions that the schema
+	does not understand.  Eventually a new schema (most likely in
+	Relax NG Compact format) will be created for validation of the
+	extendd records.
+
+pqf.properties -- The specification for how CQL queries are translated
+	into 39.50 Type-1 queries.  This file is identical to the one
+	supplied in the YAZ distribution: we'd just use that if there
+	was a reliable way to discover where it is.
+
+ezeerex2pqfproperties.pl -- An in-progress script to automatically
+	generate the pqf.properties file from an extended ZeeRex
+	record.  Not yet in use.  A Makefile controls the use of this
+	script to generate "terse.properties", which may be, but is
+	not, used in place of "pqf.properties".
+
+zebra.cfg -- Zebra-specific configuration, including the location of
+	the register files, the location of the XSLT filter
+	configuration (filterconf.xml), etc.
+
+htpasswd -- Password file for the "admin" user who has permission to
+	update the database remotely.
+
+filterconf.xml -- Configuration of Zebra's XSLT filter, which uses
+	XSLT stylesheets to identify the indexable data in incoming
+	files and to transform records for presentation.
+
+zeerex2index.xsl -- The indexing stylesheet for ZeeRex records.  It's
+	possible to check what indexer will see as follows:
+		xsltproc zeerex2index.xsl zeerex.xml
+
+zeerex2zeerex.xsl -- The "no-op" stylesheet for presenting ZeeRex
+	records.
+
+zeerex2dc.xsl -- A stylesheet for presenting Dublin Core records.
+
+zeerex2id.xsl -- A trivial stylesheet that just yields the record
+	identifier (not as an XML document).
+
+profile -- Notes on the indexes in the ZeeRex profile, with
+	indications of whether they are yet supported by the Zebra
+	configuration in this directory.
+
+records-2007-05-01 or similar
+records-2007-05-01.tar.gz or similar
+     -- A subdirectory containing ZeeRex records to be added to the
+	database, and the tarball from which they were unpacked.
+	The first version was harvested from Index Data's old
+	target-test database using
+		scp -r bagel.indexdata.dk:/home/perhans/targettest/xml records
+	processed to add the missing namespace.  Subsequent versions
+	have been dumped from the evolving database on
+	irspy.indexdata.com.
+
+db -- A subdirectory containing the actual database: register files,
+	dictionaries and suchlike.
+
+form.html -- A simple HTML search form that submits SRU queries to a
+	server running on local port 8018.
+
+init-script -- A startup/shutdown script for controlling the zebra
+	server according to "System V init" rules.  Instructions can
+	be found in the script itself.
+
+crontab -- An example file that can be used to automate periodic
+	running of a test or tests.  This can be installed using:
+		sudo crontab crontab
+	But you probably want to edit it first.
+
+--
+
+The database can be interrogated with SRU URLs such as:
+	http://localhost:8018/IR-Explain---1?version=1.1&operation=searchRetrieve&maximumRecords=10&recordSchema=zeerex&query=net.protocol=sru
+
+To create the database:
+
+$ make newdb
+
+or:
+
+tar xzf records-2007-04-18.tar.gz
+zebraidx-2.0 init
+zebraidx-2.0 update zeerex.xml
+zebraidx-2.0 update records-2010-04-06
+zebraidx-2.0 commit
+
+zebrasrv-2.0 -f yazserver.xml
+

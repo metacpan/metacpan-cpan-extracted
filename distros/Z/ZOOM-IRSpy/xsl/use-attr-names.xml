@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Maps numeric use attributes to human readable names - credits to Per
+-->
+<mapping>
+    <map set="bib-1" attr="1" name="Personal name"/>
+    <map set="bib-1" attr="2" name="Corporate name"/>
+    <map set="bib-1" attr="3" name="Conference name"/>
+    <map set="bib-1" attr="4" name="Title"/>
+    <map set="bib-1" attr="5" name="Title series"/>
+    <map set="bib-1" attr="6" name="Title uniform"/>
+    <map set="bib-1" attr="7" name="ISBN"/>
+    <map set="bib-1" attr="8" name="ISSN"/>
+    <map set="bib-1" attr="9" name="LC card number"/>
+    <map set="bib-1" attr="10" name="BNB card no."/>
+    <map set="bib-1" attr="11" name="BGF number"/>
+    <map set="bib-1" attr="12" name="Local number"/>
+    <map set="bib-1" attr="13" name="Dewey classificat"/>
+    <map set="bib-1" attr="14" name="UDC classification"/>
+    <map set="bib-1" attr="15" name="Bliss classification"/>
+    <map set="bib-1" attr="16" name="LC call number"/>
+    <map set="bib-1" attr="17" name="NLM call number"/>
+    <map set="bib-1" attr="18" name="NAL call number"/>
+    <map set="bib-1" attr="19" name="MOS call number"/>
+    <map set="bib-1" attr="20" name="Local classification"/>
+    <map set="bib-1" attr="21" name="Subject heading"/>
+    <map set="bib-1" attr="22" name="Subject Rameau"/>
+    <map set="bib-1" attr="23" name="BDI index subject"/>
+    <map set="bib-1" attr="24" name="INSPEC subject"/>
+    <map set="bib-1" attr="25" name="MESH subject"/>
+    <map set="bib-1" attr="26" name="PA subject"/>
+    <map set="bib-1" attr="27" name="LC subject heading"/>
+    <map set="bib-1" attr="28" name="RVM subject heading"/>
+    <map set="bib-1" attr="29" name="Local subject index"/>
+    <map set="bib-1" attr="30" name="Date"/>
+    <map set="bib-1" attr="31" name="Date of publication"/>
+    <map set="bib-1" attr="32" name="Date of acquisition"/>
+    <map set="bib-1" attr="33" name="Title key"/>
+    <map set="bib-1" attr="34" name="Title collective"/>
+    <map set="bib-1" attr="35" name="Title parallel"/>
+    <map set="bib-1" attr="36" name="Title cover"/>
+    <map set="bib-1" attr="37" name="Title added title page"/>
+    <map set="bib-1" attr="38" name="Title caption"/>
+    <map set="bib-1" attr="39" name="Title running"/>
+    <map set="bib-1" attr="40" name="Title spine"/>
+    <map set="bib-1" attr="41" name="Title other variant"/>
+    <map set="bib-1" attr="42" name="Title former"/>
+    <map set="bib-1" attr="43" name="Title abbreviated"/>
+    <map set="bib-1" attr="44" name="Title expanded"/>
+    <map set="bib-1" attr="45" name="Subject precis"/>
+    <map set="bib-1" attr="46" name="Subject rswk"/>
+    <map set="bib-1" attr="47" name="Subject subdivision"/>
+    <map set="bib-1" attr="48" name="No. nat'l biblio."/>
+    <map set="bib-1" attr="49" name="No. legal deposit"/>
+    <map set="bib-1" attr="50" name="No. govt pub."/>
+    <map set="bib-1" attr="51" name="No. music publisher"/>
+    <map set="bib-1" attr="52" name="Number db"/>
+    <map set="bib-1" attr="53" name="Number local call"/>
+    <map set="bib-1" attr="54" name="Code--language"/>
+    <map set="bib-1" attr="55" name="Code--geographic area"/>
+    <map set="bib-1" attr="56" name="Code--institution"/>
+    <map set="bib-1" attr="57" name="Name and title"/>
+    <map set="bib-1" attr="58" name="Name geographic"/>
+    <map set="bib-1" attr="59" name="Place publication"/>
+    <map set="bib-1" attr="60" name="CODEN"/>
+    <map set="bib-1" attr="61" name="Microform generation"/>
+    <map set="bib-1" attr="62" name="Abstract"/>
+    <map set="bib-1" attr="63" name="Note"/>
+    <map set="bib-1" attr="1000" name="Author-title"/>
+    <map set="bib-1" attr="1001" name="Record type"/>
+    <map set="bib-1" attr="1002" name="Name"/>
+    <map set="bib-1" attr="1003" name="Author"/>
+    <map set="bib-1" attr="1004" name="Author-name personal"/>
+    <map set="bib-1" attr="1005" name="Author-name corporate"/>
+    <map set="bib-1" attr="1006" name="Author-name conference"/>
+    <map set="bib-1" attr="1007" name="Identifier--standard"/>
+    <map set="bib-1" attr="1008" name="Subject--LC children's"/>
+    <map set="bib-1" attr="1009" name="Subject name -- personal"/>
+    <map set="bib-1" attr="1010" name="Body of text"/>
+    <map set="bib-1" attr="1011" name="Date/time added to db"/>
+    <map set="bib-1" attr="1012" name="Date/time last modified"/>
+    <map set="bib-1" attr="1013" name="Authority/format id"/>
+    <map set="bib-1" attr="1014" name="Concept-text"/>
+    <map set="bib-1" attr="1015" name="Concept-reference"/>
+    <map set="bib-1" attr="1016" name="Any"/>
+    <map set="bib-1" attr="1017" name="Server-choice"/>
+    <map set="bib-1" attr="1018" name="Publisher"/>
+    <map set="bib-1" attr="1019" name="Record-source"/>
+    <map set="bib-1" attr="1020" name="Editor"/>
+    <map set="bib-1" attr="1021" name="Bib-level"/>
+    <map set="bib-1" attr="1022" name="Geographic-class"/>
+    <map set="bib-1" attr="1023" name="Indexed-by"/>
+    <map set="bib-1" attr="1024" name="Map-scale"/>
+    <map set="bib-1" attr="1025" name="Music-key"/>
+    <map set="bib-1" attr="1026" name="Related-periodical"/>
+    <map set="bib-1" attr="1027" name="Report-number"/>
+    <map set="bib-1" attr="1028" name="Stock-number"/>
+    <map set="bib-1" attr="1030" name="Thematic-number"/>
+    <map set="bib-1" attr="1031" name="Material-type"/>
+    <map set="bib-1" attr="1032" name="Doc-id"/>
+    <map set="bib-1" attr="1033" name="Host-item"/>
+    <map set="bib-1" attr="1034" name="Content-type"/>
+    <map set="bib-1" attr="1035" name="Anywhere"/>
+    <map set="bib-1" attr="1036" name="Author-Title-Subject"/>
+</mapping>

@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+
+set -e
+
+main() {
+  setup
+  version="${NEW_VERSION//\./\\.}"
+  if [ -z "$(grep -E "^version: +$version" Meta)" ]; then
+    perl -p0i -e "s/^(version: +).*/\${1}$NEW_VERSION/m" Meta
+    cat <<... > tmp
+---
+version: $NEW_VERSION
+date:    
+changes:
+- 
+...
+    cat Changes >> tmp
+    mv tmp Changes
+  fi
+}
+
+setup() {
+  OLD_VERSION="$(
+    git show HEAD:Changes |
+    grep ^version: |
+    head -n1 |
+    cut -f2 -d' ')"
+  [ -n "$OLD_VERSION" ] || die "Can't get old version string"
+
+  [[ "$OLD_VERSION" =~ ^(.*)\.(.*)$ ]] ||
+    die "Invalid version string: '$OLD_VERSION'"
+
+  part1="${BASH_REMATCH[1]}"
+  part2="${BASH_REMATCH[2]}"
+  length="${#part2}"
+  part2="${part2##0}"
+  part2=$(( part2 + 1 ))
+  printf -v NEW_VERSION "$part1.%0${length}d" "$part2"
+}
+
+die() {
+  echo "$@"
+  exit 1
+}
+
+[ "$BASH_SOURCE" == "$0" ] && main "$@"

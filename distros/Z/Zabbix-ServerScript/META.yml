@@ -1,0 +1,54 @@
+---
+abstract: "Simplify your Zabbix server scripts' environment."
+author:
+  - 'Anton Alekseyev <akint.wr+github@gmail.com>'
+build_requires:
+  Capture::Tiny: '0'
+  Test::Fatal: '0'
+  Test::MockModule: '0'
+  Test::MockObject: '0'
+  Test::More: '0.98'
+  Test::Output: '0'
+configure_requires:
+  Module::Build: '0.4005'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.2, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Zabbix-ServerScript
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Zabbix::ServerScript:
+    file: lib/Zabbix/ServerScript.pm
+    version: '0.13'
+  Zabbix::ServerScript::API:
+    file: lib/Zabbix/ServerScript/API.pm
+requires:
+  DBD::ODBC: '1.50'
+  DBI: '1.609'
+  Getopt::Long: '2.38'
+  JSON: '2.15'
+  LWP::UserAgent: '6.15'
+  List::MoreUtils: '0.22'
+  Log::Log4perl: '1.30'
+  Proc::Daemon: '0.19'
+  Proc::PID::File: '1.27'
+  Term::UI: '0.20'
+  YAML: '0.70'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/Akint/Zabbix-ServerScript/issues
+  homepage: https://github.com/Akint/Zabbix-ServerScript
+  repository: git://github.com/Akint/Zabbix-ServerScript.git
+version: '0.13'

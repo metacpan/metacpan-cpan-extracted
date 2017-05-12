@@ -1,0 +1,33 @@
+Changes
+lib/Zeal.pm
+lib/Zeal/Docset.pm
+lib/Zeal/Document.pm
+lib/Zeal/Feed.pm
+Makefile.PL
+MANIFEST
+README
+t/a.tar
+t/a.tar.bz2
+t/a.tar.gz
+t/ds/a.docset/Contents/Info.plist
+t/ds/a.docset/Contents/Resources/docSet.dsidx
+t/ds/a.docset/Contents/Resources/Documents/about.html
+t/ds/a.docset/Contents/Resources/Documents/array.html
+t/ds/b.docset/Contents/Info.plist
+t/ds/b.docset/Contents/Resources/docSet.dsidx
+t/ds/b.docset/Contents/Resources/Documents/building.html
+t/ds/b.docset/Contents/Resources/Documents/builtin.html
+t/ds/c.docset/Contents/Info.plist
+t/ds/c.docset/Contents/Resources/docSet.dsidx
+t/ds/c.docset/Contents/Resources/Documents/category.html
+t/ds/c.docset/Contents/Resources/Documents/class.html
+t/ds/dummy-file
+t/feed.xml
+t/mkindex.pl
+t/perlcritic.t
+t/perlcriticrc
+t/Zeal.t
+t/Zeal-Feed.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

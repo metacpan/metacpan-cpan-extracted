@@ -1,0 +1,27 @@
+Changes
+lib/Zenoss.pm
+lib/Zenoss/Connector.pm
+lib/Zenoss/Error.pm
+lib/Zenoss/Examples.pod
+lib/Zenoss/MetaHelper.pm
+lib/Zenoss/Response.pm
+lib/Zenoss/Router.pm
+lib/Zenoss/Router/DetailNav.pm
+lib/Zenoss/Router/Device.pm
+lib/Zenoss/Router/Events.pm
+lib/Zenoss/Router/Messaging.pm
+lib/Zenoss/Router/Mib.pm
+lib/Zenoss/Router/Network.pm
+lib/Zenoss/Router/Process.pm
+lib/Zenoss/Router/Report.pm
+lib/Zenoss/Router/Search.pm
+lib/Zenoss/Router/Service.pm
+lib/Zenoss/Router/Template.pm
+lib/Zenoss/Router/Tree.pm
+lib/Zenoss/Router/ZenPack.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/Zenoss-API.t

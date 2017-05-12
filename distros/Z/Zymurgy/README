@@ -1,0 +1,24 @@
+Zymurgy version 0.0.2
+
+The study and use of fermentations.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+DEPENDENCIES
+
+None.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009, Roger A Hall
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

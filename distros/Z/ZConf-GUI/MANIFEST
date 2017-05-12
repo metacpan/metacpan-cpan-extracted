@@ -1,0 +1,15 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/ZConf/GUI.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+bin/zcgui-set
+bin/zcgui-lm
+bin/zcgui-la
+bin/zcgui-get
+bin/zcgui-which
+bin/zcgui-gux
+bin/zcgui-sux

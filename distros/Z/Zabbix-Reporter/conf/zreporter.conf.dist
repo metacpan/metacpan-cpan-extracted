@@ -1,0 +1,12 @@
+<Zabbix>
+	<Reporter>
+            key = 
+            <DB>
+                Hostname = 127.0.0.1
+                Port     = 3306
+                Database = zabbix
+                Username = zabbix
+                Password = zabbix
+            </DB>
+	</Reporter>
+</Zabbix>

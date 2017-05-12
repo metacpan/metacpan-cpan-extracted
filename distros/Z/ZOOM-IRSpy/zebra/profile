@@ -1,0 +1,30 @@
+
+Notes on the indexes in the ZeeRex profile, with indications of
+whether they are yet supported by the Zebra configuration in this
+directory.
+
+Mandatory
+OK	dc:title	The human readable title for the database	databaseInfo/title
+OK	dc:description	A description of the database	databaseInfo/description
+OK	net:host	The hostname (srw.cheshire3.org) or IP address (138.253.81.47) of the database/server, but each case will likely find only records which contain the host in that form. For example 138.253.81.47 will not necessarily find srw.cheshire3.org	serverInfo/host
+OK	net:port	The port on which the database/server can be reached	serverInfo/port
+OK	net:protocol	The protocol to use to interact with the database/server	serverInfo/@protocol
+OK	net:version	The version of the protocol	serverInfo/@version
+OK	net:path	The name (z39.50) or path (OAI, FTP, SRW/U, etc) to the service from the base URL	serverInfo/database
+OK	net:method	The HTTP method used to access the service (values: 'GET' 'POST' or 'GET POST')	serverInfo/@method
+OK	rec:lastModificationDate	The date that the ZeeRex record was last modified (as opposed to the date that the database was last updated (dc.date))	metaInfo/dateModified
+OK	rec:authorityIndicator	Is the record known to be the authoritative description, or might there be a more correct record somewhere else? (values: 'true' or 'false')	explain/@authoritative
+
+Optional
+	cql:anywhere	Anywhere in the record	 /
+OK	dc:date	Time that the database was last updated	serverInfo/database/@lastUpdate
+OK	dc:creator	The maintainer for the database	databaseInfo/author
+OK	dc:language	The language of the records in the database described by the ZeeRex record	databaseInfo/langusage
+OK	zeerex:numberOfRecords	Number of records in the database	serverInfo/database/@numrecs
+###	zeerex:set	The context set/attribute set for an index	indexInfo/set/@identifier
+###	zeerex:index	The name of an SRW/U index	indexInfo/index/map/name
+###	zeerex:attributeType	Type of an attribute in Z39.50	indexInfo/index/map/attr@type
+###	zeerex:attributeValue	Value of an attribute in Z39.50	indexInfo/index/map/attr
+OK	zeerex:schema	Identifier for a record schema in SRW/U	schemaInfo/schema/@identifier
+OK	zeerex:recordSyntax	Identifier for a record syntax in Z39.50. This should be specified as an OID (1.2.840.10003.5.10).	recordInfo/recordSyntax/@identifier
+SOME	zeerex:supports_*	Described in ZeeRex context set	/explain/configInfo/supports[@type=*]

@@ -1,0 +1,31 @@
+---
+abstract: 'Perl-ish Interface libzmq '
+author:
+  - 'Daisuke Maki C<< <daisuke@endeworks.jp> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.08'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: ZMQ
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Sub::Name: 0
+  ZMQ::Constants: 0
+  ZMQ::LibZMQ2: 0
+resources:
+  bugtracker: https://github.com/lestrrat/p5-ZMQ/issues
+  homepage: https://github.com/lestrrat/p5-ZMQ
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/lestrrat/p5-ZMQ.git
+version: '1.06'

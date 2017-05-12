@@ -1,0 +1,80 @@
+<html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge;" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Zonemaster</title>
+    <link href='https://fonts.googleapis.com/css?family=Cuprum:400,700&subset=latin,cyrillic' rel='stylesheet' type='text/css' />
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/css/style.css" />
+</head>
+
+<body ng-app="dnscheck">
+    <div class="pagecontainer">
+        <div class="wrapper">
+            <div>
+                <div class="head">
+                    <br>
+                    <img src="/images/zonemaster_logo.svg" alt="DNS check" width="300">
+                    <div class="pull-right">
+                        <lang lang="en">en</lang> |
+                        <lang lang="fr">fr</lang> |
+                        <lang lang="sv">sv</lang>
+                        &nbsp;
+                    </div>
+                    <div style="position:absolute;display:inline-block;margin-top:30px;">
+                    </div>
+                    <navigation nav-id="main">
+                        <tab tab-title="{{'Domain check'|translate}}" tab-id="domain_check"></tab>
+                        <tab tab-title="{{'Pre-delegated domain'|translate}}" tab-id="inactive_domain_check"></tab>
+                        <tab tab-title="{{'FAQ'|translate}}" tab-id="faq"></tab>
+                    </navigation>
+                    <div class="pull-right">
+                        <a class="nojs" href="/nojs" target="_self">{{'Non-Javascript Interface'|translate}}</a>
+                        &nbsp;
+                    </div>
+                </div>
+                <div class="shadow">&nbsp;</div>
+                <div class="container-fluid">
+                    <div class="row-fluid">
+                        <div class="col-sm-8 col-md-9 col-lg-10">
+                            <div ng-show="main_currentTab == 'domain_check'">
+                                <domain_check></domain_check>
+                            </div>
+                            <div ng-show="main_currentTab == 'inactive_domain_check'">
+                                <domain_check inactive="yes"></domain_check>
+                            </div>
+                            <div ng-show="main_currentTab == 'faq'">
+                                <p translate="{{'FAQ_CONTENT'|translate}}"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="push"></div>
+        </div>
+    </div>
+    <div class="footer">
+        <div version ng-style="{ 'color' : color }"></div>
+        <div class="pull-right">
+ 			<img src="/images/email.svg" alt="contact" width="24">&nbsp;<a class="nojs" href="mailto:contact@zonemaster.net">contact@zonemaster.net</a>&nbsp;&nbsp;<img src="/images/github.svg" alt="github" width="15">&nbsp;<a class="nojs" href="https://github.com/dotse/zonemaster">Github</a>&nbsp;&nbsp;&nbsp;&nbsp;
+        </div>
+    </div>
+    <script type="text/javascript">/* <![CDATA[ */
+        !window.jQuery && document.write('<script type="text/javascript" src="/javascripts/jquery.js"><\/script>')
+        /* ]]> */</script>
+    <script src="/components/angular/angular.min.js"></script>
+    <script src="/components/angular-translate/angular-translate.min.js"></script>
+    <script src="/components/angular-translate-loader-static-files/angular-translate-loader-static-files.min.js"></script>
+    <script src="/javascripts/bootstrap.min.js"></script>
+    <script src="/javascripts/dnscheck.js"></script>
+    <script src="/javascripts/japp.js"></script>
+    <noscript>
+        <% if test_id %>
+        <meta http-equiv="refresh" content="0;url=/nojs?test_id=<% test_id %>">
+        <% else %>
+        <meta http-equiv="refresh" content="0;url=/nojs">
+        <% end %>
+    </noscript>
+</body>
+</html>

@@ -1,0 +1,247 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" 
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Zucchini</title>
+<!-- metadata -->
+<meta name="generator" content="S5" />
+<meta name="version" content="S5 1.1" />
+<meta name="presdate" content="2008mmdd" />
+<meta name="author" content="Chisel Wright" />
+<meta name="company" content="www.herlpacker.co.uk" />
+<!-- configuration parameters -->
+<meta name="defaultView" content="slideshow" />
+<meta name="controlVis" content="hidden" />
+<!-- style sheet links -->
+<link rel="stylesheet" href="ui/herlpacker/slides.css"  type="text/css" media="projection" id="slideProj" />
+<link rel="stylesheet" href="ui/herlpacker/outline.css" type="text/css" media="screen"     id="outlineStyle" />
+<link rel="stylesheet" href="ui/herlpacker/print.css"   type="text/css" media="print"      id="slidePrint" />
+<link rel="stylesheet" href="ui/herlpacker/opera.css"   type="text/css" media="projection" id="operaFix" />
+<!-- S5 JS -->
+<script src="ui/herlpacker/slides.js" type="text/javascript"></script>
+</head>
+<body>
+
+<div class="layout">
+<div id="controls"><!-- DO NOT EDIT --></div>
+<div id="currentSlide"><!-- DO NOT EDIT --></div>
+<div id="header"></div>
+<div id="footer">
+<h1>www.herlpacker.co.uk</h1>
+<h2>Zucchini - creating websites with a vegetable</h2>
+</div>
+
+</div>
+
+
+<div class="presentation">
+
+<!-- title slide -->
+<div class="slide">
+    <h1>Zucchini</h1>
+    <h2>Creating websites with a vegetable</h2>
+    <h3>Chisel Wright</h3>
+    <h4>Packing Herl</h4>
+</div>
+<!-- (end) title slide -->
+
+
+<div class="slide">
+    <h1>Why?</h1>
+    <ul>
+        <li>I'm inherently lazy</li>
+        <li>Static website</li>
+        <li>Common <strike>elephants</strike> elements across site</li>
+        <li>Cut &amp; Paste vs. Common Sense</li>
+        <li>Hopefully common sense won...</li>
+    </ul>
+
+    <div class="handout">
+    [any material that should appear in print but not on the slide]
+    </div>
+</div>
+
+<div class="slide">
+    <h1>Cut &amp; Paste</h1>
+    <ul>
+        <li>page1.html</li>
+        <li>copy</li>
+        <li>&hellip;</li>
+        <li>copy</li>
+        <li>page43.html</li>
+        <li>&hellip;</li>
+        <li>I just want to make a small tweak to &hellip;</li>
+        <li>FAIL!</li>
+    </ul>
+
+    <div class="handout">
+    [any material that should appear in print but not on the slide]
+    </div>
+</div>
+
+<div class="slide">
+    <h1>Common Sense?</h1>
+    <ul>
+        <li>Template Toolkit</li>
+        <ul>
+            <li>header.tt &amp; footer.tt</li>
+            <li>variables</li>
+            <li>TT plugins</li>
+            <li>&hellip;</li>
+        </ul>
+
+        <li>FTP / rsync</li>
+        <ul>
+            <li>develop locally</li>
+            <li>transfer automagically</li>
+            <li>smart copying á la rsync</li>
+        </ul>
+
+        <li>Let the machine do the hard work!</li>
+    </ul>
+
+    <div class="handout">
+    [any material that should appear in print but not on the slide]
+    </div>
+</div>
+
+<div class="slide">
+    <h1>Common Sense? (cont.)</h1>
+
+    <h4>page1.html</h4>
+    <pre>
+[% include header.tt %]
+    &lt;h1&gt;Page 1&lt;/h1&gt;
+    &lt;!-- page 1 content --&gt;
+[% include header.tt %]
+    </pre>
+
+    <h4>page2.html</h4>
+    <pre>
+[% include header.tt %]
+    &lt;h1&gt;Page 2&lt;/h1&gt;
+    &lt;!-- page 2 content --&gt;
+[% include header.tt %]
+    </pre>
+
+
+    <div class="handout">
+    [any material that should appear in print but not on the slide]
+    </div>
+</div>
+
+<div class="slide">
+    <h1>Generating</h1>
+
+    <h4>First run:</h4>
+    <pre>$ zucchini 
+templating: page1.html
+templating: page2.html
+$ </pre>
+
+    <h4>Second run (nothing changed):</h4>
+    <pre>$ zucchini 
+$ </pre>
+
+    <h4>Third run (page2.html changed):</h4>
+    <pre>$ zucchini 
+templating: page2.html
+$ </pre>
+</div>
+
+<div class="slide">
+    <h1>Uploading</h1>
+
+    <pre>
+# smart site that allows rsync/ssh
+$ zucchini --rsync
+
+# dumb site that only allows FTP
+# (*cough* netsol *cough*)
+$ zucchini --fsync
+    </pre>
+</div>
+
+<div class="slide">
+    <h1>fsync?</h1>
+
+    <ul>
+        <li>I had to call it something</li>
+        <li>digest files</li>
+        <li>rsync-over-ftp</li>
+        <li>only transfer new and modified files</li>
+        <li>faster</li>
+        <li>chomps less bandwidth</li>
+    </ul>
+</div>
+
+
+<div class="slide">
+    <h1>Issues</h1>
+    <ul>
+        <li>Normal People</li>
+        <ul>
+            <li>perl? CPAN?</li>
+        </ul>
+
+        <li>Umm &hellip;</li>
+        <ul>
+            <li>No feedback</li>
+            <li>Perfect?</li>
+            <li>Nah, probably only one user</li>
+        </ul>
+    </ul>
+
+    <div class="handout">
+        <ul>
+            <li>Normal People: don't know how to use perl or
+            install anything from the CPAN</li>
+        </ul>
+    </div>
+</div>
+
+<div class="slide">
+    <h1>Questions?</h1>
+
+    <div style="display:block;text-align:center;vertical-align:middle;">
+    <img src="images/zucchini.jpg" title="Zucchini" alt="Zucchini" />
+    </div>
+
+    <div class="handout">
+    [any material that should appear in print but not on the slide]
+    </div>
+</div>
+
+<!-- final slide -->
+<div class="slide">
+    <h1>More Information</h1>
+    <ul>
+        <li>the CPAN:</li>
+        <ul>
+            <li>Zucchini</li>
+        </ul>
+
+        <li>Tutorial</li>
+        <ul>
+            <li>perldoc Zucchini::Manual::Tutorial</li>
+        </ul>
+
+        <li>Me:</li>
+        <ul>
+            <li>chisel@herlpacker.co.uk</li>
+            <li>www.herlpacker.co.uk</li>
+            <li>CPANID: CHISEL</li>
+        </ul>
+    </ul>
+    <div class="handout">
+    [any material that should appear in print but not on the slide]
+    </div>
+</div>
+<!-- (end) final slide -->
+</div>
+
+</body>
+</html>

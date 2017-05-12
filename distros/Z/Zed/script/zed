@@ -1,0 +1,80 @@
+#!/usr/bin/env perl
+use Module::Runtime qw(use_module);
+
+use Zed;
+use Zed::Output;
+use Zed::Config::Env;
+use Zed::Config::Space;
+
+use Zed::Plugin;
+
+use Path::Tiny;
+use YAML::XS;
+
+
+my $home = path( $ENV{ZED_HOME} || '~/.zed');
+
+unless($home->is_dir)
+{
+    text "Init zed working directory..";
+    die "Init fail!(Can't mkdir $home: $!)" unless $home->mkpath; 
+    my $conf = YAML::XS::Load join '', <DATA>;
+
+    for(keys %$conf)
+    {
+        text "Gen file ", path($home, $_)->canonpath, "..";
+        YAML::XS::DumpFile path($home, $_) => $conf->{$_} 
+    }
+    text "Done..\n" ;
+}
+
+$ENV{ZED_HOME} = $home->realpath;
+
+Zed::Config::Env->load;
+Zed::Config::Space->load;
+
+
+die "Not define plugin!" unless my $plugin = env 'plugin';
+
+for(@$plugin)
+{
+    debug "Load $_";
+    use_module $_;
+}
+
+info "Welcome ", env('username'), "~!";
+text "(Type 'help' to show more commands)\n";
+
+Zed::run;
+
+Zed::Config::Env->dump;
+Zed::Config::Space->dump;
+
+__DATA__
+---
+Env:
+  username: nobody
+  batch:
+    idc: ^.+?\..+?\.(.+?)\.
+  macro:
+    ip: cmd /sbin/ip addr|grep inet|grep -v 127.0.0.1|awk "{print \$2}"|awk -F"/"
+      "{print \$1}"
+  plugin:
+  - Zed::Plugin::Sys::Echo
+  - Zed::Plugin::Sys::Help
+  - Zed::Plugin::Sys::Set
+  - Zed::Plugin::Sys::Debug
+  - Zed::Plugin::Exe::Cmd
+  - Zed::Plugin::Exe::Put
+  - Zed::Plugin::Exe::Get
+  - Zed::Plugin::Exe::Port
+  - Zed::Plugin::Host::Add
+  - Zed::Plugin::Host::Dump
+  - Zed::Plugin::Host::Space
+  - Zed::Plugin::Host::Use
+  - Zed::Plugin::Host::Batch
+  - Zed::Plugin::Host::Checkout
+Space:
+  foo:
+  - 127.0.0.1
+  none: ~

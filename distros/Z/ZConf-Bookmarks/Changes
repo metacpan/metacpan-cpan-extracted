@@ -1,0 +1,28 @@
+Revision history for ZConf-Bookmarks
+
+0.2.4	2009-10-18/15:20
+		-Misc fixes to 'modBookmark'.
+
+0.2.3	2009-10-18/03:30
+		-Misc fixes to 'delBookmark'.
+
+0.2.2	2009-10-18/03:15
+		-Correct 'delBookmark' not saving after the change.
+		-Misc warning cleanups.
+
+0.2.1	2009-10-17/15:50
+		-Correct how 'addBookmark' calls 'bookmarkExists'.
+		-All schemes are now coverted to lowercase.
+
+0.2.0	2009-10-17/01:00
+		-Add the method 'getBookmark'.
+		-Massive number of bug fixes in regards to interfacing with ZConf.
+
+0.1.0	2009-02-23/01:30
+		-Add 'listSets', 'getSet', and 'readSet'.
+		-Now defaults to autoinit being on.
+
+0.0.0	2009-01-26/08:00
+		-Initial release.
+		
+

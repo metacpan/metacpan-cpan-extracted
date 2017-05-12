@@ -1,0 +1,55 @@
+Zenoss
+------
+
+This is a PERL interface to the Zenoss Monitoring System
+JSON API.  It allows the ability to execute all available functions
+provided by the Zenoss API programmatically.  Anything you could do from
+the Zenoss interface can be achieved via this module.  This is a
+full service implementation, providing the construction of the call
+to the API and the handling of the response.
+
+For additional information on usage, please see the perldoc for
+Zenoss.
+
+INSTALLATION
+------------
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+------------
+
+This module requires these other modules and libraries:
+
+    Carp
+    JSON
+    Moose
+    File::Find
+    File::Basename
+    LWP::UserAgent
+    HTTP::Request::Common
+    IO::Socket::INET
+    Test::More
+
+COPYRIGHT AND LICENSE
+---------------------
+
+Copyright (C) 2010 by Patrick Baker <patricksbaker@gmail.com>
+
+This module is free software: you can redistribute it and/or modify
+it under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+You can obtain the Artistic License 2.0 by either viewing the 
+LICENSE file provided with this distribution or by navigating
+to the below link.
+
+http://opensource.org/licenses/artistic-license-2.0.php

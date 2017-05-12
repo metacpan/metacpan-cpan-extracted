@@ -1,0 +1,94 @@
+ZCS::Admin
+==========
+ZCS::Admin is a Perl module for use with the Zimbra Collaboration
+Suite (ZCS) Admin Web Service (SOAP and REST)
+
+DEPENDENCIES
+============
+The following are the minimum requirements for using ZCS::Admin:
+
+- Perl 5.8
+    http://www.perl.org/
+- SOAP::WSDL 2.00.10 (thus Class::Std, etc.)
+    http://search.cpan.org/dist/SOAP-WSDL/
+- Zimbra Collaboration Suite
+    http://www.zimbra.com/
+- ZCS::Admin (this package)
+    http://zcs-admin.sf.net/
+
+INSTALLATION
+============
+1. Download ZCS::Admin module (coming soon!)
+    http://search.cpan.org/dist/ZCS-Admin
+
+2. Read this README
+
+3. This module has a number of dependencies on other Perl modules
+   available from CPAN.  If any modules are missing, appropriate
+   warnings will be generated in the following step.
+
+4. Prepare to build this module and install any prerequisite modules:
+
+    perl Makefile.PL
+
+5. Build, test and install this module:
+
+    make
+    make test
+    (sudo) make install
+
+6. Get admin access to a ZCS server.
+
+7. Read the documentation to become familiar with this module.
+
+AUTHOR
+======
+Phil Pearl <phil@zimbra.com>
+
+COPYRIGHT AND LICENSE
+=====================
+Copyright (C) 2010-2011 by Phil Pearl.  All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+BACKGROUND SOAP::WSDL INFO
+==========================
+This module started by using wsdl2perl.pl for generating supporting
+modules.  Below is an example of the command line used and some
+additional details about the arguments used in the command:
+
+    .../bin/wsdl2perl.pl \
+      -a ZCS::Admin::Attributes \
+      -t ZCS::Admin::Types \
+      -e ZCS::Admin::Elements \
+      -m ZCS::Admin::Typemaps \
+      -i ZCS::Admin::Interfaces \
+      -sp ZCS::Admin::Server \
+      -mi .../zcs-admin-custom-typemap.pl \
+      file:.../ZimbraAdmin.wsdl
+
+- .../bin/wsdl2perl.pl :: utility provided by SOAP::WSDL
+- .../zcs-admin-custom-typemap.pl :: (typemap) hash to map types to
+  modules that wsdl2perl.pl did not handle
+- .../ZimbraAdmin.wsdl :: WSDL that describes some (but not yet all)
+  of the ZCS Admin SOAP API capabilities
+
+Project Links
+-------------
+- Bugs/tickets (coming soon!):
+    https://rt.cpan.org/Public/Dist/Display.html?Name=ZCS-Admin
+- CPAN releases (coming soon!):
+    http://search.cpan.org/dist/ZCS-Admin
+- Source code repository (git):
+    http://sourceforge.net/p/zcs-admin/git/
+- zcs-wsdl (WSDL this package is based on)
+    http://zcs-wsdl.sf.net/
+
+Resources
+---------
+- Zimbra Collaboration Suite:
+    http://www.zimbra.com/
+- Project hosted on SourceForge:
+    http://sourceforge.net/

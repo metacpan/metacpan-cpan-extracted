@@ -1,0 +1,42 @@
+#!perl
+use 5.14.0;
+use warnings;
+use autodie;
+
+use open ':std', ':encoding(UTF-8)';
+
+use ZMachine::ZSCII;
+
+my $sw = $ARGV[0];
+my $encode = $sw eq '-e' ? 1
+           : $sw eq '-d' ? 0
+           : die "first arg must be -e or -d\n";
+my $fn = $ARGV[1];
+
+my $z = ZMachine::ZSCII->new;
+
+if ($encode) {
+  my $content = do {
+    open my $fh, '<:encoding(UTF-8)', $fn;
+    local $/;
+    <$fh>;
+  };
+
+  my $zchars = $z->encode($content);
+
+  open my $fh, '>:raw', "$fn.zscii";
+  print {$fh} $zchars;
+  close $fh;
+} else {
+  my $content = do {
+    open my $fh, '<:raw', $fn;
+    local $/;
+    <$fh>;
+  };
+
+  my $text = $z->decode($content);
+
+  open my $fh, '>:encoding(UTF-8)', "$fn.utf-8";
+  print {$fh} $text;
+  close $fh;
+}

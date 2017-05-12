@@ -1,0 +1,56 @@
+{
+   "abstract" : "Declarative 0MQ Infrastructure",
+   "author" : [
+      "Steffen Mueller <smueller@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.005, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "ZMQ-Declare",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Clone" : "0",
+            "Data::Dumper" : "0",
+            "Data::Rx" : "0",
+            "File::Spec" : "0",
+            "JSON" : "0",
+            "Moose" : "0",
+            "Scalar::Util" : "0",
+            "Storable" : "0",
+            "Test::More" : "0.88",
+            "ZeroMQ" : "0",
+            "autodie" : "0",
+            "lib" : "0",
+            "parent" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/tsee/ZMQ-Declare.git",
+         "web" : "http://github.com/tsee/ZMQ-Declare"
+      }
+   },
+   "version" : "0.03"
+}
+

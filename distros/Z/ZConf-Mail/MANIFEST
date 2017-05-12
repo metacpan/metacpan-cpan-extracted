@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+TODO
+lib/ZConf/Mail.pm
+t/00-load.t
+t/pod.t
+bin/zcgetmail
+bin/zcmailaccount

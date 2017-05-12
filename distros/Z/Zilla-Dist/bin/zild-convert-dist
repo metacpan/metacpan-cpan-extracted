@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+# Add Meta and Makefile
+# Update Meta
+# git rm Makefile.PL README
+# mkdir doc/…
+# foreach lib, make doc
+# doc conversion
+# =head1 → =
+# =head2 → ==
+# B< C< F< I< L<
+# =item lists
+# Reformat (gq)
+# mv t test

@@ -1,0 +1,53 @@
+SYNOPSIS
+
+     use Chinese::Zodiac::Table qw(chinese_zodiac);
+     my $res = chinese_zodiac("1980-02-17");
+
+    Sample result:
+
+     [
+       "1980-02-16",
+       "1981-02-04",
+       "yang",
+       "metal",
+       "庚",
+       "申",
+       "猴",
+       "monkey",
+     ]
+
+DESCRIPTION
+
+    This module can look up Chinese zodiac for a given Gregorian date.
+    Compared to Zodiac::Chinese, it uses a lookup table (currently
+    available for years 1924-2043) so it is more accurate.
+
+    Data source is currently at: https://github.com/perlancar/gudangdata
+    (table/chinese_zodiac), which in turn is parsed from Wikipedia article.
+
+FUNCTIONS
+
+ chinese_zodiac($date) => arrayref
+
+    Return Chinese zodiac information for a Gregorian date $date. Currently
+    date must be a string in the format of YYYY-MM-DD. Will return an
+    arrayref containing these elements:
+
+     # index: 0         1           2           3              4               5               6            7
+     ["start_date", "end_date", "yin_yang", "element", "heavenly_stem", "earthly_branch", "zh_animal", "en_animal"].
+
+    Will return undef if date range is unsupported.
+
+SEE ALSO
+
+    Zodiac::Chinese
+
+POD ERRORS
+
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 13:
+
+      Non-ASCII character seen before =encoding in '"庚",'. Assuming UTF-8
+

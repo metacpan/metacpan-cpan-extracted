@@ -1,0 +1,22 @@
+---
+username: nobody
+batch:
+  idc: ^.+?\..+?\.(.+?)\.
+macro:
+  ip: cmd /sbin/ip addr|grep inet|grep -v 127.0.0.1|awk "{print \$2}"|awk -F"/" "{print
+    \$1}"
+plugin:
+- Zed::Plugin::Sys::Echo
+- Zed::Plugin::Sys::Help
+- Zed::Plugin::Sys::Set
+- Zed::Plugin::Sys::Debug
+- Zed::Plugin::Exe::Cmd
+- Zed::Plugin::Exe::Put
+- Zed::Plugin::Exe::Get
+- Zed::Plugin::Exe::Port
+- Zed::Plugin::Host::Add
+- Zed::Plugin::Host::Dump
+- Zed::Plugin::Host::Space
+- Zed::Plugin::Host::Use
+- Zed::Plugin::Host::Batch
+- Zed::Plugin::Host::Checkout

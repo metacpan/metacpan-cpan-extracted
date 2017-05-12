@@ -1,0 +1,2 @@
+steps = DistTest, FindVersion, ChangeVersion, Commit, MakeDist, Tag, UploadCPAN
+

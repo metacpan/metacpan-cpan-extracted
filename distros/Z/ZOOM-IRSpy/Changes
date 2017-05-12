@@ -1,0 +1,106 @@
+Revision history for Perl extension ZOOM::IRSpy.
+
+1.02  Wed Jul  7 16:43:36 BST 2010
+	- Enhance setrlimit program so that it can set maximum
+	  address-space size as well as number of file descriptors.
+	- Add new restrict_modulo() method to restrict tests to those
+	  targets whose ID hashes to a number satisfying
+		hashval mod n == i
+	- Add new command-line options -m <n>,<i> to invoke
+	  restrict_modulo().  This enables us to set up cron jobs to
+	  test one seventh of the targets each night.
+	- Modify Zebra configuration to expect Z39.50 query terms to
+	  be encoded using UTF-8 (which is what the Web UI uses)
+	  rather than the default ISO-8859-1.  Fixes bug #3420.
+	- Add new test Record::OPAC which checks the ability to return
+	  multiple OPAC records in a piggy-backed Search Response.
+	  Test result is saved in the new element 
+	  <irspy:status/irspy:multiple_opac>
+	- Add new test Search::Bath which checks the ability to
+	  respond to Bath-profile searches.  Test result is saved in
+	  the new element <irspy:status/irspy:search_bath name="NAME">
+	  for NAME in "author", "title", "subject" and "any".
+	- The web UI displays this new information in full-record
+	  view.
+	- A target can be disabled from participating in testing by
+	  setting the irspy:status/i:disabled xmlns element.  This can
+	  be set and unset from the Admin UI.  It's useful for
+	  omitting targets that make long test runs take too long.
+	- Improve input validation for new targets.
+	- New and enhanced admin scripts (in ./bin) for IRSpy
+	  maintenance.
+	- Fix search for zeerex.reliability = 0, bug #3399
+	- Improve timeout handling of targets. Stop testing a target
+	  if we got to many timeouts (>= 3). Otherwise we have to wait
+	  up to an hour to finish all tests for a broken target.  A
+	  complete tests of all targets is now much faster and more
+	  reliable.
+	- Ignore case for record syntax field. This solves the problem that 
+	  you cannot search for record syntax "USmarc" if the server 
+	  response was in lowercase "usmarc".
+	- Run only one instance of the IRSpy script at a time.
+	- Use iconv character-set name "UTF-8" rather than "UTF8" as
+	  the latter is for some reason not supported by the iconv
+	  package in the Macports collection.
+	- _irspy_identifier2target() recognises and allows for
+	  comma-separated ZOOM-style options at the front of IRSpy
+	  identifiers.
+	- Fix bug #3534, which caused targets to be probed for
+	  record-syntax support using the wrong
+	  preferredRecordSyntax.
+	- Reorder record-syntaxes probed to reduce likelihood of early
+	  failure.  Ameliorates, but does not fix, bug #3548.
+	- irspy.pl and irspy-dump.pl are now installed as binaries.
+	- Add sample Apache2 configuration to distribution.
+	- robots.txt used to ameliorate web-site spamming.
+
+1.01  Mon Jul 16 12:51:19 BST 2007
+	- Web UI pages to add or upload a new target are now publicly
+	  accessible -- although admin privileges are still required
+	  to edit the newly added records, since there is no simple
+	  way to know that the person editing a record is the same
+	  person who first added it.
+	- When adding new records via the Web UI, the port number is
+	  guessed from the protocol if not explicitly stated.
+	- Note that Web UI's ZeeRex upload expects just the ZeeRex
+	  record, not an entire SRU explainResponse.
+
+1.00  Mon Jul  9 10:42:06 BST 2007
+	- First public release.
+	- Many, many changes since 0.02.
+
+0.02  Wed Jun 27 12:09:49 BST 2007
+	- Renamed from Net::Z3950::IRSpy to ZOOM::IRSpy
+	- Fix display of non-ASCII characters in, for example, the
+	    list of targets beginning with "R".
+	- Change targets() API to accept a Perl list rather than a
+	    space-separated string.
+	- Change check.html parameters to cleanly accept multiple
+	    target IDs even if they contain spaces.
+	- Proper URL-encoding of all link parameters.
+	- Proper HTML-quoting of all output.
+	- Capture YAZ logging output for web display.
+	- Add Dublin Core record format to Zebra configuration.
+	- Much better "Add a target" form, including:
+		- Name
+		- URL to hosting organisation
+		- Email to technical contact
+		- Username/password if needed
+		- Type of library (Academic, Public, Corporate,
+		    Special, National, Education or Other)
+		- Country.
+	- "Add another database to this target" button.
+	- Form for editing details of an existing target.
+	- Require authentication for database-changing operations
+		such as target testing, adding a new target and
+		editing and existing one.
+	- Add statistics page like that one at
+		http://targettest.indexdata.com/stat.php
+	- Record deletion and ID change works correctly even when the
+	  ID contains spaces or non-ASCII characters.
+	- Many, many more enhancements.
+
+0.01  Wed Apr  5 15:53:47 2006
+	- original version; created by h2xs 1.23 with options
+		-X --name=Net::Z3950::IRSpy --compat-version=5.8.0 --omit-constant --skip-exporter --skip-ppport
+

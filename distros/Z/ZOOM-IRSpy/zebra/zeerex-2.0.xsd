@@ -1,0 +1,484 @@
+<schema
+  xmlns='http://www.w3.org/2001/XMLSchema'
+  targetNamespace='http://explain.z3950.org/dtd/2.0/'
+  xmlns:explain='http://explain.z3950.org/dtd/2.0/'>
+
+ <element name='explain'>
+  <complexType>
+   <sequence>
+    <element ref='explain:serverInfo'/>
+    <element ref='explain:databaseInfo' minOccurs='0' maxOccurs='1'/>
+    <element ref='explain:metaInfo' minOccurs='0' maxOccurs='1'/>
+    <element ref='explain:indexInfo' minOccurs='0' maxOccurs='1'/>
+    <choice minOccurs='0' maxOccurs='1'>
+     <element ref='explain:recordInfo'/>
+     <element ref='explain:schemaInfo'/>
+    </choice>
+    <element ref='explain:configInfo' minOccurs='0' maxOccurs='1'/>
+   </sequence>
+   <attribute name='authoritative' use='optional' default='false'>
+    <simpleType>
+     <restriction base='string'>
+      <enumeration value='true'/>
+      <enumeration value='false'/>
+     </restriction>
+    </simpleType>
+   </attribute>
+   <attribute name='id' type='string' use='optional'/>
+  </complexType>
+ </element>
+
+ <element name='serverInfo'>
+  <complexType>
+   <sequence>
+    <element ref='explain:host'/>
+    <element ref='explain:port'/>
+    <element ref='explain:database'/>
+    <element ref='explain:authentication' minOccurs='0' maxOccurs='1'/>
+   </sequence>
+   <attribute name='protocol' type='string' use='optional' default='Z39.50'/>
+   <attribute name='version' type='string' use='optional' default='3'/>
+   <attribute name='transport' type='string' use='optional' default='http'/>
+   <!-- ### The next line is not in the official schema.  I need 2.1 -->
+   <attribute name='method' type='string' use='optional' default='get'/>
+   <attribute name='wsdl' type='string' use='optional'/>
+  </complexType>
+ </element>
+
+ <element name='host'>
+  <complexType mixed='true'>
+  </complexType>
+ </element>
+
+ <element name='port'>
+  <complexType mixed='true'>
+  </complexType>
+ </element>
+
+ <element name='database'>
+  <complexType mixed='true'>
+   <attribute name='numRecs' type='string' use='optional'/>
+   <attribute name='lastUpdate' type='string' use='optional'/>
+  </complexType>
+ </element>
+
+ <element name='authentication'>
+  <complexType>
+   <choice>
+    <element ref='explain:open'/>
+    <sequence>
+     <element ref='explain:user' minOccurs='0' maxOccurs='1'/>
+     <element ref='explain:group' minOccurs='0' maxOccurs='1'/>
+     <element ref='explain:password' minOccurs='0' maxOccurs='1'/>
+    </sequence>
+   </choice>
+   <attribute name='required' use='optional' default='true'>
+    <simpleType>
+     <restriction base='string'>
+      <enumeration value='true'/>
+      <enumeration value='false'/>
+     </restriction>
+    </simpleType>
+   </attribute>
+  </complexType>
+ </element>
+
+ <element name='open'>
+  <complexType mixed='true'>
+  </complexType>
+ </element>
+
+ <element name='user'>
+  <complexType mixed='true'>
+  </complexType>
+ </element>
+
+ <element name='group'>
+  <complexType mixed='true'>
+  </complexType>
+ </element>
+
+ <element name='password'>
+  <complexType mixed='true'>
+  </complexType>
+ </element>
+
+ <element name='databaseInfo'>
+  <complexType>
+   <sequence>
+    <element ref='explain:title' minOccurs='0' maxOccurs='unbounded'/>
+    <element ref='explain:description' minOccurs='0' maxOccurs='unbounded'/>
+    <choice minOccurs='0' maxOccurs='unbounded'>
+     <element ref='explain:author'/>
+     <element ref='explain:contact'/>
+     <element ref='explain:extent'/>
+     <element ref='explain:history'/>
+     <element ref='explain:langUsage'/>
+     <element ref='explain:restrictions'/>
+     <element ref='explain:subjects'/>
+     <element ref='explain:links'/>
+     <element ref='explain:implementation'/>
+    </choice>
+   </sequence>
+  </complexType>
+ </element>
+
+ <element name='title'>
+  <complexType mixed='true'>
+   <attribute name='primary' use='optional'>
+    <simpleType>
+     <restriction base='string'>
+      <enumeration value='true'/>
+      <enumeration value='false'/>
+     </restriction>
+    </simpleType>
+   </attribute>
+   <attribute name='lang' type='string' use='optional'/>
+  </complexType>
+ </element>
+
+ <element name='description'>
+  <complexType mixed='true'>
+   <attribute name='primary' use='optional'>
+    <simpleType>
+     <restriction base='string'>
+      <enumeration value='true'/>
+      <enumeration value='false'/>
+     </restriction>
+    </simpleType>
+   </attribute>
+   <attribute name='lang' type='string' use='optional'/>
+  </complexType>
+ </element>
+
+ <element name='author'>
+  <complexType mixed='true'>
+   <attribute name='primary' use='optional'>
+    <simpleType>
+     <restriction base='string'>
+      <enumeration value='true'/>
+      <enumeration value='false'/>
+     </restriction>
+    </simpleType>
+   </attribute>
+   <attribute name='lang' type='string' use='optional'/>
+  </complexType>
+ </element>
+
+ <element name='contact'>
+  <complexType mixed='true'>
+   <attribute name='primary' use='optional'>
+    <simpleType>
+     <restriction base='string'>
+      <enumeration value='true'/>
+      <enumeration value='false'/>
+     </restriction>
+    </simpleType>
+   </attribute>
+   <attribute name='lang' type='string' use='optional'/>
+  </complexType>
+ </element>
+
+ <element name='extent'>
+  <complexType mixed='true'>
+   <attribute name='primary' use='optional'>
+    <simpleType>
+     <restriction base='string'>
+      <enumeration value='true'/>
+      <enumeration value='false'/>
+     </restriction>
+    </simpleType>
+   </attribute>
+   <attribute name='lang' type='string' use='optional'/>
+  </complexType>
+ </element>
+
+ <element name='history'>
+  <complexType mixed='true'>
+   <attribute name='primary' use='optional'>
+    <simpleType>
+     <restriction base='string'>
+      <enumeration value='true'/>
+      <enumeration value='false'/>
+     </restriction>
+    </simpleType>
+   </attribute>
+   <attribute name='lang' type='string' use='optional'/>
+  </complexType>
+ </element>
+
+ <element name='langUsage'>
+  <complexType mixed='true'>
+   <attribute name='codes' type='string' use='optional'/>
+   <attribute name='primary' use='optional'>
+    <simpleType>
+     <restriction base='string'>
+      <enumeration value='true'/>
+      <enumeration value='false'/>
+     </restriction>
+    </simpleType>
+   </attribute>
+   <attribute name='lang' type='string' use='optional'/>
+  </complexType>
+ </element>
+
+ <element name='restrictions'>
+  <complexType mixed='true'>
+   <attribute name='primary' use='optional'>
+    <simpleType>
+     <restriction base='string'>
+      <enumeration value='true'/>
+      <enumeration value='false'/>
+     </restriction>
+    </simpleType>
+   </attribute>
+   <attribute name='lang' type='string' use='optional'/>
+  </complexType>
+ </element>
+
+ <element name='subjects'>
+  <complexType>
+   <sequence>
+    <element ref='explain:subject' maxOccurs='unbounded'/>
+   </sequence>
+  </complexType>
+ </element>
+
+ <element name='subject'>
+  <complexType mixed='true'>
+  </complexType>
+ </element>
+
+ <element name='links'>
+  <complexType>
+   <sequence>
+    <element ref='explain:link' maxOccurs='unbounded'/>
+   </sequence>
+  </complexType>
+ </element>
+
+ <element name='link'>
+  <complexType mixed='true'>
+   <attribute name='type' type='string' use='optional'/>
+  </complexType>
+ </element>
+
+ <element name='implementation'>
+  <complexType>
+   <sequence>
+    <element ref='explain:title' minOccurs='0' maxOccurs='unbounded'/>
+   </sequence>
+   <attribute name='identifier' type='string' use='optional'/>
+   <attribute name='version' type='string' use='optional'/>
+  </complexType>
+ </element>
+
+ <element name='metaInfo'>
+  <complexType>
+   <sequence>
+    <element ref='explain:dateModified'/>
+    <sequence minOccurs='0' maxOccurs='1'>
+     <element ref='explain:aggregatedFrom'/>
+     <element ref='explain:dateAggregated'/>
+    </sequence>
+   </sequence>
+  </complexType>
+ </element>
+
+ <element name='dateModified'>
+  <complexType mixed='true'>
+  </complexType>
+ </element>
+
+ <element name='aggregatedFrom'>
+  <complexType mixed='true'>
+  </complexType>
+ </element>
+
+ <element name='dateAggregated'>
+  <complexType mixed='true'>
+  </complexType>
+ </element>
+
+ <element name='indexInfo'>
+  <complexType>
+   <choice maxOccurs='unbounded'>
+    <element ref='explain:set'/>
+    <element ref='explain:index'/>
+    <element ref='explain:sortKeyword'/>
+   </choice>
+  </complexType>
+ </element>
+
+ <element name='set'>
+  <complexType>
+   <sequence>
+    <element ref='explain:title' minOccurs='0' maxOccurs='unbounded'/>
+   </sequence>
+   <attribute name='name' type='string' use='required'/>
+   <attribute name='identifier' type='string' use='required'/>
+  </complexType>
+ </element>
+
+ <element name='index'>
+  <complexType>
+   <sequence>
+    <element ref='explain:title' minOccurs='0' maxOccurs='unbounded'/>
+    <element ref='explain:map' maxOccurs='unbounded'/>
+    <element ref='explain:configInfo' minOccurs='0' maxOccurs='1'/>
+   </sequence>
+   <attribute name='id' type='string' use='optional'/>
+   <attribute name='search' use='optional'>
+    <simpleType>
+     <restriction base='string'>
+      <enumeration value='true'/>
+      <enumeration value='false'/>
+     </restriction>
+    </simpleType>
+   </attribute>
+   <attribute name='scan' use='optional'>
+    <simpleType>
+     <restriction base='string'>
+      <enumeration value='true'/>
+      <enumeration value='false'/>
+     </restriction>
+    </simpleType>
+   </attribute>
+   <attribute name='sort' use='optional'>
+    <simpleType>
+     <restriction base='string'>
+      <enumeration value='true'/>
+      <enumeration value='false'/>
+     </restriction>
+    </simpleType>
+   </attribute>
+  </complexType>
+ </element>
+
+ <element name='sortKeyword'>
+  <complexType mixed='true'>
+  </complexType>
+ </element>
+
+ <element name='map'>
+  <complexType>
+   <choice>
+    <sequence>
+     <element ref='explain:attr' maxOccurs='unbounded'/>
+    </sequence>
+    <element ref='explain:name'/>
+   </choice>
+   <attribute name='primary' use='optional' default='false'>
+    <simpleType>
+     <restriction base='string'>
+      <enumeration value='true'/>
+      <enumeration value='false'/>
+     </restriction>
+    </simpleType>
+   </attribute>
+  </complexType>
+ </element>
+
+ <element name='name'>
+  <complexType mixed='true'>
+   <attribute name='set' type='string' use='optional'/>
+  </complexType>
+ </element>
+
+ <element name='attr'>
+  <complexType mixed='true'>
+   <attribute name='type' type='string' use='required'/>
+   <attribute name='set' type='string' use='optional' default='1.2.840.10003.3.1'/>
+  </complexType>
+ </element>
+
+ <element name='recordInfo'>
+  <complexType>
+   <sequence>
+    <element ref='explain:recordSyntax' maxOccurs='unbounded'/>
+   </sequence>
+  </complexType>
+ </element>
+
+ <element name='recordSyntax'>
+  <complexType>
+   <sequence>
+    <element ref='explain:elementSet' maxOccurs='unbounded'/>
+   </sequence>
+   <attribute name='name' type='string' use='optional'/>
+   <attribute name='identifier' type='string' use='optional'/>
+  </complexType>
+ </element>
+
+ <element name='elementSet'>
+  <complexType>
+   <sequence>
+    <element ref='explain:title' minOccurs='0' maxOccurs='unbounded'/>
+   </sequence>
+   <attribute name='name' type='string' use='required'/>
+  </complexType>
+ </element>
+
+ <element name='schemaInfo'>
+  <complexType>
+   <sequence>
+    <element ref='explain:schema' maxOccurs='unbounded'/>
+   </sequence>
+  </complexType>
+ </element>
+
+ <element name='schema'>
+  <complexType>
+   <sequence>
+    <element ref='explain:title' minOccurs='0' maxOccurs='unbounded'/>
+   </sequence>
+   <attribute name='identifier' type='string' use='required'/>
+   <attribute name='name' type='string' use='required'/>
+   <attribute name='location' type='string' use='optional'/>
+   <attribute name='sort' use='optional' default='false'>
+    <simpleType>
+     <restriction base='string'>
+      <enumeration value='true'/>
+      <enumeration value='false'/>
+     </restriction>
+    </simpleType>
+   </attribute>
+   <attribute name='retrieve' use='optional' default='true'>
+    <simpleType>
+     <restriction base='string'>
+      <enumeration value='true'/>
+      <enumeration value='false'/>
+     </restriction>
+    </simpleType>
+   </attribute>
+  </complexType>
+ </element>
+
+ <element name='configInfo'>
+  <complexType>
+   <choice minOccurs='0' maxOccurs='unbounded'>
+    <element ref='explain:default'/>
+    <element ref='explain:setting'/>
+    <element ref='explain:supports'/>
+   </choice>
+  </complexType>
+ </element>
+
+ <element name='default'>
+  <complexType mixed='true'>
+   <attribute name='type' type='string' use='required'/>
+  </complexType>
+ </element>
+
+ <element name='setting'>
+  <complexType mixed='true'>
+   <attribute name='type' type='string' use='required'/>
+  </complexType>
+ </element>
+
+ <element name='supports'>
+  <complexType mixed='true'>
+   <attribute name='type' type='string' use='required'/>
+  </complexType>
+ </element>
+</schema>

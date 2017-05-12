@@ -1,0 +1,128 @@
+#!/usr/bin/perl
+#Copyright (c) 2009, Zane C. Bowers
+#All rights reserved.
+#
+#Redistribution and use in source and binary forms, with or without modification,
+#are permitted provided that the following conditions are met:
+#
+#   * Redistributions of source code must retain the above copyright notice,
+#    this list of conditions and the following disclaimer.
+#   * Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#
+#THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+#ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
+#WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+#IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+#INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
+#BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
+#DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+#LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+#OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+#THE POSSIBILITY OF SUCH DAMAGE.
+
+use strict;
+use warnings;
+use Getopt::Std;
+use ZConf::RSS;
+use ZConf::RSS::GUI;
+
+$Getopt::Std::STANDARD_HELP_VERSION = 1;
+
+#version function
+sub main::VERSION_MESSAGE {
+	print "zcrss-addfeed 0.0.0\n";
+}
+
+#print help
+sub main::HELP_MESSAGE {
+	print "\n".
+		  "-s <set>  The ZConf set to use\n";
+}
+
+#gets the options
+my %opts=();
+getopts('s:', \%opts);
+
+#inits ZConf::RSS
+my $zr = ZConf::RSS->new();
+if($zr->{error}){
+	warn('zcrss-addfeed: ZConf::RSS->new() errored');
+	exit $zr->{error};
+}
+
+if (defined($opts{s})) {
+	$zr->readSet($opts{s});
+	if ($zr->{error}) {
+		exit $zr->{error};
+	}
+}
+
+my $zcrssgui=ZConf::RSS::GUI->new({obj=>$zr});
+if($zr->{error}){
+	warn('zcrss-addfeed: ZConf::RSS::GUI->new errored');
+	exit $zr->{error};
+}
+
+$zcrssgui->addFeed($ARGV[0]);
+if($zr->{error}){
+	warn('zcrss-addfeed: ZConf::RSS::GUI->addFeed errored');
+	exit $zr->{error};
+}
+
+=head1 NAME
+
+zcrss-addfeed - Calls the addFeed dialog for ZConf::RSS::GUI
+
+=head1 SYNOPSIS
+
+zcrss-addfeed [B<-s> <set>] [<feed URL>]
+
+If $ARGV[0] is specified, it is used to populate the URL field.
+
+=head1 SWTICHES
+
+=head2 -s <set>
+
+If this is specified, this set is ran.
+
+=head1 EXIT CODES
+
+If a exit code is not listed below, it is what ever error value ZConf::RSS returned.
+
+=head1 AUTHOR
+
+Copyright (c) 2009, Zame C. Bowers <vvelox@vvelox.net>
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+     this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS` OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=head1 OSNAMES
+
+any
+
+=head1 README
+
+zcrss-addfeed - Calls the addFeed dialog for ZConf::RSS::GUI
+
+=cut

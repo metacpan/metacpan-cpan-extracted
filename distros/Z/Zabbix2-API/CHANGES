@@ -1,0 +1,44 @@
+0.013 2015-06-09
+
+ * Remove dependency on Moo::Lax, recent versions of Moo have
+   abandoned the ALL WARNINGS ARE DEADLY EVERYWHERE philosophy
+ * Add templates accessor to host objects
+ * Fix issue with macro objects pushing read-only properties to the
+   server
+ * Fix compat issue with Zabbix 2.4: methods that used not to require
+   an auth parameter now require that the auth parameter be absent
+ * Add missing CRUD features in the HostInterface class
+
+0.012 2014-11-17
+
+ * Realized I never updated the CHANGES file
+ * Trigger constants, courtesy of Ray Link
+
+0.011 2014-10-20
+
+ * Allow item parameter macro expansion in item names (fixes #8)
+ * Use item name instead of host name + item key (fixes #4)
+ * Fix issue with chart URLs (fixes #6)
+ * Graph type constants
+ * Support Zabbix 2.4.x (fixes #16)
+ * Update doc for HostInterface creation (fixes #15)
+ * Test fixes
+ * Doc fixes
+ * Build script fixes
+
+0.010 2014-06-12
+
+ * Hosts have gained a "graph" accessor
+ * Fix history accessor for non-integer types (fixes #5)
+ * Fix chart URLs not having the ID in the params
+ * Use "name" attribute of hosts, available in 2.x
+ * Up version requirement for Moo
+ * Doc fixes
+ * Fix copyright and email stuff
+ * Too many other fixes
+ * First CPAN release
+
+0.001 2014-04-26
+
+ * Completed most of the rewrite for Zabbix 2.x and Moo, all tests
+   pass.

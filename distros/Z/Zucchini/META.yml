@@ -1,0 +1,50 @@
+---
+abstract: 'turn templates into static websites'
+author:
+  - 'Chisel <chisel@chizography.net>'
+build_requires:
+  FindBin: 0
+  Moose: 0
+  Test::File::Contents: 0
+  Test::More: 0
+  Test::NoWarnings: 0
+  Test::UseAllModules: 0
+  lib: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.012, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Zucchini
+requires:
+  Carp: 0
+  Config::Any: 0
+  Digest::MD5: 0
+  Exporter: 0
+  File::Basename: 0
+  File::Copy: 0
+  File::Find: 0
+  File::Rsync: 0
+  File::Slurp: 0
+  File::Temp: 0
+  File::stat: 0
+  Getopt::Long: 0
+  HTML::Lint: 0
+  IO::File: 0
+  Moo: 0
+  MooX::Types::MooseLike::Base: 0
+  Net::FTP: 0
+  Path::Class: 0
+  Pod::Usage: 0
+  Template: 0
+  base: 0
+  strict: 0
+  version: 0
+  warnings: 0
+resources:
+  bugtracker: http://github.com/chiselwright/Zucchini/issues
+  repository: git://github.com/chiselwright/zucchini.git
+version: 0.0.21

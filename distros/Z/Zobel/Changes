@@ -1,0 +1,71 @@
+Revision history for Perl module LiveGeez
+
+0.14 Mon Nov 20 19:03:33 EST 2000
+	- Initial Office 2000 HTML Support.
+	- Smarter cacheing.
+	- Cgi module added.
+	- mod_perl support.
+	- 'date-only' coversion problem fixed.
+	- Ethiopia Jiret font added.
+	- bug fixes
+
+0.13 Sun Jan 30 20:42:46 EST 2000
+	- $VERSION addded to all pm files.
+ 	- New GeezFont typefaces added AddisB1, AddisL1, AddisT1
+
+0.12 Fri Nov 26 11:30:05 EST 1999
+	- bug fix for frames in HTML::FixLink
+
+0.11 Sat Nov 13 23:53:37 EST 1999
+	- File.pm fixes for file and dirs names with spaces and parenthesis.
+	- GeezTypeNet and AMH3 fonts added.
+	- bug fix for SERA guillemets in HTML.
+
+0.10 Thu Aug 26 00:12:33 EET DST 1999
+	- bug fix in SetCookie (forgotten in 0.09).
+	- GFZemen2K font added.
+
+0.09 Sun Aug 22 21:24:28 EET DST 1999
+	- lexical and dynamic scoping rules are now used properly.
+	- bug fix for URLs when a closing "/" is not included.
+
+0.08 Fri Jul 30 11:24:01 EET DST 1999
+	- general rework and extension of Request architecture.
+	- directit.pl integrated into G.pl.
+	- cookies.pl integrated into Request.pm (ParseCookie, SetCookie, 
+	  $cookieExpires, $cookieDomain)
+	- TopHtml, BotHtml, ParseCgi, DieCgi methods added.  $defaultBGColor added.
+	- method PrintHeader renamed HeaderPrint and ParseInput renamed ParseQuery.
+
+0.07 Mon Jul 12 21:05:21 EET DST 1999
+	- PrintHeader added in Request.pm when sysOut look up fails.
+	- cookies.pl no longer imports cgi-lib.pl
+
+0.06  Sat Jul 10 13:16:39 EST 1999
+	- minor bug fix in CacheAsSERA.pm and HTML.pm.
+	- cookies.pl updated to set and detect 7-bit preference.
+	- Request.pm checks cookies for each page opened unless cookie
+	  is being set.
+	- Services.pm and Request.pm fixed for Time services.
+
+0.05  Wed Jun 30 02:05:00 EET DST 1999
+	- CacheAsSERA added, processing of non-SERA HTML files is now
+	  possible
+	- many enhancements for HTML processing
+
+0.04  Wed May 12 17:35:59 EET DST 1999
+	- bug fixes, Zobel exits more gracefully now.
+
+0.03  Wed May 12 17:35:59 EET DST 1999
+	- bug fixes
+	- requests for local files works when path is given w/o
+	  file name (checks for index.html, index.htm, index.sera.html)
+	- "src=" and "href=" links no longer require an absolute path
+	  with local files
+
+0.02  Sun May  9 20:59:09 EET DST 1999
+	- numerous bug fixes
+	- in sync with Convert::Ethiopic
+
+0.01  Sat Apr 17 18:51:34 EET 1999
+	- original version;

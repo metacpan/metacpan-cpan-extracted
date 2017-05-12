@@ -1,0 +1,39 @@
+Revision history for ZConf-Runner
+
+2.1.4	2009-11-27/9:45
+		-Correct initilization if the config exists, but not the default set.
+		-Warning cleanup.
+
+2.1.3	2009-10-17/15:00
+		-Now uses 'String::ShellQuote' when it runs a program.
+
+2.1.2	2009-10-11/13:30
+		-Minor pod correction to 'ZConf::Runner::GUI'.
+
+2.1.1	2009-10-11/4:10
+		-Correct initilization issue with accepting GUI not accepting the arg zcgui.
+		-Add load test for ZConf::Runner::GUI.
+
+2.1.0	2009-10-11/3:40
+		-'bin/zcrunner' will now use the first arguement if -o is not given
+		-Correct documentation in regards to the new method for
+			'ZConf::Runner::GUI::Curses'.
+
+2.0.0	2009-09-26/2:00
+		-Remove the 'zconf' value from the arg hash for 'ZConf::Runner::GUI->new'
+			and 'ZConf::Runner::GUI::Curses->new'. It now uses the one from the
+			'ZConf::Runner' object.
+
+1.0.0   2009-05-18/13:00
+		-Now has ZConf::GUI support.
+
+0.1.0	2009-02-20/18:30
+		-Add 'readSet', 'getSet', and 'listSets'.
+
+0.0.1	2009-01-23/18:30
+		-Add 'Curses::UI' as a requirement in 'Makefile.PL' to appease CPAN's
+			testing.
+
+0.0.0   2009-01-05/13:15
+		-Initial release.
+

@@ -1,0 +1,54 @@
+Zwoelf-Hash-Union version 0.01
+==============================
+
+This module extends Hash::Merge. The big difference is that nested ArrayRefs are
+merged together by union, not by simply adding them up.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  - Test::Deep
+  - Hash::Merge
+
+COPYRIGHT AND LICENCE
+
+MIT
+
+Copyright (C) 2016 by Martin Gutsch
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.20.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+# SYNOPSIS
+
+    use Zwoelf::Hash::Union qw( merge_hash unique_array );
+
+    unique_array([ {a=>1}, {b=>2}, {c=>3}, {b=>2} ])
+    # yields
+    [{ a => 1 }, { b => 2 }, { c => 3 }];
+
+    merge_hash(
+        { a => 1, b => [{ b => 2 }, { c => 3 }] },
+        { a => 2, b => [{ b => 2 }, { d => 4 }] },
+    );
+    # yields
+    { a => 2, b => [{ b => 2}, { c => 3 }, { d => 4 }] },
+    
+    merge_hash(
+        { a => 1, b => [{ b => 2 }, { c => 3 }] },
+        { a => 2, b => [{ b => 2 }, { d => 4 }] },
+        'LEFT_PRECEDENT'
+    );
+    # yields
+    { a => 1, b => [{ b => 2}, { c => 3 }, { d => 4 }] },

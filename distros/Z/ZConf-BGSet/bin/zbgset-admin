@@ -1,0 +1,548 @@
+#!/usr/bin/perl
+#Copyright (c) 2008, Zane C. Bowers
+#All rights reserved.
+#
+#Redistribution and use in source and binary forms, with or without modification,
+#are permitted provided that the following conditions are met:
+#
+#   * Redistributions of source code must retain the above copyright notice,
+#    this list of conditions and the following disclaimer.
+#   * Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#
+#THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+#ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
+#WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+#IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+#INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
+#BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
+#DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+#LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+#OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+#THE POSSIBILITY OF SUCH DAMAGE.
+
+use strict;
+use warnings;
+use Getopt::Std;
+use Image::Size::FillFullSelect;;
+use ZConf;
+use Cwd 'abs_path';
+
+$Getopt::Std::STANDARD_HELP_VERSION=1;
+
+#version function
+sub main::VERSION_MESSAGE {
+	print "zbgset-admin 0.0.1\n";
+};
+
+#print help
+sub main::HELP_MESSAGE {
+	print "\n".
+	"-l <list>  Specifies something to list.\n".
+	"-k <variable>  Species a variable to set.\n".
+	"-a <FS path>  Species a path on the FS to add to a path.\n".
+	"-r <FS path>  Species a path on the FS to remove from a path.\n".
+	"-n <path>  Creates a new blank path.\n".
+	"-d <path>  Delete a path.\n".
+	"\n".
+	"-s <set to operate on> \n".
+	"-p <path name>  Specifies a path name.".
+	"-v <value>  Species a value.\n";
+};
+
+#s=zconf set
+#l=list
+#p=path
+#s=set
+#k=key
+#v=value
+#a=path to add
+#r=path to remove
+#n=new path
+#d=delete a path
+#gets the options
+my %opts=();
+getopts('d:s:l:p:k:v:a:r:n:', \%opts);
+my %args;
+
+#inits zconf
+my $zconf = ZConf->new();
+if($zconf->{error}){
+	warn("zbgset:1: Could not initiate ZConf. It failed with '".$zconf->{error}."'".
+		", '".$zconf->{errorString}."'.");
+	exit 1;
+}
+
+#handles set checking
+if(defined($opts{s})){
+	if(!$zconf->setNameLegit($opts{s})){
+		warn("zbgset:4: '".$opts{s}."' is not a legit ZConf set name.");
+		exit 4;
+	}else{
+		$args{set}=$opts{s};
+	};
+}else{
+	$args{set}=undef;
+};
+
+#create the config if it does not exist
+#if it does exist, make sure the set we are using exists
+my $returned = $zconf->configExists("zbgset");
+if(!$returned){
+	warn("zbgset: Has not been run before. Initiating config.");
+	$returned = $zconf->createConfig("zbgset");
+	if($zconf->{error}){
+		warn("zbgset:2: Could not create config.");
+		exit 2;
+	};
+	#inits it
+	my $returned=$zconf->writeSetFromHash({config=>"zbgset", set=>$args{set}},
+						{
+							savelast=>"1",
+							filltype=>"auto",
+							numberoflast=>"15",
+							postSetRefresh=>"0",
+							postSetRefresher=>"zbgfbmb -l",
+							maxdiff=>".2",
+							filltype=>"auto",
+							full=>'hsetroot -full \'%%%THEFILE%%%\'',
+							tile=>'hsetroot -tile \'%%%THEFILE%%%\'',
+							fill=>'hsetroot -fill \'%%%THEFILE%%%\'',
+							center=>'hsetroot -center \'%%%THEFILE%%%\'',
+							path=>'default'
+						}
+					);
+	warn("zbgset: Initilization succeeded.");
+}else{
+	#gets the set name if it is not defined
+	if(!defined($args{set})){
+		$args{set}=$zconf->chooseSet("zbgset");
+	};
+	
+	#gets the list of sets
+	my @sets=$zconf->getAvailableSets("zbgset");
+	if($zconf->{error}){
+		warn("zbgset:3: Could not get a list of sets.");
+		exit 3;
+	};
+	
+	#creates the default config if it the specified set has not been created before
+	my $setsInt=0; #used for intering through @sets
+	my $found=undef;
+	while(defined($sets[$setsInt])){
+		#sets $found to true if the set is found
+		if($sets[$setsInt] eq $args{set}){
+			$found=1;
+		};
+		$setsInt++;
+	};
+
+	#if found is false, initialize the set
+	if(!$found){
+		warn("zbgset: The specified or auto choosen set, '".$args{set}.
+				"' has not been initialized before. Doing so now.");
+		#inits it
+		my $returned=$zconf->writeSetFromHash({config=>"zbgset", set=>$args{set}},
+						{
+							savelast=>"true",
+							filltype=>"auto",
+							numberoflast=>"15",
+							postSetRefresh=>"false",
+							postSetRefresher=>"zbgfbmb -l",
+							maxdiff=>".2",
+							filltype=>"auto",
+							full=>'hsetroot -full \'%%%THEFILE%%%\'',
+							tile=>'hsetroot -tile \'%%%THEFILE%%%\'',
+							fill=>'hsetroot -fill \'%%%THEFILE%%%\'',
+							center=>'hsetroot -center \'%%%THEFILE%%%\'',
+							path=>'default',
+							override=>'default',
+							last=>''
+						}
+					);
+		warn("zbgset: Initilization succeeded for set '".$args{set}."'.");
+	};
+};
+
+$returned = $zconf->read({config=>"zbgset", set=>$args{set}});
+if($zconf->{error}){
+	warn("zbgset:3: Could not read config. It failed with '".$zconf->{error}."'".
+		", '".$zconf->{errorString}."'.");
+	exit 3;
+};
+
+if(defined($opts{l})){
+	
+	#all
+	if($opts{l} eq "all"){
+		my @keys=$zconf->getKeys("zbgset");
+		my $keysInt=0;
+		while(defined($keys[$keysInt])){
+			my $value=$zconf->{conf}{"zbgset"}{$keys[$keysInt]};
+			$value=~s/\n/\n /g ;
+			print $keys[$keysInt]."=".$value."\n";
+			
+			$keysInt++;
+		};
+
+		exit 0;
+	};
+
+	#path
+	#if -p is used, unly show that path
+	if($opts{l} eq "path"){
+		my $path="^paths/";#the '^' is there as as regexVarSearch takes a regular expression 
+		#if -p is used, unly show that path
+		if(defined($opts{p})){
+			$path="paths/".$opts{p};
+			if(!defined($zconf->{conf}{"zbgset"}{$path})){
+				warn("zbgset-admin:5: Path '".$opts{p}."' does not exist.");
+				exit 5;
+			};
+			print $zconf->{conf}{"zbgset"}{$path};
+		};
+
+		#print the paths in ZML format
+		my @keys = $zconf->regexVarSearch("zbgset", $path);
+		my $keysInt=0;
+		while(defined($keys[$keysInt])){
+			my $value=$zconf->{conf}{"zbgset"}{$keys[$keysInt]};
+			$value=~s/\n/\n /g ;
+			print $keys[$keysInt]."=".$value."\n";
+			
+			$keysInt++;
+		};
+		
+		exit 0;
+	};
+	
+	#print the paths
+	if($opts{l} eq "paths"){
+		my @keys = $zconf->regexVarSearch("zbgset", "^paths/");
+		my $keysInt=0;
+		while(defined($keys[$keysInt])){
+			my $value=$keys[$keysInt];
+			$value=~s/^paths\///g;
+			print $value."\n";
+			$keysInt++;
+		};
+		exit 0;
+	};
+
+	#if either none of the above match, check to see if it is a variable
+	if(!defined($zconf->{conf}{zbgset}{$opts{l}})){
+		warn("zbgset-admin:6: Key '".$opts{l}."' not found ");
+		exit 6
+	};
+	
+	print $zconf->{conf}{zbgset}{$opts{l}}."\n";
+	
+	exit 0;
+};
+
+#handles setting if defined
+if(defined($opts{k})){
+
+	if(!defined($opts{v})){
+		warn("abgset-admin:8: No value specified using -v ");
+		exit 8;
+	};
+
+	my @allowedKeys=("tile", "center", "full", "fill","numberoflast",
+					"path", "savelast", "postSetRefresher", "postSetRefresh");				
+	my $allowedKeysInt=0;
+	while(defined($allowedKeys[$allowedKeysInt])){
+		#if it matches, set it
+		if($opts{k} eq $allowedKeys[$allowedKeysInt]){
+			$zconf->{conf}{zbgset}{$opts{k}}=$opts{v};
+
+			#saves the config
+			$returned=$zconf->writeSetFromLoadedConfig({config=>"zbgset"});
+			if($zconf->{error}){
+				warn("zbgset-admin:1: It failed with '".$zconf->{error}."'".
+					", '".$zconf->{errorString}."'.");
+				exit 1;
+			};
+
+			exit 0;
+		};
+		
+		$allowedKeysInt++;
+	};
+	warn("zbgset-admin:6: Key '".$opts{s}."' not found ");
+	exit 6;
+};
+
+#handles adding paths
+if($opts{a}){
+	#make sure the file/dir exists
+	if(! -e $opts{a}){
+		warn("zbgset-admin:7: '".$opts{a}."' does not exist ");
+		exit 7;
+	};
+	
+	#get the full path
+	my $fullpath=abs_path($opts{a});
+
+	#make sure path exists and if not add it
+	if(!defined($zconf->{conf}{zbgset}{"paths/".$opts{p}})){
+		my $returned=$zconf->setVar("zbgset", "paths/".$opts{p}, $fullpath);
+		if($zconf->{error}){
+			warn("zbgset-admin:1: It failed with '".$zconf->{error}."'".
+			", '".$zconf->{errorString}."'.");
+			exit 1;
+		};
+		#saves the config
+		$returned=$zconf->writeSetFromLoadedConfig({config=>"zbgset"});
+		if($zconf->{error}){
+			warn("zbgset-admin:1: It failed with '".$zconf->{error}."'".
+			", '".$zconf->{errorString}."'.");
+			exit 1;
+		};
+		exit 0;
+	};
+
+	#if we are here it means that the path exists
+	$zconf->{conf}{zbgset}{"paths/".$opts{p}}=$zconf->{conf}{zbgset}{"paths/".$opts{p}}."\n".$fullpath;
+	#remove any double new lines
+	$zconf->{conf}{zbgset}{"paths/".$opts{p}}=~s/\n\n/\n/g;
+	#removes any new lines at the beginning
+	$zconf->{conf}{zbgset}{"paths/".$opts{p}}=~s/^\n//g;
+	#saves it
+	$zconf->writeSetFromLoadedConfig({config=>"zbgset"});
+	if($zconf->{error}){
+		warn("zbgset-admin:1: It failed with '".$zconf->{error}."'".
+		", '".$zconf->{errorString}."'.");
+		exit 1;
+	};
+	exit 0;
+};
+
+#deletes a path
+if(defined($opts{d})){
+	if(!defined($zconf->{conf}{"zbgset"}{"paths/".$opts{d}})){
+		warn("zbgset-admin:5: Path '".$opts{d}."' does not exist.");
+		exit 5;
+	};
+
+	my @deleted = $zconf->regexVarDel("zbgset", "^paths/".$opts{d}."\$");
+	if($zconf->{error}){
+			warn("zbgset-admin:1: It failed with '".$zconf->{error}."'".
+			", '".$zconf->{errorString}."'.");		
+	};
+
+	$zconf->writeSetFromLoadedConfig({config=>"zbgset"});
+	if($zconf->{error}){
+		warn("zbgset-admin:1: It failed with '".$zconf->{error}."'".
+		", '".$zconf->{errorString}."'.");
+		exit 1;
+	};
+	exit 0;	
+};
+
+#remotes a path from a path
+if(defined($opts{r})){
+	#makes sure that -p has been used
+	if(!defined($opts{p})){
+		warn("zbgset-admin:5: No path defined ");
+		exit 5;
+	};
+
+	if(!defined($zconf->{conf}{"zbgset"}{"paths/".$opts{p}})){
+		warn("zbgset-admin:5: Path '".$opts{p}."' does not exist.");
+		exit 5;
+	};
+
+	my 	@paths=split(/\n/, $zconf->{conf}{"zbgset"}{"paths/".$opts{p}});
+	my $pathsInt=0;
+	my $newpath="";#holds the new path
+	#removes matching paths
+	while(defined($paths[$pathsInt])){
+		if( $paths[$pathsInt] !~ /$opts{r}/){
+			$newpath=$newpath.$paths[$pathsInt]."\n";
+		};
+		
+		$pathsInt++;
+	};
+	
+	print $newpath."-";
+	
+	#removes the \n\n that was added and replace it with a \n
+	$newpath=~s/\n\n/\n/g;
+	
+	print $newpath;
+	
+	#sets it
+	$zconf->{conf}{"zbgset"}{"paths/".$opts{p}}=$newpath;
+
+	#saves it
+	$zconf->writeSetFromLoadedConfig({config=>"zbgset"});
+	if($zconf->{error}){
+		warn("zbgset-admin:1: It failed with '".$zconf->{error}."'".
+		", '".$zconf->{errorString}."'.");
+		exit 1;
+	};
+	exit 0;	
+};
+
+#adds a new path with a blank set of paths
+if(defined($opts{n})){
+	if(defined($zconf->{conf}{"zbgset"}{"paths/".$opts{n}})){
+		warn("zbgset-admin:5: Path '".$opts{d}."' already exist.");
+		exit 5;
+	};
+
+	my $returned=$zconf->setVar("zbgset", "paths/".$opts{n}, "");
+	if($zconf->{error}){
+		warn("zbgset-admin:1: It failed with '".$zconf->{error}."'".
+		", '".$zconf->{errorString}."'.");
+		exit 1;
+	};
+
+	$zconf->writeSetFromLoadedConfig({config=>"zbgset"});
+	if($zconf->{error}){
+		warn("zbgset-admin:1: It failed with '".$zconf->{error}."'".
+		", '".$zconf->{errorString}."'.");
+		exit 1;
+	};
+	exit 0;	
+};
+
+#we should never get here
+exit 1;
+
+=head1 NAME
+
+zbgset-admin - Manages the configuration of zbgset.
+
+=head1 SYNOPSIS
+
+zbgset-admin 
+
+=head1 ARGUEMENTS
+
+=head2 B<-a> <FS path>
+
+This adds a path to path. If a relative path is specified, it is first converted
+to a full path.
+
+=head2 B<-b> <regex>
+
+This removes any paths matching the specified regexp. To specify a path to operate
+on use '-p'.
+
+=head2 B<-k> <key>
+
+This sets a variable. Use '-v' to specify the the value.
+
+=head2 B<-l> <list>
+
+Lists something.
+
+=head3 all
+
+	This lists everything in the zbgset config.
+	
+=head3 path
+
+Lists a specified path. The path is specified using '-p'.
+
+=head3 paths
+
+This lists all available paths.
+
+=head2 path
+
+This specifies a path that will be used.
+
+=head2 B<-n> <path>
+
+This creates a new blank path.
+
+=head2 B<-s> <ZConf set>
+
+This is the ZConf set to use for it. If the set has not been initiated before it
+will do so.
+
+=head2 B<-v> <value>
+
+For use with '-k' for specifying a value when setting a variable.
+
+=head1 ERROR CODES
+
+=head2 0
+
+Success.
+
+=head2 1
+
+ZConf error.
+
+=head2 2
+
+Could not create config.
+
+=head2 3
+
+Could not get set information.
+
+=head2 4
+
+The set name you specified with '-s' is not a legit name for a ZConf set.
+
+=head2 5
+
+Bad path name specified or none specified.
+
+=head6 6
+
+Specified key not found.
+
+=head2 7
+
+File or directory does not exist
+
+=head2 8
+
+No value specified.
+
+=head1 AUTHOR
+
+Copyright (c) 2008, Zame C. Bowers <vvelox@vvelox.net>
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+     this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS` OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=head1 SCRIPT CATEGORIES
+
+Desktop
+
+=head1 OSNAMES
+
+any
+
+=head1 README
+
+zbgset-admin - Manages the configuration of zbgset.
+
+=cut

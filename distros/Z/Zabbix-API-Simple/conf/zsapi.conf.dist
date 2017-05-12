@@ -1,0 +1,44 @@
+<Zabbix>
+	<API>
+            url = http://zabbix/zabbix/api_jsonrpc.php
+            username = apiuser
+            password = apipass
+		<Simple>
+                    key = somelongrandomapikey
+			<Web>
+				<Plugin>
+					<AddHostSimple>
+						group_id = 1
+						group_id = 2
+                                                group_id = 3
+                                                group_id = 4
+						template_id = 10001
+                                                template_id = 10002
+                                                template_id = 10003
+						proxy_id = 5
+                                                <macros>
+                                                    <path>
+                                                        key   = {$PATH}
+                                                        value = /script.php?a=zabbix
+                                                    </path>
+                                                    <string>
+                                                        key   = {$SEARCH_STRING}
+                                                        value = zabbix
+                                                    </string>
+                                                </macros>
+					</AddHostSimple>
+                                        <RemoveHostSimple>
+                                            group_id = 4
+                                        </RemoveHostSimple>
+                                        <AddHostDerived>
+                                            group_id = 6
+                                            group_id = 7
+                                            group_id = 8
+                                            template_id = 10004
+                                            template_id = 10005
+                                        </AddHostDerived>
+				</Plugin>
+			</Web>
+		</Simple>
+	</API>
+</Zabbix>

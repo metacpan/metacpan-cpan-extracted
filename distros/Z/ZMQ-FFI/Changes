@@ -1,0 +1,176 @@
+
+1.11      2016-01-10 19:27:05-05:00 America/New_York
+
+    - Fix bareword error in closed_socket.t (GH#27 - thanks @rhrhunter)
+
+1.10      2016-01-09 15:50:59-05:00 America/New_York
+
+    - support importing zmq constants directly through ZMQ::FFI (GH#24)
+    - don't execute operations on closed sockets and emit appropriate warnings
+      (GH#23)
+
+1.09      2015-12-09 04:55:20-06:00 America/Chicago
+
+    - add more robust cleanup handling for ooo global destruction scenarios.
+
+1.08      2015-11-07 10:47:10-06:00 America/Chicago
+
+    - Fix cleanup handling when using Perl threads
+
+1.07      2015-09-19 12:38:32-05:00 America/Chicago
+
+    - Add 4.1 to xt/test_versions.sh
+    - Add missing 4.1 stable constants. Update constants generation script
+      to handle hex constant values.
+    - Add workaround for hang in device.t and proxy.t
+
+1.06      2015-03-28 11:30:15-05:00 America/Chicago
+
+    - Update FreeBSD check
+
+1.05_02   2015-03-28 03:31:38-05:00 America/Chicago
+
+1.05_01   2015-03-28 02:52:01-05:00 America/Chicago
+
+1.04      2015-03-24 03:02:20-05:00 America/Chicago
+
+    - require FFI::Platypus 0.33 which fixes potential segfaults during global
+      destruction (GH#19)
+    - don't install on unthreaded BSD perls (GH#13)
+    - more performance improvements, incl. 30% faster recv rate in some tests
+      see 83f0013, f834fe9, and 394e164
+    - use a default linger of 0 (default used by czmq/jzmq)
+    - don't clobber user linger value (GH#18)
+    - properly localize redefines in tests
+    - fix cleanup of ctx/sockets created in forked children
+
+1.03      2015-03-16 04:47:24-05:00 America/Chicago
+
+    - add alternative (non-exceptional) error handling semantics
+    - fix socket files being left around after device.t and proxy.t
+    - misc doc reformatting and rewording
+    - don't use EV in fd.t
+
+1.02      2015-03-12 04:51:14-05:00 America/Chicago
+
+    - fix cleanup handling of inherited contexts/sockets in forked childen
+    - don't include datetime in generated Constants module
+    - fix pointer pack warning in ZMQ2 backend
+
+1.01      2015-03-11 00:50:39-05:00 America/Chicago
+
+    - Require Math::BigInt 1.997 or newer to resolve integer overflow bug
+      (GH#14 - thanks @plicease!)
+    - Perl v5.10 is now the official minimum version supported
+
+1.00      2015-03-09 00:54:41-05:00 America/Chicago
+
+    - switch to FFI::Platypus on the backend. FFI::Platypus provides the
+      ability to bind ffi functions as first class Perl xsubs, resulting in
+      dramatic performance gains.
+    - optimize the Perl code in general, especially the send/recv hot spots
+    - require Class::XSAccessor, which substantially improves Moo accessor
+      performance
+    - don't test against dev Perl on travis for now, seems to be busted
+
+0.19      2015-03-04 01:42:16-06:00 America/Chicago
+
+    - use dzil FFI::CheckLib plugin to properly report NA on CPAN tester boxes
+      without libzmq
+    - test against dev perl in addition to stable on travis
+
+0.18      2015-02-25 07:30:20-06:00 America/Chicago
+
+    - linger default has changed back to -1 for libzmq all versions
+    - add travis tests for Perl 5.20
+    - $! will not be localized by default when stringified in Perl 5.22 and
+      beyond, and needs to be explicitly localized in the tests (GH#12)
+
+0.17      2014-11-08 22:31:25-06:00 America/Chicago
+
+    - add zmq_device and zmq_proxy functionality
+      (GH#10, GH#11 - thanks @semifor)
+    - add libzmq.so.4 to list of sonames checked
+    - linger default is 2000 circa libzmq 4.2
+
+0.16      2014-09-13 17:20:05-05:00 America/Chicago
+
+    - generate zmq_msg_t size, don't hardcode it
+      (GH#9 - thanks @parth-j-gandhi!)
+    - test against libzmq dev repo in addition to stable
+
+0.15      2014-08-15 20:39:39 America/Chicago
+
+    - Apply flags correctly in multipart sends (GH#8 - thanks @shripchenko)
+
+0.14      2014-07-06 00:39:20 America/Chicago
+
+    - add disconnect POD
+
+0.13      2014-07-05 17:03:08 America/Chicago
+
+    - add zmq_disconnect and zmq_unbind bindings (GH#7)
+
+0.12      2014-03-29 17:48:45 America/Chicago
+
+    - fix binary/string option handling (e.g. ZMQ_LAST_ENDPOINT)
+
+0.11      2014-02-17 19:50:14 America/Chicago
+
+    - works on OS X now (GH#6 - thanks @wjackson!)
+    - mucho refactor and code reorg
+
+0.10      2014-02-14 20:27:36 America/Chicago
+
+    - Implicitly use system libc by passing undef as soname to FFI::Raw
+      Requires FFI::Raw >= 0.26
+
+0.09      2014-01-29 08:07:12 America/Chicago
+
+    - use correct pack type for zmq_version
+    - use appropriate error function depending on the context
+    - don't ship zmq constants generation script, which confuses CPAN
+
+0.08      2014-01-19 01:19:49 America/Chicago
+
+    - ZMQ_DONTWAIT is not necessary in examples & tests
+    - Fix unicode bytes handling (GH#5)
+      Thanks @klaus for test and code
+    - Generate constants through 4.0.3
+    - ZMQ4 support added (GH#4)
+      Thanks @klaus for test, code, and suggestions
+
+0.07      2013-11-10 15:38:14 America/Chicago
+
+    - Support 32bit Perls (GH#1)
+    - Make tests locale aware (GH#2)
+
+0.06      2013-10-08 07:53:53 America/Chicago
+
+    - Fix socket/context DEMOLISH order bug
+
+0.05      2013-10-07 01:47:00 America/Chicago
+
+    - Minimum required Moo version is 1.003001
+
+0.04      2013-10-06 22:29:35 America/Chicago
+
+    - Use Moo instead of Moose
+    - Support specifying soname at object creation
+    - Add zmq_soname and zmq_version Util functions
+    - If soname unspecified try all libzmq sonames before failing
+    - Major code and doc refactor
+    - add .travis.yml for Travis CI builds
+
+0.03      2013-10-03 14:32:50 America/Chicago
+
+    - Doc additions
+
+0.02      2013-10-03 12:32:16 America/Chicago
+
+    - Doc tweaks
+    - Don't try to close/destroy sockets/contexts if creation failed
+
+0.01      2013-10-03 10:10:05 America/Chicago
+
+    - Initial release

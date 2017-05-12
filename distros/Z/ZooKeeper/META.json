@@ -1,0 +1,95 @@
+{
+   "abstract" : "Perl bindings for Apache ZooKeeper",
+   "author" : [
+      "Mark Flickinger <maf@cpan.org>"
+   ],
+   "dynamic_config" : "0",
+   "generated_by" : "Module::Install version 1.16, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "ZooKeeper",
+   "no_index" : {
+      "directory" : [
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Devel::CheckLib" : "0.4",
+            "Devel::PPPort" : "3.19",
+            "ExtUtils::MakeMaker" : "6.59"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "Devel::CheckLib" : "0.4",
+            "Devel::PPPort" : "3.19",
+            "ExtUtils::MakeMaker" : "6.59",
+            "ExtUtils::ParseXS" : "3.18"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Digest::SHA" : "0",
+            "FindBin::libs" : "0",
+            "Module::Install::CPANfile" : "0",
+            "Module::Install::ExtraTests" : "0",
+            "Module::Install::ReadmePodFromPod" : "0",
+            "Module::Install::XSUtil" : "0",
+            "Test::Fatal" : "0",
+            "Test::Pod" : "0",
+            "Test::Strict" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "Carp" : "0",
+            "Module::Runtime" : "0",
+            "Moo" : "0",
+            "Scope::Guard" : "0",
+            "Throwable" : "0",
+            "XSLoader" : "0.02",
+            "namespace::autoclean" : "0.16",
+            "perl" : "v5.10.1"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "AnyEvent::Future" : "0",
+            "Storable" : "0",
+            "Test::Class::Moose" : "0.55",
+            "Test::LeakTrace" : "0",
+            "Test::More" : "0",
+            "Try::Tiny" : "0",
+            "namespace::clean" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mark-5/p5-zookeeper/issues"
+      },
+      "homepage" : "https://github.com/mark-5/p5-zookeeper",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/mark-5/p5-zookeeper.git"
+      }
+   },
+   "version" : "0.1.10",
+   "x_module_name" : "ZooKeeper",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

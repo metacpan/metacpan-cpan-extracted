@@ -1,0 +1,2 @@
+
+vim -p lib/ZWave/Protocol.pm t/*

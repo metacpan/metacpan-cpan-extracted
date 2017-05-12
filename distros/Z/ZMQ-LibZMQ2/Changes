@@ -1,0 +1,93 @@
+Changes
+=======
+
+1.09 - Jun 04 2014
+    - Fix return value upon errors (rurban)
+
+1.08 - May 28 2014
+    - Fix locale dependent tests (J. Gomez)
+
+1.07 - Mar 01 2013
+    - No code change
+    - Remove MYMETA.* from distro (http://weblog.bulknews.net/post/44251476706/stop-shipping-mymeta-to-cpan)
+
+1.06 - Jan 23 2013
+    - Add zmq_errno() and zmq_strerror() to @EXPORT, so the following works
+          use ZMQ::LibZMQ qw(zmq_errno);
+      Previously zmq_errno() and zmq_strerror() existed, but could not be
+      imported (https://github.com/lestrrat/p5-ZMQ/issues/26, @emceelam).
+
+1.05 - Jan 12 2013
+    - t/100_basic.t uses POSIX::setlocale() to force $! stringification
+      (rt #82613, reported by Konstantin A. Pustovalov)
+
+1.04 - Jan 04 2013
+    - Update docs
+    - Remove Module::Install::TestTarget
+
+1.03 - Oct 09 2012
+    - Fix memory leak in zmq_recv(), retported by trinitum
+      (https://github.com/lestrrat/p5-ZMQ/issues/15)
+    - Workaround ZMQ_RCVMORE being "int64" on libzmq2 and "int" on libzmq3
+      (ZMQ::Constants::ZMQ_RCVMORE is int), by hardcoding.
+      If this becomes a problem in the future, set an environment variable
+      like so to disable this workaround
+
+            PERL_LIBZMQ2_RCVMORE_HACK=0 ./yourprog.pl
+
+      Reported by sorear.
+
+1.02 - Aug 22 2012
+    - Fix implicit and explicit destructors for context and sockets.
+      (https://github.com/lestrrat/p5-ZMQ/issues/11), spotted by @melo
+
+      Previously this threw an assertion:
+
+        my $ctxt = zmq_init();
+        my $pid = fork();
+        exit(0) unless $pid;
+        waitpid($pid, 0);
+
+     This is because $ctxt was being freed on both the child and the parent.
+
+     As of this version, we make sure that behind the scenes the context 
+     can only be freed in the process and thread that it was created in.
+     Likewise sockets can only be freed within the same process.
+
+1.01 - Apr 23 2012
+    - Changed zmq_poll()'s return value. In list context, you can get the
+      array of boolean values indicating if the particular socket got fired
+
+        my @fired = zmq_poll(...);
+
+      In scalar context, you get the return value of zmq_poll() from the C
+      layer
+
+        my $rv = zmq_poll(...)
+
+      See https://github.com/lestrrat/p5-ZMQ/pull/1 (Steffen Mueller, Nick Peres)
+
+    - Fix getsockopt_string() 
+      https://github.com/lestrrat/p5-ZMQ/pull/2 (Sergey KHripchenko)
+
+1.00 - Apr 05 2012
+    - All of you using ZeroMQ.pm + libzmq 2.x, you are recommended to use this 
+      module instead. ZeroMQ will go into minimal maintenance mode, and new
+      features are not going to be added.
+    - Also, users writing ZMQ tools in Perl should also use the raw ZMQ
+      interface over the Perl-ish interface.
+    - Make sure to not clone ZMQ::LibZMQ2::Socket.
+    - Remove code that generates constants.
+
+1.00_02 - Mar 26 2012
+    - Beef up the docs extensively.
+    - Remove other croak() calls, make sure to set $!
+    - Add zmq_errno(), zmq_strerror()
+    - zmq_send(), zmq_recv() are now pure perl wrappers around _zmq_send() 
+      and z_zmq_recv()
+    - Make sure to emulate libzmq2 errors for stuff like trying to act upon
+      closed cxt, sockets, and messages, since we don't call the C level
+      functions when we detect that they have been closed from the Perl level.
+
+1.00_01 - Mar 24 2012
+    - Initial release.

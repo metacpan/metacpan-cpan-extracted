@@ -1,0 +1,68 @@
+ZCS::LocalConfig
+================
+ZCS::LocalConfig is a Perl module for reading the Zimbra Collaboration
+Suite (ZCS) local configuration file (localconfig.xml)
+
+DEPENDENCIES
+============
+The following are the minimum requirements for ZCS::LocalConfig:
+
+- Perl 5.8
+    http://www.perl.org/
+- Zimbra Collaboration Suite
+    http://www.zimbra.com/
+- ZCS::LocalConfig (this package)
+    http://zcs-localconfig.sf.net/
+
+INSTALLATION
+============
+1. Download ZCS::LocalConfig (coming soon!)
+    http://search.cpan.org/dist/ZCS-LocalConfig
+
+2. Read this README
+
+3. This module has a number of dependencies on other Perl modules
+   available from CPAN.  If any modules are missing, appropriate
+   warnings will be generated in the following step.
+
+4. Prepare to build this module and install any prerequisite modules:
+
+    perl Makefile.PL
+
+5. Build, test and install this module:
+
+    make
+    make test
+    (sudo) make install
+
+6. Get user 'zimbra' access to a ZCS server.
+
+7. Read the documentation to become familiar with this module.
+
+AUTHOR
+======
+Phil Pearl <phil@zimbra.com>
+
+COPYRIGHT AND LICENSE
+=====================
+Copyright (C) 2010 by Phil Pearl.  All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+Project Links
+-------------
+- Bugs/tickets (coming soon!):
+    https://rt.cpan.org/Public/Dist/Display.html?Name=ZCS-LocalConfig
+- CPAN releases (coming soon!):
+    http://search.cpan.org/dist/ZCS-LocalConfig
+- Source code repository (git):
+    http://sourceforge.net/p/zcs-localconfig/git/
+
+Resources
+---------
+- Zimbra Collaboration Suite:
+    http://www.zimbra.com/
+- Project hosted on SourceForge:
+    http://sourceforge.net/

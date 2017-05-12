@@ -1,0 +1,5 @@
+#!/usr/bin/perl
+
+use Zilla::Dist;
+
+Zilla::Dist->new->run(@ARGV);

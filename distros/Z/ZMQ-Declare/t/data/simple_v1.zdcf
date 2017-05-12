@@ -1,0 +1,29 @@
+{
+  "version": 1.0,
+  "apps":{
+    "weather":{
+      "context": { "iothreads": 1 },
+      "devices":{
+        "server":{
+          "type": "myweatherserverdevice",
+          "sockets":{
+            "weather_info_publisher": {
+              "type": "pub",
+              "option": { "hwm": 100 },
+              "bind": "inproc://weather_endpoint"
+            }
+          }
+        },
+        "client": {
+          "type": "myweatherclientdevice",
+          "sockets":{
+            "weather_info_subscriber": {
+              "type": "SUB",
+              "connect": "inproc://weather_endpoint"
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,65 @@
+!!!Note: most part of this document is outdated!!!
+
+Please have a look at the README in the top-level directory.
+
+April 2010, Wolfram
+
+$Id: README,v 1.5 2006-10-31 14:17:54 sondberg Exp $
+
+To install the web UI (assuming you're using some version of Apache as
+your web server):
+
+-- First, make sure that the IRSpy code runs OK outside the context of
+   a web-server.  Build and test it as you would any Perl module, with
+   "perl Makefile.PL && make && make test".  There's no need to
+   install it, though.  Among the prerequisites are ZOOM-Perl and
+   XML::LibXML::XPathContext: unfortunately neither of these is
+   packaged for Debian, so they must be installed from CPAN. If you insist
+   on installing these packages as debian packages, first install the
+   tool dh-make-perl, i.e. apt-get install dh-make-perl. Then execute this:
+
+     dh-make-perl --build --cpan XML::LibXML::XPathContext
+
+   After a lot of output has been generated, you should have a .deb file one
+   directory step back. Install it using dpkg -i package-xxx.deb. For the
+   IRSpy package, just cd into the base directory of the source tree, and
+   execute
+
+     dh-make-perl --build
+
+   which will give you a .deb package one directory step back.
+   
+   You'll also need a 2.0-series Zebra installation to run the database.
+
+-- Make a config file for the host you're on, probably by making a
+   modified copy of apache1.3/xeno.conf
+
+-- Include this configuration in that of the web server.  For example,
+   if you're using the Apache 1.3 setup that is the default on
+   Debian-based operating systems, go to /etc/apache/conf.d and:
+	# ln -s /usr/local/src/cvs/irspy/web/conf/apache1.3/XXX.conf irspy.conf
+
+-- Restart the web-server or otherwise tell it about the change to its
+   configurations, for example using "apachectl restart".
+
+-- Make sure that the web-server's user (often root, www-data or
+   nobody) can write the logs in in the ../logs directory: for
+   example, you might use "chmod ugo+w ."
+
+-- Make sure that you can read the logs that it generates: for
+   example, you might use:
+	# chmod ugo+r access.log error.log
+
+-- Make sure you have the HTML::Mason Perl module installed, including
+   all its prerequisites (most notably mod_perl itself).  On
+   Debian-based operating systems, this is as simple as
+	# apt-get install libhtml-mason-perl libapache-request-perl \
+                          libapache-reload-perl
+
+-- Ensure that the web server can write the HTML::Mason object
+   directory and cache directory.  For example:
+	chmod ugo+w data/obj data/cache
+
+That should be everything: just start Zebra, point your browser to the
+root of your new virtual host, and off you go.
+

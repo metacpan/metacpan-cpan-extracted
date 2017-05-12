@@ -1,0 +1,58 @@
+Revision history for Perl extension Zabbix-ServerScript
+
+0.13 2016-10-10T09:26:35Z
+    - Refactored _get_option, fixed hash dereference
+
+0.12 2016-09-26T09:26:21Z
+    - Added default filename usage to cache functions
+
+0.11 2016-09-05T07:22:17Z
+    - Skip checking /usr/local/etc on Mac OS X. Resolves #6.
+
+0.10 2016-08-26T05:44:16Z
+    - Removed unnecessary 'use Text::ParseWords'
+    - Fixed 'defined %$opt -> defined $opt'
+    - Added List::MoreUtils to dependencies.
+    - Change way of testing _set_unique: one of forks must find out that the other is running.
+    - Implemented --daemon option and _get_options(). Resolves #3.
+
+0.09 2016-08-25T03:44:26Z
+    - Fixed race condition in t/04_pid.t.
+    - Accepting options to create_config.
+    - Changed default file logger to Log::Log4perl::Appender::File to minimize dependencies.
+    - Got rid of setting UTF-8 binmode directly and via Log4perl config. Resolves #5.
+
+0.08 2016-08-24T05:45:02Z
+    - Fixed race condition in t/07_return_value.t. Resolves #4
+
+0.07 2016-07-25T06:16:19Z
+    - Fixed documentation
+    - Added Term::UI to dependencies
+
+0.06 2016-07-18T09:50:19Z
+    - Implemented 'create_config'
+    - Changed the way of testing if JSON is valid
+    - Corrected existing tests
+    - Got rid of TZ in log4perl.appender.Logfile declaration, since it is deprecated in Date::Manip
+
+0.05 2016-07-15T06:50:49Z
+    - Fixed dependencies, changed 'config_dir' to /usr/local/etc in DefaultConfig.pm
+      Added missed dependencies: DBI, DBD::ODBC, JSON, LWP::UserAgent
+
+
+0.04 2016-07-15T04:53:27Z
+    - added Log::Dispatch to dependencies, changed 'pid_dir' to /tmp in DefaultConfig.pm
+
+0.03 2016-07-14T09:41:41Z
+    - added zabbix_sender implementation
+
+0.02 2016-07-12T09:27:56Z
+    - implemented Zabbix API
+
+0.02 2016-07-12T09:26:21Z
+    - implemented Zabbix API
+
+0.01 2016-06-30T11:43:33Z
+
+    - original version
+

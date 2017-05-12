@@ -1,0 +1,16 @@
+  <p>
+   For Z39.50 databases, contains the name of the Z39.50 database
+   which the service provides.  If the service provides multiple
+   databases, then a separate target record must be made for each.
+   This can most easily be done using the <tt>Copy target</tt> link in
+   the menu.
+  </p>
+  <p>
+   For SRW and SRU, this element is used to contain the the remainder
+   of the URL to the server, omitting any preceeding '/' character.
+   For example, a target record describing the SRU service at
+   <tt>http://z3950.loc.gov:7090/voyager</tt>,
+   the database name would be <tt>voyager</tt>, but for a service at
+   <tt>http://test.com:8080/foo/cgi-bin/server</tt>
+   it would be <tt>foo/cgi-bin/server</tt>.
+  </p>

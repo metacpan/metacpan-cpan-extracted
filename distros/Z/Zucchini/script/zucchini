@@ -1,0 +1,122 @@
+#!/usr/bin/env perl
+# PODNAME: zucchini
+# ABSTRACT: script to generate and upload template based websites
+# vim: ts=8 sts=4 et sw=4 sr sta
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Pod::Usage;
+use version;
+use Zucchini;
+
+use Zucchini;  our $VERSION = $Zucchini::VERSION;
+
+# evil globals
+my ($zucchini, %cliopt);
+
+# get command-line options from user
+GetOptions (
+    \%cliopt,
+    'config_file|f=s',
+    'create-config!',
+    'dry-run!',
+    'force!',
+    'fsync!',
+    'fsync-only!',
+    'ftp-debug',
+    'help!',
+    'quiet',
+    'rsync!',
+    'rsync-only!',
+    'showdest!',
+    'showpath!',
+    'site=s',
+    'sites',
+    'v|verbose+',
+    'version!'
+);
+
+if ($cliopt{help}) {
+    pod2usage(); # exits for us
+}
+
+if ($cliopt{version}) {
+    my $vstring = version->new($VERSION)->normal;
+    print "Zucchini ($vstring)\n";
+    exit;
+}
+
+# create a new zucchini object
+$zucchini = Zucchini->new(
+    \%cliopt
+);
+
+# call the high-level function that works out what needs doing ... and does it
+$zucchini->gogogo;
+
+exit; # all done
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+zucchini - script to generate and upload template based websites
+
+=head1 VERSION
+
+version 0.0.21
+
+=head1 SYNOPSIS
+
+  zucchini [options]
+
+    --site=LABEL    process the site called LABEL
+    --config=FILE   use an alternative configuration file
+                    [you may also use -f FILE]
+
+    --force         force all templates to be regenerated
+    --showpath      show paths relative from site's <source_dir>
+    --showdest      show full path to files written to site's <output_dir>
+
+    --rsync         transfer generated site to server using rsync
+    --rsync-only    transfer generated site to server using rsync
+                    [do not regenerate site first]
+    --dry-run       perform a dry-run of the rsync - do not transfer any files
+
+    --fsync         transfer generated site to server using fsync
+    --fsync-only    transfer generated site to server using fsync
+                    [do not regenerate site first]
+    --ftp-debug     show FTP debugging information
+
+    --create-config write a new (sample) config file as ~/.zucchini
+
+    --verbose       increase the verbosity of the script
+                    can be used multiple times to increase further
+    --version       output the version string
+    --help          display this help information
+
+=head1 DESCRIPTION
+
+TODO
+
+=head1 SEE ALSO
+
+Zucchini
+
+=head1 AUTHOR
+
+Chisel <chisel@chizography.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Chisel Wright.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

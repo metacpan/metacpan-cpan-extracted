@@ -1,0 +1,125 @@
+{
+   "abstract" : "Access the JSON-RPC API of a Zabbix 2.x server",
+   "author" : [
+      "Fabrice Gabolde <fgabolde@weborama.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4212",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Zabbix2-API",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Deep" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.36_14"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "JSON" : "0",
+            "LWP::UserAgent" : "0",
+            "List::Util" : "0",
+            "Log::Any" : "0",
+            "Module::Load" : "0",
+            "Module::Loaded" : "0",
+            "Moo" : "1.001",
+            "Params::Validate" : "0",
+            "Scalar::Util" : "0",
+            "Text::ParseWords" : "0",
+            "URI" : "0",
+            "autodie" : "0",
+            "constant" : "0",
+            "perl" : "5.01",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Zabbix2::API" : {
+         "file" : "lib/Zabbix2/API.pm",
+         "version" : "0.013"
+      },
+      "Zabbix2::API::Action" : {
+         "file" : "lib/Zabbix2/API/Action.pm"
+      },
+      "Zabbix2::API::Application" : {
+         "file" : "lib/Zabbix2/API/Application.pm"
+      },
+      "Zabbix2::API::CRUDE" : {
+         "file" : "lib/Zabbix2/API/CRUDE.pm"
+      },
+      "Zabbix2::API::Graph" : {
+         "file" : "lib/Zabbix2/API/Graph.pm"
+      },
+      "Zabbix2::API::GraphItem" : {
+         "file" : "lib/Zabbix2/API/GraphItem.pm"
+      },
+      "Zabbix2::API::Host" : {
+         "file" : "lib/Zabbix2/API/Host.pm"
+      },
+      "Zabbix2::API::HostGroup" : {
+         "file" : "lib/Zabbix2/API/HostGroup.pm"
+      },
+      "Zabbix2::API::HostInterface" : {
+         "file" : "lib/Zabbix2/API/HostInterface.pm"
+      },
+      "Zabbix2::API::Item" : {
+         "file" : "lib/Zabbix2/API/Item.pm"
+      },
+      "Zabbix2::API::Macro" : {
+         "file" : "lib/Zabbix2/API/Macro.pm"
+      },
+      "Zabbix2::API::Map" : {
+         "file" : "lib/Zabbix2/API/Map.pm"
+      },
+      "Zabbix2::API::MediaType" : {
+         "file" : "lib/Zabbix2/API/MediaType.pm"
+      },
+      "Zabbix2::API::Proxy" : {
+         "file" : "lib/Zabbix2/API/Proxy.pm"
+      },
+      "Zabbix2::API::Screen" : {
+         "file" : "lib/Zabbix2/API/Screen.pm"
+      },
+      "Zabbix2::API::Script" : {
+         "file" : "lib/Zabbix2/API/Script.pm"
+      },
+      "Zabbix2::API::Template" : {
+         "file" : "lib/Zabbix2/API/Template.pm"
+      },
+      "Zabbix2::API::Trigger" : {
+         "file" : "lib/Zabbix2/API/Trigger.pm"
+      },
+      "Zabbix2::API::User" : {
+         "file" : "lib/Zabbix2/API/User.pm"
+      },
+      "Zabbix2::API::UserGroup" : {
+         "file" : "lib/Zabbix2/API/UserGroup.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://bitbucket.org/fgabolde/zabbix2-api/issues"
+      },
+      "repository" : {
+         "url" : "https://bitbucket.org/fgabolde/zabbix2-api"
+      }
+   },
+   "version" : "0.013"
+}

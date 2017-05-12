@@ -1,0 +1,28 @@
+Revision history for ZConf-BGSet
+
+1.0.0	2009-10-24/03:30
+		-Clean up warnings.
+		-Remove autoinit and it now inits autormatically.
+		-Set should now be set using either readSet or via passing ZConf with the specified default set.
+		-'zconf' is now a ZConf object instead of a hash.
+		-Add 'bin/zbgset-pt'.
+		-Update 'Makefile.PL' to reflect new dependencies.
+		-Update the scripts to reflect the new manner for specifing a set.
+
+0.2.0	2009-02-20/19:10
+		-Add 'readSet', 'getSet', 'listSets'.
+
+0.1.0   2009-02-01/23:10
+		-Added 'getPath', 'setPath', 'delPath', 'getLast', and 'getDefaultPath'.
+		-'listPaths' no longer leaves 'paths/' prepended.
+
+0.0.2	2009-01-28/19:10
+		-Fix the return of listPaths.
+
+0.0.1	2009-01-23/18:50
+		-Correct how zbgset calls setRand.
+		-Correct were self was used in the pod instead of zbg.
+
+0.0.0   2009-01-14
+		-Initial release.
+

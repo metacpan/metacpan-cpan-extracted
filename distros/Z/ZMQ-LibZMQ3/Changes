@@ -1,0 +1,181 @@
+Changes
+=======
+
+1.19 Oct 28 2014
+    - Fix return value of recvmsg() to actually return an undef value
+      when the underlying call to the raw recvmsg() fails (https://github.com/lestrrat/p5-ZMQ/issues/28)
+
+1.18 Jul 08 2014
+    - Fix broken zmq_disconnect/zmq_unbind/zmq_socket_monitor (https://github.com/lestrrat/p5-ZMQ/issues/59)
+
+1.17 Jun 18 2014
+    - Fix docs on zmq_msg_recv() (Giacomo Montagner)
+    - Do away with tools/zmqcheck, and use Devel::CheckLib (nponeccop)
+    - Fix breakage on windows for t/100_basic.t (nponeccop)
+    - Fix breakage on windows for t/104_ipc.t and t/106_last_endpoint.t (noponeccop)
+    - Skip t/200_fork.t on windows (noponeccop)
+
+1.16 May 03 2014
+    - Fix locale dependent tests (J. Gomez)
+    - Fix ZMQ_LAST_ENDPOINT (Michael Gray)
+
+1.15 Nov 26 2013
+    - Skip tests when linking against libzmq4 (cdybedahl pr #45)
+      (Note: if/when libzmq4 API diverges from libzmq3, you should be
+       using ZMQ::LibZMQ4 -- which hasn't been written yet -- instead of
+       ZMQ::LibZMQ4)
+
+1.14 Nov 26 2013
+    - Fix Makefile.PL for OS X (reported by cdybedahl, #43)
+
+1.13 Jun 10 2013
+    - Add zmq_disconnect (https://github.com/lestrrat/p5-ZMQ/pull/40)
+    - Merge change to work with Alien::ZMQ (Robin Lee)
+    - Remove Module::Install::Repository from check_mi_mods.pl (only affects people working from git repo)
+
+1.12 May 30 2013
+    - Fix memory leak from getsockopt reported by og01
+    - Fix Makefile.PL clean_files specification (https://github.com/lestrrat/p5-ZMQ/issues/32)
+    - Fix where we declare PERL_GCC_PEDANTIC
+
+1.11 May 09 2013
+    - Add a define for PERL_GCC_PEDANTIC in zmqcheck
+    - Fix memory leak in zmq_recv(), reported by Ton Nijkes (rt #85153)
+    - Fix silly warning on test
+
+1.10 Mar 01 2013
+    - No code change
+    - Remove MYMETA.* from distro (http://weblog.bulknews.net/post/44251476706/stop-shipping-mymeta-to-cpan)
+
+1.09 Jan 24 2013
+    - Add zmq_errno() and zmq_strerror() to @EXPORT, so the following works
+          use ZMQ::LibZMQ qw(zmq_errno);
+      Previously zmq_errno() and zmq_strerror() existed, but could not be
+      imported (https://github.com/lestrrat/p5-ZMQ/issues/26, @emceelam).
+
+1.08 Jan 19 2013
+    - Only overwrite zmq_init/zmq_term if zmq_ctx_new/zmq_ctx_destroy are
+      available AND zmq_init/zmq_term are not.
+    - Take caution not to cause warnings while doing so.
+
+1.07 Jan 16 2013
+    - Remove some Module::Install plugins.
+    - Add tests for zmq_msg_send() (https://github.com/lestrrat/p5-ZMQ/pull/24,  @domm)
+
+1.06 Jan 12 2013
+    - t/100_basic.t uses POSIX::setlocale() to force $! stringification
+      (rt #82613, reported by Konstantin A. Pustovalov)
+    - struct -> object, object -> struct conversion has now been
+      converted to a generic macro.
+    - Doc updates
+    - House cleaning (shouldn't be visible to users)
+
+1.05 Jan 09 2013
+    - Make sure to specify c99 in zmqcheck.
+    - Make sure to specify -pedantic-errors in zmqcheck.
+    - Makefile.PL now warns if zmqcheck fails to compile everything,
+      which is most certainly wrong.
+    - Minor test cleanup.
+
+1.04 Jan 09 2013
+    - zmq_proxy(), zmq_device() should now be usable (if your underlying
+      libzmq has them). Thanks for @melo and @domm for testing.
+    - Added mechanism to check if deprecated/new functions are available.
+      Currently these functions are checked:
+        zmq_init
+        zmq_ctx_destroy
+        zmq_ctx_get
+        zmq_ctx_new
+        zmq_ctx_set
+        zmq_device
+        zmq_msg_recv
+        zmq_msg_send
+        zmq_proxy
+        zmq_recvmsg
+        zmq_socket_monitor
+        zmq_sendmsg
+        zmq_term
+        zmq_unbind
+    - Of the above functions, zmq_init, zmq_term, zmq_sendmsg, zmq_recmsg
+      are marked as deprecated by recent libzmq3.
+      ZMQ::LibZMQ3 being a Perl module, we'll try to be backwards compatible
+      as much as possible, so it will silently fallback to using the
+      right replacement, i.e.:
+        zmq_init    -> zmq_ctx_new
+        zmq_term    -> zmq_ctx_destroy
+        zmq_sendmsg -> zmq_msg_send
+        zmq_recvmsg -> zmq_msg_recv
+      However, we may decide to start complaining in the future versions.
+      You have been warned.
+    - Of the above functions, the following functions are newly added,
+      AS LONG AS THE UNDERLYING libzmq SUPPORTS IT:
+        zmq_ctx_new
+        zmq_ctx_destroy
+        zmq_ctx_get
+        zmq_ctx_set
+        zmq_msg_recv
+        zmq_msg_send
+        zmq_socket_monitor
+        zmq_unbind
+      If the underlying libzmq does not support any of these functions,
+      it will croak.
+
+1.03 - Jan 05 2013
+    - Update docs
+
+1.02 - Dec 26 2012
+    - Fix tools/detect_zmq.pl as it was checking for old libzmq2 version
+      (https://github.com/lestrrat/p5-ZMQ/pull/17), pr by @andyjones
+    - EXPERIMENTAL: Add zmq_proxy(). Test cases are most welcome.
+      (https://github.com/lestrrat/p5-ZMQ/issues/16)
+    - Fix SYNOPSIS for zmq_send(msg)?, zmq_recv(msg)?
+
+1.01 - Oct 09 2012
+    - Fix memory leak in zmq_recvmsg(), retported by trinitum
+      (https://github.com/lestrrat/p5-ZMQ/issues/15)
+
+1.00 - Aug 22 2012
+    - Fix implicit and explicit destructors for context and sockets.
+      (https://github.com/lestrrat/p5-ZMQ/issues/11), spotted by @melo
+
+      Previously this threw an assertion:
+
+        my $ctxt = zmq_init();
+        my $pid = fork();
+        exit(0) unless $pid;
+        waitpid($pid, 0);
+
+     This is because $ctxt was being freed on both the child and the parent.
+
+     As of this version, we make sure that behind the scenes the context 
+     can only be freed in the process and thread that it was created in.
+     Likewise sockets can only be freed within the same process.
+
+1.00_03 - Apr 23 2012
+    - Changed zmq_poll()'s return value. In list context, you can get the
+      array of boolean values indicating if the particular socket got fired
+
+        my @fired = zmq_poll(...);
+
+      In scalar context, you get the return value of zmq_poll() from the C
+      layer
+
+        my $rv = zmq_poll(...)
+
+      See https://github.com/lestrrat/p5-ZMQ/pull/1 (Steffen Mueller, Nick Peres)
+
+    - Fix getsockopt_string() 
+      https://github.com/lestrrat/p5-ZMQ/pull/2 (Sergey KHripchenko)
+
+1.00_02 - Mar 26 2012
+    - Beef up the docs extensively.
+    - Make sure to set $! upo failure
+    - Add author tests
+    - Change zmq_sendmsg to a pure perl method.
+    - Make sure to emulate libzmq2 errors for stuff like trying to act upon
+      closed cxt, sockets, and messages, since we don't call the C level
+      functions when we detect that they have been closed from the Perl level.
+
+
+1.00_01 - Mar 24 2012
+    - Initial release.

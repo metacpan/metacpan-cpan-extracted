@@ -1,0 +1,56 @@
+# PODNAME: Zucchini::Contributors
+# ABSTRACT: people that helped out along the way
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Zucchini::Contributors - people that helped out along the way
+
+=head1 VERSION
+
+version 0.0.21
+
+=head1 NAME
+
+Zucchini::Contributors - people that helped out along the way
+
+=head1 AUTHOR
+
+Chisel Wright C<< <chiselwright@users.berlios.de> >>
+
+=head1 IDEAS and FEEDBACK
+
+=head2 Kurt vom Walde
+
+General positive feedback.
+
+Numerous functionality suggestions: --config, always_follow, TT options and more.
+
+=head1 INTERFACE
+
+=head2 Jason Tang
+
+Refactoring of ttsite script
+
+=head1 PROJECTS
+
+L<Moose>,
+L<Template>
+
+=head1 AUTHOR
+
+Chisel <chisel@chizography.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Chisel Wright.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

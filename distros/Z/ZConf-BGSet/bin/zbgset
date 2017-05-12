@@ -1,0 +1,231 @@
+#!/usr/bin/perl
+#Copyright (c) 2008, Zane C. Bowers
+#All rights reserved.
+#
+#Redistribution and use in source and binary forms, with or without modification,
+#are permitted provided that the following conditions are met:
+#
+#   * Redistributions of source code must retain the above copyright notice,
+#    this list of conditions and the following disclaimer.
+#   * Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#
+#THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+#ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
+#WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+#IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+#INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
+#BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
+#DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+#LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+#OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+#THE POSSIBILITY OF SUCH DAMAGE.
+
+use strict;
+use warnings;
+use Getopt::Std;
+use ZConf::BGSet;
+
+
+$Getopt::Std::STANDARD_HELP_VERSION=1;
+
+#version function
+sub main::VERSION_MESSAGE {
+	print "zbgset 3.2.1\n";
+};
+
+#print help
+sub main::HELP_MESSAGE {
+	print "\n".
+		"-r  choose a random background\n".
+		"-f <file>  choose a set the bg as\n".
+		"-l  use the last BG\n".
+		"\n".
+		"-F <filltype> fill type to use\n".
+		"-s <set>  What set to use.\n".
+		"-p <path>  The path variable to use if -r is given.".
+		"\n".
+		"FILL TYPES\n".
+		"center\n".
+		"tile\n".
+		"full\n".
+		"fill\n";
+};
+
+#gets the options
+my %opts=();
+getopts('F:f:lrs:p:', \%opts);
+my %args;
+
+#makes sure the file exists if -f is used.
+if(defined($opts{f})){
+	if(!-f $opts{f}){
+		warn("zbgset:5: '".$opts{f}."' does not exist or is not a file.");
+		exit 5;
+	};
+};
+
+
+my $zbg=ZConf::BGSet->new();
+if ($zbg->{error}) {
+	warn('zbgset:1: Coult not initialize ZConf::BGSet');
+	exit $zbg->{error};
+}
+
+if (defined($opts{s})) {
+	if ($zbg->{error}) {
+		warn('zbgset: Coult not initialize ZConf::BGSet');
+		exit $zbg->{error};
+	}
+}
+
+#handles it if -f is specified
+if(defined($opts{f})){
+	$zbg->setBG({image=>$opts{f}, filltype=>$opts{F}});
+	if ($zbg->{error}) {
+		warn('zbgset: setBG errored');
+		exit $zbg->{error};
+	}
+
+	exit 0;
+};
+
+#sets the last background
+if(defined($opts{l})){
+	$zbg->setLast({image=>$opts{f}, filltype=>$opts{F}});
+	if ($zbg->{error}) {
+		warn('zbgset:3: setLast errored');
+		exit $zbg->{error};
+	}
+
+	exit 0;
+};
+
+#handles if if a random background is selected
+if(defined($opts{r})){
+	$zbg->setRand($opts{p});
+	if ($zbg->{error}) {
+		warn('zbgset:4: setRand errored');
+		exit $zbg->{error};
+	}
+
+	exit 0;
+};
+
+exit 254;
+
+=head1 NAME
+
+zbgset - A perl program for managing the background.
+
+=head1 SYNOPSIS
+
+zbgset (B<-f> <file>|B<-r>|B<-l>) [B<-F> <fill type>] [B<-s> <ZConf set>]
+
+=head1 USAGE
+
+Either -f, -r, or -l need used.
+
+This does not actually set the background, but calls another program to do it,
+but what makes it useful is it allows for random images to be used as well as
+the last image to be called. This makes it useful for setting the image upon
+login or changing it regullarly through cron.
+
+When it is ran for the first time it creates a ZConf config named "zbgset" used
+store the settings.
+
+=head1 ARGUEMENTS
+
+=head2 B<-f> <file>
+
+This specifies a file to use.
+
+=head2 B<-F> <fill type>
+
+This specifies the fill type to use.
+
+=head2 B<-l>
+
+Use the last image.
+
+=head2 B<-p> <path>
+
+If this is specified, the specified path is used for selecting the random image from.
+
+=head2 B<-s> <ZConf set>
+
+This is the ZConf set to use for it. If the set has not been initiated before it
+will do so.
+
+
+=head1 EXIT CODES
+
+Any codes not listed below reflect the error value of ZConf::BGSet.
+
+=head2 254
+
+No usable options specified.
+
+=head1 AUTHOR
+
+Copyright (c) 2008, Zame C. Bowers <vvelox@vvelox.net>
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+     this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS` OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=head1 CHANGELOG
+
+=head2 3.2.1/2009-10-24
+
+-Exit code cleanup,
+
+-Update set usage.
+
+-Remove notes about 'cair' from help.
+
+=head2 3.2.0/2009-01-13
+
+-Import into ZConf::BSset.
+
+-Make use of ZConf::BGSet.
+
+=head2 3.1.0/2008-10-21
+
+-Add CHANGELOG to the POD.
+
+-Add add the 'cair' setter, Content Aware Image Resizer. Use 'cairhelper' script
+from CPAN to use this.
+
+=head1 SCRIPT CATEGORIES
+
+Desktop
+
+=head1 OSNAMES
+
+any
+
+=head1 README
+
+zbgset - A perl program for managing the background.
+
+=cut

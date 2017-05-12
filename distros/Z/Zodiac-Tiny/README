@@ -1,0 +1,15 @@
+DESCRIPTION
+
+    This module is a lightweight alternative to DateTime::Event::Zodiac.
+
+FUNCTIONS
+
+ zodiac_of($date) => str
+
+    Return zodiac sign for a date, which can be a string in the format of
+    "YYYY-MM-DD" or "MM-DD", or a DateTime or Time::Moment object.
+
+SEE ALSO
+
+    This module is a lightweight alternative to DateTime::Event::Zodiac
+

@@ -1,0 +1,42 @@
+ZConf-DBI
+
+Stores DBI connection information in ZConf.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc ZConf::DBI
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=ZConf-DBI
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/ZConf-DBI
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/ZConf-DBI
+
+    Search CPAN
+        http://search.cpan.org/dist/ZConf-DBI/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012 Zane C. Bowers-Hadley
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

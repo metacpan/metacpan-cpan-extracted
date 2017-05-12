@@ -1,0 +1,11 @@
+Revision history for Zed
+
+0.03  2016-09-19 11:54:30 CST
+        - Add some pod
+
+0.02  2016-09-14 19:02:42 CST
+        - Add some SYNOPSIS
+        - Set StrictHostKeyChecking=no
+
+0.01  2016-09-13 18:31:59 CST
+        - Initial release

@@ -1,0 +1,17 @@
+<html>
+<head>
+	<link rel="stylesheet" href="/css/bootstrap.min.css" />
+	<link rel="stylesheet" href="/css/export_style.css" />
+</head>
+<body>
+	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+	<% FOREACH test_res IN test_results %>
+		<% IF test_res.is_module %>
+			<b><% test_res.message %></b>
+		<% ELSE %>
+			<div class="<% test_res.class %>" style=""><% test_res.message %></div>
+		<% END %>
+	<% END %>
+	</div>
+</body>
+</html>

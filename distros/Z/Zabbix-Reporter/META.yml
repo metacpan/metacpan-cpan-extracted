@@ -1,0 +1,48 @@
+---
+abstract: 'Zabbix dashboard'
+author:
+  - 'Dominik Schulz <dominik.schulz@gauner.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  File::ShareDir::Install: 0.03
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Zabbix-Reporter
+requires:
+  Cache::MemoryCache: 0
+  Config::Yak: 0
+  Config::Yak::LazyConfig: 0
+  Config::Yak::RequiredConfig: 0
+  DBI: 0
+  Data::Dumper: 0
+  File::ShareDir: 0
+  IO::Socket::INET: 0
+  Log::Tree: 0
+  Log::Tree::Logger: 0
+  Log::Tree::RequiredLogger: 0
+  Module::Pluggable: 0
+  Moose: 0
+  MooseX::App::Cmd: 0
+  MooseX::App::Cmd::Command: 0
+  Plack::Builder: 0
+  Plack::Loader: 0
+  Plack::Request: 0
+  Template: 0
+  Try::Tiny: 0
+  feature: 0
+  mro: 0
+  namespace::autoclean: 0
+  perl: 5.010_000
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/gittex/Zabbix-Reporter/issues
+  repository: git://github.com/gittex/Zabbix-Reporter.git
+version: 0.07
+x_authority: cpan:TEX

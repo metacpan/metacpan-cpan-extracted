@@ -1,0 +1,40 @@
+Revision history for ZML
+
+1.0.0	 2012-05-24/17:00
+		 -Error code '0' became 11. This makes it Error::Helper friendy.
+		 -Now uses Error::Helper.
+		 -varNameCheck now returns a boolean for the legit value.
+		 -Lots of fixes.
+		 -Update my last name post marriages.
+		 
+
+0.5.4	2009-11-22/9:30
+		-Clean up the parser so it now properly parses meta
+			variables and comments. Also neater is design.
+
+0.5.3	2009-11-22/6:40
+		-Correct meta/comment handling.
+
+0.5.2	2009-02-17/14:30
+		-Undefined meta,comments, and vars are now handled properly.
+
+0.5.1	2008-05-24/16:15
+		-Fix the parse function's handling of multiline values.
+
+0.5.0	2008-05-14/7:30
+		Fix parse function.
+
+0.4.0	2008-05-14/16:30
+		Fix lots of misc. issues.
+
+0.3.0	2008-05-13/17:40
+		Fix a lot of calls to varNameCheck.
+
+0.2.0   2008-04-28/04:04
+        Added valRegexDelVar, keyRegexDelComment, keyRegexDelMeta,
+        keyRegexDelVar, valRegexDelComment, valRegexDelMeta, and
+        valRegexDelVar.
+
+0.1.0   2008-04-25/19:30
+        Initial release.
+

@@ -1,0 +1,128 @@
+NAME
+    ZM::Session - sessions manager for CGI
+
+VERSION
+    Session.pm v 0.2.0
+
+    Recent Changes:
+
+        0.1.0
+            Added sessions this user's IP support.
+
+        0.0.3
+            Added 'nocontent' parametr to method start().
+
+        0.0.2
+            Changed variable's manipulation methods.
+
+        0.0.1
+            WOW! It's working!!! :-)
+
+DESCRIPTION
+    This module can be used anywhere you need sessions. As a session
+    management module, it uses files with a configurable lifetime to handle
+    your session data. For those of you familiar with PHP, you will notice
+    that the session syntax is a little bit similar. This module storing
+    session ID at users COOKIES.
+
+METHODS
+    The following public methods are availible:
+
+    $s = new ZM::Session();
+        The constructor, this starts the ball rolling. It can take the
+        following hash-style parameters:
+
+        lifetime
+            how long the session lasts, in seconds.
+
+        path
+            the directory where you want to store your session files.
+
+        id  if you want to give the session a non-random name, use this
+            parameter as well.
+
+        head
+            additional headers.
+
+        check_ip
+            if you want check user IP address. Create new session if IP was
+            changed.
+
+    $s->start();
+        This creates a session and set COOKIE or resumes an old one if
+        COOKIE exist and session file alive. This will return '1' if this is
+        a new session, and '0' if it's resuming an old one. If you defined
+        no values in the 'new()' call, then the session will start with a
+        default lifetime of 600 seconds, a path of /tmp, and a random string
+        for an id. This method have one argument - 'nocontent'. This
+        argument allow you print Content-type self.
+
+    $s->set_path();
+        Set the session path or, without an argument, return the current
+        session path. Used with an argument, this performs the same thing as
+        the 'path' parameter in the constructor.
+
+    $s->id();
+        If the session id exists, this will return the current session id -
+        useful if you want to maintain state with a cookie! If you pass a
+        parameter, it acts the same as new( id => 'some_session_name'),
+        i.e., it creates a session with that id.
+
+    $s->is_set();
+        Check to see if the variable is defined. Returns '1' for true, '0'
+        for false.
+
+    $s->unset();
+        This method allows you to undefine variable.
+
+    $s->set();
+        This is where you actually define your variables. This method takes
+        two arguments: the first is the name of the variable, and the second
+        is the value of the variable.
+
+    $s->get();
+        This method allows you to access the data that you have saved in a
+        session - just pass it the name of the variable that you 'set()'.
+
+    $s->unsetall();
+        Calling this method will wipe all the variables stored in your
+        session.
+
+    $s->destroy();
+        This method deletes the session file, destroys all the evidence, and
+        skips bail.
+
+EXAMPLES
+    Session creation and destruction
+         use strict;
+         use ZM::Session;
+
+            my $s = new ZM::Session(lifetime=>10,path=>"/home/user/sessions/",id=>$cgi->param("SID"),check_ip=>"yes");
+            $s->start();
+            # $s->set_path('/home/user/sessions/');
+
+            $s->set("zm","abc");
+            print $s->get("zm"); #should print out "abc"
+
+            if ($s->is_set("zm"))
+                {
+                        print "Is set";
+                }
+                else
+                {
+                        print "Not set";
+                }
+
+            # unset "zm"
+            $s->unset("zm");
+            print $s->get("zm"); #should print out empty string
+    
+            $s->unset(); # wipe all variables
+            $s->destroy(); # delete session with this ID
+
+COPYRIGHT
+    Copyright 2002 Zet Maximum
+
+AUTHOR
+    Zet Maximum ltd. http://www.zmaximum.ru/
+

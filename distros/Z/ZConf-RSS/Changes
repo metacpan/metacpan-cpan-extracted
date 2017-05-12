@@ -1,0 +1,37 @@
+Revision history for ZConf-RSS
+
+2.1.1	2009-11-08/01:10
+		-Correct a error with delTemplate.
+		-Add 'bin/zcrss-addfeed'.
+		-Add 'bin/zcrss-browse'.
+		-Add 'bin/zcrss-managetemplates'.
+		-Correct the dependencies in 'Makefile.PL'.
+
+2.1.0	2009-11-07/00:40
+		-Correct a few mistakes in the GUI module.
+		-Remove the POD stuff for some non-existant methods.
+		-Add examples to any methods that are missing any.
+		-Add ZConf::RSS::GUI-addFeed.
+
+2.0.1	2009-10-31/17:45
+		-Clean a few things for the POD.
+
+2.0.0	2009-10-31/16:29
+		-ZConf::GUI support added.
+
+1.0.0	2009-10-23/23:20
+		-Warning cleanup.
+		-The arg hash key 'zconf' for new is now a ZConf object.
+		-Add POD for 'bin/zcrss-admin'.
+		-Add POD for 'bin/zcrss-get'.
+		-Added support for removing templates and feeds to 'ZConf::RSS' and 'bin/zcrss-admin'.
+		-Updated both scripts to for the new set handling.
+		-Removed '-o' from 'bin/zcrss-admin'.
+		-Fixed 'gro' action for 'bin/zcrss-admin'.
+		-Cleaned up template handling for categories incase a ARRAY is given.
+
+0.0.1	?/?
+		-Pod header corrections for the new method.
+
+0.0.0   2009-04-16/16:30
+        First version, released on an unsuspecting world.

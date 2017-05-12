@@ -1,0 +1,18 @@
+Changes
+lib/Zeta.pm
+lib/Zeta/Util.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-util-constants.t
+t/02-util-get_opts.t
+t/03-util-datatype.t
+t/04-util-perltype.t
+t/05-util-fileinfo.t
+t/06-util-env.t
+t/07-util-string.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

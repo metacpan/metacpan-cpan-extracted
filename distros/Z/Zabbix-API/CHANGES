@@ -1,0 +1,49 @@
+March 8, 2013 - Version 0.009
+  * MediaType support, provided by Ray Link
+
+March 5, 2013 - Version 0.008
+  * Item class:
+    * graphs() accessor
+  * Graph class:
+    * url() accessor
+
+February 15, 2013 - Version 0.007
+  * User class:
+    * set_usergroups() method
+  * Removed stash misfeature.  Since it never worked no one should be
+    impacted...
+
+February 14, 2013 - Version 0.006
+  * User class:
+    * set_password() method
+  * API class:
+    * fetch_single method
+
+January 25, 2013 - Version 0.005
+  * Hostgroup class:
+    * name() accessor
+    * hosts() accessor
+  * Template support from Chris Larsen
+  * Proxy support from Chris Larsen
+  * Item class:
+    * history() accessor
+  * User support
+  * UserGroup support
+
+February 23, 2012 - Version 0.004
+  * Trigger support
+  * Action support
+  * Documented Host and Item name() methods
+
+July 11, 2011 - Version 0.003
+  * Mostly completed a distribution-wide rewrite
+  * Broke backwards compatibility
+  * More unit tests
+
+March 25, 2011 - Version 0.002
+  * More PBP-compliance, kwalitee
+  * Fixed bugs
+  * Decided to write a CHANGES file
+
+March 07, 2011 - Version 0.001
+  * Initial release (internal use).

@@ -1,0 +1,24 @@
+Release history for ZMachine
+
+0.004     2013-09-15 07:10:37 America/New_York
+        - fixed a boolean-instead-of-defined test that refused to decode
+          Z+030, aka the character "0"
+
+0.003     2013-01-28 09:42:50 America/New_York
+        - renamed dist from ZSCII to ZMachine for future expansion
+
+0.002     2013-01-20 13:45:20 America/New_York
+        - allow v7 and v8
+
+        - implement the four-z-character sequence
+
+        - implement extra character support
+
+        - implement alternate unicode replacement tables
+
+        - add support for custom alphabets
+
+        - add make_dict_length to help with dictionary construction
+
+0.001     2013-01-18 23:00:40 America/New_York
+        - first release

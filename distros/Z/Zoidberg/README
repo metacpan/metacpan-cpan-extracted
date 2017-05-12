@@ -1,0 +1,110 @@
+ Zoidberg - a modular perl shell, version 0.981
+================================================
+
+  http://github.com/jberger/Zoidberg
+ 
+  Zoidberg provides a modular Perl shell written, configured, and operated 
+  entirely in Perl. It aspires to be a fully operational login shell with all 
+  the features one normally expects. But it also gives direct access to Perl 
+  objects and data structures from the command line, and allows you to run Perl 
+  code within the scope of your commandline.
+
+For usage information please see the zoiduser manpage:
+
+https://github.com/jberger/Zoidberg/blob/master/man1/zoiduser.pod
+
+INSTALLATION
+
+  First of all you need perl <www.perl.org>, it is very likely this is already
+  on your system. Zoidberg is tested for perl versions 5.6.1 and 5.8.2, but
+  you are welcome to also file bug reports for other versions of perl.
+
+  Modules which are not in the Zoidberg package but are depended upon by 
+  Zoidberg are listed in the file "Build.PL" -- these modules are
+  available from CPAN <http://cpan.org> or your CPAN client (i.e. cpanm).
+
+  On most clean systems you will need to install:
+    Exporter::Tidy
+    File::ShareDir
+
+  The following are also recommended:
+    Env::PS1
+    Term::ReadKey
+    Term::ReadLine::Zoid
+
+  To install the package untar it, change to the new dir and type:
+    > perl Build.PL
+    > ./Build
+    > ./Build test
+    > ./Build install
+
+  To install in your home dir try using the `cpanm` client which 
+  may be installed 
+    1) from CPAN by installing the 'App::cpanminus' package
+      or
+    2) curl -L http://cpanmin.us | perl - --sudo App::cpanminus
+  In the latter case the `--sudo` option is only needed if installing 
+  using the system Perl. Once cpanm is installed, try
+    > cpanm Bundle::Zoidberg
+  which will manage the installation process for you! 
+
+  To see all possible build actions type:
+    > ./Build help
+    > ./Build help action
+
+  Zoidberg now uses the File::ShareDir architecture for keeping its shared
+  files. This allows for greater portability of the install process. 
+  Zoidberg will still search for zoidrc files at
+    '/etc/zoidrc',
+    '$HOME/.zoidrc'
+  and plugins in 
+    '/usr/share/zoid/',
+    '/usr/local/share/zoid/',
+    '$HOME/.zoid/' 
+  as it did previously.
+
+  If you need to add a directory to the include path -for example the install
+  path where you installed the dependencies- use the PERL5LIB environment
+  variable, using "perl -Isomedir" won't do.
+
+  For advanced installation options, see the Module::Build documentation.
+
+CONFIGURATION
+
+  See the zoiduser(1) manual page.
+
+BUGS AND LIMITATIONS
+
+  To submit bug reports visit http://github.com/jberger/Zoidberg/issues 
+  or mail the author.
+
+  The Zoidberg shell is being developed for GNU/Linux, but should also run on
+  other flavours of unix. Please _do_ bug report bugs or OS dpendent problems
+  for other operatings systems.
+
+AUTHORS
+
+  Joel Berger, <joel.a.berger@gmail.com>
+  Jaap Karssenberg || Pardus [Larus] <pardus@cpan.org>
+  R.L. Zwart, <rlzwart@cpan.org>
+
+COPYRIGHT AND LICENCE
+
+  Copyright (c) 2011 Jaap G Karssenberg and Joel Berger. All rights reserved.
+  This program is free software; you can redistribute it and/or
+  modify it under the same terms as Perl.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See either
+  the GNU General Public License or the Artistic License for
+  more details.
+
+  http://www.perl.com/language/misc/Artistic.html
+  http://www.gnu.org/copyleft/gpl.html
+
+
+
+
+
+  Share and enjoy!

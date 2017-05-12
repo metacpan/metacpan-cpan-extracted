@@ -1,0 +1,43 @@
+ZML
+
+A simple, fast, and easy to read data storage format.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc ZML
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=ZML
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/ZML
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/ZML
+
+    Search CPAN
+        http://search.cpan.org/dist/ZML
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012 Zane C. Bowers-Hadley
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

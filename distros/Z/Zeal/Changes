@@ -1,0 +1,24 @@
+Revision history for Perl extension Zeal.
+
+0.001001 2015-02-15T00:31+02:00
+ - Use chdir manually instead of passing -C to tar
+ - Force using Archive::Tar when unpacking compressed tarballs on solaris
+ - Recommend IO::Zlib and IO::Uncompress::Bzip2
+
+0.001 2015-02-07T22:07+02:00
+ - First stable release
+
+0.000_003 2015-01-03T16:43+02:00
+ - Make family:query syntax in Zeal->query stricter
+ - Add support for anchors
+ - Make Zeal->sets die if given family does not exist
+
+0.000_002 2014-12-30T23:50+02:00
+ - Fix POD formatting in Zeal.pm
+ - Fix PREREQ_PM
+ - Fix remote documents in Zeal::Docset
+ - Add SYNOPSIS sections for Zeal::Document and Zeal::Docset
+ - Add Zeal::Feed for working with documentation feeds
+
+0.000_001 2014-12-28T23:42+02:00
+ - Initial release

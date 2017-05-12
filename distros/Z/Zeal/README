@@ -1,0 +1,40 @@
+Zeal version 0.001001
+=====================
+
+Dash is an offline API documentation browser. Zeal.pm is a module for
+reading and querying Dash documentation sets.
+
+For more information see the POD and the Dash website:
+http://kapeli.com/dash
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+* Archive::Tar
+* Class::Accesor::Fast
+* DBI
+* DBD::SQLite
+* File::Slurp
+* File::Which
+* Mac::PropertyList::SAX
+* XML::Rules
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2014-2015 by Marius Gavrilescu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.20.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

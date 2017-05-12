@@ -1,0 +1,33 @@
+=meta: 0.0.2
+
+name: Package-Name
+version: 0.0.1
+abstract: Abstract goes here
+homepage: http://example.com
+language: perl
+license: perl
+copyright: 2014. Your Name.
+
+author:
+  name: Your Name
+  email: you@your.name
+  homepage: http://www.your.name
+  github: yourgithubid
+  twitter: yourtwitterid
+  freenode: yourfreenodeircnick
+
+devel:
+  git: https://github.com/yourgithubid/repo-name
+  bug: https://github.com/yourgithubid/repo-name/issues
+  irc: irc.freenode.net#roomname
+
+requires:
+  perl: 5.8.1
+  Pre::Req: 0
+
+test:
+  requires:
+    Test::Pre::Req: 0
+
+=zild:
+  libname: Module::Override

@@ -1,0 +1,62 @@
+#! /bin/sh
+
+#
+# This is a startup/shutdown script for IRSpy's Zebra server, suitable
+# for use in a SysV-style init directory such as /etc/init.d (on
+# Debian systems) and /etc/rc.d/init.d (on Red Hat systems), like this:
+#
+#	cd /etc/init.d
+#	sudo ln -s .../irspy/zebra/init-script irspy-zebra
+#	sudo /etc/init.d/irspy-zebra start
+#
+# You may need to tweak it to suit your system's paths.
+
+
+# zebrasrv-2.0 may be in /usr/local/bin, hence this slight security hole
+PATH=/bin:/usr/bin:/usr/local/bin/
+logfile=/var/log/irspy-zebra.log
+pidfile=/var/run/irspy-zebra.pid
+
+case "`hostname`" in
+    nigiri | xeno | rafa | test) IRSPYDIR=/usr/local/src/git/irspy/;;
+    shawarma|kafta) IRSPYDIR=/home/mike/cvs/irspy/;;
+    your-development-machine ) 
+	IRSPYDIR=/home/foobar/indexdata/irspy/
+	logfile=$IRSPYDIR/irspy-zebra
+	pidfile=$IRSPYDIR/irspy-zebra.pid
+	;;
+    *) echo "$0: unsupported host `hostname`" >&2
+	exit 1;;
+esac
+
+case "$1" in
+  start)
+	if [ -f $pidfile ]; then
+		echo "IRSpy's Zebra seems to be already running"
+		exit 1
+	fi
+	echo "Starting IRSpy's Zebra"
+	# Let log rotation take care of backups
+	#test -f $logfile && mv -f $logfile $logfile.old
+	( cd $IRSPYDIR/zebra
+	  zebrasrv-2.0 -f yazserver.xml < /dev/null >> $logfile 2>&1 &
+	  echo $! > $pidfile
+	)
+	;;
+  stop)
+	if [ ! -f $pidfile ]; then
+		echo "IRSpy's Zebra does not seem to be running"
+		exit 1
+	fi
+	echo "Stopping IRSpy's Zebra"
+	kill `cat $pidfile`
+	rm $pidfile
+	;;
+  restart)
+	$0 stop && $0 start
+	;;
+  *)
+	echo "Usage: $0 start|stop|restart" >&2
+        ;;
+esac
+

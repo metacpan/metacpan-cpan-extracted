@@ -1,0 +1,90 @@
+Revision history for Zonemaster GUI.
+v1.0.7 2016-10-11
+	Fixes #160 - "perl Makefile.PL" returns warnings on missing files
+	Fixes #157 - Date of test must be created from an UTC date
+	Fixes #151 - Fix type s/Test Engine Verison/Test Engine Version/
+	Fixes #123 - Add a Docker image with a packaged and ready to use GUI+Backend+Engine
+v1.0.6 2015-12-17
+	Fixes #146 - Redirect Dancer log messages to the console
+	Fixes #141 - Error in the engine while testing "oxynux.fr" 
+	Fixes #142 - Javascript crash after the test result is displayed 
+	Fixes #42  - Add policy and test profiles for the Web GUI
+	Fixes #46  - export the result in HTML format
+	Fixes #62  - Enable DS records in the interface
+	Fixes #131 - Typo in the french FAQ 
+	Fixes #117 - History not clickable
+	Fixes #133 - The link from the nojs interface to the JS interface is wrong
+	Fixes #125 - Update the Zonemaster logotype 
+	Fixes #128 - FAQ link missing
+	Fixes #29  - Undelegated (pre-delegated) test looks for DS at parent
+	Fixes #121 - Change FAQ Link to the new repository 
+	Fixes #85  - Zonemaster-GUI shows errors for the zones that are not signed with DNSSEC
+	Fixes #86  - while testing gouv.fr the response is "Domain does not exist" which is not true
+	Fixes #89  - Test identifiers should not be enumerable
+	Fixes #118 - skinnskatteberg.se
+	Fixes #56  - Missing link in the Web site
+	Fixes #37  - HTTPS does not work for zonemaster.net
+v1.0.3 2015-06-26
+	Fixes #113 - Add user geolocation support
+	Fixes #110 - Need to tell from_json() that we are feeding it Perl strings.
+	Fixes #109 - When using Apache as a frontend server and starman as a proxy backend the IP addresse is not available and thus not displayed correctly
+	Fixes #108 - Input field not visible on GUI (MAC/Chrome Version 42.0.2311.152 (64-bit))
+	Fixes #107 - More on "Domain does not exist"
+
+v1.0.2 2015-05-11
+	Fixes #103 - Add contact e-mail to the interface
+	Fixes #102 - Cleanup of GUI code
+	Fixes #100 - Remove dancer subdir
+	Fixes #98 - added missing /
+	Fixes #97 - added bootstrap for mobiles at nojs
+	Fixes #96 - switch to JS interface extendet with test_id if present
+	Fixes #95 - make bootstrap working on mobiles
+	Fixes #94 - missing </script>
+	Fixes #91 - added URL to JS Interface
+	Fixes #90 - added http to link href
+	Fixes #88 - Updated installation instructions for the GUI
+	Fixes #87 - when testing gouv.fr in the "Undelegated domain check" tab the message the user receives when pressing the "Fetch data from parent zone" is wrong.
+	Fixes #82 - Remove the contents of Zonemaster-Dancer and movie it to the parent Zonemaster-GUI directory
+	Fixes #81 - Inconsistent answers for domains www.google.com and www.microsoft.com
+
+v1.0.1 2015-02-24
+	Fixes #78 - Version change from 1.0.0 to 1.0.1 for release 2015.1
+	Fixes #75 - Disable the "make install" target in makefiles
+	Fixes #73 - Add the front-end identification to the parameters
+	Fixes #49 - Interface does not work in IE9
+	Fixes #66 - zonemaster-gui issue #17 impacts in the frontend
+	Fixes #38 - Spelling correction in Swedish
+	Fixes #60 - Change logo
+	Fixes #58 - Disable DS records on the interface until the DS hash algorithm field is added in the gui.
+	Fixes #34 - Readability of the FAQ
+	Fixes #35 - Link to /nojs doesn't work when javascript is enabled
+	Fixes #36 - Print dates in ISO 8601-format
+	Fixes #49 - IE incompatibility problem
+
+v1.0.0 2014-12-30
+
+v1.0.0 2014-12-11 Public beta release.
+	Fixes #17  - URL field does not get updated
+	Fixes #22  - Disable test profile selection dropdown list
+	Fixes #10  - Cannot view test result without javascript 
+	Fixes #8   - HTTP header security recommendation
+	Fixes #7   - Swedish language code is sv, not sw
+	Fixes #9   - Not a number-error instead of date of the test in the rest results dialog
+	Fixes #11  - Module name(s) in Zonemaster_Dancer are dangerous
+	Fixes #225 - Missing install instructions for Web UI
+	Fixes #173 - Write up procedures on how to translate Zonemaster
+	Fixes #123 - The un delegated view should have a text describing what un delegated means
+	Fixes #94  - Seperate history delegated vs undelegated
+	Fixes #119 - Design issue: very small column with results
+	Fixes #236 - Automatic language switch in GUI
+	Fixes #203 - Interfaces does not take into account the winter timings
+	Fixes #184 - New logo fro the Web GUI
+	Fixes #190 - Debug text in output from results?
+	Fixes #124 - FAQ to be added
+	Fixes #163 - Link to non java script
+	Fixes #125 - Does not display correct IPv6 address
+	Fixes #121 - fixes #122 - fr and sw translations of the GUI
+	Fixes #126 - Does not support Swedish language
+	Fixes #127 - Does not support IDN 2.0 domains
+	Fixes #118 - Run test when pressing Enter
+	Fixes #117 - Disable both IPv4 and IPv6

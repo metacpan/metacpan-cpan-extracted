@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/ZConf/Runner.pm
+lib/ZConf/Runner/GUI.pm
+lib/ZConf/Runner/GUI/Curses.pm
+bin/zcrunner
+t/00-load.t
+t/01-load.t
+t/boilerplate.t
+t/pod.t

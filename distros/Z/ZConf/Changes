@@ -1,0 +1,273 @@
+Revision history for ZConf
+
+6.1.0	 2012-05-25/15:40
+		 -Lots of misc cleanups.
+		 -Now uses Error::Helper.
+
+6.0.0   2012-03-30/07:15
+		-The sets now end with '.set' on the FS backend.
+			 This was done to prevent the config and set names from
+			 colliding. Previously "someConfig/Default" would collide
+			 with the set "Default" for "someConfig". This requires
+			 all sets to be renamed.
+
+5.1.0	2011-05-06/21:50
+		-Remove any references to sys from the scripts.
+		-Add subversion link.
+		-Update my last name every where.
+		-Fix a error with 
+
+5.0.0	2011-02-17/06:30
+		-Cleanup initialization of the new methods. The backends will also never return undef now.
+		-'bin/zcget' now does proper regex escaping unless -r is specified.
+		-Remove sysmode. Everything it use to do can now be done via specifying a config file and setting the base stuff.
+		-Add ZConf->getVar, ZConf->getMeta, ZConf->getComment.
+		-Correct Backend checking.
+
+4.2.1	2011-02-14/18:30
+		-"bin/zccdump" added. This should of been added previously, but was not do to a commit error.
+
+4.2.0	2010-11-11/12:30
+		-Minor correction in 'MANIFEST'.
+		-Add 'initBackend' method to 'ZConf'.
+		-Rewrite 'new' method chunk to use 'initBackend'.
+		-Cleanup 'LDAPconnect' method in 'ZConf'.
+		-Add 'writeSetFromZML' method for all.
+		-All write methods for the backends now use 'writeSetFromZML'.
+
+4.1.0	2010-10-30/22:00
+		-CPAN should now show the POD for ZConf::backends::files.
+		-Add the method 'dumpToZML' and 'isConfigLoaded' to 'ZConf'.
+		-'writeSetFromLoadedConfig' now verifies if the config is loaded.
+		-Add 'bin/zccdump'.
+		-Add 'Module::List' as a dependency to 'Makefile.PL' as it was missing.
+		-Update 'MANIFEST', fixing lots of missing stuff.
+		-Add some nicer example stuff to the POD.
+		-The 'writeSetFromLoadedConfig' for the backends now checks if a config is loaded and for the config name.
+		-Rename anything improperly labeled function is labeled method.
+
+4.0.1	2010-10-24/07:45
+		-Correct getAvailableSets if it does not error.
+
+4.0.0	2010-09-24/06:50
+		-Break the backends out into seperate modules.
+		-Lots of documentation cleanup.
+
+3.1.1	2010-05-29/
+		-Clean up the documentation on the regex get functions.
+
+3.1.0	2010-03-12/06:10
+		-Add the methods 'error' and 'errorString'.
+		-Fix writing newly initiated configs in LDAP so it no longer complains
+			about 'zconfRev' not being present in the entry.
+
+3.0.2	2009-12-13/20:20
+		-Make sure it uses the proper LDAP attribute
+			for lock checking.
+
+3.0.1	2009-12-13/20:00
+		-Fix lock syncing.
+
+3.0.0	2009-12-05/13:30
+		-Correct auto hostname choosing.
+		-Now EESDP LDAP compatible, this means it uses
+			Net::LDAP::AutoDNs and Net::LDAP::AutoServer for
+			fetching information.
+
+2.0.1	2009-11-26/8:00
+		-If a override chooser is not present, the override method just
+			returns 1.
+
+2.0.0	2009-11-23/20:00
+		-the writeFromHash functions now use ZML instead of creating
+			them manually. This makes it more robust as it is easier
+			add support in the future for what ever supported by ZML
+			and it does checking of the variable names.
+		-Add meta and comment support methods as listed below.
+			regexCommentDel
+			regexCommentGet
+			regexMetaDel
+			regexMetaGet
+			setComment
+			setMeta
+		-Add support for config revisions and support methods.
+			getConfigRevision
+			getConfigRevisionFile
+			getConfigRevisionLDAP
+			getLoadedConfigRevision
+		-Added update if change support methods.
+			getAutoupdate
+			setAutoupdate
+			reread
+			updatable
+			updateIfNeeded
+		-Added automatic rereading to the methods listed below.
+			getComments
+			getKeys
+			getMetas
+			regexCommentDel
+			regexCommentGet
+			regexMetaDel
+			regexMetaGet
+			regexVarDel
+			regexVarGet
+			regexVarSearch
+			setComment
+			setMeta
+			SetVar
+		-Add 'zconfRev' and 'zconfLock' to the LDAP schema.
+		-Add config locking and supporting methods.
+			setLockConfig
+			setLockConfigFile
+			setLockConfigLDAP
+			getLockedLoadedConfigs
+			isLoadedConfigLocked
+			isConfigLocked
+			isConfigLockedFile
+			isConfigLockedLDAP
+		-All backend related methods now call the backend
+			related methods for checking if a config exists
+			or not.
+		-Modified time support added. The meta $var='mtime'
+			is set to the UNIX time when it is changed. It can be
+			fetched using getMtime.
+		-Create time support added. The meta $var='ctime'
+			is set to the UNIX time when it was created. It can be
+			fetched using getCtime.
+		-Add ldap/<profile>/passwordfile support to zconf.zml.
+		-If a set name is not specified for writing to LDAP or the
+			file backend, it will now properly choose one. Previously
+			it only would if the generic ones were called.
+		-When syncing to file backend, it will now make sure the config
+			exists and if not it will be created.
+		-Lots of assorted POD cleanups.
+		-Add override support and the support methods listed below. override
+			is ran when ever readFile or readLDAP is called.
+				getOverrideChooser
+				override
+				setOverrideChooser
+
+1.3.1	2009-11-17/15:00
+		-Add misc ca and cert stuff that was forgotten about.
+
+1.3.0   2009-11-17/06:40
+		-Update LDAP schema. 'zconfRev' is not in use yet, but will be in the
+			next release.
+		-Fix the '-f' flag for 'bin/zcset'.
+		-Correct the manifest.
+		-All the scripts are now executable.
+		-No longer uses 'Net::LDAP::Express'.
+		-starttls now supported for LDAP.
+		-Adds the the following scripts for working with the choosers.
+			bin/zcchooser-edit
+			bin/zcchooser-get
+			bin/zcchooser-run
+			bin/zcchooser-set
+
+1.2.1	2009-10-16/2:00
+		-Correct which file is being loaded.
+
+1.2.0	2009-07-08/01:00
+		-Fix system mode.
+		-Implement system mode support in all the utilities.
+		-Update system mode documentation.
+
+1.1.1	2009-05-07/00:30
+		-defaultSetExists now actually works instead of always returning true.
+		-setExists will now use defaultSetExists if no set is specified.
+
+1.1.0	2009-04-12/14:30
+		-Implement system mode.
+		-New cleanup.
+
+1.0.0	2009-03-02/05:00
+		-Removed 'chooseSetFile' and 'chooseSetLDAP' as it now uses readChooser.
+		-Implement read fall through for. Now any reads that error for LDAP, will try
+			to use the file backend.
+
+0.7.1	2009-02-16/5:20
+		-Fix error strings for writeSetFromHash
+		-Fix ZML parsing error in 'readFile'. It now properply parses
+			multiline variables.
+
+
+0.7.0	2008-12-09/7:30
+		-Import the ZConf utilities.
+
+0.6.0	2008-10-10/16:40
+		-Changed the LDAP connection error code from 0 to 34. Now any time it's
+			value is true there is an error.
+		-Clean up the POD for delSet*
+		-Fix call to delSetFile in delConfig instead of delConfigFile
+		-delConfigFile now uses getAvailableSetsFile instead of getAvailableSets
+		
+
+0.5.0   2008-10-09/19:00
+		-Add LDAPconnect, LDAPgetConfMessage, LDAPgetConfMessageOne, LDAPgetConfEntry,
+			delConfig, delConfigFile, and delConfigLDAP.
+		-Now uses LDAPconnect for forming all connections.
+		-LDAPget* is now used for fetching various LDAP stuff.
+
+0.4.0	2008-09-19/19:30
+		-Add delSet, delSetFile, delSetLDAP, and setExists.
+		-Make sure setDefault blanks errors.
+		-Document the internal hash 'set'.
+		-The name checks now check for undefined ones as well.
+
+0.3.2	2008-07-22/19:15
+		-Fix a major error with readFile.
+
+0.3.2	2008-07-12/19:20
+		-Fully implement and document defaultSetExists.
+
+0.3.0	2008-07-12/18:55
+		-Add a few missing ';'s in the POD
+		-Remove stray comments in the LDAP schema.
+		-Added unloadConfig function.
+
+0.2.0	2008-06-24/2:00
+		-Fix some documentation.
+		-Implement getSubConfig functions.
+
+0.1.8	2008-06-23/14:20
+		-Fix chooseSetFile being used instead of choose for the read part
+		-Fix variable name checking in setVar
+		-Fix error in regexVarDel
+		-Fix issues with the documentation missing ';' in someplaces.
+
+0.1.7	2008-05-24/19:16
+		-Forgot to remove a bit of debugging.
+
+0.1.6	2008-05-24/19:16
+		-Fix regexGetVar.
+
+0.1.5	2008-05-24/3:21
+		-Rebump version as the removal of it does constitute a major change.
+
+0.0.5	2008-05-24/3:20
+		-Remove parseZML and use ZML->parse for any thing it was doing before.
+
+0.0.4	2008-05-22/19:20
+		-Fix error with writeSetFromLoadedConfig not passing writeSetFromLoadedConfigFile %args.
+
+0.0.3	2008-05-22/14:20
+		-Add LDAP schema to the pod.
+
+0.0.2	2008-05-21/19:31
+		-No longer requires a hash be defined with new.
+		-Fix default set deciding for writeSetFromHash. It was using "defualt" if
+			the set was not defined. Now it uses '$self->{args}{default}'.
+		-Fixed sync issues with writeSetFromHash.
+		-Fix chooseSet* as they were returning 'default' instead of '$self->{args}{default}'
+			when no chooser or the like was present.
+		-Fix chooseSet* warnings and handling of bad set names. It now returns
+			'$self->{args}{default}' on error.
+		-Fix issue with read trying to sync and not passing writeSetFromLoadedConfigFile
+			all of %args.
+
+0.0.1	2008-05-21/15:20
+		-Fixed some formatting issues with the POD.
+
+0.0.0	2008-05-20/17:38
+		-Initial release.
+

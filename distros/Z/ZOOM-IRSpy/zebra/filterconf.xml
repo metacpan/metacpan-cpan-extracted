@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemaInfo>
+ <schema name="index" stylesheet="zeerex2index.xsl"
+	 identifier="http://indexdata.dk/zebra/xslt/1"/>
+ <schema name="zeerex" stylesheet="zeerex2zeerex.xsl"/>
+ <schema name="zeerexNoAuth" stylesheet="zeerex2noauth.xsl"/>
+ <schema name="id" stylesheet="zeerex2id.xsl"/>
+ <schema name="dc" stylesheet="zeerex2dc.xsl"/>
+</schemaInfo>

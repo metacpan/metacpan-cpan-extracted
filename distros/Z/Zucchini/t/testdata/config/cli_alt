@@ -1,0 +1,63 @@
+default_site   alt1
+
+<site>
+    # a default site
+    <alt1>
+        source_dir          /tmp
+        includes_dir        /tmp
+        output_dir          /tmp
+
+        template_files      \.html\z
+
+        ignore_dirs         CVS
+        ignore_dirs         .svn
+
+        ignore_files        \.swp\z
+
+        lint_check          1
+
+        <tags>
+            author          Joe Bloggs
+            email           joe@localhost
+            copyright       &copy; 2006-2008 Joe Bloggs. All rights reserved.
+        </tags>
+
+        <ftp>
+            hostname        remote.ftp.site
+            username        joe.bloggs
+            password        sekrit
+            passive         1
+            path            /
+        </ftp>
+    </alt1>
+
+
+    # a second site definition - to demonstrate how to define multiple sites
+    <alt2>
+        source_dir          /tmp
+        includes_dir        /tmp
+        output_dir          /tmp
+
+        plugin_base         MyPrefix::Template::Plugin
+
+        template_files      \.html\z
+
+        ignore_dirs         CVS
+        ignore_dirs         .svn
+
+        ignore_files        \.swp\z
+
+        lint_check          1
+
+        <tags>
+            author          Joe Bloggs
+            email           joe@localhost
+            copyright       &copy; 2000-2006 Joe Bloggs. All rights reserved.
+        </tags>
+
+        <rsync>
+            hostname        remote.site
+            path            /home/joe.bloggs
+         </rsync>
+    </alt2>
+</site>

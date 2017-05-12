@@ -1,0 +1,50 @@
+1.10	2016-12-28
+		- Usage of Lazy::Utils::fileCache instead of cache function
+		- Perl arguement fix ( -- ) in configuration, readme, pod
+		- Supervisor worker status fix for "no such ..." result for undefined workers
+		- Added file cache in Supervisor getStatuses
+		- Fix and changes for disk ioutil
+
+1.09	2016-12-23
+		- zbxEncode comma and nonascii fix
+		- Fix in Time.pm for _ntp_offset returning scientific notation
+		- Fix in Disk.pm for returning scientific notation
+		- Try 5 times to get NTP server response in Time.pm _ntp_offset
+		- err_mode => "quiet" for File::Slurp funcs
+		- read_file optimization in Disk.pm analyzeStats
+		- cache function
+		- RabbitMQ cache
+
+1.08	2016-12-22
+		- Hotfix for Supervisor worker status
+
+1.07	2016-12-22
+		- Hotfix for Supervisor worker status
+
+1.06	2016-12-22
+		- Added distribution generator
+		- _check -> _running
+		- Improved documentation
+		- Added Time.pm
+
+1.05	2016-12-21
+		- Shell quote problem fixed
+
+1.04	2016-12-20
+		- Changed CPAN repositry info in PODs
+		- Added version info to use by Zabbix Agent
+		- Added conf/zabbix-agentd.conf
+		- Added conf/Template CPAN Zabbix-Check
+		- Improved Systemd
+		- Little fixes
+
+1.03	2016-12-19
+		- sub whereisBin exec test
+		- Service installation status detection is changed
+
+1.02	2016-12-18
+		- Added Systemd.pm
+		- Improvements and fixes
+
+1.01	2016-12-17
+		- Zabbix::Check first release

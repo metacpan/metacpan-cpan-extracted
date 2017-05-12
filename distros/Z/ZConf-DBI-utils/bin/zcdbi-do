@@ -1,0 +1,111 @@
+#!/usr/bin/perl
+
+use ZConf::DBI;
+use strict;
+use warnings;
+use Getopt::Std;
+use ZConf::DBI::utils;
+
+$Getopt::Std::STANDARD_HELP_VERSION = 1;
+
+#version function
+sub main::VERSION_MESSAGE {
+        print "zcdbi-do 0.0.0\n";
+}
+
+#print help
+sub main::HELP_MESSAGE {
+        print "\n".
+		      "-S <set>\n".
+			  "-d <data source>\n".
+			  "-s <sql>\n";
+}
+
+#gets the options
+my %opts=();
+getopts('S:s:d:', \%opts);
+
+#initilize it
+my $zcdbi=ZConf::DBI->new;
+
+#read the specified set if requested
+if (defined($opts{S})) {
+	$zcdbi->readset($opts{S});
+	if ($zcdbi->error) {
+		warn('zcdbi-tables-columns:'.$zcdbi->error.': '.$zcdbi->errorString);
+		exit $zcdbi->error;
+	}
+}
+
+my $utils=ZConf::DBI::utils->new($zcdbi);
+
+my $returned=$utils->do($opts{d}, $opts{s});
+if ($utils->error) {
+	warn('zcdbi-create-table:'.$utils->error.': '.$utils->errorString);
+	exit $utils->error;
+}
+
+print $returned."\n";
+
+exit 0;
+
+=head1 NAME
+
+zcdbi-do - Call the do method for a DBH formed from the specified data source.
+
+=head1 SYNOPSIS
+
+zcdbi-do [B<-S> <set>] -d <data source> B<-s> <sql>
+
+=head1 SWTICHES
+
+=head2 -d <data source>
+
+The data source to operate on.
+
+=head2 -s <sql>
+
+The SQL to run.
+
+=head2 -S <set>
+
+The set to load.
+
+=head1 EXIT CODES
+
+Any non-zero exit codes are the error codes returned by ZConf::DBI or
+ZConf::DBI::utils.
+
+=head1 AUTHOR
+
+Copyright (c) 2010, Zame C. Bowers <vvelox@vvelox.net>
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+     this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS` OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=head1 Changelog
+
+=head2 2010-03-12/15:00
+
+Initial release.
+
+=cut

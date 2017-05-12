@@ -1,0 +1,42 @@
+ZConf-Cron-GUI-GTK
+
+This provides a GTK backend for ZConf::Cron::GUI.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc ZConf::Cron::GUI::GTK
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=ZConf-Cron-GUI-GTK
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/ZConf-Cron-GUI-GTK
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/ZConf-Cron-GUI-GTK
+
+    Search CPAN
+        http://search.cpan.org/dist/ZConf-Cron-GUI-GTK/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Zane C. Bowers
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

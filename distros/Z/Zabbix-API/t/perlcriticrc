@@ -1,0 +1,6 @@
+severity = stern
+verbose = 9
+
+[-Subroutines::RequireArgUnpacking]
+[-Subroutines::ProhibitBuiltinHomonyms]
+[-ValuesAndExpressions::ProhibitConstantPragma]

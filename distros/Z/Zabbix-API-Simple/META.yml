@@ -1,0 +1,39 @@
+---
+abstract: 'A simple abstraction of the Zabbix::API'
+author:
+  - 'Dominik Schulz <dominik.schulz@gauner.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Zabbix-API-Simple
+requires:
+  Config::Yak: 0
+  Config::Yak::LazyConfig: 0
+  Log::Tree: 0
+  Log::Tree::Logger: 0
+  Module::Pluggable: 0
+  Moose: 0
+  MooseX::App::Cmd: 0
+  MooseX::App::Cmd::Command: 0
+  Plack::Loader: 0
+  Plack::Request: 0
+  Try::Tiny: 0
+  Zabbix::API: 0
+  Zabbix::API::Host: 0
+  feature: 0
+  mro: 0
+  namespace::autoclean: 0
+  perl: 5.010_000
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/gittex/Zabbix-API-Simple/issues
+  repository: git://github.com/gittex/Zabbix-API-Simple.git
+version: 0.01
+x_authority: cpan:TEX

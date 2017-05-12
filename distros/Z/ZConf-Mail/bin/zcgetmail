@@ -1,0 +1,163 @@
+#!/usr/bin/perl
+#Copyright (c) 2011, Zane C. Bowers-Hadley
+#All rights reserved.
+#
+#Redistribution and use in source and binary forms, with or without modification,
+#are permitted provided that the following conditions are met:
+#
+#   * Redistributions of source code must retain the above copyright notice,
+#    this list of conditions and the following disclaimer.
+#   * Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#
+#THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+#ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
+#WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+#IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+#INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
+#BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
+#DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+#LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+#OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+#THE POSSIBILITY OF SUCH DAMAGE.
+
+use warnings;
+use strict;
+use ZConf::Mail;
+use ZConf;
+use Getopt::Std;
+
+$Getopt::Std::STANDARD_HELP_VERSION=1;
+
+#version function
+sub main::VERSION_MESSAGE {
+        print "zcgetmail 0.2.0\n";
+};
+
+#print help
+sub main::HELP_MESSAGE {
+        print "\n".
+		      "-a account\n".
+			  "-z <ZConf config>\n".
+			  "-s <config set>\n";
+		exit 1;
+};
+
+#gets the options
+my %opts=();
+getopts('a:s:z:', \%opts);
+my %args;
+
+#create a custom ZConf object if needed
+my $zconf;
+if (defined($opts{z})) {
+	$zconf=ZConf->new({file=>$opts{z}});
+	if ($zconf->error) {
+		warn('zcmailaccount: Failed to start ZConf using the config file "'.$opts{z}.'"');
+		exit $zconf->error;
+	}
+}
+
+#initializes it
+my $mail=ZConf::Mail->new({zconf=>$zconf});
+
+#change set if requests
+if (defined($opts{s})) {
+	$mail->readSet($opts{s});
+	if ($mail->error) {
+		warn('zcmailaccount: readSet failed. error="'.
+			 $mail->error.'" errorString="'.$mail->errorString.'"');
+		
+		exit $mail->error;
+	}
+}
+
+#fetches it
+my $fetched=$mail->fetch($opts{a});
+if ($mail->error) {
+	my $account=$mail->defaultFetchableGet;
+	if (defined($opts{a})) {
+		$account='"'.$opts{a}.'"';
+	}
+	warn('zcgetmail: $mail->fetch('.$account.') failed. $mail->{error}="'.
+		 $mail->error.'" $mail->{errorString}="'.$mail->errorString.'"');
+	exit $mail->error;
+}else {
+	my $account=$mail->defaultFetchableGet;
+	if (defined($opts{a})) {
+		$account='"'.$opts{a}.'"';
+	}
+	print "fetched '".$fetched."' for the account '".$account."'\n";
+}
+
+if ($mail->error) {
+	exit $mail->error;
+}
+
+exit 0;
+
+
+=head1 NAME
+
+zcgetmail - Fetches mail for a ZConf::Mail account.
+
+=head1 SYNOPSIS
+
+zcgetmail [B<-a> <account>] [B<-s> <config set>] [B<-z> <ZConf config file>]
+
+=head1 SWITCHES
+
+=head2 B<-a> <account>
+
+The account to fetch the mail for. If this is not specified,
+then the default one is used.
+
+=head2 B<-s> <config set>
+
+The config set to use.
+
+=head2 B<-z> <ZConf config file>
+
+The config file to use.
+
+=head1 AUTHOR
+
+Copyright (c) 2011, Zame C. Bowers-Hadley <vvelox@vvelox.net>
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+     this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+xFOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS` OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=head1 SCRIPT CATEGORIES
+
+Desktop
+Mail
+
+=head1 OSNAMES
+
+any
+
+=head1 README
+
+zcgetmail - Fetches mail for a ZConf::Mail account.
+
+=cut

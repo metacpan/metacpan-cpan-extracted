@@ -1,0 +1,11 @@
+.gz$
+blib
+^Makefile$
+^Makefile.old$
+.gitignore
+.git
+docs
+MANIFEST.bak
+adm/release
+MYMETA.json
+MYMETA.yml

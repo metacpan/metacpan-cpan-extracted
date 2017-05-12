@@ -1,0 +1,72 @@
+ZOOM::IRSpy
+===========
+
+This module exists to implement the IRspy program, which discovers,
+analyses and monitors IR servers implementing the Z39.50 and SRU/W
+protocols.  It is a successor to the ZSpy program.
+
+INSTALLATION
+
+for debian/ubuntu:
+-------------------
+
+DEBIAN DEPENDENCIES
+
+If you have a Debian-based operating system, you can get what you need
+by installing the following packages from the operating system's
+package store, using apt-get:
+
+sudo apt-get install \
+	libnet-z3950-zoom-perl \
+	libxml-libxml-common-perl \
+	liburi-perl \
+	libxml-libxml-perl \
+	libapache2-mod-perl2 \
+	libhtml-mason-perl \
+	libapache2-request-perl \
+	libapache2-mod-apreq2 \
+	libxml-libxslt-perl \
+	idzebra-2.0 \
+
+you may need one of the following packages for development:
+
+sudo apt-get install \
+	make perl-doc libxml2-utils tidy yaz libyaz4-dev 
+
+and may enable mod_apreq: sudo a2enmod apreq
+
+Note: mod_perl works only safe without threads. Please use the non-threaded 
+debian package: sudo apt-get install apache2-mpm-prefork
+
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries, in addition to
+those specified in Makefile.PL:
+
+  Zebra, release 2.0 or later: see http://www.indexdata.com/zebra/
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006-2010 by Index Data ApS.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.7 or,
+at your option, any later version of Perl 5 you may have available.
+
+--
+
+Notes to self: everyone else please ignore these
+
+$ cd /usr/local/src/cvs/irspy && YAZ_LOG=irspy,irspy_test,irspy_debug,pod perl -I lib bin/irspy.pl -t "bagel.indexdata.dk/gils foo.bar.baz:12345/fish z3950.loc.gov:7090/Voyager" localhost:8018/IR-Explain---1
+
+To get a list of all Danish domains in the database:
+.../ZOOM-Perl/samples/zoom/zselect -t q localhost:8018/IR-Explain---1 'net.host = *.dk' //zeerex:host
+

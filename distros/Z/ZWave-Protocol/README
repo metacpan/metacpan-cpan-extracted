@@ -1,0 +1,88 @@
+######################################################################
+    ZWave::Protocol 0.04
+######################################################################
+
+NAME
+    ZWave::Protocol - Protocol helpers for Z-Wave communication
+
+SYNOPSIS
+        use ZWave::Protocol;
+        my $zw = ZWave::Protocol->new( device => "/dev/ttyUSB0" );
+
+        $zw->connect();
+
+        my $node_id = 3;
+        my $state   = 255; # "on"
+
+        $zw->payload_transmit( 0x13, $node_id, 
+                       0x03, 0x20, 0x01, $state, 0x05 );
+
+DESCRIPTION
+    ZWave::Protocol helps with the low-level details of the Z-Wave protocol,
+    and offers support for packing packets with length headers and
+    checksums, as well as connecting, sending, and receiving to the Z-Wave
+    controller plugged into the USB port.
+
+METHODS
+    "new( device =" "/dev/ttyUSB0" )>
+        Constructor, takes the device path to the plugged in Z-Wave
+        controller.
+
+    "connect()"
+        Initialize a connection with the Z-Wave controller plugged into the
+        USB port.
+
+    "payload_transmit( $payload_byte1, $payload_byte2, ... )"
+        A combination of "send()" and "recv_ack()".
+
+    "payload_send( $payload_byte1, $payload_byte2, ... )"
+        Wrap the given payload bytes into a package and send the result over
+        to the USB port.
+
+    "payload_recv()"
+        Wait for a payload packet to arrive and receive it.
+
+    "ack_recv()"
+        Wait for an ACK to arrive from the recipient of the previous
+        "send()".
+
+    "ack_send()"
+        Send an ACK back to acknowledge receiving a packet.
+
+    "request_packet( $payload_byte1, $payload_byte2, ... )"
+        Packs a sequence of payload bytes into a request packet, by adding a
+        request header, packet length, and a trailing checksum. For example,
+
+                        0x00, 0x13, 0x03, 0x03, 0x20, 0x01, 0x00, 0x05
+
+        becomes
+
+            0x01, 0x09, 0x00, 0x13, 0x03, 0x03, 0x20, 0x01, 0x00, 0x05, 0xc1
+
+        with 0x01 being the packet header, 0x09 being the packet length, and
+        0xc1 being the checksum, which is calculated over all bytes except
+        the first one (see the ZWave protocol spec for details).
+
+    "checksum( $byte1, $byte2, ... )"
+        Calculate the Z-Wave checksum required at the end of a package.
+
+  ERROR HANDLING
+    If one of the methods above returns a non-true value, the underlying
+    error can be obtained by calling
+
+        print $zwave->error();
+
+    Additional insight can be obtained by bumping up the Log4perl level to
+    $DEBUG in the "CWave::Protocol" or root categories.
+
+  TODO List
+    Retries
+
+LEGALESE
+    Copyright 2015 by Mike Schilli, all rights reserved. This program is
+    free software, you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+
+AUTHOR
+    2015, Mike Schilli <m@perlmeister.com>
+

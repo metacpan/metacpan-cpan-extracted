@@ -1,0 +1,43 @@
+Zabbix::API
+
+* About Zabbix::API
+
+Zabbix is a free software monitoring solution.  This distribution is an
+abstraction layer over the JSON-RPC API provided by Zabbix, allowing you to log
+in, create, update, delete, and generally manipulate many (but as of yet not
+all) types of objects, all in Perl with Perlish constructs.
+
+Examples are available in the examples/ folder; the tests are also good material
+to start with.
+
+* About the authors
+
+This distribution was originally written by Uperto for SFR, a French ISP and
+telecom.
+
+Some patches and most code in the Proxy and Template classes were submitted by
+Chris Larsen.
+
+* Installation
+
+This distribution supports installation via Module::Build:
+
+  perl Build.pl [OPTIONS]
+  ./Build
+  ./Build test
+  ./Build install
+
+Check out https://metacpan.org/module/Module::Build for documentation on how to
+use Module::Build installers.
+
+Alternatively, you can trust the various CPAN clients to pull the distribution
+and install it automagically, along with any dependencies you might be missing.
+
+* Bugs and complaints
+
+We have the usual RT queue on rt.cpan.org.
+
+* Contributing
+
+Our repository can be found on github at
+https://github.com/SFR-ZABBIX/Zabbix-API.

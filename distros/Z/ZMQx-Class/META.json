@@ -1,0 +1,68 @@
+{
+   "abstract" : "OO Interface to ZMQ",
+   "author" : [
+      "Thomas Klausner <domm@plix.at>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "ZMQx-Class",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "Carp" : "0",
+            "Encode" : "0",
+            "Log::Any" : "0",
+            "Moose" : "0",
+            "MooseX::Role::Parameterized" : "0",
+            "Package::Stash" : "0",
+            "ZMQ::Constants" : "0",
+            "ZMQ::FFI" : "0",
+            "constant" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.014",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "File::Temp" : "0",
+            "JSON::XS" : "0",
+            "Test::More" : "0",
+            "Test::Most" : "0",
+            "Test::SharedFork" : "0",
+            "bytes" : "0",
+            "perl" : "5.014",
+            "utf8" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://devbox.vpn.validad.net/ZMQx-Class.git"
+      }
+   },
+   "version" : "0.006"
+}
+

@@ -1,0 +1,118 @@
+#!/bin/bash
+#
+#       /etc/rc.d/init.d/ZimbraManager
+#
+# Starts the ZimbraManager daemon
+#
+# chkconfig: 2345 99 35
+# description: ZimbraManager is a interface to Zimbra SOAP calls (like a proxy)
+# processname: zimbra-manager.pl
+# config: /etc/sysconfig/ZimbraManager
+# pidfile: /var/run/zimbra-manager.pl.pid
+
+### BEGIN INIT INFO
+# Provides: ZimbraManager
+# Required-Start: $network
+# Required-Stop: $network
+# Default-Start: 2 3 4 5 
+# Default-Stop: 0 1 6
+# Short-Description: start and stop ZimbraManager service
+# Description: ZimbraManager is a interface to Zimbra SOAP calls (like a proxy)
+### END INIT INFO
+
+# Source function library.
+
+. /etc/rc.d/init.d/functions
+
+if [ -f /etc/sysconfig/ZimbraManager ]; then
+    . /etc/sysconfig/ZimbraManager
+fi
+
+RETVAL=0
+prog='Zimbra Manager'
+executable="/opt/oss/ZimbraManager/bin/zimbra-manager.pl"
+pidfile="/var/run/zimbra-manager.pl.pid"
+pid=`test -f $pidfile && cat $pidfile`
+lockfile="/var/lock/subsys/ZimbraManager"
+
+ZIMBRA_MANAGER_USER=${ZIMBRA_MANAGER_USER:-zm_admin}
+ZIMBRA_MANAGER_LOGDIR=${ZIMBRA_MANAGER_LOGDIR:-/var/log/ZimbraManager}
+ZIMBRA_MANAGER_LOGLEVEL=${ZIMBRA_MANAGER_LOGLEVEL:-error}
+
+OPTIONS="--logfile=$ZIMBRA_MANAGER_LOGDIR/ZimbraManager.log --loglevel=$ZIMBRA_MANAGER_LOGLEVEL prefork --pid-file=/tmp/Zimbra-Manager-prefork.pid --listen='http://*:13000' &"
+
+start() {
+    [ -x $exec ] || exit 5
+    pidofproc -p $pidfile $executable
+    status=$?
+    if [ $status -eq 0 ]; then
+        echo "ZimbraManager service is already running with pid $pid"
+        exit 1
+    else
+        echo -n $"Starting $prog: "
+        [ -d $ZIMBRA_MANAGER_LOGDIR ] || install --directory $ZIMBRA_MANAGER_LOGDIR --owner=$ZIMBRA_MANAGER_USER || exit 6
+        daemon --user=${ZIMBRA_MANAGER_USER} $executable $OPTIONS
+        RETVAL=$?
+        echo
+        [ $RETVAL -eq 0 ] && touch $lockfile
+        PID=`ps -ef | grep $executable | cut -d" " -f2`
+        PID=`echo $PID | cut -d" " -f2`
+        [ -n $PID ] && echo $PID > $pidfile
+    fi
+}
+
+stop() {
+    echo -n $"Stopping $prog: "
+    killproc $executable
+    RETVAL=$?
+    echo
+    if [ $RETVAL -eq 0 ]; then
+        rm -f $lockfile
+        rm -f $pidfile
+    fi
+}
+
+restart() {
+    stop
+    start
+}
+
+reload() {
+    restart
+}
+
+force_reload() {
+    restart
+}
+
+
+#
+#       See how we were called.
+#
+case "$1" in
+  start)
+        start
+        ;;
+  stop)
+        stop
+        ;;
+  reload)
+        reload
+        ;;
+  force-reload|restart)
+        stop
+        sleep 1
+        start
+        RETVAL=$?
+        ;;
+  status)
+        status -p $pidfile $executable
+        RETVAL=$?
+        ;;
+  *)
+        echo $"Usage: $0 {start|stop|restart|reload|force-reload|status}"
+        RETVAL=2
+        [ "$1" = 'usage' ] && RETVAL=0
+esac
+
+exit $RETVAL

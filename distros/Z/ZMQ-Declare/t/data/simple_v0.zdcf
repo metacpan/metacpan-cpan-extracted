@@ -1,0 +1,25 @@
+{
+    "context": {
+        "iothreads": 1
+    },
+    "weather_client": {
+        "type": "myweatherclientdevice",
+        "weather_info_subscriber": {
+            "type": "SUB",
+            "option": {
+                "hwm": 0
+            },
+            "connect": "inproc://weather_endpoint"
+        }
+    },
+    "weather_server": {
+        "type": "myweatherserverdevice",
+        "weather_info_publisher": {
+            "type": "pub",
+            "option": {
+                "hwm": 100
+            },
+            "bind": "inproc://weather_endpoint"
+        }
+    }
+}

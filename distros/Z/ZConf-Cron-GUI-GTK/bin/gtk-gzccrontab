@@ -1,0 +1,510 @@
+#!/usr/bin/perl
+#Copyright (c) 2008, Zane C. Bowers
+#All rights reserved.
+#
+#Redistribution and use in source and binary forms, with or without modification,
+#are permitted provided that the following conditions are met:
+#
+#   * Redistributions of source code must retain the above copyright notice,
+#    this list of conditions and the following disclaimer.
+#   * Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#
+#THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+#ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
+#WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+#IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+#INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
+#BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
+#DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+#LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+#OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+#THE POSSIBILITY OF SUCH DAMAGE.
+
+use strict;
+use warnings;
+use Getopt::Std;
+use ZConf;
+use ZConf::Cron;
+use Glib qw(TRUE FALSE);
+use Gtk2 '-init';
+use Gtk2::SimpleList;
+
+$Getopt::Std::STANDARD_HELP_VERSION = 1;
+
+#version function
+sub main::VERSION_MESSAGE {
+	print "zccron 0.0.0\n";
+};
+
+#print help
+sub main::HELP_MESSAGE {
+}
+
+#quits
+sub quit{
+	
+	exit 0;
+}
+
+#creates a new set
+
+#
+sub setsReload{
+	my $widget=$_[0];
+	my %args= %{$_[1]};
+
+	#gets the initial sets
+	my @sets=$args{cron}->getSets;
+
+	$args{setList}->set_data_array(\@sets);
+
+}
+
+#
+sub tabsReload{
+	my $widget=$_[0];
+	my %args= %{$_[1]};
+
+	#gets the initial sets
+	my @tabs=$args{cron}->getTabs;
+
+	$args{tabList}->set_data_array(\@tabs);
+
+}
+
+#change set
+sub changeSet{
+	my $widget=$_[0];
+	my %args=%{$_[1]};
+
+	my @selected=$widget->get_selected_indices;
+
+	my $newset=$args{cron}->{sets}[$selected[0]];
+
+	$args{cron}->setSet($newset);
+
+	#gets the initial sets
+	my @tabs=$args{cron}->getTabs;
+
+	$args{tabList}->set_data_array(\@tabs);
+}
+
+#change tab
+sub changeTab{
+	my $widget=$_[0];
+	my %args= %{$_[1]};
+
+	my @selected=$widget->get_selected_indices;
+
+	my $newtab=$args{cron}->{tabs}[$selected[0]];
+
+	my $buffer=Gtk2::TextBuffer->new();
+
+	$args{selected}=$args{cron}->{tabs}[$selected[0]];
+
+	$buffer->set_text($args{cron}->readTab($newtab));
+
+	$args{tab}->set_buffer($buffer);
+}
+
+#
+sub save{
+	my $widget=$_[0];
+	my %args= %{$_[1]};
+
+	#gets the text buffer object
+	my $buffer=$args{tab}->get_buffer;
+
+	my @selected=$args{tabList}->get_selected_indices;
+
+	#get the text
+	my $text=$buffer->get_text($buffer->get_start_iter,
+							   $buffer->get_end_iter, 1);
+
+	#if $selected[0] is undef, it means nothing is selected... which causes errors
+	#when we try to write the tab
+	if (!defined($selected[0])){
+		return undef;
+	}
+
+	#get what tab it is
+	my $tab=$args{cron}->{tabs}[$selected[0]];
+
+	#save it
+	$args{cron}->writeTab($tab, $text);
+}
+
+#
+sub newSet{
+	my $widget=$_[0];
+	my %args= %{$_[1]};
+
+	my ($pressed, $set)=ask('Name of new set...');
+
+	if ((!$args{cron}->create($set))&&($pressed eq 'accept')) {
+		warn('gzccrontab newSet:1: Could not create the set. ZConf::Cron errored with "'.
+			 $args{cron}->{error}.'"');
+		return undef;
+	}
+
+	#gets the initial sets
+	my @sets=$args{cron}->getSets;
+
+	$args{setList}->set_data_array(\@sets);
+
+	return 1;
+}
+
+#removes a set
+sub delSet{
+	my $widget=$_[0];
+	my %args= %{$_[1]};
+
+	my @selected=$args{setList}->get_selected_indices;
+
+	my $set=$args{cron}->{sets}[$selected[0]];
+
+	my ($pressed)=askYN('Remove set "'.$set.'"?');
+
+	if ($pressed eq "ok") {
+		if (!$args{cron}->delSet($set)){
+			warn('gzccrontab delSet:12: Could not delte the set, "'.$set.'". ZConf::Cron errored with "'.
+				 $args{cron}->{error}.'"');
+			return undef;
+		}
+	}
+
+	#gets the initial sets
+	my @sets=$args{cron}->getSets;
+
+	$args{setList}->set_data_array(\@sets);
+
+	return 1;
+}
+
+#
+sub newTab{
+	my $widget=$_[0];
+	my %args= %{$_[1]};
+
+	my ($pressed, $tab)=ask('Name of new Tab...');
+
+	if ((!$args{cron}->writeTab($tab, ''))&&($pressed eq 'accept')) {
+		warn('gzccrontab newSet:1: Could not create the set. ZConf::Cron errored with "'.
+			 $args{cron}->{error}.'"');
+		return undef;
+	}
+
+	#gets the initial sets
+	my @tabs=$args{cron}->getTabs;
+
+	$args{tabList}->set_data_array(\@tabs);
+
+	return 1;
+}
+
+#removes a tab
+sub delTab{
+	my $widget=$_[0];
+	my %args= %{$_[1]};
+
+	my @selected=$args{tabList}->get_selected_indices;
+
+	my $tab=$args{cron}->{tabs}[$selected[0]];
+
+	my ($pressed)=askYN('Remove tab "'.$tab.'"?');
+
+	if ($pressed eq "ok") {
+		if (!$args{cron}->delTab($tab)){
+			warn('gzccrontab delSet:12: Could not delte the tab, "'.$tab.'". ZConf::Cron errored with "'.
+				 $args{cron}->{error}.'"');
+			return undef;
+		}
+	}
+
+	$args{cron}->save;
+
+	#gets the initial sets
+	my @tabs=$args{cron}->getTabs;
+
+	$args{tabList}->set_data_array(\@tabs);
+
+	return 1;
+}
+
+#asks for a string...
+#largely based on 'http://forgeftp.novell.com//gtk2-perl-study/documentation/html/c1701.html#AEN1791'
+sub ask{
+	my $text=$_[0];
+
+	my $window = Gtk2::Dialog->new($text,
+									  undef,
+									  [qw/modal destroy-with-parent/],
+									  'gtk-cancel'     => 'cancel',
+									  'gtk-save'     => 'accept',
+									  );
+
+	$window->set_position('center-always');
+
+	$window->set_response_sensitive ('accept', FALSE);
+	$window->set_response_sensitive ('reject', FALSE);
+
+	my $vbox = $window->vbox;
+	$vbox->set_border_width(5);
+
+	my $label = Gtk2::Label->new_with_mnemonic($text);
+	$vbox->pack_start($label, 0, 0, 1);
+	$label->show;
+
+	my $entry = Gtk2::Entry->new();
+	$vbox->pack_end($entry, 0, 0, 1);
+	$entry->show;
+
+	$entry->signal_connect (changed => sub {
+								my $text = $entry->get_text;
+								$window->set_response_sensitive ('accept', $text !~ m/^\s*$/);
+								$window->set_response_sensitive ('reject', TRUE);
+								}
+							);
+
+	my $value;
+	my $pressed;
+
+	$window->signal_connect(response => sub {
+								$value=$entry->get_text;
+								$pressed=$_[1];
+								}
+							);
+	#runs the dailog and gets the response
+	#'cancel' means the user decided not to create a new set
+	#'accept' means the user wants to create a new set with the entered name
+	my $response=$window->run;
+
+	$window->destroy;
+
+	#set the pressed to reject if 
+	if (($value eq '' )&&($pressed eq 'accept')) {
+		$pressed='reject'
+	}
+
+	return $pressed, $value;
+}
+
+#asks Y/N
+#largely based on 'http://forgeftp.novell.com//gtk2-perl-study/documentation/html/c1701.html#AEN1791'
+sub askYN{
+	my $text=$_[0];
+
+	my $window = Gtk2::Dialog->new($text,
+									  undef,
+									  [qw/modal destroy-with-parent/],
+									  'gtk-cancel'     => 'cancel',
+									  'gtk-ok'     => 'ok',
+									  );
+
+	$window->set_position('center-always');
+
+	$window->set_response_sensitive ('accept', FALSE);
+	$window->set_response_sensitive ('reject', FALSE);
+
+	my $vbox = $window->vbox;
+	$vbox->set_border_width(5);
+
+	my $label = Gtk2::Label->new_with_mnemonic($text);
+	$vbox->pack_start($label, 0, 0, 1);
+	$label->show;
+
+#	my $entry = Gtk2::Entry->new();
+#	$vbox->pack_end($entry, 0, 0, 1);
+#	$entry->show;
+
+#	$entry->signal_connect (changed => sub {
+#								my $text = $entry->get_text;
+#								$window->set_response_sensitive ('accept', $text !~ m/^\s*$/);
+#								$window->set_response_sensitive ('reject', TRUE);
+#								}
+#							);
+
+#	my $value;
+	my $pressed;
+
+	$window->signal_connect(response => sub {
+#								$value=$entry->get_text;
+								$pressed=$_[1];
+								}
+							);
+	#runs the dailog and gets the response
+	#'cancel' means the user decided not to create a new set
+	#'ok' means the user wants to create a new set with the entered name
+	my $response=$window->run;
+
+	$window->destroy;
+
+	#set the pressed to reject if 
+#	if (($value eq '' )&&($pressed eq 'accept')) {
+#		$pressed='reject'
+#	}
+
+	return $pressed;
+}
+
+#
+my $cron=ZConf::Cron->new();
+
+#gets the initial sets
+my @sets=$cron->getSets;
+
+#gets the tabs
+my @tabs=$cron->getTabs;
+
+#inits gtk
+Gtk2->init;
+
+my $window = Gtk2::Window->new();
+
+#
+my $vbox=Gtk2::VBox->new(0, 1);
+$window->add($vbox);
+$vbox->show;
+
+#
+my $listHBox=Gtk2::HBox->new(0, 1);
+$vbox->pack_start($listHBox, 1, 1, 1);
+$listHBox->show;
+
+#displays the selected tab
+my $tab=Gtk2::TextView->new;
+
+#displays the selected tab
+my $tabList = Gtk2::SimpleList->new( 'tabs'=>'text');
+
+#displays the sets
+my $setList = Gtk2::SimpleList->new( 'sets'=>'text');
+$listHBox->pack_start($setList, 0, 0, 1);
+$setList->set_data_array(\@sets);
+#sets up the signal to be called when the selection changes
+#and passes $setList, $cron, @sets, and $tabList to &changeSet
+$setList->signal_connect("cursor-changed"=>\&changeSet,
+						 {cron=>$cron, setList=>$setList,
+						  sets=>[@sets], tabList=>$tabList});
+$setList->show;
+
+#displays the tabs
+$listHBox->pack_start($tabList, 0, 0, 1);
+$tabList->set_data_array(\@tabs);
+#
+my $selected=undef;
+#sets up the signal to be called then the selection changes
+#and passes $cron, @tabs, $tabList, and $tab to &changeTab
+$tabList->signal_connect("cursor-changed"=>\&changeTab,
+						 {cron=>$cron, tabList=>$tabList,
+						  tabs=>[@tabs], tab=>$tab, selected=>$selected});
+$tabList->show;
+
+#creates a scroll window for
+my $tabSW=Gtk2::ScrolledWindow->new (undef, undef);
+$tabSW->set_policy ('automatic', 'automatic');
+$tabSW->set_size_request (600, 600);
+#$tabSW->set_resize_mode('immediate');
+$tabSW->add($tab);
+
+#we insert the tab display here
+$listHBox->pack_start($tabSW, 1, 1, 1);
+$tabSW->show;
+$tab->show;
+
+#holds the buttons
+my $buttonHBox=Gtk2::HBox->new(0, 1);
+$vbox->pack_end($buttonHBox, undef, undef, 1);
+$buttonHBox->show;
+
+#sets up the set new set button
+my $newSet_button = Gtk2::Button->new();
+#sets up the clicked signal and passes $setList, $cron, and $tabList to &newSet
+$newSet_button->signal_connect("clicked" => \&newSet,
+							   {cron=>$cron, setList=>$setList, tabList=>$tabList});
+$buttonHBox->pack_start($newSet_button, 0, 0, 1);
+my $newSet_button_label=Gtk2::Label->new("New Set");
+$newSet_button_label->show;
+$newSet_button->add($newSet_button_label);
+$newSet_button->show;
+
+#this sets up the delSet button
+my $delSet_button = Gtk2::Button->new();
+$delSet_button->signal_connect("clicked" => \&delSet,
+							   {cron=>$cron, setList=>$setList, tabList=>$tabList});
+$buttonHBox->pack_start($delSet_button, 0, 0, 1);
+my $delSet_button_label=Gtk2::Label->new("Del Set");
+$delSet_button_label->show;
+$delSet_button->add($delSet_button_label);
+$delSet_button->show;
+
+#sets up the sets reload button
+my $setsReload_button = Gtk2::Button->new();
+#sets up the clicked signal and passes $cron, $setList, and $tabList to &setsReload
+$setsReload_button->signal_connect("clicked" => \&setsReload,
+								   {cron=>$cron, setList=>$setList});
+$buttonHBox->pack_start($setsReload_button, 0, 0, 1);
+my $setsReload_button_label=Gtk2::Label->new("Reload Sets");
+$setsReload_button_label->show;
+$setsReload_button->add($setsReload_button_label);
+$setsReload_button->show;
+
+#sets up the tab reload button
+my $tabsReload_button = Gtk2::Button->new();
+#sets the clicked signal and passes $cron and $tablist to &tabsReload
+$tabsReload_button->signal_connect("clicked" => \&tabsReload,
+								   {cron=>$cron, tabList=>$tabList});
+$buttonHBox->pack_start($tabsReload_button, 0, 0, 1);
+my $tabsReload_button_label=Gtk2::Label->new("Reload Tabs");
+$tabsReload_button_label->show;
+$tabsReload_button->add($tabsReload_button_label);
+$tabsReload_button->show;
+
+#sets up the new tab button
+my $newTab_button = Gtk2::Button->new();
+#sets up the clicked signal and passes $setList, $cron, and $tabList to &newSet
+$newTab_button->signal_connect("clicked" => \&newTab,
+							   {cron=>$cron, setList=>$setList, tabList=>$tabList});
+$buttonHBox->pack_start($newTab_button, 0, 0, 1);
+my $newTab_button_label=Gtk2::Label->new("New Tab");
+$newTab_button_label->show;
+$newTab_button->add($newTab_button_label);
+$newTab_button->show;
+
+#this sets up the delTab button
+my $delTab_button = Gtk2::Button->new();
+$delTab_button->signal_connect("clicked" => \&delTab,
+							   {cron=>$cron, setList=>$setList, tabList=>$tabList});
+$buttonHBox->pack_start($delTab_button, 0, 0, 1);
+my $delTab_button_label=Gtk2::Label->new("Del Tab");
+$delTab_button_label->show;
+$delTab_button->add($delTab_button_label);
+$delTab_button->show;
+
+#sets up the save button
+my $save_button = Gtk2::Button->new();
+#sets up the clicked signal and passes $cron, $tab, and $tabList to &save
+$save_button->signal_connect("clicked" => \&save,
+							 {cron=>$cron, tab=>$tab, tabList=>$tabList});
+$buttonHBox->pack_start($save_button, 0, 0, 1);
+my $save_button_label=Gtk2::Label->new("Save");
+$save_button_label->show;
+$save_button->add($save_button_label);
+$save_button->show;
+
+#sets up the sets quit button
+my $quit_button = Gtk2::Button->new();
+$quit_button->signal_connect("clicked" => \&quit);
+$buttonHBox->pack_start($quit_button, 0, 0, 1);
+my $quit_button_label=Gtk2::Label->new("Quit");
+$quit_button_label->show;
+$quit_button->add($quit_button_label);
+$quit_button->show;
+
+$window->signal_connect('delete-event'=>\&quit);
+
+$window->show;
+Gtk2->main;

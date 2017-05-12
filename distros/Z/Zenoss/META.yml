@@ -1,0 +1,30 @@
+--- #YAML:1.0
+name:               Zenoss
+version:            1.11
+abstract:           Perl interface to the Zenoss JSON API
+author:
+    - Patrick Baker <patricksbaker@gmail.com>
+license:            artistic_2
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Carp:                 0
+    File::Basename:       0
+    File::Find:           0
+    HTTP::Request::Common:  0
+    IO::Socket::INET:     0
+    JSON:                 2
+    LWP::UserAgent:       0
+    Moose:                1
+    Test::More:           0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

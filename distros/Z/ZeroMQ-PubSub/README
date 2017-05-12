@@ -1,0 +1,60 @@
+# ZeroMQ-PubSub - Publish/Subscribe event passing system based on ZeroMQ
+
+ZeroMQ::PubSub providers a client/server framework for simple message
+passing using ZeroMQ.
+
+ZeroMQ::PubSub::Client is used to connect to a ZeroMQ::PubSub::Server
+and can publish and subscribe to events.
+
+This setup should work well as a low-latency, lightweight
+mostly-reliable realtime message passing system. You can use in-proc,
+TCP, IPC and multicast transports. See the ZeroMQ documentation for
+more details.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc ZeroMQ::PubSub
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=ZeroMQ-PubSub
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/ZeroMQ-PubSub
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/ZeroMQ-PubSub
+
+    Search CPAN
+        http://search.cpan.org/dist/ZeroMQ-PubSub/
+
+
+SHOUTOUTS
+
+ZeroMQ XS wrapper - http://metacpan.org/module/ZeroMQ
+ZeroMQ project - http://zeromq.org
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2011 Mischa Spiegelmock
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

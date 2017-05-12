@@ -1,0 +1,58 @@
+{
+   "abstract" : "Read and query Dash/Zeal docsets",
+   "author" : [
+      "Marius Gavrilescu <marius@ieval.ro>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Zeal",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "IO::Uncompress::Bunzip2" : "0",
+            "IO::Zlib" : "0"
+         },
+         "requires" : {
+            "Archive::Tar" : "0",
+            "Class::Accessor::Fast" : "0",
+            "DBD::SQLite" : "0",
+            "DBI" : "0",
+            "File::Slurp" : "0",
+            "File::Which" : "0",
+            "Mac::PropertyList::SAX" : "0",
+            "XML::Rules" : "0",
+            "perl" : "5.014000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "http://git.ieval.ro/?p=zeal.git"
+      }
+   },
+   "version" : "0.001001"
+}

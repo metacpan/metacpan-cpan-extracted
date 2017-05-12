@@ -1,0 +1,50 @@
+ZConf-Cron
+
+ZConf::Cron manages cron tab entries for  ZConf. Two utilies are included.
+'zccron' and 'zccrontab'. 'zccron' runs the tabs.
+
+This is aimed at being a single pass cron for running when ever one wants. My
+motivization for writing this was for the purpose of loading the current days
+web comics in firefox.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc ZConf::Cron
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=ZConf-Cron
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/ZConf-Cron
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/ZConf-Cron
+
+    Search CPAN
+        http://search.cpan.org/dist/ZConf-Cron
+
+	SVN
+		http://eesdp.org/svnweb/index.cgi/pubsvn/browse/Perl/ZConf%3A%3ACron%3A%3AGUI%3A%3AGTK
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Zane C. Bowers
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

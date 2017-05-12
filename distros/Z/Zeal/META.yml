@@ -1,0 +1,35 @@
+---
+abstract: 'Read and query Dash/Zeal docsets'
+author:
+  - 'Marius Gavrilescu <marius@ieval.ro>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Zeal
+no_index:
+  directory:
+    - t
+    - inc
+recommends:
+  IO::Uncompress::Bunzip2: '0'
+  IO::Zlib: '0'
+requires:
+  Archive::Tar: '0'
+  Class::Accessor::Fast: '0'
+  DBD::SQLite: '0'
+  DBI: '0'
+  File::Slurp: '0'
+  File::Which: '0'
+  Mac::PropertyList::SAX: '0'
+  XML::Rules: '0'
+  perl: '5.014000'
+resources:
+  repository: http://git.ieval.ro/?p=zeal.git
+version: '0.001001'

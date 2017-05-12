@@ -1,0 +1,15 @@
+.shipit
+eg/zmq_ping.pl
+eg/zmq_pubsub_server.pl
+ignore.txt
+lib/ZeroMQ/PubSub.pm
+lib/ZeroMQ/PubSub/Client.pm
+lib/ZeroMQ/PubSub/Server.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/10-round-trip.t
+t/manifest.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

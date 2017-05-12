@@ -1,0 +1,157 @@
+
+=pod
+
+=head1 NAME
+
+Examples covering the Zenoss JSON API
+
+=head1 OVERVIEW
+
+This page serves as collection of some quick examples designed to get one started.  I will
+try to add more occasionally.
+
+=head1 CODE EXAMPLES
+
+=head2 Find events and write log messages
+
+This sample is quite arbitrary.  It will find all events, that are not in history, that have a
+severity of ERROR or CRITICAL and a firstTime of -2 days ago.
+
+    use Zenoss:
+    use DateTime;
+    
+    # Get the date two days ago
+    my $start_time = sprintf("%s", DateTime->now->subtract(days => 2));
+    
+    # Create Zenoss API object
+    my $api = Zenoss->connect(
+        {
+            username    => 'admin',
+            password    => 'zenoss',
+            url         => 'http://zenossinstance',
+            timeout     => '300',
+        }
+    );
+    
+    # Find all events with a severity of ERROR and CRITICAL
+    # that have a firstTime of -2 days ago
+    my $result = $api->events_query(
+        {
+            params      => {
+                severity    => [4,5],
+                firstTime   => $start_time,
+            },
+        }
+    );
+    
+    # Add a log message to each event found
+    if ($result->is_success()) {
+        my $decoded_result = $result->decoded();
+        foreach my $event (@{$decoded_result->{'events'}}) {
+            $api->events_write_log(
+                {
+                    evid        => $event->{'evid'},
+                    message     => 'This is a test message!!',
+                }
+            );
+        }
+    } else {
+        # something bad happened, lets print out to see what
+        print $result->raw_response();
+    }
+
+=head2 Add a device
+
+This sample adds a device and prints out the JobID
+
+    use Zenoss;
+    
+    # Create Zenoss API object
+    my $api = Zenoss->connect(
+        {
+            username    => 'admin',
+            password    => 'zenoss',
+            url         => 'http://zenossinstance',
+            timeout     => '300',
+        }
+    );
+    
+    # Add a device
+    my $result = $api->device_addDevice(
+        {
+            deviceName  => 'newdevice',
+            deviceClass => '/Server/Linux',
+            model       => JSON::true,
+        }
+    );
+    
+    # Print the JobID that this device will be processed under
+    my $result_decoded = $result->decoded();
+    if ($result->is_success()) {
+        printf("Success = %s, JobID = %s", $result_decoded->{'success'}, $result_decoded->{'jobId'});
+    } else {
+        # do something if the http response was bad
+    }
+
+=head2 Print available templates for a device
+
+This example could be made more advanced to bind templates to a device
+very easily.
+
+    use Zenoss;
+    
+    # Create Zenoss API object
+    my $api = Zenoss->connect(
+        {
+            username    => 'admin',
+            password    => 'zenoss',
+            url         => 'http://zenossinstance',
+            timeout     => '300',
+        }
+    );
+    
+    # Find devices in /Server/Linux
+    my $devices_found = $api->device_getDevices(
+        {
+            params  => {
+                deviceClass => '/Server/Linux',
+            },
+        }
+    )->decoded();
+    
+    # Print the names of the devices found then their available templates
+    foreach my $device (@{$devices_found->{'devices'}}) {
+        print "[$device->{'name'}] has the following available templates:\n";
+        my $available_tempaltes = $api->device_getTemplates(
+            {
+                id  => $device->{'uid'},
+            }
+        )->decoded();
+        
+        # Print the templates
+        foreach my $templates (@{$available_tempaltes}) {
+            print "\t$templates->{'text'}\n";
+        }
+        
+    }
+
+=head1 AUTHOR
+
+Patrick Baker E<lt>patricksbaker@gmail.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2010 by Patrick Baker E<lt>patricksbaker@gmail.comE<gt>
+
+This module is free software: you can redistribute it and/or modify
+it under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+You can obtain the Artistic License 2.0 by either viewing the
+LICENSE file provided with this distribution or by navigating
+to L<http://opensource.org/licenses/artistic-license-2.0.php>.
+
+=cut

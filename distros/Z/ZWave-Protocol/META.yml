@@ -1,0 +1,26 @@
+---
+abstract: 'Protocol helpers for Z-Wave communication'
+author:
+  - 'Mike Schilli <cpan@perlmeister.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.142690'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: ZWave-Protocol
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Device::SerialPort: '1.04'
+  Log::Log4perl: '1'
+  Moo: '1.006'
+resources:
+  repository: https://github.com/mschilli/zwave-protocol.git
+version: '0.04'

@@ -1,0 +1,14 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/ZConf/DBI.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+bin/zcdbi-add
+bin/zcdbi-ls
+bin/zcdbi-rm
+bin/zcdbi-set
+bin/zcdbi-sh
+bin/zcdbi-show

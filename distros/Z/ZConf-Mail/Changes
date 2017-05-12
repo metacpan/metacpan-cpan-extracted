@@ -1,0 +1,91 @@
+Revision history for ZConf-Mail
+
+2.0.0	2011-07-02/08:00
+		-Lots of misc cleanups.
+		-Remove all GUI stuff as it got broken some place and I've not had time to fix it.
+		-Add "bin/zcmailaccount".
+		-Cleanup Makefile.PL and README.
+		-Update MANIFEST.
+
+1.5.0	2011-04-08/02:15
+		-Change the order of use statements as using Net::SMTP_auth before ZConf can cause a segfault on some Perl compilations
+			for unknown reason.
+		-Some POD cleanup.
+		-Add errorblanking to some methods missing it.
+		-Add the ability to error permanently in new if it can't initialize properly.
+		-Actually implement the 'formatterSet' and 'formatterGet' instead of them being undocumented place holders.
+		-Cleanup error handling code.
+		-Document the 'deliverToFolder' option.
+		-Add 'error' and 'errorString'.
+		-MIME::Lite objects now have the quiet method called on them do to brain dead warning messages when doing GPG signing.
+		-Add 'quiet' to the args for 'createMimeLite'.
+		-Remove 'bin/zcmailimapcache'. It is not really being used for any thing currently. It is being moved into a more
+			comprehensive IMAP utility set that will be named 'ZConf::Mail::IMAPhelper'.
+			http://eesdp.org/svnweb/index.cgi/pubsvn/browse/Perl/ZConf%3A%3AMail%3A%3AIMAPhelper
+
+
+1.4.1	2010-06-26/07:10
+		-Correct the requirements in 'Makefile.PL'.
+		-Remove some mentions of 'ZConf::Runner' in 'ZConf::Mail::GUI::Curses'.
+
+1.4.0	2009-07-20/01:00
+		-Add asking on quiting and sending for 'bin/curses-zcmailcompose'.
+
+1.3.0	2009-07-19/22:00
+		-Fix initilizing ZConf::Mail in ZConf::Mail::GUI::Curses.
+		-Add spell checking support to 'bin/curses-zcmailcompose'.
+		-Note that hot key info should be found in the corresponding POD.
+		-Add 'bin/zcmailimapcache'.
+
+1.2.0	2009-06-21/14:00
+		-Updated look for 'bin/curses-zcmailcompose'.
+		-Compose no longer requires either a to or cc address for compose.
+		-Document the hot keys for 'ZConf::Mail::GUI::Curses'.
+		-Fix the README.
+
+1.1.0	2009-06-17/11:50
+		-Correct ZConf::Mail::GUI->compose documentation as the info
+			on the account args hash was missing.
+		-Add 'composeFromURI' to 'ZConf::Mail::GUI'.
+		-Add 'bin/zcmailuri'.
+		-Correct some POD naming stuff for 'bin/zcmailcompose' and
+			'bin/curses-zcmailcompose'.
+		-Update manifest.
+		-Default sendable and fetchable stuff implemented.
+
+1.0.1	2009-06-17/00:00
+		-Fix error when the compose script fails.
+		-Fix the pod for ZConf::Mail::GUI.
+		-All modules are now load tested.
+		-useX fixed.
+
+1.0.0	2009-06-15/19:00
+		-Add ZConf::GUI support.
+		-Reimplement 'bin/zcmailcompose' and 'bin/zcmailaccountmanage'
+			under 'ZConf::Mail::GUI'.
+
+0.3.1	2009-04-01/8:30
+		-Fix mime-signing.
+
+0.2.0	2009-03-04/6:00
+		-Added 'deliverIMAP' and 'createMimeEntity'.
+		-SMTP can now save the sent mail.
+		-'createEmailSimple' now no longer tries to create 'To' or
+			'CC' headers if it has nothing.
+
+0.2.0	2009-02-23/02:30
+		-Add 'getSet', 'listSets', and 'readSet'.
+
+0.1.0	2009-02-20/03:40
+		-Add 'bin/zcmailaccountmanage'.
+		-Fix 'getAccounts'.
+		-'createAccount' actually saves the config now.
+		-'createAccount' now works for the type 'exec'.
+		-Correct requirement checks in IMAP, MBox, and Maildir connectors.
+		-No longer error if ending the data session fails.
+		-'delAccount' now works.
+		-Add pod docs for all scripts.
+
+0.0.0	2008-11-25/17:40
+		-Initial release.
+

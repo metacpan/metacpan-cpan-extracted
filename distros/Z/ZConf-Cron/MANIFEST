@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/ZConf/Cron.pm
+lib/ZConf/Cron/GUI.pm
+t/00-load.t
+t/01-load.t
+t/pod.t
+bin/zccron
+bin/zccrontab
+bin/gzccrontab

@@ -1,0 +1,25 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Repository.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/ZMQ/CZMQ.pm
+lib/ZMQ/CZMQ/Zctx.pm
+lib/ZMQ/CZMQ/Zframe.pm
+lib/ZMQ/CZMQ/Zmsg.pm
+lib/ZMQ/CZMQ/Zsocket.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+t/001_zctx.t
+t/002_zframe.t
+t/003_zsocket.t
+t/004_zmsg.t
+xt/999_leak.t
+xt/999_pod-coverage.t
+xt/999_pod.t

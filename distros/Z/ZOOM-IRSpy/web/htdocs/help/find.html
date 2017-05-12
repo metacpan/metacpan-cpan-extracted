@@ -1,0 +1,31 @@
+  <p>
+   Fill in as many search critera as you like, then press the
+   <b>Search</b> button.
+  </p>
+  <p>
+   If you don't fill in any fields, all registered targets will be found.
+  </p>
+  <p>
+   Each search term that you enter is a CQL fragment.  This means:
+  </p>
+  <ul class="gappy">
+   <li>They can use boolean operators: for example, a title search
+	could be for
+	<a href="#" onclick="sendOpener(
+	'/find.html?dc.title=state+or+national&amp;_search=Search'
+	); return false;"><tt>state or national</tt></a>
+   </li>
+   <li>They can use the standard wildcard characters: <tt>?</tt> for
+	any single character and <tt>*</tt> for any run of zero or
+	more characters.  For example, a hostname search of
+	<a href="#" onclick="sendOpener(
+	'/find.html?net.host=*indexdata*&amp;_search=Search'
+	); return false;"><tt>*indexdata*</tt></a>
+	would find all services hosted on Index Data machines.
+   </li>
+  </ul>
+  <p>
+   For more detailed information, see
+   <a href="http://zing.z3950.org/cql/intro.html" target="_blank"
+	>the CQL tutorial</a>
+  </p>

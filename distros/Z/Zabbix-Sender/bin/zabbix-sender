@@ -1,0 +1,77 @@
+#!/usr/bin/perl
+# PODNAME: zabbix-sender
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Zabbix::Sender;
+
+my $opts = {
+    'item'    => undef,    # Zabbix Item
+    'value'   => undef,    # Value of Zabbix Item
+    'server'  => undef,
+    'port'    => 10051,
+    'timeout' => 30,
+};
+
+my $show_info;
+
+GetOptions(
+    'item=s'    => \$opts->{'item'},
+    'value=s'   => \$opts->{'value'},
+    'server=s'  => \$opts->{'server'},
+    'port=i'    => \$opts->{'port'},
+    'timeout=i' => \$opts->{'timeout'},
+    'hostname=s' => \$opts->{'hostname'},
+    'info'      => \$show_info,
+);
+
+foreach my $key (qw(item value server)) {
+    if ( !defined( $opts->{$key} ) ) {
+        die("Usage: $0 --item=X --value=Z --server=Y [--port=int] [--timeout=int] [--hostname=H]\n");
+    }
+}
+
+delete $opts->{'hostname'} unless defined $opts->{'hostname'};
+my $Sender = Zabbix::Sender->new($opts);
+my $status = $Sender->send( $opts->{'item'}, $opts->{'value'} );
+print $Sender->_info(), "\n" if $show_info;
+
+if ($status) {
+    exit 0;
+}
+else {
+    exit 1;
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+zabbix-sender
+
+=head1 VERSION
+
+version 0.06
+
+=head1 NAME
+
+zabbix-sender
+
+=head1 AUTHOR
+
+Dominik Schulz <dominik.schulz@gauner.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Dominik Schulz.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
