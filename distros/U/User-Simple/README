@@ -1,0 +1,48 @@
+User::Simple - Simple user sessions management
+
+User::Simple provides a very simple framework for validating users,
+managing their sessions and storing a minimal set of information (this
+is, a meaningful user login/password pair) and allowing for
+transparent access of arbitrary data (i.e. the user's name, privilege
+level, etc.) via a database. The sessions can be used as identifiers
+for i.e. cookies on a Web system. The passwords are stored as MD5
+hashes (this means, the password is not stored in clear text). 
+
+User::Simple includes User::Simple::Admin, which provides the basic
+functionalities to manage the users.
+
+User::Simple was originally developed with a PostgreSQL database in
+mind, but should work with any DBD, even those not implemented with a
+real RDBMS (i.e. XBase, CSV, etc).
+
+INSTALLATION
+
+Installing this module is like installing any standard Perl module,
+this means:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Date::Calc
+  Digest::MD5
+  DBI
+
+DBI is not called directly from within the module, but it is required
+in order to do anything with it.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005-2009 by Gunnar Wolf
+Instituto de Investigaciones Económicas, UNAM
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.7 or,
+at your option, any later version of Perl 5 you may have available.
+
+

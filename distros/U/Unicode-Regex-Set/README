@@ -1,0 +1,33 @@
+Unicode/Regex/Set version 0.04
+===============================
+
+NAME
+
+Unicode::Regex::Set - Subtraction and Intersection of Character Sets
+in Unicode Regular Expressions
+
+SYNOPSIS
+
+    use Unicode::Regex::Set qw(parse);
+
+    $regex = parse('[\p{Latin} & \p{L&} - \p{ASCII}]');
+
+INSTALLATION
+
+Perl 5.8.0 or later
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENSE
+
+SADAHIRO Tomoyuki <SADAHIRO@cpan.org>
+
+Copyright(C) 2003, SADAHIRO Tomoyuki. Japan. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

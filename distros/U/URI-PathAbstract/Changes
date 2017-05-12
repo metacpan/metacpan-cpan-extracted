@@ -1,0 +1,6 @@
+0.01 Wednesday August 06 01:02:23 PDT 2008:
+    - Initial release; stolen from the Path::Abstract codebase
+    - Added WithBase-esque functionality
+    - Documented how basing , ->abs, and ->rel work
+    - Changed ->path and ->uri NOT to chain on set, to mimic URI and not violate principle of least surprise
+

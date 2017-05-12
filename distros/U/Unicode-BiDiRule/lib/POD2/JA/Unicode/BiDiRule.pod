@@ -1,0 +1,193 @@
+
+=encoding utf-8
+
+=head1 NAME
+
+Unicode::BiDiRule~[ja] - RFC 5893 BiDi規則
+
+=head1 SYNOPSIS
+
+  use Unicode::BiDiRule qw(check);
+  $result = check($string);
+  %result = check($string);
+
+=head1 DESCRIPTION
+
+L<Unicode::BiDiRule> は、RFC 5893に述べるBiDi規則にしたがって検査を行う。
+
+なお当ドキュメントでは、「UTF-8」という語を本来の意味で用いる。
+
+=head2 Functions
+
+=over
+
+=item check ( $string, [ $strict ] )
+
+文字列がBiDi規則を満たすかどうか検査する。
+
+Parameters:
+
+=over
+
+=item $string
+
+検査する文字列。ユニコード文字列またはバイト文字列。
+
+バイト文字列は、ユニコードへアップグレードされることなく
+UTF-8列として扱われることに注意。
+
+=item $strict
+
+C<0>を指定すると、文字列が右書き文字を含まず
+BiDiラベルでないときに次の検査をしない。
+
+=over
+
+=item *
+
+文字列が前進を伴わない記号で始まらない。
+
+=item *
+
+文字列が書式文字、空白文字、行終端文字を含まない。
+
+=back
+
+=back
+
+Returns:
+
+スカラコンテキストでは、C<BIDIRULE_RTL>、C<BIDIRULE_LTR>、C<BIDIRULE_NOTBIDI>
+のいずれか (L</Constants> を参照)、あるいはC<undef>を返す。
+
+配列コンテキストでは、次のキーを持つ対によるリストで結果の詳細を返す。
+
+=over
+
+=item C<result>
+
+L</Constants> で述べる値のいずれか。
+
+=item C<offset>
+
+検査が失敗したときは、文字列の先頭からのオフセット。
+成功したときは、文字列の長さ。
+
+オフセットや長さは、
+バイト文字列ではバイト数、ユニコード文字列ではキャラクタ数で数える。
+
+=item C<length>
+
+検査が失敗したときの、認められない部分文字列の長さ。
+
+長さは、
+バイト文字列ではバイト数、ユニコード文字列ではキャラクタ数で数える。
+不正な列では未定義となる。
+
+=item C<ord>
+
+C<length>がある場合、認められない部分文字列の最初のキャラクタのユニコードスカラ値。
+
+=item C<unsafe>
+
+認められなかった部分文字列が書式文字を含むときは、真値がセットされる。このようなキャラクタを表示すると問題が起きるかもしれない。
+
+=back
+
+=item Unicode::BiDiRule::UnicodeVersion()
+
+ユニコード文字データベースの版を返す。これは
+Unicode::UCD::UnicodeVersion() と同じであるはずである。
+
+=back
+
+=head2 Constants
+
+検査の結果。
+
+=over
+
+=item C<BIDIRULE_RTL>
+
+文字列はRTLラベルである。
+
+=item C<BIDIRULE_LTR>
+
+文字列はLTRラベルである。
+
+=item C<BIDIRULE_NOTBIDI> (C<0>)
+
+文字列は右書き文字を含まないがBiDiラベルではない
+(RTLラベルでもLTRラベルでもない)。
+
+=item C<BIDIRULE_INVALID>
+
+文字列は規則を満たさない。
+
+=back
+
+=head2 Exports
+
+初期状態ではなにもエクスポートしない。
+C<:all> タグで check()および定数をエクスポートする。
+
+=head1 RESTRICTIONS
+
+check()はEBCDICプラットフォームでのユニコード文字列を検査できない。
+
+=head1 CAVEATS
+
+=over
+
+=item *
+
+当モジュールが提供できるレパートリと特性値は、Perl
+本体のユニコードデータベースが提供するものにかぎられる。下表に、Perl
+の各版が実装するユニコードの版を示す。
+
+  Perlの版           実装するユニコードの版
+  ------------------ ------------------------------------
+  5.8.0              3.2.0
+  5.8.1 - 5.8.3      4.0.0
+  5.8.4 - 5.8.6      4.0.1
+  5.8.7 - 5.8.8      4.1.0
+  5.10.0             5.0.0
+  5.8.9, 5.10.1      5.1.0
+  5.12.x             5.2.0
+  5.14.x             6.0.0 (訂正#8を反映ずみ)
+  5.16.x             6.1.0
+  5.18.x             6.2.0
+  5.20.x             6.3.0
+  5.22.x             7.0.0 (2014-10-21付け誤植を修正ずみ)
+
+=item *
+
+BiDiラベルではない (RTLラベルでもLTRラベルでもない)
+文字列が無効な文字列であるとはかぎらない。別の規則で検査すべきである。
+
+=back
+
+=head1 SEE ALSO
+
+RFC 5893
+I<Right-to-Left Scripts for Internationalized Domain Names for Applications
+(IDNA)>.
+L<https://tools.ietf.org/html/rfc5893>.
+
+=head1 AUTHOR
+
+Hatuka*nezumi - IKEDA Soji, E<lt>hatuka@nezumi.nuE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2015 by Hatuka*nezumi - IKEDA Soji
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. For more details, see the full text of
+the licenses at <http://dev.perl.org/licenses/>.
+
+This program is distributed in the hope that it will be
+useful, but without any warranty; without even the implied
+warranty of merchantability or fitness for a particular purpose.
+
+=cut

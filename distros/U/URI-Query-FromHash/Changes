@@ -1,0 +1,14 @@
+0.005 2017-04-11
+    - Treat undef param value as empty string. (MCRayRay)
+
+0.004 2016-06-29
+    - Ensure reproducibility by sorting by key.
+
+0.003 2015-03-08
+    - Add an unimport sub, so "no URI::Query::FromHash" works.
+
+0.002 2015-03-01
+    - Fixed regex escaping.
+
+0.001 2015-02-28
+    - Initial release.

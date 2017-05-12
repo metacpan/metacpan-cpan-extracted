@@ -1,0 +1,14 @@
+0.002 - 02 Feb 2012
+
+ - fix the content of the NAME section, Unicode was spelled incorrectly.
+   https://rt.cpan.org/Ticket/Display.html?id=73960
+
+ - adjust failure message when we can't find icu-config to indicate an
+   unsupported platform (ie. one without libicu) rather than some
+   generic unknown issue.
+
+ - set a minimum perl version of 5.8.8.
+
+0.001 - 22 Sep 2011
+
+ - initial release

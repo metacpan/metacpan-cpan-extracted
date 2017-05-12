@@ -1,0 +1,143 @@
+use strict; use warnings;
+
+=head1 NAME
+
+drawstate.pl - a script to turn text files into simple UML state diagrams
+
+=head1 SYNOPSIS
+
+    drawstate.pl diagram_text_file > diagram.svg
+    java -jar batik-rasterizer.jar diagram.svg
+
+=head1 DESCRIPTION
+
+The diagram_text_file is processed in paragraph mode, each paragraph is
+separated from the next by a blank line.  The order of the paragraphs is
+important (that is a minor bug).  The order is:
+
+    node layout
+    starting states
+    accepting states
+    edges...
+
+You may include as many edge paragraphs as you like, but each one should
+have a different label.
+
+At least two example input files are included in the distribution.  Look
+in the samples subdirectory for files ending in .input.  The README file
+in that directory explains what these input files represent.  The
+corresponding .svg and .png files hold the resulting images.  The .png
+images were produced with the freely available Batik rasterizer,
+which is part of the Batik project from Apache.
+See http://xml.apache.org/batik/ for information on Apache Batik.
+
+In case you have trouble finding those files, one is included here:
+
+    (0) ()  (5)
+    ()  ()  (10)
+    (25)(15)
+    ()  (20)(30)
+
+    Starting
+    0,0,N N
+
+    Accepting
+    0,2
+    2,3
+
+    5
+    0,0,E 2,0,W
+    2,0,S 2,1,N
+    2,1,W 1,2,E
+    1,2,S 1,3,N
+    1,3,W 0,2,S
+
+    10
+    0,0,S 2,1,W
+    1,2,W 0,2,E
+    2,1,S 1,3,E
+    1,3,E 2,3,W
+
+    25
+    0,0,S 0,2,N Counter
+    2,0,E 2,3,E Clock
+
+This represents the states in a coin operated vending machine which accepts
+coins with values of 5, 10, and 25.  The purchase price for the machine is
+25, so 25 and 30 are accepting states.  Zero is the start state.  Each
+deposited coin increases the total, which is used to label the nodes.
+Edges represent deposits and are labeled with the value of the deposited
+coin.  (The diagram is not complete.  It is meant to show features of
+diagrams.  If you have a coin-op machine you need to build, feel free
+to extend it as needed.)
+
+Each paragraph except the one for node layout has a label.  The labels are
+only used for edge paragraphs.  All coordinates are in terms of the node
+layout which is numbered from 0.  Columns are listed first, then rows
+(think x and y from algebra).  Sides of the nodes (where edges begin and
+end) are labeled with compass points N(orth), S(outh), E(ast), and W(est).
+
+This input format is idiosyncratic.  If you don't like it, you should design
+your own and interface directly with UML::State.  If you don't like listing
+columns first, or numbering from zero, you will need to account for that
+in your new script or change UML::State.
+
+=head1 BUGS
+
+The order of the paragraphs matters.  All paragraphs except the node layout
+must be labeled.
+
+All edges using the same label must be in the same paragraph.
+If an edge paragraph repeats a label used by an earlier edge paragraph,
+it overwrites that paragraph.  (Think of the labels as hash keys, I do.)
+
+The bugs in UML::State apply here as well, since this script uses it
+to make the pictures.  See perldoc UML::State for those bugs.
+
+=cut
+
+use UML::State;
+
+$/                   = "";   # paragraph mode
+
+my $node_data        = <>;
+my $start_states     = <>;
+my $accepting_states = <>;
+
+my $nodes            = make_2D_array($node_data       );
+my $starts           = make_array   ($start_states    );
+my $accepting        = make_array   ($accepting_states);
+
+my $edges = {};
+
+while (<>) {
+    my ($label, @arrows) = split /\n/;
+    $edges->{$label} = \@arrows;
+}
+
+my $machine = UML::State->new($nodes, $starts, $accepting, $edges);
+
+print $machine->draw();
+
+sub make_2D_array {
+    my $input = shift;
+    my @answer;
+
+    my @rows  = split /\n/, $input;
+
+    foreach my $row (@rows) {
+        $row  =~ s/^\s*\(//;  # remove the first (
+        $row  =~ s/\)\s*$//;  # remove the last )
+        my @elements = split /\)\s*\(/, $row; # split on ') (' or similar
+        push @answer, \@elements;
+    }
+    return \@answer;
+}
+
+sub make_array {
+    my     $input  = shift;
+    my     @answer = split /\n/, $input;
+    shift  @answer;
+    return \@answer;
+}
+

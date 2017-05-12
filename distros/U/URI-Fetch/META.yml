@@ -1,0 +1,32 @@
+---
+abstract: 'Smart URI fetching/caching'
+author:
+  - 'Benjamin Trott <ben+cpan@stupidfool.org>'
+build_requires:
+  Data::Dumper: '0'
+  Test::More: '0'
+  Test::RequiresInternet: '0.05'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: URI-Fetch
+requires:
+  Carp: '0'
+  Class::ErrorHandler: '0'
+  LWP::UserAgent: '0'
+  Storable: '0'
+  URI: '0'
+  base: '0'
+  constant: '0'
+  perl: 5.008_001
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/neilb/URI-Fetch
+  repository: https://github.com/neilb/URI-Fetch.git
+version: '0.13'

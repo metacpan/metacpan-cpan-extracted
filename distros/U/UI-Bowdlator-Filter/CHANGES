@@ -1,0 +1,35 @@
+==================================================
+Changes from 2015-09-28 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.002 at 2016-09-27 17:01:06 +0000
+------------------------------------------
+
+  Change: 826dfaa2c8b0feb3e4d51996bf4f574d80c9a72d
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2016-09-27 19:00:59 +0000
+
+    Migrating from github://a3f to github://athreef 
+
+  Change: facdadd327b0343967f8eb945e00b810ba7a5cc4
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2016-09-26 21:15:55 +0000
+
+    Added Github metadata to package 
+
+  Change: 7a92e6f6e67bea7b3ea127edf0e6e2bfd67079e5
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2016-09-25 05:00:18 +0000
+
+    Renamed and documented module 
+
+  Change: 30a063afc3555d2c37360c4588c64b954d99a9a5
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2016-09-19 18:21:57 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

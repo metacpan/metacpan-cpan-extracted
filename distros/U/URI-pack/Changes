@@ -1,0 +1,14 @@
+Revision history for perl distribution URI-pack
+
+0.002001 2011-10-18
+ [OTHER]
+ - Change from Module::Install to Module::Build.
+ - Change from Readonly to Const::Fast.
+ - Change from base.pm to parent.pm.
+
+0.002 2009-10-10
+ [OTHER]
+ - Added Readonly 1.03 as a dependency as it was missing from the list.
+
+0.001 2009-10-08
+ - First release.

@@ -1,0 +1,356 @@
+=head1 NAME
+
+UI::Dialog::Screen::Druid - wrapper to screen dialogs.
+
+=head1 SYNOPSIS
+
+  use UI::Dialog::Screen::Druid;
+
+  # $d is an existing instance of UI::Dialog
+
+  my $druid = new UI::Dialog::Screen::Druid ( dialog => $d );
+  $druid->add_yesno_step('somename',"Ask the user a y/n question?");
+  $druid->add_input_step
+    ( 'anothertag',"Tell me something:",
+      "Hello World: {{somename}}"
+    );
+  my (%answers) = $druid->perform();
+  if ($answers{aborted}) {
+    die "user canceled at step: ".$answers{key}."\n";
+  }
+
+  # %answers contains all the responses, keyed by the first argument
+  # used in the add_*_step() methods.
+  print $answers{anothertag}."\n";
+  
+
+=head1 ABSTRACT
+
+UI::Dialog::Screen::Druid is a helper class which enables a clean and
+modular code flow for menu driven applications using UI::Dialog. Using
+a simple "question" format, tucked into a queue; developers can ask
+a series of questions and receive back a HASH (or HASHREF) of all the
+user input keyed by the first argument to the add_*_step() methods.
+
+=head1 DESCRIPTION
+
+UI::Dialog::Screen::Druid is actually "external" to the UI::Dialog core
+usage. The class simply wraps around an existing UI::Dialog instance
+for rendering a druid-walkthrough series of dialogs.
+
+Using this class, you define one (or more) druid instances and assign
+tags and helpful text to questions. Once defined, simply call B<perform()>
+and receive the resulting HASH (or HASHREF).
+
+If the user aborts (presses <ESC>) the druid performance, a simple
+hash containing two key/value pairs is returned and resembles the
+following:
+
+ { aborted => 1, key => "tagNameOfAbortedStep" }
+
+=head1 EXPORT
+
+=over 2
+
+None
+
+=back
+
+=head1 INHERITS
+
+=over 2
+
+None
+
+=back
+
+=head1 CONSTRUCTOR
+
+=head2 new( %options )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ # Have UI::Dialog::Screen::Druid use an existing UI::Dialog instance
+ # to render the user interface.
+ my $druid = new( dialog => $d );
+
+ # Also accepts UI::Dialog constructor arguments, so that it can create
+ # it's own instance of UI::Dialog if none is provided.
+ my $druid = new( title => 'Default Title', backtitle => 'Backtitle',
+                  width => 65, height => 20, listheight => 5,
+                  order => [ 'zenity', 'xdialog', 'gdialog' ] );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+This is the Class Constructor method. It accepts a list of key => value pairs
+and uses them as the defaults when interacting with the various widgets.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+A blessed object reference of the UI::Dialog::Screen::Druid class.
+
+=back
+
+=item OPTIONS
+
+The (...)'s after each option indicate the default for the option. An * denotes
+support by all the widget methods on a per-use policy defaulting to the values
+decided during object creation.
+
+=over 6
+
+=item B<dialog = UI::Dialog> (undef)
+
+=item B<debug = 0,1,2> (0)
+
+=item B<order = [ zenity, xdialog, gdialog, kdialog, cdialog, whiptail, ascii ]> (as indicated)
+
+=item B<PATH = [ /bin, /usr/bin, /usr/local/bin, /opt/bin ]> (as indicated)
+
+=item B<backtitle = "backtitle"> ('') *
+
+=item B<title = "title"> ('') *
+
+=item B<beepbefore = 0,1> (0) *
+
+=item B<beepafter = 0,1> (0) *
+
+=item B<height = \d+> (20) *
+
+=item B<width = \d+> (65) *
+
+=item B<listheight = \d+> (5) *
+
+=back
+
+=back
+
+=head1 DRUID METHODS
+
+=head2 add_yesno_step( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ $druid->add_yesno_step( "yesnotag", "Yes/no question?" );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Append a new B<yesno()> dialog step to the druid performance, keyed
+by the first argument.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+Nothing
+
+=back
+
+=back
+
+=head2 add_input_step( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ $druid->add_input_step( "inputtag", "Helpful text", "default text" );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Append a new B<inputbox()> dialog step to the druid performance, keyed
+by the first argument.
+
+A unique property to this druid step in particular is that the default
+text (the third arguement) goes through a semi-templating system. By
+using B<{{keytag}}> within the default text string, when the input
+question is posed to the user, the B<{{keytag}}> string is replaced
+with the user's response to a prior question keyed as B<keytag>. For
+example:
+
+ $druid->add_input_step
+   ( "user_name",
+     "Tell me the user name you'd like.",
+     "$ENV{USER}"
+   );
+ $druid->add_input_step
+   ( "another_q",
+     "What is the email address you'd like?",
+     "{{user_name}}@example.com"
+   );
+
+When the above is performed, assuming the user entered "boring" for
+the I<user_name> question; the suggested (default) email address would
+become I<boring@example.com>.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+Nothing
+
+=back
+
+=back
+
+=head2 add_password_step( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ $druid->add_password_step( "passwordtag", "Helpful text." );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Append a new B<password()> dialog step to the druid performance, keyed
+by the first argument.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+Nothing
+
+=back
+
+=back
+
+=head2 add_menu_step( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ $druid->add_menu_step( "menutag", "Helpful text", [qw|item0 item1|] );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Append a new B<menu()> dialog step to the druid performance, keyed
+by the first argument.
+
+The third argument is an ARRAYREF containing the options the user
+can select from. This is not the same as the menu() method's B<list>
+argument. Whatever is supplied is what is returned as the response
+for the keyed question. In the above B<EXAMPLE> the user would be
+presented with two options in a menu; "item0" and "item1". Upon
+selecting one of those two options; the I<%answers> HASH would
+contain I<menutag => "item0"> (if the user selected "item0" of course).
+
+=back
+
+=item RETURNS
+
+=over 6
+
+Nothing
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+=over 2
+
+=item PERLDOC
+
+ UI::Dialog
+ UI::Dialog::GNOME
+ UI::Dialog::KDE
+ UI::Dialog::Console
+ UI::Dialog::Screen::Menu
+ UI::Dialog::Backend
+ UI::Dialog::Backend::ASCII
+ UI::Dialog::Backend::CDialog
+ UI::Dialog::Backend::GDialog
+ UI::Dialog::Backend::KDialog
+ UI::Dialog::Backend::Nautilus
+ UI::Dialog::Backend::Whiptail
+ UI::Dialog::Backend::XDialog
+ UI::Dialog::Backend::XOSD
+ UI::Dialog::Backend::Zenity
+
+=back
+
+=over 2
+
+=item MAN FILES
+
+ dialog(1), whiptail(1), zenity(1), gdialog(1), Xdialog(1),
+ osd_cat(1), kdialog(1) and nautilus(1)
+
+=back
+
+=head1 BUGS
+
+Please email the author with any bug reports. Include the name of the
+module in the subject line.
+
+=head1 AUTHOR
+
+Kevin C. Krinke, E<lt>kevin@krinke.caE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+ Copyright (C) 2004-2016  Kevin C. Krinke <kevin@krinke.ca>
+
+ This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 2.1 of the License, or (at your option) any later version.
+
+ This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+
+ You should have received a copy of the GNU Lesser General Public
+ License along with this library; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+
+=cut

@@ -1,0 +1,58 @@
+TYPEMAP
+SDL_Overlay * O_OBJECT_SDL
+SDL_Rect *    O_OBJECT_SDL
+AVFrame *     O_OBJECT
+
+
+OUTPUT
+ 
+O_OBJECT
+    if ($var) {
+        void** pointers  = malloc(1 * sizeof(void*));
+        pointers[0]      = (void*)$var;
+        $arg = newSVpv( (void*)pointers, 1 );
+    }
+    else {
+        XSRETURN_UNDEF;
+    }
+
+O_OBJECT_SDL
+    if ($var) {
+        void** pointers  = malloc(3 * sizeof(void*));
+        pointers[0]      = (void*)$var;
+        pointers[1]      = (void*)PERL_GET_CONTEXT;
+        Uint32 *threadid = (Uint32 *)safemalloc(sizeof(Uint32));
+        *threadid        = SDL_ThreadID();
+        pointers[2]      = (void*)threadid;
+        sv_setref_pv( $arg, CLASS, (void*)pointers );
+    }
+    else {
+        XSRETURN_UNDEF;
+    }
+
+
+INPUT
+
+O_OBJECT
+    if( sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG) ) {
+        void** pointers = (void**)INT2PTR(void *, SvIV((SV *)SvRV( $arg )));
+        $var = ($type)(pointers[0]);
+    }
+    else if ($arg == 0) {
+        XSRETURN(0);
+    }
+    else {
+        XSRETURN_UNDEF;
+    }
+
+O_OBJECT_SDL
+    if( sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG) ) {
+        void** pointers = (void**)INT2PTR(void *, SvIV((SV *)SvRV( $arg )));
+        $var = ($type)(pointers[0]);
+    }
+    else if ($arg == 0) {
+        XSRETURN(0);
+    }
+    else {
+        XSRETURN_UNDEF;
+    }

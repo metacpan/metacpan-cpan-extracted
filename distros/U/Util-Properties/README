@@ -1,0 +1,119 @@
+NAME
+    Util::Properties - Java.util.properties like class
+
+DESCRIPTION
+    rimplement something like ava.util.Properties API.
+
+    The main differences with CPAN existant Config::Properties and
+    Data::Properties is file locking & autoload/autosave features
+
+SYNOPSIS
+use Util::Properties;
+
+my $prop = Util::Properties->new({file=>'file.properties'});
+my $xyz=$prop->prop_get('x.y.z');
+$prop->prop_set('w', -1);
+$prop->save();
+
+FUNCTIONS
+METHODS
+  Creators
+   my $prop=Util::Properties->new()
+   my $prop=Util::Properties->new(filename)
+   my $prop=Util::Properties->new(\%h)
+   my $prop=Util::Properties->new(\$Util::Properties)
+    Create a new prop system from either:
+
+    empty
+    filename
+    hash ref (key=>values will be taken as property name/value)
+    a copy constructor from another Util::Properties object;
+
+  Accessors/Mutators
+   $prop->name([$val])
+    Get/set a name for the set of prperty (mainly used for debugging or code
+    clarity purpose
+
+   $prop->file_ismirrored([val])
+    Get/set (set if an argument is passed) a boolean value to determine if
+    the file is to be file with property (if any is defined) is to be kept
+    coherent with the data. This mean that any set of property will be
+    mirrored on the file, and before any get, the file time stamp will be
+    check to see if the data has changed into the file.
+
+   $prop->file_name([path])
+    Get/set the filename
+
+   $prop->file_md5([hexval])
+    Get/set the md5 of the file
+
+   $prop->file_locker(bool|\$LockFile::Simple);
+    Set if a file locker is to be used (or a file locker is you do not wish
+    to use the default). A die will be thrown if locking fails
+
+   $prop->file_locker();
+    Get the file locker (or undef).
+
+   $prop->file_isghost([val])
+    get/set is it is possible for the file not to exist (in this case, no
+    problem not to save...)
+
+  Properties values
+   $prop->prop_get(key)
+    get property defined by key;
+
+   $prop->prop_set(key, value)
+    Set a property
+
+   $prop->prop_list
+    return a hash with all the properties
+
+   $prop->prop_clean
+    Clean the properties list;
+
+   $prop->isEmpty();
+    return true if the properties does not contain any fields
+
+  I/O
+   $prop->load()
+    load properties from $prop->file_name
+
+   $prop->save()
+    Save properties from $prop->file_name (comment have been forgotten)
+
+EXPORT
+   $DEFAULT_FILE_LOCKER
+    If a file_locker is to be defined by default creator [default is 1]
+
+   $DEFAULT_FILE_ISMIRRORED
+    If data in memory must be consistent with file (based on file
+    maodification time) [default is 1]
+
+   $VERBOSE
+    verbose level;
+
+AUTHOR
+    Alexandre Masselot, "<alexandre.masselot@genebio.com>"
+
+TODO
+   implement a '+=' notation (to have mult lines defined properties)
+prop.one=some
+prop.one+=thing
+
+   implement a dependencies between properties
+prop.one=something
+prop.two=other/${prop.one}-thing
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-util-properties@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Util-Properties>. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+ACKNOWLEDGEMENTS
+COPYRIGHT & LICENSE
+    Copyright 2006 Alexandre Masselot, all rights reserved.
+
+    This program is released under the following license: gpl
+

@@ -1,0 +1,60 @@
+#!/usr/bin/perl -w
+
+# Quick&Dirty script to generate element data from UDDI schema.
+# works with 'uddi_1.xsd':
+# "UDDI API schema.  Version 1.0, revision 0.  Last change 2000-09-06"
+#
+
+use strict;
+use XML::Parser;
+
+open(S, "uddi_1.xsd") || die;
+
+my $p = XML::Parser->new(Style => "Objects", Handlers => { Char => sub {} });
+
+my $schema = $p->parse(\*S);
+undef($p);
+
+die if @$schema != 1;
+$schema = $schema->[0];
+die unless ref($schema) eq "main::schema";
+
+print "# $schema->{targetNamespace} elements
+
+sub TEXT_CONTENT () { 0x01 }
+sub ELEM_CONTENT () { 0x02 }
+
+";
+
+print "our %elementContent = (\n";
+
+for my $e (@{$schema->{Kids}}) {
+    next unless ref($e) eq "main::element";
+
+    my $name = $e->{name};
+    die unless $name =~ /^[a-z]\w*$/;
+
+    my $content;
+    if (my $t = $e->{type}) {
+	die if $t ne "string";
+	$content = "textOnly";
+    }
+    else {
+	for (@{$e->{Kids}}) {
+	    next unless ref($_) eq "main::type";
+	    $content = $_->{content};
+	    last;
+	}
+    }
+    die "Missing content for $name" unless $content;
+
+    $content = { "textOnly"    => 0x01,
+                 "elementOnly" => 0x02,
+                 "empty"       => "0 but true", #0x00,
+                 "mixed"       => 0x03,
+               }->{$content} || die "content is $content for $name";
+
+    printf "    %-29s => %#04x,\n", "'UDDI::$name'", $content;
+}
+print ");\n";
+

@@ -1,0 +1,50 @@
+Changes for UNIVERSAL::isa
+--------------------------
+
+1.20150614  2015-06-14 23:16:46Z
+    - remove useless 'use UNIVERSAL'
+
+1.20140927  2014-09-27 04:21:23Z
+    - fix tests for even newer development versions of Test::More
+
+1.20140824  2014-08-24 05:29:46Z
+    - fix tests that started failing with new development versions of
+      Test::Builder (RT#97468)
+
+1.20120726  2012-07-26 03:51:54Z
+    - updated to work on Perl 5.17.2+ (rjbs)
+
+1.20120418  2012-04-18 19:15:33Z
+    - removed use_ok from tests; it's unnecessary
+
+1.20110613  2011-06-13 21:16:04Z
+    - converted to Dist::Zilla
+
+1.03      2009-06-22 20:42:36Z
+    - improved packaging (Module::Build is now a config_requires dependency)
+
+1.01      2008-08-22 05:29:44Z
+    - minor packaging housekeeping
+    - report only CURRENT ACTUAL BUGS THAT WILL BREAK YOUR CODE AS IT EXISTS
+      RIGHT NOW SO FIX THEM PLEASE rather than latent bugs that will break your
+      code in the future, at least by default
+    - added the verbose flag to fix you about all bugs regarding the use of
+      isa() as a function
+
+0.06      2006-02-24 06:47:14Z
+    - allowed for overridden can()
+    - allowed backwards-compatible use of isa() to check reftype
+    - added Changes and README files
+    - revised internal code for readability
+    - improved documentation slightly
+
+0.05      2005-11-07
+
+0.04      2005-11-05
+
+0.03      2005-11-05
+
+0.02      2005-07-03
+
+0.01      2005-06-30
+    - initial release

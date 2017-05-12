@@ -1,0 +1,80 @@
+﻿qwerty
+QWERTY
+äáêåþÿ			AltGr		(accented Latin)
+ÄÁÊÅÞŸ
+θωερτψ			lControl-lAlt	(Greek)
+ΘΩΕΡΤΨ
+яверты			Mnu		(Russian)
+ЯВЕРТЫ
+קשערתי			rCtrl-Mnu		(Hebrew)
+ֲשֱֵׁטּ
+𝓆𝓌ℯ𝓇𝓉𝓎			AltGr-rCtrl	(math script)
+𝒬𝒲ℰℛ𝒯𝒴
+𝕢𝕨𝕖𝕣𝕥𝕪		𝟙𝟚𝟛𝟜	AltGr-Mnu	(math double-struck)
+ℚ𝕎𝔼ℝ𝕋𝕐
+𝔮𝔴𝔢𝔯𝔱𝔶			AltGr-Mnu-rCtrl	(math fraktur)
+𝔔𝔚𝔈ℜ𝔗𝔜
+
+||–||―||⸓|⸎|⁃|‑||‑|‾|		Alt-F-keys (F1,F3,F5 not working in notepad; Alt-F10 too)
+| | | | | | | | | || | |		  (with Shift; all working but Shift-Alt-F10)
+
+┌┬┐			AltGr
+├┼┤
+└┴┘
+─│			NUMPAD (NumLock) (Shift is not compatible with NumLock!)
+╔╦╗
+╠╬╣
+╚╩╝			AltGr + Mnu
+═║
+╓╥╖			AltGr + rCtrl
+╟╫╢
+╙╨╜
+
+╒╤╕			AltGr + Mnu + rCtrl
+╞╪╡
+╘╧╛
+
+┏┳┓			Mnu
+┣╋┫
+┗┻┛
+━┃
+┎┰┒			Mnu + rCtrl
+┠╂┨
+┖┸┚
+.
+┍┯┑			Currently Alt + rCtrl (eventually, should be just Ctrl)
+┝┿┥
+┕┷┙
+
+▗▄▖			Alt + rCtrl arrows (but in Notepad, cause the insertion point to move; on AltGr + Mnu, likewise???)
+▐█▌
+▝▀▘				Apparently, not now???  Recheck???
+  ↵
+
+
+↖↑↗	÷×‒﬩		Mnu
+←⎯→
+↙↓↘
+ ↔⟷↕			ARROWS (No NumLock)
+
+⇖⇑⇗	∕⨯−∑		Mnu-Shift
+⇐⏐⇒
+⇙⇓⇘
+ ⇔⟺⇕
+================= For testing purposes only; math =========
+𝞱𝟂𝞮𝞺𝞽𝟁		𝟏𝟐𝟑𝟒	Alt-rCtrl		(ssbiGreek + bDigits)
+			uc not working (column 15!)
+
+			Alt-Mnu (not working)	(monospace)
+
+𝑞𝑤𝑒𝑟𝑡𝑦			Ctrl-Mnu			(i)
+𝑄𝑊𝐸𝑅𝑇𝑌
+
+𝒒𝒘𝒆𝒓𝒕𝒚			Ctrl-Alt-Mnu		(bi)
+𝑸𝑾𝑬𝑹𝑻𝒀
+
+𝗾𝘄𝗲𝗿𝘁𝘆		𝟭𝟮𝟯𝟰	Alt-Mnu-rCtrl		(ssb)
+𝗤𝗪𝗘𝗥𝗧𝗬
+
+𝚚𝚠𝚎𝚛𝚝𝚢		𝟷𝟸𝟹𝟺	[if it worked on Alt-Mnu]	(monospace)
+𝚀𝚆𝙴𝚁𝚃𝚈

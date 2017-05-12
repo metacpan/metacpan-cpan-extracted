@@ -1,0 +1,60 @@
+Revision history for URI-ParseSearchString
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+0.02    Fixed a minor bug regarding URI::Split
+0.03    Renames to 0.3 to catch up with PAUSE files
+0.5     Minor changes to documentation
+0.6     Cleaned up code, added some search engines, fixed POD documentation.
+0.7     Added Technorati and Feedster blog search engines support
+0.8     Kwalitee fixes
+0.9     Updated META.yml specs
+0.10    Added Froogle, thanks Brian !
+1.0     First normal version.
+1.1     Fixed a really obscure bug regarding some Google string, thanks Ed !
+1.2     Fixed LISENCE , finally.
+1.3     Fixed yet another weird error with Google.
+1.4     Fixed a prereq 
+1.5     Fixed yet another (harmless) error when matching Google strings that cannot be parsed.
+        Also added a number of tests that use the no warnings test to make sure.
+1.6     Fixed yet another bug with matching Google URL's. Thanks mtm ! 
+1.7     Added support for Megasearching.net , MS's live.com, tesco.net, search.bbc.co.uk, mywebsearch.com and Virgin.net search.
+1.8     Added Orange, NTLworld.
+1.9     Major revamp. New function added to detect search the search engine used. Also added two
+        additional search engines. Now using objects.
+2.0     Even more changes. More functions being exported, more detailed breakdown of
+        information. Special thanks to Lana for the invaluable feedback.
+2.1     Very small fixes, some typos.
+2.2     Changed the ordering of the search engine matching.
+2.3     Added Orange.es, Terra.es, Sweetim, Conduit, Lycos ES, Ozu ES, ICQ, Yahoo Japan, Soso, MyWay, thanks Ruben!
+2.4     Added ilMotore.com, Ithaki.net, Alice.it, Excite, Lycos IT, Libero IT, The Spider IT, Godado IT, Kataweb IT, Simpatico IT, Abacho, Categorico IT (Thanks Ruben and Matteo!)
+2.5     Added Cuil (thanks Ed!)
+2.6     Major cleaning up of code, thanks to Ed for the advice
+        -- The module now uses a hash for the internal mappings between search engine hosts and names. 
+        -- Removed duplicated code from several places.
+        -- added fastweb.it, t-online.de
+2.7     Updated META.yml and abstract
+2.8     Long overdue major rewriting of the code, POD and tests (thanks Menno!)
+        -- added Paglo
+        -- added Mahalo
+        -- added Sproose
+2.9     Added URI as a prereq as it appears some systems get confused.
+3.0     Added a test case for the new Google referrer strings (http://tinyurl.com/dz5mtu)
+3.1     Added MS Bing support (thanks Mark!)
+3.2     Added MS Bing to list of engines (forgot to to so at v. 3.1)
+        Added Sapo from Portugal (Thanks Fransisco) and about 10 more .pt engines and newspapers : Iol, Clix, Aeiou, Rpt, Record, Correiomanha and XL
+        Some improvements over speed (Thanks once more Fransisco)
+        Replaced big engine list with a flat one, easier to read.
+        Added fastbrowsersearch.com and Yahoo answers.
+3.3     No code changes, just POD. Added code to Google code.
+3.3     Added Clusty, In GR, Robby GR, Pathfinder GR, Phantis GR search engines.
+3.4     Fixed POD issue (thanks mtm!)
+3.41    Added Google Ukraine (UA) in the list of Google domains (thanks beho)
+3.42    Added Brazilian search engines (Thanks Alex)
+3.43    Added Conduit (thanks mtm), cleaned up POD
+3.44    Added some Indian search engines (thanks Alex)
+3.441   Code is now on github
+3.442   Added Cuil PT
+3.443   Added Torrentz, Isohunt and BT Junkie
+3.5     Fixed bug with badly formatted strings (thanks mtm)
+3.51    Fixed bug with POD encoding (thanks Andreas)

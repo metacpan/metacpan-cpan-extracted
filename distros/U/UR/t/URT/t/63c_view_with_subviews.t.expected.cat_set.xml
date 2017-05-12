@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<object type="Acme::Cat::Set" id="Acme::Cat/And/owner_id/O:O:111">
+  <display_name>(Acme::Cat::Set  owner_id =&gt; 111)</display_name>
+  <label_name>Set</label_name>
+  <types>
+    <isa type="Acme::Cat::Set"/>
+    <isa type="Acme::Animal::Set"/>
+    <isa type="UR::Object::Set"/>
+    <isa type="UR::Value"/>
+    <isa type="UR::Object"/>
+  </types>
+  <aspect name="members">
+    <object type="Acme::Cat" id="222">
+      <display_name>222</display_name>
+      <label_name>Cat</label_name>
+      <types>
+        <isa type="Acme::Cat"/>
+        <isa type="Acme::Animal"/>
+        <isa type="UR::Object"/>
+      </types>
+    </object>
+    <object type="Acme::Cat" id="333">
+      <display_name>333</display_name>
+      <label_name>Cat</label_name>
+      <types>
+        <isa type="Acme::Cat"/>
+        <isa type="Acme::Animal"/>
+        <isa type="UR::Object"/>
+      </types>
+    </object>
+  </aspect>
+</object>

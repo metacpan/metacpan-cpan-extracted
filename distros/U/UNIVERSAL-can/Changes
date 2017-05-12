@@ -1,0 +1,73 @@
+Revision history for UNIVERSAL::can
+
+1.20140328 2014-03-28 16:21:13-07:00 America/Los_Angeles
+    - eliminated a UNIVERSAL::isa warning
+
+1.20140124 2014-01-24 11:02:04 America/Los_Angeles
+    - added =encoding to POD (thanks to Debian Perl Group)
+
+1.20120726 2012-07-25 20:52:38 America/Los_Angeles
+    - updated to work on Perl 5.17.2+ (rjbs)
+
+1.20110617 2011-06-17 11:45:11 America/Los_Angeles
+    - bumped minimum Perl version to 5.8, as working around 5.6 bugs is not
+      worth the trouble
+
+1.20110614 2011-06-14 15:32:23 America/Los_Angeles
+
+1.20110613 2011-06-12 18:31:27 America/Los_Angeles
+    - fixed RT #63771, buggy triggering of overloading for blessed invocants
+      (found and fixed by Norbert Buchmüller)
+    - migrated to Dist::Zilla
+
+1.16  Thu Jan 14 22:55:10 UTC 2010
+    - applied patch to fix deep recursion crash (RT #49580, Daniel LeWarne)
+
+1.15  Mon Jun 22 20:39:48 UTC 2009
+    - moved Module::Build dependency to config_requires (RT #47165, hdp)
+    - unified licensing between README and module (RT #46934, nhandler)
+
+1.14  Fri Jun 12 19:43:21 UTC 2009
+    - released a new stable version
+    - removed developer tests, custom M::B subclass, and passthrough
+      Makefile.PL
+    - added build_requires
+    - fixed a documentation bug reported by Adam Kennedy (RT #17043)
+    - fixed interaction with SUPER::can() (patch by Peter du Marchie van
+      Voorthuysen in RT #25355)
+
+1.13_001  Sat Dec 29 02:28:33 UTC 2007
+    - warn only when someone has overridden can() but someone else called U::c
+      directly
+
+1.12  Sat Apr  1 06:13:33 UTC 2006
+    - really made Test::Warn optional
+    - moved developer tests to t/developer/
+
+1.11  Fri Feb 10 01:55:59 UTC 2006
+    - made can() export *optional*, as it can break things...
+    - fixed invocant check to use existing code and avoid infinite
+      UNIVERSAL::isa loop
+
+1.10  Fri Feb 10 01:17:56 UTC 2006
+    - worked around weirdness with Test::Warn in the tests
+    - fixed the invalid invocant bug reported by Mark Clements
+    - fixed the tests to test for that bug too...
+    - made the export of can() actually work
+    - added the -always_warn flag to catch all dodgy uses of UNIVERSAL::can()
+
+1.03  Fri Jan 13 04:46:59 UTC 2006
+    - mark minimum dependency on Perl 5.6 (reported by Adam Kennedy)
+    - test for Really Bad Input (also suggested by Adam Kennedy)
+    - fixed invalid input bugs
+
+1.02  Wed Jan 11 00:58:57 UTC 2006
+    - don't eat $@ in can() (RT #17008, reported by martin at hybyte dot com)
+
+1.01  Wed Dec 14 00:19:22 UTC 2005
+    - check for uninitialized invocant (patch from Stevan Little)
+    - squelch unnecessary warnings (wow, a typo!)
+    - added a bit more advice to the documentation
+
+1.00  Sun Jul  3 21:38:47 UTC 2005
+    - First version, released on an unsuspecting world.

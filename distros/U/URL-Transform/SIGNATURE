@@ -1,0 +1,55 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.66.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 dd149f596077733da7b249b0cf907783eb78dd2b Build.PL
+SHA1 30e0a0baa46e73d0c8641dcdfc5ff3ef4d3d6dc7 Changes
+SHA1 c781d094fa375d0ec47490af1dd8a2ba20b6232f MANIFEST
+SHA1 80243793ae4f84d077d397b39d91ef91e828c8a6 META.json
+SHA1 3f3bea42cf8398d72e6c30ba4ab72fc769d9cf92 META.yml
+SHA1 32f3410ec46293911fed73567cbbebc1121b6ac4 README
+SHA1 92743e4c107ec881ce4f0b6383f13d3f1775a912 lib/URL/Transform.pm
+SHA1 03fa434db4769eb14994b6e95d0f77032c834afa lib/URL/Transform/SAX/Filter.pm
+SHA1 3b1cf065f80544b1f077e2e1d83a10200f5da081 lib/URL/Transform/using/CSS/RegExp.pm
+SHA1 7e910692d09dd423b30414fb793fc367f23cc91b lib/URL/Transform/using/HTML/Meta.pm
+SHA1 ea551dabc8d99a27076b8ed85aa3833c0074cfcf lib/URL/Transform/using/HTML/Parser.pm
+SHA1 25a0264e49e24b32b1dce2a517520a7ba53e0fa4 lib/URL/Transform/using/Remove.pm
+SHA1 51c6c7d39b01a08ca52d82835d8aa0998be232af lib/URL/Transform/using/XML/SAX.pm
+SHA1 cf55e0d3c930307bb64fb649e6541ad32f84f079 t/01_URL-Transform.t
+SHA1 fc670f188ea2d8fb53374d99a7984132fb100bd7 t/02_URL-Transform-using-CSS-RegExp.t
+SHA1 ade67dbad5d0b6d7f9dcc440fb5b3fadb04f3a0b t/02_URL-Transform-using-Remove.t
+SHA1 88b58d438565ea8e2623d049f47cb171f524502b t/02_URL-Transform-using-XML-SAX.t
+SHA1 95e607d44bc774d319f25add95159b988d1feac3 t/data/URL-Transform-01-result.html
+SHA1 5a3b9a90405bf30b10fd339c7dfca9fbceb954e1 t/data/URL-Transform-01.html
+SHA1 4aac8eb4ba470081090d67b4f7b547384993f36e t/data/URL-Transform-02.html.gz
+SHA1 fe475b21effd3225ca791102433687bd46597b33 t/data/URL-Transform-03-result.html
+SHA1 c9778809b2f568d0d6037cdc4476475bc3f55d9d t/data/URL-Transform-03.html
+SHA1 e80c30ad152185ad92950333ed95e90d9f193f08 t/data/URL-Transform-04-result.html
+SHA1 041af72b9f08c31983edec1f1898f8a0368a2fda t/data/URL-Transform-04.html
+SHA1 8b45640d6801e70cc40e1810d3a52a60283057c1 t/data/URL-Transform-05-result.html
+SHA1 6ffc29d804d14e5aa013dbfe9e5fa4dddcb504a0 t/data/URL-Transform-05.html
+SHA1 76ce276052d18d4b113e32b8a0ae651668179016 t/data/URL-Transform-06-result.html
+SHA1 22a3f893ac8000c84adcae0b464142b49b99e9a5 t/data/URL-Transform-06.html
+SHA1 41533fbd463e42d2ecf1e119eca910c16809d13e t/distribution.t
+SHA1 0b1c5a2d59be6bfa7d60c64cd964fea6a0331705 t/pod-coverage.t
+SHA1 e1bde21123b4fc24525b3dd4200f046066c432f6 t/pod-spell.t
+SHA1 640935336dc1123c0069bcf5432bcaedc2cf22d3 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAk24WI8ACgkQC0OgUPgL2SdwdQCfc/l8mh7/krmZnvsIYoSlq02r
+JRYAniVAeRInx2qrtih6+Hjzi8aL+vtd
+=yUgF
+-----END PGP SIGNATURE-----

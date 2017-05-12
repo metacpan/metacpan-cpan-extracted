@@ -1,0 +1,30 @@
+0.303   2017-04-25
+  * If input string can fit in size, don't perform truncation (issue #2)
+
+0.302   2015-02-01
+  * Don't require Test::ZeroCopy for testing
+
+0.301   2015-01-13
+  * Fix docs
+
+0.300   2015-01-13
+  * Use Inline::Module::LeanDist instead of Inline::Module
+
+0.200   2015-01-09
+  * Passes unicode's GraphemeBreakTest.txt test-cases
+  * Inline::Filters::Uniprops2Ragel
+  * Rewrite perl wrapper in C
+  * In-place mode
+  * Lots more error checking and decent test coverage
+  * Docs
+
+0.102   2015-01-02
+  * Use Inline::Filters::* plug-in infrastructure
+
+0.101   2014-12-30
+  * Use Inline::Module's new "bundle => 0" feature (thanks Ingy)
+  * Tweak docs a bit
+  * dev prereqs
+
+0.100   2014-12-30
+  * Initial CPAN release

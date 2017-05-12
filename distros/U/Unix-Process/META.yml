@@ -1,0 +1,29 @@
+--- #YAML:1.0
+name:               Unix-Process
+version:            1.3101
+abstract:           ~
+author:
+    - Paul Miller <jettero@cpan.org>
+license:            lgpl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    IPC::System::Simple:  0
+    perl:                 5.008
+resources:
+    repository:  http://github.com/jettero/unix--process
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.50
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4
+keywords:
+    - ps
+    - process
+    - unix

@@ -1,0 +1,43 @@
+Uniq version 0.01
+=================
+
+Uniq is a pure perl module. It exports the following modules.
+
+    Method name			Uniq shell equivalant
+    uniq			uniq
+    dups			uniq -d
+    distinct			uniq -u
+
+
+For those who do not familiar with unix shells, here is more verbose
+explanation.
+
+    uniq	Eliminates multiple occurances of values from input.
+    dups	Reports what values appear more than once in input.
+    distinct	Reprts only those values that are not duplicated.
+
+    If your input is say @list = qw ( 1, 2, 2, 3, 4, 4, 5 );
+    uniq @list returns a list ( 1, 2, 3, 4, 5 )
+    dups @list returns a list ( 2, 4 )
+    and 
+    distinct @list returns a list (1,3,5)
+    
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+  None.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Syamala Tadigadapa
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 

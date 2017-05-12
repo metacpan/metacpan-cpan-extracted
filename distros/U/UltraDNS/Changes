@@ -1,0 +1,13 @@
+=head1 NAME
+
+Changes - List of significant changes to the UltraDNS module
+
+(As of $Date: 2008-09-01 22:45:51 +0100 (Mon, 01 Sep 2008) $ $Revision: 11719 $)
+
+=cut
+
+=head1 Changes in UltraDNS 1.00
+
+  First production-ready release.
+
+=cut

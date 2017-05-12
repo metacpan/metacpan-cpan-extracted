@@ -1,0 +1,98 @@
+Revision history for Perl extension Ukigumo-Server
+
+v2.1.4 2015-01-23T12:04:05Z
+
+    - Add lacked dependent module (Thank you for reporting, @hfm)
+
+v2.1.3 2014-04-30T06:45:34Z
+
+    [Feature]
+    - Support duration graph view
+
+    [Bug Fix]
+    - Fix to show 404 on not found
+
+v2.1.2 2014-04-08T07:07:29Z
+
+    - Show build ID column in tables
+    - Show elapsed time column in tables
+
+v2.1.1 2014-04-06T14:50:51Z
+
+    - Support STATUS_TIMEOUT
+
+v2.1.0 2014-04-05T05:45:25Z
+
+    - Fix the bug that does not work on Windows (tokuhirom)
+    - Generate RSS feeds (mattn)
+    - Prefer "project [branch](rivision)" to be same as /recent (mattn)
+    - (*** INCOMPATIBLE CHANGE / ALTER DATABASE SCHEMA IS REQUIRED ***) Change to store elapsed time (moznion)
+
+v2.0.3 2014-03-17T15:23:28Z
+
+    - Fix mojibake
+    - Suppress warning message by encoding undef value
+    - Remove some escape sequences from reports
+    - Add documentation for report compression
+
+v2.0.2 2014-03-14T14:35:53Z
+
+    - Change option name to limit number of reports
+    - Upgrade SQL schemas
+    - Fix documentations
+
+v2.0.1 2014-03-13T15:32:55Z
+
+    - Add screen shot in documentation
+    - Formal release! (Not UNAUTHORIZED)
+
+v2.0.0 2014-03-13T10:41:14Z
+
+    - Delete old reports for keeping DB file size constant
+      (cho45)
+    - Compress body and vc_log with enable_compression option
+      (cho45)
+    - Support compare_url (for GitHub webhooks)
+      *** YOU MUST ALTER DETABASE SCHEMA ***
+      (moznion)
+
+v1.1.0 2014-02-20T10:33:14Z
+
+    commit 95b7e83c6d51382b8cbc59ad77c90bddca01d964
+    Author: cho45 <cho45@lowreal.net>
+    Date:   Thu Feb 20 14:07:25 2014 +0900
+
+    Coloring console output
+
+    commit dc5eab639fe82d3a8fd530f97496d4164535d1cb
+    Author: Takumi Sakamoto <takumi.saka@gmail.com>
+    Date:   Thu Jan 23 02:57:24 2014 +0900
+
+    Use Teng instead of SQL::Interp
+
+    commit 413e05bb9ae174dbb1afe7398a137d426a7d17ec
+    Author: sakamoto-takumi <takumi.saka@gmail.com>
+    Date:   Sun Oct 6 02:53:04 2013 +0900
+
+    Listing only current failures
+
+v1.0.2 2013-11-02T09:27:19Z
+
+    - Fixed deps, again.
+      (tokuhirom)
+
+v1.0.1 2013-11-02T00:25:05Z
+
+    - fixed cpanfile
+      (songmu)
+
+v1.0.0 2013-10-03T16:58:42Z
+
+    - Switch to Kolon syntax
+    - Remove deps on Text::Xslate::Bridge::TT2Like
+
+
+0.01 2013-10-03T02:12:17Z
+
+    - original version
+

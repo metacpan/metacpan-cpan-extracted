@@ -1,0 +1,23 @@
+Revision history for Perl extension URI::Escape::JavaScript
+
+  0.04  Fri Mar  5 11:13:41 2010
+        - fixed in unescape(), was failed unescaping if the argument string
+          was included some escaped patterns that are able to be seen a long
+          (over 4 characters) hexdecimal string.
+          currently, it substitutes only 4 characters behind "%u" to
+          an unescaped character.
+          (reported by Marinus).
+          https://rt.cpan.org/Ticket/Display.html?id=55175
+
+  0.03  Thu Apr 23 19:01:27 2009
+        - fixed in unescape(), if odd number hexadecimal characters are
+          placed on behind "%u", it will be failed to capture.
+          (patches from Tom).
+
+  0.02  Thu Jan 25 11:11:10 2007
+        - added js_escape() and js_unescape() functions
+          (suggested by Mark Donovan).
+        - Pod fix.
+
+  0.01  Fri Jan 19 15:43:12 2007
+        - original version

@@ -1,0 +1,3 @@
+* UDP video protocol
+    * Change heartbeat to be sent periodically by client without prompting
+    * No more Heartbeat flag

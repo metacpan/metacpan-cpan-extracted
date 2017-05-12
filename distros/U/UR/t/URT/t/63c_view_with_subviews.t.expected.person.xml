@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<object type="Acme::Person" id="111">
+  <display_name>111</display_name>
+  <label_name>Person</label_name>
+  <types>
+    <isa type="Acme::Person"/>
+    <isa type="Acme::Animal"/>
+    <isa type="UR::Object"/>
+  </types>
+  <aspect name="name">
+    <value>Fester</value>
+  </aspect>
+  <aspect name="age">
+    <value>99</value>
+  </aspect>
+  <aspect name="cats">
+    <object type="Acme::Cat" id="222">
+      <display_name>222</display_name>
+      <label_name>Cat</label_name>
+      <types>
+        <isa type="Acme::Cat"/>
+        <isa type="Acme::Animal"/>
+        <isa type="UR::Object"/>
+      </types>
+      <aspect name="name">
+        <value>fluffy</value>
+      </aspect>
+      <aspect name="age">
+        <value>2</value>
+      </aspect>
+      <aspect name="fluf">
+        <value>11</value>
+      </aspect>
+      <aspect name="owner">
+        <object type="Acme::Person" id="111">
+          <display_name>111</display_name>
+          <label_name>Person</label_name>
+          <types>
+            <isa type="Acme::Person"/>
+            <isa type="Acme::Animal"/>
+            <isa type="UR::Object"/>
+          </types>
+        </object>
+      </aspect>
+    </object>
+    <object type="Acme::Cat" id="333">
+      <display_name>333</display_name>
+      <label_name>Cat</label_name>
+      <types>
+        <isa type="Acme::Cat"/>
+        <isa type="Acme::Animal"/>
+        <isa type="UR::Object"/>
+      </types>
+      <aspect name="name">
+        <value>nestor</value>
+      </aspect>
+      <aspect name="age">
+        <value>8</value>
+      </aspect>
+      <aspect name="fluf">
+        <value>22</value>
+      </aspect>
+      <aspect name="owner">
+        <object type="Acme::Person" id="111">
+          <display_name>111</display_name>
+          <label_name>Person</label_name>
+          <types>
+            <isa type="Acme::Person"/>
+            <isa type="Acme::Animal"/>
+            <isa type="UR::Object"/>
+          </types>
+        </object>
+      </aspect>
+    </object>
+  </aspect>
+</object>

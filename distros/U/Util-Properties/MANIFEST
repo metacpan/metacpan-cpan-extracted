@@ -1,0 +1,16 @@
+Build.PL
+Makefile.PL
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+README
+lib/Util/Properties.pm
+lib/Util/Properties/Combine.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+t/combined-1.t
+t/Util-Properties.t
+t/data/l1.properties
+t/data/p1.properties
+t/data/p2.properties

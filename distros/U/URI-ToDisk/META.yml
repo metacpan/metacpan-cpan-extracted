@@ -1,0 +1,25 @@
+--- 
+abstract: An object for mapping a URI to an on-disk storage directory
+author: 
+  - Adam Kennedy L<http://ali.as/>, cpan@ali.as
+build_requires: 
+  File::Spec: 0.80
+  Test::More: 0.47
+distribution_type: module
+generated_by: Module::Install version 0.68
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: URI-ToDisk
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Clone: 0.21
+  List::Util: 1.11
+  Params::Util: 0.10
+  URI: 0
+  perl: 5.005
+version: 1.12

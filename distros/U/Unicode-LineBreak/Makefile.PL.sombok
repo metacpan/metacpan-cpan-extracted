@@ -1,0 +1,70 @@
+#-*- perl -*-
+#-*- coding: us-ascii -*-
+
+use ExtUtils::MakeMaker;
+use Cwd;
+
+my $define = '';
+$define .= ' -DWIN32 -DPERL_STATIC_SYMS' if ($^O eq 'MSWin32');
+
+my $pwd = cwd();
+
+WriteMakefile(
+    NAME      => 'sombok', # (doesn't matter what the name is here) oh yes it does
+    DEFINE    => $define,
+    INC       => "\"-I\$(PERL_INC)\" \"-I$pwd\$(DIRFILESEP)include\" @LIBTHAI_INC@", # force PERL_INC dir ahead of system -I's
+    SKIP      => [qw(dynamic dynamic_lib dlsyms)],
+    OBJECT    => '$(O_FILES)',
+    clean     => {'FILES' => 'libsombok$(LIB_EXT)'},
+    H         => [qw(include/sombok.h include/sombok_constants.h $(PERL_INC)/config.h)],
+    C         => [qw(lib/break.c lib/charprop.c lib/gcstring.c lib/linebreak.c lib/southeastasian.c lib/utf8.c lib/utils.c lib/@UNICODE_VERSION@.c)]
+);
+
+sub MY::constants {
+    package MY;
+    my $self = shift;
+
+    $self->{INST_STATIC} = 'libsombok$(LIB_EXT)';
+
+    return $self->SUPER::constants();
+}
+
+sub MY::top_targets {
+    my $r = '
+all :: static
+	$(NOECHO) $(NOOP)
+
+config ::
+	$(NOECHO) $(NOOP)
+
+lint:
+	lint -abchx $(LIBSRCS)
+
+pure_all ::
+	$(NOECHO) $(NOOP)
+
+';
+    $r .= '
+# This is a workaround, the problem is that our old GNU make exports
+# variables into the environment so $(MYEXTLIB) is set in here to this
+# value which can not be built.
+sombok/libsombok.a:
+	$(NOECHO) $(NOOP)
+' unless $^O eq 'VMS';
+
+    return $r;
+}
+
+sub MY::c_o {
+    package MY;
+    my $self = shift;
+    my $inherited = $self->SUPER::c_o(@_);
+    $inherited =~ s{(:\n\t)(.*(?:\n\t.*)*)}
+	{ $1 . $self->cd('lib', split /(?<!\\)\n\t/, $2) }eg;
+    $inherited =~ s{(\s)(\$\*\.c\s)}
+	{ "$1..\$(DIRFILESEP)$2" }eg;
+    $inherited =~ s{(-o\s)(\$\*\$\(OBJ_EXT\))}
+	{ "$1..\$(DIRFILESEP)$2" }eg;
+    $inherited;
+}
+

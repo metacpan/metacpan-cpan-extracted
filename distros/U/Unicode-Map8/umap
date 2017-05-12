@@ -1,0 +1,298 @@
+#!/usr/bin/perl -w
+
+=head1 NAME
+
+umap - map between different character sets
+
+=head1 SYNOPSIS
+
+ umap [options] <before>:<after>
+
+=head1 DESCRIPTION
+
+The I<umap> script acts as a filter between different encodings and
+character sets.
+
+The following options are recognized:
+
+=over 4
+
+=item --list [charset]
+
+Without argument list all character sets recognized.  With a specified
+character set list the mapping between this set and Unicode.
+
+=item --strict
+
+Do the stict mapping between the character sets.  The default is to
+not translate unmapped character.  With I<--stict> we will remove
+unmapped characters or use the default specified with I<--def8> or
+I<--def16>.
+
+=item --def8=<charcode>
+
+Set the default 8-bit code for unmapped chars.
+
+=item --def16=<charcode>
+
+Set the default 16-bit code for unmapped chars.
+
+=item --verbose
+
+Generate more verbose output.
+
+=item --version
+
+Print the version number of this program and quit.
+
+=item --help
+
+Print the usage message.
+
+=back
+
+=head1 SEE ALSO
+
+L<Unicode::String>,
+L<Unicode::Map8>,
+recode(1)
+
+=head1 COPYRIGHT
+
+Copyright 1998 Gisle Aas.
+
+This is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut
+
+
+use strict;
+use Getopt::Long  qw(GetOptions);
+
+my $VERSION = "1.05";
+
+my $list;
+my $strict;
+my $verbose;
+my $def8;
+my $def16;
+my $before;
+my $after;
+
+GetOptions('version' => \&print_version,
+	   'help'    => \&usage,
+	   'list:s'  => \$list,
+	   'verbose' => \$verbose,
+	   'strict!' => \$strict,
+	   'def8=i'  => \$def8,
+	   'def16=i' => \$def16,
+	  ) || usage ();
+
+
+if (defined $list) {
+    if (length($list)) {
+	list_charset($list);
+    } else {
+	list_charsets();
+    }
+    exit;
+}
+
+# Try to extract $before/$after from the remaining arguments
+$before = shift || $ENV{UMAP_BEFORE} || "latin1";
+if (!@ARGV && $before =~ s/([^\\]):/$1\0/) {
+    ($before, $after) = split('\0', $before, 2);
+}
+unless ($after) {
+    $after  = shift || $ENV{UMAP_AFTER}  || "utf8";
+}
+for ($before, $after) {
+    s/\\:/:/g;
+}
+usage() if @ARGV;
+
+print STDERR "$before --> $after\n" if $verbose;
+
+
+#------------------------------------------------------------------
+package MySpace;  # use a new namespace
+
+use Unicode::String 2.00 qw(ucs4 ucs2 utf16 utf7 utf8);
+
+my $bsub = \&{$before};
+
+unless (defined(&$bsub)) {
+    require Unicode::Map8;
+    my $map = Unicode::Map8->new($before);
+    die "Don't know about charset '$before'\n" unless $map;
+    $map->nostrict unless $strict;
+    $map->default_to16($def16) if defined($def16);
+    no strict 'refs';
+    *{$before} = sub {	$map->tou($_[0]); };
+}
+
+if ($after =~ /^(ucs[24]|utf16|utf[78])$/) {
+    *out = sub { print $_[0]->$after(); };
+} elsif ($after eq "hex") {
+    *out = sub {
+	my $hex = $_[0]->hex;
+	$hex =~ s/U\+000a\s*/U+000a\n/g;
+	print $hex;
+    };
+} elsif ($after eq "uname") {
+    require Unicode::CharName;
+    *out = sub {
+	for ($_[0]->unpack) {
+	    printf "U+%04X   %s\n", $_, Unicode::CharName::uname($_) || "";
+	}
+    };
+} else {
+    require Unicode::Map8;
+    my $map = Unicode::Map8->new($after);
+    die "Don't know about charset '$after'\n" unless $map;
+    $map->nostrict unless $strict;
+    $map->default_to8($def8) if defined($def8);
+    #*out = sub { print $map->to8(${$_[0]}); };
+    *out = sub { print $map->to8(${$_[0]}); };
+}
+
+if (-t STDIN || $before =~ /^utf[78]$/) {
+    # must read a line at the time (should not break encoded chars)
+    my $line;
+    while (defined($line = <STDIN>)) {
+	out(&$bsub($line));
+    }
+} else {
+    my $n;
+    my $buf;
+    # must read buffers which are multiples of 4 bytes (ucs4)
+    while ( $n = read(STDIN, $buf, 512)) {
+	#print "$n bytes read\n";
+	out(&$bsub($buf));
+    }
+}
+
+
+#------------------------------------------------------------------
+package main;
+
+sub list_charset
+{
+    require Unicode::Map8;
+    require Unicode::CharName;
+
+    my($charset, $format) = @_;
+    my $m = Unicode::Map8->new($charset);
+    die "Don't know about charset $charset\n" unless $m;
+
+    my @res8;
+    my %map16;
+    for (my $i = 0; $i < 256; $i++) {
+	my $u = $m->to_char16($i);
+	if ($u == Unicode::Map8::NOCHAR()) {
+	    push(@res8, sprintf "# 0x%02X unmapped\n", $i) if $verbose;
+	} else {
+	    push(@res8, sprintf "0x%02X 0x%04X   # %s\n", $i, $u,
+		                               Unicode::CharName::uname($u));
+	    $map16{$u} = $i;
+	}
+    }
+
+    my @res16;
+    my @blocks;
+    for (my $block = 0; $block < 256; $block++) {
+	next if $m->_empty_block($block);
+	push(@blocks, $block);
+	for (my $i = 0; $i < 256; $i++) {
+	    my $u = $block*256 + $i;
+	    my $c = $m->to_char8($u);
+	    next if $c == Unicode::Map8::NOCHAR();
+	    next if exists $map16{$u} && $map16{$u} == $c;
+	    push(@res16, sprintf "0x%02X 0x%04X   # %s\n", $c, $u,
+		                                Unicode::CharName::uname($u));
+	}
+    }
+
+    print "# Mapping for '$charset'\n";
+    print "#\n";
+    printf "# %d allocated blocks", scalar(@blocks);
+    if (@blocks > 1 || $blocks[0] != 0) {
+	print " (", join(", ", map  "#".($_+1), @blocks), ")";
+    }
+    print "\n";
+    print "#\n";
+    print @res8;
+
+    if (@res16) {
+	print "\n# Extra 16-bit to 8-bit mappings\n";
+	print @res16;
+    }
+}
+
+
+sub list_charsets
+{
+    require Unicode::Map8;
+    my %set = (
+	       ucs4 => {},
+	       ucs2 => {utf16 => 1},
+	       utf7 => {},
+	       utf8 => {},
+	      );
+    if (opendir(DIR, $Unicode::Map8::MAPS_DIR)) {
+	my $f;
+	while (defined($f = readdir(DIR))) {
+	    next unless -f "$Unicode::Map8::MAPS_DIR/$f";
+	    $f =~ s/\.(?:bin|txt)$//;
+	    $set{$f} = {} if Unicode::Map8->new($f);
+	}
+    }
+
+    my $avoid_warning = keys %Unicode::Map8::ALIASES;
+    while ( my($alias, $charset) = each %Unicode::Map8::ALIASES) {
+	if (exists $set{$charset}) {
+	    $set{$charset}{$alias} = 1;
+	} else {
+	    warn "$charset does not seem to exist (aliased as $alias)\n";
+	}
+    }
+
+    for (sort keys %set) {
+	print "$_";
+	if (%{$set{$_}}) {
+	    print " ", join(" ", sort keys %{$set{$_}});
+	}
+	print "\n";
+    }
+}
+
+
+sub print_version
+{
+    require Unicode::Map8;
+    my $avoid_warning = $Unicode::Map8::VERSION;
+    print <<"EOT";
+This is umap version $VERSION (Unicode-Map8-$Unicode::Map8::VERSION)
+
+Copyright 1998, Gisle Aas.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+EOT
+    exit 0;
+}
+
+
+sub usage
+{
+    (my $progname = $0) =~ s,.*/,,;
+    die "Usage:\t$progname [options] <before>:<after>
+The options are:
+  --list [charset]    list character sets
+  --strict            use the strict mapping
+  --def8 <code>       default 8-bit code for unmapped chars
+  --def16 <code>      default 16-bit code for unmapped chars
+  --version           print version number and quit
+";
+}

@@ -1,0 +1,93 @@
+NAME
+    Unicode::Util - Unicode grapheme-level versions of core Perl functions
+
+VERSION
+    This document describes Unicode::Util v0.10.
+
+SYNOPSIS
+        use Unicode::Util qw( grapheme_length grapheme_reverse );
+
+        # grapheme cluster ю́ (Cyrillic small letter yu, combining acute accent)
+        my $grapheme = "ю\x{301}";
+
+        say length($grapheme);           # 2 (length in code points)
+        say grapheme_length($grapheme);  # 1 (length in grapheme clusters)
+
+        # Spın̈al Tap; n̈ = Latin small letter n, combining diaeresis
+        my $band = "Spın\x{308}al Tap";
+
+        say scalar reverse $band;     # paT länıpS
+        say grapheme_reverse($band);  # paT lan̈ıpS
+
+DESCRIPTION
+    This module provides versions of core Perl string functions tailored to
+    work on Unicode grapheme clusters, which are what users perceive as
+    characters, as opposed to code points, which are what Perl considers
+    characters.
+
+FUNCTIONS
+    These functions all operate on character strings, not byte strings. They
+    are implemented using the "\X" character class, which was introduced in
+    Perl v5.6 and significantly improved in v5.12 to properly match Unicode
+    extended grapheme clusters. An example of a notable change is that CR+LF
+    <0x0D 0x0A> is now considered a single grapheme cluster instead of two.
+    For that reason, as well as additional Unicode improvements, Perl v5.12
+    or greater is strongly recommended, both for use with this module and as
+    a language in general.
+
+    These functions may each be exported explicitly or by using the ":all"
+    tag for everything.
+
+    grapheme_length($string)
+    grapheme_length
+        Works like "length" except the length is in number of grapheme
+        clusters.
+
+    grapheme_chop($string)
+    grapheme_chop(@array)
+    grapheme_chop(%hash)
+    grapheme_chop
+        Works like "chop" except it operates on the last grapheme cluster.
+
+    grapheme_reverse($string)
+    grapheme_reverse(@list)
+    grapheme_reverse
+        Works like "reverse" except it reverses grapheme clusters in scalar
+        context.
+
+    grapheme_index($string, $substring, $position)
+    grapheme_index($string, $substring)
+        Works like "index" except the position is in grapheme clusters.
+
+    grapheme_rindex($string, $substring, $position)
+    grapheme_rindex($string, $substring)
+        Works like "rindex" except the position is in grapheme clusters.
+
+    grapheme_substr($string, $offset, $length, $replacement)
+    grapheme_substr($string, $offset, $length)
+    grapheme_substr($string, $offset)
+        Works like "substr" except the offset and length are in grapheme
+        clusters.
+
+SEE ALSO
+    *   Unicode::GCString - String as sequence of UAX #29 grapheme clusters
+
+    *   Perl6::Str - Grapheme-level string implementation for Perl 5
+
+    *   String::Multibyte - Manipulation of multibyte character strings
+
+    *   <http://www.unicode.org/reports/tr29/> - UAX #29: Unicode Text
+        Segmentation
+
+    *   <http://perlcabal.org/syn/S32/Str.html> - Perl 6 Synopsis 32:
+        Setting Library—Str
+
+AUTHOR
+    Nick Patch <patch@cpan.org>
+
+COPYRIGHT AND LICENSE
+    © 2011–2013 Nick Patch
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

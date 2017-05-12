@@ -1,0 +1,1974 @@
+=encoding UTF-8
+
+=head1 NAME
+
+UI::KeyboardLayout::izKeys - example keyboard layout generated with L<UI::KeyboardLayout>
+
+=head1 SYNOPSIS
+
+  #!/usr/bin/perl -wC31
+  use UI::KeyboardLayout; 
+  use strict;
+  
+  UI::KeyboardLayout::->set_NamesList("$ENV{HOME}/Downloads/NamesList.txt", 
+  				      "$ENV{HOME}/Downloads/DerivedAge.txt"); 
+  my $l = UI::KeyboardLayout::->new_from_configfile('examples/izKey.kbdd');
+  for my $F (qw(US CyrillicPhonetic Greek Hebrew)) {		
+  	# Open file, select() 
+    print $l->fill_win_template(1,[qw(faces US)]);
+    $l->print_coverage(q(US));
+  }
+
+=head1 AUTHORS
+
+Ilya Zakharevich, ilyaz@cpan.org
+
+=head1 Design goals
+
+Design goals for izKeys keyboard group:
+
+=over 4
+
+=item 0
+
+No gotchas for people who cannot remember anything.
+
+=item 1
+
+Doing 3-4 experiments, one must be able to find most (80-90% achievable?) of covered characters
+knowing only a handful of general rules for "position allocation" [*].
+
+  [*] Currently it is unclear if the general rules may be shared by all the "application domains".
+      For example, to access our layout this way, one needs to know different "handfuls" of allocation rules
+      for Ancient Greek than for Math Symbols.
+
+=item 2
+
+Gradual degradation: the fewer rules one can keep in mind, the narrower repertoir of characters is
+*easily* accessible; but "more cumbersome" ways to access characters should be available if they
+are easier to keep in mind.  So people who can remember have access to easier typing experience,
+but the covered repertoir should not change much.
+
+=item 3
+
+Have most (70%-80% achievable?) of covered characters available in easy-to-remember positions.
+
+=item 4
+
+Have whole coverage of certain ranges of Unicode.
+
+=back
+
+B<[What follows describes a pretty old version of layouts; see L<the current one|http://k.ilyaz.org/windows/izKeys-visual-maps.html#goals-progress>]>  Currently achieved (ranges as of Unicode v6.1):
+
+=over 4
+
+=item *
+
+One gotcha (with Shift-SPACE) comparing to US and Russian Phonetic keyboards;
+
+=item *
+
+Full coverage of Latin-based scripts (according to Wikipedia), Latin-n repertoirs of ISO 8859, and MES-1 (except for arrows);
+
+=item *
+
+Full coverage of Greek Unicode ranges and Greekish stuff of MES-3B (polytonic and esoteric characters need double prefix keys);
+
+=item *
+
+97% coverage of Cyrillic ranges (except for: lc/uc pairs for ԕԡԣꙣꙥꚁ;
+from the Latin personality: titlo-chars, 10ⁿ-combiners and most esoteric chars need double prefix keys);
+
+=item *
+
+Full coverage of currency symbols;
+
+=item *
+
+Full coverage of vulgar fractions;
+
+=item *
+
+Full coverage of Coptic alphabet (via double prefix keys);
+
+=item *
+
+Full coverage of characters covered by EurKey/Bépo keyboards (except arrows and combining 0302, 030a);
+
+=item *
+
+50% coverage of math symbols in BMP (the most useful implemented first);
+
+=item *
+
+Full coverage of double-accented letters of MES-3b;
+
+=item *
+
+Full coverage of non-modifiers/combiners of IPA and UPA;
+
+=item *
+
+Full coverage of obsolete-IPA and case-extended IPA;
+
+=item *
+
+Latin and Cyrillic personalities;
+
+=item *
+
+Visual bell to report unrecognized/unsupported combinations;
+
+=item *
+
+Documentation of the allocation rules scattered over different files/sections.
+
+=back
+
+Not yet implemented, or lost by upgrades to other goals:
+
+=over 4
+
+=item *
+
+Clear documentation of the allocation rules (needed for "goal 1" above).
+
+=item *
+
+Greek personality;
+
+=item *
+
+The "compose" prefix key + access by human-guessable sequence of Latin chars;
+
+=item *
+
+Full coverage of Cyrillic;
+
+=item *
+
+Full coverage of IPA (both visually, and by structure properties of the described sounds) and UPA;
+
+=item *
+
+Full coverage of spacing modifiers and combining characters for Latin scripts, and for symbols
+(had it before Blue keys were implemented);
+
+=item *
+
+Full coverage of Unicode's paleo-Latin characters;
+
+=item *
+
+Full (is it compatible with other goals???) coverage of math symbol ranges in BMP;
+
+=item *
+
+Full coverage of Math Fractur, uc Math Double-Strike and Math Script English letters (would need to abandon kbdutool...);
+
+=item *
+
+reasonable coverage of arrows;
+
+=item *
+
+reasonable coverage of ASCII/Unicode drawing characters;
+
+=item *
+
+Full coverage of non-Eastern characters covered by Neo keyboard, and X11+Neo composition tables;
+
+=item *
+
+Full coverage of MES-2 (currently 7 arrows + ⌠⌡ + 48 box drawing symbols missing);
+
+=item *
+
+Easy-to-describe quick access to Vietnamese characters (seems to be present - needs documentation).
+
+=back
+
+Possible roadmaps:
+
+=over
+
+=item *
+
+Full coverage of Hebrew (and a personality?)
+
+=item *
+
+What about other scripts with "small repertoir" of characters (such as arabic with 62 access points on the M$ keyboard; indic)?
+
+=back
+
+=head1 Personalities of keyboard
+
+=head2 General architecture
+
+Currently, there are four personalities: one for continuous typing in Latin scripts, 
+and one for Cyrillic scripts.  All access practically the same character repertoirs,
+but to access an individual "out-of-personality" letter one must use a prefix key
+C<Shift-SPACE>.  To type several such keys in a row, it is more convenient to switch
+to the other personality — such switch is performed using OS/Windowing-system specific 
+ways (via hotkeys, or via mouse clicks on the "Language bars").
+
+Currently, the result of a key press is governed by two modifiers: C<Shift> and C<AltGr>; 
+so a key may generate 4 characters.  On letter keys, C<Shift> changes a case; so there are 2 case
+pairs assigned to a key (the I<"base"> character, and I<"alternative"> one); on symbols, 
+there is usually no relationship between C<Shift>ed and unC<Shift>ed symbols (compare
+C</> and C<?> on the US keyboard); to compensate for this, a lot of effort goes to make
+C<AltGr>-ing a key to have more logical connections.
+
+Every personality has a few personality-specific prefix keys (to access accented and other
+"more exotic" characters of Latin/Cyrillic scripts).  Additionally, there are prefix keys to access
+"common pools" of extra characters (so-called I<Green Keys>, Greek, Business symbols
+etc).  To finish, there is a common "C<AltGr>-access" prefix key which emulates pressing
+the C<AltGr>-modifier with the key (especially useful when an application or a system
+steals some particular C<AltGr-letter> combinations to become hotkeys).  (Currently,
+this prefix key is C<AltGr-Shift-SPACE>.)
+
+=head2 The Base Layer of Latin Personality
+
+This base layer is identical to L<US keyboard|http://en.wikipedia.org/wiki/Keyboard_layout#United_States>.
+In particular, there is no prefix keys on
+the base layer (except C<Shift-SPACE>!); all other prefix keys require pressing
+C<AltGr>-modifier.  So there is no gotchas with this leyout if one does not use
+C<AltGr>-modifier or C<Shift-SPACE>.
+
+B<NOTE:> Many people do not realize this, but I<there is> one scenario where people
+actually press C<Shift-SPACE>: it happens when typing B<CAPITALIZED PHRASES> by keeping 
+C<Shift> pressed all the time.  When C<Shift-SPACE> is a prefix key, when
+pressed between B<ZED> and B<PHR> in B<CAPITALIZED PHRASES>, it would consume the following
+keypress for B<P>.  In particular, the SPACE will not entered, and instead of B<P>  
+the Cyrillic counterpart B<П> will appear.  Since the result B<CAPITALIZEDПHRASES>
+differs so much from the original, such situations are easy to recognize and compensate
+for.
+
+=head2 C<AltGr>-access to Latin-1 characters
+
+The most widely used Latin characters outside the L<ISO basic Latin alphabet|http://en.wikipedia.org/wiki/ISO_basic_Latin_alphabet> 
+(which is the PC name for "English Alphabet") are made
+accessible via C<AltGr>-modifier.  The leading principle of assigning positions to these
+letters is not the considerationa of mechanics of finger movement, but a simplicity of
+memorization of position of these keys on keyboard.
+
+These characters are the vowels B<AEYUIO> with "simplest" accents diaeresis=umlaut=trema,
+acute and grave (except for extremely rare Ë and Ỳ), "the additional" Latin-1 letters B<ÆÅÇÐĲÑŒØßÞ> and symbols
+B<ªº¡¿№> which cannot be entered using most obvious prefix keys - and
+we throw in the most useful of other letters, B<êÊ>.
+
+Two rules govern the allocation of the letters to alphabetic keys (modified by C<AltGr>):
+
+=over
+
+=item 1.  
+
+The "additional" letters B<ÆÅÇÐĲÑŒØßÞ> are assigned to the "closest" base Latin letters
+(B<ACDINOST>).  (When conflicts arise - B<Æ> vs B<Å>, B<Œ> vs B<Ø> - the digraph wins.)
+
+=item 2.
+
+The characters with simplest accents B<¨´`> are assigned in the "diagonal of the base
+vowel" in B<¨>=top, B<´>=middle, B<`>=bottom rows of the 3 alphabetic rows of the keyboard.
+
+=back
+
+For example, the wishful-thinking positions for characters B<ÄÁÀ> is on keys B<QAZ> (left-hand vowels' 
+diagonals are sloping to the left) and the wishful thinking positions for characters B<ÖÓÒ> are on keys
+B<OKM> (right-hand vowels' diagonals are sloping to the right).  When conflicts arise, the rule 1
+wins, and the losing B<¨´`>-accented vowel is pushed away 1 step from the diagonal (down if
+possible, otherwise down).  For example, by rules above, both B<Æ> and B<Á> want to be on the
+B<A> key; so B<Á> is pushed away; there is no key "away from B<QAZ>-diagonal down", so it goes
+"away from B<QAZ>-diagonal up" to B<W> key.  Likewise, B<Œ> pushes away B<Ö> is from B<O> down
+to B<L>.
+
+This does not say what to do with B<ÅØÏÌ>, and alphabetic keys B<RP> are not used.  Moreover,
+this I<does> allocate B<ỲË> which are (comparing to unallocated letters) not in widespread
+usage.  So one adds:
+
+B<EXCEPTIONS:> C<Ê> is on B<E>, B<Ì> is pushed away 2 steps left to the wishful-thinking
+position of B<Ỳ> on B<V>, B<Ø> is pushed 1 step to the right to B<P>, and C<Å> is on B<R>.
+
+For non-alphabetic symbols, B<¡¿№> are on most natural positions B<!?#>; B<ª> is put on the
+closest non-alphabetic key B<@>, and B<º> is put on the same key but without C<Shift>.
+
+B<NOTE:> our sloping rule for right-hand diagonals makes all diagonals go over alphabetic
+keys of US keyboard.  This allows for C<AltGr>-alphabetic keys generate alphabetic characters,
+and C<AltGr>-symbol keys generate symbols.
+
+=head2 C<AltGr>-access to non-math symbols
+
+B<€> is put at the position on the keyboard L<most often etched with this
+symbol|https://www.libreoffice.org/bugzilla/show_bug.cgi?id=5981> (which is B<5>), and B<¥> is
+on the same key shifted.  B<¢£> are put on B<4$> (but B<AltGr-$> is a dead key for Business-related
+symbols, follow it by SPACE to get the B<£> character!).
+
+
+=head2 The Base Layer of Cyrillic Personality
+
+This base layer is identical to the standard C<X11>'s I<Russian Phonetic> 
+keyboard layout (which is of "яверты" flavor).  Of 26 letter keys of US keyboard,
+19 have an obvious phonetic mapping, 5 partially ambiguous keys are W==>В, V==>Ж 
+and J==>Й, Y==>Й, H==>Х; and 2 (Q==>Я [heuristic: remember яверты?]
+and X=>Ь) must be memorized.  Other 5 Russian letters are put on rarely used symbol keys 
+in two top rows: `~ ==> Ю, =+ ==> Ч, [{ and ]} ==> Ш and Щ, and \| ==> Э (they also
+must be memorized).
+
+Where are two remaining Russian alphabet characters, ъЪ and ёЁ?  On the base layer,
+they are on C<Shift>ed digit keys 3456 (in other words, on #$%^
+- which is not very intuitive.  (To compensate, these letters
+are considered C<AltGr>-variants of B<ЬЕ>, so they are available on both the Base Layer, and
+on C<AltGr>-layer.  [Unfortunately, this leads to certain problems on Windows - so called
+ъЪёЁ-mirroring; more on this later.])
+
+In particular, the most commonly used symbols are available at the same locations 
+as on US keyboard, but the symbols B<`~#$%^+=[{]}\|> cannot be entered from the base layer
+of the Cyrillic personality.  (To compensate, they are all available when one types
+them with C<AltGr>-modifier; and for B<#$%^> obscured by ъЪёЁ one does not need to
+use C<Shift>-modifier.)
+
+=head1 What follows is a collection of odd pieces of old documentation
+
+... but I<most> of it is relevant, though not necessarily exposed in the most convenient order...
+
+=head1 DESCRIPTION
+
+In this section, a "keyboard" has a certain "character repertoir" (which characters may be
+entered using this keyboard), and a mapping associating a character in the repertoir
+to a keypress or to several (sequential or simultaneous) keypresses.  A small enough keyboard
+may have a pretty arbitrary mapping and remain useful (witness QUERTY
+vs Dvorak vs Colemac).  However, if a keyboard has a sufficiently large repertoir,
+there must be a strong logic ("orthogonality") in this association - otherwise
+the most part of the repertoir will not be useful (except for people who have an
+extraordinary memory - and are ready to invest part of it into the keyboard).
+
+"Character repertoir" needs of different people vary enormously; observing
+the people around me, I get a very narrow point of view.  But it is the best
+I can do; what I observe is that many of them would use 1000-2000 characters
+if they had a simple way to enter them; and the needs of different people do 
+not match a lot.  So to be helpful to different people, a keyboard should have 
+at least 2000-3000 different characters in the repertoir.  (Some ballpark
+comparisons: L<MES-3B|http://web.archive.org/web/20000815100817/http://www.egt.ie/standards/iso10646/pdf/cwa13873.pdf> 
+has about 2800 characters; L<Adobe Glyph list|http://en.wikipedia.org/wiki/Adobe_Glyph_List> corresponds 
+to about 3600 Unicode characters.)
+
+To access these characters, how much structure one needs to carry in memory?  One can
+make a (trivial) estimate from below: on Windows, the standard US keyboard allows 
+entering 100 - or 104 - characters (94 ASCII keys, SPACE, ENTER, TAB - moreover, C-ENTER, 
+BACKSPACE and C-BACKSPACE also produce characters; so do C-[, C-] and C-\
+C-Break in most layouts!).  If one needs about 30 times more, one could do
+with 5 different ways to "mogrify" a character; if these mogrifications 
+are "orthogonal", then there are 2^5 = 32 ways of combining them, and
+one could access 32*104 = 3328 characters.
+
+Of course, the characters in a "reasonable repertoir" form a very amorphous
+mass; there is no way to introduce a structure like that which is "natural"
+(so there is a hope for "ordinary people" to keep it in memory).  So the
+complexity of these mogrification is not in their number, but in their
+"nature".  One may try to decrease this complexity by having very easy to
+understand mogrifications - but then there is no hope in having 5 of them
+- or 10, or 15, or 20.
+
+However, we B<know> that many people I<are> able to memorise the layout of 
+70 symbols on a keyboard.  So would they be able to handle, for example, 30 
+different "natural" mogrifications?  And how large a repertoir of characters
+one would be able to access using these mogrifications?
+
+This module does not answer these questions directly, but it provides tools
+for investigating them, and tools to construct the actually working keyboard
+layouts based on these ideas.  It consists of the following principal
+components:
+
+=over 4
+
+=item Unicode table examiner
+
+distills relations between different Unicode characters from the Unicode tables,
+and combines the results with user-specified "manual mogrification" rules.
+From these automatic/manual mogrifications, it constructs orthogonal scaffolding 
+supporting Unicode characters (we call it I<composition/decomposition>, but it
+is a major generalization of the corresponding Unicode consortium's terms).
+
+=item Layout constructor
+
+allows building keyboard layouts based on the above mogrification rules, and
+on other visual and/or logical directives.  It combines the bulk-handling
+ability of automatic rule-based approach with a flexibility provided by 
+a system of manual overrides.   (The rules are read from a F<.kbdd> L<I<Keyboard
+Description> file|/"Keyboard description files">.
+
+=item System-specific software layouts
+
+may be created basing on the "theoretical layout" made by the layout constructor
+(currently only on Windows, and only via F<KBDUTOOL> route).
+
+=item Report/Debugging framework
+
+creates human-readable descriptions of the layout, and/or debugging reports on
+how the layout creation logic proceeded.
+
+=back
+
+The last (and, probably, the most important) component of the distribution is
+L<an example keyboard layout|http://k.ilyaz.org/iz> created using this toolset.
+
+=head1 Keyboards: on ease of access
+
+Let's start with trivialities: different people have different needs
+with respect to keyboard layouts.  For a moment, ignore the question
+of the repertoir of characters available via keyboard; then the most 
+crucial distinction corresponds to a certain scale.  In absense of  
+a better word, we use a provisional name "the required typing speed".
+
+One example of people on the "quick" (or "rabid"?) pole of this scale are 
+people who type a lot of text which is either "already prepared", or for 
+which the "quality of prose" is not crucial.  Quite often, these people may
+type in access of 100 words per minute.  For them, the most important
+questions are of physical exhaustion from typing.  The position
+of most frequent letters relative to the "rest" finger position, whether
+frequently typed together letters are on different hands (or at least
+not on the same/adjacent fingers), the distance fingers must travel
+when typing common words, how many keypresses are needed to reach 
+a letter/symbol which is not "on the face fo the keyboard" - their
+primary concerns are of this kind.
+
+On the other, "deliberate", pole these concerns cease to be crucial.
+On this pole are people who type while they "create" the text, and
+what takes most of their focus is this "creation" process.  They may
+"polish their prose", or the text they write may be overburdened by
+special symbols - anyway, what they concentrate on is not typing itself.
+
+For them, the details of the keyboard layout are important mostly in
+the relation to how much they I<distract> the writer from the other
+things the writer is focused on.  The primary question is now not
+"how easy it is to type this", but "how easy it is to I<recall> how
+to type this".  The focus transfers from the mechanics of finger movements
+to the psycho/neuro/science of memory.
+
+These questions are again multifaceted: there are symbols one encounters
+every minute; after you recall once how to access them, most probably
+you won't need to recall them again - until you have a long interval when
+you do not type.  The situation is quite different with symbols you need
+once per week - most probably, each time you will need to call them again
+and again.  If such rarely used symbols/letters are frequenct (since I<many>
+of them appear), it is important to have an easy way to find how to type them;
+on the other hand, probably there is very little need for this way to
+be easily memorizable.  And for symbols which you need once per day, one needs
+both an easy way to find how to type them, I<and> the way to type them should
+better be easily memorizable.
+
+Now add to this the fact that for different people (so: different usage
+scenarios) this division into "all the time/every minute/every day/every week"
+categories is going to be different.  And one should not forget important
+scenario of going to vacation: when you return, you need to "reboot" your
+typing skills from the dormant state.
+
+On the other hand, note that the questions discussed above are more or less
+orthogonal: if the logic of recollection requires ω to be related in some 
+way to the W-key,
+then it does not matter where the W-key is on the keyboard - the same logic
+is applicable to the QWERTY base layoubt, or BÉPO one, or Colemak, or Dvorak.
+This module concerns itself I<only> with the questions of "consistency" and
+the related question of "the ease of recall"; we care only about which symbols
+relate to which "base keys", and do not care about where the base key sit on
+the physical keyboard.
+
+B<NOTE:> the version 0.01 of this module supports only the standard US layout
+of the base keys.
+
+Now consider the question of the character repertoir: a person may need ways
+to type "continuously" in several languages; in addition to this, there may
+be a need to I<occasionally> type "standalone" characters or symbols outside
+the repertoir of these languages.  Moreover, these languages may use different
+scripts (such as Polish/Bulgarian/Greek/Arabic/Japanese), or may share a
+"bulk" of their characters, and differ only in some "exceptional letters".
+To add insult to injury, these "exceptional letters" may be rare in the language
+(such as ÿ in French or à in Swedish) or may have a significant letter frequency 
+(such as é in French) or be somewhere in between (such as ñ in Spanish).
+
+And the non-language symbols do not need to be the I<math> symbols (although
+often they are).  An Engish-language discussion of etimology at coffee table 
+may lead to a need to write down a word in polytonic greek, or old norse;
+next moment one would need to write a phonetic transcription in IPA/APA
+symbols.  A discussion of keyboard layout may involve writing down symbols
+for non-character keys of the keyboard.  A typography freak would optimize
+a document by fine-tuned whitespaces.  Almost everybody needs arrows symbols,
+and many people would use box drawing characters if they had a simple access
+to them.
+
+Essentially, this means that as far as it does not impacts other accessibility
+goals, it makes sense to have unified memorizable access to as many
+symbols/characters as possible.  (An example of impacting other aspects:
+MicroSoft's (and IBM's) "US International" keyboards steal characters C<`~'^">:
+typing them produces "unexpected results" - they are deadkeys.  This
+significantly simplifies entering characters with accents, but makes it
+harder to enter non-accented characters.)
+
+One of the most known principles of design of human-machine interaction
+is that "simple common tasks should be simple to perform, and complicated
+tasks should be possible to perform".  I strongly disagree with this
+principle - IMO, it lacks a very important component: "a gradual increase
+in complexity".  When a certain way of doing things is easy to perform, and another 
+similar way is still "possible to perform", but on a very elevated level 
+of complexity, this leads to a significant psychological barrier erected
+between these ways.  Even when switching from the first way to the other one 
+has significant benefits, this barrier leads to self-censorship.  Essentially,
+people will 
+ignore the benefits even if they exceed the penalty of "the elevated level of 
+complexity" mentioned above.  And IMO self-censorship is the worst type of 
+censorship.  (There is a certain similarity between this situation and that
+of "self-fulfilled prophesies".  "People won't want to do this, so I would not
+make it simpler to do" - and now people do not want to do this...)
+
+So I would add another clause to the law above: "and moderately complicated
+tasks should remain moderately hard to perform".  What does it tell us in
+the situation of keyboard layout?  One can separate several levels of
+complexity.
+
+=over 10
+
+=item Basic:
+
+There should be some "base keyboards": keyboard layouts used for continuous 
+typing in a certain language or script.  Access from one base keyboard to
+letters of another should be as simple as possible.
+
+=item By parts:
+
+If a symbol can be thought of as a combination of certain symbols accessible
+on the base keyboard, one should be able to "compose" the symbol: enter it
+by typing a certain "composition prefix" key then the combination (as far
+as the combination is unambiguously associated to one symbol).
+
+The "thoughts" above should be either obvious (as in "combining a and e should 
+give æ") or governed by simple mneumonic rules; the rules should cover as
+wide a range as possible (as in "Greek/Coptic/Hebrew/Russian letters are
+combined as G/C/H/R and the corresponding Latin letter; the correspondence is 
+phonetic, or, in presence of conflicts, visual").
+
+=item Quick access:
+
+As many non-basic letters as possible (of those expected to appear often)
+should be available via shortcuts.  Same should be applicable to starting
+sequences of composition rules (such as "instead of typing C<StartCompose>
+and C<'> one can type C<AltGr-'>).
+
+=item Smart access
+
+Certain non-basic characters may be accessible by shortcuts which are not
+based on composition rules.  However, these shortcuts should be deducible
+by using simple mneumonic rules (such as "to get a vowel with `-accent,
+type C<AltGr>-key with the physical keyboard's key sitting below the vowel key").
+
+=item Superdeath:
+
+If everything else fails, the user should be able to enter a character by
+its Unicode number (preferably in the most frequently referenced format:
+hexadecimal).
+
+=back
+
+=over
+
+B<NOTE:> This does not seem to be easily achievable, but it looks like a very nifty
+UI: a certain HotKey is reserved (e.g., C<AltGr-AppMenu>);
+when it is tapped, and a character-key is pressed (for example, B<B>) a
+menu-driven interface pops up where user may navigate to different variants
+of B, Beta, etc - each of variants with a hotkey to reach I<NOW>, and with
+instructions how to reach it later from the keyboard without this UI.
+
+Also: if a certain timeout passes after pressing the initial HotKey, an instruction
+what to do next should appear.
+
+=back
+
+Here are the finer points elaborating on these levels of complexity:
+
+=over 4
+
+=item 1
+
+It looks reasonable to allow "fuzzy mneumonic rules": the rules which specify
+several possible variants where to look for the shortcut (up to 3-4 variants).
+If/when one forgets the keying of the shortcut, but remembers such a rule,
+a short experiment with these positions allows one to reconstruct the lost
+memory.
+
+=item
+
+The "base keyboards" (those used for continuous typing in a certain language
+or script) should be identical to some "standard" widely used keyboards.
+These keyboards should differ from each other in position of keys used by the
+scripts only; the "punctuation keys" should be in the same position.  If a
+script B has more letters than a script A, then a lot of
+"punctuation" on the layout A will be replaced by letters in the layout B.
+This missing punctuation should be made available by pressing a modifier
+(AltGr? compare with MicroSoft's Vietnamese keyboard's top row).
+
+=item
+
+If more than one base keyboard is used, there must be a quick access:
+if one needs to enter one letter from layout B when the active layout is A, one
+should not be forced to switch to B, type the letter, then switch back
+to A.  It must be available on "C<Quick_Access_Key letter>".
+
+=item
+
+One should consider what the C<Quick_Access_Key> does when the layouts A
+and B are identical on a particular key.  One can go with the "Occam's
+razor" approach and make C<Quick_Access_Key> the do-nothing identity map.
+Alternatively, one can make it access some symbols useful both for
+script A and script B.  It is a judgement call.
+
+Note that there is a gray area when layouts A and B are not identical,
+but a key C<K> produces punctuation in layout A, and a letter in layout
+B.  Then when in layout B, this punctuation is available on C<AltGr-key>,
+so, in principle, C<Quick_Access_Key> would duplicate the functionality
+of C<AltGr>.  Compare with "there is more than one way to do it" below;
+remember that OS (or misbehaving applications) may make some keypresses
+"unavailable".  I feel that in these situations, having duplication is
+a significant advantage over "having some extra symbols available".
+
+=item
+
+Paired symbols (such as such as ≤≥, «», ‹›, “”, ‘’ should be put on paired 
+keyboard's keys: <> or [] or ().
+
+=item
+
+"Directional symbols" (such as arrows) should be put either on numeric keypad
+or on a 3×3 subgrid on the letter-part of the keyboard (such as QWE/ASD/ZXC).
+(Compare with [broken?] implementation in Neo2.)
+
+=item
+
+for symbols that are naturally thought of as sitting in a table, one can 
+create intuitive mapping of quite large tables to the keyboard.  Split each
+key in halves by a horizontal line, think of C<Shift-key> as sitting in the
+top half.  Then ignoring C<`~> key and most of punctuation on the right
+hand side, keyboard becomes an 8×10 grid.  Taking into account C<AltGr>,
+one can map up to 8×10×2 (or, in some cases, 8×20!) table to a keyboard.
+
+B<Example:> Think of IPA consonants.
+
+=item
+
+Cheatsheets are useful.  And there are people who are ready to dedicate a
+piece of their memory to where on a layout is a particularly useful to them
+symbol.  So even if there is no logical position for a certain symbol, but
+there is an empty slot on layout, one should not hesitate in using this slot.
+
+However, this I<will be> distractive to people who do not want to dedicate
+their memory to "special cases".  So it makes sense to have three kinds of
+cheatsheets for layouts: one with special cases ignored (useful for most 
+people), one with all general cases ignored (useful for checks "is this 
+symbol available in some place I do not know about" and for memorization),
+and one with all the bells and whistles.
+
+=item
+
+"There is more than one way to do it" is not a defect, it is an asset.
+If it is a reasonable expectation to find a symbol X on keypress K', and
+the same holds for keypress K'' I<and> they both do not conflict with other
+"being intuitive" goals, go with both variants.  Same for 3 variants, 4
+- now you get my point.
+
+B<Example:> The standard Russian phonetic layout has Ё on the C<^>-key; on the
+other hand, Ё is a variant of Е; so it makes sense to have Ё available on
+C<AltGr-Е> as well.  Same for Ъ and Ь.
+
+=item
+
+Dead keys which are "abstract" (as opposed to being related to letters
+engraved on physical keyboard) should better be put on modified state
+of "zombie" keys of the keyboard (C<SPACE>, C<TAB>, C<CAPSLOCK>, C<MENU_ACCESS>).
+
+B<NOTE:> Making C<Shift-Space> a prefix key may lead to usability issues
+for people used to type CAPITALIZED PHRASES by keeping C<Shift> pressed
+all the time.  As a minimum, the symbols accessed via C<Shift-SPACE key>
+should be strikingly different from those produced by C<key> so that
+such problems are noted ASAP.  Example: on the first sight, producing
+C<NO-BREAK SPACE> on C<Shift-Space Shift-Space> or C<Shift-Space Space>
+looks like a good idea.  Do not do this: the visually undistinguishable
+C<NO-BREAK SPACE> would lead to significantly hard-to-debug problems if
+it was unintentional.
+
+=back
+
+
+=head1 Explanation of keyboard layout terms used in the docs
+
+The aim of this module is to make keyboard layout design as simple as 
+possible.  It turns out that even very elaborate designs can be made
+quickly and the process is not very error-prone.  It looks like certain
+venues not tried before are now made possible; at least I'm not aware of 
+other attempts in this direction.  One can make layouts which can be
+"explained" very concisely, while they contain thousand(s) of accessible
+letters.
+
+Unfortunately, being on unchartered territories, in my explanations I'm 
+forced to use home-grown terms.  So be patient with me...  The terms are
+I<keyboard group>, I<keyboard>, I<face> and I<layer>.  (I must compare them
+with what ISO 9995 does: L<http://en.wikipedia.org/wiki/ISO/IEC_9995>...)
+
+In what follows,
+the words I<letter> and I<character> are used interchangeably.  A I<key> 
+means a physical key on a keyboard clicked (possibly together with 
+one of modifiers C<Shift>, C<AltGr> - or, rarely C<Control>.  The key C<AltGr> 
+is either marked as such, or is just the "right" C<Alt> key; at least
+on Windows it can be replaced by C<Control-Alt>.  A I<prefix key> is a key tapping
+which does not produce any letter, but modifies what the next
+keypress would do (sometimes it is called a I<dead key>; in C<ISO 9995> terms,
+it is probably a I<latching key>).
+
+A plain I<layer> is a part of keyboard layout accessible by using only 
+non-prefix keys (possibly in combination with C<Shift>); likewise, I<additional 
+layers> are parts of layout accessible by combining the non-prefix keys 
+with C<Shift> (if needed) and with a particular combination of other modifiers 
+(C<AltGr> or C<Control>).  So there may be up to 2 additional layers: the
+C<AltGr>-layer and C<Control>-layer.  
+
+
+On the simplest layouts, such as "US" or "Russian",  there is no prefix keys - 
+but this is only feasible for languages which use very few characters with 
+diacritic marks.  However, note that most layouts do not use 
+C<Control>-layer - it is stated that this might be subject to problems with
+system interaction.
+
+The primary I<face> consists of the plain and additional layers of a keyboard;
+it is the part of layout accessible without switching "sticky state" and 
+without using prefix keys.  There may be up to 3 layouts (Primary, AltGr, Control)
+per face (on Windows).  A I<secondary face> is a face exposed after pressing 
+a prefix key.
+
+A I<personality> is a collection of faces: the primary face, plus one face per
+a defined prefix-key.  Finally, a I<keyboard group> is a collection of personalities
+(switchable by CapsLock and/or personality change hotkeys like C<Shift-Alt>)
+designed to work smoothly together.
+
+B<EXAMPLE:> Start with a I<very> elaborate (and not yet implemented, but 
+feasible with this module) example.  A keyboard group may consist of 
+phonetically matched Latin and Cyrillic personalities, and visually matched Greek 
+and Math personalities.  Several prefix-keys may be shared by all 4 of these 
+personalities; in particular, there would be 4 prefix-keys allowing access to primary 
+faces of these 4 personalities from other personalities of the group.  Also, there 
+may be specialised prefix-key tuned for particular need of entering Latin script, 
+Cyrillic script, Greek script, and Math.
+
+Suppose that there are 8 specialized Latin prefix-keys (for example, name them
+   
+  grave/tilde/hat/breve/ring_above/macron/acute/diaeresis
+
+although in practice each one of them may do more than the name suggests).  
+Then Latin personality will have the following 13 faces:
+
+   Primary/Latin-Primary/Cyrillic-Primary/Greek-Primary/Math-Primary
+   grave/tilde/hat/breve/ring_above/macron/acute/diaeresis
+
+B<NOTE:>   Here Latin-Primary is the face one gets when one presses
+the Access-Latin prefix-key when in Latin mode; it may be convenient to define 
+it to be the same as Primary - or maybe not.  For example, if one defines it 
+to be Greek-Primary, then this prefix-key has a convenient semantic of flipping
+between Latin and Greek modes for the next typed character: when in
+Latin, C<Latin-PREFIX-KEY a> would enter α, when in Greek, the same keypresses
+[now meaning "Latin-PREFIX-KEY α"] would enter "a".
+
+Assume that the layout does not use the C<Control> modifier.  Then each of 
+these faces would consists of two layers: the plain one, and the C<AltGr>- 
+one.  For example, pressing C<AltGr> with a key on Greek face could add
+diaeresis to a vowel, or use a modified ("final" or "symbol") "glyph" for
+a consonant (as in σ/ς θ/ϑ).  Or, on Latin face, C<AltGr-a> may produce æ.  Or, on a
+Cyrillic personality, AltGr-я (ya) may produce ѣ (yat').
+
+Likewise, the Greek personality may define special prefix-keys to access polytonic 
+greek vowels.  (On the other hand, maybe this is not a very good idea - it may
+be more useful to make polytonic Greek accessible from all personalities in a
+keyboard group.  Then one is able to type a polytonic Greek letter without 
+switching to the Greek personality.)
+
+With such a keyboard group, to type one Greek word in a Cyrillic text one 
+would switch to the Greek personality, then back to Cyrillic; but when all one 
+need to type now is only one Greek letter, it may be easier to use the 
+"Greek-PREFIX-KEY letter" combination, and save switching back to the
+Cyrillic personality.  (Of course, for this to work the letter should be 
+on the primary face of the Greek personality.)
+
+   =====================================================
+
+Looks too complicated?  Try to think about it in a different way: there
+are many faces in a keyboard group; break them into 3 "onion rings":
+
+=over 4
+
+=item I<CORE> faces 
+
+one can "switch to a such a face" and type continuously using 
+this face without pressing prefix keys.  In other words, these faces 
+can be made "active".
+     
+When another face is active, the letters in these faces are still 
+accessible by pressing one particular prefix key before each of these
+letters.  This prefix key does not depend on which core face is 
+currently "active".  (This is the same as for univerally accessible faces.)
+     
+=item  I<Universally accessible> faces 
+
+one cannot "switch to them", however, letters
+in these faces are accessible by pressing one particular prefix key
+before this letter.  This prefix key does not depend on which
+core face is currently "active".
+     
+=item I<satellite> faces 
+
+one cannot "switch to them", and letters in these faces
+are accessible from one particular core face only.  One must press a 
+prefix key before every letter in such faces.
+
+=back
+
+For example, when entering a mix of Latin/Cyrillic scripts and math,
+it makes sense to make the base-Latin and base-Cyrillic faces into
+the core; it is convenient when (several) Math faces and a Greek face 
+can be made universally accessible.  On the other hand, faces containing
+diacritized Latin letters and diacritized Cyrillic letters should better
+be made satellite; this avoids a proliferation of prefix keys which would
+make typing slower.
+
+=head1 Access to diacritic marks
+
+The logic: prefix keys are either 8-bit characters with high bit set, or
+if none with the needed glyph, they are "spacing modifier letters" or
+"spacing clones of diacritics".  And if you type I<something> after them,
+you can get other modifier letters and combining characters: here is the
+logic of this:
+
+=over 20
+
+=item The second press
+
+The principal combining mark.
+
+=item Surrogate for the diacritic
+
+(either C<"> or C<'>): corresponding "prime shape"-modifier character
+
+=item SPACE
+
+The modifier character itself.
+
+=item NBSP
+
+Modifier letter (the first one if diacritic is 8-bit, the second one
+otherwise.
+
+=back
+
+Some stats on prefix keys: C<ISO 9995-3> uses 26 prefix keys for diacritics;
+bépo uses 20, while EurKey uses 8.  On the other end of spectrum, there are
+10 US keyboard keys with "calculatable" relation to Latin diacritics:
+
+  `~^-'",./? --- grave/tilde/hat/macron/acute/diaeresis/cedilla/dot/stroke/hook-above
+
+To this list one may add a "calculatable" key C<$> as I<the currency prefix>;
+on the other hand, one should probably remove C<?> since C<AltGr-?> should better
+be "set in stone" to denote C<¿>.  If one adds Greek, then the calculatable positions
+for aspiration are on C<[ ]> (or on C<( )>).  Of widely used Latin diacritics, this
+leaves I<ring/hacek/breve/horn/ogonek/comma> (and doubled I<grave/acute>).
+
+CAVEATS for BÉPO keyboard:
+
+Non-US keycaps: the key "a" still uses (VK_)A, but its scancode is now different.
+E.g., French's A is on 0x10, which is US's Q.  Our table of scancodes is
+currently hardwired.  Some pictures and tables are available on
+
+  http://bepo.fr/wiki/Pilote_Windows
+
+
+=head1 FILES
+
+
+=head1 SEE ALSO
+
+The keyboard generated with this layout: L<http://k.ilyaz.org/>
+
+The generator module: L<UI::KeyboardLayout> and reference therein: see L<UI::KeyboardLayout/"SEE ALSO">.
+
+
+On diacritics:
+
+  http://www.phon.ucl.ac.uk/home/wells/dia/diacritics-revised.htm#two
+  http://en.wikipedia.org/wiki/Tonos#Unicode
+  http://en.wikipedia.org/wiki/Early_Cyrillic_alphabet#Numerals.2C_diacritics_and_punctuation
+  http://en.wikipedia.org/wiki/Vietnamese_alphabet#Tone_marks
+  http://diacritics.typo.cz/
+
+  http://en.wikipedia.org/wiki/User:TEB728/temp			(Chars of languages)
+  http://www.evertype.com/alphabets/index.html
+
+     Accents in different Languages:
+  http://fonty.pl/porady,12,inne_diakrytyki.htm#07
+  http://en.wikipedia.org/wiki/Latin-derived_alphabet
+  
+     Typesetting Old and Modern Church Slavonic
+  http://www.sanu.ac.rs/Cirilica/Prilozi/Skup.pdf
+  http://irmologion.ru/ucsenc/ucslay8.html
+  http://irmologion.ru/csscript/csscript.html
+  http://cslav.org/success.htm
+  http://irmologion.ru/developer/fontdev.html#allocating
+
+On typography marks
+
+  http://wiki.neo-layout.org/wiki/Striche
+  http://www.matthias-kammerer.de/SonsTypo3.htm
+  http://en.wikipedia.org/wiki/Soft_hyphen
+  http://en.wikipedia.org/wiki/Dash
+  http://en.wikipedia.org/wiki/Ditto_mark
+
+On keyboard layouts:
+
+  http://en.wikipedia.org/wiki/Keyboard_layout
+  http://en.wikipedia.org/wiki/Keyboard_layout#US-International
+  http://en.wikipedia.org/wiki/ISO/IEC_9995
+  http://www.pentzlin.com/info2-9995-3-V3.pdf		(used almost nowhere - only half of keys in Canadian multilanguage match)
+      Discussion of layout changes:
+  https://www.libreoffice.org/bugzilla/show_bug.cgi?id=5981
+
+  http://msdn.microsoft.com/en-us/goglobal/bb964651
+  http://eurkey.steffen.bruentjen.eu/layout.html
+  http://ru.wikipedia.org/wiki/%D0%A4%D0%B0%D0%B9%D0%BB:Birman%27s_keyboard_layout.svg
+  http://bepo.fr/wiki/Accueil
+  http://cgit.freedesktop.org/xkeyboard-config/tree/symbols/ru
+  http://cgit.freedesktop.org/xkeyboard-config/tree/symbols/keypad
+  http://www.evertype.com/celtscript/type-keys.html			(Old Irish mechanical typewriters)
+  http://eklhad.net/linux/app/halfqwerty.xkb			(One-handed layout)
+  http://www.doink.ch/an-x11-keyboard-layout-for-scholars-of-old-germanic/   (and references there)
+  http://www.neo-layout.org/
+  https://commons.wikimedia.org/wiki/File:Neo2_keyboard_layout.svg
+      Images in (download of)
+  http://www.mzuther.de/en/contents/osd-neo2
+      Neo2 sources:
+  http://wiki.neo-layout.org/browser/windows/kbdneo2/Quelldateien
+      Shift keys at center, nice graphic:
+  http://www.tinkerwithabandon.com/twa/keyboarding.html
+      Physical keyboard:
+  http://www.konyin.com/?page=product.Multilingual%20Keyboard%20for%20UNITED%20STATES
+      Portable keyboard layout
+  http://www.autohotkey.com/forum/viewtopic.php?t=28447
+      One-handed
+  http://www.autohotkey.com/forum/topic1326.html
+      Typing on numeric keypad
+  http://goron.de/~johns/one-hand/#documentation
+      On screen keyboard indicator
+  http://www.autohotkey.com/docs/scripts/KeyboardOnScreen.htm
+      Phonetic Hebrew layout(s) (1st has many duplicates, 2nd overweighted)
+  http://bc.tech.coop/Hebrew-ZC.html
+  http://help.keymanweb.com/keyboards/keyboard_galaxiehebrewkm6.php
+      Greek (Galaxy) with a convenient mapping (except for Ψ) and BibleScript
+  http://www.tavultesoft.com/keyboarddownloads/%7B4D179548-1215-4167-8EF7-7F42B9B0C2A6%7D/manual.pdf
+      With 2-letter input of Unicode names:
+  http://www.jlg-utilities.com
+      Medievist's
+  http://www.personal.leeds.ac.uk/~ecl6tam/
+
+By author of MSKLC Michael S. Kaplan (do not forget to follow links)
+
+  http://blogs.msdn.com/b/michkap/archive/2006/03/26/560595.aspx
+  http://blogs.msdn.com/b/michkap/archive/2006/04/22/581107.aspx
+      Chaining dead keys:
+  http://blogs.msdn.com/b/michkap/archive/2011/04/16/10154700.aspx
+      Mapping VK to VSC etc:
+  http://blogs.msdn.com/b/michkap/archive/2006/08/29/729476.aspx
+      [Link] Remapping CapsLock to mean Backspace in a keyboard layout
+            (if repeat, every second Press counts ;-)
+  http://colemak.com/forum/viewtopic.php?id=870
+      Scancodes from kbd.h get in the way
+  http://blogs.msdn.com/b/michkap/archive/2006/08/30/726087.aspx
+      What happens if you start with .klc with other VK_ mappings:
+  http://blogs.msdn.com/b/michkap/archive/2010/11/03/10085336.aspx
+      Keyboards with Ctrl-Shift states:
+  http://blogs.msdn.com/b/michkap/archive/2010/10/08/10073124.aspx
+      On assigning Ctrl-values
+  http://blogs.msdn.com/b/michkap/archive/2008/11/04/9037027.aspx
+      On hotkeys for switching layouts:
+  http://blogs.msdn.com/b/michkap/archive/2008/07/16/8736898.aspx
+      Text services
+  http://blogs.msdn.com/b/michkap/archive/2008/06/30/8669123.aspx
+      Low-level access in MSKLC
+  http://levicki.net/articles/tips/2006/09/29/HOWTO_Build_keyboard_layouts_for_Windows_x64.php
+  http://blogs.msdn.com/b/michkap/archive/2011/04/09/10151666.aspx
+      On font linking
+  http://blogs.msdn.com/b/michkap/archive/2006/01/22/515864.aspx
+      Unicode in console
+  http://blogs.msdn.com/michkap/archive/2005/12/15/504092.aspx
+      Adding formerly "invisible" keys to the keyboard
+  http://blogs.msdn.com/b/michkap/archive/2006/09/26/771554.aspx
+      Redefining NumKeypad keys
+  http://blogs.msdn.com/b/michkap/archive/2007/07/04/3690200.aspx
+	BUT!!!
+  http://blogs.msdn.com/b/michkap/archive/2010/04/05/9988581.aspx
+      And backspace/return/etc
+  http://blogs.msdn.com/b/michkap/archive/2008/10/27/9018025.aspx
+       kbdutool.exe, run with the /S  ==> .c files
+      Doing one's own WM_DEADKEY processing'
+  http://blogs.msdn.com/b/michkap/archive/2006/09/10/748775.aspx
+      Dead keys do not work on SG-Caps
+  http://blogs.msdn.com/b/michkap/archive/2008/02/09/7564967.aspx
+      Dynamic keycaps keyboard
+  http://blogs.msdn.com/b/michkap/archive/2005/07/20/441227.aspx
+      Backslash/yen/won confusion
+  http://blogs.msdn.com/b/michkap/archive/2005/09/17/469941.aspx
+      Unicode output to console
+  http://blogs.msdn.com/b/michkap/archive/2010/10/07/10072032.aspx
+      Install/Load/Activate an input method/layout
+  http://blogs.msdn.com/b/michkap/archive/2007/12/01/6631463.aspx
+  http://blogs.msdn.com/b/michkap/archive/2008/05/23/8537281.aspx
+      Suggest a topic:
+  http://blogs.msdn.com/b/michkap/archive/2007/07/29/4120528.aspx#7119166
+
+VK_OEM_8 Kana modifier - Using instead of AltGr
+  http://www.kbdedit.com/manual/ex13_replacing_altgr_with_kana.html
+Limitations of using KANA toggle
+  http://www.kbdedit.com/manual/ex12_trilang_ser_cyr_lat_gre.html
+
+HTML consolidated entity names and discussion, MES charsets:
+
+  http://www.w3.org/TR/xml-entity-names
+  http://www.w3.org/2003/entities/2007/w3centities-f.ent
+  http://www.cl.cam.ac.uk/~mgk25/ucs/mes-2-rationale.html
+  http://web.archive.org/web/20000815100817/http://www.egt.ie/standards/iso10646/pdf/cwa13873.pdf
+
+Ctrl2cap
+
+  http://technet.microsoft.com/en-us/sysinternals/bb897578
+
+Low level scancode mapping
+
+  http://www.annoyances.org/exec/forum/winxp/r1017256194
+    http://web.archive.org/web/20030211001441/http://www.microsoft.com/hwdev/tech/input/w2kscan-map.asp
+    http://msdn.microsoft.com/en-us/windows/hardware/gg463447
+  http://www.annoyances.org/exec/forum/winxp/1034644655
+     ???
+  http://netj.org/2004/07/windows_keymap
+  the free remapkey.exe utility that's in Microsoft NT / 2000 resource kit.
+
+  perl -wlne "BEGIN{$t = {T => q(), qw( X e0 Y e1 )}} print qq(  $t->{$1}$2\t$3) if /^#define\s+([TXY])([0-9a-f]{2})\s+(?:_EQ|_NE)\((?:(?:\s*\w+\s*,){3})?\s*([^\W_]\w*)\s*(?:(?:,\s*\w+\s*){2})?\)\s*(?:\/\/.*)?$/i" kbd.h >ll2
+    then select stuff up to the first e1 key (but DECIMAL is not there T53 is DELETE??? take from MSKLC help/using/advanced/scancodes)
+
+CapsLock as on typewriter:
+
+  http://www.annoyances.org/exec/forum/winxp/1071197341
+
+Problems on X11:
+
+  http://www.x.org/releases/X11R7.6/doc/kbproto/xkbproto.html			(definition of XKB???)
+
+  http://wiki.linuxquestions.org/wiki/Configuring_keyboards			(current???)
+  http://wiki.linuxquestions.org/wiki/Accented_Characters			(current???)
+  http://wiki.linuxquestions.org/wiki/Altering_or_Creating_Keyboard_Maps	(current???)
+  https://help.ubuntu.com/community/ComposeKey			(documents almost 1/2 of the needed stuff)
+  http://www.gentoo.org/doc/en/utf-8.xml					(2005++ ???)
+  http://en.gentoo-wiki.com/wiki/X.Org/Input_drivers	(2009++ HAS: How to make CapsLock change layouts)
+  http://www.freebsd.org/cgi/man.cgi?query=setxkbmap&sektion=1&manpath=X11R7.4
+  http://people.uleth.ca/~daniel.odonnell/Blog/custom-keyboard-in-linuxx11
+  http://shtrom.ssji.net/skb/xorg-ligatures.html				(of 2008???)
+  http://tldp.org/HOWTO/Danish-HOWTO-2.html					(of 2005???)
+  http://www.tux.org/~balsa/linux/deadkeys/index.html				(of 1999???)
+  http://www.x.org/releases/X11R7.6/doc/libX11/Compose/en_US.UTF-8.html
+  http://cgit.freedesktop.org/xorg/proto/xproto/plain/keysymdef.h
+
+  EIGHT_LEVEL FOUR_LEVEL_ALPHABETIC FOUR_LEVEL_SEMIALPHABETIC PC_SYSRQ : see
+  http://cafbit.com/resource/mackeyboard/mackeyboard.xkb
+
+  ./xkb in /etc/X11 /usr/local/X11 /usr/share/local/X11 but what dead_diaresis means is defined here:
+     Apparently, may be in /usr/X11R6/lib/X11/locale/en_US.UTF-8/Compose /usr/share/X11/locale/en_US.UTF-8/Compose
+  http://wiki.maemo.org/Remapping_keyboard
+  http://www.x.org/releases/current/doc/man/man8/mkcomposecache.8.xhtml
+  
+B<Note:> have XIM input method in GTK disables Control-Shift-u way of entering HEX unicode.
+
+B<Note:> the problems with handling deadkeys via .Compose are that: .Compose is handled by
+applications, while keymaps by server (since they may be on different machines, things can
+easily get out of sync); .Compose knows nothing about the current "Keyboard group" or of
+the state of CapsLock etc (therefore emulating "group switch" via composing is impossible).
+
+JS code to add "insert these chars": google for editpage_specialchars_cyrilic, or
+
+  http://en.wikipedia.org/wiki/User:TEB728/monobook.jsx
+
+Latin paleography
+
+  http://en.wikipedia.org/wiki/Latin_alphabet
+  http://tlt.its.psu.edu/suggestions/international/bylanguage/oenglish.html
+  http://guindo.pntic.mec.es/~jmag0042/LATIN_PALEOGRAPHY.pdf
+  http://www.evertype.com/standards/wynnyogh/ezhyogh.html
+  http://www.wordorigins.org/downloads/OELetters.doc
+  http://www.menota.uio.no/menota-entities.txt
+  http://std.dkuug.dk/jtc1/sc2/wg2/docs/n2957.pdf	(Uncomplete???)
+  http://skaldic.arts.usyd.edu.au/db.php?table=mufi_char&if=mufi	(No prioritization...)
+
+Summary tables for Cyrillic
+
+  http://ru.wikipedia.org/wiki/%D0%9A%D0%B8%D1%80%D0%B8%D0%BB%D0%BB%D0%B8%D1%86%D0%B0#.D0.A1.D0.BE.D0.B2.D1.80.D0.B5.D0.BC.D0.B5.D0.BD.D0.BD.D1.8B.D0.B5_.D0.BA.D0.B8.D1.80.D0.B8.D0.BB.D0.BB.D0.B8.D1.87.D0.B5.D1.81.D0.BA.D0.B8.D0.B5_.D0.B0.D0.BB.D1.84.D0.B0.D0.B2.D0.B8.D1.82.D1.8B_.D1.81.D0.BB.D0.B0.D0.B2.D1.8F.D0.BD.D1.81.D0.BA.D0.B8.D1.85_.D1.8F.D0.B7.D1.8B.D0.BA.D0.BE.D0.B2
+  http://ru.wikipedia.org/wiki/%D0%9F%D0%BE%D0%B7%D0%B8%D1%86%D0%B8%D0%B8_%D0%B1%D1%83%D0%BA%D0%B2_%D0%BA%D0%B8%D1%80%D0%B8%D0%BB%D0%BB%D0%B8%D1%86%D1%8B_%D0%B2_%D0%B0%D0%BB%D1%84%D0%B0%D0%B2%D0%B8%D1%82%D0%B0%D1%85
+  http://en.wikipedia.org/wiki/List_of_Cyrillic_letters			- per language tables
+  http://en.wikipedia.org/wiki/Cyrillic_alphabets#Summary_table
+  http://en.wiktionary.org/wiki/Appendix:Cyrillic_script
+
+     Extra chars (see also the ordering table on page 8)
+  http://std.dkuug.dk/jtc1/sc2/wg2/docs/n3194.pdf
+
+IPA
+
+  http://upload.wikimedia.org/wikipedia/commons/f/f5/IPA_chart_2005_png.svg
+  http://en.wikipedia.org/wiki/Obsolete_and_nonstandard_symbols_in_the_International_Phonetic_Alphabet
+  http://en.wikipedia.org/wiki/Case_variants_of_IPA_letters
+    Table with Unicode points marked:
+  http://www.staff.uni-marburg.de/~luedersb/IPA_CHART2005-UNICODE.pdf
+			(except for "Lateral flap" and "Epiglottal" column/row.
+    (Extended) IPA explained by consortium:
+  http://www.unicode.org/charts/PDF/U0250.pdf
+    IPA keyboard
+  http://www.rejc2.co.uk/ipakeyboard/
+
+http://en.wikipedia.org/wiki/International_Phonetic_Alphabet_chart_for_English_dialects#cite_ref-r_11-0
+
+
+Is this discussing KBDNLS_TYPE_TOGGLE on VK_KANA???
+
+  http://mychro.mydns.jp/~mychro/mt/2010/05/vk-f.html
+
+Windows: fonts substitution/fallback/replacement
+
+  http://msdn.microsoft.com/en-us/goglobal/bb688134
+
+Problems on Windows:
+
+  http://en.wikipedia.org/wiki/Help:Special_characters#Alt_keycodes_for_Windows_computers
+  http://en.wikipedia.org/wiki/Template_talk:Unicode#Plane_One_fonts
+
+    Console font: Lucida Console 14 is viewable, but has practically no Unicode support.
+                  Consolas (good at 16) has much better Unicode support (sometimes better sometimes worse than DejaVue)
+		  Dejavue is good at 14 (equal to a GUI font size 9 on 15in 1300px screen; 16px unifont is native at 12 here)
+  http://cristianadam.blogspot.com/2009/11/windows-console-and-true-type-fonts.html
+  
+    Apparently, Windows picks up the flavor (Bold/Italic/Etc) of DejaVue at random; see
+  http://jpsoft.com/forums/threads/strange-results-with-cp-1252.1129/
+	- he got it in bold.  I''m getting it in italic...  Workaround: uninstall 
+	  all flavors but one, THEN enable it for the console...  Then reinstall
+	  (preferably newer versions).
+
+Display (how WikiPedia does it):
+
+  http://en.wikipedia.org/wiki/Help:Special_characters#Displaying_special_characters
+  http://en.wikipedia.org/wiki/Template:Unicode
+  http://en.wikipedia.org/wiki/Template:Unichar
+  http://en.wikipedia.org/wiki/User:Ruud_Koot/Unicode_typefaces
+    In CSS:  .IPA, .Unicode { font-family: "Arial Unicode MS", "Lucida Sans Unicode"; }
+  http://web.archive.org/web/20060913000000/http://en.wikipedia.org/wiki/Template:Unicode_fonts
+
+Windows shortcuts:
+
+  http://windows.microsoft.com/en-US/windows7/Keyboard-shortcuts
+  http://www.redgage.com/blogs/pankajugale/all-keyboard-shortcuts--very-useful.html
+
+On meaning of Unicode math codepoints
+
+  http://milde.users.sourceforge.net/LUCR/Math/unimathsymbols.pdf
+  http://milde.users.sourceforge.net/LUCR/Math/data/unimathsymbols.txt
+  http://unicode.org/Public/math/revision-09/MathClass-9.txt
+
+Zapf dingbats encoding, and other fine points of AdobeGL:
+
+  ftp://ftp.unicode.org/Public/MAPPINGS/VENDORS/ADOBE/zdingbat.txt
+  http://web.archive.org/web/20001015040951/http://partners.adobe.com/asn/developer/typeforum/unicodegn.html
+
+Quoting tchrist:
+I<You can snag C<unichars>, C<uniprops>, and C<uninames> from L<http://training.perl.com> if you like.>
+
+=head1 LIMITATIONS
+
+Currently only output for Windows keyboard layout drivers (via MSKLC) is available.
+
+Currently only the keyboards with US-mapping of hardware keys to "the etched
+symbols" are supported (think of German physical keyboards where Y/Z keycaps
+are swapped: Z is etched between T and U, and Y is to the left of X, or French
+which swaps A and Q, or French or Russian physical keyboards which have more
+alphabetical keys than 26).
+
+Currently no C<LIGATURES> are supported.
+
+While the architecture of assembling a keyboard of small easy-to-describe
+pieces is (IMO) elegant and very powerful, and is proven to be useful, it 
+still looks like a collection of independent hacks.  Many of these hacks
+look quite similar; it would be great to find a way to unify them, so 
+reduce the repertoir of operations for assembly.
+
+The current documentation is a hodge-podge of semi-coherent rambling.
+
+The implementation of the module is crumbling under its weight.  Its 
+evolution was by bloating (even when some design features were simplified).
+Since initially I had very little clue to which level of abstraction and 
+flexibility the keyboard description would evolve, bloating accumulated 
+to incredible amounts.
+
+=head1 UNICODE TABLE GOTCHAS
+
+APL symbols with C<UP TACK> and C<DOWN TACK> look reverted w.r.t. other
+C<UP TACK> and C<DOWN TACK> symbols.  (We base our mutation on the names,
+not glyphs.)
+
+C<LESS-THAN>, C<FULL MOON>, C<GREATER-THAN>, C<EQUALS> C<GREEK RHO>, C<MALE>
+are defined with C<SYMBOL> or C<SIGN> at end, but (may) drop it when combined
+with modifiers via C<WITH>.  Likewise for C<SUBSET OF>, C<SUPERSET OF>,
+C<CONTAINS AS MEMBER>, C<PARALLEL TO>, C<EQUIVALENT TO>, C<IDENTICAL TO>.
+
+Sometimes opposite happens, and C<SIGN> appears out of blue sky; compare:
+
+  2A18	INTEGRAL WITH TIMES SIGN
+  2A19	INTEGRAL WITH INTERSECTION
+
+C<ENG> I<is> a combination of C<n> with C<HOOK>, but it is not marked as such
+in its name.
+
+Sometimes a name of diacritic (after C<WITH>) acquires an C<ACCENT> at end
+(see C<U+0476>).
+
+Oftentimes the part to the left of C<WITH> is not resolvable: sometimes it
+is underspecified (e.g, just C<TRIANGLE>), sometimes it is overspecified
+(e.g., in C<LEFT VERTICAL BAR WITH QUILL>), sometime it should be understood
+as a word (e.g, in C<END WITH LEFTWARDS ARROW ABOVE>).  Sometimes it just
+does not exist (e.g., C<LATIN LETTER REVERSED GLOTTAL STOP WITH STROKE> -
+there is C<LATIN LETTER INVERTED GLOTTAL STOP>, but not the reversed variant).
+Sometimes it is a defined synonym (C<VERTICAL BAR>).
+
+Sometimes it has something appended (C<N-ARY UNION OPERATOR WITH DOT>).
+
+Sometimes C<WITH> is just a clarification (C<RIGHTWARDS HARPOON WITH BARB DOWNWARDS>).
+
+  1	AND
+  1	ANTENNA
+  1	ARABIC MATHEMATICAL OPERATOR HAH
+  1	ARABIC MATHEMATICAL OPERATOR MEEM
+  1	ARABIC ROUNDED HIGH STOP
+  1	ARABIC SMALL HIGH LIGATURE ALEF
+  1	ARABIC SMALL HIGH LIGATURE QAF
+  1	ARABIC SMALL HIGH LIGATURE SAD
+  1	BACK
+  1	BLACK SUN
+  1	BRIDE
+  1	BROKEN CIRCLE
+  1	CIRCLED HORIZONTAL BAR
+  1	CIRCLED MULTIPLICATION SIGN
+  1	CLOSED INTERSECTION
+  1	CLOSED LOCK
+  1	COMBINING LEFTWARDS HARPOON
+  1	COMBINING RIGHTWARDS HARPOON
+  1	CONGRUENT
+  1	COUPLE
+  1	DIAMOND SHAPE
+  1	END
+  1	EQUIVALENT
+  1	FISH CAKE
+  1	FROWNING FACE
+  1	GLOBE
+  1	GRINNING CAT FACE
+  1	HEAVY OVAL
+  1	HELMET
+  1	HORIZONTAL MALE
+  1	IDENTICAL
+  1	INFINITY NEGATED
+  1	INTEGRAL AVERAGE
+  1	INTERSECTION BESIDE AND JOINED
+  1	KISSING CAT FACE
+  1	LATIN CAPITAL LETTER REVERSED C
+  1	LATIN CAPITAL LETTER SMALL Q
+  1	LATIN LETTER REVERSED GLOTTAL STOP
+  1	LATIN LETTER TWO
+  1	LATIN SMALL CAPITAL LETTER I
+  1	LATIN SMALL CAPITAL LETTER U
+  1	LATIN SMALL LETTER LAMBDA
+  1	LATIN SMALL LETTER REVERSED R
+  1	LATIN SMALL LETTER TC DIGRAPH
+  1	LATIN SMALL LETTER TH
+  1	LEFT VERTICAL BAR
+  1	LOWER RIGHT CORNER
+  1	MEASURED RIGHT ANGLE
+  1	MONEY
+  1	MUSICAL SYMBOL
+  1	NIGHT
+  1	NOTCHED LEFT SEMICIRCLE
+  1	ON
+  1	OR
+  1	PAGE
+  1	RIGHT ANGLE VARIANT
+  1	RIGHT DOUBLE ARROW
+  1	RIGHT VERTICAL BAR
+  1	RUNNING SHIRT
+  1	SEMIDIRECT PRODUCT
+  1	SIX POINTED STAR
+  1	SMALL VEE
+  1	SOON
+  1	SQUARED UP
+  1	SUMMATION
+  1	SUPERSET BESIDE AND JOINED BY DASH
+  1	TOP
+  1	TOP ARC CLOCKWISE ARROW
+  1	TRIPLE VERTICAL BAR
+  1	UNION BESIDE AND JOINED
+  1	UPPER LEFT CORNER
+  1	VERTICAL BAR
+  1	VERTICAL MALE
+  1	WHITE SUN
+  2	CLOSED MAILBOX
+  2	CLOSED UNION
+  2	DENTISTRY SYMBOL LIGHT VERTICAL
+  2	DOWN-POINTING TRIANGLE
+  2	HEART
+  2	LEFT ARROW
+  2	LINE INTEGRATION
+  2	N-ARY UNION OPERATOR
+  2	OPEN MAILBOX
+  2	PARALLEL
+  2	RIGHT ARROW
+  2	SMALL CONTAINS
+  2	SMILING CAT FACE
+  2	TIMES
+  2	TRIPLE HORIZONTAL BAR
+  2	UP-POINTING TRIANGLE
+  2	VERTICAL KANA REPEAT
+  3	CHART
+  3	CONTAINS
+  3	TRIANGLE
+  4	BANKNOTE
+  4	DIAMOND
+  4	PERSON
+  5	LEFTWARDS TWO-HEADED ARROW
+  5	RIGHTWARDS TWO-HEADED ARROW
+  8	DOWNWARDS HARPOON
+  8	UPWARDS HARPOON
+  9	SMILING FACE
+  11	CIRCLE
+  11	FACE
+  11	LEFTWARDS HARPOON
+  11	RIGHTWARDS HARPOON
+  15	SQUARE
+
+  perl -wlane "next unless /^Unresolved: <(.*?)>/; $s{$1}++; END{print qq($s{$_}\t$_) for keys %s}" oxx-us2 | sort -n > oxx-us2-sorted-kw
+
+C<SQUARE WITH> specify fill - not combining.  C<FACE> is not combining, same for C<HARPOON>s.
+
+Only C<CIRCLE WITH HORIZONTAL BAR> is combining.  Triangle is combining only with underbar and dot above.
+
+C<TRIANGLE> means C<WHITE UP-POINTING TRIANGLE>.  C<DIAMOND> - C<WHITE DIAMOND> (so do many others.)
+C<TIMES> means C<MULTIPLICATION SIGN>; but C<CIRCLED MULTIPLICATION SIGN> means C<CIRCLED TIMES> - go figure!
+C<CIRCLED HORIZONTAL BAR WITH NOTCH> is not a decomposition (it is "something circled").
+
+Another way of compositing is C<OVER> (but not C<UNDER>!) and C<FROM BAR>.  See also C<ABOVE>, C<BELOW>
+- but only C<BELOW LONG DASH>.  Avoid C<WITH/AND> after these.
+
+C<TWO HEADED> should replace C<TWO-HEADED>.  C<LEFT ARROW> means C<LEFTWARDS ARROW>, same for C<RIGHT>.
+C<DIAMOND SHAPE> means C<DIAMOND> - actually just a bug - http://www.reddit.com/r/programming/comments/fv8ao/unicode_600_standard_published/?
+C<LINE INTEGRATION> means C<CONTOUR INTEGRAL>.  C<INTEGRAL AVERAGE> means C<INTEGRAL>.
+C<SUMMATION> means C<N-ARY SUMMATION>.  C<INFINITY NEGATED> means C<INFINITY>.
+
+C<HEART> means C<WHITE HEART SUIT>.  C<TRIPLE HORIZONTAL BAR> looks genuinely missing...
+
+C<SEMIDIRECT PRODUCT> means one of two, left or right???
+
+This better be convertible by rounding/sharpening, but see
+C<BUT NOT/WITH NOT/OR NOT/AND SINGLE LINE NOT/ABOVE SINGLE LINE NOT/ABOVE NOT>
+
+  2268    LESS-THAN BUT NOT EQUAL TO;             1.1
+  2269    GREATER-THAN BUT NOT EQUAL TO;          1.1
+  228A    SUBSET OF WITH NOT EQUAL TO;            1.1
+  228B    SUPERSET OF WITH NOT EQUAL TO;          1.1
+  @               Relations
+  22E4    SQUARE IMAGE OF OR NOT EQUAL TO;                1.1
+  22E5    SQUARE ORIGINAL OF OR NOT EQUAL TO;             1.1
+  @@      2A00    Supplemental Mathematical Operators     2AFF
+  @               Relational operators
+  2A87    LESS-THAN AND SINGLE-LINE NOT EQUAL TO;         3.2
+          x (less-than but not equal to - 2268)
+  2A88    GREATER-THAN AND SINGLE-LINE NOT EQUAL TO;              3.2
+          x (greater-than but not equal to - 2269)
+  2AB1    PRECEDES ABOVE SINGLE-LINE NOT EQUAL TO;                3.2
+  2AB2    SUCCEEDS ABOVE SINGLE-LINE NOT EQUAL TO;                3.2
+  2AB5    PRECEDES ABOVE NOT EQUAL TO;            3.2
+  2AB6    SUCCEEDS ABOVE NOT EQUAL TO;            3.2
+  @               Subset and superset relations
+  2ACB    SUBSET OF ABOVE NOT EQUAL TO;           3.2
+  2ACC    SUPERSET OF ABOVE NOT EQUAL TO;         3.2
+
+Looking into v6.1 reference PDFs, 2268,2269,2ab5,2ab6,2acb,2acc have two horizontal bars, 
+228A,228B,22e4,22e5,2a87,2a88,2ab1,2ab2 have one horizontal bar,  Hence C<BUT NOT EQUAL TO> and C<ABOVE NOT EQUAL TO>
+are equivalent; so are C<WITH NOT EQUAL TO>, C<OR NOT EQUAL TO>, C<AND SINGLE-LINE NOT EQUAL TO>
+and C<ABOVE SINGLE-LINE NOT EQUAL TO>.  (Square variants come only with one horizontal line?)
+
+
+Set C<$ENV{UI_KEYBOARDLAYOUT_UNRESOLVED}> to enable warnings.  Then do
+
+  perl -wlane "next unless /^Unresolved: <(.*?)>/; $s{$1}++; END{print qq($s{$_}\t$_) for keys %s}" oxx | sort -n > oxx-sorted-kw
+
+=head1 COPYRIGHT
+
+Copyright (c) 2011-2012 Ilya Zakharevich <ilyaz@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+The distributed examples may have their own copyrights.
+
+=head1 TODO
+
+UniPolyK-MultiSymple
+
+Multiple linked faces (accessible as described in ChangeLog); designated 
+Primary- and Secondary- switch keys (as Shift-Space and AltGr-Space now).
+
+C<Soft hyphen> as a deadkey may be not a good idea: following it by a special key
+(such as C<Shift-Tab>, or C<Control-Enter>) may insert the deadkey character???
+Hence the character should be highly visible... (Now the key is invisible,
+so this is irrelevant...)
+
+Currently linked layers must have exactly the same number of keys in VK-tables.
+
+VK tables for TAB, BACK were BS.  Same (remains) for the rest of unusual keys...  (See TAB-was.)
+But UTOOL cannot handle them anyway...
+
+Define an extra element in VK keys: linkable.  Should be sorted first in the kbd map,
+and there should be the same number in linked lists.  Non-linkable keys should not
+be linked together by deadkey access...
+
+Interaction of FromToFlipShift with SelectRX not intuitive.  This works: Diacritic[<sub>](SelectRX[[0-9]](FlipShift(Latin)))
+
+DefinedTo cannot be put on Cyrillic 3a9 (yo to superscript disappears - due to duplication???).
+
+... so we do it differently now, but: LinkLayer was not aggressively resolving all the occurences of a character on a layer
+before we started to combine it with Diacritic_if_undef...  - and Cyrillic 3a9 is not helped...
+
+via_parent() is broken - cannot replace for Diacritic_if_undef.
+
+Currently, we map ephigraphic letters to capital letters - is it intuitive???
+
+dotted circle ◌ 25CC
+
+DeadKey_Map200A=	FlipLayers
+#DeadKey_Map200A_0=	Id(Russian-AltGr)
+#DeadKey_Map200A_1=	Id(Russian)
+  performs differently from the commented variant: it adds links to auto-filled keys...
+
+Why ¨ on THIN SPACE inserts OGONEK after making ¨ multifaceted???
+
+When splitting a name on OVER/BELOW/ABOVE, we need both sides as modifiers???
+
+Ỳ currently unreachable (appears only in Latin-8 Celtic, is not on Wikipedia)
+
+Somebody is putting an extra element at the end of arrays for layers???  - Probably SPACE...
+
+Need to treat upside-down as a pseudo-decomposition.
+
+We decompose reversed-smallcaps in one step - probably better add yet another two-steps variant...
+
+When creating a <pseudo-stuff> treat SYMBOL/SIGN/FINAL FORM/ISOLATED FORM/INITIAL FORM/MEDIAL FORM;
+note that SIGN may be stripped: LESS-THAN SIGN becomes LESS-THAN WITH DOT
+
+We do not do canonical-merging of diacritics; so one needs to specify VARIA in addition to GRAVE ACCENT.
+
+We use a smartish algorithm to assign multiple diacritics to the same deadkey.  A REALLY smart algorithm
+would use information about when a particular precombined form was introduced in Unicode...
+
+Inspector tool for NamesList.txt:
+
+ grep " WITH .* " ! | grep -E -v "(ACUTE|GRAVE|ABOVE|BELOW|TILDE|DIAERESIS|DOT|HOOK|LEG|MACRON|BREVE|CARON|STROKE|TAIL|TONOS|BAR|DOTS|ACCENT|HALF RING|VARIA|OXIA|PERISPOMENI|YPOGEGRAMMENI|PROSGEGRAMMENI|OVERLAY|(TIP|BARB|CORNER) ([A-Z]+WARDS|UP|DOWN|RIGHT|LEFT))$" | grep -E -v "((ISOLATED|MEDIAL|FINAL|INITIAL) FORM|SIGN|SYMBOL)$" |less
+ grep " WITH "    ! | grep -E -v "(ACUTE|GRAVE|ABOVE|BELOW|TILDE|DIAERESIS|CIRCUMFLEX|CEDILLA|OGONEK|DOT|HOOK|LEG|MACRON|BREVE|CARON|STROKE|TAIL|TONOS|BAR|CURL|BELT|HORN|DOTS|LOOP|ACCENT|RING|TICK|HALF RING|COMMA|FLOURISH|TITLO|UPTURN|DESCENDER|VRACHY|QUILL|BASE|ARC|CHECK|STRIKETHROUGH|NOTCH|CIRCLE|VARIA|OXIA|PSILI|DASIA|DIALYTIKA|PERISPOMENI|YPOGEGRAMMENI|PROSGEGRAMMENI|OVERLAY|(TIP|BARB|CORNER) ([A-Z]+WARDS|UP|DOWN|RIGHT|LEFT))$" | grep -E -v "((ISOLATED|MEDIAL|FINAL|INITIAL) FORM|SIGN|SYMBOL)$" |less
+
+AltGrMap should be made CapsLock aware (impossible: smart capslock works only on the first layer, so
+the dead char must be on the first layer).  [May work for Shift-Space - but it has a bag of problems...]
+
+Alas, CapsLock'ing a composition cannot be made stepwise.  Hence one must calculate it directly.
+(Oups, Windows CapsLock is not configurable on AltGr-layer.  One may need to convert
+it to VK_KANA???)
+
+WarnConflicts[exceptions] and NoConflicts translation map parsing rules.
+
+Need a way to map to a different face, not a different layer.
+
+Vietnamese: to put second accent over ă, ơ (o/horn), put them over ae/oe; - including 
+another ˘ which would "cancel the implied one", so will get o-horn itself.  - Except
+for acute accent which should replaced by ¨, and hook must be replaced by ˆ.  (Over ae/oe
+there is only macron and diaeresis over ae.)
+
+Or: for the purpose of taking a second accent, AltGr-A behaves as Ă (or Â?), AltGr-O 
+behaves as Ô (or O-horn Ơ?).  Then Å and O/ behave as the other one...  And ˚ puts the
+dot *below*, macron puts a hook.  Exception: ¨ acts as ´ on the unaltered AE.
+
+  While Å takes acute accent, one can always input it via putting ˚ on Á.
+
+If Ê is on the keyboard (and macron puts a hook), then the only problem is how to enter
+a hook alone (double circumflex is not precombined), dot below (???), and accents on u-horn ư.
+
+Mogrification rules for double accents: AE Å OE O/ Ù mogrify into hatted/horned versions; macron
+mogrifies into a hook; second hat modifies a hat into a horn.  The only problem: one won't be 
+able to enter double grave on U - use the OTHER combination of ¨ and `...  And how to enter
+dot below on non-accented aue?  Put ¨ on umlaut? What about Ë?
+
+When linking two layers, consider prefer_first as a suggestion only: if the prefered slot
+results in no link, try the second one.
+
+Translation map "functions" for flipping AltGr-register (cannot one use FromTo[] between
+explicit layers???).
+
+To allow . or , on VK_DECIMAL: maybe make CapsLock-dependent?
+
+  http://blogs.msdn.com/b/michkap/archive/2006/09/13/752377.aspx
+
+How to write this diacritic recipe: insert hacheck on AltGr-variant, but only if
+the breve on the base layer variant does not insert hacheck (so inserts breve)???
+
+Sorting diacritics by usefulness: we want to apply one of accents from the
+given list to a given key (with l layers of 2 shift states).  For each accent,
+we have 2l possible variants for composition; assign to 2 variants differing
+by Shift the minimum penalty of the two.  For each layer we get several possible
+combinations of different priority; and for each layer, we have a certain number
+of slots open.  We can redistribute combinations from the primary layer to
+secondary one, but not between secondary layers.
+
+Work with slots one-by-one (so that the assignent is "monotinic" when the number
+of slots increases).  Let m be the number of layers where slots are present.
+Take highest priority combinations; if the number of "extra" combinations
+in the primary layer is at least m, distribute the first m of them to
+secondary layers.  If n<m of them are present, fill k layers which
+have no their own combinations first, then other n-k layers.  More precisely,
+if n<=k, use the first n of "free" layers; if n>k, fill all free layers, then
+the last n-k of non-free layers.
+
+Repeat as needed (on each step, at most one slot in each layer appears).
+
+But we do not need to separate case-differing keys!  How to fix?
+
+All done, but this works only on the current face!  To fix, need to pass
+to the translator all the face-characters present on the given key simultaneously.
+
+===== Accent-key TAB accesses extra bindinges (including NUM->numbered one)
+	(may be problematic with some applications???
+	 -- so duplicate it on + and @ if they is not occupied
+	 -- there is nothing related to AT in Unicode)
+
+Diacritics_0218_0b56_0c34=	May create such a thing...
+ (0b56_0c34 invisible to the user).
+
+  Hmm - how to combine penaltized keys with reversion?  It looks like
+  the higher priority bindings would occupy the hottest slots in both
+  direct and reverse bindings...
+
+  Maybe additional forms Diacrtitics2S_* and Diacrtitics2E_* which fight
+  for symbols of the same penalty from start and from end (with S winning
+  on stuff exactly in the middle...).  (The E-form would also strip the last |-group.)
+
+' Shift-Space (from US face) should access the second level of Russian face.
+To avoid infinite cycles, face-switch keys to non-private faces should be
+marked in each face... 
+
+"Acute makes sharper" is applicable to () too to get <>-parens...
+
+Another ways of combining: "OR EQUAL TO", "OR EQUIVALENT TO", "APL FUNCTIONAL
+SYMBOL QUAD", "APL FUNCTIONAL SYMBOL *** UNDERBAR", "APL FUNCTIONAL SYMBOL *** DIAERESIS".
+
+When recognizing symbols for GREEK, treat LUNATE (as NOP).  Try adding HEBREW LETTER at start as well...
+
+Compare with: 8 basic accents: http://en.wikipedia.org/wiki/African_reference_alphabet (English 78)
+
+When a diacritic on a base letter expands to several variants, use them all 
+(with penalty according to the flags).
+
+Problem: acute on acute makes double acute modifier...
+
+Penalized letter are temporarily completely ignored; need to attach them in the end... 
+ - but not 02dd which should be completely ignore...
+
+Report characters available on diacritic chains, but not accessible via such chains.
+Likewise for characters not accessible at all.  Mark certain chains as "Hacks" so that
+they are not counted in these lists.
+
+Long s and "preceded by" are not handled since the table has its own (useless) compatibility decompositions.
+
+╒╤╕
+╞╪╡
+╘╧╛
+╓╥╖
+╟╫╢
+╙╨╜
+╔╦╗
+╠╬╣
+╚╩╝
+┌┬┐
+├┼┤
+└┴┘
+┎┰┒
+┠╂┨
+┖┸┚
+┍┯┑
+┝┿┥
+┕┷┙
+┏┳┓
+┣╋┫
+┗┻┛
+    On top of a light-lines grid (3×2, 2×3, 2×2; H, V, V+H):
+┲┱
+╊╉
+┺┹
+┢╈┪
+┡╇┩
+╆╅
+╄╇
+╼━╾╺╸╶─╴╌┄┈ ╍┅┉
+╻
+┃
+╹
+╷
+│
+╵
+ 
+╽
+╿
+╎┆┊╏┇┋
+
+╲ ╱
+ ╳
+╭╮
+╰╯
+◤▲◥
+◀■▶
+◣▼◢
+◜△◝
+◁□▷
+◟▽◞
+◕◓◔
+◐○◑
+ ◒ 
+▗▄▖
+▐█▌
+▝▀▘
+▛▀▜
+▌ ▐
+▙▄▟
+
+░▒▓
+
+
+=head1 WINDOWS GOTCHAS
+
+First of all, keyboard layouts on Windows are controlled by DLLs; the only function
+of these DLLs is to export a table of "actions" to perform.  This table is passed
+to the kernel, and that's it - whatever is not supported by the format of this table
+cannot be implemented by native layouts.  (The DLL performs no "actions" when
+actual keyboard events arrive.)
+
+Essentially, the logic is like that: there are primary "keypresses", and
+chained "keypresses" ("prefix keys" [= deadkeys] and keys pressed after them).  
+Primary keypresses are distinguished by which physical key on keyboard is 
+pressed, and which of "modifier keys" are also pressed at this moment (as well
+as the state of "latched keys" - usually C<CapsLock> only).  This combination
+determines which Unicode character is generated by the keypress, and whether
+this character starts a "chained sequence".
+
+On the other hand, the behaviour of chained keys is governed I<ONLY> by Unicode
+characters they generate: if there are several physical keypresses generating
+the same Unicode characters, these keypresses are completely interchangeable
+inside a chained sequence.  (The only restriction is that the first keypress
+should be marked as "prefix key"; for example, there may be two keys producing
+B<-> so that one is producing a "real dash sign", and another is producing a
+"prefix" B<->.)
+
+The table allows: to map C<ScanCode>s to C<VK_key>s; to associate a C<VK_key> to several
+(numbered) choices of characters to output, and mark some of these choices as prefixes
+(deadkeys).  (These "base" choices may contain up to 4 16-bit characters (with 32-bit
+characters mapped to 2 16-bit surrogates); but only those with 1 16-bit character may
+be marked as deadkeys.)  For each prefix character (not a prefix key!) one can
+associate a table mapping input 16-bit "base characters" to output 16-bit characters,
+and mark some of the output choices as prefix characters.
+
+The numbered choices above are determined by the state of "modifier keys" (such as
+C<Shift>, C<Alt>, C<Control>), but not directly.  First of all, C<VK_keys> may be
+associated to a certain combination of 6 "modifier bits" (called "logical" C<Shift>,
+C<Alt>, C<Control>, C<Kana>, C<User1> and C<User2>, but the logical bits are not 
+required to coincide with names of modifier keys).  (Example: bind C<Right Control>
+to activate C<Shift> and C<Kana> bits.)  The 64 possible combinations of modifier bits
+are mapped to the numbered choices above.
+
+Additionally, one can define two "separate 
+numbered choices" in presence of CapsLock (but the only allowed modifier bit is C<Shift>).
+The another way to determine what C<CapsLock> is doing: one can mark that it 
+flips the "logical C<Shift>" bit (separately on no-modifiers state, C<Control-Alt>-only state,
+and C<Kana>-only state [?!] - here "only" allow for the C<Shift> bit to be C<ON>).
+
+C<AltGr> key is considered equivalent to C<Control-Alt> combination (of those
+are present, or always???), and one cannot bind C<Alt> and C<Alt-Shift> combinations.  
+Additionally, binding bare C<Control> modifier on alphabetical keys (and
+C<SPACE>, C<[>, C<]>, C<\>) may confuse some applications.
+
+B<NOTE:> there is some additional stuff allowed to be done (but only in presence
+of Far_East_Support installed???).  FE-keyboards can define some sticky state (so
+may define some other "latching" keys in addition to C<CapsLock>).  However,
+I did not find a clear documentation yet (C<keyboard106> in the DDK toolkit???).
+
+There is a tool to create/compile the required DLL: F<kbdutool.exe> of I<MicroSoft 
+Keyboard Layout Creator> (with a graphic frontend F<MSKLC.exe>).  The tool does 
+not support customization of modifier bits, and has numerous bugs concerning binding keys which
+usually do not generate characters.  The graphic frontend does not support
+chained prefix keys, adds another batch of bugs, and has arbitrarily limitations:
+refuses to work if the compiled version of keyboard is already installed;
+refuses to work if C<SPACE> is redefined in useful ways.
+
+B<WORKFLOW:> uninstall the keyboard, comment the definition of C<SPACE>,
+load in F<MSKLC> and create an install package.  Then uncomment the
+definition of C<SPACE>, and compile 4 architecture versions using F<kbdutool>,
+moving the DLLs into suitable directories of the install package.  Install
+the keyboard.
+
+For development cycle, one does not need to rebuild the install package
+while recompiling.
+
+=over 4
+
+=item Several similar F<MSKLC> created keyboards may confuse the system
+
+Apparently, the system may get majorly confused when the C<description>
+of the project gets changed without changing the DLL (=project) name.
+   
+(Tested only with Win7 and the name in the DESCRIPTIONS section
+coinciding with the name on the KBD line - both in F<*.klc> file.)
+   
+The symptoms: I know how one can get 4 different lists of keyboards:
+
+=over 4
+
+=item 1
+
+Click on the keyboard icon in the C<Language Bar> - usually shown
+on the toolbar; positioned to the right of the language code EN/RU 
+etc (keyboard icon is not shown if only one keyboard is associated
+to the current language).
+
+=item
+
+Go to the C<Input Language> settings (e.g., right-click on the 
+Language bar, Settings, General.
+
+=item
+
+on this C<General> page, press C<Add> button, go to the language
+in question.
+
+=item
+
+Check the F<.klc> files for recently installed Input Languages.
+
+=item
+
+In MS Keyboard Layout Creator, go to C<File/Load Existing Keyboard>
+list.
+
+=back
+        
+It looks like the first 4 get in sync if one deletes all related keyboards,
+then installs the necessary subset.  I do not know how to fix 5 - MSKLC
+continues to show the old name for this project.
+
+Another symptom: Current language indicator (like C<EN>) on the language
+bar disappears.  (Reboot time?)
+
+Possible workaround: manually remove the entry in C<HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Control\Keyboard Layouts>
+(the last 4 digits match the codepage in the F<.klc> file).
+   
+=item Too long description (or funny characters in description?)
+
+If the name in the C<DESCRIPTIONS> section is too long, the name shown in 
+the list C<2> above may be empty.
+    
+(Checked only on Win7 and when the name in the DESCRIPTIONS section
+coincides with the name on the C<KBD> line - both in F<*.klc> file.)
+   
+(Fixed by shortening the name [but see
+L<"Several similar F<MSKLC> created keyboards may confuse the system">
+above!], so maybe it was
+not the length but some particular character (C<+>?) which was confusing
+the system.  (I saw a report on F<MSKLC> bug when description had apostroph
+character C<'>.)
+   
+=item F<MSKLC> ruins names of dead key when reading a F<.klc>
+
+When reading a F<.klc> file, MS Keyboard Layout Creator may ruin the names
+of dead keys.  Symptom: open the dialogue for a dead key mapping
+(click the key, check that C<Dead key view> has checkmark, click on the
+C<...> button near the C<Dead key?> checkbox); then the name (the first 
+entry field) contains some junk.  (Looks like a long ASCII string 
+
+   U+0030 U+0030 U+0061 U+0039
+
+.)
+
+B<Workaround:> if all one needs is to compile a F<.klc>, one can run
+F<KBDUTOOL> directly.
+
+B<Workaround:> correct ALL these names manually in MSKLC.  If the names are
+the Unicode name for the dead character, just click the C<Default> button 
+near the entry field.  Do this for ALL the dead keys in all the registers
+(including C<SPACE>!).  If C<CapsLock> is not made "semantically meaningful",
+there are 6 views of the keyboard (C<PLAIN, Ctrl, Ctrl+Shift, Shift,
+AltGr, AltGr+Shift>) - check them all for grayed out keys (=deadkeys).
+   
+Check for success: C<File/"Save Source File As>, use a temporary name.  
+Inspect near the end of the generated F<.klc> file.  If OK, you can
+go to the Project/Build menu.  (Likewise, this way lets you find which
+deadkey's names need to be fixed.)
+   
+!!! This is time-consuming !!!  Make sure that I<other> things are OK
+before you do this (by C<Project/Validate>, C<Project/Test>).
+   
+BTW: It might be that this is cosmetic only.  I do not know any bad
+effect - but I did not try to use any tool with visual feedback on
+the currently active sub-layout of keyboard.
+
+=item Double bug in F<KBDUTOOL> with dead characters above 0x0fff
+
+This line in F<.klc> file is treated correctly by F<MSKLC>'s builtin keyboard tester:
+
+  39 SPACE 0 0020 00a0@ 0020 2009@ 200a@ //  ,  ,  ,  ,   // SPACE, NO-BREAK SPACE, SPACE, THIN SPACE, HAIR SPACE
+
+However, via F<kbdutool> it produces the following two bugs:
+
+  static ALLOC_SECTION_LDATA MODIFIERS CharModifiers = {
+    &aVkToBits[0],
+    7,
+    {
+    //  Modification# //  Keys Pressed
+    //  ============= // =============
+        0,            // 
+        1,            // Shift 
+        2,            // Control 
+        SHFT_INVALID, // Shift + Control 
+        SHFT_INVALID, // Menu 
+        SHFT_INVALID, // Shift + Menu 
+        3,            // Control + Menu 
+        4             // Shift + Control + Menu 
+     }
+  };
+ .....................................
+    {VK_SPACE     ,0      ,' '      ,WCH_DEAD ,' '      ,WCH_LGTR ,WCH_LGTR },
+    {0xff         ,0      ,WCH_NONE ,0x00a0   ,WCH_NONE ,WCH_NONE ,WCH_NONE },
+ .....................................
+  static ALLOC_SECTION_LDATA LIGATURE2 aLigature[] = {
+    {VK_SPACE     ,6      ,0x2009   ,0x2009   },
+    {VK_SPACE     ,7      ,0x200a   ,0x200a   },
+
+Essentially, C<2009@ 200a@> produce C<LIGATURES> (= multiple 16-bit chars)
+instead of deadkeys.  Moreover, these ligatures are put on non-existing
+"modifications" 6, 7 (the maximal modification defined is 4; so the code uses
+the C<Shift + Control + Menu> flags instead of "modification number" in
+the ligatures table.
+
+=item Default keyboard of an application
+
+Apparently, there is no way to choose a default keyboard for a certain
+language.  The configuration UI allows moving keyboards up and down in
+the list, but, apparently, this order is not related to which keyboard
+is selected when an application starts.
+
+=item C<AltGr>-keypresses going nowhere
+
+Some C<AltGr>-keypresses do not result in the corresponding letter on
+keyboard being inserted.  It looks like they are stolen by some system-wide
+hotkeys.  See:
+
+  http://www.kbdedit.com/manual/ex13_replacing_altgr_with_kana.html
+
+If these keypresses would perform some action, one might be able to deduce
+how to disable the hotkeys.  So the real problem comes when the keypress
+is silently dropped.
+
+I found out one scenario how this might happen, and how to fix this particular
+situation.  (Unfortunately, it is not fixed what I see, when C<AltGr-s> [but not
+C<AltGr-S>] is stolen.  Installing a shortcut, one can associate a hotkey to
+the shortcut.  Unfortunately, the UI allows (and encourages!) hotkeys of the
+form <Control-Alt-letter> (which are equivalent to C<AltGr-letter>) - instead
+of safe combinations like C<Control-Alt-F4> or
+C<Alt-Shift-letter> (which do not go to keyboard drivers, so cannot generate
+characters).  If/when an application linked to by this shortcut is
+gone, the hotkey remains, but now it does nothing (no warning or dialogue comes).
+
+If the shortcut is installed in one of "standard places", one can find it.
+Save this to F<K:\findhotkey.vbs> (replace F<K:> by the suitable drive letter
+here and below)
+
+  on error resume next
+  set WshShell = WScript.CreateObject("WScript.Shell")
+  Dim A
+  Dim Ag
+  Set Ag=Wscript.Arguments
+  If Ag.Count > 0 then
+  For x = 0 to Ag.Count -1
+  A = A & Ag(x)
+  Next
+  End If
+  Set FSO = CreateObject("Scripting.FileSystemObject")
+  f=FSO.GetFile(A)
+  set lnk = WshShell.CreateShortcut(A)
+  If lnk.hotkey <> "" then
+  msgbox A & vbcrlf & lnk.hotkey
+  End If
+
+Save this to F<K:\findhotkey.cmd>
+
+  set findhotkey=k:\findhotkey
+  for /r %%A in (*.lnk) do %findhotkey%.vbs "%%A"
+  for /r %%A in (*.pif) do %findhotkey%.vbs "%%A"
+  for /r %%A in (*.url) do %findhotkey%.vbs "%%A"
+  cd /d %UserProfile%\desktop
+  for /r %%A in (*.lnk) do %findhotkey%.vbs "%%A"
+  for /r %%A in (*.pif) do %findhotkey%.vbs "%%A"
+  for /r %%A in (*.url) do %findhotkey%.vbs "%%A"
+  cd /d %AllUsersProfile%\desktop
+  for /r %%A in (*.lnk) do %findhotkey%.vbs "%%A"
+  for /r %%A in (*.pif) do %findhotkey%.vbs "%%A"
+  for /r %%A in (*.url) do %findhotkey%.vbs "%%A"
+  cd /d %UserProfile%\Start Menu
+  for /r %%A in (*.lnk) do %findhotkey%.vbs "%%A"
+  for /r %%A in (*.pif) do %findhotkey%.vbs "%%A"
+  for /r %%A in (*.url) do %findhotkey%.vbs "%%A"
+  cd /d %AllUsersProfile%\Start Menu
+  for /r %%A in (*.lnk) do %findhotkey%.vbs "%%A"
+  for /r %%A in (*.pif) do %findhotkey%.vbs "%%A"
+  for /r %%A in (*.url) do %findhotkey%.vbs "%%A"
+  cd /d %APPDATA%
+  for /r %%A in (*.lnk) do %findhotkey%.vbs "%%A"
+  for /r %%A in (*.pif) do %findhotkey%.vbs "%%A"
+  for /r %%A in (*.url) do %findhotkey%.vbs "%%A"
+  cd /d %HOMEDRIVE%%HOMEPATH%
+  for /r %%A in (*.lnk) do %findhotkey%.vbs "%%A"
+  for /r %%A in (*.pif) do %findhotkey%.vbs "%%A"
+  for /r %%A in (*.url) do %findhotkey%.vbs "%%A"
+
+(In most situations, only the section after the last C<cd /d> is important;
+in my configuration all the "interesting" stuff is in C<%APPDATA%>.  Running
+this should find all shortcuts which define hot keys.
+
+Run the cmd file.  Repeat in the "All users"/"Public" directory.  It should
+show a dialogue for every shortcut with a hotkey it finds.  (But, as I said,
+it did not fix I<my> problem: C<AltGr-s> works in F<MSKLC> test window,
+and nowhere else I tried...)
+
+=item "There was a problem loading the file" from C<MSKLC>
+
+Make line endings in F<.klc> DOSish.
+
+=item C<AltGr-keys> do not work
+
+Make line endings in F<.klc> DOSish (when given as input to F<kbdutool> -
+it gives no error messages, and deadkeys work [?!]).
+
+=back
+

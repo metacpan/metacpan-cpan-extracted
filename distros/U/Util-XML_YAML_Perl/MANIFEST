@@ -1,0 +1,14 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Util/XML_YAML_Perl.pm
+t/00-load.t
+t/01.t
+t/02.t
+t/03.t
+t/test_file
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

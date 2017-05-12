@@ -1,0 +1,33 @@
+---
+abstract: 'Find URIs in arbitrary text'
+author:
+  - 'Michael G Schwern <schwern@pobox.com>'
+build_requires:
+  Module::Build: '0.30'
+  Test::More: '0.88'
+configure_requires:
+  Module::Build: '0.30'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: URI-Find
+provides:
+  URI::Find:
+    file: lib/URI/Find.pm
+    version: '20160806'
+  URI::Find::Schemeless:
+    file: lib/URI/Find/Schemeless.pm
+    version: '20160806'
+requires:
+  URI: '1.60'
+  perl: v5.8.8
+resources:
+  bugtracker: http://github.com/schwern/URI-Find/issues/
+  homepage: http://metacpan.org/release/URI-Find
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/schwern/URI-Find/
+version: '20160806'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

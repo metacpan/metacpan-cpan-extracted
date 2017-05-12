@@ -1,0 +1,12 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         URI-OpenURL
+version:      0.4.6
+version_from: lib/URI/OpenURL.pm
+installdirs:  site
+requires:
+    URI:                           1.19
+    URI::Escape:                   0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

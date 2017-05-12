@@ -1,0 +1,106 @@
+NAME
+    Unicode::Block::Ascii - Ascii output of unicode block.
+
+SYNOPSIS
+     use Unicode::Block::Ascii;
+     my $obj = Unicode::Block::Ascii->new(%parameters);
+     my $output = $obj->get;
+     my $item = $obj->next;
+
+METHODS
+    "new(%parameters)"
+            Constructor.
+
+            *       "char_from"
+
+                     Character from.
+                     Default value is '0000'.
+
+            *       "char_to"
+
+                     Character to.
+                     Default value is '007f'.
+
+            *       "title"
+
+                     Title of block.
+                     Default value is undef.
+
+    "get()"
+             Get output.
+             Return string with ascii table of Unicode::Block object.
+
+    "next()"
+             Get next character.
+             Returns Unicode::Block::Item object for character, if character exists.
+             Returns undef, if character doesn't exist.
+
+ERRORS
+     new():
+             From Class::Utils::set_params_pub():
+                     Unknown parameter '%s'.
+
+     get():
+             Long title.
+
+EXAMPLE
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Encode qw(encode_utf8);
+     use Unicode::Block::Ascii;
+     use Unicode::Block::List;
+
+     # Arguments.
+     if (@ARGV < 1) {
+             print STDERR "Usage: $0 block_name\n";
+             exit 1;
+     }
+     my $block_name = $ARGV[0];
+
+     # List object.
+     my $obj = Unicode::Block::List->new;
+
+     # Get Unicode::Block for block name.
+     my $block = $obj->block($block_name);
+
+     # Get ASCII object.
+     my $block_ascii = Unicode::Block::Ascii->new(%{$block});
+
+     # Print to output.
+     print encode_utf8($block_ascii->get)."\n";
+ 
+     # Output:
+     # Usage: /tmp/o1NG0vm_Wf block_name
+
+     # Output with 'Block Elements' argument:
+     # ┌────────────────────────────────────────┐
+     # │             Block Elements             │
+     # ├────────┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┤
+     # │        │0│1│2│3│4│5│6│7│8│9│A│B│C│D│E│F│
+     # ├────────┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┤
+     # │ U+258x │▀│▁│▂│▃│▄│▅│▆│▇│█│▉│▊│▋│▌│▍│▎│▏│
+     # ├────────┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┤
+     # │ U+259x │▐│░│▒│▓│▔│▕│▖│▗│▘│▙│▚│▛│▜│▝│▞│▟│
+     # └────────┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘
+
+DEPENDENCIES
+    Error::Pure, Readonly, Text::UnicodeBox, Text::UnicodeBox::Control,
+    Unicode::Block.
+
+REPOSITORY
+    <https://github.com/tupinek/Unicode-Block-Ascii>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    BSD license.
+
+VERSION
+    0.01
+

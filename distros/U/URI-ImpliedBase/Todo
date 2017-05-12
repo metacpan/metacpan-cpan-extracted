@@ -1,0 +1,6 @@
+TODO list for Perl module URI::ImpliedBase
+
+- Check to see that multithreaded code can use URI::ImpliedBase
+- Test with mod_perl / mod_soap
+
+

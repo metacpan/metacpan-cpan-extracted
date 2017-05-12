@@ -1,0 +1,69 @@
+Revision history for Perl extension UPS::Nut.
+
+0.01  Tue Mar 26 12:10:41 2002
+	- original version; created by ExtUtils::ModuleMaker 0.20102
+0.02  Tue May 21 10:46:00 2002
+        - changed default port from 3305 to 3493 to comply with IANA 
+          assigned port # for NUT. -- KP
+0.03  Sat August 10 12:00:00 2002
+        - Made debug messages slightly more descriptive, improved comments 
+          in code.
+
+	  Removed TimeLeft() function.  I'm just going to let people do a 
+	  request for the RUNTIME var, if supported.  I don't think that 
+	  my code for calculating battery life belongs in the module, 
+	  although I'm happy to share the code with anyone who asks. 
+
+	  Accessor functions for all supported vars added by Wayne 
+          Wylupski <wayne@connact.com>.  Yay Wayne!
+
+	  The module no longer automatically logs in to the UPS.  Now you 
+	  have to explicitly set an option (LOGIN => 1) in the 
+	  constructor.  This was done at the suggestion of Russell Kroll 
+	  (rkroll@exploits.org) so that people using my module won't cause 
+	  upsd to wait forever for them to log out if it doesn't need to.  
+	  So only use LOGIN if you're actually connected to the UPS, OR 
+	  CLOWNS WILL EAT YOU!.(com)
+ 
+	  Modified login logic a bit.  Now it doesn't check to see if we 
+	  got OK, ERR, or something else from upsd.  It simply checks for 
+	  a response beginning with OK from upsd. Anything else is an 
+	  error.  The login logic was just way too long and involved 
+	  before.
+
+	  Modified login to send ups name w/LOGIN command, as sending 
+	  LOGIN with no upsname makes some versions (prior to 0.50.1a) 
+	  break.
+
+	  Wayne Wylupski <wayne@connact.com> Added functions to directly 
+	  call all supported instant commands.  Yay Wayne again!
+ 
+	  Request() now returns undef on all failure conditions.
+ 
+ 	  Master() now returns undef on all failure conditions. 
+ 
+  	  I'm no longer using "default" as the upsname if no upsname was 
+  	  specified.  "default" is a convention used in the upsd code, and 
+	  could change any time.  Now, if no upsname is specified, Nut.pm 
+	  doesn't send one either, which is acceptable behavior.  upsd 
+	  will then select a UPS - see the docs for upsd.
+
+      Fri Aug 23 7:55:00 2002
+
+          All references to _debug() have been replaced with 
+          $self->_debug().  This improves compatibility with Perl 5.005 
+          and 'use strict'
+
+0.04  Sat Nov 30 10:17:27 2002
+
+          From Wayne:
+
+          AUTOLOAD for InstCmds;
+          Removed EXPANDed stuff
+          Added attributions for the specific routines
+          Adjusted the POD for the above changes
+
+          From me:
+  
+          Changed $version to read 0.04.  Oh boy.  *grin*
+

@@ -1,0 +1,9 @@
+Revision history for Perl extension UNIVERSAL::derived_classes.
+
+0.02  Tue Nov 27 14:42:30 2007
+	- fixed memory leak
+
+0.01  Wed Jul 25 10:06:00 2007
+	- original version; created by h2xs 1.23 with options
+		-AX -n UNIVERSAL::derived_classes
+

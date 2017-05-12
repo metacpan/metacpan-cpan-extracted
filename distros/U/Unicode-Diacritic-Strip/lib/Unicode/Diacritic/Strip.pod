@@ -1,0 +1,208 @@
+
+=encoding UTF-8
+
+=head1 NAME
+
+Unicode::Diacritic::Strip - strip diacritics from Unicode text
+
+=head1 SYNOPSIS
+
+    
+    use utf8;
+    use Unicode::Diacritic::Strip ':all';
+    my $in = 'àÀâÂäçéÉèÈêÊëîïôùÙûüÜがぎぐげご';
+    print strip_diacritics ($in), "\n";
+    print fast_strip ($in), "\n";
+    
+
+
+produces output
+
+    aAaAaceEeEeEeiiouUuuUかきくけこ
+    aAaAaceEeEeEeiiouUuuUがぎぐげご
+
+
+(This example is included as L<F<synopsis.pl>|https://api.metacpan.org/source/BKB/Unicode-Diacritic-Strip-0.09/examples/synopsis.pl> in the distribution.)
+
+
+=head1 VERSION
+
+This documents Unicode::Diacritic::Strip version 0.09
+corresponding to git commit L<3069a4a261cef77ec40ff6aebfd2243819e64b1f|https://github.com/benkasminbullock/Unicode-Diacritic-Strip/commit/3069a4a261cef77ec40ff6aebfd2243819e64b1f> released on Wed Apr 5 11:18:47 2017 +0900.
+
+=head1 DESCRIPTION
+
+This module offers two ways to remove diacritics from Unicode
+text. One of them, L</strip_diacritics>, uses the unicode
+decompositions to break the characters down. The other one,
+L</fast_strip>, is a faster alternative, which is basically C<tr> with
+a big list of alphabetical characters with and without
+diacritics. There is also L</strip_alphabet>, which is the same as
+L</strip_diacritics>, but it also returns a list of what characters
+were changed.
+
+=head1 FUNCTIONS
+
+=head2 strip_diacritics
+
+    my $stripped = strip_diacritics ($text);
+
+Strip diacritics from C<$text>. The diacritics are as defined by the
+Unicode Character Database. See L<Unicode::UCD>.
+
+=head2 strip_alphabet
+
+    my ($stripped, $swaps) = strip_alphabet ($text);
+
+Strip diacritics from C<$text> in the same way as
+L</strip_diacritics>, and also return the alphabet of diacritic to
+non-diacritic characters as a hash reference.
+
+    
+    use utf8;
+    use FindBin '$Bin';
+    use Unicode::Diacritic::Strip 'strip_alphabet';
+    my $stuff = '89. ročník udílení Oscarů';
+    my ($out, $list) = strip_alphabet ($stuff);
+    for my $k (keys %$list) {
+        print "$k was converted to $list->{$k}\n";
+    }
+
+
+produces output
+
+    č was converted to c
+    ů was converted to u
+    í was converted to i
+
+
+(This example is included as L<F<strip-alphabet.pl>|https://api.metacpan.org/source/BKB/Unicode-Diacritic-Strip-0.09/examples/strip-alphabet.pl> in the distribution.)
+
+
+This was added to the module in version 0.08. Prior to that it was in
+another module called Unicode::StripDiacritics which I wrote as a
+duplicate of this module, but fortunately hadn't released to CPAN.
+
+=head2 fast_strip
+
+    my $stripped = fast_strip ($text);
+
+Rapidly strip alphabetical Unicode characters to the nearest plain
+ASCII equivalents. This is just a big list of characters and a C<tr>
+to zap them into ASCII. It also contains a few other things like the
+thorn character and a ligature.
+
+    
+    use utf8;
+    use FindBin '$Bin';
+    use Unicode::Diacritic::Strip 'fast_strip';
+    my $unicode = 'Bjørn Łódź';
+    print fast_strip ($unicode), "\n";
+    
+
+
+produces output
+
+    Bjorn Lodz
+
+
+(This example is included as L<F<ask.pl>|https://api.metacpan.org/source/BKB/Unicode-Diacritic-Strip-0.09/examples/ask.pl> in the distribution.)
+
+
+This was added to the module in version 0.07. It has been in service
+for several years at the following website:
+L<http://www.sljfaq.org/cgi/e2k.cgi> for converting the user's inputs
+into the closest English equivalent.
+
+=head1 SEE ALSO
+
+=head2 CPAN modules
+
+=over
+
+=item L<Text::Undiacritic>
+
+This overlaps with Unicode::Diacritic::Strip.
+
+=item L<Text::Unidecode>
+
+This somewhat bizarre module converts any Unicode to ASCII.
+
+=item L<Text::Unaccent>
+
+This is an XS module dating from more than ten years ago which has
+problems compiling on 64 bit systems.
+
+=item L<Text::Unaccent::PurePerl>
+
+=item L<Text::Transliterator::Unaccent>
+
+=item L<Text::StripAccents>
+
+=back
+
+=head2 Web pages
+
+The page at L<Strip diacritics from
+text|https://www.lemoda.net/tools/strip-diacritics/index.html> offers
+an online interface to this module.
+
+L<How to remove diacritic marks from
+characters|http://ahinea.com/en/tech/accented-translate.html> by Ivan
+Kurmanov.
+
+=head1 DEPENDENCIES
+
+=over
+
+=item L<Unicode::UCD>
+
+=item L<Encode>
+
+=back
+
+=head1 EXPORTS
+
+Nothing is exported by default. The functions L</strip_diacritics>,
+L</strip_alphabet>, and L</fast_strip> are exported on demand. A tag
+C<:all> exports all the functions from the module.
+
+=head1 BUGS
+
+=over
+
+=item Test failures on Perl 5.14
+
+The test failures on CPAN testers for version 0.08 of this module and
+Perl version 5.14, such as
+L<these|http://matrix.cpantesters.org/?dist=Unicode-Diacritic-Strip%200.08;os=linux;perl=5.14.2;reports=1>,
+containing the error string
+
+    perl: hv.c:2663: S_unshare_hek_or_pvn: Assertion `he->shared_he_he.hent_hek == hek' failed.
+
+are due to a bug in that version of Perl, and are completely beyond my
+control. Unicode::Diacritic::Strip is a pure Perl module with no XS
+components. (I have tried to contact the tester responsible for these
+reports with no success, due to the registered email address
+bouncing.)
+
+=back
+
+
+=head1 AUTHOR
+
+Ben Bullock, <bkb@cpan.org>
+
+=head1 COPYRIGHT & LICENCE
+
+This package and associated files are copyright (C) 
+2012-2017
+Ben Bullock.
+
+You can use, copy, modify and redistribute this package and associated
+files under the Perl Artistic Licence or the GNU General Public
+Licence.
+
+
+
+

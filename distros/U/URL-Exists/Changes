@@ -1,0 +1,14 @@
+Revision history for Perl module URL::Exists
+
+0.03 2015-11-13 NEILB
+    - Updated github repo URL after changing my github username
+    - Added [MetaJSON] to dist.ini so META.json is included in releases
+    - Improved the abstrat (one line description in NAME section)
+
+0.02 2014-12-12 NEILB
+    - Removed used of // operator, so it will work with older perls.
+      SYOHEX++
+
+0.01 2014-12-11 NEILB
+    - First release to CPAN
+

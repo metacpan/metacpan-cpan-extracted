@@ -1,0 +1,291 @@
+NAME
+    UMLS::Association Installation Guide
+
+TESTING PLATFORMS
+    UMLS::Association has been developed and tested on Linux primarily using
+    Perl and MySQL.
+
+SYNOPSIS
+     perl Makefile.PL
+
+     make
+
+     make test
+
+     make install
+ 
+     perl CUICollector.pl --directory metamapped-baseline/2014/
+
+DESCRIPTION
+    The UMLS::Association module provides a framework for exploring the
+    semantic association of terms in the Unified Medical Language System
+    (UMLS).
+
+REQUIREMENTS
+    UMLS-Interface REQUIRES that the following software packages and data:
+
+  Programming Languages
+     Perl (version 5.8.0 or better)
+
+  CPAN Modules
+     DBI
+     DBD::mysql
+     Text::NSP
+     Compress::Zlib
+ 
+     and of course,
+     UMLS::Interface
+
+  Database
+    MySQL (version 5 or better)
+
+  Data
+    MetaMapped Medline Baseline available at
+    <http://ii.nlm.nih.gov/MMBaseline>
+
+INSTALLATION STAGES
+    The installation is broken into four stages:
+    Stage 1: Install Programming Languages
+                  If already installed you need at minimum: 
+                      - Perl version 5.10 or better
+
+    Stage 2: Install CPAN Modules
+    Stage 3: Install MySQL
+                  If already installed you need at minimum: 
+                      - MySQL version 5 or better
+
+    Stage 4: Build the bigram score database
+    Stage 5: Install UMLS-Association
+
+Stage 1: Install Programming Languages, if already installed go to Stage 2
+  Perl (version 5.8.5 or better)
+    Perl is freely available at <http://www.perl.org>. It is very likely
+    that you will already have Perl installed if you are using a Unix/Linux
+    based system.
+
+Stage 2 - Install CPAN modules, if already installed go to Stage 3
+  DBI
+    CPAN modules, and will not be repeated in detail for each module.****
+
+    UMLS-Interface uses DBI to access the mysql database containing the
+    UMLS. DBI is freely available at <http://search.cpan.org/~timb/DBI/>
+
+    If you have supervisor access, or have configured MCPAN for local
+    install, you can install via:
+
+     perl -MCPAN -e shell
+     > install DBI
+
+    If not, you can, "manually" install by downloading the *.tar.gz file,
+    unpacking, and executing the following commands.
+
+     perl Makefile.PL PREFIX=/home/programs LIB=/home/lib
+     make
+     make test
+     make install
+
+    Note that the PREFIX and LIB settings are just examples to help you
+    create a local install, if you do not have supervisor (su) access.
+
+    You must include /home/MyPerlLib in your PERL5LIB environment variable
+    to access this module when running.
+
+  DBD::mysql
+    UMLS::Association uses this module to connect, create, and add to the
+    bigram score database with the MySQL database management system. It is
+    the MySQL sriver for the Perl5 Database interface.
+
+    This package is freely available at
+    <http://search.cpan.org/dist/DBD-mysql/>
+
+  Text::NSP
+    UMLS-Association uses this package to obtain the frequency counts for
+    propagation. This package is freely available at:
+
+    <http://search.cpan.org/dist/Text-NSP/>
+
+  Compress::Zlib
+    This package is needed to read the compressed MMB output files into the
+    bigram database. These files are rather large so decompressing them on
+    the fly saves a tremoundous amount of space.
+
+    The package is freely available at:
+    <http://search.cpan.org/dist/Compress-Zlib/>
+
+  UMLS::Interface
+    The core UMLS package provides a dictionary from content unqiue
+    identifiers (CUI) to their meanings in the Unified Medical Language
+    System. Refer to the UMLS::Interface documentation for how to install
+    the UMLS database on your system.
+
+    The package is freely available at:
+    <http://search.cpan.org/dist/UMLS-Interface/>
+
+Stage 3 - Install MySQL, if already installed go to Stage 4
+    Requires MySQL (version 5 or better)
+
+    MySQL is a freely available database at <http://www.mysql.com/>. You may
+    be able to install this with you package manager. Otherwise you will
+    have to download the appropriate files from the MySQL website. Either
+    way, make certain that the following are installed:
+
+            1. Server
+            2. Client
+            3. Shared libraries
+            4. Headers and libraries
+
+    Sometimes the headers and libraries are not installed so you want to
+    double check on that.
+
+  Installing on Fedora using yum
+    To install mysql using yum, type the following three commands on the
+    command line:
+
+        1. yum install mysql
+        2. yum install mysql-server
+        3. yum install mysql-devel
+
+    After this is complete mysql should be installed. Next you need to start
+    the mysql server by typing the following command:
+
+         service mysqld start
+
+  Installing on Ubuntu using apt-get
+    Type the following commands as root or with sudo:
+
+     apt-get install mysql-common
+     apt-get install mysql-client
+     apt-get install mysql-server
+ 
+     service mysqld start
+
+  Reminder
+    Also for all the installations, remember to set your root password:
+
+         /usr/bin/mysqladmin -u root password 'new-password'
+
+    If you are not going to be using root as your main entry into mysql -
+    which is probably a good idea - you can create a user account. Here is
+    how I did it:
+
+     mysql> CREATE USER bthomson IDENTIFIED BY 'psswrd';
+     Query OK, 0 rows affected (0.00 sec)
+
+     mysql> GRANT ALL ON *.* TO bthomson;
+     Query OK, 0 rows affected (0.00 sec)
+
+    Directions are in the mysql documentation:
+
+    <http://dev.mysql.com/doc/refman/5.1/en/adding-users.html>
+
+Stage 4: Build Bigram Database
+    Here we will process MetaMap Machine Output (MMO) formatted files into a
+    databasecontaining bigram scores for Content Unique Identifies (CUIs).
+    These files arepresumed to be compressed as GNU Zip archives (*.gz). You
+    can download the MetaMap Medline Baseline from the National Library of
+    Medicine:
+
+    <http://ii.nlm.nih.gov/MMBaseline/index.shtml>
+
+    To process a directory containing only MMO files using default database
+    settings:
+
+        CUICollector.pl --directory metamapped-baseline/2015/
+
+    These same defaults:
+
+        CUICollector.pl --database CUI_Bigrams --hostname localhost --port 3306 --username user --password pass --file_step 5 --directory metamapped-baseline/2015/ --verbose
+
+    To process a single file:
+
+        CUICollector.pl --database filename_Bigrams --files filename.txt.gz
+
+    For a full listing of options,
+
+        CUICollector.pl --help
+
+    Or consult the documentation for CUICollector:
+
+        man CUICollector.pl
+
+Stage 5: Install UMLS-Association package
+    The usual way to install the package is to run the following commands:
+
+         perl Makefile.PL
+         make
+         make test
+         make install
+
+    You will often need root access/superuser privileges to run make
+    install. The module can also be installed locally. To do a local
+    install, you need to specify a PREFIX option when you run 'perl
+    Makefile.PL'. For example,
+
+     perl Makefile.PL PREFIX=/home
+
+     or
+
+     perl Makefile.PL LIB=/home/lib PREFIX=/home
+
+    will install UMLS-Interface into /home. The first method above will
+    install the modules in /home/lib/perl5/site_perl/5.8.3 (assuming you are
+    using version 5.8.3 of Perl; otherwise, the directory will be slightly
+    different). The second method will install the modules in /home/lib. In
+    either case the executable scripts will be installed in /home/bin and
+    the man pages will be installed in home/share.
+
+    Warning: do not put a dash or hyphen in front of PREFIX, or LIB
+
+    In your perl programs that you may write using the modules, you may need
+    to add a line like so
+
+     use lib '/home/lib/perl5/site_perl/5.8.3';
+
+    if you used the first method or
+
+     use lib '/home/lib';
+
+    if you used the second method. By doing this, the installed modules are
+    found by your program. To run the umls-association.pl program, you would
+    need to do
+
+     perl -I/home/lib/perl5/site_perl/5.8.3 umls-association.pl
+
+     or
+
+    perl -I/home/lib
+
+    Of course, you could also add the 'use lib' line to the top of the
+    program yourself, but you might not want to do that. You will need to
+    replace 5.8.3 with whatever version of Perl you are using. The preceding
+    instructions should be sufficient for standard and slightly non-standard
+    installations. However, if you need to modify other makefile options you
+    should look at the ExtUtils::MakeMaker documentation. Modifying other
+    makefile options is not recommended unless you really, absolutely, and
+    completely know what you're doing!
+
+    NOTE: If one (or more) of the tests run by 'make test' fails, you will
+    see a summary of the tests that failed, followed by a message of the
+    form "make: *** [test_dynamic] Error Y" where Y is a number between 1
+    and 255 (inclusive). If the number is less than 255, then it indicates
+    how many test failed (if more than 254 tests failed, then 254 will still
+    be shown). If one or more tests died, then 255 will be shown. For more
+    details, see:
+
+    <http://search.cpan.org/dist/Test-Simple/lib/Test/Builder.pm#EXIT_CODES>
+
+CONTACT US
+     If you have any trouble installing and using UMLS-Association, please 
+     contact us via the users mailing list : 
+
+     umls-association@yahoogroups.com
+
+     You can join this group by going to:
+
+    <http://tech.groups.yahoo.com/group/umls-association/>
+
+     You may also contact us directly if you prefer :
+
+     Bridget T. McInnes: btmcinnes at vcu.edu
+     Keith Herbert: herbertkb at vcu.edu
+

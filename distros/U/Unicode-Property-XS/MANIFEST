@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Unicode-Property-XS.t
+lib/Unicode/Property/XS.pm

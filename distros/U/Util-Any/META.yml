@@ -1,0 +1,51 @@
+---
+abstract: 'to export any utilities and to create your own utility module'
+author:
+  - 'Ktat, C<< <ktat at cpan.org> >>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.2.0, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Util-Any
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Util::Any:
+    file: lib/Util/Any.pm
+    version: '0.25'
+requires:
+  Clone: '0'
+  Data::Dumper: '0'
+  ExportTo: '0'
+  Hash::Util: '0'
+  List::MoreUtils: '0'
+  List::Pairwise: '0'
+  List::Util: '0'
+  Module::Pluggable: '0'
+  Scalar::Util: '0'
+  String::CamelCase: '0'
+  String::Util: '0'
+  Test::More: '0.88'
+resources:
+  bugtracker: https://github.com/ktat/Util-Any/issues
+  homepage: https://github.com/ktat/Util-Any
+  repository: git://github.com/ktat/Util-Any.git
+version: '0.25'
+x_contributors:
+  - 'drry <drry@d0d07461-0603-4401-acd4-de1884942a52>'
+  - 'ktat <ktat@d0d07461-0603-4401-acd4-de1884942a52>'
+  - 'ktat <ktat.is@gmail.com>'

@@ -1,0 +1,34 @@
+
+
+=pod
+
+=head1 NAME
+
+ur update - update parts of the source tree of a UR namespace
+
+
+
+=head1 VERSION
+
+This document describes ur update version 0.29.
+
+=head1 SUB-COMMANDS
+
+ classes-from-db       [--class-name=?] ...  Update class definitions (and data dictionary cache) to   
+                                              reflect changes in the database schema.                  
+ schema-diagram        --file=? [--data-...  Update an Umlet diagram based on the current schema       
+ class-diagram         --file=? [--data-...  Update an Umlet diagram based on the current class        
+                                              definitions                                              
+ pod                   [--input-path=?] ...  generate man-page-like POD for a commands                 
+ rename-class          [--force] [CLASSE...  Update::RewriteClassHeaders class descriptions headers to 
+                                              normalize manual changes.                                
+ rewrite-class-header  [--force] [CLASSE...  Update::RewriteClassHeaders class descriptions headers to 
+                                              normalize manual changes.                                
+ tab-completion-spec   [--output=?] CLAS...  Creates a .opts file beside class/module passed as        
+                                              argument, e.g. UR::Namespace::Command.                   
+
+
+
+
+=cut
+

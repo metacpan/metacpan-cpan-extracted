@@ -1,0 +1,666 @@
+=head1 NAME
+
+Uniden::BC75XLT - module to program Uniden BC75XLT radio scanner over
+USB connection
+
+=head1 SYNOPSIS
+
+ use Uniden::BC75XLT;
+ use Data::Dumper;
+
+ my $radio = Uniden::BC75XLT->new('/dev/ttyUSB0') || die "Cannot open radio: $!\n";
+   
+ #  get channels info in bank N1
+ my $channelsInfo = $radio->getBankChannelsInfo(1);
+ print Dumper($channelsInfo);
+   
+ undef($radio);
+
+=head1 DESCRIPTION
+
+Module implements all command described in
+UNIDEN BC75XLT Operation Specification
+(http://info.uniden.com/UnidenMan4/BC75XLT).
+
+=head1 CONSTRUCTOR
+
+=head2 PACKAGE-E<gt>new(DEVICE_STR, OPTS_HASH)
+
+Creates new Uniden::BC75XLT object. Where C<DEVICE_STR> is port name and 
+C<OPTS_HASH> is a hash with following keys:
+
+=over 3
+
+=item *
+
+B<baudrate> - integer, port speed, default - 57600
+
+=item *
+
+B<databits> - integer, number of data bits in each character, default - 8
+
+=item *
+
+B<parity> - string, method of detecting errors in transmission, default - "none"
+
+=item *
+
+B<stopbits> - integer, stop bits, default - 1
+
+=item *
+
+B<handshake> - string, handshake method, default - "none"
+
+=item *
+
+B<read_cost_time> - integer, const time for read (milliseconds), default - 1
+
+=item * 
+
+B<timeout> - integer, reading port timeout in milliseconds, default - 999
+
+=item *
+
+B<echo> - boolean, if true all data sent to and received from port will be sent
+to STDERR
+
+=item *
+
+B<fatal> - boolean, if set to true all errors are regarded as fatal and C<die>
+will be called on them, otherwise error message invokes print to STDERR and
+C<undef> will be returned after error.
+
+=back
+
+More accurate meaning and possible values of keys B<baudrate>, B<databits>, 
+B<parity>, B<stopbits>, B<handshake> and B<read_cost_time> you can find in 
+L<Device::SerialPort> documentation.
+
+B<Example>:
+
+ my $radio = Uniden::BC75XLT->new('/dev/ttyUSB0', echo => 1) || die "Cannot open: $!\n";
+
+=head1 METHODS
+
+=head2 command(CMD_STR, ARGS_ARRAYREF)
+
+Method send command C<CMD_STR> to radio scanner with arguments C<ARGS_ARRAYREF>.
+Arguments array may be undefined.
+
+Normally you do not need to use this method 'cause other methods are frontends
+to this method and cover all described in operation manual commands.
+
+Method returns C<HASHREF> with following keys:
+
+=over 3
+
+=item *
+
+B<status> - string, B<OK> - if command executed successfully and B<ERROR> if 
+something was wrong
+
+=item *
+
+B<desc> - string, if B<status> has value B<ERROR> this key contains
+description of error occurred
+
+=item *
+
+B<data> - arrayref of strings, if B<status> has value B<OK> this key 
+contains data returned by radio. Arrayref always defined even no data
+supposed to be returned.
+
+=back
+
+=head2 getModelName
+
+Method returns model name.
+
+=head2 getFirmwareVersion
+
+Method returns firmware version.
+
+=head2 getVolume
+
+Method returns volume level (0-15)
+
+=head2 setVolume(VOL_INT)
+
+Method set volume level value (VOL_INT). Reasonable values 0-15.
+
+=head2 getSql
+
+Method returns Sql value (0-15)
+
+=head2 setSql(SQL_INT)
+
+Method set Sql value (SQL_INT). Reasonable values 0-15.
+
+=head2 setProgramMode
+
+The scanner goes to Program Mode (PGM). The scanner displays "PC" and
+Key lock and PGM icons.
+
+Some command (almost all) must be executed in PGM of scanner. If 
+you use methods of this package you do not need enter to PGM
+manually. Each method "knows" how to communicate with scanner and if it 
+needs PGM, it will enter to PGM before send command and exit after. But if you
+want to send sequence of commands you may start PGM manually and quit it after
+sequence is complete. It may save you some seconds.
+
+=head2 quitProgramMode
+
+The scanner exits from Program Mode.
+Then the scanner goes to Scan Hold Mode.
+
+You need to call this method only if you call C<setProgramMode> before.
+
+=head2 getBandPlan
+
+Returns band plan code - 0:USA, 1:Canada.
+
+=head2 getBandPlanName
+
+Returns band plan name - USA/CANADA.
+
+=head2 setBandPlan(BANDPLAN)
+
+Set band plane. C<BANDPLAN> can be integer - code or string - name.
+
+B<Example>:
+
+ $radio->setBandPlan('CANADA');
+ $radio->setBandPlan(1);
+
+=head2 getKeyLockState
+
+Returns key lock state code - 0:OFF, 1:ON.
+
+=head2 getKeyLockStateName
+
+Returns key lock state name - OFF/ON.
+
+=head2 setKeyLockState(STATE)
+
+Set key lock state. C<STATE> can be integer - code or string - name.
+
+B<Example>:
+
+ $radio->setKeyLockState('OFF');
+ $radio->setKeyLockState(0);
+
+=head2 getPriorityMode
+
+Returns priority mode code - 0:OFF, 1:ON, 2:PLUS ON, 3:DND.
+
+=head2 getPriorityModeName
+
+Returns priority mode name - OFF/ON/PLUS ON/DND.
+
+=head2 setPriorityMode(MODE)
+
+Set priority mode. C<MODE> can be integer - code or string - name.
+
+B<Example>:
+
+ $radio->setPriorityMode('DND');
+ $radio->setPriorityMode(3);
+
+=head2 getScanChannelGroup
+
+Get current status of the channel storage bank select. 
+
+Returns C<ARRAYREF> of 10 elements. Each element contains ON/OFF string. 
+Every array element describes group with the same index in radio. 
+But index of radio scanner groups starts with 1. So element with index 0 means
+state of group with index 1.
+
+=head2 setScanChannelGroup(GROUP_DATA)
+
+Set current status of the channel storage bank select. 
+
+If C<GROUP_DATA> is C<HASHREF> then keys mean to be index of radio scanner 
+group and values are states of group. States can be strings - ON/OFF or integer
+1:OFF/0:ON.
+
+If C<GROUP_DATA>  is C<ARRAYREF> then every element is state of group with index
+equals index of element plus 1. States can be strings - ON/OFF or integer
+1:OFF/0:ON.
+
+If C<GROUP_DATA> is a string it will be passed as argument to command ASIS.
+
+B<Example>:
+
+ # Set group 1,2,3,7,8,9 to ON state in Scan mode
+ # all three lines are equivalents
+ 
+ $radio->setScanChannelGroup([ 'ON', 'ON', 'ON', 'OFF', 'OFF', 'OFF', 'ON', 'ON', 'ON', 'OFF' ]);
+ $radio->setScanChannelGroup({  1 => 'ON',  2 => 'ON', 3 => 'ON', 7 => 'ON', 8 => 'ON', 9 => 'ON' });
+ $radio->setScanChannelGroup('0001110001');
+
+=head2 setValidScanChannels(CHANNELS_ARRAYREF)
+
+Set valid radio scanner groups in Scan mode. C<CHANNELS_ARRAYREF> is C<ARRAYREF>
+of radio scanner group indexes.
+
+B<Example>:
+
+ # Set group 1,2,3,7,8,9 to ON state in Scan mode
+ 
+ $radio->setValidScanChannels([1,2,3,7,8,9 ]);
+
+
+=head2 getChannelInfo(N_INT)
+
+Get stored channel information, C<N_INT> is number of channel, integer 
+between 1..300.
+
+Returns C<HASHREF> with keys:
+
+=over 3
+
+=item *
+
+B<state> - status of channel: B<SET> or B<UNSET>.
+
+=item *
+
+B<index> - number of channel
+
+=item *
+
+B<freq> - stored frequency in human readable form, e.g. 128.0000
+
+=item *
+
+B<freq_code> - stored frequency as returned by radio scanner, e.g. '01280000'
+
+=item *
+
+B<delay> - is delay turned on - ON/OFF
+
+=item *
+
+B<delay_code> - is delay turned on code - 0:OFF/1:ON
+
+=item *
+
+B<lockout> - lockout - UNLOCKED/LOCKOUT 
+
+=item *
+
+B<lockout_code> - lockout code - 0:UNLOCKED/1:LOCKOUT
+
+=item *
+
+B<priority> - priority - ON/OFF
+
+=item *
+
+B<priority_code> - priority code - 0:OFF/1:ON
+
+=back
+
+B<Return example>:
+
+ {
+   'priority' => 'ON',
+   'delay_code' => '1',
+   'delay' => 'ON',
+   'freq_code' => '00271350',
+   'lockout' => 'UNLOCKED',
+   'state' => 'SET',
+   'index' => '61',
+   'lockout_code' => '0',
+   'freq' => '27.1350',
+   'priority_code' => '1'
+ };
+
+=head2 getChannelsInfo(OPTS_HASH)
+
+Retrieve information about stored channels. 
+
+C<OPTS_HASH> has keys:
+
+=over 3
+
+=item *
+
+B<start> - index of first channel
+
+=item *
+
+B<stop> - index of last channels
+
+=item *
+
+B<state> - status of channels to show. Possible values ON, OFF, 1, 0. If not 
+set all channels will be selected.
+
+=back
+
+Returns C<ARRAYREF> each element is C<HASHREF> with information about channel
+described in method C<getChannelInfo>.
+
+B<Example>:
+
+ # get information about channels 60..70 in ON state 
+ 
+ $radio->getChannelsInfo(start => 60, stop => 70, status => 'ON');
+
+ # get all channels information
+
+ $radio->getChannelsInfo();
+
+=head2 getBankChannelsInfo(N_INT)
+
+Gets information about channel in a bank. C<N_INT> is index of channels
+bank, 1..10.
+
+Returns C<ARRAYREF> each element is C<HASHREF> with information about channel
+described in method C<getChannelInfo>.
+
+B<Example>:
+
+ $radio->getBankChannelsInfo(5);
+
+=head2 setChannelInfo(IDX_INT, DATA_HASHREF)
+
+Store frequency in to the channel. C<IDX_INT> - integer, index of channel
+(1..300).
+
+C<DATA_HASHREF> is C<HASHREF>, information about stored frequency with keys:
+
+=over 3
+
+=item *
+
+B<freq> - frequency
+
+=item *
+
+B<delay> - delay ON/OFF.
+
+=item *
+
+B<priority> - priotity - ON/OFF.
+
+=item *
+
+B<lockout> - lockout - UNLOCKED/LOCKOUT.
+
+=back
+
+B<Example>:
+
+ $radio->setChannelInfo(61, { freq => '27.135' }); # set channel 
+ $radio->setChannelInfo(61, { freq => '' }); # unset channel
+
+=head2 eraseChannel(IDX_INT)
+
+Erase information stored in channel. C<IDX_INT> - integer, index of channel.
+
+=head2 getSearchCloseCallSettings
+
+Get Search Close Call Settings.
+
+Returns C<HASHREF> with keys:
+
+=over 3
+
+=item *
+
+B<direction> - search direction: DOWN/UP.
+
+=item *
+
+B<direction_code> search direction code: 1:DOWN/0:UP.
+
+=item *
+
+B<delay> - delay: ON/OFF.
+
+=item *
+
+B<delay_code> - delay code: 1:ON/0:OFF.
+
+=back
+
+=head2 setSearchCloseCallSettings(OPTS_HASHREF)
+
+Set Search Close Call Settings.
+
+C<OPTS_HASHREF> is C<HASHREF> with keys:
+
+=over 3
+
+=item *
+
+B<direction> - search direction: 0, 1 or 'UP', 'DOWN'.
+
+=item *
+
+B<delay> - delay: 0, 1 or 'OFF', 'ON'
+
+=back
+
+=head2 getGlobalLockoutFreqs
+
+Get list of global lockout frequencies. List returned as an C<ARRAYREF>.
+
+=head2 lockGlobalFrequency(FREQ)
+
+Locks out frequency. C<FREQ> is frequency value as string of float or integer.
+
+B<Example>:
+
+ $radio->lockGlobalFrequency('27.000');
+ $radio->lockGlobalFrequency(27);
+
+=head2 unlockGlobalFrequency(FREQ)
+
+Unlocks a lockout frequency. C<FREQ> is frequency value as string of float or integer.
+
+=head2 getCloseCallSettings
+
+Get close call settings.
+
+Returns C<HASHREF> with keys:
+
+=over 3
+
+=item *
+
+B<mode> - current CC mode: OFF/PRIORITY/DND
+
+=item *
+
+B<mode_code> - current CC mode code: 0:OFF/1:PRIORITY/2:DND
+
+=item *
+
+B<alert_beep> - beep alarm when CC is found: ON/OFF 
+
+=item *
+
+B<alert_beep_code> - beep alarm when CC is found code: 1:ON/0:OFF 
+
+
+=item *
+
+B<alert_light> - alarm with light when CC is found: ON/OFF
+
+=item *
+
+B<alert_light_code> - alarm with light when CC is found code: 1:ON/0:OFF
+
+=item *
+
+B<bands> - state of preset bands in Close Call RF mode. There are 4 bands:
+B<VHF_LOW>, B<AIR>, B<VHF_HIGH> and B<UHF>. They are keys in B<bands>
+C<HASHREF>, possible values: ON/OFF.
+
+=back
+
+=head2 setCloseCallSettings(OPTS_HASHREF)
+
+Set close call settings.
+
+B<OPTS_HASHREF> is C<HASHREF> with keys:
+
+=over 3
+
+=item *
+
+B<mode> - Close Call RF mode - 0,1,3 or OFF, PRIORITY, DND
+
+=item *
+
+B<alert_beep> - alert with beep settings: 0, 1 or OFF, ON
+
+=item *
+
+B<alert_light> - alert with light settings: 0, 1 or OFF, ON
+
+=item *
+
+B<bands> - list of available bands in Close Call RF mode. C<ARRAYREF> each element
+is band name to be set to ON state.
+
+=back
+
+All keys are optional. By default B<mode> is set in DND, all B<alerts> are OFF,
+all B<bands> are ON.
+
+=head2 getServiceSearchSettings(BAND)
+
+Returns information about Service Search settings. C<BAND_INT> is index or
+name of one of 10 Service frequencies ranges. 
+
+Ranges: 1:WX -Weather, 2:POLICE - Police, 3:FIRE - Fire/Emergency,
+4:MARINE - Marine, 5:RACE - Racing, 6:AIR - Civil Air, 7:HAM - HAM Radio,
+8:RAIL - Railroad, 9:CB - CB Radio, 10:OTHER - FRS/GMRS/MRUS.
+
+Return value is C<HASHREF> with keys:
+
+=over 3
+
+=item *
+
+B<index> - index of freq range (1..10)
+
+=item *
+
+B<band> - name for freq range
+
+=item *
+
+B<delay> - delay: ON/OFF.
+
+=item *
+
+B<delay_code> - delay code: 1:ON/0:OFF.
+
+=item *
+
+B<direction> - direction of search: UP/DOWN.
+
+=item *
+
+B<direction_code> - direction of search code: 0:UP/1:DOWN.
+
+=back
+
+=head2 setServiceSearchSettings(BAND, DLY, DIR)
+
+Set Service search freq range settings. C<BAND> index or name of search range.
+C<DLY> - delay code or name - 1:ON/0:OFF. C<DIR> - direction of search 
+- 0:UP/1:DOWN.
+
+=head2 getCustomSearchGroup
+
+Returns state of Custom Search frequencies groups and Custom Search settings.
+Return value is C<HASHREF> with keys:
+
+=over 3
+
+=item *
+
+B<group> -  C<ARRAYREF> of 10 elements. Each element contains ON/OFF string.
+Every array element describes group with the same index in radio.
+But index of radio scanner groups starts with 1. So element with index 0 means
+state of group with index 1.
+
+=item *
+
+B<delay> - delay: ON/OFF.
+
+=item *
+
+B<delay_code> - delay code: 1:ON/0:OFF.
+
+=item *
+
+B<direction> - direction of search: UP/DOWN.
+
+=item *
+
+B<direction_code> - direction of search code: 0:UP/1:DOWN.
+
+=back
+
+=head2 setCustomSearchGroup(GROUPS, DLY, DIR)
+
+Set state of frequencies groups in Custom Search mode. 
+
+C<GROUPS> - C<HASHREF> or C<ARRAYREF> - describes states of freq group. 
+If you use C<ARRAYREF> you should set 10 elements array every element must 
+contain string ON or OFF. In C<HASHREF> representation keys are index of groups, 
+values are state. If group state was not present in C<HASH> its state would
+be set to OFF.
+
+C<DLY> - delay code or name - 1:ON/0:OFF.
+
+C<DIR> - direction of search 
+- 0:UP/1:DOWN.
+
+=head2 getCustomSearchRange(RANGE_INT)
+
+Radio scanner has 10 Custom Search frequency ranges. This method retrieve 
+left and right bound of range.
+
+C<RANGE_INT> - integer, index of range.
+
+Return value is an C<ARRAYREF> of 2 elements. First is left bound,
+second is right.
+
+=head2 getAllCustomSearchRanges
+
+Returns all ten ranges bounds as C<ARRAYREF> every element contains 
+two elements C<ARRAYREF> where first element is left bound and second is right.
+
+=head2 setCustomSearchRange(RANGE_INT, LEFT, RIGHT)
+
+Set bounds of frequency range.
+
+B<RANGE_INT> - index of range. 1..10
+
+B<LEFT> - frequency value - left bound of range
+
+B<RIGHT> - frequency value - right bound of range
+
+B<Example>:
+ 
+ $radio->setCustomSearchRange(3, '144.0000', '147.9950');
+ $radio->setCustomSearchRange(3, 144, 147.995);
+
+=head2 clearMemory
+
+Clear all radio memory. Not tested :)
+
+=head1 SEE ALSO
+
+L<Device::SerialPort>
+
+=cut
+

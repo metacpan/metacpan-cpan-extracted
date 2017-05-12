@@ -1,0 +1,20 @@
+Unicode/Decompose version 0.01
+==============================
+
+This module provides support for converting Unicode strings into
+Normalization Forms C and D, Perl's native Unicode normalization
+formats.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+This extension is copyright Simon Cozens 2001 and is
+distributable under the same terms as Perl itself.

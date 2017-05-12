@@ -1,0 +1,207 @@
+Revision history for Unexpected
+
+0.46.1    2017-02-16 22:29:03
+          - Better type error file locations
+          - Updated copyright year
+          - Can call instance_of with a code reference
+          - Toolchain update CVE-2016-1238
+
+0.45.1    2016-10-23 19:42:39
+          - Added no_quote_bind_values to StringifyingError
+
+0.44.1    2016-05-08 23:04:28
+          - Added coverage URI to travis.yml
+          - Added coverage badge and coverage report posting
+
+0.43.1    2015-11-29 15:38:05
+          - Refactored smoker exceptions to dump file
+          - Added another broken smoker to exception list
+          - Can set multiple exception attributes from exception classes
+
+0.42.1    2015-10-04 11:09:47
+          - Strictify the POD encoding
+          - Better subroutine naming
+          - Toolchain update
+
+0.41.1    2015-09-14 09:58:50
+          - Turning off CPAN Testing Aug 2015.
+            Since the site went down I cannot see the reports so there is no
+            point leaving them running
+          - Eliminated Try::Tiny from abridged stacktrace
+
+0.40.1    2015-09-04 11:51:43
+          - Cache the exception class lookup in Functions
+            Won't need to except EXCEPTION_CLASS when importing throw
+          - Upstream toolchain update
+
+0.39.1    2015-08-26 23:36:44
+          - Added RequestFactory duck type
+          - Added tests for clone method
+          - Added clone method to Throwing
+          - Replaced 01always-pass.t with Test::ReportMetadata
+
+0.38.1    2015-05-01 14:10:50
+          - Fixed prototype on inflate_placeholders
+          - Exposed inflate_placeholders
+          - Deprecated quote_bind_values. Deleted interpolate_msg
+          - Stop quote_maybe in Functions::interpolate_msg with extra default
+          - Updated copyright year
+
+0.37.1    2015-04-22 21:52:56
+          - Dropped Coveralls due to permission creep on Github
+          - Added Kwalitee badge
+          - Added NonZeroPositiveNum and PositiveNum to Types
+          - Added interpolate_msg which uses new default placeholders
+          - Reversed missing placeholder change
+          - Made boolean overload subclassable
+          - Replaced last _sub with lexical
+          - Missing placeholders replaced with undef and null
+          - Call instance_of in catch_class matching
+
+0.36.1    2014-12-22 01:02:53
+          - Added explicite bool overload
+          - Broken smoker a54c1c84-6bf5-1014-b4f9-dcd54300afcd
+            added to skip list
+          - Updated prereqs
+
+0.35.1    2014-12-01 17:18:12
+          - Switched to lexical subroutines
+          - Added coderef|error, arrayref to constructor method signature
+          - Switched back to alternate D::C::R::Coveralls
+            The alternate version uses Furl and works the official
+            version uses HTTP::Tiny and fails to validate the host cert
+            https://travis-ci.org/pjfl/p5-unexpected/builds/39405067#L152
+          - Added exception, throw and throw_on_error functions
+          - Made is_one_of_us an exported function
+
+0.34.1    2014-10-07 17:21:03
+          - Updated prereq for Exporter::Tiny closes RT#99263 (tobyink++)
+
+0.33.1    2014-10-02 18:31:16
+          - Fixed class coderef dereferencing bug
+
+0.32.1    2014-10-02 01:38:57
+          - Made tests skip broken dev releases of Exporter::Tiny
+            7b202d3a-49be-11e4-8c55-4b712c6f0924 and RT#99263
+
+0.31.1    2014-10-01 23:43:15
+          - Added coderef and list constructor signature
+          - Added two colons test skip line to t/boilerplate.t
+
+0.30.1    2014-08-19 00:02:19
+          - Bumped Type:Tiny version RT#98113
+          - Removed version from POD
+          - Removed strictures::defanged unnecessary
+            warnings::bits is going undefined. Something in the test suite
+            since first occurance was on 02pod.t
+          - Corrected inline package definition in type tests
+          - More breakage 494fe6de-2168-11e4-b0d1-f6bc4915a708
+          - Added fury badge
+          - Updated build_requires dependencies
+          - Split out boilerplate from test scripts
+          - Moved s::d calls til after min perl ver tests
+          - Added strictures::defanged to tests because
+            160dd1a2-1ebe-11e4-ae61-5739e0bfc7aa
+
+0.28.1    2014-08-07 16:37:55
+          - Added another constructor method signature
+          - Added Coverall instructions to tavis.yml
+          - Added Travis and Coverall badges to POD
+
+0.27.1    2014-07-16 15:51:37
+          - Fixed frame skipping sub in stack tracing role
+            Something in the way Moo constructs attributes if different
+            between most systems and some BSD smokers. The
+            Unexpected::TraitFor::TracingStacks::_build_trace frame is
+            reported as __ANON__
+          - Removed dependency on strictures
+
+0.26.1    2014-07-16 08:07:00
+          - Skipping Type::Tiny 0.44. Doesn't install with Moo 1.005
+          - Tests set ENV variable when stack trace broken. More debug op
+          - Removed filtered frames
+
+0.25.1    2014-07-16 06:26:37
+          - Stack trace broken on some bsd smokers
+
+0.24.1    2014-07-15 22:09:12
+          - Releasing
+          - Added catch_class to ::Functions
+          - Replaced namespace::sweep with namespace::autoclean
+          - CPAN Testing failure 20ba3f5a-f94d-11e3-82c2-bc3ea1235623
+            Seifer Cross unknown host. Undefined install paths
+
+0.23.1    2014-05-28 11:24:47
+          - Added new construction signature, <error>, <hash_ref>
+          - Added stringification test
+          - Moved location of namespace::clean calls. Yuck
+          - Made LoadableClass TC output require_module error
+          - Removed Ident: lines
+
+0.22.1    2014-01-24 20:30:06
+          - Removed VERSION from all but main module
+          - Updated git pre commit hook
+          - Method add_exception now only adds one exception at a time
+
+0.21.1    2014-01-15 17:13:43
+          - Added ::Functions::has_exception. Exception descriptor DSL
+          - Renamed ::EC::has_exception to add_exception
+
+0.20.1    2014-01-01 01:20:15
+          - Defined the Unspecified exception class
+          - Added default error message to ::ExceptionClasses
+          - Updated Build.PL. Remove prereqs below min_perl_ver
+
+0.19.1    2013-12-06 12:33:21
+          - CPAN Testing failure 073a6592-5dc5-11e3-8778-8bb49a6ffe4e
+            Sebastian Woetzel openbsd.my.domain. We require version.pm 0.88
+            Smoker says 0.99002 installed runs tests using 0.82. This is a
+            candidate for the Admin interface when it arrives
+          - Using DZ::P::AbstractFromPOD
+          - Using DZ::P::LicenseFromModule
+          - Added prototypes to ::Functions
+
+0.18.1    2013-11-30 15:52:42
+          - ::F::import test exception_class for is_exception
+
+0.17.1    2013-11-30 15:09:48
+          - Added ::Functions::is_class_loaded
+
+0.16.1    2013-11-27 12:15:44
+          - Replaced Class::Load with Module::Runtime
+          - Dropped DZ::P::MarkdownInRoot from dist.ini
+
+0.15.1    2013-11-21 16:59:45
+          - Added exception class function export
+          - Renamed placeholder state mutator to quote_bind_values
+          - Added placeholder quoting in inflate_message
+
+0.14.1    2013-10-19 18:31:27
+          - Updated git hooks
+          - Type::Tiny exception class renamed RT#89410
+
+0.13.1    2013-09-27 13:27:37
+          - Replaced Exporter::TypeTiny with Exporter::Tiny
+
+0.12.1    2013-09-03 11:58:21
+          - ::TF::EC requires subclasses to call has_exception
+
+0.11.4    2013-09-03 11:50:34
+          - Added ::TraitFor::ExceptionClasses
+
+0.10.1    2013-08-26 22:34:17
+          - Terminate if MB version too low
+
+0.9.1     2013-08-25 14:01:22
+          - Updated Build.PL template. Tests MB version
+          - Improved Devel::Cover scores
+
+0.8.2     2013-08-24 00:56:57
+          - Bumped version to fix mad meta data
+
+0.7.6     2013-08-16 22:45:20
+          - Raised min Perl ver to 5.10.1. Using //
+          - Lowered min Perl ver to 5.8
+          - Readded dependencies
+          - Switched to Dist::Zilla
+

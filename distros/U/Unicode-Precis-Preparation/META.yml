@@ -1,0 +1,28 @@
+---
+abstract: 'RFC 7564 PRECIS Framework - Preparation'
+author:
+  - 'Hatuka*nezumi - IKEDA Soji <hatuka@nezumi.nu>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.26'
+  Test::More: '0.45'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Unicode-Precis-Preparation
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Exporter: '0'
+  XSLoader: '0'
+  perl: '5.006001'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/hatukanezumi/Unicode-Precis-Preparation/
+version: '0.01'

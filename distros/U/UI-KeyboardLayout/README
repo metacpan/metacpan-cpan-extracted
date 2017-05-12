@@ -1,0 +1,31 @@
+UI-KeyboardLayout version 0.01
+==============================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires works best with the latest Unicode data table installed.
+Since it uses its own parser for this table, it relies very little on Perl's
+builtin knowledge of Unicode (only for upcase/downcase).
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (c) 2011-2012 Ilya Zakharevich <ilyaz@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+The distributed examples may have their own copyrights.
+
+

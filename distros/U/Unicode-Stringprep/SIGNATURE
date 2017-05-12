@@ -1,0 +1,57 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 6701a8831679bf0bef1a00ee92e3c8227d6ac1af Build.PL
+SHA1 735d6d420fc01bdadf56e2886a7b6a964afca400 Changes
+SHA1 f50df6f14ea5f27d9f62c654348eaeee2d223131 LICENSE
+SHA1 5947211a7123cedadfe1fe4d58b0274a32045212 MANIFEST
+SHA1 be4125ecef7d2c4e575a442f8e6e1a551b8fdb21 META.json
+SHA1 f3b1ddfdf65be2c74504e31404dda1519cc5672d META.yml
+SHA1 ebe4edbe94c1302f5b43b9484d48125af7b656f0 Makefile.PL
+SHA1 76b5306b21e526d332660e5ca9ad9a5f77eacaea README
+SHA1 f6829baa052c940d0bd9ccecff132671f97395b3 eg/Nameprep.pm
+SHA1 85a3ac0c5d7af229a576358a738c1bc0ddf03848 eg/Readme-Examples.pod
+SHA1 43f88ca4db5e7eb71e2e01f068dac3006530d093 eg/SASLprep.pm
+SHA1 35915154aa7a03fa41fd2652b04f606b6967acdb lib/Unicode/Stringprep.pm
+SHA1 06b50c467935acee6dce848b6a7a236d0c702bfb lib/Unicode/Stringprep/BiDi.pm
+SHA1 2c2b5f45dec9a663690a614c3a7cbc324368f346 lib/Unicode/Stringprep/Mapping.pm
+SHA1 321adeb3c3cc69b7d34bbce5a6ed9d0a7f01b96d lib/Unicode/Stringprep/Prohibited.pm
+SHA1 38a62800f63561f82012bbf7b936ce1b9f665802 lib/Unicode/Stringprep/Unassigned.pm
+SHA1 26ef2cc5b56fe7ee09d4055aa6e6ce5d6ed28235 lib/Unicode/Stringprep/_Common.pm
+SHA1 41e0e43142b871a776bccde036bb73c64d102f98 t/00_use.t
+SHA1 ab73a06aad69cc7d949f171887174cb11c62c5b2 t/01_references.t
+SHA1 056063d18c3f48338620bbff698f81f91f2ea4d0 t/10_pod_check.t
+SHA1 b0c66bcb572f82e4401fee07b5342d09f6918c87 t/11_pod_coverage.t
+SHA1 a3758f6e1dc4c908b4ce0a9e026a44d8ec554959 t/30_mappings.t
+SHA1 67066846e401ec89de19ce295a93c865a7ccb898 t/31_prohibited_characters.t
+SHA1 e4e46d46098fdb9590cb9cb1eb4c04dce8a17ee4 t/31_prohibited_characters_extra.t
+SHA1 eab9140472500d97c6ab376c12c9105f26657fa0 t/32_nfkc_3_2.t
+SHA1 d669c53711a9bd390d68a2a9140f9a81bc245ad0 t/99_perl-5.11.3.t
+SHA1 571afb1f57976934f7b045346c6d3754684007ec t/nameprep.t
+SHA1 37ce46ea177f432e74688df86766fe5f7ac027f6 t/nameprep_bytes.t
+SHA1 ee424fa556e217ca673ec6d4d5f29c7c41f0f5de t/nameprep_stored.t
+SHA1 f5053025cd885fb2828897100235fbb1eb57c9df t/saslprep.t
+SHA1 34c09f6db7be90d9c8ebd3be1d10979d2af901b8 t/saslprep_bytes.t
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBCAAGBQJUB13+AAoJEIS+srvgrWBm9FMH/RaWfLktxmETvsO63nEh4P3x
+6cBAizjxghFDGIfX4u5iZNoj+h+Pp6ya9ZMe80r46TivJg7fEc4M9HhHGwczQhtb
+wNs5pwxk6D9qlXoFspiHpp3SfEtHz9auPzg+iBY9ILE+60xSMwLdq9i09juR2sin
+krSS9yj+01yX6zpcP8s6Nni9jvO3dKk1ZQEugcKEclA7JLB/MOilJMmHDUO6V9wa
+jiIquX0lrNHLLxaVQ0FKV9K1zItjqGkBwSfG7of4SnMd3kJKkrrfEs+NHJS2Zwim
+cHly3QuLFj9rKwaSjdDVsdFl5Tv5IwWCKAEZjLHaXxWv5ep/PRV08my1L2YAzBs=
+=K+s1
+-----END PGP SIGNATURE-----

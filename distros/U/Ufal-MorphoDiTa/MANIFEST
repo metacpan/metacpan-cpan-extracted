@@ -1,0 +1,21 @@
+Build.PL
+Changes
+examples/run_morpho_cli.pl
+examples/run_tagger.pl
+lib/Ufal/MorphoDiTa.pm
+lib/Ufal/MorphoDiTa.pod
+lib/Ufal/MorphoDiTa.xs
+LICENSE
+MANIFEST			This list of files
+morphodita/morphodita.cpp
+morphodita/morphodita.h
+morphodita/morphodita_perl.cpp
+README
+t/data/test.dict
+t/data/test.tagger
+t/import.t
+t/morpho.t
+t/tagger.t
+t/tokenizer.t
+META.yml
+META.json

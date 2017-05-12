@@ -1,0 +1,167 @@
+#!/usr/bin/perl -w
+#$Id: map,v 1.20 1998/02/11 23:58:27 schwartz Exp $
+#
+# map - convert a text file to a different character set
+#
+# See also usage() of this file. General information at:
+#    http://wwwwbs.cs.tu-berlin.de/~schwartz/pmh/index.html
+#
+# Copyright (C) 1998 Martin Schwartz. All rights reserved.
+# This program is free software; you can redistribute it and/or
+# modify it under the same terms as Perl itself.
+#
+# Contact: Martin Schwartz <martin@nacho.de>
+#
+
+my $PROGNAME = "map";
+my $VERSION = "1.21";
+my $DATE = "2000-Jun-26";
+
+use Getopt::Long;
+use Unicode::Map;
+
+my %opt = ();
+my $defaultCsId = "ISO-8859-1";
+
+main: {
+   $|=1; undef $/;
+
+   GetOptions ( \%opt, "from=s", "help", "list", "to=s" );
+
+   usage() if $opt{"help"};
+
+   my $error = 0;
+   if ( $opt{"list"} ) {
+      $error = list_csids ( );
+   } else {
+      if ( !$opt{"to"} && !$opt{"from"} ) {
+         usage ( );
+      }
+      $opt{"from"} ||= $defaultCsId;
+      $opt{"to"}   ||= $defaultCsId;
+      $error = handle_stream ( );
+   }
+
+   exit $error;
+}
+
+sub handle_stream {
+   undef $/;
+   my $input = <STDIN>;
+   my ( $unicode, $output, $csid );
+
+   $csid = $opt { "from" };
+   if ( $csid =~ /^unicode$/i) {
+      $unicode = $input;
+   } else {
+      my $MapFrom = new Unicode::Map ( $csid );
+      if ( !$MapFrom ) {
+         print "Error! Mapping \"$csid\" not available!\n";
+         return 0;
+      }
+      $unicode = $MapFrom -> to_unicode ( $input );
+   }
+   undef $input;
+
+   $csid = $opt{"to"};
+   if ( $csid =~ /^unicode$/i ) {
+      $output = $unicode;
+   } else {
+      my $MapTo = new Unicode::Map ( $csid );
+      if ( !$MapTo ) {
+         print "Error! Mapping \"$csid\" not available!\n";
+         return 0;
+      }
+      $output = $MapTo -> from_unicode ( $unicode );
+   }
+   undef $unicode;
+
+   print STDOUT $output;
+1}
+
+sub list_csids {
+   return 0 unless my $Map = new Unicode::Map ( );
+   my (@alias, $last, $s);
+   my $i=1;
+   print "Defined character sets:\n";
+   for ($Map->ids()) {
+      $s = sprintf "%02d: $_", $i++;
+      if (@alias = sort {$a cmp $b} $Map->alias($_)) {
+         $last = pop(@alias);
+         $s .= " (";
+         $s .= join(", ", @alias);
+         $s .= ", " if $#alias>=0;
+         $s .= "$last)";
+      }
+      print "$s\n";
+   }
+   print "Done.\n";
+1}
+
+sub usage {
+   _print_usage (
+      "$PROGNAME V$VERSION ($DATE) - recode from and to Unicode\n"
+      ."usage: $PROGNAME {--option [arg]} [--from cset] || [--to cset] file(s)",
+      [
+        "from s  Encoding of input files (default \"$defaultCsId\")",
+        "list    Lists available character sets and their alias names.",
+        "to   s  Encoding of output files (default \"$defaultCsId\")",
+      ]
+   );
+   exit 0;
+}
+
+sub _print_usage {
+   my ($header, $bodylistR, $footer) = @_;
+   print "$header\n" if $header;
+   print map "   --$_\n", sort { lc($a) cmp lc($b) } @$bodylistR;
+   print "$footer\n" if $footer;
+}
+
+__END__
+
+=head1 NAME
+
+map - An utility to map texts from and to unicode
+
+=head1 SYNOPSIS
+
+ map - recode from and to various character sets.
+       Reads from STDIN, writes to STDOUT.
+ usage: map [--from cset] [--to cset] < input.txt > output.txt
+
+ from s  Encoding of input files (default "ISO-8859-1")
+ list    Lists available character sets and their alias names.
+ to   s  Encoding of output files (default "ISO-8859-1")
+
+=head1 DESCRIPTION
+
+Maps text from one character set representation to another. This work is
+actually long time very well done by C<recode>, but unfortunately recode
+does not support Unicode and eastern asia character sets. But, if you have
+pure 8 bit things to do, recode will still be the best solution.
+
+Examples:
+
+Conversion from ISO-8859-1 to Unicode:
+
+ map --to unicode < iso-8859-1.txt > unicode.txt
+
+Conversion from GB2312 to CP936:
+
+ map --from cp936 --to GB2312 < gb2312.txt > cp936.txt
+
+Conversion from CP850 to Unicode:
+
+ map --from cp850 --to unicode < cp850.txt > unicode.txt
+
+=head1 SEE ALSO
+
+recode(1), Unicode::Map(3), Unicode::Map8(3), Unicode::String(3)
+
+=head1 AUTHOR
+
+Martin Schwartz E<lt>F<martin@nacho.de>E<gt>.
+
+=cut
+

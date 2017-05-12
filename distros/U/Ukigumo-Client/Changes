@@ -1,0 +1,176 @@
+Revision history for Perl module Ukigumo::Client
+
+0.36 2014-06-27T03:51:54Z
+
+    - Bug fix
+
+0.35 2014-06-19T08:06:47Z
+
+    - Accept `.travis.yml` and support generally interface (@ikasam_a++)
+    - Support multiple commands at `install` and `script` (@ikasam_a++)
+
+0.34 2014-06-05T01:45:53Z
+
+    - Fix typo in documentation for .ukigumo.yml
+
+0.33 2014-06-04T09:19:56Z
+
+    - Add documentations for .ukigumo.yml
+
+0.32 2014-06-04T06:48:13Z
+
+    - Supports Env
+    - Change to be configurable the project name
+    - Allow to register user declared notifiers
+    - Fix bug about vc-log of git
+    - Rename script directory due to Module::Build::Tiny install only script/* (thank you @kga)
+
+0.31 2014-05-01T04:21:43Z
+
+    - Fix the problem that doesn't show git log when both of revisions are equal
+    - Fix the handling for timeout
+    - Fix typo in the documentation
+
+0.30 2014-04-08T06:50:37Z
+
+    - Fix bug at GitHub Notifier
+    - Do not die with silence
+
+0.29 2014-04-06T14:46:40Z
+
+    - Change to send STATUS_TIMEOUT
+
+0.28 2014-04-05T05:49:54Z
+
+    - Add the documentation for elapsed time
+
+0.27 2014-04-03T08:21:51Z
+
+    - Measure the elapsed time (moznion)
+    - Normalize paths for work directory (mattn)
+    - Fix the problem that does not work certainly on Windows (mattn)
+
+0.26 2014-03-27T23:25:33Z
+
+    - Support report_timeout() method
+      (moznion)
+
+0.25 2014-03-19T08:46:31Z
+
+    - Fix a fatal typo in U::C::N::GitHubStatuses
+
+0.24 2014-03-17T15:31:34Z
+
+    - It do not die if notifying is fail
+    - Fix a conditional branch bug
+
+0.23 2014-03-17T03:45:06Z
+
+    - Fix a bug that cannot create notifier instance
+
+0.22 2014-03-13T10:45:34Z
+
+    - Support compare_url (for GitHub webhooks)
+      (moznion)
+    - Support GitHub Statuses API
+      (moznion)
+
+0.21 2014-03-05T00:15:47Z
+
+    - Throws exception if .ukigumo.yml is borken.
+      (tokuhirom)
+
+0.20 2014-01-16T07:45:11Z
+
+    - Ukigumo::Client should load Ukigumo::Cliient::Notify::Ikachan.
+      (tokuhirom)
+
+0.19 2014-01-16T06:48:30Z
+
+    - Load Ukigumo::Client::Executor::Command expressly.
+      (tokuhirom)
+
+0.18 2013-07-25T17:35:35Z
+
+    - fix dependencies
+    - fix spelling errors
+    - adjust Formatting of Changes for CPAN::Changes::Spec (neilbowers)
+
+0.17 2013-04-15T14:45:26Z
+
+    - fix packaging only
+
+0.16 2013-04-13T10:16:34Z
+
+    - Add Notify::Growl
+    - Switch to Minilla from M::B
+
+0.15 2013-03-11T19:01:27
+
+    - Switch to Module::Build
+
+0.14 2013-03-11T15:57:55
+
+    - [Experimental] Added .ukigumo.yml support
+
+0.13 2013-03-06 11:32:13
+
+    - Notify::Callback
+    - Executor::Command
+    - add `skip_if_unmodified` option to Role::VC and ukigumo-client.pl
+    - add `command` option to ukigumo-client.pl
+
+0.12 2011-11-15
+
+    - skip notification if $status is success and last status was skipped.
+
+0.11 2011-11-11
+
+    - 8a6f9d8 better diag on http response error
+    - b9febd1 Notify::Ikachan: ignore STATUS_SKIP by default.
+    - depend to Ukigumo::Common 0.03
+
+0.10 2011-11-08
+
+    - no feature changes
+    - 0.09 wasn't released to CPAN. Changes of 0.09 bellow.
+    - VC::SVN(xaicron)
+    - d6c85db reset revision after update
+    - e9c930f maybe better for tee_merged
+    - 4852ef8 forgotten substituting
+
+0.08 2011-10-20
+
+    - fixed packaging issue
+
+0.07 2011-10-19
+
+    - better packaging
+
+0.06 2011-10-11
+
+    - fixed packaging issue
+
+0.05 2011-10-04
+
+    - [Notify::Ikachan] make ignore_success option as '1' by default.
+
+0.04 2011-10-04
+
+    - allow '/' character in branch name
+
+0.03 2011-10-02
+
+    - better error message on ukigumo-client.pl
+    - doc fix
+
+0.02 2011-10-02
+
+    - win32 fix(mattn++)
+    - added Executor::Callback
+    - added VC::Callback
+
+0.01 2011-09-03 19:14:47
+
+    - original version
+

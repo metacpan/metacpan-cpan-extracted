@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/01basic.t
+t/02u501ll.t
+t/98podsyn.t
+t/99podcov.t
+eg/utf8_regex.pl
+lib/Unicode/SetAutomaton.pm
+META.yml                                 Module meta-data (added by MakeMaker)

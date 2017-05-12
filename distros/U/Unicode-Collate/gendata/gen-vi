@@ -1,0 +1,89 @@
+#!perl
+# gen-vi : auxiliary script for Vietnamese
+#
+# output files
+#
+#   vi.txt   (a main part of data/vi.txt)
+#   loc_vi.t (a main part of t/loc_vi.t)
+#
+use strict;
+use warnings;
+require 'gen-head'; # for testcount() and testhead()
+
+use Unicode::Normalize;
+require 'dumpstr'; # for element(), string() and unidump()
+
+my @base = qw( 61 41 103 102 E2 C2 65 45 EA CA 69 49 6F 4F
+	       F4 D4 1A1 1A0 75 55 1B0 1AF 79 59 );
+my @tone = qw( 300 340 309 303 301 341 323 );
+
+my $textf = 'vi.txt';
+my $text1 = "#equivalent sequences\n";
+my $text2 = '';
+my $testf = 'loc_vi.t';
+my $test0 = '';
+my $test1 = '';
+my $test2 = '';
+my $test3 = '';
+
+my %data;
+
+for my $b (@base) {
+    my $bc = pack 'U', hex $b;
+    for my $t (@tone) {
+	my $tc = pack 'U', hex $t;
+	my $cat = $bc.$tc;
+	my $com = NFC($bc.$tc);
+	my $dec = NFD($bc).$tc;
+
+	my $scat = string($cat);
+	my $scom = string($com);
+	my $sdec = string($dec);
+	$test0 .= qq|ok(\$objVi->eq($sdec, $scom));\n|;
+
+	next if length $dec < 3;
+	$test3 .= qq|ok(\$objVi->eq($sdec, $scat));\n|;
+
+	my @d = split //, $dec;
+	my $rule = sprintf "<%s><%s>", unidump($bc), unidump($tc);
+
+	my $rv2 = NFC($d[0].$d[2]).$d[1];
+	if ($com eq NFC $rv2) {
+	    my $srv2 = string($rv2);
+	    $test1 .= qq|ok(\$objVi->eq($sdec, $srv2));\n|;
+	    my $d = element($rv2);
+	    $text1 .= "$d;$rule\n" unless $data{$d}++;
+	}
+
+	my $rev = $d[0].$d[2].$d[1];
+	if ($com eq NFC $rev) {
+	    my $srev = string($rev);
+	    $test2 .= qq|ok(\$objVi->eq($sdec, $srev));\n|;
+	    my $d = element($rev);
+	    $text2 .= "$d;$rule\n" unless $data{$d}++;
+	}
+    }
+}
+
+### WRITE DATA ###
+open my $dh, ">$textf" or die $textf;
+binmode $dh;
+print $dh "$text1$text2";
+close $dh or die $textf;
+
+### WRITE TEST ###
+my $test = '';
+my $ok = 0;
+
+$test .= testcount(\$ok, 74);
+$test .= testcount(\$ok, $test0);
+$test .= testcount(\$ok, $test1);
+$test .= testcount(\$ok, $test2);
+$test .= testcount(\$ok, $test3);
+$test .= testcount(\$ok, 26);
+
+chomp $test;
+open my $th, ">$testf" or die $testf;
+binmode $th;
+print $th testhead('vi', $ok), $test;
+close $th or die $testf;

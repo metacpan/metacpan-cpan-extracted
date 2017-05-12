@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/UMLS-Norm.t
+lib/UMLS/Norm.pm

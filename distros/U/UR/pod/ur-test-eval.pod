@@ -1,0 +1,46 @@
+
+
+=pod
+
+=head1 NAME
+
+ur test eval - Evaluate a string of Perl source
+
+
+
+=head1 VERSION
+
+This document describes ur test eval version 0.29.
+
+=head1 SYNOPSIS
+
+ur test eval [BARE-ARGS]
+
+ur test eval 'print "hello\n"' 
+ur test eval 'print "hello\n"' 'print "goodbye\n"'
+ur test eval 'print "Testing in  the " . \$self->namespace_name . " namespace.\n"'
+
+
+=head1 OPTIONAL ARGUMENTS
+
+=over
+
+
+=item BARE-ARGS
+
+(undocumented)
+
+
+=back
+
+=head1 DESCRIPTION:
+
+  This command is for testing and debugging.  It simply eval's the Perl
+  source supplied on the command line, after using the current namespace.
+  
+  A $self object is in scope representing the current context.
+
+
+
+=cut
+

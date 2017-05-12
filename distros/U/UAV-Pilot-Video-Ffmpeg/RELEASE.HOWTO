@@ -1,0 +1,8 @@
+Run:
+
+perl ./Build.PL
+./Build manifest
+./Build disttest
+./Build dist
+
+Then upload the generated tarball to pause.perl.org

@@ -1,0 +1,36 @@
+Revision history for Perl module URI::Find::Simple
+
+1.06 2014-08-04
+    - URI-Find-20140709 stopped translating URIs to canonical form,
+      which broke our testsuite. Thanks to Petr Pisar for RT#97738
+
+1.05 2014-02-05
+    - Added SEE ALSO links to HTML::LinkExtractor and HTML::LinkExtor.
+    - Hadn't added README to MANIFEST, so it wasn't in the dist. Sigh.
+
+1.04 2014-02-02
+    - NEILB has taken over maintenance
+    - Added github repo to metadata and pod
+    - Added license details to metadata and added LICENSE section to doc
+    - Reformatted Changes as per CPAN::Changes::Spec
+    - Specified min perl version as 5.6.0
+    - Added missing PREREQ's, and moved Test::More to TEST_REQUIRES
+    - Added README
+
+1.03 2010-10-25
+    - Package properly
+
+1.01 2010-09-06
+    - Fix tests for URI::Find change
+    - Count tests properly
+
+1.01 2008-09-15
+    - Clearer license
+    - Better method of requiring perl 5.8.1
+
+1.0 2008-06-19
+    - Unicode support improved.
+
+0.7 2004-03-16
+    - Initial release  
+

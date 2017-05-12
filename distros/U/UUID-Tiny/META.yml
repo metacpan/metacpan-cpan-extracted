@@ -1,0 +1,28 @@
+--- #YAML:1.0
+name:               UUID-Tiny
+version:            1.04
+abstract:           Pure Perl UUID Support With Functional Interface
+author:
+    - Christian Augustin <mail@caugustin.de>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Carp:          0
+    Digest::MD5:   0
+    IO::File:      0
+    MIME::Base64:  0
+    POSIX:         0
+    Test::More:    0
+    Time::HiRes:   0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

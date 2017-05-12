@@ -1,0 +1,129 @@
+{cs};c+1
+{cS};C+1---1 [.0.0.2.0]
+{Cs};C+1---1 [.0.0.8.0]
+{CS};C+1
+{dz};d+1
+{dZ};D+1---1 [.0.0.2.0]
+{Dz};D+1---1 [.0.0.8.0]
+{DZ};D+1
+{dzs};d+2
+{dzS};D+2---1 [.0.0.2.0][.0.0.2.0]
+{dZs};D+2---1 [.0.0.2.0][.0.0.7.0]
+{dZS};D+2---1 [.0.0.2.0][.0.0.8.0]
+{Dzs};D+2---1 [.0.0.8.0][.0.0.2.0]
+{DzS};D+2---1 [.0.0.8.0][.0.0.7.0]
+{DZs};D+2---1 [.0.0.8.0][.0.0.8.0]
+{DZS};D+2
+{gy};g+1
+{gY};G+1---1 [.0.0.2.0]
+{Gy};G+1---1 [.0.0.8.0]
+{GY};G+1
+{ly};l+1
+{lY};L+1---1 [.0.0.2.0]
+{Ly};L+1---1 [.0.0.8.0]
+{LY};L+1
+{ny};n+1
+{nY};N+1---1 [.0.0.2.0]
+{Ny};N+1---1 [.0.0.8.0]
+{NY};N+1
+{sz};s+1
+{sZ};S+1---1 [.0.0.2.0]
+{Sz};S+1---1 [.0.0.8.0]
+{SZ};S+1
+{ty};t+1
+{tY};T+1---1 [.0.0.2.0]
+{Ty};T+1---1 [.0.0.8.0]
+{TY};T+1
+{zs};z+1
+{zS};Z+1---1 [.0.0.2.0]
+{Zs};Z+1---1 [.0.0.8.0]
+{ZS};Z+1
+00F6;o+1
+00D6;O+1
+0151;o+1++1
+0150;O+1++1
+00FC;u+1
+00DC;U+1
+0171;u+1++1
+0170;U+1++1
+#here ccs is identical to cscs etc.
+{ccs};<{cs}><{cs}>
+{ccS};<{cs}><{cS}>
+{cCs};<{cs}><{Cs}>
+{cCS};<{cs}><{CS}>
+{Ccs};<{CS}><{cs}>
+{CcS};<{CS}><{cS}>
+{CCs};<{CS}><{Cs}>
+{CCS};<{CS}><{CS}>
+{ddz};<{dz}><{dz}>
+{ddZ};<{dz}><{dZ}>
+{dDz};<{dz}><{Dz}>
+{dDZ};<{dz}><{DZ}>
+{Ddz};<{DZ}><{dz}>
+{DdZ};<{DZ}><{dZ}>
+{DDz};<{DZ}><{Dz}>
+{DDZ};<{DZ}><{DZ}>
+{ddzs};<{dzs}><{dzs}>
+{ddzS};<{dzs}><{dzS}>
+{ddZs};<{dzs}><{dZs}>
+{ddZS};<{dzs}><{dZS}>
+{dDzs};<{dzs}><{Dzs}>
+{dDzS};<{dzs}><{DzS}>
+{dDZs};<{dzs}><{DZs}>
+{dDZS};<{dzs}><{DZS}>
+{Ddzs};<{DZS}><{dzs}>
+{DdzS};<{DZS}><{dzS}>
+{DdZs};<{DZS}><{dZs}>
+{DdZS};<{DZS}><{dZS}>
+{DDzs};<{DZS}><{Dzs}>
+{DDzS};<{DZS}><{DzS}>
+{DDZs};<{DZS}><{DZs}>
+{DDZS};<{DZS}><{DZS}>
+{ggy};<{gy}><{gy}>
+{ggY};<{gy}><{gY}>
+{gGy};<{gy}><{Gy}>
+{gGY};<{gy}><{GY}>
+{Ggy};<{GY}><{gy}>
+{GgY};<{GY}><{gY}>
+{GGy};<{GY}><{Gy}>
+{GGY};<{GY}><{GY}>
+{lly};<{ly}><{ly}>
+{llY};<{ly}><{lY}>
+{lLy};<{ly}><{Ly}>
+{lLY};<{ly}><{LY}>
+{Lly};<{LY}><{ly}>
+{LlY};<{LY}><{lY}>
+{LLy};<{LY}><{Ly}>
+{LLY};<{LY}><{LY}>
+{nny};<{ny}><{ny}>
+{nnY};<{ny}><{nY}>
+{nNy};<{ny}><{Ny}>
+{nNY};<{ny}><{NY}>
+{Nny};<{NY}><{ny}>
+{NnY};<{NY}><{nY}>
+{NNy};<{NY}><{Ny}>
+{NNY};<{NY}><{NY}>
+{ssz};<{sz}><{sz}>
+{ssZ};<{sz}><{sZ}>
+{sSz};<{sz}><{Sz}>
+{sSZ};<{sz}><{SZ}>
+{Ssz};<{SZ}><{sz}>
+{SsZ};<{SZ}><{sZ}>
+{SSz};<{SZ}><{Sz}>
+{SSZ};<{SZ}><{SZ}>
+{tty};<{ty}><{ty}>
+{ttY};<{ty}><{tY}>
+{tTy};<{ty}><{Ty}>
+{tTY};<{ty}><{TY}>
+{Tty};<{TY}><{ty}>
+{TtY};<{TY}><{tY}>
+{TTy};<{TY}><{Ty}>
+{TTY};<{TY}><{TY}>
+{zzs};<{zs}><{zs}>
+{zzS};<{zs}><{zS}>
+{zZs};<{zs}><{Zs}>
+{zZS};<{zs}><{ZS}>
+{Zzs};<{ZS}><{zs}>
+{ZzS};<{ZS}><{zS}>
+{ZZs};<{ZS}><{Zs}>
+{ZZS};<{ZS}><{ZS}>

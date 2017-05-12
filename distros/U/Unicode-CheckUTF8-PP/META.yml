@@ -1,0 +1,26 @@
+---
+abstract: 'Pure Perl implementation of Unicode::CheckUTF8'
+author:
+  - 'Hunter McMillen <mcmillhj@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Unicode-CheckUTF8-PP
+requires:
+  Exporter: '0'
+  base: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://github.com/mcmillhj/Unicode-CheckUTF8-PP/issues
+  homepage: https://metacpan.org/release/Unicode-CheckUTF8-PP
+  repository: git://github.com/mcmillhj/Unicode-CheckUTF8-PP.git
+version: '0.003'

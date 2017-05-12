@@ -1,0 +1,13 @@
+# INSTALLATION HINT
+#
+# Copy everything in this directory to the directory that
+#   corresponds to http://www.unamerican.com/truth/
+#
+# Put the following lines in your "httpd.conf" and
+# replace "/home/httpd/truth" with the directory that 
+#   corresponds to http://www.unamerican.com/truth/
+
+<Directory /home/httpd/truth>
+    Options +ExecCGI
+    AddHandler cgi-script cgi pl
+</Directory>

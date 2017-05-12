@@ -1,0 +1,6 @@
+Revision history for Perl extension Unicode::Overload.
+
+0.01  Thu Oct  2 19:58:53 2003
+	- original version; created by h2xs 1.23 with options
+		-AXn Unicode::Overload
+

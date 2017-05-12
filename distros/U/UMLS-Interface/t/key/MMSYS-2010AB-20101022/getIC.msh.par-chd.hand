@@ -1,0 +1,22 @@
+
+CuiFinder User Options: 
+   --config option set
+
+
+UMLS-Interface Configuration Information
+  Sources (SAB):
+    MSH
+  Relations (REL):
+    CHD
+    PAR
+  Database: 
+    umls (MMSYS-2010AB-20101022)
+
+
+
+
+
+ICFinder User Options:
+  --icpropagation t/options/icpropagation
+
+The information content of hand (C0018563) is 3.71084481255696

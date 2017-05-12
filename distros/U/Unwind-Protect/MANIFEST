@@ -1,0 +1,9 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Unwind/Protect.pm
+t/001-context.t
+t/002-die.t

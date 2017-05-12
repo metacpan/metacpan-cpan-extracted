@@ -1,0 +1,314 @@
+=head1 NAME
+
+UI::Dialog::Gauged - wrapper support of gauge related functions.
+
+=head1 SYNOPSIS
+
+  use UI::Dialog::Gauged;
+  my $d = new UI::Dialog::Gauged ( title => 'Default title',
+                                  height => 20, width => 65 ,
+                                  listheight => 5,
+                                  order => [ 'zenity', 'xdialog' ] );
+
+  # Either a Zenity or Xdialog msgbox widget should popup,
+  # with a preference for Zenity.
+  $d->msgbox( title => 'Welcome!', text => 'Welcome one and all!' );
+
+=head1 ABSTRACT
+
+UI::Dialog::Gauged is simply another meta-class for UI::Dialog. This
+class simply has a different order of priority than UI::Dialog and only
+uses backends that support a standard set of gauge related functions.
+
+=head1 DESCRIPTION
+
+This class is simply a nice way to try and ensure a GNOME based widget set.
+
+=head1 EXPORT
+
+=over 2
+
+None
+
+=back
+
+=head1 INHERITS
+
+=over 2
+
+UI::Dialog
+
+=back
+
+=head1 CONSTRUCTOR
+
+=head2 new( @options )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my $d = new( title => 'Default Title', backtitle => 'Backtitle',
+              width => 65, height => 20, listheight => 5,
+              order => [ 'zenity', 'xdialog' ] );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+This is the Class Constructor method. It accepts a list of key => value pairs
+and uses them as the defaults when interacting with the various widgets.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+A blessed object reference of the UI::Dialog::Gauged class.
+
+=back
+
+=item OPTIONS
+
+The (...)'s after each option indicate the default for the option.
+
+=over 6
+
+=item B<debug = 0,1,2> (0)
+
+=item B<order = [ zenity, xdialog, cdialog, whiptail ]> (as indicated)
+
+=item B<PATH = [ /bin, /usr/bin, /usr/local/bin, /opt/bin ]> (as indicated)
+
+=item B<backtitle = "backtitle"> ('')
+
+=item B<title = "title"> ('')
+
+=item B<beepbefore = 0,1> (0)
+
+=item B<beepafter = 0,1> (0)
+
+=item B<height = \d+> (20)
+
+=item B<width = \d+> (65)
+
+=item B<listheight = \d+> (5)
+
+=back
+
+=back
+
+=head1 WIDGET METHODS
+
+=head2 gauge_start( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ $d->gauge_start( text => 'gauge...', percentage => 1 );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Display a meter bar to the user. This get's the widget realized but requires
+the use of the other gauge_*() methods for functionality.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+TRUE (1) if the widget loaded fine and FALSE (0) for anything else.
+
+=back
+
+=back
+
+=head2 gauge_inc( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ $d->gauge_inc( 1 );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Increment the meter by the given amount.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+TRUE (1) if the widget incremented fine and FALSE (0) for anything else.
+
+=back
+
+=back
+
+=head2 gauge_set( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ $d->gauge_set( 99 );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Set the meter bar to the given amount.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+TRUE (1) if the widget set fine and FALSE (0) for anything else.
+
+=back
+
+=back
+
+=head2 gauge_text( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ $d->gauge_text( 'string' );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Set the meter bar message to the given string.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+TRUE (1) if the widget set fine and FALSE (0) for anything else.
+
+=back
+
+=back
+
+=head2 gauge_stop( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ $d->gauge_stop();
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+End the meter bar widget process. One of the flaws with gdialog is that the
+gauge widget does not close properly and requies the end user to close the
+gauge window when 100% has been reached. This is the second reason why I'm
+glad gdialog is going the way of the dodo.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+TRUE (1) if the widget closed fine and FALSE (0) for anything else.
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+=over 2
+
+=item PERLDOC
+
+ UI::Dialog
+ UI::Dialog::Backend
+ UI::Dialog::Backend::CDialog
+ UI::Dialog::Backend::Nautilus
+ UI::Dialog::Backend::Whiptail
+ UI::Dialog::Backend::XDialog
+ UI::Dialog::Backend::XOSD
+ UI::Dialog::Backend::Zenity
+
+=back
+
+=over 2
+
+=item MAN FILES
+
+ zenity(1), Xdialog(1), dialog(1), whiptail(1), osd_cat(1) and nautilus(1)
+
+=back
+
+=head1 BUGS
+
+Please email the author with any bug reports. Include the name of the
+module in the subject line.
+
+=head1 AUTHOR
+
+Kevin C. Krinke, E<lt>kevin@krinke.caE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+ Copyright (C) 2004-2016  Kevin C. Krinke <kevin@krinke.ca>
+
+ This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 2.1 of the License, or (at your option) any later version.
+
+ This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+
+ You should have received a copy of the GNU Lesser General Public
+ License along with this library; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+
+=cut

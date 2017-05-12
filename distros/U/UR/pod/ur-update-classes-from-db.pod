@@ -1,0 +1,79 @@
+
+
+=pod
+
+=head1 NAME
+
+ur update classes-from-db - Update class definitions (and data dictionary cache) to reflect changes in the database schema.
+
+
+
+=head1 VERSION
+
+This document describes ur update classes-from-db version 0.29.
+
+=head1 SYNOPSIS
+
+ur update classes-from-db [--class-name=?] [--data-source=?] [--force-check-all-tables] [--force-rewrite-all-classes] [--table-name=?] [CLASSES-OR-MODULES]
+
+
+
+=head1 OPTIONAL ARGUMENTS
+
+=over
+
+
+=item class-name  I<List>
+
+Update only the specified classes.
+
+=item data-source  I<List>
+
+Limit updates to these data sources
+
+=item force-check-all-tables  I<Boolean>
+
+By default we only look at tables with a new DDL time for changed database schema information.  This explicitly (slowly) checks each table against our cache.
+
+=item noforce-check-all-tables  I<Boolean>
+
+Make force-check-all-tables 'false'
+
+=item force-rewrite-all-classes  I<Boolean>
+
+By default we only rewrite classes where there are database changes.  Set this flag to rewrite all classes even where there are no schema changes.
+
+=item noforce-rewrite-all-classes  I<Boolean>
+
+Make force-rewrite-all-classes 'false'
+
+=item table-name  I<List>
+
+Update the specified table.
+
+=item CLASSES-OR-MODULES
+
+(undocumented)
+
+
+=back
+
+=head1 DESCRIPTION:
+
+  
+  Reads from the data sources in the current working directory's namespace,
+  and updates the local class tree.
+  
+  This hits the data dictionary for the remote database, and gets changes there
+  first.  Those changes are then used to mutate the class tree.
+  
+  If specific data sources are specified on the command-line, it will limit
+  its database examination to just data in those data sources.  This command
+  will, however, always load ALL classes in the namespace when doing this update,
+  to find classes which currently reference the updated table, or are connected
+  to its class indirectly.
+
+
+
+=cut
+

@@ -1,0 +1,4 @@
+
+The purpose of this directory is to hold the output files of the 
+various test cases. It should be empty except for this file unless 
+a test case which uses this directory errors out. 

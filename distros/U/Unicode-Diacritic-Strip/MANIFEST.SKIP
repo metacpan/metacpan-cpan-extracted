@@ -1,0 +1,12 @@
+^blib/.*$
+^Makefile$
+^(build|make-pod)\.pl$
+^\.git.*$
+\.pod\.tmpl$
+^MYMETA\..*$
+^pm_to_blib$
+# Tar files, untarred tarfiles
+^Unicode-Diacritics-Strip-.*$
+^\.perlcriticrc$
+^xt/.*$
+^examples/.*-out\.txt$

@@ -1,0 +1,36 @@
+NAME
+    Update::Immutable - React-compatible data-structure update utility
+
+SYNOPSIS
+        use Update::Immutable;
+
+        my $orig = { a => 1 };
+
+        my $new = Update::Immutable::update($orig, { b => { '$set' => 2 } });
+
+        ## new:  { a => 1, b => 2 }
+        ## orig: { a => 1 }
+
+DESCRIPTION
+    This is a perl implementation of the react update function
+    <https://facebook.github.io/react/docs/update.html>.
+
+    There are some additional features and bugfixes. For details, see the
+    companion javascript module
+    <https://www.npmjs.com/package/update-immutable>.
+
+SEE ALSO
+    Update-Immutable github repo
+    <https://github.com/hoytech/Update-Immutable-p5>
+
+    The companion javascript module
+    <https://www.npmjs.com/package/update-immutable>
+
+AUTHOR
+    Doug Hoyte, "<doug@hcsw.org>"
+
+COPYRIGHT & LICENSE
+    Copyright 2016 Doug Hoyte.
+
+    This module is licensed under the same terms as perl itself.
+

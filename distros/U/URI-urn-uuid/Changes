@@ -1,0 +1,10 @@
+Revision history for Perl extension URI::urn::uuid
+
+0.03  Sat Nov  7 20:20:45 PST 2009
+        - Added URI.pm to the deps
+
+0.02  Tue Sep 26 23:56:52 JST 2006
+        - Added doc and test how to create new urn:uuid 
+
+0.01  Fri Sep  8 02:18:32 2006
+        - original version

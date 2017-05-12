@@ -1,0 +1,13 @@
+# http://search.cpan.org/~dmitry/
+#
+name:         UkrMoney-API
+version:      1.01
+version_from: lib/UkrMoney/API.pm
+installdirs:  site
+requires:
+    LWP::Simple:              0
+    XML::Simple:       0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.21
+license: perl

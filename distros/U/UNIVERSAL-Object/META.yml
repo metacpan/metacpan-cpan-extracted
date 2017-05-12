@@ -1,0 +1,23 @@
+---
+abstract: 'A useful base class'
+author:
+  - 'Stevan Little <stevan@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: UNIVERSAL-Object
+requires:
+  Carp: '0'
+  perl: v5.6.0
+resources:
+  bugtracker: https://github.com/stevan/p5-UNIVERSAL-Object/issues
+  repository: https://github.com/stevan/p5-UNIVERSAL-Object.git
+version: '0.09'
+x_serialization_backend: 'YAML::Tiny version 1.70'

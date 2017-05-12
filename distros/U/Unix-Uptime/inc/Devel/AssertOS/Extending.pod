@@ -1,0 +1,123 @@
+=head1 NAME
+
+Devel::AssertOS::Extending - how to write Devel::AssertOS::* modules that
+check what platform they're running on
+
+=head1 DESCRIPTION
+
+Devel::AssertOS::* modules are used by Devel::CheckOS to figure out what
+OS it is running on.  A set of modules are provided which should correctly
+detect all platforms that perl *currently* runs on, as well as detecting
+OS 'families' like 'Unix' and 'Windows'.
+
+You can also use Devel::AssertOS::* modules on their own to quickly check
+whether you're running on the right platform.
+
+If you try to C<use> a Devel::AssertOS module on the wrong platform, it
+will C<die> by calling C<Devel::CheckOS::die_unsupported()>.  This
+conveniently spits out the text that CPAN-testers look for to see if
+your code failed simply because they're doing something as silly as
+testing your Solaris-only code on HPUX.
+
+=head1 HOW TO WRITE YOUR OWN MODULES
+
+If you want to add support for new platforms, you need to write a module
+called Devel::AssertOS::PlatformName which looks like:
+
+    package Devel::AssertOS::Linux;
+    use Devel::CheckOS;
+    $VERSION = '1.0';
+    sub os_is { $^O =~ /^linux$/i ? 1 : 0; }
+    Devel::CheckOS::die_unsupported() unless(os_is());
+    1;
+
+And that's it.  The subroutine B<must> be called C<os_is> and loading the
+module B<must> die in precisely that manner if your code is running on
+the wrong platform. It's a good idea to check $^O case-insensitively
+as it's not consistent. Note that it is an error to say:
+
+    sub os_is { 1; }
+
+and assume "well, on the wrong platform that'll never get reached because
+the module can't load".  Because the module *can* load, and indeed *does
+get loaded* - some functions in Devel::CheckOS do things like:
+
+    eval "use Devel::AssertOS::$os";
+
+to suppress the error.
+
+If you want to support a 'family' of OSes, then instead of matching against
+C<$^O>, instead use C<Devel::CheckOS::os_is> to check that we're running on
+any of the OSes in your family, like this:
+
+match any of several values of C<$^O> like this:
+
+    package Devel::AssertOS::FreeSoftware;
+    use Devel::CheckOS;
+    $VERSION = '1.0';
+    sub matches { return qw(Linux FreeBSD NetBSD OpenBSD DragonflyBSD); }
+    sub os_is { Devel::CheckOS::os_is(matches()); }
+    sub expn { "The operating system is free-as-in-beer" }
+    Devel::CheckOS::die_unsupported() unless(os_is());
+
+You may also add a subroutine called C<expn> which should return a small
+snippet of explanatory text.  Again, see Devel::AssertOS::Unix for an
+example.  This is particularly useful for 'family' modules.
+
+Note the C<matches> subroutine - this is so that people can query your
+module and see what OSes are in your family.
+
+=head1 VERSIONS OF AN OS
+
+Two levels of name are supported.  So C<Devel::AssertOS::Linux::v2_6> is
+legal.  More than two levels are not supported.  Be careful to pick names
+that are both legal perl package names and legal filenames on all platforms.
+In general, this means anything that matches C</[_a-z]\w*/i>.
+
+=head1 OS FEATURES
+
+I would like to reserve the namespace C<Devel::AssertOS::OSFeatures::*>.
+If you want to release a module that tells the user whether a particular
+feature is available (eg, whether POSIX shell redirection can be expected
+to work) then please discuss it with me first.
+
+=head1 BUGS and FEEDBACK
+
+I welcome feedback about my code, including constructive criticism.
+Bug reports should be made using L<http://rt.cpan.org/> or by email.
+
+If you are feeling particularly generous you can encourage me in my
+open source endeavours by buying me something from my wishlist:
+  L<http://www.cantrell.org.uk/david/wishlist/>
+
+=head1 SEE ALSO
+
+L<Devel::CheckOS>
+
+$^O in L<perlvar>
+
+L<perlport>
+
+=head1 AUTHOR
+
+David Cantrell E<lt>F<david@cantrell.org.uk>E<gt>
+
+Thanks to David Golden for the name and ideas about the interface, and
+for the cpan-testers-discuss mailing list for prompting me to write it
+in the first place.
+
+=head1 COPYRIGHT and LICENCE
+
+Copyright 2007 - 2014 David Cantrell
+
+This documentation is free-as-in-speech.  It may be used,
+distributed and modified under the terms of the Creative Commons
+Attribution-Share Alike 2.0 UK: England & Wales License, whose
+text you may read at
+L<http://creativecommons.org/licenses/by-sa/2.0/uk/>.
+
+=head1 CONSPIRACY
+
+This documentation is also free-as-in-mason.
+
+=cut

@@ -1,0 +1,89 @@
+@prefix cpan:  <http://purl.org/NET/cpan-uri/person/> .
+@prefix cpant: <http://purl.org/NET/cpan-uri/terms#> .
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix dcs:   <http://ontologi.es/doap-changeset#> .
+@prefix dist:  <http://purl.org/NET/cpan-uri/dist/UNIVERSAL-AUTHORITY-Lexical/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix nfo:   <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+dist:project
+	a                 doap:Project;
+	doap:name         "UNIVERSAL-AUTHORITY-Lexical";
+	cpant:perl_version_from _:B1;
+	cpant:readme_from _:B1;
+	cpant:requires    "Method::Lexical";
+	cpant:requires    "Object::AUTHORITY";
+	cpant:requires    "parent";
+	cpant:test_requires "Test::More 0.61";
+	cpant:version_from _:B1;
+	doap:bug-database <http://rt.cpan.org/Dist/Display.html?Queue=UNIVERSAL-AUTHORITY-Lexical>;
+	doap:created      "2011-12-01"^^xsd:date;
+	doap:developer    [
+		a foaf:Person;
+		foaf:name "Toby Inkster";
+		foaf:mbox <mailto:tobyink@cpan.org>;
+	];
+	doap:download-page <https://metacpan.org/release/UNIVERSAL-AUTHORITY-Lexical>;
+	doap:homepage     <https://metacpan.org/release/UNIVERSAL-AUTHORITY-Lexical>;
+	doap:license      <http://dev.perl.org/licenses/>;
+	doap:programming-language "Perl";
+	doap:release      dist:v_0-001;
+	doap:release      dist:v_0-002;
+	doap:release      dist:v_0-003;
+	doap:repository   [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-universal-authority-lexical>;
+	];
+	doap:shortdesc    "an AUTHORITY method for every class, within a lexical scope".
+
+dist:v_0-001
+	a                 doap:Version;
+	rdfs:label        "Initial release";
+	dc:issued         "2011-12-01"^^xsd:date;
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/UNIVERSAL-AUTHORITY-Lexical-0.001.tar.gz>;
+	doap:revision     "0.001"^^xsd:string.
+
+dist:v_0-002
+	a                 doap:Version;
+	dc:issued         "2011-12-03"^^xsd:date;
+	dcs:changeset     [
+		dcs:item [
+			a dcs:Bugfix;
+			a dcs:Packaging;
+			rdfs:label "Upgrade Module::Package::RDF."@en;
+		];
+		dcs:versus dist:v_0-001;
+	];
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/UNIVERSAL-AUTHORITY-Lexical-0.002.tar.gz>;
+	doap:revision     "0.002"^^xsd:string.
+
+dist:v_0-003
+	a                 doap:Version;
+	dc:issued         "2013-07-24"^^xsd:date;
+	dcs:changeset     [
+		dcs:item [
+			a dcs:Bugfix;
+			a dcs:Packaging;
+			rdfs:label "Stop bundling prehistoric version of Scalar::Util."@en;
+			dcs:fixes <http://purl.org/NET/cpan-uri/rt/ticket/87112>;
+			dcs:thanks cpan:rsrchboy;
+		];
+		dcs:versus dist:v_0-002;
+	];
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/UNIVERSAL-AUTHORITY-Lexical-0.003.tar.gz>;
+	doap:revision     "0.003"^^xsd:string.
+
+cpan:rsrchboy
+	a                 foaf:Person;
+	foaf:name         "Chris Weyl";
+	foaf:nick         "RSRCHBOY".
+
+<http://dev.perl.org/licenses/>
+	dc:title          "the same terms as the perl 5 programming language system itself".
+
+_:B1
+	nfo:fileName      "lib/UNIVERSAL/AUTHORITY/Lexical.pm".
+

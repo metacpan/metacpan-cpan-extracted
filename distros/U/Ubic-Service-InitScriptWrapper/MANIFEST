@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.md
+dist.ini
+lib/Ubic/Service/InitScriptWrapper.pm
+t/init.d/test
+t/release-pod-coverage.t
+t/release-pod-syntax.t
+t/test.t

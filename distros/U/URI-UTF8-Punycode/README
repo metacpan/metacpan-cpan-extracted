@@ -1,0 +1,15 @@
+URI-UTF8-Punycode version 1.00
+==============================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+LICENCE
+
+This released under The GNU-GPL General Public License.

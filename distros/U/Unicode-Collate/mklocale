@@ -1,0 +1,815 @@
+#!perl
+#
+# This auxiliary script makes locale .pl files and copes with Korean.pm
+# used by Unicode::Collate::Locale.
+#
+# Usage:
+#    <do 'mklocale'> in perl, or <perl mklocale> in command line
+#
+# Input files:
+#    data/*.txt
+#    Collate/CJK/Korean.pm
+#    Collate/allkeys.txt
+#
+# Output files:
+#    Locale/*.pl (need to be moved to Collate/Locale/*.pl to install them)
+#    Korean.pm   (need to be moved to Collate/CJK/Korean.pm to install it)
+#
+# What to do:
+#   * convert data/*.txt to Locale/*.pl
+#   * rewrite %jamo2prim in Korean.pm
+#
+# == Examples of the Rules for data/*.txt ==
+#
+# 00F1;n+1 ===> primary weight of 00F1 is greater than that of n by 1.
+#    Among literals, only [A-Za-z'"] can be the base.
+#    +1 for primary weight (greater by 1),
+#    -1 for primary weight (less by 1),
+#    ++1 and --1 for secondary weight,
+#    +++1 and ---1 for tertiary weight.
+#    A number followed by + or - is decimal integer.
+#
+# 0491;<0433>+1
+# 1D2D;<00C6>+++12
+#    XXXX is hexadecimal for U+XXXX.
+#    <XXXX> can be the base followed by +1 etc.
+#
+# 3220;<0028 4E00 0029>+++?
+#    '+++?' means implicit tertiary weights and borrows them from DUCET.
+#    The lefthand (3220) and the righthand (0028 4E00 0029) *must* be
+#    secondary equal in DUCET too (usually compatibility equivalent).
+#    The example shown works like "3220;<0028>+++2 <4E00>+++2 <0029>+++29",
+#    since the tertiary weights of U+3200 are (0x4,0x4,0x1F), those of
+#    <0028 4E00 0029> are (0x2,0x2,0x2), and the difference is (+2,+2,+29).
+#    Limitation: cannot be combined with other rules in the same line.
+#
+# 01FD;<00E6><0301> ===> U+01FD eq U+00E6,U+0301
+#    simple decomposition (without + and -): identical each other.
+#
+# 0902;<0950>+0 [.FFF1.0.0.0]
+#     [...] means constant weights in hexadecimal.
+#
+# 0064 0335;=
+# 0111;d++1<0335>
+#    '=' saves DUCET weights as it is.
+#    0064 0335;= prevents 0064 0335 from being equal to 0111.
+#
+# {ch};c+1   ===> 0063 0068;c+1
+# {K'};Q++1  ===> 004B 0027;Q++1
+#     { } before ; encloses a literal: [A-Za-z'] (alphabets or apostrophe).
+#
+# {gh}0335;<{g}0127> ===> U+0067,U+0068,U+0335 eq U+0067,U+0127
+# {dZ}030C;<{d}017D> ===> U+0064,U+005A,U+030C eq U+0064,U+017D
+#     < > after ; can enclose a unit comprising plural XXXX or {literal}.
+#
+# alternate
+#    "alternate XXX" gives "variable => 'XXX'," and "alternate => 'XXX',".
+#
+# backwards
+#    It gives "backwards => 2,".
+#
+# upper
+#    It gives "upper_before_lower => 1,".
+#
+# suppress
+#    "suppress XXXX YYYY" gives "suppress => [0xXXXX, 0xYYYY],",
+#    "suppress XXXX-YYYY" gives "suppress => [0xXXXX..0xYYYY],".
+#    Values XXXX etc. should be hexadecimal, and may be listed in few lines.
+#
+# use
+#    "use PACKAGE" gives "use PACKAGE;".  The PACKAGE stands for a module,
+#    such as CJK/*.pm for overrideCJK, to be loaded from Locale/*.pl.
+#
+# overrideCJK and overrideHangul
+#    "overrideCJK FUNCNAME" or "overrideCJK \&FUNCNAME" gives
+#    "overrideCJK => \&FUNCNAME,", where FUNCNAME should be visible
+#    from Locale/*.pl. As well, overrideHangul works similar.
+#
+# locale_version
+#    The version number of Locale/*.pl. It should be updated when a *.pl file
+#    will be changed. The default value is $DEFAULT_LOCALE_VERSION.
+#
+use 5.006;
+use strict;
+use warnings;
+use Carp;
+use File::Spec;
+
+my $Use4th; # Use 4th level (Unicode 6.2.0 or before)
+my $DEFAULT_LOCALE_VERSION = '1.19'; # should be same as $VERSION of Collate.pm
+
+BEGIN {
+    unless ("A" eq pack('U', 0x41)) {
+	die "Unicode::Collate cannot stringify a Unicode code point\n";
+    }
+    unless (0x41 == unpack('U', 'A')) {
+	die "Unicode::Collate cannot get a Unicode code point\n";
+    }
+}
+
+sub _getHexArray { map hex, $_[0] =~ /([0-9A-Fa-f]+)/g }
+sub trim { $_[0] =~ s/^\ +//; $_[0] =~ s/\ +\z// }
+
+sub ce {
+    my $var = shift;
+    my $vc = $var ? '*' : '.';
+    my $hx = join '.', map { sprintf '%04X', $_ } @_;
+    return "[$vc$hx]";
+}
+
+our $PACKAGE = 'Unicode::Collate, locale';
+our $ENT_FMT = "%-9s ; %s # %s\n";
+our $RE_CE   = '(?:\[[0-9A-Fa-f\.\*]+\])';
+our $CUR_DIR = File::Spec->curdir();
+
+use constant SBase  => 0xAC00;
+use constant SFinal => 0xD7A3;
+use constant NCount =>    588;
+use constant TCount =>     28;
+use constant LBase  => 0x1100;
+use constant VBase  => 0x1161;
+use constant TBase  => 0x11A7;
+
+use constant Min2Wt => 0x20;
+use constant Min3Wt => 0x02;
+
+our $OvCJK  = 'overrideCJK';
+our $OvHang = 'overrideHangul';
+
+sub decHangul {
+    my $code = shift;
+    my $si = $code - SBase;
+    my $li = int( $si / NCount);
+    my $vi = int(($si % NCount) / TCount);
+    my $ti =      $si % TCount;
+    return (
+	LBase + $li,
+	VBase + $vi,
+	$ti ? (TBase + $ti) : (),
+    );
+}
+
+use constant CJK_UidFr =>  0x4E00;
+use constant CJK_UidTo =>  0x9FFF;
+
+sub simple_cjk_deriv { # $u should be CJK U.I. or Ext.
+    my $u = hex shift;
+    my $base = (CJK_UidFr <= $u && $u <= CJK_UidTo) ? 0xFB40 : 0xFB80;
+    my $aaaa = $base + ($u >> 15);
+    my $bbbb = ($u & 0x7FFF) | 0x8000;
+    my @u = $Use4th ? ($u) : ();
+    return ce(0, $aaaa, Min2Wt, Min3Wt, @u).ce(0, $bbbb, 0, 0, @u);
+}
+
+my %Keys;        # "0300" => "[.0000.0035.0002.0300]"
+my %Code;        # "[.0000.0035.0002.0300]" => "0300"
+my %Name;        # "0300" => "COMBINING GRAVE ACCENT"
+my %Equiv;       # "[.0000.0035.0002.0300]" => ["0340", "0953"]
+my $vDUCET;      # from @version, such as "6.0.0"
+my %JamoWt1;     # primary weights of modern jamo (codept => wt) decimal
+my $JamoWt2 = 0; # the maximum secondary weight of modern jamo (decimal)
+my @CompId;      # decomp. mapping of CJK compat. id. like ["FA00", 0x5207]
+
+my @OtherEquiv = split /\n=/, <<'OTHEREQUIV';
+=00C2= (A-circ)
+1EA7;<00E2><0300>
+1EA6;<00C2><0300>
+1EA5;<00E2><0301>
+1EA4;<00C2><0301>
+1EAB;<00E2><0303>
+1EAA;<00C2><0303>
+1EA9;<00E2><0309>
+1EA8;<00C2><0309>
+1EAD;<00E2><0323>
+1EAC;<00C2><0323>
+=00C4= (A-uml)
+01DF;<00E4><0304>
+01DE;<00C4><0304>
+=00C5= (A-ring)
+01FB;<00E5><0301>
+01FA;<00C5><0301>
+=00C6= (AE-lig)
+1D2D;<00C6>+++12
+01FD;<00E6><0301>
+01FC;<00C6><0301>
+01E3;<00E6><0304>
+01E2;<00C6><0304>
+=00CA= (E-circ)
+1EC1;<00EA><0300>
+1EC0;<00CA><0300>
+1EBF;<00EA><0301>
+1EBE;<00CA><0301>
+1EC5;<00EA><0303>
+1EC4;<00CA><0303>
+1EC3;<00EA><0309>
+1EC2;<00CA><0309>
+1EC7;<00EA><0323>
+1EC6;<00CA><0323>
+=00D4= (O-circ)
+1ED3;<00F4><0300>
+1ED2;<00D4><0300>
+1ED1;<00F4><0301>
+1ED0;<00D4><0301>
+1ED7;<00F4><0303>
+1ED6;<00D4><0303>
+1ED5;<00F4><0309>
+1ED4;<00D4><0309>
+1ED9;<00F4><0323>
+1ED8;<00D4><0323>
+=00D5= (O-tilde)
+1E4D;<00F5><0301>
+1E4C;<00D5><0301>
+022D;<00F5><0304>
+022C;<00D5><0304>
+1E4F;<00F5><0308>
+1E4E;<00D5><0308>
+1EE1;<00F5><031B>
+1EE0;<00D5><031B>
+=00D6= (O-uml)
+022B;<00F6><0304>
+022A;<00D6><0304>
+=00D8= (O-slash)
+01FF;<00F8><0301>
+01FE;<00D8><0301>
+=00DC= (U-uml)
+01DC;<00FC><0300>
+01DB;<00DC><0300>
+01D8;<00FC><0301>
+01D7;<00DC><0301>
+01D6;<00FC><0304>
+01D5;<00DC><0304>
+01DA;<00FC><030C>
+01D9;<00DC><030C>
+=0102= (A-breve)
+1EB1;<0103><0300>
+1EB0;<0102><0300>
+1EAF;<0103><0301>
+1EAE;<0102><0301>
+1EB5;<0103><0303>
+1EB4;<0102><0303>
+1EB3;<0103><0309>
+1EB2;<0102><0309>
+1EB7;<0103><0323>
+1EB6;<0102><0323>
+=0186= (open-O)
+1D53;<0186>+++?
+=0190= (open-E)
+2107;<0190>+++?
+1D4B;<0190>+++?
+=01A0= (O-horn)
+1EDD;<01A1><0300>
+1EDC;<01A0><0300>
+1EDB;<01A1><0301>
+1EDA;<01A0><0301>
+1EE1;<01A1><0303>
+1EE0;<01A0><0303>
+1EDF;<01A1><0309>
+1EDE;<01A0><0309>
+1EE3;<01A1><0323>
+1EE2;<01A0><0323>
+=01AF= (U-horn)
+1EEB;<01B0><0300>
+1EEA;<01AF><0300>
+1EE9;<01B0><0301>
+1EE8;<01AF><0301>
+1EEF;<01B0><0303>
+1EEE;<01AF><0303>
+1EED;<01B0><0309>
+1EEC;<01AF><0309>
+1EF1;<01B0><0323>
+1EF0;<01AF><0323>
+=0301= (acute)
+00E1;a<0301>
+00C1;A<0301>
+00E9;e<0301>
+00C9;E<0301>
+00ED;i<0301>
+00CD;I<0301>
+00F3;o<0301>
+00D3;O<0301>
+00FA;u<0301>
+00DA;U<0301>
+00FD;y<0301>
+00DD;Y<0301>
+=0302= (circum)
+00E2;a<0302>
+00C2;A<0302>
+00EA;e<0302>
+00CA;E<0302>
+00EE;i<0302>
+00CE;I<0302>
+00F4;o<0302>
+00D4;O<0302>
+00FB;u<0302>
+00DB;U<0302>
+0177;y<0302>
+0176;Y<0302>
+=0303= (tilde)
+00E3;a<0303>
+00C3;A<0303>
+1EBD;e<0303>
+1EBC;E<0303>
+0129;i<0303>
+0128;I<0303>
+00F5;o<0303>
+00D5;O<0303>
+0169;u<0303>
+0168;U<0303>
+1EF9;y<0303>
+1EF8;Y<0303>
+=0309= (hook-above)
+1EA3;a<0309>
+1EA2;A<0309>
+1EBB;e<0309>
+1EBA;E<0309>
+1EC9;i<0309>
+1EC8;I<0309>
+1ECF;o<0309>
+1ECE;O<0309>
+1EE7;u<0309>
+1EE6;U<0309>
+1EF7;y<0309>
+1EF6;Y<0309>
+=0323= (dot-below)
+1EA1;a<0323>
+1EA0;A<0323>
+1EB9;e<0323>
+1EB8;E<0323>
+1ECB;i<0323>
+1ECA;I<0323>
+1ECD;o<0323>
+1ECC;O<0323>
+1EE5;u<0323>
+1EE4;U<0323>
+1EF5;y<0323>
+1EF4;Y<0323>
+=0933= (Devanagari-LLA)
+0934;<0933><093C>
+=0A3C= (Gurmukhi-Nukta)
+0A33;<0A32><0A3C>
+0A36;<0A38><0A3C>
+0A59;<0A16><0A3C>
+0A5A;<0A17><0A3C>
+0A5B;<0A1C><0A3C>
+0A5E;<0A2B><0A3C>
+=1EB8= (E-dot-below)
+1EC7;<1EB9><0302>
+1EC6;<1EB8><0302>
+=1ECC= (O-dot-below)
+1ED9;<1ECD><0302>
+1ED8;<1ECC><0302>
+1EE3;<1ECD><031B>
+1EE2;<1ECC><031B>
+=1EE4= (U-dot-below)
+1EF1;<1EE5><031B>
+1EF0;<1EE4><031B>
+OTHEREQUIV
+
+my %OtherEquiv;
+for my $o (@OtherEquiv) {
+    my @ln = split /\n/, $o;
+    my $uv = shift @ln;
+    $uv =~ s/ *\([a-zA-Z-]+\) *//;
+    $uv =~ tr/=//d;
+    croak "$PACKAGE: $uv is invalid in OTHEREQUIV" if $uv !~ /^[0-9A-F]+\z/;
+    $OtherEquiv{$uv} = \@ln;
+}
+
+##### read DUCET #####
+
+{
+    my($f, $fh);
+    foreach my $d ($CUR_DIR) {
+	$f = File::Spec->catfile($d, "Collate", "allkeys.txt");
+	last if open($fh, $f);
+	$f = undef;
+    }
+    croak "$PACKAGE: Collate/allkeys.txt is not found" if !defined $f;
+
+    while (my $line = <$fh>) {
+	chomp $line;
+	next if $line =~ /^\s*#/;
+	$vDUCET = $1 if $line =~ /^\@version\s*(\S*)/;
+
+	next if $line !~ /^\s*[0-9A-Fa-f]/;
+
+	my $name = ($line =~ s/[#%]\s*(.*)//) ? $1 : '';
+
+	# gets element
+	my($e, $k) = split /;/, $line;
+	trim($e);
+	trim($k);
+	$name =~ s/; QQ[A-Z]+//;
+	$name =~ s/^ ?\[[0-9A-F]+\] ?//;
+
+	if ($k =~ /\[\.0000\.0000\.0000(\.?0*)\]/) {
+	    $Use4th = 1 if $1;
+	    $Name{$e} = $name;
+	    next;
+	}
+	croak "Wrong Entry: <charList> must be separated by ';' ".
+	      "from <collElement>" if ! $k;
+	push @{ $Equiv{$k} }, $e if exists $Code{$k};
+
+	$Keys{$e} = $k;
+	$Code{$k} = $e if !exists $Code{$k};
+	$Name{$e} = $name;
+
+	# Hangul Jamo (modern only)
+	if ($e =~ /^11[0-9A-F]{2}\z/) {
+	    my @ec = _getHexArray($e);
+	    my @kc = _getHexArray($k);
+	    if (@ec == 1) {
+		$JamoWt1{$ec[0]} = $kc[0]; # each jamo
+		$JamoWt2 = $kc[1] if $JamoWt2 < $kc[1]; # max
+	    }
+	}
+
+	# CJK compatibility ideographs
+	if ($k =~ /^\[\.F[0-9A-F]+\.[0-9A-F]+\.0002[\.\]]/) {
+	    my @p = map hex($_), $k =~ /\[\.([0-9A-F]+)\./g;
+	    if (@p == 2) {
+		my $ui = ((($p[0] & 0x3F) << 15) | ($p[1] & 0x7FFF));
+		my $h = sprintf "%04X", $ui;
+		push @CompId, [$e, $ui] if $e ne $h; # should be decomposable
+	    }
+	}
+    }
+    close $fh;
+}
+
+# $Code{$k} : precomposed (such as 04D1, CYRILLIC SMALL LETTER A WITH BREVE)
+# $eqs      : equivalent sequence (such as <0430><0306>)
+# $starter  : starter codepoint (integer such as hex '0430')
+my @Contractions; # store Cyrillic, currently required, and others.
+for my $k (sort keys %Equiv) {
+    if ($Code{$k} !~ / / && $Equiv{$k}[0] =~ / /) {
+	(my $eqs = "<$Equiv{$k}[0]>") =~ s/ /></g;
+	my $starter = $eqs =~ /^<([0-9A-Fa-f]+)>/ ? hex($1) : '';
+	push @Contractions, [$starter, "$Code{$k};$eqs"];
+    }
+}
+
+##### Korean.pm #####
+
+{
+    my($f, $fh);
+    foreach my $d ($CUR_DIR) {
+	$f = File::Spec->catfile($d, "Collate", "CJK", "Korean.pm");
+	last if open($fh, $f);
+	$f = undef;
+    }
+    croak "$PACKAGE: Collate/CJK/Korean.pm is not found" if !defined $f;
+
+    my %KO_jamo; # (codepoint => 1) for jamo that a syllable comprises.
+    my $KO_head = ''; # before /^my %jamo2prim/
+    my $KO_foot = ''; # after /^\); # for DUCET/
+    while (my $line = <$fh>) {
+	chomp $line;
+
+	# check jamo that a syllable in __DATA__ comprises.
+	if (($line =~ /^__DATA__/) .. ($line =~ /^__END__/)) {
+	    if ($line =~ /^[A-D]/) { # Hangul syllable
+		$line =~ s/:.*//;
+		my @u = _getHexArray($line);
+		croak "unexpected $line" if @u != 1;
+		my $uv = $u[0];
+		croak "unexpected $line" unless SBase <= $uv && $uv <= SFinal;
+		my @dec = decHangul($uv);
+		$KO_jamo{$_} = 1 for @dec;
+		$line .= ':'.join '-', map sprintf('%04X', $_), @dec;
+	    }
+	}
+
+	$line .= "\n"; # guarantee the last LF at the file end.
+	$KO_head .= $line if 1 .. ($line =~ /^my %jamo2prim/);
+	$KO_foot .= $line if ($line =~ /^\); # for DUCET/) .. 1; # eof($fh)
+    }
+    close $fh;
+
+    open my $pm, ">Korean.pm" or die 'Korean.pm';
+    binmode $pm;
+    print $pm $KO_head;
+
+    my $count = 0;
+    for (sort keys %KO_jamo) {
+	print $pm ' ' if ($count % 4) == 0;
+	++$count;
+	print $pm '   ';
+	print $pm sprintf q!'%04X', 0x%04X,!, $_, $JamoWt1{$_};
+	print $pm "\n" if ($count % 4) == 0;
+    }
+    print $pm "\n" if $count % 4 != 0;
+
+    $JamoWt2 = sprintf "0x%02X", $JamoWt2;
+    $KO_foot =~ s/(\$wt = )[0-9x]+/$1$JamoWt2/;
+    $KO_foot =~ s/^(\); # for DUCET).*/$1 v$vDUCET/;
+    print $pm $KO_foot;
+    close $pm;
+}
+
+##### Locale/*.pl #####
+
+my $source = 'data';
+opendir DIR, $source or croak "no $source";
+my @txts = grep /^[a-zA-Z]/, readdir DIR;
+closedir DIR;
+
+my $target = 'Locale';
+mkdir $target;
+for my $txt (@txts) {
+    my %locale_keys;
+    my $txtfile = File::Spec->catfile($source, $txt);
+    my $pl = $txt;
+       $pl =~ s/\.txt\z/.pl/ or croak "$PACKAGE: $source/$txt is not .txt";
+    my $plfile = File::Spec->catfile($target, $pl);
+
+    open my $fh,  $txtfile  or croak "$PACKAGE: $source/$txt is not found: $!";
+    open my $ph, ">$plfile" or croak "$PACKAGE: $target/$pl can't be made: $!";
+    binmode $ph;
+
+    my $ptxt  = '';
+    my $entry = '';
+    my $locale_version = $DEFAULT_LOCALE_VERSION;
+
+    while (<$fh>) {
+	chomp;
+	next if /^\s*\z/;
+	if (s/^locale_version//) {
+	    $locale_version = $1 if /(\S+)/;
+	    next;
+	}
+	if (/^use/) {
+	    print $ph "$_;\n";
+	    s/^[^:]+:://; # assume that will be located under ./Collate,
+			  # then omit the first identifier (Unicode::).
+	    s/\s*\z/.pm/;
+	    my $f = File::Spec->catfile($CUR_DIR, split /::/, $_);
+	    $f = 'Korean.pm' if /::Korean\.pm/; # using the newer one
+	    require $f;
+	    next;
+	}
+	if (/^(alternate)\s+(\S+)/) {
+	    my $v = "variable";
+	    $ptxt .= "   $v => '$2',\n";
+	    $ptxt .= "   $1 => '$2',\n";
+	    next;
+	}
+	if (/^backwards$/) {
+	    $ptxt .= "   backwards => 2,\n";
+	    next;
+	}
+	if (s/^(override)(CJK|Hangul)[ \t]+(?:\\&|)/\\&/) {
+	    my $key = $1.$2;
+	    $ptxt .= "   $key => $_,\n";
+	    $locale_keys{$key} = eval $_;
+	    next;
+	}
+	if (/^upper$/) {
+	    $ptxt .= "   upper_before_lower => 1,\n";
+	    next;
+	}
+	if (s/^suppress//) {
+	    s/\s*-\s*/../g;
+	    my @c = split;
+	    s/(?:0[Xx])?([0-9A-Fa-f]+)/0x$1/g for @c;
+	    my $list = join ", ", @c;
+	    $ptxt .= "   suppress => [$list],\n";
+	    next;
+	}
+	if (/^([\s\-0-9A-Fa-fXx]+)\z/) { # continue the last list
+	    s/\s*-\s*/../g;
+	    my @c = split;
+	    s/(?:0[Xx])?([0-9A-Fa-f]+)/0x$1/g for @c;
+	    my $list = join ", ", @c;
+	    $ptxt =~ s/\](,$)/$1/;
+	    $ptxt .= "\t\t$list],\n";
+	    next;
+	}
+	if (/^\s*(#\s*)/) {
+	    $ptxt .= "$_\n" if $1 ne '#';
+	    next;
+	}
+
+	$entry .= parse_entry($_, \%locale_keys);
+    }
+
+    # precomposed chars to be suppressed as additional equivalents
+    if ($ptxt =~ /suppress => \[(.*)\]/s) {
+	my @suplist = eval $1;
+	my %suppressed;
+	@suppressed{@suplist} = (1) x @suplist;
+
+	for my $contract (@Contractions) {
+	    my $starter = $contract->[0];
+	    my $addline = $contract->[1];
+	    next if ! $suppressed{$starter};
+	    $entry .= parse_entry($addline, \%locale_keys);
+	}
+    }
+
+    # Compatibility ideographs are tailored as equivalent unified ideographs.
+    if ($locale_keys{$OvCJK}) {
+	for my $c (@CompId) {
+	    my $r = $locale_keys{$OvCJK}->($c->[1]);
+	    next if !defined $r;
+	    my $addline = sprintf '%s;<%04X>', $c->[0], $c->[1];
+	    $entry .= parse_entry($addline, \%locale_keys);
+	}
+    }
+
+    if ($entry) {
+	my $v = $vDUCET ? " # for DUCET v$vDUCET" : '';
+	$ptxt .= "   entry => <<'ENTRY',$v\n";
+	$ptxt .= $entry;
+	$ptxt .= "ENTRY\n";
+    }
+
+    my $lv = "   locale_version => $locale_version,\n";
+    print $ph "+{\n$lv$ptxt};\n";
+    close $fh;
+    close $ph;
+}
+
+sub parse_entry {
+    my $line = shift;
+    my $lockeys = shift;
+
+    my($e,$rule) = split_e_rule($line);
+    my $name = getname($e);
+    my $eq_rule = $rule eq '=';
+    $rule = join '', map "<$_>", split ' ', $e if $eq_rule;
+    my ($newce, $simpdec) = parse_rule($e, $rule, $lockeys);
+
+    my $newentry = '';
+
+    if (!$lockeys->{$e}) {
+	$newentry .= sprintf $ENT_FMT, $e, $newce, $name if !$eq_rule;
+	$lockeys->{$e} = $newce;
+    } else {
+	$newentry .= "# already tailored: $_\n";
+    }
+
+    if (!$simpdec && $Keys{$e}) { # duplicate for the decomposition
+	my $key = $Keys{$e};
+	my @ce = $key =~ /$RE_CE/go;
+	if (@ce > 1) {
+	    my $ok = 1;
+	    my $ee = '';
+	    for my $c (@ce) {
+		$ok = 0, last if !$Code{$c};
+		$ee .= ' ' if $ee ne '';
+		$ee .= $Code{$c};
+	    }
+	    if ($ok && !$lockeys->{$ee}) {
+		$newentry .= sprintf $ENT_FMT, $ee, $newce, $name;
+		$lockeys->{$ee} = $newce;
+	    }
+	    if ($ee =~ s/ 030([01])/ 034$1/ &&
+		$ok && !$lockeys->{$ee}) {
+		$newentry .= sprintf $ENT_FMT, $ee, $newce, $name;
+		$lockeys->{$ee} = $newce;
+	    }
+	}
+	if ($Equiv{$key}) {
+	    for my $eq (@{ $Equiv{$key} }) {
+		next if $key =~ /^\[\.0000\.[^]]+\]\z/; # primary ignorable
+		next if $lockeys->{$eq};
+		next if $eq eq '3038'; # 3038 is identical to 2F17 in DUCET,
+				       # but not canonical equivalent.
+		$newentry .= sprintf $ENT_FMT, $eq, $newce, $Name{$eq};
+		$lockeys->{$eq} = $newce;
+	    }
+	}
+    }
+
+    if ($OtherEquiv{$e}) {
+	for my $o (@{ $OtherEquiv{$e} }) {
+	    my($e,$rule) = split_e_rule($o);
+	    my $name = getname($e);
+	    (my $newce, undef) = parse_rule($e, $rule, $lockeys);
+	    next if $lockeys->{$e};
+	    $newentry .= sprintf $ENT_FMT, $e, $newce, $name;
+	    $lockeys->{$e} = $newce;
+	}
+    }
+
+    return $newentry;
+}
+
+sub getunicode {
+    return join ' ', map { sprintf '%04X', $_ } unpack 'U*', shift;
+}
+
+sub parse_element {
+    my $e = shift;
+    $e =~ s/\{([A-Za-z']+)\}/' '.getunicode($1).' '/ge;
+    $e =~ s/ +/ /g;
+    trim($e);
+    return $e;
+}
+
+sub split_e_rule {
+    my $line = shift;
+    my($e, $r) = split /;/, $line;
+    return (parse_element($e), $r);
+}
+
+sub getname {
+    my $e = shift;
+    return $Name{$e} if $Name{$e};  # single collation element (without <>)
+    my @e = split ' ', $e;
+    my @name = map { $Name{$_} ? $Name{$_} :
+		     /^FD[DE][0-9A-F]\z/ ? "noncharacter-$_" :
+		     'unknown' } @e;
+    return sprintf '<%s>', join ', ', @name;
+}
+
+sub parse_rule {
+    my $e    = shift;
+    my $e1   = $e =~ /^([0-9A-F]+)/ ? $1 : '';
+    my $rule = shift;
+    my $lockeys = shift;
+    my $result = '';
+    my $simple_decomp = 1; # rules containing only [A-Za-z'"] or <XXXX>
+
+    for (my $prerule = $rule; $rule ne ''; $prerule = $rule) {
+	$rule =~ s/^ +//;
+	last if $rule =~ /^#/;
+	if ($rule =~ s/^($RE_CE)//o) {
+	    my $k = $1;
+	    my $var = $k =~ /^\[\*/ ? 1 : 0;
+	    my @c = _getHexArray($k);
+	    @c = @c[0..2] if !$Use4th;
+	    $result .= ce($var, @c);
+	    next;
+	}
+
+	if ($rule =~ s/^(<([0-9A-F ]+)>\+\+\+\?)//) {
+	    my $cr = $1;
+	    my @c = split ' ', $2;
+	    my $compat = $Keys{$e};
+	    my $decomp = join '', map {
+			$Keys{$_} ? $Keys{$_} : simple_cjk_deriv($_)
+		    } @c;
+	    my $regexp = $decomp;
+	    $regexp =~ s/([\[\]\.\*])/\\$1/g;
+	    $regexp =~ s/\.00(?:0[1-9A-F]|1[0-9A-F])(?:\\\.[0-9A-F]+|)\\\]
+			/.(00(?:0[1-9A-F]|1[0-9A-F]))(?:\\.[0-9A-F]+|)\\\]/gx;
+			# tertiary weights of 01-1F (excluding 00)
+	    my @tD = map hex($_), $decomp =~ /^$regexp\z/;
+	    my @tC = map hex($_), $compat =~ /^$regexp\z/;
+	    croak "wrong at $cr" unless @c == @tD && @c == @tC;
+	    my $r = join ' ', map "<$c[$_]>+++".($tC[$_] - $tD[$_]), 0..@c-1;
+	    $rule = $r.$rule;
+	    next;
+	}
+
+	my $key;
+	if ($rule =~ s/^(<[0-9A-Za-z'{ }]+>|[A-Za-z'"])//) {
+	    my $e = $1;
+	    my $c = $e =~ tr/<>//d ? parse_element($e) : getunicode($e);
+	    croak "<$c> is too short" if 4 > length $c;
+	    $key = $lockeys->{$c} || $Keys{$c};
+	    if (!defined $key) {
+		my $u = hex $c;
+		my @u = $Use4th ? ($u) : ();
+		my @r;
+		if (SBase <= $u && $u <= SFinal) {
+		    @r = $lockeys->{$OvHang}->($u) if $lockeys->{$OvHang};
+		} else {
+		    # but no check if $u is in CJK ideographs
+		    @r = $lockeys->{$OvCJK} ->($u) if $lockeys->{$OvCJK};
+		}
+		if (@r) {
+		    $key = join '', map {
+			ref $_ ? ce(0, @$_) : ce(0, $_, Min2Wt, Min3Wt, @u)
+			    } @r;
+		}
+	    }
+	}
+
+	my @base;
+	for my $k ($key =~ /$RE_CE/go) {
+	    my $var = $k =~ /^\[\*/ ? 1 : 0;
+	    push @base, [$var, _getHexArray($k)];
+	}
+	croak "the rule seems wrong at $prerule" if !@base;
+
+	my $replaced = 0;
+	while ($rule =~ s/^(([+-])\2*)(\d+)//) {
+	    my $idx = length($1);
+	    my $num = $2 eq '-' ? -$3 : $3;
+	    $base[0][$idx] += $num;
+	    ++$replaced;
+	}
+
+	$simple_decomp = 0 if $replaced;
+	for my $c (@base) {
+	    $c->[4] = hex $e1 if $replaced && $Use4th;
+	    $result .= ce(@$c);
+	}
+	croak "something wrong at $rule" if $prerule eq $rule;
+    }
+    return($result, $simple_decomp);
+}

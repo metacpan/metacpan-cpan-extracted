@@ -1,0 +1,138 @@
+NAME
+    CUICollectorMapReduce README
+
+  SYNOPSIS
+      CUICollectorMapReduce is a collection of two Java classes designed 
+      to parse MetaMap output files to identify CUI bigrams for use by
+      the UMLS::Association package.  The Hadoop implementation improves 
+      upon the Perl CUICollector.pl module through paralellization of 
+      counting CUI bigram frequencies, removal of memory constraints, 
+      and identification of CUI bigrams that span utterances having the 
+      same PubMed ID.
+
+      The two Java classes are ArticleCollector.java and CUICollector.java.
+      ArticleCollector parses MetaMap files in order to concatenate all 
+      utterances that have the same Pubmed ID into a single record.  
+      This single record is then processed by CUICollector.java when in 
+      "article" mode. CUICollector.java has 2 modes: "cui" and "article".
+      In "cui" mode the CUICollector class parses MetaMap output 
+      directly and reproduces the original output of the Perl 
+      CUICollector.pl algorithm by identifying CUI bigrams in each 
+      individual utterance.  In "article" mode the CUICollector requires 
+      that ArticleCollector.java be run first, then it parses the output 
+      of the ArticleCollector.  
+
+      The following sections provide installation instructions and give
+      examples of how to use CUICollectorMapReduce.
+
+  REQUIERMENTS
+    To install and run CUICollectorMapReduce you must have the following and
+    all their dependencies installed:
+
+      Java version 1.8.0
+
+      Apache Hadoop 2.7.3 (install binary from http://hadoop.apache.org/releases.html)
+
+      Apache Maven 3.3.9 (only required if compiling from source)
+
+    A Hadoop cluster with an HDFS is not required to run this software as
+    Hadoop can be installed on a single computer by following the directions
+    for a Single Node Setup.
+
+    To download and install above software dependencies on a Linux box use:
+
+      >> sudo apt-get install maven git ssh rsync default-jdk default-jre openssh-server
+
+    Once Hadoop is installed edit Line 25 of the file
+    hadoop-2.7.3/etc/hadoop/hadoop-env.sh to point to your default-java
+    location (in linux it is /usr/lib/jvm/default-java).
+
+    Make sure to add the path to your Hadoop executable to your environment
+    $PATH.
+
+    This code has only been test on a Linux platform.
+
+  INSTALL
+    Once downloaded you can either use the JAR file directly or recompile.
+    To recompile you must have Maven installed. CD to the source directory
+    with the pom.xml file and do the following:
+
+      >> mvn install
+
+    This will compile the CUICollectorMapReduce class files and save the
+    executable jar file under a new directory named "target".
+
+  USAGE
+   ArticleCollector
+    To run the ArticleCollector class on MetaMap machine readable output
+    files (MMO files) use the following (>> indicates command line prompt
+    and should not be typed):
+
+       >> hadoop jar <path to jar file> Hadoop.CUICollectorMapReduce.ArticleCollector <path to metamap directory OR individual file> <path and name of output directory>
+
+    For example from within the Hadoop folder:
+
+       >> hadoop jar ./target/CUICollectorMapReduce-0.0.1-SNAPSHOT.jar Hadoop.CUICollectorMapReduce.ArticleCollector ./metamap/ articleOut
+
+   CUICollector
+    To run CUICollector in "cui" mode, which processes MMO files directly
+    use the following:
+
+       >> hadoop jar <path to jar file> Hadoop.CUICollectorMapReduce.CUICollector <path to metamap directory OR individual file> <path and name of output directory> cui
+
+    For example:
+
+       >> hadoop jar ./target/CUICollectorMapReduce-0.0.1-SNAPSHOT.jar Hadoop.CUICollectorMapReduce.CUICollector ./metamap/ cuiOut cui
+
+    To run CUICollector in "article" mode you need to point the input to the
+    ArticleCollector output and replace the "cui" with "article".
+
+    For example:
+
+       >> hadoop jar ./target/CUICollectorMapReduce-0.0.1-SNAPSHOT.jar Hadoop.CUICollectorMapReduce.CUICollector ./articleOut/part-r-00000 cuiOut article
+
+  OUTPUT
+    CUICollectorMapReduce outputs all CUI bigrams and frequencies into a
+    flat text file; thus, installation of MySQL is not required for this
+    part of the package. This text file can be loaded into a MySQL database
+    for use with the UMLS::Association package.
+
+  REFERENCING
+    If you write a paper that has used UMLS-Association in some way, we'd
+    certainly be grateful if you sent us a copy.
+
+  CONTACT US
+    If you have any trouble installing and using CUICollectorMapReduce,
+    please contact us via the users mailing list :
+
+    umls-association@yahoogroups.com
+
+    You can join this group by going to:
+
+    <http://tech.groups.yahoo.com/group/umls-association/>
+
+    You may also contact us directly if you prefer :
+
+        Bridget T. McInnes: btmcinnes at vcu.edu 
+        Amy L. Olex: alolex at vcu.edu
+
+  SOFTWARE COPYRIGHT AND LICENSE
+    Copyright (C) 2017 Bridget T McInnes and Amy L. Olex
+
+    This suite of programs is free software; you can redistribute it and/or
+    modify it under the terms of the GNU General Public License as published
+    by the Free Software Foundation; either version 2 of the License, or (at
+    your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+    Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+    Note: The text of the GNU General Public License is provided in the file
+    'GPL.txt' that you should have received with this distribution.
+

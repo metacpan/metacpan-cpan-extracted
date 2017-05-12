@@ -1,0 +1,33 @@
+---
+abstract: 'handle numerals in Unicode using the libuninum library'
+author:
+  - 'Zakariyya Mughal <zmughal@cpan.org>'
+build_requires:
+  Test::More: 0
+  utf8: 0
+configure_requires:
+  Alien::Uninum: 0
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.016, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Unicode-Number
+recommends:
+  Math::BigInt: 0
+requires:
+  Alien::Uninum: 0
+  Carp: 0
+  Encode: 0
+  List::AllUtils: 0
+  XSLoader: 0
+  constant: 0
+  overload: 0
+  strict: 0
+  warnings: 0
+resources:
+  homepage: https://github.com/zmughal/p5-Unicode-Number
+  repository: https://github.com/zmughal/p5-Unicode-Number.git
+version: 0.009

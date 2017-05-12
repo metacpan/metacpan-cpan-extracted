@@ -1,0 +1,22 @@
+---
+abstract: "Make UUID::Random use Math::Random::Secure's rand()"
+author:
+  - 'Steven Haryanto <stevenharyanto@gmail.com>'
+build_requires:
+  Module::Build: 0.3601
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300006, CPAN::Meta::Converter version 2.113640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: UUID-Random-Patch-UseMRS
+requires:
+  Math::Random::Secure: 0
+  UUID::Random: 0
+resources:
+  homepage: http://metacpan.org/dist/UUID-Random-Patch-UseMRS
+  repository: http://github.com/sharyanto/perl-UUID-Random-Patch-UseMRS
+version: 0.01

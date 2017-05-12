@@ -1,0 +1,34 @@
+---
+abstract: 'running ZooKeeper as Ubic service'
+author:
+  - 'Yury Zavarin <yury.zavarin@gmail.com>'
+build_requires:
+  File::Temp: 0
+  Perl6::Slurp: 0
+  Test::Class: 0
+  Test::More: 0
+  Test::TCP: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Ubic-Service-ZooKeeper
+requires:
+  File::Copy: 0
+  File::Spec::Functions: 0
+  IO::Socket::INET: 0
+  Params::Validate: 0
+  Storable: 0
+  Time::HiRes: 0
+  Ubic::Daemon: 0
+  Ubic::Result: 0
+  Ubic::Service::Common: 0
+  parent: 0
+resources:
+  homepage: http://github.com/tadam/Ubic-Service-ZooKeeper
+  repository: git://github.com/tadam/Ubic-Service-ZooKeeper.git
+version: 0.02

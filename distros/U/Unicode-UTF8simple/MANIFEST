@@ -1,0 +1,7 @@
+Makefile.PL
+MANIFEST
+test.pl
+UTF8simple.pm
+README
+META.yml                                 Module meta-data (added by MakeMaker)
+gb2312.txt

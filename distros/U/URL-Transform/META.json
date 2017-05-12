@@ -1,0 +1,94 @@
+{
+   "abstract" : "perform URL transformations in various document types",
+   "author" : [
+      "Jozef Kutej <jkutej@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110930",
+   "keywords" : [
+      "url",
+      "edit"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "URL-Transform",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Cwd" : 0,
+            "Test::Differences" : 0,
+            "Test::Exception" : 0,
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp::Clan" : 0,
+            "Class::Accessor::Fast" : 0,
+            "Compress::Zlib" : 0,
+            "Cwd" : 0,
+            "File::Slurp" : 0,
+            "HTML::Parser" : 0,
+            "HTML::Tagset" : 0,
+            "List::Util" : 0,
+            "XML::SAX" : 0,
+            "XML::SAX::Base" : 0,
+            "XML::SAX::ParserFactory" : 0,
+            "XML::SAX::Writer" : 0
+         }
+      }
+   },
+   "provides" : {
+      "URL::Transform" : {
+         "file" : "lib/URL/Transform.pm",
+         "version" : "0.01"
+      },
+      "URL::Transform::SAX::Filter" : {
+         "file" : "lib/URL/Transform/SAX/Filter.pm",
+         "version" : "0.01"
+      },
+      "URL::Transform::using::CSS::RegExp" : {
+         "file" : "lib/URL/Transform/using/CSS/RegExp.pm",
+         "version" : "0.01"
+      },
+      "URL::Transform::using::HTML::Meta" : {
+         "file" : "lib/URL/Transform/using/HTML/Meta.pm",
+         "version" : "0.01"
+      },
+      "URL::Transform::using::HTML::Parser" : {
+         "file" : "lib/URL/Transform/using/HTML/Parser.pm",
+         "version" : "0.01"
+      },
+      "URL::Transform::using::Remove" : {
+         "file" : "lib/URL/Transform/using/Remove.pm",
+         "version" : "0.01"
+      },
+      "URL::Transform::using::XML::SAX" : {
+         "file" : "lib/URL/Transform/using/XML/SAX.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/jozef/URL-Transform/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/jozef/URL-Transform.git"
+      }
+   },
+   "version" : "0.01"
+}

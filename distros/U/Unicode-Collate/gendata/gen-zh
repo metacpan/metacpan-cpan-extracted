@@ -1,0 +1,136 @@
+#!perl
+# gen-zh : auxiliary script for Chinese
+#
+# output files
+#
+#   zh.txt   (equal to data/zh.txt)
+#   loc_zh.t (equal to t/loc_zh.t)
+#
+use strict;
+use warnings;
+require 'gen-head'; # for testcount() and testhead()
+
+use Unicode::Normalize;
+require 'dumpstr'; # for element() and string()
+
+my @low = qw( 61 65 EA 69 6D 6E 6F 75 FC ); # lower base letters
+my @upp = qw( 41 45 CA 49 4D 4E 4F 55 DC ); # upper base letters
+my @tone = qw( 304 301 30C 300 0 ); # combining characters for tones
+my @misc = qw( 303 309 323 ); # some combining characters other than tones
+
+my $textf = 'zh.txt';
+my $text0 = '';
+my $testf = 'loc_zh.t';
+my $test0 = '';
+my $test1 = '';
+my $test2 = '';
+my $test3 = '';
+
+for my $i (0..@low-1) {
+    my $lb = pack('U', hex $low[$i]);
+    my $ub = pack('U', hex $upp[$i]);
+    for my $j (0..@tone-1) {
+	my $tc = $tone[$j] ? pack('U', hex $tone[$j]) : '';
+
+	my $ldec = NFD($lb).$tc;
+	my $udec = NFD($ub).$tc;
+
+	my $sldec = string($ldec);
+	my $sudec = string($udec);
+
+	if ($tc) { # has a tone
+	    my $nc = $tone[$j+1] ? pack('U', hex $tone[$j+1]) : '';
+	    my $snext = string(NFD($lb).$nc);
+	    $test0 .= qq|ok(\$objZh->eq($sldec, $snext));\n|;
+	}
+	if ($lb ne $ldec) { # has a tone, or the base is a composite
+	    $test1 .= qq|ok(\$objZh->eq($sldec, $sudec));\n|;
+	}
+
+	my $te1 = '';
+	my $te2 = '';
+	my $tx1 = '';
+	my $tx2 = '';
+	for my $bc ($lb, $ub) { # base letter
+	    my $dec = NFD($bc).$tc;
+	    my $com = NFC($bc.$tc);
+	    my $cat = $bc.$tc;
+
+	    my $sdec = string($dec);
+	    my $scom = string($com);
+	    my $scat = string($cat);
+	    {
+		my $sacc = $sdec;
+		$te1 .= qq|ok(\$objZh->eq($sdec, $scom));\n| if $dec ne $com;
+		$te1 .= qq|ok(\$objZh->eq($sdec, $sacc));\n|
+			if $sacc =~ s/(x\{?3)0([01])/${1}4${2}/;
+	    }
+	    if ($dec ne $cat && $cat ne $com) {
+		$te2 .= qq|ok(\$objZh->eq($sdec, $scat));\n|;
+		$te2 .= qq|ok(\$objZh->eq($sdec, $scat));\n|
+			if $scat =~ s/(x\{?3)0([01])/${1}4${2}/;
+	    }
+
+	    # .txt
+	    my $c = element($com);
+	    my @d = split //, $dec;
+	    my $dif = $bc eq $d[0] ? "--".(4-$j) : "++".($j+1);
+
+	    if ($dif ne '--0') { # $com is not a simple base
+		my $e = $c;
+		$tx1 .= "$e;$d[0]$dif\n";
+		$tx1 .= "$e;$d[0]$dif\n" if $e =~ s/(\b03)0([01])/${1}4${2}/;
+	    }
+	    if ($dec ne $cat && $tc ne '') { # $cat is composite + tone
+		my $e = element($cat eq $com ? $dec : $cat);
+		$tx2 .= "$e;<$c>\n";
+		$tx2 .= "$e;<$c>\n" if $e =~ s/(\b03)0([01])/${1}4${2}/;
+	    }
+	}
+	$test2 .= "$te1$te2";
+	$text0 .= "$tx1$tx2";
+    }
+
+    for my $m (@misc) { # misc. combining character
+	my $mc = pack('U', hex $m);
+	for my $bc ($lb, $ub) { # base letter
+	    next if $bc eq NFD($bc); # $bc should be a composite
+	    my $dec = NFD($bc).$mc;
+	    my $com = NFC($bc.$mc);
+	    next if length $com > 1; # $com should be a composite
+	    my $sdec = string($dec);
+	    my $scom = string($com);
+	    $test3 .= qq|ok(\$objZh->eq($sdec, $scom));\n|;
+	}
+    }
+}
+
+### WRITE DATA ###
+open my $dh, ">$textf" or die $textf;
+binmode $dh;
+print $dh $text0;
+close $dh or die $textf;
+
+### WRITE TEST ###
+my $test = '';
+my $ok = 2;
+
+$test .= "\$objZh->change(level => 1);\n\n";
+$test .= testcount(\$ok, $test0);
+
+$test0 =~ s/->eq/->lt/g;
+$test .= "\$objZh->change(level => 2);\n\n";
+$test .= testcount(\$ok, $test0);
+$test .= testcount(\$ok, $test1);
+
+$test1 =~ s/->eq/->lt/g;
+$test .= "\$objZh->change(level => 3);\n\n";
+$test .= testcount(\$ok, $test1);
+$test .= testcount(\$ok, $test2);
+$test .= testcount(\$ok, $test3);
+
+chomp $test;
+open my $th, ">$testf" or die $testf;
+binmode $th;
+print $th testhead('zh', $ok), $test;
+close $th or die $testf;

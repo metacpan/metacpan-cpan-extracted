@@ -1,0 +1,22 @@
+{
+   "age" : "99 yrs",
+   "cats" : [
+      {
+         "age" : "2 yrs",
+         "fluf" : "11",
+         "name" : "fluffy",
+         "owner" : {
+            "id" : "111"
+         }
+      },
+      {
+         "age" : "8 yrs",
+         "fluf" : "22 yrs",
+         "name" : "nestor",
+         "owner" : {
+            "id" : "111"
+         }
+      }
+   ],
+   "name" : "Fester"
+}

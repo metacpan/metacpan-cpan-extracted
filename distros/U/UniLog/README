@@ -1,0 +1,43 @@
+UniLog version 0.14
+===================
+
+This module could be used to hide some annoying operations
+with logging on Unix and Win32 systems.
+
+Your messages will be logged trough syslog on Unix
+and trough EventLog on Win32.
+
+Only local logging supported.
+Logging to remote computer will be supported in a future. Probably.
+
+Module was tested on FreeBSD 4.2, Win2000, Win98 and Solaris 7.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules:
+
+    Carp
+    IO::File
+    File::Path
+    File::Basename
+    POSIX
+    Unix::Syslog - on Unix systems
+    Win32::EventLog from libwin32 - on Win32 systems
+
+
+COPYRIGHT AND LICENCE
+
+Copyright: Daniel Podolsky <tpaba@cpan.org>, 2003
+Licence:   Same as perl itself
+
+29 Sep 2001, Daniel Podolsky <tpaba@cpan.org>
+

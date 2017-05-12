@@ -1,0 +1,13 @@
+install using 
+
+	% perl Build.PL
+	% ./Build
+	% ./Build test
+	% sudo ./Build install
+
+
+read 
+
+	% perldoc URI::Find::Iterator
+
+for details

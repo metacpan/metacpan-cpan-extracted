@@ -1,0 +1,43 @@
+{
+   "abstract" : "DCE compatible Universally Unique Identifier library for Perl",
+   "author" : [
+      "Rick Myers <jrm@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "UUID",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Devel::CheckLib" : "1.02"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.005"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.27",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

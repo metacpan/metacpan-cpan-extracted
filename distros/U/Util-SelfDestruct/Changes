@@ -1,0 +1,30 @@
+Version 1.21 - 20th February 2006
+    + Changed to build with Module::Build from
+      svn instead of cvs repository
+
+Version 1.20 - 12th January 2006
+    + Fixed unit tests which will never work under
+      Win32 to skip under Win32.
+
+    + Fixed broken unit test that wasn't running the
+      right Test::Pod::Coverage test code
+
+Version 1.19 - 7th January 2006
+    + Added Test::Pod and Test::Pod::Coverage
+      unit tests.
+
+Version 1.18 - 30th December 2005
+    + Changed license to Apache 2.0
+      http://www.apache.org/licenses/LICENSE-2.0
+
+Version 1.16 - 29th December 2005
+    + Added Changes file.
+
+    + Modified Makefile.PL to send anonymous information to
+      http://perlgirl.org.uk/lib/usage.cgi if the user
+      agrees. This is so I can track which of my modules
+      are most heavily used and on what platforms, so I can
+      concentrate on maintaning the most popular ones in
+      my limited spare time.
+
+

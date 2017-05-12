@@ -1,0 +1,27 @@
+---
+abstract: 'Normalize URI paths'
+author:
+  - 'Andrew Sterling Hanenkamp <hanenkamp@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: URI-Normalize
+requires:
+  Exporter: '0'
+  Scalar::Util: '0'
+  URI: '0'
+  base: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/zostay/URI-Normalize/issues
+  repository: https://github.com/zostay/URI-Normalize
+version: '0.002'
+x_serialization_backend: 'YAML::Tiny version 1.69'

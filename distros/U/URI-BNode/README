@@ -1,0 +1,115 @@
+NAME
+    URI::BNode - RDF blank node identifiers which are also URI objects
+
+VERSION
+    Version 0.06
+
+SYNOPSIS
+        my $bnode = URI::BNode->new;
+
+        print "$bnode\n"; # something like _:EH_kW827XQ6vvX0yF8YzRA
+
+DESCRIPTION
+    This module has two purposes:
+
+    1   Provide a reliable factory interface for generating RDF blank nodes
+        (via random UUIDs permuted through Data::UUID::NCName).
+
+    2   When an RDF blank node class is a subclass of URI, you can use
+        identity tests to make more robust RDF interfaces, like so:
+
+            $node->isa('URI');        # either URI or bnode, but not literal
+            $node->isa('URI::BNode'); # narrow it down further
+
+        Along the same vein, coerce string literals into the correct class
+        by heuristic:
+
+            my $subject = '_:foo';
+            my $node = URI::BNode->new($subject); # _:foo becomes a bnode
+
+            # URI::BNode->new('http://foo/') would properly become
+            # a URI::http object.
+
+METHODS
+  new [$ID]
+    Creates a new blank node identifier. If $ID is undefined or empty, one
+    will be generated using Data::UUID::NCName. If $ID has a value, it must
+    either begin with "_:" or conform to the blank node syntax from the
+    Turtle spec. Other values, including other URIs, will be passed to the
+    URI constructor.
+
+  name [$NEWVAL]
+    Alias for "opaque".
+
+  opaque [$NEWVAL]
+    Retrieve or, if supplied a value, replace the blank node's value with a
+    new one. This method will croak if passed a $NEWVAL which doesn't match
+    the spec in <http://www.w3.org/TR/turtle/#BNodes>.
+
+  from_uuid_urn $UUID
+    Takes a URI::urn::uuid object and turns it into a blank node. Can be
+    invoked as either a class or an instance method.
+
+  to_uuid_urn
+    Takes a blank node (in the proper form) and turns it into a
+    URI::urn::uuid object.
+
+  skolemize $AUTHORITY
+    Return the skolemized URI ("$AUTHORITY/.well-known/genid/...") for a
+    given blank node. See RDF 1.1 Concepts
+    <http://www.w3.org/TR/rdf11-concepts/#section-skolemization>.
+
+  de_skolemize $URI
+    Take a skolemized URI like "http://foo.com/.well-known/genid/asdf" and
+    turn it into "_:asdf".
+
+AUTHOR
+    Dorian Taylor, "<dorian at cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-uri-bnode at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=URI-BNode>. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc URI::BNode
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker (report bugs here)
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=URI-BNode>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/URI-BNode>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/URI-BNode>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/URI-BNode/>
+
+SEE ALSO
+    URI
+    Data::UUID::NCName
+
+LICENSE AND COPYRIGHT
+    Copyright 2013 Dorian Taylor.
+
+    Licensed under the Apache License, Version 2.0 (the "License"); you may
+    not use this file except in compliance with the License. You may obtain
+    a copy of the License at <http://www.apache.org/licenses/LICENSE-2.0>.
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+

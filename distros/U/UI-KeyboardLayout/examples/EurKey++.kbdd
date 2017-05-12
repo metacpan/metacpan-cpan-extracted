@@ -1,0 +1,428 @@
+[]
+ExtraScanCodesWin=
+COMPANYNAME=Steffen Brüntjen, Ilya Zakharevich
++LAYOUTNAME=US-Intl Shift-Space -> Russian phonetic, k.ilyaz.org/v0
++LAYOUTNAME=Russian phonetic Shift-Space -> US-Intl, k.ilyaz.org/v0
+COPYR_YEARS=2011,2012
+@LOCALE_NAME=en-US,ru-RU
+@LOCALE_ID=0409,0419
+@DLLNAME=la-ru-iz,ru-la-iz
+SORT_ORDER_ID_=0000
+@LANGUAGE_NAME=English (United States),Russian (Russia)
+#
+[Substitutions]
+# Will be used when putting a second diacritic: (as <subst-Vietnamese>)
+@Vietnamese=åă,àâ,èê,òô,øơ,ùư
+#
+[DEADKEYS]
+#
+# Can be omitted now
+#
+0020=SPACE
+#
+[visual -> KBD/B/C/D]
+#
+visual_rowcount=4
+@visual_per_row_counts=3,2,4,4
+visual_prefixes=  *
+in_key_separator=/
+prefix_repeat=3
+#					Greek-AltGr and CopyRight-AltGr each has only one element: Ω and ©
+@layer_names=Greek,Math,Greek-AltGr
+@layer_names=Green,Green-AltGr
+@layer_names=Latin,Latin-AltGr,CopyRight,CopyRight-AltGr
+@layer_names=Russian,Russian-AltGr,Russian-II,Russian-II-AltGr
+#
+# Perl 5.8.8 does not recognize  ҇ as a combining character...
+# @AltGrCharSubstitutions=ĳü,|∣,!⊥,1⊤,¡≠,¹⟂,2∫,@∮,ª∭,²‖,²∥,3⊳,#⊲,º⊢,³⊣,4□,$◇,€△,¥▽,ó∘,5•,%⋈,£⨯,6∨,7∪,^∧,&∩,*×,(∈,)∋
+# □◇/△▽
+	--	--/--≠	--	--	--	--	--	--		--/--∏		--		--		⁻/−		⁼⁺/≈∑
+	--	⊤⊥/≠⟂	∫∮/∭∥	⊳⊲/⊢⊣	□◇/△▽	•⋈/⨯	∨∧	∪∩		--×		--∈		--∋		--		--
+***	`~/ˋ˜	1!/¡¹/¼	2@/ª²/½	3#/º³/¾	4$/€¥/⅓	5%/£¢/⅔	6^/ˆˇ	7&/°¯		8*/„‚		9(/“‘		0)/”’		-_/©№//©	=+/×÷/↔⇔
+	ю//ѫ/ѭ	1!/≈≠	2@/²§	3ъ/--№	4Ъ/--£	5ё/--€	6Ё/-- ҃	7&/ ҆ ҇// ꙽ꙿ	8*/∞×/-- ҅	9(/≤←//ҁ	0)/≥→// ꙼꙾	-_/©–		ч//ҷ/ӵ
+#
+	ω	ψ	ε	ρ/√	τ	υ	ω	η/∞	ο	π/∂	⁽₍	⁾₎	--
+	--	--	--	--	--	--	--	--	--	--	--	--	--
+***	q/æ	w/å	e/ë	r/ý/®	t/þ/™	y/ÿ	u/ü/↖⇖	i/ï/↗⇗	o/ö	p/œ/℗	[{/«‹	]}/»›	\|/¬¦
+	я/ѣ/ѧ/ѩ	в/ѵ/ꙍ/ԝ	е/ё/ө/ӫ	р/ ҄®/ѽ	т/ћ/ҭ/ԏ	ы/і/ү/ұ	у/ў/ӯ/ӱ	и/ѷ/ӣ/ӥ	о/ѡ/ѻ/ѿ	п/ѱ/ԥԤ/ҧ	ш//ԧԦ/ѐ	щ//ꚇ/ѝ	э//ѥ/ӧ
+#
+	α/∟	σ/∩	δ/∕	φ	γ	θ	ι/∫	κ	λ	₋		₌₊
+	--	--	--	--	--	--	--	--	--	--		--
+***	a/ä	s/ß§/℠	d/ð	f/è	g/é	h/ù/←⇐	j/ú/↓⇓	k/ĳ/↑⇑	l/ø/→⇒	;:/¨·		'"/´†
+	а/ә/ꙗ/ӓ	с/ѕ/ҫ/ԍ	д/ђ/ӟ/ԁ	ф/ѳ/ғ/ӻ	г/ґ/ӷ/ҕ	х/һ/ҳ/ӽ	й/ї/ҋ/ӑ	к/қ/ҡ/ҟ	л/љ/ӆ/ԓ	;:/¨—/ӹ/ӳ	'"/ ́´/ ̀ ̀/ ́ ́
+#
+	ζ	ξ	χ	β	β	ν/ⁿ	μ//Ω		--/--≤		--/--≥		--
+	--	--	--	--	--	--	--		--		--		--
+***	z/à	x/á	c/ç/©	v/ì	b/í	n/ñ/↙⇙	m/Ω±/↘⇘		,</ò		.>/ó		/?/¿…
+	з/є/ҙ/ѯ	ь/ъ/ӛ/ӕ	ц/џ/ҵ/ќ	ж/ӂ/җ/ӝ	б/ѓ/ѹ/ꙋ	н/њ/ң/ҥ	м/Ω±/ӎ/ꙟ	,</«„/⁘⁙	.>/»“/·։/჻⁖	/?/ј
+#
+	--	--
+	--	--
+***	\|/¶❧	./,
+	\|/ӏӀ	./,
+#
+# Earlier versions had:	б/ѹ (now г overflows down as ...);	7&/ ҅ ҆	/?/§”	2@/²³
+# ԥԤ  ԧԦ must be specified both lc/uc since perl 5.10 does not upcases them automatically (v6.0)
+# On II-maps: forms with ¨, iotified, latinized forms, forms with more developped appendages, or appendages
+# more to the right, or higher, are on AltGr prefix.  (Same for almost-unrelated letters placed
+# opportunistically.  (Many are inverted w.r.t. Unicode versions!  Later reason in the list wins.)
+#
+# ԃ 	Ꚉ 	ӗ
+# ԅ 	Ԑ 	ӡ
+# ԇ 	ӄ
+# ҝ 	Ԟ 	Ԛ 	Ԡ
+# ԉ 	Ԕ 	ӊ 	ӈ
+# Ԣ 	ԋ 	ҩ
+# ҏ
+# 
+# Ӿ 	Ԧ 	ӌ
+# ҹ 	ҽ 	ҿ 	ҍ 	ӭ
+# Ԙ 	Ӏ
+#
+#		Stressed: ѐ ѝ
+#
+#Non-obvious: '"/́´/ӹ/ӳ	я/ѣ/ѧ/ѩ	б/ѓ/ѹ/ѽ	д/ђ/ӟ/ԁ  й/ї/ҋ/ӑ  ь/ъ/ӛ/ӕ   ф/ѳ/ғ/Ӻ   м/Ω±/ӎ/ꙟ   ш//ԧ/ѐ	щ//ꚇ/ѝ   з/є/ҙ/ѯ  ц/џ/ҵ/ќ
+#		р/ ҄®/ꙋ	,</«„/⁘⁙	.>/»“/·։/჻⁖	/?/ј/;	+ 6789
+# Coppa is on AltGr since 1/9 fraction pushes it there...
+#
+[layer_recipes]
+CopyRight_0=		Id(CopyRight)		MutateDupsOK[0327](SelectRX[[eE]](Latin))	ByPairs[$¤ ,¸ qĸ Q⌨ ËƏ ëə "〃 -∓](Latin)
+CopyRight_1=		Id(CopyRight-AltGr)	MutateDupsOK[00a8](SelectRX[[t]](Latin))	ByPairs[EƏ eə](Latin)
+#
+Math_PlusPlus=	Id(Math)		ByPairs['′ "″]
+#
+# 0301 over Greek letters=tonos;   0308=dialytika	'
+Greek_Hairy_0=	Id(Greek)	MutateDupsOK[<super>](SelectRX[[0-9]])	MutateDupsOK[<sub>](SelectRX[[0-9]](FlipShift))	MutateDupsOK[0308](ByPairs[.υ ,ι <Ι >Υ](Latin))	ByPairs[/₯ ?; `΄ _ͺ](Latin)
+Greek_Hairy_1=	Id(Greek-AltGr)	MutateDupsOK[0308+0301](ByPairs[.υ ,ι <Ι >Υ](Latin))	MutateDupsOK[0301|<any-calculated-symbol>|<any-calculated-final>|<any-lunate-symbol>|<any-latinize>|<any-quasisynon>,<any-amplify>](Greek)	ByPairs[Mµ WϜ wϝ TϚ tϛ Kϗ XϠ xϡ CϘ cϙ ZϞ zϟ ;· R∐ l∧ L⋀ n∨ N⋁ F∅](Latin)	ByPairs[1‐ 2– 3—](Latin) ByPairs[4― 0‒ |00ad !‑](Latin)	ShiftFromTo[5,˥](SelectRX[[5-9]](Latin))	ShiftFromTo[5,꜒](SelectRX[[5-9]](FlipShift(Latin))) ShiftFromTo[0,꜍](SelectRX[[0-4]](FlipShift(Latin)))
+#
+BusinessA_0=	Imported[business,00a4](Latin)
+BusinessA_1=	Imported[business,00a3](Latin)
+BusinessAdd_0=		ByPairs[qĸ Q⌨ "〃 -∓](Latin)			DefinedTo[¤](SelectRX[[^\da-zA-Z]](Latin))
+BusinessAdd_1=		ByPairs[EƏ eə](Latin)	FlipShift(CopyRight)	DefinedTo[¤](SelectRX[[^\da-zA-Z]](Latin))
+#
+Business_0=	Id(BusinessA_0)	Face(VLine)		Id(BusinessAdd_0)
+Business_1=	Id(BusinessA_1)	FlipLayers(VLine)	Id(BusinessAdd_1)
+#
+[face_recipes]
+#
+VLine=		Mutate[20d2,20d3,<any-addvline>,20e6,<any-vertical>,<any-stem>|<any-calculated-operator>,0338+<any-manual>,20d2+<any-manual>,20d3+<any-manual>|<any-vline>+<any-vline>,<any-addleft>+<any-addleft>,<any-addright>+<any-addright>](Face(US))
+Business=	Layers(BusinessA_0+BusinessA_1)	Face(VLine)	Layers(BusinessAdd_0+BusinessAdd_1)
+#
+[faces]
+# Create DeadKey maps basing on (massaged!) visual descriptions:
+#
+DeadKey_Map00a9=	Layers(CopyRight_0+CopyRight_1)
+#
+DeadKey_Map00b1_0=	Id(Math_PlusPlus)
+DeadKey_Map00b1_1=				SpaceSelf2Id
+#
+DeadKey_Map03a9=	Layers(Greek_Hairy_0+Greek_Hairy_1)
+#
+[faces/US]
+@layers=Latin,Latin-AltGr
+LinkFace=CyrillicPhonetic
+#
+MetaData_Index=0
+faceDeadKeys= 	´  ˋ  ˜  ˆ  ˇ  °  ¯  ¨  Ω  ±  ©  ¥
+ExportDeadKeys=	´  ˋ  ˜  ˆ  ˇ  °  ¯  ¨
+#
+@faceDeadKeys2= 03a6.03a6
+#			, 0192.02c7,	0192.00b4
+#		=> 0483	=> 0483		=> 03a6
+#
+#						002c = ,
+@char2key_prefer_first=\,|,.,002c
+#
+# Will be only considered when putting a diacritic on AltGr-key (~∼, *∗, .⋅ ) perp=⟂' ¹⟂ is good only if ¹ is on 1! key…
+#@AltGrCharSubstitutions=ĳü,|∣,!⊥,1⊤,¡≠,¹⟂,2∫,@∮,ª∭,²‖,²∥,3⊳,#⊲,º⊢,³⊣,4□,$◇,€△,¥▽,ó∘,5•,%⋈,£⨯,6∨,7∪,^∧,&∩,*×,(∈,)∋
+@AltGrCharSubstitutions=ĳü,|∣,²‖,ó∘
+# ¡≀ - better on bluekeys; #≠ - conflicts too much
+@AltGrCharSubstitutionLayers=Green,Green-AltGr
+#
+#  This gives more collisions:
+#@AltGrCharSubstitutions=ĳü,^∧,&∩,*×,#≠,6∨,7∪,|∣,!⊥,1⊤,¡≀,¹⟂,2∫,@∮,ª∭,²‖,²∥,3⊳,#⊲,º△,³▽,4□,$◇,€⊢,¥⊣
+#
+# Tibetan range: take only tibetan diacritics, so our code adding diacritics won't be confused by prefices... ???
+Auto_Diacritic_Start=0f00
+Flip_AltGr_Key=00a0
+@Import_Prefix_Keys=	0301:CyrillicPhonetic,03a6,	0483:CyrillicPhonetic,0483
+#
+DeadKey_InvMap0000=	ByPairs[0192.202f]
+#                   Chaining makes sense if Flip_AltGr_Key is on AltGr key (repeating will reach inverted faces of:)
+@chainAltGr=0192,03a6,0483
+#
+Diacritic_if_undef=			SpaceSelf2Id
+DeadChar_DefaultTranslation=		♪
+DeadChar_32bitTranslation=		♫
+#
+# 017F,0192,03a6 - good candidates to never be generated on the base face.  But 017F takes accents (use it for dead2 only)
+# 00b6=pilcrow 007c=| 002f=/ 00a0=NBSPC --> open box, narrow and hair spaces to figure and narrow nbr-spaces (was: 03a6.2007 00a0.202F)
+DeadKey_Map0192=	ByPairs[0020.2422 0192.2423 03a6.2420]	LinkFace
+# Layers(Russian+Russian-AltGr)
+#							was: 0020.2009
+DeadKey_AddMap03a6=	ByPairs[0020.00a0 0192.2007 03a6.0483]
+#				Default map (not used now???):
+DeadKey_Map=		Mutate	Mutate2Self
+#
+# diaeresis 00a8: combine with cedilla 0327(00b8) and ogonek 0328, comma below 0326 (precombined only on SsTt)
+# ogonek is reachable on AltGr layer...)
+# cedilla: only E H unreachable on front layer  except for Ȩȩ Ee - and Hh would be unreachable with AltGr too because of Ǜ - which is typable as ¨Ù)
+# (and Ȩȩ is not used in "known" languages - http://fr.wikipedia.org/wiki/E_caudata - alternative writing of æ
+#   - moved to Copyright face)
+# ẗ gets in the way of Ț and Ţ!		(Used in transliteration of Arabic and UPA; moved to copyright face - on AltGr-t...)
+# Ǜ would get in the way of Ḩ (used WHERE?) - available elsewhere - but there it is also penalized... ; ,<any-symbol-diaeresis> does not add anything...   visigothic conflicts with greekized ɑⱭ
+DeadKey_Map00a8=	Mutate[\\ẗ,\\Ǜ[h],\\⋅[;],00a8|0309+<subst-Vietnamese>,<reveal-greenkey>|<any-diaeresized>,0328,0327,0326|<any-comma>,<any-calculated-operator>|<any-overlay>+<any-addvline>,<any-overlay>+<any-addhline>,<any-overlay>+<any-addline>,<any-amplify>+<any-round>,<any-round>+<any-round>,<any-rotunda>,<any-NONONO-visigothic>,<any-doubleletter>]	MutateDupsOK[<any-latinize>](Greek)	MutateDupsOK[<any-latinize>](FromTo[Latin,Greek](ByPairs[za ZA]))	Mutate2Self
+#     <any-comma> picks up digits with comma which are above 0xffff - better make it last
+#
+#  Combine macron=00af and stroke (AOUaou missing stroke...)  00ad=SOFT HYPHEN; <any-stroke> should pick up 0338; 20D2 (|) and 20E5 \ do not appear in decompositions...
+# ⩉ masks combining macron
+#DeadKey_Map00af=	ByPairs[4― 0‒ ”ə ¦00ad !‑ ¹ǃ]	Mutate[\\⩉,00af|<pseudo-stroke>,<any-bar>,<any-stroke>,<any-dash>,<any-overbar>,<any-topbar>,<any-diagonal>,<any-strikethrough>,<any-over-equal>,<any-solidus>,<any-equal>,<any-line>,<any-quill>,<any-base>,<any-underbar>,<any-phonetized>,<any-addline>|<any-stroke>+<any-calculated>,<any-right-hook>]	ByPairs[1‐ 2– 3—]	ShiftFromTo[5,˥](SelectRX[[5-9]])	Mutate2Self
+DeadKey_Map00af=	ByPairs[”ɚ ¹ǃ]	Mutate[\\⩉,00af|<pseudo-stroke>,<any-bar>,<any-stroke>,<any-dash>,<any-overbar>,<any-topbar>,<any-diagonal>,<any-strikethrough>,<any-over-equal>,<any-solidus>,<any-equal>,<any-line>,<any-quill>,<any-base>,<any-underbar>,<any-phonetized>,<any-addline>,<any-addhline>|<any-stroke>+<any-calculated>,<any-right-hook>]	ByPairs[1‐ 2– 3—]	ByPairs[4― 0‒ ”ə ¦00ad !‑ ¹ǃ]	ShiftFromTo[5,˥](SelectRX[[5-9]])	Mutate2Self
+#
+# ring above 00b0: combine with dotabove 307 dotbelow 323 
+# (only WÊ miss dot below, AUY miss dot above: Ȧ is Livonian and phonetic; U is not precomposed; Ẉ - WHERE???) ; <any-jot> does not add anything useful now...
+# Ẏ (useful WHERE???) obscures Vietnamese Ỵ, [any-dots does not add anything...]	ByPairs[‚⊗]
+DeadKey_Map00b0=	Mutate[\\Ẏ⋵,00b0||0323+<subst-Vietnamese>|0307,0323|<any-round>,<any-ring>,<any-dot>,<any-dots>,<any-dotless>,<any-other-circle>,<any-circled>,<any-circled>+<reveal-greenkey>,<any-adddot>|<any-insular>|<circle>] ByPairs[%‰]	Mutate2Self
+#
+#  Combine breve=02d8/0306 and caron 02c7/030c (we do not description of breve-like diacretics!)
+#   Note that Ü combines with caron (in 2 ways! Ǖ Ṻ) - but we prefer Ü -> Ǔ;	arc/check not visible
+DeadKey_Map02c7=	Mutate[02c7|030c|<any-breve>,<any-arc>,<any-caron>,<any-loop>,<any-check>,<any-belt>,<any-flourish>|<any-quasisynon>]	ByPairs[þꝥ ÞꝤ]	Mutate2Self
+#
+Named_DIA_Recipe__acute_more=	<pseudo-hook>,<any-hook>+<any-calculated>,<any-fishhook>+<any-calculated>,<any-hook>,<any-fishhook>,<pseudo-tail>,<any-leg>,<any-tail>,<pseudo-curl>,<any-apostrophe>,<any-tick>,<any-sharpen>,<any-addright>,<any-rightwards>|031b
+# combine acute 00b4 and hooks/tails/curls and horn 031b	(double acute=030b/2dd - protect against '' --> "; Ǘ is accessible otherwise, hides Ủ)
+DeadKey_Map00b4=	Mutate[\\˝,\\Ǘ[u],00b4|030b--00b4,00b4+031b--0300|<NAMED-acute-more>]	Mutate2Self
+#
+# Do not need 00b4+<subst-Vietnamese> ???
+#
+# double grave 30f, grave 60/2cb/300; append reversed list for acute (horn=031b)	
+# (tnvz have 3 type of hooks attached; the middle one [palatal] on nz are not reached ƫᶇᶌᶎ)
+# Ǜ would get in the way of Vietnamese Ư (it could be available elsewhere, but there it is also penalized...)
+DeadKey_Map02cb=	Mutate[\\Ǜ[u],02cb|030f--0300,02cb+031b--0301,031b--00a8|<any-unsharpen>,<any-calculated-squared>,<any-addleft>,<any-leftwards>|||00b4|030b--00b4,00b4+031b--0300|||<NAMED-acute-more>]	Mutate2Self
+#
+# ; <any-overbar>--<any-manual-turnaround> to symmetrize ∈∋.
+Named_DIA_Recipe__hat_more=	<pseudo-smallcaps>,<any-amplify>,<any-whiten>,<any-fake-white>,<any-fake-black>,<any-calculated-!operator-!squared-!circled>,<any-loop>,<any-upturn>,<any-descender>,<any-underbar>,<any-overbar>--<any-manual-turnaround>,<any-paleo>
+#	(For the purpose of double accents, grave 0300 is considered equivalent to horn 031b or hat 02c6, ring 00b0 to breve 02d8/0306, with-stroke to horn)
+DeadKey_Map02dc=	Mutate[\\ı∼∽≈〚〛₡,02dc|02dc+<subst-Vietnamese>,<any-tilde>,<any-equivalent>,<any-addtilde>|||02c6|||<NAMED-hat-more>]	ByPairs[§ẞ]	Mutate2Self
+# adding <any-turnaround> breaks more than it adds.   \\∽[˜] does not work, since [**] acts BEFORE propagation to AltGr...
+#
+# Hat:  (if both smallcaps and turned/etc defined in the same Unicode version, prefer smallcaps) [loop/upturn not visible]
+DeadKey_Map02c6=	Mutate[\\ı≈˜〚〛₡,02c6|<NAMED-hat-more>]	Mutate2Self
+#
+DeadKey_Map00a5=	Face(Business)
+#
+[faces/VK]
+#
+@SPACE=,0020,0192@,03a6@,00a0@
+#@TAB=,0009,0009,0483@,0484@
+#
+# Dotted circle, black circle, white circle
+#@APPS=,-1,25CC@,25CF@,25EF@
+#
+# Non-breakable translations (non-ideal 2007), 202F
+#
+[faces/CyrillicPhonetic]
+#
+@layers=Russian,Russian-AltGr
+BaseLayer=Latin
+LinkFace=US
+#
+MetaData_Index=1
+#
+faceDeadKeys= 	́	҃	Ω  ±  ©  £
+ExportDeadKeys=	́	҃
+#
+@faceDeadKeys2= 03a6.03a6,	00a0.Ё
+#		=> 0483	     	=> 0483
+#
+# Pressing AltGr-| produces |; with the setting below, pressing SWITCH AltGr-| produces the expected ¦
+# Otherwise: the keys on OEM_102 (the SECOND \|) (which produce \| when both on Cyrillic and Latin) 
+# would be prefered, and SWITCH AltGr-| would be resolved as "map | to Latin", and would produce |.
+#						002c = ,
+@char2key_prefer_first=\,|,.,002c
+@char2key_prefer_last=Ё,Ъ,ё,ъ
+#
+# Tibetan range: take only tibetan diacritics, so our code adding diacritics won't be confused by prefices... ???
+Auto_Diacritic_Start=0f00
+Flip_AltGr_Key=00a0
+#
+# (Ё would be mapped to Е if we do not specify it explicitly:)
+DeadKey_InvMap0000=	ByPairs[0192.202f Ё.0483]
+#                   Chaining makes sense if Flip_AltGr_Key is on AltGr key (repeating will reach inverted faces of:)
+@chainAltGr=0301,0483,0192
+@Explicit_AltGr_Invert=0192,03a6
+#
+Diacritic_if_undef=			SpaceSelf2Id
+DeadChar_DefaultTranslation=		♪
+DeadChar_32bitTranslation=		♫
+#
+DeadKey_Map0192=	ByPairs[0020.2422 0192.2423 03a6.2420]	LinkFace
+DeadKey_InvMap0192=	ByPairs[0020.00a0 0192.2007 03a6.0483]
+#
+DeadKey_Map0301_0=	Id(Russian-II)		FromTo[Digits,Denominators1](LinkFace)	FromTo[Digits,Numerators1](FlipShift(Latin))
+# This ByPairs is tricky: we want to translate AltGr-Shift-Space; one might think one must use the mapping of non-AltGr layer???
+DeadKey_Map0301_1=	Id(Russian-II-AltGr)	FromTo[Digits,Denominators2](Latin)	FromTo[Digits,Numerators2](FromToFlipShift[Latin,Latin](Latin))	ByPairs[$⅘](Latin)
+#				0483 is ҃ titlo, A66F is combining vzmet, 2df5 is combining ST, 2df8 is combining DJERV (which we do not have non-combining???)
+DeadKey_Map0483=	ByPairs[0020.2009 0192.2009 03a6.2009]	Mutate[<pseudo-calculated-combining>](Face(CyrillicPhonetic))	Mutate[<pseudo-calculated-combining>](FlipShift(Layers(Russian-II+Russian-II-AltGr)))	FromTo[Digits,CyrPowersOfTen](Face(US))	ByPairs[-A66F S.2df5 D.2df8](Face(US))
+DeadKey_InvMap0483=	ByPairs[0192.2009]
+#
+DeadKey_Map00a3=	Face(Business)
+#
+####[DEADKEYS/eurkey/1/1]
+#####
+####klc_filename=eurkey-std.klc
+#####
+#####    Now is not needed at all
+#####
+[visual -> DEADKEYS/la_ru]
+#
+# Can be omitted now:
+#
+KEYNAME_DEAD
+
+02c6	"MODIFIER LETTER CIRCUMFLEX ACCENT"
+00b4	"ACUTE ACCENT"
+00b1	"PLUS-MINUS SIGN"
+00a8	"DIAERESIS"
+00a9	"COPYRIGHT SIGN"
+00b0	"DEGREE SIGN"
+02cb	"MODIFIER LETTER GRAVE ACCENT (Mandarin Chinese fourth tone)"
+00af	"MACRON"
+02dc	"SMALL TILDE"
+02c7	"CARON (Mandarin Chinese third tone)"
+03a9	"GREEK CAPITAL LETTER OMEGA"
+
+[visual -> DEADKEYS/business]
+
+DEADKEY	00A4
+
+0041	20b3	// A -> ₳
+0061	060b	// a -> ؋
+0042	0e3f	// B -> ฿
+0062	09f3	// b -> ৳
+0043	00a2	// C -> ¢
+// 0063	20a1	// c -> ₡
+0063	00a9	// c -> ©
+0044	20af	// D -> ₯
+0064	20ab	// d -> ₫
+0045	20a0	// E -> ₠
+0065	20ac	// e -> €
+0046	20a3	// F -> ₣
+0066	0192	// f -> ƒ
+0047	20b2	// G -> ₲
+0067	0af1	// g -> ૱
+0048	20b4	// H -> ₴
+0068	20b4	// h -> ₴
+0049	fdfc	// I -> ﷼
+0069	17db	// i -> ៛
+004b	20ad	// K -> ₭
+006b	20ad	// k -> ₭
+004c	00a3	// L -> £
+006c	10da	// l -> ლ	GEORGIAN LETTER LAS [Georgian; Georgian; 1.1]
+004d	2133	// M -> ℳ
+006d	20a5	// m -> ₥
+004e	20a6	// N -> ₦
+006e	a838	// n -> ꠸	NORTH INDIC RUPEE MARK [5.2]
+0050	20b1	// P -> ₱
+0070	2117	// p -> ℗
+0052	20b9	// R -> ₹
+0072	00ae	// r -> ®
+0053	20aa	// S -> ₪
+0073	2120	// s -> ℠
+0054	20b8	// T -> ₸
+0074	2122	// t -> ™
+// Put (CJK) yuans to AltGr-u/U	[Order on Wikipedia: yen (円/圓), yuan (元/圆)]
+0055	5706	// U -> 圆	yuan-2
+0075	5143	// u -> 元	yuan-1
+0057	20a9	// W -> ₩
+0077	20a9	// w -> ₩
+0059	00a5	// Y -> ¥
+0079	5143	// y -> 元
+00a0	00a4	//   -> ¤
+00a4	00a4	// ¤ -> ¤
+//0024	00a4	// $ -> ¤
+0020	00a4	//   -> ¤
+
+DEADKEY	00A3
+
+// 0043	20a2	// C -> ₢ (AltGr-inv)
+0063	20b5	// c -> ₵ (AltGr-inv)
+// ®™℗℠
+0043	20a1	// C -> ₡
+0042	09f2	// B -> ৲ (AltGr-inv)	BENGALI RUPEE MARK	Í
+0062	20a2	// b -> ₢ (AltGr-inv)				í
+0044	058F	// D -> ֏ (AltGr-inv) 	ARMENIAN DRAM SIGN	Ð
+0064	058F	// d -> ֏ (AltGr-inv) 	ARMENIAN DRAM SIGN	ð
+0047	09fB	// G -> ৾ (AltGr-inv)	BENGALI GANDA MARK	É
+0067	09fB	// g -> ৾ (AltGr-inv)	BENGALI GANDA MARK	é
+004c	20b6	// L -> ₶ (AltGr-inv) LIVRE TOURNOIS SIGN [5.2]	Ø
+006c	20a4	// l -> ₤ (AltGr-inv)				ø
+004e	a837	// N -> ꠷ (AltGr-inv) NORTH INDIC PLACEHOLDER MARK	Ñ
+006e	a837	// n -> ꠷ (AltGr-inv) NORTH INDIC PLACEHOLDER MARK	ñ
+0050	20a7	// P -> ₧ (AltGr-inv)	[obsolete Spanish]	œ
+0070	20b0	// p -> ₰
+0072	20a8	// r -> ₨
+// 0052	20a2	// R -> ₢ (AltGr-inv)				ý
+0052	211b	// R -> ℛ (AltGr-inv)	SCRIPT CAPITAL R	Ý
+// 0053	0024	// S -> $ (AltGr-inv)				§
+0053	0024	// S -> $ (AltGr-inv)				ß
+0073	20b7	// s -> ₷	SPESMILO SIGN [5.2]
+// 0054	0bf9	// T -> ௹ (AltGr-inv)				Þ
+0074	20ae	// t -> ₮
+0054	0bf9	// T -> ௹ (AltGr-inv)				þ
+// Put CJK yens to AltGr-y/Y	[Order on Wikipedia: yen (円/圓), yuan (元/圆)]
+0059	5713	// Y -> 圓 (AltGr-inv)	CJK yen-2		Ÿ
+0079	5186	// y -> 円 (AltGr-inv)	CJK yen-1		ÿ
+
+[visual -> KBD/Digits]
+#
+# For fractions, we look for fractions with minimal denominator/numerator which contain the given digit in numerator/denominator.  We take the first one and the second one from the list.
+# Note that ⅗, ⅝, ⅞ do not appear in the lists via denominators; and ⅓, ¼, ⅕, ⅙, ⅛ do not appear in the lists via numerators.
+# All Unicoded fractions appear in these lists.  So each one can be entered via a DeadKeyMap.
+#
+#
+visual_rowcount=10
+@visual_per_row_counts=1,1,2,1,1,1,1,1,1,1
+visual_prefixes=<* *<> < +
+in_key_separator=/
+prefix_repeat=3
+#
+@layer_names=Numerators2,Numerators1,Digits,OverDigits,Denominators1,Denominators2,Super,SuperExtraLetters,Sub,SubExtraLetters,CyrPowersOfTen
+# ↉ 0/3  ⅐ 1/7 ⅑ 1/9
+<<<	½	⅖	⅗	--	⅝	--	--	--	--	--	--	--	--	--	--	--	--	--	--
+***	⅟	⅔	¾	⅘	⅚	--	⅞	--	--	↉	--	--	--	--	--	--	--	--	--
+	1/!	2/@	3/#	4/$	5/%	6/^	7/&	8/*	9/(	0/)	--	--	--	--	--	--	--	--	--
+***	⅒	½	⅓	¼	⅕	⅙	⅐	⅛	⅑	⅒	--	--	--	--	--	--	--	--	--
+<<<	--	--	⅔	¾	⅖	⅚	--	⅜	--	--	--	--	--	--	--	--	--	--	--
+>>>	¹	²	³	⁴	⁵	⁶	⁷	⁸	⁹	⁰	ⁱ	⁲	⁳	⁺	⁻	⁼	⁽	⁾	ⁿ
+	--	--	--	--	--	--	--	--	--	--	i	--	--	+	-	=	(	)	n
+<<<	₁	₂	₃	₄	₅	₆	₇	₈	₉	₀	₊	₋	₌	₍	₎	₏	--	--	--
+	--	--	--	--	--	--	--	--	--	--	+	-	=	(	)	ə	--	--	--
++++	--	--	҂	 ⃝	 ҈	 ҉	꙰	꙱	꙲	--	--	--	--	--	--	--	--	--	--
+#
+#
+# Most of the above are very optional now: Super and Sup are obsoleted by Mutate[<super>] etc
+# combined with Select[] clauses.  Register mapping is not done yet (2011) but can be easily done.
+#
+[Diacritics_Limits]
+# For debugging purposes only, to check correct reading of tables below (0th entry is for 0..3 combined; 1 for 1..3, 2: 2,3; 4,5,6: combined)
+@ALL=8,5,0,0,10,10,10,10
+# 0:tilde, 1:grave,quote, 2: quote
+[Diacritics]
+# Surrogate + 8bit + Modifiers, Modifiers below, Vertical (or Comma-like or Doubled or Dotlike or Rotated or letter-like) Modifiers, Prime-like or Centered modifiers, Combining, Combining below, Vertical/plus-like/arrows and dotlike Combining, Combining for symbols
+/APOSTROPHE=		'´ʼʾˀˊ΄/ˏˌ/ˈˌˡ/ʹˑ/ ́ ̉ ̛ ̷ ̸ ́ ͗  ᷎  ᷄  ᷇  ᷁/ ̗ ̩  ̦  ̹  ͅ / ̍ ̓  ̓ ̕ ̩  /  ⃬  ⃐ ⃫  ⃬
+/QUOTATION_MARK=	"¨˝˸ː΅/˶˵/ˮ/ʺ/ ̈ ̋ ̏ ̈́  ᷉  ᷈  ゙    / ̤  ͈ / ̎  ͛   ͈ /  ⃛   ⃜  ⃨
+/GRAVE_ACCENT=		`ˋʿˁˤ/ˎ/ʻʽ/˴˵/ ̀ ̀  ͑  ᷆  ᷅  ᷀ / ̖  ̜   ᷂ / ̒ ̔ /  ⃑ ⃭   ⃠ ⃥
+/CIRCUMFLEX_ACCENT=	^ˆ˄˟/˰/˪˫ꜛʳʴʵʶˣ// ̂ ̑  ͒  ͡    ̽  ͆  ᷍ / ̭ ̯   ᷼     ͓  ̪  ̼  ͎  ᷊ /  ̘  ̙   ͉  ̘  ͉ /   ⃟  ⃤  ⃧ ⃩ ⃰  ⃟ 
+/BREVE=			˘ˇ˅/ˬ˯˽˾/˱˲˿ˠʸꜜ/˂˃/ ̆ ̌ ̐ ͝   ᷓ  ᷾   ͐  ᷌  ᷋   ᷃/ ̮ ̬ ͜    ̺  ̫   ͔  ͕  ͖  ᷿  /  ͍   ͢  /   ⃞  ⃢  ⃣ 
+/DEGREE_SIGN=		°˚˙/˳/˙ˠʰʱʲˢʷᵊᶣ/˓˒/ ̊ ゚     ᷒ / ̣ ̥ ̤  ̻   ͙   ͚ / ̇ ͘  ̣ ̤ ͘ /   ⃝ ⃘
+/TILDE=			~ ˜/˷¸˛ͺ/ⸯꙿ/˞/ ̃ ̴ ͂ ͊ ͋ ͌   ͠  ᷑  / ̰  ̧  ̨  ̡  ̢  ᷏  ᷐  ᷽  ᷽ / ̾ ̾ /   ⃗  ⃖ ⃯ ⃮ ⃕ ⃔ ⃙ ⃚ ⃡
+/MACRON=		¯ˉ˹˺/ˍ˻˼‗/˭/˔˕˖˗/ ̄ ̅ ̅ ̵ ̶ ̿ ͞   ̚  / ̱  ̲  ̳ ͇ ͟   ̠  /  ͍   ̝  ̞  ̟  ̠  ̘  ̙   ͉ /  ⃒ ⃓ ⃦  ⃪ ⃡  ⃡  ⃗  ⃖ ⃯ ⃮
+#
+# These are from "main blocks" of the modifiers and combining; plus Greek standalone diacritics: ͺ΄΅
+# One of ˠ is obscured by vertical line with middle dot...  The Macron-\ 29F7 obscures ˭.
+# Circled \ and | with middle dot obscure ˙ˠ.  ˙ duplicated (forward) to make accessible.  Also:  ̅
+#  ̾ ̘  ̙  ͘  ͉  ͉  ᷽  combining chars are also duplicated.  Also:  ⃡  ⃗  ⃖ ⃯ ⃮  ⃬  ⃟ (for symbols).
+# ʰʱʲˡˢʷ - from IPA.  The rest (and ʳʴʵʶʸ) are v1.1 letter modifiers.  (ˠ is in front to unobscure the rest.)
+#
+# Combining for symbols: arrows and round arrows -> ~; rectangular around: to ˘ .
+#`´¨˜ˆˇ°¯

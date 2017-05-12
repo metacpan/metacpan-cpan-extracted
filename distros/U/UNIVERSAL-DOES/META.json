@@ -1,0 +1,77 @@
+{
+   "abstract" : "Provides UNIVERSAL::DOES() method for older perls",
+   "author" : [
+      "Goro Fuji (gfx) <gfuji(at)cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.1.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "UNIVERSAL-DOES",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.36",
+            "Test::More" : "0.47"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "v5.8.1"
+         }
+      }
+   },
+   "provides" : {
+      "UNIVERSAL::DOES" : {
+         "file" : "lib/UNIVERSAL/DOES.pm",
+         "version" : "0.005"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/gfx/Perl-UNIVERSAL-DOES/issues"
+      },
+      "homepage" : "https://github.com/gfx/Perl-UNIVERSAL-DOES",
+      "repository" : {
+         "url" : "git://github.com/gfx/Perl-UNIVERSAL-DOES.git",
+         "web" : "https://github.com/gfx/Perl-UNIVERSAL-DOES"
+      }
+   },
+   "version" : "0.005",
+   "x_contributors" : [
+      "Fuji, Goro <g.psy.va@gmail.com>",
+      "FUJI Goro (gfx) <gfuji@cpan.org>"
+   ]
+}

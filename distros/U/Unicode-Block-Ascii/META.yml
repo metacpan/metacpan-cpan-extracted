@@ -1,0 +1,40 @@
+---
+abstract: 'Ascii output of unicode block.'
+author:
+  - 'Michal Špaček <skim@cpan.org>'
+build_requires:
+  English: 0
+  ExtUtils::MakeMaker: 6.36
+  File::Object: 0.06
+  Test::More: 0
+  Test::NoWarnings: 0
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.10'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Unicode-Block-Ascii
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+requires:
+  Class::Utils: 0.02
+  Error::Pure: 0.16
+  Readonly: 0
+  Text::UnicodeBox: 0
+  Text::UnicodeBox::Control: 0
+  Unicode::Block: 0.02
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Unicode-Block-Ascii
+  homepage: https://github.com/tupinek/Unicode-Block-Ascii
+  license: http://opensource.org/licenses/BSD-3-Clause
+  repository: git://github.com/tupinek/Unicode-Block-Ascii
+version: 0.01

@@ -1,0 +1,31 @@
+#!perl -w
+use 5.005_03;
+use strict;
+#use warnings;
+use Getopt::Long;
+use Unicode::Lite;
+my %opt;
+
+GetOptions( \%opt, "from=s", "to=s", "help" );
+
+exit print <<USAGE if $opt{help} or !$opt{from} or !@ARGV;
+$0 - recode from and to charset
+
+  usage: $0 [--from cset] [--to cset] file(s)
+
+  from s  Encoding of input files
+  to   s  Encoding of output files (default utf8)
+USAGE
+
+
+my $convertor = eval {
+	convertor($opt{from}, $opt{to}||'utf8', UL_ALL) } ||
+	convertor($opt{from}, $opt{to}||'utf8')
+	or die "Can't create convertor instance!\n";
+
+
+$^I = '.bak';
+while (<>)
+{
+	print &$convertor;
+}

@@ -1,0 +1,16 @@
+root::0:root
+other::1:
+bin::2:daemon,root
+sys::3:admin,root,sys
+adm::4:admin,daemon,root
+uucp::5:root,uucp
+mail::6:root
+lp::8:admin,lp,root
+nuucp::9:nuucp,root
+daemon:*:12:daemon,root
+sysadmin::14:
+staff:*:20:alice,dilbert,wally
+mygroup::5150:bongo,dude1,dude2,johndoe
+nobody::60001:
+noaccess::60002:
+nogroup::65534:

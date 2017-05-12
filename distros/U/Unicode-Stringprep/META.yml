@@ -1,0 +1,25 @@
+---
+abstract: 'Preparation of Internationalized Strings (RFC 3454)'
+author:
+  - 'Claus FÃ¤rber <CFAERBER@cpan.org>'
+build_requires:
+  Test::More: 0
+  Test::NoWarnings: 0
+configure_requires:
+  Module::Build: 0.42
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4208, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Unicode-Stringprep
+no_index:
+  directory:
+    - eg
+requires:
+  Unicode::Normalize: 1
+  perl: 5.008003
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.105

@@ -1,0 +1,74 @@
+NAME
+    Unix::setuid - Get/set real/effective UID/username via (localizeable)
+    variable
+
+VERSION
+    This document describes version 0.02 of Unix::setuid (from Perl
+    distribution Unix-setuid), released on 2014-10-09.
+
+SYNOPSIS
+     use Unix::setuid; # exports $RUID, $EUID, $RUSER, $EUSER
+     say "Real      UID : $RUID";
+     say "Effective UID : $EUID";
+     say "Real username : $RUSER";
+     say "Effective user: $EUSER";
+     {
+         # become UID 1000 temporarily
+         local $EUID = 1000;
+         # same thing
+         #local $EUSER = "jajang"; # or 1000
+     }
+     # we're back to previous UID/user
+
+DESCRIPTION
+    This module is inspired by File::chdir and File::umask, using a tied
+    scalar variable to get/set stuffs. One benefit of this is being able to
+    use Perl's "local" with it, effectively setting something locally.
+
+EXPORTS
+  $RUID (real UID)
+    This will get/set $<.
+
+  $EUID (effective UID)
+    This will get/set $>.
+
+  $RUSER (real user)
+    Same as $RUID except you will get username and you can set using
+    UID/username. Will return numeric UID if no user exists with that ID.
+    Will die if setting to non-existing username.
+
+  $EUSER (effective user)
+    Same as $EUID except you will get username and you can set using
+    UID/username. Will return numeric UID if no user exists with that ID.
+    Will die if setting to non-existing username.
+
+SEE ALSO
+    Perl's $< and $>.
+
+    Other modules with the same concept: File::chdir, File::umask,
+    Locale::Tie.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Unix-setuid>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-System-setuid>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Unix-setuid>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,32 @@
+TYPEMAP
+sg_error_details	    *   O_OBJECT
+sg_host_info		    *   O_OBJECT
+sg_cpu_stats		    *   O_OBJECT
+sg_cpu_percents		    *   O_OBJECT
+sg_mem_stats		    *   O_OBJECT
+sg_load_stats		    *   O_OBJECT
+sg_user_stats		    *   O_OBJECT
+sg_swap_stats		    *   O_OBJECT
+sg_fs_stats		    *   O_OBJECT
+sg_disk_io_stats	    *   O_OBJECT
+sg_network_io_stats	    *   O_OBJECT
+sg_network_iface_stats      *   O_OBJECT
+sg_page_stats		    *   O_OBJECT
+sg_process_stats	    *	O_OBJECT
+sg_process_count	    *   O_OBJECT
+
+# older perls don't have these default typemaps
+LUV			    T_UV
+UV			    T_UV
+NV			    T_NV
+
+INPUT
+O_OBJECT
+    $var = ($type)SvIV((SV*)SvRV( $arg ));
+
+OUTPUT
+T_NV
+    sv_setnv($arg, (NV)$var);
+
+T_UV
+    sv_setuv($arg, (UV)$var);

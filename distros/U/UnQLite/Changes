@@ -1,0 +1,27 @@
+Revision history for Perl extension Unqlite
+
+0.05 2014-12-23T22:55:15Z
+
+    - Doc fix
+
+0.04 2014-08-30T09:33:52Z
+
+    - Fixed packaging issue.
+
+0.03 2013-07-18T03:14:07Z
+
+    - more OPEN consts as mode argument
+      we do not only want to create databases
+      (Reini Urban)
+
+0.02 2013-07-05T06:42:59Z
+
+    - Store RC to magic to fix race condition
+      (charsbar)
+    - Added `tie` interface.
+      (charsbar)
+
+0.01 2013-07-03T19:02:44Z
+
+    - original version
+

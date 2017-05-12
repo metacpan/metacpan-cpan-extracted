@@ -1,0 +1,37 @@
+TYPEMAP
+
+uc_perl_t * T_PTROBJ
+uc_engine * T_PTROBJ
+uc_query_type T_ENUM
+uc_arch T_ENUM
+uc_mode T_ENUM
+uc_err T_ENUM
+uc_mem_type T_ENUM
+uc_hook_type T_ENUM
+uc_prot T_ENUM
+uint32_t T_UV
+#
+# typemap - This file is in the public domain
+#
+# Author: Salvador Fandino <sfandino@yahoo.com>
+# Version: 1.0
+#
+
+
+TYPEMAP
+int64_t         T_INT64
+uint64_t        T_UINT64
+
+INPUT
+T_INT64
+        $var = SvI64($arg);
+
+T_UINT64
+        $var = SvU64($arg);
+
+OUTPUT
+T_INT64
+        $arg = newSVi64($var);
+
+T_UINT64
+        $arg = newSVu64($var);

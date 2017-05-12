@@ -1,0 +1,1546 @@
+============ Design goals for izKeys keyboard group (the main drive for the development of this module):
+
+  0) No gotchas for people who cannot remember anything.
+  1) Doing 3-4 experiments, one must be able to find most (80-90% achievable?) of covered characters
+     knowing only a handful of general rules for "position allocation" [*].
+  2) Gradual degradation: the fewer general rules one can keep in mind, the narrower repertoir of characters is
+     *easily* accessible; but "more cumbersome" ways to access characters should be available if they
+     are easier to keep in mind.  So people who can remember have access to easier typing experience,
+     but the covered repertoir should not change much.
+  3) Have most (70%-80% achievable?) of covered characters available in easy-to-remember positions.
+  4) Have whole coverage of certain ranges of Unicode.
+
+     [*] Currently it is unclear if the general rules may be shared by all the "application domains".
+	 For example, to access our layout this way, one needs to know different "handfuls" of allocation rules
+	 for Ancient Greek than for Math Symbols.
+
+Currently achieved (ranges as of Unicode v6.2):
+*) Two gotcha (with Shift-SPACE and ApplicationMenu keys) comparing to US and Russian Phonetic keyboards;
+*) Support of all keys (ISO/ABNT/JIS) on all contemporary hardware layouts;
+*) Full coverage of Latin-based scripts (according to Wikipedia), Latin-n repertoirs of ISO 8859,
+     WGL, MES-1, MES-2, and non-CJK part of UGL;
+*) Full coverage of Greek Unicode ranges and Greekish stuff of MES-3B (polytonic and esoteric characters need double prefix keys;
+     Greek sub/superscript, MATHEMATICAL, APL, DOUBLE-STRUCK letters and digraphs not supported);
+*) Full coverage of Cyrillic ranges (with ԡꙣꙥꚁ [temporarily?] put on free slots in Business map);
+     from the Latin personality: titlo-chars, 10ⁿ-combiners and most esoteric chars need double-or-"special" prefix keys;
+*) Full coverage of Hebrew/Yiddish/Ladino characters, points, cantillation, punctuation
+     (except alternative/wide forms and precomposed chars);
+*) The "Compose" prefix key based on std X11 Compose tables, MathML entity names, and rfc1345 codes;
+*) Full coverage of currency symbols;
+*) Full coverage of vulgar fractions;
+*) Full coverage of Coptic alphabet (except from Greek personality, requires double-or-"special" prefix keys);
+*) Full coverage of characters covered by EurKey/Bépo keyboards (except 0323);
+*) 50% coverage of math symbols in BMP (the most useful implemented first);
+*) Full coverage of Math Fraktur, Math Double-Strike and Math Script Latin letters;
+*) Full coverage of double-accented letters of MES-3b;
+*) Full coverage of non-modifiers/combiners of IPA and UPA;
+*) Full coverage of obsolete-IPA and case-extended IPA;
+*) Simple/double arrows and most of box-drawing characters (via numeric keypad);
+*) Latin and Cyrillic personalities (pre-release of Greek and Hebrew personality);
+*) Visual bell to report unrecognized/unsupported combinations (except for those using Application-Menu modifier and Compose);
+*) Many pathways to access “advanced” characters to make it possible to work around bugs in applications;
+*) Documentation of the allocation rules scattered over different files/sections.
+
+Not yet implemented, or lost by upgrades to other goals:
+*) Clear documentation of the allocation rules (needed for "goal 1" above).
+*) Finish implementing usable Greek and Hebrew personality;
+*) Full coverage of IPA (both visually, and by structure properties of the described sounds) and UPA;
+*) Full coverage of spacing modifiers and combining characters for Latin scripts, and for symbols 
+   (had it before Green keys were implemented);
+*) Full coverage of Unicode's paleo-Latin characters;
+*) Full (is it compatible with other goals???) coverage of math symbol ranges in BMP;
+*) reasonable coverage of arrows;
+*) reasonable coverage of ASCII/Unicode box drawing characters (almost finished);
+*) Full coverage of non-Eastern characters covered by Neo keyboard, and X11+Neo composition tables;
+*) Easy-to-describe quick access to Vietnamese characters (seems to be present - needs documentation).
+
+MOREOVER: To assist debugging applications, ALL POSSIBLE combinations of modifiers produce (non necessarily generally useful) results.
+
+Possible roadmaps:
+*) What about other scripts with "small repertoir" of characters (such as arabic with 62 access points on the M$ keyboard;
+   indic)?
+
+=========== Revision history for Perl module UI::KeyboardLayout.
+
+0.01  Mon Jan  9 23:45:23 2012
+	- original version; created by h2xs 1.23 with options
+		-AX -b 5.8.0 -n UI::KeyboardLayout
+
+0.02
+	Minor additions to "principles" section of the docs.
+	Document how Windows keyboard layout DLL work.
+	PODify section on Latin-characters keyboard.
+	Parse DerivedAge.
+	Verbose mode of UName with script/block/age appended.
+	Print out coverage.
+	When multiple diacritics assigned to the same key, allow 
+	  intelligent priorities by sorting by Unicode-age inside a group.
+	When a sequence of diacritics is assigned to two keys in
+	  opposite directions, allow intelligent sharing.
+	Allow chained (de)diacritics inside Diacritics() rule, 
+	  as in 02dc+031b--0300: remove `, add horn, add ~.
+	Allow a custom translation list, as in <subst-Vietnamese>.
+	Recognize many new heuristics for pseudo-decompositions.
+	Make the access to modifier letters take into account mapping of SPACE,
+	  and use Enter,Tab,C-Enter as well.  Exchange roles of - and _.
+	Repeated deadkeys.
+	Separate visual bell for 32-bit chars in diacritic maps...
+
+	Eurkey++:	[tentative webpage: k.ilyaz.org/v0 ]
+	  To enter ONE character from THE OTHER face, preceed by Shift-SPACE.
+
+	  Latin face: identical to EurKey (but with enhanced diacritic prefixes,
+	    and full [monotonic] Greek).
+
+	  Cyrillic face: *) identical to Russian phonetic (of X11) on the base layer;
+              *)  has all other letters of modern Slavic Cyrillic-based languages, 
+                   XIX century russian, Kazakh letters on the AltGr-layer;
+              *)  has all the other characters of ISO 8859-5, Old Slavonic (except
+                   letters-titlo-form and powers-of-10), and those in 
+                   flavors of ru on X11 (Tatar, Ossetian, Chuvash, 
+                   Udmurt, Komi, Yakut, Kalmyk, Bashkirian, Mari) 
+                   on AltGr-' prefix (the "bizarre variants key").
+              *)  Has all titlo-forms (up to v6.1) accessible via AltGr-^ 
+                   prefix key (for "bizarre ones" use a key with Shift,
+                   for the rest type the lowercase form [after AltGr-^]);
+                   double-AltGr-^ enters the titlo itself.  Powers of 10
+                   are on the AltGr-^ + digit.  (ST as S, DJERV as D, vzmet as -.)
+		Most keys are in the "expected" positions; but note the following:
+
+    '"/́´/ӹ/ӳ	я/ѣ/ѧ/ѩ	б/ѓ/ѹ/ѽ	д/ђ/ӟ/ԁ  й/ї/ҋ/ӑ  ь/ъ/ӛ/ӕ   ф/ѳ/ғ/Ӻ   м/Ω±/ӎ/ꙟ   ш//ԧ/ѐ	щ//ꚇ/ѝ   з/є/ѯ/ҙ  ц/џ/ҵ/ќ
+
+		AltGr-' is the "get bizarre variants" key; so for д/ђ/ӟ/ԁ, ђ is on
+		AltGr-д, ӟ is on AltGr-' д, and ԁ=U+0501 is on AltGr-' AltGr-д.
+		Shift-AltGr-' gives ´.
+		The keys ъЪёЁ are duplicated: they are placed above 3456 (as in
+		the standard phonetic keyboard) AND they are placed as 
+		AltGr-variants of ь and е.  The Latin punctuation keys "hidden"
+		by ючшщэ (and over-digits ъЪёЁ) are accessible on AltGr-keys.
+
+	  Extended prefix keys for Latin diacritics:
+		Each can perform multiple functions; if several functions are
+		applicable to a given key (the normal situation!) the best match
+		is assigned to PREFIX + Key, the second best to PREFIX + AltGr-Key.
+
+		Pressing twice give the corresponding combining character; if
+		followed by Space, Shift-Space, AltGr-Space, Shift-AltGr-Space,
+		produces various related spacing modifier letters; if followed
+		by | or AltGr-|, gives a vertical form etc (see below).
+
+		What is "the best match"?  It is the position in the list below 
+		(left is prefered) combined with bizarreness of the symbol (less
+		bizarre is prefered).  Also, PREFIXed AltGr-Key may just add
+		a second accent to what AltGr-Key generates (if this is "the best
+		choice" as described above - it competes with "the second choice"
+		for the base key); the [Vietnamese ACCENT] actions
+		below operate only for adding SECOND accent on AltGr-keys, and 
+		only on "green ones": AltGr- WZFH,L (see below).
+
+	    Alt-^    breve + caron + other breves + other carons + loop + belt + flourish
+	    		Heuristic: Alt-Shift-6 inverts Alt-6 (which is, basically, hat-accent)
+	    Alt-;    diaeresis + [Vietnamese hook above] + ogonek + cedilla + comma below
+	    		Heuristic: ; is an offspring of double-dot and comma
+	    Alt-&    macron + stroke + various other additions of straight line(s)
+	    		On numbers 0,1,2,3,4: soft-hyphen, hyphen, en-dash, em-dash, horizontal bar
+	    		On numbers 5-9: IPA tone modifiers ˥˦˧˨˩.
+	    Alt-7    
+    ring above + [Vietnamese dot below] + dot above + dot below + various rings/dots + circle about
+
+	  	The other prefix keys work in pairs: the first one operates
+	  	as described above, prefering accents on the left of the list; 
+	  	and the second one prefers accents on the right
+	  	
+	    Alt-' and Alt-`
+	acute + [Vietnamese acute] + hooks + tails + curls + horn + ticks + [Vietnamese grave] + grave
+	    Alt-~ and Alt-6
+	       tilde + [Vietnamese tilde] + belt + descender + mutiliated + smallcaps + hat
+			("Mutiliated" means rotated/reflected/open/closed etc.
+			 Case is preserved, so characters without uppercase equivalents
+			 are on lower register keys, and smallcaps are on Shift-register.)
+
+	  Vietnamese input: One must remember positions of quick-access 
+	    AltGr-vowels with ` or ´, of additional "green keys" for ĂÂÊÔƠƯ,
+	    how to enter diacritics `, ´, ˜, ... via AltGr-prefix keys
+	    (`, ´, ˜ are where expected, dot below on AltGr-7 [possibly with
+	    AltGr on the vowel key], ˘ on AltGr-^, ˆ on AltGr-6; hook above on 
+	    "English vowels" is on AltGr-´ with AltGr-vowel, and on "green keys"
+	    it is on AltGr-;).  Also: đ/Đ is AltGr-& before d/D.
+
+	    THE RULES:
+
+	    All characters with at most one "accent" (except "horny" ƠƯ) can be 
+	    entered "normally" (following the rules for AltGr-diacritics 
+	    on "English letters", or via quick-access AltGr-vowels with ` or ´).
+	    
+	    For characters with ` or ´ tone mark and another ornament 
+	    (except "horn"), use the AltGr-prefix key for this 
+	    "other ornament" with the quick-access AltGr-vowel for `/´-vowel.
+	    
+	    To put tilde, dot below, or hook as the "second" diacritic, one
+	    should know additional positions on AltGr-layer: ĂÂÊÔƠƯ take 
+	    places of ÅÀÈÒØÙ (which are on AltGr- WZF,LH; call these places 
+	    "green AltGr-keys").  Preceed the green AltGr-key by the 
+	    AltGr-prefix for the diacritic (given above).  For example, ỡ is AltGr-~ AltGr-l.
+	    
+	    This leaves `, ´ on horns ƠƯ and horns themselves.  For the former,
+	    use AltGr-` and AltGr-´ on O and U with "the opposite ` or ´ accent".
+	    For ƠƯ, use AltGr-` on AltGr-O and AltGr-U (which are ÖÜ).
+	  
+	    =====
+
+	    Desired heuristic for semantic: under the weight of additional 
+	    accent, `-accent on letters collapses to a different accent:
+	      under ´ it collapses to a horn on O and U (Ơ and Ư) so
+	      one gets Ớ and Ứ (likewise for ´-accent under `).
+	      Over ¨-accent ` again collapses to horn (but ¨ evaporates, so
+	      one gets a pure horn).
+	      
+	  Modifier letters: entered via the Latin AltGr-diacritic with a similar
+            shape of "the principal diacritic".  Following by space gives the
+            standalone form of the diacritic; by Shift-Space the modifier 
+            form (if different; otherwise the other most similar modifier form).
+            Two most visually similar "lower modifier" letters are entered by
+            - and _; same for Vertical/Comma-like/Doubled/Dotlike - on \ and |;
+            the Prime-like/Centered are on / and ?.  As the last resort, follow
+            by AltGr-Space, AltGr-Shift-Space, Enter, Tab, Ctrl-Enter, C-[,
+            C-], C-\, Backspace and Control-Backspace to get other visually
+            similar forms (in order).  (The last resort method helps also
+            when, for example, AltGr-& \ enters stroked-\ (which overrides
+            the possible modifier semantic).  All pre-v4.0 modifiers (and all
+            non-letter 4.0-modifiers, and all
+            IPA modifiers) can be entered.  (See tables in .kbdd file.)
+	  
+	  Combining diacritics: only the principal one is currently supported.
+	    Enter by double-AltGr-diacritic.
+	    
+	  Accessibility features: prefix a key by AltGr-Shift-Space to
+	    access the AltGr-meaning of the key (useful if AltGr-key is stolen 
+	    by the system).  Works after linked-faces-prefixes too (but 
+	    currently not before or after Latin diacritic-prefix). Example: 
+	    AltGr-Shift-Space + | acts as AltGr-|.  Repeat twice/3-times/4-times 
+	    to access the AltGr-inverted linked face (and other flavors of
+	    the linked face).
+
+	    Similarly, from Cyrillic personality, the linked faces are Latin,
+	    AltGr-inverted Latin, bizarre Cyrillic, and titlo-Cyrillic.  So
+	    Shift-Space accesses Latin, AltGr-Space accesses AltGr-inverted Latin,
+	    double AltGr-Space accesses bizarre Cyrillic.  And repetition
+	    of AltGr-Shift-Space access AltGr-inverted versions of Cyrillic,
+	    bizarre Cyrillic, titlo-Cyrillic, and Latin.
+
+	  Linked faces for Latin: Cyrillic, bizarre-Cyrillic, and
+	    titlo-Cyrillic.  The principal one is accessed by Shift-Space,
+	    the second by AltGr-Space, the third one by double-AltGr-Space.
+	    Alternatively, one can access the second/third one by using Cyrillic
+	    prefix keys AltGr-' and AltGr-^ after Shift-Space prefix.
+            
+          Shift-Space followed by various Modifiers-Space enters "visible
+            representations" of space: ␢, ␣ and ␠ on Space, Shift-Space, and
+            AltGr-Space.  Follow AltGr-Space by Space or Shift-Space to get 
+            wide no-break space (space-wide and digit-wide); follow
+            Shift-AltGr-Space by Shift-Space to get narrow no-break space. 
+            The third linked face maps all spaces to narrow breakable space.
+            
+          Vulgar fraction access: on bizarre-Cyrillic face, either enter a
+            digit in denominator, or a digit in numerator with Shift-modifier.
+            To increase numerator/denominator, add AltGr-modifier.  (All
+            fractions of v6.1 are accessible.)  (From Latin: on AltGr-Space;
+            from Cyrillic: on AltGr-'.)
+            
+          Visual bell: non-existent prefix-key combinations generate the visual
+            bell bell ♪.  Combination which make sense but can't be entered
+            on the give OS generate ♫ (currently 32-bit codepoints on Windows).
+          
+==========================================
+	  Add ќ on Russian-II-AltGr on c[ц] (this completes ISO 8819-5.)
+	  Add characters missing from ru X11 old slavic keyboard (except
+	  powers-of-10 and combining letters).
+	  
+	  Add ―, soft hyphen, no-break hyphen and figure dash to Overbar map (on 4, ¦, ! and 0). 
+	  Add ¤, kra ĸ and cedilla to CopyRight layer on $, q and comma.  
+	    (This completes ISO 8859-N maps - except for Hebrew/Arabic/Thai letters.)  
+	    (But not WGL4; or Adobe GL - about 760 missing [!!!] outside of combined characters, and
+	      "ARABIC|HALFWIDTH|FULLWIDTH|HEBREW|<control>|ARMENIAN|DEVANAGARI|BENGALI|GURMUKHI|GUJARATI|THAI|CJK.Symbols|CJK.Letters|CJK.Compatibility|Private.Use.Area|HIRAGANA|KATAKANA|BOPOMOFO|HANGUL|Small.Form"
+	    .)
+	    
+	  Add ẗ to CopyRight layer as AltGr-t, and Ȩȩ cedilla as eE.
+	  How to do ḩ, ḥ, ɬ, ŀ, ẇ, ẉ, Ẏ, ẓ, Ǜ, ǚ, Ǘ (1.1 penalized by Vietnamese)
+	  and newer Ȧ, Ⱥ???
+
+	  ḩ - romanization of Arabic
+	  ḥ - in dialects of Asturian
+	  ɬ - IPA
+	  ŀ - not recommended usage of l·l in Catalan
+	  ẇ ẉ - unknown
+	  Ẏ - Avestan, and ISO transliteration of Izhitsa Ѵ
+	  ẓ - transcription of Afro-Asiatic
+	  Ǜ, ǚ, Ǘ - unknown (transliteration of chinese?)
+	  Ȧ - Livonian, and ISO transliteration of Yus Ѫ
+	  Ⱥ - Saanich and precursor to Å in Norsk.
+	  
+	  Fix shortcoming of the Greek section: dialytika-versions of ι and υ
+	    on ,. , drahma ₯ and question mark ; on /?, micro sign on AltGr-M, 
+	    and tonos, ypogegrammeni on `_.  
+	    Add tonos-versions of vowels, symbol variants, and final sigma 
+	    on AltGr-letters.
+	    	(?!!! But no tonos-dialytika with Diacritics[+...]???? - it may work only on the given face, not elsewhere...)
+
+	  Diacritic tables: all the non-char modifiers up to v4.0 are accessible, so are all IPA letter-modifiers.
+
+	Vulgar fractions: 1/7 1/9 and 0/3 were missing.
+	Scancodes for unusual keys were completely wrong (now taken from keyboard type 4 of kbd.h).
+
+0.03	Remove accumulated crud from EurKey++.kbdd.
+	Remove manyHEX() wrongly used.
+	Make Substitutions case-aware: only one case should be used.
+	New face configuration AltGrCharSubstitutions.
+	Better sorting of variants of diacritics: take into account the block (the later in the list, the more bizarre).
+	Auto-generate linked-in AltGr-inverted maps; handles prefix keys; we did cycle elimination (but not now,
+	  when we do not expect this to coexist with manual AltGr-inversion - cycle elimination is too much
+	  work in presence of InvMap).
+	Support for repeated altgr_flip_key --> inversion of other linked faces.
+	Generation of modifier keys - skip the AltGr-inversion key.
+	When emitting coverage, do not count deadkeys "by themselves".  (Not implemented for repeated dead keys.)
+	Include the files with repertoirs of certain "access Unicode chars" tools/standards; in examples/charlists.
+	Extra sorting order for results of <any-FOO> - take into account the number of words.
+	+ARRAY_NAME=val was not allowed in a visual section.
+	Overrides are possible for AltGr-inverted prefix keymaps (including chained deadkeys when inverted key is not auto).
+	Start documenting format of .kbdd file; all but the (most important) personality-sections are documented.
+
+	EurKey++:
+	  Enable pinyin input of tonal variants of ü by accents on a green key AltGr-k (normally enters ĳ).
+	  New sorting required some massage of binding for ` and ´ to preserve the Vietnamese semantic.
+	  New sorting: we lost N with long leg, and exchanged I-dot-below with I-dot-above.
+	    (Now, of Vietnamese, only o gets dot below without AltGr.)
+	  Shift-AltGr-SPACE after a prefix diacritics key does not generate a 4th modifier letter.
+	  Shift-AltGr-SPACE after a prefix diacritics key gives AltGr-inverted map.	
+	  Allow ring/dot prefix to remove dots from i and j; remove ı from "mutiliated" lists, so that ᴉ is available.
+	  AltGr-inverted maps are aware of diacritics (so can be used before and/or after diacritics).
+	  Massive simplification of .kbdd file - remove manual AltGr-inversion crud.
+
+0.04	Block output of control chars in prefix keymaps; fix output of \x03.
+	Make all Face-related base-operators in the satellite face processor return the initial layers
+	  (and not massaged layers).  Makes LinkFace useful again in DeadKey descriptor.
+	Rename layerDeadKeys2 to faceDeadKeys2.
+	Replace layerDeadKeys by faceDeadKeys.
+	Start of redoing the internal representation of a face: layers may contain [$deadkey, $face, $noexport] instead of $deadkey.
+	  (do not redo prelink_layers, since it operates on non-instrumented layers).  Deadkeys inherited
+	  from LinkFace are recognized now.  One would need coverage2 section soon...
+	Add a compact summary of characters available on principal prefix keys (of repeated deadkeys, only inherited are marked).
+	Recognized ESH EZH ENG and SCHWA as phonetized variants of s z n 0 (no majuscule SCHWA, as in Azeri).
+	Add curses to LIMITATIONS section docs.
+	Table of chars of bépo was missing many base characters.
+
+	EurKey++:
+	  Clean up .kbdd file a bit.
+	  Add phonetized variants on macron prefix key (add ESH EZH and SCHWA, but removes ‒ so add schwa manually on AltGr).
+	    (To support this, add rules introducing ɟ and v with right hook).
+	  Add hookish+mutiliated rules to the `―´ pair.  (Adds only ʮ - not enough to add ʄ - is it 3 modifiers???)
+	  Now eng's are on macron+etc+phonetized (and n with long right leg appear on `).
+	  Add solidus (overlays) to macron.
+	  Exchange diacritic signs for combining ´ ` in Cyrillic (on double AltGr-' and on AltGr-' with '; 
+	    now Vietnamese versions (which got into Wikipedia ?!) are
+	    on Shift-ed keys, and "normal" acute and grave are on unshifted.
+	  Add Azeri Əə to Ë=AltGr-e, and ditto mark 〃 to " on Copyright face (AltGr-minus).
+	  Add promille ‰ on % on ring/dots face, primes ′,″ on '," on Math (AltGr-M) and ‡ on †=AltGr-" on macron/bar face.
+	  Latin's diacritics prefix keys are available from Cyrillic after Shift-Space. 
+
+0.05	Infrastructure to allow multiple decompositions extracted from the Unicode database.
+	  (Currently only changes the order of (dotless) j with stroke.)
+	Add SLANTED, APPROXIMATELY, ASYMPTOTICALLY, ALMOST to mutiliated.
+	Equate EQUAL TO to EQUALS in unicode names.
+	Treatment of match-(),[] in satellite face processor was completely busted.
+	Significant rework of satellite face processor to change the order of loops: 
+	  now the loop in layers and shift-state are internal.  (So components can operate on a "key as a whole").
+	Via Diacritic2Self(), AltGr-variants of /?, -_, \| access 3 groups of combining characters; AltGr of digits (with or
+	  without Shift) access "missed" combining characters (digits are extended on the left by ` and on the right by +[],.).
+	Add +-like and arrow combining characters to the last category.
+	New mutators latinize and greekize for greek letters put into "LATIN" script (greekize: F |--> PHI etc).
+	New category "Combining for symbols" for diacritics (accessible after diacritic key on AltGr-;: and on [{]}'" ).
+	Allow AltGrCharSubstitutions to be a multimap.
+	Allow adding "OPERATOR" when constructing compositions (TILDE, ASTERISK).
+	Allow stripping OPERATOR when considering explicit decompositions (NOT TILDE).4
+	RAMS HORN is a phonetization of uc V (we ignore that it is "SMALL").
+	phonetize is now done via a hash map as 0 ə  s ʃ  z ʒ  j ɟ  v ⱱ  n ŋ  V ɤ  ! ǃ  ? ʔ  ¿ ʕ .
+	New mogrify (manual):     addline	0 ∅  ( ∈  ) ∋	
+				     sharpen	< ≺  > ≻  { ⊰  } ⊱  ( ⟨  ) ⟩		???	〈〉
+				   unsharpen	< ⊏  > ⊐  ( ⟮  ) ⟯
+				     amplify	< ≪  > ≫  ≪ ⋘  ≫ ⋙  ˆ ∧
+				       round 	< ⊂  > ⊃
+				      whiten	[ ⟦  ] ⟧  ( ⟬ ) ⟭		- now many many more...
+	Document gotchas with ABOVE SINGLE-LINE NOT EQUAL TO etc.
+	Recognize SQUARED as mutiliation (does not make sense for CURLY).
+	Sorting combined keys by Age we were not splitting key/shift-key pairs which were not uc/lc.
+	Use information from loaded UCD to output combining chars in a readable form.
+	Avoid infinite recursion on cutting away SIGN; allows for new calculated-sign decomposition (MINUS SIGN --> HYPHEN-MINUS).
+	Decompositions to MINUS SIGN are duplicated to HYPHEN-MINUS.
+
+	EurKey++:
+	  All combining characters (except for invisible CGJ, musical [BALINESE and high plane], half-diacritics,
+	    combining raised letters, NKO, PHAISTOS, ETHIOPIC, TAI, COPTIC, BAMUM, DEVANAGARI) are available
+	    on AltGr- /?\|-_ `~ (shift-)digits =+ [{ ]} ,< .> after
+	    the corresponding prefix key (one with the visually most similar "principal action").
+	  Lunation was missing on Greek-in-Cyrillic.
+	  Add latinize as one of the functions of AltGr on Greek (active only on γΓδ).
+	  Add latinized-Greek to diaeresis satellite face (all present, with alpha/Alpha sliding to zZ).
+  Misplaced - after adding math, MANY!
+	  Start to acquire some math symbols via ` = unsharpen, ´ = sharpen, ¯ = addline, ° = round, ˆ = amplify/whiten
+	    ¨ - reveals greenkey/converts to an operator/neg-addline/amplify+round/round+round,  ˘ - quasisynon, 
+                         (omit ~ = turnaround - breaks more than it adds...)
+	  (The intent is to cover as large part of 22** and 27[CDE]* and 2980–2aff ranges as possible.)
+	  underbar and stem were missing as action of ¯.
+	  
+0.06	New mutator adddot.
+	⋌ was put on addright-\, not addright-/.
+	Add neo2base, neo2ext1 to example character repertoirs (the primary face of Neo2).
+	  perl -C31 -wne "print $1 if /\x{2502}(.*?)\x{2502}/" <neo20.txt >oox
+	  perl -C31 -wne "$s{$_}++ for split //; END{print for sort keys %s}" oox >neo2base
+	  grep DEADTRANS kbdneo2.c | perl -wlne "warn $_ unless /DEADTRANS\s*\(\s*([\w]+|L'[^'\s]+')\s*,\s*([\w]+|L'[^'\s]+')\s*,\s*([\w]+|L'[^'\s]+')\s*,\s*0x000([01])\s*\)/; next if $4; print $3" | sort -u >o
+	  perl -C31 -wne "next unless /^0x([\da-f]+)$/i; print chr hex $1" o >neo2ext1
+	    (The file o contains 81 other [symbolic] names which should be pretty common [in Latin-N?].)
+	    I did not check that all bindings in kbdneo2 are reachable under Windows...
+	OPERATORs were not always recognized.
+	Give "round" precedence over dots - gives ⊃ precedence over ⋗.
+	More math greenkeys: on 1,2,3,4.
+	Logic to get greekize mutator was busted.
+	New charlist neo2ext2:
+	  egrep -v "^0x|^L'" o > oo
+	  wget "http://wiki.neo-layout.org/browser/windows/kbdneo2/Quelldateien/keysym4utf16.h?format=txt"
+	  perl -C31 -wane "BEGIN{local @ARGV = my $f= shift; for (<>) {m[^#define\s+(\w+)\s+0x([\da-f]+)\b]i and $map->{$1}=$2}} print chr hex $map->{$F[0]}" keysym4utf16.h@format=txt oo > neo2ext2
+	Switch the "new" Diacritic* subsystem to operate on all layers of the key at once.
+	Add variant "KeepDups" to Diacritic* subsystem; now can (and do) scrap the "old" diacritic subsystem.
+	Sane logic to specify mutually-reverse lists of diacritic recipies.
+	Can define named portions of diacritic recipies.
+	<any-FOO> may be qualified as <any-FOO-!BAR-!BAZ>.
+	Support layer_recipes section.
+	New key PartialFace in face descriptor to denote a purely-parent face.
+	Start allowing migration of keys from a face section to parent sections (Diacritics_* and VK done).
+	New mutators: calculated-small, calculated-mathematical, fake-white, fake-black.
+	Diacritic2Self and sort_compositions: were not handling prefixing prefix keys as expected (did not affect EurKey++).
+	New charlist currency.
+	FlipShift was busted; fix by making it operate in all_layers mode.
+
+	EurKey++:	Use new syntax for Diacritic recipies.
+			No reversion in binding for grave.
+			Add -!operator-!squared-!cirlced to any-calculated.
+			Avoid duplication of companion faces in personalities via layer_recipes.
+			Move up to the parents the shared keys (if possible).
+			Minor cleanup.
+			Add leftwards/rightwards to grave/acute.
+			Add green keys to 3 and (part of) 4.
+			Add digamma, stigma, kai (lc only), koppa, archaic koppa, sampi on Greek AltGr with w,t,K,c,z,x.
+			Ring operator - added as a green key on AltGr-.
+			Add currency map on AltGr-$ (based on bepo, wikipedia articles, and v6.1 currency section of UCD):
+			  all except for ARABIC THAANA DEVANAGARI SINHALA letters and Squared Katakana are included.
+			  Logic of assigning to letters: use the first letter of currency name, or (for versions of rupees) the first
+			    letter of language/region, or (for rial/riel and yuan and cruzeiro) the second letter of the name.  If no
+			    conflict appears, the symbol is duplicated with and without Shift; otherwise 7-bit $ sign,
+			    regional versions of rupees and obsolete currencies are penalized (moved to AltGr-keys,
+			    or Shift keys); if at least one of symbols on the same key is very similar to low-case/upper-case letter, 
+			    then they are assigned due to this similarity, not penalty.  Yuan-1/yen/yen-CJK-1/yen-CJK-2
+			    are put on Y, while yuan-1,yuan-2 are put on U (the order of variants is as in wikipedia).
+			  All symbols are on letter keys; the symbol keys are all assigned the default ¤.
+			  The only keys with two different symbols on AltGr are C,L,Y:  ¢₡₵₢, ლ£₤₶, 元¥円圓.
+			  For completeness, we include all currency symbols, even if BENGALI MARKS make no sense without
+			    a way to enter BENGALI digits/numerators/denominators (see http://std.dkuug.dk/jtc1/sc2/wg2/docs/n3311.pdf).
+			Add business symbols to uc-AltGr of currency face (needed to massage it a little bit).
+			Prohibit 〚〛	LEFT/RIGHT WHITE SQUARE BRACKET [Common; CJK Symbols and Punctuation; 1.1]  301a/301b.
+			Adding underbar to ˆ˜ adds a little bit...
+			Now that dashes are obscured by green keys, add them to AltGr on Greek; remove overrides from macron map.
+
+0.07	Add recognition of APL symbols.
+	Report coverage of math symbols in 22**, 27**, 29**, 2A** ranges.
+	Leading whitespace in a layer recipe was not stripped.
+	face_recipes section added (forced to 2 layers???) (do not put on `faces' since such "virtual" faces confuse the engine).
+	Recognize INSULAR, VISIGOTHIC, MIDDLE-WELSH, ROTUNDA, BROKEN, and double-letter names as mutiliation.
+	Add paleo as a mutator (now all pre-v5.1 paleo-latin letters compete).
+	Add oldenglish (not OE!) to the charlists.
+	Rename Diacritic* operators to use Mutate in the name.
+	Start implementing NotId and NotSameKey.
+	Allow auto-creation via `layers' entry of the face (either a recipe, or a key for layer_recipes).
+	Allow auto-creation of layers in a personality via `face_recipes' (in presence of numLayers).
+	   We do not deal with complicated dependencies of faces on each other - we do it linearly???
+	Implement AltGrCharSubstitutionLayers, AltGrCharSubstitutionFaces (later unused).
+	New mutator InheritPrefixKeys (complements NotId and NotSameKey to a useful form).
+	Output html table (use background colors to distinguish "operator-like" and "ipa-like" homographs).
+	New character list: double-accents
+	  perl -I D:\ilya\ru-pho-keyboard\UI-KeyboardLayout\lib  -wC31 D:\ilya\ru-pho-keyboard\UI-KeyboardLayout\examples\grep_nameslist.pl "\bSMALL\b.*\b(AND\s+)?(\w+\s+)?(DIAERESIS|TILDE|GRAVE|BREVE|CARON|ACUTE|MACRON|CEDILLA|OGONEK|CIRCUMFLEX|RING|DOT|COMMA|HORN|HOOK|STROKE)(\s+\w+)?(?(1)| AND)\b" C:\Users\ilya\Downloads\NamesList.txt >double-accents1
+	  perl -C31 -wne "print chr hex $1 if /^([\da-f]{4,}\b)/i" double-accents1 >double-accents
+
+	EurKey++:	Move ®™℗℠© on AltGr-$ face to lc on the base layout (ls is as on all prior art: X11 US Intl/M$ US Intl/Bepo/UK Enchanced/EurKey/Birman's)
+			Filter COLON SIGN ₡ out of AltGr-~/^.
+			Green keys for 2 were significantly mixed up.
+			Ano teleia put on Greek AltGr-; (since ; is occupied by ₋); Likewise for ∐∧⋀∅ on RlLF.
+			Capital ß, ẞ, added as AltGr-~ AltGr-S; þÞ with stroke added to AltGr-^ prefix.
+			Add paleo to hat/tilde pair, rotunda/doubleletter to ¨ (visigothic z conflicts with latinized alpha ɑⱭ).
+			(Insular-g's, and doubleletters do not win the competition...).
+			Add small and large ∨∧∅ to νλΦ (and capitalized variants).
+			Temporarily (???) add insular to circled-face (and deprioritize circled characters).
+				(This finishes access to pre-v5.1 paleolatin.)
+			Add bullet on 6, ∈∋ on () as green keys.
+			Add double-vline and double-addleft/right to AltGr-$.
+			Add more tone bars (all except ꜎).
+			Move most of green keys to AltGrCharSubstitutionLayers.
+			Remove "cyrillic question mark from Russian-II (it had the same codepoint as semicolon!).
+			Add extra chars from Copyright to Business; add KEYBOARD ⌨ to Q on both (finishes bepo coverage).
+			ɚ to AltGr-0 on macron (where phonetize is).
+
+	izKeys:		Split from EurKey++.
+			Non-accented greek from http://help.keymandesktop.com/keyboards/keyboard_galaxiebiblescriptmnemonic/welcome-greek.htm
+			  (Less bizzare correspondence to Latin, AND vowels are on different diagonals.)
+			  (Without other changes, breaks latinized greek on AltGr-; .
+			Dialytica i/u put on "empty" slots j/v.
+			Define Russian, Russian_AltGr via layer_recipe.
+			Unify Russian AltGr map	with Latin one as much as possible.
+			Switch to logical layout of accented letters on AltGr-layer.
+			Split AltGr-; into AltGr-; AltGr-, AltGr-"; swap ˆ˘.
+			Remove © and ± faces.
+			Implement BlueKeys.
+			Pinyin without green keys (¨ on ü to insert ǚ).  (Any diaeresis+accent except ṻ ¯ü can be entered.)
+			Make AltGr-; insert hook above (as the last resort).  Finishes Vietnamese input (but is it "logical"? ê is black and green...).
+			Add double-grave and dot-above to AltGr-;.
+				Currently ȽɾᴁᴙᶏᶒḄḚṂṚ‖′″ⁿ⊠⊦⌐⌙⧇⫴ꟽꟿ missing w.r.t. EurKey++.
+			
+0.08	New charlist latin-derived (from http://en.wikipedia.org/wiki/Latin-derived_alphabet).
+	Work on manual-mutators lists.
+	Decrease font size in HTML tables to 10pt (to compensate for slash-column).
+	Add mutators for paleo-latin contractions and UM-ified contractions.
+	Rename toHEX() to fromHEX().
+	Allow omitting argument to print_decompositions; new subroutine print_compositions_ch().
+	Remove duplicates and trivial id entries from (de)composition mappings.
+	Two bugs in (un)chaining mutators: shallow copy + modify, and case of hex.
+	Penalize out-of-order modifiers.
+	Allow for multiple results of a mutator (to preserve backward compatibility, we need to calculate penalties 
+	  in a very convoluted way...) - STILL NOT WORKING SATISFACTORY...
+	Highlight vietnamese and doubleaccent entries in an HTML table; write line explaining highlights.
+	Store geometry information extracted from the visual representation of layers (with keyline_offsets set in a visual section
+	  or an ancestor); propagate to faces via the first layer, or geometry_via_layer.
+	New mutators uc/lc/Empty.
+	New Mutate[] atoms uc/lc/ucfirst/lcfirst (which act only when they change letter, and the result is of length 1 - see U+1fa6, or rho with aspirations)
+	Fix caching of ancillary layers in for 'all_layers' mode.
+	Add manual-* maps for coptic script.
+	Start documenting the engine of layer recipes.
+	Add more fix-uc/lc pairs for v>5.1.
+	In HTML tables: highlight zero-width chars, soft-hyphen and whitespace; allow manual addition of paragraphs;
+	  auto-generate the table header.
+	New root key of .kbdd: VERSION.
+	New charlists mes1, mes2, mes3b.
+		perl -C2 -wane "next unless /^[\da-f]{2}\s/i; my $p = (hex shift @F)<<8; for (@F) {print(chr($p + hex)), next unless /\W/; my @r = split /\W+/; for my $c (hex $r[0] .. hex $r[1]) {print chr($p+$c)}}" ! >o3b
+		http://web.archive.org/web/20000815100817/http://www.egt.ie/standards/iso10646/pdf/cwa13873.pdf
+
+	izKeys:	Remove duplicates from comma/cedilla/ogonek map, and fuse with dot/ring.
+		Simplify greekize on comma/cedilla/ogonek.
+		Rename layers and faces to better reflect the semantic.
+		Micro-optimize layout (now compatible with all http://en.wikipedia.org/wiki/Latin-derived_alphabet).
+		Add retroflex hook on acute-on-top-of-acute, fishhook to hat, reversed to acute/grave, tilde-below 
+		  on breve-on-grave, Æ-smallcaps on AltGr-$ Æ.
+		Split macron into macron and slash maps (miss therefore and midline ellipsis).	  (All *letters* from EurKey++ accessible now.)
+		Add inverted breve to macron (to reach a/u, allow removing acute; manually slide Ȏȏ to AltGr-less positions Kk).
+		Make AltGr-/ insert macron under diaeresis (so Ṻṻ appear).
+		Remove binding for TONOS and YPOGEGRAMMENI from `_ in the Greek face.
+		Fully implement polytonic Greek vowels; full Coptic alphabet support: the prefix keys working AFTER greek prefix:
+		  [ and ] prefix keys for the corresponding aspiration; each vowels is entered via 4 keys on the
+		    vowel's key's principal diagonal as: digit row: circumflex; QWERTY row: acute, ASDF row: plain,
+		    ZXCV row: grave; add AltGr for diaresis or iotation.  ρ is entered on `.
+		  \ prefix key: the same without aspiration (but "plain without iotation" is replaced by vrachy=breve, and the
+		    next neighbour ASDF-row letter gives macron); all letters are "upgraded", so acute is actually oxia (not tonos),
+		    υ-diaeresis-acute gives ϓ (on AltGr-u), and epsilon/rho are replaced by the corresponding symbols ϵ ϼ (on d 
+		    and `; rho is stroked).
+		       ("Standalone diacritics" are put on the place of non-existing omicron with dialytika: 9ol.-column with AltGr 
+		        [ heuristic: on AltGr-. ];
+		        add Shift to get variants with dialytika.  As exceptions, coronis is entered as psili with shift (on
+		        ] AltGr-L), and the "no-accents position" \ AltGr-l gives YPOGEGRAMMENI/PROSGEGRAMMENI (without/with Shift),
+		        while \ 3 and \ # give lower/upper number signs.  Standalone tonos is on \ AltGr-3; shift to add dialytika.)
+		  ` prefix key: Coptic analogues of greek letters, and j/J --> ḏanḏia, v/V --> fei, hyphen --> double-hyphen;
+		    the letters without Greek analogue are on AltGr-letter where the "letter" is the first letter of the
+		    name on Wikipedia page (or the first letter of Unicode name for DEI and KHEI [ti and xai]).
+		    Additional "random" AltGr-letters: Bactrian sho on b/B; ½-H heta Ͱ/ͱ on i; yot ϳ on j; Pamphylian digamma Ͷ/ͷ 
+		      on g; san Ϻ/ϻ on m, ϒ on Y, lunate sigmas ϲ/Ϲ on l, reversed lunate sigmas ͻ/Ͻ on o, reversed epsilon ϶
+		      on e, kai's Ϗ/ϗ on q, (reversed) dotted lunate sigmas ͽ/Ͽ ͼ/Ͼ on r and u,  and archaic sampi Ͳ/ͳ on n.
+		On Greek face: add ϔ as an AltGr-variant of Ϋ (this completes the coverage of greek ranges).
+		On 0483 Cyrillic: add Modifier-ᵸ and smallcaps ᴫ on Shifted positions;
+				  on AltGr-positions: enter more obscure letters...  
+		Have all letters used in current languages (including Enets with 70 speakers ;-), according to Wikipedia tables;
+		  (old Komi scripts are on comma, and some zee's on zero ;-). But tables in ru.wikipedia mention also
+0514	<Ԕ>	CYRILLIC CAPITAL LETTER LHA [Cyrillic; Cyrillic Supplement; 5.1]
+0520	<Ԡ>	CYRILLIC CAPITAL LETTER EL WITH MIDDLE HOOK [Cyrillic; Cyrillic Supplement; 5.1]
+0522	<Ԣ>	CYRILLIC CAPITAL LETTER EN WITH MIDDLE HOOK [Cyrillic; Cyrillic Supplement; 5.1]
+		  - anyway, what is missing is only 6 lc/uc-pairs (all with: from v5.1, for obsolete scripts, for non-Slavic lang):
+		    ԕԡԣꙣꙥꚁ	(3л, 1н and 2д; one binding slot - on ш - still unused).
+		Repeat greek number signs Shift-inverted on []-prefixes, and add digit subscripts to Coptic 
+		  (to enable access from CyrillicPhonetic - obscured by ъЪёЁ).
+		Set version to 0.01.
+		To access Ȧȧ, add on / (undoing `: on à); for z-hook, put on ¨ z; etc - many small changes.
+		Add obsolete Zhuang tone marks to Coptic (!) AltGr-numbers.
+		Restore compatibility with Bépo, and micro-optimize comparing with M#S-1/2/3b.
+		  
+			-VEND -UM
+		
+	print_nameslist.pl:	Update to use non-beta Unicode files.
+				New option -hex.
+
+0.09	Cache results of Unicode::UCD::charinfo --> 2.3x speedup of processing.
+	Cache results of <any-foo> - speeds up things another 2x, but behaves bad w.r.t. pairing of uc/lc letters.
+	Report resolution of mutator recipes if UI_KEYBOARDLAYOUT_REPORT_MUTATORS is set in environment;
+	  bit 0x1 for concise report, bit 0x2 for verbose (to STDOUT!), bit 0x4 for details of sorting compositions,
+	  bit 0x8 for composing, bit 0x10 for caching <any-*> compose, bit 0x20 for inhibiting cache-merging <any-*>.
+	Explicit penalization was applied to a Shift-pair of characters even if it is not an lc/uc-pair.
+	Allow partial penalization (via \ú).
+	Extra arguments $omit (not used yet) and $do_lc, $do_uc for shift_pop_composition().
+	Allow for fallbacks in prefix keys sharing a recipe in opposite direction (after the second ||||).
+	Penalize lists start anew in every ||||- (or top |||-) section.
+	New semantic of repetition on these sections: we do not extract a char already extracted in previous section,
+	  but may extract a char mentioned there, but not extracted.
+	New variant of Mutate*(): Mutate32OK[].
+	+ starting Mutate[]'s directives means "primary recipe"; ||| etc are the same as |.  
+	  (Now can share the whole primary directives.)
+	Allow -recipe1+recipe2 in a mutator (including <any-foo> in recipe1 - need to switch off caching!).
+	Fix the UP/DOWN TACK mixup in Unicode names.
+	Add version numbers to the coverage report.
+	New coverage lists: IPA-obsolete-and-capital-small and UPA (Uralic PA).
+	Penalization via \ọ was not working on double-occupation slots.
+	Add Cʗ to phonetize.
+	Add uc/lc fixes for Ɋ and ß.
+	Fix IPA-obsolete/etc coverage set (had 2 PUA from WikiPedia page; fix one of them both here and there).
+
+	izKeys.kbdd:	Add `turned' to AltGr-'.
+			Tortoise parens supported (again!), 3 variants of 4, and bold braces.
+			Micro-optimize to the level of 0.01 - only much better.
+			Swap ␠/␢; add symbols for special keys to Shift-Space; add images for special keys to Business;
+			  with ↹ on Tab, ⇤ on C-[, ⇥ on C-];
+			  NL and NUL considered as images (on C-Enter and C-\), and CR LF as symbols.
+			Bump the version to 0.02.
+			Optimize IPA coverage "by visual resemblance" (now all symbols except for modifiers/combiners are present);
+			  [but broke case-preservation: ɞ/ɝ/ɺ are on upper-case E,È,AltGr-I with AltGr-/].
+			Swap AltGr-Y/U on Coptic (have exotic Greek letter forms); move Ohm from Business to Coptic, add inverted.
+			Put fi/fl ligatures on AltGr-w/W, and HOUSE ⌂ on AltGr-h on Business.
+			[Only graphics + arrows + 9 5-bit C0 dingbats of cp437 not supported from MES-2 now.]
+			Add ⌈⌉⌊⌋ to {}[] on AltGr-/ (heuristic: cut off a piece).
+			Try adding double-struck on AltGr-/ (CHN fit, PQRZ not).
+			Penalize ọ to have all of dots below accessible the same way (on AltGr; having them all without
+			  AltGr makes Scandinavian å, Turkish ı and Lithuanian ė harder to enter; I presume that Vietnamese
+			  input with this layout will not be the prime-time usage).
+  			Switch ủ and ǚ and other clean ups.
+  			Pinyin ǚ now entered the natural way; Latin-Belorussian/Esperanto ŭ moved to AltGr-/.
+  			Business map: move (CJK) Yuans to AltGr-u/U; move schwa case pairs to z/Z (African to AltGr);
+  			  put hooks on u/o; move c/o to / and AltGr-o, ℮ to AltGr-e; 
+  			  add Double-Female/Male and "Female and Male" signs on AltGr: F/M/a.
+  			Add case pair for ʔ on AltGr-?/ on Greek (this finishes "obsolete+case-pairs of IPA").
+  			Add smallcaps Greek and OU on breve + AltGr-Shift (this finishes non-modifiers/combiners of UPA).
+  			  (This did not cover smallcaps-Γ [not in UPA according to WikiPedia!], so duplicate on grave.)
+  			Penalize ⊠ to allow for ???.
+
+  Vietnamese vowels; input:
+    The vowels with 1 diacritic (except horn and hook above): only ê can be 
+      entered via AltGr (as AltGr-e); all may be entered by the corresponding 
+      dead key (as AltGr-6/^/`/'/~ for ˘/ˆ/`/´/˜ followed by the base vowel;
+      and AltGr-. AltGr-vowel for the dot-below diacritic).
+    Ư/Ơ: put ` on AltGr-vowel (as AltGr-` AltGr-vowel); or on AltGr-$ map;
+    Ư/Ơ with ` or ´: put ` or ´ on U/O with the opposite tick (´ or `);
+      as AltGr-` (or AltGr-') AltGr-key; here key is one (or two, for ´) keys
+      below the u/o key.
+    Hook above: put ¨ on AltGr-vowel (as AltGr-; AltGr-vowel).     (!!! Except ủ: do AltGr-' AltGr-u)
+    Double diacritics involving ê, or `, or ´ (except ê?=ể/ệ and those 
+      involving hook above or horn): put the OTHER diacritic on the
+      AltGr-key accessing ê or the vowel with ` or ´.  
+        Example: ầ via AltGr-^ AltGr-z (since AltGr-z gives à).
+    Tilde or dot-below on â/ê/ô or ă/ơ/ư:
+      Tap AltGr-~ or AltGr-. and press the corresponding GREEN KEY (replace the
+      ˆ-vowel by `-vowel, and ă/ơ/ư by å/ø/b and use the key accessing
+      the replacement (AltGr-z/AltGr-f/AltGr-m/AltGr-r/AltGr-p/b).
+        Example: AltGr-~ AltGr-z gives ẫ since AltGr-z gives à which
+		is a GREEN KEY for â.
+    Likewise, hook-above on â/ê/ô or ă/ơ/ư: tap AltGr-; then the GREEN key.
+
+    Symbolic representation of these rules (with diaeresis=AltGr-; )
+           (the GREEN one is a generalization of grave one above it):
+      grave + diaeresis		==>	horn
+        or (same)
+      grave + AltGr		==>	horn		(or use AltGr-$ prefix)
+      grave + acute		==>	grave + horn 
+      acute + grave		==>	acute + horn
+      diaeresis + AltGr		==>	hook above
+      tilde/dot-below + grave	==>	tilde/dot-below + hat
+      tilde/dot-below + GREEN	==>	tilde/dot-below + horn/hat/breve
+      diaeresis + grave		==>	hook-above + hat
+      diaeresis + GREEN		==>	hook-above + horn/hat/breve
+
+    In the shortest form:
+      diaeresis 	+ AltGr	==>	hook above
+      diaeresis		+ GREEN	==>	hook-above	+ horn/hat/breve
+
+      tilde/dot-below	+ GREEN	==>	tilde/dot-below	+ horn/hat/breve
+
+      grave		+ AltGr	==>	horn		(or use AltGr-$ prefix)
+      grave		+ acute	==>	grave + horn 
+      acute		+ grave	==>	acute + horn
+
+      GREEN-for-hat	= grave	= AltGr-z/AltGr-f/AltGr-m for à/è/ò.
+      GREEN-for-ă/ơ/ư	= å/ø/b	= AltGr-r/AltGr-p/b
+
+    One must remember positions of quick-access 
+    AltGr-vowels with ` or ´, of additional "green keys" for ĂÂÊÔƠƯ,
+    how to enter diacritics `, ´, ˜, ... via AltGr-prefix keys
+    (`, ´, ˜ are where expected, dot below on AltGr-7 [possibly with
+    AltGr on the vowel key], ˘ on AltGr-^, ˆ on AltGr-6; hook above on 
+    "English vowels" is on AltGr-´ with AltGr-vowel, and on "green keys"
+    it is on AltGr-;).  Also: đ/Đ is AltGr-& before d/D.
+    
+
+    THE RULES:
+
+    All characters with at most one "accent" (except "horny" ƠƯ) can be 
+    entered "normally" (following the rules for AltGr-diacritics 
+    on "English letters", or via quick-access AltGr-vowels with ` or ´).
+	    
+    For characters with ` or ´ tone mark and another ornament 
+    (except "horn"), use the AltGr-prefix key for this 
+    "other ornament" with the quick-access AltGr-vowel for `/´-vowel.
+	    
+    To put tilde, dot below, or hook as the "second" diacritic, one
+    should know additional positions on AltGr-layer: ĂÂÊÔƠƯ take 
+    places of ÅÀÈÒØÙ (which are on AltGr- WZF,LH; call these places 
+    "green AltGr-keys").  Preceed the green AltGr-key by the 
+    AltGr-prefix for the diacritic (given above).  For example, ỡ is AltGr-~ AltGr-l.
+	    
+    This leaves `, ´ on horns ƠƯ and horns themselves.  For the former,
+    use AltGr-` and AltGr-´ on O and U with "the opposite ` or ´ accent".
+    For ƠƯ, use AltGr-` on AltGr-O and AltGr-U (which are ÖÜ).
+	  
+    =====
+
+    Desired heuristic for semantic: under the weight of additional 
+    accent, `-accent on letters collapses to a different accent:
+      under ´ it collapses to a horn on O and U (Ơ and Ư) so
+      one gets Ớ and Ứ (likewise for ´-accent under `).
+      Over ¨-accent ` again collapses to horn (but ¨ evaporates, so
+      one gets a pure horn).
+	      
+0.10	Update uc/lc maps.
+	When determining case pairs for merge of diacritics (during caching), be most conservative:
+	   ($c,uc $c) form a pair only if $c eq lc uc $c (only applicable to ſ/S).
+	Add UGL character repertoir (from http://www.borgendale.com/codepage/os2ugl.htm) and all-greekish
+	   from perl -wC31 UI-KeyboardLayout\examples\grep_nameslist.pl "\b(ALPHA|BETA|GAMMA|DELTA|EPSILON|ZETA|ETA|THETA|IOTA|KAPPA|LAMDA|MU|NU|XI|OMICRON|PI|RHO|SIGMA|TAU|UPSILON|PHI|CHI|PSI|OMEGA)\b" ~/Downloads/NamesList.txt >out-greek.
+	Add DESCRIPTION POD section.
+	New pseudo-fake-mutator but-not.
+	Add popup on control-chars in HTML output.
+	The duplicated overflow from the first key on a second key in a pair has lower precedence than $map3.
+	
+	izKeys.kbdd:	Update VERSION to 0.03
+		Put playing cards suits of cp437 to p/P on AltGr-" ("reds" on AltGr) (but ℙ obscures one).
+		Add a few dingbats at start of cp437 to Shift-Numbers (and _, AltGr- -/_) of Coptic
+		  (3 of 4 card suits not accessible from CyrillicPhonetic).
+		Add "lean CR" and Undo images to Greek Enter/Backspace.
+		Add ƺʓ to j on Business; ɿ to AltGr-"; stroked paleo-contraction.
+		Move Greek ϲ/Ϲ from l to v, and Heta ͱ/Ͱ from i/I to 1/! (on Coptic).
+		Add stroke+latinize (including manual ƛ) to Coptic.
+		  (Of embellished Latin letters of MES-3b, only digraphs and ^¯°¨-below and half-ring are not present now.)
+		AltGr-j to ℩ on cedilla.
+		Micro-optimize so that all non-modifier Paleo-latins now at least compete...
+		Micro-optimize more Greek stuff not from Greek ranges 
+		  (this finishes all Greek except modifier/combining/subscript/double-struck)
+		Micro-optimize ⧔, and make back ∘ (removed by removal of ó∘ greek key).
+		Micro-optimize math; now more than 60% of math ranges is covered...
+		Exchange ҽҼҿҾ.
+		Rename deadkey ˮ to ˵.
+		Add Zodiak to Shifted digit-row on ~-Greek.
+		Greek numerals: move left and right keraya to [ 3 and ] 3 (with # having the opposite binding).
+
+0.11	The header row for HTML tables contained the most obscure access code, not the most convenient.
+	Do not complain when de-obscured fails with a symbold which was already de-obscured earlier.
+	reveal-substkey replaces (deprecated) reveal-greenkey.
+	Make Auto_Diacritic_Start, Flip_AltGr_Key, Diacritic_if_undef, DeadChar_DefaultTranslation/32bitTranslation inheritable.
+	Add a couple of new links to Mike Kaplan's stuff.
+	New cmd script doing .C --> DLLs build using only the standard compilers from MSKLC (no utils!).
+	Scancode for VK_KANA, VK_(NON)CONVERT, VK_OEM_8 (put on YEN,|-key), OEM_AX
+	   (kbdutool produces 1 wrong line for each .H and .C - with #ERROR# - for OEM_AX, KANA, (NON)CONVERT)
+	Start supporting UI_KEYBOARDLAYOUT_DEBUG (0x1..0x4 for face/layer_recipes, guess name-normalization, OPERATOR in names).
+	Support scancode/VK difference between JIS and ISO,ABNT keyboards (102 vs C1, C2 vs 8; throw in NONCONVERT --> CONVERT too);
+		only one of the pair may be described, the other one (if not defined) will be a duplicate.
+	Allow "extra" deadkeys to be reported via extra_report_DeadChar.
+	Shut up warnings about new discovered duplicates for composition (after manual inspection).
+	Shut up warning for `no [deadkeyFace]'.
+	Allow for a deadkey recipe to be an array reference (split on space, or after comma or |).
+	Quiet warnings for double prefix keys, make those for triple (and more) less verbose; "attempt to separate... with comma".
+	Queit wide-char warning during debugging on $DB::OUT, $DB::LINEINFO.
+	Hack with $m1 to work about a bug (???) in Perl 5.10.  The result without 0x1000000 is different:
+	  env UI_KEYBOARDLAYOUT_DEBUG=0x1000000 perl -wC31 -Ilib examples/build-iz.pl examples/izKeys.kbdd
+	Make things work (not necessarily correct) without downloaded Unicode
+		tables.
+	Add (unsorted) list of references to Unicode mailing list.
+	Add pre-docs for .XCompose and summary of behaviour of different .XCompose's.
+	Propagate new %fix from HTML visual formatter.
+
+	izKeys.kbdd:	Update VERSION to 0.04.
+			ъЪёЁ were interchanged w.r.t. X11. ( Search for "phonetic" in [/usr/share/]X11/xkb/symbols/ru )
+			Add ⁻⁼⁺⁽⁾ to BlueKeys; (natural places, except: ⁽⁾ on AltGr, and only accessible from Latin)
+			Exchange ⁻ and ∓, so they are now in more natural positions.
+			Exchange · and √  --- now miss:
+-27de	<⟞>	LONG LEFT TACK [Common; Miscellaneous Mathematical Symbols-A; 3.2]
+-2aa6	<⪦>	LESS-THAN CLOSED BY CURVE [Common; Supplemental Mathematical Operators; 3.2]
+			Add ъЪ to the OTHER \| key (leads to a certain rehashing of ъЪёЁ-mirroring).
+			Start splitting into TILDE/CEDILLA groups of modifiers/combiners (now cedilla may be entered as expected).
+			Swap "Green" and "Blue" in the names.
+			Make RipeKey introduce Greek; replace μ by appropriate symbols (ԣ en with middle hook on Cyr, ≈ on Latin).  
+			  Now miss:
+-2422   <␢>     BLANK SYMBOL [Common; Control Pictures; 1.1]
+-2a73   <⩳>     EQUALS SIGN ABOVE TILDE OPERATOR [Common; Supplemental Mathematical Operators; 3.2]
+			Cyrillic: Move palatization to AltGr-' AltGr-^ (slide things back on AltGr-рР; add ԕ at freed space).
+			Exchange RipeKey and GreenKey w.r.t. Cyrillic/Greek (now greek on Green, cyrillic on ripe).
+			Cleanup LatinGreenMax.  (But DITTO is missing on Cyrillic personality...)
+			26ce ⛎ OPHIUCHUS added to the left of ARIES (for "extended completeness"), obscuring useless CAPITAL RHO.
+			Remove ₯ DRACHMA SIGN from the Greek map (remains on Business).
+			Swap Green and Ripe (not on Cyrillic yet).
+				Currently some tone marks missing.
+				Also: ByPairs[Vϔ](FlipLayers(Latin)) omitted (leads to bugs).
+			Swap ¦†.
+			Replace Junk, Junk-AltGr with Ripe/-AltGr in the visual table.
+			In Cyrillic, move psili/pokrytie to AltGr-2/@ (from 7); dup palatization to AltGr-!
+				[instead of ºª¡ of Latin!].
+			Bind ABNT_C2 to (future) Compose, and easier access to some other stuff (Flip-AltGr, Business, Cyr-II).
+			Add primes ′″ to the Ripe face.
+	#######	Keyboard name is now out of sync...  #####################
+
+			Now compiled with (currently, patching is not needed; for an example, see examples/fix-MSKLC.patch):
+%Keyboard_Layout_Creator%\bin\i386\kbdutool.exe -v -w -s ooo-us
+%Keyboard_Layout_Creator%\bin\i386\kbdutool.exe -v -w -s ooo-ru
+	####  Do patching if needed...
+..\..\UI-KeyboardLayout\examples\compile_link_kbd.cmd iz-la-ru 2>&1 | tee 00c
+..\..\UI-KeyboardLayout\examples\compile_link_kbd.cmd iz-ru-la 2>&1 | tee 00c3
+				- see examples/build_here.cmd
+
+	New file: examples/enable-hex-unicode-entry.reg
+		On Windows:
+			reg import enable-hex-unicode-entry.reg
+		(active after a reboot).	Alt(keep it pressed)	+ NumPad+	+ any hex digits (release Alt)
+		(Not with a numlock... ???)
+	New files: *.cmd - DLL build environment.
+
+		time env PERLDB_OPTS="frame=7 LineInfo=oo-dd NonStop=1 AutoTrace=1" perl -d -wC31 -I UI-KeyboardLayout/lib UI-KeyboardLayout/examples/build-iz.pl UI-KeyboardLayout/examples/izKeys.kbdd |& tee ooxx-us-ru 
+
+0.12	Change internal representation of exportable prefixes from [*, *] to [*, *, 2] (so now all prefixes have $k->[2] TRUE).
+	Enhance doc section on Windows problems.
+	Clearer popups in output .html.
+	Change internal structure of representation of a character-in-a-key-slot: $c or [$c, $face_from, $is_prefix, ...].
+	New in-prefix-map directive PrefixDocs[DESCR]; DESCR is put into html popups for prefix keys.
+	Start adding docstrings on the generation pathway of the slot (up to FromTo, which has problems now???;
+			Does not work on DEADKEYS and InheritPrefixKeys???).
+		Format of char-to-emit now is [char, from_face, dead/inheritable, generation_pathway, old_prefix] 
+		with all but 0th optional.
+	Improve the order of control-chars in the output tables.
+	Allow arbitrary number of “+”s in the Layers(*) directive (untested).
+	Allow arbitrary number of layers in output_unit00() (untested).
+	Trace provenance up to a visual layer.
+	Add DOCTYPE to the generated HTML.
+	Update year in the .kbdd's copyright.
+	Trace provenance of AltGrSubstitutions.
+	Mark EIGHTH NOTE meaning vbell as such in HTML.
+	Mark positions involving/being AltGrSubst in blue in HTML.
+	Restore addhline () --> ∈∋.
+	Report separately "via single prefix key" and "via repeated prefix key" in the output tables.
+		BUG: ignores DeadKeys2...
+	Implement mutator ByPairs(Inv)Prefix.  (These BUGS are now fixed:)
+		BUGS: in print_deadkey_win() (sp?) we need to <<3 - apparently, only the inverted map is shifted by 3...
+			in massage_imported2(), one can't make a deep copy 
+				(related??? makes 03a6@ into 0301@, but only in the not-inverted face???
+					- old value is cached during link_layers()!)
+	Recognize YEN, BROKEN BAR and "the second SLASH" in BaseLayer as ABNT_C2 (so as JIS ¥¦ via duplication).
+	Make default_char() to be used as late as possible.
+	Remove repeated-dead-key magic from print_deadkey_win() (except for AltGr-inverted base face).
+	Merge all the debugging flags into UI_KEYBOARDLAYOUT_DEBUG.
+	Link layers AFTER the imported keys are (re)assigned (fixes BUGS mentioned above).
+	New configuration key for a face: PrefixChains.
+	layer_recipes entries could not be arrays.
+	Allow variation of the column where Ctrl-keys go in the output .klc; omit missing CTRL if at end 
+		(does not fix the Control-Shift-Letter bug).
+	Allow generation of Ctrl-letter and Ctrl-Shift-letter (works about a bug in File Commander with C-S-letter).
+		(XXXX currently hidden in the output tables - need to put a fifth char in a “prefixed” cell)
+	Add new translation filters: ucfirst_not_lc (etc for uc/lc; behave as uc/lc/ucfirst pseudo-compositing rules), dectrl.
+	Add new pseudo-compositing: dectrl.
+	ShiftFromTo was not allowing chars-by-hex.
+	Document the problem with Control-Shift-letter in MSKLC-generated keyboards.
+		Why only the last of these works??? ByPairs[0020␢](FlipLayers(Latin))	ByPairs[0192␢](Face(Latin))	ByPairs[0192␢]
+	Control-\ and Control-] were mixed up in several cases.
+	Output of visual keyboard layouts (non-surrogates hardwired).
+	Use to_ne class instead of from_sw in visual layouts (is not obscured due to z-order).
+	New toplevel .kbdd key face_shortcuts (used in [re]generation of visual diagrams).
+	New in-prefix-map directive HTML_classes[(WHERE,CLASS,chars,)*].  (Can be put also in DeadKey_InvMap0000.)
+	Add what-is-prefix info to the base layers.
+		(In RU, it now thinks that 0301 needs double-prefix???)
+	Consider KORONIS, PROSGEGRAMMENI, ANO TELEIA, GREEK QUESTION MARK as homographs.
+	When process visual map, use ucfirst() instead of uc() (does not matter with izKeys.kbdd).
+	Mark lc/ucfirst pairs with 3 case forms by yellow dotted outline in visual keymaps (relevant for polytonic).
+		(Before, we were pairing on the base of lc/uc, not lc/ucfirst.)
+	The visual table was based on “pure” layers, not layers marred by prefix mapping.
+	We did not mark prefix-keys-from-VK as $c->[2] = 1.
+	Optimize depth of span inclusion in generated HTML tables.
+	Use the classes/docs generated on TABLE HTML when doing visual HTML (some cause visual clutter, so
+		should be explicitly enabled on the enclosing DIV). 
+			VIET has background which is not visible???
+	Add info on the used unicode tables version to the outputs.
+	When looking a prefix in the diacritics table, prefer the row with the earliest occurence.
+	Move "next combining" from AltGr-/,? to '/",AltGr-'/"
+		We had prime-like stuff there - which was nice too???
+
+	izKeys.kbdd:	Update VERSION to 0.05.
+			Add PrefixDocs.
+			Fix prefer_(first|last).
+			Fix AltGr-- with () --> ∈∋.
+			Use ByPairsPrefix for greek double prefix keys.
+			Use PrefixChains for 00b5, 0192; first char moves to 4th press, the other is killed:
+-2423   <␣>     OPEN BOX [Common; Control Pictures; 1.1]
+-2007   < >     FIGURE SPACE [Common; General Punctuation; 1.1]
+				Having ¨ inside the chain kills modifier-colon...
+                            Latin				Cyr
+    AltGr	Greek -> Cyr -> Cyr-II -> Cyr-III	Latin -> Cyr-II -> Greek -> Cyr-III
+    Green				Greek -> Busns -> Coptic
+    Ripe	Cyr -> Cyr-II -> Cyr-III		Latin -> Negate -> Blue
+			Improve £ on the £-map (now £ is obtained by doubling the prefix), ¤ is still on # and @ (hi, Tom!).
+			Add ␣⍽/␢ to Green/Ripe keys (well, it would be nicer to have honest whitespace on Ripe keys, but this
+				conflicts with having text-Control-key symbols there...)
+			Add textual-symbols for remaining control keys (XXXX 0x1e and 0x1f still missing).
+			Add circled letter to Round-Ctrl (uppercased to the sibling map Cedilla+Ctrl).
+			Same for letter super- (on ^/~) and sub-scripts (on / - there is no uppercase subscripts in 6.2!).
+				Note that the alternative (case-switched) letters are also available on AltGr-flipped face ???
+			Reorder dead keys in the report closer to accordance with Green/Ripe.
+			Control-\ and Control-] were mixed up in several cases.
+			Exchange Control-key-symbols and Control-key-other-images (hides £ on AltGr-$ SPACE...).
+			Add non-break spaces (usual and narrow) on spaces in Ripe face.
+			Add 9=thin, a=Hair, 7=figure(noBreak), 8=Punctuation spaces to 2nd/3rd Ripe maps (only on Latin now)
+			Add @ -> ƻ to macron (on 2 it would hide useful bluekeys+macron).	[case/shift twisting!]
+			Assign classes to chars for use in visual HTML output.
+			We were missing ῭ in Greek-polytonic (\) AltGr-L-column.
+			Put ԡꙣꙥꚁ [temporarily?] onto the free slots in Business map (this finishes the Cyrillic coverage);
+				SOFT are on X=Ь; DWE on V...
+			Move … from Green to Ripe, and put · to Green (on fullstop=.).
+			Add €/£ to Green $/^.
+			Add ⌧,⎚ as other-iconic on Control-Backspace, Control-C; ␥/substitute-2=U+2426 as iconic on Control-C/SUB=^Z.
+			Downgrade LAS from l to AltGr-L on Business (Wikipedia article on Lari does not include ლ).
+			Downgrade LIVRE TOURNOIS SIGN from AltGr-L to AltGr-i/I on business (by the second letter now!).
+			Add TURKISH LIRA SIGN on l on Business.
+			Fix CEDILLA modifier/combiners list; lost:
+	-1dfd   < <U+1DFD>>     COMBINING ALMOST EQUAL TO BELOW [5.2]
+			Fix double-presses-with-AltGr of , . " ~ / ^ ˘.
+			Add faky-diacritics-type for DBL_GRAVE.
+			Add diacritics type for SLASH.
+
+	Add examples/console-fonts00-added.reg
+	Add examples/build_here.cmd (run in subdirectory of a directory with the distribution subdirectory, after creation of oo-*)
+	New file examples/izkeys-visual-base.html
+
+Perl bug with 2Self auto-docs (not debugged yet).  Already "my $c =" leads to a bug...
+
+0.13	Add ∩/∪ as round-∧/∨.
+	Add names of extra keys we (may) use with the keyboards to the .klc template.
+	Flip MUTATORS uc/uc_not_lc etc with uc_maybe/uc (does not change the output for izKeys).
+	Add documentation for mutators (except for Mutate(2Self)).
+	*Really* case-fold when checking for double-occupancy in sort_compositions.
+	Our code to find extra combining characters was off by 1.
+	Add prefix2 highlight for inverted prefixes in visual HTML.
+	Merge Shift-doubled-prefixes in visual HTML.
+	Better warning for mismatched length of lines in a visual map.
+	Allow space before NonspacingMark in HTML_classes.
+	Put BDO into generated HTML tables.
+		BUG: Can't put Meteq | to secondary AltGr-|.
+	Explicitly recognize [\xAD\x{200b}-\x{200f}\x{2060}-\x{2064}\x{fe00}-\x{fe0f}\x{034f}] as ZERO WIDTH.
+	Quiet warnings when non-AltGr positions are copied from LinkFace.
+	Add Shift if needed when copying form LinkFace to AltGr layer.
+	Allow visualization of LTR/RTL mirroring in HTML visual output by class rtl-hover and options rtl-hover/rtl-hover-Trivia.
+	Allow visualization of zero-width and whitespace characters. 
+		(Whitespaces lost the representation of the width.)
+	Allow in_key_separator2 as a separator of keys in visual keymaps (but only if one of the chunks is ≥2 chars long).
+	Output ligatures.
+		Not good in HTML output, or in coverage, or in deadkey tables???
+		Not for out-of-BMP
+	Add more documentation of mutators.
+	Simplify output_unit00() a lot.
+	Make ctrl_after_modcol create_alpha_ctrl keep_missing_ctrl into configuration variables (inheritable).
+	Support LRO/RLO at start (and then PDF at ends) of visual layout lines.
+	Implement extra layers per face.  (Via extra_layers, layers_modifiers configuration variables)
+			(Visual bell is not working for the added keys...)
+		Needs a patch to the generated .C and .H files.
+		kbdutool overfulls with too long lines unless one manually removes comments.
+		kbdutool ignores all the added layers but one (looks like it is limited by: up to 8 chars per key).
+	BIG was not highlighted in generated tables.
+		
+
+	izKeys.kbdd:	Update version to 0.06.
+			Change µ to ĸ (00b5 to 0138) as the GreenKey prefix (so it is not directly in any personality).
+				In RU personality, ɣ/Ɣ moved from double-prefix to triple prefix in the report???
+			Remove vestigal 03a6 from Cyrillic personality.
+			Regularize whitespace in Cyrillic.
+				(Still: 2009/200a are not on the 2nd Ripe...).
+			Beginning of Greek personality 
+				(did not remove they-are-prefix-in-Latin characters)
+				Green keys are missing,	AltGr-decimal becomes « ; GLOTTAL STOP is obscuring "?"...
+				Greek Number signs added to AltGr-6/^ and «» are as in Cyrillic.
+			Beginning of Hebrew map ( perl -C31 cvt_apple.pl Hebrew-ZC.keylayout >hebrew-ZC-visual )
+				(Start with http://bc.tech.coop/Hebrew-ZC.html; make SWUIO produce PRESENTATION (?!) forms, 
+				have <> not inverted, remove "lo" לֹ and typographic marks, add punctuation gershon/gershoim
+				longest vowels and YOD-YOD-PATAH, exchange v and u, add HET on H.  Then regularize niqqud 
+				— deoptimize for finger movement, optimize for memorization.)
+			Add accessor Į 012E for Hebrew (and corresponding extra columns in HTML tables).
+				(◌ 25cc moves to the double-prefix section in the report???)
+			Double-Green face MathBlue.
+			Exchange ѹ/ꙋ (per http://www.synaxis.info/azbuka/ponomar/charset/charset_1.htm).
+			Add extra layers (in Latin personality: Greek; in Cyrillic personality: Latin).  (Currently on AppMenu)
+			Regularize order of personalities on S-␣ AGr-␣ 2×AGr-␣: Latin/Greek/Cyrillic/Hebrew (Cyrillic₂/Cyrillic₃???)
+			Make Control-keys generate super/SUPER/txt-Ctrl on 1×,2×,3× S-␣, sub/icon-Ctrl/icon₂-Ctrl on 1×,2×,3× AGr-␣
+				(at least on Latin).
+			Make AltGr-/ generate SmallCaps on Control-keys (on Latin).
+
+	examples/cvt_apple.pl:	new script to convert Apple layout to a visual layout
+					(does not process correctly strings of length > 1)
+	examples/hebrew-ZC-visual:	example output of cvt_apple.pl
+	build_here.cmd			Cut longer lines in the generated .klc; preserve more related files.
+					Add patching to workflow.
+	examples/izKeys.patch		Switch ApplicationMenu key and KANA (as OEM_AX which works as KBDKANA modifier).
+					Apparently, with KBDKANA present (???), KLLF_ALTGR is not processed;
+						so manually process RMENU as Control+Alt.
+					Support (NON)CONVERT keys.
+	build-iz.pl			Prepair a copy of visual-base.html unless it exists.
+	examples/izkeys-visual-maps-base.html	Rename from examples/izkeys-visual-base.html
+					Major improvements.
+
+0.14	BIG YUS was highlighted as BIG in generated tables.
+	Support out-of-BMP in LIGATURES (untested).
+	Characters available via single prefix were not counted as such in coverage tables if earlier seen as double-prefix.
+	[[[Face(NAME) accesses the “bare” layers of the face, not with added control chars, VK and linked chars...]]]
+		Disabling this leads to disappearence of control chars on Hebrew, Cyrillic???
+			Inverting the order “fixes” this:	Face(Hebrew)	Face(SpecialKey_Images)
+	New debugging flag debug_STACKING (0x2000 now).
+	In CSS: make on-right on-left compatible with all of lc/uc/uclc (and with shift-changing wrapper - but not react yet).
+	Document debugging output for mutators.
+	Document primary/secondary mutators.
+	Debugging output for “TMP Extracted” was not updated for characters-as-an-array.
+	When one of a mogrified shift/unshift pair was penalized away (but had good priority), 
+		the priority of the remaining one was boosted.
+	Allow depenalization (weakier or stronger than Unicode version) of characters via !\, !\\.
+	Add dummy entries in front of extra_layers, rename to output_layers.
+	Inverted prefix keys lost inversion in extra layers.
+	Implement prefixNOTSAME=DDDD and prefixNOTSAMEcase=DDDD in output_layers.
+	Implement [visual -> RECT/name] sections.
+	Mark AltGr-inverter prefix in the generated table.
+	New mutator AssignTo(RANGENAME, LIM).
+	Allow mutators exchange key slots.
+	Allow BaseLayer to be a recipe.
+	Allow output of Kana+Fkeys (earlier was disabled in output_layout_win(), since kbdutool does not support Fkeys and arrow keys).
+	Document newly found errors of MSKLC and Firefox.
+	Allow in_key_separator2 to start a lonely entry in a slot.
+	«amplify» backtick to ⎖.
+	LIGATURES produced for non-BMP were byte-split, not 16-bit split.
+	Allow Shift to be clickable on the HTML visual layouts.
+	
+	izKeys.kbdd:	Update version to 0.07.
+			Make AltGr-. AltGr-</> produce ⊆/⊇.
+			Greek and Hebrew personality had wrong Metadata-index.
+			Add visual tables of Drawing Characters and arrows.
+			Assign Kana-Fkeys, Kana-Arrows, Kana-Numpad (dashes/spaces, single/double arrows, single-line box drawing)
+				(currently all Fkeys/Numpad/Clear are disabled later — except F2 — since too many overload kbdutool)
+			(Temporarily:)	Make AppMenu-(Shift-)F2 produce em-dash surrounded by HAIR(THIN) space (and AppMenu-,/M).
+			(Temporarily:)	Make AppMenu-< and AppMenu-> produce Clefs: ALTO and (doubled) BASS (to investigate apps).
+
+	build_here.cmd:	Incorporate massaging of #ERROR# to enable F-keys and arrow-keys.
+			Incorporate removing of CLEAR, F-keys (except F2), and NUMPAD-keys to not overload kbdutool.
+
+	izKeys.patch:	Take into account that X35 is not inserted now by kbdutool.
+	examples/izKeys-visual-maps-base.html:	Make Shift flippable on the base map and combined-Cyrillic one.
+
+0.50	Make a more universal font-family in generated coverage HTML tables.
+	Make C-^ and C-_ produce \x1e and \x1f, as the US keyboard does.
+	Rename extra modifiers: now KANA, X, Y
+	Allow layer 1 to be longer than layer 0 due to F-keys etc.
+	
+	test-klc-tr.pl:		new file
+	build_here.cmd: 	use test-klc-tr.pl to (finally!) build a keyboard with all the defined additional layers.
+
+	izKeys.kbdd:	Update version to 0.50.
+			Change prefix= to prefixNOTSAME= in descriptor of additional layers.
+			Fight against sublayer 15 (0-based) being ignored by Windows.
+			Make new scheme of accessors: CA- is Green, Mnu is Ripe, CMnu is 2xRipe; the rest with Mnu is Bbb/Scr/Frak.
+			Assign ↨ as "image" on C-_, and ⌠⌡ on AltGr-Business on Qq (needed for MES-2!).
+			For testing purposes: assign ssbiGreek(+bold dgt) to rC-A, i to A-Mnu, bi to C-Mnu, ssb to A-C-Mnu,
+				monospace to A-M-rC.
+			Add Gray boxes to BlackFrame, and ↵ to WhiteFrame (for UGL/MES2)
+			Add Black/White Frames, WireFrames (with 1,2,B) to NUMPAD.
+				(temporarily, 1B is not on rCtrl, but on Alt+rCtrl???).
+			Duplicate multi-char mappings to AltGr-rCtrl.
+
+	izKeys.patch:	Make Green+: and Ripe+; be Ripe AltGr-' and Ripe+: be Ripe AltGr-^ on Latin;
+				now from Latin one can access (non-AltGr) fractions and "other" Cyrillic layers even on FF.
+			Fix RightCtrl to produce expected chars.
+			Assign ROYA and LOYA to AltGr and RightCtrl.
+			More prefixes 0x0306 at random places.
+
+	izKeys-visual-maps-base.html:	Introduce anchors.
+
+	examples/raw_keys_via_api.pl:	new files to test I/O on Windows
+	examples/Keyboard_API.pm
+				???XXX See problems (when given argument "cooked"):
+					SetConsoleMode always fails; input of surrogates (and " — "???) is broken:
+					When reading by 10 chars: The first character is delivered OK (separately), 
+					the second and third are delivered together, and former as 4 bytes (with buffer overrun):
+					the correct char is followed by 0x0065 = 'e' (so one gets $c2 'e' instead of $c2 $c3).
+					   (instead of 0xRR 0xSS 0xTT 0xUU one gets 0xRR 0xSS 0x65 0x00 0xTT 0xUU).
+				   When reading 𝄞 (0x1d11e): on reading the second (low) surrogate, one gets only one extra byte 0x65
+					   (instead of 0xRR 0xSS one gets 0xRR 0xSS 0x65).
+				   When reading 𝄡𝄡 (0x1d11e): the first SMP character is delivered with the same bug as above;
+				   	   the second SMP character is
+				   	   	a) read as 2 shorts in one call;
+				   	   	b) the first one is as expected, the high surrogate;
+				   	   	c) the second one is 'e';
+				   	   	d) the low surrogate disappears;
+				   	   	e) the buffer is overrun by one byte 0x21 (the low byte of low surrogate).
+					   (instead of 0xRR 0xSS one gets 0xRR 0xSS 0x65).
+got <0x34 0xd8 0x20 0x20 0x20 0x20 0x20 0x20 0x20 0x20 0x20 0x20 0x20 0x20 0x20 0x20 0x20 0x20 0x20 0x20 0x20 0x20 0x20 0x20> 1 of 10 read at raw_keys_via_api.pl line 98.
+got <0x1e 0xdd 0x65 0x20 0x20 0x20> 1 of 1 read at raw_keys_via_api.pl line 98.
+1: I see «𝄞»
+got <0x34 0xd8 0x20 0x20 0x20 0x20 0x20 0x20 0x20 0x20 0x20 0x20 0x20 0x20 0x20 0x20 0x20 0x20 0x20 0x20 0x20 0x20 0x20 0x20> 1 of 10 read at raw_keys_via_api.pl line 98.
+got <0x21 0xdd 0x65 0x20 0x20 0x20> 1 of 1 read at raw_keys_via_api.pl line 98.
+2: I see «𝄡»
+got <0x34 0xd8 0x65 00 0x21 0x20 0x20 0x20 0x20 0x20 0x20 0x20 0x20 0x20 0x20 0x20 0x20 0x20 0x20 0x20 0x20 0x20 0x20 0x20> 2 of 10 read at raw_keys_via_api.pl line 98.
+3: I see «�e»
+					Pasting 01234567890123456789012345678901234 results in similar overruns and patterns:
+got <0x30 00 0x31 00 0x32 00 0x33 00 0x34 00 0x35 00 0x36 00 0x37 00 0x38 00 0x39 00 0x20 0x20 0x20 0x20> 10 of 10 read at raw_keys_via_api.pl line 100.
+1: I see «0123456789»
+got <0x30 00 0x65 00 0x31 00 0x32 00 0x33 00 0x34 00 0x35 00 0x36 00 0x37 00 0x38 00 0x39 0x20 0x20 0x20> 10 of 10 read at raw_keys_via_api.pl line 100.
+2: I see «0e12345678»
+got <0x30 00 0x65 00 0x31 00 0x32 00 0x33 00 0x34 00 0x35 00 0x36 00 0x37 00 0x38 00 0x39 0x20 0x20 0x20> 10 of 10 read at raw_keys_via_api.pl line 100.
+3: I see «0e12345678»
+got <0x30 00 0x65 00 0x31 00 0x32 00 0x33 00 0x34 0x20 0x20 0x20 0x20 0x20 0x20 0x20 0x20 0x20 0x20 0x20 0x20 0x20> 5 of 10 read at raw_keys_via_api.pl line 100.
+4: I see «0e123»
+			NOW: better warnings, overruns reported, pad by _=0x5f instead of 0x20 (which conficts with `—´ ;-).
+
+0.60	When layers were defined to have different length, we put stuff in VK sections into wrong places, and had messy
+		printouts of layouts.
+	Remove special sections (F-keys etc) from the printouts.
+	In printout, better document behaviour of control-letters.
+	Consistently use DeadkeyFaceHexMap instead of recalculating it.
+	process_dotcompose(), dotcomposefile_2_hash(), get__value(), set__value(): new subroutines.
+	Load Compose files, generate corresponding prefix maps.  
+		(Only rules starting with Compose processed, and with keysymbols in Latin-1/Cyrillic/Greek/Hebrew/Unnnn.)
+		(Plus those Latin characters and technical symbols which appear in std Compose.)
+		Currently makes a lot of sense only in Latin personality.
+	Load MathML entity files, generate corresponding prefix maps (on ComposeKey×2).
+		(If a binding and a longer one exist, finish shorter one with SPACE.)
+		(We avoid over-long synonims: those more than 2x longer than the shortest one.)
+	Load rfc1345 files, generate corresponding prefix maps (on ComposeKey×3).
+		(If a binding and a longer one exist, finish shorter one with SPACE.)
+	New key ComposeKey in .kbdd.
+	Logic for wrapping autodead.
+ basing on PrefixDocs.
+	Autogenerate PrefixDocs for flip_AltGr key.
+	AltGr-inverted deadkeys were not in the KEYNAME_DEAD section.
+	Suppress generation of deadkey names for Compose Compose Etc (overflow some Windows' buffer??? - installs but not activatable).
+
+	build_here.cmd:		In absense of F2 bound would produce wrong mapping to scancodes (and RU had no FKEYS).
+
+	izKeys.kbdd:	Update version to 0.60.
+			Make / (of /¥ key) a ComposeKey.
+
+	izKeys.patch:	Make Mnu-F12 into a ComposeKey.
+
+0.61	Add parser for Unicode names MODIFIER LETTER (LOW).
+	Support prefix-keys-as-arrays in the main keymap section.
+	New keys COLgap ROWgap in RECT visual sections (are counts; ROWgaps must start with #, COLgaps contain whitespace).
+	Start adding superize/subize manual mogrification rules.
+	Allow C-^/_ access modifier letters too (at end of other controls).
+		(Now all modifiers accessible from eurkey++ are accessible from izKeys too!)
+	Avoid auto-creating deadkey IDs below 0x80 (may lead to embarassing results if won't combine with the following char…).
+	Double processing of VK_DECIMAL could lead to broken LIGATURES for this key.
+	Make C-@ produce U+0000, as US keyboard, and append it to the end of access-modifiers list.
+	Document how to produce 0-length string after a prefix key(s).
+	Start categorizing tidbits from Unicode lists.
+
+	izKeys.kbdd:	Update version to 0.61.
+			DECIMAL on arrows: may also have semantic of mirror-reflect (⇄⇆).
+			Fix/add arrow blocks in visual tables.
+			Ins/Del on boxdraw: on heterogeneous boxes, makes H/V half-lines in simple/bold style 
+				(also add to BBoxDrawOnHV as “diagonal” blocks)
+				(Now only ╌┄┈ ╍┅┉ ╎┆┊ ╏┇┋ are missing from visual tables.)
+			Remove obsolete commented Hebrew rows from the visual map.
+			Add ⎖, 〃 to '," on MathBlue.
+			Add Super(&Phonetic)/Sub+SmallCaps(&legs,curl,tail)/Turn(&hooks, preferably right) on AltGr-↑/↓/→ .
+			Same for hooks, preferably left on AltGr-← (temporary; later combining variants should be put there).
+			Use COLgap=1 ROWgap=1 (with Tab in COLgap).
+			Continue orthogonalization of arrows (all types with at least 4 directions are in visual layouts).
+				(Harpoons and dingbats not processed.)
+			Optimize whitespace in the table of diacritics for print.
+
+	izKeys-visual-maps-base.html:	Suppress fallback fonts in :after/:before monospace (otherwise arrows too small???).
+
+0.62	Scan for DeadKey_Maps in a different pass.
+	Allow splitting Named_DIA_Recipe__* into several array elements (same as with other recipes).
+	Avoid infinite mutial recursion between DeadKey_* recipes.
+	Start implementing FullFace(NAME).
+		Not supported yet.
+	Implement prefix(NOTSAME(case)?)?=CHAR
+		(`case´ not implemented yet.)
+		The restrictions:	FullFace and prefix= should better be not used from principal layers;
+					prefix= should not create circular dependency between prefixes;
+	More clear messages about unknown duplicate composition rules.
+	Document how Windows' kernel processes keyboard events.
+	Document how Windows' applications should process keyboard events.
+
+	izKeys.kbdd:	Update version to 0.62.
+		Add triple dot operator to MathBlue :, set minus ∖ to \.
+		Manually put (move!) reverse solidus operator ⧵  to MathBlue AltGr-\.
+		Penalize Planck ℎ on MathBlue, add stroked-font.
+		Add Planck ℎ on MathBlue AltGr-p, minus operator to -, horizontal line to _, Å on A, K on K.
+			Remove last two: Having AÅ KK contradicts Unicode recommendations.
+
+0.63	New configuration keys mods_keys_KBD (hash), layers_mods_keys.
+	Skip modification column=15.
+	Remove now ALL dead key names with Compose from the output table (another overflow hit again!).
+	Update to Unicode 6.3 changed only the description of one of dead keys (ID=ARABIC LETTER MARK).
+	Detect the (fake) prefix keys which appear only in output_layers directive; do not warn “unreachable”, do not output.
+			(Reduces the DLL size about 20%.)
+	Restore dead key names with only one Compose in the output table.
+			(Increases the DLL size about 8%.)
+	Document newly discovered bugs in MSKLC and Windows.
+	Better documentation of how to assign mask's bits to the Win key.
+
+	izKeys.kbdd:	Update version to 0.63.
+		Fix Amplify-∭ to get ⨌ instead of ⨜.
+		Exchange BoxDrawB1 and BoxDraw1B.
+		Generate Compose on Mnu-F12, and other extra keys on extra layers without patching.
+		Switch to new scheme of modifier masks (now CapsLock works, Alt-Mnu works — at least in cmd).
+		Move bold-digits to bold/italic.
+		In ssbiGreek, map extra symbol-letters (along diagonal) to the numbers' row (with ∂∇ also unmoved on '", as usual).
+		Exchange Double-Struck and Scripts (follow heuristics rC=flipBold, M=flipItalic).
+		Make Fraktur into BoldFraktur.
+		Move Monospace and Italic to lAlt-rAlt, lAlt-rAlt-Menu (follow heuristic lAlt-rAlt=MathLatin).
+		Add flip-bold versions of Double-Struck (make SSBI), Bold-Fraktur and Script (change AltGr to lCtrl).
+				(Adds 1.5% to the DLL size.)
+		Move Sans Serif Bold to lAlt-Menu (follow heuristic lAlt=SSBI).
+		Add Bold/Italic versions of Greek (modifying lCtrl-lAlt).
+		Add Bold versions of Latin (modifying lAlt-rAlt).	(Finishes B/I-flavors of Latin)
+		Make Menu-Space into Compose key (does not work since SPACE is not in visual map).
+		For the purpose of generation of BoxDraw chars: loner rCtrl is replaced by lCtrl+rCtrl (instead of lAlt+rCtrl).
+			(Apparently, lCtrl+rCtrl+NUMPADchar does not work — neither with nor without CapsLock; keep lAlt+rCtrl.)
+		Instrument MathBlue for highlight in HTML.
+
+	izKeys.patch:	Now patch only for bugs in MSKLC.
+			Update for the new scheme of modifier masks.
+			Update for MSKLC forgetting to emit aVkToWch3/6/8 (in presence of many modification columns).
+			Make Green-Space and Ripe-Space into Compose key.
+
+	test-klc-tr.pl:	Generate the mask → modification column table ourselves.
+
+0.64	Create layer named NAME² from every layer named NAME and the following layer (on uc) from rectangle visual maps.
+	Document the Windows' limit 126 for the number of modification columns.
+	Quiet a warning if compose key is on VK_array.
+	Add to docs classified shapes from http://std.dkuug.dk/jtc1/sc2/wg2/docs/n4384.pdf.
+	Document 3 keystate tables (‟internal”, async, and no-name one).
+	Document the restriction that the offsets of the (1 or 2) tables in keyboard layout should be less than 0x10000.
+
+	izKeys.kbdd:	Update version to 0.64.
+			Minor massage of the table of arrows.
+			Add WhiteTriangSmall,BlackTrianSmall rectangle visual maps.
+			Use Arrows² style references to Arrow visual layers.
+			Assign Black and “Player Controls” arrows to Boldified (=add rCtrl) [un-Shifted/Shifted).
+			Assign Hook  and ZigZag arrows to Script (=AltGr-Mnu) [un-Shifted/Shifted).
+			Assign White and Triple arrows to Double-Struck (=AltGr-rCtrl) [un-Shifted/Shifted).
+			Assign MapsTo and ToBar arrows to Fraktur (=AltGr-Mnu-rCtrl) [un-Shifted/Shifted).
+			Use ⮕ U+2b95 (from Unicode-v7.0) instead of ➡ on →.  Move ➡ to ./Del.
+				http://www.unicode.org/mail-arch/unicode-ml/y2013-m10/0083.html
+			Assign Large/Small Triang to arrows on SS-Bold (=lAlt-Menu) [un-Shifted/Shifted).
+			Assign Large/Small BlackTriang to arrows on SS (=lAlt-Menu-rCtrl) [un-Shifted/Shifted).
+			Assign White/Black PartialCircles to arrows on BoldItal (=lAlt-rAltGr-Menu-rCtrl) [un-Shifted/Shifted).
+			Assign ⊃/⊇ etc to arrows on Monospace (=lAlt-rAltGr) [un-Shifted/Shifted).
+			Assign ⊐/⊒ etc to arrows on MathItalic (=lAlt-rAltGr-Mnu) [un-Shifted/Shifted).
+			Assign ↠/⇉ etc to arrows on MathBold (=lAlt-rAltGr-rCtrl) [un-Shifted/Shifted).
+			Assign ➲/◑ etc to arrows on MathBoldItalic (=lAlt-rAltGr-Mnu-rCtrl) [un-Shifted/Shifted).
+			Add whiten to mogrification rules for Double-Struck.
+
+	build_here.cmd:			Bug of kdbutool with LIGATURES on unusual keys requires patching.
+	izKeys.pre-convert-fix.patch:	new file
+	izKeys.patch:	To move the structure-to-output earlier in the file (to make offset below 0x10000),
+				change static to extern, and pre-declare arrays.
+				(This does not help.  According to objconv -fasm, or to
+               D:\Programs\Microsoft-Keyboard_Layout_Creator\bin\i386\cl.exe      -nologo -ID:\Programs\Microsoft-Keyboard_Layout_Creator\inc -DNOGDICAPMASKS -DNOWINMESSAGES -DNOWINSTYLES -DNOSYSMETRICS -DNOMENUS -DNOICONS -DNOSYSCOMMANDS -DNORASTEROPS -DNOSHOWWINDOW -DOEMRESOURCE -DNOATOM -DNOCLIPBOARD -DNOCOLOR -DNOCTLMGR -DNODRAWTEXT -DNOGDI -DNOKERNEL -DNONLS -DNOMB -DNOMEMMGR -DNOMETAFILE -DNOMINMAX -DNOMSG -DNOOPENFILE -DNOSCROLL -DNOSERVICE -DNOSOUND -DNOTEXTMETRIC -DNOWINOFFSETS -DNOWH -DNOCOMM -DNOKANJI -DNOHELP -DNOPROFILER -DNODEFERWINDOWPOS -DNOMCX -DWIN32_LEAN_AND_MEAN -DRoster -DSTD_CALL -D_WIN32_WINNT=0x0500 /DWINVER=0x0500 -D_WIN32_IE=0x0500 /MD /c /Zp8 /Gy /W3 /WX /Gz /Gm- /EHs-c- /GR- /GF -Z7 /Oxs iz-la-ru.c
+               ..\objconv.exe -felf32 -nu iz-la-ru.obj iz-la-ru.o
+               nm iz-la-ru.o >iz-la-ru.o-nm
+				the KbdTable is moved to the end of the 1st data section (at off=0x36348), before the string table.
+	extra_c.zip:			Extra files to break C into two compilation units.
+	compile_link_kbd.cmd:		New option --with-extra-c BASENAME_of_C_FILE
+						(makes the returned table at minimal possible offset; but this does not fix
+						 the problem with installing large files)
+
+0.65	Major cleanup of the documentation.
+	Tables to support emitting OS X keyboards.
+	Support colors and high position in CSS for inter-keycaps-arrows.
+	Do not emit empty rows in the coverage tables.
+	Allow for spaces in user-specified CSS classes.
+	Document ComposeKey.
+	Allow ComposeKey to be an array.
+	Better stats for the coverage of the keyboard
+		(but still mix up extra layers vs. single-prefix, and do not discard AltGr-layer for extra-layers).
+	Include Compose Key into stats of coverage 
+		(but we do not filter out unreachable sequences).
+	Add to adddot: (m-)dash/bar, [h/v]draw (+ with bold/dbl) generate ┄┅┈┉┆┇┊┋
+		(bold variants not accessible now from izKeys since bold/dbl-draw is on extra layers).
+
+	izKeys.kbdd:	Mark Ø as from_w/high.
+			Organize the “rest” of arrows into 2×2×2 groups.
+			(Re-)bind the “rest” of arrows in groups (undocumented!):
+				???
+			Re-bind 2009—2009, 200a—200a and music C clef cyclically.
+			Add ⟨⟩ to Blue <> (Green conflicts with 200a—200a) and ≪≫ to Blue AltGr.
+			Enable shortening Compose Compose to Shift-Compose.
+			(Temporarily?) put combining dot above/below after ring in 4th section of DIACRITICS.
+			Two new box-drawing rect-maps: BoxDrawOnBH,BoxDrawOnBV (thin lines on background of horizontal/vertical
+				bold lines).
+			Add bold-box-draw on on background of thin lines to: 
+				lCtrl        +Mnu (add both V and H background lines) +rCtrl (flip H background lines).
+					Add lAlt to flip bold vs thin.
+						(but Mnu means Vertical Bold background).
+			Add ballot marks to frakture’s numpad (Shift adding frames; *// is bold +/-).
+
+	izKeys.patch:	Enable shortening Compose Compose Compose to Shift-Compose.
+
+	izKeys.pre-convert-fix.patch:	Update for rebinding of 2009—2009, 200a—200a etc.
+
+0.66	Add an optional argument $dummy to fill_win_template() (creates a file readable with GUI; one can make an install package).
+		(the only key defined is ⟨q⟩)
+	ByPairsInvPrefix not working in the principal layers (still does not!).
+	Warn if the description is longer than 63 chars.
+	Protect " and \ in the description.
+	Add DIAMETER as quasisyn of ∅, and APL quad as unsharpen (kills squared ⟏⟎, ⩻, ⭀).
+	APL postfixes were not recognized.
+	Require appending explicit apl at end since the usability of these is severely limited.
+		(not always beneficial)
+	Warn if the description of the keyboard exceeds 63 UTF-16 codepoints.
+	In the main face, flagw from deadkeys-in-the-list were overwriting flags explicit deadkeys in the layers
+		(important for Inv only).
+	Put a plug for my unifont build into the browser setup section of the docs.
+
+	build-iz.pl:	Generate “dummy” files processable with GUI (if directory ./dummy is not present)
+
+	izKeys.kbdd:	Change DLL names, fix descriptions
+			Hebrew had Green on the Ripe keys.
+			Add Inverted Prefixes to Greek Poly.
+			Add a few new chars to keypads.
+			Add ≃ to MathBlue =. 
+				duplicates AltGr-8
+			
+	izKeys.pre-convert-fix.patch:	Extend to handle Greek and Hebrew
+	izKeys.patch:			Likewise
+
+	dump_kbd_reg.cmd:	Output the keyboard-related part of the registry.
+	Layout63.klc:		Working long description
+	Layout64.klc:		Not working long description
+
+0.67	Put a plug for my Dejavu+unifont build into the console font setup section of the docs.
+	Implement FullFace(Name_or_Recipe) accessor which accesses a face with LinkLayer substitutions.
+		was a synonim for Face() before.
+		If called too early, gives different results than when called later.
+	Start documenting the ways we mutate faces and layers during construction.
+	New options oneRow, startKey, cntKeys for generation of HTML keyboards.
+	Do not apply diacritics rules to ComposeKeys and flip_AltGr_Key.
+	Allow BaseLayer to be a full recipe.
+	Make BaseLayer to be prepended to the layer 0 (so it may be incomplete).
+	Allow Space as a key in BaseLayer.
+	Switch generation of ABNT_C1 and ABNT_C2 and make C2 a double of DECIMAL 
+		(now JIS’ left is ABNT’s right is /, JIS’ right is ISO is \)
+		(now both on JIS and on ABNT main island has 2 distinct additional keys)
+
+	izKeys.kbdd:	Attempt to put Ripe/Green in a correct Left/Right positions (duplicating Green symbols on Ripe if possible).
+				Removes: ⨃⨄⨊ from Russian.
+			Remove duplicates-of-Latin from Russian visual layer.
+
+	izKeys.patch:	Latin was not defining Shift-Mnu-Space (as Compose³).
+
+	examples/nano-en.kbdd:	New file.
+				(compile of .klc not tested yet; misses 0331)
+	examples/logo-base.html:	New file.
+
+0.68	Add ℊ Ɡ to the list of case pairs. (does not help, since instructions are in different Mutate() rules)
+
+	izKeys.kbdd:	Temporary (?) suppress auto and add ℊꞬ to manual list for Blue (to fix the previous one).
+		Suppress ꭓ on Greek (can get through cedilla).
+		Now we benefit from Unicode 7.0.
+		Use FullFace() in the MathBlue recipe (does not actually change anything???).
+		Add whiten,amplify to MathBlue rules (except for explicit <⟨ >⟩ =≃).
+		Update currencies to 7.0 (Ruble and Manat replace ℛ and ℳ, which may be entered via Script [and Blue]; 
+					  new/old Rupees are now on AltGr).
+		Add bracket corners on Blue `' (+AltGr for bottom); move decimal separator to AltGr-".
+		In 0.66, because of APL, ⍭ would obscure ◌̃ on AltGr-~ AltGr-~.
+	
+	nano-en.kbdd:	
+		Update currencies to 7.0 (Ruble and Manat replace ℛ and ℳ, which may be entered via Script [and Blue]; 
+		                          new/old Rupees are now on AltGr).
+		Fix description + cosmetic changes.
+
+0.69	For text-mode tables of keyboard layout, do separate by SPACE (and not TAB) if have at least 7 clusters.
+		(Does not help with display of “keys” where combining-with-◌ fails)
+	Return the generated keymap table from print_coverage() and print_table_coverage().
+	Do not process Compose bindings for/with out-of-BMP chars, or unaccessible characters (about 250 extra bindings were created).
+	Do not create explanations of Compose bindings with one or more keys (allows non-Latin personalities to fit into 256K).
+	Replace warning about obscuring Blank during linking of faces to one about obscuring prefixes.
+	In generated HTML visual layouts, make SPACE narrower, and AltGr wider by 0.4em.
+	Add case-pair for YOT ϳ to override table.
+	Allow for layer number to be '-' in the layer specification of kbd_rebuild (then the face name is actually a layer name).
+	In docs, add more refs to mappings to (La)TeX.
+	Subize “,” то “¸”, superize “.” to “⸳”.
+
+	build-iz.pl:	Streamline repetitve tasks.
+			Generate the file 'text-tables' with text tables for layouts (good for HOWTO-... file — now only 1–2 lines
+				need manual edit — one per line).
+	izKeys.kbdd:	Add RUBLE SIGN ₽ on AltGr-1 (“unit”) on Cyrillic.
+			Remove LinkFace from Latin
+  			Add BaseFace to Latin
+  			Make ISO key Compose+InvertAltGr on Latin (hence on Greek)
+  			Manually add uc-YOT to Paleo-Latin, small-uc Ω to o on ↓. 
+  			Add new-7.0-greek and coptic epact digits on script (AltGr-Mnu- modifiers)
+  				(units/tens/hundreds on digits/shifted-digits/fkeys; thousand mark on F10)
+  			Switch back Fraktur and BoldFraktur 
+  				(since \boldsymbol{\mathfrak{G}} delivers bolder version!  So the default should be non-bold!)
+  			Micro-optimize ⫛ ⫙ ∟.
+
+0.70	Very primitive output of Apple keymaps.
+		Initially: Mods-Space was not defined; all prefixes worked only via terminators.  Had problems with UTF-16.
+	Converted via-VK entries of layout to the array form.
+		The positions of these are in the '[VK_off]' hash; currently used for Apple output only.
+	“Terminators” on Mac (shown after a prefix key is pressed) are controlled by Show[NNNN] directive on a face descriptor,
+		and via AltGr_Invert_Show, ComposeKey_Show entries.
+	Name of layout on Mac is controlled via LAYOUTNAME with OSX_ADD_VERSION (or OSX_LAYOUTNAME).
+	Useless: Allow postfix "Apple" on ByPairs.  (Such declarations give empty results now.)
+	Duplication of keys on Mac is controlled by Apple_Duplicate (has a sane default: PC_Menu, F20 duplicate ISO keys, etc).
+	Extra Apple bindings may be inserted by (temporarily???) Apple_Override (by Mods+VK or by Prefix+Char).
+	Allow 4-Hex input on F19 and Blue-u (duplicate, or use with Shift-, or follow by one of SPACE - _ + = to enter 6-Hex).
+		Currently generated unconditionally!  Need: lookup whether the layout defines hex4/hex6 Apple prefixes.
+	Allow mixing 5-Hex with 6-Hex (where unambiguous — not starting with U+10);
+		currently disabled: won’t install with this.
+	Document what happens when pasting to console window on Windows.
+	Add references to diode-less keyboards (as in lCtrl-rCtrl problem on Windows).
+	Base CapsLocking behaviour on Windows on uc AND on ucfirst.
+		is it beneficial???
+	On Apple, switch off the hex5 generation, and terminators for “high surrogate” part of hex6 input.
+		(Were leading to instabilities [at least without logout/login cycle]:
+			jumbled or grayed out list of active keyboard layouts; applications running out of stack)
+	On Apple, switch from Plan A generation of hex6 (works, but may be unstable, and huge .keylayout files)
+		to Plan C with chunk=2¹ (slightly smaller .keylayout files).
+	Make Flip_AltGr always override other bindings on the same key (with a warning).
+	Implement document_chars_on_key().
+	Use document_chars_on_key() to add provenance to things added via Mutate2Self etc.
+	Warn on immediate deadkey loops.  Fix them (silently) in AltGr-inverted base face (abusing DeadChar_32bitTranslation!).
+	Restore warning on 0000 in the output of a deadkey.
+		(Appears in Compose³.)
+	Force rehashing backlinks after adding AltGr-invertor (needed on imported faces).
+	New HTML class hide45end decreasing opacity of consonant ↘-columns (those of 4,5,0).
+
+	raw_keys_via_api.pl:	Did not print out [ ] on SPACE.
+				Mismatched surrogates was a fatal error.
+
+	izKeys.kbdd:	Enable extra keys and hex input on Apple.
+			Add ¶❧ to Green &, Ripe &.
+					❧ is actually obscured by dashes!
+			Move RATIO ∶ from Blue-AltGr to Green, replace by ⦂ (does not work???)
+			Add ℼℿℽ (with ℎ moved to q, and GAMMA ℽ on y).
+
+	mini-en.kbdd:	Renamed from nano-en.kbdd
+
+	*-base.html:	Better docs.
+
+0.71	Allow specification of LRM_RLM ALTGR SHIFTLOCK through parents, or via toplevel attributes.
+	Start implementing CapsLOCKoverride key.
+		(No Apple, ligatures or DECIMAL support yet.)
+	New mutator IfPrefix[PREFIX1,PREFIX2,…](RECIPES) (and IfNotPrefox).
+		(Suitable for putting into default bindings.)
+	Output CTRL Apple mapping from BaseLayer (diffs: 71, 110 emit the same as 10 [SPACE]; 73 emits \x10; usually all 3 dup 10 ???)
+	Separate Cmd Apple mapping (from BaseLayer).
+	Parse X11/keysymdef.h.
+		(Adds excessive circled katakana/hangul.)
+	Filtering unaccessible keyseqs from compose maps was not removing seqs with at least one reachable char (!).
+	Comment out code warning about dup macros in keysymdef.h (we do not use them, and there are some offenders).
+	Fix remaining qw-warnings and duplicate-composition warnings.
+	_TR_rx was wrongly made 1 (map in scalar context).
+		Does not affect results ???  Just fixes warnings with unicode 9.0…
+	In half of cases (who comes earlier/later), auto-appending SPACE to a binding in Compose rules was wrong.
+	Allow $term in put_val_deep() to be a hash (to implement options).
+	Allow FullFlipLayers accessor (similar to FullFace).
+	New configuration variable AltGrInv_AltGr_as_Ctrl (defaults to 1).
+	maybe_lc (etc) were not recognized.
+	Better decomposition of APL symbols.
+
+	izKeys.kbdd:	ℽ was (erroneously) on AltGr; add ℾ too.
+			Add attribute LRM_RLM to Hebrew.
+			Put ƒ on Shift-␣² f.
+			Start coding CapsLock on Hebrew (so that it has no duplication in layer 0).
+				perl -wlane "next unless /^LAYOUT/../^LIGATURE/; next if /SGCap|OEM_8|NUMPAD|MULTIPLY|DIVIDE|ADD|SUBTRACT|RETURN|ABNT_C[12]|DECIMAL/; print for grep defined, @F[3,4]" ooo-hb | sort | uniq -d
+			Better docs in the table of layout (Latin only).
+			Add AltGr-Arrows columns to Greek personality.
+			Add super/sub greeks
+				(only 2 active, only super???;  greekize is not Latin->Greek!)
+			Tuneup for update to Unicode 9.0 tables: broken (COPTIC) SAMPI Ϡ/Ⳁ, ḃ, Ḃ, ⫏
+			Tuneup for ⩔⩓.
+			Add ÷×‒∑ to Shift-Numpad-/*-+
+				Breaks build; disabled.
+			AltGr-inverted Ctrl chars: uc-super on Green, smallcaps on Ripe, phonetics on MathBlue.
+			Add -tail to bindings of AltGr-→.
+			Tuneup right tails/hooks on AltGr-→.
+				All the left/right-tailed characters of http://www.rejc2.co.uk/ipakeyboard/ are where expected now.
+			Add greekize lc (and uc) on Ripe³ (AltGrInv) Ctrl	(at least on Latin).
+				Complement rare “extra” control-char icons.
+			Same on Greek \ (AltGrInv) Ctrl (and likewise superscript forms to Greek [/] AltInv Ctrl).
+			Add Greek superscripts/subscripts to Greek [/] Ctrl.
+			Add Greek satellite accessors to Script layer.
+				Partially broken by:	 ~ → 𐆌	1018C	GREEK SINUSOID SIGN
+			Remove APL from “random amplification operations”.
+				(Replacing symbols may need micro-optimization.  See below.)
+			Add APL greek (underbarred) near super(sub-)script Greek letters.  (No conflicts.)
+
+	examples/HOWTO-release-version		New file
+	examples/build_here.cmd			Do fixing-#ERROR# properly.
+						Add more needed files to the .zip's.
+						Make apple.zip contain ZIPs with .klayout files, one per ZIP (as needed to release).
+
+	examples/izKeys.pre-convert-fix.patch	Is not needed anymore.
+	examples/build-iz.pl			Make proper search for X11 dirs with configuration files
+						Try to find keysymdef.h
+
+	Updating to Unicode 9.0 tables.
+		a lot of warnings (fixed, see above), needed tuneup: broken SAMPI Ϡ, COPTIC SAMPI Ⳁ, ḃ, Ḃ, ⫏
+
+                  -0021	234e	// ! -> ⍎	// EXCLAMATION MARK	-> APL FUNCTIONAL SYMBOL DOWN TACK JOT [Common; Miscellaneous Technical; 1.1] (via VisLr=US-Base ⇒ Subst{L=Blue} ⇒ <any-calculated-)
+                  +0021	2aeb	// ! -> ⫫	// EXCLAMATION MARK	-> DOUBLE UP TACK [Common; Supplemental Mathematical Operators; 3.2] (via VisLr=US-Base ⇒ Subst{L=Blue} ⇒ <pseudo-manual-whiten>)
+                  -0024	233a	// $ -> ⌺	// DOLLAR SIGN	-> APL FUNCTIONAL SYMBOL QUAD DIAMOND [Common; Miscellaneous Technical; 1.1] (via VisLr=US-Base ⇒ Subst{L=Blue} ⇒ <any-calculated-)
+                  +0024	25c6	// $ -> ◆	// DOLLAR SIGN	-> BLACK DIAMOND [Common; Geometric Shapes; 1.1] (via VisLr=US-Base ⇒ Subst{L=Blue} ⇒ <pseudo-fake-black>)
+                  -002c	236a	// , -> ⍪	// COMMA	-> APL FUNCTIONAL SYMBOL COMMA BAR [Common; Miscellaneous Technical; 1.1] (via VisLr=US-Base ⇒ <any-calculated-)
+                  +002c	2e32	// , -> ⸲	// COMMA	-> TURNED COMMA [6.1] (via VisLr=US-Base ⇒ <any-calculated-)
+                  -0031	2361	// 1 -> ⍡	// DIGIT ONE	-> APL FUNCTIONAL SYMBOL UP TACK DIAERESIS [Common; Miscellaneous Technical; 1.1] (via VisLr=US-Base ⇒ Subst{L=Blue} ⇒ <any-calculated-)
+                  +0031	27d9	// 1 -> ⟙	// DIGIT ONE	-> LARGE DOWN TACK [Common; Miscellaneous Mathematical Symbols-A; 3.2] (via VisLr=US-Base ⇒ Subst{L=Blue} ⇒ <pseudo-manual-amplify>)
+                  -003b	236e	// ; -> ⍮	// SEMICOLON	-> APL FUNCTIONAL SYMBOL SEMICOLON UNDERBAR [Common; Miscellaneous Technical; 1.1] (via VisLr=US-Base ⇒ <any-calculated-)
+                  +003b	204f	// ; -> ⁏	// SEMICOLON	-> REVERSED SEMICOLON [Common; General Punctuation; 3.2] (via VisLr=US-Base ⇒ <any-calculated-)
+                  -00a1	2aeb	// ¡ -> ⫫	// INVERTED EXCLAMATION MARK	-> DOUBLE UP TACK [Common; Supplemental Mathematical Operators; 3.2] (via VisLr=US-Base ⇒ Subst{L=Blue} ⇒ <pseudo-manual-whiten>)
+                  +00a1	2ae1	// ¡ -> ⫡	// INVERTED EXCLAMATION MARK	-> PERPENDICULAR WITH S [Common; Supplemental Mathematical Operators; 3.2] (via VisLr=USLatin-AltGr ⇒ Subst{L=Blue-AltGr} ⇒ <pseudo-manual-amplify>)
+                  -00a3	25c6	// £ -> ◆	// POUND SIGN	-> BLACK DIAMOND [Common; Geometric Shapes; 1.1] (via VisLr=US-Base ⇒ Subst{L=Blue} ⇒ <pseudo-fake-black>)
+                  +00a3	25bc	// £ -> ▼	// POUND SIGN	-> BLACK DOWN-POINTING TRIANGLE [Common; Geometric Shapes; 1.1] (via VisLr=USLatin-AltGr ⇒ Subst{L=Blue-AltGr} ⇒ <pseudo-fake-black>)
+                  -00a8	2364	// ¨ -> ⍤	// DIAERESIS	-> APL FUNCTIONAL SYMBOL JOT DIAERESIS [Common; Miscellaneous Technical; 1.1] (via VisLr=USLatin-AltGr ⇒ <any-calculated-)
+                  +00a8	2a3e	// ¨ -> ⨾	// DIAERESIS	-> Z NOTATION RELATIONAL COMPOSITION [Common; Supplemental Mathematical Operators; 3.2] (via VisLr=US-Base ⇒ <pseudo-manual-amplify>)
+                  -00b8	2e32	// ¸ -> ⸲	// CEDILLA	-> TURNED COMMA [6.1] (via VisLr=US-Base ⇒ <any-calculated-)
+                  +00b8	2e41	// ¸ -> ⹁	// CEDILLA	-> REVERSED COMMA [7.0] (via VisLr=US-Base ⇒ <any-calculated-)
+                  -00f7	2360	// ÷ -> ⍠	// DIVISION SIGN	-> APL FUNCTIONAL SYMBOL QUAD COLON [Common; Miscellaneous Technical; 1.1] (via VisLr=US-Base ⇒ <any-calculated-)
+                  +00f7	2982	// ÷ -> ⦂	// DIVISION SIGN	-> Z NOTATION TYPE COLON [Common; Miscellaneous Mathematical Symbols-B; 3.2] (via VisLr=US-Base ⇒ <pseudo-manual-amplify>)
+                  -2264	2343	// ≤ -> ⍃	// LESS-THAN OR EQUAL TO	-> APL FUNCTIONAL SYMBOL QUAD LESS-THAN [Common; Miscellaneous Technical; 1.1] (via VisLr=US-Base ⇒ <any-calculated-)
+                  -2265	2344	// ≥ -> ⍄	// GREATER-THAN OR EQUAL TO	-> APL FUNCTIONAL SYMBOL QUAD GREATER-THAN [Common; Miscellaneous Technical; 1.1] (via VisLr=US-Base ⇒ <any-calculated-)
+                  +2264	2aa1	// ≤ -> ⪡	// LESS-THAN OR EQUAL TO	-> DOUBLE NESTED LESS-THAN [Common; Supplemental Mathematical Operators; 3.2] (via VisLr=US-Base ⇒ <pseudo-manual-whiten>)
+                  +2265	2aa2	// ≥ -> ⪢	// GREATER-THAN OR EQUAL TO	-> DOUBLE NESTED GREATER-THAN [Common; Supplemental Mathematical Operators; 3.2] (via VisLr=US-Base ⇒ <pseudo-manual-whiten>)
+
+                  -0021	00a1	// ! -> ¡	// EXCLAMATION MARK	-> INVERTED EXCLAMATION MARK [Common; Latin-1 Supplement; 1.1] (via VisLr=US-Base ⇒ <any-calculated-)
+                  +0021	27d8	// ! -> ⟘	// EXCLAMATION MARK	-> LARGE UP TACK [Common; Miscellaneous Mathematical Symbols-A; 3.2] (via VisLr=US-Base ⇒ Subst{L=Blue} ⇒ <pseudo-manual-amplify>)
+                  -0031	2355	// 1 -> ⍕	// DIGIT ONE	-> APL FUNCTIONAL SYMBOL UP TACK JOT [Common; Miscellaneous Technical; 1.1] (via VisLr=US-Base ⇒ Subst{L=Blue} ⇒ <any-calculated-)
+                  +0031	2aea	// 1 -> ⫪	// DIGIT ONE	-> DOUBLE DOWN TACK [Common; Supplemental Mathematical Operators; 3.2] (via VisLr=US-Base ⇒ Subst{L=Blue} ⇒ <pseudo-manual-whiten>)
+                  -003b	204f	// ; -> ⁏	// SEMICOLON	-> REVERSED SEMICOLON [Common; General Punctuation; 3.2] (via VisLr=US-Base ⇒ <any-calculated-)
+                  +003b	2a1f	// ; -> ⨟	// SEMICOLON	-> Z NOTATION SCHEMA COMPOSITION [Common; Supplemental Mathematical Operators; 3.2] (via VisLr=US-Base ⇒ <pseudo-manual-whiten>)
+                  -00a1	2ae1	// ¡ -> ⫡	// INVERTED EXCLAMATION MARK	-> PERPENDICULAR WITH S [Common; Supplemental Mathematical Operators; 3.2] (via VisLr=USLatin-AltGr ⇒ Subst{L=Blue-AltGr} ⇒ <pseudo-manual-amplify>)
+                  +00a1	00a1	// ¡ -> ¡	// INVERTED EXCLAMATION MARK	-> INVERTED EXCLAMATION MARK [Common; Latin-1 Supplement; 1.1] (via VisLr=US-Base ⇒ <any-calculated-)
+                  -00a8	2368	// ¨ -> ⍨	// DIAERESIS	-> APL FUNCTIONAL SYMBOL TILDE DIAERESIS [Common; Miscellaneous Technical; 1.1] (via VisLr=USLatin-AltGr ⇒ <any-calculated-)
+                  +00a8	2e35	// ¨ -> ⸵	// DIAERESIS	-> TURNED SEMICOLON [6.1] (via VisLr=US-Base ⇒ <any-calculated-)
+                  -00f7	2982	// ÷ -> ⦂	// DIVISION SIGN	-> Z NOTATION TYPE COLON [Common; Miscellaneous Mathematical Symbols-B; 3.2] (via VisLr=US-Base ⇒ <pseudo-manual-amplify>)
+                  +00f7	27cc	// ÷ -> ⟌	// DIVISION SIGN	-> LONG DIVISION [Common; Miscellaneous Mathematical Symbols-A; 5.1] (via VisLr=USLatin-AltGr ⇒ <any-calculated-)
+                  -2264	2aa1	// ≤ -> ⪡	// LESS-THAN OR EQUAL TO	-> DOUBLE NESTED LESS-THAN [Common; Supplemental Mathematical Operators; 3.2] (via VisLr=US-Base ⇒ <pseudo-manual-whiten>)
+                  -2265	2aa2	// ≥ -> ⪢	// GREATER-THAN OR EQUAL TO	-> DOUBLE NESTED GREATER-THAN [Common; Supplemental Mathematical Operators; 3.2] (via VisLr=US-Base ⇒ <pseudo-manual-whiten>)
+                  +2264	2a7d	// ≤ -> ⩽	// LESS-THAN OR EQUAL TO	-> LESS-THAN OR SLANTED EQUAL TO [Common; Supplemental Mathematical Operators; 3.2] (via VisLr=USLatin-AltGr ⇒ <any-calculated-)
+                  +2265	2a7e	// ≥ -> ⩾	// GREATER-THAN OR EQUAL TO	-> GREATER-THAN OR SLANTED EQUAL TO [Common; Supplemental Mathematical Operators; 3.2] (via VisLr=USLatin-AltGr ⇒ <any-calculated-)

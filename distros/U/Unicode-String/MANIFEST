@@ -1,0 +1,15 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+String.pm
+String.xs
+lib/Unicode/CharName.pm
+t/byteswap.t
+t/charname.t
+t/encoding.t
+t/ord.t
+t/op.t
+t/stringify.t
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

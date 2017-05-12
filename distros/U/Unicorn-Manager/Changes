@@ -1,0 +1,15 @@
+Revision history for Unicorn
+
+0.01    2010/10/14
+        First working implementation of the basic start-stop-restart interface.
+
+0.02    2011/02/03
+        Actions start, stop, restart, add_worker and rm_worker confirmed
+        working. Fixed bugs and created a working Makefile.PL
+
+0.03    To be documented..
+
+
+0.04    2011/10/07
+        switched to Module::Build
+        added Version.pm

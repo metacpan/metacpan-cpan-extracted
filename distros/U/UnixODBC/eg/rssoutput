@@ -1,0 +1,417 @@
+#!/usr/bin/perl
+
+# $Id: rssoutput,v 1.12 2008-01-21 09:16:56 kiesling Exp $
+
+$VERSION=0.4;
+
+use UnixODBC qw(:all);
+use UnixODBC::RSS;
+use Getopt::Long;
+
+# ODBC Handles
+
+my $env;
+my $cnh;
+my $sth;
+
+# Function Return Value
+
+# RSS object
+
+my $rss = new UnixODBC::RSS;
+
+my $r;
+
+# Data Buffers and Lengths
+my $buf;
+my $buflen = $SQL_MAX_MESSAGE_LENGTH;   # Maximum length of parameter data.
+my $rlen;                               # Actual length of returned data.
+
+
+## 
+## Filled in by GetOptions.
+##
+my $DSN = '';
+my $UserName = '';
+my $PassWord = '';
+my $Query='';
+my $ChannelFile = '';
+my $ContentFile = '';
+my $ImageFile = '';
+my $TextInputFile = '';
+my $SynFile = '';
+
+# Help Text
+
+my $usage=<<EOH;
+Usage: rssoutput [--help] | [--user=<username>] [--password=<password>] --dsn=<DSN> --query=<sqlquery> --channel=<channel_info_file> --content=<content_info_file> [--image=<image_resource_file>] [--syn=<syn_resource_file>] [--textinput=<textinput_resource_file>]
+  --help       Print this help and exit.
+  --dsn        Data source name.
+  --user       DBMS login name.
+  --password   DBMS login password.
+  --query      SQL query.
+  --channel    File containing channel information.
+  --content    File containing content information.
+  --image      File containing channel image resource information.
+  --syn        File containing Syn resources.
+  --textinput  File containing channel textinput resouce information.
+EOH
+
+# Get the DSN and login data from the command line.
+
+GetOptions ('help' => \$help,
+	    'dsn=s' => \$DSN,
+	    'user=s' => \$UserName,
+	    'password=s' => \$PassWord,
+            'query=s' => \$Query,
+	    'channel=s' => \$ChannelFile,
+	    'content=s' => \$ContentFile,
+	    'imagefile=s' => \$ImageFile,
+	    'syn=s' => \$SynFile,
+	    'textinput=s' => \$TextInputFile);
+  
+
+# If necessary print the help message and exit.
+
+if ($help || 
+    (! length ($DSN) || ! length ($Query) || ! length ($ChannelFile) || 
+     ! length ($ContentFile))){
+    print STDERR $usage;
+    exit 0;
+}
+
+# Get resource descriptions
+
+my ($channeldesc, $contentdesc, $imagedesc, $textinputdesc, $syndesc);
+
+if (length ($ChannelFile)) {
+    if (-f $ChannelFile) {
+	$channeldesc = do $ChannelFile;
+    } else {
+	print "rssoutput: channel description $ChannelFile: not found. \n";
+	exit 1;
+    }
+    $rss -> Channel ($channeldesc);
+}
+
+if (length ($ContentFile)) {
+    if (-f $ContentFile) {
+	$contentdesc = do $ContentFile;
+    } else {
+	print "rssoutput: Content description $ContentFile: not found. \n";
+	exit 1;
+    }
+    $rss -> ItemColumns ($contentdesc);
+}
+
+if (length ($ImageFile)) {
+    if (-f $ImageFile) {
+	$imagedesc = do $ImageFile;
+    } else {
+	print "rssoutput: Image description $ImageFile: not found. \n";
+	exit 1;
+    }
+    $rss -> ChannelImage ($imagedesc);
+}
+
+if (length ($TextInputFile)) {
+    if (-f $TextInputFile) {
+	$textinputdesc = do $TextInputFile;
+    } else {
+	print "rssoutput: TextInput description $TextInputFile: not found. \n";
+	exit 1;
+    }
+    $rss -> TextInput ($textinputdesc);
+}
+
+if (length ($SynFile)) {
+    if (-f $SynFile) {
+	$syndesc = do $SynFile;
+	$rss -> Syn ($syndesc);
+    } else {
+	print "rssoutput: Syn resource $SynFile not found. \n";
+	exit 1;
+    }
+}
+
+# Fields defined in SQLTables result set.
+
+my ($table_cat, $table_schem, $table_name, $table_type, $remarks);
+
+# Allocate Environment Handle.
+
+$r = SQLAllocHandle ($SQL_HANDLE_ENV, $SQL_NULL_HANDLE, $evh);
+
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    print "SQLAllocHandle evh: ";
+    getdiagrec ($SQL_HANDLE_ENV, $evh);
+    exit 1;
+}
+
+# Set the ODBC Version
+
+$r = SQLSetEnvAttr($evh, $SQL_ATTR_ODBC_VERSION, $SQL_OV_ODBC2, 0);
+
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    &getdiagrec ($SQL_HANDLE_ENV, $evh);
+    exit 1;
+}
+
+# Allocate a connection handle.
+
+$r = SQLAllocHandle ($SQL_HANDLE_DBC, $evh, $cnh);
+
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    &getdiagrec ($SQL_HANDLE_ENV, $evh);
+    exit 1;
+}
+
+# Connect to the DSN given on the command line.
+
+$r = SQLConnect ($cnh, $DSN, $SQL_NTS,
+		 $UserName, $SQL_NTS,
+		 $PassWord, $SQL_NTS);
+
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    &getdiagrec ($SQL_HANDLE_DBC, $cnh);
+    exit 1;
+}
+
+# Allocate a statement handle.
+
+$r = SQLAllocHandle ($SQL_HANDLE_STMT, $cnh, $sth);
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    &getdiagrec ($SQL_HANDLE_DBC, $cnh);
+    exit 1;
+}
+
+$r = SQLPrepare ($sth, $Query, length ($Query));
+
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    getdiagrec ($SQL_HANDLE_STMT, $sth);
+    print "ODBC Error $r: $buf\n";
+    exit 1;
+}
+
+$r = SQLExecute ($sth);
+
+my $ncols;
+
+$r = SQLNumResultCols ($sth,$ncols);
+
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    &getdiagrec ($SQL_HANDLE_STMT, $sth);
+    exit 1;
+}
+
+#if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+#    getdiagrec ($SQL_HANDLE_STMT, $sth);
+#    exit 1;
+#}
+
+my ($col, $buf, $rfetch, $rget, $colarrayref, @rowarray, $rlen, $n);
+
+my $colheadref = new_array_ref ();
+
+# Get column headings
+
+for ($col = 1; $col <= $ncols; $col++) {
+    $r = SQLColAttribute ($sth, $col, $SQL_COLUMN_NAME, $buf, 
+			  $SQL_MAX_MESSAGE_LENGTH, $rlen, $n);
+    if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+	getdiagrec ($SQL_HANDLE_STMT, $sth);
+	exit 1;
+    }
+    $$colheadref[$col - 1] = $buf;
+}
+
+$rss -> ColumnHeadings ($colheadref);
+
+# Get column data
+
+while (1) {
+
+    $rfetch = SQLFetch ($sth);
+
+    last if $rfetch == $SQL_NO_DATA;
+
+    $colarrayref = new_array_ref ();
+
+    for ( $col = 1; $col <= $ncols; $col++) {
+	$rget = SQLGetData ($sth, $col, $SQL_CHAR, $buf, 
+			 $SQL_MAX_MESSAGE_LENGTH, $rlen);
+	if ($rget == $SQL_ERROR) {
+	    getdiagrec ($SQL_HANDLE_STMT, $sth);
+	}
+	$$colarrayref[$col - 1] = $buf;
+    } # for 
+    push @rowarray, ($colarrayref);
+}
+
+$rss -> Output (\@rowarray, *STDOUT);
+
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    &getdiagrec ($SQL_HANDLE_STMT, $sth);
+    exit 1;
+}
+
+# Clean up.  Disconnect from DSN and de-allocate statement, 
+# connection, and environment handles.
+
+$r = SQLFreeHandle ($SQL_HANDLE_STMT, $sth);
+
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    getdiagrec ($SQL_HANDLE_STMT, $sth);
+    exit 1;
+}
+
+$r = SQLDisconnect ($cnh);
+
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    getdiagrec ($SQL_HANDLE_DBC, $cnh);
+    exit 1;
+}
+
+$r = SQLFreeConnect ($cnh);
+
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    getdiagrec ($SQL_HANDLE_DBC, $cnh);
+    exit 1;
+}
+
+$r = SQLFreeHandle ($SQL_HANDLE_ENV, $evh);
+
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    getdiagrec ($SQL_HANDLE_ENV, $evh);
+    exit 1;
+}
+
+# Subroutine to print a SQL diagnostic record.
+
+sub getdiagrec {
+    my ($handle_type, $handle) = @_;
+    my ($sqlstate, $native, $message_text, $mlen);
+    my $diagrecno = 1;
+    print 'SQLGetDiagRec: ';
+    $r = SQLGetDiagRec ($handle_type, $handle, $diagrecno, 
+			$sqlstate, $native, $buf, $buflen,
+			$rlen);
+    if ($r == $SQL_NO_DATA) { 
+	print STDERR "result \= SQL_NO_DATA\n";
+    } elsif (($r == $SQL_SUCCESS_WITH_INFO) 
+	     || ($r == $SQL_SUCCESS)) { 
+	print STDERR "$buf\n";
+    } else { 
+	print STDERR "sqlresult = $r\n";
+    }
+
+    return $r;
+}
+
+sub new_array_ref { my @a; return \@a; }
+
+=head1 NAME
+
+rssoutput - Format UnixODBC result set as RSS version 1.0 RDF file.
+
+=head1 SYNOPSIS
+
+  rssoutput [--help] | [--user=<username>] [--password=<password>] 
+  --dsn=<DSN> --query=<SQLQuery> --channel=<channel_info_file>
+  --content=<content_info_file>   [--image=<image_resource_file>]
+  [--textinput=<texintput_resource_file>] [--syn=<syn_resource_file>]
+
+
+=head1 OPTIONS
+
+=head2 --help
+
+Print help message and exit.
+
+=head2 --dsn
+
+Name of the data source to query.
+
+=head2 --user
+
+User's DSN login name.
+
+=head2 --password
+
+User's DSN login password.
+
+=head2 --query
+
+Valid SQL query. 
+
+=head2 --channel
+
+A file that contains information about the RSS channel, as an
+anonymous hash.  A sample channel description is shown here.
+
+  {
+    'title' => 'Sample Feed',
+    'description' => 'Sample Feed for UnixODBC::RSS.pm',
+    'link' => 'http://www.yourserver.yourdomain.org/feed.cgi'
+  }
+
+=head2 --content
+
+A file that contains information about which column of the result set
+provides content for an item member, as an anonymous hash.  Each
+key-value pair contains, respectively, the name of a result set column
+and the name of an item member tag: <title>, <description>, <name>,
+<link>.
+
+  {  
+    'name' => 'title',
+    'short_description' => 'description',
+    'author' => 'name',
+    'url' => 'link'
+  }
+
+=head2 --image
+
+Channel image resource information provided in the file that is the
+argument's parameter should have the form:
+
+  {
+	'title' => 'Test Image',
+	'url' => 'http://owl/icons/ball.red.gif'
+  }
+
+=head2 --syn
+
+Optional Syn resource description in the file given as a parameter.
+
+ {'updatePeriod' => 'daily',
+  'updateFrequency' => 1,
+  'updateBase' => '2000-01-01T12:00+00.00'
+ }
+
+=head2 --textinput
+
+Channel <textinput> resource information in the file given as a parameter.
+
+  {
+    'title' => 'Test TextInput',
+    'description' => 'This is a test text input',
+    'name' => 'Test Input',
+    'link' => 'http://hostname/textinput.html'
+  }
+
+
+=head1 VERSION INFORMATION AND CREDITS
+
+Version 0.4
+
+Copyright © 2004, 2008 Robert Kiesling, rkies@cpan.org.
+
+Licensed under the same terms as Perl.  Refer to the file, "Artistic,"
+for details.
+
+=head1 SEE ALSO
+
+perl(1), UnixODBC(3), UnixODBC::RSS(3)
+
+=cut

@@ -1,0 +1,358 @@
+=head1 NAME
+
+Unix::Mgt - lightweight Unix management tools
+
+=head1 SYNOPSIS
+
+ # get user account
+ $user = Unix::Mgt::User->get('fred');
+
+ # display some info
+ print 'uid: ', $user->uid, "\n";
+ print join(', ', $user->groups()), "\n";
+
+ # set some properties
+ $user->gid('websters');
+ $user->shell('/bin/bash');
+ $user->add_to_group('postgres');
+
+ # create user account
+ $user = Unix::Mgt::User->create('vera');
+
+ # get user account, creating it if necessary
+ $user = Unix::Mgt::User->ensure('molly');
+
+ # get group
+ $group = Unix::Mgt::Group->get('www-data');
+
+ # display some info
+ print 'gid: ', $group->gid, "\n";
+ print join(', ', $group->members()), "\n";
+
+ # add a member
+ $group->add_member('tucker');
+
+=head1 DESCRIPTION
+
+Unix::Mgt provides simple object-oriented tools for managing your Unixish
+system.  Currently this module provides tools for managing users and groups.
+Other tools may follow as they evolve.
+
+Unix::Mgt does not directly manipulate any of the system files such as
+C</etc/passwd>. This module uses Perl's built-in Unix functions such as
+C<getgrent> to get information, and Unix's built-in programs such as
+C<adduser>.
+
+=head2 Early release
+
+In the spirit of "release early, release often", I'm releasing this version
+of Unix::Mgt before it has all the features that might be expected. This
+version does not include methods for removing users from groups, renaming
+users or groups, or several other methods.
+
+=head1 Unix::Mgt::User
+
+A Unix::Mgt::User object represents a user in the Unix system. The object
+allows you to get and set information about the user account. A user object
+is created in one of three ways: C<get>, C<create>, or C<ensure>. The C<new>
+method is an alias for C<get>.
+
+Unix::Mgt::User objects stringify to the account's name. For example, the
+following code would output C<miko>.
+
+ $user = Unix::Mgt::User->get('miko');
+ print $user, "\n";
+
+=head2 get
+
+Unix::Mgt::User->get() retrieves user account information using C<getpwnam> or
+C<getpwuid>.  The single param for this method is either the name or the uid of
+the user.
+
+ $user = Unix::Mgt::User->get('vera');
+ $user = Unix::Mgt::User->get('1010');
+
+If the user is not found then the C<do-not-have-user> error id is set in
+C<$Unix::Mgt::err_id> and undef is returned.
+
+=head2 create
+
+Unix::Mgt::User->create() creates a user account.  The required param for this
+method is the name for the new account.
+
+ $user = Unix::Mgt::User->create('vera');
+
+If the C<system> param is true, then the account is created as a system user,
+like this:
+
+ $user = Unix::Mgt::User->create('lanny', system=>1);
+
+create() uses the Unix C<adduser> program.
+
+=head2 ensure
+
+Unix::Mgt::User->ensure() gets a user account if it already exists, and
+creates the account if it does not. For example, the following lines ensures
+the C<molly> account:
+
+ $user = Unix::Mgt::User->ensure('molly');
+
+=head2 name
+
+Returns the name of the user account. Currently this method cannot be used to
+set the account name.
+
+ print $user->name(), "\n";
+
+=head2 uid
+
+Returns the user's user id (uid).
+
+ print $user->uid(), "\n";
+
+=head2 passwd
+
+Returns the password field from C<getpwname()>.  This method will not actually
+return a password, it will probably just return C<*>.
+
+ print $user->passwd(), "\n"; # probably outputs "*"
+
+=head2 gid
+
+Sets/gets the gid of the user's primary group. Called without params, it
+returns the user's gid:
+
+ print $user->gid(), "\n";
+
+Called with a single param, gid() sets, then returns the user's primary
+group id:
+
+ print $user->gid('1010'), "\n";
+
+If you want to get a Unix::Mgt::Group object representing the user's primary
+group, use $user->group().
+
+=head2 dir
+
+Sets/gets the user's home directory. Called without params, it returns the
+directory name:
+
+ print $user->dir(), "\n";
+
+Called with a single param, dir() sets, then returns the user's home directory:
+
+ print $user->dir('/tmp'), "\n";
+
+=head2 shell
+
+Sets/gets the user's default command line shell. Called without params, it
+returns the shell name:
+
+ print $user->shell(), "\n";
+
+Called with a single param, shell() sets, then returns the user's shell:
+
+ print $user->shell('/bin/sh'), "\n";
+
+=head2 group
+
+Sets/gets the user's primary group. When called without any params, C<group()>
+returns a Unix::Mgt::Group object representing the user's primary group:
+
+ $group = $user->group();
+
+When called with a single param, C<group()> sets the user's primary group. The
+param can be either the group's name or its gid:
+
+ $user->group('video');
+ $user->group(44);
+
+=head2 secondary_groups
+
+C<secondary_groups()> returns an array of the user's secondary groups. Each
+element in the array is a Unix::Mgt::Group object.
+
+ @groups = $user->secondary_groups();
+
+=head2 groups
+
+C<groups()> returns an array of all of the groups the user is a member of. The
+first element in the array will be the user's primary group.
+
+ @groups = $user->groups();
+
+=head2 add_to_group
+
+C<add_to_group()> adds the user to a group.  The group will be one of the user's
+secondary groups, not the primary group.
+
+ $user->add_to_group('video');
+
+=head2 remove
+
+C<remove> removes the user account from the system. C<remove> does not take any
+parameters.
+
+ $user->remove();
+
+=head1 Unix::Mgt::Group
+
+A Unix::Mgt::Group object represents a group in the Unix system. The object
+allows you to get and set information about the group. A group object is
+created in one of three ways: C<get>, C<create>, or C<ensure>. The C<new>
+method is an alias for C<get>.
+
+Unix::Mgt::Group objects stringify to the groups's name. For example, the
+following code would output C<video>.
+
+ $group = Unix::Mgt::Group->get('video');
+ print $group, "\n";
+
+=head2 get
+
+Unix::Mgt::Group->get() retrieves group information using C<getgrnam> or
+C<getgrgid>.  The single param for this method is either the name or the gid of
+the group.
+
+ $group = Unix::Mgt::Group->get('video');
+ $group = Unix::Mgt::Group->get('44');
+
+If the group is not found then the C<do-not-have-group> error id is set in
+C<$Unix::Mgt::err_id> and undef is returned.
+
+=head2 create
+
+Unix::Mgt::Group->create() creates a group.  The required param for this method
+is the name for the new group.
+
+ $group = Unix::Mgt::Group->create('websters');
+
+create() uses the Unix C<groupadd> program.
+
+=head2 ensure
+
+Unix::Mgt::Group->ensure() gets a group if it already exists, and creates the
+group if it does not. For example, the following lines ensures
+the C<wbesters> group:
+
+ $group = Unix::Mgt::User->ensure('wbesters');
+
+=head2 name
+
+Returns the name of the group. Currently this method cannot be used to set the
+group name.
+
+ print $group->name(), "\n";
+
+=head2 gid
+
+Returns the groups's group id (gid).
+
+ print $group->gid(), "\n";
+
+=head2 members
+
+C<members()> returns an array of all members of the group. Both users for whom
+this is the primary group, and users for whom this is a secondary group are
+returned.
+
+ @members = $group->members();
+
+The elements in the array are Unix::Mgt::User objects.
+
+=head2 primary_members
+
+C<primary_members()> returns an array of users for whom this is the primary
+group.
+
+ @members = $group->primary_members();
+
+The elements in the returned array are Unix::Mgt::User objects.
+
+=head2 secondary_members
+
+C<secondary_members()> returns an array of users for whom this is a secondary group.
+
+ @members = $group->secondary_members();
+
+The elements in the returned array are Unix::Mgt::User objects.
+
+=head2 add_member
+
+C<add_member()> adds a user to the group as a secondary group.  The single
+param can be a user name, uid, or Unix::Mgt::User object.
+
+ $group->add_member('miko');
+
+If the user is already a member of the group then nothing is done and no error
+is set.
+
+=head2 remove
+
+C<remove> removes the group from the system. C<remove> does not take any
+parameters.
+
+ $group->remove();
+
+If any users have the group as a primary group then this method will fail.
+
+=head1 SEE ALSO
+
+L<Passwd::Unix|http://search.cpan.org/~strzelec/Passwd-Unix/> and
+L<Unix::Passwd::File|http://search.cpan.org/~sharyanto/Unix-Passwd-File/>
+provide similar functionality.
+
+=head1 TERMS AND CONDITIONS
+
+Copyright (c) 2014 by Miko O'Sullivan. All rights reserved. This program is
+free software; you can redistribute it and/or modify it under the same terms
+as Perl itself. This software comes with no warranty of any kind.
+
+=head1 AUTHOR
+
+Miko O'Sullivan C<miko@idocs.com>
+
+=head1 TO DO
+
+This is an early release of Unix::Mgt. It does not include methods for
+deleting users, removing them from groups, or other deletion oriented
+objectives.
+
+Please feel free to contribute code for these purposes.
+
+=head1 HISTORY
+
+=over 4
+
+=item Version 0.10 December 30, 2014
+
+Initial release
+
+=item Version 0.11 December 31, 2014
+
+Changed addgroup to groupadd.
+
+Added tests for existence of adduser, usermod, and groupadd.
+
+=item Version 0.12 January 3, 2015
+
+Fixed some POD formatting issues.
+
+Revised tests to include test names.
+
+=item Version 0.13 January 4, 2015
+
+Added $user->remove() and $group->remove().
+
+Added slots where BSD-style commands will go. Currently, methods for creating,
+modifying, or deleting users or group will fail on BSD.
+
+=item Version 0.14 February 2, 2015
+
+Added support for BSD. The support is poorly tested because I don't have a BSD
+system. Any feedback is appreciated.
+
+Added Unix::Mgt::User::new and Unix::Mgt::Group::new as aliases to get().
+
+=back
+

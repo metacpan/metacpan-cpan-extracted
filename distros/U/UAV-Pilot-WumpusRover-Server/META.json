@@ -1,0 +1,57 @@
+{
+   "abstract" : "$in_min == 0>, which avoids a divide-by-zero error. This isn't correct behavior and will be fixed Soon(tm). The output min/max settings don't have this problem.",
+   "author" : [
+      "Timm Murray <tmurray@wumpus-cave.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "UAV-Pilot-WumpusRover-Server",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Device::WebIO" : "0.008",
+            "GStreamer1" : "0.003",
+            "Getopt::Long" : "0"
+         },
+         "requires" : {
+            "AnyEvent" : "0",
+            "HiPi" : "0",
+            "Moose" : "0",
+            "Test::More" : "0",
+            "Throwable" : "0",
+            "Tie::IxHash" : "0",
+            "UAV::Pilot" : "0.8",
+            "UAV::Pilot::WumpusRover" : "0.2",
+            "perl" : "v5.14.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Pod" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://www.wumpus-cave.net",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/frezik/UAV-Pilot-WumpusRover-Server.git",
+         "web" : "https://github.com/frezik/UAV-Pilot-WumpusRover-Server"
+      }
+   },
+   "version" : "0.3"
+}
+

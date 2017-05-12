@@ -1,0 +1,31 @@
+
+CuiFinder User Options: 
+   --config option set
+
+
+UMLS-Interface Configuration Information
+  Sources (SAB):
+    SNOMEDCT
+  Relations (REL):
+    CHD
+    PAR
+  Database: 
+    umls (MMSYS-2010AB-20101022)
+
+
+
+
+max_depth : 0
+avg_depth : 1
+sd_depth  : 0
+paths_to_root : 0
+sources : SNOMEDCT
+max_branch : 0
+avg_branch : 0
+leaf_count : 1
+node_count : 0
+avg_leaf_depth : 1
+avg_node_depth : 0
+mean_leaf_depth : 0
+mean_node_depth : 0
+root : C0175895

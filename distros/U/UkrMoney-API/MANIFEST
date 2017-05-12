@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/UkrMoney-API.t
+lib/UkrMoney/API.pm

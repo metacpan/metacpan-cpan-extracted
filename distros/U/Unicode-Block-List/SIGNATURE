@@ -1,0 +1,50 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 34651021579a36fd392afc610a899554ca578160 Changes
+SHA1 d32d1b957eb6d99bd7b76fd8c33dac3bed505f96 LICENSE
+SHA1 46bff6c314186869685988fd3828de8a9cbdf9c4 List.pm
+SHA1 2806e5ab44f4cc86b76e5d026ccb620e64dd8eb8 MANIFEST
+SHA1 6b0aa1870225225148beadbab800d887bae1abdf META.yml
+SHA1 0690cdf36cec05b01c89a8f351b869296979590c Makefile.PL
+SHA1 2a24fe447dc1f2573a1f64480204e826901bd7f9 README
+SHA1 a4315225f289daf9ccb0acbfb36bc4ebfd4195b8 examples/ex1.pl
+SHA1 d83f41122837e7a7e7112d4a66a091e1012502b5 examples/ex2.pl
+SHA1 4f7982f7e554df23debce735ab343d88d7355140 inc/Module/Install.pm
+SHA1 c68c85ca62ae30d83f633975cd9af2a0789f59e0 inc/Module/Install/Base.pm
+SHA1 4797fd314e2653a427e725104704b0320993ba8c inc/Module/Install/Can.pm
+SHA1 b771d93af2bfc41273f48fa36082bf1bd6f21dbe inc/Module/Install/Fetch.pm
+SHA1 f4f3258a505a432a58cbcdc1fd030ef5e8e90985 inc/Module/Install/Makefile.pm
+SHA1 100a0dd8572f0b40373350fdd6c0a6f035d9dc39 inc/Module/Install/Metadata.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 4490fed943f4e556db9fd054b7ec8765ca417f7d inc/Module/Install/Win32.pm
+SHA1 8464ddf690b9f7036a0974ff172ec0ced2f6a329 inc/Module/Install/WriteAll.pm
+SHA1 417aefe8d73a0cfd42e61636b3c247b00f94eb73 t/Unicode-Block-List/00-use.t
+SHA1 16beef97c41af9ff0d0b723a0916b8725e43c50a t/Unicode-Block-List/01-version.t
+SHA1 b505936d75fcd057850c80268f38ecd9f874db74 t/Unicode-Block-List/02-pod_coverage.t
+SHA1 35265999e637801999731ac0ac3a267dba42af3d t/Unicode-Block-List/03-pod.t
+SHA1 36848cb4276b39155e9924d3a89dca47b002ac1a t/Unicode-Block-List/04-new.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQEcBAEBAgAGBQJT/mY2AAoJEAwa+cf4dLBaymkH/RWsKQWF7WjIFHiTsAzpam4Z
+EG5HUR91DrlBcBEIi/i7amGiyLYb7oRaZAfcy4Gm5s6p26yzMB51XXIfAFHRTLRO
+pXikAO4IwoKqjqO/zy5nmRYy6L+bFUT5/lh9iwF0rTTF8eTs8ADbdse1cKKBSvlC
+AOCEc0eYgesBfSAi/WBivrCTeVB/DoUDOeYbupseZE/Qi5iSwlwH+TAPdSidupP5
+lQP3mB5oaXAcdkFncYshLb/3LNSG+2J2f2JFL3cMAuiZabTsk8+01XiS1XL+wkNY
+AN4tSSL4h7gxQyIFb/7zqWp+kmPJ9SZNMKUdb7AJgtkvto0iAM/1BuBu1ORRAQE=
+=KreR
+-----END PGP SIGNATURE-----

@@ -1,0 +1,8 @@
+BC75XLT.pm
+BC75XLT.pod
+Makefile.PL
+MANIFEST			This list of files
+t/002_syntax.t
+Changes
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

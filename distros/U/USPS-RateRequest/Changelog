@@ -1,0 +1,21 @@
+version 1.0004 - March 9, 2016
+ * Added XML::DOM to prereqs.
+
+version 1.0003 - February 29, 2016
+ * Fixed a problem with APO/FPO/DPO sanitation.
+
+version 1.0002 - July 2, 2015
+ * Fixed international rate request for non-flat rate USPS Priority to Canada per the changes documented here: https://www.usps.com/business/web-tools-apis/2015-may-webtools-release-notes.rtf
+
+version 1.0001 - June 3, 2015
+ * Added sanitization of military mailing labels, because there aren't specific military shipping boxes.
+
+version 1.0000 - September 14, 2014
+ * Major API change
+
+version 0.0101 - September 5, 2014
+ * Added missing dependency for XML::Simple.
+
+version 0.0100 - June 23, 2014
+ * First public release.
+

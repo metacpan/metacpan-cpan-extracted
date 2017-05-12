@@ -1,0 +1,89 @@
+{
+   "abstract" : "SDL Extensions for UAV::Pilot",
+   "author" : [
+      "Timm Murray <tmurray@wumpus-cave.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "UAV-Pilot-SDL",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "Log::Log4perl" : "0",
+            "Moose" : "0",
+            "MooseX::Event" : "0",
+            "SDL" : "0",
+            "Test::More" : "0",
+            "Time::HiRes" : "0",
+            "UAV::Pilot" : "1.1",
+            "namespace::autoclean" : "0",
+            "perl" : "v5.14.0"
+         }
+      }
+   },
+   "provides" : {
+      "MockSDL" : {
+         "file" : "lib/UAV/Pilot/SDL/Window/Mock.pm"
+      },
+      "UAV::Pilot::SDL" : {
+         "file" : "lib/UAV/Pilot/SDL.pm",
+         "version" : "0.3"
+      },
+      "UAV::Pilot::SDL::Events" : {
+         "file" : "lib/UAV/Pilot/SDL/Events.pm"
+      },
+      "UAV::Pilot::SDL::Joystick" : {
+         "file" : "lib/UAV/Pilot/SDL/Joystick.pm"
+      },
+      "UAV::Pilot::SDL::NavFeeder" : {
+         "file" : "lib/UAV/Pilot/SDL/NavFeeder.pm"
+      },
+      "UAV::Pilot::SDL::Video" : {
+         "file" : "lib/UAV/Pilot/SDL/Video.pm"
+      },
+      "UAV::Pilot::SDL::VideoOverlay" : {
+         "file" : "lib/UAV/Pilot/SDL/VideoOverlay.pm"
+      },
+      "UAV::Pilot::SDL::VideoOverlay::Reticle" : {
+         "file" : "lib/UAV/Pilot/SDL/VideoOverlay/Reticle.pm"
+      },
+      "UAV::Pilot::SDL::Window" : {
+         "file" : "lib/UAV/Pilot/SDL/Window.pm"
+      },
+      "UAV::Pilot::SDL::Window::Mock" : {
+         "file" : "lib/UAV/Pilot/SDL/Window/Mock.pm"
+      },
+      "UAV::Pilot::SDL::WindowEventHandler" : {
+         "file" : "lib/UAV/Pilot/SDL/WindowEventHandler.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/BSD-3-Clause"
+      ],
+      "repository" : {
+         "url" : "https://github.com/frezik/UAV-Pilot-SDL"
+      }
+   },
+   "version" : "0.3",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

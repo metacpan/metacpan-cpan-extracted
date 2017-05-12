@@ -1,0 +1,206 @@
+package Unixish; # just to make PodWeaver happy
+
+# VERSION
+
+1;
+# ABSTRACT: Data transformation framework, inspired by Unix toolbox philosophy
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Unixish - Data transformation framework, inspired by Unix toolbox philosophy
+
+=head1 VERSION
+
+This document describes version 1.0.5 of Unixish (from Perl distribution Unixish), released on 2015-09-06.
+
+=head1 SPECIFICATION VERSION
+
+ 1.0
+
+=head1 ABSTRACT
+
+This document specifies B<Unixish>, Perl framework for data processing
+(transformation, conversion, whatever) using the tried-and-true Unix toolbox
+philosophy. For the implementation, see L<Data::Unixish>.
+
+=head1 STATUS
+
+Early draft. The 1.0 series does not guarantee full backward compatibility
+between revisions, so caveat implementor. However, major incompatibility will
+bump the version to 1.1.
+
+=head1 PHILOSOPHY
+
+The Unix philosophy says a program should do only one thing and do it well.
+Problem is solved by sewing or chaining together a sequence of small,
+specialized programs. From Douglas McIlroy, the original developer of Unix
+pipelines:
+
+ This is the Unix philosophy: Write programs that do one thing and do it well.
+ Write programs to work together. Write programs to handle text streams, because
+ that is a universal interface.
+
+In Unixish, programs translate to functions. Unixish is essentially a set of
+guidelines and tools on how to write such functions.
+
+The goal of the framework is to let users easily create functions that can be
+used as normal Perl functions operating on arrays and streams (filehandles), as
+well as functions that can become Unix command-line utilities.
+
+=head1 GLOSSARY
+
+L<Data::Unixish> is the Perl implementation.
+
+B<dux> is a short notation for Data::Unixish.
+
+=head1 GUIDELINES
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
+"SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
+interpreted as described in RFC 2119.
+
+=over 4
+
+=item * Function should accept a hash argument C<%args>
+
+This future-proofs the function when more and more arguments are added.
+
+=item * Arguments should be described in Rinci metadata
+
+See L<Rinci> and L<Rinci::function> for more details.
+
+=item * There are some standard arguments: in, out
+
+B<in> and B<out> are analogous to standard input and output streams, explained
+below.
+
+=item * Arguments should have good defaults
+
+=item * Input data is given in C<$args{in}>
+
+It is a "stream", usually actually a reference to array or a tied array.
+Function can iterate it as follows:
+
+ while (my ($index, $item) = each @{ $args{in} }) {
+     ...
+ }
+
+Function SHOULD NOT slurp it in memory like this, unless necessary:
+
+ # CAUTION!
+ for (@{ $args{in} }) {
+     ...
+ }
+
+Remember that in Perl 5 for() is not lazy, the stream might contain very large
+amount of data or is infinite.
+
+=item * Output should be written (appended) to C<$args{out}>
+
+It is a "stream", usually actually a reference to array or a tied array.
+Function can append output as follows:
+
+ while (my ($index, $item) = each @{ $args{in} }) {
+     ...
+     push @{ $args{out} }, $res;
+ }
+
+Note that assigning an array directly doesn't work the way you think:
+
+ # DOESN'T WORK
+ $args{out} = [1, 2, 3];
+
+=item * Error messages can be logged to Log::Any
+
+Standard format for error message will be specified in the future.
+
+=item * When processing, undef/invalid/non-applicable value should generally be skipped (passed unchanged)
+
+For example, the B<date> dux function accepts either an integer (assumed as Unix
+timestamp) or a L<DateTime> object. Other values like undef, an empty string, or
+other kinds of unsupported objects should not be processed and just passed to
+the output stream unprocessed. A warning can be logged if needed.
+
+=back
+
+A well-written dux function can be readily transformed into a usual Unix
+command-line utility.
+
+=head1 NAMESPACE ORGANIZATION
+
+B<Unixish> is the specification.
+
+B<Data::Unixish> is the implementation.
+
+Each dux function should be written in all-lowercase name, put under
+B<Data::Unixish::FUNCTION_NAME> package. The function itself is put in that
+package with the same name. For example the L<Data::Unixish::date> package
+contains the Data::Unixish::date::date function.
+
+A further subpackaging is allowed, for example:
+B<Data::Unixish::English::count_syllables>.
+
+L<App::dux> is a utility to access dux functions via the command-line.
+
+=head1 SEE ALSO
+
+L<Rinci> and L<Rinci::function>, another specification to leverage functions.
+
+L<Log::Any>.
+
+=head2 Similar projects on CPAN
+
+=over
+
+=item * L<Text::Pipe> (2007-now)
+
+Similarly inspired by Unix pipes, OO. I didn't find this project before I
+started Unixish.
+
+Some of the differences: Text::Pipe is, as the name suggests, more
+text-oriented. It was created to unify text/template processing. Unixish on the
+other hand focuses on functions that can accept streams/arrays.
+
+=item * B<Perl Power Tools> (1999-now)
+
+(Search for C<ppt> in CPAN).
+
+Actually not quite the same thing, but the end result is roughly the same for
+many text-oriented Unix utilities (like B<wc>, B<sum>, B<head>, B<tail>, etc).
+
+=back
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Unixish>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/sharyanto/perl-Unixish>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Unixish>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

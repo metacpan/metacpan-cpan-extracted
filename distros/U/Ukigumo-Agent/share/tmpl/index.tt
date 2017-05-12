@@ -1,0 +1,72 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset=utf8>
+    <title>Ukigumo-Agent</title>
+    <link href="[% uri_for('/static/bootstrap/css/bootstrap.min.css') %]" media="screen" rel="stylesheet" type="text/css">
+    <style>
+        .at-sign {
+            color: #ee1111;
+        }
+        section {
+            padding-top: 20px;
+        }
+        .container {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="pull-left">
+            <h1>Ukigumo Agent server</h1>
+            <p>This is ukigumo agent server.</p>
+        </div>
+        <img src="[% uri_for('/static/img/ukigumo-chan.png') %]" class="pull-right">
+
+        <div class="row">
+            <div class="span12">
+                <section>
+                <div class="page-header">
+                    <h2>Running jobs</h2>
+                </div>
+            [% FOR k IN children.keys() %]
+                <h3>[% children[k].job.repository %]<span class="at-sign">@</span>[% children[k].job.branch %]</h3>
+                <table class="table">
+                <tr><th>PID</th><td>[% k %]</td></tr>
+                <tr><th>Elapsed</th><td>[% duration(time() - children[k].start) %]</td></tr>
+                </table>
+            [% END %]
+                </section>
+
+                <section>
+                <div class="page-header">
+                    <h2>Waiting jobs</h2>
+                </div>
+                <ul>
+            [% FOR job IN job_queue %]
+                <li>[% job.repository %]<span class="at-sign">@</span>[% job.branch %]</li>
+            [% END %]
+                </ul>
+                </section>
+
+                <section>
+                    <div class="page-header">
+                        <h2>Server status</h2>
+                    </div>
+                    <table class="table">
+                        <tr><th>Server URL</th><td>[% server_url %]</td></tr>
+                        <tr><th>Max children</th><td>[% max_children %]</td></tr>
+                        <tr><th>Work dir</th><td>[% work_dir %]</td></tr>
+                        <tr><th>Timeout</th><td>[% IF timeout > 0 %][% timeout %]sec[% ELSE %]Not timeout[% END %]</td></tr>
+                        <tr><th>Ignore GitHub Tags</th><td>[% IF ignore_github_tags == 0 %]False[% ELSE %]True[% END %]</td></tr>
+                        <tr><th>Force Git URL</th><td>[% IF force_git_url == 0 %]False[% ELSE %]True[% END %]</td></tr>
+                        <tr><th>Cleanup Cycle</th><td>[% IF cleanup_cycle <= 0 %]Don't cleanup[% ELSE %][% cleanup_cycle %] day(s)[% END %]</td></tr>
+                    </table>
+                </section>
+
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,4 @@
+#!/bin/sh
+
+rm *.png *.dot *.tmp fast*.yml a.yml baz.yml t/me.dot t/ppi.png
+

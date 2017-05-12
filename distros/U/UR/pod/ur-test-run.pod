@@ -1,0 +1,193 @@
+
+
+=pod
+
+=head1 NAME
+
+ur test run - Run the test suite against the source tree.
+
+
+
+=head1 VERSION
+
+This document describes ur test run version 0.29.
+
+=head1 SYNOPSIS
+
+ur test run [--color] [--junit] [--list] [--lsf] [--recurse] [--callcount] [--cover=?] [--cover-cvs-changes] [--cover-svk-changes] [--cover-svn-changes] [--coverage] [--inc=?[,?]] [--jobs=?] [--long] [--lsf-params=?] [--noisy] [--perl-opts=?] [--run-as-lsf-helper=?] [--script-opts=?] [--time=?] [BARE-ARGS]
+
+cd MyNamespace
+ur test run --recurse                   # run all tests in the namespace
+ur test run                             # runs all tests in the t/ directory under pwd
+ur test run t/mytest1.t My/Class.t      # run specific tests
+ur test run -v -t --cover-svk-changes   # run tests to cover latest svk updates
+ur test run -I ../some/path/            # Adds ../some/path to perl's @INC through -I
+ur test run --junit                     # writes test output in junit's xml format (consumable by Hudson integration system)
+
+
+=head1 REQUIRED ARGUMENTS
+
+=over
+
+
+=item color  I<Boolean>
+
+Use TAP::Harness::Color to generate color output
+
+Default value 'false' (--nocolor) if not specified
+
+=item nocolor  I<Boolean>
+
+Make color 'false'
+
+=item junit  I<Boolean>
+
+Run all tests with junit style XML output. (requires TAP::Formatter::JUnit)
+
+=item nojunit  I<Boolean>
+
+Make junit 'false'
+
+=item list  I<Boolean>
+
+List the tests, but do not actually run them.
+
+=item nolist  I<Boolean>
+
+Make list 'false'
+
+=item lsf  I<Boolean>
+
+If true, tests will be submitted as jobs via bsub
+
+=item nolsf  I<Boolean>
+
+Make lsf 'false'
+
+=item recurse  I<Boolean>
+
+Run all .t files in the current directory, and in recursive subdirectories.
+
+=item norecurse  I<Boolean>
+
+Make recurse 'false'
+
+
+=back
+
+=head1 OPTIONAL ARGUMENTS
+
+=over
+
+
+=item callcount  I<Boolean>
+
+Count the number of calls to each subroutine/method
+
+=item nocallcount  I<Boolean>
+
+Make callcount 'false'
+
+=item cover  I<List>
+
+Cover only this(these) modules
+
+=item cover-cvs-changes  I<Boolean>
+
+Cover modules modified in cvs status
+
+=item nocover-cvs-changes  I<Boolean>
+
+Make cover-cvs-changes 'false'
+
+=item cover-svk-changes  I<Boolean>
+
+Cover modules modified in svk status
+
+=item nocover-svk-changes  I<Boolean>
+
+Make cover-svk-changes 'false'
+
+=item cover-svn-changes  I<Boolean>
+
+Cover modules modified in svn status
+
+=item nocover-svn-changes  I<Boolean>
+
+Make cover-svn-changes 'false'
+
+=item coverage  I<Boolean>
+
+Invoke Devel::Cover
+
+=item nocoverage  I<Boolean>
+
+Make coverage 'false'
+
+=item inc  I<String>
+
+Additional paths for @INC, alias for -I
+
+=item jobs  I<Number>
+
+How many tests to run in parallel
+
+Default value '1' if not specified
+
+=item long  I<Boolean>
+
+Run tests including those flagged as long
+
+=item nolong  I<Boolean>
+
+Make long 'false'
+
+=item lsf-params  I<String>
+
+Params passed to bsub while submitting jobs to lsf
+
+Default value '-q short -R select[type==LINUX64]' if not specified
+
+=item noisy  I<Boolean>
+
+doesn't redirect stdout
+
+=item nonoisy  I<Boolean>
+
+Make noisy 'false'
+
+=item perl-opts  I<String>
+
+Override options to the Perl interpreter when running the tests (-d:Profile, etc.)
+
+Default value '' if not specified
+
+=item run-as-lsf-helper  I<String>
+
+Used internally by the test harness
+
+=item script-opts  I<String>
+
+Override options to the test case when running the tests (--dump-sql --no-commit)
+
+Default value '' if not specified
+
+=item time  I<String>
+
+Write timelog sum to specified file
+
+=item BARE-ARGS
+
+(undocumented)
+
+
+=back
+
+=head1 DESCRIPTION:
+
+  This command is like "prove" or "make test", running the test suite for the current namespace.
+
+
+
+=cut
+

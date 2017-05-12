@@ -1,0 +1,41 @@
+=pod
+
+=head1 NAME
+
+UR::Manual - Short list of UR's documentation
+
+=head1 Manuals
+
+L<UR> - Short introduction
+
+L<UR::Manual::Overview> - UR from Ten Thousand Feet
+
+L<UR::Manual::Tutorial> - Getting started with UR
+
+L<UR::Manual::SchemaDesign> - A few things to keep in mind when designing a database schema
+
+L<UR::Manual::Presentation> - Slides for a presentation on UR
+
+L<UR::Manual::Cookbook> - Recepies for getting stuff working
+
+L<UR::Manual::Metadata> - UR's metadata system
+
+L<UR::Object::Type::Initializer> - Defining classes
+
+L<ur> - UR's command line tool
+
+=head1 Basic Entities
+
+L<UR::Object> - Pretty much everything is-a UR::Object
+
+L<UR::Object::Type> - Metadata class for Classes
+
+L<UR::Object::Property> - Metadata class for Properties
+
+L<UR::Namespace> - Manage packages and classes
+
+L<UR::Context> - Software transactions and More!
+
+L<UR::DataSource> - How and where to get data
+
+

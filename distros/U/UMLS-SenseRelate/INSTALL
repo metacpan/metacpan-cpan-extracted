@@ -1,0 +1,94 @@
+UMLS-SenseRelate
+TESTING PLATFORMS
+    UMLS-SenseRelate has been developed and tested on Linux and Solaris,
+    primarily using Perl and the C shell (csh).
+
+REQUIREMENTS
+    UMLS-SenseRelate REQUIRES that the following software be installed. More
+    details on how to obtain and install appear below.
+
+    --Programming Languages Perl (version 5.8.5 or better)
+
+    --CPAN modules UMLS::Interface UMLS::Similarity
+
+PROGGRAMMING LANGUAGES
+  Perl (version 5.8.5 or better)
+    Perl is freely available at:
+
+    <http://www.perl.org>
+
+    It is very likely that you will already have Perl installed if you are
+    using a Unix/Linux based system.
+
+CPAN MODULES
+  UMLS-Interface
+    Please see the UMLS-Interface documentation.
+
+  UMLS-Similarity
+    Please see the UMLS-Similarity documentation.
+
+INSTALLATION
+  UMLS::SenseRelate
+    If you have supervisor access, or have configured MCPAN for local
+    install, you can install via:
+
+     perl -MCPAN -e shell
+     > install UMLS-SenseRelate
+
+    If not, you can, "manually" install by downloading the *.tar.gz file,
+    unpacking, and executing the following commands.
+
+                    perl Makefile.PL PREFIX=/home/programs LIB=/home/lib
+                    make
+                    make test
+                    make install
+
+    Note that the PREFIX and LIB settings are just examples to help you
+    create a local install, if you do not have supervisor (su) access.
+
+    You must include /home/lib in your PERL5LIB environment variable to
+    access this module when running.
+
+    If you have the super-user access, then you can install UMLS-SenseRelate
+    into system directories via : perl Makefile.PL make make install make
+    clean
+
+    The exact location of where UMLS-SenseRelate will be installed depends
+    on your system configuration. A message will be printed out after 'make
+    install' telling your exactly where it was installed.
+
+  External Programs
+    To use the umls-senserelate-evaluation.pl program, you must install the
+    scorer2 program from the SemEval 2010 All Words Disambiguation Task. To
+    do this, there is an install.sh script in the External directory. This
+    script takes a install location as input and installs the scorer2
+    program in that location. For example:
+
+        install.sh /home/bridget/programs/bin
+
+    Please ensure that this path is in your PATH environment variable. For
+    example:
+
+          # in cshell
+          setenv PATH /home/bridget/programs/bin/:$PATH
+
+          # in bash
+          export PATH=/home/bridget/programs/bin/:$PATH
+
+        This can be added to your .cshrc or .bashrc file
+
+CONTACT US
+    If you have any trouble installing and using UMLS-Interface, please
+    contact us via the users mailing list :
+
+    umls-similarity@yahoogroups.com
+
+    You can join this group by going to:
+
+    <http://tech.groups.yahoo.com/group/umls-similarity/>
+
+    You may also contact us directly if you prefer :
+
+     Bridget T. McInnes: bthomson at cs.umn.edu
+     Ted Pedersen      : tpederse at d.umn.edu
+

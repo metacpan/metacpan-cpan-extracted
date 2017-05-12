@@ -1,0 +1,60 @@
+
+CuiFinder User Options: 
+   --config option set
+
+
+UMLS-Interface Configuration Information
+  Sources (SAB):
+    MTH
+  Relations (REL):
+    RB
+    RN
+  Database: 
+    umls (MMSYS-2010AB-20101022)
+
+
+
+
+The related (ro) CUIs to hand (C0018563):
+  forefoot, human (C0016539)
+  wrist (C0043262)
+   (C0177511)
+   (C0177525)
+   (C0177535)
+   (C0177569)
+   (C0177585)
+   (C0177587)
+   (C0177592)
+   (C0177593)
+   (C0177597)
+   (C0177606)
+   (C0177609)
+   (C0177705)
+   (C0177706)
+   (C0187069)
+   (C0187138)
+   (C0187139)
+   (C0187272)
+  amputation of hand (procedure) (C0187278)
+   (C0187324)
+   (C0187483)
+   (C0187495)
+  repair of intrinsic muscles of hand (procedure) (C0187496)
+   (C0187516)
+   (C0187589)
+   (C0187590)
+   (C0187643)
+   (C0187661)
+   (C0187676)
+   (C0230459)
+   (C0265594)
+   (C0444563)
+  physical findings:finding:point in time:hand:narrative:observed (C0551679)
+  physical findings:finding:point in time:hand:nominal:observed (C0551680)
+   (C0699845)
+   (C0699846)
+  hand problem (C0741992)
+   (C1261288)
+  forepaw (C1533572)
+  hand - occupational therapist - nuccprovidercodes (C1552290)
+  hand - physical therapist - nuccprovidercodes (C1552301)

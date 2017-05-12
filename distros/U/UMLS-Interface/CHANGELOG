@@ -1,0 +1,908 @@
+NAME
+    UMLS::Interface CHANGES
+
+  Changes from version 1.49 to 1.51
+    1. added a function to obtain all the descendants of a given CUI
+
+    2. added a corresponding utils program
+
+  Changes from version 1.47 to 1.49
+    1. added a getAllSts function to CuiFinder.pm and Interface.pm
+
+    2. added --all option to getSts.pl to return a list of all semantic
+    types in the UMLS
+
+    3. added a getAllSemanticGroups function to CuiFinder.pm and
+    Interface.pm
+
+    4. added --all option to getSemanticGroups.pl to return a list of all
+    semantic types in the UMLS
+
+    5. added --sg option to getSts.pl to return list of semantic types given
+    a semantic group
+
+    6. added getStsFromSg function to CuiFinder.pm and Interface.pm
+
+  Changes from version 1.45 to 1.47
+    1. added a getDUI.pl program in the utils/ directory to obtain the DUI
+    of a given CUI.
+
+    2. modified CuiFinder.pm for this functionality
+
+  Changes from version 1.43 to 1.45
+    1. modified PathFinder.pm to account for finding the shortest path
+    between two concepts in realtime when the path goes down and then back
+    up
+
+  Changes from version 1.41 to 1.43
+    1. added findAncestors function which returns a hash of a given CUIs
+    ancestors
+
+    2. added findAncestors.pl program to utils/
+
+  Changes from version 1.39 to 1.41
+    1. add the findNumberTurns.pl program to the utils/ directory.
+
+    2. modified findShortestPath.pl to set the realtime option automatically
+    when using --undirected
+
+    3. added a setRealtimeOption and setUndirectedOption to the Interface.pm
+    module and their subsequent Finder modules
+
+  Changes from version 1.37 to 1.39
+    1. modification of path information to account for changes the SNOMEDCT
+    -- added SUPPRESS='N' to obtain the PAR/CHD and RB/RN relations between
+    CUIs
+
+    2. modified the test cases to account for the SNOMEDCT name change to
+    SNOMEDCT_US in the database
+
+  Changes from version 1.34 to 1.37
+    1. updated the documentation and test parameters for the intrinsic IC
+    meaures.
+
+  Changes from version 1.33 to 1.35
+    1. updated the IC measure modules to store the parameters required to
+    calculate Intrinisic IC while the index is being created rather than
+    done on the fly. To do them on the fly you can use the realtime
+    parameter can be set.
+
+    2. added test cases to getIC.t
+
+    3. modified getIC.pl with the --intrinsic (sanchez|seco) option. I also
+    don't require an icpropagation or icfrequency file to specified -- use
+    the default if one is not provided.
+
+  Changes from version 1.31 to 1.33
+    1. Updated documentation
+
+    2. Added getIntrinsicIC function and corresponding util/ program
+
+  Changes from version 1.29 to 1.31
+    1. modified ICFinder.pm to return an error if the icfrequency
+    information does not match the configuration file -- similar to what we
+    do with icpropagation
+
+  Changes from version 1.27 to 1.29
+    1. modified loading the IC propagation file to require only on CUI per
+    file -- prior it allowed for multiple -- this played havoc on the web
+    interface.
+
+  Changes from version 1.25 to 1.27
+    1. modified the To Do list
+
+  Changes from version 1.23 to 1.25
+    1. modified the utils/ programs database options - some where not
+    working correctly. They all should be operational now!
+
+  Changes from version 1.21 to 1.23
+    1. added a --relations option to getCuiList.pl in order to obtain the
+    number of specified relations from given CUIs
+
+  Changes from version 1.19 to 1.21
+    1. modified Interface.pm documentation
+
+    2. added the --parents and --children option to getCuiList in order
+    obtain the number of parents and children from given CUIs in a specified
+    source
+
+  Changes from version 1.17 to 1.19
+    1. modified the getSemanticGroup.pl program to include an --st option
+    which returns the semantic group of a given semantic type
+
+    2. created an stGetSemanticGroup() function to return the semantic group
+    of a given semantic type in the Interface.pm module
+
+    3. Added API function information to the Interface.pm perldoc
+
+  Changes from version 1.15 to 1.17
+    1. modified getIC.pl and getCuiDepth.pl to take in a CUI as input
+    properly - there was an error
+
+    2. added the API documentation
+
+  Changes from version 1.13 to 1.15
+    1. updated README documentation
+
+    2. made a change in getCuiDef.pl. The definition was not being returned
+    when a CUI was used as input although the term was working just fine.
+
+    3. made a change in getExtendedDef.pl. If a term was entered the
+    associated CUI was obtained from the SAB variable rather than the SABDEF
+
+    4. added configuration checks to getCuiDef.pl and getExtendedDef.pl
+
+    5. added ability to use ' in the term without having to escape it. For
+    example:
+
+         findPathToRoot.pl "Alzheimer's Disease"
+
+  Changes from version 1.11 to 1.13
+    1. added the STFinder module which returns the information content of a
+    semantic type using the isa relations in the semantic network to
+    propagate the counts
+
+    2. added the --st option to findPathToRoot.pl which finds all the paths
+    to the root given a semantic type (TUI or Abbreviation) using the isa
+    relations in the semantic network
+
+    3. added the --st option to findShortestPath.pl which finds the shortest
+    path between two semantic types (TUIs or Abbreviations) using the isa
+    relations in the semantic network
+
+  Changes from version 1.09 to 1.11
+    1. modified the ICFinder module to include a setPropagationParameters
+    function to set the propagation parameters outside of initialization of
+    the interface package.
+
+  Changes from version 1.07 to 1.09
+    1. modified the input and output of the perl modules to pass everything
+    by reference
+
+    2. modified the .pl programs to account for this
+
+    3. updated the synopsis code
+
+  Changes from version 1.05 to 1.07
+    1. modified test cases for getCuiDef
+
+  Changes from version 1.03 to 1.05
+    1. modified the getDefConceptList to use the sabdef source(s) rather
+    than the sab source(s).
+
+    2. added the following options to getCuiList.pl
+
+         --term -> prints out the terms
+
+         --st   -> prints out the CUIs that have the specified semantic type
+
+         --sg   -> prints out the CUIs that have the specified semantic group
+
+  Changes from version 1.01 to 1.03
+    1. updated the synopsis code in the .pm modules
+
+  Changes from version 0.101 to 1.01
+    1. modified the version number - this release was specifically about
+    modifying the version number because cpan doesn't realize that .101 is
+    greater than .99
+
+    2. updated documentation
+
+  Changes from version 0.99 to 0.101
+    1. revised the program to obtain the semantic group of a cui or term <-
+    no input file needed now
+
+    2. added getSemanticGroup function in Interface.pm and its corresponding
+    _getSemanticGroup function in CuiFinder.pm
+
+    3. added getSemanticGroup.t test program in t/
+
+    4. revised getSts.t test program in t/
+
+    5. added a getSemanticRelation.pl program in the utils/ directory along
+    with its corresponding functions and test cases
+
+  Changes from version 0.97 to 0.99
+    1. added program to obtain the semantic group of a cui or a term
+
+    2. added an --infile FILE option to getSts.pl
+
+    3. added a reConfig function which takes in a new configuration
+    parameters
+
+  Changes from version 0.95 to 0.97
+    1. I forgot to add the new configuration files for the test cases
+
+  Changes from version 0.93 to 0.95
+    1. added a getDefTermList() function to obtain the concepts using the
+    SABDEF information rather than the SAB information
+
+    2. modified the getExtendedDef() function to reflect this
+
+    3. modified the getCuiDef() function to print out the term as well as
+    the CUI when returning the definition
+
+  Changes from version 0.91 to 0.93
+    1. modified the configuration options such that if not defined in the
+    configuration file they use their respective defaults.
+
+    2. return error message if source in the configuration file does not
+    exist in the current view of the UMLS.
+
+    3. added a getDefConceptList() function to obtain the concepts using the
+    SABDEF information rather than the SAB information
+
+  Changes from version 0.89 to 0.91
+    1. modified documentation
+
+    2. added a length cache for the realtime option so once you find the
+    path length in realtime, it will store that for you. This is similar to
+    what I did for the depth only this only runs during realtime - other
+    wise there is the index that is created so there is no point in having
+    both due to space issues.
+
+  Changes from version 0.87 to 0.89
+    1. added the mysql_auto_reconnect option to the database variables
+
+  Changes from version 0.85 to 0.87
+    1. changed the IC to return log base 10 rather than the natural log
+    (which is the default in perl)
+
+    2. added a new util/ program findNumberOfCloserConcepts.pl to coincide
+    with the new function findNumberOfCloserConcepts()
+
+  Changes from version 0.83 to 0.85
+    1. added a new program called getCompounds.pl which returns a list of
+    compounds from the MRCONSO table given a specified set of sources in the
+    configuration table
+
+    2. added the getCompound() function in the Interface.pm module to
+    support this program
+
+  Changes from version 0.81 to 0.83
+    1. modified the --icpropagation option in findShortestPath.pl and the
+    findPathToRoot.pl programs. The option was not working properly.
+
+    2. modified getChildren to include the upper level taxonomy even if it
+    isn't explicitily stated in MRREL
+
+  Changes from version 0.79 to 0.81
+    1. added a forbidden CUI: C2733115|limited status concept which was
+    introduced in UMLS 2010AA
+
+  Changes from version 0.77 to 0.79
+    1. added --level option to findDFS.pl which prints out the number of
+    leafs and nodes above a specified depth
+
+    2. added the mean information to findDFS.pl
+
+    3. modified getChildren and getParent to print out the preferred term of
+    a cui rather than a random associated one.
+
+    4. added a developers-check to the t directory
+
+  Changes from version 0.75 to 0.77
+    1. added a getStString.pl program to utils/
+
+    2. added a findShortestPathLength.pl program to utils/
+
+    3. fixed error in the find shortest path length function
+
+  Changes from version 0.73 to 0.75
+    1. added average maximum depth to the findDFS.pl program
+
+    2. modified the findShortestPathLength function to obtain the length
+    using the index when the --realtime option is not used.
+
+    3. added standard deviation from average depth to the findDFS.pl program
+
+  Changes from version 0.71 to 0.73
+    1. modified the shortest path - there was a problem with the directed
+    paths - I was getting some undirected ones mixed in there. This should
+    not have affected the length of the shortest path just the paths
+    themselves.
+
+    2. modified utils programs to return the preferred term of a concept
+    rather than just any term.
+
+    3. modified the depth() function to obtain the maximum cui depth of the
+    concepts in the view when called - these are stored in a database
+    currently
+
+    4. modified the findMaximumDepth function to cache the maximum depth of
+    cuis when found (storing them in the same database as mentioned above).
+
+  Changes from version 0.69 to 0.71
+    1. There are two functions that currently exist:
+
+            getTermList()    -> returns CUIs terms that exist in the sources
+                                specified in the configuration file
+            getAllTermList() -> returns CUIs terms from the entire UMLS
+
+     I added to new functions:
+
+            getPreferredTerm() -> returns the CUIs preferred term if it exists
+                                  in the sources specified in the
+                                  configuration file
+
+            getAllPreferredTerm()-> returns the CUIs preferred term
+
+    2. For the getAssociatedTerms.pl program , there is an additional option
+    called:
+
+            --preferred
+
+     Here are the options:
+
+
+     1. --config FILE
+            returns the cuis associated terms from the sources specified in
+            the configuration file
+
+     2. --preferred --config FILE
+            returns the cuis preferred term from the sources specified in
+            the configuration file
+
+     3. --preferred
+            returns the cuis preferred term
+
+     4. no config and no preferred option
+            returns the cuis associated terms from the entire UMLS
+
+     5. removed added white space in the config file parameters 
+        - this was causing an error sometimes
+
+     6. made certain that the parent/children information is only
+        being obtained if in the configuration file. There was a 
+        problem with this using RELDEF :: include and a single 
+        option such as CHD.
+
+     7. restrict util programs to heirarchical relations - PAR/CHD and RB/RN
+          - findCuiDepth
+          - findDFS
+          - findLeastCommonSubsumer
+          - findPathToRoot
+
+     8. modified the default source and relation output
+
+     9. added an --infile option to getAssociatedTerms.pl
+
+     10. modified the getMinimumCuiDepth to speed up the process
+
+  Changes from version 0.67 to 0.69
+    1. Updated configuration file reading for spaces
+
+    2. Updated icfrequency and icpropagation files to include the total
+    number of concepts - I call this N
+
+    3. Added getFrequency() function which returns the frequency of a
+    concept - after propagation
+
+    4. Modified documentation - hope it is clearer
+
+    5. Added a getN() function which returns the total number of concepts in
+    the icpropgation or icfrequency file
+
+    6. Updated getExtendedDefinition to include the source in which the term
+    originates
+
+    7. Updated getExtendedDefinition to allow include the defintiion of the
+    concepts semantic type
+
+    8. Allowed the definitions to come from all the sources in the MRDEF
+    table when using UMLS_ALL rather than all the sources in the MRREL
+    table.
+
+    9. Added the new shortest path measure
+
+  Changes from version 0.65 to 0.67
+    1. Fixed the RELADEF parameter
+
+    2. Added better parameter check for propagation
+
+  Changes from version 0.63 to 0.65
+    1. modified N in creating the probability of a concept for propagation
+
+    2. modified documentation
+
+    3. Added the RELADEF option
+
+    4. Added the UMLS_ALL parameter for RELADEF and RELDEF
+
+    5. put the shortest path back to what we had. The previous version
+    shortest path works but it isn't as fast as we would like. We are still
+    working on this.
+
+  Changes from version 0.61 to 0.63
+    1. updated the source and relation output for SABDEF/RELDEF and SAB/REl
+
+    2. the UMLS_ROOT showing up as a child of C0282503 - that seems a bit
+    odd (priority)
+
+       we figured out why - this node seems to be part of three sources:
+       MSH, NCI and HL7v2.5 (as a PAR/CHD relationship). 
+
+       we are fixing this by creating a fake root: C0000000
+
+    3. implement shortest path algorithm (priority)
+
+    4. implement the lcs algorithm for the new shortest path (priority)
+
+    5. allow SABDEF, SABREL and REL to have the UMLS_ALL option
+
+    6. add --undirected option to shortest path
+
+    7. require that both the SAB and REL or SABDEF and RELDEF be specified
+
+  Changes from version 0.59 to 0.61
+    1. add validOptions() check in the Interface.pm module -> I actually
+    called it checkOptions since this is consistent with other functions
+    that do this
+
+    2. change the synopsis of the Finder modules so that are unique and
+    describe what they do better (priority)
+
+    3. add a check in the table file of the index to make certain that the
+    program completed
+
+    4. Get --icfrequency option up and running
+
+    5. write the SAB and REL info on the top lines of the icpropagation
+    file, and then check those relative to the config file being used
+
+    6. perldoc should give a quick intro to what propagation is, and how we
+    are doing the actual calculations of info content values
+
+    7. Add --smooth option
+
+    8. document how the smoothing is done in the perldoc
+
+    9. document the --icfrequency option
+
+    10. add check to RELA requiring REL if specified
+
+    11. move error checking into separate module
+
+    12. add RELA to the documentation
+
+    13. create getExtendedRelation function using SABDEF and use that
+    instead of getRelated in the getExtendedDefinition function
+
+  Changes from version 0.57 to 0.59
+    1. fixed an error that happened when trying to obtain the depth of a
+    taxonomy when not in --realtime
+
+    2. cleaned up documentation and STDERR output a bit
+
+    3. add check to make certain that that the .t programs can only be
+    called in the main directory
+
+    4. change mkpath and rmtree to make_path() and remove_tree() in the .t
+    files
+
+    5. reorganized the Finder modules
+
+  Changes from version 0.55 to 0.57
+    1. add a more complete configuration file in the samples directory
+
+    2. updated the documentation
+
+    3. Added --info option to getParent.pl and getChild.pl to display the
+    source information (similar to the --info option in findPathtoRoot?)
+
+  Changes from version 0.53 to 0.55
+    1. There are significant changes in the Interface.pm module but if
+    everything went well you should not notice them at all. We split the
+    functionality of Interface.pm into three module: CuiFinder.pm
+    PathFinder.pm ICFinder.pm
+
+        These modules is where the main code is but the 
+        API is still through the Interface.pm module so 
+        you should not have to access these at all.
+
+    2. modification in the findLeatCommonSubsumer.pl out. The output would
+    be as follows: the least common subsumer between C0007286 (C0007286) and
+    hypertrophic arthritis, nos (C0029408) is other soft tissue disorders
+    (disorder) (C0158370). Fix this to print out the term rather than the
+    CUI twice.
+
+    3. Added an addition to forbidden concepts: unapproved attribute
+    (C1443286)
+
+    4. Removed bignum from UMLS-Interface
+
+    5. Know uses SABDEF and RELDEF for the extended definition and
+    definition configuration options rather than DEF
+
+    6. The getCuiDef.pl displays the source of definitions when using the
+    --sab option
+
+    7. The findShortestPath.pl and FindLeastCommonSubsumer.pl do not go
+    through all their path finding when CUI1 and CUI2 are the same
+
+    9. The exclude option is now working for SAB, REL and RELA
+
+    10. Obtains the source in which a relationship exists between two
+    concepts. We now have a method called: getRelationBetweenTwoCuis($cui1,
+    $cui2);
+
+    11. There are new examples of how to go about specifing the config
+    option in the API code. These are in the Interface.pm module
+    documentation under CONFIGURATION FILE and I think the README does a
+    decent job of it now, as well.
+
+  Changes from version 0.51 to 0.53
+    Added the --debugpath FILE option to the path util/ programs and the
+    UMLS-Interface. This option prints out the path information on the fly
+    for debuging purposes. It works only with the --realtime function
+    because otherwise an index is built. If you need the path information in
+    the index you can use the --verbose option while creating the index and
+    it will print it to a file.
+
+  Changes from version 0.49 to 0.51
+    1. Modified Interface.pm to accept either a propagation file or a
+    frequency file when returning the information content of a CUI. I also
+    modified the format these files are required.
+
+    2. Added a README in the samples/ directory
+
+    3. Updated documentation
+
+    4. Added example files to the samples/ directory
+
+  Changes from version 0.47 to 0.49
+    1. Added the getExtendedDefinition function
+
+    2. Modified the configuration file to accept what relations should be
+    included in the extended defintion. The format is:
+
+        DEF :: include TERM, CUI, PAR, CHD, SIB, SYN, RB, RN
+
+        where TERM refers to the associated terms of a concept
+              CUI refers to the CUIs definition and the rest 
+              are the definition of the relations.
+
+    3. Created a samples/ directory which contains an example of the
+    configuration file
+
+  Changes from version 0.45 to 0.47
+    1. Added a t/ test case for each of the programs in the utils/ directory
+
+    2. Added the --infile option for findPathsToRoot.pl
+
+        The format consists of a CUI or term each on its 
+        own line.
+
+    3. Added the --infile option for findCuiDepth.pl
+
+        The format is the same as above.
+
+  Changes from version 0.43 to 0.45
+    Modified the way that the path information was being returned. It was
+    causing some problems with UMLS-Similarity
+
+  Changes from version 0.41 to 0.43
+    1. Added the terms associated to concept2 and the lcs in the
+    findLeastCommonSubsumer program
+
+    2. Added the --info option to the findPathsToRoot program
+
+  Changes from version 0.39 to 0.41
+     1. Modified the findShortestPath and findLeastCommonSubsumer 
+        functions to return all of the paths and LCS's if there 
+        is more than one.
+
+  Changes from version 0.37 to 0.39
+     1. Added the following options to findLeastCommonSubsumer
+       a. --infile            File containing TERM or CUI pairs
+       b. --depth             Outputs the depth of the lcs
+       c. --propagation FILE  Outputs the IC of the lcs
+     2. Added the following options to findShortestPath    
+       a. --propagation FILE  Outputs the IC of the lcs
+       b. --length            Outputs the length of the path
+       c. --info              Outputs the source and relation
+                              information between the concepts 
+                              in the path
+
+  Changes from version 0.35 to 0.37
+     1. Revised the way the propagation of counts is handled
+
+     2. Renamed everything spelt propogation to propagation
+
+     3. Updated documentation
+
+  Changes from version 0.33 to 0.35
+    1. Added the ability to propogation counts given a propogation file.
+    Currently the format of that file is: Frequency|CUI|String
+
+        So for example:
+
+        1|C0018563|hand
+
+        The concept C0018563 has a frequency count of one and is associated 
+        with the term hand. The string really isn't necessary but I like 
+        to know what a CUI means. This input format may be changed in the 
+        future to accept a file but I might also create a program in the 
+        util/ directory that given a file it will create this for you. 
+
+        To do this the propogation parameter must be set to the location
+        of the propogation file.
+
+    2. Added the getPropogationCount.pl program to the util/ directory. This
+    is used to obtain the propogation count of a specified CUI.
+
+    3. Added a getIC() function which takes in a CUI and returns its
+    information content based on the propagation file
+
+    4. I also added a getPropogationCount() function which takes in a CUI
+    and returns the propogation count of a given concept
+
+    5. Added getCuiList() program to the util directory and its associated
+    function in the Interface.pm module. This allows you to get a list of
+    CUIs given the sources and relations in a config file.
+
+    6. Added a --debug option to print out function information for debuging
+    purposes.
+
+    7. Added a --propogation PROPOGATIONFILE option to findPathToRoot.pl
+    which will return the propogation count of the CUIs in the path
+
+    8. Combined the following util programs:
+
+        a. findMaximumCuiDepth and findMinimumCuiDepth => findCuiDepth
+        b. queryCui and queryCui-SAB -> getAssociatedTerms
+
+    9. Changed the name of the following util programs a. queryTerm ->
+    getAssociatedCuis b. dfs -> findDFS
+
+    10. Added a --propogation option for findPathToRoot to return the
+    propogation counts of the CUIs in the path.
+
+  Changes from version 0.31 to 0.33
+    1. fixed the error in the make tests - they would not work properly
+    unless you had the UMLS-Interface environment variable set for the
+    location of the configuration files even though we weren't using them.
+
+  Changes from version 0.29 to 0.31
+    1. Changed all of the table names into hex form!! This is important
+    because it now means the versions aren't back compatible. Why did I do
+    this - well the table names were getting long the more sources and
+    relations that were added. If to many were used an error is thrown
+    because there were too many characters in the table name.
+
+       I created two utils/ programs the first is returnTableNames.pl. 
+       This returns all of the table names in both hex and human readable 
+       form (the original form) that were created for a specified config 
+       file. The second is returnAllTableNames.pl which returns all of 
+       the table names (in hex and the original form) that have been 
+       created by the package. These tables are stored in a database called 
+       umlsinterfaceindex. One nice thing is that this will be the only 
+       database created now.
+
+    2. The getSab() disappeared - I must have erased it - it is back!
+
+    3. The RELA option in the config file is now up and running. So you can
+    now not only specify a set of sources and relations but also RELAs - as
+    long as the RELA exists in the source and relation combination. If it
+    doesn't I just continue on right now - I could error out though - not
+    certain which is the best thing to do right now.
+
+    4. You can use other relations in UMLS-Interface now, like, for example,
+    RO. I don't connect these though to the root so if they are not either
+    connected to the root itself (like in SNOMEDCT but unlike in FMA) it
+    will only connect through additional relations.
+
+    5. The make tests have been expanded
+
+    6. Added a --realtime option. This allows the path information to be
+    obtained on the fly rather than prebuilding the umlsinterface index. You
+    will notice these in the util/ programs
+
+    7. There is a UMLS_ALL tag that can be used in the configuration file in
+    replace of the source names. For example, to use the entire UMLS with
+    the PAR/CHD relations, the configuration file would be as follows:
+
+          SAB :: include UMLS_ALL
+          REL :: include PAR, CHD
+
+  Changes from version 0.27 to 0.29
+    1. Added a dfs.pl program which is located in the utils/ directory. This
+    program runs a dfs over a specified set of sources and relations in the
+    UMLS and returns:
+
+        1. the maximum depth
+        2. paths to root
+        3. sources
+        4. maximum branching factor
+        5. average branching factor
+        6. number of leaf nodes
+        7. number of nodes
+        8. root
+
+    2. Added a function in Interface.pm called getAllTerms() which returns
+    all of the possible terms of a given CUI along with their source(s).
+    This is for all of the strings associated with the CUI in the MRCONSO
+    table so you can't specify a source for this one. If you would like to
+    do that use the getTermList function instead.
+
+       There is also a program in the utils/ directory which uses this called 
+       queryCui-Sab.pl
+
+    3. Added the functionality to store only the path information of a given
+    set of cuis. To do this you need to use the --cuilist option which takes
+    in a file containing CUIs. Note that each CUI needs to be on a seperate
+    line.
+
+  Changes from version 0.25 to 0.27
+    1. Added a --verbose option will print out path information to a file
+    rather than having this be done automatically. This will reduce the
+    amount of storage space required to hold the path information for a
+    given set of sources and relations.
+
+  Changes from version 0.23 to 0.25
+    1. Fixed mysql error that was occuring in UMLS-Interface
+
+        DBD::mysql::db do failed: You have an error in your SQL syntax; 
+        check the manual that corresponds to your MySQL server version 
+        for the right syntax to use near '' at line 1 at 
+        /usr/local/share/perl/5.10.0/UMLS/Interface.pm line 1063, <STDIN> 
+        line 2.
+
+       This was also happening on line 1066 - both should be fixed now.
+
+    2. Updated INSTALL documentation - nothing major just some clean up
+
+    3. Added a --forcerun option which will bypass any questions about
+    whether or not you would like to set up an index on a specified set of
+    relations/sources
+
+    4. Updated the documentation of the programs in the util/ directory
+
+  Changes from version 0.21 to 0.23
+    1. Added a getRelation function which returns all the possible relations
+    in the MRREL file given a specified CUI and source. There is a
+    corresponding util program getRelation.pl to show how this is used. 2.
+    Modified checking the existance of the UMLS tables. Before it was
+    expecting the table names to be all capatalized but now they can be in
+    lower case as well.
+
+  Changes from version 0.19 to 0.21
+    1. Added check to see if program files exist prior to removing them just
+    in case they don't exist an error isn't going to display
+
+    2. Had an error in getCuiDef.pl when the input was a term. This has been
+    fixed.
+
+    3. Modified the upper level taxonomy to be written to tables in its
+    appropriate database.
+
+    4. Add the program removeConfigData.pl which will remove the database
+    and all of the associated files created by the program given a specified
+    configuration.
+
+  Changes from version 0.17 to 0.19
+    1. Modified the documentation in the utils/ programs. The descriptions
+    were just a mess
+
+  Changes from version 0.15 to 0.17
+    1. In SNOMED CT there exist concepts that are used to show why a concept
+    is retired. Unfortunately, the relationship linking that reason to the
+    retired concept is 'is-a'. So you have for example 'stenosis' is-a
+    'non-current concept - ambiguous'. This is understandable in a plain
+    English sense but doesn't fit into the hierarchical sense of an 'is-a'
+    relationship. We now exclude these nodes:
+
+    C1274012|Ambiguous concept (inactive concept) C1276325|Reason not stated
+    concept (inactive concept) C1274013|Duplicate concept (inactive concept)
+    C1274014|Outdated concept (inactive concept) C1274015|Erroneous concept
+    (inactive concept) C1274021|Moved elsewhere (inactive concept)
+
+    If you have a strong reason why they should still be there send us an
+    email and we can probably work something else out.
+
+    2. When using the RB/RN and PAR/CHD relations not all of the upper level
+    taxonomy was being looked at to obtain the path information. This has
+    been fixed.
+
+    3. Moved the dropTemporaryTables.pl program to removeConfigData.pl and
+    added the functionality to drop the files associated with the
+    configuration data as well.
+
+    4. The UMLS-Interface module was not accepting the a configuration file
+    if the first one was printed out incorrectly. We fixed this.
+
+    5. Added configuration file information printed out to STDERR containing
+    source, relation and configuration file location information.
+
+    6. Added a file option to the findShortestPath.pl program:
+
+       --inputfile FILE
+
+       A file containing pairs of concepts or terms in the following format:
+
+        term1<>term2 
+
+        or 
+
+        cui1<>cui2
+
+        or 
+
+        cui1<>term2 
+
+        or 
+
+        term1<>cui2
+
+  Changes from version 0.13 to 0.15
+    1. Added three new functions for semantic types:
+
+          getSt       which returns the semantic type TUI of a given CUI
+          getStAbr    which returns the semantic type abbreviation 
+                      given the semantic type TUI
+          getStString which returns the semantic type string 
+                      given the semantic type abbreviation
+
+    2. Added a program to the utils/ directory:
+
+           getSt.pl    which returns the semantic type of a given CUI
+                      or TERM in the UMLS. This program uses the three 
+                      above functions.
+
+    3. Added the function checkConceptExists which returns true or false
+    whether a concept exists in the current view of the UMLS (this is based
+    on the sources and relations that are being used). This function was
+    hidden but it seemed like it could be useful to others as well - it
+    became useful for me anyway :)
+
+    4. Modified the SYNOPSIS section in the Interface.pm module to include
+    all or at least most of the different functions available through the
+    Interface.pm module.
+
+    5. Fixed the permissions on the configuration file directory when it is
+    being created. And chmod the individual files after they were created.
+    Hopefully now they will be created with read and write privlidges so you
+    can see them if you install using the -MCPAN option.
+
+    6. Modified the findPathToRoot.pl and findShortestPath.pl to include the
+    term associated with the CUI in the path
+
+    7. I forgot to add the UMLS Root to the PATH in the pathToRoot function.
+    It is now added.
+
+  Changes from version 0.11 to 0.13
+    1. Speed up the getTermList() option when all of the sources are being
+    used
+
+    2. Modified documentation
+
+    3. Added the function findMinimumDepth and findMaximumDepth which
+    returns the minimum and maximum depth of a CUI respectively given the
+    view of the UMLS
+
+  Changes from version 0.09 to 0.11
+    1. Modified the Changelog directory and tried to remember to add them to
+    the release!
+
+    2. Modified documenation - tried to get the misspelling and obvious
+    errors removed.
+
+    3. Removed the HTML documentation
+
+  Changes from version 0.03 to 0.09
+    1. Allowed the program to create the directory that we prompt the user
+    for (the location that the config files should be stored) if it doesn't
+    exist rather than requiring it be already created.
+
+    2. Modified the location of where the utils/ programs are installed. All
+    of them now get installed and they are all in the same location.
+
+    3. Found a bug in the code that reads the configuration file. Error
+    would occur if trying to exclude a source.
+
+  Changes from version 0.01 to 0.03
+    1. Removed the need for UMLSINTERFACE environment variable indicating
+    the location of the UMLS. Now we prompt the user for the location that
+    the config files should be stored and ask them to set a
+    UMLSINTERFACE_CONFIGFILE_DIR variable.
+

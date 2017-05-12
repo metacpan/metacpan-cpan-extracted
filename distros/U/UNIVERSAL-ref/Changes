@@ -1,0 +1,51 @@
+Revision history for UNIVERSAL::ref
+
+0.01    Feb 25, 2007
+        First version, released on an unsuspecting world.
+
+0.02    Mar 6, 2007
+        Now with tests for overloading too. It doesn't pass tests but
+        that's the point. I'd like the CPAN version to fail its tests.
+
+0.03    Mar 7, 2007
+        Hey, fixing this was easy!
+
+0.04    Mar 8, 2007
+        Don't bother trying to do impossible things.
+
+0.05    Mar 8, 2007
+        Don't enable debugging output in production.
+
+0.06    Mar 8, 2007
+        Also test that Data::Dumper and Data::Dump::Streamer are still
+        sane.
+
+0.07    Mar 9, 2007
+        Added typemap to the distribution.
+
+0.08    Mar 13, 2007
+        Added B::Utils as a requirement.
+        All functions compiled before loading UNIVERSAL::ref are hooked.
+        TODO: change the functions that are still being compiled.
+
+0.09    Mar 13, 2007
+        Moved the hook logic into perl from XS.
+        Uses 5.10's ->DOES when possible.
+        Separates out the idea of hooked classes and classes that need
+        the truth.
+
+0.10    ???
+
+0.11    ???
+
+0.12    Nov 20, 2007
+        David Dyck patched ref.xs to work on his ancient egcs.
+
+0.13
+        Rename private functions
+        Stop auto-setting $|
+        Build with Dist::Zilla
+        Minimum perl, 5.6.2 [RT #52516]
+
+0.14
+        Minimum perl, 5.6.0 [RT #52516]

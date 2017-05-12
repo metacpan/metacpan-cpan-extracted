@@ -1,0 +1,17 @@
+Changes
+examples/ask.pl
+examples/strip-alphabet.pl
+examples/synopsis.pl
+lib/Unicode/Diacritic/Strip.pm
+lib/Unicode/Diacritic/Strip.pod
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/empty.t
+t/fast-strip.t
+t/Unicode-Diacritic-Strip.t
+t/Unicode-StripDiacritics.t
+t/vietnamese.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

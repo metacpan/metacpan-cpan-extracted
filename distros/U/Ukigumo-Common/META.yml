@@ -1,0 +1,51 @@
+---
+abstract: 'Common things between Ukigumo::Client/Ukigumo::Server'
+author:
+  - 'Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ GMAIL COM>'
+build_requires:
+  Capture::Tiny: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v1.1.0, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Ukigumo-Common
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Ukigumo::Common:
+    file: lib/Ukigumo/Common.pm
+    version: '0.10'
+  Ukigumo::Constants:
+    file: lib/Ukigumo/Constants.pm
+  Ukigumo::Helper:
+    file: lib/Ukigumo/Helper.pm
+  Ukigumo::Logger:
+    file: lib/Ukigumo/Logger.pm
+requires:
+  Log::Minimal: '0'
+  Mouse: '0'
+  parent: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: ssh://git@github.com/ukigumo/Ukigumo-Common/issues
+  homepage: ssh://git@github.com/ukigumo/Ukigumo-Common
+  repository: ssh://git@github.com/ukigumo/Ukigumo-Common
+version: '0.10'
+x_authority: cpan:TOKUHIROM
+x_contributors:
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
+  - 'mattn <mattn.jp@gmail.com>'
+  - 'moznion <moznion@gmail.com>'

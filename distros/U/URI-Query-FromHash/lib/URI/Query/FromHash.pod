@@ -1,0 +1,62 @@
+=encoding UTF-8
+
+=head1 NAME
+
+URI::Query::FromHash - Construct a query string from a hash ref
+
+=for html
+<a href=https://travis-ci.org/JRaspass/URI-Query-FromHash>
+    <img src=https://api.travis-ci.org/JRaspass/URI-Query-FromHash.svg>
+</a>
+
+=head1 SYNOPSIS
+
+ use utf8;
+ use URI::Query::FromHash;
+
+ my $query_string = hash2query {
+    foo  => 'bar',
+    baz  => [ qw/qux quux/ ],
+    utf8 => '☃',
+ };
+
+ # or
+
+ my %args = ...;
+
+ my $query_string = hash2query %args;
+
+=head1 DESCRIPTION
+
+URI::Query::FromHash aims to be a fast, light query string constructor.
+
+Inspired by Ruby on Rails'
+L<to_query|http://api.rubyonrails.org/classes/Hash.html#method-i-to_query>
+hash method.
+
+=head1 METHODS
+
+=head2 hash2query
+
+Accepts a hash ref of query parameters. The value of each parameter must
+either by a simple scalar or an array ref of simple scalars.
+
+All strings are assumed to be UTF-8 decoded values.
+
+=head1 BENCHMARK
+
+ $ perl -Ilib example/bench.pl
+               Rate        uri hash2query
+ uri        24436/s         --       -59%
+ hash2query 59077/s       142%         --
+
+=head1 SEE ALSO
+
+L<URI>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright © 2016 by James Raspass
+
+This is free software; you can redistribute it and/or modify it under the
+same terms as Perl itself.

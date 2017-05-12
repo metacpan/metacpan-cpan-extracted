@@ -1,0 +1,55 @@
+{
+   "abstract" : "Mini data collection framework!",
+   "author" : [
+      "Matthias Krull <<m.krull@uninets.eu>>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Uninets-Check",
+   "no_index" : {
+      "directory" : [
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moo" : "0",
+            "perl" : "v5.10.1"
+         }
+      }
+   },
+   "provides" : {
+      "Uninets::Check" : {
+         "file" : "lib/Uninets/Check.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ],
+      "repository" : {
+         "url" : "https://github.com/uninets/Uninets-Check"
+      }
+   },
+   "version" : "0.04"
+}

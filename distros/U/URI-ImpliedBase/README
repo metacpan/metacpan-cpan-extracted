@@ -1,0 +1,15 @@
+URI::ImpliedBase 
+
+This class was created to provide support in SOAP::Lite for relative URLS
+in WSDL.
+
+It acts as a wrapper around URI; it adds an additional level of processing 
+before the URI makes in into the URI class. This additional code looks at the 
+incoming URI: if it is absolute, it saves the scheme and path as the current 
+base. If it isn't, it creates and saves a new base URI internally, using the 
+current working directory as the path and "file:" as the scheme. Any relative
+URIs supplied thereafter are silently converted to use the new base.
+
+Questions, bugs, and problems should be sent to me at mcmahon@ibiblio.org.
+I can't guarantee to address them in a timely manner, but I always read my 
+mail!

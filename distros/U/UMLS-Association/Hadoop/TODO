@@ -1,0 +1,34 @@
+NAME
+    Todo List for CUICollectorMapReduce
+
+SYNOPSIS
+    Plans for future versions of CUICollectorMapReduce
+
+TO DO LIST
+    1. add windowing to collect distant CUI bigrams (stride of 2, 3, 4,
+    etc.)
+
+    2. add n-gram collection as an option
+
+    3. write perl script to convert hadoop CUI bigram output into MySQL
+    database
+
+    4. add command line option parsing
+
+AUTHORS
+    Bridget McInnes <btmcinnes at vcu.edu>
+
+    Amy Olex <alolex at vcu.edu>
+
+COPYRIGHT
+    Copyright (C) 2017 Bridget T. McInnes and Amy L. Olex
+
+    Permission is granted to copy, distribute and/or modify this document
+    under the terms of the GNU Free Documentation License, Version 1.2 or
+    any later version published by the Free Software Foundation; with no
+    Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
+
+    Note: a copy of the GNU Free Documentation License is available on the
+    web at <http://www.gnu.org/copyleft/fdl.html> and is included in this
+    distribution as FDL.txt.
+

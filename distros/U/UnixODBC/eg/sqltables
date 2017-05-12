@@ -1,0 +1,254 @@
+#!/usr/bin/perl
+
+# $Id: sqltables,v 1.6 2004-03-06 05:57:56 kiesling Exp $
+$VERSION=1.0;
+
+use UnixODBC qw(:all);
+use Getopt::Long;
+
+# ODBC Handles
+
+my $env;
+my $cnh;
+my $sth;
+
+# Function Return Value
+
+my $r;
+
+# Data Buffers and Lengths
+
+my $buf;
+my $buflen = 255;   # Maximum length of parameter data.
+my $rlen;           # Actual length of returned data.
+
+
+## 
+## DSN, username, and password from command line arguments.
+##
+
+my $DSN = '';
+my $UserName = '';
+my $PassWord = '';
+my $Verbose = '';
+
+# Help Text
+
+my $usage=<<EOH;
+Usage: sqltables [--help] | [--verbose] [--user=<username>] [--password=<password>] --dsn=<DSN> 
+  --help       Print this help and exit.
+  --verbose    Print tables' catalog, schema, name, and type.
+  --dsn        Data source name.
+  --user       DBMS login name.
+  --password   DBMS login password.
+EOH
+
+# Get the DSN and login data from the command line.
+
+GetOptions ('help' => \$help,
+	    'verbose' => \$Verbose,
+	    'dsn=s' => \$DSN,
+	    'user=s' => \$UserName,
+	    'password=s' => \$PassWord);
+
+# If necessary print the help message and exit.
+
+if ($help || (not length ($DSN)))
+     {
+	 print $usage;
+	 exit 0;
+     }
+
+# Fields defined in SQLTables result set.
+
+my ($table_cat, $table_schem, $table_name, $table_type, $remarks);
+
+# Allocate Environment Handle.
+
+$r = SQLAllocHandle ($SQL_HANDLE_ENV, $SQL_NULL_HANDLE, $evh);
+
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    print "SQLAllocHandle evh: ";
+    getdiagrec ($SQL_HANDLE_ENV, $evh);
+    exit 1;
+}
+
+# Set the ODBC Version
+
+$r = SQLSetEnvAttr($evh, $SQL_ATTR_ODBC_VERSION, $SQL_OV_ODBC2, 0);
+
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    &getdiagrec ($SQL_HANDLE_ENV, $evh);
+    exit 1;
+}
+
+# Allocate a connection handle.
+
+$r = SQLAllocHandle ($SQL_HANDLE_DBC, $evh, $cnh);
+
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    &getdiagrec ($SQL_HANDLE_ENV, $evh);
+    exit 1;
+}
+
+# Connect to the DSN given on the command line.
+
+$r = SQLConnect ($cnh, $DSN, $SQL_NTS,
+		 $UserName, $SQL_NTS,
+		 $PassWord, $SQL_NTS);
+
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    &getdiagrec ($SQL_HANDLE_DBC, $cnh);
+    exit 1;
+}
+
+# Allocate a statement handle.
+
+$r = SQLAllocHandle ($SQL_HANDLE_STMT, $cnh, $sth);
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    &getdiagrec ($SQL_HANDLE_DBC, $cnh);
+    exit 1;
+}
+
+# Get table information.  Blank parameters are treated as matching 
+# every catalog, schema, table, and column for the DSN.
+
+$r = SQLTables ($sth, '', 0, '', 0, '', 0, '', 0);
+
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    &getdiagrec ($SQL_HANDLE_STMT, $sth);
+    exit 1;
+}
+
+while (1) {
+
+    # Fetch the next row of data.
+
+    $r = SQLFetch ($sth);
+
+    # Exit the while loop if there are no more rows to fetch.
+
+    last if $r == $SQL_NO_DATA;
+
+    $r = SQLGetData ($sth, 1, $SQL_C_CHAR, $table_cat, $buflen, $rlen);
+    $r = SQLGetData ($sth, 2, $SQL_C_CHAR, $table_schem, $buflen, $rlen);
+    $r = SQLGetData ($sth, 3, $SQL_C_CHAR, $table_name, $buflen, $rlen);
+    $r = SQLGetData ($sth, 4, $SQL_C_CHAR, $table_type, $buflen, $rlen);
+    $r = SQLGetData ($sth, 5, $SQL_C_CHAR, $remarks, $buflen, $rlen);
+
+    # Delimit fields with tabs and lines with newlines.
+
+    if ($Verbose) {
+	print "$table_cat\t$table_schem\t$table_name\t$table_type\t$remarks\n";
+    } else {
+	print "$table_name\n";
+    }
+}
+
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    &getdiagrec ($SQL_HANDLE_STMT, $sth);
+    exit 1;
+}
+
+# Clean up.  Disconnect from DSN and de-allocate statement, 
+# connection, and environment handles.
+
+$r = SQLFreeHandle ($SQL_HANDLE_STMT, $sth);
+
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    &getdiagrec ($SQL_HANDLE_STMT, $sth);
+    exit 1;
+}
+
+$r = SQLDisconnect ($cnh);
+
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    &getdiagrec ($SQL_HANDLE_DBC, $cnh);
+    exit 1;
+}
+
+$r = SQLFreeConnect ($cnh);
+
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    &getdiagrec ($SQL_HANDLE_DBC, $cnh);
+    exit 1;
+}
+
+$r = SQLFreeHandle ($SQL_HANDLE_ENV, $evh);
+
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    &getdiagrec ($SQL_HANDLE_ENV, $evh);
+    exit 1;
+}
+
+# Subroutine to print a SQL diagnostic record.
+
+sub getdiagrec {
+    my ($handle_type, $handle) = @_;
+    my ($sqlstate, $native, $message_text, $mlen);
+    my $diagrecno = 1;
+    print 'SQLGetDiagRec: ';
+    $r = SQLGetDiagRec ($handle_type, $handle, $diagrecno, 
+			$sqlstate, $native, $buf, $buflen,
+			$rlen);
+    if ($r == $SQL_NO_DATA) { 
+	print "result \= SQL_NO_DATA\n";
+    } elsif (($r == $SQL_SUCCESS_WITH_INFO) 
+	     || ($r == $SQL_SUCCESS)) { 
+	print "$buf\n";
+    } else { 
+	print "sqlresult = $r\n";
+    }
+
+    return $r;
+}
+
+=head1 NAME
+
+sqltables - Print names of a data source's tables.
+
+=head1 SYNOPSIS
+
+sqltables [--help] | [--verbose] [--user=<username>] [--password=<password>] --dsn=<DSN> 
+
+=head1 DESCRIPTION
+
+Sqltables prints the names of a data source's  tables and optionally
+the catalog and schema.
+
+=head1 OPTIONS
+
+=head2 --help
+
+Print help message and exit.
+
+=head2 --verbose
+
+Print catalog and schema information as well as table information.
+
+=head2 --dsn
+
+Name of the data source to query.
+
+=head2 --user
+
+User's DSN login name.
+
+=head2 --password
+
+User's DSN login password.
+
+=head1 VERSION INFORMATION AND CREDITS
+
+Revision: $Revision: 1.6 $
+
+Written by: Robert Kiesling, rkies@cpan.org.
+
+Licensed under the same terms as Perl.  Please refer to the
+file "Artistic" for details.
+
+=head1 SEE ALSO
+
+perl(1), UnixODBC(3), UnixODBC::BridgeServer(3).
+
+=cut

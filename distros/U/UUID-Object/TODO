@@ -1,0 +1,9 @@
+
+* TODO
+- rewrite POD
+- write more tests
+- create_from_urn(), assign_with_urn()
+- make comaration more reasonable.
+  - currently, compare portable binary form
+- functional interface?
+

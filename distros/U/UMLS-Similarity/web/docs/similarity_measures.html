@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <title>Measures</title>
+    <link rel="stylesheet" href="sim-style.css" type="text/css">
+  </head>
+
+  <body>
+    <h1>Similarity Measures</h1>
+
+    <h2>Path length</h2>
+    <p>A simple node-counting scheme (path).  The similarity score is inversely
+      proportional to the number of nodes along the shortest path between
+      the concepts.  The shortest possible path occurs when the two concepts
+      are the same, in which case the length is 1.  Thus, the maximum
+      similarity value is 1.
+    </p>
+
+    <h2>Leacock &amp; Chodorow</h2>
+    <p>The similarity measure proposed by Leacock and Chodorow (lch) is
+      -log (length / (2 * D)), where length is the length of the shortest
+      path between the two concepts (using node-counting) and D is the
+      maximum depth of the taxonomy.
+    </p>
+
+    <h2>Wu &amp; Palmer</h2>
+    <p>The Wu & Palmer measure (wup) calculates similarity by considering the
+       depths of the two concepts in the UMLS, along with the depth of the LCS
+       The formula is score = 2*depth(lcs) / (depth(s1) + depth(s2)).  This 
+       means that 0 &lt; score &lt;= 1.  The score can never be zero because 
+       the depth of the LCS is never zero (the depth of the root of a taxonomy 
+       is one). The score is one if the two input concepts are the same.
+    </p>
+
+   <h2>Resnik</h2>
+   <p>The related value is equal to the information content (IC) of the
+      Least Common Subsumer (LCS) (most informative subsumer).  This means
+      that the value will always be greater-than or equal-to zero.  The
+      upper bound on the value is generally quite large and varies depending
+      upon the size of the corpus used to determine information content values.
+      To be precise, the upper bound should be ln (N) where N is the number of
+      words in the corpus.</p>
+
+    <h2>Jiang &amp; Conrath</h2>
+    <p>The similarity value returned by the jcn measure is equal to
+       1 / jcn_distance, where jcn_distance is equal to
+      IC(concept1) + IC(concept2) - 2 * IC(lcs).
+    </p>
+    <p>There are two special cases that need to be handled carefully when
+      computing similarity; both of these involve the case when jcn_distance
+      is zero.
+    </p>
+    <p>In the first case, we have ic(concept1) = ic(concept2) = ic(lcs) = 0.
+      In an ideal world, this would only happen when all three concepts,
+      viz. concept1, concept2, and lcs, are the root node. However, when a
+      concept has a frequency count of zero, we use the value 0 for the
+      information content. In this first case, we return 0 due to lack of
+      data.
+    </p>
+    <p>In the second case, we have ic(concept1) + ic(concept2) = 2 * ic(ics).
+      This is almost always found when concept1 = concept2 = lcs (i.e., the
+      two input concepts are the same). Intuitively this is the case of
+      maximum similarity, which would be infinity, but it is impossible
+      to return infinity. Insteady we find the smallest possible distance
+      greater than zero and return the multiplicative inverse of that distance.
+    </p>
+
+    <h2>Lin</h2>
+    <p>The similarity value returned by the lin measure is a number equal
+      to 2 * IC(lcs) / (IC(concept1) + IC(concept2)). Where IC(x) is the
+      information content of x. One can observe, then, that the similarity
+      value will be greater-than or equal-to zero and less-than or equal-to
+      one.
+    </p>
+    <p>
+      If the information content of any of either concept1 or concept2 is zero,
+      then zero is returned as the similarity score, due to lack of data.
+      Ideally, the information content of a concept would be zero only if
+      that concept were the root node, but when the frequency of a concept 
+      is zero, we use the value of zero as the information content because
+      of a lack of better alternatives.
+    </p>
+    <h2>Conceptual Distance</h2>
+    <p>The similarity value returned by the cdist measure is the number of 
+      edges between two concepts in the UMLS. This was initial proposed by 
+      Rada, et. al. using the RB/RN relations in the UMLS and later evaluated 
+      by Caviedes and Cimino using the PAR/CHD relations. 
+    </p>
+    <h2> Nguyen and Al-Mubaid</h2>
+    <p>The similarity value returned by the nam measure is computed by 
+      calculating the log of two plus the product of the shortest distance 
+      between the two concepts minus one and the depth of the taxonomy minus 
+      the depth of the LCS. Concepts that are more similar with have a lower 
+      similarity score than concepts that are less similar with this measure.
+    </p>
+    <h2>Random</h2>
+    <p>The similarity values are simply randomly generated numbers. 
+     This is intended only to be used as a baseline. 
+    </p>
+  </body>
+</html>

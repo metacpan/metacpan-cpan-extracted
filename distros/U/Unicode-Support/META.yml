@@ -1,0 +1,28 @@
+---
+abstract: 'Test various things with Unicode'
+author:
+  - 'brian d foy <bdfoy@cpan.org>'
+build_requires:
+  Test::Manifest: 2.00
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110440'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Unicode-Support
+provides:
+  Unicode::Support:
+    file: lib/Unicode/Support.pm
+    version: 0.001
+recommends:
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+requires:
+  perl: 5.014
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.001

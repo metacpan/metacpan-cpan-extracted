@@ -1,0 +1,15 @@
+Changes
+lib/UDT/Simple.pm
+Makefile.PL
+MANIFEST
+perlobject.map
+ppport.h
+README
+Simple.xs
+t/stream.t
+t/UDT-Simple.t
+inc/Devel/CheckLib.pm
+typemap
+UDT__Simple.hpp
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

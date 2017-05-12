@@ -1,0 +1,16 @@
+^CVS/
+^.git/
+/CVS/
+pm_to_blib$
+MYMETA.yml
+MYMETA.json
+,v$
+\.(bak|new|old)$
+\bMakefile$
+\.o$
+\.c$
+\.bs$
+\.tar\.
+\bblib\b
+\.svn/
+^(.*/)?MYMETA\..*$

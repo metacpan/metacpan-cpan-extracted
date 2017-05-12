@@ -1,0 +1,89 @@
+=head1 NAME
+
+Ubic::Watchdog::Notice - Notice service for ubic.
+
+=head1 VERSION
+
+version 0.31
+
+=head1 SYNOPSIS
+
+    Start notice service:
+    $ ubic start ubic.notice
+
+=head1 DESCRIPTION
+
+Currently module can notice by email and to L<HIPCHAT|https://www.hipchat.com> or L<SLACK|https://slack.com> service.
+
+=head1 INSTALLATION
+
+Put this code in file `/etc/ubic/service/ubic/notice`:
+
+    use Ubic::Service::SimpleDaemon;
+    
+    Ubic::Service::SimpleDaemon->new(
+        bin => ['ubic-notice'],
+    );
+
+Put this configuration in file `/etc/ubic/notice.cfg`:
+
+
+    {
+	    From => 'likhatskiy@gmail.com',
+	    To   => 'name@mail.com',
+    };
+
+Start it:
+
+    $ ubic start ubic.notice
+
+=head1 OPTIONS
+
+=over
+
+=item B< From >
+    
+Sets the email address to send from.
+
+=item B< To >
+    
+Sets the addresses in `MIME::Lite` style to send to.
+
+=item B< log >
+    
+Path to `ubic-watchdog` file for scan. Default is `/var/log/ubic/watchdog.log`.
+
+=item B< hipchat >
+    
+Notice to L<HIPCHAT|https://www.hipchat.com> service.
+
+	hipchat => {
+		token => 'YOUR_TOKEN',
+		room  => 'ROOM_NAME'
+	},
+
+=item B< slack >
+    
+Notice to L<SLACK|https://slack.com> service.
+
+	slack => {
+		token    => 'YOUR_TOKEN',
+		channel  => '#CHANNEL_NAME'
+		username => 'Ubic Server Bot'
+	},
+
+=back
+
+=head1 SOURCE REPOSITORY
+
+L<https://github.com/likhatskiy/Ubic-Watchdog-Notice>
+
+=head1 AUTHOR
+
+Alexey Likhatskiy, <likhatskiy@gmail.com>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2014 "Alexey Likhatskiy"
+
+This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.

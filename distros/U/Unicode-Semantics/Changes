@@ -1,0 +1,15 @@
+Revision history for Perl extension Unicode::Semantics.
+
+1.02  Fri Sep 7 00:09 2007
+        - Reverted Exporter use to old style because 5.8.1 and 5.8.2 don't
+          support the new style. (FAIL#603990, FAIL#603996)
+        - Fixed minor documentation typos
+
+1.01  Sun Sep 2 17:34 2007
+        - abeltje wrote a new test on a dvorak keyboard! :)
+        - Added a whole bunch of other new tests
+        - Improved documentation
+
+1.00  Thu Aug 30 09:27 2007
+        - Released during YAPC::Europe 2007 (Vienna)
+        - See http://juerd.nl/files/slides/2007yapceu/unicodesemantics.html

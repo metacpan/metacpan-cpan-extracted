@@ -1,0 +1,30 @@
+Revision history for Perl extension Unicode::Precis.
+
+1.100  Fri Jan 15 2016
+
+  - Adding "Nickname" PRECIS profile: Unicode::Precis::Nickname.
+
+1.000  Mon Sep 07 2015
+
+  - Unicode::Precis::SASLprep was splitted into three packages:
+    Unicode::Precis::OpaqueString, Unicode::Precis::UsernameCaseMapped and
+    Unicode::Precis::UsernameCasePreserved.
+  - Needs Unicode::Normalize 1.23 or later to support UTF-8 bytestring on
+    EBCDIC platforms and to provide faster XS implementation.
+
+0.02  Tue Jul 21 2015
+
+  - Fixed some typos in code.
+
+0.01  Mon Jul 20 2015
+
+  - Adding "SASLprep" PRECIS profiles.
+
+0.000_02  Tue Jul 14 2015
+
+  - Initial CPAN upload.
+
+0.000_01  Sat Jul 11 2015
+
+  - Initial commit.
+

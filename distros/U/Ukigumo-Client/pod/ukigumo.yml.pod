@@ -1,0 +1,111 @@
+=encoding utf8
+
+=for stopwords ukigumo YAML CamelCase ikachan
+
+=head1 NAME
+
+ukigumo.yml - Configuration file by YAML
+
+=head1 SYNOPSIS
+
+    before_install:
+      - "cpanm -L $HOME/.ukigumo/ukigumo-client/extlib --installdeps -n ."
+    install: "ln -s $HOME/.ukigumo/ukigumo-client/extlib ./extlib"
+    script: prove -lrv -Iextlib/lib/perl5 t
+
+=head1 DESCRIPTION
+
+Configuration file by YAML.
+
+=head1 CONFIGURABLE ITEMS
+
+=over 4
+
+=item * C<env>
+
+One time environment variables that are enabled on running tasks.
+
+    env:
+      - foo: bar
+      - buz: qux
+      - foo: hoge
+
+=item * C<project_name>
+
+Voluntary project name. If you don't want to use repository name as the project name, please configure this.
+
+    project_name: MyProj
+
+=item * C<notifications>
+
+Notifiers. Registered notifiers module are looked up in C<Ukigumo::Client::Notify::*> (module name will be converted to CamelCase automatically).
+
+    notifications:
+      ikachan:
+        - url: localhost
+          channel: "#ukigumo"
+      github_statuses:
+        - api_endpoint: localhost
+          access_token: __ACCESS_TOKEN__
+
+Now available notifiers names are followings;
+
+=over 8
+
+=item * callback (L<Ukigumo::Client::Notify::Callback>)
+
+=item * debug (L<Ukigumo::Client::Notify::Debug>)
+
+=item * github_statuses (L<Ukigumo::Client::Notify::GitHubStatuses>)
+
+=item * growl (L<Ukigumo::Client::Notify::Growl>)
+
+=item * ikachan (L<Ukigumo::Client::Notify::Ikachan>)
+
+=back
+
+=item * C<before_install>
+
+Commands that runs on before install phase (default: do nothing).
+
+    before_install:
+      - echo "before install!"
+
+=item * C<install>
+
+Commands that runs on install phase (default: C<cpanm --notest --installdeps .>).
+
+    install:
+      - bundle install --path=./bundle/gems
+
+=item * C<before_script>
+
+Commands that runs on before main script phase , and after install phase (default: do nothing).
+
+    before_script
+      - echo "before script!"
+
+=item * C<script>
+
+Main command (default: command that is passed by L<ukigumo-client.pl> or C<Ukigumo::Client::Executor::Perl>).
+
+    script
+      - rake spec
+
+=item * C<after_script>
+
+Commands that runs on after main script phase (default: do nothing).
+
+    after_script
+      - echo "this is the end"
+
+=back
+
+=head1 NOTES
+
+=head2 Execution sequence of commands
+
+C<before_install> -> C<install> -> C<before_script> -> C<script> -> C<after_script>
+
+=cut
+

@@ -1,0 +1,80 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+BEGIN {
+    if ($ENV{COMP_CWORD}) {
+        eval "use Getopt::Complete::Cache class => 'UR::Namespace::Command', above => 1;";
+        exit if ($@);
+    }
+    if ($ENV{COMP_LINE}) {
+        #for transitioning from older version of completion
+        #just return no result
+        exit;
+    }
+};
+
+use above "UR";
+
+UR::Namespace::Command->execute_with_shell_params_and_exit();
+
+=pod
+
+=head1 NAME
+
+B<ur> - command-line interface to UR 
+
+=head1 DESCRIPTION
+
+The B<ur> command is the entry point for a suite of tools to create
+and manage a module tree of UR classes, data sources, and views.
+
+It also includes launchers for some built-in services.
+
+=head1 SUB-COMMANDS
+
+See the help on specific sub-commands for details.  
+
+ init      NAMESPACE [DB]      initialize a new UR app in one command            
+ define    ...                 define namespaces, data sources and classes       
+ describe  CLASSES-OR-MODULES  show class properties, relationships, meta-data   
+ update    ...                 update parts of the source tree of a UR namespace 
+ list      ...                 list objects, classes, modules                    
+ sys       ...                 service launchers                                 
+ test      ...                 tools for testing and debugging                   
+
+=head1 DEVELOPMENT 
+
+=head2 PWD
+
+Running this WITHIN the source tree of a UR namespace will automatically "use lib" your tree.
+
+A message will appear to STDERR when this occurs.  See the <above> module for context-sensitive library usage info. 
+
+=head2 MAC SOFTWARE MODULE API
+
+Looking for the docs on UR.pm on a Mac?  
+
+Try "perldoc UR.pm" or "man UR".  On some systems (Mac),
+perldoc will show this page for both "perldoc ur" and also "perldoc UR" due to
+filesystem case insensitivity.
+
+=head2 SOURCE
+
+UR is hosted on github, at:
+ 
+ http://github.com/sakoht/ur
+
+=head1 BUGS
+
+Report bugs at http:://github.com/sakoht/ur/issues
+
+=head1 AUTHOR
+
+Scott Smith (sakoht)
+
+ at cpan.org
+
+=cut
+
+

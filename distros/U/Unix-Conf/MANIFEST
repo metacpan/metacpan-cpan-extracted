@@ -1,0 +1,8 @@
+Changes
+Conf.pm
+Conf/ConfIO.pm
+Conf/Err.pm
+Makefile.PL
+MANIFEST
+README
+test.pl

@@ -1,0 +1,60 @@
+{
+   "abstract" : "Determine the current uptime, in seconds, and load",
+   "author" : [
+      "Mike Kelly <pioto@pioto.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.132140",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Unix-Uptime",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0",
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      }
+   },
+   "provides" : {
+      "Unix::Uptime" : {
+         "file" : "lib/Unix/Uptime.pm",
+         "version" : "0.4000"
+      },
+      "Unix::Uptime::BSD" : {
+         "file" : "lib/Unix/Uptime/BSD.pm",
+         "version" : "0.4000"
+      },
+      "Unix::Uptime::BSD::XS" : {
+         "file" : "lib/Unix/Uptime/BSD/XS.pm",
+         "version" : "0.4000"
+      },
+      "Unix::Uptime::Linux" : {
+         "file" : "lib/Unix/Uptime/Linux.pm",
+         "version" : "0.4000"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Unix-Uptime"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/pioto/Unix-Uptime"
+      }
+   },
+   "version" : "0.4000"
+}

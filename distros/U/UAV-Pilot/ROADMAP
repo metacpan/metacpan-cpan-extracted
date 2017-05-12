@@ -1,0 +1,25 @@
+Version 0.10
+-----------
+* *::Control::Event modules should have their own role.
+* Modify uav_joystick (and other bin/uav_*) to use share/ libraries
+* For bin/uav;
+    * Different libraries will need to be loaded with a different host
+    * Use a factory pattern for init'ing the drivers and controllers
+    * Error message formatting
+    * Use a Factory object to create the Driver and Control objects
+    * Load a config file for loading modules by default
+    * Possibly use subref in @INC to load REPL modules.  See require() perlfunc 
+      docs in Perl 5.19.2.  Note that feature was implemented in 5.10 according 
+      to 5.19.2's perldelta.
+* EasyEvent takes nav data into account ("vert_speed 1.0 until altitude == 
+  10000cm")
+* Document:
+    * bin/uav_video_dump (all command line options)
+
+
+Version ???
+-----------
+* Send multiconfig commands in order to set video display size and fps
+* Joystick
+    * Support more than one joystick
+    * Map toggle buttons using config

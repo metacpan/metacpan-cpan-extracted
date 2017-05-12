@@ -1,0 +1,35 @@
+# Revision history for URI-Amazon-APA
+#
+# $Id: Changes,v 0.5 2013/07/16 18:32:01 dankogai Exp dankogai $
+$Revision: 0.5 $ $Date: 2013/07/16 18:32:01 $
+! lib/URI/Amazon/APA.pm
+  Merged: #85910 (URI::query_form has potential to double encode)
+  https://github.com/dankogai/p5-uri-amazon-apa/pull/1
+
+0.04 2011/05/21 21:53:23
+! lib/URI/Amazon/APA.pm
+  Default API version upgraded to 2010-09-01
+  https://rt.cpan.org/Ticket/Display.html?id=68244
+! Makefile.PL
+  Addressed: Undeclared dependency on Encode
+  https://rt.cpan.org/Ticket/Display.html?id=50731
+
+0.03 2009/10/19 09:33:51
+! lib/URI/Amazon/APA.pm
+  Single quote (') should be escaped
+  http://github.com/miyagawa/p5-uri-amazon-apa/commit/857d4d3a99b2ad4d913f2da0205fbd81b07870b2
+! lib/URI/Amazon/APA.pm
+  No longer uses POSIX::strftime().
+! Makefile.PL
+  Requires URI.pm 1.36 or better
+  http://coderepos.org/share/changeset/34935
+  http://twitter.com/matsuu/status/3559718797
+
+0.02 2009/05/22 19:31:05
+! lib/URI/Amazon/APA.pm
+  Handles non-ASCII query properly
+  http://blog.livedoor.jp/dankogai/archives/51211577.html#comments
+
+0.01    2009/05/10 11:01:30
+        First version, released on an unsuspecting world.
+

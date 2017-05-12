@@ -1,0 +1,26 @@
+---
+abstract: 'Perl interface to the Unified Medical Language System (UMLS)'
+author:
+  - 'Bridget McInnes <bthomson@cs.umn.edu>, Ted Pedersen <tpederse@d.umn.edu>, Serguei Pakhomov <pakh0002@umn.edu>, Siddharth Patwardhan <sidd@cs.utah.edu>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: UMLS-Interface
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DBD::mysql: 0
+  DBI: 0
+  Digest::SHA1: 2.12
+  File::Path: 2.08
+  File::Spec: 3.31
+version: 1.51

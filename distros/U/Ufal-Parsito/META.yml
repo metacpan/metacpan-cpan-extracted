@@ -1,0 +1,50 @@
+---
+abstract: 'Bindings to Parsito library'
+author:
+  - 'Milan Straka <straka@ufal.mff.cuni.cz>'
+build_requires:
+  ExtUtils::CBuilder: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.142060'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Ufal-Parsito
+provides:
+  Ufal::Parsito:
+    file: lib/Ufal/Parsito.pm
+    version: v1.1.0.1
+  Ufal::Parsito::Children:
+    file: lib/Ufal/Parsito.pm
+    version: v1.1.0.1
+  Ufal::Parsito::Node:
+    file: lib/Ufal/Parsito.pm
+    version: v1.1.0.1
+  Ufal::Parsito::Nodes:
+    file: lib/Ufal/Parsito.pm
+    version: v1.1.0.1
+  Ufal::Parsito::Parser:
+    file: lib/Ufal/Parsito.pm
+    version: v1.1.0.1
+  Ufal::Parsito::Tree:
+    file: lib/Ufal/Parsito.pm
+    version: v1.1.0.1
+  Ufal::Parsito::TreeInputFormat:
+    file: lib/Ufal/Parsito.pm
+    version: v1.1.0.1
+  Ufal::Parsito::TreeOutputFormat:
+    file: lib/Ufal/Parsito.pm
+    version: v1.1.0.1
+  Ufal::Parsito::Version:
+    file: lib/Ufal/Parsito.pm
+    version: v1.1.0.1
+  Ufal::Parsitoc:
+    file: lib/Ufal/Parsito.pm
+    version: v1.1.0.1
+resources:
+  license: http://www.mozilla.org/MPL/2.0/index.txt
+version: v1.1.0.1

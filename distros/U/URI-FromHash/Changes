@@ -1,0 +1,27 @@
+0.05     2015-10-17
+
+- Require URI 1.68 and use the query_form method to ensure that query params
+  are always sorted by key. Based on PR #1 from Greg Oschwald.
+
+
+0.04     2013-06-16
+
+- Pod fixes.
+
+
+0.03     2008-05-30
+
+- Add missing dependency - Params::Validate.
+
+- Added support for accepting an array reference for the path. Based
+  on a suggestion from Dave Doyle. RT #31352.
+
+
+0.02     2006-02-24
+
+- Forgot to include a dependency on URI.pm. Duh.
+
+
+0.01     2006-02-24
+
+- Initial release

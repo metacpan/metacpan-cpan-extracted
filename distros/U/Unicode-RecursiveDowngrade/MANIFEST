@@ -1,0 +1,12 @@
+Changes
+lib/Unicode/RecursiveDowngrade.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00_compile.t
+t/01_test_pod.t
+t/02_simple_downgrade.t
+t/03_arrayref_downgrade.t
+t/04_hashref_downgrade.t
+t/05_composite_downgrade.t

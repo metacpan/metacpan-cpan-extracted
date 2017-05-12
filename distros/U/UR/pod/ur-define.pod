@@ -1,0 +1,25 @@
+
+
+=pod
+
+=head1 NAME
+
+ur define - define namespaces, data sources and classes
+
+
+
+=head1 VERSION
+
+This document describes ur define version 0.29.
+
+=head1 SUB-COMMANDS
+
+ namespace  NSNAME               create a new namespace tree and top-level module 
+ db         URI NAME             add a data source to the current namespace       
+ class      --extends=? [NAMES]  Add one or more classes to the current namespace 
+
+
+
+
+=cut
+

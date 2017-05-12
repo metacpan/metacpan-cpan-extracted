@@ -1,0 +1,28 @@
+Installating and Configuring Tkdm
+---------------------------------
+
+Tkdm is installed as part of the UnixODBC.pm installation process.  If
+for some reason you want to install it manually, you can copy the
+program to a directory like /usr/bin or /usr/local/bin, as in this
+example.
+
+  # su
+  # cp tkdm /usr/local/bin
+  # chmod 0755 /usr/local/bin/tkdm
+
+Copy the dot-odbclogins file to $HOME/.odbclogins, and make sure that
+the permissions are set so that other users can't view the login
+information.
+
+   $ cp dot-odbclogins $HOME/.odbclogins
+   $ chmod 0600 $HOME/.odbclogins
+
+There must be an entry for each host that has a UnixODBC bridge server
+installed, with your login name and password for that system.  There
+are sample entries in the dot-odbclogins file, and information about
+the entry format in the tkdm manual page ("man tkdm").
+
+For a description of how to use tkdm, refer to the manual page:
+type "man tkdm."
+
+$Id: README,v 1.2 2003-07-13 14:24:02 kiesling Exp $

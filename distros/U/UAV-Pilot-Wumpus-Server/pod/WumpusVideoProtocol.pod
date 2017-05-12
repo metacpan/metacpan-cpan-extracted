@@ -1,0 +1,66 @@
+=head1 Wumpus Video Protocol
+
+Video data is sent with headers in this order of bytes:
+
+=over 4
+
+=item * 2 bytes: Magic number (0xFB42)
+
+=item * 2 bytes: Protocol version (this document specifies version 0x0001)
+
+=item * 2 bytes: Codec ID (h.264 = 0x0001, JPEG = 0x0002)
+
+=item * 4 bytes: Flags
+
+=item * 4 bytes: Payload length
+
+=item * 2 bytes: Width of video
+
+=item * 2 bytes: Height of video
+
+=item * 4 bytes: Adler32 checksum of payload
+
+=item * 4 bytes: Frame count of video
+
+=item * 6 bytes: Reserved for future use
+
+=back
+
+This will be followed by the payload data.
+
+
+=head2 Flags
+
+The following bits are specified for the Flags field.
+
+=over 4
+
+=item 1 - Reserved for future use
+
+=item 2 - If 1, this frame is a keyframe.  Codecs where every frame is effectively a keyframe (e.g. MJPEG) should always set this to 1.
+
+=item 3 - If 1, the frame count value has overflowed
+
+=back
+
+
+=head2 Heartbeats
+
+To ensure clients are still connected, the client should periodically send a 
+Hearbeat packet. If the server does not see a heartbeat within a specified time 
+period (e.g. every 1 minute), it may terminate the connection. Clients should send 
+Heartbeats much more often than that (say every 10 seconds).
+
+The Heartbeat is also sent to initiate a connection.
+
+The Heartbeat packet is structured as the following:
+
+=over 4
+
+=item * 2 bytes: Magic number (0xFB42)
+
+=item * 14 bytes: All zeros (reserved for future use)
+
+=back
+
+=cut

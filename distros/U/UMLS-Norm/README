@@ -1,0 +1,41 @@
+UMLS-Norm version 0.01
+======================
+
+This module performs term normalization using UMLS LUINORM. 
+It works best at token level. 
+Given a word as an input, it returns its normalized form.
+E.g. chemicals -> chemical
+alzheimer's -> alzheimer
+
+The LUINorm program has to be downloaded and installed 
+inorder to work with his module.
+For more infromation about Norm program and its sister program 
+LUINorm refer: 
+http://lexsrv2.nlm.nih.gov/SPECIALIST/Projects/lvg/2009/docs/userDoc/tools/norm.html
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  blah blah blah
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2010 by Harsha Gurulingappa
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

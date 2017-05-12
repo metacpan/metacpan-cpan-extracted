@@ -1,0 +1,74 @@
+{
+   "abstract" : "Perl port of Underscore.js",
+   "author" : [
+      "Viacheslav Tykhanovskyi, C<vti@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.7.5",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "UnderscoreJS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "B" : "0",
+            "List::MoreUtils" : "0",
+            "Test::Spec" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "UnderscoreJS" : {
+         "file" : "lib/UnderscoreJS.pm",
+         "version" : "0.07"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/vti/underscore-perl/issues"
+      },
+      "homepage" : "https://github.com/vti/underscore-perl",
+      "repository" : {
+         "url" : "git://github.com/vti/underscore-perl",
+         "web" : "https://github.com/vti/underscore-perl"
+      }
+   },
+   "version" : "0.07",
+   "x_contributors" : [
+      "richdouglasevans <rich.douglas.evans@gmail.com>",
+      "vti <viacheslav.t@gmail.com>"
+   ]
+}

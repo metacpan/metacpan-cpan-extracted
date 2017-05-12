@@ -1,0 +1,104 @@
+#!/usr/bin/perl
+#
+# Create a character mapping for GB2312 encoding.
+# usage: mkCSGB2312.pl
+#
+# Requires the map file GB2312.TXT (mapping actually GB2312-80) in the
+# current directory, produces the map file CSGB2312.TXT 
+#
+# Copyright (C) 2000 Martin Schwartz. All rights reserved.
+# This program is free software; you can redistribute it and/or
+# modify it under the same terms as Perl itself.
+#
+# Contact: Martin Schwartz <martin@nacho.de>
+#
+
+my $info = <<END;
+#
+# GB2312 to Unicode table; a mixed one byte, two byte mapping.
+#
+# NOTE: This file is generated automatically from GB2312.TXT by mkCSGB2312
+# It is constructed from the mappings of:
+#
+#     - ISO8859-1 characters 0x0000 .. 0x00FF
+#
+#     - GB2312-80 characters in EUC form.
+#
+# Actually GB2312 should not incorporate the whole ISO8859-1 set, but only the
+# Unicode characters 0x0020 to 0x007f. World's usage is different...
+# As an effect of this a round trip conversion GB2312 -> UTF16 -> GB2312 will
+# produce differences if the original GB2312 encoding contains one or more
+# of these ISO-8859-1 one byte characters:
+# 
+#     0xA4, 0xA7, 0xA8, 0xB0, 0xB1, 0xD7, 0xE0, 0xE1, 0xE8, 0xE9,
+#     0xEA, 0xEC, 0xED, 0xF2, 0xF3, 0xF7, 0xF9, 0xFA, 0xFC
+#     
+# Anyway these differences shouldn't cause rendering problems, since the
+# translation back to GB2312 for these characters will utilize an original
+# character of set GB2312-80.
+#  
+# martin [2000-Jun-19]
+#
+END
+
+use strict;
+
+main: {
+    print "Creating GB2312 encoding, based on GB2312-80 encoding.\n";
+    _open ( );
+    _createInfo ( );
+    _createMapping ( );
+    _close ( );
+    print "Done. Saved as CSGB2312.TXT\n";
+}
+
+sub _open {
+    open ( GB2312, "GB2312.TXT" )
+        or die "Can't open input file GB2312.TXT! ($!)"
+    ;
+    open ( CSGB2312, ">CSGB2312.TXT" )
+        or die "Can't open output file CSGB2312.TXT! ($!)"
+    ;
+}
+
+sub _createInfo {
+    print CSGB2312 $info;
+}
+
+sub _createMapping {
+    print CSGB2312 "\n# ISO-8859-1 characters (0x0000-0x00ff):\n\n";
+    for ( 0x00 .. 0xff ) {
+        printf CSGB2312 "0x%02x\t0x%04x\n", $_, $_;
+    }
+
+    # print CSGB2312 "\n\n# Unambiguous ISO-8859-1 characters:\n\n";
+    # for (
+    #     0x80..0xa3, 0xa5..0xa6, 0xa9..0xaf, 0xb2..0xd6, 
+    #     0xd8..0xdf, 0xe2..0xe7, 0xeb, 0xee..0xf1, 0xf4..0xf6,
+    #     0xf8, 0xfb, 0xfd, 0xfe, 0xff
+    # ) {
+    #     printf CSGB2312 "0x%02x\t0x%04x\n", $_, $_;
+    # }
+
+    print CSGB2312 "\n\n# GB2312-80 characters:\n\n";
+    while ( <GB2312> ) {
+        next unless /^0x/i;
+        my ($gb, $uni) = /(0x....)\s+(0x....)/;
+        if ( $gb && $uni ) {
+            my $euc = hex ($gb) | 0x8080;
+            printf CSGB2312 "0x%04x\t$uni\n", $euc;
+        }
+    }
+
+    print CSGB2312 "\n# End of file\n";
+}
+
+sub _close {
+    close CSGB2312
+        or die "Can't close input file GB2312.TXT! ($!)"
+    ;
+    close GB2312
+        or die "Can't close output file CSGB2312.TXT! ($!)"
+    ;
+}
+

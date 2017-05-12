@@ -1,0 +1,84 @@
+U
++0	1	2	3	4	5	6	7	8	9	A	B	C	D	E	F	Block
+0020		!	"	#	$	%	&	'	(	)	*	+	,	-	.	/	C0 Controls and Basic Latin
+(identical to ASCII)
+0030	0	1	2	3	4	5	6	7	8	9	:	;	<	=	>	?
+0040	@	A	B	C	D	E	F	G	H	I	J	K	L	M	N	O
+0050	P	Q	R	S	T	U	V	W	X	Y	Z	[	\	]	^	_
+0060	`	a	b	c	d	e	f	g	h	i	j	k	l	m	n	o
+0070	p	q	r	s	t	u	v	w	x	y	z	{	|	}	~	 
+	C1 Controls and Latin-1 Supplement
+(identical to ISO/IEC 8859-1)
+00A0	 	¡	¢	£	¤	¥	¦	§	¨	©	ª	«	¬	-	®	¯
+00B0	°	±	²	³	´	µ	¶	·	¸	¹	º	»	¼	½	¾	¿
+00C0	À	Á	Â	Ã	Ä	Å	Æ	Ç	È	É	Ê	Ë	Ì	Í	Î	Ï
+00D0	Ð	Ñ	Ò	Ó	Ô	Õ	Ö	×	Ø	Ù	Ú	Û	Ü	Ý	Þ	ß
+00E0	à	á	â	ã	ä	å	æ	ç	è	é	ê	ë	ì	í	î	ï
+00F0	ð	ñ	ò	ó	ô	õ	ö	÷	ø	ù	ú	û	ü	ý	þ	ÿ
+0100	Ā	ā	Ă	ă	Ą	ą	Ć	ć	Ĉ	ĉ	Ċ	ċ	Č	č	Ď	ď	Latin Extended-A
+0110	Đ	đ	Ē	ē	Ĕ	ĕ	Ė	ė	Ę	ę	Ě	ě	Ĝ	ĝ	Ğ	ğ
+0120	Ġ	ġ	Ģ	ģ	Ĥ	ĥ	Ħ	ħ	Ĩ	ĩ	Ī	ī	Ĭ	ĭ	Į	į
+0130	İ	ı	Ĳ	ĳ	Ĵ	ĵ	Ķ	ķ	ĸ	Ĺ	ĺ	Ļ	ļ	Ľ	ľ	Ŀ
+0140	ŀ	Ł	ł	Ń	ń	Ņ	ņ	Ň	ň	ŉ	Ŋ	ŋ	Ō	ō	Ŏ	ŏ
+0150	Ő	ő	Œ	œ	Ŕ	ŕ	Ŗ	ŗ	Ř	ř	Ś	ś	Ŝ	ŝ	Ş	ş
+0160	Š	š	Ţ	ţ	Ť	ť	Ŧ	ŧ	Ũ	ũ	Ū	ū	Ŭ	ŭ	Ů	ů
+0170	Ű	ű	Ų	ų	Ŵ	ŵ	Ŷ	ŷ	Ÿ	Ź	ź	Ż	ż	Ž	ž	ſ
+	Latin Extended-B
+0190	 	ƒ	 
+01F0	 	Ǻ	ǻ	Ǽ	ǽ	Ǿ	ǿ
+02C0	 	ˆ	ˇ	 	ˉ	 	Spacing Modifier Letters
+02D0	 	˘	˙	˚	˛	˜	˝	 
+0370	 	;	 	Greek
+0380	 	΄	΅	Ά	·	Έ	Ή	Ί	 	Ό	 	Ύ	Ώ
+0390	ΐ	Α	Β	Γ	Δ	Ε	Ζ	Η	Θ	Ι	Κ	Λ	Μ	Ν	Ξ	Ο
+03A0	Π	Ρ	 	Σ	Τ	Υ	Φ	Χ	Ψ	Ω	Ϊ	Ϋ	ά	έ	ή	ί
+03B0	ΰ	α	β	γ	δ	ε	ζ	η	θ	ι	κ	λ	μ	ν	ξ	ο
+03C0	π	ρ	ς	σ	τ	υ	φ	χ	ψ	ω	ϊ	ϋ	ό	ύ	ώ	 
+0400	Ѐ	Ё	Ђ	Ѓ	Є	Ѕ	І	Ї	Ј	Љ	Њ	Ћ	Ќ	Ѝ	Ў	Џ	Cyrillic
+0410	А	Б	В	Г	Д	Е	Ж	З	И	Й	К	Л	М	Н	О	П
+0420	Р	С	Т	У	Ф	Х	Ц	Ч	Ш	Щ	Ъ	Ы	Ь	Э	Ю	Я
+0430	а	б	в	г	д	е	ж	з	и	й	к	л	м	н	о	п
+0440	р	с	т	у	ф	х	ц	ч	ш	щ	ъ	ы	ь	э	ю	я
+0450	ѐ	ё	ђ	ѓ	є	ѕ	і	ї	ј	љ	њ	ћ	ќ	ѝ	ў	џ
+0490	Ґ	ґ	 
+1E80	Ẁ	ẁ	Ẃ	ẃ	Ẅ	ẅ	 	Latin Extended Additional
+1EF0	 	Ỳ	ỳ	 
+2010	 	–	—	―	 	‗	‘	’	‚	‛	“	”	„	 	General Punctuation
+2020	†	‡	•	 	…	 
+2030	‰	 	′	″	 	‹	›	 	‼	 	‾	 
+2040	 	⁄	 
+2070	 	ⁿ	Super/Subscripts
+20A0	 	₣	₤	 	₧	 	€	 	Currency Symbols
+2100	 	℅	 	Letterlike symbols
+2110	 	ℓ	 	№	 
+2120	 	™	 	Ω	 	℮	 
+2150	 	⅛	⅜	⅝	⅞	 	Number Forms
+2190	←	↑	→	↓	↔	↕	 	Arrows
+21A0	 	↨	 
+2200	 	∂	 	∆	 	∏	Mathematical Operators
+2210	 	∑	−	 	∕	 	∙	√	 	∞	∟
+2220	 	∩	 	∫	 
+2240	 	≈	 
+2260	≠	≡	 	≤	≥	 
+2300	 	⌂	 	Miscellaneous Technical
+2310	⌐	 
+2320	⌠	⌡	 
+2500	─	 	│	 	┌	 	Box drawing characters
+2510	┐	 	└	 	┘	 	├	 
+2520	 	┤	 	┬	 
+2530	 	┴	 	┼	 
+2550	═	║	╒	╓	╔	╕	╖	╗	╘	╙	╚	╛	╜	╝	╞	╟
+2560	╠	╡	╢	╣	╤	╥	╦	╧	╨	╩	╪	╫	╬	 
+2580	▀	 	▄	 	█	 	▌	 	Block Elements
+2590	▐	░	▒	▓	 
+25A0	■	□	 	▪	▫	▬	 	Geometric Shapes
+25B0	 	▲	 	►	 	▼	 
+25C0	 	◄	 	◊	○	 	●
+25D0	 	◘	◙	 
+25E0	 	◦	 
+	Miscellaneous Symbols
+2630	 	☺	☻	☼	 
+2640	♀	 	♂	 
+2660	♠	 	♣	 	♥	♦	 	♪	♫	 
+F000	 			 	Private Use Area
+FB00	 	ﬁ	ﬂ	 	Alphabetic Presentation Forms

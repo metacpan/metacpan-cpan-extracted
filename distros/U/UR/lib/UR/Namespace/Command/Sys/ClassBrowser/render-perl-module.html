@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<head>
+    <title>[% module_name %]</title>
+    <link href="assets/css/class-browser.css" rel="stylesheet" media="screen">
+</head>
+<body>
+<div>
+    [% SET lineno = 0 %]
+    [% FOREACH line IN lines %]
+        [% lineno = lineno + 1 %]
+        <a name="[% lineno %]"/><div class="code">[% line %]&nbsp;</div>
+    [% END %]
+</div>
+</body>

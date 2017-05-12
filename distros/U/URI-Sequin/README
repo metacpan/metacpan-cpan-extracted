@@ -1,0 +1,52 @@
+
+ ==-==-==-==-==-==-==-==-==-==-==-==-==-==-==-==-==-==-==-==-==-==
+ 
+ SSSSSSSSSS SSSSSSSSSS SSSSSSSSSS SSS    SSS SSSSSSSSSS SSS    SSS
+ SSSSSSSSSS SSSSSSSSSS SSSSSSSSSS SSS    SSS SSSSSSSSSS SSS    SSS
+ SSSSSSSSSS SSSSSSSSSS SSSSSSSSSS SSS    SSS SSSSSSSSSS SSSS   SSS
+ SSSSS      SSSS       SSS    SSS SSS    SSS    SSSS    SSSSS  SSS
+ SSSSS      SSSS       SSS    SSS SSS    SSS    SSSS    SSSSSS SSS
+ SSSSSSSSSS SSSSSSS    SSS    SSS SSS    SSS    SSSS    SSSSSSSSSS
+ SSSSSSSSSS SSSSSSS    SSS     SS SSS    SSS    SSSS    SSSSSSSSSS
+      SSSSS SSSS       SSS SSSS S SSS    SSS    SSSS    SSS SSSSSS
+      SSSSS SSSS       SSS  SSSS  SSS    SSS    SSSS    SSS  SSSSS
+ SSSSSSSSSS SSSSSSSSSS SSSSS SSSS SSSSSSSSSS SSSSSSSSSS SSS   SSSS
+ SSSSSSSSSS SSSSSSSSSS SSSSSS SSS SSSSSSSSSS SSSSSSSSSS SSS    SSS
+ SSSSSSSSSS SSSSSSSSSS SSSSSSS SS SSSSSSSSSS SSSSSSSSSS SSS    SSS
+
+ ==-==-==-==-==-==-==-==-==-==-==-==-==-==-==-==-==-==-==-==-==-==
+
+  [S]earch   [E]ngine   [Q]uery   [U]rl   [I]nformation   [N]oter
+           Version 1.2 by Peter Sergeant (01-09-03)
+
+                  ( great tasting new formula! ) 
+
+SEQUIN is intended to extract the keywords used and the name of a
+search engine given the a line from a logfile that contains a
+referal URL from a Search Engine which GETs its data.
+
+Unlike traditional applications for doing this, it does not rely
+on a preset list of search engines and thus currently works with
+almost every search engine URL the author could get his hands on.
+
+Comments are appreciated - if you find a search engine with which
+it does not work, I would be truly fascinated. 
+
+Included:
+=-=-=-=-=
+	README           - This file
+	CHANGES          - List of changes through revisions
+	MANIFEST         - A list of what's included to keep MAKE happy
+	Sequin.pm  	 		 - The module itselfy
+	Example.pl 	     - Some working code to play with
+	Makefile.pl      - What we make the makefile with
+	Test.pl		       - A test file to keep MAKE happy
+	ref1.log	       - Some sample URLs to play with
+	ref2.log	       - Some logfile lines to play with
+
+Copyright (c) 2000 - 2003, Peter Sergeant. All Rights Reserved.
+      This module is free software. It may be used, redistributed
+      and/or modified under the terms of the Perl Artistic License
+      (see http://www.perl.com/perl/misc/Artistic.html)
+
+

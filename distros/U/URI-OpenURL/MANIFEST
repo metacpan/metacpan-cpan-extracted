@@ -1,0 +1,11 @@
+MANIFEST
+Makefile.PL
+README
+CHANGELOG
+lib/URI/OpenURL.pm
+t/custom.t
+t/empty.t
+t/journal.t
+t/parse.t
+t/referent.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,28 @@
+URI::magnet
+
+This Perl module provides Magnet scheme support for URI objects. Simply install it and your URI objects will also be able to parse Magnet URIs!
+
+See the full documentation and usage examples with:
+
+perldoc URI::magnet
+
+INSTALLATION
+
+To install this module, use cpan or cpanm:
+
+  cpan URI::magnet
+
+For a manual installation, download and extract the module, then run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012, Breno G. de Oliveira
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

@@ -1,0 +1,84 @@
+Unix-Mknod version 0.04
+=======================
+
+This module allows access to the device routines major()/minor()/makedev()
+that may or may not be macros in .h files.
+
+It also allows access to the mknod system call.
+
+NOTES
+
+There are 2 other perl modules that implement the mknod(2) system call,
+but they have problems working on some platforms.  Sys::Mknod does not
+work on AIX because it uses the syscall(2) generic system call which
+AIX does not have.  Mknod implements S_IFIFO, which on most platforms
+is not implemented in mknod, but rather mkfifo (which is implemented
+in POSIX perl module).
+
+The perl module File::Stat::Bits also implements major() and minor() (and
+a version of makedev() called dev_join).  They are done as a program to
+get the bit masks at compile time, but if major() and minor() are
+implemented as sub routines, the arugment could be something as simple
+as an index to a lookup table (and thereby having no decernable relation
+to its result).
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+PLATFORMS
+
+This module has been tested out and verified on the following platforms:
+
+FreeBSD-5.4-STABLE
+Mac OS X 10.3.9
+Solaris 8, 9, 10
+RedHat Linux EL 4.1
+AIX 4.3.3, 5.1
+
+
+DEPENDENCIES
+
+This module does not require any other modules or libraries.
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2005-2008 University of Illinois Board of Trustees
+All rights reserved.
+
+Developed by: Campus Information Technologies and Educational Services,
+              University of Illinois at Urbana-Champaign
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+``Software''), to deal with the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+* Redistributions of source code must retain the above copyright
+  notice, this list of conditions and the following disclaimers.
+
+* Redistributions in binary form must reproduce the above copyright
+  notice, this list of conditions and the following disclaimers in the
+  documentation and/or other materials provided with the distribution.
+
+* Neither the names of Campus Information Technologies and Educational
+  Services, University of Illinois at Urbana-Champaign, nor the names
+  of its contributors may be used to endorse or promote products derived
+  from this Software without specific prior written permission.
+
+THE SOFTWARE IS PROVIDED ``AS IS'', WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR
+ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+OR THE USE OR OTHER DEALINGS WITH THE SOFTWARE.
+

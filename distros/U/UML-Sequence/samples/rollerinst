@@ -1,0 +1,11 @@
+#!/usr/bin/perl
+use DiePair;
+
+my $die_pair          = DiePair->new (6, 6);
+my ($total, $doubles) = $die_pair->roll ();
+$die_pair             = DiePair->new (6, 6);
+($total, $doubles)    = $die_pair->roll ();
+
+print "Your total is $total ";
+print "it was doubles\n" if $doubles;
+print "it was not doubles\n" unless $doubles;

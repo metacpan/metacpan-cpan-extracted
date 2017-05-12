@@ -1,0 +1,11 @@
+Revision history for Perl extension UDT::Simple.
+0.03  Fri Aug 15 17:29:30 2014
+	- add inc/Devel/CheckLib.pm to the MANIFEST
+
+0.02  Fri Aug 15 17:29:30 2014
+	- add libudt dependency check in Makefile.PL
+
+0.01  Sun May 25 20:14:28 2014
+	- original version; created by h2xs 1.23 with options
+		-A -n UDT::Simple
+

@@ -1,0 +1,25 @@
+The following scripts require "keys" for the tests to run correctly:
+
+findCuiDepth.t
+findDFS.t
+findLeastCommonSubsumer.t
+findPathToRoot.t
+findShortestPath.t
+getAssociatedCuis.t
+getAssociatedTerms.t
+getChildren.t
+getCuiDef.t
+getCuiList.t
+getIC.t
+getParents.t
+getRelated.t
+getRelations.t
+getStDef.t
+getSts.t
+
+Each of these scripts co-incide with a program in the util/ directory
+under the same name. If a key does not exist for the version of the 
+UMLS that you are using. They will automatically be created in key/ 
+under the directory of your version.
+
+

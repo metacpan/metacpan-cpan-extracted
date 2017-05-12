@@ -1,0 +1,89 @@
+NAME
+
+    UI::Bowdlator::Filter - Helper for specifying input filters to
+    Bowdlator
+
+SYNOPSIS
+
+        # maps all typed characters to uppercase
+        use UI::Bowdlator::Filter;
+    
+        # connect to Bowdlator server
+        my $bowdlator = UI::Bowdlator::Filter->new()
+            or die "Bowdlator server not online\n";
+    
+        my $composed = '';
+        while ($bowdlator->getKey(handle_backspace => \$composed)) {
+    
+            if (/^[^[:graph:]]/a) { # non graphical character ends composition
+                $bowdlator->commit(\$composed);
+                next;
+            }
+    
+            $composed .= uc;
+    
+            $bowdlator->suggest($composed);
+        }
+
+DESCRIPTION
+
+    Makes writing filters for Bowdlator (http://github.com/a3f/Bowdlator)
+    easier.
+
+METHODS AND ARGUMENTS
+
+    new([$sock])
+
+      Connects to a running Bowdlator AF_UNIX socket. Returns undef on
+      connection failure. Default socket is
+      /usr/local/var/run/bowdlator.sock. Optionally, an actual socket or a
+      path to one can be specified.
+
+    getKey([keep_nul => 0, buffer_size => 160, handle_backspace => undef])
+
+      Blocks till the user types a Key while Bowdlator is selected. Accepts
+      following optional arguments:
+
+      handle_backspace
+
+	User code can offload backspace handling to the module. On
+	backspace receipt, the module will discard the composed string's
+	last character, and chop and return the one before it, so it can be
+	rehandled. If the buffer is empty, a backspace (\b) is returned.
+
+      keep_nul
+
+	Bowdlator sends NUL-terminated strings. The module strips them
+	unless instructed otherwise.
+
+      buffer_size
+
+	The recv buffer size. This shouldn't need changing. Default is 160.
+
+      undef is returned on socket error.
+
+    suggest($display, @candidates)
+
+      Sends off a suggestion to $display and a list of @candidates to
+      choose from. (Candidates list support not immplemented yet).
+
+    commit(\$commit)
+
+      Sends off the final string to $commit. If $commit is a ref, it will
+      be cleared.
+
+GIT REPOSITORY
+
+    http://github.com/athreef/UI-Bowdlator-Filter
+
+AUTHOR
+
+    Ahmad Fatoum <athreef@cpan.org>, http://a3f.at
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2016 Ahmad Fatoum
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

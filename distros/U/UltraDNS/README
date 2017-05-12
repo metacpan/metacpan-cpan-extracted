@@ -1,0 +1,29 @@
+UltraDNS - Client API for the NeuStar UltraDNS Transaction Protocol
+
+STATUS
+
+Very much alpha, with rapid development at the moment.
+Released to encourage feedback.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+        # set ULTRADNS_CONNECT_ARGS env var to 'host.domain:port|sponsor|username|password'
+	make test
+	make install
+
+
+DEPENDENCIES
+
+Refer to the META.yaml file
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009, TigerLead.com
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

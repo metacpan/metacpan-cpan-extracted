@@ -1,0 +1,35 @@
+NAME
+    Todo List for UMLS-Interface
+
+SYNOPSIS
+    Plans for future versions of UMLS-Interface
+
+TO DO LIST
+    1. concurrency control so that while a table is in the process of being
+    created it can not be used by used by another program.
+
+    2. seperate out the SABDEF and the SAB functions. I was thinking of a
+    DefFinder.pm module to contain this information. I didn't get around to
+    actually completing it. It will take a little bit given how everything
+    is so coupled together. I might try this in the future.
+
+    3. added t/ test for getDUI.pl and associated functionality
+
+AUTHORS
+    Bridget McInnes <bthomson at cs.umn.edu>
+
+    Ted Pedersen <tpederse at d.umn.edu>
+
+SEE ALSO
+COPYRIGHT
+    Copyright (C) 2007-2011 Ted Pedersen, Bridget T. McInnes
+
+    Permission is granted to copy, distribute and/or modify this document
+    under the terms of the GNU Free Documentation License, Version 1.2 or
+    any later version published by the Free Software Foundation; with no
+    Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
+
+    Note: a copy of the GNU Free Documentation License is available on the
+    web at <http://www.gnu.org/copyleft/fdl.html> and is included in this
+    distribution as FDL.txt.
+

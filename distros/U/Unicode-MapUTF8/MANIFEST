@@ -1,0 +1,15 @@
+Build.PL
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Unicode/MapUTF8.pm
+lib/Unicode/MapUTF8.pod
+pod/MapUTF8.ja_JP.utf8.pod
+pod/MapUTF8.ja_JP.eucjp.pod
+pod/MapUTF8.en.pod
+t/01_unicode_maputf8.t
+t/97_distribution.t
+t/98_pod_coverage.t
+t/99_pod.t
+META.yml

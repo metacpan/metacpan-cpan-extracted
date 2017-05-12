@@ -1,0 +1,60 @@
+NAME
+    Unix::Groups - Perl to support "getgroups" and "setgroups" syscalls
+
+SYNOPSIS
+     use Unix::Groups qw/:all/;
+
+     $ngroups_max=NGROUPS_MAX;
+     @gids=getgroups;
+     $success=setgroups(@gids);
+
+INSTALLATION
+     perl Makefile.PL
+     make
+     make test
+     make install
+
+DESCRIPTION
+    This module implements a very thin layer around the getgroups(2) and
+    setgroups(2) syscalls. See your system manual for more information.
+
+    Note, the module is written and tested on Linux. For other UNIX-like
+    systems there are good chances that it will work at least if it compiles
+    properly.
+
+  Functions
+   $n=NGROUPS_MAX
+    returns the max. number of arguments that "setgroups" will accept.
+
+   @gids=getgroups
+    returns the list of supplementary group IDs of the current process. It
+    is very similar to the $( variable. But $( is a string and its first
+    element is the current effective GID.
+
+   $success=setgroups @gids
+    sets the list of supplementary group IDs of the current process. On most
+    systems this is a privileged operation. On Linux "CAP_SETGID" is
+    required.
+
+  EXPORT
+    None by default.
+
+    On demand all functions are exported.
+
+   Export tags
+    :all
+        export all functions.
+
+SEE ALSO
+    Linux manual.
+
+AUTHOR
+    Torsten Förtsch, <torsten.foertsch@gmx.net>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2011 by Torsten Foertsch
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.12.3 or, at
+    your option, any later version of Perl 5 you may have available.
+

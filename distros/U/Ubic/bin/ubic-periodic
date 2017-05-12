@@ -1,0 +1,117 @@
+#!/usr/bin/env perl
+package ubic_periodic;
+$ubic_periodic::VERSION = '1.60';
+# ABSTRACT: run given command every N seconds
+
+use strict;
+use warnings;
+
+
+use Getopt::Long 2.33;
+use Pod::Usage;
+
+return 1 if caller;
+
+my $period = 60;
+my $stdout;
+my $stderr;
+my $rotate_logs;
+
+GetOptions(
+    'period=i' => \$period,
+    'stdout=s'  => \$stdout,
+    'stderr=s'  => \$stderr,
+    'rotate-logs!' => \$rotate_logs,
+) or pod2usage(2);
+pod2usage(2) unless @ARGV == 1;
+
+my $command = shift @ARGV;
+
+sub xunlink {
+    my $file = shift;
+    unlink $file or die "Can't unlink '$file': $!";
+}
+
+sub xrename {
+    my ($from, $to) = @_;
+    rename $from => $to or die "Can't rename '$from' to '$to': $!";
+}
+
+sub touch {
+    my $file = shift;
+    open my $fh, '>', $file or die "Can't touch '$file': $!";
+}
+
+sub rotate {
+    my $file = shift;
+    my $time = time;
+
+    return unless -e $file;
+
+    unless (-e "$file.1") {
+        touch("$file.1");
+    }
+    my $mtime = (stat "$file.1")[9];
+    if ($time - $mtime >= 86400) {
+        # it's time to rotate!
+        if (-e "$file.2") {
+            xunlink("$file.2");
+        }
+        xrename("$file.1" => "$file.2");
+        xrename($file => "$file.1");
+    }
+}
+
+while (1) {
+    my $start_time = time;
+
+    if ($rotate_logs) {
+        rotate($stdout);
+        rotate($stderr);
+    }
+
+    # we reopen logs on every loop, so we don't have to restart periodic service on logrotate
+    if ($stdout) {
+        open STDOUT, '>>', $stdout or die "Can't open stdout: $!";
+    }
+    if ($stderr) {
+        open STDERR, '>>', $stderr or die "Can't open stderr: $!";
+    }
+    system($command); # no, we don't check for failures
+
+    my $time = time;
+    if ($time - $start_time < $period) {
+        sleep $start_time + $period - $time;
+    }
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+ubic_periodic - run given command every N seconds
+
+=head1 VERSION
+
+version 1.60
+
+=head1 SYNOPSIS
+
+    ubic-periodic --period=60 --stdout=/var/log/ubic/watchdog.log --stderr=/var/log/ubic/watchdog.err.log ubic-watchdog
+
+=head1 AUTHOR
+
+Vyacheslav Matyukhin <mmcleric@yandex-team.ru>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Yandex LLC.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

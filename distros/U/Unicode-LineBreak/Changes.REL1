@@ -1,0 +1,228 @@
+2011.0  Xxx Xxx XX XXXX
+	* Imp: Added ComplexBreaking option to choose SA complex breaking
+	  will be performed or not (if it is suppoted).
+	* Added test #14; skipping test #7 on non-SA build.
+	* Chg: Changes of public interface:
+	  - Format callback name "DEFAULT" was deprecated. Use "SIMPLE".
+	  - SizingMethod callback name "DEFAULT" was deprecated. Use "UAX11".
+	  - SizingMethod callback with extra 6th argument was deprecated.
+	  - UrgentBreaking callback name "NONBREAK" was deprecated. Use undef.
+	  - UrgentBreaking callback should take two arguments, not five.
+	* Imp: In array context, break() and break_partial() return an array
+	  of lines.
+	* Chg: Linebreak library package was renamed to Sombok.
+	* Requires Sombok >= 2011.0.
+	* Doc: some typos.
+	* Doc: Unicode::GCString:
+	- split POD and code.
+	- added docs on undocumented things.
+
+1.011  Sat Jan 01 2011
+	* Updated linebreak library (improved conformance to UAX #14).
+	* Added BreakIndent option that defaults to "YES".
+	* Requires linebreak >= 1.10.0
+	* Added test #0 (partially failed).
+
+1.010    Wed Dec 29 2010
+
+	* New linebreak library (1.9; fixed broken pair table).
+	* Added constants for some ambiguous quotation marks (QU).
+	* Doc: some modifications
+
+1.008.2  Tue Nov 16 2010
+
+	* Fixed linebreak library (only for Win32).
+
+1.008.1  Mon Nov 01 2010 - Withdrawn
+
+1.008  Mon Oct 11 2010
+
+	* By now linebreak library will be maintained independently. See repository
+	  <http://hatuka.nezumi.nu/repos/linebreak>.
+	* Removed Version.pm.
+	* Needs linebreak >= 1.8.1.
+	* MSWin32+MinGW support (testing).
+	* Doc: Unicode::GCString: small fix.
+
+1.008_02  Sat Sep 18 2010
+
+	* Update UCD to 6.0.0beta at Sep 1.
+	* Needs linebreak >= 1.8.
+
+1.008_01  Tue Aug 10 2010
+
+	* Update UCD to 6.0.0beta at Jun 21.
+	* Check if libthai is broken on compile time.
+	* Small fixes on docs.
+
+1.007.520  Wed Dec 30 2009
+
+	* Fix: Text::LineFold: Newline option doesn't have effect for fold()
+	  second style.
+	* New: Text::LineFold::unfold: ``FLOWEDSP'' method for DelSp=No.
+	* Imp: Unicode::GCString: New undocumented method lbclass_ext().
+	* Imp: Unicode::GCString: lbclass() and lbclass_ext() allow negative
+	  arguments.
+	* Fix: non-CM characters in grapheme extender were ignored.
+	* Requires linebreak 1.5.
+	* removed unused data/rules2pl.pl.
+	* Added test #13.
+	* Some typos.
+
+1.006.520  Sat Dec 05 2009
+
+	* Fix: Update VERSION for Text::LineFold.
+	* Fix: Text::LineFold: non-Unicode was not allowed for Newline option.
+	* Doc: Small fixes.
+
+1.005.520  Mon Nov 30 2009
+
+	* Imp: Text::LineFold::fold(): Second calling style to ease transition
+	  from Text::Wrap::wrap().
+	* Chg: Text::LineFold::fold() considers tab stops: Added new option
+	  TabSize.
+	* Doc: Fixed example of SizingMethod option to count spaces at
+	  beginning of lines.
+	* Doc: Some typos.
+	* Makefile.PL: Support for separate linebreak library (incompleted).
+	* Added test #12.
+	
+1.004.520  Sun Oct 18 2009
+
+	* Imp: XS'ized built-in Format & UrgentBreak functions. 5-10% faster.
+	* Doc: Added an example of SizingMethod option.
+	* Doc: Added notes for utf8_mg_pos_cache_update panic.
+	* Added tests for Format & UrgentBreak options.
+	* Requires linebreak 1.4.x.
+
+1.003.520  Thu Oct 15 2009
+
+	* NOTE: For changes on linebreak library see linebreak/ChangeLog.
+	* Fix: Makefile.PL: fix for dmake+MSWin32 (hopefully).
+	* Fix: LineBreak.xs: UTF8_MAXBYTES exists as of Perl>=5.8.8.  Use
+	  UTF8_MAXLEN.
+	* Fix: URGENT_BREAKING_FUNCS{FORCE}: Workaround for Perl5 RT #69422 -
+	  utf8_mg_pos_cache_update panic - Perl 5.10.1 & (maybe) 5.10.0.
+	* Imp: LineBreak.xs: Check data type of self argument.
+	* Imp: preprocess() get Perl (utf8) string then returns array.  Faster.
+	* Imp: XS'ized break().
+	* New: Unicode::GCString::join().
+	* Added test for Format feature.
+	* Doc: Small fixes.
+	
+1.003_11  Sun Oct 11 2009
+
+	* Imp: Almost full XS version.  Isolated pure-C codes to linebreak library.
+	* Chg: Update Unicode data to version 5.2.0.
+	* Doc: Small fix.
+	
+1.003_09  Sun Oct 04 2009
+
+	* Transitional release - NOTE that this release is VERY slow.
+	* Imp/Chg: Custom functions (for sizing, user breaking, urgent breaking
+	  and format) accepts grapheme cluster string.
+	* Cleanup: separate C codes.
+	* Doc: Added more example.
+	* Doc: Added link to CPAN RT page.
+	* Doc: Added a bug to BUGS section.
+
+1.003_06  Sat Sep 12 2009
+
+	* Fix: Get back LB9: Some CM characters may be single grapheme cluster
+	  as their Grapheme_Cluster_Break property is Control.
+	* Imp: Almost XS'ized grapheme cluster processing.  Approx. 25% faster.
+	
+1.003_05  Thu Sep 10 2009
+
+	* Chg: Include suffixing ``URL:'' to URI pattern.
+	* Imp: Efficient user-breaking.  Approx. 10% faster.
+
+1.003_03  Sat Sep 06 2009
+
+	* Chg: Deprecated non-XS version.
+	* Imp: XS'ized character data. Implemented hash index for searching.
+	  Approx. 10% faster in speed, approx. 40KB more in memory usage.
+	* Removed ranges of trivial entries (e.g. XX on lbmap), reserved for CJK
+	  ideographs etc. from character data maps.
+	* Update Unicode data for 5.2.0beta to those of Aug 24.
+	* Doc: Fixed attributes for some UCS ranges.  Correct several typos.
+
+1.002.510  Sun Jun 21 2009
+
+	* Chg: Apply CMOS rules to "BREAKURI".
+
+1.000.510  Sat Jun 20 2009
+
+	* Fix: broken testin/th.in
+	* Imp: Added QUESTIONABLE_NARROW_SIGNS constant.
+	* Chg: $UNICODE_VERSION to constant UNICODE_VERSION
+	* Fix: Sync options of Text::LineFold->new() with base class.
+
+1.000_02  Sat Jun 13 2009
+
+	* Fix: Correct Thai (th) tests.
+	* Fix: Unassigned code points are given N, not A (except those of SIP are W).
+	* Imp: strsize(): Now texts are broken at boundaries of graphame cluster.
+	* Chg: SA characters are resolved by Grapheme_Cluster_Break property,
+	  as some suffixing vowels have General_Category Lo and some others have
+		Grapheme_Cluster_Break Prepend property.
+	* Added tests for incremental input.
+	* Chg: Remove @LB_CLASSES which may not be used;
+	* Chg: Remove NarrowAL and NSKanaAsID options: use TailorEA/TailorLB options.
+	
+1.000_01  Sat May 30 2009
+
+	* Fix: broken non-XS strsize().
+	* New: Added Thai word segmentation using libthai.
+
+0.005.510  Fri May 29 2009
+
+	* Chg: renamed functions: remove ``get-''.
+	* New: break_partial() method.
+	* New: eawidth() method, XS'ized.
+	* Imp: XS'ized strsize().
+	* Fix: lbclass(): use SV* instead of char*.
+	* Fix: Mc characters aren't nonspacing: Mn, Me, Cc, Cf, Zl and Zp
+	  are nonspacing.
+	* Cleanup codes and PODs.
+
+0.004.510  Sat May 23 2009
+	* New: method getstrsize().
+	* Imp: XS'ize getlbclass().
+	* Doc: separate POD.  Added a few examples.
+	
+0.003.510  Thu May 21 2009
+	* Fix: Perl 5.6.x - skip tests with older POD::Simple.
+	* Imp: remove \p{...} pattern matchings slower than substr().
+
+0.002.510  Sun May 17 2009
+	* Partial XS support.
+	* lib/Unicode/LineBreak.pm: Added second format of SizingMethod
+	  subroutines.
+	
+0.001.510  Sun May 10 2009
+	* No new features.  Small fixes on documentation.
+
+0.001  Sat May 09 2009
+	* 0.001 release.
+	- Added urgent/custom breaking features.
+	- Added tests.
+
+0.001_11  Sat May 02 2009
+	* 0.001beta.  Added Text::LineFold module.
+
+0.001_03  Wed Apr 29 2009
+	* alpha.
+
+0.001_02  Sun Apr 26 2009
+	* pre-alpha.
+
+0.001_01  Sat Apr 18 2009
+	* pre-alpha.
+
+	Local Variables:
+	mode: change-log
+	change-log-default-name: "Changes"
+	tab-width: 2
+	left-margin: 2
+	End:

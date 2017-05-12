@@ -1,0 +1,35 @@
+<div class="modal">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4>[% meta.property_name %]</h4>
+    </div>
+    <div class="modal-body scrollable">
+        <dl class="dl-horizontal">
+            [% FOREACH key IN show %]
+                <dt>[% key %]</dt>
+                [% SET val = meta.item(key).list %]
+                <dd>
+                    [% IF val.size > 1 %]
+                        <ul class="horizontal-list">
+                            [% FOREACH elt IN val %]
+                                <li>
+                                [% PROCESS render_value val = elt %]
+                                </li>
+                            [% END %]
+                        </ul>
+                    [% ELSE %]
+                        [% PROCESS render_value val = meta.item(key) %]
+                    [% END %]
+                </dd>
+            [% END %]
+        </dl>
+    </div>
+</div>
+[% BLOCK render_value %]
+    [% IF val.defined %]
+        [% val %]
+    [% ELSE %]
+        <span class="label label-info">undef</span>
+    [% END %]
+[% END %]
+

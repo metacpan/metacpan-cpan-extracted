@@ -1,0 +1,206 @@
+#!/usr/bin/perl
+
+# $Id: client,v 1.1 2003-11-28 22:25:43 kiesling Exp $
+$VERSION=1.0;
+
+use UnixODBC qw(:all);
+use Getopt::Long;
+
+my $env;
+my $cnh;
+my $sth;
+my $r;
+
+## 
+## Options from the command line
+##
+my $DSN = '';      # Data Source Name
+my $UserName = ''; # DBMS User Name
+my $PassWord = ''; # DBMS Password
+
+my $usage=<<EOH;
+Usage: alltypes [--help] | [--user=<username>] [--password=<password>] --dsn=<DSN> 
+  --help       Print this help and exit.
+  --dsn        Data source name.
+  --user       DBMS login name.
+  --password   DBMS login password.
+EOH
+
+my $help;  # Print help and exit.
+
+GetOptions ('help' => \$help,
+	    'dsn=s' => \$DSN,
+	    'user=s' => \$UserName,
+	    'password=s' => \$PassWord);
+
+if ($help || (not length ($DSN)))
+     {
+	 print $usage;
+	 exit 0;
+     }
+
+
+
+my $ncols;
+my ($rbuf, $mlen, $nattr);
+
+$SIG{PIPE} = sub { print "SIGPIPE: ". $! . "\n"};
+
+$r = SQLAllocHandle ($SQL_HANDLE_ENV, $SQL_NULL_HANDLE, $evh);
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    print "SQLAllocHandle evh: ";
+   &getdiagrec ($SQL_HANDLE_ENV, $evh);
+    exit 1;
+}
+
+$r = SQLSetEnvAttr($evh, $SQL_ATTR_ODBC_VERSION, $SQL_OV_ODBC2, 0);
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    &getdiagrec ($SQL_HANDLE_ENV, $evh);
+    exit 1;
+}
+
+$r = SQLAllocConnect ($evh, $cnh);
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    &getdiagrec ($SQL_HANDLE_ENV, $evh);
+    exit 1;
+}
+
+$r = SQLConnect ($cnh, $DSN, $SQL_NTS,
+			    $UserName, $SQL_NTS,
+			    $PassWord, $SQL_NTS);
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    &getdiagrec ($SQL_HANDLE_DBC, $cnh);
+    exit 1;
+}
+
+$r = &UnixODBC::SQLAllocHandle ($SQL_HANDLE_STMT, $cnh, $sth);
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    &getdiagrec ($SQL_HANDLE_DBC, $cnh);
+    exit 1;
+}
+
+$r = &UnixODBC::SQLGetTypeInfo ($sth, $SQL_ALL_TYPES);
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    &getdiagrec ($SQL_HANDLE_STMT, $sth);
+    exit 1;
+}
+
+$r = &UnixODBC::SQLNumResultCols ($sth,$ncols);
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    &getdiagrec ($SQL_HANDLE_STMT, $sth);
+    exit 1;
+}
+
+foreach my $i (1..$ncols) {
+    $r = &UnixODBC::SQLColAttribute ($sth, $i, 
+				     $SQL_COLUMN_NAME, $char_attribute, 
+				     255, $mlen, $nattr);
+    if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+	&getdiagrec ($SQL_HANDLE_STMT, $sth);
+	exit 1;
+    }
+    print "$char_attribute\t";
+}
+print "\n";
+
+while (1) {
+    $r = &UnixODBC::SQLFetch ($sth);
+    last if $r == $SQL_NO_DATA;
+    foreach my $cn (1..4) {
+	$r=&UnixODBC::SQLGetData ($sth, $cn, $SQL_C_CHAR, $rbuf, 255, $mlen);
+	print "$rbuf\t";
+    }
+    print "\n";
+}
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    &getdiagrec ($SQL_HANDLE_STMT, $sth);
+    exit 1;
+}
+
+$r = SQLFreeHandle ($SQL_HANDLE_STMT, $sth);
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    &getdiagrec ($SQL_HANDLE_DBC, $sth);
+    exit 1;
+}
+
+$r = SQLDisconnect ($cnh);
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    &getdiagrec ($SQL_HANDLE_DBC, $cnh);
+    exit 1;
+}
+
+$r = SQLFreeConnect ($cnh);
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    &getdiagrec ($SQL_HANDLE_DBC, $cnh);
+    exit 1;
+}
+
+$r = SQLFreeHandle ($SQL_HANDLE_ENV, $evh);
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    &getdiagrec ($SQL_HANDLE_ENV, $evh);
+    exit 1;
+}
+
+sub getdiagrec {
+    my ($handle_type, $handle) = @_;
+    my ($sqlstate, $native, $message_text, $mlen);
+    print 'SQLGetDiagRec: ';
+    $r = &UnixODBC::SQLGetDiagRec ($handle_type, $handle, 1, $sqlstate,
+				   $native, $message_text, 255,
+				   $mlen);
+    if ($r == $SQL_NO_DATA) { 
+	print "result \= SQL_NO_DATA\n";
+    } elsif (($r == 1) || ($r == 0)) { 
+     print "$message_text\n";
+    } else { 
+     print "sqlresult = $r\n";
+    }
+    return $r;
+}
+
+=head1 NAME
+
+alltypes - Display data type information of a DBMS server.
+
+=head1 SYNOPSIS
+
+alltypes [--help] | [--user=<username>] [--password=<password>] --dsn=<DSN>
+
+=head1 DESCRIPTION
+
+Alltypes prints the data types defined for a data source's DBMS server.  
+The data types are listed in a table, with fields delimited by tabs, 
+and lines delimited by newlines.
+
+=head1 OPTIONS
+
+=head2 --help
+
+Print a help message and exit.
+
+=head2 --dsn
+
+The name of the data source.
+
+=head2 --user
+
+User's login name on the DBMS server.
+
+=head2 --password
+
+User's login password on the DBMS server.
+
+=head1 VERSION INFORMATION AND CREDITS
+
+Revision: $Revision: 1.1 $
+
+Written by: Robert Allan Kiesling, rkies@cpan.org.
+
+Licensed under the same terms as Perl.  Please refer to the
+file "Artistic" for details.
+
+=head1 SEE ALSO
+
+perl(1), UnixODBC(3), UnixODBC::BridgeServer(3).
+
+=cut

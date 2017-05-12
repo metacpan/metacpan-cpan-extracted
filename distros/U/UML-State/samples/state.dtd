@@ -1,0 +1,20 @@
+<!ELEMENT state_diagram  (states, transition_set+)>
+<!ELEMENT states         (state_row+)             >
+<!ELEMENT state_row      (state+)                 >
+<!ELEMENT state          EMPTY                    >
+<!ELEMENT transition_set (transition+)            >
+<!ELEMENT transition     EMPTY                    >
+
+<!ATTLIST states         name       CDATA  #REQUIRED
+                         label      CDATA  #IMPLIED
+                         accepting  CDATA  "no"
+                         start_from CDATA  #IMPLIED
+                         start_to   CDATA  #IMPLIED   >
+
+<!ATTLIST transition_set label      CDATA  #REQUIRED  >
+
+<!ATTLIST transition     from       CDATA  #REQUIRED
+                         to         CDATA  #REQUIRED
+                         arc        CDATA  ""
+                         start_from CDATA  #IMPLIED
+                         start_to   CDATA  #IMPLIED   >

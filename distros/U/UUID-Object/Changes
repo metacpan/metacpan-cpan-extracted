@@ -1,0 +1,25 @@
+Revision history for Perl extension UUID::Object
+
+0.81    Mon May 31 17:00:00 JST 2010
+        - adjust overloading comparator to act with string (RT#57738)
+
+0.80    Tue Apr 28 12:00:00 JST 2009
+        - this module is going to be marked as DECRECATED
+
+0.04    Thu Apr 16 10:00:00 JST 2009
+        - released as 0.04
+          (code except $VERSION is quite the same as 0.03_01)
+
+0.03_01 Tue Apr 14 11:00:00 JST 2009
+        - changed the way to inherit Exporter's import() method
+          (to deal with Exporter prior to version 5.57)
+
+0.03    Mon Apr 13 12:00:00 JST 2009
+        - modified t/14_time.t (to ignore failure for bad time() impl.)
+
+0.02    Mon Apr 07 17:55:00 JST 2009
+        - fixed as from 'use strict' to 'use warnings'
+
+0.01    Mon Apr 06 14:30:00 JST 2009
+        - original version
+

@@ -1,0 +1,32 @@
+NAME
+
+    UI::Notify::Cocoa - Posts a Cocoa Notification
+
+SYNOPSIS
+
+        use UI::Notify::Cocoa;
+    
+        UI::Notify::Cocoa->show("Message");
+        UI::Notify::Cocoa->show("Title", "Message");
+        UI::Notify::Cocoa->show("Title", "Subtitle", "Message");
+
+DESCRIPTION
+
+    Displays a Cocoa Notification. Eventually will use XS but for now
+    shells out to osascript. Module is OS X only.
+
+GIT REPOSITORY
+
+    http://github.com/athreef/UI-Notify-Cocoa
+
+AUTHOR
+
+    Ahmad Fatoum <athreef@cpan.org>, http://a3f.at
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2016 Ahmad Fatoum
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

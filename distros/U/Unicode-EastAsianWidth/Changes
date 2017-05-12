@@ -1,0 +1,77 @@
+[Changes for 1.33 - 2012-10-21]
+
+* Rebuild with up-to-date Module::Install 1.06; no functional changes.
+
+[Changes for 1.32 - 2012-05-13]
+
+* Correct unit tests for Perl 5.16+.
+
+[Changes for 1.31 - 2012-05-13]
+
+* Clarify that $EastAsianWidth needs to be set at BEGIN time in
+  POD and tests for Perl 5.16+; no functional changes.
+
+* LICENSING CHANGE: This compilation and all individual files in it
+  are now under the nullary CC0 1.0 Universal terms:
+
+  To the extent possible under law, 唐鳳 has waived all copyright and
+  related or neighboring rights to selfvars.
+
+[Changes for 1.30 - 2007-02-08]
+
+* Added miss-parsed lines of ranges in EastAsianWidth.txt, affecting
+  all but the first codepoints of codepoint ranges (as mentioned in
+  the changelog entry for version 1.20).
+
+  Reported by: JJ Jenq
+
+[Changes for 1.20 - 2007-02-08]
+
+* Added miss-parsed lines of ranges in EastAsianWidth.txt, affecting
+  all but the last codepoints of these codepoints:
+
+    3400..4DB5;W
+    4E00..9FBB;W
+    AC00..D7A3;W
+    D800..DB7F;N
+    DB80..DBFF;N
+    DC00..DFFF;N
+    E000..F8FF;A
+    20000..2A6D6;W
+    2A6D7..2F7FF;W
+    2FA1E..2FFFD;W
+    30000..3FFFD;W
+    F0000..FFFFD;A
+    100000..10FFFD;A
+
+  Reported by: JJ Jenq
+
+[Changes for 1.10 - 2007-10-14]
+
+* LICENSING CHANGE: This compilation and all individual files in it
+  are now under the permissive "MIT" license.
+
+* Updated to Unicode Database 5.0.0.
+
+* Ranges in EastAsianWidth.txt are now recognized, in addition to
+  individual codepoints.
+
+* If the EastAsianWidth.txt that came with site Perl is older than
+  the bundled version, we now prefer the bundled version instead.
+
+* Modernized the build infrastructure with Module::Install.
+
+* Tidied up source code, test files, and this changelog.
+
+[Changes for 1.02 - 2003-10-02]
+
+* Updated to Unicode Database 4.0.0.
+
+[Changes for 1.01 - 2002-09-22]
+
+* POD NAME fixes, spelling nits, etc.
+* Correct the PPD x86 binary name.
+
+[Changes for 1.00 - 2002-09-20]
+
+* Initial CPAN release.

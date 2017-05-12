@@ -1,0 +1,72 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/URI-duri/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:runtime-requirement [
+		doap-deps:on "DateTime::Incomplete"^^doap-deps:CpanId;
+	], [ doap-deps:on "URI"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.61"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=URI-duri>;
+	doap:created         "2012-06-15"^^xsd:date;
+	doap:download-page   <https://metacpan.org/release/URI-duri>;
+	doap:homepage        <https://metacpan.org/release/URI-duri>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      [
+		a foaf:Person;
+		foaf:mbox <mailto:tobyink@cpan.org>;
+		foaf:name "Toby Inkster";
+	];
+	doap:name            "URI-duri";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/URI-duri/v_0-001>, <http://purl.org/NET/cpan-uri/dist/URI-duri/v_0-002>, <http://purl.org/NET/cpan-uri/dist/URI-duri/v_0-003>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-uri-duri>;
+	];
+	doap:shortdesc       "the duri and tdb URI schemes".
+
+<http://purl.org/NET/cpan-uri/dist/URI-duri/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:issued            "2012-06-16"^^xsd:date;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/URI-duri-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/URI-duri/v_0-002>
+	a                    doap:Version;
+	dc:issued            "2012-06-17"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Workaround bizarro %+ hash slice bug (http://www.perlmonks.org/index.pl?node_id=976633) in Perl versions older than 5.16.";
+			rdfs:seeAlso <http://www.perlmonks.org/index.pl?node_id=976633>;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/URI-duri/v_0-001>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/URI-duri-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/URI-duri/v_0-003>
+	a                    doap:Version;
+	dc:identifier        "URI-duri-0.003"^^xsd:string;
+	dc:issued            "2014-09-10"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Switch to Dist::Inkt.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/URI-duri-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+

@@ -1,0 +1,43 @@
+NAME
+    Todo List for UMLS-Similarity
+
+SYNOPSIS
+    Plans for future versions of UMLS-Similarity
+
+TO DO LIST
+    1. Add configuration information to the cache files.
+
+    2. Add option such that after the shortest path between the two concepts
+    is of a certain threshold just return a similarity score of zero. There
+    is something similar to this in WordNet:: Similarity. I think this would
+    be very useful when using the --realtime option
+
+    3. Explore using measures of association rather than frequency in the
+    vectors for the vector measure
+
+    4. Explore linking WordNet and the UMLS together outside of the --dict
+    file option for the relatedness measures
+
+    5. Add additional defaults for the icpropgation and vector matrix files.
+    Right now vector matrix comes from clinical records, I think we should
+    explore using the bigrams over the entire Medline provided by NLM. The
+    bigram files is large and therefore thresholds here become really
+    important otherwise we get killed on time.
+
+AUTHORS
+    Bridget T. McInnes <bthomson at cs.umn.edu>
+
+SEE ALSO
+COPYRIGHT
+    Copyright (C) 2007-2011 Ted Pedersen, Bridget T. McInnes, Ying Liu,
+    Serguei Pakhomov
+
+    Permission is granted to copy, distribute and/or modify this document
+    under the terms of the GNU Free Documentation License, Version 1.2 or
+    any later version published by the Free Software Foundation; with no
+    Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
+
+    Note: a copy of the GNU Free Documentation License is available on the
+    web at <http://www.gnu.org/copyleft/fdl.html> and is included in this
+    distribution as FDL.txt.
+

@@ -1,0 +1,42 @@
+URL::Grab
+=========
+
+URL::Grab is a perl module that drastically simplifies the fetching of files.
+It is designed to be used in programs that need common (but not necessarily
+simple) url-fetching features. It is extremely simple to drop into an
+existing program and provides a clean interface to protocol-independant
+file-access. Best of all, URL::Grab takes care of all those pesky
+file-fetching details, and lets you focus on whatever it is that your program
+is written to do!
+
+URL::Grab came into existence as the part of Config::YUM that downloads remote
+yum-configs and header files, but it quickly became clear that this is a
+general problem that many applications must deal with. 
+
+Yes, URL::Grab has been heavily inspired by the famous Python urlgrabber. :-)
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  require Carp;
+  require LWP::UserAgent;
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006-2008 by Oliver Falk <oliver@linux-kernel.at>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+

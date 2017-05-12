@@ -1,0 +1,19 @@
+Revision history for URI-cpan
+
+1.007     2015-04-17 11:22:03+02:00 Europe/Berlin
+        - allow authority section in uri (the "local" in
+          cpan://local/author/BOB)
+
+1.006     2015-03-02 20:40:13-05:00 America/New_York
+        - added $distfile_uri->dist_filepath to get the full path for the
+          distfile
+
+1.005     2013-10-21 22:11:42 America/New_York
+        - update bugtracker and repo metadata
+        - switch from base to parent
+
+1.004     2009-11-27
+          cope with author names with - or 0-9 in them (RT #52130)
+
+1.003     2009-04-05
+          cope with distfile URI that have deep paths to the distfile

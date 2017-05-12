@@ -1,0 +1,103 @@
+v1.4.0        2017-02-27
+
+    [Changed Functionality]
+
+    - "_::alias" is now only provided if Data::Alias is already installed.
+    Technically, this is not a backwards-compatible change but it will not
+    break existing installations.
+
+v1.3.0        2015-05-25
+
+    [New Functionality]
+
+    - Scalars: chomp, index,
+
+    - Lists: min_by, max_by uniq_by, classify
+
+    - Miscellaneous Functions: caller, callstack, process_start, process_run
+
+    [Other Changes]
+
+    - You can now use Util::Underscore more freely since it uses the same license as Perl
+
+v1.2.1        2014-07-30
+
+    [Bugfixes]
+
+    - Tests now pass on all supported platforms
+
+    - "_::ref_type qr//" properly returns "REGEXP" even on Perl 5.10
+
+v1.2.0        2014-07-28
+
+    [New Functionality]
+
+    - Scalars: added is_string, is_bool, alias from Data::Alias, const from Const::Fast.
+
+    - Numbers: added floor, ceil.
+
+    - Miscellaneous Functions: added File() and Dir() as Path::Class bindings
+
+    [Changed Functionality]
+
+    - The is_* validation functions handle undef input without warnings now.
+
+    - References: ref-refs are now handled correctly: "_::is_scalar_ref \\1" is true, and "_::ref_type \\1" is "REF".
+
+    [Other Changes]
+
+    - Tightened dependencies to decrease chance of test failures.
+
+    - Added a "_.pm" file to reduce clashes. I apologize for polluting your file system with such a weird file.
+
+    - Removed documentation for _::package which never existed.
+
+    - Rewrote parts of the docs in a more formal fashion.
+
+    - Split the docs by topic into separate files.
+
+v1.1.1      2014-03-19
+
+    - Removed build files from the manifest.
+
+v1.1.0      2014-03-18
+
+    [New Functionality]
+
+    - Scalars: added is_plain, is_identifier, is_package.
+
+    - Numbers: added is_int, is_uint.
+
+    - Reference Type Validation: added is_ref, is_scalar_ref, is_array_ref,
+    is_hash_ref, is_code_ref, is_glob_ref, is_regex.
+
+    - Classes and Objects: added is_object, is_instance, class_can.
+
+    - Exception Handling: added "carpf" family of functions for formatted error
+    messages.
+
+    - Miscellaneous Functions: added "Data::Dump" functions.
+
+    [Changed Functionality]
+
+    - Improved prototypes for many functions: Nearly all single argument
+    functions now default to "$_" as their arg. This makes their usage in "map",
+    "grep", or "for" more convenient, e.g. "@classes = map _::class, @objects".
+
+    [Other Changes]
+
+    - The documentation is now organized by topic, instead of by source module.
+    In the same vein, the tests were improved.
+
+    - Removed dependency on "Safe::Isa", as we can do the same thing ourselves
+    with less overhead.
+
+    - Various optimizations were merged from DOLMEN
+
+v1.0.1      2014-03-02
+
+    - Fixed bugs that prevented installation on older perls.
+
+v1.0.0      2014-03-02
+
+    - Initial release.

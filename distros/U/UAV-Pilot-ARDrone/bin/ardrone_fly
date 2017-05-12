@@ -1,0 +1,265 @@
+#!/usr/bin/perl
+# Copyright (c) 2015  Timm Murray
+# All rights reserved.
+# 
+# Redistribution and use in source and binary forms, with or without 
+# modification, are permitted provided that the following conditions are met:
+# 
+#     * Redistributions of source code must retain the above copyright notice, 
+#       this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright 
+#       notice, this list of conditions and the following disclaimer in the 
+#       documentation and/or other materials provided with the distribution.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+# POSSIBILITY OF SUCH DAMAGE.
+use v5.14;
+use warnings;
+use AnyEvent;
+use UAV::Pilot;
+use UAV::Pilot::EasyEvent;
+use UAV::Pilot::ARDrone::Driver;
+use UAV::Pilot::ARDrone::Driver::Mock;
+use UAV::Pilot::ARDrone::NavPacket;
+use UAV::Pilot::ARDrone::Video;
+use UAV::Pilot::ARDrone::Video::Mock;
+use UAV::Pilot::ARDrone::Control;
+use UAV::Pilot::Events;
+use UAV::Pilot::SDL::Events;
+use UAV::Pilot::SDL::Video;
+use UAV::Pilot::SDL::VideoOverlay::Reticle;
+use UAV::Pilot::SDL::Window;
+use UAV::Pilot::Video::FileDump;
+use UAV::Pilot::Video::H264Decoder;
+use String::CRC32 'crc32';
+use Getopt::Long ();
+
+use constant NAV_UPDATE_INTERVAL => 1 / 30;
+use constant {
+    FRONT_CAMERA   => 'front',
+    BOTTOM_CAMERA  => 'bottom',
+    RESOLUTION_HD  => 'hd',
+    RESOLUTION_SD  => 'sd',
+};
+
+
+my $IP                = '192.168.1.1';
+my $VIDEO_OUT         = '';
+my $DO_VIDEO          = 1;
+my $DO_JOYSTICK       = 1;
+my $DO_NAV            = 1;
+my $RETICLE           = 0;
+my $CAMERA            = FRONT_CAMERA;
+my $FORMAT            = RESOLUTION_HD;
+my $FPS               = 30;
+my $CONFIG_SESSION_ID = sprintf( '%x', crc32( int rand 2**16 ) );
+my $CONFIG_USER_ID    = sprintf( '%x', crc32( 'uav_pilot_user' ) );
+my $CONFIG_APP_ID     = sprintf( '%x', crc32( 'uav_pilot' ) );
+Getopt::Long::GetOptions(
+    'host=s'      => \$IP,
+    'video'       => \$DO_VIDEO,
+    'video-out=s' => \$VIDEO_OUT,
+    'joystick'    => \$DO_JOYSTICK,
+    'nav'         => \$DO_NAV,
+    'camera=s'    => \$CAMERA,
+    'format=s'    => \$FORMAT,
+    'fps=i'       => \$FPS,
+);
+
+my $VIDEO_OUT_FH;
+
+
+
+sub set_driver_config
+{
+    my ($control, $driver, $easy_event) = @_;
+
+    $control->send_config(
+        $driver->ARDRONE_CONFIG_VIDEO_BITRATE_CONTROL_MODE,
+        $driver->ARDRONE_CONFIG_VIDEO_VBC_MODE_DYNAMIC,
+    );
+
+    my $camera_setting = ($CAMERA eq BOTTOM_CAMERA)
+        ? $driver->ARDRONE_CONFIG_VIDEO_CHANNEL_ZAP_CHANNEL_VERT
+        : $driver->ARDRONE_CONFIG_VIDEO_CHANNEL_ZAP_CHANNEL_HORI;
+    $control->send_config(
+        $driver->ARDRONE_CONFIG_VIDEO_VIDEO_CHANNEL,
+        $camera_setting,
+    );
+
+    my $format_setting = ($FORMAT eq RESOLUTION_SD)
+        ? $driver->ARDRONE_CONFIG_VIDEO_CODEC_H264_360P
+        : $driver->ARDRONE_CONFIG_VIDEO_CODEC_H264_720P;
+    say "Setting codec $format_setting";
+    $control->send_config(
+        $driver->ARDRONE_CONFIG_VIDEO_VIDEO_CODEC,
+        $format_setting,
+    );
+
+    my $bitrate_setting = ($FORMAT eq RESOLUTION_SD)
+        ? 2000
+        : 4000;
+    $control->send_config(
+        $driver->ARDRONE_CONFIG_VIDEO_BITRATE,
+        $bitrate_setting,
+    );
+
+    my $fps = $FPS;
+    if( $fps > $driver->ARDRONE_CONFIG_VIDEO_MAX_FPS ) {
+        warn "*** Max FPS is " . $driver->ARDRONE_CONFIG_VIDEO_MAX_FPS . "\n";
+        $fps = $driver->ARDRONE_CONFIG_VIDEO_MAX_FPS;
+    }
+    elsif( $fps < $driver->ARDRONE_CONFIG_VIDEO_MIN_FPS ) {
+        warn "*** Min FPS is " . $driver->ARDRONE_CONFIG_VIDEO_MIN_FPS . "\n";
+        $fps = $driver->ARDRONE_CONFIG_VIDEO_MIN_FPS;
+    }
+    $control->send_config(
+        $driver->ARDRONE_CONFIG_VIDEO_CODEC_FPS,
+        $fps,
+    );
+
+    return 1;
+}
+
+sub set_comm_watchdog
+{
+    my ($driver, $cv) = @_;
+
+    my $commwatch_timer; $commwatch_timer = AnyEvent->timer(
+        after => 1,
+        interval => 1.5,
+        cb => sub {
+            $driver->at_comwdg;
+            $commwatch_timer;
+        },
+    );
+
+    return 1;
+}
+
+sub build_video_handlers
+{
+    my ($events) = @_;
+    my @h264_handlers;
+    if( $DO_VIDEO || $VIDEO_OUT ) {
+        if( $DO_VIDEO ) {
+            my $window = UAV::Pilot::SDL::Window->new;
+            my $vid_display = UAV::Pilot::SDL::Video->new;
+
+            push @h264_handlers, UAV::Pilot::Video::H264Decoder->new({
+                displays => [$vid_display],
+            });
+
+            $vid_display->add_to_window( $window );
+            $events->register( $window );
+        }
+
+        if( $VIDEO_OUT ) {
+            open( $VIDEO_OUT_FH, '>', $VIDEO_OUT )
+                or die "Can't open file for writing '$VIDEO_OUT': $!\n";
+            my $file_handler = UAV::Pilot::Video::FileDump->new({
+                fh => $VIDEO_OUT_FH,
+            });
+            push @h264_handlers, $file_handler;
+        }
+    }
+
+    return @h264_handlers;
+}
+
+
+{
+    my $cv = AnyEvent->condvar;
+    my $events = UAV::Pilot::Events->new({
+        condvar => $cv,
+    });
+
+    say "Connecting . . . ";
+    my $driver = UAV::Pilot::ARDrone::Driver->new({
+        host => $IP,
+    });
+    $driver->connect;
+    say "Done connecting";
+
+    set_comm_watchdog( $driver, $cv );
+    my $easy_event = UAV::Pilot::EasyEvent->new({
+        condvar => $cv,
+    });
+
+    my $control = UAV::Pilot::ARDrone::Control->new({
+        driver     => $driver,
+        user_id    => $CONFIG_USER_ID,
+        app_id     => $CONFIG_APP_ID,
+        session_id => $CONFIG_SESSION_ID,
+    });
+    set_driver_config( $control, $driver, $easy_event );
+    #$control->setup_read_nav_event( $easy_event );
+
+    my $sdl_events = UAV::Pilot::SDL::Events->new;
+    $events->register( $sdl_events );
+
+    say "Starting video stream . . . ";
+    my @h264_handlers = build_video_handlers( $events );
+    my $driver_video = UAV::Pilot::ARDrone::Video->new({
+        handlers => \@h264_handlers,
+        condvar  => $cv,
+        driver   => $driver,
+    });
+    $control->video( $driver_video );
+    say "Video stream started";
+
+
+    say "Running . . .";
+    $_->init_event_loop for $driver_video, $events;
+    $cv->recv;
+
+    say "Closing";
+    close $VIDEO_OUT_FH if defined $VIDEO_OUT_FH;
+}
+
+__END__
+
+
+=head1 SYNOPSIS
+
+    uav_video_display \
+        --host 192.168.1.1 \
+        --in /path/to/file \
+        --reticle \
+        --camera=front \
+        --format=hd \
+        --fps=30
+
+=head1 DESCRIPTION
+
+Shows a video stream from the UAV in an SDL window.  If the C<--in> option is specified 
+with a file, plays the stream from that file instead of connecting to the UAV.
+
+=head1 OPTIONS
+
+=head2 --reticle
+
+Overlay a targeting reticle.
+
+=head2 --camera
+
+Set to C<front> or C<bottom> for the associated camera.  (Default: front)
+
+=head2 --format
+
+Set to C<hd> (720p resolution) or C<sd> (360p resolution).  (Default: hd)
+
+=head2 --fps
+
+Set to the desired framerate.  Max fps on the Parrot AR.Drone is 30.  (Default: 30)
+
+=cut

@@ -1,0 +1,18 @@
+Revision history for Perl extension Ucam::Terms.
+
+1.00  Sun Aug 29 2010
+	- original version
+
+2.00  Tue Jul 30 2013
+        - Extend coverage to 2030 based on term dates table in the
+          2012 edition of S&O
+        - Adapt to generate 4-day General Admission dates from 2014
+          in line with an amemndment to relavent Ordanance (grace 1 of 
+          13 February 2013
+          http://www.admin.cam.ac.uk/reporter/2012-13/weekly/6297/section6.shtml)
+
+3.00  Sun Jan 12 2017
+        - Adapt for revised definition of the dates of Full Term (Grace 2
+	  of 5 February 2014 - in practice this only affects General
+	  Admission in 2025.
+	  

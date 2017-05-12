@@ -1,0 +1,41 @@
+
+STANDARD INSTALLATION
+
+Installing the package involves these steps:
+
+   1. perl Makefile.PL
+
+   2. make
+
+   3. make test
+
+If everything succeeded assure to have write permissions for you Perl 
+Library directories. Then:
+
+   4. make install
+
+"perl Makefile.PL" creates a Makefile for your system. "make" builds the
+package, "make test" checks if the module really works at your system
+and "make install" installs it to your system. This includes 3 tools:
+
+   map        - maps characters from and to unicode encoding
+   mkmapfile  - creates binary mapfiles from textual mapfiles
+   mkCSGB2312 - creates a GB2312 mapfile
+
+Typically you will not use the latter two tools.
+
+
+INDIVIDUAL INSTALLATION
+
+If you need store the package differently from the default values you
+can do so by adding a PREFIX parameter to the first step mentioned above.
+Like:
+
+   perl Makefile.PL PREFIX=/usr/local/
+
+
+"make test" FAILED
+
+Oops? Why? Please let me know.
+
+

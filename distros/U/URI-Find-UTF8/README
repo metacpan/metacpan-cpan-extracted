@@ -1,0 +1,60 @@
+NAME
+
+    URI::Find::UTF8 - Finds URI from arbitrary text containing UTF8 raw
+    characters in its path
+
+SYNOPSIS
+
+      use utf8;
+      use URI::Find::UTF8;
+    
+      # Since this code has "use utf8", $text is UTF-8 flagged
+      my $text = <<TEXT;
+      Japanese Wikipedia home page is http://ja.wikipedia.org/wiki/メインページ
+      TEXT
+    
+      my $finder = URI::Find::UTF8->new(\&callback);
+      $finder->find(\$text);
+    
+      sub callback {
+          my($uri, $orig) = @_;
+    
+          # $uri is an URI object that represents
+          #   "http://ja.wikipedia.org/wiki/%E3%83%A1%E3%82%A4%E3%83%B3%E3%83%9A%E3%83%BC%E3%82%B8"
+          # $orig is a string
+          #   "http://ja.wikipedia.org/wiki/メインページ"
+      }
+
+DESCRIPTION
+
+    URI::Find::UTF8 is an URI::Find extension to find URIs from arbitrary
+    chunk of text that has UTF8 raw characters in its path (instead of URI
+    escaped %XX%XX%XX form).
+
+    This often happens when Safari users paste an URL to IM or IRC window,
+    because Safari displays decoded URL path in its location bar, such as:
+
+      http://ja.wikipedia.org/wiki/メインページ
+
+    This module tries to extract URLs like this (in addition to normal URLs
+    that URI::Find can find) and give you an encoded URL (URI object) and
+    the raw, unencoded string.
+
+    This module passes URI::Find's own test file (besides the old find_uris
+    call), so this can be used as a drop-in replacement for the module.
+
+    Note that this module doesn't (yet) handle International Domain Names.
+
+AUTHOR
+
+    Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+LICENSE
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+
+    URI::Find
+

@@ -1,0 +1,57 @@
+{
+   "abstract" : "Universally Unique Identifiers FFI style",
+   "author" : [
+      "Graham Ollis <plicease@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "UUID-FFI",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "FFI::CheckLib" : "0.05",
+            "Module::Build" : "0.28",
+            "perl" : "5.006"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "FFI::CheckLib" : "0.06",
+            "FFI::Platypus" : "0.12",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.94",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/plicease/UUID-FFI/issues"
+      },
+      "homepage" : "http://perl.wdlabs.com/UUID-FFI",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/plicease/UUID-FFI.git",
+         "web" : "https://github.com/plicease/UUID-FFI"
+      }
+   },
+   "version" : "0.05"
+}
+

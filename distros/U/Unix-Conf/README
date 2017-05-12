@@ -1,0 +1,40 @@
+Unix/Conf version 0.1
+======================
+The Unix::Conf module consists of small classes intended to be
+used by the other modules in the Unix::Conf suite. The two
+modules in Unix::Conf are Unix::Conf::Err and Unix::Conf::ConfIO.
+The first is used to create Err objects which are returned back
+to signal error. These objects store the state of the stack
+at the time of creation and can be used to debug. The reason,
+Unix::Conf::Err exists is because I don't particularly like 
+general purpose libraries die'ing. Unix::Conf::ConfIO is a 
+class for handling file I/O especially for configuration files.
+It takes care of locking and security.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation; either version 2 of the License, or (at your
+option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with the program; if not, write to the Free Software Foundation, Inc. :
+
+59 Temple Place, Suite 330, Boston, MA 02111-1307
+
+Copyright (c) 2002, Karthik Krishnamurthy <karthik.k@extremix.net>.

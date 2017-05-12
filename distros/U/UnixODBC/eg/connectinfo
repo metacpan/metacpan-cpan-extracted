@@ -1,0 +1,313 @@
+#!/usr/bin/perl -w
+
+# $Id: connectinfo,v 1.8 2003-11-28 22:17:23 kiesling Exp $
+$VERSION=1.0;
+
+use UnixODBC qw(:all);
+use Getopt::Long;
+
+my $evh = 0;
+my $cnh = 0;
+my $sth = 0;
+my $r = 0;
+
+# ODBC Version
+my $ver=0;
+
+## 
+## DSN, username, and password from command line.
+##
+
+my $DSN = '';
+my $UserName = '';
+my $PassWord = '';
+my $Numeric = '';
+
+# Data buffer and length
+
+my ($ibuf, $ibuflen);
+
+my $usage=<<EOH;
+Usage: connectinfo [--help] | [--numeric] [--user=<username>] [--password=<password>] --dsn=<DSN>
+  --help       Print this help and exit.
+  --dsn        Data source name.
+  --user       DBMS login name.
+  --password   DBMS login password.
+  --numeric    Print numeric values instead of labels.
+EOH
+
+my $help;  # Print help and exit.
+
+GetOptions ('help' => \$help,
+	    'dsn=s' => \$DSN,
+	    'user=s' => \$UserName,
+	    'password=s' => \$PassWord,
+	    'numeric' => \$Numeric);
+
+if ($help || (not length ($DSN)))
+     {
+	 print $usage;
+	 exit 0;
+     }
+
+
+my %string_attrs = ('SQL_DATA_SOURCE_NAME', 2,
+		    'SQL_SERVER_NAME', 13,
+		    'SQL_DBMS_NAME', 17,
+		    'SQL_DBMS_VER', 18,
+		    'SQL_USER_NAME', 47,
+		    'SQL_ORDER_BY_COLUMNS_IN_SELECT', 90,
+		    'SQL_ACCESSIBLE_TABLES', 19,
+		    'SQL_DATA_SOURCE_READ_ONLY', 25,
+		    'SQL_ACCESSIBLE_PROCEDURES', 20,
+		    'SQL_INTEGRITY', 73,
+		    'SQL_SEARCH_PATTERN_ESCAPE', 14,
+		    'SQL_IDENTIFIER_QUOTE_CHAR', 29,
+		     'SQL_XOPEN_CLI_YEAR', 10000,
+		    'SQL_CATALOG_NAME', 10003,
+		     'SQL_DESCRIBE_PARAMETER', 10002,
+		    'SQL_COLLATION_SEQ',10004,
+		  );
+
+my %numeric_attrs = ('SQL_MAX_DRIVER_CONNECTIONS', 0,
+		    'SQL_FETCH_DIRECTION', 8,
+		     'SQL_MAX_IDENTIFIER_LEN', 10005,
+		     'SQL_ASYNC_MODE', 10021,
+		  'SQL_OUTER_JOIN_CAPABILITIES', 115,
+		  'SQL_MAX_CONCURRENT_ACTIVITIES', 1,
+		  'SQL_MAXIMUM_CONCURRENT_ACTIVITIES', 1,	
+		  'SQL_CURSOR_COMMIT_BEHAVIOR', 23,
+		  'SQL_DEFAULT_TXN_ISOLATION', 26,
+		  'SQL_IDENTIFIER_CASE', 28,
+		  'SQL_MAXIMUM_COLUMN_NAME_LENGTH', 30,
+		  'SQL_MAXIMUM_CURSOR_NAME_LENGTH', 31,
+		  'SQL_MAXIMUM_SCHEMA_NAME_LENGTH', 32,
+		  'SQL_MAXIMUM_CATALOG_NAME_LENGTH', 34,
+		  'SQL_MAX_TABLE_NAME_LEN', 35,
+		  'SQL_SCROLL_CONCURRENCY', 43,
+		  'SQL_TXN_CAPABLE', 46,
+                  'SQL_TXN_ISOLATION_OPTION', 72,
+                  'SQL_GETDATA_EXTENSIONS', 81,
+                  'SQL_NULL_COLLATION', 85,
+                  'SQL_ALTER_TABLE', 86,
+                  'SQL_SPECIAL_CHARACTERS', 94,
+                  'SQL_MAXIMUM_COLUMNS_IN_GROUP_BY', 97,
+                  'SQL_MAXIMUM_COLUMNS_IN_INDEX', 98,
+                  'SQL_MAXIMUM_COLUMNS_IN_ORDER_BY', 99,
+                  'SQL_MAXIMUM_COLUMNS_IN_SELECT', 100,
+                  'SQL_MAX_COLUMNS_IN_TABLE', 101,
+                  'SQL_MAXIMUM_INDEX_SIZE', 102,
+                  'SQL_MAXIMUM_ROW_SIZE', 104,
+                  'SQL_MAXIMUM_STATEMENT_LENGTH', 105,
+                  'SQL_MAXIMUM_TABLES_IN_SELECT', 106,
+                  'SQL_MAXIMUM_USER_NAME_LENGTH', 107,
+                     'SQL_CURSOR_SENSITIVITY', 10001,
+                  );
+
+$SIG{PIPE} = sub { print "SIGPIPE: ". $! . "\n"};
+
+
+$r = SQLAllocEnv ($evh);
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+   &getdiagrec ($SQL_HANDLE_ENV, $evh);
+    exit 1;
+}
+
+#$r = SQLAllocHandle ($SQL_HANDLE_DBC, $evh, $cnh);
+$r = SQLAllocConnect ($evh, $cnh);
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    &getdiagrec ($SQL_HANDLE_ENV, $evh);
+    exit 1;
+}
+
+$r = SQLConnect ($cnh, $DSN, $SQL_NTS,
+                            $UserName, $SQL_NTS,
+                            $PassWord, $SQL_NTS);
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    &getdiagrec ($SQL_HANDLE_DBC, $cnh);
+    exit 1;
+}
+
+foreach my $it (keys %string_attrs) {
+    $ibuf = ''; $ibuflen = 0;
+    no warnings;
+    $r = SQLGetInfo ($cnh, $string_attrs{$it},$ibuf, 255, $ibuflen);
+    use warnings;
+    print "$it \= $ibuf\n";
+}
+
+foreach my $it (keys %numeric_attrs) {
+    $ibuf = ''; $ibuflen = 0;
+    no warnings;
+    $r = SQLGetInfo ($cnh, $numeric_attrs{$it},$ibuf, $SQL_IS_UINTEGER, 0);
+    use warnings;
+    if ($Numeric) {
+        $ibuf = sprintf "%u", $ibuf;
+        print "$it \= $ibuf\n" if length ($ibuf);
+    } else {
+        print "$it \= ";
+        if ($it =~ /SQL_ASYNC_MODE/) {
+            print "SQL_AM_NONE\n" if $ibuf == 0;
+            print "SQL_AM_CONNECTION\n" if $ibuf == 1;
+            print "SQL_AM_STATEMENT\n" if $ibuf == 2;
+        } elsif ($it =~ /SQL_CURSOR_COMMIT_BEHAVIOR/) {
+            print "SQL_CB_DELETE\n" if $ibuf == 0;
+            print "SQL_CB_CLOSE\n" if $ibuf == 1;
+            print "SQL_CB_PRESERVE\n" if $ibuf == 2;
+        } elsif ($it =~ /SQL_FETCH_DIRECTION/) {
+            $s = mask_labels ($ibuf, 'SQL_FD_FETCH_NEXT', 
+                                    'SQL_FD_FETCH_FIRST', 
+                                    'SQL_FD_FETCH_LAST',
+                                    'SQL_FD_FETCH_PRIOR', 
+                                    'SQL_FD_FETCH_ABSOLUTE',
+                                    'SQL_FD_FETCH_RELATIVE');
+            print "$s\n";
+        } elsif ($it =~ /SQL_GETDATA_EXTENSIONS/) {
+            $s = mask_labels ($ibuf, 'SQL_GD_ANY_COLUMN',
+                                    'SQL_GD_ANY_ORDER');
+            print "$s\n";
+        } elsif ($it =~ /SQL_IDENTIFIER_CASE/) {
+            print 'SQL_IC_UPPER' if $ibuf == $SQL_IC_UPPER;
+            print 'SQL_IC_LOWER' if $ibuf == $SQL_IC_LOWER;
+            print 'SQL_IC_SENSITIVE' if $ibuf == $SQL_IC_SENSITIVE;
+            print 'SQL_IC_MIXED' if $ibuf == $SQL_IC_MIXED;
+            print "\n";
+        } elsif ($it =~ /SQL_OUTER_JOIN_CAPABILITIES/) {
+            $s = mask_labels ($ibuf, SQL_OJ_LEFT, SQL_OJ_RIGHT, 
+                                    SQL_OJ_FULL, SQL_OJ_NESTED, 
+                                    SQL_OJ_NOT_ORDERED, 
+                                    SQL_OJ_INNER, SQL_OJ_ALL_COMPARISON_OPS);
+            print "$s\n";
+        } elsif ($it =~ /SQL_SCROLL_CONCURRENCY/) {
+            $s = mask_labels ($ibuf, SQL_SCCO_READ_ONLY,SQL_SCCO_LOCK,
+                              SQL_SCCO_OPT_ROWVER,SQL_SCCO_OPT_VALUES);
+            print "$s\n";
+        } elsif ($it =~ /SQL_TXN_CAPABLE/) {
+            print 'SQL_TC_NONE' if $ibuf == $SQL_TC_NONE;
+            print 'SQL_TC_DML' if $ibuf == $SQL_TC_DML;
+            print 'SQL_TC_ALL' if $ibuf == $SQL_TC_ALL;
+            print 'SQL_TC_DDL_COMMIT' if $ibuf == $SQL_TC_DDL_COMMIT;
+            print 'SQL_TC_DDL_IGNORE' if $ibuf == $SQL_TC_DDL_IGNORE;
+            print "\n";
+        } elsif ($it =~ /SQL_TXN_ISOLATION_OPTION/) {
+	    $s = mask_labels ($ibuf, SQL_TRANSACTION_READ_UNCOMMITTED,
+			      SQL_TRANSACTION_READ_COMMITTED,
+			      SQL_TRANSACTION_REPEATABLE_READ,
+			      SQL_TRANSACTION_SERIALIZABLE);
+	    print "$s\n";
+	} elsif ($it =~ /SQL_NULL_COLLATION/) {
+	    $s = mask_labels ($ibuf, SQL_NC_START, SQL_NC_END);
+	    print "$s\n";
+	} elsif ($it =~ /SQL_ALTER_TABLE/) {
+	    $s = mask_labels ($ibuf, 'SQL_AT_ADD_COLUMN', 
+			      'SQL_AT_DROP_COLUMN', 'SQL_AT_ADD_CONSTRAINT');
+
+	    print "$s\n";
+	} else {
+	    print "$ibuf\n";
+	}
+    }
+}
+
+$r = SQLDisconnect ($cnh);
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    &getdiagrec ($SQL_HANDLE_DBC, $cnh);
+    exit 1;
+}
+
+$r = SQLFreeConnect ($cnh);
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    &getdiagrec ($SQL_HANDLE_DBC, $cnh);
+    exit 1;
+}
+
+$r = SQLFreeHandle ($SQL_HANDLE_ENV, $evh);
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    &getdiagrec ($SQL_HANDLE_ENV, $evh);
+    exit 1;
+}
+
+exit 0;
+
+sub getdiagrec {
+    my ($handle_type, $handle) = @_;
+    my ($sqlstate, $native, $message_text, $mlen);
+    print 'SQLGetDiagRec: ';
+    $r = &UnixODBC::SQLGetDiagRec ($handle_type, $handle, 1, $sqlstate,
+				   $native, $message_text, 255,
+				   $mlen);
+    if ($r == $SQL_NO_DATA) { 
+	print "result \= SQL_NO_DATA\n";
+    } elsif (($r == 1) || ($r == 0)) { 
+     print "$message_text\n";
+    } else { 
+     print "sqlresult = $r\n";
+    }
+    return $r;
+}
+
+sub mask_labels {
+    my $val = shift;
+    my @labels = @_;
+    my $m = 0;
+    my $s = '';
+    foreach my $a (@labels) {
+	if (ord($val) & hex(${$a})) {
+	    $s .=  ' | ' if $m;
+	    $s .= "$a";
+	    $m++;
+        }
+    }
+    return $s;
+}
+
+=head1 NAME 
+
+connectinfo - Display the connection attributes for a data source.
+
+=head1  SYNOPSIS
+
+connectinfo [--help] | [--numeric] [--user=<username>] [--password=<password>] --dsn=<DSN>
+
+=head1 DESCRIPTION
+
+Connectinfo displays the ODBC API connection attributes for a
+connection to a data source.
+
+=head1 OPTIONS
+
+=head2 --help
+
+Print a help message and exit.
+
+=head2 --dsn
+
+The name of the data source.
+
+=head2 --user
+
+User's login name on the DBMS server.
+
+=head2 --password
+
+User's login password on the DBMS server.
+
+=head2 --numeric
+
+Print numeric attributes instead of the ODBC constant labels.
+
+=head1 VERSION INFORMATION AND CREDITS
+
+Revision: $Revision: 1.8 $
+
+Written by: Robert Allan Kiesling, rkies@cpan.org.
+
+Licensed under the same terms as Perl.  Please refer to the
+file "Artistic" for details.
+
+=head1 SEE ALSO
+
+perl(1), UnixODBC(3), UnixODBC::BridgeServer(3).
+
+=cut
+

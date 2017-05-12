@@ -1,0 +1,247 @@
+#!/opt/bin/perl
+
+use common::sense;
+use Getopt::Long;
+use Digest::MD5;
+use Urlader;
+
+my $verbose = 1;
+
+my $URLADER;
+my $OUTPUT;
+my $WINDOWS_ICON;
+my $MODE = "pack";
+
+Getopt::Long::Configure ("bundling", "no_ignore_case");
+GetOptions(
+   "verbose|v" => sub {
+      $verbose++;
+   },
+   "quiet|q" => sub {
+      $verbose = 0;
+   },
+   "urlader=s"      => \$URLADER,
+   "output|o=s"     => \$OUTPUT,
+   "windows-icon=s" => \$WINDOWS_ICON,
+   "pack"           => sub { $MODE = "pack" },
+   "help|h"         => sub {
+      require Pod::Usage;
+      Pod::Usage::pod2usage (-verbose => 1, -exitval => 0, -noperldoc => 1);
+   },
+) or exit 1;
+
+#############################################################################
+
+my $out = *STDOUT;
+
+if (length $OUTPUT) {
+   undef $out;
+   open $out, ">:raw:perlio", $OUTPUT
+      or die "$OUTPUT: $!";
+}
+
+#############################################################################
+# for now, $MODE is --pack
+
+@ARGV >= 4
+   or die "not enough arguments for --pack.\n";
+
+#############################################################################
+
+my $urlader_md5 = "\x00" x 16;
+
+if (length $URLADER) {
+   open my $fh, "<:raw:perlio", $URLADER
+      or die "$URLADER: $!";
+   my $urlader = do { local $/; <$fh> };
+
+   if (length $WINDOWS_ICON) {
+      require Win32::Exe;
+      if (my $exe = eval { Win32::Exe->new (\$urlader) }) {
+         $exe->set_icons ([Win32::Exe::IconFile->new ($WINDOWS_ICON)->icons]);
+         $exe->write (\$urlader);
+      } else {
+         print "unable to set icon ($@)\n" if $verbose >= 2;
+      }
+   }
+
+   $urlader_md5 = Digest::MD5::md5 $urlader;
+
+   syswrite $out, $urlader;
+}
+
+#############################################################################
+
+my $exe_id  = shift;
+my $exe_ver = shift;
+my $dir     = shift;
+
+my $size;
+my $max_uncomp;
+my $datasize;
+
+my $md5 = new Digest::MD5;
+
+sub wr {
+   syswrite $out, $_[0];
+   $size += length $_[0];
+   $md5->add ($_[0]);
+}
+
+sub ent {
+   my ($type, $flags, $name, $data) = @_;
+
+   warn "add record type $type, path $name\n" if $verbose >= 2;
+
+   my $ent = pack "CCnN Z* a*",
+      $type,
+      $flags,
+      (length $name),
+      (length $data),
+      $name,
+      $data;
+
+   wr $ent;
+}
+
+sub scandir {
+   my ($path, $pfx) = @_;
+
+   $pfx =~ s%^/%%;
+
+   opendir my $fh, $path
+      or die "$path: $!";
+
+   for my $file (sort readdir $fh) {
+      next if $file eq "." || $file eq "..";
+
+      lstat "$path/$file"
+         or die "$path/$file: $!";
+
+      if (-d _) {
+         ent Urlader::T_DIR, 0, "$pfx$file";
+         &scandir ("$path/$file", "$pfx$file/");
+      } elsif (-f _) {
+         my $len = -s _;
+
+         $datasize += $len;
+         $max_uncomp = $len if $max_uncomp < $len;
+
+         open my $fh2, "<:raw:perlio", "$path/$file"
+            or die "$path/$file: $!";
+
+         $len == sysread $fh2, my $data, $len
+            or die "$path/$file: read error";
+
+         my $flags = (-x _) ? Urlader::F_EXEC : 0;
+
+         if (Urlader::lzf_compress $data) {
+            $flags |= Urlader::F_LZF;
+         }
+
+         ent Urlader::T_FILE, $flags, "$pfx$file", $data;
+      } else {
+         warn "$path/$file: unsupported filetype, skipping.\n";
+      }
+   }
+}
+
+ent Urlader::T_META, 0, $exe_id, "$exe_ver\x00";
+
+shift, ent Urlader::T_ENV, 0, $1, "$2\x00"
+   while $ARGV[0] =~ /^([^=]+)=(.*)$/s;
+
+ent Urlader::T_ARG, 0, shift
+   while @ARGV;
+
+scandir $dir, "";
+
+ent Urlader::T_NULL, 0;
+
+wr pack "NN x8 a16",
+   $max_uncomp,
+   $size + 4 + 4 + 8 + 16 + 16 + 16, # sizeof this pack + md5s, ugly
+   Urlader::TAIL_MAGIC;
+
+wr $urlader_md5;
+wr $md5->digest;
+
+printf STDERR "%d bytes written (file data before compression: %d, biggest file %d bytes)\n", $size, $datasize, $max_uncomp
+   if $verbose;
+
+exit 0;
+
+=head1 NAME
+
+   urlader-util - generate new urladers, maybe other stuff
+
+=head1 SYNOPSIS
+
+   urlader-util --urlader myurlader.exe --windows-icon myicon.ico \
+                --pack exe_id exe_ver directory \
+                LD_LIBRARY_PATH=. ./perl run >myprog.exe
+
+=head1 DESCRIPTION
+
+Urlader utility program - see the L<Urlader> module manpage for more info.
+
+=head1 OPTIONS
+
+=head2 SWITCHES
+
+=over 4
+
+=item --help
+
+Display this manual page.
+
+=item -v, --verbose
+
+Increase verbosity (the default verbosity level is 1).
+
+=item -q, --quiet
+
+Set verbosity to zero, that is, only errors and warnings will be printed.
+
+=item -o, --output <path>
+
+Write output (e.g. the generated executable) to the given path instead of
+to standard output.
+
+=item --urlader <path>
+
+Use the given file as urlader. What this means depends on the execution mode.
+
+=item --windows-icon <path>
+
+If the urlader executable is a windows executable, patch it with this
+icon resource (which must be in .ICO format). For other executables, this
+switch is ignored.
+
+=back
+
+=head2 MODES
+
+=over 4
+
+=item --pack <exe_id> <exe_ver> <path> [env-vars...] <program> [arguments...]
+
+Packs the given directory tree, env-variable assignments, program path
+and arguments into an urlader archive and optionally prepend the urlader
+binary (see C<--urlader>) and output the whole blob.
+
+See the L<Urlader> manual page for an explanation of C<exe_id>, C<exe_ver>
+and other concepts.
+
+=back
+
+=head1 AUTHOR
+
+ Marc Lehmann <schmorp@schmorp.de>
+ http://home.schmorp.de/
+
+=head1 SEE ALSO
+
+L<Urlader>, L<PAR> - for more features and easier usage.
+
+=cut

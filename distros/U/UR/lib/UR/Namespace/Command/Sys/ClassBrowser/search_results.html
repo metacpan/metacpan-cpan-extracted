@@ -1,0 +1,10 @@
+<h2>Classes matching [% search %]</h2>
+[% IF classes.size %]
+<ul>
+    [% FOREACH class IN classes %]
+        <li><a href="/detail-for-class/[% class %]" class="class-detail">[% class %]</a></li>
+    [% END %]
+</ul>
+[% ELSE %]
+<strong>No classes matching [% search %]</strong>
+[% END %]

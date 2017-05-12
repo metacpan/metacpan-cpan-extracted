@@ -1,0 +1,12 @@
+Changes
+INSTALL
+LICENSE
+Makefile.PL
+MANIFEST
+README
+README.pod
+lib/Ucam/Term.pm
+t/basic.t
+t/ga.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,52 @@
+Revision history for Perl module Unicode::Tussle
+
+1.111 2016-06-07T18:55:18Z
+	* Removed a smart-match in unichars
+
+1.11 2015-04-11T23:09:59Z
+	* Require v5.14, which some scripts need
+
+1.09 2015-04-05T11:55:32Z
+	* Remove smart matching, which is now an experimental feature
+	(GitHub #5)
+	* Some typo fixes
+
+1.08 - 2014-08-26
+	* Remove Build.PL. Let's stick with one build system.
+
+1.07 - 2014-08-26
+	* Don't install everything in script/ RT #98126 (Non-programs installed to bindir)
+
+1.05 - 2013-12-02
+	* Remove uses of my $_, which is now an experimental and warning
+	feature.
+
+1.04 - 2013-07-18
+	* Bump to release version
+	* Change the author to Tom C., which it should have always been
+
+1.03_05 - 2013-07-11
+	* Change Underscore.pm to ForbidUnderscore.pm. VTI owns the
+	other namespace for a different reason.
+	* Switch to Makefile.PL
+
+1.03_04 - 2013-06-06
+	* Remove 5.10 features which Perl 5.18 now makes experimental
+	compilation errors.
+
+1.03_01 - 2011-07-25
+	* A minor adjustment to the compile.t test
+
+1.03 - 2011-07-18
+	* Add mismaps, to discover which 8-bit chars don't map to UCS
+	* Add README and oscon-whatis.pod to explain what each script
+	is
+	* Update byte2uni for better programming practice
+	* All of these updates come from Tom
+
+1.02 - 2011-07-18
+	* Add examples of most programs, from Tom
+
+1.01 - 2011-07-16
+	* Tom Christiansen's Unicode Scripts So Life is Easier (TUSSLE)
+	* I just made the distribution

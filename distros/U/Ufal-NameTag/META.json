@@ -1,0 +1,78 @@
+{
+   "abstract" : "Bindings to NameTag library",
+   "author" : [
+      "Milan Straka <straka@ufal.mff.cuni.cz>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Ufal-NameTag",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Ufal::NameTag" : {
+         "file" : "lib/Ufal/NameTag.pm",
+         "version" : "v1.1.1.1"
+      },
+      "Ufal::NameTag::Forms" : {
+         "file" : "lib/Ufal/NameTag.pm",
+         "version" : "v1.1.1.1"
+      },
+      "Ufal::NameTag::NamedEntities" : {
+         "file" : "lib/Ufal/NameTag.pm",
+         "version" : "v1.1.1.1"
+      },
+      "Ufal::NameTag::NamedEntity" : {
+         "file" : "lib/Ufal/NameTag.pm",
+         "version" : "v1.1.1.1"
+      },
+      "Ufal::NameTag::Ner" : {
+         "file" : "lib/Ufal/NameTag.pm",
+         "version" : "v1.1.1.1"
+      },
+      "Ufal::NameTag::TokenRange" : {
+         "file" : "lib/Ufal/NameTag.pm",
+         "version" : "v1.1.1.1"
+      },
+      "Ufal::NameTag::TokenRanges" : {
+         "file" : "lib/Ufal/NameTag.pm",
+         "version" : "v1.1.1.1"
+      },
+      "Ufal::NameTag::Tokenizer" : {
+         "file" : "lib/Ufal/NameTag.pm",
+         "version" : "v1.1.1.1"
+      },
+      "Ufal::NameTag::Version" : {
+         "file" : "lib/Ufal/NameTag.pm",
+         "version" : "v1.1.1.1"
+      },
+      "Ufal::NameTagc" : {
+         "file" : "lib/Ufal/NameTag.pm",
+         "version" : "v1.1.1.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.mozilla.org/MPL/2.0/index.txt"
+      ]
+   },
+   "version" : "v1.1.1.1"
+}

@@ -1,0 +1,123 @@
+This is version 0.4 of UPS::Nut, a module to monitor a UPS via upsd, part 
+of the Network UPS Tools package, available from 
+http://www.exploits.org/nut/.  It's the first Perl module I've ever 
+written, so please let me know if I've screwed something up.  :)
+
+This README may be kinda out of date.  Check the POD for what to do with 
+this.
+
+NAME
+    Nut - a module to talk to a UPS via NUT (Network UPS Tools) upsd
+
+SYNOPSIS
+     use UPS::Nut;
+
+     $ups = new UPS::Nut( NAME => "myups",
+                          HOST => "somemachine.somewhere.com",
+                          PORT => "3305",
+                          USERNAME => "upsuser",
+                          PASSWORD => "upspasswd",
+                          TIMEOUT => 30,
+                          DEBUG => 0,
+                          DEBUGOUT => "/some/file/somewhere");
+     if ($ups->Status() =~ /OB/) {
+        print "Oh, no!  Power failure!\n";
+        }
+
+DESCRIPTION
+    This is an object-oriented (whoo!) interface between Perl and upsd from
+    the Network UPS Tools package (http://www.exploits.org/nut/). It only
+    does the things that it can do talking to upsd. It won't monitor your
+    UPS continually - you'll have to write something that does that, like:
+
+    for (;;) { if ($ups->Status() =~ /OB/) { # Ack! There's a power failure!
+    Sure wish I had written some code to # deal with that situation... } }
+
+CONSTRUCTOR
+    Shown with defaults: new UPS::Nut( NAME => "default", HOST =>
+    "localhost", PORT => "3305", USERNAME => "", PASSWORD => "", DEBUG => 0,
+    DEBUGOUT => ""); * NAME is the name of the UPS to monitor, as specified
+    in ups.conf * HOST is the host running upsd * PORT is the port that upsd
+    is running on * USERNAME and PASSWORD are those specified in upsd.conf.
+    If these aren't specified, then you will only have access to the level
+    of privileges in upsd.conf that do not require a password. This is
+    configured in upsd.conf. * DEBUG turns on debugging output * DEBUGOUT is
+    de thing you do when the s*** hits the fan. Actually, it's the filename
+    where you want debugging output to go. If it's not specified, debugging
+    output comes to STDOUT.
+
+Methods
+  Methods for querying UPS status
+
+    Query(varname) returns value of the specified variable, if supported
+
+    BattPercent() returns % of battery left
+
+    LoadPercent() returns % of load, the UPS' available capacity
+
+    LineVoltage() returns line voltage, useful if your UPS doesn't do
+    voltage regulation.
+
+    Status() returns status, one of "OL," "OB," or "LB," which are online
+    (power OK), on battery (power failure), or low battery, respectively.
+
+    Temperature() returns UPS temperature
+
+  Other methods
+
+      These all operate on the UPS specified in the NAME argument to the 
+      constructor.
+
+    Master() Use this to find out whether or not we have MASTER privileges
+    for this UPS. Returns 1 if we have MASTER privileges, returns 0
+    otherwise.
+
+    ListVars() Returns a list of all variables supported by the UPS.
+
+    ListInstCmds() Returns a list of all instant commands supported by the
+    UPS.
+
+    InstCmd (command) Send an instant command to the UPS. Returns undef if
+    the command can't be completed for whatever reason, otherwise returns 1.
+
+    FSD() Set the FSD (forced shutdown) flag for the UPS. This means that
+    we're planning on shutting down the UPS very soon, so the attached load
+    should be shut down as well. Returns 1 on success, returns undef on
+    failure for any reason. This cannot be unset, so don't set it unless you
+    mean it.
+
+    Error() why did the previous operation fail? The answer is here. It will
+    return a concise, well-written, and brilliantly insightful few words as
+    to why whatever you just did went bang. I promise that this method will
+    never return "Error: This module doesn't like you. Go away."
+
+    TimeLeft() at current load, how much time before battery is depleted.
+    This isn't implemented yet.
+
+Unimplemented commands to UPSD
+      These are things that are listed in "protocol.txt" in the Nut 
+      distribution that I haven't implemented yet.  Consult "protocol.txt" (in 
+      the Nut distribution, under the docs/ subdirectory)  to see what these 
+      commands do.
+
+      SET ENUM VARDESC LISTRW VARTYPE INSTCMDDESC 
+
+AUTHOR
+      Kit Peters 
+      perl@clownswilleatyou.com
+      http://www.clownswilleatyou.com/perl/
+
+CREDITS
+    Many kind thanks go to Wayne Wylupski <wayne@connact.com>, for adding 
+    major functionality.  Go check out his LCD UPS thing!  
+    http://www.webbastards.com/projects/
+
+    Developed with the kind support of A World Of Difference, Inc.
+    <http://www.awod.com/>
+
+    Many thanks to Ryan Jessen <rjessen@cyberpowersystems.com> at CyberPower
+    Systems for much-needed assistance.
+
+LICENSE
+    This module is distributed under the same license terms as Perl 
+    itself.

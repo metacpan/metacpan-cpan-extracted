@@ -1,0 +1,86 @@
+{
+   "abstract" : "USB Device Descriptor generation tools",
+   "author" : [
+      "Brandon Fosdick <bfoz@bfoz.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "USB-Descriptor",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.01"
+         }
+      }
+   },
+   "provides" : {
+      "USB::Descriptor" : {
+         "file" : "lib/USB/Descriptor.pm",
+         "version" : "2"
+      },
+      "USB::Descriptor::Configuration" : {
+         "file" : "lib/USB/Descriptor/Configuration.pm",
+         "version" : "2"
+      },
+      "USB::Descriptor::Device" : {
+         "file" : "lib/USB/Descriptor/Device.pm",
+         "version" : "2"
+      },
+      "USB::Descriptor::Endpoint" : {
+         "file" : "lib/USB/Descriptor/Endpoint.pm",
+         "version" : "2"
+      },
+      "USB::Descriptor::Interface" : {
+         "file" : "lib/USB/Descriptor/Interface.pm",
+         "version" : "2"
+      },
+      "USB::HID" : {
+         "file" : "lib/USB/HID.pm",
+         "version" : "1"
+      },
+      "USB::HID::Descriptor::Class" : {
+         "file" : "lib/USB/HID/Descriptor/Class.pm",
+         "version" : "2"
+      },
+      "USB::HID::Descriptor::Interface" : {
+         "file" : "lib/USB/HID/Descriptor/Interface.pm",
+         "version" : "1"
+      },
+      "USB::HID::Descriptor::Report" : {
+         "file" : "lib/USB/HID/Descriptor/Report.pm",
+         "version" : "1"
+      },
+      "USB::HID::Report" : {
+         "file" : "lib/USB/HID/Report.pm",
+         "version" : "1"
+      },
+      "USB::HID::Report::Field" : {
+         "file" : "lib/USB/HID/Report/Field.pm",
+         "version" : "1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/bsd-license.php"
+      ]
+   },
+   "version" : "4"
+}

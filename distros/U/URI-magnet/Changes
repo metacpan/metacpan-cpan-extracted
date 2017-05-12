@@ -1,0 +1,14 @@
+Revision history for URI-magnet
+
+0.03  2013-04-28
+      - compliance to CPAN::Changes::Spec
+      - moving developer tests to xt/
+        This should fix a few test failures
+        seen in the wild.
+
+0.02  2012-09-18
+      - updating docs.
+
+0.01  2012-09-18
+      - Initial release.
+

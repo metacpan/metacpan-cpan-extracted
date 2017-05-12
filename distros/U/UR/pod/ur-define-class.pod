@@ -1,0 +1,67 @@
+
+
+=pod
+
+=head1 NAME
+
+ur define class - Add one or more classes to the current namespace
+
+
+
+=head1 VERSION
+
+This document describes ur define class version 0.29.
+
+=head1 SYNOPSIS
+
+ur define class --extends=? [NAMES]
+
+
+$ cd Acme
+
+$ ur define class Animal Vegetable Mineral
+A Acme::Animal
+A Acme::Vegetable
+A Acme::Mineral
+
+$ ur define class Dog Cat Bird --extends Animal
+A Acme::Dog
+A Acme::Cat
+A Acme::Bird
+
+
+
+=head1 REQUIRED ARGUMENTS
+
+=over
+
+
+=item extends
+
+The base class.  Defaults to UR::Object.
+
+Default value 'UR::Object' if not specified
+
+
+=back
+
+=head1 OPTIONAL ARGUMENTS
+
+=over
+
+
+=item NAMES
+
+(undocumented)
+
+
+=back
+
+=head1 DESCRIPTION:
+
+  Add one or more classes to the current namespace
+
+
+
+=cut
+

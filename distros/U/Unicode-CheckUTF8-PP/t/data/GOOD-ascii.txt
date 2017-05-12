@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<foo>
+Just some ascii.  Nothing interesting.
+Just some ascii.  Nothing interesting.
+Just some ascii.  Nothing interesting.
+Just some ascii.  Nothing interesting.
+Just some ascii.  Nothing interesting.
+Just some ascii.  Nothing interesting.
+Just some ascii.  Nothing interesting.
+Just some ascii.  Nothing interesting.
+Just some ascii.  Nothing interesting.
+Just some ascii.  Nothing interesting.
+Just some ascii.  Nothing interesting.
+Just some ascii.  Nothing interesting.
+Just some ascii.  Nothing interesting.
+Just some ascii.  Nothing interesting.
+Just some ascii.  Nothing interesting.
+Just some ascii.  Nothing interesting.
+Just some ascii.  Nothing interesting.
+Just some ascii.  Nothing interesting.
+Just some ascii.  Nothing interesting.
+Just some ascii.  Nothing interesting.
+Just some ascii.  Nothing interesting.
+Just some ascii.  Nothing interesting.
+Just some ascii.  Nothing interesting.
+Just some ascii.  Nothing interesting.
+Just some ascii.  Nothing interesting.
+Just some ascii.  Nothing interesting.
+Just some ascii.  Nothing interesting.
+Just some ascii.  Nothing interesting.
+Just some ascii.  Nothing interesting.
+Just some ascii.  Nothing interesting.
+Just some ascii.  Nothing interesting.
+Just some ascii.  Nothing interesting.
+Just some ascii.  Nothing interesting.
+Just some ascii.  Nothing interesting.
+Just some ascii.  Nothing interesting.
+Just some ascii.  Nothing interesting.
+Just some ascii.  Nothing interesting.
+
+</foo>

@@ -1,0 +1,31 @@
+==================================================
+Changes from 2015-04-27 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.003 at 2016-04-26 22:18:25 +0000
+------------------------------------------
+
+  Change: 22eabeff62c7181a06c31a9ff497328354873d6f
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2016-04-26 17:18:04 +0000
+
+    Bump Version 0.003 
+
+  Change: b2d9bfca6310fc6e4ebb4c378485735d40505ab4
+  Author: William Wolf <throughnothing@users.noreply.github.com>
+  Date : 2016-04-23 12:20:25 +0000
+
+    Merge pull request #2 from dionys/master
+
+    Add support of proxy_logs option 
+
+  Change: eaa5b467dcc0efe00a09a29554fa476c2db7c510
+  Author: Denis Ibaev <dionys@gmail.com>
+  Date : 2014-08-02 00:45:15 +0000
+
+    Add support of proxy_logs option 
+
+================================================
+Plus 2 releases after 2015-04-27 00:00:00 +0000.
+================================================

@@ -1,0 +1,9 @@
+Changes
+examples.html
+lib/URI/GoogleChart.pm
+Makefile.PL
+MANIFEST
+README
+t/basic.t
+t/eg.t
+META.yml                                 Module meta-data (added by MakeMaker)

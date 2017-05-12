@@ -1,0 +1,18 @@
+---
+install:
+    - 'cpanm --quiet --notest --no-man-pages -- App::Prove Test::Pretty'
+    - cpanm --quiet --notest --no-man-pages --installdeps .
+language: perl
+perl:
+    - '5.22'
+    - '5.20'
+    - '5.18'
+    - '5.16'
+    - '5.14'
+    - '5.12'
+    - '5.10'
+    - '5.8'
+script:
+    - perl ./Build.PL
+    - ./Build
+    - prove --lib --blib -Pretty

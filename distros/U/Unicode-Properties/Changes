@@ -1,0 +1,32 @@
+Revision history for perl module Unicode::Properties
+
+0.07 2017-01-30
+
+* Documentation
+* "matchchars" is now exported
+
+0.06 2014-02-08
+
+* Add git repo URL, minimum Perl version, licence info to "Makefile.PL"
+
+0.05 2013-11-28
+
+* Change format of "Changes"
+
+0.04 2011-07-30
+
+* Added a new function, matchchars, which matches any characters in
+  the specified block.
+* Changed to ExtUtils::MakeMaker & removed Module::Install things.
+
+0.03 2008-08-17
+
+0.02 2008-08-16
+
+* Internal changes to pass cpantesters tests.
+
+0.01 2008-08-16
+
+* First version
+
+

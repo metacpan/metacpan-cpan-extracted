@@ -1,0 +1,196 @@
+#!/usr/bin/perl
+# Copyright (c) 2014  Timm Murray
+# All rights reserved.
+# 
+# Redistribution and use in source and binary forms, with or without 
+# modification, are permitted provided that the following conditions are met:
+# 
+#     * Redistributions of source code must retain the above copyright notice, 
+#       this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright 
+#       notice, this list of conditions and the following disclaimer in the 
+#       documentation and/or other materials provided with the distribution.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+# POSSIBILITY OF SUCH DAMAGE.
+use v5.14;
+use warnings;
+use IO::Socket::INET;
+use UAV::Pilot;
+use UAV::Pilot::Video::FileDump;
+use AnyEvent;
+use Getopt::Long;
+
+my %UAV_TYPES = (
+    'ARDrone'     => \&init_ardrone,
+    'WumpusRover' => \&init_wumpus_rover,
+);
+
+my $HOST          = '192.168.1.1';
+my $FILE_OUT      = '';
+my $FILE_IN       = '';
+my $UAV_TYPE      = 'ARDrone';
+my $SINGLE_FRAMES = 0;
+Getopt::Long::GetOptions(
+    'host=s'        => \$HOST,
+    'out=s'         => \$FILE_OUT,
+    'in=s'          => \$FILE_IN,
+    'uav=s'         => \$UAV_TYPE,
+    'single-frames' => \$SINGLE_FRAMES,
+);
+die "'$UAV_TYPE' is not a valid UAV.  Valid types are: "
+    . join( ', ', sort keys %UAV_TYPES ) . "\n"
+    unless exists $UAV_TYPES{$UAV_TYPE};
+my $init_sub = $UAV_TYPES{$UAV_TYPE};
+
+$SIG{'INT'} = 'cleanup';
+END { cleanup() }
+
+my ($driver_video, $file_dump, $start_time);
+
+
+sub init_ardrone
+{
+    my ($cv, $file_dump) = @_;
+    eval '
+        use UAV::Pilot::ARDrone::Driver;
+        use UAV::Pilot::ARDrone::Driver::Mock;
+        use UAV::Pilot::ARDrone::Video;
+        use UAV::Pilot::ARDrone::Video::Mock;
+    '; die $@ if $@;
+
+    my $driver_class = $FILE_IN
+        ? 'UAV::Pilot::ARDrone::Driver::Mock'
+        : 'UAV::Pilot::ARDrone::Driver';
+    my $ardrone = $driver_class->new({
+        host => $HOST,
+    });
+
+    my %video_args = (
+        handlers => [ $file_dump ],
+        condvar  => $cv,
+        driver   => $ardrone,
+    );
+
+    my $driver_video = $FILE_IN
+        ? UAV::Pilot::ARDrone::Video::Mock->new({
+            %video_args,
+            file => $FILE_IN,
+        })
+        : UAV::Pilot::ARDrone::Video->new( \%video_args );
+    $driver_video->init_event_loop;
+
+    return $driver_video
+}
+
+sub init_wumpus_rover
+{
+    my ($cv, $file_dump) = @_;
+    eval '
+        use UAV::Pilot::WumpusRover::Driver;
+        use UAV::Pilot::WumpusRover::Driver::Mock;
+        use UAV::Pilot::WumpusRover::Video;
+        use UAV::Pilot::WumpusRover::Video::Mock;
+    '; die $@ if $@;
+
+    my $driver_class = $FILE_IN
+        ? 'UAV::Pilot::WumpusRover::Driver::Mock'
+        : 'UAV::Pilot::WumpusRover::Driver';
+    my $wumpus = $driver_class->new({
+        host => $HOST,
+    });
+
+    my %video_args = (
+        handlers => [ $file_dump ],
+        condvar  => $cv,
+        driver   => $wumpus,
+    );
+
+    my $driver_video = $FILE_IN
+        ? UAV::Pilot::WumpusRover::Video::Mock->new({
+            %video_args,
+            file => $FILE_IN,
+        })
+        : UAV::Pilot::WumpusRover::Video->new( \%video_args );
+    $driver_video->init_event_loop;
+
+    return $driver_video
+}
+
+
+my $cleanup_done = 0;
+sub cleanup
+{
+    return if $cleanup_done;
+    my $end_time = time;
+
+    if( defined $driver_video ) {
+        my $num_frames = $driver_video->frames_processed;
+        warn "Frames processed: $num_frames \n";
+
+        my $duration = $end_time - $start_time;
+        my $fps = $num_frames / $duration;
+        warn "FPS: $fps\n";
+    }
+
+    $file_dump->close if defined $file_dump;
+    $cleanup_done = 1;
+    exit;
+}
+
+
+{
+    my $cv = AnyEvent->condvar;
+
+    $file_dump = UAV::Pilot::Video::FileDump->new({
+        file         => $FILE_OUT,
+        single_frame => 1,
+    });
+
+    $driver_video = $init_sub->( $cv, $file_dump );
+    $start_time = time;
+    $cv->recv;
+}
+
+
+
+
+
+__END__
+
+=head1 SYNOPSIS
+
+    uav_video_dump --out /path/to/out_video.h264
+
+=head1 DESCRIPTION
+
+Reads the video stream from the Parrot AR.Drone and puts it in a file.
+
+If the C<--out> parameter is not specified, it will dump to C<STDOUT>.  In theory, something 
+like the below should show the video stream in real time:
+
+    uav_video_dump | vlc -
+
+But it hasn't worked for me yet.  I'd be interested in comments/patches from anybody who 
+figures it out.
+
+VLC seems to guess the FPS of the h264 stream correctly.  Mplayer doesn't seem to, and will 
+show a streaky mess when it guesses wrong.  The FPS setting will depend on your AR.Drone's 
+configuration.  You can try 30.  Set it in mplayer with:
+
+    mplayer -fps 30 /path/to/video.h264
+
+If you want to know the exact value, you can telnet into your AR.Drone (after connecting 
+to it on wifi, of course) and cat the file C</data/config.ini>.  The setting will be 
+under the C<[video]> section with the key C<codec_fps>.
+
+=cut

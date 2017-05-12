@@ -1,0 +1,39 @@
+
+CuiFinder User Options: 
+   --config option set
+
+
+UMLS-Interface Configuration Information
+  Sources (SAB):
+    MTH
+  Relations (REL):
+    RB
+    RN
+  Database: 
+    umls (MMSYS-2010AB-20101022)
+
+
+
+
+The children of hand (C0018563) are: 
+  fingers (C0016129) 
+  metacarpal bone (C0025526) 
+   (C0222222) 
+  skin structure of hand (C0222224) 
+   (C0222227) 
+  skin structure of hand and foot (C0222228) 
+  skin structure of hand, including finger (C0222229) 
+   (C0222487) 
+  subcutaneous tissue structure of hand (C0222489) 
+   (C0222492) 
+  subcutaneous tissue structure of hand and foot (C0222493) 
+  subcutaneous tissue structure of hand, including finger (C0222494) 
+  phalanx of hand (C0223792) 
+  tendon and tendon sheath of hand (C0224889) 
+  structure of fascia of forearm, hand and finger (C0225240) 
+  structure of right hand (C0230370) 
+  structure of left hand (C0230371) 
+  palm (C0230373) 
+  bone structure of hand (C0448064) 
+  hand joint structure (C0459470) 
+  entire hand (C1281583) 

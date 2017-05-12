@@ -1,0 +1,58 @@
+Errata for NeuStar UltraDNS Transaction Protocol
+Version 3.0, dated September 5, 2008
+http://www.ultradns.net/api/NUS_API_XML.pdf
+
+These are just assorted issues I noted as I've worked with the document.
+
+* Parameter Types
+
+Per http://www.xmlrpc.info/xmlrpc-specification.html and http://www.xmlrpc.com/spec
+there is no "unsigned" type, and the string type no longer refers to ASCII (since 2003)
+
+* DNS-Related Data Types
+
+Does not list all the non-standard types used. For example it doesn't list the
+'generic' scalar types, which all seem to have been added needlessly.
+
+    unsigned_short: should be standard i4
+    unsigned:       should be standard double where i4 wouldn't fit
+    unsigned_int:   as above, also presumably a typo (appears in some results)
+    float:          should be standard double
+    hexint:         should be standard base64 (which was added in 1999)
+
+Server-side validation is always needed, so adding new generic types to
+indicate the range of values adds little value.
+
+Also, the boolean type is correctly documented as being an integer "1" or "0"
+but the documentation for the "Zone ACL Requests" methods all include "Note:
+Specify Boolean values as either True or False." The examples clearly show the
+strings "True" and "False" being used within boolean tags:
+
+    <value><boolean>True</boolean></value>
+
+To have two different interpretations of the 'boolean' type is very broken and
+will cause significant extra code.
+
+* UDNS_GetZoneInfo
+
+In the Example Response the first "<name>id</name>" should be "<name>name</name>".
+
+* UDNS_CreateSSHFPRecord
+* UDNS_DeleteSSHFPRecord
+
+Show a 'Method succeeded' response even though other methods that return 'Method succeeded' don't.
+
+* UDNS_FindResourceRecords
+
+The Syntax section shows the second argument as <hostname>hostname.myzone.com.</hostname>
+but the description says it's a "Resource Record type".
+
+* Zone ACL Requests
+
+Refer to the 'boolean' type issues notes in "DNS-Related Data Types" above. 
+
+* See also
+
+http://effbot.org/zone/xmlrpc-errata.htm
+
+

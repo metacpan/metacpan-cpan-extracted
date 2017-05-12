@@ -1,0 +1,107 @@
+Version History for URI-Encode
+Mithun Ayachit
+
+
+
+1.1.0
+
+
+-   Stop using $' [Github Issue #3]
+
+
+
+1.0.1
+
+
+-   Bump version to allow change in version number strategy
+
+
+
+0.9.1
+
+
+-   No functional changes. Use semver and move bugtracker to
+    github-issues
+
+
+
+0.09
+
+
+-   [RT #83761] Lower-cased encoded characters were not being decoded.
+    Fixed now. Thanks David Arenillas ...
+
+
+
+0.08
+
+
+-   [RT #80177] doh! double_encode wasn't working at all. Fixed now.
+    Thanks DWRIGHT ...
+-   [RT #80178] Do not reset default options when they (not all) are
+    passed to the constructor. Thanks DWRIGHT ...
+-   Updated some POD. Do not promote the old interface for setting
+    options
+
+
+
+0.07
+
+
+-   Fix issue where '%' was not being encoded unless encode_reserved was
+    requested [RT #78314]
+-   Introduce option to NOT encode an already encoded string/URL
+
+
+
+0.061
+
+
+-   POD updates
+-   Added a benchmark script
+
+
+
+0.06
+
+
+-   Fixed synopsis
+
+
+
+0.05
+
+
+-   Store character maps in object
+-   Update repo format
+
+
+
+0.04
+
+
+-   Allow strings to be '0' (literally). See RT #70628
+-   Added option in constructor to set reserved encoding
+
+
+
+0.03
+
+
+-   Minimum perl 5.8.1
+
+
+
+0.02
+
+
+-   Corrected POD
+
+
+
+0.01
+
+
+-   Initial release
+
+------------------------------------------------------------------------

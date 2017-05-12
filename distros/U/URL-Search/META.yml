@@ -1,0 +1,34 @@
+---
+abstract: 'search for URLs in plain text'
+author:
+  - 'Lukas Mai <l.mai@web.de>'
+build_requires:
+  Test::More: '0'
+  utf8: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Find: '0'
+  File::Spec: '0'
+  strict: '0'
+  warnings: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: URL-Search
+no_index:
+  directory:
+    - t
+    - inc
+    - xt
+requires:
+  Exporter: '5.57'
+  perl: '5.010000'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: git://github.com/mauke/URL-Search
+version: '0.000004'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

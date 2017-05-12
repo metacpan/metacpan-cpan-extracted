@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Unicode-Escape
+version:      0.0.2
+version_from: lib/Unicode/Escape.pm
+installdirs:  site
+requires:
+    Encode:                        0
+    Test::More:                    0
+    Unicode::String:               0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

@@ -1,0 +1,45 @@
+<state_diagram>
+  <states>
+    <state_row>
+      <state name="zero" label="0" start_from="N" start_to="N" />
+      <state name="filler"                                     />
+      <state name="five" label="5"                             />
+    </state_row>
+    <state_row>
+      <state name="filler"                                     />
+      <state name="filler"                                     />
+      <state name="ten" label="10"                             />
+    </state_row>
+    <state_row>
+      <state name="tf" label="25" accepting="yes"              />
+      <state name="ft" label="15"                              />
+      <state name="filler"                                     />
+    </state_row>
+    <state_row>
+      <state name="filler"                                     />
+      <state name="twenty" label="20"                          />
+      <state name="thirty" label="30" accepting="yes"          />
+    </state_row>
+  </states>
+
+  <transition_set label="5">
+    <transition from="zero"   to="five"   />
+    <transition from="five"   to="ten"    />
+    <transition from="ten"    to="ft"     from_side="W" to_side="E"/>
+    <transition from="ft"     to="twenty" />
+    <transition from="twenty" to="tf"     from_side="W" to_side="S"/>
+  </transition_set>
+
+  <transition_set label="10">
+    <transition from="zero"   to="ten"    from_side="S" to_side="W"/>
+    <transition from="ten"    to="twenty" from_side="S" to_side="E"/>
+    <transition from="ft"     to="tf"     />
+    <transition from="twenty" to="thirty" />
+  </transition_set>
+
+  <transition_set label="25">
+    <transition from="zero"   to="tf"     arc="counter" />
+    <transition from="five"   to="thirty" arc="clock" from_side="E" to_side="E"/>
+  </transition_set>
+
+</state_diagram>

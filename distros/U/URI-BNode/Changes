@@ -1,0 +1,20 @@
+Revision history for URI-BNode
+
+0.06    2013-11-03
+        (Still) trying to get CPANTS to stop complaining   
+
+0.05    2013-11-03
+        Adding docs
+
+0.04    2013-11-03
+        Trying to get CPANTS to stop complaining   
+
+0.03    2013-11-03
+        Added from/to UUID URN methods and (de)skolemization
+
+0.02    2013-11-03
+        Moved from handrolled UUID library picker to Data::GUID::Any
+
+0.01    2013-10-17
+        Initial release
+

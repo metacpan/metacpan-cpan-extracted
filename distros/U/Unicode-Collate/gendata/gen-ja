@@ -1,0 +1,360 @@
+#!perl
+# gen-ja : auxiliary script for Japanese
+#
+# output files
+#
+#   ja.txt     (equal to data/ja.txt)
+#   loc_ja.t   (equal to t/loc_ja.t)
+#   loc_japr.t (equal to t/loc_japr.t)
+#   loc_jait.t (equal to t/loc_jait.t)
+#
+use strict;
+use warnings;
+require 'gen-head'; # for testcount() and testhead()
+
+use Unicode::Normalize;
+require 'dumpstr'; # for string() and unidump()
+
+my $textf = 'ja.txt';
+my $text0 = "#katakana\n";
+my $text1 = "#hiragana\n";
+my $text2 = "#fullwidth and halfwidth\n";
+
+my $testf = 'loc_ja.t';
+my $test1 = '';
+my $test2 = '';
+my $test3 = '';
+my $test4 = '';
+
+my %kata2hira;
+my %kata2kana;
+
+for my $u (0x30A1..0x30FA, 0x30FD..0x30FE) {
+    my $nfd = NFD(pack 'U', $u);
+    my @d = unpack 'U*', $nfd;
+
+    if (@d == 1) {
+	$text0 .= sprintf "%04X;<%04X>++++2\n", $u, $u;
+    } else {
+	my $dec = join '', map sprintf("<%04X>", $_), @d;
+	$text0 .= sprintf "%04X;%s\n", $u, $dec;
+    }
+
+    next if @d == 1;
+    my $ustr = string(pack 'U', $u);
+    my $dstr = string($nfd);
+    $test3 .= qq|ok(\$objJa->eq($ustr, $dstr));\n|;
+}
+
+for my $u (0x3041..0x3096, 0x309D..0x309E) {
+    my $nfd = NFD(pack 'U', $u);
+    my @d = unpack 'U*', $nfd;
+
+    my $k = $u + 0x60;
+    $kata2hira{$k} = $u;
+
+    if (@d == 1) {
+	$text1 .= sprintf "%04X;<%04X>----1\n", $u, $k;
+    } else {
+	my $dec = join '', map sprintf("<%04X>", $_), @d;
+	$text1 .= sprintf "%04X;%s\n", $u, $dec;
+    }
+
+    my $ustr = string(pack 'U', $u);
+    my $kstr = string(pack 'U', $k);
+    $test1 .= qq|ok(\$objJa->eq($ustr, $kstr));\n|;
+
+    next if @d == 1;
+    my $dstr = string($nfd);
+    $test4 .= qq|ok(\$objJa->eq($ustr, $dstr));\n|;
+}
+
+for my $u (0x3000, 0xFF00..0xFF9F, 0xFFE0..0xFFFD) {
+    my $src = pack 'U', $u;
+    my $nfk = NFKC $src;
+    next if $src eq $nfk;
+
+    my @k = unpack 'U*', $nfk;
+    my $k = $k[0] == 0x5C ? 0x27 : $k[0];
+    $kata2kana{$k} = $u;
+
+    my $comm = $u == 0xFF3C ? " # reverse solidus = apostrophe" :
+	       $u == 0xFFE3 ? " # macron = space" : '';
+    $text2 .= sprintf "%04X;<%04X>$comm\n", $u, $k;
+
+    my $ustr = string($src);
+    my $kstr = string(pack 'U', $k);
+    $test2 .= qq|ok(\$objJa->eq($ustr, $kstr));\n|;
+}
+
+### WRITE TEST ###
+my $test = '';
+my $ok = 2;
+my @listCJK = (
+    [qw(4E9C 5516 5A03 963F 54C0 611B 6328 59F6 9022 8475)],
+    [qw(69C7 9059 7464 51DC 7199 4E02 3400)],
+    [qw(20000 20001 20002 20003 20004 20005)],
+    [qw(4E00 4E01 4E02 4E03 4E04 4E05)],
+    [qw(9F9B 9F9C 9F9D 9F9E 9F9F 9FA0)],
+);
+my @testCJK = map testprim('Ja', $_), @listCJK;
+
+$testCJK[0] =~ s/^/# first ten kanji\n/;
+$testCJK[1] =~ s/^/# last five kanji and undef\n/;
+$testCJK[1] =~ s/(\{(4E02)\}"\)\);)/$1 # $2: UIdeo undef in JIS X 0208/;
+$testCJK[1] =~ s/(\{(3400)\}"\)\);)/$1 # $2: Ext.A undef in JIS X 0208/;
+$testCJK[2] =~ s/^/# Ext.B\n/;
+
+$test .= "\$objJa->change(level => 1);\n\n";
+$test .= testcount(\$ok, join "\n", @testCJK[0..2]);
+
+$test .= "\$objJa->change(overrideCJK => undef);\n\n";
+$test .= testcount(\$ok, join "\n", @testCJK[3,4]);
+
+$test .= "\$objJa->change(level => 3);\n\n";
+$test .= testcount(\$ok, $test1);
+
+$test .= "\$objJa->change(variable => 'Non-ignorable');\n\n";
+$test .= testcount(\$ok, $test2);
+
+$test1 =~ s/->eq/->lt/g;
+$test .= "\$objJa->change(level => 4);\n\n";
+$test .= testcount(\$ok, $test1);
+$test .= testcount(\$ok, $test3);
+$test .= testcount(\$ok, $test4);
+
+$test .= "\$objJa->change(katakana_before_hiragana => 1);\n\n";
+$test .= testcount(\$ok, $test1);
+
+chomp $test;
+open my $th, ">$testf" or die $testf;
+binmode $th;
+print $th testhead('ja', $ok), $test;
+close $th or die $testf;
+
+#------------------------------------------------------------------------------
+
+my @vowA = qw(30A1 30A2 30AB 30AC 30B5 30B6      30BF 30C0 30CA 30CF 30D0 30D1
+	 30DE 30E3 30E4 30E9 30EE 30EF 30F7 30F5           31F5      31FB);
+my @vowI = qw(30A3 30A4 30AD 30AE 30B7 30B8      30C1 30C2 30CB 30D2 30D3 30D4
+	 30DF           30EA      30F0 30F8      31F1      31F6      31FC);
+my @vowU = qw(30A5 30A6 30AF 30B0 30B9 30BA 30C3 30C4 30C5 30CC 30D5 30D6 30D7
+	 30E0 30E5 30E6 30EB           30F4 31F0 31F2 31F4 31F7 31FA 31FD);
+my @vowE = qw(30A7 30A8 30B1 30B2 30BB 30BC      30C6 30C7 30CD 30D8 30D9 30DA
+	 30E1           30EC      30F1 30F9 30F6           31F8      31FE);
+my @vowO = qw(30A9 30AA 30B3 30B4 30BD 30BE      30C8 30C9 30CE 30DB 30DC 30DD
+	 30E2 30E7 30E8 30ED      30F2 30FA      31F3      31F9      31FF);
+my @vowN = qw(30F3);
+
+my %vowel; # total 105
+$vowel{$_} = '30A1' for @vowA; # 22
+$vowel{$_} = '30A3' for @vowI; # 19
+$vowel{$_} = '30A5' for @vowU; # 24
+$vowel{$_} = '30A7' for @vowE; # 19
+$vowel{$_} = '30A9' for @vowO; # 21
+	      # not for @vowN;
+
+my $textP = "#prolonged\n";
+my $testP = "";
+my $testQ = "";
+my $testR = "";
+
+my $HexPL = '30FC';
+my $HexHP = 'FF70';
+
+for my $hex (@vowA, @vowI, @vowU, @vowE, @vowO) {
+    my $u    = hex $hex;
+    my $kata = pack 'U', $u;
+    my @nfd  = unpack 'U*', NFD $kata;
+    my $chr0 = $kata2kana{$nfd[0]} ? pack('U', $kata2kana{$nfd[0]}) : '';
+    my $chr1 = @nfd == 2 ? pack('U', $kata2kana{$nfd[1]}) : '';
+    my $kana = $chr0.$chr1;
+    my $hira = pack 'U', $kata2hira{$u} ? $kata2hira{$u} : 0;
+
+    my $kataH = unidump($kata);
+    my $kataD = unidump(NFD $kata);
+    my $kanaH = unidump($kana);
+    my $hiraH = unidump($hira);
+    my $hiraD = unidump(NFD $hira);
+    my $repl  = $vowel{$kataH};
+    my $replP = "<$repl>---8";
+
+    $textP .= "$kataH $HexPL;<$kataH>$replP\n";
+    $textP .= "$kataD $HexPL;<$kataH $HexPL>\n" if $kataH ne $kataD;
+    $textP .= "$kanaH $HexPL;<$kataH $HexPL>\n" if $kana && $chr0;
+    $textP .= "$kanaH $HexHP;<$kataH $HexPL>\n" if $kana && $chr0;
+    $textP .= "$hiraH $HexPL;<$hiraH>$replP\n"  if $kata2hira{$u};
+    $textP .= "$hiraD $HexPL;<$hiraH $HexPL>\n" if $hiraH ne $hiraD;
+
+    my $kata_prolong  = string($kata.pack('U', hex $HexPL));
+    my $kata_replace  = string($kata.pack('U', hex $repl));
+    my $kana_prolong  = string($kana.pack('U', hex $HexPL));
+    my $kana_prolongH = string($kana.pack('U', hex $HexHP));
+    my $hira_prolong  = string($hira.pack('U', hex $HexPL));
+    my $kata_prolongD = string(NFD($kata).pack('U', hex $HexPL));
+    my $hira_prolongD = string(NFD($hira).pack('U', hex $HexPL));
+
+    $testP .= qq|ok(\$objJa->eq($kata_prolong, $kata_replace));\n|;
+  $kata2hira{$u} and
+    $testQ .= qq|ok(\$objJa->eq($hira_prolong, $kata_prolong));\n|;
+  $kataH ne $kataD and
+    $testR .= qq|ok(\$objJa->eq($kata_prolong, $kata_prolongD));\n|;
+  $kana && $chr0 and
+    $testR .= qq|ok(\$objJa->eq($kata_prolong, $kana_prolong));\n|;
+  $kana && $chr0 and
+    $testR .= qq|ok(\$objJa->eq($kata_prolong, $kana_prolongH));\n|;
+  $hiraH ne $hiraD and
+    $testR .= qq|ok(\$objJa->eq($hira_prolong, $hira_prolongD));\n|;
+}
+
+### WRITE TEST PROLONG ###
+$test = '';
+$ok = 2;
+
+$test .= "\$objJa->change(level => 2);\n\n";
+$test .= testcount(\$ok, $testP);
+
+$testP =~ s/->eq/->lt/g;
+$test .= "\$objJa->change(level => 3);\n\n";
+$test .= testcount(\$ok, $testP);
+$test .= testcount(\$ok, $testQ);
+
+$testQ =~ s/->eq/->lt/g;
+$test .= "\$objJa->change(level => 4);\n\n";
+$test .= "\$objJa->change(variable => 'Non-ignorable');\n\n";
+$test .= testcount(\$ok, $testQ);
+$test .= testcount(\$ok, $testR);
+
+$testf =~ s/\./pr./;
+chomp $test;
+open my $ph, ">$testf" or die $testf;
+binmode $ph;
+print $ph testhead('ja', $ok), $test;
+close $ph or die $testf;
+
+#------------------------------------------------------------------------------
+
+my %SmallKana = qw(
+    30A1 30A2   30A3 30A4   30A5 30A6   30A7 30A8   30A9 30AA   30F5 30AB
+    31F0 30AF   30F6 30B1   31F1 30B7   31F2 30B9   30C3 30C4   31F3 30C8
+    31F4 30CC   31F5 30CF   31F6 30D2   31F7 30D5   31F8 30D8   31F9 30DB
+    31FA 30E0   30E3 30E4   30E5 30E6   30E7 30E8   31FB 30E9   31FC 30EA
+    31FD 30EB   31FE 30EC   31FF 30ED   30EE 30EF
+);
+my %VoiceableKana = map +($_=>1), qw(
+    30A6 30AB 30AD 30AF 30B1 30B3 30B5 30B7 30B9 30BB 30BD 30BF 30C1
+    30C4 30C6 30C8 30CF 30D2 30D5 30D8 30DB 30EF 30F0 30F1 30F2
+);
+
+my $textI = "#iteration\n";
+my $testI = "";
+my $testJ = "";
+my $testK = "";
+
+my $HexKI = '30FD';
+my $HexHI = '309D';
+my $HexKV = '30FE';
+my $HexHV = '309E';
+my $HexVS = '3099';
+
+for my $hex (sort @vowA, @vowI, @vowU, @vowE, @vowO, @vowN) {
+    my $u    = hex $hex;
+    my $kata = pack 'U', $u;
+    my @nfd  = unpack 'U*', NFD $kata;
+    my $base = pack 'U', $nfd[0];
+    my $chr0 = $kata2kana{$nfd[0]} ? pack('U', $kata2kana{$nfd[0]}) : '';
+    my $chr1 = @nfd == 2 ? pack('U', $kata2kana{$nfd[1]}) : '';
+    my $kana = $chr0.$chr1;
+    my $hira = pack 'U', $kata2hira{$u} ? $kata2hira{$u} : 0;
+
+    my $kataH = unidump($kata);
+    my $kataD = unidump(NFD $kata);
+    my $kanaH = unidump($kana);
+    my $hiraH = unidump($hira);
+    my $hiraD = unidump(NFD $hira);
+    my $repl  = $SmallKana{$hex} ? $SmallKana{$hex} : unidump($base);
+    my $replI = "<$repl>---1";
+    my $replV = "$replI<$HexVS>";
+
+    $textI .= "$kataH $HexKI;<$kataH>$replI\n";
+    $textI .= "$kataD $HexKI;<$kataH $HexKI>\n" if $kataH ne $kataD;
+    $textI .= "$kanaH $HexKI;<$kataH $HexKI>\n" if $kana && $chr0;
+    $textI .= "$hiraH $HexHI;<$hiraH>$replI\n"  if $kata2hira{$u};
+    $textI .= "$hiraD $HexHI;<$hiraH $HexHI>\n" if $hiraH ne $hiraD;
+
+    my $kata_iterate  = string($kata.pack('U', hex $HexKI));
+    my $kata_replace  = string($kata.pack('U', hex $repl));
+    my $kana_iterate  = string($kana.pack('U', hex $HexKI));
+    my $hira_iterate  = string($hira.pack('U', hex $HexHI));
+    my $kata_iterateD = string(NFD($kata).pack('U', hex $HexKI));
+    my $hira_iterateD = string(NFD($hira).pack('U', hex $HexHI));
+
+    $testI .= qq|ok(\$objJa->eq($kata_iterate, $kata_replace));\n|;
+  $kata2hira{$u} and
+    $testJ .= qq|ok(\$objJa->eq($hira_iterate, $kata_iterate));\n|;
+  $kataH ne $kataD and
+    $testK .= qq|ok(\$objJa->eq($kata_iterate, $kata_iterateD));\n|;
+  $kana && $chr0 and
+    $testK .= qq|ok(\$objJa->eq($kata_iterate, $kana_iterate));\n|;
+  $hiraH ne $hiraD and
+    $testK .= qq|ok(\$objJa->eq($hira_iterate, $hira_iterateD));\n|;
+
+    next if !$VoiceableKana{$repl};
+    $textI .= "$kataH $HexKV;<$kataH>$replV\n";
+    $textI .= "$kataD $HexKV;<$kataH $HexKV>\n" if $kataH ne $kataD;
+    $textI .= "$kanaH $HexKV;<$kataH $HexKV>\n" if $kana && $chr0;
+    $textI .= "$hiraH $HexHV;<$hiraH>$replV\n"  if $kata2hira{$u};
+    $textI .= "$hiraD $HexHV;<$hiraH $HexHV>\n" if $hiraH ne $hiraD;
+
+    my $kata_iterateV  = string($kata.pack('U', hex $HexKV));
+    my $kana_iterateV  = string($kana.pack('U', hex $HexKV));
+    my $hira_iterateV  = string($hira.pack('U', hex $HexHV));
+    my $kata_iterateVD = string(NFD($kata).pack('U', hex $HexKV));
+    my $hira_iterateVD = string(NFD($hira).pack('U', hex $HexHV));
+
+    $testK .= qq|ok(\$objJa->eq($kata_iterateV, $kata_iterate.\$vs));\n|;
+  $kataH ne $kataD and
+    $testK .= qq|ok(\$objJa->eq($kata_iterateVD, $kata_iterateD.\$vs));\n|;
+  $kana && $chr0 and
+    $testK .= qq|ok(\$objJa->eq($kana_iterateV, $kana_iterate.\$vs));\n|;
+  $kata2hira{$u} and
+    $testK .= qq|ok(\$objJa->eq($hira_iterateV, $hira_iterate.\$vs));\n|;
+  $hiraH ne $hiraD and
+    $testK .= qq|ok(\$objJa->eq($hira_iterateVD, $hira_iterateD.\$vs));\n|;
+}
+
+### WRITE TEST ITERATION ###
+$test = '';
+$ok = 2;
+
+$test .= "\$objJa->change(level => 2);\n\n";
+$test .= testcount(\$ok, $testI);
+
+$testI =~ s/->eq/->lt/g;
+$test .= "\$objJa->change(level => 3);\n\n";
+$test .= testcount(\$ok, $testI);
+$test .= testcount(\$ok, $testJ);
+
+$testJ =~ s/->eq/->lt/g;
+$test .= "\$objJa->change(level => 4);\n\n";
+$test .= "\$objJa->change(variable => 'Non-ignorable');\n\n";
+$test .= testcount(\$ok, $testJ);
+
+$test .= qq|my \$vs = "\\x{$HexVS}";\n\n|;
+$test .= testcount(\$ok, $testK);
+
+$testf =~ s/pr\./it./;
+chomp $test;
+open my $ih, ">$testf" or die $testf;
+binmode $ih;
+print $ih testhead('ja', $ok), $test;
+close $ih or die $testf;
+
+### WRITE DATA ###
+open my $dh, ">$textf" or die $textf;
+binmode $dh;
+print $dh "use Unicode::Collate::CJK::JISX0208\n";
+print $dh "overrideCJK Unicode::Collate::CJK::JISX0208::weightJISX0208\n";
+print $dh "$text0$text1$text2";
+print $dh "$textP$textI";
+close $dh or die $textf;

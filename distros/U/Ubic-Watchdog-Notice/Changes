@@ -1,0 +1,15 @@
+Revision history for Perl module Ubic::Watchdog::Notice
+
+0.31 2014-09-09
+    - fix make PREREQ_PM
+
+0.3 2014-06-12
+    - Scack notice
+
+0.2 2014-06-10
+    - HipChat notice
+
+0.1 2014-05-14
+    - original version; created by ExtUtils::ModuleMaker 0.51
+
+

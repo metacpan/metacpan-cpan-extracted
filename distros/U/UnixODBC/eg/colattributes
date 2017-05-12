@@ -1,0 +1,292 @@
+#!/usr/bin/perl
+
+# $Id: colattributes,v 1.5 2004-03-06 05:59:26 kiesling Exp $
+$VERSION=1.0;
+
+use UnixODBC qw(:all);
+use Getopt::Long;
+
+my $env;
+my $cnh;
+my $sth;
+my $r;
+
+## 
+## Connection parameters from command line.
+##
+my $DSN = '';       # Data source name.
+my $UserName = '';  # User login to DBMS
+my $PassWord = '';  # Password login to DBMS
+my $Table = '';     # Name of table.
+
+my $usage=<<EOH;
+Usage: 
+colattributes [--help] | [--user=<username>] [--password=<password>] [--brief] [--fieldsep=<s>] --dsn=<DSN> --table=<tablename> 
+  --help       Print this help and exit.
+  --dsn        Data source name.
+  --table      Table name.
+  --user       DBMS login name.
+  --password   DBMS login password.
+  --brief      Print attributes without label headings.
+  --fieldsep   Field separator.  Default is a tab character (0x09).
+EOH
+
+my $help;  # Print help and exit.
+my $brief; # Do not print attribute labels.
+my $fieldsep = "\t";  # Default field separator.
+
+GetOptions ('help' => \$help,
+	    'brief' => \$brief,
+	    'fieldsep=s' => \$fieldsep,
+	    'dsn=s' => \$DSN,
+	    'user=s' => \$UserName,
+            'table=s' => \$Table,
+	    'password=s' => \$PassWord);
+
+if ($help || (not length ($DSN)) || (not length ($Table)))
+     {
+	 print $usage;
+	 exit 0;
+     }
+
+my ($rbuf, $rbuflen, $numeric_attr, $ncols);
+
+my @headings = qw(SQL_COLUMN_COUNT SQL_COLUMN_NAME SQL_COLUMN_TYPE
+		  SQL_COLUMN_LENGTH SQL_COLUMN_PRECISION 
+		  SQL_COLUMN_SCALE SQL_COLUMN_DISPLAY_SIZE
+		  SQL_COLUMN_NULLABLE SQL_COLUMN_UNSIGNED
+		  SQL_COLUMN_MONEY SQL_COLUMN_UPDATABLE
+		  SQL_COLUMN_AUTO_INCREMENT SQL_COLUMN_CASE_SENSITIVE
+		  SQL_COLUMN_SEARCHABLE SQL_COLUMN_TYPE_NAME
+		  SQL_COLUMN_TABLE_NAME SQL_COLUMN_OWNER_NAME
+		  SQL_COLUMN_QUALIFIER_NAME SQL_COLUMN_LABEL
+		  SQL_COLUMN_DRIVER_START);
+
+my @rowbuffer;  # Buffer attributes in correct order before printing.
+
+my $query = "select \* from $Table\;";
+
+my %numeric_attrs = ('SQL_COLUMN_COUNT', 0,
+		     'SQL_COLUMN_TYPE', 2,
+		     'SQL_COLUMN_LENGTH', 3,
+		     'SQL_COLUMN_PRECISION', 4,
+		     'SQL_COLUMN_SCALE', 5,
+		     'SQL_COLUMN_DISPLAY_SIZE', 6,
+		     'SQL_COLUMN_NULLABLE', 7,
+		     'SQL_COLUMN_UNSIGNED', 8,
+		     'SQL_COLUMN_MONEY', 9,
+		     'SQL_COLUMN_UPDATABLE', 10,
+		     'SQL_COLUMN_AUTO_INCREMENT', 11,
+		     'SQL_COLUMN_CASE_SENSITIVE', 12,
+		     'SQL_COLUMN_SEARCHABLE', 13,
+		     'SQL_COLUMN_DRIVER_START', 1000,
+		     );
+
+my %char_attrs = ('SQL_COLUMN_NAME', 1,
+		'SQL_COLUMN_TYPE_NAME', 14,
+		'SQL_COLUMN_TABLE_NAME', 15,
+		'SQL_COLUMN_OWNER_NAME', 16,
+		'SQL_COLUMN_QUALIFIER_NAME', 17,
+		'SQL_COLUMN_LABEL', 18,
+		 );
+
+$r = SQLAllocHandle ($SQL_HANDLE_ENV, $SQL_NULL_HANDLE, $evh);
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    print "SQLAllocHandle evh: ";
+   &getdiagrec ($SQL_HANDLE_ENV, $evh);
+    exit 1;
+}
+
+$r = SQLSetEnvAttr($evh, $SQL_ATTR_ODBC_VERSION, $SQL_OV_ODBC2, 0);
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    &getdiagrec ($SQL_HANDLE_ENV, $evh);
+    exit 1;
+}
+
+$r = SQLAllocHandle ($SQL_HANDLE_DBC, $evh, $cnh);
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    &getdiagrec ($SQL_HANDLE_ENV, $evh);
+    exit 1;
+}
+
+$r = SQLConnect ($cnh, $DSN, $SQL_NTS,
+			    $UserName, $SQL_NTS,
+			    $PassWord, $SQL_NTS);
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    &getdiagrec ($SQL_HANDLE_DBC, $cnh);
+    exit 1;
+}
+
+$r = SQLAllocHandle ($SQL_HANDLE_STMT, $cnh, $sth);
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    &getdiagrec ($SQL_HANDLE_DBC, $cnh);
+    exit 1;
+}
+
+$r = &UnixODBC::SQLPrepare ($sth, $query, length ($query));
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    &getdiagrec ($SQL_HANDLE_STMT, $sth);
+    exit 1;
+}
+
+$r = &UnixODBC::SQLExecute ($sth);
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    &getdiagrec ($SQL_HANDLE_STMT, $sth);
+    exit 1;
+}
+
+
+# Get the number of columns in the table
+$r = &UnixODBC::SQLNumResultCols ($sth,$ncols);
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    &getdiagrec ($SQL_HANDLE_STMT, $sth);
+    exit 1;
+}
+
+if (not $brief) { # Print column count and attribute headings.
+    print "$ncols columns in $Table.\n";
+    for (my $i = 0; $i <= $#headings; $i++) {
+	print $headings[$i] . $fieldsep;
+    }
+    print "\n";
+}
+
+for (my $cn = 1; $cn <= $ncols; $cn++) {
+    for (my $i = 0; $i <= $#headings; $i++) {
+	foreach my $attr (keys %char_attrs) {
+	    $r = SQLColAttribute ($sth, $cn, $char_attrs{$attr},
+				  $rbuf, 255, $rbuflen, $numeric_attr);
+$r = SQLCancel ($sth);
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    &getdiagrec ($SQL_HANDLE_STMT, $sth);
+    exit 1;
+}
+
+	    for (my $j = 0; $j <= $#headings; $j++) {
+		if ($attr =~ m"$headings[$j]") {
+		    $rowbuffer[$j] = $rbuf;
+		}
+	    }
+	}
+	foreach  my $attr (keys %numeric_attrs) {
+	    $r = SQLColAttribute ($sth, $cn, $numeric_attrs{$attr},
+				  $rbuf, 255, $rbuflen, $numeric_attr);
+	    for (my $j = 0; $j <= $#headings; $j++) {
+		if ($attr =~ m"$headings[$j]") {
+		    $rowbuffer[$j] = $numeric_attr;
+		}
+	    }
+	}
+    }
+    foreach my $f (@rowbuffer) {
+	print $f . $fieldsep;
+    }
+    print "\n";
+}
+
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    &getdiagrec ($SQL_HANDLE_STMT, $sth);
+    exit 1;
+}
+
+$r = SQLFreeHandle ($SQL_HANDLE_STMT, $sth);
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    &getdiagrec ($SQL_HANDLE_STMT, $sth);
+    exit 1;
+}
+
+$r = SQLDisconnect ($cnh);
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    &getdiagrec ($SQL_HANDLE_DBC, $cnh);
+    exit 1;
+}
+
+$r = SQLFreeConnect ($cnh);
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    &getdiagrec ($SQL_HANDLE_DBC, $cnh);
+    exit 1;
+}
+
+$r = SQLFreeHandle ($SQL_HANDLE_ENV, $evh);
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    &getdiagrec ($SQL_HANDLE_ENV, $evh);
+    exit 1;
+}
+
+sub getdiagrec {
+    my ($handle_type, $handle) = @_;
+    my ($sqlstate, $native, $message_text, $mlen);
+    print 'SQLGetDiagRec: ';
+    $r = &UnixODBC::SQLGetDiagRec ($handle_type, $handle, 1, $sqlstate,
+				   $native, $message_text, 255,
+				   $mlen);
+    if ($r == $SQL_NO_DATA) { 
+	print "result \= SQL_NO_DATA\n";
+    } elsif (($r == 1) || ($r == 0)) { 
+     print "$message_text\n";
+    } else { 
+     print "sqlresult = $r\n";
+    }
+    return $r;
+}
+
+=head1 NAME
+
+colattributes - Display the column attributes for a table in a 
+data source.
+
+=head1 SYNOPSYS
+
+colattributes [--help] | [--user=<username>] [--password=<password>] [--brief] [--fieldsep=<s>] --dsn=<DSN> --table=<tablename> 
+
+=head1 DESCRIPTION
+
+Colattributes prints the characteristics of each column of a data
+source table.  The ODBC API defines the attributes of each column.
+The default output is a table with fields separated by a tab character
+and lines terminated with a newline.
+
+=head1 OPTIONS
+
+=head2 --help
+
+Print a help message and exit.
+
+=head2 --dsn
+
+The name of the data source.
+
+=head2 --table
+
+The name of the table in the data source for the column attributes.
+
+=head2 --user
+
+User's login name on the DBMS server.
+
+=head2 --password
+
+User's login password on the DBMS server.
+
+=head2 --brief
+
+Print a table the column attributes without the headings.
+
+=head2 --fieldsep
+
+Specify a character string to use as a field separator.
+
+=head1 VERSION INFORMATION AND CREDITS
+
+Revision: $Revision: 1.5 $
+
+Written by: Robert Kiesling, rkies@cpan.org.
+
+Licensed under the same terms as Perl.  Refer to the
+file, "Artistic," for details.
+
+=head1 SEE ALSO
+
+perl(1), UnixODBC(3), UnixODBC::BridgeServer(3).
+
+

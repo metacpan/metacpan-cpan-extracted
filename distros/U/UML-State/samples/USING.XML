@@ -1,0 +1,40 @@
+This file explains the xml format of state diagrams used by drawstatexml.pl.
+There is a dtd (which is not enforced) in state.dtd in this directory.
+This directory also has examples of the format in files ending in .xml.
+
+Here are the key points.
+
+States come first.  States are layed out in rows.  To leave out an
+element use a state tag with name filler.  Note that labels and names
+are distinct.  The label appears on the screen.  The name is used
+for specifying transition edges (see below).
+
+If a state is accepting, include the attribute accepting="yes".  The
+default for this attribute is "no".
+
+If the state is a start state, specify a direction of origin for the
+start arrow as the attribute start_from (use N for from above, S for
+from below, E for from the right, and W for from the left).  Also
+specify the side of the state's box where the arrow will point (use
+N for the top of the box, S for the bottom, E for the right, and
+W for the left).
+
+The transition edges are specified in transition_set tags.  Each
+one must have a unique label.  That label appears on the graph.  If you
+use it again, the second occurance will overwrite the first one
+(think of the labels as hash keys, I do).
+
+Each transition must have a from and a to attribute.  The value of
+these attributes must be names of states as specified in state tags.
+The script will try to guess which sides of the state box to connect.
+It is easily confused.  If you don't like its choice, use the
+from_side and to_side tags to specify which sides to connect.  You must
+use both of them or neither.  The sides are compass points on the
+state's box: N is the top, S is the bottom, E is the right side,
+and W is the left side.
+
+Some transition edges overlap other parts of the diagram.  You can sometimes
+fix this by using the arc tag with a value of clock or counter (for
+clockwise and counterclockwise).  This will result in a Bezier curve
+instead of a straight line.  This will often (but not always) require
+an adjustment to the from_side and the to_side.

@@ -1,0 +1,6 @@
+name = "UR"
+
+badges = ["travis"]
+
+[build]
+build_class = "builder::UR"

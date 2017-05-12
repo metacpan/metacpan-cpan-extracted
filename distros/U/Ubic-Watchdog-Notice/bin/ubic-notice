@@ -1,0 +1,5 @@
+#!/usr/bin/env perl
+
+use Ubic::Watchdog::Notice;
+
+Ubic::Watchdog::Notice->run;

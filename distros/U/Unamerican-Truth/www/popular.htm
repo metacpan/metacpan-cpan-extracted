@@ -1,0 +1,76 @@
+<html><head><title>attention span, anyone?</title>
+
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<script language="JavaScript">
+function openWin(URL) {
+    aWindow = window.open(URL, "comments", "toolbar=no,width=500,height=500,status=no,scrollbars=yes,resize=yes,menubar=no")
+}
+</script>
+<link rel="stylesheet" href="truth.css" type="text/css">
+</head>
+<body bgcolor="#000000" background="images/nonskidback.gif" text="#ffffff" link="#ffff00" vlink="#ffff00">
+<table width="450" border="0" cellspacing="0" cellpadding="15" align="center" bgcolor="#000000">
+  <tbody><tr valign="top" bgcolor="#111111"> 
+    <td> 
+      <p align="center"><font face="Verdana, Arial, Helvetica, sans-serif" size="1"> 
+      <img src="images/lovemachine.jpg" width="343" height="191" vspace="5" hspace="5"></font></p>
+      <center>
+      <font face="Verdana, Arial, Helvetica, sans-serif" size="1" color="#ffff00"><b>
+      ( the most popular truths )
+      </b></font>
+      </center>
+      <p align="left"> <b><font color="#ffff00" size="1" face="Verdana, Arial, Helvetica, sans-serif">THE 
+        TRUTH IS THAT...</font></b><font face="Verdana, Arial, Helvetica, sans-serif" size="1" color="#ffff00"><br>
+        </font> </p>
+      <tmpl_if name="is_numbered">
+      <ol>
+      <tmpl_else>
+      <ul>
+      </tmpl_if>
+
+        <tmpl_loop name="truths">
+        <li value="<tmpl_var name='truth_id'>">
+          <font face="Verdana, Arial, Helvetica, sans-serif" size="1" color="#ffffff">
+          <tmpl_var name="data">
+          <br>
+          <div align="right">
+
+	  <!-- JavaScript-enabled browsers open a pop-up window. -->
+	  <script>
+	    document.write("<a href=\"javascript:openWin('truth.cgi?rm=add&truth_id=<tmpl_var name='truth_id'>')\">add comment</a> | ");
+	    document.write("<a href=\"javascript:openWin('truth.cgi?rm=read&truth_id=<tmpl_var name='truth_id'>')\">read comments</a>");
+	  </script>
+	  <!-- Other browsers keep it in the same window -->
+	  <noscript>
+	    <a href="truth.cgi?rm=add&truth_id=<tmpl_var name='truth_id'>">add comments</a> |
+	    <a href="truth.cgi?rm=read&truth_id=<tmpl_var name='truth_id'>">read comments</a>
+	  </noscript>
+
+          ( <tmpl_var name='number_of_comments'> )
+          </div>
+          <br>
+          <br>
+          </font>
+        </li>
+        </tmpl_loop>
+
+      <tmpl_if name="is_numbered">
+      </ol>
+      <tmpl_else>
+      </ul>
+      </tmpl_if>
+
+      <center>
+	<form name="jump" action="truth.cgi" method="get">
+        <font face="Verdana, Arial, Helvetica, sans-serif" size="1" color="#ffff00">
+	  <b>( seek truth )</b><br>
+	    <input type="text" size="5" name="i" value="1" onChange="document.jump.submit()">
+	</font>
+	</form>
+      </center>
+
+      <p align="left">  </p>
+      </td>
+  </tr>
+</tbody></table>
+</body></html>

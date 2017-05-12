@@ -1,0 +1,111 @@
+NAME
+    Unicode::Lite - Easy conversion between encodings
+
+SYNOPSIS
+     use Unicode::Lite;
+
+     print convert( 'latin1', 'unicode', "hello world!" );
+
+     local *lat2uni = convertor( 'latin1', 'unicode' );
+     print lat2uni( "hello world!" );
+
+     my $lat2uni = convertor( 'latin1', 'unicode' );
+     print &$lat2uni( "hello world!" );
+
+DESCRIPTION
+    This module includes string converting function from one and to another
+    charset. Requires installed Unicode::String and Unicode::Map packages.
+
+    Supported unicode charsets: unicode, utf16, ucs2, utf8, utf7, ucs4,
+    uchr, uhex.
+
+    Supported Single-Byte Charsets (SBCS): latin1 and all installed maps in
+    Unicode::Map package.
+
+FUNCTIONS
+    convertor SRC_CP DST_CP [FLGS] [CHAR]
+        Creates convertor function and returns reference to her, for further
+        fast direct call.
+
+        The param FLGS operates replacing by SBCS->SBCS converting if any
+        char from SRC_CP is absent at DST_CP. The order of search of
+        substitution:
+
+         UL_7BT - to equivalent 7bit char or sequence of 7bit chars
+         UL_SEQ - to equivalent char or sequence of chars
+         UL_EQV - to equivalent char
+
+         UL_ENT - to entity - &#0000;
+         UL_CHR - to [CHAR].
+         UL_ALL - UL_SEQ or UL_EQV and UL_ENT or UL_CHR
+
+        If flag UL_CHR or UL_ENT is not specified, absent chars will be
+        deleted. Param CHAR used for replacing of absent chars. If CHAR is
+        not specified, will be used '?' char.
+
+        If you are getting message "Character Set '' not defined!", run the
+        script test.pl from distribution.
+
+    convert SRC_CP DST_CP [VAR] [FLGS] [CHAR]
+        Convert VAR from SRC_CP codepage to DST_CP codepage and returns
+        converted string.
+
+    addequal UNICODES...
+        The function adds a rule for equivalent char finding. Params is a
+        list of hex unicodes of chars. For substitution on a sequence of
+        characters, the codes of characters need to be connected in
+        character '+'.
+
+         addequal( qw/2026 2E+2E+2E 3A/ ); # ELLIPSIS ... :
+
+        Note! Work of rules for finding of equivalent char is cascade:
+
+         2500 002D      # - -
+         2550 2500      # = -
+
+         2550 2500 002D # = - -
+
+     The following rules are correct for converting functions:
+
+     VAR may be SCALAR or REF to SCALAR.
+     If VAR is REF to SCALAR then SCALAR will be converted.
+     If VAR is omitted, uses $_.
+     If function called to void context and VAR is not REF then result placed to $_.
+
+EXAMPLES
+     $_ = "drüben, Straße";
+     convert 'latin1', 'latin1', $_, UL_7BT;
+     convert 'latin1', 'latin2', $_, UL_SEQ|UL_CHR, '?';
+     convert 'latin1', 'latin2', $_, UL_SEQ|UL_ENT, '?';
+
+     # EQVIVALENT CALLS:
+
+     local *lat2uni = convertor( 'latin1', 'unicode' );
+
+     lat2uni( $str );        # called to void context -> result placed to $_
+     $_ = lat2uni( $str );
+
+     lat2uni( \$str );       # called with REF to string -> direct converting
+     $str = lat2uni( $str );
+
+     lat2uni();              # with omitted param called -> $_ converted
+     lat2uni( \$_ );
+     $_ = lat2uni( $_ );
+
+AUTHOR
+    Albert MICHEEV <amichauer@cpan.org>
+
+COPYRIGHT
+    Copyright (C) 2000, Albert MICHEEV
+
+    This module is free software; you can redistribute it or modify it under
+    the same terms as Perl itself.
+
+AVAILABILITY
+    The latest version of this library is likely to be available from:
+
+    http://www.perl.com/CPAN
+
+SEE ALSO
+    Unicode::String, Unicode::Map.
+

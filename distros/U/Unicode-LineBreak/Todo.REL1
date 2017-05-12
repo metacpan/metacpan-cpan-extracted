@@ -1,0 +1,49 @@
+2009-10-17  Hatuka*nezumi - IKEDA Soji <hatuka(at)nezumi.nu>
+
+	* Text::Wrap compatible functions.
+	  - Unsatisfactorily DONE for wrap() by 1.005.
+
+2009-05-29  Hatuka*nezumi - IKEDA Soji <hatuka(at)nezumi.nu>
+
+	* Perform appropriate line breaking for South East Asian complex
+	  contexts (SA), at least on Thai and Khmer scripts.
+	- For Thai, libthai package will be useful. - DONE by 1.000_01.
+	- Some implementations can be found for Khmer.
+	- Burmese, Lao, Tai Le, New Tai Lue, Tai Tham and Tai Viet - No plans.
+
+2009-05-17  Hatuka*nezumi - IKEDA Soji <hatuka(at)nezumi.nu>
+
+	* Full XS version for speed. - DONE by 1.004, except functions using regexp.
+
+2009-05-11  Hatuka*nezumi - IKEDA Soji <hatuka(at)nezumi.nu>
+
+	* Incremental input. - DONE by 0.005.
+
+2009-05-02  Hatuka*nezumi - IKEDA Soji <Hatuka(at)nezumi.nu>
+
+	* Text::LineFold: obsoleted RFC 2646 folding and unfolding. - DONE by 1.007.
+
+2009-05-02  Hatuka*nezumi - IKEDA Soji <Hatuka(at)nezumi.nu>
+
+	* ``Hunging punctuation'' (ぶら下げ組み; burasage-gumi) mainly for
+	  Japanese texts.
+
+	- Punctuations may protrude into the right -- bottom, in vertical
+	  line -- margin.
+	- It is usually applied to IDEOGRAPHIC FULL STOP and
+	  IDEOGRAPHIC COMMA.  It is less frequently applied to FULL STOP and
+	  COMMA.
+	- ``Half-''hunging, regarding ideographic punctuations as narrow
+	  only at end of line, might be either allowed or inhibited by
+	  typesetting rules, whether (full-)hunging was allowed or not.
+	- I. FULL STOP is more often inhibited to be narrow than I. COMMA.
+	- Wide (including fullwidth) parentheses may or may not
+	  ``half''-hung by rules, however, they shouldn't ``full''-hung
+	  anyway.
+
+	Local Variables:
+	mode: change-log
+	change-log-default-name: "Todo"
+	tab-width: 2
+	left-margin: 2
+	End:

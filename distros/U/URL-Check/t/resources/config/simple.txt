@@ -1,0 +1,10 @@
+#a super simple config 
+onerror.mailto=steve.jobs@apple.com.xx,steve.wozniak@pear.com.xx
+http://www.apple.com
+http://www.apple.ch
+
+#on facebok, send mail only to mark
+http://www.facebook.com
+
+#on llemond, send the mail to the steves
+http://www.lemonde.fr

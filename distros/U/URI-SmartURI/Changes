@@ -1,0 +1,48 @@
+Revision history for URI-SmartURI
+
+0.032  2012-08-12 21:17:28
+    - fix $uri->can('can')
+
+0.031  2010-09-27 09:46:24
+    - removed most tests, they were causing odd failures on cpantesters
+
+0.030  2009-12-26 15:50:29
+    - fix some failing tests (copied from URI t/)
+
+0.029  2009-04-29 17:20:08
+    - fucked up, previous dist was missing inc/
+
+0.028  2009-04-27 20:11:54
+    - disable dns based tests in t/heuristic.t because some ISPs override
+      unknown DNS addresses
+    - fixed v-string version warning
+
+0.027  2009-04-27 15:24:22
+    - accidentally shipped a Makefile
+
+0.026  2009-04-27 13:35:48
+    - fix non-inlined-constructor warning.
+    - re-enable escape.t.
+    - remove taint check in tests.
+    - ignore @INC entries that don't exist
+
+0.025  2008-09-02 16:23:57
+    - Turned off escape.t because it was failing tests in some places for reasons
+      I don't understand.
+
+0.024  2008-06-28 01:10:13
+    - Clear $@ in ->can to not show spurious errors in Catalyst.
+
+0.023  2008-06-13 09:32:43
+    - Removed ugly hack to turn off redefined warnings, this is fixed
+      in new MRO::Compat.
+
+0.022  2008-06-06 13:10:05
+    - Fixed test and import issues on Win32.
+
+0.021  2008-06-05 18:11:11
+    - Fixed redefined warnings from Class::C3 and a bug in AUTOLOAD
+      during destruction.
+
+0.02  2008-06-03 20:42:46
+    - Split from Catalyst::Plugin::SmartURI, converted to Moose

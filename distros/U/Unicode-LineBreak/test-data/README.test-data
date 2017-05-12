@@ -1,0 +1,206 @@
+Test data for line breaking
+===========================
+
+Files named ``*.in'' are input text. ``*.out'' are expected outputs.
+
+Default configuration is as following.  Overridden values are described
+by each test data.
+
+    charmax:        998
+    colmin:         0
+    colmax:         76
+    context:        NONEASTASIAN
+    format:         SIMPLE
+    hangul as AL:   no
+    legacy CM:      yes
+    virama sign:    behave as consonant joiner
+    newline:        "\n"
+    sizing:         UAX11
+    tailoring EAW:  none
+    tailoring LBC:  none
+    urgent breaking:none
+    preprocessing:  none
+
+01 Generic
+----------
+
+ar.in
+ar.out
+    Arabic
+el.in
+el.out
+    Greek
+fr.in
+fr.out
+    French
+he.in
+he.out
+    Hebrew
+ja.in
+ja.out
+    Japanese
+ja-a.in
+ja-a.out
+    Japanese (annotated readings)
+ja-k.in
+    Japanese (kana transcribed)
+ko.in
+ko.out
+    Korean
+ko-decomp.in
+ko-decomp.out
+    Korean (NFD)
+ru.in
+ru.out
+    Russian
+sa.in
+sa.out
+    Sanskrit
+th.in
+th.out
+    Thai
+vi.in
+vi.out
+    Vietnamese
+vi-decomp.in
+vi-decomp.out
+    Vietnamese (decomposed)
+zh.in
+zh.out
+    Chinese Mandarin
+
+02 Hangul text
+--------------
+
+amitagyong.in
+amitagyong.out
+    complex hangul syllables and conjoining jamo.
+    tailoring EAW:  U+302E and U+302F are nonspacing.
+ko.al.out
+    treat hangul syllables and conjoining jamo as alphabetic (AL).
+
+03 Tailoring Line Breaking Classes
+----------------------------------
+
+ja-k.in
+ja-k.out
+    colmax:         72
+ja-k.ns.out
+    colmax:         72
+    kana nonstarters (small kana) are assigned Line Breaking Class ``ID''.
+
+04 Folding/unfolding
+--------------------
+
+fr.fixed.out
+ja.fixed.out
+    same as default but an empty line is inserted after each paragraph.
+fr.flowed.out
+ja.flowed.out
+    RFC 3676 ``Format="FLOWED"; DelSp="YES"'' format.
+fr.plain.out
+ja.plain.out
+    same as default.
+quotes.in
+    unfolded e-mail text with one problematic line.
+quotes.norm.in
+    unfolded e-mail text without problematic lines.
+quotes.fixed.out
+quotes.flowed.out
+quotes.plain.out
+    folded e-mail text by three methods as above.
+
+05 Long lines
+-------------
+
+ecclesiazusae.in
+ecclesiazusae.out
+ecclesiazusae.CharactersMax.out
+    charmax:        79
+ecclesiazusae.ColumnsMax.out
+    urgent breaking:FORCE
+ecclesiazusae.ColumnsMin.out
+    colmin:         7
+    colmax:         66
+    urgent breaking:FORCE
+
+06 East Asian context
+---------------------
+
+fr.ea.out
+    context:        EASTASIAN
+
+07 n/a
+------
+
+08 n/a
+------
+
+09 URI
+------
+
+uri.in
+uri.break.out
+    colmax:         1
+    preprocessing:  break URIs according to some CMoS rules.
+uri.break.http.out
+    colmax:         1
+    preprocessing:  break HTTP URLs according to some CMoS rules; never 
+    break FTP URLs.
+uri.nonbreak.out
+    colmax:         1
+    preprocessing:  never break URIs.
+
+10 n/a
+------
+
+11 Formatting context
+---------------------
+
+fr.format.out
+ja.format.out
+    insert context names.
+fr.newline.out
+ko.newline.out
+    trim spaces at end of each lines.
+
+12 Indentation
+--------------
+
+fr.wrap.out
+ja.wrap.out
+    Paragraphs are indented by one horizontal tab ("\t") and other lines
+    are indented by four spaces ("    ").
+
+13 RFC 3676
+-----------
+
+fr.flowed.out
+ja.flowed.out
+    folding by RFC 3676 ``Format="FLOWED"; DelSp="YES"'' method.
+flowedsp.in
+flowedsp.out
+    unfolding RFC 3676 ``Format="FLOWED"; DelSp="NO"'' (obsoleted
+    RFC 2646) format.
+
+14 Non-South East Asian context
+-------------------------------
+
+th.al.out
+    treat South East Asian complex context (SA) as alphabetic (AL).
+
+15 n/a
+------
+
+16 n/a
+------
+
+Other useful test data
+----------------------
+
+* LineBreakTest.txt file in Unicode Character Database (UCD) may be
+  useful for regression test.  Current version of this file will be
+  found at:
+    http://www.unicode.org/Public/UNIDATA/auxiliary/LineBreakTest.txt
+
+$$

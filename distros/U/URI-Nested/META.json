@@ -1,0 +1,55 @@
+{
+   "abstract" : "Nested URIs",
+   "author" : [
+      "David E. Wheeler <david@justatheory.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "URI-Nested",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.30",
+            "Test::More" : "0.88"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "URI" : "1.40",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "provides" : {
+      "URI::Nested" : {
+         "file" : "lib/URI/Nested.pm",
+         "version" : "0.10"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/theory/uri-nested/issues/"
+      },
+      "homepage" : "https://metacpan.org/release/URI-Nested/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/theory/uri-nested/"
+      }
+   },
+   "version" : "0.10"
+}

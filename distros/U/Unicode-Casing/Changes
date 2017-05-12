@@ -1,0 +1,36 @@
+Revision history for Perl extension Unicode::Casing.
+
+0.16  Thu Aug 04 2016
+       - Add LICENSE to MANIFEST
+       - Fix some build issues, thanks to Karen Etheridge
+
+0.13  Mon Aug 18 2014
+       - Fix assertion failure in debugging builds (Brian Fraser)
+
+0.12  Fri May 25 2012
+       - Try changes to Makefile.PL to find B::Hooks::OP::Check, which isn't
+         being found on some platforms
+
+0.11  Thu May 24 2012
+       - Try changes to Makefile.PL to find B::Hooks::OP::PPAddr, which isn't
+         being found on some platforms
+
+0.10  Fri May 18 2012
+       - Fix bugs introduced by 0.09 on older Perls
+       - Fix #70270.
+       - Clean up pod to correct misstatements about CORE::
+       
+0.09  Mon May 07 2012
+        - Add support for fc(), \F
+
+0.08  Sun Aug  7 04:45:58 CDT 2011 (brian d foy)
+        - Fix RT #69400: Pod as UTF-8, Copyright header
+        - Fix RT #69399: Prereqs in Makefile.PL
+
+0.07  Tue Apr 12 2011
+        - Added -load option, and doc changes
+
+0.01  Sun Mar 13 21:17:28 2011
+	- original version; created by h2xs 1.23 with options
+		-I../blead/lib -A -n Unicode::Casing
+

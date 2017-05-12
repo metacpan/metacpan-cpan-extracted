@@ -1,0 +1,27 @@
+ URI-Fetch-SimpleCache 
+=======================
+
+"URI::Fetch::SimpleCache" is URI::Fetch extension with local cache
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+ - URI::Fetch
+ - Cache::FileCache
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Atsushi Kobayashi (E<lt>nekokak@cpan.orgE<gt>). All rights reserved.
+
+This library is free software; you can redistribute it and/or modify it
+ under the same terms as Perl itself.
+

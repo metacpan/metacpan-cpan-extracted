@@ -1,0 +1,97 @@
+Revision history for Perl module URI::ParseSearchString::More
+
+0.17      2014-08-15 22:52:09EDT-0400 America/Toronto
+    - Fixes failing tests.
+
+0.16 2012-11-24
+    - Cleans up test suite to reduce deps.
+
+0.15 2012-11-18
+    - Converts dist to Dist::Zilla.
+
+0.14 2012-11-17
+    - Removed as.weatherstudio.com. Domain no longer active.
+
+0.13 2009-11-20
+    - Fixed AOL parsing
+
+0.12 2009-07-22
+    - Now requires version 1.33 of WWW::Mechanize::Cached as this release
+      fixes the CODE items error
+    - Added bing.com to engines
+    - Added fastbrowsersearch.com to engines
+    - Now requires Data::Dump rather than Data::Dumper
+    - Added answers.yahoo.com to engines
+    - Removed images.google.* from TODO list as this was already being parsed
+
+0.11 2009-07-10
+    - Wrapped $mech->get in an eval in order to get by the following cryptic
+      error message:
+      Can't store CODE items at ../../lib/Storable.pm
+      (autosplit into ../../lib/auto/Storable/_freeze.al) line 290,
+      at /usr/local/share/perl/5.8.7/WWW/Mechanize/Cached.pm line 118
+      I believe this error occurs when WWW::Mechanize::Cached deals with
+      pages that return 403 response codes
+    - have disabled AOL tests in t/005_parse_more.t because AOL is currently
+      blocking me and returning 403 responses.  URI::ParseSearchString doesn't
+      do any mechanized searchs, so it cannot deal with AOL's encoded URLs
+
+0.10 2008-11-20
+    - Added search.incredimail.com to engines
+    - Added search.rogers.com to engines
+    - Added search.rr.com to engines
+    - Added searchservice.myspace.com to engines
+    - moved dogpile tests to extended url tests
+    - Added yandex.ru to engines
+    - Added youtube.com to engines
+
+0.09 2008-10-30
+    - Moved googlesyndication.com tests as they were causing
+      failing test reports.  Some of these tests are tricky
+      as we can't reliably predict that these URLs will
+      always be available. They are now in t/006_extended.t
+      and must be explicitly enabled.
+
+0.08 2008-10-29
+    - Fixed license in Makefile as it never actually made it into 0.07
+    - Caching is now disabled by default
+    - Fixed bug with escaped single quotes in search strings
+    - Added set_cached() and get_cached() methods
+    - Updated get_mech() to return either a WWW::Mechanize or
+      WWW::Mechanize::Cached object, depending on the return value of
+      get_cached()
+
+0.07 2008-10-09
+    - Added license to Makefile to improve Kwalitee
+
+0.06 2008-10-09
+    - Tweaked aol regex so that it doesn't flag urls in which
+      aol is a referring url
+    - Added googlesyndication as its own engine
+    - Tweaked comcast params
+    - Added ebay, nextag, dogpile, cuil.com
+    - Fixed bug where parsing would die if no title found in mech lookup
+    - Fixed problem with escaped, quoted strings under mod_perl
+    - Added very basic example script to examples folder
+
+0.05 2007-11-04
+    - Fixed params for yahoo and ask.* urls
+
+0.04 2007-08-09
+    - Added the urls.cfg file to facilitate the testing of many URLs
+    - Added parse_more() method, which is called before URI::ParseSearchString
+    - Added guess() method
+    - Added blame() method to confirm which module has returned the last
+      results of se_term() or parse_search_string()
+
+0.03 2007-07-27
+    - Added Test::Pod::Coverage, Test::Pod and File::Spec to prerequisites
+
+0.02 2007-07-25
+    - Added support for the following engines:
+        http://as.starware.com/dp/search
+        http://as.weatherstudio.com/dp/search
+    - Using URI::Heuristic to fix malformed or incomplete URLs
+
+0.01 Sat Jul 21 16:14:45 2007
+    - original version; created by ExtUtils::ModuleMaker 0.49

@@ -1,0 +1,13 @@
+Revision history for Perl extension Unix::Conf::Bind8.
+
+0.2  Mon Aug  5 23:23:27 2002
+	- First release
+
+0.3 
+	- Too many bugfixes, improvements and additions to document here
+	  completely. 0.02 is useless for all practical purposes. 0.03
+	  is almost a complete rewrite.
+	- New parser that handles intra directive comments correctly.
+	- Added support for controls, key, server, trustedkeys. This adds
+	  complete support for Bind-8.2.3.
+	- Added tests.

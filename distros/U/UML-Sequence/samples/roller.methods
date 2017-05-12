@@ -1,0 +1,6 @@
+DiePair::new
+Die::new
+DiePair::roll
+Die::roll
+DiePair::total
+DiePair::doubles

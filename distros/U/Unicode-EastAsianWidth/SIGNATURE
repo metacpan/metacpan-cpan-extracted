@@ -1,0 +1,44 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 d814b741578c2fb52f29f3f6dfdaac9e05af9f2e Changes
+SHA1 7ca6635d4b114a0581b9711ffb30e0fb182d122f MANIFEST
+SHA1 ea4760320c04dd83f0533471d52df8e51442c50b META.yml
+SHA1 3769b8932587477311a51d3cb073f8049c0bccf6 Makefile.PL
+SHA1 8c991192330510d3049bea67b4355b49f4609129 README
+SHA1 426bbf372b402923428d6d11488dc027bdbb84b7 README.mkdn
+SHA1 8a924add836b60fb23b25c8506d45945e02f42f4 inc/Module/Install.pm
+SHA1 2d0fad3bf255f8c1e7e1e34eafccc4f595603ddc inc/Module/Install/Base.pm
+SHA1 f0e01fff7d73cd145fbf22331579918d4628ddb0 inc/Module/Install/Can.pm
+SHA1 7328966e4fda0c8451a6d3850704da0b84ac1540 inc/Module/Install/Fetch.pm
+SHA1 27ffe05bb181a2ddd79c4846ed29950896459f39 inc/Module/Install/GithubMeta.pm
+SHA1 b62ca5e2d58fa66766ccf4d64574f9e1a2250b34 inc/Module/Install/Makefile.pm
+SHA1 1aa925be410bb3bfcd84a16985921f66073cc1d2 inc/Module/Install/Metadata.pm
+SHA1 3b9281ddf7dd6d6f5de0a9642c69333023193c80 inc/Module/Install/Package.pm
+SHA1 e4196994fa75e98bdfa2be0bdeeffef66de88171 inc/Module/Install/Win32.pm
+SHA1 c3a6d0d5b84feb3280622e9599e86247d58b0d18 inc/Module/Install/WriteAll.pm
+SHA1 26d58a041cd6b3d21db98b32e8fd1841aae21204 inc/Module/Package.pm
+SHA1 43e39b144c19dd9b760b4aaa0cc0d922fc07ed6c inc/Pod/Markdown.pm
+SHA1 489749c6c3a21def628897aebe12fc9cef36ec78 lib/Unicode/EastAsianWidth.pm
+SHA1 41afe2c04bb573b40e283e2b210ed70a47a3f8ba t/0-signature.t
+SHA1 6c458bb03230841793b52c4709d20f248f98fe2d t/1-basic.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (Darwin)
+
+iEYEARECAAYFAlCEAB4ACgkQtLPdNzw1AaAINgCglNi7IMrxZx0BI4b2I0TwZ6Dp
+2toAn34nQIwbTEHlGNgK3gNxdiKMqBym
+=6PRb
+-----END PGP SIGNATURE-----

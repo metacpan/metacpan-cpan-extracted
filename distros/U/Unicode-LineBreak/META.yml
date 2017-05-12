@@ -1,0 +1,29 @@
+---
+abstract: 'UAX #14 Unicode Line Breaking Algorithm'
+author:
+  - 'Hatuka*nezumi - IKEDA Soji <hatuka@nezumi.nu>'
+build_requires:
+  ExtUtils::MakeMaker: '6.26'
+  Test::More: '0.45'
+configure_requires:
+  ExtUtils::MakeMaker: '6.26'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Unicode-LineBreak
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Encode: '1.98'
+  MIME::Charset: v1.6.2
+  perl: '5.008'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/hatukanezumi/Unicode-LineBreak/
+version: '2017.004'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

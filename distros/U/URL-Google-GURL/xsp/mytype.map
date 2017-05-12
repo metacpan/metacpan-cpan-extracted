@@ -1,0 +1,19 @@
+GURL *	O_OBJECT
+GURLStatic * O_OBJECT_gurl
+
+INPUT
+
+O_OBJECT_gurl
+    if (sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG)) {
+        $var = ($type)SvIV((SV*)SvRV( $arg ));
+    }
+    else {
+        warn( \"${Package}::$func_name() -- $var is not a blessed SV reference\" );
+        XSRETURN_UNDEF;
+    }
+
+
+OUTPUT
+
+O_OBJECT_gurl
+    sv_setref_pv( $arg, "URL::Google::GURL", (void*)$var );

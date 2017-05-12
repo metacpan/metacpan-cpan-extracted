@@ -1,0 +1,20 @@
+UNIVERSAL-AUTHORITY-Lexical
+===========================
+
+Created:      2011-12-01
+Home page:    <https://metacpan.org/release/UNIVERSAL-AUTHORITY-Lexical>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=UNIVERSAL-AUTHORITY-Lexical>
+
+0.003  2013-07-24
+
+ - (Bugfix Packaging) Stop bundling prehistoric version of Scalar::Util.
+   Fixes RT#87112
+   ++$RSRCHBOY
+
+0.002  2011-12-03
+
+ - (Bugfix Packaging) Upgrade Module::Package::RDF.
+
+0.001  2011-12-01  # Initial release
+
+

@@ -1,0 +1,32 @@
+---
+abstract: 'Run programs using Server::Starter'
+author:
+  - 'William Wolf <throughnothing@gmail.com>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.014, CPAN::Meta::Converter version 2.132830'
+license: unrestricted
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Ubic-Service-ServerStarter
+requires:
+  Params::Validate: '0'
+  Server::Starter: '0.12'
+  Ubic::Daemon: '0'
+  Ubic::Service::Skeleton: '0'
+  base: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/throughnothing/Ubic-Service-ServerStarter/issues
+  homepage: http://metacpan.org/release/Ubic-Service-ServerStarter/
+  repository: git://github.com/throughnothing/Ubic-Service-ServerStarter.git
+version: '0.003'

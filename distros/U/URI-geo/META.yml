@@ -1,0 +1,22 @@
+---
+name: URI-geo
+version: 0.05
+author:
+  - 'Andy Armstrong <andy@hexten.net>'
+abstract: The geo URI scheme.
+license: perl
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=URI-geo
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/AndyA/URI--geo.git
+requires:
+  Test::More: 0
+  URI: 0
+provides:
+  URI::geo:
+    file: lib/URI/geo.pm
+    version: 0.05
+generated_by: Module::Build version 0.33
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

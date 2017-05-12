@@ -1,0 +1,177 @@
+=head1 NAME
+
+Unix::Statgrab::sg_fs_stats - container for libstatgrab filesystem statistics
+
+=head1 DESCRIPTION
+
+C<Unix::Statgrab::sg_fs_stats> is a Perl package name providing
+accessors to bundled libstatgrab L<sg_fs_stats|http://www.i-scream.org/libstatgrab/docs/sg_get_fs_stats.3.html> filesystem statistics.
+
+=head1 METHODS
+
+=head2 nentries
+
+Returns the number of entries in the container.
+
+=head2 systime
+
+Returns the seconds since Epoch (0:00:00 on January, 1st 1970) of the time measure the filesystem statistics.
+
+=head2 as_list
+
+B<Deprecated> alias of L</fetchall_hash>
+
+=head2 fetchall_hash
+
+Returns all records from L<sg_fs_stats|http://www.i-scream.org/libstatgrab/docs/sg_get_fs_stats.3.html>
+container as list of hash containing each datum name as key and the datum as value.
+
+=head2 fetchall_array
+
+Returns all records from L<sg_fs_stats|http://www.i-scream.org/libstatgrab/docs/sg_get_fs_stats.3.html>
+container as list of arrays containing the values in following order:
+
+  (device_name fs_type mnt_point device_type size used free avail
+   total_inodes used_inodes free_inodes avail_inodes
+   io_size block_size
+   total_blocks used_blocks free_blocks avail_blocks
+   systime)
+
+in that order without leading headline.
+
+=head2 fetchall_table
+
+Returns all records from L<sg_fs_stats|http://www.i-scream.org/libstatgrab/docs/sg_get_fs_stats.3.html>
+container as list of arrays containing the values in following order:
+
+  (device_name fs_type mnt_point device_type size used free avail
+   total_inodes used_inodes free_inodes avail_inodes
+   io_size block_size
+   total_blocks used_blocks free_blocks avail_blocks
+   systime)
+
+in that order including leading headline.
+
+=head2 fetchrow_arrayref($row = 0)
+
+Returns one row as array containing values as above.
+
+=head2 fetchall_arrayref
+
+Returns all records from L<sg_fs_stats|http://www.i-scream.org/libstatgrab/docs/sg_get_fs_stats.3.html>
+container as array of arrays without header.
+
+=head2 fetchrow_hashref($row = 0)
+
+Returns one row as hash containing C<< { device_name => $self.device_name($row), fs_type => ... } >>.
+
+=head2 fetchall_hashref
+
+Returns all records from L<sg_fs_stats|http://www.i-scream.org/libstatgrab/docs/sg_get_fs_stats.3.html>
+container as array of hashes.
+
+=head2 colnames
+
+Returns list of column names: C<< (device_name fs_type mnt_point device_type size used free avail total_inodes used_inodes free_inodes avail_inodes io_size block_size total_blocks used_blocks free_blocks avail_blocks systime) >>
+
+=head2 device_name
+
+Name of the device the filesystem statistics belong to
+
+=head2 device_canonical
+
+Canonical name of the device the filesystem statistics belong to
+
+=head2 fs_type
+
+Filesystem type (as string), e.g. "zfs"
+
+=head2 mnt_point
+
+Path name of mount point for the file system
+
+=head2 device_type
+
+Bitwise combination of C<sg_fs_regular sg_fs_special sg_fs_loopback sg_fs_remote>, usually one of
+
+=head2 size
+
+Size of filesystem, in bytes
+
+=head2 used
+
+Used bytes of filesystem
+
+=head2 free
+
+Free bytes in filesystem
+
+=head2 avail
+
+Available bytes in filesystem (free - reserved)
+
+=head2 total_inodes
+
+Total number of inodes in filesystem
+
+=head2 used_inodes
+
+Used number of inodes in filesystem
+
+=head2 free_inodes
+
+Free number of inodes in filesystem
+
+=head2 avail_inodes
+
+Available inodes in filesystem (free - reserved)
+
+=head2 io_size
+
+Optimal size for I/O for this filesystem in bytes
+
+=head2 block_size
+
+Size of blocks in bytes
+
+=head2 total_blocks
+
+Total number of blocks in filesystem
+
+=head2 used_blocks
+
+Used number of blocks in filesystem
+
+=head2 free_blocks
+
+Free number of blocks in filesystem
+
+=head2 avail_blocks
+
+Available blocks in filesystem (free - reserved)
+
+=head2 get_fs_stats_diff
+
+Provides the difference between the last measurement and the recent one.
+
+  $recent->get_fs_stats_diff($last);
+
+=head1 CONSTANTS
+
+    sg_fs_unknown sg_fs_regular sg_fs_special sg_fs_loopback sg_fs_remote
+    sg_fs_local sg_fs_alltypes
+
+=head1 AUTHOR
+
+Jens Rehsack, E<lt>rehsack AT cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2012-2015 by Jens Rehsack
+
+This library is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 2.1 of the License, or (at your option) any
+later version.
+
+=cut

@@ -1,0 +1,44 @@
+# This file serves as a sample methods_file for Seq.java
+#
+# As you may have noticed, comments in this file are allowed, use a
+# pound sign as the FIRST character on a line to make a comment.
+# Blank lines are also allowed.  Blanks and comments are ignored.
+#
+# There are two basic approaches you can use when building this file.
+# You may list clases, or you may list methods.  To list classes include
+# a line with only 'ALL'.  You may put it anywhere.  Then list the classes
+# from which you want to see method calls.  For example:
+#
+# ALL
+# Hello
+# HelloHelper
+#
+# This will list all methods from the Hello and HelloHelper classes.
+#
+# If all the classes you interested in start or end with the same string
+# you can use a wildcard syntax as in:
+#
+# ALL
+# com.your.company.Hello*
+#
+# Some class families may generate too much output in ALL method mode.  If that
+# is the case, leave out the 'ALL' line and list the full signatures of
+# the methods you want to hear about.  To summarize, a signature is of the
+# form:
+#
+# package.subpackage.Class.method(argument_list)
+#
+# where the argument_list is a list of fully qualified type names including []
+# to indicate array dimensions.  Note that variable names are not
+# included in the argument_list, so you must edit if you copy from a
+# declaration.  Here is an example signature:
+#
+# SomeHelper.printIt(java.lang.String, float, java.lang.String[][])
+#
+# A good way to collect signatures is to use the ALL mode and remove the
+# ones you don't like.
+#
+ALL
+Roller
+DiePair
+Die

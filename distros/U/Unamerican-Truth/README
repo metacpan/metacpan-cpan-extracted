@@ -1,0 +1,111 @@
+INTRO:
+
+    srini,
+
+    You don't know me, but I'm a long time visitor to
+    http://unamerican.com/.  Over the years, I've learned a lot
+    from what you've written, and the truth is that it changed
+    my life for the better.
+
+    In gratitude for all your hard work and in respect of the
+    struggle that is your life, I'd like to present you with
+    this gift.  It is the realization of truth #301 which
+    states:
+
+        I envision this - this is the spec.
+        you've got this document - the "truth"
+        as it were - and you invite commentary
+        on each and every single point in it.
+        every bullet point has "add comment" and
+        "read comments" hyperlinks. Ideally, the
+        "read comments" hyperlinks also indicate
+        how many comments have been added to
+        that particular truth.
+
+
+INSTALLATION:
+
+    * Install the following Perl modules if you don't
+      have them already.
+
+      CGI::Application
+      HTML::Template
+      HTML::Parser
+      Bundle::DBI
+      DBD::mysql
+
+        $ perl -MCPAN -e 'install CGI::Application'
+        $ perl -MCPAN -e 'install HTML::Template'
+        $ perl -MCPAN -e 'install HTML::Parser'
+        $ perl -MCPAN -e 'install Bundle::DBI'
+        $ perl -MCPAN -e 'install DBD::mysql'
+
+    * Unarchive Unamerican-Truth-1.0?.tar.gz
+
+        $ tar zxvf Unamerican-Truth-1.0?.tar.gz
+
+    * Install Unamerican::Truth Perl module
+
+        $ cd Unamerican-Truth-1.0?
+        $ perl Makefile.PL
+        $ make
+        $ su
+        $ make install
+
+    * Create the truth database
+
+        $ mysqladmin create truth
+
+    * Create tables in that database by sourcing
+      the table definitions from sql/truth.sql
+
+        $ mysql truth
+        mysql> \. sql/truth.sql
+
+    * Populate the database with truths by
+      parsing truth1.htm and truth2.htm with a perl script.
+
+        $ bin/parse-truth.pl -d truth --user='srini' --password='s3cr37' \
+	  truth1.htm truth2.htm
+
+      Be sure to specify a user and password pair that'll work
+      on your system.
+
+    * Copy everything in www/ to the directory that corresponds
+      to "http://www.unamerican.com/truth/".  For our example, we'll
+      assume that it's "/var/www/html/truth"
+
+        $ cp -R www/* /var/www/html/truth
+
+    * Modify your httpd.conf so that CGI scripts can be executed
+      from that directory.
+
+        # Unamerican::Truth
+        <Directory /var/www/html/truth>
+            Options +ExecCGI
+            AddHandler cgi-script cgi
+        </Directory>
+
+    * Edit truth.cgi so that @CONNECT has the right
+      information for connecting to the truth database.
+      You can also modify the following parameters:
+
+      proverbs_per_page         number of proverbs on a page
+
+      is_numbered               1 to use an ordered list
+                                0 to use a bulleted list
+
+    * Restart apache so that the changes to httpd.conf can
+      take effect.
+
+        $ apachectl restart
+
+    * Try to load "http://www.unamerican.com/truth/truth.cgi"
+      and see if it works.  If it doesn't, see what the
+      error_log says, and try to figure out what's wrong.
+
+
+I recommend getting a sysadmin friend to help you out.  If all else fails,
+you can write to me at beppu@cpan.org, and I'll help you in whatever way
+I can.
+

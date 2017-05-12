@@ -1,0 +1,56 @@
+Revision history for Perl extension UniLog.
+
+0.14  Mon Jan 10 17:00:00 2005
+	- 'SafeStr' parameter added to 'new()'
+	- Information about Perl2Exe problem update
+
+0.13  Wed Nov 24 15:00:00 2004
+    - 'Subroutine error redefined at PERL2EXE_STORAGE/UniLog.pm line 365.' error fixed
+
+0.12  Thu Nov 11 18:30:00 2004
+	- Methods
+	  emergency(), alert(), critical(), error(), warning(), notice(), info(), debug()
+	  added
+
+0.11  Fri Mar 07 22:20:00 2003
+	- Licence changed
+
+0.09  Fri Jan 24 15:40:00 2003
+	- Minor bug with Win32 log levels fixed
+	- Licence changed
+
+0.07  Wed Jun 21 02:12:00 2002
+	- Support for logging to file added
+	- Posibility to disable syslog modules loading added
+	- Function SafeStr added
+        - Minor bugfix
+        - Minor documentation correction
+
+0.06  Fri Apr 26 02:00:00 2002
+	- Support for Win32 other NT added (STDERR only)
+
+0.05  Wed Apr 24 17:00:00 2002
+	- The pre-request for apropriate module (Unix::Syslog or Win32::EventLog)
+	  added to Makefile.PL by request from CPAN tester
+	- Information about Perl2Exe problem added to documentation, section "Known problems"
+
+0.04  Mon Apr 22 10:25:00 2002
+        - Message method was changed to obtain sprintf parameters array
+          instead of simple string
+        - Minor bugfix
+        - Minor documentation correction
+
+0.03  Fri Mar 22 18:05:00 2002
+        - Win32 bugfixes.
+          Now it does not produce annoing messages 
+          about "Use of uninitialized value in subroutine entry at EventLog.pm line 199"
+          or "Use undefined value"
+
+0.02  Wed Oct 10 14:30:00 2001
+	- Author e-mail address changed to tpaba@cpan.org
+
+0.01  Sat Sep 29 19:08:22 2001
+	- original version; created by h2xs 1.21 with options
+		-AXcfn UniLog
+
+

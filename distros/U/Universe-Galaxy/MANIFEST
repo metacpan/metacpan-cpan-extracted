@@ -1,0 +1,18 @@
+Build.PL
+Changes
+lib/Universe/Galaxy.pm
+lib/Universe/ObservableUniverse/Filament/SuperCluster/Cluster/Group/Galaxy/Arm/Bubble/InterstellarCloud/SolarSystem/Earth.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00_compile.t
+t/distribution.t
+t/fixme.t
+t/perlcritic.t
+t/perlcriticrc
+t/perltidy.conf
+t/pod-coverage.t
+t/pod-spell.t
+t/pod.t
+t/universe-observableuniverse-filament-supercluster-cluster-group-galaxy-arm-bubble-interstellarcloud-solarSystem-planet-earth.t

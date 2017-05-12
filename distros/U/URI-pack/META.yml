@@ -1,0 +1,38 @@
+---
+abstract: 'Support of the pack scheme in URI.'
+author:
+  - 'Douglas Christopher Wilson <doug@somethingdoug.com>'
+build_requires:
+  Test::More: 0
+  Test::Most: 0
+  Test::Requires: 0.02
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: URI-pack
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+provides:
+  URI::pack:
+    file: lib/URI/pack.pm
+    version: 0.002001
+requires:
+  Carp: 0
+  Const::Fast: 0
+  URI: 0
+  namespace::clean: 0
+  parent: 0
+  perl: 5.008003
+resources:
+  homepage: http://github.com/dougwilson/perl5-uri-pack/
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/dougwilson/perl5-uri-pack.git
+version: 0.002001

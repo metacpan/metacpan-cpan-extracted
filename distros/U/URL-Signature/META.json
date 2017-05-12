@@ -1,0 +1,48 @@
+{
+   "abstract" : "Tamper-proof URLs with Signed authentication",
+   "author" : [
+      "Breno G. de Oliveira <garu@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "URL-Signature",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::Load" : "0",
+            "Digest::HMAC" : "0",
+            "MIME::Base64" : "3.11",
+            "Params::Util" : "0",
+            "Test::More" : "0",
+            "URI" : "1.60",
+            "URI::QueryParam" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.03"
+}

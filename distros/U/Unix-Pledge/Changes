@@ -1,0 +1,21 @@
+Revision history for Perl extension Unix::Pledge.
+
+0.001  2015-11-17
+    - inital version; basic syscall;
+
+0.002  2015-11-17
+    - removed extraneous perl glue code
+    - tidy and document
+
+0.003  2015-11-30
+    - added better capability check for pledge on install
+    - basic test cases to verify that pledge is indeed working
+
+0.004  2016-01-12
+    - added documentation note that whitelist feature is disabled
+      in OpenBSD 5.9
+    - comment out whitelist test since it is not functional at this time
+
+0.005  2016-11-02
+    - fix broken tests
+    - tweak docs

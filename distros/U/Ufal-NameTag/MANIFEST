@@ -1,0 +1,18 @@
+Build.PL
+Changes
+examples/run_ner.pl
+lib/Ufal/NameTag.pm
+lib/Ufal/NameTag.pod
+lib/Ufal/NameTag.xs
+LICENSE
+MANIFEST			This list of files
+nametag/nametag.cpp
+nametag/nametag.h
+nametag/nametag_perl.cpp
+README
+t/data/test.ner
+t/import.t
+t/ner.t
+t/tokenizer.t
+META.yml
+META.json

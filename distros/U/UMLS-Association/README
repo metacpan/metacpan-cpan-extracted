@@ -1,0 +1,160 @@
+NAME
+    UMLS-Association README
+
+  SYNOPSIS
+      This package consists of Perl modules along with supporting Perl
+      programs that calculate the association between CUI pairs using 
+      frequency information from the Metamapped Medline baseline. 
+
+      UMLS::Association requires the Text::NSP module to calculate the 
+      association measures. Text::NSP currently implements the following 
+      measures for bigrams: 
+
+      UMLS::Association requires the UMLS::Interface module to access 
+      the Unified Medical Language System (UMLS) to map input terms 
+      to Concept Unique Identifiers (CUIs) and provide additional 
+      information. 
+
+      The following sections describe the organization of this software
+      package and how to use it. A few typical examples are given to help
+      clearly understand the usage of the modules and the supporting
+      utilities.
+
+  INSTALL
+    To install the module, run the following magic commands:
+
+      perl Makefile.PL
+      make
+      make test
+      make install
+
+    This will install the module in the standard location. You will, most
+    probably, require root privileges to install in standard system
+    directories. To install in a non-standard directory, specify a prefix
+    during the 'perl Makefile.PL' stage as:
+
+      perl Makefile.PL PREFIX=/home/programs
+
+    It is possible to modify other parameters during installation. The
+    details of these can be found in the ExtUtils::MakeMaker documentation.
+    However, it is highly recommended not messing around with other
+    parameters, unless you know what you're doing.
+
+  DATABASE SETUP
+    UMLS-Association assumes that the CUI bigrams extracted from the
+    Metamapped Medline baseline is present as a mysql database. The names of
+    these databases can be passed as configuration options at
+    initialization. However, if the names of the database is not provided at
+    initialization, then default values are used -- the database is called
+    CUI_BIGRAMS and contains four tables: 1. N_11 2. N_1P 3. N_P1 4. N_PP
+
+    Direction on installing the CUI_BIGRAMS database is in the INSTALL file.
+
+    All other tables in the databases will be ignored, and any of these
+    tables missing would raise an error.
+
+    The mysql server can be on the same machine as the module or could be on
+    a remotely accessible machine. The location of the server can be
+    provided during initialization of the module.
+
+  INITIALIZING THE MODULE
+    To create an instance of the UMLS-Association object, using default
+    values for all configuration options:
+
+      use UMLS::Association;
+      my $association = UMLS::Association->new();
+
+    The following configuration options are also provided though:
+
+        'driver'       -> Default value 'mysql'. This option specifies the 
+                          Perl DBD driver that should be used to access the
+                          database. This implies that the some other DBMS
+                          system (such as PostgresSQL) could also be used,
+                          as long as there exist Perl DBD drivers to
+                          access the database.
+        'database'     -> Default value 'CUI_BIGRAMS'. This option specifies 
+                          the name UMLS-Association database. 
+        'hostname'     -> Default value 'localhost'. The name or the IP 
+                          address of the machine on which the database 
+                          server is running.
+        'socket'       -> Default value '/tmp/mysql.sock'. The socket on 
+                          which the database server is using.
+        'port'         -> The port number on which the database server 
+                          accepts connections.
+        'username'     -> Username to use to connect to the database server. 
+                          If not provided, the module attempts to connect as 
+                          an anonymous user.
+        'password'     -> Password for access to the database server. If not
+                          provided, the module attempts to access the server
+                          without a password.
+
+    These are passed through a hash. For example:
+
+        my %options = ();
+        $options{'config'}   = $config;
+        $options{'database'} = 'CUI_BIGRAM_V1';
+
+        my $association = UMLS::Association->new(\%options);
+
+    Keep in mind that the database configuration options can be included in
+    the MySQL my.cnf file. This is preferable. The directions for this are
+    in the INSTALL file.
+
+  CONTENTS
+        All the modules that will be installed in the Perl system directory are
+        present in the '/lib' directory tree of the package. 
+
+        The package contains a utils/ directory that contain Perl utility 
+        programs. These utilities use the modules or provide some supporting
+        functionality.
+
+          umls-association.pl         -- returns the association score of two 
+                                        terms or UMLS CUIs given a specified 
+                                        measure (and view of the UMLS).
+
+         CUICollector.pl            -- script to create the CUI_BIGRAM database
+                                       from the Metamapped Medline Baseline 
+
+        The package also contains a Apache Hadoop MapReduce java implementation
+        of CUICollector.pl named CUICollectorMapReduce in the '/Hadoop' directory.
+        Refer to the README file in the '/Hadoop' directory for installation and
+        running instructions.
+
+  REFERENCING
+        If you write a paper that has used UMLS-Association in some way, we'd 
+        certainly be grateful if you sent us a copy.
+
+  CONTACT US
+    If you have any trouble installing and using UMLS-Interface, please
+    contact us via the users mailing list :
+
+    umls-association@yahoogroups.com
+
+    You can join this group by going to:
+
+    <http://tech.groups.yahoo.com/group/umls-association/>
+
+    You may also contact us directly if you prefer :
+
+        Bridget T. McInnes: btmcinnes at vcu.edu
+
+  SOFTWARE COPYRIGHT AND LICENSE
+    Copyright (C) 2015 Bridget T McInnes
+
+    This suite of programs is free software; you can redistribute it and/or
+    modify it under the terms of the GNU General Public License as published
+    by the Free Software Foundation; either version 2 of the License, or (at
+    your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+    Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+    Note: The text of the GNU General Public License is provided in the file
+    'GPL.txt' that you should have received with this distribution.
+

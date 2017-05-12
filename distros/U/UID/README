@@ -1,0 +1,48 @@
+UID.pm
+
+The UID module lets you declare unique identifiers -- values that you 
+can be sure will not be coincidentally matched by some other value.
+The values are not "universally" unique (UUIDs/GUIDs); they are unique 
+keywords for a single run of your program.
+
+
+
+INSTALLATION
+
+To install this module, run the usual commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc UID
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/UID
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=UID
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/UID
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/UID
+
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 David Green
+
+This module is free software; you may redistribute it or modify it under
+the same terms as Perl itself.

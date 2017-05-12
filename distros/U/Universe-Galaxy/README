@@ -1,0 +1,52 @@
+NAME
+    Universe::Galaxy - the missing piece in CPAN
+
+SYNOPSIS
+        use Universe::Galaxy;
+
+DESCRIPTION
+    Not too useful for the moment but it was a missing piece in the CPAN.
+
+METHODS
+    none... (jet)
+
+SEE ALSO
+    Universe::ObservableUniverse::Filament::SuperCluster::Cluster::Group::Ga
+    laxy::Arm::Buble::InterstellarCloud::SolarSystem::Earth
+
+AUTHOR
+    Jozef Kutej, `<jkutej at cpan.org>'
+
+BUGS
+    Please report any bugs or feature requests to `bug-universe-galaxy at
+    rt.cpan.org', or through the web interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Universe-Galaxy. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Universe::Galaxy
+
+    You can also look for information at:
+
+    * RT: CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Universe-Galaxy
+
+    * AnnoCPAN: Annotated CPAN documentation
+        http://annocpan.org/dist/Universe-Galaxy
+
+    * CPAN Ratings
+        http://cpanratings.perl.org/d/Universe-Galaxy
+
+    * Search CPAN
+        http://search.cpan.org/dist/Universe-Galaxy
+
+ACKNOWLEDGEMENTS
+COPYRIGHT
+    Copyright 2009 Jozef Kutej, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

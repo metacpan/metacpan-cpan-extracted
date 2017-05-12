@@ -1,0 +1,27 @@
+
+
+=pod
+
+=head1 NAME
+
+ur list - list objects, classes, modules
+
+
+
+=head1 VERSION
+
+This document describes ur list version 0.29.
+
+=head1 SUB-COMMANDS
+
+ objects  --subject-class-n...  lists objects matching specified params             
+ classes  [CLASSES-OR-MODULES]  a command which operates on classes/modules in a UR 
+                                 namespace directory                                
+ modules  [CLASSES-OR-MODULES]  a command which operates on classes/modules in a UR 
+                                 namespace directory                                
+
+
+
+
+=cut
+

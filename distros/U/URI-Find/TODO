@@ -1,0 +1,10 @@
+- parameterize top level domain list in Schemeless.pm?
+- shouldn't have picked this out:
+    $url = 'http://'.rand(1000000).'@anonymizer.com/'.$url (/url 63);
+- find email addresses
+    - <freeside> $text =~ s((?<![\/:])([.-_\w]+\@(\w+\.)+\w+))(<A HREF="mailto:$1">$1</A>)g;
+    - see also Email::Find
+- I'd think this should either be leaving off the parenthesized part or
+  including the close paren:
+    http://www.tbjck.com(86-10-85893372)
+        -> http://www.tbjck.com(86-10-85893372/

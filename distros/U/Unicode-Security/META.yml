@@ -1,0 +1,27 @@
+---
+abstract: 'Unicode security mechanisms'
+author:
+  - 'gray <gray@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Unicode-Security
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Unicode::Normalize: '0'
+  Unicode::UCD: '0'
+  perl: '5.008'
+resources:
+  repository: https://github.com/gray/unicode-security
+version: '0.08'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

@@ -1,0 +1,88 @@
+
+#!start included /usr/lib64/perl5/vendor_perl/5.16.3/ExtUtils/MANIFEST.SKIP
+# Avoid version control files.
+\bRCS\b
+\bCVS\b
+\bSCCS\b
+,v$
+\B\.svn\b
+\B\.git\b
+\B\.gitignore\b
+\b_darcs\b
+\B\.cvsignore$
+
+# Avoid VMS specific MakeMaker generated files
+\bDescrip.MMS$
+\bDESCRIP.MMS$
+\bdescrip.mms$
+
+# Avoid Makemaker generated and utility files.
+\bMANIFEST\.bak
+\bMakefile$
+\bblib/
+\bMakeMaker-\d
+\bpm_to_blib\.ts$
+\bpm_to_blib$
+\bblibdirs\.ts$         # 6.18 through 6.25 generated this
+
+# Avoid Module::Build generated and utility files.
+\bBuild$
+\b_build/
+\bBuild.bat$
+\bBuild.COM$
+\bBUILD.COM$
+\bbuild.com$
+
+# Avoid temp and backup files.
+~$
+\.old$
+\#$
+\b\.#
+\.bak$
+\.tmp$
+\.#
+\.rej$
+
+# Avoid OS-specific files/dirs
+# Mac OSX metadata
+\B\.DS_Store
+# Mac OSX SMB mount metadata files
+\B\._
+
+# Avoid Devel::Cover and Devel::CoverX::Covered files.
+\bcover_db\b
+\bcovered\b
+ 
+# Avoid MYMETA files
+^MYMETA\.
+#!end included /usr/lib64/perl5/vendor_perl/5.16.3/ExtUtils/MANIFEST.SKIP
+
+# Avoid configuration metadata file
+^MYMETA\.
+
+# Avoid Module::Build generated and utility files.
+\bBuild$
+\bBuild.bat$
+\b_build
+\bBuild.COM$
+\bBUILD.COM$
+\bbuild.com$
+^MANIFEST\.SKIP
+
+# Avoid developer scripts
+\bscripts/
+
+# Avoid archives of this distribution
+\bUAV-Pilot-ARDrone-[\d\.\_]+
+
+# Leftover video stream files from testing
+ardrone_video_stream.h264.*
+
+# Developer script
+test.sh
+test_file.sh
+install.sh
+
+# Leftover C and compiler files
+.*\.c
+.*\.o

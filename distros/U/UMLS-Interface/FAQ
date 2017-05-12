@@ -1,0 +1,74 @@
+NAME
+    FAQs.UI.pod
+
+SYNOPSIS
+    Listing the frequently asked questions about the UMLS-Interface package.
+
+DESCRIPTION
+  Functionality related questions :
+   What relations should I use?
+    You can use any of the relations exist in the sources that you specified
+    in the configuration file. The directional relations though are PAR/CHD
+    and RB/RN. The other relations (such as RO and SIB) are not directional
+    which means when obtaining path information when using these relations
+    may take quite a long time.
+
+  Package related questions :
+   What is the UMLS?
+    The Unified Medical Language System (UMLS) is a knowledge representation
+    framework designed to support biomedical and clinical research. It
+    includes over 100 knowledge sources and classification systems encoded
+    with different semantic and syntactic structures. The three major
+    components of UMLS are the Metathesaurus, Semantic Network and
+    SPECIALIST Lexicon.
+
+    For more information please see:
+
+    <http://www.nlm.nih.gov/research/umls/>
+
+   I have used this software and want to cite it. How should I do that?
+    If you write a paper that has used UMLS-Interface in some way, we'd
+    certainly be grateful if you sent us a copy and referenced
+    UMLS-Interface. We have a published paper that provides a suitable
+    reference:
+
+     @inproceedings{McInnesPP09,
+     title={{UMLS-Interface and UMLS-Similarity : Open Source Software for Measuring Paths and Semantic Similarity}}, 
+     author={McInnes, B.T. and Pedersen, T. and Pakhomov, S.V.}, 
+     booktitle={Proceedings of the American Medical Informatics Association (AMIA) Symposium},
+     year={2009}, 
+     month={November}, 
+     address={San Fransico, CA} }
+
+   What is the earlist version of the UMLS that I can use?
+    The package has been run and tested using UMLS 2008AA. We have plans to
+    make this compatable with earlier versions of the UMLS and do our best
+    to ensure that the package remains updated for future versions.
+
+SEE ALSO
+AUTHOR
+    Bridget T. McInnes, University of Minnesota bthomson at cs.umn.edu
+
+COPYRIGHT
+    Copyright (c) 2007 - 2009
+
+    Bridget T. McInnes, University of Minnesota bthomson at cs.umn.edu
+
+    Ted Pedersen, University of Minnesota, Duluth. tpederse at umn.edu
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 2 of the License, or (at your
+    option) any later version.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+    Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to
+
+    The Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
+    MA 02111-1307, USA.
+

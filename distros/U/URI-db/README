@@ -1,0 +1,43 @@
+URI/db version 0.17
+===================
+
+This library implements a Perl interface for a proposed standard for database
+connection URIs. The basic formats are:
+
+* `db:engine://username:password@example.com:8042/over/there/widget.db?type=animal&name=narwhal`
+* `db:engine:my_big_fat_database?subject=Topic`
+
+This library also includes an interface to convert database URIs to
+[DBI](https://metacpan.org/module/DBI) DSNs. For additional information on the
+format, see `README.md`.
+
+**Warning:** This is an alpha release. I will do my best to preserve
+functionality going forward, especially as [Sqitch](http://sqitch.org/) uses
+this module. However, as the database URI specification moves forward, changes
+*may* require backwards-incompatible changes. Caveat Hackor.
+
+Installation
+------------
+
+To install this module, type the following:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+Dependencies
+------------
+
+URI::db requires the following modules:
+
+* URI
+* URI::Nested
+
+Copyright and Licence
+---------------------
+
+Copyright (c) 2013 David E. Wheeler. Some Rights Reserved.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

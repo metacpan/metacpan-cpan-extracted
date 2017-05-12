@@ -1,0 +1,13 @@
+At Home.Wash Car
+    Garage.retrieve bucket
+    Kitchen.prepare bucket
+        Kitchen.pour soap in bucket
+        Kitchen.fill bucket
+    Garage.get sponge
+    Garage.open door
+    Driveway.apply soapy water
+    Driveway.rinse
+    Driveway.empty bucket
+    Garage.close door
+    Garage.replace sponge
+    Garage.replace bucket

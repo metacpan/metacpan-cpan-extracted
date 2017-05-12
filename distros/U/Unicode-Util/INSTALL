@@ -1,0 +1,16 @@
+Unicode::Util Installation
+
+# install via cpanminus
+cpanm Unicode::Util
+
+# install via CPAN shell
+cpan Unicode::Util
+
+# install via ActivePerl
+ppm install Unicode::Util
+
+# install manually
+perl Build.PL
+./Build
+./Build test
+./Build install

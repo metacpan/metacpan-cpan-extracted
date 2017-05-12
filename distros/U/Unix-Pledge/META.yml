@@ -1,0 +1,24 @@
+---
+abstract: unknown
+author:
+  - 'Richard Farr'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.9801, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Unix-Pledge
+no_index:
+  directory:
+    - t
+    - inc
+requires: {}
+resources:
+  bugtracker: https://github.com/rfarr/Unix-Pledge/issues
+  repository: git://github.com/rfarr/Unix-Pledge.git
+version: '0.005'

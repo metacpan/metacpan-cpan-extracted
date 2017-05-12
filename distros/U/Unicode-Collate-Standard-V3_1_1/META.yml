@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name: Unicode-Collate-Standard-V3_1_1
+version: 0.1
+license: perl
+distribution_type: module
+requires:
+  File::Spec: 0
+  Unicode::Collate: 0
+recommends: {}
+build_requires: {}
+conflicts: {}
+provides:
+  Unicode::Collate::Standard::V3_1_1:
+    file: lib/Unicode/Collate/Standard/V3_1_1.pm
+    version: 0.1
+generated_by: Module::Build version 0.18

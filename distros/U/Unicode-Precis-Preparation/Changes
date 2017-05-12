@@ -1,0 +1,63 @@
+Revision history for Perl extension Unicode::Precis::Preparation.
+
+0.01  Sat Jun 13 2015
+! lib/POD2/JA/Unicode/Precis/Preparation.pod
+! lib/Unicode/Precis/Preparation.pm
+! precis_preparation.c
+! precis_preparation.h
+! t/01utf8.t
++ t/02repertoires.t
++ t/Utils.pm
+  - Doc: Added RESTRICTIONS section.
+  - Added tests.
+
+0.000_03  Sat Jun 06 2015
+! data/precis_preparation.pl
+! lib/POD2/JA/Unicode/Precis/Preparation.pod
+! lib/Unicode/Precis/Preparation.pm
+! Preparation.xs
+! precis_preparation.c
+! precis_preparation.h
++ t/01utf8.t
+! t/03contextualrules.t
+  - Fix: Some tests fail on Perl < 5.14 due to codepoints added by Unicode 6.0.
+  - Fixed other many bugs.
+  - prepare() in array context also returns offset item if check succeeded.
+  - Added tests.
+
+0.000_02  Sun May 31 2015
+! Changes
+! data/makefile
+- data/precis_preparation.c.in
+! data/precis_preparation.pl
+! lib/POD2/JA/Unicode/Precis/Preparation.pod
+! lib/Unicode/Precis/Preparation.pm
+! Makefile.PL
+! MANIFEST
+! precis_preparation.c
+! precis_preparation.h
+! Preparation.xs
+! README
++ t/00use.t
++ t/03contextualrules.t
+- t/Unicode-Precis-Preparation.t
++ t/pod.t
+  - Initial CPAN upload.
+
+0.000_01  Wed May 27 2015
++ Changes
++ data/makefile
++ data/precis_preparation.c.in
++ data/precis_preparation.pl
++ Makefile.PL
++ MANIFEST
++ ppport.h
++ precis_preparation.c
++ precis_preparation.h
++ Preparation.xs
++ README
++ t/Unicode-Precis-Preparation.t
++ lib/POD2/JA/Unicode/Precis/Preparation.pod
++ lib/Unicode/Precis/Preparation.pm
+  - Initial checkin.
+

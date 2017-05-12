@@ -1,0 +1,73 @@
+{
+   "abstract" : "the duri and tdb URI schemes",
+   "author" : [
+      "Toby Inkster <tobyink@cpan.org>",
+      "TOBYINK <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.016, CPAN::Meta::Converter version 2.140640",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "URI-duri",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime::Incomplete" : "0",
+            "URI" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.61"
+         }
+      }
+   },
+   "provides" : {
+      "URI::duri" : {
+         "file" : "lib/URI/duri.pm",
+         "version" : "0.003"
+      },
+      "URI::tdb" : {
+         "file" : "lib/URI/tdb.pm",
+         "version" : "0.003"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "X_identifier" : "http://purl.org/NET/cpan-uri/dist/URI-duri/project",
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=URI-duri"
+      },
+      "homepage" : "https://metacpan.org/release/URI-duri",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-uri-duri.git",
+         "web" : "https://github.com/tobyink/p5-uri-duri"
+      }
+   },
+   "version" : "0.003"
+}

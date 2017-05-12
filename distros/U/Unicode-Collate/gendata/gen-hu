@@ -1,0 +1,100 @@
+#!perl
+# gen-hu : auxiliary script for Hungarian
+#
+# output files
+#
+#   hu.txt   (equal to data/hu.txt)
+#   loc_hu.t (a main part of t/loc_hu.t)
+#
+use strict;
+use warnings;
+require 'gen-head'; # for testcount() and testhead()
+
+my @a = qw( cs dz dzs gy ly ny sz ty zs );
+
+my $textf = 'hu.txt';
+my $text1 = '';
+my $text2 = "00F6;o+1\n00D6;O+1\n0151;o+1++1\n0150;O+1++1\n"
+	  . "00FC;u+1\n00DC;U+1\n0171;u+1++1\n0170;U+1++1\n"
+	  . "#here ccs is identical to cscs etc.\n";
+my $testf = 'loc_hu.t';
+my $test1 = '';
+my $test2 = '';
+
+for my $e (@a) {
+    my @c = split //, $e;
+    my $u1 = uc $c[0];
+    my $l1 = lc $c[0];
+    my $u2 = uc $c[1];
+    my $l2 = lc $c[1];
+    my @set;
+    if (@c == 2) {
+	@set = map { ($_ & 2 ? $u1 : $l1).($_ & 1 ? $u2 : $l2) } (0..3);
+    } else {
+	my $u3 = uc $c[2];
+	my $l3 = lc $c[2];
+	@set = map { ($_ & 4 ? $u1 : $l1).($_ & 2 ? $u2 : $l2)
+					 .($_ & 1 ? $u3 : $l3) } (0..7);
+    }
+
+    my $set = @set;
+    my $s_1 = $set - 1;
+    my $max = 2 * $set -1;
+    my @third = (8,2,7);
+    for my $i (0..$s_1) {
+	$text1 .= "{" . $set[$i] . "};";
+	$text1 .= ($i ? $u1 : $l1). "+" .(@c == 2 ? 1 : 2);
+	if ($i != 0 && $i != $s_1) {
+	    $text1 .= "---1 ";
+	    $text1 .= sprintf "[.0.0.%d.0]", $third[$i < $set/2];
+	    $text1 .= sprintf "[.0.0.%d.0]", $third[$i % 3] if @c == 3;
+	}
+	$text1 .= "\n";
+    }
+    for my $i (0..$max) {
+	my $f = $i & $set ? $u1 : $l1;
+	my $left = $f. $set[$i & $s_1];
+	my $r1 = $set[$i & $set ? $s_1 : 0];
+	my $r2 = $set[$i & $s_1];
+
+	$text2 .=  "{$left};<{$r1}><{$r2}>\n";
+	$test2 .= qq|ok(\$objHu->eq("$left", "$r1$r2"));\n|;
+    }
+    for my $i (1..$s_1) {
+	$test1 .= qq|ok(\$objHu->eq("$set[$i-1]", "$set[$i]"));\n|;
+    }
+}
+
+
+### WRITE DATA ###
+open my $dh, ">$textf" or die $textf;
+binmode $dh;
+print $dh "$text1$text2";
+close $dh or die $textf;
+
+### WRITE TEST ###
+my $test = '';
+my $ok = 0;
+
+$test .= "\$objHu->change(level => 1);\n\n";
+$test .= testcount(\$ok, 34);
+
+$test .= "\$objHu->change(level => 2);\n\n";
+$test .= testcount(\$ok, $test1);
+$test .= testcount(\$ok, 6);
+
+$test1 =~ s/->eq/->lt/g;
+$test .= "\$objHu->change(level => 3);\n\n";
+$test .= testcount(\$ok, $test1);
+$test .= testcount(\$ok, 22);
+$test .= testcount(\$ok, $test2);
+
+$test1 =~ s/->lt/->gt/g;
+$test .= "\$objHu->change(upper_before_lower => 1);\n\n";
+$test .= testcount(\$ok, $test1);
+
+chomp $test;
+open my $th, ">$testf" or die $testf;
+binmode $th;
+print $th testhead('hu', $ok), $test;
+close $th or die $testf;

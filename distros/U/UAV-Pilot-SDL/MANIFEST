@@ -1,0 +1,25 @@
+Build.PL
+CHANGELOG
+lib/UAV/Pilot/SDL.pm
+lib/UAV/Pilot/SDL/Events.pm
+lib/UAV/Pilot/SDL/Joystick.pm
+lib/UAV/Pilot/SDL/NavFeeder.pm
+lib/UAV/Pilot/SDL/Video.pm
+lib/UAV/Pilot/SDL/Video.xs
+lib/UAV/Pilot/SDL/VideoOverlay.pm
+lib/UAV/Pilot/SDL/VideoOverlay/Reticle.pm
+lib/UAV/Pilot/SDL/Window.pm
+lib/UAV/Pilot/SDL/Window/Mock.pm
+lib/UAV/Pilot/SDL/WindowEventHandler.pm
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+ppport.h
+README
+RELEASE.HOWTO
+t/001_load.t
+t/002_pod.t
+t/170_sdl_window.t
+typemap
+uav.h

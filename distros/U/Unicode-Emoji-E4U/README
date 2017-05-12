@@ -1,0 +1,93 @@
+NAME
+    Unicode::Emoji::E4U - Emoji mappings based on emoji4unicode project
+
+SYNOPSIS
+        use Unicode::Emoji::E4U;
+
+        my $e4u = Unicode::Emoji::E4U->new;
+
+        # fetch data files from Google Code (default)
+        $e4u->datadir('http://emoji4unicode.googlecode.com/svn/trunk/data/');
+
+        # or load from local cached files
+        $e4u->datadir('data');
+
+        my $docomo   = $e4u->docomo;    # Unicode::Emoji::DoCoMo instance
+        my $kddi     = $e4u->kddi;      # Unicode::Emoji::KDDI instance
+        my $softbank = $e4u->softbank;  # Unicode::Emoji::SoftBank instance
+        my $google   = $e4u->google;    # Unicode::Emoji::Google instance
+
+        my $kddiweb  = $e4u->kddiweb;   # alias to $e4u->kddi
+
+DESCRIPTION
+    This module provides emoji picture characters cross-mapping table base
+    on emoji4unicode, Emoji for Unicode, project on Google Code:
+    <http://code.google.com/p/emoji4unicode/>
+
+    This has the following accessor methods.
+
+  datadir
+    To fetch data files from emoji4unicode project repository on Google
+    Code. (default)
+
+        $e4u->datadir('http://emoji4unicode.googlecode.com/svn/trunk/data/');
+
+    To load data files cached on local path.
+
+        $e4u->datadir('data');
+
+  treepp
+    This returns XML::TreePP instance to parse data files.
+
+        $e4u->treepp->set(user_agent => 'Mozilla/4.0 (compatible; ...)');
+
+  docomo
+    This returns Unicode::Emoji::DoCoMo instance.
+
+  kddi
+    This returns Unicode::Emoji::KDDI instance.
+
+  softbank
+    This returns Unicode::Emoji::SoftBank instance.
+
+  google
+    This returns Unicode::Emoji::Google instance.
+
+  kddiweb
+    This returns Unicode::Emoji::KDDI instance as an alias for "kddi".
+
+LINKS
+    *   Subversion Trunk
+
+        <http://emoji4unicode-ll.googlecode.com/svn/trunk/lang/perl/Unicode-
+        Emoji-E4U/trunk/>
+
+    *   Project Hosting on Google Code
+
+        <http://code.google.com/p/emoji4unicode-ll/>
+
+    *   Google Groups and some Japanese documents
+
+        <http://groups.google.com/group/emoji4unicode-ll>
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Unicode-Emoji-E4U>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Unicode-Emoji-E4U>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Unicode-Emoji-E4U/>
+
+AUTHOR
+    Yusuke Kawasaki, <http://www.kawa.net/>
+
+SEE ALSO
+    Encode::JP::Emoji
+
+COPYRIGHT
+    Copyright 2009 Yusuke Kawasaki, all rights reserved.
+

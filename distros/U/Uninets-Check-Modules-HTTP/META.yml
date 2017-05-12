@@ -1,0 +1,31 @@
+---
+abstract: 'Uninets::Check module to check web urls.'
+author:
+  - 'Matthias Krull <<m.krull@uninets.eu>>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Uninets-Check-Modules-HTTP
+no_index:
+  directory:
+    - t
+provides:
+  Uninets::Check::Modules::HTTP:
+    file: lib/Uninets/Check/Modules/HTTP.pm
+    version: 0.03
+requires:
+  JSON: 0
+  Mojo::UserAgent: 0
+  Moo: 0
+  perl: v5.10.1
+resources:
+  license: http://www.perlfoundation.org/artistic_license_2_0
+  repository: https://github.com/uninets/Uninets-Check-Modules-HTTP
+version: 0.03

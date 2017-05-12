@@ -1,0 +1,78 @@
+#!perl
+# gen-ta : auxiliary script for Tamil
+#
+# output files
+#
+#   ta.txt   (equal to data/ta.txt)
+#   loc_ta.t (equal to t/loc_ta.t)
+#
+use strict;
+use warnings;
+require 'gen-head'; # for testcount() and testhead()
+
+my @consonant = qw(B95 B99 B9A B9E B9F BA3 BA4 BA8 BAA BAE BAF BB0
+                   BB2 BB5 BB4 BB3 BB1 BA9 B9C BB6 BB7 BB8 BB9 );
+my @aftercons = qw(Kssa BBE);
+
+my $textf = 'ta.txt';
+my $text1 = "0B82;<0B83>+0 [.FFF0.0.0.0]\n0B83;<0B83>+0 [.FFF1.0.0.0]\n";
+my $text2 = '';
+my $testf = 'loc_ta.t';
+my $test1 = << 'TEST';
+    no warnings 'utf8';
+    my $t = $h ? pack('U', 0xFFFF) : "";
+    $objTa->change(highestFFFF => 1) if $h;
+
+    ok($objTa->lt("\x{B94}$t",   "\x{B82}"));
+    ok($objTa->lt("\x{B82}$t",   "\x{B83}"));
+TEST
+
+my $type = 'c';
+my $pre = '\x{B83}';
+my $p   = '';
+for my $c (@consonant, @aftercons) {
+    $type = '' if $c eq 'Kssa';
+    my $u   = $c eq 'Kssa' ? '0B95 0BCD 0BB7' : "0$c";
+    my $hex = $c eq 'Kssa' ? "\${$c}" : "\\x{$c}";
+
+    if ($c eq 'Kssa') {
+	$text1 .= "$u 0BCD;<$p>+0 [.FFF2.0.0.0]\n";
+	$text1 .= "$u     ;<$p>+0 [.FFF3.0.0.0]\n";
+    }
+    if ($type eq 'c') {
+	$text2 .= "$u 0BCD;<$u>+0 [.FFF0.0.0.0]\n";
+	$text2 .= "$u     ;<$u>+0 [.FFF1.0.0.0]\n";
+    }
+
+    if ($c eq 'BBE') {
+	$test1 .= qq|    ok(\$objTa->lt("$pre\$t",   "$hex"));\n|;
+    } else {
+	$test1 .= qq|    ok(\$objTa->lt("$pre\$t",   "$hex\$v"));\n|;
+	$test1 .= qq|    ok(\$objTa->lt("$hex\$v\$t",\ "$hex"));\n|;
+    }
+
+    $p = $u;
+    $pre = $hex;
+}
+
+### WRITE DATA ###
+open my $dh, ">$textf" or die $textf;
+binmode $dh;
+print $dh "$text1$text2";
+close $dh or die $textf;
+
+### WRITE TEST ###
+my $test = '';
+my $ok = 2;
+
+$test .= "\$objTa->change(level => 1);\n\n";
+$test .= 'my $Kssa = "\x{B95}\x{BCD}\x{BB7}";'."\n";
+$test .= 'my $v    = "\x{BCD}";'."\n\n";
+$test .= qq|for my \$h (0, 1) |;
+$test .= testcount(\$ok, $test1, 2);
+
+chomp $test;
+open my $th, ">$testf" or die $testf;
+binmode $th;
+print $th testhead('ta', $ok), $test;
+close $th or die $testf;

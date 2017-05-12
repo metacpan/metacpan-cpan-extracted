@@ -1,0 +1,6 @@
+bigguy		fileserv1:/home/&
+coolguy		anotherserver:/export/home/&
+fsi		-rw,intr	fileserv1:/home/fsi
+yp		-ro		netinfo:/var/yp
+default		-ro		raid-01:/default raid-02:/default
+ssnodgra	fileserv1:/home/&

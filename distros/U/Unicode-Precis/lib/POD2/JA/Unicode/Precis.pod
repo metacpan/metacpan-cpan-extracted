@@ -1,0 +1,155 @@
+
+=encoding utf-8
+
+=head1 NAME
+
+Unicode::Precis~[ja] - RFC 7564 PRECISフレームワーク - 実施と比較
+
+=head1 SYNOPSIS
+
+  use Unicode::Precis;
+  $precis = Unicode::Precis->new(options...);
+  $string = $precis->enforce($input);
+  $equals = $precis->compare($inputA, $inputB);
+  
+=head1 DESCRIPTION
+
+L<Unicode::Precis> は、PRECISフレームワークに基づいて
+UTF-8バイト文字列やユニコード文字列の実施と比較を行う。
+
+なお当モジュールは、バイト文字列をアップグレードすることなくUTF-8列として扱う。
+
+=head2 Methods
+
+=over
+
+=item new ( options ... )
+
+I<コンストラクタ>。
+L<Unicode::Precis>クラスのインスタンスを作成する。
+次のオプションを指定できる。
+
+=over
+
+=item WidthMappingRule =E<gt> 'Decomposition'
+
+指定すると、半角および全角のキャラクタをそれらの分解マッピングに変換する
+(decomposeWidth()を使う)。
+
+=item AdditionalMappingRule =E<gt> 'I<オプション...>'
+
+指定すると、空白を変換する。I<オプション...>には次の語 (複数可) を指定できる。
+
+=over
+
+=item C<MapSpace>
+
+非ASCIIの空白をASCIIの空白に変換する
+(mapSpace()を使う)。
+
+=item C<StripSpace>
+
+文字列の始まりや終わりのASCII空白文字を取り除く。
+
+=item C<UnifySpace>
+
+複数のASCII空白文字の並びを単一のASCII空白文字に変換する。
+
+=back
+
+=item CaseMappingRule =E<gt> 'Fold'
+
+指定すると、大文字およびタイトル文字を小文字に変換する
+(foldCase()を使う)。
+
+=item NormalizationRule =E<gt> 'NFC' | 'NFKC' | 'NFD' | 'NFKD'
+
+指定すると、文字列を指定の正規化形式で正規化する。
+
+=item DirectionalityRule =E<gt> 'BiDi'
+
+指定すると、右書き文字を含む文字列をBiDi規則で検査する。
+
+=item StringClass =E<gt> 'FreeFormClass' | 'IdentifierClass'
+
+指定すると、文字列を指定の文字列クラスで検査する。
+
+=item OtherRule =E<gt> $subref
+
+指定すると、文字列を$subrefで参照するサブルーチンの結果によって変換・検査する。
+
+=back
+
+=item compare ( $stringA, $stringB )
+
+I<インスタンスメソッド>。
+文字列を比較する。
+両方の文字列の実施が成功すれば、compareExactly()
+を使って両者を比較し、C<1>かC<0>を返す。
+そうでなければ、C<undef>を返す。
+
+引数$stringA、$stringBは変更されない。
+
+=item enforce ( $string )
+
+I<インスタンスメソッド>。
+文字列の実施を行う。
+処理が成功すれば、引数$stringを変更し、それを返す。
+そうでなければ、C<undef>を返す。
+
+=back
+
+=head2 Exports
+
+なにもエクスポートしない。
+
+=head1 CAVEATS
+
+当モジュールが提供できるレパートリは、Perl
+本体のユニコードデータベースが提供するものにかぎられる。
+この範囲外のキャラクタは、最新版のユニコードで利用可能であっても
+「未割り当て」とみなされ、認められない。下表に、Perl
+の各版が実装するユニコードの版を示す。
+
+  Perl's version     Implemented Unicode version
+  ------------------ ---------------------------
+  5.8.7, 5.8.8       4.1.0
+  5.10.0             5.0.0
+  5.8.9, 5.10.1      5.1.0
+  5.12.x             5.2.0
+  5.14.x             6.0.0
+  5.16.x             6.1.0
+  5.18.x             6.2.0
+  5.20.x             6.3.0
+
+=head1 RESTRICTIONS
+
+当モジュールはEBCDICプラットフォームでのユニコード文字列を扱えない。
+
+=head1 SEE ALSO
+
+RFC 7564 I<PRECIS Framework: Preparation, Enforcement, and Comparison of
+Internationalized Strings in Application Protocols>.
+L<https://tools.ietf.org/html/rfc7564>.
+
+L<Unicode::BiDiRule~[ja]>, L<Unicode::Normalize>,
+L<Unicode::Precis::Preparation~[ja]>,
+L<Unicode::Precis::Utils>.
+
+=head1 AUTHOR
+
+Hatuka*nezumi - IKEDA Soji, E<lt>hatuka@nezumi.nuE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+(C) 2015, 2016 Hatuka*nezumi - IKEDA Soji
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself. For more details, see the full text of
+the licenses at <http://dev.perl.org/licenses/>.
+
+This program is distributed in the hope that it will be
+useful, but without any warranty; without even the implied
+warranty of merchantability or fitness for a particular purpose.
+
+=cut

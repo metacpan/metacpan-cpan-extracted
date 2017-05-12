@@ -1,0 +1,109 @@
+SYNOPSIS
+
+     use Unix::Passwd::File;
+    
+     # list users. by default uses files in /etc (/etc/passwd, /etc/shadow, et al)
+     my $res = list_users(); # [200, "OK", ["root", ...]]
+    
+     # change location of files, return details
+     $res = list_users(etc_dir=>"/some/path", detail=>1);
+         # [200, "OK", [{user=>"root", uid=>0, ...}, ...]]
+    
+     # also return detail, but return array entries instead of hash
+     $res = list_users(detail=>1, with_field_names=>0);
+         # [200, "OK", [["root", "x", 0, ...], ...]]
+    
+     # get user/group information
+     $res = get_group(user=>"paijo"); # [200, "OK", {user=>"paijo", uid=>501, ...}]
+     $res = get_user(user=>"titin");  # [404, "Not found"]
+    
+     # check whether user/group exists
+     say user_exists(user=>"paijo");   # 1
+     say group_exists(group=>"titin"); # 0
+    
+     # get all groups that user is member of
+     $res = get_user_groups(user=>"paijo"); # [200, "OK", ["paijo", "satpam"]]
+    
+     # check whether user is member of a group
+     $res = is_member(user=>"paijo", group=>"satpam"); # 1
+    
+     # adding user/group, by default adding user will also add a group with the same
+     # name
+     $res = add_user (user =>"ujang", ...); # [200, "OK", {uid=>540, gid=>541}]
+     $res = add_group(group=>"ujang", ...); # [412, "Group already exists"]
+    
+     # modify user/group
+     $res = modify_user(user=>"ujang", home=>"/newhome/ujang"); # [200, "OK"]
+     $res = modify_group(group=>"titin"); # [404, "Not found"]
+    
+     # deleting user will also delete user's group
+     $res = delete_user(user=>"titin");
+    
+     # change user password
+     $res = set_user_password(user=>"ujang", pass=>"foobar");
+     $res = modify_user(user=>"ujang", pass=>"foobar"); # same thing
+    
+     # add/delete user to/from group
+     $res = add_user_to_group(user=>"ujang", group=>"wheel");
+     $res = delete_user_from_group(user=>"ujang", group=>"wheel");
+    
+     # others
+     $res = get_max_uid(); # [200, "OK", 65535]
+     $res = get_max_gid(); # [200, "OK", 65534]
+
+DESCRIPTION
+
+    This module can be used to read and manipulate entries in Unix system
+    password files (/etc/passwd, /etc/group, /etc/group, /etc/gshadow; but
+    can also be told to search in custom location, for testing purposes).
+
+    This module uses a procedural (non-OO) interface. Each function in this
+    module open and read the passwd files once. Read-only functions like
+    `list_users()` and `get_max_gid()` open in read-only mode. Functions
+    that might write to the files like `add_user()` or `delete_group()`
+    first lock `passwd` file, open in read+write mode and also read the
+    files in the first pass, then seek to the beginning and write back the
+    files.
+
+    No caching is done so you should do your own if you need to.
+
+SEE ALSO
+
+    Old modules on CPAN which do not support shadow files are pretty
+    useless to me (e.g. Unix::ConfigFile). Shadow passwords have been
+    around since 1988 (and in Linux since 1992), FFS!
+
+    Passwd::Unix. I created a fork of Passwd::Unix v0.52 called
+    Passwd::Unix::Alt in 2011 to fix some of the deficiencies/quirks in
+    Passwd::Unix, including: lack of tests, insistence of running as root
+    (despite allowing custom passwd files), use of not-so-ubiquitous bzip2,
+    etc. Then in 2012 I decided to create Unix::Passwd::File. Here are how
+    Unix::Passwd::File differs compared to Passwd::Unix (and
+    Passwd::Unix::Alt):
+
+      * tests in distribution
+
+      * no need to run as root
+
+      * no need to be able to read the shadow file for some operations
+
+      For example, list_users() will simply not return the encpass field if
+      the shadow file is unreadable. Of course, access to shadow file is
+      required when getting or setting password.
+
+      * strictly procedural (non-OO) interface
+
+      I consider this a feature :-)
+
+      * detailed error message for each operation
+
+      * removal of global error variable
+
+      * working locking
+
+      Locking is done by locking passwd file.
+
+    Setup::Unix::User and Setup::Unix::Group, which use this module.
+
+    Rinci
+

@@ -1,0 +1,1476 @@
+=head1 NAME
+
+UI::Dialog::Backend::XDialog - backend for the Xdialog(1)
+
+=head1 SYNOPSIS
+
+  use UI::Dialog::Backend::XDialog;
+  my $d = new UI::Dialog::Backend::XDialog ( backtitle => 'Demo',
+                                             title => 'Default',
+                                             height => 20, width=>65,
+                                             listheight => 5 );
+
+  $d->msgbox( title => 'Welcome!', text => 'Welcome one and all!' );
+
+=head1 ABSTRACT
+
+UI::Dialog::Backend::XDialog is the UI::Dialog backend for the Xdialog(1)
+application. While this module is used through UI::Dialog or any other meta
+module only the compatible methods are ever accessible. However, when using
+this module directly in your application (as in the SYNOPSIS example) you are
+given access to all the options and features of the real Xdialog(1) application.
+
+=head1 DESCRIPTION
+
+This backend is a wrapper for the Xdialog(1) application and as such attempts to
+extend every facet of Xdialog(1) to you the Perl programmer. The best reference
+for finding out about the various widgets, please read the fine Xdialog(1) manual
+as it's got the definitive details on the Xdialog application itself. This perldoc
+simply briefly describes all the supported options and widgets.
+
+Note that XDialog supports newlines (\n) within it's message text area,
+UI::Dialog strips the newlines in order to not break all the other backends. If
+you're using XDialog specifically, you can set the B<literal> option to 1 and the
+message text will be left as it was literally given.
+
+=head1 EXPORT
+
+=over 2
+
+None
+
+=back
+
+=head1 INHERITS
+
+=over 2
+
+UI::Dialog::Backend
+
+=back
+
+=head1 CONSTRUCTOR
+
+=head2 new( @options )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my $d = new( title => 'Default Title', backtitle => 'Backtitle',
+              width => 65, height => 20, listheight => 5 );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+This is the Class Constructor method. It accepts a list of key => value pairs
+and uses them as the defaults when interacting with the various widgets.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+A blessed object reference of the UI::Dialog::Backend::XDialog class.
+
+=back
+
+=item OPTIONS
+
+The (...)'s after each option indicate the default for the option. An * denotes
+support by all the widget methods on a per-use policy defaulting to the values
+decided during object creation.
+
+=over 6
+
+=item B<debug = 0,1,2> (0)
+
+=item B<literal = 0,1> (0)
+
+=item B<PATH = [ /bin, /usr/bin, /usr/local/bin, /opt/bin ]> (as indicated)
+
+=item B<wmclass = "name"> ('') *
+
+=item B<rc-file = "/path/to/any/gtkrc"> ('') *
+
+=item B<backtitle = "backtitle"> ('') *
+
+=item B<title = "title"> ('') *
+
+=item B<allowclose = 0,1> (0) *
+
+=item B<noclose = 0,1> (0) *
+
+=item B<screencenter = 0,1> (0) *
+
+=item B<undermouse = 0,1> (0) *
+
+=item B<autoplacement = 0,1> (0) *
+
+=item B<center = 0,1> (0) *
+
+=item B<right = 0,1> (0) *
+
+=item B<left = 0,1> (0) *
+
+=item B<fill = 0,1> (0) *
+
+=item B<nowrap = 0,1> (0) *
+
+=item B<wrap = 0,1> (0) *
+
+=item B<crwrap = 0,1> (0) *
+
+=item B<nocrwrap = 0,1> (0) *
+
+=item B<buttonsstyle = default,icon,text> (default) *
+
+=item B<fixedfont = 0,1> (0) *
+
+=item B<editable = 0,1> (0) *
+
+=item B<timestamp = 0,1> (0) *
+
+=item B<datestamp = 0,1> (0) *
+
+=item B<reverse = 0,1> (0) *
+
+=item B<keepcolors = 0,1> (0) *
+
+=item B<interval = \d+> (0) *
+
+=item B<notags = 0,1> (0) *
+
+=item B<itemhelp = 0,1> (0) *
+
+=item B<defaultitem = "tag"> ('') *
+
+=item B<icon = "/path/to/file.xpm"> ('') *
+
+=item B<nook = 0,1> (0) *
+
+=item B<nocancel = 0,1> (0) *
+
+=item B<nobuttons = 0,1> (0) *
+
+=item B<defaultno = 0,1> (0) *
+
+=item B<wizard = 0,1> (0) *
+
+=item B<help = "help"> ('') *
+
+=item B<print = "lp0"> ('') *
+
+=item B<check = "label"> ('') *
+
+=item B<oklabel  = "label"> ('') *
+
+=item B<cancellabel = "label"> ('') *
+
+=item B<beepbin = "/usr/bin/beep"> ('/usr/bin/beep') *
+
+=item B<beepbefore = 0,1> (0) *
+
+=item B<beepafter = 0,1> (0) *
+
+=item B<begin = [ $y, $x ]> (0) *
+
+=item B<ignoreeof = 0,1> (0) *
+
+=item B<smooth = 0,1> (0) *
+
+=item B<height = \d+> (20) *
+
+=item B<width = \d+> (65) *
+
+=item B<listheight = \d+> (5) *
+
+=item B<percentage = \d+> (0)
+
+=back
+
+=back
+
+=head1 WIDGET METHODS
+
+=head2 yesno( )
+
+=over 6
+
+=item EXAMPLE
+
+ if ($d->yesno( text => 'A binary type question?') ) {
+     # user pressed yes
+ } else {
+     # user pressed no or cancel
+ }
+
+=back
+
+=over 6
+
+=item DESCRIPTION
+
+Present the end user with a message box that has two buttons, yes and no.
+
+=back
+
+=over 6
+
+=item RETURNS
+
+TRUE (1) for a response of YES or FALSE (0) for anything else.
+
+=back
+
+=head2 msgbox( )
+
+=over 6
+
+=item EXAMPLE
+
+ $d->msgbox( text => 'A simple message' );
+
+=back
+
+=over 6
+
+=item DESCRIPTION
+
+Pesent the end user with a message box that has an OK button.
+
+=back
+
+=over 6
+
+=item RETURNS
+
+TRUE (1) for a response of OK or FALSE (0) for anything else.
+
+=back
+
+=head2 infobox( )
+
+=over 6
+
+=item EXAMPLE
+
+ $d->infobox( text => 'Information to convey.', timeout => 5000 );
+
+=back
+
+=over 6
+
+=item DESCRIPTION
+
+Present the end user with a message box that disappears after a certain length
+of time. The 'timeout' argument is representative of milliseconds. The default
+timeout is 5000 milliseconds (5 seconds). Yes this message will self destruct!
+You can also use the alternate timeout option of 'wait' in which is interpreted
+in seconds instead of milliseconds
+
+=back
+
+=over 6
+
+=item RETURNS
+
+TRUE (1) for a response of OK / normal timeout or FALSE (0) for anything else.
+
+=back
+
+=head2 gauge_start( ) progress_start( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ $d->gauge_start( text => 'gauge...', percentage => 1 );
+ $d->progress_start( text => 'progres...', percentage => 1 );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Display a meter bar to the user. This get's the widget realized but requires
+the use of the other gauge_*() methods for functionality. There are two such
+meter bars provided by Xdialog(1) and both are handled independantly of each
+other. This allows for an interesting situation... two progress meters up at
+the same time, both fully functional.
+
+ #
+ # Progressive Duality :)
+ #
+ $d->gauge_start( text => 'gauge...', begin => [ 10, 10 ] );
+ $d->progress_start( text => 'progres...' );
+ foreach my $i (10,20,30,40,50,60,70,80,90,100) {
+     $d->gauge_set($i);
+     sleep(1);
+     $d->progress_set($i);
+     sleep(1);
+ }
+ $d->gauge_stop();
+ $d->progress_stop();
+
+=back
+
+=item RETURNS
+
+=over 6
+
+TRUE (1) if the widget loaded fine and FALSE (0) for anything else.
+
+=back
+
+=back
+
+=head2 gauge_inc( ) progress_inc( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ $d->gauge_inc( 1 );
+ $d->progress_inc( 1 );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Increment the meter by the given amount.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+TRUE (1) if the widget incremented fine and FALSE (0) for anything else.
+
+=back
+
+=back
+
+=head2 gauge_dec( ) progress_dec( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ $d->gauge_dec( 1 );
+ $d->progress_dec( 1 );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Decrement the meter by the given amount.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+TRUE (1) if the widget decremented fine and FALSE (0) for anything else.
+
+=back
+
+=back
+
+=head2 gauge_set( ) progress_set( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ $d->gauge_set( 99 );
+ $d->progress_inc( 99 );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Set the meter bar to the given amount.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+TRUE (1) if the widget set fine and FALSE (0) for anything else.
+
+=back
+
+=back
+
+=head2 gauge_text( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ $d->gauge_text( 'string' );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Set the meter bar message to the given string.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+TRUE (1) if the widget set fine and FALSE (0) for anything else.
+
+=back
+
+=back
+
+=head2 gauge_stop( ) progress_stop( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ $d->gauge_stop();
+ $d->progress_stop();
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+End the meter bar widget process.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+TRUE (1) if the widget closed fine and FALSE (0) for anything else.
+
+=back
+
+=back
+
+=head2 password( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my $string = $d->password( text => 'Enter some (hidden) text.' );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Present the end user with a text input field that doesn't reveal the input
+(except to the script) and a message.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+a SCALAR if the response is OK and FALSE (0) for anything else.
+
+=back
+
+=back
+
+=head2 passwords2( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my @strings = $d->passwords2( text => 'Enter some (hidden) text.',
+                               label1 => 'first field label',
+                               label2 => 'second field label' );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Present the end user with two (labeled) password input fields.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+an ARRAY of up to two elements if the response is OK and FALSE (0) for
+anything else.
+
+=back
+
+=back
+
+=head2 passwords3( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my @strings = $d->passwords3( text => 'Enter some (hidden) text.',
+                               label1 => 'first field label',
+                               label2 => 'second field label',
+                               label3 => 'third field label' );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Present the end user with three (labeled) passsword input fields.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+an ARRAY of up to three elements if the response is OK and FALSE (0) for
+anything else.
+
+=back
+
+=back
+
+=head2 inputbox( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my $string = $d->inputbox( text => 'Enter some text...',
+                            entry => 'this is the input field' );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Present the end user with a text input field and a message.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+a SCALAR if the response is OK and FALSE (0) for anything else.
+
+=back
+
+=back
+
+=head2 inputsbox2( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my @strings = $d->inputsbox2( text => 'Enter some text.',
+                               label1 => 'first field label',
+                               input1 => '1st input field',
+                               label2 => 'second field label',
+                               input2 => '2nd input field' );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Present the end user with two (labeled) text input fields.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+an ARRAY of up to two elements if the response is OK and FALSE (0) for
+anything else.
+
+=back
+
+=back
+
+=head2 inputsbox3( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my @strings = $d->inputsbox3( text => 'Enter some text.',
+                               label1 => 'first field label',
+                               input1 => '1st input field',
+                               label2 => 'second field label',
+                               input2 => '2nd input field',
+                               label3 => 'third field label',
+                               input3 => '3rd input field' );
+
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Present the end user with three (labeled) text input fields.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+an ARRAY of up to three elements if the response is OK and FALSE (0) for
+anything else.
+
+=back
+
+=back
+
+=head2 combobox( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my $string = $d->combobox( text => 'Enter some text.',
+                            editable => 1, list => [ 'item1',
+                                                     'item2' ] );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Present the end user with a (possibly editable) dropdown list.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+a SCALAR or TRUE (1) if the response is OK and FALSE (0) for anything else.
+
+=back
+
+=back
+
+=head2 rangebox( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my $string = $d->rangebox( text => 'Pick a number...',
+                            min => 0, max => 100, def => 50 );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Present the end user with a range slider and a message.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+a SCALAR if the response is OK and FALSE (0) for anything else.
+
+=back
+
+=back
+
+=head2 rangesbox2( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my @strings = $d->rangesbox2( text => 'Pick a number...',
+                               label1 => 'first slider label',
+                               min1 => 0, max1 => 100, def1 => 50,
+                               label2 => 'second slider label',
+                               min1 => 0, max2 => 10, def2 => 5 );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Present the end user with two (labeled) text range fields.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+an ARRAY of up to two elements if the response is OK and FALSE (0) for
+anything else.
+
+=back
+
+=back
+
+=head2 rangesbox3( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my @strings = $d->rangesbox3( text => 'Pick a number...',
+                               label1 => 'first slider label',
+                               min1 => 10, max1 => 100, def1 => 50,
+                               label2 => 'second slider label',
+                               min2 => 1, max2 => 10, def2 => 5,
+                               label3 => 'third slider label',
+                               min3 => 2, max3 => 7, def3 => 5 );
+
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Present the end user with three (labeled) range sliders.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+an ARRAY of up to three elements if the response is OK and FALSE (0) for
+anything else.
+
+=back
+
+=back
+
+=head2 spinbox( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my $string = $d->spinbox( text => 'Pick a number...',
+                           min => 0, max => 100, def => 50 );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Present the end user with a spin slider and a message.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+a SCALAR if the response is OK and FALSE (0) for anything else.
+
+=back
+
+=back
+
+=head2 spinsbox2( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my @strings = $d->spinsbox2( text => 'Pick a number...',
+                              label1 => 'first slider label',
+                              min1 => 0, max1 => 100, def1 => 50,
+                              label2 => 'second slider label',
+                              min1 => 0, max2 => 10, def2 => 5 );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Present the end user with two (labeled) text spin fields.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+an ARRAY of up to two elements if the response is OK and FALSE (0) for
+anything else.
+
+=back
+
+=back
+
+=head2 spinsbox3( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my @strings = $d->spinsbox3( text => 'Pick a number...',
+                              label1 => 'first slider label',
+                              min1 => 10, max1 => 100, def1 => 50,
+                              label2 => 'second slider label',
+                              min2 => 1, max2 => 10, def2 => 5,
+                              label3 => 'third slider label',
+                              min3 => 25, max3 => 75, def3 => 50 );
+
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Present the end user with three (labeled) spin sliders.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+an ARRAY of up to three elements if the response is OK and FALSE (0) for
+anything else.
+
+=back
+
+=back
+
+=head2 textbox( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ $d->textbox( path => '/path/to/a/text/file' );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Present the end user with a simple scrolling box containing the contents
+of the given text file.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+TRUE (1) if the response is OK and FALSE (0) for anything else.
+
+=back
+
+=back
+
+=head2 editbox( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my $text = $d->editbox( path => '/path/to/a/text/file' );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Present the end user with an editable scrolling box containing the contents
+of the given text file.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+a multiline SCALAR if the response is OK and FALSE (0) for anything else.
+
+=back
+
+=back
+
+=head2 tailbox( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ $d->tailbox( path => '/path/to/a/text/file' );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Present the end user with a scrolling box containing the contents
+of the given text file. The contents of the window is constantly updated
+in a similar manner to that of the unix tail(1) command.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+TRUE (1) if the response is OK and FALSE (0) for anything else.
+
+=back
+
+=back
+
+=head2 logbox( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ $d->logbox( path => '/path/to/a/text/file',
+             timestamp => 1, datestamp => 1, reverse => 0 );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Present the end user with a scrolling box containing the contents
+of the given text file. The contents of the window is constantly updated
+in a similar manner to that of the unix tail(1) command. In addition, this
+widget can also colourize the output based on any ASCII colour escape
+sequences found within the file.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+TRUE (1) if the response is OK and FALSE (0) for anything else.
+
+=back
+
+=back
+
+=head2 menu( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my $selection1 = $d->menu( text => 'Select one:',
+                            list => [ 'tag1', 'item1',
+                                      'tag2', 'item2',
+                                      'tag3', 'item3' ] );
+
+ my $selection2 = $d->menu( text => 'Select one:',
+                            itemhelp => 1,
+                            list => [ 'tag1', 'item1', 'help1',
+                                      'tag2', 'item2', 'help2',
+                                      'tag3', 'item3', 'help3' ]
+                          );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Present the user with a selectable list and optional help tips.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+a SCALAR of the chosen tag if the response is OK and FALSE (0) for
+anything else.
+
+=back
+
+=back
+
+=head2 checklist( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my @selection1 = $d->checklist( text => 'Select one:',
+                                 list => [ 'tag1', [ 'item1', 0 ],
+                                           'tag2', [ 'item2', 1 ],
+                                           'tag3', [ 'item3', 1 ] ]
+                               );
+
+ my @selection2 = $d->checklist( text => 'Select one:',
+                                 itemhelp => 1,
+                                 list => [ 'tag1',
+                                           [ 'item1', 0, 'help1' ],
+                                           'tag2',
+                                           [ 'item2', 1, 'help2' ],
+                                           'tag3',
+                                           [ 'item3', 1, 'help3' ]
+                                         ]
+                               );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Present the user with a selectable checklist and optional help tips.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+an ARRAY of the chosen tags if the response is OK and FALSE (0) for
+anything else.
+
+=back
+
+=back
+
+=head2 radiolist( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my $selection1 = $d->radiolist( text => 'Select one:',
+                                 list => [ 'tag1', [ 'item1', 0 ],
+                                           'tag2', [ 'item2', 1 ],
+                                           'tag3', [ 'item3', 0 ] ]
+                               );
+
+ my $selection2 = $d->radiolist( text => 'Select one:',
+                                 itemhelp => 1,
+                                 list => [ 'tag1',
+                                           [ 'item1', 0, 'help1' ],
+                                           'tag2',
+                                           [ 'item2', 1, 'help2' ],
+                                           'tag3',
+                                           [ 'item3', 0, 'help3' ]
+                                         ]
+                               );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Present the user with a selectable radiolist and optional help tips.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+a SCALAR of the chosen tag if the response is OK and FALSE (0) for
+anything else.
+
+=back
+
+=back
+
+=head2 buildlist( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my $selection1 = $d->buildlist( text => 'Select one:',
+                                 list => [ 'tag1', [ 'item1', 0 ],
+                                           'tag2', [ 'item2', 1 ],
+                                           'tag3', [ 'item3', 0 ] ]
+                               );
+
+ my $selection2 = $d->buildlist( text => 'Select one:',
+                                 itemhelp => 1,
+                                 list => [ 'tag1',
+                                           [ 'item1', 0, 'help1' ],
+                                           'tag2',
+                                           [ 'item2', 1, 'help2' ],
+                                           'tag3',
+                                           [ 'item3', 0, 'help3' ]
+                                         ]
+                                );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Present the user with a buildable list and optional help tips.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+a SCALAR of the chosen tag if the response is OK and FALSE (0) for
+anything else.
+
+=back
+
+=back
+
+=head2 treeview( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my $selection1 = $d->treeview( text => 'Select one:',
+                                list => [ 'tag1',
+                                          [ 'item1', 0, 1 ],
+                                          'tag2',
+                                          [ 'item2', 1, 2 ],
+                                          'tag3',
+                                          [ 'item3', 0, 2 ]
+                                        ]
+                              );
+
+ my $selection2 = $d->treeview( text => 'Select one:',
+                                itemhelp => 1,
+                                list => [ 'tag1',
+                                          [ 'item1',0,1,'help1' ],
+                                          'tag2',
+                                          [ 'item2',1,2,'help2' ],
+                                          'tag3',
+                                          [ 'item3',0,2,'help3' ]
+                                        ]
+                              );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Present the user with a treeview of items and optional help tips. The treeview
+list is made up of an array(ref) consisting of a name (which is returned upon
+user selection) and an array reference containg the details of the item. The
+details array is made up of a description string, a status indicator (1,0), the
+desired tree depth and the optional help string.
+
+ [ 'ReturnName',
+   [ 'Description of item',
+     $status,
+     $depth,
+     'help string is ignored unless itemhelp is non-null.'
+   ]
+ }
+
+=back
+
+=item RETURNS
+
+=over 6
+
+a SCALAR of the chosen tag if the response is OK and FALSE (0) for
+anything else.
+
+=back
+
+=back
+
+=head2 fselect( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my $text = $d->fselect( path => '/path/to/a/file/or/directory' );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Present the user with a file selection widget preset with the given path.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+a SCALAR if the response is OK and FALSE (0) for anything else.
+
+=back
+
+=back
+
+=head2 dselect( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my $text = $d->dselect( path => '/path/to/a/file/or/directory' );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Present the user with a file selection widget preset with the given path.
+Unlike fselect() this widget will only return a directory selection.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+a SCALAR if the response is OK and FALSE (0) for anything else.
+
+=back
+
+=back
+
+=head2 calendar( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my $date = $d->calendar( text => 'Pick a date...',
+                          day => 1, month => 1, year => 1970 );
+ my ($m,$d,$y) = split(/\//,$date);
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Present the user with a calendar widget preset with the given date.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+a SCALAR if the response is OK and FALSE (0) for anything else.
+
+=back
+
+=back
+
+=head2 timebox( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my $time = $d->timebox( text => 'What time?' );
+ my ($h,$m,$s) = split(/\:/,$time);
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Present the user with a time widget preset with the current time.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+a SCALAR if the response is OK and FALSE (0) for anything else.
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+=over 2
+
+=item PERLDOC
+
+ UI::Dialog
+ UI::Dialog::GNOME
+ UI::Dialog::Backend
+ UI::Dialog::Backend::Nautilus
+ UI::Dialog::Backend::XOSD
+
+=back
+
+=over 2
+
+=item MAN FILES
+
+ Xdialog(1)
+
+=back
+
+=head1 BUGS
+
+Please email the author with any bug reports. Include the name of the
+module in the subject line.
+
+=head1 AUTHOR
+
+Kevin C. Krinke, E<lt>kevin@krinke.caE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+ Copyright (C) 2004-2016  Kevin C. Krinke <kevin@krinke.ca>
+
+ This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 2.1 of the License, or (at your option) any later version.
+
+ This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+
+ You should have received a copy of the GNU Lesser General Public
+ License along with this library; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+
+=cut

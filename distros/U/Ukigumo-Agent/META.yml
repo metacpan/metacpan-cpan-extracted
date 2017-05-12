@@ -1,0 +1,79 @@
+---
+abstract: 'Ukigumo test runner server'
+author:
+  - 'Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ GMAIL COM>'
+build_requires:
+  Capture::Tiny: '0'
+  File::Temp: '0'
+  LWP::UserAgent: '0'
+  Plack::Loader: '0'
+  Test::More: '0.98'
+  Test::TCP: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Ukigumo-Agent
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Ukigumo::Agent:
+    file: lib/Ukigumo/Agent.pm
+    version: v0.1.8
+  Ukigumo::Agent::Cleaner:
+    file: lib/Ukigumo/Agent/Cleaner.pm
+  Ukigumo::Agent::Dispatcher:
+    file: lib/Ukigumo/Agent/Dispatcher.pm
+  Ukigumo::Agent::Manager:
+    file: lib/Ukigumo/Agent/Manager.pm
+  Ukigumo::Agent::View:
+    file: lib/Ukigumo/Agent/View.pm
+requires:
+  Amon2: '6'
+  Amon2::Plugin::ShareDir: '0'
+  Coro: '0'
+  Data::Validator: '0'
+  File::Path: '0'
+  File::Spec: '0'
+  Getopt::Long: '2.42'
+  JSON: '2'
+  List::Util: '0'
+  Log::Minimal: '0'
+  Mouse: '0'
+  Plack: '0.9949'
+  Pod::Usage: '0'
+  Text::Xslate: '0'
+  Time::Duration: '0'
+  Twiggy: '0'
+  Ukigumo::Client: '0.36'
+  Ukigumo::Common: '0.10'
+  autodie: '0'
+  parent: '0'
+  perl: '5.010001'
+  version: '0'
+resources:
+  bugtracker: https://github.com/ukigumo/Ukigumo-Agent/issues
+  homepage: https://github.com/ukigumo/Ukigumo-Agent
+  repository: git://github.com/ukigumo/Ukigumo-Agent.git
+version: v0.1.8
+x_authority: cpan:TOKUHIROM
+x_contributors:
+  - 'Tomohiro Hosaka <bokutin@bokut.in>'
+  - 'mattn <mattn.jp@gmail.com>'
+  - 'Yoshihiro Sugi <sugi1982@gmail.com>'
+  - 'ikasam_a <masaki.nakagawa@gmail.com>'
+  - 'moznion <moznion@gmail.com>'
+  - 'hayajo <hayato.imai@gmail.com>'
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'

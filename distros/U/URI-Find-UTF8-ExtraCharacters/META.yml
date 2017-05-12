@@ -1,0 +1,29 @@
+---
+abstract: 'URI::Find::UTF8 with optional extra characters.'
+author:
+  - 'Sam Kaufman <skaufman@cpan.org>'
+build_requires:
+  Test::Base: 0
+  Test::More: 0
+  open: 0
+  utf8: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: URI-Find-UTF8-ExtraCharacters
+requires:
+  URI::Find: 20140709
+  URI::Find::UTF8: 0
+  base: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/ediblenergy/URI-Find-UTF8-ExtraCharacters/issues
+  homepage: https://github.com/ediblenergy/URI-Find-UTF8-ExtraCharacters
+  repository: https://github.com/ediblenergy/URI-Find-UTF8-ExtraCharacters.git
+version: 0.03

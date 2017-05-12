@@ -1,0 +1,37 @@
+---
+abstract: 'Detect CJK Language'
+author:
+  - 'mattn <mattn.jp@gmail.com>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.6.5, CPAN::Meta::Converter version 2.132140'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Unicode-EastAsianWidth-Detect
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  Unicode::EastAsianWidth::Detect:
+    file: lib/Unicode/EastAsianWidth/Detect.pm
+    version: 0.03
+requires:
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/mattn/p5-Unicode-EastAsianWidth-Detect/issues
+  homepage: https://github.com/mattn/p5-Unicode-EastAsianWidth-Detect
+  repository: git://github.com/mattn/p5-Unicode-EastAsianWidth-Detect.git
+version: 0.03

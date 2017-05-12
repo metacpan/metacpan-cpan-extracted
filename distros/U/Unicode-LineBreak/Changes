@@ -1,0 +1,466 @@
+2017.004  Tue Apr 11 2017
+# No new features.
+
+2016.007_02  Sat Jul 02 2016
+! lib/Text/LineFold.pm
+! t/04fold.t
+  - CPAN RT#115146: Space indenting not happening with "From" or " ".
+
+2016.003  Tue Mar 29 2016
+# No new features, version number as canonical numstring.
+
+2016.002_27  Sat Feb 27 2016
+! Makefile.PL.sombok
+  - CPAN RT#112078: Compiling libsombok.a fails due to invalid path for object
+    files.
+
+2015.12  Sun Nov 29 2015
+# No new features.
+
+2015.011_09  Mon Nov 09 2015
+! LineBreak.xs
+  - uvnui_to_utf8() was obsoleted by Perl 5.20.0. Use uvchr_to_utf8().
+
+2015.011_03  Sun Nov 03 2015
+! LineBreak.xs
+  - Bug fix: CPAN RT #106714: Unicode::GCString fails to handle numeric value,
+    mostly on *BSD and Mac OS X.
+! t/10gcstring.t
+  - Adding more case.
+
+2015.11  Sun Nov 01 2015
+# No new features.
+! lib/Unicode/LineBreak.pm
+  - CPAN RT #106859: The latest version is not indexed.
+! t/10gcstring.t
+  - testing that GCString stringify numeric arguments (CPAN RT #106714).
+
+2015.07.16  Fri Jul 17 2015
+# No new features.
+! LineBreak.xs
+  - utf8_to_uvuni_buf has been deprecated by Perl 5.19.4.
+
+2015.06  Sun Jun 21 2015
+# Unicode 8.0.0, bundled sombok 2.4.0.
+! lib/Unicode/LineBreak.pod
+! lib/POD2/JA/Unicode/LineBreak.pod
+! t/18currency.y
+  - add a change for U+20BE.
+
+2014.06  Fri Jun 20 2014
+# Unicode 7.0.0, bundled sombok 2.3.2.
+
+2014.004_26  Sat May 04 2014
+# Unicode 7.0.0beta at Mar 18, bundled sombok-2.3.2beta1.
+! lib/Unicode/LineBreak.pod
+! lib/POD2/JA/Unicode/LineBreak.pod
+! t/18currency.t
+  - add a change for U+20BB.
+
+2013.11  Thu Nov 21 2013
+# No new features.
+- debian/
+  - Removed becuase it was not maintained.
+! lib/Unicode/GCString.pm
+  - I forgot to bump up version to 2013.10.
+! lib/POD2/JA/Text/LineFold.pod
+! lib/POD2/JA/Unicode/GCString.pod
+! lib/POD2/JA/Unicode/LineBreak.pod
+! lib/Text/LineFold.pm
+! lib/Unicode/GCString.pod
+! lib/Unicode/LineBreak.pod
+! Makefile.PL
+  - Repository has been moved to GitHub.
+
+2013.10  Fri Oct 04 2013
+# Unicode 6.3.0, bundled sombok-2.3.1.
+! Makefile.PL
+! Makefile.PL.sombok
+  - Added include path of libthai to sombok/Makefile.PL for such as Mac OS X.
+! perl-Unicode-LineBreak.spec
+  - mv POD2::JA manpages into %{_mandir}/ja/.
+
+2013.008_06  Sun Aug 25 2013
++ lib/POD2/JA/Text/LineFold.pod
++ lib/POD2/JA/Unicode/GCString.pod
++ lib/POD2/JA/Unicode/LineBreak.pod
+- lib/Text/LineFold/JA_JP.pod
+- lib/Unicode/GCString/JA_JP.pod
+- lib/Unicode/LineBreak/JA_JP.pod
+  - Moved Japanese PODs to suit POD2 feature.
+! lib/POD2/JA/Unicode/GCString.pod
+! lib/Unicode/GCString.pod
+  - Commented-out "Methods planned to be deprecated".
+! lib/POD2/JA/Unicode/LineBreak.pod
+! lib/Unicode/LineBreak.pod
+  - Addition about IDEOGRAPHIC SPACE.
+  - Added description about predefined property values for currency symbols.
+  - Commented-out "Methods Planned to be Deprecated" and "Obsoleted Options".
+! lib/Unicode/LineBreak/Constants.pm
+  - A new constant IDEOGRAPHIC_SPACE.
+! Makefile.PL
+  - Now "make dist" generates META files.
++ t/18currency.t
+  - On reserved codepoints for currency symbols.
+
+2013.004_26  Sat Apr 27 2013
+! Makefile.PL
+  - Use $(NOOP) instead of true, for Windows.
+  - Abort make if older libthai was found.
+! Linebreak.xs
+! typemap
+  - Decode arguments without utf8 flag as ISO-8859-1: CPAN RT #84661.
+! t/17prop.t
+  - Added tests for non-utf8-flagged arguments.
+
+2013.003_11  Mon Mar 25 2013
+# Unicode 6.3.0 beta at 2013-03-02, bundled sombok-2.3.1b.
+
+2012.10  Mon Oct 01 2012
+# Unicode 6.2.0, bundled sombok-2.3.0.
+! lib/Unicode/LineBreak/JA_JP.pod
+! lib/Unicode/LineBreak.pod
+  - Undocumented EA_ZA and EA_ZW introduced by sombok-2.3.0.
+  - Added a note to state EA_Z* are not a part of Standard.
+! lib/Unicode/LineBreak.pm
+  - added warning for obsoleted options: TailorEA, TailorLB and UserBreaking.
+! t/03ns.t
+! t/06context.t
+! t/09uri.t
+  - Removed tests for obsoleted options.
+
+2012.008_16  Sat Aug 18 2012
+! lib/Unicode/LineBreak.pm
+! lib/Unicode/LineBreak.pod
+! lib/Unicode/LineBreak/JA_JP.pod
+! t/00GraphemeBreakTest.t
+! t/00LineBreakTest.t
+  - Updates for latest 6.2.0beta.
+  - Bundled sombok-2.3.0gamma1.
+
+2012.007_16  Thu Jul 12 2012
+! Makefile.PL:
+  - Use sombok >= 2.3.0.
+! t/00LineBreakTest.t:
+  - Temporarily skip problematic ZJ subtests.
+! lib/Unicode/GCString.pod:
+! lib/Unicode/GCString/JA_JP.pod:
+  - Updated citation.
+! lib/Unicode/LineBreak.pod:
+! lib/Unicode/LineBreak/JA_JP.pod:
+  - Updated citation.
+  - Added a section about tailoring for IDEOGRAPHIC SPACE (not yet written).
+    See <http://www.unicode.org/review/pri212/feedback.html>, by Koji Ishii.
+
+2012.007_14  Thu Jul 12 2012
+# Not really released
+
+2012.06  Sat Jun 02 2012
+! lib/Unicode/LineBreak/Defaults.pm.sample:
+  - removed obsoleted options.
+! Makefile.PL:
+! META.json:
+  - fixed broken {'meta-spec'}{'version'}.
+
+2012.005_18  Sat May 26 2012
+! lib/Unicode/LineBreak.pod:
+! lib/Unicode/LineBreak/JA_JP.pod:
+  - Added "Incompatible Changes" section.
+! LineBreak.xs:
+  - Fix for all versions of Perl: CPAN RT #77394.  utf8_to_uvuni has been
+    deprecated by Perl 5.16 since it may read out of buffer.
+  - Chg: LineBreak: eawidth() and lbclass() were removed.
+! Makefile.PL:
+! META.yml:
+  - requires ExtUtils::MakeMaker >= 6.26.
++ META.json:
+  - added.
++ t/000.t:
+  - added.
+! t/01break.t:
+! t/08partial.t:
+  - Added ko-decomp test.
+
+2012.04  Sun Apr 01 2012
+! lib/Unicode/GCString.pod:
+! lib/Unicode/GCString/JA_JP.pod:
+  - Let flag(), lbclass() and lbclass_ext() be deprecated.
+! lib/Unicode/LineBreak.pod:
+! lib/Unicode/LineBreak/JA_JP.pod:
+  - Let eawidth(), lbrule() and lbclass() be deprecated.
+! LineBreak.xs:
+  - New: GCString::lbc(), GCString::lbcext().
+! Makefile.PL:
+  - Fix: Win32 etc.: Include XSUB.h in sombok.h to avoid mismatches of
+    malloc implementations, when bundled sombok is used.
+  - Requires sombok >= 2.2.0.
+
+2012.003_30  Tue Mar 20 2012
+# Mainly fixes of bugs emited by previous development release.
+! lib/Unicode/GCString.pod:
+! lib/Unicode/GCString/JA_JP.pod:
+  - Added a caveat about calling the grapheme cluster as "grapheme".
+! lib/Unicode/LineBreak.pod:
+! lib/Unicode/LineBreak/JA_JP.pod:
+  - some corrections.
+! LineBreak.xs:
+  - Fix: Win32/MSVC: lack of strcasecmp().
+! Makefile.PL:
+! Makefile.PL.sombok:
+  - Fix: error on test-subdirs with *BSD make.
+
+2012.003_26  Tue Mar 13 2012
+# Tests building on Win32 are appreciated.
+! lib/Text/LineFold.pm:
+  - use breakingRule().
+! LineBreak.xs:
+  - Cast ref_func() according to strict prototyping.
+  - New: LineBreak::breakingRule().  lbrule() may be deprecated in near future.
+! Makefile.PL
+  - requires sombok 2.1.1.
+  - Now configure script won't be used to build bundled sombok.
+  - Fix: libthai cflags were ommitted.
+  - get UC test files only when they do not exist.
++ Makefile.PL.sombok
+  - To make bundled sombok static library.
+- sombok/configure, etc.
+  - No longer shipped with full package of sombok.
++ t/00GraphemeBreakTest.t
+  - Added test suite provided by Unicode Consortium.
+  - Cases including single surrogates will be skipped.
+
+2012.003_13  Mon Mar 12 2012 - Withdrawn
+
+2012.003_11  Mon Mar 12 2012 - Withdrawn
+
+2012.02  Sat Feb 04 2012
+! t/01break.t
+  - Added Sanskrit case.
+
+2012.001_29  Sun Jan 29 2012
+# trunk, Unicode data 6.1.0 beta.
+! LineBreak.xs
+  - Bug Fix: lbclass() & eawidth() return wrong values for strings with
+    single non-ASCII byte, e.g. lbclass("\x{A0}") returns such as LB_H3.
+  - Chg: CharMax may be 0 (unlimited).  NOTE: this feature has not been
+    tested enough. 
+  - Added new option ViramaAsJoiner.
+! Makefile.PL
+  - Needs Sombok >= 2.1.0beta2.
+  - fix: Solaris sh blames test with ``-e''.  Use ``-f''.
+! lib/Unicode/LineBreak.pm
+  - Chg: New option ViramaAsJoiner which is by default "YES".
+! lib/Unicode/LineBreak.pod
+! lib/Unicode/LineBreak/JA_JP.pod
+  - Update documentation:
+    - Added descriptions about LBC CJ & HL.
+    - Modify citation:
+      [UAX #11] really had not been revised after rev. 19 (2009).
+    - Added citation for [JLREQ].
+! t/00LineBreakText.t
+  - skip empty data.
++ t/17prop.h
+  - added for fix on LineBreak.xs
+
+2011.12  Sat Dec 17 2011
+# Backport from trunk with Unicode data 6.0.0.
+! LineBreak.xs
+  - Bug Fix: lbclass() & eawidth() return wrong values for strings with
+    single non-ASCII byte, e.g. lbclass("\x{A0}") returns LB_H3.
++ t/17prop.t
+  - added for fix on LineBreak.xs
+
+2011.11  Tue Nov 01 2011
+# Backport from trunk with Unicode data 6.0.0.
++ debian/*
+  - Added Debian packaging info at Debian sid, packaged by Emmanuel Bouthenot.
+! GPL
+  - Street address of FSF: CPAN RT #69999.
+! lib/Text/LineFold.pm:
+  - Bump up version to 2011.10.
+  - _is_indirect(): Simplified as enhancement of lbrule().
+! lib/Unicode/LineBreak.pod
+! lib/Unicode/LineBreak/JA_JP.pod
+  - Some updates.
+! Makefile.PL
+  - Bundle LineBreakTest.txt in dist for test #00.
+! META.yml
+  - Quote abstract containing `#'.
+! sombok/*
+  - Bundled Sombok 2.0.6.
+! t/00LineBreakText.t
+  - Now all tests shall be past.
+  - Add test names.
+! t/01break.t
+  - Added Hebrew (he) test.
+
+2011.010_26  Wed Oct 26 2011
++ debian/*
+  - Added Debian packaging info at Debian sid, packaged by Emmanuel Bouthenot.
+! lib/Text/LineFold.pm:
+  - Bump up version to 2011.10.
+  - _is_indirect(): Simplified as enhancement of lbrule().
+! LineBreak.xs:
+  - lbrule(): Use new linebreak_get_lbrule() instead of linebreak_lbrule().
+! Makefile.PL
+  - Try getting LineBreakTest.txt for test #00.
+! t/00LineBreakText.t
+  - Now all tests shall be past.
+! sombok/*
+  - Bundled Sombok 2.0.6beta2.
+
+2011.010_21  Fri Oct 21 2011
+! GPL
+  - Street address of FSF: CPAN RT #69999.
+! lib/Unicode/LineBreak.pod
+! lib/Unicode/LineBreak/JA_JP.pod
+  - Some updates.
+! Makefile.PL
+  - Requires Sombok >= 2.0.6.
+! META.yml
+  - Quote abstract containing `#'.
+! t/00LineBreakTest.t
+  - Add test names.
+! t/01break.t
+  - Added Hebrew (he) test.
+
+2011.05  Sun May 01 2011
+! Makefile.PL
+  - Pass (full) names of ar & ranlib to configure: link fails if they were not
+    found in PATH (e.g. Solaris; ar is under /usr/ccs/bin).
+  - New versioning scheme of Sombok.  See sombok/ChangeLog.
+! lib/Text/LineFold/JA_JP.pod
+  - typo.
+! perl-Unicode-LineBreak.spec
+  - Update %{sombok_version}. increased epoch.
+! t/07sea.t
+! t/08partial.t
+  - Skip tests with older libthai: see CPAN RT #61922.
+! t/16regex.t
+  - Skip tests when perlbug #82302 was detected (Perl 5.13.8 around 300-388).
+
+2011.04.26  Sat Apr 16 2011
+! lib/Text/LineFold.pm
+! lib/Text/LineFold/JA_JP.pod
+  - Small fixes.
+! lib/Unicode/LineBreak.pod
+! lib/Unicode/LineBreak/JA_JP.pod
+  - Added example usage of hashref override.  Small fixes.
+! sombok
+  - Update to 2011.5RC: Fix CPAN RT #67505 Long URLs cause infinite loop.
+! MANIFEST
+  - Eliminate sombok/data and some of sombok/src/* from CPAN distribution.
+    To get full package of Sombok see <http://sf.net/projects/linefold/>.
+
+2011.04  Fri Apr 01 2011
++ perl-Unicode-LineBreak.spec
+  - RPM spec file.
+! LineBreak.xs
+  - New constant SOMBOK_VERSION.
+! Makefile.PL
+  - requires sombok >= 2011.4: compilation failed by Solaris cc.
+
+2011.03.21  Mon Mar 21 2011
+! Makefile.PL
+  - MYEXTLIB: avoid compilation failure due to parallel execution by make.
+! lib/Unicode/LineBreak.pod
+! lib/Unicode/LineBreak/JA_JP.pod
+  - Doc: U+3xxxx (a.k.a. Tertiary Ideographic Plane) contains old hanzi.
+
+2011.003_13  Sun Mar 13 2011
+! lib/Unicode/GCString/JA_JP.pod
+! lib/Unicode/LineBreak.pod
+! lib/Unicode/LineBreak/JA_JP.pod
+  - Update REFERENCES.
+! Makefile.PL
+  - removed sombok/configure dependency.
+  - added dist PREOP to correct timestamp of files included into distribution.
+  - possible fix for RT #61922, about libthai.  Requires sombok >= 2011.3.
+
+2011.03.05  Sat Mar 05 2011
+! lib/Unicode/LineBreak.pm
+  - Chg: CharactersMax, ColumnsMax, ColumnsMin, SizingMethod & UrgentBreaking
+    are renamed to CharMax, ColMax, ColMin, Sizing & Urgent, respectively.
+    Old names may also be used.
+! LineBreak.xs
+  - Bug Fix: Unicode::LineBreak: Cannot update config from inside Perl
+    callbacks.
+  - Fix: Unicode::LineBreak::_config(): Suppress ``Use of uninitialized value
+    in subroutine entry'' warning.
+  - Imp: Unicode::GCString::substr(): replacement may be also Unicode
+    string.
+  - Imp: Functions croak using strerror().
+  - Imp: Now Unicode::LineBreak & Unicode::GCString are SvREADONLY_on()'ed.
+! typemap
+  - Unify maps for unistr_t * and gcstring_t *.
+  - Added notes.
+! t/00LineBreakTest.t
+  - Simplified code.
+! t/lf.pl
+! t/04fold.t
+  - Added tests.
+! lib/Unicode/LineBreak.pod
+! lib/Unicode/LineBreak/JA_JP.pod
+  - Updated.
+
+2011.03  Sat Mar 05 2011 - Withdrawn.
+
+2011.002_26  Sat Feb 26 2011
+! lib/Unicode/LineBreak/Constants.pm
+  - ``LEFT_'' and ``RIGHT_'' are inappropriate on right-to-left contexts.
+    Use ``BACKWORD_'' and ``FORWARD_'' instead.
+! lib/Unicode/LineBreak.pm
+  - Moved codes for custom property maps to XS.
+  - Chg: TailorEA & TailorLB options are obsoleted. Use EAWidth & LBClass
+    options instead.
+! LineBreak.xs
+  - Removed _loadmap(): use linebreak_update_*().
+  - Removed _propvals(): Added EAWidths() and LBClasses() to get prop. vals.
+  - Fix: Stash (instance of hashref) was not allocated at construction time.
+  - Most of conversions between C and Perl are moved to typemap.
+! typemap
+  - Added typemap for linebreak_t *, gcstring_t *, unistr_t *, generic string
+    etc.
+! t/03ns.t
+  - Added tests for obsoleted TailorLB option.
+! t/06context.t
+  - Added tests for obsoleted TailorEA option.
+! Makefile.PL
+  - Requires sombok >= 2011.2beta1.
+
+2011.002_19  Sat Feb 19 2011
+	* Update ppport.h to 3.19.
+	* Most of config() codes are moved to XS.
+	* Cleanup handling of REGEXP in XS.
+
+2011.002_11  Fri Feb 11 2011
+	* Imp: regex matching are moved to XS.
+	* Chg: instead of UserBreaking option, use Prep option.
+	* Requires Sombok >= 2011.1RC.
+
+2011.01  Thu Jan 20 2011
+	* New major release.
+	* Requires Sombok >= 2011.0.
+
+Important Changes beside Unicode-LineBreak-1.x:
+
+	* 1.x had memory leaks & potantial buffer overrun vulnerabilities.
+	  Switching to release 20XX is strongly recommended.
+	* Major changes of public interface:
+	  - Format callback name "DEFAULT" was deprecated. Use "SIMPLE".
+	  - SizingMethod callback name "DEFAULT" was deprecated. Use "UAX11".
+	  - SizingMethod callback with extra 6th argument was deprecated.
+	  - UrgentBreaking callback name "NONBREAK" was deprecated. Use undef.
+	  - UrgentBreaking callback MUST take two arguments, NOT five.
+	  - In array context, break() and break_partial() return an array
+	    of lines.
+	* Linebreak library package was renamed to Sombok.
+
+About change history until release 1.x see Changes.REL1 file.
+
+	Local Variables:
+	mode: change-log
+	change-log-default-name: "Changes"
+	tab-width: 2
+	left-margin: 2
+	End:

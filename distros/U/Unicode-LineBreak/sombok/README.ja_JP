@@ -1,0 +1,60 @@
+=========================================
+Sombok - ユニコードテキスト分節パッケージ
+=========================================
+
+Sombok is Copyright (C) 2009-2014, by Hatuka*nezumi - IKEDA Soji.
+
+It is free software; you can redistribute it and/or modify it under the
+terms of either:
+
+a) the GNU General Public License as published by the Free Software
+   Foundation; either version 1, or (at your option) any later version,
+   or
+
+b) the "Artistic License".
+
+----
+
+See the COPYING and the ARTISTIC files for more details.
+
+これはなにか
+============
+
+ソンボク (sombok) ライブラリパッケージは、ユニコード標準附属書14 (UAX 
+#14) に述べる「ユニコード行分割アルゴリズム」を実行できます。附属書11 
+(UAX #11) で定義する East_Asian_Width 参考特性を考慮して行分割位置を決定
+できます。またこのパッケージでは、附属書29 (UAX #29) で述べる「初期の」
+書記素クラスタをも実装しています。
+
+ソンボクの入手
+==============
+
+ソンボクは次の場所で入手できます。
+    https://github.com/hatukanezumi/sombok.git
+
+インストール
+============
+
+INSTALL.ja_JP を参照。
+
+名前
+====
+
+「ソンボク」の名は、朝鮮語で「すぱっと切る」という様子を表す擬態語 (「サ
+ンバク」も使います) にちなんでいます。クメール語の「ソンボック」や
+アフリカーンス語の「シャンボク」とは関係ありません。
+
+言語バインディング
+==================
+
+Perl
+    Unicode-LineBreak: http://search.cpan.org/dist/Unicode-LineBreak/
+
+Python
+    pytextseg: http://pypi.python.org/pypi/pytextseg/
+
+著者
+====
+
+Hatuka*nezumi - IKEDA Soji <hatuka(at)nezumi.nu>.
+

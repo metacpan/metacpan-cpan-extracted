@@ -1,0 +1,6 @@
+<input type="hidden" name="bar" value="3" />
+<input type="hidden" name="bar" value="7" />
+<input type="hidden" name="bog" value="abc" />
+<input type="hidden" name="fluffy" value="3" />
+<input type="hidden" name="foo" value="1" />
+<input type="hidden" name="foo" value="2" />

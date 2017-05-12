@@ -1,0 +1,23 @@
+
+CuiFinder User Options: 
+   --config option set
+
+
+UMLS-Interface Configuration Information
+  Sources (SAB):
+    MTH
+  Relations (REL):
+    RB
+    RN
+  Database: 
+    umls (MMSYS-2010AB-20101022)
+
+
+
+PathFinder User Options:
+  --realtime option set
+
+
+
+The shortest path between elbow (C0013769) and hand (C0018563):
+  => C0013769 (Elbow(s)) C0446516 (Upper arm) C0018563 (Hand, NOS) 

@@ -1,0 +1,22 @@
+Build.PL
+Changes
+lib/USB/Descriptor.pm
+lib/USB/Descriptor/Configuration.pm
+lib/USB/Descriptor/Device.pm
+lib/USB/Descriptor/Endpoint.pm
+lib/USB/Descriptor/Interface.pm
+lib/USB/HID.pm
+lib/USB/HID/Descriptor/Class.pm
+lib/USB/HID/Descriptor/Interface.pm
+lib/USB/HID/Descriptor/Report.pm
+lib/USB/HID/Report.pm
+lib/USB/HID/Report/Field.pm
+MANIFEST			This list of files
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+Makefile.PL
+META.yml
+META.json

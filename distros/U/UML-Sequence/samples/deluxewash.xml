@@ -1,0 +1,68 @@
+<?xml version='1.0' ?>
+<sequence>
+<class_list>
+  <class name='AtHome' born='0' extends-to='14'>
+    <activation_list>
+      <activation born='0' extends-to='14' offset='0' />
+    </activation_list>
+  </class>
+  <class name='Garage' born='1' extends-to='14'>
+    <activation_list>
+      <activation born='1' extends-to='1' offset='0' />
+      <activation born='5' extends-to='5' offset='0' />
+      <activation born='6' extends-to='8' offset='0' />
+      <activation born='8' extends-to='8' offset='1' />
+      <activation born='12' extends-to='12' offset='0' />
+      <activation born='13' extends-to='13' offset='0' />
+      <activation born='14' extends-to='14' offset='0' />
+    </activation_list>
+  </class>
+  <class name='Kitchen' born='2' extends-to='4'>
+    <activation_list>
+      <activation born='2' extends-to='4' offset='0' />
+      <activation born='3' extends-to='3' offset='1' />
+      <activation born='4' extends-to='4' offset='1' />
+    </activation_list>
+  </class>
+  <class name='Driveway' born='9' extends-to='11'>
+    <activation_list>
+      <activation born='9' extends-to='9' offset='0' />
+      <activation born='10' extends-to='10' offset='0' />
+      <activation born='11' extends-to='11' offset='0' />
+    </activation_list>
+  </class>
+</class_list>
+
+<arrow_list>
+  <arrow from='AtHome' to='Garage' type='call' label='retrieve bucket'
+         from-offset='0' to-offset='0' >
+<annotation text="the bucket is in the garage " />
+</arrow>
+  <arrow from='AtHome' to='Kitchen' type='call' label='prepare bucket '
+         from-offset='0' to-offset='0' />
+  <arrow from='Kitchen' to='Kitchen' type='call' label='pour soap in bucket '
+         from-offset='0' to-offset='1' />
+  <arrow from='Kitchen' to='Kitchen' type='call' label='fill bucket '
+         from-offset='0' to-offset='1' />
+  <arrow from='AtHome' to='Garage' type='call' label='get sponge '
+         from-offset='0' to-offset='0' />
+  <arrow from='AtHome' to='Garage' type='call' label='checkDoor '
+         from-offset='0' to-offset='0' />
+  <arrow from='_EXTERNAL' to='Garage' type='async' label='clickDoorOpener '
+         from-offset='0' to-offset='0' />
+  <arrow from='Garage' to='Garage' type='call' label='[ ifDoorClosed ] open door '
+         from-offset='0' to-offset='1' />
+  <arrow from='AtHome' to='Driveway' type='call' label='* apply soapy water '
+         from-offset='0' to-offset='0' />
+  <arrow from='AtHome' to='Driveway' type='call' label='rinse  !'
+         from-offset='0' to-offset='0' />
+  <arrow from='AtHome' to='Driveway' type='call' label='empty bucket '
+         from-offset='0' to-offset='0' />
+  <arrow from='AtHome' to='Garage' type='call' label='close door '
+         from-offset='0' to-offset='0' />
+  <arrow from='AtHome' to='Garage' type='call' label='replace sponge '
+         from-offset='0' to-offset='0' />
+  <arrow from='AtHome' to='Garage' type='call' label='replace bucket '
+         from-offset='0' to-offset='0' />
+</arrow_list>
+</sequence>

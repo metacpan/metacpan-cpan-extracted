@@ -1,0 +1,40 @@
+---
+abstract: 'Common helper functions without having to import them'
+author:
+  - 'Lukas Atkinson (cpan: AMON) <amon@cpan.org>'
+build_requires:
+  Test::Exception: '0'
+  Test::More: '0.94'
+  Test::Warn: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Util-Underscore
+recommends:
+  perl: v5.12.0
+requires:
+  Carp: '0'
+  Const::Fast: '0.011'
+  Data::Dump: '1.10'
+  IPC::Run: '0.92'
+  List::MoreUtils: '0.07'
+  List::Util: '1.35'
+  POSIX: '0'
+  Path::Class: '0'
+  Scalar::Util: '1.36'
+  Try::Tiny: '0.03'
+  overload: '0'
+  perl: v5.10.1
+  strict: '0'
+  version: '0.77'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/latk/p5-Util-Underscore/issues
+  repository: git://github.com/latk/p5-Util-Underscore.git
+version: v1.4.1
+x_serialization_backend: 'YAML::Tiny version 1.69'

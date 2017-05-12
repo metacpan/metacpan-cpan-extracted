@@ -1,0 +1,84 @@
+Revision history for Perl extension UML::Sequence.
+
+0.08 Tue Sep 11 17:08:45 CDT 2007
+    - Corrected test suite so tests needing to shell out call $^X to get
+      their perl instead of getting the firt perl in the path.
+      Thanks to Andreas Koenig for finding this problem.
+
+0.07 Fri Sep  8 17:42:58 CDT 2006
+    - Corrected error that disallowed array ref returns from grab_methods.
+      That caused the PerlSeq and PerlOOSeq backends to fail, since that's
+      what they choose to return.  Thanks to CPAN user NKH for pointing
+      this out with enough detail for me to fix it.
+
+0.06	Tue Jan 31 2006 (D. Arnold)
+	- significat updates to UML::Sequence::SimpleSeq:
+		- '*' iterator indicator
+		- '->' async event intro indicator; renders as halfarrow
+		- '!' urgent indicator (for PSiCHE/Thread::Apartment)
+		- '[text]' conditional indicator
+		- '/*' annotation '*/' support
+		- 'class.method -> returns' syntax
+
+	- updated genericseq.source to add grab_methods() ref to 
+		build_xml_sequence() params
+
+	- updated UML::Sequence::Svg:
+		- added '-[pP] pathname' option to specify classdocs path; 
+			renders as hyperlinks for classnames and methods
+		- added '-c color' to render color of class boxes
+		- added '-a color' to render color of activation boxes
+		- added rendering of return arrows
+		- changed arrow label positions to cuddle arrowheads
+		- slightly increased arrowhead size
+		- added -x charWidth, -y charHeight options to specify text sizes
+		- added text wrapping for class names to fit class boxes
+		- added -g arrow-gap option to adjust inter-arrow spacing
+		- added -[mM] html-file imagemap option
+		- added -w classBoxWidth option to adjust spacing of class boxes
+		- added -e option to render ordered list of annotations
+			after imagemap, and append superscript w/ hyperlinks
+			to the annotation to the arrow labels
+		- added -j option to render annotations as Javascript'ed
+			tooltips in the imagemap links
+
+	- added deluxewash samples
+	- added 07deluxe.t, 08edeluxesvg.t, 09jdeluxe.t, 10raster.t to tests
+	- added UML::Sequence::Raster.pm, which renders a raster image
+		of the diagram using GD/GD::Text
+	- removed "EDIT HISTORY" sections from all modules
+
+0.05  Tue Sep 30 13:50:54 CDT 2003
+      Corrected NAME entry in pod for genericseq.source so that html links
+      on CPAN are not broken for it.
+      Corrected t/03java.t to reflect the new instance oriented approach
+      (boxes at the top of the diagram now have instance names in addition
+      to class names).
+      Corrected directory structure so Devel modules deploy correctly.
+      Expanded samples README to explain that method and function are
+      interchangeable so far as the modules are concerned.
+      Cleaned test directory.
+
+0.04  Tue Mar 11 08:10:33 CST 2003
+      Changed t/02perl.t and t/03perl.t so they ignore the first line of the
+      sequence outline.  On some Perls (including a 5.8 on Solaris 2.4)
+      the first line is '    (eval)' instead of 'main'.  I think the effect
+      on the pictures will be minor: (eval) will replace main as the label
+      for the left most class box (but I could be wrong).
+
+0.03  Mon Mar 10 13:41:26 CST 2003
+      Modified Makefile.PL so the shebang line will be right more often.
+
+      Added output to failing tests so I have a better chance to see what
+      is wrong on someone else's box.
+
+0.02  Fri Feb 28 08:06:52 CST 2003
+      Introduced UML::Sequence::PerlOOSeq and modified UML::Sequence::JavaSeq
+      so these no longer conflate distinct instances onto the same life line
+
+      Added samples directory with instructions for making them.
+
+0.01  Sat Jan 18 12:49:35 2003
+	- original version; created by h2xs 1.20 with options
+		-XA -n UML::Sequence
+

@@ -1,0 +1,42 @@
+---
+abstract: 'the duri and tdb URI schemes'
+author:
+  - 'Toby Inkster <tobyink@cpan.org>'
+  - 'TOBYINK <tobyink@cpan.org>'
+build_requires:
+  Test::More: '0.61'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.016, CPAN::Meta::Converter version 2.140640'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: URI-duri
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  URI::duri:
+    file: lib/URI/duri.pm
+    version: '0.003'
+  URI::tdb:
+    file: lib/URI/tdb.pm
+    version: '0.003'
+requires:
+  DateTime::Incomplete: '0'
+  URI: '0'
+resources:
+  X_identifier: http://purl.org/NET/cpan-uri/dist/URI-duri/project
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=URI-duri
+  homepage: https://metacpan.org/release/URI-duri
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-uri-duri.git
+version: '0.003'

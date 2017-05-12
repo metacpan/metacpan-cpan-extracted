@@ -1,0 +1,52 @@
+
+
+=pod
+
+=head1 NAME
+
+ur init - create a new ur app with default classes in place
+
+
+
+=head1 VERSION
+
+This document describes ur init version 0.29.
+
+=head1 SYNOPSIS
+
+ur init NAMESPACE [DB]
+
+
+
+=head1 REQUIRED ARGUMENTS
+
+=over
+
+
+=item NAMESPACE  I<Text>
+
+the name of the namespace/app to create
+
+
+=back
+
+=head1 OPTIONAL ARGUMENTS
+
+=over
+
+
+=item DB  I<Text>
+
+the (optional) DBI connection string for the primary data source
+
+
+=back
+
+=head1 DESCRIPTION:
+
+  !!! define help_detail() in module 
+
+
+
+=cut
+

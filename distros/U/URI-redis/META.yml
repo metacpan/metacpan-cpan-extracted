@@ -1,0 +1,28 @@
+---
+abstract: 'URI for Redis connection info'
+author:
+  - 'Norbert Buchmueller.'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::Most: '0.21'
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: URI-redis
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  URI: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/mendel/URI-redis.git
+version: '0.02'

@@ -1,0 +1,40 @@
+---
+abstract: 'Provides UNIVERSAL::DOES() method for older perls'
+author:
+  - 'Goro Fuji (gfx) <gfuji(at)cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::More: 0.47
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v2.1.1, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: UNIVERSAL-DOES
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  UNIVERSAL::DOES:
+    file: lib/UNIVERSAL/DOES.pm
+    version: 0.005
+requires:
+  perl: v5.8.1
+resources:
+  bugtracker: https://github.com/gfx/Perl-UNIVERSAL-DOES/issues
+  homepage: https://github.com/gfx/Perl-UNIVERSAL-DOES
+  repository: git://github.com/gfx/Perl-UNIVERSAL-DOES.git
+version: 0.005
+x_contributors:
+  - 'Fuji, Goro <g.psy.va@gmail.com>'
+  - 'FUJI Goro (gfx) <gfuji@cpan.org>'

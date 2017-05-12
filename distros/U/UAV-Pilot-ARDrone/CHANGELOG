@@ -1,0 +1,48 @@
+1.1 2015-08-22
+
+- Install bin/ scripts under Dist::Zilla
+
+1.0 2015-06-09
+
+- Fileno video decoding can dump to file on its own
+- Cleanup dependency error on UAV::Pilot::SDL::Joystick in tests
+
+1.0_1 2014-06-11
+
+- Fix config dependency regarding ShareDir
+
+1.0_0 2014-06-05
+
+- Bump version number.  Really, that's it.
+
+0.6 2014-06-05
+
+- Fix joystick interface
+
+0.5 2014-06-04
+- ::Control::Events won't do the NavFeeder role if SDL extensions are not 
+  installed
+
+0.4 2014-06-03
+
+- ::Control::Events won't use UAV::Pilot::SDL::Joystick if it's not installed
+
+0.3 2014-05-29
+
+- Port build to Dist::Zilla
+- Actually release some things under UAV/Pilot/ARDrone/Video/ that were meant 
+  to go with v0.2
+
+
+0.2 2014-04-27
+
+- Added bin/ardrone_display_video.pl for displaying video from a stream on STDIN
+  or using a file descriptor
+- Added UAV::Pilot::ARDrone::Video::Stream to output the video stream directly 
+  to a filehandle
+- Nav data parsing now parses floats correctly for roll/pitch/yaw
+- Busywork like license headers
+
+0.1 2014-02-16
+
+- Initial breakoff from UAV::Pilot main distro

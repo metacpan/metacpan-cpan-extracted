@@ -1,0 +1,10 @@
+README
+lib/UDCode.pm
+Makefile.PL
+MANIFEST
+t/01.basic.t
+t/02_is_udcode.t
+t/03_is_prefix_of.t
+t/04_subtract.t
+t/05_ud_pair.t
+META.yml                                 Module meta-data (added by MakeMaker)

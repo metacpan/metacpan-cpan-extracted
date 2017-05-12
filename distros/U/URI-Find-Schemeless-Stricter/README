@@ -1,0 +1,39 @@
+NAME
+    URI::Find::Schemeless::Stricter - Find schemeless URIs in arbitrary
+    text.
+
+SYNOPSIS
+            require URI::Find::Schemeless::Stricter;
+
+            my $finder = URI::Find::Schemeless::Stricter->new(\&callback);
+
+    The rest is the same as URI::Find::Schemeless.
+
+DESCRIPTION
+  schemeless_uri_re
+    URI::Find finds absolute URIs in plain text with some weak heuristics
+    for finding schemeless URIs. This subclass is for finding things which
+    might be URIs in free text. It is slightly stricter than
+    URI::Find::Schemeless, as it finds things like "www.foo.com" but not
+    "lifes.a.bitch.if.you.aint.got.net"; it finds "1.2.3.4/foo" but not
+    "1.2.3.4". This should mean your sectioned lists no longer get marked up
+    as URLs...
+
+AUTHOR
+    Current maintainer: Tony Bowden
+
+    Original author: Simon Cozens
+
+BUGS and QUERIES
+    Please direct all correspondence regarding this module to:
+    bug-URI-Find_Schemeless-Stricter@rt.cpan.org
+
+COPYRIGHT AND LICENSE
+    Copyright 2003 - 2005 by Kasei Ltd.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    URI::Find, URI::Find::Schemeless
+

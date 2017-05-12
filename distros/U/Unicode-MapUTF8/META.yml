@@ -1,0 +1,19 @@
+---
+name: Unicode-MapUTF8
+version: 1.11
+author:
+  - Benjamin Franz <snowhare@nihongo.org>
+abstract: Conversions to and from arbitrary character sets and UTF8
+license: perl
+requires:
+  Carp: 0
+  File::Copy: 0
+  Jcode: 0
+  Unicode::Map: 0
+  Unicode::Map8: 0
+  Unicode::String: 0
+provides:
+  Unicode::MapUTF8:
+    file: lib/Unicode/MapUTF8.pm
+    version: 1.11
+generated_by: Module::Build version 0.261

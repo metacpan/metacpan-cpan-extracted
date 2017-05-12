@@ -1,0 +1,6 @@
+Revision history for Perl extension Ubigraph.
+
+0.01  Mon Oct 27 12:27:15 2008
+	- original version; created by h2xs 1.23 with options
+		-X -A Ubigraph
+

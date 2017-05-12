@@ -1,0 +1,79 @@
+{
+   "abstract" : "Extract search strings from more referrers.",
+   "author" : [
+      "Olaf Alders <olaf@wundercounter.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "URI-ParseSearchString-More",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Module::Build" : "0.28"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Spelling" : "0.12"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "List::Compare" : "0",
+            "Params::Validate" : "0",
+            "Test::WWW::Mechanize" : "1.44",
+            "Try::Tiny" : "0",
+            "URI" : "0",
+            "URI::Heuristic" : "0",
+            "URI::ParseSearchString" : "0",
+            "URI::QueryParam" : "0",
+            "WWW::Mechanize::Cached" : "0",
+            "base" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Config::General" : "0",
+            "Test::Most" : "0",
+            "Test::RequiresInternet" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/oalders/URI-ParseSearchString-More/issues"
+      },
+      "homepage" : "https://metacpan.org/release/URI-ParseSearchString-More",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/oalders/uri-parsesearchstring-more.git",
+         "web" : "https://github.com/oalders/uri-parsesearchstring-more"
+      }
+   },
+   "version" : "0.17",
+   "x_contributors" : [
+      "Olaf Alders <admin@ww1.wundercounter.com>",
+      "Olaf Alders <olaf@wundersolutions.com>",
+      "root <root@ww1.wundercounter.com>"
+   ]
+}
+

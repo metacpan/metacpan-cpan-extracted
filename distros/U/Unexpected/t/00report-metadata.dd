@@ -1,0 +1,44 @@
+do { my $x = {
+       'build' => {
+                    'requires' => {
+                                    'Module::Build' => '0.4004',
+                                    'version' => '0.88'
+                                  }
+                  },
+       'configure' => {
+                        'requires' => {
+                                        'Module::Build' => '0.4004',
+                                        'version' => '0.88'
+                                      }
+                      },
+       'runtime' => {
+                      'requires' => {
+                                      'Devel::StackTrace' => '1.34',
+                                      'Exporter::Tiny' => '0.042',
+                                      'Module::Runtime' => '0.014',
+                                      'Moo' => '2.000001',
+                                      'Package::Stash' => '0.37',
+                                      'Sub::Install' => '0.928',
+                                      'Type::Tiny' => '1.000002',
+                                      'namespace::autoclean' => '0.26',
+                                      'perl' => '5.010001'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'File::Spec' => '0',
+                                   'Module::Build' => '0.4004',
+                                   'Module::Metadata' => '0',
+                                   'Sys::Hostname' => '0',
+                                   'Test::Requires' => '0.08',
+                                   'Try::Tiny' => '0.22',
+                                   'strictures' => '1.005004',
+                                   'version' => '0.88'
+                                 }
+                 }
+     };
+  $x;
+ }

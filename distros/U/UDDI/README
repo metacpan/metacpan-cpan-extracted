@@ -1,0 +1,23 @@
+This is a simple perl implementation of the UDDI inquire interface.
+You can find out more about UDDI at http://www.uddi.org.
+
+The UDDI module provide functions that let you send requests to the
+UDDI database servers.
+
+This release is to be regarded as an alpha.  Documentation is lacking.
+Interface still subject to change.
+
+Usage is something like this:
+
+   use UDDI;
+
+   my $list = UDDI::find_business(name => "a");
+   my $bis = $list->businessInfos;
+   for my $b ($bis->businessInfo) {
+       print $b->name, "\n";
+   }
+
+Copyright 2000 ActiveState Tool Corp.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

@@ -1,0 +1,128 @@
+=head1 NAME
+
+Unix::Statgrab::sg_host_info - container for libstatgrab host information
+
+=head1 DESCRIPTION
+
+C<Unix::Statgrab::sg_host_info> is a Perl package name providing
+accessors to bundled libstatgrab L<sg_host_info|http://www.i-scream.org/libstatgrab/docs/sg_get_host_info.3.html> host information.
+
+=head1 METHODS
+
+=head2 nentries
+
+Returns the number of entries in the container.
+
+=head2 systime
+
+Returns the seconds since Epoch (0:00:00 on January, 1st 1970) of the time measure the host information.
+
+=head2 as_list
+
+B<Deprecated> alias of L</fetchall_hash>
+
+=head2 fetchall_hash
+
+Returns all records from L<sg_host_info|http://www.i-scream.org/libstatgrab/docs/sg_get_host_info.3.html>
+container as list of hash containing each datum name as key and the datum as value.
+
+=head2 fetchall_array
+
+Returns all records from L<sg_host_info|http://www.i-scream.org/libstatgrab/docs/sg_get_host_info.3.html>
+container as list of arrays containing the values in following order:
+
+  (os_name os_release os_version platform hostname bitwidth host_state ncpus maxcpus uptime systime)
+
+in that order without leading headline.
+
+=head2 fetchall_table
+
+Returns all records from L<sg_host_info|http://www.i-scream.org/libstatgrab/docs/sg_get_host_info.3.html>
+container as list of arrays containing the values in following order:
+
+  (os_name os_release os_version platform hostname bitwidth host_state ncpus maxcpus uptime systime)
+
+in that order including leading headline.
+
+=head2 fetchrow_arrayref($row = 0)
+
+Returns one row as array containing values as above.
+
+=head2 fetchall_arrayref
+
+Returns all records from L<sg_host_info|http://www.i-scream.org/libstatgrab/docs/sg_get_host_info.3.html>
+container as array of arrays without header.
+
+=head2 fetchrow_hashref($row = 0)
+
+Returns one row as hash containing C<< { os_name => $self.os_name($row), os_release => ... } >>.
+
+=head2 fetchall_hashref
+
+Returns all records from L<sg_host_info|http://www.i-scream.org/libstatgrab/docs/sg_get_host_info.3.html>
+container as array of hashes.
+
+=head2 colnames
+
+Returns list of column names: C<< (os_name os_release os_version platform hostname bitwidth host_state ncpus maxcpus uptime systime) >>
+
+=head2 os_name
+
+Name of operating system
+
+=head2 os_release
+
+Release number as string
+
+=head2 os_version
+
+Complete version string for operating system
+
+=head2 platform
+
+Name of the platform
+
+=head2 hostname
+
+Hostname
+
+=head2 bitwidth
+
+Host/Machine bitwidth
+
+=head2 host_state
+
+One of
+
+  sg_unknown_configuration
+  sg_physical_host
+  sg_virtual_machine
+  sg_paravirtual_machine
+  sg_hardware_virtualized
+
+=head2 ncpus
+
+Number of currently configured cpu's
+
+=head2 maxcpus
+
+Number of maximum configurable cpu's
+
+=head2 uptime
+
+System is up since C<uptime> seconds
+
+=head1 AUTHOR
+
+Jens Rehsack, E<lt>rehsack AT cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2012-2015 by Jens Rehsack
+
+This library is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 2.1 of the License, or (at your option) any
+later version.
+
+=cut

@@ -1,0 +1,65 @@
+NAME
+    URI::Template - Object for handling URI templates (RFC 6570)
+
+SYNOPSIS
+        use URI::Template;
+   
+        my $template = URI::Template->new( 'http://example.com/{x}' );
+        my $uri      = $template->process( x => 'y' );
+
+        # or
+    
+        my $template = URI::Template->new();
+        $template->template( 'http://example.com/{x}' );
+        my $uri      = $template->process( x => 'y' );
+    
+        # uri is a URI object with value 'http://example.com/y'
+
+DESCRIPTION
+    This module provides a wrapper around URI templates as described in RFC
+    6570: <http://tools.ietf.org/html/rfc6570>.
+
+INSTALLATION
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+METHODS
+  new( $template )
+    Creates a new URI::Template instance with the template passed in as the
+    first parameter (optional).
+
+  template( $template )
+    This method returns the original template string. If provided, it will
+    also set and parse a new template string.
+
+  variables
+    Returns an array of unique variable names found in the template (in the
+    order of appearance).
+
+  expansions
+    This method returns an list of expansions found in the template.
+    Currently, these are just coderefs. In the future, they will be more
+    interesting.
+
+  process( \%vars )
+    Given a list of key-value pairs or an array ref of values (for
+    positional substitution), it will URI escape the values and substitute
+    them in to the template. Returns a URI object.
+
+  process_to_string( \%vars )
+    Processes input like the "process" method, but doesn't inflate the
+    result to a URI object.
+
+AUTHORS
+    *   Brian Cassidy <bricas@cpan.org>
+
+    *   Ricardo SIGNES <rjbs@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2007-2015 by Brian Cassidy
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

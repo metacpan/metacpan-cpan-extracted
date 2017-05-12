@@ -1,0 +1,19 @@
+---
+name: Util-SelfDestruct
+version: 1.21
+author:
+  - Nicola Worthington <nicolaw@cpan.org>
+abstract: Conditionally prevent execution of a script
+license: open_source
+requires:
+  Carp: 0
+build_requires:
+  Test: 0
+  Test::More: 0
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+provides:
+  Util::SelfDestruct:
+    file: lib/Util/SelfDestruct.pm
+    version: 1.21
+generated_by: Module::Build version 0.2611

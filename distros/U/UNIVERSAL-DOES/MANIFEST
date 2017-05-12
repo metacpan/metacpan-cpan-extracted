@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/UNIVERSAL/DOES.pm
+t/00_load.t
+t/01_basic.t
+t/02_compat.t
+t/lib/test.pl
+xt/02_pod.t
+xt/03_pod-coverage.t
+xt/04_synopsis.t
+META.yml
+MANIFEST

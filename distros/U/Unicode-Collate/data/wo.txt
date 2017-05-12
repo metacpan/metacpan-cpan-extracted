@@ -1,0 +1,13 @@
+# eng doesn't require tailoring
+00E0;a+1
+00C0;A+1
+00E9;e+1
+00C9;E+1
+00EB;e+2
+00CB;E+2
+00F1;n+1
+00D1;N+1
+#014B;n+2
+#014A;N+2
+00F3;o+1
+00D3;O+1

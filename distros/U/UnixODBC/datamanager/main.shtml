@@ -1,0 +1,20 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!-- Data source graphics from unixODBC-2.2.1 by EasySoft. -->
+<!-- $Id: main.shtml,v 1.7 2008-01-21 09:16:56 kiesling Exp $ -->
+<HTML>
+ <BODY
+  BGCOLOR="#FFFFFF"
+  TEXT="#000000"
+ >
+<center>
+<img src="/icons/odbc.gif">
+<p>
+<font size="5">ODBC Data Manager</font><br>
+<p>
+Copyright &copy; 2002-2005, 2008 by Robert Kiesling, rkies@cpan.org.<br>
+Please read the file, &quot;Artistic,&quot; for
+licensing terms.
+</center>
+
+ </BODY>
+</HTML>

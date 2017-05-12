@@ -1,0 +1,7 @@
+Changes
+lib/Update/Immutable.pm
+Makefile.PL
+MANIFEST
+t/basic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

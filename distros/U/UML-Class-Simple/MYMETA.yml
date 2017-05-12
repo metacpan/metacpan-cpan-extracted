@@ -1,0 +1,35 @@
+---
+abstract: 'Render simple UML class diagrams, by loading the code'
+author:
+  - "Yichun \"agentzh\" Zhang (ç« äº¦æ\x98¥) C<< <agentzh@gmail.com> >>, OpenResty Inc."
+build_requires:
+  ExtUtils::MakeMaker: '6.59'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: UML-Class-Simple
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Class::Inspector: '1.16'
+  Devel::Peek: '0'
+  File::Slurp: '0'
+  File::Spec: '0'
+  IPC::Run3: '0'
+  List::MoreUtils: '0'
+  PPI: '0'
+  Template: '0'
+  XML::LibXML: '0'
+  YAML::Syck: '0'
+  perl: '5.006001'
+version: '0.22'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

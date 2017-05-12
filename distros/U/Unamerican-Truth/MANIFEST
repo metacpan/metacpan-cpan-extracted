@@ -1,0 +1,27 @@
+.cvsignore
+bin/parse-truth.pl
+Changes
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml			Module meta-data (added by MakeMaker)
+README
+sql/truth.sql
+Truth.pm
+www/add_comment.htm
+www/images/Banglogo.gif
+www/images/crypto.gif
+www/images/i-love-source-code.png
+www/images/linkbttn.gif
+www/images/lovemachine.jpg
+www/images/nonskidback.gif
+www/images/simplify.png
+www/index.html
+www/popular.htm
+www/read_comments.htm
+www/README
+www/truth.cgi
+www/truth.css
+www/truth.htm
+www/truth1.htm
+www/truth2.htm

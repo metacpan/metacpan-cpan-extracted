@@ -1,0 +1,76 @@
+
+
+=pod
+
+=head1 NAME
+
+ur update schema-diagram - Update an Umlet diagram based on the current schema
+
+
+
+=head1 VERSION
+
+This document describes ur update schema-diagram version 0.29.
+
+=head1 SYNOPSIS
+
+ur update schema-diagram --file=? [--data-source=?] [--depth=?] [--show-columns] [INITIAL-NAME]
+
+
+
+=head1 REQUIRED ARGUMENTS
+
+=over
+
+
+=item file  I<String>
+
+Pathname of the Umlet (.uxf) file
+
+
+=back
+
+=head1 OPTIONAL ARGUMENTS
+
+=over
+
+
+=item data-source  I<String>
+
+Which datasource to use
+
+=item depth  I<Integer>
+
+Max distance of related tables to include.  Default is 1.  0 means show only the named tables, -1 means to include everything
+
+=item show-columns  I<Boolean>
+
+Include column names in the diagram
+
+Default value 'true' if not specified
+
+=item noshow-columns  I<Boolean>
+
+Make show-columns 'false'
+
+=item INITIAL-NAME
+
+(undocumented)
+
+
+=back
+
+=head1 DESCRIPTION:
+
+  Creates a new Umlet diagram, or updates an existing diagram.  Bare arguments
+  are taken as table names to include in the diagram.  Other tables may be
+  included in the diagram based on their distance from the names tables
+  and the --depth parameter.
+  
+  If an existing file is being updated, the position of existing elements 
+  will not change.
+
+
+
+=cut
+

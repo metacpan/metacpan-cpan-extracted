@@ -1,0 +1,6 @@
+Revision history for Perl extension UDPServersAndClients.
+
+0.01  Wed Apr 19 15:59:46 2006
+	- original version; created by h2xs 1.23 with options
+		-X -n UDPServersAndClients
+

@@ -1,0 +1,11 @@
+# odbclogins - each line has the format server::user::password
+# IMPORTANT - make sure you chmod 0600 odbclogins, and, if using
+# UnixODBC with CGI applications, change ownership to the user and 
+# group of the httpd server - usually user nobody, group nobody, 
+# although some installations use apache or www-data, or the values 
+# of the User and Group directives in httpd.conf, if they are 
+# something different.
+# host1::user::password
+# host2::user::password
+# host3::user::password
+

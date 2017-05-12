@@ -1,0 +1,99 @@
+NAME
+    URI::Amazon::APA - URI to access Amazon Product Advertising API
+
+VERSION
+    $Id: README,v 0.1 2009/05/10 11:04:33 dankogai Exp $
+
+SYNOPSIS
+      # self-explanatory
+      use strict;
+      use warnings;
+      use URI::Amazon::APA;
+      use LWP::UserAgent;
+      use XML::Simple;
+      use YAML::Syck;
+
+      use URI::Amazon::APA; # instead of URI
+      my $u = URI::Amazon::APA->new('http://webservices.amazon.com/onca/xml');
+      $u->query_form(
+        Service     => 'AWSECommerceService',
+        Operation   => 'ItemSearch',
+        Title       => shift || 'Perl',
+        SearchIndex => 'Books',
+      );
+      $u->sign(
+        key    => $public_key,
+        secret => $private_key,
+      );
+
+      my $ua = LWP::UserAgent->new;
+      my $r  = $ua->get($u);
+      if ( $r->is_success ) {
+        print YAML::Syck::Dump( XMLin( $r->content ) );
+      }
+      else {
+        print $r->status_line, $r->as_string;
+      }
+
+EXPORT
+    None.
+
+METHODS
+    This adds the following methods to URI object
+
+  sign
+    Sings the URI accordingly to the Amazon Product Advertising API.
+
+      $u->sign(
+        key    => $public_key,
+        secret => $private_key,
+      );
+
+  signature
+    Checks the signature within the URI;
+
+      print "The signature is " : $u->signature;
+
+AUTHOR
+    Dan Kogai, "<dankogai at dan.co.jp>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-uri-amazon-apa at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=URI-Amazon-APA>. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc URI::Amazon::APA
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=URI-Amazon-APA>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/URI-Amazon-APA>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/URI-Amazon-APA>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/URI-Amazon-APA/>
+
+ACKNOWLEDGEMENTS
+    <http://docs.amazonwebservices.com/AWSECommerceService/latest/DG/index.h
+    tml?rest-signature.html>
+
+COPYRIGHT & LICENSE
+    Copyright 2009 Dan Kogai, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

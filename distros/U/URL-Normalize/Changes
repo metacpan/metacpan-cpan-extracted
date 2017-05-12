@@ -1,0 +1,153 @@
+Revision history for URL::Normalize
+
+0.35    2016-07-07
+        - Corrected the version number in the documentation.
+
+0.34    2016-07-07
+        - MAJOR: Directory indexes are NO LONGER case-sensitive, so 'Index.html'
+                 and 'index.html' are treated the same.
+        - Added more directory indexes to the default directory index list.
+        - Added more UTM-parameters to the default social query parameter list.
+        - Renamed 'add_directory_index_regexp' to 'add_dir_index_regexp'.
+        - Up requirements' versions.
+        - Improved the documentation.
+
+0.33    2015-12-12
+        - Maintenance release:
+            - Upped version numbers on required modules.
+            - Changed license to MIT.
+            - Updated dist.ini.
+
+0.32    2015-10-29
+        - ADDED: add_directory_index_regexp() can be used to add directory
+          index regexps.
+        - ADDED: add_social_query_param() can be used to add social query
+          params.
+        - Added a few tests.
+        - Improved the documentation.
+
+0.31    2015-10-28
+        - Improved the documentation.
+
+0.30    2015-10-28
+        - MAJOR UPDATE: Lots of changes under the hood, but most of the
+          functionality should behave as before, with exceptions mentioned
+          below.
+        - Improved the tests.
+        - Improved the documentation, although the API hasn't changed that
+          much.
+        - CHANGED: The constructor now only accepts a URL, _or_ a path of
+          a URL. This makes it possible to do normalizing on just the paths
+          as well, but the 'base' argument might come back in the future.
+        - REMOVED: remove_hostname_prefix() is no longer considered to be
+          the job of this module. Instead, look into Domain::PublicSuffix
+          for getting the "real" domain name from a URL.
+        - REMOVED: do_all() because it's considered too harmful.
+
+0.22    2015-09-09
+        - Added correct 'remove_social_query_parameters' call from 'do_all'.
+
+0.21    2015-03-02
+        - When removing dot segments, '/.../' will now be treated as '/./'.
+
+0.20    2014-12-12
+        - Added url method, which is an alias for get_url.
+        - Upped URI version requirement to 1.65.
+        - Improved the documentation.
+
+0.19    2014-06-03
+        - Added remove_social_query_parameters method.
+        - Improved the remove_empty_query_parameters method.
+        - Improved the documentation.
+
+0.18    2014-05-31
+        - Improved support for older Perl versions.
+
+0.17    2014-05-31
+        - remove_fragment does NOT remove the fragment (#whatever) if they
+          are part of the "logical" path, ie. "http://www.ex.com/#foo/bar"
+          will NOT be changed, but "http://www.ex.com/#foo" will be translated
+          to "http://www.ex.com/".
+          Added tests for it.
+        - remove_fragments was added, which behaves like the old
+          remove_fragment, and removes anything after a # in the URL.
+          Added tests for it.
+        - Rewrote the remove_dot_segments method totally, and it no longer
+          relies on the RFC 3986 algorithm, but something simpler or better,
+          depending on how one chooses to look at it. (jamaica)
+          Added tests for it.
+        - Improved the documentation.
+
+0.16    2013-07-21
+        - Only try to sort query parameters if there are query parameters
+          present.
+
+0.15    2013-02-18
+        - Improved error message when illegal URL and/or base is used.
+
+0.14    2013-02-07
+        - Added URL validity checking. (@Theo_vanHoesel).
+
+0.13    2012-12-18
+        - Upped the number of times remove_dot_segments can run before
+          giving up.
+
+0.12    2012-12-18
+        - Fixed a bug in remove_dot_segments where the removal of multiple
+          slashes were too aggressive.
+        - Added more tests.
+
+0.11    2012-12-13
+        - Made it possible to modify the directory index regexps, so that the
+          remove_directory_index method can be modified to your own fitting.
+        - Removed old (commented) code.
+        - Improved the documentation.
+
+0.10    2012-11-02
+        - No longer requires Moose.
+        - Added more tests.
+        - Improved the documentation.
+
+0.09    2012-10-31
+        - Fixed a bug where a cached URI object was returned from get_URI.
+        - Improved the documentation.
+
+0.08    2012-10-30
+        - Added the remove_hostname_prefix method.
+        - Exposed the get_URI method.
+        - Added more tests.
+        - Improved the documentation.
+
+0.07    2012-10-30
+        - Renamed several of the tests' filename.
+        - Improved the documentation.
+
+0.06    2012-10-30
+        - Added remove_duplicate_query_parameters method.
+        - Added remove_empty_query_parameters method.
+        - Added more tests.
+        - Improved the documentation.
+
+0.05    2012-10-30
+        - Make sure remove_dot_segments won't run for too long.
+        - Add Moose to dependencies. (tobyink)
+        - Improved the documentation.
+
+0.04    2012-10-29
+        - Added more tests.
+        - Improved the documentation.
+
+0.03    2012-10-29
+        - Fixed a bug in sort_query_parameters where keys with multiple values
+          wasn't sorted correctly.
+        - Added more tests.
+        - Improved the documentation.
+
+0.02    2012-10-29
+        - Added remove_empty_query method.
+        - Added remove_fragment method.
+        - Added remove_duplicate_slashes method.
+        - Added more tests.
+
+0.01    2012-10-29
+        - First release.

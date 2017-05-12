@@ -1,0 +1,170 @@
+=head1 NAME
+
+Unix::Statgrab::sg_process_stats - container for libstatgrab process statistics
+
+=head1 DESCRIPTION
+
+C<Unix::Statgrab::sg_process_stats> is a Perl package name providing
+accessors to bundled libstatgrab L<sg_process_stats|http://www.i-scream.org/libstatgrab/docs/sg_get_process_stats.3.html> process statistics.
+
+=head1 METHODS
+
+=head2 nentries
+
+Returns the number of entries in the container.
+
+=head2 systime
+
+Returns the seconds since Epoch (0:00:00 on January, 1st 1970) of the time measure the process statistics.
+
+=head2 as_list
+
+B<Deprecated> alias of L</fetchall_hash>
+
+=head2 fetchall_hash
+
+Returns all records from L<sg_process_stats|http://www.i-scream.org/libstatgrab/docs/sg_get_process_stats.3.html>
+container as list of hash containing each datum name as key and the datum as value.
+
+=head2 fetchall_array
+
+Returns all records from L<sg_process_stats|http://www.i-scream.org/libstatgrab/docs/sg_get_process_stats.3.html>
+container as list of arrays containing the values in following order:
+
+  (process_name proctitle pid parent pgid sessid uid euid gid egid
+   context_switches voluntary_context_switches involuntary_context_switches
+   proc_size proc_resident start_time time_spent cpu_percent nice state
+   systime)
+
+in that order without leading headline.
+
+=head2 fetchall_table
+
+Returns all records from L<sg_process_stats|http://www.i-scream.org/libstatgrab/docs/sg_get_process_stats.3.html>
+container as list of arrays containing the values in following order:
+
+  (disk_name read_bytes write_bytes systime)
+
+in that order including leading headline.
+
+=head2 fetchrow_arrayref($row = 0)
+
+Returns one row as array containing values as above.
+
+=head2 fetchall_arrayref
+
+Returns all records from L<sg_process_stats|http://www.i-scream.org/libstatgrab/docs/sg_get_process_stats.3.html>
+container as array of arrays without header.
+
+=head2 fetchrow_hashref($row = 0)
+
+Returns one row as hash containing C<< { process_name => $self.process_name($row), proctitle => ... } >>.
+
+=head2 fetchall_hashref
+
+Returns all records from L<sg_process_stats|http://www.i-scream.org/libstatgrab/docs/sg_get_process_stats.3.html>
+container as array of hashes.
+
+=head2 colnames
+
+Returns list of column names: C<< (process_name proctitle pid parent pgid sessid uid euid gid egid context_switches voluntary_context_switches involuntary_context_switches proc_size proc_resident start_time time_spent cpu_percent nice state systime) >>
+
+=head2 process_name
+
+The name of the command that was run. The content of this field heavily depends on the underlying operating system, some store the basename the executable passes to the exec(2) system call, some the entire path. Most OS restrict the size of this field - some like the *BSD family to a very low value of 15 bytes.
+
+This field is usually immutable for userland processes. 
+
+=head2 proctitle
+
+The command line (the "title") of the process. Take note - this can be modified by the process, so isn't guaranteed to be the original command line.
+
+=head2 pid
+
+The process ID.
+
+=head2 parent
+
+The parent process ID.
+
+=head2 pgid
+
+The process ID of the process group leader.
+
+=head2 sessid
+
+Session id of the session the process belongs to.
+
+=head2 uid
+
+The ID of the user the process is running as.
+
+=head2 euid
+
+The ID of the effective user the process is running as.
+
+=head2 gid
+
+The ID of the group the process is running as.
+
+=head2 egid
+
+The ID of the effective group the process is running as. 
+
+=head2 context_switches
+
+The number of context switches of this process (voluntary and involuntary). 
+
+=head2 voluntary_context_switches
+
+The number of voluntary context switches of this process (e.g. by calling C<sched_yield()>, C<sleep()> or C<nanosleep()>). 
+
+=head2 involuntary_context_switches
+
+The number of involuntary context switches of this process (e.g. time slice exhausted or signal sent).
+
+=head2 proc_size
+
+The virtual memory size of the process in bytes.
+
+=head2 proc_resident
+
+The size of the process that's resident in memory.
+
+=head2 start_time
+
+The time when the process has been started in seconds since epoch.
+
+=head2 time_spent
+
+The number of seconds the process has been running (user+system time, without time spent by child processes).
+
+=head2 cpu_percent
+
+The current percentage of CPU the process is using.
+
+=head2 nice
+
+The nice value of the process.
+
+=head2 state
+
+The current state of the process, one of
+
+    SG_PROCESS_STATE_RUNNING SG_PROCESS_STATE_SLEEPING SG_PROCESS_STATE_STOPPED
+    SG_PROCESS_STATE_ZOMBIE SG_PROCESS_STATE_UNKNOWN
+
+=head1 AUTHOR
+
+Jens Rehsack, E<lt>rehsack AT cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2012-2015 by Jens Rehsack
+
+This library is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 2.1 of the License, or (at your option) any
+later version.
+
+=cut

@@ -1,0 +1,271 @@
+#!/usr/bin/perl -w
+use strict;
+
+# wget -O - http://cgit.freedesktop.org/xorg/proto/xproto/plain/keysymdef.h | perl -C31 -wlne 'next unless /\bXK_(\w+)\s+0x00([a-fA-F\d]+)/; print chr hex $2, qq(\t$1)' > ! oooo1)]))
+my %enc = (qw#
+		  ` grave
+		  ' apostrophe
+		  " quotedbl
+		  ~ asciitilde
+		  ! exclam
+		  ? question
+		  @ at
+	     #, qw!
+		  # numbersign
+		  $ dollar
+		  % percent
+		  ^ asciicircum
+		  & ampersand
+		  * asterisk
+		  ( parenleft
+		  ) parenright
+		  [ bracketleft
+		  ] bracketright
+		  { braceleft
+		  } braceright
+		  - minus
+		  + plus
+		  = equal
+		  _ underscore
+		  < less
+		  > greater
+		  \ backslash
+		  / slash
+		  | bar
+		  , comma
+		  . period
+		  : colon
+		  ; semicolon
+		  _bar underbar
+
+
+¡	exclamdown
+¢	cent
+£	sterling
+¤	currency
+¥	yen
+¦	brokenbar
+§	section
+¨	diaeresis
+©	copyright
+ª	ordfeminine
+«	guillemotleft
+¬	notsign
+­	hyphen
+®	registered
+¯	macron
+°	degree
+±	plusminus
+²	twosuperior
+³	threesuperior
+´	acute
+µ	mu
+¶	paragraph
+·	periodcentered
+¸	cedilla
+¹	onesuperior
+º	masculine
+»	guillemotright
+¼	onequarter
+½	onehalf
+¾	threequarters
+¿	questiondown
+À	Agrave
+Á	Aacute
+Â	Acircumflex
+Ã	Atilde
+Ä	Adiaeresis
+Å	Aring
+Æ	AE
+Ç	Ccedilla
+È	Egrave
+É	Eacute
+Ê	Ecircumflex
+Ë	Ediaeresis
+Ì	Igrave
+Í	Iacute
+Î	Icircumflex
+Ï	Idiaeresis
+Ð	ETH
+Ð	Eth
+Ñ	Ntilde
+Ò	Ograve
+Ó	Oacute
+Ô	Ocircumflex
+Õ	Otilde
+Ö	Odiaeresis
+×	multiply
+Ø	Oslash
+Ø	Ooblique
+Ù	Ugrave
+Ú	Uacute
+Û	Ucircumflex
+Ü	Udiaeresis
+Ý	Yacute
+Þ	THORN
+Þ	Thorn
+ß	ssharp
+à	agrave
+á	aacute
+â	acircumflex
+ã	atilde
+ä	adiaeresis
+å	aring
+æ	ae
+ç	ccedilla
+è	egrave
+é	eacute
+ê	ecircumflex
+ë	ediaeresis
+ì	igrave
+í	iacute
+î	icircumflex
+ï	idiaeresis
+ð	eth
+ñ	ntilde
+ò	ograve
+ó	oacute
+ô	ocircumflex
+õ	otilde
+ö	odiaeresis
+÷	division
+ø	oslash
+ø	ooblique
+ù	ugrave
+ú	uacute
+û	ucircumflex
+ü	udiaeresis
+ý	yacute
+þ	thorn
+ÿ	ydiaeresis
+
+	’sq	rightsinglequotemark
+	‘sq	leftsinglequotemark
+	•	enfilledcircbullet
+	♀	femalesymbol
+	♂	malesymbol
+	NBSP	nobreakspace
+	…	ellipsis
+	∩#	intersection
+	∫	integral
+	≤	lessthanequal
+	≥	greaterthanequal
+
+	d`	dead_grave
+	d'	dead_acute
+	d^	dead_circumflex
+	d~	dead_tilde
+	d¯	dead_macron
+	dd#	dead_breve----
+	d^.	dead_abovedot
+	d"	dead_diaeresis
+	d^°	dead_abovering
+	d''	dead_doubleacute
+	d^v	dead_caron
+	d,	dead_cedilla
+	dd#	dead_ogonek---
+	d_ι	dead_iota
+	d_voiced	dead_voiced_sound
+	d_½voiced	dead_semivoiced_sound
+	d.	dead_belowdot
+	dd#	dead_hook---
+	dd#	dead_horn---
+	d/	dead_stroke
+	d^,	dead_abovecomma
+	dd#	dead_abovereversedcomma---
+	d``	dead_doublegrave
+	d``#	dead_double_grave
+	d_°	dead_belowring
+	d__	dead_belowmacron
+	dd#	dead_belowcircumflex---
+	d_~	dead_belowtilde
+	dd#	dead_belowbreve---
+	d_"	dead_belowdiaeresis
+	d_invbrev	dead_invertedbreve
+	d_inv_brev	dead_inverted_breve
+	d_,	dead_belowcomma
+	dd#	dead_currency
+
+	d^(	dead_dasia
+	d^)	dead_psili
+	Gr_ι	Greek_iota
+
+        Gr_α        Greek_alpha
+        Gr_β        Greek_beta
+        Gr_γ        Greek_gamma
+        Gr_Γ        Greek_GAMMA
+        Gr_δ        Greek_delta
+        Gr_Δ        Greek_DELTA
+        Gr_ε        Greek_epsilon
+        Gr_η        Greek_eta
+        Gr_θ        Greek_theta
+        Gr_φ        Greek_phi
+        Gr_ι        Greek_iota
+        Gr_κ        Greek_kappa
+        Gr_λ        Greek_lambda
+        Gr_μ        Greek_mu
+        Gr_ν        Greek_nu
+	Gr_ο	    Greek_omicron
+        Gr_π        Greek_pi
+        Gr_ρ        Greek_rho
+        Gr_σ        Greek_sigma
+        Gr_τ        Greek_tau
+        Gr_ψ        Greek_psi
+        Gr_Ψ        Greek_PSI
+        Gr_υ        Greek_upsilon
+        Gr_Υ        Greek_UPSILON
+        Gr_ζ        Greek_zeta
+        Gr_ξ        Greek_xi
+        Gr_χ        Greek_chi
+        Gr_ω        Greek_omega
+        Gr_Ω        Greek_OMEGA
+        Gr_Σ        Greek_SIGMA
+
+	Gr_Α	    Greek_ALPHA
+	Gr_Ε	Greek_ETA
+
+        Gr_α_acc    Greek_alphaaccent
+        Gr_ω_acc    Greek_omegaaccent
+	Gr_η_acc    Greek_etaaccent
+	heb_ש	    hebrew_shin
+	heb_ך_fin   hebrew_finalkaph
+
+		  CP Multi_key
++# KP_Add
+-# KP_Subtract
+*# KP_Multiply
+/# KP_Divide
+.# KP_Decimal
+=# KP_Equal
+SPC#	KP_Space
+
+		  ← Left → Right ↑ Up ↓ Down
+		  ←arr leftarrow →arr rightarrow ↑arr uparrow ↓arr downarrow
+	     !, map {("$_#", "KP_$_")} 0..9);
+;
+
+my %dec = reverse %enc;
+
+sub shorten ($) {
+  (my $in = shift) =~ s/\b(Cyr|Ukr|Gr|heb|Ar)[a-z]+(?=_)/$1/;
+  $in =~ s/\b(dead)(?=_)/d/;
+  $in =~ s/\b(Gr_\w+dier|d_diaer)esis/$1/;
+  $in
+}
+
+sub dec ($) {
+  my $in = shift;
+  my($pre, $post) = split /:/, $in, 2;
+  $post or warn("Can't parse <<$in>>"), return;
+  my @pre = ($pre =~ /<(\w+)>/g) or warn("Unknown format of IN in <<$in>>"), return;
+  my($p) = ($post =~ /"(.+?)"/) or warn("Unknown format of OUT in <<$in>>"), return;
+  @pre = map { exists $dec{$_} ? $dec{$_} : shorten $_} @pre;
+  (@pre, $p)
+}
+
+while (<>) {
+  next if /^\s*(#|include\b)/;
+  next unless /\S/;
+  next unless my @in = dec $_;
+  print "@in[0..$#in-1]  $in[-1]"; # Two spaces to allow for combining marks
+}

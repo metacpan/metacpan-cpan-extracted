@@ -1,0 +1,176 @@
+#!/usr/bin/perl -w
+
+use strict;
+
+use Getopt::Long;
+use HTTP::Status;
+use LWP::Simple;
+use Unicode::Map;
+
+my $emptyMap = 0;
+my $numWarnings = 0;
+my $numErrors = 0;
+my %opt = ( );
+
+main: {
+    $|=1;
+    _getOptions ( );
+    _mirror ( );
+    _summarizeResult ( );
+    exit $numErrors;
+}
+
+sub _getOptions {
+    GetOptions ( \%opt, "update" );
+    if ( !$opt{"update"} ) {
+        usage ( );
+    }
+}
+
+sub usage {
+    print <<EOF;
+
+Usage: mirrorMappings --update [\@ids]
+An utility for hardcore Unicode::Map perl developers.
+
+It mirrors a collection of textual Unicode mapping files in order to create 
+binary mapping files. Mirrors the charsets for the ids specified. If none
+specified the whole set mentioned in control file REGISTRY will be updated.
+Can cause quite some net traffic!
+
+EOF
+    exit 1;
+}
+
+sub _mirror ( ) {
+    $emptyMap = new Unicode::Map ( );
+
+    if ( @ARGV ) {
+        for ( @ARGV ) {
+            _mirrorOne ( $_ );
+        }
+    } else {
+        for ( sort $emptyMap->ids() ) {
+            _mirrorOne ( $_ );
+        }
+    }
+}
+
+sub _mirrorOne {
+    my ($id) = @_;
+
+    print "Processing \"$id\": ";
+
+    $id = $emptyMap -> id ( $_ );
+    my $srcURL  = $emptyMap -> srcURL ( $id );
+    my $srcCopy = $emptyMap -> src ( $id );
+
+    if ( !$srcCopy ) {
+        print "Error!\n";
+        print "! No 'src:' entry for this charset in file 'REGISTRY'!\n";
+        $numErrors++;
+        return;
+    }
+
+    if ( !_mkFilePath($srcCopy) ) {
+        print "Error!\n";
+        print "Couldn't create directory! ($!)\n";
+        $numErrors++;
+        return;
+    }
+    
+    if ( !$srcURL ) {
+        print "Warning!\n";
+        print <<EOF;
+? No source URL for charset "$id"!
+  This indicates an error unless you added an charset source manually to
+  the control file "REGISTRY" and don't want to update it automatically!
+EOF
+        $numWarnings++;
+        return;
+    }
+    
+    my $existed = -e $srcCopy;
+
+    $^W = 0; # no warnings here
+        my $rc;
+        for ( 1..2 ) {
+            $rc = mirror ( $srcURL, $srcCopy );
+            # If a BAD_REQUEST occurs for stupid reasons try another time.
+            last unless $rc == RC_BAD_REQUEST;
+        }
+    $^W = 1;
+    
+    if ( is_error($rc) ) {
+        my $msg = status_message ( $rc );
+        print "Error!\n";
+        print "! Couldn't mirror \"$srcURL\"! ($rc: $msg)\n";
+        $numErrors++;
+        return;
+    }
+
+    if ( !$existed ) {
+        print "created \"$srcCopy\"\n";
+    } else {
+        if ( $rc==RC_NOT_MODIFIED ) {
+            print "is uptodate.\n";
+        } else {
+            print "updated.\n";
+        }
+    }
+}
+
+sub _summarizeResult {
+    if ( $numWarnings==0 && $numErrors==0 ) {
+        print "Ok. Everything went fine!\n";
+    } elsif ( $numErrors>0 ) {
+        my $msg;
+        $msg = "$numErrors error";
+        $msg .= "s" if $numErrors>1;
+        $msg .= ", $numWarnings warning" if $numWarnings>0;
+        $msg .= "s" if $numWarnings>1;
+        $msg .= ".";
+        print "Error! Encountered $msg\n";
+    } else {
+        my $msg;
+        $msg = "$numWarnings warning";
+        $msg .= "s" if $numWarnings>1;
+        $msg .= ".";
+        print "Warning! Possible trouble! $msg\n";
+    }
+}
+
+##
+## Utilities
+##
+
+sub _mkFilePath {
+    my ( $filePath ) = @_;
+    my $file = substr ( $filePath, rindex($filePath,"/")+1 );
+    my $path = $filePath; $path =~ s/$file$//;
+    _mkPath ( $path );
+}
+
+sub _mkPath {
+    my ( $path ) = @_;
+    my $current = "";
+    for (grep {$_} split /\//, $path) {
+        $current .= "/$_";
+        if ( !-d $current ) {
+            if ( !_mkdir($current) ) {
+                return 0;
+            }
+        }
+    }
+1}
+
+sub _mkdir {
+    my ( $path ) = @_;
+    if ( !-d $path ) {
+        if ( !mkdir ($path, 0777 ) ) {
+            return 0;
+        }
+    }
+1}
+
+

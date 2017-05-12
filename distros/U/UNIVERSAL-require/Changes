@@ -1,0 +1,65 @@
+Revision history for Perl module UNIVERSAL::require
+
+0.18 2015-02-24
+    - Skip the taint test if Perl was compiled without taint support.
+      RAZ++
+    - Changed use of "use vars" to "our"
+    - Added strict and warnings to PREREQ_PM
+
+0.17 2014-04-19
+    - Check for valid module names. RT#94866 from TOBYINK.
+    - Changed used of die() to croak() RT#23113
+    - Fixed typo in pod (fschlich++)
+
+0.16 2014-02-03
+    - All seems fine with previous dev release
+
+0.15_01 2014-02-03
+    - Added README
+    - Specified min version of perl 5.6.0
+    - Now "use warnings"
+
+0.15 2013-09-28
+    - Hadn't specified meta-spec version 2, so github repo wasn't turning
+      up in the metadata.
+
+0.14 2013-08-25
+    - Changed the repository meta_merge to the new format
+    - Tweaked format (mainly release dates) to conform to CPAN::Changes::Spec
+
+0.13_1 2013-03-08
+    - first test release by NEILB after getting comaint
+    - no changes other than specifying github repository
+
+0.13 2009-03-30
+    - $module->require now always resets $@ which removes a trap of using $@
+      to indicate an error, rather than checking $module->require directly.
+      [rt.cpan.org 44444]
+
+0.12 2009-03-30
+    - bleadperl introduced a new warning deprecating "use UNIVERSAL"
+      (thank goodness) which interfered with t/require.t
+
+0.11 2006-11-11
+    - Sped up require() by about 400% for already loaded modules.
+      [rt.cpan.org 21141]
+    - Fix the test for the changed version error in 5.10.
+
+0.10 2005-10-10
+    - Split out of UNIVERSAL-exports into its own distribution.
+    - UNIVERSAL::require no longer uses eval STRING in require().  This 
+      closes a security hole.
+    - Testing that it works under taint mode.
+    - Added license and copyright notice.
+    - Added use()
+    - Mention Module::Load in SEE ALSO.
+
+0.03 2001-12-16
+    - Fixed a little nit when "use UNIVERSAL" is involved.
+
+0.02 2001-06-25
+    - -->API CHANGE!<-- require() no longer dies on failure
+
+0.01 2001-01-22
+    - First version, adapted from the Perl 6 RFC prototypes 253 and 257.
+

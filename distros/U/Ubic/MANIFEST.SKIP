@@ -1,0 +1,17 @@
+^\.git
+^\.gitignore
+^tfiles
+^blib
+^_build
+^Build$
+^MANIFEST\.bak
+^cover_db
+^Ubic-.*
+^MYMETA.yml$
+^man/
+^.*\.dsc
+^.*\.tar\.gz
+^.*\.build
+^.*\.deb
+^.*\.changes
+^.*\.upload

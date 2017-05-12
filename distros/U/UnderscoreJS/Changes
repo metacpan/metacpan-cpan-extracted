@@ -1,0 +1,44 @@
+Revision history for perl module Underscore
+
+0.07 2014-01-06T08:38:55Z
+
+ - Fix hash ordering in tests (AGAIN)
+
+0.06 2014-01-05T07:18:24Z
+
+ - Do not rely on hash ordering in tests
+
+0.05 2014-01-03T10:44:45Z
+
+ - Rename to UnderscoreJS
+
+0.04 2014-01-03T10:28:48Z
+
+ - Release fixes
+
+0.03 2013-07-17T15:09:49Z
+
+ - Add test for count_by alias
+ - Add test for sort used in chain
+ - Fix commented out tests
+ - Implement after
+ - Implement computed min
+ - Implement countBy
+ - Implemented computed max
+ - Implement initial, shuffle, object
+ - Implement omit
+ - Implement pairs
+ - Implement pick
+ - Implement Python test for range
+ - Implement result
+ - Reduce/reduceRight now mimic the JS impl
+ - Remove for_each alias
+ - Update to underscore.js 1.4.3 API
+
+0.02 2012-02-08
+
+ - Import _ function by an arbitrary name
+
+0.01 2012-02-02
+
+ - Initial release

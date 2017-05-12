@@ -1,0 +1,9 @@
+Changes
+MANIFEST
+Makefile.PL
+Transliterate.pm
+Transliterate.xs
+test.pl
+transwrap/Makefile.PL
+transwrap/transwrap.c
+transwrap/transwrap.h

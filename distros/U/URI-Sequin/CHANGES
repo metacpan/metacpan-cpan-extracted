@@ -1,0 +1,52 @@
+Revision history for Perl extension URI::Sequin.
+
+1.2 Mon Sep 01 12:20 2003
+  - Added patches by Justin Mason that matched
+	    search-engine URLs beginning with https,
+			and matched more search-engine query fields.
+
+1.1.2 Mon Oct 07 09:44:00 2002
+	- Removed some temp files, changed the license
+		to artistic, and updated copyright date
+
+1.1.1 Tue Oct 30 00:00:00 2001
+	- Changed unzip directory. oooops
+
+1.1   Thu Oct 29 00:00:00 2001
+	- Fixed the require version
+	- Fixed leaning toothpick syndrome
+	- Fixed many, many small bugs
+
+1.0   Sat Feb 24 00:00:00 2001
+	- Fixed POD
+	- Fixed some of the package arguments
+	- Improved Regex checker
+
+0.9   Fri Feb 23 00:00:00 2001
+	- Changed versions
+	- Improved Documentation
+	- Improved name matching to deal with some more wierd names
+	- Improved the keyword matching to deal with yet more 
+		search engines, and also documented which search
+		engines use which keywords
+
+0.4   Mon Dec 11 10:10:00 2000
+	- Complete rewrite
+	- Broke the module down into 3 subs
+	- Fixed many, many, many bugs
+	- Improved the Search-Engine name and url regex so that odd
+	  .com.uk and other such URLs could be dealt with
+	- Added a tool for extracting referrer URLs from log-files
+	- Fixed lots of bugs in the keyword finder, and allowed it to
+	  potentially match many more search-engines
+
+0.3   Thu Feb 17 12:00:00 2000
+	- Contains appropriate position guessing
+	- Real name lookup of search engines
+	- Fixed some bugs
+
+0.2   Tue Feb 15 15:24:43 2000
+	- Uses Regular Expressions to glean information
+
+0.1   Mon Feb 14 12:00:00 2000
+	- Used a Search Engine database for information

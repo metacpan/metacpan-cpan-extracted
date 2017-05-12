@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name:                Unix-PID
+version:             0.23
+abstract:            Perl extension for getting PID info.
+license:             ~
+author:              
+    - Daniel Muey <http://drmuey.com/cpan_contact.pl>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Fcntl:                         0
+    List::Cycle:                   0
+    Math::Fibonacci::Phi:          0
+    Time::HiRes:                   0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

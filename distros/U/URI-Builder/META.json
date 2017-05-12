@@ -1,0 +1,40 @@
+{
+   "abstract" : "URI objects optimised for manipulation",
+   "author" : [],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4202",
+   "license" : [
+      "artistic_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "URI-Builder",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "URI" : "1.60",
+            "perl" : "v5.6.0"
+         }
+      }
+   },
+   "provides" : {
+      "URI::Builder" : {
+         "file" : "lib/URI/Builder.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_1_0"
+      ]
+   },
+   "version" : "0.04"
+}

@@ -1,0 +1,48 @@
+"Undoing" this patch is enough to restore the coverage of combining chars 
+which was present before math symbols started to get in the way: one should:
+  
+A) remove math greenkeys from kbdd file, 
+B) disable uni_manual (except for phonetization, where only ? --> ? gets in the way),
+C) turn off recognition of SQUARED/OPERATOR/SIGN/IN TRIANGLE.
+
+--- examples/EurKey++.kbdd	2012-02-19 23:14:32.372000000 -0800
++++ examples/EurKey++.kbdd-ook	2012-02-19 21:52:37.637200000 -0800
+@@ -95,7 +95,7 @@ ExportDeadKeys=	´  ˋ  ˜  ˆ  ˇ  °
+ @char2key_prefer_first=\,|,.,002c
+ #
+ # Will be only considered when putting a diacritic on AltGr-key (~∼, *∗, .⋅ )
+-@AltGrCharSubstitutions=ĳü
++@AltGrCharSubstitutions=ĳü,^∧,&∩,*×,#≠,6∨,7∪,|∣
+ #
+ # Tibetan range: take only tibetan diacritics, so our code adding diacritics won't be confused by prefices... ???
+ Auto_Diacritic_Start=0f00
+--- lib/UI/KeyboardLayout.pm	2012-02-19 23:32:19.630400000 -0800
++++ lib/UI/KeyboardLayout.pm-ook	2012-02-19 22:33:04.515200000 -0800
+@@ -3964,8 +3964,7 @@ my %operators = (DOT => ['MIDDLE DOT', '
+ 		 'DOUBLE SOLIDUS' => ['PARALLEL TO'], MINUS => ['HYPHEN-MINUS']);
+ 
+ #			THIS IS NOT A MULTIMAP!
+-my %uni_manual = (phonetized => {qw( 0 ə  s ʃ  z ʒ  j ɟ  v ⱱ  n ŋ  V ɤ  ! ǃ  q ʔ  ¿ ʕ )},
+-); my %ignore = (
++my %uni_manual = (phonetized => {qw( 0 ə  s ʃ  z ʒ  j ɟ  v ⱱ  n ŋ  V ɤ  ! ǃ  ? ʔ  ¿ ʕ )},
+ 		  addline    => {qw( 0 ∅  ( ∈  ) ∋  = ≡  ≡ ≣  † ‡  + ∦  / ∠  | ∟  . ∸  ∨ ⊻  ∧ ⊼ )},	# conflict with modifiers: qw( | ‖  _ ‗ )
+ 		  addtilde   => {qw( 0 ∝  / ∡  \ ∢  ∫ ∱  : ∻  - ≂  ≠ ≆  ~ ≈  ∼ ≈  ≃ ≊  ≈ ≋  = ≌  ( ⟅  ) ⟆ )},	# not on 2A**
+ 		  addleft    => {qw( = ≔  × ⨴  × ⋉  \ ⋋  + ⨭  → ⧴)},	#  × ⨴ is hidden
+@@ -4013,7 +4012,7 @@ sub parse_NameList ($$) {
+         if ($name =~ /^(.*)\s+(?=OR\s)(.*?)\s*$/) {	# Find the latest possible...
+           push @{$candidates{$k}}, [$1, $2];
+         }
+-        if (($t = $name) =~ s/\b(COMBINING(?=\s+CYRILLIC\s+LETTER)|BARRED|SLANTED|APPROXIMATELY|ASYMPTOTICALLY|ALMOST|^xxx-SQUARED|LUNATE|SIDEWAYS(?:\s+(?:DIAERESIZED|OPEN))?|INVERTED|ARCHAIC|SCRIPT|LONG|TURNED(?:\s+(?:INSULAR|SANS-SERIF))?|REVERSED|OPEN|CLOSED|DOTLESS|FINAL)\s+|\s+(BAR|SYMBOL|xxx-OPERATOR|xxx-SIGN|xxx-IN\s+TRIANGLE)$//) {
++        if (($t = $name) =~ s/\b(COMBINING(?=\s+CYRILLIC\s+LETTER)|BARRED|SLANTED|APPROXIMATELY|ASYMPTOTICALLY|ALMOST|^SQUARED|LUNATE|SIDEWAYS(?:\s+(?:DIAERESIZED|OPEN))?|INVERTED|ARCHAIC|SCRIPT|LONG|TURNED(?:\s+(?:INSULAR|SANS-SERIF))?|REVERSED|OPEN|CLOSED|DOTLESS|FINAL)\s+|\s+(BAR|SYMBOL|OPERATOR|SIGN|IN\s+TRIANGLE)$//) {
+           push @{$candidates{$k}}, [$t, "calculated-$+"];
+           $candidates{$k}[-1][1] .= '-epigraphic'   if $t =~ /\bEPIGRAPHIC\b/;	# will be massaged away from $t later
+           $candidates{$k}[-1][0] =~ s/\s+SYMBOL$// and $candidates{$k}[-1][1] .= '-symbol' 
+@@ -4081,7 +4080,7 @@ sub parse_NameList ($$) {
+       my $name = $NM{$self->charhex2key($base)};
+       next if not $name and ($k =~ /^[12]?F[89A]..$/ or hex $base >= 0x4E00 and hex $base <= 0x9FCC);		# ideographs; there is also 3400 region...
+       warn "Basic: `$k' --> `@$exp', base=`$base' --> `",$self->charhex2key($base),"'" unless $name;
+-      if ((my $NN = $name) =~ s/\s+xxx-OPERATOR$//) {
++      if ((my $NN = $name) =~ s/\s+OPERATOR$//) {
+ #warn "operator: `$k' --> <$NN>, `@$exp', base=`$base' --> `",$self->charhex2key($base),"'";
+         push @{$candidates{$k}}, [$_, @$exp[2..$#$exp]] for $NN, @{ $operators{$NN} || []};
+       }

@@ -1,0 +1,35 @@
+Revision history for Unixish
+
+1.0.5   2015-09-06 (PERLANCAR)
+
+	- No spec changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+1.0.4   2013-06-26 (SHARYANTO)
+
+        - No spec changes. Fix some typo and update some references.
+
+
+1.0.3   2013-04-06 (SHARYANTO)
+
+        - No spec changes. Tweak some wordings.
+
+
+1.0.2   2012-07-27 (SHARYANTO)
+
+        - No spec changes. Mention similar project on CPAN: Text::Pipe.
+
+
+1.0.1   2012-07-21 (SHARYANTO)
+
+        - No spec changes. Rename specification from Data-Unixish (now used for
+          the implementation) to Unixish (now only for specification).
+
+
+1.0.0   2012-07-13 (SHARYANTO)
+
+        - First version.

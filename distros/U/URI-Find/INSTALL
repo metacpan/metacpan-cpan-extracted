@@ -1,0 +1,39 @@
+WHAT IS THIS?
+
+This is URI::Find, a perl module.  Please see the README that comes with
+this distribution.
+
+HOW DO I INSTALL IT?
+
+To install this module, cd to the directory that contains this README
+file and type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+To install this module into a specific directory, do:
+   perl Build.PL --install_base /name/of/the/directory
+   ...the rest is the same...
+
+Please also read the perlmodinstall man page, if available.
+
+
+WHAT VERSION OF PERL DO I NEED?
+
+        perl 5.8.9 or higher
+
+
+WHAT MODULES DO I NEED?
+
+To build, test and install the module you need:
+
+        Module::Build   0.30 or higher
+        Test::More      0.88 or higher
+
+To run the module you need:
+
+        URI             1.60 or higher
+
+They can all be found on http://search.cpan.org/ or by running your CPAN shell.

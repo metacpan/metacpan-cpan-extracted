@@ -1,0 +1,86 @@
+<state_diagram>
+  <states>
+    <state_row>
+      <state name="loveall" label="0-0" start_from="N" start_to="N" />
+      <state name="ff-0"    label="15-0"                            />
+      <state name="th-0"    label="30-0"                            />
+      <state name="ft-0"    label="40-0"                            />
+    </state_row>
+    <state_row>
+      <state name="0-ff"    label="0-15"                            />
+      <state name="ff-ff"   label="15-15"                           />
+      <state name="th-ff"   label="30-15"                           />
+      <state name="ft-ff"   label="40-15"                           />
+      <state name="gs"      label="Game Server" accepting="yes"     />
+    </state_row>
+    <state_row>
+      <state name="0-th"    label="0-30"                            />
+      <state name="ff-th"   label="15-30"                           />
+      <state name="th-th"   label="30-30"                           />
+      <state name="ft-th"   label="40-30"                           />
+    </state_row>
+    <state_row>
+      <state name="0-ft"    label="0-40"                            />
+      <state name="ff-ft"   label="15-40"                           />
+      <state name="th-ft"   label="30-40"                           />
+      <state name="deuce"   label="Deuce"                           />
+      <state name="as"      label="Advantage Server"                />
+    </state_row>
+    <state_row>
+      <state name="filler"                                          />
+      <state name="gr"      label="Game Receiver" accepting="yes"   />
+      <state name="filler"                                          />
+      <state name="ar"      label="Advantage Receiver"              />
+    </state_row>
+  </states>
+
+  <transition_set label="R">
+    <transition from="loveall" to="0-ff"                />
+    <transition from="0-ff"    to="0-th"                />
+    <transition from="0-th"    to="0-ft"                />
+    <transition from="0-ft"    to="gr"    from_side="S" to_side="W" />
+
+    <transition from="ff-0"    to="ff-ff"               />
+    <transition from="ff-ff"   to="ff-th"               />
+    <transition from="ff-th"   to="ff-ft"               />
+    <transition from="ff-ft"   to="gr"                  />
+
+    <transition from="th-0"    to="th-ff"               />
+    <transition from="th-ff"   to="th-th"               />
+    <transition from="th-th"   to="th-ft"               />
+    <transition from="th-ft"   to="gr"    from_side="S" to_side="E" />
+
+    <transition from="ft-0"    to="ft-ff"               />
+    <transition from="ft-ff"   to="ft-th"               />
+    <transition from="ft-th"   to="deuce"               />
+    <transition from="deuce"   to="ar"    arc="counter" />
+
+    <transition from="ar"      to="gr"                  />
+    <transition from="as"      to="deuce" arc="counter" />
+  </transition_set>
+
+  <transition_set label="S">
+    <transition from="loveall" to="ff-0"                />
+    <transition from="ff-0"    to="th-0"                />
+    <transition from="th-0"    to="ft-0"                />
+    <transition from="ft-0"    to="gs"    from_side="E" to_side="N" />
+
+    <transition from="0-ff"    to="ff-ff"               />
+    <transition from="ff-ff"   to="th-ff"               />
+    <transition from="th-ff"   to="ft-ff"               />
+    <transition from="ft-ff"   to="gs"    from_side="E" to_side="W" />
+
+    <transition from="0-th"    to="ff-th"               />
+    <transition from="ff-th"   to="th-th"               />
+    <transition from="th-th"   to="ft-th"               />
+    <transition from="ft-th"   to="gs"    from_side="E" to_side="S" />
+
+    <transition from="0-ft"    to="ff-ft"               />
+    <transition from="ff-ft"   to="th-ft"               />
+    <transition from="th-ft"   to="deuce"               />
+    <transition from="deuce"   to="as"    arc="counter" />
+
+    <transition from="as"      to="gs"                  />
+    <transition from="ar"      to="deuce" arc="counter" />
+  </transition_set>
+</state_diagram>

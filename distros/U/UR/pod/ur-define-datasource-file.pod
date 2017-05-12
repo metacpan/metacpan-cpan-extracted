@@ -1,0 +1,66 @@
+
+
+=pod
+
+=head1 NAME
+
+ur define datasource file - Add a file-based data source (not yet implemented)
+
+
+
+=head1 VERSION
+
+This document describes ur define datasource file version 0.29.
+
+=head1 SYNOPSIS
+
+ur define datasource file --server=? [--singleton] [--dsid=?] [DSNAME]
+
+
+
+=head1 REQUIRED ARGUMENTS
+
+=over
+
+
+=item server  I<String>
+
+"server" attribute for this data source, such as a database name
+
+=item singleton  I<Boolean>
+
+by default all data sources are singletons, but this can be turned off
+
+Default value 'true' if not specified
+
+=item nosingleton  I<Boolean>
+
+Make singleton 'false'
+
+
+=back
+
+=head1 OPTIONAL ARGUMENTS
+
+=over
+
+
+=item dsid  I<Text>
+
+The full class name to give this data source.
+
+=item DSNAME  I<Text>
+
+The distinctive part of the class name for this data source.  Will be prefixed with the namespace then '::DataSource::'.
+
+
+=back
+
+=head1 DESCRIPTION:
+
+  Add a file-based data source (not yet implemented)
+
+
+
+=cut
+

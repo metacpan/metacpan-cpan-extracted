@@ -1,0 +1,184 @@
+=head1 NAME
+
+UI::Dialog::Charts
+
+=head1 SYNOPSIS
+
+This Perl Document details, the various attributes, widgets and all the
+dialog variant-specific features made avaiable by UI::Dialog and the
+specific UI::Dialog::Backend:: modules.
+
+This document is not complete and at this time serves only as a quick
+reference for the standard functions, attributes and of course the widget
+chart.
+
+=head1 STANDARD ATTRIBUTES
+
+These can be used during object construction (as defaults) or with any
+widget method call (override default).
+
+ title         => "string"
+ backtitle     => "string"
+ height        => 20       #characters, not pixels
+ width         => 65       #    ''       "    ''
+ listheight    => 5        #    ''       "    ''
+ menu          => [ 't1', 't1 desc', 't2', 't2 desc' ]
+ list          => [ 't1', [ 't1 desc', 1 ], 't2', [ 't2 desc'. 0 ] ]
+ beepbefore    => 0
+ beepafter     => 0
+ autoclear     => 0
+
+=head2 STANDARD ATTRIBUTE NOTES
+
+'autoclear' is only works in terminals and consoles (doesn't do anything
+for any of the GUI backends. 'menu' is only used with the menu() widget and
+'list' is used for checklist() and radiolist() widgets.
+
+=head1 META CLASSES
+
+The following list of classes are the "wrappers" that perform a few simple
+tests that determine a suitable dialog variant to use. These allow the end-
+progammer to create an application using the standard widgets without having
+to force the end-user into any particular UI::Dialog::Backend::. End-users can
+override the meta-class via the environment variables listed further in this
+document.
+
+This list makes references to the DISPLAY environment variable as well as
+to running in a CONSOLE (terminal, xterm, etc). The DISPLAY environment
+variable is not null when being run within an X-Windows session.
+
+=over 4
+
+=item UI::Dialog                        (most flexible)
+
+ ::Backend::
+  (if DISPLAY != "") Zenity, XDialog, GDialog, KDialog
+  (if DISPLAY == "") CDialog, Whiptail, ASCII
+
+=item UI::Dialog::GNOME                 (GNOME oriented)
+
+ ::Backend::
+  (assumes DISPLAY) Zenity, XDialog, GDialog
+
+=item UI::Dialog::KDE                   (KDE oriented)
+
+ ::Backend::
+  (assumed DISPLAY) KDialog, XDialog
+
+=item UI::Dialog::Console               (non-GUI only)
+
+ ::Backend::
+  (assumed CONSOLE) CDialog, Whiptail, ASCII
+
+=item UI::Dialog::Gauged                (flexible, has gauge methods)
+
+ ::Backend::
+  (if DISPLAY != "") Zenity, XDialog
+  (if DISPLAY == "") CDialog, Whiptail
+
+=back
+
+=head1 STANDARD WIDGETS
+
+These widgets are provided by all backends and are the only methods made
+available by all meta classes.
+
+ $switch = $d->yesno( text => 'A question?' );
+ $switch = $d->msgbox( text => 'A message.' );
+ $scalar = $d->inputbox( text => 'Type visible text.' );
+ $scalar = $d->password( text => 'Type hidden text.' );
+ $switch = $d->textbox( filename => '/path/to/regular/file' );
+ $scalar = $d->fselect( path => '/path/to/start/browse' );
+ $scaler = $d->dselect( path => '/path/to/start/browse' );
+ $scalar = $d->menu( text => 'A message.',
+                     menu => [ 't1', 't1 desc', 't2', 't2 desc' ] );
+ $scalar = $d->radiolist( text => 'A message.',
+                          list => [ 't1', [ 't1 desc', 1 ],
+                                    't2', [ 't2 desc', 0 ] ] );
+ @array  = $d->checklist( text => 'A message.',
+                          list => [ 't1', [ 't1 desc', 1 ],
+                                    't2', [ 't2 desc', 0 ] ] );
+
+=head1 COMPLETE WIDGET CHART
+
+  -----------------------------------+
+   Zenity                             \
+  ---------------------------------+   \
+   XDialog                          \   \
+  -------------------------------+   \   \
+   Whiptail                       \   \   \
+  -----------------------------+   \   \   \
+   KDialog                      \   \   \   \
+  ---------------------------+   \   \   \   \
+   GDialog                    \   \   \   \   \
+  -------------------------+   \   \   \   \   \
+   CDialog                  \   \   \   \   \   \
+  -----------------------+   \   \   \   \   \   \
+   ASCII                  \   \   \   \   \   \   \
+  ---------------------+   \   \   \   \   \   \   \
+   Widget Method Name   \   \   \   \   \   \   \   \
+  -----------------------+---+---+---+---+---+---+---+
+  calendar               |   | C |   |   |   | X | Z |
+  checklist              | A | C | G | K | W | X | Z |
+  combobox               |   |   |   |   |   | X |   |
+  draw_gauge             | A |   |   |   |   |   |   |
+  dselect                | A | C | G | K | W | X | Z |
+  editbox                |   |   |   |   |   | X | Z |
+  end_gauge              | A |   |   |   |   |   |   |
+  entry                  |   |   |   |   |   |   | Z |
+  error                  |   |   |   | K |   |   | Z |
+  fselect                | A | C | G | K | W | X | Z |
+  gauge_dec              |   | C |   |   | W | X | Z |
+  gauge_inc              |   | C |   |   | W | X | Z |
+  gauge_set              |   | C |   |   | W | X | Z |
+  gauge_start            |   | C |   |   | W | X | Z |
+  gauge_stop             |   | C |   |   | W | X | Z |
+  gauge_text             |   | C |   |   | W | X | Z |
+  getexistingdirectory   |   |   |   | K |   |   |   |
+  getopenfilename        |   |   |   | K |   |   |   |
+  getopenurl             |   |   |   | K |   |   |   |
+  getsavefilename        |   |   |   | K |   |   |   |
+  getsaveurl             |   |   |   | K |   |   |   |
+  info                   |   |   |   |   |   |   | Z |
+  infobox                | A | C | G |   | W | X |   |
+  inputbox               | A | C | G | K | W | X | Z |
+  inputsbox2             |   |   |   |   |   | X |   |
+  inputsbox3             |   |   |   |   |   | X |   |
+  list                   |   |   |   |   |   | X |   |
+  logbox                 |   |   |   |   |   |   | Z |
+  menu                   |   |   |   |   |   | X |   |
+  msgbox                 | A | C | G | K | W | X | Z |
+  noyes                  |   |   |   | K |   |   | Z |
+  password               | A | C |   | K | W | X | Z |
+  passwords2             |   |   |   |   |   | X |   |
+  passwords3             |   |   |   |   |   | X |   |
+  progress_dec           |   |   |   |   |   | X |   |
+  progress_inc           |   |   |   |   |   | X |   |
+  progress_set           |   |   |   |   |   | X |   |
+  progress_start         |   |   |   |   |   | X |   |
+  progress_stop          |   |   |   |   |   | X |   |
+  question               |   |   |   |   |   |   | Z |
+  radiolist              | A | C | G | K | W | X | Z |
+  rangebox               |   |   |   |   |   | X |   |
+  rangesbox2             |   |   |   |   |   | X |   |
+  rangesbox3             |   |   |   |   |   | X |   |
+  sorry                  |   |   |   | K |   |   |   |
+  spinbox                |   |   |   |   |   | X |   |
+  spinner                |   |   |   |   |   | X |   |
+  spinsbox2              |   |   |   |   |   | X |   |
+  spinsbox3              |   |   |   |   |   | X |   |
+  tailbox                |   | C |   |   |   | X |   |
+  tailboxbg              |   | C |   |   |   |   |   |
+  text_info              |   |   |   |   |   |   | Z |
+  textbox                | A | C | G | K | W | X | Z |
+  timebox                |   | C |   |   |   | X |   |
+  treeview               |   |   |   |   |   | X |   |
+  warning                |   |   |   |   |   |   | Z |
+  warningyesno           |   |   |   | K |   |   |   |
+  warningyesnocancel     |   |   |   | K |   |   |   |
+  yesno                  | A | C | G | K | W | X | Z |
+  yesnocancel            |   |   |   | K |   |   |   |
+
+
+=cut
+

@@ -1,0 +1,115 @@
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Ubic::Service::ServerStarter - Run programs using Server::Starter
+
+=head1 VERSION
+
+version 0.003
+
+=head1 SYNOPSIS
+
+    use Ubic::Service::ServerStarter;
+    return Ubic::Service::ServerStarter->new({
+        cmd => [
+            'starman',
+            '--preload-app',
+            '--env' => 'development',
+            '--workers' => 5,
+        ],
+        args => {
+            interval => 5,
+            port => 5003,
+            signal-on-hup => 'QUIT',
+            signal-on-term => 'QUIT',
+        },
+        ubic_log => '/var/log/app/ubic.log',
+        stdout   => '/var/log/app/stdout.log',
+        stderr   => '/var/log/app/stderr.log',
+        user     => "www-data",
+    });
+
+=head1 DESCRIPTION
+
+This service allows you to wrap any command with L<Server::Starter>, which
+enables graceful reloading of that app without any downtime.
+
+=head1 NAME
+
+Ubic::Service::ServerStarter - ubic service class for running commands
+with L<Server::Starter>
+
+=head1 METHODS
+
+=over
+
+=item I<args> (optional)
+
+Arguments to send to C<start_server>.
+
+=item I<cmd> (required)
+
+ArrayRef of command + options to run with server starter.  Everything passed
+here will go be put after the C<--> in the C<start_server> command:
+
+    start_server [ args ] -- [ cmd ]
+
+This argument is required becasue we have to have something to run!
+
+=item I<status>
+
+Coderef to special function, that will check status of your application.
+
+=item I<ubic_log>
+
+Path to ubic log.
+
+=item I<stdout>
+
+Path to stdout log.
+
+=item I<stderr>
+
+Path to stderr log.
+
+=item I<proxy_logs>
+
+Boolean flag. If enabled, C<ubic-guardian> will replace daemon's stdout and
+stderr filehandles with pipes, proxy all data to the log files, and reopen
+them on C<SIGHUP>.
+
+=item I<user>
+
+User under which C<start_server> will be started.
+
+=item I<group>
+
+Group under which C<start_server> will be started. Default is all user groups.
+
+=item I<cwd>
+
+Change working directory before starting a daemon.
+
+=item I<pidfile>
+
+Pidfile for C<Ubic::Daemon> module.
+
+=head1 AUTHOR
+
+William Wolf <throughnothing@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+
+William Wolf has dedicated the work to the Commons by waiving all of his
+or her rights to the work worldwide under copyright law and all related or
+neighboring legal rights he or she had in the work, to the extent allowable by
+law.
+
+Works under CC0 do not require attribution. When citing the work, you should
+not imply endorsement by the author.
+
+=cut

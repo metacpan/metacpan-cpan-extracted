@@ -1,0 +1,362 @@
+=encoding utf8
+
+=head1 NAME
+
+User::Identity - maintains info about a physical person
+
+=head1 INHERITANCE
+
+ User::Identity
+   is a User::Identity::Item
+
+=head1 SYNOPSIS
+
+ use User::Identity;
+ my $me = User::Identity->new
+  ( 'john'
+  , firstname => 'John'
+  , surname   => 'Doe'
+  );
+ print $me->fullName  # prints "John Doe"
+ print $me;           # same
+
+=head1 DESCRIPTION
+
+The C<User::Identity> object is created to maintain a set of informational
+objects which are related to one user.  The C<User::Identity> module tries to
+be smart providing defaults, conversions and often required combinations.
+
+The identities are not implementing any kind of storage, and can therefore
+be created by any simple or complex Perl program.  This way, it is more
+flexible than an XML file to store the data.  For instance, you can decide
+to store the data with Data::Dumper, Storable, DBI, AddressBook
+or whatever.  Extension to simplify this task are still to be developed.
+
+If you need more kinds of user information, then please contact the
+module author.
+
+Extends L<"DESCRIPTION" in User::Identity::Item|User::Identity::Item/"DESCRIPTION">.
+ 
+=head1 OVERLOADED
+
+=over 4
+
+=item $obj-E<gt>B<stringification>()
+
+When an C<User::Identity> is used as string, it is automatically
+translated into the fullName() of the user involved.
+
+example: 
+
+ my $me = User::Identity->new(...)
+ print $me;          # same as  print $me->fullName
+ print "I am $me\n"; # also stringification
+
+=back
+
+=head1 METHODS
+
+Extends L<"METHODS" in User::Identity::Item|User::Identity::Item/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in User::Identity::Item|User::Identity::Item/"Constructors">.
+ 
+=over 4
+
+=item User::Identity-E<gt>B<new>( [NAME], OPTIONS )
+
+Create a new user identity, which will contain all data related 
+to a single physical human being.  Most user data can only be
+specified at object construction, because they should never
+change.  A NAME may be specified as first argument, but also
+as option, one way or the other is required.
+
+ -Option     --Defined in          --Default
+  birth                              undef
+  charset                            $ENV{LC_CTYPE}
+  courtesy                           undef
+  description  User::Identity::Item  undef
+  firstname                          undef
+  formal_name                        undef
+  full_name                          undef
+  gender                             undef
+  initials                           undef
+  language                           'en'
+  name         User::Identity::Item  <required>
+  nickname                           undef
+  parent       User::Identity::Item  undef
+  prefix                             undef
+  surname                            undef
+  titles                             undef
+
+=over 2
+
+=item birth => DATE
+
+=item charset => STRING
+
+=item courtesy => STRING
+
+=item description => STRING
+
+=item firstname => STRING
+
+=item formal_name => STRING
+
+=item full_name => STRING
+
+=item gender => STRING
+
+=item initials => STRING
+
+=item language => STRING
+
+=item name => STRING
+
+=item nickname => STRING
+
+=item parent => OBJECT
+
+=item prefix => STRING
+
+=item surname => STRING
+
+=item titles => STRING
+
+=back
+
+=back
+
+=head2 Attributes
+
+Extends L<"Attributes" in User::Identity::Item|User::Identity::Item/"Attributes">.
+ 
+=over 4
+
+=item $obj-E<gt>B<age>()
+
+Calcuted from the datge of birth to the current moment, as integer.  On the
+birthday, the number is incremented already.
+
+=item $obj-E<gt>B<birth>()
+
+Returns the date in standardized format: YYYYMMDD, easy to sort and
+select.  This may return C<undef>, even if the L<dateOfBirth()|User::Identity/"Attributes"> contains
+a value, simply because the format is not understood. Month or day may
+contain C<'00'> to indicate that those values are not known.
+
+=item $obj-E<gt>B<charset>()
+
+The user's preferred character set, which defaults to the value of
+LC_CTYPE environment variable.
+
+=item $obj-E<gt>B<courtesy>()
+
+The courtesy is used to address people in a very formal way.  Values
+are like "Mr.", "Mrs.", "Sir", "Frau", "Heer", "de heer", "mevrouw".
+This often provides a way to find the gender of someone addressed.
+
+=item $obj-E<gt>B<dateOfBirth>()
+
+Returns the date of birth, as specified during instantiation.
+
+=item $obj-E<gt>B<description>()
+
+Inherited, see L<User::Identity::Item/"Attributes">
+
+=item $obj-E<gt>B<firstname>()
+
+Returns the first name of the user.  If it is not defined explicitly, it
+is derived from the nickname, and than capitalized if needed.
+
+=item $obj-E<gt>B<formalName>()
+
+Returns a formal name for the user.  If not defined as instantiation
+parameter (see new()), it is constructed from other available information,
+which may result in an incorrect or an incomplete name.  The result is
+built from "courtesy initials prefix surname title".
+
+=item $obj-E<gt>B<fullName>()
+
+If this is not specified as value during object construction, it is
+guessed based on other known values like "firstname prefix surname". 
+If a surname is provided without firstname, the nickname is taken
+as firstname.  When a firstname is provided without surname, the
+nickname is taken as surname.  If both are not provided, then
+the nickname is used as fullname.
+
+=item $obj-E<gt>B<gender>()
+
+Returns the specified gender of the person, as specified during
+instantiation, which could be like 'Male', 'm', 'homme', 'man'.
+There is no smart behavior on this: the exact specified value is
+returned. Methods isMale(), isFemale(), and courtesy() are smart.
+
+=item $obj-E<gt>B<initials>()
+
+The initials, which may be derived from the first letters of the
+firstname.
+
+=item $obj-E<gt>B<isFemale>()
+
+See isMale(): return true if we are sure the user is a woman.
+
+=item $obj-E<gt>B<isMale>()
+
+Returns true if we are sure that the user is male.  This is specified as
+gender at instantiation, or derived from the courtesy value.  Methods
+isMale and isFemale are not complementatory: they can both return false
+for the same user, in which case the gender is undertermined.
+
+=item $obj-E<gt>B<language>()
+
+Can contain a list or a single language name, as defined by the RFC
+Examples are 'en', 'en-GB', 'nl-BE'.  The default language  is 'en'
+(English).
+
+=item $obj-E<gt>B<name>( [NEWNAME] )
+
+Inherited, see L<User::Identity::Item/"Attributes">
+
+=item $obj-E<gt>B<nickname>()
+
+Returns the user's nickname, which could be used as username, e-mail
+alias, or such.  When no nickname was explicitly specified, the name is
+used.
+
+=item $obj-E<gt>B<prefix>()
+
+The words which are between the firstname (or initials) and the surname.
+
+=item $obj-E<gt>B<surname>()
+
+Returns the surname of person, or C<undef> if that is not known.
+
+=item $obj-E<gt>B<titles>()
+
+The titles, degrees in education or of other kind.  If these are complex,
+you may need to specify the formal name of the users as well, because
+smart formatting probably failes.
+
+=back
+
+=head2 Collections
+
+Extends L<"Collections" in User::Identity::Item|User::Identity::Item/"Collections">.
+ 
+=over 4
+
+=item $obj-E<gt>B<add>(COLLECTION, ROLE)
+
+Inherited, see L<User::Identity::Item/"Collections">
+
+=item $obj-E<gt>B<addCollection>(OBJECT | ([TYPE], OPTIONS))
+
+Inherited, see L<User::Identity::Item/"Collections">
+
+=item $obj-E<gt>B<collection>(NAME)
+
+Inherited, see L<User::Identity::Item/"Collections">
+
+=item $obj-E<gt>B<parent>( [PARENT] )
+
+Inherited, see L<User::Identity::Item/"Collections">
+
+=item $obj-E<gt>B<removeCollection>(OBJECT|NAME)
+
+Inherited, see L<User::Identity::Item/"Collections">
+
+=item $obj-E<gt>B<type>()
+
+=item User::Identity-E<gt>B<type>()
+
+Inherited, see L<User::Identity::Item/"Collections">
+
+=item $obj-E<gt>B<user>()
+
+Inherited, see L<User::Identity::Item/"Collections">
+
+=back
+
+=head2 Searching
+
+Extends L<"Searching" in User::Identity::Item|User::Identity::Item/"Searching">.
+ 
+=over 4
+
+=item $obj-E<gt>B<find>(COLLECTION, ROLE)
+
+Inherited, see L<User::Identity::Item/"Searching">
+
+=back
+
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Error: $object is not a collection.
+
+The first argument is an object, but not of a class which extends
+L<User::Identity::Collection|User::Identity::Collection>.
+
+=item Error: Cannot load collection module for $type ($class).
+
+Either the specified $type does not exist, or that module named $class returns
+compilation errors.  If the type as specified in the warning is not
+the name of a package, you specified a nickname which was not defined.
+Maybe you forgot the 'require' the package which defines the nickname.
+
+=item Error: Creation of a collection via $class failed.
+
+The $class did compile, but it was not possible to create an object
+of that class using the options you specified.
+
+=item Error: Don't know what type of collection you want to add.
+
+If you add a collection, it must either by a collection object or a
+list of options which can be used to create a collection object.  In
+the latter case, the type of collection must be specified.
+
+=item Warning: No collection $name
+
+The collection with $name does not exist and can not be created.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of User-Identity distribution version 0.97,
+built on February 02, 2017.
+
+Do not forget to read
+L</Mail::Box-Overview>,
+L</Mail::Box-Cookbook>, and
+L</Mail::Box-Index>.
+Examples are included in the Mail-Box distribution, directories 'examples'
+and 'scripts'.
+
+Browseable manuals, papers, and other released material van be found
+at  Website: F<http://perl.overmeer.net/userid/>
+
+The central modules (in separate distributions) in the MailBox suite are:
+L</Mail::Message>,
+L</Mail::Box>,
+L</Mail::Box::IMAP4>,
+L</Mail::Box::POP3>,
+L</Mail::Box::Parser::C>,
+L</Mail::Box::Dbx> (unpublished),
+L</Mail::Transport>,
+L</Object::Realize::Later>, and
+L</User::Identity>.
+
+Please post questions or ideas to the author F<markov@cpan.org>.
+
+=head1 LICENSE
+
+Copyrights 2003-2017 by [Mark Overmeer <perl@overmeer.net>]. For other contributors see Changes.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

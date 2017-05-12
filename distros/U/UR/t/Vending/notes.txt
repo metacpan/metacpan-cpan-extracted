@@ -1,0 +1,51 @@
+ur define namespace Vending
+
+ur define datasource sqlite --dsname Machine
+
+Schema:
+-- name the kinds of things the machine knows about
+create table item_type (type_id integer PRIMARY KEY NOT NULL,
+                        name varchar NOT NULL);
+
+-- places where things get sloted in
+create table vend_slot (slot_id integer PRIMARY KEY NOT NULL,
+                         name varchar NOT NULL,
+                         is_buyable integer NOT NULL,
+                         cost_cents integer,
+                         label varchar);
+
+-- kinds of coins we'll accept and their value
+--create table coin_type(type_id integer PRIMARY KEY NOT NULL REFERENCES item_type(type_id),
+--                       value_cents integer NOT NULL);
+
+
+--Parent table for instances of things the machine can sell
+create table vend_item (vend_item_id integer PRIMARY KEY NOT NULL,
+                        subtype_name varchar,
+                        slot_id integer NOT NULL REFERENCES vend_slot(slot_id));
+
+-- instances of coins held by the machine
+create table coin (coin_id integer PRIMARY KEY NOT NULL REFERENCES vend_item(vend_item_id),
+                   type_id integer NOT NULL REFERENCES item_type(type_id));
+
+-- kinds of things we'll sell
+create table product (product_id integer PRIMARY KEY NOT NULL REFERENCES item_type(type_id),
+                      cost_cents integer NOT NULL,
+                      manufacturer varchar NOT NULL);
+
+-- instances of things in the inventory
+create table inventory (inv_id integer PRIMARY KEY NOT NULL,
+                        product_id integer NOT NULL REFERENCES product(product_id),
+                        insert_date datetime NOT NULL DEFAULT (date('now')));
+                        
+
+ur update classes
+
+fixup VendingMachine::Inventory
+    add indirect properties for name, price, is_sellable
+
+make command line script vend
+
+Make skeleton VendingMachine::Command
+
+

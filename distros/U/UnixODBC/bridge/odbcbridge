@@ -1,0 +1,153 @@
+#! /usr/bin/perl -w
+
+# $Id: odbcbridge,v 1.4 2003-11-28 22:22:17 kiesling Exp $
+
+use UnixODBC qw(:all);
+use UnixODBC::BridgeServer;
+use Getopt::Long;
+
+my $help = '';  # Print help text and exit.
+my $pidfile = '/usr/local/var/odbcbridge/odbcbridge.pid';
+
+my $helptext =<<EOHELP;
+Usage: odbcbridge
+Options: 
+--help     Print this message and exit.
+For help configuring odbcbridge, type "man odbcbridge."
+EOHELP
+
+GetOptions ('help' => \$help);
+
+if ($help) {
+    print $helptext;
+    exit 0;
+}
+
+
+# Signal handler for PostgreSQL exceptions.
+$SIG{PIPE} = sub{print "SIGPIPE: ". $!."\n"};
+
+$SIG{TERM} = sub { `rm -f $pidfile` ; exit 0 }; 
+
+&UnixODBC::BridgeServer::main;
+
+=head1 NAME
+
+odbcbridge - Bridge proxy server daemon for UnixODBC.pm.
+
+=head1 SYNOPSIS
+
+odbcbridge
+
+=head1 DESCRIPTION
+
+Odbcbridge is a proxy server for ODBC clients that use the
+UnixODBC::BridgeServer API.  In normal use, odbcbridge is started when
+the system boots, and requires no user intervention.
+
+Odbcbridge uses two configuration files, odbcbridge.conf and
+odbclogins, for run-time configuration.  The configuration files are
+described below.
+
+Odbcbridge can be started manually from the shell prompt, or as
+installed by the UnixODBC installation from the startup script
+unixodbc:
+
+  $ /usr/local/etc/init.d/unixodbc start
+
+To terminate the operation of the daemon, use:
+
+  $ /usr/local/etc/init.d/unixodbc stop
+
+The unixodbc script is meant to start the daemon when the system boots
+and terminate the daemon at system shut down.  To enable automatic
+starting and stopping of the daemon, consult your system's
+documentation.
+
+=head1 OPTIONS
+
+=head2 --help
+
+Print help message and exit.
+
+=head1 CONFIGURATION FILES
+
+=head2 odbcbridge.conf
+
+Odbcbridge.conf is normally installed in /usr/local/etc and contains
+configuration directives for odbcbridge, as well as host-based access.
+Because UnixODBC::BridgeServers are a subclass of RPC::PlServer,
+odbcbridge inherits all of its configuration facilities.  Consult the
+RPC::PlServer man page for details about configuration.
+
+Here is the odbcbridge.conf file that is installed during the 
+odbcbridge installation:
+
+  #
+  # odbcbridge.conf - configuration options for UnixODBC.pm bridge 
+  # server.
+  # 
+
+  {
+	'localaddr' => undef,
+	'localport' => 9999,
+	'facility' => 'daemon',
+	'user' => 'nobody',
+	'group' => undef,
+	'mode' => 'fork',
+	# Increase this value if you receive socket reset errors
+        'timeout' => 60,
+	# Use syslog facility's daemon log.
+	'logfile' => undef,
+	'pidfile' => '/usr/local/var/odbcbridge/odbcbridge.pid',
+	'debug' => 2,
+	# Accept connections from anyone.	
+	'clients' => [{
+		'mask' => '.*',
+		'accept' => 1}]
+  }
+
+=head2 odbclogins
+
+The odbclogins file contains host login information, in the 
+form:
+
+  host::user::password
+
+The odbclogins file should have permissions 0600, to prevent outside
+users from viewing the information.  If using odbcbridge with 
+CGI scripts, then the odbclogins ownership should be those named
+in the Web server httpd.conf file's User and Group directives.
+
+The odbclogins file that is installed with odbcbridge is shown here.
+
+# odbclogins - each line has the format server::user::password
+# IMPORTANT - make sure you chmod 0600 odbclogins, and, if using
+# UnixODBC with CGI applications, change ownership to the user and 
+# group of the httpd server - usually user nobody, group nobody, 
+# although some installations use apache or www-data, or the values 
+# of the User and Group directives in httpd.conf, if they are 
+# something different.
+# host1::user::password
+# host2::user::password
+# host3::user::password
+
+
+=head1 VERSION INFORMATION AND CREDITS
+
+Revision: $Revision: 1.4 $
+
+Written by: Robert Allan Kiesling, rkies@cpan.org.
+
+Licensed under the same terms as Perl.  Please refer to the
+file "Artistic" for details.
+
+=head1 SEE ALSO
+
+perl(1), UnixODBC(3), UnixODBC::BridgeServer(3), RPC::PlServer(3)
+
+=cut
+
+
+
+

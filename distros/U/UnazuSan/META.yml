@@ -1,0 +1,41 @@
+---
+abstract: 'IRC reaction bot framework'
+author:
+  - 'Masayuki Matsuki <y.songmu@gmail.com>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.11.0, CPAN::Meta::Converter version 2.132510'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: UnazuSan
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  UnazuSan:
+    file: lib/UnazuSan.pm
+    version: 0.03
+requires:
+  AnySan: 0.10
+  perl: 5.010
+resources:
+  bugtracker: https://github.com/Songmu/p5-UnazuSan/issues
+  homepage: https://github.com/Songmu/p5-UnazuSan
+  repository: git://github.com/Songmu/p5-UnazuSan.git
+version: 0.03
+x_contributors:
+  - 'nagayasu <nagayasu@kayac.com>'

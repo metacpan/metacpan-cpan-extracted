@@ -1,0 +1,22 @@
+
+CuiFinder User Options: 
+   --config option set
+
+
+UMLS-Interface Configuration Information
+  Sources (SAB):
+    SNOMEDCT
+  Relations (REL):
+    CHD
+    PAR
+  Database: 
+    umls (MMSYS-2010AB-20101022)
+
+
+
+PathFinder User Options:
+  --realtime option set
+
+
+The minimum depth of cardiac structure (body structure) (C0018787) is 9
+The minimum depth of myocardial tissue (C0027061) is 9

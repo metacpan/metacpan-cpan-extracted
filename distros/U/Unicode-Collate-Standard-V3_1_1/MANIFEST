@@ -1,0 +1,11 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST			This list of files
+META.yml
+Makefile.PL
+README
+lib/Unicode/Collate/Standard/V3_1_1.pm
+lib/Unicode/Collate/Standard/V3_1_1.txt
+t/00load.t
+t/01collate.t

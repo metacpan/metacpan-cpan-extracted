@@ -1,0 +1,46 @@
+NAME
+
+    UnicornEngine - Perl extension for Unicorn Engine from
+    http://unicorn-engine.org
+
+SYNOPSIS
+
+        use UnicornEngine;
+    
+        my $uc = UnicornEngine->new(arch => UC_ARCH_X86, mode => UC_MODE_32);
+        my $addr = 0x80000000;
+        $uc->mem_map($addr, 2 * 1024 * 1024);
+        my $code = "\x31\xc9\x90\x90"; ## xor ecx, ecx; nop; nop;
+        $uc->mem_write($addr, $code);
+        $uce->reg_write(UC_X86_REG_ECX, 0xdeadbeef);
+        $uce->emu_start(begin => $address, end => $addr + length($code));
+        $uce->reg_read(UC_X86_REG_ECX);
+        my $regions = $uc->mem_regions;
+        foreach (@$regions) {
+            $uce->mem_unmap($_->{begin}, $_->{end});
+        }
+          
+
+DESCRIPTION
+
+    Refer documentation for UnicornEngine at http://unicorn-engine.org
+
+    All constants are exported for X86 and ARM. SPARC/MIPS/ARM64/M68K not
+    supported yet.
+
+SEE ALSO
+
+    Capstone, Keystone, Alien::UnicornEngine
+
+AUTHOR
+
+    Vikas N. Kumar, <vikas@cpan.org<gt>
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2016 by Vikas N. Kumar
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.14.2 or, at
+    your option, any later version of Perl 5 you may have available.
+

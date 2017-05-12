@@ -1,0 +1,23 @@
+Revision history for Perl extension Urlader
+
+1.01 Sun Jun 17 15:09:57 CEST 2012
+	- use :raw:perlio to open files for retarted operating systems, although
+          :perlio *should* work - maybe a perl 5.8 issue? (reported by sten).
+        - Urlader::lock now official part of the API, and doesn't cause
+          "free unreferenced scalar" error.
+
+1.0  Mon Feb  6 23:08:58 CET 2012
+        - warn about set*id or privileged operation.
+        - properly do PATH search on unix to find executable (*blush*).
+	- more tips and tricks.
+        - use FILE_SHARE_DELETE when opening override/executable and lockfiles
+          on windows.
+
+0.2   Sun Jan  8 10:12:00 CET 2012
+        - initial release, was successfully used for one deliantra
+          release.
+
+0.01  Sat Dec 31 11:15:29 CET 2011
+	- original version; cloned from Convert::Scalar and scavenging
+          earlier "urlader" work.
+

@@ -1,0 +1,34 @@
+#
+# Revision history for Perl extension UNIVERSAL::which.
+# 
+$Revision: 0.6 $ $Date: 2007/05/15 16:01:20 $
++ t/05-blessed.t
+! lib/UNIVERSAL/which.pm t/04-anon.t
+  Blessed coderef should work as well.
+  which() w/ scalar context now returns '' for __ANON__.
+
+0.5 2007/05/15 14:54:00
+! lib/UNIVERSAL/which.pm
+  POD fixes.
+
+0.4 2007/05/15 14:45:23 (unreleased)
++ t/04-anon.t
+! lib/UNIVERSAL/which.pm t/03-function.t t/02-autoload.t
+  Addressed the bug noted by MIYAZAKI
+  http://d.hatena.ne.jp/fbis/20070412/1176360713
+
+0.03 2006/05/15 07:47:52
+! MANIFEST
+- UNIVERSAL
++ lib/UNIVERSAL
+  Some versions of ExtUtils::MakeMaker fails to install
+  
+0.02 2006/05/14 03:09:45
+! t/*.t
+  s/Universal/UNIVERSAL/g
+  *blush* Mac OS X (HFS+ to be more exact) blew my foot again!
+
+0.01  Sun May 14 03:54:41 2006
+	- original version; created by h2xs 1.23 with options
+		-XAn UNIVERSAL::which
+

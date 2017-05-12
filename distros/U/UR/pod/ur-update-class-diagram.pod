@@ -1,0 +1,96 @@
+
+
+=pod
+
+=head1 NAME
+
+ur update class-diagram - Update an Umlet diagram based on the current class definitions
+
+
+
+=head1 VERSION
+
+This document describes ur update class-diagram version 0.29.
+
+=head1 SYNOPSIS
+
+ur update class-diagram --file=? [--data-source=?] [--depth=?] [--include-ur-object] [--show-attributes] [--show-methods] [INITIAL-NAME]
+
+
+
+=head1 REQUIRED ARGUMENTS
+
+=over
+
+
+=item file  I<String>
+
+Pathname of the Umlet (.uxf) file
+
+
+=back
+
+=head1 OPTIONAL ARGUMENTS
+
+=over
+
+
+=item data-source  I<String>
+
+Which datasource to use
+
+=item depth  I<Integer>
+
+Max distance of related classes to include.  Default is 1.  0 means show only the named class(es), -1 means to include everything
+
+=item include-ur-object  I<Boolean>
+
+Include UR::Object and UR::Entity in the diagram (default = no)
+
+Default value 'false' (--noinclude-ur-object) if not specified
+
+=item noinclude-ur-object  I<Boolean>
+
+Make include-ur-object 'false'
+
+=item show-attributes  I<Boolean>
+
+Include class attributes in the diagram
+
+Default value 'true' if not specified
+
+=item noshow-attributes  I<Boolean>
+
+Make show-attributes 'false'
+
+=item show-methods  I<Boolean>
+
+Include methods in the diagram (not implemented yet
+
+Default value 'false' (--noshow-methods) if not specified
+
+=item noshow-methods  I<Boolean>
+
+Make show-methods 'false'
+
+=item INITIAL-NAME
+
+(undocumented)
+
+
+=back
+
+=head1 DESCRIPTION:
+
+  Creates a new Umlet diagram, or updates an existing diagram.  Bare arguments
+  are taken as class names to include in the diagram.  Other classes may be
+  included in the diagram based on their distance from the names classes
+  and the --depth parameter.
+  
+  If an existing file is being updated, the position of existing elements 
+  will not change.
+
+
+
+=cut
+

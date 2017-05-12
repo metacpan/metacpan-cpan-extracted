@@ -1,0 +1,21 @@
+NAME
+    URL::Encode::XS - XS implementation of URL::Encode
+
+DESCRIPTION
+    The main URL::Encode package will use this package automatically if it
+    can find it. Do not use this package directly, use URL::Encode instead.
+
+SUPPORT
+    Please report any bugs or feature requests to
+    "bug-url-encode-xs@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=URL-Encode-XS>
+
+AUTHOR
+    Christian Hansen, <chansen@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2014 by Christian Hansen
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

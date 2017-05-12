@@ -1,0 +1,54 @@
+Revision history for Perl module Unicode::Util
+
+v0.10 2013-02-27
+ - Added new grapheme_substr function
+ - Fixed bugs in grapheme_rindex, which is now supported and no longer
+   experimental
+
+v0.09 2013-02-11
+ - grapheme_index is now officially supported and no longer experimental
+ - grapheme_length now returns a value based at 0 or whatever you’ve set the $[
+   variable to—like with CORE::index—but don’t do that!
+
+v0.08 2013-02-08
+ - The new grapheme_length, grapheme_chop, and grapheme_reverse functions now
+   work like CORE::length, CORE::chop, and CORE::reverse, respectively, except
+   on grapheme clusters instead of code points
+ - The old graph_length, graph_chop, and graph_reverse will remain unchanged and
+   deprecated
+
+v0.07 2013-01-29
+ - Converted this Changes file from YAML to CPAN Changes format as per
+   CPAN::Changes::Spec
+ - Added grapheme_length, grapheme_chop, and grapheme_reverse as the primary
+   names for graph_length, graph_chop, and graph_reverse, respectively
+ - Deprecated graph_length, graph_chop, and graph_reverse
+ - Deprecated code_length and byte_length
+ - Deprecated :length tag
+ - Added experimental grapheme_index, grapheme_rindex, and grapheme_split
+
+v0.06 2012-04-15
+ - Deprecated code_chop as it’s easy to do using core syntax and this module
+   will only implement grapheme cluster functions going forward, except for
+   code_length and byte_length
+ - Improved documentation
+
+v0.05 2012-03-04
+ - Added additional argument to code_length and byte_length to optionally
+   specify the normalization form
+
+v0.04 2012-02-24
+ - Added optional second argument to byte_length to specify the encoding,
+   with the default remaining UTF-8
+
+v0.03 2012-01-18
+ - Added graph_reverse
+ - Removed side-effects from graph_chop and code_chop,
+   unlike the build-in chop
+
+v0.02 2012-01-17
+ - Added graph_chop and code_chop
+
+v0.01 2012-01-17
+ - First release
+ - Includes graph_length, code_length, and byte_length

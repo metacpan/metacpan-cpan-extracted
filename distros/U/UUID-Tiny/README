@@ -1,0 +1,70 @@
+UUID-Tiny Version 1.04
+
+This is a Pure Perl module for the creation of UUIDs:
+
+- version 1 time based (with random multicast MAC address)
+- version 3 MD5 based
+- version 4 random number based
+- version 5 SHA-1 based
+
+The module uses a functional interface and creates binary (network byte order)
+or string representations. Version 3 and 5 UUIDs can be created from file
+content instead of "names" (strings).
+
+Be aware that, because of being a Pure Perl implementation, there are
+performance limits and the randomness of multicast MAC addresses and the
+version 4 numbers are not perfect. If you can afford module compilation and
+installation, you should look at Data::UUID instead!
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+DEPENDENCIES
+
+Should run from Perl 5.8 up and uses this modules (mostly Perl 5.8 core):
+
+    Carp
+    Digest::MD5
+    Digest::SHA1 (or Digest::SHA or Digest::SHA::PurePerl)
+    MIME::Base64
+    Time::HiRes
+    POSIX
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc UUID::Tiny
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=UUID-Tiny
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/UUID-Tiny
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/UUID-Tiny
+
+    Search CPAN
+        http://search.cpan.org/dist/UUID-Tiny/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009, 2010, 2013 Christian Augustin
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

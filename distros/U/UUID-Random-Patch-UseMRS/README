@@ -1,0 +1,33 @@
+NAME
+    UUID::Random::Patch::UseMRS - Make UUID::Random use
+    Math::Random::Secure's rand()
+
+VERSION
+    version 0.01
+
+SYNOPSIS
+     use UUID::Random::Patch::UseMRS;
+     say UUID::Random::generate();
+
+DESCRIPTION
+    This module makes UUID::Random use "rand()" from Math::Random::Secure
+    instead of the default "rand()" that comes with Perl. It is useful for
+    creating cryptographically secure UUID's. On the other hand, as a note,
+    this makes generate() around 20 times slower.
+
+    After you "use" this module, use UUID::Random as usual.
+
+SEE ALSO
+    Math::Random::Secure
+
+    UUID::Random
+
+AUTHOR
+    Steven Haryanto <stevenharyanto@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Steven Haryanto.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

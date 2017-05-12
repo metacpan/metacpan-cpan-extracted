@@ -1,0 +1,130 @@
+{
+   "abstract" : "Bindings to UDPipe library",
+   "author" : [
+      "Milan Straka <straka@ufal.mff.cuni.cz>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Ufal-UDPipe",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Ufal::UDPipe" : {
+         "file" : "lib/Ufal/UDPipe.pm",
+         "version" : "v1.1.0.1"
+      },
+      "Ufal::UDPipe::Children" : {
+         "file" : "lib/Ufal/UDPipe.pm",
+         "version" : "v1.1.0.1"
+      },
+      "Ufal::UDPipe::Comments" : {
+         "file" : "lib/Ufal/UDPipe.pm",
+         "version" : "v1.1.0.1"
+      },
+      "Ufal::UDPipe::EmptyNode" : {
+         "file" : "lib/Ufal/UDPipe.pm",
+         "version" : "v1.1.0.1"
+      },
+      "Ufal::UDPipe::EmptyNodes" : {
+         "file" : "lib/Ufal/UDPipe.pm",
+         "version" : "v1.1.0.1"
+      },
+      "Ufal::UDPipe::Evaluator" : {
+         "file" : "lib/Ufal/UDPipe.pm",
+         "version" : "v1.1.0.1"
+      },
+      "Ufal::UDPipe::InputFormat" : {
+         "file" : "lib/Ufal/UDPipe.pm",
+         "version" : "v1.1.0.1"
+      },
+      "Ufal::UDPipe::Model" : {
+         "file" : "lib/Ufal/UDPipe.pm",
+         "version" : "v1.1.0.1"
+      },
+      "Ufal::UDPipe::MultiwordToken" : {
+         "file" : "lib/Ufal/UDPipe.pm",
+         "version" : "v1.1.0.1"
+      },
+      "Ufal::UDPipe::MultiwordTokens" : {
+         "file" : "lib/Ufal/UDPipe.pm",
+         "version" : "v1.1.0.1"
+      },
+      "Ufal::UDPipe::OutputFormat" : {
+         "file" : "lib/Ufal/UDPipe.pm",
+         "version" : "v1.1.0.1"
+      },
+      "Ufal::UDPipe::Pipeline" : {
+         "file" : "lib/Ufal/UDPipe.pm",
+         "version" : "v1.1.0.1"
+      },
+      "Ufal::UDPipe::ProcessingError" : {
+         "file" : "lib/Ufal/UDPipe.pm",
+         "version" : "v1.1.0.1"
+      },
+      "Ufal::UDPipe::Sentence" : {
+         "file" : "lib/Ufal/UDPipe.pm",
+         "version" : "v1.1.0.1"
+      },
+      "Ufal::UDPipe::Sentences" : {
+         "file" : "lib/Ufal/UDPipe.pm",
+         "version" : "v1.1.0.1"
+      },
+      "Ufal::UDPipe::Token" : {
+         "file" : "lib/Ufal/UDPipe.pm",
+         "version" : "v1.1.0.1"
+      },
+      "Ufal::UDPipe::Trainer" : {
+         "file" : "lib/Ufal/UDPipe.pm",
+         "version" : "v1.1.0.1"
+      },
+      "Ufal::UDPipe::Version" : {
+         "file" : "lib/Ufal/UDPipe.pm",
+         "version" : "v1.1.0.1"
+      },
+      "Ufal::UDPipe::Word" : {
+         "file" : "lib/Ufal/UDPipe.pm",
+         "version" : "v1.1.0.1"
+      },
+      "Ufal::UDPipe::Words" : {
+         "file" : "lib/Ufal/UDPipe.pm",
+         "version" : "v1.1.0.1"
+      },
+      "Ufal::UDPipec" : {
+         "file" : "lib/Ufal/UDPipe.pm",
+         "version" : "v1.1.0.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ufal/udpipe/issues"
+      },
+      "homepage" : "http://ufal.mff.cuni.cz/udpipe",
+      "license" : [
+         "http://www.mozilla.org/MPL/2.0/index.txt",
+         "https://www.mozilla.org/en-US/MPL/2.0/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/ufal/udpipe.git"
+      }
+   },
+   "version" : "v1.1.0.1"
+}

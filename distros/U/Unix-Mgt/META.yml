@@ -1,0 +1,19 @@
+---
+abstract: 'Unix::Mgt - lightweight Unix management tools'
+author:
+    - "Miko O'Sullivan <miko@idocs.com>"
+generated_by: home grown
+license: perl
+name: Unix-Mgt
+provides:
+    Unix::Mgt:
+        file: lib/Unix/Mgt.pm
+        version: 0.14
+requires:
+    Capture::Tiny: 0.25
+    IPC::System::Simple: 1.25
+    JSON::Tiny: 0.50
+    String::Util: 1.24
+    Unix::SearchPathGuess: 0.11
+    perl: 5.003
+version: 0.14

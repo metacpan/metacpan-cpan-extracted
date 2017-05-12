@@ -1,0 +1,10 @@
+0.03    21 September 2014
+        Add URI::URL as a prereq and use it since URI::Find removed it
+        as one. (CPAN RT #99003)
+
+0.02    24 March 2003
+        Bugfix (CPAN RT #2245) - turned on URI::URL::strict to stop it
+          assuming that any old thing followed by a colon is a scheme.
+
+0.01    18 February 2003
+        Initial release.

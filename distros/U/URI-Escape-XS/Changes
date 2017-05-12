@@ -1,0 +1,109 @@
+#
+# $Id: Changes,v 0.14 2016/06/09 11:09:38 dankogai Exp dankogai $
+#
+# Revision history for Revision history for URI-Escape-XS
+#
+$Revision: 0.14 $ $Date: 2016/06/09 11:09:38 $
+! XS.xs
+  pulled: RT #115183: MSVC 2013 and earlier do not understand `inline`
+  https://github.com/dankogai/p5-uri-escape-xs/pull/6
+ 
+0.13 2015/06/27 00:28:39
+! XS.xs t/02-basic.t
+  Refactor & debug my_hextol()
+! XS.xs
+  Pulled: Speed up common case of decoding
+  https://github.com/dankogai/p5-uri-escape-xs/pull/5
+
+0.12 2014/04/16 10:49:36
+! XS.xs
++ t/06-nonstr.t
+  Addressed: RT#94793: encodeURIComponent can't encode integer values
+  https://rt.cpan.org/Ticket/Display.html?id=94793
+
+0.11 2014/01/20 20:39:54
+! t/03-hashu.t
+  No longer skips tests 4-6 for Test::Harness->VERSION > 3
+! Makefile.PL
+  Pulled: https://github.com/dankogai/p5-uri-escape-xs/pull/4
+! lib/URI/Escape/XS.pm
+  Pulled: https://github.com/dankogai/p5-uri-escape-xs/pull/3
+
+0.10 2013/02/25 17:24:25
+! lib/URI/Escape/XS.pm
+  Updated mail address
+! XS.xs
+  Pulled: https://github.com/dankogai/p5-uri-escape-xs/pull/2
+
+0.09 2012/08/06 01:44:20
+! lib/URI/Escape/XS.pm
+  POD Fixes
+! Makefile.PL
+  Addressed: RT#78738: Please provide LICENSE in metadata.
+  https://rt.cpan.org/Ticket/Display.html?id=78738
+! t/04-idn.t
+  Addressed: RT#74344: Fails when Net::IDN::Encode 2.003 installed
+  https://rt.cpan.org/Ticket/Display.html?id=74344
+
+0.08 2010/07/16 07:52:31
+! XS.xs
+  The fix in RT#39135 did not address %XX
+  reported by @kazuho via twitter DM
+
+0.07 2010/05/04 06:02:38
+! XS.xs
+  Addressed:
+  #57168: memory leak in uri_escape ?
+  http://rt.cpan.org/Public/Bug/Display.html?id=57168
+
+0.06 2009/10/07 11:40:30
++ t/05-null.t
+! XS.xs lib/URI/Escape/XS.pm
+  Addressed:
+  #45392: First invocation of encodeURIComponentIDN loses the path
+  #49375: decodeURIComponent() influences references from a regexp
+  #45855: Problems with undef
+  http://rt.cpan.org/Public/Bug/Display.html?id=45392
+  http://rt.cpan.org/Public/Bug/Display.html?id=49375
+  http://rt.cpan.org/Public/Bug/Display.html?id=45855
+
+0.05 2009/03/24 14:24:09
+! lib/URI/Escape/XS.pm t/04-IDN.t
+  Now you can also use Net::LibIDN instead of Net::IDN::Encode
+  http://rt.cpan.org/Public/Bug/Display.html?id=44084
+
+0.04 2009/01/16 08:26:52
+!  lib/URI/Escape/XS.pm
+!  t/04-IDN.t
+   drry:   * fixed POD and test. * et cetera.
+   http://coderepos.org/share/changeset/28708
+! t/t/01-compat.t
+  Retouched so it is now locale-free
+  http://rt.cpan.org/Public/Bug/Display.html?41134
+  http://rt.cpan.org/Public/Bug/Display.html?42702
+
+0.04 2009/01/16 08:26:52
+! XS.pm README
++ t/04-idn.t
+  added: decodeURICompornentIDN() and encodeURICompornentIDN()
+
+0.03 2009/01/16 08:26:52
+! XS.pm
+  Arguments are now unconditionally stringified
+  http://rt.cpan.org/Public/Bug/Display.html?39344
+! XS.xs
+  Addressed test failure on 5.10.x and others
+  http://rt.cpan.org/Public/Bug/Display.html?39135
+
+0.02 2008/05/30 23:53:13
+! XS.xs
+  s/ishexnumber/isxdigit/g # for better compatibility
+  http://rt.cpan.org/Public/Bug/Display.html?id=32556
+  http://rt.cpan.org/Public/Bug/Display.html?id=28583
+! lib/URI/Escape/XS.pm
+  POD fixes.
+
+0.01 2007/04/27 17:17:46
++ *
+  First Release.
+

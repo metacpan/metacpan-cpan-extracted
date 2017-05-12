@@ -1,0 +1,11 @@
+MANIFEST
+Readme
+Build.PL
+Makefile.PL
+META.yml
+lib/URI/Find/Iterator.pm
+t/01simple.t
+t/02multiple.t
+t/03withcruft.t
+t/04class_schemeless.t
+t/04re_schemeless.t

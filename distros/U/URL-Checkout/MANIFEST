@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+Checkout.pm
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+url_co.pl
+META.yml                                 Module meta-data (added by MakeMaker)

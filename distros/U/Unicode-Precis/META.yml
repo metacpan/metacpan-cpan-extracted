@@ -1,0 +1,33 @@
+---
+abstract: 'RFC 7564 PRECIS Framework - Enforcement and Comparison'
+author:
+  - 'Hatuka*nezumi - IKEDA Soji <hatuka@nezumi.nu>'
+build_requires:
+  Encode: '0'
+  Unicode::UCD: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.26'
+  Test::More: '0.45'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Unicode-Precis
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Encode: '0'
+  Exporter: '0'
+  Unicode::BiDiRule: '0.02'
+  Unicode::Normalize: '1.23'
+  Unicode::Precis::Preparation: '0.01'
+  XSLoader: '0'
+  perl: '5.008'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/hatukanezumi/Unicode-Precis/
+version: '1.100'

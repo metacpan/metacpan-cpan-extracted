@@ -1,0 +1,12 @@
+MANIFEST
+Changes
+META.yml
+LICENSE
+README
+Build.PL
+Makefile.PL
+t/module-lib.pm
+t/test.t
+t/test-lib.pm
+lib/Unix/Mgt.pod
+lib/Unix/Mgt.pm

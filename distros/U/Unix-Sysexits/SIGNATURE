@@ -1,0 +1,40 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 1f71467236699c03cd569d971ea591625d965048 Changes
+SHA1 27cf078faac611b6a6bb94ab8dd9d9b463defb6c LICENSE
+SHA1 ac0e64a121df16a3264afff51c3d502dacffad4a MANIFEST
+SHA1 f38fe723ecaac7532136245b68a16afd3ed32884 META.json
+SHA1 15f112436cfd0814635e98bd5169904c6977f4c3 META.yml
+SHA1 0619ffd4c566b192dd41ec30d423542d27304313 Makefile.PL
+SHA1 1b5003ae93469f71bde4187cd132c8845cf41eed README
+SHA1 45818063c39bcc107e11edc4b8efcd4eccc224a7 Sysexits.xs
+SHA1 69c44e42f183e7b55d6988204928e714e9e57d01 fallback/const-c.inc
+SHA1 4dde1be74bdae39a2d658f46e19c70577f151724 fallback/const-xs.inc
+SHA1 33e21c96a0df79a9ac0d01a5e97053e18d9480c6 lib/Unix/Sysexits.pm
+SHA1 1a8122d899b6f3b466bf938f6406997ac3843d36 ppport.h
+SHA1 978ec77b79a3f5ba74a925d56a15f00908b67b42 t/Unix-Sysexits.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJU0ZFSAAoJEDTEVWqwTuCU+C8IAJpZruwuK0aHJTldXn8j9Lnh
+YGL026QA/qOpzrgBQ4bZ1E/kZcaGxT8h1RJ3INrq71vmcQIWhwO599aZs8XfrC+m
+LmCn7z5NCDHyIcW8l3aaODcdrQ50JDmvdo/jEwBEEZS7qp7qtz5ndidWi+OUGuC0
+JXZBqJTDTobdp3qQv/l+PW2SO3Kkqz+qFE/Dzkcm7VXxgaSMZQG0MKF0diGuLF/e
+7tplMZuMLH0Q2as/MD7pmTct1rnBXuc5U9e0BIpk+j21HxBrtxBCyDXy8S9W0smM
+fnPjsikndFhdKiGakzbC5uWEG9/oiZncDnnecFlBwYVoo/nyimNJ0ejJ0vp5jxU=
+=phQ4
+-----END PGP SIGNATURE-----

@@ -1,0 +1,308 @@
+NAME
+    UDDI::Lite - Library for UDDI clients in Perl
+
+SYNOPSIS
+      use UDDI::Lite;
+      print UDDI::Lite
+        -> proxy('http://uddi.microsoft.com/inquire')
+        -> find_business(name => 'old')
+        -> result
+        -> businessInfos->businessInfo->serviceInfos->serviceInfo->name;
+
+    The same code with autodispatch:
+
+      use UDDI::Lite +autodispatch =>
+        proxy => 'http://uddi.microsoft.com/inquire'
+      ;
+
+      print find_business(name => 'old')
+        -> businessInfos->businessInfo->serviceInfos->serviceInfo->name;
+
+    Or with importing:
+
+      use UDDI::Lite
+        'UDDI::Lite' => [':inquiry'],
+        proxy => 'http://uddi.microsoft.com/inquire'
+      ;
+
+      print find_business(name => 'old')
+        -> businessInfos->businessInfo->serviceInfos->serviceInfo->name;
+
+    Publishing API:
+
+      use UDDI::Lite
+        import => ['UDDI::Data'],
+        import => ['UDDI::Lite'],
+        proxy => "https://some.server.com/endpoint_fot_publishing_API";
+
+      my $auth = get_authToken({userID => 'USERID', cred => 'CRED'})->authInfo;
+      my $busent = with businessEntity =>
+        name("Contoso Manufacturing"),
+        description("We make components for business"),
+        businessKey(''),
+        businessServices with businessService =>
+          name("Buy components"),
+          description("Bindings for buying our components"),
+          serviceKey(''),
+          bindingTemplates with bindingTemplate =>
+            description("BASDA invoices over HTTP post"),
+            accessPoint('http://www.contoso.com/buy.asp'),
+            bindingKey(''),
+            tModelInstanceDetails with tModelInstanceInfo =>
+              description('some tModel'),
+              tModelKey('UUID:C1ACF26D-9672-4404-9D70-39B756E62AB4')
+      ;
+      print save_business($auth, $busent)->businessEntity->businessKey;
+
+DESCRIPTION
+    UDDI::Lite for Perl is a collection of Perl modules which provides a
+    simple and lightweight interface to the Universal Description, Discovery
+    and Integration (UDDI) server.
+
+    To learn more about UDDI, visit http://www.uddi.org/.
+
+    The main features of the library are:
+
+    *  Supports both inquiry and publishing API
+
+    *  Builded on top of SOAP::Lite module, hence inherited syntax and
+       features
+
+    *  Supports easy-to-use interface with convenient access to
+       (sub)elements and attributes
+
+    *  Supports HTTPS protocol
+
+    *  Supports SMTP protocol
+
+    *  Supports Basic/Digest server authentication
+
+OVERVIEW OF CLASSES AND PACKAGES
+    This table should give you a quick overview of the classes provided by
+    the library.
+
+     UDDI::Lite.pm
+     -- UDDI::Lite         -- Main class provides all logic
+     -- UDDI::Data         -- Provides extensions for serialization architecture
+     -- UDDI::Serializer   -- Serializes data structures to UDDI/SOAP package
+     -- UDDI::Deserializer -- Deserializes result into objects
+     -- UDDI::SOM          -- Provides access to deserialized object tree
+
+  UDDI::Lite
+    All methods that UDDI::Lite gives you access to can be used for both
+    setting and retrieving values. If you provide no parameters, you'll get
+    current value, and if you'll provide parameter(s), new value will be
+    assigned and method will return object (if not stated something else).
+    This is suitable for stacking these calls like:
+
+      $uddi = UDDI::Lite
+        -> on_debug(sub{print@_})
+        -> proxy('http://uddi.microsoft.com/inquire')
+      ;
+
+    Order is insignificant and you may call new() method first. If you don't
+    do it, UDDI::Lite will do it for you. However, new() method gives you
+    additional syntax:
+
+      $uddi = new UDDI::Lite
+        on_debug => sub {print@_},
+        proxy => 'http://uddi.microsoft.com/inquire'
+      ;
+
+    new() accepts hash with method names and values, and will call
+    appropriate method with passed value.
+
+    Since new() is optional it won't be mentioned anymore.
+
+    Other available methods inherited from SOAP::Lite and most usable are:
+
+    proxy()
+        Shortcut for "transport->proxy()". This lets you specify an endpoint
+        and also loads the required module at the same time. It is required
+        for dispatching SOAP calls. The name of the module will be defined
+        depending on the protocol specific for the endpoint. SOAP::Lite will
+        do the rest work.
+
+    on_fault()
+        Lets you specify handler for on_fault event. Default behavior is die
+        on transport error and does nothing on others. You can change this
+        behavior globally or locally, for particular object.
+
+    on_debug()
+        Lets you specify handler for on_debug event. Default behavior is do
+        nothing. Use +trace/+debug option for UDDI::Lite instead.
+
+    To change to UDDI Version 2, use the following pragma:
+
+      use UDDI::Lite uddiversion => 2;
+
+  UDDI::Data
+    You can use this class if you want to specify value and name for UDDI
+    elements. For example, "UDDI::Data->name('businessInfo')->value(123)"
+    will be serialized to "<businessInfo>123</businessInfo>", as well as
+    "UDDI::Data-"name(businessInfo => 123)>.
+
+    If you want to provide names for your parameters you can either specify
+
+      find_business(name => 'old')
+
+    or do it with UDDI::Data:
+
+      find_business(UDDI::Data->name(name => 'old'))
+
+    Later has some advantages: it'll work on any level, so you can do:
+
+      find_business(UDDI::Data->name(name => UDDI::Data->name(subname => 'old')))
+
+    and also you can create arrays with this syntax:
+
+      find_business(UDDI::Data->name(name =>
+        [UDDI::Data->name(subname1 => 'name1'),
+         UDDI::Data->name(subname2 => 'name2')]))
+
+    will be serialized into:
+
+      <find_business xmlns="urn:uddi-org:api" generic="1.0">
+        <name>
+          <subname1>name1</subname1>
+          <subname2>name2</subname2>
+        </name>
+      </find_business>
+
+    For standard elements more convenient syntax is available:
+
+      find_business(
+        findQualifiers(findQualifier('sortByNameAsc',
+                                     'caseSensitiveMatch')),
+        name('M')
+      )
+
+    and
+
+      find_business(
+        findQualifiers([findQualifier('sortByNameAsc'),
+                        findQualifier('caseSensitiveMatch')]),
+        name('M')
+      )
+
+    both will generate:
+
+      <SOAP-ENV:Envelope
+        xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+        <SOAP-ENV:Body>
+          <find_business xmlns="urn:uddi-org:api" generic="1.0">
+            <findQualifiers>
+              <findQualifier>sortByNameAsc</findQualifier>
+              <findQualifier>caseSensitiveMatch</findQualifier>
+            </findQualifiers>
+            <name>M</name>
+          </find_business>
+        </SOAP-ENV:Body>
+      </SOAP-ENV:Envelope>
+
+    You can use ANY valid combinations (according to "UDDI Programmer's API
+    Specification"). If you try to generate something unusual, like
+    "name(name('myname'))", you'll get:
+
+      Don't know what to do with 'name' and 'name' elements ....
+
+    If you REALLY need to do it, use "UDDI::Data" syntax described above.
+
+    As special case you can pass hash as the first parameter of method call
+    and values of this hash will be added as attributes to top element:
+
+      find_business({maxRows => 10}, UDDI::Data->name(name => old))
+
+    gives you
+
+      <find_business xmlns="urn:uddi-org:api" generic="1.0" maxRows="10">
+        ....
+      </find_business>
+
+    You can also pass back parameters exactly as you get it from method call
+    (like you probably want to do with authInfo).
+
+    You can get access to attributes and elements through the same
+    interface:
+
+      my $list = find_business(name => old);
+      my $bis = $list->businessInfos;
+      for ($bis->businessInfo) {
+        my $s = $_->serviceInfos->serviceInfo;
+        print $s->name,        # element
+              $s->businessKey, # attribute
+              "\n";
+      }
+
+    To match advantages provided by "with" operator available in other
+    languages (like VB) we provide similar functionality that adds you
+    flexibility:
+
+        with findQualifiers =>
+          findQualifier => 'sortByNameAsc',
+          findQualifier => 'caseSensitiveMatch'
+
+    is the same as:
+
+        with(findQualifiers =>
+          findQualifier('sortByNameAsc'),
+          findQualifier('caseSensitiveMatch'),
+        )
+
+    and:
+
+        findQualifiers->with(
+          findQualifier('sortByNameAsc'),
+          findQualifier('caseSensitiveMatch'),
+        )
+
+    will all generate the same code as mentioned above:
+
+        findQualifiers(findQualifier('sortByNameAsc',
+                                     'caseSensitiveMatch')),
+
+    Advantage of "with" syntax is the you can specify both attributes and
+    elements through the same interface. First argument is element where all
+    other elements and attributes will be attached. Provided examples and
+    tests cover different syntaxes.
+
+  AUTODISPATCHING
+    UDDI::Lite provides autodispatching feature that lets you create code
+    that looks similar for local and remote access.
+
+    For example:
+
+      use UDDI::Lite +autodispatch =>
+        proxy => 'http://uddi.microsoft.com/inquire';
+
+    tells autodispatch all UDDI calls to
+    'http://uddi.microsoft.com/inquire'. All subsequent calls can look like:
+
+      find_business(name => 'old');
+      find_business(UDDI::Data->name(name => 'old'));
+      find_business(name('old'));
+
+BUGS AND LIMITATIONS
+    *   Interface is still subject to change.
+
+    *   Though HTTPS/SSL is supported you should specify it yourself (with
+        "proxy" or "endpoint") for publishing API calls.
+
+AVAILABILITY
+    For now UDDI::Lite is distributed as part of SOAP::Lite package. You can
+    download it from ( http://soaplite.com/ ) or from CPAN (
+    http://search.cpan.org/search?dist=SOAP-Lite ).
+
+SEE ALSO
+    SOAP::Lite ( http://search.cpan.org/search?dist=SOAP-Lite ) UDDI (
+    http://search.cpan.org/search?dist=UDDI )
+
+COPYRIGHT
+    Copyright (C) 2000-2004 Paul Kulchenko. All rights reserved.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+AUTHOR
+    Paul Kulchenko (paulclinger@yahoo.com)
+

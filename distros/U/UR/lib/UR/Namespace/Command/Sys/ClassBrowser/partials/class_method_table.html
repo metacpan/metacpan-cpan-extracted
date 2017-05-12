@@ -1,0 +1,38 @@
+<table class="table table-condensed table-hover">
+    <caption>[% title %]</caption>
+    <thead>
+        <tr><th>Method</th>
+            <th>From</th>
+            <th>Source</th>
+        </tr>
+    </thead>
+    <tbody>
+        [% FOREACH method IN methods %]
+            <tr><td>
+                    [% IF method.line.defined %]
+                        <a href="/render-perl-module/[% method.package %]#[% method.line %]"
+                            target="_blank">[% method.method %]</a>
+                    [% ELSE %]
+                        [% method.method %]
+                    [% END %]
+                </td>
+
+                <td>
+                    <ul class="method-inheritance">
+                        [% FOREACH superclass IN method.overrides %]
+                        <li>
+                            [% IF (superclass == meta.class_name) || (superclass == 'UR::ModuleBase') %]
+                                [% superclass %]
+                            [% ELSE %]
+                                <a href="/detail-for-class/[% method.class %]"
+                                    class="btn btn-mini class-detail">[% superclass %]</a>
+                            [% END %]
+                        </li>
+                        [% END %]
+                    <ul>
+                </td>
+            </tr>
+        [% END %]
+    </tbody>
+</table>
+

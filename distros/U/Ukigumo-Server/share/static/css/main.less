@@ -1,0 +1,72 @@
+@import "../less/bootstrap/mixins.less";
+
+header {
+    height: 50px;
+    font-size: 36px;
+    padding: 2px;
+    text-align: center; }
+    header a {
+        color: black;
+        font-weight: bold;
+        text-decoration: none; }
+
+footer {
+    text-align: right;
+    padding-right: 10px;
+    padding-top: 2px; }
+    footer a {
+        text-decoration: none;
+        color: black;
+        font-weight: bold;
+    }
+
+.line-anchor {
+    color: #dddddd;
+}
+.line-anchor:hover {
+    color: #aaaaaa;
+}
+
+.pager {
+    text-align: center;
+}
+
+code {
+    line-height: 18px;
+}
+
+#main {
+    margin-top: 50px;
+}
+
+div.success {
+    background: url(../img/ukigumo-chan.png) right top no-repeat;
+}
+
+div.fail {
+    background: url(../img/ukigumo-chan-angry.png) right top no-repeat;
+}
+
+#APIDocs {
+    .io {
+        .clearfix();
+        margin-left: 10px;
+
+        .input {
+            width: 400px;
+            display: inline;
+            float : left;
+            margin-left: 20px;
+        }
+        .output {
+            width: 400px;
+            display: inline;
+            float : left;
+            margin-left: 20px;
+        }
+    }
+}
+
+/* smart phones */
+@media screen and (max-device-width: 480px) {
+}

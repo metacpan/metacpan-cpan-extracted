@@ -1,0 +1,57 @@
+{
+   "abstract" : "Uninets::Check module to check mongodb servers.",
+   "author" : [
+      "Matthias Krull <<m.krull@uninets.eu>>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Uninets-Check-Modules-MongoDB",
+   "no_index" : {
+      "directory" : [
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON" : "0",
+            "MongoDB" : "0",
+            "Moo" : "0",
+            "perl" : "v5.10.1"
+         }
+      }
+   },
+   "provides" : {
+      "Uninets::Check::Modules::MongoDB" : {
+         "file" : "lib/Uninets/Check/Modules/MongoDB.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ],
+      "repository" : {
+         "url" : "https://github.com/uninets/Uninets-Check-Modules-MongoDB"
+      }
+   },
+   "version" : "0.02"
+}

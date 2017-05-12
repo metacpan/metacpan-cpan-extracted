@@ -1,0 +1,47 @@
+{
+   "abstract" : "Define a base URI and then generate variations on it",
+   "author" : [
+      "Nic Wolff <nic@angel.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "URI-Based",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "URI::WithBase" : 0,
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "URI::Based" : {
+         "file" : "lib/URI/Based.pm",
+         "version" : "1.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "1.03"
+}

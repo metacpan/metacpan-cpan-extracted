@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Schema/Class Browser</title>
+    <link href="assets/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link href="assets/css/class-browser.css" rel="stylesheet" media="screen">
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/bootstrap.min.js"></script>
+    <script src="assets/js/class-browser.js"></script>
+    <script src="assets/js/table-sorter.js"></script>
+</head>
+<body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="navbar-inner">
+            <a class="brand" href="/">UR Class Browser</a>
+            <form method="get" id="nav-form" class="navbar-search form-search pull-left">
+                <div class="input-prepend">
+                    <input type="submit" name="submit" value="Search" class="btn"/>
+                    <input type="text" class="search-query span2 input-small">
+                </div>
+                <div class="input-append">
+                    <select id="namespace-select" class="input-small" name="namespace">
+                        [% FOREACH namespace = namespaces %]
+                            <option value="[% namespace %]"
+                            [% IF namespace == current_namespace %] selected[% END %]>[% namespace %]</option>
+                        [% END %]
+                    </select>
+                    <input class="btn" type="submit" name="submit"
+                            value="Namespace" id="submit-namespace"/>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row">
+        <div id="class-picker" class="tabbable span5">
+            <ul class="nav nav-tabs">
+                <li class="active"><a href="#classes-by-name" data-toggle="tab">Classes</a></li>
+                <li><a href="#classes-by-inheritance" data-toggle="tab">Inheritance</a></li>
+                <li><a href="#classes-by-path" data-toggle="tab">Paths</a></li>
+            </ul>
+
+            <div class="tab-content">
+                <div class="tab-pane active css-treeview" id="classes-by-name">
+                    <ul>
+                        [% PROCESS partials/path_treeview.html tree = classnames %]
+                    </ul>
+                </div>
+                <div class="tab-pane css-treeview" id="classes-by-inheritance">
+                    <ul>
+                        [% PROCESS partials/path_treeview.html tree = inheritance %]
+                    </ul>
+                </div>
+                <div class="tab-pane css-treeview" id="classes-by-path">
+                    <ul>
+                        [% PROCESS partials/path_treeview.html tree = paths %]
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div id="detail" class="span8">
+
+        </div>
+    </div>
+</body>
+</html>

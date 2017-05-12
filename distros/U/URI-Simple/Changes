@@ -1,0 +1,12 @@
+Revision history for Perl extension URI::Simple.
+
+0.01  Mon Jul 23 23:25:21 2012
+	- original version; created by h2xs 1.23 with options
+		-X -n URI::Simple
+
+1.00  Mon May 27 23:25:21 2013
+	- adding more tests
+	- adding scheme & fragment methods
+	- updating documentations
+	- strict mode is now by default
+

@@ -1,0 +1,26 @@
+---
+abstract: 'URI to access Amazon Product Advertising API'
+author:
+  - 'Dan Kogai <dankogai@dan.co.jp>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: URI-Amazon-APA
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Digest::SHA: 0
+  Encode: 2
+  Test::More: 0
+  URI: 1.36
+  URI::Escape: 0
+version: 0.05

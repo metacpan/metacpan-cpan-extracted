@@ -1,0 +1,39 @@
+#!/usr/bin/perl
+use v5.14;
+use warnings;
+use AnyEvent;
+use UAV::Pilot::EasyEvent;
+use UAV::Pilot::WumpusRover;
+use UAV::Pilot::WumpusRover::Driver;
+use UAV::Pilot::WumpusRover::Control::Event;
+use Getopt::Long ();
+
+
+my $PORT = UAV::Pilot::WumpusRover;
+my $HOST = '10.0.0.16';
+Getopt::Long::GetOptions(
+    'port=i' => \$PORT,
+    'host=s' => \$HOST,
+);
+
+
+my $driver = UAV::Pilot::WumpusRover::Driver->new({
+    host => $HOST,
+    port => $PORT,
+});
+$driver->connect;
+
+my $cv = AnyEvent->condvar;
+my $event = UAV::Pilot::EasyEvent->new({
+    condvar => $cv,
+});
+
+my $control = UAV::Pilot::WumpusRover::Control::Event->new({
+    driver => $driver,
+});
+$control->init_event_loop( $cv, $event );
+
+$control->throttle( 100 );
+$control->turn( 10 );
+
+$cv->recv;

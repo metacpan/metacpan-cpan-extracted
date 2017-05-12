@@ -1,0 +1,25 @@
+Revision history for Ubic-Service-Memcached
+
+2.02    Tue Jan 10, 2012
+        * prune debian/ and debuild/ dirs from package
+
+2.01    Tue Mar 22, 2011
+        * hotfix - 'pidfile' is now really optional
+        * 'uninitialized' warning fixed
+
+2.00    Tue Mar 22, 2011
+        * 'other_argv' option implemented
+        * using timeout_options() feature of Ubic::Service::Skeleton,
+          manual trials loop removed
+        * 'pidfile' parameter is now optional and will be derived implicitly
+          (morpheus configuration is required to use this feature)
+
+
+1.02    Mon Mar 21, 2011
+        'max_connections' option implemented
+
+1.01    Fri Dec 03, 2010
+        Tests fixed and refactored.
+
+1.00    Fri Sep 03, 2010
+        First opensource release.

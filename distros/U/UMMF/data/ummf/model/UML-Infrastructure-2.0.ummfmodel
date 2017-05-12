@@ -1,0 +1,883 @@
+/* -*- C++ -*- */
+/**********************************************************************
+ **********************************************************************
+ ****
+ **** UML 2.0 Infrastructure Specification
+ **** Based on UML 2.0 Infrastructure pfs/03-09-15
+ ****
+ **** Author: kstephens@users.sourceforge.net
+ **** Version: $Revision: 1.1 $
+ **** Date: 2003/10/05
+ **** References:
+ ****    http://ummf.sourceforge.net/
+ ****    http://www.omg.org/technology/documents/modeling_spec_catalog.htm#UML
+ ****
+ **** Note: This document is machine-readable by UMMF::UML::Import::UMMFModel;
+ **** Please see it for language definition.
+ ****
+ **** This specification is incomplete.
+ ****
+ **********************************************************************
+ **********************************************************************
+ */
+
+
+
+Model "UML 2.0 Infrastructure pfs/03-07-06"
+{
+  Package InfrastructureLibrary
+  {
+    Package Core
+    {
+      Package PrimitiveTypes
+      {
+      }
+
+      /* p.52 */
+      Package Abstractions
+      {
+	:: ..::PrimitiveTypes;
+
+
+	/* Tier 1 */
+        Package Elements
+        {
+	    Class Element;
+        }
+
+	/* Tier 2 */
+	/* p. 79, 9.14 Ownerships package */
+        Package Ownerships
+        {
+	  :: ..::Elements;
+
+	  Class Element : ..::Elements::Element
+	  {
+	      @ <#> /owner        : . 0..1 {union}
+	      ,     /ownedElement : . *    {union}
+	      ;
+	  }
+	}
+
+
+	/* Tier 3 */
+	Package Multiplicities
+	{
+	  :: ..::Elements;
+
+	  Class /MulitplicityElement/ : Element
+	  {
+	      isOrdered : Boolean = false;
+	      isUnique  : Boolean = true;
+	      lower : Integer [0..1] = 1;
+	      upper : UnlimitedNatural [0..1] = 1;
+	  }
+	}
+
+	/* p.54, 9.7 Expressions package */
+	Package Expressions
+	{
+	  Class /ValueSpecification/ : ..::Ownerships:Element
+	  {
+	  }
+
+	  Class OpaqueExpression : ValueSpecification
+	  {
+	      body     : String;
+	      language : String [0..1];
+	  }
+
+	  Class Expressions : ValueSpecification
+	  {
+	      symbol : String;
+
+	      @ <#> expression : .                  0..1 {subsets owner}
+              , ->  operand    : ValueSpecification *    {ordered, subsets ownedElement}
+	      ;
+	  }
+	}
+
+	/* p. 76, 9.13 Namespaces package */
+	Package Namespaces
+	{
+	  :: ..::Ownerships;
+
+	  class /NamedElement/ : Element
+	  {
+	      name           : String [0..1];
+	      /qualifiedName : String [0..1];
+	  }
+
+	  class /Namespace/ : NamedElement
+	  {
+	      @ <#> /namespace   : .            0..1 {subsets owner, union}
+	      ,     /ownedMember : NamedElement *    {subsets ownedElement, subsets member, union}
+	      ;
+
+	      @
+	      , --> /member      : NamedElement *    {union}
+	      ;
+	  }
+	}
+
+	/* p.47, 9.4 Comments package */
+	Package Comments
+	{
+	  Class Element : ..::Ownerships::Element
+	  {
+	    @ 0..1 , -> ownedComment : Comment * {subsets ownedElement};
+	  }
+
+	  Class Comment : Element
+	  {
+	    body : String;
+
+	    @ , -> annotatedElement : ..::Ownerships::Element *;
+	  }
+	}
+
+	Package Relationships
+	{
+	  :: ..::Ownerships;
+
+	  Class /Relationship/ : Element
+	  {
+	      @ 
+	      , --> /relatedElement : Element 1..* {union}
+	      ;
+	  }
+
+	  Class /DirectedRelationship/ : Relationship
+	  {
+	      @
+	      , --> /source : Element 1..* {subsets relatedElement, union}
+	      ;
+
+	      @
+	      , --> /target : Element 1..* {subsets relatedElement, union}
+	      ;
+
+	  }
+	}
+
+	/* Tier 4 */
+	/* p. 91, 9.20 Visibilities package */
+	Package Visibilities
+	{
+	  :: ..::Namespaces;
+
+	  Class NamedElement : ..::Namespaces::NamedElement
+	  {
+	      visibility : VisibilityKind [0..1];
+	  }
+
+	  Enumeration VisibilityKind
+	  {
+	      public;
+	      private;
+	  }
+	}
+
+	Package Classifiers
+	{
+	  :: ..::Namespaces;
+
+	  Class Classifier : Namespace;
+	  {
+	      @ /featuringClassifier 1..* {union} , /feature : Feature * {subsets member, union} ;
+	  }
+
+	  Class Feature : NamedElement
+	  {
+	      ;
+	  }
+	}
+
+	/* Tier 5 */
+	/* p. 66, 9.10 Literals package */
+	Package Literals
+	{
+	  :: ..::Expressions;
+
+	  Class /LiteralSpecification/ : ValueSpecification
+	  {
+	      ;
+	  }
+
+	  Class LiteralInteger : LiteralSpecification
+	  {
+	      value : Integer;
+	  }
+
+	  Class LiteralString : LiteralSpecification
+	  {
+	      value : String;
+	  }
+
+	  Class LiteralBoolean : LiteralSpecification
+	  {
+	      value : Boolean;
+	  }
+
+	  Class LiteralNull : LiteralSpecification
+	  {
+	      ; /* NOTHING */
+	  }
+
+	  Class LiteralUnlimitedNatural : LiteralSpecification
+	  {
+	      value : UnlimitedNatural;
+	  }
+
+	}
+
+	/* 9.18 Super package */
+	Package Super
+	{
+	  :: ..::Classifiers;
+
+	  Class Classifier : ..::Classifiers::Classifier
+	  {
+	      isAbstract : Boolean = false;
+	      
+	      @ 
+	      , --> /inheritedMember : NamedElement * {subsets member}
+	      ;
+
+	      @
+	      , --> general          : .            *
+	      ;
+	  }
+	}
+
+	/* Tier 6 */
+	/* p. 90, 9.19 TypedElements package */
+	Package TypedElements
+	{
+	  :: ..::Namespaces;
+
+	  Class /TypedElement/ : NamedElement
+	  {
+	      @ , --> type : Type 0..1 ;
+	  }
+
+	  Class /Type/ : NamedElement
+	  {
+	      ;
+	  }
+
+	}
+
+	/* Tier 7 */
+
+	/* p.49, 9.5 Constraints package */
+	Package Constraints
+	{
+	  :: ..::Expressions,
+             ..::Namespaces;
+
+	  Class Constraint : NamedElement
+	  {
+	    @          , /context           : ..::Namespaces::Namespace           0..1        {union};
+	    @          , constrainedElement : ..::Ownerships::Element             *           {ordered};
+	    @ <#> 0..1 , specification      : ..::Expressions::ValueSpecification 1           {subsets ownedElement} ;
+	  }
+
+	  Class Namespace : ..::Namespaces::Namespace
+	  {
+	     @ <#> namespace 0..1 :              {subsets context}
+             ,     ownedRule      : Constraint * {subsets ownedMember}
+	     ;
+	  }
+
+	}
+
+	/* p.57, 9.8 Generalization package */
+	Package Generalizations
+	{
+	    
+	    Class Classifier : ..::Super::Classifier, ..::TypedElements::Type
+	    {
+		@ <#> specific       : .              1 {subsets source, subsets owner}
+		,     generalization : Generalization * {subsets ownedElement}
+
+		@
+		,     /general       : .              * ;
+	    }
+
+	    Class Generalization : ..::Relationships::DirectedRelationship
+	    {
+		@ 
+		, general : Classifier 1 {subsets target}
+	    }
+	}
+
+	/* Tier 8 */
+	Package StructuralFeatures
+	{
+	  :: ..::TypedElements,
+             ..::Classifiers;
+
+	     Class StructuralFeature : Feature, TypeElement
+	     {
+		 ;
+	     }
+	}
+
+	/* p. 40, 9.1 BehavioralFeatures package */
+	Package BehavioralFeatures
+	{
+	  :: ..::TypedElements,
+             ..::Classifiers;
+
+	  /* p. 41, 9.1.1 BehavioralFeature */
+	  Class BehavioralFeature : Feature, Namespace
+	  {
+	    @ 0..1 , -> /parameter : Parameter * {ordered, subsets member, union} ;
+	  }
+
+	  /* p. 42, 9.1.2 Parameter */ 
+	  Class Parameter : TypedElement, NamedElement
+          {
+	      ;
+          }
+
+	}
+
+       	
+	/* Tier 9 */
+	Package MultiplicityExpressions
+	{
+	  :: ..::Multiplicities,
+             ..::Expressions;
+
+	     Class MultiplicityElement : ..::Multiplicities::MultiplicityElement
+	     {
+		 @ <#> ownerUpper : .                  0..1 {subsets owner}
+		 , --> upperValue : ValueSpecification 0..1 {subsets ownedElement}
+		 ;
+
+		 @ <#> ownerlower : .                  0..1 {subsets owner}
+		 , --> lowerValue : ValueSpecification 0..1 {subsets ownedElement}
+		 ;
+
+	     }
+	}
+
+	/* p. 61, 9.9 Instances package */
+	Package Instances
+	{
+	  :: ..::Expressions,
+		   ..::StructuralFeatures,
+		   ..::Classifiers;
+	  
+
+	  /* p. 62, 9.9.1 */
+	  Class InstanceSpecification : ..::Namespaces::NamedElement
+	  {
+	    @ , --> classifier : Classifier 1..* ;
+
+	    @ <#> owningInstance : .                1 {subsets owner}
+	    ,     slot           : Slot             * {subsets ownedElement}
+	    ;
+
+	    @ <#> 
+	    , --> specification : ValueSpecfication * {subsets ownedElement}
+	    ;
+	  }
+
+	  /* p. 64, 9.9.2 */
+	  Class InstanceValue : ValueSpecification
+	  {
+	    @ , --> instance : InstanceSpecification 1 ;
+	  }
+
+	  /* p. 65, 9.9.3 */
+	  Class Slot : ...::Ownerships::Element 
+	  {
+	    @ , --> definingFeature : StructuralFeature 1 ;
+
+	    @ <#>                            0..1 
+	    , --> value : ValueSpecification *    {ordered, subsets ownedElement}
+	    ;
+	  }
+
+	}
+
+	/* p. 43, 9.2. Changeablilities package */
+	Package Changeablilities
+	{
+	  :: ..::StructuralFeatures;
+
+	  /* p. 43, 9.2.1 */
+	  Enumeration ChangeablilityKind
+	  {
+	    unrestricted;
+	    readOnly;
+	    addOnly;
+	    removeOnly;
+	  }
+
+	  /* p. 44, 9.2.2 */
+	  Class StructuralFeature : ..::StructuralFeatures::StructuralFeature
+	  {
+	    isReadOny : Boolean = false;
+	  }
+
+	}
+
+	/* p. 81, 9.15 */
+	Package Redefinitions
+	{
+	  :: ..::Super;
+
+	  /* p. 82, 9.15.1 */
+	  Class /RedefinableElement/ : NamedElement
+	  {
+	      @
+	      , --> /redefinedElement    : RedefinableElement * {union}
+	      ;
+
+	      @
+	      , --> /redefinitionContext : Classifier         * {union}
+	      ;
+	  }
+	}
+
+      }
+
+      /* p. 94, 10 Core::Basic */
+      Package Basic
+      {
+	:: ..::PrimitiveTypes,
+	   ..::Abstractions;
+
+	/* p. 95, 10.1. Types diagram */
+
+        /* p. 95, 10.1.1 */
+	Class Type : NamedElement
+	{
+	  ;
+	}
+
+	/* p. 95, 10.1.2 */
+	Class NamedElement : ..::Abstractions::Elements::Element
+	{
+	  name : String [0..1];
+	}
+
+      
+	/* p. 96, 10.1.3 */
+        Class TypedElement : NamedElement
+	{
+          @ , --> type : Type 0..1 ; 
+	}
+
+
+	/* p. 97, 10.2 Classes diagram */
+
+	/* p. 97, 10.2.1 */
+	Class "Class" : Type
+	{
+	  isAbstract : Boolean = false;
+
+	  @ <#> class          : .         0..1 
+	  ,     ownedAttribute : Property  *    {ordered}
+	  ;
+
+	  @ <#> class          : .         0..1 
+	  ,     ownedOperation : Operation *    {ordered}
+	  ;
+
+	  @, --> superclass    : .         * ;
+	}
+
+	/* p. 98, 10.2.2 */
+	Class Operation : TypedElement, MultiplicityElement
+	{
+	  @ <#> operation       : .         0..1
+	  ,     ownedParameter  : Parameter *    {ordered,composite}
+	  ;
+
+	  @,--> raisedException : Type      * ;
+
+	}
+
+	/* p. 98, 10.2.3 */
+	Class Parameter: TypedElement, MultiplicityElement
+	{
+	  ; /* NOTHING */
+	}
+
+	/* p. 99, 10.2.4 */
+	Class Property : TypedElement, MultiplicityElement
+	{
+	  isReadOnly  : Boolean        = false;
+	  default     : String [0..1]         ;
+	  isComposite : Boolean        = false;
+	  isDerived   : Boolean        = false;
+	       
+	  @ , --> opposite : . 0..1;
+	}
+
+	/* p. 100, 10.3 DataTypes diagram */
+
+	/* p. 100, 10.3.1 */
+	Class /DataType/ : Type;
+
+	/* p. 100, 10.3.2 */	
+	Class Enumeration : DataType
+	{
+	  @ <#> enumeration                       0..1 
+	  ,     ownedLiteral : EnumerationLiteral 1..* {ordered,composite}
+	  ;
+	}
+
+	/* p. 101, 10.3.3 */
+	Class EnumerationLiteral : NamedElement;	  
+
+
+	/* p. 101, 10.3.4 */
+	Class PrimitiveType : DataType;
+
+
+	/* p. 102, 10.4 Packages diagram */
+
+	/* p. 102, 10.4.1, 10.4.2 */
+	Class "Package" : NamedElement
+	{
+	  @ <#> package        : .    0..1 
+	  ,     ownedType      : Type * {composite}
+	  ;
+	  
+	  @ <#> nestingPackage : .    0..1
+	  ,     nestedPackage  : .    *
+	  ;
+	} 
+      }
+
+      /* p. 104, 11 Core::Constructs */
+      Package Constructs
+      {
+	:: ..::PrimitiveTypes,
+	   ..::Basic;
+
+	/* p. 105, 11.1 Root diagram */
+
+	/* p. 106, 11.1.1 Comment */
+	Class Comment : Comment
+	{
+	  @,--> annotatedElement : .::Element * ;
+	}
+	
+	/* p. 107, 11.1.2 */
+	Class DirectedRelationship : .::Relationship , DirectedRelationship
+	{
+	  @,--> /source         : Element 1..* {union, subset relatedElement} ;
+	  @,--> /target         : Element 1..* {union, subset relatedElement} ;
+	}
+
+	Class Relationship : Element , .::Relationship
+	{
+	  @,--> /relatedElement : Element 1..* {union} ;
+	}
+
+	Class Element : Element
+	{
+	  @ <#> /owner        : . 0..1 {union}
+	  ,     /ownedELement : . *    {union}
+	  ;
+
+	  @ <#>                   0..1 
+	  , --> /ownedComment : Comment * {subsets ownedElement }
+          ; 
+	}
+
+	/* P.    , 11.2 Expressions diagram */
+	/* p. 109, 11.2.1 */
+	Class Expression : Expression , .::ValueSpecification
+	{
+          @ <#> expression : .                  0..1 {subsets owner}
+          , --> operand    : ValueSpecification * {ordered, subsets ownedElement}
+          ;
+	}
+
+	/* p. 110, 11.2.2 */
+	Class OpaqueExpression : OpaqueExpression, .::ValueSpecification;
+ 
+	/* p. 110, 11.2.3 */
+	Class /ValueSpecification/ : ValueSpecification, TypedElement
+	{
+	}
+
+	/* p. 111, 11.3 Classes diagram */
+	
+	/* p. 112, 11.3.1 */
+	Class Association : Relationship
+	{
+	  isDerived : Boolean = false;
+
+	  @     assocation : .        0..1
+	  ,     memberEnd  : Property 2..* {ordered, subsets member}
+	  ;
+
+	  @ <#> +owningAssociation : .        0..1
+                {subsets assocation, subsets namespace, subsets featuringClassifier}
+	  ,      ownedEnd          : Property * 
+                {ordered, subsets memberEnd, subsets feature, subsets ownedMember}
+	  ;
+
+	  @, --> /endType : Type 1..* {subset relatedElement}
+          ;
+	}
+
+	/* p. 118, 11.3.2 */
+	Class "Class" : "Basic::Class", Classifier
+	{
+	  isAbstract : Boolean;
+	  
+	  @ <#> class : . 0..1
+	    {subsets namespace, subsets featuringClassifier, subsets classifier}
+	  ,     ownedAttribute : Property  *
+            {ordered, subsets attribute, subsets ownedMember} 
+	  ;
+
+	  @ <#> class : . 0..1
+	    {subsets redefinitionContext, subsets namespace, subsets featuringClassifier}
+	  ,     ownedOperation : Operation *
+            {ordered, subsets feature, subsets ownedMember} 
+	  ;
+
+	  @, --> superclass : . * {redefines general};
+	}
+
+	/* p. 123, 11.3.4 */
+	Class Operation : ???
+	{
+	  ;
+	}
+
+	/* p. 123, 11.3.5 */
+	Class Property : StructuralFeature , Basic::Property
+	{
+	  isReadOnly     : Boolean = false;
+	  isDerivedUnion : Boolean = false;
+
+	  @, --> redefinedProperty : . *    {subsets redefinedElement};
+	  @, --> subsettedProperty : . *    ;
+	  @, --> /opposite         : . 0..1 ;
+	}
+
+	/* p. 127, 11.3.6 Classifiers diagram */
+
+	/* p. 127, 11.3.7 */
+	Class Classifier : Namespace, Type, Super::Classifer
+	{
+	  @      classifier          : .        0..1 {subsets redefinitionContext}
+          , --> /attribute           : Property *    {subsets feature, union}
+	  ;
+
+	  @,--> +general             : .        *;
+	  @     /featuringClassifier : .        1..* {union}
+	  ,     /feature             : Feature  *    {union, subsets member}
+	}
+
+	Class RedefinableElement : Redefinitions::RedefinableElement, NamedElement
+	{
+	  @,--> /redefinitionContext : Classifier * {union}
+	  @,--> /redefinedElement    : .          * {union};
+	}
+
+	Class Feature : Classifier::Feature, RedefinableElement
+	{
+          ;
+	}
+
+	Class StructuralFeature : Changeabilities::StructuralFeature, Feature, TypedElement, MultiplicityElement
+	{
+	}
+
+        Class MultiplicityElement : Element , Multiplicities:: MultiplicityElement
+	{
+	  ;
+	}
+
+
+	Class Type : NamedElement, Basic::Type, TypedElements::Type
+	{
+	}
+
+
+	Class TypedElement : NamedElement, Basic::TypedElement, TypedElements::TypedElement
+	{
+	  @,--> type : Type 0..1;
+	}
+	
+	/* p. 131, 11.4 Constraints diagram */
+
+	/* p. 131. 11.4.1 */
+	Class Constraint : Constraints::Contstraint, PackageableElement
+	{
+	  @,--> /context           : Namespace          0..1 {union} ;
+	  @,--> constrainedElement : Element            *    {ordered} ;
+
+	  @ <#>                                         0..1 
+	  , --> specification      : ValueSpecification 1    {subsets ownedElement}
+	  ;
+	}
+
+	Class Namespaces : ????
+	{
+	  @ <#> namespace                               0..1 {subsets context}
+          , --> ownedRule          : Constraint         *    {subsets ownedMember}
+	  ;
+	}
+
+	/* p. 133, 11.5 DataTypes diagram */
+
+	/* p. 133, 11.5.1 */
+	Class DataType : Classifier, Basic::DataType
+	{
+	  @ <#> datatype       : .        0..1 
+                 {subsets namespace, subsets featureingClassifier, subsets classifier}
+          ,     ownedAttribute : Property *
+	         {ordered, subsets attribute, subsets ownedMember}
+	  ;
+
+	  @ <#> datatype       : .        0..1 
+                 {subsets redefinitionContext, subsets namespace, subsets featuringClassifier}
+          ,     ownedOperation : Operation *
+	         {ordered, subsets feature, subsets ownedMember}
+	  ;
+	}
+
+	Class PrimitiveType : DataType, Basic::PrimitiveType
+	{
+	  ;
+	}
+
+	Class Enumeration : DataType, Basic::Enumeration
+	{
+	  @ <#> enumeration  : . 0..1 {subsets namespace}
+          ,     ownedLiteral : EnumerationLiteral * {ordered, subsets ownedMember}
+	  ;
+	}
+
+	Class EnumerationLiteral : NamedElement : Basic::EnumerationLiteral
+	{
+	  ;
+	}
+
+	/* p.    , 11.6 Namespaces diagram */
+	/* p     , 11.6.1 */
+	Class ElementImport : DirectedRelationship
+	{
+	  visibility : VisibilityKind;
+	  alias : String;
+
+	  @,--> importedElement : PackageableElement 1 {subsets target};
+	}
+
+	/* p.    , 11.6.2 */
+	Class NamedElement : Element,  Visibilites::NamedElement, Basic::NamedElement
+	{
+	  name : String;
+	}
+
+	/* p.    , 11.6.3 */
+	Class Namespace : NamedElement, Constraints::Namespace
+	{
+	  @,--> /importedMember : PackageableElement * {subsets member};
+	  @,--> /member         : NamedElement       * {union};
+
+	  @ <#> /namespace      : .                  0..1 {union, subsets owner}
+	  ,     /ownedMember    : NamedElement       *    {union, subsets member, subsets ownedElement}
+          ;
+
+	  @ <#> importingNamespace : .                1 
+                  {subsets source, subsets owner}
+	  ,     elementImport      : ElementImport    *    
+	          {subsets ownedElement}
+          ;
+
+	  @ <#> importingNamespace : .                1 
+                  {subsets source, subsets owner}
+	  ,     packageImport      : PackageImport    *    
+	          {subsets ownedElement}
+          ;
+
+	}
+
+	/* p.    , 11.6.4 */
+	Class PackageableElement : ??? ;
+
+
+	/* p.    , 11.6.5 */
+	Class PackageImport : DirectedRelationship
+	{
+	  visibility : VisibilityKind;
+
+	  @,--> importedPackage : Package 1 {subsets target};
+	}
+
+
+	/* p.    , 11.7 Operations diagram */
+	/* p.    , 11.8 Packages diagram */
+
+	/* p.    , 11.8.2 */
+	Class "Package" : Namespace, "Basic::Package", PackageableElement
+	{
+	  @ <#>  owningPackage : .                  0..1
+	          {subsets namespace}
+	  , -->  ownedMember   : PackageableElement *    
+                  {redefines ownedMember}
+	  ;
+
+
+	  @ <#>  package       : .                 0..1
+	          {subsets namespace}
+	  ,     /ownedtype     : Type              *
+                  {redefines ownedMember}
+	  ;
+
+
+	  @ <#>  mergingPackage : .                 0..1
+	          {subsets source, subsets owner}
+	  ,      packageMerge   : PackageMerge      *
+                  {redefines ownedMember}
+	  ;
+
+	  @ <#>  nestingPackage : .                 0..1
+	          {subsets namespace}
+	  ,      nestedPackage  : .                 *
+                  {subsets ownedMember}
+	  ;
+	}
+
+	/* p.   , 11.8.3 */
+	Class PackageMerge : DirectedRelationship
+	{
+	  @,--> mergedPackage : Package 1 {subsets target}
+	}
+
+      }
+
+      /* p. 160, 12 */
+      Package PrimitiveTypes
+      {
+	
+      }
+
+    } /* End Package Core */
+
+
+    Package Profiles
+    {
+      :: ..::Core;
+    }
+  }
+
+
+} /* Model "UML-2.0" */
+
+

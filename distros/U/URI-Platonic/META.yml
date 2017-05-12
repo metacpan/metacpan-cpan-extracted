@@ -1,0 +1,25 @@
+---
+abstract: 'Platonic and Distinct URIs'
+author:
+  - 'NAKAGAWA Masaki <masaki@cpan.org>'
+build_requires:
+  Test::More: 0
+  Test::use::ok: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: URI-Platonic
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Moose: 0
+  MooseX::Types::URI: 0
+  URI: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.03

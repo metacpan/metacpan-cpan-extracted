@@ -1,0 +1,29 @@
+<h2>Introduction</h2>
+<hr />
+<p>UR is a Class Framework and Object/Relational Mapper (ORM) for Perl.</p>
+
+<p>After installing, run the "ur" command for a list of options.</p>
+
+<p>As a Class Framework, it starts with the familiar Perl meme of the blessed
+hash reference as the basis for object instances, and builds upon that 
+with a more formal way to describe classes and their properties, object
+caching, and metadata about the classes and the ways they connect to each
+other.</p>
+
+<p>As an ORM, it aims to relieve the developer from having to think about the
+SQL behind any particular request, instead using the class structure and
+its metadata as a guide for where the data will be found.  Behind the scenes,
+the RDBMS portion can handle JOINs (both INNER and OUTER) representing
+inheritance and indirect properties, multi-column primary and foreign keys,
+and iterators.  It does its best to only query the database for information
+you've directly asked for, and to not query the database for something that
+has been loaded before.  Oracle, SQLite, MySQL and PostgreSQL are all
+supported.</p>
+
+<p>Additionally, UR can use files or collections of files as if they were
+tables in a database, as well as internally handling the equivalent of an
+SQL join between two or more databases if that's what the query and class
+structure indicates.</p>
+
+<p>UR.pm contains more introductory POD documentation.  UR::Manual has a short
+list of documentation you're likely to want to see next.</p>

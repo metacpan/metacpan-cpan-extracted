@@ -1,0 +1,1242 @@
+=head1 NAME
+
+UI::Dialog::Backend - simply a collection of primarily internal methods.
+
+=head1 SYNOPSIS
+
+  use UI::Dialog::Backend;
+  BEGIN {
+    use vars qw( @ISA );
+    @ISA = qw( UI::Dialog::Backend );
+  }
+
+=head1 ABSTRACT
+
+UI::Dialog::Backend is simply a collection of primarily internal methods.
+
+=head1 DESCRIPTION
+
+While this module is inherited by all UI::Dialog backend modules, this module
+itself is not meant for direct usage. The "STATE METHODS" and "UTILITY METHODS"
+documentation is applicable to all backends thus rendering the POD for this class
+more important to the end-programmer than the usage of the class itself.
+
+=head1 EXPORT
+
+=over 2
+
+None
+
+=back
+
+=head1 INHERITS
+
+=over 2
+
+None
+
+=back
+
+=head1 BACKEND EXTENSIONS
+
+=head2 nautilus
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my @paths = $d->nautilus->paths();
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+This method gives access to the UI::Dialog::Backend::Nautilus class. This will
+automagically try to load the UI::Dialog::Backend::Nautilus module or it will
+silently fail.
+
+=back
+
+=back
+
+=head2 xosd
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ $d->xosd->line( "a line of text on your screen" );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+This method gives access to the UI::Dialog::Backend::XOSD class. This will
+automagically try to load the UI::Dialog::Backend::XOSD module or it will
+silently fail.
+
+=back
+
+=back
+
+=head2 notify_send
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ $d->notify_send->notify_send( "a line of text on your screen" );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+This method gives access to the UI::Dialog::Backend::NotifySend class. This will
+automagically try to load the UI::Dialog::Backend::NotifySend module or it will
+silently fail.
+
+=back
+
+=back
+
+=head1 STATE METHODS
+
+=head2 attr( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my $value = $self->attr('listheight');
+ my $new_value = $d->attr('listheight',5);
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Either sets and returns the value of the desired attribute, or just returns
+the value of the desired attribute.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+a single SCALAR.
+
+=back
+
+=back
+
+=head2 state( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ if ($d->state() eq "OK") {
+   # the last user response was "OK"
+ } else {
+   # something other than an "OK" response
+ }
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Returns the state of the last dialog widget command. The value can be one of
+"OK", "CANCEL" or "ESC". The return data is based on the exit codes (return
+value) of the last widget displayed. Some backends also support other exit
+values than the standard few and these are represented as "EXTRA" (3), "HELP"
+(2), and "ERROR" (255).
+
+=back
+
+=item RETURNS
+
+=over 6
+
+a single SCALAR.
+
+=back
+
+=back
+
+=head2 ra( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my @array = $d->ra();
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Returns the last widget's data as an array.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+an ARRAY.
+
+=back
+
+=back
+
+=head2 rs( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my $string = $d->rs();
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Returns the last widget's data as a (possibly multiline) string.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+a SCALAR.
+
+=back
+
+=back
+
+=head2 rv( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my $string = $d->rv();
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Returns the last widget's exit status, aka: return value. This is the value
+used when determining the state() of a widget.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+a SCALAR.
+
+=back
+
+=back
+
+=head1 CALLBACK FUNCTIONS
+
+=head2 PRE
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ sub CB_PRE {
+   my $widget_args = shift();
+   print "Caller: ".$args->{'caller'}."\n";
+ }
+ my $d = new UI::Dialog ( callbacks => { PRE => \&CB_PRE } );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+This function recieves a hasref of the current argument values and is called
+before any widget performs any operations.
+
+=back
+
+=back
+
+=head2 POST
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ sub CB_POST {
+   my $widget_args = shift();
+   my $state = shift();
+   print "Caller: ".$args->{'caller'}.", State: ".$state."\n";
+ }
+ my $d = new UI::Dialog ( callbacks => { POST => \&CB_POST } );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+This function recieves a hasref of the current argument values and the one word
+state indicator (as reported by state()) and is called after all widget
+operations have been performed (including other callback functions).
+
+=back
+
+=back
+
+=head2 OK
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ sub CB_OK_FUNC {
+   my $widget_args = shift();
+   print "Widget caller: ".$args->{'caller'}."\n";
+ }
+ my $d = new UI::Dialog ( callbacks => { OK => \&CB_OK_FUNC } );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+This function recieves a hasref of the current argument values and is called
+when any widget finishes with a state() of "OK" but before the POST callback.
+
+=back
+
+=back
+
+=head2 CANCEL
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ sub CB_CANCEL {
+   my $widget_args = shift();
+   print "Caller: ".$args->{'caller'}."\n";
+ }
+ my $d = new UI::Dialog ( callbacks => { CANCEL => \&CB_CANCEL } );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+This function recieves a hasref of the current argument values and is called
+when any widget finishes with a state() of "CANCEL" but before the POST
+callback. Be forewarned that with respect to the yesno() type widgets, a
+user response of "NO" is interpreted as "CANCEL" and will execute this function.
+
+=back
+
+=back
+
+=head2 ESC
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ sub CB_ESC {
+   my $widget_args = shift();
+   print "Caller: ".$args->{'caller'}."\n";
+ }
+ my $d = new UI::Dialog ( callbacks => { ESC => \&CB_ESC } );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+This function recieves a hasref of the current argument values and is called
+when any widget finishes with a state() of "ESC" but before the POST callback.
+
+=back
+
+=back
+
+=head2 HELP
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ sub CB_HELP {
+   my $widget_args = shift();
+   print "Caller: ".$args->{'caller'}."\n";
+ }
+ my $d = new UI::Dialog ( callbacks => { HELP => \&CB_HELP } );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+This function recieves a hasref of the current argument values and is called
+when any widget finishes with a state() of "HELP" but before the POST callback.
+The user response of "HELP" is not supported by all backends.
+
+=back
+
+=back
+
+=head2 EXTRA
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ sub CB_EXTRA {
+   my $widget_args = shift();
+   print "Caller: ".$args->{'caller'}."\n";
+ }
+ my $d = new UI::Dialog ( callbacks => { EXTRA => \&CB_EXTRA } );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+This function recieves a hasref of the current argument values and is called
+when any widget finishes with a state() of "EXTRA" but before the POST callback.
+The user response of "EXTRA" is not supported by all backends.
+
+=back
+
+=back
+
+=head1 UTILITY METHODS
+
+=head2 beep( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ $d->beep();
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+If the beep(1) application can be found, use it to make a beep sound.
+Otherwise print "\a" to STDERR which normally is good enough to make
+some noise.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+TRUE (1) regardless of result.
+
+=back
+
+=back
+
+=head2 clear( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ $d->clear();
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Clear the terminal screen via STDOUT and the `clear` command. This method is
+technically useless for any GUI based dialog variants.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+TRUE (1) regardless of result.
+
+=back
+
+=back
+
+=head2 word_wrap( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my @wrapped_text = $d->word_wrap($cols,$indent,$sub_indent,@text);
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Using the Text::Wrap::wrap function, wrap the words in a string (or array of
+strings). This is primarily used within the _organize_text() method but may
+be of use to the end-programmer.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+A word-wrapped version of the given text data.
+
+=back
+
+=back
+
+=head2 gen_tempfile_name( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my $tempfile = $d->gen_tempfile_name();
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+This method returns a temporary file name generated using one of the following
+(in order): the File::Temp perl module if detected, the program "mktemp" or
+an extremely simplistic built-in name generator.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+A temporary file name.
+
+=back
+
+=back
+
+=head2 gen_random_string( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my $random_string = $d->gen_random_string(5);
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+This will return a string of random (printable) characters of an arbitrary
+user-definable length (defaults to 5);
+
+=back
+
+=item RETURNS
+
+=over 6
+
+A string of random ASCII characters.
+
+=back
+
+=back
+
+=head1 WIDGET WRAPPER METHODS
+
+These methods are common methods to most backends as they do not have native
+support for the functionality, yet the functionality is achievable by utilizing
+existing compatible methods.
+
+=head2 fselect( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my $path = $self->fselect( path => $start_path );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Using the menu() and msgbox() widgets we can simulate a file browser interface.
+Note: to select a directory, go into it and then pick the '.' entry.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+a SCALAR for positive results and FALSE (0) for everything else.
+
+=back
+
+=back
+
+=head2 dselect( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my $path = $self->dselect( path => $start_path );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Using the fselect() widget we can simulate a directory browser interface.
+Note: to select a directory, go into it and then pick the '.' entry.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+a SCALAR for positive results and FALSE (0) for everything else.
+
+=back
+
+=back
+
+=head1 BACKEND METHODS
+
+These methods are only necessary for someone wishing to create more
+UI::Dialog::Backend:: Modules. These are never needed to be directly
+used but are none the less documented here for reference purposes.
+
+=head2 command_state( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ if ($self->command_state("/some/shell/command")) {
+   #: command succeeded
+ } else {
+   #: command failed
+ }
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+This will execute the given command and send STDOUT and STDERR to /dev/null
+then analyse the exit code and return accordingly.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+TRUE (1) for positive results and FALSE (0) for anything else.
+
+=back
+
+=back
+
+=head2 command_string( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my ($rv,$scalar) = $self->command_string("/some/shell/command");
+ if ($rv >= 1) {
+   #: command failed
+ } else {
+   #: command succeeded
+   print "The command results: ".$scalar."\n";
+ }
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+This will execute the given command, catch STDOUT and STDERR, then return
+the SCALAR data.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+a SCALAR for positive results and FALSE (0) for anything else.
+
+=back
+
+=back
+
+=head2 command_array( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my ($rv,@array) = $self->command_array("/some/shell/command");
+ if ($rv >= 1) {
+   #: command failed
+ } else {
+   #: command succeeded
+   foreach my $line_of_output (@array) {
+      print "The command results: ".$line_of_output."\n";
+   }
+ }
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+This will execute the given command, catch STDOUT and STDERR, then return
+the data, split by newlines, as an ARRAY.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+an ARRAY for positive results and FALSE (0) for anything else.
+
+=back
+
+=back
+
+=head2 _pre( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my $args = $self->_pre(@_);
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+This will use _merge_attrs(), perform any pre-widget-exec things and
+then return the current argument list as a hashref. This is used in
+every widget before anything is actually done in the widget and is
+responsible for running the optional callback function labelled "PRE".
+
+=back
+
+=item RETURNS
+
+=over 6
+
+a HASHREF.
+
+=back
+
+=back
+
+=head2 _post( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ $self->_post( $args );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+This method is used in every widget after all operations (for the immediate
+widget call) are complete but before the widget actually returns anything. This
+method is responsible for running the optional callback funcions labelled "OK",
+"ESC", "CANCEL" and "POST" with "POST" being executed absolutely last.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+Nothing.
+
+=back
+
+=back
+
+=head2 _merge_attrs( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my $args = $self->_merge_attrs(@_);
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+This will apply the arguments passed in with the defaults stored in
+$self->{'_opts'} (which was instantiated upon object construction).
+The return result is the "current" options as defined by the defaults
+with the argument options overriding them.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+a HASHREF.
+
+=back
+
+=back
+
+=head2 _find_bin( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my $ZenityBinaryPath = $self->_find_bin('zenity');
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+This will look in the default path directories for the program of the given
+name. The default PATH list is: /bin, /usr/bin, /usr/local/bin, /opt/bin.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+a SCALAR.
+
+=back
+
+=back
+
+=head2 _esc_text( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my $escaped_text = $self->_esc_text( $raw_text );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+This will escape the following with a prefixing '\' character:
+
+  Character -> Escaped
+
+      "          \"
+      `          \`
+      (          \(
+      )          \)
+      [          \[
+      ]          \]
+      {          \}
+      }          \}
+      $          \$
+      <          \<
+      >          \>
+
+=back
+
+=item RETURNS
+
+=over 6
+
+an SCALAR for positive results and FALSE (0) for anything else.
+
+=back
+
+=back
+
+=head2 _strip_text( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my $clean_text = $self->_strip_text( $text_with_markup );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+This will strip various markup sequences from within the given argument data.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+an SCALAR for positive results and FALSE (0) for anything else.
+
+=back
+
+=back
+
+=head2 _organize_text( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my $final_text1 = $self->_organize_text( $text_with_markup );
+ my $final_text2 = $self->_organize_text( \@text_with_markup );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+This will strip various markup sequences from within the given argument data.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+a SCALAR for positive results and FALSE (0) for anything else.
+
+=back
+
+=back
+
+=head2 _is_bsd( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ if ($self->_is_bsd()) {
+   # do something with BSD specific characteristics
+ } else {
+   # do something with general perl characteristics
+ }
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+This simply checks (case-insensitively) the perlvar $^0 for the string "bsd".
+
+=back
+
+=item RETURNS
+
+=over 6
+
+TRUE (1) for positive results and FALSE (0) for anything else.
+
+=back
+
+=back
+
+=head2 _list_dir( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my $menu_list = $self->_list_dir( '/some/path/to/a/directory',
+                                   [ 'optional', 'prefix', 'items' ] );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Gather a list of the contents of a directory and forumlate a list suitable for
+use with most (if not all) file/path selection dialog variant widgets. An
+optional array reference will have all elements prefixing the directory list.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+an ARRAYREF for positive results and FALSE (0) for anything else.
+
+=back
+
+=back
+
+=head2 _debug( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ $self->_debug( $debuging_message_string, $debuging_level );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+This method will print to STDERR the debugging message provided if and only
+if the debuging level is greater than or equal to the $debuging_level. The
+debugging level argument is optional and defaults to a level of 1.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+TRUE (1) for positive results and FALSE (0) for anything else.
+
+=back
+
+=back
+
+=head2 _error( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ $self->_error( $error_message_string );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+This method will print to STDERR the error message provided regardless of
+debugging level.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+TRUE (1) for positive results and FALSE (0) for anything else.
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+=over 2
+
+=item PERLDOC
+
+ UI::Dialog
+ UI::Dialog::Console
+ UI::Dialog::GNOME
+ UI::Dialog::KDE
+ UI::Dialog::Backend::ASCII
+ UI::Dialog::Backend::CDialog
+ UI::Dialog::Backend::GDialog
+ UI::Dialog::Backend::KDialog
+ UI::Dialog::Backend::Nautilus
+ UI::Dialog::Backend::Whiptail
+ UI::Dialog::Backend::XDialog
+ UI::Dialog::Backend::XOSD
+ UI::Dialog::Backend::Zenity
+
+=back
+
+=over 2
+
+=item MAN FILES
+
+ dialog(1), whiptail(1), zenity(1), gdialog(1), Xdialog(1),
+ kdialog(1), nautilus(1) and osd_cat(1).
+
+=back
+
+=head1 BUGS
+
+Please email the author with any bug reports. Include the name of the
+module in the subject line.
+
+=head1 AUTHOR
+
+Kevin C. Krinke, E<lt>kevin@krinke.caE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+ Copyright (C) 2004-2016  Kevin C. Krinke <kevin@krinke.ca>
+
+ This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 2.1 of the License, or (at your option) any later version.
+
+ This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+
+ You should have received a copy of the GNU Lesser General Public
+ License along with this library; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+
+=cut

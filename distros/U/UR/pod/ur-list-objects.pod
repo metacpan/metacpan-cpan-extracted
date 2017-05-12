@@ -1,0 +1,117 @@
+
+
+=pod
+
+=head1 NAME
+
+ur list objects - lists objects matching specified params
+
+
+
+=head1 VERSION
+
+This document describes ur list objects version 0.29.
+
+=head1 SYNOPSIS
+
+ur list objects --subject-class-name=? [--csv-delimiter=?] [--filter=?] [--noheaders] [--show=?] [--style=?]
+
+
+
+=head1 REQUIRED ARGUMENTS
+
+=over
+
+
+=item subject-class-name  I<Text>
+
+(undocumented)
+
+
+=back
+
+=head1 OPTIONAL ARGUMENTS
+
+=over
+
+
+=item csv-delimiter  I<Text>
+
+For the csv output style, specify the field delimiter
+
+Default value ',' if not specified
+
+=item filter  I<Text>
+
+Filter results based on the parameters.  See below for how to.
+
+=item noheaders  I<Boolean>
+
+Do not include headers
+
+Default value 'false' (--nonoheaders) if not specified
+
+=item nonoheaders  I<Boolean>
+
+Make noheaders 'false'
+
+=item show  I<Text>
+
+Specify which columns to show, in order.
+
+=item style  I<Text>
+
+Style of the list: text (default), csv, pretty, html, xml
+
+Default value 'text' if not specified
+
+
+=back
+
+=head1 DESCRIPTION:
+
+  Listing Styles:
+  ---------------
+   text - table like
+   csv - comma separated values
+   pretty - objects listed singly with color enhancements
+   html - html table
+   xml - xml document using elements
+  
+  
+  Filtering:
+  ----------
+   Create filter equations by combining filterable properties with operators and
+       values.
+   Combine and separate these 'equations' by commas.  
+   Use single quotes (') to contain values with spaces: name='genome institute'
+   Use percent signs (%) as wild cards in like (~).
+   Use backslash or single quotes to escape characters which have special meaning
+       to the shell such as < > and &
+  
+  Operators:
+  ----------
+   =  (exactly equal to)
+   ~  (like the value)
+   :  (in the list of several values, slash "/" separated)
+      (or between two values, dash "-" separated)
+   >  (greater than)
+   >= (greater than or equal to)
+   <  (less than)
+   <= (less than or equal to)
+  
+  Examples:
+  ---------
+   lister-command --filter name=Bob --show id,name,address
+   lister-command --filter name='something with space',employees>200,job~%manager
+   lister-command --filter cost:20000-90000
+   lister-command --filter answer:yes/maybe
+  
+  Filterable Properties: 
+  ----------------------
+   Can't determine the list of filterable properties without a subject_class_name
+
+
+
+=cut
+

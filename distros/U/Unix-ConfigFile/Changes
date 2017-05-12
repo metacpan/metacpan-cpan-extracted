@@ -1,0 +1,36 @@
+Revision history for Perl extension Unix::ConfigFile.
+
+0.06  Tue May  2 12:08:17 2000
+	- Fixed documentation bugs
+	- Optimized performance of maxuid() and added ignore parameter
+	- Unix::PasswdFile now always writes out root as the first account
+	- Fixed group() method to return parameters in the correct order
+	- Added locking style "none" for no locking
+	- Added example script examples/grouper.pl
+
+0.05  Tue Jun  8 17:23:53 1999
+	- Renamed add/remove in AliasFile/GroupFile to add_user/remove_user
+	- New and commit can now pass options through to read and write
+	- All modules now have rename (or rename_user) methods
+	- AliasFile and GroupFile now use "*" to mean all aliases/groups
+
+0.04  Tue May  4 12:29:23 1999
+	- Corrected nasty bug in AliasFile that hosed multiline aliases
+	- Really fixed the "embedded commas" bug in AliasFile this time
+
+0.03  Mon May  3 21:29:59 1999
+	- The new() method has been redone and the open() method eliminated
+	- The commit() method can now create backup files
+	- AliasFile now works under 5.004, but with a minor bug (see docs)
+	- Fixed bug in AliasFile that dropped empty aliases at read time
+	- Added rename() method to PasswdFile to rename users
+	- Added delempty() method to AliasFile to remove empty aliases
+	- Minor code and documentation cleanups
+
+0.02  Thu Apr 15 16:18:00 1999
+	- Added support for aliases and automounter files
+	- ConfigFile now provides sequencing API, joinwrap, and commit
+	- Various internal restructuring and improvements
+
+0.01  Thu Feb 18 22:47:05 1999
+	- original version; created by h2xs 1.18

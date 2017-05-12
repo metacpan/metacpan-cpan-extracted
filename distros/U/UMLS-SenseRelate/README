@@ -1,0 +1,265 @@
+UMLS::SenseRelate
+  SYNOPSIS
+    This package consists of a set of Perl modules along with supporting
+    Perl programs that perform the task of Word Sense Disambiguation. The
+    program(s) attempt to disambiguate the sense of a single target word in
+    a given context using measures of similarity and relatedness provided by
+    the UMLS::Similarity CPAN module.
+
+  INSTALL
+        To install these modules run:
+
+          perl Makefile.PL
+          make
+          make test
+          make install
+
+        This will install the modules in the standard locations. You will, 
+        most probably, require root privileges to install in standard system
+        directories. To install in a non-standard directory, specify a prefix
+        during the 'perl Makefile.PL' stage as:
+
+          perl Makefile.PL PREFIX=/home
+
+  CONTENTS
+           lib/     
+
+             Location of the UMLS::SenseRelate::TargetWord perl module. 
+             Location of the UMLS::SenseRelate::AllWords perl module. 
+
+           t/       
+
+             Location of the test programs
+
+           samples/
+
+              A directory of scripts that demonstrate SenseClusters' usage and
+              functionality.
+
+           External/
+
+              Contains a modified version of SemEval 2010 All Words Disambigation
+              scorering program , and a script that can be run to automatically 
+              install it. This is used by the umls-senserelate-evaluation.pl 
+              program
+
+           utils/
+       
+              Directory containing Perl utility programs. These utilities use 
+              the UMLS::SenseRelate modules and provide some supporting
+              functionality.
+
+  MEASURES
+    UMLS-SenseRelate disambiguates terms in running text using the measures
+    implemented in the UMLS-Similarity packages. Currently the following
+    measures are available:
+
+        lch    - Leacock & Chodorow (1998)
+        wup    - Wu & Palmer (1994)
+        nam    - Nguyen and Al-Mubaid  (2006) 
+        zhong  - Zhong, et al. 2002
+        cdist  - Rada, et. al. 1989
+        jcn    - Jiang & Conrath (1997) 
+        res    - Resnik (1995)
+        lin    - Lin (1998) 
+        lesk   - Banerjee and Pedersen(2002)
+        vector - Patwardhan and Pedersen (2006)
+        path   - a simple path  based measure.
+
+  CONFIGURATION FILE
+    UMLS-SenseRelate passes the UMLS-Similarity package a configuration file
+    which allows a specified set of sources and relations to be used when
+    calculating the similarity score between two CUIs.
+
+    There are six configuration options: SAB, REL, RELA, SABDEF, RELDEF, and
+    RELADEF.
+
+    The SAB and REL options are used to determine which sources and
+    relations the path information is to be obtained from. The RELA option
+    narrows down the relation even further. The RELA will only be applied to
+    the PAR/CHD and RB/RN relations.
+
+    The SABDEF and RELDEF options are used to determine which sources and
+    relations to use when creating the Extended Definition. The RELA option
+    narrows down the relation even further. The RELADEF will only be applied
+    to the PAR/CHD and RB/RN relations.
+
+    The path, wup, lch, lin, jcn and res measures require the SAB and REL
+    options to be set. There is also an optional RELA option.
+
+    The vector and lesk measures require the SABDEF and RELDEF options to be
+    set with an optional RELADEF.
+
+    You can specify a single source, multiple sources or the entire UMLS
+    (using the UMLS_ALL option). Keep in mind that the greater the number of
+    sources the larger the search space so if you obtaining path information
+    about two concepts this will take longer. The names of the sources in
+    the configuration file are expected to be in the SAB (source
+    abbreviation) form. A listing of the sources and their SABs can be
+    found:
+
+    <http://www.nlm.nih.gov/research/umls/knowledge_sources/metathesaurus/re
+    lease/source_vocabularies.html>
+
+    You can specify any relations that exist in the specified set of sources
+    that you defined. The directional (hierarchical) relations though are
+    PAR/CHD and RB/RN. The other relations (such as RO and SIB) are not
+    directional which means when obtaining path information when using these
+    relations may take much longer than obtaining path information using the
+    directional relations. A listing of the different relations can be found
+    here (scroll down to the REL table):
+
+    <http://www.nlm.nih.gov/research/umls/knowledge_sources/metathesaurus/re
+    lease/abbreviations.html>
+
+    If you do plan on using a multiple sources or the entire UMLS, we would
+    advise you to use the --realtime option which is explained below, in the
+    Interface.pm documentation and the path programs in the utils/
+    directory. We also have a am UMLS_ALL option for this so you do not have
+    to specify each and every source and relation.
+
+    The format of the configuration file is as follows:
+
+    SAB :: <include|exclude> <source1, source2, ... sourceN>
+
+    REL :: <include|exclude> <relation1, relation2, ... relationN>
+
+    RELA :: <include|exclude> <rela1, rela2, ... relaN>
+
+    For example, if we wanted to use the MSH vocabulary with only the RB/RN
+    relations, the configuration file would be:
+
+     SAB :: include MSH
+     REL :: include RB, RN
+
+    or
+
+     SAB :: include MSH
+     REL :: exclude PAR, CHD
+
+    If we wanted to use the SNOMEDCT vocabulary with only the PAR/CHD
+    relations that are is-a relations, the configuration file would be:
+
+     SAB :: include SNOMEDCT
+     REL :: include PAR, CHD 
+     RELA :: include isa, inverse_isa
+
+    The format for SABDEF and RELDEF is similar.
+
+    The SABDEF and RELDEF options are used to determine the sources and
+    relations the extended definition is to be obtained from.
+
+    The format of the configuration file is as follows:
+
+    SABDEF :: <include|exclude> <source1, source2, ... sourceN>
+
+    RELDEF :: <include|exclude> <relation1, relation2, ... relationN>
+
+    RELADEF :: <include|exclude> <rela1, rela2, ... relaN>
+
+    Note: RELDEF takes any of MRREL relations and two special 'relations':
+
+          1. CUI which refers to the CUIs definition
+
+          2. TERM which refers to the terms associated with the CUI
+
+    For example, if we wanted to use the definitions from MSH vocabulary and
+    we only wanted the definition of the CUI and the definitions of the CUIs
+    SIB relation, the configuration file would be:
+
+     SABDEF :: include MSH
+     RELDEF :: include CUI, SIB
+
+    If you wanted only the PAR/CHD definitions which are is-a relations.
+
+     SABDEF :: include MSH
+     RELDEF :: include PAR, CHD
+     RELADEF :: include isa, inverse_isa
+
+    For all of these options, there is an UMLS_ALL tag. If used with SAB or
+    SABDEF, it would include all of the UMLS sources. If used with the REL
+    or RELDEF, it would include all of the possible relations (as well as
+    CUI and TERM for RELDEF). If used with the RELA or RELADEF, it would
+    include all of the RELA relations including those with no RELA relation.
+    Note that this is also the default for this option which is why it is
+    optional. An example of using the UMLS_ALL option is as follows:
+
+     SAB :: include UMLS_ALL
+     REL :: include UMLS_ALL
+
+    and another is:
+
+     SABDEF :: include UMLS_ALL
+     RELDEF :: include UMLS_ALL
+
+    If you go to the configuration file directory, there will be example
+    configuration files for the different runs that you have performed.
+
+    For more information about the configuration options please see the
+    README.
+
+  SOFTWARE COPYRIGHT AND LICENSE
+    Copyright (C) 2010-2013 Bridget T McInnes, Ying Liu, Serguei Pakhomov
+    and Ted Pedersen
+
+    This suite of programs is free software; you can redistribute it and/or
+    modify it under the terms of the GNU General Public License as published
+    by the Free Software Foundation; either version 2 of the License, or (at
+    your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+    Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+    Note: The text of the GNU General Public License is provided in the file
+    GPL.txt' that you should have received with this distribution.
+
+  CONTACT US
+    If you have any trouble installing and using UMLS-SenseRelate, please
+    contact us via the users mailing list :
+
+    umls-similarity@yahoogroups.com
+
+    You can join this group by going to:
+
+    <http://tech.groups.yahoo.com/group/umls-similarity/>
+
+    You may also contact us directly if you prefer :
+
+      Bridget T. McInnes: bthomson at umn.edu
+      Ted Pedersen      : tpederse at d.umn.edu
+
+  AUTHORS
+     Bridget T McInnes, University of Minnesota Twin Cities
+     bthomson at umn.edu
+
+     Ted Pedersen, University of Minnesota Duluth
+     tpederse at d.umn.edu
+
+     Ying Liu, University of Minnesota
+     liux0395 at umn.edu
+
+     Serguei Pakhomov, University of Minnesota Twin Cities
+     pakh002 at umn.edu
+
+  DOCUMENTATION COPYRIGHT AND LICENSE
+    Copyright (C) 2010-2012 Bridget T. McInnes, Ying Liu, Serguei Pakhomov
+    and Ted Pedersen.
+
+    Permission is granted to copy, distribute and/or modify this document
+    under the terms of the GNU Free Documentation License, Version 1.2 or
+    any later version published by the Free Software Foundation; with no
+    Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
+
+    Note: a copy of the GNU Free Documentation License is available on the
+    web at:
+
+    <http://www.gnu.org/copyleft/fdl.html>
+
+    and is included in this distribution as FDL.txt.
+

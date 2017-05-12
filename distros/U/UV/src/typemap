@@ -1,0 +1,18 @@
+TYPEMAP
+uv_handle_t*    T_UV_HANDLE
+uv_stream_t*    T_UV_HANDLE
+uv_tcp_t*       T_UV_HANDLE
+uv_udp_t*       T_UV_HANDLE
+uv_tty_t*       T_UV_HANDLE
+uv_poll_t*      T_UV_HANDLE
+uv_pipe_t*      T_UV_HANDLE
+uv_prepare_t*   T_UV_HANDLE
+uv_check_t*     T_UV_HANDLE
+uv_async_t*     T_UV_HANDLE
+uv_timer_t*     T_UV_HANDLE
+uv_idle_t*      T_UV_HANDLE
+
+INPUT
+T_UV_HANDLE
+    $var = ($type)mg_find(SvRV($arg), PERL_MAGIC_ext)->mg_obj;
+

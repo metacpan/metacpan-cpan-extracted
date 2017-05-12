@@ -1,0 +1,18 @@
+Revision history for Perl extension Unicode::Lite.
+
+0.01  03 Aug 2001
+    - first version
+
+0.03  06 Aug 2001
+    - bugfix version
+
+0.04  04 Sep 2001
+    - added FLGS and CHAR params to functions
+    - added EQUIVALENT CHAR REPLACING for SBCS->SBCS
+
+0.07  07 Oct 2001
+    - bugfix version
+    - Unicode::Map bug now ignored
+
+0.12  29 Aug 2002
+    - bugfix version

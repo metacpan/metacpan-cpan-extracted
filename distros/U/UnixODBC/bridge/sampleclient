@@ -1,0 +1,181 @@
+#! /usr/bin/perl
+
+use RPC::PlClient;
+use UnixODBC qw (:all);
+use UnixODBC::BridgeServer;
+
+#
+# Edit for the Host Address, DSN, TableName, UserName and PassWord of 
+# the remote DBMS.
+#
+my $HostAddress = '127.0.0.1';
+my $DSN = 'Data_Source_Name';
+my $TableName = 'Table_Name';
+my $UserName = 'User_Name';
+my $PassWord = 'Password';
+
+# TCP/IP Socket used by client and odbcbridge daemon.
+
+my $Port = 9999;
+
+# Maximum field length.  The RPC::PlServer POD documentation describes
+# how to change this.
+
+my $MaxFieldLength = 65535;
+
+# ODBC Handles
+
+my $evh = 0;  # Environment Handle
+my $cnh = 0;  # Connection Handle
+my $sth = 0;  # Statement Handle
+
+# Return values for sql_get_diag_rec 
+
+my ($r, $sqlstate, $native, $text, $textlen);
+
+# SQL Query Text
+
+my $query = "select \* from $TableName\;";
+
+# Rows and columns in the result set
+
+my ($nrows, $ncols);
+
+# Create a RPC network client object.  This manages the TCP/IP
+# network interface.
+
+my $client = 
+    eval { RPC::PlClient->new('peeraddr' => $HostAddress,
+			  'peerport' => $Port,
+			  'application' => 'UnixODBC::BridgeServer',
+			  'version' => $UnixODBC::VERSION,
+			  'user' => $UserName,
+			  'password' => $PassWord) }
+    or do {
+	print "Failed to make first connection: $@\n";
+	exit 1;
+    };
+
+# Create the BridgeClient object.
+
+my $c = $client -> ClientObject ('BridgeAPI', 'new');
+
+# Uncomment if you want the Driver Manager to log the ODBC 
+# function calls.  Also uncomment the call to dm_log_close,
+# below.
+
+# my $ODBCLogFile = '/tmp/sampleclient.log';
+# $c -> dm_log_open ('UnixODBC Bridge Sample Client', $ODBCLogFile);
+
+# Allocate an environment handle.
+
+$evh =  $c -> sql_alloc_env ();
+if (defined $evh) { 
+    $r = $c -> 
+	sql_set_env_attr ($evh, $SQL_ATTR_ODBC_VERSION, $SQL_OV_ODBC2, 0);
+} else {
+    ($r, $sqlstate, $native, $text, $textlen) = 
+        $c -> sql_get_diag_rec ($SQL_HANDLE_ENV, $evh, 1, 255);
+    print "\nsql_alloc_handle: $r, $text, $textlen\n";
+    exit 1;
+}
+
+# Allocate a connection handle.
+
+$cnh = $c -> sql_alloc_connect ($evh);
+
+# Connect to the data source.
+
+$r = $c -> sql_connect ($cnh, $DSN, length($DSN),
+			$UserName, length($UserName), 
+			$PassWord, length($PassWord), 0);
+if ($r != 0) {
+    ($r, $sqlstate, $native, $text, $textlen) = 
+        $c -> sql_get_diag_rec ($SQL_HANDLE_DBC, $cnh, 1, 255);
+    print "\nconnect: $r, $text, $textlen\n";
+}
+
+# Allocate a statement handle.
+
+$sth = $c -> sql_alloc_handle ($SQL_HANDLE_STMT, $cnh);
+if (! defined $sth) {
+    ($r, $sqlstate, $native, $text, $textlen) = 
+        $c -> sql_get_diag_rec ($SQL_HANDLE_DBC, $cnh, 1, 255);
+    print "\nsql_alloc_handle sth: $r, $text, $textlen\n";
+}
+
+# Query the remote DBMS.
+
+$r = $c -> sql_exec_direct ($sth, $query, length ($query));
+if ($r != 0) {
+    ($r, $sqlstate, $native, $text, $textlen) = 
+        $c -> sql_get_diag_rec ($SQL_HANDLE_STMT, $sth, 1, 255);
+    print "\nsql_exec_direct: $r, $text, $textlen\n";
+}
+
+# Get the number of columns in the result set.
+
+($r, $ncols) = $c -> sql_num_result_columns ($sth);
+if ($r != 0) {
+    ($r, $sqlstate, $native, $text, $textlen) = 
+        $c -> sql_get_diag_rec ($SQL_HANDLE_STMT, $sth, 1, 255);
+    print "\nsql_num_result_columns: $r, $text, $textlen\n";
+}
+
+# Get the number of rows in the result set.
+
+($r, $nrows) = $c -> sql_row_count ($sth);
+if ($r != 0) {
+    ($r, $sqlstate, $native, $text, $textlen) = 
+        $c -> sql_get_diag_rec ($SQL_HANDLE_STMT, $sth, 1, 255);
+    print "\nsql_num_result_columns: $r, $text, $textlen\n";
+}
+print "\n$nrows rows, $ncols columns\n";
+
+
+# Fetch each row and each column's contents.
+
+while (1) {
+    $r = $c -> sql_fetch ($sth);
+    last if $r == $SQL_NO_DATA;
+    foreach my $colno (1..$ncols) {
+	($r, $text, $textlen) = 
+	    $c -> sql_get_data ($sth, $colno, $SQL_C_CHAR, $MaxFieldLength);
+	print "$text\t";
+    }
+    print "\n";
+}
+
+# De-allocate the ODBC handles.
+
+$r = $c -> sql_free_handle ($SQL_HANDLE_STMT, $sth);
+if ($r != 0) {
+    ($r, $sqlstate, $native, $text, $textlen) = 
+        $c -> sql_get_diag_rec ($SQL_HANDLE_DBC, $cnh, 1, 255);
+    print "\nfree_handle sth: $r, $text, $textlen\n";
+}
+
+$r = $c -> sql_disconnect ($cnh);
+if ($r != 0) {
+    ($r, $sqlstate, $native, $text, $textlen) = 
+        $c -> sql_get_diag_rec ($SQL_HANDLE_DBC, $cnh, 1, 255);
+    print "\nconnect: $r, $text, $textlen\n";
+}
+
+$r = $c -> sql_free_connect ($cnh);
+if ($r != 0) {
+    ($r, $sqlstate, $native, $text, $textlen) = 
+        $c -> sql_get_diag_rec ($SQL_HANDLE_ENV, $evh, 1, 255);
+    print "\nfree_connect: $r, $text, $textlen\n";
+}
+
+$r = $c -> sql_free_handle ($SQL_HANDLE_ENV, $evh);
+if ($r != 0) {
+    ($r, $sqlstate, $native, $text, $textlen) = 
+        $c -> sql_get_diag_rec ($SQL_HANDLE_ENV, $evh, 1, 255);
+    print "\nfree_connect: $r, $text, $textlen\n";
+}
+
+# $c -> dm_log_close;
+
+

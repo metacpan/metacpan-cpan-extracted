@@ -1,0 +1,106 @@
+Revision history for Perl extension Unix::Statgrab.
+
+0.111	2016-05-01
+    - Release 0.110_003 without further changes
+
+0.110_003	2016-04-21
+    - add missing prove whether requested row exists in stat or not for
+      fetchrow_hashref and fetchrow_arrayref calls
+
+0.110_002	2016-04-20
+    - harden passing strings from libstatgrab to perl when fetching stats
+      as array
+
+0.110_001	2016-04-14
+    - harden tests
+      * eval around all statgrab calls & don't prove result when exception catched
+      * check for result and error, if no result received
+    - harden passing strings from libstatgrab to perl when fetching stats
+      as hash
+    - improve author tests and so improve documentation
+
+0.109	2015-07-10
+    - documentation improvements using pod and spelling checker
+    - remove upstream included "_default_headers_with_perl" C::AC method
+
+0.108_001	2015-02-03
+    - add full flavored struct accessors and implement all in XS, supports now
+      colnames, fetchrow_arrayref, fetchall_arrayref, fetchrow_hashref, fetchall_hashref,
+      fetchall_hash fetchall_array fetchall_table
+    - as_list is deprecated in favor of fetchall_hash
+
+0.107	2015-01-20
+    - eliminate potential memory leaks in get_fs_stats, get_network_io_stats,
+      get_network_iface_stats, get_process_stats
+    - add support for device_canonical
+    - update bundled ppport.h to 3.28 one
+
+0.016	2015-01-06
+    - update meta-information
+    - update author tests
+    - take advantage of Config::AutoConf 0.306
+
+0.105_001 2014-09-07
+    - take advantage of Config::AutoConf 0.23
+    - switch to ExtUtils::MakeMaker, it seems more active maintained
+    - add a test for possible leak
+    - improve repository documentation (README.md)
+
+0.104 2014-02-20
+    - fix link targets for stats description
+
+0.103 2014-02-19
+    - learn include paths and linker flags from pkg-config, if available
+    - keep configure phase settings persistent for building stage
+    - redo meta_add using meta-spec v2
+      * includes developer deps to please ribasushi
+
+0.102 2013-09-28
+    - Update repository URI - it's now officially hosted on i-scream.org
+      with a mirror on GitHub for issue tracking and easy deal with
+      pull requests
+
+0.101 2013-09-10
+    - depend on 'parent' not 'parant' (Thanks to Chris Weyl)
+
+0.100 2013-09-09
+    - add POD for generic methods
+    - return stats in integer representation, if valid (read: if
+      UV can hold any value of unsigned long long)
+    - add "parants" to configure_requires
+
+0.099_002 2013-09-06
+    - Update POD to match current functionality
+    - introduce as_list() for each object
+    - Changes reformatted as per CPAN::Changes::Spec
+    - Fix Build to make the distribution more CPAN testers friendly
+
+0.099_001 2013-08-03 19:13:04 CEST
+    - Update Unix::Statgrab for being used with libstatgrab 0.90
+    - kick out all "special" handling (process_stats, cpu_percents)
+      and replace them by general stats as naturally provided
+    - move pod tests to xt/ making them Author only tests
+
+0.04  2005-09-22 08:20:59 CEST
+    - 0.12 is now required for compilation
+    - therefore: additional statistics for get_fs_stats()
+    - fixed a minor nit in the POD tests:
+      make sure that Test::Pod and Test::Pod::Coverage are
+      installed in the required minimum versions
+      (thanks to Ricardo Signes <rjbs AT cpan DOT org>)
+
+0.03  2005-04-03 07:38:20 CEST
+    - POD- and POD-coverage-tests
+
+0.02  2004-06-21 07:05:16 CEST
+    - running Makefile.PL could nuke /dev/null. Fixed.
+      (Tim Bishop <tim AT bishnet DOT net>)
+    - some DESTROY methods missing which potentially lead
+      to some slight memory leaks. Fixed.
+    - added sg_get_process_stats(). I must have missed that one
+      for some reason.
+
+0.01  2004-05-21 06:57:16
+    - original version; created by h2xs 1.23 with
+      "h2xs -O -b 5.5.3 -n Unix::Statgrab /usr/local/include/statgrab.h"
+

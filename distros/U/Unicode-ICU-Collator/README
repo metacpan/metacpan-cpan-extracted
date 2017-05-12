@@ -1,0 +1,5 @@
+Unicode::ICU::Collator is a simple (and currently incomplete) wrapper
+around the ICU library collation functions.
+
+Installation requires that the development files, that is, headers,
+link libraries and icu-config tool are installed at Makefile.PL time.

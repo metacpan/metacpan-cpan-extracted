@@ -1,0 +1,20 @@
+--- #YAML:1.0
+name:         Unix-Processors
+version:      2.045
+version_from: Processors.pm
+abstract:     Interface to processor (CPU) information
+license:      perl
+installdirs:  site
+author:
+    - Wilson Snyder <wsnyder@wsnyder.org>
+resources:
+    homepage: http://www.veripool.org
+requires:
+    Test:                          1
+    warnings:                      1
+
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.4.html
+    version: 1.4
+distribution_type: module
+generated_by: hand

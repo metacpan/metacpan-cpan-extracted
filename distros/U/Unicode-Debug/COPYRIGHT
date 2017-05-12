@@ -1,0 +1,51 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: Unicode-Debug
+Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
+Source: https://metacpan.org/release/Unicode-Debug
+
+Files: README
+ lib/Devel/Unicode.pm
+ lib/PerlIO/via/UnicodeDebug.pm
+ lib/Unicode/Debug.pm
+ t/01basic.t
+ t/02unidebug.t
+ t/03perlio.t
+Copyright: This software is copyright (c) 2012-2013 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: Changes
+ META.json
+ META.yml
+ Makefile.PL
+ dist.ini
+ doap.ttl
+Copyright: Copyright 2013 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: CONTRIBUTING
+ INSTALL
+ LICENSE
+ examples/output-names.pl
+ examples/output.pl
+Copyright: Unknown
+License: Unknown
+
+Files: COPYRIGHT
+ CREDITS
+ SIGNATURE
+Copyright: None
+License: public-domain
+
+License: Artistic-1.0
+ This software is Copyright (c) 2013 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The Artistic License 1.0
+
+License: GPL-1.0
+ This software is Copyright (c) 2013 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The GNU General Public License, Version 1, February 1989

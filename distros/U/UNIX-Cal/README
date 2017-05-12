@@ -1,0 +1,29 @@
+
+UNIX::Cal
+
+This package is a perl/Inline implementation of the UNIX cal 
+command line tool.
+
+It is really paying homage to the original code from
+   The Regents of the University of California
+   and
+   Berkeley by Kim Letkeman.
+
+
+To build you first need to install Inline ( and Inline::C ),
+and the do the usual:
+
+perl Makefile.PL
+make 
+make test
+make install
+
+Dance.
+
+for more details:
+
+perldoc UNIX::Cal
+and
+man cal
+
+Piers Harding - piers@ompa.net

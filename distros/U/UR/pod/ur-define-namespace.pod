@@ -1,0 +1,40 @@
+
+
+=pod
+
+=head1 NAME
+
+ur define namespace - create a new namespace tree and top-level module
+
+
+
+=head1 VERSION
+
+This document describes ur define namespace version 0.29.
+
+=head1 SYNOPSIS
+
+ur define namespace NSNAME
+
+
+
+=head1 REQUIRED ARGUMENTS
+
+=over
+
+
+=item NSNAME
+
+the name of the namespace, and first "word" in all classes
+
+
+=back
+
+=head1 DESCRIPTION:
+
+  !!! define help_detail() in module 
+
+
+
+=cut
+

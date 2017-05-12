@@ -1,0 +1,14 @@
+Revision history for perl module URI-Find-UTF8-ExtraCharacters
+
+0.03      2014-08-06 21:19:21+01:00 Europe/London
+
+ - Compatibility fixes with URI::Find >= 20140702
+ - Swap out URI::Find::UTF8 for URI::Find, as newer URI::Find supports UTF8.
+
+0.02 2014-02-16
+
+ - Stable release
+
+0.01_001 2014-02-15
+
+ - First release

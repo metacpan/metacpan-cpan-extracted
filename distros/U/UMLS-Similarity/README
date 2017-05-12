@@ -1,0 +1,503 @@
+UMLS::Similarity
+  SYNOPSIS
+      This package consists of Perl modules along with supporting Perl
+      programs that implement the semantic similarity and relatedness 
+      measures described by Leacock & Chodorow (1998), Wu & Palmer (1994), 
+      Nguyen and Al-Mubaid  (2006), Zhong, et al. (2002), Rada, et. al. 
+      (1989), Jiang & Conrath (1997), Resnik (1995), Lin (1998), Banerjee 
+      and Pedersen(2002), Patwardhan and Pedersen (2006) and a simple path  
+      based measure.
+
+      UMLS::Similarity requires the UMLS::Interface module to access 
+      the Unified Medical Language System (UMLS) in order to determine 
+      the similarity between two UMLS concepts.
+
+      The Perl modules are designed as objects with methods that take as
+      input two concepts from the UMLS. The semantic relatedness of these 
+      concepts is returned by these methods. A quantitative measure of 
+      the degree to which the two concepts are related has wide ranging 
+      applications in numerous areas, such as word sense disambiguation, 
+      information retrieval, etc. For example, in order to determine which 
+      sense of a given word is being used in a particular context, the sense 
+      having the highest relatedness with its context word senses is most 
+      likely to be the sense being used. Similarly, in information retrieval, 
+      retrieving documents containing highly related concepts are more likely 
+      to have higher precision and recall values.
+
+      The following sections describe the organization of this software
+      package and how to use it. A few typical examples are given to help
+      clearly understand the usage of the modules and the supporting
+      utilities.
+
+  INSTALL
+        To install these modules run:
+
+          perl Makefile.PL
+          make
+          make test
+          make install
+
+        This will install the modules in the standard locations. You will, 
+        most probably, require root privileges to install in standard system
+        directories. To install in a non-standard directory, specify a prefix
+        during the 'perl Makefile.PL' stage as:
+
+          perl Makefile.PL PREFIX=/home
+
+        It is possible to modify other parameters during installation. The
+        details of these can be found in the ExtUtils::MakeMaker
+        documentation. However, it is highly recommended not messing 
+        around with other parameters, unless you know what you're doing.
+
+  SEMANTIC RELATEDNESS
+        We observe that humans find it extremely easy to say if two words are
+        related and if one word is more related to a given word than another.
+        For example, if we come across two words -- 'car' and 'bicycle', we know
+        they are related as both are means of transport. Also, we easily observe
+        that 'bicycle' is more related to 'car' than 'fork' is. But is there
+        some way to assign a quantitative value to this relatedness? Some ideas
+        have been put forth by researchers to quantify the concept of
+        relatedness of words, with encouraging results.
+
+        A number of different measures of relatedness have been implemented in
+        this software package. These include a simple edge counting
+        approach. The measures require the UMLS-Interface that define UMLS 
+        concepts, and some basic relationships between these concepts.
+
+  CONTENTS
+        All the modules that will be installed in the Perl system directory are
+        present in the '/lib' directory tree of the package. These include the
+        semantic relatedness modules -- 
+
+          UMLS/Similarity/lch.pm
+          UMLS/Similarity/path.pm
+          UMLS/Similarity/wup.pm
+          UMLS/Similarity/nam.pm
+          UMLS/Similarity/zhong.pm
+          UMLS/Similarity/cdist.pm
+          UMLS/Similarity/res.pm
+          UMLS/Similarity/lin.pm
+          UMLS/Similarity/jcn.pm
+          UMLS/Similarity/random.pm
+          UMLS/Similarity/vector.pm
+          UMLS/Similarity/lesk.pm
+
+        -- present in the lib/ subdirectory. All these modules, once installed
+        in the Perl system directory, can be directly used by Perl programs.
+
+        The package contains a utils/ directory that contain Perl utility 
+        programs. These utilities use the modules or provide some supporting
+        functionality.
+
+          umls-similarity.pl         -- returns the semantic similarity of two 
+                                        terms or UMLS CUIs given a specified 
+                                        measure (and view of the UMLS).
+
+          spearman.pl                -- calculates the Spearman Rank 
+                                        Correlation between two files
+
+          vector-input.pl            -- creates the matrix and index files 
+                                        required for the vector measure
+
+          SignificanceTesting.r      -- R script to calculate the correlation 
+                                        between a gold standard and the results 
+                                        obtained using the measures in the 
+                                        umls-similarity.pl program
+
+          sim2r.pl                   -- converts umls-similarity.pl output to 
+                                        a format that can be read by the R script
+
+          create-icfrequency.pl      -- create the frequency file for 
+                                        information content measures
+
+          create-icpropagation.pl    -- create the probability file for 
+                                        information content measures
+  
+         vector-input.pl            -- script to create the matrix and index
+                                       files for the vector measure
+
+        The package contains a web/ directory which contains a web interface to 
+        the UMLS-Similarity package once it is installed. Please see the README 
+        file in the web/ directory for further information.
+
+  CONFIGURATION
+    UMLS-Interface allows information to be extracted from the UMLS given a
+    specified set of sources and relations through the use of a
+    configuration file.
+
+    There are six configuration options: SAB, REL, RELA, SABDEF, RELDEF, and
+    RELADEF.
+
+    The SAB and REL options are used to determine which sources and
+    relations the path information is to be obtained from. The RELA option
+    narrows down the relation even further. The RELA will only be applied to
+    the PAR/CHD and RB/RN relations.
+
+    The SABDEF and RELDEF options are used to determine which sources and
+    relations to use when creating the Extended Definition. The RELA option
+    narrows down the relation even further. The RELADEF will only be applied
+    to the PAR/CHD and RB/RN relations.
+
+    The path, wup, lch, lin, jcn and res measures require the SAB and REL
+    options to be set. There is also an optional RELA option.
+
+    The vector and lesk measures require the SABDEF and RELDEF options to be
+    set with an optional RELADEF.
+
+    You can specify a single source, multiple sources or the entire UMLS
+    (using the UMLS_ALL option). Keep in mind that the greater the number of
+    sources the larger the search space so if you obtaining path information
+    about two concepts this will take longer. The names of the sources in
+    the configuration file are expected to be in the SAB (source
+    abbreviation) form. A listing of the sources and their SABs can be
+    found:
+
+    <http://www.nlm.nih.gov/research/umls/knowledge_sources/metathesaurus/re
+    lease/source_vocabularies.html>
+
+    You can specify any relations that exist in the specified set of sources
+    that you defined. The directional (hierarchical) relations though are
+    PAR/CHD and RB/RN. The other relations (such as RO and SIB) are not
+    directional which means when obtaining path information when using these
+    relations may take much longer than obtaining path information using the
+    directional relations. A listing of the different relations can be found
+    here (scroll down to the REL table):
+
+    <http://www.nlm.nih.gov/research/umls/knowledge_sources/metathesaurus/re
+    lease/abbreviations.html>
+
+    If you do plan on using a multiple sources or the entire UMLS, we would
+    advise you to use the --realtime option which is explained below, in the
+    Interface.pm documentation and the path programs in the utils/
+    directory. We also have a am UMLS_ALL option for this so you do not have
+    to specify each and every source and relation.
+
+    The format of the configuration file is as follows:
+
+    SAB :: <include|exclude> <source1, source2, ... sourceN>
+
+    REL :: <include|exclude> <relation1, relation2, ... relationN>
+
+    RELA :: <include|exclude> <rela1, rela2, ... relaN>
+
+    For example, if we wanted to use the MSH vocabulary with only the RB/RN
+    relations, the configuration file would be:
+
+     SAB :: include MSH
+     REL :: include RB, RN
+
+    or
+
+     SAB :: include MSH
+     REL :: exclude PAR, CHD
+
+    If we wanted to use the SNOMEDCT vocabulary with only the PAR/CHD
+    relations that are is-a relations, the configuration file would be:
+
+     SAB :: include SNOMEDCT
+     REL :: include PAR, CHD 
+     RELA :: include isa, inverse_isa
+
+    The format for SABDEF and RELDEF is similar.
+
+    The SABDEF and RELDEF options are used to determine the sources and
+    relations the extended definition is to be obtained from.
+
+    The format of the configuration file is as follows:
+
+    SABDEF :: <include|exclude> <source1, source2, ... sourceN>
+
+    RELDEF :: <include|exclude> <relation1, relation2, ... relationN>
+
+    RELADEF :: <include|exclude> <rela1, rela2, ... relaN>
+
+    Note: RELDEF takes any of MRREL relations and two special 'relations':
+
+          1. CUI which refers to the CUIs definition
+
+          2. TERM which refers to the terms associated with the CUI
+
+    For example, if we wanted to use the definitions from MSH vocabulary and
+    we only wanted the definition of the CUI and the definitions of the CUIs
+    SIB relation, the configuration file would be:
+
+     SABDEF :: include MSH
+     RELDEF :: include CUI, SIB
+
+    If you wanted only the PAR/CHD definitions which are is-a relations.
+
+     SABDEF :: include MSH
+     RELDEF :: include PAR, CHD
+     RELADEF :: include isa, inverse_isa
+
+    For all of these options, there is an UMLS_ALL tag. If used with SAB or
+    SABDEF, it would include all of the UMLS sources. If used with the REL
+    or RELDEF, it would include all of the possible relations (as well as
+    CUI and TERM for RELDEF). If used with the RELA or RELADEF, it would
+    include all of the RELA relations including those with no RELA relation.
+    Note that this is also the default for this option which is why it is
+    optional. An example of using the UMLS_ALL option is as follows:
+
+     SAB :: include UMLS_ALL
+     REL :: include UMLS_ALL
+
+    and another is:
+
+     SABDEF :: include UMLS_ALL
+     RELDEF :: include UMLS_ALL
+
+    If you go to the configuration file directory, there will be example
+    configuration files for the different runs that you have performed.
+
+    For more information about the configuration options please see the
+    README.
+
+  PROPAGATION
+    The Information Content (IC) is defined as the negative log of the
+    probability of a concept. The probability of a concept, c, is determine
+    by summing the probability of the concept occurring in some text plus
+    the probability its descendants occurring in some text.
+
+    The following is an example of the method UMLS-Interface uses to
+    propagate counts to determine the probability of a concept in the
+    sources/relations specified in the configuration file. In this method,
+    we percolate the counts up the hierarchy, and in the case of multiple
+    inheritance, we send a full count up all the paths to the parent.
+
+    The icfrequency file contains the frequency of the following concepts
+    existing in some corpus. For example, our corpus consists of three
+    concepts, A B & C, each occurring five times:
+
+     SAB :: (include|exclude) <sources>
+     REL :: (include|exclude) <relations>
+     N :: 15
+     A<>5
+     B<>5
+     C<>5
+
+    In this case, our sources and relations consist of the following
+    'graph': Notation....A->D means A is a child of D....
+
+     A->D
+     B->D
+     B->E
+     D->F
+     C->E
+     E->F
+
+    So A B and C are "leaf" nodes and F is the root.
+
+    Step 1: determine the descendants of each nodes
+
+     Descendants(A) = {}
+     Descendants(B) = {}
+     Descendants(C) = {}
+     Descendants(D) = {A, B}
+     Descendants(E) = {B, C}
+     Descendants(F) = {A, B, C, D, E, F}
+
+    Step 2: determine the probability of a concept, P(c), occurring by
+    summing the probability of each of descendants plus its probability.
+
+     P(A) = freq(A) / N = .33
+     P(B) = freq(B) / N = .33
+     P(C) = freq(C) / N = .33
+     P(D) = (freq(A)+freq(B)+freq(D)) / N = .66
+     P(E) = (freq(B)+freq(C)+freq(E)) / N = .66
+     P(F) = (freq(A)+freq(B)+freq(C)+freq(D)+freq(E)+freq(F)) / N = .99
+
+    Step 3: print the probability of the concept occurring, P(c), for each
+    node in the sources/relations defined in the configuration table.
+
+     SMOOTH :: 0 <- or 1 if smoothing was used
+     SAB :: (include|exclude) <sources>
+     REL :: (include|exclude) <relations>
+     RELA :: (include|exclude) <relas>  <- if any are specified in the config
+     N :: 15
+     A<>.33
+     B<>.33
+     C<>.33
+     D<>.66
+     E<>.66
+     F<>.99
+
+    The information content for the nodes is then calculated by taking -log
+    of this probability.
+
+    We have an option that incorporates Laplace smoothing. Laplace smoothing
+    is where the frequency count of each of the concepts in the taxonomy is
+    incremented by one. The advantage of doing this is that it avoids having
+    a concept that has a probability of zero. The disadvantage is that it
+    can shift the overall probability mass of the concepts from what is
+    actually seen in the corpus.
+
+  SOFTWARE COPYRIGHT AND LICENSE
+        Copyright (C) 2004-2011 Bridget T McInnes, Siddharth Patwardhan, 
+        Serguei Pakhomov and Ted Pedersen
+
+        This suite of programs is free software; you can redistribute it and/or
+        modify it under the terms of the GNU General Public License as published
+        by the Free Software Foundation; either version 2 of the License, or (at
+        your option) any later version.
+
+        This program is distributed in the hope that it will be useful, but
+        WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+        General Public License for more details.
+
+        You should have received a copy of the GNU General Public License along
+        with this program; if not, write to the Free Software Foundation, Inc.,
+        59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
+        Note: The text of the GNU General Public License is provided in the file
+        'GPL.txt' that you should have received with this distribution.
+
+  REFERENCING
+        If you write a paper that has used UMLS-Similarity in some way, we'd 
+        certainly be grateful if you sent us a copy and referenced UMLS-Interface. 
+        We have a published paper that provides a suitable reference:
+
+        @inproceedings{McInnesPP09,
+           title={{UMLS-Interface and UMLS-Similarity : Open Source 
+                   Software for Measuring Paths and Semantic Similarity}}, 
+           author={McInnes, B.T. and Pedersen, T. and Pakhomov, S.V.}, 
+           booktitle={Proceedings of the American Medical Informatics 
+                      Association (AMIA) Symposium},
+           year={2009}, 
+           month={November}, 
+           address={San Fransisco, CA}
+        }
+
+        This paper is also found in
+        <http://www-users.cs.umn.edu/~bthomson/publications/pubs.html>
+        or
+        <http://www.d.umn.edu/~tpederse/Pubs/amia09.pdf>
+
+  REFERENCES
+        1   Wu Z. and Palmer M. 1994. Verb Semantics and Lexical Selection. In
+            Proceedings of the 32nd Annual Meeting of the Association for
+            Computational Linguistics.  Las Cruces, New Mexico.
+
+        2   Resnik P. 1995. Using information content to evaluate semantic
+            similarity. In Proceedings of the 14th International Joint
+            Conference on Artificial Intelligence, pages 448-453, Montreal.
+
+        3   Jiang J. and Conrath D. 1997. Semantic similarity based on corpus
+            statistics and lexical taxonomy. In Proceedings of International
+            Conference on Research in Computational Linguistics, Taiwan.
+
+        4   Fellbaum C., editor. WordNet: An electronic lexical database. MIT
+            Press, 1998.
+
+        5   Leacock C. and Chodorow M. 1998. Combining local context and WordNet
+            similarity for word sense identification. In Fellbaum 1998, pp.
+            265-283.
+
+        6   Lin D. 1998. An information-theoretic definition of similarity. In
+            Proceedings of the 15th International Conference on Machine
+            Learning, Madison, WI.
+
+        7   Hirst G. and St-Onge D. 1998. Lexical Chains as representations of
+            context for the detection and correction of malapropisms. In
+            Fellbaum 1998, pp. 305-332.
+
+        8   Schütze H. 1998. Automatic Word Sense Discrimination. Computational
+            Linguistics, 24(1):97-123.
+
+        9   Resnik P. 1999. Semantic Similarity in a Taxonomy: An Information-
+            Based Measure and its Applications to Problems of Ambiguity in
+            Natural Language. Journal of Artificial Intelligence Research, 11,
+            95-130.
+
+        10  Budanitsky A. and Hirst G. 2001. Semantic distance in WordNet: An
+            experimental, application-oriented evaluation of five measures. In
+            Workshop on WordNet and Other Lexical Resources, Second meeting of
+            the North American Chapter of the Association for Computational
+            Linguistics. Pittsburgh, PA.
+
+        11  Banerjee S. and Pedersen T. 2002. An Adapted Lesk Algorithm for Word
+            Sense Disambiguation Using WordNet. In Proceeding of the Fourth
+            International Conference on Computational Linguistics and
+            Intelligent Text Processing (CICLING-02). Mexico City.
+
+        12  Patwardhan S., Banerjee S. and Pedersen T. 2002. Using Semantic
+            Relatedness for Word Sense Disambiguation. In Proceedings of the
+            Fourth International Conference on Intelligent Text Processing and
+            Computational Linguistics, Mexico City.
+
+        13  Banerjee S. Adapting the Lesk algorithm for word sense
+            disambiguation to WordNet. Master Thesis, University of Minnesota,
+            Duluth, 2002.
+
+        14  Patwardhan S. Incorporating dictionary and corpus information into a
+            vector measure of semantic relatedness. Master Thesis, University of
+            Minnesota, Duluth, 2003.
+
+        15  Patwardhan, S. and Pedersen T. Using WordNet Based Context Vectors 
+            to Estimate the Semantic Relatedness of Concepts. In Proceedings of 
+            the EACL 2006 Workshop Making Sense of Sense - Bringing Computational 
+            Linguistics and Psycholinguistics Together, pp. 1-8, April 4, 2006, 
+            Trento, Italy.
+
+        16  Rada, R., Mili, H., Bicknell, E. and Blettner, M. Development and 
+            application of a metric on semantic nets. In Proceedings of the 
+            IEEE Transactions on Systems, Man, and Cybernetics, volume 19, 
+            pages 17-30, 1989.
+
+        17  Nguyen, H.A. and Al-Mubaid, H. New ontology based semantic 
+            similarity mesaure for the biomedical domain. In Proceedings of 
+            the IEEE International Conference on Granular Computing, pages 
+            623-628, 2006.
+
+  SEE ALSO
+    <http://search.cpan.org/dist/UMLS-Interface>
+
+    <http://search.cpan.org/dist/UMLS-Similarity>
+
+  CONTACT US
+    If you have any trouble installing and using UMLS-Interface, please
+    contact us via the users mailing list :
+
+    umls-similarity@yahoogroups.com
+
+    You can join this group by going to:
+
+    <http://tech.groups.yahoo.com/group/umls-similarity/>
+
+    You may also contact us directly if you prefer :
+
+      Bridget T. McInnes: bthomson at cs.umn.edu
+      Ted Pedersen      : tpederse at d.umn.edu
+
+  AUTHORS
+     Bridget T McInnes, University of Minnesota Twin Cities
+     bthomson at cs.umn.edu
+
+     Siddharth Patwardhan, University of Utah
+     sidd at cs.utah.edu
+
+     Serguei Pakhomov, University of Minnesota Twin Cities
+     pakh002 at umn.edu
+
+     Ted Pedersen, University of Minnesota Duluth
+     tpederse at d.umn.edu
+
+     Ying Liu, University of Minnesota
+     liux0395 at umn.edu
+
+  DOCUMENTATION COPYRIGHT AND LICENSE
+    Copyright (C) 2003-2013 Bridget T. McInnes, Siddharth Patwardhan,
+    Serguei Pakhomov, Ying Liu and Ted Pedersen.
+
+    Permission is granted to copy, distribute and/or modify this document
+    under the terms of the GNU Free Documentation License, Version 1.2 or
+    any later version published by the Free Software Foundation; with no
+    Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
+
+    Note: a copy of the GNU Free Documentation License is available on the
+    web at:
+
+    <http://www.gnu.org/copyleft/fdl.html>
+
+    and is included in this distribution as FDL.txt.
+

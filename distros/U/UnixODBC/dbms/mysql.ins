@@ -1,0 +1,14 @@
+create database gutenberg;
+use gutenberg;
+create table titles (
+	id_no int(11),
+	etext_no int(11),
+	collection varchar(20),
+	author varchar(64),
+	title varchar(128));
+load data local infile "titles.dat" into table titles;
+
+create table files (
+	id_no int(11),
+	filename varchar(128));
+load data local infile "files.dat" into table files;

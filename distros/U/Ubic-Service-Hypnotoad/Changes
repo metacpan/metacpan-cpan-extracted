@@ -1,0 +1,27 @@
+Revision history for Ubic-Service-Hypnotoad
+
+0.3005  2015-03-27
+        Improved tests (thanks Logioniz)
+        Fixed bug that disallowed array form of bin parameter
+        Check if pid_file and app paths are absolute
+        Improve security with 3-param form of "open" function
+
+0.3     2015-03-27
+        step duration and number of trials are optionally parametrizable
+
+0.2001  2014-07-05
+        Fixed bug in POD documentation
+
+0.2     2014-07-05
+        - 'bin' parameter may be an array, or contain many words
+        - added 'cwd' parameter, to change dir before execution
+
+0.1     2013-11-20
+        - Suppressed extra unwanted output in STDOUT, during 'stop'
+        - Wrote documenatation
+
+0.002   2013-10-10
+        First usable version
+
+0.001   2013-10-09
+        First version, released on an unsuspecting world.

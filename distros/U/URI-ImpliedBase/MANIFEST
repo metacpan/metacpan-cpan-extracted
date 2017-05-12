@@ -1,0 +1,19 @@
+Changes
+lib/URI/ImpliedBase.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README
+t/001_load.t
+t/002_abs.t
+t/003_set_base.t
+t/004_relative1.t
+t/005_relative2.t
+t/006_relative3.t
+t/007_dots.t
+t/008_clear.t
+t/pod-coverage.t
+t/pod.t
+Todo
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

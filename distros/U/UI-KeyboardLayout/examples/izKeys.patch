@@ -1,0 +1,772 @@
+--- iz-ru-4s.C.orig	2013-06-30 11:58:28.079116700 -0700
++++ iz-ru-4s.C	2013-06-30 12:09:01.975373500 -0700
+@@ -25,6 +25,8 @@ TYPEDEF_VK_TO_WCHARS(46) // VK_TO_WCHARS
+ #define ALLOC_SECTION_LDATA
+ #endif
+ 
++#include "msklc_lig4.h"
++
+ /***************************************************************************\
+ * ausVK[] - Virtual Scan Code to Virtual Key conversion table
+ \***************************************************************************/
+@@ -97,6 +97,7 @@ ALLOC_SECTION_LDATA VSC_VK aE0Vsc
+         { 0x2E, X2E | KBDEXT              },  // Speedracer: Volume Down
+         { 0x30, X30 | KBDEXT              },  // Speedracer: Volume Up
+         { 0x32, X32 | KBDEXT              },  // Speedracer: Browser Home
++        { 0x35, X35 | KBDEXT              },  // Numpad Divide
+         { 0x37, X37 | KBDEXT              },  // Snapshot
+         { 0x38, X38 | KBDEXT              },  // RMenu
+         { 0x47, X47 | KBDEXT              },  // Home
+@@ -141,10 +142,21 @@ ALLOC_SECTION_LDATA VSC_VK aE1Vsc
+ *     CTRL  (L & R) is used to generate control characters
+ *     ALT   (L & R) used for generating characters by number with numpad
+ \***************************************************************************/
++#define KBD_Z	0x40
++#define KBD_T	0x80
+ ALLOC_SECTION_LDATA VK_TO_BIT aVkToBits[] = {
+     { VK_SHIFT    ,   KBDSHIFT     },
++  /* CONTROL and MENU may appear only when an application creates a configuration of keys for ToUnicode() ``by hand''.
++     CONTROL may be combined with MENU and LMENU; MENU may also be combined with LCONTROL:
++	C+A, C+A+K, C+A+L
++     We can freely choose to which configuration columns to resolve these combinations. */
+     { VK_CONTROL  ,   KBDCTRL      },
+     { VK_MENU     ,   KBDALT       },
++    { VK_LCONTROL ,   KBDCTRL + KBDLOYA      },
++    { VK_RCONTROL ,   KBDCTRL + KBDALT + KBDROYA      },
++    { VK_LMENU    ,   KBDALT + KBDKANA       },
++    { VK_RMENU    ,   KBDALT + KBDCTRL + KBDLOYA + KBD_Z       },
++    { VK_OEM_AX   ,   KBDALT + KBDCTRL + KBD_T      },
+     { 0           ,   0           }
+ };
+ 
+@@ -167,24 +179,24 @@ static ALLOC_SECTION_LDATA MODIFIERS Cha
+ 	3,            // Shift	Ctrl
+ 	SHFT_INVALID, // 		Alt
+ 	SHFT_INVALID, // Shift		Alt
+-	SHFT_INVALID, // 	Ctrl	Alt
+-	SHFT_INVALID, // Shift	Ctrl	Alt
+-	SHFT_INVALID, // 			Kana
+-	SHFT_INVALID, // Shift			Kana
++	4,            // 	Ctrl	Alt
++	5,            // Shift	Ctrl	Alt
++	0,            // 			Kana
++	1,            // Shift			Kana
+ 	SHFT_INVALID, // 	Ctrl		Kana
+ 	SHFT_INVALID, // Shift	Ctrl		Kana
+ 	SHFT_INVALID, // 		Alt	Kana
+ 	SHFT_INVALID, // Shift		Alt	Kana
+-	SHFT_INVALID, // 	Ctrl	Alt	Kana
+-	SHFT_INVALID, // Shift	Ctrl	Alt	Kana
++	4,            // 	Ctrl	Alt	Kana
++	5,            // Shift	Ctrl	Alt	Kana
+ 	SHFT_INVALID, // 				Roya
+ 	SHFT_INVALID, // Shift				Roya
+ 	SHFT_INVALID, // 	Ctrl			Roya
+ 	SHFT_INVALID, // Shift	Ctrl			Roya
+ 	SHFT_INVALID, // 		Alt		Roya
+ 	SHFT_INVALID, // Shift		Alt		Roya
+-	SHFT_INVALID, // 	Ctrl	Alt		Roya
+-	SHFT_INVALID, // Shift	Ctrl	Alt		Roya
++	2,            // 	Ctrl	Alt		Roya
++	3,            // Shift	Ctrl	Alt		Roya
+ 	SHFT_INVALID, // 			Kana	Roya
+ 	SHFT_INVALID, // Shift			Kana	Roya
+ 	SHFT_INVALID, // 	Ctrl		Kana	Roya
+@@ -195,12 +207,12 @@ static ALLOC_SECTION_LDATA MODIFIERS Cha
+ 	16,           // Shift	Ctrl	Alt	Kana	Roya
+ 	SHFT_INVALID, // 					Loya
+ 	SHFT_INVALID, // Shift					Loya
+-	SHFT_INVALID, // 	Ctrl				Loya
+-	SHFT_INVALID, // Shift	Ctrl				Loya
++	2,            // 	Ctrl				Loya
++	3,            // Shift	Ctrl				Loya
+ 	SHFT_INVALID, // 		Alt			Loya
+ 	SHFT_INVALID, // Shift		Alt			Loya
+-	SHFT_INVALID, // 	Ctrl	Alt			Loya
+-	SHFT_INVALID, // Shift	Ctrl	Alt			Loya
++	4,            // 	Ctrl	Alt			Loya
++	5,            // Shift	Ctrl	Alt			Loya
+ 	SHFT_INVALID, // 			Kana		Loya
+ 	SHFT_INVALID, // Shift			Kana		Loya
+ 	SHFT_INVALID, // 	Ctrl		Kana		Loya
+@@ -523,14 +529,18 @@ static ALLOC_SECTION_LDATA VK_TO_WCHARS3
+   {0            ,0      ,0        ,0        ,0        }
+ };
+ 
+-static ALLOC_SECTION_LDATA VK_TO_WCHARS6 aVkToWch6[] = {
++static ALLOC_SECTION_LDATA VK_TO_WCHARS10 aVkToWch10[] = {
+ //                      |         |  Shift  |  Ctrl   |S+Ctrl   |  C+  X1 |  C+  X1 |
+ //                      |=========|=========|=========|=========|=========|=========|
+-  {VK_SPACE     ,0      ,' '      ,WCH_DEAD ,' '      ,WCH_NONE ,WCH_DEAD ,WCH_DEAD },
+-  {0xff         ,0      ,WCH_NONE ,0x0138   ,WCH_NONE ,WCH_NONE ,0x0192   ,0x00a0   },
+-  {VK_ABNT_C1   ,0      ,WCH_DEAD ,WCH_DEAD ,WCH_NONE ,WCH_NONE ,WCH_DEAD ,0x0301   },
+-  {0xff         ,0      ,0x06f0   ,0x00a0   ,WCH_NONE ,WCH_NONE ,0x00a3   ,WCH_NONE },
+-  {0            ,0      ,0        ,0        ,0        ,0        ,0        ,0        }
++  {VK_SPACE     ,0      ,' '      ,WCH_DEAD ,' '      ,WCH_NONE ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD },
++  {0xff         ,0      ,WCH_NONE ,0x0138   ,WCH_NONE ,WCH_NONE ,0x0192   ,0x00a0   ,0x06f0   ,0x06e8   ,0x06f0   ,0x06e8   },
++  {VK_CONVERT   ,0      ,' '      ,WCH_DEAD ,' '      ,WCH_NONE ,WCH_DEAD ,WCH_DEAD ,WCH_NONE ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD },
++  {0xff         ,0      ,WCH_NONE ,0x0138   ,WCH_NONE ,WCH_NONE ,0x0192   ,0x00a0   ,0x06f0   ,0x06e8   ,0x06f0   ,0x06e8   },
++  {VK_NONCONVERT,0      ,' '      ,WCH_DEAD ,' '      ,WCH_NONE ,WCH_DEAD ,WCH_DEAD ,WCH_NONE ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD },
++  {0xff         ,0      ,WCH_NONE ,0x0138   ,WCH_NONE ,WCH_NONE ,0x0192   ,0x00a0   ,0x06f0   ,0x06e8   ,0x06f0   ,0x06e8   },
++  {VK_ABNT_C1   ,0      ,WCH_DEAD ,WCH_DEAD ,WCH_NONE ,WCH_NONE ,WCH_DEAD ,0x0301   ,WCH_NONE ,WCH_NONE ,WCH_NONE ,WCH_NONE },
++  {0xff         ,0      ,0x06f0   ,0x00a0   ,WCH_NONE ,WCH_NONE ,0x00a3   ,WCH_NONE ,WCH_NONE ,WCH_NONE ,WCH_NONE ,WCH_NONE },
++  {0            ,0      ,0        ,0        ,0        ,0        ,0        ,0        ,0		 ,0 }
+ };
+ 
+ static ALLOC_SECTION_LDATA VK_TO_WCHARS45 aVkToWch45[] = {
+@@ -656,6 +666,9 @@ static ALLOC_SECTION_LDATA VK_TO_WCHARS2
+ };
+ 
+ ALLOC_SECTION_LDATA VK_TO_WCHAR_TABLE aVkToWcharTable[] = {
++    {  (PVK_TO_WCHARS1)aVkToWch3, 3, sizeof(aVkToWch3[0]) },
++    {  (PVK_TO_WCHARS1)aVkToWch10, 10, sizeof(aVkToWch10[0]) },
++    {  (PVK_TO_WCHARS1)aVkToWch45, 45, sizeof(aVkToWch45[0]) },
+     {  (PVK_TO_WCHARS1)aVkToWch2, 2, sizeof(aVkToWch2[0]) },
+     {  (PVK_TO_WCHARS1)aVkToWch25, 25, sizeof(aVkToWch25[0]) },
+     {                       NULL, 0, 0                    },
+@@ -28744,50 +28811,6 @@ static ALLOC_SECTION_LDATA LIGATURE4 aLi
+   {VK_SUBTRACT      ,44      ,0xd83d   ,0xdf97   ,WCH_NONE ,WCH_NONE },
+   {VK_DECIMAL   ,23      ,0x200a   ,0x2014   ,0x200a   ,WCH_NONE },
+   {0            ,0      ,0        ,0        ,0        ,0        }
+-};
+-
+-static ALLOC_SECTION_LDATA KBDTABLES KbdTables = {
+-    /*
+-     * Modifier keys
+-     */
+-    &CharModifiers,
+-
+-    /*
+-     * Characters tables
+-     */
+-    aVkToWcharTable,
+-
+-    /*
+-     * Diacritics
+-     */
+-    aDeadKey,
+-
+-    /*
+-     * Names of Keys
+-     */
+-    aKeyNames,
+-    aKeyNamesExt,
+-    aKeyNamesDead,
+-
+-    /*
+-     * Scan codes to Virtual Keys
+-     */
+-    ausVK,
+-    sizeof(ausVK) / sizeof(ausVK[0]),
+-    aE0VscToVk,
+-    aE1VscToVk,
+-
+-    /*
+-     * Locale-specific special processing
+-     */
+-    MAKELONG(KLLF_ALTGR, KBD_VERSION),
+-
+-    /*
+-     * Ligatures
+-     */
+-    4,
+-    sizeof(aLigature[0]),
+-    (PLIGATURE1)aLigature
+ };
+ 
+ PKBDTABLES KbdLayerDescriptor(VOID)
+--- iz-ru-4s.H.orig	2013-03-09 16:06:20.394533900 -0800
++++ iz-ru-4s.H	2013-03-09 16:48:18.378554400 -0800
+@@ -37,3 +37,13 @@
+ #undef  T7D
+  #define T7D _EQ(                                      OEM_8                      )
+ 
++#undef X5D			/* Was: APPS; move to non-special "kinda-KANA" */
++#define X5D _EQ(                                    OEM_AX                      )
++
++#undef T70			/* KANA */
++#define T70 _EQ(                                    APPS                      )
++
++#undef  T7B
++#define T7B _EQ(                                    NONCONVERT                      )
++#undef  T79
++#define T79 _EQ(                                    CONVERT                      )
+--- iz-la-4s.C.orig	2013-06-30 11:58:27.984111300 -0700
++++ iz-la-4s.C	2013-06-30 12:05:57.478820900 -0700
+@@ -25,6 +25,8 @@ TYPEDEF_VK_TO_WCHARS(46) // VK_TO_WCHARS
+ #define ALLOC_SECTION_LDATA
+ #endif
+ 
++#include "msklc_lig4.h"
++
+ /***************************************************************************\
+ * ausVK[] - Virtual Scan Code to Virtual Key conversion table
+ \***************************************************************************/
+@@ -97,6 +97,7 @@ ALLOC_SECTION_LDATA VSC_VK aE0Vsc
+         { 0x2E, X2E | KBDEXT              },  // Speedracer: Volume Down
+         { 0x30, X30 | KBDEXT              },  // Speedracer: Volume Up
+         { 0x32, X32 | KBDEXT              },  // Speedracer: Browser Home
++        { 0x35, X35 | KBDEXT              },  // Numpad Divide
+         { 0x37, X37 | KBDEXT              },  // Snapshot
+         { 0x38, X38 | KBDEXT              },  // RMenu
+         { 0x47, X47 | KBDEXT              },  // Home
+@@ -141,10 +142,21 @@ ALLOC_SECTION_LDATA VSC_VK aE1Vsc
+ *     CTRL  (L & R) is used to generate control characters
+ *     ALT   (L & R) used for generating characters by number with numpad
+ \***************************************************************************/
++#define KBD_Z	0x40
++#define KBD_T	0x80
+ ALLOC_SECTION_LDATA VK_TO_BIT aVkToBits[] = {
+     { VK_SHIFT    ,   KBDSHIFT     },
++  /* CONTROL and MENU may appear only when an application creates a configuration of keys for ToUnicode() ``by hand''.
++     CONTROL may be combined with MENU and LMENU; MENU may also be combined with LCONTROL:
++	C+A, C+A+K, C+A+L
++     We can freely choose to which configuration columns to resolve these combinations. */
+     { VK_CONTROL  ,   KBDCTRL      },
+     { VK_MENU     ,   KBDALT       },
++    { VK_LCONTROL ,   KBDCTRL + KBDLOYA      },
++    { VK_RCONTROL ,   KBDCTRL + KBDALT + KBDROYA      },
++    { VK_LMENU    ,   KBDALT + KBDKANA       },
++    { VK_RMENU    ,   KBDALT + KBDCTRL + KBDLOYA + KBD_Z       },
++    { VK_OEM_AX   ,   KBDALT + KBDCTRL + KBD_T      },
+     { 0           ,   0           }
+ };
+ 
+@@ -167,24 +179,24 @@ ALLOC_SECTION_LDATA MODIFIERS Cha
+ 	3,            // Shift	Ctrl
+ 	SHFT_INVALID, // 		Alt
+ 	SHFT_INVALID, // Shift		Alt
+-	SHFT_INVALID, // 	Ctrl	Alt
+-	SHFT_INVALID, // Shift	Ctrl	Alt
+-	SHFT_INVALID, // 			Kana
+-	SHFT_INVALID, // Shift			Kana
++	4,            // 	Ctrl	Alt
++	5,            // Shift	Ctrl	Alt
++	0,            // 			Kana
++	1,            // Shift			Kana
+ 	SHFT_INVALID, // 	Ctrl		Kana
+ 	SHFT_INVALID, // Shift	Ctrl		Kana
+ 	SHFT_INVALID, // 		Alt	Kana
+ 	SHFT_INVALID, // Shift		Alt	Kana
+-	SHFT_INVALID, // 	Ctrl	Alt	Kana
+-	SHFT_INVALID, // Shift	Ctrl	Alt	Kana
++	4,            // 	Ctrl	Alt	Kana
++	5,            // Shift	Ctrl	Alt	Kana
+ 	SHFT_INVALID, // 				Roya
+ 	SHFT_INVALID, // Shift				Roya
+ 	SHFT_INVALID, // 	Ctrl			Roya
+ 	SHFT_INVALID, // Shift	Ctrl			Roya
+ 	SHFT_INVALID, // 		Alt		Roya
+ 	SHFT_INVALID, // Shift		Alt		Roya
+-	SHFT_INVALID, // 	Ctrl	Alt		Roya
+-	SHFT_INVALID, // Shift	Ctrl	Alt		Roya
++	2,            // 	Ctrl	Alt		Roya
++	3,            // Shift	Ctrl	Alt		Roya
+ 	SHFT_INVALID, // 			Kana	Roya
+ 	SHFT_INVALID, // Shift			Kana	Roya
+ 	SHFT_INVALID, // 	Ctrl		Kana	Roya
+@@ -195,12 +207,12 @@ ALLOC_SECTION_LDATA MODIFIERS Cha
+ 	16,           // Shift	Ctrl	Alt	Kana	Roya
+ 	SHFT_INVALID, // 					Loya
+ 	SHFT_INVALID, // Shift					Loya
+-	SHFT_INVALID, // 	Ctrl				Loya
+-	SHFT_INVALID, // Shift	Ctrl				Loya
++	2,            // 	Ctrl				Loya
++	3,            // Shift	Ctrl				Loya
+ 	SHFT_INVALID, // 		Alt			Loya
+ 	SHFT_INVALID, // Shift		Alt			Loya
+-	SHFT_INVALID, // 	Ctrl	Alt			Loya
+-	SHFT_INVALID, // Shift	Ctrl	Alt			Loya
++	4,            // 	Ctrl	Alt			Loya
++	5,            // Shift	Ctrl	Alt			Loya
+ 	SHFT_INVALID, // 			Kana		Loya
+ 	SHFT_INVALID, // Shift			Kana		Loya
+ 	SHFT_INVALID, // 	Ctrl		Kana		Loya
+@@ -523,14 +529,18 @@ static ALLOC_SECTION_LDATA VK_TO_WCHARS3
+   {0            ,0      ,0        ,0        ,0        }
+ };
+ 
+-static ALLOC_SECTION_LDATA VK_TO_WCHARS6 aVkToWch6[] = {
++static ALLOC_SECTION_LDATA VK_TO_WCHARS10 aVkToWch10[] = {
+ //                      |         |  Shift  |  Ctrl   |S+Ctrl   |  C+  X1 |  C+  X1 |
+ //                      |=========|=========|=========|=========|=========|=========|
+-  {VK_SPACE     ,0      ,' '      ,WCH_DEAD ,' '      ,WCH_NONE ,WCH_DEAD ,WCH_DEAD },
+-  {0xff         ,0      ,WCH_NONE ,0x0138   ,WCH_NONE ,WCH_NONE ,0x0192   ,0x00a0   },
+-  {VK_ABNT_C1   ,0      ,WCH_DEAD ,WCH_DEAD ,WCH_NONE ,WCH_NONE ,WCH_DEAD ,0x0301   },
+-  {0xff         ,0      ,0x06f0   ,0x00a0   ,WCH_NONE ,WCH_NONE ,0x00a3   ,WCH_NONE },
+-  {0            ,0      ,0        ,0        ,0        ,0        ,0        ,0        }
++  {VK_SPACE     ,0      ,' '      ,WCH_DEAD ,' '      ,WCH_NONE ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD ,WCH_NONE ,WCH_DEAD ,WCH_NONE },
++  {0xff         ,0      ,WCH_NONE ,0x0138   ,WCH_NONE ,WCH_NONE ,0x0192   ,0x00a0   ,0x06f0   ,0x06e8   ,0x06f0   ,0x06e8   },
++  {VK_CONVERT   ,0      ,' '      ,WCH_DEAD ,' '      ,WCH_NONE ,WCH_DEAD ,WCH_DEAD ,WCH_NONE ,WCH_NONE ,WCH_DEAD ,WCH_NONE },
++  {0xff         ,0      ,WCH_NONE ,0x0138   ,WCH_NONE ,WCH_NONE ,0x0192   ,0x00a0   ,0x06f0   ,0x06e8   ,0x06f0   ,0x06e8   },
++  {VK_NONCONVERT,0      ,' '      ,WCH_DEAD ,' '      ,WCH_NONE ,WCH_DEAD ,WCH_DEAD ,WCH_NONE ,WCH_NONE ,WCH_DEAD ,WCH_NONE },
++  {0xff         ,0      ,WCH_NONE ,0x0138   ,WCH_NONE ,WCH_NONE ,0x0192   ,0x00a0   ,0x06f0   ,0x06e8   ,0x06f0   ,0x06e8   },
++  {VK_ABNT_C1   ,0      ,WCH_DEAD ,WCH_DEAD ,WCH_NONE ,WCH_NONE ,WCH_DEAD ,0x0301   ,WCH_NONE ,WCH_NONE ,WCH_NONE ,WCH_NONE },
++  {0xff         ,0      ,0x06f0   ,0x00a0   ,WCH_NONE ,WCH_NONE ,0x00a3   ,WCH_NONE ,WCH_NONE ,WCH_NONE ,WCH_NONE ,WCH_NONE },
++  {0            ,0      ,0        ,0        ,0        ,0        ,0        ,0        ,0		 ,0 }
+ };
+ 
+ static ALLOC_SECTION_LDATA VK_TO_WCHARS45 aVkToWch45[] = {
+@@ -656,6 +666,9 @@ static ALLOC_SECTION_LDATA VK_TO_WCHARS2
+ };
+ 
+ ALLOC_SECTION_LDATA VK_TO_WCHAR_TABLE aVkToWcharTable[] = {
++    {  (PVK_TO_WCHARS1)aVkToWch3, 3, sizeof(aVkToWch3[0]) },
++    {  (PVK_TO_WCHARS1)aVkToWch10, 10, sizeof(aVkToWch10[0]) },
++    {  (PVK_TO_WCHARS1)aVkToWch45, 45, sizeof(aVkToWch45[0]) },
+     {  (PVK_TO_WCHARS1)aVkToWch2, 2, sizeof(aVkToWch2[0]) },
+     {  (PVK_TO_WCHARS1)aVkToWch25, 25, sizeof(aVkToWch25[0]) },
+     {                       NULL, 0, 0                    },
+@@ -29010,50 +29077,6 @@ ALLOC_SECTION_LDATA LIGATURE4 aLi
+   {VK_SUBTRACT      ,44      ,0xd83d   ,0xdf97   ,WCH_NONE ,WCH_NONE },
+   {VK_DECIMAL   ,23      ,0x200a   ,0x2014   ,0x200a   ,WCH_NONE },
+   {0            ,0      ,0        ,0        ,0        ,0        }
+-};
+-
+-static ALLOC_SECTION_LDATA KBDTABLES KbdTables = {
+-    /*
+-     * Modifier keys
+-     */
+-    &CharModifiers,
+-
+-    /*
+-     * Characters tables
+-     */
+-    aVkToWcharTable,
+-
+-    /*
+-     * Diacritics
+-     */
+-    aDeadKey,
+-
+-    /*
+-     * Names of Keys
+-     */
+-    aKeyNames,
+-    aKeyNamesExt,
+-    aKeyNamesDead,
+-
+-    /*
+-     * Scan codes to Virtual Keys
+-     */
+-    ausVK,
+-    sizeof(ausVK) / sizeof(ausVK[0]),
+-    aE0VscToVk,
+-    aE1VscToVk,
+-
+-    /*
+-     * Locale-specific special processing
+-     */
+-    MAKELONG(KLLF_ALTGR, KBD_VERSION),
+-
+-    /*
+-     * Ligatures
+-     */
+-    4,
+-    sizeof(aLigature[0]),
+-    (PLIGATURE1)aLigature
+ };
+ 
+ PKBDTABLES KbdLayerDescriptor(VOID)
+--- iz-la-4s.H.orig	2013-03-09 16:06:20.205523100 -0800
++++ iz-la-4s.H	2013-03-09 16:48:24.179886200 -0800
+@@ -37,3 +37,13 @@
+ #undef  T7D
+  #define T7D _EQ(                                      OEM_8                      )
+ 
++#undef X5D			/* Was: APPS; move to non-special "kinda-KANA" */
++#define X5D _EQ(                                    OEM_AX                      )
++
++#undef T70			/* KANA */
++#define T70 _EQ(                                    APPS                      )
++
++#undef  T7B
++#define T7B _EQ(                                    NONCONVERT                      )
++#undef  T79
++#define T79 _EQ(                                    CONVERT                      )
+--- iz-gr-p4.H.orig	2013-03-09 16:06:20.205523100 -0800
++++ iz-gr-p4.H	2013-03-09 16:48:24.179886200 -0800
+@@ -37,3 +37,13 @@
+ #undef  T7D
+  #define T7D _EQ(                                      OEM_8                      )
+ 
++#undef X5D			/* Was: APPS; move to non-special "kinda-KANA" */
++#define X5D _EQ(                                    OEM_AX                      )
++
++#undef T70			/* KANA */
++#define T70 _EQ(                                    APPS                      )
++
++#undef  T7B
++#define T7B _EQ(                                    NONCONVERT                      )
++#undef  T79
++#define T79 _EQ(                                    CONVERT                      )
+--- iz-hb-4s.H.orig	2013-03-09 16:06:20.205523100 -0800
++++ iz-hb-4s.H	2013-03-09 16:48:24.179886200 -0800
+@@ -37,3 +37,13 @@
+ #undef  T7D
+  #define T7D _EQ(                                      OEM_8                      )
+ 
++#undef X5D			/* Was: APPS; move to non-special "kinda-KANA" */
++#define X5D _EQ(                                    OEM_AX                      )
++
++#undef T70			/* KANA */
++#define T70 _EQ(                                    APPS                      )
++
++#undef  T7B
++#define T7B _EQ(                                    NONCONVERT                      )
++#undef  T79
++#define T79 _EQ(                                    CONVERT                      )
+--- iz-gr-p4.C.orig	2013-06-30 11:58:28.079116700 -0700
++++ iz-gr-p4.C	2013-06-30 12:09:01.975373500 -0700
+@@ -25,6 +25,8 @@ TYPEDEF_VK_TO_WCHARS(46) // VK_TO_WCHARS
+ #define ALLOC_SECTION_LDATA
+ #endif
+ 
++#include "msklc_lig4.h"
++
+ /***************************************************************************\
+ * ausVK[] - Virtual Scan Code to Virtual Key conversion table
+ \***************************************************************************/
+@@ -97,6 +97,7 @@ ALLOC_SECTION_LDATA VSC_VK aE0Vsc
+         { 0x2E, X2E | KBDEXT              },  // Speedracer: Volume Down
+         { 0x30, X30 | KBDEXT              },  // Speedracer: Volume Up
+         { 0x32, X32 | KBDEXT              },  // Speedracer: Browser Home
++        { 0x35, X35 | KBDEXT              },  // Numpad Divide
+         { 0x37, X37 | KBDEXT              },  // Snapshot
+         { 0x38, X38 | KBDEXT              },  // RMenu
+         { 0x47, X47 | KBDEXT              },  // Home
+@@ -141,10 +142,21 @@ ALLOC_SECTION_LDATA VSC_VK aE1Vsc
+ *     CTRL  (L & R) is used to generate control characters
+ *     ALT   (L & R) used for generating characters by number with numpad
+ \***************************************************************************/
++#define KBD_Z	0x40
++#define KBD_T	0x80
+ ALLOC_SECTION_LDATA VK_TO_BIT aVkToBits[] = {
+     { VK_SHIFT    ,   KBDSHIFT     },
++  /* CONTROL and MENU may appear only when an application creates a configuration of keys for ToUnicode() ``by hand''.
++     CONTROL may be combined with MENU and LMENU; MENU may also be combined with LCONTROL:
++	C+A, C+A+K, C+A+L
++     We can freely choose to which configuration columns to resolve these combinations. */
+     { VK_CONTROL  ,   KBDCTRL      },
+     { VK_MENU     ,   KBDALT       },
++    { VK_LCONTROL ,   KBDCTRL + KBDLOYA      },
++    { VK_RCONTROL ,   KBDCTRL + KBDALT + KBDROYA      },
++    { VK_LMENU    ,   KBDALT + KBDKANA       },
++    { VK_RMENU    ,   KBDALT + KBDCTRL + KBDLOYA + KBD_Z       },
++    { VK_OEM_AX   ,   KBDALT + KBDCTRL + KBD_T      },
+     { 0           ,   0           }
+ };
+ 
+@@ -167,24 +179,24 @@ static ALLOC_SECTION_LDATA MODIFIERS Cha
+ 	3,            // Shift	Ctrl
+ 	SHFT_INVALID, // 		Alt
+ 	SHFT_INVALID, // Shift		Alt
+-	SHFT_INVALID, // 	Ctrl	Alt
+-	SHFT_INVALID, // Shift	Ctrl	Alt
+-	SHFT_INVALID, // 			Kana
+-	SHFT_INVALID, // Shift			Kana
++	4,            // 	Ctrl	Alt
++	5,            // Shift	Ctrl	Alt
++	0,            // 			Kana
++	1,            // Shift			Kana
+ 	SHFT_INVALID, // 	Ctrl		Kana
+ 	SHFT_INVALID, // Shift	Ctrl		Kana
+ 	SHFT_INVALID, // 		Alt	Kana
+ 	SHFT_INVALID, // Shift		Alt	Kana
+-	SHFT_INVALID, // 	Ctrl	Alt	Kana
+-	SHFT_INVALID, // Shift	Ctrl	Alt	Kana
++	4,            // 	Ctrl	Alt	Kana
++	5,            // Shift	Ctrl	Alt	Kana
+ 	SHFT_INVALID, // 				Roya
+ 	SHFT_INVALID, // Shift				Roya
+ 	SHFT_INVALID, // 	Ctrl			Roya
+ 	SHFT_INVALID, // Shift	Ctrl			Roya
+ 	SHFT_INVALID, // 		Alt		Roya
+ 	SHFT_INVALID, // Shift		Alt		Roya
+-	SHFT_INVALID, // 	Ctrl	Alt		Roya
+-	SHFT_INVALID, // Shift	Ctrl	Alt		Roya
++	2,            // 	Ctrl	Alt		Roya
++	3,            // Shift	Ctrl	Alt		Roya
+ 	SHFT_INVALID, // 			Kana	Roya
+ 	SHFT_INVALID, // Shift			Kana	Roya
+ 	SHFT_INVALID, // 	Ctrl		Kana	Roya
+@@ -195,12 +207,12 @@ static ALLOC_SECTION_LDATA MODIFIERS Cha
+ 	16,           // Shift	Ctrl	Alt	Kana	Roya
+ 	SHFT_INVALID, // 					Loya
+ 	SHFT_INVALID, // Shift					Loya
+-	SHFT_INVALID, // 	Ctrl				Loya
+-	SHFT_INVALID, // Shift	Ctrl				Loya
++	2,            // 	Ctrl				Loya
++	3,            // Shift	Ctrl				Loya
+ 	SHFT_INVALID, // 		Alt			Loya
+ 	SHFT_INVALID, // Shift		Alt			Loya
+-	SHFT_INVALID, // 	Ctrl	Alt			Loya
+-	SHFT_INVALID, // Shift	Ctrl	Alt			Loya
++	4,            // 	Ctrl	Alt			Loya
++	5,            // Shift	Ctrl	Alt			Loya
+ 	SHFT_INVALID, // 			Kana		Loya
+ 	SHFT_INVALID, // Shift			Kana		Loya
+ 	SHFT_INVALID, // 	Ctrl		Kana		Loya
+@@ -523,14 +529,18 @@ static ALLOC_SECTION_LDATA VK_TO_WCHARS3
+   {0            ,0      ,0        ,0        ,0        }
+ };
+ 
+-static ALLOC_SECTION_LDATA VK_TO_WCHARS6 aVkToWch6[] = {
++static ALLOC_SECTION_LDATA VK_TO_WCHARS10 aVkToWch10[] = {
+ //                      |         |  Shift  |  Ctrl   |S+Ctrl   |  C+  X1 |  C+  X1 |
+ //                      |=========|=========|=========|=========|=========|=========|
+-  {VK_SPACE     ,0      ,' '      ,WCH_DEAD ,' '      ,WCH_NONE ,WCH_DEAD ,WCH_DEAD },
+-  {0xff         ,0      ,WCH_NONE ,0x0138   ,WCH_NONE ,WCH_NONE ,0x0192   ,0x00a0   },
+-  {VK_ABNT_C1   ,0      ,WCH_DEAD ,WCH_DEAD ,WCH_NONE ,WCH_NONE ,WCH_DEAD ,0x0301   },
+-  {0xff         ,0      ,0x06f0   ,0x00a0   ,WCH_NONE ,WCH_NONE ,0x00a3   ,WCH_NONE },
+-  {0            ,0      ,0        ,0        ,0        ,0        ,0        ,0        }
++  {VK_SPACE     ,0      ,' '      ,WCH_DEAD ,' '      ,WCH_NONE ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD },
++  {0xff         ,0      ,WCH_NONE ,0x0138   ,WCH_NONE ,WCH_NONE ,0x0192   ,0x00a0   ,0x06f0   ,0x06e8   ,0x06f0   ,0x06e8   },
++  {VK_CONVERT   ,0      ,' '      ,WCH_DEAD ,' '      ,WCH_NONE ,WCH_DEAD ,WCH_DEAD ,WCH_NONE ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD },
++  {0xff         ,0      ,WCH_NONE ,0x0138   ,WCH_NONE ,WCH_NONE ,0x0192   ,0x00a0   ,0x06f0   ,0x06e8   ,0x06f0   ,0x06e8   },
++  {VK_NONCONVERT,0      ,' '      ,WCH_DEAD ,' '      ,WCH_NONE ,WCH_DEAD ,WCH_DEAD ,WCH_NONE ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD },
++  {0xff         ,0      ,WCH_NONE ,0x0138   ,WCH_NONE ,WCH_NONE ,0x0192   ,0x00a0   ,0x06f0   ,0x06e8   ,0x06f0   ,0x06e8   },
++  {VK_ABNT_C1   ,0      ,WCH_DEAD ,WCH_DEAD ,WCH_NONE ,WCH_NONE ,WCH_DEAD ,0x0301   ,WCH_NONE ,WCH_NONE ,WCH_NONE ,WCH_NONE },
++  {0xff         ,0      ,0x06f0   ,0x00a0   ,WCH_NONE ,WCH_NONE ,0x00a3   ,WCH_NONE ,WCH_NONE ,WCH_NONE ,WCH_NONE ,WCH_NONE },
++  {0            ,0      ,0        ,0        ,0        ,0        ,0        ,0        ,0		 ,0 }
+ };
+ 
+ static ALLOC_SECTION_LDATA VK_TO_WCHARS45 aVkToWch45[] = {
+@@ -656,6 +666,9 @@ static ALLOC_SECTION_LDATA VK_TO_WCHARS2
+ };
+ 
+ ALLOC_SECTION_LDATA VK_TO_WCHAR_TABLE aVkToWcharTable[] = {
++    {  (PVK_TO_WCHARS1)aVkToWch3, 3, sizeof(aVkToWch3[0]) },
++    {  (PVK_TO_WCHARS1)aVkToWch10, 10, sizeof(aVkToWch10[0]) },
++    {  (PVK_TO_WCHARS1)aVkToWch45, 45, sizeof(aVkToWch45[0]) },
+     {  (PVK_TO_WCHARS1)aVkToWch2, 2, sizeof(aVkToWch2[0]) },
+     {  (PVK_TO_WCHARS1)aVkToWch25, 25, sizeof(aVkToWch25[0]) },
+     {                       NULL, 0, 0                    },
+@@ -28744,50 +28811,6 @@ static ALLOC_SECTION_LDATA LIGATURE4 aLi
+   {VK_SUBTRACT      ,44      ,0xd83d   ,0xdf97   ,WCH_NONE ,WCH_NONE },
+   {VK_DECIMAL   ,23      ,0x200a   ,0x2014   ,0x200a   ,WCH_NONE },
+   {0            ,0      ,0        ,0        ,0        ,0        }
+-};
+-
+-static ALLOC_SECTION_LDATA KBDTABLES KbdTables = {
+-    /*
+-     * Modifier keys
+-     */
+-    &CharModifiers,
+-
+-    /*
+-     * Characters tables
+-     */
+-    aVkToWcharTable,
+-
+-    /*
+-     * Diacritics
+-     */
+-    aDeadKey,
+-
+-    /*
+-     * Names of Keys
+-     */
+-    aKeyNames,
+-    aKeyNamesExt,
+-    aKeyNamesDead,
+-
+-    /*
+-     * Scan codes to Virtual Keys
+-     */
+-    ausVK,
+-    sizeof(ausVK) / sizeof(ausVK[0]),
+-    aE0VscToVk,
+-    aE1VscToVk,
+-
+-    /*
+-     * Locale-specific special processing
+-     */
+-    MAKELONG(KLLF_ALTGR, KBD_VERSION),
+-
+-    /*
+-     * Ligatures
+-     */
+-    4,
+-    sizeof(aLigature[0]),
+-    (PLIGATURE1)aLigature
+ };
+ 
+ PKBDTABLES KbdLayerDescriptor(VOID)
+--- iz-hb-4s.C.orig	2013-06-30 11:58:28.079116700 -0700
++++ iz-hb-4s.C	2013-06-30 12:09:01.975373500 -0700
+@@ -25,6 +25,8 @@ TYPEDEF_VK_TO_WCHARS(46) // VK_TO_WCHARS
+ #define ALLOC_SECTION_LDATA
+ #endif
+ 
++#include "msklc_lig4.h"
++
+ /***************************************************************************\
+ * ausVK[] - Virtual Scan Code to Virtual Key conversion table
+ \***************************************************************************/
+@@ -97,6 +97,7 @@ ALLOC_SECTION_LDATA VSC_VK aE0Vsc
+         { 0x2E, X2E | KBDEXT              },  // Speedracer: Volume Down
+         { 0x30, X30 | KBDEXT              },  // Speedracer: Volume Up
+         { 0x32, X32 | KBDEXT              },  // Speedracer: Browser Home
++        { 0x35, X35 | KBDEXT              },  // Numpad Divide
+         { 0x37, X37 | KBDEXT              },  // Snapshot
+         { 0x38, X38 | KBDEXT              },  // RMenu
+         { 0x47, X47 | KBDEXT              },  // Home
+@@ -141,10 +142,21 @@ ALLOC_SECTION_LDATA VSC_VK aE1Vsc
+ *     CTRL  (L & R) is used to generate control characters
+ *     ALT   (L & R) used for generating characters by number with numpad
+ \***************************************************************************/
++#define KBD_Z	0x40
++#define KBD_T	0x80
+ ALLOC_SECTION_LDATA VK_TO_BIT aVkToBits[] = {
+     { VK_SHIFT    ,   KBDSHIFT     },
++  /* CONTROL and MENU may appear only when an application creates a configuration of keys for ToUnicode() ``by hand''.
++     CONTROL may be combined with MENU and LMENU; MENU may also be combined with LCONTROL:
++	C+A, C+A+K, C+A+L
++     We can freely choose to which configuration columns to resolve these combinations. */
+     { VK_CONTROL  ,   KBDCTRL      },
+     { VK_MENU     ,   KBDALT       },
++    { VK_LCONTROL ,   KBDCTRL + KBDLOYA      },
++    { VK_RCONTROL ,   KBDCTRL + KBDALT + KBDROYA      },
++    { VK_LMENU    ,   KBDALT + KBDKANA       },
++    { VK_RMENU    ,   KBDALT + KBDCTRL + KBDLOYA + KBD_Z       },
++    { VK_OEM_AX   ,   KBDALT + KBDCTRL + KBD_T      },
+     { 0           ,   0           }
+ };
+ 
+@@ -167,24 +179,24 @@ static ALLOC_SECTION_LDATA MODIFIERS Cha
+ 	3,            // Shift	Ctrl
+ 	SHFT_INVALID, // 		Alt
+ 	SHFT_INVALID, // Shift		Alt
+-	SHFT_INVALID, // 	Ctrl	Alt
+-	SHFT_INVALID, // Shift	Ctrl	Alt
+-	SHFT_INVALID, // 			Kana
+-	SHFT_INVALID, // Shift			Kana
++	4,            // 	Ctrl	Alt
++	5,            // Shift	Ctrl	Alt
++	0,            // 			Kana
++	1,            // Shift			Kana
+ 	SHFT_INVALID, // 	Ctrl		Kana
+ 	SHFT_INVALID, // Shift	Ctrl		Kana
+ 	SHFT_INVALID, // 		Alt	Kana
+ 	SHFT_INVALID, // Shift		Alt	Kana
+-	SHFT_INVALID, // 	Ctrl	Alt	Kana
+-	SHFT_INVALID, // Shift	Ctrl	Alt	Kana
++	4,            // 	Ctrl	Alt	Kana
++	5,            // Shift	Ctrl	Alt	Kana
+ 	SHFT_INVALID, // 				Roya
+ 	SHFT_INVALID, // Shift				Roya
+ 	SHFT_INVALID, // 	Ctrl			Roya
+ 	SHFT_INVALID, // Shift	Ctrl			Roya
+ 	SHFT_INVALID, // 		Alt		Roya
+ 	SHFT_INVALID, // Shift		Alt		Roya
+-	SHFT_INVALID, // 	Ctrl	Alt		Roya
+-	SHFT_INVALID, // Shift	Ctrl	Alt		Roya
++	2,            // 	Ctrl	Alt		Roya
++	3,            // Shift	Ctrl	Alt		Roya
+ 	SHFT_INVALID, // 			Kana	Roya
+ 	SHFT_INVALID, // Shift			Kana	Roya
+ 	SHFT_INVALID, // 	Ctrl		Kana	Roya
+@@ -195,12 +207,12 @@ static ALLOC_SECTION_LDATA MODIFIERS Cha
+ 	16,           // Shift	Ctrl	Alt	Kana	Roya
+ 	SHFT_INVALID, // 					Loya
+ 	SHFT_INVALID, // Shift					Loya
+-	SHFT_INVALID, // 	Ctrl				Loya
+-	SHFT_INVALID, // Shift	Ctrl				Loya
++	2,            // 	Ctrl				Loya
++	3,            // Shift	Ctrl				Loya
+ 	SHFT_INVALID, // 		Alt			Loya
+ 	SHFT_INVALID, // Shift		Alt			Loya
+-	SHFT_INVALID, // 	Ctrl	Alt			Loya
+-	SHFT_INVALID, // Shift	Ctrl	Alt			Loya
++	4,            // 	Ctrl	Alt			Loya
++	5,            // Shift	Ctrl	Alt			Loya
+ 	SHFT_INVALID, // 			Kana		Loya
+ 	SHFT_INVALID, // Shift			Kana		Loya
+ 	SHFT_INVALID, // 	Ctrl		Kana		Loya
+@@ -523,14 +529,18 @@ static ALLOC_SECTION_LDATA VK_TO_WCHARS3
+   {0            ,0      ,0        ,0        ,0        }
+ };
+ 
+-static ALLOC_SECTION_LDATA VK_TO_WCHARS6 aVkToWch6[] = {
++static ALLOC_SECTION_LDATA VK_TO_WCHARS10 aVkToWch10[] = {
+ //                      |         |  Shift  |  Ctrl   |S+Ctrl   |  C+  X1 |  C+  X1 |
+ //                      |=========|=========|=========|=========|=========|=========|
+-  {VK_SPACE     ,0      ,' '      ,WCH_DEAD ,' '      ,WCH_NONE ,WCH_DEAD ,WCH_DEAD },
+-  {0xff         ,0      ,WCH_NONE ,0x0138   ,WCH_NONE ,WCH_NONE ,0x0192   ,0x00a0   },
+-  {VK_ABNT_C1   ,0      ,WCH_DEAD ,WCH_DEAD ,WCH_NONE ,WCH_NONE ,WCH_DEAD ,0x0301   },
+-  {0xff         ,0      ,0x06f0   ,0x00a0   ,WCH_NONE ,WCH_NONE ,0x00a3   ,WCH_NONE },
+-  {0            ,0      ,0        ,0        ,0        ,0        ,0        ,0        }
++  {VK_SPACE     ,0      ,' '      ,WCH_DEAD ,' '      ,WCH_NONE ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD },
++  {0xff         ,0      ,WCH_NONE ,0x0138   ,WCH_NONE ,WCH_NONE ,0x0192   ,0x00a0   ,0x06f0   ,0x06e8   ,0x06f0   ,0x06e8   },
++  {VK_CONVERT   ,0      ,' '      ,WCH_DEAD ,' '      ,WCH_NONE ,WCH_DEAD ,WCH_DEAD ,WCH_NONE ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD },
++  {0xff         ,0      ,WCH_NONE ,0x0138   ,WCH_NONE ,WCH_NONE ,0x0192   ,0x00a0   ,0x06f0   ,0x06e8   ,0x06f0   ,0x06e8   },
++  {VK_NONCONVERT,0      ,' '      ,WCH_DEAD ,' '      ,WCH_NONE ,WCH_DEAD ,WCH_DEAD ,WCH_NONE ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD },
++  {0xff         ,0      ,WCH_NONE ,0x0138   ,WCH_NONE ,WCH_NONE ,0x0192   ,0x00a0   ,0x06f0   ,0x06e8   ,0x06f0   ,0x06e8   },
++  {VK_ABNT_C1   ,0      ,WCH_DEAD ,WCH_DEAD ,WCH_NONE ,WCH_NONE ,WCH_DEAD ,0x0301   ,WCH_NONE ,WCH_NONE ,WCH_NONE ,WCH_NONE },
++  {0xff         ,0      ,0x06f0   ,0x00a0   ,WCH_NONE ,WCH_NONE ,0x00a3   ,WCH_NONE ,WCH_NONE ,WCH_NONE ,WCH_NONE ,WCH_NONE },
++  {0            ,0      ,0        ,0        ,0        ,0        ,0        ,0        ,0		 ,0 }
+ };
+ 
+ static ALLOC_SECTION_LDATA VK_TO_WCHARS45 aVkToWch45[] = {
+@@ -656,6 +666,9 @@ static ALLOC_SECTION_LDATA VK_TO_WCHARS2
+ };
+ 
+ ALLOC_SECTION_LDATA VK_TO_WCHAR_TABLE aVkToWcharTable[] = {
++    {  (PVK_TO_WCHARS1)aVkToWch3, 3, sizeof(aVkToWch3[0]) },
++    {  (PVK_TO_WCHARS1)aVkToWch10, 10, sizeof(aVkToWch10[0]) },
++    {  (PVK_TO_WCHARS1)aVkToWch45, 45, sizeof(aVkToWch45[0]) },
+     {  (PVK_TO_WCHARS1)aVkToWch2, 2, sizeof(aVkToWch2[0]) },
+     {  (PVK_TO_WCHARS1)aVkToWch25, 25, sizeof(aVkToWch25[0]) },
+     {                       NULL, 0, 0                    },
+@@ -28744,50 +28811,6 @@ static ALLOC_SECTION_LDATA LIGATURE4 aLi
+   {VK_SUBTRACT      ,44      ,0xd83d   ,0xdf97   ,WCH_NONE ,WCH_NONE },
+   {VK_DECIMAL   ,23      ,0x200a   ,0x2014   ,0x200a   ,WCH_NONE },
+   {0            ,0      ,0        ,0        ,0        ,0        }
+-};
+-
+-static ALLOC_SECTION_LDATA KBDTABLES KbdTables = {
+-    /*
+-     * Modifier keys
+-     */
+-    &CharModifiers,
+-
+-    /*
+-     * Characters tables
+-     */
+-    aVkToWcharTable,
+-
+-    /*
+-     * Diacritics
+-     */
+-    aDeadKey,
+-
+-    /*
+-     * Names of Keys
+-     */
+-    aKeyNames,
+-    aKeyNamesExt,
+-    aKeyNamesDead,
+-
+-    /*
+-     * Scan codes to Virtual Keys
+-     */
+-    ausVK,
+-    sizeof(ausVK) / sizeof(ausVK[0]),
+-    aE0VscToVk,
+-    aE1VscToVk,
+-
+-    /*
+-     * Locale-specific special processing
+-     */
+-    MAKELONG(KLLF_ALTGR, KBD_VERSION),
+-
+-    /*
+-     * Ligatures
+-     */
+-    4,
+-    sizeof(aLigature[0]),
+-    (PLIGATURE1)aLigature
+ };
+ 
+ PKBDTABLES KbdLayerDescriptor(VOID)

@@ -1,0 +1,71 @@
+--- #YAML:1.0
+# $Id: UML-1.5.ummfprofile,v 1.3 2004/05/18 11:20:58 kstephens Exp $
+# Profile for mapping UML-1.5 primitive elements to implementation languages.
+# Author: kstephens@users.sourceforge.net 2003/10/20
+Java:
+  '*':
+    '': 1
+  Foundation::Data_Types::Boolean:
+    construct: |-
+      (x != null && ! x.equals("") && ! x.equals("0") && ! x.equals("false") && ! x.equals("no"))
+    construct.type: java.lang.String
+    deconstruct: '(x ? "true" : "false")'
+    deconstruct.type: java.lang.String
+    primitive: 1
+    primitive.type: boolean
+    validate.type: true
+    validate.type.type: java.lang.String
+  Foundation::Data_Types::Integer:
+    primitive: 1
+    primitive.type: int
+    validate.type: 'true /* x =~ /^[-+]?[0-9]+$/ */'
+  Foundation::Data_Types::Name:
+    primitive: 1
+    primitive.type: java.lang.String
+    validate.type: 'true /* x !~ /::/ */'
+  Foundation::Data_Types::String:
+    primitive: 1
+    primitive.type: java.lang.String
+    validate.type: true
+  Foundation::Data_Types::UnlimitedInteger:
+    construct: |-
+      (x.equals("*") || x.equals("-1") ? java.lang.Integer.MAX_VALUE : java.lang.Integer.parseInt(x))
+    construct.type: java.lang.String
+    deconstruct: |-
+      (x == java.lang.Integer.MAX_VALUE ? "*" : java.lang.Integer.toString(x))
+    deconstruct.type: java.lang.String
+    primitive: 1
+    primitive.type: int
+    validate.type: ' true '
+Perl:
+  '':
+    storage: true
+    generate: true
+  '*':
+    '': 1
+  Foundation::Data_Types::Boolean:
+    construct: |-
+      (defined($x) && $x ne '' && $x ne '0' && substr($x, 0, 1) ne 'f' && substr($x, 0, 1) ne 'n') 
+    deconstruct: "$x ? 'true' : 'false'"
+    primitive: 1
+    validate.type: 1
+    storage.type:  string
+    storage.type.sql:   CHAR(1) NULL
+  Foundation::Data_Types::Integer:
+    primitive: 1
+    validate.type: '$x =~ /^[-+]?[0-9]+$/'
+    storage.type:  int
+  Foundation::Data_Types::Name:
+    primitive: 1
+    validate.type: '$x !~ /::/'
+    storage.type:  string
+  Foundation::Data_Types::String:
+    primitive: 1
+    validate.type: 1
+  Foundation::Data_Types::UnlimitedInteger:
+    primitive: 1
+    construct: |-
+      ($x < 0 ? '*' : $x)
+    validate.type: '$x =~ /^[0-9]+|\*$/'
+    storage.type:  string
+    storage.type.sql:   VARCHAR(12)

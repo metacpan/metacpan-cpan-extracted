@@ -1,0 +1,358 @@
+=encoding utf8
+
+=head1 NAME
+
+User::Identity::Collection - base class for collecting roles of a user
+
+=head1 INHERITANCE
+
+ User::Identity::Collection
+   is a User::Identity::Item
+
+ User::Identity::Collection is extended by
+   User::Identity::Collection::Emails
+   User::Identity::Collection::Locations
+   User::Identity::Collection::Systems
+   User::Identity::Collection::Users
+
+=head1 SYNOPSIS
+
+ use User::Identity;
+ use User::Identity::Collection;
+ my $me    = User::Identity->new(...);
+ my $set   = User::Identity::Collection::Emails->new(...);
+ $me->addCollection($set);
+
+ # Simpler
+ use User::Identity;
+ my $me    = User::Identity->new(...);
+ my $set   = $me->addCollection(type => 'email', ...)
+ my $set   = $me->addCollection('email', ...)
+
+ my @roles = $me->collection('email');  # list of collected items
+
+ my $coll  = $me->collection('email');  # a User::Identity::Collection
+ my @roles = $coll->roles;
+ my @roles = @$coll;                    # same, by overloading
+
+ my $role  = $me->collection('email')->find($coderef);
+ my $role  = $me->collection('location')->find('work');
+ my $role  = $me->find(location => 'work');
+
+=head1 DESCRIPTION
+
+The C<User::Identity::Collection> object maintains a set user related
+objects.  It helps selecting these objects, which is partially common to
+all collections (for instance, each object has a name so you can search
+on names), and sometimes specific to the extension of this collection.
+
+Currently imlemented extensions are
+
+=over 4
+
+=item * I<people> is a L<collection of users|User::Identity::Collection::Users>
+
+=item * I<whereabouts> are L<locations|User::Identity::Collection::Locations>
+
+=item * a I<mailinglist> is a
+
+L<collection of email addresses|User::Identity::Collection::Emails>
+
+=item * a I<network> contains
+
+L<groups of systems|User::Identity::Collection::Systems>
+
+=back
+
+Extends L<"DESCRIPTION" in User::Identity::Item|User::Identity::Item/"DESCRIPTION">.
+ 
+=head1 OVERLOADED
+
+=over 4
+
+=item overload: B<@{}>
+
+When the reference to a collection object is used as array-reference, it
+will be shown as list of roles.
+
+example: 
+
+ my $locations = $ui->collection('location');
+ foreach my $loc (@$location) ...
+ print $location->[0];
+
+=item overload: B<stringification>
+
+Returns the name of the collection and a sorted list of defined items.
+
+example: 
+
+ print "$collection\n";  #   location: home, work
+
+=back
+
+=head1 METHODS
+
+Extends L<"METHODS" in User::Identity::Item|User::Identity::Item/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in User::Identity::Item|User::Identity::Item/"Constructors">.
+ 
+=over 4
+
+=item User::Identity::Collection-E<gt>B<new>( [NAME], OPTIONS )
+
+ -Option     --Defined in          --Default
+  description  User::Identity::Item  undef
+  item_type                          <required>
+  name         User::Identity::Item  <required>
+  parent       User::Identity::Item  undef
+  roles                              undef
+
+=over 2
+
+=item description => STRING
+
+=item item_type => CLASS
+
+The CLASS which is used to store the information for each of the maintained
+objects within this collection.
+
+=item name => STRING
+
+=item parent => OBJECT
+
+=item roles => ROLE|ARRAY
+
+Immediately add some roles to this collection.  In case of an ARRAY,
+each element of the array is passed separately to L<addRole()|User::Identity::Collection/"Maintaining roles">. So,
+you may end-up with an ARRAY of arrays each grouping a set of options
+to create a role.
+
+=back
+
+=back
+
+=head2 Attributes
+
+Extends L<"Attributes" in User::Identity::Item|User::Identity::Item/"Attributes">.
+ 
+=over 4
+
+=item $obj-E<gt>B<description>()
+
+Inherited, see L<User::Identity::Item/"Attributes">
+
+=item $obj-E<gt>B<itemType>()
+
+Returns the type of the items collected.
+
+=item $obj-E<gt>B<name>( [NEWNAME] )
+
+Inherited, see L<User::Identity::Item/"Attributes">
+
+=item $obj-E<gt>B<roles>()
+
+Returns all defined roles within this collection.  Be warned: the rules
+are returned in random (hash) order.
+
+=back
+
+=head2 Collections
+
+Extends L<"Collections" in User::Identity::Item|User::Identity::Item/"Collections">.
+ 
+=over 4
+
+=item $obj-E<gt>B<add>(COLLECTION, ROLE)
+
+Inherited, see L<User::Identity::Item/"Collections">
+
+=item $obj-E<gt>B<addCollection>(OBJECT | ([TYPE], OPTIONS))
+
+Inherited, see L<User::Identity::Item/"Collections">
+
+=item $obj-E<gt>B<collection>(NAME)
+
+Inherited, see L<User::Identity::Item/"Collections">
+
+=item $obj-E<gt>B<parent>( [PARENT] )
+
+Inherited, see L<User::Identity::Item/"Collections">
+
+=item $obj-E<gt>B<removeCollection>(OBJECT|NAME)
+
+Inherited, see L<User::Identity::Item/"Collections">
+
+=item $obj-E<gt>B<type>()
+
+=item User::Identity::Collection-E<gt>B<type>()
+
+Inherited, see L<User::Identity::Item/"Collections">
+
+=item $obj-E<gt>B<user>()
+
+Inherited, see L<User::Identity::Item/"Collections">
+
+=back
+
+=head2 Maintaining roles
+
+=over 4
+
+=item $obj-E<gt>B<addRole>(ROLE| ([NAME],OPTIONS) | ARRAY)
+
+Adds a new role to this collection.  ROLE is an object of the right type
+(depends on the extension of this module which type that is) or a list
+of OPTIONS which are used to create such role.  The options can also be
+passed as reference to an ARRAY.  The added role is returned.
+
+example: 
+
+ my $uicl = User::Identity::Collection::Locations->new;
+
+ my $uil  = User::Identity::Location->new(home => ...);
+ $uicl->addRole($uil);
+
+ $uicl->addRole( home => address => 'street 32' );
+ $uicl->addRole( [home => address => 'street 32'] );
+
+Easier
+
+ $ui      = User::Identity;
+ $ui->add(location => 'home', address => 'street 32' );
+ $ui->add(location => [ 'home', address => 'street 32' ] );
+
+=item $obj-E<gt>B<removeRole>(ROLE|NAME)
+
+The deleted role is returned (if it existed).
+
+=item $obj-E<gt>B<renameRole>( <ROLE|OLDNAME>, NEWNAME )
+
+Give the role a different name, and move it in the collection.
+
+=item $obj-E<gt>B<sorted>()
+
+Returns the roles sorted by name, alphabetically and case-sensitive.
+
+=back
+
+=head2 Searching
+
+Extends L<"Searching" in User::Identity::Item|User::Identity::Item/"Searching">.
+ 
+=over 4
+
+=item $obj-E<gt>B<find>(NAME|CODE|undef)
+
+Find the object with the specified NAME in this collection.  With C<undef>,
+a randomly selected role is returned.
+
+When a code reference is specified, all collected roles are scanned one
+after the other (in unknown order).  For each role,
+
+ CODE->($object, $collection)
+
+is called.  When the CODE returns true, the role is selected.  In list context,
+all selected roles are returned.  In scalar context, the first match is
+returned and the scan is aborted immediately.
+
+example: 
+
+ my $emails = $ui->collection('emails');
+ $emails->find('work');
+
+ sub find_work($$) {
+    my ($mail, $emails) = @_;
+    $mail->location->name eq 'work';
+ }
+ my @at_work = $emails->find(\&find_work);
+ my @at_work = $ui->find(location => \&find_work);
+ my $any     = $ui->find(location => undef );
+
+=back
+
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Error: $object is not a collection.
+
+The first argument is an object, but not of a class which extends
+L<User::Identity::Collection|User::Identity::Collection>.
+
+=item Error: Cannot create a $type to add this to my collection.
+
+Some options are specified to create a $type object, which is native to
+this collection.  However, for some reason this failed.
+
+=item Error: Cannot load collection module for $type ($class).
+
+Either the specified $type does not exist, or that module named $class returns
+compilation errors.  If the type as specified in the warning is not
+the name of a package, you specified a nickname which was not defined.
+Maybe you forgot the 'require' the package which defines the nickname.
+
+=item Error: Cannot rename $name into $newname: already exists
+
+=item Error: Cannot rename $name into $newname: doesn't exist
+
+=item Error: Creation of a collection via $class failed.
+
+The $class did compile, but it was not possible to create an object
+of that class using the options you specified.
+
+=item Error: Don't know what type of collection you want to add.
+
+If you add a collection, it must either by a collection object or a
+list of options which can be used to create a collection object.  In
+the latter case, the type of collection must be specified.
+
+=item Warning: No collection $name
+
+The collection with $name does not exist and can not be created.
+
+=item Error: Wrong type of role for $collection: requires a $expect but got a $type
+
+Each $collection groups sets of roles of one specific type ($expect).  You
+cannot add objects of a different $type.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of User-Identity distribution version 0.97,
+built on February 02, 2017.
+
+Do not forget to read
+L</Mail::Box-Overview>,
+L</Mail::Box-Cookbook>, and
+L</Mail::Box-Index>.
+Examples are included in the Mail-Box distribution, directories 'examples'
+and 'scripts'.
+
+Browseable manuals, papers, and other released material van be found
+at  Website: F<http://perl.overmeer.net/userid/>
+
+The central modules (in separate distributions) in the MailBox suite are:
+L</Mail::Message>,
+L</Mail::Box>,
+L</Mail::Box::IMAP4>,
+L</Mail::Box::POP3>,
+L</Mail::Box::Parser::C>,
+L</Mail::Box::Dbx> (unpublished),
+L</Mail::Transport>,
+L</Object::Realize::Later>, and
+L</User::Identity>.
+
+Please post questions or ideas to the author F<markov@cpan.org>.
+
+=head1 LICENSE
+
+Copyrights 2003-2017 by [Mark Overmeer <perl@overmeer.net>]. For other contributors see Changes.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

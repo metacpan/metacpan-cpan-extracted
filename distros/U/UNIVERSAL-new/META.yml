@@ -1,0 +1,47 @@
+---
+abstract: 'Load a module when you call the new method on it'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+  File::Find: 0
+  File::Spec::Functions: 0
+  File::Temp: 0
+  List::Util: 0
+  Test::Fatal: 0
+  Test::More: 0.96
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300031, CPAN::Meta::Converter version 2.130880'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: UNIVERSAL-new
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  U:
+    file: lib/U.pm
+    version: 0.001
+  UNIVERSAL::new:
+    file: lib/UNIVERSAL/new.pm
+    version: 0.001
+requires:
+  Carp: 0
+  Module::Runtime: 0
+  perl: 5.008001
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/dagolden/universal-new/issues
+  homepage: https://metacpan.org/release/UNIVERSAL-new
+  repository: git://github.com/dagolden/universal-new.git
+version: 0.001

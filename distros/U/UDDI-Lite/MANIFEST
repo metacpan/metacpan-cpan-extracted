@@ -1,0 +1,17 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/25-uddi.t
+t/29-uddi_publishing.t
+t/28-uddi_search.t
+lib/UDDI/Lite.pm
+examples/inquire1.pl
+examples/publish1.pl
+examples/simple1.pl
+examples/simple2.pl
+examples/syntax1.pl
+examples/syntax2.pl
+examples/syntax3.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

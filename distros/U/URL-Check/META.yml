@@ -1,0 +1,32 @@
+---
+abstract: 'Check a list of URL and respond accordingly.'
+author:
+  - 'Alexandre Masselot <alexmass@cpan.org>'
+build_requires:
+  Capture::Tiny: '0.28'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: URL-Check
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  URL::Check:
+    file: lib/URL/Check.pm
+    version: '0.11'
+requires:
+  LWP::Simple: '0'
+  Mail::Sendmail: '0'
+  Time::HiRes: '0'
+  perl: '5.006'
+resources:
+  repository: https://github.com/manwar/URL-Check.git
+version: '0.11'

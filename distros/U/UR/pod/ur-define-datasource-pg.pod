@@ -1,0 +1,78 @@
+
+
+=pod
+
+=head1 NAME
+
+ur define datasource pg - Add a PostgreSQL data source to the current namespace.
+
+
+
+=head1 VERSION
+
+This document describes ur define datasource pg version 0.29.
+
+=head1 SYNOPSIS
+
+ur define datasource pg --auth=? --login=? [--nosingleton] --owner=? [--dsid=?] [--server=?] [DSNAME]
+
+
+
+=head1 REQUIRED ARGUMENTS
+
+=over
+
+
+=item auth  I<String>
+
+Password to log in with
+
+=item login  I<String>
+
+User to log in with
+
+=item nosingleton  I<Boolean>
+
+Created data source should not inherit from UR::Singleton (defalt is that it will)
+
+Default value 'false' (--nonosingleton) if not specified
+
+=item nonosingleton  I<Boolean>
+
+Make nosingleton 'false'
+
+=item owner  I<String>
+
+Owner/schema to connect to
+
+
+=back
+
+=head1 OPTIONAL ARGUMENTS
+
+=over
+
+
+=item dsid  I<Text>
+
+The full class name to give this data source.
+
+=item server  I<String>
+
+"server" attribute for this data source, such as a database name
+
+=item DSNAME  I<Text>
+
+The distinctive part of the class name for this data source.  Will be prefixed with the namespace then '::DataSource::'.
+
+
+=back
+
+=head1 DESCRIPTION:
+
+  Add a PostgreSQL data source to the current namespace.
+
+
+
+=cut
+

@@ -1,0 +1,9 @@
+
+* TODO
+- v2?
+- function interface
+- capability function (ex. disable v5 for Digest::SHA absense)
+- RNG selector
+- write more POD
+- write more tests
+

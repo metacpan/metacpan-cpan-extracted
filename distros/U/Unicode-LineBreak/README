@@ -1,0 +1,71 @@
+===========================================================
+Unicode-LineBreak - UAX #14 Unicode Line Breaking Algorithm
+===========================================================
+
+Unicode-LineBreak Package is Copyright (C) 2009-2017,
+by Hatuka*nezumi - IKEDA Soji.
+
+This package is free software; you can redistribute it and/or modify it 
+under the same terms as Perl itself.
+
+Prerequisites
+=============
+
+Perl 5.8.0 or later is required.
+
+Sombok library package is required.  If Sombok had not been installed,
+bundled source will be used.
+    https://sourceforge.net/projects/linefold/files/
+
+Optionally, LibThai package is needed to support Thai word segmentation:
+    http://linux.thai.net/projects/libthai/
+
+Additionally, pkg-config will be required for libthai and/or shared
+sombok library.
+
+Install
+=======
+
+To build and install Unicode-LineBreak package, do:
+
+  $ perl Makefile.PL
+  $ make
+  $ make test
+  # make install
+
+If you wish to disable libthai feature explicitly, do:
+
+  $ perl Makefile.PL --with-bundled-sombok --disable-libthai
+  $ make
+  $ make test
+  # make install
+
+Documentations
+==============
+
+Three main modules and some supporting program files are contained. For
+more details read following POD documentations:
+
+    Text::LineFold - Line Folding for Plain Text
+    Unicode::GCString - String as Sequence of UAX #29 Grapheme Clusters
+    Unicode::LineBreak - UAX #14 Unicode Line Breaking Algorithm
+
+For japonophones, PODs in Japanese language are also included:
+
+    POD2::JA::Text::LineFold - プレインテキストの行折り
+    POD2::JA::Unicode::GCString - UAX #29 書記素クラスタの列としての文字列
+    POD2::JA::Unicode::LineBreak - UAX #14 Unicode 行分割アルゴリズム
+
+For Other Language
+==================
+
+Python
+    pytextseg: http://pypi.python.org/pypi/pytextseg/
+
+Author
+======
+
+Copyright (C) 2009-2013 Hatuka*nezumi - IKEDA Soji <hatuka(at)nezumi.nu>.
+
+
+$$

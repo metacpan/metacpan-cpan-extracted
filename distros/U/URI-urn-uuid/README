@@ -1,0 +1,27 @@
+This is Perl module URI::urn::uuid.
+
+INSTALLATION
+
+URI::urn::uuid installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan URI::urn::uuid
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+DOCUMENTATION
+
+URI::urn::uuid documentation is available as in POD. So you can do:
+
+    % perldoc URI::urn::uuid
+
+to read the documentation online with your favorite pager.
+
+Tatsuhiko Miyagawa

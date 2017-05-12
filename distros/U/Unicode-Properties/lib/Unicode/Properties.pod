@@ -1,0 +1,211 @@
+
+
+
+=encoding utf8
+
+=head1 NAME
+
+Unicode::Properties - find out what properties a character has
+
+=cut
+
+=head1 SYNOPSIS
+
+    
+    use utf8;
+    use Unicode::Properties 'uniprops';
+    my @prop_list = uniprops ('☺'); # Unicode smiley face
+    print "@prop_list\n";
+    
+
+
+produces output
+
+    Any Assigned Common InMiscellaneousSymbols
+
+
+(This example is included as L<F<synopsis.pl>|https://api.metacpan.org/source/BKB/Unicode-Properties-0.07/examples/synopsis.pl> in the distribution.)
+
+
+You can then use, for example, C<\p{InMiscellaneousSymbols}> to match
+this character in a regular expression.
+
+=head1 VERSION
+
+This documents Unicode::Properties version 0.07
+corresponding to git commit L<c1071fba77751ea891c887d26d8e3ea9ce91f631|https://github.com/benkasminbullock/Unicode-Properties/commit/c1071fba77751ea891c887d26d8e3ea9ce91f631> released on Mon Jan 30 09:30:10 2017 +0900.
+
+=head1 DESCRIPTION
+
+Unicode::Properties provides a way to go from a character to its list of
+properties.
+
+=head1 FUNCTIONS
+
+=head2 uniprops
+
+    my @prop_list = uniprops ('☺'); # Unicode smiley face
+
+Given a character, returns a list of properties which the character
+has. This works by testing its argument against C<\p{}> regular
+expressions for every possible category the module knows about, so it
+is not an efficient method.
+
+    
+    use Unicode::Properties 'uniprops';
+    print join (',',uniprops('2')), "\n";
+    
+    
+    
+
+
+produces output
+
+    ASCII,Any,Assigned,Common,IDContinue,InBasicLatin
+
+
+(This example is included as L<F<univer.pl>|https://api.metacpan.org/source/BKB/Unicode-Properties-0.07/examples/univer.pl> in the distribution.)
+
+
+=head2 matchchars
+
+   my @matching = matchchars ($property);
+
+This returns a list of all the characters which match a particular
+property. If C<$property> is not found in the list of possible Unicode
+properties, it treats it as a regular expression.
+
+It can also return an array reference:
+
+    
+    use utf8;
+    use FindBin '$Bin';
+    use Unicode::Properties ':all';
+    my $type = 'InCJKUnifiedIdeographs';
+    my $matching = matchchars ($type);
+    printf "There are %d characters of type %s.\n", scalar (@$matching), $type;
+    
+
+
+produces output
+
+    There are 20992 characters of type InCJKUnifiedIdeographs.
+
+
+(This example is included as L<F<matchchars.pl>|https://api.metacpan.org/source/BKB/Unicode-Properties-0.07/examples/matchchars.pl> in the distribution.)
+
+
+=head1 VARIABLES
+
+=head2 $unicode_version
+
+C<$unicode_version> is the version of Unicode supplied with your
+version of Perl, taken from L</Unicode::UCD>. To override the Unicode
+version and get properties for a different version of Unicode, set
+this to a desired value.
+
+=head1 EXPORTS
+
+L</uniprops> and L</matchchars> are exported on demand. A tag C<:all>
+exports all the functions of the module.
+
+=head1 DEPENDENCIES
+
+=over
+
+=item Unicode::UCD
+
+L<Unicode::UCD> (Unicode Character Database) is used to find the
+version of Unicode which your Perl supplies.
+
+=back
+
+=head1 BUGS
+
+=over
+
+=item Data source
+
+This module uses a list taken from the "perlunicode" documentation. It
+should use Perl's internals or the Unicode files to get the list.
+
+=item Outdated data
+
+As of version 0.07, the Unicode data dates from an older
+version of Perl.
+
+=item Perl & Unicode version
+
+Depending on your Perl and Unicode version, you'll get different
+results. For example "Balinese" was added in Unicode version 5.0.0, so
+if you are using Perl 5.8.8 unpatched, your Unicode version is 4.1.0
+so you won't get "Balinese" in the results list.
+
+Also, I don't know the behaviour of Unicode versions other than 4.1.0
+and 5.0.0, so this module only covers those two. I couldn't get Perl
+5.8.5 to install on my computer, so I've set the minimum version to
+5.8.8 for this module.
+
+=back
+
+=head1 SEE ALSO
+
+=head2 Other CPAN modules
+
+=over
+
+=item L<Unicode::Tussle/uniprops>
+
+This script was written because the author (Tom Christiansen,
+<TCHRIST>) was dissatisfied with Unicode::Properties. Unfortunately,
+it uses the same method as this module, of parsing the Perl
+documentation to get the information. The last time I tested it, it
+only worked for Perl versions 5.12 or 5.14, but that was about three
+years ago.
+
+=back
+
+=head2 Information about Perl and Unicode
+
+=over
+
+=item Perl Unicode documentation
+
+See L<perlunicode> for Unicode documentation, and L<perluniprops> for
+details of all the different properties. There is also a tutorial in
+L<perlunitut>, and some more advice in L<perlunifaq>.
+
+=item Other Unicode and Perl information
+
+L<Tutorial on Perl and
+Unicode|https://www.lemoda.net/perl/perl-unicode-tutorial/index.html>
+is a tutorial for people new to Unicode and Perl.
+
+L<Get the Unicode value of a character in
+Perl|https://www.lemoda.net/perl/perl-unicode-value/index.html>
+explains how to get the Unicode value of a single character.
+
+L<What characters match a regular
+expression?|https://www.lemoda.net/perl/what-matches/index.html> is a
+Perl script which shows what single characters match a particular
+regular expression, like C<\s> or C<\p{InCJKUnifiedIdeographs}>.
+
+=back
+
+
+=head1 AUTHOR
+
+Ben Bullock, <bkb@cpan.org>
+
+=head1 COPYRIGHT & LICENCE
+
+This package and associated files are copyright (C) 
+2011-2017
+Ben Bullock.
+
+You can use, copy, modify and redistribute this package and associated
+files under the Perl Artistic Licence or the GNU General Public
+Licence.
+
+
+

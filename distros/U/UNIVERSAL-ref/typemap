@@ -1,0 +1,21 @@
+TYPEMAP
+B::OP		T_OP_OBJ
+B::UNOP		T_OP_OBJ
+B::BINOP	T_OP_OBJ
+B::LOGOP	T_OP_OBJ
+B::LISTOP	T_OP_OBJ
+B::PMOP		T_OP_OBJ
+B::SVOP		T_OP_OBJ
+B::PADOP	T_OP_OBJ
+B::PVOP		T_OP_OBJ
+B::LOOP		T_OP_OBJ
+B::COP		T_OP_OBJ
+
+INPUT
+T_OP_OBJ
+	if (SvROK($arg)) {
+	    IV tmp = SvIV((SV*)SvRV($arg));
+	    $var = INT2PTR($type,tmp);
+	}
+	else
+	    croak(\"$var is not a reference\")

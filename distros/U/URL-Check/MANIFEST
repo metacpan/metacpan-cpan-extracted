@@ -1,0 +1,24 @@
+LICENSE
+Changes
+lib/URL/Check.pm
+script/url-check
+MANIFEST
+MANIFEST.SKIP
+README
+t/00-load.t
+t/01-read-config.t
+t/02-test-to-console.t
+t/03-various-check-types.t
+t/pod-coverage.t
+t/pod.t
+t/manifest.t
+t/meta-json.t
+t/meta-yml.t
+t/resources/config/simple.txt
+t/resources/config/toconsole-with-error.txt
+t/resources/config/toconsole.txt
+t/resources/config/various-check-type-mail-reports.txt
+t/resources/config/various-check-type.txt
+Makefile.PL
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

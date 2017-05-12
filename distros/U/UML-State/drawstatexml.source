@@ -1,0 +1,177 @@
+use strict; use warnings;
+
+=head1 NAME
+
+drawstatexml.pl - turns a simple xml description into a state diagram
+
+=head1 SYNOPSIS
+
+    drawstatexml.pl diagram.xml > diagram.svg
+    java -jar batik-rasterizer.jar diagram.svg
+
+=head1 DESCRIPTION
+
+The xml format is described by the (unenforced) dtd in the samples directory
+included with the distribution.  The advantage of the xml format is that
+it lets you name the states and specify edges in terms of the names.
+The samples directory also includes examples in the files ending in xml.  See
+the samples/README.
+
+If you don't like xml, feel free to use the text format supported by
+drawstate.pl.  You could also use UML::State directly to support a format
+of your choice.
+
+=cut
+
+use XML::DOM;
+use UML::State;
+
+my $dom_parser  = XML::DOM::Parser->new();
+my $file        = shift;
+
+open STDIN, "$file" if (defined $file);
+
+my $doc         = $dom_parser->parse(*STDIN);
+
+my ($states,
+    $names,
+    $starts,
+    $accepting) = grab_states($doc);
+
+my $edges       = grab_transitions($doc, $names);
+
+my $diagram     = UML::State->new(
+    $states, $starts, $accepting, $edges
+);
+
+print $diagram->draw();
+
+#use Data::Dumper; print Dumper($edges);
+
+sub grab_states {
+    my $doc = shift;
+    my @states;
+    my %states;
+    my @starts;
+    my @accepting;
+
+    my $i = 0;
+    foreach my $state_row ($doc->getElementsByTagName("state_row")) {
+
+        my @row;
+        my $j = 0;
+        foreach my $state ($state_row->getElementsByTagName("state")) {
+            my $name = $state->getAttribute("name");
+            if ($name eq 'filler') {
+                push @row, "";
+            }
+            else {
+                push @row, $state->getAttribute("label");
+
+                my $accepting = $state->getAttribute("accepting");
+                push @accepting, "$j,$i"
+                    if (defined $accepting and $accepting eq 'yes');
+
+                my $start_from = $state->getAttribute("start_from");
+                my $start_to   = $state->getAttribute("start_to"  );
+                if ($start_from and $start_to) {
+                    push @starts, "$j,$i,$start_from $start_to";
+                }
+
+                $states{$name} = "$j,$i";
+            }
+            $j++;
+        }
+        push @states, \@row;
+        $i++;
+
+    }
+    return (\@states, \%states, \@starts, \@accepting);
+}
+
+sub grab_transitions {
+    my $doc  = shift;
+    my $names= shift;
+    my %edges;
+
+    foreach my $transition_set ($doc->getElementsByTagName("transition_set")) {
+        my $label = $transition_set->getAttribute("label");
+        my @list;
+        foreach my $transition
+            ($transition_set->getElementsByTagName("transition"))
+        {
+            my $from_name = $transition->getAttribute("from"       );
+            my $to_name   = $transition->getAttribute("to"         );
+            my $arc       = ucfirst $transition->getAttribute("arc");
+            my $from_side = $transition->getAttribute("from_side"  );
+            my $to_side   = $transition->getAttribute("to_side"    );
+
+            my $from      = $names->{$from_name};
+            my $to        = $names->{$to_name};
+
+            unless ($from_side and $to_side) {
+                ($from_side, $to_side) = find_ends($from, $to);
+            }
+
+            my $edge = "$from,$from_side $to,$to_side $arc";
+            $edge    =~ s/\s+$//;
+
+            push @list, $edge;
+        }
+        $edges{$label} = \@list;
+    }
+    return \%edges;
+}
+
+sub find_ends {
+    my $from = shift;
+    my $to   = shift;
+
+    my ($from_x, $from_y) = split /,/, $from;
+    my ($to_x,   $to_y  ) = split /,/, $to;
+
+    my $delx = $to_x - $from_x;
+    my $dely = $to_y - $from_y;
+
+    if ($delx == 0 and $dely == 0) {
+        return ("N", "N");
+    }
+
+    if ($delx == 0) {
+        if ($dely < 0) { return ("N", "S"); }
+        else           { return ("S", "N"); }
+    }
+    elsif ($dely == 0) {
+        if ($delx < 0) { return ("W", "E"); }
+        else           { return ("E", "W"); }
+    }
+
+    return ("W", "E");
+}
+
+=head1 PREREQUISTE 
+
+XML::DOM
+
+=head1 BUGS
+
+The state.dtd description is not enforced.  This can lead to hard to diagnose
+errors in the input file.
+
+All edges using the same label must be in the same transition_set tag.
+If a transition_set tag repeats a label used by an earlier transition_set tag,
+it overwrites that transition_set.  (Think of the labels as hash keys, I do.)
+
+The bugs in UML::State apply here as well, since this script uses it
+to make the pictures.  See perldoc UML::State for those bugs.
+
+=head1 AUTHOR
+
+Phil Crow E<lt>philcrow2000@yahoo.com<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2003 by Phil Crow.  All rights reserved.  This is free software.
+You may modify and/or redistribute it under the same terms as Perl 5.8.0.
+
+=cut

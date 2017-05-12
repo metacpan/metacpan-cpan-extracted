@@ -1,0 +1,131 @@
+package Ubic::Manual::FAQ;
+# ABSTRACT: frequently asked questions about Ubic
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Ubic::Manual::FAQ - frequently asked questions about Ubic
+
+=head1 VERSION
+
+version 1.60
+
+=head1 QUESTIONS
+
+=head2 I changed my service's user, and now it fails with "Permission denied" error. Please help!
+
+You have to chown your service files manually. Try this:
+
+    find /var/lib/ubic -name '*MY_SERVICE_NAME*' | xargs chown -R MY_NEW_USER
+
+In the future, this one-liner will be reimplemented as "ubic fix-permissions" command. Sorry for the inconvenience.
+
+=head2 Can I use ubic with perlbrew? How?
+
+Yes you can, but you have to be careful.
+
+Perlbrew depends on environment variables, so you have to make sure that they are configured correctly in all cases when you call ubic. This especially includes the crontab entry which ubic installs for you. You'll probably have to edit it manually, like this:
+
+  * * * * * . /home/your_login/perl5/perlbrew/etc/bashrc && ubic-watchdog ubic.watchdog    >>/dev/null 2>>/dev/null
+
+=head2 How is ubic compatible with SysV-style /etc/rcX.d/ symlinks?
+
+There are two ways of managing ubic service statuses across reboots.
+
+=over
+
+=item Don't use rc.d
+
+Trust the ubic to manage service statuses for you. If you start a service and then reboot, B<ubic.watchdog> will bring it back to life automatically.
+
+This is the recommended mode of using ubic. (In other words, this is how author uses it.)
+
+Downside: nobody will do C<ubic stop> on your services before reboot. C<shutdown(8)> will send the SIGTERM, though, usually that's all you need.
+
+=item Use rc.d
+
+Turn any ubic service into the init script using L<Ubic::Run>. Register it with rc.d using C<chkconfig> or C<update-rc.d> or however your OS wants you to do it.
+
+Downsides:
+1) more manual work;
+2) no persistent statuses: if you stop a service, forget to unregister it from rc.d, and then reboot, it will start again.
+
+Upside: runlevels.
+
+=back
+
+=head2 Why do I get confusing error messages when I try to add the service with a dot in its name?
+
+Dot is a reserved symbol, it separates service name parts in service tree (like C</> separates directories in unix filesystems). So, if you really want the service C<foo.bar>, put its description in C</etc/ubic/service/foo/bar>.
+
+Dot in config file names is used to distinguish different configuration styles. Extension-less configs are pure-perl, I<*.ini> is ini configs, etc.
+
+=head2 Why ubic creates a new daemon every minute in an endless loop if my binary daemonizes itself?
+
+Ubic can't distinguish self-daemonizing binary from program which instantly exits, so C<ubic.watchdog> thinks that the service has failed and tries to respawn it every minute.
+
+You can either fix the daemon (hint: many daemons have some kind of C<--foreground> option), or implement your own service class.
+
+See L<Ubic::Service>, L<Ubic::Service::Skeleton>, L<Ubic::Service::Common> and L<Ubic::Manual::Overview/"Common service classes"> for more details on writing custom service classes.
+
+=head2 Why did ubic edit my crontab?
+
+Ubic uses cron as the way to bootstrap all its services. This crontab entry will bring the C<ubic.watchdog> up if it ever goes down, and it will then start all other services as necessary.
+
+Even though watchdog itself is very robust, this mechanism is also useful on host reboots.
+
+If you B<really> don't like it, you can pass C<--no-crontab> option to C<ubic-admin setup> command while configuring ubic instance (or just answer C<no> to the appropriate question).
+
+=head2 What is this ubic-guardian process I see in my "ps aux" output?
+
+This process guards any daemon started with C<Ubic::Daemon> module.
+
+Optionally, ubic-guardian can write some information to its log, for example, the exit code or signal in case of service failure. Despite its name, ubic-guardian *does not* restart the service on failures. It's the job for the completely different program, ubic-watchdog.
+
+It also holds the lock on the pidfile for a whole lifetime, which theoretically makes daemons more secure, but it's more of a historical nuance than the necessity.
+
+It's probable that ubic-guardian will become optional in the future (i.e. it will only be created if service asks for I<ubic_log>).
+Anyway, don't worry about it, it's completely harmless.
+
+=head2 What does ubic.update service do?
+
+C<ubic.update> service (and ubic-update script) updates portmap - local C<< { port => service-name } >> mapping.
+It makes possible to check a service status via C<ubic.ping> using service port instead of its name:
+
+    $ wget -q -O - 'http://localhost:12345/status/port/12345'
+    ok
+
+Resolving of service by port can't be done on-the-fly by C<ubic.ping>, because all service definitions are cached internally by Ubic.pm (L<Ubic::Multiservice>, actually, but you don't have to know the difference), since constant reloading of service definition can cause memory leaks.
+So C<ubic.ping> just loads portmap generated by C<ubic.update> instead, resolves service name by port, and loads cached service status from another local file.
+
+In other words, if you don't use C<ubic.ping>, you can stop both C<ubic.update> and C<ubic.ping> services.
+
+=head2 Why is it called "ubic", anyway?
+
+It's called after "Ubik" - science fiction novel by Philip K. Dick. I spelled it incorrectly in early releases, because "c" and "k" are indistinguishable in Russian language, and now it's too late to fix this.
+
+Why is it called after "Ubik"? Well, these two quotes can hint to some suggestions:
+
+  "This substance, whose name is derived from the word "ubiquity", has the property of preserving people who are in half-life."
+  "Ubik is a metaphor for God. Ubik is all-powerful and all-knowing, and Ubik is everywhere."
+
+Alternatively, one possible backronym is "Ubic Because I Can" :)
+(Thanks to Christopher Paulicka for suggesting it!)
+
+=head1 AUTHOR
+
+Vyacheslav Matyukhin <mmcleric@yandex-team.ru>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Yandex LLC.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

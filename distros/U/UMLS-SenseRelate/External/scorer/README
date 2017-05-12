@@ -1,0 +1,56 @@
+UMLS::SenseRelate scorer documentation
+========================================
+
+The scoring package used UMLS::SenseRelate is from the All-Words
+Disambiguation Task (task 17) in Semeval 2010. 
+
+Contents:
+-------------------------------
+- documentation 
+  * answer-format.txt  
+  * documentation.txt  
+  * scorescheme.txt
+
+- examples 
+  * sampletask.key  
+  * sampletask.sensemap  
+  * sampletask.system.answers
+
+- README file
+
+- score.pl
+
+- scorer2.c
+
+Installation Instructions
+-------------------------------
+
+The complete installation instructions for scorer2.c are located 
+in the documentation.txt file in the documentation directory. 
+
+The quick guide is:
+
+ 1. compile the scorder2.c program: 
+    
+    gcc -o scorer2 scorer2.c
+
+ 2. run the score.pl program:
+
+    perl scorer.pl <answer file> <key file>
+
+For further information see the contents in the documentation 
+directory and the score.pl documentation.
+
+COPYRIGHT
+---------
+
+Copyright (c) 2010-2011, Ted Pedersen and Bridget T. McInnes and 
+
+This distribution is free software; you may redistribute and/or modify it
+under the terms of the GNU General Public License, version 2 or, at your
+option, any later version.
+
+SEE ALSO
+--------
+http://groups.yahoo.com/group/umls-similarity/
+

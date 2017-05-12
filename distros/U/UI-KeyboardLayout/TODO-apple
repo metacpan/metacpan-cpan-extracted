@@ -1,0 +1,97 @@
+﻿• Create actions basing on arrays, not hashes;
+• Alt-→ etc;
+• Keypad???
+• Math alphabets???
+• Access via Control-Keys.
+• Shortcuts to satellites of companion faces (without Mnu-).
+• Good terminators for imported prefixes.
+• Conditional doHEX
+• action⸣s should be CapsLock-dependent if on alphanum, but contain deadkeys (like 'u'/'U' for HEX-unicode)
+• Compose + OR Compose SPACE: enable HEX
+• Make the offset 4100 customizable, or auto-calculated.
+
+  http://osxnotes.net/keybindings.html
+  http://lolengine.net/raw-attachment/blog/2012/06/17/compose-key-on-os-x/DefaultKeyBinding.dict
+  http://lolengine.net/blog/2012/06/17/compose-key-on-os-x
+  	KeyRemap4MacBook:
+  https://pqrs.org/osx/karabiner/index.html.en
+
+Compose stuff is pre-filtered (output = 1 UTF-16 codepoint) for Windows.  Fix???
+
+These make it hard to input HEX on Compose² x
+	xcap xcup xdtri xcirc Xfr xfr
+
+
+===================== 0.70 Maveriicks 10.9.5
+
+Choosing in “Others” shows “keyboard layout not available” instead of the picture of layout
+No good icon.
+	http://apple.stackexchange.com/questions/147820/how-to-extract-keyboard-layout-icon
+	https://saltesta.com/hack/customizing-mac-input-source-icon/
+	http://superuser.com/questions/665494/how-to-make-a-custom-keyboard-layout-in-os-x
+	   You can also add an icon for an XML keylayout file by for example saving the icns file as /Library/Keyboard Layouts/My Keyboard Layout.icns. – user495470 Jan 26 '14 at 9:25
+
+Βundle:
+	http://hints.macworld.com/article.php?story=20050617084032393
+
+Hex prefix works only on Latin
+Likewise for Command-a etc.
+	See cyr.keylayout-diff-*
+		cyr.keylayout-diff-0-ctrl-repl is w.r.t. edited: CHR --> ^CHR
+
+Entering
+   Shift-Space² A t i l d e 
+has CJK as a hint.  (Same for "map".)
+
+hex a673	gives		U-587		(on the last step; the previous are fine)
+hex a640	gives		U-544		(on the last step; the previous are fine)
+hex a600	gives		U-504		(on the last step; the previous are fine)
+hex a300	gives		U-204		(on the last step; the previous are fine)
+hex a100	gives		U-004		(on the last step; the previous are fine)
+hex a0ff	gives		U-054		(on the last step; the previous are fine)
+hex a0f8	gives		U-023		(on the last step; the previous are fine)
+hex a0f4	gives		U-00c		(on the last step; the previous are fine)
+hex a0f3	gives		U-007		(on the last step; the previous are fine)
+hex a0f2	gives		U-001		(on the last step; the previous are fine)
+hex a0df	gives		U-034		(on the last step; the previous are fine)
+hex a0af	gives		U-004		(on the last step; the previous are fine)
+hex a0ae	gives		U-000		(on the last step; the previous are fine)
+    a000 works OK
+    a080 works OK
+    a0c0 works OK	a0e0?  a0f0, a0f1 OK
+    266b works OK
+    32be works OK
+    fb00 works OK
+
+a0f gives state 6253.
+  0 ->
+	  <when state="6238" through="6493" multiplier="16" output="ꀀ" />
+  1 ->
+	  <when state="6238" through="6493" multiplier="16" output="ꀁ" />
+  2 ->
+	  <when state="6238" through="6493" multiplier="16" output="ꀂ" />
+
+=================== Apple Font Tool Suite
+
+The file with box-icon; Control-click it, choose "Open", then "Open" again.
+
+klcompile is put on the path (the semantic is undocumented).
+  klcompile FILE.klayout > FILE.res
+	What to do with .res?
+
+==================  https://github.com/archagon/cyrillic-transliterator/wiki/Technical-Notes:-Keylayout-Files
+
+================== cmd
+
+Diff cyr/lat is ,/. on code="65".
+
+================== ctrl in cyr
+
+Diff:	10		--> "0",
+	18–26, 28,29	--> digits
+ (all as in mine)
+	41 --> ":"  (instead of ";" ???)
+On 65 as above.
+
+================== 71 110 are mirrored to 10 ???
+

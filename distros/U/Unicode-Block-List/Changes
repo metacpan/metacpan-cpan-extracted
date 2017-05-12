@@ -1,0 +1,7 @@
+0.02 2014-08-28T01:13:45+02:00
+ - Add another EXAMPLE section to doc.
+ - Add minimal version of Perl.
+ - Add tests for constructor.
+
+0.01 2014-08-22T16:07:51+02:00
+ - First version.

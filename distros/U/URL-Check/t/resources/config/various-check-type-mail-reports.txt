@@ -1,0 +1,19 @@
+#a super simple config 
+onerror.console=true
+onerror.mailto=alexandre.masselot@gmail.com
+#we can assume apple.com will rendered in less than 30s
+http://www.apple.com
+check.overtime=30000
+
+#we check for the google page in 5ms, so that should produce an error...
+http://www.google.com
+check.overtime=5
+
+#
+http://www.apple.ch
+check.contains=microsoft is the best
+check.contains=ipad is only for dummies
+
+#
+http://www.google.ch
+check.contains=o

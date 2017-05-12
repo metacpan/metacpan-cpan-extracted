@@ -1,0 +1,22 @@
+
+CuiFinder User Options: 
+   --config option set
+
+
+UMLS-Interface Configuration Information
+  Sources (SABDEF):
+    SNOMEDCT
+  Relations (RELDEF):
+    CHD
+    PAR
+    RB
+    RN
+  Database: 
+    umls (MMSYS-2010AB-20101022)
+
+
+
+
+The definition(s) of entire hand (body structure) (C1281583):
+  1. C1281583 RN C0222229 SNOMEDCT : Skin region including some skin of finger AND some additional non finger skin
+  2. C1281583 RN C0222494 SNOMEDCT : Subcutaneous tissue including some tissue of finger AND some additional non finger tissue

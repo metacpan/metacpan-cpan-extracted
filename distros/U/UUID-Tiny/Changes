@@ -1,0 +1,52 @@
+Revision history for UUID-Tiny
+
+1.04    2013-08-22, caugustin.de
+        Fixed typos from bug report #87187.
+        Rejected bug report #83073 (UUID::Tiny correctly sets the variant).
+        Thread-tests still not running (Mac OS X 10.8.x and other machines).
+        Thread-tests removed, bug report #57188 deferred.
+        POD changed to better reflect the new standard interface.
+        Fixed a bug in Makefile.PL reported by Matt Koscica.
+
+1.03_01 2010-05-04, caugustin.de
+        Thread-patches from Michael C. Schwern applied.
+        Test not running on Mac OS X 10.6.3 ...
+
+1.03    2010-01-31, caugustin.de
+        Once again clk_seq uniqueness and fixing some small bugs with
+        _get_clk_seq() (due to failed CPAN Tester's ID 6750882).
+        Changed COPYRIGHT due to rt.cpan.org Bug #53642.
+        License should now be shown in CPAN.
+
+1.0202  2010-01-12, caugustin.de
+        Fixed a small bug (calling _init_globals without need).
+        Introduced a test on clk_seq uniqueness (due to failed CPAN Tester's
+        ID 6357718). We'll see ...
+
+1.0201  2010-01-12, caugustin.de
+        Bug #50519 fixed: Test number 03 fails on Windows (just skipping this
+        test on MSWin32).
+
+1.02    2009-08-21, caugustin.de
+        Cosmetic changes to documentation.
+        Changed comments on Perl versions.
+        Changed POD example code (there were some "-" in the names).
+        "my" instead of "our" seed (no need to be a public global var).
+        Introducing UUID_TIME etc. as alternatives to UUID_V1 etc.
+        New standard interface added ("use UUID::Tiny ':std';").
+        Tries to load alternative SHA-1 modules, UUID_SHA1_AVAIL added.
+        Refactoring by Jesse Vincent.
+        Testing the legacy interface.
+        New _init_globals() to make UUID::Tiny "fork-safe".
+        Test cases to prove "fork-safety" of v1 and v4 UUIDs.
+        Locking for thread-safety of MD5_CALCULATOR and SHA1_CALCULATOR.
+
+1.01    2009-07-12, caugustin.de
+        Synopsis corrected after CPAN upload of version 1.00.
+        Explicit use of Digest::MD5 and Digest::SHA1 after related failures on
+        CPAN Testers (let's see if it will help ...).
+        Modified clk_seq algorithm (simplified, independent of node_id).
+
+1.00    2009-06-21, caugustin.de
+        First, feature-complete and tested version.
+

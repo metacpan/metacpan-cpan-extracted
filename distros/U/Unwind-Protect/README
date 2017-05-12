@@ -1,0 +1,12 @@
+
+
+This archive contains the distribution Unwind-Protect, version
+0.01:
+
+  Run code after other code, even with exceptions
+
+This software is copyright (c) 2009 by Shawn M Moore.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as perl itself.
+

@@ -1,0 +1,30 @@
+Perl library for controlling UAVs, specifically ARDrone (maybe others in the future).  See:
+
+http://ardrone2.parrot.com
+
+WARNING!
+If your ARDrone crashes into your neighbor's house, invades Iranian airspace, or tries to 
+find Sarah Conner, don't blame me.
+
+
+RECOMMENDED MODULES
+===================
+
+SDL is highly recommended on clients for displaying navigation data, video 
+streams, and joystick input.
+
+The RaspberryPi HiPi modules are only needed for the WumpusRover server.
+
+
+INSTALLATION
+============
+
+For full functionality, you will need the SDL Perl module and the ffmpeg C library.
+
+Install with the standard Module::Build method:
+
+    perl ./Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+

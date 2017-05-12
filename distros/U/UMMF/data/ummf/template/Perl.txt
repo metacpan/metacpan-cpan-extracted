@@ -1,0 +1,3148 @@
+# -*- perl -*-
+# $Id: Perl.txt,v 1.77 2006/05/14 01:40:03 kstephens Exp $
+
+[% MACRO other BLOCK %]
+  [% FOREACH x = end.opposite %]
+  [% NEXT UNLESS x.isNavigable %]
+
+    $old->remove_[% x.name_ %]($self) if $old;
+    $val->add_[% x.name_ %]($self)    if $val;
+
+  [% END %]
+[% END %]
+
+
+[% MACRO container_type BLOCK %]
+  [%# Set default container types %]
+  [% DEFAULT attr.container_type_ordered = 'ARRAY' %]
+  [%# Set::Object 1.03 does not work with Storable %]
+  [%# Set::Object 1.04 appears to have Storable support %]
+  [% DEFAULT attr.container_type_unordered = 'Set::Object' %]
+
+  [% IF attr.ordering == 'ordered' %]
+  [% DEFAULT attr.container_type = attr.container_type_ordered %]
+  [% ELSE %]
+  [% DEFAULT attr.container_type = attr.container_type_unordered %]
+  [% END %]
+[% END %]
+
+
+[% MACRO tangram_type BLOCK %]
+  [%# If end is * and end.opposite is 1,
+    # Use Tangram intrusive sets and arrays, "iset", "iarray"
+    # For intrusive collections, set the column name (coll) in the
+    # intruded table (attr) to be the name of the holder
+    # of the coll(ection) object (cls_end).
+    #
+    # Note: cls_end is undef if attr is an Attribute,
+    #       thus cls_end.multi_single should be assumed to be 1. %]
+  [% DEFAULT attr.tangram_col = attr.storage_name %]
+
+  [% IF (! cls_end || cls_end.multi_single) && ! attr.multi_single %]
+    [% SET attr.tangram_intrusive = 1 %]
+  [% END %]
+
+  [%# If the cls_end has composite aggregation of the attr, make it so. %]
+  [% IF attr.storage_aggregation == 'composite' || (cls_end && cls_end.aggregation == 'composite') %]
+    [% SET attr.tangram_aggreg = 1 %]
+  [% END %]
+
+  [% IF attr.multi_single %]
+    [% IF attr.type_info.isaEnumeration %]
+      [%# Enumerations always use strings %]
+      [% DEFAULT attr.storage_type = 'string' %]
+    [% ELSE %]
+      [%# Default to a "ref" %]
+      [% DEFAULT attr.storage_type = attr.type_info.storage_type %]
+      [% DEFAULT attr.storage_type = 'ref' %]
+    [% END %]
+
+    # TAttr [% attr.name %] [% attr.storage_type %]
+
+    [% SWITCH attr.storage_type %]
+      [% CASE 'ref' %]
+        [% IF attr.multi_lower == '0' %]
+          [% SET attr.tangram_null = '1' %]
+        [% END %]
+        [% IF attr.storage_type_impl %]
+          [% SET attr.storage_type = attr.storage_type_impl %]
+        [% END %]
+        [% IF attr.type_info.storage_type_impl %]
+          [% SET attr.storage_type = attr.type_info.storage_type_impl %]
+        [% END %]
+        [% DEFAULT attr.tangram_class = attr.type %]
+
+      [% CASE [ 'flat_array', 'array' ] %]
+        [% SET attr.tangram_array = 1 %]
+
+        [% DEFAULT attr.tangram_subtype = attr.type_info.storage_subtype %]
+        [% DEFAULT attr.tangram_subtype = attr.type_info.storage_type %]
+
+        [% SET attr.tangram_coll = cls.nAME_ %]
+        [% SET attr.tangram_item = attr.name_ %]
+        [% SET attr.tangram_slot = "${attr.tangram_item}_i" %]
+
+        [% DEFAULT attr.storage_table = "${cls.tangram_table}__${attr.name_}" %]
+
+      [% CASE [ 'flat_hash', 'hash' ] %]
+        # HASH [% attr.name %] [% attr.storage_type %]
+        [% DEFAULT attr.tangram_subtype = attr.storage_value_type %]
+        [% DEFAULT attr.tangram_subtype = attr.storage_subtype %]
+        [% SET attr.tangram_key_type = attr.storage_key_type %]
+
+        [% SET attr.tangram_coll = cls.nAME_ %]
+        [% SET attr.tangram_item = attr.name_ %]
+        [% SET attr.tangram_slot = "${attr.tangram_item}_i" %]
+
+        [% SET attr.tangram_key_sql = attr.storage_key_sql %]
+ 
+       [% DEFAULT attr.storage_table = "${cls.tangram_table}__${attr.name_}" %]
+
+    [% END %]
+
+    [% DEFAULT attr.tangram_col = attr.name_ %]
+    [% SET attr.tangram_type  = attr.storage_type %]
+    [% SET attr.tangram_sql   = attr.storage_type_sql %]
+
+  [% ELSE %]
+    [%# Multi attr %]
+    [% SWITCH attr.storage_type %]
+
+      [% CASE [ 'string', 'int' ] %]
+        [% SET attr.tangram_array = 1 %]
+        [% SET attr.tangram_type = 'flat_array' %]
+        [% SET attr.tangram_subtype = attr.storage_type %]
+
+        [% DEFAULT attr.storage_table = "${cls.tangram_table}__${attr.name_}" %]
+        [% SET attr.tangram_coll = cls.nAME_ %]
+        [% SET attr.tangram_item = attr.name_ %]
+        [% SET attr.tangram_slot = "${attr.tangram_item}_i" %]
+
+      [% CASE [ 'real', 'float', 'double' ] %]
+        [% SET attr.tangram_array = 1 %]
+        [% SET attr.tangram_type = 'flat_array' %]
+        [% SET attr.tangram_subtype = 'real' %]
+
+        [% DEFAULT attr.storage_table = "${cls.tangram_table}__${attr.name_}" %]
+        [% SET attr.tangram_coll = cls.nAME_ %]
+        [% SET attr.tangram_item = attr.name_ %]
+        [% SET attr.tangram_slot = "${attr.tangram_item}_i" %]
+
+ 
+      [% CASE [ 'date', 'rawdatetime' ] %]
+        [% SET attr.tangram_array = 1 %]
+        [% SET attr.tangram_type = 'flat_array' %]
+        [% SET attr.tangram_subtype = 'rawdatetime' %]
+
+        [% DEFAULT attr.storage_table = "${cls.tangram_table}__${attr.name_}" %]
+        [% SET attr.tangram_coll = cls.nAME_ %]
+        [% SET attr.tangram_item = attr.name_ %]
+        [% SET attr.tangram_slot = "${attr.tangram_item}_i" %]
+
+
+      [% CASE [ 'flat_array', 'array' ] %]
+        [% SET attr.tangram_array = 1 %]
+        [% SET attr.tangram_subtype = attr.type_info.storage_subtype %]
+        [% SET attr.tangram_subtype = attr.type_info.storage_type %]
+
+        [% DEFAULT attr.storage_table = "${cls.tangram_table}__${attr.name_}" %]
+
+      [% CASE [ 'flat_hash', 'hash' ] %]
+        [% SET attr.tangram_type = attr.storage_type %]
+        [% SET attr.tangram_subtype = attr.storage_subtype %]
+
+        [% SET attr.tangram_key_type = attr.storage_key_type %]
+        [% SET attr.tangram_key_sql = attr.storage_key_sql %]
+
+        [% DEFAULT attr.storage_table = "${cls.tangram_table}__${attr.name_}" %]
+
+      [% CASE %]
+        [% # Most likely a collection of 'ref's %]
+        [% IF attr.ordering == 'ordered' %]
+          [% SET attr.tangram_type = 'array' %]
+	  [% SET attr.tangram_array = 1 %]
+        [% ELSE %]
+          [% SET attr.tangram_type = 'set' %]
+        [% END %]
+
+	[% # Use the intrusive collection variant %]
+        [% IF attr.tangram_intrusive %]
+          [% SET attr.tangram_type = "i${attr.tangram_type}" %]
+        [% END %]
+
+	[% # Set the referent type to be the type_impl %]
+        [% SET attr.tangram_class = attr.type_impl %]
+    [% END %]
+
+    [%# If the cls_end has composite aggregation of the attr, make it so. %]
+    [% IF cls_end.aggregation == 'composite' %]
+      [% SET attr.tangram_aggreg = 1 %]
+    [% END %]
+
+    [% IF attr.tangram_intrusive %]
+      [%# Since an intrusive collections (iset,iarray) is going to be used,
+        # the coll(ection) name should be the attr.name
+        # Because this attr is going to intrude on cls_end's table.
+       %]
+       [% DEFAULT attr.tangram_coll = cls_end.storage_name || cls_end.name_ || cls.nAME_ %] 
+       [% IF attr.tangram_array %]
+         [% DEFAULT attr.tangram_slot = "${attr.tangram_coll}_i" %]
+       [% END %]
+    [% ELSE %]
+      [%# Since this is a non-intrusive collection,
+        # (probably a *-* Association),
+        # An association table is going to be used:
+        # The item is the "outward" end (attr),
+        # The coll(ection) is the "inward" end (cls_end). %]
+      [% DEFAULT attr.tangram_coll = cls_end.storage_name || cls_end.name_ || cls.nAME_ %]   
+      [% DEFAULT attr.tangram_item = attr.name_ %]
+ 
+      [% # If the attribute is from an Association
+         # Default the table name to be
+         # the Associations qualified name w/_.
+      %]
+      [% IF end.isaAssociationEnd %]
+        [% DEFAULT attr.storage_table = end.assoc.storage_table %]
+      [% END %]
+
+    [% END %]
+
+    [% DEFAULT attr.storage_table = "${cls.tangram_table}__${attr.name_}" %]
+
+    [% IF attr.tangram_array %]
+      [% DEFAULT attr.tangram_type = 'array' %]
+      [% DEFAULT attr.tangram_slot = "${attr.tangram_item}_i" %]
+    [% END %]
+
+  [% END %]
+
+  [% IF attr.storage_table %]
+    [% # Normalize the storage_table name %]
+    [% SET attr.storage_table = attr.storage_table_filter(attr.storage_table) %]
+
+    [% DEFAULT attr.tangram_table = attr.storage_table %]
+  [% END %]
+
+  [% DEFAULT attr.tangram_index = attr.storage_index %]
+
+  [% PERL %]
+  if ( 0 ) {
+     my $cls = $stash->get('cls');
+     my $cls_end = $stash->get('cls_end') || { };
+     my $attr = $stash->get('attr');
+     if ( grep($cls->{'name'} eq $_, 'Blah') ) {
+     print STDERR join("\n", 
+		       "Class=$cls->{name} ==========================",
+		       "cls_end.name\t=\t$cls_end->{name}",
+		       "cls_end.multi_single\t=\t" . ($cls_end && $cls_end->{'multi_single'}),
+		       map("$_\t=\t" . $attr->{$_},
+			   'name',
+                           'multi_single',
+			   'isaAssociationEnd',
+			   'tangram_array',
+			   'tangram_col',
+			   'tangram_coll',
+			   'tangram_item',
+			   'tangram_slot',
+			   'tangram_type',
+			   'tangram_intrusive',
+			   'tangram_table',
+			   'tangram_class',
+			   'tangram_sql',
+			   'tangram_index',
+			  ),
+		       '',
+		      );
+   }
+   }
+   [% END %]
+
+[% END %]
+
+
+[% MACRO tangram_field BLOCK %]
+[% IF attr.instance && attr.storage && attr.tangram_type && attr.type_info.storage %]
+    '[% attr.name_ %]'
+       => {
+	 'type_impl' => '[% attr.tangram_type %]',
+         [% IF attr.tangram_class %]'class' => '[% attr.tangram_class %]',
+
+         [% END %]
+         [% IF attr.tangram_null %]'null' => '1', 
+
+         [% END %]
+         [% IF attr.tangram_table %]'table' => '[% attr.tangram_table %]', 
+
+         [% END %]
+         [% IF attr.tangram_subtype %]'type' => '[% attr.tangram_subtype %]', 
+
+         [% END %]
+         [% IF attr.tangram_col %]'col' => '[% attr.tangram_col %]', 
+
+         [% END %]
+         [% IF attr.tangram_key_type %]'key_type' => '[% attr.tangram_key_type %]', 
+
+         [% END %]
+         [% IF attr.tangram_key_sql %]'key_sql' => '[% attr.tangram_key_sql %]', 
+
+         [% END %]
+         [% IF attr.tangram_item %]'item' => '[% attr.tangram_item %]', 
+
+         [% END %]
+         [% IF attr.tangram_coll %]'coll' => '[% attr.tangram_coll %]',
+
+         [% END %]
+         [% IF attr.tangram_slot %]'slot' => '[% attr.tangram_slot %]', 
+
+         [% END %]
+         [% IF attr.tangram_back %]'back' => '[% attr.tangram_back %]', 
+
+         [% END %]
+         [% IF attr.tangram_index %]'index' => '[% attr.tangram_index %]', 
+
+         [% END %]
+         [% IF attr.tangram_aggreg %]'aggreg' => '[% attr.tangram_aggreg %]', 
+
+         [% END %]
+         [% IF attr.tangram_deep_update %]'deep_update' => '[% attr.tangram_deep_update %]',
+
+         [% END %]
+         [% IF attr.tangram_sql %]'sql' => '[% attr.tangram_sql %]', 
+
+         [% END %]
+         [% IF attr.storage_field_class == 'false' %]'no_type_col' => 1,
+
+         [% END %]
+       }
+      ,
+[% END %]
+[% END %]
+
+
+
+
+[%# Initialize Classifiers %]
+
+[% # Initialize Classifier Tangram attributes %]
+[% FOREACH cls = classifier %]
+
+[% # Initialize class' Tangram table name %]
+[% DEFAULT cls.storage_table = cls.name_q_ %]
+[% SET cls.storage_table = cls.storage_table_filter(cls.storage_table) %]
+[% DEFAULT cls.tangram_table = cls.storage_table %]
+
+[% END %]
+
+
+[%# Initialize Associations %]
+
+[% # Initialize Association Tangram attributes %]
+[% FOREACH assoc = association %]
+
+[% # Initialize class' Tangram table name %]
+[% DEFAULT assoc.storage_table = assoc.name_q_ %]
+[% SET     assoc.storage_table = assoc.storage_table_filter(assoc.storage_table) %]
+[% DEFAULT assoc.tangram_table = assoc.storage_table %]
+
+[% END %]
+
+
+[% FOREACH cls = classifier %]
+
+[% # Initialize Attributes %]
+[% FOREACH attr = cls.attribute %]
+
+# Initialize Attribute [% cls.name %] [% attr.name %]
+
+[% # Initialize container type %]
+[% container_type(attr=attr,cls=cls) %]
+
+[% # Class or instance storage, depends on attr %]
+[% IF attr.instance %]
+  [% SET attr.loc = "\$self->{'${attr.name_}'}" %]
+[% ELSE %]
+  [% SET attr.loc = "\$${attr.name_}" %]
+[% END %]
+
+[% IF attr.type_info.primitive %]
+  [% SET attr.typecheck = "" %]
+[% ELSE %]
+  [% SET attr.typecheck = "\$self->__use('${attr.type}')->__typecheck(\$val, \"${cls.package}.${attr.name_}\")" %]
+[% END %]
+
+[% # No storage for class Attributes %]
+[% NEXT UNLESS attr.instance %]
+[% tangram_type(attr=attr,cls=cls) %]
+
+[% END %]
+ 
+
+[% # Initialize AssociationEnds %]
+
+[% # See cls_end.multi_single in tangram_type() %]
+[% SET cls.multi_single = 1 %]
+
+[% FOREACH cls_end = cls.association %]
+[% # ASSOC: [% cls_end.name_ %] %]
+
+[% # Initialize container type %]
+[% container_type(attr=end,cls=cls) %]
+[% # Make the link towards the composite aggregator weak
+   # since the objects are "owned" by the aggregator. %]
+[% IF cls_end.aggregation == "composite" %]
+  [% SET cls_end.weak_ref = cls_end.weak_ref_enabled %]
+[% END %]
+
+[% FOREACH end = cls_end.opposite %]
+
+[% NEXT UNLESS end.isNavigable %]
+
+[% # Initialize container type %]
+[% container_type(attr=end,cls=cls) %]
+[% IF end.aggregation == "composite" %]
+  [% SET end.weak_ref = end.weak_ref_enabled %]
+[% END %]
+
+[% # Class or instance storage, depends on cls_end %]
+[% IF cls_end.instance %]
+  [% SET end.loc = "\$self->{'${end.name_}'}" %]
+[% ELSE %]
+  [% SET end.loc = "\$${end.name_}" %]
+[% END %]
+
+[% SET end.typecheck = "\$self->__use('${end.type}')->__typecheck(\$val, \"${cls.package}.${end.name_}\")" %]
+
+[% # No storage for class AssociationEnds %]
+[% NEXT UNLESS cls_end.instance %]
+[% tangram_type(attr=end,cls=cls,cls_end=cls_end) %]
+
+[% END %]
+[% END %]
+
+[% END %]
+
+
+
+#//-// FILE BEGIN [%model_package_file%]
+
+# -*- perl -*-
+# DO NOT EDIT - This file is generated by UMMF; http://ummf.sourceforge.net 
+# From template: $Id: Perl.txt,v 1.77 2006/05/14 01:40:03 kstephens Exp $
+
+package [%model_package%];
+
+# use 5.6.1;
+use strict;
+use warnings;
+
+#################################################################
+# Version
+#
+
+our $VERSION = do { my @r = (q$Revision: 1.77 $ =~ /\d+/g); sprintf "%d." . "%03d" x $#r, @r };
+
+=head1 NAME
+
+[% model_package %] - Model package for Model [% model.name %];
+
+=head1 SYNOPSIS
+
+  use [% model_package %];
+  my $model = [% model_package %]->model;
+
+=head1 DESCRIPTION
+
+This package
+
+=head1 USAGE
+
+=head1 EXPORT
+
+None exported.
+
+=head1 AUTHOR
+
+Kurt Stephens, kstephens@users.sourceforge.net 2003/04/15
+
+=head1 CLASSIFIERS
+
+The following is a list of all the Classifiers and their respective Perl modules defined in this Model.
+
+[% FOREACH cls = classifier %]
+
+=head2 C<[% cls.name_q %]>
+
+See L<[% cls.package %]|[% cls.package %]>.
+
+[% END %]
+
+=head1 SEE ALSO
+
+L<UMMF::Core::MetaModel|UMMF::Core::MetaModel>
+
+=head1 VERSION
+
+$Revision: 1.77 $
+
+=head1 METHODS
+
+=cut
+
+#################################################################
+# Supers
+#
+
+
+#################################################################
+# Dependencies
+#
+
+use Carp qw(croak confess);
+
+
+#################################################################
+# Import them all!!!
+# [ % model_package_use % ];
+#
+
+
+#################################################################
+# Methods
+#
+
+my $factory_map = 
+[
+  [% FOREACH x = factory_map %]
+    '[% x %]',
+  [% END %]
+];
+
+=head2 C<factory_map>
+
+Returns an array ref that maps all UML Model names to Perl package names for this package.
+Also includes short name to fully-qualified name mappings. 
+
+=cut
+sub factory_map { $factory_map; }
+       
+my $model;
+
+[% RAWPERL %]
+  {
+    use UMMF;
+
+    my $model = $stash->get('model');
+    my $tmpfile = UMMF->make_tempfile('Model', 'xmi');
+    my $outfile = $stash->get('model_package_file') . '.Model.xmi';
+
+    print STDERR "UMMF: Export UML Model: to $tmpfile\n";
+
+    # Create empty file
+    use IO::File;
+    my $fh = IO::File->new;
+    $fh->open("> $tmpfile") || die("Cannot write '$tmpfile': $!");
+
+    eval {
+      use UMMF::Export::XMI;
+      my $exporter = UMMF::Export::XMI->new('output' => $fh);
+      $exporter->export_Model($model);
+    };
+
+    # The above fails when bootstrapping UMMF.
+    if ( my $exc = $@ ) {
+      if ( $fh ) {
+	$fh->seek(0, 0);
+	$fh->close;
+      }
+      use UMMF;
+      UMMF->bootstrapping ? warn($exc) : die($exc);
+    }
+
+    $output .= "#//-// FILE MOVE $tmpfile $outfile\n";
+    print STDERR "UMMF: Export UML Model: DONE\n";
+  }
+[% END %]
+
+=head2 C<model>
+
+Returns the UML meta-model Model object for this Model.
+
+=cut
+sub model 
+{
+  unless ( $model ) {
+    my $module = __PACKAGE__;
+    $module =~ s@::@/@sg;
+    my $file = $INC{$module . '.pm'};
+    $file .= '.Model.xmi';
+    
+    if ( -s $file ) {
+      print STDERR "UMMF: Reading UML Model: from $file\n";
+      
+      eval {
+	use UMMF::Import::XMI;
+	my $importer = UMMF::Import::XMI->new();
+	my $results = $importer->import_input_file($file);
+	($model) = grep($_->isaModel, @$results);
+      };
+      if ( my $exc = $@ ) {
+	use UMMF;
+	print STDERR "UMMF: Reading UML Model: from $file: FAILED\n";
+	UMMF->bootstrapping ? warn($exc) : die($exc);
+      }
+    }
+    
+    if ( UMMF->bootstrapping && ! $model ) {
+      print STDERR "UMMF: Reading UML Model: from UMMF::Boot::MetaModel\n";
+      use UMMF::Boot::MetaModel;
+      $model = UMMF::Boot::MetaModel->model('pure' => 1);
+    }
+
+    print STDERR "UMMF: Reading UML Model: DONE\n";
+  }
+  $model;
+}
+
+
+=head2 C<__rebless_tree>
+
+Work around for errors like:
+
+    Can't locate object method "parent" via package "UMMF::UML_1_5::Foundation::Core::Generalization" at /c/wct/ummf/1.0/bin/../lib/perl/UML/MetaMetaModel/Util.pm line 712.
+
+=cut
+# 'emacs
+my %__rebless_tree_primitive =
+map(($_ => 1),
+    'HASH', 
+    'ARRAY', 
+    'SCALAR', 
+    'CODE', 
+    'GLOB',
+    );
+
+sub __rebless_tree
+{
+  no warnings;
+
+  my ($x, $visited, $used) = @_;
+
+  if ( my $ref = ref($x) ) {
+    return if $visited->{$x} ++;
+
+    # print STDERR "x = $x\n";
+
+    # Rebless object.
+    unless ( __rebless_tree_primitive{$ref} ) {
+      # Does Storable::retrieve do this?
+      unless ( $used->{$ref} ) {
+	$used->{$ref} = 1;
+	print STDERR "  use $ref\n";
+	eval qq{ package main; use $ref; }; die $@ if $@;
+      }
+
+      # print STDERR "rebless $x, $ref\n";
+      # REBLESS!!!
+      bless($x, $ref);
+    }
+
+    # Traverse primitive
+    if ( $ref eq 'Set::Object') {
+      for my $y ( $x->members ) {
+	__rebless_tree($y, $visited, $used);
+      }
+    }
+    elsif ( $x =~ /HASH\(/ ) {
+      for my $y ( values %$x ) {
+	__rebless_tree($y, $visited, $used);
+      }
+    }
+    elsif ( $x =~ /ARRAY\(/ ) {
+      for my $y ( @$x ) {
+	__rebless_tree($y, $visited, $used);
+      }
+    }
+    elsif ( $x =~ /SCALAR\(/ ) {
+      __rebless_tree($$x, $visited, $used);
+    }
+  }
+}
+
+
+
+my $factory;
+
+=head2 C<factory>
+
+Returns a factory for this Model.
+
+=cut
+sub factory 
+{
+  # $DB::single = 1;
+
+  my $self = shift;
+  unless ( $factory ) {
+    eval q{use UMMF::Core::Factory;}; die $@ if $@;
+    $factory = UMMF::Core::Factory->new('classMap' => $self->factory_map);
+  }
+  $factory;
+}
+
+
+############################################################################
+
+1; # Is true!!!
+
+############################################################################
+
+### Keep these comments at end of file: kstephens@users.sourceforge.net 2003/04/06 ###
+### Local Variables: ###
+### mode:perl ###
+### perl-indent-level:2 ###
+### perl-continued-statement-offset:0 ###
+### perl-brace-offset:0 ###
+### perl-label-offset:0 ###
+### End: ###
+
+#//-// FILE END [% model_package_file %] 
+
+#//-// FILE BEGIN [% base_package_file %]
+
+# -*- perl -*-
+# DO NOT EDIT - This file is generated by UMMF; http://ummf.sourceforge.net 
+# From template: $Id: Perl.txt,v 1.77 2006/05/14 01:40:03 kstephens Exp $
+
+package [% base_package %];
+
+# This package provides base class support for generated Classifiers.
+
+#use 5.6.1;
+use strict;
+use warnings;
+
+#################################################################
+# Version
+#
+
+our $VERSION = do { my @r = (q$Revision: 1.77 $ =~ /\d+/g); sprintf "%d." . "%03d" x $#r, @r };
+
+=head1 NAME
+
+[% base_package %] - base class package for Model [% model.name %];
+
+=head1 SYNOPSIS
+
+  use base qw([% base_package %]);
+
+=head1 DESCRIPTION
+
+This package provides a base class for Perl modules generated by UMMF.
+
+=head1 USAGE
+
+=head1 EXPORT
+
+  use [% base_package %] qw(:__ummf_array);
+
+  __ummf_array_index
+  __ummf_array_delete
+  __ummf_array_delete_once
+  __ummf_array_delete_each
+  __ummf_array_delete_each_once
+
+
+=head1 AUTHOR
+
+Kurt Stephens, kstephens@users.sourceforge.net 2003/04/15
+
+=head1 SEE ALSO
+
+L<UMMF::Core::MetaModel|UMMF::Core::MetaModel>
+
+=head1 VERSION
+
+$Revision: 1.77 $
+
+=head1 METHODS
+
+=cut 
+
+#################################################################
+# Supers
+#
+
+use base qw(Exporter);
+our @EXPORT_OK = 
+  qw(
+     __ummf_array_index
+     __ummf_array_delete
+     __ummf_array_delete_once
+     __ummf_array_delete_each
+     __ummf_array_delete_each_once
+    );
+our %EXPORT_TAGS = (
+		   '__ummf_array' => \@EXPORT_OK,
+		   );
+
+#################################################################
+# Dependencies
+#
+
+use Carp qw(croak confess);
+use Set::Object;
+
+#################################################################
+# Dynamic loading
+#
+
+
+my %__use;
+
+=head2 C<__use>
+
+  my $pkg = $self->__use('Some::Package');
+  my $new_obj = $pkg->new(...);
+
+Dynamically "use" a package.
+
+=cut
+sub __use
+{
+  my ($self, $cls) = @_;
+
+  $cls ||= $self;
+
+  unless ( $__use{$cls} ) {
+    # $DB::single = 1;
+    no strict 'refs';
+    unless ( ${"${cls}::VERSION"} ) {
+      use Carp qw(confess);
+      # $DB::single = 1;
+      eval "use $cls"; confess "Attempting use '$cls':\n$@" if $@;
+      ${"${cls}::VERSION"} ||= -1;
+    }
+    $__use{$cls} = 1;
+  }
+
+  $cls;
+}
+
+
+#################################################################
+# Introspection
+#
+
+=head2 C<__factory>
+
+Returns the factory object for this Classifier's Model.
+
+=cut
+# 'emacs
+sub __factory 
+{ 
+  __use('[% model_package %]')->factory;
+}
+
+
+=head2 C<__metamodel>
+
+Returns the Model for this Classifier.
+
+=cut
+sub __metamodel 
+{
+  __use('[% model_package %]')->model;
+}
+
+
+my %__classifier;
+=head2 C<__classifier>
+
+  my $classifier = $obj_or_package->__classifier;
+
+Returns the UML meta-model Classifier for an object or package.
+
+=cut
+sub __classifier 
+{ 
+  my ($self) = @_;
+  
+  my $name = ref($self) || $self;
+
+  my $cls;
+  unless ( $cls = $__classifier{$name} ) {
+    use UMMF::Core::Util qw(Namespace_ownedElement_name_);
+    $cls = $__classifier{$name} = 
+    Namespace_ownedElement_name_($self->__metamodel, $self->__model_name);
+  }
+  
+  $cls;
+}
+
+
+=head2 C<__isAbstract>
+
+  $package->__isAbstract;
+
+Returns true if C<<$package>> is an abstract Classifer.
+
+Abstract Classifiers are not instantiable via C<new>.
+
+=cut
+sub __isAbstract { 1 }
+
+
+#################################################################
+# Validation.
+#
+
+=head2 C<__validate_type>
+
+  Some::Package->__validate_type($value);
+
+Returns true if C<$value> is a valid representation of this Classifier.
+
+=cut
+sub __validate_type { 1 }
+
+
+=head2 C<__typecheck>
+
+  $value = Some::Package->__typecheck($value, $msg);
+
+Generates an exception with C<$msg> if C<$value> is not a valid representaion of this Classifier.
+
+Returns C<$value>.
+
+=cut
+sub __typecheck { $_[1] }
+
+
+#################################################################
+# Initialization.
+#
+
+
+=head2 C<__initialize>
+
+Initialize all slots in an instance with initial values.
+
+Called by C<new> and C<new_>.
+
+=cut
+sub __initialize { shift }
+
+
+=head2 C<___initialize>
+
+Initialize all slots of a particular Classifier's Attributes and AssociationEnds.
+
+Called by C<__initialize>.
+
+=cut
+#'emacs
+sub ___initialize { shift }
+
+
+=head2 C<__create>
+
+Calls all Generalizations' C<__create> methods.
+
+Called by C<new>.
+
+=cut
+sub __create { shift }
+
+
+=head2 C<___create>
+
+Placeholder for user-specified <<create>> methods.
+
+Called by C<__create>.
+
+=cut
+sub ___create { shift }
+
+
+=head2 C<____create>
+
+Hand-coded subclasses can override this method, but they must return C<$self>.
+
+Called by C<new>.
+
+=cut
+sub ____create { shift }
+
+
+#################################################################
+# Extent.
+#
+
+=head2 C<$_id>
+
+Variable incremented for each new instance created by C<__new_instance>.  The new ID is stored in the object's C<<$self->{_id}>> slot.
+
+=cut
+our $_id = 0;
+
+
+=head2 C<$__new_instance_event>
+
+Defines a subroutine that is called with each new instance created by C<__new_instance>.
+Deprecated: See C<add___extent>.
+
+=cut
+our $__new_instance_event;
+
+
+my @__extent;
+
+=head2 C<add___extent>
+
+  my $extent = UMMF::Object::Extent->new();
+  [% base_package %]->add___extent($extent);
+
+Register a new Extent observer object to this base class.
+
+See also: L<UMMF::Object::Extent|UMMF::Object::Extent>.
+
+=cut
+sub add___extent
+{
+  my ($self, $extent) = @_;
+
+  push(@__extent, $extent);
+  $extent->add_classifier($self);
+}
+
+
+=head2 C<remove___extent>
+
+  my $extent = ...;
+  [% base_package %]->remove__extent($extent);
+
+Deregister an Extent observer object from this base class.
+
+=cut
+sub remove___extent
+{
+  my ($self, $extent) = @_;
+
+  @__extent = grep($_ ne $extent, @__extent);
+  $extent->remove_classifier($self);
+}
+
+
+=head2 C<__extent_add_object>
+
+  $obj = $package->__extent_add_object($obj, @args)
+
+Cause all registered Extent objects to be messaged as C<<$extent->add_object($obj, @args)>>.
+
+Extent observer implementors should note that C<$obj> may not be a fully initialized instance.
+
+Called by C<__new_instance> and C<__clone>.
+
+Overides of C<__new_instance> or C<__clone> should call C<<self->__extent_add_object($obj, ...)>>.
+
+Returns C<$obj>.
+
+=cut
+sub __extent_add_object
+{
+  my ($self, $obj, @args) = @_;
+
+  # Deprecated: use add___extent.
+  $__new_instance_event->($self, @args) if $__new_instance_event;
+
+  for my $extent ( @__extent ) {
+    $extent->add_object($self, @args);
+  }
+
+  $obj;
+}
+
+
+#################################################################
+# Instantiation.
+#
+
+=head2 C<__new_instance>
+
+  my $obj = $package->__new_instance(%attrs);
+
+Returns a new instance, without initializing.
+
+New instances get a unique id stored in C<<$obj->{'_id'}>>.
+
+=cut
+sub __new_instance
+{
+  my ($self, %attrs) = @_;
+
+  $attrs{'_id'} ||= ++ $_id;
+  $self->__extent_add_object(bless(\%attrs, ref($self) || $self), '__new_instance');
+}
+
+
+=head2 C<new>
+
+  my $obj = $package->new(%attrs);
+
+Returns a new, initialized instance using keyword values.
+
+Throws exception if C<<$package->__isAbstract>>.
+
+Calls C<<$package->__new_instance(%attrs)>> to create instance, 
+then calls C<<$obj->__initialize()->__create()>> to complete initialization.
+
+=cut
+sub new
+{
+  my ($self, @opts) = @_;
+
+  # $DB::single = 1;
+
+  # Abstract Classifiers are not instantitable.
+  confess("$self isAbstract") if $self->__isAbstract;
+
+  # Allow __initialize method to delegate instantation.
+  $self->__new_instance(@opts)->__initialize->__create()->____create();
+}
+
+
+=head2 C<new_>
+
+  my $obj = $package->new_(@opts);
+
+Returns a new, initialized instance using a matching <<create>> Method.
+
+Throws exception if C<<$package->__isAbstract>>.
+
+Calls C<<$package->__new_instance()>> to create instance without any initialization keyword values
+then calls C<<$obj->__initialize()->__create(@opts)>> to complete initialization.
+
+=cut
+sub new_
+{
+  my ($self, @opts) = @_;
+
+  # $DB::single = 1;
+
+  # Abstract Classifiers are not instantitable.
+  confess("$self isAbstract") if $self->__isAbstract;
+
+  # Allow __initialize method to delegate instantation.
+  $self->__new_instance()->__initialize->__create(@opts);
+}
+
+
+=head2 C<__clone>
+
+  my $clone = $obj->__clone();
+
+Returns a new cloned instance.
+
+Clones get a unique id stored in C<<$clone->{'_id'}>>.
+
+=cut
+sub __clone
+{
+  my ($self) = @_;
+
+  $self = bless({ %$self }, ref($self));
+
+  $self->{'_id'} .= '.' . ++ $_id; # Fix me!!!
+
+  # Clone all attributes.
+  for my $key ( keys %$self ) {
+    my $v = \$self->{$key};
+    if ( ref($$v) eq 'ARRAY' ) {
+      $$v = [ @$$v ];
+    } elsif ( ref($$v) eq 'HASH' ) {
+      $$v = { %$$v };
+    } elsif ( ref($v) eq 'Set::Object') {
+      $$v = Set::Object->new(($$v)->members);
+    }
+  }
+
+  $self->__clone_deepen;
+
+  $self->__extent_add_object($self, '__clone');
+}
+
+
+=head2 C<__clone_deepen>
+
+Further deepens any composed objects in a instance.
+Subclasses may override and call SUPER.
+
+=cut
+sub __clone_deepen
+{
+  my ($self) = @_;
+
+  # Clone all the aggegrated Associations.
+
+  $self;
+}
+
+
+=head2 C<__ummf_disassemble>
+
+$obj->__ummf_disassemble();
+
+Dissassembles an object graph, recursively, by traversing any Attributes or AssoicationEnds.
+
+Only objects that respond to C<__ummf_disassemble> are affected.
+
+=cut
+
+sub __ummf_disassemble ($)
+{
+  no warnings;
+
+  my ($self) = @_;
+
+  # untie(%$self); # Dont allow Tangram OnDemand start pulling things in.
+
+  # print STDERR "__ummf_disassemble $self\n";
+
+  # Get list of objects to traverse.
+  my @x;
+  for my $k ( keys %$self ) {
+    untie $self->{$k}; # Dont allow Tangram::*OnDemand start pulling things in.
+    my $v = $self->{$k};
+
+    if ( my $ref = ref($v) ) {
+      if ( $ref eq 'Set::Object' ) {
+	push(@x, $v->members);
+      }
+      elsif ( $ref eq 'ARRAY' ) {
+	push(@x, @$v);
+      }
+      elsif ( $ref eq 'HASH' ) {
+	push(@x, values %$v);
+      }
+      else {
+	push(@x, $v);
+      }
+    }
+  }
+
+  # Only objects that can disassemble.
+  @x = grep(UNIVERSAL::can($_, '__ummf_disassemble'), @x);
+
+  # Empty $self; avoids recursion.
+  %$self = ();
+
+  # Process.
+  for $self ( @x ) {
+    $self->__ummf_disassemble;
+  }
+}
+
+
+
+############################################################################
+# Exported Helpers
+#
+
+
+=head2 __ummf_array_index
+
+  my $i = __ummf_array_index(\@a, $elem);
+
+Returns the first index of C<$elem> in C<@a> or undef.
+
+=cut
+sub __ummf_array_index
+{
+  my ($a, $e) = @_;
+
+  my $i = 0;
+  for my $ae ( @$a ) {
+    return $i if $ae eq $e;
+    ++ $i;
+  }
+  undef; # Not found.
+}
+
+
+=head2 __ummf_array_delete
+
+  __ummf_array_delete(\@a, $elem);
+
+Deletes all C<$elem> in C<@a>.
+
+=cut
+sub __ummf_array_delete
+{
+  my ($a, $e) = @_;
+
+  my $i = 0;
+  while ( $i < @$a ) {
+    if ( $a->[$i] eq $e ) {
+      splice(@$a, $i, 1);
+      next;
+    }
+    ++ $i;
+  }
+}
+
+
+=head2 __ummf_array_delete_once
+
+  __ummf_array_delete_once(\@a, $elem);
+
+Deletes the first C<$elem> in C<@a>.
+
+=cut
+sub __ummf_array_delete_once
+{
+  my ($a, $e) = @_;
+
+  my $i = 0;
+  while ( $i < @$a ) {
+    if ( $a->[$i] eq $e ) {
+      splice(@$a, $i, 1);
+      last;
+    }
+    ++ $i;
+  }
+}
+
+
+=head2 __ummf_array_delete_each
+
+  __ummf_array_delete_each(\@a, \@elem);
+
+Deletes each element in C<@elem> in C<@a>.
+
+=cut
+sub __ummf_array_delete_each
+{
+  my ($a, $es) = @_;
+  for my $e ( @$es ) {
+    __ummf_array_delete($a, $e);
+  }
+}
+
+
+=head2 __ummf_array_delete_each
+
+  __ummf_array_delete_each(\@a, \@elem);
+
+Deletes each first element in C<@elem> in C<@a>.
+
+=cut
+sub __ummf_array_delete_each_once
+{
+  my ($a, $es) = @_;
+  for my $e ( @$es ) {
+    __ummf_array_delete_once($a, $e);
+  }
+}
+
+
+#################################################################
+
+
+use vars qw($AUTOLOAD);
+
+our $AUTOLOAD_verbose = 0;
+
+
+sub __true { 1 };
+sub __false { 1 };
+
+
+my %__isa;
+
+
+=head2 C<AUTOLOAD>
+
+Autoloader to simplify isa<Classifier>() handling of disjoint types.
+This also prints a verbose stack trace for an unimplemented method.
+
+=cut
+sub AUTOLOAD
+{
+  no strict 'refs';
+  
+  my ($self, @args) = @_;
+  local ($1, $2);
+  
+  my ($package, $operation) = $AUTOLOAD =~ m/^(?:(.+)::)([^:]+)$/;
+  return if $operation eq 'DESTROY';
+  
+  my ($method); # The autogenerated method.
+  
+  #$DB::single = 1;
+  
+  # warn __PACKAGE__ . ": package='$package' operation='$operation'";
+  
+  # Handle isa<Classifier> automagically.
+  # better check your spelling!!
+  if ( $self && $operation =~ /^isa[A-Z]/ ) {
+    my $ref = ref($self) || $self;
+
+    # Install true method in $self class, not any superclass.
+    $AUTOLOAD = "${ref}::${operation}";
+
+    # Check a false cache.
+    my $method = $__isa{$AUTOLOAD};
+    unless ( defined $method ) {
+      my @x = @{"${ref}::ISA"};
+      while ( @x ) {
+	my $x = pop @x;
+	if ( UNIVERSAL::can($x, $operation) && $x->$operation ) {
+	  $method = \&__true;
+	  last;
+	}
+	push(@x, @{"${x}::ISA"});
+      }
+      $__isa{"$ref\t$operation"} = 0;
+    }
+
+    # Do not install false method, so multiple-inheritance will work.
+    # print STDERR "$ref \t $operation \t = $method->()\n";
+    return undef unless $method;
+  }
+  
+  # Install the generated method and invoke it.
+  if ( $method ) {
+    *{$AUTOLOAD} = $method;
+    # Tail call.
+    goto &$method;
+  } else {
+    use Carp qw(confess);
+    use Data::Dumper;
+
+    # Nice feature:
+    # Print a stack trace if an undefined method is called.
+    # Why doesn't Perl always do this?
+    my $e = 
+    {
+      'type'      => 'UndefinedMethod',
+      'package'   => $package,
+      'operation' => $operation,
+      'receiver'  => "$self",
+      'arguments' => [ map("$_", @args) ],
+    };
+
+    confess(Data::Dumper->new([$e],[qw(EXCEPTION)])->Dump);
+  }
+}  
+
+
+1; # Is true!!!
+
+#//-// FILE END [% base_package_file %]
+
+[% FOREACH cls = classifier %]
+[% NEXT UNLESS cls.generate %]
+
+#//-// FILE BEGIN [% cls.package_file %]
+
+# -*- perl -*-
+# DO NOT EDIT - This file is generated by UMMF; http://ummf.sourceforge.net 
+# From template: $Id: Perl.txt,v 1.77 2006/05/14 01:40:03 kstephens Exp $
+
+package [% cls.package %];
+
+#use 5.6.1;
+use strict;
+use warnings;
+
+#################################################################
+# Version
+#
+
+our $VERSION = do { my @r = (q{[% cls.version %]} =~ /\d+/g); sprintf "%d." . "%03d" x $#r, @r };
+
+
+#################################################################
+# Documentation
+#
+
+=head1 NAME
+
+[% cls.package %] -- [% cls.documentation %]
+
+
+=head1 VERSION
+
+[% cls.version %]
+
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION 
+
+=head1 USAGE
+
+=head1 EXPORT
+
+=head1 METATYPE
+
+L<[% cls.metatype %]|[% cls.metatype %]>
+
+=head1 SUPERCLASSES
+
+[% FOREACH super = cls.supers %]
+L<[% super %]|[% super %]>
+
+[% END %]
+[% FOREACH super = cls.abstraction %]
+L<[% super.package %]|[% super.package %]>
+
+[% END %]
+[% FOREACH super = cls.supers_default %]
+L<[% super %]|[% super %]>
+
+[% END %]
+
+
+[% IF cls.isaEnumeration %]
+
+=head1 ENUMERATION LITERALS
+
+[% FOREACH attr = cls.literal %]
+
+=head2 C<[% attr.name_ %]>
+
+[% attr.documentation %]
+
+
+[% END %]
+
+[% ELSE %]
+
+=head1 ATTRIBUTES
+
+[% UNLESS cls.attributes %]
+I<NO ATTRIBUTES>
+[% END %]
+[% FOREACH attr = cls.attribute %]
+
+=head2 C<[% attr.name_ %]> : [% attr.type %] [% UNLESS attr.multi_single %][C<[% attr.multi %]>][% END %]
+
+[% attr.documentation %]
+
+
+=over 4
+
+=item metatype = L<[% attr.metatype %]|[% attr.metatype %]>
+
+=item type = L<[% attr.type %]|[% attr.type %]>
+
+=item visibility = C<[% attr.visibility %]>
+
+=item multiplicity = C<[% attr.multi %]>
+
+=item changeability = C<[% attr.changeability %]>
+
+=item targetScope = C<[% attr.targetScope %]>
+
+=item ordering = C<[% attr.ordering %]>
+
+=item initialValue = [% IF attr.initialValue_defined %]C<<[% attr.initialValue %]>>[% ELSE %]I<UNSPECIFIED>[% END %]
+
+
+=item container_type = C<[% attr.container_type %]>
+
+=back
+
+[% END %]
+
+
+=head1 ASSOCIATIONS
+
+[% UNLESS cls.associations %]
+I<NO ASSOCIATIONS>
+[% END %]
+[% FOREACH clsend = cls.association %]
+[% FOREACH end = clsend.opposite %]
+
+=head2 C<[% clsend.name_ %]> : I<THIS> C<[% clsend.multi %]> [% IF clsend.isNavigable %]E<lt>[% ELSE %]-[% END %]---[% IF end.isNavigable %]E<gt>[% ELSE %]-[% END %]  C<[% end.name_ %]> : [% end.type %] C<[% end.multi %]>
+
+[% end.documentation %]
+
+
+=over 4
+
+=item metatype = L<[% end.metatype %]|[% end.metatype %]>
+
+=item type = L<[% end.type %]|[% end.type %]>
+
+=item multiplicity = C<[% end.multi %]>
+
+=item changeability = C<[% end.changeability %]>
+
+=item targetScope = C<[% end.targetScope %]>
+
+=item ordering = C<[% end.ordering %]>
+
+=item isNavigable = C<[% end.isNavigable %]>
+
+=item aggregation = C<[% end.aggregation %]>
+
+=item visibility = C<[% end.visibility %]>
+
+=item container_type = C<[% end.container_type %]>
+
+=back
+
+[% END %]
+[% END %]
+
+[% END %]
+
+=head1 METHODS
+
+=cut
+
+
+[% cls.header %]
+
+#################################################################
+# Dependencies
+#
+
+[% FOREACH dep = cls.dependency %]
+use [% dep.package %];
+[% END %]
+
+[% FOREACH dep = cls.usage %]
+use [% dep %];
+[% END %]
+
+[% IF cls.imports %]
+use use_alias qw(
+[% FOREACH dep = cls.import %]
+  [% dep %]
+
+[% END %]
+);
+[% END %]
+
+
+use Carp qw(croak confess);
+use Set::Object 1.05;
+use Class::Multimethods 1.70;
+use Data::Dumper;
+use Scalar::Util qw(weaken);
+use [% base_package %] qw(:__ummf_array);
+
+
+#################################################################
+# Generalizations
+#
+
+use base qw(
+[% FOREACH super = cls.supers %]
+  [% super %]
+[% END %]
+
+[% FOREACH super = cls.abstraction %]
+  [% super.package %]
+[% END %]
+
+[% FOREACH super = cls.supers_default %]
+  [% super %]
+[% END %]
+
+[% IF cls.isaEnumeration %]
+  Exporter
+[% END %]
+
+);
+
+
+#################################################################
+# Exports
+#
+
+our @EXPORT_OK = qw(
+[% IF cls.isaEnumeration %]
+  [% FOREACH literal = cls.literal %]
+    [% literal.NAME_ %]
+  [% END %]
+[% END %]
+);
+our %EXPORT_TAGS = ( 'all' => \@EXPORT_OK );
+
+[% IF cls.primitive || cls.construct %]
+
+
+#################################################################
+# Instantiation
+#
+
+=head2 C<new>
+
+Constructs new [% cls.package %] value.
+
+=cut
+sub new
+{
+  my ($self, @args) = @_;
+
+  my $x = pop(@args);
+
+  [% IF cls.construct %]
+  $x = [% cls.construct %]
+  ;
+  [% END %]
+
+  __typecheck($self, $x, '[% cls.package %]::new');
+
+  $x;
+}
+
+[% ELSIF cls.isaEnumeration %]
+=head2 C<new>
+
+  my $x = [% cls.package %]->new($literal);
+
+Constructs new [% cls.package %] literal value.
+C<$literal> must be one of the following:
+
+=over 4
+
+[% FOREACH literal = cls.literal %]
+
+=item * '[% literal.name_ %]'
+
+[% END %]
+
+=back
+
+=cut
+sub new
+{
+  my ($self, @args) = @_;
+  my $x = pop(@args);
+  __typecheck($self, $x, '[% cls.package %]::new');
+  $x;
+}
+
+[% END %]
+
+
+[% IF cls.isaEnumeration %]
+
+#################################################################
+# EnumerationLiterals
+#
+
+[% FOREACH literal = cls.literal %]
+
+=head2 C<[% literal.NAME_ %]>
+
+Returns '[% literal.name_ %]'.
+
+=cut
+sub [% literal.NAME_ %]
+{
+  '[% literal.name_ %]';
+}
+
+[% END %]
+
+[% END %]
+
+
+#################################################################
+# Validation
+#
+
+[% IF cls.isaEnumeration %]
+[% DEFAULT cls.validate_type = '$__literal{$x}' %]
+my %__literal = 
+(
+ [% FOREACH literal = cls.literal %]
+   '[% literal.name_ %]' => '[% literal.name_ %]',
+ [% END %]
+ );
+[% END %]
+[% DEFAULT cls.validate_type = "UNIVERSAL::isa(\$x, '${cls.package}')" %]
+
+=head2 C<__validate_type>
+
+  [%cls.package%]->__validate_type($value);
+
+Returns true if C<$value> is a valid representation of L<[%cls.package%]|[%cls.package%]>.
+
+=cut
+sub __validate_type($$)
+{
+  my ($self, $x) = @_;
+
+  no warnings;
+
+  [% cls.validate_type %]
+  ;
+}
+
+
+=head2 C<__typecheck>
+
+  [%cls.package%]->__typecheck($value, $msg);
+
+Calls C<confess()> with C<$msg> if C<<[%cls.package%]->__validate_type($value)>> is false.
+
+=cut
+sub __typecheck
+{
+  my ($self, $x, $msg) = @_;
+
+  confess("typecheck: $msg: type '" . '[%cls.package%]' . ": value '$x'")
+    unless __validate_type($self, $x);
+}
+
+
+=head2 C<isa[% cls.name_ %]>
+
+
+Returns true if receiver is a L<[% cls.package %]|[% cls.package %]>.
+Other receivers will return false.
+
+=cut
+sub isa[% cls.name_ %] { 1 }
+
+
+[% IF cls.name_q_ != cls.name_ %]
+=head2 C<isa[% cls.name_q_ %]>
+
+
+Returns true if receiver is a L<[% cls.package %]|[% cls.package %]>.
+Other receivers will return false.
+This is the fully qualified version of the C<isa[% cls.name_ %]> method.
+
+=cut
+sub isa[% cls.name_q_ %] { 1 }
+[% END %]
+
+
+#################################################################
+# Introspection
+#
+
+=head2 C<__model_name> 
+
+  my $name = $obj_or_package->__model_name;
+
+Returns the UML Model name (C<'[% cls.name_q %]'>) for an object or package of
+this Classifier.
+
+=cut
+sub __model_name { '[% cls.name_q %]' }
+
+
+
+=head2 C<__isAbstract>
+
+  $package->__isAbstract;
+
+Returns C<[% IF cls.isAbstract %]1[% ELSE %]0[% END %]>.
+
+=cut
+sub __isAbstract { [% IF cls.isAbstract %]1[% ELSE %]0[% END %]; }
+
+
+my $__tangram_schema;
+=head2 C<__tangram_schema>
+
+  my $tangram_schema $obj_or_package->__tangram_schema
+
+Returns a HASH ref that describes this Classifier for Tangram.
+
+See L<UMMF::Export::Perl::Tangram|UMMF::Export::Perl::Tangram>
+
+=cut
+sub __tangram_schema
+{
+  my ($self) = @_;
+
+  $__tangram_schema ||=
+  {
+[% IF cls.storage && ! cls.isaEnumeration %]
+   'classes' =>
+   [
+     '[% cls.package %]' =>
+     {
+[% IF cls.storage_type_impl %]
+       'type_impl' => '[% cls.storage_type_impl %]',
+[% ELSE %]
+       'table' => '[% cls.tangram_table %]',
+       'abstract' => [% IF cls.isAbstract || cls.isaInterface %]1[% ELSE %]0[% END %],
+       'slots' => 
+       { 
+	 # Attributes
+	 [% FOREACH attr = cls.attribute %]
+	   [% tangram_field(cls=cls,attr=attr) %]
+         [% END %]
+
+	 # Associations
+	 [% FOREACH clsend = cls.association %]
+	 [% FOREACH end = clsend.opposite %]
+	   [% tangram_field(cls=cls,attr=end) %]
+         [% END %]
+         [% END %]
+       },
+       'bases' => [ [% FOREACH x = cls.supers %] '[% x %]', [% END %] ],
+       'sql' => {
+[% IF cls.storage_field_id %]
+         'id_col' => '[% cls.storage_field_id %]', 
+[% END %]
+[% IF cls.storage_field_class %]
+[% IF cls.storage_field_class == 'false' %]
+          'no_class_col' => 1,
+[% ELSE %]
+         'class_col' => '[% cls.storage_field_class %]', 
+[% END %]
+[% END %]
+
+[% UNLESS cls.storage_deploy_table %]
+         'no_deploy_table' => 1, 
+[% END %]
+       },
+[% END %]
+     },
+   ],
+
+   'sql' =>
+   {
+    # Note Tangram::Ref::get_exporter() has
+    # "UPDATE $table SET $self->{col} = $refid WHERE id = $id",
+    # The id_col is hard-coded, 
+    # Thus id_col will not work.
+    #'id_col' => '__sid',
+    #'class_col' => '__stype',
+   },
+     # 'set_id' => sub { }
+     # 'get_id' => sub { }
+[% END %]
+
+   [% IF cls.storage_deploy %]
+   'deploy' => { '[% cls.package %]' => '[% cls.storage_deploy %]', },
+   [% END %]
+   [% IF cls.storage_retreat %]
+   'retreat' =>{ '[% cls.package %]' => '[% cls.storage_retreat %]', },
+   [% END %]
+
+  };
+}
+
+
+#################################################################
+# Class Attributes
+#
+
+
+[% FOREACH attr = cls.attribute %]
+  [% UNLESS attr.instance %]
+my [% attr.loc %][% IF attr.initialValue_defined %] = [% attr.initialValue %][% END %];
+  [% END %]
+[% END %]
+    
+
+#################################################################
+# Class Associations
+#
+
+
+[% FOREACH cls_end = cls.association %]
+[% FOREACH end = cls_end.opposite %]
+[% NEXT UNLESS end.isNavigable %]
+[% UNLESS cls_end.instance %]
+my [% end.loc %][% IF end.initialValue_defined %] = [% end.initialValue %][% END %];
+[% END %]
+[% END %]
+[% END %]
+    
+
+#################################################################
+# Initialization
+#
+
+
+=head2 C<___initialize>
+
+Initialize all Attributes and AssociationEnds in a instance of this Classifier.
+Does B<not> initalize slots in its Generalizations.
+
+See also: C<__initialize>.
+
+=cut
+sub ___initialize
+{
+  my ($self) = @_;
+
+  # Attributes
+
+[% FOREACH attr = cls.attribute %]
+  [% IF attr.instance %]
+  # Attribute [% attr.name_ %]
+
+  if ( exists [% attr.loc %] ) {
+    my $x = [% attr.loc %];
+    [% attr.loc %] = undef;
+    [% IF attr.multi_single %]
+    $self->set_[% attr.name_ %]($x);
+    [% ELSE %]
+    $self->set_[% attr.name_ %](ref($x) ? @$x : $x);
+    [% END %]
+  } else {
+    [% IF attr.initialValue_defined %]
+    [% attr.loc %] = [% attr.initialValue %];
+    [% END %]
+  }
+  [% END %]
+
+[% END %]
+
+
+  # Associations
+
+[% FOREACH cls_end = cls.association %]
+[% FOREACH end = cls_end.opposite %]
+[% NEXT UNLESS end.isNavigable %]
+[% NEXT UNLESS cls_end.instance %]
+  # AssociationEnd 
+  #  [% cls_end.name %] [% cls_end.multi %] 
+
+  #  <--> 
+  #  [% end.name %] [% end.multi %] [% end.type %].
+  [% IF end.multi_single %]
+  if ( defined [% end.loc %] ) {
+    my $x = [% end.loc %];
+    [% end.loc %] = undef;
+    $self->set_[% end.name_ %]($x);
+  }
+  [% ELSE %]
+  if ( defined [% end.loc %] ) {
+    my $x = [% end.loc %];
+    [% IF end.container_type == 'ARRAY' %]
+    [% end.loc %] = [ ];
+    [% ELSE %]
+    [% end.loc %] = Set::Object->new();
+    [% END %]
+    $self->set_[% end.name_ %](@$x);
+  }
+  [% END %]
+
+[% END %]
+[% END %]
+
+  $self;
+}
+
+
+my $__initialize_use;
+
+=head2 C<__initialize>
+
+Initialize all slots in this Classifier and all its Generalizations.
+
+See also: C<___initialize>.
+
+=cut
+sub __initialize
+{
+  my ($self) = @_;
+
+  # $DB::single = 1;
+
+  unless ( ! $__initialize_use ) {
+    $__initialize_use = 1;
+[% FOREACH super = cls.generalization_all %]
+    $self->__use('[% super.package %]');
+[% END %]
+  }
+
+  $self->[% cls.package %]::___initialize;
+[% FOREACH super = cls.generalization_all %]
+  $self->[% super.package %]::___initialize;
+[% END %]
+
+  $self;
+}
+      
+
+=head2 C<__create>
+
+Calls all <<create>> Methods for this Classifier and all Generalizations.
+
+See also: C<___create>.
+
+=cut
+sub __create
+{
+  my ($self, @args) = @_;
+
+  # $DB::single = 1;
+  $self->[% cls.package %]::___create(@args);
+[% FOREACH super = cls.generalization_all %]
+  $self->[% super.package %]::___create();
+[% END %]
+
+  $self;
+}
+
+
+
+
+#################################################################
+# Attributes
+#
+
+
+[% FOREACH attr = cls.attribute %]
+
+=for html <hr/>
+
+=cut
+
+#################################################################
+# Attribute [% attr.name_ %]
+
+# type = [% attr.type %] 
+
+# multiplicity = [% attr.multi %] 
+
+# ordering = [% attr.ordering %]
+
+# ownerScope = [% attr.ownerScope %]
+
+# initialValue = [% attr.initialValue %]
+
+
+[% IF attr.multi_single %]
+=head2 C<[% attr.name_ %]>
+
+  my $val = $obj->[% attr.name_ %];
+
+Returns the L<[% attr.type %]|[% attr.type %]> value of Attribute C<[% attr.name %]>.
+
+=cut
+sub [% attr.name_ %] ($)
+{
+  my ($self) = @_;
+
+  [% attr.getter_before %];
+
+  my $val = [% attr.loc %];
+
+  [% attr.getter_after %];
+
+  $val;
+}
+
+
+[% UNLESS attr.changeability == 'frozen' AND ! attr.instance %]
+=head2 C<set_[% attr.name_ %]>
+
+  $obj->set_[% attr.name_ %]($val);
+
+Sets the value of Attribute C<[% attr.name %]>.
+C<$val> must be of type L<[% attr.type %]|[% attr.type %]> or C<undef>.
+Returns C<$obj>.
+
+=cut
+sub set_[% attr.name_ %] ($$)
+{
+  my ($self, $val) = @_;
+
+  [% attr.setter_before %];
+
+  if ( defined $val ) {
+    [% attr.typecheck %];
+  }
+
+  [% IF attr.weak_ref %]weaken([% END %]
+  [% attr.loc %] = $val
+  [% IF attr.weak_ref %])[% END %];
+
+  [% attr.setter_after %];
+
+  $self;
+}
+
+
+=head2 C<count_[% attr.name_ %]>
+
+  $obj->count_[% attr.name_ %];
+
+Returns the number of elements (0 or 1) in C<[% attr.name_ %]>.
+
+=cut
+sub count_[% attr.name_ %] ($)
+{
+  my ($self) = @_;
+
+  [% attr.getter_before %];
+
+  my $val = [% attr.loc %];
+
+  [% attr.getter_after %];
+
+  defined $val ? 1 : 0;
+}
+
+
+[% END %]
+[% ELSE %]
+=head2 C<[% attr.name_ %]>
+
+  my $array_ref = $obj->[% attr.name_ %];
+  my @val = $obj->[% attr.name_ %];
+
+Returns the L<[% attr.type %]|[% attr.type %]> values of Attribute C<[% attr.name %]>.
+In list context it returns the list of values.
+In scalar context it returns a reference to the list of values.
+
+=cut
+sub [% attr.name_ %] ($)
+{
+  my ($self) = @_;
+
+  [% attr.getter_before %];
+
+  my $val = [% attr.loc %] ||= [ ];
+
+  [% attr.getter_after %];
+
+  wantarray ? @$val : $val;
+}
+
+
+[% IF attr.ordering == 'ordered' %]
+=head2 C<index_[% attr.name_ %]>
+
+  my $x = $obj->index_[% attr.name_ %]($i);
+  my @x = $obj->index_[% attr.name_ %]($i, $count);
+
+In scalar context, returns the value of Attribute C<[% attr.name %]> at index C<$i>.
+In array context, returns the values between index C<$i> and C<$i + $count - 1>, inclusive.
+
+=cut
+sub index_[% attr.name_ %] ($$@)
+{
+  my ($self, $i, $count) = @_;
+
+  [% attr.getter_before %];
+
+  my $val = [% attr.loc %] ||= [ ];
+
+  [% attr.getter_after %];
+
+  wantarray ? $val->[$i .. (defined $count ? $i + $count - 1 : $i)]
+            : $val->[$i];
+}
+
+
+=head2 C<index_of_[% attr.name_ %]>
+
+  my $index = $obj->index_of_[% attr.name_ %]($x);
+
+Returns the index of C<$x> in Attribute C<[% attr.name %]>.
+Return C<undef> if C<$x> is not in C<[% attr.name %]>.
+
+=cut
+sub index_of_[% attr.name_ %] ($$)
+{
+  my ($self, $x) = @_;
+
+  [% attr.getter_before %];
+
+  my $val = [% attr.loc %] ||= [ ];
+
+  [% attr.getter_after %];
+
+  __ummf_array_index($val, $x);
+}
+[% END %]
+
+
+=head2 C<set_[% attr.name_ %]>
+
+  $obj->set_[% attr.name_ %](@val);
+
+Sets the values of Attribute C<[% attr.name %]>.
+The elements of C<@val> must be of type L<[% attr.type %]|[% attr.type %]>.
+Returns C<$obj>.
+
+=cut
+sub set_[% attr.name_ %] ($@)
+{
+  my ($self, @val) = @_;
+
+  [% attr.setter_before %];
+
+  for my $val ( @val ) { 
+    [% attr.typecheck %];
+  }
+  
+  [% attr.loc %] = \@val;
+  [% IF attr.weak_ref %]for my $x ( @val ) { weaken($x); }[% END %]
+
+  [% attr.setter_after %];
+
+  $self;
+}
+
+
+[% IF attr.ordering == 'ordered' %]
+=head2 C<set_index_[% attr.name_ %]>
+
+  $obj->set_index_[% attr.name_ %]($i, $val);
+
+Sets the value of Attribute C<[% attr.name %]> at index C<$i>.
+Returns self.
+
+=cut
+sub set_index_[% attr.name_ %] ($$$)
+{
+  my ($self, $i, $val) = @_;
+
+  [% attr.setter_before %];
+
+  my $x = [% attr.loc %] ||= [ ];
+
+  [% IF attr.weak_ref %]weaken([% END %]
+  $x->[$i] = $val
+  [% IF attr.weak_ref %])[% END %];
+
+  [% attr.setter_after %];
+
+  $self;
+}
+
+
+[% END %]
+=head2 C<add_[% attr.name_ %]>
+
+  $obj->add_[% attr.name_ %](@val);
+
+Adds the values of Attribute C<[% attr.name %]>.
+The elements of C<@val> must be of type L<[% attr.type %]|[% attr.type %]>.
+Returns C<$obj>.
+
+=cut
+sub add_[% attr.name_ %] ($@)
+{
+  my ($self, @val) = @_;
+
+  [% attr.setter_before %];
+
+  for my $val ( @val ) { 
+    [% attr.typecheck %];
+  }
+
+  my $x = [% attr.loc %] ||= [ ]; 
+  push(@$x, @val);
+  [% IF attr.weak_ref %]weaken($x->[-1]);[% END %]
+
+  [% attr.setter_after %];
+
+  $self;
+}
+[% IF attr.ordering == 'ordered' %]
+
+
+
+=head2 C<add_index_[% attr.name_ %]>
+
+  $obj->add_index_[% attr.name_ %]($i, @val);
+
+Add values of Attribute C<[% attr.name %]> at index C<$i>.
+Returns self.
+
+=cut
+sub add_index_[% attr.name_ %] ($$@)
+{
+  my ($self, $i, @val) = @_;
+
+  [% attr.setter_before %];
+
+  my $x = [% attr.loc %] ||= [ ];
+
+  splice(@$x, $i, 0, @val);
+  [% IF attr.weak_ref %]grep(weaken($_), @{$x}[$i .. ($i + $#val)]) if @val;[% END %]
+
+  [% attr.setter_after %];
+
+  $self;
+}
+[% END %]
+
+
+=head2 C<remove_[% attr.name_ %]>
+
+  $obj->remove_[% attr.name_ %](@val);
+
+Removes values from Attribute C<[% attr.name %]>.
+The elements of C<@val> must be of type L<[% attr.type %]|[% attr.type %]>.
+Returns C<$obj>.
+
+=cut
+sub remove_[% attr.name_ %] ($@)
+{
+  my ($self, @val) = @_;
+
+  [% attr.setter_before %];
+
+  for my $val ( @val ) { 
+    [% attr.typecheck %];
+  }
+
+  my $x = [% attr.loc %] ||= [ ];
+  __ummf_array_delete_each($x, \@val);
+
+  [% attr.setter_after %];
+
+  $self;
+}
+[% IF attr.ordering == 'ordered' %]
+
+
+
+=head2 C<remove_index_[% attr.name_ %]>
+
+  $obj->remove_index_[% attr.name_ %]($i, $count);
+  $obj->remove_index_[% attr.name_ %]($i);
+
+Remove the values of Attribute C<[% attr.name %]> at index C<$i> (or between index C<$i> and C<$i + $count - 1>, inclusive).
+Returns self.
+
+=cut
+sub remove_index_[% attr.name_ %] ($$@)
+{
+  my ($self, $i, $count) = @_;
+
+  $count ||= 1;
+
+  [% attr.setter_before %];
+
+  my $x = [% attr.loc %] ||= [ ];
+
+  splice(@$x, $i, $count);
+
+  [% attr.setter_after %];
+
+  $self;
+}
+[% END %]
+
+
+=head2 C<clear_[% attr.name_ %]>
+
+  $obj->clear_[% attr.name_ %];
+
+Removes all values from Attribute C<[% attr.name %]>.
+Returns C<$obj>.
+
+=cut
+sub clear_[% attr.name_ %] ($)
+{
+  my ($self) = @_;
+
+  [% attr.setter_before %];
+
+  [% attr.loc %] = [ ];
+
+  [% attr.setter_after %];
+	      
+  $self;
+}
+
+
+=head2 C<count_[% attr.name_ %]>
+
+  $obj->count_[% attr.name_ %];
+
+Returns the number of elements in C<[% attr.name %]>.
+
+=cut
+sub count_[% attr.name_ %] ($)
+{
+  my ($self) = @_;
+
+  [% attr.getter_before %];
+
+  my $val = [% attr.loc %];
+
+  [% attr.getter_after %];
+
+  $val ? scalar @$val : 0;
+}
+
+
+[% END %]
+[% END %]
+
+
+#################################################################
+# Association
+#
+
+[% FOREACH cls_end = cls.association %]
+[% FOREACH end = cls_end.opposite %]
+[% NEXT UNLESS end.isNavigable %]
+
+=for html <hr/>
+
+=cut
+
+#################################################################
+# AssociationEnd [% cls_end.name %] <---> [% end.name %]
+
+# type = [% end.type %]
+
+# multiplicity = [% end.multi %]
+
+# ordering = [% end.ordering %]
+
+[% IF end.multi_single %]
+
+=head2 C<[% end.name_ %]>
+
+  my $val = $obj->[% end.name_ %];
+
+Returns the AssociationEnd C<[% end.name %]> value of type L<[% end.type %]|[% end.type %]>.
+
+=cut
+sub [% end.name_ %] ($)
+{
+  my ($self) = @_;
+		  
+  [% end.loc %];
+}
+
+
+=head2 C<set_[% end.name_ %]>
+
+  $obj->set_[% end.name_ %]($val);
+
+Sets the AssociationEnd C<[% end.name %]> value.
+C<$val> must of type L<[% end.type %]|[% end.type %]>.
+Returns C<$obj>.
+
+=cut
+sub set_[% end.name_ %] ($$)
+{
+  my ($self, $val) = @_;
+		  
+  no warnings; # Use of uninitialized value in string ne at ...
+		  
+  my $old;
+  if ( ($old = [% end.loc %]) ne $val ) { # Recursion lock
+
+    if ( defined $val ) { [% end.typecheck %] }
+
+    # Recursion lock
+    [% IF end.weak_ref %]weaken([% END %]
+    [% end.loc %] = $val
+    [% IF end.weak_ref %])[% END %];
+
+    # Remove and add associations with other ends.
+    [% other(end=end) %]
+  }
+		  
+  $self;
+}
+
+
+=head2 C<add_[% end.name_ %]>
+
+  $obj->add_[% end.name_ %]($val);
+
+Adds the AssociationEnd C<[% end.name %]> value.
+C<$val> must of type L<[% end.type %]|[% end.type %]>.
+Throws exception if a value already exists.
+Returns C<$obj>.
+
+=cut
+sub add_[% end.name_ %] ($$)
+{
+  my ($self, $val) = @_;
+
+  no warnings; # Use of uninitialized value in string ne at ...
+
+  my $old;
+  if ( ($old = [% end.loc %]) ne $val ) { # Recursion lock
+    [% end.typecheck %];
+      
+    # confess("[% cls.package %]::[% end.name_ %]: too many")
+    # if defined [% end.loc %];
+
+    # Recursion lock
+    [% IF end.weak_ref %]weaken([% END %]
+    [% end.loc %] = $val
+    [% IF end.weak_ref %])[% END %];
+
+    # Remove and add associations with other ends.
+    [% other(end=end) %]
+
+  }
+
+  $self;
+}
+
+
+=head2 C<remove_[% end.name_ %]>
+
+  $obj->remove_[% end.name_ %]($val);
+
+Removes the AssociationEnd C<[% end.name %]> value C<$val>.
+Returns C<$obj>.
+
+=cut
+sub remove_[% end.name_ %] ($$)
+{
+  my ($self, $val) = @_;
+
+  no warnings; # Use of uninitialized value in string ne at ...
+
+  my $old;
+  if ( ($old = [% end.loc %]) eq $val ) { # Recursion lock
+    $val = [% end.loc %] = undef;         # Recursion lock
+
+    # Remove and add associations with other ends.
+    [% other(end=end) %]
+
+  }
+}
+
+
+=head2 C<clear_[% end.name_ %]>
+
+  $obj->clear_[% end.name_ %];
+
+Clears the AssociationEnd C<[% end.name %]> links to L<[% end.type %]|[% end.type %]>.
+Returns C<$obj>.
+
+=cut
+sub clear_[% end.name_ %] ($@)
+{
+  my ($self) = @_;
+
+  my $old;
+  if ( defined ($old = [% end.loc %]) ) { # Recursion lock
+    my $val = [% end.loc %] = undef;      # Recursion lock
+
+    # Remove and add associations with other ends.
+    [% other(end=end) %]
+  }
+
+  $self;
+}
+
+
+=head2 C<count_[% end.name_ %]>
+
+  $obj->count_[% end.name_ %];
+
+Returns the number of elements of type L<[% end.type %]|[% end.type %]> associated with C<[% end.name %]>.
+
+=cut
+sub count_[% end.name_ %] ($)
+{
+  my ($self) = @_;
+
+  my $x = [% end.loc %];
+
+  defined $x ? 1 : 0;
+}
+
+
+[% ELSE %]
+
+=head2 C<[% end.name_ %]>
+
+  my @val = $obj->[% end.name_ %];
+  my $ary_val = $obj->[% end.name_ %];
+
+Returns the AssociationEnd C<[% end.name %]> values of type L<[% end.type %]|[% end.type %]>.
+In array context, returns all the objects in the Association.
+In scalar context, returns an array ref of all the objects in the Association.
+
+=cut
+sub [% end.name_ %] ($)
+{
+  my ($self) = @_;
+
+  [% IF end.container_type == 'ARRAY' %]
+  my $x = [% end.loc %] ||= [ ];
+
+  wantarray ? @{$x} : $x;
+  [% ELSE %]
+  my $x = [% end.loc %];
+
+  # confess("Container for [% end.name_ %] $x is not a blessed ref: " . Data::Dumper->new([ $self ], [qw($self)])->Maxdepth(2)->Dump()) if $x && ref($x) !~ /::/;
+ 
+  wantarray ? ($x ? $x->members() : ()) : [ $x ? $x->members() : () ];
+  [% END %]
+
+}
+[% IF end.ordering == 'ordered' %]
+[% IF end.container_type == 'ARRAY' %]
+
+
+=head2 C<index_[% end.name_ %]>
+
+  my $x = $obj->index_[% end.name_ %]($i);
+  my @x = $obj->index_[% end.name_ %]($i, $count);
+
+In scalar context, returns the value of AssociationEnd C<[% end.name %]> at index C<$i>.
+In array context, returns the values between index C<$i> and C<$i + $count - 1>, inclusive.
+
+=cut
+sub index_[% end.name_ %] ($$@)
+{
+  my ($self, $i, $count) = @_;
+
+  [% end.getter_before %];
+
+  my $val = [% end.loc %] ||= [ ];
+
+  [% end.getter_after %];
+
+  wantarray ? $val->[$i .. (defined $count ? $i + $count - 1 : $i)]
+            : $val->[$i];
+}
+
+
+=head2 C<index_of_[% end.name_ %]>
+
+  my $index = $obj->index_of_[% end.name_ %]($val);
+
+Returns the index of C<$val> in AssociationEnd C<[% end.name %]>.
+Return C<undef> if C<$val> is not in C<[% end.name %]>.
+
+=cut
+sub index_of_[% end.name_ %] ($$)
+{
+  my ($self, $x) = @_;
+
+  [% end.getter_before %];
+
+  my $val = [% end.loc %] ||= [ ];
+
+  [% end.getter_after %];
+
+  __ummf_array_index($val, $x);
+}
+[% END %]
+[% END %]
+
+
+=head2 C<set_[% end.name_ %]>
+
+  $obj->set_[% end.name_ %](@val);
+
+Sets the AssociationEnd C<[% end.name %]> value.
+Elements of C<@val> must of type L<[% end.type %]|[% end.type %]>.
+Returns C<$obj>.
+
+=cut
+sub set_[% end.name_ %] ($@)
+{
+  my ($self, @val) = @_;
+  
+  $self->clear_[% end.name_ %];
+  $self->add_[% end.name_ %](@val);
+}
+
+
+[% IF end.ordering == 'ordered' %]
+[% IF end.container_type == 'ARRAY' %]
+=head2 C<set_index_[% end.name_ %]>
+
+  $obj->set_index_[% end.name_ %]($i, $val);
+
+Sets the value of AssociationEnd C<[% end.name %]> at index C<$i>.
+Returns self.
+
+=cut
+sub set_index_[% end.name_ %] ($$$)
+{
+  my ($self, $i, $val) = @_;
+
+  [% end.setter_before %];
+
+  my $x = [% end.loc %] ||= [ ];
+
+  no warnings;
+  my $old;
+  if ( ($old = $x->[$i]) ne $val) {
+    # Recursion lock
+    [% IF end.weak_ref %]weaken([% END %]
+    $x->[$i] = $val
+    [% IF end.weak_ref %])[% END %];
+
+    # Remove and add associations with other ends.
+    [% other(end=end) %]
+
+    [% end.setter_after %];
+  }
+
+  $self;
+}
+
+
+[% END %]
+[% END %]
+=head2 C<add_[% end.name_ %]>
+
+  $obj->add_[% end.name_ %](@val);
+
+Adds AssociationEnd C<[% end.name %]> values.
+Elements of C<@val> must of type L<[% end.type %]|[% end.type %]>.
+Returns C<$obj>.
+
+=cut
+sub add_[% end.name_ %] ($@)
+{
+  my ($self, @val) = @_;
+  
+  [% IF end.container_type == 'ARRAY' %]
+  my $x = [% end.loc %] ||= [ ];
+  [% ELSE %]
+  my $x = [% end.loc %] ||= Set::Object->new();
+  [% END %]
+  my $old; # Place holder for other MACRO.
+  
+  for my $val ( @val ) {
+    # Recursion lock
+    [% IF end.container_type == 'ARRAY' %]
+    next if grep($_ eq $val, @$x);
+    [% ELSE %]
+    next if $x->includes($val);
+    [% END %]
+    [% end.typecheck %];
+
+    # Recursion lock
+    [% IF end.container_type == 'ARRAY' %]
+    push(@{$x}, $val);
+    [% IF end.weak_ref %]weaken($x->[-1]);[% END %]
+    [% ELSE %]
+    $x->insert($val);
+    # weaken?
+    [% END %]
+
+    # Remove and add associations with other ends.
+    [% other(end=end) %]
+  }
+  
+  $self;
+}
+
+
+[% IF end.ordering == 'ordered' %]
+=head2 C<add_index_[% end.name_ %]>
+
+  $obj->add_index_[% end.name_ %]($i, @val);
+
+Adds AssociationEnd C<[% end.name %]> values at index C<$i>.
+Elements of C<@val> must of type L<[% end.type %]|[% end.type %]>.
+Returns C<$obj>.
+
+=cut
+sub add_index_[% end.name_ %] ($$@)
+{
+  my ($self, $i, @val) = @_;
+
+  [% end.setter_before %]
+
+  [% IF end.container_type == 'ARRAY' %]
+  my $x = [% end.loc %] ||= [ ];
+  [% ELSE %]
+  my $x = [% end.loc %] ||= Set::Object->new();
+  [% END %]
+  my $old; # Place holder for other MACRO.
+  
+  for my $val ( @val ) {
+    # Recursion lock
+    [% IF end.container_type == 'ARRAY' %]
+    next if grep($_ eq $val, @$x);
+    [% ELSE %]
+    next if $x->includes($val);
+    [% END %]
+    [% end.typecheck %];
+
+    # Recursion lock
+    [% IF end.container_type == 'ARRAY' %]
+    splice(@{$x}, $i, 0, $val); # Recursion lock
+    [% IF end.weak_ref %]weaken($x->[$i]);[% END %]
+    ++ $i;
+    [% ELSE %]
+    $x->insert($val);            # Recursion lock
+    # weaken?
+    [% END %]
+
+    # Remove and add associations with other ends.
+    [% other(end=end) %]
+  }
+  
+  [% end.setter_after %]
+
+  $self;
+}
+
+
+[% END %]
+=head2 C<remove_[% end.name_ %]>
+
+  $obj->remove_[% end.name_ %](@val);
+
+Removes the AssociationEnd C<[% end.name %]> values C<@val>.
+Elements of C<@val> must of type L<[% end.type %]|[% end.type %]>.
+Returns C<$obj>.
+
+=cut
+sub remove_[% end.name_ %] ($@)
+{
+  my ($self, @val) = @_;
+  
+  [% IF end.container_type == 'ARRAY' %]
+  my $x = [% end.loc %] ||= [ ];
+  [% ELSE %]
+  my $x = [% end.loc %] ||= Set::Object->new();
+  [% END %]
+
+  for my $old ( @val ) {
+    # Recursion lock
+    [% IF end.container_type == 'ARRAY' %]
+    my $i; # index of $old in @$x.
+    next unless defined($i = __ummf_array_index($x, $old));
+    [% ELSE %]
+    next unless $x->includes($old);
+    [% END %]
+
+    my $val = $old;
+      
+    [% end.typecheck %];
+
+    # Recursion lock
+    [% IF end.container_type == 'ARRAY' %]
+    splice(@$x, $i, 1); [% # splice() preserves weaken() upon delete. %]
+    [% ELSE %]
+    $x->remove($old);
+    [% END %]
+
+    $val = undef;
+
+    # Remove associations with other ends.
+
+    [% other(end=end) %];
+
+  }
+  
+  $self;
+}
+
+
+=head2 C<clear_[% end.name_ %]>
+
+  $obj->clear_[% end.name_ %];
+
+Clears the AssociationEnd C<[% end.name %]> links to L<[% end.type %]|[% end.type %]>.
+Returns C<$obj>.
+
+=cut
+sub clear_[% end.name_ %] ($) 
+{
+  my ($self) = @_;
+  
+  [% IF end.container_type == 'ARRAY' %]
+  my $x = [% end.loc %] ||= [ ];
+  [% ELSE %]
+  my $x = [% end.loc %] ||= Set::Object->new();
+  [% END %]
+
+  my $val; # Place holder for other MACRO.
+  
+  [% IF end.container_type == 'ARRAY' %]
+  [% end.loc %] = [ ];  # Recursion lock
+  for my $old ( @$x ) { # Recursion lock
+  [% ELSE %]
+  [% end.loc %] = Set::Object->new(); # Recursion lock
+  for my $old ( $x->members() ) {     # Recursion lock
+  [% END %]
+
+    # Remove associations with other ends.
+
+    [% other(end=end) %];
+
+  }
+  
+  $self;
+}
+
+
+=head2 C<count_[% end.name_ %]>
+
+  $obj->count_[% end.name_ %];
+
+Returns the number of elements associated with C<[% end.name %]>.
+
+=cut
+sub count_[% end.name_ %] ($)
+{
+  my ($self) = @_;
+
+  my $x = [% end.loc %];
+
+  [% IF end.container_type == 'ARRAY' %]
+  defined $x ? scalar @$x : 0;
+  [% ELSE %]
+  defined $x ? $x->size : 0;
+  [% END %]
+}
+
+
+[% END %]
+
+[% END %]
+[% END %]
+
+
+
+[% IF cls.methods %]
+################################################################/
+## Methods
+##
+
+[% FOREACH meth = cls.method %]
+[% IF meth.op.has_stereotype.create || meth.has_stereotype.create %]
+[% SET meth.op.name_impl = '___create' %]
+[% SET meth.multimethod = 1 %]
+[% SET cls.found_create = 1 %]
+[% END %]
+[% DEFAULT meth.op.name_impl = meth.op.name_ %]
+
+=head2 C<[% meth.op.name_impl %]>
+
+  $obj->[% meth.op.name_impl %]([% FOREACH param = meth.op.parameter %]$[% param.name %][%- ", " UNLESS loop.last %][% END %]);
+
+[% meth.op.documentation %]
+
+Parameters: 
+
+=over
+
+[% FOREACH param = meth.op.parameter %]
+
+=item C<$[% param.name_ %]> : L<[% param.type %]|[% param.type %]> [% IF param.defaultValue_defined %] = [% param.defaultValue %][% END %]
+
+[% END %]
+
+=back
+
+UML:
+
+  id = [% meth.id %];
+  specification.id = [% meth.op.id %];
+
+=cut
+[% IF meth.multimethod %]
+multimethod '[% meth.op.name_impl %]' => 
+(__PACKAGE__ [% FOREACH param = meth.op.parameter %][% IF param.defaultValue_defined %], '$'[% ELSE %], [% IF param.type_primitive == 'SCALAR' %]'$'[% ELSE %]'[% param.type_primitive %]'[% END %][% END %][% END %] ) => 
+sub
+[% ELSE %]
+sub [% meth.op.name_impl %] ($[% FOREACH param = meth.op.parameter %][% UNLESS param.defaultValue_defined %]$[% END %][% END %])
+[% END %]
+{
+  [% IF meth.op.debug_break %]
+  $DB::single = 1;
+  [% END %]
+[% IF cls.isaInterface %]
+  confess("Method [% meth.op.name_ %] from Interface [% cls.package %] not implemented");
+[% ELSE %]
+  my ($self[% FOREACH param = meth.op.parameter %][%- ", " %]$[% param.name_ %][% END %]) = @_;
+  [% FOREACH param = meth.op.parameter %]
+  [% IF param.defaultValue_defined %]
+  $[% param.name_ %] = [% param.defaultValue %] unless defined $[% param.name_ %]; # defaultValue
+  [% END %]
+  [% END %]
+  [% IF meth.body_defined %]
+  [% meth.body %]
+  [% ELSE %]
+  confess('Method ' . '[% cls.package %]' . '::' . '[% meth.op.name_ %]' .' not defined; try using tagged value "ummf.Perl.body" on the UML Method; or use "# UMMF-LANG: Perl" comments in default Expression language to delimit Perl code.');
+  [% END %]
+[% END %]
+
+};
+# End of Class [% cls.name %] Method [% meth.op.name %] 
+
+
+[% END %]
+
+
+[% UNLESS cls.found_create %]
+
+=head2 C<___create>
+
+Placeholder for undefined <<create>> Method.
+
+See also: C<__create>.
+
+=cut
+multimethod '___create'
+=> (__PACKAGE__)
+=> sub { shift; };
+
+[% END %]
+
+# End of Class [% cls.name %] Methods
+
+
+[% END %]
+
+# End of Class [% cls.name %]
+
+[% cls.footer %]
+
+
+=pod
+
+=for html <hr/>
+
+I<END OF DOCUMENT>
+
+=cut
+
+############################################################################
+
+1; # is true!
+
+############################################################################
+
+### Keep these comments at end of file: kstephens@users.sourceforge.net 2003/04/06 ###
+### Local Variables: ###
+### mode:perl ###
+### perl-indent-level:2 ###
+### perl-continued-statement-offset:0 ###
+### perl-brace-offset:0 ###
+### perl-label-offset:0 ###
+### End: ###
+
+#//-// FILE END [% cls.package_file %]
+[% END %]
+
+############################################################################
+
+### Keep these comments at end of file: kstephens@users.sourceforge.net 2003/04/06 ###
+### Local Variables: ###
+### mode:perl ###
+### perl-indent-level:2 ###
+### perl-continued-statement-offset:0 ###
+### perl-brace-offset:0 ###
+### perl-label-offset:0 ###
+### End: ###
+

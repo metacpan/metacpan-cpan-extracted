@@ -1,0 +1,356 @@
+/* -*- C++ -*- */
+
+/**********************************************************************
+ **********************************************************************
+ ****
+ **** MOF 1.3 Meta-model Specification
+ **** Based on  MOF 1.3 formal/00-04-03.pdf
+ **** Author: kurt@umleta.com
+ **** Version: $Revision: 1.1 $
+ **** Date: 2006/05/12
+ **** Reference: http://ummf.umleta.com/
+ ****
+ **** Note: This document is machine-readable by UMMF::Import::UMMFModel;
+ **** Please see it for language definition.
+ ****
+ **** This specification is incomplete.
+ ****
+ **********************************************************************
+ **********************************************************************
+ */
+
+Model "MOF 1.3 formal/00-04-03"
+{
+  { 
+    <<taggedValue>> "ummf.version" : "1.3";
+    <<taggedValue>> "ummf.xmi.nstag" : "Model";
+    <<taggedValue>> "ummf.xmi.nsdef" : "omg.org/mof.Model/1.3";
+  }
+
+  Package Model
+  {
+
+    /* 3.4.1 */
+    Class /ModelElement/ {
+      name : String;
+      /* /qualifiedName : String[1..*] {ordered}; */
+      annotation : String;
+
+      /*
+      ----
+	findRequiredElements(kinds : { in } String[1..*], recursive : { in } Boolean) : ModelElement; # kinds : see 7.8 "MOF Model Constants"
+        isRequiredBecause(otherElement : { in } ModelElement, reason { out } : String) : Boolean;
+        isFrozen() : Boolean;
+        isVisible(otherElement : { in } ModelElement) : Boolean;
+      */
+      
+      /* 3.5.9 {DERIVED} */
+      @ @ DependsOn
+          +provider 0..*   , +dependent : ModelElement 0..*;
+    }
+
+    /* 3.4.2 */
+    Class /Namespace/ : ModelElement {
+      /*
+      ----
+      lookupElement(name : String {in) : ModelElement <<raises>> NameNotFound;
+      resolveQualifiedName(qualifiedName : {in, ordered} String [1..*]) : ModelElement <<raises>> NameNotResolved;
+      findElementsByType(ofType : Class {in}, includeSubtypes : Boolean {in} ) : ModelElement [0..*] {ordered};
+      nameIsValid(proposedName : String {in}) : Boolean;
+      */
+
+      /* 3.5.1 */
+      @ @ Contains
+      <#> +container 0..1  , +containedElement : ModelElement 0..* { ordered };
+    }
+
+    /* 3.4.3 */
+    Class /GeneralizableElement/ : Namespace {
+      isRoot : Boolean;
+      isLeaf : Boolean;
+      isAbstract : Boolean;
+      visibility : VisibilityKind;
+
+      /*
+      ----
+      allSupertypes() : {ordered, unique} GeneralizeableElement [0..*];
+      lookupElementExtended(name : {in} String) : ModelElement <<raises>> NameNotFound;
+      findElementByTypeExtended(ofType : {in} Class, includeSubtypes : {in} Boolean) : {ordered, unique} GeneralizeableElement [0..*] ;
+      */
+
+      /* 3.5.2 */
+      @ @ Generalizes
+          +subtype 0..* , +supertype : GeneralizableElement 0..* { ordered };
+    }
+
+    /* 3.4.4 */
+    Class /TypedElement/ : ModelElement {
+
+      /* 3.5.5 */
+      @@ IsOfType
+          +typedElements 0..* , +type : Classifier 1 ;
+    }
+
+    /* 3.4.5 */
+    Class /Classifier/ : GeneralizableElement {
+      ;
+    }
+
+    /* 3.4.6 */
+    Class "Class" : Classifier {
+      isSingleton : Boolean;
+    }
+
+    /* 3.4.7 */
+    Class DataType : Classifier {
+      ;
+    }
+
+    /* 3.4.8 */
+    Class TypeAlias : TypedElement {
+      ;
+    }
+
+    /* 3.4.9 */
+    Class /Feature/ : ModelElement {
+      scope : ScopeKind;
+      visibility : VisibilityKind;
+    }
+
+    /* 3.4.10 */
+    Class StructureType : DataType {
+      ;
+    }
+
+    /* 3.4.11 */
+    Class Attribute : StructuralFeature {
+      isDerived : Boolean;
+    }
+
+    /* 3.4.12 */
+    Class Reference : StructuralFeature {
+      /* 3.5.3 */
+      @ @ RefersTo
+            +referent 0..*   , +referencedEnd : AssociationEnd 1;
+
+      /* 3.5.4 */
+      @ @ Exposes
+            +referrer 0..*   , +exposedEnd  : AssociationEnd 1;      
+    }
+
+
+    /* 3.4.13 */
+    Class /BehavioralFeature/ : Feature {
+      ;
+    }
+
+    /* 3.4.14 */
+    Class Operation : BehavioralFeature {
+      isQuery : Boolean;
+
+      /* 3.5.6 */
+      @ @ CanRaise
+            +operation 0..* , +except  : Exception [0..*] { ordered };      
+    }
+
+    /* 3.4.15 */
+    Class Exception : BehavioralFeature {
+      ;
+    }
+
+
+    /* 3.4.16 */
+    Class Association : Classifier {
+      isDerived : Boolean;
+    }
+
+
+    /* 3.4.17 */
+    Class AssociationEnd : TypedElement {
+      isNavigable : Boolean;
+      aggregation : AggregationKind;
+      multiplicity : MultiplicityType;
+      isChangeable : Boolean;
+	/*
+	----
+        otherEnd() : AssociationEnd;
+	*/
+    }
+
+    /* 3.4.18 */
+    Class Package : GeneralizableElement {
+      ;
+    }
+
+    /* 3.4.19 */
+    Class Import : ModelElement {
+      visibility : VisibilityKind;
+      isClustered : Boolean;
+
+      /* 3.5.7 */
+      @ @ Aliases
+          +importer 0..* , +imported : Namespace;
+    }
+
+    /* 3.4.20 */
+    Class Parameter : TypedElement {
+      direction : DirectionKind;
+      multiplicity : MultiplicityType;
+    }
+
+    /* 3.4.21 */
+    Class Constraint : ModelElement {
+      expression : String;
+      language : String;
+      evaluationPolicy : EvaluationKind;
+
+      /* 3.5.8 */
+      @ @ Constrains
+          +constraint 0..* , +constrainedElement : ModelElement 1..*;
+    }
+
+    /* 3.4.22 */
+    Class Constant : TypedElement {
+      value : String;
+    }
+
+    /* 3.4.23 */
+    Class Tag : ModelElement {
+      tagId : String;
+      values : String [0..*] {unordered};
+
+      /* 3.5.10 */
+      @ @ AttachesTo
+          +tag 0..* { ordered } , +modelElement : ModelElement 1..*;
+    }
+
+
+    /* 7.4.9 CollectionType */
+    Class CollectionType : DataType, TypedElement {
+      multiplicity : MultiplicityType;
+    }
+
+    /* 7.4.10 EnumerationType */
+    Class EnumerationType : DataType {
+      labels : String [1..*] /* {ordered, unique} */;
+    }
+
+    /* 7.4.13 */
+    Class StructureField : TypedElement {
+      ;
+    }
+
+    /* 7.4.15 */
+    Class /StructuralFeature/ : Feature, TypedElement {
+      multiplicity : MultiplicityType;
+      isChangeable : Boolean;
+    }
+
+    /* 3.6.5 */
+    Class MultiplicityType {
+      lower : Integer;
+      upper : Integer;
+      isOrdered : Boolean;
+      isUnique : Boolean;
+    }
+    
+    /* 3.6.6 */
+    Enumeration VisibilityKind {
+      public_vis;
+      protected_vis;
+      private_vis;
+    }
+
+    /* 3.6.7 */
+    Enumeration DepthKind {
+      shallow;
+      deep;
+    }
+
+    /* 3.6.8 */
+    Enumeration DirectionKind {
+      in_dir;
+      out_dir;
+      inout_dir;
+      return_dir;
+    }
+
+    /* 3.6.9 */
+    Enumeration ScopeKind {
+      instance_level;
+      classifer_level;
+    }
+
+    /* 3.6.10 */
+    Enumeration AggregationKind {
+      none;
+      shared;
+      composite;
+    }
+
+    /* 3.6.11 */
+    Enumeration EvaluationKind {
+      immediate;
+      deferred;
+    }
+
+    /* 3.6.12 */
+    /*
+     Alias to String
+     Enumeration DependencyKind {
+    }
+    */
+
+    /* 3.6.13 */
+    /*
+     Alias to String
+     Enumeration FormatType {
+    }
+    */
+
+    /* 3.6.14 */
+    /*
+     Alias to ANY
+     Enumeration LiteralType {
+    }
+    */
+
+    /* 3.6.15 */
+    Enumeration VerifyResultKind {
+      valid;
+      invalid;
+      published;
+    }
+
+    /* 3.6.16 */
+    Class ViolationType {
+      type : String;
+      elementInError : Model::Reflective::RefObject;
+      valuesInError : Model::Reflective::NamedValueList;
+      errorDescription : String;
+    }
+ 
+    /* ??? */
+    Class PrimitiveType : DataType {
+      ;
+    }
+
+    Primitive Boolean : PrimitiveType;
+    Primitive Integer : PrimitiveType;
+    Primitive String : PrimitiveType;
+
+    Primitive Long : PrimitiveType;
+    Primitive Float : PrimitiveType;
+    Primitive Double : PrimitiveType;
+
+    Package Reflective {
+      Class RefBaseObject;
+      Class RefObject;
+      Class RefObjectUList;
+      Class RefAssociation;
+      Class RefPackage;
+      Class NamedValueList;
+    }
+  }
+} /* Model END */
+

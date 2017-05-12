@@ -1,0 +1,114 @@
+URI-NamespaceMap
+================
+
+Created:      2012-08-27
+Home page:    <https://metacpan.org/module/URI::NamespaceMap>
+Bug tracker:  <https://github.com/kjetilk/URI-NamespaceMap/issues>
+Maintainer:   Kjetil Kjernsmo <kjetilk@cpan.org>
+Maintainer:   Gregory Todd Williams <gwilliams@cpan.org>
+Maintainer:   Chris Prather (PERIGRIN) <chris@prather.org>
+
+1.00	2017-01-18	Check prefixes so they don't conflict with existing methods.
+
+ - Added: Prefixes that will conflict with existing methods will throw an
+   error.
+   Paul Williams++
+ - Improve the BUILDARGS code.
+   Chris Prather++
+ - Minor cleanups.
+ - Removed: Remove strict/warnings pragmas where Moo is used.
+   Paul Williams++
+
+0.32	2016-12-29	New guessing method and improved diagnostics.
+
+ [ Bug Fixes ]
+ - Rework some tests that fails in strange ways.
+
+ [ Other ]
+ - Added: Add method for adding guesses post-construction.
+ - Use carp instead of warns.
+
+0.30	2016-02-12	Test bugfix.
+
+ [ Bug Fixes ]
+ - Remove a test because toolchain makes it hard to get the correct
+   version.
+
+0.28	2015-09-23	Bugfix release.
+
+ [ Bug Fixes ]
+ - Had forgotten to update error messages.
+
+0.26	2015-09-01	Support for RDF::NS::Curated.
+
+ - Support for RDF::NS::Curated.
+
+0.24	2014-12-10	Improve documentation.
+
+ [ Bug Fixes ]
+ - Use a string comparison in failing test.
+
+ [ Other ]
+ - Improve documentation, autoloader.
+ - Reindent using Emacs smart-tabs.
+ - Some code cleanup.
+
+0.22	2014-10-15	Clean up source tree.
+
+ - Clean up source tree.
+
+0.21	2014-10-05	Fix missing Changes.
+
+ [ Bug Fixes ]
+ - Fix missing Changes.
+
+0.20	2014-10-05	Moo refactoring.
+
+ - Added: Warn the user when they have too old RDF::NS but not in automated
+   tests.
+ - Convert packaging to Dist::Inkt.
+   Toby Inkster++
+ - Port to Moo.
+   Toby Inkster++
+
+0.12	2014-09-29	Support IRI module.
+
+ [ Bug Fixes ]
+ - Silence warnings when URI doesn't have local part.
+
+ [ Other ]
+ - Added: Link Debian packages in metadata.
+ - Added: Support the new IRI module.
+   Gregory Todd Williams++
+ - Added: Use Types::URI.
+ - Added: Warn the user in test when they have too old RDF::NS.
+
+0.10	2014-05-21	Compatibility with RDF::Trine::NamespaceMap.
+
+ - Added: Make it possible to send local part to the uri method of
+   URI::Namespace.
+   Chris Prather++
+
+0.08	2014-05-19	Prefix guessing.
+
+ [ Bug Fixes ]
+ - Fix breakage in terms with hyphens.
+   Dorian Taylor++
+
+ [ Other ]
+ - Added: Prefix guessing using RDF::NS, RDF::Prefixes or XML::CommonNS.
+
+0.06	2012-11-28	Bugfix release.
+
+ [ Bug Fixes ]
+ - URI::Namespace must be used from URI::NamespaceMap.
+
+0.04	2012-10-23	Reverse lookups.
+
+ - Added: Adding reverse lookups, i.e. abbreviation and prefix_for.
+   Dorian Taylor++
+ - Stop using blank node in makefile.ttl to fix version_from.
+
+0.02	2012-08-30	Minor bugfixes.
+
+0.01	2012-08-28	Initial release.

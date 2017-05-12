@@ -1,0 +1,17 @@
+[% IF tree.data %]
+    <li>
+        <a href="/detail-for-class/[% tree.data.item('name') %]" class="btn btn-small class-detail">
+        <i class="icon-file"></i>&nbsp;<span class="trunc-left">[% tree.name %]</span></a>
+    </li>
+[% END %]
+[% IF tree.has_children %]
+    <li>
+        <input type="checkbox" id="[% tree.id %]" />
+        <label for="[% tree.id %]"><span class="trunc-left">[% tree.name %]</span></label>
+            <ul>
+            [% FOREACH child IN tree.children %]
+                [% PROCESS partials/path_treeview.html tree = child %]
+            [% END %]
+            </ul>
+    </li>
+[% END %]

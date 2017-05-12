@@ -1,0 +1,12 @@
+1.03    2016-09-03
+
+  - Set URI version in PREREQ_PM.
+  - Add license and repository in Makefile.PL.
+
+1.02    2012-01-13
+
+  - Return true in URI::secure.
+
+1.01    2004-08-07
+
+  - Initial version.

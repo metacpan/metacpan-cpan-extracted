@@ -1,0 +1,32 @@
+Installing URI-Encode
+Mithun Ayachit
+
+
+
+DISTRIBUTION PAGE
+
+
+The latest and all previous releases for URI-Encode can be downloaded
+from https://metacpan.org/release/URI-Encode
+
+
+
+INSTALL USING cpanm
+
+
+URI-Encode can be installed with cpanm using the following command
+
+    cpanm .
+
+
+
+INSTALL USING Module::Build
+
+
+URI-Encode can be installed with Module::Build using the following
+commands
+
+    perl ./Build.PL
+    ./Build
+    ./Build test
+    ./Build install

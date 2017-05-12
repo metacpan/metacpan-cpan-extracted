@@ -1,0 +1,52 @@
+
+
+=pod
+
+=head1 NAME
+
+ur update tab-completion-spec - Creates a .opts file beside class/module passed as argument, e.g. UR::Namespace::Command.
+
+
+
+=head1 VERSION
+
+This document describes ur update tab-completion-spec version 0.29.
+
+=head1 SYNOPSIS
+
+ur update tab-completion-spec [--output=?] CLASSNAME
+
+
+
+=head1 REQUIRED ARGUMENTS
+
+=over
+
+
+=item CLASSNAME  I<Text>
+
+The base class to use as trunk of command tree, e.g. UR::Namespace::Command
+
+
+=back
+
+=head1 OPTIONAL ARGUMENTS
+
+=over
+
+
+=item output  I<Text>
+
+Override output location of the opts spec file.
+
+
+=back
+
+=head1 DESCRIPTION:
+
+  Creates a .opts file beside class/module passed as argument, e.g. UR::Namespace::Command.
+
+
+
+=cut
+

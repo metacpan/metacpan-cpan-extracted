@@ -1,0 +1,287 @@
+#!/usr/bin/perl
+use v5.14;
+use warnings;
+use Glib qw( TRUE FALSE );
+use GStreamer1;
+use Digest::Adler32::XS;
+use IO::Socket::INET ();
+use IO::Select ();
+use Getopt::Long ();
+
+use constant {
+    VIDEO_MAGIC_NUMBER => 0xFB42,
+    VIDEO_VERSION      => 0x0000,
+    VIDEO_ENCODING     => 0x0001,
+};
+use constant {
+    FLAG_HEARTBEAT => 0,
+};
+use constant HEARTBEAT_TIMEOUT_SEC       => 5;
+use constant HEARTBEAT_SEND_INTERVAL_SEC => 60;
+use constant LISTEN_PORT                 => 49001;
+use constant TYPE_TO_CLASS => {
+    'rpi' => [
+        'rpicamsrc',
+    ],
+    'stdin' => [
+        'fdsrc',
+    ],
+};
+
+#my $INPUT_DEV        = '/dev/video0';
+my $WIDTH  = 1280;
+my $HEIGHT = 720;
+my $PORT   = 49001;
+my $TYPE   = 'rpi';
+Getopt::Long::GetOptions(
+    #'input=s'  => \$INPUT_DEV,
+    'w|width=i'  => \$WIDTH,
+    'h|height=i' => \$HEIGHT,
+    'p|port=i'   => \$PORT,
+    't|type=s'   => \$TYPE,
+);
+die "Type '$TYPE' is not supported\n"
+    unless exists TYPE_TO_CLASS->{$TYPE};
+
+
+sub bus_callback
+{
+    my ($bus, $msg, $loop) = @_;
+
+    if( $msg->type & "error" ) {
+        warn $msg->error;
+        $loop->quit;
+    }
+    elsif( $msg->type & "eos" ) {
+        warn "End of stream, quitting\n";
+        $loop->quit;
+    }
+
+    return TRUE;
+}
+
+sub get_catch_handoff_callback
+{
+    my ($args) = @_;
+    my $print_callback        = $args->{print_callback};
+    my $check_client_callback = $args->{check_client_callback};
+    my $add_to_pending_heartbeats_callback =
+        $args->{add_to_pending_heartbeats_callback};
+    my $digest = Digest::Adler32::XS->new;
+    my $called = 0;
+
+    my $callback = sub {
+        my ($sink, $data_buf, $pad) = @_;
+        my $frame_size = $data_buf->get_size;
+        my $frame_data = $data_buf->extract_dup( 0, $frame_size,
+            undef, $frame_size );
+        my $data = pack "C*", @$frame_data;
+
+        $digest->add( $data );
+        my $checksum = $digest->hexdigest;
+        warn "Frame $called, Buffer size: $frame_size, Checksum: $checksum\n";
+
+        output_video_frame( $data, $frame_size, $checksum, $WIDTH, $HEIGHT,
+            $print_callback, $check_client_callback,
+            $add_to_pending_heartbeats_callback );
+
+        $called++;
+        return 1;
+    };
+
+    return $callback;
+}
+
+sub output_video_frame
+{
+    my ($frame_data, $frame_size, $checksum_hex, $width, $height,
+        $print_callback, $check_client_callback,
+        $add_to_pending_heartbeats_callback) = @_;
+    my $flags = 0x00000000;
+
+    my $set_heartbeat_flag = $check_client_callback->();
+    if( $set_heartbeat_flag ) {
+        $add_to_pending_heartbeats_callback->( $checksum_hex );
+        $flags |= 1 << FLAG_HEARTBEAT;
+    }
+
+
+    warn "Constructing output headers\n";
+    my $out_headers = pack 'nnnNNnnC*'
+        ,VIDEO_MAGIC_NUMBER
+        ,VIDEO_VERSION
+        ,VIDEO_ENCODING
+        ,$flags
+        ,$frame_size
+        ,$width
+        ,$height
+        ,unpack( 'C*', hex($checksum_hex) )
+        ,( (0x00) x 10 ) # 10 bytes reserved
+        ;
+
+    warn "Printing headers\n";
+    $print_callback->( $out_headers );
+    warn "Print frame data\n";
+    $print_callback->( $frame_data );
+    return 1;
+}
+
+sub setup_network_callbacks
+{
+    my ($port) = @_;
+
+    my $socket = IO::Socket::INET->new(
+        LocalPort => $port,
+        Proto     => 'tcp',
+        Listen    => 1,
+        Reuse     => 1,
+        Blocking  => 0,
+    ) or die "Could not start socket on port $port: $!\n";
+    IO::Handle::blocking( $socket, 0 );
+
+    my $select              = IO::Select->new;
+    my $client              = undef;
+    my $last_heartbeat_send = undef;
+    my %pending_heartbeats  = ();
+
+    my $print_callback = sub {
+        my ($data) = @_;
+        return 1 if ! defined $client;
+        $client->send( $data );
+        return 1;
+    };
+    my $check_client_callback = sub {
+        warn "Checking client\n";
+        if( defined $client) {
+            read_heartbeat( $client, $select, \%pending_heartbeats );
+            if( is_heartbeat_expired( \%pending_heartbeats ) ) {
+                $select->remove( $client );
+                $client->close;
+                undef $client;
+                undef $last_heartbeat_send;
+                return 0;
+            }
+
+            my $time = time;
+            if( (HEARTBEAT_SEND_INTERVAL_SEC + $time) <= $last_heartbeat_send ){
+                warn "Sending heartbeat at $time\n";
+                return 1;
+            }
+        }
+        else {
+            if( my $got_client = $socket->accept ) {
+                warn "Got new client connection\n";
+                $client = $got_client;
+                $select->add( $client );
+                $last_heartbeat_send = time;
+            }
+            else {
+                warn "No client connection\n";
+            }
+        }
+
+        return 0;
+    };
+    my $add_to_heartbeat_list_callback = sub {
+        my ($digest) = @_;
+        $last_heartbeat_send = time;
+        $pending_heartbeats{$digest}
+            = $last_heartbeat_send + HEARTBEAT_TIMEOUT_SEC;
+        warn "Setting heartbeat with digest [$digest] at $last_heartbeat_send, expries at $pending_heartbeats{$digest}\n";
+        return 1;
+    };
+
+    return ($print_callback, $check_client_callback,
+        $add_to_heartbeat_list_callback);
+}
+
+sub read_heartbeat
+{
+    my ($client, $select, $pending_heartbeat) = @_;
+    warn "Reading for heartbeat\n";
+    my $buf;
+    if( $select->can_read( 0 ) && $client->recv( \$buf, 512 ) ) {
+        my ($magic_number, $digest) = unpack 'nN', $buf;
+        if( VIDEO_MAGIC_NUMBER == $magic_number ) {
+            warn "Got heartbeat from client\n";
+            delete $pending_heartbeat->{$digest};
+        }
+        else {
+            warn "Got message from client with bad magic number\n";
+        }
+    }
+    return 1;
+}
+
+sub is_heartbeat_expired
+{
+    my ($pending_heartbeats) = @_;
+    my $time = time;
+
+    foreach (keys %$pending_heartbeats) {
+        if( $pending_heartbeats->{$_} <= $time ) {
+            warn "Heartbeat $_ expiring at $$pending_heartbeats{$_}"
+                . " has expired (current time: $time)\n";
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+
+{
+    GStreamer1::init([ $0, @ARGV ]);
+    my $loop = Glib::MainLoop->new( undef, FALSE );
+
+    my ($src_name, @src_config) = @{ +TYPE_TO_CLASS->{$TYPE} };
+
+    my $pipeline = GStreamer1::Pipeline->new( 'pipeline' );
+    my $src = GStreamer1::ElementFactory::make( $src_name => 'and_who_are_you' );
+    my $h264 = GStreamer1::ElementFactory::make(
+        h264parse => 'the_proud_lord_said' );
+    my $capsfilter = GStreamer1::ElementFactory::make(
+        capsfilter => 'that_i_should_bow_so_low' );
+    my $fakesink = GStreamer1::ElementFactory::make(
+        fakesink   => 'only_a_cat_of_a_different_coat');
+
+    my $caps = GStreamer1::Caps::Simple->new( 'video/x-h264',
+        alignment       => 'Glib::String' => 'au',
+        'stream-format' => 'Glib::String' => 'byte-stream',
+        width           => 'Glib::Int'    => $WIDTH,
+        height          => 'Glib::Int'    => $HEIGHT,
+    );
+    $capsfilter->set( caps => $caps );
+
+    $src->set( @src_config ) if @src_config;
+
+    my ($print_callback, $check_client_callback,
+        $add_to_pending_heartbeats_callback) = setup_network_callbacks( $PORT );
+    $fakesink->set(
+        'signal-handoffs' => TRUE,
+    );
+    $fakesink->signal_connect(
+        'handoff' => get_catch_handoff_callback({
+            print_callback        => $print_callback,
+            check_client_callback => $check_client_callback,
+            add_to_pending_heartbeats_callback =>
+                $add_to_pending_heartbeats_callback
+        }),
+    );
+
+    my @link = ($src, $h264, $capsfilter, $fakesink);
+    $pipeline->add( $_ ) for @link;
+    foreach my $i (0 .. $#link - 1) {
+        my $this = $link[$i];
+        my $next = $link[$i+1];
+        $this->link( $next );
+    }
+
+    #$pipeline->get_bus->add_watch( \&bus_callback, $loop );
+
+    $pipeline->set_state( 'playing' );
+    $loop->run;
+
+    # Cleanup
+    $pipeline->set_state( 'null' );
+}

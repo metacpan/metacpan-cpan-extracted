@@ -1,0 +1,598 @@
+NAME
+    UMLS::Interface README
+
+  SYNOPSIS
+    This package provides a Perl interface to the Unified Medical Language
+    System (UMLS). The UMLS is a knowledge representation framework encoded
+    designed to support broad scope biomedical research queries. There
+    exists three major sources in the UMLS. The Metathesaurus which is a
+    taxonomy of medical concepts, the Semantic Network which categorizes
+    concepts in the Metathesaurus, and the SPECIALIST Lexicon which contains
+    a list of biomedical and general English terms used in the biomedical
+    domain. The UMLS-Interface package is set up to access the Metathesaurus
+    and the Semantic Network present in a MySQL database.
+
+  INSTALL
+    To install the module, run the following magic commands:
+
+      perl Makefile.PL
+      make
+      make test
+      make install
+
+    This will install the module in the standard location. You will, most
+    probably, require root privileges to install in standard system
+    directories. To install in a non-standard directory, specify a prefix
+    during the 'perl Makefile.PL' stage as:
+
+      perl Makefile.PL PREFIX=/home/programs
+
+    It is possible to modify other parameters during installation. The
+    details of these can be found in the ExtUtils::MakeMaker documentation.
+    However, it is highly recommended not messing around with other
+    parameters, unless you know what you're doing.
+
+  DATABASE SETUP
+    The interface assumes that the UMLS is present as a mysql database. The
+    names of these databases can be passed as configuration options at
+    initialization. However, if the names of the database is not provided at
+    initialization, then default values are used -- the database for the
+    UMLS is called 'umls'. The UMLS database must contain six tables: 1.
+    MRREL 2. MRCONSO 3. MRSAB 4. MRDOC 5. MRDEF 6. SRDEF 7. MRSTY
+
+    All other tables in the databases will be ignored, and any of these
+    tables missing would raise an error.
+
+    The mysql server can be on the same machine as the module or could be on
+    a remotely accessible machine. The location of the server can be
+    provided during initialization of the module.
+
+  INITIALIZING THE MODULE
+    To create an instance of the interface object, using default values for
+    all configuration options:
+
+      use UMLS::Interface;
+      my $interface = UMLS::Interface->new();
+
+    The following configuration options are also provided though:
+
+        'driver'       -> Default value 'mysql'. This option specifies the 
+                          Perl DBD driver that should be used to access the
+                          database. This implies that the some other DBMS
+                          system (such as PostgresSQL) could also be used,
+                          as long as there exist Perl DBD drivers to
+                          access the database.
+        'umls'         -> Default value 'umls'. This option specifies the name
+                          of the UMLS database.
+        'hostname'     -> Default value 'localhost'. The name or the IP 
+                          address of the machine on which the database 
+                          server is running.
+        'socket'       -> Default value '/tmp/mysql.sock'. The socket on 
+                          which the database server is using.
+        'port'         -> The port number on which the database server 
+                          accepts connections.
+        'username'     -> Username to use to connect to the database server. 
+                          If not provided, the module attempts to connect as 
+                          an anonymous user.
+        'password'     -> Password for access to the database server. If not
+                          provided, the module attempts to access the server
+                          without a password.
+
+        'forcerun'     -> This parameter will bypass any command prompts such 
+                          as asking if you would like to continue with the index 
+                          creation. 
+
+        'realtime'     -> This parameter will not create a database of path 
+                          information (what we refer to as the index) but obtain
+                          the path information about a concept on the fly
+
+        'cuilist'      -> This parameter contains a file containing a list 
+                          of CUIs in which the path information should be 
+                          store for - if the CUI isn't on the list the path 
+                          information for that CUI will not be stored
+
+        'verbose'      -> This parameter will print out the table information 
+                          to a config file in the UMLSINTERFACECONFIG directory
+
+        'config'       -> This parameter contains the location of the config
+                          file
+
+    These are passed through a hash. For example:
+
+        my %options = ();
+        $options{'config'}   = $config;
+        $options{'realtime'} = 1;
+
+        my $interface = UMLS::Interface->new(\%options);
+
+    Keep in mind that the database configuration options can be included in
+    the MySQL my.cnf file. This is preferable. The directions for this are
+    in the INSTALL file. It is Stage 5 Step D.
+
+    These options can be reconfigured during run time using the reConfig()
+    method.
+
+        $options{'config'} = $newconfig;
+        $interface->reConfig(\%options);
+
+  USING THE MODULE
+    Once the object of module is successfully created after following the
+    steps described in the previous section, a number of methods can be
+    called upon this object. The output of methods varies:
+
+     @array refers to an array
+     $array refers to a reference to an array
+     $hash  refers to a reference to a hash
+
+    The methods are as follows:
+
+         my $root = $interface->root();                
+             Returns the concept ID of the root of the tree.
+
+         my $depth = $interface->depth();
+             Returns the depth of the tree.
+
+         my $version = $interface->version();
+             Return the version of UMLS.
+
+         my $bool = $interface->exists($cui);
+             Determines if a CUI exists
+
+         my $bool = $interface->validCui($cui);
+             Checks if CUI is a valid concept
+
+         my $array = $interface->getSab($cui);
+             Returns the list of sources the concept exists in
+
+         my $array = $interface->getConceptList($term);    
+             Returns the list of all CUIs of a given term
+             from the SAB parameter specified in the config 
+             file or the default 
+
+         my $array = $interface->getDefConceptList($term);
+             Returns the list of all CUIs of a given term
+             from the SABDEF parameter specified in the 
+             config file or the default 
+
+         my $array = $interface->getAllConcepts($term);
+             Returns the list of all CUIs of a given term
+             in the entire UMLS. 
+
+         my $hash = $interface->getCuiList();              
+             Returns a list of CUIs from the source(s) specified 
+             in the configuration file
+
+         my $array = $interface->getCuisFromSource($sab);
+             Returns an list of CUIs in a specified source
+
+         my $array = $interface->getCuisFromSource($sab);       
+             Returns a list of CUIs from a specific source
+
+         my $array = $interface->getTermList($cui);            
+             Returns the list of terms and their sources using 
+             the SAB parameter in the configuration file or the 
+             default
+
+         my $array = $interface->getDefTermList($cui);            
+             Returns the list of terms and their sources using 
+             the SABDEF parameter in the configuration file or 
+             the default     
+
+         my $array = $interface->getAllTerms($cui);             
+             Returns the list of terms corresponding to a CUI 
+             for all sources 
+
+         my $hash = $interface->getCompounds();
+             Returns all the compound terms in the sources specified in
+             the configuration file.
+
+         my $term = $interface->getPreferredTerms($cui);             
+             Returns the preferred term of a CUI if that term 
+             exists in the sources specified by the SAB parameter 
+             in the configuration file or the default
+
+         my $term = $interface->getAllPreferredTerms($cui);             
+             Returns the preferred term of a CUI regardless
+             of the source information in the configuration
+             file
+
+         my $array = $interface->getParents($cui);              
+             Returns the parent of a given CUI
+
+         my $array = $interface->getChildren($cui);             
+             Returns the children of a given CUI
+
+         my $array = $interface->getRelated($cui, $rel);              
+             Returns the CUI relations of a given CUI and relation
+
+         my $array = $interface->getRelationsBetweenCuis($cui1, $cui2);
+             Returns the relations between two CUIs.
+
+         my $array$interface->getRelations($cui);           
+             Returns all of the relations associated with a CUI in 
+             the sources specified in the configuration file 
+
+         my $array = $interface->getCuiDef($cui);               
+             Returns the definition(s) of a given CUI
+
+         my $array = $interface->getExtendedDefinition($cui);
+             Returns the extended definition of a given CUI
+
+
+         my $array = $interface->getSt($cui);                  
+             Returns the TUI(s) of the semantic type(s) associated 
+             with a CUI
+
+         my $abr = $interface->getStAbr($tui);                
+             Returns the abbreviation of a semantic type of a TUI
+
+         my $tui = $interface->getStTui($abr);
+             Returns the TUI of an abbreviation of a semantic type
+
+         my $string = $interface->getStString($abr);             
+             Returns the name of the semantic type given its 
+
+         my $def = $interface->getStDef($abr);                
+             Returns the definition of a semantic type given its 
+             abbreviation
+
+         my $array = $interface->getSemanticRelation($st1, $st2);
+             Returns a list of semantic relation between the two 
+             semantic types. 
+
+         my $array = $interface->getSemanticGroup($cui1);
+             Returns a list of semantic groups of a given CUI
+
+         my $array = $interface->getSemanticGroupOfSt($st);
+             Returns a list of semantic groups of a given semantic type
+
+         my $array = $interface->pathsToRoot($cui);             
+             Returns a list of concept IDs that denote the path from 
+             the input CUI to the root using the source and relation 
+             information in the configuration file
+
+         my $array = $interface->findShortestPath($cui1, $cui2);        
+             Returns the shortest path between two CUIs
+
+         my $array = $interface->findLeastCommonSubsumer($cui1, $cui2); 
+             Returns the least common subsumer between two CUIs 
+
+         my $min = $interface->findMinimumDepth($cui);        
+             Returns the minimum depth of a CUI given the sources
+             and relations specified in the configuration file
+
+         my $max = $interface->findMaximumDepth($cui);        
+             Returns the maximum depth of a CUI given the sources
+             and relations specified in the configuration file
+
+         my $int = $interface->findNumberOfCloserConcepts($cui1, $cui2);
+             Returns the number of concepts closer to cui1 than cui2
+
+         my $double = $interface->getIC($cui);                   
+             Returns the information content of a CUI 
+    
+         my $double = $interface->getProbability($cui);
+             Returns the probability of a concept
+
+         my $int = $interface->getFrequency($cui);
+             Returns the frequency of a CUI that was used to calculate
+             its information content and probability
+
+         my $N = $interface->getN();
+             Returns the total number of CUIs the probabilities were 
+             calculated with
+
+         my $hash = $interface->getPropagationCuis();
+             Returns a list of CUIs that the counts were propagated over
+
+         my $hash = $interface->propagateCounts(\%hash);
+             Returns the propagation counts of the input CUIs
+
+          my $array = $interface->stPathsToRoot($tui);
+             Returns all the path to the root information of the given
+             semantic type (TUI)
+
+         my $array = $interface->stFindShortestPath($tui1, $tui2);
+             Returns the shortest paths between the two semantic types
+             (TUIs)
+
+         my $double = $interface->getStIC($tui);
+             Returns the information content of a given semantic type (TUI)
+ 
+         my $double = $interface->getStProbability($tui);
+             Returns the probability of a given semantic type (TUI)
+
+         my $stN = $interface->getStN();
+             Returns the total number of semantic types used to 
+             obtain the probability of a semantic type
+
+         $interface->setPropagationParameters(\%parameters);
+             Sets the propagation parameters 
+
+         $interface->setStSmoothing();
+             Sets the smoothing parameter to smooth the input counts
+
+         my $hash = $interface->propagateStCounts(\%hash);
+             Returns the propagation counts of the input semantic types
+
+         $interface->loadStPropagationHash(\%hash);
+             Load the propagation hash with probability counts
+ 
+
+         my $hash = $interface->returnTableNames();        
+             Returns the mysql database table names in human and hex form 
+             created by the package for a given configuration
+
+         $interface->dropConfigTable();               
+             Drops the temporary table created by the UMLS-Interface 
+             module of path information for a specified set of sources 
+
+         $interface->removeConfigFiles();
+             Removes the configuration files created by the 
+             verbose option
+
+    These methods essentially expose an interface as required by the
+    UMLS::Similarity modules. The UMLS::Similarity modules require that any
+    interface to a taxonomy provide the above methods.
+
+  CONFIGURATION
+    UMLS-Interface allows information to be extracted from the UMLS given a
+    specified set of sources and relations through the use of a
+    configuration file.
+
+    There are six configuration options: SAB, REL, RELA, SABDEF, RELDEF, and
+    RELADEF.
+
+    The SAB and REL options are used to determine which sources and
+    relations the path information is to be obtained from. The RELA option
+    narrows down the relation even further. The RELA will only be applied to
+    the PAR/CHD and RB/RN relations.
+
+    The SABDEF and RELDEF options are used to determine which sources and
+    relations to use when creating the EXTENDED DEFINITION. The RELA option
+    narrows down the relation even further. The RELADEF will only be applied
+    to the PAR/CHD and RB/RN relations.
+
+    You can specify a single source, multiple sources or the entire UMLS
+    (using the UMLS_ALL option). Keep in mind that the greater the number of
+    sources the larger the search space so if you obtaining path information
+    about two concepts this will take longer. The names of the sources in
+    the configuration file are expected to be in the SAB (source
+    abbreviation) form. A listing of the sources and their SABs can be
+    found:
+
+    <http://www.nlm.nih.gov/research/umls/knowledge_sources/metathesaurus/re
+    lease/source_vocabularies.html>
+
+    You can specify any relations that exist in the specified set of sources
+    that you defined. The directional (hierarchical) relations though are
+    PAR/CHD and RB/RN. The other relations (such as RO and SIB) are not
+    directional which means when obtaining path information when using these
+    relations may take much longer than obtaining path information using the
+    directional relations. A listing of the different relations can be found
+    here (scroll down to the REL table):
+
+    <http://www.nlm.nih.gov/research/umls/knowledge_sources/metathesaurus/re
+    lease/abbreviations.html>
+
+    If you do plan on using a multiple sources or the entire UMLS, we would
+    advise you to use the --realtime option which is explained below, in the
+    Interface.pm documentation and the path programs in the utils/
+    directory. We also have a am UMLS_ALL option for this so you do not have
+    to specify each and every source and relation.
+
+    The format of the configuration file is as follows:
+
+    SAB :: <include|exclude> <source1, source2, ... sourceN>
+
+    REL :: <include|exclude> <relation1, relation2, ... relationN>
+
+    RELA :: <include|exclude> <rela1, rela2, ... relaN>
+
+    For example, if we wanted to use the MSH vocabulary with only the RB/RN
+    relations, the configuration file would be:
+
+     SAB :: include MSH
+     REL :: include RB, RN
+
+    or
+
+     SAB :: include MSH
+     REL :: exclude PAR, CHD
+
+    If we wanted to use the SNOMEDCT vocabulary with only the PAR/CHD
+    relations that are is-a relations, the configuration file would be:
+
+     SAB :: include SNOMEDCT
+     REL :: include PAR, CHD 
+     RELA :: include isa, inverse_isa
+
+    The format for SABDEF and RELDEF is similar.
+
+    The SABDEF and RELDEF options are used to determine the sources and
+    relations the extended definition is to be obtained from.
+
+    The format of the configuration file is as follows:
+
+    SABDEF :: <include|exclude> <source1, source2, ... sourceN>
+
+    RELDEF :: <include|exclude> <relation1, relation2, ... relationN>
+
+    RELADEF :: <include|exclude> <rela1, rela2, ... relaN>
+
+    Note: RELDEF takes any of MRREL relations and two special 'relations':
+
+          1. CUI which refers to the CUIs definition
+
+          2. TERM which refers to the terms associated with the CUI
+
+    For example, if we wanted to use the definitions from MSH vocabulary and
+    we only wanted the definition of the CUI and the definitions of the CUIs
+    SIB relation, the configuration file would be:
+
+     SABDEF :: include MSH
+     RELDEF :: include CUI, SIB
+
+    If you wanted only the PAR/CHD definitions which are is-a relations.
+
+     SABDEF :: include MSH
+     RELDEF :: include PAR, CHD
+     RELADEF :: include isa, inverse_isa
+
+    For all of these options, there is an UMLS_ALL tag. If used with SAB or
+    SABDEF, it would include all of the UMLS sources. If used with the REL
+    or RELDEF, it would include all of the possible relations (as well as
+    CUI and TERM for RELDEF). If used with the RELA or RELADEF, it would
+    include all of the RELA relations including those with no RELA relation.
+    Note that this is also the default for this option which is why it is
+    optional. An example of using the UMLS_ALL option is as follows:
+
+     SAB :: include UMLS_ALL
+     REL :: include UMLS_ALL
+
+    and another is:
+
+     SABDEF :: include UMLS_ALL
+     RELDEF :: include UMLS_ALL
+
+    If you go to the configuration file directory, there will be example
+    configuration files for the different runs that you have performed.
+
+    For more information about the configuration options please see the
+    README.
+
+  PROPAGATION
+    The Information Content (IC) is defined as the negative log of the
+    probability of a concept. The probability of a concept, c, is determine
+    by summing the probability of the concept occurring in some text plus
+    the probability its descendants occurring in some text.
+
+    The following is an example of the method UMLS-Interface uses to
+    propagation counts to determine the probability of a concept in the
+    sources/relations specified in the configuration file. In this method,
+    we percolate the counts up the hierarchy, and in the case of multiple
+    inheritance, we send a full count up all the paths to the parent.
+
+    The icfrequency file contains the frequency of the following concepts
+    existing in some corpus. For example, our corpus consists of three
+    concepts, A B & C, each occurring five times:
+
+     SAB :: <sources>
+     N:15
+     A<>5
+     B<>5
+     C<>5
+
+    In this case, our sources and relations consist of the following
+    'graph': Notation....A->D means A is a child of D....
+
+     A->D
+     B->D
+     B->E
+     D->F
+     C->E
+     E->F
+
+    So A B and C are "leaf" nodes and F is the root.
+
+    Step 1: determine the descendants of each nodes
+
+     Descendants(A) = {}
+     Descendants(B) = {}
+     Descendants(C) = {}
+     Descendants(D) = {A, B}
+     Descendants(E) = {B, C}
+     Descendants(F) = {A, B, C, D, E, F}
+
+    Step 2: determine the probability of a concept, P(c), occurring by
+    summing the probability of each of descendants plus its probability.
+
+     P(A) = freq(A) / N = .33
+     P(B) = freq(B) / N = .33
+     P(C) = freq(C) / N = .33
+     P(D) = (freq(A)+freq(B)+freq(D)) / N = .66
+     P(E) = (freq(B)+freq(C)+freq(E)) / N = .66
+     P(F) = (freq(A)+freq(B)+freq(C)+freq(D)+freq(E)+freq(F)) / N = .99
+
+    Step 3: print the probability of the concept occurring, P(c), for each
+    node in the sources/relations defined in the configuration table.
+
+     SMOOTH :: 0 <- or 1 if smoothing was used
+     SAB :: <sources>
+     REL :: <relations>
+     RELA :: <relas>  <- if any are specified in the config
+     A<>.33
+     B<>.33
+     C<>.33
+     D<>.66
+     E<>.66
+     F<>.99
+
+    The information content for the nodes is then calculated by taking -log
+    of this probability.
+
+    We have an option that incorporates Laplace smoothing. Laplace smoothing
+    is where the frequency count of each of the concepts in the taxonomy is
+    incremented by one. The advantage of doing this is that it avoids having
+    a concept that has a probability of zero. The disadvantage is that it
+    can shift the overall probability mass of the concepts from what is
+    actually seen in the corpus.
+
+  REFERENCING
+        If you write a paper that has used UMLS-Interface in some way, we'd 
+        certainly be grateful if you sent us a copy and referenced UMLS-Interface. 
+        We have a published paper that provides a suitable reference:
+
+        @inproceedings{McInnesPP09,
+           title={{UMLS-Interface and UMLS-Similarity : Open Source 
+                   Software for Measuring Paths and Semantic Similarity}}, 
+           author={McInnes, B.T. and Pedersen, T. and Pakhomov, S.V.}, 
+           booktitle={Proceedings of the American Medical Informatics 
+                      Association (AMIA) Symposium},
+           year={2009}, 
+           month={November}, 
+           address={San Fransisco, CA}
+        }
+
+        This paper is also found in
+        <http://www-users.cs.umn.edu/~bthomson/publications/pubs.html>
+        or
+        <http://www.d.umn.edu/~tpederse/Pubs/amia09.pdf>
+
+  CONTACT US
+    If you have any trouble installing and using UMLS-Interface, please
+    contact us via the users mailing list :
+
+    umls-similarity@yahoogroups.com
+
+    You can join this group by going to:
+
+    <http://tech.groups.yahoo.com/group/umls-similarity/>
+
+    You may also contact us directly if you prefer :
+
+        Bridget T. McInnes: bthomson at cs.umn.edu
+
+        Ted Pedersen      : tpederse at d.umn.edu
+
+  SOFTWARE COPYRIGHT AND LICENSE
+    Copyright (C) 2004-2010 Bridget T McInnes, Siddharth Patwardhan, Serguei
+    Pakhomov, Ying Liu and Ted Pedersen
+
+    This suite of programs is free software; you can redistribute it and/or
+    modify it under the terms of the GNU General Public License as published
+    by the Free Software Foundation; either version 2 of the License, or (at
+    your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+    Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+    Note: The text of the GNU General Public License is provided in the file
+    'GPL.txt' that you should have received with this distribution.
+

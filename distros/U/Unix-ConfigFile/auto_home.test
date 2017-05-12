@@ -1,0 +1,6 @@
+bozo	-rw,nosuid	fileserv1:/users/& fileserv2:/users/& fileserv3:/users/&
+default	-ro	raid-01:/default raid-02:/default
+fsi	-rw,intr	fileserv1:/home/fsi
+linus	anotherserver:/export/home/&
+ssnodgra	fileserv1:/users/& fileserv2:/users/& fileserv3:/users/&
+yp	-ro	netinfo:/var/yp

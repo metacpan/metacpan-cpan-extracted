@@ -1,0 +1,87 @@
+#include "myinit.h"
+
+%typemap{std::string};
+%typemap{bool};
+
+%typemap{GURLStatic&}{reference};
+
+%module{URL::Google::GURL};
+
+%name{URL::Google::GURL} class GURL
+{
+    static GURLStatic& EmptyGURL();
+    static int PORT_UNSPECIFIED()
+      %code{% RETVAL = url_parse::PORT_UNSPECIFIED; %};
+    static int PORT_INVALID()
+      %code{% RETVAL = url_parse::PORT_INVALID; %};
+
+    %name{new} GURL(std::string& url);
+    // this the copy CTOR -- I call it clone, for lack of anything better
+    %name{clone} GURL(GURL& copy_from);
+    ~GURL();
+  
+    bool is_valid();
+    bool is_empty();
+    std::string spec();
+    std::string possibly_invalid_spec();
+
+    %name{resolve}
+      GURLStatic& Resolve(std::string& relative);
+            
+    %name{get_with_empty_path}
+      GURLStatic& GetWithEmptyPath();
+
+    %name{get_origin}
+      GURLStatic& GetOrigin();
+
+    %name{is_standard}
+      bool IsStandard();
+
+    %name{scheme_is}
+      bool SchemeIs(const char* lower_ascii_scheme);
+
+    %name{scheme_is_file}
+      bool SchemeIsFile();
+
+    %name{scheme_is_secure}
+      bool SchemeIsSecure();
+
+    %name{host_is_ip_address}
+      bool HostIsIPAddress();
+
+    std::string scheme();
+    std::string username();
+    std::string password();
+    std::string host();
+    std::string port();
+    std::string path();
+    std::string query();
+    std::string ref();
+    bool has_scheme();
+    bool has_username();
+    bool has_password();
+    bool has_host();
+    bool has_port();
+    bool has_path();
+    bool has_query();
+    bool has_ref();
+
+    %name{int_port}
+      int IntPort();
+
+    %name{effective_int_port}
+      int EffectiveIntPort();
+
+    %name{extract_file_name}
+      std::string ExtractFileName();
+
+    %name{path_for_request}
+      std::string PathForRequest();
+
+    %name{host_no_brackets}
+      std::string HostNoBrackets();
+
+    %name{domain_is}
+      bool DomainIs(const char* lower_ascii_domain);
+};
+

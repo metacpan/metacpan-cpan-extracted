@@ -1,0 +1,22 @@
+#!/usr/bin/perl -w
+
+use Unicode::CharName qw(uname);
+
+my $file = "stdin";
+if (@ARGV) {
+    $file = shift;
+    open(STDIN, $file) || die "Can't open $file: $!\n";
+}
+binmode(STDIN);
+die "Can't read: $!" unless read(STDIN, $magic, 4) == 4;
+my($hi,$lo) = unpack("nn", $magic);
+die "Bad magic\n" unless $hi == 0xFFFE && $lo == 0x0001;
+
+print "# Made from $file (Charmap file v$lo)\n";
+print "#\n";
+print "# U8   Unicode     Unicode name\n";
+
+while (read(STDIN, $buf, 4)) {
+    my($from, $to) = unpack("nn", $buf);
+    printf "0x%02x   0x%04x    # %s\n", $from, $to, uname($to);
+}

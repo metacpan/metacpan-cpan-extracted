@@ -1,0 +1,6 @@
+SMOOTH: 0
+SAB :: include OMIM
+REL :: include RB, RN
+N :: 1597
+C0000000<>1
+C0950133<>1

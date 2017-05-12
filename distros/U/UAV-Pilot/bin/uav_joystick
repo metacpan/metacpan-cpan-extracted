@@ -1,0 +1,115 @@
+#!/usr/bin/perl
+# Copyright (c) 2014  Timm Murray
+# All rights reserved.
+# 
+# Redistribution and use in source and binary forms, with or without 
+# modification, are permitted provided that the following conditions are met:
+# 
+#     * Redistributions of source code must retain the above copyright notice, 
+#       this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright 
+#       notice, this list of conditions and the following disclaimer in the 
+#       documentation and/or other materials provided with the distribution.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+# POSSIBILITY OF SUCH DAMAGE.
+use v5.14;
+use warnings;
+use AnyEvent;
+use UAV::Pilot;
+use UAV::Pilot::Commands;
+use UAV::Pilot::ARDrone::Driver;
+use UAV::Pilot::ARDrone::NavPacket;
+use UAV::Pilot::ARDrone::Control::Event;
+use UAV::Pilot::Events;
+use UAV::Pilot::SDL::Events;
+use UAV::Pilot::SDL::Joystick;
+use Getopt::Long ();
+
+use constant NAV_UPDATE_INTERVAL => 1 / 30;
+
+
+my $IP       = '192.168.1.1';
+my $SHOW_NAV = 0;
+my $CONF     = undef;
+Getopt::Long::GetOptions(
+    'host=s'   => \$IP,
+    'show-nav' => \$SHOW_NAV,
+    'conf=s'   => \$CONF,
+);
+
+
+sub show_nav
+{
+    my ($driver, $cv, $events, $nav_feeder) = @_;
+    eval "use UAV::Pilot::ARDrone::SDLNavOutput";
+    die $@ if $@;
+
+    my $sdl_nav = UAV::Pilot::ARDrone::SDLNavOutput->new({
+        condvar => $cv,
+        driver  => $driver,
+        feeder  => $nav_feeder,
+    });
+    $events->register( $sdl_nav );
+
+    return 1;
+}
+
+
+{
+    my $ardrone = UAV::Pilot::ARDrone::Driver->new({
+        host => $IP,
+    });
+    $ardrone->connect;
+
+    my $dev = UAV::Pilot::ARDrone::Control::Event->new({
+        driver => $ardrone,
+    });
+
+    my $cv = $dev->init_event_loop;
+    my $events = UAV::Pilot::Events->new({
+        condvar => $cv,
+    });
+
+    my $sdl_events = UAV::Pilot::SDL::Events->new;
+    $events->register( $sdl_events );
+
+    my $joystick = UAV::Pilot::SDL::Joystick->new({
+        condvar    => $cv,
+        controller => $dev,
+        conf_path  => $CONF,
+    });
+    $events->register( $joystick );
+
+    show_nav( $ardrone, $cv, $events, $dev ) if $SHOW_NAV;
+    $events->init_event_loop;
+    say "Ready to fly";
+    $cv->recv;
+    $joystick->close;
+}
+
+
+=head1 SYNOPSIS
+
+    uav_joystick --show-nav
+
+=head1 DESCRIPTION
+
+Controls a Parrot AR.Drone with an SDL-compatible joystick.
+
+C<--show-nav> displays the navigation output in an SDL window.  Closing the window will end 
+the program.
+
+The joystick parameters can be configured in a config file.  See C<UAV::Pilot::SDL::Joystick>
+for details.
+
+=cut

@@ -1,0 +1,18 @@
+Build
+Build.PL
+Changes
+lib/Unicode/Support.pm
+LICENSE
+MANIFEST			This list of files
+README
+t/files/filename_case_folding.t
+t/files/filenames.t
+t/files/filenames_with_different_nf.t
+t/lib/file_utils.pl
+t/load.t
+t/pod.t
+t/pod_coverage.t
+t/test_manifest
+t/variables/case-folding.t
+META.yml
+META.json

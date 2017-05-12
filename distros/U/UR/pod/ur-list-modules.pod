@@ -1,0 +1,40 @@
+
+
+=pod
+
+=head1 NAME
+
+ur list modules - a command which operates on classes/modules in a UR namespace directory
+
+
+
+=head1 VERSION
+
+This document describes ur list modules version 0.29.
+
+=head1 SYNOPSIS
+
+ur list modules [CLASSES-OR-MODULES]
+
+
+
+=head1 OPTIONAL ARGUMENTS
+
+=over
+
+
+=item CLASSES-OR-MODULES
+
+(undocumented)
+
+
+=back
+
+=head1 DESCRIPTION:
+
+  a command which operates on classes/modules in a UR namespace directory
+
+
+
+=cut
+

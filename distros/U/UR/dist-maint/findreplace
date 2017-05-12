@@ -1,0 +1,43 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+my $find = shift;
+my $replace = shift;
+
+my @files = @ARGV;
+unless (@files) {
+	@files = <STDIN>;
+}
+
+chomp(@files);
+
+for my $file (@files) {
+    next if (-d $file);
+    next if ($file =~ /.bak\d+/);
+    print "Handling $file\n";
+    my $bak = $file . ".bak$$";
+    print `mv '$file' '$bak'`;
+    print `grep -- '$find' '$bak'`;
+    
+    #print `cat $bak | sed 's/$find/$replace/g' > $file`;
+    my $IN;
+    my $OUT;
+    open($IN,$bak) or warn "can't open $bak!" && next;
+    open($OUT,">$file") or die;
+    
+    while (<$IN>)
+    {
+        $_ =~ s/$find/$replace/g;
+        print $OUT $_;
+    }
+    close $OUT;
+    close $IN;
+    
+    print `diff $bak $file`;
+    print `rm $bak`;
+    print "\n";
+}
+
+#print "\\rm `find * | grep .bak$$\n";
+

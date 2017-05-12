@@ -1,0 +1,33 @@
+====================================================================
+Unicode-BiDiRule - RFC 5893 BiDi Rule
+====================================================================
+
+Unicode-BiDiRule Package is Copyright (C) 2015,
+by Hatuka*nezumi - IKEDA Soji.
+
+This package is free software; you can redistribute it and/or modify it 
+under the same terms as Perl itself.
+
+Installation
+============
+
+To install this module type the following:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+Documentations
+==============
+
+One main module is contained. For more details read following POD
+documentation:
+
+  Unicode::BiDiRule - RFC 5893 BiDi Rule
+
+For japonophones, POD in Japanese language is also included:
+
+  POD2::JA::Unicode::BiDiRule - RFC 5893 BiDi規則
+
+$$

@@ -1,0 +1,12 @@
+use File::Copy qw();
+
+if (-f "Collate.xsX") {
+    print STDERR "Enabling XS in sources...\n";
+
+    die "***** Failed, sources could be inconsistent! *****\n"
+     unless File::Copy::move('MANIFEST',	'MANIFEST.N')
+	and File::Copy::move('MANIFEST.X',	'MANIFEST')
+	and File::Copy::move('Collate.pm',	'Collate.pmN')
+	and File::Copy::move('Collate.xsX',	'Collate.xs')
+	and File::Copy::move('Collate.pmX',	'Collate.pm');
+}

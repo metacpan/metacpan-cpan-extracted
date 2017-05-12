@@ -1,0 +1,11 @@
+Revision history for Perl extension UnazuSan
+
+0.03 2014-01-21T09:18:48Z
+    - add [EXPERIMENTAL] option `receive_commands` (ngys++)
+
+0.02 2013-09-04T16:48:56Z
+    - add `on_command` interface
+
+0.01 2013-09-04T14:20:14Z
+    - original version
+

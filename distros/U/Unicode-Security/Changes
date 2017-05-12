@@ -1,0 +1,27 @@
+Revision history for Unicode-Security
+
+0.08  Sun Jun 21 00:48:36 UTC 2015
+    - Updated confusable data to support Unicode 8.0.
+
+0.07  Wed May 20 06:07:22 UTC 2015
+    - Updated confusable data to support Unicode 7.0.
+
+0.06  Thu Aug 21 19:20:26 UTC 2014
+    - Updated mixed_number to not bail on non-numeric characters.
+
+0.05  Tue Aug 19 15:42:43 UTC 2014
+    - Handle unknown characters.
+    - Fixed tests for Perl 5.8; use characters from Unicode 3.2.
+
+0.04  Tue Aug 19 03:48:45 UTC 2014
+    - Added mixed_script function.
+    - Added whole- and mixed-script confusable detection.
+
+0.03  Sun Aug 17 18:53:13 UTC 2014
+    - Fixed compatibility with Perl <5.14.
+
+0.02  Sat Aug 16 23:33:46 UTC 2014
+    - Added mixed_number function.
+
+0.01  Fri Aug 15 03:43:58 UTC 2014
+    - Initial distribution.

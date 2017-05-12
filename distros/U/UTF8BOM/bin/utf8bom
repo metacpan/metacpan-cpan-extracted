@@ -1,0 +1,90 @@
+#!/usr/bin/perl -w
+eval 'exec /usr/bin/perl -w -S $0 ${1+"$@"}' if 0;
+use strict;
+use Getopt::Long;
+use Pod::Usage;
+use UTF8BOM;
+
+my($help, $insert, $strip, $dir, $file, $recursive);
+
+my %opt = (
+    'help|h|?'        => \$help,
+    'insert|i'        => \$insert,
+    'strip|s'        => \$strip,
+    'dir|d=s'        => \$dir,
+    'file|f=s'        => \$file,
+    'recursive|r'    => \$recursive,
+);
+
+GetOptions(%opt);
+
+pod2usage(1) if($help);
+pod2usage(1) if($insert && $strip);
+pod2usage(1) unless($insert || $strip);
+
+if($file){
+    if($insert){
+    UTF8BOM->insert_into_file($file);
+    }elsif($strip){
+    UTF8BOM->remove_from_file($file);
+    }
+}
+
+if($dir){
+    if($insert){
+    UTF8BOM->insert_into_files(
+    dir            => $dir,
+    recursive    => $recursive,
+    );
+    }elsif($strip){
+    UTF8BOM->remove_from_files(
+    dir            => $dir,
+    recursive    => $recursive,
+    );
+    }
+}
+
+=head1 NAME
+
+utf8bom - handling Byte Order Mark for UTF-8 files.
+
+=head1 SYNOPSIS
+
+    utf8bom [options]
+
+    utf8bom -insert -dir /path/to/dir -recursive
+
+    utf8bom -strip -file /path/to/file
+
+    Options:
+        -help       display this help and exists
+        -insert     run as insert mode
+        -strip      run as strip mode
+        -file       file you want to insert/strip bom into/from.
+        -dir        directory which includes files that you want to insert/strip bom into/from.
+        -recursive  run as recursive mode
+
+you can set each options with their first alphabet.
+for example, you can write -d instead of -dir
+
+=head1 DESCRIPTION
+
+This script allows you to insert UTF8's BOM into strings and files, or remove it from them easily.
+
+=head1 SEE ALSO
+
+L<UTF8BOM>
+
+=head1 AUTHOR
+
+Lyo Kato E<lt>lyo.kato@gmail.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005 Lyo Kato. All rights reserved.
+
+This library is free software. You can redistribute it and/or modify it under
+the same terms as perl itself.
+
+=cut
+

@@ -1,0 +1,95 @@
+<html>
+<head>
+  <title>what do you think?</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <link rel="stylesheet" href="truth.css" type="text/css">
+  <script language="JavaScript">
+  function openWin(URL) {
+    aWindow = window.open(URL, "truth", "toolbar=no,width=500,height=500,status=no,scrollbars=yes,resize=yes,menubar=no")
+  }
+  </script>
+</head>
+<body bgcolor="#000000" background="images/crypto.gif"
+ text="#ffffff" link="#ffff00" vlink="#ffff00">
+<table width="450" border="0" cellspacing="0" cellpadding="15"
+ align="center" bgcolor="#000000">
+  <tbody>
+    <tr valign="top" bgcolor="#111111">
+      <td>        
+      
+      <p align="left"> <b><font color="#ffff00" size="1" face="Verdana, Arial, Helvetica, sans-serif">
+      THE TRUTH IS THAT...</font></b><font face="Verdana, Arial, Helvetica, sans-serif" size="1" color="#ffff00"><br>
+        </font> </p>
+      <blockquote>
+        <font face="Verdana, Arial, Helvetica, sans-serif" size="1" color="#ffffff">
+        <tmpl_var name="truth">
+        <br>
+        </font>
+      </blockquote>
+
+      <p align="left"> <b><font color="#ffff00" size="1" face="Verdana, Arial, Helvetica, sans-serif">
+        WHAT DO YOU THINK?</font></b><font face="Verdana, Arial, Helvetica, sans-serif" size="1" color="#ffff00"><br>
+        </font> </p>
+
+      <form name="comment" action="truth.cgi" method="post">
+      <input type="hidden" name="rm"       value="submit">
+      <input type="hidden" name="truth_id" value="<tmpl_var name='truth_id'>">      
+        <table>
+        <tbody>
+        <tr>
+        <td align="left" valign="top">
+          <font face="Verdana, Arial, Helvetica, sans-serif" size="1" color="#ffffff">
+          name
+          </font>
+        </td>
+        <td><input type="text" name="author"></td>
+        </tr>
+        <tr>
+        <td align="left" valign="top">
+          <font face="Verdana, Arial, Helvetica, sans-serif" size="1" color="#ffffff">
+          email
+          </font>
+        </td>
+        <td><input type="text" name="url"></td>
+        </tr>
+        <tr>
+        <td align="left" valign="top">
+          <font face="Verdana, Arial, Helvetica, sans-serif" size="1" color="#ffffff">
+          message
+          </font>
+        </td>
+        <td>      
+          <textarea name="data" rows="16" cols="40"></textarea>
+        </td>
+        </tr>
+        <tr>
+        <td></td>
+        <td><input type="submit" name="submit" value="Submit"></td>
+        </tr>
+        </tbody>
+        </table>
+      </form>
+
+      <p>
+      <div align="right">
+      <font face="Verdana, Arial, Helvetica, sans-serif" size="1" color="#ffffff"><b>
+      <!-- JavaScript-enabled browsers open a pop-up window. -->
+      <script>
+	document.write("<a href=\"javascript:openWin('truth.cgi?i=<tmpl_var name='truth_id'>')\">#<tmpl_var name='truth_id'></a>");
+      </script>
+      <!-- Other browsers keep it in the same window -->
+      <noscript>
+	<a href="truth.cgi?i=<tmpl_var name='truth_id'>">#<tmpl_var name='truth_id'></a>
+      </noscript>
+      </b></font>
+      </div>
+      </p>
+
+      <p align="left">&nbsp; </p>
+      </td>
+  </tr>
+  </tbody>
+</table>
+<br>
+</body>
+</html>

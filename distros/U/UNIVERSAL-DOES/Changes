@@ -1,0 +1,13 @@
+Revision history for Perl extension UNIVERSAL::DOES
+
+0.005 2014-08-22T23:12:11Z
+    - No code changes
+    - Fix tests for newer perls
+
+0.002 Sun Sep  6 11:12:50 2009
+	- No code changes
+	- Fix documentation
+	- Fix repository section in META.yml
+
+0.001 Sat Sep  5 10:18:53 2009
+	- original version; created by Module::Setup

@@ -1,0 +1,63 @@
+2011.0	Xxx Xxx XX XXXX
+	* RENAMED library name from linebreak to sombok.
+	* Imp: lib/utils.c: Built-in callbacks.
+	* Chg: urgent_func callback takes two arguments, not five.
+	* Chg: sizing_func callback with extra 6th argument was obsoleted.
+	* Chg: default sizing method simply returns number of grapheme
+	  cluster, not column number based on UAX11.
+	* Bug Fix: memory leaks & potential buffer overruns in
+	  linebreak_break_partial().
+
+1.10	Sat Jan 01 2011
+	* Added LINEBREAK_OPTION_BREAK_INDENT option.
+	* Fix SA segmentaion behavior.
+
+1.9	Wed Dec 29 2010
+	* BUG FIX: broken pair tables.
+	* updated config.sub & config.guess.
+
+1.8.2	Mon Nov 01 2010
+	* Win32: typo in lib/Makefile.mingw
+
+1.8.1	Mon Oct 11 2010
+	* update Unicode data to version 6.0.0.
+	* update config.sub & config.guess.
+	* renamed: include/linebreak_defs.h, libinebreak.
+	* added linebreak.spec.in.
+	* removed autogen.sh, linebreak_constants.h.in.
+	* added Makefile's for MinGW (testing).
+	* Chg: added linebreak_propvals_?? variables to tell application layer
+	  possible property values.
+
+1.5	Wed Dec 30 2009
+	* gcstring_t: added new member elbc to describe non-CM LBC at
+	  after-side of grapheme cluster.
+	* Chg: On <Prepend X>, set LBC of prepend character to lbc member
+	  and LBC of X to elbc member.
+	* Use compact array instead of hash table.
+	* update config.sub/config.guess to support Dragonfly etc.
+	* patched config.sub/config.guess to support MidnightBSD.
+
+1.4.p1  Thu Oct 29 2009
+	* southeastasian.c: Added assert() to check broken libthai.
+	* Fix: break.c: NULL arguments for _sizing() and _urgent_break() may
+	  cause segfault in user-defined functions.
+	* Supports pkg-config.
+	* Added documentations.
+
+1.4  Sun Oct 18 2009
+	* Fix: break.c: Custom function won't be used when user data is NULL.
+	* Imp: linebreak_charprop(): Complement GCB property for characters
+	  with tailored LB property.
+	* Fix: gcstring_new(): Too large memory allocation.
+	* New: gcstring_newcopy().
+
+1.3  Thu Oct 15 2009
+	* Fix: linebreak_break_partial(): Memory leak saving status.
+	* Fix: linebreak_break_partial(): Fix state transition.
+	* Fix: gcstring_cmp(): Case of comparison with zero length string.
+	* New: linebreak_break() and linebreak_break_fast().  Latter consumes
+	  heap size proportional to length of input.  linebreak_break() is
+	  highly recommended.
+	* Chg: linebreak_break*() get unistr_t * input then return unistr_t *.
+	* break.c: Cleanup codes.

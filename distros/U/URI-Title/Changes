@@ -1,0 +1,93 @@
+Revision history for Perl module URI::Title
+
+1.901 2016-08-21 BOOK
+  - Added various contributors to the META file
+  - Use dzil plugin Test::ReportPrereqs to report prereq versions
+  - Updated release header lines to follow CPAN::Changes::Spec
+
+1.900 2014-12-17 BOOK
+  - now packaged with Dist::Zilla
+  - Added separate COPYRIGHT AND LICENSE section to pod (NEILB)
+  - Specified min version of perl as 5.006 (NEILB)
+  - Added WWW::GetPageTitle to SEE ALSO. More for completeness than any belief
+    that anyone might want to use that over URI::Title. (NEILB)
+
+1.89 2014-09-12 BOOK
+  - Closed RT #55235 (thanks to James Green (JKG))
+
+1.88 2014-02-04 BOOK
+  - Closed RT #41361 (thanks to Kevin Ryde (KRYDE))
+
+1.87 2014-02-04 BOOK
+  - New maintainer: BOOK
+  - Added github repo to metadata
+  - Added license details to metadata
+  - Closed RT #82054 (thanks to Jotam Jr. Trejo)
+  - Closed RT #92091 (thanks to Zakariyya Mughal (ZMUGHAL))
+  - Fixed POD syntax
+  - Added some POD tests
+  - Fixed broken tests
+
+1.86 2012-05-26 TOMI (not released)
+  - Twitter suport fixed for non-javascript anchor links (yay)
+
+1.85 2011-06-02 TOMI (not released)
+  - Twitter suport fixed for javascript anchor links (ugh)
+
+1.84 2009-07-27 TOMI (not released)
+  - Spotify titling support from https://rt.cpan.org/Public/Bug/Display.html?id=48231
+
+1.83 2008-10-18 PMISON (not released)
+  - Work around a change in Twitter HTML
+
+1.82 2008-09-30 TOMI
+  - Latest LWP-UserAgent is pickier about what you pass it as a URI - fixed.
+
+1.81 2008-06-19 TOMI
+  - fix changes for the Register title
+  - clearer licensing
+
+1.80 2008-06-19 TOMI
+  - Twitter support
+  - Google calculator support
+  - Too many irritating corner-case bugfixes to list.
+  - Claim that we don't do gzip in some cases, to avoid evil
+
+1.70 2008-04-21 TOMI
+  - Added special case for Helsingin Sanomat URLs.
+  - Supressed warnings if imgsize can't get an image size (from Dagfinn Ilmari Mannsaker)
+  - Fixed some more nagging unicode issues. Bah, unicode.
+  - Send a real user-agent, to prevent people that hard-code a block of the default Perl useragent from blocking us.
+
+1.62 2006-05-18 TOMI
+  - character set support that actually _works_ - we also try utf-8
+    first always, because people lie.
+  - Fix for servers that don't respect the Range header.
+
+1.61 2005-07-21 TOMI
+  - Fix tiny test breakage
+  - Better charset support
+
+1.60 2004-09-23 TOMI
+  - Added limited character set support. It mostly sucks, but
+    less than it did before.
+
+1.50 2004-08-13 TOMI
+  - Added quick special case for iTMS urls.
+  - Bumped version to 1.0, I quite like this code now.
+
+0.50 2004-05-06 TOMI
+  - 0.5 Release
+  - Use File::Type to detech mime types and hand off to sub-modules
+  - Use Module::Pluggable to discover sub-modules
+  - Add Image, MP3 and PDF naming modules
+
+0.30 2004-03-16 TOMI
+  - 0.3 Release
+  - Don't run tests without a net connection
+  - More special cases.
+  - Variable header size downloading for pathological cases
+  - Much better whitespace trimming
+
+0.10 2004-01-17 TOMI
+  - 0.1 Release. It doesn't suck, much.

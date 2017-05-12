@@ -1,0 +1,32 @@
+
+
+=pod
+
+=head1 NAME
+
+ur old - define namespaces, data sources and classes
+
+
+
+=head1 VERSION
+
+This document describes ur old version 0.29.
+
+=head1 SUB-COMMANDS
+
+ diff-rewrite         (no execute or su...  a command which operates on classes/modules in a UR       
+                                             namespace directory                                      
+ diff-update          (no execute or su...  a command which operates on classes/modules in a UR       
+                                             namespace directory                                      
+ export-dbic-classes  [BARE-ARGS] [CLAS...  Create or update a DBIx::Class class from an already      
+                                             existing UR class                                        
+ info                 [SUBJECT]             Outputs description(s) of UR entities such as classes and 
+                                             tables to stdout                                         
+ redescribe           [CLASSES-OR-MODULES]  Outputs class description(s) formatted to the latest      
+                                             standard.                                                
+
+
+
+
+=cut
+

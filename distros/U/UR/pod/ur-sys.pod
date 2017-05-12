@@ -1,0 +1,24 @@
+
+
+=pod
+
+=head1 NAME
+
+ur sys - service launchers
+
+
+
+=head1 VERSION
+
+This document describes ur sys version 0.29.
+
+=head1 SUB-COMMANDS
+
+ class-browser     Start a web server to browse through the class and database 
+                    structures.                                                
+
+
+
+
+=cut
+

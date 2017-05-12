@@ -1,0 +1,42 @@
+---
+abstract: 'Tiny URL builder'
+author:
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+  Tie::IxHash: '0'
+configure_requires:
+  CPAN::Meta: '0'
+  CPAN::Meta::Prereqs: '0'
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v0.13.0, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: URL-Builder
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  URL::Builder:
+    file: lib/URL/Builder.pm
+    version: '0.06'
+requires:
+  WWW::Form::UrlEncoded: '0.19'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/tokuhirom/URL-Builder/issues
+  homepage: https://github.com/tokuhirom/URL-Builder
+  repository: git://github.com/tokuhirom/URL-Builder.git
+version: '0.06'
+x_contributors:
+  - 'Masahiro Nagano <kazeburo@gmail.com>'

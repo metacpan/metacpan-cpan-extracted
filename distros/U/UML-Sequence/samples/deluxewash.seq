@@ -1,0 +1,16 @@
+AtHome.Wash Car
+	/* the bucket is in the garage */
+    Garage.retrieve bucket
+    Kitchen.prepare bucket
+        Kitchen.pour soap in bucket
+        Kitchen.fill bucket
+    Garage.get sponge
+    Garage.checkDoor
+	    -> clickDoorOpener
+    	[ ifDoorClosed ] Garage.open door
+    * Driveway.apply soapy water
+    ! Driveway.rinse
+    Driveway.empty bucket
+    Garage.close door
+    Garage.replace sponge
+    Garage.replace bucket

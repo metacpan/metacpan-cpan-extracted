@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Unicode/Char.pm
+t/00-load.t
+t/01-valid.t
+t/02-u.t
+t/03-n.t
+
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,37 @@
+=pod
+
+=head1 NAME
+
+UR::Manual::SchemaDesign - Tips for designing an efficient schema for UR
+
+=head1 Relational Databases
+
+=over 4
+
+=item Avoid creating a table called 'type' or 'types'.
+
+When 'ur update classes' translates it into a class name, it will become
+YourNamespace::Type.  Class names ending in '::Type' are reserved for
+class metadata, the class will be renamed to 'YourNamespace::TypeTable' to
+avoid the conflict.  The table_name for that class will still refer to
+the actual table name.  'ur update classes' will print a warning if this
+happens, and rename the class automatically.
+
+=item Avoid columns named 'id'
+
+UR expects an object to be uniquely identified by a property called 'id'.
+Classes cannot have multiple ID properties where one of them is called 'id',
+because 'id' would no uniqiely identify one of them.  If you want to call
+the column 'id', then the property name in the class metadata must be 
+something else ('id_id', for example) in both the 'has' and 'id_by' sections,
+and the column_name set to 'id'.
+
+=item Indexes for common queries
+
+Create indexes in your database to cover common queries.  If you routinely
+make queries involving non-primary keys, creating an index that includes
+these other columns will improve query times.
+
+=back
+
+=pod

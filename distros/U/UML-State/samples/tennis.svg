@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+  <svg xmlns="http://www.w3.org/2000/svg" height="800" width="800">
+    <defs>
+      <style type='text/css'>
+        rect, line, path { stroke-width: 1; stroke: black; fill: none }
+      </style>
+      <marker orient="auto" refY="2.5" refX="4"
+              markerHeight="5" markerWidth="4" id="mArrow">
+        <path style="fill: black; stroke: none" d="M 0 0 4 2 0 5"/>
+      </marker>
+    </defs>
+<text x='25' y='75'>0-0</text>
+<rect ry='10' height='37.5' width='89.375' y='56.2' x='19.9' />
+<text x='162.5' y='75'>15-0</text>
+<rect ry='10' height='37.5' width='107.653' y='56.2' x='157.4' />
+<text x='328.12' y='75'>30-0</text>
+<rect ry='10' height='37.5' width='91.403' y='56.2' x='323.02' />
+<text x='468.74' y='75'>40-0</text>
+<rect ry='10' height='37.5' width='117.8125' y='56.2' x='463.64' />
+<text x='25' y='150'>0-15</text>
+<rect ry='10' height='37.5' width='89.375' y='131.2' x='19.9' />
+<text x='162.5' y='150'>15-15</text>
+<rect ry='10' height='37.5' width='107.653' y='131.2' x='157.4' />
+<text x='328.12' y='150'>30-15</text>
+<rect ry='10' height='37.5' width='91.403' y='131.2' x='323.02' />
+<text x='468.74' y='150'>40-15</text>
+<rect ry='10' height='37.5' width='117.8125' y='131.2' x='463.64' />
+<text x='649.99' y='150'>Game Server</text>
+<rect ry='10' height='37.5' width='113.7565' y='131.2' x='644.89' />
+<text x='25' y='225'>0-30</text>
+<rect ry='10' height='37.5' width='89.375' y='206.2' x='19.9' />
+<text x='162.5' y='225'>15-30</text>
+<rect ry='10' height='37.5' width='107.653' y='206.2' x='157.4' />
+<text x='328.12' y='225'>30-30</text>
+<rect ry='10' height='37.5' width='91.403' y='206.2' x='323.02' />
+<text x='468.74' y='225'>40-30</text>
+<rect ry='10' height='37.5' width='117.8125' y='206.2' x='463.64' />
+<text x='25' y='300'>0-40</text>
+<rect ry='10' height='37.5' width='89.375' y='281.2' x='19.9' />
+<text x='162.5' y='300'>15-40</text>
+<rect ry='10' height='37.5' width='107.653' y='281.2' x='157.4' />
+<text x='328.12' y='300'>30-40</text>
+<rect ry='10' height='37.5' width='91.403' y='281.2' x='323.02' />
+<text x='468.74' y='300'>Deuce</text>
+<rect ry='10' height='37.5' width='117.8125' y='281.2' x='463.64' />
+<text x='649.99' y='300'>Advantage Server</text>
+<rect ry='10' height='37.5' width='113.7565' y='281.2' x='644.89' />
+<text x='162.5' y='375'>Game Receiver</text>
+<rect ry='10' height='37.5' width='107.653' y='356.2' x='157.4' />
+<text x='468.74' y='375'>Advantage Receiver</text>
+<rect ry='10' height='37.5' width='117.8125' y='356.2' x='463.64' />
+<line x1='64.5875' y1='36.2' x2='64.5875' y2='56.2' style='marker-end: url(#mArrow);'/>
+<rect ry='10' height='33.5' width='109.7565' y='133.2' x='646.89' />
+<rect ry='10' height='33.5' width='103.653' y='358.2' x='159.4' />
+<path d='M522.54625 356.2 Q 531.92125 337.45, 522.54625 318.7' style='marker-end: url(#mArrow);' />
+<text x='533.23375' y='341.45'>S</text>
+<line x1='109.275' y1='74.95' x2='157.4' y2='74.95' style='marker-end: url(#mArrow);'/>
+<text x='123.3375' y='71.95'>S</text>
+<line x1='265.053' y1='74.95' x2='323.02' y2='74.95' style='marker-end: url(#mArrow);'/>
+<text x='284.0365' y='71.95'>S</text>
+<line x1='414.423' y1='74.95' x2='463.64' y2='74.95' style='marker-end: url(#mArrow);'/>
+<text x='429.0315' y='71.95'>S</text>
+<line x1='581.4525' y1='74.95' x2='701.76825' y2='131.2' style='marker-end: url(#mArrow);'/>
+<text x='631.610375' y='100.075'>S</text>
+<line x1='109.275' y1='149.95' x2='157.4' y2='149.95' style='marker-end: url(#mArrow);'/>
+<text x='123.3375' y='146.95'>S</text>
+<line x1='265.053' y1='149.95' x2='323.02' y2='149.95' style='marker-end: url(#mArrow);'/>
+<text x='284.0365' y='146.95'>S</text>
+<line x1='414.423' y1='149.95' x2='463.64' y2='149.95' style='marker-end: url(#mArrow);'/>
+<text x='429.0315' y='146.95'>S</text>
+<line x1='581.4525' y1='149.95' x2='644.89' y2='149.95' style='marker-end: url(#mArrow);'/>
+<text x='603.17125' y='146.95'>S</text>
+<line x1='109.275' y1='224.95' x2='157.4' y2='224.95' style='marker-end: url(#mArrow);'/>
+<text x='123.3375' y='221.95'>S</text>
+<line x1='265.053' y1='224.95' x2='323.02' y2='224.95' style='marker-end: url(#mArrow);'/>
+<text x='284.0365' y='221.95'>S</text>
+<line x1='414.423' y1='224.95' x2='463.64' y2='224.95' style='marker-end: url(#mArrow);'/>
+<text x='429.0315' y='221.95'>S</text>
+<line x1='581.4525' y1='224.95' x2='701.76825' y2='168.7' style='marker-end: url(#mArrow);'/>
+<text x='631.610375' y='193.825'>S</text>
+<line x1='109.275' y1='299.95' x2='157.4' y2='299.95' style='marker-end: url(#mArrow);'/>
+<text x='123.3375' y='296.95'>S</text>
+<line x1='265.053' y1='299.95' x2='323.02' y2='299.95' style='marker-end: url(#mArrow);'/>
+<text x='284.0365' y='296.95'>S</text>
+<line x1='414.423' y1='299.95' x2='463.64' y2='299.95' style='marker-end: url(#mArrow);'/>
+<text x='429.0315' y='296.95'>S</text>
+<path d='M581.4525 299.95 Q 613.17125 315.809375, 644.89 299.95' style='marker-end: url(#mArrow);' />
+<text x='609.17125' y='321.8796875'>S</text>
+<line x1='701.76825' y1='281.2' x2='701.76825' y2='168.7' style='marker-end: url(#mArrow);'/>
+<text x='691.76825' y='221.95'>S</text>
+<line x1='64.5875' y1='93.7' x2='64.5875' y2='131.2' style='marker-end: url(#mArrow);'/>
+<text x='54.5875' y='109.45'>R</text>
+<line x1='64.5875' y1='168.7' x2='64.5875' y2='206.2' style='marker-end: url(#mArrow);'/>
+<text x='54.5875' y='184.45'>R</text>
+<line x1='64.5875' y1='243.7' x2='64.5875' y2='281.2' style='marker-end: url(#mArrow);'/>
+<text x='54.5875' y='259.45'>R</text>
+<line x1='64.5875' y1='318.7' x2='157.4' y2='374.95' style='marker-end: url(#mArrow);'/>
+<text x='100.99375' y='343.825'>R</text>
+<line x1='211.2265' y1='93.7' x2='211.2265' y2='131.2' style='marker-end: url(#mArrow);'/>
+<text x='201.2265' y='109.45'>R</text>
+<line x1='211.2265' y1='168.7' x2='211.2265' y2='206.2' style='marker-end: url(#mArrow);'/>
+<text x='201.2265' y='184.45'>R</text>
+<line x1='211.2265' y1='243.7' x2='211.2265' y2='281.2' style='marker-end: url(#mArrow);'/>
+<text x='201.2265' y='259.45'>R</text>
+<line x1='211.2265' y1='318.7' x2='211.2265' y2='356.2' style='marker-end: url(#mArrow);'/>
+<text x='201.2265' y='334.45'>R</text>
+<line x1='368.7215' y1='93.7' x2='368.7215' y2='131.2' style='marker-end: url(#mArrow);'/>
+<text x='358.7215' y='109.45'>R</text>
+<line x1='368.7215' y1='168.7' x2='368.7215' y2='206.2' style='marker-end: url(#mArrow);'/>
+<text x='358.7215' y='184.45'>R</text>
+<line x1='368.7215' y1='243.7' x2='368.7215' y2='281.2' style='marker-end: url(#mArrow);'/>
+<text x='358.7215' y='259.45'>R</text>
+<line x1='368.7215' y1='318.7' x2='265.053' y2='374.95' style='marker-end: url(#mArrow);'/>
+<text x='306.88725' y='343.825'>R</text>
+<line x1='522.54625' y1='93.7' x2='522.54625' y2='131.2' style='marker-end: url(#mArrow);'/>
+<text x='512.54625' y='109.45'>R</text>
+<line x1='522.54625' y1='168.7' x2='522.54625' y2='206.2' style='marker-end: url(#mArrow);'/>
+<text x='512.54625' y='184.45'>R</text>
+<line x1='522.54625' y1='243.7' x2='522.54625' y2='281.2' style='marker-end: url(#mArrow);'/>
+<text x='512.54625' y='259.45'>R</text>
+<path d='M522.54625 318.7 Q 513.17125 337.45, 522.54625 356.2' style='marker-end: url(#mArrow);' />
+<text x='503.85875' y='341.45'>R</text>
+<line x1='463.64' y1='374.95' x2='265.053' y2='374.95' style='marker-end: url(#mArrow);'/>
+<text x='354.3465' y='371.95'>R</text>
+<path d='M644.89 299.95 Q 613.17125 284.090625, 581.4525 299.95' style='marker-end: url(#mArrow);' />
+<text x='609.17125' y='286.0203125'>R</text>
+</svg>

@@ -1,0 +1,73 @@
+<?xml version='1.0' ?>
+<sequence>
+<class_list>
+  <class name='main' born='0' extends-to='12'>
+    <activation_list>
+      <activation born='0' extends-to='12' offset='0' />
+    </activation_list>
+  </class>
+  <class name='diePair1:DiePair' born='1' extends-to='6'>
+    <activation_list>
+      <activation born='1' extends-to='3' offset='0' />
+      <activation born='4' extends-to='6' offset='0' />
+    </activation_list>
+  </class>
+  <class name='die1:Die' born='2' extends-to='5'>
+    <activation_list>
+      <activation born='2' extends-to='2' offset='0' />
+      <activation born='5' extends-to='5' offset='0' />
+    </activation_list>
+  </class>
+  <class name='die2:Die' born='3' extends-to='6'>
+    <activation_list>
+      <activation born='3' extends-to='3' offset='0' />
+      <activation born='6' extends-to='6' offset='0' />
+    </activation_list>
+  </class>
+  <class name='diePair2:DiePair' born='7' extends-to='12'>
+    <activation_list>
+      <activation born='7' extends-to='9' offset='0' />
+      <activation born='10' extends-to='12' offset='0' />
+    </activation_list>
+  </class>
+  <class name='die3:Die' born='8' extends-to='11'>
+    <activation_list>
+      <activation born='8' extends-to='8' offset='0' />
+      <activation born='11' extends-to='11' offset='0' />
+    </activation_list>
+  </class>
+  <class name='die4:Die' born='9' extends-to='12'>
+    <activation_list>
+      <activation born='9' extends-to='9' offset='0' />
+      <activation born='12' extends-to='12' offset='0' />
+    </activation_list>
+  </class>
+</class_list>
+
+<arrow_list>
+  <arrow from='main' to='diePair1:DiePair' type='call' label='new'
+         from-offset='0' to-offset='0' />
+  <arrow from='diePair1:DiePair' to='die1:Die' type='call' label='new'
+         from-offset='0' to-offset='0' />
+  <arrow from='diePair1:DiePair' to='die2:Die' type='call' label='new'
+         from-offset='0' to-offset='0' />
+  <arrow from='main' to='diePair1:DiePair' type='call' label='roll'
+         from-offset='0' to-offset='0' />
+  <arrow from='diePair1:DiePair' to='die1:Die' type='call' label='roll'
+         from-offset='0' to-offset='0' />
+  <arrow from='diePair1:DiePair' to='die2:Die' type='call' label='roll'
+         from-offset='0' to-offset='0' />
+  <arrow from='main' to='diePair2:DiePair' type='call' label='new'
+         from-offset='0' to-offset='0' />
+  <arrow from='diePair2:DiePair' to='die3:Die' type='call' label='new'
+         from-offset='0' to-offset='0' />
+  <arrow from='diePair2:DiePair' to='die4:Die' type='call' label='new'
+         from-offset='0' to-offset='0' />
+  <arrow from='main' to='diePair2:DiePair' type='call' label='roll'
+         from-offset='0' to-offset='0' />
+  <arrow from='diePair2:DiePair' to='die3:Die' type='call' label='roll'
+         from-offset='0' to-offset='0' />
+  <arrow from='diePair2:DiePair' to='die4:Die' type='call' label='roll'
+         from-offset='0' to-offset='0' />
+</arrow_list>
+</sequence>

@@ -1,0 +1,17 @@
+.gitignore
+Changes
+COPYING
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml
+Processors.pm
+Processors.xs
+Processors/Info.pm
+README
+readme.texi
+t/00_pod.t
+t/01_manifest.t
+t/20_test.t
+t/test_utils.pl
+typemap

@@ -1,0 +1,191 @@
+20160806  Sat Aug  6 13:36:14 PDT 2016
+    Distribution
+    * Homepage is now metacpan
+    * Now testing Strawberry Perl with AppVeyor
+    * Kwalitee fix (Patrice Clement) [github 14]
+
+20140709  Wed Jul  9 16:28:37 PDT 2014
+    New Features
+    * The "git" scheme is supported. (Schwern)
+    * svn, ssh and svn+ssh schemes are supported. [rt.cpan.org 57490] (Schwern)
+    * Added a --schemeless option to urifind. (Schwern)
+
+    Bug Fixes
+    * http:// is no longer matched [rt.cpan.org 63283] (Schwern)
+
+    Backwards Incompatibilities
+    * Previously, URIs stringified to their canonical version.  Now
+      they stringify as written.  This results in less loss of
+      information.  For example.  "Blah HTTP:://FOO.COM" previously
+      would stringify as "http://foo.com/" and now it will stringify
+      as "HTTP://FOO.COM".  To restore the old behavior you can call
+      $uri->canonical. (Schwern)
+
+    Distribution Changes
+    * No longer using URI::URL. (Schwern)
+    * Now requires URI 1.60 for Unicode support. (Schwern)
+
+
+20140702  Wed Jul  2 13:41:47 PDT 2014
+    New Features
+    * IDNA (aka Unicode) domains are now supported. [github 3] (GwenDragon)
+    * The list of TLDs for schemeless matching has been updated. [github 3] (GwenDragon)
+
+    Bug Fixes
+    * Handle balanced [], {} and quotes in addition to (). [rt.cpan.org 85053] (Schwern)
+    * Don't mangle IPv6 URLs. [rt.cpan.org 85053] (Schwern)
+    * Schemeless is more accurate about two letter TLDs. [github 3] (GwenDragon)
+
+    Distribution Changes
+    * Switched the issue tracker to Github. (Schwern)
+
+
+20111103  Thu Nov  3 12:14:21 PDT 2011
+    Bug Fixes
+    * URI::URL::strict will no longer leak out of find() if the callback
+      or filter fails. [rt.cpan.org 71153] (Carl Chambers)
+
+
+20111020  Thu Oct 20 17:31:56 PDT 2011
+    Bug Fixes
+    * Things which look like URIs, but aren't, are now properly escaped like
+      other text.  [rt.cpan.org 71658]
+
+    New Features
+    * Balanced parens in URIs are no longer stripped.  Example:
+      "http://example.com/foo(bar)"  (Merten Falk)
+
+
+20100505  Wed May  5 18:48:44 PDT 2010
+    Test Fixes
+    * Fixed t/urifind/find.t on Windows
+
+
+20100504.1039  Tue May  4 10:39:23 PDT 2010
+    Doc Fixes
+    * Forgot to mention that we ship with urifind now.
+
+
+20100504  Tue May  4 10:29:52 PDT 2010
+    New Features
+    * Added a urifind program. (Darren Chamberlain)
+    Bug Fixes
+    * The final semi-colon was being strippped form URLs found in HTML
+      that ended with HTML entities. (Michael Peters)
+      Example: http://google.com/search?q=&lt;html&gt;
+    * URLs with leading dots, pluses and minuses are now found.
+      [rt.cpan.org 57032]
+      Example: stuff...http://example.com
+
+
+20100211  Thu Feb 11 04:02:26 PST 2010
+    Bug Fixes
+    * Finding URIs inside brackets was pretty badly broken by
+      the last release.  (Michael Peters)
+
+
+20090319  Thu Mar 19 12:17:53 PDT 2009
+    Bug Fixes
+    * Schemeless now ignores the case of the TLD.
+
+    New Features
+    * Updated the list of accepted domains for finding schemeless URIs
+      from the latest ICANN list.
+
+    Docs
+    * Add LICENSE section
+    * Remove wildly out of date CAVEATS
+    * Added an example of how to get a list of all URIs.
+    * Updated INSTALL section to reflect new dependencies and Module::Build
+      installation process
+    * Regenerated the README file
+
+
+20090316  Mon Mar 16 16:18:10 PDT 2009
+    New Features
+    * Added optional replacement function to find(). Now you 
+      can not only replace URLs found, but also the rest of the text around
+      them in one fell swoop. (Mike Schilli) [rt.cpan.org 20486]
+    * Whitespace inside <...> is now ignored as per the suggestion of
+      RFC 3986 appendix C. [rt.cpan.org 20483]
+
+    Other
+    * Michael G Schwern is now primary maintainer again.  Thanks for all your
+      work, Roderick!
+    * Repository moved to http://github.com/schwern/uri-find
+    * Now requires Test::More
+    * Verisoning scheme changed to ISO date integers
+    * Minimum Perl version is now 5.6.0.
+
+
+0.16 Fri Jul 22 06:00:24 EDT 2005
+    - Oops, make the URI::Find::Schemeless->top_level_domain_re case
+      insensitive, as it should be and the docs claimed it was.  Thanks
+      to Todd Eigenschink.
+
+
+0.15 Tue Mar 22 07:23:17 EST 2005
+    - Have all functions croak if invoked with the wrong number of
+      arguments.  Add URI::Find->badinvo.
+        https://rt.cpan.org/NoAuth/Bug.html?id=1845
+    - Mention DARREN's urifind script in the man page.
+    - Oops, URI::URL::strict was turned on and left on.  Put it back the
+      way you found it.  Thanks to Chris Nandor.
+        https://rt.cpan.org/NoAuth/Bug.html?id=11906
+    - Schemeless.pm:
+        - Find '<x>intag.com</x>'.
+        - Get $tldRe from a new class method, ->top_level_domain_re.
+        - Update top level domain list.
+
+
+0.14 Sat Oct  9 08:20:04 EDT 2004
+    - Add copyright notice.
+    - Add ] to main $cruftSet, } to schemeless $cruftSet, for
+      [http://square.com] and {brace.com}.
+    - quotemeta() $cruftSet.
+
+
+0.13 Mon Jul  1 10:37:54 EDT 2002
+    - Don't find any schemeless URIs with a plain URI::Find.  Previously
+      it'd find ones which started with "ftp." and "www.", but it was
+      more prone to false positives than URI::Find::Schemeless.
+    - Have schemeless_to_schemed use http:// except in the specific case
+      in which it uses ftp://.  Remove URI::Find::Schemeless's version.
+
+
+0.12 Wed Mar 20 14:39:21 EST 2002
+    - Improve the "wrap each URI found in an HTML anchor" example.
+    - Release a new version so CPAN sees the maintainer change.
+
+
+0.11 Thu Jul 26 14:43:49 EDT 2001
+    - Michael passed the module to Roderick for maintenance.
+    - Improve test suite.
+    - Tweak URI::Find::Schemeless not to find Foo.p[ml].
+
+
+0.10  Mon Jul 10 20:14:08 EDT 2000
+    - Rearchitected the internals to allow simple subclassing
+    - Added URI::Find::Schemeless (thanks Roderick)
+
+
+0.04  Sat Feb 26 09:05:11 GMT 2000
+    - Added # to the uric set of characters so HTML anchors are caught.
+
+
+0.03  Tue Feb  1 16:15:22 EST 2000
+    - Added some heuristic discussion to the docs.
+    - Added some heuristics to avoid picking up perl module names
+    - Improved schemeless URI heuristic to avoid picking up
+      usenet board names.
+    - Handling the <URL:...> case better as suggested in RFC 2396 Apdx E
+    - Added ; to the cruft heuristic
+
+
+0.02  Tue Feb  1 13:11:56 EST 2000
+    - Added heuristic to handle 'URL:http://www.foo.com'
+    - Added heuristic to handle trailing quotes.
+
+
+0.01  Mon Jan 31 19:12:23 EST 2000
+    - First working version released to CPAN.

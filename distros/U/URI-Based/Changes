@@ -1,0 +1,11 @@
+Revision history for URI-Based
+
+1.01    2012-10-03
+        First version, released on an unsuspecting world.
+
+1.02    2012-10-04
+        Add URI::WithBase to require list
+
+1.03    2012-10-04
+        Require Module::Build and archive with gnutar
+

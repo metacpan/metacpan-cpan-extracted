@@ -1,0 +1,236 @@
+#!/usr/bin/perl
+# Copyright (c) 2014  Timm Murray
+# All rights reserved.
+# 
+# Redistribution and use in source and binary forms, with or without 
+# modification, are permitted provided that the following conditions are met:
+# 
+#     * Redistributions of source code must retain the above copyright notice, 
+#       this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright 
+#       notice, this list of conditions and the following disclaimer in the 
+#       documentation and/or other materials provided with the distribution.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+# POSSIBILITY OF SUCH DAMAGE.
+use v5.14;
+use AnyEvent::ReadLine::Gnu;
+use UAV::Pilot;
+use UAV::Pilot::EasyEvent;
+use UAV::Pilot::Commands;
+use Getopt::Long qw( :config no_ignore_case );
+
+my $IP               = '192.168.1.1';
+my $PROMPT           = 'uav> ';
+my $MULTILINE_PROMPT = "\t";
+my @LIB_PATHS        = ();
+my @LIBS             = ();
+my $IFACE            = undef;
+my $DO_MULTICAST     = 0;
+GetOptions(
+    'host=s'      => \$IP,
+    'i|iface=s'   => \$IFACE,
+    'l|load=s'    => \@LIBS,
+    'L|library=s' => \@LIB_PATHS,
+    'm|multicast' => \$DO_MULTICAST,
+);
+
+
+sub run_cmd
+{
+    my ($cmd, $repl) = @_;
+    my $return = 1;
+    if( $cmd =~ /\A(?: exit | quit | q ) \s*;\s*\z/x ) {
+        $return = 0;
+        $repl->quit;
+    }
+    else {
+        eval {
+            $repl->run_cmd( $cmd );
+        };
+
+        if( $@ ) {
+            if( ref($@) && $@->isa( 'UAV::Pilot::Exception' ) ) {
+                warn $@->to_string;
+            }
+            else {
+                warn $@;
+            }
+        }
+    }
+
+    return $return;
+}
+
+sub load_libraries
+{
+    my ($repl, $lib_paths, $libs, $cv) = @_;
+
+    $repl->add_lib_dir( $_ ) for @$lib_paths;
+    $repl->add_lib_dir( UAV::Pilot->default_module_dir );
+
+    foreach my $lib (@$libs) {
+        print "Loading library '$lib' . . . ";
+        $repl->load_lib( $lib, {
+            condvar => $cv,
+        });
+        print "OK\n";
+    }
+
+    print "\n";
+    return 1;
+}
+
+sub make_ardrone_controller
+{
+    my ($cmd, $cv, $easy_events) = @_;
+    eval "use UAV::Pilot::ARDrone::Driver";         die $@ if $@;
+    eval "use UAV::Pilot::ARDrone::Control::Event"; die $@ if $@;
+
+    my $driver = UAV::Pilot::ARDrone::Driver->new({
+        host => $IP,
+        (defined $IFACE        ? (iface => $IFACE)                       : ()),
+        (defined $DO_MULTICAST ? (do_multicast_navdata => $DO_MULTICAST) : ()),
+    });
+    $driver->connect;
+
+    my $control = UAV::Pilot::ARDrone::Control::Event->new({
+        driver => $driver,
+    });
+    $control->init_event_loop( $cv, $easy_events );
+
+    return $control;
+}
+
+sub make_wumpusrover_controller
+{
+    my ($cmd, $cv, $easy_events) = @_;
+    eval "use UAV::Pilot::WumpusRover::Driver";         die $@ if $@;
+    eval "use UAV::Pilot::WumpusRover::Control::Event"; die $@ if $@;
+
+    my $driver = UAV::Pilot::WumpusRover::Driver->new({
+        host => $IP,
+    });
+    $driver->connect;
+
+    my $control = UAV::Pilot::WumpusRover::Control::Event->new({
+        driver => $driver,
+    });
+    $control->init_event_loop( $cv, $easy_events );
+
+    return $control;
+}
+
+{
+    my @cmd = ();
+
+    sub add_cmd
+    {
+        my ($cmd) = @_;
+        push @cmd => $cmd;
+        return 1;
+    }
+
+    sub full_cmd
+    {
+        my $cmd = join( ' ', @cmd );
+        @cmd = ();
+        return $cmd;
+    }
+}
+
+
+{
+    my $continue = 1;
+
+    my $cv = AnyEvent->condvar;
+    my $repl = UAV::Pilot::Commands->new({
+        condvar => $cv,
+        controller_callback_ardrone     => \&make_ardrone_controller,
+        controller_callback_wumpusrover => \&make_wumpusrover_controller,
+    });
+    load_libraries( $repl, \@LIB_PATHS, \@LIBS, $cv );
+
+    my $readline; $readline = AnyEvent::ReadLine::Gnu->new(
+        prompt => $PROMPT,
+        on_line => sub {
+            my ($line) = @_;
+            add_cmd( $line );
+            if( $line =~ /; \s* \z/x ) {
+                my $cmd = full_cmd;
+                $readline->hide;
+                my $do_continue = run_cmd( $cmd, $repl );
+                $readline->show;
+
+                $cv->send( $do_continue ) unless $do_continue;
+            }
+        },
+    );
+
+    $cv->recv;
+}
+
+__END__
+
+
+=head1 SYNOPSIS
+
+    uav \
+        --host 192.168.1.1 \
+        -L /path/to/libraries
+        -l ARDrone
+
+=head1 DESCRIPTION
+
+Launches a shell for controlling a UAV.  Perl statements may be typed at the prompt, ending
+with a semi-colon.  With the Parrot AR.Drone, try:
+
+    uav> takeoff;
+    uav> pitch -0.5;
+    uav> wave;
+    uav> land;
+
+=head1 OPTIONS
+
+=head2 --host
+
+Host IP to connect to.  Out of the box, the Parrot AR.Drone will be its own wireless
+access point on IP 192.168.1.1 (which is the default here).
+
+=head2 -L or --library
+
+Path to library modules.  May be specified multiple times.  By default, this will be the
+dist shared dir returned by L<File::ShareDir> for L<UAV::Pilot>.
+
+=head2 -l or --load
+
+Library to load.  May be specified multiple times.  It will need to be under one of the
+directories specified by the C<--library> option (or the default library path).
+
+=head2 -i or --iface
+
+Specify interface name to be used with the drone.  By default, iface is set to wlan0.
+Mac useses different interface names and can be found using the ifconfig command.
+More recent Linux setups with predictable interface names also use different 
+naming convention (unless your distro configures things using the old names).
+
+This is only needed with the multicast option.
+
+=head2 -m or --multicast
+
+Use multicast addresses for UAV connections that support it.  In particular, 
+the Parrot AR.Drone's nav data.
+
+Multicast seems to be tricky to use on Mac OSX.  Default is to use traditional 
+unicast.
+
+=cut

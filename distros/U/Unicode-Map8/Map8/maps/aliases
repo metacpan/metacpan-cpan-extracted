@@ -1,0 +1,158 @@
+ANSI_X3.110-1983 CSA_T500-1983 NAPLPS iso-ir-99
+ANSI_X3.4-1968 ANSI_X3.4-1986 ASCII IBM367 ISO646-US ISO_646.irv:1991 US-ASCII cp367 iso-ir-6 us
+ASMO_449 ISO_9036 arabic7 iso-ir-89
+Adobe-Standard adobe-standard
+Adobe-Symbol adobe-symbol
+Adobe-Zapf-Dingbats adobe-zapf-dingbats
+BS_4730 ISO646-GB gb iso-ir-4 uk
+BS_viewdata iso-ir-47
+CSA_Z243.4-1985-1 ISO646-CA ca csa7-1 iso-ir-121
+CSA_Z243.4-1985-2 ISO646-CA2 csa7-2 iso-ir-122
+CSA_Z243.4-1985-gr iso-ir-123
+CSN_369103 iso-ir-139
+DEC-MCS dec
+DIN_66003 ISO646-DE de iso-ir-21
+DS_2089 DS2089 ISO646-DK dk
+ECMA-cyrillic iso-ir-111
+ES ISO646-ES iso-ir-17
+ES2 ISO646-ES2 iso-ir-85
+GB_1988-80 ISO646-CN cn iso-ir-57
+GOST_19768-74 ST_SEV_358-88 iso-ir-153
+IBM037 cp037 ebcdic-cp-ca ebcdic-cp-nl ebcdic-cp-us ebcdic-cp-wt
+IBM038 EBCDIC-INT cp038
+IBM1026 CP1026
+IBM273 CP273
+IBM274 CP274 EBCDIC-BE
+IBM275 EBCDIC-BR cp275
+IBM277 EBCDIC-CP-DK EBCDIC-CP-NO
+IBM278 CP278 ebcdic-cp-fi ebcdic-cp-se
+IBM280 CP280 ebcdic-cp-it
+IBM281 EBCDIC-JP-E cp281
+IBM284 CP284 ebcdic-cp-es
+IBM285 CP285 ebcdic-cp-gb
+IBM290 EBCDIC-JP-kana cp290
+IBM297 cp297 ebcdic-cp-fr
+IBM420 cp420 ebcdic-cp-ar1
+IBM424 cp424 ebcdic-cp-he
+IBM437 437 cp437
+IBM500 CP500 ebcdic-cp-be ebcdic-cp-ch
+IBM850 850 cp850
+IBM851 851 cp851
+IBM852 852 cp852
+IBM855 855 cp855
+IBM857 857 cp857
+IBM860 860 cp860
+IBM861 861 cp-is cp861
+IBM862 862 cp862
+IBM863 863 cp863
+IBM864 cp864
+IBM865 865 cp865
+IBM868 CP868 cp-ar
+IBM869 869 cp-gr cp869
+IBM870 CP870 ebcdic-cp-roece ebcdic-cp-yu
+IBM871 CP871 ebcdic-cp-is
+IBM880 EBCDIC-Cyrillic cp880
+IBM891 cp891
+IBM903 cp903
+IBM904 904 cp904
+IBM905 CP905 ebcdic-cp-tr
+IBM918 CP918 ebcdic-cp-ar2
+IEC_P27-1 iso-ir-143
+INIS iso-ir-49
+INIS-8 iso-ir-50
+INIS-cyrillic iso-ir-51
+ISO_10367-box iso-ir-155
+ISO_2033-1983 e13b iso-ir-98
+ISO_5427 ISO_5427:1981 iso-ir-37 iso-ir-54
+ISO_5428 ISO_5428:1980 iso-ir-55
+ISO_646.basic ISO_646.basic:1983 ref
+ISO_646.irv ISO_646.irv:1983 irv iso-ir-2
+ISO_6937-2-25 iso-ir-152
+ISO_6937-2-add iso-ir-142
+ISO_8859-1 8859-1 CP819 IBM819 ISO-8859-1 ISO_8859-1:1987 iso-ir-100 iso8859-1 l1 latin1
+ISO_8859-2 8859-2 ISO-8859-2 ISO_8859-2:1987 iso-ir-101 iso8859-2 l2 latin2
+ISO_8859-3 8859-3 ISO-8859-3 ISO_8859-3:1988 iso-ir-109 iso8859-3 l3 latin3
+ISO_8859-4 8859-4 ISO-8859-4 ISO_8859-4:1988 iso-ir-110 iso8859-4 l4 latin4
+ISO_8859-5 8859-5 ISO-8859-5 ISO_8859-5:1988 cyrillic iso-ir-144 iso8859-5
+ISO_8859-6 8859-6 ASMO-708 ECMA-114 ISO-8859-6 ISO_8859-6:1987 arabic iso-ir-127 iso8859-6
+ISO_8859-7 8859-7 ECMA-118 ELOT_928 ISO-8859-7 ISO_8859-7:1987 greek greek8 iso-ir-126 iso8859-7
+ISO_8859-8 8859-8 ISO-8859-8 ISO_8859-8:1988 hebrew iso-ir-138 iso8859-8
+ISO_8859-9 8859-9 ISO-8859-9 ISO_8859-9:1989 iso-ir-148 iso8859-9 l5 latin5
+ISO_8859-13 8859-13 ISO-8859-13 iso8859-13 latin13
+ISO_8859-15 8859-15 ISO-8859-15 iso8859-15 latin15
+ISO_8859-supp iso-ir-154 latin1-2-5
+IT ISO646-IT iso-ir-15
+JIS_C6220-1969-jp JIS_C6220-1969 iso-ir-13 katakana x0201-7
+JIS_C6220-1969-ro ISO646-JP iso-ir-14 jp
+JIS_C6229-1984-a iso-ir-91 jp-ocr-a
+JIS_C6229-1984-b ISO646-JP-OCR-B iso-ir-92 jp-ocr-b
+JIS_C6229-1984-b-add iso-ir-93 jp-ocr-b-add
+JIS_C6229-1984-hand iso-ir-94 jp-ocr-hand
+JIS_C6229-1984-hand-add iso-ir-95 jp-ocr-hand-add
+JIS_C6229-1984-kana iso-ir-96
+JIS_X0201 X0201
+JUS_I.B1.002 ISO646-YU iso-ir-141 js yu
+JUS_I.B1.003-mac iso-ir-147 macedonian
+JUS_I.B1.003-serb iso-ir-146 serbian
+KSC5636 ISO646-KR
+Latin-greek-1 iso-ir-27
+MSZ_7795.3 ISO646-HU hu iso-ir-86
+NATS-DANO iso-ir-9-1
+NATS-DANO-ADD iso-ir-9-2
+NATS-SEFI iso-ir-8-1
+NATS-SEFI-ADD iso-ir-8-2
+NC_NC00-10 ISO646-CU NC_NC00-10:81 cuba iso-ir-151
+NF_Z_62-010 ISO646-FR ISO646-FR1 NF_Z_62-010_(1973) fr iso-ir-25 iso-ir-69
+NS_4551-1 ISO646-NO iso-ir-60 no
+NS_4551-2 ISO646-NO2 iso-ir-61 no2
+PT ISO646-PT iso-ir-16
+PT2 ISO646-PT2 iso-ir-84
+SEN_850200_B FI ISO646-FI ISO646-SE iso-ir-10 se
+SEN_850200_C ISO646-SE2 iso-ir-11 se2
+T.101-G2 iso-ir-128
+T.61-7bit iso-ir-102
+T.61-8bit T.61 iso-ir-103
+cp037 IBMUSCanada
+cp10000 MacRoman
+cp10006 MacGreek
+cp10007 MacCyrillic
+cp10029 MacLatin2
+cp10079 MacIcelandic
+cp10081 MacTurkish
+cp1026 IBMLatin5Turkish
+cp1250 WinLatin2
+cp1251 WinCyrillic
+cp1252 WinLatin1
+cp1253 WinGreek
+cp1254 WinTurkish
+cp1255 WinHebrew
+cp1256 WinArabic
+cp1257 WinBaltic
+cp1258 WinVietnamese
+cp437 DOSLatinUS
+cp500 IBMInternational
+cp737 DOSGreek
+cp775 DOSBaltRim
+cp850 DOSLatin1
+cp852 DOSLatin2
+cp855 DOSCyrillic
+cp857 DOSTurkish
+cp860 DOSPortuguese
+cp861 DOSIcelandic
+cp862 DOSHebrew
+cp863 DOSCanadaF
+cp864 DOSArabic
+cp865 DOSNordic
+cp866 DOSCyrillicRussian
+cp869 DOSGreek2
+cp874 DOSThai
+cp875 IBMGreek
+greek-ccitt iso-ir-150
+greek7 iso-ir-88
+greek7-old iso-ir-18
+hp-roman8 r8 roman8
+latin-greek iso-ir-19
+latin-lap iso-ir-158 lap
+latin6 iso-ir-157 l6
+macintosh mac
+videotex-suppl iso-ir-70

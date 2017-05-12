@@ -1,0 +1,87 @@
+#!/usr/bin/env perl
+package ubic_watchdog;
+$ubic_watchdog::VERSION = '1.60';
+use strict;
+use warnings;
+
+# ABSTRACT: watchdog which checks all ubic services.
+
+
+use Getopt::Long 2.33;
+use Pod::Usage;
+
+use Ubic::Watchdog;
+
+return 1 if caller();
+unless (grep { $_ eq '/usr/local/bin' } split /:/, $ENV{PATH}) {
+    $ENV{PATH} = "/usr/local/bin:$ENV{PATH}";
+}
+
+my $compile_timeout = 10;
+my $verbose;
+
+GetOptions(
+    'v|verbose' => \$verbose,
+    'compile-timeout=i' => \$compile_timeout,
+) or pod2usage(2);
+
+Ubic::Watchdog->run(
+    glob_filter => \@ARGV,
+    verbose => $verbose,
+    compile_timeout => $compile_timeout,
+);
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+ubic_watchdog - watchdog which checks all ubic services.
+
+=head1 VERSION
+
+version 1.60
+
+=head1 SYNOPSIS
+
+    ubic-watchdog [-v] [--compile-timeout=N]
+
+    ubic-watchdog SERVICE SERVICE2 SERVICE_GLOB ...
+
+=head1 DESCRIPTION
+
+This is a generic watchdog for all ubic services.
+
+It checks every enabled service by asking for its status and tries to start it if service is down or broken.
+
+Services are checked in parallel fashion, each one in separate forked process.
+
+=head1 PARAMETERS
+
+B<-v> or B<--verbose> flag can be used to enable detailed logging.
+
+B<--compile-timeout=N> option can be used to override service compilation timeout in seconds. Default is 10 seconds. This option is experimental and can be removed in future releases.
+
+All other arguments are interpreted as service names. Arguments can contain C<*> symbol, which will be expanded in Unix shell fashion.
+
+If service names are omitted, all services will be checked.
+
+=head1 DEPLOYMENT
+
+This script should be invoked every minute (or as often as you like), usually as a cron job.
+
+=head1 AUTHOR
+
+Vyacheslav Matyukhin <mmcleric@yandex-team.ru>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Yandex LLC.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

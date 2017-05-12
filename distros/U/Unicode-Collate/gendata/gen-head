@@ -1,0 +1,103 @@
+#!perl
+use strict;
+use warnings;
+
+# functions for gen-* scripts : testcount(), testhead() and testnew().
+
+require 'dumpstr';  # for string()
+
+sub testcount ($$;$) {
+    my $r_ok = shift; # reference to the counter
+    my $test = shift; # give a test script or increase by
+    my $mult = shift; # multiplier (tests in a loop)
+
+    my $numeric = $test =~ /^\d+\z/;
+    my $num_ok  = $test =~ s/ok\(/ok\(/g;
+    $$r_ok += $numeric ? $test : ($mult ? $mult : 1) * $num_ok;
+	# if $test is real, ok() in the script will be counted.
+	# if $numeric, only increase in $r_ok.
+
+    my $retval;
+    $retval .= "{\n" if $mult;
+    $retval .= $test if !$numeric;
+    $retval .= "}\n" if $mult;
+    $retval .= "\n# $$r_ok\n\n";
+    return $retval;
+}
+
+sub testhead ($$) {
+    my $loc = shift;
+    my $ok  = shift;
+    my $lc = lc $loc;
+    my $uc = uc $loc;
+    my $uf = ucfirst $lc;
+
+    my $head = <<'HEADER';
+BEGIN {
+    unless ('A' eq pack('U', 0x41)) {
+	print "1..0 # Unicode::Collate cannot pack a Unicode code point\n";
+	exit 0;
+    }
+    unless (0x41 == unpack('U', 'A')) {
+	print "1..0 # Unicode::Collate cannot get a Unicode code point\n";
+	exit 0;
+    }
+    if ($ENV{PERL_CORE}) {
+	chdir('t') if -d 't';
+	@INC = $^O eq 'MacOS' ? qw(::lib) : qw(../lib);
+    }
+}
+HEADER
+
+    my $locale = <<"LOCALE";
+use strict;
+use warnings;
+BEGIN { \$| = 1; print "1..$ok\\n"; }
+my \$count = 0;
+sub ok (\$;\$) {
+    my \$p = my \$r = shift;
+    if (\@_) {
+	my \$x = shift;
+	\$p = !defined \$x ? !defined \$r : !defined \$r ? 0 : \$r eq \$x;
+    }
+    print \$p ? "ok" : "not ok", ' ', ++\$count, "\\n";
+}
+
+use Unicode::Collate::Locale;
+
+ok(1);
+
+#########################
+LOCALE
+    return "\n$head\n$locale\n".testnew($uf, $uc);
+}
+
+sub testnew ($$) {
+    my $obj = shift;
+    my $loc = shift;
+    my $ret = lc $loc;
+    return <<"NEW_OK";
+my \$obj$obj = Unicode::Collate::Locale->
+    new(locale => '$loc', normalization => undef);
+
+ok(\$obj$obj->getlocale, '$ret');
+
+NEW_OK
+}
+
+sub testprim ($$) {
+    my $objn = shift; # object identifier following "\$obj"
+    my $list = shift; # arrayref of codepoints in hexadecimal
+    my $pre = pack('U', hex shift @$list);
+    my $retv = '';
+    for my $h (@$list) {
+	my $cur = pack('U', hex $h);
+	my $spre = string($pre);
+	my $scur = string($cur);
+	$retv .= qq|ok(\$obj$objn->lt($spre, $scur));\n|;
+	$pre = $cur;
+    }
+    return $retv;
+}
+
+1;

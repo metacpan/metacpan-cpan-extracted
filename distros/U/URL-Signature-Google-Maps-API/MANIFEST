@@ -1,0 +1,11 @@
+MANIFEST
+README
+LICENSE
+Todo
+Changes
+Makefile.PL
+lib/URL/Signature/Google/Maps/API.pm
+t/001_load.t
+t/002_no_client.t
+perl-URL-Signature-Google-Maps-API.spec
+META.yml                                 Module meta-data (added by MakeMaker)

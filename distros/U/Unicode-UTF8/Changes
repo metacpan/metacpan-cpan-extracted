@@ -1,0 +1,124 @@
+0.62 2017-04-11
+  - Only check for missing Module::Install related modules in Makefile.PL
+
+0.61 2017-04-10
+  - Avoid relying on current working directory being in @INC
+  - Documentation typo fixes by Andreas Guldstrand (COFFEE)
+
+0.60 2013-09-24
+  - added valid_utf8()
+  - skip copy-on-write tests on Perl 5.19
+
+0.59 2013-03-28
+  - No functional changes in this release
+  - 5.17.7 introduced a new copy-on-write mechanism which was disabled in
+    5.17.10 due too many rough edges. Skip one test if running on these Perl 
+    versions.
+    http://search.cpan.org/dist/perl-5.17.10/pod/perldelta.pod#Internal_Changes
+
+0.58 2012-12-15
+  - decode_utf8()/encode_utf8() now tries to avoid copying values returned 
+    from a subroutine, ARRAY functions (delete, pop, shift, splice) and HASH 
+    functions (delete). 
+    Following examples is zero-copy if the returned value is a string:
+      - decode_utf8(function());
+      - decode_utf8(delete $hash{Key});
+      - deocde_utf8(shift @array);
+  - Optimized decoding of upgraded octets.
+  - Removed suffix "in UTF-8 encoding form" from warnings messages
+
+0.57 2012-11-05
+  - Permit isolated usage of sub-categories non_unicode, nonchar and surrogate
+    on Perl 5.14 or greater. 
+
+0.56 2012-11-04
+  - Added a third argument to $fallback, the position of octet/character at 
+    which the error occurred.
+
+0.55 2011-12-22
+  - Fixed an assertion failure that was triggered by Perl_sv_catpvn_flags() 
+    when perl was compiled with DEBUGGING.
+
+0.54 2011-12-21
+  - Fixed a bug where GET magic would be triggered twice in decode_utf8 if the 
+    provided $octets scalar had the SvUTF8 flag turned on.
+  - Clarified $fallback return values.
+
+0.53 2011-11-23
+  - Previous release introduced a bug in utf8_skip(), fixed the bug and
+    increased test coverage.
+
+0.52 2011-11-22
+  - There are no functional changes introduced by this release.
+  - Prefixed internal function names to avoid potential future name clashes.
+  - Minor refactor of internal function utf8_skip().
+  - Added a CONFORMANCE section to POD.
+  - Moved Encode.pm comparison to it's own section COMPARISON.
+
+0.51 2011-11-10
+  - Implemented support for the nonchar, surrogate and non_unicode 
+    sub-categories of utf8 warning on Perl 5.14 or greater.
+
+0.50 2011-11-04
+  - First stable release. API is declared as stable. Warning messages might
+    undergo a few changes before 1.00 release.
+
+0.01_11 2011-11-03
+  - Only use XSTARG on well-formed UTF-8 strings
+
+0.01_10 2011-11-03
+  - Corrected POD commands and typos in documentation.
+
+0.01_09 2011-11-03
+  - Implemented support for error-handling mechanism
+
+0.01_08 2011-10-18
+  - Refactored internal function utf8_check() for better performance
+
+0.01_07 2011-10-11
+  - Fixed detection of non-shortest form UTF-X on perl versions <= 5.8.6
+  - Fixed utf8_length() invocation, don't pass the interpreter context
+  - Shortened the Encode.pm comparison
+
+0.01_06 2011-09-24
+  - Report character position in encode_utf8() warning messages
+  - Added a comparison with Encode.pm
+
+0.01_05 2011-09-20
+  - Correct maximal subpart implementation
+    An initial subsequence of a ill-formed sequence is not maximal subpart.
+
+    <C0 80>       -> <FFFD FFFD>
+    <ED A0 80>    -> <FFFD FFFD FFFD>
+    <EF BF BF>    -> <FFFD>
+    <F4 80 80>    -> <FFFD>
+    <F4 90 80 80> -> <FFFD FFFD FFFD FFFD>
+
+    Unicode v6.0:
+    D93b Maximal subpart of an ill-formed subsequence: The longest code unit
+    subsequence starting at an unconvertible offset that is either:
+      a. the initial subsequence of a well-formed code unit sequence, or
+      b. a subsequence of length one.
+
+0.01_04 2011-09-17
+  - croak if Perl's internal representation of wide characters is ill-formed.
+  - Fixed a bug in replacement handling.
+  - Added a test for replacement handling.
+
+0.01_03 2011-09-16
+  - Removed the "Can't represent restricted code point" error, code points 
+    above U+10FFFF is reported as "Can't represent super code point".
+  - Instead of just croaking use the 'utf8' warnings category and 
+    leave the choise of error reporting to the user.
+  - Maximal subpart of an ill-formed subsequence is replaced with U+FFFD as 
+    recomended by Unicode.
+
+0.01_02 2011-09-13
+  - Changed wording in encoding exception messages from "Can't map \w+ code point"
+    to "Can't represent \w+ code point",
+  - Added a taint test.
+  - Added a leaks test.
+
+0.01_01 2011-09-12
+  - Initial CPAN release.
+

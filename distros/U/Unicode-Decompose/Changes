@@ -1,0 +1,9 @@
+Revision history for Perl extension Unicode::Decompose.
+
+0.02 
+    - Same thing, just another upload
+
+0.01  Fri Jul 20 00:51:56 2001
+	- original version; created by h2xs 1.21 with options
+		-A -n Unicode::Decompose
+

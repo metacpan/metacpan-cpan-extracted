@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name:                Unicode-SetAutomaton
+version:             0.01
+abstract:            UTF-8 based DFAs and Regexps from Unicode sets
+license:             perl
+author:              
+    - Bjoern Hoehrmann <bjoern@hoehrmann.de>
+generated_by:        ExtUtils::MakeMaker version 6.42_01
+distribution_type:   module
+requires:     
+    Graph:                         0
+    Set::IntSpan:                  0
+    Set::IntSpan::Partition:       0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

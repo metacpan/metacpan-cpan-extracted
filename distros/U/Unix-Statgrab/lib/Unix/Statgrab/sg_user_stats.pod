@@ -1,0 +1,106 @@
+=head1 NAME
+
+Unix::Statgrab::sg_user_stats - container for libstatgrab user-login collection
+
+=head1 DESCRIPTION
+
+C<Unix::Statgrab::sg_user_stats> is a Perl package name providing
+accessors to bundled libstatgrab L<sg_user_stats|http://www.i-scream.org/libstatgrab/docs/sg_get_user_stats.3.html> disk I/O statistics.
+
+=head1 METHODS
+
+=head2 nentries
+
+Returns the number of entries in the container.
+
+=head2 systime
+
+Returns the seconds since Epoch (0:00:00 on January, 1st 1970) of the time measure the disk I/O statistics.
+
+=head2 as_list
+
+B<Deprecated> alias of L</fetchall_hash>
+
+=head2 fetchall_hash
+
+Returns all records from L<sg_user_stats|http://www.i-scream.org/libstatgrab/docs/sg_get_user_stats.3.html>
+container as list of hash containing each datum name as key and the datum as value.
+
+=head2 fetchall_array
+
+Returns all records from L<sg_user_stats|http://www.i-scream.org/libstatgrab/docs/sg_get_user_stats.3.html>
+container as list of arrays containing the values in following order:
+
+  (login_name record_id record_id_size device hostname pid login_time systime)
+
+in that order without leading headline.
+
+=head2 fetchall_table
+
+Returns all records from L<sg_user_stats|http://www.i-scream.org/libstatgrab/docs/sg_get_user_stats.3.html>
+container as list of arrays containing the values in following order:
+
+  (login_name record_id record_id_size device hostname pid login_time systime)
+
+in that order including leading headline.
+
+=head2 fetchrow_arrayref($row = 0)
+
+Returns one row as array containing values as above.
+
+=head2 fetchall_arrayref
+
+Returns all records from L<sg_user_stats|http://www.i-scream.org/libstatgrab/docs/sg_get_user_stats.3.html>
+container as array of arrays without header.
+
+=head2 fetchrow_hashref($row = 0)
+
+Returns one row as hash containing C<< { disk_name => $self.disk_name($row), read_bytes => ...} >>.
+
+=head2 fetchall_hashref
+
+Returns all records from L<sg_user_stats|http://www.i-scream.org/libstatgrab/docs/sg_get_user_stats.3.html>
+container as array of hashes.
+
+=head2 colnames
+
+Returns list of column names: C<< (login_name record_id record_id_size device hostname pid login_time systime) >>
+
+=head2 login_name
+
+The username which was used to log in
+
+=head2 record_id
+
+Record identifier of host database containing login information
+
+=head2 device
+
+Device name (e.g. "pts/0") of the tty assigned to the login session
+
+=head2 hostname
+
+(remote) Hostname from where the user is logged on, e.g. "infoterm7.some.kind.of.domain.local", "localhost", "10.42.17.4" or ":0.0" (in case it's a local logon via new xterm) 
+
+=head2 pid
+
+Process identifier of the process which made the entry to the logged on users database
+
+=head2 login_time
+
+Timestamp (time in seconds since epoch) when the user logged on
+
+=head1 AUTHOR
+
+Jens Rehsack, E<lt>rehsack AT cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2012-2015 by Jens Rehsack
+
+This library is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 2.1 of the License, or (at your option) any
+later version.
+
+=cut

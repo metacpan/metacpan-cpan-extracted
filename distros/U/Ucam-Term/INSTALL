@@ -1,0 +1,6 @@
+Installation follows the usual MakeMaker sequence:
+
+  perl Makefile.PL
+  make
+  make test
+  make install

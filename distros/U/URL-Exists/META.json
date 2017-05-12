@@ -1,0 +1,49 @@
+{
+   "abstract" : "test whether a URL exists, when you don't care about the contents",
+   "author" : [
+      "Neil Bowers <neil@bowers.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "URL-Exists",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "HTTP::Tiny" : "0.014",
+            "base" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/neilb/URL-Exists",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/neilb/URL-Exists.git",
+         "web" : "https://github.com/neilb/URL-Exists"
+      }
+   },
+   "version" : "0.03"
+}
+

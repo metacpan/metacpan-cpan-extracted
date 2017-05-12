@@ -1,0 +1,8 @@
+Revision history for Ubic-Service-ZooKeeper
+
+0.02    Thu Oct 27, 2011
+        Incompatible change, all config related info now holds in
+        'config' key without any additional checks. Just KISS.
+
+0.01    Fri Oct 07, 2011
+        Initial release.

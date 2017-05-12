@@ -1,0 +1,25 @@
+--- #YAML:1.0
+name:               Unicode-Emoji-E4U
+version:            0.03
+abstract:           ~
+author:  []
+license:            apache
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Any::Moose:     0
+    Encode:         0
+    Test::Harness:  3.04
+    Test::More:     0
+    XML::TreePP:    0.39
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.52
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

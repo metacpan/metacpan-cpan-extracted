@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Unix-PasswdFileOps.t
+lib/Unix/PasswdFileOps.pm
+META.yml                                 Module meta-data (added by MakeMaker)

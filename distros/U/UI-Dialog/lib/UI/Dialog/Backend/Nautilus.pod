@@ -1,0 +1,324 @@
+=head1 NAME
+
+UI::Dialog::Backend::Nautilus - wrapper around the data provided by the nautilus(1).
+
+=head1 SYNOPSIS
+
+ use UI::Dialog::Backend::Nautilus;
+ my $nautilus = new UI::Dialog::Backend::Nautilus ();
+ my @paths = $nautilus->paths();
+
+=head1 ABSTRACT
+
+UI::Dialog::Backend::Nautilus is simply an OOPerl wrapper around the
+data provided by the nautilus(1) file manager's scripts feature.
+
+=head1 DESCRIPTION
+
+nautilus(1) is a GNOME file manager that has a "right-click" menu for
+user made scripts (found in the user's ~/.gnome2/nautilus-scripts/
+directory). This is an OOPerl interface to the environment variables
+provided to the scripts during runtime by nautilus. When you use any of
+the UI::Dialog meta classes (UI::Dialog, UI::Dialog::GNOME, etc.) access
+to this backend is provided via the $d->nautilus method. ie: replace
+$nautilus with $d->nautilus in the synopsis example (provided you made
+$d with something like my $d = new UI::Dialog...). Also, UI::Dialog and
+friends only load this module when you first use the $d->nautilus method
+(this may silently fail, but you can test by ref() for success).
+
+=head1 EXPORT
+
+=over 2
+
+ None
+
+=back
+
+=head1 INHERITS
+
+=over 2
+
+ None
+
+=back
+
+=head1 CONSTRUCTOR
+
+=head2 new( @options )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my $nautilus = new UI::Dialog::Backend::Nautilus ();
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+This is the Class Constructor method. It accepts a list of key => value pairs
+and uses them as the defaults when interacting with the various widgets.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+A blessed object reference of the UI::Dialog::Backend::Nautilus class.
+
+=back
+
+=back
+
+=head1 METHODS
+
+=head2 path( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my $path = $nautilus->path();
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+This method examines the NAUTILUS_SCRIPT_CURRENT_URI string uri
+unescapes and strips it of any prefixing protocol indicators (file://)
+then returns the modified string.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+ a SCALAR.
+
+=back
+
+=back
+
+=head2 paths( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my @paths = $nautilus->paths();
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+This method splits the NAUTILUS_SCRIPT_SELECTED_FILE_PATHS multiline
+string and returns the ARRAY of selections in the order provided by
+nautilus.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+ an ARRAY.
+
+=back
+
+=back
+
+=head2 uri( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my $uri = $nautilus->uri();
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+This simply returns the NAUTILUS_SCRIPT_CURRENT_URI string.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+ a SCALAR.
+
+=back
+
+=back
+
+=head2 uris( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my @uris = $nautilus->uris();
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+This method splits the NAUTILUS_SCRIPT_SELECTED_URIS multiline
+string and returns the ARRAY of selections in the order provided by
+nautilus. This does not uri escape or unescape the string.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+ an ARRAY.
+
+=back
+
+=back
+
+=head2 geometry( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my ($h,$w,$x,$y) = $nautilus->geometry();
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+This method splits the NAUTILUS_SCRIPT_WINDOW_GEOMETRY string and returns
+and ARRAY of the geometry details provided by nautilus. The array returned
+contains the following (in order):
+
+ height
+ width
+ X-coordinate
+ Y-coordinate
+
+=back
+
+=item RETURNS
+
+=over 6
+
+ an ARRAY.
+
+=back
+
+=back
+
+=head2 uri_unescape( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my $path = $nautilus->uri_unescape( "file:///path/to/somewhere" );
+ my @paths = $nautilus->uri_unescape( "file:///path/to/somewhere",
+				      "file:///yet/another/path" );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+This is the method used to unescape the NAUTILUS_SCRIPT_CURRENT_URI in
+the path() method. This method is derived from the URI::Escape module which
+is not included in the Perl core modules yet is vitally necessary for the
+path() method to function in a useful manor.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+an ARRAY or a SCALAR depending on the calling arguments.
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+=over 2
+
+=item PERLDOC
+
+ UI::Dialog
+ UI::Dialog::Backend
+
+=back
+
+=over 2
+
+=item MAN FILES
+
+ nautilus(1)
+
+=back
+
+=head1 BUGS
+
+ Please email the author with any bug reports. Include the name of the
+ module in the subject line.
+
+=head1 AUTHOR
+
+ Kevin C. Krinke, E<lt>kevin@krinke.caE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+ Copyright (C) 2004-2016  Kevin C. Krinke <kevin@krinke.ca>
+
+ This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 2.1 of the License, or (at your option) any later version.
+
+ This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+
+ You should have received a copy of the GNU Lesser General Public
+ License along with this library; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+
+=cut

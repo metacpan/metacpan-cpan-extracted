@@ -1,0 +1,34 @@
+---
+abstract: "Tom's Unicode Scripts So Life is Easier"
+author:
+  - 'Tom Christiansen <tchrist@perl.com>'
+build_requires:
+  Test::More: '0.94'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+  File::Spec::Functions: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Unicode-Tussle
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Lingua::EN::Syllable: '0'
+  Lingua::JA::Romanize::Japanese: '0'
+  Lingua::KO::Hangul::Util: '0'
+  Lingua::KO::Romanize::Hangul: '0'
+  Lingua::ZH::Romanize::Pinyin: '0'
+  Unicode::GCString: '0'
+  Unicode::Unihan: '0'
+  perl: '5.014001'
+resources:
+  bugtracker: https://github.com/briandfoy/Unicode-Tussle/issues
+  homepage: https://github.com/briandfoy/Unicode-Tussle
+  repository: https://github.com/briandfoy/Unicode-Tussle.git
+version: '1.111'

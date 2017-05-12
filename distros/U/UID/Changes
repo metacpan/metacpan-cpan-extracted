@@ -1,0 +1,16 @@
+Revision history for UID
+
+0.20    2007-July-22
+        First public release
+
+0.20.1  2007-July-24
+        Doh, encoding issues in the POD...
+
+0.21    2007-July-28
+        Hm, CPAN doesn't like that version number!
+
+0.23	2009-April-15
+		Fix up broken test
+
+0.24	2009-April-16
+		Fix test again (possible difference between Test::More from v.78 to v.86?)

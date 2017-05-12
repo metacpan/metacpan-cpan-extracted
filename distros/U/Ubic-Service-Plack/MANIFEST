@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Ubic/Service/PSGI.pm
+lib/Ubic/Service/Plack.pm
+t/bin/test.psgi
+t/release-pod-coverage.t
+t/release-pod-syntax.t
+t/test.t

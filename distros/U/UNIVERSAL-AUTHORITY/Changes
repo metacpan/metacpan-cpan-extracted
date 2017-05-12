@@ -1,0 +1,35 @@
+UNIVERSAL-AUTHORITY
+===================
+
+Created:      2011-11-05
+Home page:    <https://metacpan.org/release/UNIVERSAL-AUTHORITY>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=UNIVERSAL-AUTHORITY>
+Maintainer:   Toby Inkster <tobyink@cpan.org>
+
+0.006	2014-09-11
+
+ [ Packaging ]
+ - Switch to Dist::Inkt.
+
+0.005	2011-12-04
+
+ [ Bug Fixes ]
+ - Note dependency on Object::AUTHORITY.
+
+0.004	2011-12-03
+
+ [ Bug Fixes ]
+ - Upgrade Module::Package::RDF.
+
+0.003	2011-12-01
+
+ - Deprecate this module.
+ - Reimplement using Object::AUTHORITY.
+
+0.002	2011-11-06
+
+ - Allow calling as an object method.
+ - Expose reaonably_smart_match utility function.
+ - Remove trailing full stops from croak messages.
+
+0.001	2011-11-05	'Twas his intent

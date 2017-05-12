@@ -1,0 +1,20 @@
+Revision history for Perl extension Unicode::RecursiveDowngrade
+
+0.04  Thu Mar  6 11:57:30 JST 2008
+    - fixed the bug on when it is run on perl 5.9.0 or higher.
+        patched by Kazuma Shiraiwa
+
+0.03  Mon Jun 26 11:08:31 JST 2006
+    - fixed the bugs on test codes.
+        patched by Jun Kuriyama
+    - stop to spit any warning with an undef.
+        patched by Tatsuhiko Miyagawa
+
+0.02  Sat Sep 24 07:01:37 JST 2005
+    - fixed to downgrade for hash-key
+    - fixed to downgrade for blessed reference
+        above ideas were provided by Dan Kogai
+        http://blog.livedoor.jp/dankogai/archives/50097405.html
+
+0.01  Thu Sep 20 22:44:33 2005
+        - original version

@@ -1,0 +1,174 @@
+=head1 NAME
+
+UI::Dialog::Backend::NotifySend - backend for notify-send(1).
+
+=head1 SYNOPSIS
+
+  use UI::Dialog::Backend::NotifySend;
+  my $ns = new UI::Dialog::Backend::NotifySend ();
+  $ns->notify_send( subject => "Subject of notification." );
+
+=head1 ABSTRACT
+
+UI::Dialog::Backend::NotifySend is an OOPerl wrapper for the notify-send(1)
+program.
+
+=head1 DESCRIPTION
+
+Use this module to notify end-users via the notification daemon (Desktop Notifications).
+Requires the notify-send(1) progam to be installed (the libnotify-bin package in Debian).
+
+=head1 EXPORT
+
+=over 2
+
+None
+
+=back
+
+=head1 INHERITS
+
+=over 2
+
+UI::Dialog::Backend
+
+=back
+
+=head1 CONSTRUCTOR
+
+=head2 new( @options )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my $ns = new UI::Dialog::Backend::NotifySend ( );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+This is the Class Constructor method. It accepts a list of key => value pairs
+and uses them as the defaults when interacting with the various widgets. All
+methods accept the same arguments as new() except that the arguments passed to
+the methods are temporarily used instead of making them the default as the
+new() method does.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+A blessed object reference of the UI::Dialog::Backend::NotifySend class.
+
+=back
+
+=item OPTIONS
+
+The (...)'s after each option indicate the default for the option. An * denotes
+support by all the widget methods on a per-use policy defaulting to the
+values decided during object creation.
+
+=over 6
+
+=item B<expire-time = \d+> (0) *
+
+=item B<urgency = (low|normal|critical)> ('normal') *
+
+=item B<app-name = \w+> (none) *
+
+=item B<icon = ICON[,ICON...]> (none) *
+
+=item B<category = TYPE[,TYPE...]> (none) *
+
+=item B<hint = TYPE:NAME:VALUE> (none) *
+
+=back
+
+=back
+
+=head1 METHODS
+
+=head2 notify_send( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ $ns->notify_send( subject => "Notification subject",
+                   body => "Some text to display" );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Display a notification to the end user.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+Nothing.
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+=over 2
+
+=item PERLDOC
+
+ UI::Dialog
+ UI::Dialog::Backend
+
+=back
+
+=over 2
+
+=item MAN FILES
+
+osd_cat(1)
+
+=back
+
+=head1 BUGS
+
+Please email the author with any bug reports. Include the name of the
+module in the subject line.
+
+=head1 AUTHOR
+
+Kevin C. Krinke, E<lt>kevin@krinke.caE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+ Copyright (C) 2004-2016  Kevin C. Krinke <kevin@krinke.ca>
+
+ This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 2.1 of the License, or (at your option) any later version.
+
+ This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+
+ You should have received a copy of the GNU Lesser General Public
+ License along with this library; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+
+=cut

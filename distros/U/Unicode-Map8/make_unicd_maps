@@ -1,0 +1,121 @@
+#!/usr/bin/perl -w
+
+my $cdroot = shift || "CD";
+die "Need Unicode-CD location as argument\n" unless -d "$cdroot/mappings";
+# The content of the Unicode-CD is also available from
+#          ftp://ftp.unicode.org/Public
+
+unless (-d "maps") {
+    print STDERR "Making directory 'maps'\n";
+    mkdir('maps', 0777) || die "Can't create directory: $!";
+}
+
+if (open(ALIASES, "maps/aliases")) {
+    while (<ALIASES>) {
+	next if /^\s*\#/;
+	next if /^\s*$/;
+	chomp;
+	my($charset, @aliases) = split(' ', $_);
+	$aliases{$charset} = { map {$_ => 1} @aliases };
+    }
+}
+
+
+# Adobe encodings
+for $enc ("stdenc", "symbol", "zdingbat") {
+    my $file = "$cdroot/mappings/vendors/adobe/$enc.txt";
+    if (open(F, $file) ||
+	(-f "$file.gz" && open(F, "gunzip -c $file.gz|"))
+       ) {
+	$name = $enc;
+	@map = ();
+	while (<F>) {
+	    if (/^\#\s*Name:\s*(.*)/) {
+		$name = $1;
+	    } elsif (/^([0-9A-Fa-f]{4})\s+([0-9A-Fa-f]{2})/) {
+		push(@map, [$2, $1]);
+	    }
+	}
+	close(F);
+	next unless @map;
+
+	$name =~ s/ Encoding to Unicode$//;
+	$name =~ s/\s+/-/g;
+	
+	my $lc = lc($name);
+	$aliases{$name}{$lc}++ if $lc ne $name;
+
+	print STDERR "$name\n";
+	open(BINMAP, "| ./map8_txt2bin >maps/$name.bin") || die;
+	for (sort {$a->[0] cmp $b->[0]} @map) {
+	    printf BINMAP "0x%s 0x%s\n", @$_;
+	}
+	close(BINMAP);
+    }
+}
+
+# Microsoft stuff
+use File::Find;
+find(sub {
+	 return unless /\.txt(\.gz)?$/;
+	 push(@enc, $File::Find::name);
+     },
+     "$cdroot/mappings/vendors/micsft");
+
+for $enc (@enc) {
+
+    @map = ();
+    $cp = undef;
+    $name = undef;
+
+    $fname = $enc;
+    $fname =~ s/\.gz$//;
+    $fname =~ s/\.txt$//;
+    $fname =~ s,.*/,,;
+
+    $enc = "gunzip -c $enc|" if $enc =~ /\.gz$/;
+    #print "$fname\n";
+    open(F, $enc) || next;
+
+    while (<F>) {
+	if (/^\#\s*Name:\s*(.*)/) {
+            $name = $1;
+	    $name =~ s/ to Unicode table$//;
+	    $name =~ s/\s*\(.*\)\s*//;
+	    $cp = $1 if $name =~ s/(^cp\d+)_//;
+	} elsif (/^0x([0-9A-Fa-f]+)\s+0x([0-9A-Fa-f]+)/ && $name) {
+	    my $u8 = hex($1);
+	    if ($u8 > 0xFF) {
+	        printf STDERR "Skipping $fname ($name), not 8-bit charset\n";
+	        undef($name);
+		last;
+	    }
+	    my $u16 = hex($2);
+	    push(@map, [$u8, $u16]);
+	}
+    }
+    close(F);
+
+    next unless $name;
+
+    my $file = $cp || $name;
+    $aliases{$file}{$name}++ if $name ne $file;
+
+    print STDERR "$file\n";
+    open(BINMAP, "| ./map8_txt2bin >maps/$file.bin") || die;
+    for (@map) {
+	printf BINMAP "0x%02X 0x%04X\n", @$_;
+    }
+    close(BINMAP);
+}
+
+
+
+
+
+
+open(ALIASES, ">maps/aliases") || die "Can't write aliases: $!";
+for (sort keys %aliases) {
+    print ALIASES "$_ ", join(" ", sort keys %{$aliases{$_}}), "\n";
+}
+close(ALIASES);

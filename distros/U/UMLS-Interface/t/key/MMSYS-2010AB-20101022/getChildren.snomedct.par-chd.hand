@@ -1,0 +1,25 @@
+
+CuiFinder User Options: 
+   --config option set
+
+
+UMLS-Interface Configuration Information
+  Sources (SAB):
+    SNOMEDCT
+  Relations (REL):
+    CHD
+    PAR
+  Database: 
+    umls (MMSYS-2010AB-20101022)
+
+
+
+
+The children of hand (C0018563) are: 
+  structure of right hand (body structure) (C0230370) 
+  structure of left hand (C0230371) 
+  hand part (body structure) (C1268199) 
+  entire hand (body structure) (C1281583) 
+The children of hand (C1281583) are: 
+  entire right hand (C1288948) 
+  left hand (C1288949) 

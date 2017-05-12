@@ -1,0 +1,45 @@
+{
+   "abstract" : "GURL class implementation from the Google URL library.",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "URL-Google-GURL",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::Typemaps::Default" : "0.01",
+            "ExtUtils::XSpp" : "0.17"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Devel::CheckLib" : "0.01",
+            "ExtUtils::CppGuess" : "0.07",
+            "Module::Build" : "0.40",
+            "Module::Build::WithXSpp" : "0.01"
+         }
+      }
+   },
+   "provides" : {
+      "URL::Google::GURL" : {
+         "file" : "lib/URL/Google/GURL.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.03"
+}

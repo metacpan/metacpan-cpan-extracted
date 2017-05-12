@@ -1,0 +1,13 @@
+Build.PL
+Changes
+lib/User/Simple.pm
+lib/User/Simple/Admin.pm
+LICENSE
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/User-Simple.t
+t/pod.t
+examples/user-simple-admin
+META.json

@@ -1,0 +1,67 @@
+NAME
+    Unicode::Unihan - The Unihan Data Base 5.1.0
+
+SYNOPSIS
+      use Unicode::Unihan;
+      my $uh = Unicode::Unihan->new;
+      print join("," => $uh->Mandarin("\x{5c0f}\x{98fc}\x{5f3e}")), "\n";
+
+ABSTRACT
+    This module provides a user-friendly interface to the Unicode Unihan
+    Database 5.1. With this module, the Unihan database is as easy as shown
+    in the SYNOPSIS above.
+
+DESCRIPTION
+    The first thing you do is make the database available. Just say
+
+      use Unicode::Unihan;
+      my $uh = new Unicode::Unihan;
+
+    That's all you have to say. After that, you can access the database via
+    $uh->*tag*($string) where *tag* is the tag in the Unihan Database,
+    without 'k' prefix.
+
+    $data = $uh->*tag*($string)
+    @data = $uh->*tag*($string)
+      The first form (scalar context) returns the Unihan Database entry of
+      the first character in $string. The second form (array context) checks
+      the entry for each character in $string.
+
+        @data = $uh->Mandarin("\x{5c0f}\x{98fc}\x{5f3e}");
+        # @data is now ('SHAO4 XIAO3','SI4','DAN4')
+
+        @data = $uh->JapaneseKun("\x{5c0f}\x{98fc}\x{5f3e}");
+        # @data is now ('CHIISAI KO O','KAU YASHINAU','TAMA HAZUMU HIKU')
+
+FIELDS AND THEIR MEANINGS
+    For a complete list of tags, their meaning, and information on parsing
+    the value field, see <http://www.unicode.org/reports/tr38/>.
+
+SEE ALSO
+    perlunintro
+    perlunicode
+    The Unihand Database
+      <http://www.unicode.org/Public/UNIDATA/Unihan.html>
+
+AUTHOR
+    of the Module
+      Dan Kogai <dankogai@dan.co.jp>
+
+    of the Source Data
+      Unicode, Inc.
+
+COPYRIGHT AND LICENSE
+    of the Module
+      Copyright 2002-2008 by Dan Kogai, All rights reserved.
+
+      This library is free software; you can redistribute it and/or modify
+      it under the same terms as Perl itself.
+
+    of the Source Data
+      Copyright (c) 1996-2008 Unicode, Inc. All Rights reserved.
+
+             Name: Unihan database
+             Unicode version: 5.1.0
+             Table version: 1.1
+             Date: 3 March 2008
+

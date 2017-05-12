@@ -1,0 +1,125 @@
+#!/usr/bin/env perl
+package ubic;
+$ubic::VERSION = '1.60';
+use strict;
+use warnings;
+
+# ABSTRACT: command-line frontend to ubic services
+
+
+use Getopt::Long 2.33;
+use Pod::Usage;
+
+use Ubic;
+use Ubic::Cmd;
+
+return 1 if caller();
+unless (grep { $_ eq '/usr/local/bin' } split /:/, $ENV{PATH}) {
+    $ENV{PATH} = "/usr/local/bin:$ENV{PATH}";
+}
+
+my $force;
+GetOptions(
+    'f|force' => \$force,
+) or pod2usage(2);
+
+if (
+    not @ARGV
+    or @ARGV == 1 and $ARGV[0] eq 'help'
+) {
+    pod2usage(2);
+}
+
+my $command = shift @ARGV;
+if (@ARGV) {
+    Ubic::Cmd->run({
+        name => [@ARGV],
+        command => $command,
+        force => $force,
+    });
+}
+else {
+    Ubic::Cmd->run({
+        name => undef,
+        command => $command,
+        force => $force,
+    });
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+ubic - command-line frontend to ubic services
+
+=head1 VERSION
+
+version 1.60
+
+=head1 SYNOPSIS
+
+ ubic [-f] COMMAND [SERVICE]...
+
+ Supported commands:
+    status
+    start
+    stop
+    restart
+    reload
+    force-reload
+    cached-status
+    try-restart
+    ...and any service-specific commands
+
+=head1 DESCRIPTION
+
+This program can start, stop and display status of any services. It is a main tool for system administrator who wants to operate ubic services.
+
+B<ubic> conforms to LSB interface for init scripts (L<http://refspecs.freestandards.org/LSB_4.0.0/LSB-Core-generic/LSB-Core-generic/iniscrptact.html>) with obvious exception that it is invoked as C<ubic COMMAND SERVICE> instead of C</etc/init.d/SERVICE COMMAND>.
+
+It also can operate several services at once:
+
+=over
+
+=item *
+
+if invoked as C<ubic start service1 service2>, it will try to start both services;
+
+=item *
+
+if invoked as C<ubic start multiservice>, it will start all subservices of given multiservice;
+
+=item *
+
+if invoked as C<ubic start>, it will start all existing services.
+
+=back
+
+When operating multiservices, flag B<-f> can be used to force operations on "protected" multiservices. For example, you can't restart all services on host using C<ubic restart>, you have to say C<ubic restart -f>.
+
+=head1 EXIT STATUS
+
+When managing one service, exit status conforms to LSB specification when it makes sense.
+
+When managing several services, exit code is non-zero if any service fails, and zero if all operations succeeded.
+
+=head1 SEE ALSO
+
+L<LSB - Init Script Actions|http://refspecs.freestandards.org/LSB_4.0.0/LSB-Core-generic/LSB-Core-generic/iniscrptact.html>
+
+=head1 AUTHOR
+
+Vyacheslav Matyukhin <mmcleric@yandex-team.ru>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Yandex LLC.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

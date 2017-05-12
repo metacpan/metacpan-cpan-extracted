@@ -1,0 +1,7 @@
+Revision history for Ubic-Service-InitScriptWrapper
+
+0.02    2012-06-10
+    * proper requires and build_requires
+
+0.01    2012-02-15
+    * Initial release

@@ -1,0 +1,207 @@
+=head1 NAME
+
+URL::Encode - Encoding and decoding of C<application/x-www-form-urlencoded> encoding.
+
+=head1 SYNOPSIS
+
+    $octets = url_decode($octets);
+    $string = url_decode_utf8($octets);
+    
+    $octets = url_encode($octets);
+    $octets = url_encode_utf8($string);
+    
+    $params = url_params_flat($octets [, $utf8 = false]);
+    $params = url_params_mixed($octets [, $utf8 = false]);
+    $params = url_params_multi($octets [, $utf8 = false]);
+              url_params_each($octets, $callback [, $utf8 = false]);
+
+=head1 DESCRIPTION
+
+This module provides functions to encode and decode strings into and from the 
+C<application/x-www-form-urlencoded> encoding.
+
+The C<application/x-www-form-urlencoded> format encodes a ordered data 
+sets of pairs consisting of a name and a value, with pairs seperated by 
+ampersand or semicolon and names and values seperated by the equal sign. 
+Space characters are replaced with plus sign and any characters not in 
+the unreserved character set is encoded using the percent-encoding scheme 
+also used for resource identifiers. A percent-encoded octet is encoded as 
+a character triplet, consisting of the percent character "%" followed by 
+the two hexadecimal digits representing that octet's numeric value.
+
+The unreserved character set includes the uppercase and lowercase letters, 
+decimal digits, hyphen, period, underscore, and tilde.
+
+    ABCDEFGHIJKLMNOPQRSTUVWXYZ
+    abcdefghijklmnopqrstuvwxyz
+    0123456789
+    - . _ ~
+
+=head1 FUNCTIONS
+
+=head2 url_decode
+
+    $octets = url_decode($octets);
+    
+Returns a decoded representation of the given URL-encoded C<$octets> as an 
+octet string.
+
+=head2 url_decode_utf8
+
+    $string = url_decode_utf8($octets);
+
+Returns a decoded representation of the given URL-encoded C<$octets> in
+UTF-8 encoding as a character string.
+
+=head2 url_encode
+
+    $octets = url_encode($octets);
+
+Returns a URL-encoded representation of the given C<$octets> as an octet 
+string.
+
+=head2 url_encode_utf8
+
+    $octets = url_encode_utf8($string);
+
+Returns a URL-encoded representation of C<$string> in UTF-8 encoding as an 
+octet string.
+
+=head2 url_params_flat
+
+    $params = url_params_flat($octets);
+    $params = url_params_flat($octets, $utf8);
+
+Parses a URL-encoded data set of name/value pairs from the given octets. 
+Returns an ARRAY reference containing the URL-decoded name/value pairs in order.
+
+    $params = url_params_flat('foo=A&foo=B&bar=C');
+    $params; # [ foo => 'A', foo => 'B', bar => 'C' ]
+
+=head2 url_params_mixed
+
+    $params = url_params_mixed($octets);
+    $params = url_params_mixed($octets, $utf8);
+
+Parses a URL-encoded data set of name/value pairs from the given octets. 
+Returns a HASH reference containing the URL-decoded name/value pairs. Multiple 
+occurrences of a parameter will result in an ARRAY reference holding all 
+the values for that parameter in order.
+
+    $params = url_params_mixed('foo=A&foo=B&bar=C');
+    $params; # { foo => [ 'A', 'B' ], bar => 'C' }
+
+=head2 url_params_multi
+
+    $params = url_params_multi($octets);
+    $params = url_params_multi($octets, $utf8);
+
+Parses a URL-encoded data set of name/value pairs from the given octets. 
+Returns a HASH reference containing the URL-decoded name/value pairs. Values 
+are stored in an ARRAY reference.
+
+    $params = url_params_multi('foo=A&foo=B&bar=C');
+    $params; # { foo => [ 'A', 'B' ], bar => [ 'C' ] }
+
+=head2 url_params_each
+
+    url_params_each($octets, $callback);
+    url_params_each($octets, $callback, $utf8);
+
+Parses a URL-encoded data set of name/value pairs from the given octets. 
+Invokes the given callback for each URL-decoded name/value pair.
+
+    $callback = sub {
+        my ($name, $value) = @_;
+    };
+    
+    url_params_each($octets, $callback);
+
+=head1 EXPORTS
+
+None by default. All functions can be exported using the C<:all> tag or individually.
+
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item B<(F)> Usage: %s
+
+Subroutine called with wrong number of arguments.
+
+=item B<(F)> Wide character in octet string
+
+=item B<(F)> Malformed UTF-8 in URL-decoded octets
+
+=back
+
+=head1 PERFORMANCE
+
+The L<URL::Encode::XS> module provides faster C/XS implementations of 
+the functions found in this module. This module will automatically use 
+L<URL::Encode::XS> if it's installed.
+
+    Benchmarking url_decode() PP vs XS:
+
+            Rate    PP    XS
+    PP  507520/s    --  -92%
+    XS 6389812/s 1159%    --
+
+    Benchmarking url_encode() PP vs XS:
+
+            Rate    PP    XS
+    PP  119866/s    --  -98%
+    XS 7214089/s 5918%    --
+
+    Benchmarking url_params_mixed() PP vs XS:
+
+          Rate    PP    XS
+    PP  4450/s    --  -95%
+    XS 95015/s 2035%    --
+
+    Benchmarking URL::Encode::XS vs CGI::Deurl::XS
+
+                       Rate  CGI::Deurl::XS URL::Encode::XS
+    CGI::Deurl::XS  51932/s              --            -48%
+    URL::Encode::XS 99444/s             91%              --
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<URL::Encode::XS>
+
+XS implementation of C<URL::Encode>.
+
+=item L<CGI::Deurl::XS>
+
+=back
+
+=head1 SUPPORT
+
+=head2 BUGS
+
+Please report any bugs by email to C<bug-url-encode at rt.cpan.org>, or 
+through the web interface at L<http://rt.cpan.org/Public/Dist/Display.html?Name=URL-Encode>. 
+You will be automatically notified of any progress on the request by the system.
+
+=head2 SOURCE CODE
+
+This is open source software. The code repository is available for public 
+review and contribution under the terms of the license.
+
+L<http://github.com/chansen/p5-url-encode>
+
+    git clone http://github.com/chansen/p5-url-encode
+
+=head1 AUTHOR
+
+Christian Hansen C<chansen@cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright 2011-2014 by Christian Hansen.
+
+This library is free software; you can redistribute it and/or modify 
+it under the same terms as Perl itself.
+

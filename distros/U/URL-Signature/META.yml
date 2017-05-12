@@ -1,0 +1,29 @@
+---
+abstract: 'Tamper-proof URLs with Signed authentication'
+author:
+  - 'Breno G. de Oliveira <garu@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: URL-Signature
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: 0
+  Class::Load: 0
+  Digest::HMAC: 0
+  MIME::Base64: 3.11
+  Params::Util: 0
+  Test::More: 0
+  URI: 1.60
+  URI::QueryParam: 0
+version: 0.03

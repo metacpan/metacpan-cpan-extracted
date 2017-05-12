@@ -1,0 +1,41 @@
+$TTL 1D
+@		IN	SOA		ns1.foo.com.	hostmaster.foo.com. (
+				0025062001			; Serial Number: Update 00 on 25st June 2001
+				24H					; Refresh
+				2H					; Retry
+				14D					; Expire
+				1D)					; TTL
+
+@			IN	NS		ns1
+			IN	NS		ns.offsite.net.
+			IN	MX	10	mx1.foo.com.
+			IN	MX	20	mx2
+			IN	MX	30	mail.isp.net.
+			IN	A		192.168.1.1			
+
+ns1			IN	A		192.168.1.1
+mx1			IN	A		192.168.1.3
+mx2			IN	A		192.168.3.3
+www			IN	A		192.168.1.1	; www comment
+bigboss		IN	A		192.168.1.10
+bigboss		IN	MX	10	bigboss
+bigboss		IN	MX	40	mail.isp.net.
+
+gw			IN	A		192.168.5.1
+maximus		IN	A		192.168.5.2
+			IN	A		192.168.5.3
+			IN	A		192.168.5.4
+			IN	A		192.168.5.5
+
+; since there are records attached to labels below
+; 'downtown', records attached to 'downtown', should
+; be attached to '@', after a $ORIGIN line.
+downtown		1w	IN	NS	ns1.downtown
+downtown		1w	IN	NS	ns1				; ns1.foo.com
+router.downtown	1w	IN	A	192.168.10.1
+
+manager.accts	IN	CNAME	emily
+
+$ORIGIN accts
+@			IN	NS		router
+router		IN	A		192.168.11.1

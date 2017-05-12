@@ -1,0 +1,54 @@
+--- #YAML:1.0
+# $Id: MOF-1.3.ummfprofile,v 1.1 2006/05/14 01:40:03 kstephens Exp $
+# Profile for mapping MOF-1.3 primitive elements to implementation languages.
+# Author: kurt@umleta.com 2006/06/13
+Java:
+  '*':
+    '': 1
+  Model::Boolean:
+    construct: |-
+      (x != null && ! x.equals("") && ! x.equals("0") && ! x.equals("false") && ! x.equals("no"))
+    construct.type: java.lang.String
+    deconstruct: '(x ? "true" : "false")'
+    deconstruct.type: java.lang.String
+    primitive: 1
+    primitive.type: boolean
+    validate.type: true
+    validate.type.type: java.lang.String
+  Model::Integer:
+    primitive: 1
+    primitive.type: int
+    validate.type: 'true /* x =~ /^[-+]?[0-9]+$/ */'
+  Model::Long:
+    primitive: 1
+    primitive.type: long
+    validate.type: 'true /* x =~ /^[-+]?[0-9]+$/ */'
+  Model::String:
+    primitive: 1
+    primitive.type: java.lang.String
+    validate.type: true
+Perl:
+  '':
+    storage: true
+    generate: true
+  '*':
+    '': 1
+  Model::Boolean:
+    construct: |-
+      (defined($x) && $x ne '' && $x ne '0' && substr($x, 0, 1) ne 'f' && substr($x, 0, 1) ne 'n') 
+    deconstruct: "$x ? 'true' : 'false'"
+    primitive: 1
+    validate.type: 1
+    storage.type:  string
+    storage.type.sql:   CHAR(1) NULL
+  Model::Integer:
+    primitive: 1
+    validate.type: '$x =~ /^[-+]?[0-9]+$/'
+    storage.type:  int
+  Model::Long:
+    primitive: 1
+    validate.type: '$x =~ /^[-+]?[0-9]+$/'
+    storage.type:  int
+  Model::String:
+    primitive: 1
+    validate.type: 1

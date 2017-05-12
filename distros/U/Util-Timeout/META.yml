@@ -1,0 +1,22 @@
+---
+abstract: 'thin wrapper around Sys::SigAction::timeout_call'
+author:
+  - 'Ben Hengst <notbenh@cpan.org>'
+build_requires:
+  Module::Build: 0.3601
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.101900, CPAN::Meta::Converter version 2.101670'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Util-Timeout
+requires:
+  Devel::Declare::Parser::Sublike: 0.017
+  Exporter::Declare: 0.103
+  POSIX: 0
+  Sys::SigAction: 0.11
+  Test::Most: 0
+version: 0.01

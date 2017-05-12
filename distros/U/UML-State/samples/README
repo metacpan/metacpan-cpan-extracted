@@ -1,0 +1,45 @@
+This directory contains examples of state diagrams with input to and output
+from drawstate.pl and drawstatexml.pl.  The .input files and their
+corresponding .xml files produce the identical .svg output.  For those who
+can't view SVG, PNG is also provided, along with instructions for
+making it with Apache Batik.
+
+This file explains the meaning of the diagrams.  The input formats
+are described in drawstate.pl for the simple text format and in
+state.dtd in the samples directory for the xml format.
+
+Coins:
+coinop.input coinop.xml coinop.svg coinop.png
+Suppose you have a coin operated vending machine which accepts 5, 10, and
+25 cent coins.  If it needs 25 cents for each purchase, accepting states
+are 25 and 30 (this diagram is simplified, while still showing common
+features).  The edges are numbered with coin denomination.  The
+nodes are labeled with the accumlated total of coins deposited to date.
+This example is the one that t/01state.t uses to test the generator.
+
+    drawstate.pl coinop.input > coinop.svg
+
+OR
+
+    drawstatexml.pl coinop.xml > coinop.svg
+
+THEN
+
+    java -jar batik-rasterize.jar coinop.svg
+
+Tennis:
+tennis.input tennis.xml tennis.svg tennis.png
+This represents the state machine for scoring tennis.  The edges are labeled S
+for server and R for receiver of serve.  The nodes are labeled with things
+the chair umpire might say at Wimbledon, except that the chair would replace
+Server and Receiver with names.
+
+    drawstate.pl tennis.input > tennis.svg
+
+OR
+
+    drawstatexml.pl tennis.xml > tennis.svg
+
+THEN
+
+    java -jar batik-rasterize.jar tennis.svg

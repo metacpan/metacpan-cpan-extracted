@@ -1,0 +1,110 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/UNIVERSAL-AUTHORITY/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:runtime-requirement [ doap-deps:on "Object::AUTHORITY"^^doap-deps:CpanId ], [ doap-deps:on "UNIVERSAL"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.61"^^doap-deps:CpanId ], [ doap-deps:on "Test::Exception"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=UNIVERSAL-AUTHORITY>;
+	doap:created         "2011-11-05"^^xsd:date;
+	doap:download-page   <https://metacpan.org/release/UNIVERSAL-AUTHORITY>;
+	doap:homepage        <https://metacpan.org/release/UNIVERSAL-AUTHORITY>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      [
+		a foaf:Person;
+		foaf:mbox <mailto:tobyink@cpan.org>;
+		foaf:name "Toby Inkster";
+	];
+	doap:name            "UNIVERSAL-AUTHORITY";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/UNIVERSAL-AUTHORITY/v_0-001>, <http://purl.org/NET/cpan-uri/dist/UNIVERSAL-AUTHORITY/v_0-002>, <http://purl.org/NET/cpan-uri/dist/UNIVERSAL-AUTHORITY/v_0-003>, <http://purl.org/NET/cpan-uri/dist/UNIVERSAL-AUTHORITY/v_0-004>, <http://purl.org/NET/cpan-uri/dist/UNIVERSAL-AUTHORITY/v_0-005>, <http://purl.org/NET/cpan-uri/dist/UNIVERSAL-AUTHORITY/v_0-006>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-universal-authority>;
+	];
+	doap:shortdesc       "adds an AUTHORITY method to UNIVERSAL".
+
+<http://purl.org/NET/cpan-uri/dist/UNIVERSAL-AUTHORITY/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "'Twas his intent";
+	dc:issued            "2011-11-05"^^xsd:date;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/UNIVERSAL-AUTHORITY-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/UNIVERSAL-AUTHORITY/v_0-002>
+	a                    doap:Version;
+	dc:issued            "2011-11-06"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			rdfs:label "Allow calling as an object method."@en;
+		], [
+			rdfs:label "Expose reaonably_smart_match utility function."@en;
+		], [
+			rdfs:label "Remove trailing full stops from croak messages."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/UNIVERSAL-AUTHORITY/v_0-001>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/UNIVERSAL-AUTHORITY-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/UNIVERSAL-AUTHORITY/v_0-003>
+	a                    doap:Version;
+	dc:issued            "2011-12-01"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [ rdfs:label "Deprecate this module."@en ], [
+			rdfs:label "Reimplement using Object::AUTHORITY."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/UNIVERSAL-AUTHORITY/v_0-002>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/UNIVERSAL-AUTHORITY-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/UNIVERSAL-AUTHORITY/v_0-004>
+	a                    doap:Version;
+	dc:issued            "2011-12-03"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix, doap-changeset:Packaging;
+			rdfs:label "Upgrade Module::Package::RDF."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/UNIVERSAL-AUTHORITY/v_0-003>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/UNIVERSAL-AUTHORITY-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/UNIVERSAL-AUTHORITY/v_0-005>
+	a                    doap:Version;
+	dc:issued            "2011-12-04"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix, doap-changeset:Packaging;
+			rdfs:label "Note dependency on Object::AUTHORITY."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/UNIVERSAL-AUTHORITY/v_0-004>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/UNIVERSAL-AUTHORITY-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/UNIVERSAL-AUTHORITY/v_0-006>
+	a                    doap:Version;
+	dc:identifier        "UNIVERSAL-AUTHORITY-0.006"^^xsd:string;
+	dc:issued            "2014-09-11"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Switch to Dist::Inkt.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/UNIVERSAL-AUTHORITY-0.006.tar.gz>;
+	doap:revision        "0.006"^^xsd:string.
+

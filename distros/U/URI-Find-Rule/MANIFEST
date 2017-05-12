@@ -1,0 +1,9 @@
+Build.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml
+lib/URI/Find/Rule.pm
+t/URI-Find-Rule.t
+t/test-rules.t
+Makefile.PL
+README

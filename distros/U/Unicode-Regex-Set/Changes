@@ -1,0 +1,16 @@
+Revision history for Perl module Unicode::Regex::Set.
+
+0.04  Wed Mar  7 21:46:15 2012
+    - avoid "use vars" and "use Test".
+
+0.03  Sun Jul 31 11:02:28 2011
+    - fix the tarball with world writable files.
+    - allowed [:prop:value:], such as [:gc:Lu:].
+      but it is not sure what version of perl supports such a syntax.
+
+0.02  Sun Jun 15 15:17:42 2003
+    - many bug fixes
+    - more doc
+
+0.01  Sat Jun 14 21:15:21 2003
+    - original version;

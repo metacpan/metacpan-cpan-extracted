@@ -1,0 +1,29 @@
+---
+abstract: 'memcached as ubic service'
+author:
+  - 'Vyacheslav Matyukhin <me@berekuk.ru>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Ubic-Service-Memcached
+requires:
+  Cache::Memcached: 0
+  Carp: 0
+  Morpheus: 0
+  Params::Validate: 0
+  Ubic::Daemon: 0
+  Ubic::Result: 0
+  Ubic::Service::Skeleton: 0
+  parent: 0
+resources:
+  bugtracker: http://github.com/berekuk/Ubic-Service-Memcached/issues
+  homepage: http://github.com/berekuk/Ubic-Service-Memcached/wiki
+  repository: git://github.com/berekuk/Ubic-Service-Memcached.git
+version: 2.02

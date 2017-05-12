@@ -1,0 +1,44 @@
+
+
+=pod
+
+=head1 NAME
+
+ur describe - show class properties, relationships, meta-data
+
+
+
+=head1 VERSION
+
+This document describes ur describe version 0.29.
+
+=head1 SYNOPSIS
+
+ur describe CLASSES-OR-MODULES
+
+ur describe UR::Object
+
+ur describe Acme::Order Acme::Product Acme::Order::LineItem
+
+
+
+=head1 REQUIRED ARGUMENTS
+
+=over
+
+
+=item CLASSES-OR-MODULES
+
+classes to describe by class name or module path
+
+
+=back
+
+=head1 DESCRIPTION:
+
+  show class properties, relationships, meta-data
+
+
+
+=cut
+

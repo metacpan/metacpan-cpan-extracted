@@ -1,0 +1,6 @@
+load.t
+pod.t
+pod_coverage.t
+files/filename_case_folding.pl
+files/filenames_with_different_nf.t
+files/filenames.t

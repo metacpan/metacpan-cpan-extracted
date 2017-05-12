@@ -1,0 +1,23 @@
+Build.PL
+CHANGELOG
+lib/UAV/Pilot/Video/Ffmpeg.pm
+lib/UAV/Pilot/Video/H264Decoder.pm
+lib/UAV/Pilot/Video/H264Decoder.xs
+lib/UAV/Pilot/Video/JPEGDecoder.pm
+lib/UAV/Pilot/Video/JPEGDecoder.xs
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+ppport.h
+README
+RELEASE.HOWTO
+ROADMAP
+t/001_load.t
+t/002_pod.t
+t/010_h264_decode.t
+t/020_jpeg_decode.t
+t_data/frame.h264
+t_data/frame.jpg
+TODO
+uav.h

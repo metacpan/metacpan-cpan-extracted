@@ -1,0 +1,34 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Mail/Identity.pm
+lib/Mail/Identity.pod
+lib/User/Identity.pm
+lib/User/Identity.pod
+lib/User/Identity/Archive.pm
+lib/User/Identity/Archive.pod
+lib/User/Identity/Archive/Plain.pm
+lib/User/Identity/Archive/Plain.pod
+lib/User/Identity/Collection.pm
+lib/User/Identity/Collection.pod
+lib/User/Identity/Collection/Emails.pm
+lib/User/Identity/Collection/Emails.pod
+lib/User/Identity/Collection/Locations.pm
+lib/User/Identity/Collection/Locations.pod
+lib/User/Identity/Collection/Systems.pm
+lib/User/Identity/Collection/Systems.pod
+lib/User/Identity/Collection/Users.pm
+lib/User/Identity/Collection/Users.pod
+lib/User/Identity/Item.pm
+lib/User/Identity/Item.pod
+lib/User/Identity/Location.pm
+lib/User/Identity/Location.pod
+lib/User/Identity/System.pm
+lib/User/Identity/System.pod
+t/10userid.t
+t/20loc.t
+t/30col.t
+xt/99pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

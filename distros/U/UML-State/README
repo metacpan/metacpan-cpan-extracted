@@ -1,0 +1,36 @@
+UML/State version 0.01
+======================
+
+UML::State helps drawstate.pl produce simple UML state diagrams.
+The diagrams do not attempt to comply to any particular version of
+UML.  They merely allow you to make diagrams which help you see
+states and transitions.
+
+The diagrams are rigid in structure with nodes located in a grid.
+If you don't like this approach, you should probably use GraphViz.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires nothing other than the Perl standard installation.
+
+DESCRIPTION
+
+See the samples directory and the drawstate.pl script for details on
+how to format input and what to expect for output.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Phil Crow, all rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl 5.8.0 itself. 
+

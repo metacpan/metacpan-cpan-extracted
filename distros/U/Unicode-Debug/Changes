@@ -1,0 +1,26 @@
+Unicode-Debug
+=============
+
+Created:      2012-04-26
+Home page:    <https://metacpan.org/release/Unicode-Debug>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Unicode-Debug>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.002	2013-11-09
+
+ [ Documentation ]
+ - Document the test suite.
+ - Document usage of PerlIO::via::UnicodeDebug with Test::More.
+
+ [ Test Suite ]
+ - Update xt tests.
+
+ [ Packaging ]
+ - use Dist::Inkt.
+
+ [ Other ]
+ - Backport to Perl 5.8.1.
+ - Drop smart match usage.
+ - General tidy-ups.
+
+0.001	2012-04-26	Initial release

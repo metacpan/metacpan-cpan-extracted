@@ -1,0 +1,31 @@
+---
+abstract: 'Ultra fast parallelized asyncronous USPS rate lookups.'
+author:
+  - 'JT Smith <jt@plainblack.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: USPS-RateRequest
+requires:
+  AnyEvent: '0'
+  AnyEvent::HTTP::LWP::UserAgent: '0'
+  Box::Calc: '0'
+  Data::Printer: '0'
+  JSON: '2.0'
+  Log::Any: '0'
+  Moose: '0'
+  Ouch: '0.0400'
+  Test::Deep: '0'
+  Test::More: '0'
+  XML::DOM: '0'
+  XML::Simple: '0'
+resources:
+  bugtracker: http://github.com/rizen/USPS-RateRequest/issues
+  repository: git://github.com/rizen/USPS-RateRequest.git
+version: '1.0004'

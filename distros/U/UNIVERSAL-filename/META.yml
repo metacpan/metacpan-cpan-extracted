@@ -1,0 +1,26 @@
+---
+abstract: 'file location inspector of modules'
+author:
+  - 'shelling <navyblueshellingford@gmail.com>'
+  - 'shelling <navyblueshellingford@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: UNIVERSAL-filename
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+resources:
+  license: http://opensource.org/licenses/mit-license.php
+  repository: git://github.com/shelling/universal-filename
+version: 0.03

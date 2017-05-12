@@ -1,0 +1,12 @@
+Revision history for Perl extension UUID::Random.
+
+0.04 CPAN fixes :)
+
+0.03 prerequisite for perl 5.8.8 removed
+
+0.02 Tests added, pod fix
+
+0.01  Sun Jun 22 12:36:17 2008
+	- original version; created by h2xs 1.23 with options
+		-Xt -n UUID::Random
+

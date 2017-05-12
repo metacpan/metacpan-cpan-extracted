@@ -1,0 +1,28 @@
+
+
+=pod
+
+=head1 NAME
+
+ur old diff-update - a command which operates on classes/modules in a UR namespace directory
+
+
+
+=head1 VERSION
+
+This document describes ur old diff-update version 0.29.
+
+=head1 SYNOPSIS
+
+ur old diff-update (no execute or sub commands implemented)
+
+
+
+=head1 DESCRIPTION:
+
+  a command which operates on classes/modules in a UR namespace directory
+
+
+
+=cut
+

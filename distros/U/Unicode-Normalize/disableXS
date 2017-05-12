@@ -1,0 +1,12 @@
+use File::Copy qw();
+
+if (-f "Normalize.xs") {
+    print STDERR "Disabling XS in sources...\n";
+
+    die "***** Failed, sources could be inconsistent! *****\n"
+     unless File::Copy::move('MANIFEST',	'MANIFEST.X')
+	and File::Copy::move('MANIFEST.N',	'MANIFEST')
+	and File::Copy::move('Normalize.pm',	'Normalize.pmX')
+	and File::Copy::move('Normalize.xs',	'Normalize.xsX')
+	and File::Copy::move('Normalize.pmN',	'Normalize.pm');
+}

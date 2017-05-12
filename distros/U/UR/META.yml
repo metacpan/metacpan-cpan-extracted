@@ -1,0 +1,1014 @@
+---
+abstract: 'rich declarative transactional objects'
+author:
+  - 'UR was built by the software development team at the McDonnell Genome Institute'
+build_requires:
+  Test::Deep: '0'
+  Test::Exception: '0'
+  Test::Fatal: '0'
+  Test::Fork: '0'
+  Test::More: '0.98'
+configure_requires:
+  CPAN::Meta: '0'
+  CPAN::Meta::Prereqs: '0'
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v1.1.0, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: UR
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Command:
+    file: lib/Command.pm
+    version: '0.46'
+  Command::Common:
+    file: lib/Command/Common.pm
+  Command::DynamicSubCommands:
+    file: lib/Command/DynamicSubCommands.pm
+  Command::Shell:
+    file: lib/Command/Shell.pm
+  Command::SubCommandFactory:
+    file: lib/Command/SubCommandFactory.pm
+  Command::Test:
+    file: lib/Command/Test.pm
+  Command::Test::Echo:
+    file: lib/Command/Test/Echo.pm
+  Command::Test::Tree1:
+    file: lib/Command/Test/Tree1.pm
+  Command::Test::Tree1::Echo1:
+    file: lib/Command/Test/Tree1/Echo1.pm
+  Command::Test::Tree1::Echo2:
+    file: lib/Command/Test/Tree1/Echo2.pm
+  Command::Tree:
+    file: lib/Command/Tree.pm
+    version: '0.46'
+  Command::V1:
+    file: lib/Command/V1.pm
+    version: '0.46'
+  Command::V2:
+    file: lib/Command/V2.pm
+    version: '0.46'
+  Devel::callsfrom:
+    file: lib/Devel/callcount.pm
+  My::TAP::Parser::Iterator::Process::LSF:
+    file: lib/UR/Namespace/Command/Test/Run.pm
+  My::TAP::Parser::IteratorFactory::LSF:
+    file: lib/UR/Namespace/Command/Test/Run.pm
+  My::TAP::Parser::Multiplexer:
+    file: lib/UR/Namespace/Command/Test/Run.pm
+  My::TAP::Parser::Scheduler:
+    file: lib/UR/Namespace/Command/Test/Run.pm
+  My::TAP::Parser::Timer:
+    file: lib/UR/Namespace/Command/Test/Run.pm
+  UR:
+    file: lib/UR.pm
+    version: '0.46'
+  UR::All:
+    file: lib/UR/All.pm
+    version: '0.46'
+  UR::AttributeHandlers:
+    file: lib/UR/AttributeHandlers.pm
+    version: '0.46'
+  UR::BoolExpr:
+    file: lib/UR/BoolExpr.pm
+    version: '0.46'
+  UR::BoolExpr::BxParser:
+    file: lib/UR/BoolExpr/BxParser.pm
+  UR::BoolExpr::BxParser::Yapp::Driver:
+    file: lib/UR/BoolExpr/BxParser.pm
+    version: '1.05'
+  UR::BoolExpr::Template:
+    file: lib/UR/BoolExpr/Template.pm
+    version: '0.46'
+  UR::BoolExpr::Template::And:
+    file: lib/UR/BoolExpr/Template/And.pm
+    version: '0.46'
+  UR::BoolExpr::Template::Composite:
+    file: lib/UR/BoolExpr/Template/Composite.pm
+    version: '0.46'
+  UR::BoolExpr::Template::Or:
+    file: lib/UR/BoolExpr/Template/Or.pm
+    version: '0.46'
+  UR::BoolExpr::Template::PropertyComparison:
+    file: lib/UR/BoolExpr/Template/PropertyComparison.pm
+    version: '0.46'
+  UR::BoolExpr::Template::PropertyComparison::Between:
+    file: lib/UR/BoolExpr/Template/PropertyComparison/Between.pm
+    version: '0.46'
+  UR::BoolExpr::Template::PropertyComparison::Equals:
+    file: lib/UR/BoolExpr/Template/PropertyComparison/Equals.pm
+    version: '0.46'
+  UR::BoolExpr::Template::PropertyComparison::False:
+    file: lib/UR/BoolExpr/Template/PropertyComparison/False.pm
+    version: '0.46'
+  UR::BoolExpr::Template::PropertyComparison::GreaterOrEqual:
+    file: lib/UR/BoolExpr/Template/PropertyComparison/GreaterOrEqual.pm
+    version: '0.46'
+  UR::BoolExpr::Template::PropertyComparison::GreaterThan:
+    file: lib/UR/BoolExpr/Template/PropertyComparison/GreaterThan.pm
+    version: '0.46'
+  UR::BoolExpr::Template::PropertyComparison::In:
+    file: lib/UR/BoolExpr/Template/PropertyComparison/In.pm
+    version: '0.46'
+  UR::BoolExpr::Template::PropertyComparison::Isa:
+    file: lib/UR/BoolExpr/Template/PropertyComparison/Isa.pm
+    version: '0.46'
+  UR::BoolExpr::Template::PropertyComparison::LessOrEqual:
+    file: lib/UR/BoolExpr/Template/PropertyComparison/LessOrEqual.pm
+    version: '0.46'
+  UR::BoolExpr::Template::PropertyComparison::LessThan:
+    file: lib/UR/BoolExpr/Template/PropertyComparison/LessThan.pm
+    version: '0.46'
+  UR::BoolExpr::Template::PropertyComparison::Like:
+    file: lib/UR/BoolExpr/Template/PropertyComparison/Like.pm
+    version: '0.46'
+  UR::BoolExpr::Template::PropertyComparison::Matches:
+    file: lib/UR/BoolExpr/Template/PropertyComparison/Matches.pm
+    version: '0.46'
+  UR::BoolExpr::Template::PropertyComparison::NotBetween:
+    file: lib/UR/BoolExpr/Template/PropertyComparison/NotBetween.pm
+    version: '0.46'
+  UR::BoolExpr::Template::PropertyComparison::NotEquals:
+    file: lib/UR/BoolExpr/Template/PropertyComparison/NotEquals.pm
+    version: '0.46'
+  UR::BoolExpr::Template::PropertyComparison::NotIn:
+    file: lib/UR/BoolExpr/Template/PropertyComparison/NotIn.pm
+    version: '0.46'
+  UR::BoolExpr::Template::PropertyComparison::NotLike:
+    file: lib/UR/BoolExpr/Template/PropertyComparison/NotLike.pm
+    version: '0.46'
+  UR::BoolExpr::Template::PropertyComparison::True:
+    file: lib/UR/BoolExpr/Template/PropertyComparison/True.pm
+    version: '0.46'
+  UR::BoolExpr::Util:
+    file: lib/UR/BoolExpr/Util.pm
+    version: '0.46'
+  UR::BoolExpr::Util::clonedThing:
+    file: lib/UR/BoolExpr/Util.pm
+  UR::Change:
+    file: lib/UR/Change.pm
+    version: '0.46'
+  UR::Context:
+    file: lib/UR/Context.pm
+    version: '0.46'
+  UR::Context::AutoUnloadPool:
+    file: lib/UR/Context/AutoUnloadPool.pm
+    version: '0.46'
+  UR::Context::DefaultRoot:
+    file: lib/UR/Context/DefaultRoot.pm
+    version: '0.46'
+  UR::Context::LoadingIterator:
+    file: lib/UR/Context/LoadingIterator.pm
+    version: '0.46'
+  UR::Context::ObjectFabricator:
+    file: lib/UR/Context/ObjectFabricator.pm
+    version: '0.46'
+  UR::Context::Process:
+    file: lib/UR/Context/Process.pm
+    version: '0.46'
+  UR::Context::Root:
+    file: lib/UR/Context/Root.pm
+    version: '0.46'
+  UR::Context::Transaction:
+    file: lib/UR/Context/Transaction.pm
+    version: '0.46'
+  UR::DBI:
+    file: lib/UR/DBI.pm
+    version: '0.46'
+  UR::DBI::Report:
+    file: lib/UR/DBI/Report.pm
+    version: '0.46'
+  UR::DBI::db:
+    file: lib/UR/DBI.pm
+  UR::DBI::st:
+    file: lib/UR/DBI.pm
+  UR::DataSource:
+    file: lib/UR/DataSource.pm
+    version: '0.46'
+  UR::DataSource::CSV:
+    file: lib/UR/DataSource/CSV.pm
+    version: '0.46'
+  UR::DataSource::Code:
+    file: lib/UR/DataSource/Code.pm
+    version: '0.46'
+  UR::DataSource::Default:
+    file: lib/UR/DataSource/Default.pm
+    version: '0.46'
+  UR::DataSource::File:
+    file: lib/UR/DataSource/File.pm
+    version: '0.46'
+  UR::DataSource::FileMux:
+    file: lib/UR/DataSource/FileMux.pm
+    version: '0.46'
+  UR::DataSource::Filesystem:
+    file: lib/UR/DataSource/Filesystem.pm
+    version: '0.46'
+  UR::DataSource::Meta:
+    file: lib/UR/DataSource/Meta.pm
+    version: '0.46'
+  UR::DataSource::MySQL:
+    file: lib/UR/DataSource/MySQL.pm
+    version: '0.46'
+  UR::DataSource::Oracle:
+    file: lib/UR/DataSource/Oracle.pm
+    version: '0.46'
+  UR::DataSource::Pg:
+    file: lib/UR/DataSource/Pg.pm
+    version: '0.46'
+  UR::DataSource::Pg::Operator::False:
+    file: lib/UR/DataSource/Pg/Operator/False.pm
+  UR::DataSource::Pg::Operator::True:
+    file: lib/UR/DataSource/Pg/Operator/True.pm
+  UR::DataSource::QueryPlan:
+    file: lib/UR/DataSource/QueryPlan.pm
+    version: '0.46'
+  UR::DataSource::RDBMS:
+    file: lib/UR/DataSource/RDBMS.pm
+    version: '0.46'
+  UR::DataSource::RDBMS::BitmapIndex:
+    file: lib/UR/DataSource/RDBMS/BitmapIndex.pm
+    version: '0.46'
+  UR::DataSource::RDBMS::Entity:
+    file: lib/UR/DataSource/RDBMS/Entity.pm
+    version: '0.46'
+  UR::DataSource::RDBMS::FkConstraint:
+    file: lib/UR/DataSource/RDBMS/FkConstraint.pm
+    version: '0.46'
+  UR::DataSource::RDBMS::FkConstraintColumn:
+    file: lib/UR/DataSource/RDBMS/FkConstraintColumn.pm
+    version: '0.46'
+  UR::DataSource::RDBMS::Operator::Between:
+    file: lib/UR/DataSource/RDBMS/Operator/Between.pm
+  UR::DataSource::RDBMS::Operator::Equals:
+    file: lib/UR/DataSource/RDBMS/Operator/Equals.pm
+  UR::DataSource::RDBMS::Operator::False:
+    file: lib/UR/DataSource/RDBMS/Operator/False.pm
+  UR::DataSource::RDBMS::Operator::GreaterOrEqual:
+    file: lib/UR/DataSource/RDBMS/Operator/GreaterOrEqual.pm
+  UR::DataSource::RDBMS::Operator::GreaterThan:
+    file: lib/UR/DataSource/RDBMS/Operator/GreaterThan.pm
+  UR::DataSource::RDBMS::Operator::In:
+    file: lib/UR/DataSource/RDBMS/Operator/In.pm
+  UR::DataSource::RDBMS::Operator::LessOrEqual:
+    file: lib/UR/DataSource/RDBMS/Operator/LessOrEqual.pm
+  UR::DataSource::RDBMS::Operator::LessThan:
+    file: lib/UR/DataSource/RDBMS/Operator/LessThan.pm
+  UR::DataSource::RDBMS::Operator::Like:
+    file: lib/UR/DataSource/RDBMS/Operator/Like.pm
+  UR::DataSource::RDBMS::Operator::NotBetween:
+    file: lib/UR/DataSource/RDBMS/Operator/NotBetween.pm
+  UR::DataSource::RDBMS::Operator::NotEquals:
+    file: lib/UR/DataSource/RDBMS/Operator/NotEquals.pm
+  UR::DataSource::RDBMS::Operator::NotIn:
+    file: lib/UR/DataSource/RDBMS/Operator/NotIn.pm
+  UR::DataSource::RDBMS::Operator::NotLike:
+    file: lib/UR/DataSource/RDBMS/Operator/NotLike.pm
+  UR::DataSource::RDBMS::Operator::True:
+    file: lib/UR/DataSource/RDBMS/Operator/True.pm
+  UR::DataSource::RDBMS::PkConstraintColumn:
+    file: lib/UR/DataSource/RDBMS/PkConstraintColumn.pm
+    version: '0.46'
+  UR::DataSource::RDBMS::Table:
+    file: lib/UR/DataSource/RDBMS/Table.pm
+    version: '0.46'
+  UR::DataSource::RDBMS::Table::View::Default::Text:
+    file: lib/UR/DataSource/RDBMS/Table/View/Default/Text.pm
+    version: '0.46'
+  UR::DataSource::RDBMS::TableColumn:
+    file: lib/UR/DataSource/RDBMS/TableColumn.pm
+    version: '0.46'
+  UR::DataSource::RDBMS::TableColumn::View::Default::Text:
+    file: lib/UR/DataSource/RDBMS/TableColumn/View/Default/Text.pm
+    version: '0.46'
+  UR::DataSource::RDBMS::UniqueConstraintColumn:
+    file: lib/UR/DataSource/RDBMS/UniqueConstraintColumn.pm
+    version: '0.46'
+  UR::DataSource::RDBMSRetriableOperations:
+    file: lib/UR/DataSource/RDBMSRetriableOperations.pm
+  UR::DataSource::SQLite:
+    file: lib/UR/DataSource/SQLite.pm
+    version: '0.46'
+  UR::DataSource::ValueDomain:
+    file: lib/UR/DataSource/ValueDomain.pm
+    version: '0.46'
+  UR::Debug:
+    file: lib/UR/Debug.pm
+    version: '0.46'
+  UR::DeletedRef:
+    file: lib/UR/DeletedRef.pm
+    version: '0.46'
+  UR::Doc::Pod2Html:
+    file: lib/UR/Doc/Pod2Html.pm
+    version: '0.46'
+  UR::Doc::Section:
+    file: lib/UR/Doc/Section.pm
+    version: '0.46'
+  UR::Doc::Writer:
+    file: lib/UR/Doc/Writer.pm
+    version: '0.46'
+  UR::Doc::Writer::Html:
+    file: lib/UR/Doc/Writer/Html.pm
+    version: '0.46'
+  UR::Doc::Writer::Pod:
+    file: lib/UR/Doc/Writer/Pod.pm
+    version: '0.46'
+  UR::Env::UR_COMMAND_DUMP_DEBUG_MESSAGES:
+    file: lib/UR/Env/UR_COMMAND_DUMP_DEBUG_MESSAGES.pm
+    version: '0.46'
+  UR::Env::UR_COMMAND_DUMP_STATUS_MESSAGES:
+    file: lib/UR/Env/UR_COMMAND_DUMP_STATUS_MESSAGES.pm
+    version: '0.46'
+  UR::Env::UR_CONTEXT_BASE:
+    file: lib/UR/Env/UR_CONTEXT_BASE.pm
+    version: '0.46'
+  UR::Env::UR_CONTEXT_CACHE_SIZE_HIGHWATER:
+    file: lib/UR/Env/UR_CONTEXT_CACHE_SIZE_HIGHWATER.pm
+    version: '0.46'
+  UR::Env::UR_CONTEXT_CACHE_SIZE_LOWWATER:
+    file: lib/UR/Env/UR_CONTEXT_CACHE_SIZE_LOWWATER.pm
+    version: '0.46'
+  UR::Env::UR_CONTEXT_LIBS:
+    file: lib/UR/Env/UR_USED_LIBS.pm
+    version: '0.46'
+  UR::Env::UR_CONTEXT_MONITOR_QUERY:
+    file: lib/UR/Env/UR_CONTEXT_MONITOR_QUERY.pm
+    version: '0.46'
+  UR::Env::UR_CONTEXT_ROOT:
+    file: lib/UR/Env/UR_CONTEXT_ROOT.pm
+    version: '0.46'
+  UR::Env::UR_DBI_DUMP_STACK_ON_CONNECT:
+    file: lib/UR/Env/UR_DBI_DUMP_STACK_ON_CONNECT.pm
+    version: '0.46'
+  UR::Env::UR_DBI_EXPLAIN_SQL_CALLSTACK:
+    file: lib/UR/Env/UR_DBI_EXPLAIN_SQL_CALLSTACK.pm
+    version: '0.46'
+  UR::Env::UR_DBI_EXPLAIN_SQL_IF:
+    file: lib/UR/Env/UR_DBI_EXPLAIN_SQL_IF.pm
+    version: '0.46'
+  UR::Env::UR_DBI_EXPLAIN_SQL_MATCH:
+    file: lib/UR/Env/UR_DBI_EXPLAIN_SQL_MATCH.pm
+    version: '0.46'
+  UR::Env::UR_DBI_EXPLAIN_SQL_SLOW:
+    file: lib/UR/Env/UR_DBI_EXPLAIN_SQL_SLOW.pm
+    version: '0.46'
+  UR::Env::UR_DBI_MONITOR_DML:
+    file: lib/UR/Env/UR_DBI_MONITOR_DML.pm
+    version: '0.46'
+  UR::Env::UR_DBI_MONITOR_EVERY_FETCH:
+    file: lib/UR/Env/UR_DBI_MONITOR_EVERY_FETCH.pm
+    version: '0.46'
+  UR::Env::UR_DBI_MONITOR_SQL:
+    file: lib/UR/Env/UR_DBI_MONITOR_SQL.pm
+    version: '0.46'
+  UR::Env::UR_DBI_NO_COMMIT:
+    file: lib/UR/Env/UR_DBI_NO_COMMIT.pm
+    version: '0.46'
+  UR::Env::UR_DBI_SUMMARIZE_SQL:
+    file: lib/UR/Env/UR_DBI_SUMMARIZE_SQL.pm
+    version: '0.46'
+  UR::Env::UR_DEBUG_OBJECT_PRUNING:
+    file: lib/UR/Env/UR_DEBUG_OBJECT_PRUNING.pm
+    version: '0.46'
+  UR::Env::UR_DEBUG_OBJECT_RELEASE:
+    file: lib/UR/Env/UR_DEBUG_OBJECT_RELEASE.pm
+    version: '0.46'
+  UR::Env::UR_DUMP_DEBUG_MESSAGES:
+    file: lib/UR/Env/UR_DUMP_DEBUG_MESSAGES.pm
+    version: '0.46'
+  UR::Env::UR_DUMP_STATUS_MESSAGES:
+    file: lib/UR/Env/UR_DUMP_STATUS_MESSAGES.pm
+    version: '0.46'
+  UR::Env::UR_IGNORE:
+    file: lib/UR/Env/UR_IGNORE.pm
+    version: '0.46'
+  UR::Env::UR_NO_REQUIRE_USER_VERIFY:
+    file: lib/UR/Env/UR_NO_REQUIRE_USER_VERIFY.pm
+    version: '0.46'
+  UR::Env::UR_NR_CPU:
+    file: lib/UR/Env/UR_NR_CPU.pm
+    version: '0.46'
+  UR::Env::UR_RUN_LONG_TESTS:
+    file: lib/UR/Env/UR_RUN_LONG_TESTS.pm
+    version: '0.46'
+  UR::Env::UR_STACK_DUMP_ON_DIE:
+    file: lib/UR/Env/UR_STACK_DUMP_ON_DIE.pm
+    version: '0.46'
+  UR::Env::UR_STACK_DUMP_ON_WARN:
+    file: lib/UR/Env/UR_STACK_DUMP_ON_WARN.pm
+    version: '0.46'
+  UR::Env::UR_TEST_QUIET:
+    file: lib/UR/Env/UR_TEST_QUIET.pm
+    version: '0.46'
+  UR::Env::UR_USED_MODS:
+    file: lib/UR/Env/UR_USED_MODS.pm
+    version: '0.46'
+  UR::Env::UR_USE_ANY:
+    file: lib/UR/Env/UR_USE_ANY.pm
+    version: '0.46'
+  UR::Env::UR_USE_DUMMY_AUTOGENERATED_IDS:
+    file: lib/UR/Env/UR_USE_DUMMY_AUTOGENERATED_IDS.pm
+    version: '0.46'
+  UR::Exit:
+    file: lib/UR/Exit.pm
+    version: '0.46'
+  UR::Iterator:
+    file: lib/UR/Iterator.pm
+    version: '0.46'
+  UR::ModuleBase:
+    file: lib/UR/ModuleBase.pm
+    version: '0.46'
+  UR::ModuleBase::Message:
+    file: lib/UR/ObjectDeprecated.pm
+  UR::ModuleBuild:
+    file: lib/UR/ModuleBuild.pm
+  UR::ModuleConfig:
+    file: lib/UR/ModuleConfig.pm
+    version: '0.46'
+  UR::ModuleLoader:
+    file: lib/UR/ModuleLoader.pm
+    version: '0.46'
+  UR::Namespace:
+    file: lib/UR/Namespace.pm
+    version: '0.46'
+  UR::Namespace::Command:
+    file: lib/UR/Namespace/Command.pm
+    version: '0.46'
+  UR::Namespace::Command::Base:
+    file: lib/UR/Namespace/Command/Base.pm
+    version: '0.46'
+  UR::Namespace::Command::Define:
+    file: lib/UR/Namespace/Command/Define.pm
+    version: '0.46'
+  UR::Namespace::Command::Define::Class:
+    file: lib/UR/Namespace/Command/Define/Class.pm
+    version: '0.46'
+  UR::Namespace::Command::Define::Datasource:
+    file: lib/UR/Namespace/Command/Define/Datasource.pm
+    version: '0.46'
+  UR::Namespace::Command::Define::Datasource::File:
+    file: lib/UR/Namespace/Command/Define/Datasource/File.pm
+    version: '0.46'
+  UR::Namespace::Command::Define::Datasource::Mysql:
+    file: lib/UR/Namespace/Command/Define/Datasource/Mysql.pm
+    version: '0.46'
+  UR::Namespace::Command::Define::Datasource::Oracle:
+    file: lib/UR/Namespace/Command/Define/Datasource/Oracle.pm
+    version: '0.46'
+  UR::Namespace::Command::Define::Datasource::Pg:
+    file: lib/UR/Namespace/Command/Define/Datasource/Pg.pm
+    version: '0.46'
+  UR::Namespace::Command::Define::Datasource::Rdbms:
+    file: lib/UR/Namespace/Command/Define/Datasource/Rdbms.pm
+    version: '0.46'
+  UR::Namespace::Command::Define::Datasource::RdbmsWithAuth:
+    file: lib/UR/Namespace/Command/Define/Datasource/RdbmsWithAuth.pm
+    version: '0.46'
+  UR::Namespace::Command::Define::Datasource::Sqlite:
+    file: lib/UR/Namespace/Command/Define/Datasource/Sqlite.pm
+    version: '0.46'
+  UR::Namespace::Command::Define::Db:
+    file: lib/UR/Namespace/Command/Define/Db.pm
+    version: '0.46'
+  UR::Namespace::Command::Define::Namespace:
+    file: lib/UR/Namespace/Command/Define/Namespace.pm
+    version: '0.46'
+  UR::Namespace::Command::Init:
+    file: lib/UR/Namespace/Command/Init.pm
+    version: '0.46'
+  UR::Namespace::Command::List:
+    file: lib/UR/Namespace/Command/List.pm
+    version: '0.46'
+  UR::Namespace::Command::List::Classes:
+    file: lib/UR/Namespace/Command/List/Classes.pm
+    version: '0.46'
+  UR::Namespace::Command::List::Modules:
+    file: lib/UR/Namespace/Command/List/Modules.pm
+    version: '0.46'
+  UR::Namespace::Command::List::Objects:
+    file: lib/UR/Namespace/Command/List/Objects.pm
+    version: '0.46'
+  UR::Namespace::Command::Old:
+    file: lib/UR/Namespace/Command/Old.pm
+    version: '0.46'
+  UR::Namespace::Command::Old::DiffRewrite:
+    file: lib/UR/Namespace/Command/Old/DiffRewrite.pm
+    version: '0.46'
+  UR::Namespace::Command::Old::DiffUpdate:
+    file: lib/UR/Namespace/Command/Old/DiffUpdate.pm
+    version: '0.46'
+  UR::Namespace::Command::Old::ExportDbicClasses:
+    file: lib/UR/Namespace/Command/Old/ExportDbicClasses.pm
+    version: '0.46'
+  UR::Namespace::Command::Old::Info:
+    file: lib/UR/Namespace/Command/Old/Info.pm
+    version: '0.46'
+  UR::Namespace::Command::Old::Redescribe:
+    file: lib/UR/Namespace/Command/Old/Redescribe.pm
+    version: '0.46'
+  UR::Namespace::Command::RunsOnModulesInTree:
+    file: lib/UR/Namespace/Command/RunsOnModulesInTree.pm
+    version: '0.46'
+  UR::Namespace::Command::Show:
+    file: lib/UR/Namespace/Command/Show.pm
+  UR::Namespace::Command::Show::Properties:
+    file: lib/UR/Namespace/Command/Show/Properties.pm
+    version: '0.46'
+  UR::Namespace::Command::Show::Schema:
+    file: lib/UR/Namespace/Command/Show/Schema.pm
+  UR::Namespace::Command::Show::Subclasses:
+    file: lib/UR/Namespace/Command/Show/Subclasses.pm
+  UR::Namespace::Command::Sys:
+    file: lib/UR/Namespace/Command/Sys.pm
+    version: '0.46'
+  UR::Namespace::Command::Sys::ClassBrowser:
+    file: lib/UR/Namespace/Command/Sys/ClassBrowser.pm
+    version: '0.46'
+  UR::Namespace::Command::Sys::ClassBrowser::TreeItem:
+    file: lib/UR/Namespace/Command/Sys/ClassBrowser.pm
+  UR::Namespace::Command::Test:
+    file: lib/UR/Namespace/Command/Test.pm
+    version: '0.46'
+  UR::Namespace::Command::Test::Callcount:
+    file: lib/UR/Namespace/Command/Test/Callcount.pm
+    version: '0.46'
+  UR::Namespace::Command::Test::Callcount::List:
+    file: lib/UR/Namespace/Command/Test/Callcount/List.pm
+    version: '0.46'
+  UR::Namespace::Command::Test::Compile:
+    file: lib/UR/Namespace/Command/Test/Compile.pm
+    version: '0.46'
+  UR::Namespace::Command::Test::Eval:
+    file: lib/UR/Namespace/Command/Test/Eval.pm
+    version: '0.46'
+  UR::Namespace::Command::Test::Run:
+    file: lib/UR/Namespace/Command/Test/Run.pm
+    version: '0.46'
+  UR::Namespace::Command::Test::TrackObjectRelease:
+    file: lib/UR/Namespace/Command/Test/TrackObjectRelease.pm
+    version: '0.46'
+  UR::Namespace::Command::Test::Use:
+    file: lib/UR/Namespace/Command/Test/Use.pm
+    version: '0.46'
+  UR::Namespace::Command::Test::Window:
+    file: lib/UR/Namespace/Command/Test/Window.pm
+    version: '0.46'
+  UR::Namespace::Command::Test::Window::Tk:
+    file: lib/UR/Namespace/Command/Test/Window.pm
+  UR::Namespace::Command::Update:
+    file: lib/UR/Namespace/Command/Update.pm
+    version: '0.46'
+  UR::Namespace::Command::Update::ClassDiagram:
+    file: lib/UR/Namespace/Command/Update/ClassDiagram.pm
+    version: '0.46'
+  UR::Namespace::Command::Update::ClassesFromDb:
+    file: lib/UR/Namespace/Command/Update/ClassesFromDb.pm
+    version: '0.46'
+  UR::Namespace::Command::Update::Doc:
+    file: lib/UR/Namespace/Command/Update/Doc.pm
+    version: '0.46'
+  UR::Namespace::Command::Update::Pod:
+    file: lib/UR/Namespace/Command/Update/Pod.pm
+    version: '0.46'
+  UR::Namespace::Command::Update::RenameClass:
+    file: lib/UR/Namespace/Command/Update/RenameClass.pm
+    version: '0.46'
+  UR::Namespace::Command::Update::RewriteClassHeader:
+    file: lib/UR/Namespace/Command/Update/RewriteClassHeader.pm
+    version: '0.46'
+  UR::Namespace::Command::Update::SchemaDiagram:
+    file: lib/UR/Namespace/Command/Update/SchemaDiagram.pm
+    version: '0.46'
+  UR::Namespace::Command::Update::TabCompletionSpec:
+    file: lib/UR/Namespace/Command/Update/TabCompletionSpec.pm
+    version: '0.46'
+  UR::Object:
+    file: lib/UR/Object.pm
+    version: '0.46'
+  UR::Object::Accessorized:
+    file: lib/UR/Object/Accessorized.pm
+    version: '0.46'
+  UR::Object::Command::FetchAndDo:
+    file: lib/UR/Object/Command/FetchAndDo.pm
+    version: '0.46'
+  UR::Object::Command::List:
+    file: lib/UR/Object/Command/List.pm
+    version: '0.46'
+  UR::Object::Command::List::Csv:
+    file: lib/UR/Object/Command/List/Style.pm
+  UR::Object::Command::List::Html:
+    file: lib/UR/Object/Command/List/Style.pm
+  UR::Object::Command::List::Newtext:
+    file: lib/UR/Object/Command/List/Style.pm
+  UR::Object::Command::List::Pretty:
+    file: lib/UR/Object/Command/List/Style.pm
+  UR::Object::Command::List::Style:
+    file: lib/UR/Object/Command/List/Style.pm
+    version: '0.46'
+  UR::Object::Command::List::Text:
+    file: lib/UR/Object/Command/List/Style.pm
+  UR::Object::Command::List::Tsv:
+    file: lib/UR/Object/Command/List/Style.pm
+  UR::Object::Command::List::Xml:
+    file: lib/UR/Object/Command/List/Style.pm
+  UR::Object::Ghost:
+    file: lib/UR/Object/Ghost.pm
+    version: '0.46'
+  UR::Object::Index:
+    file: lib/UR/Object/Index.pm
+    version: '0.46'
+  UR::Object::Iterator:
+    file: lib/UR/Object/Iterator.pm
+    version: '0.46'
+  UR::Object::Join:
+    file: lib/UR/Object/Join.pm
+    version: '0.46'
+  UR::Object::Property:
+    file: lib/UR/Object/Property.pm
+    version: '0.46'
+  UR::Object::Property::View::Default::Text:
+    file: lib/UR/Object/Property/View/Default/Text.pm
+    version: '0.46'
+  UR::Object::Property::View::DescriptionLineItem::Text:
+    file: lib/UR/Object/Property/View/DescriptionLineItem/Text.pm
+    version: '0.46'
+  UR::Object::Property::View::ReferenceDescription::Text:
+    file: lib/UR/Object/Property/View/ReferenceDescription/Text.pm
+    version: '0.46'
+  UR::Object::Set:
+    file: lib/UR/Object/Set.pm
+    version: '0.46'
+  UR::Object::Set::View::Default::Html:
+    file: lib/UR/Object/Set/View/Default/Html.pm
+    version: '0.46'
+  UR::Object::Set::View::Default::Json:
+    file: lib/UR/Object/Set/View/Default/Json.pm
+    version: '0.46'
+  UR::Object::Set::View::Default::Text:
+    file: lib/UR/Object/Set/View/Default/Text.pm
+    version: '0.46'
+  UR::Object::Set::View::Default::Xml:
+    file: lib/UR/Object/Set/View/Default/Xml.pm
+    version: '0.46'
+  UR::Object::Tag:
+    file: lib/UR/Object/Tag.pm
+    version: '0.46'
+  UR::Object::Type:
+    file: lib/UR/Object/Type.pm
+    version: '0.46'
+  UR::Object::Type::AccessorWriter:
+    file: lib/UR/Object/Type/AccessorWriter.pm
+  UR::Object::Type::AccessorWriter::Product:
+    file: lib/UR/Object/Type/AccessorWriter/Product.pm
+    version: '0.46'
+  UR::Object::Type::AccessorWriter::Sum:
+    file: lib/UR/Object/Type/AccessorWriter/Sum.pm
+    version: '0.46'
+  UR::Object::Type::Initializer:
+    file: lib/UR/Object/Type/Initializer.pm
+  UR::Object::Type::ModuleWriter:
+    file: lib/UR/Object/Type/ModuleWriter.pm
+  UR::Object::Type::View::AvailableViews::Json:
+    file: lib/UR/Object/Type/View/AvailableViews/Json.pm
+    version: '0.46'
+  UR::Object::Type::View::AvailableViews::Xml:
+    file: lib/UR/Object/Type/View/AvailableViews/Xml.pm
+    version: '0.46'
+  UR::Object::Type::View::Default::Text:
+    file: lib/UR/Object/Type/View/Default/Text.pm
+    version: '0.46'
+  UR::Object::Type::View::Default::Xml:
+    file: lib/UR/Object/Type/View/Default/Xml.pm
+    version: '0.46'
+  UR::Object::Value:
+    file: lib/UR/Object/Value.pm
+    version: '0.46'
+  UR::Object::View:
+    file: lib/UR/Object/View.pm
+    version: '0.46'
+  UR::Object::View::Aspect:
+    file: lib/UR/Object/View/Aspect.pm
+    version: '0.46'
+  UR::Object::View::Default::Gtk:
+    file: lib/UR/Object/View/Default/Gtk.pm
+    version: '0.46'
+  UR::Object::View::Default::Gtk2:
+    file: lib/UR/Object/View/Default/Gtk2.pm
+    version: '0.46'
+  UR::Object::View::Default::Html:
+    file: lib/UR/Object/View/Default/Html.pm
+    version: '0.46'
+  UR::Object::View::Default::Json:
+    file: lib/UR/Object/View/Default/Json.pm
+    version: '0.46'
+  UR::Object::View::Default::Text:
+    file: lib/UR/Object/View/Default/Text.pm
+    version: '0.46'
+  UR::Object::View::Default::Xml:
+    file: lib/UR/Object/View/Default/Xml.pm
+    version: '0.46'
+  UR::Object::View::Default::Xsl:
+    file: lib/UR/Object/View/Default/Xsl.pm
+    version: '0.46'
+  UR::Object::View::Lister::Text:
+    file: lib/UR/Object/View/Lister/Text.pm
+    version: '0.46'
+  UR::Object::View::Static::Html:
+    file: lib/UR/Object/View/Static/Html.pm
+    version: '0.46'
+  UR::Object::View::Toolkit:
+    file: lib/UR/Object/View/Toolkit.pm
+    version: '0.46'
+  UR::Object::View::Toolkit::Text:
+    file: lib/UR/Object/View/Toolkit/Text.pm
+    version: '0.46'
+  UR::Observer:
+    file: lib/UR/Observer.pm
+    version: '0.46'
+  UR::Role:
+    file: lib/UR/Role.pm
+    version: '0.46'
+  UR::Role::Instance:
+    file: lib/UR/Role/Instance.pm
+    version: '0.46'
+  UR::Role::MethodModifier:
+    file: lib/UR/Role/MethodModifier.pm
+    version: '0.46'
+  UR::Role::MethodModifier::After:
+    file: lib/UR/Role/MethodModifier/After.pm
+    version: '0.46'
+  UR::Role::MethodModifier::Around:
+    file: lib/UR/Role/MethodModifier/Around.pm
+    version: '0.46'
+  UR::Role::MethodModifier::Before:
+    file: lib/UR/Role/MethodModifier/Before.pm
+    version: '0.46'
+  UR::Role::Param:
+    file: lib/UR/Role/Param.pm
+    version: '0.46'
+  UR::Role::Prototype:
+    file: lib/UR/Role/Prototype.pm
+    version: '0.46'
+  UR::Role::PrototypeWithParams:
+    file: lib/UR/Role/PrototypeWithParams.pm
+    version: '0.46'
+  UR::Service::JsonRpcServer:
+    file: lib/UR/Service/JsonRpcServer.pm
+    version: '0.46'
+  UR::Service::RPC::Executer:
+    file: lib/UR/Service/RPC/Executer.pm
+    version: '0.46'
+  UR::Service::RPC::Message:
+    file: lib/UR/Service/RPC/Message.pm
+    version: '0.46'
+  UR::Service::RPC::Server:
+    file: lib/UR/Service/RPC/Server.pm
+    version: '0.46'
+  UR::Service::RPC::TcpConnectionListener:
+    file: lib/UR/Service/RPC/TcpConnectionListener.pm
+    version: '0.46'
+  UR::Service::UrlRouter:
+    file: lib/UR/Service/UrlRouter.pm
+  UR::Service::WebServer:
+    file: lib/UR/Service/WebServer.pm
+  UR::Service::WebServer::Server:
+    file: lib/UR/Service/WebServer/Server.pm
+  UR::Singleton:
+    file: lib/UR/Singleton.pm
+    version: '0.46'
+  UR::Util:
+    file: lib/UR/Util.pm
+    version: '0.46'
+  UR::Util::ArrayRefIterator:
+    file: lib/UR/Util/ArrayRefIterator.pm
+  UR::Value:
+    file: lib/UR/Value.pm
+    version: '0.46'
+  UR::Value::ARRAY:
+    file: lib/UR/Value/ARRAY.pm
+    version: '0.46'
+  UR::Value::Blob:
+    file: lib/UR/Value/Blob.pm
+    version: '0.46'
+  UR::Value::Boolean:
+    file: lib/UR/Value/Boolean.pm
+    version: '0.46'
+  UR::Value::Boolean::View::Default::Text:
+    file: lib/UR/Value/Boolean/View/Default/Text.pm
+    version: '0.46'
+  UR::Value::CODE:
+    file: lib/UR/Value/CODE.pm
+    version: '0.46'
+  UR::Value::CSV:
+    file: lib/UR/Value/CSV.pm
+    version: '0.46'
+  UR::Value::DateTime:
+    file: lib/UR/Value/DateTime.pm
+    version: '0.46'
+  UR::Value::Decimal:
+    file: lib/UR/Value/Decimal.pm
+    version: '0.46'
+  UR::Value::DirectoryPath:
+    file: lib/UR/Value/DirectoryPath.pm
+    version: '0.46'
+  UR::Value::FOF:
+    file: lib/UR/Value/FOF.pm
+    version: '0.46'
+  UR::Value::FilePath:
+    file: lib/UR/Value/FilePath.pm
+    version: '0.46'
+  UR::Value::FilesystemPath:
+    file: lib/UR/Value/FilesystemPath.pm
+    version: '0.46'
+  UR::Value::Float:
+    file: lib/UR/Value/Float.pm
+    version: '0.46'
+  UR::Value::GLOB:
+    file: lib/UR/Value/GLOB.pm
+    version: '0.46'
+  UR::Value::HASH:
+    file: lib/UR/Value/HASH.pm
+    version: '0.46'
+  UR::Value::Integer:
+    file: lib/UR/Value/Integer.pm
+    version: '0.46'
+  UR::Value::Iterator:
+    file: lib/UR/Value/Iterator.pm
+    version: '0.46'
+  UR::Value::JSON:
+    file: lib/UR/Value/JSON.pm
+  UR::Value::Number:
+    file: lib/UR/Value/Number.pm
+    version: '0.46'
+  UR::Value::PerlReference:
+    file: lib/UR/Value/PerlReference.pm
+    version: '0.46'
+  UR::Value::REF:
+    file: lib/UR/Value/REF.pm
+    version: '0.46'
+  UR::Value::SCALAR:
+    file: lib/UR/Value/SCALAR.pm
+    version: '0.46'
+  UR::Value::Set:
+    file: lib/UR/Value/Set.pm
+    version: '0.46'
+  UR::Value::SloppyPrimitive:
+    file: lib/UR/Value/SloppyPrimitive.pm
+    version: '0.46'
+  UR::Value::String:
+    file: lib/UR/Value/String.pm
+    version: '0.46'
+  UR::Value::Text:
+    file: lib/UR/Value/Text.pm
+    version: '0.46'
+  UR::Value::Timestamp:
+    file: lib/UR/Value/Timestamp.pm
+    version: '0.46'
+  UR::Value::Type:
+    file: lib/UR/Value.pm
+  UR::Value::URL:
+    file: lib/UR/Value/URL.pm
+    version: '0.46'
+  UR::Value::View::Default::Html:
+    file: lib/UR/Value/View/Default/Html.pm
+  UR::Value::View::Default::Json:
+    file: lib/UR/Value/View/Default/Json.pm
+  UR::Value::View::Default::Text:
+    file: lib/UR/Value/View/Default/Text.pm
+  UR::Value::View::Default::Xml:
+    file: lib/UR/Value/View/Default/Xml.pm
+  UR::Vocabulary:
+    file: lib/UR/Vocabulary.pm
+    version: '0.46'
+  above:
+    file: lib/above.pm
+    version: '0.03'
+  class_name:
+    file: lib/UR/Object/Type/Initializer.pm
+    version: '2'
+requires:
+  Carp: '0'
+  Class::AutoloadCAN: '0.03'
+  Class::Autouse: '2.0'
+  Clone::PP: '1.02'
+  DBD::SQLite: '1.14'
+  DBI: '1.601'
+  Data::Compare: '0.13'
+  Data::UUID: '0.148'
+  Date::Format: '0'
+  Devel::GlobalDestruction: '0'
+  File::Basename: '2.73'
+  File::Path: '0'
+  File::Temp: '0'
+  FreezeThaw: '0.43'
+  Getopt::Complete: '0.26'
+  HTTP::Request: '0'
+  JSON: '0'
+  Lingua::EN::Inflect: '1.88'
+  List::MoreUtils: '0'
+  MRO::Compat: '0'
+  Module::Runtime: v0.14.0
+  Path::Class: '0'
+  Plack: '0'
+  Pod::Simple::HTML: '3.03'
+  Pod::Simple::Text: '2.02'
+  Sub::Install: '0.924'
+  Sub::Name: '0.04'
+  Sys::Hostname: '1.11'
+  Template: '0'
+  Text::Diff: '0.35'
+  Text::Glob: '0'
+  YAML: '0'
+  perl: v5.8.7
+  version: '0'
+resources:
+  bugtracker: https://github.com/genome/UR/issues
+  homepage: https://github.com/genome/UR
+  repository: git://github.com/genome/UR.git
+version: '0.46'
+x_contributors:
+  - 'josborne <josborne@watson.wustl.edu>'
+  - 'thepler <thepler@watson.wustl.edu>'
+  - 'charris <charris@watson.wustl.edu>'
+  - 'jweible <jweible@watson.wustl.edu>'
+  - 'edemello <edemello@watson.wustl.edu>'
+  - 'jschindl <jschindl@watson.wustl.edu>'
+  - 'mjohnson <mjohnson@watson.wustl.edu>'
+  - 'ebelter <ebelter@watson.wustl.edu>'
+  - 'lcarmich <lcarmich@watson.wustl.edu>'
+  - 'jwalker <jwalker@watson.wustl.edu>'
+  - 'gsanders <gsanders@watson.wustl.edu>'
+  - 'eclark <eclark@watson.wustl.edu>'
+  - 'adukes <adukes@watson.wustl.edu>'
+  - 'iferguso <iferguso@watson.wustl.edu>'
+  - 'ssmith <ssmith@watson.wustl.edu>'
+  - 'boberkfe <boberkfe@watson.wustl.edu>'
+  - 'Mark Johnson <mjohnson@linus129.gsc.wustl.edu>'
+  - 'Ben Oberkfell <boberkfe@ben.local>'
+  - 'ssmith <ssmith@Scotts-Laptop.local>'
+  - 'Edward Belter <ebelter@blade8-4-3.(none)>'
+  - 'Feiyu Du <fdu@vm27.gsc.wustl.edu>'
+  - 'Edward Belter <ebelter@linus108.gsc.wustl.edu>'
+  - 'Feiyu Du <fdu@linus252.gsc.wustl.edu>'
+  - 'ssmith <ssmith@Scottland.local>'
+  - 'ssmith <ssmith@host194.wifi.epochcoffee.com>'
+  - 'Robert Long <rlong@linus83.gsc.wustl.edu>'
+  - 'Robert Long <rlong@vm27.gsc.wustl.edu>'
+  - 'Thomas Mooney <tmooney@linus208.gsc.wustl.edu>'
+  - 'Eric Clark <eclark@zerohp.net>'
+  - 'Thomas Mooney <tmooney@linus2111.gsc.wustl.edu>'
+  - 'ssmith <ssmith@Scottland-2.local>'
+  - 'Scott Smith X <ssmith@Scott-Smiths-MacBook-Pro.local>'
+  - 'eclark <eclark@genome.wustl.edu>'
+  - 'Anthony Brummett <abrummet@watson.wustl.edu>'
+  - 'Rob Long <rlong@genome.wustl.edu>'
+  - 'Adam Dukes <adam.dukes@gmail.com>'
+  - 'Eddie Belter <ebelter@genome.wuslt.edu>'
+  - 'Kyung Kim <kkyung@genome.wustl.edu>'
+  - 'Joshua McMichael <jmcmicha@genome.wustl.edu>'
+  - 'Jim Weible <jweible@genome.wustl.edu>'
+  - 'Philip Kimmey <pkimmey@genome.wustl.edu>'
+  - 'Matt Callaway <mcallawa@genome.wustl.edu>'
+  - 'Travis Abbott <tabbott@genome.wustl.edu>'
+  - 'Chris Oliver <coliver@genome.wustl.edu>'
+  - 'Steven Wallace <swallace@genome.wustl.edu>'
+  - 'James Koval <jkoval@genome.wustl.edu>'
+  - 'Gabriel Sanderson <gsanders@genome.wustl.edu>'
+  - 'Scott Smith <sakoht@cpan.org>'
+  - 'Brian Derickson <bdericks@genome.wustl.edu>'
+  - 'Justin Lolofie <jlolofie@genome.wustl.edu>'
+  - 'Ian Ferguson <iferguso@genome.wustl.edu>'
+  - 'Neil Bowers <neil@bowers.com>'
+  - 'Scott Smith <scottsmith1@gmail.com>'
+  - 'Ben Oberkfell <boberkfe@genome.wustl.edu>'
+  - 'Jason Walker <jwalker@genome.wustl.edu>'
+  - 'Mark Burnett <mburnett@genome.wustl.edu>'
+  - 'Scott Smith <ssmith@genome.wustl.edu>'
+  - 'Adam Coffman <acoffman@genome.wustl.edu>'
+  - 'Susanna Siebert <ssiebert@genome.wustl.edu>'
+  - 'apregier <aregier@genome.wustl.edu>'
+  - 'David Morton <davidlmorton@gmail.com>'
+  - 'David Morton <davidlmorton@users.noreply.github.com>'
+  - 'Sebastian Heil <(none)>'
+  - 'nnutter <nnutter@genome.wustl.edu>'
+  - 'Nathaniel Nutter <iam@nnutter.com>'
+  - 'Eddie Belter <ebelter@genome.wustl.edu>'
+  - 'APipe Tester <apipe-tester@genome.wustl.edu>'
+  - 'Jim Eldred <jeldred@genome.wustl.edu>'
+  - 'Yanick Champoux <yanick@babyl.dyndns.org>'
+  - 'Thomas B. Mooney <tmooney@genome.wustl.edu>'
+  - 'Thomas B. Mooney <mooney@wustl.edu>'
+  - 'Anthony Brummett <abrummet@genome.wustl.edu>'
+  - 'Anthony Brummett <brummett@gmail.com>'
+  - 'Eddie Belter <ebelter@gmail.com>'

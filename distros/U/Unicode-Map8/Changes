@@ -1,0 +1,137 @@
+2010-01-18   Gisle Aas <gisle@ActiveState.com>
+
+   Release 0.13
+
+   Header order tweak to make it compile with Strawberry Perl [RT#50443]
+
+   Get rid of CVS artifacts
+
+
+
+2002-12-27   Gisle Aas <gisle@ActiveState.com>
+
+   Release 0.12
+
+   Make it compile with perl-5.003 and on Windows.
+
+   Minor test fix by Andreas.
+
+
+
+2001-12-31   Gisle Aas <gisle@ActiveState.com>
+
+   Release 0.11
+
+   Tweaks to make it compile with perl-5.8-tobe
+   and ithread enabled perl.
+
+
+
+2000-06-13   Gisle Aas <gisle@ActiveState.com>
+
+   Release 0.10
+
+   Tweaks to make it compile with perl-5.6.0
+
+
+
+2000-01-21   Gisle Aas <gisle@aas.no>
+
+   Release 0.09
+
+   Added ISO-8859-13 and ISO-8859-15 mappings.  Contributed by
+   Alexander Smishlajev <als@turnhere.com>.
+
+
+
+1999-09-14   Gisle Aas <gisle@aas.no>
+
+   Release 0.08
+
+   A little patch to Makefile.PL from Andreas König that makes the
+   umap program install by default.
+
+   Added some Unicode::Map8 compatibility stuff to the interface.
+   The constructor can now take a hash argument with the hash element
+   'ID' specifying the coding.  The method names from_unicode() and
+   to_unicode() are now aliases for to8() and to16().
+
+
+
+1999-06-02   Gisle Aas <gisle@aas.no>
+
+   Release 0.07
+
+   Added koi8-[ru] mappings.  Contributed by Alexander Smishlajev.
+
+
+
+1999-05-01   Gisle Aas <gisle@aas.no>
+
+   Release 0.06
+
+   Added binmode() at appropriate places.  Patch by
+   Alexander Smishlajev <als@turnhere.com>.
+
+   Fixed the /cp\d+.bin/ mappings.  They where missing a lot
+   of characters.
+
+   Added maps/cp866lr.  Contributed by Alexander Smishlajev.
+
+   PerlIO support.  Based on patch from Honza Pazdziora
+   <adelton@fi.muni.cz>
+
+
+
+1998-07-14   Gisle Aas <aas@sn.no>
+
+   Release 0.05
+
+   Avoid core dump when the requests mapping file does not exists.
+
+
+
+1998-02-19   Gisle Aas <aas@sn.no>
+
+   Release 0.04
+   
+   Support one-to-many mappings by the use of callbacks.
+
+
+
+1998-02-13   Gisle Aas <aas@sn.no>
+
+   Release 0.03
+
+   Renamed 'map8.c' to 'map8x.c' because some bad systems would
+   overwrite it with 'Map8.c'.
+
+   Attach mapper using magic.  The Unicode::Map8 object is now a
+   plain HASH.  That should help when subclassing.
+
+   Support mapping using callback methods.  One one-to-one mapping
+   supported by the callbacks yet.
+
+
+
+1998-01-19   Gisle Aas <aas@sn.no>
+
+   Release 0.02
+
+   Documentation update
+   
+   Added the umap script.
+
+   Fix the MACRON/OVERLINE bug in the iso-8859-[149] encodings
+
+   $m->recode8() did not strip unmapped characters as it should.
+
+   $m->default_to8 did not work
+
+   More tests.
+
+
+
+1998-01-16   Gisle Aas <aas@sn.no>
+
+   Release 0.01

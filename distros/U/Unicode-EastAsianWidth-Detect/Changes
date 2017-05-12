@@ -1,0 +1,14 @@
+Revision history for Perl extension Unicode-EastAsianWidth-Detect
+
+0.03 2013-09-09T07:14:52Z
+
+    - windows workaround
+
+0.02 2013-09-07T12:45:28Z
+
+    - updates doc
+
+0.01 2013-09-07T12:35:03Z
+
+    - original version
+

@@ -1,0 +1,22 @@
+<corpus lang='en'>
+  <lexelt item="adjustment">
+    <instance id="9337195.ab.7" pmid="9337195" alias="adjustment">
+      <answer instance="9337195.ab.7" senseid="M2"/>
+      <context>
+        <title>Flow-mediated dilation in 9- to 11-year-old children: the influence of intrauterine and childhood factors.  </title> BACKGROUND: Early life factors, particularly size at birth, may influence later risk of cardiovascular_disease, but a mechanism for this influence has not been established. We have examined the relation between birth weight and endothelial function (a key event in atherosclerosis) in a population-based study of children, taking into account classic cardiovascular risk factors in childhood. METHODS AND RESULTS: We studied 333 British children aged 9 to 11 years in whom information on birth weight, maternal factors, and risk factors (including blood pressure, lipid fractions, preload and postload glucose levels, smoking exposure, and socioeconomic status) was available. A noninvasive ultrasound technique was used to assess the ability of the brachial artery to dilate in response to increased blood flow (induced by forearm cuff occlusion and release), an endothelium-dependent response. Birth weight showed a significant, graded, positive association with flow-mediated dilation (0.027 mm/kg; 95% CI, 0.003 to 0.051 mm/kg; P=.02). Childhood cardiovascular risk factors (blood pressure, total and LDL cholesterol, and salivary cotinine level) showed no relation with flow-mediated dilation, but HDL cholesterol level was inversely related (-0.067 mm/mmol; 95% CI, -0.021 to -0.113 mm/mmol; P=.005). The relation between birth weight and flow-mediated dilation was not affected <local>by <head>adjustment</head></local> for childhood body build, parity, cardiovascular risk factors, social class, or ethnicity. CONCLUSIONS: Low birth weight is associated with impaired endothelial function in childhood, a key early event in atherogenesis. Growth in utero may be associated with long-term changes in vascular function that are manifest by the first decade of life and that may influence the long-term risk of cardiovascular_disease.
+      </context>
+    </instance>
+    <instance id="9314720.ab.4" pmid="9314720" alias="adjustment">
+      <answer instance="9314720.ab.4" senseid="M1"/>
+      <context>
+        <title>Psychological distress among women with recurrent spontaneous abortion.  </title> Fifty-seven of 100 women with recurrent abortion completed questionnaires designed to assess demographic and reproductive variables, depression, anxiety, social desirability, self-esteem, locus of control, and marital adjustment. The results indicated that 32% of the women could be classified as depressed. The subjects also reported higher than average levels of acute and chronic anxiety. Fifty-three percent of the subjects reported below average <local>marital <head>adjustment</head>.</local> Post hoc analyses indicated that the women who had a previous elective abortion had higher levels of anxiety, lower marital adjustment, and different attributions regarding their pregnancy losses than the women who had not had an elective abortion. Having a living child was not a protective buffer against psychological distress.
+      </context>
+    </instance>
+    <instance id="9325655.ab.3" pmid="9325655" alias="adjustment">
+      <answer instance="9325655.ab.3" senseid="M1"/>
+      <context>
+        <title>Child mortality in Goa: a cross-sectional analysis.  </title> This paper is a study of the determinants of child mortality in the relatively developed Indian state of Goa. Data from the National_Family_Health_Survey (NFHS, 1992-93) conducted in the state of Goa have been used to examine the child mortality experiences of 1,331 women who were within a marriage lasting 15 years. An aggregated index of child mortality, which summarizes the mortality experiences of a woman <local>with exposure <head>adjustment</head>,</local> is the study variable. Maternal education and longer birth spacing were found to lower child mortality risks significantly.
+      </context>
+    </instance>
+   </lexelt>
+</corpus>

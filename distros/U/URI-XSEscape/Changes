@@ -1,0 +1,26 @@
+0.000008    2016-07-14
+            * Use memcpy instead of copying three bytes separately,
+              it gets us a bit more speed.
+              Inspired on a blog by David Farrell
+
+0.000007    2016-05-10
+            * Control wether we override URI::Escape functions using
+              the environment variable PERL_URI_XSESCAPE; if it is
+              set to 0, we won't override. Thanks SawyerX (dutifully
+              added as author).
+
+0.000006    2016-05-08
+            * Keep playing the compiler flag game.
+
+0.000005    2016-05-08
+            * Switch to using %AB instead of %ab, for compatibility.
+            * Prepare code to magically replace URI::Escape methods;
+              NOT DONE YET.
+            * Add documentation.
+
+0.000004    2016-05-08
+            * Change code to be C89-compliant. So long clean code...
+
+0.000003    2016-05-06
+            * Initial released version.
+            * Replicates all functionality from URI::Escape, but faster.

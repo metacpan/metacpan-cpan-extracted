@@ -1,0 +1,27 @@
+1.3101: Sat Apr 25 16:15:09 EDT 2009
+   - a few tweaks and bug fixes (mostly doc bugs)
+   - added new meta.yml stuff
+
+1.31: 
+   - I used a perl 5.8 syntax in my Makefile.PL
+   - although, I think this should work in perl 5.6
+     + hrm, looks like IPC::System::Simple doesn't work under
+       5.6, at some point they started using the "use if WINDOWS"
+       syntax, which I think is from later perls.
+
+1.300_000: Tue May 27 12:09:33 EDT 2008
+   - The autoloader was kinda crappy
+   - There were whitespace bugs
+   - I hate M::B and went back to EU::MM
+     (so I also ditched version.pm)
+
+1.2.1: Mon May 26 15:44:35 EDT 2008
+   - I might as well do a new version of everything using
+     version.pm while I wait for all my CPAN deletes to go
+     through.  I just discovered that version.pm doesn't/didn't
+     go core until perl 5.9...  I really wish I'd have prereqed
+     it everywhere I used it, but I didn't.  *sigh*
+
+1.2.0: Sat May 24 09:53:04 EDT 2008
+   - using version.pm as suggested by Andreas Koenig
+   - making the module slightly less platform dependent.

@@ -1,0 +1,73 @@
+Revision history for Perl extension Unicode::BiDiRule.
+
+0.03  Mon Nov 09 2015
+! Makefile.PL
+  - Bug fix: Windows: "make" fails due to incompatible directory/file
+    separator.
+! data/bidirule.pl
+  - Bug fix: CPAN RT #108280: Perl around 5.23.4 rejects deprecated Unicode
+    property definition "Other_Default_Ignorable_Code_Point" in regex.
+
+0.02  Sat Jul 04 2015
+! BiDiRule.xs
+! data/bidirule.pl
+! lib/POD2/JA/Unicode/BiDiRule.pod
+! lib/Unicode/BiDiRule.pm
+! unicode_bidirule.c
+  Changes:
+  - BIDIRULE_UNKNOWN and BIDIRULE_DISALLOWED were renamed to BIDIRULE_NOTBIDI
+    and BIDIRULE_INVALID, respectively.
+  - BIDIRULE_NOTBIDI is returned if BiDi Rule is unsuited for given string,
+    namely, string does not contain right-to-left characters and does not
+    satisfy BiDi Rule.
+  - check(): New strict option enabled by default.
+
+0.01.2  Fri Jun 26 2015
+! data/bidirule.pl
+  - Fix: Windows: Renaming file fails due to lock on opened file.
+! Makefile.PL
++ t/02IdnaTest.t
+  - Adding tests.
+
+0.01.1  Wed Jun 24 2015
+- bidirule.c
+! BiDiRule.xs
+! Makefile.PL
++ unicode_bidirule.c
+  - CPAN RT#105450: Case-sensitive file systems are assumed.
+
+0.01  Tue Jun 23 2015
+! bidirule.c
+! BiDiRule.xs
+! Makefile.PL
+! data/bidirule.pl
+! lib/POD2/JA/Unicode/BiDiRule.pod
+! lib/Unicode/BiDiRule.pm
+! t/00use.t
++ t/01flodhast.t
+  - Adding some tests for normal cases.
+
+0.000_02  Sun Jun 21 2015
+! Makefile.PL
+! bidirule.c
+! data/bidirule.pl
+! lib/POD2/JA/Unicode/BiDiRule.pod
+! lib/Unicode/BiDiRule.pm
+! t/00use.t
+  - Initial CPAN upload.
+
+0.000_01  Sat Jun 20 2015
++ bidirule.c
++ BiDiRule.xs
++ Changes
++ data/bidirule.pl
++ lib/POD2/JA/Unicode/BiDiRule.pod
++ lib/Unicode/BiDiRule.pm
++ Makefile.PL
++ MANIFEST
++ ppport.h
++ README
++ t/00use.t
++ t/pod.t
+  - Initial checkin.
+

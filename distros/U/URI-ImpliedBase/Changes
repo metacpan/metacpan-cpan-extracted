@@ -1,0 +1,27 @@
+Revision history for Perl module URI::ImpliedBase
+0.08 Sun Jul  8 11:23:14 PDT 2012
+    - added support for accepted_schemes
+
+0.07 Sun Aug 23 23:47:04 PDT 2009
+	- added license
+	- update META.yml format
+
+0.06 Wed Aug 31 16:49:30 2005
+	- added pod and pod-coverage tests
+	- updated documentation
+
+0.05 Fri Apr 23 13:12:34 2004
+	- Changes tests to use right module name. Duh.
+
+0.04 Wed Mar 10 13:17:08 2004
+	- Removed LWP forcing
+
+0.03 Wed Mar 10 11:23:17 2004
+	- Change module name from URI::DefaultBased to URI::ImpliedBase
+
+0.02 Tue Mar  9 16:35:35 2004
+	- Added $HTTP::URI_CLASS setting to make LWP use this class for URIs       
+0.01 Tue Mar  9 12:46:14 2004
+	- original version; created by ExtUtils::ModuleMaker 0.32
+
+

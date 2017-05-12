@@ -1,0 +1,121 @@
+2016-09-08   Gisle Aas <gisle@ActiveState.com>
+
+   Release 2.10
+
+   Applied patch from Michael Joyce that is required to make the
+   test pass for perl-5.24
+
+
+2005-10-26   Gisle Aas <gisle@ActiveState.com>
+
+   Release 2.09
+
+   Simplified and reworked documentation.
+
+   Unicode::CharName::uname() did not work for chars > 0xFFFF.
+
+
+
+2005-10-25   Gisle Aas <gisle@ActiveState.com>
+
+   Release 2.08
+
+   Unicode::String now provide utf16le() and utf32le() constructors.
+   Corresponding methods also available.
+
+   Unicode::CharName updated with Unicode 4.1 data.
+
+
+
+2003-03-10   Gisle Aas <gisle@ActiveState.com>
+
+   Release 2.07
+   
+   Don't let the $^W test get confused by lexical warnings.
+
+
+
+2000-05-19   Gisle Aas <gisle@ActiveState.com>
+
+   Release 2.06
+
+   Make it compile with perl5.6.0.
+
+   Typo fixes spotted by alexander smishlajev <als@turnhere.com>
+   when translating the module to python.
+
+
+
+1999-11-17   Gisle Aas <gisle@aas.no>
+
+   Release 2.05
+
+   Operator "." failed when a normal string was concatenated with
+   and Unicode::String object.  Patch by Ilya Ketris <ilya@gde.to>.
+
+
+
+1999-09-14   Gisle Aas <gisle@aas.no>
+
+   Release 2.04
+
+   Added a byteswap method.  Also the functions byteswap2() and
+   byteswap4() are made available.
+
+
+
+1999-07-28   Gisle Aas <gisle@aas.no>
+
+   Release 2.03
+
+   Tweaks to allow compilation on Win32 systems.  Patch by
+   Jan Dubois <jan.dubois@ibm.net>.
+
+
+
+1999-05-01   Gisle Aas <gisle@aas.no>
+
+   Release 2.02
+
+   Avoid "Ambiguous call resolved as CORE::..." warnings from
+   newer perls.
+
+
+
+1998-01-20   Gisle Aas <aas@sn.no>
+
+   Release 2.01
+
+   Improved the documentation of Unicode::String
+
+   Only warn when $^W is TRUE
+
+
+
+1998-01-19   Gisle Aas <aas@sn.no>
+
+   Release Unicode-String-2.00
+
+   Renamed package to Unicode-String (moved String modules up one
+   level in the distribution)
+
+   Handle assignment of utf16 strings with uneven byte length
+
+   The $u->length now always returns an integer value as it should
+
+   The $u->utf7 encoder bailed out on U+XX0A characters
+
+
+
+1997-07-10   Gisle Aas <aas@sn.no>
+
+   Release Unicode-19970710
+
+   Now most basic conversion routines and string manipulation works.
+   Documentation is starting to appear.
+
+
+
+1997-02-11   Gisle Aas <aas@sn.no>
+
+   First version of this module posted to perl5-porters.

@@ -1,0 +1,105 @@
+Revision history for Perl extension User::Simple.
+1.45 Tue Jun 18 16:24:21 CDT 2013
+
+     	- Turns out the POD checks actually need a charset to be
+          explicitly declared, even if using UTF. Go know. Anyway,
+          thanks (again!) to gregor herrmann.
+
+1.44 Tue Jun 18 13:09:03 CDT 2013
+
+        - Reencoded the files as UTF8. Older encoding systems must
+          die.
+	- One missing pair of parentheses caused the admin module
+          to fail building under Perl 5.18. Thanks to gregor herrmann
+          for reporting it!
+
+1.43 Tue Jan 20 13:37:10 CST 2009
+
+        - Dropped spurious requirement of YAML in the test suite (that
+          was added as a debugging aid :-/ ) Thanks to Slaven Rezic
+          for pointing it out...
+
+1.42 Wed Dec 10 17:22:19 CST 2008
+        - Fixed a session hash predictability/clash vulnerability,
+	  reported by Eugene V. Lyubimkin via Damyan Ivanov. Thanks!
+
+1.40 Fri Jun 27 11:35:01 CDT 2008
+        - Bah... Why jump through that many hoops? Moving away from
+	  ExtUtils::MakeMaker to Module::Build
+
+1.38 Wed Jun 25 17:30:31 CDT 2008
+        - "The Kwalitee release"
+	- Added Test::Pod test
+	- Regenerated META.yml to be valid. Where did I take mine
+	  from?! 
+	- Completed license, author license, both in META.yml and in
+	  LICENSE 
+	- But still, no real, substantive changes!
+
+1.37 Mon Jun 23 10:41:00 CDT 2008
+     	- Fixed remaining file locking problem which caused the tests
+	  to fail in *BSD systems. Thanks to Slaven Rezic and CPANTS
+	  for helping me spot and fix the bug!
+
+1.36 Sun Jun 15 23:56:56 CDT 2008
+        - Umh... since the very early revisions (0.9?), I was only
+	  explicitly skipping 14 tests if DBD::XBase is not
+	  installed. Updating it to 37. Grr.
+	- Changed the tests to run under SQLite3 instead of DBD::XBase
+	  - A bit more reliable, it seems
+
+1.35
+        - Gah... Using DBD::XBase in the tests lets many subtle
+          problems slip by... For example, 1.3 was released with a
+          broken User::Admin::new_user :-/
+
+1.3 Thu Oct  6 13:21:56 CDT 2005
+	- By popular demand, User::Simple (not necessarily from within
+	  ::Admin) can modify the user data - Not only that, but also
+	  a subtle distinction was added: fields called beginning with
+	  adm_ are not modifiable by it.
+
+1.23 Sun Oct  2 11:45:35 CDT 2005
+	- Bugfix: Some DBDs return uppercase fields, some
+	  lowercase... Try to handle them all correctly (or at least,
+	  not as incorrectly :) )
+
+1.22 Mon Sep 26 19:47:12 2005
+        - Bugfix: Last remanent of old name/level structure
+	  removed. Thanks, Alex Juarez!
+	- Minimum required Perl version reduced to 5.8 (was 5.8.7)
+
+1.2  Fri Sep 23 13:43:00 2005
+        - API CHANGE - API CHANGE - API CHANGE: Some changes in
+	  User::Admin::Simple (in user creation, database structure creation)
+	- Added generic (AUTOLOADed) methods to both User::Simple and
+	  User::Simple::Admin to deal with unknown attributes in the
+	  table
+	- Finally (completely) removed the deprecated is_admin
+	  infrastructure 
+	- Name and level are not explicitly implemented from within
+	  the class, they become (if required by the user) AUTOLOADed.
+	- Added examples/user-simple-admin, a command-line interface
+	  for managing User::Simple tables
+
+1.1  Thu Sep 08 14:40:05 2005
+        - Never really released, but PAUSE won't allow me to re-use
+	  this version number... Sorry
+
+1.0  Sun Aug 21 23:06:08 2005
+        - Now correctly works with any kind of DBD backend
+	- Added a complete test suite, which surprisingly worked!
+
+0.9  Sat Jul 30 10:45:15 2005
+	- Added Date::Calc and Digest::MD5 as prerequisite modules
+        - Added a more granular 'level' for the users instead of the 
+	  all-or-nothing is_admin infrastructure
+	- Modified the is_admin infrastructure so old code works
+	  seamlessly with the new version (although sends out some
+	  warnings, as is_admin is officially deprecated)
+        - Added/clarified some documentation
+
+0.8  Wed Jun 15 10:52:29 2005
+	- original version; created by h2xs 1.23 with options
+		-X User::Simple
+

@@ -1,0 +1,26 @@
+   		          /samples README
+
+This directory contains a number sample files that demonstrate various
+aspects of the UMLS::Interface package and related utilities.
+
+We recommend that you save a copy of the files in this directory for 
+future use.  
+
+Configuration files
+===================
+
+configuration: is a sample configuration file for the umls-similarity.pl 
+program in the utils/ directory
+
+
+Information content
+===================
+
+icpropagation: is a sample file containing a list of CUIs and their 
+information content This file is required by the getIC.pl program 
+
+icfrequency: is a sample file containing a list of CUIs and their 
+frequency. This file is required by the getIC.pl program when you 
+would like to generate the information content on the fly for a given 
+input.
+

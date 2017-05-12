@@ -1,0 +1,15 @@
+SYNOPSIS
+
+     use Unicode::Homoglyph;
+
+    See the @Unicode::Homoglyph::Homoglyphs variable.
+
+DESCRIPTION
+
+SEE ALSO
+
+    mimic, https://github.com/reinderien/mimic/ the project where the list
+    was originally stolen from.
+
+    http://www.irongeek.com/homoglyph-attack-generator.php
+

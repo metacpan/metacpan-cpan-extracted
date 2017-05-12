@@ -1,0 +1,196 @@
+#!/usr/bin/perl
+use v5.14;
+use warnings;
+use Digest::Adler32::XS;
+use GStreamer1;
+use Glib qw( TRUE FALSE );
+use UAV::Pilot::Wumpus ();
+use IO::Socket::Multicast;
+use Getopt::Long ();
+
+use constant {
+    VIDEO_MAGIC_NUMBER => 0xFB42,
+    VIDEO_VERSION      => 0x0001,
+    VIDEO_ENCODING     => 0x0001,
+};
+use constant {
+    FLAG_HEARTBEAT => 0,
+    FLAG_KEYFRAME => 1,
+    FLAG_FRAME_COUNT_OVERFLOW => 2,
+};
+use constant HEARTBEAT_TIMEOUT_SEC       => 60;
+use constant TYPE_TO_CLASS => {
+    'rpi' => [
+        'rpicamsrc',
+    ],
+    'stdin' => [
+        'fdsrc',
+    ],
+};
+
+my $PORT = UAV::Pilot::Wumpus->DEFAULT_VIDEO_PORT;
+my $WIDTH = 640;
+my $HEIGHT = 480;
+my $BITRATE = 0;
+my $VBR_QUANT = 15;
+my $FPS = 30;
+my $KEYFRAME_INTERVAL = 1;
+my $SENSOR_MODE = undef;
+my $TYPE = 'rpi';
+my $TTL = 1;
+my $MULTICAST_INTERFACE = 'wlan0';
+my $MULTICAST_ADDR = '239.255.0.1';
+Getopt::Long::GetOptions(
+    #'input=s'  => \$INPUT_DEV,
+    'w|width=i'  => \$WIDTH,
+    'h|height=i' => \$HEIGHT,
+    'p|port=i'   => \$PORT,
+    't|type=s'   => \$TYPE,
+    'f|fps=i' => \$FPS,
+    'b|bitrate=i' => \$BITRATE,
+    'v|vbr-quant=i' => \$VBR_QUANT,
+    'k|keyframe-interval=i' => \$KEYFRAME_INTERVAL,
+    'l|ttl=i' => \$TTL,
+    'i|multicast-interface=s' => \$MULTICAST_INTERFACE,
+    'a|multicast-address=s' => \$MULTICAST_ADDR,
+);
+die "Type '$TYPE' is not supported\n"
+    unless exists TYPE_TO_CLASS->{$TYPE};
+
+
+sub bus_error_callback
+{
+    my ($bus, $msg, $loop) = @_;
+    my $s = $msg->get_structure;
+    warn $s->get_value('gerror')->message . "\n";
+    $loop->quit;
+    return FALSE;
+}
+
+sub bus_eos_callback
+{
+    my ($bus, $msg, $loop) = @_;
+    say "Got End of Stream";
+    $loop->quit;
+    return TRUE;
+}
+
+my $digest = Digest::Adler32::XS->new;
+my $frame_count = 0;
+sub handoff_callback
+{
+    my ($fakesink, $buffer, $pad, $socket) = @_;
+    my $size = $buffer->get_size;
+    my $frame_data = $buffer->extract_dup( 0, $size );
+
+    $digest->add( $frame_data );
+    my $checksum_hex = $digest->hexdigest;
+
+    my $flags = 0x00000000;
+    # TODO find if this frame is actually a keyframe based on the 
+    # GStreamer objects
+    $flags |= 1 << FLAG_KEYFRAME;
+
+    if( $frame_count > (2**32 - 1) ) {
+        $flags |= 1 << FLAG_FRAME_COUNT_OVERFLOW;
+        $frame_count = 0;
+    }
+
+    my $packet = pack 'nnn' . 'NNn' . 'nnN' . 'CCCCCCC*'
+        ,VIDEO_MAGIC_NUMBER
+        ,VIDEO_VERSION
+        ,VIDEO_ENCODING
+        ,$flags
+        ,$size
+        ,$WIDTH
+        ,$HEIGHT
+        ,unpack( 'C*', hex($checksum_hex) )
+        ,$frame_count
+        ,( (0x00) x 6 ) # 6 bytes reserved
+        ,@$frame_data
+        ;
+
+    $socket->mcast_send( $packet );
+
+    $frame_count++;
+    return TRUE;
+}
+
+sub setup_socket
+{
+    my $socket = IO::Socket::Multicast->new(
+        LocalPort => $PORT,
+    );
+
+    $socket->mcast_if( $MULTICAST_INTERFACE );
+    $socket->mcast_ttl( $TTL );
+    $socket->mcast_loopback( 0 );
+    $socket->mcast_dest( $MULTICAST_ADDR . ':' . $PORT );
+
+    return $socket;
+}
+
+{
+    my $loop = Glib::MainLoop->new( undef, FALSE );
+    GStreamer1::init([ $0, @ARGV ]);
+
+    my ($src_name, @src_config) = @{ +TYPE_TO_CLASS->{$TYPE} };
+
+    my $pipeline = GStreamer1::Pipeline->new( 'pipeline' );
+    my $src = GStreamer1::ElementFactory::make( $src_name => 'and_who_are_you' );
+    my $capsfilter = GStreamer1::ElementFactory::make(
+        capsfilter => 'are_you' );
+    my $h264parse = GStreamer1::ElementFactory::make(
+        'h264parse' => 'the_proud_lord_said' );
+    my $fakesink = GStreamer1::ElementFactory::make(
+        fakesink => 'that_i_should_bow_so_low' );
+
+    if( $src_name eq 'rpicamsrc' ) {
+        $src->set(
+            bitrate => $BITRATE,
+            'keyframe-interval' => $KEYFRAME_INTERVAL,
+            ($BITRATE == 0
+                ? ('quantisation-parameter' => $VBR_QUANT) : ()),
+            (defined $SENSOR_MODE
+                ? ('sensor-mode' => $SENSOR_MODE) : ()),
+        );
+    }
+
+    my $caps = GStreamer1::Caps::Simple->new( 'video/x-h264',
+        alignment       => 'Glib::String' => 'au',
+        'stream-format' => 'Glib::String' => 'byte-stream',
+        width           => 'Glib::Int'    => $WIDTH,
+        height          => 'Glib::Int'    => $HEIGHT,
+        #framerate => 'Glib::Double' => ($FPS / 1),
+    );
+    $capsfilter->set( caps => $caps );
+
+    $fakesink->set(
+        'signal-handoffs' => TRUE,
+    );
+
+    $pipeline->add( $_ ) for
+        $src,
+        $capsfilter,
+        $h264parse,
+        $fakesink;
+
+    $src->link( $capsfilter );
+    $capsfilter->link( $h264parse );
+    $h264parse->link( $fakesink );
+
+    my $socket = setup_socket();
+
+    my $bus = $pipeline->get_bus;
+    $bus->add_signal_watch;
+    $bus->signal_connect( 'message::error', \&bus_error_callback, $loop );
+    $bus->signal_connect( 'message::eos', \&bus_eos_callback, $loop );
+    $fakesink->signal_connect( 'handoff', \&handoff_callback, $socket );
+
+    say "Ready to send on multicast addr $MULTICAST_ADDR, port $PORT . . . ";
+    $pipeline->set_state( 'playing' );
+    $loop->run;
+    $pipeline->set_state( 'null' );
+
+    $socket->mcast_drop;
+}

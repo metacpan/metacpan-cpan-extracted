@@ -1,0 +1,685 @@
+NAME
+    UMLS-Interface Installation Guide
+
+TESTING PLATFORMS
+    UMLS-Interface has been developed and tested on Linux primarily using
+    Perl.
+
+SYNOPSIS
+     perl Makefile.PL
+
+     make
+
+     make test
+
+     make install
+
+DESCRIPTION
+    The UMLS-Interface package is an interface to the Unified Medical
+    Language System (UMLS)
+
+REQUIREMENTS
+    UMLS-Interface REQUIRES that the following software packages and data:
+
+  Programming Languages
+     Perl (version 5.8.0 or better)
+
+  CPAN Modules
+     DBI
+     DBD::mysql
+     Text::NSP
+     Digest::SHA1
+     File::Spec
+     File::Path
+
+  Database
+    MySQL (version 5 or better)
+
+  Data
+    Unified Medical Language System (UMLS 2008AA or higher)
+
+INSTALLATION STAGES
+    The installation is broken into five stages:
+    Stage 1: Install Programming Languages
+                  If already installed you need at minimum: 
+                      - Perl version 5.8 or better
+
+    Stage 2: Install CPAN Modules
+    Stage 3: Install MySQL
+                  If already installed you need at minimum: 
+                      - MySQL version 5 or better
+
+    Stage 4: Install the UMLS
+                  If already installed you need at minimum: 
+                      - the following files in the META directory:
+                        -- populate_mysql_db.sh script 
+                        -- MRREL.RFF
+                        -- MRCONSO.RFF
+                        -- MRSAB.RFF
+                        -- MRDOC.RFF
+                        -- MRDEF.RFF
+                        -- MRSTY.RFF
+                      - the following files in the NET directory
+                            --populate_net_mysql_db.sh script
+                            --SRDEF
+
+    Stage 5: Load the UMLS into MySQL
+                  If already installed you need at minimum: 
+                      - the following tables 
+                        -- MRREL
+                        -- MRCONSO
+                        -- MRSAB
+                        -- MRDOC
+                        -- SRDEF
+                        -- MRDEF
+                        -- MRSTY
+
+    Stage 6: Install UMLS-Interface and set environment variable
+        More details on how to obtain and install appear below.
+
+Stage 1: Install Programming Languages, if already installed go to Stage 2
+  Perl (version 5.8.5 or better)
+    Perl is freely available at <http://www.perl.org>. It is very likely
+    that you will already have Perl installed if you are using a Unix/Linux
+    based system.
+
+Stage 2 - Install CPAN modules, if already installed go to Stage 3
+  DBI
+    CPAN modules, and will not be repeated in detail for each module.****
+
+    UMLS-Interface uses DBI to access the mysql database containing the
+    UMLS. DBI is freely available at <http://search.cpan.org/~timb/DBI/>
+
+    If you have supervisor access, or have configured MCPAN for local
+    install, you can install via:
+
+     perl -MCPAN -e shell
+     > install DBI
+
+    If not, you can, "manually" install by downloading the *.tar.gz file,
+    unpacking, and executing the following commands.
+
+     perl Makefile.PL PREFIX=/home/programs LIB=/home/lib
+     make
+     make test
+     make install
+
+    Note that the PREFIX and LIB settings are just examples to help you
+    create a local install, if you do not have supervisor (su) access.
+
+    You must include /home/MyPerlLib in your PERL5LIB environment variable
+    to access this module when running.
+
+    UMLS-Interface uses this module to connect with umls installed on the
+    mysql database. It is the MySQL sriver for the Perl5 Database interface.
+    This package is freely available at
+    <http://search.cpan.org/dist/DBD-mysql/>
+
+    During a recent install there were some very very strange looking
+    errors. These wereresolved after installing the Ubuntu package
+    libmysqld-dev via
+
+    sudo apt-get install libmysql-dev
+
+    The following gives a little discussion about this situation :
+
+    <http://www.dslreports.com/forum/r26750216-Can-t-install-the-DBD-mysql-p
+    ackage-on-Ubuntu>
+
+  Digest::SHA1
+    UMLS-Interface uses Digest::SHA1 to conver the human readable tables
+    names (the original one) to hex in order to keep the table names short
+    while still having them contain all the relevant information. This
+    pakcage is freely available at
+    <http://search.cpan.org/~gaas/Digest-SHA1/>
+
+  File::Spec
+    UMLS-Interface uses this package for testing purposes. This package is
+    freely available at:
+
+    <http://search.cpan.org/~smueller/PathTools-3.31/lib/File/Spec.pm>
+
+  File::Path
+    UMLS-Interface uses this package for testing purposes. This package is
+    freely available at:
+
+    <http://search.cpan.org/~dland/File-Path-2.08/>
+
+  Text::NSP
+    UMLS-Interface uses this package to obtain the frequency counts for
+    propagation. This package is freely available at:
+
+    <http://search.cpan.org/dist/Text-NSP/>
+
+Stage 3 - Install MySQL, if already installed go to Stage 4
+    Requires MySQL (version 5 or better)
+
+    MySQL is a freely available database at <http://www.mysql.com/>. You may
+    be able to install this with you package manager. Otherwise you will
+    have to download the appropriate files from the MySQL website. Either
+    way, make certain that the following are installed:
+
+            1. Server
+            2. Client
+            3. Shared libraries
+            4. Headers and libraries
+
+    Sometimes the headers and libraries are not installed so you want to
+    double check on that.
+
+  Installing on Red Hat Enterprise Linux WS release 4 using rpms
+    I installed this on Red Hat Enterprise Linux WS release 4 using rpms.
+    So, I downloaded the corresponding rpms:
+
+            1. MySQL-server-community-5.0.51a-0.rhel4.i386.rpm
+            2. MySQL-client-community-5.0.51a-0.rhel4.i386.rpm
+            3. MySQL-shared-community-5.0.51a-0.rhel4.i386.rpm
+            4. MySQL-devel-community-5.0.51a-0.rhel4.i386.rpm
+
+    I ran into two problems. The first was I had an older version of RedHat
+    that another program was dependent on and it would not let me upgrade. I
+    ended up just removing the program and the older version of MySQL. This
+    was not recommended by the MySQL documentation but after a certain point
+    it just became too frustrating. The second problem that I had was I kept
+    receiving the following error:
+
+    Warning: Can't connect to local MySQL server through socket
+    '/var/lib/mysql/mysql.sock' (2) in /var/www/html/forum/admin/
+    db_mysql.php on line 40
+
+    Warning: MySQL Connection Failed: Can't connect to local MySQL server
+    through socket '/var/lib/mysql/mysql.sock' (2) in
+    /var/www/html/forum/admin/db_mysql.php on line 40
+
+    I don't completely understand this error but after much googling I ended
+    up moving the mysql.sock file to the '/tmp' directory and changed the
+    the socket location in my 'my.cnf' file which was located in the '/etc'
+    directory. I changed the following line: from : socket =
+    /var/lib/mysql/mysql.sock to : socket = /tmp/mysql.sock
+
+    In the /var/lib/mysql/ directory I have a mysql.sock= file. I created a
+    symbolic link to that from the /tmp directory
+
+            ln -s /var/lib/mysql/mysql.sock= /tmp/mysql.sock
+
+    Then everything seemed to work fine.
+
+    I then set my root password:
+
+         /usr/bin/mysqladmin -u root password 'new-password'
+
+  Installing on Fedora using yum
+    Ted installed mysql on Fedora using yum.
+
+    To install mysql using yum, type the following three commands on the
+    command line:
+
+        1. yum install mysql
+        2. yum install mysql-server
+        3. yum install mysql-devel
+
+    After this is complete mysql should be installed. Next you need to start
+    the mysql server by typing the following command:
+
+         service mysqld start
+
+  Installing on Ubuntu using apt-get
+    I also installed this on Ubuntu. This was 100 times easier than using
+    the rpms! Type the following commands:
+
+     sudo apt-get install mysql-common
+     sudo apt-get install mysql-client
+     sudo apt-get install mysql-server
+
+    You are done - much easier!
+
+  Reminder
+    Also for all the installations, remember to set your root password:
+
+         /usr/bin/mysqladmin -u root password 'new-password'
+
+    If you are not going to be using root as your main entry into mysql -
+    which is probably a good idea - you can create a user account. Here is
+    how I did it:
+
+     mysql> CREATE USER bthomson IDENTIFIED BY 'psswrd';
+     Query OK, 0 rows affected (0.00 sec)
+
+     mysql> GRANT ALL ON *.* TO bthomson;
+     Query OK, 0 rows affected (0.00 sec)
+
+    Directions are in the mysql documentation:
+
+    <http://dev.mysql.com/doc/refman/5.1/en/adding-users.html>
+
+Stage 4 - Install UMLS, if already installed go to Stage 5
+  VERSION
+    The UMLS-Interface requires version UMLS 2008AA or higher.
+
+    Directionsmodified for installation version 2012AA.
+
+  REMINDER
+    If you already have the UMLS installed, make certain that you have the
+    populate_mysql_db.sh script in the META directory as well as the
+    MRREL.RFF, MRCONSO.RFF, MRSAB.RFF, MRDOC.RFF, MRDEF.RFF, MRSTY.RFF and
+    SRDEF.RFF files. If you do not you will need to run the install program
+    (MetamorphoSys) again.
+
+  DESCRIPTION OF UMLS
+    The UMLS is a freely available knowledge representation framework
+    designed to support broad scope biomedical research queries. It includes
+    over 100 controlled medical terminologies and classification systems
+    encoded with different semantic and syntactic structures. The three
+    major sources of UMLS are the Metathesaurus, Semantic Network and
+    SPECIALIST Lexicon. To obtain the UMLS you need to register for a
+    license. For more information please see:
+
+    <http://www.nlm.nih.gov/research/umls/>
+
+    The UMLS is installed and the MySQL load scripts are created using
+    MetamorphoSys. MetamorphoSys is the UMLS installation wizard and
+    customization tool included in each UMLS release. It installs one or
+    more of the UMLS Knowledge Sources; when the Metathesaurus is selected,
+    the user can create customized Metathesaurus subsets. MetamorphoSys may
+    be used to exclude vocabularies that are not required or licensed for
+    use in local applications and to select from a variety of data output
+    options and filters. Below are directions for a basic installation -
+    nothing fancy.
+
+    There are quite a few steps and substeps here. The steps aren't
+    complicated - there are just a lot of different windows that pop up and
+    I tried to break it down into small steps so I wouldn't miss anything.
+    The directions can also be found with in the UMLS documentation:
+
+    <http://www.nlm.nih.gov/research/umls/load_scripts.html>
+    <http://www.nlm.nih.gov/research/umls/meta6.html>
+
+  Step 1: Download the UMLS
+    The UMLS is freely available but you need to register for a UMLS license
+    prior to downloading.
+
+    You can register here:
+
+    <http://umlsks.nlm.nih.gov/>
+
+    The download link is here:
+
+    <http://www.nlm.nih.gov/research/umls/>
+
+     Download the following files:
+      1. <current release>-1-meta.nlm  
+      2. <current release>-otherks.nlm    
+      3. <current release>-2-meta.nlm  
+      4. mmsys.zip    
+      5. <current release>.CHK  
+      6. Copyright_Notice.txt  
+      7. README.txt
+
+  Step 2: Unzip the mmsys.zip file (unzip mmsys.zip)
+    The following should be created: 1. linux_mmsys.sh 2. solaris_mmsys.sh
+    3. macintosh_mmsys.sh 4. windows_mmsys.bat 5. MMSYS/ (directory)
+
+  Step 3: Run MetamorphoSys (the install wizard)
+     -- Run the appropriate .sh file for your system 
+         --> I ran ./run_linux.sh
+
+     -- Click 'Install UMLS'
+
+     -- INSTALL UMLS' Window will appear
+        - Type in your destination directory. I used 
+          the same directory as my Source.
+        - At the very least make certain that the Metathesaurus 
+          box is checked. Although, I installed all three of the 
+          Knowledge Sources: 'Metathesaurus', 'Semantic 
+          Network' and 'SPECIALIST Lexicon and Lexical Tools'.
+        - Choose the mysql database for the Semantic Network load
+          scripts    
+        - Click 'OK'
+
+     -- 'Install UMLS' and 'MetamorphoSys Configuration' windows will appear
+         - Click 'New Configuration' in the 'MetamorphoSys Configuration' 
+
+     -- 'License Agreement Notice' window will appear
+         - Click 'Accept'
+
+     -- 'Select Default Subset' window will appear
+         - Click 'Level 0 + SNOMEDCT'               
+         - Unless you don't want or do not have a license for 
+           SNOMED-CT. then Click 'Level 0'
+         - Click 'Done'
+
+     -- 'UMLS Metathesaurus Configuration' window will appear
+         - Click on the 'Output Options' tab
+         - Check the 'Write MySQL load script' box 
+         - this is under the heading 'Write Database Load Scripts'
+       - Click 'Done' and then 'Begin Subset'
+         - this is the last option on the list of options in the 
+           top left hand corner of the window. 
+       - A box will appear asking if you would save the changes 
+         - this is up to you; I clicked 'No'
+
+         Now the UMLS will install and the load scripts will be created 
+
+     -- 'Finished' window will appear
+        - Click 'Done'
+
+Stage 5 - Load UMLS into MySQL, if already installed go to Stage 6
+  Step 1: Create the MySQL database
+    Log into MySQL and create a database called 'umls' as follows:
+
+    CREATE DATABASE IF NOT EXISTS umls CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+    
+
+  Step 2: Modify the 'my.cnf' file.
+    This has been put in a different place every version or distribution
+    that I have run this one. I have found it in the '/etc' directory as
+    well as the '/etc/mysql' directory.
+
+    You can find where yours is by using the find command:
+
+        sudo find / -name my.cnf
+
+    If you do not have a my.cnf file check to see if you have a 'my.ini'
+    file (which one you have will depend on your system).
+
+    The following options need to be modified to optimize for read
+    performance, the MySQL 5 server requires changing buffer sizes to make
+    use of the memory available.
+
+          key_buffer              = 600M
+          table_cache             = 300
+          sort_buffer_size        = 20M
+          read_buffer_size        = 200M
+          query_cache_limit       = 3M
+          query_cache_size        = 100M
+          myisam_sort_buffer      = 200M
+          bulk_insert_buffer_size = 100M
+          join_buffer_size        = 100M
+
+    Also make certain that this file is readable in order to run this as
+    non-root. To change permission on it: chmod gou+r /etc/my.cnf
+
+  Step 3: Populate the MySQL table using the load scripts
+   Step A: Find the MySQL load script for the Metathesaurus
+    Go to your Destination directory that you typed in Step C (this is where
+    I said my source and destination directory were the same)
+
+    Go to the: <destination>/2008AA/META directory
+
+     In it you should see the file:
+
+       populate_mysql_db.sh
+
+    If you don't see this file - you need to start over. Step 3 - F did not
+    get done properly.
+
+   Step B: Modify the MySQL load scripts for the Metathesaurus
+    In the populate_mysql_db.sh you need to modify the following:
+
+            MYSQL_HOME=<path to MYSQL_HOME>
+            user=<username>
+            password=<password>
+            db_name=<db_name>
+
+    For example, I modified my file as follows:
+
+            MYSQL_HOME=/usr/
+            user=bthomson
+            password=<well I am not giving you my actual password>
+            db_name=umls
+
+   Step C:  Run the MySQL load scripts for the Metathesaurus
+    Run this script by typing on the command line:
+
+            ./populate_mysql_db.sh
+
+    If you get the following:
+
+            ./populate_mysql_db.sh: Permission denied.
+
+    You need to change your permissions and try again. To change your
+    permissions type:
+
+            chmod 755 populate_mysql_db.sh
+
+    Now this takes what feels like FOREVER! Now would be a good time to go
+    do something else until sometime late tomorrow (yes, unfortunately,
+    tomorrow) evening ...
+
+    Note: different distributions set up mysql just a bit differently, and
+    one area that seems to matter to UMLS is whether or not "load local
+    infile" is enabled. I think normally it is, but openSuse does not enable
+    that by default. So, statement 15 in mysql_tables.sql was
+    failing...which caused the populate script to end immediately...
+
+    To overcome this, modify the my.cnf file to include
+
+    [client] loose-local-infile=1
+
+    This information comes from the following:
+
+    <http://dev.mysql.com/doc/refman/5.1/en/load-data-local.html>
+
+   Step D: Find the MySQL load script for the Semantic Network
+    Go to your Destination directory that you typed in Step C (this is where
+    I said my source and destination directory were the same)
+
+    Go to the: <destination>/2008AA/NET
+
+    In it you should see the file:
+
+        LoadScripts.zip
+
+    Unzip this file as follows:
+
+        unzip LoadScripts.zip
+
+    The following file then should appear:
+
+        populate_net_mysql_db.sh
+
+    If you don't see this file - you need to start over. Step 3 - F did not
+    get done properly.
+
+   Step E: Modify the MySQL load script for the Semantic Network
+    This is the exact same modifications that were done in the Metathesaurus
+    load script.
+
+    In the populate_net_mysql_db.sh you need to modify the following:
+
+        MYSQL_HOME=<path to MYSQL_HOME>
+        user=<username>
+        password=<password>
+        db_name=<db_name>
+
+    For example, I modified my file as follows:
+
+        MYSQL_HOME=/usr/
+        user=bthomson
+        password=<well I am not giving you my actual password>
+        db_name=umls
+
+   Step F:  Run the MySQL load script for the Semantic Network
+    Run this script by typing on the command line:
+
+        ./populate_net_mysql_db.sh
+
+    If you get the following:
+
+        ./populate_net_mysql_db.sh: Permission denied.
+
+    You need to change your permissions and try again. To change your
+    permissions type:
+
+        chmod 755 populate_net_mysql_db.sh
+
+    Now this should not take forever. It goes much much quicker!
+
+  Step G: Modify the my.cnf file (again)
+    This has been put in a different place every version or distribution
+    that I have run this one. I have found it in the '/etc' directory as
+    well as the '/etc/mysql' directory.
+
+    You can find where yours is by using the find command:
+
+        sudo find / -name my.cnf
+
+    This time you are modifying it so the that the UMLS-Interface package
+    (and the utils/ files) can automatically log into the umls database.
+
+        [client]
+        user            = <username>
+        password        = <password>
+        port            = 3306
+        socket          = /tmp/mysql.sock
+        database        = umls
+
+    The port number is should already be in the my.cnf file under the
+    [mysql] heading. I just copied and pasted that.
+
+    The socket is what ever socket you used in Stage 3.
+
+    Remember we discussed how big of pain this was since it seemed like the
+    socket location depended on what operating system you were using.
+
+    My RedHat is:
+
+        socket = /tmp/mysql.sock
+
+    where as on my Ubunutu 8.04:
+
+        socket = /var/lib/mysql/mysql.sock
+
+    and currently on Ubuntu 9.04:
+
+        socket = /var/run/mysqld/mysqld.sock
+
+    So the sock file is different and its location is different depending on
+    what version of linux you are running.
+
+    You can find it using:
+
+         sudo find / -name mysqld.sock 
+
+         or
+
+         sudo find / -name mysql.sock
+
+    This is a huge pain. If you need help just send me an email.
+
+    The database is whatever you called the database that the UMLS is
+    installed in. Mine is 'umls'.
+
+    Also again remember to make certain that this file is readable in order
+    to run this as non-root user. To change permission on it:
+
+          chmod gou+r /etc/my.cnf
+
+Stage 6 - Install UMLS-Interface and set environment variable
+    The usual way to install the package is to run the following commands:
+
+         perl Makefile.PL
+         make
+         make test
+         make install
+
+    You will often need root access/superuser privileges to run make
+    install. The module can also be installed locally. To do a local
+    install, you need to specify a PREFIX option when you run 'perl
+    Makefile.PL'. For example,
+
+     perl Makefile.PL PREFIX=/home
+
+     or
+
+     perl Makefile.PL LIB=/home/lib PREFIX=/home
+
+    will install UMLS-Interface into /home. The first method above will
+    install the modules in /home/lib/perl5/site_perl/5.8.3 (assuming you are
+    using version 5.8.3 of Perl; otherwise, the directory will be slightly
+    different). The second method will install the modules in /home/lib. In
+    either case the executable scripts will be installed in /home/bin and
+    the man pages will be installed in home/share.
+
+    Warning: do not put a dash or hyphen in front of PREFIX, LIB or WNHOME.
+
+    In your perl programs that you may write using the modules, you may need
+    to add a line like so
+
+     use lib '/home/lib/perl5/site_perl/5.8.3';
+
+    if you used the first method or
+
+     use lib '/home/lib';
+
+    if you used the second method. By doing this, the installed modules are
+    found by your program. To run the umls-similarity.pl program, you would
+    need to do
+
+     perl -I/home/lib/perl5/site_perl/5.8.3 umls-similarity.pl
+
+     or
+
+     perl -I/home/lib
+
+    Of course, you could also add the 'use lib' line to the top of the
+    program yourself, but you might not want to do that. You will need to
+    replace 5.8.3 with whatever version of Perl you are using. The preceding
+    instructions should be sufficient for standard and slightly non-standard
+    installations. However, if you need to modify other makefile options you
+    should look at the ExtUtils::MakeMaker documentation. Modifying other
+    makefile options is not recommended unless you really, absolutely, and
+    completely know what you're doing!
+
+    NOTE: If one (or more) of the tests run by 'make test' fails, you will
+    see a summary of the tests that failed, followed by a message of the
+    form "make: *** [test_dynamic] Error Y" where Y is a number between 1
+    and 255 (inclusive). If the number is less than 255, then it indicates
+    how many test failed (if more than 254 tests failed, then 254 will still
+    be shown). If one or more tests died, then 255 will be shown. For more
+    details, see:
+
+    <http://search.cpan.org/dist/Test-Simple/lib/Test/Builder.pm#EXIT_CODES>
+
+    If desired, you can set the UMLSINTERFACE_CONFIGFILE_DIR environment
+    variable. This will be the location where you don't mind the
+    UMLS-Interface module writing out system files when using the verbose
+    option. The files created when using this option are:
+
+           1. <UMLS_version>_<sources><relations>_config
+
+              which is an example configuration file of the 
+              the current run
+
+           2. <UMLS_version>_<sources><relations>_child
+              <UMLS_version>_<sources><relations>_parent
+
+              this files store the upper level taxonomy which is 
+              created when connecting multiple sources
+
+           3. <UMLS_version>_<sources><relations>_table
+
+    They are primarily for testing purposes.
+
+CONTACT US
+     If you have any trouble installing and using UMLS-Interface, please 
+     contact us via the users mailing list : 
+
+     umls-similarity@yahoogroups.com
+
+     You can join this group by going to:
+
+    <http://tech.groups.yahoo.com/group/umls-similarity/>
+
+     You may also contact us directly if you prefer :
+
+     Bridget T. McInnes: bthomson at cs.umn.edu
+     Ted Pedersen      : tpederse at d.umn.edu
+
+POD ERRORS
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 145:
+        Unknown directive: =head
+

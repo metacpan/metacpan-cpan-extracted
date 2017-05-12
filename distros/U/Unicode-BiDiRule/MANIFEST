@@ -1,0 +1,16 @@
+BiDiRule.xs
+Changes
+data/bidirule.pl
+lib/POD2/JA/Unicode/BiDiRule.pod
+lib/Unicode/BiDiRule.pm
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/00use.t
+t/01flodhast.t
+t/02IdnaTest.t
+t/pod.t
+unicode_bidirule.c
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,70 @@
+Revision history for Perl extension Unicode::Stringprep
+
+1.105 (2014-09-03)
+	- FIXES: #98106: [PATCH] Silence "Redundant argument in sprintf"
+	  warnings (reported by fraserbn@*****.com)
+
+1.104 (2011-12-08)
+	- FIXES: #72615 faulty data in Build.PL causes a lack of
+	  meta files, which breaks carton.
+
+1.103 (2010-01-16)
+	- fix 'couldn't find diagnostic data' in tests on some machines
+
+1.102 (2010-01-09)
+	- fix utf8 warning in _NFKC_3_2
+
+1.101 (2010-01-03)
+	- fix v-string warning on perl >= 5.10
+
+1.100 (2010-01-01)
+	- release as 1.10
+
+1.09_70091231 (2009-12-28)
+	- add support for stored strings
+
+1.09_70091230 (2009-12-28)
+	- add 3.2-compatible normalization
+
+1.09_70091228 Dec 26 00:00:00 2009
+	- add tests for automatic promotion to utf8 (bytes input)
+	- warn with old perls < 5.8.3
+
+1.09_70091227 Dec 26 00:00:00 2009 (broken)
+	- re-enable some tests for 5.6.x (broken)
+
+1.09_70091226 Dec 26 00:00:00 2009
+	- switch to Module::Build
+	- only use ASCII in POD, fixes FAILs with perl 5.6.x
+
+1.02 Sun Dec 13 00:00:00 2009
+	- FIXES: #52734: Undeclared dependency on Test::NoWarnings
+	  reported by ANDK
+
+1.01 Thu Dec 10 00:00:00 2009
+	- release 1.00_20080919 as 1.01
+	- add Example.pod
+	- add dist signature
+	- add LICENSE file
+
+1.00_20080919 Sat Sep 19 00:00:00 2008
+	- fixed compile error on Solaris 2.11 (i86pc-solaris-64int)
+	- add SIGNATURE
+	- pod cleanup
+
+1.00 Fri Oct 12 00:00:00 2007
+	- first release
+	- cleanup
+
+0.99_20071004 Thu Oct 04 00:00:00 2007
+	- better 5.6.x compatibility II
+	- skip some tests for perl versions <5.8.3.
+
+0.99_20070927 Fri Sep 28 00:00:00 2007
+	- better 5.6.x compatibility
+	- better performance (using regular expression)
+
+0.99_20070922 Wed Sep 22 00:00:00 2007
+	- first public developer release
+	- based on RFC 3454, includes test vectors from Internet
+	  Draft draft-josefsson-idn-test-vectors-00.

@@ -1,0 +1,28 @@
+2000-11-07   Gisle Aas <gisle@ActiveState.com>
+
+    Release 0.03 (@10414)
+
+    Changed error handling.  The API functions now return
+    undef on errors and set the %UDDI::err hash.
+
+    Improved documentation.
+
+    Added a little test script.
+
+
+
+2000-11-05   Gisle Aas <gisle@ActiveState.com>
+
+    Release 0.02 (@10373)
+
+    Completed the inquire interface.
+
+    Actual documentation in the module.
+
+    @EXPORT_OK public functions.
+
+
+
+2000-11-03   Gisle Aas <gisle@ActiveState.com>
+
+    Release 0.01 (@10352)

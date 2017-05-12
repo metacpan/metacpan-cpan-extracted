@@ -1,0 +1,36 @@
+Revision history for perl module Unicode::Diacritic::Strip
+
+0.09 2017-04-05
+
+* Expanded SEE ALSO section
+
+0.08 2017-02-28
+
+* Fix bad repo link in Makefile.PL
+* New function strip_alphabet (was Unicode::StripDiacritics)
+
+0.07 2017-02-28
+
+* Export tag ":all"
+* More tests
+* Added "fast_strip" function.
+
+0.06 2016-03-07
+
+* Minor changes
+
+0.05 2014-02-06
+
+* Add MIN_PERL_VERSION in Makefile.PL.
+
+0.04 2014-01-17
+
+* Add Changelog, README
+* Restored to CPAN by popular demand
+
+
+0.03 2012-07-03
+
+0.02 2012-05-31
+
+0.01 2012-04-29

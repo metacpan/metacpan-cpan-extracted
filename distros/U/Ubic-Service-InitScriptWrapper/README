@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Ubic-Service-InitScriptWrapper,
+version 0.02:
+
+  represent any /etc/init.d/ script as ubic service
+
+This software is copyright (c) 2012 by Yandex LLC.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

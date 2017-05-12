@@ -1,0 +1,244 @@
+<h2>UR User Manual</h2>
+<hr />
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#perspective_on_objects">Perspective on Objects</a></li>
+	<li><a href="#objectrelational_mapping">Object-Relational Mapping</a></li>
+	<li><a href="#object_context">Object Context</a></li>
+	<ul>
+
+		<li><a href="#benefits">Benefits</a></li>
+		<li><a href="#issues">Issues</a></li>
+	</ul>
+
+	<li><a href="#class_definitions">Class Definitions</a></li>
+	<li><a href="#metadata">Metadata</a></li>
+	<li><a href="#documentation_system">Documentation System</a></li>
+	<li><a href="#iterators">Iterators</a></li>
+	<li><a href="#command_line_tools">Command Line Tools</a></li>
+  <li><a href="#example">Example</a></li>
+  <ul>
+    <li><a href="#item_paththing_2fpath_2epm">PathThing/Path.pm</a></li>
+    <li><a href="#item_paththing_2fnode_2epm">PathThing/Node.pm</a></li>
+  </ul>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<h1><a name="name">NAME</a></h1>
+<p>UR::Manual::Overview - UR from Ten Thousand Feet</p>
+<hr />
+
+<h1><a name="perspective_on_objects">Perspective on Objects</a></h1>
+<p>Standard software languages provide a facility for making objects. Those
+objects have certain characteristics which are different with UR objects.</p>
+
+<p>A standard object in most languages:</p>
+<ul>
+  <li>exists only as long as the program which created it has a reference to it</li>
+  <li>requires that the developer manage organizing the <code>object(s)</code> into a structure
+  to support any searching required</li>
+  <li>handles persistence between processes explicitly, by saving or loading the object to external storage</li>
+  <li>references other objects only if explicitly linked to those objects</li>
+  <li>acts as a functional software device, but any meaning associated with the object is implied by how it is used</li>
+</ul>
+
+<p>Regular objects like those described above are the building blocks of most software.</p>
+
+<p>In many cases, however, they are often used for a second, higher-level
+purpose: defining entities in the domain model of the problem area the
+software addresses. UR objects are tailored to represent domain model
+entities well. In some sense, UR objects follow many of the design principles
+present in relational databases, and as such mapping to a database for UR
+objects is trivial, and can be done in complex ways.</p>
+<p>UR objects differ from a standard object in the following key ways:</p>
+<ul>
+  <li>the object exists after creation until explicitly deleted, or the transaction it is in rolled-back</li>
+  <li>managing loaded objects is done automatically by a Context object, which handles queries, saving, lazy-loading and caching</li>
+  <li>it is possible to query for an object by specifying the class and the matching characteristics</li>
+  <li>the object can reference other objects which are not loaded in the current process, and be referenced by objects not in the current process</li>
+  <li>the object is a particular truth-assertion in the context in which it exists</li>
+</ul>
+
+<hr />
+<h1><a name="objectrelational_mapping">Object-Relational Mapping</a></h1>
+<p>UR's primary reason for existing is to function as an ORM. That is, managing
+how to store instances of objects in memory of a running program with more
+persistant storage in a relational database, and retrieve them later.  It
+handles the common cases where each table is implemented by a class their
+columns are properties of the classes; retrieving objects by arbitrary
+properties; creating, updating and deleting objects with enforced database
+constraints; and named relationships between classes.</p>
+
+<p>It can also handle more complicated things like:</p>
+<ul>
+  <li>classes for things which are not database entities at all</li>
+  <li>derived classes where the data spans multiple tables between the parent and child classes</li>
+  <li>loading an object through a parent class and having it automatically reblessed into the appropriate subclass</li>
+  <li>properties with no DB column behind them</li>
+  <li>calculated properties with a formula behind them</li>
+  <li>inheritance hierarchies that may have tables missing at some or all stages</li>
+  <li>meta-data about Properties, Classes and the relationships between them</li>
+</ul>
+<hr />
+
+<h1><a name="object_context">Object Context</a></h1>
+<p>With UR, every object you create is made a part of the current ``Context''.
+Conceptually, the Context is the lens by which your application views the
+data that exists in the world.  At one level, you can think of the current
+context as an in-memory transaction. All changes to the object are tracked
+by the context. The Context knows how to map objects to their storage
+locations, called Data Sources. Saving your changes is simply a matter of
+asking the current context to commit.</p>
+<p>The Context can also reverse the saving process, and map a request for an
+object to a query of external storage. Requests for objects go through the
+Context, are loaded from outside as needed, and are returned to the caller
+after being made part of the current context's transaction.</p>
+<p>Objects never reference each other by actual Perl reference internally,
+instead they use the referent's ID. Accessors on an object which return
+another object send the ID through the context to get the object back,
+allowing the context to load the referenced object only when it is actually
+needed. This means that your objects can hook together until references
+span an entire database schema, and pulling one object from the database
+will not load the entire database into memory.</p>
+<p>The context handles caching, and by default will cache everything it
+touches. This means that you can ask for the same thing multiple times,
+and only the first request will actually hit the underlying database.
+It also means that requests for objects which map to the same ID will return
+the exact same instance of the object.</p>
+<p>The net effect is that each process's context is an in-memory database. All
+object creation, deletion, and change is occurring directly to that database.
+For objects configured to have external persistence, this database manages
+itself as a ``diff'' vs. the external database, allowing it to simulate
+representing all UR data everywhere, while only actually tracking what is needed.</p>
+
+<h2><a name="benefits">Benefits</a></h2>
+<ul>
+  <li>database queries don't repeat themselves again and again</li>
+  <li>you never write insert/update/delete statements, or work out constraint order yourself</li>
+  <li>allows you to write methods which address an object individually, with ways to avoid many individual database queries</li>
+  <li>explicitly clearing the cache is less complex than explicitly managing the caching of data</li>
+</ul>
+
+<h2><a name="issues">Issues</a></h2>
+<ul>
+  <li>the cache grows until you explicitly clear it, or allow the Context to prune the cache by setting object count limits explicitly</li>
+  <li>there is CPU overhead checking the cache if you really are always going directly to the database</li>
+</ul>
+
+<hr />
+<h1><a name="class_definitions">Class Definitions</a></h1>
+<p>At the top of every module implementing a UR class is a block of code that
+defines the class to explicitly spell out its inheritance, properties and
+types, constraints, relationships to other classes and where the persistent
+storage is located. It's meant to be easy to read and edit, if necessary. If
+the class is backed by a database table, then it can also maintain itself.</p>
+
+<hr />
+<h1><a name="metadata">Metadata</a></h1>
+<p>Besides the object instances representing data used by the program, the UR
+system has other objects representing metadata about the classes (class
+information, properties, relationships, etc), database entities (databases,
+tables, columns, constraints, etc), transactions, data sources, etc. All the
+metadata is accessable through the same API as any of the database-backed
+data.</p>
+<p>For classes backed by the database, after a schema change (like adding tables
+or columns, altering types or constraints), a command-line tool can
+automatically detect the change and alter the class definition in the Perl
+module to keep the metadata in sync with the database.</p>
+
+<hr />
+<h1><a name="documentation_system">Documentation System</a></h1>
+<p>At the simplest level, most entities have a 'doc' metadata attribute to
+attach some kind of documentation to. There's also a set of tools that can
+be run from the command line or a web browser to view the documentation. It
+can also be used to browse through the class and database metadata, and
+generate diagrams about the metadata.</p>
+
+<hr />
+<h1><a name="iterators">Iterators</a></h1>
+<p>If a retrieval from the database is likely to result in the generation of
+tons of objects, you can choose to get them back in a list and keep them all
+in memory, or get back a special Iterator object that the program can use to
+get back objects in batches.</p>
+
+<hr />
+<h1><a name="command_line_tools">Command Line Tools</a></h1>
+<p>UR has a central command-line tool that cam be used to manipulate the
+metadata in different ways. Setting up namespaces, creating data sources,
+syncing classes with schemas, accessing documentation, etc.</p>
+<p>There is also a framework for creating classes that represent command line
+tools, their parameters and results, and makes it easy to create tools
+through the Command Pattern.</p>
+
+<hr />
+<h1><a name="example">Example</a></h1>
+<p>Given these classes:</p>
+
+<p><strong><a name="item_paththing_2fpath_2epm">PathThing/Path.pm</a></strong></p>
+<pre class="terminal">
+  use strict;
+  use warnings;
+
+  use PathThing;  # The application's UR::Namespace module
+
+  class PathThing::Path {
+      id_by =&gt; 'path_id',
+      has =&gt; [
+          desc   =&gt; { is =&gt; 'String' },
+          length =&gt; { is =&gt; 'Integer' },
+      ],
+      data_source =&gt; 'PathThing::DataSource::TheDB',
+      table_name =&gt; 'PATHS',
+  };
+</pre>
+
+<p><strong><a name="item_paththing_2fnode_2epm">PathThing/Node.pm</a></strong></p>
+<pre class="terminal">
+  class PathThing::Node {
+      id_by =&gt; 'node_id',
+      has =&gt; [
+          left_path =&gt; { is =&gt; 'PathThing::Path', id_by =&gt; 'left_path_id' },
+          left_path_desc =&gt; { via =&gt; 'left_path', to =&gt; 'desc' },
+          left_path_length =&gt; { via =&gt; 'left_path', to =&gt; 'length' },
+          right_path =&gt; { is =&gt; 'PathThing::Path', id_by =&gt; 'right_path_id' },
+          right_path_desc =&gt; { via =&gt; 'right_path', to =&gt; 'desc' },
+          right_path_length =&gt; { via =&gt; 'right_path', to =&gt; 'length' },
+          map_coord_x =&gt; { is =&gt; 'Integer' },
+          map_coord_y =&gt; { is =&gt; 'String' },
+      ],
+      data_source =&gt; 'PathThing::DataSource::TheDB',
+      table_name =&gt; 'NODES',
+  };
+</pre>
+
+<p>For a script like this one:</p>
+<pre class="terminal">
+  use PathThing::Node;
+  my @results = PathThing::Node-&gt;get(
+                    right_path_desc =&gt; 'over the river',
+                    left_path_desc =&gt; 'through the woods',
+                    right_path_length =&gt; 10,
+                );
+</pre>
+<p>It will generate SQL like this:</p>
+<pre class="terminal">
+  select NODES.NODE_ID, NODES.LEFT_PATH_ID, NODES.RIGHT_PATH_ID,
+         NODES.MAP_COORD_X, NODES.MAP_COORD_Y,
+         left_path_1.PATH_ID, left_path_1.DESC, left_path_1.LENGTH
+         right_path_1.PATH_ID, right_path_1.DESC, right_path_1.LENGTH
+  from NODES
+  join PATHS left_path_1 on NODES.LEFT_PATH_ID = left_path_1.PATH_ID
+  join PATHS right_path_1 on NODES.RIGHT_PATH_ID = right_path1.PATH_ID
+  where left_path_1.DESC = 'through the woods'
+    and right_path_1.DESC = 'over the river',
+    and right_path_1.LENGTH = 10
+</pre>
+<p>And for every row returned by the query, a PathThing::Node and two
+PathThing::Path objects will be instantiated and stored in the Context's
+cache.  <code>@results</code> will contain a list of matching PathThing::Node objects.</p>
+

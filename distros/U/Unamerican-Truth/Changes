@@ -1,0 +1,44 @@
+1.06
+    - $LAST is properly initialized during setup()
+    - parse_truths.pl works even when HTML::Parser doesn't
+      generate end events for implicitly closed <LI> tags.
+
+1.05
+
+    - add_comments.htm also needs to get a link at the
+      bottom that indicates which proverb # it refers to.
+    - added link to truth.zip in index.html
+    - added images/simplify.png as an icon for truth.zip
+
+1.04  Fri Dec 13 17:41:57 PST 2002
+
+    - changed the link at the bottom of read_comments.htm
+      to the proverb # the current page refers to.
+    - use an external css file
+    - css for forms is light green on dark green
+    - modified the end of truth.htm
+
+1.03  Tue Dec 10 23:50:40 PST 2002
+
+    - added a way to view only the most popular truths
+      which are truths that have 1 or more comments
+      attached to them.
+    - truth.htm provides a link to this
+    - read_comments.htm links back to the page where
+      the proverb originall came from
+
+1.02  Thu Dec  5 22:04:21 PST 2002
+
+    - read_comments.htm and Truth.pm changed to make
+      it possible for people w/o JavaScript to participate
+    - minor formatting changes
+    - read_comments.htm lets you input the # of the
+      proverb you want to read.
+
+1.01
+
+    - minor refinements that I don't remember
+
+1.00
+
+    - initial release

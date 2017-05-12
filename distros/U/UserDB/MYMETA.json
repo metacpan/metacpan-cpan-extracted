@@ -1,0 +1,42 @@
+{
+   "abstract" : "A simple users and groups management interface",
+   "author" : [
+      "Patrick Lambert <dendory@live.ca>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 6.84, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "UserDB",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBI" : "1.630",
+            "Digest::SHA" : "5.85"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.00"
+}

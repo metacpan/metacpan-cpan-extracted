@@ -1,0 +1,23 @@
+Revision history for Perl extension URI::UTF8::Punycode.
+
+1.00  Fri May 24 00:00:00 2013
+	add features: +processing to all level of domains.
+
+0.97  Fri May 10 22:00:00 2013
+	fix possibility of memory leak on *char data to SV and freeing
+	utf8 and tainted flags is on at return value
+	upgrading libidn 1.19 to 1.26
+
+0.96  Fri Oct 22 22:00:00 2010
+	fix pTHX, to pTHX_
+
+0.95  Sun Oct 10 18:00:00 2010
+	punycode_strerror() to Perl_croak()
+
+0.90  Sat Sep 25 03:40:00 2010
+	ignoring "xn--" is automated
+
+0.01  Fri Sep 24 21:10:28 2010
+	- original version; created by h2xs 1.23 with options
+		-A -n URI::UTF8::Punycode
+

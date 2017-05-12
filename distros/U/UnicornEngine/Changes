@@ -1,0 +1,18 @@
+Revision history for Perl extension UnicornEngine.
+
+0.05
+    - Configure requirements are now handled better
+
+0.04
+    - Matching version numbers in Alien::UnicornEngine so that updates to either
+      will force rebuilding of both.
+
+0.02 
+
+    - First release of UnicornEngine. Most functions implemented. X86/ARM
+      supported.
+
+0.01  Tue Sep 20 13:38:58 2016
+	- original version; created by h2xs 1.23 with options
+		-n UnicornEngine -M '^uc_' include/unicorn/unicorn.h
+

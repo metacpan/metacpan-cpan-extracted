@@ -1,0 +1,15 @@
+Revision history for Unix-SavedIDs
+
+0.1  Fri May  2 12:23:09 2008
+	Initial release.
+
+0.4.0 Fri May 16th 2008
+	- Fixed lots of bugs.  It might actually work now.
+    - Installer is smarter now
+	- Added Unix::SetUser to this package
+    - I still call this alpha test code
+
+0.4.0 Fri May 16th 2008
+	- D'oh
+	- Forgot to up VERSION of Unix::SetUser
+	- improve 20.touchtest

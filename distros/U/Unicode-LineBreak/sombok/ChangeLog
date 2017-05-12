@@ -1,0 +1,327 @@
+2.4.0 2015-06-21
+	* Fix: Added rules 21b and 22.02 introduced by Unicode 8.0.0.
+	* Update -version-info from 4:6:1 to 4:7:1.
+
+2.3.3 2015-06-21
+	* Withdrawn.
+	* Update UCD to 8.0.0.
+
+2.3.2 2014-06-20
+	* Update UCD to 7.0.0.
+
+2.3.2beta1 2014-05-04
+	* Update UCD to 7.0.0 beta at 2014-03-18.
+	* Moved repository to GitHub.
+
+2.3.1 2013-09-28
+	* Update UCD to 6.3.0.
+	* Typo in README.ja_JP.
+
+2.3.1beta1  2013-03-26
+	* Update UCD to 6.3.0 beta at 2013-03-02.
+
+2.3.0  2012-10-01
+	* Update UCD to 6.2.0.
+	* data/custom.pl:
+	* data/data.pl:
+	* lib/charprop.c:
+	* lib/gcstring.c:
+	  - EA_Z was devided to EA_Z, EA_ZA and EA_ZW which are nonspacing
+	    variants of EAW "N", "A" and "W", respectively.  Currently,
+	    there are no differences between EA_Z and EA_ZA.
+	  - VIRAMA_AS_JOINER option had been applicable to versions prior
+	    to 6.1.0.
+
+2.3.0gamma1  2012-08-18
+	* data/Rules-6.2.0beta.txt:
+	* data/constants.pl:
+	* data/custom.pl:
+	* data/data.pl:
+	* lib/charprop.c:
+	* lib/gcstring.c:
+	  - Changes based on new drafts of UAX#14/UAX#29 (not yet published).
+	    GCB Joiner and After_Joiner and LBC ZJ are withdrawn by UC.  As
+	    also NonJoiner.
+
+2.3.0beta1  2012-07-14
+	* Update UCD to 6.2.0beta at Jun 05 2012.
+	* config.guess:
+	* config.sub:
+	  - updated.
+	* data/constants.pl:
+	* data/custom.pl:
+	* data/data.pl:
+	* data/makefile:
+	  - custom Grapheme_Cluster_Break property value "ZWJ" is divided
+	    to "NonJoiner" (U+200C ZERO WIDTH NON-JOINER) and "Joiner"
+	    (U+200D ZERO WIDTH JOINER).
+	  - Store custom GCB to *.custom file.
+	* lib/charprop.c:
+	  - Added ZJ/Joiner case of guessed properties.
+	* lib/gcstring.c:
+	  - Updated GCB rules.
+	* Makefile.am:
+	  - increase -version-info from 4.5.1 to 4.6.1.
+
+2.2.1  2012-04-11
+	* lib/gcstring.c:
+	  - Treat an isolated hangul jamo as wide, though some of them
+	    are assigned EAW neutral (N).  cf. the discussion:
+	    http://lists.w3.org/Archives/Public/public-i18n-cjk/2011JanMar/thread.html#msg55
+	* REAME:
+	* README.ja_JP:
+	  - About naming.
+
+2.2.0  2012-04-02
+	* data/constants.pl:
+	* data/data.pl:
+	  - NEW: added custom Grapheme_Cluster_Break property value
+	    "ZWJ", U+200C ZERO WIDTH JOINER or U+200D ZERO WIDTH
+	    NON-JOINER.  They are lb:CM and gb:Extend but aren't gc:M
+	    so do not affect to Legacy-CM rule.
+	* tests/01break.t:
+	  - Added Korean (NFD) test.
+	* tests/03ns.t:
+	  - Added loose nonstarter test.
+
+2.2.0beta  2012-03-30
+	* License Change:
+	  - From now on, sombok is distributed under dual license of
+	    GPL *and* Artistic License.
+	* configure.ac:
+	  - Move variable version informations to files: UNICODE and VERSION.
+	* lib/break.c:
+	  - New: linebreak_free_result(): to free result of 
+	    linebreak_break*() so that implementation mismatches of malloc
+	    functions are hidden.
+	* lib/charprop.c:
+	  - New: linebreak_merge_lbclass(), linebreak_merge_eawidth().
+	* lib/gcstring.c:
+	  - New: gcstring_lbclass(), gcstring_lbclass_ext().
+	* lib/linebreak.c:
+	  - Specify strict prototypes for some more functions.
+	  - linebreak_get_lbrule(): Concern LEGACY_CM and HANGUL_AS_AL
+	    options. 
+	  - Obsoleted: linebreak_lbclass(), linebreak_lbclass_ext(),
+	    linebreak_eawidth().
+	* Makefile.am:
+	  - increase -version-info from 4.4.1 to 4.5.1.
+	* Added TODO.
+
+2.1.1  2012-02-25
+	* config.guess:
+	* config.sub:
+	  - updated.
+	* data/Rules-6.1.0.txt:
+	  - Correct revision date of UAX#14.
+	* include/sombok.h.in:
+	* lib/linebreak.c:
+	  - Specify strict prototypes of callback members of linebreak_t.
+	* lib/break.c:
+	* lib/gcstring.c:
+	  - Chg: Now Legacy-CM rule is applied during grapheme cluster 
+	    breaking.  If this rule is disabled, SPACE and succeeding 
+	    combining mark are not conjoined.
+	  - Chg: Morbid hangul syllable block (e.g. <L Extend V T>) no 
+	    longer does not form single grapheme cluster.
+
+2.1.0  2012-02-04
+	* Release 2.1.0.
+	* Makefile.am:
+	  - increase -version-info from 4.3.1 to 4.4.1.
+	* tests/01break.t:
+	  - Added Sanskrit (sa) case.
+
+2.1.0beta2  2012-01-29
+	* data/constants.pl:
+	* data/data.pl:
+	  - NEW: added custom Grapheme_Cluster_Break property values 
+	    "Virama" and "OtherLetter".  Former means characters having 
+	    canonical combining class 9 (Virama) (they are either Extend or
+	    SpacingMark).  Latter means characters having general category
+	    L? and Grapheme_Cluster_Break Other.  They are currently limited 
+	    to Brahmic scripts.
+	* lib/break.c:
+	  - NEW: linebreak_break_from_utf8().
+	  - Chg: charmax may be 0 (unlimited).  NOTE: this feature has not been
+	    tested enough.
+	* lib/gcstring.c:
+	  - NEW: gcstring_new_from_utf8().
+	  - NEW: LINEBREAK_OPTION_VIRAMA_AS_JOINER option of linebreak object
+	    controls if virama characters behave as consonant joiner.
+	* lib/utf8.c:
+	  - NEW: sombok_decode_utf8(), sombok_encode_utf8().
+
+2.1.0beta  2012-01-01
+	* Bump up minor version.
+	* Update UCD to 6.1.0beta at Dec 15 2011.
+	* config.sub:
+	* config.guess:
+	  - Updated.
+	* data/Rules-6.0.0.txt:
+	  - Backport - removed LB25 entries.
+	* lib/break.c:
+	  - _break_partial(): Fix: LB25 preprocessing can miss partial input.
+	* lib/charprop.c:
+	* lib/lineBreak.c:
+	* include/sombok.h.in:
+	  - New option LINEBREAK_OPTION_NONSTARTER_LOOSE to control strictness
+	    of line breaking behavior.  If it is set, a newly introduced class
+	    CJ will be treated as ID, otherwise NS.
+	* t/02hangul.t:
+	  - Unicode 6.1.0beta changed general category of hangul bangjeom
+	    (U+302E and U+302F) from Mn to Mc.
+	* [Note] ``Compact array'' became smaller than 8192 entries again.
+
+2.0.6  2011-11-01
+	Backport from 2.1.0beta; Unicode data version 6.0.0.
+	* data/Rule-6.0.0.txt:
+	  - Removed LB25 entries since they are handled by hardcoded
+	    preprocessing.
+	* debian/*:
+	  - Updated Debian packaging info by which in Debian sid packaged by
+	    Emmanuel Bouthenot.
+	* lib/break.c:
+	  - Implemented strict LB25 rule.  See also UAX#14 8.2 Example 7.
+	  - Moved linebreak_lbrule() from linebreak.c to break.c.
+	  - For compatibility, linebreak_lbrule() gives results by simplified
+	    rules LB1, LB25 and emulates LB9, LB10.
+	* src/sombok.c:
+	  - Fix SF.net bug #3400519(1): removed ESTRPIPE which is specific to
+	    Linux etc.  Reported by Yusuke Muraoka (jbking@sf.net).
+	* tests/01break.t:
+	  - Added Hebrew (he) test.
+	* config.guess:
+	* config.sub:
+	  - Updated.
+	* COPYING:
+	  - Fix CPAN RT#71657: Updated street address of FSF.  Reported by
+	    Xavier Bachelot.
+
+2.0.6beta2  2011-10-26
+	* data/Rules-6.1.0beta.txt:
+	  - Removed LB25 entries since they are handled by hardcoded
+	    preprocessing.
+	* debian/*:
+	  - Updated Debian packaging info by which in Debian sid packaged by
+	    Emmanuel Bouthenot.
+	* lib/break.c:
+	  - Implemented strict LB25 rule.  See also UAX#14 8.2 Example 7.
+	  - Moved linebreak_lbrule() from linebreak.c to break.c.
+	  - For compatibility, linebreak_lbrule() gives results by simplified
+	    rules LB1, LB21a & LB25 and emulates LB9, LB10.
+	* lib/linebreak.c:
+	  - New: linebreak_get_lbrule(): Resolve AI then apply
+	    linebreak_lbrule().
+
+2.0.6beta1  2011-10-21
+	* Update UCD to 6.1.0beta at Sep 19.
+	* lib/break.c:
+	  - New prep for LB21a about HL (as of UAX#14 rel 27; 6.1.0 draft 2).
+	* lib/charprop.c:
+	  - Unassigned codepoints (Cn) are GCB Control, not Other (as of
+	    Unicode 6.1.0beta data).
+	* lib/linebreak.c:
+	  - linebreak_lbrule(): treat HL as AL.
+	* Makefile.am:
+	  - increase -version-info from 4.2.1 to 4.3.1.
+	* src/sombok.c:
+	  - Fix SF.net bug #3400519(1): removed ESTRPIPE which is specific to
+	    Linux etc.  Reported by Yusuke Muraoka (jbking@sf.net).
+	* tests/01break.t:
+	  - Added Hebrew (he) test.
+	* config.guess:
+	* config.sub:
+	  - Updated.
+	* COPYING:
+	  - Fix CPAN RT#71657: Updated street address of FSF.  Reported by
+	    Xavier Bachelot.
+	* [Note] ``Compact array'' has grown bigger than 8191 entries.
+	  Therefore the architectures with 16-bit signed pointer won't be
+	  supported anymore.
+
+2.0.5  2011-04-23
+	* No new features.
+	* New versioning scheme. Suggested by Emmanuel Bouthenot.
+
+2011.5RC  Sat Apr 16 2011
+	* break.c:
+	  - Bug Fix: Infinite loop occurs when prep_func generated very long
+	    (> charmax) unbreakable line.
+	* utils.c:
+	  - linebreak_prep_URIBREAK(): loosely refers RFC3986.
+
+2011.4  Fri Apr 01 2011
+	* Added Debian packaging info.
+	* Makefile.am:
+	  - increase -version-info from 4.1.1 to 4.2.1.
+	  - added doc rules.
+	* sombok.h.in: new macro SOMBOK_VERSION.
+
+2011.4RC  Sat Mar 26 2011
+	* charprop.c, break.c: Fix groundless coding denied by honest C
+	  compilers (e.g. Solaris cc).
+	* Makefile.am: Added README.ja_JP to EXTRA_DIST.
+	* tests/lb.sh: function definition suitable for both bash and d?ash.
+
+2011.3  Mon Mar 21 2011
+	* tests/01break.t: Added tests for Vietnamese.
+
+2011.3RC  Sun Mar 13 2011
+	* configure.ac: unichar_t may be unsigned int or unsigned long.
+	* include/sombok.h: now generated from include/sombok.h.in.
+	* Bug Fix: southeastasian.c: th_wbrk() may return 0 _or_ -1 when
+	  breaking position was not found.
+	* break.c: some optimizations.
+
+2011.2  Sat Mar 05 2011
+	* charprop.c: Fix: _add_prop() broke custom map.
+
+2011.2beta1  Sat Feb 26 2011
+	* charprop.c: New: linebreak_update_lbclass(),
+	  linebreak_clear_lbclass(), linebreak_update_eawidth(),
+	  linebreak_clear_eawidth().
+	* tests/03ns.t: added test on custom map.
+	* tests/06context.t: added test on custom map.
+	* Typos: GBC will be GCB.
+	* Chg: update -version-info to 4:1:1.
+
+2011.1	Sat Feb 19 2011
+	* Chg: update -version-info to 4:0:1.
+	* Doc: some additions.
+
+2011.1RC	Fri Feb 11 2011
+	* break.c: New: ``preprocess'' callback feature. user_func is obsoleted.
+	* utils.c: built-in preprocess callback linebreak_prep_URIBREAK().
+	* sombok.c: custom format callback using shell script.
+	* Test: added test data for ``make check''.
+
+2011.0	Wed Jan 26 2011
+	* Brush-up documentations.
+	* ``make check'' feature (incomplete).
+
+2011.0RC	Thu Jan 20 2011
+	* Fix: Eliminated all (maybe, ...hopefully) memory leaks.
+	* Chg: split part of gcstring_substr() to gcstring_replace().
+
+2011.0b1	Sun Jan 15 2011 
+	* First beta of new major release.
+
+Important Changes beside Linebreak 1.x:
+
+	* 1.x has memory leaks & potantial buffer overrun vulnerabilities.
+	  Switching to release 20XX is strongly recommended.
+	* Renamed package name from Linebreak to Sombok.
+	* Major changes on public interface:
+	- urgent_func callback takes two arguments, not five.
+	- sizing_func callback with extra 6th argument was obsoleted.
+	- default sizing method simply returns number of grapheme
+	  clusters, not number of columns based on UAX #11.  For
+	  compatible behavior with 1.x, use linebreak_sizing_UAX11()
+	  built-in callback function.
+	- linebreak_break*() functions return array of lines, not
+	  single Unicode string.  Additinally, elements of array are
+	  grapheme cluster strings.
+
+About change history until release 1.x see ChangeLog.REL1 file.
+

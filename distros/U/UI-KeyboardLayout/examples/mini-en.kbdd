@@ -1,0 +1,183 @@
+[]
+COMPANYNAME=Ilya Zakharevich
+LAYOUTNAME=US mini-test: AltGr, Diacritics, Compose
+COPYR_YEARS=2014
+LOCALE_NAME=
+LOCALE_ID=0409
+DLLNAME=mini-en
+SORT_ORDER_ID_=0000
+LANGUAGE_NAME=English (United States)
+#
+VERSION=0.70
+#
+[visual -> KBD/ok]
+#
+visual_rowcount=1
+@visual_per_row_counts=2
+visual_prefixes=*
+in_key_separator=/
+in_key_separator2=‼
+prefix_repeat=3
+#					Greek-AltGr-Junk has only one element: 2009—2009
+@layer_names=US-Base,USLatin-AltGr
+#					20: access KP_Decimal and KP_Extra_Slash_on_Left on offsets 20,21
+@keyline_offsets=0,1,1,1,20
+#
+***	`~/ˋ˜	1!/¬¡	2@/ºª	3#/·№	4$/¢£	5%/€¥	6^/ˇˆ	7&/√§	8*/„‚	9(/“‘	0)/”’	-_/¯—	=+/≈±
+***	q/ä	w/á	e/ê	r/å	t/þ	y/ÿ	u/ü	i/ĳ	o/œ	p/ø	[{/«‹	]}/»›	\|/¦†
+***	a/æ	s/ßẞ	d/ð	f/è	g/ý	h/ú	j/í	k/ó	l/ö	;:/¨÷	'"/´˵
+***	z/à	x/é	c/ç	v/ì	b/ù	n/ñ	m/ò	,</¸≤	.>/°≥	/?/0338¿
+***	00a0.06f0/06f1¶		./,	0020.0020/--00a0	06f0.00a0/06f1
+#
+[faces]
+#
++DeadKey_Map00a3=	PrefixDocs[Currencies, horn, add-vertical-line(s) {AND: double addleft/addright, “text” control-key symbols, etc}]
++DeadKey_Map00a3=	HTML_classes[k=businessAlt,from_w,u,C,special,©®℠™℗℅℮‱,C,very-special,ĸươəǝ,C,need-learn,៛﷼ԡꙣꙥꚁ,C1,need-learn,元圆]
++DeadKey_Map00a3=		ByPairs[££]	Face(Business)	
+#
+geometry_via_layer=US-Base
+#
+# Tibetan range 0f**: take only tibetan diacritics, so our code adding diacritics won't be confused by prefices... ???
+Auto_Diacritic_Start=0700
+#
+Flip_AltGr_Key=00a0
+#ComposeKey=06f0
+/ComposeKey=ComposeFiles,dotcompose,warn,06f0/EntityFiles,entity,warn,,06f0/rfc1345Files,rfc1345,warn,06f1,06f0
+#
+Diacritic_if_undef=			SpaceSelf2Id
+DeadChar_DefaultTranslation=		♪
+DeadChar_32bitTranslation=		♫
+#				Explicit on Latin
+[faces/Latin]
+@layers=US-Base,USLatin-AltGr
+BaseLayer=ByPairs[06f0/ 00a0\]
+#
+faceDeadKeys= 	´  ˋ |||  ˆ  ˜ |||  ° ¸ |||  ˇ  ¯  0338  ˵ ¨  £ 06f0 06f1 00a0
+#
+#							002c = ,
+@char2key_prefer_first=\,|,.,002c,£,06f1,06f0
+@char2key_prefer_last=00a0
+#
++DeadKey_InvMap0000=	HTML_classes[k=latinAlt,from_ne,x,k=latinAlt,to_ne,ac,k=latinAlt,xfrom_sw,wf,k=latinAlt,from_nw,l,k=latinAlt,from_w high,p]
++DeadKey_InvMap0000=	HTML_classes[c=latinBase,special,aeyuio,C=latinAlt,special,ê,C=latinAlt,very-special,ºª№€§æßðþçñĳœ¡¿]
++DeadKey_InvMap0000=	HTML_classes[C1,need-learn,åøì]
+#				Default map (not used now???):
+DeadKey_Map=		Mutate	Mutate2Self
+#
+[layer_recipes]
+BusinessA_0=	Imported[business,00a4](US-Base)
+BusinessA_1=	Imported[business,00a3](US-Base)
+#
+[face_recipes]
+Business=	Layers(BusinessA_0+BusinessA_1)
+[visual -> DEADKEYS/business]
+
+DEADKEY	00A4
+
+0041	20b3	// A -> ₳
+0061	060b	// a -> ؋
+0042	0e3f	// B -> ฿
+0062	09f3	// b -> ৳
+0043	00a2	// C -> ¢
+// 0063	20a1	// c -> ₡
+0063	00a9	// c -> ©
+0044	20af	// D -> ₯
+0064	20ab	// d -> ₫
+0045	20a0	// E -> ₠
+0065	20ac	// e -> €
+0046	20a3	// F -> ₣
+0066	0192	// f -> ƒ
+0047	20b2	// G -> ₲
+0067	0af1	// g -> ૱
+0048	20b4	// H -> ₴
+0068	20b4	// h -> ₴
+0049	fdfc	// I -> ﷼
+0069	17db	// i -> ៛
+004b	20ad	// K -> ₭
+006b	20ad	// k -> ₭
+004c	00a3	// L -> £
+006c	20ba	// l -> ₺	TURKISH LIRA SIGN [6.2]
+// 004d	2133	// M -> ℳ
+004d	20BC	// M -> ₼	MANAT SIGN
+006d	20a5	// m -> ₥
+004e	20a6	// N -> ₦
+006e	a838	// n -> ꠸	NORTH INDIC RUPEE MARK [5.2]
+0050	20b1	// P -> ₱
+0070	2117	// p -> ℗
+// 0052	20b9	// R -> ₹
+0052	20BD	// R -> ₼	RUBLE SIGN
+0072	00ae	// r -> ®
+0053	20aa	// S -> ₪
+0073	2120	// s -> ℠
+0054	20b8	// T -> ₸
+0074	2122	// t -> ™
+0057	20a9	// W -> ₩
+0077	20a9	// w -> ₩
+0059	00a5	// Y -> ¥
+0079	5143	// y -> 元
+// 00a0	00a4	//   -> ¤
+00a4	00a4	// ¤ -> ¤
+//0024	00a4	// $ -> ¤
+0020	00a4	//   -> ¤
+
+DEADKEY	00A3
+
+// 0043	20a2	// C -> ₢ (AltGr-inv)
+0063	20b5	// c -> ₵ (AltGr-inv)
+// ®™℗℠
+0043	20a1	// C -> ₡
+0042	09f2	// B -> ৲ (AltGr-inv)	BENGALI RUPEE MARK	Í
+0062	20a2	// b -> ₢ (AltGr-inv)				í
+0044	058F	// D -> ֏ (AltGr-inv) 	ARMENIAN DRAM SIGN	Ð
+0064	058F	// d -> ֏ (AltGr-inv) 	ARMENIAN DRAM SIGN	ð
+0047	09fB	// G -> ৾ (AltGr-inv)	BENGALI GANDA MARK	É
+0067	09fB	// g -> ৾ (AltGr-inv)	BENGALI GANDA MARK	é
+0069	20b6	// i -> ₶ (AltGr-inv) LIVRE TOURNOIS SIGN [5.2] ĳ
+0049	20b6	// I -> ₶ (AltGr-inv) LIVRE TOURNOIS SIGN [5.2] Ĳ
+004c	10da	// L -> ლ	GEORGIAN LETTER LAS [Georgian; Georgian; 1.1] Ø // Wikipedia article on Lari does not include ლ
+// 006c	20b6	// l -> ₶ (AltGr-inv) LIVRE TOURNOIS SIGN [5.2]
+006c	20a4	// l -> ₤ (AltGr-inv)				ø
+004e	a837	// N -> ꠷ (AltGr-inv) NORTH INDIC PLACEHOLDER MARK	Ñ
+006e	a837	// n -> ꠷ (AltGr-inv) NORTH INDIC PLACEHOLDER MARK	ñ
+0050	20a7	// P -> ₧ (AltGr-inv)	[obsolete Spanish]	œ
+0070	20b0	// p -> ₰
+// 0052	20a2	// R -> ₢ (AltGr-inv)				ý
+// 0052	211b	// R -> ℛ (AltGr-inv)	SCRIPT CAPITAL R	Ý
+0072	20b9	// r -> ₹ (AltGr-inv) new indian RUPEE sign
+0052	20a8	// R -> ₨ (AltGr-inv) RUPEE sign
+// 0053	0024	// S -> $ (AltGr-inv)				§
+0053	0024	// S -> $ (AltGr-inv)				ß
+0073	20b7	// s -> ₷	SPESMILO SIGN [5.2]
+// 0054	0bf9	// T -> ௹ (AltGr-inv)				Þ
+0074	20ae	// t -> ₮
+0054	0bf9	// T -> ௹ (AltGr-inv)				þ
+// Put CJK yens to AltGr-y/Y	[Order on Wikipedia: yen (円/圓), yuan (元/圆)]
+0059	5713	// Y -> 圓 (AltGr-inv)	CJK yen-2		Ÿ
+0079	5186	// y -> 円 (AltGr-inv)	CJK yen-1		ÿ
+// Put (CJK) yuans to AltGr-u/U	[Order on Wikipedia: yen (円/圓), yuan (元/圆)]
+0055	5706	// U -> 圆	yuan-2
+0075	5143	// u -> 元	yuan-1
+
+[Diacritics_Limits]
+# For debugging purposes only, to check correct reading of tables below (0th entry is for 0..3 combined; 1 for 1..3, 2: 2,3; 4,5,6: combined)
+@ALL=5,4,0,0,10,10,10,10
+# 0:tilde, 1:grave,quote, 2: quote
+[Diacritics]
+# Surrogate + 8bit + Modifiers, Modifiers below-or-opposite, Vertical (or Comma-like or Doubled or Dotlike or Rotated or letter-like) Modifiers, 
+# Prime-like or Centered modifiers, Combining, Combining below-or-opposite, Vertical/plus-like/arrows and dotlike Combining, Combining for symbols
+# ⎖ in prime-like apostrophe??? - is currently obscured…
+/APOSTROPHE=		'´ʼʾˀˊ΄/ˏˌ/ˈˌˡ/ʹˑ/ ́ ̉ ̛ ̷ ̸ ́ ͗  ᷎  ᷄ ᷇ ᷁/ ̗ ̩  ̦  ̹  ͅ / ̍ ̓  ̓ ̕ ̩  /  ⃬  ⃐  ⃫  ⃬
+/QUOTATION_MARK=	"¨˝˸ː΅/˶˵/ˮ/ʺ/ ̈ ̋ ̏ ̈́ ᷉ ᷈  ゙  /  ̤  ͈ / ̎  ͛   ͈ /  ⃛  ⃜  ⃨
+/GRAVE_ACCENT=		`ˋʿˁˤ/ˎ/ʻʽ/˴˵/ ̀ ̀  ͑  ᷆  ᷅  ᷀ / ̖  ̜   ᷂ / ̒ ̔ /  ⃑  ⃭  ⃠  ⃥
+#  Stopgap measure to preserve many flavors of grave (we moved ˵):
+/DBL_GRAVE_ACCENT=	`ˋʿˁˤ˵/ˎ/ʻʽ/˴/ ̀ ̀  ͑  ᷆  ᷅  ᷀ / ̖  ̜   ᷂ / ̒ ̔ /  ⃑  ⃭  ⃠  ⃥
+/CIRCUMFLEX_ACCENT=	^ˆ˄˟/˰/˪˫ꜛʳʴʵʶˣ// ̂ ̑  ͒  ͡   ̽  ͆  ᷍ / ̭ ̯   ᷼  ͓  ̪  ̼  ͎  ᷊ /  ̘  ̙   ͉  ̘  ͉ /  ⃟   ⃤  ⃧  ⃩ ⃰  ⃟ 
+/BREVE=			˘ˇ˅/ˬ˯˽˾/˱˲˿ˠʸꜜ/˂˃/ ̆ ̌ ̐ ͝  ᷓ  ᷾   ͐  ᷌  ᷋  ᷃ / ̮ ̬ ͜    ̺  ̫ ͔  ͕ ͖ ᷿   /  ͍  ͢  /   ⃞   ⃢   ⃣ 
+/DEGREE_SIGN=		°˚˙/˳/˙ˠʰʱʲˢʷᵊᶣ/˓˒/ ̊  ̇ ̣  ᷒  ゚ / ̣ ̥ ̤  ̻   ͙   ͚ / ̇ ͘  ̣ ̤ ͘ /   ⃝  ⃘
+/TILDE=			~ ˜/˷/ⸯꙿ/˞/ ̃  ̴ ͂ ͊ ͋ ͌ ͠   ᷑  / ̰  ̧  ̨  ̡  ̢  ᷏  ᷐  ᷽  ᷽ / ̾ ̾ /  ⃗  ⃖  ⃯  ⃮  ⃕  ⃔ ⃙ ⃚ ⃡
+/CEDILLA=		¸˛ͺ/˷/ⸯꙿ/˞/  ̧  ̨  ̡  ̢  ̰  ᷏  ᷐  ᷽  ᷽ /  ᷎  ̃  ̴ ͂ ͊ ͋ ͌ ͠   ᷑  / ̾ ̾ /   ⃗  ⃖ ⃯  ⃮  ⃕ ⃔ ⃙ ⃚ ⃡
+/MACRON=		¯ˉ˹˺/ˍ˻˼‗/˭/˔˕˖˗/ ̄ ̅ ̵ ̶ ̿ ͞   ̚  / ̱  ̲  ̳ ͇ ͟   ̠  /  ͍   ̝  ̞  ̟  ̠  ̘  ̙   ͉ /  ⃒ ⃓ ⃦  ⃪  ⃡  ⃡  ⃗  ⃖  ⃯  ⃮
+/SLASH=			⁄÷∕ / ˈˌ / / /  ̸  ̷  ̶  ̵ / /  ⃒  ⃓ /  ̸  ̷  ⃒   ⃓ ̶   ̵
+#
+[face_shortcuts]
+l=Latin

@@ -1,0 +1,42 @@
+This package contains the URI::OpenURL module. The module implements part of
+the OpenURL (Z39.88-2004) specs, constructing KEV Format URIs.
+
+From the implementation guide:
+
+The OpenURL Framework for Context-Sensitive Services Standard [1] [2] provides
+a means of describing a referenced resource along with a description of the
+context of the reference.  Additionally it defines methods of transporting
+these descriptions between networked systems. It is anticipated that it will be
+used to request services pertaining to the referenced resource and appropriate
+for the requester.
+
+The OpenURL Framework is very general and has the potential to be used in many
+application domains and by many communities. Concrete instantiations of the
+various core components within the framework are defined within the OpenURL
+Registry [3]. The OpenURL Framework is currently a .draft standard for ballot..
+During the ballot and public review period, the content of the Registry will be
+static and has been pre-defined by the NISO AX Committee. There is also an
+experimental registry where components under development are held. In the
+future it will be possible to register further items.
+
+There are currently two formats for ContextObjects defined in the OpenURL
+Framework, Key/Encoded-Value and XML. This document provides implementation
+guidelines for the Key/Encoded-Value Format, concentrating mainly, but not
+exclusively, on components from the San Antonio Level 1 Community Profile
+(SAP1).
+
+
+This module requires URI and URI::Escape. Installation:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+(n.b. as OpenURLs contain a timestamp the tests are really example cases rather
+than actually checking it's working correctly)
+
+Copyright 2004 Tim Brody.
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

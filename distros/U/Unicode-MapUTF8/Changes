@@ -1,0 +1,67 @@
+Unicode::MapUTF8 - Conversions to and from arbitrary character sets and UTF8
+
+1.11 2005.10.10   Documentation changes. Addition of Build.PL support.
+                  Added various build tests, LICENSE, Artistic_License.txt,
+                  GPL_License.txt. Split documentation into seperate
+                  .pod file. Added Japanese translation of POD.
+
+1.10 2005.05.22 - Fixed bug in conversion of ISO-2022-JP to UTF-8.
+                  Problem and fix found by Masahiro HONMA
+                  <masahiro.honma@tsutaya.co.jp>.
+
+                  Similar bugs in conversions of shift_jis and euc-jp
+                  to UTF-8 corrected as well.
+
+1.09 2001.08.22 - Fixed multiple typo occurances of 'uft'
+                  where 'utf' was meant in code. Problem affected
+                  utf16 and utf7 encodings. Problem found
+                  by devon smith <devon@taller.PSCL.cwru.edu>
+
+1.08 2000.11.06 Added 'utf8_charset_alias' function to allow for runtime
+                setting of character set aliases. Added several alternate
+                names for 'sjis' (shiftjis, shift-jis, shift_jis, s-jis,
+                and s_jis). 
+
+                Corrected 'croak' messages for 'from_utf8' functions to
+                appropriate function name.
+
+                Corrected fatal problem in jcode-unicode internals. Problem 
+                and fix found by Brian Wisti <wbrian2@uswest.net>.
+
+1.07 2000.11.01 Added 'croak' to use Carp declaration to fix error
+                messages. Problem and fix found by <wbrian2@uswest.net>.
+
+1.06 2000.10.30 Fix to handle change in stringification of overloaded
+                objects between Perl 5.005 and 5.6.  
+                Problem noticed by Brian Wisti <wbrian2@uswest.net>.
+
+1.05 2000.10.23 Error in conversions from UTF8 to multibyte encodings corrected
+
+1.04 2000.10.23 Additional diagnostic error messages added for
+                internal errors
+
+1.03 2000.10.22 Bug fix for load time Unicode::Map encoding
+                detection
+
+1.02 2000.10.22 Bug fix to 'from_utf8' method and load time
+                detection of Unicode::Map8 supported character
+                set encodings
+
+1.01 2000.10.02 Initial public release
+
+Provides an adapter layer between core routines for converting
+to and from UTF8 and other encodings. In essence, a way to give 
+multiple existing Unicode modules a single common interface so 
+you don't have to know the underlaying implementations to do 
+simple UTF8 to-from other character set string conversions. 
+As such, it wraps the Unicode::String, Unicode::Map8,
+Unicode::Map and Jcode modules in a standardized and simple 
+API.
+
+To install:
+
+perl Makefile.PL
+make
+make test
+make install
+

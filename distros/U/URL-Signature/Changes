@@ -1,0 +1,12 @@
+Revision history for URL-Signature
+
+0.03  2013-04-06
+    - Fixed versioning of submodules
+
+0.02  2013-04-06
+    - Minimum requirement for MIME::Base64 is 3.11
+      (RT84459 - Thanks, Andreas!)
+
+0.01  2013-02-15
+    - Initial release.
+

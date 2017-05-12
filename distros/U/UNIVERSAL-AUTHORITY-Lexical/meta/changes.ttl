@@ -1,0 +1,47 @@
+# This file acts as the project's changelog.
+
+@prefix :        <http://usefulinc.com/ns/doap#> .
+@prefix dcs:     <http://ontologi.es/doap-changeset#> .
+@prefix dc:      <http://purl.org/dc/terms/> .
+@prefix dist:    <http://purl.org/NET/cpan-uri/dist/UNIVERSAL-AUTHORITY-Lexical/> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+
+dist:project :release dist:v_0-001 .
+dist:v_0-001
+	a               :Version ;
+	dc:issued       "2011-12-01"^^xsd:date ;
+	:revision       "0.001"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/UNIVERSAL-AUTHORITY-Lexical-0.001.tar.gz> ;
+	rdfs:label      "Initial release" .
+
+dist:project :release dist:v_0-002 .
+dist:v_0-002
+	a               :Version ;
+	dc:issued       "2011-12-03"^^xsd:date ;
+	:revision       "0.002"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/UNIVERSAL-AUTHORITY-Lexical-0.002.tar.gz> ;
+	dcs:changeset [
+		dcs:versus dist:v_0-001 ;
+		dcs:item   [ rdfs:label "Upgrade Module::Package::RDF."@en ; a dcs:Packaging , dcs:Bugfix ]
+		].
+
+<http://purl.org/NET/cpan-uri/person/rsrchboy> a foaf:Person; foaf:name "Chris Weyl"; foaf:nick "RSRCHBOY".
+
+dist:project :release dist:v_0-003 .
+dist:v_0-003
+	a               :Version ;
+	dc:issued       "2013-07-24"^^xsd:date ;
+	:revision       "0.003"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/UNIVERSAL-AUTHORITY-Lexical-0.003.tar.gz> ;
+	dcs:changeset [
+		dcs:versus dist:v_0-002 ;
+		dcs:item [
+			a dcs:Packaging, dcs:Bugfix;
+			rdfs:label "Stop bundling prehistoric version of Scalar::Util."@en;
+			dcs:fixes <http://purl.org/NET/cpan-uri/rt/ticket/87112>;
+			dcs:thanks <http://purl.org/NET/cpan-uri/person/rsrchboy>;
+		]
+	].
+

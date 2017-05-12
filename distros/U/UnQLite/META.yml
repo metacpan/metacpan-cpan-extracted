@@ -1,0 +1,41 @@
+---
+abstract: 'Perl bindings for UnQLite'
+author:
+  - 'tokuhirom <tokuhirom@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.2.0, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: UnQLite
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  UnQLite:
+    file: lib/UnQLite.pm
+    version: '0.05'
+  UnQLite::Cursor:
+    file: lib/UnQLite.pm
+requires:
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/tokuhirom/UnQLite/issues
+  homepage: https://github.com/tokuhirom/UnQLite
+  repository: git://github.com/tokuhirom/UnQLite.git
+version: '0.05'
+x_contributors:
+  - 'Kenichi Ishigaki <ishigaki@cpan.org>'
+  - 'Reini Urban <rurban@cpanel.net>'

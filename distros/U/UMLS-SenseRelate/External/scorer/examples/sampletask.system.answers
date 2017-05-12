@@ -1,0 +1,19 @@
+art.n art.30003 P/1
+art.n art.30006 art%1:06:00::
+art.n art.30010 work_of_art%1:06:00::/0.5
+art.n art.30013 art%1:04:00::/1
+art.n art.30016 art%1:06:00::
+art.n art.30019 art%1:04:00::
+art.n art.30022 art%1:06:00::
+art.n art.30025 art%1:09:00::
+art.n art.30028 art%1:06:00::
+art.n art.30031 work_of_art%1:06:00::
+art.n art.30034 art%1:06:00::/0.33 art%1:09:00::/0.33 art%1:04:00::/0.33
+art.n art.30037 art%1:06:00::/1
+art.n art.30040 art%1:06:00::/1
+art.n art.30043 art%1:09:00::/0.75
+art.n art.30046 art_collection%1:14:00::
+authority.n authority.30043 regulatory_authority%1:14:00::
+authority.n authority.30046 authority%1:07:00::
+authority.n authority.30050 authority%1:07:00::
+authority.n authority.30053 P

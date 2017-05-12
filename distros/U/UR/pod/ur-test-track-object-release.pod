@@ -1,0 +1,44 @@
+
+
+=pod
+
+=head1 NAME
+
+ur test track-object-release - Parse the data produced by UR_DEBUG_OBJECT_RELEASE and report possible memory leaks
+
+
+
+=head1 VERSION
+
+This document describes ur test track-object-release version 0.29.
+
+=head1 SYNOPSIS
+
+ur test track-object-release --file=?
+
+ur test track-object-release --file /path/to/text.file > /path/to/results
+
+=head1 REQUIRED ARGUMENTS
+
+=over
+
+
+=item file  I<Text>
+
+pathname of the input file
+
+
+=back
+
+=head1 DESCRIPTION:
+
+  When a UR-based program is run with the UR_DEBUG_OBJECT_RELEASE environment
+  variable set to 1, it will emit messages to STDERR describing the various
+  stages of releasing an object.  This command parses those messages and
+  provides a report on objects which did not completely deallocate themselves,
+  usually because of a reference being held.
+
+
+
+=cut
+

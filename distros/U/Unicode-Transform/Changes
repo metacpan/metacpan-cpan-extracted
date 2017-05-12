@@ -1,0 +1,70 @@
+Revision history for Perl module Unicode::Transform.
+
+0.51  Wed Mar  7 21:37:08 2012
+    - avoid "use vars".
+
+0.50  Sun Jul 31 10:28:09 2011
+    - fix the tarball with world writable files.
+
+0.40  Mon Jan 10 13:19:14 2011
+    - unitrans.h: provision against the case when UTF8_ALLOW_* flags
+                  may be undefined in future.
+
+0.34  Sat Sep 10 11:58:14 2005
+    - ord_in_utf32(be|le): avoided promotion from 32-bit int to 64-bit UV.
+     (Note: but no test for UV > 0xFFFF_FFFF is included yet.)
+
+0.33  Tue Aug 30 21:27:30 2005
+    - improvement of documentation.
+    - added ext32bit.t (for UV within 0x8000_0000..0xFFFF_FFFF).
+    - added META.yml.
+
+0.32  Sun Nov 30 19:57:01 2003
+    - modified doc.
+    - UTF-32BE,LE : chr_utf32(be|le) now cope with code points
+      in range of 0x8000_0000..0xFFFF_FFFF.
+      (ord_utf32(be|le) have been 32-bit safe, then chr_ will be so.)
+    - added u32.t.
+
+0.31  Sat Nov 15 21:22:22 2003
+    - doc fix: should be chr_utf8mod() and ord_utf8mod(), but not /mode\z/.
+
+0.30  Sat Nov 15 15:47:29 2003
+    - new: 8 x 8 conversion functions, <something>_to_<something>.
+      (added 50 functions; 14 functions, named unicode_to_<something>
+       and <something>_to_unicode, have been already supported.)
+    - new: ord_<something> and chr_<something> functions (now improved
+      and documented)
+    - fixed: unicode_to_<something>(), ord_unicode():
+      * \x{D800}-\x{DFFF}\x{FFFE}\x{FFFF} and partial octets are
+        no longer regarded as NULL (U+0000).
+      * Partial octets are treated as illegal (no longer as NULL).
+
+0.23  Sun Nov  9 17:25:36 2003
+    - fixed: unicode_to_utfcp1047() and utfcp1047_to_unicode() did not
+      cope with CODEREF correctly.
+    - fixed: chr_utfcp1047() was buggy.
+    - added ord_*() functions.
+    - added chr.t and ord.t.
+    - added G_EVAL in XSUB code.
+    - modified test.t avoiding a non-character \x{10ffff}.
+
+0.22  Fri Mar 21 21:46:28 2003
+    - fix test.t: new tests 25..28
+ http://www.xray.mpe.mpg.de/mailing-lists/perl-unicode/2003-03/msg00026.html
+
+0.21  Wed Mar 19 23:23:11 2003
+    - ord_uv_in[] : type of return values mismatching (STRLEN/UV).
+      reported by Brian DePradine.
+ http://www.xray.mpe.mpg.de/mailing-lists/perl-unicode/2003-03/msg00024.html
+    - test.t: tests 25..28 are commented out.
+
+0.20  Tue Mar 18 00:24:11 2003
+    - fix tests... A trial to pass the tests on an EBCDIC-platform.
+
+0.10  Mon Nov 04 08:01:11 2002
+    - fix a momery leak when the process died in a callback.
+      like: eval { utf16be_to_unicode(sub { die }, "\x00"); };
+
+0.01  Sat Aug 17 11:25:31 2002
+    - original version; created by h2xs 1.19

@@ -1,0 +1,60 @@
+{
+   "abstract" : "Find URIs in arbitrary text",
+   "author" : [
+      "Michael G Schwern <schwern@pobox.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "URI-Find",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.30",
+            "Test::More" : "0.88"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "URI" : "1.60",
+            "perl" : "v5.8.8"
+         }
+      }
+   },
+   "provides" : {
+      "URI::Find" : {
+         "file" : "lib/URI/Find.pm",
+         "version" : "20160806"
+      },
+      "URI::Find::Schemeless" : {
+         "file" : "lib/URI/Find/Schemeless.pm",
+         "version" : "20160806"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/schwern/URI-Find/issues/"
+      },
+      "homepage" : "http://metacpan.org/release/URI-Find",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/schwern/URI-Find/"
+      }
+   },
+   "version" : "20160806",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

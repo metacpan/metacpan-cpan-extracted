@@ -1,0 +1,41 @@
+Revision history for Perl extension Ukigumo::Common
+
+0.10 2014-06-19T07:03:04Z
+
+    - Add `normalize_path` helper method
+
+0.09 2014-05-10T06:46:43Z
+
+    - Support to prepend prefix on logger
+
+0.08 2014-05-10T05:40:40Z
+
+    - Add logger class
+
+0.07 2014-04-06T14:35:55Z
+
+    - Export STATUS_TIMEOUT
+
+0.06 2014-04-06T14:31:07Z
+
+    - Add STATUS_TIMEOUT into helper class
+
+0.05 2014-03-28T03:17:17Z
+
+    - Add a constant for timeout
+
+0.04 2014-03-13T07:54:10Z
+
+    - Add some constants
+    - Change module building system (inner change)
+
+0.03
+
+    - oops
+
+0.02
+
+    - added experimental STATUS_SKIP
+
+0.01    Sat Sep  3 18:23:00 2011
+        - original version

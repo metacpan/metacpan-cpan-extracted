@@ -1,0 +1,15 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+dist.ini~
+lib/UNIVERSAL/ref.pm
+ref.xs
+t/basic.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t
+typemap
+weaver.ini

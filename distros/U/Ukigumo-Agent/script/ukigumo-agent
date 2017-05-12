@@ -1,0 +1,90 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use utf8;
+use 5.010000;
+use autodie;
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+
+use Twiggy::Server;
+use Plack::Builder;
+use Plack::App::File;
+use Ukigumo::Agent;
+use Ukigumo::Agent::Manager;
+use Getopt::Long;
+use Pod::Usage;
+use File::Spec;
+
+$|++;
+
+my $host = '0.0.0.0';
+my $port = 1984;
+my $cleanup_cycle = 0;
+
+GetOptions(
+    'c|config=s'         => \my $file,
+
+    'h|host=s'           => \$host,
+    'p|port=i'           => \$port,
+    'cleanup_cycle=i'    => \$cleanup_cycle,
+
+    'work_dir=s'         => \my $work_dir,
+    'server_url=s'       => \my $server_url,
+    'timeout=i'          => \my $timeout,
+    'ignore_github_tags' => \my $ignore_github_tags,
+    'force_git_url'      => \my $force_git_url,
+);
+
+my $config = ($file && -f $file) ? Ukigumo::Agent->load_config($file) : +{};
+
+$config->{work_dir}           = $work_dir           if defined $work_dir;
+$config->{server_url}         = $server_url         if defined $server_url;
+$config->{timeout}            = $timeout            if defined $timeout;
+$config->{ignore_github_tags} = $ignore_github_tags if defined $ignore_github_tags;
+$config->{force_git_url}      = $force_git_url      if defined $force_git_url;
+$config->{cleanup_cycle}      = $cleanup_cycle      if defined $cleanup_cycle;
+
+pod2usage() unless $config->{work_dir};
+pod2usage() unless $config->{server_url};
+
+my $manager = Ukigumo::Agent::Manager->new(config => $config);
+Ukigumo::Agent->register_manager($manager);
+
+my $static_dir = File::Spec->catdir(Ukigumo::Agent->share_dir, 'static');
+my $app = builder {
+    enable 'AccessLog';
+
+    mount '/'        => Ukigumo::Agent->to_app;
+    mount '/static/' => Plack::App::File->new({ root => $static_dir })->to_app;
+};
+
+my $twiggy = Twiggy::Server->new(host => $host, port => $port);
+$twiggy->register_service($app);
+
+print "Twiggy: Accepting connections at http://${host}:${port}/\n";
+
+AE::cv->recv;
+__END__
+
+=head1 NAME
+
+ukigumo-agent.pl - CI agent server
+
+=head1 SYNOPSIS
+
+    % ukigumo-agent.pl --server_url=http://example.com/
+
+        --config=config.pl               Configuration file
+        --server_url=http://example.com  ukigumo-server URL
+        --work_dir=/tmp/                 working directory
+        --host=127.0.0.1                 Bind host
+        --port=80                        Bind port (Default: 1984)
+        --timeout=123                    Timeout seconds (Default: Not timeout)
+        --ignore_github_tags             ignore push event of GitHub if it sends with tags
+        --force_git_url                  always use Git URL
+        --cleanup_cycle=3                Days of cleanup cycle to remove directory of old branch (Default: 0 (means don't cleanup))
+
+=head1 DESCRIPTION
+
+ukigumo-agent.pl is CI agent server, runs test cases.

@@ -1,0 +1,35 @@
+Revision history for Perl extension UUID::Generator::PurePerl
+
+0.80    Tue Apr 28 13:30:00 JST 2009
+        - this module is going to be marked as DECRECATED
+
+0.05    Tue Apr 28 11:00:00 JST 2009
+        - released as 0.05
+          (code except $VERSION is quite the same as 0.04_02)
+
+0.04_02 Thu Apr 23 12:30:00 JST 2009
+        - added pseudo hash generator to U::G::P::Util
+          (for case that Digest::MD5 doesn't exist)
+
+0.04_01 Mon Apr 13 11:00:00 JST 2009
+        - changed the way to inherit Exporter's import() method
+          (to deal with Exporter prior to version 5.57)
+
+0.04    Mon Apr 13 11:00:00 JST 2009
+        - modified t/31_compat for processor's endian consideration
+          (binary and base64 represenation on Data::UUID depend on endian)
+        - wrote POD of UUID::Generator::PurePerl::Compat
+
+0.03    Fri Apr 10 10:10:00 JST 2009
+        - modified t/32_compat_du to check Data::UUID version >= 1.200
+          (Data::UUID < 1.200 has wrong MD5 implementation)
+        - changed required Perl version down to 5.006
+
+0.02    Wed Apr 08 13:40:00 JST 2009
+        - modified t/23_v3 test not to use Data::UUID,
+          to use pre-calculated parameters.
+          (to figure out problems on x86_64 architecture)
+
+0.01    Tue Apr 07 12:00:00 JST 2009
+        - original version
+

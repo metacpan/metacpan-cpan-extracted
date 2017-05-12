@@ -1,0 +1,21 @@
+Revision history for UUID-FFI
+
+0.05      2015-01-22 06:42:44 -0500
+  - First CPAN release
+  - Very minor documentation tweak
+  - Functionally identical to 0.04
+
+0.04      2015-01-13 12:21:02 -0500
+  - support perl 5.8
+
+0.03      2015-01-13 12:00:02 -0500
+  - migrate to FFI::Platypus
+  - remove dep on FFI::Raw
+  - remove dep on FFI::Util
+
+0.02      2014-11-04 23:47:51 -0500
+  - add time meothd
+  - overload <=> to use compare method
+
+0.01      2014-11-04 17:30:35 -0500
+  - initial version

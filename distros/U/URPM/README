@@ -1,0 +1,7 @@
+The URPM module allows you to manipulate rpm files, rpm header files and
+hdlist files and manage them in memory.
+
+Copyright 2002-2007 Mandrakesoft
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

@@ -1,0 +1,21 @@
+Source: libur-perl
+Section: perl
+Priority: optional
+Build-Depends: debhelper (>= 7), perl (>= 5.8.0)
+Build-Depends-Indep: perl (>= 5.8.0),libtest-fork-perl (>= 0.02),libmodule-build-perl,libtest-simple-perl,liblingua-en-inflect-perl,libfreezethaw-perl,libdate-pcalc-perl,libyaml-perl,libdata-compare-perl,libtext-diff-perl,libdbi-perl,libsub-name-perl,libsub-install-perl,libpath-class-perl,libxml-dumper-perl,libxml-generator-perl,libxml-libxml-perl,libtimedate-perl,libdbd-sqlite3-perl,libclone-pp-perl (>= 1.02),libclass-autoloadcan-perl,libclass-autouse-perl (>= 2.00),libgetopt-complete-perl (>= 0.20),libnet-httpserver-perl,libxml-simple-perl,libclass-inspector-perl,libjson-perl,libossp-uuid-perl,libmro-compat-perl,libplack-perl
+Maintainer: Anthony Brummett <brummett@cpan.org>
+Standards-Version: 3.8.3
+Homepage: http://search.cpan.org/dist/UR/
+
+Package: libur-perl
+Provides: ur
+Architecture: all
+Depends: ${perl:Depends}, ${misc:Depends}, perl (>= 5.8.0),liblingua-en-inflect-perl,libfreezethaw-perl,libdate-pcalc-perl,libyaml-perl,libdata-compare-perl,libtext-diff-perl,libdbi-perl,libsub-name-perl,libsub-install-perl,libpath-class-perl,libxml-dumper-perl,libxml-generator-perl,libxml-libxml-perl,libtimedate-perl,libdbd-sqlite3-perl,libclone-pp-perl (>= 1.02),libclass-autoloadcan-perl,libclass-autouse-perl (>= 2.00),libnet-httpserver-perl,libjson-perl,libossp-uuid-perl,libpod-simple-perl (>= 3.13), libplack-perl
+Suggests: libgetopt-complete-perl (>= 0.20),libxml-xslt-perl,libmro-compat-perl
+Description: Rich declarative transactional objects
+ UR is a class framework and object/relational mapper for Perl.  It starts
+ with the familiar Perl meme of the blessed hash reference as the basis for
+ object instances, and extends its capabilities with ORM (object-relational
+ mapping) capabilities, object cache, in-memory transactions, more formal
+ class definitions, metadata, documentation system, iterators, command line
+ tools, etc.

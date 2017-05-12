@@ -1,0 +1,24 @@
+.travis.yml
+appveyor.yml
+bin/urifind
+Build.PL
+Changes
+INSTALL
+lib/URI/Find.pm
+lib/URI/Find/Schemeless.pm
+LICENSE
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.json
+META.yml
+README
+t/filter.t
+t/Find.t
+t/html.t
+t/is_schemed.t
+t/load-schemeless.t
+t/rfc3986_appendix_c.t
+t/urifind/find.t
+t/urifind/pod.t
+t/urifind/sciencenews
+TODO

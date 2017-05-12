@@ -1,0 +1,57 @@
+------------------------------------------------------------------------
+r26 | tdb01r | 2005-10-15 12:44:41 +0100 (Sat, 15 Oct 2005) | 2 lines
+
+Removed ctxobj version init
+
+------------------------------------------------------------------------
+r25 | tdb01r | 2005-09-15 18:16:24 +0100 (Thu, 15 Sep 2005) | 2 lines
+
+Added query_param to enable proper utf-8 encoding
+
+------------------------------------------------------------------------
+r22 | tdb01r | 2005-07-29 20:02:59 +0100 (Fri, 29 Jul 2005) | 4 lines
+
+Version 0.4.4
+
+Correct translation of 0.1<=>1.0 (no, really)
+
+------------------------------------------------------------------------
+r21 | tdb01r | 2005-07-29 17:07:44 +0100 (Fri, 29 Jul 2005) | 10 lines
+
+Version 0.4.3
+
+Added import/export of 'id' from 0.1
+Exporting:
+- If rft.id starts with info:doi or info:pmid strip the info: and add
+- If rft.id starts with oai: or bibcode: then add
+Importing:
+- If id starts with doi or pmid add info:
+- Otherwise set rft.id
+
+------------------------------------------------------------------------
+r19 | tdb01r | 2005-07-29 12:44:24 +0100 (Fri, 29 Jul 2005) | 2 lines
+
+Added hybrid functionality to trunk
+
+------------------------------------------------------------------------
+r10 | tdb01r | 2005-07-26 13:04:46 +0100 (Tue, 26 Jul 2005) | 3 lines
+
+- Test case for 0.1/1.0 OpenURL hybrid
+- Fixed genre mappings
+
+------------------------------------------------------------------------
+r9 | tdb01r | 2005-07-26 12:58:44 +0100 (Tue, 26 Jul 2005) | 2 lines
+
+Added as_hybrid
+
+------------------------------------------------------------------------
+r8 | tdb01r | 2005-07-26 12:34:35 +0100 (Tue, 26 Jul 2005) | 2 lines
+
+Moved to openURL subfolder
+
+------------------------------------------------------------------------
+r4 | tdb01r | 2005-07-26 12:30:02 +0100 (Tue, 26 Jul 2005) | 2 lines
+
+0.4.1
+
+------------------------------------------------------------------------

@@ -1,0 +1,19 @@
+UDCode - Does a set of code words form a uniquely decodable code?
+
+A code is a set of strings, called the _code words_.  A code is
+"uniquely decodable" if any string S that is a concatenation of
+code words is so in _exactly one way_.
+
+For example, the code ("ab", "abba", "b") is _not_ uniquely
+decodable, because "abba" . "b" eq "ab" . "b" . "ab".  But the code
+("a", "ab", "abb") _is_ uniquely decodable, because there is no such
+pair of sequences of code words.
+
+UDcode contains a function "is_udcode" that tells whether a set of
+code words is a uniquely decodable code, and a function "ud_pair" that
+returns two sequences of code words whose concatenations are the same,
+if there is such a pair.
+
+Author: Mark Jason Dominus (mjd@plover.com)
+
+License: Public domain

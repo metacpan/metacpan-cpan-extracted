@@ -1,0 +1,336 @@
+Changes		# Changes
+Collate.pm	perl module for NoXSUB (pure perl)
+Collate.pmX	# perl module for XSUB
+Collate.xsX	# extension for XSUB
+Collate/allkeys.txt
+Collate/keys.txt
+Collate/CJK/Big5.pm
+Collate/CJK/GB2312.pm
+Collate/CJK/JISX0208.pm
+Collate/CJK/Korean.pm
+Collate/CJK/Pinyin.pm
+Collate/CJK/Stroke.pm
+Collate/CJK/Zhuyin.pm
+Collate/Locale.pm		Unicode::Collate::Locale
+Collate/Locale/af.pl		Unicode::Collate::Locale
+Collate/Locale/ar.pl		Unicode::Collate::Locale
+Collate/Locale/as.pl		Unicode::Collate::Locale
+Collate/Locale/az.pl		Unicode::Collate::Locale
+Collate/Locale/be.pl		Unicode::Collate::Locale
+Collate/Locale/bn.pl		Unicode::Collate::Locale
+Collate/Locale/ca.pl		Unicode::Collate::Locale
+Collate/Locale/cs.pl		Unicode::Collate::Locale
+Collate/Locale/cy.pl		Unicode::Collate::Locale
+Collate/Locale/da.pl		Unicode::Collate::Locale
+Collate/Locale/de_at_ph.pl	Unicode::Collate::Locale
+Collate/Locale/de_phone.pl	Unicode::Collate::Locale
+Collate/Locale/ee.pl		Unicode::Collate::Locale
+Collate/Locale/eo.pl		Unicode::Collate::Locale
+Collate/Locale/es.pl		Unicode::Collate::Locale
+Collate/Locale/es_trad.pl	Unicode::Collate::Locale
+Collate/Locale/et.pl		Unicode::Collate::Locale
+Collate/Locale/fa.pl		Unicode::Collate::Locale
+Collate/Locale/fi.pl		Unicode::Collate::Locale
+Collate/Locale/fi_phone.pl	Unicode::Collate::Locale
+Collate/Locale/fil.pl		Unicode::Collate::Locale
+Collate/Locale/fo.pl		Unicode::Collate::Locale
+Collate/Locale/fr_ca.pl		Unicode::Collate::Locale
+Collate/Locale/gu.pl		Unicode::Collate::Locale
+Collate/Locale/ha.pl		Unicode::Collate::Locale
+Collate/Locale/haw.pl		Unicode::Collate::Locale
+Collate/Locale/he.pl		Unicode::Collate::Locale
+Collate/Locale/hi.pl		Unicode::Collate::Locale
+Collate/Locale/hr.pl		Unicode::Collate::Locale
+Collate/Locale/hu.pl		Unicode::Collate::Locale
+Collate/Locale/hy.pl		Unicode::Collate::Locale
+Collate/Locale/ig.pl		Unicode::Collate::Locale
+Collate/Locale/is.pl		Unicode::Collate::Locale
+Collate/Locale/ja.pl		Unicode::Collate::Locale
+Collate/Locale/kk.pl		Unicode::Collate::Locale
+Collate/Locale/kl.pl		Unicode::Collate::Locale
+Collate/Locale/kn.pl		Unicode::Collate::Locale
+Collate/Locale/ko.pl		Unicode::Collate::Locale
+Collate/Locale/kok.pl		Unicode::Collate::Locale
+Collate/Locale/ln.pl		Unicode::Collate::Locale
+Collate/Locale/lt.pl		Unicode::Collate::Locale
+Collate/Locale/lv.pl		Unicode::Collate::Locale
+Collate/Locale/mk.pl		Unicode::Collate::Locale
+Collate/Locale/ml.pl		Unicode::Collate::Locale
+Collate/Locale/mr.pl		Unicode::Collate::Locale
+Collate/Locale/mt.pl		Unicode::Collate::Locale
+Collate/Locale/nb.pl		Unicode::Collate::Locale
+Collate/Locale/nn.pl		Unicode::Collate::Locale
+Collate/Locale/nso.pl		Unicode::Collate::Locale
+Collate/Locale/om.pl		Unicode::Collate::Locale
+Collate/Locale/or.pl		Unicode::Collate::Locale
+Collate/Locale/pa.pl		Unicode::Collate::Locale
+Collate/Locale/pl.pl		Unicode::Collate::Locale
+Collate/Locale/ro.pl		Unicode::Collate::Locale
+Collate/Locale/sa.pl		Unicode::Collate::Locale
+Collate/Locale/se.pl		Unicode::Collate::Locale
+Collate/Locale/si.pl		Unicode::Collate::Locale
+Collate/Locale/si_dict.pl	Unicode::Collate::Locale
+Collate/Locale/sk.pl		Unicode::Collate::Locale
+Collate/Locale/sl.pl		Unicode::Collate::Locale
+Collate/Locale/sq.pl		Unicode::Collate::Locale
+Collate/Locale/sr.pl		Unicode::Collate::Locale
+Collate/Locale/sv.pl		Unicode::Collate::Locale
+Collate/Locale/sv_refo.pl	Unicode::Collate::Locale
+Collate/Locale/ta.pl		Unicode::Collate::Locale
+Collate/Locale/te.pl		Unicode::Collate::Locale
+Collate/Locale/th.pl		Unicode::Collate::Locale
+Collate/Locale/tn.pl		Unicode::Collate::Locale
+Collate/Locale/to.pl		Unicode::Collate::Locale
+Collate/Locale/tr.pl		Unicode::Collate::Locale
+Collate/Locale/ug_cyrl.pl	Unicode::Collate::Locale
+Collate/Locale/uk.pl		Unicode::Collate::Locale
+Collate/Locale/ur.pl		Unicode::Collate::Locale
+Collate/Locale/vi.pl		Unicode::Collate::Locale
+Collate/Locale/vo.pl		Unicode::Collate::Locale
+Collate/Locale/wae.pl		Unicode::Collate::Locale
+Collate/Locale/wo.pl		Unicode::Collate::Locale
+Collate/Locale/yo.pl		Unicode::Collate::Locale
+Collate/Locale/zh.pl		Unicode::Collate::Locale
+Collate/Locale/zh_big5.pl	Unicode::Collate::Locale
+Collate/Locale/zh_gb.pl		Unicode::Collate::Locale
+Collate/Locale/zh_pin.pl	Unicode::Collate::Locale
+Collate/Locale/zh_strk.pl	Unicode::Collate::Locale
+Collate/Locale/zh_zhu.pl	Unicode::Collate::Locale
+data/af.txt		# preparating Unicode::Collate::Locale
+data/ar.txt		# preparating Unicode::Collate::Locale
+data/as.txt		# preparating Unicode::Collate::Locale
+data/az.txt		# preparating Unicode::Collate::Locale
+data/be.txt		# preparating Unicode::Collate::Locale
+data/bn.txt		# preparating Unicode::Collate::Locale
+data/ca.txt		# preparating Unicode::Collate::Locale
+data/cs.txt		# preparating Unicode::Collate::Locale
+data/cy.txt		# preparating Unicode::Collate::Locale
+data/da.txt		# preparating Unicode::Collate::Locale
+data/de_at_ph.txt	# preparating Unicode::Collate::Locale
+data/de_phone.txt	# preparating Unicode::Collate::Locale
+data/ee.txt		# preparating Unicode::Collate::Locale
+data/eo.txt		# preparating Unicode::Collate::Locale
+data/es.txt		# preparating Unicode::Collate::Locale
+data/es_trad.txt	# preparating Unicode::Collate::Locale
+data/et.txt		# preparating Unicode::Collate::Locale
+data/fa.txt		# preparating Unicode::Collate::Locale
+data/fi.txt		# preparating Unicode::Collate::Locale
+data/fi_phone.txt	# preparating Unicode::Collate::Locale
+data/fil.txt		# preparating Unicode::Collate::Locale
+data/fo.txt		# preparating Unicode::Collate::Locale
+data/fr_ca.txt		# preparating Unicode::Collate::Locale
+data/gu.txt		# preparating Unicode::Collate::Locale
+data/ha.txt		# preparating Unicode::Collate::Locale
+data/haw.txt		# preparating Unicode::Collate::Locale
+data/he.txt		# preparating Unicode::Collate::Locale
+data/hi.txt		# preparating Unicode::Collate::Locale
+data/hr.txt		# preparating Unicode::Collate::Locale
+data/hu.txt		# preparating Unicode::Collate::Locale
+data/hy.txt		# preparating Unicode::Collate::Locale
+data/ig.txt		# preparating Unicode::Collate::Locale
+data/is.txt		# preparating Unicode::Collate::Locale
+data/ja.txt		# preparating Unicode::Collate::Locale
+data/kk.txt		# preparating Unicode::Collate::Locale
+data/kl.txt		# preparating Unicode::Collate::Locale
+data/kn.txt		# preparating Unicode::Collate::Locale
+data/ko.txt		# preparating Unicode::Collate::Locale
+data/kok.txt		# preparating Unicode::Collate::Locale
+data/ln.txt		# preparating Unicode::Collate::Locale
+data/lt.txt		# preparating Unicode::Collate::Locale
+data/lv.txt		# preparating Unicode::Collate::Locale
+data/mk.txt		# preparating Unicode::Collate::Locale
+data/ml.txt		# preparating Unicode::Collate::Locale
+data/mr.txt		# preparating Unicode::Collate::Locale
+data/mt.txt		# preparating Unicode::Collate::Locale
+data/nb.txt		# preparating Unicode::Collate::Locale
+data/nn.txt		# preparating Unicode::Collate::Locale
+data/nso.txt		# preparating Unicode::Collate::Locale
+data/om.txt		# preparating Unicode::Collate::Locale
+data/or.txt		# preparating Unicode::Collate::Locale
+data/pa.txt		# preparating Unicode::Collate::Locale
+data/pl.txt		# preparating Unicode::Collate::Locale
+data/ro.txt		# preparating Unicode::Collate::Locale
+data/sa.txt		# preparating Unicode::Collate::Locale
+data/se.txt		# preparating Unicode::Collate::Locale
+data/si.txt		# preparating Unicode::Collate::Locale
+data/si_dict.txt	# preparating Unicode::Collate::Locale
+data/sk.txt		# preparating Unicode::Collate::Locale
+data/sl.txt		# preparating Unicode::Collate::Locale
+data/sq.txt		# preparating Unicode::Collate::Locale
+data/sr.txt		# preparating Unicode::Collate::Locale
+data/sv.txt		# preparating Unicode::Collate::Locale
+data/sv_refo.txt	# preparating Unicode::Collate::Locale
+data/ta.txt		# preparating Unicode::Collate::Locale
+data/te.txt		# preparating Unicode::Collate::Locale
+data/th.txt		# preparating Unicode::Collate::Locale
+data/tn.txt		# preparating Unicode::Collate::Locale
+data/to.txt		# preparating Unicode::Collate::Locale
+data/tr.txt		# preparating Unicode::Collate::Locale
+data/ug_cyrl.txt	# preparating Unicode::Collate::Locale
+data/uk.txt		# preparating Unicode::Collate::Locale
+data/ur.txt		# preparating Unicode::Collate::Locale
+data/vi.txt		# preparating Unicode::Collate::Locale
+data/vo.txt		# preparating Unicode::Collate::Locale
+data/wae.txt		# preparating Unicode::Collate::Locale
+data/wo.txt		# preparating Unicode::Collate::Locale
+data/yo.txt		# preparating Unicode::Collate::Locale
+data/zh.txt		# preparating Unicode::Collate::Locale
+data/zh_big5.txt	# preparating Unicode::Collate::Locale
+data/zh_gb.txt		# preparating Unicode::Collate::Locale
+data/zh_pin.txt		# preparating Unicode::Collate::Locale
+data/zh_strk.txt	# preparating Unicode::Collate::Locale
+data/zh_zhu.txt		# preparating Unicode::Collate::Locale
+disableXS	# perl script to disable XSUB
+enableXS	# perl script to enable XSUB
+gendata/cjk_test	# whole tests for CJK/*.pm
+gendata/dumpstr		# preparating Unicode::Collate::Locale
+gendata/gen-cjkc	# preparating Unicode::Collate::Locale
+gendata/gen-head	# preparating Unicode::Collate::Locale
+gendata/gen-hu		# preparating Unicode::Collate::Locale
+gendata/gen-ja		# preparating Unicode::Collate::Locale
+gendata/gen-ta		# preparating Unicode::Collate::Locale
+gendata/gen-tcyr	# preparating Unicode::Collate::Locale
+gendata/gen-vi		# preparating Unicode::Collate::Locale
+gendata/gen-zh		# preparating Unicode::Collate::Locale
+gendata/gen-zh2		# preparating Unicode::Collate::Locale
+Makefile.PL
+MANIFEST	MANIFEST for NoXSUB (pure perl)
+MANIFEST.X	# MANIFEST for XSUB
+META.json	# meta file
+META.yml	# meta file
+mkheader	# perl script to make C header files for XSUB
+mklocale	# preparating Unicode::Collate::Locale
+README		# README
+t/altern.t
+t/backwds.t
+t/cjk_b5.t	test Unicode::Collate::CJK::Big5
+t/cjk_gb.t	test Unicode::Collate::CJK::GB2312
+t/cjk_ja.t	test Unicode::Collate::CJK::JISX0208
+t/cjk_ko.t	test Unicode::Collate::CJK::Korean using DUCET
+t/cjk_py.t	test Unicode::Collate::CJK::Pinyin
+t/cjk_st.t	test Unicode::Collate::CJK::Stroke
+t/cjk_zy.t	test Unicode::Collate::CJK::Zhuyin
+t/cjkrange.t
+t/compatui.t
+t/contract.t
+t/default.t	test using DUCET
+t/hangtype.t
+t/hangul.t
+t/ident.t
+t/iglevel2.t
+t/ignor.t
+t/illegal.t
+t/illegalp.t
+t/index.t
+t/loc_af.t	test Unicode::Collate::Locale
+t/loc_ar.t	test Unicode::Collate::Locale
+t/loc_as.t	test Unicode::Collate::Locale
+t/loc_az.t	test Unicode::Collate::Locale
+t/loc_be.t	test Unicode::Collate::Locale
+t/loc_bg.t	test Unicode::Collate::Locale
+t/loc_bn.t	test Unicode::Collate::Locale
+t/loc_bs.t	test Unicode::Collate::Locale
+t/loc_bscy.t	test Unicode::Collate::Locale
+t/loc_ca.t	test Unicode::Collate::Locale
+t/loc_cjk.t	test Unicode::Collate::Locale
+t/loc_cjkc.t	test Unicode::Collate::Locale
+t/loc_cs.t	test Unicode::Collate::Locale
+t/loc_cy.t	test Unicode::Collate::Locale
+t/loc_cyrl.t	test Unicode::Collate::Locale
+t/loc_da.t	test Unicode::Collate::Locale
+t/loc_de.t	test Unicode::Collate::Locale
+t/loc_deat.t	test Unicode::Collate::Locale
+t/loc_deph.t	test Unicode::Collate::Locale
+t/loc_ee.t	test Unicode::Collate::Locale
+t/loc_eo.t	test Unicode::Collate::Locale
+t/loc_es.t	test Unicode::Collate::Locale
+t/loc_estr.t	test Unicode::Collate::Locale
+t/loc_et.t	test Unicode::Collate::Locale
+t/loc_fa.t	test Unicode::Collate::Locale
+t/loc_fi.t	test Unicode::Collate::Locale
+t/loc_fil.t	test Unicode::Collate::Locale
+t/loc_fiph.t	test Unicode::Collate::Locale
+t/loc_fo.t	test Unicode::Collate::Locale
+t/loc_fr.t	test Unicode::Collate::Locale
+t/loc_frca.t	test Unicode::Collate::Locale
+t/loc_gu.t	test Unicode::Collate::Locale
+t/loc_ha.t	test Unicode::Collate::Locale
+t/loc_haw.t	test Unicode::Collate::Locale
+t/loc_he.t	test Unicode::Collate::Locale
+t/loc_hi.t	test Unicode::Collate::Locale
+t/loc_hr.t	test Unicode::Collate::Locale
+t/loc_hu.t	test Unicode::Collate::Locale
+t/loc_hy.t	test Unicode::Collate::Locale
+t/loc_ig.t	test Unicode::Collate::Locale
+t/loc_is.t	test Unicode::Collate::Locale
+t/loc_ja.t	test Unicode::Collate::Locale
+t/loc_jait.t	test Unicode::Collate::Locale
+t/loc_japr.t	test Unicode::Collate::Locale
+t/loc_kk.t	test Unicode::Collate::Locale
+t/loc_kl.t	test Unicode::Collate::Locale
+t/loc_kn.t	test Unicode::Collate::Locale
+t/loc_ko.t	test Unicode::Collate::Locale
+t/loc_kok.t	test Unicode::Collate::Locale
+t/loc_ln.t	test Unicode::Collate::Locale
+t/loc_lt.t	test Unicode::Collate::Locale
+t/loc_lv.t	test Unicode::Collate::Locale
+t/loc_mk.t	test Unicode::Collate::Locale
+t/loc_ml.t	test Unicode::Collate::Locale
+t/loc_mncy.t	test Unicode::Collate::Locale
+t/loc_mr.t	test Unicode::Collate::Locale
+t/loc_mt.t	test Unicode::Collate::Locale
+t/loc_nb.t	test Unicode::Collate::Locale
+t/loc_nn.t	test Unicode::Collate::Locale
+t/loc_nso.t	test Unicode::Collate::Locale
+t/loc_om.t	test Unicode::Collate::Locale
+t/loc_or.t	test Unicode::Collate::Locale
+t/loc_pa.t	test Unicode::Collate::Locale
+t/loc_pl.t	test Unicode::Collate::Locale
+t/loc_ro.t	test Unicode::Collate::Locale
+t/loc_ru.t	test Unicode::Collate::Locale
+t/loc_sa.t	test Unicode::Collate::Locale
+t/loc_se.t	test Unicode::Collate::Locale
+t/loc_si.t	test Unicode::Collate::Locale
+t/loc_sidt.t	test Unicode::Collate::Locale
+t/loc_sk.t	test Unicode::Collate::Locale
+t/loc_sl.t	test Unicode::Collate::Locale
+t/loc_sq.t	test Unicode::Collate::Locale
+t/loc_sr.t	test Unicode::Collate::Locale
+t/loc_srla.t	test Unicode::Collate::Locale
+t/loc_sv.t	test Unicode::Collate::Locale
+t/loc_svrf.t	test Unicode::Collate::Locale
+t/loc_sw.t	test Unicode::Collate::Locale
+t/loc_ta.t	test Unicode::Collate::Locale
+t/loc_te.t	test Unicode::Collate::Locale
+t/loc_test.t	test Unicode::Collate::Locale
+t/loc_th.t	test Unicode::Collate::Locale
+t/loc_tn.t	test Unicode::Collate::Locale
+t/loc_to.t	test Unicode::Collate::Locale
+t/loc_tr.t	test Unicode::Collate::Locale
+t/loc_ugcy.t	test Unicode::Collate::Locale
+t/loc_uk.t	test Unicode::Collate::Locale
+t/loc_ur.t	test Unicode::Collate::Locale
+t/loc_vi.t	test Unicode::Collate::Locale
+t/loc_vo.t	test Unicode::Collate::Locale
+t/loc_wae.t	test Unicode::Collate::Locale
+t/loc_wo.t	test Unicode::Collate::Locale
+t/loc_yo.t	test Unicode::Collate::Locale
+t/loc_zh.t	test Unicode::Collate::Locale
+t/loc_zhb5.t	test Unicode::Collate::Locale
+t/loc_zhgb.t	test Unicode::Collate::Locale
+t/loc_zhpy.t	test Unicode::Collate::Locale
+t/loc_zhst.t	test Unicode::Collate::Locale
+t/loc_zhzy.t	test Unicode::Collate::Locale
+t/nonchar.t
+t/normal.t	test using Unicode::Normalize
+t/notable.t
+t/overcjk0.t
+t/overcjk1.t
+t/override.t
+t/rearrang.t
+t/rewrite.t	test using DUCET
+t/test.t
+t/trailwt.t
+t/variable.t
+t/version.t
+t/view.t

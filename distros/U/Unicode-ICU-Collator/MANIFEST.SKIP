@@ -1,0 +1,15 @@
+\.gcov$
+\.gcda$
+\.gcno$
+\.o$
+\.bs$
+\.old$
+^Collator\.c$
+^const-(c|xs)\.inc$
+^Makefile$
+\.bak$
+~$
+^MYMETA\.yml$
+^blib/
+^pm_to_blib$
+^Unicode-ICU-Collator-

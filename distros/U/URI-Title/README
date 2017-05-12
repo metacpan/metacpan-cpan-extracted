@@ -1,0 +1,29 @@
+NAME
+   URI::Title - get the titles of things on the web in a sensible way
+
+DESCRIPTION
+
+   I keep having to find the title of things on the web. This seems like a
+   really simple request, just get() the object, parse for a title tag,
+   you're done. Ha, I wish. There are several problems with this approach:
+
+   What if the resource is on a very slow server? Do we wait for ever or what?
+   What if the resource is a 900 gig file? You don't want to download that.
+   What if the page title isn't in a title tag, but is buried in the HTML somewhere?
+   What if the resource is an MP3 file, or a word document or something?
+   ...
+
+   So, let's solve these issues once.
+
+METHODS
+   only one, the title(url) method. Call it with an url, get the title if
+   possible, undef if it wasn't. Very simple.
+
+AUTHORS
+   Tom Insam <tom@jerakeen.org>, original author, 2004-2012.
+
+   Philippe Bruhat (BooK) <book@cpan.org>, maintainer, 2014.
+
+LICENSE
+   This program is free software; you can redistribute it and/or modify it
+   under the same terms as Perl itself.

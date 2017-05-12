@@ -1,0 +1,6 @@
+do { my $x = {
+       'cpantest.antelope.net' => '0a2fcf86-8a1d-11e5-ae6c-05e5e19420dd',
+       'digitalis' => 'a54c1c84-6bf5-1014-b4f9-dcd54300afcd'
+     };
+  $x;
+ }

@@ -1,0 +1,111 @@
+package Ubic::Manual::Intro;
+
+# ABSTRACT: Initial introduction
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Ubic::Manual::Intro - Initial introduction
+
+=head1 VERSION
+
+version 1.60
+
+=head1 DESCRIPTION
+
+Ubic is a polymorphic service manager.
+
+It can run any program as a service and provides frontend script C<ubic> to manage services.
+
+C<Polymorphic> means that ubic can use various pluggable backends for managing services, for configuring services and even for describing a list of all services.
+Don't panic, it offers easy-to-use default solutions for the common tasks out-of-the-box too!
+
+Ubic includes a centralized watchdog process which checks every service periodically and brings them back online if necessary.
+
+=head1 INSTALLATION
+
+Installing ubic is easy.
+
+First, install the module using your favorite CPAN client:
+
+    cpanm Ubic
+
+Second, invoke ubic-admin script to perform initial configuration:
+
+    ubic-admin setup
+
+If you don't want to answer too many questions, you can invoke it with batch-mode option:
+
+    ubic-admin setup --batch-mode
+
+Alternatively, if you're using Debian or Ubuntu, you can install ubic .deb package from the official launchpad PPA repository:
+
+    apt-add-repository ppa:berekuk/ubic
+    apt-get update
+    apt-get install ubic
+
+=head1 WRITE YOUR FIRST SERVICE
+
+Put this code in your service dir, i.e. in the file I</etc/ubic/service/example> (or if you opted for a home-dir installation, in the I<~/ubic/service/example>):
+
+    use Ubic::Service::SimpleDaemon;
+    Ubic::Service::SimpleDaemon->new(
+        bin => 'sleep 1000',
+    );
+
+Start it:
+
+    $ ubic start example
+    Starting example... started (pid 41209)
+
+Check its status:
+
+    $ ubic status
+    example running (pid 41209)
+    ubic
+        ubic.ping   off
+        ubic.update off
+        ubic.watchdog   running (pid 93226)
+
+Or:
+
+    $ ubic status example
+    example running (pid 41209)
+
+Now let's see how the watchdog works by killing the process (replace the pid value with the pid you got from the status command above):
+
+    $ kill 41209
+
+    $ ubic status example
+    example not running
+
+    $ ubic-watchdog
+    [Thu May 26 20:20:54 2011]  example is broken, restarting
+
+You don't have to run C<ubic-watchdog> manually; it will do its work in background in a minute.
+
+=head1 SEE ALSO
+
+L<Ubic::Service::SimpleDaemon> allows you to tune other service aspects other than I<bin>. Check it out.
+
+L<< Series of blog posts written as tutorials|http://blogs.perl.org/mt/mt-search.fcgi?blog_id=310&tag=tutorial&limit=20 >>
+
+Now go and read L<Ubic::Manual::Overview>, it explains everything else that ubic has to offer.
+
+=head1 AUTHOR
+
+Vyacheslav Matyukhin <mmcleric@yandex-team.ru>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Yandex LLC.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

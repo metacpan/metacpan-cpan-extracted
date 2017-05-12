@@ -1,0 +1,93 @@
+This gives an example of how to fix MSKLC errors; 
+apply a patch like this between creation of the 
+.C .H files and running the compiler.
+
+  patch -b -p0 < this_file
+
+--- iz-la-ru.C	2012-11-09 23:07:59.360304400 +0100
++++ iz-la-ru.C-ok	2012-11-09 23:06:54.180576300 +0100
+@@ -285,13 +285,13 @@ static ALLOC_SECTION_LDATA VK_TO_WCHARS5
+   {0xff         ,0      ,WCH_NONE ,0x0192   ,WCH_NONE ,0x00b5   ,0x00a0   },
+   {VK_OEM_8     ,0      ,' '      ,WCH_DEAD ,' '      ,WCH_DEAD ,WCH_DEAD },
+   {0xff         ,0      ,WCH_NONE ,0x0192   ,WCH_NONE ,0x00b5   ,0x00a0   },
+-  {#ERROR#      ,0      ,' '      ,WCH_DEAD ,' '      ,WCH_DEAD ,WCH_DEAD },
++  {VK_OEM_AX      ,0      ,' '      ,WCH_DEAD ,' '      ,WCH_DEAD ,WCH_DEAD },
+   {0xff         ,0      ,WCH_NONE ,0x0192   ,WCH_NONE ,0x00b5   ,0x00a0   },
+-  {#ERROR#      ,0      ,' '      ,WCH_DEAD ,' '      ,WCH_DEAD ,WCH_DEAD },
++  {VK_KANA      ,0      ,' '      ,WCH_DEAD ,' '      ,WCH_DEAD ,WCH_DEAD },
+   {0xff         ,0      ,WCH_NONE ,0x0192   ,WCH_NONE ,0x00b5   ,0x00a0   },
+-  {#ERROR#      ,0      ,' '      ,WCH_DEAD ,' '      ,WCH_DEAD ,WCH_DEAD },
++  {VK_NONCONVERT      ,0      ,' '      ,WCH_DEAD ,' '      ,WCH_DEAD ,WCH_DEAD },
+   {0xff         ,0      ,WCH_NONE ,0x0192   ,WCH_NONE ,0x00b5   ,0x00a0   },
+-  {#ERROR#      ,0      ,' '      ,WCH_DEAD ,' '      ,WCH_DEAD ,WCH_DEAD },
++  {VK_CONVERT      ,0      ,' '      ,WCH_DEAD ,' '      ,WCH_DEAD ,WCH_DEAD },
+   {0xff         ,0      ,WCH_NONE ,0x0192   ,WCH_NONE ,0x00b5   ,0x00a0   },
+   {0            ,0      ,0        ,0        ,0        ,0        ,0        }
+ };
+--- iz-la-ru.H	2012-11-09 23:07:59.306301300 +0100
++++ iz-la-ru.H-ok	2012-11-09 23:06:46.235121900 +0100
+@@ -37,11 +37,11 @@
+ #undef  T7D
+  #define T7D _EQ(                                      OEM_8                      )
+ #undef  T5C
+- #define T5C _EQ(                                    #ERROR#                      )
++ #define T5C _EQ(                                    OEM_AX                      )
+ #undef  T70
+- #define T70 _EQ(                                    #ERROR#                      )
++ #define T70 _EQ(                                    KANA                      )
+ #undef  T7B
+- #define T7B _EQ(                                    #ERROR#                      )
++ #define T7B _EQ(                                    NONCONVERT                      )
+ #undef  T79
+- #define T79 _EQ(                                    #ERROR#                      )
++ #define T79 _EQ(                                    CONVERT                      )
+ 
+
+
+This fixes the output of
+
+5c	OEM_AX		0	0020	0192@	0020	00b5@	00a0@	//  , ƒ,  , µ,  	// SPACE, LATIN SMALL LETTER F WITH HOOK, SPACE, MICRO SIGN, NO-BREAK SPACE
+70	KANA		0	0020	0192@	0020	00b5@	00a0@	//  , ƒ,  , µ,  	// SPACE, LATIN SMALL LETTER F WITH HOOK, SPACE, MICRO SIGN, NO-BREAK SPACE
+7B	NONCONVERT	0	0020	0192@	0020	00b5@	00a0@	//  , ƒ,  , µ,  	// SPACE, LATIN SMALL LETTER F WITH HOOK, SPACE, MICRO SIGN, NO-BREAK SPACE
+79	CONVERT		0	0020	0192@	0020	00b5@	00a0@	//  , ƒ,  , µ,  	// SPACE, LATIN SMALL LETTER F WITH HOOK, SPACE, MICRO SIGN, NO-BREAK SPACE
+
+
+Alternative modifications (work):
+
+// perl -wple "s/^(((?:^|\s+)\S+){6}(((?:^|\s+)(\S+)){2}))/$1\t$3/" aa1 > aa3
+// ShiftLock is 1, AltGr-version is 4, Kana version is 8
+//   This does not work: kbdutool breaks on b/c.  Need to do on the generated .C file
+// perl -wple "BEGIN {$s{$_}=$_ for 0..16; $s{4}=q(c); $s{5} = q(d)} s/^(\s*\S+\s+\S+\s+)(\S+)/$1$s{$2}/" aa3 > aa4
+
+// Replace in .C file s/ | CAPLOKALTGR/ | CAPLOKALTGR | KANALOK/
+////        { 0x38, X38 | KBDEXT              },  // RMenu
+//        { 0x38, X38              },  // RMenu
+
+//    { VK_RMENU     ,   KBDKANA       },
+
+// Apparently, this is not enough - kana is not generated; this works (X38 is for RightAlt)
+//    { VK_KANA     ,   KBDKANA       },
+// #undef X38
+// #define X38 _EQ(                                    KANA                      )
+//    - but this generates AltGr key which acts as a toggle [Caps]Lock-for-AltGr (on chars with KANALOK)
+//    - changing KANA (same in VK_KANA) to OEM_AX makes it non-togglable, but CapsLock does not affect AltGr-keys
+//	--- but CapsLock affects Ctrl-Alt keys... - not very useful...
+
+--- iz-la-ru.C-pre	2013-03-05 02:34:54.368881800 -0800
++++ iz-la-ru.C	2013-03-05 02:39:11.632596500 -0800
+@@ -142,6 +142,7 @@ static ALLOC_SECTION_LDATA VK_TO_BIT aVk
+     { VK_SHIFT    ,   KBDSHIFT     },
+     { VK_CONTROL  ,   KBDCTRL      },
+     { VK_MENU     ,   KBDALT       },
++    { VK_OEM_AX     ,   KBDKANA       },
+     { 0           ,   0           }
+ };
+ 
+--- iz-la-ru.H-pre	2013-03-05 02:34:54.309878500 -0800
++++ iz-la-ru.H	2013-03-05 02:41:09.646346500 -0800
+@@ -37,3 +37,5 @@
+ #undef  T7D
+  #define T7D _EQ(                                      OEM_8                      )
+ 
++#undef X5D
++#define X5D _EQ(                                    OEM_AX                      )

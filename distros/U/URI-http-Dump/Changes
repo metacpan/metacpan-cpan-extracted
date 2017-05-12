@@ -1,0 +1,12 @@
+Revision history for URI-http-Dump
+
+0.03    Fixed tests and redacted incorrect build notes
+
+0.02    Jun 02
+        Fixed doc which had listed wrong function name.
+				Fixed minimum perl version
+				Added scheme and URI::http / URI::http blackbox violation hakcs
+
+0.01    Prior to June 02
+        First version, released on an unsuspecting world.
+

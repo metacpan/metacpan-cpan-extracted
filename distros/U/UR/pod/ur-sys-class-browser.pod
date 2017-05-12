@@ -1,0 +1,28 @@
+
+
+=pod
+
+=head1 NAME
+
+ur sys class-browser - Start a web server to browse through the class and database structures.
+
+
+
+=head1 VERSION
+
+This document describes ur sys class-browser version 0.29.
+
+=head1 SYNOPSIS
+
+ur sys class-browser 
+
+
+
+=head1 DESCRIPTION:
+
+  Start a web server to browse through the class and database structures.
+
+
+
+=cut
+

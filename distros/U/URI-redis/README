@@ -1,0 +1,80 @@
+NAME
+    URI::redis - URI for Redis connection info
+
+SYNOPSIS
+     use URI::redis;
+ 
+     $url = URI->new('redis://redis.example.com?password=correcthorsebatterystaple');
+
+     $url = URI->new('redis://redis.example.com?db=5&password=correcthorsebatterystaple');
+
+     $url = URI->new('redis+unix:///tmp/redis.sock?db=5&password=correcthorsebatterystaple');
+
+DESCRIPTION
+    The "URI::redis" class supports "URI" objects belonging to the *redis*
+    and *redis+unix* URI scheme.
+
+    Such URLs are used to encode connection info ("redis": host, port,
+    password, database, "redis+unix": socket path, password, database) to
+    Redis servers.
+
+    Supported URLs are in any of these formats:
+
+    "redis://HOST[:PORT][?db=DATABASE[&password=PASSWORD]]"
+    "redis://HOST[:PORT][?password=PASSWORD[&db=DATABASE]]"
+    "redis://[:PASSWORD@]HOST[:PORT][/DATABASE]"
+    "redis://[:PASSWORD@]HOST[:PORT][?db=DATABASE]"
+    "redis://HOST[:PORT]/DATABASE[?password=PASSWORD]"
+        A TCP connection, see
+        <http://www.iana.org/assignments/uri-schemes/prov/redis>.
+
+        The port defaults to 6379 and the host defaults to "localhost".
+
+    "redis+unix://[:PASSWORD@]SOCKET_PATH[?db=DATABASE]"
+    "redis+unix://SOCKET_PATH[?db=DATABASE[&password=PASSWORD]]"
+    "redis+unix://SOCKET_PATH[?password=PASSWORD[&db=DATABASE]]"
+        A Unix domain socket connection.
+
+METHODS
+    In addition to the methods inherited from URI, it provides the following
+    methods:
+
+  database
+    Returns the database number from the path or the "db" query param.
+
+    Returns 0 if no database is specified.
+
+  database_from_path
+    Returns the database number encoded in the path part of the URI. Only
+    works if the path is in the format "^ / \d+".
+
+    Returns undef if no database can be parsed from the path.
+
+  database_from_query
+    Returns the database number from the "db" query param.
+
+    Returns undef if no "db" query param, or it has no value set.
+
+  password
+    Returns the password from the userinfo or the "password" query param.
+
+  password_from_userinfo
+    Returns the password part of the "userinfo" in URI.
+
+  password_from_query
+    Returns the password from the "password" query param.
+
+  socket_path
+    Returns the Unix domain socket path.
+
+    Returns undef if the URI is not of the 'redis+unix' scheme.
+
+SEE ALSO
+    URI
+
+COPYRIGHT
+    Copyright 2016 Norbert Buchmueller.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

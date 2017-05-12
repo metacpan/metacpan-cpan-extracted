@@ -1,0 +1,11 @@
+MANIFEST
+README
+LICENSE
+Changes
+Makefile.PL
+lib/Ubic/Watchdog/Notice.pm
+t/001_load.t
+bin/ubic-notice
+etc/ubic/service/ubic/notice
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

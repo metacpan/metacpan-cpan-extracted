@@ -1,0 +1,653 @@
+<?xml version="1.0"?>
+<!DOCTYPE corpus SYSTEM  "all-words.dtd">
+<corpus lang="en">
+<text id="001">
+<head id="d001.s001.t001" candidates="C1280500,C2348382">effect</head>
+of
+the
+<head id="d001.s001.t004" candidates="C0449238">duration</head>
+of
+prefeeding
+on
+<head id="d001.s001.t008" candidates="C0001128,C0002520">amino acid</head>
+digestibility
+of
+<head id="d001.s001.t011" candidates="C0043137,C0087114,C1095911,C1123020,C1510495,C2722062">wheat</head>
+<head id="d001.s001.t012" candidates="C0682260">distillers</head>
+<head id="d001.s001.t013" candidates="C1512080">dried</head>
+<head id="d001.s001.t014" candidates="C0007757,C0086369,C1552950">grains</head>
+with
+<head id="d001.s001.t016" candidates="C1749467,C1948047">solubles</head>
+in
+<head id="d001.s002.t002" candidates="C1554183,C2698565">broiler</head>
+<head id="d001.s002.t003" candidates="C0008051,C0677521,C1443000,C2722032">chicken</head>
+.
+the
+<head id="d001.s002.t006" candidates="C0018017,C1571702,C2239270">objective</head>
+of
+this
+<head id="d001.s002.t009" candidates="C0008976,C0557651,C2603343">study</head>
+was
+to
+<head id="d001.s002.t012" candidates="C2004162">determine</head>
+the
+<head id="d001.s002.t014" candidates="C1280500,C2348382">effect</head>
+of
+the
+<head id="d001.s002.t017" candidates="C0449238">duration</head>
+of
+prefeeding
+on
+prececal
+<head id="d001.s002.t022" candidates="C0001128,C0002520">amino acid</head>
+<head id="d001.s002.t023" candidates="C1235746">aa</head>
+digestibility
+of
+<head id="d001.s002.t026" candidates="C0043137,C0087114,C1095911,C1123020,C1510495,C2722062">wheat</head>
+<head id="d001.s002.t027" candidates="C0682260">distillers</head>
+<head id="d001.s002.t028" candidates="C1512080">dried</head>
+<head id="d001.s002.t029" candidates="C0007757,C0086369,C1552950">grains</head>
+with
+<head id="d001.s002.t031" candidates="C1749467,C1948047">solubles</head>
+in
+<head id="d001.s003.t002" candidates="C1554183">broilers</head>
+.
+the
+<head id="d001.s003.t005" candidates="C1517004">experimental</head>
+<head id="d001.s003.t006" candidates="C0012155,C0012159,C0012180">diets</head>
+with
+<head id="d001.s003.t008" candidates="C0682260">distillers</head>
+<head id="d001.s003.t009" candidates="C0011682,C0151908,C0205222,C1512080,C2148606">dried</head>
+<head id="d001.s003.t010" candidates="C0007757,C0086369,C1552950">grains</head>
+with
+<head id="d001.s003.t012" candidates="C1749467,C1948047">solubles</head>
+at
+<head id="d001.s003.t014" candidates="C0441889,C0456079">levels</head>
+of
+0
+,
+10
+,
+and
+20 %
+were
+<head id="d001.s003.t023" candidates="C1444648">offered</head>
+<head id="d001.s003.t024" candidates="C1879743">ad libitum</head>
+for
+7
+,
+5
+,
+and
+3 d
+,
+<head id="d001.s003.t033" candidates="C0439659,C1272689">starting</head>
+on
+14
+,
+16
+,
+and
+18
+d
+of
+<head id="d001.s004.t002" candidates="C0001779,C0001792">age</head>
+.
+<head id="d001.s004.t004" candidates="C0040302,C0076733,C0678717">titanium dioxide</head>
+was
+<head id="d001.s004.t006" candidates="C0042153,C0457083,C1524063,C1947944">used</head>
+as
+an
+indigestible
+<head id="d001.s005.t004" candidates="C0005516,C2745888">marker</head>
+.
+<head id="d001.s005.t006" candidates="C0205452">six</head>
+<head id="d001.s005.t007" candidates="C1527077">pens</head>
+of
+10
+<head id="d001.s005.t010" candidates="C0005595">birds</head>
+were
+allocated
+to
+each
+<head id="d001.s006.t003" candidates="C0039798,C0087111,C1522326,C1533734,C1705169">treatment</head>
+.
+Digesta
+was
+<head id="d001.s006.t007" candidates="C0370003,C0441621,C0870078,C2347026">sampled</head>
+on
+a
+<head id="d001.s006.t010" candidates="C1527077">pen</head>
+<head id="d001.s006.t011" candidates="C0178499,C0205112,C0597742,C1527178,C1626935,C1874451,C1880279">basis</head>
+from
+the
+<head id="d001.s006.t014" candidates="C0205108,C0450168">distal</head>
+<head id="d001.s006.t015" candidates="C0205437,C0205448">two - thirds</head>
+of
+the
+<head id="d001.s006.t018" candidates="C0021853">intestine</head>
+<head id="d001.s006.t019" candidates="C0205155,C1293097,C1522472,C1552923,C1705191">section</head>
+between
+<head id="d001.s006.t021" candidates="C0012817,C0025037,C1546602">meckel ' s diverticulum</head>
+and
+2
+cm
+<head id="d001.s006.t025" candidates="C0205094">anterior</head>
+to
+the
+<head id="d001.s007.t003" candidates="C0020885,C0475466">ileo</head>
+-
+<head id="d001.s007.t005" candidates="C0007531,C0280555,C0520526,C0521375,C1278925">ceca</head>
+-
+<head id="d001.s007.t007" candidates="C0009368">colonic</head>
+<head id="d001.s007.t008" candidates="C0205144,C1706311">junction</head>
+.
+<head id="d001.s007.t010" candidates="C0232478">ingested</head>
+and
+<head id="d001.s007.t012" candidates="C0868946">digested</head>
+<head id="d001.s007.t013" candidates="C1265611">amounts</head>
+of
+<head id="d001.s007.t015" candidates="C1235746">aa</head>
+were
+<head id="d001.s007.t017" candidates="C2004162">determined</head>
+for
+each
+<head id="d001.s008.t003" candidates="C1527077">pen</head>
+.
+Digestibility
+of
+<head id="d001.s008.t007" candidates="C1235746">aa</head>
+in
+the
+<head id="d001.s008.t010" candidates="C0012155,C0012159,C0012180">diets</head>
+was
+<head id="d001.s008.t012" candidates="C1518422">not</head>
+significantly
+<head id="d001.s008.t014" candidates="C0001721,C0392760,C1314939,C2237113">affected</head>
+by
+the
+<head id="d001.s008.t017" candidates="C0449238">duration</head>
+of
+prefeeding
+but
+was
+significantly
+<head id="d001.s008.t023" candidates="C0392756">reduced</head>
+by
+<head id="d001.s008.t025" candidates="C1512693">inclusion</head>
+of
+<head id="d001.s009.t002" candidates="C0682260">distillers</head>
+<head id="d001.s009.t003" candidates="C0011682,C0151908,C0205222,C1512080,C2148606">dried</head>
+<head id="d001.s009.t004" candidates="C0007757,C0086369,C1552950">grains</head>
+with
+<head id="d001.s009.t006" candidates="C1749467,C1948047">solubles</head>
+.
+Digestibility
+of
+<head id="d001.s009.t010" candidates="C1235746">aa</head>
+in
+<head id="d001.s009.t012" candidates="C0682260">distillers</head>
+<head id="d001.s009.t013" candidates="C0011682,C0151908,C0205222,C1512080,C2148606">dried</head>
+<head id="d001.s009.t014" candidates="C0007757,C0086369,C1552950">grains</head>
+with
+<head id="d001.s009.t016" candidates="C1749467,C1948047">solubles</head>
+was
+<head id="d001.s009.t018" candidates="C2004162">determined</head>
+by
+<head id="d001.s009.t020" candidates="C0042153,C0457083,C1524063,C1947944">using</head>
+a
+<head id="d001.s010.t002" candidates="C0023733,C0205132,C0684320,C0684321,C2346679">linear regression</head>
+<head id="d001.s010.t003" candidates="C0449445,C1292724,C2371926">approach</head>
+.
+The
+digestibility
+of
+<head id="d001.s010.t008" candidates="C1235746">aa</head>
+in
+<head id="d001.s010.t010" candidates="C0682260">distillers</head>
+<head id="d001.s010.t011" candidates="C0011682,C0151908,C0205222,C1512080,C2148606">dried</head>
+<head id="d001.s010.t012" candidates="C0007757,C0086369,C1552950">grains</head>
+with
+<head id="d001.s010.t014" candidates="C1749467,C1948047">solubles</head>
+<head id="d001.s010.t015" candidates="C1514721,C2348147">ranged</head>
+from
+76 %
+(
+Arg
+,
+5
+d
+of
+<head id="d001.s010.t024" candidates="C0204695,C2148613">feeding</head>
+)
+to
+33 %
+(
+<head id="d001.s010.t029" candidates="C0206293">asp</head>
+,
+3 d
+of
+<head id="d001.s010.t033" candidates="C0204695,C2148613">feeding</head>
+)
+.
+There
+was
+no
+<head id="d001.s011.t006" candidates="C0237881,C0750502,C1546944">significant</head>
+<head id="d001.s011.t007" candidates="C1280500,C2348382">effect</head>
+of
+prefeeding
+<head id="d001.s011.t010" candidates="C0040223,C0442043,C0935456,C1632851,C2362314">time</head>
+on
+<head id="d001.s011.t012" candidates="C1235746">aa</head>
+digestibility
+of
+<head id="d001.s012.t002" candidates="C0682260">distillers</head>
+<head id="d001.s012.t003" candidates="C0011682,C0151908,C0205222,C1512080,C2148606">dried</head>
+<head id="d001.s012.t004" candidates="C0007757,C0086369,C1552950">grains</head>
+with
+<head id="d001.s012.t006" candidates="C1749467,C1948047">solubles</head>
+.
+<head id="d001.s012.t008" candidates="C0024337,C1446005">lysine</head>
+digestibility
+of
+<head id="d001.s012.t011" candidates="C0682260">distillers</head>
+<head id="d001.s012.t012" candidates="C0011682,C0151908,C0205222,C1512080,C2148606">dried</head>
+<head id="d001.s012.t013" candidates="C0007757,C0086369,C1552950">grains</head>
+with
+<head id="d001.s012.t015" candidates="C1749467,C1948047">solubles</head>
+was
+72 %
+.
+the
+<head id="d001.s013.t004" candidates="C0444504,C1704970,C2347634,C2348143">mean</head>
+digestibility
+of
+the
+<head id="d001.s013.t008" candidates="C1235746">aa</head>
+arg
+,
+<head id="d001.s013.t011" candidates="C0010654">cys</head>
+,
+<head id="d001.s013.t013" candidates="C0022192">ile</head>
+,
+<head id="d001.s013.t015" candidates="C0023401">leu</head>
+,
+<head id="d001.s013.t017" candidates="C0024337">lys</head>
+,
+<head id="d001.s013.t019" candidates="C0556656">met</head>
+,
+<head id="d001.s013.t021" candidates="C0031453">phe</head>
+,
+<head id="d001.s013.t023" candidates="C0040005">thr</head>
+,
+and
+<head id="d001.s013.t026" candidates="C0042285">val</head>
+of
+<head id="d001.s013.t028" candidates="C0682260">distillers</head>
+<head id="d001.s013.t029" candidates="C0011682,C0151908,C0205222,C1512080,C2148606">dried</head>
+<head id="d001.s013.t030" candidates="C0007757,C0086369,C1552950">grains</head>
+with
+<head id="d001.s013.t032" candidates="C1749467,C1948047">solubles</head>
+across
+<head id="d001.s013.t034" candidates="C0442043,C0935456,C2362314">the</head>
+3
+prefeeding
+<head id="d001.s013.t037" candidates="C0040223,C0442043,C0935456,C1632851,C2362314">times</head>
+was
+66 %
+.
+this
+<head id="d001.s014.t004" candidates="C0008976,C0557651,C2603343">study</head>
+<head id="d001.s014.t005" candidates="C1947971,C1998497">gave</head>
+<head id="d001.s014.t006" candidates="C0332120">evidence</head>
+that
+3 d
+of
+prefeeding
+a
+<head id="d001.s014.t012" candidates="C0012155,C0012159,C0012180">diet</head>
+is
+<head id="d001.s014.t014" candidates="C0205410">sufficient</head>
+in
+<head id="d001.s014.t016" candidates="C0008976,C0557651,C2603343">studying</head>
+prececal
+<head id="d001.s014.t018" candidates="C1235746">aa</head>
+digestibility
+in
+<head id="d001.s014.t021" candidates="C1554183">broilers</head>
+when
+<head id="d001.s014.t023" candidates="C0205251,C1299352,C1550472,C2700150">low</head>
+-
+<head id="d001.s014.t025" candidates="C0868946">digestible</head>
+<head id="d001.s014.t026" candidates="C0204695,C1510670">feeds</head>
+are
+</text>
+<text id="002">
+<head id="d002.s001.t001" candidates="C0025552">metal</head>
+<head id="d002.s001.t002" candidates="C0007447">cation</head>
+<head id="d002.s001.t003" candidates="C0011546,C0439857,C0851827,C1546937,C1701901,C2712228">dependence</head>
+of
+<head id="d002.s001.t005" candidates="C0687133,C1704675">interactions</head>
+with
+<head id="d002.s001.t007" candidates="C0001128,C0002520">amino acids</head>
+:
+<head id="d002.s001.t009" candidates="C0028758,C0424589,C0542479,C1442080,C1547025">bond energies</head>
+of
+Rb +
+to
+<head id="d002.s001.t013" candidates="C0017890,C0522461">glycine</head>
+,
+<head id="d002.s001.t015" candidates="C0036720">serine</head>
+,
+<head id="d002.s001.t017" candidates="C0040005">threonine</head>
+,
+and
+<head id="d002.s002.t001" candidates="C0033382">proline</head>
+.
+the
+<head id="d002.s002.t004" candidates="C0687133,C1704675">interactions</head>
+of
+<head id="d002.s002.t006" candidates="C0035930">rubidium</head>
+<head id="d002.s002.t007" candidates="C0007447">cations</head>
+with
+the
+<head id="d002.s002.t010" candidates="C0205450">four</head>
+<head id="d002.s002.t011" candidates="C0001128,C0002520">amino acids</head>
+,
+<head id="d002.s002.t013" candidates="C0017890,C0522461">glycine</head>
+,
+<head id="d002.s002.t015" candidates="C0036720">serine</head>
+,
+<head id="d002.s002.t017" candidates="C0040005">threonine</head>
+,
+and
+<head id="d002.s002.t020" candidates="C0033382">proline</head>
+,
+are
+<head id="d002.s002.t023" candidates="C0332128,C2004054">examined</head>
+in
+<head id="d002.s003.t002" candidates="C1522508,C1561567">detail</head>
+.
+Experimentally
+,
+the
+<head id="d002.s003.t007" candidates="C0028758,C0424589,C0542479,C1442080,C1547025">bond energies</head>
+are
+<head id="d002.s003.t009" candidates="C2004162">determined</head>
+<head id="d002.s003.t010" candidates="C0042153,C0457083,C1524063,C1947944">using</head>
+<head id="d002.s003.t011" candidates="C0449864">threshold</head>
+<head id="d002.s003.t012" candidates="C0337196,C1707433">collision</head>
+-
+<head id="d002.s003.t014" candidates="C0205263">induced</head>
+<head id="d002.s003.t015" candidates="C0086168">dissociation</head>
+of
+the
+rb ( + ) (
+<head id="d002.s003.t019" candidates="C0001128,C0002520">amino acids</head>
+)
+<head id="d002.s003.t021" candidates="C0439855,C1704241">complexes</head>
+with
+<head id="d002.s003.t023" candidates="C0043339">xenon</head>
+in
+a
+<head id="d002.s004.t003" candidates="C0181090,C0302614,C1706050,C2003846">guided</head>
+<head id="d002.s004.t004" candidates="C0022023">ion</head>
+<head id="d002.s004.t005" candidates="C0338248,C2347880">beam</head>
+<head id="d002.s004.t006" candidates="C0075804">tandem</head>
+<head id="d002.s004.t007" candidates="C0183395,C0183396,C0577559,C1306372,C1710143,C2700045">mass spectrometer</head>
+.
+<head id="d002.s004.t009" candidates="C0002778,C0936012,C1524024">analyses</head>
+of
+the
+<head id="d002.s004.t012" candidates="C0424589,C0542479,C1442080,C1547025">energy</head>
+<head id="d002.s004.t013" candidates="C0851827,C1701901,C1962923">dependent</head>
+<head id="d002.s004.t014" candidates="C0205155,C0205203,C0552389,C0700320,C1293097,C1522472,C1552923,C1705191">cross sections</head>
+<head id="d002.s004.t015" candidates="C0332257,C1552866,C2700399">include</head>
+<head id="d002.s004.t016" candidates="C0518609">consideration</head>
+of
+unimolecular
+<head id="d002.s004.t019" candidates="C1265875,C2700592">decay</head>
+<head id="d002.s004.t020" candidates="C0871208,C1521828">rates</head>
+,
+<head id="d002.s004.t022" candidates="C0205102,C1553872,C1619620">internal</head>
+<head id="d002.s004.t023" candidates="C0424589,C0542479,C1442080,C1547025">energy</head>
+of
+reactant
+<head id="d002.s004.t026" candidates="C0022023">ions</head>
+,
+and
+<head id="d002.s005.t001" candidates="C0439064">multiple</head>
+<head id="d002.s005.t002" candidates="C0022023">ion</head>
+-
+<head id="d002.s005.t004" candidates="C0567416,C1521991">molecule</head>
+<head id="d002.s005.t005" candidates="C0022023,C0337196">collisions</head>
+.
+0
+<head id="d002.s005.t008" candidates="C0202194,C0597277,C1553029">k</head>
+<head id="d002.s005.t009" candidates="C0028758,C0424589,C0542479,C1442080,C1547025">bond energies</head>
+of
+108 . 9
++
+/
+-
+7 . 0
+,
+115 . 7
++
+/
+-
+4 . 9
+,
+122 . 1
++
+/
+-
+4 . 6
+,
+and
+125 . 2
++
+/
+-
+4 . 5
+<head id="d002.s005.t035" candidates="C0439255">kj</head>
+/
+<head id="d002.s005.t037" candidates="C0026367,C0027960,C0027962,C0324740,C0439189,C0560145,C0560263,C1706186,C1824986,C1881883">mol</head>
+are
+<head id="d002.s005.t039" candidates="C2004162">determined</head>
+for
+<head id="d002.s005.t041" candidates="C0439855,C1704241">complexes</head>
+of
+Rb ( + )
+with
+<head id="d002.s005.t045" candidates="C0017890,C0522461">glycine</head>
+,
+<head id="d002.s005.t047" candidates="C0036720">serine</head>
+,
+<head id="d002.s005.t049" candidates="C0040005">threonine</head>
+,
+and
+<head id="d002.s005.t052" candidates="C0033382">proline</head>
+,
+respectively
+.
+<head id="d002.s006.t003" candidates="C0309989">quantum</head>
+<head id="d002.s006.t004" candidates="C0220806">chemical</head>
+<head id="d002.s006.t005" candidates="C1441506">calculations</head>
+are
+<head id="d002.s006.t007" candidates="C0004927">conducted</head>
+at
+the
+B3LYP
+,
+B3P86
+,
+and
+<head id="d002.s006.t015" candidates="C1418676">mp2</head>
+(
+<head id="d002.s006.t017" candidates="C0443225">full</head>
+)
+<head id="d002.s006.t019" candidates="C0441889,C0456079">levels</head>
+of
+<head id="d002.s006.t021" candidates="C0871935">theory</head>
+with
+<head id="d002.s006.t023" candidates="C0449829">geometries</head>
+and
+<head id="d002.s006.t025" candidates="C0919414">zero</head>
+<head id="d002.s006.t026" candidates="C1552961,C2347617">point</head>
+<head id="d002.s006.t027" candidates="C0424589,C0542479,C1442080,C1547025">energies</head>
+<head id="d002.s006.t028" candidates="C0444686,C1441506,C1443182">calculated</head>
+at
+the
+b3lyp
+<head id="d002.s006.t032" candidates="C0441889,C0456079">level</head>
+<head id="d002.s006.t033" candidates="C0042153,C0457083,C1524063,C1947944">using</head>
+both
+HW
+*
+/
+6
+-
+311
++
+<head id="d002.s006.t042" candidates="C0439267,C1553027">g</head>
+(
+<head id="d002.s006.t044" candidates="C1442455,C1705052">2d</head>
+,
+<head id="d002.s006.t046" candidates="C1521168,C1552213">2p</head>
+)
+and
+<head id="d002.s007.t001" candidates="C0016617">def2tzvp</head>
+<head id="d002.s007.t002" candidates="C0178499,C0205112,C0597742,C1527178,C1626935,C1874451,C1880279">basis</head>
+<head id="d002.s007.t003" candidates="C0036849,C1442518,C1705195">sets</head>
+.
+<head id="d002.s007.t005" candidates="C1274040,C1546471">results</head>
+<head id="d002.s007.t006" candidates="C0205217,C0439661,C0442805,C0442808,C1301820,C1706701">obtained</head>
+<head id="d002.s007.t007" candidates="C0042153,C0457083,C1524063,C1947944">using</head>
+the
+<head id="d002.s007.t009" candidates="C0016617,C0205156,C0750523">former</head>
+<head id="d002.s007.t010" candidates="C0178499,C0205112,C0597742,C1527178,C1626935,C1874451,C1880279">basis</head>
+<head id="d002.s007.t011" candidates="C0036849,C1442518,C1705195">sets</head>
+are
+systematically
+<head id="d002.s007.t014" candidates="C0205251,C1299352,C1550472,C2700150">low</head>
+<head id="d002.s007.t015" candidates="C1707455">compared</head>
+to
+the
+<head id="d002.s007.t018" candidates="C1517004">experimental</head>
+<head id="d002.s007.t019" candidates="C0028758,C0424589,C0542479,C1442080,C1547025">bond energies</head>
+,
+whereas
+the
+latter
+<head id="d002.s007.t024" candidates="C0178499,C0205112,C0597742,C1527178,C1626935,C1874451,C1880279">basis</head>
+<head id="d002.s007.t025" candidates="C0036849,C1442518,C1705195">sets</head>
+<head id="d002.s007.t026" candidates="C1547282">show</head>
+<head id="d002.s008.t001" candidates="C0038848,C0205170">good</head>
+<head id="d002.s008.t002" candidates="C0680240">agreement</head>
+.
+for
+rb ( + ) (
+<head id="d002.s008.t006" candidates="C0017890,C0522461">glycine</head>
+)
+,
+the
+<head id="d002.s008.t010" candidates="C0185051,C0205548,C0333138,C0441463,C1301808,C1442792,C1552743">ground state</head>
+<head id="d002.s008.t011" candidates="C0180093">conformer</head>
+has
+the
+<head id="d002.s008.t014" candidates="C0035930">rubidium</head>
+<head id="d002.s008.t015" candidates="C0022023,C1752728">ion</head>
+<head id="d002.s008.t016" candidates="C0243122,C1145667,C1167622">binding</head>
+to
+the
+<head id="d002.s008.t019" candidates="C0596259">carbonyl</head>
+<head id="d002.s008.t020" candidates="C0441833,C1257890,C1552516,C1552839,C1705428,C1705429">group</head>
+of
+the
+<head id="d002.s008.t023" candidates="C0001128,C0007066,C0596260">carboxylic acid</head>
+,
+and
+a
+<head id="d002.s008.t027" candidates="C0871364,C2348205">similar</head>
+<head id="d002.s008.t028" candidates="C0449829">geometry</head>
+is
+<head id="d002.s008.t030" candidates="C0037088,C0243095">found</head>
+for
+rb ( + ) (
+<head id="d002.s008.t033" candidates="C0033382">proline</head>
+)
+except
+the
+<head id="d002.s008.t037" candidates="C0027627,C0175668,C0205436,C1522484">secondary</head>
+<head id="d002.s008.t038" candidates="C0028158,C1550581">nitrogen</head>
+<head id="d002.s008.t039" candidates="C1272684,C1548435,C1548601">accepts</head>
+the
+<head id="d002.s008.t041" candidates="C0001128,C0007066,C0596260">carboxylic acid</head>
+<head id="d002.s008.t042" candidates="C0020275,C0885426">hydrogen</head>
+to
+<head id="d002.s008.t044" candidates="C0013058,C0205431,C0348078,C0376315,C1522492">form</head>
+the
+zwitterionic
+<head id="d002.s009.t003" candidates="C0678594">structure</head>
+.
+Both
+rb ( + ) (
+<head id="d002.s009.t007" candidates="C0036720">serine</head>
+)
+and
+rb ( + ) (
+<head id="d002.s009.t011" candidates="C0040005">threonine</head>
+)
+are
+<head id="d002.s009.t014" candidates="C0037088,C0243095">found</head>
+to
+have
+tridentate
+<head id="d002.s009.t018" candidates="C0243122,C1145667,C1167622">binding</head>
+at
+the
+B3LYP
+and
+<head id="d002.s009.t023" candidates="C1418676">mp2</head>
+(
+<head id="d002.s009.t025" candidates="C0443225">full</head>
+)
+<head id="d002.s009.t027" candidates="C0441889,C0456079">levels</head>
+,
+whereas
+the
+b3p86
+<head id="d002.s009.t032" candidates="C0750482">slightly</head>
+<head id="d002.s009.t033" candidates="C0558295,C1548789">prefers</head>
+<head id="d002.s009.t034" candidates="C0243122,C1145667,C1167622">binding</head>
+rb ( + )
+at
+the
+<head id="d002.s010.t003" candidates="C0001128,C0007066,C0596260">carboxylic acid</head>
+.
+<head id="d002.s010.t005" candidates="C1707455">comparison</head>
+of
+these
+<head id="d002.s010.t008" candidates="C1274040,C1546471">results</head>
+to
+those
+for
+the
+<head id="d002.s010.t013" candidates="C0336769">lighter</head>
+<head id="d002.s010.t014" candidates="C0002055,C0597742,C1979842">alkali</head>
+<head id="d002.s010.t015" candidates="C0022023">ions</head>
+<head id="d002.s010.t016" candidates="C0359589">provides</head>
+<head id="d002.s010.t017" candidates="C0233820">insight</head>
+into
+the
+<head id="d002.s010.t020" candidates="C0040833,C1521798">trends</head>
+in
+<head id="d002.s010.t022" candidates="C0243122,C1145667,C1167622">binding</head>
+<head id="d002.s010.t023" candidates="C1510827">affinities</head>
+and
+<head id="d002.s010.t025" candidates="C0678594">structures</head>
+<head id="d002.s010.t026" candidates="C0332281,C0750490,C1706221">associated</head>
+</text>
+</corpus>

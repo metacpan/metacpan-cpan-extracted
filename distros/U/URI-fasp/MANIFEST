@@ -1,0 +1,8 @@
+INSTALL.SKIP
+lib/URI/fasp.pm
+Makefile.PL
+MANIFEST			This list of files
+README.pod
+t/fasp.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

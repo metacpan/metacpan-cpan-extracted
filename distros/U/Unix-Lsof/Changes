@@ -1,0 +1,39 @@
+Revision history for Unix-Lsof
+
+0.1.0   Wed 11 20 11:41:00 2013
+        - Minuscule update to support task IDs
+        - bumped version number to 0.1.0 because no serious bug reports in 4 years
+
+0.0.9   Fri 07 24 15:29:00 2009
+        - Fixed failing tests ID 4752286, 4745065, 4740865 (removed skip for Test::Warn on a test file)
+
+0.0.8   Wed 07 22 11:49:00 2009
+        - Fixed RT bug 46009 by removing workaround introduced in 0.0.6 and replacing it with correct parsing
+        - Changed parse_lsof_output to accept raw output in a scalar  instead of pre-split array reference
+
+0.0.7   Wed 03 25 17:23:00 2009
+        - Additional test and fix for 43394
+
+0.0.6   Tue 03 17 11:28:00 2009
+        - Fixed RT bugs 41016 and 43394 by working around broken lsof output
+        - Documentation fixes
+
+0.0.5   Mon 09 01 17:55:00 2008
+        - Fixed test failures
+
+0.0.4   Wed 08 27 17:35:00 2008
+        - Fixed number of skip counts which made test fail on systems without Test::Exception
+        - Possibly fixed issue with failed tests on FreeBSD
+
+0.0.3   Mon 08 25 16:02:00 2008
+        - Fixed http://rt.cpan.org/Ticket/Display.html?id=38474 (spurious warnings and suppress_errors)
+        - Fixed http://rt.cpan.org/Ticket/Display.html?id=38440 (tcp/tpi parsing)
+        - Added options for specifying an lsof binary, tcp/tpi parsing and error handling
+
+0.0.2   Sat 01 31 00:31:00 2008
+        - Made to work with 5.10
+        - Optionally use field names with underscore instead of space
+
+0.0.1  Sun 02 24 10:21:53 2008
+       - Initial release.
+

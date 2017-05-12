@@ -1,0 +1,17 @@
+Build.PL
+Changes
+examples/run_parsito.pl
+lib/Ufal/Parsito.pm
+lib/Ufal/Parsito.pod
+lib/Ufal/Parsito.xs
+LICENSE
+MANIFEST			This list of files
+parsito/parsito.cpp
+parsito/parsito.h
+parsito/parsito_perl.cpp
+README
+t/data/test.parser
+t/import.t
+t/parser.t
+META.yml
+META.json

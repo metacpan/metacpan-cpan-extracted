@@ -1,0 +1,39 @@
+<?xml version='1.0' ?>
+<sequence>
+<class_list>
+  <class name='main' born='0' extends-to='6'>
+    <activation_list>
+      <activation born='0' extends-to='6' offset='0' />
+    </activation_list>
+  </class>
+  <class name='DiePair' born='1' extends-to='6'>
+    <activation_list>
+      <activation born='1' extends-to='3' offset='0' />
+      <activation born='4' extends-to='6' offset='0' />
+    </activation_list>
+  </class>
+  <class name='Die' born='2' extends-to='6'>
+    <activation_list>
+      <activation born='2' extends-to='2' offset='0' />
+      <activation born='3' extends-to='3' offset='0' />
+      <activation born='5' extends-to='5' offset='0' />
+      <activation born='6' extends-to='6' offset='0' />
+    </activation_list>
+  </class>
+</class_list>
+
+<arrow_list>
+  <arrow from='main' to='DiePair' type='call' label='new'
+         from-offset='0' to-offset='0' />
+  <arrow from='DiePair' to='Die' type='call' label='new'
+         from-offset='0' to-offset='0' />
+  <arrow from='DiePair' to='Die' type='call' label='new'
+         from-offset='0' to-offset='0' />
+  <arrow from='main' to='DiePair' type='call' label='roll'
+         from-offset='0' to-offset='0' />
+  <arrow from='DiePair' to='Die' type='call' label='roll'
+         from-offset='0' to-offset='0' />
+  <arrow from='DiePair' to='Die' type='call' label='roll'
+         from-offset='0' to-offset='0' />
+</arrow_list>
+</sequence>

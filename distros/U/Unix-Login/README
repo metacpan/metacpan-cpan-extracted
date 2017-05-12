@@ -1,0 +1,115 @@
+NAME
+    Unix::Login - Customizable Unix login prompt and validation
+
+SYNOPSIS
+       #
+       # You can use the object-oriented syntax...
+       #
+       use Unix::Login;
+
+       my $ul = Unix::Login->new(banner => "-- Welcome to Newix --\n");
+       my $username = $ul->login || exit 1;
+
+       #
+       # Or, use the shorter function-oriented syntax
+       #
+       use Unix::Login qw(login);
+   
+       my(@pwent) = login(login => "Username: ", cdhome => 1)
+            || die "Sorry, you don't know your own password!\n";
+
+DESCRIPTION
+    This is a simple yet flexible module that provides a Unix-esque login
+    prompt w/ password validation. This can be used in custom applications
+    that need to validate the username/password of the person using the app.
+
+    The above examples are pretty much all you'll ever need (and all this
+    module provides). Here are some specifics on the two functions provided:
+
+  new(option => value, option => value)
+
+    This creates a new Unix::Login object. You only need to use this if
+    you're using the object-oriented calling form. The parameters accepted
+    and their default values are:
+
+       attempts      Max login attempts [3]
+       failmesg      Print this on failure ["Login incorrect\n"]
+       failsleep     And sleep for this many seconds [3]
+
+       banner        Banner printed once up top ["Please Login\n"]
+       bannerfile    If set, printed after banner (i.e. /etc/issue) []
+       login         Prompt asking for username ["login: "]
+       password      Prompt asking for password ["Password: "]
+
+       passreq       Require a password for all users? [1]
+       nohomemesg    Printed if no homedir ["No home directory! Setting HOME=/\n"]
+
+       setenv        If true, setup HOME and other %ENV variables [1]
+       clearenv      If true, first undef %ENV before setenv [0]
+       path          If setenv, set PATH to this for non-root [/usr/bin:]
+       supath        If setenv, set PATH to this for root [/usr/sbin:/usr/bin]
+       maildir       If setenv, set MAIL to this dir/username [/var/mail]
+
+       pwent         Return a User::pwent struct in scalar context? [0]
+       cdhome        Chdir to the person's homedir on success? [0]
+       execshell     Execute the person's shell as login session? [0]
+
+    If the "pwent" option is set, then User::pwent is used to provide an
+    object in a scalar context. See the man page for User::pwent.
+
+    If the "execshell" option is set, then if login() is successful the
+    user's shell is forked and the current process is terminated, just like
+    a real Unix login session.
+
+    With these options, you could create a very Unix-like login with the
+    following:
+
+       use Unix::Login;
+
+       my $ul = Unix::Login->new(bannerfile => '/etc/issue',
+                                 banner     => `uname -rs`,
+                                 setenv     => 1,
+                                 clearenv   => 1,
+                                 cdhome     => 1,
+                                 execshell  => 1);
+
+       my(@pwent) = $ul->login || exit 1;
+
+    This will validate our login, clear our environment and reset it, then
+    exec the shell as a login shell just like a real life Unix login.
+
+  login(option => value, option => value)
+
+    This prompts for the username and password and tries to validate the
+    login. On success, it returns the same thing that getpwuid() does: the
+    username in a scalar context, or the passwd struct as a list in a list
+    context. It returns undef on failure.
+
+    Just like new(), you can pass it an optional set of parameters. These
+    will specify options for that login prompt only. As such, you can create
+    a fully-customized login screen from the function-oriented calling form:
+
+       use Unix::Login qw(login);
+
+       my(@pwent) = login(login => "User: ", password => "Pass: ")
+            || die "Sorry, try remembering your password next time.\n";
+
+    This would create a simple dialog which would return the passwd struct
+    if the user could be logged in. So, unless you really like OO
+    modularity, or intend on calling login() multiple times (in which case
+    setting options via new() would give you an advantage), use this form.
+
+VERSION
+    $Id: Login.pm,v 1.4 2001/04/05 23:32:42 nwiger Exp nwiger $
+
+SEE ALSO
+    User::pwent(3), login(1), perlfunc(1)
+
+AUTHOR
+    Copyright (c) 2000-2001 Nathan Wiger <nate@nateware.com>. All Rights
+    Reserved.
+
+    This module is free software; you may copy this under the terms of the
+    GNU General Public License, or the Artistic License, copies of which
+    should have accompanied your Perl kit.
+

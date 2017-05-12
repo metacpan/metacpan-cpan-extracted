@@ -1,0 +1,28 @@
+URI-Unredirect
+==============
+
+This module provides a method to remove obvious redirects from a URI.
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Test::More
+    URI
+    URI::Escape
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 by gray <gray@cpan.org>
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

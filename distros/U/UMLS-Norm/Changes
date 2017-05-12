@@ -1,0 +1,6 @@
+Revision history for Perl extension UMLS::Norm.
+
+0.01  Mon Jul 19 15:17:56 2010
+	- original version; created by h2xs 1.23 with options
+		-AXc -n UMLS::Norm
+

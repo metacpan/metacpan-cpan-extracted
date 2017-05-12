@@ -1,0 +1,66 @@
+Changes for Unix::Uptime
+
+0.4000 Mon Oct 13 15:11:06 EDT 2014
+    - Add support for Cygwin, from Graham Ollis <plicease@cpan.org>.
+    - Fix unit tests running under some non-English locales with
+      different decimal separators, from Graham Ollis
+      <plicease@cpan.org>.
+    - Improve forward-compatibility with Module::Build 0.4200, from
+      Graham Ollis <plicease@cpan.org>.
+
+0.3701 Thu Dec 16 22:40:14 EST 2010
+    - Fix build of XS on NetBSD.
+    - Correctly allocate all the space we need in SP 
+
+0.37  Tue Dec 14 23:25:05 EST 2010
+    - Unify support for all BSD derivatives, using XS, and falling back
+      on using the '-b' flag to sysctl, which is a bit more portable
+      than the standard output.
+    - Add a sample script that sorta emulates the output of the
+      uptime(1) command.
+
+0.36  Thu Oct 22 00:07:06 EDT 2009
+    - More internal cleaning.
+    - Fix load() tests for loads > 10.
+
+0.34  Tue Jun 30 20:04:01 EST 2009
+    - Don't pollute $ENV{PATH}.
+    - Support for DragonFly BSD.
+    - Internal cleanups and improved diagnostics.
+
+0.33_02  Tue Mar 24 19:17:52 EST 2009
+    - 0.33_01 wasn't built properly. Re-released & bumped.
+
+0.33_01  Tue Mar 24 19:01:47 EST 2009
+    - Initial load() implementation, for getting the 1, 5, and 15 minute
+      load averages.
+
+0.3201  Thu Feb 12 01:33:29 EST 2009
+    - Another attempt to fix sysctl path handling for *BSD.
+
+0.32  Tue Feb 10 19:52:09 EST 2009
+    - Attempt to fix path handling for *BSD.
+    - Skip tests when we're missing modules.
+
+0.31_01  Sun Feb  1 00:21:31 EST 2009
+    - Fix dependencies for NetBSD.
+
+0.30_02  Sat Jan 31 13:34:04 EST 2009
+    - Initial support for NetBSD.
+
+0.30_01  Tue Jan 27 01:42:32 EST 2009
+    - Some internal cleanup.
+
+0.3  Mon Jan 26 18:29:11 EST 2009
+    - Initial support for OpenBSD, Darwin.
+    - Add uptime_hires() for getting a "HiRes" uptime. uptime() is just
+      for second granularity.
+
+0.2  Tue Jan 20 01:43:36 EST 2009
+    - "HiRes" mode.
+    - Fix a scalar/list context bug.
+
+0.1  Mon Dec  8 16:01:51 EST 2008
+    - Initial public release.
+    - Support for FreeBSD, Linux.
+

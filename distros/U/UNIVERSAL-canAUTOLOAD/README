@@ -1,0 +1,66 @@
+README for UNIVERSAL::canAUTOLOAD 0.01
+
+=head1 NAME
+
+UNIVERSAL::canAUTOLOAD - installs a UNIVERSAL::can that respects AUTOLOAD subs
+
+=head1 SYNOPSIS
+
+ use UNIVERSAL::canAUTOLOAD;
+
+ package MyModule;
+
+ sub DESTROY {}
+ sub AUTOLOAD {
+     our $AUTOLOAD;
+     print "in AUTOLOAD for $AUTOLOAD\n";
+ }
+
+ my $object = bless {}, 'MyModule';
+ my $method = $object->can( 'potato' ); # returns a true value
+ $object->$method();                    # call the AUTOLOADed potato method
+
+
+=head1 DEPENDENCIES
+
+This module has external dependencies on the following modules:
+
+ Class::ISA
+ Test::More
+
+=head1 INSTALLATION
+
+ perl Build.PL
+ perl Build test
+
+and if all goes well
+
+ perl Build install
+
+=head1 HISTORY
+
+What changed over the last 3 revisions
+
+=over
+
+=item 0.01	Monday 10th November, 2003
+
+	Initial release
+=back
+
+=head1 AUTHOR
+
+Richard Clamp <richardc@unixbeard.net> original need and anticipated
+documentation from Mark Fowler.
+
+=head1 COPYRIGHT
+
+Copyright (C) 2003 Richard Clamp. All Rights Reserved.
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<UNIVERSAL/can>
+

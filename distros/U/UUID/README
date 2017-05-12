@@ -1,0 +1,183 @@
+NAME
+    UUID - DCE compatible Universally Unique Identifier library for Perl
+
+SYNOPSIS
+        use UUID 'uuid';
+
+        $string = uuid();   # generate stringified UUID
+
+        UUID::generate($uuid);               # new binary UUID; prefer random
+        UUID::generate_random($uuid);        # new binary UUID; use random
+        UUID::generate_time($uuid);          # new binary UUID; use time
+
+        UUID::unparse($uuid, $string);       # stringify $uuid; system casing
+        UUID::unparse_lower($uuid, $string); # force lowercase stringify
+        UUID::unparse_upper($uuid, $string); # force uppercase stringify
+
+        $rc = UUID::parse($string, $uuid);   # map string to UUID; -1 on error
+
+        UUID::copy($dst, $src);              # copy binary UUID from $src to $dst
+        UUID::compare($uuid1, $uuid2);       # compare binary UUIDs
+
+        UUID::clear( $uuid );                # set binary UUID to NULL
+        UUID::is_null( $uuid );              # compare binary UUID to NULL
+
+DESCRIPTION
+    The UUID library is used to generate unique identifiers for objects that
+    may be accessible beyond the local system. For instance, they could be
+    used to generate unique HTTP cookies across multiple web servers without
+    communication between the servers, and without fear of a name clash.
+
+    The generated UUIDs can be reasonably expected to be unique within a
+    system, and unique across all systems, and are compatible with those
+    created by the Open Software Foundation (OSF) Distributed Computing
+    Environment (DCE) utility uuidgen.
+
+FUNCTIONS
+    Most of the UUID functions expose the underlying libuuid C interface
+    rather directly. That is, many return their values in their parameters
+    and nothing else.
+
+    Not very Perlish, is it? It's been like that for a long time though, so
+    not very likely to change any time soon.
+
+    All take or return UUIDs in either binary or string format. The string
+    format resembles the following:
+
+        1b4e28ba-2fa1-11d2-883f-0016d3cca427
+
+    Or, in terms of printf(3) format:
+
+        "%08x-%04x-%04x-%04x-%012x"
+
+    The binary format is simply a packed 16 byte binary value.
+
+  generate( $uuid )
+    Generates a new binary UUID based on high quality randomness from
+    /dev/urandom, if available.
+
+    Alternately, the current time, the local ethernet MAC address (if
+    available), and random data generated using a pseudo-random generator
+    are used.
+
+    The previous content of $uuid, if any, is lost.
+
+  generate_random( $uuid )
+    Generates a new binary UUID but forces the use of the all-random
+    algorithm, even if a high-quality random number generator (i.e.,
+    /dev/urandom) is not available, in which case a pseudo-random
+    generator is used.
+
+    Note that the use of a pseudo-random generator may compromise the
+    uniqueness of UUIDs generated in this fashion.
+
+  generate_time( $uuid )
+    Generates a new binary UUID but forces the use of the alternative
+    algorithm which uses the current time and the local ethernet MAC address
+    (if available).
+
+    This algorithm used to be the default one used to generate UUIDs, but
+    because of the use of the ethernet MAC address, it can leak information
+    about when and where the UUID was generated.
+
+    This can cause privacy problems in some applications, so the generate()
+    function only uses this algorithm if a high-quality source of randomness
+    is not available.
+
+  unparse( $uuid, $string )
+    Converts the binary UUID in $uuid to string format and returns in
+    $string. The previous content of $string, if any, is lost.
+
+    The case of the hex digits returned may be upper or lower case, and is
+    dependent on the system-dependent local default.
+
+  unparse_lower( $uuid, $string )
+    Same as unparse() but $string is forced to lower case.
+
+  unparse_upper( $uuid, $string )
+    Same as unparse() but $string is forced to upper case.
+
+  $rc = parse( $string, $uuid )
+    Converts the string format UUID in $string to binary and returns in
+    $uuid. The previous content of $uuid, if any, is lost.
+
+    Returns 0 on success and -1 on failure. Additionally on failure, the
+    content of $uuid is unchanged.
+
+  clear( $uuid )
+    Sets $uuid equal to the value of the NULL UUID.
+
+  is_null( $uuid )
+    Compares the value of $uuid to the NULL UUID.
+
+    Returns 1 if NULL, and 0 otherwise.
+
+  copy( $dst, $src )
+    Copies the binary $src UUID to $dst.
+
+    If $src isn't a UUID, $dst is set to the NULL UUID.
+
+  compare( $uuid1, $uuid2 )
+    Compares two binary UUIDs.
+
+    Returns an integer less than, equal to, or greater than zero if $uuid1
+    is less than, equal to, or greater than $uuid2.
+
+    However, if either operand is not a UUID, falls back to a simple string
+    comparison returning similar values.
+
+  $string = uuid()
+    Creates a new string format UUID and returns it in a more Perlish way.
+
+    Functionally the equivalent of calling generate() and then unparse(),
+    but throwing away the intermediate binary UUID.
+
+UUID LIBRARY
+    Note that on some systems external packages will need to be installed
+    first. Notably, uuid-dev or uuid-devel on Debian and RedHat Linux,
+    respectively, and their derivatives.
+
+EXPORTS
+    None by default. All functions may be imported in the usual manner,
+    either individually or all at once using the ":all" tag.
+
+TODO
+    Need more tests and sanity checks.
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2014-2016 by Rick Myers.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+
+    Details of this license can be found within the 'License' text file.
+
+AUTHOR
+    Current maintainer:
+
+      Rick Myers <jrm@cpan.org>.
+
+    Authors and/or previous maintainers:
+
+      Lukas Zapletal <lzap@cpan.org>
+
+      Joseph N. Hall <joseph.nathan.hall@gmail.com>
+
+      Colin Faber <cfaber@clusterfs.com>
+
+      Peter J. Braam <braam@mountainviewdata.com>
+
+CONTRIBUTORS
+    David E. Wheeler
+
+    William Faulk
+
+    gregor herrmann
+
+    Slaven Rezic
+
+SEE ALSO
+    uuid(3), uuid_clear(3), uuid_compare(3), uuid_copy(3), uuid_generate(3),
+    uuid_is_null(3), uuid_parse(3), uuid_unparse(3), perl(1).
+

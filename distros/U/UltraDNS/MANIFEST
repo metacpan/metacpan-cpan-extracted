@@ -1,0 +1,21 @@
+Changes
+lib/UltraDNS.pm
+lib/UltraDNS/Methods.pm
+lib/UltraDNS/Parser.pm
+lib/UltraDNS/Type.pm
+Makefile.PL
+MANIFEST
+NUS_API_XML.errata
+mk_methods.pl
+README
+t/00.load.t
+t/01-connect.t
+t/02-basic.t
+t/03-err.t
+t/30-get.t
+t/perlcritic.t
+t/perlcriticrc
+t/pod-coverage.t
+t/pod.t
+t/util.pl
+META.yml                                 Module meta-data (added by MakeMaker)

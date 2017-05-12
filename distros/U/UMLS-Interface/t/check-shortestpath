@@ -1,0 +1,63 @@
+#!/usr/bin/perl
+
+my $file1 = shift;
+my $file2 = shift;
+
+open(FILE1, $file1) || die "Could not open $file1\n";
+open(FILE2, $file2) || die "Could not open $file2\n";
+
+my %hash1 = ();
+my %hash2 = ();
+
+my $cui1 = "";
+my $cui2 = "";
+
+while(<FILE1>) { 
+    chomp;
+    
+    if($_=~/The shortest path between/) { 
+	$_=~/\((C[0-9]+)\) and .*? \((C[0-9]+)\):/;
+	$cui1 = $1;
+	$cui2 = $2;
+    }
+    if($_=~/=>/) { 
+	$hash1{$cui1}{$cui2}{$_}++;
+    }
+}
+    
+while(<FILE2>) { 
+    chomp;
+    
+    if($_=~/The shortest path between/) { 
+	$_=~/\((C[0-9]+)\) and .*? \((C[0-9]+)\):/;
+	$cui1 = $1;
+	$cui2 = $2;
+    }
+    if($_=~/=>/) { 
+	$hash2{$cui1}{$cui2}{$_}++;
+    }
+}
+    
+foreach my $c1 (sort keys %hash1) { 
+    foreach my $c2 (sort keys %{$hash1{$c1}}) {
+	foreach my $path (sort keys %{$hash1{$c1}{$c2}}) {
+	    if(!exists $hash2{$c1}{$c2}{$path}) { 
+		print "ERROR FILE 1: $c1 $c2\n";
+		exit;
+	    }
+	}
+    }
+}
+
+    
+foreach my $c1 (sort keys %hash2) { 
+    foreach my $c2 (sort keys %{$hash2{$c1}}) {
+	foreach my $path (sort keys %{$hash2{$c1}{$c2}}) {
+	    if(!exists $hash1{$c1}{$c2}{$path}) { 
+		print "ERROR for FILE 2: $c1 $c2\n";
+		exit;
+	    }
+	}
+    }
+}
+	

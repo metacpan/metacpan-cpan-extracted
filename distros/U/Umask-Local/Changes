@@ -1,0 +1,9 @@
+Revision history for Umask-Local
+
+1.0     Wed Mar 12 2014
+        Rename module to Umask::Local
+        move to the Module::Starter layout
+
+0.01    Thu Feb 27 12:41:07 2014
+        First version, released on an unsuspecting world.
+

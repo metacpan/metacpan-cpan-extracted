@@ -1,0 +1,57 @@
+#!/usr/bin/perl
+use v5.14;
+use warnings;
+use UAV::Pilot::Wumpus;
+use UAV::Pilot::Wumpus::Server;
+use Getopt::Long ();
+
+my %BACKENDS = (
+    rpi => 'UAV::Pilot::Wumpus::Server::Backend::RaspberryPiI2C',
+    spektrum => 'UAV::Pilot::Wumpus::Server::Backend::Spektrum',
+    logger => 'UAV::Pilot::Wumpus::Server::Backend::Logger',
+);
+
+my $BACKEND = 'logger';
+my $PORT = UAV::Pilot::Wumpus::DEFAULT_PORT;
+my $SERIAL_PORT = '/dev/ttyAMA0';
+Getopt::Long::GetOptions(
+    'port=i' => \$PORT,
+    'backend=s' => \$BACKEND,
+    'serial-port=s' => \$SERIAL_PORT,
+);
+die "Unknown --backend parameter '$BACKEND', known backends are: " 
+    . join( ', ', keys %BACKENDS ) . "\n"
+    unless exists $BACKENDS{$BACKEND};
+
+my $BACKEND_CLASS = $BACKENDS{$BACKEND};
+eval "use $BACKEND_CLASS";
+die $@ if $@;
+
+
+sub setup_backend
+{
+    my ($backend_class) = @_;
+
+    my $backend;
+    if( $backend_class eq $BACKENDS{'spektrum'} ) {
+        $backend = $backend_class->new({
+            port => $SERIAL_PORT,
+        });
+    }
+    else {
+        $backend = $backend_class->new;
+    }
+
+    return $backend;
+}
+
+{
+    my $backend = setup_backend( $BACKEND_CLASS );
+    my $server = UAV::Pilot::Wumpus::Server->new({
+        listen_port => $PORT,
+        backend     => $backend,
+    });
+
+    warn "Ready!\n";
+    $server->start_listen_loop;
+}

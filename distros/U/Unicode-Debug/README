@@ -1,0 +1,91 @@
+NAME
+    Unicode::Debug - debug Unicode strings
+
+SYNOPSIS
+     use Unicode::Debug;
+ 
+     print unidebug("Héllò Wörld"), "\n";
+
+DESCRIPTION
+    Makes non-ASCII/non-printable characters in a string blindingly obvious.
+
+  Functions
+    `unidebug`
+        This function replaces "unusual" characters in strings with a Perl
+        escape sequence that will have the same effect. The example in the
+        SYNOPSIS outputs this:
+
+         H\x{00e9}ll\x{00f2} W\x{00f6}rld
+
+        Which characters are considered unusual? Everything outside the range
+        \x20 to \x7F. (The \t, \r and \n characters are handled separately.)
+
+        To ensure that `unidebug` is reversible, backslashes in the input are
+        doubled in the output.
+
+        Called in void context, it modifies the strings passed to it in-place.
+        For example, the following will output the same as the previous
+        example.
+
+          my @strings = ("Héllò", "Wörld");
+          unidebug(@strings);
+          say(join " ", @strings);
+
+        Called in list context, it returns modified versions of the strings
+        passed to it. Another example:
+
+          my @strings = unidebug("Héllò", "Wörld");
+          say(join " ", @strings);
+
+        Called in scalar context, it acts the same as in list context, but
+        only returns the first modified string.
+
+    `unidecode`
+        An alias for `unidebug`, to use as a drop-in replacement for
+        Text::Unidecode.
+
+  Package Variables
+    OK, so global variables are perhaps not the best way to configure things,
+    but we have `local` so quit complaining.
+
+   $Unicode::Debug::Whitespace
+    If set to true, debugs "\r", "\n" and "\t" as well. They are substituted
+    as follows:
+
+     "\r\n"    => "\\r\\n\n"
+     "\r"      => "\\r\n"
+     "\n"      => "\\n\n"
+     "\t"      => "\\t"
+
+    When false, these whitespace characters are passed through unchanged.
+    False by default.
+
+   $Unicode::Debug::Names
+    If set to true, will use charnames to show character names for substituted
+    characters. "Wörld" becomes:
+
+     W\N{LATIN SMALL LETTER O WITH DIAERESIS}rld
+
+    False by default.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Unicode-Debug>.
+
+SEE ALSO
+    PerlIO::via::UnicodeDebug, Devel::Unicode.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012-2013 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

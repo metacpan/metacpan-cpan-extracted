@@ -1,0 +1,28 @@
+---
+abstract: 'Helper class for creating distributed lists of URLs based on their host name, domain name or TLDs.'
+author:
+  - 'Tore Aursand <toreau@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '7.24'
+  Test::More: '1.302059'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: URL-List
+requires:
+  Carp: '1.38'
+  Domain::PublicSuffix: '0.14'
+  List::MoreUtils: '0.416'
+  Moose: '2.1806'
+  URI: '1.71'
+  namespace::autoclean: '0.28'
+resources:
+  bugtracker: https://github.com/toreau/URL-List/issues
+  repository: https://github.com/toreau/URL-List
+version: '0.13'
+x_serialization_backend: 'YAML::Tiny version 1.69'

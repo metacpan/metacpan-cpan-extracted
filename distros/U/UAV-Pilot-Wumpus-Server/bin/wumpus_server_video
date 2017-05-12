@@ -1,0 +1,377 @@
+#!/usr/bin/perl
+use v5.14;
+use warnings;
+use Glib qw( TRUE FALSE );
+use GStreamer1;
+use Digest::Adler32::XS;
+use IO::Socket::INET ();
+use IO::Select ();
+use UAV::Pilot::Wumpus ();
+use Getopt::Long ();
+
+use constant {
+    VIDEO_MAGIC_NUMBER => 0xFB42,
+    VIDEO_VERSION      => 0x0000,
+    VIDEO_ENCODING     => 0x0001,
+};
+use constant {
+    FLAG_HEARTBEAT => 0,
+    FLAG_KEYFRAME => 1,
+    FLAG_FRAME_COUNT_OVERFLOW => 2,
+};
+use constant HEARTBEAT_TIMEOUT_SEC       => 60;
+use constant TYPE_TO_CLASS => {
+    'rpi' => [
+        'rpicamsrc',
+    ],
+    'stdin' => [
+        'fdsrc',
+    ],
+};
+
+#my $INPUT_DEV        = '/dev/video0';
+my $WIDTH  = 640;
+my $HEIGHT = 480;
+my $PORT   = UAV::Pilot::Wumpus->DEFAULT_VIDEO_PORT;
+my $TYPE   = 'rpi';
+my $FPS = 30;
+my $BITRATE = 0;
+my $VBR_QUANT = 15;
+my $KEYFRAME_INTERVAL = 1;
+my $SENSOR_MODE = undef;
+Getopt::Long::GetOptions(
+    #'input=s'  => \$INPUT_DEV,
+    'w|width=i'  => \$WIDTH,
+    'h|height=i' => \$HEIGHT,
+    'p|port=i'   => \$PORT,
+    't|type=s'   => \$TYPE,
+    'f|fps=i' => \$FPS,
+    'b|bitrate=i' => \$BITRATE,
+    'v|vbr-quant=i' => \$VBR_QUANT,
+    'k|keyframe-interval=i' => \$KEYFRAME_INTERVAL,
+);
+die "Type '$TYPE' is not supported\n"
+    unless exists TYPE_TO_CLASS->{$TYPE};
+
+
+sub bus_error_callback
+{
+    my ($bus, $msg, $loop) = @_;
+    my $s = $msg->get_structure;
+    warn $s->get_value('gerror')->message . "\n";
+    $loop->quit;
+    return FALSE;
+}
+
+sub bus_eos_callback
+{
+    my ($bus, $msg, $loop) = @_;
+    say "Got End of Stream";
+    $loop->quit;
+    return TRUE;
+}
+
+sub get_catch_handoff_callback
+{
+    my ($args) = @_;
+    my $print_callback        = $args->{print_callback};
+    my $check_client_callback = $args->{check_client_callback};
+    my $wait_for_next_client_callback
+        = $args->{wait_for_next_client_callback};
+    my $start_callback = $args->{start_callback};
+    my $stop_callback = $args->{stop_callback};
+    my $digest = Digest::Adler32::XS->new;
+    my $called = 0;
+
+    my $callback = sub {
+        my ($sink, $data_buf, $pad) = @_;
+        my $frame_size = $data_buf->get_size;
+        my $frame_data = $data_buf->extract_dup( 0, $frame_size,
+            undef, $frame_size );
+        my $data = pack "C*", @$frame_data;
+
+        my $overflow_flag = 0;
+        if( $called > (2**32 - 1) ) {
+            $overflow_flag = 1;
+            $called = 0;
+        }
+
+        # TODO find if this frame is actually a keyframe based on the 
+        # GStreamer objects
+        my $is_keyframe = $KEYFRAME_INTERVAL == 1 ? 1 : 0;
+
+        $digest->add( $data );
+        my $checksum = $digest->hexdigest;
+        warn "Frame $called, Buffer size: $frame_size, Checksum: $checksum\n";
+
+        if( $wait_for_next_client_callback->() ) {
+            # We got a new client, so we need to restart the whole
+            # pipeline
+            $stop_callback->();
+            $start_callback->();
+        }
+        else {
+            output_video_frame( $data, $frame_size, $checksum,
+                $WIDTH, $HEIGHT,
+                $print_callback, $check_client_callback,
+                $called, $overflow_flag, $is_keyframe );
+        }
+
+        $called++;
+        return 1;
+    };
+
+    return $callback;
+}
+
+sub output_video_frame
+{
+    my ($frame_data, $frame_size, $checksum_hex, $width, $height,
+        $print_callback, $check_client_callback,
+        $frame_count, $overflow_flag,
+        $is_keyframe) = @_;
+    my $flags = 0x00000000;
+
+    if( $is_keyframe ) {
+        $flags |= 1 << FLAG_KEYFRAME;
+    }
+    if( $overflow_flag ) {
+        $flags |= 1 << FLAG_FRAME_COUNT_OVERFLOW;
+    }
+
+
+    warn "Constructing output headers\n";
+    my $out = pack 'nnnNNnnnnC*'
+        ,VIDEO_MAGIC_NUMBER
+        ,VIDEO_VERSION
+        ,VIDEO_ENCODING
+        ,$flags
+        ,$frame_size
+        ,$width
+        ,$height
+        ,unpack( 'C*', hex($checksum_hex) )
+        ,$frame_count
+        ,( (0x00) x 6 ) # 6 bytes reserved
+        , unpack( 'C*', $frame_data );
+        ;
+
+    warn "Printing data\n";
+    $print_callback->( $out );
+    return 1;
+}
+
+sub setup_network_callbacks
+{
+    my ($port, $start_callback, $stop_callback) = @_;
+
+    my $socket = IO::Socket::INET->new(
+        LocalPort => $port,
+        Proto     => 'udp',
+        ReuseAddr => 1,
+        Blocking  => 0,
+    ) or die "Could not start socket on port $port: $!\n";
+    IO::Handle::blocking( $socket, 0 );
+
+    my $client              = undef;
+    my $last_heartbeat_read = undef;
+
+    my $print_callback = sub {
+        my ($data) = @_;
+        return 1 if ! defined $client;
+
+        eval {
+            warn "Sending data\n";
+            $client->print( $data );
+        };
+        if( $@ ) {
+            warn "Error sending data: $@\n";
+            warn "Dropping client\n";
+            $client->close;
+            undef $client;
+            undef $last_heartbeat_read;
+            $stop_callback->();
+        }
+
+        return 1;
+    };
+    my $wait_for_next_client_callback = sub {
+        return 0 if defined $client;
+        $stop_callback->();
+        my $msg;
+        if( my $got_client = $socket->recv( $msg, 1024 ) ) {
+            my $addr = $socket->peerhost;
+            my $port = $socket->peerport;
+            warn "Got new client connection at $addr:$port\n";
+
+            $client = IO::Socket::INET->new(
+                PeerAddr => $addr,
+                PeerPort => $port,
+                Proto    => 'udp',
+                ReuseAddr => 1,
+                Blocking => 0,
+            ) or die "Could not start socket: $!\n";
+            IO::Handle::blocking( $client, 0 );
+
+            $client->autoflush( 1 );
+            $last_heartbeat_read = time;
+            $start_callback->();
+            return 1;
+        }
+        else {
+            #warn "No client connection\n";
+            return 0;
+        }
+    };
+    my $check_client_callback = sub {
+        warn "Checking client\n";
+        if( defined $client) {
+            if( read_heartbeat( $client ) ) {
+                $last_heartbeat_read = time();
+            }
+            if( HEARTBEAT_TIMEOUT_SEC <= time() - $last_heartbeat_read ) {
+                $client->close;
+                undef $client;
+                undef $last_heartbeat_read;
+                return 0;
+            }
+        }
+
+        return 1;
+    };
+
+    return ($print_callback, $check_client_callback, $wait_for_next_client_callback);
+}
+
+sub read_heartbeat
+{
+    my ($socket) = @_;
+    warn "Reading for heartbeat\n";
+    my $buf;
+    if( $socket->recv( \$buf, 16 ) ) {
+        my ($magic_number, $digest) = unpack 'nN', $buf;
+        if( VIDEO_MAGIC_NUMBER == $magic_number ) {
+            warn "Got heartbeat from client\n";
+            return 1;
+        }
+        else {
+            warn "Got message from client with bad magic number\n";
+        }
+    }
+    return 0;
+}
+
+sub is_heartbeat_expired
+{
+    my ($pending_heartbeats) = @_;
+    my $time = time;
+
+    foreach (keys %$pending_heartbeats) {
+        if( $pending_heartbeats->{$_} <= $time ) {
+            warn "Heartbeat $_ expiring at $$pending_heartbeats{$_}"
+                . " has expired (current time: $time)\n";
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+sub get_start_stop_callbacks
+{
+    my ($pipeline, $loop) = @_;
+    my $is_started = 0;
+
+    my $start = sub {
+        return if $is_started;
+        $pipeline->set_state( 'playing' );
+        $loop->run;
+        $is_started = 1;
+    };
+
+    my $stop = sub {
+        return if ! $is_started;
+        $pipeline->set_state( 'null' );
+        $is_started = 0;
+    };
+
+    return ($start, $stop);
+}
+
+
+{
+    GStreamer1::init([ $0, @ARGV ]);
+    my $loop = Glib::MainLoop->new( undef, FALSE );
+
+    my ($src_name, @src_config) = @{ +TYPE_TO_CLASS->{$TYPE} };
+
+    say "Generating pipeline elements";
+    my $pipeline = GStreamer1::Pipeline->new( 'pipeline' );
+    my $src = GStreamer1::ElementFactory::make( $src_name => 'and_who_are_you' );
+    my $h264 = GStreamer1::ElementFactory::make(
+        h264parse => 'the_proud_lord_said' );
+    my $capsfilter = GStreamer1::ElementFactory::make(
+        capsfilter => 'that_i_should_bow_so_low' );
+    my $fakesink = GStreamer1::ElementFactory::make(
+        fakesink   => 'only_a_cat_of_a_different_coat');
+
+    say "Setting element params";
+    if( $src_name eq 'rpicamsrc' ) {
+        $src->set(
+            bitrate => $BITRATE,
+            'keyframe-interval' => $KEYFRAME_INTERVAL,
+            ($BITRATE == 0
+                ? ('quantisation-parameter' => $VBR_QUANT) : ()),
+            (defined $SENSOR_MODE
+                ? ('sensor-mode' => $SENSOR_MODE) : ()),
+        );
+    }
+
+    my $caps = GStreamer1::Caps::Simple->new( 'video/x-h264',
+        alignment       => 'Glib::String' => 'au',
+        'stream-format' => 'Glib::String' => 'byte-stream',
+        width           => 'Glib::Int'    => $WIDTH,
+        height          => 'Glib::Int'    => $HEIGHT,
+        #framerate => 'Glib::Double' => ($FPS / 1),
+    );
+    $capsfilter->set( caps => $caps );
+
+    $src->set( @src_config ) if @src_config;
+
+    say "Getting callbacks";
+    my ($start_callback, $stop_callback) = get_start_stop_callbacks(
+        $pipeline, $loop );
+    my ($print_callback, $check_client_callback,
+        $wait_for_next_client_callback) = setup_network_callbacks(
+            $PORT, $start_callback, $stop_callback );
+    $fakesink->set(
+        'signal-handoffs' => TRUE,
+    );
+    $fakesink->signal_connect(
+        'handoff' => get_catch_handoff_callback({
+            print_callback        => $print_callback,
+            check_client_callback => $check_client_callback,
+            wait_for_next_client_callback
+                => $wait_for_next_client_callback,
+            start_callback => $start_callback,
+            stop_callback => $stop_callback,
+        }),
+    );
+
+    say "Linking elements";
+    my @link = ($src, $h264, $capsfilter, $fakesink);
+    $pipeline->add( $_ ) for @link;
+    foreach my $i (0 .. $#link - 1) {
+        my $this = $link[$i];
+        my $next = $link[$i+1];
+        $this->link( $next );
+    }
+
+    say "Setting up pipeline bus";
+    my $bus = $pipeline->get_bus;
+    $bus->add_signal_watch;
+    $bus->signal_connect( 'message::error', \&bus_error_callback, $loop );
+    $bus->signal_connect( 'message::eos', \&bus_eos_callback, $loop );
+
+    say "Ready to serve on port $PORT . . . ";
+    while(1) { $wait_for_next_client_callback->() }
+}

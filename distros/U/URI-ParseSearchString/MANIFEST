@@ -1,0 +1,13 @@
+Changes
+examples/example.pl
+lib/URI/ParseSearchString.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/00-load.t
+t/kwalitee.t
+t/parse.t
+t/pod-coverage.t
+t/pod.t
+META.json                                Module JSON meta-data (added by MakeMaker)

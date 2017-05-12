@@ -1,0 +1,41 @@
+{
+   "abstract" : "Unicode Versions of Some Perl Operators",
+   "author" : [
+      "philiprbrenan@gmail.com"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "UnicodeOperators",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Filter::Util::Call" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "UnicodeOperators" : {
+         "file" : "lib/UnicodeOperators.pm",
+         "version" : "1.002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "1.002"
+}

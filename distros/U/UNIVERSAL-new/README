@@ -1,0 +1,61 @@
+NAME
+    UNIVERSAL::new - Load a module when you call the new method on it
+
+VERSION
+    version 0.001
+
+SYNOPSIS
+      use UNIVERSAL::new;
+
+      my $object = HTTP::Tiny->new; # HTTP::Tiny gets loaded
+
+DESCRIPTION
+    This module installs a universal, fallback "new" method. When called, it
+    loads the invoking module like "require" would. If the module has a
+    "new" method, control is transferred to that method.
+
+    This is most useful for command line scripts via the U alias:
+
+      $ perl -MU -we 'HTTP::Tiny->new->mirror(...)'
+
+    Otherwise, you wind up repeating your module name, and that's painful
+    for a "one-liner":
+
+      $ perl -MHTTP::Tiny -we 'HTTP::Tiny->new->mirror(...)'
+
+    If the module is not installed or if it does not have a "new" method,
+    the usual exceptions are thrown.
+
+CAVEAT
+    Warning: Mucking with UNIVERSAL is a potentially fragile, global hack
+    that could have unintended consequences. You should not use it in
+    production unless you are willing to accept that risk.
+
+SEE ALSO
+    *   CPAN modules that (can) load other modules
+        <http://neilb.org/reviews/module-loading.html> by Neil Bowers
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/dagolden/universal-new/issues>. You will be notified
+    automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/universal-new>
+
+      git clone git://github.com/dagolden/universal-new.git
+
+AUTHOR
+    David Golden <dagolden@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2013 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

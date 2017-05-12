@@ -1,0 +1,67 @@
+
+
+=pod
+
+=head1 NAME
+
+ur update pod - generate man-page-like POD for a commands
+
+
+
+=head1 VERSION
+
+This document describes ur update pod version 0.29.
+
+(built on 2011-03-07 at 10:34:30)
+
+=head1 SYNOPSIS
+
+ur update pod [--input-path=?] [--output-path=?] EXECUTABLE-NAME CLASS-NAME TARGETS
+
+ur update pod -i ./lib -o ./pod ur UR::Namespace::Command
+
+
+=head1 REQUIRED ARGUMENTS
+
+=over
+
+
+=item EXECUTABLE-NAME  I<Text>
+
+the name of the executable to document
+
+=item CLASS-NAME  I<Text>
+
+the command class which maps to the executable
+
+=item TARGETS  I<Text>
+
+specific classes to document (documents all unless specified)
+
+
+=back
+
+=head1 OPTIONAL ARGUMENTS
+
+=over
+
+
+=item input-path  I<Path>
+
+optional location of the modules to document
+
+=item output-path  I<Text>
+
+optional location to output .pod files
+
+
+=back
+
+=head1 DESCRIPTION:
+
+This tool generates POD documentation for each all of the commands in a tree for a given executable.
+
+This command must be run from within the namespace directory.
+
+=cut
+

@@ -1,0 +1,49 @@
+{
+   "abstract" : "Ubic service module for Mojolicious Hypnotoad",
+   "author" : [
+      "Alexander Karelas <karjala@karjala.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Ubic-Service-Hypnotoad",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Capture::Tiny" : "0.15",
+            "File::Basename" : "0",
+            "Time::HiRes" : "0",
+            "Ubic::Result" : "0",
+            "Ubic::Service::Skeleton" : "0",
+            "perl" : "5.010",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/akarelas/ubic-service-hypnotoad/issues"
+      },
+      "homepage" : "https://github.com/akarelas/ubic-service-hypnotoad",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/akarelas/ubic-service-hypnotoad.git",
+         "web" : "https://github.com/akarelas/ubic-service-hypnotoad"
+      }
+   },
+   "version" : "0.3005"
+}
+

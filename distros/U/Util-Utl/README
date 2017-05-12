@@ -1,0 +1,95 @@
+NAME
+    Util::Utl - Scalar::Util, List::Util, List::MoreUtils, String::Util &
+    more (via one subroutine)
+
+VERSION
+    version 0.0011
+
+SYNOPSIS
+        use Util::Utl;
+
+        utl->first( { ... }, ... )
+
+        if ( utl->blessed( ... ) ) {
+        }
+
+        if ( utl->looks_like_number( ... ) ) {
+        }
+
+DESCRIPTION
+    Util::Utl exports a single subroutine "utl" which provides access to:
+
+    Scalar::Util
+
+    List::Util
+
+    List::MoreUtils
+
+    String::Util
+
+USAGE
+    Util::Utl also provides some additional functionality
+
+    Each function here is accessed in the same way:
+
+        utl->$name( ... )
+
+  empty( $value )
+    Returns true if $value is undefined or has 0-length
+
+  blank( $value )
+    Returns true if $value is undefined or is composed only of whitespace
+    (\s)
+
+  first( $code, ... )
+    List::Util::first
+
+  first( $hash, @query, $options )
+        %hash = ( a => 1, b => 2, c => 3 )
+        ... = utl->first( \%hash, qw/ z a b / ) # Returns 1
+
+    For each name in @query, test $hash to see if it exists. Returns the
+    value of the first entry found
+
+    Returns undef if none exist
+
+    $options (a HASH reference) are:
+
+        exclusive       True to throw an exception if more than 1 of query is present
+                        in $hash
+
+                            %hash = ( a => 1, b => 2, c => 3 )
+
+                            ... = utl->first( \%hash, qw/ a b /, { exclusive => 1 } )
+                            # Throws an exception (die)
+
+                            ... = utl->first( \%hash, qw/ a z /, { exclusive => 1 } )
+                            # Does not throw an exception 
+
+        test            A subroutine for testing whether a value should be included or not. Can be
+                        used to skip over undefined or empty values
+
+                            %hash = ( a => undef, b => '', c => 1 )
+
+                            ... = utl->first( \%hash, qw/ a b c /, { test => sub { defined } } )
+                            # Returns ''
+
+        empty           True to return an empty list instead of undef if none are found
+
+                            %hash = ( a => 1 )
+                        
+                            ... = utl->first( \%hash, qw/ z x y / )
+                            # Returns undef
+
+                            ... = utl->first( \%hash, qw/ z x y /, { empty => 1 } )
+                            # Returns ()
+
+AUTHOR
+    Robert Krimen <robertkrimen@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Robert Krimen.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

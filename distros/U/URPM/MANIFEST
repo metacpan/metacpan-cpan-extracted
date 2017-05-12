@@ -1,0 +1,26 @@
+README
+MANIFEST
+Makefile.PL
+perl_math_int64.c
+perl_math_int64.h
+typemap
+URPM.xs
+URPM.pm
+URPM/Build.pm
+URPM/Resolve.pm
+URPM/Signature.pm
+t/00prepare.t
+t/01setter-getter.t
+t/buggy_synthesis.cz
+t/empty_synthesis.cz
+t/fatal.t
+t/parse.t
+t/pod.t
+t/rpmdb.t
+t/sort_graph.t
+t/synthesis.t
+t/test-rpm.spec
+ChangeLog
+META.yml                                 Module meta-data (added by MakeMaker)
+NEWS
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,8 @@
+root:x:0:10:Charlie root:/:/bin/csh
+daemon:x:1:31:Mr Background:/:
+bin:x:2:100:System and local source:/bin:/bin/csh
+sys:x:3:3:Mr Kernel:/:/bin/csh
+adm:x:4:14:Adm account:/usr/adm:/bin/csh
+lp:x:71:100:Line Printer Account:/usr/lib/lp:
+myself:x:17:200:Me:/net/myself:/bin/csh
+nobody:x:60001:60001:Unprivileged user:/:/bin/false

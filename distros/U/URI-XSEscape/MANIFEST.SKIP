@@ -1,0 +1,5 @@
+gonzo/*
+.git/*
+tools/encode/encode
+tools/encode/encode.o
+tools/encode/uri_tables.h

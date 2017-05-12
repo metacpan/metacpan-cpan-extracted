@@ -1,0 +1,12 @@
+Revision history for Perl extension Unicode::Transliterate.
+
+0.3 Tue Jul 16 12:59:56 2002
+	- Simplified the U_CAPI void U_EXPORT2 checkErrorCode (int* errorCode_PTR)
+	C subroutine thanks to Ram Viswanadha <ram@jtcsv.com>
+
+0.2  ???
+
+0.1  Tue Jan  8 11:24:22 2002
+	- original version; created by h2xs 1.20 with options
+		-O -n Unicode::Transliterate ./Unicode/Transliterate/transwrap/transwrap.h
+

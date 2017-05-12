@@ -1,0 +1,26 @@
+Changes
+lib/POD2/JA/Unicode/Precis.pod
+lib/POD2/JA/Unicode/Precis/Nickname.pod
+lib/POD2/JA/Unicode/Precis/OpaqueString.pod
+lib/POD2/JA/Unicode/Precis/UsernameCaseMapped.pod
+lib/POD2/JA/Unicode/Precis/UsernameCasePreserved.pod
+lib/Unicode/Precis.pm
+lib/Unicode/Precis/Nickname.pm
+lib/Unicode/Precis/OpaqueString.pm
+lib/Unicode/Precis/UsernameCaseMapped.pm
+lib/Unicode/Precis/UsernameCasePreserved.pm
+Makefile.PL
+MANIFEST
+README
+t/00use.t
+t/01decomposeWidth.t
+t/01mapSpace.t
+t/pod.t
+Utils/data/utils.pl
+Utils/Makefile.PL
+Utils/ppport.h
+Utils/Utils.pm
+Utils/Utils.xs
+Utils/precis_utils.c
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

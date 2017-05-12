@@ -1,0 +1,27 @@
+CHANGELOG
+FAQ
+FDL.txt
+GPL.txt
+Hadoop/jar/CUICollectorMapReduce-0.0.1-SNAPSHOT.jar
+Hadoop/pom.xml
+Hadoop/README
+Hadoop/src/main/java/Hadoop/CUICollectorMapReduce/ArticleCollector.java
+Hadoop/src/main/java/Hadoop/CUICollectorMapReduce/CUICollector.java
+Hadoop/src/test/java/Hadoop/CUICollectorMapReduce/AppTest.java
+Hadoop/TODO
+INSTALL
+lib/UMLS/Association.pm
+lib/UMLS/Association/CUICollector.pm
+lib/UMLS/Association/CuiFinder.pm
+lib/UMLS/Association/ErrorHandler.pm
+lib/UMLS/Association/StatFinder.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/CuiCollector.t
+t/functions.t
+TODO
+utils/CUICollector.pl
+utils/umls-association.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

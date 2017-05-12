@@ -1,0 +1,88 @@
+{
+   "abstract" : "to export any utilities and to create your own utility module",
+   "author" : [
+      "Ktat, C<< <ktat at cpan.org> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.2.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Util-Any",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Clone" : "0",
+            "Data::Dumper" : "0",
+            "ExportTo" : "0",
+            "Hash::Util" : "0",
+            "List::MoreUtils" : "0",
+            "List::Pairwise" : "0",
+            "List::Util" : "0",
+            "Module::Pluggable" : "0",
+            "Scalar::Util" : "0",
+            "String::CamelCase" : "0",
+            "String::Util" : "0",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "provides" : {
+      "Util::Any" : {
+         "file" : "lib/Util/Any.pm",
+         "version" : "0.25"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ktat/Util-Any/issues"
+      },
+      "homepage" : "https://github.com/ktat/Util-Any",
+      "repository" : {
+         "url" : "git://github.com/ktat/Util-Any.git",
+         "web" : "https://github.com/ktat/Util-Any"
+      }
+   },
+   "version" : "0.25",
+   "x_contributors" : [
+      "drry <drry@d0d07461-0603-4401-acd4-de1884942a52>",
+      "ktat <ktat@d0d07461-0603-4401-acd4-de1884942a52>",
+      "ktat <ktat.is@gmail.com>"
+   ]
+}

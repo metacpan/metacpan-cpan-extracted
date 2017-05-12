@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/UNIVERSAL-derived_classes.t
+lib/UNIVERSAL/derived_classes.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,35 @@
+---
+abstract: 'Implements the Parrot AR.Drone under UAV::Pilot'
+author:
+  - 'Timm Murray <tmurray@wumpus-cave.net>'
+build_requires:
+  Test::Pod: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+  File::ShareDir::Install: 0.06
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: UAV-Pilot-ARDrone
+recommends:
+  UAV::Pilot::SDL: 0.3
+  UAV::Pilot::Video::Ffmpeg: 0
+requires:
+  AnyEvent: 0
+  AnyEvent::ReadLine::Gnu: 0
+  IO::Socket::Multicast: 0
+  Math::Trig: 0
+  Moose: 0
+  MooseX::Event: 0
+  String::CRC32: 0
+  Test::More: 0
+  Time::HiRes: 0
+  UAV::Pilot: 1.1
+  namespace::autoclean: 0
+resources:
+  homepage: http://www.wumpus-cave.net
+  repository: https://github.com/frezik/UAV-Pilot-ARDrone
+version: 1.1

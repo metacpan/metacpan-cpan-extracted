@@ -1,0 +1,80 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/Unicode-Debug/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.008001"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.47"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Unicode-Debug>;
+	doap:created         "2012-04-26"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/Unicode-Debug>;
+	doap:homepage        <https://metacpan.org/release/Unicode-Debug>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "Unicode-Debug";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Unicode-Debug/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Unicode-Debug/v_0-002>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-unicode-debug>;
+	];
+	doap:shortdesc       "debug unicode strings".
+
+<http://purl.org/NET/cpan-uri/dist/Unicode-Debug/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "Unicode-Debug-0.001"^^xsd:string;
+	dc:issued            "2012-04-26"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Unicode-Debug-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Unicode-Debug/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "Unicode-Debug-0.002"^^xsd:string;
+	dc:issued            "2013-11-09"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "use Dist::Inkt.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Backport to Perl 5.8.1.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Drop smart match usage.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "General tidy-ups.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Document usage of PerlIO::via::UnicodeDebug with Test::More.";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "Update xt tests.";
+		], [
+			a doap-changeset:Documentation, doap-changeset:Tests;
+			rdfs:label "Document the test suite.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Unicode-Debug-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+

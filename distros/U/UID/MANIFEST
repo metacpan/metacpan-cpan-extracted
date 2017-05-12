@@ -1,0 +1,8 @@
+Build.PL
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+README
+lib/UID.pm
+t/tests.t
+t/pod.t

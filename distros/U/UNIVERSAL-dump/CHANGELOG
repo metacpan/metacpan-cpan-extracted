@@ -1,0 +1,29 @@
+0.06	1 April 2012
+	Refactored a bit of code.  Verified it runs on 5.14.2 threaded and
+	unthreaded.
+
+0.05	15 November 2006
+	Some code cleanup.  Added pod about direct coderefs.
+
+0.04	29 January 2004
+	*INCOMPATIBILITY CHANGE*
+	Added notion of presets, so that you don't need to know the magic
+	subroutine names anymore.  Added presets blessed, dump, peek and
+	refaddr and documentation about it.  Added support for installing
+	a different method name using the name of the preset as the subroutine
+	specification.  Added test-suite as well.
+
+	This change should simplify the usage of this module significantly.
+
+0.03	29 January 2004
+	Added check for attempting to install the same method with a different
+	subroutine: now dies if that happens.  Added tests for it as well.
+
+	Added example of "blessed".
+
+0.02	29 January 2004
+	Argh.  Possible namespace clash with CPAN.  Added extra package
+	specification to prevent any clashes.
+
+0.01	29 January 2004
+	First version of UNIVERSAL::dump.

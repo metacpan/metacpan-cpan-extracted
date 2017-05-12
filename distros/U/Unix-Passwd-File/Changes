@@ -1,0 +1,193 @@
+Revision history for Perl extension Unix-Passwd-File
+
+0.23    2016-10-07 (PERLANCAR)
+
+	- [Experimental] Increase safety/compatibility with other programs that
+	  might write to the passwd files by locking all the
+	  passwd/shadow/group/gshadow files themselves instead of just
+	  passwd.lock file (see [GH#1]).
+
+	- [Bugfix] Regression bug, when we switched to File::Flock::Retry,
+	  locking was accidentally always done for all actions including
+	  read-only ones [GH#1].
+
+
+0.22    2015-10-22 (PERLANCAR)
+
+	- No functional changes.
+
+	- Replace File::Flock with the more lightweight File::Flock::Retry.
+
+
+0.21    2015-09-06 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.20    2015-07-01 (PERLANCAR)
+
+	- No functional changes.
+
+	- Fix Rinci metadata (add missing args 'schema's).
+
+
+0.19    2015-07-01 (PERLANCAR)
+
+	- No functional changes.
+
+	- Update Rinci metadata (args_groups -> args_rels).
+
+
+0.18    2015-03-13 (PERLANCAR)
+
+        - No functional changes.
+
+        - [Build] [Bugfix] Rebuild with DZP:Rinci::AddPrereqs 0.02 which no
+          longer add prereqs to Perinci::Sub::ArgEntity::* unless if required by
+          CLI scripts. The addition of Perinci::Sub::ArgEntity::unix_* causes a
+          circular dependency [RT#102700].
+
+
+0.17    2015-03-10 (PERLANCAR)
+
+	- No functional changes.
+
+	- Change result metadata 'result_format_options' ->
+	  'format_options'.
+
+
+0.16    2015-03-07 (PERLANCAR)
+
+	- No functional changes.
+
+	- Tweak/fix Rinci metadata: fix a pos, add some
+          x.schema.{entity,element_entity} for completion.
+
+
+0.15    2015-03-06 (PERLANCAR)
+
+	- No functional changes.
+
+	- Tweak Rinci metadata: add some argument positions, schemas, etc.
+
+
+0.14    2015-03-06 (PERLANCAR)
+
+	- No functional changes.
+
+	- Give hints of table column order when returning detailed list of
+	  users/groups.
+
+
+0.13     2015-03-06 (PERLANCAR)
+
+         - No functional changes.
+
+         - Some minor tweaks and POD fixes.
+
+
+0.12     2014-05-17 (SHARYANTO)
+
+         - No functional changes.
+
+         - Replace File::Slurp with File::Slurp::Tiny.
+
+
+0.11     2014-03-21 (SHARYANTO)
+
+         - No functional changes.
+
+         - Add 'use experimental smartmatch' for perl 5.18.
+
+
+0.10     2012-09-06 (SHARYANTO)
+
+         - Use Crypt::Password::Util's crypt() to create encrypted password in a
+           more portable way.
+
+
+0.09     2012-09-06 (SHARYANTO)
+
+         - No functional changes.
+
+         - In test script, use Crypt::Password::Util's looks_like_crypt() to
+           check encrypted password instead of /^\$6\$/ (implies SSHA512)
+           because different OS'es use different crypt types.
+
+
+0.08     2012-09-05 (SHARYANTO)
+
+         - Add function: set_user_groups().
+
+
+0.07     2012-09-05 (SHARYANTO)
+
+         - Add function: add_delete_user_groups().
+
+
+0.06     2012-09-01 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - Allow adding user with non-unique UID.
+
+         - Allow adding group with non-unique GID.
+
+
+0.05     2012-08-31 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - Add function: list_users_and_groups().
+
+         - Add some overview information about the module.
+
+
+0.04     2012-08-31 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - add_user(): Add option 'group' to allow setting primary group that is
+           not the same as group with the same name as user (e.g.
+           add_user(user=>'nobody', group=>'nogroup')). The group (in this case,
+           'nogroup') must already exist.
+
+
+0.03     2012-08-31 (SHARYANTO)
+
+         - Convert several package-lexical variables into package variables
+           (our) to make it accessible from other packages.
+
+         - Update examples in Synopsis.
+
+
+0.02     2012-08-31 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - Implement the rest of the functions not yet implemented in the
+           previous release: modify_user(), modify_group(), delete_user(),
+           delete_group(), set_user_password(), add_user_to_group(),
+           delete_user_from_group().
+
+         - Add functions: is_member(), user_exists(), group_exists(),
+           get_user_groups().
+
+
+0.01     2012-08-30 (SHARYANTO)
+
+         - First release. I created a new module instead of using
+           Passwd::Unix::Alt mainly because of these reasons: 1) got tired of
+           having to input passwd, shadow, group, gshadow separately; with
+           Unix::Passwd::File I just need to specify etc_dir; 2) I couldn't get
+           locking to work, something which I think is important and I'd rather
+           start with a clean codebase to make sure this and other things work;
+           3) want a cleaner interface, without any global error variable.
+
+           This release does not include some functions yet: modify_user(),
+           modify_group(), delete_user(), delete_group(), set_user_password(),
+           add_user_to_group(), delete_user_from_group().

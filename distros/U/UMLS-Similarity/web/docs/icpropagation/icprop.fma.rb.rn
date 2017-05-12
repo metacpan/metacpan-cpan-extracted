@@ -1,0 +1,6 @@
+SMOOTH: 0
+SAB :: include FMA
+REL :: include RB, RN
+N :: 953
+C0000000<>1
+C2332774<>1

@@ -1,0 +1,83 @@
+UMLS-Similarity
+    This package consists of Perl modules along with supporting Perl
+    programs that implement the semantic similarity and relatedness measures
+    described by Leacock & Chodorow (1998), Wu & Palmer (1994), Nguyen and
+    Al-Mubaid (2006), Rada, et. al. 1989, Patwardhan (2003), Jiang & Conrath
+    (1997), Resnik (1995), Lin (1998), Patwardhan and Pedersen (2006) and a
+    simple path based measure.
+
+TESTING PLATFORMS
+    UMLS-Similarity has been developed and tested on Linux and Solaris,
+    primarily using Perl and the C shell (csh).
+
+REQUIREMENTS
+    UMLS-Similarity REQUIRES that the following software be installed. More
+    details on how to obtain and install appear below.
+
+    --Programming Languages Perl (version 5.8.5 or better)
+
+    --CPAN modules UMLS::Interface
+    	   	   Text::NSP
+                   File::Spec
+                   File::Path
+                   Lingua::Stem
+		   Text::OverlapFinder
+Math::SparseVector;
+
+PROGGRAMMING LANGUAGES
+  Perl (version 5.8.5 or better)
+    Perl is freely available at:
+
+    <http://www.perl.org>
+
+    It is very likely that you will already have Perl installed if you are
+    using a Unix/Linux based system.
+
+CPAN MODULES
+  UMLS-Interface
+    Please see the UMLS-Interface documentation.
+
+INSTALLATION
+    If you have supervisor access, or have configured MCPAN for local
+    install, you can install via:
+
+     perl -MCPAN -e shell
+     > install UMLS-Similarity
+
+    If not, you can, "manually" install by downloading the *.tar.gz file,
+    unpacking, and executing the following commands.
+
+                    perl Makefile.PL PREFIX=/home/programs LIB=/home/lib
+                    make
+                    make test
+                    make install
+
+    Note that the PREFIX and LIB settings are just examples to help you
+    create a local install, if you do not have supervisor (su) access.
+
+    You must include /home/lib in your PERL5LIB environment variable to
+    access this module when running.
+
+    If you have the super-user access, then you can install UMLS-Similarity
+    into system directories via : perl Makefile.PL make make install make
+    clean
+
+    The exact location of where UMLS-Similarity will be installed depends on
+    your system configuration. A message will be printed out after 'make
+    install' telling your exactly where it was installed.
+
+CONTACT US
+    If you have any trouble installing and using UMLS-Interface, please
+    contact us via the users mailing list :
+
+    umls-similarity@yahoogroups.com
+
+    You can join this group by going to:
+
+    <http://tech.groups.yahoo.com/group/umls-similarity/>
+
+    You may also contact us directly if you prefer :
+
+     Bridget T. McInnes: bthomson at cs.umn.edu
+     Ted Pedersen      : tpederse at d.umn.edu
+

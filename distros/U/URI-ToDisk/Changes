@@ -1,0 +1,45 @@
+Revision history for Perl extension URI-ToDisk
+
+1.12 Mon 12 Nov 2007
+	- Updating Module::Install to 0.68
+
+1.11 Sat  4 Aug 2007
+	- Upgrading Module::Install
+
+1.10 Fri  9 Mar 2007
+	- No functional changes
+	- Removing the use of auto_install
+	- Upgrading Module::Install to 0.65
+
+1.09 Sat 15 Apr 2006
+	- No functional changes, no need to upgrade
+	- Moved from old CVS to new SVN repository
+	- Replaced nasty uses of UNIVERSAL::isa with Params::Util::_INSTANCE
+          (Improves correctness and makes URI::ToDisk sub-classable now)
+	- Updated Module::Install to 0.62
+
+1.08 Wed 28 Sep 2005
+	- Renamed from HTML::Location to URI::ToDisk
+	- This resolves the last niggly RT bug CPAN #13774
+	- Has shown itself to be very stable, switching to post 1.00 version
+
+0.7  Tue 15 Feb 2005
+	- Removing braindead Build.PL
+
+0.6  Tue 12 Oct 2004
+	- Fixed Param::Coerce support for subclasses
+
+0.5  Sat  2 Oct 2004
+	- Added support for URI coercion via Param::Coerce
+
+0.4  Sat 18 Sep 2004
+	- Added the ->param static method
+
+0.3  Sat 20 Mar 2004
+	- Some documentation fixes
+
+0.2  Fri 12 Dec 2003
+	- Added a missing dependency on Clone
+
+0.1  Sun  7 Dec 2003
+	- original version

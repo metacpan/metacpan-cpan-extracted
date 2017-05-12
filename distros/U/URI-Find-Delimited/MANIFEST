@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/URI/Find/Delimited.pm
+t/delimited.t
+META.yml                                 Module meta-data (added by MakeMaker)

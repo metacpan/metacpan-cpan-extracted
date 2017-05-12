@@ -1,0 +1,192 @@
+DBMS Installation Notes for UnixODBC.
+
+[Note - "UnixODBC," refers to the Perl module, and, "unixODBC," 
+refers to the unixODBC ODBC driver manager libraries.]
+
+1. Notes about various DBMS's.
+   - MySQL
+   - PostgreSQL
+2. Installing Test Databases
+3. Driver Configuration for UnixODBC.pm tests.
+
+
+1. DBMS Installation Notes
+
+UnixODBC 0.33 has been tested with unixODBC versions 2.2.0 - 2.2.6 
+from EasySoft, with the following platform configurations:
+
+    Operating System          DBMS
+    ----------------          ----
+    Debian GNU/Linux 2.2      MySQL 3.23.42 with MyODBC 3.51.02
+    Debian GNU/Linux 3.0      MySQL 3.23.49 with MyODBC 3.51.02
+                              PostgreSQL 7.2.5
+                              PostgreSQL 7.3.3
+    Solaris 7                 MySQL 3.23.42 with MyODBC 3.51.02
+    Solaris 8                 PostgreSQL 7.2.1
+
+If you need one of these configurations, refer to the instructions in
+the UnixODBC-0.33 archive.
+
+UnixODBC 0.34 has been tested with unixODBC 2.2.12 with the following
+platform configurations.
+
+    Operating System          DBMS
+    ----------------          ----
+    Debian GNU/Linux etch     MySQL 5.0.51 with Connector/ODBC 3.51.23
+                              PostgreSQL 7.4.19 - 8.1.11 with unixODBC 
+                              or psqlODBC drivers [2]
+    Solaris 8                 PostgreSQL 8.2.6 with psqlODBC.
+
+
+    Notes: 1. psqlODBC is not bundled with PostgreSQL.  It is 
+              available separately on the PostgreSQL Web site, 
+              or you can find it by searching the Web. 
+           2. psqlODBC has more recent upgrades than the 
+              libodbcpsql.so driver.  psqlODBC handles PostgreSQL's 
+              socket optimizations much better than libodbcpsql.so after 
+              2.1.11 with PostgreSQL 8.x.x, althought it does not provide 
+              a configuration library.
+- MySQL
+
+MySQL should be configured with the following options:
+
+$ ./configure --prefix=/usr/local/mysql \
+> --enable-thread-safe-client \
+> --enable-load-infile
+
+You can set prefix to whatever directory you want to install MySQL in.  
+Be sure adjust the directories below accordingly.  Connector/ODBC 
+requires the --enable-thread-safe-client option, and UnixODBC.pm requires 
+--enable-load-infile for its tests.
+
+Make sure that the MySQL include files from the source distribution's
+include subdirectory get installed in /usr/local/mysql/include/mysql.
+
+On Linux systems, be sure to add the MySQL library directory,
+/usr/local/mysql/lib/mysql, to /etc/ld.so.conf, and then run ldconfig.
+On Solaris, add the directory to $LD_LIBRARY_PATH.
+
+- Connector/ODBC 
+
+Connector/ODBC needs to be configured with the unixODBC and MySQL 
+configurations:
+
+# ./configure \
+> --with-mysql-path=/usr/local/mysql \
+> --with-unixODBC=/usr/local
+
+- PostgreSQL
+
+The following options configure PostgreSQL for unixODBC:
+
+# ./configure --prefix=/usr/local/pgsql \
+> --enable-thread-safety
+
+To configure psqlODBC:
+
+# export PG_CONFIG=/usr/local/pgsql/bin/pg_config
+# ./configure
+
+PostgreSQL's internal processes reopen one socket for efficiency.
+This can cause UNIX to signal an pipe error if the socket overflows,
+and causes Perl scripts to terminate with, "Broken Pipe," errors.  To 
+catch the socket signals, add a signal handler, like this one, in 
+the Perl scripts:
+
+$SIG{PIPE} = sub { print "SIGPIPE: $!\n" };
+
+Installing Test Databases
+
+The later tests in the test.pl script depend on the installation
+of the gutenberg.titles and gutenberg.files tables and data.  
+
+  1. MySQL:
+
+     $ /usr/local/mysql/bin/mysql --local-infile \
+     >   --user=<user> --password=<password> <mysql.ins
+
+  If you don't want to use a user name and password, you can 
+  start MySQL with --skip-grant-tables.
+
+  Edit the data source template file, MySQLTest.ini.
+
+    [Gutenberg Catalog]
+    Driver	= myodbc3     # The name you gave the Connector/ODBC driver.
+    Server	= localhost   # System's host name.
+    Database	= gutenberg
+    User	= root        # MySQL user name after installation.  
+                              # Also check that this and
+                              # Password's value are the same as $UserName 
+                              # and $PassWord in test.pl.
+    Password   	=             # MySQL password after installation.
+
+  Install the data source as root:
+
+  $ su <enter root password>  
+  # odbcinst -i -s -l -f MySQLTest.ini
+
+Be sure to substitute the user name and password in the example above 
+for the user that has the correct privileges for creating the database
+and tables and loading the data.  You might also need to edit test.pl - 
+see below.
+
+  2. PostgreSQL with psqlODBC:
+
+     # su postgres
+     # /usr/local/pgsql/bin/createdb gutenberg
+     # /usr/local/pgsql/bin/psql gutenberg <postgres.ins
+     # /usr/local/pgsql/bin/psql gutenberg 
+     gutenberg=# copy titles from '<full path of titles.dat>';
+     gutenberg=# copy files from '<full path of files.dat>';
+
+  Edit the data source template file, psqlODBC.ini.  
+
+     [Gutenberg Catalog]
+     Driver		= psqlODBC  # Whatever you named the psqlODBC driver.
+     Server		= localhost # DBMS host name.
+     Database	        = gutenberg
+     User		= postgres  # PostgreSQL user after installation.
+                                    # Also check that this is the value
+                                    # of $UserName in test.pl.
+     Password        =
+
+  Install the data source as root:
+
+  $ su <enter root password>  
+  # odbcinst -i -s -l -f psqlODBC.ini
+
+  If you are using the unixODBC psql driver, use the template file
+  unixODBCpsql.ini.
+
+Edit $UserName and $Password in test.pl for either the PostgreSQL or MySQL 
+DBMS.  Then run the test script with the following command.
+
+  # perl test.pl
+
+Driver Configuration for UnixODBC.pm Tests
+
+The unixODBC library and the unixodbc.org Web site contain
+documentation about driver and data source installation, and the use
+of the Driver Manager and odbcinst.  In addition, each driver contains
+installation notes.
+
+Here is the UnixODBC.pm driver configuration for the test databases,
+contained in the file TestDrv.ini.
+
+   [myodbc3]
+   Description     = MySQL with Connector/ODBC 
+   Driver		= /usr/local/lib/libmyodbc3.so
+   Setup		= /usr/local/lib/libmyodbc3S.so
+   UsageCount		= 2
+   [psqlODBC]
+   Description     = PostgreSQL with psqlODBC 
+   Driver		= /usr/local/lib/psqlodbcw.so
+   [unixODBCpsql]
+   Description     = PostgreSQL with libodbcpsql (unixODBC)
+   Driver          = /usr/local/lib/libodbcpsql.so
+   Setup           = /usr/local/lib/libodbcpsqlS.so
+
+You can install the drivers as root:
+
+# su <enter root password>  
+# odbcinst -i -d -f TestDrv.ini

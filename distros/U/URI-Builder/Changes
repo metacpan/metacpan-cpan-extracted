@@ -1,0 +1,16 @@
+Revision history for perl module URI::Builder
+
+0.04 2014-08-01
+    - Fixed query_param scalar context behaviour
+    - Fixed escaping of query strings
+
+0.03 2013-08-07
+    - Fixed the format of this file (thanks to Neil Bowers)
+
+0.02 2013-08-06
+    - Remove dependency on namespace::clean
+    - Allow hashref in query_form constructor option
+    - Fix clone method
+
+0.01 2013-08-05
+    - Initial release

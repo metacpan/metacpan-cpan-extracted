@@ -1,0 +1,48 @@
+Revision history for Perl extension User::Utmp.
+
+0.01  Fri Feb 27 18:20:35 UTC 1998
+	- original version; created by h2xs 1.18
+
+0.02  Mon Mar 22 20:32:24 UTC 1999
+	- should now compile on Solaris and Linux
+
+1.00  Sun Feb 27 17:15:30 UTC 2000
+	- support for utmpx and writing
+
+1.01  Sat May  6 16:36:55 UTC 2000
+
+	- unset OPTIMIZE in Linux hint file (workaround for what looks
+	  like a Linux bug)
+
+1.5   Sun Sep 16 21:18:43 UTC 2001
+	- in ut_addr, addresses containing NULL bytes (e.g.,
+	  127.0.0.1) were truncated
+	- unlike utmp ut_addr, utmpx ut_addr was not converted to a
+	  string (but the documentation claimed it was)
+	- reworked example.pl
+	- added test for utmpx to test.pl
+	- some editing of the documentation
+	- some minor changes due to moving from CVS to PRCS; the PRCS
+	  project version is now used as release version
+
+1.6	Mon Sep 17 15:10:23 UTC 2001
+	- EMPTY is no longer unconditionally defined in Linux hint
+	  file (it wasn't defined on older Linux versions); if
+	  necessary it's defined in Utmp.xs
+	- tests should be more robust
+
+1.7	Tue Sep 20 10:12:03 UTC 2005
+	- In Utmp.xs, the tv_usec field was assigned the value of tv_sec
+
+1.8	Sun Mar 26 23:42:44 UTC 2006
+	- For compatibility with utmp, the utmpx read functions
+	  generate a ut_time field; it can also be specified in the
+	  argument to pututxline()
+	- Added support for NetBSD (hints file and various #ifdefs)
+	- Added Perl interfaces for all functions defined in the
+	  Single UNIX Specification Version 3 (namely: endutxent(),
+	  getutxent(), getutxid(), getutxline(), pututxline(), and
+	  setutxent())
+	- Extended documentation; it now also says that utmpx is
+	  preferred
+	- Enhanced test.pl

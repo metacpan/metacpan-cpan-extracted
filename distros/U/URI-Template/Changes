@@ -1,0 +1,87 @@
+Revision history for Perl extension URI::Template
+
+0.22 2015-04-04
+ - Fix regression in variables() when called in list context (GH #4)
+
+0.21 2015-01-08
+ - variables() now returns items in their order of appearance (Artem 
+   Krivopolenov)
+
+0.20 2015-01-05
+ - Handle "0" as a template properly (RT 101109)
+
+0.19 2015-01-05
+ - Allow empty template as per spec (RT 101109)
+ - template() now accepts a new string as an argument (Artem Krivopolenov)
+
+0.18 2013-12-05
+ - Fix empty hash/array special casing to not return anything
+
+0.17 2013-03-11
+ - Special case return from empty hash and array values in query strings
+
+0.16 2012-05-30
+ - Conform to latest spec RFC 6570 (RT 66651)
+ - Re-use test suite from official github repo
+
+0.15 2009-01-19
+ - Promote dev release to stable
+
+0.14_01 2008-09-09
+ - Conform to latest spec (draft 03) (Ricardo SIGNES) Due to the new spec,
+   the following are no longer applicable:
+    - deparse()
+    - all_variables()
+    - passing an arrayref to the process subs
+ - as_string() is now just template() (Ricardo SIGNES)
+ - added expansions() - returns the coderefs used to expand the template
+   (Ricardo SIGNES)
+ - add support for default values (where applicable)
+
+0.13 2008-02-12
+ - Properly terminate deparse regex (Karen Cravens)
+
+0.12 2008-02-10
+ - Attempt to fix deparse() when the template ends in a variable
+
+0.11 2008-02-08
+ - require perl 5.6 minimum
+
+0.10 2008-01-16
+ - fix test suite for JSON 2.x
+
+0.09 2007-08-28
+ - minor doc update
+
+0.08_02 2007-07-31
+ - switch to Module::Install
+ - extract part of the test suite into a generic json-formatted structure
+
+0.08_01 2007-07-29
+ - handle new escaping rules from the latest spec.
+
+0.07 2007-05-24
+ - allow the user to pass an array ref to process and process_to_string
+   which fills values by position
+ - added all_variables() which returns all arguments by position (including
+   duplicates)
+
+0.06 2007-04-23
+ - added some caching for better deparse() performance [Paul "LeoNerd"
+   Evans]
+
+0.05 2007-04-19
+ - fix test for variables()
+ - added a note that the results from variables() are in random order
+
+0.04 2007-01-22
+ - fix undef values when processing
+
+0.03 2007-01-16
+ - added a simple deparse() method
+
+0.02 2007-01-16
+ - added process_to_string() method
+
+0.01 2007-01-15
+ - original version

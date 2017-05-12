@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                URL-Grab
+version:             1.4
+abstract:            Perl extension for blah blah blah
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.32
+distribution_type:   module
+requires:     
+    Carp:                          0
+    LWP::UserAgent:                0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Oliver Falk <oliver@linux-kernel.at>

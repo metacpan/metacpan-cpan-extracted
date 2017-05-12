@@ -1,0 +1,42 @@
+---
+abstract: 'Perl port of Underscore.js'
+author:
+  - 'Viacheslav Tykhanovskyi, C<vti@cpan.org>'
+build_requires: {}
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.7.5, CPAN::Meta::Converter version 2.130880'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: UnderscoreJS
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  UnderscoreJS:
+    file: lib/UnderscoreJS.pm
+    version: 0.07
+requires:
+  B: 0
+  List::MoreUtils: 0
+  Test::Spec: 0
+resources:
+  bugtracker: https://github.com/vti/underscore-perl/issues
+  homepage: https://github.com/vti/underscore-perl
+  repository: git://github.com/vti/underscore-perl
+version: 0.07
+x_contributors:
+  - 'richdouglasevans <rich.douglas.evans@gmail.com>'
+  - 'vti <viacheslav.t@gmail.com>'

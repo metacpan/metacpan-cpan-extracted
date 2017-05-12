@@ -1,0 +1,10 @@
+=head1 README
+
+These examples have been simplified.
+
+For more elaborate examples including examples for documentation, see
+L<Authen::SASL::SASLprep> and L<Net::IDN::Nameprep>.
+
+If you want to write a perl distribution implementing a Stringprep profile, the
+easiest way is to fork L<Authen::SASL::SASLprep> from
+L<http://github.com/cfaerber/Authen-SASL-SASLprep>.

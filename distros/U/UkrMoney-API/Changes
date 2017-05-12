@@ -1,0 +1,9 @@
+Revision history for Perl extension Ukrmoney::API.
+
+1.00  Fri Apr 14 10:43:36 2006
+	- original version; created by h2xs 1.23 with options
+		-XA -n Ukrmoney::API
+                
+1.00  Fri Apr 17 15:43:36 2006
+        - fixed few bugs in POD help
+

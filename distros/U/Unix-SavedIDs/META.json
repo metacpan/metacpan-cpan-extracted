@@ -1,0 +1,51 @@
+{
+   "abstract" : "interface to unix saved id commands: getresuid(), getresgid(), setresuid() and setresgid()",
+   "author" : [
+      "Dylan Martin <dmartin@sccd.ctc.edu>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Unix-SavedIDs",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Unix::SavedIDs" : {
+         "file" : "lib/Unix/SavedIDs.pm",
+         "version" : "0.004003"
+      },
+      "Unix::SetUser" : {
+         "file" : "lib/Unix/SetUser.pm",
+         "version" : "0.004003"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/bsd-license.php"
+      ]
+   },
+   "version" : "0.004003",
+   "x_serialization_backend" : "JSON::PP version 2.27202"
+}

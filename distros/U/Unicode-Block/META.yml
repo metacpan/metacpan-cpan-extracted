@@ -1,0 +1,41 @@
+---
+abstract: 'Class for unicode block manipulation.'
+author:
+  - 'Michal Špaček <skim@cpan.org>'
+build_requires:
+  Encode: 0
+  English: 0
+  Error::Pure::Utils: 0.13
+  ExtUtils::MakeMaker: 6.36
+  File::Object: 0.06
+  Test::More: 0
+  Test::NoWarnings: 0
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.10'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Unicode-Block
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+requires:
+  Class::Utils: 0.06
+  Error::Pure: 0.13
+  Text::CharWidth: 0
+  Unicode::Char: 0
+  perl: 5.6.2
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Unicode-Block
+  homepage: https://github.com/tupinek/Unicode-Block
+  license: http://opensource.org/licenses/BSD-3-Clause
+  repository: git://github.com/tupinek/Unicode-Block
+version: 0.03

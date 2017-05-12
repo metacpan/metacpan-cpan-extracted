@@ -1,0 +1,6 @@
+Revision history for Perl extension Upp::Reader.
+
+0.01  Fri Mar  2 13:44:35 2012
+	- original version; created by h2xs 1.23 with options
+		-AX Upp::Reader
+

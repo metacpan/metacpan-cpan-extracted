@@ -1,0 +1,26 @@
+---
+abstract: "test whether a URL exists, when you don't care about the contents"
+author:
+  - 'Neil Bowers <neil@bowers.com>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: URL-Exists
+requires:
+  Exporter: '0'
+  HTTP::Tiny: '0.014'
+  base: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/neilb/URL-Exists
+  repository: https://github.com/neilb/URL-Exists.git
+version: '0.03'

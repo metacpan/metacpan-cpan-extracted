@@ -1,0 +1,186 @@
+NAME
+    URI::Builder - URI objects optimised for manipulation
+
+SYNOPSIS
+        my $uri = URI::Builder->new(
+            scheme => 'http',
+            host   => 'www.cpan.org',
+        );
+
+        $uri->path_segments(qw( misc cpan-faq.html ));
+
+        say $uri->as_string; # http://www.cpan.org/misc/cpan-faq.html
+
+VERSION
+    0.04
+
+DESCRIPTION
+    This class is a close relative of URI, but while that class is optimised
+    for parsing, this is optimised for building up or modifying URIs. To
+    that end objects of this class represent their URIs in sections, each of
+    which are independently mutable, that then need to be serialised to form
+    a string. In contrast, "URI" uses a fully-formed string internally which
+    must be parsed afresh each time a mutation is performed on it.
+
+    At the moment only http and https URIs are known to work correctly,
+    support for other schemes may follow later.
+
+ATTRIBUTES
+    The following attributes relate closely with the URI methods of the same
+    names.
+
+    *   scheme
+
+    *   userinfo
+
+    *   host
+
+    *   port
+
+    *   path_segments
+
+    *   query_form
+
+    *   query_keywords
+
+    *   fragment
+
+    In addition the "query_separator" attribute defines how "query_form"
+    fields are joined. It defaults to ';' but can be usefully set to '&'.
+
+    The accessors for these attributes have a similar interface to the URI
+    methods, that is to say that they return old values when new ones are
+    set. Those attributes that take a list of values: "path_segments",
+    "query_form" and "query_keywords" all return plain lists but can be
+    passed nested array references.
+
+METHODS
+  new
+    The constructor.
+
+    In addition to the attributes listed above, a "uri" argument can be
+    passed as a string or a URI object, which will be parsed to popoulate
+    any missing fields.
+
+        # a cpan URL without its path
+        my $uri = URI::Builder->new(
+            uri => 'http://www.cpan.org/SITES.html',
+            path_segments => [],
+        );
+
+    Non-attribute arguments that match other methods in the class will cause
+    those methods to be called on the object. This means that what we
+    internally regard as composite attributes can be specified directly in
+    the constructor.
+
+        # Implicitly populate path_segments:
+        my $uri = URI::Builder->new( path => 'relative/path' );
+
+    Unrecognised arguments cause an exception.
+
+  abs
+        $absolute_uri = $relative_uri->abs($base_uri)
+
+    Returns a new URI::Builder object as an absolute URL based on the given
+    base URI.
+
+    Implemented as a wrapper of "abs" in URI.
+
+  rel
+        $relative_uri = $absolute_uri->rel($base_uri)
+
+    Returns a new URI::Builder object denoting the relative URI compared
+    with the base URI.
+
+    Implemented as a wrapper of "rel" in URI.
+
+  clone
+    Returns a new object with all attributes copied.
+
+  as_string
+    Returns the URI described by the object as a string. This is built up
+    from the individual components each time it's called.
+
+    This is also used as the stringification overload.
+
+  uri
+    Returns a version of this object as a URI object.
+
+  default_port
+    Returns the default port for the current object's scheme. This is
+    obtained from the appropriate URI subclass. See "default_port" in URI.
+
+  secure
+    Returns true if the current scheme is a secure one, false otherwise. See
+    "secure" in URI.
+
+  authority
+    Returns the 'authority' section of the URI. In our case this is obtained
+    by combining "userinfo", "host" and "port" together as appropriate.
+
+    Note that this is a read-only operation.
+
+  host_port
+    Returns the host and port in a single string.
+
+  path
+    Returns the path portion of the URI as a string.
+
+    Can be assigned to to populate "path_segments".
+
+    Leading, trailing and doubled slashes are represented faithfully using
+    empty path segments.
+
+  query
+    Returns a string representation of the query. This is obtained from
+    either "query_form" or "query_keywords", in that order.
+
+    If an argument is passed, it is parsed to populate "query_form".
+
+  path_query
+    Returns a string representation of the path plus the query string. See
+    "path_query" in URI.
+
+  query_param
+        @keys       = $uri->query_param
+        @values     = $uri->query_param($key)
+        @old_values = $uri->query_param($key, @new_values);
+
+    This works exactly like the method of the same name implemented in
+    URI::QueryParam.
+
+    With no arguments, all unique query field names are returned
+
+    With one argument, all values for the given field name are returned
+
+    With more than one argument, values for the given key (first argument)
+    are set to the given values (remaining arguments). Care is taken in this
+    case to preserve the ordering of the fields.
+
+  query_param_append
+        $uri->query_param_append($key, @values)
+
+    Appends fields to the end of the "query_form". Returns nothing.
+
+  query_param_delete
+        @old_values = $uri->query_param_delete($key)
+
+    Removes all fields with the given key from the "query_form".
+
+  query_form_hash
+        $hashref     = $uri->query_form_hash
+        $old_hashref = $uri->query_form_hash(\%new_hashref)
+
+    A hash representation of the "query_form", with multiple values
+    represented as arrayrefs.
+
+TODO
+    The following URI methods are currently not implemented:
+
+    *   as_iri
+
+    *   ihost
+
+LICENSE
+    perlartistic
+

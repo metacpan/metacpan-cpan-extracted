@@ -1,0 +1,21 @@
+#------------------------------------------------------------------------------
+
+severity = 1
+verbose  = %f: %m at line %l.  %e.  (Severity: %s)\n %p near '%r'\n
+
+exclude = Modules::RequireEndWithOne Subroutines::RequireArgUnpacking Subroutines::ProtectPrivateSubs Documentation::RequirePodAtEnd ClassHierarchies::ProhibitAutoloading ValuesAndExpressions::ProhibitMagicNumbers CodeLayout::RequireTidyCode
+#------------------------------------------------------------------------------
+
+[Documentation::RequirePodSections]
+lib_sections    = NAME|DESCRIPTION|SYNOPSIS|AUTHOR|COPYRIGHT
+script_sections = NAME|DESCRIPTION|SYNOPSIS|AUTHOR|COPYRIGHT
+
+[-Miscellanea::RequireRcsKeywords]
+
+[ControlStructures::ProhibitPostfixControls]
+allow = if unless
+
+[CodeLayout::RequireTidyCode]
+perltidyrc = t/perltidy.conf
+
+

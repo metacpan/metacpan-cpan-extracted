@@ -1,0 +1,33 @@
+Revision history for Perl extension URBL::Prepare
+
+0.09  Mon Jan 27 11:59:58 PST 2014
+        modify Makefile.PL to bypass missing 'pod2text'
+
+0.08  Sun Dec 15 17:38:32 PST 2013
+	add method 'urblblack'
+	change urbldomain to conform to SURBL guidelines
+	and return the domain tld to lookup
+
+0.07  Sun Dec 15 06:22:12 PST 2013
+	update comments
+
+0.06  Sun Dec 15 06:13:06 PST 2013
+	add method 'urblwhite'
+
+0.05  Sat Dec 14 11:33:04 PST 2013
+	update to force all stored white & tld's to be lower case
+	add method 'urblblack'
+
+0.04  Mon Jun 17 11:09:13 PDT 2013
+	update cacheTLDs.pl to use $ARGV[0] for cachedir
+	fixed IDIOTIC POD error
+
+0.03  Fri Jun 14 17:44:32 PDT 2013
+	update documentation to correct
+	test points for listed URBL's
+
+0.02  no released
+	clean up POD syntax errors
+
+0.01  Thu Jun 13 12:10:38 PDT 2013
+	initial release

@@ -1,0 +1,21 @@
+Revision history for Perl extension URI::Template::Restrict
+
+0.06
+        - fixed join pattern (zigorou)
+
+0.05
+        - fixed wrong usage on synopsis (zigorou)
+        - replaced ro-accessors to rw-accessors (masaki)
+
+0.04
+        - extends vardefault matches chars on extract (zigorou)
+
+0.03
+        - removed Mouse
+
+0.02
+        - no functional changes, no need to upgrade
+        - fix POD (thanks to Tomohiro Teranishi)
+
+0.01
+        - original version

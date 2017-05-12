@@ -1,0 +1,13 @@
+0.3 2015-10-25
+
+- Tweak min/max joystick values to match actual observed results
+- Don't require joystick module to be loaded without the rest of SDL
+
+0.2 2014-04-27
+
+- Fix updating of the window when drawing
+
+
+0.1 2014-02-16
+
+- Initial breakoff from UAV::Pilot main distro

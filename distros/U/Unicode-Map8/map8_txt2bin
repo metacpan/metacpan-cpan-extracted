@@ -1,0 +1,12 @@
+#!/usr/bin/perl -w
+
+# This script converts a textual mapping file to a binary one.
+# One reason that we do this is that we are not allowed to
+# re-distribute the mapping provided by Unicode, Inc directly.
+
+binmode(STDOUT);
+print pack("nn", 0xFFFE, 0x0001);  # magic
+while (<>) {
+    next unless /^\s*0x([0-9A-Fa-f]{2})\s+0x([0-9A-Fa-f]{4})/;
+    print pack("nn", hex($1), hex($2));
+}

@@ -1,0 +1,58 @@
+{
+   "abstract" : "Check a list of URL and respond accordingly.",
+   "author" : [
+      "Alexandre Masselot <alexmass@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "URL-Check",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Capture::Tiny" : "0.28",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "LWP::Simple" : "0",
+            "Mail::Sendmail" : "0",
+            "Time::HiRes" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "URL::Check" : {
+         "file" : "lib/URL/Check.pm",
+         "version" : "0.11"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/manwar/URL-Check.git",
+         "web" : "https://github.com/manwar/URL-Check"
+      }
+   },
+   "version" : "0.11"
+}

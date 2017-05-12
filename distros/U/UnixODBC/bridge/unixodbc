@@ -1,0 +1,31 @@
+#! /bin/sh
+
+# Shell script to start and stop the odbcbridge daemon.
+
+# $Id: unixodbc,v 1.6 2003-07-23 13:08:04 kiesling Exp $
+
+BRIDGEUSER='nobody' ; export BRIDGEUSER
+PIDFILE='/usr/local/var/odbcbridge/odbcbridge.pid' ; export PIDFILE
+
+case "$1" in
+  start)
+	echo "Starting ODBC bridge... "
+	/usr/local/sbin/odbcbridge &
+	while [ ! -f $PIDFILE ]; do
+	  sh -c true
+	done
+	chown $BRIDGEUSER $PIDFILE 
+        exit 0
+	;;
+  stop)
+	echo "Stopping ODBC bridge... "
+        kill `cat $PIDFILE`
+        exit 0
+	;;
+  *)
+	echo "Usage: unixodbc {start|stop|}" >&2
+	exit 1
+	;;
+esac
+
+exit 1

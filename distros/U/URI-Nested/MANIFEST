@@ -1,0 +1,9 @@
+Build.PL
+Changes
+lib/URI/Nested.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README.md
+t/jdbc.t
+t/nested_class.t

@@ -1,0 +1,15 @@
+CREATE TABLE method (
+            file_name   varchar2(255),
+            class_name  varchar2(255),
+            method_name varchar2(255),
+            line_number integer,
+            line_count  integer,
+            is_deprecated bool
+        );
+CREATE TABLE method_name_usage (
+            file_name   varchar2(255),
+            method_name varchar2(255),
+            line_number integer
+        );
+CREATE INDEX method_i_method_name on method(method_name);
+CREATE INDEX method_name_usage_i_method_name on method_name_usage(method_name);

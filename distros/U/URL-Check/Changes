@@ -1,0 +1,55 @@
+Revision history for URL::Check
+
+0.11   Wed Mar 30 16:15:00 2016 MANWAR
+       - Added test scripts (t/manifest.t, t/meta-json.t and t/meta-yml.t).
+       - Added MANIFEST.SKIP file.
+       - Updated copyright year information.
+
+0.10   Wed Dec 16 10:50:00 2015 MANWAR
+       - Updated Copyright year information.
+       - Tidied up pod document in general.
+
+0.09   Mon Nov 30 11:00:00 2015 MANWAR
+       - Earlier fix didn't resolve the issue, so one more attempt to resolve it,
+         using module Capture::Tiny.
+
+0.08   Thu Nov 26 10:40:00 2015 MANWAR
+       - Enable warning check in the unit test script t/02-test-to-console.t.
+         Also changed slightly how the STDOUT is captured as some CPAN Tester
+         reporting error on amd64-netbsd as below:
+         http://www.cpantesters.org/cpan/report/8a4733de-9220-11e5-afef-e7dd1d056eec
+
+0.07   Sat Nov 21 11:40:00 2015 MANWAR
+       - Tidied up script/url-check script.
+
+0.06   Sat Nov 21 11:20:00 2015 MANWAR
+       - Added $AUTHORITY to the package URL::Check.
+       - Added key 'provides' to the Makefile.PL script.
+       - Added LICENSE to the MANIFEST file.
+       - Removed 'Test::More' from prereqs list in the Makefile.PL script.
+
+0.05   Fri Nov 20 12:55:00 2015 MANWAR
+       - Copied 'script/url-check.pl' and created another called 'script/url-check'.
+         Keeping the old one as it is just to be backward compatible.
+       - On install, copy the new script 'url-check' to the user path. So that it can
+         be run from anywhere.
+       - Updated pod document with regard to the above changes.
+
+0.04   Thu Nov 19 10:30:00 2015 MANWAR
+       - Added LICENSE file.
+       - Added key 'LICENSE' to the Makefile.PL
+       - Added section "REPOSITORY" to the pod document.
+       - Added section "MAINTAINER" to the pod document.
+       - General tidied up pod document.
+
+0.03   Wed Nov 18 10:25:00 2015 MANWAR
+       - Tidied up Makefile.PL script.
+       - Removed Build.PL script.
+       - Tidied up README file.
+       - Added github repository to the Makefile.PL file.
+
+0.02   2011-10-02 ALEXMASS
+       - Some more changes.
+
+0.01   2011-10-02 ALEXMASS
+       -  First version, released on an unsuspecting world.

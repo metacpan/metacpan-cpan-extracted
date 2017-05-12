@@ -1,0 +1,27 @@
+# vim: syntax=sh
+_ubic()
+{
+    local cur prev
+    COMPREPLY=()
+    cur=${COMP_WORDS[COMP_CWORD]}
+
+    commands='start stop restart try-restart reload force-reload status'
+
+    if [[ $COMP_CWORD -eq 1 ]] ; then
+        COMPREPLY=( $( compgen -W "$commands" -- $cur ) )
+        return 0
+    fi
+
+    prev=${COMP_WORDS[COMP_CWORD-1]}
+
+    if [[ $COMP_CWORD -eq 2 ]] ; then
+        if [[ "x$prev" == "xlist" ]] ; then
+            return 0
+        fi
+        COMPREPLY=( $(cur=$cur perl -MUbic -le 'print join "\n", Ubic->compl_services($ENV{cur})') )
+    fi
+
+    return 0
+}
+
+complete -F _ubic -o nospace ubic

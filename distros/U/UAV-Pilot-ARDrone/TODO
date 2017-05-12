@@ -1,0 +1,2 @@
+* Video::BuildIO actually requires the methods its POD says it does
+* Running 'start_nav' in commands seems to steal keyboard input

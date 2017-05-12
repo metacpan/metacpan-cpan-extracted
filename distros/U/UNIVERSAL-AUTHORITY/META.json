@@ -1,0 +1,70 @@
+{
+   "abstract" : "adds an AUTHORITY method to UNIVERSAL",
+   "author" : [
+      "Toby Inkster <tobyink@cpan.org>",
+      "TOBYINK <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Moose::Meta::Class::__ANON__::SERIAL::7 version , CPAN::Meta::Converter version 2.140640",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "UNIVERSAL-AUTHORITY",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Object::AUTHORITY" : "0",
+            "UNIVERSAL" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0.61"
+         }
+      }
+   },
+   "provides" : {
+      "UNIVERSAL::AUTHORITY" : {
+         "file" : "lib/UNIVERSAL/AUTHORITY.pm",
+         "version" : "0.006"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "X_identifier" : "http://purl.org/NET/cpan-uri/dist/UNIVERSAL-AUTHORITY/project",
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=UNIVERSAL-AUTHORITY"
+      },
+      "homepage" : "https://metacpan.org/release/UNIVERSAL-AUTHORITY",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-universal-authority.git",
+         "web" : "https://github.com/tobyink/p5-universal-authority"
+      }
+   },
+   "version" : "0.006"
+}

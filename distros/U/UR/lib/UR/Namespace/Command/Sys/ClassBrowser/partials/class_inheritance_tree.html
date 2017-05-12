@@ -1,0 +1,10 @@
+<li>
+    <a href="/detail-for-class/[% tree.name %]" class="btn btn-small class-detail">[% tree.name %]</a>
+    [% IF tree.has_children %]
+        <ul>
+        [% FOREACH child IN tree.children %]
+            [% PROCESS partials/class_inheritance_tree.html tree = child %]
+        [% END %]
+        </ul>
+    [% END %]
+</li>

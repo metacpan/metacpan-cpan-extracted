@@ -1,0 +1,29 @@
+---
+abstract: 'Perl extension for Unicorn Engine from C<http://unicorn-engine.org>'
+author:
+  - 'Vikas Kumar <vikas@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Copy: '0'
+  File::ShareDir: '0'
+  File::Spec: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0511, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: UnicornEngine
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Alien::UnicornEngine: '0.04'
+  Math::Int64: '0'
+resources:
+  repository: https://github.com/selectiveintellect/p5-unicorn
+version: '0.05'
+

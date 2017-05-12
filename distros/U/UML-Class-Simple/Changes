@@ -1,0 +1,109 @@
+Change Log for UML::Class::Simple
+
+=version 0.22 (December 18, 2016)
+* fixed the author name.
+
+=version 0.21 (December 17, 2016)
+* feature: added support for SVG output.
+
+=version 0.20 (December 7, 2014)
+* doc: fixed broken links to the sample images.
+
+=version 0.19 (January 26, 2013)
+* feature: umlclass.pl: added option --moose-roles to display relationships
+  between Moose::Role packages and their consumers with different
+  colored edges in the output. thanks Tony Monroe for the patch.
+* feature: umlclass.pl: added option --no-methods to avoid displaying
+  the class methods in the output. thanks Tony Monroe for the patch.
+* feature: umlclass.pl: added option --no-inheritance to avoid displaying
+  class inheritance relationships in the output. thanks Tony Monroe
+  for the patch.
+* upgraded the bundled Module::Install to its latest 1.06 release.
+* updated docs for the new code repository on GitHub.
+* updated the English name of the 1st author.
+
+=version 0.18 (May 20, 2008)
+* applied another patch from Dave Howorth for the Class::Accessor::Grouped support.
+* updated the bundled Module::Install module to the best one on CPAN, i.e., the version 0.88.
+
+=version 0.17 (Oct 27, 2008)
+* applied the patch from Dave Howorth for the Class::Accessor::Grouped support.
+* added some tests for it.
+
+=version 0.16 (Sep 13, 2008)
+* throws an exception when the dot program complaints and returns non-zero status (this fixed RT #39179).
+* added a hint to t/basic.t that the invalid argument warning can be safely ignored.
+
+=version 0.15 (Aug 31, 2008)
+* added support for the best practice feature of Class::Accessor and applied Thomas Erskine++'s patch for its tests.
+* applied a modified version of Thomas Erskine++'s patch for the new --dot option and better diagnostic messages when the dot prog cannot be found.
+
+=version 0.14 (Aug 28, 2008)
+* applied the patch to umlclass.pl from Thomas Erskine:
+** the -I option now augments @INC
+** the -M option now preloads the modules eagerly.
+
+=version 0.12 (Jul 30, 2008)
+* applied the patch from Adam Lounds for intelligently recognize accessors created by Class::Accessor and Class::Accessor::Fast as "class properties" rather than "class methods" in the UML structure.
+
+=version 0.11 (Jun 22, 2008)
+* added the  --without-inherited-methods command-line option to umlclass.pl.
+* added the inherited_methods property added to UML::Class::Simple.
+  It allows the user to filter out all methods, that imported of inherited
+  from other classes.
+* fixed test failures in perl 5.10.x
+
+=version 0.10 (Jun 20, 2008)
+* initial XMI export support added.
+* Added dependency XML::LibXML.
+
+= version 0.09 (Apr 10, 2007)
+* applied a patch for the dot template from usuihiro++, now this module
+  should work with more versions of Graphviz :)
+* minor POD tweaks.
+
+= version 0.08 (Apr 10, 2007)
+* fixed the failing tests on ubuntu linux.
+* fixed some typos in the POD.
+
+= version 0.07 (Nov 5, 2006)
+* updated the POD to refect recent changes.
+
+= version 0.06 (Nov 5, 2006)
+* added long option versions for existing single-char options.
+  (for example, added `--size` for `-s`, and `--pattern` for `-p`.)
+* multiple `-M` options are now supported.
+* sub `classes_from_runtime` now supports array refs as its first argument:
+    @classes = classes_from_runtime([qw(Foo::Bar Baz)], qr/blah/);
+* sub `classes_from_files` now supports scalars as its first argument:
+    @classes = classes_from_files('Foo.pm');
+* fixed a bug in sub `classes_from_files`
+  (regex patterns were not honoured at all in previous versions. sigh.)
+* implemented subs `exclude_by_paths` and `grep_by_paths` in Simple.pm.
+* added -E and -I options to umlclass.pl.
+
+= version 0.05 (Nov 5, 2006)
+* fixed the wrong sub prototype so as to make the second argument truly optional
+  (reported by Yanick Champoux as [rt.cpan.org #22811])
+* added more TODOs from Christopher.
+
+= version 0.04 (Nov 1, 2006)
+* fixed the PPI->strerr bug reported by christopher.
+  it should have been PPI::Document->strerr in the source.
+* added a simple SYNOPSIS to script/umlclass.pl's POD.
+* added more guide to script/umlclass.pl's POD.
+  (thanks christopher's questions.)
+
+= version 0.03 (Oct 31, 2006)
+* fixed the node_color bug.
+* eliminated all the subroutine redefinition warnings in the test suite.
+* added the `-c color` option to script/umlclass.pl
+
+= version 0.02 (Oct 31, 2006)
+* improved the POD a bit.
+* resolved the @INC problem.
+* made classes_from_files loads .pm files automatically.
+* removed unnecessary dependencies (GraphViz and Clone) in t/FAST/lib
+
+= version 0.01 (Oct 30, 2006)
+* initial CPAN release

@@ -1,0 +1,25 @@
+
+CuiFinder User Options: 
+   --config option set
+
+
+UMLS-Interface Configuration Information
+  Sources (SAB):
+    MSH
+  Relations (REL):
+    CHD
+    PAR
+  Database: 
+    umls (MMSYS-2010AB-20101022)
+
+
+
+PathFinder User Options:
+  --realtime option set
+
+
+The paths between hand (C0018563) and the root:
+  => C0000000 (**UMLS ROOT**) C1135584 (msh) C1256739 (mesh descriptors) C1256741 (topical descriptor) C0002807 (anatomy (mesh category)) C0005898 (regions, body) C0015385 (limbs) C1140618 (limbs, upper) C0018563 (hand) 
+The paths between skull (C0037303) and the root:
+  => C0000000 (**UMLS ROOT**) C1135584 (msh) C1256739 (mesh descriptors) C1256741 (topical descriptor) C0002807 (anatomy (mesh category)) C0026860 (musculoskeletal systems) C0816871 (skeletons) C0005931 (bones and bone tissue) C0037303 (skull) 
+  => C0000000 (**UMLS ROOT**) C1135584 (msh) C1256739 (mesh descriptors) C1256741 (topical descriptor) C0002807 (anatomy (mesh category)) C0040300 (tissues) C0009780 (connective tissues) C0005931 (bones and bone tissue) C0037303 (skull) 

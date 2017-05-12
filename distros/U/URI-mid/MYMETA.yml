@@ -1,0 +1,24 @@
+---
+abstract: 'RFC 2392 mid: URI implementation'
+author:
+  - 'Dorian Taylor, C<< <dorian at cpan.org> >>, Dorian Taylor <dorian@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.120921'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: URI-mid
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  URI: 0
+  perl: 5.008
+version: 0.03

@@ -1,0 +1,56 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 797feb450020746892a00d6fcc6fd7bfe13b944d Build.PL
+SHA1 ee05c546e79d3c6d3bac3bbd79d54616e8c74657 Changes
+SHA1 c9287a0cfea1301a8e275e14df35a74d0b85e71c LICENSE
+SHA1 c16183254965399eb843e8ff72bac5ee4ff762da MANIFEST
+SHA1 18e46db7ffdc318dd9ce629b565d65361161737d META.json
+SHA1 dbcc8addeba6e78a876582a36484447a02392bfb META.yml
+SHA1 924734bb315e2926f8bc45831efd6ce42f4e008e README
+SHA1 b1b4ffa050ed262e2ef64f3dd9f6259ba8a1bd46 lib/Unexpected.pm
+SHA1 daa09c18627da44729210c255de1892b47b04ede lib/Unexpected/Functions.pm
+SHA1 6ad885f6ca6a76f7f88fbcbc99a0efa40f12db45 lib/Unexpected/TraitFor/ErrorLeader.pm
+SHA1 86e8ba7c212509f116747a99dce46f9ec9d0764f lib/Unexpected/TraitFor/ExceptionClasses.pm
+SHA1 f39b83f57b83d9e63547f06a01bc735797a84de6 lib/Unexpected/TraitFor/StringifyingError.pm
+SHA1 4c6c917033304b9315628072bdcfb13d75a49173 lib/Unexpected/TraitFor/Throwing.pm
+SHA1 3d9233ee6db8ae274d68c95be34297159cf3b2c3 lib/Unexpected/TraitFor/TracingStacks.pm
+SHA1 675ea3b11634f327d0e3b6d95e9e3db68c5b8bee lib/Unexpected/Types.pm
+SHA1 d6ba19b09dc794d31b38728162b75492467db460 t/00report-metadata.dd
+SHA1 c7d9429f60087220bf7b11ad1f97c7af9a647fa7 t/00report-metadata.t
+SHA1 427b1a5820b3d6bc52044b99c999e458eba7d6dc t/02pod.t
+SHA1 905a84ed4a01bba172b682620964560f04ff93d2 t/03podcoverage.t
+SHA1 c1c29d14c961c30f0ea1ff84dd3b6acb7f4d3e81 t/05kwalitee.t
+SHA1 8b1ef2c2000dda84911be6a6bf76d4de88a4d4dc t/06yaml.t
+SHA1 c5e84bd368b48e8462b34dd7801659bfed43f6f9 t/07podspelling.t
+SHA1 72287925bd28bf2cceb2349d0a0f16b03bccac7b t/08memory_leak.t
+SHA1 8586bb9881baeaa0ccb9d9ca109bf2966162338a t/10test_script.t
+SHA1 d78f665a7186bb00e2e0789f7c39f0a8684508f0 t/20types.t
+SHA1 14b076dd8c99916368cc3e09707c2815bd7b86e1 t/30functions.t
+SHA1 a31b353f15ddf00f3ccaab2d7378bb18d3326f12 t/40no_exception_class.t
+SHA1 196585dd3abdd4c0cbae8bd2b60cb29f4bbbcaba t/boilerplate.pm
+SHA1 46b483a2455a50a70fc8069c9f058e80d8370a5a t/exceptions.dd
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQEcBAEBAgAGBQJYpieyAAoJEK492j4Im1BpmW4H/AvesAi7zZVkQVkOFAn2Srk9
+1POGRYAAxKsZswFi0CdOSqyVLQ+vq/qNMli3XqWL7oVV0yO15PPW3ucBnCFB9f4X
+gEWm7DVz09umrQL+RF6+oGZ0UTd3r2zm7Hk3NX+e9lTPtX3t7cyC9c+e8Nzd1Dqe
+VkkMFSZqP5q5wJslLhbn3RY6K5PSfr/qr2N34huyiXclimYMprPfw4sUZuHqD+Za
+bQGw9XKf7ZhhtFRDGu+of7V88LoQulnaI8xBgFz+MvR9d7XKbOK8eIZ4IEigkDId
+es1Iffy7Qxh65mDNDyMbeGtU26yBPsvzpX7G917OWbtYoyaX64aQu7OacduCDEI=
+=88Bm
+-----END PGP SIGNATURE-----

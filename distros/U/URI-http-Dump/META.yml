@@ -1,0 +1,25 @@
+---
+abstract: 'A module to assist in the reverse engineering of URL parameters.'
+author:
+  - 'Evan Carroll <me@evancarroll.com>'
+build_requires:
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.74'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: URI-http-Dump
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Moose: 0
+  MooseX::InsideOut: 0
+  URI::http: 0
+  YAML: 0
+  mro: 0
+  perl: 5.10.0
+version: 0.03

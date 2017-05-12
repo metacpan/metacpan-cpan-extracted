@@ -1,0 +1,60 @@
+#!perl
+# gen-cjkc : auxiliary script for CJK compatibility ideographs
+#
+# input files
+#
+#   ../Collate/allkeys.txt
+#
+# output files
+#
+#   loc_cjkc.t (equal to t/loc_cjkc.t)
+#
+use strict;
+use warnings;
+use File::Spec;
+
+require 'gen-head'; # for testcount(), testhead() and testnew()
+require 'dumpstr';  # for string()
+
+my @obj = qw($objDefault $objB $objG $objJ $objK $objP $objS $objZ);
+my $ok = 1 + @obj;
+my $listobj = join ', ', @obj;
+my $test = <<"TEST";
+for my \$obj ($listobj) {
+    \$obj->change(level => 3);
+TEST
+my $d = File::Spec->updir();
+my $f = File::Spec->catfile($d, 'Collate', 'allkeys.txt');
+open my $fh, "<$f" or die $f;
+
+while (<$fh>) {
+    next if !/\[\.F[0-9A-F]+\.[0-9A-F]+\.0002[\.\]]/;
+    my @p = map hex($_), /\[\.([0-9A-F]+)\./g;
+    next if @p != 2;
+    my $u = ((($p[0] & 0x3F) << 15) | ($p[1] & 0x7FFF));
+    my $c = /^\s*([0-9A-F]+)\s*;/ ? hex($1) : 0;
+    next if $u == $c; # not decomposable
+    my $su = string(pack 'U', $u);
+    my $sc = string(pack 'U', $c);
+    $test .= ' ' x 4 . qq|ok(\$obj->eq($su, $sc));\n|;
+}
+close $fh;
+
+$test .= "}\n";
+
+testcount(\$ok, $test, 0+@obj);
+# discard the return value
+
+my $testf = "loc_cjkc.t";
+open my $th, ">$testf" or die $testf;
+binmode $th;
+print $th testhead('default', $ok);
+print $th testnew('B', 'ZH__big5han');
+print $th testnew('G', 'ZH__gb2312han');
+print $th testnew('J', 'JA');
+print $th testnew('K', 'KO');
+print $th testnew('P', 'ZH__pinyin');
+print $th testnew('S', 'ZH__stroke');
+print $th testnew('Z', 'ZH__zhuyin');
+print $th $test;
+close $th;

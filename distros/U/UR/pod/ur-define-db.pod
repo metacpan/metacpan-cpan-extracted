@@ -1,0 +1,57 @@
+
+
+=pod
+
+=head1 NAME
+
+ur define db - add a data source to the current namespace
+
+
+
+=head1 VERSION
+
+This document describes ur define db version 0.29.
+
+=head1 SYNOPSIS
+
+ur define db URI NAME
+
+ur define db dbi:SQLite:/some/file.db Db1
+
+ur define db me@dbi:mysql:myserver MainDb
+
+ur define db me@dbi:Oracle:someserver ProdDb
+ur define db me@dbi:Oracle:someserver~schemaname BigDb 
+
+ur define db me@dbi:Pg:prod  Db1
+ur define db me@dbi:Pg:dev   Testing::Db1 # alternate for "Testing" (arbitrary) context
+ur define db me@dbi:Pg:stage Staging::Db1 # alternate for "Staging" (arbitrary) context
+
+
+
+=head1 REQUIRED ARGUMENTS
+
+=over
+
+
+=item URI  I<Text>
+
+a DBI connect string like dbi:mysql:someserver or user/passwd@dbi:Oracle:someserver~defaultns
+
+=item NAME  I<Text>
+
+the name for this data source (used for class naming)
+
+Default value 'Db1' if not specified
+
+
+=back
+
+=head1 DESCRIPTION:
+
+  add a data source to the current namespace
+
+
+
+=cut
+

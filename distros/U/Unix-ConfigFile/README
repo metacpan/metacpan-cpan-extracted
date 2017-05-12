@@ -1,0 +1,41 @@
+Welcome to Unix::ConfigFile 0.06.  This is an *alpha* release.  That means
+that interfaces may change in the future and there will probably be some bugs
+lurking around.  You have been warned.
+
+The Unix::ConfigFile distribution is a suite of modules that provide simple
+interfaces to various Unix configuration files.  The objective is to free the
+system administrator from dealing with the trivial formatting details of the
+files, and allow him or her to concentrate on the information therein.
+Currently supported files include:
+
+        aliases    Unix::AliasFile
+	automount  Unix::AutomountFile
+        group      Unix::GroupFile
+        passwd     Unix::PasswdFile
+
+You can install this module in the usual way:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+These modules will work with perl 5.004 or higher.  However, the AliasFile
+module may exhibit a minor bug under versions less than 5.005; see the
+AliasFile documentation for details.  The documentation is embedded in each
+module; use perldoc (e.g. perldoc Unix::PasswdFile) after installation to get
+started.
+
+A mailing list is available for discussions regarding the Unix::ConfigFile
+module.  To subscribe, send an email with "subscribe" (without the quotes)
+in the body of your message (the subject will be ignored) to:
+
+configfile-request@trfn.clpgh.org
+
+This library is free software; you may redistribute and/or modify it under
+the same terms as Perl itself.  Copyright 1999 Steve Snodgrass.
+
+These modules are written by Steve "Pheran" Snodgrass, ssnodgra@fore.com.
+Additional contributors include:
+
+James Walden <jamesw@ichips.intel.com>

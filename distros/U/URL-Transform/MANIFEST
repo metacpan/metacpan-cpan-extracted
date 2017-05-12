@@ -1,0 +1,34 @@
+Build.PL
+Changes
+lib/URL/Transform.pm
+lib/URL/Transform/SAX/Filter.pm
+lib/URL/Transform/using/CSS/RegExp.pm
+lib/URL/Transform/using/HTML/Meta.pm
+lib/URL/Transform/using/HTML/Parser.pm
+lib/URL/Transform/using/Remove.pm
+lib/URL/Transform/using/XML/SAX.pm
+MANIFEST			This list of files
+META.yml
+MYMETA.json
+README
+t/01_URL-Transform.t
+t/02_URL-Transform-using-CSS-RegExp.t
+t/02_URL-Transform-using-Remove.t
+t/02_URL-Transform-using-XML-SAX.t
+t/data/URL-Transform-01-result.html
+t/data/URL-Transform-01.html
+t/data/URL-Transform-02.html.gz
+t/data/URL-Transform-03-result.html
+t/data/URL-Transform-03.html
+t/data/URL-Transform-04-result.html
+t/data/URL-Transform-04.html
+t/data/URL-Transform-05-result.html
+t/data/URL-Transform-05.html
+t/data/URL-Transform-06-result.html
+t/data/URL-Transform-06.html
+t/distribution.t
+t/pod-coverage.t
+t/pod-spell.t
+t/pod.t
+META.json
+SIGNATURE    Added here by Module::Build

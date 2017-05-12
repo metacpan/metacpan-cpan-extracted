@@ -1,0 +1,12 @@
+0.03 2014-02-20
+  - Added support for semicolon as a separator in data sets.
+  - Added support pairs without value (i.e. without '=' sign).
+
+0.02 2013-09-30
+  - No functional changes in this release, only documentation improvements.
+  - Rewritten most documentation
+  - Added a section about performance
+
+0.01 2011-07-12
+  - Original version
+

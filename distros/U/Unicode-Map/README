@@ -1,0 +1,139 @@
+Hi,
+
+Welcome to Unicode::Map version 0.112.
+
+This release adds mappings for EUC-JP and EUC-KR.
+
+
+DESCRIPTION
+
+   This module converts strings from and to 2-byte Unicode UCS2 format. 
+   All mappings happen via 2 byte UTF16 encodings, not via 1 byte UTF8
+   encoding. To convert between UTF8 and UTF16 use Unicode::String.
+
+   For historical reasons this module coexists with Unicode::Map8.
+   Please use Unicode::Map8 unless you need to care for >1 byte character
+   sets, e.g. chinese GB2312. Anyway, if you stick to the basic 
+   functionality (see documentation) you can use both modules equivalently.
+
+   Practically this module will disappear from earth sooner or later as 
+   Unicode mapping support needs somehow to get into perl's core. If you 
+   like to work on this field please don't hesitate contacting Gisle Aas
+   and check out the mailing list perl-unicode!
+
+
+REQUIRED MODULES
+
+   No further modules are necessary.
+
+   In former releases you needed the module Startup, but no longer. 
+   You need the libwww-perl distribution to run the utility mirrorMappings.
+
+
+This module resides on your favorite CPAN mirror or at: 
+
+    http://www.cs.tu-berlin.de/~schwartz/perl/
+
+
+Contact: Martin Schwartz <martin@nacho.de>
+
+
+CREDITS
+
+    Many thanks to Michael Chen <mchen@interwoven.com> and Jonathan Cox
+    <jcox@interwoven.com> from Interwoven for the EUC-implementation!
+
+
+CHARACTER SETS
+
+01: ADOBE-DINGBATS
+02: ADOBE-STANDARD (Adobe-Standard-Encoding, csAdobeStandardEncoding)
+03: ADOBE-SYMBOL (csHPPSMath)
+04: APPLE-ARABIC
+05: APPLE-CENTEURO
+06: APPLE-CHINSIMP
+07: APPLE-CHINTRAD
+08: APPLE-CROATIAN
+09: APPLE-CYRILLIC (APPLE-UKRAINE)
+10: APPLE-DEVANAGA
+11: APPLE-DINGBATS
+12: APPLE-GREEK
+13: APPLE-HEBREW
+14: APPLE-ICELAND
+15: APPLE-JAPANESE
+16: APPLE-KOREAN
+17: APPLE-ROMAN
+18: APPLE-ROMANIAN
+19: APPLE-SYMBOL
+20: APPLE-THAI
+21: APPLE-TURKISH
+22: BIG5
+23: CNS-11643-1986
+24: CP037 (IBM037, csIBM037, ebcdic-cp-ca, ebcdic-cp-nl, ebcdic-cp-us, ebcdic-cp-wt)
+25: CP1026 (IBM1026, csIBM1026)
+26: CP1250 (windows-1250)
+27: CP1251 (windows-1251)
+28: CP1252 (windows-1252)
+29: CP1253 (windows-1253)
+30: CP1254 (windows-1254)
+31: CP1255 (windows-1255)
+32: CP1256 (windows-1256)
+33: CP1257 (windows-1257)
+34: CP1258 (windows-1258)
+35: CP437 (437, IBM437, csPC8CodePage437)
+36: CP500 (IBM500, csIBM500, ebcdic-cp-be, ebcdic-cp-ch)
+37: CP737
+38: CP775 (IBM775, csPC775Baltic)
+39: CP850 (850, IBM850, csPC850Multilingual)
+40: CP852 (852, IBM852, csPCp852)
+41: CP855 (855, IBM855, csIBM855)
+42: CP857 (857, IBM857, csIBM857)
+43: CP860 (860, IBM860, csIBM860)
+44: CP861 (861, IBM861, cp-is, csIBM861)
+45: CP862 (862, IBM862, csPC862LatinHebrew)
+46: CP863 (863, IBM863, csIBM863)
+47: CP864 (IBM864, csIBM864)
+48: CP865 (865, IBM865, csIBM865)
+49: CP866 (866, IBM866, csIBM866)
+50: CP869 (869, IBM869, cp-gr, csIBM869)
+51: CP874
+52: CP875
+53: CP932
+54: CP936
+55: CP949
+56: CP950
+57: EUC-JP
+58: EUC-KR
+59: GB12345-80
+60: GB2312 (csGB2312)
+61: GB2312-80 (GB_2312-80, chinese, csISO58GB231280, iso-ir-58)
+62: IBM038 (CP038, EBCDIC-INT, csIBM038)
+63: ISO-8859-1 (CP819, IBM819, ISO-IR-100, ISO_8859-1:1987, L1, LATIN1)
+64: ISO-8859-10 (ISO-IR-157, ISO_8859-10:1993, L6, LATIN6)
+65: ISO-8859-13
+66: ISO-8859-14
+67: ISO-8859-15
+68: ISO-8859-2 (ISO-IR-101, ISO_8859-2:1987, L2, LATIN2)
+69: ISO-8859-3 (ISO-IR-109, ISO_8859-3:1988, L3, LATIN3)
+70: ISO-8859-4 (ISO-IR-110, ISO_8859-4:1988, L4, LATIN4)
+71: ISO-8859-5 (CYRILLIC, ISO-IR-144, ISO_8859-5:1988)
+72: ISO-8859-6 (ARABIC, ASMO-708, ECMA-114, ISO-IR-127, ISO_8859-6:1987)
+73: ISO-8859-7 (ECMA-118, ELOT_928, GREEK, GREEK8, ISO-IR-126, ISO_8859-7:1987)
+74: ISO-8859-8 (HEBREW, ISO-IR-138, ISO_8859-8:1988)
+75: ISO-8859-9 (ISO-IR-148, ISO_8859-9:1989, L5, LATIN5)
+76: JIS-X-0201 (JIS_X0201, X0201, csHalfWidthKatakana)
+77: JIS-X-0208 (JIS_C6226-1983, JIS_X0208-1983, X0208, csISO87JISX0208, iso-ir-87)
+78: JIS-X-0212
+79: JOHAB
+80: KSC5601-1992
+81: KSCX-1001
+82: MS-CYRILLIC
+83: MS-GREEK
+84: MS-ICELAND
+85: MS-LATIN2
+86: MS-ROMAN
+87: MS-TURKISH
+88: NEXT (NEXTSTEP, NeXT)
+89: Shift-JIS
+90: US-ASCII (ANSI_X3.4-1968, ANSI_X3.4-1986, ASCII, IBM367, ISO646-US, ISO_646.irv:1991, cp367, csASCII, iso-ir-6, us)
+Done.

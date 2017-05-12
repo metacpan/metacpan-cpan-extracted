@@ -1,0 +1,119 @@
+#!/usr/bin/perl
+
+# $Id: driverinfo,v 1.6 2003-11-28 22:17:23 kiesling Exp $
+$VERSION=1.0;
+
+use UnixODBC qw (:all);
+use Getopt::Long;
+my $usage=<<EOH;
+Usage: driverinfo [--help]
+  --help       Print this help and exit.
+EOH
+
+my $help;  # Print help and exit.
+
+GetOptions ('help' => \$help);
+
+if ($help) {
+    print $usage;
+    exit 0;
+}
+
+my ($envhandle, $sqlresult, $dsnname, $drivername);
+my ($driver_desc,$desc_length,$driver_attributes, $attr_length);
+
+$sqlresult = SQLAllocHandle ($SQL_HANDLE_ENV,$SQL_NULL_HANDLE,$envhandle);
+if ($sqlresult != $SQL_SUCCESS) {
+    &getdiagrec ($SQL_HANDLE_ENV, $envhandle);
+    exit 1;
+}
+
+$sqlresult = SQLSetEnvAttr ($envhandle, $SQL_ATTR_ODBC_VERSION,
+			    $SQL_OV_ODBC3, 0);
+if ($sqlresult != $SQL_SUCCESS) {
+    &getdiagrec ($SQL_HANDLE_ENV, $envhandle);
+    exit 1;
+}
+
+$sqlresult = SQLDrivers ($envhandle, $SQL_FETCH_FIRST, $driver_desc,
+			 255, $desc_length, $driver_attributes,
+			 255, $attr_length);
+if (($sqlresult != $SQL_SUCCESS) && ($sqlresult != $SQL_NO_DATA)) {
+    &getdiagrec ($SQL_HANDLE_ENV, $envhandle);
+    exit 1;
+}
+print "$driver_desc, $driver_attributes\n";
+
+while (1) {
+    $sqlresult = 
+	SQLDrivers ($envhandle, $SQL_FETCH_NEXT, $driver_desc, 255,
+		    $desc_length, $driver_attributes,
+		    255, $attr_length);
+    if (($sqlresult != $SQL_SUCCESS) && ($sqlresult != $SQL_NO_DATA)) {
+	&getdiagrec ($SQL_HANDLE_ENV, $envhandle);
+	exit 1;
+    }
+    print "$driver_desc, $driver_attributes\n";
+    last if $sqlresult == $SQL_NO_DATA;
+}
+
+$sqlresult = SQLFreeHandle ($SQL_HANDLE_ENV, $envhandle);
+if ($sqlresult != $SQL_SUCCESS) {
+    &getdiagrec ($SQL_HANDLE_ENV, $envhandle);
+    exit 1;
+}
+
+exit 0;
+
+sub getdiagrec {
+    my ($handle_type, $handle) = @_;
+    my ($sqlstate, $native, $message_text, $msglength);
+    print 'SQLGetDiagRec: ';
+    $sqlresult = SQLGetDiagRec ($handle_type, $handle, 1, $sqlstate,
+				$native, $message_text, 255, $msglength);
+    if ($sqlresult == $SQL_NO_DATA) { 
+	print "result \= SQL_NO_DATA\n";
+    } elsif (($sqlresult == 1) || ($sqlresult == 0)) { 
+     print "$message_text\n";
+    } else { 
+     print "sqlresult = $sqlresult\n";
+    }
+    return $sqlresult;
+}
+
+=head1 NAME
+
+driverinfo - Display ODBC drivers and descriptions.
+
+=head1 SYNOPSIS
+
+driverinfo [--help]
+
+=head1 DESCRIPTION
+
+Driverinfo prints the names and descriptions of a system's ODBC
+drivers.
+
+=head1 OPTIONS
+
+=head2 --help
+
+Print help message and exit.
+
+=head1 VERSION INFORMATION AND CREDITS
+
+Revision: $Revision: 1.6 $
+
+Written by: Robert Allan Kiesling, rkies@cpan.org.
+
+Licensed under the same terms as Perl.  Please refer to the
+file "Artistic" for details.
+
+=head1 SEE ALSO
+
+perl(1), UnixODBC(3), UnixODBC::BridgeServer(3).
+
+=cut
+
+
+

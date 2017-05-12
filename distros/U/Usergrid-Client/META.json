@@ -1,0 +1,60 @@
+{
+   "abstract" : "Usergrid Perl Client",
+   "author" : [
+      "Anuradha Weeraman <anuradha@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4205",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Usergrid-Client",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON" : "0",
+            "Log::Log4perl" : "0",
+            "Moose" : "0",
+            "REST::Client" : "0",
+            "URI::Template" : "0",
+            "namespace::autoclean" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Usergrid::Client" : {
+         "file" : "lib/Usergrid/Client.pm",
+         "version" : "0.22"
+      },
+      "Usergrid::Collection" : {
+         "file" : "lib/Usergrid/Collection.pm"
+      },
+      "Usergrid::Entity" : {
+         "file" : "lib/Usergrid/Entity.pm"
+      },
+      "Usergrid::Request" : {
+         "file" : "lib/Usergrid/Request.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.apache.org/licenses/LICENSE-2.0.txt"
+      ]
+   },
+   "version" : "0.22"
+}

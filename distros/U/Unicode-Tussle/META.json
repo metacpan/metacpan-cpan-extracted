@@ -1,0 +1,63 @@
+{
+   "abstract" : "Tom's Unicode Scripts So Life is Easier",
+   "author" : [
+      "Tom Christiansen <tchrist@perl.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Unicode-Tussle",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::Spec::Functions" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Lingua::EN::Syllable" : "0",
+            "Lingua::JA::Romanize::Japanese" : "0",
+            "Lingua::KO::Hangul::Util" : "0",
+            "Lingua::KO::Romanize::Hangul" : "0",
+            "Lingua::ZH::Romanize::Pinyin" : "0",
+            "Unicode::GCString" : "0",
+            "Unicode::Unihan" : "0",
+            "perl" : "5.014001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.94"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/briandfoy/Unicode-Tussle/issues"
+      },
+      "homepage" : "https://github.com/briandfoy/Unicode-Tussle",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/briandfoy/Unicode-Tussle.git",
+         "web" : "https://github.com/briandfoy/Unicode-Tussle"
+      }
+   },
+   "version" : "1.111"
+}

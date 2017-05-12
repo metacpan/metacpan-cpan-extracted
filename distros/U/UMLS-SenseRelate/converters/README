@@ -1,0 +1,134 @@
+UMLS::SenseRelate converters documentation
+===========================================
+
+This directory contains converter programs to create input files 
+for the umls-targetword-senserelate.pl and umls-allwords-senserelate.pl 
+programs. 
+
+Contents:
+-------------------------------------------
+- README
+
+- plain2mm-xml.pl
+  
+- mm-xml2aw-xml.pl
+
+Description 
+-------------------------------------------
+plain2mm-xml.pl
+----------------
+
+ Synopsis: 
+
+   This program converts plain text into MetaMap xml format. This format 
+   can be used as input into mm-xml2aw-xml.pl which creates the output 
+   format required by umls-allwords-senserelate.pl. And in the very near
+   future, this can be used as input into the umls-targetword-senserelate.pl 
+   program. 
+
+ Format: 
+ 
+   plain format - the term plain format is a bit overloaded and therefore 
+   needs some explanation. 
+
+   In the case of all words disambiguation, it refers to an instance on a 
+   single line in which each term is to disambiguated. For example: 
+
+      The nurse wore white. 
+
+   In the case of target word disambiguation, it refers to an instance on a 
+   single line in which the term is identified in the following tags:
+   
+    <head item="target word" instance="id" sense="CUI">word</head>
+
+   For example: 
+
+    The <head item="nurse" instance="2" sense="C0028661">nurse</head> wore white. 
+
+   This program will take either format and just ignore the head tags in the 
+   conversion unless you specify that you want to keep them using the --target 
+   option. If you use this option, the target words will be marked with a 
+   <Target> tag in the mm-xml output. Note that this is an addition to the 
+   original metamap xml output format. 
+   
+   metamap xml format - this format is the xml format outputted by the concept 
+   mapping system MetaMap. The documentation for this is here:
+   	      	   
+       http://metamap.nlm.nih.gov/
+
+ Example for all words disambiguation:
+
+   In the samples/ directory, there is an example file called:
+ 
+    allwords-example.plain
+
+   To convert this to MetaMap xml (mm-xml), ensure that metamap is installed
+   on your computer and is running and the enter the following command:
+
+    plain2mm-xml.pl allwords-example.mm-xml allwords-example.plain
+  
+   The default is metamap10 although if you have a different version, 
+   for example if you are using metamap09, use the --metamap option:
+
+    plain2mm-xml.pl --metamap 09 allwords-example.mm-xml allwords-example.plain
+	   
+   This output file (allwords-example.mm-xml) can be used into the 
+   mm-xml2aw-xml.pl program to create an input file for the 
+   umls-allwords-senserelate.pl program. 
+
+ Example for target word disambigation
+
+   In the samples/ directory, there is an example file called:
+ 
+    targetword-example.aa.plain
+
+   To convert this to MetaMap xml (mm-xml), ensure that metamap is installed
+   on your computer and is running and the enter the following command:
+
+    plain2mm-xml.pl --target targetword-example.aa.mm-xml targetword-example.aa.plain
+  
+   Again, the default is metamap10 although if you have a different version, 
+   for example if you are using metamap09, use the --metamap option:
+
+    plain2mm-xml.pl --target --metamap 09 targetword-example.aa.mm-xml targetword-example.aa.plain
+	   
+   In the future, this output file could be used as an input into the
+   umls-targetword-senserelate.pl program - this is not the case yet.
+
+
+mm-xml2aw-xml.pl
+----------------
+
+ Synopsis: 
+
+   This program converts the MetaMap xml format into the xml format required 
+   for umls-allwords-senserelate.pl. This format is the same format that 
+   is used in the SemEval all words disambiguation tasks. 
+
+ Format: 
+   
+   mm-xml format - this is metamap xml format outputed by the plain2mm-xml.pl 
+   program described above.
+
+   aw-xml format - this is the all words disambiguation format which is used
+   by in SemEval All-Words Disambiguation Tasks described here: 
+
+    http://www.senseval.org/
+
+ Example:  
+
+   In the samples/ directory, there is an example file called:
+ 
+    allwords-example.mm-xml 
+
+   (Note: This is the same file we created with the above example)
+
+   To convert this from MetaMap xml (mm-xml) to all-words xml (aw-xml) 
+   enter the following command:
+
+    mm-xml2aw-xml.pl allwords-example.aw-xml allwords-example.mm-xml 
+
+   This output file (allwords-example.aw-xml) can now be used as input 
+   into the umls-allwords-senserelate.pl program
+
+

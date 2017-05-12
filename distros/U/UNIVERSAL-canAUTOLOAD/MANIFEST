@@ -1,0 +1,8 @@
+Build.PL
+Makefile.PL
+README
+META.yml
+Changes
+lib/UNIVERSAL/canAUTOLOAD.pm
+MANIFEST
+t/can.t

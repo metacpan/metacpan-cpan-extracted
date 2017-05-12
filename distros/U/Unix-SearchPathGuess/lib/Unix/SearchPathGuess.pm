@@ -1,0 +1,229 @@
+package Unix::SearchPathGuess;
+use strict;
+use File::Which;
+
+# debug tools
+# use Debug::ShowStuff ':all';
+# use Debug::ShowStuff::ShowVar;
+
+# version
+our $VERSION = '0.11';
+
+
+#------------------------------------------------------------------------------
+# opening POD
+#
+
+=head1 NAME
+
+Unix::SearchPathGuess -- Make an educated guess for $ENV{'PATH'} in a
+Unixish system
+
+=head1 SYNOPSIS
+
+ # set $ENV{'PATH'} just for this sub
+ sub mysub {
+    local $ENV{'PATH'} = search_path_guess();
+    ...
+ }
+
+ # make a guess on the path to the ls program
+ my $ls = cmd_path_guess('ls')
+
+ # only run ls if a path to it was found
+ if ($ls) {
+    ...
+ }
+
+=head1 DESCRIPTION
+
+Unix::SearchPathGuess helps you make an educated guess about what a useful
+value for $ENV{'PATH'} would be if, for whatever reason, you don't already
+know.  It also helps you look for a command in that path, and returns the
+full path to that command if it is found.  Unix::SearchPathGuess is only
+useful on Unixish systems.
+
+=head1 INSTALLATION
+
+Unix::SearchPathGuess can be installed with the usual routine:
+
+ perl Makefile.PL
+ make
+ make test
+ make install
+
+=head1 GLOBALS AND FUNCTIONS
+
+=cut
+
+#
+# opening POD
+#------------------------------------------------------------------------------
+
+
+#------------------------------------------------------------------------------
+# export
+#
+use base 'Exporter';
+use vars qw[@EXPORT_OK %EXPORT_TAGS];
+@EXPORT_OK = qw{search_path_guess cmd_path_guess};
+%EXPORT_TAGS = ('all' => [@EXPORT_OK]);
+#
+# export
+#------------------------------------------------------------------------------
+
+
+#------------------------------------------------------------------------------
+# paths to add to "best guess" path for external commands
+#
+
+=head2 @search_paths
+
+@search_paths is an array of the guesses for the search path. It consists of
+
+ /usr/local/sbin
+ /usr/local/bin
+ /usr/sbin
+ /usr/bin
+ /sbin
+ /bin
+ /usr/games
+
+=cut
+
+our @search_paths = qw{
+	/usr/local/sbin
+	/usr/local/bin
+	/usr/sbin
+	/usr/bin
+	/sbin
+	/bin
+	/usr/games
+};
+#
+# paths to add to "best guess" path for external commands
+#------------------------------------------------------------------------------
+
+
+
+#------------------------------------------------------------------------------
+# search_path_guess
+#
+
+=head2 search_path_guess()
+
+search_path_guess() returns a string that is a guessed value for $ENV{'PATH'}.
+Note that search_path_guess() B<DOES NOT> set $ENV{'PATH'}, it just returns a
+string with which you can set $ENV{'PATH'} as you like.
+
+If $ENV{'PATH'} is already defined, the guessed path is appended to it and
+returned.
+
+A good practice is to only use search_path_guess() to set the local value of
+$ENV{'PATH'}. That way you aren't messing around with a global that some
+function you don't know about is relying on to be a certain way. So, for
+example, you could set $ENV{'PATH'} just for a single subroutine:
+
+ sub mysub {
+    local $ENV{'PATH'} = search_path_guess();
+    ...
+ }
+
+=cut
+
+sub search_path_guess {
+	my $rv = $ENV{'PATH'} || '';
+	
+	# if there is a path, add a colon
+	if ($rv)
+		{ $rv .= ':' }
+	
+	# add "best guess" path
+	$rv .= join(':', @search_paths);
+	
+	# return
+	return $rv;
+}
+#
+# search_path_guess
+#------------------------------------------------------------------------------
+
+
+#------------------------------------------------------------------------------
+# cmd_path_guess
+#
+
+=head2 cmd_path_guess()
+
+cmd_path_guess() searches the guessed $ENV{'PATH'} for the given command.
+Returns the full path to that command if it was found, undef otherwise.
+
+For example, to find the path to the C<ls> command, you would do something
+like this:
+
+ my $ls = cmd_path_guess('ls')
+
+ # only run ls if a path to it was found
+ if ($ls) {
+    ...
+ }
+
+Note that you should check if the command was found before using it.
+
+=cut
+
+sub cmd_path_guess {
+	my ($cmd) = @_;
+	
+	# TESTING
+	# println subname(), ': ', $cmd; ##i
+	
+	# set local search path
+	local $ENV{'PATH'} = search_path_guess();
+	
+	# look for the command in the search path
+	return which($cmd);
+}
+#
+# cmd_path_guess
+#------------------------------------------------------------------------------
+
+
+# return true
+1;
+
+__END__
+
+=head1 TERMS AND CONDITIONS
+
+Copyright (c) 2014 by Miko O'Sullivan.  All rights reserved.  This program is 
+free software; you can redistribute it and/or modify it under the same terms 
+as Perl itself. This software comes with B<NO WARRANTY> of any kind.
+
+=head1 AUTHORS
+
+Miko O'Sullivan
+F<miko@idocs.com>
+
+=head1 VERSION
+
+Version: 0.11
+
+=head1 HISTORY
+
+=over
+
+=item Version 0.10    December 30, 2014
+
+Initial release
+
+=item Version 0.11    December 30, 2014
+
+Fixed prerequisite declaration for File::Which so that it requires
+version 1.09.
+
+Clarifed and cleaned up documentation.
+
+=back
+
+=cut

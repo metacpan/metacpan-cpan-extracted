@@ -1,0 +1,58 @@
+
+
+=pod
+
+=head1 NAME
+
+ur update rewrite-class-header - Update::RewriteClassHeaders class descriptions headers to normalize manual changes.
+
+
+
+=head1 VERSION
+
+This document describes ur update rewrite-class-header version 0.29.
+
+=head1 SYNOPSIS
+
+ur update rewrite-class-header [--force] [CLASSES-OR-MODULES]
+
+
+
+=head1 OPTIONAL ARGUMENTS
+
+=over
+
+
+=item force  I<Boolean>
+
+(undocumented)
+
+=item noforce  I<Boolean>
+
+Make force 'false'
+
+=item CLASSES-OR-MODULES
+
+(undocumented)
+
+
+=back
+
+=head1 DESCRIPTION:
+
+  
+  
+  UR classes have a header at the top which defines the class in terms of its metadata.
+  This command replaces that text in the source module with a fresh copy.
+  
+  It is most useful to fix formatting problems, since the data from which the new
+  version is made is the data supplied by the old version of the file.
+  
+  It's somewhat of a "perltidy" for the module header.
+  
+      
+
+
+
+=cut
+

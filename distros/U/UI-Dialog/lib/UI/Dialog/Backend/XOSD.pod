@@ -1,0 +1,386 @@
+=head1 NAME
+
+UI::Dialog::Backend::XOSD - backend for the osd_cat(1).
+
+=head1 SYNOPSIS
+
+  use UI::Dialog::Backend::XOSD;
+  my $xosd = new UI::Dialog::Backend::XOSD ();
+  $xosd->line( text => "Something to display...");
+
+=head1 ABSTRACT
+
+UI::Dialog::Backend::XOSD is an OOPerl wrapper for the osd_cat(1)
+program.
+
+=head1 DESCRIPTION
+
+Use this module to present feedback to the end user via an on-screen
+display (like an on-screen TV volume meter).  When you use any of the
+UI::Dialog meta classes (UI::Dialog, UI::Dialog::GNOME, etc.) access
+to this backend is provided via the $d->xosd method. ie: replace $xosd
+with $d->xosd in the synopsis example (provided you made $d with
+something like my $d = new UI::Dialog...). Also, UI::Dialog (and
+friends) only load this module when you first use the $d->xosd method
+(this may silently fail, but you can test by ref() for success).
+
+=head1 EXPORT
+
+=over 2
+
+None
+
+=back
+
+=head1 INHERITS
+
+=over 2
+
+UI::Dialog::Backend
+
+=back
+
+=head1 CONSTRUCTOR
+
+=head2 new( @options )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my $xosd = new UI::Dialog::Backend::XOSD ( );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+This is the Class Constructor method. It accepts a list of key => value pairs
+and uses them as the defaults when interacting with the various widgets. All
+methods accept the same arguments as new() except that the arguments passed to
+the methods are temporarily used instead of making them the default as the
+new() method does. In the case of the 'wait' option, any (non-zero) value enables
+the option as it's a switch and not a string argument.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+A blessed object reference of the UI::Dialog::Backend::XOSD class.
+
+=back
+
+=item OPTIONS
+
+The (...)'s after each option indicate the default for the option. An * denotes
+support by all the widget methods on a per-use policy defaulting to the
+values decided during object creation.
+
+=over 6
+
+=item B<offset = \d+> (0) *
+
+=item B<align = \w+> ('left') *
+
+=item B<indent = \d+> (0) *
+
+=item B<font = "x-font-string"> ('fixed') *
+
+=item B<colour = \w+> ('red') *
+
+=item B<delay = \d+> (5) *
+
+=item B<lines = \d+> (5) *
+
+=item B<shadow = \d+> (0) *
+
+=item B<age = \d+> (0) *
+
+=item B<wait = 0,1> (0) *
+
+=back
+
+=back
+
+=head1 METHODS
+
+=head2 line( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ $xosd->line( text => "some text to display" );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Display a simple string on the screen.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+Nothing.
+
+=back
+
+=back
+
+=head2 file( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ $xosd->file( file => "/path/to/a/file" );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Display a file on the screen.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+Nothing.
+
+=back
+
+=back
+
+=head2 gauge( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ $xosd->gauge( text => "",
+               percent => $current_percentage,
+               length => 40,
+               bar => "-",
+               mark => "|" );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Display a gauge bar with a percentage mark on the screen with an optional
+message.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+Nothing.
+
+=back
+
+=back
+
+=head2 display_start( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ $xosd->display_start( );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Opens a pipe command to the osd_cat(1) program for prolonged interactivity.
+This accepts all of the standard options but has nothing else to offer. The
+other display_*() methods (detailed below) return zero unless this method has
+been used and has created the command pipe.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+TRUE (1) for success and FALSE (0) otherwise.
+
+=back
+
+=back
+
+=head2 display_text( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ $xosd->display_start();
+ $xosd->display_text( "Some string to display." );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Uses the command pipe created by display_start() and prints the first argument
+to the screen. This method does not have any options, save the one string
+scalar.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+TRUE (1) for success and FALSE (0) otherwise.
+
+=back
+
+=back
+
+=head2 display_gauge( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ $xosd->display_start();
+ $xosd->display_gauge( 50, "display an optional text string." );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Uses the command pipe created by display_start() and prints a gauge identical
+to the regular (stand-alone) gauge() method. There are only to accepted
+arguments; the desired percentage and an optional text string.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+TRUE (1) for success and FALSE (0) otherwise.
+
+=back
+
+=back
+
+=head2 display_stop( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ $xosd->display_start();
+ $xosd->display_text( "about to stop!" );
+ $xosd->display_stop();
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+This closes the command pipe opened by the display_start() method. This method
+takes no arguments and performs only the task for closing and existing
+command pipe.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+TRUE (1) for success and FALSE (0) otherwise.
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+=over 2
+
+=item PERLDOC
+
+ UI::Dialog
+ UI::Dialog::Backend
+
+=back
+
+=over 2
+
+=item MAN FILES
+
+osd_cat(1)
+
+=back
+
+=head1 BUGS
+
+Please email the author with any bug reports. Include the name of the
+module in the subject line.
+
+=head1 AUTHOR
+
+Kevin C. Krinke, E<lt>kevin@krinke.caE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+ Copyright (C) 2004-2016  Kevin C. Krinke <kevin@krinke.ca>
+
+ This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 2.1 of the License, or (at your option) any later version.
+
+ This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+
+ You should have received a copy of the GNU Lesser General Public
+ License along with this library; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+
+=cut

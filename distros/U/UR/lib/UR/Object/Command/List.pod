@@ -1,0 +1,78 @@
+=pod
+
+=head1 NAME
+
+UR::Object::Command::List - Fetches and lists objects in different styles.
+
+=head1 SYNOPSIS
+
+ package MyLister;
+
+ use strict;
+ use warnings;
+
+ use above "UR";
+
+ class MyLister {
+     is => 'UR::Object::Command::List',
+     has => [
+     # add/modify properties
+     ],
+ };
+
+ 1;
+
+=head1 Provided by the Developer
+
+=head2 subject_class_name (optional)
+
+The subject_class_name is the class for which the objects will be fetched.  It can be specified one of two main ways:
+
+=over
+
+=item I<by_the_end_user_on_the_command_line>
+
+For this do nothing, the end user will have to provide it when the command is run.
+
+=item I<by_the_developer_in the_class_declartion>
+
+For this, in the class declaration, add a has key w/ arrayref of hashrefs.  One of the hashrefs needs to be subject_class_name.  Give it this declaration:
+
+ class MyFetchAndDo {
+     is => 'UR::Object::Command::FetchAndDo',
+     has => [
+         subject_class_name => {
+             value => <CLASS NAME>,
+             is_constant => 1,
+         },
+     ],
+ };
+
+=back
+
+=head2 show (optional)
+
+Add defaults to the show property:
+
+ class MyFetchAndDo {
+     is => 'UR::Object::Command::FetchAndDo',
+     has => [
+         show => {
+             default_value => 'name,age', 
+         },
+     ],
+ };
+
+=head2 helps (optional)
+
+Overwrite the help_brief, help_synopsis and help_detail methods to provide specific help.  If overwiting the help_detail method, use call '_filter_doc' to get the filter documentation and usage to combine with your specific help.
+
+=head1 List Styles
+
+text, csv, html, xml, pretty (inprogress)
+
+=cut
+
+
+#$HeadURL: svn+ssh://svn/srv/svn/gscpan/perl_modules/trunk/UR/Object/Command/List.pm $
+#$Id: List.pm 50329 2009-08-25 20:10:00Z abrummet $

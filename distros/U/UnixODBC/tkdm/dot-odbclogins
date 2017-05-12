@@ -1,0 +1,21 @@
+# $Id: dot-odbclogins,v 1.2 2003-07-13 14:15:24 kiesling Exp $
+#
+# $HOME/.odbclogins file.  Each line has the format:
+# 
+#  hostname::login::password
+#
+#  For example:
+#
+#  CAUTION: You should make sure that other users cannot read 
+#  this file.  You can remove group and other read permissions
+#  after with, for example:
+#  
+#   chmod 0600 ~/.odbclogins
+#
+#  Example entries:
+#
+#   accounting::mylogin::mypassword
+#   sales::mylogin::mypassword
+#   warehouse::mylogin::mypassword
+#
+# 

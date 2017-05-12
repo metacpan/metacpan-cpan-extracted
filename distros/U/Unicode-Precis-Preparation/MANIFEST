@@ -1,0 +1,20 @@
+Changes
+data/makefile
+data/precis_preparation.pl
+Makefile.PL
+MANIFEST
+ppport.h
+precis_preparation.c
+precis_preparation.h
+Preparation.xs
+README
+t/00use.t
+t/01utf8.t
+t/02repertoires.t
+t/03contextualrules.t
+t/pod.t
+t/Utils.pm
+lib/POD2/JA/Unicode/Precis/Preparation.pod
+lib/Unicode/Precis/Preparation.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

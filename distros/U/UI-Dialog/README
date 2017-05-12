@@ -1,0 +1,113 @@
+UI-Dialog
+=========
+
+UI::Dialog is a OOPerl wrapper for the various dialog applications. These
+dialog backends are currently supported: Zenity, GDialog, XDialog, KDialog,
+CDialog, and Whiptail. There is also an ASCII backend provided as a last
+resort interface for the console based dialog variants. UI::Dialog is a
+class that provides a strict interface to these various backend modules.
+By using UI:Dialog (with it's imposed limitations on the widgets) you can
+ensure that your Perl program will function with any available interfaces.
+
+UI::Dialog supports priority ordering of the backend detection process. So
+if you'd prefer that Xdialog should be used first if available, simply
+designate the desired order when creating the new object. The default order
+for detecting and utilization of the backends are as follows:
+  (with DISPLAY env): Zenity, GDialog, XDialog, KDialog
+  (without DISPLAY): CDialog, Whiptail, ASCII
+
+
+INSTALLATION
+------------
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+SPECIAL NOTES
+-------------
+
+This release of UI::Dialog fundamentally changes how some internal mechanics
+function, namely the new `trust-input` behaviour for handling argument input
+(not user-input but rather programmer input). Every backend needed to have
+core functionality altered for this release and while the author has tried
+their best to test all the backends as thoroughly as possible; this has
+proven to require more time than they could invest.
+
+Developers should not need to adjust their use of UI::Dialog unless they
+need to enable the `trust-input` feature. See `examples/trust-input.pl` for
+example usage (or check the unit-tests, most have been updated for this
+specific feature).
+
+In the end, this release considers the XDialog backend to be "untested"
+and it is entirely possible that this backend is fundamentally broken at
+this time. XDialog is untested because it's unbuildable on Debian Jessie.
+This is a whole different problem, well beyond the scope of this release.
+
+In addition to XDialog, KDialog is also considered untested and potentially
+broken in fundamental ways.
+
+If you use either of these backends, or are just willing to help, please
+try the backends out (with this release of UI::Dialog) however you can.
+
+Detailed bugreports are very welcome. Unit tests, patches and anything
+else that can help the project along are even more appreciated. Please
+use the GitHub issue tracker[0] (or CPAN request tracker[1]) to provide
+your reports.
+
+ [0] https://github.com/kckrinke/ui-dialog/issues
+ [1] https://rt.cpan.org/Public/Dist/Display.html?Name=UI-Dialog
+
+These backends are of value and priority to UI::Dialog and given feedback,
+a followup bugfix release of UI::Dialog will be pushed out in a higher
+priority fashion. However, given little or no feedback, the assumption will
+be that either nobody uses these backends (highly doubted) or that they
+are functional as-is and not needing any fixes.
+
+
+PROVIDES
+--------
+
+ This module provides these classes, each with it's own perldoc:
+
+ UI::Dialog
+ UI::Dialog::Backend
+ UI::Dialog::Backend::ASCII
+ UI::Dialog::Backend::CDialog
+ UI::Dialog::Backend::GDialog
+ UI::Dialog::Backend::KDialog
+ UI::Dialog::Backend::Nautilus
+ UI::Dialog::Backend::NotifySend
+ UI::Dialog::Backend::Whiptail
+ UI::Dialog::Backend::XDialog
+ UI::Dialog::Backend::XOSD
+ UI::Dialog::Backend::Zenity
+ UI::Dialog::Console
+ UI::Dialog::GNOME
+ UI::Dialog::KDE
+ UI::Dialog::Screen::Menu
+ UI::Dialog::Screen::Druid
+
+
+COPYRIGHT AND LICENCE
+---------------------
+
+ Copyright (C) 2004-2016  Kevin C. Krinke <kevin@krinke.ca>
+
+ This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 2.1 of the License, or (at your option) any later version.
+
+ This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+
+ You should have received a copy of the GNU Lesser General Public
+ License along with this library; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA

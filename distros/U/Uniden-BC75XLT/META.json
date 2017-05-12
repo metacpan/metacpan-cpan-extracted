@@ -1,0 +1,41 @@
+{
+   "abstract" : "module to program Uniden BCL75XLT radio scanner over USB connection",
+   "author" : [
+      "Vladimir Ershov "
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.86, CPAN::Meta::Converter version 2.120351",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Uniden-BC75XLT",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Device::SerialPort" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v0.0.4"
+}

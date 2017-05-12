@@ -1,0 +1,107 @@
+=pod
+
+=head1 NAME
+
+UR::Manual::Metadata - Overview of the metadata classes in UR
+
+=head1 SYNOPSIS
+
+  use MyNamespace;
+  my $class_meta = MyNamespace::SomeClass->__meta__;
+  my @property_metas = $class_meta->direct_property_metas();
+  my @parent_class_metas = $class_meta->ancestry_class_metas();
+
+  my $table_obj = UR::DataSource::RDBMS::Table->get(
+                  table_name => $class_meta->table_name,
+              );
+  my @column_objs = $table_obj->columns();
+
+=head1 DESCRIPTION
+
+The UR system creates and uses several classes and objects to represent
+information about the many classes and objects in the system - metadata.
+For example, for each class, there is an object, called a class metadata
+object, to represent it.  Each property in a class has metadata.  So does
+the relationship between parent and child classes and relationships involved
+in delegated properties.  metadata about any database schemas your namespace
+knows about is also tracked and stored.
+
+These classes define an API for introspection and reflection, a way for the
+system to change itself as it runs, and methods for tracking changes and
+applying those changes to files and databases.
+
+=head1 APIs
+
+The metadata API is divided into 5 primary parts:
+
+=over 4
+
+=item Defining Classes
+
+The mechanism for defining class structure, including their properties and
+relationships.  It handles creating accessor/mutator methods for you.  The
+syntax for defining classes is detailed in the
+L<UR::Object::Type::Initializer> page.
+
+=item Objects Representing Classes, Properties, Relationships, etc.
+
+UR Classes aren't just conceptual entities like a package name, they have
+object instances to represent them.  For every named class, you can get a
+L<UR::Object::Type> instance with that C<class_name>.  Each property defined
+on that class has a L<UR::Object::Property> with a matching C<class_name>
+and C<property_name> pair.  Even those basic metadata classes have class,
+property and relationship metadata of their own.
+
+=item Schema Objects
+
+If you use the C<ur update classes> command-line tool to manage the linkage
+between your database schema(s) and class structure (it's not necessary; you
+can also manage it by hand), then objects will also exist to represent the
+database entities.  See also L<UR::DataSource::Meta>
+
+=over 2 
+
+=item .
+tables L<UR::DataSource::RDBMS::Table>
+
+=item .
+columns L<UR::DataSource::RDBMS::TableColumn>
+
+=item .
+Foreign key constraints L<UR::DataSource::RDBMS::FkConstraint> and
+L<UR::DataSource::RDBMS::FkConstraintColumn>
+
+=item .
+Primary key constraints L<UR::DataSource::RDBMS::PkConstraintColumn>
+
+=item .
+Unique constraints L<UR::DataSource::RDBMS::UniqueConstraintColumn>
+
+=back
+
+=item Namespaces, Contexts and Data Sources
+
+Namespaces (L<UR::Namespace>) collect and manage groups of related classes.
+Classes can be a member of one Namespace, and in practice will live in
+a subdirectory under the Namespace module's name.
+
+Contexts (L<UR::Context>) and Data Sources (L<UR::DataSource>) provide a
+filtered view of the data that is reachable through the current Namespace.
+
+=item Index, Change, Observer and other incidentals
+
+And then there's everything else
+
+L<UR::Object::Index> objects are created by the system to handle get()
+requests for non-ID parameters.
+
+L<UR::Change> objects represent a change in the system during a software
+transaction, such as an object's property changind value or creating a new
+instance of something.
+
+L<UR::Observer> objects manage the change subscription system, where the
+application can be notified of changes through callbacks.  See also 
+L<UR::Object/create_subscription>.
+
+=back
+

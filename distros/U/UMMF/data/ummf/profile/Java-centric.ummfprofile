@@ -1,0 +1,538 @@
+--- #YAML:1.0
+# $Id: Java-centric.ummfprofile,v 1.5 2005/01/01 10:13:48 kstephens Exp $
+# Profile for mapping common Java elements to other implementation languages.
+# Helpful for dealing with "Java-centric" UML editors.
+# Author: kstephens@users.sourceforge.net 2003/10/20
+Java:
+  '':
+    generate:        true
+# Handle primitive Java types
+  void:
+    generate:        false
+    primitive:       true
+    primitive.type:  void
+    type.impl:       void
+    storage:         false
+  boolean:
+    generate:        false
+    primitive:       true
+    primitive.type:  boolean
+    type.impl:       boolean
+    storage:         true
+    storage.type:    int
+  byte:
+    generate:        false
+    primitive:       true
+    primitive.type:  byte
+    type.impl:       byte
+    storage:         true
+    storage.type:    int
+  char:
+    generate:        false
+    primitive:       true
+    primitive.type:  char
+    type.impl:       char
+    storage:         true
+    storage.type:    int
+  short:
+    generate:        false
+    primitive:       true
+    primitive.type:  short
+    type.impl:       short
+    storage:         true
+    storage.type:    int
+  int:
+    generate:        false
+    primitive:       true
+    primitive.type:  int
+    type.impl:       int
+    storage:         true
+    storage.type:    int
+  long:
+    generate:        false
+    primitive:       true
+    primitive.type:  long
+    type.impl:       long
+    storage:         true
+    storage.type:    int
+  float:
+    generate:        false
+    primitive:       true
+    primitive.type:  float
+    type.impl:       float
+    storage:         true
+    storage.type:    real
+  double:
+    generate:        false
+    primitive:       true
+    primitive.type:  double
+    type.impl:       double
+    storage:         true
+    storage.type:    real
+  'boolean[]':
+    generate:        false
+    primitive:       true
+    primitive.type:  boolean[]
+    type.impl:       boolean[]
+    storage:         true
+    storage.type:    binary
+  'byte[]':
+    generate:        false
+    primitive:       true
+    primitive.type:  byte[]
+    type.impl:       byte[]
+    storage:         true
+    storage.type:    binary
+  'char[]':
+    generate:        false
+    primitive:       true
+    primitive.type:  char[]
+    type.impl:       char[]
+    storage:         true
+    storage.type:    text
+  'short[]':
+    generate:        false
+    storage:         true
+    primitive:       true
+    primitive.type:  short[]
+    type.impl:       short[]
+    storage.type:    flat_array
+    storage.subtype: int
+  'int[]':
+    generate:        false
+#    primitive:       true
+#    primitive.type:  int[]
+    type.impl:       int[]
+    storage:         true
+    storage.type:    flat_array
+    storage.subtype: int
+  'long[]':
+    generate:        false
+#    primitive:       true
+#    primitive.type:  long[]
+    type.impl:       long[]
+    storage:         true
+    storage.type:    flat_array
+    storage.subtype: int
+  'float[]':
+    generate:        false
+#    primitive:       true
+#    primitive.type:  float[]
+    type.impl:       float[]
+    storage:         true
+    storage.type:    flat_array
+    storage.subtype: float
+  'double[]':
+    generate:        false
+#    primitive:       true
+#    primitive.type:  double[]
+    type.impl:       double[]
+    storage:         true
+    storage.type:    flat_array
+    storage.subtype: double
+# Do not generate standard java(tm) packages.
+  java:
+    generate:        false
+  javax:
+    generate:        false
+  #
+  # Some UML editors (Poseidon) sometimes auto-vivify Primitive types,
+  # like, 'int' as in the 'java::lang::' Package, which is actually wrong because
+  # "java.lang.int" is not a valid Java type.
+  java::lang:
+    generate:        false
+  java::lang::void:
+    generate:        false
+    primitive:       true
+    primitive.type:  void
+    type.impl:       void
+    storage:         false
+  java::lang::boolean:
+    generate:        false
+    primitive:       true
+    primitive.type:  boolean
+    type.impl:       boolean
+    storage:         true
+    storage.type:    int
+  java::lang::byte:
+    generate:        false
+    primitive:       true
+    primitive.type:  byte
+    type.impl:       byte
+    storage:         true
+    storage.type:    int
+  java::lang::char:
+    generate:        false
+    primitive:       true
+    primitive.type:  char
+    type.impl:       char
+    storage:         true
+    storage.type:    int
+  java::lang::short:
+    generate:        false
+    primitive:       true
+    primitive.type:  short
+    type.impl:       short
+    storage:         true
+    storage.type:    int
+  java::lang::int:
+    generate:        false
+    primitive:       true
+    primitive.type:  int
+    type.impl:       int
+    storage:         true
+    storage.type:    int
+  java::lang::long:
+    generate:        false
+    primitive:       true
+    primitive.type:  long
+    type.impl:       long
+    storage:         true
+    storage.type:    int
+  java::lang::float:
+    generate:        false
+    primitive:       true
+    primitive.type:  float
+    type.impl:       float
+    storage:         true
+    storage.type:    real
+  java::lang::double:
+    generate:        false
+    primitive:       true
+    primitive.type:  double
+    type.impl:       double
+    storage:         true
+    storage.type:    real
+  'java::lang::boolean[]':
+    generate:        false
+    primitive:       true
+    primitive.type:  boolean[]
+    type.impl:       boolean[]
+    storage:         true
+    storage.type:    binary
+  'java::lang::byte[]':
+    generate:        false
+    primitive:       true
+    primitive.type:  byte[]
+    type.impl:       byte[]
+    storage:         true
+    storage.type:    binary
+  'java::lang::char[]':
+    generate:        false
+    primitive:       true
+    primitive.type:  char[]
+    type.impl:       char[]
+    storage:         true
+    storage.type:    text
+  'java::lang::short[]':
+    generate:        false
+    storage:         true
+    primitive:       true
+    primitive.type:  short[]
+    type.impl:       short[]
+    storage.type:    flat_array
+    storage.subtype: int
+  'java::lang::int[]':
+    generate:        false
+#    primitive:       true
+#    primitive.type:  int[]
+    type.impl:       int[]
+    storage:         true
+    storage.type:    flat_array
+    storage.subtype: int
+  'java::lang::long[]':
+    generate:        false
+#    primitive:       true
+#    primitive.type:  long[]
+    type.impl:       long[]
+    storage:         true
+    storage.type:    flat_array
+    storage.subtype: int
+  'java::lang::float[]':
+    generate:        false
+#    primitive:       true
+#    primitive.type:  float[]
+    type.impl:       float[]
+    storage:         true
+    storage.type:    flat_array
+    storage.subtype: float
+  'java::lang::double[]':
+    generate:        false
+#    primitive:       true
+#    primitive.type:  double[]
+    type.impl:       double[]
+    storage:         true
+    storage.type:    flat_array
+    storage.subtype: double
+  java::lang::Object:
+    generate:        false
+#    primitive:       true
+#    primitive.type:  java.lang.Object
+#    type.impl:       java.lang.Object
+    storage:         true
+    storage.type:    ref
+  'java::lang::Object[]':
+    generate:        false
+#    primitive:       true
+#    primitive.type:  java.lang.Object[]
+    storage:         true
+    storage.type:    array
+    storage.subtype: java::lang::Object
+  java::lang::String:
+    generate:        false
+#    primitive:       true
+#    primitive.type:  java.lang.String
+#    type.impl:       java.lang.String
+    storage:         true
+    storage.type:    string
+  'java::lang::String[]':
+    generate:        false
+#    primitive:       true
+#    primitive.type:  java.lang.String[]
+    storage:         true
+    storage.type:    flat_array
+    storage.subtype: string
+Perl:
+  '':
+    generate:        true
+    storage:         true
+  void:
+    generate:        false
+    primitive:       true
+    storage:         false
+  boolean:
+    generate:        false
+    primitive:       true
+    primitive.type:  SCALAR
+    storage.type:    int
+  byte:
+    generate:        false
+    primitive:       true
+    primitive.type:  SCALAR
+    storage.type:    int
+  short: 
+    generate:        false
+    primitive:       true
+    primitive.type:  SCALAR
+    storage.type:    int
+  int:
+    generate:        false
+    primitive:       true
+    primitive.type:  SCALAR
+    storage.type:    int
+  long:
+    generate:        false
+    primitive:       true
+    primitive.type:  SCALAR
+    storage.type:    int
+  float:
+    generate:        false
+    primitive:       true
+    primitive.type:  SCALAR
+    storage.type:    real
+  double:
+    generate:        false
+    primitive:       true
+    primitive.type:  SCALAR
+    storage.type:    real
+  'boolean[]':
+    generate:        false
+    primitive:       true
+    primitive.type:  ARRAY
+    storage.type:    flat_array
+    storage.subtype: int
+  'byte[]':
+    generate:        false
+    primitive:       true
+    primitive.type:  ARRAY
+    storage.type:    flat_array
+    storage.subtype: int
+  'short[]':
+    generate:        false
+    primitive:       true
+    primitive.type:  ARRAY
+    storage.type:    flat_array
+    storage.subtype: int
+  'int[]':
+    generate:        false
+    primitive:       true
+    primitive.type:  ARRAY
+    storage.type:    flat_array
+    storage.subtype: int
+  'long[]':
+    generate:        false
+    primitive:       true
+    primitive.type:  ARRAY
+    storage.type:    flat_array
+    storage.subtype: int
+  'float[]':
+    generate:        false
+    primitive:       true
+    primitive.type:  ARRAY
+    storage.type:    flat_array
+    storage.subtype: real
+  'double[]':
+    generate:        false
+    primitive:       true
+    primitive.type:  ARRAY
+    storage.type:    flat_array
+    storage.subtype: real
+  # Sometimes Poseidon 2.2.x sometimes puts 'String' in the root Namespace!!
+  # -- kurt@users.sourceforge.net 2004/02/25
+  String:
+    primitive:       true
+    primitive.type:  SCALAR
+    storage:         true
+    storage.type:    string
+  'String[]':
+    primitive:       true
+    primitive.type:  ARRAY
+    storage:         true
+    storage.type:    flat_array
+    storage.subtype: string
+  java:
+    generate:        false
+  # Some UML editors (Poseidon) sometimes auto-vivify Primitive types,
+  # like, 'int' as in the 'java::lang::' Package, which is actually wrong because
+  # "java.lang.int" is not a valid Java type.
+  java::lang::void:
+    generate:        false
+    primitive:       true
+    primitive.type:  SCALAR
+    storage:         false
+  java::lang::boolean:
+    generate:        false
+    primitive:       true
+    primitive.type:  SCALAR
+    storage:         true
+    storage.type:    int
+  java::lang::byte:
+    generate:        false
+    primitive:       true
+    primitive.type:  SCALAR
+    storage:         true
+    storage.type:    int
+  java::lang::short:
+    generate:        false
+    primitive:       true
+    primitive.type:  SCALAR
+    storage:         true
+    storage.type:    int
+  java::lang::int:
+    generate:        false
+    primitive:       true
+    primitive.type:  SCALAR
+    storage:         true
+    storage.type:    int
+  java::lang::long:
+    generate:        false
+    primitive:       true
+    primitive.type:  SCALAR
+    storage:         true
+    storage.type:    int
+  java::lang::float:
+    generate:        false
+    primitive:       true
+    primitive.type:  SCALAR
+    storage:         true
+    storage.type:    real
+  java::lang::double:
+    generate:        false
+    primitive:       true
+    primitive.type:  SCALAR
+    storage:         true
+    storage.type:    real
+  'java::lang::boolean[]':
+    generate:        false
+    primitive:       true
+    primitive.type:  ARRAY
+    storage:         true
+    storage.type:    flat_array
+    storage.subtype: int
+  'java::lang::byte[]':
+    generate:        false
+    primitive:       true
+    primitive.type:  ARRAY
+    storage:         true
+    storage.type:    flat_array
+    storage.subtype: int
+  'java::lang::short[]':
+    generate:        false
+    storage:         true
+    primitive:       true
+    primitive.type:  ARRAY
+    storage.type:    flat_array
+    storage.subtype: int
+  'java::lang::int[]':
+    generate:        false
+    primitive:       true
+    primitive.type:  ARRAY
+    storage:         true
+    storage.type:    flat_array
+    storage.subtype: int
+  'java::lang::long[]':
+    generate:        false
+    primitive:       true
+    primitive.type:  ARRAY
+    storage:         true
+    storage.type:    flat_array
+    storage.subtype: int
+  'java::lang::float[]':
+    generate:        false
+    primitive:       true
+    primitive.type:  ARRAY
+    storage:         true
+    storage.type:    flat_array
+    storage.subtype: real
+  'java::lang::double[]':
+    generate:        false
+    primitive:       true
+    primitive.type:  ARRAY
+    storage:         true
+    storage.type:    flat_array
+    storage.subtype: real
+  java::lang::Object:
+    primitive:       true
+    primitive.type:  SCALAR
+    storage:         true
+    storage.type:    ref
+  'java::lang::Object[]':
+    primitive:       true
+    primitive.type:  ARRAY
+    storage:         true
+    storage.type:    array
+    # storage.subtype: java::lang::Object
+  java::lang::String:
+    primitive:       true
+    primitive.type:  SCALAR
+    storage:         true
+    storage.type:    string
+  'java::lang::String[]':
+    primitive:       true
+    primitive.type:  ARRAY
+    storage:         true
+    storage.type:    flat_array
+    storage.subtype: string
+  java::util::Time:
+    primitive:       true
+    primitive.type:  SCALAR
+    storage:         true
+    storage.type:    double
+  java::util::Date:
+    primitive:       true
+    primitive.type:  SCALAR
+    storage:         true
+    storage.type:    double
+  java::util::TimeZone:
+    primitive:       true
+    primitive.type:  SCALAR
+    storage:         true
+    storage.type:    string
+  java::net::URL:
+    primitive:       true
+    primitive.type:  SCALAR
+    storage:         true
+    storage.type:    string
+
+
+

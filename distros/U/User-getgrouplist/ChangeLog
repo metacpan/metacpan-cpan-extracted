@@ -1,0 +1,31 @@
+Change log for User::getgrouplist
+
+20140410	[ 1.1.1 ]
+	- Fix implementation for Cygwin
+
+20140109	[ 1.1.0 ]
+	- Add support for OpenBSD and MacOS X
+
+20131125	[ 1.0.4 ]
+	- Fix a memory leak
+		Thanks to Vincent Pit for notification
+
+20131125	[ 1.0.3 ]
+	- Include a more recent version of Devel::CheckLib which works
+	  with perl 5.18.1
+		Thanks to Gelu Lupaş for notification
+	- Migrate to github
+	- More sensible test to really call the getgrouplist function
+
+20100310	[ 1.0.2 ]
+	- Operating system check (do not build on Irix, Solaris, Windows)
+	- Check for availability of libc function before building
+
+20100308	[ 1.0.1 ]
+	- Include pwd.h (fix building for multiple platforms)
+		Thanks to Brian De Wolf for notification
+	- Use gzip instead of bzip2 for compressing distribution
+		Thanks to Brian De Wolf as well for this
+
+20091020	[ 1.0 ]
+	- Initial release

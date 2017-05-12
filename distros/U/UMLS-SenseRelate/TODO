@@ -1,0 +1,50 @@
+NAME
+    Todo List for UMLS-SenseRelate
+
+SYNOPSIS
+    Plans for future versions of UMLS-SenseRelate
+
+TO DO LIST
+    1. add additional tests in t/
+
+    2. add a cache to the all words disambiguation programs similar to that
+    in the target word disambiguation programs
+
+    3. mmxml format runs rather slow -- I think this could be speed up
+
+    4. I keep thinking that for all words disambiguation we could treat this
+    as a graph problem. We have possible senses for each term in the
+    abstract, the possible senses and the terms are linked together based on
+    their similarity scores -- can we use a graph algorithm to find the
+    global maximum for all the scores? I don't know if I am stating this
+    clearly.
+
+    5. Explore using vector. I think a different vector matrix files will be
+    needed when using the biomedical data though. I would suggest looking at
+    the bigram counts of Medline provided by the library.
+
+    6. We have not looked at combining sources which I think this could lend
+    itself to nicely -- especially with the NLM-WSD dataset because not all
+    possible senses of a target word are in a single source.
+
+    7. Ted has mentioned using viterbi -- I wonder if this is along the same
+    lines of the graph idea from (4).
+
+    8. incorporate intrinsic information content measures
+
+AUTHORS
+    Bridget T. McInnes <bthomson at cs.umn.edu>
+
+SEE ALSO
+COPYRIGHT
+    Copyright (C) 2007-2011 Ted Pedersen, Bridget T. McInnes
+
+    Permission is granted to copy, distribute and/or modify this document
+    under the terms of the GNU Free Documentation License, Version 1.2 or
+    any later version published by the Free Software Foundation; with no
+    Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
+
+    Note: a copy of the GNU Free Documentation License is available on the
+    web at <http://www.gnu.org/copyleft/fdl.html> and is included in this
+    distribution as FDL.txt.
+

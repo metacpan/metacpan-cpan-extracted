@@ -1,0 +1,30 @@
+---
+abstract: 'East Asian Width properties'
+author:
+  - '唐鳳 <cpan@audreyt.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: unrestricted
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Unicode::EastAsianWidth
+name: Unicode-EastAsianWidth
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  perl: 5.6.0
+resources:
+  homepage: https://github.com/audreyt/Unicode-EastAsianWidth/tree
+  repository:
+    type: git
+    url: git://github.com/audreyt/Unicode-EastAsianWidth.git
+    web: https://github.com/audreyt/Unicode-EastAsianWidth/tree
+version: 1.33

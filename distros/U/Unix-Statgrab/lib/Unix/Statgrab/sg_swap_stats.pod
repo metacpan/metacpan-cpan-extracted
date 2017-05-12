@@ -1,0 +1,94 @@
+=head1 NAME
+
+Unix::Statgrab::sg_swap_stats - container for libstatgrab swap space statistics
+
+=head1 DESCRIPTION
+
+C<Unix::Statgrab::sg_swap_stats> is a Perl package name providing
+accessors to bundled libstatgrab L<sg_swap_stats|http://www.i-scream.org/libstatgrab/docs/sg_get_mem_stats.3.html> swap space statistics.
+
+=head1 METHODS
+
+=head2 nentries
+
+Returns the number of entries in the container.
+
+=head2 systime
+
+Returns the seconds since Epoch (0:00:00 on January, 1st 1970) of the time measure the swap space statistics.
+
+=head2 as_list
+
+B<Deprecated> alias of L</fetchall_hash>
+
+=head2 fetchall_hash
+
+Returns all records from L<sg_swap_stats|http://www.i-scream.org/libstatgrab/docs/sg_get_mem_stats.3.html>
+container as list of hash containing each datum name as key and the datum as value.
+
+=head2 fetchall_array
+
+Returns all records from L<sg_swap_stats|http://www.i-scream.org/libstatgrab/docs/sg_get_mem_stats.3.html>
+container as list of arrays containing the values in following order:
+
+  (total free used systime)
+
+in that order without leading headline.
+
+=head2 fetchall_table
+
+Returns all records from L<sg_swap_stats|http://www.i-scream.org/libstatgrab/docs/sg_get_mem_stats.3.html>
+container as list of arrays containing the values in following order:
+
+  (total free used systime)
+
+in that order including leading headline.
+
+=head2 fetchrow_arrayref($row = 0)
+
+Returns one row as array containing values as above.
+
+=head2 fetchall_arrayref
+
+Returns all records from L<sg_swap_stats|http://www.i-scream.org/libstatgrab/docs/sg_get_mem_stats.3.html>
+container as array of arrays without header.
+
+=head2 fetchrow_hashref($row = 0)
+
+Returns one row as hash containing C<< { total => $self.total($row), used => ... } >>.
+
+=head2 fetchall_hashref
+
+Returns all records from L<sg_swap_stats|http://www.i-scream.org/libstatgrab/docs/sg_get_mem_stats.3.html>
+container as array of hashes.
+
+=head2 colnames
+
+Returns list of column names: C<< (total free used systime) >>
+
+=head2 total
+
+The total swap space in bytes.
+
+=head2 free
+
+The used swap in bytes.
+
+=head2 used
+
+The free swap in bytes.
+
+=head1 AUTHOR
+
+Jens Rehsack, E<lt>rehsack AT cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2012-2015 by Jens Rehsack
+
+This library is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 2.1 of the License, or (at your option) any
+later version.
+
+=cut

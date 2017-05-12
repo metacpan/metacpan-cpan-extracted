@@ -1,0 +1,25 @@
+Revision history for URL-Checkout
+
+1.05    jw, Mon Jan 17 21:30:04 CET 2011
+	added pre_cmd() post_cmd() whith support for fake_home credentials.
+
+1.04	jw, Wed Aug 11 01:29:25 CEST 2010
+	Using Text::Sprintf::Named for pythonesque %(format)s.
+	Added missing add_method() method.
+
+1.03	jw, Fri Aug  6 14:29:36 CEST 2010
+	Testsuite added with a list of known URLs and Commands.
+	Added 01-init.t, 02-urls.t
+	Fixed name matching bug in find_method(). 'ne' is now 'eq'
+	Added description texts and method describe().
+
+1.02	Thu Aug  5 01:37:46 CEST 2010
+	demo script url_co.pl was missing in MANIFEST
+
+1.01	jw, Thu Aug  5 01:37:26 CEST 2010
+	It works. surprisingly well.
+
+0.01    jw, Wed Aug  4 02:10:03 CEST 2010
+        Completed coding in one go. Nothing tested.
+	Offering wget, git, svn.
+

@@ -1,0 +1,6 @@
+Revision history for Perl extension UserDB.
+
+1.00  Thu Dec 17 20:15:54 2014
+	- original version; created by h2xs 1.23 with options
+		-AX UserDB
+

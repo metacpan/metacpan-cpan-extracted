@@ -1,0 +1,93 @@
+User::Utmp
+
+Copyright © 2006 Michael Piotrowski.  All Rights Reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+Description
+-----------
+
+This module provides a Perl interface to utmpx- and utmp-style
+databases on UNIX systems, the most important being "the utmpx file"
+(typically found at /var/run/utmpx, /etc/utmpx or a similar location),
+which provides information about users currently logged in.  There is
+also support for writing records to utmpx and utmp files.  For further
+details see the POD documentation embedded in the file Utmp.pm, which
+will also be installed as User::Utmp(3) manpage, and the example.pl
+script.
+
+Prerequisites
+-------------
+
+Your system should provide a utmpx implementation compliant with the
+Single UNIX Specification or (for utmp) setutent(), getutent(), and
+endutent() functions compliant with SVID2.
+
+Hint files are provided for AIX, HP-UX, Linux, NetBSD and Solaris.  If
+you're using a system for which there is no hint file, User::Utmp will
+be built with basic utmp support, and, if the _XOPEN_UNIX macro is
+defined, with basic utmpx support.  If you want to use additional
+fields provided by your system's implementation, you'll have to define
+the appropriate flags.
+
+Portability note
+----------------
+
+Unfortunately, the contents of the utmp structure are highly
+system-dependent, making multi-platform support difficult.
+
+Utmpx is formally standardized, but the definition still leaves some
+details to the implementation; most vendors also provide extensions.
+
+Therefore User::Utmp uses hint files (see the hints directory and the
+ExtUtils::MakeMaker man page) to control the inclusion of
+system-dependent code.  Note that the Linux hint file enables support
+for the ut_host and ut_addr fields; these fields exist on the system I
+tested it, which is fairly recent.  Older versions of Linux seem to
+have much more limited Utmp implementations.
+
+Building the module
+-------------------
+
+The module can be built using this sequence of commands:
+
+    perl Makefile.PL
+    make
+    make test
+
+Besides testing if the module is loadable, "make test" runs a number
+of other tests.  For example, it checks if a utmp record matching the
+current user and tty can be found.  If utmpx is available, the same
+test is also done using utmpx functions.  I *think* this is pretty
+portable, but if it fails, it might be because that the assumptions
+made by the test do not apply to your system, not because User::Utmp
+doesn't work.
+
+I'd appreciate any ideas for portable tests.
+
+Also included is the script example.pl, which can be used for further
+testing.
+
+Installation
+------------
+
+    make install
+
+History
+-------
+
+User::Utmp was developed as a quick solution for a project at hand.
+It's therefore a straightforward translation of the C interface to
+Perl; originally it provided only two functions (getut() and
+getutx()), now it covers the standard utmpx interface, the traditional
+utmp interface, and some vendor extensions.
+
+Feedback
+--------
+
+This version of User::Utmp was tested on HP-UX 11.00, Linux 2.4.20 and
+2.6.14, NetBSD 3.0, and Solaris 9.  If you are building the module on
+another platform I'd appreciate a note about how you got on.
+
+Michael Piotrowski <mxp@dynalabs.de>

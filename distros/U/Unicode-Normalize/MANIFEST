@@ -1,0 +1,26 @@
+Changes		# Changes
+disableXS	# perl script to disable XSUB
+enableXS	# perl script to enable XSUB
+LICENSE
+Makefile.PL
+MANIFEST	MANIFEST for XSUB
+MANIFEST.N	# MANIFEST for NoXSUB (pure perl)
+mkheader	perl script to make C header files for XSUB
+Normalize.pm	perl module for XSUB
+Normalize.pmN	# perl module for NoXSUB (pure perl)
+Normalize.xs	extension for XSUB
+README		# README
+t/fcdc.t
+t/form.t
+t/func.t
+t/illegal.t
+t/norm.t
+t/null.t
+t/partial1.t
+t/partial2.t
+t/proto.t
+t/split.t
+t/test.t
+t/tie.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

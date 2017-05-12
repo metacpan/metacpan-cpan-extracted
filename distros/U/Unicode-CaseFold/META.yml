@@ -1,0 +1,36 @@
+---
+abstract: 'Unicode case-folding for case-insensitive lookups.'
+author:
+  - 'Andrew Rodland <arodland@cpan.org>'
+build_requires:
+  Module::Build: 0.3601
+  Test::More: 0
+  utf8: 0
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Unicode-CaseFold
+no_index:
+  directory:
+    - t
+recommends:
+  XSLoader: 0
+requires:
+  Exporter: 0
+  Scalar::Util: 1.11
+  Unicode::UCD: 0
+  perl: 5.008001
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Unicode-CaseFold
+  homepage: http://metacpan.org/release/Unicode-CaseFold
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/arodland/Unicode-CaseFold.git
+version: 1.00
+x_authority: cpan:ARODLAND

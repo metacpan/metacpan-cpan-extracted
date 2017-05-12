@@ -1,0 +1,967 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+ABSPERL	Makefile	/^ABSPERL = $(PERL)$/;"	m
+ABSPERLRUN	Makefile	/^ABSPERLRUN = $(ABSPERL)$/;"	m
+ABSPERLRUNINST	Makefile	/^ABSPERLRUNINST = $(ABSPERLRUN) "-I$(INST_ARCHLIB)" "-I$(INST_LIB)"$/;"	m
+AR	Makefile	/^AR = ar$/;"	m
+ARMAYBE	Makefile	/^ARMAYBE = :$/;"	m
+AR_STATIC_ARGS	Makefile	/^AR_STATIC_ARGS = cr$/;"	m
+AUTOSPLITFILE	Makefile	/^AUTOSPLITFILE = $(ABSPERLRUN)  -e 'use AutoSplit;  autosplit($$$$ARGV[0], $$$$ARGV[1], 0, 1, 1)' --$/;"	m
+AvFILLp	ppport.h	/^#  define AvFILLp /;"	d
+BASEEXT	Makefile	/^BASEEXT = XSEscape$/;"	m
+BOOTDEP	Makefile	/^BOOTDEP = $/;"	m
+BOOTSTRAP	Makefile	/^BOOTSTRAP = $(BASEEXT).bs$/;"	m
+BUFFER_H_	buffer.h	/^#define BUFFER_H_$/;"	d
+BUFFER_SIZEOF_DESIRED	buffer.h	/^#define BUFFER_SIZEOF_DESIRED /;"	d
+BUFFER_SIZE_FACTOR	buffer.h	/^#define BUFFER_SIZE_FACTOR /;"	d
+BUFFER_SIZE_INIT	buffer.h	/^#define BUFFER_SIZE_INIT /;"	d
+Buffer	buffer.h	/^typedef struct Buffer {$/;"	s
+Buffer	buffer.h	/^} Buffer;$/;"	t	typeref:struct:Buffer
+CC	Makefile	/^CC = cc$/;"	m
+CCCDLFLAGS	Makefile	/^CCCDLFLAGS =  $/;"	m
+CCCMD	Makefile	/^CCCMD = $(CC) -c $(PASTHRU_INC) $(INC) \\$/;"	m
+CCDLFLAGS	Makefile	/^CCDLFLAGS =  $/;"	m
+CCFLAGS	Makefile	/^CCFLAGS = -arch i386 -arch x86_64 -g -pipe -fno-common -DPERL_DARWIN -fno-strict-aliasing -fstack-protector -std=c89 -pedantic -Wall$/;"	m
+CHMOD	Makefile	/^CHMOD = chmod$/;"	m
+CI	Makefile	/^CI = ci -u$/;"	m
+COMPRESS	Makefile	/^COMPRESS = gzip --best$/;"	m
+CONFIGDEP	Makefile	/^CONFIGDEP = $(PERL_ARCHLIBDEP)$(DFSEP)Config.pm $(PERL_INCDEP)$(DFSEP)config.h$/;"	m
+CP	Makefile	/^CP = cp$/;"	m
+CPERLscope	ppport.h	/^#  define CPERLscope(/;"	d
+CPERLscope	ppport.h	/^typedef OP* (CPERLscope(*Perl_check_t)) (pTHX_ OP*);$/;"	t
+CPERLscope	ppport.h	/^typedef OP* (CPERLscope(*Perl_ppaddr_t))(ARGSproto);$/;"	t
+CPERLscope	ppport.h	/^typedef OP* (CPERLscope(*Perl_ppaddr_t))(pTHX);$/;"	t
+CP_NONEMPTY	Makefile	/^CP_NONEMPTY = $(ABSPERLRUN) -MExtUtils::Command::MM -e 'cp_nonempty' --$/;"	m
+C_FILES	Makefile	/^C_FILES  = escape.c \\$/;"	m
+CopFILE	ppport.h	/^#  define CopFILE(/;"	d
+CopFILEAV	ppport.h	/^#  define CopFILEAV(/;"	d
+CopFILEGV	ppport.h	/^#  define CopFILEGV(/;"	d
+CopFILEGV_set	ppport.h	/^#  define CopFILEGV_set(/;"	d
+CopFILESV	ppport.h	/^#  define CopFILESV(/;"	d
+CopFILE_set	ppport.h	/^#  define CopFILE_set(/;"	d
+CopSTASH	ppport.h	/^#  define CopSTASH(/;"	d
+CopSTASHPV	ppport.h	/^#  define CopSTASHPV(/;"	d
+CopSTASHPV_set	ppport.h	/^#  define CopSTASHPV_set(/;"	d
+CopSTASH_eq	ppport.h	/^#  define CopSTASH_eq(/;"	d
+CopSTASH_set	ppport.h	/^#  define CopSTASH_set(/;"	d
+CopyD	ppport.h	/^#  define CopyD(/;"	d
+DEFINE_VERSION	Makefile	/^DEFINE_VERSION = -D$(VERSION_MACRO)=\\"$(VERSION)\\"$/;"	m
+DEFSV	ppport.h	/^#  define DEFSV /;"	d
+DEFSV_set	ppport.h	/^#  define DEFSV_set(/;"	d
+DESTDIR	Makefile	/^DESTDIR = $/;"	m
+DESTINSTALLARCHLIB	Makefile	/^DESTINSTALLARCHLIB = $(DESTDIR)$(INSTALLARCHLIB)$/;"	m
+DESTINSTALLBIN	Makefile	/^DESTINSTALLBIN = $(DESTDIR)$(INSTALLBIN)$/;"	m
+DESTINSTALLMAN1DIR	Makefile	/^DESTINSTALLMAN1DIR = $(DESTDIR)$(INSTALLMAN1DIR)$/;"	m
+DESTINSTALLMAN3DIR	Makefile	/^DESTINSTALLMAN3DIR = $(DESTDIR)$(INSTALLMAN3DIR)$/;"	m
+DESTINSTALLPRIVLIB	Makefile	/^DESTINSTALLPRIVLIB = $(DESTDIR)$(INSTALLPRIVLIB)$/;"	m
+DESTINSTALLSCRIPT	Makefile	/^DESTINSTALLSCRIPT = $(DESTDIR)$(INSTALLSCRIPT)$/;"	m
+DESTINSTALLSITEARCH	Makefile	/^DESTINSTALLSITEARCH = $(DESTDIR)$(INSTALLSITEARCH)$/;"	m
+DESTINSTALLSITEBIN	Makefile	/^DESTINSTALLSITEBIN = $(DESTDIR)$(INSTALLSITEBIN)$/;"	m
+DESTINSTALLSITELIB	Makefile	/^DESTINSTALLSITELIB = $(DESTDIR)$(INSTALLSITELIB)$/;"	m
+DESTINSTALLSITEMAN1DIR	Makefile	/^DESTINSTALLSITEMAN1DIR = $(DESTDIR)$(INSTALLSITEMAN1DIR)$/;"	m
+DESTINSTALLSITEMAN3DIR	Makefile	/^DESTINSTALLSITEMAN3DIR = $(DESTDIR)$(INSTALLSITEMAN3DIR)$/;"	m
+DESTINSTALLSITESCRIPT	Makefile	/^DESTINSTALLSITESCRIPT = $(DESTDIR)$(INSTALLSITESCRIPT)$/;"	m
+DESTINSTALLVENDORARCH	Makefile	/^DESTINSTALLVENDORARCH = $(DESTDIR)$(INSTALLVENDORARCH)$/;"	m
+DESTINSTALLVENDORBIN	Makefile	/^DESTINSTALLVENDORBIN = $(DESTDIR)$(INSTALLVENDORBIN)$/;"	m
+DESTINSTALLVENDORLIB	Makefile	/^DESTINSTALLVENDORLIB = $(DESTDIR)$(INSTALLVENDORLIB)$/;"	m
+DESTINSTALLVENDORMAN1DIR	Makefile	/^DESTINSTALLVENDORMAN1DIR = $(DESTDIR)$(INSTALLVENDORMAN1DIR)$/;"	m
+DESTINSTALLVENDORMAN3DIR	Makefile	/^DESTINSTALLVENDORMAN3DIR = $(DESTDIR)$(INSTALLVENDORMAN3DIR)$/;"	m
+DESTINSTALLVENDORSCRIPT	Makefile	/^DESTINSTALLVENDORSCRIPT = $(DESTDIR)$(INSTALLVENDORSCRIPT)$/;"	m
+DEV_NULL	Makefile	/^DEV_NULL = > \/dev\/null 2>&1$/;"	m
+DFSEP	Makefile	/^DFSEP = $(DIRFILESEP)$/;"	m
+DIRFILESEP	Makefile	/^DIRFILESEP = \/$/;"	m
+DISTNAME	Makefile	/^DISTNAME = URI-XSEscape$/;"	m
+DISTVNAME	Makefile	/^DISTVNAME = URI-XSEscape-0.000007$/;"	m
+DIST_CP	Makefile	/^DIST_CP = best$/;"	m
+DIST_DEFAULT	Makefile	/^DIST_DEFAULT = tardist$/;"	m
+DLBASE	Makefile	/^DLBASE = $(BASEEXT)$/;"	m
+DLEXT	Makefile	/^DLEXT = bundle$/;"	m
+DLSRC	Makefile	/^DLSRC = dl_dlopen.xs$/;"	m
+DOC_INSTALL	Makefile	/^DOC_INSTALL = $(ABSPERLRUN) -MExtUtils::Command::MM -e 'perllocal_install' --$/;"	m
+DPPP_	ppport.h	/^#define DPPP_(/;"	d
+DPPP_CAT2	ppport.h	/^#define DPPP_CAT2(/;"	d
+DPPP_NAMESPACE	ppport.h	/^#  define DPPP_NAMESPACE /;"	d
+DPPP_SVPV_NOLEN_LP_ARG	ppport.h	/^# define DPPP_SVPV_NOLEN_LP_ARG /;"	d
+D_PPP_CONSTPV_ARG	ppport.h	/^# define D_PPP_CONSTPV_ARG(/;"	d
+D_PPP_PERL_SIGNALS_INIT	ppport.h	/^#  define D_PPP_PERL_SIGNALS_INIT /;"	d
+D_PPP_PL_copline	ppport.h	/^#define D_PPP_PL_copline /;"	d
+D_PPP_my_PL_parser_var	ppport.h	/^#  define D_PPP_my_PL_parser_var(/;"	d
+D_PPP_parser_dummy_warning	ppport.h	/^#   define D_PPP_parser_dummy_warning(/;"	d
+ECHO	Makefile	/^ECHO = echo$/;"	m
+ECHO_N	Makefile	/^ECHO_N = echo -n$/;"	m
+END_EXTERN_C	ppport.h	/^#  define END_EXTERN_C /;"	d
+END_EXTERN_C	ppport.h	/^#  define END_EXTERN_C$/;"	d
+END_EXTERN_C	ppport.h	/^#undef END_EXTERN_C$/;"	d
+EQUALIZE_TIMESTAMP	Makefile	/^EQUALIZE_TIMESTAMP = $(ABSPERLRUN) -MExtUtils::Command -e 'eqtime' --$/;"	m
+ERRSV	ppport.h	/^#  define ERRSV /;"	d
+EXE_EXT	Makefile	/^EXE_EXT = $/;"	m
+EXPORT_LIST	Makefile	/^EXPORT_LIST        = $/;"	m
+EXTERN_C	ppport.h	/^#  define EXTERN_C /;"	d
+EXTERN_C	ppport.h	/^#undef EXTERN_C$/;"	d
+FALSE	Makefile	/^FALSE = false$/;"	m
+FIRST_MAKEFILE	Makefile	/^FIRST_MAKEFILE = Makefile$/;"	m
+FIXIN	Makefile	/^FIXIN = $(ABSPERLRUN) -MExtUtils::MY -e 'MY->fixin(shift)' --$/;"	m
+FULLEXT	Makefile	/^FULLEXT = URI\/XSEscape$/;"	m
+FULLPERL	Makefile	/^FULLPERL      = "\/usr\/bin\/perl"$/;"	m
+FULLPERL	Makefile	/^FULLPERL = "\/usr\/bin\/perl"$/;"	m
+FULLPERLRUN	Makefile	/^FULLPERLRUN = $(FULLPERL)$/;"	m
+FULLPERLRUNINST	Makefile	/^FULLPERLRUNINST = $(FULLPERLRUN) "-I$(INST_ARCHLIB)" "-I$(INST_LIB)"$/;"	m
+FULL_AR	Makefile	/^FULL_AR = \/usr\/bin\/ar$/;"	m
+GMEM_DEL	gmem.h	/^#define GMEM_DEL(/;"	d
+GMEM_DELARR	gmem.h	/^#define GMEM_DELARR(/;"	d
+GMEM_DELSTR	gmem.h	/^#define GMEM_DELSTR(/;"	d
+GMEM_H_	gmem.h	/^#define GMEM_H_$/;"	d
+GMEM_NEW	gmem.h	/^#define GMEM_NEW(/;"	d
+GMEM_NEWARR	gmem.h	/^#define GMEM_NEWARR(/;"	d
+GMEM_NEWSTR	gmem.h	/^#define GMEM_NEWSTR(/;"	d
+GMEM_REALLOC	gmem.h	/^#define GMEM_REALLOC(/;"	d
+GROK_NUMERIC_RADIX	ppport.h	/^#  define GROK_NUMERIC_RADIX(/;"	d
+G_METHOD	ppport.h	/^# define G_METHOD	/;"	d
+GvSVn	ppport.h	/^#  define GvSVn(/;"	d
+H_FILES	Makefile	/^H_FILES  = buffer.h \\$/;"	m
+HvNAMELEN_get	ppport.h	/^#  define HvNAMELEN_get(/;"	d
+HvNAME_get	ppport.h	/^#  define HvNAME_get(/;"	d
+INC	Makefile	/^INC = -I.$/;"	m
+INSTALLARCHLIB	Makefile	/^INSTALLARCHLIB = \/Library\/Perl\/Updates\/5.18.2\/darwin-thread-multi-2level$/;"	m
+INSTALLBIN	Makefile	/^INSTALLBIN = \/usr\/bin$/;"	m
+INSTALLDIRS	Makefile	/^INSTALLDIRS = site$/;"	m
+INSTALLMAN1DIR	Makefile	/^INSTALLMAN1DIR = \/usr\/share\/man\/man1$/;"	m
+INSTALLMAN3DIR	Makefile	/^INSTALLMAN3DIR = \/usr\/share\/man\/man3$/;"	m
+INSTALLPRIVLIB	Makefile	/^INSTALLPRIVLIB = \/Library\/Perl\/Updates\/5.18.2$/;"	m
+INSTALLSCRIPT	Makefile	/^INSTALLSCRIPT = \/usr\/bin$/;"	m
+INSTALLSITEARCH	Makefile	/^INSTALLSITEARCH = \/Library\/Perl\/5.18\/darwin-thread-multi-2level$/;"	m
+INSTALLSITEBIN	Makefile	/^INSTALLSITEBIN = \/usr\/local\/bin$/;"	m
+INSTALLSITELIB	Makefile	/^INSTALLSITELIB = \/Library\/Perl\/5.18$/;"	m
+INSTALLSITEMAN1DIR	Makefile	/^INSTALLSITEMAN1DIR = \/usr\/local\/share\/man\/man1$/;"	m
+INSTALLSITEMAN3DIR	Makefile	/^INSTALLSITEMAN3DIR = \/usr\/local\/share\/man\/man3$/;"	m
+INSTALLSITESCRIPT	Makefile	/^INSTALLSITESCRIPT = \/usr\/local\/bin$/;"	m
+INSTALLVENDORARCH	Makefile	/^INSTALLVENDORARCH = \/Network\/Library\/Perl\/5.18\/darwin-thread-multi-2level$/;"	m
+INSTALLVENDORBIN	Makefile	/^INSTALLVENDORBIN = \/usr\/local\/bin$/;"	m
+INSTALLVENDORLIB	Makefile	/^INSTALLVENDORLIB = \/Network\/Library\/Perl\/5.18$/;"	m
+INSTALLVENDORMAN1DIR	Makefile	/^INSTALLVENDORMAN1DIR = \/usr\/local\/share\/man\/man1$/;"	m
+INSTALLVENDORMAN3DIR	Makefile	/^INSTALLVENDORMAN3DIR = \/usr\/local\/share\/man\/man3$/;"	m
+INSTALLVENDORSCRIPT	Makefile	/^INSTALLVENDORSCRIPT = \/usr\/local\/bin$/;"	m
+INST_ARCHAUTODIR	Makefile	/^INST_ARCHAUTODIR = $(INST_ARCHLIB)\/auto\/$(FULLEXT)$/;"	m
+INST_ARCHLIB	Makefile	/^INST_ARCHLIB = blib\/arch$/;"	m
+INST_ARCHLIBDIR	Makefile	/^INST_ARCHLIBDIR  = $(INST_ARCHLIB)\/URI$/;"	m
+INST_AUTODIR	Makefile	/^INST_AUTODIR     = $(INST_LIB)\/auto\/$(FULLEXT)$/;"	m
+INST_BIN	Makefile	/^INST_BIN = blib\/bin$/;"	m
+INST_BOOT	Makefile	/^INST_BOOT        = $(INST_ARCHAUTODIR)\/$(BASEEXT).bs$/;"	m
+INST_DYNAMIC	Makefile	/^INST_DYNAMIC     = $(INST_ARCHAUTODIR)\/$(DLBASE).$(DLEXT)$/;"	m
+INST_DYNAMIC_DEP	Makefile	/^INST_DYNAMIC_DEP = $/;"	m
+INST_DYNAMIC_FIX	Makefile	/^INST_DYNAMIC_FIX = $/;"	m
+INST_LIB	Makefile	/^INST_LIB = blib\/lib$/;"	m
+INST_LIBDIR	Makefile	/^INST_LIBDIR      = $(INST_LIB)\/URI$/;"	m
+INST_MAN1DIR	Makefile	/^INST_MAN1DIR = blib\/man1$/;"	m
+INST_MAN3DIR	Makefile	/^INST_MAN3DIR = blib\/man3$/;"	m
+INST_SCRIPT	Makefile	/^INST_SCRIPT = blib\/script$/;"	m
+INST_STATIC	Makefile	/^INST_STATIC      = $(INST_ARCHAUTODIR)\/$(BASEEXT)$(LIB_EXT)$/;"	m
+INT2PTR	ppport.h	/^#    define INT2PTR(/;"	d
+IN_LOCALE	ppport.h	/^#  define IN_LOCALE /;"	d
+IN_LOCALE_COMPILETIME	ppport.h	/^#  define IN_LOCALE_COMPILETIME /;"	d
+IN_LOCALE_RUNTIME	ppport.h	/^#  define IN_LOCALE_RUNTIME /;"	d
+IN_PERL_COMPILETIME	ppport.h	/^#  define IN_PERL_COMPILETIME /;"	d
+IS_NUMBER_GREATER_THAN_UV_MAX	ppport.h	/^#  define IS_NUMBER_GREATER_THAN_UV_MAX /;"	d
+IS_NUMBER_INFINITY	ppport.h	/^#  define IS_NUMBER_INFINITY /;"	d
+IS_NUMBER_IN_UV	ppport.h	/^#  define IS_NUMBER_IN_UV /;"	d
+IS_NUMBER_NAN	ppport.h	/^#  define IS_NUMBER_NAN /;"	d
+IS_NUMBER_NEG	ppport.h	/^#  define IS_NUMBER_NEG /;"	d
+IS_NUMBER_NOT_INT	ppport.h	/^#  define IS_NUMBER_NOT_INT /;"	d
+IVSIZE	ppport.h	/^#    define IVSIZE /;"	d
+IVSIZE	ppport.h	/^#  define IVSIZE /;"	d
+IVTYPE	ppport.h	/^#  define IVTYPE /;"	d
+IV_MAX	ppport.h	/^#  define IV_MAX /;"	d
+IV_MIN	ppport.h	/^#  define IV_MIN /;"	d
+IVdf	ppport.h	/^#      define	IVdf /;"	d
+IVdf	ppport.h	/^#    define	IVdf /;"	d
+LD	Makefile	/^LD = cc -mmacosx-version-min=10.11.3$/;"	m
+LDDLFLAGS	Makefile	/^LDDLFLAGS = -arch i386 -arch x86_64 -bundle -undefined dynamic_lookup -fstack-protector$/;"	m
+LDFLAGS	Makefile	/^LDFLAGS = -arch i386 -arch x86_64 -fstack-protector$/;"	m
+LDFROM	Makefile	/^LDFROM = $(OBJECT)$/;"	m
+LIBC	Makefile	/^LIBC = $/;"	m
+LIBPERL_A	Makefile	/^LIBPERL_A = libperl.a$/;"	m
+LIB_EXT	Makefile	/^LIB_EXT = .a$/;"	m
+LINKTYPE	Makefile	/^LINKTYPE = dynamic$/;"	m
+MACROEND	Makefile	/^MACROEND = $/;"	m
+MACROSTART	Makefile	/^MACROSTART = $/;"	m
+MAKE	Makefile	/^MAKE = make$/;"	m
+MAKEFILE_OLD	Makefile	/^MAKEFILE_OLD = Makefile.old$/;"	m
+MAKEMAKER	Makefile	/^MAKEMAKER   = \/Library\/Perl\/5.18\/ExtUtils\/MakeMaker.pm$/;"	m
+MAKE_APERL_FILE	Makefile	/^MAKE_APERL_FILE = Makefile.aperl$/;"	m
+MAKE_BYTE	uri_tables.h	/^#define MAKE_BYTE(/;"	d
+MAN1EXT	Makefile	/^MAN1EXT = 1$/;"	m
+MAN1PODS	Makefile	/^MAN1PODS = $/;"	m
+MAN3EXT	Makefile	/^MAN3EXT = 3pm$/;"	m
+MAN3PODS	Makefile	/^MAN3PODS = lib\/URI\/XSEscape.pm$/;"	m
+MAP_TARGET	Makefile	/^MAP_TARGET    = perl$/;"	m
+MKPATH	Makefile	/^MKPATH = $(ABSPERLRUN) -MExtUtils::Command -e 'mkpath' --$/;"	m
+MM_REVISION	Makefile	/^MM_REVISION = 71000$/;"	m
+MM_Unix_VERSION	Makefile	/^MM_Unix_VERSION = 7.1$/;"	m
+MM_VERSION	Makefile	/^MM_VERSION  = 7.1$/;"	m
+MOD_INSTALL	Makefile	/^MOD_INSTALL = $(ABSPERLRUN) -MExtUtils::Install -e 'install([ from_to => {@ARGV}, verbose => '\\''$(VERBINST)'\\'', uninstall_shadows => '\\''$(UNINST)'\\'', dir_mode => '\\''$(PERM_DIR)'\\'' ]);' --$/;"	m
+MPOLLUTE	Makefile	/^MPOLLUTE = $/;"	m
+MV	Makefile	/^MV = mv$/;"	m
+MY	Makefile.PL	/^package MY;$/;"	p
+MY_CXT	ppport.h	/^#define MY_CXT	/;"	d
+MY_CXT_CLONE	ppport.h	/^#define MY_CXT_CLONE	/;"	d
+MY_CXT_CLONE	ppport.h	/^#define MY_CXT_CLONE /;"	d
+MY_CXT_INIT	ppport.h	/^#define MY_CXT_INIT	/;"	d
+MY_CXT_INIT	ppport.h	/^#define MY_CXT_INIT /;"	d
+Manifest	Makefile	/^	$(NOECHO) cd $(DISTVNAME) && $(ABSPERLRUN) -MExtUtils::Manifest=maniadd -e 'eval { maniadd({q{SIGNATURE} => q{Public-key signature (added by MakeMaker)}}) }' \\$/;"	m
+Manifest	Makefile	/^	$(NOECHO) cd $(DISTVNAME) && $(ABSPERLRUN) -MExtUtils::Manifest=maniadd -e 'exit unless -e q{META.yml};' \\$/;"	m
+Manifest	Makefile	/^	$(NOECHO) cd $(DISTVNAME) && $(ABSPERLRUN) -MExtUtils::Manifest=maniadd -e 'exit unless -f q{META.json};' \\$/;"	m
+Manifest	Makefile	/^	$(PERLRUN) "-MExtUtils::Manifest=manicopy,maniread" \\$/;"	m
+MoveD	ppport.h	/^#  define MoveD(/;"	d
+NAME	Makefile	/^NAME = URI::XSEscape$/;"	m
+NAME_SYM	Makefile	/^NAME_SYM = URI_XSEscape$/;"	m
+NEED_sv_2pv_flags	ppport.h	/^#  define NEED_sv_2pv_flags$/;"	d
+NEED_sv_2pv_flags_GLOBAL	ppport.h	/^#  define NEED_sv_2pv_flags_GLOBAL$/;"	d
+NIBBLE_BITS	uri_tables.h	/^#define NIBBLE_BITS /;"	d
+NOECHO	Makefile	/^NOECHO = @$/;"	m
+NOOP	Makefile	/^NOOP = $(TRUE)$/;"	m
+NOOP	ppport.h	/^#  define NOOP /;"	d
+NUM2PTR	ppport.h	/^#  define NUM2PTR(/;"	d
+NV	ppport.h	/^typedef NVTYPE NV;$/;"	t
+NVTYPE	ppport.h	/^#    define NVTYPE /;"	d
+NVef	ppport.h	/^#    define NVef /;"	d
+NVff	ppport.h	/^#    define NVff /;"	d
+NVgf	ppport.h	/^#    define NVgf /;"	d
+Newx	ppport.h	/^#  define Newx(/;"	d
+Newxc	ppport.h	/^#  define Newxc(/;"	d
+Newxz	ppport.h	/^#  define Newxz(/;"	d
+OBJECT	Makefile	/^OBJECT = $(O_FILES)$/;"	m
+OBJ_EXT	Makefile	/^OBJ_EXT = .o$/;"	m
+OPTIMIZE	Makefile	/^OPTIMIZE = -Os$/;"	m
+OSNAME	Makefile	/^OSNAME = darwin$/;"	m
+OSVERS	Makefile	/^OSVERS = 15.0$/;"	m
+OTHERLDFLAGS	Makefile	/^OTHERLDFLAGS = $/;"	m
+O_FILES	Makefile	/^O_FILES  = escape.o \\$/;"	m
+PARENT_NAME	Makefile	/^PARENT_NAME = URI$/;"	m
+PASTHRU	Makefile	/^PASTHRU = LIBPERL_A="$(LIBPERL_A)"\\$/;"	m
+PERL	Makefile	/^PERL = "\/usr\/bin\/perl"$/;"	m
+PERLIO_FUNCS_CAST	ppport.h	/^#  define PERLIO_FUNCS_CAST(/;"	d
+PERLIO_FUNCS_DECL	ppport.h	/^#  define PERLIO_FUNCS_DECL(/;"	d
+PERLMAINCC	Makefile	/^PERLMAINCC = $(CC)$/;"	m
+PERLPREFIX	Makefile	/^PERLPREFIX = \/$/;"	m
+PERLRUN	Makefile	/^PERLRUN = $(PERL)$/;"	m
+PERLRUNINST	Makefile	/^PERLRUNINST = $(PERLRUN) "-I$(INST_ARCHLIB)" "-I$(INST_LIB)"$/;"	m
+PERLTYPE	Makefile	/^PERLTYPE = $/;"	m
+PERL_ABS	ppport.h	/^#  define PERL_ABS(/;"	d
+PERL_ARCHIVE	Makefile	/^PERL_ARCHIVE       = $/;"	m
+PERL_ARCHIVEDEP	Makefile	/^PERL_ARCHIVEDEP    = $/;"	m
+PERL_ARCHIVE_AFTER	Makefile	/^PERL_ARCHIVE_AFTER = $/;"	m
+PERL_ARCHLIB	Makefile	/^PERL_ARCHLIB = \/System\/Library\/Perl\/5.18\/darwin-thread-multi-2level$/;"	m
+PERL_ARCHLIBDEP	Makefile	/^PERL_ARCHLIBDEP = \/System\/Library\/Perl\/5.18\/darwin-thread-multi-2level$/;"	m
+PERL_ARGS_ASSERT_CROAK_XS_USAGE	escape.c	/^#define PERL_ARGS_ASSERT_CROAK_XS_USAGE /;"	d	file:
+PERL_ARGS_ASSERT_CROAK_XS_USAGE	escape.c	/^#undef  PERL_ARGS_ASSERT_CROAK_XS_USAGE$/;"	d	file:
+PERL_BCDVERSION	ppport.h	/^#define PERL_BCDVERSION /;"	d
+PERL_CORE	Makefile	/^PERL_CORE = 0$/;"	m
+PERL_DECIMAL_VERSION	escape.c	/^#  define PERL_DECIMAL_VERSION /;"	d	file:
+PERL_DL_NONLAZY	Makefile	/^	PERL_DL_NONLAZY=1 $(FULLPERLRUN) "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness($(TEST_VERBOSE), '$(INST_LIB)', '$(INST_ARCHLIB)')" $(TEST_FILES)$/;"	m
+PERL_DL_NONLAZY	Makefile	/^	PERL_DL_NONLAZY=1 $(FULLPERLRUN) $(TESTDB_SW) "-I$(INST_LIB)" "-I$(INST_ARCHLIB)" $(TEST_FILE)$/;"	m
+PERL_GCC_BRACE_GROUPS_FORBIDDEN	ppport.h	/^#    define PERL_GCC_BRACE_GROUPS_FORBIDDEN$/;"	d
+PERL_HASH	ppport.h	/^#  define PERL_HASH(/;"	d
+PERL_HDRS	Makefile	/^PERL_HDRS = \\$/;"	m
+PERL_INC	Makefile	/^PERL_INC = \/System\/Library\/Perl\/5.18\/darwin-thread-multi-2level\/CORE$/;"	m
+PERL_INCDEP	Makefile	/^PERL_INCDEP = \/System\/Library\/Perl\/5.18\/darwin-thread-multi-2level\/CORE$/;"	m
+PERL_INT_MAX	ppport.h	/^#      define PERL_INT_MAX /;"	d
+PERL_INT_MAX	ppport.h	/^#    define PERL_INT_MAX /;"	d
+PERL_INT_MIN	ppport.h	/^#      define PERL_INT_MIN /;"	d
+PERL_INT_MIN	ppport.h	/^#    define PERL_INT_MIN /;"	d
+PERL_LIB	Makefile	/^PERL_LIB = \/System\/Library\/Perl\/5.18$/;"	m
+PERL_LOADMOD_DENY	ppport.h	/^#  define PERL_LOADMOD_DENY /;"	d
+PERL_LOADMOD_IMPORT_OPS	ppport.h	/^#  define PERL_LOADMOD_IMPORT_OPS /;"	d
+PERL_LOADMOD_NOIMPORT	ppport.h	/^#  define PERL_LOADMOD_NOIMPORT /;"	d
+PERL_LONG_MAX	ppport.h	/^#      define PERL_LONG_MAX /;"	d
+PERL_LONG_MAX	ppport.h	/^#    define PERL_LONG_MAX /;"	d
+PERL_LONG_MIN	ppport.h	/^#      define PERL_LONG_MIN /;"	d
+PERL_LONG_MIN	ppport.h	/^#    define PERL_LONG_MIN /;"	d
+PERL_MAGIC_arylen	ppport.h	/^#  define PERL_MAGIC_arylen /;"	d
+PERL_MAGIC_backref	ppport.h	/^#  define PERL_MAGIC_backref /;"	d
+PERL_MAGIC_bm	ppport.h	/^#  define PERL_MAGIC_bm /;"	d
+PERL_MAGIC_collxfrm	ppport.h	/^#  define PERL_MAGIC_collxfrm /;"	d
+PERL_MAGIC_dbfile	ppport.h	/^#  define PERL_MAGIC_dbfile /;"	d
+PERL_MAGIC_dbline	ppport.h	/^#  define PERL_MAGIC_dbline /;"	d
+PERL_MAGIC_defelem	ppport.h	/^#  define PERL_MAGIC_defelem /;"	d
+PERL_MAGIC_env	ppport.h	/^#  define PERL_MAGIC_env /;"	d
+PERL_MAGIC_envelem	ppport.h	/^#  define PERL_MAGIC_envelem /;"	d
+PERL_MAGIC_ext	ppport.h	/^#  define PERL_MAGIC_ext /;"	d
+PERL_MAGIC_fm	ppport.h	/^#  define PERL_MAGIC_fm /;"	d
+PERL_MAGIC_glob	ppport.h	/^#  define PERL_MAGIC_glob /;"	d
+PERL_MAGIC_isa	ppport.h	/^#  define PERL_MAGIC_isa /;"	d
+PERL_MAGIC_isaelem	ppport.h	/^#  define PERL_MAGIC_isaelem /;"	d
+PERL_MAGIC_mutex	ppport.h	/^#  define PERL_MAGIC_mutex /;"	d
+PERL_MAGIC_nkeys	ppport.h	/^#  define PERL_MAGIC_nkeys /;"	d
+PERL_MAGIC_overload	ppport.h	/^#  define PERL_MAGIC_overload /;"	d
+PERL_MAGIC_overload_elem	ppport.h	/^#  define PERL_MAGIC_overload_elem /;"	d
+PERL_MAGIC_overload_table	ppport.h	/^#  define PERL_MAGIC_overload_table /;"	d
+PERL_MAGIC_pos	ppport.h	/^#  define PERL_MAGIC_pos /;"	d
+PERL_MAGIC_qr	ppport.h	/^#  define PERL_MAGIC_qr /;"	d
+PERL_MAGIC_regdata	ppport.h	/^#  define PERL_MAGIC_regdata /;"	d
+PERL_MAGIC_regdatum	ppport.h	/^#  define PERL_MAGIC_regdatum /;"	d
+PERL_MAGIC_regex_global	ppport.h	/^#  define PERL_MAGIC_regex_global /;"	d
+PERL_MAGIC_shared	ppport.h	/^#  define PERL_MAGIC_shared /;"	d
+PERL_MAGIC_shared_scalar	ppport.h	/^#  define PERL_MAGIC_shared_scalar /;"	d
+PERL_MAGIC_sig	ppport.h	/^#  define PERL_MAGIC_sig /;"	d
+PERL_MAGIC_sigelem	ppport.h	/^#  define PERL_MAGIC_sigelem /;"	d
+PERL_MAGIC_substr	ppport.h	/^#  define PERL_MAGIC_substr /;"	d
+PERL_MAGIC_sv	ppport.h	/^#  define PERL_MAGIC_sv /;"	d
+PERL_MAGIC_taint	ppport.h	/^#  define PERL_MAGIC_taint /;"	d
+PERL_MAGIC_tied	ppport.h	/^#  define PERL_MAGIC_tied /;"	d
+PERL_MAGIC_tiedelem	ppport.h	/^#  define PERL_MAGIC_tiedelem /;"	d
+PERL_MAGIC_tiedscalar	ppport.h	/^#  define PERL_MAGIC_tiedscalar /;"	d
+PERL_MAGIC_utf8	ppport.h	/^#  define PERL_MAGIC_utf8 /;"	d
+PERL_MAGIC_uvar	ppport.h	/^#  define PERL_MAGIC_uvar /;"	d
+PERL_MAGIC_uvar_elem	ppport.h	/^#  define PERL_MAGIC_uvar_elem /;"	d
+PERL_MAGIC_vec	ppport.h	/^#  define PERL_MAGIC_vec /;"	d
+PERL_MAGIC_vstring	ppport.h	/^#  define PERL_MAGIC_vstring /;"	d
+PERL_MALLOC_DEF	Makefile	/^PERL_MALLOC_DEF = -DPERL_EXTMALLOC_DEF -Dmalloc=Perl_malloc -Dfree=Perl_mfree -Drealloc=Perl_realloc -Dcalloc=Perl_calloc$/;"	m
+PERL_NO_GET_CONTEXT	escape.c	/^#define PERL_NO_GET_CONTEXT /;"	d	file:
+PERL_PATCHLEVEL_H_IMPLICIT	ppport.h	/^#    define PERL_PATCHLEVEL_H_IMPLICIT$/;"	d
+PERL_PV_ESCAPE_ALL	ppport.h	/^#  define PERL_PV_ESCAPE_ALL /;"	d
+PERL_PV_ESCAPE_FIRSTCHAR	ppport.h	/^#  define PERL_PV_ESCAPE_FIRSTCHAR /;"	d
+PERL_PV_ESCAPE_NOBACKSLASH	ppport.h	/^#  define PERL_PV_ESCAPE_NOBACKSLASH /;"	d
+PERL_PV_ESCAPE_NOCLEAR	ppport.h	/^#  define PERL_PV_ESCAPE_NOCLEAR /;"	d
+PERL_PV_ESCAPE_QUOTE	ppport.h	/^#  define PERL_PV_ESCAPE_QUOTE /;"	d
+PERL_PV_ESCAPE_RE	ppport.h	/^#  define PERL_PV_ESCAPE_RE /;"	d
+PERL_PV_ESCAPE_UNI	ppport.h	/^#  define PERL_PV_ESCAPE_UNI /;"	d
+PERL_PV_ESCAPE_UNI_DETECT	ppport.h	/^#  define PERL_PV_ESCAPE_UNI_DETECT /;"	d
+PERL_PV_PRETTY_DUMP	ppport.h	/^#  define PERL_PV_PRETTY_DUMP /;"	d
+PERL_PV_PRETTY_ELLIPSES	ppport.h	/^#  define PERL_PV_PRETTY_ELLIPSES /;"	d
+PERL_PV_PRETTY_LTGT	ppport.h	/^#  define PERL_PV_PRETTY_LTGT /;"	d
+PERL_PV_PRETTY_NOCLEAR	ppport.h	/^#  define PERL_PV_PRETTY_NOCLEAR /;"	d
+PERL_PV_PRETTY_QUOTE	ppport.h	/^#  define PERL_PV_PRETTY_QUOTE /;"	d
+PERL_PV_PRETTY_REGPROP	ppport.h	/^#  define PERL_PV_PRETTY_REGPROP /;"	d
+PERL_QUAD_MAX	ppport.h	/^#        define PERL_QUAD_MAX /;"	d
+PERL_QUAD_MAX	ppport.h	/^#      define PERL_QUAD_MAX /;"	d
+PERL_QUAD_MAX	ppport.h	/^#  define PERL_QUAD_MAX /;"	d
+PERL_QUAD_MIN	ppport.h	/^#        define PERL_QUAD_MIN /;"	d
+PERL_QUAD_MIN	ppport.h	/^#      define PERL_QUAD_MIN /;"	d
+PERL_QUAD_MIN	ppport.h	/^#  define PERL_QUAD_MIN /;"	d
+PERL_REVISION	ppport.h	/^#    define PERL_REVISION /;"	d
+PERL_SCAN_ALLOW_UNDERSCORES	ppport.h	/^#  define PERL_SCAN_ALLOW_UNDERSCORES /;"	d
+PERL_SCAN_DISALLOW_PREFIX	ppport.h	/^#  define PERL_SCAN_DISALLOW_PREFIX /;"	d
+PERL_SCAN_GREATER_THAN_UV_MAX	ppport.h	/^#  define PERL_SCAN_GREATER_THAN_UV_MAX /;"	d
+PERL_SCAN_SILENT_ILLDIGIT	ppport.h	/^#  define PERL_SCAN_SILENT_ILLDIGIT /;"	d
+PERL_SHORT_MAX	ppport.h	/^#        define PERL_SHORT_MAX /;"	d
+PERL_SHORT_MAX	ppport.h	/^#      define PERL_SHORT_MAX /;"	d
+PERL_SHORT_MAX	ppport.h	/^#    define PERL_SHORT_MAX /;"	d
+PERL_SHORT_MIN	ppport.h	/^#        define PERL_SHORT_MIN /;"	d
+PERL_SHORT_MIN	ppport.h	/^#      define PERL_SHORT_MIN /;"	d
+PERL_SHORT_MIN	ppport.h	/^#    define PERL_SHORT_MIN /;"	d
+PERL_SIGNALS_UNSAFE_FLAG	ppport.h	/^#define PERL_SIGNALS_UNSAFE_FLAG /;"	d
+PERL_SUBVERSION	ppport.h	/^#    define PERL_SUBVERSION /;"	d
+PERL_UCHAR_MAX	ppport.h	/^#      define PERL_UCHAR_MAX /;"	d
+PERL_UCHAR_MAX	ppport.h	/^#    define PERL_UCHAR_MAX /;"	d
+PERL_UCHAR_MIN	ppport.h	/^#  define PERL_UCHAR_MIN /;"	d
+PERL_UINT_MAX	ppport.h	/^#      define PERL_UINT_MAX /;"	d
+PERL_UINT_MAX	ppport.h	/^#    define PERL_UINT_MAX /;"	d
+PERL_UINT_MIN	ppport.h	/^#  define PERL_UINT_MIN /;"	d
+PERL_ULONG_MAX	ppport.h	/^#      define PERL_ULONG_MAX /;"	d
+PERL_ULONG_MAX	ppport.h	/^#    define PERL_ULONG_MAX /;"	d
+PERL_ULONG_MIN	ppport.h	/^#  define PERL_ULONG_MIN /;"	d
+PERL_UNUSED_ARG	ppport.h	/^#    define PERL_UNUSED_ARG(/;"	d
+PERL_UNUSED_CONTEXT	ppport.h	/^#    define PERL_UNUSED_CONTEXT /;"	d
+PERL_UNUSED_CONTEXT	ppport.h	/^#    define PERL_UNUSED_CONTEXT$/;"	d
+PERL_UNUSED_DECL	ppport.h	/^#      define PERL_UNUSED_DECL /;"	d
+PERL_UNUSED_DECL	ppport.h	/^#      define PERL_UNUSED_DECL$/;"	d
+PERL_UNUSED_DECL	ppport.h	/^#    define PERL_UNUSED_DECL$/;"	d
+PERL_UNUSED_VAR	escape.c	/^#  define PERL_UNUSED_VAR(/;"	d	file:
+PERL_UNUSED_VAR	ppport.h	/^#  define PERL_UNUSED_VAR(/;"	d
+PERL_UQUAD_MAX	ppport.h	/^#        define PERL_UQUAD_MAX /;"	d
+PERL_UQUAD_MAX	ppport.h	/^#      define PERL_UQUAD_MAX /;"	d
+PERL_UQUAD_MAX	ppport.h	/^#  define PERL_UQUAD_MAX /;"	d
+PERL_UQUAD_MIN	ppport.h	/^#    define PERL_UQUAD_MIN /;"	d
+PERL_UQUAD_MIN	ppport.h	/^#  define PERL_UQUAD_MIN /;"	d
+PERL_USE_GCC_BRACE_GROUPS	ppport.h	/^#    define PERL_USE_GCC_BRACE_GROUPS$/;"	d
+PERL_USHORT_MAX	ppport.h	/^#        define PERL_USHORT_MAX /;"	d
+PERL_USHORT_MAX	ppport.h	/^#      define PERL_USHORT_MAX /;"	d
+PERL_USHORT_MAX	ppport.h	/^#    define PERL_USHORT_MAX /;"	d
+PERL_USHORT_MIN	ppport.h	/^#  define PERL_USHORT_MIN /;"	d
+PERL_VERSION	ppport.h	/^#    define PERL_VERSION /;"	d
+PERL_VERSION_DECIMAL	escape.c	/^#  define PERL_VERSION_DECIMAL(/;"	d	file:
+PERL_VERSION_GE	escape.c	/^#  define PERL_VERSION_GE(/;"	d	file:
+PERL_VERSION_LE	escape.c	/^#  define PERL_VERSION_LE(/;"	d	file:
+PERM_DIR	Makefile	/^PERM_DIR = 755$/;"	m
+PERM_RW	Makefile	/^PERM_RW = 644$/;"	m
+PERM_RWX	Makefile	/^PERM_RWX = 755$/;"	m
+PL_DBsignal	ppport.h	/^#  define PL_DBsignal /;"	d
+PL_DBsingle	ppport.h	/^#  define PL_DBsingle /;"	d
+PL_DBsub	ppport.h	/^#  define PL_DBsub /;"	d
+PL_DBtrace	ppport.h	/^#  define PL_DBtrace /;"	d
+PL_Sv	ppport.h	/^#  define PL_Sv /;"	d
+PL_bufend	ppport.h	/^#  define PL_bufend /;"	d
+PL_bufend	ppport.h	/^# define PL_bufend /;"	d
+PL_bufptr	ppport.h	/^#  define PL_bufptr /;"	d
+PL_bufptr	ppport.h	/^# define PL_bufptr /;"	d
+PL_compiling	ppport.h	/^#  define PL_compiling /;"	d
+PL_copline	ppport.h	/^#  define PL_copline /;"	d
+PL_copline	ppport.h	/^# define PL_copline /;"	d
+PL_curcop	ppport.h	/^#  define PL_curcop /;"	d
+PL_curstash	ppport.h	/^#  define PL_curstash /;"	d
+PL_debstash	ppport.h	/^#  define PL_debstash /;"	d
+PL_defgv	ppport.h	/^#  define PL_defgv /;"	d
+PL_diehook	ppport.h	/^#  define PL_diehook /;"	d
+PL_dirty	ppport.h	/^#  define PL_dirty /;"	d
+PL_dowarn	ppport.h	/^#  define PL_dowarn /;"	d
+PL_errgv	ppport.h	/^#  define PL_errgv /;"	d
+PL_error_count	ppport.h	/^#  define PL_error_count /;"	d
+PL_error_count	ppport.h	/^# define PL_error_count /;"	d
+PL_expect	ppport.h	/^#  define PL_expect /;"	d
+PL_expect	ppport.h	/^# define PL_expect /;"	d
+PL_hexdigit	ppport.h	/^#  define PL_hexdigit /;"	d
+PL_hints	ppport.h	/^#  define PL_hints /;"	d
+PL_in_my	ppport.h	/^#  define PL_in_my /;"	d
+PL_in_my	ppport.h	/^# define PL_in_my /;"	d
+PL_in_my_stash	ppport.h	/^# define PL_in_my_stash /;"	d
+PL_laststatval	ppport.h	/^#  define PL_laststatval /;"	d
+PL_lex_state	ppport.h	/^#  define PL_lex_state /;"	d
+PL_lex_state	ppport.h	/^# define PL_lex_state /;"	d
+PL_lex_stuff	ppport.h	/^#  define PL_lex_stuff /;"	d
+PL_lex_stuff	ppport.h	/^# define PL_lex_stuff /;"	d
+PL_linestr	ppport.h	/^#  define PL_linestr /;"	d
+PL_linestr	ppport.h	/^# define PL_linestr /;"	d
+PL_na	ppport.h	/^#  define PL_na /;"	d
+PL_no_modify	ppport.h	/^#  define PL_no_modify /;"	d
+PL_parser	ppport.h	/^# define PL_parser /;"	d
+PL_perl_destruct_level	ppport.h	/^#  define PL_perl_destruct_level /;"	d
+PL_perldb	ppport.h	/^#  define PL_perldb /;"	d
+PL_ppaddr	ppport.h	/^#  define PL_ppaddr /;"	d
+PL_rsfp	ppport.h	/^#  define PL_rsfp /;"	d
+PL_rsfp	ppport.h	/^# define PL_rsfp /;"	d
+PL_rsfp_filters	ppport.h	/^#  define PL_rsfp_filters /;"	d
+PL_rsfp_filters	ppport.h	/^# define PL_rsfp_filters /;"	d
+PL_signals	ppport.h	/^#define PL_signals /;"	d
+PL_stack_base	ppport.h	/^#  define PL_stack_base /;"	d
+PL_stack_sp	ppport.h	/^#  define PL_stack_sp /;"	d
+PL_statcache	ppport.h	/^#  define PL_statcache /;"	d
+PL_stdingv	ppport.h	/^#  define PL_stdingv /;"	d
+PL_sv_arenaroot	ppport.h	/^#  define PL_sv_arenaroot /;"	d
+PL_sv_no	ppport.h	/^#  define PL_sv_no /;"	d
+PL_sv_undef	ppport.h	/^#  define PL_sv_undef /;"	d
+PL_sv_yes	ppport.h	/^#  define PL_sv_yes /;"	d
+PL_tainted	ppport.h	/^#  define PL_tainted /;"	d
+PL_tainting	ppport.h	/^#  define PL_tainting /;"	d
+PL_tokenbuf	ppport.h	/^#  define PL_tokenbuf /;"	d
+PL_tokenbuf	ppport.h	/^# define PL_tokenbuf /;"	d
+PM_TO_BLIB	Makefile	/^PM_TO_BLIB = lib\/URI\/XSEscape.pm \\$/;"	m
+POD2MAN	Makefile	/^POD2MAN = $(POD2MAN_EXE)$/;"	m
+POD2MAN_EXE	Makefile	/^POD2MAN_EXE = $(PERLRUN) "-MExtUtils::Command::MM" -e pod2man "--"$/;"	m
+POSTOP	Makefile	/^POSTOP = $(NOECHO) $(NOOP)$/;"	m
+PREFIX	Makefile	/^PREFIX = $(SITEPREFIX)$/;"	m
+PREOP	Makefile	/^PREOP = $(NOECHO) $(NOOP)$/;"	m
+PTR2IV	ppport.h	/^#  define PTR2IV(/;"	d
+PTR2NV	ppport.h	/^#  define PTR2NV(/;"	d
+PTR2UV	ppport.h	/^#  define PTR2UV(/;"	d
+PTR2nat	ppport.h	/^#  define PTR2nat(/;"	d
+PTR2ul	ppport.h	/^#    define PTR2ul(/;"	d
+PTRV	ppport.h	/^#      define PTRV /;"	d
+PTRV	ppport.h	/^#    define PTRV /;"	d
+PUSHmortal	ppport.h	/^#  define PUSHmortal /;"	d
+PUSHu	ppport.h	/^#  define PUSHu(/;"	d
+Perl_eval_pv	ppport.h	/^#define Perl_eval_pv /;"	d
+Perl_grok_bin	ppport.h	/^#define Perl_grok_bin /;"	d
+Perl_grok_hex	ppport.h	/^#define Perl_grok_hex /;"	d
+Perl_grok_number	ppport.h	/^#define Perl_grok_number /;"	d
+Perl_grok_numeric_radix	ppport.h	/^#define Perl_grok_numeric_radix /;"	d
+Perl_grok_oct	ppport.h	/^#define Perl_grok_oct /;"	d
+Perl_load_module	ppport.h	/^#define Perl_load_module /;"	d
+Perl_my_snprintf	ppport.h	/^#define Perl_my_snprintf /;"	d
+Perl_my_sprintf	ppport.h	/^#define Perl_my_sprintf /;"	d
+Perl_my_strlcat	ppport.h	/^#define Perl_my_strlcat /;"	d
+Perl_my_strlcpy	ppport.h	/^#define Perl_my_strlcpy /;"	d
+Perl_newCONSTSUB	ppport.h	/^#define Perl_newCONSTSUB /;"	d
+Perl_newRV_noinc	ppport.h	/^#define Perl_newRV_noinc /;"	d
+Perl_newSV_type	ppport.h	/^#define Perl_newSV_type /;"	d
+Perl_newSVpvn_flags	ppport.h	/^#define Perl_newSVpvn_flags /;"	d
+Perl_newSVpvn_share	ppport.h	/^#define Perl_newSVpvn_share /;"	d
+Perl_pv_display	ppport.h	/^#define Perl_pv_display /;"	d
+Perl_pv_escape	ppport.h	/^#define Perl_pv_escape /;"	d
+Perl_pv_pretty	ppport.h	/^#define Perl_pv_pretty /;"	d
+Perl_sv_2pv_flags	ppport.h	/^#define Perl_sv_2pv_flags /;"	d
+Perl_sv_2pvbyte	ppport.h	/^#define Perl_sv_2pvbyte /;"	d
+Perl_sv_catpvf_mg	ppport.h	/^#define Perl_sv_catpvf_mg /;"	d
+Perl_sv_catpvf_mg_nocontext	ppport.h	/^#define Perl_sv_catpvf_mg_nocontext /;"	d
+Perl_sv_pvn_force_flags	ppport.h	/^#define Perl_sv_pvn_force_flags /;"	d
+Perl_sv_setpvf_mg	ppport.h	/^#define Perl_sv_setpvf_mg /;"	d
+Perl_sv_setpvf_mg_nocontext	ppport.h	/^#define Perl_sv_setpvf_mg_nocontext /;"	d
+Perl_vload_module	ppport.h	/^#define Perl_vload_module /;"	d
+Perl_vnewSVpvf	ppport.h	/^#define Perl_vnewSVpvf /;"	d
+Perl_warner	ppport.h	/^#define Perl_warner /;"	d
+Perl_warner_nocontext	ppport.h	/^#define Perl_warner_nocontext /;"	d
+Poison	ppport.h	/^#  define Poison(/;"	d
+PoisonFree	ppport.h	/^#  define PoisonFree(/;"	d
+PoisonNew	ppport.h	/^#  define PoisonNew(/;"	d
+PoisonWith	ppport.h	/^#  define PoisonWith(/;"	d
+RANLIB	Makefile	/^RANLIB = \/usr\/bin\/ar s$/;"	m
+RCS_LABEL	Makefile	/^RCS_LABEL = rcs -Nv$(VERSION_SYM): -q$/;"	m
+RM_F	Makefile	/^RM_F = rm -f$/;"	m
+RM_RF	Makefile	/^RM_RF = rm -rf$/;"	m
+SAVE_DEFSV	ppport.h	/^#  define SAVE_DEFSV /;"	d
+SET_ENCODE_VALUE	uri.c	/^#define SET_ENCODE_VALUE(/;"	d	file:
+SHAR	Makefile	/^SHAR = shar$/;"	m
+SHELL	Makefile	/^SHELL = \/bin\/sh$/;"	m
+SITEARCHEXP	Makefile	/^SITEARCHEXP = \/Library\/Perl\/5.18\/darwin-thread-multi-2level$/;"	m
+SITELIBEXP	Makefile	/^SITELIBEXP = \/Library\/Perl\/5.18$/;"	m
+SITEPREFIX	Makefile	/^SITEPREFIX = \/usr\/local$/;"	m
+SO	Makefile	/^SO = dylib$/;"	m
+START_EXTERN_C	ppport.h	/^#  define START_EXTERN_C /;"	d
+START_EXTERN_C	ppport.h	/^#  define START_EXTERN_C$/;"	d
+START_EXTERN_C	ppport.h	/^#undef START_EXTERN_C$/;"	d
+START_MY_CXT	ppport.h	/^#define START_MY_CXT	/;"	d
+START_MY_CXT	ppport.h	/^#define START_MY_CXT$/;"	d
+STMT_END	ppport.h	/^#    define STMT_END	/;"	d
+STMT_END	ppport.h	/^#  define STMT_END	/;"	d
+STMT_END	ppport.h	/^#undef STMT_END$/;"	d
+STMT_START	ppport.h	/^#    define STMT_START	/;"	d
+STMT_START	ppport.h	/^#  define STMT_START	/;"	d
+STMT_START	ppport.h	/^#undef STMT_START$/;"	d
+STR_WITH_LEN	ppport.h	/^#  define STR_WITH_LEN(/;"	d
+SUFFIX	Makefile	/^SUFFIX = .gz$/;"	m
+SV_CONST_RETURN	ppport.h	/^#  define SV_CONST_RETURN /;"	d
+SV_COW_DROP_PV	ppport.h	/^#  define SV_COW_DROP_PV /;"	d
+SV_COW_SHARED_HASH_KEYS	ppport.h	/^#  define SV_COW_SHARED_HASH_KEYS /;"	d
+SV_GMAGIC	ppport.h	/^#  define SV_GMAGIC /;"	d
+SV_HAS_TRAILING_NUL	ppport.h	/^#  define SV_HAS_TRAILING_NUL /;"	d
+SV_IMMEDIATE_UNREF	ppport.h	/^#  define SV_IMMEDIATE_UNREF /;"	d
+SV_MUTABLE_RETURN	ppport.h	/^#  define SV_MUTABLE_RETURN /;"	d
+SV_NOSTEAL	ppport.h	/^#  define SV_NOSTEAL /;"	d
+SV_SMAGIC	ppport.h	/^#  define SV_SMAGIC /;"	d
+SV_UTF8_NO_ENCODING	ppport.h	/^#  define SV_UTF8_NO_ENCODING /;"	d
+SVf	ppport.h	/^#  define SVf /;"	d
+SVfARG	ppport.h	/^#  define SVfARG(/;"	d
+SVf_UTF8	ppport.h	/^#  define SVf_UTF8 /;"	d
+S_croak_xs_usage	escape.c	/^S_croak_xs_usage(pTHX_ const CV *const cv, const char *const params)$/;"	f
+SvGETMAGIC	ppport.h	/^#  define SvGETMAGIC(/;"	d
+SvIV_nomg	ppport.h	/^#  define SvIV_nomg /;"	d
+SvMAGIC_set	ppport.h	/^#  define SvMAGIC_set(/;"	d
+SvPVX_const	ppport.h	/^#  define SvPVX_const(/;"	d
+SvPVX_mutable	ppport.h	/^#  define SvPVX_mutable(/;"	d
+SvPV_const	ppport.h	/^#  define SvPV_const(/;"	d
+SvPV_flags	ppport.h	/^#  define SvPV_flags(/;"	d
+SvPV_flags_const	ppport.h	/^#  define SvPV_flags_const(/;"	d
+SvPV_flags_const_nolen	ppport.h	/^#  define SvPV_flags_const_nolen(/;"	d
+SvPV_flags_mutable	ppport.h	/^#  define SvPV_flags_mutable(/;"	d
+SvPV_force	ppport.h	/^#  define SvPV_force(/;"	d
+SvPV_force_flags	ppport.h	/^#  define SvPV_force_flags(/;"	d
+SvPV_force_flags_mutable	ppport.h	/^#  define SvPV_force_flags_mutable(/;"	d
+SvPV_force_flags_nolen	ppport.h	/^#  define SvPV_force_flags_nolen(/;"	d
+SvPV_force_mutable	ppport.h	/^#  define SvPV_force_mutable(/;"	d
+SvPV_force_nolen	ppport.h	/^#  define SvPV_force_nolen(/;"	d
+SvPV_force_nomg	ppport.h	/^#  define SvPV_force_nomg(/;"	d
+SvPV_force_nomg_nolen	ppport.h	/^#  define SvPV_force_nomg_nolen(/;"	d
+SvPV_mutable	ppport.h	/^#  define SvPV_mutable(/;"	d
+SvPV_nolen	ppport.h	/^#  define SvPV_nolen(/;"	d
+SvPV_nolen_const	ppport.h	/^#  define SvPV_nolen_const(/;"	d
+SvPV_nomg	ppport.h	/^#  define SvPV_nomg(/;"	d
+SvPV_nomg_const	ppport.h	/^#  define SvPV_nomg_const(/;"	d
+SvPV_nomg_const_nolen	ppport.h	/^#  define SvPV_nomg_const_nolen(/;"	d
+SvPV_renew	ppport.h	/^#  define SvPV_renew(/;"	d
+SvPVbyte	ppport.h	/^#  define SvPVbyte /;"	d
+SvPVbyte	ppport.h	/^#define SvPVbyte(/;"	d
+SvPVbyte	ppport.h	/^#undef SvPVbyte$/;"	d
+SvREFCNT_inc	ppport.h	/^#    define SvREFCNT_inc(/;"	d
+SvREFCNT_inc_NN	ppport.h	/^#    define SvREFCNT_inc_NN(/;"	d
+SvREFCNT_inc_simple	ppport.h	/^#    define SvREFCNT_inc_simple(/;"	d
+SvREFCNT_inc_simple_NN	ppport.h	/^#  define SvREFCNT_inc_simple_NN(/;"	d
+SvREFCNT_inc_simple_void	ppport.h	/^#  define SvREFCNT_inc_simple_void(/;"	d
+SvREFCNT_inc_simple_void_NN	ppport.h	/^#  define SvREFCNT_inc_simple_void_NN(/;"	d
+SvREFCNT_inc_void	ppport.h	/^#    define SvREFCNT_inc_void(/;"	d
+SvREFCNT_inc_void_NN	ppport.h	/^#  define SvREFCNT_inc_void_NN(/;"	d
+SvRV_set	ppport.h	/^#  define SvRV_set(/;"	d
+SvSHARED_HASH	ppport.h	/^#  define SvSHARED_HASH(/;"	d
+SvSTASH_set	ppport.h	/^#  define SvSTASH_set(/;"	d
+SvUOK	ppport.h	/^#  define SvUOK(/;"	d
+SvUV	ppport.h	/^#  define SvUV(/;"	d
+SvUVX	ppport.h	/^#  define SvUVX(/;"	d
+SvUVXx	ppport.h	/^#  define SvUVXx(/;"	d
+SvUV_nomg	ppport.h	/^#  define SvUV_nomg /;"	d
+SvUV_set	ppport.h	/^#  define SvUV_set(/;"	d
+SvUVx	ppport.h	/^#  define SvUVx(/;"	d
+SvVSTRING_mg	ppport.h	/^#  define SvVSTRING_mg(/;"	d
+TAR	Makefile	/^TAR = COPY_EXTENDED_ATTRIBUTES_DISABLE=1 COPYFILE_DISABLE=1 tar$/;"	m
+TARFLAGS	Makefile	/^TARFLAGS = cvf$/;"	m
+TESTDB_SW	Makefile	/^TESTDB_SW = -d$/;"	m
+TEST_F	Makefile	/^TEST_F = test -f$/;"	m
+TEST_FILE	Makefile	/^TEST_FILE = test.pl$/;"	m
+TEST_FILES	Makefile	/^TEST_FILES = t\/*.t$/;"	m
+TEST_TYPE	Makefile	/^TEST_TYPE=test_$(LINKTYPE)$/;"	m
+TEST_VERBOSE	Makefile	/^TEST_VERBOSE=0$/;"	m
+TOUCH	Makefile	/^TOUCH = touch$/;"	m
+TO_INST_PM	Makefile	/^TO_INST_PM = lib\/URI\/XSEscape.pm$/;"	m
+TO_UNIX	Makefile	/^TO_UNIX = $(NOECHO) $(NOOP)$/;"	m
+TRUE	Makefile	/^TRUE = true$/;"	m
+UMASK_NULL	Makefile	/^UMASK_NULL = umask 0$/;"	m
+UNDERBAR	ppport.h	/^#  define UNDERBAR /;"	d
+UNINST	Makefile	/^UNINST = 0$/;"	m
+UNINSTALL	Makefile	/^UNINSTALL = $(ABSPERLRUN) -MExtUtils::Command::MM -e 'uninstall' --$/;"	m
+URI::XSEscape	blib/lib/URI/XSEscape.pm	/^package URI::XSEscape;$/;"	p
+URI::XSEscape	lib/URI/XSEscape.pm	/^package URI::XSEscape;$/;"	p
+URI_H_	uri.h	/^#define URI_H_$/;"	d
+URI_STATE_END	uri_tables.h	/^#define URI_STATE_END /;"	d
+URI_STATE_EQUALS	uri_tables.h	/^#define URI_STATE_EQUALS /;"	d
+URI_STATE_ERROR	uri_tables.h	/^#define URI_STATE_ERROR /;"	d
+URI_STATE_NAME	uri_tables.h	/^#define URI_STATE_NAME /;"	d
+URI_STATE_START	uri_tables.h	/^#define URI_STATE_START /;"	d
+URI_STATE_TERMINATE	uri_tables.h	/^#define URI_STATE_TERMINATE /;"	d
+URI_STATE_VALUE	uri_tables.h	/^#define URI_STATE_VALUE /;"	d
+USEMAKEFILE	Makefile	/^USEMAKEFILE = -f$/;"	m
+UTF8_MAXBYTES	ppport.h	/^#  define UTF8_MAXBYTES /;"	d
+UVSIZE	ppport.h	/^#  define UVSIZE /;"	d
+UVTYPE	ppport.h	/^#  define UVTYPE /;"	d
+UVXf	ppport.h	/^#      define	UVXf /;"	d
+UVXf	ppport.h	/^#    define	UVXf /;"	d
+UV_MAX	ppport.h	/^#  define UV_MAX /;"	d
+UV_MIN	ppport.h	/^#  define UV_MIN /;"	d
+UVof	ppport.h	/^#      define	UVof /;"	d
+UVof	ppport.h	/^#    define	UVof /;"	d
+UVuf	ppport.h	/^#      define	UVuf /;"	d
+UVuf	ppport.h	/^#    define	UVuf /;"	d
+UVxf	ppport.h	/^#      define	UVxf /;"	d
+UVxf	ppport.h	/^#    define	UVxf /;"	d
+VENDORARCHEXP	Makefile	/^VENDORARCHEXP = \/Network\/Library\/Perl\/5.18\/darwin-thread-multi-2level$/;"	m
+VENDORLIBEXP	Makefile	/^VENDORLIBEXP = \/Network\/Library\/Perl\/5.18$/;"	m
+VENDORPREFIX	Makefile	/^VENDORPREFIX = \/usr\/local$/;"	m
+VERBINST	Makefile	/^VERBINST = 0$/;"	m
+VERSION	Makefile	/^VERSION = 0.000007$/;"	m
+VERSION_FROM	Makefile	/^VERSION_FROM = lib\/URI\/XSEscape.pm$/;"	m
+VERSION_MACRO	Makefile	/^VERSION_MACRO = VERSION$/;"	m
+VERSION_SYM	Makefile	/^VERSION_SYM = 0_000007$/;"	m
+WARN_ALL	ppport.h	/^#  define WARN_ALL /;"	d
+WARN_AMBIGUOUS	ppport.h	/^#  define WARN_AMBIGUOUS /;"	d
+WARN_ASSERTIONS	ppport.h	/^#  define WARN_ASSERTIONS /;"	d
+WARN_BAREWORD	ppport.h	/^#  define WARN_BAREWORD /;"	d
+WARN_CLOSED	ppport.h	/^#  define WARN_CLOSED /;"	d
+WARN_CLOSURE	ppport.h	/^#  define WARN_CLOSURE /;"	d
+WARN_DEBUGGING	ppport.h	/^#  define WARN_DEBUGGING /;"	d
+WARN_DEPRECATED	ppport.h	/^#  define WARN_DEPRECATED /;"	d
+WARN_DIGIT	ppport.h	/^#  define WARN_DIGIT /;"	d
+WARN_EXEC	ppport.h	/^#  define WARN_EXEC /;"	d
+WARN_EXITING	ppport.h	/^#  define WARN_EXITING /;"	d
+WARN_GLOB	ppport.h	/^#  define WARN_GLOB /;"	d
+WARN_IF_OLD_PACKLIST	Makefile	/^WARN_IF_OLD_PACKLIST = $(ABSPERLRUN) -MExtUtils::Command::MM -e 'warn_if_old_packlist' --$/;"	m
+WARN_INPLACE	ppport.h	/^#  define WARN_INPLACE /;"	d
+WARN_INTERNAL	ppport.h	/^#  define WARN_INTERNAL /;"	d
+WARN_IO	ppport.h	/^#  define WARN_IO /;"	d
+WARN_LAYER	ppport.h	/^#  define WARN_LAYER /;"	d
+WARN_MALLOC	ppport.h	/^#  define WARN_MALLOC /;"	d
+WARN_MISC	ppport.h	/^#  define WARN_MISC /;"	d
+WARN_NEWLINE	ppport.h	/^#  define WARN_NEWLINE /;"	d
+WARN_NUMERIC	ppport.h	/^#  define WARN_NUMERIC /;"	d
+WARN_ONCE	ppport.h	/^#  define WARN_ONCE /;"	d
+WARN_OVERFLOW	ppport.h	/^#  define WARN_OVERFLOW /;"	d
+WARN_PACK	ppport.h	/^#  define WARN_PACK /;"	d
+WARN_PARENTHESIS	ppport.h	/^#  define WARN_PARENTHESIS /;"	d
+WARN_PIPE	ppport.h	/^#  define WARN_PIPE /;"	d
+WARN_PORTABLE	ppport.h	/^#  define WARN_PORTABLE /;"	d
+WARN_PRECEDENCE	ppport.h	/^#  define WARN_PRECEDENCE /;"	d
+WARN_PRINTF	ppport.h	/^#  define WARN_PRINTF /;"	d
+WARN_PROTOTYPE	ppport.h	/^#  define WARN_PROTOTYPE /;"	d
+WARN_QW	ppport.h	/^#  define WARN_QW /;"	d
+WARN_RECURSION	ppport.h	/^#  define WARN_RECURSION /;"	d
+WARN_REDEFINE	ppport.h	/^#  define WARN_REDEFINE /;"	d
+WARN_REGEXP	ppport.h	/^#  define WARN_REGEXP /;"	d
+WARN_RESERVED	ppport.h	/^#  define WARN_RESERVED /;"	d
+WARN_SEMICOLON	ppport.h	/^#  define WARN_SEMICOLON /;"	d
+WARN_SEVERE	ppport.h	/^#  define WARN_SEVERE /;"	d
+WARN_SIGNAL	ppport.h	/^#  define WARN_SIGNAL /;"	d
+WARN_SUBSTR	ppport.h	/^#  define WARN_SUBSTR /;"	d
+WARN_SYNTAX	ppport.h	/^#  define WARN_SYNTAX /;"	d
+WARN_TAINT	ppport.h	/^#  define WARN_TAINT /;"	d
+WARN_THREADS	ppport.h	/^#  define WARN_THREADS /;"	d
+WARN_UNINITIALIZED	ppport.h	/^#  define WARN_UNINITIALIZED /;"	d
+WARN_UNOPENED	ppport.h	/^#  define WARN_UNOPENED /;"	d
+WARN_UNPACK	ppport.h	/^#  define WARN_UNPACK /;"	d
+WARN_UNTIE	ppport.h	/^#  define WARN_UNTIE /;"	d
+WARN_UTF8	ppport.h	/^#  define WARN_UTF8 /;"	d
+WARN_VOID	ppport.h	/^#  define WARN_VOID /;"	d
+XCPT_CATCH	ppport.h	/^#    define XCPT_CATCH /;"	d
+XCPT_RETHROW	ppport.h	/^#    define XCPT_RETHROW /;"	d
+XCPT_TRY_END	ppport.h	/^#    define XCPT_TRY_END /;"	d
+XCPT_TRY_START	ppport.h	/^#    define XCPT_TRY_START /;"	d
+XPUSHmortal	ppport.h	/^#  define XPUSHmortal /;"	d
+XPUSHu	ppport.h	/^#  define XPUSHu(/;"	d
+XSPROTO	ppport.h	/^#  define XSPROTO(/;"	d
+XSPROTOARG	Makefile	/^XSPROTOARG = $/;"	m
+XSRETURN	ppport.h	/^#  define XSRETURN(/;"	d
+XSRETURN	ppport.h	/^#  undef XSRETURN$/;"	d
+XSRETURN_UV	ppport.h	/^#  define XSRETURN_UV(/;"	d
+XST_mUV	ppport.h	/^#  define XST_mUV(/;"	d
+XSUBPP	Makefile	/^XSUBPP = "$(XSUBPPDIR)$(DFSEP)xsubpp"$/;"	m
+XSUBPPARGS	Makefile	/^XSUBPPARGS = -typemap "\/System\/Library\/Perl\/5.18\/ExtUtils\/typemap"$/;"	m
+XSUBPPDEPS	Makefile	/^XSUBPPDEPS = \/System\/Library\/Perl\/5.18\/ExtUtils\/typemap \/System\/Library\/Perl\/5.18\/ExtUtils$(DFSEP)xsubpp$/;"	m
+XSUBPPDIR	Makefile	/^XSUBPPDIR = \/System\/Library\/Perl\/5.18\/ExtUtils$/;"	m
+XSUBPPRUN	Makefile	/^XSUBPPRUN = $(PERLRUN) $(XSUBPP)$/;"	m
+XSUBPP_EXTRA_ARGS	Makefile	/^XSUBPP_EXTRA_ARGS =$/;"	m
+XS_DEFINE_VERSION	Makefile	/^XS_DEFINE_VERSION = -D$(XS_VERSION_MACRO)=\\"$(XS_VERSION)\\"$/;"	m
+XS_EUPXS	escape.c	/^#  define XS_EUPXS(/;"	d	file:
+XS_EUPXS	escape.c	/^#undef XS_EUPXS$/;"	d	file:
+XS_EUPXS	escape.c	/^XS_EUPXS(XS_URI__XSEscape_uri_escape)$/;"	f
+XS_EUPXS	escape.c	/^XS_EUPXS(XS_URI__XSEscape_uri_unescape)$/;"	f
+XS_EXTERNAL	escape.c	/^#        define XS_EXTERNAL(/;"	d	file:
+XS_EXTERNAL	escape.c	/^#      define XS_EXTERNAL(/;"	d	file:
+XS_EXTERNAL	escape.c	/^#    define XS_EXTERNAL(/;"	d	file:
+XS_EXTERNAL	escape.c	/^#  define XS_EXTERNAL(/;"	d	file:
+XS_EXTERNAL	escape.c	/^#  undef XS_EXTERNAL$/;"	d	file:
+XS_EXTERNAL	escape.c	/^XS_EXTERNAL(boot_URI__XSEscape)$/;"	f
+XS_FILES	Makefile	/^XS_FILES = escape.xs$/;"	m
+XS_INTERNAL	escape.c	/^#        define XS_INTERNAL(/;"	d	file:
+XS_INTERNAL	escape.c	/^#      define XS_INTERNAL(/;"	d	file:
+XS_INTERNAL	escape.c	/^#    define XS_INTERNAL(/;"	d	file:
+XS_INTERNAL	escape.c	/^#  define XS_INTERNAL(/;"	d	file:
+XS_INTERNAL	escape.c	/^#  undef XS_INTERNAL$/;"	d	file:
+XS_URI__XSEscape_uri_escape	escape.c	/^XS_EUPXS(XS_URI__XSEscape_uri_escape); \/* prototype to pass -Wmissing-prototypes *\/$/;"	v
+XS_URI__XSEscape_uri_unescape	escape.c	/^XS_EUPXS(XS_URI__XSEscape_uri_unescape); \/* prototype to pass -Wmissing-prototypes *\/$/;"	v
+XS_VERSION	Makefile	/^XS_VERSION = 0.000007$/;"	m
+XS_VERSION_MACRO	Makefile	/^XS_VERSION_MACRO = XS_VERSION$/;"	m
+XSprePUSH	ppport.h	/^#  define XSprePUSH /;"	d
+ZIP	Makefile	/^ZIP = zip$/;"	m
+ZIPFLAGS	Makefile	/^ZIPFLAGS = -r$/;"	m
+ZeroD	ppport.h	/^#  define ZeroD(/;"	d
+_GMEM_DEL	gmem.h	/^#define _GMEM_DEL(/;"	d
+_GMEM_NEW	gmem.h	/^#define _GMEM_NEW(/;"	d
+_GMEM_REALLOC	gmem.h	/^#define _GMEM_REALLOC(/;"	d
+_P_P_PORTABILITY_H_	ppport.h	/^#define _P_P_PORTABILITY_H_$/;"	d
+_aMY_CXT	ppport.h	/^#define _aMY_CXT	/;"	d
+_aMY_CXT	ppport.h	/^#define _aMY_CXT$/;"	d
+_dpppDEC2BCD	ppport.h	/^#define _dpppDEC2BCD(/;"	d
+_pMY_CXT	ppport.h	/^#define _pMY_CXT	/;"	d
+_pMY_CXT	ppport.h	/^#define _pMY_CXT$/;"	d
+aMY_CXT	ppport.h	/^#define aMY_CXT	/;"	d
+aMY_CXT	ppport.h	/^#define aMY_CXT$/;"	d
+aMY_CXT_	ppport.h	/^#define aMY_CXT_	/;"	d
+aMY_CXT_	ppport.h	/^#define aMY_CXT_$/;"	d
+aTHX	ppport.h	/^#  define aTHX$/;"	d
+aTHXR	ppport.h	/^#    define aTHXR /;"	d
+aTHXR	ppport.h	/^#    define aTHXR$/;"	d
+aTHXR	ppport.h	/^#  define aTHXR /;"	d
+aTHXR_	ppport.h	/^#    define aTHXR_ /;"	d
+aTHXR_	ppport.h	/^#    define aTHXR_$/;"	d
+aTHXR_	ppport.h	/^#  define aTHXR_ /;"	d
+aTHX_	ppport.h	/^#  define aTHX_$/;"	d
+boolSV	ppport.h	/^#  define boolSV(/;"	d
+buffer_append	buffer.h	/^#define buffer_append(/;"	d
+buffer_ensure_total	buffer.h	/^#define buffer_ensure_total(/;"	d
+buffer_ensure_unused	buffer.h	/^#define buffer_ensure_unused(/;"	d
+buffer_fini	buffer.h	/^#define buffer_fini(/;"	d
+buffer_init	buffer.h	/^#define buffer_init(/;"	d
+buffer_reset	buffer.h	/^#define buffer_reset(/;"	d
+buffer_rewind	buffer.h	/^#define buffer_rewind(/;"	d
+buffer_terminate	buffer.h	/^#define buffer_terminate(/;"	d
+buffer_wrap	buffer.h	/^#define buffer_wrap(/;"	d
+buffer_zero	buffer.h	/^#define buffer_zero(/;"	d
+call_argv	ppport.h	/^#  define call_argv /;"	d
+call_method	ppport.h	/^#  define call_method /;"	d
+call_pv	ppport.h	/^#  define call_pv /;"	d
+call_sv	ppport.h	/^#  define call_sv /;"	d
+call_sv	ppport.h	/^#  define call_sv(/;"	d
+call_sv	ppport.h	/^#  undef call_sv$/;"	d
+cflags	Makefile.PL	/^sub cflags {$/;"	s
+ckWARN	ppport.h	/^#    define  ckWARN(/;"	d
+croak_xs_usage	escape.c	/^#define croak_xs_usage /;"	d	file:
+croak_xs_usage	escape.c	/^#define croak_xs_usage(/;"	d	file:
+dAX	ppport.h	/^#  define dAX /;"	d
+dAXMARK	ppport.h	/^#  define dAXMARK /;"	d
+dITEMS	ppport.h	/^#  define dITEMS /;"	d
+dMY_CXT	ppport.h	/^#define dMY_CXT	/;"	d
+dMY_CXT_SV	ppport.h	/^#define dMY_CXT_SV	/;"	d
+dMY_CXT_SV	ppport.h	/^#define dMY_CXT_SV /;"	d
+dNOOP	ppport.h	/^#  define dNOOP /;"	d
+dTHR	ppport.h	/^#  define dTHR /;"	d
+dTHX	ppport.h	/^#  define dTHX /;"	d
+dTHXR	ppport.h	/^#  define dTHXR /;"	d
+dTHXa	ppport.h	/^#  define dTHXa(/;"	d
+dTHXoa	ppport.h	/^#  define dTHXoa(/;"	d
+dUNDERBAR	ppport.h	/^#  define dUNDERBAR /;"	d
+dVAR	escape.c	/^#  define dVAR	/;"	d	file:
+dVAR	ppport.h	/^#  define dVAR /;"	d
+dXCPT	ppport.h	/^#    define dXCPT /;"	d
+dXSTARG	ppport.h	/^#  define dXSTARG /;"	d
+data	buffer.h	/^    char* data;$/;"	m	struct:Buffer
+eval_pv	ppport.h	/^#  undef eval_pv$/;"	d
+eval_pv	ppport.h	/^#define eval_pv(/;"	d
+eval_sv	ppport.h	/^#  define eval_sv /;"	d
+fill_matrix	uri.c	/^static void fill_matrix(const Buffer* escape, char matrix[256][3])$/;"	f	file:
+fixed	buffer.h	/^    char fixed[  BUFFER_SIZEOF_DESIRED$/;"	m	struct:Buffer
+get_av	ppport.h	/^#  define get_av /;"	d
+get_cv	ppport.h	/^#  define get_cv /;"	d
+get_cvn_flags	ppport.h	/^#  define get_cvn_flags(/;"	d
+get_cvs	ppport.h	/^#  define get_cvs(/;"	d
+get_hv	ppport.h	/^#  define get_hv /;"	d
+get_sv	ppport.h	/^#  define get_sv /;"	d
+gmem_del	gmem.c	/^long gmem_del = 0;$/;"	v
+gmem_del_called	gmem.c	/^int gmem_del_called(const char* file,$/;"	f
+gmem_fini	gmem.c	/^void gmem_fini(void)$/;"	f
+gmem_init	gmem.c	/^void gmem_init()$/;"	f
+gmem_inited	gmem.c	/^static int gmem_inited = 0;$/;"	v	file:
+gmem_new	gmem.c	/^long gmem_new = 0;$/;"	v
+gmem_new_called	gmem.c	/^int gmem_new_called(const char* file,$/;"	f
+gmem_strdel	gmem.c	/^int gmem_strdel(const char* file,$/;"	f
+gmem_strnew	gmem.c	/^int gmem_strnew(const char* file,$/;"	f
+gmem_unused	gmem.c	/^int gmem_unused = 0;$/;"	v
+grok_bin	ppport.h	/^#  undef grok_bin$/;"	d
+grok_bin	ppport.h	/^#define grok_bin(/;"	d
+grok_hex	ppport.h	/^#  undef grok_hex$/;"	d
+grok_hex	ppport.h	/^#define grok_hex(/;"	d
+grok_number	ppport.h	/^#  undef grok_number$/;"	d
+grok_number	ppport.h	/^#define grok_number(/;"	d
+grok_numeric_radix	ppport.h	/^#  undef grok_numeric_radix$/;"	d
+grok_numeric_radix	ppport.h	/^#define grok_numeric_radix(/;"	d
+grok_oct	ppport.h	/^#  undef grok_oct$/;"	d
+grok_oct	ppport.h	/^#define grok_oct(/;"	d
+gv_fetchpvn_flags	ppport.h	/^#  define gv_fetchpvn_flags(/;"	d
+gv_fetchpvs	ppport.h	/^#  define gv_fetchpvs(/;"	d
+gv_fetchsv	ppport.h	/^#  define gv_fetchsv(/;"	d
+gv_stashpvn	ppport.h	/^#  define gv_stashpvn(/;"	d
+gv_stashpvs	ppport.h	/^#  define gv_stashpvs(/;"	d
+hv_fetchs	ppport.h	/^#  define hv_fetchs(/;"	d
+hv_stores	ppport.h	/^#  define hv_stores(/;"	d
+isALNUMC	ppport.h	/^#  define isALNUMC(/;"	d
+isASCII	ppport.h	/^#  define isASCII(/;"	d
+isBLANK	ppport.h	/^#  define isBLANK(/;"	d
+isCNTRL	ppport.h	/^#  define isCNTRL(/;"	d
+isGRAPH	ppport.h	/^#  define isGRAPH(/;"	d
+isGV_with_GP	ppport.h	/^#  define isGV_with_GP(/;"	d
+isPRINT	ppport.h	/^#  define isPRINT(/;"	d
+isPRINT	ppport.h	/^#  undef isPRINT$/;"	d
+isPSXSPC	ppport.h	/^#  define isPSXSPC(/;"	d
+isPUNCT	ppport.h	/^#  define isPUNCT(/;"	d
+isXDIGIT	ppport.h	/^#  define isXDIGIT(/;"	d
+load_module	ppport.h	/^#  undef load_module$/;"	d
+load_module	ppport.h	/^#define load_module /;"	d
+mPUSHi	ppport.h	/^#  define mPUSHi(/;"	d
+mPUSHn	ppport.h	/^#  define mPUSHn(/;"	d
+mPUSHp	ppport.h	/^#  define mPUSHp(/;"	d
+mPUSHs	ppport.h	/^#  define mPUSHs(/;"	d
+mPUSHu	ppport.h	/^#  define mPUSHu(/;"	d
+mXPUSHi	ppport.h	/^#  define mXPUSHi(/;"	d
+mXPUSHn	ppport.h	/^#  define mXPUSHn(/;"	d
+mXPUSHp	ppport.h	/^#  define mXPUSHp(/;"	d
+mXPUSHs	ppport.h	/^#  define mXPUSHs(/;"	d
+mXPUSHu	ppport.h	/^#  define mXPUSHu(/;"	d
+main	tools/bench.pl	/^sub main {$/;"	s
+memEQ	ppport.h	/^#  define memEQ(/;"	d
+memEQs	ppport.h	/^#  define memEQs(/;"	d
+memNE	ppport.h	/^#  define memNE(/;"	d
+memNEs	ppport.h	/^#  define memNEs(/;"	d
+my_PL_signals	ppport.h	/^U32 DPPP_(my_PL_signals) = D_PPP_PERL_SIGNALS_INIT;$/;"	v
+my_PL_signals	ppport.h	/^static U32 DPPP_(my_PL_signals) = D_PPP_PERL_SIGNALS_INIT;$/;"	v
+my_eval_pv	ppport.h	/^DPPP_(my_eval_pv)(char *p, I32 croak_on_error)$/;"	f
+my_grok_bin	ppport.h	/^DPPP_(my_grok_bin)(pTHX_ const char *start, STRLEN *len_p, I32 *flags, NV *result)$/;"	f
+my_grok_hex	ppport.h	/^DPPP_(my_grok_hex)(pTHX_ const char *start, STRLEN *len_p, I32 *flags, NV *result)$/;"	f
+my_grok_number	ppport.h	/^DPPP_(my_grok_number)(pTHX_ const char *pv, STRLEN len, UV *valuep)$/;"	f
+my_grok_numeric_radix	ppport.h	/^DPPP_(my_grok_numeric_radix)(pTHX_ const char **sp, const char *send)$/;"	f
+my_grok_oct	ppport.h	/^DPPP_(my_grok_oct)(pTHX_ const char *start, STRLEN *len_p, I32 *flags, NV *result)$/;"	f
+my_load_module	ppport.h	/^DPPP_(my_load_module)(U32 flags, SV *name, SV *ver, ...)$/;"	f
+my_my_snprintf	ppport.h	/^DPPP_(my_my_snprintf)(char *buffer, const Size_t len, const char *format, ...)$/;"	f
+my_my_sprintf	ppport.h	/^DPPP_(my_my_sprintf)(char *buffer, const char* pat, ...)$/;"	f
+my_my_strlcat	ppport.h	/^DPPP_(my_my_strlcat)(char *dst, const char *src, Size_t size)$/;"	f
+my_my_strlcpy	ppport.h	/^DPPP_(my_my_strlcpy)(char *dst, const char *src, Size_t size)$/;"	f
+my_newCONSTSUB	ppport.h	/^DPPP_(my_newCONSTSUB)(HV *stash, const char *name, SV *sv)$/;"	f
+my_newRV_noinc	ppport.h	/^DPPP_(my_newRV_noinc)(SV *sv)$/;"	f
+my_newSV_type	ppport.h	/^DPPP_(my_newSV_type)(pTHX_ svtype const t)$/;"	f
+my_newSVpvn_flags	ppport.h	/^DPPP_(my_newSVpvn_flags)(pTHX_ const char *s, STRLEN len, U32 flags)$/;"	f
+my_newSVpvn_share	ppport.h	/^DPPP_(my_newSVpvn_share)(pTHX_ const char *src, I32 len, U32 hash)$/;"	f
+my_pv_display	ppport.h	/^DPPP_(my_pv_display)(pTHX_ SV *dsv, const char *pv, STRLEN cur, STRLEN len, STRLEN pvlim)$/;"	f
+my_pv_escape	ppport.h	/^DPPP_(my_pv_escape)(pTHX_ SV *dsv, char const * const str,$/;"	f
+my_pv_pretty	ppport.h	/^DPPP_(my_pv_pretty)(pTHX_ SV *dsv, char const * const str, const STRLEN count,$/;"	f
+my_snprintf	ppport.h	/^#define my_snprintf /;"	d
+my_sprintf	ppport.h	/^#define my_sprintf /;"	d
+my_strlcat	ppport.h	/^#define my_strlcat /;"	d
+my_strlcpy	ppport.h	/^#define my_strlcpy /;"	d
+my_sv_2pv_flags	ppport.h	/^DPPP_(my_sv_2pv_flags)(pTHX_ SV *sv, STRLEN *lp, I32 flags)$/;"	f
+my_sv_2pvbyte	ppport.h	/^DPPP_(my_sv_2pvbyte)(pTHX_ SV *sv, STRLEN *lp)$/;"	f
+my_sv_catpvf_mg	ppport.h	/^DPPP_(my_sv_catpvf_mg)(pTHX_ SV *sv, const char *pat, ...)$/;"	f
+my_sv_catpvf_mg_nocontext	ppport.h	/^DPPP_(my_sv_catpvf_mg_nocontext)(SV *sv, const char *pat, ...)$/;"	f
+my_sv_pvn_force_flags	ppport.h	/^DPPP_(my_sv_pvn_force_flags)(pTHX_ SV *sv, STRLEN *lp, I32 flags)$/;"	f
+my_sv_setpvf_mg	ppport.h	/^DPPP_(my_sv_setpvf_mg)(pTHX_ SV *sv, const char *pat, ...)$/;"	f
+my_sv_setpvf_mg_nocontext	ppport.h	/^DPPP_(my_sv_setpvf_mg_nocontext)(SV *sv, const char *pat, ...)$/;"	f
+my_vload_module	ppport.h	/^DPPP_(my_vload_module)(U32 flags, SV *name, SV *ver, va_list *args)$/;"	f
+my_vnewSVpvf	ppport.h	/^DPPP_(my_vnewSVpvf)(pTHX_ const char *pat, va_list *args)$/;"	f
+my_warner	ppport.h	/^DPPP_(my_warner)(U32 err, const char *pat, ...)$/;"	f
+newCONSTSUB	ppport.h	/^#  undef newCONSTSUB$/;"	d
+newCONSTSUB	ppport.h	/^#define newCONSTSUB(/;"	d
+newRV_inc	ppport.h	/^#  define newRV_inc(/;"	d
+newRV_noinc	ppport.h	/^#  undef newRV_noinc$/;"	d
+newRV_noinc	ppport.h	/^#define newRV_noinc(/;"	d
+newSV_type	ppport.h	/^#  undef newSV_type$/;"	d
+newSV_type	ppport.h	/^#define newSV_type(/;"	d
+newSVpvn	ppport.h	/^#  define newSVpvn(/;"	d
+newSVpvn_flags	ppport.h	/^#  undef newSVpvn_flags$/;"	d
+newSVpvn_flags	ppport.h	/^#define newSVpvn_flags(/;"	d
+newSVpvn_share	ppport.h	/^#  undef newSVpvn_share$/;"	d
+newSVpvn_share	ppport.h	/^#define newSVpvn_share(/;"	d
+newSVpvn_utf8	ppport.h	/^#  define newSVpvn_utf8(/;"	d
+newSVpvs	ppport.h	/^#  define newSVpvs(/;"	d
+newSVpvs_flags	ppport.h	/^#  define newSVpvs_flags(/;"	d
+newSVpvs_share	ppport.h	/^#  define newSVpvs_share(/;"	d
+newSVuv	ppport.h	/^#  define newSVuv(/;"	d
+newXSproto_portable	escape.c	/^#define newXSproto_portable(/;"	d	file:
+pMY_CXT	ppport.h	/^#define pMY_CXT	/;"	d
+pMY_CXT_	ppport.h	/^#define pMY_CXT_	/;"	d
+pMY_CXT_	ppport.h	/^#define pMY_CXT_$/;"	d
+pTHX	ppport.h	/^#  define pTHX /;"	d
+pTHX_	ppport.h	/^#  define pTHX_$/;"	d
+packWARN	ppport.h	/^#  define packWARN(/;"	d
+pos	buffer.h	/^    unsigned int pos;$/;"	m	struct:Buffer
+pv_display	ppport.h	/^#  undef pv_display$/;"	d
+pv_display	ppport.h	/^#define pv_display(/;"	d
+pv_escape	ppport.h	/^#  undef pv_escape$/;"	d
+pv_escape	ppport.h	/^#define pv_escape(/;"	d
+pv_pretty	ppport.h	/^#  undef pv_pretty$/;"	d
+pv_pretty	ppport.h	/^#define pv_pretty(/;"	d
+size	buffer.h	/^    unsigned int size;$/;"	m	struct:Buffer
+sv_2pv_flags	ppport.h	/^#  undef sv_2pv_flags$/;"	d
+sv_2pv_flags	ppport.h	/^#define sv_2pv_flags(/;"	d
+sv_2pv_nolen	ppport.h	/^#  define sv_2pv_nolen(/;"	d
+sv_2pvbyte	ppport.h	/^#  define sv_2pvbyte /;"	d
+sv_2pvbyte	ppport.h	/^#  undef sv_2pvbyte$/;"	d
+sv_2pvbyte	ppport.h	/^#define sv_2pvbyte(/;"	d
+sv_2pvbyte_nolen	ppport.h	/^#  define sv_2pvbyte_nolen(/;"	d
+sv_2uv	ppport.h	/^#  define sv_2uv(/;"	d
+sv_catpv_mg	ppport.h	/^#  define sv_catpv_mg(/;"	d
+sv_catpvf_mg	ppport.h	/^#    define sv_catpvf_mg /;"	d
+sv_catpvf_mg_nocontext	ppport.h	/^#define sv_catpvf_mg_nocontext /;"	d
+sv_catpvn_mg	ppport.h	/^#  define sv_catpvn_mg(/;"	d
+sv_catpvn_nomg	ppport.h	/^#  define sv_catpvn_nomg /;"	d
+sv_catpvs	ppport.h	/^#  define sv_catpvs(/;"	d
+sv_catsv_mg	ppport.h	/^#  define sv_catsv_mg(/;"	d
+sv_catsv_nomg	ppport.h	/^#  define sv_catsv_nomg /;"	d
+sv_magic_portable	ppport.h	/^#  define sv_magic_portable(/;"	d
+sv_pvn_force_flags	ppport.h	/^#  undef sv_pvn_force_flags$/;"	d
+sv_pvn_force_flags	ppport.h	/^#define sv_pvn_force_flags(/;"	d
+sv_pvn_nomg	ppport.h	/^#  define sv_pvn_nomg /;"	d
+sv_setiv_mg	ppport.h	/^#  define sv_setiv_mg(/;"	d
+sv_setnv_mg	ppport.h	/^#  define sv_setnv_mg(/;"	d
+sv_setpv_mg	ppport.h	/^#  define sv_setpv_mg(/;"	d
+sv_setpvf_mg	ppport.h	/^#    define sv_setpvf_mg /;"	d
+sv_setpvf_mg_nocontext	ppport.h	/^#define sv_setpvf_mg_nocontext /;"	d
+sv_setpvn_mg	ppport.h	/^#  define sv_setpvn_mg(/;"	d
+sv_setpvs	ppport.h	/^#  define sv_setpvs(/;"	d
+sv_setsv_mg	ppport.h	/^#  define sv_setsv_mg(/;"	d
+sv_setsv_nomg	ppport.h	/^#  define sv_setsv_nomg /;"	d
+sv_setuv	ppport.h	/^#  define sv_setuv(/;"	d
+sv_setuv_mg	ppport.h	/^#  define sv_setuv_mg(/;"	d
+sv_usepvn_mg	ppport.h	/^#  define sv_usepvn_mg(/;"	d
+sv_uv	ppport.h	/^#  define sv_uv(/;"	d
+sv_vcatpvf	ppport.h	/^#  define sv_vcatpvf(/;"	d
+sv_vcatpvf_mg	ppport.h	/^#  define sv_vcatpvf_mg(/;"	d
+sv_vsetpvf	ppport.h	/^#  define sv_vsetpvf(/;"	d
+sv_vsetpvf_mg	ppport.h	/^#  define sv_vsetpvf_mg(/;"	d
+uri_decode	uri.c	/^Buffer* uri_decode(Buffer* src, int length,$/;"	f
+uri_decode_tbl	uri_tables.h	/^static char uri_decode_tbl[256] =$/;"	v
+uri_encode	uri.c	/^Buffer* uri_encode(Buffer* src, int length,$/;"	f
+uri_encode_matrix	uri.c	/^Buffer* uri_encode_matrix(Buffer* src, int length,$/;"	f
+uri_encode_tbl	uri_tables.h	/^static char* uri_encode_tbl[256] =$/;"	v
+uri_escape_utf8	blib/lib/URI/XSEscape.pm	/^sub uri_escape_utf8 {$/;"	s
+uri_escape_utf8	lib/URI/XSEscape.pm	/^sub uri_escape_utf8 {$/;"	s
+uri_state_tbl	uri_tables.h	/^static char uri_state_tbl[256][7] =$/;"	v
+vload_module	ppport.h	/^#  undef vload_module$/;"	d
+vload_module	ppport.h	/^#define vload_module(/;"	d
+vnewSVpvf	ppport.h	/^#  undef vnewSVpvf$/;"	d
+vnewSVpvf	ppport.h	/^#define vnewSVpvf(/;"	d
+warner	ppport.h	/^#define warner /;"	d

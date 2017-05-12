@@ -1,0 +1,7 @@
+#a super simple config 
+onerror.console=true
+http://www.apple.com
+http://www.apple.ch
+
+http://aaa.bbb.ccc.ddd
+http://zzz.yyy.xxx.www

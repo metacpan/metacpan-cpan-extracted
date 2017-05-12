@@ -1,0 +1,225 @@
+#!/usr/bin/perl
+
+# $Id: apifuncs,v 1.5 2005-07-12 01:08:39 kiesling Exp $
+$VERSION = 1.0;
+
+use UnixODBC qw(:all);
+use Getopt::Long;
+
+my $env;
+my $cnh;
+my $sth;
+my $r;
+
+## 
+## Options from the command line.
+##
+my $DSN = '';      # Data source name
+my $UserName = ''; # Login for DBMS  
+my $PassWord; = '' # Password for DBMS
+
+
+my $usage=<<EOH;
+Usage: apifuncs [--help] | [--user=<username>] [--password=<password>] --dsn=<DSN> 
+  --help       Print this help and exit.
+  --dsn        Data source name.
+  --user       DBMS login name.
+  --password   DBMS login password.
+EOH
+
+my $help;  # Print help and exit.
+
+GetOptions ('help' => \$help,
+	    'dsn=s' => \$DSN,
+	    'user=s' => \$UserName,
+	    'password=s' => \$PassWord);
+
+if ($help || (not length ($DSN)))
+     {
+	 print $usage;
+	 exit 0;
+     }
+
+my $ibuf;
+
+my %api_funcs = ('SQL_API_SQLALLOCHANDLESTD', 73,
+		 'SQL_API_SQLBULKOPERATIONS', 24,
+		 'SQL_API_SQLALLOCCONNECT', 1,
+		 'SQL_API_SQLALLOCENV', 2,
+		 'SQL_API_SQLALLOCHANDLE', 1001,
+		 'SQL_API_SQLALLOCSTMT', 3,
+		 'SQL_API_SQLBINDCOL', 4,
+		 'SQL_API_SQLBINDPARAM', 1002,
+		 'SQL_API_SQLCANCEL', 5,
+		 'SQL_API_SQLCLOSECURSOR', 1003,
+		 'SQL_API_SQLCOLATTRIBUTE', 6,
+		 'SQL_API_SQLCOLUMNS', 40,
+		 'SQL_API_SQLCONNECT', 7,
+		 'SQL_API_SQLCOPYDESC', 1004,
+		 'SQL_API_SQLDATASOURCES', 57,
+		 'SQL_API_SQLDESCRIBECOL', 8,
+		 'SQL_API_SQLDISCONNECT', 9,
+		 'SQL_API_SQLENDTRAN', 1005,
+		 'SQL_API_SQLERROR', 10,
+		 'SQL_API_SQLEXECDIRECT', 11,
+		 'SQL_API_SQLEXECUTE', 12,
+		 'SQL_API_SQLFETCH', 13,
+		 'SQL_API_SQLFETCHSCROLL', 1021,
+		 'SQL_API_SQLFREECONNECT', 14,
+		 'SQL_API_SQLFREEENV', 15,
+		 'SQL_API_SQLFREEHANDLE', 1006,
+		  'SQL_API_SQLFREESTMT', 16,
+		 'SQL_API_SQLGETCONNECTATTR', 1007,
+		 'SQL_API_SQLGETCONNECTOPTION', 42,
+		 'SQL_API_SQLGETCURSORNAME', 17,
+		 'SQL_API_SQLGETDATA', 43,
+		 'SQL_API_SQLGETDESCFIELD', 1008,
+		 'SQL_API_SQLGETDESCREC', 1009,
+		 'SQL_API_SQLGETDIAGFIELD', 1010,
+		 'SQL_API_SQLGETDIAGREC', 1011,
+		 'SQL_API_SQLGETENVATTR', 1012,
+		 'SQL_API_SQLGETFUNCTIONS', 44,
+		 'SQL_API_SQLGETINFO', 45,
+		 'SQL_API_SQLGETSTMTATTR', 1014,
+		 'SQL_API_SQLGETSTMTOPTION', 46,
+		 'SQL_API_SQLGETTYPEINFO', 47,
+		 'SQL_API_SQLNUMRESULTCOLS', 18,
+		 'SQL_API_SQLPARAMDATA', 48,
+		 'SQL_API_SQLPREPARE', 19,
+		 'SQL_API_SQLPUTDATA', 49,
+		 'SQL_API_SQLROWCOUNT', 20,
+		 'SQL_API_SQLSETCONNECTATTR', 1016,
+		 'SQL_API_SQLSETCONNECTOPTION', 50,
+		 'SQL_API_SQLSETCURSORNAME', 21,
+		 'SQL_API_SQLSETDESCFIELD', 1017,
+		 'SQL_API_SQLSETDESCREC', 1018,
+		 'SQL_API_SQLSETENVATTR', 1019,
+		 'SQL_API_SQLSETPARAM', 22,
+		 'SQL_API_SQLSETSTMTATTR', 1020,
+		 'SQL_API_SQLSETSTMTOPTION', 51,
+		 'SQL_API_SQLSPECIALCOLUMNS', 52,
+		 'SQL_API_SQLSTATISTICS', 53,
+		 'SQL_API_SQLTABLES', 54,
+		 'SQL_API_SQLTRANSACT', 23 );
+
+$SIG{PIPE} = sub { print "SIGPIPE: ". $! . "\n"};
+
+$r = SQLAllocHandle ($SQL_HANDLE_ENV, $SQL_NULL_HANDLE, $evh);
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    print "SQLAllocHandle evh: ";
+   &getdiagrec ($SQL_HANDLE_ENV, $evh);
+    exit 1;
+}
+
+$r = SQLSetEnvAttr($evh, $SQL_ATTR_ODBC_VERSION, $SQL_OV_ODBC2, 0);
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    &getdiagrec ($SQL_HANDLE_ENV, $evh);
+    exit 1;
+}
+
+$r = SQLAllocHandle ($SQL_HANDLE_DBC, $evh, $cnh);
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    &getdiagrec ($SQL_HANDLE_ENV, $evh);
+    exit 1;
+}
+
+$r = SQLConnect ($cnh, $DSN, $SQL_NTS,
+			    $UserName, $SQL_NTS,
+			    $PassWord, $SQL_NTS);
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    &getdiagrec ($SQL_HANDLE_DBC, $cnh);
+    exit 1;
+}
+
+foreach my $func (keys %api_funcs) {
+    $r = SQLGetFunctions ($cnh, $api_funcs{$func}, $s);
+    if ($s) {
+	print "$func \= supported\n";
+    } else {
+	print "$func \= not supported\n";
+    }
+}
+
+$r = SQLDisconnect ($cnh);
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    &getdiagrec ($SQL_HANDLE_DBC, $cnh);
+    exit 1;
+}
+
+$r = SQLFreeConnect ($cnh);
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    &getdiagrec ($SQL_HANDLE_DBC, $cnh);
+    exit 1;
+}
+
+$r = SQLFreeHandle ($SQL_HANDLE_ENV, $evh);
+if (($r!=$SQL_SUCCESS)&&($r!=$SQL_NO_DATA)) {
+    &getdiagrec ($SQL_HANDLE_ENV, $evh);
+    exit 1;
+}
+
+sub getdiagrec {
+    my ($handle_type, $handle) = @_;
+    my ($sqlstate, $native, $message_text, $mlen);
+    print 'SQLGetDiagRec: ';
+    $r = &UnixODBC::SQLGetDiagRec ($handle_type, $handle, 1, $sqlstate,
+				   $native, $message_text, 255,
+				   $mlen);
+    if ($r == $SQL_NO_DATA) { 
+	print "result \= SQL_NO_DATA\n";
+    } elsif (($r == 1) || ($r == 0)) { 
+     print "$message_text\n";
+    } else { 
+     print "sqlresult = $r\n";
+    }
+    return $r;
+}
+
+=head1 NAME
+
+apifuncs - Display the ODBC functions supported by a data source.
+
+=head1 SYNOPSIS
+
+apifuncs [--help] | [--user=<username>] [--password=<password>] --dsn=<DSN>
+
+=head1 DESCRIPTION
+
+Apifuncs displays which functions of the ODBC API are supported by a 
+data source.  For each function in the ODBC API, apifuncs prints 
+the API mnemonic, and either "supported" or "not supported."
+
+=head1 OPTIONS
+
+=head2 --help
+
+Print a help message and exit.
+
+=head2 --dsn
+
+The name of the data source.
+
+=head2 --user
+
+User's login name on the DBMS server.
+
+=head2 --password
+
+User's login password on the DBMS server.
+
+=head1 VERSION INFORMATION AND CREDITS
+
+Revision: $Revision: 1.5 $
+
+Written by: Robert Kiesling, rkies@cpan.org.
+
+Licensed under the same terms as Perl.  Please refer to the
+file "Artistic" for details.
+
+=head1 SEE ALSO
+
+perl(1), UnixODBC(3), UnixODBC::BridgeServer(3).
+
+
+=cut
+

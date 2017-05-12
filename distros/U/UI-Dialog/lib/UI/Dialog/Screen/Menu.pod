@@ -1,0 +1,493 @@
+=head1 NAME
+
+UI::Dialog::Screen::Menu - wrapper to screen dialogs.
+
+=head1 SYNOPSIS
+
+  use UI::Dialog::Screen::Menu;
+
+  # $d is an existing instance of UI::Dialog
+
+  my $screen = new UI::Dialog::Screen::Menu ( dialog => $d );
+  $screen->add_menu_item("This is the label", sub { print "Hello\n"; });
+
+  # $rv is 0 if the user canceled, 1 if any menu item was selected.
+  my $rv = $screen->run();
+
+=head1 ABSTRACT
+
+UI::Dialog::Screen::Menu is a helper class which enables a clean and
+modular code flow for menu driven applications using UI::Dialog. Using
+callbacks assigned to menu items, a reactionary model to scripting with
+UI::Dialog becomes rapidly easy.
+
+=head1 DESCRIPTION
+
+UI::Dialog::Screen::Menu is actually "external" to the UI::Dialog core
+usage. The class simply wraps around an existing UI::Dialog instance
+for rendering a menu-driven flow of screens.
+
+Using this class, you define a number of screen instances and assign
+callbacks to each of the menu items. Once defined, simply call B<run()>
+(or B<loop()> to execute B<run()> indefinitely). When a user selects
+one of the menu items, the assigned function will be executed. From
+within those functions, simply call other UI::Dialog::Screen::Menu
+instances and that's how you branch your user's experience from one
+screen to the next. See the B<EXAMPLES>
+
+=head1 EXPORT
+
+=over 2
+
+None
+
+=back
+
+=head1 INHERITS
+
+=over 2
+
+None
+
+=back
+
+=head1 CONSTRUCTOR
+
+=head2 new( %options )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ # Have UI::Dialog::Screen::Menu use an existing UI::Dialog instance
+ # to render the user interface.
+ my $s = new( dialog => $d );
+
+ # Also accepts UI::Dialog constructor arguments, so that it can create
+ # it's own instance of UI::Dialog if none is provided.
+ my $s = new( title => 'Default Title', backtitle => 'Backtitle',
+              width => 65, height => 20, listheight => 5,
+              order => [ 'zenity', 'xdialog', 'gdialog' ] );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+This is the Class Constructor method. It accepts a list of key => value pairs
+and uses them as the defaults when interacting with the various widgets.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+A blessed object reference of the UI::Dialog::Screen::Menu class.
+
+=back
+
+=item OPTIONS
+
+The (...)'s after each option indicate the default for the option. An * denotes
+support by all the widget methods on a per-use policy defaulting to the values
+decided during object creation.
+
+=over 6
+
+=item B<dialog = UI::Dialog> (undef)
+
+=item B<debug = 0,1,2> (0)
+
+=item B<order = [ zenity, xdialog, gdialog, kdialog, cdialog, whiptail, ascii ]> (as indicated)
+
+=item B<PATH = [ /bin, /usr/bin, /usr/local/bin, /opt/bin ]> (as indicated)
+
+=item B<backtitle = "backtitle"> ('') *
+
+=item B<title = "title"> ('') *
+
+=item B<beepbefore = 0,1> (0) *
+
+=item B<beepafter = 0,1> (0) *
+
+=item B<height = \d+> (20) *
+
+=item B<width = \d+> (65) *
+
+=item B<listheight = \d+> (5) *
+
+=back
+
+=back
+
+=head1 STATE METHODS
+
+=head2 run( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my $rv = $s->run();
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Render the screen menu immediately. This method blocks until the user
+input has been received and acted upon.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+TRUE if the user selected an item from the menu, FALSE otherwise.
+
+=back
+
+=back
+
+=head2 loop( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ $s->loop();
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Calls the B<run()> method immediately. Once B<run()> completes it's
+execution, the B<loop()> decides whether or not to display again. If
+the return value of run() is TRUE, the B<loop()> will continue. If the
+use pressed Cancel (or Escape) or any other action other than one of
+the menu items; the B<loop()> will end. The B<loop()> will also end
+if the B<break_loop()> method is called.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+TRUE if the user selected an item from the menu, FALSE otherwise.
+
+=back
+
+=back
+
+=head2 is_looping( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ if ($s->is_looping()) {
+     print "Currently in a UI::Dialog::Screen::Menu loop\n";
+ }
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Returns TRUE if the given screen is in a menu B<loop()>, FALSE
+otherwise.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+a single SCALAR.
+
+=back
+
+=back
+
+=head2 break_loop( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ $s->break_loop();
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Flags the screen menu to stop looping. This does not close or
+otherwise clear the screen. This simply flags the loop to exit
+at the end of it's current run.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+None.
+
+=back
+
+=back
+
+=head1 SCREEN METHODS
+
+=head2 add_menu_item( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my $index = $s->add_menu_item( "Menu Item Label", \%some_function );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Append a new item to the menu list.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+Returns the list index (starting from 0) of the item that was just
+appended to the list.
+
+=back
+
+=back
+
+=head2 get_menu_items( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my @items = $s->get_menu_items();
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Returns an array of hashrefs. Each hash contains a "label" and
+"func" key/value pairs.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+An ARRAY.
+
+=back
+
+=back
+
+=head2 del_menu_item( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my $old_item = $d->del_menu_item( $index );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Remove a specific item from the menu, addressed by it's list index
+(starting from 0), and return the menu item as a hashref.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+A HASH containing the 'label' and 'func' of the menu item that was
+just removed from the menu list.
+
+=back
+
+=back
+
+=head2 set_menu_item( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ # Modify the 'label' and 'func' for a specific menu item
+ my $original_item = $s->set_menu_item( $index, $label, $func );
+
+ # Modify just the label of a menu item
+ my $original_item = $s->set_menu_item( $index, $label, undef );
+
+ # Modify just the func of a menu item
+ my $original_item = $s->set_menu_item( $index, undef, $func );
+
+ # Effectively do nothing
+ my $original_item = $s->set_menu_item( $index, undef, undef );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Modify the menu item addressed by the given index (starting from 0).
+If the 'label' and/or 'func' arguments are undef then the previous
+value is kept.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+A HASH of the original values for the modified menu item.
+
+=back
+
+=back
+
+=head1 EXAMPLE USAGE
+
+The below example assumed that $d is an instances of UI::Dialog.
+
+ # Create our first screen
+ my $s1 = new UI::Dialog::Screen::Menu ( dialog => $d );
+ $s1->add_menu_item( "Just an option", \&some_function );
+
+ # Add a menu item that updates it's own label every time
+ # it is selected.
+ our $counter = 0;
+ $s1->add_menu_item
+  ( "Counter: ".$counter,
+    sub {
+      my ($self,$dialog,$index) = @_;
+      $counter++;
+      $self->set_menu_item($index,"Counter: ".$counter, undef);
+    }
+  );
+
+ # Create a second screen
+ my $s2 = new UI::Dialog::Screen::Menu ( dialog => $d );
+ $s2->add_menu_item( "Another item", \&another_function );
+
+ # Link the second screen to an option of the first
+ $s1->add_menu_item( "Goto Screen 2", sub { $s2->loop(); } );
+
+ # Start a menu loop and actually display the first screen
+ $s1->loop();
+
+Users can get to second menu from selecting the third item on the first
+menu screen. As long as the user continues to select items from the
+second menu, it will continue to loop. If the user cancels the second
+screen, the will return to the first which will itself continue to loop.
+
+=head1 SEE ALSO
+
+=over 2
+
+=item PERLDOC
+
+ UI::Dialog
+ UI::Dialog::GNOME
+ UI::Dialog::KDE
+ UI::Dialog::Console
+ UI::Dialog::Screen::Druid
+ UI::Dialog::Backend
+ UI::Dialog::Backend::ASCII
+ UI::Dialog::Backend::CDialog
+ UI::Dialog::Backend::GDialog
+ UI::Dialog::Backend::KDialog
+ UI::Dialog::Backend::Nautilus
+ UI::Dialog::Backend::Whiptail
+ UI::Dialog::Backend::XDialog
+ UI::Dialog::Backend::XOSD
+ UI::Dialog::Backend::Zenity
+
+=back
+
+=over 2
+
+=item MAN FILES
+
+ dialog(1), whiptail(1), zenity(1), gdialog(1), Xdialog(1),
+ osd_cat(1), kdialog(1) and nautilus(1)
+
+=back
+
+=head1 BUGS
+
+Please email the author with any bug reports. Include the name of the
+module in the subject line.
+
+=head1 AUTHOR
+
+Kevin C. Krinke, E<lt>kevin@krinke.caE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+ Copyright (C) 2004-2016  Kevin C. Krinke <kevin@krinke.ca>
+
+ This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 2.1 of the License, or (at your option) any later version.
+
+ This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+
+ You should have received a copy of the GNU Lesser General Public
+ License along with this library; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+
+=cut

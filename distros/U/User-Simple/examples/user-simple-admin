@@ -1,0 +1,394 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+user-simple-admin - Example script to administer a User::Simple database
+
+=head1 SYNOPSIS
+
+What you always have to specify: 
+  - How to get to the information: a DSN (--dsn), the table name (--tbl),
+    and probably the database user (--dbuser) and password (--dbpass)
+  - An action to perform: --new_user, --mod_user, --remove_user
+  - The attributes needed for your query (--login, --name, --level, --password)
+  - Optionally, to get a listing of the users in the database, use --dump_users
+
+Table creation:
+  user-simple-admin --dsn 'dbi:Pg:dbname=database;host=some.host.org' 
+      --table user_simple --dbuser useradmin --dbpass s3kr3t --create_plain
+  user-simple-admin --dsn 'dbi:Pg:dbname=database;host=some.host.org' 
+      --table user_simple --dbuser useradmin --dbpass s3kr3t --create_rdbms
+
+User creation example:
+  user-simple-admin --dsn 'dbi:Pg:dbname=database;host=some.host.org' 
+      --table user_simple --dbuser useradmin --dbpass s3kr3t --new_user 
+      --login joe --name 'Joe Schmoe' --passwd mys3kr17 --level 5
+
+User remotion:
+  user-simple-admin --dsn 'dbi:Pg:dbname=database;host=some.host.org' 
+      --table user_simple--dbuser useradmin --dbpass s3kr3t --remove_user 
+      --login john
+
+User modification:
+  user-simple-admin --dsn 'dbi:Pg:dbname=database;host=some.host.org' 
+      --table user_simple --dbuser useradmin --dbpass s3kr3t --new_user 
+      --login joe --name 'Joe A. Schmoe' --passwd dont_forget_it --level 2
+
+=head1 DESCRIPTION
+
+This script gives you access from the command line to the main 
+User::Simple::Admin functionality. Please note that it has been written more as
+an example than as a script you will use in your day to day administration -
+But if it suits you, well... :)
+
+The script is made to be run non-interactively, taking all of its input via the
+command line (using the standard L<Getopts::Long> syntax), and signalling 
+either success or failure as the exit code (as always, 0 means success, and any
+other thing means failure).
+
+About the L<Getopts::Long> syntax, in a nutshell: You can specify the options
+to the script in any order, as long as you keep the switches next to their
+values (that is, C<--tbl tablename --dump_users> is the same as C<--dump_users
+--tbl tablename>, but it is not the same as C<--tbl --dump_users tablename>.
+You can use the shortest possible not ambiguous string for each of the switches
+(i.e. C<--remove_user> is equivalent to C<--r>).
+
+First of all, you have to get the script to get to the users' data - In 
+order to do so, you have to specify a DSN (a DBI Data Source Name - A bit
+obscure, yes, I should replace it to something more intuitive as soon as I have
+some time to do so) and the name of the table where the information is located.
+This should be done with the C<--dsn> and C<--tbl> options. Probably you will 
+also specify a database user name and password - do so using the C<--dbuser>
+and C<--dbpass> options.
+
+=head2 Table creation
+
+If you specify C<--create_plain> or C<--create_rdbms>, the User::Admin::Simple
+object will be instantiated by creating (instead of just accessing) the 
+specified table. Beware, as attempting to create an already existing table will
+not work!
+
+C<--create_rdbms> should be used whenever possible (this is, whenever you are
+using a real RDBMS behind User::Simple, in contraposition to a simple
+file-based structure such as DBD::XBase, DBD::CSV or similar ones). If you are
+using a file-based structure, use C<--create_plain> instead. For further 
+details, refer to the L<User::Simple::Admin> manual.
+
+=head2 User creation
+
+To create a new user, specify C<--new_user> and give the desired user 
+information - The only required option is C<--login>, as it is the unique
+descriptor for this user - The other available switches are C<--name>, 
+C<--passwd> and C<--level>. Again, refer to L<User::Simple::Admin> for further
+details.
+
+If you do not specify a password upon user creation, the account will be 
+created but access to it will be disabled until a password is set.
+
+=head2 User remotion
+
+Use C<--remove_user>. You have to specify the C<--login> you will be removing -
+Don't specify any other data; the script will refuse to work if you specify
+any of the other data options.
+
+=head2 User modification
+
+Use C<--mod_user>. You need to specify the C<--login> you are referring to.
+You cannot change a user's login, it is an immutable field. You can specify
+one or more of the C<--name>, C<--passwd> and C<--level> data options.
+
+=head2 Querying
+
+If you specify C<--dump_users>, a user listing will be returned to you. Please
+note that you can ask for C<--dump_users> when performing other opertions (i.e.
+creation, remotion) - It will be run as the last operation, however, if the 
+operation fails, the users list will not be dumped.
+
+=head2 Other switches
+
+C<--quiet> supresses all output (including errors produced by this script, the
+errors generated by User::Simple::Admin, DBI or whatever else will still be
+sent) - Only the users dump will be printed.
+
+C<--verbose> will give status debug information you will very seldom require.
+
+=head2 Examples
+
+Create a table in a remote PostgreSQL database and insert a user in it:
+
+    user-simple-admin --dsn 'dbi:Pg:dbname=userdb;host=dbserver' --dbuser dbadmin --dbpass dbs3kr37 --tbl test --create_rdbms --new_user --login someone --name 'A random user' 
+
+Change that user's password in order to enable the account
+
+    user-simple-admin --dsn 'dbi:Pg:dbname=userdb;host=dbserver' --dbuser dbadmin --dbpass dbs3kr37 --tbl test --mod_user --login someone --passwd thepassword
+
+Remove that user
+
+    user-simple-admin --dsn 'dbi:Pg:dbname=userdb;host=dbserver' --dbuser dbadmin --dbpass dbs3kr37 --tbl test --remove_user --login someone 
+
+Get the users listing in a DBD::XBase database
+
+    user-simple-admin --dsn 'dbi:XBase:/home/user/databases/users' --tbl user_simple --dump_users
+
+=head1 DEPENDS ON
+
+L<DBI> (and a suitable L<DBD> backend)
+
+L<Getopt::Long>
+
+L<User::Simple::Admin>
+
+=head1 SEE ALSO
+
+L<User::Simple> and L<User::Simple::Admin>
+
+=head1 AUTHOR
+
+Gunnar Wolf <gwolf@gwolf.org>
+
+=head1 COPYRIGHT
+
+Copyright 2005 Gunnar Wolf / Instituto de Investigaciones Económicas UNAM
+This module is Free Software, it can be redistributed under the same terms 
+as Perl.
+
+=cut
+
+use lib qw(/home/gwolf/User-Simple/lib);
+use strict;
+use warnings;
+use Carp;
+use DBI;
+use Getopt::Long;
+use User::Simple::Admin;
+
+my (%conf, $db, $ua);
+
+# Default values, to be overwritten by Getopt::Long
+%conf = ( dsn => 'DBI:XBase:/tmp/user_simple',
+	  dbtable => 'user_simple',
+	  dbuser => undef,
+	  dbpass => undef,
+	  verbose => 1,
+	  create_plain => undef,
+	  create_rdbms => undef,
+	  new_user => undef,
+	  remove_user => undef,
+	  mod_user => undef,
+	  login => undef,
+	  passwd => undef,
+	  name => undef,
+	  level => undef
+	 );
+
+GetOptions ('dsn=s' => \$conf{dsn},
+	    'tbl=s' => \$conf{dbtable},
+	    'dbuser=s' => \$conf{dbuser},
+	    'dbpass=s' => \$conf{dbpass},
+	    'create_plain' => \$conf{create_plain},
+	    'create_rdbms' => \$conf{create_rdbms},
+	    'dump_users' => \$conf{dump_users},
+	    'new_user' => \$conf{new_user},
+	    'remove_user' => \$conf{remove_user},
+	    'mod_user' => \$conf{mod_user},
+	    'login=s' => \$conf{login},
+	    'passwd=s' => \$conf{passwd},
+	    'name=s' => \$conf{name},
+	    'level=i' => \$conf{level},
+	    'quiet' => sub  {$conf{verbose} = 0},
+	    'verbose' => sub {$conf{verbose} = 2}
+	    ) || usage_err();
+debug(2,'Options parsed correctly');
+
+#use Data::Dumper; warn Dumper \%conf;
+
+# Check we are requested to carry out at least one operation - Finish 
+# otherwise. Check as well for mutually exclusive options 
+usage_err() unless (# Operations
+		    $conf{create_plain} or $conf{create_rdbms} or
+		    $conf{new_user} or $conf{remove_user} or
+		    $conf{mod_user} or $conf{dump_users} or
+		    # Mutually exclusive
+		    ($conf{create_plain} and $conf{create_rdbms}) or
+		    ($conf{new_user} and $conf{remove_user}) or
+		    ($conf{new_user} and $conf{mod_user}) or
+		    ($conf{mod_user} and $conf{remove_user})
+		    );
+
+# Connect to the DB
+$db = DBI->connect($conf{dsn},$conf{dbuser},$conf{dbpass},{AutoCommit => 1});
+ref($db) or dbconn_err();
+debug(2,'Database connection established');
+
+# get a User::Simple::Admin instance (creating the structure if we were
+# requested to)
+if ($conf{create_rdbms}) {
+    $ua = User::Simple::Admin->create_rdbms_db_structure($db, $conf{dbtable});
+} elsif ($conf{create_plain}) {
+    $ua = User::Simple::Admin->create_plain_db_structure($db, $conf{dbtable});
+} else {
+    $ua = User::Simple::Admin->new($db, $conf{dbtable});
+}
+ref($ua) or useradmin_err(); 
+debug(2,'User::Simple::Admin instance established');
+
+# Ok, everything is now ready - Do what we were told to do!
+new_user() if $conf{new_user};
+remove_user() if $conf{remove_user};
+mod_user() if $conf{mod_user};
+dump_users() if $conf{dump_users};
+
+debug(2,'Program finished successfully');
+
+exit 0;
+
+sub new_user {
+    # For new user creation, we only require a login 
+    usage_err() unless $conf{login};
+
+    unless ($ua->new_user($conf{login}, $conf{name}, 
+			  $conf{passwd}, $conf{level})) {
+	newuser_err();
+    }
+}
+
+sub remove_user {
+    # For user remotion, we require a login - But name, password and level
+    # should not be specified.
+    my ($id);
+    usage_err() if ($conf{name} or $conf{passwd} or $conf{level});
+
+    $id = $ua->id($conf{login}) or no_user_err();
+
+    $ua->remove_user($id) or remove_err();
+}
+
+sub mod_user {
+    # For user modification, we require at least one of name, password and
+    # level - and we require login _not_ to be set.
+    my ($id);
+    usage_err() unless ($conf{name} or $conf{passwd} or $conf{level} or
+			!$conf{login});
+
+    $id = $ua->id($conf{login}) or no_user_err();
+
+    if (defined $conf{name}) {
+	$ua->set_name($id, $conf{name}) or mod_err();
+    }
+    if (defined $conf{level}) {
+	$ua->set_level($id, $conf{level}) or mod_err();
+    }
+    if (defined $conf{passwd}) {
+	$ua->set_passwd($id, $conf{passwd}) or mod_err();
+    }
+}
+
+sub dump_users {
+    my %users = $ua->dump_users;
+
+    # Print the header first
+    printf("%-4s %-15s %-30s %-5s\n", 'ID', 'Login', 'Name', 'Level');
+    print '='x60,"\n";
+
+    for my $user (sort {$a<=>$b} keys %users) {
+	printf("%4d %-15s %-30s %5d\n", $user, $users{$user}{login},
+	       $users{$user}{name}, $users{$user}{level});
+    }
+}
+
+sub usage_err {
+    my $progname = $0;
+    $progname =~ s!^.+/([^/]+)$!$1!;
+
+    debug(1,<<"USAGE");
+$progname: Incorrect invocation!
+
+What you always have to specify: 
+  - How to get to the information: a DSN (--dsn), the table name (--tbl),
+    and probably the database user (--dbuser) and password (--dbpass)
+  - An action to perform: --new_user, --mod_user, --remove_user
+  - The attributes needed for your query (--login, --name, --level, --password)
+  - Optionally, to get a listing of the users in the database, use --dump_users
+
+User creation example:
+  $progname --dsn 'dbi:Pg:dbname=database;host=some.host.org' 
+      --table user_simple --dbuser useradmin --dbpass s3kr3t --new_user 
+      --login joe --name 'Joe Schmoe' --passwd mys3kr17 --level 5
+
+User remotion:
+  $progname --dsn 'dbi:Pg:dbname=database;host=some.host.org' 
+      --table user_simple--dbuser useradmin --dbpass s3kr3t --remove_user 
+      --login john
+
+User modification:
+  $progname --dsn 'dbi:Pg:dbname=database;host=some.host.org' 
+      --table user_simple --dbuser useradmin --dbpass s3kr3t --new_user 
+      --login joe --name 'Joe A. Schmoe' --passwd dont_forget_it --level 2
+
+Please check the full documentation for further details:
+  perldoc $0
+
+USAGE
+
+    exit 1;
+}
+
+sub dbconn_err {
+    debug(1,<<"DBERR");
+Could not open DB connection - Please check that the provided data source 
+(dsn), user (dbuser) and password (dbpass) are correct.
+DBERR
+
+    exit 2;
+}
+
+sub useradmin_err {
+    debug(1,<<"USERADMIN");
+Could not create User::Simple::Admin - This might have happened because you 
+requested to create a table with the same name an existing one, or because you 
+asked to use a table which does not yet exist.
+USERADMIN
+
+    exit 3;
+}
+
+sub newuser_err {
+    debug(1,<<"NEWUSER");
+Could not create the requested user - This can be because the requested login
+is already registered.
+NEWUSER
+
+    exit 4;
+}
+
+sub no_user_err {
+    debug(1,<<"NOUSER");
+Could not find the requested user in the database - The specified login might
+be wrong, or the user might have been removed.
+NOUSER
+
+    exit 5;
+}
+
+sub remove_err {
+    debug(1,<<"REMOVE");
+Could not remove the requested user from the database - It might be being
+referred to from another table if you have such a setup.
+REMOVE
+
+    exit 6;
+}
+
+sub mod_err {
+    debug(1,<<"MODIF");
+Could not modify the requested user in the database
+MODIF
+
+    exit 7;
+}
+
+sub debug {
+    my $level = shift;
+    return unless $conf{verbose} >= $level;
+    warn @_,"\n";
+}

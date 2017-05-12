@@ -1,0 +1,16 @@
+=pod
+
+=head1 NAME
+
+UR::Manual::Presentation - Slides for a presenation on UR
+
+=head1 Overview
+
+UR_Presentation.pdf is located in the Manual/ subdirectory of the UR
+distribution.  It contains slides for a presentation on UR originally given
+at the Lambda Lounge meeting in St. Louis, MO on May 6 2009.  
+
+The presentation covers the implementation of an over-the-top vending
+machine that stores its contents and inventory in an SQLite database.
+
+

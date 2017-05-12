@@ -1,0 +1,9 @@
+# Odbclogins - Each line contains the login for a ODBC 
+# host.  The format is server_name_or_address::user::password.
+# IMPORTANT - Be sure that the permissions are 0600, 
+# and the owner is the user and group of the httpd 
+# server - usually user nobody, group nobody.
+#
+# host1::user::password
+# host2::user::password
+# host3::user::password

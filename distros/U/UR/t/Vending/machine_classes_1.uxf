@@ -1,0 +1,456 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<umlet_diagram>
+<element>
+<type>com.umlet.element.base.Relation</type>
+<coordinates>
+<x>130</x>
+<y>200</y>
+<w>260</w>
+<h>220</h>
+</coordinates>
+<panel_attributes>lt=&lt;&lt;-
+//subject_id:Vending::VendSlot;UR::Entity;;
+</panel_attributes>
+<additional_attributes>240;200;20;20</additional_attributes>
+</element>
+<element>
+<type>com.umlet.element.base.Relation</type>
+<coordinates>
+<x>495</x>
+<y>320</y>
+<w>340</w>
+<h>120</h>
+</coordinates>
+<panel_attributes>lt=&lt;&lt;-
+//subject_id:UR::Singleton;UR::Object;;
+</panel_attributes>
+<additional_attributes>20;100;320;20</additional_attributes>
+</element>
+<element>
+<type>com.umlet.element.base.Class</type>
+<coordinates>
+<x>420</x>
+<y>180</y>
+<w>290</w>
+<h>160</h>
+</coordinates>
+<panel_attributes>Vending::Coin
+--
+ value_cents: 
+ name: String
++coin_id: integer
+ item_type: Vending::ItemType
+ coin_type: Vending::CoinType
+ type_id: integer
+ subtype_name: 
+//subject_id:Vending::Coin
+</panel_attributes><additional_attributes/></element>
+<element>
+<type>com.umlet.element.base.Relation</type>
+<coordinates>
+<x>545</x>
+<y>120</y>
+<w>325</w>
+<h>240</h>
+</coordinates>
+<panel_attributes>lt=&lt;&lt;-
+//subject_id:Vending::Coin;Vending::VendItem;;
+</panel_attributes>
+<additional_attributes>305;20;20;220</additional_attributes>
+</element>
+<element>
+<type>com.umlet.element.base.Relation</type>
+<coordinates>
+<x>260</x>
+<y>272</y>
+<w>510</w>
+<h>88</h>
+</coordinates>
+<panel_attributes>lt=&lt;-
+//subject_id:Vending::VendSlot;UR::Singleton;machine_id;id
+</panel_attributes>
+<additional_attributes>490;68;20;20</additional_attributes>
+</element>
+<element>
+<type>com.umlet.element.base.Class</type>
+<coordinates>
+<x>720</x>
+<y>20</y>
+<w>290</w>
+<h>100</h>
+</coordinates>
+<panel_attributes>Vending::CoinType
+--
+ type_id: 
+ value_cents: integer
+ item_type: Vending;:ItemType
++name: String
+//subject_id:Vending::CoinType
+</panel_attributes><additional_attributes/></element>
+<element>
+<type>com.umlet.element.base.Class</type>
+<coordinates>
+<x>320</x>
+<y>380</y>
+<w>100</w>
+<h>20</h>
+</coordinates>
+<panel_attributes>UR::Entity
+//subject_id:UR::Entity
+</panel_attributes><additional_attributes/></element>
+<element>
+<type>com.umlet.element.base.Relation</type>
+<coordinates>
+<x>260</x>
+<y>326</y>
+<w>1080</w>
+<h>142</h>
+</coordinates>
+<panel_attributes>lt=&lt;-
+//subject_id:Vending::ReturnedItem;Vending::VendSlot;source_slot_id;slot_id
+</panel_attributes>
+<additional_attributes>20;20;1060;122</additional_attributes>
+</element>
+<element>
+<type>com.umlet.element.base.Class</type>
+<coordinates>
+<x>20</x>
+<y>220</y>
+<w>260</w>
+<h>280</h>
+</coordinates>
+<panel_attributes>Vending::VendSlot
+--
+ items: Vending::VendItem
+ label: varchar
+ content_value: 
+ machine_id: Scalar
+ cost_cents: integer
+ content_value_dollars: 
++slot_id: integer
+ count: 
+ coins: Vending::Coin
+ price: 
+ machine: UR::Singleton
+ is_buyable: integer
+ name: varchar
+//subject_id:Vending::VendSlot
+</panel_attributes><additional_attributes/></element>
+<element>
+<type>com.umlet.element.base.Relation</type>
+<coordinates>
+<x>180</x>
+<y>0</y>
+<w>655</w>
+<h>380</h>
+</coordinates>
+<panel_attributes>lt=&lt;&lt;-
+//subject_id:Vending::Machine;UR::Singleton;;
+</panel_attributes>
+<additional_attributes>635;360;20;20</additional_attributes>
+</element>
+<element>
+<type>com.umlet.element.base.Class</type>
+<coordinates>
+<x>1050</x>
+<y>60</y>
+<w>220</w>
+<h>100</h>
+</coordinates>
+<panel_attributes>Vending::Product
+--
+ price: 
++product_id: integer
+ manufacturer: varchar
+ cost_cents: integer
+//subject_id:Vending::Product
+</panel_attributes><additional_attributes/></element>
+<element>
+<type>com.umlet.element.base.Class</type>
+<coordinates>
+<x>1320</x>
+<y>340</y>
+<w>310</w>
+<h>140</h>
+</coordinates>
+<panel_attributes>Vending::ReturnedItem
+--
+ cost_cents: 
+ price: 
+ value: Float
+ source_slot: Vending::VendSlot
+ name: String
+ source_slot_id: integer
+//subject_id:Vending::ReturnedItem
+</panel_attributes><additional_attributes/></element>
+<element>
+<type>com.umlet.element.base.Class</type>
+<coordinates>
+<x>720</x>
+<y>140</y>
+<w>260</w>
+<h>160</h>
+</coordinates>
+<panel_attributes>Vending::VendItem
+--
+ machine_id: Scalar
+ slot: Vending::VendSlot
+ machine: Vending::Machine
+ subtype_name: varchar
++vend_item_id: integer
+ slot_id: integer
+ slot_name: 
+//subject_id:Vending::VendItem
+</panel_attributes><additional_attributes/></element>
+<element>
+<type>com.umlet.element.base.Class</type>
+<coordinates>
+<x>750</x>
+<y>340</y>
+<w>130</w>
+<h>20</h>
+</coordinates>
+<panel_attributes>UR::Singleton
+//subject_id:UR::Singleton
+</panel_attributes><additional_attributes/></element>
+<element>
+<type>com.umlet.element.base.Relation</type>
+<coordinates>
+<x>830</x>
+<y>120</y>
+<w>340</w>
+<h>280</h>
+</coordinates>
+<panel_attributes>lt=&lt;&lt;-
+//subject_id:Vending::Merchandise;Vending::VendItem;;
+</panel_attributes>
+<additional_attributes>20;20;320;260</additional_attributes>
+</element>
+<element>
+<type>com.umlet.element.base.Class</type>
+<coordinates>
+<x>420</x>
+<y>20</y>
+<w>260</w>
+<h>120</h>
+</coordinates>
+<panel_attributes>Vending::ItemType
+--
+ machine_id: Scalar
+ machine: Vending::Machine
+ name: varchar
+ count: 
++type_id: integer
+//subject_id:Vending::ItemType
+</panel_attributes><additional_attributes/></element>
+<element>
+<type>com.umlet.element.base.Relation</type>
+<coordinates>
+<x>690</x>
+<y>72</y>
+<w>50</w>
+<h>164</h>
+</coordinates>
+<panel_attributes>lt=&lt;-
+//subject_id:Vending::Coin;Vending::CoinType;name;name
+</panel_attributes>
+<additional_attributes>30;20;20;144</additional_attributes>
+</element>
+<element>
+<type>com.umlet.element.base.Relation</type>
+<coordinates>
+<x>350</x>
+<y>360</y>
+<w>185</w>
+<h>80</h>
+</coordinates>
+<panel_attributes>lt=&lt;&lt;-
+//subject_id:UR::Entity;UR::Object;;
+</panel_attributes>
+<additional_attributes>165;60;20;20</additional_attributes>
+</element>
+<element>
+<type>com.umlet.element.base.Relation</type>
+<coordinates>
+<x>350</x>
+<y>0</y>
+<w>220</w>
+<h>420</h>
+</coordinates>
+<panel_attributes>lt=&lt;&lt;-
+//subject_id:Vending::ItemType;UR::Entity;;
+</panel_attributes>
+<additional_attributes>20;400;200;20</additional_attributes>
+</element>
+<element>
+<type>com.umlet.element.base.Relation</type>
+<coordinates>
+<x>260</x>
+<y>228</y>
+<w>480</w>
+<h>138</h>
+</coordinates>
+<panel_attributes>lt=&lt;-
+//subject_id:Vending::VendItem;Vending::VendSlot;slot_id;slot_id
+</panel_attributes>
+<additional_attributes>20;118;460;20</additional_attributes>
+</element>
+<element>
+<type>com.umlet.element.base.Relation</type>
+<coordinates>
+<x>360</x>
+<y>0</y>
+<w>80</w>
+<h>58</h>
+</coordinates>
+<panel_attributes>lt=&lt;-
+//subject_id:Vending::ItemType;Vending::Machine;machine_id;id
+</panel_attributes>
+<additional_attributes>20;20;60;38</additional_attributes>
+</element>
+<element>
+<type>com.umlet.element.base.Class</type>
+<coordinates>
+<x>20</x>
+<y>20</y>
+<w>360</w>
+<h>180</h>
+</coordinates>
+<panel_attributes>Vending::Machine
+--
+ items: Vending::VendItem
+ coin_box_slot: 
+ products: Vending::Product
+ bank_slot: 
+ change_dispenser: 
+ slots: Vending::VendSlot
+ inventory_items: Vending::Merchandise
+ item_types: Vending::ItemType
+//subject_id:Vending::Machine
+</panel_attributes><additional_attributes/></element>
+<element>
+<type>com.umlet.element.base.Relation</type>
+<coordinates>
+<x>495</x>
+<y>320</y>
+<w>1000</w>
+<h>120</h>
+</coordinates>
+<panel_attributes>lt=&lt;&lt;-
+//subject_id:Vending::ReturnedItem;UR::Object;;
+</panel_attributes>
+<additional_attributes>20;100;980;20</additional_attributes>
+</element>
+<element>
+<type>com.umlet.element.base.Relation</type>
+<coordinates>
+<x>1030</x>
+<y>76</y>
+<w>270</w>
+<h>286</h>
+</coordinates>
+<panel_attributes>lt=&lt;-
+//subject_id:Vending::Merchandise;Vending::Product;product_id;product_id
+</panel_attributes>
+<additional_attributes>20;20;250;266</additional_attributes>
+</element>
+<element>
+<type>com.umlet.element.base.Relation</type>
+<coordinates>
+<x>400</x>
+<y>90</y>
+<w>40</w>
+<h>218</h>
+</coordinates>
+<panel_attributes>lt=&lt;-
+//subject_id:Vending::Coin;Vending::ItemType;type_id;type_id
+</panel_attributes>
+<additional_attributes>20;20;20;198</additional_attributes>
+</element>
+<element>
+<type>com.umlet.element.base.Relation</type>
+<coordinates>
+<x>350</x>
+<y>0</y>
+<w>535</w>
+<h>420</h>
+</coordinates>
+<panel_attributes>lt=&lt;&lt;-
+//subject_id:Vending::CoinType;UR::Entity;;
+</panel_attributes>
+<additional_attributes>20;400;515;20</additional_attributes>
+</element>
+<element>
+<type>com.umlet.element.base.Relation</type>
+<coordinates>
+<x>530</x>
+<y>0</y>
+<w>650</w>
+<h>180</h>
+</coordinates>
+<panel_attributes>lt=&lt;&lt;-
+//subject_id:Vending::Product;Vending::ItemType;;
+</panel_attributes>
+<additional_attributes>20;20;630;160</additional_attributes>
+</element>
+<element>
+<type>com.umlet.element.base.Class</type>
+<coordinates>
+<x>1020</x>
+<y>180</y>
+<w>260</w>
+<h>200</h>
+</coordinates>
+<panel_attributes>Vending::Merchandise
+--
+ manufacturer: 
+ name: 
+ product: Vending::Product
++inv_id: integer
+ cost_cents: 
+ insert_date: datetime
+ price: 
+ subtype_name: 
+ product_id: integer
+//subject_id:Vending::Merchandise
+</panel_attributes><additional_attributes/></element>
+<element>
+<type>com.umlet.element.base.Relation</type>
+<coordinates>
+<x>360</x>
+<y>0</y>
+<w>380</w>
+<h>178</h>
+</coordinates>
+<panel_attributes>lt=&lt;-
+//subject_id:Vending::VendItem;Vending::Machine;machine_id;id
+</panel_attributes>
+<additional_attributes>20;20;360;158</additional_attributes>
+</element>
+<element>
+<type>com.umlet.element.base.Class</type>
+<coordinates>
+<x>460</x>
+<y>380</y>
+<w>110</w>
+<h>40</h>
+</coordinates>
+<panel_attributes>UR::Object
+--
++id: Scalar
+//subject_id:UR::Object
+</panel_attributes><additional_attributes/></element>
+<element>
+<type>com.umlet.element.base.Relation</type>
+<coordinates>
+<x>350</x>
+<y>120</y>
+<w>520</w>
+<h>300</h>
+</coordinates>
+<panel_attributes>lt=&lt;&lt;-
+//subject_id:Vending::VendItem;UR::Entity;;
+</panel_attributes>
+<additional_attributes>20;280;500;20</additional_attributes>
+</element>
+</umlet_diagram>

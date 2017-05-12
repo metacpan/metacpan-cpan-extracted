@@ -1,0 +1,10 @@
+UNIVERSAL::can
+--------------
+
+This module attempts to work around people calling UNIVERSAL::can() as a
+function, which it is not.
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2005 - 2011, chromatic. This module is made available under the
+same terms as Perl 5.12.

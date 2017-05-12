@@ -1,0 +1,27 @@
+---
+abstract: 'Universally Unique IDentifier (UUID) Object Class'
+author:
+  - 'ITO Nobuaki <banb@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.98'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: UUID-Object
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Carp: 1.01
+  Exporter: 5.562
+  MIME::Base64: 2.12
+  perl: 5.6.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.81

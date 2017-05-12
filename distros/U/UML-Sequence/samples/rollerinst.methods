@@ -1,0 +1,16 @@
+diePair1:DiePair::new
+diePair1:DiePair::roll
+diePair1:DiePair::total
+diePair1:DiePair::doubles
+diePair2:DiePair::new
+diePair2:DiePair::roll
+diePair2:DiePair::total
+diePair2:DiePair::doubles
+die1:Die::new
+die1:Die::roll
+die2:Die::new
+die2:Die::roll
+die3:Die::new
+die3:Die::roll
+die4:Die::new
+die4:Die::roll

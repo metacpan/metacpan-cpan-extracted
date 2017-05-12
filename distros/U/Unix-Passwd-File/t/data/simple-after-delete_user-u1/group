@@ -1,0 +1,5 @@
+root:x:0:
+bin:x:1:
+daemon:x:2:
+nobody:x:111:
+u2:x:1001:u2

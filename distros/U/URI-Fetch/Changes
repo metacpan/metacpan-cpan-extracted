@@ -1,0 +1,91 @@
+Revision history for Perl module URI::Fetch
+
+0.13 2016-07-02 NEILB
+    - Switched to using Test::RequiresInternet rather than the hand-rolled
+      online() function that was duplicated in 2 tests. Plus it was testing
+      whether google.com was contactable, and not the site used in the tests.
+
+0.12 2016-06-23 NEILB
+    - Travis support added by Jason Hall.
+    - Added list of contributors to the doc.
+
+0.11 2015-07-04 NEILB
+    - Added [MetaJSON] to dist.ini, so release will include META.json.
+      RT#105632 from ETHER++
+
+0.10 2014-06-23
+    - CPAN Testers looking good after previous developer release.
+    - Added github repo to pod
+
+0.09_01 2014-06-13
+    - If you've got caching enabled, and get a 304 response (Not Modified)
+      with content (from the cache), then is_success() returns true.
+      Suggested in RT#75665
+    - Caching now done under the original url rather than the sanitised
+      version of it. Bug report and patch from Mario Domgoergen RT#39820
+    - Switched to Dist::Zilla
+    - Reformatted Changes as per CPAN::Changes::Spec
+
+0.09  2011-01-28
+    - Use $ua->env_proxy to load local proxy settings. (RT 53819)
+    - Skip tests if we don't have a network connection. (RT 28388, 59694)
+    - Removed sign() and auto_install() from Makefile.PL.
+    - Removed magic svn keywords.
+    - Added author tests (xt/) and modified SYNOPSIS for all modules to
+      make them pass the compilation test.
+
+0.08  2006-07-24
+    - Don't overwrite the User-Agent field if the caller has set it and
+      provided the UserAgent argument. Thanks to Tatsuhiko Miyagawa
+      for the patch.
+
+0.071 2006-06-25
+    - Fixed broken is_error (broken in 0.07). Thanks to Tatsuhiko for the
+      patch.
+
+0.07  2006-06-18
+    - Use $res->header('Content-Type') instead of $res->content_type, since
+      the latter can return an array. Thanks to Tatsuhiko Miyagawa for the
+      patch.
+    - $res->is_success, is_error, and is_redirect previously threw an exception
+      when called with NoNetwork. They just work as 200 succesful request now,
+      when the response is taken back from the cache. Thanks to Tatsuhiko
+      Miyagawa for the patch.
+
+0.06  2006-04-09
+    - Fixed issue where content-type was not stored in the cache, and was
+      thus blank on subsequent requests. Thanks to Tatsuhiko Miyagawa for
+      the patch.
+    - Fixed issue with caching redirected (304) URIs. Thanks to Tatsuhiko
+      Miyagawa for the patch.
+    - Added is_error, is_redirect, is_success convenience methods to
+      URI::Fetch::Response. Thanks to Tatsuhiko Miyagawa for the patch.
+
+0.05  2006-02-24
+    - Added a ForceResponse option, which forces URI::Fetch->fetch to return
+      a URI::Fetch::Response object even if the HTTP request fails for an
+      unknown reason. Thanks to Tim Appnel for the patch.
+
+0.04  2005-10-09
+    - Added Thaw and Freeze options, which allow you to define the
+      serialization and deserialization options that are used. Thanks to
+      Tim Appnel for the patch.
+
+0.03  2005-05-27
+    - Added a NoNetwork option, allowing fetch to trust the cache completely
+      and skip the HTTP request; or the option to do this only if the version
+      in the cache is older than N seconds. [bradfitz]
+    - Added a CacheEntryGrep option, to allow for not caching certain
+      responses. [bradfitz]
+    - Documentation fixes & clarifications. [bradfitz]
+
+0.02  2005-05-25
+    - Let the caller pass in their own UserAgent and ContentAlterHook.
+      [bradfitz]
+    - Be more strict about invalid parameters. [bradfitz]
+    - Documentation fixes for URI::Fetch->fetch in the SYNOPSIS. Thanks
+      to Naoya Ito for the note.
+
+0.01  2004-12-31
+    - Initial distribution.
+

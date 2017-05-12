@@ -1,0 +1,22 @@
+# vim: ft=perl
+
+use strict;
+use warnings;
+
+use Ubic::Service::Common;
+use Storable;
+
+my $file = 'tfiles/fake-http-service.status';
+return Ubic::Service::Common->new({
+    start => sub {
+        store { status => 'running' } => $file;
+    },
+    stop => sub {
+        store { status => 'not running' } => $file;
+    },
+    status => sub {
+        return unless -e $file;
+        return retrieve($file)->{status};
+    },
+    port => 12347,
+});

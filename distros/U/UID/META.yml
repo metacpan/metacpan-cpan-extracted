@@ -1,0 +1,19 @@
+---
+name: UID
+version: 0.24
+author:
+  - 'David Green <plato@cpan.org>'
+abstract: Define unique identifier objects that can be used like a kind of keyword
+license: perl
+resources:
+  license: ~
+build_requires:
+  Test::More: 0
+provides:
+  UID:
+    file: lib/UID.pm
+    version: 0.24
+generated_by: Module::Build version 0.32
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

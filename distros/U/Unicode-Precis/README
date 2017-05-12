@@ -1,0 +1,34 @@
+====================================================================
+Unicode-Precis - RFC 7564 PRECIS Framework
+====================================================================
+
+Unicode-Precis Package is Copyright (C) 2015,
+by Hatuka*nezumi - IKEDA Soji.
+
+This package is free software; you can redistribute it and/or modify it 
+under the same terms as Perl itself.
+
+Installation
+============
+
+To install this module type the following:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+Documentations
+==============
+
+Two modules are contained. For more details read following POD
+documentations:
+
+  Unicode::Precis - RFC 7564 PRECIS Framework
+  Unicode::Precis::Utils - Utility functions for PRECIS enforcement
+
+For japonophones, a POD in Japanese language is also included:
+
+  POD2::JA::Unicode::Precis - RFC 7564 PRECISフレームワーク
+
+$$

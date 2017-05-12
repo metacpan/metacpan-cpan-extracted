@@ -1,0 +1,17 @@
+Build.PL
+Changes
+examples/run_udpipe.pl
+lib/Ufal/UDPipe.pm
+lib/Ufal/UDPipe.pod
+lib/Ufal/UDPipe.xs
+LICENSE
+MANIFEST			This list of files
+README
+t/data/test.model
+t/import.t
+t/udpipe.t
+udpipe/udpipe.cpp
+udpipe/udpipe.h
+udpipe/udpipe_perl.cpp
+META.yml
+META.json

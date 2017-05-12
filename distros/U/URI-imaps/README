@@ -1,0 +1,17 @@
+NAME
+    URI::imaps - Support IMAPS URI
+
+DESCRIPTION
+    Support IMAPS schemas with URI.
+
+SEE ALSO
+    URI.
+
+AUTHOR
+    Casey West, <casey@geeknest.com>.
+
+COPYRIGHT
+      Copyright (c) 2004 Casey West.  All rights reserved.
+      This module is free software; you can redistribute it and/or modify it
+      under the same terms as Perl itself.
+

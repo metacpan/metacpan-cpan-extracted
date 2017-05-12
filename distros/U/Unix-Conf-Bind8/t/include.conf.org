@@ -1,0 +1,4 @@
+zone "include.com" {
+	type master;
+	file "db.include.com";
+};

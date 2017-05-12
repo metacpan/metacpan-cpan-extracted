@@ -1,0 +1,57 @@
+   		          /samples README
+
+This directory contains a number sample files that demonstrate various
+aspects of the UMLS::Similarity package and related utilities.
+
+We recommend that you save a copy of the files in this directory for 
+future use.  
+
+Configuration Files
+===================
+
+pathmeasures.config: is a sample configuration file for the umls-similarity.pl 
+program in the utils/ directory when using the path-based measures
+
+icmeasures.config  : is a sample configuration file for the umls-similarity.pl 
+program in the utils/ directory when using the information content measures
+
+vector.config      : is a sample configuration file for the umls-similarity.pl 
+program in the utils/ directory when using the vector vector measure
+
+lesk.config        : is a sample configuration file for the umls-similarity.pl 
+program in the utils/ directory when using the vector lesk measure
+
+Information Content
+===================
+
+icpropagation: is a sample file containing a list of CUIs and their 
+information content This file is required by the umls-similarity.pl
+program when using the information content measures. 
+
+icfrequency: is a sample file containing a list of CUIs and their 
+frequency. This file is required by the createPropagationFile.pl 
+which uses these frequency counts to generate an icpropagation file. 
+It also can be used by umls-similarity if you would like to generate 
+the information content on the fly for a given input.
+
+
+Vector Files
+===================
+
+vectormatrix: is a sample of the matrix file required when using the 
+vector measure.
+
+vectorindex : is a sample of the index file required when using the 
+vector measure.
+
+dictfile    : is a sample of the dictionary file that can be used instead 
+of having the definitions be obtained from the UMLS.
+
+
+stoplist-nsp.regex
+==================
+ 
+stoplist-nsp.regex : is a sample of the stop words for lesk and vector 
+method. Stop words are in the regular expression format. 
+
+

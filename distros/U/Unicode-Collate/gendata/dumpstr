@@ -1,0 +1,79 @@
+#!perl
+use strict;
+use warnings;
+no warnings 'utf8';
+
+# return a string such as '0061 0301', '00FF', etc
+sub unidump ($) { join(' ', map { sprintf '%04X', $_ } unpack 'U*', shift) }
+
+# return a string such as '{a}0301', '00FF', etc
+sub element ($) {
+    my $s = shift;
+    my $u = unidump($s);
+    for ($u) {
+	s/\b00([46][1-9A-F]|[57][0-9A])\b/'{'.pack('U', hex $1).'}'/ge;
+	s/\ \{/{/g;
+	s/\}\ /}/g;
+	s/\}\{//g;
+    }
+    return $u;
+}
+
+# return a string such as '"a\x{301}"', q|pack('U', 0xFF)|, etc
+sub string ($) {
+    my $s = shift;
+    my @u = unpack 'U*', $s;
+    my $ret = '"';
+    for my $u (@u) {
+	if (0x20 <= $u && $u <= 0x7E) {
+	    my $c = pack 'U', $u;
+	    $ret .= "\\" if $c !~ /^[0-9A-Za-z_]\z/;
+	    $ret .= $c;
+	} elsif (0x80 <= $u && $u <= 0xFF) {
+	    my $temp = @u == 1 ? "'U'" : "'U*'";
+	    my $hexa = join ', ', map sprintf("0x%X", $_), @u;
+	    return "pack($temp, $hexa)";
+	} else {
+	    $ret .= sprintf '\x{%X}', $u;
+	}
+    }
+    $ret .= '"';
+    return $ret;
+}
+
+# usage: -e "require 'dumpstr'; test_element(1);"
+sub test_element (;$) {
+    my $verbose = shift;
+    my %hash = map +($_ => "{$_}"), 'a'..'z', 'A'..'Z';
+    my $err = keys %hash == 52 ? '' : "hash error\n";
+
+    for (my $i = 0; $i <= 0x10FFFF; ++$i) {
+	my $c = pack 'U', $i;
+	my $h = sprintf '%04X', $i;
+	my $e = element($c);
+	my $r = $hash{$c} ? $hash{$c} : $h; # expected
+	$err .= "$e ($h)\n" if $e ne $r;
+	printf STDERR "$h\r" if $verbose && $h =~ /00\z/; # progress indicator
+    }
+    print $err ? "not ok\n$err" : "all ok\n";
+}
+
+# usage: -e "require 'dumpstr'; test_dumpstr();"
+sub test_dumpstr () {
+    my $a = "a\x{301}";
+    my $b = pack 'U', 0xFF;
+    my $c = "\x{3042}$b";
+    my @not_ok;
+    push @not_ok, 1 if unidump($a) ne '0061 0301';
+    push @not_ok, 2 if unidump($b) ne '00FF';
+    push @not_ok, 3 if unidump($c) ne '3042 00FF';
+    push @not_ok, 4 if element($a) ne '{a}0301';
+    push @not_ok, 5 if element($b) ne '00FF';
+    push @not_ok, 6 if element($c) ne '3042 00FF';
+    push @not_ok, 7 if string ($a) ne '"a\x{301}"';
+    push @not_ok, 8 if string ($b) ne q|pack('U', 0xFF)|;
+    push @not_ok, 9 if string ($c) ne q|pack('U*', 0x3042, 0xFF)|;
+    print @not_ok ? "not ok\n@not_ok" : "all ok\n";
+}
+
+1;

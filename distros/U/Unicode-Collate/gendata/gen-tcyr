@@ -1,0 +1,287 @@
+#!perl
+# gen-tcyr : auxiliary script to generate tests for cyrillic
+#
+# output files
+#
+#   loc_be.t
+#   loc_bg.t
+#   loc_bscy.t
+#   loc_cyrl.t
+#   loc_kk.t
+#   loc_mk.t
+#   loc_mncy.t
+#   loc_ru.t
+#   loc_sr.t
+#   loc_ugcy.t
+#   loc_uk.t
+#
+use strict;
+use warnings;
+use File::Spec;
+require 'gen-head'; # for testcount() and testhead()
+
+my %equiv = (
+    0x439 => [qw(\x{438}\x{306})],
+    0x419 => [qw(\x{418}\x{306})],
+    0x451 => [qw(\x{435}\x{308})],
+    0x401 => [qw(\x{415}\x{308})],
+    0x453 => [qw(\x{433}\x{301} \x{433}\x{341})],
+    0x403 => [qw(\x{413}\x{301} \x{413}\x{341})],
+    0x457 => [qw(\x{456}\x{308})],
+    0x407 => [qw(\x{406}\x{308})],
+    0x45c => [qw(\x{43a}\x{301} \x{43a}\x{341})],
+    0x40c => [qw(\x{41a}\x{301} \x{41a}\x{341})],
+    0x45e => [qw(\x{443}\x{306})],
+    0x40e => [qw(\x{423}\x{306})],
+);
+
+my @Cyrill = qw(be bg bscy kk mk mncy ru sr ugcy uk);
+
+my(%Lower,%Upper);
+# negative value means secondary greatness
+$Lower{be} = [0x430..0x435,0x451,0x436..0x438,0x456,0x439..0x443,0x45e,
+	      0x444..0x448,0x44b..0x44f];
+$Upper{be} = [0x410..0x415,0x401,0x416..0x418,0x406,0x419..0x423,0x40e,
+	      0x424..0x428,0x42b..0x42f];
+$Lower{bg} = [0x430..0x44a,0x44c,0x44e,0x44f];
+$Upper{bg} = [0x410..0x42a,0x42c,0x42e,0x42f];
+$Lower{kk} = [0x430,0x4d9,0x431..0x433,0x493,0x434,0x435,0x451,0x436..0x43a,
+	      0x49b,0x43b..0x43d,0x4a3,0x43e,0x4e9,0x43f..0x443,0x4b1,0x4af,
+	      0x444,0x445,0x4bb,0x446..0x44b,0x456,0x44c..0x44f];
+$Upper{kk} = [0x410,0x4d8,0x411..0x413,0x492,0x414,0x415,0x401,0x416..0x41a,
+	      0x49a,0x41b..0x41d,0x4a2,0x41e,0x4e8,0x41f..0x423,0x4b0,0x4ae,
+	      0x424,0x425,0x4ba,0x426..0x42b,0x406,0x42c..0x42f];
+$Lower{mk} = [0x430..0x434,0x503,0x453,0x435..0x437,0x455,0x438,-0x439,0x458,
+	      0x43a,0x43b,0x459,0x43c,0x43d,0x45a,0x43e..0x442,0x45b,0x45c,
+	      0x443..0x447,0x45f,0x448];
+$Upper{mk} = [0x410..0x414,0x502,0x403,0x415..0x417,0x405,0x418,-0x419,0x408,
+	      0x41a,0x41b,0x409,0x41c,0x41d,0x40a,0x41e..0x422,0x40b,0x40c,
+	      0x423..0x427,0x40f,0x428];
+$Lower{mncy} = [0x430..0x435,-0x451,0x436..0x43e,0x4e9,0x43f..0x443,0x4af,
+		0x444..0x44f];
+$Upper{mncy} = [0x410..0x415,-0x401,0x416..0x41e,0x4e8,0x41f..0x423,0x4ae,
+		0x424..0x42f];
+$Lower{ru} = [0x430..0x435,-0x451,0x436..0x44f];
+$Upper{ru} = [0x410..0x415,-0x401,0x416..0x42f];
+$Lower{ugcy} = [0x430..0x433,0x493,0x434,0x435,0x4d9,0x436,0x497,0x437..0x43a,
+		0x49b,0x43b..0x43d,0x4a3,0x43e,0x4e9,0x43f..0x443,0x4af,0x444,
+		0x445,0x4bb,0x447,0x448,0x44e,0x44f];
+$Upper{ugcy} = [0x410..0x413,0x492,0x414,0x415,0x4d8,0x416,0x496,0x417..0x41a,
+		0x49a,0x41b..0x41d,0x4a2,0x41e,0x4e8,0x41f..0x423,0x4ae,0x424,
+		0x425,0x4ba,0x427,0x428,0x42e,0x42f];
+$Lower{sr} = [0x430..0x434,0x452,0x435..0x438,-0x439,0x458,0x43a,0x43b,0x459,
+	      0x43c,0x43d,0x45a,0x43e..0x442,0x45b,0x443..0x447,0x45f,0x448];
+$Upper{sr} = [0x410..0x414,0x402,0x415..0x418,-0x419,0x408,0x41a,0x41b,0x409,
+	      0x41c,0x41d,0x40a,0x41e..0x422,0x40b,0x423..0x427,0x40f,0x428];
+$Lower{uk} = [0x430..0x433,0x491,0x434,0x435,0x454,0x436..0x438,0x456,0xa647,
+	      0x457,0x439..0x449,0x44c,0x44e,0x44f];
+$Upper{uk} = [0x410..0x413,0x490,0x414,0x415,0x404,0x416..0x418,0x406,0xa646,
+	      0x407,0x419..0x429,0x42c,0x42e,0x42f];
+
+$Lower{bscy} = $Lower{sr};
+$Upper{bscy} = $Upper{sr};
+
+for my $loc (@Cyrill) {
+    my $o = "\$obj\u$loc";
+
+    my $test1 = my $test2 = '';
+    for my $cA ($Lower{$loc}, $Upper{$loc}) {
+	my $pr = 0;
+	for my $c (@$cA) {
+	    $test1 .= sprintf qq|ok($o->lt("\\x{%x}z", "\\x{%x}"));\n|,
+		      $pr,  $c if $pr && $c > 0;
+	    $test2 .= sprintf qq|ok($o->eq("\\x{%x}", "\\x{%x}"));\n|,
+		      $pr, -$c if $pr && $c < 0;
+	    $pr = $c if $c > 0;
+	}
+	$test1 .= "\n" if $cA eq $Lower{$loc};
+    }
+
+    my $test3 = my $test4 = '';
+    my @cl = @{ $Lower{$loc} };
+    my @cu = @{ $Upper{$loc} };
+    while (@cl && @cu) {
+	my $l = abs shift @cl;
+	my $u = abs shift @cu;
+	$test3 .= sprintf qq|ok($o->eq("\\x{%x}", "\\x{%x}"));\n|, $l, $u;
+	if ($l eq 0x457 && $u eq 0x407) {
+	    my $m = 0xa676;
+	    $test3 .= sprintf qq|ok($o->eq("\\x{%x}", "\\x{%x}"));\n|, $l, $m;
+	    $test3 .= sprintf qq|ok($o->eq("\\x{%x}", "\\x{%x}"));\n|, $m, $u;
+	}
+
+	my @eql = $equiv{$l} ? @{ $equiv{$l} } : ();
+	$test4 .= sprintf qq|ok($o->eq("\\x{%x}", "%s"));\n|, $l, $_ for @eql;
+	my @equ = $equiv{$u} ? @{ $equiv{$u} } : ();
+	$test4 .= sprintf qq|ok($o->eq("\\x{%x}", "%s"));\n|, $u, $_ for @equ;
+    }
+
+    s/("\\x\{[0-9a-f]{4}\}z?",) /$1/g for $test1,$test2,$test3;
+
+### WRITE TEST ###
+    my $test = '';
+    my $ok = 2;
+    $test .= "$o->change(level => 1);\n\n";
+    $test .= testcount(\$ok, $test1);
+    $test .= testcount(\$ok, $test2) if $test2 ne '';
+    $test2 =~ s/->eq/->lt/g;
+    $test .= "$o->change(level => 2);\n\n";
+    $test .= testcount(\$ok, $test2) if $test2 ne '';
+    $test .= testcount(\$ok, $test3);
+    $test3 =~ s/->eq/->lt/g;
+    $test .= "$o->change(level => 3);\n\n";
+    $test .= testcount(\$ok, $test3);
+    $test .= testcount(\$ok, $test4);
+
+    {
+	chomp $test;
+	my $f = "loc_$loc.t";
+	open my $dst, ">$f" or die $f;
+	binmode $dst;
+	my $text = testhead($loc, $ok).$test;
+
+	$text =~ s/'([A-Z][A-Z])CY'/'$1-CYRL'/;
+	$text =~ s/'([a-z][a-z])cy'/'$1_Cyrl'/;
+	$text =~ s/(obj[A-Z][a-z])cy/$1Cyrl/g;
+
+	$text =~ s/'mn_Cyrl'/'default'/;
+	$text =~ s/'(?:bg|ru)'\);/'default'); # no tailoring since 1.17/;
+
+	print $dst $text;
+	close $dst or die "close $f";
+    }
+}
+
+### LOC_CYRL.T ###
+
+my $NoSupp = 'NoSuppress'; # for loc_cyrl.t
+
+# convert 'AAA BBB' to '\x{AAA}\x{BBB}'
+sub xstr ($) {
+    my $s = shift;
+    my $j = join '', map "\\x{$_}", split ' ', $s;
+    $j =~ s/(\{)0+/$1/g;
+    return $j;
+}
+
+my @data;
+while (<DATA>) {
+    last if /^__END__$/;
+    chomp;
+    push @data, $_;
+}
+
+for my $loc ('cyrl') {
+    my $obj = "\$obj\u$loc";
+    my($t0,$t1,$t2,$t3,$t4,$t5);
+
+    for (@data) {
+	my $com = s/(\s*#.*)// ? $1 : '';
+
+	s/></ /g;
+	tr/<>/ /d;
+	my($fr,$to) = split /;/, $_;
+	my $xfr = xstr($fr);
+	my $xto = xstr($to);
+	if ($com eq '') {
+	    $xto =~ s/(\})(\\x\{)/$1\$i$2/;
+	    $t5 .= qq|  ok($obj->eq("$xfr", "$xto"));\n|;
+	    $xto =~ s/\$i.*//; # remove combining characters
+	    $t1 .= qq|ok($obj->eq("$xfr", "$xto"));\n|;
+	    $t2 .= qq|ok($obj->gt("$xfr", "$xto"));\n|;
+	} else {
+	    my $c = $com;
+	    $t3 .= qq|ok($obj->eq("$xfr", "$xto"));$c\n|;
+	    $xto =~ s/(\})(\\x\{)/$1\\0$2/;
+	    $t4 .= qq|ok($obj->gt("$xfr", "$xto"));$c\n|;
+	    $xto =~ s/(\}).*/$1/; # remove combining characters
+	    $t0 .= qq|ok($obj->gt("$xfr", "$xto"));$c\n| if $c;
+	}
+    }
+
+    my $test;
+    my $ok = 2;
+    $test .= "$obj->change(level => 1);\n\n";
+    $test .= testcount(\$ok, $t0)  if $t0;
+    $test .= testcount(\$ok, $t1)  if $t1;
+
+    $test .= "$obj->change(level => 2);\n\n";
+    $test .= testcount(\$ok, $t2)  if $t2;
+
+    $test .= "$obj->change(level => 3);\n\n";
+    $test .= testcount(\$ok, $t3)  if $t3;
+    $test .= testcount(\$ok, $t4)  if $t4;
+
+    $test .= qq|for my \$i ("", "\\0") |;
+    $test .= testcount(\$ok, $t5, 2);
+
+    {
+	chomp $test;
+	my $f = "loc_$loc.t";
+	open my $dst, ">$f" or die $f;
+	binmode $dst;
+	my $text = testhead($loc, $ok).$test;
+
+	$text =~ s/'CYRL'/'$NoSupp'/;
+	$text =~ s/'cyrl'/'default'/;
+	$text =~ s/objCyrl/obj$NoSupp/g;
+
+	print $dst $text;
+	close $dst or die "close $f";
+    }
+}
+
+__DATA__
+04D1;<0430><0306>
+04D0;<0410><0306>
+04D3;<0430><0308>
+04D2;<0410><0308>
+04DB;<04D9><0308>
+04DA;<04D8><0308>
+0453;<0433><0301>
+0403;<0413><0301>
+0450;<0435><0300>
+0400;<0415><0300>
+04D7;<0435><0306>
+04D6;<0415><0306>
+0451;<0435><0308>
+0401;<0415><0308>
+04C2;<0436><0306>
+04C1;<0416><0306>
+04DD;<0436><0308>
+04DC;<0416><0308>
+04DF;<0437><0308>
+04DE;<0417><0308>
+045D;<0438><0300>
+040D;<0418><0300>
+04E5;<0438><0308>
+04E4;<0418><0308>
+04E3;<0438><0304>
+04E2;<0418><0304>
+0457;<0456><0308>
+0407;<0406><0308>
+0439;<0438><0306> # not suppressed
+0419;<0418><0306> # not suppressed
+045C;<043A><0301>
+040C;<041A><0301>
+04E7;<043E><0308>
+04E6;<041E><0308>
+04EB;<04E9><0308>
+04EA;<04E8><0308>
+045E;<0443><0306>
+040E;<0423><0306>
+04F1;<0443><0308>
+04F0;<0423><0308>
+04F3;<0443><030B>
+04F2;<0423><030B>
+04EF;<0443><0304>
+04EE;<0423><0304>
+04F5;<0447><0308>
+04F4;<0427><0308>
+04F9;<044B><0308>
+04F8;<042B><0308>
+04ED;<044D><0308>
+04EC;<042D><0308>
+0477;<0475><030F>
+0476;<0474><030F>
+__END__

@@ -1,0 +1,22 @@
+
+CuiFinder User Options: 
+   --config option set
+
+
+UMLS-Interface Configuration Information
+  Sources (SAB):
+    SNOMEDCT
+  Relations (REL):
+    CHD
+    PAR
+  Database: 
+    umls (MMSYS-2010AB-20101022)
+
+
+
+
+The definition(s) of hand (C0018563):
+  1. part of the upper limb distal to the wrist including carpus, metacarpus and fingers.
+  2. The distal portion of the upper extremity. It consists of the carpus, metacarpus, and digits. (NCI)
+  3. The distal portion of the upper extremity. It consists of the carpus, metacarpus, and digits.
+There are no definitions for hand (C1281583)

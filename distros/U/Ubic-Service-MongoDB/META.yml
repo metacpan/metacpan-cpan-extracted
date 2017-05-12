@@ -1,0 +1,30 @@
+---
+abstract: 'running MongoDB as Ubic service'
+author:
+  - 'Yury Zavarin <yury.zavarin@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.036, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Ubic-Service-MongoDB
+requires:
+  File::Copy: '0'
+  File::Spec::Functions: '0'
+  MongoDB: '0.502'
+  Params::Validate: '0'
+  Ubic::Daemon: '0'
+  Ubic::Result: '0'
+  Ubic::Service::Common: '0'
+  parent: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: http://github.com/tadam/Ubic-Service-MongoDB
+  repository: git://github.com/tadam/Ubic-Service-MongoDB.git
+version: '0.02'

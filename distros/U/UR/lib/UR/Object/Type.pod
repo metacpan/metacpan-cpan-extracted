@@ -1,0 +1,529 @@
+=pod
+
+=head1 NAME
+
+UR::Object::Type - a meta-class for any class or primitive type 
+
+=head1 SYNOPSIS
+
+    use UR;
+
+    class MyClass {
+        is => ['ParentClass1', 'ParentClass2'],
+        id_by => [
+            id_prop1    => { is => 'Integer' },
+            id_prop2    => { is => 'String' },
+        ],
+        has => [
+            property_a  => { is => 'String' }
+            property_b  => { is => 'Integer', is_optional => 1 },
+        ],
+    };
+
+    my $meta = MyClass->__meta__;
+    
+    my @parent_class_metas = $meta->parents();
+    # 2 meta objects, see UR::Object::Property
+
+    my @property_meta = $meta->properties();
+    # N properties (4, +1 from UR::Object, +? from ParentClass1 and ParentClass2)
+    
+    $meta->is_abstract;
+
+    $meta->...
+
+=head1 DESCRIPTION
+
+UR::Object::Type implements the class behind the central metadata in the UR
+class framework.  It contains methods for introspection and manipulation of 
+related class data.  
+
+A UR::Object::Type object describes UR::Object, and also
+every subclass of UR::Object.
+
+=head1 INHERITANCE
+
+In addition to describing UR::Object an each of its subclasses, 
+UR::Object::Type is _itself_ a subclass of L<UR::Object>.  This means
+that the same query APIs used for regular objects can be used
+for meta objects.
+
+   UR::Object  -> has-meta -> UR::Object::Type
+          A                         |
+          \                        / 
+           \-----<- is-a  <-------/
+
+Further, new classes which generate a new UR::Objec::Type,
+also generate a new subclass for the meta-class.  This
+means that each new class can have private meta methods,
+(ala Ruby).  
+
+This means that extensions to a meta-class,
+apply to the meta-class of its derivatives.
+
+     Regular                    Meta-Class 
+     Entity                     Singleton
+     -------                    ----------
+
+    Greyhound   has-meta ->   Greyhound::Type
+        |                          |
+        V                          V
+      is-a                       is-a 
+        |                          |
+        V                          V
+       Dog      has-meta ->    Dog::Type
+        |                          |
+        V                          V
+      is-a                       is-a
+        |                          |
+        V                          V
+      Animal    has-meta ->   Animal::Type        
+        |                          |
+        V                          V
+      is-a                       is-a
+        |                          |     /-----------------\
+        V                          V     V                 |
+   UR::Object   has-meta ->   UR::Object::Type   has-meta -/ 
+          A                      is-a
+          |                        |
+           \______________________/
+
+
+=head1 CONSTRUCTORS
+
+=over 4
+
+=item "class" 
+
+  class MyClass1 {};
+
+  class MyClass2 { is => 'MyClass1' };
+
+  class MyClass3 {
+      is => ['Parent1','Parent2'],
+      is_abstract => 1,
+      is_transient => 1,
+      has => [ qw/p1 p2 p3/ ],
+      doc => 'woo hoo!'
+  };
+
+The primary constructor is not a method on this class at all.
+UR catches "class SOMENAME { ... }" and calls define() with
+the parameters.
+
+=item define
+
+  my $class_obj = UR::Object::Type->define(
+                      class_name => 'MyClass',
+                      ...
+                  );
+
+Register a class with the system.  The given class_name must be unique
+within the application.  As a side effect, a new Perl namespace will be
+created for the class's name, and methods will be injected into that
+namespace for any of the class properties.  Other types of metadata
+objects will get created to manage the properties and relationships
+to other classes.  See the L<UR::Object::Type::Initializer> documentation
+for more information about the parameters C<define()> accepts.
+
+=item create
+
+  my $class_obj = UR::Object::Type->create(
+                      class_name => 'Namespace::MyClass',
+                      ...
+                  );
+
+Create a brand new class within an already existing UR namespace.
+C<create()> takes all the same parameters as C<define()>.  Another side
+effect of create is that when the application commits its Context,
+a new Perl module will be created to implement the class, complete 
+with a class definition.  
+
+Applications will not normally use create().
+
+=back
+
+=head1 PROPERTIES
+
+Each property has a method of the same name
+
+=head2 External API 
+
+=over 4
+
+=item class_name
+
+    $name = $class_obj->class_name
+
+The name of the class.  Class names are unique within a UR namespace and an
+application.  
+
+This is symmetrical with $class_obj = $name->__meta__.
+
+=item properties
+
+  @all = $class_obj->properties();
+  
+  @some = $class_obj->properties(
+      'is                    => ['Text','Number']
+      'doc like'             => '%important%',
+      'property_name like'   => 'someprefix_%',
+  );
+
+Access the related property meta-objects for all properties of this class.  It includes 
+the properties of any parent classes which are inherited by this class.
+
+See L<UR::Object::Property> for details.
+
+=item property
+
+  $property_meta = $class_obj->property('someproperty');
+
+The singular version of the above.  A single argument, as usual, is treated
+as the remainder of the ID, and will select a property by name.
+
+=item namespace
+
+  $namespace_name = $class_obj->namespace
+
+Returns the name of the class's UR namespace.
+
+=item doc
+
+  $doc = $class_obj->doc
+
+A place to put general class-specific notes.
+
+=item data_source_id
+
+  $ds_id = $class_obj->data_source_id
+
+The name of the external data source behind this class.  Classes without
+data sources cannot be saved and exist only during the life of the
+application.  data_source_id will resolve to an L<UR::DataSource> id.
+
+=item table_name
+
+  $table_name = $class_object->table_name
+
+For classes with data sources, this is the name of the table within that
+data source.  This is usually a table in a relational database.
+
+At a basic level, it is a storage directive interpreted by the data_source,
+and may or may not related to a storage table at that level.
+
+=item is_abstract
+
+  $bool = $class_obj->is_abstract
+
+A flag indicating if this is an abstract class.  Abstract classes cannot have
+instances, but can be inherited by other classes.
+
+=item is_final
+
+  $bool = $class_obj->is_final
+
+A flag indicating if this class cannot have subclasses.
+
+=item is_singleton
+
+  $bool = $class_obj->is_singleton
+
+A flag indicating whether this is a singleton class.  If true, the class
+will inherit from L<UR::Singleton>.
+
+=item is_transactional
+
+  $bool = $class_obj->is_transactional
+
+A flag indicating whether changes to this class's instances will be tracked.
+Non-transactional objecs do not change when an in-memory transaction rolls back.
+
+It is similar to the is_transient meta-property, which does the same for an 
+individual property.
+
+=back
+
+=head2 Internal API 
+
+These methods return data about how this class relates to other classes.
+
+=over 4
+
+=item namespace_meta
+
+  $ns_meta = $class_obj->namespace_meta
+
+Returns the L<UR::Namespace> object with the class's namespace name.
+
+=item parent_class_names
+
+  @names = $class_obj->parent_class_names
+
+Returns a list of the immediate parent classes.  
+
+=item parent_class_metas
+
+  @class_objs = $class_obj->parent_class_metas
+
+Returns a list of the class objects (L<UR::Object::Type> instances) of the
+immediate parent classes
+
+=item ancestry_class_names
+
+  @names = $class_obj->ancestry_class_names
+
+Returns a list of all the class names this class inherits from, directly or 
+indirectly.  This list may have duplicate names if there is multiple
+inheritance in the family tree.
+
+=item ancestry_class_metas
+
+  @class_objs = $class_obj->ancestry_class_metas
+
+Returns a list of the class objects for each inherited class.
+
+=item direct_property_names
+
+  @names = $class_obj->direct_property_names
+
+Returns a list of the property names defined within this class.  This list
+will not include the names of any properties inherited from parent classes
+unless they have been overridden.
+
+=item direct_property_metas
+
+  @property_objs = $class_obj->direct_property_metas
+
+Returns a list of the L<UR::Object::Property> objects for each direct
+property name.
+
+=item ancestry_property_names
+
+  @names = $class_obj->ancestry_property_names
+
+Returns a list of property names of the parent classes and their inheritance
+hierarchy.  The list may include duplicates if a property is overridden
+somewhere in the hierarchy.
+
+=item ancestry_property_metas
+
+  @property_objs = $class_obj->ancestry_property_metas;
+
+Returns a list of the L<UR::Object::Property> objects for each ancestry
+property name.
+
+=item all_property_names
+
+Returns a list of property names of the given class and its inheritance
+hierarchy.  The list may include duplicates if a property is overridden
+somewhere in the hierarchy.
+
+=item all_property_metas
+
+  @property_objs = $class_obj->all_property_metas;
+
+Returns a list of the L<UR::Object::Property> objects for each name returned
+by all_property_names.
+
+=item direct_id_property_names
+
+  @names = $class_obj->direct_id_property_names
+
+Returns a list of the property names designated as "id" properties in the
+class definition.
+
+=item direct_id_property_metas
+
+  @property_objs = $class_obj->direct_id_property_metas
+
+Returns a list of the L<UR::Object::Property> objects for each id property
+name.
+
+=item ancestry_id_property_names
+
+=item ancestry_id_property_metas
+
+=item all_id_property_names
+
+=item all_id_property_metas
+
+  @names         = $class_obj->ancestry_id_property_names;
+  @property_objs = $class_obj->ancestry_id_property_metas;
+  @names         = $class_obj->all_id_property_names;
+  @property_objs = $class_obj->all_id_property_metas;
+
+Returns the property names or L<UR::Object::Property> objects for either
+the parent classes and their inheritance hierarchy, or for the given
+class and all of its inheritance hierarchy.  The lists may include duplicates
+if properties are overridden somewhere in the hierarchy.
+
+=item unique_property_set_hashref
+
+  $constraints = $class_obj->unique_property_set_hashref
+
+Return a hashref describing the unique constraints on the given class.  The
+keys of $constraint are constraint names, and the values are listrefs of 
+property names that make up the unique constraint.
+
+=item add_unique_constraint
+
+  $class_obj->add_unique_constraint($constraint_name, @property_name_list)
+
+Add a unique constraint to the given class.  It is an exception if the
+given $constraint_name already exists as a constraint on this class or
+its parent classes.
+
+=item remove_unique_constraint
+
+  $class_obj->remove_unique_constraint($constraint_name)
+
+Remove a unique constraint from the given class.  It is an exception if
+the given constraint name does not exist.
+
+
+=item ancestry_table_names
+
+=item all_table_names
+
+  @names = $class_obj->ancestry_table_names
+
+Returns a list of table names in the class's inheritance hierarchy.
+
+=item direct_column_names
+
+Returns a list of column names for each direct property meta.  Classes with
+data sources and table names will have properties with column names.
+
+=item direct_id_column_names
+
+Returns a list of ID column names for each direct property meta.
+
+=item direct_columnless_property_names
+
+=item direct_columnless_property_metas
+
+=item ancestry_columnless_property_names
+
+=item ancestry_columnless_property_metas
+
+=item all_columnless_property_names
+
+=item all_columnless_property_metas
+
+Return lists of property meta objects and their names for properties that
+have no column name.
+
+=back
+
+=head1 METHODS
+
+=over 4
+
+=item property_meta_for_name
+
+  $property_obj = $class_obj->property_meta_for_name($property_name);
+
+Return the L<UR::Object::Property> object in the class's inheritance
+hierarchy with the given name.  If the property name has been overridden
+somewhere in the hierarchy, then it will return the property object
+most specific to the class.
+
+=item id_property_sorter
+
+  $subref = $class_obj->id_property_sorter;
+  @sorted_objs = sort $subref @unsorted_objs;
+
+Returns a subroutine reference that can be used to sort object instances of
+the class.  The subref is able to handle classes with multiple ID 
+properties, and mixes of numeric and non-numeric data and data types.
+
+=item autogenerate_new_object_id
+
+This method is called whenever new objects of the given class are created
+through C<ClassName-E<gt>create()>, and not all of their ID properties were
+specified.  UR::Object::Type has an implementation used by default, but
+other classes can override this if they need special handling.
+
+=item singular_accessor_name_for_is_many_accessor
+
+  $property_name = $class_obj->singular_accessor_name_for_is_many_accessor($is_many_name);
+
+For is_many properties, returns the name of the singular accessor.  Usually,
+this the singular version of the plural, is_many property's name.  The singular
+accessor accepts key/value pairs as arguments, which are used to filter the
+results of the is_many accessor.  For example, the singular for the 'cars'
+accessor is 'car'.
+
+Returns a false value if the given property name does not exist or is not is_many.
+
+=item iterator_accessor_name_for_is_many_accessor
+
+  $iter_name = $class_obj->iterator_accessor_name_for_is_many_accessor($is_many_name);
+
+Returns the accessor name used to get the L<UR::Object::Iterator> that corresponds
+with the is_many accessor.  For example, the iterator for the 'cars' accessor
+is 'car_iterator'.
+
+Returns a false value if the given property name does not exist or is not is_many.
+
+=item set_accessor_name_for_is_many_accessor
+
+  $set_name = $class_obj->set_accessor_name_for_is_many_accessor($is_many_name);
+
+Returns the accessor name used to get the L<UR::Object::Set> that corresponds
+with the is_many accessor.  For example, the set for the 'cars' accessor
+is 'car_set'.
+
+Returns a false value if the given property name does not exist or is not is_many.
+
+=item rule_accessor_name_for_is_many_accessor
+
+  $rule_name = $class_obj->rule_accessor_name_for_is_many_accessor($is_many_name);
+
+Returns the accessor name used to get the L<UR::BoolExpr> that corresponds
+with the is_many accessor.  For example, the rule for the 'cars' accessor
+is '__car_rule'.
+
+Returns a false value if the given property name does not exist or is not is_many.
+
+=item arrayref_accessor_name_for_is_many_accessor
+
+  $arrayref_name = $class_obj->arrayref_accessor_name_for_is_many_accessor($is_many_name);
+
+Returns the accessor name used to get the arrayref of objects that corresponds
+with the is_many accessor.  For example, the arrayref for the 'cars' accessor
+is 'car_arrayref'.
+
+Returns a false value if the given property name does not exist or is not is_many.
+
+=item adder_name_for_is_many_accessor
+
+  $adder_name = $class_obj->adder_name_for_is_many_accessor($is_many_name);
+
+Returns the method name used to get the adder method that corresponds with
+the is_many accessor.  For example, the adder for the 'cars' accessor is
+'add_car'.
+
+Returns a false value if the given property name does not exist or is not is_many.
+
+=item remover_name_for_is_many_accessor
+
+  $remover_name = $class_obj->remover_name_for_is_many_accessor($is_many_name);
+
+Returns the method name used to get the remover method that corresponds with
+the is_many accessor.  For example, the adder for the 'cars' accessor is
+'remove_car'.
+
+Returns a false value if the given property name does not exist or is not is_many.
+
+=back
+
+=head1 SEE ALSO
+
+L<UR::Object::Property>, L<UR::Object::Iterator>, L<UR::Object::Set>,
+L<UR::BoolExpr>
+
+=cut
+
+

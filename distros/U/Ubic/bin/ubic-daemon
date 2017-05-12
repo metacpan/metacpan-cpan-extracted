@@ -1,0 +1,105 @@
+#!/usr/bin/env perl
+package ubic_daemon;
+$ubic_daemon::VERSION = '1.60';
+# ABSTRACT: daemonize any binary
+
+use strict;
+use warnings;
+
+
+use Getopt::Long 2.33;
+use Pod::Usage;
+
+use Ubic::Daemon qw(:all);
+use Ubic::Settings;
+
+return 1 if caller();
+
+my $name;
+my $pid_dir = Ubic::Settings->data_dir.'/ubic-daemon';
+my ($stop, $list);
+
+GetOptions(
+    'name=s'    => \$name,
+    'pid-dir=s' => \$pid_dir,
+    'stop'      => \$stop,
+    'list'      => \$list,
+) or pod2usage(2);
+
+if ($stop) {
+    pod2usage(2) unless @ARGV == 0;
+    unless (-e "$pid_dir/$name") {
+        die "$name not found";
+    }
+    # TODO - check owner
+    stop_daemon("$pid_dir/$name");
+    system("rm -rf $pid_dir/$name");
+}
+elsif ($list) {
+    pod2usage(2) unless @ARGV == 0;
+    for my $file (glob "$pid_dir/*") {
+        my $name = File::Spec->abs2rel($file, $pid_dir);
+        print "$name\t";
+        if (check_daemon($file)) {
+            print "running\n";
+        }
+        else {
+            print "dead\n";
+        }
+    }
+}
+else {
+    pod2usage(2) unless @ARGV == 1;
+    pod2usage(2) unless defined $name;
+    start_daemon({
+        name => $name,
+        pidfile => "$pid_dir/$name",
+        bin => shift(@ARGV),
+    });
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+ubic_daemon - daemonize any binary
+
+=head1 VERSION
+
+version 1.60
+
+=head1 SYNOPSIS
+
+    ubic-daemon --name=sleep 'sleep 1000'
+    ubic-daemon --stop --name=sleep
+    ubic-daemon --list
+
+=head1 DECSRIPTION
+
+This program can be used to start any binary in the background.
+
+Note that it doesn't create the proper service: binary won't be monitored by the watchdog and it won't be started on the system reboot.
+In other words, you usually will want to write the service config instead of using this program.
+
+=head1 SEE ALSO
+
+L<Ubic::Daemon>
+
+There is a similar program named C<start-stop-daemon> in Debian and some other Linux distributions which does daemonization and have some other powerful features.
+
+=head1 AUTHOR
+
+Vyacheslav Matyukhin <mmcleric@yandex-team.ru>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Yandex LLC.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

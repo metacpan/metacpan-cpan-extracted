@@ -1,0 +1,27 @@
+Revision history for Perl extension UV
+
+0.24 2013-03-29T17:00:00+09:00
+     - fixed a packaging issue
+
+0.23 2013-03-29T15:21:00+09:00
+     - libuv updated to 0.10.2 (first officially versioned release of libuv)
+     - supported following new functions:
+           uv_version_string, uv_stop, uv_tcp_open, uv_udp_open, uv_interface_addresses
+
+0.22 2012-10-12T14:18:36+09:00
+     - added a dirty (hopefully temporary) hack to make libuv with -fPIC.
+
+0.21 2012-10-10T08:25:36+09:00
+     - added a Makefile.PL treak avoiding segmentation fault. (ref RT #115206)
+
+0.2  2012-10-05T17:49:02+09:00
+     - added UV::loop namespace and UV::default_loop() to get default_loop,
+       it contains active_handles information.
+     - added uv_walk
+     - added deps/ to ignoring list for CPAN indexer
+
+0.12 2012-10-01T05:55:32+09:00
+     - added CAUTION section in doc ;)
+
+0.1  2012-09-30T15:45:53+09:00
+     - initial version

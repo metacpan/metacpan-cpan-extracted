@@ -1,0 +1,11 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         URI-Find-Schemeless-Stricter
+version:      1.03
+version_from: lib/URI/Find/Schemeless/Stricter.pm
+installdirs:  site
+requires:
+    URI::Find:                     0.13
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

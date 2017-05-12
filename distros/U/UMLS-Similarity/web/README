@@ -1,0 +1,161 @@
+WordNet::Similarity Web Interface
+=================================
+
+The web interface distribution contains two CGI scripts, which are in the
+cgi-bin directory:
+
+cgi-bin/umls_similarity.cgi
+cgi-bin/umls_wps.cgi
+
+A set of required html and style files in the docs directory:
+
+docs/faq.html       
+docs/index.html
+docs/instructions.html  
+docs/similarity_measures.html
+docs/relatedness_measures.html  
+docs/logo_black.gif     
+docs/sim-style.css
+
+As well as two directories containing the externam information content 
+and vector files, also in the docs directory:
+
+docs/icpropagation  
+docs/vectorfiles
+
+The code and documentation borrows heavly from the WordNet::Similarity 
+web interface written by Jason Michelizzi if you are familiar with it. 
+Any problems with this package though are due to my inabilities not 
+Jason's. All good things with this package are due to his very nice 
+coding and documention skills. 
+ 
+The interface employs a client-server model.  The two CGI scripts,
+umls_similarity.cgi and umls)wps.cgi, are the clients that request 
+informationfrom the similarity server (umls_similarity_server.pl). 
+The similarityserver is distributed as one of the utilities (in the 
+/utils directory)in this package.
+
+The similarity server is a network interface to the UMLS::Similarity
+measures. It is similarity_server.pl that actually interacts with the 
+UMLS-Interface and UMLS-Similarity packages to compute relatedness 
+scores. It loads all the similarity modules, and sits on a machine 
+listening for network requests for relatedness information. A client 
+can then connect to this similarity server and request information 
+about semantic relatedness of words and concepts. This information, 
+if available, will be returned by the similarity server to the client 
+over the netwrok connection.
+
+In the web interface, umls_similarity.cgi and umls_wps.cgi are the 
+clients thatconnect to the similarity server to request similarity 
+or relatedness information. The information retrieved by these two 
+clients from the server is then presented via web-pages to the end-user. 
+Thus, umls_wps.cgi and umls_similarity.cgi form part of the web-server 
+creating web pages to serve up to the end-user, using information 
+obtained from the backend similarity server (umls_similarity_server.pl). 
+Here is a block schematic:
+
+
+[UMLS Similarity Server] <-----> [Web Server] <-----> [End User]
+                             (umls_similarity.cgi)     (browser)
+                             (umls_wps.cgi)
+
+
+The umsl_similarity_server.pl can be run on the same machine on which your
+webserver is running or it can be on a different machine.  Running the 
+umls_similarity_server.pl on a different machine than the webserver can 
+beuseful if you have only limited control over the webserver machine (for
+example, you might not be able to install WordNet on the webserver
+machine).
+
+Quick Installation Instructions
+-------------------------------
+
+This guide assumes that you are using the Apache webserver as installed
+on a Fedora/RedHat based Linux distribution. If you are using a 
+different server or Linux distribution, then the setup process will 
+probably vary a little.
+
+Step 1
+------
+Put the umls_similarity.cgi and umls_wps.cgi scripts whereever CGI scripts 
+go on your webserver (e.g., /usr/local/apache2/cgi-bin). In order to keep 
+your system somewhat organized, you may want to put them in a subdirectory 
+in your cgi directory (e.g., /usr/local/apache2/cgi-bin/umls_similarity). 
+These  instructions generally assume the latter.  
+
+The various html, style sheets, and images in the 'docs' directory  
+of the distribution. These should be put wherever html documents go on  
+your webserver (e.g., /usr/local/apache2/htdocs). In order to keep your  
+system somewhat organized, you may want to put them in a subdirectory in  
+your html directory (e.g., /usr/local/apache2/htdocs/umls_similarity). 
+These instructions generally assume the latter. 
+
+The icpropagation and vectorfiles directories in the 'docs' directory
+should also be put wherever the html documents go on your server. 
+
+Note that if you are using Ubuntu Linux, your cgi-bin directory is 
+typically found at /usr/lib/cgi-bin and documents are found in /var/www
+
+Step 2
+------
+
+The following three files may need to be edited:
+
+umls_similarity.cgi
+umls_wps.cgi
+umls_similarity_server.pl
+
+
+- umls_similarity.cgi
+   * change $remote_host to be the hostname or IP addr of the machine
+     on which similarty_server.pl is located.  If umls_similarity_server.pl 
+     is running on the same machine as your web server, then 'localhost' 
+     or '127.0.0.1' will work.  Note: the setting for $remote_host and
+     $remote_port in similarity.cgi are not related to Apache's LISTEN
+     setting.  In fact, $remote_port needs to be different than the
+     port on which Apache is listening.
+
+   * set $doc_base to be the relative path to the HTML files that are
+     in the 'doc' directory in the distribution. For example, if you
+     have the .cgi files in /usr/local/apache2/cgi-bin/umls_similarity 
+     and the HTML files in /usr/local/apache2/htdocs/umls_similarity, 
+     then you  would set $doc_base to '../../umls_similarity'.  Note: 
+     this  variable is not (closely) related to Apache's DOCUMENT_ROOT 
+     setting.
+
+- umls_wps.cgi
+   * $remote_host should be the same as $remote_host for umls_similarity.cgi. 
+     $doc_base is the location of a style sheet (sim-style.css), which
+     is often the same as $doc_base in umls_similarity.cgi. 
+
+-umls_similarity_server.pl
+   * $doc_base is the location of a style sheet (sim-style.css), which
+     is the same as $doc_base in umls_similarity.cgi. The reason is 
+     because the directories containing required files for the icpropagation 
+     and vector measure files are in the same directory. 
+
+Step 3
+------
+Start umls_similarity_server.pl, by running:
+
+$ umls_similarity_server.pl
+
+A number of options are available for running the server. Please see the
+documentation of umls_similarity_server.pl for more information on this. 
+This utility should be installed along with all the other utilities as 
+part of the installation of the UMLS::Similarity package.
+
+COPYRIGHT
+---------
+
+Copyright (c) 2010-2011, Ted Pedersen and Bridget T. McInnes and 
+Jason Michelizzi
+
+This distribution is free software; you may redistribute and/or modify it
+under the terms of the GNU General Public License, version 2 or, at your
+option, any later version.
+
+SEE ALSO
+--------
+http://groups.yahoo.com/group/umls-similarity/
+

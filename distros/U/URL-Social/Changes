@@ -1,0 +1,25 @@
+0.07    2014-05-22
+        - Tests will now use local data instead of querying the services.
+        - Removed caching functionality; not this module's job.
+        - Improved the documentation.
+
+0.06    2013-03-20
+        - Now depends on Moose instead of Mouse.
+        - Improved the documentation.
+
+0.05    2013-03-19
+        - Added support for Reddit.
+
+0.04    2013-03-19
+        - Changed default cache expiration to 3 minutes.
+        - SHA-encode URLs (for cache keys).
+            - Added Digest::SHA 5.84 as requirement.
+
+0.03    2013-03-19
+        - Removed unnecessary output to STDERR.
+
+0.02    2013-03-19
+        - Added caching of URL requests.
+
+0.01    2013-03-19
+        - Initial release.

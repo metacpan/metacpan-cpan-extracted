@@ -1,0 +1,73 @@
+1.02 - 2006/05/05 kurt@umleta.com
+  - Model reflection implemented with XMI (no more Storeable errors).
+  - Bootstrapping uses 3 passes to generate gen/perl:
+    - Fully test model introspection during bootstrap
+  - Preliminary MOF 1.3 and MOF 1.4.1 support:
+    - Need Reference implementation (and code generation).
+  - Preliminary XMI 1.1 support.
+  - UMMF::Import::UMMFModel, UMMF::Core::Builder: 
+    - Added <<metaclass>> support to UMMF::Import::UMMFModel.
+    - Added prelim MOF syntax support.
+    - confess() on parser errors.
+  - AssocClassLink multiplicities of generated AssociationEnds is now "1".
+  - TaggedValues for model versions and XMI defaults supported.
+  - "package" visibility is notated as '~'
+  - UMMF::Export::XMI:
+    - Added XMI.model, XMI.metamodel, XMI.metametamodel tags.
+    - Added XMI.field support for lists of SCALARs.
+  - "make bootstrap" no long runs ummf_install.pl for required modules.
+
+1.01 - 2005/04/12 kstephens@users.sourceforge.net
+  - Completely reworked lib/perl/UMMF namespace in 1.1 repository 
+      in preparation for multiple meta-models
+      NOTE: 1.0 repo is now obsolete.
+  - Generated UML metamodel is now named "UMMF::UML_1_5".
+  - Boot strapping UML metamodel is now named "UMMF::Boot::MetaModel".
+  - bin/ummf.pl: added "-M metamodel" switch for bootstrapping.
+  - bin/ummf.pl: added "-l module" option for applying configuration modules
+      (see example/ex1/build.sh).
+  - Added more complete Tangram usage example
+      (see example/ex1).
+  - Cleaned up examples/ex2 java code generation.
+  - Added transaction support to Tangram::Storage 
+      (see run_in_transaction()).
+  - Fixed Tangram flat_array table column names
+      (see example/ex1)
+
+0.26 - 2005/01/01 kstephens@users.sourceforge.net
+  - Fixes for java code generation.
+  - Now generates compilable UML-1.5 implementation in java.
+
+0.25 - 2004/07/31 kstephens@users.sourceforge.net
+  - Use underscored names in Perl and Java template.
+  - Search resource paths for templates.
+  - Builds CPAN modules (see cpan/)
+
+0.24 - 2004/05/17 kstephens@users.sourceforge.net
+  - Force "-1" Multiplicities to be "*".
+  - Sort AssociationEnds by name in template to reduce code changes 
+      between UML changes.
+  - Added support for switching between multiple Perl::Tangram::Storage objects.  - Fixed index generation for intrusive collection id columns.
+  - get_or_error(): better error reporting.
+  - Metamodel: State_Machines::Event is now subclass of ModelElement;
+      was causing problems with Poseidon State Machine diagrams with CallEvents.  - Sort by table when generating Tangram indices.
+
+0.23 - 2004/04/19 kstephens@users.sourceforge.net
+  - Added DProf support
+  - Cache use and constant value function evals in use_alias;
+  - Reuse __ummf_array_*() code.
+  - Enhanced performance during XMI import for Unimplemented meta-objects.
+  - Tangram-related changes:
+    - Added Tangram deploy method callbacks.
+    - Added UMMF_STORAGE_SCHEMA_PKG_FILTER support for ignore packages during
+      schema compilation.
+    - Fixed minor SQL errors.
+    - Added Storage $cls->get*() cache flush after update() or insert(). 
+    - Added Schema and Schema hash caching.
+    - Added host and port DB connection configuration options.
+    - Added $storage->update_or_insert(@objs).
+    - Added test for ambigous $cls->get*().
+    - Added storage configuration callbacks.
+    - Added $cls->get_or_init(\%key, \%init) useful for deploy method callbacks.    - Added $cls->get_force(%keys).
+
+$Id: Changes,v 1.9 2006/05/14 01:40:03 kstephens Exp $

@@ -1,0 +1,95 @@
+Revision history for Perl extension Unix::PID.
+
+0.23  Mon Apr  4 16:01:10  2011
+    - option to wait  between kill and re-check
+    
+0.22  Fri Dec 24 11:07:12  2010
+    - rt 64190: fix broken regex, thanks mcartmell!
+    - rt 59366: fix return value logic, thanks galumph!
+    - rt 57634: is_pid_running() use /proc if available , thanks GWADEJ!
+    
+0.21  Tue May 18 10:31:47 2010
+    - make open3 error handle a glob ref so it is not duped into the read handle (duh!)
+    - Memory pedantic system fixups:
+       - make use of open3 optional
+       - comment out strict and warnings (should still run under them)
+       - put POD in different file (doesn't really gain anything, mainly for easing worried minds)
+  
+0.20  Thu May 13 08:03:15 2010
+    - pidfile END block only unlink if PID in file is $$ (so fork()s won't bork a process not their own via END copy)
+    - start doing changelog top down
+
+[ -- pre 0.20 changes -- ]
+    
+0.0.1  Thu Nov 17 11:27:19 2005
+	- original version; created by h2xs 1.22 with options
+		-AXc -n Unix::PID
+
+0.0.2  Fri Nov 18 21:33:14 2005
+	- fixed up POD a bit
+	- added wait_for_pidsof()
+
+0.0.3  Fri Dec  9 17:30:07 2005
+	- added is_*running methods
+
+0.0.4  Thu Dec 15 23:51:24 2005 
+	- added pid_file()
+
+0.0.5  Sat Dec 17 14:00:10 2005
+        - added "use Unix::PID 'pid_file';" funtionality
+        - fixed up pid_file() to work with multipe pid_file calls to the same file using $$ and !$$ pids
+
+0.0.6  Sun Dec 18 07:57:13 2005
+	- minor POD fix
+	
+0.0.7  Thu Nov  9 10:44:38 2006
+    - added kill() and pid_file_no_unlink()
+
+0.0.8  Thu Nov  9 14:31:42 2006
+	- added kill_pid_file() and kill_pid_file_no_unlink()
+
+0.0.9  Thu Nov 10 14:31:42 2006
+	- fixed mistake in kill_pid_file()
+	
+0.0.10  Mon Nov 13 17:28:21 2006
+    - added -e $pidfile when $rc was good before unlink to avoid spurious -1
+
+0.0.11 Sat Feb 10 22:30:11 2007
+	- added pid_list key to wait_for_pidsof() 
+	- added HiRes support, array ref support, and Fibonacci support to wait_for_pidsof()'s 'sleep_for'
+	- added a local()ized ignore of SIG CHLD before open3() call
+	- added non_blocking_wait()
+	
+0.0.12 Fri Sep 28 16:15:11 2007
+	- added pid_info*() ( seems sooo obvious now... )
+	- improve is_pid_running() by having it now use pid_info*()
+	- xms'd a few regex's
+	
+0.0.13 Fri Sep 28 19:29:23 2007
+	- spiffed up is_pid_running() return value and call from 0.0.12
+	
+0.0.14 Thu Apr 10 18:09:35 2008
+    - make kill() more portable
+    
+0.0.15 Fri Apr 11 10:59:55 2008
+    - fixed 0.4 reverse logic on kill() return
+
+0.16  Fri Apr  09 08:37:26 CDT 2010
+    - changed version number to simple decimal
+    - make pid file setup more robust
+    - remove Class::Std dependency
+    - perltidy
+    - added missing waitpid() after open3()
+
+0.17  on Apr 12 12:22:59 CDT 2010
+    - only do END block pid file removal if we successfully setup file for our PID (thanks GWADEJ)
+
+0.18  Tue May  4 23:06:31 2010
+    - Happy Star Wars day, May the 4th be with you!
+    - rt 57199 TODOs: added get_pid_from_pidfile() and is_pidfile_running()
+    - POD comment clarification, typo fix
+    
+0.19
+    Add 'minimum_pid' support
+    have is_pid_running use kill 0 instead of ps when we are root
+    Qualify kill() calls to CORE::kill() when appropriate

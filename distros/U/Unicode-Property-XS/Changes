@@ -1,0 +1,17 @@
+Revision history for Perl extension Unicode::Property::XS.
+0.81  Jan 2009
+    - Update tests for Perl 5.10
+      Fix the range of legal codes.
+
+0.80  Jan 2009
+    - Update the unicode property sources from Perl 5.10.0
+      It still runs on 5.8 but since there are some updates in 5.10, 
+      The regex in form \p{ } on 5.8 will not match the (newer) data in this package.
+  
+0.71  Apr 2008
+    - First Release.
+
+0.01  Fri Feb 15 22:20:11 2008
+	- original version; created by h2xs 1.23 with options
+		-A -n Unicode::Property::XS
+

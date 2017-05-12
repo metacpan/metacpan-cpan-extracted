@@ -1,0 +1,170 @@
+NAME
+    URL::Transform - perform URL transformations in various document types
+
+SYNOPSIS
+        my $output;
+        my $urlt = URL::Transform->new(
+            'document_type'      => 'text/html;charset=utf-8',
+            'content_encoding'   => 'gzip',
+            'output_function'    => sub { $output .= "@_" },
+            'transform_function' => sub { return (join '|', @_) },
+        );
+        $urlt->parse_file($Bin.'/data/URL-Transform-01.html');
+
+        print "and this is the output: ", $output;
+
+DESCRIPTION
+    URL::Transform is a generic module to perform an url transformation in a
+    documents. Accepts callback function using which the url link can be
+    changed.
+
+    There are different modules to handle different document types, elements
+    or attributes:
+
+    `text/html', `text/vnd.wap.wml', `application/xhtml+xml',
+    `application/vnd.wap.xhtml+xml'
+        URL::Transform::using::HTML::Parser, URL::Transform::using::XML::SAX
+        (incomplete was used only to benchmark)
+
+    `text/css'
+        URL::Transform::using::CSS::RegExp
+
+    `text/html/meta-content'
+        URL::Transform::using::HTML::Meta
+
+    `application/x-javascript'
+        URL::Transform::using::Remove
+
+    By passing `parser' option to the `URL::Transform->new()' constructor
+    you can set what library will be used to parse and execute the output
+    and transform functions. Note that the elements inside for example
+    `text/html' that are of a different type will be transformed via
+    default_for($document_type) modules.
+
+    `transform_function' is called with following arguments:
+
+        transform_function->(
+            'tag_name'       => 'img',
+            'attribute_name' => 'src',
+            'url'            => 'http://search.cpan.org/s/img/cpan_banner.png',
+        );
+
+    and must return (un)modified url as the return value.
+
+    `output_function' is called with (already modified) document chunk for
+    outputting.
+
+PROPERTIES
+        content_encoding
+        document_type
+        parser
+        transform_function
+        output_function
+
+    parser
+        For HTML/XML can be HTML::Parser, XML::SAX
+
+    document_type
+            text/html - default
+
+    transform_function
+        Function that will be called to make the transformation. The
+        function will receive one argument - url text.
+
+    output_function
+        Reference to function that will receive resulting output. The
+        default one is to use print.
+
+    content_encoding
+        Can be set to `gzip' or `deflate'. By default it is `undef', so
+        there is no content encoding.
+
+METHODS
+  new
+    Object constructor.
+
+    Requires `transform_function' a CODE ref argument.
+
+    The rest of the arguments are optional. Here is the list with defaults:
+
+        document_type       => 'text/html;charset=utf-8',
+        output_function     => sub { print @_ },
+        parser              => 'HTML::Parser',
+        content_encoding    => undef,
+
+  default_for($document_type)
+    Returns default parser for a supplied $document_type.
+
+    Can be used also as a set function with additional argument - parser
+    name.
+
+    If called as object method set the default parser for the object. If
+    called as module function set the default parser for a whole module.
+
+  parse_string($string)
+    Submit document as a string for parsing.
+
+    This some function must be implemented by helper parsing classes.
+
+  parse_chunk($chunk)
+    Submit chunk of a document for parsing.
+
+    This some function should be implemented by helper parsing classes.
+
+  can_parse_chunks
+    Return true/false if the parser can parse in chunks.
+
+  parse_file($file_name)
+    Submit file for parsing.
+
+    This some function should be implemented by helper parsing classes.
+
+  link_tags
+        # To simplify things, reformat the %HTML::Tagset::linkElements
+        # hash so that it is always a hash of hashes.
+
+    # Construct a hash of tag names that may have links.
+
+  js_attributes
+    # Construct a hash of all possible JavaScript attribute names
+
+  decode_string($string)
+    Will return decoded string suitable for parsing. Decoding is chosen
+    according to the $self->content_encoding.
+
+    Decoding is run automatically for every chunk/string/file.
+
+  encode_string($string)
+    Will return encoded string. Encoding is chosen according to the
+    $self->content_encoding.
+
+    NOTE if you want to have your content encoded back to the
+    $self->content_encoding you will have to run this method in your code.
+    Argument to the `output_function()' are always plain text.
+
+  get_supported_content_encodings()
+    Returns hash reference of supported content encodings.
+
+benchmarks
+        Benchmark: timing 10000 iterations of HTML::Parser    , XML::LibXML::SAX, XML::SAX::PurePerl...
+        HTML::Parser      :  3 wallclock secs ( 2.41 usr +  0.04 sys =  2.45 CPU) @ 4081.63/s (n=10000)
+        XML::LibXML::SAX  : 29 wallclock secs (27.22 usr +  0.11 sys = 27.33 CPU) @ 365.90/s (n=10000)
+        XML::SAX::PurePerl: 192 wallclock secs (180.62 usr +  0.50 sys = 181.12 CPU) @ 55.21/s (n=10000)
+
+TODO
+    There are urls in `pics' meta tag: `<meta http-equiv="pics-label"
+    content=" ...'. See http://www.w3.org/PICS/.
+
+SEE ALSO
+    HTML::Parser, URL::Transform::using::HTML::Parser
+
+AUTHOR
+    Jozef Kutej `<jkutej at cpan.org>'
+
+LICENSE AND COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

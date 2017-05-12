@@ -1,0 +1,99 @@
+#!/usr/bin/perl
+# Copyright (c) 2014  Timm Murray
+# All rights reserved.
+# 
+# Redistribution and use in source and binary forms, with or without 
+# modification, are permitted provided that the following conditions are met:
+# 
+#     * Redistributions of source code must retain the above copyright notice, 
+#       this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright 
+#       notice, this list of conditions and the following disclaimer in the 
+#       documentation and/or other materials provided with the distribution.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+# POSSIBILITY OF SUCH DAMAGE.
+use v5.14;
+use warnings;
+use UAV::Pilot::Driver::ARDrone;
+use Getopt::Long;
+
+my $HOST         = '192.168.1.1';
+my $PORT         = UAV::Pilot::ARDrone::Driver->ARDRONE_PORT_COMMAND;
+my $SSID         = undef;
+my $MODE_AP      = 0;
+my $MODE_JOIN    = 0;
+my $MODE_STATION = 0;
+my $OWNER_MAC    = undef;
+GetOptions(
+    'host=s'      => \$HOST,
+    'port=i'      => \$PORT,
+    'ssid=s'      => \$SSID,
+    'join'        => \$MODE_JOIN,
+    'ap'          => \$MODE_AP,
+    'station'     => \$MODE_STATION,
+    'owner-mac=s' => \$OWNER_MAC,
+);
+
+
+my $ardrone = UAV::Pilot::ARDrone::Driver->new({
+    host => $HOST,
+    ($PORT ? (port => $PORT) : ()),
+});
+$ardrone->connect;
+
+$ardrone->at_config(
+    $ardrone->ARDRONE_CONFIG_NETWORK_SSID_SINGLE_PLAYER,
+    $SSID,
+) if defined $SSID;
+
+my $mode_setting =
+    $MODE_JOIN    ? $ardrone->ARDRONE_CONFIG_NETWORK_WIFI_MODE_JOIN    :
+    $MODE_AP      ? $ardrone->ARDRONE_CONFIG_NETWORK_WIFI_MODE_AP      :
+    $MODE_STATION ? $ardrone->ARDRONE_CONFIG_NETWORK_WIFI_MODE_STATION :
+    undef;
+$ardrone->at_config(
+    $ardrone->ARDRONE_CONFIG_NETWORK_WIFI_MODE,
+    $mode_setting,
+) if defined $mode_setting;
+
+$ardrone->at_config(
+    $ardrone->ARDRONE_CONFIG_NETWORK_OWNER_MAC,
+    $OWNER_MAC,
+) if defined $OWNER_MAC;
+
+
+__END__
+
+=head1 SYNOPSIS
+
+   uav_set_ssid \
+       --ssid 'bane_of_cats'
+       --host 192.168.1.1 \
+       --port 5557 \
+       --join    \  # Join a network in Ad-Hoc mode (default)
+       --ap      \  # UAV is the access point
+       --station \  # Join the network as a station
+       --owner-mac <00:00:00:00:00:00>
+
+=head1 DESCRIPTION
+
+Configure the network settings for the AR Parrot UAV.
+
+B<NOTE>: The AR Parrot must be restarted before the changes take effect.
+
+If none of the settings C<--join>, C<--ap>, or C<--station> are set, the UAV is left 
+with its current setting.
+
+You can set C<--owner-mac> to C<00:00:00:00:00:00> to unpair the UAV.
+
+=cut

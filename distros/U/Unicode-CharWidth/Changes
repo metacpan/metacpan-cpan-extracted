@@ -1,0 +1,12 @@
+Revision history for Unicode-CharWidth
+
+1.01    2014-05-06 04:40:23
+        First version, released on an unsuspecting world.
+1.02 2014-05-06 13:52:57
+        Removed Devel::Dwarn from the distribution
+1.03 2014-11-11 00:27:07
+	Took care of a syntax warning in import
+1.04 2014-11-13 04:21:02
+	Removed trivial error from t/01-function.t
+1.05 2015-11-27 20:20:24
+	Fixed warnings when module was loaded more than once

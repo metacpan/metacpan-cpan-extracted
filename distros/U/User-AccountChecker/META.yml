@@ -1,0 +1,21 @@
+---
+abstract: 'I<Tools for user account checking in an Unix environment>'
+author:
+  - 'Eric Villard <evi@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: User-AccountChecker
+provides:
+  User::AccountChecker:
+    file: lib/User/AccountChecker.pm
+    version: 0.02
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

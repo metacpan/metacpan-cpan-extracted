@@ -1,0 +1,14 @@
+Casing.xs
+Changes
+lib/Unicode/Casing.pm
+LICENSE
+Makefile.PL
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+META.json
+META.yml
+ppport.h
+README
+t/01basic.t
+t/90turkish.t

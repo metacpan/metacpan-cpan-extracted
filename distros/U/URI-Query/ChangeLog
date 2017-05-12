@@ -1,0 +1,43 @@
+ChangeLog
+---------
+
+[2016-08-10]
+* Bump $VERSION to 0.16.
+* Add clone method via Clone.
+* Add trivial qstringify method stringify with leading '?'.
+
+[2015-11-18]
+* Convert to Dist::Zilla.
+
+[2015-11-03]
+* Bump $VERSION to 0.15; add Carp to prereqs.
+* Add strip_like method and unit tests.
+* Add changed attribute and has_changed() method and unit test.
+
+[2012-09-10]
+* Bump $VERSION to 0.10.
+* Remove value-based reordering in stringification.
+
+[2011-01-27]
+* Bump version to 0.09.
+* Change t/t05/default from symlink to dup, to avoid problems on windows etc.
+* Add ChangeLog to .gitignore.
+
+[2011-01-21]
+* Fix typo in URI::Query pod.
+* MANIFEST tweakage.
+* Add lots of nice pod.
+* Add support for cgi-packed-scalar-values, update unit tests.
+* Perldoc updates, and trailing whitespace pruning.
+* Add .gitignore; bump Test::More requirement to 0.88.
+* Add _init_from_arrayref method to Query, and unescape keys/values.
+* Add unescaping of keys and values in parse_qs, and unit test.
+* Remove all old arch-tags.
+
+[2010-01-20]
+* Upgrade use of uri_escape to uri_escape_utf8; bump version to 0.07.
+
+[2007-09-11]
+* Sort output hash key order for deterministic testing; bump to version 0.06.
+* Initial import, version 0.05.
+

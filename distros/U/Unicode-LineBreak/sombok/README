@@ -1,0 +1,60 @@
+==========================================
+Sombok - Unicode Text Segmentation Package
+==========================================
+
+Sombok is Copyright (C) 2009-2014, by Hatuka*nezumi - IKEDA Soji.
+
+It is free software; you can redistribute it and/or modify it under the 
+terms of either:
+
+a) the GNU General Public License as published by the Free Software 
+   Foundation; either version 1, or (at your option) any later version, 
+   or
+
+b) the "Artistic License".
+
+----
+
+See the COPYING and the ARTISTIC files for more details.
+
+What is this
+============
+
+Sombok library package performs Line Breaking Algorithm described in 
+Unicode Standard Annex #14 (UAX #14).  East_Asian_Width informative 
+properties defined by Annex #11 (UAX #11) may be concerned to determin 
+breaking positions.  This package also implements "default" Grapheme 
+Cluster segmentation described in Annex #29 (UAX #29).
+
+Getting Sombok
+==============
+
+You can get Sombok from:
+    https://github.com/hatukanezumi/sombok.git
+
+Installing
+==========
+
+See INSTALL.
+
+Name
+====
+
+"Sombok" (or "sambak") is Korean onomatopeic word to represent "cutting
+cleanly".  It is not connected to Khmer word "sombok" nor Afrikaans word
+"sjambok".
+
+Language bindings
+=================
+
+Perl
+    Unicode-LineBreak: http://search.cpan.org/dist/Unicode-LineBreak/
+
+Python
+    pytextseg: http://pypi.python.org/pypi/pytextseg/
+
+Author
+======
+
+Hatuka*nezumi - IKEDA Soji <hatuka(at)nezumi.nu>.
+

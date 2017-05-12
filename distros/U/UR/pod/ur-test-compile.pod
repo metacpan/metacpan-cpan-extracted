@@ -1,0 +1,48 @@
+
+
+=pod
+
+=head1 NAME
+
+ur test compile - Attempts to compile each module in the namespace in its own process.
+
+
+
+=head1 VERSION
+
+This document describes ur test compile version 0.29.
+
+=head1 SYNOPSIS
+
+ur test compile [CLASSES-OR-MODULES]
+
+ur test complie
+
+ur test compile Some::Module Some::Other::Module
+
+ur test complile Some/Module.pm Some/Other/Mod*.pm
+
+
+=head1 OPTIONAL ARGUMENTS
+
+=over
+
+
+=item CLASSES-OR-MODULES
+
+(undocumented)
+
+
+=back
+
+=head1 DESCRIPTION:
+
+  This command runs "perl -c" on each module in a separate process and aggregates results.
+  Running with --verbose will list specific modules instead of just a summary.
+  
+  Try "ur test use" for a faster evaluation of whether your software tree is broken. :)
+
+
+
+=cut
+

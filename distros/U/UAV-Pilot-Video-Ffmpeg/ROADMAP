@@ -1,0 +1,3 @@
+* Use Devel::CheckLib to look for ffmpeg 
+    * Replace Alien::ffmpeg?
+    * Or use ExtUtils::PkgConfig?

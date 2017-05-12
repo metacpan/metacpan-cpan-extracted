@@ -1,0 +1,24 @@
+---
+abstract: 'WebSocket support for URI package'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Test::More: 0
+  URI: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300038, CPAN::Meta::Converter version 2.132510'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: URI-ws
+requires:
+  URI: 0
+  perl: 5.006
+resources:
+  bugtracker: https://github.com/plicease/uri-ws/issues
+  homepage: http://perl.wdlabs.com/URI-ws/
+  repository: git://github.com/plicease/uri-ws.git
+version: 0.03

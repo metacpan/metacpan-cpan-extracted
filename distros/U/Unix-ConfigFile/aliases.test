@@ -1,0 +1,65 @@
+#ident	"@(#)aliases	1.13	92/07/14 SMI"	/* SVr4.0 1.1	*/
+
+##
+#  Aliases can have any mix of upper and lower case on the left-hand side,
+#	but the right-hand side should be proper case (usually lower)
+#
+#	>>>>>>>>>>	The program "newaliases" will need to be run after
+#	>> NOTE >>	this file is updated for any changes to
+#	>>>>>>>>>>	show through to sendmail.
+#
+#	@(#)aliases 1.8 86/07/16 SMI
+##
+
+# Following alias is required by the mail protocol, RFC 822
+# Set it to the address of a HUMAN who deals with this system's mail problems.
+Postmaster: root
+
+# Alias for mailer daemon; returned messages from our MAILER-DAEMON
+# should be routed to our local Postmaster.
+MAILER-DAEMON: postmaster
+
+# Aliases to handle mail to programs or files, eg news or vacation
+# decode: "|/usr/bin/uudecode"
+nobody: /dev/null
+
+
+# Alias for distribution list, members specified here:
+staff: anothertest,bonon,bozon,ecc,extent1,extent5,mckusick,moretests,mosher,
+	rwh@ernie,sam,test1,test3,wnj
+
+# Alias for distribution list, members specified elsewhere:
+#keyboards: :include:/usr/jfarrell/keyboards.list
+
+# Alias for a person, so they can receive mail by several names:
+#epa:eric
+
+#######################
+# Local aliases below #
+#######################
+
+root: :include:/lists/superusers
+webmaster: lwall,webby,webdude,webguy
+
+#
+# Aliases for Majordomo mailing lists
+#
+majordomo: "|/usr/local/majordomo/wrapper majordomo"
+owner-majordomo: bigguy
+majordomo-owner: bigguy
+
+# Aliases for mylist-l list
+mylist-l: "|/usr/local/majordomo/wrapper resend -l mylist-l mylist-l-list"
+mylist-l-list: :include:/usr/local/majordomo/lists/mylist-l
+owner-mylist-l: bigguy,foobar
+mylist-l-request: "|/usr/local/majordomo/wrapper majordomo -l mylist-l"
+mylist-l-approval: bigguy
+
+# Aliases for yourlonglist-l list
+yourlonglist-l: "|/usr/local/majordomo/wrapper resend -l yourlonglist-l yourlonglist-l-list"
+yourlonglist-l-list: :include:/usr/local/majordomo/lists/yourlonglist-l
+owner-yourlonglist-l: bigguy,foobar
+yourlonglist-l-request: "|/usr/local/majordomo/wrapper majordomo -l yourlonglist-l"
+yourlonglist-l-approval: bigguy
+# Funny guys
+stooges: curly,larry,moe

@@ -1,0 +1,614 @@
+NAME
+    UMLS::Similarity CHANGES
+
+  Changes from version 1.45 to 1.47
+    1. Added error checking for feature measures
+
+  Changes from version 1.43 to 1.45
+    1. Added error checking to the new measures.
+
+  Changes from version 1.41 to 1.43
+    1. Added the following similarity measures:
+
+        a. Pekar and Staab (2002) referred to as pks
+
+        b. Pirro and Euzenat (2010) referred to as faith
+
+        c. Maedche and Staab (2001) referred to as cmatch
+
+        d. Batet, et al (2011) referred to as batet
+
+        e. Sanchez, et al. (2012) referred to as sanchez
+
+  Changes from version 1.39 to 1.41
+    1. revision to include Makefile.PL
+
+  Changes from version 1.37 to 1.39
+    1. modified an umls-similarity for the closeness error
+
+  Changes from version 1.35 to 1.37
+    1. updated umls-similarity.pl to include the upath measure
+
+    2. add the upath.pm module
+
+  Changes from version 1.33 to 1.35
+    1. updated test case config files for the SNOMEDCT name change
+
+    2. updated the web documents to account for the name change as well
+
+  Changes from version 1.31 to 1.33
+    1. ensure that jcn returns 1 if both concepts are equal
+
+  Changes from version 1.29 to 1.31
+    1. updated --intrinsic option to umls-similarity.pl and the IC measure
+    modules to store the parameters required to calculate Intrinisic IC in
+    the index rather than done on the fly. To do them on the fly you can use
+    the --realtime option
+
+  Changes from version 1.27 1.29
+    1. added --intrinsic option to umls-similarity.pl and the IC measure
+    modules to allow for the Intrinisic IC to be used rather than the corpus
+    based IC.
+
+  Changes from version 1.25 to 1.27
+    1. updated documentation
+
+  Changes from version 1.23 to 1.25
+    1. updated documentation
+
+    2. modified umls-similarity.pl to return an error if the icfrequency
+    information does not match the configuration file -- similar to what we
+    do with the icpropagation option
+
+  Changes from version 1.21 to 1.23
+    1. modified query-umls-similarity-webinterface.pl to return -1 when one
+    or both input terms/cuis is unknown.
+
+  Changes from version 1.19 to 1.21
+    1. added a --loadcache and --getcache option to speed things up if
+    desired
+
+  Changes from version 1.17 to 1.19
+    1. added a --word option to sim2r.pl in order to use it with files that
+    do not contain CUIs as the term pairs.
+
+  Changes from version 1.15 to 1.17
+    1. added the measure proposed by Zhong, et al 2002 to the
+    UMLS::Similarity package. You can use it by using the --measure zhong
+    option in the umls-similarity.pl program. I will add this to the web
+    interface shortly. If you are in a hurry though, let me know :-)
+
+  Changes from version 1.13 to 1.15
+    1. added the --original option which will return the original distance
+    score between the two cuis rather than the similarity score (this is for
+    nam, cdist and jcn)
+
+    2. fixed cdist and nam to return a -1 for lack of sufficient path
+    information
+
+  Changes from version 1.11 to 1.13
+    1. modified the query-umls-similarity-webinterface.pl to retry the query
+    if an error is thrown due to a busy server rather than just return
+    ()<>()
+
+  Changes from version 1.09 to 1.11
+    1. modified the synopsis code in the measures
+
+    2. modified the web documentation
+
+    3. included the icpropagation and vectorfiles in the distribution for
+    the web interface
+
+    4. added a --url option to the query-umls-similarity-webinterface.pl
+    program.
+
+  Changes from version 1.07 to 1.09
+    1. added the --st option to create-icfrequency and create-icpropagation
+    to propagation semantic types to find their probability using the is-a
+    heirarchy in the semantic network
+
+    2. added the --st option to umls-similarity.pl for the Resnik (res)
+    measure - this will return the information content of the semantic type
+    of the two concepts least common subsumer
+
+  Changes from version 1.05 to 1.07
+    1. added the query-umls-similarity-webinterface.pl program to
+    automatically query the web interface
+
+    2. added default vectormatrix and vectorindex files if they are not
+    specified on the command line
+
+    3. added default icpropagation information to the icpropagation
+    similarity measures if the --icpropagation or --icfrequency options are
+    not specified on the command line
+
+    4. updated the web interface to include OMIM
+
+  Changes from version 1.03 to 1.05
+    1. modified the .pm modules and umls-similarity.pl program to account
+    for the changes in the UMLS::Interface API which now passes all array
+    information back by reference.
+
+  Changes from version 1.01 to 1.03
+    1. Fixed umls-similarity.pl - it was printing out all possible senses of
+    a term pair if one of the terms didn't exists. Now it just prints out
+    one unless the --allsenses option is used.
+
+  Changes from version 0.99 to 1.01
+    1. Added a --word option to spearmans.pl to use for input files that do
+    not consist of CUIs and/or are not in the umls-similarity.pl output
+    format
+
+  Changes from version 0.97 to 0.99
+    1. modified the umls_similarity_server.pl program to account for spaces
+    in the preferred term when a CUI is entered
+
+    2. modified the umls_similarity_server.pl program to include showing the
+    shortest path between the concepts and their definitions if they exist
+    in the view of the UMLS that is specified at the SAB.
+
+  Changes from version 0.95 to 0.97
+    1. updated the --debugfile option print out the concept's definition
+    after --dbouledef, --compoundfile, --stoplist, --defraw, --stem options.
+
+    2. fix the bug when use --dictfile and --config together, if a word is
+    not in UMLS, it will check the dictfile.
+
+  Changes from version 0.93 to 0.95
+    1. modified the check to see if a concept exists when using the vector
+    or lesk measure - it was checking the existence based on the SAB/REL
+    parameters rather than the SABDEF/RELDEF
+
+  Changes from version 0.91 to 0.93
+    1. updated the --metamap option in create-icfrequency.pl to require the
+    year (version) of metamap that is being used in order to call it on the
+    command line.
+
+    2. modified the umls-similarity.pl program to obtain the CUIs of terms
+    from a different function when using the lesk or vector measures (this
+    is due to the config options).
+
+  Changes from version 0.89 to 0.91
+    1. modified documentation
+
+    2. fixed an error in the output of the umls-similarity.pl program
+
+    3. stipulated the --realtime option can only be used with the similarity
+    measures and modified the tests accordingly
+
+    4. turned back on the error checking - not certain why I had it off
+
+    5. added error.t test to check the ErrorHandler.pm module
+
+  Changes from version 0.85 to 0.89
+    1. Added the web interface scripts
+
+  Changes from version 0.85 to 0.87
+    1. Modified the documentation in jcn.pm, vector.pm and lesk.pm
+
+    2. update vector-input.pl
+
+  Changes from version 0.83 to 0.85
+    1. Add --doubledef document in vector.pm and lesk.pm
+
+  Changes from version 0.81 to 0.83
+    1. Add --doubledef in vector.pm and lesk.pm
+
+  Changes from version 0.79 to 0.81
+    1. added the --compoundfile option for vector
+
+    2. added the --dictfile option for vector
+
+  Changes from version 0.77 to 0.79
+    1. I am testing a new measure and forgot to it from umls-similarity
+
+  Changes from version 0.75 to 0.77
+    1. there was an error in the umls-similarity.pl program. I was messing
+    around with a new measure and forgot to remove its reference
+
+    2. updated documentation
+
+  Changes from version 0.73 to 0.75
+    1. modified umls-similarity with the --compoundfile option for lesk and
+    vector
+
+    2. modified lesk and vector to accept compound words
+
+    3. fixed a small output error in umls-similarity when no similarity is
+    found between two concepts
+
+    4. added the --compoundify option to icfrequency
+
+  Changes from version 0.71 to 0.73
+    1. added the undirected option to umls-similarity for the path measure
+
+  Changes from version 0.69 to 0.71
+    1. modified cdist and nam to use findShortestPathLength
+
+    2. added developers-check to t/ directory
+
+  Changes from version 0.67 to 0.69
+    1. added a --precision option to spearmans.pl and set the default to
+    four.
+
+    2. updated jcn to return a -1 if thre is no lcs or the IC of the lcs is
+    zero
+
+    3. modified the path based measures to use findShortestPathLength rather
+    than findShortestPath
+
+  Changes from version 0.65 to 0.67
+    1. umls-similarity outputs the preferred term of a CUI rather than
+    randomy picking one of the associated terms
+
+    2. the path measures return 1 if the CUIs are the same prior to going
+    out and finding the shortest path
+
+    3. modified umls-similarity.pl to allow the --config option to be used
+    with the '--measure random' option.
+
+    4. fixed the dictfile errors for lesk and vector
+
+    5. modified the ic measures to return a -1, if the IC of the CUIs (or
+    their LCS) is 0. The idea is that there is not enough information to
+    determine their similarity.
+
+    6. modified vector and lesk to return a -1, if the definition or vector
+    is empty. Again, the idea is that there isnot enought information to
+    determine their similarity.
+
+  Changes from version 0.63 to 0.65
+    1. modified the documentation for the lesk and vector measure
+
+    2. added the ST option to RELDEF
+
+    3. fixed small warnings/errors in the modules
+
+    4. fixed the synopsis code so they should run properly
+
+    6. Added the total number of concepts to the icfrequency and
+    icpropagation files
+
+  Changes from version 0.61 to 0.63
+    1. Modified the --dictfile option for the lesk and vector measures.
+
+    This is a dictionary file for the vector measure. It contains the
+    'definitions' of a concept or term which would be used rather than the
+    definitions from the UMLS. If you would like to use dictfile as a
+    augmentation of the UMLS definitions, then use the --config option in
+    conjunction with the --dictfile option.
+
+    The expect format for the --dictfile file is:
+
+    CUI: <definition> CUI: <definition> TERM: <definition> TERM:
+    <definition>
+
+    Keep in mind, when using this file with the --config option, if one of
+    the CUIs or terms that you are obtaining the similarity for does not
+    exist in the file the vector or lesk will return -1.
+
+  Changes from version 0.59 to 0.61
+    1. modified create-icfrequency to run faster - the new change really
+    slowed things down
+
+  Changes from version 0.57 to 0.59
+    1. modified the create-icfrequency to only tag CUIs to the terms/words
+    in the data that exist in the set of sources/ relations in the
+    configuration file
+
+    2. updated documentation - specifically the configuration options and
+    propagation
+
+  Changes from version 0.55 to 0.57
+    1. added propagation files to the t/options directory
+
+    2. revised errorchecking w.r.t. propagation
+
+  Changes from version 0.53 to 0.55
+    There was an errorhandler mistake when no config option was defined.
+    This has been fixed.
+
+  Changes from version 0.51 to 0.53
+    1. add configuration checking for the modules
+
+    2. check the number of tests planned for the long tests. It looks like
+    they didn't get updated
+
+    3. increment the modules by 2
+
+    4. fix long tests
+
+        plan skip_all => "Lengthy Tests Disabled - set UMLS_SIMILARITY_RUN_ALL
+        to run this test suite\n"
+        unless defined $ENV{UMLS_SIMILARITY_RUN_ALL} and
+        $ENV{UMLS_SIMILARITY_RUN_ALL}==1;
+
+        rather than what I have.
+
+    5. add --smooth option
+
+    6. document how the smoothing is done in the perldoc
+
+    7. create-icfrequency.pl [PLAINTEXT|DIRECTORY] ICFREQUENCY_FILE Options:
+    --term --metamap
+
+    8. create-icpropagation.pl ICFREQUENCY_FILE ICPROPAGATION_FILE Options:
+    --smooth --config CONFIGURATION_FILE
+
+    9. Note: add time stamp to count.pl output for default output file name
+    in create-propagation-count.pl
+
+    10. released the lesk measure!!!
+
+    11. added the --stem option in the vector measure - this option is also
+    available in lesk
+
+    12. add regular expression stoplist support to vector - this option is
+    also available in lesk
+
+  Changes from version 0.49 to 0.51
+     1. modified the create-propagation-file.pl to be a bit
+        more robust in order for it to accepting a file with 
+        spaces when using the --icfrequency option.
+
+     2. added remove of the output file in create-propgation-file.t
+        prior to actually running the test
+
+     3. added a check in jcn that returns 0 if the distance is equal
+        to 0 <- not certain why I didn't have that in there.
+
+     4. add --precision option to create-propagation-file.pl
+
+     5. add check to make certain that that the .t programs can only
+        be called in the main directory
+
+     6. add a check so that the make test long environment variable
+        has to equal 1 - it won't run if it equals 0
+
+     7. remove the output directory prior to running in order be certain 
+        they are removed
+
+     8. add --precision option to create-propagation-file.pl
+
+     9. change mkpath and rmtree to make_path() and remove_tree() in the 
+        .t files
+
+  Changes from version 0.47 to 0.49
+    Note: the make test longs are not working properly on all of the
+    systems.
+
+     1. added documentation on how to create propagation file 
+        for the the ic measure's 
+
+     2. add a more complete configuration file in the samples directory
+
+     3. add --stoplist in vector method
+
+     4. modified the umls-similarity package for consistency with
+        the new UMLS-Interface. We wanted to remove some of the 
+        redundancy in the package which meant modifying this 
+        package. The package is now not back compatible with 
+        older versions of the UMLS-Interface package.
+
+  Changes from version 0.45 to 0.47
+    1. updated documentation
+
+    2. added to the --dictfile option the ability to have TERMS not just
+    CUIs as input.
+
+  Changes from version 0.43 to 0.45
+    1. Fixed some small errors that went out due to lesk
+
+    2. Updated pod documentation
+
+    3. Added README to samples/
+
+    4. Renamed --matrixfile to --vectormatrix Renamed --indexfile to
+    --vectorindex Renamed --propagationfile to --icpropagation
+
+    5. Added the --defraw option for lesk and vector. This will stop any
+    cleaning that is done to the definition prior to use.
+
+    6. Created a create-propagation-file.pl program to create a file
+    containing the information content of the CUIs in a specified set of
+    sources to be used by umls-similarity when using the information content
+    semantic similarity measures.
+
+    7. Created testing file vector-input.t add bigrams input file under
+    t/tests/utils add index and matrix files under t/key/static
+
+    8. Added the --defraw option to vector.pm. If this option is set it will
+    NOT clean the definition otherwise the words in the definition are
+    cleaned up (ie remove punctuation, lower case, ...)
+
+    9. Created testing file create-propagation-file.t
+
+  Changes from version 0.41 to 0.43
+    Modified documentation and cleaned up the package
+
+    Updated the vector.pm that the vector method read the index file and
+    co-occurrence matrix from the command line.
+
+    Added the --dictfile options to read the definitions from a text file.
+    Each line is a definition. def1: the first definition def2: the second
+    definition
+
+    Added the --debugfile options. It can print the definition of each
+    concept and the vector (words) of every word covered by the
+    co-occurrence matrix.
+
+    Added the vector-input.pl. This file generates the index file and
+    co-occurrence matrix file from the bigrams list for vector measure use.
+
+    Added test cases for each of the measures in the t/ directory
+
+    Added a samples/ directory which contains examples of the configuration
+    file, matrix and index files for the vector measure, and propagation
+    file for the information content measures.
+
+  Changes from version 0.39 to 0.41
+        Modified documentation and cleaned up the package
+
+  Changes from version 0.37 to 0.39
+    Updated the way that the lcs and shortestpath was being done in
+    UMLS-Interface. There were some complications.
+
+    Added the vector.pm module and the def.pm module
+
+    Added the --measure vector option to umls-similarity.
+
+  Changes from version 0.35 to 0.37
+    I messed up when modifying the way the lcs and shortestpath information
+    was obtained in UMLS-Similarity after I had changed it in
+    UMLS-Interface. It should all be fixed now.
+
+    I also removed the vector and lesk measures. We are not quite ready for
+    those and are in the process of getting them together for a fresh
+    release.
+
+    I changed the Jiang and Conrath measure from jnc to jcn like it is
+    suppose to be
+
+  Changes from version 0.33 to 0.35
+    1. Modified the way lcs and shortestpath information is returned by the
+    UMLS-Interface. Needed to modify the UMLS-Similarity to reflect these
+    changes
+
+  Changes from version 0.31 to 0.33
+    1. Modified the propogation in UMLS-Interface and needed to reflect this
+    in UMLS-Similarity
+
+  Changes from version 0.29 to 0.31
+    1. Added the information content measures proposed by Resnik (1995),
+    Jiang and Conrath (1997) and Lin (1998), as well as a random measure
+    that returns a random number between one and zero as the similarity
+    score.
+
+    2. Added a --debug option which prints out UMLS-Interface informatin for
+    debugging purposes
+
+  Changes from version 0.21 to 0.29
+    I used the following require command:
+
+        require "UMLS::Similarity::vector"
+
+    rather than
+
+        require "UMLS/Similarity/vector.pm";
+
+    Not certain what I was thinking ...
+
+  Changes from version 0.19 to 0.21
+    I fixed (for certain this time) how the modules are installed in the
+    umls-similarity.pl program in the utils/ directory. It should not
+    require BerkeleyDB now unless you are running the
+    UMLS::Similarity::vector measure.
+
+    For documentation puposes:
+
+            'use' loads the package at compile time
+
+    where as
+
+            'require' loads the package at run time
+
+    Here is some documentation on it:
+
+    <http://perldoc.perl.org/perlfaq8.html#What's-the-difference-between-req
+    uire-and-use?>
+
+    So when using 'use UMLS::Similarity::vector' - the program was loading
+    vector.pm at compile time which used dbif.pm which requires BerkeleyDB
+    to be installed. I switched to 'require "UMLS::Similarity::vector"'
+    which now only loads vector.pm at runtime and only when use specify the
+    vector measure.
+
+  Changes from version 0.17 to 0.19
+    The --verbose option originally in the package is changed to a --info
+    option. This option prints out a little more information about a concept
+    if it doesn't exist in the sources that are being used.
+
+    The reason for this change is because a new --verbose option was added
+    to UMLS-Interface and we wanted to keep the options consistent. Since I
+    do not think too many people were using the old --verbose option, I
+    don't *think* it will cause too many problems.
+
+    The new --verbose option will print out path information to a file
+    rather than having this be done automatically. This will reduce the
+    amount of storage space required to hold the path information for a
+    given set of sources and relations.
+
+    A new --forcerun option was also added. This option will just create the
+    what we call the index - the path information - required by the program
+    without prompting you to continue. So this will assume you know what you
+    are doing and will not question you :)
+
+    I also fixed (I hope) how the modules are installed in the
+    umls-similarity.pl program in the utils/ directory. It should not
+    require BerkeleyDB now unless you are running the
+    UMLS::Similarity::vector measure.
+
+  Changes from version 0.15 to 0.17
+    Modified the output of umls-similarity to return only the pair of CUIs
+    that obtain the highest similarity score when terms that map to multiple
+    concepts are being used. I added a --allsenses option if you would like
+    the original output that displayed all possible CUIs with their
+    similarity score for a given pair of terms.
+
+    Added the vector measure. This measure is in 'beta' version so there
+    will be some modifications to it in the future.
+
+    I also removed the print statements that were displayed when the Wu and
+    Palmer (wup) measure was being used. Sorry about the noise.
+
+  Changes from version 0.13 to 0.15
+    Modified the output of umls-similarity so that if a concept doesn't
+    exist you can tell which one it is. I also added a --verbose option
+    which gives a little more information about the concept that doesn't
+    exist.
+
+    Modified the wup.pm module. The Wu and Palmer measure is twice the depth
+    of the two concepts LCS divided by the product of the the depths of the
+    individual concepts. I was using the minimum depths of these concepts
+    where as I should have been using the depth of the path that contained
+    the LCS itself.
+
+  Changes from version 0.11 to 0.13
+    Added two new semantic similarity measure modules: i) nam.pm which is an
+    implemantion of the semantic similarity measure described by Nguyan and
+    Al-Mubaid, 2006 and ii) cdist.pm which is the Conceptual Distance
+    measure described by Rada, et. al., 1989.
+
+    Modified the umls-similarity.pl utility program to incorporate the
+    nam.pm and cdist.pm similarity modules.
+
+  Changes from version 0.09 to 0.11
+    Allow the umls-similarity.pl program to obtain the semantic similarity
+    between a term and CUI as well as CUI-CUI and term-term pairs.
+
+    Added some error checking to the umls-similarity.pl program and the
+    measure modules.
+
+  Changes from version 0.07 to 0.09
+    Removed the queryUMLS.pl module and put in its place umls-similarity.pl.
+    This does exactly what the original queryUMLS.pl does but it also now
+    accepts files and is much nicer.
+
+  Changes from version 0.05 to 0.07
+    Added the similarity measure described by Wu and Palmer (1994)
+
+    Updated the documentation
+
+  Changes from version 0.03 to 0.05
+    Modified the Changelog directory
+
+    Modified documenation - tried to get the misspelling and obvious errors
+    removed.
+
+    Removed the HTML documentation
+
+  Changes from version 0.01 to 0.03
+    Modified documentation
+
+    Modified the utils/ program
+

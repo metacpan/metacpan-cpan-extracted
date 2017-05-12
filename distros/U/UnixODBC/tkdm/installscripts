@@ -1,0 +1,72 @@
+# $Id: installscripts,v 1.1 2003-07-13 17:01:47 kiesling Exp $
+
+# Replace with the scripts that are to be manified and installed.
+my @apps = qw/tkdm/;
+
+# Create the installation directories if they don't exist.
+my $scriptdir = '/usr/local/bin';
+my $man1dir = '/usr/local/man/man1';
+
+foreach my $instdir ($scriptdir, $man1dir) {
+    if (! -d $instdir) {
+	print STDERR "Directory $instdir does not exist.\n";
+	print STDERR "Should I create it? (Y/n)\n";
+	local $c = <STDIN>;
+	chomp $c;
+	if ($c =~ /n/i) {
+	    exit 1;
+	}
+	mkdirtree ($instdir, 0755);
+    }
+}
+
+my $perl = `which perl`;
+chomp $perl;
+my $pod2man = `which pod2man`;
+chomp $pod2man;
+
+if ((! length ($perl)) || (! length ($pod2man))) {
+    print STDERR "\nThe system could not find either perl or pod2man.\n";
+    print STDERR "You need to make sure they are installed correctly\n";
+    print STDERR "and in a directory named by the \$PATH environment\n";
+    print STDERR "variable.\n";
+    exit 1;
+}
+
+
+$/ = undef;  # "slurp" mode
+foreach my $app (@apps) {
+    # set the perl interpreter.
+    print STDOUT "Setting application $app perl interpreter to $perl.\n";
+    local $apptext;
+    open IN, $app or die "Couldn't read $app: $!\n";
+    $apptext = <IN>;
+    $apptext =~ s"^\#\!.*?/perl.*?$"\#\!$perl"ism;
+    open OUT, ">/tmp/$app.out" or 
+	die "Couldn't open $app.out for writing: $!\n";
+    print OUT $apptext;
+    close OUT;
+    close IN;
+    print STDOUT "Installing $app as $scriptdir/$app\n";
+    `mv /tmp/$app.out "$scriptdir/$app"`;
+    chmod 0755, ("$scriptdir/$app");
+    `rm -f /tmp/$app.out`;
+
+    print STDOUT "Manifying $app\n";
+    `$pod2man $app > /tmp/$app.1p.out`;
+    `mv /tmp/$app.1p.out "$man1dir/$app.1p"`;
+    `rm -f /tmp/$app.1p.out`;
+}
+
+sub mkdirtree {
+    my ($dir, $mask) = @_;
+    my ($parent) = 
+	($dir =~ /(.*)\/.*$/);
+    if (! -d $parent) {
+	mkdirtree ($parent, $mask);
+    } 
+    if (! -d $dir) {
+	print "Creating directory $dir.\n";
+    }
+    mkdir ($dir, $mask) or die "Could not make directory $dir: $!\n";
+}

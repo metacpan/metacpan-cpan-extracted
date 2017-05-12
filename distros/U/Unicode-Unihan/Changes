@@ -1,0 +1,22 @@
+# Revision history for Perl extension Unicode::Unihan.
+#
+# $Id: Changes,v 0.4 2008/06/11 14:40:27 dankogai Exp $
+#
+
+$Revision: 0.4 $ $Date: 2008/06/11 14:40:27 $
+! Unihan.pm
+  POD streamlined.
+! srctxt/*
+  Updated with Unihan 5.1.0
+- bin/splitdb.pl
++ util/splitdb.pl
+  renamed.
+
+0.03  2007/03/25 23:18:53
+! *
+  Now based upon Unihan 5.0.0
+
+0.02 2007/03/25 21:39:11
+
+First version to be CPANized.
+

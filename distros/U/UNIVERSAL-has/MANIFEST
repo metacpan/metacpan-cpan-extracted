@@ -1,0 +1,10 @@
+Changes
+has.xs
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/UNIVERSAL-has.t
+lib/UNIVERSAL/has.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

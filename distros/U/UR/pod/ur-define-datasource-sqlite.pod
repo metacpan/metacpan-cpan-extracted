@@ -1,0 +1,73 @@
+
+
+=pod
+
+=head1 NAME
+
+ur define datasource sqlite - Add a SQLite data source to the current namespace.
+
+
+
+=head1 VERSION
+
+This document describes ur define datasource sqlite version 0.29.
+
+=head1 SYNOPSIS
+
+ur define datasource sqlite [--nosingleton] [--dsid=?] [--server=?] [DSNAME]
+
+  cd Acme
+
+  ur define datasource sqlite --dsname MyDB1 
+  # writes Acme::DataSource::MyDB1 to work with Acme/DataSource/MyDB1.sqlite3
+  
+  ur define datasource sqlite --dsname MyDB2 --server /var/lib/acmeapp/mydb2.sqlite3
+  # writes Acme::DataSource::MyDB2 to work with the specified sqlite file
+
+
+=head1 REQUIRED ARGUMENTS
+
+=over
+
+
+=item nosingleton  I<Boolean>
+
+Created data source should not inherit from UR::Singleton (defalt is that it will)
+
+Default value 'false' (--nonosingleton) if not specified
+
+=item nonosingleton  I<Boolean>
+
+Make nosingleton 'false'
+
+
+=back
+
+=head1 OPTIONAL ARGUMENTS
+
+=over
+
+
+=item dsid  I<Text>
+
+The full class name to give this data source.
+
+=item server  I<String>
+
+"server" attribute for this data source, such as a database name
+
+=item DSNAME  I<Text>
+
+The distinctive part of the class name for this data source.  Will be prefixed with the namespace then '::DataSource::'.
+
+
+=back
+
+=head1 DESCRIPTION:
+
+  Add a SQLite data source to the current namespace.
+
+
+
+=cut
+

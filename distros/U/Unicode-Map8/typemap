@@ -1,0 +1,19 @@
+Map8*       T_MAP8
+
+INPUT
+T_MAP8
+        $var = find_map8($arg);
+
+OUTPUT
+T_MAP8
+        /* Make a HASH object, and attach the map to it */
+	if ($var) {
+	    HV* stash = gv_stashpv(\"Unicode::Map8\", TRUE);
+	    sv_upgrade($arg, SVt_RV);
+	    SvRV($arg) = (SV*)newHV();
+	    SvROK_on($arg);
+	    (void)sv_bless($arg, stash);
+	    attach_map8($arg, $var);
+        } else {
+	    SvOK_off($arg);
+        }

@@ -1,0 +1,30 @@
+Revision history for Perl extension URL-Builder
+
+0.06 2014-04-30T05:34:20Z
+
+    - requires WWW::Form::UrlEncoded 0.19 and fixed test
+      https://github.com/tokuhirom/URL-Builder/pull/5
+      (kazeburo)
+
+0.05 2014-02-21T08:57:23Z
+
+    [INCOMPATIBLE CHANGES]
+    - Added build_url_utf8(). Previous version's build_url is named build_url_utf8() now.
+      build_url() no longer care about UTF-8.
+
+0.04 2014-02-19T07:15:06Z
+
+    - use WWW::Form::UrlEncoded(kazeburo)
+
+0.03 2014-02-14T00:31:20Z
+
+    - Support multi-byte chars.
+
+0.02 2014-02-13T03:39:52Z
+
+    - CPAN release.
+
+0.01 2014-02-13T03:15:05Z
+
+    - original version
+

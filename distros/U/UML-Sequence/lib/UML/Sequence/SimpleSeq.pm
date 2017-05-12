@@ -1,0 +1,257 @@
+package UML::Sequence::SimpleSeq;
+use     strict;
+use     warnings;
+
+our $VERSION = '0.02';
+
+=head1 NAME
+
+UML::Sequence::SimpleSeq - turns simple outlines (see below) into UML sequence diagrams
+
+=head1 SYNOPSIS
+
+    genericseq.pl UML::Sequence::SimpleSeq outline_file > sequence.xml
+    seq2svg.pl sequence.xml > sequence.svg
+
+OR
+
+    genericseq.pl UML::Sequence::SimpleSeq outline_file | seq2svg.pl > sequence.svg
+
+OR
+
+    genericseq.pl UML::Sequence::SimpleSeq outline_file | seq2rast.pl > sequence.png
+
+=head1 DESCRIPTION
+
+This file may be used directly by a script (as shown above) or as a base class
+for other sequencers (see UML::Sequence::JavaSeq).  It supplies routines for
+handling simple outlines like a user could be expected to type by hand.  Such
+outlines look like this:
+
+    At Home.Wash Car
+    /*
+        this is an annotation
+        the next line shows how to specify return values
+    */
+        Garage.retrieve bucket -> bucket
+            Kitchen.prepare bucket
+                Kitchen.pour soap in bucket
+                Kitchen.fill bucket
+        Garage.get sponge -> sponge
+    /*
+        the next line specifies an external async event
+    */
+        -> clickerSignal
+    /*
+        the next line specifies a conditional, urgent method call
+    */
+        [garageDoorClosed] ! Garage.open door
+    /*
+        the next line specifies an iterative method call
+    */
+        * Driveway.apply soapy water
+        Driveway.rinse
+        Driveway.empty bucket
+        -> clickerSignal
+        Garage.close door
+        Garage.replace sponge
+    /*
+        the next line specifies a class/static method call
+    */
+        Garage::replace bucket
+
+The "class" name and "method" name are separated by a dot.  If there are
+multiple dots, the method name is everything after the last dot.  Classes
+and methods in this context are elements of a UML sequence diagram.  Classes
+get boxes at the top of the page.  Method calls are labeled lines from one
+class to another.  If you want two classes with the same name, you must
+append a suffix or prefix (try instanceName:ClassName).
+
+Static (aka class) methods are assumed if there is not dot separator, but
+only double colon '::' separators, in which case the last text segment
+preceded by '::' is assumed to be the method name, and is displayed
+in italics in the output.
+
+Return values may be specified by the '->' marker; everything to the
+right of the marker will be used as a label on a dashed line returning from
+the called object back to the caller object.
+
+External events can be indicated by the '->' marker without any preceding
+object/method name. These are rendered as lines originating
+from the far right of the image, terminated by a half-arrow, with text to the
+right of the marker displayed as the label on a line.
+
+Iterations are denoted by an introductory asterisk '*', which is preserved
+in the output label. Conditional statements can be added by introducing
+an entry with text enclosed by brackets '[]'.
+
+For L<Thread::Apartment> applications, urgent methods are introduced
+by an exclamation point '!', which is preserved in the output text label.
+
+Annotations may be specified using C style comment delimiters,
+'/* */'. Everything between the delimiters will be tagged as annotation on the next
+directive line, which the renderer may convert to e.g., tooltips
+or text in a margin. NOTE: no escape is provided for closing delimiters
+within an annotation.
+
+Finally, in order to properly position return values for nested
+method calls, whitespace characters (tabs, spaces) are used to delimit
+the scope of nested method calls.
+
+=head1 grab_outline_text
+
+Call this first with the outline file (in the format described above).
+Pass it the name of the file to read.
+Returns a reference to an array whose elements are lines from the outline
+with spacing preserved.
+
+=cut
+
+sub grab_outline_text {
+    shift;  # discard class
+    my $file = shift;
+    my @outline;
+    my $in_annot = undef;
+    my $annot = '';
+
+    open FILE, "$file" or die "Couldn't open $file\n";
+    while (<FILE>) {
+#
+#    aggregate annotations into a single line
+#    NOTE: execution order is important to support single line annotations
+#    NOTE2: trim leading tabs/spaces
+#
+        chomp;
+
+        push(@outline, "$_ $annot"),
+        $annot = '',
+        next
+            unless $in_annot || /^\s*\/\*/;
+#
+#    in annotation, trim leading and trailing whitespace
+#
+        s/^\s+//;
+        s/\s+$//;
+        if ($in_annot) {
+            $annot .= ' ' . $_;
+        }
+        elsif (/^\s*\/\*/) {
+            $annot = $_;
+            $in_annot = 1;
+        }
+
+        $in_annot = undef
+            if /\*\/\s*$/;
+    }
+    close FILE;
+
+#print STDERR "\n\n", join("\n", @outline), "\n";
+
+    return \@outline;
+}
+
+=head1 grab_methods
+
+Call this with an outline (possibly generated by grab_outline).  It will return
+a hash reference.  Each method mentioned in the outline will appear as a key
+in the hash (the values are less important, they count the occurances of
+the method).
+
+=cut
+
+sub grab_methods {
+    shift;  # discard class
+    my $outline         = shift;
+    my %methods;
+
+    foreach (@$outline) {
+        my $line = $_;
+        $line    =~ s/^\s+//;    # trim leading space
+
+# trim annotations
+        $line=~s/\s*\/\*.*\*\/\s*$//;
+
+        next if ($line=~/^\s*$/);
+
+        $line    =~ s/^[^:]+://;    # trim class info
+
+# trim leading iterator, conditionals, or urgents
+        $line    =~ s/^(((\[[^\]]+\])|[\*!])\s*)+//;
+#
+#    trim any following returnvalue list
+#
+        $line    =~ s/\s*->.*$//;
+        $line = 'EXTERNAL' if ($line eq '');
+        $methods{$line}++;
+    }
+    return \%methods;
+}
+
+=head1 parse_signature
+
+This method is a call back used by the UML::Sequence constructor.  It accepts
+a signature and returns the "class" name (in scalar context) or, in list context,
+the "class", "method", "returnvalue", iterator, urgent, conditional, indicators,
+and any annotation.  It splits the signature on the
+last dot it sees after removing any argument list and associated parentheses.
+It also looks for the '->' marker in order to collect a return values list.
+NOTE: BE SURE TO PRESERVE INTRO WHITESPACE FOR NESTED METHOD SCOPING!!
+
+=cut
+
+sub parse_signature {
+    chomp(my $line = shift);
+#
+#    external event: add External class to list, and collect
+#    rest of the line as event label
+#
+#print STDERR $line, "\n";
+    return wantarray ? ('_EXTERNAL', $1) : '_EXTERNAL'
+        if ($line=~/^\s*->\s*(.+)$/);
+
+    my ($iterator, $conditional, $urgent, $annot);
+
+    $annot = $1
+        if ($line =~ s/\s*\/\*\s*(.*)\s*\*\/\s*$//);
+
+    while ($line =~ s/^((\[[^\]]+\])|[\*!])\s*//) {
+        $iterator = '*', next
+            if ($1 eq '*');
+        $urgent = '!', next
+            if ($1 eq '!');
+        $conditional = $1;
+    }
+
+    $line =~ s/\(.*\)//;    # rely on greedy eval...tho I may decide to include the args
+
+    my $returns;
+
+    $returns = $1
+        if ($line=~s/->\s*(.*)$//);
+
+    $line =~ s/[\.:]([^\.:]*)\s*$//;
+
+    my $method = $1;
+    if (defined $method) {
+        $method    =~ s/</&lt;/g;
+        $method    =~ s/>/&gt;/g;
+    }
+    return wantarray ?
+        ($line, $method, $returns, $iterator, $urgent, $conditional, $annot) :
+        $line;
+}
+
+1;
+
+=head1 AUTHORS
+
+Original versions by Phil Crow, <philcrow2000@yahoo.com>
+Version 0.02 by Dean Arnold, <darnold@presicient.com>
+
+=head1 COPYRIGHT
+
+Copyright 2003-2006, Philip Crow, all rights reserved.
+
+You may modify and/or redistribute this code in the same manner as Perl itself.
+
+=cut

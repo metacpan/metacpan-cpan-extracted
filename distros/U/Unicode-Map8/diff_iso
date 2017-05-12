@@ -1,0 +1,9 @@
+#!/bin/bash
+
+for i in 1 2 3 4 5 6 7 8 9;
+do
+	echo "ISO-8859-$i"
+        diff -u0 <(zcat CD/mappings/iso8859/8859-$i.txt.gz | ./map8_txt2bin | ./map8_bin2txt) <(./map8_bin2txt maps/ISO_8859-$i.bin) | grep -v control
+	echo
+
+done

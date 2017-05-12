@@ -1,0 +1,15 @@
+Makefile.PL
+MANIFEST
+README
+lib/UTM5/URFAClient/Daemon.pm
+t/00-load.t
+t/01-manifest.t
+t/02-boilerplate.t
+t/03-strict.t
+t/04-fixme.t
+t/05-critic.t
+t/06-metrics.t
+t/07-pod.t
+t/08-pod-coverage.t
+t/09-test-coverage.t
+META.yml                                 Module meta-data (added by MakeMaker)

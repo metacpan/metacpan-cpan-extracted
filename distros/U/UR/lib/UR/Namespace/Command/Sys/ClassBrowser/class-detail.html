@@ -1,0 +1,86 @@
+<div class="class-detail">
+    <div class="well">
+        <h3>[% meta.class_name %]</h3>
+    </div>
+    <div>
+        [% IF meta.table_name %]
+            table [% meta.table_name %]
+        [% END %]
+    </div>
+    <div>
+        <i class="icon-file"></i>&nbsp;
+        <a href="/render-perl-module/[% meta.class_name %]" target="_blank" class="perl-module-file">[% meta.module_path %]</a>
+    </div>
+    <div class="css-inhtree">
+        <ul>
+            [% PROCESS partials/class_inheritance_tree.html tree = class_inheritance_tree %]
+        </ul>
+    </div>
+    <div class="class-meta-info">
+        <h4>Class Metadata</h4>
+        <dl class="dl-horizontal">
+            [% FOREACH prop IN [ 'doc', 'is_abstract', 'is_final', 'is_singleton', 'data_source', 'table_name' ] %]
+                <dt>[% prop %]</dt>
+                <dd>[% IF meta.item(prop).defined %]
+                        [% meta.item(prop) %]
+                    [% ELSE %]
+                        <span class="label label-info">undef</span>
+                   [% END %]
+                </dd>
+            [% END %]
+        </dl>
+    </div>
+    <div class="class-properties">
+        <h4>Class Properties</h4>
+        <form class="form-inline">
+            <label class="checkbox inline">
+                <input type="checkbox" name="show-properties" value="1" checked/>Show inherited properties
+            </label>
+        </form>
+        <table class="table table-condensed table-hover class-properties">
+            <thead>
+                <tr><th>Name</th>
+                    <th>Type</th>
+                    <th>Column</th>
+                    <th>Class</th>
+                    <th>Doc</th>
+                </tr>
+            </thead>
+            <tbody>
+                [% FOREACH prop_meta IN property_metas %]
+                    [% SET row_classes = [ ] %]
+                    [% IF prop_meta.class_name != meta.class_name %]
+                        [% row_classes.push('inherited') %]
+                    [% END %]
+                    [% IF prop_meta.is_id %]
+                        [% row_classes.push('success') %]
+                    [% END %]
+                    <tr class="[% row_classes.join(' ') %]">
+                    <td>
+                        <a class="modal-link"
+                            href="/property-metadata-list/[% prop_meta.class_name %]/[% prop_meta.property_name %]">
+                            [% prop_meta.property_name %]</a>
+                    </td>
+                    [% FOREACH prop IN ['data_type', 'column_name', 'class_name','doc' ] %]
+                        <td>
+                            [% IF (prop == 'class_name') && (prop_meta.class_name != meta.class_name) %]
+                                <a href="/detail-for-class/[% prop_meta.class_name %]" class="btn btn-mini class-detail">[% prop_meta.item(prop) %]</a>
+                            [% ELSE %]
+                                [% prop_meta.item(prop) %]
+                            [% END %]
+                        </td>
+                    [% END %]
+                    </tr>
+                [% END %]
+            </tbody>
+        </table>
+    </div>
+
+    <div class="public-methods">
+        [% PROCESS partials/class_method_table.html title = 'Public Methods', methods = public_methods %]
+    </div>
+
+    <div class="private-methods">
+        [% PROCESS partials/class_method_table.html title = 'Private Methods', methods = private_methods %]
+    </div>
+</div>

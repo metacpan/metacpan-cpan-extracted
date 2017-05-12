@@ -1,0 +1,40 @@
+
+
+=pod
+
+=head1 NAME
+
+ur old redescribe - Outputs class description(s) formatted to the latest standard.
+
+
+
+=head1 VERSION
+
+This document describes ur old redescribe version 0.29.
+
+=head1 SYNOPSIS
+
+ur old redescribe [CLASSES-OR-MODULES]
+
+
+
+=head1 OPTIONAL ARGUMENTS
+
+=over
+
+
+=item CLASSES-OR-MODULES
+
+(undocumented)
+
+
+=back
+
+=head1 DESCRIPTION:
+
+  Outputs class description(s) formatted to the latest standard.
+
+
+
+=cut
+

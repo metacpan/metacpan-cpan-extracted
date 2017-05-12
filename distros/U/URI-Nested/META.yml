@@ -1,0 +1,29 @@
+---
+abstract: 'Nested URIs'
+author:
+  - 'David E. Wheeler <david@justatheory.com>'
+build_requires:
+  Module::Build: 0.30
+  Test::More: 0.88
+configure_requires:
+  Module::Build: 0.30
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4007, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: URI-Nested
+provides:
+  URI::Nested:
+    file: lib/URI/Nested.pm
+    version: 0.10
+requires:
+  URI: 1.40
+  perl: 5.008001
+resources:
+  bugtracker: https://github.com/theory/uri-nested/issues/
+  homepage: https://metacpan.org/release/URI-Nested/
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/theory/uri-nested/
+version: 0.10

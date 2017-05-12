@@ -1,0 +1,833 @@
+=head1 NAME
+
+UI::Dialog::Backend::CDialog - backend for the console dialog(1) variant.
+
+=head1 SYNOPSIS
+
+  use UI::Dialog::Backend::CDialog;
+  my $d = new UI::Dialog::Backend::CDialog ( backtitle => 'Demo',
+                                             title => 'Default' );
+
+  $d->msgbox( title => 'Welcome!', text => 'Welcome one and all!' );
+
+=head1 ABSTRACT
+
+UI::Dialog::Backend::CDialog is the UI::Dialog backend for the console
+dialog variant. While this module is used through UI::Dialog or any other loader
+module only the compatible methods are ever accessible. However, when using
+this module directly in your application (as in the SYNOPSIS example) you are
+given access to all the options and features of the real dialog(1) application.
+
+=head1 DESCRIPTION
+
+There are essentially two versions of the console dialog program. One has
+support for colours as well as extra widgets, while the other does not have
+either. You can read about the colour support in the TEXT MARKUP section.
+
+=head1 EXPORT
+
+=over 2
+
+None
+
+=back
+
+=head1 INHERITS
+
+=over 2
+
+UI::Dialog::Backend
+
+=back
+
+=head1 CONSTRUCTOR
+
+=head2 new( @options )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my $d = new( title => 'Default Title', backtitle => 'Backtitle',
+              width => 65, height => 20, listheight => 5 );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+This is the Class Constructor method. It accepts a list of key => value pairs
+and uses them as the defaults when interacting with the various widgets.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+A blessed object reference of the UI::Dialog::Backend::CDialog class.
+
+=back
+
+=item OPTIONS
+
+The (...)'s after each option indicate the default for the option. An * denotes
+support by all the widget methods on a per-use policy defaulting to the values
+decided during object creation.
+
+=over 6
+
+=item B<debug = 0,1,2> (0)
+
+=item B<literal = 0,1> (0)
+
+=item B<backtitle = "backtitle"> ('') *
+
+=item B<title = "title"> ('') *
+
+=item B<height = \d+> (0) *
+
+=item B<width = \d+> (0) *
+
+=item B<beepbefore = 0,1> (0) *
+
+=item B<beepafter = 0,1> (0) *
+
+=back
+
+=back
+
+=head1 WIDGET METHODS
+
+=head2 yesno( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ if ($d->yesno( text => 'A binary type question?') ) {
+     # user pressed yes
+ } else {
+     # user pressed no or cancel
+ }
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Present the end user with a message box that has two buttons, yes and no.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+TRUE (1) for a response of YES or FALSE (0) for anything else.
+
+=back
+
+=back
+
+=head2 msgbox( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ $d->msgbox( text => 'A simple message' );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Pesent the end user with a message box that has an OK button.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+TRUE (1) for a response of OK or FALSE (0) for anything else.
+
+=back
+
+=back
+
+=head2 infobox( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ $d->infobox( text => 'A simple 6 second message.', timeout => 6000 );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Pesent the end user with a message box for a limited duration of time. The
+timeout is specified in thousandths of a second, ie: 1000 = 1 second.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+TRUE (1) for a response of OK or FALSE (0) for anything else.
+
+=back
+
+=back
+
+=head2 password( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my $string = $d->password( text => 'Enter some (hidden) text.' );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Present the end user with a text input field that doesn't reveal the input
+(except to the script) and a message.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+a SCALAR if the response is OK and FALSE (0) for anything else.
+
+=back
+
+=back
+
+=head2 inputbox( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my $string = $d->inputbox( text => 'Please enter some text.',
+                            entry => 'this is the input field' );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Present the end user with a text input field and a message.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+a SCALAR if the response is OK and FALSE (0) for anything else.
+
+=back
+
+=back
+
+=head2 textbox( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ $d->textbox( path => '/path/to/a/text/file' );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Present the end user with a simple scrolling box containing the contents
+of the given text file.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+TRUE (1) if the response is OK and FALSE (0) for anything else.
+
+=back
+
+=back
+
+=head2 menu( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my $selection1 = $d->menu( text => 'Select one:',
+                            list => [ 'tag1', 'item1',
+                                      'tag2', 'item2',
+                                      'tag3', 'item3' ]
+                          );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Present the user with a selectable list.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+a SCALAR of the chosen tag if the response is OK and FALSE (0) for
+anything else.
+
+=back
+
+=back
+
+=head2 checklist( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my @selection = $d->checklist( text => 'Select one:',
+                                list => [ 'tag1', [ 'item1', 0 ],
+                                          'tag2', [ 'item2', 1 ],
+                                          'tag3', [ 'item3', 1 ] ]
+                              );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Present the user with a selectable checklist.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+an ARRAY of the chosen tags if the response is OK and FALSE (0) for
+anything else.
+
+=back
+
+=back
+
+=head2 form( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my @data = $d->form( text => 'Select one:',
+                      list => [ [ 'tag1', 1, 1 ], [ 'item1', 1, 10, 10, 10 ],
+                                [ 'tag2', 2, 1 ], [ 'item2', 2, 10, 10, 10 ],
+                                [ 'tag3', 3, 1 ], [ 'item3', 3, 10, 10, 10 ] ]
+                    );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Present the user with a selectable and potentially editable form.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+an ARRAY of the form data if the response is OK and FALSE (0) for
+anything else.
+
+=back
+
+=back
+
+=head2 radiolist( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my $selection = $d->radiolist( text => 'Select one:',
+                                list => [ 'tag1', [ 'item1', 0 ],
+                                          'tag2', [ 'item2', 1 ],
+                                          'tag3', [ 'item3', 0 ] ]
+                              );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Present the user with a selectable radiolist.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+a SCALAR of the chosen tag if the response is OK and FALSE (0) for
+anything else.
+
+=back
+
+=back
+
+=head2 fselect( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my $text = $d->fselect( path => '/path/to/a/file/or/directory' );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Present the user with a file selection widget preset with the given path.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+a SCALAR if the response is OK and FALSE (0) for anything else.
+
+=back
+
+=back
+
+=head2 dselect( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my $text = $d->dselect( path => '/path/to/a/directory' );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Present the user with a file selection widget preset with the given path.
+Unlike fselect() this widget will only return a directory selection.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+a SCALAR if the response is OK and FALSE (0) for anything else.
+
+=back
+
+=back
+
+=head2 calendar( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my $date = $d->calendar( text => 'Pick a date...',
+                          day => 1, month => 1, year => 1970 );
+ my ($m,$d,$y) = split(/\//,$date);
+
+ # or alternatively...
+
+ $d->calendar( text => 'Pick a date...',
+               day => 1, month => 1, year => 1970 );
+ ($m,$d,$y) = $d->ra();
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Present the user with a calendar widget preset with the given date or if
+none is specified, use the current date.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+a SCALAR if the response is OK and FALSE (0) for anything else.
+
+=back
+
+=back
+
+=head2 timebox( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ my $time = $d->timebox( text => 'What time?' );
+ my ($h,$m,$s) = split(/\:/,$time);
+
+ # or alternatively...
+
+ $d->timebox( text => 'What time?',
+              hour => 10, minute => 01, second => 01 );
+ my ($h,$m,$s) = $d->ra();
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Present the user with a time widget preset with the current time.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+a SCALAR if the response is OK and FALSE (0) for anything else.
+
+=back
+
+=back
+
+=head2 tailbox( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ $d->tailbox( path => '/path/to/a/text/file' );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Present the end user with a scrolling box containing the contents
+of the given text file. The contents of the window is constantly updated
+in a similar manner to that of the unix tail(1) command.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+TRUE (1) if the response is OK and FALSE (0) for anything else.
+
+=back
+
+=back
+
+=head2 gauge_start( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ $d->gauge_start( text => 'gauge...', percentage => 1 );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Display a meter bar to the user. This get's the widget realized but requires
+the use of the other gauge_*() methods for functionality.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+TRUE (1) if the widget loaded fine and FALSE (0) for anything else.
+
+=back
+
+=back
+
+=head2 gauge_inc( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ $d->gauge_inc( 1 );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Increment the meter by the given amount.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+TRUE (1) if the widget incremented fine and FALSE (0) for anything else.
+
+=back
+
+=back
+
+=head2 gauge_dec( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ $d->gauge_dec( 1 );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Decrement the meter by the given amount.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+TRUE (1) if the widget incremented fine and FALSE (0) for anything else.
+
+=back
+
+=back
+
+=head2 gauge_set( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ $d->gauge_set( 99 );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Set the meter bar to the given amount.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+TRUE (1) if the widget set fine and FALSE (0) for anything else.
+
+=back
+
+=back
+
+=head2 gauge_text( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ $d->gauge_text( 'string' );
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+Set the meter bar message to the given string.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+TRUE (1) if the widget set fine and FALSE (0) for anything else.
+
+=back
+
+=back
+
+=head2 gauge_stop( )
+
+=over 4
+
+=item EXAMPLE
+
+=over 6
+
+ $d->gauge_stop();
+
+=back
+
+=item DESCRIPTION
+
+=over 6
+
+End the meter bar widget process. One of the flaws with gdialog is that the
+gauge widget does not close properly and requies the end user to close the
+gauge window when 100% has been reached. This is the second reason why I'm
+glad gdialog is going the way of the dodo.
+
+=back
+
+=item RETURNS
+
+=over 6
+
+TRUE (1) if the widget closed fine and FALSE (0) for anything else.
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+=over 2
+
+=item PERLDOC
+
+ UI::Dialog
+ UI::Dialog::Console
+ UI::Dialog::Backend
+
+=back
+
+=over 2
+
+=item MAN FILES
+
+dialog(1)
+
+=back
+
+=head1 BUGS
+
+Please email the author with any bug reports. Include the name of the
+module in the subject line.
+
+=head1 AUTHOR
+
+Kevin C. Krinke, E<lt>kevin@krinke.caE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+ Copyright (C) 2004-2016  Kevin C. Krinke <kevin@krinke.ca>
+
+ This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 2.1 of the License, or (at your option) any later version.
+
+ This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+
+ You should have received a copy of the GNU Lesser General Public
+ License along with this library; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+
+=cut

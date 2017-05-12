@@ -1,0 +1,30 @@
+UNIVERSAL-Acme version 0.01
+===========================
+
+SYNOPSIS
+
+  use UNIVERSAL::Acme;
+  UNIVERSAL::thing($obj, 'whatever');  # calls $obj->thing('whatever')
+
+DESCRIPTION
+
+Tired of people who refuse to call functions as methods? Show 'em good with
+UNIVERSAL::Acme.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 by Sean O'Rourke
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+

@@ -1,0 +1,16 @@
+#
+# Revision history for Perl extension Unicode::Char.
+#
+$Revision: 0.2 $ $Date: 2006/05/15 08:14:53 $
+! lib/Unicode/Char.pm
+  POD typo fixes  
+! MANIFEST Makefile.PL
+- Unicode
++ lib/Unicode
+  Some versions of ExtUtils::MakeMaker fails to install unless
+  modules are in lib/
+
+0.01  Sat May 13 13:14:28 2006
+	- original version; created by h2xs 1.23 with options
+		-XAn Unicode::Char
+

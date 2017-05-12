@@ -1,0 +1,10 @@
+Revision history for Perl extension Unix::Conf
+
+0.1  Mon Aug  5 22:23:17 2002
+	- First release
+
+0.2
+	- ConfIO now accepts already open filehandles.
+	  That part needs more testing though.
+	- lineno () can take -1 as argument too.
+	- Added test.pl

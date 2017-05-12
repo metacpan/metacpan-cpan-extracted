@@ -1,0 +1,99 @@
+NAME
+    URI::Find::Rule - Simpler interface to URI::Find
+
+SYNOPSIS
+      use URI::Find::Rule;
+      # find all the http URIs in some text
+      my @uris = URI::Find::Rule->scheme('http')->in($text);
+      # or you can use anything that URI->can() for HTTP URIs
+      my @uris = URI::Find::Rule->http->in($text);
+
+      # find all the URIs referencing a host
+      my @uris = URI::Find::Rule->host(qr/myhost/)->in($text);
+
+DESCRIPTION
+    URI::Find::Rule is a simpler interface to URI::Find (closely modelled on
+    File::Find::Rule by Richard Clamp).
+
+    Because it operates on URI objects instead of the stringified versions
+    of the found URIs, it's nicer than, say, grepping the stringified values
+    from URI::Find::Simple's "list_uris" method.
+
+    It returns (default) a list containing "[$original, $uri]" for each URI
+    or, optionally, a list containing a URI object for each URI.
+
+METHODS
+    Apart from "in", all the methods can take multiple strings or regexps to
+    match against, e.g.
+
+      ->scheme('http')          # match against the single string 'http'
+      ->scheme('http','ftp')    # match either string 'http' or 'ftp'
+      ->scheme(qr/tp$/, 'ldap') # match /tp$/ or the string 'ldap'
+
+    They can also be combined to provide more selective filtering, e.g.
+
+      ->scheme('ftp')->host('pi.st') # match FTP URIs with a host of pi.st
+
+    The filtering is done by checking against the corresponding methods
+    called on the URI object so almost anything (see BUGS) you can do with a
+    URI object, you can filter on.
+
+    Only a few methods are listed, for more examples check the tests.
+
+  in
+      URI::Find::Rule->in($text);
+
+    With a single argument, returns a list of anonymous arrays containing
+    "($original_text, $uri)" for each URI found in $text.
+
+      URI::Find::Rule->in($text, 'objects');
+
+    With a true-valued second argument, it returns a list of URI objects,
+    one for each URI found in $text.
+
+  not
+      URI::Find::Rule->http()->not()->host(qr/frottage/)->in($text);
+
+    Negates the immediately following rule.
+
+  scheme
+      URI::Find::Rule->scheme('http')->in($text);
+
+    Filters the URIs found based on their scheme.
+
+  host
+      URI::Find::Rule->host('pi.st')->in($text);
+
+    Filters the URIs found based on their parsed hostname.
+
+  protocol
+      URI::Find::Rule->protocol('http')->in($text);
+
+    A convenient alias for "scheme".
+
+  other methods
+      ->ldap('pi.st') # converts to ->scheme('ldap')->host('pi.st')
+
+    Any unrecognised method will be converted to
+    "->scheme($method)->host(@_)" for convenience.
+
+BUGS
+    "URI->can()" needs a URI before it'll respond -- at the moment, this is
+    "http://x:y@a/b#c?d" which means that any of the scheme-specific methods
+    (like "$uri->dn" for LDAP URIs can't be used.)
+
+    The anonymous arrays contain the original text and the stringified URI
+    in reverse order when compared with URI::Find's callback. This may
+    confuse.
+
+CREDITS
+    Richard Clamp (patches, code to cargo cult from) John Levon (pointing
+    out broken comments and complexity)
+
+LICENSE
+    This module is free software, and may be distributed under the same
+    terms as Perl itself.
+
+AUTHOR
+    Copyright (C) 2004, Rob Partington <perl-ufr@frottage.org>
+

@@ -1,0 +1,23 @@
+#!/usr/bin/perl
+use v5.14;
+use warnings;
+use UAV::Pilot::WumpusRover;
+use UAV::Pilot::WumpusRover::Server;
+use UAV::Pilot::WumpusRover::Server::Backend::RaspberryPiI2C;
+use Getopt::Long ();
+
+
+my $PORT = UAV::Pilot::WumpusRover::DEFAULT_PORT;
+Getopt::Long::GetOptions(
+    'port=i' => \$PORT,
+);
+
+
+my $backend = UAV::Pilot::WumpusRover::Server::Backend::RaspberryPiI2C->new;
+my $server = UAV::Pilot::WumpusRover::Server->new({
+    listen_port => $PORT,
+    backend     => $backend,
+});
+
+warn "Ready!\n";
+$server->start_listen_loop;

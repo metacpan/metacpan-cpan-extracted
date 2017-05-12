@@ -1,0 +1,38 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use autodie;
+
+my $command = shift;
+
+my $file = 'tfiles/test.status';
+
+sub read_status {
+    return 'off' unless -e $file;
+    open my $fh, '<', $file;
+    return join '', <$fh>;
+}
+
+sub write_status {
+    open my $fh, '>', $file;
+    print {$fh} @_;
+    close $fh;
+}
+
+if ($command eq 'start') {
+    write_status('on');
+    exit;
+}
+
+if ($command eq 'stop') {
+    write_status('off');
+    exit;
+}
+
+if ($command eq 'status') {
+    my $status = read_status;
+    exit if $status eq 'on';
+    exit 3; # see LSB specification
+}

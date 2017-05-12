@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <title>Measures</title>
+    <link rel="stylesheet" href="sim-style.css" type="text/css">
+  </head>
+
+  <body>
+    <h1>Relatedness Measures</h1>
+
+    <h2>Lesk  </h2>
+    <p>The Lesk measure works by finding overlaps in the extended definitions 
+      of the two concepts. The relatedness score is the sum of the squares of 
+      the overlap lengths.  For example, a single word overlap results in a 
+      score of 1.  Two single word overlaps results in a score of 2. A two 
+      word overlap (i.e., two consecutive words) results in a score of 4. A 
+      three word overlap results in a score of 9.    
+    </p>
+
+    <h2>Vector</h2>
+    <p>The vector measure works by forming second-order 
+      co-occurrence vectors from the UMLS extended definitions of concepts. 
+      The relatedness of two concepts is determined as the cosine of the 
+      angle between their vectors. 
+    </p>
+        
+  </body>
+</html>

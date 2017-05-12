@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/URI/crid.pm
+t/00-load.t
+t/01-crid.t
+t/pod-coverage.t
+t/pod.t
+examples/breakdown-uri.pl
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,41 @@
+Revision history for Unix-PID-Tiny
+
+0.91 Tue Jul 23 22:46:46 2013
+    - rt 86817 - minor fixes
+    - rt 86640 - Add pidfile functions from non-tiny version
+        - support named hash for more intuitive retry-conf
+    - add/improve tests
+
+0.9  Mon Apr  4 16:01:10  2011
+    - option to wait  between kill and re-check
+    
+0.8  Fri Dec 24 18:41:32 2010
+     - Apply Unix::PID v0.22 rt 57634: is_pid_running() use /proc if available , thanks GWADEJ!
+
+0.7  Fri Dec 24 11:04:36 2010
+     Fix up synopsis POD
+
+0.6  Tue May 11 07:45:50 2010
+     Add minimum_pid support
+     move ps_path checking to new()
+     have is_pid_running use kill 0 instead of ps when we are root
+     Removed Build.PL items from README
+     Qualify kill() calls to CORE::kill() when appropriate
+     
+0.5  Fri Apr 11 10:59:55 2008
+     fixed 0.4 reverse logic on kill() return
+     
+0.4  Thu Apr 10 18:09:35 2008
+     make kill() more portable
+
+0.3  Tue Apr  1 09:12:33 2008
+     rt 34586: remove Build.PL
+     rt 34586: remove use warnings from Makefile.PL
+     rt 34586: go ahead an re-add use strict
+     
+0.2  Mon Mar 31 10:45:54 2008
+       removed vars, strict, and warnings to lower memory even more
+       
+0.1  Mon Mar 31 07:44:07 2008
+       Initial release.
+

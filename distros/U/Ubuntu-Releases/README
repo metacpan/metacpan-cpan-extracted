@@ -1,0 +1,15 @@
+SYNOPSIS
+
+     use Ubuntu::Releases;
+     my $res = list_ubuntu_releases(detail=>1);
+     # raw data is in $Ubuntu::Releases::data;
+
+DESCRIPTION
+
+    This module contains list of Ubuntu releases. Data source is currently
+    at: https://github.com/sharyanto/gudangdata (table/ubuntu_release).
+
+SEE ALSO
+
+    Debian::Releases
+

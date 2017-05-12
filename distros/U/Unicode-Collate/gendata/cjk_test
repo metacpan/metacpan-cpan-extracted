@@ -1,0 +1,99 @@
+#!perl
+# cjk_test: the whole tests for CJK/*.pm
+#
+# input files: ../Collate/CJK/*.pm
+#
+# * All successful when the output is as below:
+#
+# OK - ja compare
+# OK - ja count
+# OK - ko compare
+# OK - ko count
+# OK - zh_big5 compare
+# OK - zh_big5 count
+# OK - zh_gb2312 compare
+# OK - zh_gb2312 count
+# OK - zh_pinyin compare
+# OK - zh_pinyin count
+# OK - zh_stroke compare
+# OK - zh_stroke count
+# OK - zh_zhuyin compare
+# OK - zh_zhuyin count
+#
+use strict;
+
+use File::Spec;
+use Unicode::Collate::Locale;
+
+my %file = qw(
+    zh_big5     Big5
+    zh_gb2312   GB2312
+    ja          JISX0208
+    ko          Korean
+    zh_pinyin   Pinyin
+    zh_stroke   Stroke
+    zh_zhuyin   Zhuyin
+);
+
+sub testdata ($$) {
+    my $locale = shift;
+    my $file   = $file{$locale};
+    my $count  = shift;
+    my $korean = $locale eq 'ko'; # Hangul <2 Unified Ideographs.
+
+    my $d = File::Spec->updir();
+    my $f = File::Spec->catfile($d, 'Collate', 'CJK', "$file.pm");
+    open my $fh, "<$f" or die $f;
+
+    my $col = Unicode::Collate::Locale->new(locale => $locale, level => 1);
+    my $pre = undef;
+    my $prc = '';
+    my @err;
+    my $done = 0;
+    while (<$fh>) {
+	if (!defined $pre) {
+	   $pre = '' if /^__DATA__/;
+	   next;
+	}
+	last if /^__END__/;
+	my @c = split;
+	for my $c (@c) {
+	    ++$done;
+	    $c =~ s/:.*//; # format change, Korean 1.13
+	    my $u = pack 'U*', map hex, split '-', $c;
+	    if ($korean) {
+		$col->change(level => 1);
+		if (@c != 1 || $c[0] !~ /^[A-D]/) { # not Hangul
+		    push @err, "$c($prc)" unless $col->eq($pre, $u);
+		    $col->change(level => 2);
+		}
+	    }
+	    push @err, "$c($prc)" unless $col->lt($pre, $u);
+	    push @err, "$c(A)" unless $col->lt('A', $u);
+	    $pre = $u;
+	    $prc = $c;
+	}
+    }
+    print @err            ? "NG @err"  : "OK",   " - $locale compare\n";
+    print $count != $done ? "NG $done" : "OK",   " - $locale count\n";
+    close $fh;
+}
+
+testdata('ja', 6355);
+testdata('ko', 7953);
+testdata('zh_big5',   13060);
+testdata('zh_gb2312',  6768);
+testdata('zh_pinyin', 20916); # 2.0 short
+testdata('zh_stroke', 23684); # 2.0 short
+testdata('zh_zhuyin', 22160); # 22 short
+
+__END__
+
+past test counts:
+
+testdata('zh_pinyin', 20893); # 2.0 short without U+FDD0
+testdata('zh_pinyin', 20861); # 1.9.1 short
+testdata('zh_pinyin', 20994); # 1.8.1
+
+testdata('zh_stroke', 23647); # 1.9.1 short
+testdata('zh_stroke', 13057); # 1.8.1

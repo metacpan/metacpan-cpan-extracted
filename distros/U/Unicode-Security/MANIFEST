@@ -1,0 +1,25 @@
+Changes
+data/confusables.txt
+data/confusablesWholeScript.txt
+lib/Unicode/Security.pm
+lib/Unicode/Security/Confusables.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+scripts/generate-map.pl
+t/00_compile.t
+t/01_confusable.t
+t/02_restriction_leve.t
+t/03_mixed_number.t
+t/04_mixed_script.t
+t/05_whole_script_confusable.t
+t/06_mixed_script_confusable.t
+xt/kwalitee.t
+xt/perlcritic.t
+xt/perlcriticrc
+xt/pod.t
+xt/pod_coverage.t
+xt/portability_filenames.t
+xt/vars.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

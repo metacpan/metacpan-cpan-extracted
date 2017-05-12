@@ -1,0 +1,8 @@
+lib/URI/Find/Simple.pm
+MANIFEST
+t/find.t
+Makefile.PL
+Changes
+README
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,26 @@
+NAME
+    Todo List for UMLS-Association
+
+SYNOPSIS
+    Plans for future versions of UMLS-Association
+
+TO DO LIST
+    1. add additional test cases for util/ programs
+
+    2. develop web interface
+
+AUTHORS
+    Bridget McInnes <btmcinnes at vcu.edu>
+
+COPYRIGHT
+    Copyright (C) 2015 Bridget T. McInnes
+
+    Permission is granted to copy, distribute and/or modify this document
+    under the terms of the GNU Free Documentation License, Version 1.2 or
+    any later version published by the Free Software Foundation; with no
+    Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
+
+    Note: a copy of the GNU Free Documentation License is available on the
+    web at <http://www.gnu.org/copyleft/fdl.html> and is included in this
+    distribution as FDL.txt.
+

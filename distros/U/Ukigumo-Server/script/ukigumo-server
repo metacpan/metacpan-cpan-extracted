@@ -1,0 +1,77 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Getopt::Long qw/:config posix_default no_ignore_case bundling auto_help/;
+use Pod::Usage;
+use Plack::Loader;
+use Ukigumo::Server::Launcher;
+
+GetOptions(\my %opt, qw/
+    port|p=s
+    host|h=s
+    config|c=s
+    max-workers=i
+/) or pod2usage(1);
+$opt{host}          //= 0;
+$opt{port}          //= 2828;
+$opt{'max-workers'} //= 4;
+
+$ENV{PLACK_ENV} //= 'development';
+local $0 = "$0 (Ukigumo::Server)"; # steal from growthforecast.pl
+
+Ukigumo::Server::Launcher->set_config($opt{config});
+Ukigumo::Server::Launcher->setup;
+my $app = Ukigumo::Server::Launcher->to_app;
+
+my $loader = Plack::Loader->load('Starlet',
+    port        => $opt{port},
+    host        => $opt{host},
+    max_workers => $opt{'max-workers'},
+);
+
+printf "ukigumo-server starts listen on %s:%s\n", $opt{host}, $opt{port};
+
+$loader->run($app);
+
+__END__
+
+=head1 NAME
+
+ukigumo-server - ukigumo server launcher
+
+=head1 SYNOPSIS
+
+    % ukigumo-server
+        --host|h=127.0.0.1   # Bind host   (Default: 0)
+        --port|p=80          # Bind port   (Default: 2828)
+        --max-workers        # Max workers (Default: 4)
+        --config|c=config.pl # Configuration file
+
+=head1 DESCRIPTION
+
+ukigumo-server is a Ukigumo::Server launcher.
+
+=head1 CONFIGURATION
+
+Config file is '.pl' format and has two configuration items.
+
+=head2 C<DBI>
+
+DBI connect information. You can use SQLite or MySQL.
+
+=head2 C<Text::Xslate>
+
+Text::Xslate constructor options. If you set this option, you can use original template file.
+
+=head2 C<max_num_of_reports_by_branch>
+
+Upper limit of number of reports to preserve for each branch. If you omit this configuration, it will be unlimited.
+
+=head2 C<max_num_of_reports>
+
+Upper limit of number of all reports. If you omit this configuration, it will be unlimited.
+
+=head2 C<enable_compression>
+
+Compress reports if this option is enabled
+

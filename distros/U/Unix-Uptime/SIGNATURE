@@ -1,0 +1,103 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 7d493a7361a1a8ac5f37aa642c0d69471fd9e283 .travis.yml
+SHA1 322d54f69d2399b5ac253d9c2e73070399083236 Build.PL
+SHA1 5085d9f1031bc3f7920d798915806108754ddab3 Changes
+SHA1 d04d5778aefb53928e11068f0e973f54df7d5dbe MANIFEST
+SHA1 950218f1b12ae7ad971b9de2aee4117367b146fa META.json
+SHA1 a899334bd35096d99d272b004cb7fd8f7d5a7a52 META.yml
+SHA1 3c71a25d406211ea3e7c06cf1960c1e91adae2a3 README.md
+SHA1 f9ffda3c5a56f2ca2d0b7b453b48c927302b470d inc/Devel/AssertOS.pm
+SHA1 ee1841d87162813bbc74d2054fbafcc0d66bca39 inc/Devel/AssertOS/AIX.pm
+SHA1 d5248d929619b53d48de201eaa1c4d1bed5ece4b inc/Devel/AssertOS/Amiga.pm
+SHA1 4cd082777867536d8063a0dbb6ff7c5961281c94 inc/Devel/AssertOS/Android.pm
+SHA1 0c808fe5faa0ade4e6601fb29a74de1a7b51bc12 inc/Devel/AssertOS/Apple.pm
+SHA1 2425323066e4f7e7c3984ec2db55bf68f406c123 inc/Devel/AssertOS/BSDOS.pm
+SHA1 9fd621b5d28868c781a6a577f0bf414f03c22f8a inc/Devel/AssertOS/BeOS.pm
+SHA1 05875e483a4b39f7cb1d9019fbf2ba4276ae0e1c inc/Devel/AssertOS/Bitrig.pm
+SHA1 04cdbd6f70c2eb7933131f502ae05036d8732e3b inc/Devel/AssertOS/Cygwin.pm
+SHA1 52f9980a893c68dc2c4d6740fdf3587ebf9a7a21 inc/Devel/AssertOS/DEC.pm
+SHA1 19f7955ab92d9b60c86138870e1b9de5d241db13 inc/Devel/AssertOS/DGUX.pm
+SHA1 c7284b3168cbf2442aab5fa1e9f33b06ac651b4e inc/Devel/AssertOS/DragonflyBSD.pm
+SHA1 f21f8ebb2a8027cf119852f9c1d3f5f6a99f75de inc/Devel/AssertOS/Dynix.pm
+SHA1 7ee5640eef1568722beb54c3d780fb3d2047659c inc/Devel/AssertOS/EBCDIC.pm
+SHA1 7a537979d4fc34c48160e4d6c01d27c0f06d0ed1 inc/Devel/AssertOS/Extending.pod
+SHA1 829c95529a827d9d45a2da5d1bdd7fa04d65ca0d inc/Devel/AssertOS/FreeBSD.pm
+SHA1 08b3c10bb67bd054dbd6bd2d4309cc19ba8fd3af inc/Devel/AssertOS/GNUkFreeBSD.pm
+SHA1 f155be1964170a7b86a3709b5f9a4577d56b1866 inc/Devel/AssertOS/HPUX.pm
+SHA1 e8e4bc5d992517fcc1cb3093dd89088fd37b036d inc/Devel/AssertOS/Haiku.pm
+SHA1 683ad40ccebcabdda66b599cf6faf9dfc9d4c5da inc/Devel/AssertOS/Interix.pm
+SHA1 4c3c18e19eedb149e360b3d7e993880bdb5918d3 inc/Devel/AssertOS/Irix.pm
+SHA1 2f64dbc6383411a62253f5642f26c09f00874bd5 inc/Devel/AssertOS/Linux.pm
+SHA1 eeabe972dffe0bb2f804f7eafa1a81bad59229fe inc/Devel/AssertOS/Linux/v2_6.pm
+SHA1 e4f15d3b6ac9f0fcfe8ba20c2e78310f1e694eae inc/Devel/AssertOS/MPEiX.pm
+SHA1 047ed24d47b4207e5b082888ea780158c08ca1cd inc/Devel/AssertOS/MSDOS.pm
+SHA1 9bb74c1de7bf28527fc07b8ba50b065b8aa64d40 inc/Devel/AssertOS/MSWin32.pm
+SHA1 f87f1545258920cff245a52ec5343e4338557817 inc/Devel/AssertOS/MacOSX.pm
+SHA1 66716eb573d19b124b5b9df11d8404834dbb5f76 inc/Devel/AssertOS/MacOSX/v10_4.pm
+SHA1 11166cf1fcb62355f1e23015ac45c69f502458ac inc/Devel/AssertOS/MacOSX/v10_5.pm
+SHA1 bb9a401ef90c733e38f7ab229c9b4f29fbefe4d3 inc/Devel/AssertOS/MacOSclassic.pm
+SHA1 12b8caa85c43c17d1708b67c812f56a4a54ccea8 inc/Devel/AssertOS/MachTen.pm
+SHA1 78e6007a26276ba2a3760d12990e338071f1c5df inc/Devel/AssertOS/MicrosoftWindows.pm
+SHA1 dc29302dbb751cceeef68bd87c565fdd96667e07 inc/Devel/AssertOS/MidnightBSD.pm
+SHA1 2c59d1fae7e5a62336a0fde5a855c45cb3f4fef8 inc/Devel/AssertOS/MirOSBSD.pm
+SHA1 28d1d24311dc34dcf0452152acf1ad8d07730c25 inc/Devel/AssertOS/NeXT.pm
+SHA1 7e68008c2a018a1fdbd0b95dddd4e83ca457a9e1 inc/Devel/AssertOS/NetBSD.pm
+SHA1 858e0ed91a634973e561602c8bf12ce8df45587f inc/Devel/AssertOS/Netware.pm
+SHA1 445c621cd91cd6ba821d45cc0ac79971aa3f0887 inc/Devel/AssertOS/OS2.pm
+SHA1 917036d7f02aa3eab37b587099ff3182616bdb46 inc/Devel/AssertOS/OS390.pm
+SHA1 d425c1f0fad35b05ed594f340b1505d561264fad inc/Devel/AssertOS/OS400.pm
+SHA1 33eafab7980b3764bae7c14178688612a3b8ace9 inc/Devel/AssertOS/OSF.pm
+SHA1 8f6ea7dc53d84b357b24fc55d6447598863f36a3 inc/Devel/AssertOS/OSFeatures/POSIXShellRedirection.pm
+SHA1 33add95b7749680680b4aa0f863d08caaa66fb6f inc/Devel/AssertOS/OpenBSD.pm
+SHA1 6e2062ca3c2a3aba2ab6864787b00a7359fb6622 inc/Devel/AssertOS/POSIXBC.pm
+SHA1 f9adec3dd4edceb78f5451946cc48b89b8010f03 inc/Devel/AssertOS/QNX.pm
+SHA1 57338d9b006d6d637bc8080ca0a67e7918d59022 inc/Devel/AssertOS/QNX/Neutrino.pm
+SHA1 8693b14cfcfdda87691a86da5061b5f18d5a4adc inc/Devel/AssertOS/QNX/v4.pm
+SHA1 bb382bc87bd2fc25267ecce1927129344c9d3c4c inc/Devel/AssertOS/RISCOS.pm
+SHA1 facce59d2c6e94c6057cbe5e5dcc26b80155e15f inc/Devel/AssertOS/Realtime.pm
+SHA1 7fa2c38639557e45db6b30cbe991f4b19577498b inc/Devel/AssertOS/SCO.pm
+SHA1 eb984cdc25bf5f7e919ee6fc4d44ec5c1a1019e8 inc/Devel/AssertOS/Solaris.pm
+SHA1 66d4350a55e8e794feaae3d6efdc09a1b3b6062e inc/Devel/AssertOS/Sun.pm
+SHA1 af70260f68550f1afd5dc4694dc19c9418cf17f5 inc/Devel/AssertOS/SunOS.pm
+SHA1 1fcc5bd48e7a9b5763be897e3a3c27290366eed8 inc/Devel/AssertOS/SysVr4.pm
+SHA1 785008efd2330ccdb0c25b9480dc8c220ce21991 inc/Devel/AssertOS/SysVr5.pm
+SHA1 770010576847e63751663d88ceaeda6f4ecbafd3 inc/Devel/AssertOS/Unicos.pm
+SHA1 b2fbcfb4f62e92d9d803a57be4827b8e718ed1a9 inc/Devel/AssertOS/Unix.pm
+SHA1 a6a512d2875759c45e4ec4d7c591e315abdfe6d9 inc/Devel/AssertOS/VMESA.pm
+SHA1 ac0428c5160982335afff51615f648b7f3261639 inc/Devel/AssertOS/VMS.pm
+SHA1 75398c1e4d79e9eb1fd9663c30d6e5b5f63d68dd inc/Devel/AssertOS/VOS.pm
+SHA1 05788319b0fbb2e4f8b3383dc1e1d522ab63c71d inc/Devel/CheckOS.pm
+SHA1 cb27ab53b13dc675130e45f89e064f0c7611bcb9 inc/Devel/CheckOS/Families.pod
+SHA1 d1ae359a37acd2fedc373d60770196b4280d4a66 lib/Unix/Uptime.pm
+SHA1 978dde77032bd057eb0c63bbb8042a35d575bbc2 lib/Unix/Uptime/BSD.pm
+SHA1 6d510d33d18cffb15c6f2e560de7a2c1674571d7 lib/Unix/Uptime/BSD/XS.pm
+SHA1 fd648e34aa09e1d59c74d74b206d31f094164c3b lib/Unix/Uptime/BSD/XS.xs
+SHA1 1382cac3dafe3f0de3250667bc05204a80fd26db lib/Unix/Uptime/Linux.pm
+SHA1 cbfb5f799ab0a9e17ba9188a7ee20f23f20a4e46 samples/uptime.pl
+SHA1 712c110e5a11ada009058c81b6f457fd5e212b58 t/000-compile.t
+SHA1 35d67c769f76989794e77e6f92d7f6950a92e693 t/001-uptime.t
+SHA1 86f576ae39dbd68fe2d5a56c25d172f6c0c46446 t/002-uptime_hires.t
+SHA1 3076209ca0412e84c8f3eaaa8c49e8ef6c1fafb9 t/003-load.t
+SHA1 e9c6a5881fc60173fbc8d479c1afd2ce3b43bef1 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlQ8JmEACgkQokMzJ47YCzr+oACgm7Hu7ppe/jQO3X1TW63LE5xC
+/ZcAoLphqZT5UPdTdT3VH4/8goWV2yiU
+=x5r/
+-----END PGP SIGNATURE-----

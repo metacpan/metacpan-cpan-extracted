@@ -1,0 +1,7 @@
+Revision history for Ubic-Service-MongoDB
+
+0.02    Thu Jul 02, 2015
+        Using MongoDB::MongoClient instead of deprecated MongoDB::Connection.
+
+0.01    Tue Oct 11, 2011
+        Initial release.

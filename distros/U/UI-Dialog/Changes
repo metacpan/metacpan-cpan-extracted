@@ -1,0 +1,399 @@
+1.21 - Sat, 2 Apr 2016 18:04:33 -0500
+
+ * Refactored unit tests to not fail unless it's during actual testing
+ * All unit test scripts are consistently formatted
+
+1.20 - Sun, 6 Mar 2016 21:03:33 -0500
+
+ * Removed Gconf module cludges from Nautilus
+ * Nautilus example and backend general tweaks
+ * Closes github issue 21
+ * Renamed COPYRIGHT to LICENSE
+
+1.19 - Sun, 21 Feb 2016 18:26:22 -0500
+
+ * Nautilus and XOSD tweaks, tests shouldn't fail now
+ * minor changes
+
+1.18 - Fri, 12 Feb 2016 21:48:42 -0500
+
+ * xdialog cleaned up, example script and test included
+ * minor changes
+
+1.17 - Fri, 12 Feb 2016 00:16:03 -0500
+
+ * gdialog cleaned up, example script and test included
+ * kdialog cleaned up, example script and test included
+ * general unit tests fleshed out and/or updated
+ * password dialog for gdialog no longer supported
+
+1.16 - Tue, 9 Feb 2016 21:44:42 -0500
+
+ * Fix for File::Slurp::Unicode dependency (Closes: RT111890)
+ * Fixes for ASCII backend
+ * examples/ascii.pl en-par with cdialog, whiptail and zenity
+
+1.15 - Mon, 8 Feb 2016 18:55:33 -0500
+
+ * Added dependencies for String::ShellQuote, File::Slurp::Unicode
+ * Fixed trust-input, this should now work perfectly (thanks to shell_quote)
+
+1.14 - Tue, 2 Feb 2016 19:52:03 -0500
+
+ * CDialog revisited, tests passing, example script re-written
+ * Whiptail revisited, tests passing, example script re-written
+ * Zenity revisited, tests passing, example script re-written
+ * (Note: need to revisit the rest of the backends, perhaps prune some)
+ * Copyright / license updates
+ * Use warnings across all modules
+ * Minimum perl version is consistently 5.6
+ * This is an "I'm sorry" release for all who actually use this module and I somehow broke your day.
+
+1.13 - Sat, 30 Jan 2016 16:12:04 -0500
+
+ * Bugfix for CDialog menu issue (RT111472)
+ * Patched for checklist issue (RT111429), thanks Ricky!
+ * Updated CONTRIBUTORS
+
+1.12 - Fri, 22 Jan 2016 02:20:02 -0500
+
+ * Bugfixes for tests failing when backend binaries are not found
+ * Bugfixes for CDialog backend form() functionality
+
+1.11 - Sat, 10 Oct 2015 16:20:42 -0500
+
+ * New 'trust-input' option implemented. CVE-2008-7315
+ * all new class, UI::Dialog::Screen::Druid. See examples/screen-druid.pl for usage. Has pod too.
+ * added copyright notice to UI::Dialog::Screen::Menu
+ * fix an issue with Zenity and a noisy stderr getting into the user input. zenity backend now ignores stderr for all subcommands
+ * more reliable checking/defaulting for trust-input option
+ * bugfix, hash assign, not regular =
+ * bugfix, semi-colon needed to be a comma.
+ * version bump to 1.11
+ * added Matthijs to contributors (bugreport) and updated Changes
+ * copyright date bumped to 2015
+ * updated documentation to reflect trust-input feature
+ * an example script for trust-input feature
+ * trust-input can now be set on a per-command basis, not just on module construction.
+ * feature "trust-input" - Addresses CVE-2008-7315
+
+ -- Kevin C. Krinke <kevin@krinke.ca>
+
+1.10 - Sun, 01 Sep 2013 21:12:22 -0500
+
+  * Input and arguments now escaped "more". Not sure it's "secure", but it's definitely better.
+  * Added new UI::Dialog::Backend::NotifySend class
+  * More POD tweaks / fixes, thanks Debian maintainers!
+
+ -- Kevin C. Krinke <kevin@krinke.ca>
+
+1.09 - Sat, 10 Aug 2013 03:04:42 -0500
+
+  * Updated author email address, finally
+  * Added new UI::Dialog::Screen::Menu class
+  * POD tweaks ala Debian packaging patch
+  * Resolved CPAN tickets: 35289, 33365, 18134, 32706, 82093
+
+ -- Kevin C. Krinke <kevin@krinke.ca>
+	
+1.08 - Sat, 02 Oct 2004 00:05:34 -0400
+
+  * UI::Dialog::Backend::Nautilus now correctly determins the user's desktop directory using Gnome2::GConf (if found) or via kludge.
+  * Bugfix for improper Zenity version string handling
+
+ -- Kevin C. Krinke <kckrinke@opendoorsoftware.com>
+
+1.07 - Wed, 21 Jul 2004 14:52:30 -0500
+  * Bugfix for checklist failing to work with an empty user selection
+
+ -- Kevin C. Krinke <kckrinke@opendoorsoftware.com>
+
+1.06 - Thu, 18 Mar 2004 10:55:24 -0500
+  * Bugfix for dynamic path discovery.
+
+ -- Kevin C. Krinke <kckrinke@opendoorsoftware.com>
+
+1.05 - Wed, 17 Mar 2004 18:26:44 -0500
+  * Added infobox() to CDialog and Whiptail POD
+  * Added calendar(), timebox() and tailbox() to CDialog POD
+  * Now chomping calendar() and timebox() results
+  * CDialog case handling for ancient version 0.3
+  * Dynamic PATH discovery; hard coded or $ENV{'PATH'} or default
+  * Implemented form() method for CDialog
+  * "literal" option now forces --no-collapse for CDialog
+  * Updated CONTRIBUTORS file, now gives credit for what they did too
+
+ -- Kevin C. Krinke <kckrinke@opendoorsoftware.com>
+
+1.04 - Sun, 22 Feb 2004 13:28:35 -0500
+  * fixed the use of Temp::File with qw( tempfile )...
+  * ((note to self; remember to test with _all_ variants before release))
+
+ -- Kevin C. Krinke <kckrinke@opendoorsoftware.com>
+
+1.03 - Wed, 18 Feb 2004 11:35:54 -0500
+  * fix for running in X but in a terminal. If there are no gui dialog variants it will now fallback to available console based variants.
+  * Stopped undeffing for a slurp and instead use the localized slurp. (doh! my bad!)
+  * Use tempfile() instead of File::Temp::mktemp.
+  * POD fix for UI::Dialog referring to menubox() when it should be menu()
+  * Whiptail needs the width adjusted by 4 to take into account the borders.
+  * Added in 'literal' option to supress the organization and translation of text.
+  * UI::Dialog::Backend::CDialog no longer has hard coded version dependancies (Debian unstable updates no longer break UI::Dialog::Backend::CDialog).
+  * UI::Dialog::Backend::CDialog no longer messes up by redirecting STDERR to STDOUT via 2>&1 in system() calls
+  * Fixed security issues with CDialog and Whiptail backends and their usage of the temp files.
+  * Removed all warning and diagnostic pragmas.
+  * Added/Updated CONTRIBUTORS file with special thanks to Julian Gilbey and Alfonso E.M.
+  * ((Note to self... remember to add my name at the end of each changelog entry and date to the version line))
+
+ -- Kevin C. Krinke <kckrinke@opendoorsoftware.com>  
+
+1.02
+  * Added editbox() widget to UI::Dialog::GNOME
+  * Updated UI::Dialog::GNOME pod to include editbox() widget with a gdialog warning
+	in the description of the UI::Dialog::GNOME module
+  * Updated UI::Dialog::Backend::Zenity pod to include editbox() widget
+
+1.01
+  * Bugfix from Alfonso E.M. <alfonso@el-magnifico.org> for XDialog cancellabel
+  * updated tests to skip_all that are binary dependant (all except ASCII)
+
+1.00
+
+  * Whitespace fixes
+  * Updates to UI::Dialog::Charts
+  * meta-classes now default to UI::Dialog when an unknown variant is selected via $ENV
+  * Updated CDialog for new version in Debian unstable
+
+ -- Kevin C. Krinke <kckrinke@opendoorsoftware.com>  
+
+0.21 - Mon, 10 Nov 2003 18:59:02 -0500
+
+  * Updated tests and POD
+
+ -- Kevin C. Krinke <kckrinke@opendoorsoftware.com>  
+
+0.20 - Mon, 10 Nov 2003 15:43:40 -0500
+
+  * Migrating debian/changelog to Changes
+  * updated UI::Dialog::Backend::Nautilus for GNOME 2.4 inconsistencies
+
+ -- Kevin C. Krinke <kckrinke@opendoorsoftware.com>  
+
+0.19 - Wed, 17 Sep 2003 20:34:09 -0400
+
+  * updated CDialog.pm for Debian dialog version 20030910
+
+ -- Kevin C. Krinke <kckrinke@opendoorsoftware.com>  
+
+0.18 - Tue,  9 Sep 2003 22:50:05 -0400
+
+  * migrated all the POD to *.pod files
+  * eliminated all "ERRORS" from POD using podchecker
+  * inserted copyright notice at the top of each .pm
+  * migrated all code to lib/UI/
+  * updated Makefile.PL and such to suite the changes
+  * fixed typo "sinle" -> "single" in 3 places
+  * implemented little pod2html shell script
+  * made html of pod in ./pod.html/
+
+ -- Kevin C. Krinke <kckrinke@opendoorsoftware.com>  
+
+0.17 - Wed, 27 Aug 2003 04:14:52 -0400
+
+  * implemented xosd->display_*() methods (like a gauge widget but not)
+  * enabled passing of XOSD config options via first $d->xosd() call
+  * enhanced examples/xosd.pl to suite display_*() feature
+
+ -- Kevin C. Krinke <kckrinke@opendoorsoftware.com>  
+
+0.16 - Thu,  7 Aug 2003 23:45:51 -0400
+
+  * RC3 Yet more beta goodness...
+  * _strip_text() now removes closing meta blocks (like: [/b])
+  * Backend.pm now mentions the ->xosd-> and ->nautilus-> extensions
+  * tweaked meta-class POD ABSTRACT and DESCRIPTION sections
+  * replaced 'error' with ' ' where appropriate
+  * fixed POD for gauge_text(), the example showed gauge_set( "string" );
+  * Zenity now has a "dummy" gauge_text() method for Gauged.pm compliance
+  * implemented UI::Dialog::Gauged meta-class (same as UI::Dialog but for dialogs with gauges)
+  * updated make and rules files for UI::Dialog::Gauged
+
+ -- Kevin C. Krinke <kckrinke@opendoorsoftware.com>  
+
+0.15 - Sat,  2 Aug 2003 04:18:05 -0400
+
+  * RC2 Still Beta Release...
+  * KDE.pm now loads kdialog properly instead of (typoed) xdialog
+
+ -- Kevin C. Krinke <kckrinke@opendoorsoftware.com>  
+
+0.14 - Sat,  2 Aug 2003 03:18:50 -0400
+
+  * This is the RC1 Beta release!!! (yuppers, time to go public!)
+  * corrected inconsistent state handling
+  * repaired ->ra() to return an array of the data (kill array ref madness)
+  * repaired ASCII escaping issues (reimplemented _merge_attrs())
+  * all yesno() widgets set ra() and rs() with either "YES" or "NO"
+  * set the default height of the XDialog calendar & timebox to 14
+  * repaired gauge widget FH issues
+  * beautified and repaired various examples/*.pl
+  * examples/{gnome,kde,console,ui-dialog}.pl are now simply a single msgbox()
+  * updated Makefile.PL, TODO, and Changes
+
+ -- Kevin C. Krinke <kckrinke@opendoorsoftware.com>  
+
+0.13 - Fri,  1 Aug 2003 23:56:35 -0400
+
+  * unified all gauge_*() widgets
+  * returned usleep() to sleep() as it really wasn't doing the right thing.
+
+ -- Kevin C. Krinke <kckrinke@opendoorsoftware.com>  
+
+0.12 - Thu, 31 Jul 2003 20:58:51 -0400
+
+  * implemented ASCII support for callbacks
+  * repaired ASCII gauge
+  * renamed gauge() to draw_gauge() and gauge_end() to end_gauge()
+  * cleaned up & unified "clear" and "beep" construction-time arguments
+  * 'beep' and 'clear' arguments are now set if beep|clearbefore|after exist
+  * Makefile.PL updated with Text::Wrap dependancy
+  * MANIFESTed examples/console.pl
+  * examples/{console,gnome,kde,ui-dialog}.pl are now simplified
+  * 'null-caller-fix' propagated to all backends
+  * clear added to _pre() and _post()
+  * ASCII widgets shortened by 1 line to fit in 80x24 terminals
+  * implemented ASCII infobox() widget
+  * all console infobox widgets now use Time::HiRes::usleep()
+  * ASCII gauge and spinner added to POD
+  * 'timeout' and 'wait' arguments propagated to all backends
+  * inappropriate 'beeps' and 'clears' removed
+  * BEGIN blocks unified across all modules
+  * examples/ascii.pl revisited
+
+ -- Kevin C. Krinke <kckrinke@opendoorsoftware.com>  
+
+0.11 - Thu, 31 Jul 2003 11:52:36 -0400
+
+  * repaired array ref "text" strings (text => [ 'some stuff..', 'next line' ])
+  * implemented gdialog support for callbacks
+  * updated gdialog POD
+  * revised examples/gdialog.pl
+
+ -- Kevin C. Krinke <kckrinke@opendoorsoftware.com>  
+
+0.10 - Wed, 30 Jul 2003 19:04:29 -0400
+
+  * kdialog now supports the callback system
+  * updated examples/kdialog.pl
+  * revised the UI::Dialog::Backend::KDialog POD
+
+ -- Kevin C. Krinke <kckrinke@opendoorsoftware.com>  
+
+0.09 - Wed, 30 Jul 2003 05:07:40 -0400
+
+  * implemented "smart" usage of File::Temp/mktemp/built-in-solution to temp file name generation
+
+ -- Kevin C. Krinke <kckrinke@opendoorsoftware.com>  
+
+0.08 - Wed, 30 Jul 2003 01:11:26 -0400
+
+  * whiptail now supports callbacks properly
+  * POD tweaks to a bunch of files
+  * examples/whiptail.pl updated to latest example format
+  * solved whiptail "screen-no-show" bug (command() instead of command_state())
+  * double-quotes are now escaped like the rest of the "bad shell chars"
+  * backticks are now escaped thus preventing "bad `rm -fr /` string" from doing the Wrong Thing (tm)
+  * fixed missing 'listheight' argument in Whiptail.pm and CDialog.pm
+
+ -- Kevin C. Krinke <kckrinke@opendoorsoftware.com>  
+
+0.07 - Mon, 28 Jul 2003 22:45:14 -0400
+
+  * mucho-POD-update-o
+  * POD: everything now fits nicely in 80 columns
+  * POD: remove of STATE METHODS section (should exist in UI::Dialog::Backend)
+  * POD: added in word_wrap() entry to UI::Dialog::Backend
+
+ -- Kevin C. Krinke <kckrinke@opendoorsoftware.com>  
+
+0.06 - Mon, 28 Jul 2003 15:41:48 -0400
+
+  * updated XDialog with callbacks
+  * tidied up the XDialog POD
+  * UI::Dialog::Backend now depends on Text::Wrap
+  * UI::Dialog::Backend::word_wrap for working with Text::Wrap
+  * _organize_text() now uses $self->word_wrap($cols,'','',@text)
+  * reorganized examples/xdialog.pl
+  * repaired UI::Dialog::Backend::Zenity to use word wrapping correctly
+  * updated debian/control description and depends info
+
+ -- Kevin C. Krinke <kckrinke@opendoorsoftware.com>  
+
+0.05 - Wed, 23 Jul 2003 03:57:33 -0400
+
+  * Unforseen bugs with the callback functionality repaired. callback structure finalized
+  * UI::Dialog::Backend::Zenity has been updated to suite the callback changes
+  * examples/zenity.pl has been touched up a bit with error corrections and callback things
+  * UI::Dialog::Backend pod has been updated with the callback functionality details
+
+ -- Kevin C. Krinke <kckrinke@opendoorsoftware.com>  
+
+0.04 - Tue, 22 Jul 2003 03:05:16 -0400
+
+  * UI::Dialog::Zenity is considered finished (minus unforseen bugs).
+  * UI::Dialog::Backend provides _per() and _post() to facilitate callback function support
+  * state() now recognizes exit value 129 as cancel
+  * state() returns "UNKNOWN(#)" for unrecognized exit values.
+  * added _esc_text() to prevent odd shell interpretations...
+  * _merge_attrs() escapes all appropriate strings with _esc_text() (including lists)
+  * _organize_text() chomps on last newline.
+  * lots of POD updates, mainly for finializing UI::Dialog::Backend::Zenity.
+  * updated cdialog supported version list with 20030720 release.
+  * Backend::Zenity supports the 'display', 'name', and 'class' GTK options
+  * Backend::Zenity->_is_version() created to handle STDERR issues
+  * Backend::Zenity integrated with _pre() and _post() facilities
+  * Backend::Zenity->calendar() defaults to a date-format of '%d/%m/%y'
+  * Backend::Zenity->gauge_start() uses _pre() and _post()
+  * Backend::Zenity->gauge_end() renamed to gauge_stop()
+  * Backend::Zenity->gauge_stop() uses only _post()
+  * Backend::Zenity pod should be the guideline for all other backends
+
+ -- Kevin C. Krinke <kckrinke@opendoorsoftware.com>  
+
+0.03 - Wed, 16 Jul 2003 03:05:05 -0400
+
+  * Backend->fselect() and Backend->dselect() errors resolved
+  * ASCII->password() now interprets BS, DELETE and ^H as a deletion of the last character
+  * Cleanup of various example scripts
+  * implemented _beep() and _clear()
+  * cleanup some code indentation
+  * Whiptail and CDialog now support gauge_text()
+  * GDialog no longer supports gauge_*() at all (gdialog is very flaky in some areas)
+  * debian package now installs examples using dh_installexamples
+  * All backends now support most (if not all) available command line arguments
+  * XDialog's options now support both hyphenated and non-hyphenated forms
+    (ie: 'item-help' and 'itemhelp' are the same option)
+  * CDialog now supports the environment variable DIALOGRC
+  * updated the debian/control long description
+  * override command_*() for Zenity to ignore STDERR. Zenity currently outputs user data
+    to STDERR which get's messed up with GTK warnings if the user's theme is bad. I've
+    sent a patch upstream to Glynn Foster fixing this issue. (The patch simply changes
+    the g_printerr() to g_print() where appropriate.)
+  * added more debug messages of level 2
+  * implemented UI::Dialog::Backend::XOSD
+
+ -- Kevin C. Krinke <kckrinke@opendoorsoftware.com>  
+
+0.02 - Fri, 27 Jun 2003 09:02:41 -0400
+
+  * ->rv($rv||'null') bugfix for state() inconsistencies
+  * repaired Backend::CDialog->checklist() return structure
+
+ -- Kevin C. Krinke <kckrinke@opendoorsoftware.com>
+
+0.01 - Mon, 16 Jun 2003 00:23:31 -0400
+
+  * Initial Release
+  * Extrapolated from UPDM
+
+ -- Kevin C. Krinke <kckrinke@opendoorsoftware.com>  

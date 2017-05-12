@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+META.yml
+README
+Set.pm
+t/parse.t
+t/regex.t

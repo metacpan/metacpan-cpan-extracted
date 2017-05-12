@@ -1,0 +1,12 @@
+--- 
+abstract: Run code after other code, even with exceptions
+author: 
+  - Shawn M Moore <sartak@bestpractical.com>
+generated_by: Dist::Zilla::Plugin::MetaYaml version 1.004
+license: perl
+name: Unwind-Protect
+requires: 
+  Sub::Exporter: 0.961
+  Sub::Uplevel: 0.19
+  Test::Exception: 0.27
+version: 0.01

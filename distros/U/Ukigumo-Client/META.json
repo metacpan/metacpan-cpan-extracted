@@ -1,0 +1,160 @@
+{
+   "abstract" : "Client library for Ukigumo",
+   "author" : [
+      "Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ GMAIL COM>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.1.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Ukigumo-Client",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "LWP::Protocol::PSGI" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Perl::Critic" : "1.02",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Growl::Any" : "0"
+         },
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Encode" : "2.58",
+            "Encode::Locale" : "0",
+            "File::HomeDir" : "0",
+            "File::Path" : "0",
+            "File::Temp" : "0",
+            "Getopt::Long" : "2.42",
+            "HTTP::Request::Common" : "0",
+            "JSON" : "2",
+            "LWP::UserAgent" : "6",
+            "Mouse" : "0",
+            "Pod::Usage" : "0",
+            "Scope::Guard" : "0",
+            "String::CamelCase" : "0",
+            "String::IRC" : "0",
+            "Ukigumo::Common" : "0.1",
+            "YAML::Tiny" : "0",
+            "parent" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Section::Simple" : "0",
+            "File::pushd" : "0",
+            "Test::More" : "0.98",
+            "Test::Requires" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Ukigumo::Client" : {
+         "file" : "lib/Ukigumo/Client.pm",
+         "version" : "0.36"
+      },
+      "Ukigumo::Client::CommandRunner" : {
+         "file" : "lib/Ukigumo/Client/CommandRunner.pm"
+      },
+      "Ukigumo::Client::Executor::Auto" : {
+         "file" : "lib/Ukigumo/Client/Executor/Auto.pm"
+      },
+      "Ukigumo::Client::Executor::Callback" : {
+         "file" : "lib/Ukigumo/Client/Executor/Callback.pm"
+      },
+      "Ukigumo::Client::Executor::Command" : {
+         "file" : "lib/Ukigumo/Client/Executor/Command.pm"
+      },
+      "Ukigumo::Client::Executor::Perl" : {
+         "file" : "lib/Ukigumo/Client/Executor/Perl.pm"
+      },
+      "Ukigumo::Client::Executor::Prove" : {
+         "file" : "lib/Ukigumo/Client/Executor/Prove.pm"
+      },
+      "Ukigumo::Client::Logger" : {
+         "file" : "lib/Ukigumo/Client/Logger.pm"
+      },
+      "Ukigumo::Client::Notify::Callback" : {
+         "file" : "lib/Ukigumo/Client/Notify/Callback.pm"
+      },
+      "Ukigumo::Client::Notify::Debug" : {
+         "file" : "lib/Ukigumo/Client/Notify/Debug.pm"
+      },
+      "Ukigumo::Client::Notify::GitHubStatuses" : {
+         "file" : "lib/Ukigumo/Client/Notify/GitHubStatuses.pm"
+      },
+      "Ukigumo::Client::Notify::Growl" : {
+         "file" : "lib/Ukigumo/Client/Notify/Growl.pm"
+      },
+      "Ukigumo::Client::Notify::Ikachan" : {
+         "file" : "lib/Ukigumo/Client/Notify/Ikachan.pm"
+      },
+      "Ukigumo::Client::Role::VC" : {
+         "file" : "lib/Ukigumo/Client/Role/VC.pm"
+      },
+      "Ukigumo::Client::VC::Callback" : {
+         "file" : "lib/Ukigumo/Client/VC/Callback.pm"
+      },
+      "Ukigumo::Client::VC::Git" : {
+         "file" : "lib/Ukigumo/Client/VC/Git.pm"
+      },
+      "Ukigumo::Client::VC::SVN" : {
+         "file" : "lib/Ukigumo/Client/VC/SVN.pm"
+      },
+      "Ukigumo::Client::YamlConfig" : {
+         "file" : "lib/Ukigumo/Client/YamlConfig.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ukigumo/Ukigumo-Client/issues"
+      },
+      "homepage" : "https://github.com/ukigumo/Ukigumo-Client",
+      "repository" : {
+         "url" : "git://github.com/ukigumo/Ukigumo-Client",
+         "web" : "https://github.com/ukigumo/Ukigumo-Client"
+      }
+   },
+   "version" : "0.36",
+   "x_authority" : "cpan:TOKUHIROM",
+   "x_contributors" : [
+      "xaicron <xaicron@gmail.com>",
+      "Neil Bowers <neil@bowers.com>",
+      "Masayuki Matsuki <y.songmu@gmail.com>",
+      "mattn <mattn.jp@gmail.com>",
+      "Tokuhiro Matsuno <tokuhirom@gmail.com>",
+      "Wataru TOYA <watrty@gmail.com>",
+      "ikasam_a <masaki.nakagawa@gmail.com>",
+      "moznion <moznion@gmail.com>"
+   ]
+}

@@ -1,0 +1,2 @@
+Perl library for the server side of the WumpusRover.  See UAV::Pilot for 
+controlling the WumpusRover on the client side.

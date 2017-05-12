@@ -1,0 +1,27 @@
+---
+abstract: 'A suite of Perl modules that implement a number '
+author:
+  - 'Bridget McInnes <bthomson@cs.umn.edu>, Ted Pedersen <tpederse@d.umn.edu>, Serguei Pakhomov <pakh0002 at umn.edu>, Ying Liu <liux0395@umn.edu>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: UMLS-Similarity
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::Path: 2.08
+  File::Spec: 3.31
+  Lingua::Stem: 0.84
+  Text::NSP: 1.17
+  Text::OverlapFinder: 0.02
+  UMLS::Interface: 1.43
+version: 1.47

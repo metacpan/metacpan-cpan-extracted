@@ -1,0 +1,182 @@
+#!/usr/bin/perl
+#$Id: mkmapfile,v 1.23 1998/02/17 18:04:26 schwartz Exp $
+#
+# mkmapfile - create character mapfile for Unicode::Map library
+#
+# See also usage() of this file.
+#
+# Copyright (C) 1998 Martin Schwartz. All rights reserved.
+# This program is free software; you can redistribute it and/or
+# modify it under the same terms as Perl itself.
+#
+# Contact: Martin Schwartz <martin@nacho.de>
+#
+
+my $PROGNAME = "mkmapfile";
+my $VERSION = '1.24';
+my $DATE = '2000-Jun-26';
+
+use Getopt::Std;
+use Unicode::Map;
+
+my $Map;
+my $numErrors = 0;
+my $numWarnings = 0;
+
+main: {
+   $|=1;
+   $Map = new Unicode::Map ( );
+   if ( !$Map ) {
+      print "Can't get Unicode::Map object!\n";
+      exit 1;
+   }
+
+   getopts ('fhM:oS:U');
+
+   usage() if $opt_h;
+
+   if ($opt_U) {
+      usage() if $opt_S;
+      for ($Map->ids) {
+         $numErrors++ unless _convert (
+            $_, $Map->src($_), $Map->mapping($_), $Map->style($_)
+         );
+      }
+      finish ( );
+   }
+   usage() if !@ARGV;
+
+   for ( @ARGV ) {
+       $numErrors++ unless handle_file ( $_ );
+   }
+
+   finish ( );
+}
+
+sub finish {
+    if ( $numWarnings==0 && $numErrors==0 ) {
+        print "Ok. Everything went fine!\n";
+    } elsif ( $numErrors>0 ) {
+        my $msg;
+        $msg = "$numErrors error";
+        $msg .= "s" if $numErrors>1;
+        $msg .= ", $numWarnings warning" if $numWarnings>0;
+        $msg .= "s" if $numWarnings>1;
+        $msg .= ".";
+        print "Error! Encountered $msg\n";
+    } else {
+        my $msg;
+        $msg = "$numWarnings warning";
+        $msg .= "s" if $numWarnings>1;
+        $msg .= ".";
+        print "Warning! Possible trouble! $msg\n";
+    }
+    exit $numErrors;
+}
+
+sub handle_file {
+   my ( $path ) = @_;
+   my $baseName = basename ( $path );
+   my $basePath = basepath ( $path );
+   my $csid = $Map -> id ( $baseName ) || "GENERIC";
+   my $outfile = $opt_M || $basePath . $baseName . ".map";
+   _convert ( $csid, "$path", "$outfile", $opt_S );
+}
+
+sub _convert {
+   my ($id, $from, $to, $style) = @_;
+   print "Processing $id: ";
+   if (!-f $from) {
+      print ("Text mapfile '$from' not available.\n");
+      return 0;
+   }
+
+   if (!$opt_f) {
+      if ( (stat($from))[9] <= (stat($to))[9] ) {
+         my $s = "Mapping ";
+         $s .= "\"$to\" " if $id=~/^generic$/i;
+         $s .= "'$to' seems uptodate.";
+         print "$s\n";
+         return 1;
+      }
+   }
+
+   if (!$opt_o && -e $to) { 
+     $numWarnings++;
+     print "Binary mapfile \"$to\" exists! Skipping. (Use -o to override)\n";
+     return 1;
+   }
+
+   if ( 
+      !_mkpath(basepath($to))
+      || !$Map -> read_text_mapping ($id, $from, $style)
+      || !$Map -> write_binary_mapping ($id, $to)
+   ) {
+      print "Error for '$to': $!!\n";
+      return 0;
+   }
+   print "saved binary mapping as '$to'.\n";
+1}
+
+sub usage {
+   print 
+      "$PROGNAME V$VERSION ($DATE) - create Unicode mapfiles\n"
+      ."usage: $PROGNAME [-M mapfile.map] -U unicode.TXT \n"
+      ."-M s  Mapfile output. Write created mapping to this file.\n"
+      ."-f    force. Write new mapfiles even when they seem to be update.\n"
+      ."-o    overwrite. Existing files will be overwritten.\n"
+      ."-S s  Style. Textual input mapping is of style 'unicode' or 'keld'\n"
+      ."-U    Update mode. Update mapfiles according to REGISTRY file\n"
+   ;
+   exit 0;
+}
+
+sub basepath { substr($_[0], 0, rindex($_[0],'/')+1) }
+sub basename { (substr($_[0], rindex($_[0],'/')+1) =~ /(^[^.]*)/) && $1; }
+
+sub _mkpath {
+#
+# Creates one or a chain of directories
+#
+   my ($path) = @_;
+   my $current = "";
+   for ( split /\//, $path ) {
+      $current .= "$_/";
+      next if -d $current;
+      if (!mkdir $current, 0777) {
+         print "Cannot create directory \"$current\"!\n";
+      }
+   }
+1}
+
+__END__
+
+=head1 NAME
+
+mkmapfile - create Unicode mapfiles 
+
+Very Alpha.
+
+=head1 SYNOPSIS
+
+Example:
+
+ mkmapfile -M ./GB2312-80.map ~/Unicode/MAPPINGS/EASTASIA/GB/GB2312.TXT
+
+ See "mkmapfile -h" for details.
+
+=head1 DESCRIPTION
+
+Creates the binary mapfiles that module Unicode::Map uses for converting
+from and to unicode character sets.
+
+=head1 SEE ALSO
+
+L<Unicode::Map>
+
+=head1 AUTHOR
+
+Martin Schwartz E<lt>F<martin@nacho.de>E<gt>. 
+
+=cut
+

@@ -1,0 +1,274 @@
+/* -*- C++ -*- */
+
+/****************************************************************************
+ **  Based on OMG UML 2.0 OCL 2003/01/07
+ **
+ */
+
+Package OCL /* What is this Package's name??? */ 
+{
+ 
+  Package Types 
+  {
+    :: Foundation::Core::*,                    /* Classifier */
+       Foundation::Data_Types::*,              /* DataType */
+       Behavioral_Elements::Common_Behavior::* /* Signal */
+       ;
+    
+    Class OclMessageType : Classifier
+    {
+      /* IMPLEMENT */
+      @ 1 , -> +referredSignal    : Signal    0..1 ;
+      @ 1 , -> +referredOperation : Operation 0..1 ;
+    }
+
+    Class OCLModelElementType : Classifier
+    {
+      /* IMPLEMENT */
+      ;
+    }
+
+    Class VoidType : Classifier
+    {
+      /* IMPLEMENT */
+      ;
+    }
+
+
+    Class TupleType : DataType
+    {
+      /* IMPLEMENT */
+      ;
+    }
+
+    Class CollectionType : Classifier
+    {
+      /* IMPLEMENT */
+      ;
+
+      @ +collectionTypes 0..4 , +elementType : Classifier 1 ;
+    }
+
+    Class SetType : CollectionType
+    {
+      /* IMPLEMENT */
+      ;
+
+    }
+
+    Class SequenceType : CollectionType
+    {
+      /* IMPLEMENT */
+      ;
+
+    }
+
+    Class OrdereredSetType : CollectionType
+    {
+      /* IMPLEMENT */
+      ;
+
+    }
+
+    Class BagType : CollectionType
+    {
+      /* IMPLEMENT */
+      ;
+
+    }
+
+  } /* End Package OCL::Types */
+
+
+  Package Expressions
+  {
+    :: OCL::Types::*,
+       Foundation::Core::*,                      /* Classifier */
+       Foundation::Data_Types::*,                /* DataType */
+       Behavioral_Elements::Common_Behavior::*,  /* Signal */
+       Behavioral_Elements::Actions::Messaging_Actions::* /* CallOperationAction, SendSignalAction */
+       ;
+    
+    /* UML 1.5 -- OCL 2.0 Mismatch ??? */
+    Class CallAction : CallOperationAction; /* OCL 2.0 ???? */
+    Class SendAction : SendSignalAction;    /* OCL 2.0 ???? */
+
+    /* p.53, 3.3.1 Expressions Core */
+    Class /OclExpression/ : ModelElement
+    {
+      ;
+    }
+ 
+    Class VariableExp : OclExpression
+    {
+      @ 0..* , +referredVariable : VariableDeclaration 1;
+    }
+
+    Class /LoopExp/ : PropertyCallExp /* //??? */
+    {
+      ;
+      @ <#>           0..1 , +body      : OclExpression       1    ;
+      @ <#> +loopExpr 0..1 , +iterators : VariableDeclaration 1..* ;
+    }
+
+    Class IteratorExp : LoopExp;
+
+    Class IterateExp : LoopExp
+    {
+      @ <#> +baseExpr 0..1 , +result    : VariableDeclaration 1    ;
+    }
+
+    Class VariableDeclaration : Element /* ???? */
+    {
+      @ <#> +initializedVariable 0..1 ,    +initExpression : OclExpression 0..1 ;
+      @                             1 , -> +type           : Classifier    1    ;
+    }
+
+
+    /* p.56, 3.3.2. Model PropertyCall Expressions */
+    Class /PropertyCallExp/ : OclExpression;  /* //??? */
+
+    Class /ModelPropertyCallExp/ : PropertyCallExp;  /* //??? */
+
+    Class AttributeCallExp : ModelPropertyCallExp
+    {
+      @                      0..* , -> +referredAttribute : Attribute 1 ;
+    }
+
+    Class /NavigationCallExp/ : ModelPropertyCallExp  /* //??? */
+    {
+      @                      1    , -> +navigationSource : AssociationEnd 1 ;
+      @ <#>                  0..1 ,    +qualifiers : OclExpression 0..* {ordered};
+    } 
+
+    Class AssociationEndCallExp : NavigationCallExp
+    {
+      @                      0..* , -> +referredAssociationEnd : AssociationEnd 1 ;
+    } 
+
+    Class AssociationClassEndCallExp : NavigationCallExp
+    {
+      @                      0..* , -> +referredAssociationClass : AssociationClass 1 ;
+    } 
+
+    Class OperationCallExp : ModelPropertyCallExp
+    {
+      @ <#> +parentOperation 0..1 ,    +arguments         : OclExpression 0..* {ordered} ;
+      @                      0..* , -> +referredOperation : Operation     1 ;
+    }
+
+
+    /* p. 58, 3.3.3 if Expressions */
+    Class IfExp : OclExpression
+    {
+      @ <#> 0..1 , -> +condition      : OclExpression 1 ;
+      @ <#> 0..1 , -> +thenExpression : OclExpression 1 ;
+      @ <#> 0..1 , -> +elseExpression : OclExpression 1 ;
+    }
+
+
+    /* p. 58, 3.3.4 Message Expressions */
+    Class OclMessageExp : OclExpression
+    {
+      @     1    , -> +target          : OclExpression 1              ;
+      @     1    , -> +arguments       : OclMessageArg 0..* {ordered} ;
+      @     1    , -> +calledOperation : CallAction    1              ;
+      @     1    , -> +sendSignal      : SendAction    1              ;
+    }
+
+    Class OclMessageArg : Element /* ??? */
+    {
+      @     1    , -> +unspecified     : UnspecifiedValueExp 0..1 ;
+      @     1    , -> +expression      : OclExpression       0..1 ;
+    }
+
+    Class UnspecifiedValueExp : ModelElement
+    {
+      @     1    , -> type             : Classifier         1     ;
+    }
+
+
+    /* p. 60, 3.3.5 Literal Expressions */
+    Class /LiteralExp/ : OclExpression;  /* //??? */
+
+    Class /PrimitiveLiteralExp/ : LiteralExp;  /* //??? */
+
+    Class /NumericLiteralExp/ : PrimitiveLiteralExp; /* //??? */
+
+    Class IntegerLiteralExp : NumericLiteralExp
+    {
+      integerSymbol : Integer;
+    }
+
+    Class RealLiteralExp : NumericLiteralExp
+    {
+      realSymbol : Real;
+    }
+
+    Class BooleanLiteralExp : PrimitiveLiteralExp
+    {
+      booleanSymbol : Boolean;
+    }
+
+    Class StringLiteralExp : PrimitiveLiteralExp
+    {
+      stringSymbol : String;
+    }
+
+
+    Class EnumLiteralExp : LiteralExp
+    {
+      @     1    , -> +referredEnumLiteral : EnumerationLiteral 1 ; /* Spec sez "EnumLiteral" */
+    }
+
+    Class TupleLiteralExp : LiteralExp
+    {
+      @     1    ,    +tuplePart : VariableDeclaration 0..* ;
+    }
+
+    Class CollectionLiteralExp : LiteralExp
+    {
+      kind : CollectionKind;
+
+      @     1    ,    +parts     : CollectionLiteralPart 0..* {ordered} ;
+    }
+
+    Class /CollectionLiteralPart/ : Element /* ??? */  /* //??? */
+    {
+      @     1   , -> +type      : Classifier 1 ;  
+    }
+
+    Class CollectionRange : CollectionLiteralPart
+    {
+      @     0..1 , -> +first     : OclExpression 1 ;
+      @     0..1 , -> +last      : OclExpression 1 ;
+    }
+
+    Class CollectionItem : CollectionLiteralPart
+    {
+      @     0..1 , -> +item      : OclExpression 1 ;
+    }
+
+    Enumeration CollectionKind
+    {
+      Collection;
+      Set;
+      Bag;
+      Sequence;
+    }
+
+
+    /* p. 62, 3.3.6 Let expressions */
+    Class LetExp : OclExpression
+    {
+      @ <#> 0..1 , -> +in       : OclExpression       1;
+      @ <#> 0..1 , -> +variable : VariableDeclaration 1;
+    }
+
+  } /* End Package OCL::Expressions */
+
+
+} /* End Package OCL */
+
+
+/* END OF FILE */

@@ -1,0 +1,21 @@
+---
+layout: sub
+menu: 
+    - text: Overview
+      href: index.html
+    - text: Documentation
+      href: documentation.html
+    - text: Install
+      href: install.html
+
+module_details:
+    name: 'UR'
+    exe_name: ur
+    gmt_pkg_name: ur
+    debian_pkg_name: libur-perl
+    icon: res/images/icon_48.png
+    icon_16: res/images/icon_16.png
+
+download_link: install.html
+github_url: https://github.com/genome/UR
+

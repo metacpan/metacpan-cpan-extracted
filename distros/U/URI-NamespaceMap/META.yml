@@ -1,0 +1,69 @@
+---
+abstract: 'Namespace manipulation and prefix mapping for XML, RDF, etc.'
+author:
+  - 'Kjetil Kjernsmo <kjetilk@cpan.org>'
+  - 'Gregory Todd Williams <gwilliams@cpan.org>'
+  - 'Chris Prather (PERIGRIN) <chris@prather.org>'
+build_requires:
+  Test::Exception: '0'
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.150005'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: URI-NamespaceMap
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  Types::Namespace:
+    file: lib/Types/Namespace.pm
+    version: '1.00'
+  URI::Namespace:
+    file: lib/URI/Namespace.pm
+    version: '1.00'
+  URI::NamespaceMap:
+    file: lib/URI/NamespaceMap.pm
+    version: '1.00'
+  URI::NamespaceMap::ReservedLocalParts:
+    file: lib/URI/NamespaceMap/ReservedLocalParts.pm
+    version: '1.00'
+recommends:
+  RDF::NS: '20130802'
+  RDF::NS::Curated: '0'
+  RDF::Prefixes: '0'
+  XML::CommonNS: '0'
+requires:
+  Carp: '0'
+  IRI: '0.004'
+  Module::Load::Conditional: '0'
+  Moo: '1.006000'
+  Sub::Quote: '0'
+  Try::Tiny: '0'
+  Type::Library: '1.000000'
+  Types::URI: '0.004'
+  URI: '1.52'
+  namespace::autoclean: '0.20'
+  perl: '5.008001'
+resources:
+  Identifier: http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/project
+  bugtracker: https://github.com/kjetilk/URI-NamespaceMap/issues
+  homepage: https://metacpan.org/module/URI::NamespaceMap
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/kjetilk/URI-NamespaceMap/
+version: '1.00'
+x_contributors:
+  - 'Dorian Taylor <dorian@cpan.org>'
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+  - 'Paul Williams (KWAKWA) <kwakwa@cpan.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

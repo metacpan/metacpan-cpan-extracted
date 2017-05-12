@@ -1,0 +1,105 @@
+\input texinfo @c -*-texinfo-*-
+@c %**start of header
+@setfilename readme.info
+@settitle Perl Unix::Processors Installation
+@c %**end of header
+
+@c DESCRIPTION: TexInfo: DOCUMENT source run through texinfo to produce README file
+@c Use 'make README' to produce the output file
+@c Before release, run C-u C-c C-u C-a (texinfo-all-menus-update)
+
+@node Top, Copyright, (dir), (dir)
+@chapter Unix::Processors
+
+This is the Unix::Processors Perl Package.
+
+@menu
+* Copyright::
+* Description::
+* Obtaining Distribution::
+* Supported Systems::
+* Installation::
+@end menu
+
+@node Copyright, Description, Top, Top
+@section Copyright
+
+This package is Copyright 1999-2017 by Wilson Snyder @email{wsnyder@@wsnyder.org}.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of either the GNU Lesser General Public License
+Version 3 or the Perl Artistic License Version 2.0.
+
+This code is provided with no warranty of any kind, and is used entirely at
+your own risk.
+
+@node Description, Obtaining Distribution, Copyright, Top
+@section Description
+
+This package provides access to per-processor information from Perl.
+
+@example
+  my $procs = new Unix::Processors;
+  print $procs->max_online, " CPUs at ", $procs->max_clock, " MHz\n";
+  if ($procs->max_online != $procs->max_physical) @{
+      print "Hyperthreading between ",$procs->max_physical," physical CPUs.\n";
+  @}
+  (my $FORMAT =   "%2s  %-8s     %4s    \n") =~ s/\s\s+/ /g;
+  printf($FORMAT, "#", "STATE", "CLOCK",  "TYPE", );
+  foreach my $proc (@@@{$procs->processors@}) @{
+      printf ($FORMAT, $proc->id, $proc->state, $proc->clock, $proc->type);
+  @}
+@end example
+
+See @samp{man Unix::Processors} after installation.
+
+@node Obtaining Distribution, Supported Systems, Description, Top
+@section Obtaining Distribution
+
+The latest version is available at
+@uref{http://www.perl.org/CPAN/}
+
+Download the latest package from that site, and decompress.
+@samp{gunzip Unix-Processors_version.tar.gz ; tar xvf Unix-Processors_version.tar}
+
+@node Supported Systems, Installation, Obtaining Distribution, Top
+@section Supported Systems
+
+This version of Unix::Processors has been built and tested on:
+
+@itemize @bullet
+@item i386-linux
+@item aix-4.3.3
+@item aix-5.1.0 (32 and 64 bit)
+@item alpha-osf
+@item freebsd (clock methods not supported before freebsd 5.4)
+@item hpux-11.00
+@item hpux-11.11
+@item sgi-irix
+@item sparc-sun-solaris2.6
+@item sparc-sun-solaris2.8
+@end itemize
+
+Porting will definately be necessary for other operating systems.
+
+@node Installation,  , Supported Systems, Top
+@section Installation
+
+@enumerate
+@item
+@code{cd} to the directory containing this README notice.
+
+@item
+Type @samp{perl Makefile.PL} to configure Unix::Processors for your system.
+
+@item
+Type @samp{make} to compile Unix::Processors.
+
+@item
+Type @samp{make install} to install the programs and any data files and
+documentation.
+
+@end enumerate
+
+
+

@@ -1,0 +1,17 @@
+Revision history for Perl extension URI::Find::UTF8
+
+0.05  2015-11-06 08:58:40 PST
+        - Clean up distribution to resolve test failures
+
+0.04  2014-08-06 13:06:12 PDT
+        - Make it work with newer upstream URI::Find (ediblenergy)
+
+0.03  Sun Jul 19 23:19:00 PDT 2009
+        - Fixed tests with recent URI::Find
+
+0.02  Fri Jan 18 16:27:07 PST 2008
+        - Added =encoding utf-8 to docs
+        - Specify URI::Find version number to make sure it's not ancient
+
+0.01  Fri Jan 18 15:29:16 2008
+        - original version

@@ -1,0 +1,12 @@
+lib/User/getgrouplist.pm	Perl interface to the package
+inc/Devel/CheckLib.pm		Devel::CheckLib as available from CPAN
+getgrouplist.xs			Perl extension
+t/00-load.t			Module load test
+t/01-getgrouplist-for-root.t	Test a call to the single exported function
+t/02-getgrouplist-for-barf.t	Test a in intended failing call
+Makefile.PL			MakeMaker make file
+MANIFEST			This list of files
+README				Pseudo-Readme
+ChangeLog			Change log
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

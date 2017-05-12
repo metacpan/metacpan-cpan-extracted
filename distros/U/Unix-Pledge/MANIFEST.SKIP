@@ -1,0 +1,13 @@
+MANIFEST.bak
+Makefile.old
+Makefile$
+README.pod
+.gitignore
+.git/
+blib/
+pm_to_blib
+Pledge.o
+Pledge.c
+Pledge.bs
+MYMETA.*
+Unix-Pledge.*tar[.]gz$

@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+bin/utf8bom
+t/00_compile.t
+t/01_check.t
+t/dir/with_bom.txt
+t/dir/without_bom.txt
+lib/UTF8BOM.pm
+META.yml                                 Module meta-data (added by MakeMaker)

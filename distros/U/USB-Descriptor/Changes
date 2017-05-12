@@ -1,0 +1,23 @@
+Revision history for USB-Descriptor
+
+4	October 9, 2011
+	Auto-assign configuration values during arrayification
+	Endpoint constructor allows 'direction => number' shortcut
+	Allow a hash reference, instead of an array, for setting endpoints, interfaces, configurations and reports
+	Sort report descriptors by ReportID during arrayifications
+	HID buttons now set ReportCount
+	Report constructor allows 'type => reportID' shortcut
+
+3	September 28, 2011
+        Fix interface number generation
+        Allow setting of HID Usage Pages using string constants
+        Set default HID version to 1.11
+        Fix handling of Vendor Specific Usage Pages
+        Shortcut notation for setting button numbers
+
+2       Aug 24 2011
+        POD cleanup
+        Added missing file HID/Report.pm
+
+1       Aug 16 2011
+        First version, released on an unsuspecting world.

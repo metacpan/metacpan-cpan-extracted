@@ -1,0 +1,92 @@
+UML::Sequence and its helpers produce UML sequence diagrams (they are probably
+not compliant with any of the UML specifications, but I find them useful).
+
+INSTALL
+
+Do the standard things:
+    perl Makefile.PL
+    make
+    make test
+    make install
+    make clean
+
+COPYRIGHT and LICENSE
+
+Copyright 2003-6, Philip Crow.  All rights reserved.  You may distribute
+and/or modify these programs under the same terms as Perl 5.8 itself.
+
+DESCRIPTION
+
+There are samples in the samples directory in the distribution.  The
+samples have the code and pictures (in svg and png formats).
+
+Simple Sequences
+
+You can create a sequence from an outline.  Type something like this:
+
+At Home.Wash Car
+    Garage.retrieve bucket
+    Kitchen.prepare bucket
+        Kitchen.pour soap in bucket
+        Kitchen.fill bucket
+    Garage.get sponge
+    Garage.open door
+    Driveway.apply soapy water
+    Driveway.rinse
+    Driveway.empty bucket
+    Garage.close door
+    Garage.replace sponge
+    Garage.replace bucket
+
+Then do this (to generate SVG output):
+
+    genericseq.pl UML::Sequence::SimpleSeq inputfile | seq2svg.pl > output.svg
+
+or this (to generate raster image output, e.g., PNG):
+
+    genericseq.pl UML::Sequence::SimpleSeq inputfile | seq2rast.pl > output.png
+
+Perl Sequences
+
+To produce sequences of Perl programs, first make a list of the methods
+you care about like this:
+
+    DiePair::new
+    Die::new
+    DiePair::roll
+    Die::roll
+    DiePair::total
+    DiePair::doubles
+    DiePair::to_string
+
+Then do this:
+
+    genericseq.pl UML::Sequence::PerlSeq method_file program args | seq2svg.pl > output.svg
+
+Java Sequences
+
+You must have tools.jar in your classpath.  It must contain the Java Platform
+Debugger Architecture.  The stars must properly align.  Then make a file
+of classes (or methods) you want to hear about, like this:
+
+    ALL
+    Hello
+    HelloHelper
+
+The ALL means all methods.  The other lines are classes.  All the methods from
+those classes will appear in the diagram.  To restrict the list of methods,
+include full signatures.
+
+After you make the methods file, do this:
+
+    genericseq.pl UML::Sequence::JavaSeq method_file program args | seq2svg.pl > output.svg
+
+For this to work, you must have Seq.class from the distribution and tools.jar
+from sdk 1.3 or later in your java_home/lib directory.  I also found that
+when my Linux system is not on the network, the Java Platform Debugger
+Architecture (jpda) didn't want to run.
+
+To build your own outliner, implement the same methods as
+UML::Sequence::SimpleSeq.pm.  Then use genericseq.pl and seq2svg.pl.
+
+Please send questions or comments to Phil Crow at philcrow2000@yahoo.com.

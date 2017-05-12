@@ -1,0 +1,119 @@
+#!/usr/local/bin/perl -w                                                        
+                                                                                
+# Before `make install' is performed this script should be runnable with        
+# `make test'. After `make install' it should work as `perl access.t'           
+                                                                                
+##################### We start with some black magic to print on failure.       
+
+use strict;
+use warnings;
+
+use Test::More tests => 6;
+
+use UMLS::Interface;
+use File::Spec;
+use File::Path;
+
+if(!(-d "t")) {   
+    print STDERR "Error - program must be run from UMLS::Similarity\n";
+    print STDERR "directory as : perl t/findCuiDepth.t \n";
+    exit;  
+}
+
+my $perl     = $^X;
+my $sp_prg   = File::Spec->catfile('t', 'check-shortestpath');
+
+my ($real, $index, $config, $infile, $indexfile, $realfile, $check, $util_prg);
+
+#############################################################################
+#  check shortestpathlength on msh 
+#############################################################################
+$util_prg  = File::Spec->catfile('utils', 'findShortestPathLength.pl');
+$config    = File::Spec->catfile('t', 'config', 'config.msh.par-chd');
+$infile    = File::Spec->catfile('t', 'tests', 'msh.100');
+$indexfile = File::Spec->catfile('t', 'output', 'msh.100.spl.indexfile');
+$realfile  = File::Spec->catfile('t', 'output', 'msh.100.spl.realfile');
+
+`$perl $util_prg --config $config --infile $infile > $indexfile`;
+`$perl $util_prg --config $config --realtime --infile $infile > $realfile`;
+
+$check = `diff $indexfile $realfile 2>&1`;
+
+cmp_ok($check, 'eq', "");
+
+#############################################################################
+#  check shortestpath on msh 
+#############################################################################
+$util_prg  = File::Spec->catfile('utils', 'findShortestPath.pl');
+$config    = File::Spec->catfile('t', 'config', 'config.msh.par-chd');
+$indexfile = File::Spec->catfile('t', 'output', 'msh.100.sp.indexfile');
+$realfile  = File::Spec->catfile('t', 'output', 'msh.100.sp.realfile');
+$infile    = File::Spec->catfile('t', 'tests', 'msh.100');
+
+`$perl $util_prg --config $config --infile $infile > $indexfile`;
+`$perl $util_prg --config $config --realtime --infile $infile > $realfile`;
+
+$check = `$perl $sp_prg $indexfile $realfile`;
+cmp_ok($check, 'eq', "");
+
+#############################################################################
+#  check shortestpathlength on fma 
+#############################################################################
+$util_prg  = File::Spec->catfile('utils', 'findShortestPathLength.pl');
+$config    = File::Spec->catfile('t', 'config', 'config.fma.par-chd');
+$infile    = File::Spec->catfile('t', 'tests', 'fma.100');
+$indexfile = File::Spec->catfile('t', 'output', 'fma.100.spl.indexfile');
+$realfile  = File::Spec->catfile('t', 'output', 'fma.100.spl.realfile');
+
+`$perl $util_prg --config $config --infile $infile > $indexfile`;
+`$perl $util_prg --config $config --realtime --infile $infile > $realfile`;
+
+$check = `diff $indexfile $realfile 2>&1`;
+
+cmp_ok($check, 'eq', "");
+
+#############################################################################
+#  check shortestpath on fma 
+#############################################################################
+$util_prg  = File::Spec->catfile('utils', 'findShortestPath.pl');
+$config    = File::Spec->catfile('t', 'config', 'config.fma.par-chd');
+$indexfile = File::Spec->catfile('t', 'output', 'fma.100.sp.indexfile');
+$realfile  = File::Spec->catfile('t', 'output', 'fma.100.sp.realfile');
+$infile    = File::Spec->catfile('t', 'tests', 'fma.100');
+
+`$perl $util_prg --config $config --infile $infile > $indexfile`;
+`$perl $util_prg --config $config --realtime --infile $infile > $realfile`;
+
+$check = `$perl $sp_prg $indexfile $realfile`;
+cmp_ok($check, 'eq', "");
+
+#############################################################################
+#  check shortestpathlength on snomedct 
+#############################################################################
+$util_prg  = File::Spec->catfile('utils', 'findShortestPathLength.pl');
+$config    = File::Spec->catfile('t', 'config', 'config.snomedct.par-chd');
+$infile    = File::Spec->catfile('t', 'tests', 'snomedct.100');
+$indexfile = File::Spec->catfile('t', 'output', 'snomedct.100.spl.indexfile');
+$realfile  = File::Spec->catfile('t', 'output', 'snomedct.100.spl.realfile');
+
+`$perl $util_prg --config $config --infile $infile > $indexfile`;
+`$perl $util_prg --config $config --realtime --infile $infile > $realfile`;
+
+$check = `diff $indexfile $realfile 2>&1`;
+
+cmp_ok($check, 'eq', "");
+
+#############################################################################
+#  check shortestpath on snomedct 
+#############################################################################
+$util_prg  = File::Spec->catfile('utils', 'findShortestPath.pl');
+$config    = File::Spec->catfile('t', 'config', 'config.snomedct.par-chd');
+$indexfile = File::Spec->catfile('t', 'output', 'snomedct.100.sp.indexfile');
+$realfile  = File::Spec->catfile('t', 'output', 'snomedct.100.sp.realfile');
+$infile    = File::Spec->catfile('t', 'tests', 'snomedct.100');
+
+`$perl $util_prg --config $config --infile $infile > $indexfile`;
+`$perl $util_prg --config $config --realtime --infile $infile > $realfile`;
+
+$check = `$perl $sp_prg $indexfile $realfile`;
+cmp_ok($check, 'eq', "");

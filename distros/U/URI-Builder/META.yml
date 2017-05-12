@@ -1,0 +1,24 @@
+---
+abstract: 'URI objects optimised for manipulation'
+author:
+  - unknown
+build_requires: {}
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4202, CPAN::Meta::Converter version 2.132830'
+license: artistic
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: URI-Builder
+provides:
+  URI::Builder:
+    file: lib/URI/Builder.pm
+    version: 0.04
+requires:
+  URI: 1.60
+  perl: v5.6.0
+resources:
+  license: http://www.perlfoundation.org/artistic_license_1_0
+version: 0.04

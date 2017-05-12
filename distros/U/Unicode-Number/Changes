@@ -1,0 +1,39 @@
+0.009 2014-06-08 11:12:09-0500
+   - build fix: add Alien::Uninum to configure_requires.
+     fixes: <https://rt.cpan.org/Ticket/Display.html?id=96325>. Thanks Slaven Rezic!
+
+0.008 2014-06-07 18:13:57-0500
+   - doc fixes
+
+0.007 2014-03-09 11:56:40-0500
+   - make sure Math::BigInt is a recommended dependency
+   - more tests
+
+0.006 2014-02-01 13:03:37-0600
+   - free memory
+   - use PERL_NO_GET_CONTEXT
+
+0.005 2013-12-31 12:09:19-0600
+   - add maximum_value method to Unicode::Number::System
+   - doc fixes
+
+0.004_01 2013-12-24 13:23:49-0600
+   - Alien::Uninum is a runtime prereq, not a build prereq.
+
+0.004 2013-12-24 13:12:51-0600
+   - build fix that uses MakeMaker's CONFIGURE option to specify the build
+     prereq on Alien::Uninum then use it afterwards.
+     Closes <https://github.com/zmughal/p5-Unicode-Number/issues/13>
+     (thanks to @patch for finding this).
+
+0.003 2013-12-24 09:01:27-0600
+   - fix encoding issue in tests
+   - move the overload pragma so that it works on earlier perl versions
+
+0.002 2013-12-23 18:25:53-0600
+   - stray path in Makefile.PL: make sure Alien::Uninum is called at configure
+     time, not at release time (thanks to bulk88 for catching this)
+   - make Alien::Uninum a build prereq
+
+0.001 2013-12-23 16:45:38-0600
+   - initial version

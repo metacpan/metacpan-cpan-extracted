@@ -1,0 +1,14 @@
+Changes
+lib/UUID/Tiny.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-UUID-std.t
+t/02-UUID-legacy.t
+t/03-UUID-fork.t
+t/boilerplate.t
+t/data/test.jpg
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

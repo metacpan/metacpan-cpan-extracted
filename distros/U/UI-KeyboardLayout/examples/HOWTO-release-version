@@ -1,0 +1,15 @@
+chmod u+r /tmp/iz/*
+mv /tmp/iz/* .
+cp -p ../CURRENT/index.html ../CURRENT/HOWTO-install-deinstall-and-tables .
+unzip html.zip
+unzip apple.zip
+unzip src.zip text-tables
+chmod a+r *.html *.zip README*
+
+
+  add line with the new version to ../index.html
+
+  fix the version number (appears once) in HOWTO-install-deinstall-and-tables
+  change the end of HOWTO-install-deinstall-and-tables to the content of text-tables
+      (Fix 2 lines [Cyrillic last but one, Hebrew after /?] in the inserted part — visible in FCW.)
+      	Only the second one is visible if Emacs on Unix, showing in a console on Windows.

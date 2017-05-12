@@ -1,0 +1,12 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+eg/unazu_san.pl
+lib/UnazuSan.pm
+t/00_compile.t
+t/01_basic.t
+META.yml
+MANIFEST

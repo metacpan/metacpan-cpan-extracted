@@ -1,0 +1,123 @@
+Revision history for Util-Any
+
+0.25 2016-12-19T15:53:52Z
+	remove Perl6::Export::Attrs support.
+
+0.24 2014-07-22T22:35:47Z
+
+	Fix test. test failes because List::MoreUtils and List::Utils have same name function in some Perl versions.
+        Fix some typos.
+
+0.22    2010/04/29 22:58:00
+	change the way to disable executing code defined as '.'.
+	  (see 'DO SOMETHING WITHOUT EXPORTING ANYTHING'.)
+	  for example, -list => [''] -> -list => []
+	avoid warning message on perl 5.12
+
+0.21    2010/04/22 02:38:00
+        fix bug: _default_kinds and -all keyword doesn't work well.
+        add documentation for _default_kinds.
+
+0.20    2010/04/12 23:33:00
+        add feature only execute code without exporting anything.
+        add _default_kinds method to specify default kinds to export.
+
+0.19    2010/04/03 02:00:00
+        add List::Pairwise to list.
+        add -data which is as same as -scalar
+
+0.18    2010/01/01 06:17:05
+        remove List::MoreUtils from Util::Any itself(they are left in definition).
+        Fix bug: didn't understand argument order, collectory in some case.
+
+0.17    2009/10/06 03:32
+        add -args option to give common arguments to all functions in same kind.
+        enable to work -all with kind setting. for example
+               -all, -list => {...}
+        fix typo: inherit Perl6::Export::Attr and ':ALL' keyword didn't work correctly.
+        fix typo: inherit Exporter and ':all' keyword didn't work correctly.
+        Thanks to Richard Jelinek, again.
+
+0.16    2009/09/30 03:16
+        fix bug: using SubExportor's generator way and select functions with rename function,
+                 didn't working correctly
+                 example: ["function", "function2", function3 => {-as => "functionX"}]
+        fix bug: using SubExporter's generator way, didn't add prefix.
+        if wrong option is passed as plugin options, Carp.
+        refactored code. fix buggy code.
+
+0.15    2009/09/29 04:17
+        fix bug: -as doesn't work for renamed function.
+        now, can choose how to load plugin. 'lazy', 'eager' or '0'.
+          default is 'lazy'.
+
+0.14    2009/09/26 11:02
+        add pluggable feature.
+        performance improvement.
+            if empty -select option is passed,
+            don't seek class's all functions.
+        warn when unkown arguments are passed.
+
+0.13    2009/09/24 13:53
+        improve code generator.
+            enable not to set -as.
+            export code generator when specifing only kind.
+        perfomance improvement
+        fix typo in document
+
+0.12    2009/09/15 16:29
+        fix bug importing with specific functions
+            for example, -list => ['uniq'];
+            it occurs when one kind has multiple modules.
+            This bug is from 0.08
+        fix bug, export like SubExpoter (rename using -as) didn't work.
+        fix bug, the following importing didn't work.
+            use Util::Any {-list => ['uniq']};
+            This was bug of documennt, but now work.
+        fix document
+            -kind => 'function' doesn't work. use -kind => ['function'], instead.
+            for example, -list => ['uniq']
+        add test for synopsis example
+        add test of Sub::Exporter generators way and write docuement about it.
+        fix typo in test script
+
+0.11    2009/09/15 09:47
+        fix test script. if module is not installed, skip test.
+
+0.10    2009/09/14 11:47
+        add option smart_rename.
+
+0.09    2009/09/14 03:31
+        Fix bug, prefix doesn't work when using '-kind' style.
+
+0.08    2009/09/11 15:58
+        support Sub::Exporter
+        support some of exporting ways of Sub::Exporter
+
+0.07    2009/04/12 03:58
+        Fix bug when inheriting
+        Thanks to Richard Jelinek
+
+0.06    2009/03/22 14:55
+        support Exporter and Exporter::Simple
+
+0.05    2009/03/22 02:35
+        solve the problem using Util::Any with Perl6::Export::Atttrs
+        new feature to inherit Util::Any(-Base and -Perl6ExportAttrs)
+
+0.04    2008/12/14 17:34
+        -select & -except option is added to select functions to be exported.
+        enable to rename function name.
+
+0.03    2008/12/05 15:37
+        add debug option
+        write document in detail
+        fix for Perl 5.10.
+        Perl 5.10 Hash::Util doesn't have some functions which are defined in EXPORT_OK.
+
+0.02    2008/12/03 14:52
+        class variables should be cloned in sub class,
+        so change %Utils variables from hash to hash ref to clone easily.
+
+0.01    2008/12/03 03:13
+        First version

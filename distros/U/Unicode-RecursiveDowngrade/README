@@ -1,0 +1,72 @@
+Unicode::RecursiveDowngrade version 0.02
+========================================
+
+NAME
+       Unicode::RecursiveDowngrade - Turn off the UTF-8 flags inside of com-
+       plex variable
+
+SYNOPSIS
+        use Unicode::RecursiveDowngrade;
+
+        $rd = Unicode::RecursiveDowngrade->new;
+        $var = {
+            foo   => 'bar',
+            baz   => [
+                'qux',
+                'quux',
+            ],
+            corge => \$grault,
+        };
+        $unflagged = $rd->downgrade($var);
+
+DESCRIPTION
+       Unicode::RecursiveDowngrade will turn off the UTF-8 flag inside of com-
+       plex variable in a lump.  In spite of your intention, some modules turn
+       it on every elements of returned variable.  You may be hard up for turn
+       them off if you don't need any UTF-8 flags in your variable.  This mod-
+       ule will fix it up easily.
+
+       Sometime I think about the UTF-8 flag is not stead.  But some
+       "XML::Parser" based modules will turn it on.  For example, "XML::Sim-
+       ple" is really simple way to parse XMLs, but this module returns a sim-
+       ple hashref including flagged values.  This hashref is very hard to
+       use, isn't it?
+
+METHODS
+       * new
+           "new()" is a constructor method.
+
+       * filter
+           You can set some filter to "filter()" accessor. The values of down-
+           graded will be passed this filter function.  You have to set a code
+           reference to this accessor.  Like this:
+
+            use Unicode::RecursiveDowngrade;
+            use Unicode::Japanese;
+
+            $rd = Unicode::RecursiveDowngrade->new;
+            $rd->filter(sub { Unicode::Japanese->new(shift, 'utf8')->euc });
+            $unflagged = $rd->downgrade($var);
+
+           the passed subref will be called inside "downgrade()" method.
+
+       * downgrade
+           "downgrade()" returns a turned off variable of argument.
+
+VARIABLES
+       * $Unicode::RecursiveDowngrade::DowngradeFunc
+           This variable has a downgrade function for "downgrade()" method.
+           You can override the variable for some other way.
+
+AUTHOR
+       Koichi Taniguchi <taniguchi@livedoor.jp>
+
+COPYRIGHT
+       Copyright (c) 2005 Koichi Taniguchi. Japan. All rights reserved.
+
+       This library is free software; you can redistribute it and/or modify it
+       under the same terms as Perl itself.
+
+SEE ALSO
+       utf8
+

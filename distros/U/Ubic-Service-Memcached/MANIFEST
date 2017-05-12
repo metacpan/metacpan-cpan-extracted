@@ -1,0 +1,12 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.md
+dist.ini
+lib/Ubic/Service/Memcached.pm
+t/release-pod-coverage.t
+t/release-pod-syntax.t
+t/service.t

@@ -1,0 +1,1450 @@
+// -*- java -*-
+// $Id: Java.txt,v 1.22 2005/04/12 05:40:43 stephens Exp $
+
+[% MACRO isa BLOCK %]
+  /**
+   * @return true if receiver is a <code>[% cls.package %]</code>.
+   * Other receivers will return false.
+   * Trace: [% cls.package %]
+   */
+  public boolean isa[% cls.name_ %]()
+  [% UNLESS target_cls.isaInterface %]
+  { return true; }
+  [% ELSE %];[% END %]
+
+
+  [% IF cls.name_q_ != cls.name_ %]
+  /**
+   * @return true if receiver is a <code>[% cls.package %]</code>.
+   * Other receivers will return false.
+   * This is the fully qualified version of the <code>isa[% cls.name_ %]</code> method.
+   * Trace: [% cls.package %]
+   */
+  public boolean isa[% cls.name_q_ %]()
+  [% UNLESS target_cls.isaInterface %]
+  { return true; }
+  [% ELSE %];[% END %]
+  [% END %]
+
+[% END %]
+
+
+[% MACRO other BLOCK %]
+  [% FOREACH other = end.opposite %]
+  [% NEXT UNLESS other.isNavigable %]
+
+    if ( __old != null ) __old.remove[% other.Name_ %](this);
+    if ( __val != null ) __val.add[% other.Name_ %](this);
+
+  [% END %]
+[% END %]
+
+
+[% MACRO iterate BLOCK %]
+      /* iterate */
+  [% SWITCH type.replace('[(\[\])]', '\\$1') %]
+  [% CASE [ 'java.util.Collection', 'java.util.Set', 'java.util.HashSet' ] %]
+  for ( java.util.Iterator __[% x %] = [% col %].iterator(); 
+	__[% x %].hasNext();
+       ) {
+    [% elem_type %] [% x %] = ([% elem_type %]) __[% x %].next(); 
+  [% CASE %]
+  for ( int __[% x %] = -1; 
+        ++ __[% x %] < [% col %].length;
+       ) {
+    [% elem_type %] [% x %] = ([% elem_type %]) [% col %][__[% x %]]; 
+  [% END %]
+[% END %]
+
+
+[% MACRO iterate_end BLOCK %]
+  }
+[% END %]
+
+
+    ///////////////////////////////////////////////////////////////////
+    // Collection or array manipulation.
+    //
+
+[% MACRO contains BLOCK %]
+    /* contains */
+  [% SWITCH type.replace('[(\[\])]', '\\$1') %]
+  [% CASE [ 'java.util.Collection', 'java.util.Set', 'java.util.HashSet' ] %]
+    ([% col %] != null && [% col %].contains([% x %]))
+  [% CASE %]
+    false /* IMPLEMENT */
+  [% END %]
+[% END %]
+
+
+[% MACRO add BLOCK %]
+    /* add */
+  [% SWITCH type.replace('[(\[\])]', '\\$1') %]
+  [% CASE [ 'java.util.Collection', 'java.util.Set', 'java.util.HashSet' ] %]
+    if ( [% col %] == null ) {
+      [% col %] = new [% type %]();
+    }
+    [% col %].add([% x %])
+  [% CASE %]
+    /* IMPLEMENT */;
+  [% END %]
+[% END %]
+
+
+[% MACRO remove BLOCK %]
+      /* remove */
+  [% SWITCH type.replace('[(\[\])]', '\\$1') %]
+  [% CASE [ 'java.util.Collection', 'java.util.Set', 'java.util.HashSet' ] %]
+    if ( [% col %] != null ) [% col %].remove([% x %])
+  [% CASE %]
+    /* IMPLEMENT */;
+  [% END %]
+[% END %]
+
+
+[% MACRO clear BLOCK %]
+      /* clear */
+  [% SWITCH type.replace('[(\[\])]', '\\$1') %]
+  [% CASE [ 'java.util.Collection', 'java.util.Set', 'java.util.HashSet' ] %]
+    [% col %] = null;
+  [% CASE %]
+    [% col %] = null;
+  [% END %]
+[% END %]
+
+
+[% MACRO java_modifiers BLOCK %]
+  [% SWITCH attr.visibility %]
+  [% CASE public %][% DEFAULT attr.java_visibility = 'public' %]
+  [% CASE private %][% DEFAULT attr.java_visibility = 'private' %]
+  [% CASE protected %][% DEFAULT attr.java_visibility = 'protected' %]
+  [% CASE package %][% DEFAULT attr.java_visibility = 'public' %]
+  [% END %]
+
+  [% DEFAULT attr.java_visibility = 'public' %]
+
+  [% UNLESS attr.instance %]
+  [% DEFAULT attr.java_static = 'static' %]
+  [% END %]
+      
+  [% SET attr.java_modifiers = "${attr.java_visibility} ${attr.java_static}" %]
+  [% SET attr.java_visibility_accessor = "public " %]
+  [% SET attr.java_modifiers_accessor = "public ${attr.java_static}" %]
+
+[% END %]
+
+
+      // Template 2.09: CASE stmts are regexs!!
+      // type='some.java.type[]' causes Perl regex to freek the f**k out!
+[% MACRO box BLOCK %]
+  [% SWITCH type.replace('[(\[\])]', '\\$1') %]
+    [% CASE 'boolean' %] 
+     [% SET expr = "new java.lang.Boolean((boolean) ($expr))" %]
+    [% CASE 'byte' %] 
+      [% SET expr = "new java.lang.Byte((byte) ($expr))" %]
+    [% CASE 'char' %] 
+      [% SET expr = "new java.lang.Char((char) ($expr))" %]
+    [% CASE 'short' %] 
+      [% SET expr = "new java.lang.Short((short) ($expr))" %]
+    [% CASE 'int' %] 
+      [% SET expr = "new java.lang.Integer((int) ($expr))" %]
+    [% CASE 'long' %] 
+      [% SET expr = "new java.lang.Long((long) ($expr))" %]
+    [% CASE 'float' %] 
+      [% SET expr = "new java.lang.Float((float) ($expr))" %]
+    [% CASE 'double' %] 
+      [% SET expr = "new java.lang.Double((double) ($expr))" %]
+    [% END %]
+  [% expr %]
+[% END %]
+
+
+[% MACRO unbox BLOCK %]
+  [% SWITCH type.replace('[(\[\])]', '\\$1') %]
+    [% CASE 'boolean' %] 
+     [% SET expr = "((java.lang.Boolean) ($expr)).booleanValue()" %]
+    [% CASE 'byte' %] 
+      [% SET expr = "((java.lang.Byte) ($expr)).byteValue()" %]
+    [% CASE 'char' %] 
+      [% SET expr = "((java.lang.Char) ($expr)).charValue()" %]
+    [% CASE 'short' %] 
+      [% SET expr = "((java.lang.Short) ($expr)).shortValue()" %]
+    [% CASE 'int' %] 
+      [% SET expr = "((java.lang.Integer) ($expr)).intValue()" %]
+    [% CASE 'long' %] 
+      [% SET expr = "((java.lang.Long) ($expr)).longValue()" %]
+    [% CASE 'float' %] 
+      [% SET expr = "((java.lang.Float) ($expr)).floatValue()" %]
+    [% CASE 'double' %] 
+      [% SET expr = "((java.lang.Double) ($expr)).doubleValue()" %]
+    [% CASE %]
+      [% SET expr = "(($type) ($expr))" %]
+    [% END %]
+  [% expr %]
+[% END %]
+
+
+[% MACRO parameter_init BLOCK %]
+  [%# ArgoUML/Poseidon madness. %]
+  [% IF param.type == 'java.lang.void' %]
+    [% SET param.type = "void" %]
+  [% END %]
+
+  [% DEFAULT param.type = "void" %]
+  [% DEFAULT param.type_impl = param.type %]
+[% END %]
+
+
+[% MACRO operation_init BLOCK %]
+  [% java_modifiers(attr=op) %]
+
+  [% IF op._trace %]
+    [% SET op._trace_comm = "${op.name} <<trace>> --> ${op._trace}\n" %]
+  [% END %]
+
+  [% parameter_init(param=op) %]
+
+  [% FOREACH param = op.parameter %]
+    [% parameter_init(param=param) %]
+  [% END %]
+
+[% END %]
+
+
+//-// FILE BEGIN [%model_package_dir%]/__Model.java
+
+// -*- java -*-
+// DO NOT EDIT - This file is generated by UMMF.
+// From template: $Id: Java.txt,v 1.22 2005/04/12 05:40:43 stephens Exp $
+[% IF model_package %]
+package [%model_package%];
+[% END %]
+
+// import [%model_package%].__Factory;
+
+public class __Model
+{
+  private final static java.lang.String[] factory_map = { 
+  [% FOREACH x = factory_map %]
+    "[% x %]",
+  [% END %]
+  };
+
+  /**
+   * Returns an array ref that maps all UML Model names to Java package names.
+   * Also includes short name to fully-qualified name mappings. 
+   */
+  public java.lang.String [] factory_map() { return factory_map; }
+
+      
+  private java.lang.Object model;
+
+  /**
+   * Returns the UML meta-model Model object for this Model.
+   */
+  public java.lang.Object model() 
+  { 
+      /* IMPLEMENT */
+      return null;
+  }
+
+
+  /**
+   * The cached factory.
+   */
+  private [% model_package_ %]__Factory factory;
+
+
+  /**
+   * Returns a factory for this Model.
+   */
+  public [% model_package_ %]__Factory factory()
+  {
+    if ( factory == null ) {
+      factory = new [% model_package_ %]__Factory(factory_map());
+    }
+    return factory;
+  }
+
+
+    /**
+     * Use create() method.
+     */
+  private __Model()
+  {
+  }
+
+  private static __Model instance = null;
+  public static __Model create()
+  {
+      if ( instance == null ) {
+	  instance = new __Model();
+      }
+
+      return instance;
+  }
+}
+
+
+/// Keep these comments at end of file: kstephens@sourceforge.net 2003/04/06 ///
+/// Local Variables: ///
+/// mode:java ///
+/// java-indent-level:2 ///
+/// java-continued-statement-offset:0 ///
+/// java-brace-offset:0 ///
+/// java-label-offset:0 ///
+/// End: ///
+
+//-// FILE END [% model_package_dir %]/__Model.java
+
+//-// FILE BEGIN [%model_package_dir%]/__Factory.java
+
+// -*- java -*-
+// DO NOT EDIT - This file is generated by UMMF.
+// From template: $Id: Java.txt,v 1.22 2005/04/12 05:40:43 stephens Exp $
+
+[% IF model_package %]
+package [%model_package%];
+[% END %]
+
+public class __Factory
+{
+  private java.util.Map map;
+
+  private __Factory() { }
+
+  public __Factory(java.lang.String[] __map)
+  {
+    map = new java.util.HashMap(__map.length / 2);
+    for ( int i = 0; i < __map.length; ++ i ) {
+      map.put(__map[i], __map[i + 1]);
+    }
+  }
+
+  public java.lang.String className(java.lang.String name)
+  {
+    return (java.lang.String) map.get(name);
+  }
+
+
+  public java.lang.Object create(java.lang.String name, java.lang.String [] inits)
+      /* throws java.lang.Throwable */
+  {
+    try {
+      // Get the implementation clsName.
+      java.lang.String clsName = className(name);
+	    
+      // Get the Java Class object.
+      java.lang.Class cls = java.lang.Class.forName(clsName);
+	    
+      // Create a new instance.
+      java.lang.Object instance = cls.newInstance();
+	    
+      // IMPLEMENT: Call appropriate initializers.
+
+      // Return new instance.
+      return instance;
+    } catch ( Throwable e ) {
+      // throw new Throwable(e);
+      return null;
+    }
+  }
+}
+
+/// Keep these comments at end of file: kstephens@sourceforge.net 2003/04/06 ///
+/// Local Variables: ///
+/// mode:java ///
+/// java-indent-level:2 ///
+/// java-continued-statement-offset:0 ///
+/// java-brace-offset:0 ///
+/// java-label-offset:0 ///
+/// End: ///
+
+//-// FILE END [% model_package_dir %]/__Factory.java
+
+
+/////////////////////////////////////////////////////////////////
+// Classifier initialization.
+//
+
+[% FOREACH cls = classifier %]
+
+
+[% IF 0 %]
+[% SET cls.generate = 0 %]
+[% NEXT IF cls.name == 'boolean' %]
+[% NEXT IF cls.name == 'byte' %]
+[% NEXT IF cls.name == 'char' %]
+[% NEXT IF cls.name == 'double' %]
+[% NEXT IF cls.name == 'float' %]
+[% NEXT IF cls.name == 'long' %]
+[% NEXT IF cls.name == 'short' %]
+[% NEXT IF cls.name == 'int' %]
+[% NEXT IF cls.name == 'void' %]
+[% SET cls.generate = 1 %]
+[% END %]
+
+// Initialize the Classifier.
+[% IF cls.primitive || cls.construct %]
+  [% DEFAULT cls.primitive_type = 'java.lang.Object' %]
+[% ELSIF cls.isaEnumeration() %]
+  [% DEFAULT cls.primitive_type = 'java.lang.String' %]
+  [% DEFAULT cls.validate_type = '__literal.containsKey(x)' %]
+[% ELSE %]
+  [% DEFAULT cls.primitive_type = 'java.lang.Object' %]
+[% END %]
+[% DEFAULT cls.construct_type = cls.primitive_type %]
+[% DEFAULT cls.validate_type_type = cls.construct_type %]
+[% DEFAULT cls.validate_type = "x instanceof ${cls.name_}" %]
+
+
+
+// Initialize the Attributes.
+[% FOREACH attr = cls.attribute %]
+
+  [% IF attr.instance %]
+    [% SET attr.loc = "this.${attr.name_}" %]
+  [% ELSE %]
+    [% SET attr.loc = "${cls.name}.${attr.name_}" %]
+  [% END %]
+
+  [% java_modifiers(attr=attr) %]
+
+  [% SET attr.typecheck = "${attr.type}.__typecheck(__val, \"${cls.package}.${attr.name_}\")" %]
+  [% SET attr.typecheck = "/* IMPLEMENT: typecheck on __val */" %]
+
+  [% IF attr.multi_single %]
+    [% SET attr.type_multi = attr.type_impl %]
+    [% SET attr.type_multi_impl = attr.type_impl %]
+  [% ELSE %]
+    [% SET attr.type_multi = "java.util.Collection" %]
+    [% SET attr.type_multi_impl = 'java.util.Vector' %]
+    [% SET attr.type_multi_array = "${attr.type_impl}[]" %]
+  [% END %]
+
+  [% IF attr._trace %]
+    [% SET attr._trace_comm = "${attr.name} <<trace>> --> ${attr._trace}\n" %]
+  [% END %]
+
+[% END %]
+
+
+// Initialize AssociationEnds
+[% FOREACH cls_end = cls.association %]
+
+  [% java_modifiers(attr=cls_end) %]
+
+  [% IF cls_end._trace %]
+    [% SET cls_end._trace_comm = "${cls_end.name} <<trace>> --> ${cls_end._trace}" %]
+  [% END %]
+
+  [% FOREACH end = cls_end.opposite %]
+    [% java_modifiers(attr=end) %]
+
+    [% IF cls_end.instance %]
+      [% SET end.loc = "this.${end.name_}" %]
+    [% ELSE %]
+      [% SET end.loc = "${end.name_}" %]
+    [% END %]
+
+    [% SET end.typecheck = "${end.type}.__typecheck(__val, \"${cls.package}.${end.name_}\")" %]
+    [% SET end.typecheck = "/* IMPLEMENT: typecheck on __val */" %]
+
+    [% IF end.multi_single %]
+      [% SET end.type_multi = end.type_impl %]
+      [% SET end.type_multi_impl = end.type_impl %]
+      [% SET end.type_multi_array = end.type_impl %]
+    [% ELSE %]
+      [% SET end.type_multi = "java.util.Collection" %]
+      [% SET end.type_multi_impl = 'java.util.HashSet' %]
+      [% SET end.type_multi_array = "${end.type_impl}[]" %]
+    [% END %]
+
+    [% IF end._trace %]
+      [% SET end._trace_comm = "${end.name} <<trace>> --> ${end._trace}" %]
+    [% END %]
+
+  [% END %]
+[% END %]
+
+// Initialize the Operations.
+[% FOREACH op = cls.operation %]
+  [% java_modifiers(attr=op) %]
+  [% operation_init(op=op) %]
+[% END %]
+
+// Initialize the Methods.
+[% FOREACH meth = cls.method %]
+
+  [% java_modifiers(attr=meth) %]
+
+  [% IF meth._trace %]
+    [% SET meth._trace_comm = "${meth.name} <<trace>> --> ${meth._trace}\n" %]
+  [% END %]
+
+  [% IF 0 %]
+  [% operation_init(op=meth.op) %]
+
+  [% java_modifiers(attr=meth.op) %]
+  [% END %]
+
+[% END %]
+
+
+[% END %]
+
+
+// End of Classifier initialization.
+/////////////////////////////////////////////////////////////////
+
+[% FOREACH cls = classifier %]
+
+[% NEXT UNLESS cls.generate %]
+
+//-// FILE BEGIN [% cls.implementation_file %]
+
+// -*- java -*-
+// DO NOT EDIT - This file is generated by UMMF.
+// From template: $Id: Java.txt,v 1.22 2005/04/12 05:40:43 stephens Exp $
+
+[% IF cls.namespace.package %]
+package [% cls.namespace.package %];
+[% END %]
+
+[% IF cls.dependencys %]
+/////////////////////////////////////////////////////////////////
+// Dependencies
+//
+
+[% FOREACH dep = cls.dependency %]
+  [% IF dep.obj.isaPackage() %]
+import [% dep.package %].*;
+  [% ELSE %]
+import [% dep.package %];
+  [% END %]
+[% END %]
+
+[% FOREACH dep = cls.usage %]
+import [% dep %];
+[% END %]
+
+[% END %]
+[% IF cls.imports %]
+/////////////////////////////////////////////////////////////////
+// Imports
+//
+
+[% FOREACH imp = cls.imports %]
+import [% imp %];
+[% END %]
+
+[% END %]
+
+
+[% IF cls.documentation %]
+/**
+ * [% cls.documentation_commented %]
+
+ */
+
+[% END %]
+
+[% SWITCH cls.visibility %]
+  [% CASE public %]
+public
+  [% CASE private %]
+  [% CASE protected %]
+  [% CASE package %]
+  [% CASE %]
+public /* default to public */
+[% END %]
+
+[% IF cls.isaInterface %]interface[% ELSE %]class[% END %] [% cls.name_ %]
+
+[% IF cls.generalizations %]
+  // Generalization 
+  extends
+  [% FOREACH super = cls.generalization %]
+    [% super.package %][%- ", " UNLESS loop.last %]
+
+  [% END %]
+[% END %]
+
+[% IF cls.abstractions %]
+  // Abstraction
+  implements
+  [% FOREACH super = cls.abstraction %]
+    [% super.package %][%- ", " UNLESS loop.last %]
+
+  [% END %]
+[% END %]
+
+{
+
+/////////////////////////////////////////////////////////////////
+// Instantiation
+//
+
+[% IF cls.primitive || cls.construct %]
+  /**
+   * Constructs new [% cls.package %] value.
+   */
+  public static [% cls.primitive_type %] create([% cls.construct_type %] x)
+    /* throws java.lang.Throwable */
+  {
+    [% cls.primitive_type %] result;
+
+    __typecheck(x, "[% cls.package %].create");
+
+    result = 
+	[% IF cls.construct %]
+	[% cls.construct %]
+	[% ELSE %]
+	x
+	[% END %]
+	;
+
+    return result;
+  }
+
+[% ELSIF cls.isaEnumeration %]
+
+  [% UNLESS cls.isaInterface %]
+  private static java.util.Map __literal;
+  private [% cls.primitive_type %] __name;
+
+  /**
+   * Private initializer.
+   */
+  private [% cls.name_ %] ( [% cls.primitive_type %] name ) 
+  {
+    __name = name;
+    if ( __literal == null ) {
+       __literal = new java.util.HashMap();
+    }
+    __literal.put(__name, this);
+  }
+  [% END %]
+
+  /**
+   * Returns the name of the EnumerationLiteral.
+   */
+  public java.lang.String toString()
+  [% UNLESS cls.isaInterface %]
+  { return __name; }
+  [% ELSE %];[% END %]
+
+
+  [% UNLESS cls.isaInterface %]
+  /**
+   * Constructs new [% cls.package %] literal value.
+   * <codex</code> can be one of the following:
+   * <ul>[% FOREACH literal = cls.literal %]<il><code>"[% literal.name_ %]"</code></li>[% END %]</ul>
+   */
+  public static final [% cls.name_ %] create([% cls.construct_type %] x)
+		 /* throws java.lang.Throwable */
+  {
+    __typecheck(x, "[% cls.package %].create");
+    return ([% cls.name_ %]) __literal.get((java.lang.Object) x);
+  }
+  [% END %]
+
+
+/////////////////////////////////////////////////////////////////
+// EnumerationLiterals
+//
+
+  [% UNLESS cls.isaInterface %]
+    [% FOREACH literal = cls.literal %]
+
+[% IF literal.documentation %]
+/**
+ * [% literal.documentation_commented %]
+
+ */
+
+[% END %]
+  public final static [% cls.name_ %] [% literal.NAME_ %] = new [% cls.name_ %]("[% literal.name %]");
+    [% END %]
+  [% END %]
+
+
+[% ELSE %]
+
+  [% UNLESS cls.isaInterface %]
+
+  [% UNLESS cls.default_constructor %]
+  /**
+   * Use static create() method.
+   */ 
+  public [% cls.name_ %] ()
+  {
+  }
+
+
+  [% END %]
+  /**
+   * Create new instance.
+   */
+  public static [% cls.name_ %] create[% cls.name_ %]()
+  {
+     return new [% cls.name_ %]();
+  }
+
+
+  /**
+   * Create new instance from initializer name => value pairs.
+   */
+  public static [% cls.name_ %] create[% cls.name_ %](java.lang.Object [] inits)
+      /* throws java.lang.Throwable */
+  [% UNLESS cls.isaInterface %]
+  {
+    [% cls.name_ %] instance = create[% cls.name_ %]();
+
+    for ( int i = 0; i < inits.length; i ++ ) {
+      java.lang.String name = (java.lang.String) inits[i ++];
+
+      if ( false ) {
+      } 
+  [% FOREACH attr = cls.attribute %]
+      else if ( name.equals("[% attr.name_ %]") ) {
+        instance.set[% attr.Name_ %]([% unbox(type=attr.type_multi, expr='inits[i]') %]);
+      }
+  [% END %]
+
+  [% FOREACH cls_end = cls.association %]
+    [% FOREACH end = cls_end.opposite %]
+      [% NEXT UNLESS end.isNavigable %]
+      [% NEXT IF end.phantom_obj %]
+      else if ( name.equals("[% end.name_ %]") ) {
+        instance.set[% end.Name_ %]([% unbox(type=end.type_multi, expr='inits[i]') %]);
+      }
+    [% END %]
+  [% END %]
+      else {
+	  // throw new java.lang.Throwable("Unknown init: '" + name + "'");
+      }
+    }
+
+    return instance;
+  }
+  [% ELSE %];[% END %]
+
+  [% END %]
+
+[% END %]
+
+
+/////////////////////////////////////////////////////////////////
+// Validation
+//
+
+  [% UNLESS cls.isaInterface %]
+  /**
+   * @return true if x is a valid value of <code>[%cls.package%]</code>.
+   */
+  public static boolean __validate_type([% cls.validate_type_type %] x)
+  {
+    return [% cls.validate_type %];
+  }
+  [% ELSE %];[% END %]
+
+
+  [% UNLESS cls.isaInterface %]
+  /**
+   * Throws with <code>msg</code> if <code>[%cls.package%].__validate_type(x)</code> is false.
+   */
+  public static void __typecheck([% cls.validate_type_type %] x, java.lang.String msg)
+		 /* throws java.lang.Throwable */
+  {
+    if ( ! __validate_type(x) ) {
+	// throw new java.lang.Exception("typecheck: " + msg + ": type '[%cls.package%]': value '" + x + "'");
+    }
+  }
+  [% END %]
+
+
+[% isa(target_cls=cls, cls=cls) %]
+[% FOREACH a = cls.abstraction %]
+  [% isa(target_cls=cls, cls=a) %]
+[% END %]
+
+
+/////////////////////////////////////////////////////////////////
+// Introspection
+//
+
+
+  [% UNLESS cls.isaInterface %]
+  /**
+   * The UML Model name (<code>"[% cls.name_q %]"</code>) for this Classifier.
+   */
+  public final static java.lang.String __MODEL_NAME = "[% cls.name_q %]";
+  [% END %]
+
+  /**
+   * @return the UML Model name (<code>"[% cls.name_q %]"</code>) for this Classifier.
+   */
+  public java.lang.String __model_name() 
+  [% UNLESS cls.isaInterface %]
+  { return __MODEL_NAME; }
+  [% ELSE %];[% END %]
+ 
+
+  [% UNLESS cls.isaInterface %]
+  /**
+   * @return the UML Model object for an object or package of
+   * this Classifier.
+   */
+  public static [% model_package_ %]__Model __MODEL() 
+  [% UNLESS cls.isaInterface %]
+  { return [% model_package_ %]__Model.create(); }
+  [% ELSE %];[% END %]
+  [% END %]
+
+  /**
+   * @return the UML Model object for an object or package of
+   * this Classifier.
+   */
+  public [% model_package_ %]__Model __model() 
+  [% UNLESS cls.isaInterface %]
+  { return [% model_package_ %]__Model.create(); }
+  [% ELSE %];[% END %]
+
+
+
+[% IF cls.attributes %]
+
+/////////////////////////////////////////////////////////////////
+// Attributes
+//
+
+  [% FOREACH attr = cls.attribute %]
+
+  [% UNLESS cls.isaInterface %]
+  /**
+   * [% attr.documentation_commented %]
+   *
+   * Attribute [% attr.name %];
+   * id = [% attr.id %];
+   * type = [% attr.type %];
+   * multiplicity = [% attr.multi %];
+   * initialValue = [% attr.initialValue %];
+   * [% attr._trace_comm %];
+   */
+  [% attr.java_modifiers %][% attr.type_multi_impl %] [% attr.name_ %]
+  [% IF attr.initialValue_defined %]
+    [% IF attr.type_multi_impl == 'boolean' %]
+      = [% attr.initialValue.unquoted %]
+    [% ELSIF attr.type_multi_impl == 'int' %]
+      = [% attr.initialValue.asInteger %]
+    [% ELSIF attr.type_info.isaEnumeration %]
+      = [% attr.type %].[% attr.initialValue.unquoted.uc %]
+    [% ELSE %]
+      = [% attr.initialValue %]
+    [% END %]
+  [% END %];    
+  [% END %]    
+
+[% IF attr.multi_single %]
+  [% IF attr.getter %]
+  /**
+   * @return the value of Attribute [% attr.name %].
+   * [% attr._trace_comm %]
+   */
+  [% attr.java_modifiers_accessor %] [% attr.type_impl %] get[% attr.Name_ %]() 
+  [% UNLESS cls.isaInterface %]
+  {
+    return [% attr.loc %];
+  }
+  [% ELSE %];[% END %]
+  [% END %]
+
+  [% IF attr.setter %]
+  /**
+   * Sets the value of Attribute [% attr.name %].
+   * <code>val</code> must be of type <code>[% attr.type_multi %]</code>.
+   * [% attr._trace_comm %]
+   */
+  [% attr.java_modifiers_accessor %] void set[% attr.Name_ %]([% attr.type_impl %] __val)
+		 /* throws java.lang.Throwable */
+  [% UNLESS cls.isaInterface %]
+  {
+    [% attr.typecheck %];
+
+    [% attr.loc %] = __val;
+  }
+  [% ELSE %];[% END %]
+  [% END %]
+
+[% ELSE %]
+
+  [% IF attr.getter %]
+  /**
+   * @return the values of Attribute [% attr.name %].
+   * [% attr._trace_comm %]
+   */
+  [% attr.java_modifiers_accessor %] [% attr.type_multi %] get[% attr.Name_ %]()
+  [% UNLESS cls.isaInterface %]
+  {
+    return ([% attr.type_multi %]) ([% attr.loc %]);
+  }
+  [% ELSE %];[% END %]
+
+  [% END %]
+  [% IF attr.getter %]
+  /**
+   * @return the values of Attribute [% attr.name %] as an array.
+   * [% attr._trace_comm %]
+   */
+  [% attr.java_modifiers_accessor %] [% attr.type_multi_array %] get[% attr.Name_ %]AsArray()
+  [% UNLESS cls.isaInterface %]
+  {
+    return ([% attr.type_multi_array %]) ([% attr.loc %].toArray());
+  }
+  [% ELSE %];[% END %]
+
+  [% END %]
+  [% IF attr.setter %]
+  /**
+   * Sets the values of Attribute [% attr.name %].
+   * The elements of <code>__col</code> must be of type <code>[% attr.type %]</code>.
+   * [% attr._trace_comm %]
+   */
+  [% attr.java_modifiers_accessor %] void set[% attr.Name_ %] ([% attr.type_multi %] __col)
+		 /* throws java.lang.Throwable */
+  [% UNLESS cls.isaInterface %]
+  {
+    clear[% attr.Name_ %]();
+    add[% attr.Name_ %](__col);
+  }
+  [% ELSE %];[% END %]
+  [% END %]
+
+  [% IF attr.setter %]
+  /**
+   * Sets the values of Attribute [% attr.name %].
+   * <code>__val</code> must be of type <code>[% attr.type %]</code>.
+   * [% attr._trace_comm %]
+   */
+  [% attr.java_modifiers_accessor %] void set[% attr.Name_ %] ([% attr.type_impl %] __val)
+		 /* throws java.lang.Throwable */
+  [% UNLESS cls.isaInterface %]
+  {
+    clear[% attr.Name_ %]();
+    add[% attr.Name_ %](__val);
+  }
+  [% ELSE %];[% END %]
+  [% END %]
+
+  [% IF attr.setter %]
+  /**
+   * Adds the values of Attribute [% attr.name %].
+   * The elements of <code>val</code> must be of type <code>[% attr.type %]</code>.
+   * [% attr._trace_comm %]
+   */
+  [% attr.java_modifiers_accessor %] void add[% attr.Name_ %] ([% attr.type_multi %] __col)
+		 /* throws java.lang.Throwable */
+  [% UNLESS cls.isaInterface %]
+  {
+    [% iterate(col='__col', type=attr.type_multi, elem_type=attr.type_impl, x='__val') %] 
+      [% attr.typecheck %];
+      [% add(col=attr.loc, type=attr.type_multi_impl, elem_type=attr.type_impl, x='__val') %];
+    [% iterate_end() %]
+  }
+  [% ELSE %];[% END %]
+  [% END %]
+
+  [% IF attr.setter %]
+  /**
+   * Adds the values of Attribute [% attr.name %] from an Array.
+   * The elements of <code>val</code> must be of type <code>[% attr.type %]</code>.
+   * [% attr._trace_comm %]
+   */
+  [% attr.java_modifiers_accessor %] void add[% attr.Name_ %] ([% attr.type_multi_array %] __col)
+		 /* throws java.lang.Throwable */
+  [% UNLESS cls.isaInterface %]
+  {
+    [% iterate(col='__col', type=attr.type_multi_array, elem_type=attr.type_impl, x='__val') %] 
+      [% attr.typecheck %];
+      [% add(col=attr.loc, type=attr.type_multi_impl, elem_type=attr.type_impl, x='__val') %];
+    [% iterate_end() %]
+  }
+  [% ELSE %];[% END %]
+  [% END %]
+
+  [% IF attr.setter %]
+  /**
+   * Adds <code>__val</code> to Attribute [% attr.name %]
+   * <code>__val</code> must of type <code>[% end.type %]</code>.
+   * [% attr._trace_comm %]
+   */
+  [% attr.java_modifiers_accessor %] void add[% attr.Name_ %]([% attr.type_impl %] __val)
+		 /* throws java.lang.Throwable */
+  [% UNLESS cls.isaInterface %]
+  {
+    [% attr.type_impl %][] __temp = new [% attr.type_impl %][1];
+    __temp[0] = __val;
+    add[% attr.Name_ %](__temp);
+  }
+  [% ELSE %];[% END %]
+  [% END %]
+
+  [% IF attr.setter %]
+  /**
+   * Removes values from Attribute [% attr.name %].
+   * The elements of <code>@al</code> must be of type <code>[% attr.type %]</code>.
+   * [% attr._trace_comm %]
+   */
+  [% attr.java_modifiers_accessor %] void remove[% attr.Name_ %] ([% attr.type_multi %] __col)
+		 /* throws java.lang.Throwable */
+  [% UNLESS cls.isaInterface %]
+  {
+    
+    [% iterate(col='__col', type=attr.type_multi, elem_type=attr.type_impl, x='__val') %] 
+      [% attr.typecheck %];
+      [% remove(col=attr.loc, type=attr.type_multi_impl, elem_type=attr.type_impl, x='__val') %];
+    [% iterate_end() %]
+  }
+  [% ELSE %];[% END %]
+  [% END %]
+
+
+  [% IF attr.setter %]
+  /**
+   * Removes all values from Attribute [% attr.name %].
+   * [% attr._trace_comm %]
+   */
+  [% attr.java_modifiers_accessor %] void clear[% attr.Name_ %]()
+		 /* throws java.lang.Throwable */
+  [% UNLESS cls.isaInterface %]
+  {
+    [% clear(col=attr.loc, type=attr.type_multi_impl) %];
+  }
+  [% ELSE %];[% END %]
+  [% END %]
+
+  [% END %]
+[% END %]
+
+    // End of Class [% cls.name %] Attributes
+[% END %]
+
+
+[% IF cls.associations %]
+
+/////////////////////////////////////////////////////////////////
+// Association
+//
+
+[% FOREACH cls_end = cls.association %]
+[% FOREACH end = cls_end.opposite %]
+[% NEXT UNLESS end.isNavigable %]
+[% NEXT IF end.phantom_obj %]
+
+
+  /**
+   * [% end.documentation_commented %]
+   *
+   * AssociationEnd [% cls_end.type_impl %] [% cls_end.name %] --- [% end.name %] [% end.type_impl %];
+   * [% cls_end.name %].id = [% cls_end.id %]; 
+   * [% end.name %].id = [% end.id %];
+   * [% end.name %].type = [% end.type %];
+   * [% end.name %].multiplicity = [% end.multi %];
+   * [% cls_end._trace_comm %];
+   * [% end._trace_comm %];
+   */
+  [% UNLESS cls.isaInterface %]
+  private [% cls_end.java_static %] [% end.type_multi_impl %] [% end.name_ %];
+  [% END %]
+
+[% IF end.multi_single %]
+
+  /**
+   * @return the AssociationEnd value of type <code>[% end.type %]</code>.
+   * [% end._trace_comm %]
+   */
+  [% cls_end.java_static %] [% end.java_visibility_accessor %] [% end.type_impl %] get[% end.Name_ %]()
+  [% UNLESS cls.isaInterface %]
+  {	  
+    return [% end.loc %];
+  }
+  [% ELSE %];[% END %]
+
+
+  /**
+   * Sets the AssociationEnd value for [% end.name %].
+   * <code>__val</code> must of of type <code>[% end.type %]</code>.
+   * [% end._trace_comm %]
+   */
+  [% cls_end.java_static %] [% end.java_visibility_accessor %] void set[% end.Name_ %]([% end.type_impl %] __val)
+		 /* throws java.lang.Throwable */
+  [% UNLESS cls.isaInterface %]
+  {
+    [% end.type_impl %] __old = [% end.loc %];
+    if ( __old != __val ) { // Recursion lock
+      [% end.typecheck %];
+      [% end.loc %] = __val;                // Recursion lock
+      // Remove and add associations with other ends.
+      [% other(end=end) %]
+    }
+  }
+  [% ELSE %];[% END %]
+
+  /**
+   * Adds the AssociationEnd value to [% end.name %].
+   * <code>val</code> must of of type <code>[% end.type %]</code>.
+   * Throws if a value already exists.
+   * [% end._trace_comm %]
+   */
+  [% cls_end.java_static %] [% end.java_visibility_accessor %] void add[% end.Name_ %]([% end.type_impl %] __val)
+		 /* throws java.lang.Throwable */
+  [% UNLESS cls.isaInterface %]
+  {
+    [% end.type_impl %] __old = [% end.loc %];
+    if ( __old != __val ) { // Recursion lock
+      [% end.typecheck %];
+      
+      if ( __old != null ) {
+	  // throw new java.lang.Exception("[% cls.package %]::[% end_name %]: too many");
+      }
+
+      [% end.loc %] = __val;                 // Recursion lock
+      
+      // Remove and add associations with other ends.
+      [% other(end=end) %]
+    }
+  }
+  [% ELSE %];[% END %]
+
+
+  /**
+   * Removes the Association to <code>[% end.name %]</code>.
+   * [% end._trace_comm %]
+   */
+  [% cls_end.java_static %] [% end.java_visibility_accessor %] void remove[% end.Name_ %]([% end.type_impl %] __val)
+		 /* throws java.lang.Throwable */
+  [% UNLESS cls.isaInterface %]
+  {
+    [% end.type_impl %] __old = [% end.loc %];
+    if ( __old == __val ) { // Recursion lock
+      [% end.loc %] = null;                    // Recursion lock
+      // Remove and add associations with other ends.
+      [% other(end=end) %]
+    }
+  }
+  [% ELSE %];[% END %]
+
+
+  /**
+   * Clears the Association to <code>[% end.name %]</code>.
+   * [% end._trace_comm %]
+   */
+  [% cls_end.java_static %] [% end.java_visibility_accessor %] void clear[% end.Name_ %]()
+		 /* throws java.lang.Throwable */
+  [% UNLESS cls.isaInterface %]
+  {
+    [% end.type_impl %] __old = [% end.loc %];
+    if ( __old != null ) {             // Recursion lock
+      [% end.type_multi %] __val = [% end.loc %] = null; // Recursion lock
+      // Remove and add associations with other ends.
+      [% other(end=end) %]
+    }
+  }
+  [% ELSE %];[% END %]
+
+
+[% ELSE %]
+
+  /**
+   * @return the AssociationEnd value.
+   * [% end._trace_comm %]
+   */
+  [% cls_end.java_static %] [% end.java_visibility_accessor %] [% end.type_multi %] get[% end.Name_ %]()
+  [% UNLESS cls.isaInterface %]
+  {
+    return ([% end.type_multi %]) ([% end.loc %]);
+  }
+  [% ELSE %];[% END %]
+
+
+  /**
+   * @return the AssociationEnd value as an array.
+   * [% end._trace_comm %]
+   */
+  [% cls_end.java_static %] [% end.java_visibility_accessor %] [% end.type_multi_array %] get[% end.Name_ %]AsArray()
+  [% UNLESS cls.isaInterface %]
+  {
+    return ([% end.type_multi_array %]) ([% end.loc %].toArray());
+  }
+  [% ELSE %];[% END %]
+
+
+  /**
+   * Sets the AssociationEnd value.
+   * Elements of <code>@val</code> must of of type <code>[% end.type %]</code>.
+   * [% end._trace_comm %]
+   */
+  [% cls_end.java_static %] [% end.java_visibility_accessor %] void set[% end.Name_ %]([% end.type_multi %] __col)
+		 /* throws java.lang.Throwable */
+  [% UNLESS cls.isaInterface %]
+  {
+    clear[% end.Name_ %]();
+    add[% end.Name_ %](__col);
+  }
+  [% ELSE %];[% END %]
+
+
+  /**
+   * Sets the AssociationEnd value.
+   * Elements of <code>@val</code> must of of type <code>[% end.type %]</code>.
+   * [% end._trace_comm %]
+   */
+  [% cls_end.java_static %] [% end.java_visibility_accessor %] void set[% end.Name_ %]([% end.type_multi_array %] __col)
+		 /* throws java.lang.Throwable */
+  [% UNLESS cls.isaInterface %]
+  {
+    clear[% end.Name_ %]();
+    add[% end.Name_ %](__col);
+  }
+  [% ELSE %];[% END %]
+
+
+  /**
+   * Adds the AssociationEnd values
+   * Elements of <code>__col</code> must of of type <code>[% end.type %]</code>.
+   * [% end._trace_comm %]
+   */
+  [% cls_end.java_static %] [% end.java_visibility_accessor %] void add[% end.Name_ %]([% end.type_multi %] __col)
+		 /* throws java.lang.Throwable */
+  [% UNLESS cls.isaInterface %]
+  {
+    [% end.type %] __old = null; // Place holder for other MACRO.
+  
+    [% iterate(col='__col', type=end.type_multi, elem_type=end.type_impl, x='__val') %]
+
+    // Recursion lock check.
+    if ( ! [% contains(col=end.loc, type=end.type_multi_impl, elem_type=end.type_impl, x='__val') %] ) {
+      [% end.typecheck %];
+
+      // Recursion locked.
+      [% add(col=end.loc, type=end.type_multi_impl, x='__val') %];
+      // Remove and add associations with other ends.
+      [% other(end=end) %]
+    }
+    [% iterate_end() %]
+  }
+  [% ELSE %];[% END %]
+
+
+  /**
+   * Adds the AssociationEnd values
+   * Elements of <code>__col</code> must of of type <code>[% end.type %]</code>.
+   * [% end._trace_comm %]
+   */
+  [% cls_end.java_static %] [% end.java_visibility_accessor %] void add[% end.Name_ %]([% end.type_multi_array %] __col)
+		 /* throws java.lang.Throwable */
+  [% UNLESS cls.isaInterface %]
+  {
+    [% end.type %] __old = null; // Place holder for other MACRO.
+  
+    [% iterate(col='__col', type=end.type_multi_array, elem_type=end.type_impl, x='__val') %]
+
+    // Recursion lock check.
+    if ( ! [% contains(col=end.loc, type=end.type_multi_impl, elem_type=end.type_impl, x='__val') %] ) {
+      [% end.typecheck %];
+
+      // Recursion locked.
+      [% add(col=end.loc, type=end.type_multi_impl, x='__val') %];
+      // Remove and add associations with other ends.
+      [% other(end=end) %]
+    }
+    [% iterate_end() %]
+  }
+  [% ELSE %];[% END %]
+
+
+  /**
+   * Adds Association with <code>__val</code>.
+   * <code>__val</code> must of type <code>[% end.type %]</code>.
+   * [% end._trace_comm %]
+   */
+  [% cls_end.java_static %] [% end.java_visibility_accessor %] void add[% end.Name_ %]([% end.type_impl %] __val)
+		 /* throws java.lang.Throwable */
+  [% UNLESS cls.isaInterface %]
+  {
+    [% end.type_impl %][] __temp = new [% end.type_impl %][1];
+    __temp[0] = __val;
+    add[% end.Name_ %](__temp);
+  }
+  [% ELSE %];[% END %]
+
+
+  /**
+   * Removes the Association with <code>__col</code> values.
+   * [% end._trace_comm %]
+   */
+  [% cls_end.java_static %] [% end.java_visibility_accessor %] void remove[% end.Name_ %]([% end.type_multi %] __col)
+		 /* throws java.lang.Throwable */
+  [% UNLESS cls.isaInterface %]
+  {
+    [% end.type_impl %] __val = null; // place holder for other MACRO.
+    [% iterate(col='__col', type=end.type_multi, elem_type=end.type, x='__old') %]
+
+    // Recursion lock check.
+    if ( [% contains(col=end.loc, type=end.type_multi_impl, elem_type=end.type_impl, x='__old') %] ) { 
+      [% end.typecheck %];
+
+      // Recursion locked.
+      [% remove(col=end.loc, type=end.type_multi_impl, x='__old') %];
+
+      // Remove and add associations with other ends.
+      [% other(end=end) %]
+    }
+    [% iterate_end() %]
+  }
+  [% ELSE %];[% END %]
+
+
+  /**
+   * Removes the Association with <code>__col</code> values.
+   * [% end._trace_comm %]
+   */
+  [% cls_end.java_static %] [% end.java_visibility_accessor %] void remove[% end.Name_ %]([% end.type_multi_array %] __col)
+		 /* throws java.lang.Throwable */
+  [% UNLESS cls.isaInterface %]
+  {
+    [% end.type_impl %] __val = null; // place holder for other MACRO.
+    [% iterate(col='__col', type=end.type_multi_array, elem_type=end.type, x='__old') %]
+
+    // Recursion lock check.
+    if ( [% contains(col=end.loc, type=end.type_multi_impl, elem_type=end.type_impl, x='__old') %] ) { 
+      [% end.typecheck %];
+
+      // Recursion locked.
+      [% remove(col=end.loc, type=end.type_multi_impl, x='__old') %];
+
+      // Remove and add associations with other ends.
+      [% other(end=end) %]
+    }
+    [% iterate_end() %]
+  }
+  [% ELSE %];[% END %]
+
+
+  /**
+   * Removes the Association with <code>__val</code>.
+   * [% end._trace_comm %]
+   */
+  [% cls_end.java_static %] [% end.java_visibility_accessor %] void remove[% end.Name_ %]([% end.type_impl %] __val)
+		 /* throws java.lang.Throwable */
+  [% UNLESS cls.isaInterface %]
+  {
+    [% end.type_impl %][] __temp = new [% end.type_impl %][1];
+    __temp[0] = __val;
+    remove[% end.Name_ %](__temp);
+  }
+  [% ELSE %];[% END %]
+
+
+  /**
+   * Removes all Associations.
+   * [% end._trace_comm %]
+   */
+  [% cls_end.java_static %] [% end.java_visibility_accessor %] void clear[% end.Name_ %]()
+		 /* throws java.lang.Throwable */
+  [% UNLESS cls.isaInterface %]
+  {
+    [% end.type_multi_impl %] __oldcol = [% end.loc %];
+    // Recursion lock.
+    [% clear(col=end.loc, type=end.type_multi_impl) %]
+    [% end.type %] __val = null; // place holder for other MACRO.
+
+    // Recursion lock check.
+    [% iterate(col='__oldcol', type=end.type_multi_impl, elem_type=end.type_impl, x='__old') %]
+      [% other(end=end) %];
+    [% iterate_end() %];
+  }
+  [% ELSE %];[% END %]
+
+[% END %]
+
+[% END %]
+[% END %]
+
+  // End of [% cls.name %] Associations
+
+[% END %]
+
+
+[% IF cls.methods %]
+
+/////////////////////////////////////////////////////////////////
+// Methods
+//
+
+[% FOREACH meth = cls.method %]
+
+  [% IF 0 %]
+  [% java_modifiers(attr=meth.op) %]
+  [% operation_init(op=meth.op) %]
+  [% END %]
+
+  /**
+   * Method [% meth.op.name %];
+   * id = [% meth.id %];
+   * specification.id = [% meth.op.id %];
+   * [% meth._trace_comm %];
+   * meth.op.visibility = [% meth.op.visibility %];
+   * meth.op.java_modifiers = [% meth.op.java_modifiers %];
+   */
+  [% meth.op.java_modifiers %] [% meth.op.type_impl %] [% UNLESS meth.op.has_stereotype.create %][% meth.op.name_ %][% END %]
+
+    (
+      [% FOREACH param = meth.op.parameter %]
+      [% param.type_impl %] [% param.name_ %]
+      [%- ", " UNLESS loop.last %]
+
+      [% END %]
+    )
+    /* IMPLEMENT: throws ... */
+  [% UNLESS cls.isaInterface %]
+  {
+    [% meth.body %]
+
+  }
+  /* End of Class [% cls.name %] Method [% meth.op.name %]; */
+  [% ELSE %];[% END %]
+
+  [% END %]
+  
+  // End of Class [% cls.name %] Methods
+[% END %]
+
+} // End of [% cls.name %]
+
+///////////////////////////////////////////////////////////////////////////
+
+/// Keep these comments at end of file: kstephens@sourceforge.net 2003/04/06 ///
+/// Local Variables: ///
+/// mode:java ///
+/// java-indent-level:2 ///
+/// java-continued-statement-offset:0 ///
+/// java-brace-offset:0 ///
+/// java-label-offset:0 ///
+/// End: ///
+
+//-// FILE END [% cls.implementation_file %]
+[% END %]
+
+///////////////////////////////////////////////////////////////////////////
+
+/// Keep these comments at end of file: kstephens@sourceforge.net 2003/04/06 ///
+/// Local Variables: ///
+/// mode:java ///
+/// java-indent-level:2 ///
+/// java-continued-statement-offset:0 ///
+/// java-brace-offset:0 ///
+/// java-label-offset:0 ///
+/// End: ///
+

@@ -1,0 +1,47 @@
+
+
+=pod
+
+=head1 NAME
+
+ur old export-dbic-classes - Create or update a DBIx::Class class from an already existing UR class
+
+
+
+=head1 VERSION
+
+This document describes ur old export-dbic-classes version 0.29.
+
+=head1 SYNOPSIS
+
+ur old export-dbic-classes [BARE-ARGS] [CLASSES-OR-MODULES]
+
+
+
+=head1 OPTIONAL ARGUMENTS
+
+=over
+
+
+=item BARE-ARGS
+
+(undocumented)
+
+=item CLASSES-OR-MODULES
+
+(undocumented)
+
+
+=back
+
+=head1 DESCRIPTION:
+
+  
+  Given one or more UR class names on the command line, this will create
+  or update a DBIx::Class class.  The files will appear under the DBIx directory
+  in the namespace.
+
+
+
+=cut
+

@@ -1,0 +1,126 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: share/tmpl/index.tx:29
+msgid "API Document"
+msgstr "API ドキュメント"
+
+#: share/tmpl/docs/api.tx:6
+msgid "API Document for Ukigumo"
+msgstr "浮雲 API ドキュメント"
+
+#: share/tmpl/docs/api.tx:9
+msgid "Add new report"
+msgstr "レポートを追加する"
+
+#: share/tmpl/include/table/project.tx:5 share/tmpl/recent.tx:15
+msgid "Branch"
+msgstr "ブランチ"
+
+#: share/tmpl/include/table/project.tx:8 share/tmpl/recent.tx:18 share/tmpl/report_list.tx:21
+msgid "Date"
+msgstr "日付"
+
+#: share/tmpl/branch_delete.tx:9 share/tmpl/report_list.tx:49
+msgid "Delete test data for this branch"
+msgstr "このブランチのテストデータを削除する"
+
+#: share/tmpl/branch_delete.tx:16
+msgid "Delete!"
+msgstr "はい。本当に削除してください。"
+
+#: share/tmpl/index.tx:31
+msgid "Deploy Ukigumo-Server to the dotcloud"
+msgstr "浮雲サーバーを DotCloud に配置する方法(英語)"
+
+#: share/tmpl/index.tx:32
+msgid "Deploy Ukigumo-Server to the heroku"
+msgstr "浮雲サーバーを Heroku に配置する方法(英語)"
+
+#: share/tmpl/index.tx:27
+msgid "Documentation"
+msgstr "ドキュメント"
+
+#: share/tmpl/include/table/project.tx:9 share/tmpl/recent.tx:19 share/tmpl/report_list.tx:22 share/tmpl/show_report.tx:19
+msgid "Elapsed Time"
+msgstr "処理時間"
+
+#:
+msgid "FAIL"
+msgstr "失敗"
+
+#: share/tmpl/docs/api.tx:15 share/tmpl/docs/api.tx:43
+msgid "Input"
+msgstr "入力"
+
+#:
+msgid "List of branches in %1"
+msgstr "%1 のブランチ一覧"
+
+#:
+msgid "NA"
+msgstr "不明。。"
+
+#: share/tmpl/docs/api.tx:28 share/tmpl/docs/api.tx:53
+msgid "Output"
+msgstr "出力"
+
+#: share/tmpl/recent.tx:14
+msgid "Project"
+msgstr "プロジェクト"
+
+#. ($branch.branch, $branch.project)
+#: share/tmpl/branch_delete.tx:11
+msgid "Really delete a '%1' branch from '%2'?"
+msgstr "本当に %2 の %1 ブランチを削除しますか?"
+
+#: share/tmpl/recent.tx:9
+msgid "Recent reports"
+msgstr "最近のレポート"
+
+#: share/tmpl/report_list.tx:14
+msgid "Reports for"
+msgstr "レポート: "
+
+#: share/tmpl/include/table/project.tx:6 share/tmpl/recent.tx:16 share/tmpl/report_list.tx:19
+msgid "Revision"
+msgstr "リビジョン"
+
+#:
+msgid "SUCCESS"
+msgstr "成功"
+
+#: share/tmpl/docs/api.tx:39
+msgid "Search Report"
+msgstr "レポートを検索する"
+
+#: share/tmpl/include/table/project.tx:7 share/tmpl/recent.tx:17 share/tmpl/report_list.tx:20
+msgid "Status"
+msgstr "状態"
+
+#. ($branch.branch)
+#: share/tmpl/branch_delete.tx:12
+msgid "This action removes all reports on '%1'."
+msgstr "実行すると %1 ブランチに関するすべてのテスト結果レポートが削除されます。"
+
+#: share/tmpl/include/layout.tx:26 share/tmpl/include/layout.tx:5
+msgid "Ukigumo"
+msgstr "浮雲"
+
+#: share/tmpl/index.tx:30
+msgid "about Ukigumo(In English)"
+msgstr "浮雲ってなんですか?(英語)"

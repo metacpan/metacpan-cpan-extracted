@@ -1,0 +1,22 @@
+a {  
+    text-decoration: none; 
+    font-weight: bold
+}
+
+input { 
+    color: #00cc00; 
+    background-color: #002200;
+    border-top: 1px solid #00cc00;
+    border-bottom: 1px solid #00cc00;
+    border-left: 1px solid #00cc00;
+    border-right: 1px solid #00cc00;
+}
+
+textarea { 
+    color: #00cc00;
+    background-color: #002200;
+    border-top: 1px solid #00cc00;
+    border-bottom: 1px solid #00cc00;
+    border-left: 1px solid #00cc00;
+    border-right: 1px solid #00cc00;
+}

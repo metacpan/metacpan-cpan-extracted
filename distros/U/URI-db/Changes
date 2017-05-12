@@ -1,0 +1,56 @@
+Revision history for Perl extension URI::db.
+
+0.17  2016-02-03T18:35:33Z
+      - Added URI::_ado, which subclasses URI::_odbc to provide a `dbi_dsn()`
+        that returns a DSN using DBD::ADO. NOTE: This class is experimental,
+        since I was unable to figure out the best default values for the
+        connection string -- there are so many options! Feedback and
+        recommendations wanted (Issue #11).
+      - The `dbi_dsn` method of URI::mssql now supports a single argument to
+        specify the DBI driver for which to return a DSN. Pass in "sybase" or
+        "ado" (experimental) to get a DSN for either of those drivers,
+        instead. Based on work by Dan Muey.
+
+0.16  2015-09-22T00:17:07Z
+      - Added new abstract class, URI::_odbc, for URIs that use ODBC in
+        `dbi_dsn`.
+      - The `dbi_dsn` method of URI::mssql now returns an ODBC DSN instead of
+        DBD::Sybase, since the latter would require Sybase to build.
+      - URI::sqlserver now inherits from URI::mssql rather than the other way
+        around.
+      - Fixed a bug where a URI with three slashes but no authority part after
+        the first two would incorrectly think the databse name should be an
+        absolute path. That is, in "db:sqlite:///foo.db", the `dbname` value
+        is "foo.db", not "/foo.db". Thanks to Dan Book for the report
+        (issue #8).
+
+0.15  2014-09-04T00:29:46Z
+      - Added the `canonical_engine` accessor, which returns the canonical
+        engine name.
+      - Added `the canonical` method, which will replace the engine name with
+        its canonical value if it's not already canonical.
+
+0.14  2014-09-03T00:28:37Z
+      - The `dbi_dsn` method of URI::vertica now returns an ODBC DSN instead
+        of DBD::Pg, since the latter apparently does not work with Verica.
+      - Added a note to the `dbi_dsn` documentation that query params are
+        included in the returned value.
+
+0.13  2014-08-09T22:48:53Z
+      - Added URI::postgresxc and URI::pgxc, which simply inherit from
+        URI::pg.
+      - Added URI::ldapdb, which represents LDAP databases. Patch from Brian
+        T. Wightman.
+
+0.12  2014-01-10T17:23:35Z
+      - Eliminated "v-string in use/require non-portable" warning on older
+        Perls.
+
+0.11  2014-01-03T20:01:01Z
+      - Fixed URI::oracle to properly generate a DBI DSN with no host name or
+        port.
+      - The `dbi_dsn()` method in URI::sqlserver (and its subclasses) now
+        generates a DSN using DBD::Sybase, rather than DBD::ODBC.
+
+0.10  2013-12-20T00:16:30Z
+      - Initial version.

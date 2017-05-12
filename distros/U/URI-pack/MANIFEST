@@ -1,0 +1,20 @@
+Build.PL
+Changes
+lib/URI/pack.pm
+LICENSE
+MANIFEST			This list of files
+META.yml
+README
+t/00-load.t
+t/application.t
+t/parsing.t
+xt/clean-namespaces.t
+xt/consistent-version.t
+xt/critic.t
+xt/kwalitee.t
+xt/manifest.t
+xt/perl-version.t
+xt/perlcriticrc
+xt/pod-coverage.t
+xt/pod.t
+META.json

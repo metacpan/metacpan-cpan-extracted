@@ -1,0 +1,12 @@
+Warning - This module is in ALPHA stage and will
+surely be integrated in PICU (Perl wrappers for ICU)
+library in the near future.
+
+If you are in a hurry to find a Perl library that provides
+decent transliteration services, you might wanna give
+it a try though.
+
+This library requires ICU 2.0 (search for 'ICU' on google)
+This library is redistributed under the same license as Perl itself
+
+Author: Jean-Michel Hiver (jhiver@mkdoc.com)
