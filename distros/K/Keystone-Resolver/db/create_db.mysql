@@ -1,0 +1,39 @@
+# $Id: create_db.mysql,v 1.2 2008-03-06 12:07:32 marc Exp $
+# Creates the database and users for openurl
+#
+# Create the database as follows:
+#	mysql -u root -p < create_db.mysql
+# (and enter the Mysql root password when prompted)
+#
+# After that, run create_tables as follows:
+#   mysql -u kr_admin -p kr_adm_3636 < create_tables.mysql
+#
+
+# This script shall fail if a database does exists, therefore _not_ dropping databases just like that. MC
+# Also, I do not like at all that the database name is hard-coded here. MC
+# I suggest that this is entirely up to the user to decide. With 'kr' beeing the default, and asked in a 
+# shell script prompt, maybe. MC
+# drop database if exists kr;
+create database kr;
+use kr;
+
+GRANT USAGE ON kr . * TO "kr_read"@"localhost" IDENTIFIED BY "kr_read_3636" ;
+GRANT USAGE ON kr . * TO "kr_admin"@"localhost" IDENTIFIED BY "kr_adm_3636" ;
+
+# With MySQL version 12.22 Distrib 4.0.23, as including in Ubuntu
+# Linux Hoary Hedgehog, the REVOKE command stupidly fails if there are
+# no privileges defined.  Nice one, MySQL.  So we have to add a
+# vacuous privilege first, just so we can be sure of being able to do
+# the REVOKE.  Sigh.
+#
+GRANT SELECT ON `kr`.* TO "kr_read"@"localhost";
+REVOKE ALL PRIVILEGES ON `kr`.* FROM "kr_read"@"localhost";
+GRANT SELECT 
+  ON `kr`.* TO "kr_read"@"localhost";
+
+GRANT SELECT ON `kr`.* TO "kr_admin"@"localhost";
+REVOKE ALL PRIVILEGES ON `kr`.* FROM "kr_admin"@"localhost";
+GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, INDEX, ALTER 
+  ON `kr`.* TO "kr_admin"@"localhost";
+
+

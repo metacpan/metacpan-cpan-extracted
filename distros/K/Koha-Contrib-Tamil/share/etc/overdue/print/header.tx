@@ -1,0 +1,62 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<style type='text/css'>
+@import url(http://fonts.googleapis.com/css?family=Roboto+Slab:400,700);
+body {
+  margin: 0px;
+  font-family: 'Roboto Slab', serif;
+  font-size: 12px;
+}
+@page {
+  size: auto;
+  margin: 10mm 20mm;
+}
+.rappel {page-break-after: always;}
+.entete {
+  margin: 0;
+  height: 40mm;
+}
+.entete p {
+  margin: 0;
+}
+.destinataire {
+  height: 35mm;
+  margin-top: 0;
+  margin-left: 75mm;
+}
+.destinataire p {
+  margin: 0;
+}
+.objet p {
+  margin:0;
+}
+.objet .date {
+  text-decoration: underline;
+}
+</style>
+</head>
+<body>
+<div class="rappel">
+<div class="entete">
+<p>RÉSEAU DES BIBLIOTHÈQUES DE SEVRAN</p>
+<p><: $borrower.branchname :></p>
+<p><: $borrower.branchaddress1 :></p>
+<p><: $borrower.branchzip :> <: $borrower.branchcity :></p>
+<p><: $borrower.branchphone :></p>
+<p><: $borrower.branchemail :></p>
+</div>
+
+<div class="destinataire">
+<p><: $borrower.firstname :> <: $borrower.surname :></p>
+<p><: $borrower.streetnumber :> <: $borrower.address :></p>
+<p><: $borrower.address2 :></p>
+<p><: $borrower.zipcode :> <: $borrower.city :></p>
+</div>
+
+<div class="objet">
+  <p class="date">Sevran, le <: $now :>.</p>
+  <p>Objet: <b><: $title :></b></p>
+</div>
+
+<p>Cher(e) <: $borrower.firstname :> <: $borrower.surname :></p>

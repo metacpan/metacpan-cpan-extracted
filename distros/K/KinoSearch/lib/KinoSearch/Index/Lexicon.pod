@@ -1,0 +1,81 @@
+
+# Auto-generated file -- DO NOT EDIT!!!!!
+
+=head1 NAME
+
+KinoSearch::Index::Lexicon - Iterator for a field's terms.
+
+=head1 DEPRECATED
+
+The KinoSearch code base has been assimilated by the Apache L<Lucy> project.
+The "KinoSearch" namespace has been deprecated, but development continues
+under our new name at our new home: L<http://lucy.apache.org/>
+
+=head1 SYNOPSIS
+
+    my $lex_reader = $seg_reader->obtain('KinoSearch::Index::LexiconReader');
+    my $lexicon = $lex_reader->lexicon( field => 'content' );
+    while ( $lexicon->next ) {
+       print $lexicon->get_term . "\n";
+    }
+
+
+
+=head1 DESCRIPTION
+
+A Lexicon is an iterator which provides access to all the unique terms for
+a given field in sorted order.
+
+If an index consists of two documents with a 'content' field holding "three
+blind mice" and "three musketeers" respectively, then iterating through the
+'content' field's lexicon would produce this list:
+
+    blind
+    mice
+    musketeers
+    three
+
+
+
+=head1 ABSTRACT METHODS
+
+=head2 seek(target)
+
+Seek the Lexicon to the first iterator state which is greater than or
+equal to C<< target >>.  If C<< target >> is undef,
+reset the iterator.
+
+=head2 next()
+
+Proceed to the next term.
+
+Returns: true until the iterator is exhausted, then false.
+
+=head2 get_term()
+
+Return the current term, or undef if the iterator is not in a valid
+state.
+
+=head2 reset()
+
+Reset the iterator.  next() must be called to proceed to the first
+element.
+
+
+
+
+
+=head1 INHERITANCE
+
+KinoSearch::Index::Lexicon isa L<KinoSearch::Object::Obj>.
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005-2011 Marvin Humphrey
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
+

@@ -1,0 +1,12 @@
+Revision history for Keyword-Engiven
+
+0.003       2016-06-23
+
+0.002       2016-06-23
+   - remove references to current_sub in test file
+   - reduce minimum Perl version in TravisCI configuration to 5.14
+   - increase minimum Perl version from 5.010 to 5.014 to align with Keyword::Declare
+
+0.001       2016-06-22
+    - added new syntax for 'with (...) { }' blocks that alias the result of the expression held within () to $_
+    - added simple test cases

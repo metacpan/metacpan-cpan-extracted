@@ -1,0 +1,28 @@
+$Id: README,v 1.4 2007-11-13 12:06:45 mike Exp $
+
+This directory contains XSLT templates used by the Keystone Resolver
+to generate HTML output from the standard XML form.  The resolver's
+"xsltdir" option (i.e. the "opt_xsltdir" OpenURL parameter) must be
+set to point to this directory.
+
+In normal use, the stylesheet called "default" (that is, the file
+called "default.xsl" in the nominated directory) is used; but this can
+be overridden by specifying the resolver's "xslt" option (i.e. the
+"opt_xslt" OpenURL parameter).
+
+The default.xsl in CVS and in the distribution is a copy of
+"designed.xsl", but it's only this way due to limitations in both CVS
+and the Perl packaging system.  It's useful to remove default.xsl and
+remake it as a symbolic link -- for example:
+	rm default.xsl
+	ln -s designed.xsl default.xsl
+
+"test_display_eng.xsl" was supplied by Rikke Lose <rlo@dbc.dk> at
+Fri, 16 Feb 2007 11:19:45 +0100
+
+"bibdk.xsl" was sent by Rikke at
+Wed, 7 Nov 2007 10:05:17 +0100
+There are no long-term plans to use this at DBC, but it's referenced
+in a specific OpenURL that I need to use for debugging, so it's useful
+to have around so that I am doing exactly the same thing as they are.
+

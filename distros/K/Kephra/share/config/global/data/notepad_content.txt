@@ -1,0 +1,13 @@
+Encode->encodings(":all")'
+
+ord 'o'
+chr(98)
+
+- heise:moose
+- $foo
+  - books
+  - wx
+- fm:p5t3-4
+- review:rexpl
+- .com:xrc
+

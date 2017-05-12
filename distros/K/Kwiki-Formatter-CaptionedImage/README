@@ -1,0 +1,25 @@
+Kwiki-Formatter-CaptionedImage
+
+Extends the Kwiki syntax to allow a captioned image to be easily specified.
+It works like a titled external link except a the link points to an image.
+So for example:
+
+   [http://foo.com/images/bar.gif An image of a Footastic product]
+
+By default will center the captioned image with text cleared on both sides
+but also has options to float the image left or right and allow the text to
+flow around the image.
+
+INSTALLATION
+
+To install this module and add it to your kwiki,
+run the following commands as root:
+
+%> kwiki -install Kwiki::Formatter::CaptionedImage
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 CorData
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. See http://www.perl.com/perl/misc/Artistic.html

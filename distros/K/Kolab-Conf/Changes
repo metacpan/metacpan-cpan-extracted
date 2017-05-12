@@ -1,0 +1,6 @@
+Revision history for Perl extension Kolab::Conf.
+
+0.01  Mon May  3 13:40:25 2004
+	- original version; created by h2xs 1.23 with options
+		-XA -n Kolab::Conf
+

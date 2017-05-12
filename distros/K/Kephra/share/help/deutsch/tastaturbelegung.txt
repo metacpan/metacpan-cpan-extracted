@@ -1,0 +1,316 @@
+
+   ---------------------------------
+  | Kephra Standardtastaturbelegung |
+   ---------------------------------
+
+Nach Tasten geordnet :
+ einfache, Shift+, Strg+, Strg+Shift+, Alt+, Alt+Shift+, Strg+Alt+, Strg+Alt+Shift+
+
+     F2                    springe zum nächsten Marker in diesem Dokument
+     F3                    suche nächsten Eintrag
+     F5                    starte Perlprogramm
+     F11                   Vollbildmodus ein und ausschalten
+     F12                   spring in den Notitzblock
+     Ins                   wechsle zwischen einfügen- und überschreiben-Modus
+     Entf                  lösche Markierung
+     Pos1                  springe an Zeilenanfang, 1. Buchstaben (2mal drücken)
+     Ende                  springe an Zeilenende
+     BildHoch              blättere Seite nach oben
+     BildRunter            blättere Seite nach unten
+
+     Shift+F2              springe zum vorigen Marker in diesem Dokument
+     Shift+F3              suche vorigen Eintrag
+     Shift+F5              stoppe Perlprogramm
+     Shift+F11             maximale Editierfläche
+     Shift+BildHoch        erweitere Markierung um 1 Seite nach oben
+     Shift+BildRunter      erweitere Markierung um 1 Seite nach unten
+     Shift+Rück            lösche leerzeichen bis zum nächsten tabstop
+
+     Strg+F3               speichere Markierung als Suchtext
+     Strg+F2               einen Marker hier umschalten
+     Strg+F5               schalte Sichtbarkeit des Ausgabefensters um
+     Strg+F11              Vordergrundmodus
+     Strg+F12              schalte Sichtbarkeit des Notizblocks um
+     Strg+Leertaste        rücke um ein Leerzeichen ein
+     Strg+Rück             springe zu letztbenutzter Datei
+     Strg+Tab              rücke um ein Tab ein
+     Strg+Links            springe ein Wort links
+     Strg+Rechts           springe ein Wort rechts
+     Strg+Hoch             bewege Text eine Zeile hoch
+     Strg+Runter           bewege Text eine Zeile runter
+     Strg+Entf             entferne alle Leerzeichen rechts
+     Strg+Pos1             gehe an Textanfang
+     Strg+Ende             gehe an Textende
+     Strg+BildHoch         gehe zu vorigem offenem Dokument
+     Strg+BildRunter       gehe zu nächstem offenem Dokument
+     Strg+ +               (ent)falte hier
+     Strg+1..9             Gehe zu Lesezeichen 1..9
+     Strg+A                markiere ganzen Text des Dokumentes
+     Strg+C                kopiere Markierung
+     Strg+D                dupliziere Markierung/Zeile
+     Strg+F                Suchzeile
+     Strg+G                Gehe zu Zeile
+     Strg+I                stream Kommentar zufügen (<!-- HTML -->)
+     Strg+K                kommentiere Zeilen (block comment wie in perl, ruby, python, php)
+     Strg+L                lösche Zeile
+     Strg+N                neues Dokument
+     Strg+O                öffne Datei
+     Strg+Q                schließe Datei
+     Strg+R                ersetzen Dialog
+     Strg+S                speichere Datei
+     Strg+T                schalte Fenster im Vordergrund Modus an und aus
+     Strg+V                einfügen (Inhalt der Zwischenablage)
+     Strg+W                tausche Markierung mit Zwischenablage
+     Strg+X                Markierung ausschneiden
+     Strg+Y                wechsle Markierung zwischen Wort, Zeile, Block oder nichts
+     Strg+Z                letzte Bearbeitung rückgängig
+
+     Strg+Shift+F2         alle Marker im Dokumenten löschen
+     Strg+Shift+F3         speichere Markierung als Ersatztext
+     Strg+Shift+F5         zeige im Ausgabefenster Markierung in dezimal
+     Strg+Shift+Leertaste  Markierung ein Leerzeichen ausrücken
+     Strg+Shift+Rück       gehe zum letztgeöffneten Dokument
+     Strg+Shift+Tab        Markierung einen Tab ausrücken
+     Strg+Shift+Entf       lösche Zeile
+     Strg+Shift+Links      erweitere Markierung um 1 Wort nach links
+     Strg+Shift+Rechts     erweitere Markierung um 1 Wort nach rechts
+     Strg+Shift+BildHoch   bewege Reiter nach rechts
+     Strg+Shift+BildRunter bewege Reiter nach links
+     Strg+Shift+F5         zeige im Ausgabefenster Markierung in hexadezimal
+     Strg+Shift +          (ent)falte hier rekursiv
+     Strg+Shift+1..9       Lesezeichen 1..9 umschalten
+     Strg+Shift+B          Blockformat zum rechten Rand
+     Strg+Shift+C          kopiere Zeile
+     Strg+Shift+D          Zeile doppeln (füge Kopie unterhalb ein)
+     Strg+Shift+F          Suchdialog
+     Strg+Shift+G          Gehe zur letzten Bearbeitung
+     Strg+Shift+I          stream Kommentar entfernen (<!-- HTML -->)
+     Strg+Shift+J          verbinde Zeilen (join)
+     Strg+Shift+L          lösche Zeile links vom Textcursor(caret)
+     Strg+Shift+O          lade Datei erneut
+     Strg+Shift+P          Zeilen markieren ( #perl, ruby, php, python)
+     Strg+Shift+Q          alle anderen Dokumente schließen
+     Strg+Shift+R          lösche Zeile rechts vom Textcursor(caret)
+     Strg+Shift+S          speichere Datei unter
+     Strg+Shift+V          letztbenutzte Perlvariable des Blocks einfügen
+     Strg+Shift+W          akuelle Zeile mit Zwischenablage austauschen
+     Strg+Shift+X          Zeile ausschneiden
+     Strg+Shift+Y          markiere Inhalte von Klammern oder Anführungszeichen
+     Strg+Shift+Z          Bearbeitung wiederhohlen
+
+     Alt+F2                springe zum nächsten Marker in allen Dokument
+     Alt+F3                resetze und suche nächsten Fundstelle
+     Alt+F11               Transparenz
+     Alt+Links             springe zu voriger Klammer
+     Alt+Rechts            springe zu nächster Klammer
+     Alt+Hoch              springe zu voriger Klammer gleicher Art
+     Alt+Runter            springe zu nächster Klammer gleicher Art
+     Alt+BildHoch          springe zum anfang dieses Blocks oder Absatzes
+     Alt+BildRunter        springe zum nächsten Block oder Absatz
+     Alt+ +                (ent)falte dieses Level
+     Alt+Q                 beende programm
+     Alt+Z                 mehrere Schritte rückgängig
+     
+     Alt+Shift+F2          springe zum vorigen Marker in diesem Dokument
+     Alt+Shift+F3          resetze und suche vorigen Fundstelle
+     Alt+Shift+F5          zeige im Ausgabefenster Markierung in hexadezimal
+     Alt+Shift+ +          (ent)falte alles
+     Alt+Shift+I           zeige Infobox
+     Alt+Shift+K           zeige Tastaturbelegung
+     Alt+Shift+O           lade Datei neu
+     Alt+Shift+R           alles ersetzen
+     Alt+Shift+S           Kopie der Datei speichern unter ...
+     Alt+Shift+Z           mehrere Schritte wiederhohlen
+
+     Strg+Alt+F3           gehe zur ersten Fundstelle
+     Strg+Alt+Oben         bewege Markierung oder Zeile zeilenweise hoch
+     Strg+Alt+Unten        bewege Markierung oder Zeile zeilenweise runter
+     Strg+Alt+BildHoch     bewege Markierung oder Zeile seitenweise hoch
+     Strg+Alt+BildRunter   bewege Markierung oder Zeile seitenweise runter
+     Strg+Alt+Links        bewege Markierung zeichenweise links
+     Strg+Alt+Rechts       bewege Markierung zeichenweise rechts
+     Strg+Alt+M            Menüleiste
+     Strg+Alt+O            lese alle Dateien erneut ein
+     Strg+Alt+Q            schließe alle Dateien
+     Strg+Alt+R            resetze alle
+     Strg+Alt+S            speichere alle Dateien
+     Strg+Alt+T            Reiterleiste
+     Strg+Alt+Z            rückgängig bis zum Anfang
+
+     Strg+Alt+Shift+F2     alle Marker löschen
+     Strg+Alt+Shift+F3     gehe zur letzten Fundstelle
+     Strg+Alt+Shift+R      resetze alle, aber frage jedes mal
+     Strg+Alt+Shift+S      Datei und Dokument umbenennen
+     Strg+Alt+Shift+Z      wiederhohlen bis zum jüngsten Stand
+
+================================================================================
+
+Inhaltlich geordnet:
+ - Datei Operationen
+ - Text Navigation
+ - Suchen und Ersetzen
+ - Text Markieren
+ - Text Bearbeiten
+ - Zeile Bearbeiten
+ - Werkzeuge
+ - Dialoge
+
+
+ - Datei Operationen
+
+     Strg+N                neues Dokument
+     Strg+O                öffne Datei
+     Strg+Shift+O          lade Datei erneut
+     Strg+S                speichere Datei
+     Strg+Shift+S          speichere Datei unter
+     Alt+Shift+S           Kopie der Datei speichern unter ...
+     Strg+Alt+Shift+S      Datei und Dokument umbenennen
+     Strg+Q                schließe Datei
+     Strg+Shift+Q          alle anderen Dokumente schließen
+     Strg+Alt+Q            schließe alle Dateien
+
+
+ - Text Navigation
+
+     Pos1                  springe an Zeilenanfang, 1. Buchstaben (2mal drücken)
+     Ende                  springe zum Zeilenende
+     BildHoch              blättere Seite nach oben
+     BildRunter            blättere Seite nach unten
+     Strg+Links            springe ein Wort links
+     Strg+Rechts           springe ein Wort rechts
+     Strg+Pos1             gehe zum Textanfang
+     Strg+Ende             gehe zum Textende
+
+     Strg+G                Gehe zu Zeile
+     Strg+Shift+G          Gehe zur letzten Bearbeitung
+
+     Strg+1..9             Gehe zu Lesezeichen 1..9
+     Strg+Shift+1..9       Lesezeichen 1..9 umschalten
+
+     Alt+Links             springe zu voriger Klammer
+     Alt+Rechts            springe zu nächster Klammer
+     Alt+Hoch              springe zu voriger Klammer gleicher Art
+     Alt+Runter            springe zu nächster Klammer gleicher Art
+     
+     Alt+BildHoch          springe zum anfang dieses Blocks oder Absatzes
+     Alt+BildRunter        springe zum nächsten Block oder Absatz
+
+
+ - Text falten
+ 
+     Strg+ +               (ent)falte hier
+     Strg+Shift +          (ent)falte hier rekursiv
+     Alt+ +                (ent)falte dieses Level
+     Alt+Shift +           (ent)falte alles
+
+
+ - Suchen und Ersetzen
+
+     Shift+F3              suche vorigen Fundstelle
+     F3                    suche nächsten Fundstelle
+     Strg+Alt+F3           gehe zur ersten Fundstelle
+     Strg+Alt+Shift+F3     gehe zur letzten Fundstelle
+
+     Strg+F3               speichere Markierung als Suchtext
+     Strg+Shift+F3         speichere Markierung als Ersatztext
+
+     Alt+Shift+F3          resetze und suche vorigen Fundstelle
+     Alt+F3                resetze und suche nächsten Fundstelle
+     Strg+Alt+R            resetze alle
+     Strg+Alt+Shift+R      resetze alle, aber frage jedes mal
+
+
+ - Markierungen und Lesezeichen
+ 
+     Shift+F2              springe zum vorigen Marker in diesem Dokument
+     F2                    springe zum nächsten Marker in diesem Dokument
+     Alt+Shift+F2          springe zum vorigen Marker aller Dokumente
+     Alt+F2                springe zum nächsten Marker aller Dokumente
+     Strg+F2               einen Marker hier umschalten
+     Strg+Shift+F2         alle Marker im Dokumenten löschen
+     Strg+Alt+Shift+F2     alle Marker löschen
+ 
+     Strg+1..9             springe zu diesem Lesezeichen
+     Strg+Shift+1..9       Lesezeichen 1 bis 9 am Textcursor umschalten
+ 
+
+ - Text Markieren
+ 
+     Shift+Richtungstaste  erweitere zeilenweise (normale) Markierung
+     Shift+Alt+Richtung    erweitere rechteckige (Spalten) Markierung
+     Strg+Shift+Links      erweitere Markierung um 1 Wort nach links
+     Strg+Shift+Rechts     erweitere Markierung um 1 Wort nach rechts
+     Shift+BildHoch        erweitere Markierung um 1 Seite nach oben
+     Shift+BildRunter      erweitere Markierung um 1 Seite nach unten
+     Strg+A                markiere ganzen Text des Dokumentes
+     Strg+Y                wechsle Markierung zwischen Wort, Zeile, Block oder nichts
+     Strg+Shift+Y          markiere Inhalte von Klammern oder Anführungszeichen
+
+ 
+ - Text Bearbeiten
+
+     Strg+Z                letzte Bearbeitung rückgängig
+     Strg+Shift+Z          Bearbeitung wiederhohlen
+     Alt+Z                 mehrere Schritte rückgängig
+     Alt+Shift+Z           mehrere Schritte wiederhohlen
+     Strg+Alt+Z            rückgängig bis zum Anfang
+     Strg+Alt+Shift+Z      wiederhohlen bis zum jüngsten Stand
+
+     Entf                  lösche Markierung oder rechtes Zeichen
+     Strg+Entf             lösche rechtes Wort
+     Strg+D                dupliziere Markierung/Zeile
+     Strg+V                einfügen (Inhalt der Zwischenablage)
+     Strg+W                tausche Markierung mit Zwischenablage
+     Strg+X                Markierung ausschneiden
+
+     Strg+Shift+J          verbinde Zeilen (join)
+     Strg+Alt+cursor key   bewege Markierung oder Zeile
+
+
+ - Zeile Bearbeiten
+
+     Strg+Shift+Entf       lösche Zeile
+     Strg+Shift+C          kopiere Zeile
+     Strg+Shift+D          Zeile doppeln (füge Kopie unterhalb ein)
+     Strg+Shift+L          lösche linken teil der Zeile
+     Strg+Shift+R          lösche rechten teil der Zeile
+     Strg+Shift+W          akuelle Zeile mit Zwischenablage austauschen
+     Strg+Shift+X          Zeile ausschneiden
+
+     Strg+Leertaste        Zeile um Leerzeichen einrücken
+     Strg+Shift+Leertaste  Zeile um Leerzeichen ausrücken
+     Strg+Tab              Zeile um Tab einrücken
+     Strg+Shift+Tab        Zeile um Tabausrücken
+
+
+ - Werkzeuge
+
+     F5                    starte Perlprogramm, gib Ergebnis ins Ausgabefenster
+     Shift+F5              stoppe Perlprogramm
+     Strg+F5               schalte Sichtbarkeit des Ausgabefensters um
+     Strg+Shift+F5         zeige im Ausgabefenster Markierung in dezimal
+     Alt+Shift+F5          zeige im Ausgabefenster Markierung in hexadezimal
+     F12                   spring in den Notitzblock
+     Shift+F12             Markierung im Notitzblock anhängen
+     Strg+F12              schalte Sichtbarkeit des Notizblocks um
+
+
+ - Dialoge
+
+     Strg+F                Suchzeile
+     Strg+G                Gehe zu Zeile
+     Strg+R                Ersetzendialog
+     Strg+Shift+F          Suchdialog
+     Alt+Shift+I           Infobox
+
+
+- Ansicht
+
+     F11                   Vollbildmodus ein und ausschalten
+     Shift+F11             maximale Editierfläche
+     Strg+F11              Vordergrundmodus
+     Alt+F11               Transparenz
+     Strg+Alt+M            Menüleiste
+     Strg+Alt+T            Reiterleiste
+     Strg+F12              schalte Sichtbarkeit des Notizblocks um
+     Strg+F5               schalte Sichtbarkeit des Ausgabefensters um

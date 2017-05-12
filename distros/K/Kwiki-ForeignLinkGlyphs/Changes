@@ -1,0 +1,10 @@
+---
+version: 0.02
+date:    Sun Nov 13 23:08:34 EST 2005
+changes:
+    - added kwalitee
+---
+version: 0.01
+date:    Thu Aug 26 10:31:24 EDT 2004
+changes:
+    - initial release

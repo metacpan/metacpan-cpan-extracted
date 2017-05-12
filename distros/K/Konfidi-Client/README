@@ -1,0 +1,46 @@
+Konfidi
+
+See http://konfidi.org for information about Konfidi
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+DEVELOPMENT
+
+    Developers should run these as part of their development cycle
+
+    ./Build clean
+    ./Build testcover # and verify 100% coverage
+    prove t/dev # to run 'development' tests
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Konfidi::Client
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/Konfidi
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Konfidi
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/Konfidi
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/Konfidi
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 Dave Brondsema
+
+This program is released under the following license: Apache License, Version 2.0

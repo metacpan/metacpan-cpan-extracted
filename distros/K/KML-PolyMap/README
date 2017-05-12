@@ -1,0 +1,27 @@
+README for Geo::KML::PolyMap v 1.34
+
+2007-09-19
+
+-------
+1. Description
+-------
+Geo::KML::PolyMap generates KML or KMZ-formatted maps for Google Earth. Given a
+set of polygonal regions and a number associated with each region (for example,
+city blocks and population counts on each block), Geo::KML::PolyMap generates a
+choropleth map showing the data value for each region as a shaded polygon. The
+polygons are divided into a number of bins, with the color of each bin unique.
+Optionally, Geo::KML::PolyMap will generate a legend along with the map file to
+illustrate the data ranges represented by each color.
+
+A good demo application (and the one for which this was designed) is located
+at http://gecensus.stanford.edu. This site uses the Geo::KML::PolyMap module to
+display maps of US Census data in Google Earth.
+
+If you develop an application that uses this, I'd love to hear about it.
+
+
+
+Imran Haque
+ihaque@cs.stanford.edu
+http://www.cs.stanford.edu/people/ihaque
+http://gecensus.stanford.edu

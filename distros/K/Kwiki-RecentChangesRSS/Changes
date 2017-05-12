@@ -1,0 +1,63 @@
+Revision history for Kwiki-RecentChangesRSS
+
+0.07 2005/11/06
+Changed method of setting content_type [cpan #13854] which broke between
+Spiffy 0.22 and 0.24.
+Code reformatted using perltidy.
+
+0.06 2005/02/25
+The page title in the RSS output now handles UTF-8 [cpan #11316,#11339].
+Removed the need for Kwiki::UserPreferences.
+  
+0.05   2005/12/11
+date: 2004/12/11 21:50:42;  author: peregrin;  state: Exp;  lines: +49 -8
+add rss_display_page feature, wrap description in CDATA.
+Minor fix: <img> element was not closed as per XHTML 1.1 ([cpan #8829])
+
+0.04   2004/08/30
+date: 2004/08/31 03:36:43;  author: peregrin;  state: Exp;  lines: +18 -10
+fix [cpan #7524] - use rss_link to build <link/> url instead of manually
+
+0.03    2004/07/27
+
+date: 2004/07/27 19:45:48;  author: peregrin;  state: Exp;  lines: +23 -12
+now install xml.png file, pod updated, minor bug fix if last updated page was
+earlier that rss_depth.
+
+0.02    2004/07/20
+
+date: 2004/07/20 22:31:54;  author: peregrin;  state: Exp;  lines: +4 -27
+removed rss_depth preference (not config option)
+added version number to rss_generator default
+
+0.01    2004/07/17
+        First version, released on an unsuspecting world.
+
+date: 2004/07/17 16:55:24;  author: peregrin;  state: Exp;  lines: +4 -1
+turned off warnings of redefined content_type subroutine
+
+date: 2004/07/17 00:02:09;  author: peregrin;  state: Exp;  lines: +35 -20
+minor code layout changes, better content-type override, ack ingy
+
+date: 2004/07/15 17:01:59;  author: peregrin;  state: Exp;  lines: +100 -13
+required and optional channel elments, with POD
+
+date: 2004/07/15 15:56:40;  author: peregrin;  state: Exp;  lines: +14 -24
+fix bug in item link URL, rename screen template, nominal 2.0 RSS
+
+date: 2004/07/14 20:58:42;  author: peregrin;  state: Exp;  lines: +11 -4
+move to new module layout and added default config rss.yaml
+
+date: 2004/07/14 19:49:36;  author: peregrin;  state: Exp;
+branches:  1.1.1;
+
+date: 2004/07/14 02:27:14;  author: peregrin;  state: Exp;  lines: +60 -57
+uses config.yaml, moved to RSS 1.0
+
+date: 2004/06/29 04:20:16;  author: peregrin;  state: Exp;  lines: +0 -2
+removed HTML comments from screen template makes the rdf a little better
+
+date: 2004/06/29 03:47:20;  author: peregrin;  state: Exp;
+branches:  1.1.1;
+Initial revision
+

@@ -1,0 +1,25 @@
+---
+abstract: 'MongoDB backend for KiokuDB'
+author:
+  - 'Ask Bjørn Hansen <ask@develooper.com>'
+build_requires:
+  Scope::Guard: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.101900, CPAN::Meta::Converter version 2.101670'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: KiokuDB-Backend-MongoDB
+requires:
+  Data::Stream::Bulk: 0.07
+  KiokuDB: 0.31
+  MongoDB: 0.29
+  Moose: 0
+resources:
+  homepage: http://search.cpan.org/dist/KiokuDB-Backend-MongoDB/
+  repository: http://github.com/abh/kiokudb-backend-mongodb
+version: 0.03

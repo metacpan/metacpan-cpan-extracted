@@ -1,0 +1,15 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Kwiki-TypeKey
+version:      0.08
+version_from: lib/Kwiki/TypeKey.pm
+installdirs:  site
+requires:
+    Authen::TypeKey:               0.02
+    Kwiki:                         0.38
+    Kwiki::UserName:               0.14
+    Spoon:                         0.22
+    Test::More:                    0.32
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

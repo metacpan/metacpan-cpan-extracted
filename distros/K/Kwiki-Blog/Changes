@@ -1,0 +1,5 @@
+---
+version: 0.10
+date: Mon Jun 27 19:27:25 UTC 2005
+changes:
+- Initial version of Kwiki::Keywords

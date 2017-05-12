@@ -1,0 +1,18 @@
+version: 0.12
+date:    Wed Dec 15 15:20:10 PST 2004
+changes:
+- Make compatible with Kwiki-0.34
+version: 0.12
+date:    Wed Dec 15 15:18:09 PST 2004
+changes:
+- Make compatible with Kwiki-0.34
+version: 0.12
+date:    Wed Dec 15 15:15:02 PST 2004
+changes:
+- Make compatible with Kwiki-0.34
+- use Spiffy constructor format
+---
+version: 0.10
+date:    Mon Jun 28 09:01:51 PDT 2004
+changes:
+- Initial release

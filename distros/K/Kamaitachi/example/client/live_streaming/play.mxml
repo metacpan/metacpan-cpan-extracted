@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="init()">
+    <mx:Script source="play.as"/>
+    <mx:Panel title="simple live play example" paddingTop="10" paddingBottom="10" paddingLeft="10" paddingRight="10">
+        <mx:HBox>
+            <mx:Label text="Host:"/>
+            <mx:TextInput id="host" width="120" text="rtmp:/stream/live" />
+            <mx:Button id="connectConn_button" label="connect" click="connectConn()" enabled="true"/>
+            <mx:Button id="closeConn_button" label="close" click="closeConn()" enabled="true"/>
+        </mx:HBox>
+        <mx:HBox>
+            <mx:TextInput id="input" width="120"/>
+            <mx:Button id="play_button" label="play" click="playNs()" enabled="true"/>
+            <mx:Button id="pause_button" label="pause" click="pauseNs()" enabled="true"/>
+            <mx:Button id="resume_button" label="resume" click="resumeNs()" enabled="true"/>
+            <mx:Button id="seek_button" label="seek" click="seekNs()" enabled="true"/>
+            <mx:Button id="close_button" label="close" click="closeNs()" enabled="true"/>
+        </mx:HBox>
+        <mx:HBox id="video_container" width="320" height="240" />
+        <mx:VBox>
+        <mx:Label id="status" text="Connecting..."/>
+        <mx:Label id="message_label" text=""/>
+        </mx:VBox>
+    </mx:Panel>
+</mx:Application>

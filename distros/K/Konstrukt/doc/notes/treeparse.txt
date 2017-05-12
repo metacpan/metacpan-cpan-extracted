@@ -1,0 +1,210 @@
+TODO:
+-	iBlock: Listen/Felder:
+	<table>
+	<tr><th><+$ head1 / $+></th><th><+$ head2 / $+></th></tr>
+	<+@ rows @+>
+		<tr><td><+$ field1 / $+></td><td><+$ field2 $+>default2<+$ / $+></td><+@ / @+></tr>
+	<+@ / @+>
+	</table>
+	==>
+	prepare mit & UND +@ und +$.
+	?? +@ und +$ bauen einen parallelen baum auf, der auf die einzelnen template-elemente zeigt.
+	my $iblocktemplate = {
+		fields => {
+			head1 => $tagnode,
+			head2 => $tagnode,
+		},
+		lists => {
+			rows => {
+				node => $tagnode,
+				fields => {
+					field1 => $tagnode,
+					field2 => $tagnode,
+				},
+			}
+		}
+	}
+	
+	<& iblock src="..." &>
+		<$ head1 $>a<$ / $>
+		<$ head2 $>b<$ / $>
+		<@ rows @>
+			<$ field1 $>c<$ / $>
+			<$ field2 $>d<$ / $>
+		<@ / @>
+	<& / &>
+	==>
+	my $iblock_data = {
+		fields => {
+			head1 => $tagnode,
+			head2 => $tagnode
+		},
+		lists => {
+			rows => [
+				{ field1 => $tagnode, field2 => $tagnode },
+				{ field1 => $tagnode, field2 => $tagnode },
+				{ field1 => $tagnode },
+				...
+			]
+		}
+	};
+
+-	iBlock: Listen in Listen?!
+	<table>
+	<+@ rows @+>
+		<tr>
+			<+@ columns @+><td><+$ field / $+></td><+@ / @+>
+		</tr>
+	<+@ / @+>
+	</table>
+	
+	==>
+	prepare mit & UND +@ und +$.
+	+@ und +$ bauen einen parallelen baum auf, der auf die einzelnen template-elemente zeigt.
+	my $iblocktemplate = {
+		fields => undef,
+		lists => {
+			rows => {
+				node => $tagnode,
+				fields => undef,
+				lists => {
+					columns => {
+						fields => {
+							field => $tagnode
+						},
+						lists => undef
+					}
+				}
+			}
+		}
+	}
+	
+	<& iblock src="..." &>
+		<@ rows @>
+			<@ columns @>
+				<$ field $>a<$ / $>
+				<$ field $>b<$ / $>
+			<@ / @>
+			<@ columns @>
+				<$ field $>c<$ / $>
+				<$ field $>d<$ / $>
+			<@ / @>
+		<@ / @>
+	<& / &>
+	
+	==> generische form
+	my $iblock_data = {
+		fields => {
+			field1 => 'value1',
+			field2 => 'value2'
+		},
+		lists => {
+			rows => [
+				{
+					fields => { line => $number },
+					lists => {
+						columns => [
+							{ fields => {field1 => $tagnode, field2 => $tagnode} },
+							{ fields => {field1 => $tagnode, field2 => $tagnode} }
+						]
+					}
+				}
+				...
+			]
+		}
+	}
+	
+Vorgehensweise:========================================
+Page compilation:
+-	Cache vorhanden (im RAM oder auf Platte)?
+	-	Prüfung auf gültigen Cache:
+		Jedes Plugin, das statischen Inhalt zurückgibt, kann eine Bedingung ein die gecachte Datei einfügen, die erfüllt sein muss, damit der Cache noch aktuell ist.
+		Z.B. Datei-Datum nicht neuer als XY, neuester Eintrag in einer SQL-Tabelle nicht neuer als XY, etc.
+	-	Cache teilweise dynamischer Datei (.ihtml.prepared)
+		-> Vorbereiteten Baum laden und execute'n (Execute, Display)
+	-	Kein Cache:
+		-> Datei lesen, Prepare, Cache, Execute, Display
+		
+Prepare (Parser):
+	-	Aufruf: iBlock::Compiler->prepare($input, $actions)
+		-	$input: Baum (Hashref) oder String (Scalarref)
+		-	$actions: Hashref mit den zu berücksichtigenden Tags und den damit verknüpften Aktionen:
+			{
+				'&' => 'iBlock::Handlers::Plugin'-obj,
+				'~' => 'iBlock::Handlers::Shortcut'-obj,
+			}
+			Soll bei einem bestimmten Tag-Typ keine Aktion ausgeführt werden, so weist man dem Hash-Key den Wert "undef" zu.
+			Andernfalls wird $obj->handle() ausgeführt.
+	
+	->	Strings werden in einen Baum mit einem Knoten transformiert.
+	
+	Innerhalb des Eingabebaumes verfährt der Parser folgendermaßen:
+	-	Alle Nodes bis auf den Typ plaintext (p) werden übersprungen, da sie schon Ergebnis vorherigen Parsens sind.
+	-	Kommentare (type: c) werden grundsätzlich übersprungen und nicht bearbeitet.
+	-	Jeder plaintext Node wird entsprechend einer (festen) regexp (z.B. /(<!--|-->|<&|&>)/) in Tokens (Tags) gesplittet.	Der plaintext Node wird entfernt.
+	-	Die Tokens werden auf Relevanz hin überprüft. Relevante Tokens können z.B. Plugin Tags sein (<& &>).
+		-	Wird ein öffnendes Comment Tag gefunden, werden alle Tokens bis zum Ende des Comments zu einem Comment Node zusammengefasst
+		-	Wird ein Tag-Start (<&) gefunden, so muss geprüft werden, ob alle Tokens bis zum Tag-Ende (&>) statisch (plaintext) sind
+			Falls ja, so werden diese Tokens zusammengefasst und das Tag wird geparst und in einen entsprechenden Hash umgewandelt.
+			Falls nein, wird ein vorläufiges Tag erstellt, das noch nicht geparst wird, und das als die noch zu parsenden Tokens als Unterbaum speichert.
+			Die Tokens nach dem Tag-Ende werden dann wie bei einem vollständig geparsten Tag als Child-Nodes angehangen.
+		-	Wurde ein öffnendes, vollständig geparstes Tag gefunden, wird es an aktueller Position in aktueller Ebene eingefügt. Alle folgenden Tokens sind nun Child-Nodes dieses Tags.
+		-	Wird ein schließendes Tag gefunden, springt der Parser eine Ebene höher im Baum und prüft, ob das Tag vollständig geparst wurde.
+			Falls ja führt er die mit dem Tag verknüpfte Prepare-Funktion aus: $handler->prepare().
+			Der auszuführenden Funktion wird eine Referenz auf einen Baum übergeben, die auf den Tag-Node selbst zeigt.
+			Die Funktion kann direkte Veränderungen an dem Baum und an dem Tag-Node vornehmen. Wenn die Funktion lediglich Veränderungen direkt im Baum
+			vorgenommen hat, gibt sie "undef" zurück. Ansonsten, wenn sie z.B. mehrere Nodes zurückgibt, oder den Node löschen möchte, gibt sie eine Referenz
+			auf ein Array mit den Nodes zurück, die an Stelle des Funktions-Nodes eingesetzt werden sollen bzw. eine Referenz auf eine leere Liste.
+		-	Die Funktion kann die Child-Nodes auch nur teilweise bearbeiten. Die vollständige Bearbeitung muss erst beim Execute'n geschehen.
+			Eine teilweise Bearbeitung ist immer dann der Fall, wenn sich noch dynamische Inhalte unterhalb des Nodes befinden.
+		-	Nachdem eine Funktion ausgeführt wurde, wird überprüft, ob sie dynamische Inhalte zurückgegeben hat, also ob das dynamic-Tag nach der Ausführung
+			im Node selbst oder in einem Node der Rückgabeliste gesetzt wird. Der Parent-Node wird dann ggf. auch dynamisch. $parent->{dynamic} ||= $child->{dynamic};
+		-	Wurden statische Inhalte zurückgegeben, wird geprüft, ob Geschwister vor diesem Node auch statisch und gleichen Typs sind, ggf. Zusammenfassung.
+		-	Sprung hinter den bearbeiteten Node/hinter die Rückgabeliste.
+	-	Sind alle Nodes dieser Ebene verarbeitet worden, so ist das Parsen/Preparen abgeschlossen.
+
+Execute:
+	Beim Execute'n wird der durch das Prepare'n entstandene Baum durchlaufen und die Funktions-Tags werden Bottom-up ausgeführt.
+	(1) Je Knoten auf aktueller Ebene:
+		(1.1) Node ist dynamischen Typs (Tag). Ausführen des Handlers (z.B. Plugin-Handler). Das entsprechende Plugin muss ausgeführt werden ($plugin->handle()):
+			(1.1.1) Hat der aktuelle Knoten Kinder?
+				-Ja: Springe zunächst eine Ebene tiefer und bearbeite die dortigen Knoten ("Rekursion"), gehe dort zu (1.1).
+					Das Plugin kann den Inhalt des Nodes komplett verändern.
+			(1.1.2)
+				-	Es müssen statische Elemente (c/p) zurückgegeben werden. Jegliche dynamischen Elemente/Plugins werden gezwungen, ihre Funktion auszuführen und
+					statischen Inhalt zurückzugeben.
+					Dynamische Plugins wie z.b. &embperl, &date, &embperl_mysql, &env, &param, &sql müssen nun ausgeführt werden und statischen Inhalt zurückgeben.
+					Dieser statische Inhalt kann je nach plugin (z.B. bei &embperl, &forum) nochmals auf Sonderfunktionen (Plugins, ...) geparst werden (->prepare).
+					Nach dem prepare wird (1.1.2) erneut durchgeführt.
+				-	Nachdem statischer Inhalt (ggf. auch mehrere Nodes) zurückgegeben wurden, muss geprüft werden, ob vor dem ersten zurückgegebenen Node ein Node
+					gleichen Typs (c/p) existiert. Ggf. Zusammenfassung.
+				-	Sprung hinter die Liste zurückgegebener Nodes. Fahre bei (1.1.1) fort.
+	(2) Nachdem alle Leaf-Nodes bearbeitet wurden, springt man eine Ebene höher und setzt dort die Bearbeitung bei (1.1.2) fort (Rekursionsrücksprung).
+
+Vorgehensweise (konkret bei <& iBlock &>):=============
+Prepare (P) / Execute (E)
+	(E) Kann eigentlich nur auftreten, wenn im Prepare-Durchlauf noch dynamische Elemente (Funktionen) im Baum geblieben sind.
+		Da Execute rekursiv bottom-up ausgeführt wird, sollte der Tag-Node nur noch statische Child-Nodes haben, die sich jedoch über mehrere Ebenen erstrecken
+		können, da im Prepare-Durchlauf schon vorläufig auf $/@ geparst wurde.
+	(E) Nur statische Nodes. Gehe zu "(P) - Nein:"
+	(P/E) Beinhaltet der Knoten dynamische Child-Nodes?
+		-	Ja:
+			-	Es kann noch kein Field-H0ash erstellt werden.
+				Subtree (Hauptdatei) wurde so weit wie möglich geparst, jedoch sind noch dynamische Elemente vorhanden.
+				Keine weitere Bearbeitung für den prepare-Durchlauf möglich. exit sub.
+		-	Nein:
+			-	Durchlaufe den Baum und erstelle einen Field-Hash. Der Baum kann nun gelöscht werden.
+			-	Der Subtree (Hauptdatei) war statisch und wurde vollständig geparst. Es existiert ein Field-Hash. Nun muss die .iblock-Datei bearbeitet werden.
+			-	Geforderte .iBlock-Datei laden und verarbeiten:
+				-	Existiert ein aktueller Cache (.iblock.prepared) für die geforderte .iBlock-Datei?
+					-Ja:
+						-	Baum Laden.
+					-Nein:
+						-	Geforderte .iBlock-Datei laden.
+						-	->prepare(&,~,+$,+@).
+						-	collect_fields anwenden und parallelen Baum erzeugen, der auf die +$- und +@-Tags zeigt. Diesen Baum im root-Node der iBlock-Datei speichern.
+						-	Speichern in .iblock.prepared.
+				-	Falls Template-Fields vorhanden sind, Ersetzung der Template-Fields (+$, +@) mit den Werten aus dem Field-Hash.
+				-	Die iBlock-Substitution wurde durchgeführt. Ersetzung des Tags im Baum durch den bearbeiteten .iblock-Baum.
+					Dieser kann statisch aber auch teilweise dynamisch sein.
+

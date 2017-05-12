@@ -1,0 +1,417 @@
+---
+abstract: 'DBI backend for KiokuDB'
+author:
+  - 'Yuval Kogman <nothingmuch@woobling.org>'
+build_requires:
+  DBIx::Class::Optional::Dependencies: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  KiokuDB::Entry: '0'
+  KiokuDB::Test: '0'
+  Search::GIN::Extract::Callback: '0'
+  Search::GIN::Extract::Class: '0'
+  Search::GIN::Query::Manual: '0'
+  Search::GIN::Query::Set: '0'
+  Test::Exception: '0'
+  Test::More: '0.88'
+  Test::Requires: '0'
+  Test::TempDir: '0'
+  YAML::XS: '0'
+  constant: '0'
+  perl: '5.006'
+configure_requires:
+  DBIx::Class::Optional::Dependencies: '0'
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 5.014, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: KiokuDB-Backend-DBI
+provides:
+  DBIx::Class::KiokuDB:
+    file: lib/DBIx/Class/KiokuDB.pm
+    version: '1.23'
+  DBIx::Class::KiokuDB::EntryProxy:
+    file: lib/DBIx/Class/KiokuDB/EntryProxy.pm
+    version: '1.23'
+  DBIx::Class::Schema::KiokuDB:
+    file: lib/DBIx/Class/Schema/KiokuDB.pm
+    version: '1.23'
+  KiokuDB::Backend::DBI:
+    file: lib/KiokuDB/Backend/DBI.pm
+    version: '1.23'
+  KiokuDB::Backend::DBI::Schema:
+    file: lib/KiokuDB/Backend/DBI/Schema.pm
+    version: '1.23'
+  KiokuDB::TypeMap::Entry::DBIC::ResultSet:
+    file: lib/KiokuDB/TypeMap/Entry/DBIC/ResultSet.pm
+    version: '1.23'
+  KiokuDB::TypeMap::Entry::DBIC::ResultSource:
+    file: lib/KiokuDB/TypeMap/Entry/DBIC/ResultSource.pm
+    version: '1.23'
+  KiokuDB::TypeMap::Entry::DBIC::Row:
+    file: lib/KiokuDB/TypeMap/Entry/DBIC/Row.pm
+    version: '1.23'
+  KiokuDB::TypeMap::Entry::DBIC::Schema:
+    file: lib/KiokuDB/TypeMap/Entry/DBIC/Schema.pm
+    version: '1.23'
+requires:
+  Carp: '0'
+  Class::Accessor::Grouped: '0'
+  Class::Load: '0'
+  DBI: '1.607'
+  DBIx::Class: '0.08127'
+  DBIx::Class::Core: '0'
+  DBIx::Class::ResultSource::Table: '0'
+  DBIx::Class::Schema: '0'
+  Data::Stream::Bulk::DBI: '0.07'
+  JSON: '0'
+  KiokuDB: '0.46'
+  KiokuDB::Backend: '0'
+  KiokuDB::Backend::Role::Clear: '0'
+  KiokuDB::Backend::Role::Concurrency::POSIX: '0'
+  KiokuDB::Backend::Role::GC: '0'
+  KiokuDB::Backend::Role::Query::GIN: '0'
+  KiokuDB::Backend::Role::Query::Simple: '0'
+  KiokuDB::Backend::Role::Scan: '0'
+  KiokuDB::Backend::Role::TXN: '0'
+  KiokuDB::Backend::Serialize::Delegate: '0'
+  KiokuDB::TypeMap: '0'
+  KiokuDB::TypeMap::Entry: '0'
+  KiokuDB::TypeMap::Entry::Naive: '0'
+  List::MoreUtils: '0'
+  Moose: '0'
+  Moose::Util::TypeConstraints: '0'
+  MooseX::Types: '0.08'
+  MooseX::Types::Moose: '0'
+  SQL::Abstract: '0'
+  Scalar::Util: '0'
+  Search::GIN: '0.07'
+  Search::GIN::Extract::Delegate: '0'
+  Try::Tiny: '0'
+  base: '0'
+  namespace::autoclean: '0'
+  namespace::clean: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kiokudb/kiokudb-backend-dbi/issues
+  homepage: http://www.iinteractive.com/kiokudb/
+  repository: git://github.com/kiokudb/kiokudb-backend-dbi.git
+version: '1.23'
+x_Dist_Zilla:
+  perl:
+    version: '5.018002'
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: test
+          type: requires
+      name: '@Filter/TestMoreDoneTesting'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::GatherDir
+      name: '@Filter/GatherDir'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@Filter/PruneCruft'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@Filter/ManifestSkip'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@Filter/MetaYAML'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::License
+      name: '@Filter/License'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::Readme
+      name: '@Filter/Readme'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::RunExtraTests
+      config:
+        Dist::Zilla::Role::TestRunner:
+          default_jobs: 1
+      name: '@Filter/RunExtraTests'
+      version: '0.018'
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@Filter/ExecDir'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: '@Filter/ShareDir'
+      version: '5.014'
+    -
+      class: inc::DBICOptionalDeps
+      config:
+        Dist::Zilla::Role::TestRunner:
+          default_jobs: 1
+      name: '@Filter/=inc::DBICOptionalDeps'
+      version: ~
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@Filter/Manifest'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: '@Filter/TestRelease'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@Filter/ConfirmRelease'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: '@Filter/MetaConfig'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: '@Filter/MetaJSON'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::NextRelease
+      name: '@Filter/NextRelease'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::CheckChangesHasContent
+      name: '@Filter/CheckChangesHasContent'
+      version: '0.006'
+    -
+      class: Dist::Zilla::Plugin::PkgVersion
+      name: '@Filter/PkgVersion'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::Authority
+      name: '@Filter/Authority'
+      version: '1.006'
+    -
+      class: Dist::Zilla::Plugin::PodCoverageTests
+      name: '@Filter/PodCoverageTests'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: '@Filter/PodSyntaxTests'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::NoTabsTests
+      config:
+        Dist::Zilla::Plugin::Test::NoTabs:
+          module_finder:
+            - ':InstallModules'
+          script_finder:
+            - ':ExecFiles'
+      name: '@Filter/NoTabsTests'
+      version: '0.06'
+    -
+      class: Dist::Zilla::Plugin::EOLTests
+      name: '@Filter/EOLTests'
+      version: '0.02'
+    -
+      class: Dist::Zilla::Plugin::Test::Compile
+      config:
+        Dist::Zilla::Plugin::Test::Compile:
+          filename: t/00-compile.t
+          module_finder:
+            - ':InstallModules'
+          script_finder:
+            - ':ExecFiles'
+      name: '@Filter/Test::Compile'
+      version: '2.039'
+    -
+      class: Dist::Zilla::Plugin::Metadata
+      name: '@Filter/Metadata'
+      version: '3.03'
+    -
+      class: Dist::Zilla::Plugin::MetaResources
+      name: '@Filter/MetaResources'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::Git::Check
+      name: '@Filter/Git::Check'
+      version: '2.020'
+    -
+      class: Dist::Zilla::Plugin::Git::Commit
+      name: '@Filter/Git::Commit'
+      version: '2.020'
+    -
+      class: Dist::Zilla::Plugin::Git::Tag
+      name: '@Filter/Git::Tag'
+      version: '2.020'
+    -
+      class: Dist::Zilla::Plugin::Git::NextVersion
+      name: '@Filter/Git::NextVersion'
+      version: '2.020'
+    -
+      class: Dist::Zilla::Plugin::ContributorsFromGit
+      name: '@Filter/ContributorsFromGit'
+      version: '0.006'
+    -
+      class: Dist::Zilla::Plugin::MetaProvides::Package
+      config:
+        Dist::Zilla::Plugin::MetaProvides::Package:
+          finder_objects:
+            -
+              class: Dist::Zilla::Plugin::FinderCode
+              name: '@Filter/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
+              version: '5.014'
+        Dist::Zilla::Role::MetaProvider::Provider:
+          inherit_missing: '1'
+          inherit_version: '1'
+          meta_noindex: '1'
+      name: '@Filter/MetaProvides::Package'
+      version: '2.000001'
+    -
+      class: Dist::Zilla::Plugin::PodWeaver
+      config:
+        Dist::Zilla::Plugin::PodWeaver:
+          finder:
+            - ':InstallModules'
+            - ':ExecFiles'
+          plugins:
+            -
+              class: Pod::Weaver::Plugin::EnsurePod5
+              name: '@CorePrep/EnsurePod5'
+              version: '4.006'
+            -
+              class: Pod::Weaver::Plugin::H1Nester
+              name: '@CorePrep/H1Nester'
+              version: '4.006'
+            -
+              class: Pod::Weaver::Plugin::SingleEncoding
+              name: '@Default/SingleEncoding'
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Name
+              name: '@Default/Name'
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Version
+              name: '@Default/Version'
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Region
+              name: '@Default/prelude'
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: SYNOPSIS
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: DESCRIPTION
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: OVERVIEW
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: ATTRIBUTES
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: METHODS
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: FUNCTIONS
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Leftovers
+              name: '@Default/Leftovers'
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Region
+              name: '@Default/postlude'
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Authors
+              name: '@Default/Authors'
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Legal
+              name: '@Default/Legal'
+              version: '4.006'
+      name: '@Filter/PodWeaver'
+      version: '4.005'
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@Filter/UploadToCPAN'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: configure
+          type: requires
+      name: ConfigureRequires
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::AutoPrereqs
+      name: AutoPrereqs
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':IncModules'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':MainModule'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':AllFiles'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':NoFiles'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: '@Filter/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
+      version: '5.014'
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: '0'
+    version: '5.014'
+x_authority: cpan:NUFFIN
+x_contributors:
+  - "Arthur Axel 'fREW' Schmidt <frioux@gmail.com>"
+  - 'Dan Dascalescu <ddascaNOSPAMlescu@gmail.com>'
+  - 'Daniel Ruoso <daniel@ruoso.com>'
+  - 'Jason May <jason.a.may@gmail.com>'
+  - 'Jesse Luehrs <doy@tozt.net>'
+  - 'Justin Hunter <justin.d.hunter@gmail.com>'
+  - 'Paulo E. Castro <pauloedgarcastro@gmail.com>'
+  - 'Terrence Brannon <TBrannon@SmartFinancial.com>'
+  - 'Thomas Klausner <domm@plix.at>'
+  - 'franck cuny <franck@lumberjaph.net>'

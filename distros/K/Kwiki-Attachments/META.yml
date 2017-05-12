@@ -1,0 +1,11 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Kwiki-Attachments
+version:      0.21
+version_from: lib/Kwiki/Attachments.pm
+installdirs:  site
+requires:
+    Kwiki:                         0.37
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

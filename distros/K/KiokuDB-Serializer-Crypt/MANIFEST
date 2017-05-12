@@ -1,0 +1,17 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/KiokuDB/Serializer/Crypt.pm
+t/00-compile.t
+t/01-basic.t
+t/02-typemap.t
+t/release-eol.t
+t/release-no-tabs.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t
+weaver.ini

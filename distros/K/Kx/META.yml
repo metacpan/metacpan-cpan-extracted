@@ -1,0 +1,36 @@
+---
+abstract: 'Perl extension for Kdb+ L<http://kx.com>'
+author:
+  - 'Mark Pfeiffer <markpf@mlp-consulting.com.au>'
+  - 'Stephan Loyd <stephanloyd9@gmail.com>'
+build_requires:
+  Data::Dumper: '0'
+  Test::More: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Kx
+provides:
+  Kx:
+    file: lib/Kx.pm
+    version: '0.042'
+  Kx::HASH:
+    file: lib/Kx.pm
+    version: '0.042'
+  Kx::LIST:
+    file: lib/Kx.pm
+    version: '0.042'
+requires:
+  Carp: '0'
+  POSIX: '0'
+  XSLoader: '0'
+  perl: '5.008'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: https://github.com/stphnlyd/perl5-Kx.git
+version: '0.042'
+x_serialization_backend: 'YAML::Tiny version 1.69'

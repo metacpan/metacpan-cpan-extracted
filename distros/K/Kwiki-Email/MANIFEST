@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Kwiki-Email.t
+lib/Kwiki/Email.pm
+META.yml                                 Module meta-data (added by MakeMaker)

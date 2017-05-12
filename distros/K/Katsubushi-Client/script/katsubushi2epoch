@@ -1,0 +1,15 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Katsubushi::Converter;
+use Getopt::Std;
+use Time::Piece;
+
+my $id = shift;
+my $format = shift;
+my $epoch = Katsubushi::Converter::id_to_epoch($id);
+if ($format) {
+    print localtime($epoch)->strftime($format), "\n";
+} else {
+    print $epoch, "\n";
+}

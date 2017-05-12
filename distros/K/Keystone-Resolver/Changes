@@ -1,0 +1,374 @@
+$Id: Changes,v 1.75 2008-04-30 17:27:56 mike Exp $
+
+Revision history for Perl extension Keystone::Resolver.
+
+1.23  Thu May  1 10:26:03 BST 2008
+	- Same as 1.22, except that it is properly date-stamped.
+
+1.22  (IN PROGRESS)
+	- Oracle back-end now fully functional and tested, both with
+	  the resolver itself and the Admin UI.  See db/README for
+	  instructions on making a toy Oracle resource database, and
+	  the top-level README for instructions on running the
+	  test-suite against this.
+	- Various changes to canonicalise the order of things like
+	  equal-priority results in the XML returned from
+	  resolve_to_xml(), required so that the same regression-test
+	  suite can be used with both MySQL and Oracle.
+	- Add a test-script that invokes the actual "resolve" script.
+	  The absence of this was responsible for 1.20 going out while
+	  "resolve" itself was still not making its own $resolver
+	  object, while the various test-scripts were.
+	- It is now mandatory to pass a $resolver into
+	  OpenURL::newFromCGI(), since memory problems will always
+	  result if it is allowed to allocate its own.
+	- Change API of OpenURL::newFromCGI() to reflect mandatory
+	  $resolver and better match the default constructor, new().
+	- Add Makefile.PL dependency on Scalar::Util.pm
+
+1.21  Thu Apr 10 15:23:53 BST 2008
+	- URGENT BUGFIX RELEASE: the resolve script now makes its own
+	  $resolver object rather than allowing newFromCGI() to make
+	  one on its behalf.  This ensures that the resolver stays
+	  referenced (not only by the OpenURL's weak reference) until
+	  the resolution is complete.
+
+1.20  Thu Apr 10 12:36:28 BST 2008
+	- Changes to memory management: since the Resolver, Database,
+	  OpenURL and  ContextObject classes all contain references
+	  back and forth, the next of mutually referencing objects was
+	  not getting destructed when it went out of scope, leading to
+	  memory exhaustion in long-running processes such as Apache
+	  servers under heavy load.  That is now fixed through the use
+	  of weak references back to the "owning" objects.  Tests show
+	  that resolving 50,000 OpenURLs does not cause noticable
+	  process growth.
+	- Changes to regression-test suite to facilitate running when
+	  not connected to network.
+	- Added new test script, admin.t, testing the code that
+	  underlies the web-based admin interface.
+	- Refactored database-access code in Database.pm, greatly
+	  reducing the number of similar functions and unifying
+	  logging.
+	- Add support for the Serial Alias object type, both in the
+	  code and in the Admin web UI.  (Admin support for this is
+	  not very useful yet, since, as with other kinds of link,
+	  there is no way to maintain the links between an alias
+	  object and the serial that it is an alias of.)
+	- Added low-level object-API support for the service-to-serial
+	  and genre-to-servicetype link tables.  (There's no point in
+	  wiring them into the Admin UI, since they contain no
+	  information other than link IDs.)
+	- Search-result listing in Admin web UI does not offer links
+	  to sort on virtual fields.
+	- Search-result listing in Admin web UI restored to being
+	  valid XHTML 1.0.
+	- Top-level "resolve" script runs within a scoped block, to
+	  ensure that all local ("my") variables go out of scope when
+	  the script ends, whatever Apache's memory management regime
+	  may be.  This contributes to fixing a memory-exhaustion
+	  problem.
+
+1.19  Wed Mar 26 17:22:50 GMT 2008
+	- Use the DBI module's connect_cached() method to pool similar
+	  connections.  This is important when running the resolver as
+	  a web-service, since (currently) each invocation makes a new
+	  Resolver object, which in turn makes its own Database
+	  object, which until this change made its own DBI
+	  connection.  Due to Perl's lazy garbage-collection, each
+	  Apache process can accumulate a lot of these connections
+	  before they get tidied up, and when (as is usually the case)
+	  many Apache processes are used, they can exhaust the
+	  back-end database's connection pool.
+	- Log-levels (as specified for example by the opt_loglevel
+	  query parameter) can now be specified symbolically, as a
+	  comma-separated list of level names, as well as numerically.
+	- New logging level, LIFECYCLE, notes the creation and
+	  destruction of Resolver, OpenURL and Database objects.
+	- The DBI logging level can now also be set, using the
+	  opt_dbi_trace query parameter.
+	- New function LogLevel::num() that converts a logging-level
+	  string into a numeric value, complementing the existing
+	  label().  Both these functions now handle composite values
+	  (e.g. CONVERT01|LIFECYCLE).
+	- New test-script for log-level utility functions.
+	- Add brief documentation of logging (doc/logging).
+	- Option setting is now always done via the option() method
+	  rather than, as previously at Resolver creation time, via
+	  direct assignment.  This ensures that the logging-related
+	  special cases are handled uniformly.
+	- Add static_log() function (not method) to the Resolver
+	  class, for use in contexts where no Resolver object is
+	  available to invoke the method on.
+	- Copies are included (web/htdocs/1cate-test/) of the KEV
+	  context-objects that were part of Openly's OpenURL 1.0 test
+	  suite.  These will be useful one day for local testing.
+	- More explicit diagnostics for some database problems.
+	- Steps towards support for Oracle as the back-end database:
+	  NOT YET COMPLETE.
+
+1.18  Mon Feb 11 11:05:16 GMT 2008
+	- Add the ability to delete resource database objects from the
+	  Admin UI.
+
+1.17  Thu Feb  7 16:26:37 CET 2008
+	- Fix character-set handling AGAIN :-) The resolver library
+	  was correcting accepting any specified character encoding
+	  and correctly outputting UTF-8 with the necessary XML and
+	  HTML specifications to sayt that's what it was doing, but
+	  the top level resolver script was telling Perl to do UTF-8
+	  encoding on output.  (Why didn't that cause problems when
+	  running under Apache 1/mod_perl 1?  Because of the
+	  character-set faries.)
+	- Generalise rewrite rule so that /resolve/<dbname> URLs are
+	  correctly interpreted.  This provides an easy means for
+	  running against alternative resource databases.
+	- Fix sorting in Admin UI such that it works through
+	  successive pages of results.
+	- When editing an object in the web-based Admin UI, drop-down
+	  option lists that are populated from the database (e.g. the
+	  service-types that a service can belong to) are now sorted.
+	- Fix a bug in editable_fields(), which was omitting from its
+	  output those fields used as links to non-dependent sets
+	  (e.g. the set of services implementing a service-type)
+	  rather than dependent sets (e.g. the one service-type to
+	  which a service belongs).  The result of that bug was that,
+	  for example, the raw numeric service_type_id was included on
+	  the service editing page as well as the service-type name.
+	  No more.
+	- The resolver now responds more politely if an attempt is
+	  made to access a virtual site not supported by the database,
+	  and points the user at a new README file that explains the
+	  situation.
+	- The service_type table now includes a new "plugin" field
+	  which can be used to explicitly specify the name of the Perl
+	  plugin to use to implement services of that type, if the
+	  required plugin is not named the same as the tag of the
+	  service-type.  This allows multiple service-types to share
+	  the same plugin.  (When this field is empty, the plugin
+	  named after the service-type's tag is used, as before.  Thus
+	  the new field is only an override mechanism, and the new
+	  arrangement is backwards compatible.)
+	- A database patch script is made available to support the
+	  new service_type.plugin field: see db/updates/
+	- When building URIs from recipes, the resolver now,
+	  correctly, accepts the first of several slash-separated
+	  candidate fields whose value is defined and non-empty,
+	  whereas before it would accept defined but empty values.
+
+1.16  Tue Feb  5 02:57:05 GMT 2008
+	- Remove advisory dependency on Apache module from
+	  Makefile.PL, as the true dependency is now on EITHER Apache
+	  or Apache2, and there is no way to specify that in the
+	  PREREQ_PM clause.
+	- Modification to how the sample database is built result in a
+	  more flexible configuration.
+	- Both the resolver itself and the Admin UI issue more a
+	  polite, informative message if the Resource Database is not
+	  there.
+	- Documentation tweaks arising from merge of Apache2 CVS
+	  branch back into head.
+	- README describes public CVS archive, Debian installation
+	  procedure and service-names in the default resource
+	  database.
+
+1.15  Mon Jan 28 12:26:37 GMT 2008
+	- Fix error in Apache2 debian-package configuration file:
+	  mod_rewrite's log was written into /var/log/apache rather
+	  than /var/log/apache2, which causes Apache2 to refuse to
+	  start if Apache 1.x is not also installed.
+	- Comments in Makefile.PL indicate what Debian packages
+	  contain each of the prerequisite Perl modules.
+
+1.14  Mon Jan 28 10:49:04 GMT 2008
+	- Fix the resolver-site's index page to correctly state the
+	  baseURL.  (No functional changes.)
+
+1.13  Thu Jan 24 18:07:56 GMT 2008
+	- Small changes to Web configuration to allow Apache 1.x and
+	  Apache 2.x installations to co-exist, and to ensure that a
+	  Debian install can live side-by-side with a development
+	  version.  (Yes, this means that you can -- and I do -- run
+	  four instances of the resolver on a single computer.)
+
+1.12  Thu Jan 17 15:50:00 GMT 2008
+	- Support for running under both Apache 1.3/mod_perl and
+	  Apache 2.0/mod_perl2.
+	- Add utility function apache_request() and mod_perl_version()
+	  to Keystone::Resolver::Utils to support Apache-version
+	  independence.
+
+1.11  Mon Dec 17 11:57:16 GMT 2007
+	- Fix bug #1967, which prevented the creation of certain types
+	  of record, including Service and User.
+
+1.10  Thu Dec 13 17:27:15 GMT 2007
+	- Hardwired username/password pairs for read-only and
+	  read-write pairs removed from code.  These are now obtained
+	  from the KRuser, KRpw, KRrwuser and KRrwpw environment
+	  variables.
+	- Set KRuser et al. in web/conf/apache1.3/debian.conf
+	- Set KRuser et al. in t/regression.t
+	- Fixes to the admin system's new-record-creation and editing
+	  system.
+
+1.09  Mon Dec  3 09:46:22 GMT 2007
+	- Add documentation to bin/kr-recipe.
+	- Remove the obsolete PHP-based Web Admin UI from
+	  web/htdocs/dbadmin/
+	- Much better Debian packaging.
+
+1.08  Fri Nov 23 18:23:00 GMT 2007
+	- Debian packaging.  Currently encompasses the Perl part of
+	  the application only (libraries and driver scripts).  A
+	  separate Debian package will follow for the Web Admin UI and
+	  the main HTTP entry point.
+
+1.07  Fri Sep 21 10:00:40 BST 2007
+	- The "deny" boolean field of rule object (both service-type
+	  and service rules) is re-cast as an enumeration called
+	  "action", with values "include" and "exclude".  This is
+	  clearer exposition, and better represents the code.  The
+	  underlying database field is still called "deny" and still
+	  uses the boolean values 0 and 1, so no database changes are
+	  necessary.
+
+1.06  Thu Sep 20 18:50:54 BST 2007
+	- Correct implementation of rules: both at the Service-Type
+	  and Service levels, and both "include" and "exclude" rules.
+	- Default options for the resolver object may now be set from
+	  the environment (though they will be overridden by opt_*
+	  keys in the OpenURL being resolved).  The KR_OPTIONS
+	  environment variable is consulted: it consists of zero or
+	  more assignments, separated by commas, each of the form
+	  <option>=<value>: for example, "loglevel=32,xml=1".  This is
+	  useful when running tests from the command-line.
+
+1.05  Thu Sep 13 11:00:25 BST 2007
+	- Genre class includes backlink field "metadata_formats",
+	  which is included in its full display.
+	- Provides class includes backlink field "services", which is
+	  included in its full display.
+	- Add "browse" links for each object type as well as "search"
+	  in the Admin UI menu-panel.
+	- The example form web/htdocs/mod_perl/form2.html now includes
+	  a link to the Admin UI.
+	- ... and the home page of the Admin UI links to the form.
+
+1.04  Thu Sep 13 00:50:30 BST 2007
+	- Change all occurrences of "media format" into "metadata
+	  format": the gormer was a mistake.
+	- Add links in admin UI to create new records as well as
+	  editing existing ones.
+	- Extend database with rules for selecting service-types and
+	  individual services based on values of fields in the OpenURL
+	  itself -- for example, when rfc.dctype=audiobook, omit
+	  online bookstores.
+	- Add database classes and Web UI for managing both kinds of
+	  rules.
+	- Better data-dictionary support for Domain (add name),
+	  Service (do not display ID field) and User (make
+	  summary-list name a link to full record).
+	- Web UI can now handle editing booleans and links (using
+	  dropdowns, which will not scale well when using large
+	  lists).  This works ONLY FOR -TO-ONE LINKS and not for
+	  -to-many links.
+
+1.03  Thu Jul 12 12:44:30 BST 2007
+	- _makeURI() now understands fallback fieldnames: for example,
+	  the sequence %{jtitle/btitle/title} will use jtitle if that
+	  is defined, otherwise %btitle if that is defined, otherwise
+	  plain title.
+	- Added a test-script for _makeURI().
+	- Added a new log-level, WARNING.
+	- Changed OpenURL::warn() to use $this->log(WARNING).
+
+1.02  Tue Jul 10 12:45:06 BST 2007
+	- Admin UI work continues.
+	- Add service for linking into MasterKey.
+	- Add service for linking into Reindex.
+	- Add various hacks in identifier plugins to cope with the
+	  nasty COinS OpenURLs generated by WorldCat.
+
+1.01  Fri May 25 09:35:08 BST 2007
+	- Add configuration-file fragment for Apache 2.0.x.
+	- Changed the format of the XML document generated internally
+	  as part of the resolution process (and available to the user
+	  by providing the opt_xml query argument as part of the
+	  OpenURL).  The new format places the text of each candidate
+	  result as CDATA rather than an attribute value, opening the
+	  way for more complex values.
+	- Updated the XML DTD for the results format to reflect this
+	  format change: etc/constraint/results-1.0.dtd
+	- Updated the various XSLT stylesheets in etc/xslt to work on
+	  the new form of the results XML.
+	- Updated the test regression-test's known-good output to
+	  match the new XML format.
+	- Recipe rendering by Keystone::Resolver::OpenURL::_makeURI()
+	  now accepts additional optional pre-special flag "_" which
+	  results in the interpolated value being stripped of spaces.
+	- Add new command-line utility bin/kr-recipe to test recipe
+	  rendering.
+	- Correct handling of character sets.
+	- Add admin UI: this affects Apache configuration, the core
+	  library, many HTML::Mason components, etc.  Not complete
+	  yet.
+
+1.00  Fri Jan 26 17:18:37 GMT 2007
+	- original version; created by h2xs 1.23 with options
+		-X --name=Keystone::Resolver --compat-version=5.8.0 --omit-constant --skip-exporter --skip-ppport
+	- Actually, the core of the code is much older than this, but
+	  Release 1.0 constitutes a complete repackaging and
+	  reorganisation, based on this h2xs invocation.  This allows
+	  us to take advantage of the Perl packaging conventions to
+	  make the entire distribution, as well as a generally cleaner
+	  project layout.  Prior releases were as a Perl module just
+	  called "Resolver" (which for that reason would not have been
+	  eligible as a CPAN module -- a two-level name is required).
+	  Earlier entries in this file describe that old structure.
+
+Revision history for Perl extension Resolver.
+
+0.03  (NOT RELEASED)
+	- "make test" now works on Red Hat 9, despite that platform's
+	  inability to load DBD::mysql non-lazily, i.e. when
+	  PERL_DL_NONLAZY is set.  This is done by hackery in
+	  Makefile.PL to prevent PERL_DL_NONLAZY from being set, which
+	  is not really a good solution.
+	- Move citation generation, full-text reference generation and
+	  abstract generation from Resolver::OpenURL into their own
+	  plugins.
+	- Refine service plugin interface so that the result can be
+	  success, no-op, error or non-fatal error.
+	- New test-case that checks for unknown journal titles being
+	  properly diagnosed.
+	- Add ability to request a single service rather than the
+	  usual menu using svc_dat=indexdata:<service-type>:<tag>.
+	  Add new test-case "feature-single" that exercises this.
+	- Add ability for an OpenURL object to render itself as a
+	  version 1.0 OpenURL string.  Among other uses, this
+	  functions as a v0.1-to-v1.0 converter.
+	- Add support for generating Endnote-style citations.
+	- Add ability for a ServiceType or individual Service plugin
+	  to specify the MIME-type of its result.
+	- Result sets consisting of a single, explicitly requested,
+	  result are now returned from Resolver::OpenURL::resolve() as
+	  self-contained objects of the specified MIME-type rather
+	  than embedded in a larger XML or HTML document.  This allows
+	  the resolver to generate binary objects such as Endnote
+	  citations for download.
+
+0.02  Fri Jul 30 02:23:34 2004
+	- First nailed-down version.  This is not yet ready for public
+	  release, but it does follow CPAN-like conventions, and
+	  passes its own test-suite using the standard sequence "perl
+	  Makefile.PL && make && make test", so I am treating this as
+	  a baseline from which to describe future changes.
+
+0.01  Wed Jul 28 16:00:52 2004
+	- original version; created by h2xs 1.22 with options
+		-A -X -b 5.6.0 Resolver
+	  In fact, this Perl-module superstructure was retro-fitted to
+	  a project that had already undergone a great deal of
+	  development prior to the h2xs-ization.
+

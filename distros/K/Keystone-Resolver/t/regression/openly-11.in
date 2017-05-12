@@ -1,0 +1,9 @@
+# $Id: openly-11.in,v 1.1 2007-01-26 12:25:45 mike Exp $
+
+# Lifted from Openly Informatics' OpenURL 1.0 test suite
+# The OpenURL Book Metadata Format
+# Implementation guidelines, Example 10.8.7
+# In-Line OpenURL (URL-encoded)
+
+url_ver=Z39.88-2004&url_tim=2003-04-11T10%3A09%3A15TZD&url_ctx_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Actx&ctx_ver=Z39.88-2004&ctx_enc=info%3Aofi%2Fenc%3AUTF-8&ctx_id=10_8&ctx_tim=2003-04-11T10%3A08%3A30TZD&rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Abook&rft.genre=book&rft.aulast=Vergnaud&rft.auinit=J.-R.&rft.btitle=D%C3%A9pendances+et+niveaux+de+repr%C3%A9sentationen+syntaxe&rft.date=1985&rft.pub=Benjamins&rft.place=Amsterdam%2C+Philadelphia&rfe_id=urn%3Aisbn%3A0262531283&rfe_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Abook&rfe.genre=book&rfe.aulast=Chomsky&rfe.init=N&rfe.btitle=The+Minimalist+Program&rfe.isbn=0262531283&rfe.date=1995&rfe.pub=The+MIT+Press&rfe.place=Cambridge%2C+Mass&svc_id=info%3Aofi%2Fsvc%3Asch%3Aabstract&rfr_id=info%3Asid%2Febookco.com%3Abookreader
+

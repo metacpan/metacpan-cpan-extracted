@@ -1,0 +1,120 @@
+
+# Auto-generated file -- DO NOT EDIT!!!!!
+
+=head1 NAME
+
+KinoSearch::Plan::Schema - User-created specification for an inverted index.
+
+=head1 DEPRECATED
+
+The KinoSearch code base has been assimilated by the Apache L<Lucy> project.
+The "KinoSearch" namespace has been deprecated, but development continues
+under our new name at our new home: L<http://lucy.apache.org/>
+
+=head1 SYNOPSIS
+
+    use KinoSearch::Plan::Schema;
+    use KinoSearch::Plan::FullTextType;
+    use KinoSearch::Analysis::PolyAnalyzer;
+    
+    my $schema = KinoSearch::Plan::Schema->new;
+    my $polyanalyzer = KinoSearch::Analysis::PolyAnalyzer->new( 
+        language => 'en',
+    );
+    my $type = KinoSearch::Plan::FullTextType->new(
+        analyzer => $polyanalyzer,
+    );
+    $schema->spec_field( name => 'title',   type => $type );
+    $schema->spec_field( name => 'content', type => $type );
+
+
+
+=head1 DESCRIPTION
+
+A Schema is a specification which indicates how other entities should
+interpret the raw data in an inverted index and interact with it.
+
+Once an actual index has been created using a particular Schema, existing
+field definitions may not be changed.  However, it is possible to add new
+fields during subsequent indexing sessions.
+
+=head1 CONSTRUCTORS
+
+=head2 new()
+
+    my $schema = KinoSearch::Plan::Schema->new;
+
+Constructor.  Takes no arguments.
+
+
+
+
+
+=head1 METHODS
+
+=head2 spec_field( I<[labeled params]> )
+
+Define the behavior of a field by associating it with a FieldType.
+
+If this method has already been called for the supplied
+C<< field >>, it will merely test to verify that the supplied
+FieldType equals() the existing one.
+
+=over
+
+=item *
+
+B<name> - The name of the field.
+
+=item *
+
+B<type> - A FieldType.
+
+=back
+
+=head2 num_fields()
+
+Return the number of fields currently defined.
+
+=head2 all_fields()
+
+Return all the Schema's field names as an array.
+
+=head2 fetch_type(field)
+
+Return the FieldType for the specified field.  If the field can't be
+found, return undef.
+
+=head2 fetch_sim(field)
+
+Return the Similarity for the specified field, or undef if either the
+field can't be found or it isn't associated with a Similarity.
+
+=head2 architecture()
+
+Factory method which creates an Architecture object for this index.
+
+=head2 get_architecture()
+
+Return the Schema instance's internal Architecture object.
+
+=head2 get_similarity()
+
+Return the Schema instance's internal Similarity object.
+
+
+
+=head1 INHERITANCE
+
+KinoSearch::Plan::Schema isa L<KinoSearch::Object::Obj>.
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005-2011 Marvin Humphrey
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
+

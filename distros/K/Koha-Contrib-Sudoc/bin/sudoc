@@ -1,0 +1,95 @@
+#!/usr/bin/perl 
+
+# PODNAME: sudoc
+# ABSTRACT: Commande de chargement des notices SUDOC
+
+use Modern::Perl;
+use utf8;
+use Getopt::Long;
+use Koha::Contrib::Sudoc;
+use Koha::Contrib::Sudoc::TransferDaemon;
+use Koha::Contrib::Sudoc::Loader::Biblios;
+use Koha::Contrib::Sudoc::Loader::Authorities;
+
+
+
+my ($doit);
+GetOptions(
+    'doit'     => \$doit,
+);
+
+unless (@ARGV) {
+    say "Usage : sudoc init|gtd|trans|chargeauto|spool|biblio|autorité";
+    exit;
+}
+
+my $sudoc  = Koha::Contrib::Sudoc->new;
+my $cmd = shift @ARGV;
+
+if ( $cmd =~ /init/i ) {
+    $sudoc->init();
+}
+elsif ( $cmd =~ /gtd/i ) {
+    $sudoc->send_gtd_email($sudoc->c->{loading}->{jobid}, 'waiting');
+}
+elsif ( $cmd =~ /trans/i ) {
+    my $daemon = Koha::Contrib::Sudoc::TransferDaemon->new();
+    $daemon->start;
+}
+elsif ( $cmd =~ /chargeauto/i ) {
+    my $loading = $sudoc->c->{loading};
+    $sudoc->send_gtd_email($loading->{jobid});
+    # Attente raisonnable que l'ABES envoie les fichiers
+    sleep($loading->{timeout}->{transfer} * 60);
+    $sudoc->spool->staged_to_waiting();
+    $sudoc->load_waiting();
+}
+elsif ( $cmd =~ /spool/i ) {
+    $sudoc->spool->command(@ARGV);
+}
+
+elsif ( $cmd =~ /biblio|autori/i ) {
+    my $files = $sudoc->spool->first_batch_files(
+        'waiting',
+        $cmd =~ /biblio/ ? '[a|b]' : 'c'
+    );
+    unless ($files) {
+        say "Pas de fichier à charger";
+        exit;
+    }
+    for my $file (@$files) {
+        my $loader = $cmd =~ /biblio/
+            ? Koha::Contrib::Sudoc::Loader::Biblios->new( sudoc => $sudoc, file => $file )
+            : Koha::Contrib::Sudoc::Loader::Authorities->new( sudoc => $sudoc, file => $file );
+        $loader->doit($doit);
+        $loader->run();
+    }
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+sudoc - Commande de chargement des notices SUDOC
+
+=head1 VERSION
+
+version 2.23
+
+=head1 AUTHOR
+
+Frédéric Demians <f.demians@tamil.fr>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2016 by Fréderic Demians.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

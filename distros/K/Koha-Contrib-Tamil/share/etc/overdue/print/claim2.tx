@@ -1,0 +1,14 @@
+: include print::header
+
+<p>Ne tenez pas compte de cet avis si vous avez rendu vos prêts. Malgré un
+premier rappel, les exemplaires ci-dessous sont toujours en votre
+possession. Merci de les rapporter rapidement pour les remettre à la
+disposition de tous.
+
+<p>Si vous possédez un identifiant et un mot de passe pour vous connecter à
+notre catalogue en ligne (http://biblio.sevran.fr), vous pouvez depuis
+celui-ci prolonger la durée de prêt des documents.</p>
+
+: include print::items
+
+: include print::footer

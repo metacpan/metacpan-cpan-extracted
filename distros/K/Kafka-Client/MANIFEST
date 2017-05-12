@@ -1,0 +1,10 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+README.mkdn
+lib/Kafka/Client.pm
+t/release-pod-syntax.t

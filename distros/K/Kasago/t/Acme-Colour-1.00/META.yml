@@ -1,0 +1,19 @@
+--- #YAML:1.0
+name: Acme-Colour
+version: 1.00
+license: perl
+distribution_type: module
+requires:
+  Error: 0.15
+  Graphics::ColorNames: 0
+  List::Util: 0
+  Module::Build: 0.20
+  Test::More: 0.01
+recommends: {}
+build_requires: {}
+conflicts: {}
+provides:
+  Acme::Colour:
+    file: lib/Acme/Colour.pm
+    version: 1.00
+generated_by: Module::Build version 0.20

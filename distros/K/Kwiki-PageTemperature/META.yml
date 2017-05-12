@@ -1,0 +1,12 @@
+name: Kwiki-PageTemperature
+version: 0.01
+abstract: Provide a visual cue indicating the age of a page
+author: Chris Dent <cdent@burningchrome.com>
+license: perl
+distribution_type: module
+requires:
+  Kwiki: 0.37
+no_index:
+  directory:
+    - inc
+generated_by: Module::Install version 0.36

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<results>
+  <data entity="rft">
+    <metadata key="aufirst">David</metadata>
+    <metadata key="aulast">Dodds</metadata>
+    <metadata key="btitle">Professional+XML+meta+Data</metadata>
+    <metadata key="date">2001</metadata>
+    <metadata key="genre">book</metadata>
+    <metadata key="isbn">1861004516</metadata>
+  </data>
+  <result type="citeref" priority="15" tag=""
+	service="Endnote citation"
+	>http://example.com/resolve?svc_id=xri%3AaddToCart&amp;req_id=xri%3A104-011434-4639158&amp;rft_id=urn%3Aisbn%3A1861004516&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Abook&amp;rft.aufirst=David&amp;rft.aulast=Dodds&amp;rft.btitle=Professional%2BXML%2Bmeta%2BData&amp;rft.date=2001&amp;rft.genre=book&amp;rft.isbn=1861004516&amp;rfr_id=info%3Asid%2Famazon.com&amp;rfe_id=http%3A%2F%2Fwww.amazon.com%2Fexec%2Fobidos%2FASIN%2F1861004516&amp;svc_dat=indexdata:citation:Endnote</result>
+  <result type="bookstore" priority="10" tag=""
+	service="Amazon.com"
+	>http://www.amazon.com/exec/obidos/ASIN/1861004516/thedinosaurrea0a</result>
+  <result type="bookstore" priority="10" tag="amazon-de"
+	service="Amazon.de"
+	>http://www.amazon.de/exec/obidos/ASIN/1861004516</result>
+  <result type="citation" priority="20" tag="APP"
+	service="APP-style citation" mimetype="text/html"
+	>Dodds, David.  2001.  Professional+XML+meta+Data.</result>
+  <result type="citation" priority="20" tag="author"
+	service="Author and year" mimetype="text/html"
+	>Dodds, David.  2001.</result>
+</results>

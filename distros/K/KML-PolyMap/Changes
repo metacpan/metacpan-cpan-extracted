@@ -1,0 +1,12 @@
+v1.0	ihaque	5/30/06	initial version
+v1.1	ihaque	5/31/06	added equipartition binning
+v1.2	ihaque	???	added k-means binning
+v1.3	ihaque	???	added rendering to disk
+v 1.31	ihaque	3/1/07	moved functions from EXPORT to EXPORT_OK
+			added named-argument wrappers to generate_kml_file and generate_kmz_file
+			added perldoc
+v 1.32	ihaque	3/2/07	fixed documentation bug with SYNOPSIS
+			changed default font path to that for FreeSans
+v 1.33	ihaque	6/22/07	added rudimentary support for altitude-mapping data
+			changed default font path to that for FreeSans
+v 1.34	ihaque	9/19/07	fixed bug relating to spaces in the polygon string passed to kml_polygon

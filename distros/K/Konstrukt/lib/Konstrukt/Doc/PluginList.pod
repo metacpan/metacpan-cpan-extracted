@@ -1,0 +1,775 @@
+=head1 NAME
+
+Konstrukt::Doc::PluginList - Complete list of the plugins that are shipped with this package.
+
+=head1 PLUGINS
+
+
+=head2 blog
+
+
+
+Konstrukt blogging engine
+
+
+	
+	<& blog / &>
+	
+Complete documentation: L<Konstrukt::Plugin::blog>.
+=head2 bookmarks
+
+
+
+Bookmark management for registered users
+
+
+	
+You may simply integrate it by putting
+		
+		<& bookmarks / &>
+		
+somewhere in your website.
+	
+Complete documentation: L<Konstrukt::Plugin::bookmarks>.
+=head2 browserstats
+
+
+
+Browser statistics plugin
+
+
+	
+B<Usage:>
+
+	<!-- add browser request to the db -->
+	<& browserstats / &>
+
+or
+
+	<!-- display the overall top browsers -->
+	<& browserstats show="all" / &>
+
+or
+
+	<!-- display the top browsers grouped by year -->
+	<!-- month and day will also work, if the data is stored in such a fine granularity -->
+	<!-- the display aggregation should not be finer than the setting browserstats/aggregate -->
+	<& browserstats show="year" / &>
+	
+B<Result:>
+
+A table displaying the statistics, if the attribute C<show> is set. Nothing otherwise.
+	
+Complete documentation: L<Konstrukt::Plugin::browserstats>.
+=head2 calendar
+
+
+
+Management of private and public calendar items
+
+
+	
+	You may simply integrate it by putting
+		
+		<& calendar / &>
+		
+	somewhere in your website.
+	
+Complete documentation: L<Konstrukt::Plugin::calendar>.
+=head2 captcha
+
+
+
+Put captchas in your forms easily.
+
+
+
+=head3 Tag interface
+
+B<Usage:>
+
+	<!-- the easy way -->
+	<& captcha / &>
+
+or
+
+	<!-- defining your own settings that may differ from the defaults -->
+	<& captcha type="text" template="/templates/captcha/text.template" / &>
+
+B<Result:> (Something like this)
+
+	<script type="text/javascript">
+		var enctext = "%50%0A%3A%21%44%38%4C%0C%0D%0E%31%6C%13%2F%0D%12%18%00%3C%30%6E%2D%02%11%1B%06%26%73%11%38%15%12%09%5E%76%39%58%28%08%07%02%41%74%32%5D%2D%1F%11%51%41%2C%29%5D%6E%4C%14%0D%0F%21%34%0C%6E%5D%16%06%01%23%73%11%63%52%68";
+		var key = "lcTQ1Llb";
+		function xor_enc(text, key) {
+			var result = '';
+			for(i = 0; i < text.length; i++)
+				result += String.fromCharCode(key.charCodeAt(i % key.length) ^ text.charCodeAt(i));
+			return result;
+		}
+		document.write(xor_enc(unescape(enctext), key));
+	</script>
+	
+	<noscript>
+		<label>Antispam:</label>
+		<div>
+		<p>Please type the text '1tjbw' into this field:</p>
+		<input name="captcha_answer" />
+		</div>
+	</noscript>
+	
+	<input name="captcha_hash" type="hidden" value="3452c4fb13505c5ffa256f2352851ed2b9286af70c3f9ed65e3e888690e1ee69" />
+
+The captcha tag will usually be embedded in an existing C<<form>>. It will
+only generate the question (using a template) and two C<<input>> HTML-tags that
+will accept the answer and pass a hash of the correct answer to the server.
+
+=head3 Perl interface
+
+It's very easy to add a captcha-check to your plugins:
+
+	my $template = use_plugin 'template';
+	
+	if ((use_plugin 'captcha')->check()) {
+		#captcha solved!
+		#your code...
+	} else {
+		#captcha not solved!
+		#e.g. put error message and ask again:
+		$self->add_node($template->node('error_message.template'));
+		$self->add_node($template->node('template_with_input_form_and_captcha_tag.template'));
+	}
+
+Complete documentation: L<Konstrukt::Plugin::captcha>.
+=head2 date
+
+
+
+Displays the current date
+
+
+	
+B<Usage:>
+
+	<& date / &>
+
+B<Result:>
+
+	April 23, 2006 - 10:45:16
+
+Complete documentation: L<Konstrukt::Plugin::date>.
+=head2 diff
+
+
+
+Print out an XHTML table with the difference between two texts
+
+
+
+B<Usage:>
+
+ 	<& diff &>
+		<$ left $>
+		1
+		2
+		3
+		<$ / $>
+		<$ right $>
+		1
+		3
+		<$ / $>
+	<& / &>
+
+or
+
+	<!-- set another amount of "context" lines -->
+	<& diff context="2" &>
+		...
+	<& / &>
+
+or
+
+	<!-- define a header for the columns -->
+	<& diff left_header="text a" right_header="text b" &>
+		...
+	<& / &>
+	
+B<Result:>
+
+A table showing the difference between the two texts.
+
+Complete documentation: L<Konstrukt::Plugin::diff>.
+=head2 env
+
+
+
+Access to the environment variables
+
+
+
+B<Usage:>
+	
+	<!-- set value -->
+	<& env var="var_name" set="value" / &>
+
+	<!-- print out value -->
+	<& env var="var_name" / &>
+
+B<Result:>
+
+	<!-- set value -->
+
+	<!-- print out value -->
+	value
+
+Complete documentation: L<Konstrukt::Plugin::env>.
+=head2 errors
+
+
+
+Display the error messages that occured during the page processing
+
+
+
+B<Usage:>
+
+	<& errors / &>
+
+B<Result:>
+
+A list of the errors, that occurred during the processing of the file, if any.
+
+Complete documentation: L<Konstrukt::Plugin::errors>.
+=head2 formvalidator
+
+
+
+HTML form validator
+
+
+	
+B<Usage:>
+
+	<!-- add form validation code to your page -->
+	<& formvalidator form="some_dialogue.form" / &>
+
+or
+
+	<!-- the same but explicitly define the JS files -->
+	<& formvalidator
+		form="/some/dialogue.form"
+	   script="/formvalidator/formvalidator.js"
+	   strings="/formvalidator/formvalidator_strings.js"
+	/ &>
+
+B<Result:>
+
+	<!-- add form validation code to your page -->
+	<script type="text/javascript" src="/formvalidator/formvalidator.js"></script>
+	<script type="text/javascript" src="/formvalidator/formvalidator_strings.js"></script>
+	<script type="text/javascript">
+		<!-- JS definitions of your form ... -->
+	</script>
+
+Complete documentation: L<Konstrukt::Plugin::formvalidator>.
+=head2 guestbook
+
+
+
+Konstrukt guestbook
+
+
+	
+	<& guestbook / &>
+	
+Complete documentation: L<Konstrukt::Plugin::guestbook>.
+=head2 hitstats
+
+
+
+Hit statistics plugin
+
+
+
+	<!-- count hit. use the specified title -->
+	<& hitstats title="some page" / &>
+	
+	<!-- count hit. use the current filename as title -->
+	<& hitstats / &>
+	
+	<!-- display the overall top sites -->
+	<& hitstats show="all" / &>
+	
+	<!-- display the top sites grouped by year -->
+	<!-- month and day will also work, if the data is stored in such a fine granularity -->
+	<!-- the display aggregation should not be finer than the setting hitstats/aggregate -->
+	<& hitstats show="year" / &>
+	
+	<!-- only display the top 20 sites -->
+	<& hitstats show="all" limit="20" / &>
+	
+	<!-- with optional title attribute  -->
+	<& hitstats show="counter" title="some page" / &>
+	<!-- display a counter and use the filename of the current page as the title -->
+	<& hitstats show="counter" / &>
+
+Complete documentation: L<Konstrukt::Plugin::hitstats>.
+=head2 if
+
+
+
+Conditional blocks
+
+
+	
+B<Usage:>
+
+	<!-- will put out "elsif1" -->
+	<& if condition="0" &>
+		<$ then $>then<$ / $>
+		<$ elsif condition="1" $>elsif1<$ / $>
+		<$ elsif condition="1" $>elsif2<$ / $>
+		<$ else $>else<$ / $>
+	<& / &>
+
+	<!-- shortcut, when only using "then" and no elsif or else -->
+	<!-- will put out "The condition is true!" -->
+	<& if condition="2 > 1" &>
+		The condition is true!
+	<& / &>
+	
+	<!-- dynamic conditions -->
+	<!-- non-dynamic conditions will only be checked once and then get cached -->
+	<& if condition="int rand 2" dynamic="1" &>
+		The condition is true with a chance of 50%!
+	<& / &>
+
+B<Result:>
+
+	<!-- will put out "elsif1" -->
+	elsif1
+	
+	<!-- shortcut, when only using "then" and no elsif or else -->
+	<!-- will put out "The condition is true!" -->
+		The condition is true!
+
+	<!-- dynamic conditions -->
+	<!-- non-dynamic conditions will only be checked once and then get cached -->
+		The condition is true with a chance of 50%!
+
+Complete documentation: L<Konstrukt::Plugin::if>.
+=head2 kill
+
+
+
+Remove content from a website
+
+
+	
+B<Usage:>
+
+	We will never <& kill &>agree that we always <& / &>do censoring!
+
+B<Result:>
+
+	We will never do censoring!
+
+Complete documentation: L<Konstrukt::Plugin::kill>.
+=head2 log
+
+
+
+Konstrukt logging facilities.
+
+
+	
+	<!-- add a log entry.
+	     key1-5 are optional. -->
+	<& log
+		action="put" 
+	   type="login"
+	   description="user 'foo' logged in"
+	   key1="some additional info"
+	   key2="some additional info"
+	   key3="some additional info"
+	   key4="some additional info"
+	   key5="some additional info"
+	/ &>
+	
+	<!-- display log entries -->
+	<& log
+	   type="log type"
+	   keycount="number of additional keys to display"
+	   orderby="column"
+	   limit="42"
+	/ &>
+
+Complete documentation: L<Konstrukt::Plugin::log>.
+=head2 param
+
+
+
+Displays the value of a specified HTTP parameter
+
+
+	
+B<Usage:>
+
+	<& param key="param_name" &>default value if not defined<& / &>
+
+B<Result:> (when invoked like: /page.html?param_name=foo)
+
+	foo
+
+Complete documentation: L<Konstrukt::Plugin::param>.
+=head2 perl
+
+
+
+Embedding perl code in your pages/templates
+
+
+	
+B<Usage:>
+
+	<& perl &>print "foo"<& / &>
+
+B<Result:>
+
+	foo
+	
+Complete documentation: L<Konstrukt::Plugin::perl>.
+=head2 perlvar
+
+
+
+Access to Perl variables
+
+
+	
+B<Usage:>
+
+	<!-- set value -->
+	<& perlvar var="$Foo::Bar" set="baz" / &>
+	
+	<!-- print out value -->
+	<& perlvar var="$Foo::Bar" / &>
+	<& perlvar var="undef" &>this default will be used<& / &>
+
+	<!-- unset value -->
+	<& perlvar var="$Foo::Bar" unset="1" / &>
+	
+B<Result:>
+
+	<!-- set value -->
+	
+	<!-- print out value -->
+	baz
+	this default will be used
+	
+	<!-- unset value -->
+	
+Complete documentation: L<Konstrukt::Plugin::perlvar>.
+=head2 sortlines
+
+
+
+Sort all lines of plaintext nodes
+
+
+	
+B<Usage:>
+
+	<& sortlines &>
+		some
+		<!-- comments -->
+		unsorted
+		lines
+		<!-- will be put -->
+		here
+		<!-- on top of the list -->
+	<& / &>
+
+B<Result:>
+
+	<!-- comments -->
+	<!-- will be put -->
+	<!-- on top of the list -->
+	here
+	lines
+	some
+	unsorted
+
+Complete documentation: L<Konstrukt::Plugin::sortlines>.
+=head2 sql
+
+
+
+Perform SQL queries. Usually combined with
+templates to display the results.
+
+
+	
+=head3 SELECT queries
+
+B<Usage:>
+
+	<!-- put query results into a template using the dbi default settings defined in your konstrukt.settings
+	     see the Konstrukt::DBI documentation for the configuration of the default settings -->
+	<& sql template="list_layout.template" &>
+		SELECT * FROM some_table
+	<& / &>
+	<!-- you must have a list <+@ sql @+> in your template file to which the results are passed.
+	     the fields inside the list should be named like the columns in your query. -->
+
+or
+
+	<!-- but you may also define the listname yourself -->
+	<& sql template="list_layout.template" list="some_list_name" &>
+		SELECT * FROM some_table
+	<& / &>
+	<!-- then you should have a list <+@ some_list_name @+> in your template file. -->
+
+or
+
+	<!-- using custom connection settings -->
+	<& sql template="..." source="dbi_dsn" user="username" pass="password" &>
+		...
+	<& / &>
+
+=begin doesntwork
+
+	<!-- manually define the template.
+	     more flexible, but a bit slower.
+	     #TODO: actually this one doesn't work correctly at the moment due to a bug in the template plugin -->
+	<& template src="some.template" &>
+		<& sql list="query_results" &>SELECT some, columns FROM some_table<& / &>
+		<& sql list="other_query_results" &>SELECT some, columns FROM some_other_table<& / &>
+		<$ some $>other<$ / $>
+		<$ fields $>here<$ / $>
+	<& / &>
+	<!-- in this mode, the plugin will return the result as a field list, which may
+	     be used in template. the returned result will look like this: -->
+	<@ list_name @>
+		<$ field1 $>value1a<$ / $><$ field2 $>value2a<$ / $>
+		<$ field1 $>value1b<$ / $><$ field2 $>value2b<$ / $>
+		...
+	<@ / @>
+	<!-- so you can put this data into a template as done in the example above. -->
+
+=end doesntwork
+
+=head3 Other queries
+
+	<!-- some query that won't return result data -->
+	<& sql &>DELETE FROM some_table WHERE id=23<& / &>
+
+Complete documentation: L<Konstrukt::Plugin::sql>.
+=head2 svar
+
+
+
+Access to session values
+
+
+	
+B<Usage:>
+
+	<!-- set value -->
+	<& svar var="var_name" set="value "/ &>
+	
+	<!-- print out value -->
+	<& svar var="var_name" / &>
+
+B<Result:>
+
+	<!-- set value -->
+	
+	<!-- print out value -->
+	value
+
+Complete documentation: L<Konstrukt::Plugin::svar>.
+=head2 tags
+
+
+
+Tagging plugin
+
+
+	
+=head3 Tag interface
+
+B<Usage:>
+
+	<!-- display all tags as a cloud -->
+	<& tags template="/tags/cloud.template" limit="30" order="alpha|count" / &>
+	
+	<!-- display all tags for a specified plugin.
+	     limit, order and template are also applicable here -->
+	<& tags plugin="blog|image|..." / &>
+	
+	<!-- list tags for a specified entry only.
+	     show, limit, order are ignored. the template attribute is applicable -->
+	<& tags plugin="blog" entry="42" / &>
+
+B<Result:>
+
+	Tags: <a href="?action=filter;tags=bar">bar</a>,
+	<a href="?action=filter;tags=foo">foo</a>, ...
+
+=head3 Perl interface
+
+	my $tags = use_plugin 'tags';
+	
+	#get all tags
+	my $all_tags = $tags->get();
+	
+	#get all tags for a specified plugin
+	my $all_blog_tags = $tags->get('blog');
+	
+	#get tags for a specified content entry (blog entry #42)
+	my $all_entry_tags = $tags->get('blog', 42);
+	
+	#get all entries for a specified tag query
+	my $entries = $tags->get_entries('must have all this tags');
+	
+	#get all blog entries matching the query
+	my $entries = $tags->get_entries('must have all this tags', 'blog');
+	
+	#simple OR sets are also possible
+	my $entries = $tags->get_entries('must have all this tags {and one of those}');
+	
+	#set tags
+	$tags->set('blog', 42, 'some tags here');
+	
+	#delete all tags for a specified entry
+	$tags->delete('blog', 42);
+
+Complete documentation: L<Konstrukt::Plugin::tags>.
+=head2 template
+
+
+
+Konstrukt templating engine
+
+
+	
+=head3 Tag interface
+
+	<& template src="some.template" &>
+		<$ field $>will be inserted in the template<$ / $>
+	<& / &>
+
+=head3 Perl interface
+
+	use_plugin 'template';
+	$self->add_node($template->node('path/to/some.template', { 
+		field1 => 'value1',
+		some_list => [
+			{ field1 => 'a', field2 => 'b' },
+			{ field1 => 'c', field2 => 'd' },
+			...
+		]
+	}));
+
+Complete documentation: L<Konstrukt::Plugin::template>.
+=head2 upcase
+
+
+
+Convert all text into upper case
+
+
+	
+B<Usage:>
+
+	<& upcase &>upper case<& / &>
+
+B<Result:>
+
+	UPPER CASE
+
+Complete documentation: L<Konstrukt::Plugin::upcase>.
+=head2 uriencode
+
+
+
+URI-encode the text 
+
+
+	
+B<Usage:>
+
+	<& uriencode &>Some Text<& / &>
+	<& uriencode encode="all" &>Some Text<& / &>
+
+B<Result:>
+
+	Some%20Text
+	%53%6F%6D%65%20%54%65%78%74
+
+Complete documentation: L<Konstrukt::Plugin::uriencode>.
+=head2 usermanagement
+
+
+
+User management. Extensible with plugins.
+
+
+	
+=head3 Tag interface
+
+	<!-- show basic user management -->
+	<& usermanagement::basic / &>
+	
+	<!-- show personal data -->
+	<& usermanagement::personal / &>
+	
+	<!-- show user levels -->
+	<& usermanagement::personal / &>
+	
+	<!-- ... see the docs of each usermanagement plugin -->
+
+=head3 Perl interface
+
+	#within your plugin's init sub you should use the wanted modules
+	use Konstrukt::Plugin;
+	sub init {
+		#...
+		#example for the basic plugin. the usage of the others is similar.
+		$self->{user_basic} = use_plugin 'usermanagement::basic' or return undef;
+	}
+	#then you may use the plugin
+	sub my_method {
+		my $uid = $self->{user_basic}->id();
+	}
+
+Complete documentation: L<Konstrukt::Plugin::usermanagement>.
+=head2 wiki
+
+
+
+Plugin to convert wiki markup and manage wiki content
+
+
+	
+	<& wiki &>
+	= Headline
+	
+	some text
+	<& / &>
+	
+	<& wiki page="FooBar" / &>
+
+Complete documentation: L<Konstrukt::Plugin::wiki>.=head1 AUTHOR
+
+Copyright 2006 Thomas Wittek (mail at gedankenkonstrukt dot de). All rights reserved.
+
+This document is free software.
+It is distributed under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<Konstrukt::Doc>
+
+=cut

@@ -1,0 +1,29 @@
+[Changes for 0.12 - 2006-10-09]
+
+* Mark Glines here - Audreyt made me a comaintainer.
+* Fix for a crash when using Data::Hierarchy v0.30 or above.
+
+[Changes for 0.11 - 2005-01-13]
+
+Patch from Chia-Liang Kao to make it Really Work (tm).
+
+[Changes for 0.10 - 2005-01-09]
+
+* Adjust for Kwiki 0.36 and SVK 0.23 API.
+
+[Changes for 0.06 - 2004-09-20]
+
+* Make "kwiki -update" work with Subversion 1.0.x.
+* When importing from RCS, rename instead of deleting old RCS files.
+  (Both reported by Marcus Ramberg)
+
+[Changes for 0.05 - 2004-09-07]
+
+* Fixed RCS import glitch; reported by Marcus Ramberg.
+* Try to avoid edit contention by affecting utime; reported by Chia-Liang Kao.
+
+[Changes for 0.04 - 2004-09-04]
+
+* Fixed initialization of repository.
+* Fixed off-by-one error as passed to Time::Local.
+  (Both reported by Greg Matheson)

@@ -1,0 +1,6 @@
+# $Id: feature-charset.in,v 1.1 2007-06-20 13:46:00 mike Exp $
+
+# This tests the ability of the resolver to understand incoming UTF-8
+# sequences.
+
+url_tim=2007-06-20T14%3A11%3A42Z&url_ctx_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Actx&rft_id=&rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Abook&rft.title=R%C3%A5stoffer&rft.atitle=&rft.aulast=S%C3%B8rensen&rft.auinit=H&rft.date=1989&rft.volume=&rft.spage=&rft.epage=&rfe_id=&rfr_id=&req_id=mailto%3Amike%40indexdata.com&ctx_tim=2007-06-20T14%3A16%3A03Z&ctx_enc=info%3Aofi%2Fenc%3AUTF-8&opt_loglevel=0&opt_xml=1&svc_dat=&url_ver=Z39.88-2004

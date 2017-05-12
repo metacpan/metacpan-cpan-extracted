@@ -1,0 +1,65 @@
+
+# Auto-generated file -- DO NOT EDIT!!!!!
+
+=head1 NAME
+
+KinoSearch::Store::RAMFolder - In-memory Folder implementation.
+
+=head1 DEPRECATED
+
+The KinoSearch code base has been assimilated by the Apache L<Lucy> project.
+The "KinoSearch" namespace has been deprecated, but development continues
+under our new name at our new home: L<http://lucy.apache.org/>
+
+=head1 SYNOPSIS
+
+    my $folder = KinoSearch::Store::RAMFolder->new;
+    
+    # or sometimes...
+    my $folder = KinoSearch::Store::RAMFolder->new(
+        path => $relative_path,
+    );
+
+
+
+=head1 DESCRIPTION
+
+RAMFolder is an entirely in-memory implementation of
+L<KinoSearch::Store::Folder>, primarily used for testing and development.
+
+=head1 CONSTRUCTORS
+
+=head2 new( I<[labeled params]> )
+
+    my $folder = KinoSearch::Store::RAMFolder->new(
+        path => $relative_path,   # default: empty string
+    );
+
+=over
+
+=item *
+
+B<path> - Relative path, used for subfolders.
+
+=back
+
+
+
+
+
+
+
+=head1 INHERITANCE
+
+KinoSearch::Store::RAMFolder isa L<KinoSearch::Store::Folder> isa L<KinoSearch::Object::Obj>.
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005-2011 Marvin Humphrey
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
+

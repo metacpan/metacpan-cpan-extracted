@@ -1,0 +1,12 @@
+name: Kwiki-HomePagePreference
+version: 0.10
+abstract: User Selectable HomePage
+author: Brian Ingerson <ingy@cpan.org>
+license: perl
+distribution_type: module
+requires:
+  perl: 5.6.1
+no_index:
+  directory:
+    - inc
+generated_by: Module::Install version 0.36

@@ -1,0 +1,44 @@
+#!/usr/bin/perl -w
+
+# $Id: kr-test,v 1.2 2008-04-01 13:09:40 mike Exp $
+#
+# See ../t/regression/README for a description.
+# Example command-line:
+#	perl -I ../lib kr-test ../t/regression/zetoc-sauroposeidon1
+
+use strict;
+use warnings;
+use Getopt::Std;
+use Keystone::Resolver::Test;
+
+my %opts;
+if (!getopts('vw', \%opts)) {
+  USAGE:
+    print STDERR "Usage: $0 [options] [<name>=<value>] <test-case1> [...]
+	-v	Verbose mode: print status returned from test
+	-w	Write the regression data rather than testing -- BE CAREFUL!
+	<name>=<value> pairs are passed into the resolver.
+";
+    exit 1;
+}
+
+my %kroptions = (xml => 1);
+while (@ARGV != 0 && $ARGV[0] =~ /(.*?)=(.*)/) {
+    my($key, $val) = ($1, $2);
+    $kroptions{$key} = $val;
+    shift @ARGV;
+}
+
+goto USAGE if @ARGV == 0;
+
+$|=1;
+foreach my $filename (@ARGV) {
+    my $status;
+    print "$filename ..." if $opts{v};
+    if ($opts{w}) {
+	$status = Keystone::Resolver::Test::write_test(\%kroptions, $filename);
+    } else {
+	$status = Keystone::Resolver::Test::run_test(\%kroptions, $filename);
+    }
+    print "[status=$status]\n" if $opts{v};
+}

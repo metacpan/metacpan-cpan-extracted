@@ -1,0 +1,2 @@
+~$     # ignore emacs and vim backup files
+compile.sh

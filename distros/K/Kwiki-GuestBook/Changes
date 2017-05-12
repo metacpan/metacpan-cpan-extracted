@@ -1,0 +1,17 @@
+---
+version: 0.13
+date:    Tue Jan 11 08:05:47 PST 2005
+changes:
+- Remove load_class calls per Spoon-0.21
+- Call dbm flags later
+---
+version: 0.12
+date:    Wed Dec 15 15:02:52 PST 2004
+changes:
+- Make compatible with Kwiki-0.34
+- Work with Spoon::Hook
+---
+version: 0.10
+date:    Wed Jun 23 01:45:45 PDT 2004
+changes:
+- Initial release

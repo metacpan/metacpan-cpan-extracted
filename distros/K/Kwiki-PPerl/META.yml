@@ -1,0 +1,15 @@
+---
+name: Kwiki-PPerl
+version: 0.01
+author:
+  - Chris Dent <cdent@burningchrome.com>
+abstract: Run Kwiki under PPerl
+license: perl
+requires:
+  PPerl: 0
+  Test::More: 0
+provides:
+  Kwiki::PPerl:
+    file: lib/Kwiki/PPerl.pm
+    version: 0.01
+generated_by: Module::Build version 0.261

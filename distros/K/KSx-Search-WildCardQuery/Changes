@@ -1,0 +1,22 @@
+Revision history for KSx::Search::WildCardQuery and ::RegexpTermQuery
+
+0.05    17 June, 2009
+        Updated to comply with changes that will be made  shortly  in
+        KinoSearch svn trunk (now requires 4810). Thanks once more to
+        Marvin Humphrey for providing a patch.
+
+0.04    14 June, 2009
+        Updated once more to comply with  recent  KinoSearch  changes
+        (4798), including a speed optimisation.  Thanks to Marvin Hum-
+        phrey for supplying the patch.
+
+0.03    30 May, 2009
+        Fixed  highlight_spans  to conform to  KinoSearch’s new inter-
+        face (returns an array ref instead of list)
+
+0.02    10 May, 2009
+        Updated to work with the latest KinoSearch working copy  (now
+        requires 4596)
+
+0.01    1 March, 2008
+        First release

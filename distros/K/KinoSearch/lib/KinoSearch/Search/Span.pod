@@ -1,0 +1,107 @@
+
+# Auto-generated file -- DO NOT EDIT!!!!!
+
+=head1 NAME
+
+KinoSearch::Search::Span - An offset, a length, and a weight.
+
+=head1 DEPRECATED
+
+The KinoSearch code base has been assimilated by the Apache L<Lucy> project.
+The "KinoSearch" namespace has been deprecated, but development continues
+under our new name at our new home: L<http://lucy.apache.org/>
+
+=head1 SYNOPSIS
+
+    my $combined_length = $upper_span->get_length
+        + ( $upper_span->get_offset - $lower_span->get_offset );
+    my $combined_span = KinoSearch::Search::Span->new(
+        offset => $lower_span->get_offset,
+        length => $combined_length,
+    );
+    ...
+
+
+
+=head1 DESCRIPTION
+
+Span objects store information about a span across an array of...
+something. The unit is context-dependent.
+
+Text is one possibility, in which case offset and length might be measured
+in Unicode code points.  However, the Span could also refer to a span
+within an array of tokens, for example -- in which case the start and
+offset might be measured in token positions.
+
+=head1 CONSTRUCTORS
+
+=head2 new( I<[labeled params]> )
+
+    my $span = KinoSearch::Search::Span->new(
+        offset => 75,     # required
+        length => 7,      # required
+        weight => 1.0,    # default 0.0
+    );
+
+=over
+
+=item *
+
+B<offset> - Integer offset, unit is context-dependent.
+
+=item *
+
+B<length> - Integer length, unit is context-dependent.
+
+=item *
+
+B<weight> - A floating point weight.
+
+=back
+
+
+
+
+
+=head1 METHODS
+
+=head2 set_offset(offset)
+
+Setter for C<< offset >> attribute.
+
+=head2 get_offset()
+
+Accessor for C<< offset >> attribute.
+
+=head2 set_length(length)
+
+Setter for C<< length >> attribute.
+
+=head2 get_length()
+
+Accessor for C<< length >> attribute.
+
+=head2 set_weight(weight)
+
+Setter for C<< weight >> attribute.
+
+=head2 get_weight()
+
+Accessor for C<< weight >> attribute.
+
+
+
+=head1 INHERITANCE
+
+KinoSearch::Search::Span isa L<KinoSearch::Object::Obj>.
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005-2011 Marvin Humphrey
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
+

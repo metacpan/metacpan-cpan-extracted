@@ -1,0 +1,8 @@
+^Konfidi-Client-
+^_build
+^Build$
+^blib
+~$
+\.bak$
+CVS
+\.svn

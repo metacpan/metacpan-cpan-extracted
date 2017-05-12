@@ -1,0 +1,56 @@
+
+# Auto-generated file -- DO NOT EDIT!!!!!
+
+=head1 NAME
+
+KinoSearch::Index::PolyReader - Multi-segment implementation of IndexReader.
+
+=head1 DEPRECATED
+
+The KinoSearch code base has been assimilated by the Apache L<Lucy> project.
+The "KinoSearch" namespace has been deprecated, but development continues
+under our new name at our new home: L<http://lucy.apache.org/>
+
+=head1 SYNOPSIS
+
+    my $polyreader = KinoSearch::Index::IndexReader->open( 
+        index => '/path/to/index',
+    );
+    my $doc_reader = $polyreader->obtain("KinoSearch::Index::DocReader");
+    for my $doc_id ( 1 .. $polyreader->doc_max ) {
+        my $doc = $doc_reader->fetch_doc($doc_id);
+        print " $doc_id: $doc->{title}\n";
+    }
+
+
+
+=head1 DESCRIPTION
+
+PolyReader conflates index data from multiple segments.  For instance, if
+an index contains three segments with 10 documents each, PolyReader's
+doc_max() method will return 30.
+
+Some of PolyReader's L<DataReader|KinoSearch::Index::DataReader> components
+may be less efficient or complete than the single-segment implementations
+accessed via L<SegReader|KinoSearch::Index::SegReader>.
+
+
+
+
+
+
+
+=head1 INHERITANCE
+
+KinoSearch::Index::PolyReader isa L<KinoSearch::Index::IndexReader> isa L<KinoSearch::Index::DataReader> isa L<KinoSearch::Object::Obj>.
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005-2011 Marvin Humphrey
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
+

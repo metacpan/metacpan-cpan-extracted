@@ -1,0 +1,14 @@
+name: Kwiki
+version: 0.38
+abstract: Kwiki Wiki Framework
+author: Ingy döt Net <ingy@cpan.org>
+license: perl
+distribution_type: module
+requires:
+  perl: 5.6.1
+  Spoon: 0.22
+  Storable: 0
+no_index:
+  directory:
+    - inc
+generated_by: Module::Install version 0.36

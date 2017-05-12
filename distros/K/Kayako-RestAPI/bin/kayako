@@ -1,0 +1,88 @@
+package kayako;
+$kayako::VERSION = '0.01';
+# ABSTRACT: command line utility for working and testing kayako API
+
+
+use strict;
+use warnings;
+use Test::More;
+use Config::JSON;
+use Kayako::RestAPI;
+use Data::Dumper;
+use feature 'say';
+
+# Execute this test only if release
+unless ( $ENV{RELEASE_TESTING} ) {
+    plan( skip_all => "API test is not required for installation" );
+}
+
+my $pathToFile;
+if ($ARGV[0]) {
+  $pathToFile = $ARGV[0];
+} else {
+  $pathToFile = 'kayako.json'; 	# file with Kayako API api_url, api_key, secret_key params
+}
+
+if (-e $pathToFile) {
+  say "File $pathToFile exists";
+  input_if_not_exists(['kayako/api_url', 'kayako/api_key', 'kayako/secret_key']);
+} else {
+  say "JSON file $pathToFile with API tokens not found. Creating new file...";
+  Config::JSON->create($pathToFile);
+  input_if_not_exists(['kayako/api_url', 'kayako/api_key', 'kayako/secret_key']);
+}
+
+sub input_if_not_exists {
+  my $fields = shift;
+  my $config = Config::JSON->new($pathToFile);
+  for my $i (@$fields) {
+    if (!defined $config->get($i) ) {
+      print "$i: ";
+      chomp (my $val = <STDIN>);
+      $config->set($i, $val);
+    }
+  }
+}
+
+my $config = Config::JSON->new($pathToFile) or die "No API config file found";
+my $kayako_cfg = $config->get('kayako');
+my $kayako_api = Kayako::RestAPI->new($kayako_cfg);
+
+# warn Dumper $kayako_api;
+
+warn Dumper $kayako_api->get_departements();
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+kayako - command line utility for working and testing kayako API
+
+=head1 VERSION
+
+version 0.01
+
+=head1 SYNOPSIS
+
+kayako [kayako.json]
+
+By default creates kayako.json file in current directory
+
+v 0.01 - Now it's only test API access via get_departements method
+
+=head1 AUTHOR
+
+Pavel Serikov <pavelsr@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Pavel Serikov.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,25 @@
+Changes
+lib/KiokuDB/Cmd.pm
+lib/KiokuDB/Cmd/Base.pm
+lib/KiokuDB/Cmd/Command/Dump.pm
+lib/KiokuDB/Cmd/Command/Edit.pm
+lib/KiokuDB/Cmd/Command/FSCK.pm
+lib/KiokuDB/Cmd/Command/GC.pm
+lib/KiokuDB/Cmd/Command/Load.pm
+lib/KiokuDB/Cmd/DumpFormatter.pm
+lib/KiokuDB/Cmd/InputHandle.pm
+lib/KiokuDB/Cmd/OutputHandle.pm
+lib/KiokuDB/Cmd/SpecifiedEntries.pm
+lib/KiokuDB/Cmd/TXN.pm
+lib/KiokuDB/Cmd/Verbosity.pm
+lib/KiokuDB/Cmd/WithDSN.pm
+lib/KiokuDB/Cmd/WithDSN/Create.pm
+lib/KiokuDB/Cmd/WithDSN/Read.pm
+lib/KiokuDB/Cmd/WithDSN/Write.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+t/dump.t
+t/load.t
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

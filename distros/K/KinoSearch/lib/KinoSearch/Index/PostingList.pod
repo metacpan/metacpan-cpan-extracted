@@ -1,0 +1,107 @@
+
+# Auto-generated file -- DO NOT EDIT!!!!!
+
+=head1 NAME
+
+KinoSearch::Index::PostingList - Term-Document pairings.
+
+=head1 DEPRECATED
+
+The KinoSearch code base has been assimilated by the Apache L<Lucy> project.
+The "KinoSearch" namespace has been deprecated, but development continues
+under our new name at our new home: L<http://lucy.apache.org/>
+
+=head1 SYNOPSIS
+
+    my $posting_list_reader 
+        = $seg_reader->obtain("KinoSearch::Index::PostingListReader");
+    my $posting_list = $posting_list_reader->posting_list( 
+        field => 'content',
+        term  => 'foo',
+    );
+    while ( my $doc_id = $posting_list->next ) {
+        say "Matching doc id: $doc_id";
+    }
+
+
+
+=head1 DESCRIPTION
+
+PostingList is an iterator which supplies a list of document ids that match
+a given term.  
+
+See L<KinoSearch::Docs::IRTheory> for definitions of "posting" and "posting
+list".
+
+
+
+=head1 ABSTRACT METHODS
+
+=head2 next()
+
+Proceed to the next doc id.
+
+Returns: A positive doc id, or 0 once the iterator is exhausted.
+
+=head2 get_doc_id()
+
+Return the current doc id.  Valid only after a successful call to
+next() or advance() and must not be called otherwise.
+
+=head2 get_doc_freq()
+
+Return the number of documents that the PostingList contains.  (This
+number will include any documents which have been marked as deleted but
+not yet purged.)
+
+=head2 seek(target)
+
+Prepare the PostingList object to iterate over matches for documents
+that match C<< target >>.
+
+=over
+
+=item *
+
+B<target> - The term to match.  If undef, the iterator will be empty.
+
+=back
+
+
+
+=head1 METHODS
+
+=head2 advance(target)
+
+Advance the iterator to the first doc id greater than or equal to
+C<< target >>. The default implementation simply calls next()
+over and over, but subclasses have the option of doing something more
+efficient.
+
+=over
+
+=item *
+
+B<target> - A positive doc id, which must be greater than the current
+doc id once the iterator has been initialized.
+
+=back
+
+Returns: A positive doc id, or 0 once the iterator is exhausted.
+
+
+
+=head1 INHERITANCE
+
+KinoSearch::Index::PostingList isa L<KinoSearch::Search::Matcher> isa L<KinoSearch::Object::Obj>.
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005-2011 Marvin Humphrey
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
+

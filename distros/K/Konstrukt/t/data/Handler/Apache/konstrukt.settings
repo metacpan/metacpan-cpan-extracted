@@ -1,0 +1,3 @@
+debug/short_messages 1
+handler/show_debug_messages 0
+handler/show_error_messages 0

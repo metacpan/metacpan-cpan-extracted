@@ -1,0 +1,165 @@
+=pod
+
+=encoding utf-8
+
+=for stopwords invocant invocants lexicals unintuitive yada globals
+
+=head1 NAME
+
+Kavorka::Manual::Functions - fun keyword
+
+=head1 DESCRIPTION
+
+Kavorka provides the C<fun> keyword for the purpose of defining
+functions (as against methods, etc).
+
+The anatomy of a function:
+
+=over
+
+=item 1.
+
+The keyword introducing the function.
+
+=item 2.
+
+The function name (optional).
+
+=item 3.
+
+The signature (optional).
+
+=item 4.
+
+Traits (optional).
+
+=item 5.
+
+The prototype (optional).
+
+=item 6.
+
+The attribute list (optional).
+
+=item 7.
+
+The function body.
+
+=back
+
+Example:
+
+   #  (1) (2)    (3)          (4)     (5)   (6)     (7)
+      fun foobar ($foo, $bar) is cool :($$) :cached { return $foo + $bar }
+   
+   #          (1) (6)
+      my $f = fun { return $_[0] + $_[1] };
+
+=head2 The Keyword
+
+This requires very little explanation. If you're no fun, and don't like
+the name C<fun>, you can export it with a different name:
+
+   use Kavorka fun => { -as => 'function' };
+
+=head2 The Function Name
+
+If present, it specifies the name of the function being defined. If no
+name is present, the declaration is an expression that evaluates to a
+reference to the function in question.
+
+Functions are automatically forward-declared; a la
+
+   sub foobar ($$);
+
+but are installed into the symbol table at run-time. So this works:
+
+   if ($ENV{DEBUG}) {
+      fun foobar { ... }
+   }
+   else {
+      fun foobar { ... }
+   }
+
+It is possible to install the function at compile time using the
+C<begin> L<trait|/Traits>:
+
+   fun foobar but begin { ... }
+
+It is possible to define lexical functions using a lexical variable
+for a function name:
+
+   fun my $add ($x, $y) {
+      $x + $y;
+   }
+   
+   my $sum = $add->(20, 22);
+
+=head2 The Signature
+
+See L<Kavorka::Manual::Signatures>.
+
+=head2 Traits
+
+See L<Kavorka::Manual::ExtendingKavorka>.
+
+=head2 The Prototype
+
+See L<Kavorka::Manual::PrototypeAndAttributes>.
+
+=head2 The Attributes
+
+Attributes may alternatively be provided I<< before the signature >>.
+
+See L<Kavorka::Manual::PrototypeAndAttributes>.
+
+=head2 The Function Body
+
+This is more or less what you'd expect from the function body you'd
+write with L<sub|perlsub>, however the lexical variables for parameters
+are pre-declared and pre-populated.
+
+=head2 C<< f >>, C<< func >>, and C<< function >>
+
+These are all aliases for C<< fun >>, though not exported by default.
+
+   use v5.14;
+   use Kavorka qw( function f );
+   
+   function make_plusser (Num $x = 1)
+   {
+      return f(Num $y) { $x + $y };
+   }
+   
+   my $plusser = make_plusser();
+   say $plusser->(41);   # says 42
+
+=head1 BUGS
+
+Please report any bugs to
+L<http://rt.cpan.org/Dist/Display.html?Queue=Kavorka>.
+
+=head1 SEE ALSO
+
+L<Kavorka::Manual>,
+L<Kavorka::Manual::Signatures>,
+L<Kavorka::Manual::PrototypeAndAttributes>,
+L<Kavorka::Manual::MultiSubs>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2013-2014, 2017 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

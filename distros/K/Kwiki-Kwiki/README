@@ -1,0 +1,22 @@
+= Welcome!
+
+Kwiki-Kwiki is the /easy/ way to make your own the Kwiki-based wiki software.
+
+If you are reading this, you probably have everything you need to get going.
+
+Well you'll also need these things:
+
+1) An internet connection.
+2) A Subversion client. aka the "svn" command line tool.
+3) A CGI capable web server setup.
+4) A couple minutes to run the install script.
+
+Ready?
+
+Just type:
+
+    perl bin/install
+
+from the command line and answer the questions.
+
+Enjoy!

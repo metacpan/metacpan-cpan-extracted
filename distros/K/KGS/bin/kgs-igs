@@ -1,0 +1,586 @@
+#!/opt/bin/perl
+
+# lots of things have been hardcoded. search for #d# to find the places
+
+require 5.008;
+
+use KGS::Protocol;
+use KGS::Listener::Debug;
+
+use IO::Socket::INET;
+use Event;
+
+use Getopt::Long;
+use Carp;
+
+our $VERSION = '0.0'; # be more confident....
+
+$SIG{QUIT} = sub { Carp::confess "SIGQUIT" };
+
+my $conn = new KGS::Protocol;
+my $kgs;
+my $igs;
+
+my $verbose = 1;
+my $user;
+my $pass;
+
+$Event::DIED = sub {
+   Event::verbose_exception_handler (@_);
+   Event::unloop_all;
+};
+
+sub rank($) {
+   return "NR " if !$_[0]->is_ranked || !$_[0]->rank;
+   return $_[0]->rank
+          . ($_[0]->is_reliable ? "*" : " ");
+}
+
+sub format_user($) {
+   my $format =
+      sprintf "%s|%s|%s",
+         $_[0]{name},
+         $_[0]->flags_string,
+         $_[0]->rank_string;
+
+   $format =~ y/ //d;
+   $format;
+}
+
+sub coord($$) {
+   qw(A B C D E F G H J K L M N O P Q R S T U V W X Y Z)[$_[0]] . $_[1];
+}
+
+#############################################################################
+
+package kgs;
+
+use base KGS::Listener;
+
+sub new {
+   my $class = shift;
+   my $self = bless { @_ }, $class;
+
+   print STDERR "$0 version $VERSION connecting...\n" if $verbose;
+
+   my $sock = new IO::Socket::INET PeerHost => KGS::Protocol::KGSHOST, PeerPort => KGS::Protocol::KGSPORT
+      or die "connect: $!";
+
+   $sock->blocking (1);
+   $conn->handshake ($sock);
+
+   $self->listen ($conn, "any");
+
+   # Listener for kgs data
+   $self->{w} = Event->io (fd => $sock, poll => 'r', cb => sub {
+      my $len = sysread $sock, my $buf, 16384;
+      if ($len) {
+         $conn->feed_data ($buf);
+      } elsif (defined $len || (!$!{EINTR} and !$!{EAGAIN})) {
+         print STDERR "disconnected\n" if $verbose;
+         Event::unloop;
+      }
+   });
+
+   $conn->login ("kgs-igs $VERSION", $self->{user}, delete $self->{password});
+
+   $self;
+}
+
+sub inject_login {
+   my ($self, $msg) = @_;
+
+   print STDERR "login: $msg->{message}\n" if $verbose >= 2;
+
+   if ($msg->{success}) {
+      $igs->login_ok ($msg->{message});
+   } else {
+      $igs->login_failed ($msg->{message});
+   }
+}
+
+sub inject_msg_room {
+   my ($self, $msg) = @_;
+
+   #use PApp::Util; warn PApp::Util::dumpval $msg;#d#
+   $igs->send ("21 !$msg->{name}!: $msg->{message}");
+}
+
+sub inject_any {
+   my ($self, $msg) = @_;
+   if ($verbose >= 2) {
+      print STDERR "DEBUG: $msg->{type}#$msg->{channel}";
+      for (sort keys %$msg) {
+         print  STDERR"   $_<$msg->{$_}>";
+      }
+      print STDERR "\n";
+   }
+}
+
+sub inject_upd_rooms {
+   my ($self, $msg) = @_;
+
+   for (@{$msg->{rooms}}) {
+#      $gtp->send ("kgs-room-update $_->{channel} $_->{name}");
+   }
+}
+
+sub inject_msg_chat {
+   my ($self, $msg) = @_;
+
+   return unless (lc $self->{conn}{name}) eq (lc $msg->{name2});
+
+#   $gtp->send ("kgs-user-chat $msg->{name} $msg->{message}");
+}
+
+sub inject_new_game {
+   my ($self, $msg) = @_;
+
+   $::lastnew = $msg->{channel};#d#
+#   $gtp->send ("kgs-game-new $msg->{id} $msg->{channel}");
+}
+
+#############################################################################
+
+package room;
+
+use base KGS::Listener::Room;
+
+sub new {
+   my $class = shift;
+   my $self = $class->SUPER::new (conn => $conn, @_);
+
+   $self->listen ($self->{conn});
+   $self->join;
+
+   $self;
+}
+
+sub event_join {
+   my $self = shift;
+
+   $self->SUPER::join (@_);
+
+   $self->{timer} = Event->timer (after => 0, interval => 60, cb => sub {
+      $self->req_games;
+   });
+}
+
+sub event_update_games {
+   my ($self, $add, $upd, $del) = @_;
+
+#   for (@$add, @$upd) {
+#      $gtp->send (sprintf "kgs-game-update %d %d %s %s %s %s %d %d %f %d %d %d %d %s",
+#                  $self->{channel}, $_->{channel},
+#                  $_->type_char,
+#                  ::format_user $_->{black},
+#                  ::format_user $_->{white},
+#                  ::format_user $_->{owner},
+#                  $_->size,
+#                  $_->{handicap},
+#                  $_->{komi},
+#                  $_->moves,
+#                  $_->{flags},
+#                  $_->{observers},
+#                  $_->{saved},
+#                  $_->{notes},
+#      );
+#   }
+#
+#   for (@$del) {
+#      $gtp->send ("kgs-game-delete $self->{channel} $_->{channel}");
+#   }
+}
+
+sub event_update_users {
+   my ($self, $add, $upd, $del) = @_;
+
+#   for (@$add, @$upd) {
+#      $gtp->send (sprintf "kgs-user-update %s", ::format_user $_);
+#   }
+#
+#   for (@$del) {
+#      $gtp->send (sprintf "kgs-user-remove %s", ::format_user $_);
+#   }
+}
+
+sub DESTROY {
+   my $self = shift;
+
+   $self->{timer}->cancel if $self->{timer};
+
+   $self->SUPER::DESTROY;
+}
+
+#############################################################################
+
+package game;
+
+use Gtk2::GoBoard::Constants;
+
+use base KGS::Listener::Game;
+
+sub new {
+   my $class = shift;
+   my $self = $class->SUPER::new (conn => $conn, @_);
+
+   $self->listen ($self->{conn});
+   $self->join;
+
+   $self;
+}
+
+sub event_update_users {
+   return;
+
+   my ($self, $add, $upd, $del) = @_;
+
+   for (@$add, @$upd) {
+      $gtp->send (sprintf "kgs-user-update %s", ::format_user $_);
+   }
+
+   for (@$del) {
+      $gtp->send (sprintf "kgs-user-remove %s", ::format_user $_);
+   }
+}
+
+sub inject_resign_game {
+   my ($self, $msg) = @_;
+
+   $gtp->set_gid ($self->{channel});
+   $gtp->send ("play " . (qw(b w))[$msg->{player}] . " resign");
+}
+
+sub inject_final_result {
+   my ($self, $msg) = @_;
+
+   $gtp->send (sprintf "kgs-game-score %f %f %f %f %f %f",
+               $_->{whitescore}{territory}, $_->{whitescore}{captures}, $_->{whitescore}{komi},
+               $_->{blackscore}{territory}, $_->{blackscore}{captures}, $_->{blackscore}{komi});
+}
+
+sub inject_set_teacher {
+   my ($self, $msg) = @_;
+}
+
+sub event_update_game {
+   my ($self) = @_;
+
+   $gtp->set_gid ($self->{channel});
+
+   # timesettings etc.
+}
+
+sub event_update_tree {
+   my ($self) = @_;
+
+   $gtp->set_gid ($self->{channel});
+
+   my $path = $self->get_path;
+   my $prev = $self->{prevpath};
+
+   $self->{prevpath} = [ @$path ];
+
+   if (@$prev > 1
+       and @$path > @$prev
+       and (join ":", @$prev) eq (join ":", @$path[0 .. $#$prev])) {
+
+      splice @$path, @prev, $#path, ();
+
+   } else {
+      $gtp->send ("boardsize $path->[0]{rules}{size}");
+      $gtp->send ("komi $path->[0]{rules}{komi}");
+      $gtp->send ("clear_board");
+
+      my $setup = shift @$path;
+      my $handi;
+
+      while (my ($k, $v) = each %$setup) {
+         if ($k =~ /^(\d+),(\d+)$/) {
+            $handi .= " " . ::coord $1, $2;
+         }
+      }
+
+      $gtp->send ("set_free_handicap$handi");
+   }
+
+   for (@$path) {
+      while (my ($k, $v) = each %$_) {
+         if ($k =~ /^(\d+),(\d+)$/) {
+            if ($v->[0] & MARK_MOVE) {
+               if ($v->[0] & MARK_B) {
+                  $gtp->send ("play b ". ::coord $1, $2);
+               } else {
+                  $gtp->send ("play w ". ::coord $1, $2);
+               }
+            }
+         }
+      }
+   }
+}
+
+sub DESTROY {
+   my $self = shift;
+
+   $self->SUPER::DESTROY;
+}
+
+#############################################################################
+
+package igs;
+
+use Gtk2::GoBoard::Constants;
+use KGS::Constants;
+
+use Fcntl;
+
+sub new {
+   my $class = shift;
+   my $self = bless { @_ }, $class;
+
+   my $buf;
+   $self->{w} = Event->io (fd => $self->{fh}, poll => 'r', cb => sub {
+      0 < sysread $self->{fh}, $buf, 4096, length $buf
+         or Event::unloop -1;
+
+      #$buf =~ y/\x00-\x09\x0b-\x0c\x0e-\x1f\x80-\xff//d;
+      while ($buf =~ s/^([^\015\012]*)\015?\012//) {
+         $self->{feed}->($1);
+      }
+   });
+
+   syswrite $self->{fh}, "##########################################################\r\n" for 1..1;
+   sleep 1; # required for amny clients :/
+   syswrite $self->{fh}, "Login: ";
+
+   $self->{feed} = sub {
+      my $user = $_[0];
+      print "login<$user>\n";
+      #$self->send ("\377\373\1");
+      $self->send ("1 1");
+      $self->{feed} = sub {
+         warn "pass <$_[0]>\n";#d#
+         $kgs = new kgs user => $user, password => $_[0] eq "guest" ? "" : $_[0];
+
+         $self->{feed} = sub { };
+      }
+   };
+
+   $self;
+}
+
+sub send {
+   my ($self, $cmd) = @_;
+
+   print "SEND<$cmd>\n";#d#
+   syswrite $self->{fh}, "$cmd\015\012";
+}
+
+sub roominfo {
+   my ($self) = @_;
+
+   (
+      [values %{$self->{room}{users} || {}}],
+      [values %{$self->{room}{games} || {}}],
+   )
+}
+
+sub feed {
+   my ($self, $line) = @_;
+
+   warn "GOT<$line>\n";#d#
+
+   if ($line =~ /^ga/) { # gamelist
+      $self->send ("7 [##]  white name [ rk ]      black name [ rk ] (Move size H Komi BY FR) (###)");
+      if ($self->{room}) {
+         my (undef, $games) = $self->roominfo;
+         for (@$games) {
+            next if $_->{size} <= 0 || $_->{moves} <= 0 || $_->{handicap} < 0 || $_->is_scored;
+
+            $self->send (sprintf
+                  "7 [%2d] %11s [%4s] vs. %11s [%4s] (%3d %4d %2d %4.1f %2d %s%s) (%3d)",
+                  $_->{channel},
+                  $_->{white}{name}, ::rank $_->{white},
+                  $_->{black}{name}, ::rank $_->{black},
+                  $_->{moves},
+                  $_->{size},
+                  $_->{handicap},
+                  $_->{komi},
+                  10, "F", "I",
+                  $_->{observers});
+         }
+      }
+   } elsif ($line =~ /^chan/) { # channels
+      $self->send ("9 #13 Title: English Game Room -- Open");
+
+   } elsif ($line =~ /^(y\S*|;)\s*/g) { # yell
+      my $channel = $self->{channel};
+      $channel = $1 if $line =~ /\\(\d+)\s*/gc;
+
+      if ($self->{channel} != $channel) {
+         $self->{channel} = $channel;
+         (delete $self->{room})->part if $self->{room};
+
+         if ($channel > 0) {
+            $self->{room} = new room channel => $channel;
+            $self->send ("32 Changing into channel $channel.");
+            $self->send ("32 Welcome to cyberspace.");#maybe title##d#
+
+         }
+      }
+
+      if ($channel > 0) {
+         # msg_chat to room
+      }
+      
+   } elsif ($line =~ /^up/) { # uptime
+      $self->send ("9 The current time (GMT) is:  Wed May 26 18:21:08 2004");#d#
+      $self->send ("9 The current IGS local time is:  Thu May 27 03:21:08 2004");#d#
+      $self->send ("9 Local hour when cron and the ratings, are run: 04:00");
+      $self->send ("9 The server has been up 117 days 10 hours 13 minutes");#d#
+      $self->send ("9 Max moves per game 1000");
+      $self->send ("9 Max dead stones per game 750");
+      $self->send ("9 Max account name length 11");
+      $self->send ("9 Max number of games a player can observe 20");
+      $self->send ("9 Number of aliases allowed 20");
+      $self->send ("9 Number of moves between saves 10");
+      $self->send ("9 Number of allowed connections 50");
+      $self->send ("9 Max channel number 99");
+      $self->send ("9 Locking:  Off.");
+      $self->send ("9 Players:  513, Games:  118");#d#
+      $self->send ("9 Max Board Size  19");
+      $self->send ("9 How many days games are stored 180");
+      $self->send ("9 How many days before an inactive player is removed 180");
+
+   } elsif ($line =~ /^stats\s+(\S+)/) { # stats
+      $self->send ("9 Player:      $1");
+      $self->send ("9 Game:        go (1)");
+      $self->send ("9 Language:    default");
+      $self->send ("9 Rating:      13k    0");
+      $self->send ("9 Rated Games:      0");
+      $self->send ("9 Rank:  13k  16");
+      $self->send ("9 Wins:         0");
+      $self->send ("9 Losses:       0");
+      $self->send ("9 Idle Time:  (On server) 0s");
+      $self->send ("9 Address:  igs\@schmorp.de");
+      $self->send ("9 Country:  Germany");
+      $self->send ("9 Reg date: Mon May 24 08:58:12 2004");
+      $self->send ("9 Info:  <None>");
+      $self->send ("9 Defaults (help defs):  time 90, size 19, byo-yomi time 10, byo-yomi stones 25");
+      $self->send ("9 Verbose  Bell  Quiet  Shout  Automail  Open  Looking  Client  Kibitz  Chatter");
+      $self->send ("9     Off   Off     On     On       Off   Off      Off      On      On   On");
+
+   } elsif ($line =~ /^t\S*\s+(\S+)(?:\s+(\S+))/) { # toggle
+      my ($setting, $value) = $1;
+      if ($2 =~ /^t/i) {
+         $self->{toggle}{$setting} = 1;
+      } elsif ($2 =~ /^f/i) {
+         $self->{toggle}{$setting} = 0;
+      } else {
+         $self->{toggle}{$setting} = !$self->{toggle}{$setting};
+      }
+
+   } elsif ($line =~ /^id\s+(.*)/) { # id
+      $self->{id} = $1;
+
+   } elsif ($line =~ /^wh\S*(?:\s+(.*))?/) { # who
+
+      $self->send ("27  Info       Name       Idle   Rank |  Info       Name       Idle   Rank");
+      my ($users, $games) = $self->roominfo;
+      for (@$users) {
+         # 27  SX --   -- guest8814   4s     NR  |     --   -- guest7528   1m     NR 
+      }
+      $self->send (sprintf "27                 ******** %d Players %d Total Games ********",
+                   scalar @$users, scalar @$games);
+
+   } elsif ($line =~ /^us\S*(?:\s+(.*))?/) { # users
+
+      $self->send ("42 Name        Info            Country  Rank Won/Lost Obs  Pl Idle Flags Language");
+      my ($users, $games) = $self->roominfo;
+      for (@$users) {
+         $self->send (sprintf "42  %-11.11s                --      %5s   0/   0  -   -   %3s    SX default",
+                      $_->{name},
+                      ::rank ($_),
+                      "0s",
+                      );
+      }
+      $self->send (sprintf "9                 ******** %d Players %d Total Games ********",
+                   scalar @$users, scalar @$games);
+
+   # 21 {Game 28: Robot10 vs catty : W 25.5 B 77.0}
+   # 21 {smorim [1k*] has connected.}
+   # 21 {daruma21 [5k*] has connected.}
+   # 21 {Game 102: boni vs z2004 : Black forfeits on time.}
+   # 21 {Game 14: gb vs Mahoba : White resigns.}
+   # 21 {brianlee has disconnected}
+
+
+
+   } else {
+      $self->send ("5 Unknown command.");
+   }
+
+   $self->send ("1 5");
+
+}
+
+sub login_ok {
+   my ($self, $msg) = @_;
+
+   $self->{feed} = sub { $self->feed ($_[0]) };
+   #$self->send ("39 IGS entry on 05 - 26 - 2004");
+   #$self->send ("9 File"); # motd
+
+   $self->send ("9 File");
+   $self->send (" $msg");
+   $self->send ("9 File");
+   $self->send ("39 IGS entry on 05 - 27 - 2004");#d#
+   $self->send ("1 5");
+
+   $self->{room} = new room channel => 13; # auto-join english room #d#
+}
+
+sub login_failed {
+   my ($self, $msg) = @_;
+
+   $self->send ("5 $msg");
+   Event::unloop -1;
+}
+
+package main;
+
+sub usage {
+   print STDERR <<EOF;
+Usage: $0 [options] port
+           -v             increase verbosity
+           -q             decrease verbosity
+
+EOF
+   exit shift;
+}
+
+GetOptions (
+      "v"   => sub { $verbose++ },
+      "q"   => sub { $verbose-- },
+      "h"   => sub { usage(0) },
+) or die usage(1);
+
+my $port = $ARGV[0] || 6969;
+
+my $socket = new IO::Socket::INET LocalPort => $port, Listen => 1, ReuseAddr => 1,
+   or die "cannot create listening socket on port $port: $!";
+
+print "Listening on 127.0.0.1:$port, please connect to it using your igs client.\n";
+
+while (my $fh = $socket->accept) {
+   if (fork == 0) {
+      $igs = new igs fh => $fh;
+
+      Event::loop;
+      exit 0;
+   }
+}
+
+1;
+
+

@@ -1,0 +1,26 @@
+---
+doctype: dist
+
+header:
+  name: Kavorka-TraitFor-Parameter-doc
+
+prereqs:
+  runtime:
+    requires:
+      - perl: 5.014000
+      - Module::Runtime: 0.014
+      - Moo::Role
+  test:
+    requires:
+      - Moose: 2.0000
+      - Moops: 0.034
+
+plugins:
+
+ - +config: Author::CSSON
+
+---
+doctype: weaver
+
+plugins:
+  - +config: Author::CSSON

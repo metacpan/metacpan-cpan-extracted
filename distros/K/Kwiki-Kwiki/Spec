@@ -1,0 +1,38 @@
+=== File Layout
+
+- kwiki - Kwiki-Kwiki stuff
+- kwiki/sources - various sources lists
+- kwiki/sources/list - current sources list
+- kwiki/install - installation state
+- kwiki/lib - symlink installation
+- lib - Kwiki::Kwiki modules. These need to live here
+- kwiki/src - where source files live
+- kwiki/src/svn
+
+=== Configuration
+
+- where does config info go?
+  - kk/config.yaml
+- what format?
+  - yaml
+  - need to ship YAML.pm then (and Spiffy)
+  - YAML.pm can't parse flush left lists yet
+
+- keys:
+  - perl_path
+  - kk_version_installed
+
+=== Installation story
+
+- Determine if Kwiki will be running on this machine
+- Determine the user that the webserver will run as
+- Determine which perl we will be using
+- Rewrite scripts to use the correct perl in the hashbang
+- Check if we have svn
+- Select a klist
+- Get all sources for the klist
+- Create klib
+- Set appropriate file permissions
+- Install Kwiki
+- Delete Kwiki-Kwiki distro files
+- Yay!

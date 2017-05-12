@@ -1,0 +1,12 @@
+name: Kwiki-NavigationToolbar
+version: 0.02
+abstract: Navigation Toolbar
+author: Kang-min Liu (gugod@gugod.org)
+license: perl
+distribution_type: module
+requires:
+  Kwiki: 0
+no_index:
+  directory:
+    - inc
+generated_by: Module::Install version 0.36

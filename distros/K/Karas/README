@@ -1,0 +1,147 @@
+NAME
+    Karas - Yet another O/R Mapper.
+
+SYNOPSIS
+        use Karas;
+
+        my $db = Karas->new(connect_info => ['dbi:SQLite::memory:', '', '']);
+        $db->dbh->do(q{CREATE TABLE member (id int, name varchar(255) not null)});
+        my $member = $db->insert('member' => {
+            name => 'John',
+        });
+        $db->update($member, {
+            name => 'Mills',
+        });
+        $member = $db->refetch($member);
+
+DESCRIPTION
+    Karas is yet another O/R mapper.
+
+    THIS IS A DEVELOPMENT RELEASE. API MAY CHANGE WITHOUT NOTICE.
+
+FEATURES
+    fork safe connection management
+    nested, scoped transaction support using DBIx:TransactionManager
+
+METHODS
+  Constructor
+    my $db = Karas->new(%args)
+        Create new instance of Karas.
+
+        You can pass following arguments as hash:
+
+        connect_info(Required)
+            connect_info is an arguments for "DBI->connect".
+
+        query_builder(Optional)
+            This is a query builder. You need to pass the child class
+            instance of SQL::Maker.
+
+            Default value is : "Karas::QueryBuilder->new()".
+
+  Connection
+    $db->connect([@args])
+        Connect to Database immediately.
+
+        If you pass @args, $db->{connec_info} will upgrade by @args.
+
+    $db->reconnect([@args])
+        Reconnect to Database immediately.
+
+        If you pass @args, $db->{connec_info} will upgrade by @args.
+
+    $db->dbh()
+        Get a database handle. If the connection was closed, Karas
+        reconnects automatically.
+
+  SQL Operations
+    my @rows = $db->search($table, $where[, $opt])
+        Search rows from database. For more details, please see SQL::Maker.
+
+    my $count = $db->count($table[, $where])
+        Count rows by $where.
+
+    my ($rows, $pager) = $db->search_with_pager($table, $where[, $opt])
+        *$pager* is instance of Data::Page::NoTotalEntries.
+
+    my @rows = $db->search_by_sql($sql, $binds[, $table_name]);
+        Search rows by SQL.
+
+        *$table_name* is optional. Karas finds table name by $sql
+        automatically.
+
+    my $row = $db->insert($table, $values);
+        Insert row to database. And refetch row from database.
+
+    $db->fast_insert($table, $values);
+        Insert row to database.
+
+    $db->replace($table, $values);
+        Replace into row to database.
+
+    $db->update($row, \%opts)
+        Update row object by \%opts.
+
+    my $affected_rows = $db->update($table_name, $set, $where)
+        Update *$table_name* set *$set* where *$where*.
+
+    $db->delete($row);
+        Delete row object from database.
+
+    $db->delete($table_name, $where)
+        Delete $table_name where $where.
+
+    $db->refetch($row)
+        Refetch *$row* object from database.
+
+    $db->bulk_insert($table_name, $rows_data)
+            $db->bulk_insert('member', [
+                +{ name => 'John', email => 'john@example.com' },
+                +{ name => 'Ben',  email => 'ben@example.com' },
+            ])
+
+        This is a bulk insert method. see SQL::Maker::Plugin::InsertMulti.
+
+  Row class map management
+    $db->get_row_class($table_name);
+        Clear row class from table name.
+
+  Transaction
+    my $guard = $db->txn_scope();
+        Start transaction scope with DBIx::TransactionManager. See
+        DBIx::TransactionManager for more details.
+
+Plugins
+    Karas->load_plugin($name[, $args])
+        Load plugin and install it. $name is a class name of plugin.
+
+        You can use two style of $name. If you want to use plugin under the
+        'Karas::Plugin::Name' namespace, you just write 'Name' part. If you
+        want to put your plugin on your favorite namespace, you can
+        pass'+My::Own::Plugin' as $name.
+
+        $args is a argument for "Karas::Plugin::Foo->new($args)".
+
+  Utilities
+    $db->last_insert_id()
+        Get a last_insert_id from $dbh.
+
+ROW CLASS DETECTION
+    Karas loads row class from your load path. If you are using Karas class
+    directly, Karas does not loads any row class. But if you use it as a
+    parent class like following:
+
+        parent MyDB;
+        use parent qw/Karas/;
+
+FAQ
+AUTHOR
+    Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ GMAIL COM>
+
+SEE ALSO
+LICENSE
+    Copyright (C) Tokuhiro Matsuno
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

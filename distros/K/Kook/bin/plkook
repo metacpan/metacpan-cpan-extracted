@@ -1,0 +1,19 @@
+#!/usr/bin/env perl
+
+###
+### $Release: 0.0100 $
+### $Copyright: copyright(c) 2009-2011 kuwata-lab.com all rights reserved. $
+### $License: MIT License $
+###
+
+use strict;
+use warnings;
+no warnings 'uninitialized';  # suppress warning 'Use of uninitialized value'
+
+use Data::Dumper;
+use Kook::Main;
+
+my @argv = @ARGV;
+my $klass = $argv[0] eq "-X" ? 'Kook::MainApplication' : 'Kook::MainCommand';
+my $main = $klass->new(\@argv);
+$main->main();

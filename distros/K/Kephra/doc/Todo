@@ -1,0 +1,46 @@
+open Issues, known problems
+
+
+Technical Issues:
+ - file open clutter in Tabbar
+
+0.4.4
+ + new mouse controls
+ + 3 new tools
+
+0.4.5
+ + more encodings
+ + utf convert
+ + config dialog
+
+0.5 
+ + about dialog
+ 
+0.6
+ + plugin API, demo, syntaxchecker
+ + extensions: commandline, tree lib tool  
+  
+  
+long time:
+
+plugins:
+- filebrowser
+- project manager
+- outlining
+- commandline
+- command tree aka snippet lib
+
+internal:
+ - Panel API 
+ - split output extension in output panel and interpreter tool
+ ? nested menu prepare event
+ + no global vars
+ + all event trigger are local
+ - every event handeled by eventtable
+
+---
+Legend:
+  
+ ? dunno how to do 
+ + almost done 
+ - waitens

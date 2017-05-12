@@ -1,0 +1,27 @@
+Kwiki-ListPages version 0.10
+============================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   Kwiki v0.37
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Sue Spence <sue_cpan@pennine.com> and 
+                      Alexander Goller <alex@vivien.franken.de>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+

@@ -1,0 +1,432 @@
+#!/usr/bin/perl -w
+#============================================================= -*-perl-*-
+#
+# okprof
+#
+# DESCRIPTION
+#   Utility for manipulating kite profiles using the Kite::Profile
+#   module.
+#
+# AUTHOR
+#   Andy Wardley   <abw@kfs.org>
+#
+# COPYRIGHT
+#   Copyright (C) 2000 Andy Wardley.  All Rights Reserved.
+#
+#   This is free software; you can redistribute it and/or
+#   modify it under the same terms as Perl itself.
+#
+# VERSION
+#   $Id: okprof,v 1.4 2000/10/18 08:37:49 abw Exp $
+#
+#========================================================================
+
+#!/usr/bin/perl -w
+
+# for testing
+use lib qw( ./lib ../lib );
+use strict;
+use Kite::Profile;
+
+# constants used in dispatch table
+use constant PRINT  => 1;
+use constant ERROR  => 2;
+use constant OUTPUT => 4;
+
+my $PROGRAM   = 'okprof';
+my $VERSION   = 0.1;
+my $COPYRIGHT = 'Copyright 2000 Andy Wardley.  This is free software';
+
+my ($file, $arg, $op, $nargs, $flags, $result, $misc, @args, @xargs);
+my ($verbose, $debug, $interact) = (0) x 3;
+
+
+# process any arguments that start with '-' as flags
+while (@ARGV && $ARGV[0] =~ /^-./) {
+    $arg = shift @ARGV;
+    if ($arg =~ /^-v|--verbose$/) {
+	$verbose++;
+    }
+    elsif ($arg =~ /^-d|--debug$/) {
+	$debug++;
+	$Kite::Profile::DEBUG = 1;
+    }
+    elsif ($arg =~ /^-i|--interact$/) {
+	$interact++;
+    }
+    elsif ($arg =~ /^-h|--help$/) {
+	die usage();
+    }
+    else {
+	warn "invalid option: $arg\n";
+    }
+}
+
+
+# take the next argument as the profile file name or print usage 
+# message if not defined
+die usage() unless defined ($file = shift @ARGV);
+
+print "$PROGRAM version $VERSION.  $COPYRIGHT\n" 
+    if $verbose;
+
+my $profile = Kite::Profile->new({ FILE => $file })
+    || die $Kite::Profile::ERROR, "\n";
+
+
+# $proftab is the dispatch table for the profile manipulation commands.
+# each entry should be of one of the following forms:
+#      name => [ sub_routine_ref, $nargs, $flags, $misc ]
+#      name => [ method_name, $nargs, $flags, $misc ]  
+# $nargs indicates how many extra arguments the operation takes.  These
+# are read from the input stream and passed to the sub-routine or method
+# which is called against the Kite::Profile object.  $flags may contain
+# any of the following constants, combine via logical OR: ERROR (check 
+# return value is defined and print error message if not), PRINT (print
+# the result returned using $misc as a printf() mask, if defined)
+
+my $proftab = {
+    print     => [ 'about',       0, PRINT ],
+    output    => [ 'output',      0, OUTPUT ],
+    length    => [ 'length',      0, PRINT, "length: %s\n" ],
+    height    => [ 'height',      0, PRINT, "height: %s\n" ],
+    minx      => [ 'min_x',       0, PRINT, "min x: %s\n"  ],
+    maxx      => [ 'max_x',       0, PRINT, "max x: %s\n"  ],
+    miny      => [ 'min_y',       0, PRINT, "min y: %s\n"  ],
+    maxy      => [ 'max_y',       0, PRINT, "max y: %s\n"  ],
+    normal    => [ 'normalise',   0 ],
+    normalx   => [ 'normalise_x', 0 ],
+    normaly   => [ 'normalise_y', 0 ],
+    scale     => [ 'scale_xy',    1 ],
+    scalex    => [ 'scale_x',     1 ],
+    scaley    => [ 'scale_y',     1 ],
+    transx    => [ 'translate_x', 1 ],
+    transy    => [ 'translate_y', 1 ],
+    zero      => [ 'origin',      0 ],
+    zerox     => [ 'origin_x',    0 ],
+    zeroy     => [ 'origin_y',    0 ],
+    insert    => [ 'insert',      3, ERROR ],
+    delete    => [ 'delete',      1, ERROR ],
+    keep      => [ 'keep',        2, ERROR ],
+    close     => [ 'close',       0 ],
+    xaty      => [ sub { my ($p, $y) = @_;  local $" = ', ';
+			 my $x = $p->x_at_y($y) || return undef;
+			 return "X at Y=$y : [ @$x ]";
+		   }, 1, ERROR | PRINT ],
+    yatx      => [ sub { my ($p, $x) = @_;  local $" = ', ';
+			 my $y = $p->y_at_x($x) || return undef;
+			 return "X at Y=$y : [ @$y ]\n";
+		   }, 1, ERROR | PRINT],
+};
+
+# $alias defines aliases for the above commands
+
+my $alias = {
+    h  => 'height',
+    l  => 'length',
+    p  => 'print',
+    ps => 'pscript',
+    o  => 'output',
+    n  => 'normal',
+    nx => 'normalx',
+    ny => 'normaly',
+    s  => 'scale',
+    sx => 'scalex',
+    sy => 'scaley',
+    tx => 'transx',
+    ty => 'transy',
+    i  => 'insert',
+    d  => 'delete',
+    k  => 'keep',
+    c  => 'close',
+    xy => 'xaty',
+    yx => 'yatx',
+    z  => 'zero',
+    zx => 'zerox',
+    zy => 'zeroy',
+};
+
+
+# read each command and apply the appropriate operation
+@args = @ARGV;
+while ($arg = next_command()) {
+    $arg = $alias->{ $arg } if defined $alias->{ $arg };
+    unless (defined $proftab->{ $arg }) {
+	warn "invalid command: $arg\n";
+	next;
+    }
+    ($op, $nargs, $flags, $misc) = @{ $proftab->{ $arg } };
+    @xargs = splice(@args, 0, $nargs);
+    if (scalar @xargs < $nargs) {
+	warn("$arg command expects ", 
+	     $nargs > 1 ? "$nargs parameters\n" : "a parameter\n");
+	next;
+    }
+    if (ref $op eq 'CODE') {
+	$result = &$op($profile, @xargs);
+    }
+    else {
+	$result = $profile->$op(@xargs);
+    }
+
+    next unless $flags;
+
+    # check return value and print error if ERROR flag ig set
+    if ($flags & ERROR) {
+	unless ($result) {
+	    warn $profile->error(), "\n";
+	    next;
+	}
+    }
+    
+    # print returned output to STDERR if PRINT flag is set
+    if ($flags & PRINT) {
+	$misc ||= "%s\n";
+	printf STDERR $misc, $result;
+    }
+
+    # print output to STDOUT if OUTPUT flag is set
+    if ($flags & OUTPUT) {
+	$misc ||= "%s\n";
+	printf $misc, $result;
+    }
+}
+
+
+#========================================================================
+#                                 -- END -- 
+#========================================================================
+
+
+#------------------------------------------------------------------------
+# next_command
+#
+# Provide the next command taken from any remaining command line 
+# arguments.  After that, if interaction mode is set (-i or --interact),
+# then the user will be prompted to enter a command.  Multiple commands
+# (or additional arguments) may be provided on a single line and will
+# be split and buffered in @args.
+#------------------------------------------------------------------------
+
+sub next_command {
+    my $input;
+    my $prompt = "$PROGRAM > ";
+
+    if (@args) {
+	return shift @args;
+    }
+    if ($interact) {
+      COMMAND: {
+	  print STDERR $prompt;
+	  $input = <STDIN>;
+	  chomp $input;
+	  if (! $input) {
+	      print(STDERR 
+		    "Type 'help' or '?' for help, 'quit' or 'q' to quit\n");
+	      redo COMMAND;
+	  }
+	  elsif ($input =~ /^q(uit)?$/) {
+	      return undef;
+	  }
+	  elsif ($input eq 'help' || $input eq '?') {
+	      print STDERR help();
+	      redo COMMAND;
+	  }
+	  @args = split(/\s+/, $input);
+	  return shift(@args) if @args;
+      }
+    }
+    return undef;
+}
+	
+
+#------------------------------------------------------------------------
+# usage()
+# 
+# Return a text string containing usage summary.
+#------------------------------------------------------------------------
+
+sub usage {
+    return <<EOF . commands();
+usage: $0 [options] filename [commands]
+
+options:
+    -v   --verbose      Verbose mode
+    -i   --interact     Interactive mode
+    -d   --debug        Debug mode
+    -h   --help         This help
+
+commands:
+EOF
+}
+
+
+#------------------------------------------------------------------------
+# help()
+# 
+# Return a text string containing help for the interactive session.
+#------------------------------------------------------------------------
+
+sub help {
+    return <<EOF . commands();
+Type the following commands (or abbreviations) to manipulate the current
+profile: $profile->{ NAME }
+
+EOF
+}
+
+
+#------------------------------------------------------------------------
+# commands()
+# 
+# Return a text string containing summary of commands.
+#------------------------------------------------------------------------
+
+sub commands {
+    return <<EOF;
+    print        (p)     Print the profile name and nodes
+    output       (o)     Output the profile in standard data format
+    length       (l)     Print the profile length  (maxx - minx)
+    height       (h)     Print the profile height (maxy - miny)
+    minx, maxx           Print minimum/maximum X value
+    miny, maxy           Print minimum/maximum Y value
+
+    normal       (n)     Scale profile (both X and Y) to length 1
+    normalx/y    (nx/ny) Scale the X/Y values to length/height 1
+    scale    n   (s)     Scale X and Y values by a factor of n
+    scalex/y n   (sx/sy) Scale X/Y values by a factor of n
+    transx/y n   (tx/ty) Move (translate) all X/Y values by amount n
+    zero         (z)     Move profile to origin (minx = miny = 0)
+    zerox/y      (zx/zy) Move profile X/Y to origin (minx/miny = 0)
+
+    insert n x y (i)     Insert node n with values x, y
+    delete n     (d)     Delete node n
+    keep a b     (k)     Discard profile except for nodes a - b
+    close        (c)     Add end node to ensure profile is closed
+    
+    xaty y       (xy)    Find X values where profile crosses Y at y
+    yatx x       (yx)    Find Y values where profile crosses X at x
+
+    help         (?)     This help
+    quit         (q)     Quit
+
+EOF
+}
+
+
+__END__
+
+=head1 NAME
+
+okprof - utility script providing an interface to the Kite::Profile module.
+
+=head1 DESCRIPTION
+
+The F<okprof> script provides a simple user-interface to the Kite::Profile
+module.  This allows 2D profiles to be loaded from files (Plotfoil format)
+and manipulated via various commands.
+
+For a summary of usage and commands, type 'B<okprof -h>'.
+
+    usage: okprof [options] filename [commands]
+
+The script loads the profile data from the file specified by 'filename'
+and then performs the operations denoted by the 'commands' list.  The
+script does not modify the original profile file and by default will 
+simply load the data and exit.
+
+Example: load the data from the file 'S2091' and print a summary.
+
+    $ okprof S2091 print
+
+    Profile S2091-101-83 (S2091)
+    length:    0.999   height:    0.107
+    62 co-ordinate pairs:
+    	n                X              Y
+    --------------------------------------
+    	0:      1.00000000      0.00000000
+    	1:      0.99674000      0.00035000
+    	2:      0.98707000      0.00150000
+    	3:      0.97126000      0.00367000
+        .           .               .
+        .           .               .
+       60:      1.00001000      0.00000000
+       61:      1.00000000      0.00000000
+
+Example: load the same file then print various information about the 
+profile:
+
+    $ okprof ~/etc/airfoils/S2091 minx maxx miny maxy length height
+
+    min x: 0.00058
+    max x: 1.00001
+    min y: -0.01939
+    max y: 0.08804
+    length: 0.99943
+    height: 0.10743
+
+A number of commands are provided for manipulating the profile.  These
+only affect the profile data held in memory and do not modify the
+original file.  The various commands that display profile information
+(e.g. print, minx, length, etc.) send their output to STDERR.  The
+'output' command generates the (modified) profile data in Plotfoil
+format and prints it to STDOUT.  This allows the script to be used as
+a simple filter.
+
+Example: load profile, normalise (ensure length = 1), scale by 
+450, send output to 'newfile.ps', printing the length (to STDERR) 
+before and after, for information purposes.
+
+    $ okprof S2091 length normal scalex 450 length output > newfile
+
+    length: 0.99943
+    length: 450
+
+The B<-i> option puts the script into interactive mode.  After loading
+the profile and executing any commands specified on the command line, 
+a prompt is printed and further commands can be entered.
+
+    $ okprof -i S2091 length
+
+    length: 0.99943
+    okprof> 
+
+All output from the interactive session (except for the 'output') command
+is sent to STDERR.  Thus, it is possible to run an interactive session
+while still redirecting the modified data (generated by 'output' command)
+to a file.
+
+    $ okprof -i S2091 > newfile
+
+    okprof> normal scalex 450 output
+    okprof> quit
+
+Type 'help' or '?' for help and 'quit' or 'q' to quit.
+
+The B<-v> option sets verbose mode.
+
+The B<-d> option sets debug mode.
+
+=head1 AUTHOR
+
+Andy Wardley E<lt>abw@kfs.orgE<gt>
+
+=head1 VERSION
+
+$Revision: 1.4 $
+
+=head1 COPYRIGHT
+
+Copyright (C) 2000 Andy Wardley.  All Rights Reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<Kite::Profile|Kite::Profile>
+
+=cut
+
+
+

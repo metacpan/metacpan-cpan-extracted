@@ -1,0 +1,18 @@
+parcel KinoSearch cnick Kino;
+
+inert class KinoSearch::Test::Plan::TestFieldType cnick TestFType {
+    inert void
+    run_tests();
+}
+
+class KinoSearch::Test::Plan::DummyFieldType inherits KinoSearch::Plan::FieldType {
+    inert incremented DummyFieldType*
+    new();
+}
+
+/* Copyright 2005-2011 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

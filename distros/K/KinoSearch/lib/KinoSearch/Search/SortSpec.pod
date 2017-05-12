@@ -1,0 +1,73 @@
+
+# Auto-generated file -- DO NOT EDIT!!!!!
+
+=head1 NAME
+
+KinoSearch::Search::SortSpec - Specify a custom sort order for search results.
+
+=head1 DEPRECATED
+
+The KinoSearch code base has been assimilated by the Apache L<Lucy> project.
+The "KinoSearch" namespace has been deprecated, but development continues
+under our new name at our new home: L<http://lucy.apache.org/>
+
+=head1 SYNOPSIS
+
+    my $sort_spec = KinoSearch::Search::SortSpec->new(
+        rules => [
+            KinoSearch::Search::SortRule->new( field => 'date' ),
+            KinoSearch::Search::SortRule->new( type  => 'doc_id' ),
+        ],
+    );
+    my $hits = $searcher->hits(
+        query     => $query,
+        sort_spec => $sort_spec,
+    );
+
+
+
+=head1 DESCRIPTION
+
+By default, searches return results in order of relevance; SortSpec allows
+you to indicate an alternate order via an array of
+L<SortRules|KinoSearch::Search::SortRule>.
+
+Fields you wish to sort against must be C<< sortable >>.
+
+For a stable sort (important when paging through results), add a
+sort-by-doc rule as the last SortRule.
+
+=head1 CONSTRUCTORS
+
+=head2 new( I<[labeled params]> )
+
+    my $sort_spec = KinoSearch::Search::SortSpec->new( rules => \@rules );
+
+=over
+
+=item *
+
+B<rules> - An array of SortRules.
+
+=back
+
+
+
+
+
+
+
+=head1 INHERITANCE
+
+KinoSearch::Search::SortSpec isa L<KinoSearch::Object::Obj>.
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005-2011 Marvin Humphrey
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
+

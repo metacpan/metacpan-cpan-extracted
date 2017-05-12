@@ -1,0 +1,10 @@
+Revision history for Kelp-Module-ValidateTiny
+
+0.04  2013-05-16 17:10:04 IST
+        -Better encapsulation subclassing Validate::Tiny
+        
+0.03  2013-05-15 11:41:46 IST
+        - Tests now load configuration at runtime
+
+0.02  2013-05-15 00:57:19 IST
+        - Initial release

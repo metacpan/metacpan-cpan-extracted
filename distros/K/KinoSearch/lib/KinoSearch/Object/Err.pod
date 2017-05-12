@@ -1,0 +1,68 @@
+
+# Auto-generated file -- DO NOT EDIT!!!!!
+
+=head1 NAME
+
+KinoSearch::Object::Err - Exception.
+
+=head1 DEPRECATED
+
+The KinoSearch code base has been assimilated by the Apache L<Lucy> project.
+The "KinoSearch" namespace has been deprecated, but development continues
+under our new name at our new home: L<http://lucy.apache.org/>
+
+=head1 SYNOPSIS
+
+    use Scalar::Util qw( blessed );
+    my $bg_merger;
+    while (1) {
+        $bg_merger = eval {
+            KinoSearch::Index::BackgroundMerger->new( index => $index );
+        };
+        last if $bg_merger;
+        if ( blessed($@) and $@->isa("KinoSearch::Store::LockErr") ) {
+            warn "Retrying...\n";
+        }
+        else {
+            # Re-throw.
+            die "Failed to open BackgroundMerger: $@";
+        }
+    }
+
+
+
+=head1 DESCRIPTION
+
+Most of the time when KinoSearch encounters an error, it tries to raise a
+KinoSearch::Object::Err exception with an error message and context
+information.
+
+At present, it is only safe to catch exceptions which are specifically
+documented as catchable; most times when an Err is raised, KinoSearch leaks
+memory.
+
+The Err module also provides access to a per-thread Err shared variable via
+set_error() and get_error().  It may be used to store an Err object
+temporarily, so that calling code may choose how to handle a particular
+error condition.
+
+
+
+
+
+
+
+=head1 INHERITANCE
+
+KinoSearch::Object::Err isa L<KinoSearch::Object::Obj>.
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005-2011 Marvin Humphrey
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
+

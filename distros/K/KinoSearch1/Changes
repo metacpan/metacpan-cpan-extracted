@@ -1,0 +1,10 @@
+Revision history for KinoSearch1
+
+1.01  2010-10-27
+
+  * Attempt to hide private classes from search.cpan.org more effectively.
+
+1.00  2010-03-17 
+
+  Forked from KinoSearch version 0.165.
+

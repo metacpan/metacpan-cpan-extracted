@@ -1,0 +1,5 @@
+ICC_opaque             T_UV
+ICC_status_t           T_IV
+ICC_option_t           T_IV
+ICC_Data_Msg_Type_t    T_IV
+perl_iccObj_t*         T_IV

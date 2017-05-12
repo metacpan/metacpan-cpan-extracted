@@ -1,0 +1,62 @@
+KSx::Highlight::Summarizer, version 0.06 (beta)
+
+This module is a subclass of KinoSearch::Highlight::Highlighter that
+offers more possibilities for customisation:
+
+• Summaries (multiple excerpts for a document, joined with ellipses)
+• Pagination
+• Custom ellipsis marks
+
+
+CHANGES IN THIS RELEASE
+
+Updated to work with revision 4604 of KinoSearch.
+
+
+INSTALLATION
+
+The easiest way to install this module is to use the CPAN module or
+the cpan script:
+
+    [sudo] perl -MCPAN -e "install KSx::Highlight::Summarizer"
+
+    [sudo] cpan KSx::Highlight::Summarizer
+
+Or you can use the following:
+
+    perl Makefile.PL
+    make
+    make test
+    [sudo] make install
+
+
+DEPENDENCIES
+
+This module requires perl and the following Perl modules:
+
+• Number::Range
+• Hash::Util::FieldHash::Compat
+• The development version of KinoSearch, revision 4604 or later,
+  which one can get from
+  http://www.rectangular.com/svn/kinosearch/trunk/. This module has
+  only been tested with revision 4625.
+
+
+DOCUMENTATION
+
+After installing, you can find documentation for this module with
+the perldoc command.
+
+    perldoc KSx::Highlight::Summarizer
+
+Or try using man (it's faster, in my experience):
+
+    man KSx::Highlight::Summarizer
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008-9 Father Chrysostomos
+
+This program is free software; you may redistribute it and/or modify
+it under the same terms as perl.

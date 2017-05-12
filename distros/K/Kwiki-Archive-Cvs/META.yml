@@ -1,0 +1,10 @@
+name: Kwiki-Archive-Cvs
+version: 0.104
+authored_by:
+ - Brian Ingerson <ingy@cpan.org>
+ - Joseph Walton <joe@kafsemo.org>
+installdirs: site
+requires:
+  perl: 5.6.1
+  Kwiki: 0.39
+distribution_type: module

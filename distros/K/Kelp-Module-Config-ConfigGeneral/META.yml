@@ -1,0 +1,33 @@
+---
+abstract: 'DEPRICATED !!!!!!!!! L<Config::General> as config module for your Kelp applications.'
+author:
+  - 'Konstantin Yakunin <twinhooker@gmail.com>'
+build_requires:
+  Test::More: '0.96'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.16, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Kelp-Module-Config-ConfigGeneral
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Config::General: '0'
+  Kelp: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/yakudzo/Kelp-Module-Config-ConfigGeneral/issues
+  homepage: https://github.com/yakudzo/Kelp-Module-Config-ConfigGeneral
+  repository: https://github.com/yakudzo/Kelp-Module-Config-ConfigGeneral.git
+version: '0.03'
+x_serialization_backend: 'YAML::Tiny version 1.69'

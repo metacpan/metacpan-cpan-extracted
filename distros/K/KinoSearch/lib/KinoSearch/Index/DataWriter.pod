@@ -1,0 +1,193 @@
+
+# Auto-generated file -- DO NOT EDIT!!!!!
+
+=head1 NAME
+
+KinoSearch::Index::DataWriter - Write data to an index.
+
+=head1 DEPRECATED
+
+The KinoSearch code base has been assimilated by the Apache L<Lucy> project.
+The "KinoSearch" namespace has been deprecated, but development continues
+under our new name at our new home: L<http://lucy.apache.org/>
+
+=head1 SYNOPSIS
+
+    # Abstract base class.
+
+
+
+=head1 DESCRIPTION
+
+DataWriter is an abstract base class for writing index data, generally in
+segment-sized chunks. Each component of an index -- e.g. stored fields,
+lexicon, postings, deletions -- is represented by a
+DataWriter/L<DataReader|KinoSearch::Index::DataReader> pair.
+
+Components may be specified per index by subclassing
+L<Architecture|KinoSearch::Plan::Architecture>.
+
+=head1 CONSTRUCTORS
+
+=head2 new( I<[labeled params]> )
+
+    my $writer = MyDataWriter->new(
+        snapshot   => $snapshot,      # required
+        segment    => $segment,       # required
+        polyreader => $polyreader,    # required
+    );
+
+=over
+
+=item *
+
+B<snapshot> - The Snapshot that will be committed at the end of the
+indexing session.
+
+=item *
+
+B<segment> - The Segment in progress.
+
+=item *
+
+B<polyreader> - A PolyReader representing all existing data in the
+index.  (If the index is brand new, the PolyReader will have no
+sub-readers).
+
+=back
+
+
+
+=head1 ABSTRACT METHODS
+
+=head2 add_inverted_doc( I<[labeled params]> )
+
+Process a document, previously inverted by C<< inverter >>.
+
+=over
+
+=item *
+
+B<inverter> - An Inverter wrapping an inverted document.
+
+=item *
+
+B<doc_id> - Internal number assigned to this document within the
+segment.
+
+=back
+
+=head2 add_segment( I<[labeled params]> )
+
+Add content from an existing segment into the one currently being
+written.
+
+=over
+
+=item *
+
+B<reader> - The SegReader containing content to add.
+
+=item *
+
+B<doc_map> - An array of integers mapping old document ids to
+new.  Deleted documents are mapped to 0, indicating that they should be
+skipped.
+
+=back
+
+=head2 finish()
+
+Complete the segment: close all streams, store metadata, etc.
+
+=head2 format()
+
+Every writer must specify a file format revision number, which should
+increment each time the format changes. Responsibility for revision
+checking is left to the companion DataReader.
+
+
+
+=head1 METHODS
+
+=head2 delete_segment(reader)
+
+Remove a segment's data.  The default implementation is a no-op, as
+all files within the segment directory will be automatically deleted.
+Subclasses which manage their own files outside of the segment system
+should override this method and use it as a trigger for cleaning up
+obsolete data.
+
+=over
+
+=item *
+
+B<reader> - The SegReader containing content to merge, which must
+represent a segment which is part of the the current snapshot.
+
+=back
+
+=head2 merge_segment( I<[labeled params]> )
+
+Move content from an existing segment into the one currently being
+written.
+
+The default implementation calls add_segment() then delete_segment().
+
+=over
+
+=item *
+
+B<reader> - The SegReader containing content to merge, which must
+represent a segment which is part of the the current snapshot.
+
+=item *
+
+B<doc_map> - An array of integers mapping old document ids to
+new.  Deleted documents are mapped to 0, indicating that they should be
+skipped.
+
+=back
+
+=head2 metadata()
+
+Arbitrary metadata to be serialized and stored by the Segment.  The
+default implementation supplies a Hash with a single key-value pair for
+"format".
+
+=head2 get_snapshot()
+
+Accessor for "snapshot" member var.
+
+=head2 get_segment()
+
+Accessor for "segment" member var.
+
+=head2 get_polyreader()
+
+Accessor for "polyreader" member var.
+
+=head2 get_schema()
+
+Accessor for "schema" member var.
+
+=head2 get_folder()
+
+Accessor for "folder" member var.
+
+
+
+=head1 INHERITANCE
+
+KinoSearch::Index::DataWriter isa L<KinoSearch::Object::Obj>.
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005-2011 Marvin Humphrey
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
+

@@ -1,0 +1,19 @@
+
+Kwiki::Technorati displays the Technorati Cosmos for a given URL
+using a WAFL phrase.
+
+You can see Kwiki::Technorati in action at http://www.burningchrome.com/wiki
+
+Please read the POD for more information.
+
+Contact Chris Dent <cdent@burningchrome.com> with questions,
+comments, suggestions, howdies.
+
+======================================================================
+
+Install as with most Kwiki plugins:
+
+  kwiki -add Kwiki::FetchRSS
+  kwiki -add Kwiki::Technorati
+ 
+Edit config.yaml to override technorati_key with your key.

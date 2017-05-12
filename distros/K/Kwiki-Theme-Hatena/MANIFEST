@@ -1,0 +1,10 @@
+Changes
+README
+MANIFEST
+META.yml
+lib/Kwiki/Theme/Hatena.pm
+Makefile.PL
+t/00_compile.t
+t/98-pod.t
+t/99-pod-coverage.t
+

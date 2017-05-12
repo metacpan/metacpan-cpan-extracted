@@ -1,0 +1,434 @@
+=head1 NAME
+
+Konstrukt::Doc::FunctionPlugins - Using plugins to add dynamics to your web page
+
+=head1 DESCRIPTION
+
+I will only give a brief overview of some of the existing "low level" plugins.
+For more detailed information about all of the plugins and their configuration take
+a look at the manual pages of each plugin.
+
+These "low level" plugins perform rather basic tasks and will be used to add
+some logic to the presentation/templates.
+
+There are also L<"high level" plugins|Konstrukt::Doc::ApplicationPlugins>,
+which represent complex applications that can be easily and seamlessly
+integrated into your web site.
+
+If the existing plugins don't offer the funktionality you need, you usually
+would L<implement|Konstrukt::Doc::CreatingPlugins> your own application logic
+as a plugin.
+
+=head1 "LOW LEVEL" PLUGINS: FUNCTIONS
+
+=head2 captcha
+
+L<captcha|Konstrukt::Plugin::captcha>: Put captchas in your forms easily.
+You can then easily check the answer in your perl code.
+
+B<Usage:>
+
+	<!-- the easy way -->
+	<& captcha / &>
+
+or
+
+	<!-- defining your own settings that may differ from the defaults -->
+	<& captcha type="text" template="/templates/captcha/text.template" / &>
+
+B<Result:> (Something like this)
+
+	<script type="text/javascript">
+		var enctext = "%50%0A%3A%21%44%38%4C%0C%0D%0E%31%6C%13%2F%0D%12%18%00%3C%30%6E%2D%02%11%1B%06%26%73%11%38%15%12%09%5E%76%39%58%28%08%07%02%41%74%32%5D%2D%1F%11%51%41%2C%29%5D%6E%4C%14%0D%0F%21%34%0C%6E%5D%16%06%01%23%73%11%63%52%68";
+		var key = "lcTQ1Llb";
+		function xor_enc(text, key) {
+			var result = '';
+			for(i = 0; i < text.length; i++)
+				result += String.fromCharCode(key.charCodeAt(i % key.length) ^ text.charCodeAt(i));
+			return result;
+		}
+		document.write(xor_enc(unescape(enctext), key));
+	</script>
+	
+	<noscript>
+		<label>Antispam:</label>
+		<div>
+		<p>Please type the text '1tjbw' into this field:</p>
+		<input name="captcha_answer" />
+		</div>
+	</noscript>
+	
+	<input name="captcha_hash" type="hidden" value="3452c4fb13505c5ffa256f2352851ed2b9286af70c3f9ed65e3e888690e1ee69" />
+
+=head2 date
+
+L<date|Konstrukt::Plugin::date>: Displays the current date.
+Mainly a simple demonstration plugin.
+	
+B<Usage:>
+
+	<& date / &>
+
+B<Result:>
+
+	April 23, 2006 - 10:45:16
+
+=head2 diff
+
+L<diff|Konstrukt::Plugin::diff>: Print out an XHTML table with the difference
+between two texts.
+
+B<Usage:>
+
+ 	<& diff &>
+		<$ left $>
+		1
+		2
+		3
+		<$ / $>
+		<$ right $>
+		1
+		3
+		<$ / $>
+	<& / &>
+
+or
+
+	<!-- set another amount of "context" lines -->
+	<& diff context="2" &>
+		...
+	<& / &>
+
+or
+
+	<!-- define a header for the columns -->
+	<& diff left_header="text a" right_header="text b" &>
+		...
+	<& / &>
+	
+B<Result:>
+
+A table showing the difference between the two texts.
+
+=head2 env
+
+L<env|Konstrukt::Plugin::env>: Access to the environment variables.
+	
+B<Usage:>
+	
+	<!-- set value -->
+	<& env var="var_name" set="value" / &>
+
+	<!-- print out value -->
+	<& env var="var_name" / &>
+
+B<Result:>
+
+	<!-- set value -->
+	
+	<!-- print out value -->
+	value
+
+=head2 formvalidator
+
+L<formvalidator|Konstrukt::Plugin::formvalidator>: HTML form validator.
+You can then easily check the correctness of the input in your perl code.
+
+B<Usage:>
+
+	<!-- add form validation code to your page -->
+	<& formvalidator form="some_dialogue.form" / &>
+
+or
+
+	<!-- the same but explicitly define the JS files -->
+	<& formvalidator
+		form="/some/dialogue.form"
+	   script="/formvalidator/formvalidator.js"
+	   strings="/formvalidator/formvalidator_strings.js"
+	/ &>
+
+B<Result:>
+
+	<!-- add form validation code to your page -->
+	<script type="text/javascript" src="/formvalidator/formvalidator.js"></script>
+	<script type="text/javascript" src="/formvalidator/formvalidator_strings.js"></script>
+	<script type="text/javascript">
+		<!-- JS definitions of your form ... -->
+	</script>
+
+=head2 if
+
+L<if|Konstrukt::Plugin::if>: Conditional blocks.
+	
+B<Usage:>
+
+	<!-- will put out "elsif1" -->
+	<& if condition="0" &>
+		<$ then $>then<$ / $>
+		<$ elsif condition="1" $>elsif1<$ / $>
+		<$ elsif condition="1" $>elsif2<$ / $>
+		<$ else $>else<$ / $>
+	<& / &>
+
+	<!-- shortcut, when only using "then" and no elsif or else -->
+	<!-- will put out "The condition is true!" -->
+	<& if condition="2 > 1" &>
+		The condition is true!
+	<& / &>
+
+B<Result:>
+
+	<!-- will put out "elsif1" -->
+	elsif1
+	
+	<!-- shortcut, when only using "then" and no elsif or else -->
+	<!-- will put out "The condition is true!" -->
+		The condition is true!
+
+=head2 kill
+
+L<kill|Konstrukt::Plugin::kill>: Remove content from a website.
+	
+B<Usage:>
+
+	We will never <& kill &>agree that we always <& / &>do censoring!
+
+B<Result:>
+
+	We will never do censoring!
+
+=head2 mail::obfuscator
+
+L<perl|Konstrukt::Plugin::mail::obfuscator>: Hide email addresses from SPAM harvesters.
+	
+Usage:
+
+	<& mail::obfucator name="John Doe" mail="john@doe.com" / &>
+
+Result:
+
+	<!-- used to decrypt the email address -->
+	<script type="text/javascript">
+	<!--
+	function xor_enc(text, key) {
+		var result = '';
+		for(i = 0; i < text.length; i++)
+			result += String.fromCharCode(key.charCodeAt(i % key.length) ^ text.charCodeAt(i));
+		return result;
+	}
+	// -->
+	</script>
+	
+	<script type="text/javascript">
+	<!--
+	document.write(xor_enc(unescape('encrypted link'), 'key to decrypt'));
+	-->
+	</script>
+	<noscript>
+	John Doe: john<img src="/gfx/layout/s.gif" alt="&gt; add @-character here &lt;" />doe.com
+	</noscript>
+
+=head2 param
+
+L<param|Konstrukt::Plugin::param>: Displays the value of a specified HTTP parameter.
+	
+B<Usage:>
+
+	<& param key="param_name" &>default value if not defined<& / &>
+
+B<Result:> (when invoked like: /page.html?param_name=foo)
+
+	foo
+
+=head2 perl
+
+L<perl|Konstrukt::Plugin::perl>: Embedding perl code in your pages/templates.
+	
+B<Usage:>
+
+	<& perl &>print "foo"<& / &>
+
+B<Result:>
+
+	foo
+
+=head2 perlvar
+
+L<perlvar|Konstrukt::Plugin::perlvar>: Access to Perl variables
+	
+B<Usage:>
+
+	<!-- set value -->
+	<& perlvar var="$Foo::Bar" set="baz"/ &>
+	
+	<!-- print out value -->
+	<& perlvar var="$Foo::Bar" / &>
+	<& perlvar var="undef" &>this default will be used<& / &>
+
+B<Result:>
+
+	<!-- set value -->
+	
+	<!-- print out value -->
+	baz
+	this default will be used
+
+=head2 sortlines
+
+L<sortlines|Konstrukt::Plugin::sortlines>: Sort all lines of contained plaintext
+	
+B<Usage:>
+
+	<& sortlines &>
+		some
+		<!-- comments -->
+		unsorted
+		lines
+		<!-- will be put -->
+		here
+		<!-- on top of the list -->
+	<& / &>
+
+B<Result:>
+
+	<!-- comments -->
+	<!-- will be put -->
+	<!-- on top of the list -->
+	here
+	lines
+	some
+	unsorted
+
+=head2 sql
+
+L<sql|Konstrukt::Plugin::sql>: Perform SQL queries. Usually combined with
+templates to display the results.
+	
+B<Usage:>
+
+	<!-- put query results into a template using the dbi default settings defined in your konstrukt.settings
+	     see the Konstrukt::DBI documentation for the configuration of the default settings -->
+	<& sql query="SELECT * FROM some_table" template="list_layout.template" / &>
+	<!-- you must have a list <+@ sql @+> in your template file to which the results are passed.
+	     the fields inside the list should be named like the columns in your query. -->
+
+or
+
+	<!-- but you may also define the listname yourself -->
+	<& sql query="SELECT * FROM some_table" template="list_layout.template" list="some_list_name" / &>
+	<!-- then you should have a list <+@ some_list_name @+> in your template file. -->
+
+or
+
+	<!-- using custom connection settings -->
+	<& sql query="..." template="..." source="dbi_dsn" user="username" pass="password" / &>
+
+or
+
+	<!-- some query that won't return result data -->
+	<& sql query="DELETE FROM some_table WHERE id=23" / &>
+
+B<Result:>
+
+	depends ;)
+
+=head2 svar
+
+L<svar|Konstrukt::Plugin::svar>: Access to session values.
+
+B<Usage:>
+
+	<!-- set value -->
+	<& svar var="var_name" set="value "/ &>
+	
+	<!-- print out value -->
+	<& svar var="var_name" / &>
+
+B<Result:>
+
+	<!-- set value -->
+	
+	<!-- print out value -->
+	value
+
+=head2 tags
+
+L<tags|Konstrukt::Plugin::tags>: Tagging plugin.
+
+Using the perl interface you can set the tags for some objects.
+
+B<Usage:>
+
+	<!-- display all tags as a cloud -->
+	<& tags template="/tags/cloud.template" limit="30" order="alpha|count" / &>
+
+or
+
+	<!-- display all tags for a specified plugin.
+	     limit, order and template are also applicable here -->
+	<& tags plugin="blog|image|..." / &>
+
+or
+
+	<!-- list tags for a specified entry only.
+	     show, limit, order are ignored. the template attribute is applicable -->
+	<& tags plugin="blog" entry="42" / &>
+
+B<Result:>
+
+	Tags: <a href="?action=filter;tags=bar">bar</a>,
+	<a href="?action=filter;tags=foo">foo</a>, ...
+
+=head2 template
+
+L<template|Konstrukt::Plugin::template>: Konstrukt templating engine.
+
+For a description see L<above|/CREATE STATIC WEB PAGES USING TEMPLATES> or at the
+L<manual page of this plugin|Konstrukt::Plugin::template>.
+
+=head2 upcase
+
+L<upcase|Konstrukt::Plugin::upcase>: Convert all text into upper case. Also
+mainly a demonstration plugin with no particular use...
+	
+B<Usage:>
+
+	<& upcase &>upper case<& / &>
+
+B<Result:>
+
+	UPPER CASE
+	
+=head2 uriencode
+
+L<uriencode|Konstrukt::Plugin::uriencode>: URI-encode the text.
+	
+B<Usage:>
+
+	<& uriencode &>Some Text<& / &>
+	<& uriencode encode="all" &>Some Text<& / &>
+
+B<Result:>
+
+	Some%20Text
+	%53%6F%6D%65%20%54%65%78%74
+
+=head1 AUTHOR 
+
+Copyright 2006 Thomas Wittek (mail at gedankenkonstrukt dot de). All rights reserved. 
+
+This document is free software.
+It is distributed under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+Next: L<Konstrukt::Doc::ApplicationPlugins>
+
+Previous: L<Konstrukt::Doc::Templating>
+
+Parent: L<Konstrukt::Doc>
+
+See also: L<Konstrukt::Doc::PluginList>
+
+=cut

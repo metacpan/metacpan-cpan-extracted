@@ -1,0 +1,88 @@
+#!/usr/bin/perl
+
+package Main;
+# PODNAME: koha-index-daemon
+# ABSTRACT: Insert/update/delete records into Koha Zebra server
+$Main::VERSION = '0.049';
+use 5.010;
+use utf8;
+use warnings;
+use strict;
+use Koha::Contrib::Tamil::IndexerDaemon;
+use Pod::Usage;
+
+Koha::Contrib::Tamil::IndexerDaemon->new_with_options();
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+koha-index-daemon - Insert/update/delete records into Koha Zebra server
+
+=head1 VERSION
+
+version 0.049
+
+=head1 SYNOPSIS
+
+ koha-index-daemon
+
+ koha-index-daemon --timeout 60 --conf /home/mylib/etc/koha-conf.xml
+
+ koha-index-daemon --timeout 60 --conf /home/mylib/etc/koha-conf.xml
+                   --directory /home/mylib/tmp
+
+=head1 DESCRIPTION
+
+Examine periodicaly zebraqueue table from a Koha instance and index
+bilbio/authority records. 
+
+Some info on daemon activity are logged in syslog.
+
+=head1 OPTIONS
+
+=over
+
+=item --timeout
+
+Specify the daemon timeout in seconds.
+
+=item --conf
+
+Specify Koha configuration file. Without this parameter the file specified by
+KOHA_CONF environment variable is used.
+
+=item --directory
+
+Directory where to write record exported from Koha DB before sending them to
+Zebra. Subdirectories are created.
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+L<koha-index>
+
+=back
+
+=head1 AUTHOR
+
+Frédéric Demians <f.demians@tamil.fr>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2016 by Fréderic Démians.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

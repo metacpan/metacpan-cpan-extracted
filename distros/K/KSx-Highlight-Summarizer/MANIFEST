@@ -1,0 +1,7 @@
+Changes
+lib/KSx/Highlight/Summarizer.pm
+Makefile.PL
+MANIFEST
+README
+t/test.t
+META.yml                                 Module meta-data (added by MakeMaker)

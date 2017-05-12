@@ -1,0 +1,17 @@
+NAME
+    Kwiki::Email - Kwiki Email Plugin
+
+SYNOPSIS
+DESCRIPTION
+    This module adds a email address preference for the current user.
+
+AUTHOR
+    Alexander Goller <decay@cpan.org>
+
+COPYRIGHT
+    Copyright (c) 2004. Alexander Goller. All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See http://www.perl.com/perl/misc/Artistic.html

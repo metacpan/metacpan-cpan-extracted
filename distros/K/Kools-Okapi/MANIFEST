@@ -1,0 +1,12 @@
+Changes
+COPYING
+MANIFEST
+Makefile.PL
+META.yml
+Okapi.xs
+README
+lib/Kools/Okapi.pm
+t/001Kools-Okapi.t
+t/002tradekast.t
+t/003kis.t
+typemap

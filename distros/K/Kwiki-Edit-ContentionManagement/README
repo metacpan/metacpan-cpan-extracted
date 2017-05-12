@@ -1,0 +1,21 @@
+Kwiki-Edit-ContentionManagement
+
+This module is designed to manage contention instead of simply displaying a
+message that say "Sorry, your screwed".
+
+Currently it simply allows you to say "Save anyway" if the contention
+message shows but we could at some point in the future let it guide the user
+through merging the documents (3-way merge).
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    kwiki -install Kwiki::Edit::ContentionMangement
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 CorData
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

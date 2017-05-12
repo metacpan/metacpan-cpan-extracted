@@ -1,0 +1,12 @@
+name: Kwiki-AnchorLink
+version: 0.03
+abstract: Provide anchor link phrse to Kwiki
+author: Kang-min Liu (gugod@gugod.org)
+license: perl
+distribution_type: module
+requires:
+  Kwiki: 0.38
+no_index:
+  directory:
+    - inc
+generated_by: Module::Install version 0.36

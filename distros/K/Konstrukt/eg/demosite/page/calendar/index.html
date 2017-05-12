@@ -1,0 +1,12 @@
+<& template src="/templates/layout.template" title="calendar" &>
+	<$ content $>
+		<p style="text-align: right">
+			<a href="?action=showday">Today</a>,
+			<a href="?action=showweek">Week view</a>,
+			<a href="?action=showmonth">Month view</a> -
+			<a href="?action=showall">All appointements</a> -
+			<a href="/calendar/rss2/info/"><img src="/img/blog/rss2.gif" title="RSS 2.0" style="vertical-align: middle"/></a>
+		</p>
+		<& calendar / &>
+	<$ / $>
+<& / &>

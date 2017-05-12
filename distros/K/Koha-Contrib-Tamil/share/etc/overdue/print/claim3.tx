@@ -1,0 +1,10 @@
+: include print::header
+
+<p>Ne tenez pas compte de cet avis si vous avez rendu vos prêts. Malgré
+deux rappels et deux mois de retard, vous êtes toujours en possession
+des documents ci-dessous. Veuillez les rapporter dans les plus brefs
+délais.</p>
+
+: include print::items
+
+: include print::footer

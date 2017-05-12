@@ -1,0 +1,6 @@
+Revision history for Perl extension Kolab::LDAP::Backend::dirservd.
+
+0.01  Tue Apr  6 10:24:36 2004
+	- original version; created by h2xs 1.23 with options
+		-XA -n Kolab::LDAP::Backend::dirservd
+

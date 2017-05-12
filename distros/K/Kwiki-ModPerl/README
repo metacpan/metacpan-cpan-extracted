@@ -1,0 +1,38 @@
+NAME
+    Kwiki::ModPerl - enable Kwiki to work under mod_perl
+
+DESCRIPTION
+    This module allows you to use Kwiki as a mod_perl content handler.
+
+FEATURES, BUGS and NOTES
+    * Multiple Kwikis are supported.
+        As long as each Kwiki has its own KwikiBaseDir, you're golden.
+
+    * You might need a redirect for the Kwiki base directory.
+        For example, if your Kwiki is at the location "/kwiki/" and you
+        browse to "/kwiki" (without the trailing slash), you'll definitely
+        experience some weirdness. I highly suggest adding a redirect:
+
+            RedirectMatch ^/kwiki$ http://example.com/kwiki/
+
+    * Yes, viewing index.cgi shows the source of the CGI script.
+        Don't worry, it's not executing it. It probably similar to the
+        index.cgi included with Kwiki, anyway.
+
+    * You might need to restart Apache.
+        Otherwise module additions and removal might not be working.
+
+AUTHORS
+    Ian Langworth <langworth.com>
+
+    Now Maintained by Kang-min Liu <gugod@gugod.org>
+
+SEE ALSO
+    Kwiki
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2004 by Ian Langworth Copyright (C) 2005 by Kang-min Liu
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

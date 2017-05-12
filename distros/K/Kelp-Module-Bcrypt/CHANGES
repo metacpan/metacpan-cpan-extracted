@@ -1,0 +1,5 @@
+2014-09-21: Version 0.2
+    Move to bcrypt_hash. Remove the settings.
+
+2013-08-09: Version 0.1
+    First CPAN release

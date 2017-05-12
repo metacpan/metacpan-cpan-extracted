@@ -1,0 +1,27 @@
+=head1 NAME
+
+Konstrukt::Doc::CoreDevelopment - Hacking on the Konstrukt core
+
+=head1 DESCRIPTION
+
+(Nothing yet)
+
+Just take a look at each core module. They are documented well, so it shouldn't
+be too hard to get into them.
+
+=head1 AUTHOR 
+
+Copyright 2006 Thomas Wittek (mail at gedankenkonstrukt dot de). All rights reserved. 
+
+This document is free software.
+It is distributed under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+Next: L<Konstrukt::Doc::PluginList>
+
+Previous: L<Konstrukt::Doc::CreatingPlugins>
+
+Parent: L<Konstrukt::Doc>
+
+=cut

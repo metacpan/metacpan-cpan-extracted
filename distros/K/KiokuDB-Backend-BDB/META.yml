@@ -1,0 +1,32 @@
+--- #YAML:1.0
+name:               KiokuDB-Backend-BDB
+version:            0.15
+abstract:           ~
+author:  []
+license:            unknown
+distribution_type:  module
+configure_requires:
+    BerkeleyDB:           0.36
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    BerkeleyDB:           0.36
+    BerkeleyDB::Manager:  0.11
+    Data::Stream::Bulk:   0
+    KiokuDB:              0.45
+    Moose:                0
+    MooseX::Types::Path::Class:  0
+    Search::GIN:          0
+    Storable:             0
+    Test::More:           0
+    Test::TempDir:        0
+    Test::use::ok:        0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

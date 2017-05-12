@@ -1,0 +1,34 @@
+---
+abstract: 'Simples dependency-injection (DI) container, distant relation of IoC.'
+author:
+  - 'Meettya <meettya@cpan.org>'
+build_requires:
+  DBI: 0
+  Moo: 0
+  Term::ANSIColor: 0
+  Test::Class: 0
+  Test::More: 0
+  Test::Warn: 0
+  lib::abs: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Kaiten-Container
+provides:
+  Kaiten::Container:
+    file: lib/Kaiten/Container.pm
+    version: 0.37
+requires:
+  Carp: 0
+  Moo: 0
+  Scalar::Util: 0
+  perl: 5.01
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/Meettya/Kaiten-Container/
+version: 0.37

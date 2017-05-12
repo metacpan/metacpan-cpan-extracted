@@ -1,0 +1,2 @@
+db_class: Kwiki::DB::ClassDBI
+

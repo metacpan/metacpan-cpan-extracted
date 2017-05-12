@@ -1,0 +1,33 @@
+Kwiki-Users-Cookie
+
+VERSION 0.01
+
+automatically set Kwiki user name from a cookie based lookup
+       This module will set the user's name from a cookie's value.  Optionally, that value could be used to lookup
+       session info, etc, to set the user's name.
+
+       You might also want to use Kwiki::UserName::Cookie.
+
+INSTALLATION
+    
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+    cd /path/to/kwiki
+    echo "users_class: Kwiki::Users::Cookie" >> config.yaml
+    echo "users_cookie_name: user_cookie_name"    >> config.yaml
+
+Optionally, to display the user name install Kwiki::UserName::Cookie.
+
+Based on Kwiki::Users::Remote by Ian Langworth <langworth.com>
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 John cappiello
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

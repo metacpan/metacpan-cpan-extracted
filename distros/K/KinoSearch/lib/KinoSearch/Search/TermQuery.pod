@@ -1,0 +1,79 @@
+
+# Auto-generated file -- DO NOT EDIT!!!!!
+
+=head1 NAME
+
+KinoSearch::Search::TermQuery - Query which matches individual terms.
+
+=head1 DEPRECATED
+
+The KinoSearch code base has been assimilated by the Apache L<Lucy> project.
+The "KinoSearch" namespace has been deprecated, but development continues
+under our new name at our new home: L<http://lucy.apache.org/>
+
+=head1 SYNOPSIS
+
+    my $term_query = KinoSearch::Search::TermQuery->new(
+        field => 'content',
+        term  => 'foo', 
+    );
+    my $hits = $searcher->hits( query => $term_query );
+
+
+
+=head1 DESCRIPTION
+
+TermQuery is a subclass of L<KinoSearch::Search::Query> for matching
+individual terms in a specific field.
+
+=head1 CONSTRUCTORS
+
+=head2 new( I<[labeled params]> )
+
+    my $term_query = KinoSearch::Search::TermQuery->new(
+        field => 'content',    # required
+        term  => 'foo',        # required
+    );
+
+=over
+
+=item *
+
+B<field> - Field name.
+
+=item *
+
+B<term> - Term text.
+
+=back
+
+
+
+
+
+=head1 METHODS
+
+=head2 get_field()
+
+Accessor for object's C<< field >> member.
+
+=head2 get_term()
+
+Accessor for object's C<< term >> member.
+
+
+
+=head1 INHERITANCE
+
+KinoSearch::Search::TermQuery isa L<KinoSearch::Search::Query> isa L<KinoSearch::Object::Obj>.
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005-2011 Marvin Humphrey
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
+

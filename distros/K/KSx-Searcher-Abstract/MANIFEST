@@ -1,0 +1,25 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/KSx/Searcher/Abstract.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+t/build_search.t
+t/search.t
+inc/Module/Install/Can.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+inc/Module/Install/AutoInstall.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install.pm
+inc/Module/AutoInstall.pm
+t/lib/My/Manager.pm
+t/lib/My/Schema.pm

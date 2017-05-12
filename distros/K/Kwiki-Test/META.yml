@@ -1,0 +1,12 @@
+name: Kwiki-Test
+version: 0.03
+abstract: An alpha sort of test harness for Kwiki Plugins
+author: Chris Dent <cdent@burningchrome.com>
+license: perl
+distribution_type: module
+requires:
+  Kwiki: 0.37
+no_index:
+  directory:
+    - inc
+generated_by: Module::Install version 0.36

@@ -1,0 +1,15 @@
+name: Kwiki-Simple-Server-HTTP
+version: 0.02
+abstract: Start a standalone http kwiki server from command line
+author: Kang-min Liu <gugod@gugod.org>
+license: perl
+distribution_type: module
+build_requires:
+  Test::More: 0
+requires:
+  Kwiki: 0.37
+  HTTP::Server::Simple::Kwiki: 0
+no_index:
+  directory:
+    - inc
+generated_by: Module::Install version 0.36

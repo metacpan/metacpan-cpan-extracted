@@ -1,0 +1,189 @@
+=== TODO ===
+-	inlineplugins:
+	-	definition:
+		-	auf template umstellen (performance?)
+		-	verschachtelte dl (-> diskussion)
+	-	list auf template umstellen (preformance?)
+	-	link:
+		#anchors: [[#:fobar]] / [[#fobar]]
+		splitting in woerter ist _sehr_ ineffizient!
+	
+-	blockplugins:
+	-	list:
+		* Kombination von <ul> und
+		## <ol> zulassen
+	+	table: http://de.wikipedia.org/wiki/Wikipedia:Tabellen
+	+	toc
+	
+-	"backends":
+	+	recent changes
+	+	pagelist
+	+	suche
+	-	article:
+		locking?
+		anonyme bearbeitung
+	-	image: exif ?
+	-	404 sieht komisch aus
+	-	ordner? tags/kategorien?
+	=>	filebackends
+
+-	korrekt?
+	-> vermeidung von leerzeilen am anfang/ende von absaetzen/blocken
+	(auch bei nowiki-bereichen an den blockgrenzen?)
+-	jedes plugin (mit sonderfaellen) testen.
+	z.b. nowiki-bereiche innerhalb des markups
+
+=== INFO / LINKS ===
+-	Perl Modules
+		TikiText
+			http://search.cpan.org/~tima/Text-Tiki-0.73/Tiki.pm
+		CGI::Kwiki
+			http://search.cpan.org/~ingy/CGI-Kwiki-0.18/lib/CGI/Kwiki.pm
+		Text::KwikiFormatish
+			http://search.cpan.org/~ian/Text-KwikiFormatish-1.02/lib/Text/KwikiFormatish.pm
+		Text::WikiFormat
+			http://search.cpan.org/~chromatic/Text-WikiFormat-0.72/lib/Text/WikiFormat.pm
+
+-	Formatting
+		Genuine Wiki
+			http://c2.com/cgi/wiki?TextFormattingRules
+			http://usemod.com/cgi-bin/mb.pl?WikiSyntax
+			http://www.usemod.com/cgi-bin/mb.pl?WikiMarkupStandard
+		KWiki
+			http://www.kwiki.org/?KwikiFormattingRules
+
+=== PARSING ===
+-	syntaxklassen
+	-	singles: --, ->, -->, ...
+	-	areas: _foo_ -> <ul>foo</ul>
+		-> erkennen von start und ende und ersetzung durch tags(/templates)
+	-	blocks/komplexe areas: table, listen, nummerierungen, pre, quote, definition
+-	vorgehensweise
+	->	text wird nach und nach in knoten gesplitted:
+		{ wiki_final => [01], type => text, content => 'foo' }
+	1)	nowiki-bereiche erkennen und ignorieren { final => 1, content = 'hier wird nix mehr gemacht' }
+	2) 	block: text in absaetze splitten und weiter behandeln { final => 0, type => 'block', content = "* das hier ist\n** ne liste" }
+		jeden absatz durch eine liste von filtern pipen, die ihn veraendern (oder nicht)
+		erkennung von: code, quote, definition, (un)ordered list, headline, hr, tables, normaler textabsatz
+		rueckgabe mehrere bloecke. z.b.:
+		[{ f => 1, c => '<ul><li>' }, { f => 0, type => 'text', c => 'listenitem' }, { f => 1, c => '</li></ul>' }]
+		ODER
+		undef, falls nichts unternommen wurde
+		-> abbruch falls ein filter einen block erkannt und bearbeitet hat
+	3)	alle inhalte der absaetze wieder in eine liste packen
+	4)	inline: alle nicht-finalen bloecke werden nun nach alle zusammen an jedes plugin durchgereicht
+		erkannt werden:
+		-	areas:   [[links|Titel]], %code%, /em/, _ul_, *strong*, +ins+, -del-, ^sup^, ~sub~, FBB(foo bar baz)
+		-	singles: LiNks, Image:foo.jpg, -, --, (C), (R), ...
+		->	Reihenfolge
+			1)	bilder: foo.gif, http://foo.gif, Image:foo.bar, [[Image:foobar.gif|140|100|alt text]]
+			2)	links:  CamelCase, [[nocamel]], [[foo|bar]], http://foo/bar, [[http://foo/|bar]]
+			3)	formatierung/singles: %code%, /em/, _ul_, *strong*, +ins+, -del-, ^sup^, ~sub~, FBB(foo bar baz), -, --, (C), (R), ...
+	5)	aufraeumen:
+		-	alle text-nodes als final taggen
+		-	cachen des baumes, falls eine wiki-seite (und nich nur loser text) bearbeitet wurde
+-	vorgehen bei <& iblock &>-befehlen im content:
+	-> nicht-text-nodes werden wie nowiki-nodes einfach uebersprungen (und spaeter bearbeitet)
+-	syntax modular erweiterbar
+	-	ein modul kann fuer mehrere formatierungen zustaendig sein
+	-	in einer config-direktive wird bestimmt, welche module in welcher reihenfolge ausgefuehrt werden (leerzeichenseparierte plugins):
+		wiki/plugins_block code quote definition list headline ...
+		wiki/plugins_inline image link basic acronym dash replace
+	
+
+=== EINBINDUNG IN ANDERE PLUGINS ===
+-	wiki markup wird gerendert und durch das plugin gecacht (wie das wiki-plugin
+	es auch macht, nur bekommt es den inhalt vom plugin und das plugin verwaltet
+	den inhalt und den cache)
+
+=== RECENT CHANGES ===
+-	als rss
+-	als html (bzw. iblock-template-daten)
+
+=== SYNTAX ===
+
+Paragraphs:
+-	Separated by blank lines
+
+HR:
+-	--* (mindestens 1 - allein in der ersten zeile eines absatzes. restliche zeilen werden neue absaetze)
+
+Unordered Lists:
+-	* a
+	** a1
+	** a2
+	* b
+	...
+
+Numbered/Ordered Lists (numbered == ordered?):
+-	# 1
+	## 1.1
+	# 2
+	...
+
+Code:
+-	Indented Text (Space/Tab)
+-	Inline code: %code%
+
+Quotes/Definitions:
+-	: Indented (Quote)
+-	; foo
+	: A sample name for absolutely anything, especially programs and files (especially scratch files).
+	: Term of disgust.
+
+Emphasis:
+-	/emph/ -> konflikt mit http:// ?
+
+Strong:
+-	*strong*
+
+Underline:
+-	_underline_
+
+Strikethrough/Deleted (<del>):
+-	-deleted-
+
+Inserted (<ins>):
+-	+inserted+
+
+Links:
+-	CamelCase
+-	http:// ftp:// (*://*?) mailto: news:
+	RFC 1630: "Universal Resource Identifiers in WWW"
+-	[[http://www.gnu.org/|Test]] / [[nocamelcase]]
+-	Bilder als Link? [[link|Image:link.gif Titel mit Bild]]
+-	!NoLink ?
+-	Anchors: [[#foo]], [[Anchor:foo]]
+
+Images:
+-	Automatic display of .gif .jpg .jpeg .png filenames
+-	Image:someimage / [[Image:image.gif|140|100|alt text]]?
+
+Headlines:
+-	=h1
+-	== h2 ==
+-	...
++	strip trailing ='s
++	automatic enumeration of headlines?
+
+Tables:
+-	|| col || col || col ||
+-	||||   multicolumn   ||
+
+Sub-/Superscripts:
+-	^super^
+-	~sub~
+
+Character Replacements:
+-	- -> dash
+	-- -> longdash
+-	" and ' -> more beautiful quotes
+-	(R), (TM), (C), 1/4, 1/2, 3/4
+
+Acronyms:
+-	ACRONYM(The description of ACRONYM)
+
+HTML/Not Wiki-Parsed:
+-	<nowiki></nowiki>
+	KEIN html (<>) ausserhalb nowiki zulassen! 
+-	HTML in <nowiki> auf bestimmte tags beschraenken

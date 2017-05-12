@@ -1,0 +1,34 @@
+NAME
+    Kwiki::Toolbar::List - Creates an unordered list for the toolbar items
+    in a Kwiki site.
+
+SYNOPSIS
+         $ cpan Kwiki::Toolbar::List
+         $ cd /path/to/kwiki
+         $ echo "Kwiki::Toolbar::List" >> plugins
+         $ kwiki -update
+
+DESCRIPTION
+    Kwiki::Toolbar::List displays the toolbar items as a pipe delimited
+    string which looks great but is difficult to apply a style sheet to.
+    This module displays the toolbar as an unordered list that can be styled
+    easily. It also provides more control from a template, so if you don't
+    like an unordered list, you can simply change the HTML in the template
+    instead of modifying a Perl module.
+
+    This module should be used in place of Kwiki::Toolbar.
+
+    Another module, Kwiki::Theme::TabNav provides an example of the styling
+    that can be applied to the toolbar.
+
+AUTHOR
+    Dave Mabe <dmabe@runningland.com>
+
+COPYRIGHT
+    Copyright (c) 2004. Dave Mabe. All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See http://www.perl.com/perl/misc/Artistic.html
+

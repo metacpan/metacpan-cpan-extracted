@@ -1,0 +1,259 @@
+=head1 NAME
+
+Konstrukt::Doc::Tutorial::Plugin::Note::Actions - 1) Create a simple note taking plugin performing different actions
+
+=head1 DESCRIPTION
+
+This tutorial will teach you how to create a L<simple plugin|Konstrukt::SimplePlugin>,
+which uses the CGI-action -> plugin-method mapping to perform different tasks
+according to an C<action> CGI parameter.
+
+This is especially useful, when writing a plugin, where the user can perform
+several actions like creating content, viewing it, deleting it and so on.
+
+Note: For the setup of the usage of custom plugins see L<Konstrukt::Doc::Tutorial::Plugin::Randomline/SETUP>.
+
+=head1 CREATE THE PLUGIN
+
+We will create a plugin, that by default shows a note, that is stored in a text
+file on the server (if exists).
+It also shows a link to actions, which allow the user to edit and delete the
+note.
+
+We can identify these actions:
+
+=over
+
+=item * default: show the note, if exists
+
+=item * edit: show a form to edit the note or save the note, if a new one is entered
+
+=item * delete: show a confirmation to delete to note or delete the note if the deletion has been confirmed
+
+=back
+
+First, create a file (e.g. C<note.html>) with this content:
+
+	<& note / &>
+	<a href="?">show</a>
+
+Create a file C<note.pm> in your custom plugin directory with this
+skeleton:
+
+	package Konstrukt::Plugin::note;
+	
+	use strict;
+	use warnings;
+	
+	use base 'Konstrukt::SimplePlugin';
+	
+	#show the note if exists
+	sub default : Action {
+		my ($self, $tag, $content, $params) = @_;
+		print 'note action';
+	}
+	
+	#show a form to edit the note or save the note, if a new one is entered
+	sub edit : Action {
+		my ($self, $tag, $content, $params) = @_;
+		print 'edit action';
+	}
+	
+	#show a confirmation to delete to note
+	#or delete the note if the deletion has been confirmed
+	sub delete : Action {
+		my ($self, $tag, $content, $params) = @_;
+		print 'delete action';
+	}
+	
+	1;
+
+You can now point your web browser to the web page (e.g. C<note.html>) and
+you will see the text:
+
+	note action
+
+which is the output of the default action.
+
+You can manually specify the actions, that should be executed by supplying the
+CGI parameter C<note_action>.
+For example, you could call the website with the URL C<note.html?note_action=edit>
+and you'll see this text:
+
+	edit action
+
+If you enter an action, that does not exist, an error will be produced.
+If you enter no action, the default action will be executed.
+Note that you B<must> add the C<: Action> attribute to your methods to let them
+be accessible from the outside.
+
+=head1 ADD THE LOGIC
+
+We want to read a file from disk and display the contents on the web page.
+If no note exists, display a form to create one.
+So we replace the C<print> statement of the C<default> action with this code:
+
+	my $text = $Konstrukt::File->read("/note.txt");
+	if (defined $text) {
+		print $text;
+		print '
+			<br />
+			<a href="?note_action=edit">edit</a><br />
+			<a href="?note_action=delete">delete</a>';
+	} else {
+		$self->edit($tag, $content, $params);
+	}
+
+Now we add the functionality to edit the note.
+If no text is specified and a note already exists, a form with the existing text
+will be displayed.
+Otherwise an empty form will be displayed.
+If a new text is specified, we overwrite the existing node.
+
+We replace the C<print> statement of the C<edit> action with this code:
+
+	if (exists $params->{text}) {
+		#overwrite note
+		$Konstrukt::File->write("/note.txt", $params->{text});
+		$self->default($tag, $content, $params);
+	} else {
+		#display a form to edit the note
+		my $text = $Konstrukt::File->read("/note.txt") || '(no note yet)';
+		print "
+			<form action=\"\" method=\"post\">
+				<input type=\"hidden\" name=\"note_action\" value=\"edit\" />
+				<textarea name=\"text\">$text</textarea>
+				<input type=\"submit\" value=\"Save\" />
+			</form>";
+	}
+
+Now we only need to handle the deletion of the note.
+If the CGI parameter C<delete> is true, the file will be deleted.
+Otherwise a confirmation to delete the file will be displayed.
+
+We replace the C<print> statement of the C<delete> action with this code:
+
+	if (exists $params->{delete} and $params->{delete}) {
+		#delete note
+		unlink $Konstrukt::File->absolute_path("/note.txt");
+		print "Note deleted!\n";
+		$self->default($tag, $content, $params);
+	} else {
+		#display a confirmation form
+		print "
+			<form action=\"\" method=\"post\">
+				<input type=\"hidden\" name=\"note_action\" value=\"delete\" />
+				<input type=\"checkbox\" id=\"delete\" name=\"delete\" value=\"1\" />
+				<label for=\"delete\">Really delete the note?</label>
+				<input type=\"submit\" value=\"Delete\" />
+			</form>";
+	}
+
+That's it! Restart/reload your Apache, and try it out.
+
+=head1 WHAT'S NEXT?
+
+That's a minimal example. Usually you should not print out HTML from your
+plugins - instead you should use L<templates|Konstrukt::Plugin::template>,
+which contain the HTML.
+
+Also the hardcoded filename to the file containing the note is not very flexible.
+You might use a filename that is specified in a tag attribute:
+
+	<& note file="/foo.txt" / &>
+
+This can then be accessed though the C<$tag> reference:
+
+	my $filename = $tag->{tag}->{attributes}->{file};
+
+Additionally you could just L<store the note in a database|Konstrukt::Doc::Tutorial::Plugin::Note::DBI>.
+
+Templating and database usage are topics of the L<next tutorials|/SEE ALSO>.
+
+=head1 APPENDIX: THE COMPLETE PLUGIN
+
+	package Konstrukt::Plugin::note;
+	
+	use strict;
+	use warnings;
+	
+	use base 'Konstrukt::SimplePlugin';
+	
+	#show the note, if exists
+	sub default : Action {
+		my ($self, $tag, $content, $params) = @_;
+		
+		my $text = $Konstrukt::File->read("/note.txt");
+		if (defined $text) {
+			print $text;
+			print '
+				<br />
+				<a href="?note_action=edit">edit</a><br />
+				<a href="?note_action=delete">delete</a>';
+		} else {
+			$self->edit($tag, $content, $params);
+		}
+	}
+	
+	#show a form to edit the note or save the note, if a new one is entered
+	sub edit : Action {
+		my ($self, $tag, $content, $params) = @_;
+		
+		if (exists $params->{text}) {
+			#overwrite note
+			$Konstrukt::File->write("/note.txt", $params->{text});
+			$self->default($tag, $content, $params);
+		} else {
+			#display a form to edit the note
+			my $text = $Konstrukt::File->read("/note.txt") || '(no note yet)';
+			print "
+				<form action=\"\" method=\"post\">
+					<input type=\"hidden\" name=\"note_action\" value=\"edit\" />
+					<textarea name=\"text\">$text</textarea>
+					<input type=\"submit\" value=\"Save\" />
+				</form>";
+		}
+	}
+	
+	#show a confirmation to delete to note
+	#or delete the note if the deletion has been confirmed
+	sub delete : Action {
+		my ($self, $tag, $content, $params) = @_;
+		
+		if (exists $params->{delete} and $params->{delete}) {
+			#delete note
+			unlink $Konstrukt::File->absolute_path("/note.txt");
+			print "Note deleted!\n";
+			$self->default($tag, $content, $params);
+		} else {
+			#display a confirmation form
+			print "
+				<form action=\"\" method=\"post\">
+					<input type=\"hidden\" name=\"note_action\" value=\"delete\" />
+					<input type=\"checkbox\" id=\"delete\" name=\"delete\" value=\"1\" />
+					<label for=\"delete\">Really delete the note?</label>
+					<input type=\"submit\" value=\"Delete\" />
+				</form>";
+		}
+	}
+	
+	1;
+
+=head1 AUTHOR
+
+Copyright 2006 Thomas Wittek (mail at gedankenkonstrukt dot de). All rights reserved. 
+
+This document is free software.
+It is distributed under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+Next: L<Konstrukt::Doc::Tutorial::Plugin::Note::Template>
+
+Previous: L<Konstrukt::Doc::Tutorial::Plugin::Randomline>
+
+Parent: L<Konstrukt::Doc>
+
+See also: L<Konstrukt::SimplePlugin>, L<Konstrukt::Doc::CreatingPlugins>, L<Konstrukt::File>
+
+=cut

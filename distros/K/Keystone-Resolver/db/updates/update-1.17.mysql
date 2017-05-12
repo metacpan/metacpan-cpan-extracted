@@ -1,0 +1,3 @@
+# $Id: update-1.17.mysql,v 1.1 2008-02-07 13:34:18 mike Exp $
+
+alter table service_type add column plugin text after name;

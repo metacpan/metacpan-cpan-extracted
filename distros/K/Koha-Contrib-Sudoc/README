@@ -1,0 +1,21 @@
+NAME
+    Koha::Contrib::Sudoc - Chargeur Koha par Tamil
+
+VERSION
+    version 2.23
+
+DESCRIPTION
+    Koha::Contrib::Sudoc est le Chargeur Sudoc pour Koha développé par
+    Tamil. Le fonctionnement de cet outil est décrit ici :
+    <http://www.tamil.fr/sudoc/sudoc.html>.
+
+AUTHOR
+    Frédéric Demians <f.demians@tamil.fr>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2016 by Fréderic Demians.
+
+    This is free software, licensed under:
+
+      The GNU General Public License, Version 3, June 2007
+

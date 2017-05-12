@@ -1,0 +1,15 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Kwiki-Edit-RequireUserName
+version:      0.02
+version_from: lib/Kwiki/Edit/RequireUserName.pm
+installdirs:  site
+requires:
+    Kwiki:                         0.37
+    Kwiki::Edit:                   0
+    Kwiki::UserName:               0.13
+    Kwiki::UserPreferences:        0
+    Test::More:                    0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

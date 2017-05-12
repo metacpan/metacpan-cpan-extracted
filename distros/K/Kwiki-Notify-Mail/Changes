@@ -1,0 +1,18 @@
+Revision history for Kwiki-Notify-Mail
+
+0.04    2005/11/11
+        Added notify_mail_topic feature, courtesy of brian@freebsd.org
+        [CPAN #13087]
+
+0.03    2005/01/25
+        Works with the latest Kwiki hooking mechanism.
+        No new features.
+
+0.02	2004/08/31
+        Subject line can contain site_title, page name and edited_by.
+	Can now set debug flag in config.yaml.
+	Also default subject line is more useful
+	
+0.01    2004/08/29
+        First version, released on an unsuspecting world.
+

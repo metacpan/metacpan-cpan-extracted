@@ -1,0 +1,34 @@
+NAME
+    Kwiki::Autoformat - Autoformat preformatted text
+
+SYNOPSIS
+     $ cpan Kwiki::Autoformat
+     $ cd /path/to/kwiki
+     $ echo "Kwiki::Autoformat" >> plugins
+     $ kwiki -update
+
+DESCRIPTION
+    This formats preformatted text using Damian Conway's magical
+    Text::Autoformat with the default options:
+
+        .auto
+        In comp.lang.perl.misc you wrote:
+        : > <CN = Clooless Noobie> writes:
+        : > CN> PERL sux because:
+        : > CN>    * It doesn't have a switch statement and you have to put $
+        : > CN>signs in front of everything
+        : > ...
+        .auto
+
+AUTHORS
+    Ian Langworth <langworth.com>
+
+SEE ALSO
+    Kwiki, Text::Autoformat
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2004 by Ian Langworth
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

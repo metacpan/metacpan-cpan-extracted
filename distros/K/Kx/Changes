@@ -1,0 +1,55 @@
+Revision history for Perl extension Kx.
+
+0.042 - 2016-11-06
+  - Some refactoring. No feature changes
+
+0.041 - 2016-09-15
+  - Some doc fixes.
+
+0.040_002 - 2016-08-21
+  - Fixed RT#31933: possible issue with dates.
+
+0.040_001 - 2016-08-20
+  - New co-maintainer: Stephan Loyd
+  - Fixed RT#79562: Random strings in fetching array from Kdb.
+  - Always use SvROK() macro to test RV. Since Perl 5.12 SVt_RV has merged
+    with SVt_IV, and using SVt_RV for testing RV may break in some cases.
+  - Use lastest k.h that supports Kdb+ version 3.
+
+0.039 - 2009-03-24
+  - added better datetime support Kx::__Z2epoch()
+
+0.038 - 2009-02-28
+  - added usernames, password support
+
+0.036 - 2008-10-07
+  - needed to reread perlguts and perlxs regarding mortals/AV*/HV*
+  - needed to create references in two C statements not directly from
+    the return of a function call.
+  - Most leaks gone. There is still a very small one in k2p()/k2phash()
+
+0.035 - 2008-10-03
+  - STORE in tie hash now does the right thing with values
+
+0.034 - 2008-10-03
+  - further memory leak in k2phash() removed
+
+0.032 - 2008-07-29
+  - memory leak in $k->val() cause by inappropriate use of 
+    SV* newRV_inc((SV*) thing);
+  - There is a still a small leak in $k->Tget() and possibly $k->cmd()
+    to confirm, seek and destroy
+
+0.031 - 2008-06-28
+  - Better handling of keyed tables
+
+0.03 - 2007-08-13
+  - Tmeta test failed under KDB+ 2.2 2005.08.17 as "meta" is different
+    under different q versions
+
+0.02 - 2007-08-12
+  - Missing k.h in tar file added
+
+0.01 - 2007-05-04
+  - original version; created by h2xs 1.23 with options
+    "-n Kx --skip-autoloader -O -x -d -b 5.8.0 k.h"

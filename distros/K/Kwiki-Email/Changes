@@ -1,0 +1,9 @@
+---
+version: 0.02
+date: Mon Jul 12 11:18:52 CEST 2004
+changes:
+ - fixup dependencies
+version: 0.01
+date: Wed Jul  7 16:00:08 CEST 2004
+changes:
+ - Initial release

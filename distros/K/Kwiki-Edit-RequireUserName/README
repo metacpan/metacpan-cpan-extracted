@@ -1,0 +1,62 @@
+NAME
+    Kwiki::Edit::RequireUserName - Replaces Kwiki::Edit in order to require
+    a user name to edit
+
+SYNOPSIS
+    This plugin helps reduce WikiSpam by requiring that the user have a user
+    name before editing. The idea is that SpamBots won't take the trouble to
+    do this. Of course this won't prevent spam created manually.
+
+REQUIRES
+       Kwiki 0.37 (new hooking mechanism)
+       Kwiki::UserName (adds user name functionality to Kwiki)
+       Kwiki::UserPreferences (adds the ability to change user names)
+
+INSTALLATION
+       perl Makefile.PL
+       make
+       make test
+       make install
+
+       cd ~/where/your/kwiki/is/located
+       vi plugins
+
+    Add the line
+
+      Kwiki::Edit::RequireUserName
+
+    If you don't already have them add the following also
+
+      Kwiki::UserName
+      Kwiki::UserPreferences
+
+    Then run
+
+      kwiki -update
+
+UPGRADING
+    The previous version of Kwiki::Edit::RequireUserName subclassed
+    Kwik::Edit, so the old documentation asked you to remove Kwiki::Edit
+    from your list of plugins. This new version of
+    Kwiki::Edit::RequireUserName no longer subclasses Kwiki::Edit, so you
+    should put that line back in.
+
+AUTHOR
+    James Peregrino, "<jperegrino@post.harvard.edu>"
+
+ACKNOWLEDGEMENTS
+    This plugin was inspired by the techniques used in Kwiki::Scode by
+    Kang-min Liu.
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-kwiki-edit-requireusername@rt.cpan.org", or through the web
+    interface at <http://rt.cpan.org>. I will be notified, and then you'll
+    automatically be notified of progress on your bug as I make changes.
+
+Copyright & License
+    Copyright 2004 James Peregrino, All Rights Reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

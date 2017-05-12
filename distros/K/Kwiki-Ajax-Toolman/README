@@ -1,0 +1,20 @@
+NAME
+    Kwiki::Ajax::Toolman - Tool-man Javascript Libraries for Kwiki
+
+SYNOPSIS
+DESCRIPTION
+AUTHOR
+    Brian Ingerson <ingy@cpan.org>
+
+    This module is just a distribution of the Tool-man Javascript framework
+    by Tim Taylor tim@tool-man.org, available at
+    http://tool-man.org/examples/
+
+COPYRIGHT
+    Copyright (c) 2005. Brian Ingerson. All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See http://www.perl.com/perl/misc/Artistic.html
+

@@ -1,0 +1,15 @@
+abstract: Kwiki Page Archival Using SVK
+author: 'Autrijus Tang <autrijus@autrijus.org>'
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: Kwiki-Archive-SVK
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  IO::All: 0.31
+  Kwiki: 0.35
+  SVK: 0.23
+version: 0.12

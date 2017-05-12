@@ -1,0 +1,11 @@
+Revision history for Keyword-Simple
+
+0.03    2014-10-19
+        - Add note to POD about requiring perl v5.12.
+
+0.02    2013-09-27
+        - Fix line number bug (line numbers off by one after keyword).
+
+0.01    2012-12-02
+        First version, released on an unsuspecting world.
+

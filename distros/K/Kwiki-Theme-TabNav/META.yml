@@ -1,0 +1,13 @@
+name: Kwiki-Theme-TabNav
+version: 0.01
+abstract: A simple, minimalistic kwiki theme.
+author: Dave Mabe <dmabe@runningland.com>
+license: perl
+distribution_type: module
+requires:
+  perl: 5.6.1
+  Kwiki: 0.32
+no_index:
+  directory:
+    - inc
+generated_by: Module::Install version 0.35

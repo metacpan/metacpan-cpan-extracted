@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<results>
+  <data entity="rft">
+    <metadata key="atitle">Isolation+of+a+common+receptor+for+coxsackie+B+viruses+and+adenoviruses+2+and+5</metadata>
+    <metadata key="auinit">J</metadata>
+    <metadata key="aulast">Bergelson</metadata>
+    <metadata key="date">1997</metadata>
+    <metadata key="epage">1323</metadata>
+    <metadata key="jtitle">Science</metadata>
+    <metadata key="spage">1320</metadata>
+    <metadata key="volume">275</metadata>
+  </data>
+  <result type="id" tag="info:doi"
+	>http://www.sciencemag.org/cgi/doi/10.1126/science.275.5304.1320</result>
+  <result type="error"
+	>Resolution of PubMed IDs is unsupported</result>
+  <result type="fulltext" priority="10" tag="Science"
+	service="Science Magazine Full Text"
+	>http://www.sciencemag.org/cgi/content/full/275/5304/1320</result>
+  <result type="fulltext" priority="10" tag="Infotrac"
+	service="Gale Infotrac"
+	>http://www.infotrac.galegroup.com/itw/infomark/1/1/1/purl=rc11%5FITOF%5F%5Fjn_Science_AND_sp_1320_AND_vo_275?sw_aep=indexdata</result>
+  <result type="abstract" priority="10" tag="ScienceAbstracts"
+	service="Science Magazine Abstracts"
+	>http://www.sciencemag.org/cgi/content/abstract/275/5304/1320</result>
+  <result type="citeref" priority="15" tag=""
+	service="Endnote citation"
+	>http://example.com/resolve?rft_id=info%3Adoi%2F10.1126%2Fscience.275.5304.1320&amp;rft_id=info%3Apmid%2F9036860&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Ajournal&amp;rft.atitle=Isolation%2Bof%2Ba%2Bcommon%2Breceptor%2Bfor%2Bcoxsackie%2BB%2Bviruses%2Band%2Badenoviruses%2B2%2Band%2B5&amp;rft.auinit=J&amp;rft.aulast=Bergelson&amp;rft.date=1997&amp;rft.epage=1323&amp;rft.jtitle=Science&amp;rft.spage=1320&amp;rft.title=Science&amp;rft.volume=275&amp;req_id=mailto%3Ajane.doe%40caltech.edu&amp;rfr_id=info%3Asid%2Felsevier.com%3AScienceDirect&amp;rfe_id=info%3Adoi%2F10.1006%2Fmthe.2000.0239&amp;svc_dat=indexdata:citation:Endnote</result>
+  <result type="authorsearch" priority="10" tag=""
+	service="Google"
+	>http://www.google.com/search?q=%22J Bergelson%22</result>
+  <result type="citation" priority="20" tag="APP"
+	service="APP-style citation" mimetype="text/html"
+	>Bergelson, J.  1997.  Isolation+of+a+common+receptor+for+coxsackie+B+viruses+and+adenoviruses+2+and+5.  &lt;i&gt;Science&lt;/i&gt;, 275: 1320-1323.</result>
+  <result type="citation" priority="20" tag="author"
+	service="Author and year" mimetype="text/html"
+	>Bergelson, J.  1997.</result>
+  <result type="websearch" priority="5" tag="masterkey"
+	service="MasterKey"
+	>http://masterkey.indexdata.com/author=Bergelson&amp;title=Isolation+of+a+common+receptor+for+coxsackie+B+viruses+and+adenoviruses+2+and+5&amp;date=1997</result>
+  <result type="websearch" priority="5" tag="reindex"
+	service="Reindex"
+	>http://www.reindex.org/mailto:jane.doe@caltech.edu/main/Hits.php?qe=lfo=Bergelson+and+lti=Science</result>
+  <result type="websearch" priority="10" tag=""
+	service="Google"
+	>http://www.google.com/search?q=%22Isolation+of+a+common+receptor+for+coxsackie+B+viruses+and+adenoviruses+2+and+5%22</result>
+  <result type="websearch" priority="20" tag=""
+	service="Alltheweb"
+	>http://alltheweb.com/search?q=%22Isolation+of+a+common+receptor+for+coxsackie+B+viruses+and+adenoviruses+2+and+5%22</result>
+  <result type="websearch" priority="30" tag=""
+	service="AltaVista"
+	>http://www.altavista.com/web/results?q=%22Isolation+of+a+common+receptor+for+coxsackie+B+viruses+and+adenoviruses+2+and+5%22</result>
+</results>

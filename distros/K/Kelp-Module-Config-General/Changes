@@ -1,0 +1,14 @@
+Revision history for Kelp-Module-Config-General
+
+0.04  2017-02-21 11:28:47 MSK
+        - Add IncludeRelative to init options.
+
+0.03  2017-02-08 22:39:43 MSK
+        
+        - Changed name from Kelp-Module-Config-ConfigGeneral to Kelp-Module-Config-General
+
+0.02  2017-02-05 15:49:47 MSK
+        - Update documentation
+        
+0.01  2017-02-04 19:57:25 MSK
+        - Initial release

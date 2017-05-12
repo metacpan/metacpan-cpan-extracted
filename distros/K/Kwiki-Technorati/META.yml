@@ -1,0 +1,12 @@
+name: Kwiki-Technorati
+version: 0.04
+abstract: Access Technorati Cosmos with WAFL
+author: Chris Dent <chris.dent@socialtext.com>
+license: perl
+distribution_type: module
+requires:
+  Kwiki::FetchRSS: 0
+no_index:
+  directory:
+    - inc
+generated_by: Module::Install version 0.36

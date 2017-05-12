@@ -1,0 +1,12 @@
+name: Kwiki-Theme-CPB
+version: 0.10
+abstract: Simple three column theme
+author: Chris Dent <cdent@burningchrome.com>
+license: perl
+distribution_type: module
+requires:
+  Kwiki: 0.38
+no_index:
+  directory:
+    - inc
+generated_by: Module::Install version 0.36

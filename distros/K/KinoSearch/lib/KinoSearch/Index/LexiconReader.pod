@@ -1,0 +1,68 @@
+
+# Auto-generated file -- DO NOT EDIT!!!!!
+
+=head1 NAME
+
+KinoSearch::Index::LexiconReader - Read Lexicon data.
+
+=head1 DEPRECATED
+
+The KinoSearch code base has been assimilated by the Apache L<Lucy> project.
+The "KinoSearch" namespace has been deprecated, but development continues
+under our new name at our new home: L<http://lucy.apache.org/>
+
+=head1 SYNOPSIS
+
+    my $lex_reader = $seg_reader->obtain("KinoSearch::Index::LexiconReader");
+    my $lexicon    = $lex_reader->lexicon( field => 'title' );
+
+
+
+=head1 DESCRIPTION
+
+LexiconReader reads term dictionary information.
+
+
+
+=head1 ABSTRACT METHODS
+
+=head2 lexicon( I<[labeled params]> )
+
+Return a new Lexicon for the given C<< field >>.  Will return
+undef if either the field is not indexed, or if no documents contain a
+value for the field.
+
+=over
+
+=item *
+
+B<field> - Field name.
+
+=item *
+
+B<term> - Pre-locate the Lexicon to this term.
+
+=back
+
+=head2 doc_freq( I<[labeled params]> )
+
+Return the number of documents where the specified term is present.
+
+
+
+
+
+=head1 INHERITANCE
+
+KinoSearch::Index::LexiconReader isa L<KinoSearch::Index::DataReader> isa L<KinoSearch::Object::Obj>.
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005-2011 Marvin Humphrey
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
+

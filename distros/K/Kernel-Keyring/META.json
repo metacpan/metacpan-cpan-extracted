@@ -1,0 +1,59 @@
+{
+   "abstract" : "Wrapper for kernel keyring syscalls",
+   "author" : [
+      "Viktor Liu"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Kernel-Keyring",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Encode" : "0",
+            "MIME::Base64" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/lixmal/Kernel-Keyring/issues"
+      },
+      "homepage" : "https://github.com/lixmal/Kernel-Keyring",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/lixmal/Kernel-Keyring.git",
+         "web" : "https://github.com/lixmal/Kernel-Keyring"
+      }
+   },
+   "version" : "0.07"
+}

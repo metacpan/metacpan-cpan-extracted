@@ -1,0 +1,133 @@
+
+       --------------------
+      | Kephra Version 0.5 |
+       --------------------
+
+ 1. Preliminary notes
+ 2. News summary
+ 2. News in detail
+ 4. Known bugs and issues
+ 5. Hints
+ 6. Plans
+
+
+ 1. Preliminary note
+
+ - Welcome to Kephra. This text editor is made to fullfill your individual wishes.
+   If you have any comments, suggestions ans thanks, please use the links to our
+   website in the help menu. There you find also a longer welcome text.
+
+ - This is a so called stable version for the daily use. It contains only well
+   tested features and bugs will be fixed as soon as possible with the next patch
+   level, which will add no new features. If you like to help us and/or use 
+   always the freshest features, please consider to use test versions, which have
+   a three digit version number. Four digits mark developer versions, in case you
+   really believe in: "no risk no fun".
+
+
+ 2. News summary
+    * read and write Unicode files
+    * code folding
+    * new mouse click combos
+    + moveable tabs
+    + marker
+    + 8 new tools
+    + 3 new main window modes
+    + definable status bar
+    + links to help web pages
+    * installation over CPAN for Linux, Win und Mac
+    + ... and lots more
+
+
+ 3. News in detail
+
+ - Unicode
+    + UTF-8 files will be recognized when opening and also saved as such.
+    + The fourth pane of the statusbar shows if current coding is utf or ascii.
+    + Coding of empty files can be changed with the Document > Encoding menu,
+    it may (yet) not work otherwise.
+ 
+ - New Mouse Controls
+    Following settings can all be changed or made disable at once.
+    + Left click on the selection does copy it.
+    + Middle click inserts selection.
+    + Middle click on the selection searches for next instance of that string.
+    + In any other case Middle click moves cursor to the position of last edit.
+    + Middle click while holding left pastes from clipboard.
+    + Right click while holding left does cut and selection to clipboard.
+
+ - Code Folding
+    + Between the line numbers and the text area a new margin appeared, that 
+    marks with symbols the beginnings of all code chunks that can be folded.
+    + Left click or <Ctrl>+<+> folds or defolds (toggles) the current node.
+    + Middle click or <Ctrl>+<Shift>+<+> toggles current node with all children.
+    + Right click or <Alt>+<+> toggles all nodes of that level. All nodes without
+    parent are on level one, its direct children are level two and so forth.
+    + Right click while holding left or <Alt>+<Shift>+<+> toggles all nodes.
+    + A document, reopened from file history has the folding state as when closed.
+ 
+ - Marker
+    Green arrows on the left of the line numbers mark important text spots.
+    + They can be toggled with a left click on marker margin or <Ctrl>+<F2>.
+    + <F2> or <Shift>+<F2> navigate forth and back between marker of a doc.
+    + When adding <Alt>+, Marker in all Docs can be navigated.
+    + Same you achieve with the green arrows at the search bar.
+    + A submenu with all marker functions is inside the search menu.
+    + Also bookmarks can now be toggled with a middle click on the marker margin.
+ 
+ - Richer Interface
+    + The main window has 3 new modes, all closed by the <Esc> key.
+      + <F11> - fullscreen, win consumes the whole screen and has no more border.
+      + <Shift>+<F11> - Max Editpanel, all app bars are toggled.
+      + <Alt>+<F11> - toggles transparency of the main win.
+      + <Ctrl>+<F11> - no other win can stay on top of Kephra.
+    + Tabbar (<Ctrl>+<Alt>+<T>) and menu bar (<Ctrl>+<Alt>+<M>) can be toggled.
+    + Tabs in Tabbar are now also movable with mouse.
+    + The rightmost symbol of the tabbar opens a menu to select the current doc.
+    + In the left margin can now be opened a new context menu.
+    + The status bar can now be defined by a YAML file as other toolbars too.
+    Open that file with the menu item Config > User Interface > Toolbar.
+    + Is a opened file deleted elsewhere, a new dialog tells you that and offers
+    several options to deal with that.
+    + Several icons are redesigned by Jens Neuwerk.
+
+ - More Tools
+    + <Shift>+<F4> copies selection into the notepad.
+    + A new dialog displays selected color values and writes the selected color
+    in HTML hex format into the document.
+    + Content of @INC and %ENV can be written into output panel.
+    + Output panel can show selection, converted into decimal or hexadecimal numbers.
+    + Is caret inside a quoted string, copy that with <Alt>+<Shift>+<C>.
+    + <Ctrl>+<Shift>+<V> inserts the Perl varibale last used in this block.
+    + inserting current time and date
+    + NonASCII character can be converted to HTML-Entities and back.
+
+ - More Help
+    + All documentation is updated or rewritten.
+    + A new item in the help menu opens the online documentation in the browser. 
+    + The next item opens a help forum for Perl programmer.
+    + And next 2 items open our online ticket system to report wishes or errors.
+ 
+ - Installation jetzt auch über CPAN-Shell für Linux, Win und Mac
+
+
+ 4. Known bugs and issues
+
+    Please don't try to change file encoding of nonemty files.
+
+
+ 5. Hints
+ 
+    + Read the "Advanced - Tour" in the "Help" menu. Many of these useful
+    functions can be overseen very easily.
+
+    + Look into the Module Kephra::Config::Default::GlobalSettings, a commented
+    version of the main configs.
+
+
+ 6. Plans for next releases
+
+     + Plugin API
+     + tree extention for text snipptets and self defined tools
+     + commandline extention for vi like usage
+     + config dialog

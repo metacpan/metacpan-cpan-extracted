@@ -1,0 +1,16 @@
+abstract: ''
+author: Kang-min Liu <gugod@gugod.org>
+build_requires:
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.52
+license: perl
+name: Kwiki-Emoticon
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Spiffy: 0
+  Text::Emoticon: 0.03
+version: 0.03

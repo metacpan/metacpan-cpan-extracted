@@ -1,0 +1,74 @@
+NAME
+    Kwiki::ShortcutLinks - WAFL-phrase shortcuts for arbitrary web links
+
+SYNOPSIS
+     $ cpan Kwiki::ShortcutLinks
+     $ cd /path/to/kwiki
+     $ echo "Kwiki::ShortcutLinks" >> plugins
+     $ kwiki -update
+     $ vi shortcuts.yaml
+     $ kwiki -update
+
+DESCRIPTION
+    This plugin allows the Kwiki maintainer to define a series of short-cut
+    wafl phrases via a simple config file.
+
+    When the plugin is installed and added to Kwiki via "kwiki -update", a
+    default "shortcuts.yaml" file is created. This can be edited and added
+    to as necessary. "kwiki -update" must be run again after adding,
+    renaming or deleting shortcuts.
+
+    The example entry:
+
+      google:   http://www.google.com/search?q=
+
+    adds support for the wafl phrase "{google:...}", for example:
+
+      Search Google for: {google:Kwiki}
+
+    will render as:
+
+      Search Google for: <a href="http://www.google.com/search?q=Kwiki">Kwiki</a>
+
+    If the short-cut definition contains extra words, these will be
+    prepended to the rendered link. For example:
+
+      rt:       http://ticket-serv/Ticket/Display.html?id= RT Ticket
+
+    will render "{rt:1234}" as:
+
+      <a href="http://ticket-serv/Ticket/Display.html?id=1234">RT Ticket 1234</a>
+
+    If you follow the shortcut argument by a pipe and some more text, that
+    text will be used for the link text, instead of the argument and any
+    leader. So, for the above definition of "rt", "{rt:1234|A Hateful
+    Problem}" would render as:
+
+      <a href="http://ticket-serv/Ticket/Display.html?id=1234">A Hateful Problem</a>
+
+    The shortcut can contain the string %s, which will be replaced by the
+    wafl phrase arguments. (If there is no %s, the arguments are appended to
+    the shortcut expansion, as in the examples above.) So the config entry:
+
+      wikipedia: http://www.wikipedia.org/w/wiki.phtml?search=%s&go=Go
+
+    and the shortcut "{wikipedia:Cambridge}" will render as
+
+      <a href="http://www.wikipedia.org/w/wiki.phtml?search=Cambridge&go=Go">Cambridge</a>
+
+AUTHORS
+    Michael Gray <mjg17@eng.cam.ac.uk>
+
+    Thanks to Alexander Goller for the %s suggestion, "extra_shortcuts.yaml"
+    and his general support. Thanks to Ricardo Signes for the pipe patch to
+    allow link text to be overridden.
+
+SEE ALSO
+    Kwiki
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2004 by Michael Gray
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

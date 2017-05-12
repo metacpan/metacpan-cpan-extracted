@@ -1,0 +1,58 @@
+
+# Auto-generated file -- DO NOT EDIT!!!!!
+
+=head1 NAME
+
+KinoSearch::Document::HitDoc - A document read from an index.
+
+=head1 DEPRECATED
+
+The KinoSearch code base has been assimilated by the Apache L<Lucy> project.
+The "KinoSearch" namespace has been deprecated, but development continues
+under our new name at our new home: L<http://lucy.apache.org/>
+
+=head1 SYNOPSIS
+
+    while ( my $hit_doc = $hits->next ) {
+        print "$hit_doc->{title}\n";
+        print $hit_doc->get_score . "\n";
+        ...
+    }
+
+
+
+=head1 DESCRIPTION
+
+HitDoc is the search-time relative of the index-time class Doc; it is
+augmented by a numeric score attribute that Doc doesn't have.
+
+
+
+
+
+=head1 METHODS
+
+=head2 set_score(score)
+
+Set score attribute.
+
+=head2 get_score()
+
+Get score attribute.
+
+
+
+=head1 INHERITANCE
+
+KinoSearch::Document::HitDoc isa L<KinoSearch::Document::Doc> isa L<KinoSearch::Object::Obj>.
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005-2011 Marvin Humphrey
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
+

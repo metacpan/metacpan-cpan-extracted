@@ -1,0 +1,50 @@
+
+# Auto-generated file -- DO NOT EDIT!!!!!
+
+=head1 NAME
+
+KinoSearch::Search::MatchAllQuery - Query which matches all documents.
+
+=head1 DEPRECATED
+
+The KinoSearch code base has been assimilated by the Apache L<Lucy> project.
+The "KinoSearch" namespace has been deprecated, but development continues
+under our new name at our new home: L<http://lucy.apache.org/>
+
+
+
+=head1 DESCRIPTION
+
+MatchAllQuery is a utility class which matches all documents.  Each match
+is assigned a score of 0.0, so that in composite queries, any document
+which matches against another part of the query will be ranked higher than
+a document which matches only via the MatchAllQuery.
+
+=head1 CONSTRUCTORS
+
+=head2 new()
+
+    my $match_all_query = KinoSearch::Search::MatchAllQuery->new;
+
+Constructor.  Takes no arguments.
+
+
+
+
+
+
+
+=head1 INHERITANCE
+
+KinoSearch::Search::MatchAllQuery isa L<KinoSearch::Search::Query> isa L<KinoSearch::Object::Obj>.
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005-2011 Marvin Humphrey
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
+

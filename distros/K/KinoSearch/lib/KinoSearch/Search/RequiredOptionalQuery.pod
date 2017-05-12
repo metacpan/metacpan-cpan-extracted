@@ -1,0 +1,89 @@
+
+# Auto-generated file -- DO NOT EDIT!!!!!
+
+=head1 NAME
+
+KinoSearch::Search::RequiredOptionalQuery - Join results for two Queries, one required, one optional.
+
+=head1 DEPRECATED
+
+The KinoSearch code base has been assimilated by the Apache L<Lucy> project.
+The "KinoSearch" namespace has been deprecated, but development continues
+under our new name at our new home: L<http://lucy.apache.org/>
+
+=head1 SYNOPSIS
+
+    my $foo_and_maybe_bar = KinoSearch::Search::RequiredOptionalQuery->new(
+        required_query => $foo_query,
+        optional_query => $bar_query,
+    );
+    my $hits = $searcher->hits( query => $foo_and_maybe_bar );
+    ...
+
+
+
+=head1 DESCRIPTION
+
+RequiredOptionalQuery joins the result sets of one Query which MUST match,
+and one Query which SHOULD match.  When only the required Query matches,
+its score is passed along; when both match, the scores are summed.
+
+=head1 CONSTRUCTORS
+
+=head2 new( I<[labeled params]> )
+
+    my $reqopt_query = KinoSearch::Search::RequiredOptionalQuery->new(
+        required_query => $foo_query,    # required
+        optional_query => $bar_query,    # required
+    );
+
+=over
+
+=item *
+
+B<required_query> - Query must must match.
+
+=item *
+
+B<optional_query> - Query which should match.
+
+=back
+
+
+
+
+
+=head1 METHODS
+
+=head2 get_required_query()
+
+Getter for the required Query.
+
+=head2 set_required_query(required_query)
+
+Setter for the required Query.
+
+=head2 get_optional_query()
+
+Getter for the optional Query.
+
+=head2 set_optional_query(optional_query)
+
+Setter for the optional Query.
+
+
+
+=head1 INHERITANCE
+
+KinoSearch::Search::RequiredOptionalQuery isa L<KinoSearch::Search::PolyQuery> isa L<KinoSearch::Search::Query> isa L<KinoSearch::Object::Obj>.
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005-2011 Marvin Humphrey
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
+

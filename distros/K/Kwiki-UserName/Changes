@@ -1,0 +1,20 @@
+---
+version: 0.14
+date:    Tue Jan 11 08:14:53 PST 2005
+changes:
+- Update username on screen right after user changes it.
+---
+version: 0.13
+date:    Wed Dec 15 15:48:06 PST 2004
+changes:
+- Make compatible with Kwiki-0.34
+---
+version: 0.12
+date:    Wed Aug 18 10:59:47 PDT 2004
+changes:
+- Use generic callhooks
+---
+version: 0.10
+date:    Wed Jun 23 01:24:03 PDT 2004
+changes:
+- Initial release

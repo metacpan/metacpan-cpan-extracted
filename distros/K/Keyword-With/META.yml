@@ -1,0 +1,25 @@
+---
+abstract: "provide new syntax to use a 'given' statement without an experimental warning"
+author:
+  - 'Hunter McMillen <mcmillhj@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Keyword-With
+requires:
+  Keyword::Declare: '0'
+  perl: '5.014'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://github.com/mcmillhj/Keyword-With/issues
+  homepage: https://metacpan.org/release/Keyword-With
+  repository: git://github.com/mcmillhj/Keyword-With.git
+version: '0.003'

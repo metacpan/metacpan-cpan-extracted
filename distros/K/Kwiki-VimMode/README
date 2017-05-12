@@ -1,0 +1,59 @@
+NAME
+    Kwiki::VimMode - VimMode preformatted forms of text
+
+SYNOPSIS
+     $ cpan Kwiki::VimMode
+     $ cd /path/to/kwiki
+     $ echo "Kwiki::VimMode" >> plugins
+     $ kwiki -update
+
+DESCRIPTION
+    This module allows you to hilight the syntax of any text mode that the
+    Vim editor recognizes:
+
+        Here's some *HTML* and *Perl* for you to grok:
+    
+        .vim
+        <html>
+            <head>
+                <title>Highlighted stuff!</title>
+            </head>
+            <body>
+                <em>Check</em> <strong>this</strong>
+                <code>out!</code>
+            </body>
+        </html>
+        .vim
+    
+        .vim
+        #!/usr/bin/perl
+        # sample perl
+        $name = 'Kwiki';
+        print "Check out $name!\n";
+        .vim
+
+    Text::VimColor/Vim should hopefully pick up the correct syntax
+    automatically. If it doesn't, precede your text in the ".vim" block with
+    "filetype: name", where "name" is a valid Vim syntax name. For example:
+
+        .vim
+        filetype: apache
+    
+        <VirtualHost>
+            ServerName www.me.org
+            # ...
+        </VirtualHost>
+        .vim
+
+AUTHORS
+    Ian Langworth <langworth.com>
+
+SEE ALSO
+    Kwiki, Text::VimColor
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2004 by Ian Langworth
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

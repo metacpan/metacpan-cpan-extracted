@@ -1,0 +1,137 @@
+Revision history for Perl extension Kossy
+
+0.40 2016-07-19T15:03:36Z
+
+        - Fix multibyte path handling (Thanks songmu)
+
+0.39 2014-10-20T05:46:07Z
+
+        - fix some document bug (Thanks hisaichi5518, avvmoto, niku4i)
+        - improve perfomance
+          cache router result
+          add Kossy::Header
+          render json
+
+0.38 2014-05-29T06:35:40Z
+
+        - re-packaging with Minilla
+
+0.37    Thu May 29 1:35:15 2014
+        - fix packaging issue. META file did not updated
+
+0.36    Thu May 29 0:43:12 2014
+        - fix packaging issue. change version in all modules
+
+0.35    Wed May 28 23:54:55 2014
+        - decode path args as utf8. Router::Boom encodes path?
+
+0.34    Wed Feb 20 2:18:18 2014
+        - avoid 0 0 length query_string in uri_for
+
+0.33    Wed Feb 20 1:12:34 2014
+        - skip parsing body if content_type is null
+        - requires HTTTP:Entity::Parser 0.11
+
+0.32    Wed Feb 19 15:53:33 2014
+        - use build_urlencoded that is provided by WWW::Form::UrlEncoded in uri_for
+
+0.31    Wed Feb 12 13:51:54 2014
+        - fix packaging issue. change version in all modules
+
+0.30    Wed Feb 12 13:46:15 2014
+        - replace Kossy::BodyParser with HTTP::Entity::Parser
+
+0.28    Thu Nov 28 10:29:51 2013
+        - Kossy::Request->new_response returns Kossy::Response
+
+0.27    Tue Nov 12 14:45:09 2013
+        - fix packaging issue
+
+0.26    Tue Nov 12 11:07:05 2013
+        - add support for changing X-Frame-Options through $c->res
+        - document parse json body
+
+0.25    Wed Nov 6 11:19:31 2013
+        - non trial release
+        - switch to use cpanfile
+
+0.24    Thu Oct 31 11:46:31 2013
+        - add Kossy::BodyParser based on tokuhiorm's code
+          improve perfomance of POST request
+
+0.23    Mon Oct 21 14:17:49 2013
+        - improve performance
+          use HTTP::Headers::Fast
+          optimze Kossy::Response->finalize
+
+0.22    Tue Oct 15 11:44::46 2013
+        - switch to using Router::Boom
+
+0.21    Thu Oct 10 15:37:36 2013
+        - [Kossy::Request] cache base() for performance. URI->canonical is slow
+
+0.20    Wed Oct 9 15:46:10 2013
+        - separete Kossy::Validator to another dist
+
+0.19    Fri Aug 30 16:00:56 2013
+        - fixed requires
+
+0.18    Thu Aug 8 16:05:45 2013
+        - json escape only for string ( Thank you sonots-san)
+
+0.17    Tue Jul 16 13:38:09 2013
+        - updated to Twitter Bootstrap
+        - updated to jQuery
+
+0.16    Tue Jul 16 13:29:21 2013
+        - added floating number validation rules
+
+0.15    Fri Apr 0:29:46 2013
+        - render_json: enable allow_blessed and convert_blessed
+
+0.14    Thu Mar 14 22:25:49 2013
+        - Kossy::Validator: support Coderef default
+
+0.13    Wed Dec 5 11:23:43 2012
+        - requires Text::Xslate >= 1.6001, HTML::FillInForm::Lite >= 1.11
+
+0.12    Fri Aug 24 18:17:51 2012
+        - updated to Twitter Bootstrap 2.1.0
+        - updated to jQuery 1.8.0
+
+0.11    Tue Jul 24 21:48:04 2012
+        - fixed uri_for() if app is mounted on non '/' location. (Thank you fujiwara-san)
+
+0.10    Tue Jun 19 11:12:47 2012
+        - accept hash argument in new constructor
+
+0.09    Thu May 17 17:48:24 2012
+        - fixed css uri in skelton
+
+0.08    Tue Apr 24 18:59:47 2012
+        - updated to Twitter Bootstrap 2.0.3
+        - updated to jQuery 1.7.2
+        - using sharedir for assets, Kossy::Assets was deprecated
+
+0.07    Fri Feb 17 12:07:06 2012
+        - updated to Twitter Bootstrap 2.0
+
+0.06    Thu Jan 5 10:31:51 2012
+        - htmlize error page
+
+0.05    Tue Nov 29 17:43:51 2011
+        - release to CPAN
+
+0.04    Tue Nov 29 01:04:55 2011
+        - addes Assets for setup
+
+0.03    Mon Nov 28 19:20:09 2011
+        - render_json security staff.
+        - added document
+        - added router method for dispach other than GET and POST
+
+0.02    Fri Nov 11 10:35:14 2011
+        - added Number::Format to Xslate default functions.
+
+0.01    Fri Nov 11 10:35:14 2011
+        - original version

@@ -1,0 +1,149 @@
+=head1 NAME
+
+Konstrukt::Doc::Basics - General website organization and tag syntax
+
+=head1 WEBSITE ORGANIZATION
+
+You create websites as simple as you would do with plain HTML: Each page is
+defined as a file in your document root and may contain any HTML tags and
+L<Konstrukt tags|/KONSTRUKT TAG SYNTAX>.
+
+A typical organization would look like this:
+
+	cache/                  #the directory where the objects get cached
+	 \- ...
+	
+	logs/                   #your apache logs might be stored here
+	 |- access.log
+	 \- error.log
+	
+	page/                   #the document root: all your pages and \
+	 |- blog/               #templates are stored here
+	 |   \- index.html
+	 |
+	 |- guestbook/
+	 |   \- index.html
+	 |
+	 | ...
+	 |
+	 \- templates/          #all templates are stored in docroot/templates
+	     |- blog/           #blog templates
+	     |   |- layout/
+	     |   |   \- ...
+	     |   |
+	     |   \- messages/
+	     |       \- ...
+	     |
+	     |- guestbook/      #guestbook templates
+	     |   \- ...
+	     |
+	     \- layout.template #the global layout template
+
+All static content (page definitions, templates, images, stylesheets) will be
+stored in files in your directory structure.
+All dynamic content, which is accessed by plugins like C<blog> or C<guestbook>,
+will usually be stored in a database.
+
+=head1 KONSTRUKT TAG SYNTAX
+
+The HTML files are augmented with some special Konstrukt tags.
+
+=head2 Plugin Tags
+
+Most important are B<plugin tags>. They start with C<E<lt>&> and end with C<&E<gt>>:
+
+	<& some_plugin &>some content<& / &>
+
+This will call the plugin C<some_plugin>, which will process the encapsulated
+content C<some content>. The tag and the content will be replaced by the plugins
+result.
+
+B<Example:>
+
+	<& upcase &>
+		foo
+		bar
+		baz
+	<& / &>
+
+B<Result:>
+
+	FOO
+	BAR
+	BAZ
+
+You can also define tag attributes as you can for HTML tags:
+
+	<& some_plugin attribute="value" &>
+
+Each opening tag must be closed with C<E<lt>& / &E<gt>>. You can also specify
+singleton tags without a content as you can do in XML/XHTML:
+
+	<& some_plugin / &>
+
+which is identical to
+
+	<& some_plugin &><& / &>
+
+=head2 Nested Tags
+
+You can can nest the tags/plugins.
+
+B<Example:>
+
+	<& upcase &>
+		<& sortlines &>
+			foo
+			bar
+			baz
+		<& / &>
+	<& / &>
+
+B<Result:>
+
+	BAR
+	BAZ
+	FOO
+
+You can even nest tags inside other tag definitions:
+
+	<& some_plugin attribute="<& other_plugin / &>" / &>
+
+=head2 Comments
+
+Comments will be defined just as in HTML:
+
+	<!-- <& this_plugin wont="be executed" / &> -->
+
+If you want to remove content/text from the page, so that the client will not see
+it, you can use the L<kill plugin|Konstrukt::Plugin::kill>:
+
+	<& kill &>this text won't be delivered to the client<& / &>
+
+=head2 Other Tags
+
+Of course there can be other tags as well. For example the template plugin
+uses additional tag types to define variable fields, lists and values:
+
+	<& template src="..." &>
+		<$ some_var $>some value<$ / $>
+	<& / &>
+
+These additional tags, if exist, will be described in the documentation of each plugin.
+
+=head1 AUTHOR 
+
+Copyright 2006 Thomas Wittek (mail at gedankenkonstrukt dot de). All rights reserved. 
+
+This document is free software.
+It is distributed under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+Next: L<Konstrukt::Doc::Templating>
+
+Previous: L<Konstrukt::Doc::Installation>, L<Konstrukt::Doc::About>
+
+Parent: L<Konstrukt::Doc>
+
+=cut

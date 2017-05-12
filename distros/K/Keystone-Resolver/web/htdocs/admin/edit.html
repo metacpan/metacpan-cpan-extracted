@@ -1,0 +1,7 @@
+%# $Id: edit.html,v 1.2 2007-07-13 10:55:04 mike Exp $
+<%args>
+$id => undef
+$_class
+</%args>
+<& /mc/layout.mc, %ARGS, title => (defined $id ? "Edit" : "Create") .
+	" $_class Record", component => "/mc/edit.mc" &>

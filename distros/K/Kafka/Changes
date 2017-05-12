@@ -1,0 +1,290 @@
+Revision history for Kafka package
+
+1.001013 Fri Feb  24 2017
+    CHANGES:
+    - Removed support for custom CorrelationID in constructor arguments.
+    - Use seconds for Consumer.MaxWaitTime to make it similar to Producer.Timeout.
+    - Removed deprecated constants $RECEIVE_MAX_ATTEMPTS, $RECEIVE_MAX_RETRIES, $SEND_MAX_RETRIES.
+    - Replaced Kafka::Connection->is_server_alive, Kafka::IO->is_alive with private methods (to be
+      used for internal tests only).
+
+    BUGFIXES:
+    - Fixed incorrect timeout values in requests.
+    - Improved socket handling in Kafka::IO.
+
+1.001012 Thu Nov  17 2016
+    BUGFIXES:
+    - Do not use $Kafka::SEND_MAX_ATTEMPTS in Kafka::Producer->send request
+      to prevent duplicates.
+
+1.001011 Wed Nov  09 2016
+    CHANGES:
+    - Decrease tcp connections creation.
+    BUGFIXES:
+    - The dependency declaration corrected.
+
+1.001001 Tue Jun  07 2016
+    CHANGES:
+    - Version schema changed to reflect supported Kafka version.
+      N.XXYYZZ where XXYY - major Kafka version N and ZZ - major and minor
+      versions of Perl module.
+    - Adapted for kafka 0.10.0.0 .
+    - Added new Apache Kafka server error codes.
+    - $MESSAGE_SIZE_OVERHEAD increased to 34.
+
+0.9012 Thu May  26 2016
+    CHANGES:
+    - Test improvements.
+    BUGFIXES:
+    - Data::Dumper 'Sparseseen' method not used now.
+
+0.9011 Tue May  24 2016
+    BUGFIXES:
+    - Test::More required version corrected.
+
+0.9010 Thu Apr  28 2016
+    CHANGES:
+    - Adapted for kafka 0.9.0.1 .
+    BUGFIXES:
+    - Tests corrected.
+    - Require perl 5.10 core modules version.
+
+0.9001 Tri Feb  05 2016
+    BUGFIXES:
+    - Tests corrected.
+
+0.9000 Thu Feb  04 2016
+    CHANGES:
+    - Adapted for kafka 0.9 .
+    - Updated error codes to conform with Kafka documentation.
+    - Kafka::Producer->new does not support values of RequiredAcks > 1 anymore.
+    - Added 'ip_version' argument for Kafka::Connection->new and Kafka::IO->new to
+      force host name resolving (or IP address interpretation) in IPv4 or IPv6.
+    - Added error codes $ERROR_INCOMPATIBLE_HOST_IP_VERSION .
+    BUGFIXES:
+    - Incorrect osvers comparison for NetBSD.
+    - Remove unnecessary dependency on List::MoreUtils
+      (thanks to Dan Book).
+
+0.8013 Tue Nov  24 2015
+    BUGFIXES:
+    - Packing timeval for NetBSD 6.0 and later.
+    - Use inet_aton instead inet_pton for IPv4 addresses.
+    - t/03_io_ipv6.t fixed to work with perl earlier than 5.014 .
+
+0.8012 Mon Nov  09 2015
+    CHANGES:
+    - Support IPv6. IPv6 address in standard form.
+    BUGFIXES:
+    - Fix MANIFEST.
+    - Error analysis is improved in Kafka::Connection .
+
+0.8011 Mon Aug  18 2015
+    CHANGES:
+    - Kafka::Connection connection is closed only when $connection->close method is called
+      explicitly.
+    - Kafka::IO object destruction do not close socket.
+    BUGFIXES:
+    - Added Apache Kafka server error codes:
+      $ERROR_LOAD_IN_PROGRESS_CODE,
+      $ERROR_CONSUMER_COORDINATOR_NOT_AVAILABLE_CODE,
+      $ERROR_NOT_COORDINATOR_FOR_CONSUMER_CODE
+    - $ERROR_REPLICA_NOT_AVAILABLE
+      error ignored according to Apache Kafka documentation
+      (reported by Shabnam Shamaei).
+    - Kafka::IO->is_alive method correctly determines server availability.
+
+0.8010 Fri Feb  06 2015
+    CHANGES:
+    - $RECEIVE_MAX_RETRIES, $SEND_MAX_RETRIES renamed
+      to $RECEIVE_MAX_ATTEMPTS, $SEND_MAX_ATTEMPTS .
+    - Method Kafka::Connection->is_server_alive renamed to is_server_connected .
+    - New Kafka::Connection->is_server_alive method properly checks
+      for availability of Kafka server.
+    - Added method Kafka::Connection->get_metadata .
+    - Added method Kafka::Connection->exists_topic_partition .
+    - $Kafka::MIN_BYTES_RESPOND_HAS_DATA changed to 10.
+    - Testing supports Kafka version 0.8.2 .
+    BUGFIXES:
+    - Partititon cannot be negative.
+    - Improved reporting for ERROR_UNKNOWN_TOPIC_OR_PARTITION error.
+    - Receiving metadata for a new topic fixed.
+
+0.8009 Tue Jan  13 2015
+    CHANGES:
+    - Added error $ERROR_RESPONSEMESSAGE_NOT_RECEIVED .
+    BUGFIXES:
+    - Module Kafka::IO no longer uses sigtrap
+      (thanks to Mark Hedges).
+    - Taint mode support
+      (reported by Hari Sekhon).
+
+0.8008 Tue Apr  29 2014
+    - Support for GZIP and Snappy compression
+      (thanks to Colin Blower).
+    - 'Kafka' module extended with the following constants:
+      $COMPRESSION_NONE, $COMPRESSION_GZIP, $COMPRESSION_SNAPPY,
+      $ERROR_COMPRESSION, $ERROR_METADATA_ATTRIBUTES.
+    - Removed $ERROR_COMPRESSED_PAYLOAD constant.
+    - Added test 't/45_compression.t'.
+
+0.8007 Fri Mar  14 2014
+    CHANGES:
+    - Kafka::Cluster adapted for kafka 0.8.1 .
+
+0.8006 Thu Feb  20 2014
+    BUGFIXES:
+    - Corrected description of the error in Kafka::Connection.
+
+0.8001_1 - 0.8005 Fri Dec  27 2013
+    CHANGES:
+    - t/*_io.t examines possibility of using gethostbyname( 'localhost' ) .
+    - Debug diagnostic and test improved.
+    BUGFIXES:
+    - 'localhost' is no longer used in the t/*_io.t .
+
+0.8001 Tue Dec  24 2013
+    CHANGES:
+    - Improvements to error handling and tests.
+    - 'MaxLoggedErrors' argument is added to Kafka::Connection->new.
+    - Added new methods Kafka::Connection->nonfatal_errors,
+      Kafka::Connection->clear_nonfatals, Kafka::Internals->debug_level .
+    - Added error $Kafka::ERROR_SEND_NO_ACK .
+    - Added setting $Kafka::RECEIVE_MAX_RETRIES .
+
+0.800_17 Fri Nov  15 2013
+    CHANGES:
+    - 'AutoCreateTopicsEnable' argument is added to Kafka::Connection->new
+      (thanks to Ed Silva).
+
+0.800_16 Fri Nov  08 2013
+    BUGFIXES:
+    - Fixed problem with connecting to servers running on localhost.
+
+0.800_15 Wed Nov  06 2013
+    CHANGES:
+    - Improvement of test t/*_io.t .
+
+0.800_14 Thu Oct  31 2013
+    CHANGES:
+    - We use alarm internally in Kafka::IO (not Time::HiRes::alarm).
+    - For 'gethostbyname' operations the timeout is rounded
+      to the nearest greater positive integer.
+
+0.800_8 - 0.800_13 Wed Oct  30 2013
+    CHANGES:
+    - Debugging Test t/*_io.t .
+
+0.800_7 Mon Oct  28 2013
+    CHANGES:
+    - t/*_io.t test more ways how external alarm may interfere with internal
+      alarm used by Kafka::IO.
+    - Added to META.yml the list of the modules provided by this distribution.
+
+0.800_6 Fri Oct  25 2013
+    CHANGES:
+    - You can disable ALARMS usage by Kafka by passing timeout => undef to
+      Kafka::Connection->new or Kafka::IO->new. In this case '$REQUEST_TIMEOUT'
+      is used for the rest of IO operations.
+    BUGFIXES:
+    - Kafka::IO->new preserves external alarms but this may delay alarm signal
+      delivery (thanks to Stephen Sprague).
+
+0.800_5 Fri Oct  18 2013
+    CHANGES:
+    - Test t/??_io.t checks the external ALRM signal handler.
+    - Minor improvements in documentation.
+
+0.800_4 Fri Sep  27 2013
+    CHANGES:
+    - Refactored error handling. See documentation for module Kafka::Exceptions.
+      Retired methods RaiseError, last_error last_errorcode.
+    - Added method Kafka::Connection->cluster_errors.
+
+0.800_3 Tue Sep  17 2013
+    CHANGES:
+    - Use Try::Tiny for proper preservation of $@ .
+
+0.800_2 Mon Sep  16 2013
+
+    BUGFIXES:
+    - Fixed to make it working on Perl 5.10 and over.
+
+0.800_1 Fri Sep  06 2013
+
+    !!! This is a major upgrade that changes API. It's strongly advised to study
+    revised documentation and update your code where necessary !!!
+
+    CHANGES:
+    - Implement Kafka API ver 0.8.0 . For communication with earlier versions of Kafka
+      use Kafka module versions before 0.8.0 .
+    - Added Kafka::Connection, Kafka::Internals.
+    - Kafka::Mock renamed to Kafka::MockIO and moved to t/lib.
+    - Additional testing units (in t/lib) for the following modules:
+      Kafka::Cluster, Kafka::MockProtocol, Kafka::TestInternals.
+    - Various service scripts & configurations added in t/bin and t/config.
+    - Profiling scripts are added to the tools directory.
+    - Introducted KAFKA_BASE_DIR environment variable to specify alternative location
+      to Kafka base directory. Defaults to t/data.
+    - Updated service files needed to build the package.
+
+0.12  Fri Mar  08 2013
+    CHANGES:
+    - Change the port used in the Kafka::Mock
+
+0.11  Thu Feb  28 2013
+    CHANGES:
+    - Use String::CRC32 instead of Digest::CRC
+
+0.10  Thu Feb  07 2013
+    CHANGES:
+    - 03_kafka_bench.t does not depend on previous tests
+
+0.09  Mon Jan  14 2013
+    CHANGES:
+    - benchmark_consumer.pl and benchmark_producer.pl are moved
+      to directory tools
+    - Makefile.PL by default does not ask questions interactively
+
+0.08  Fri Dec  21 2012
+    CHANGES:
+    - Tests reorganized
+
+0.07  Thu Dec  18 2012
+    FIXES:
+    - Checking OS and Perl version in Makefile.PL
+      CPAN RT #82018: Tests hang on Windows. (reported by Alexandr Ciornii)
+
+0.06  Wed Sep  26 2012
+    CHANGES:
+    - Refinement of calculation operation time in benchmarks
+    - Some improvements in tests
+
+0.05  Thu Sep  13 2012
+    CHANGES:
+    - Mock server tests moved to 'xt' directory
+
+0.04  Mon Sep  10 2012
+    CHANGES:
+    - Author and release tests moved to 'xt' directory
+
+0.03  Thu Aug  30 2012
+    CHANGES:
+    - Makefile.PL modified for the use of command line
+    - Added control code coverage 'coverage.sh'
+    - Added test 't/94_fixme.t'
+    - Added test 't/95_critic.t'
+
+    BUGFIXES:
+    - Fixed version number to 'use 5.010'
+
+0.02  Wed Jun  13 2012
+    CHANGES:
+    - Minor changes in documentation
+
+    BUGFIXES:
+    - Fixed Kafka::Int64 to make it working on Perl 5.12
+    - Disallow using 0 timeouts in Kafka::IO and Kafka::Mock
+
+0.01  Tue Jun  12 2012
+    - Original version

@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/Kwiki/Theme/BlueOcean.pm
+t/00-load.t

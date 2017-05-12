@@ -1,0 +1,39 @@
+#TODO: Generischer Ansatz. Keine Beschränkung auf HTTP_ACCEPT_LANGUAGE und HTTP_USER_AGENT
+
+Client-Klassen (Sprache, Browser/Ausgabemedium):
+-	Definition der Klassen:
+	Sprache: HTTP_ACCEPT_LANGUAGE
+	( de => 'de', en => 'en' )
+
+	Browser: HTTP_USER_AGENT
+	( ie => 'MSIE', gecko => 'Gecko' )
+	
+-	Prüfung der Klasse
+	1)	Ist explizit eine Klasse ausgewählt?
+		$top->{session}->get('iBlock::ClientClass::Language');
+		$top->{session}->get('iBlock::ClientClass::Display');
+	
+	2) Ist eine Klasse aus den HTTP-Headern ableitbar?
+		-	Extraktion der zutreffenden Klassen aus der Definitionsliste mittels RegExp-Match auf die jew. Header-Zeile
+		-	Anhängen der Klasse undef => undef als Default
+
+-	Auswahl der Datei
+	-	Generierung aller ((n+1)*(m+1)) Kombinationen der Sprach- und Browserklassen und den entspr. Dateinamen.
+		Zuerst definierte Klassen werden auch zuerst geprüft:
+		datei.de.ie.template
+		datei.de.gecko.template
+		datei.de.template
+		datei.en.ie.template
+		datei.en.gecko.template
+		datei.en.template
+		datei.ie.template
+		datei.gecko.template
+		datei.template
+	-	Prüfung, ob eine Datei aus der Liste existiert. Die erste existierende Datei wird genutzt.
+	
+=> Problem: (n+1)*(m+1) Prüfungen auf Datei-Existenz.
+	-	Evtl. sehr langsam. Ggf. Erstellung eines Hashes des entsprechenden Verzeichnisses:
+		opendir DIR, $dir or return;
+		my %dir_hash = map { $_ => 1 } readdir DIR;
+		my $file_exists = $dir_hash{$filename};
+

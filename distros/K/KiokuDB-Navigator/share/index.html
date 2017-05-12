@@ -1,0 +1,53 @@
+<html>
+<head>
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+<script language="javascript" src="js/jquery-1.2.6.js"></script>
+<script language="javascript" src="js/json2.js"></script>
+<script language="javascript" src="js/JSORB.js"></script>
+<script language="javascript" src="js/lib/KiokuDB.js"></script>
+<script language="javascript" src="js/lib/KiokuDB/Navigator.js"></script>
+<script language="javascript" src="js/lib/KiokuDB/Navigator/UI.js"></script>
+<script language="javascript">
+
+var nav = new KiokuDB.Navigator ('http://localhost:9999/');
+
+function load_object (id) {
+    (new KiokuDB.Navigator.UI ({
+        'id'        : id,
+        'navigator' : nav
+    })).load_object(function (self) {
+        $(document.body).append( self.container );
+    });
+}
+
+function load_root_set (e) {
+    nav.load_root_set(
+        function ( arr ) {
+            var o = '<select id="root_set_select">';
+            for (var i = 0; i < arr.length; i++) {
+                o += '<option value="' + arr[i] + '">' + arr[i] + '</option>';
+            }
+            o+= '</select>&nbsp;<input type="button" value="load" onclick="load_object_from_root_set()">';
+            $(e).parent().html( o );
+        }
+    );
+}
+
+function load_object_from_root_set () {
+    var select = $('#root_set_select')[0];
+    load_object( select.options[ select.selectedIndex ].value );
+}
+
+
+</script>
+</head>
+<body>
+<table class="menu" cellspacing="5" border="0" width="100%">
+<tr>
+<td class="title"><span class="title_kioku">KiokuDB</span>Navigator</td>
+<td class="controls" width="33%"><input type="text" id="lookup" size="30" />&nbsp;<input type="button" value="lookup" onclick="load_object( $('#lookup').val() )" /></td>
+<td class="controls" width="33%" align="right"><input type="button" value="load root set" onclick="load_root_set(this)" /></td>
+</tr>
+</table>
+</body>
+</html>

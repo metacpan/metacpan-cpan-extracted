@@ -1,0 +1,314 @@
+
+# Auto-generated file -- DO NOT EDIT!!!!!
+
+=head1 NAME
+
+KinoSearch::Search::QueryParser - Transform a string into a Query object.
+
+=head1 DEPRECATED
+
+The KinoSearch code base has been assimilated by the Apache L<Lucy> project.
+The "KinoSearch" namespace has been deprecated, but development continues
+under our new name at our new home: L<http://lucy.apache.org/>
+
+=head1 SYNOPSIS
+
+    my $query_parser = KinoSearch::Search::QueryParser->new(
+        schema => $searcher->get_schema,
+        fields => ['body'],
+    );
+    my $query = $query_parser->parse( $query_string );
+    my $hits  = $searcher->hits( query => $query );
+
+
+
+=head1 DESCRIPTION
+
+QueryParser accepts search strings as input and produces
+L<KinoSearch::Search::Query> objects, suitable for feeding into
+L<IndexSearcher|KinoSearch::Search::IndexSearcher> and other
+L<Searcher|KinoSearch::Search::Searcher> subclasses.
+
+The following syntactical constructs are recognized by QueryParser:
+
+    * Boolean operators 'AND', 'OR', and 'AND NOT'.
+    * Prepented +plus and -minus, indicating that the labeled entity 
+      should be either required or forbidden -- be it a single word, a 
+      phrase, or a parenthetical group.
+    * Logical groups, delimited by parentheses.  
+    * Phrases, delimited by double quotes.
+
+Additionally, the following syntax can be enabled via set_heed_colons():
+
+    * Field-specific constructs, in the form of 'fieldname:termtext' or 
+      'fieldname:(foo bar)'.  (The field specified by 'fieldname:' will be
+      used instead of the QueryParser's default fields).
+
+=head1 CONSTRUCTORS
+
+=head2 new( I<[labeled params]> )
+
+    my $query_parser = KinoSearch::Search::QueryParser->new(
+        schema         => $searcher->get_schema,    # required
+        analyzer       => $analyzer,                # overrides schema
+        fields         => ['bodytext'],             # default: indexed fields
+        default_boolop => 'AND',                    # default: 'OR'
+    );
+
+Constructor.
+
+=over
+
+=item *
+
+B<schema> - A L<Schema|KinoSearch::Plan::Schema>.
+
+=item *
+
+B<analyzer> - An L<Analyzer|KinoSearch::Analysis::Analyzer>.
+Ordinarily, the analyzers specified by each field's definition will be
+used, but if C<analyzer> is supplied, it will override and be used for
+all fields.  This can lead to mismatches between what is in the index
+and what is being searched for, so use caution.
+
+=item *
+
+B<fields> - The names of the fields which will be searched against.
+Defaults to those fields which are defined as indexed in the supplied
+Schema.
+
+=item *
+
+B<default_boolop> - Two possible values: 'AND' and 'OR'.  The default
+is 'OR', which means: return documents which match any of the query
+terms.  If you want only documents which match all of the query terms,
+set this to 'AND'.
+
+=back
+
+
+
+
+
+=head1 METHODS
+
+=head2 parse(query_string)
+
+Build a Query object from the contents of a query string.  At present,
+implemented internally by calling tree(), expand(), and prune().
+
+=over
+
+=item *
+
+B<query_string> - The string to be parsed.  May be undef.
+
+=back
+
+Returns: a Query.
+
+=head2 tree(query_string)
+
+Parse the logical structure of a query string, building a tree
+comprised of Query objects.  Leaf nodes in the tree will most often be
+LeafQuery objects but might be MatchAllQuery or NoMatchQuery objects as
+well.  Internal nodes will be objects which subclass PolyQuery:
+ANDQuery, ORQuery, NOTQuery, and RequiredOptionalQuery.
+
+The output of tree() is an intermediate form which must be passed
+through expand() before being used to feed a search.
+
+=over
+
+=item *
+
+B<query_string> - The string to be parsed.
+
+=back
+
+Returns: a Query.
+
+=head2 expand(query)
+
+Walk the hierarchy of a Query tree, descending through all PolyQuery
+nodes and calling expand_leaf() on any LeafQuery nodes encountered.
+
+=over
+
+=item *
+
+B<query> - A Query object.
+
+=back
+
+Returns: A Query -- usually the same one that was supplied after
+in-place modification, but possibly another.
+
+=head2 expand_leaf(query)
+
+Convert a LeafQuery into either a TermQuery, a PhraseQuery, or an
+ORQuery joining multiple TermQueries/PhraseQueries to accommodate
+multiple fields.  LeafQuery text will be passed through the relevant
+Analyzer for each field.  Quoted text will be transformed into
+PhraseQuery objects.  Unquoted text will be converted to either a
+TermQuery or a PhraseQuery depending on how many tokens are generated.
+
+=over
+
+=item *
+
+B<query> - A Query.  Only LeafQuery objects will be processed; others
+will be passed through.
+
+=back
+
+Returns: A Query.
+
+=head2 prune(query)
+
+Prevent certain Query structures from returning too many results.
+Query objects built via tree() and expand() can generate "return the
+world" result sets, such as in the case of
+C<< NOT a_term_not_in_the_index >>; prune() walks the hierarchy
+and eliminates such branches.  
+
+     'NOT foo'               => [NOMATCH]
+     'foo OR NOT bar'        => 'foo'
+     'foo OR (-bar AND -baz) => 'foo'
+
+prune() also eliminates some double-negative constructs -- even though 
+such constructs may not actually return the world:
+
+     'foo AND -(-bar)'      => 'foo'
+
+In this example, safety is taking precedence over logical consistency.
+If you want logical consistency instead, call tree() then expand(),
+skipping prune().
+
+=over
+
+=item *
+
+B<query> - A Query.
+
+=back
+
+Returns: a Query; in most cases, the supplied Query after in-place
+modification.
+
+=head2 set_heed_colons(heed_colons)
+
+Enable/disable parsing of C<< fieldname:foo >> constructs.
+
+=head2 make_term_query( I<[labeled params]> )
+
+Factory method creating a TermQuery.
+
+=over
+
+=item *
+
+B<field> - Field name.
+
+=item *
+
+B<term> - Term text.
+
+=back
+
+Returns: A Query.
+
+=head2 make_phrase_query( I<[labeled params]> )
+
+Factory method creating a PhraseQuery.
+
+=over
+
+=item *
+
+B<field> - Field that the phrase must occur in.
+
+=item *
+
+B<terms> - Ordered array of terms that must match.
+
+=back
+
+Returns: A Query.
+
+=head2 make_and_query(children)
+
+Factory method creating an ANDQuery.
+
+=over
+
+=item *
+
+B<children> - Array of child Queries.
+
+=back
+
+Returns: A Query.
+
+=head2 make_or_query(children)
+
+Factory method creating an ORQuery.
+
+=over
+
+=item *
+
+B<children> - Array of child Queries.
+
+=back
+
+Returns: A Query.
+
+=head2 make_not_query(negated_query)
+
+Factory method creating a NOTQuery.
+
+=over
+
+=item *
+
+B<negated_query> - Query to be inverted.
+
+=back
+
+Returns: A Query.
+
+=head2 make_req_opt_query( I<[labeled params]> )
+
+Factory method creating a RequiredOptionalQuery.
+
+=over
+
+=item *
+
+B<required_query> - Query must must match.
+
+=item *
+
+B<optional_query> - Query which should match.
+
+=back
+
+Returns: A Query.
+
+
+
+=head1 INHERITANCE
+
+KinoSearch::Search::QueryParser isa L<KinoSearch::Object::Obj>.
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005-2011 Marvin Humphrey
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
+

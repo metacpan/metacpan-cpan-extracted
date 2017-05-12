@@ -1,0 +1,14 @@
+lib/Keyword/TreeFold.pm
+
+t/12-Single-Lexical.t
+t/10-Lexical-Count.t
+t/11-Algorithm-Sanity.t
+t/20-Performance/01-Progressive-Count.t
+t/10-Lexical-Count.t
+t/lib/Bogus.pm
+
+Makefile.PL
+Changes
+MANIFEST
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

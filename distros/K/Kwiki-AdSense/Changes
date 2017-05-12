@@ -1,0 +1,10 @@
+---
+version: 0.11
+date:    Tue Feb 15 18:28:11 PST 2005
+changes:
+- Forgot Makefile.PL in MANIFEST
+---
+version: 0.10
+date: Mon Feb 14 18:20:07 PST 2005
+changes:
+- Initial version of Kwiki::AdSense

@@ -1,0 +1,49 @@
+NAME
+    KiokuDB::Backend::CouchDB - CouchDB backend for KiokuDB
+
+SYNOPSIS
+        KiokuDB->connect( "couchdb:uri=http://127.0.0.1:5984/database" );
+
+DESCRIPTION
+    This backend provides KiokuDB support for CouchDB using
+    AnyEvent::CouchDB.
+
+DEBUGGING
+    Set the environment variable KIOKU_COUCH_TRACE if you want debug output
+    describing what CouchDB bound requests are being processed.
+
+TRANSACTION SUPPORT
+    This backend does not currently support transactions.
+
+ATTRIBUTES
+    db  An AnyEvent::CouchDB::Database instance.
+
+        Required.
+
+    create
+        Whether or not to try and create the database on instantiaton.
+
+        Defaults to false.
+
+SEE ALSO
+    KiokuX::CouchDB::Role::View.
+
+VERSION CONTROL
+    <http://github.com/mzedeler/kiokudb-backend-couchdb>
+
+AUTHOR
+    Yuval Kogman <nothingmuch@woobling.org>
+
+CONTRIBUTORS
+    Michael Zedeler <michael@zedeler.dk<gt>, Anders Bruun Borch
+    <cyborch@deck.dk<gt>, Martin Parm <parmus@parmus.dk<gt>.
+
+COPYRIGHT
+        Copyright (c) 2008, 2009 Yuval Kogman, Infinity Interactive. All
+        rights reserved This program is free software; you can redistribute
+        it and/or modify it under the same terms as Perl itself.
+
+        Copyright (c) 2010 Leasingbørsen. All rights reserved. This program
+        is free software; you can redistribute it and/or modify it under 
+        the same terms as Perl itself.
+

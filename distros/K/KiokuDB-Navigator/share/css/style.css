@@ -1,0 +1,172 @@
+
+body {
+    font-family : sans-serif;
+    margin      : 0px;
+    font-size   : 0.9em;
+}
+
+.menu {
+    border-bottom : 1px solid black;
+    background    : #336699;
+    color         : white;
+}
+
+.menu .title_kioku {
+    font-family: arial black;
+}
+
+.menu .title {
+    font-size: 1.1em;
+}
+
+.menu .controls {
+    font-size : 0.9em;
+}
+
+.window {
+    border  : 1px solid black;
+    padding : 2px;
+    margin  : 5px;
+}
+
+.window .handle {
+    background : #666666;
+    color      : #ffffff;
+    text-align : right;
+    padding    : 2px;
+}
+
+.window .handle a {
+    color : #ffffff;
+    text-decoration : none;
+}
+
+.window .body {
+    padding : 2px;
+}
+
+.window .body .object {
+    border  : 1px dotted black;
+    padding : 2px;
+}
+
+.window .body .object .header {
+    background : white;
+    padding    : 2px;
+}
+
+.window .body .object .header .__CLASS__ {
+    font-weight : bold;
+    font-size   : 1.5em;
+}
+
+.window .body .object .header .id {
+    font-style : italic;
+    font-size  : 0.8em;
+}
+
+.window .body .object .data {
+    padding    : 5px;
+    background : #dddddd;
+    border     : 1px dotted black;
+}
+
+.window .body .object .data ul {
+    list-style   : none;
+    padding-left : 5px;
+}
+
+.window .body .object .data li {
+    clear: both;
+}
+
+.window .body .object .data li .label {
+    font-style   : italic;
+    float        : left;
+    width        : 250px;
+    color        : #666666;
+}
+
+.window .body .object .data li .value {
+    padding-top     : 2px;
+    padding-bottom  : 2px;
+    border-bottom   : 1px dotted #aaaaaa;
+}
+
+.window .body .object .data li .value a {
+    color      : #336699;
+    font-size  : 0.8em;
+}
+
+table.hash {
+    font-size  : 0.9em;
+    margin     : 1px;
+    background : #eeeeee;
+}
+
+table.hash tbody tr td.hash_key {
+    color : #666666;
+}
+
+table.hash tbody tr td.fat_comma {
+    color : #666666;
+}
+
+table.hash tbody tr td.hash_value {
+
+}
+
+/* sub objects */
+
+.window .body .sub_object {
+    margin-left   : 30px;
+    margin-top    : 5px;
+    margin-bottom : 10px;
+}
+
+.window .body .sub_object .header {
+    background : white;
+    padding    : 2px;
+}
+
+.window .body .sub_object .header .__CLASS__ {
+    font-weight : bold;
+    font-size   : 1.2em;
+}
+
+.window .body .sub_object .header .id {
+    font-style : italic;
+    font-size  : 0.8em;
+}
+
+.window .body .sub_object .data {
+    padding    : 5px;
+    background : #dddddd;
+    border     : 1px dotted black;
+}
+
+.window .body .sub_object .data ul {
+    list-style   : none;
+    padding-left : 5px;
+}
+
+.window .body .sub_object .data li {
+}
+
+.window .body .sub_object .data li .label {
+    font-style   : italic;
+    float        : left;
+    width        : 250px;
+    color        : #666666;
+}
+
+.window .body .sub_object .data li .value {
+
+}
+
+
+.hidden {
+    display : none;
+}
+
+

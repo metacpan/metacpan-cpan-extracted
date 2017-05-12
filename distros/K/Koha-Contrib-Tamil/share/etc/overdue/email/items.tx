@@ -1,0 +1,7 @@
+Le(s) document(s) actuellement en retard:
+
+: for $items -> $item {
+- <: $item.title :> <: $item.unititle :> <: $item.volume :>
+  <: $item.homebranch :>, <: $item.itemcallnumber :>, <: $item.barcode :>
+  attendu le <: $item.date_due :>
+: }

@@ -1,0 +1,151 @@
+NAME
+    Kavorka - function signatures with the lure of the animal
+
+SYNOPSIS
+       use Kavorka;
+   
+       fun maxnum (Num @numbers) {
+          my $max = shift @numbers;
+          for (@numbers) {
+             $max = $_ if $max < $_;
+          }
+          return $max;
+       }
+   
+       my $biggest = maxnum(42, 3.14159, 666);
+
+STATUS
+    Kavorka is still at a very early stage of development; there are likely to
+    be many bugs that still need to be shaken out. Certain syntax features are
+    a little odd and may need to be changed in incompatible ways.
+
+DESCRIPTION
+    Kavorka provides `fun` and `method` keywords for declaring functions and
+    methods. It uses Perl 5.14's keyword API, so should work more reliably
+    than source filters or Devel::Declare-based modules.
+
+    The syntax provided by Kavorka is largely inspired by Perl 6, though it
+    has also been greatly influenced by Method::Signatures and
+    Function::Parameters.
+
+    For information using the keywords exported by Kavorka:
+
+    *   Kavorka::Manual::Functions
+
+    *   Kavorka::Manual::Methods
+
+    *   Kavorka::Manual::MethodModifiers
+
+    *   Kavorka::Manual::MultiSubs
+
+  Exports
+    `-default`
+        Exports `fun` and `method`.
+
+    `-modifiers`
+        Exports `before`, `after`, and `around`.
+
+    `-allmodifiers`
+        Exports `before`, `after`, `around`, `augment`, and `override`.
+
+    `-all`
+        Exports `fun`, `method`, `before`, `after`, `around`, `augment`,
+        `override`, `classmethod`, `objectmethod`, and `multi`.
+
+    For example:
+
+       # Everything except objectmethod and multi...
+       use Kavorka qw( -default -allmodifiers classmethod );
+
+    You can rename imported functions:
+
+       use Kavorka method => { -as => 'meth' };
+
+    You can provide alternative implementations:
+
+       # use My::Sub::Method instead of Kavorka::Sub::Method
+       use Kavorka method => { implementation => 'My::Sub::Method' };
+
+    Or add traits to the default implementation:
+
+       use Kavorka method => { traits => ['My::Sub::Role::Foo'] };
+
+    See Exporter::Tiny for more tips.
+
+  Function Introspection API
+    The coderef for any sub created by Kavorka can be passed to the
+    `Kavorka->info` method. This returns a blessed object that does the
+    Kavorka::Sub role.
+
+       fun foo (:$x, :$y) { }
+   
+       my $info = Kavorka->info(\&foo);
+   
+       my $function_name = $info->qualified_name;
+       my @named_params  = $info->signature->named_params;
+   
+       say $named_params[0]->named_names->[0];   # says 'x'
+
+    See Kavorka::Sub, Kavorka::Signature and Kavorka::Parameter for further
+    details.
+
+    If you're using Moose, consider using MooseX::KavorkaInfo to expose
+    Kavorka method signatures via the meta object protocol.
+
+    Kavorka::Manual::API provides more details and examples using the
+    introspection API.
+
+CAVEATS
+    *   As noted in Kavorka::Manual::PrototypeAndAttributes, subroutine
+        attributes don't work properly for anonymous functions.
+
+    *   This module is based on Parse::Keyword, which has a chronically broken
+        implementation of closures. Kavorka uses PadWalker to attempt to work
+        around the problem. This mostly seems to work, but you may experience
+        some problems in edge cases, especially for anonymous functions and
+        methods.
+
+    *   If importing Kavorka's method modifiers into Moo/Mouse/Moose classes,
+        pay attention to load order:
+
+           use Moose;
+           use Kavorka -all;   # ok
+
+        If you do it this way, Moose's `before`, `after`, and `around`
+        keywords will stomp on top of Kavorka's...
+
+           use Kavorka -all;
+           use Moose;          # STOMP, STOMP, STOMP!  :-(
+
+        This can lead to delightfully hard to debug errors.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Kavorka>.
+
+SUPPORT
+    IRC: support is available through in the *#moops* channel on irc.perl.org
+    <http://www.irc.perl.org/channels.html>.
+
+SEE ALSO
+    Kavorka::Manual.
+
+    Inspirations: <http://perlcabal.org/syn/S06.html>, Function::Parameters,
+    Method::Signatures.
+
+    <http://en.wikipedia.org/wiki/The_Conversion_(Seinfeld)>.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2013-2014, 2017 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

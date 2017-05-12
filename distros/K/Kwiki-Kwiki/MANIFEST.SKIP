@@ -1,0 +1,11 @@
+~$
+ToDo
+bin/install
+bin/make-lib
+bin/make-src
+blib
+^Makefile$
+Makefile.old
+pm_to_blib
+kwiki
+configs/

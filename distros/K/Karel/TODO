@@ -1,0 +1,28 @@
+# -*- mode: org -*-
+
+* TODO [8/12]
+
+- [X] running learned commands: push the corresponding compiled struct
+
+- [X] parsing from text
+
+- [X] repeat 0 x - fails to parse
+
+- [X] add version to grid files
+
+- [X] for "expected" in exceptions, parser should provide a nicer
+  messages than "octothorpe" etc.
+
+- [ ] parser should report core commands, so we can deparse
+
+- [X] change comments so they can occur wherever whitespace can
+
+- [X] report unknown commands from parsing
+
+- [X] several parsers: English and Czech
+
+- [ ] refactor stack to a class (weak?)
+
+- [ ] refactor knowledge to a class?
+
+- [ ] GUI

@@ -1,0 +1,42 @@
+$Id: README,v 1.1 2007-05-16 12:41:15 mike Exp $
+
+We support seven kinds of form element here.  "error" and "separator"
+are so trivial they are implemented in their own little components,
+but the six proper controls (textbox, password, textarea, select,
+checkbox and upload) share a lot of logic, so they all use the generic
+_control.mc and have it call back to the little raw component that's
+nested inside.
+
+Calling the controls (textbox.mc and friends):
+
+* $name is MANDATORY, the name of the control (and therefore of the
+  query parameter that it generates)
+
+* $obj is a reference to an object (e.g. a Property::DB::User) that
+  the form is associated with, or the name of a class when the form is
+  being used to create a new object.  This is OPTIONAL.  But --
+
+* $label is the text to be emitted alongside the control to guide the
+  user.  If it is not specified, then the object or class passed as
+  $obj is asked what label to use for the given $name; so EITHER $obj
+  OR $label must be specified.
+
+* $mandatory is an OPTIONAL boolean indicating whether or not the
+  field is mandatory, so that an error message is emitted if it is
+  left empty when the form is submitted.  If this is undefined, then
+  $obj is consulted; if $obj is undefined, then $mandatory defaults
+  to being false.
+
+* $submitted is a MANDATORY boolean, saying whether the form that this
+  control is part of has been submitted (and so is being re-presented
+  to the user to gather extra data) as opposed to being displayed for
+  the first time.  This determines whether or not "This field is
+  mandatory" messages are emitted.
+
+* $prefix and $suffix are OPTIONAL chunks of text to be emitted before
+  and after the control.
+
+* $caption is an OPTIONAL chunk of text to be displayed unobtrusively
+  in connection with the control, e.g. to provide help in filling it
+  in.
+

@@ -1,0 +1,17 @@
+Perl module to give easy access to NVIDIA CUDA from Perl using the
+Kappa Library.  This module gives access (via the Kappa Library) to
+all NVIDA CUDA driver functionality (a superset of the NVIDIA CUDA
+runtime functionality).  Since the Kappa Library is written in C++ and
+most (host) processing occurs within the Kappa library, the KappaCUDA
+module gives CUDA performance comparable to a C++ CUDA driver program.
+Since the Kappa Library automatically chooses NVIDIA suggested
+performance optimizations for the given NVIDIA GPU's and implements
+automatic concurrent CUDA kernel execution on FERMI GPU's, the
+KappaCUDA module can give CUDA performance better than C++ CUDA driver
+or runtime API programs (however, a hand tuned C++ Kappa Library or
+CUDA driver program will be faster).
+
+The (Commercial) Kappa Library is required and is available from
+psilambda.com.  The Kappa Library requires an appropriate NVIDIA CUDA
+GPU and driver--see the installation guides for the Kappa Library for
+other prerequisites.

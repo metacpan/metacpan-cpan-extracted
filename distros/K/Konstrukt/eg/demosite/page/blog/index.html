@@ -1,0 +1,9 @@
+<& template src="/templates/layout.template" title="blog" &>
+	<$ content $>
+		<div style="text-align: right">
+		<a href="/blog/rss2/"><img src="/img/blog/rss2.gif" title="RSS 2.0" /></a>
+		</div>
+		<& blog show="filter" / &>
+		<& blog / &>
+	<$ / $>
+<& / &>

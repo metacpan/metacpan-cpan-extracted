@@ -1,0 +1,92 @@
+Revision history for Perl extension Karas
+
+0.07
+
+    [INCOMPATIBLE CHANGE]
+    - removed Ro::Raw
+
+0.06
+
+    [INCOMPATIBLE CHANGE]
+    - pull insert_on_duplicate to public core method.
+    - bulk_insert method supports non mysql RDB
+    - no AUTOLOAD, no magic.
+    - added 'replace' method.
+
+0.05
+
+    [INCOMPATIBLE CHANGE]
+    - new Schema structure
+
+0.04
+
+    commit b528adb8db17e4c2db37841850918572dce45068
+    Author: tokuhirom <tokuhirom@gmail.com>
+    Date:   Sat Dec 8 08:47:00 2012 +0900
+
+    no living dead
+
+    commit 22a5d6c24be4981808e9c4886f7d4ba5dc0db607
+    Author: tokuhirom <tokuhirom@gmail.com>
+    Date:   Sat Dec 8 08:07:22 2012 +0900
+
+    no living dead
+
+    commit 61a59ba00ab7fe7d77bbdba1fbe19a8cc5abe53b
+    Author: tokuhirom <tokuhirom@gmail.com>
+    Date:   Sat Dec 8 08:05:51 2012 +0900
+
+    remove AFTER_INSERT hook
+
+    commit a3728733ebfaa8683722e3ebba9f7434bb31623d
+    Author: tokuhirom <tokuhirom@gmail.com>
+    Date:   Sat Dec 8 08:03:58 2012 +0900
+
+    tidy
+
+    commit 54c2f933da3c7297dc38a42bfdb0759c4030382b
+    Author: tokuhirom <tokuhirom@gmail.com>
+    Date:   Sat Dec 8 07:55:03 2012 +0900
+
+    remove trash
+
+    commit 1b3a5630801e8cc8f803439a1eb094cd84eab1a3
+    Author: tokuhirom <tokuhirom@gmail.com>
+    Date:   Sat Dec 8 07:49:59 2012 +0900
+
+    - added retrieve method
+    - Timestamp plugin supports insert_multi
+    - fixed insert_multi
+
+    commit cc1c86a7e54fe07629be766ecd5efb794ece6938
+    Author: tokuhirom <tokuhirom@gmail.com>
+    Date:   Sat Dec 8 06:44:01 2012 +0900
+
+    switch to DBIx::Handler
+
+    commit d04f9a0935af212fb079a32faa735ddc93f7e39a
+    Author: tokuhirom <tokuhirom@gmail.com>
+    Date:   Fri Dec 7 19:38:51 2012 +0900
+
+    fixed deps
+
+0.03
+
+    - fixed deps(reported by syohex)
+
+0.02
+
+    commit 05682dc2d1b3bcd9bc8218c9d2e25ac604f763e5
+    Author: tokuhirom <tokuhirom@gmail.com>
+    Date:   Tue Dec 4 17:08:10 2012 +0900
+
+    added count method
+
+    commit 8d5c19dc7685f89c41c360bc99691b9b262d9a41
+    Author: tokuhirom <tokuhirom@gmail.com>
+    Date:   Tue Dec 4 16:55:13 2012 +0900
+
+    you can update database via dirty row object
+
+0.01    Tue Dec  4 01:32:56 2012
+    - original version

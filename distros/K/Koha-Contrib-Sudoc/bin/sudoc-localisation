@@ -1,0 +1,78 @@
+#!/usr/bin/perl 
+
+# PODNAME: sudoc-localisation
+# ABSTRACT: Génération de fichier de localisation automatique dans le Sudoc
+
+package Main;
+$Main::VERSION = '2.23';
+use Modern::Perl;
+use utf8;
+use Getopt::Long;
+use Pod::Usage;
+use Koha::Contrib::Sudoc::Localisation;
+
+
+my ($help, $test);
+my $select   = "SELECT biblionumber FROM biblio";
+my $lignes   = 1000;
+my $type     = 'isbn';
+my $ppn      = '001';
+my $coteabes = '930 $a';
+my $peb      = 1;
+GetOptions(
+    'help|h'     => \$help,
+    'select=s'   => \$select,
+    'lignes=i'   => \$lignes,
+    'test'       => \$test,
+    'type=s'     => \$type,
+    'ppn=s'      => \$ppn,
+    'coteabes=s' => \$coteabes,
+    'peb!'       => \$peb,
+);
+
+binmode(STDOUT, ":encoding(utf8)");
+
+if ( $help ) {
+    pod2usage( -verbose => 2 );
+    exit;
+}
+
+my $localiser = Koha::Contrib::Sudoc::Localisation->new(
+    select   => $select,
+    test     => $test,
+    lines    => $lignes,
+    type     => $type,
+    ppn      => $ppn,
+    coteabes => $coteabes,
+    peb      => $peb,
+    verbose  => 1,
+);
+$localiser->run();       
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+sudoc-localisation - GÃ©nÃ©ration de fichier de localisation automatique dans le Sudoc
+
+=head1 VERSION
+
+version 2.23
+
+=head1 AUTHOR
+
+Frédéric Demians <f.demians@tamil.fr>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2016 by Fréderic Demians.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

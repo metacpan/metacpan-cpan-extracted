@@ -1,0 +1,5 @@
+$Id: README,v 1.1 2008-03-07 17:30:43 mike Exp $
+
+These files were downloaded from Openly's OpenURL 1.0 test-suite.
+They are used by the resolver's regression-test, and will be made
+available on resolver.indexdata.com for that purpose.

@@ -1,0 +1,9 @@
+Revision history for Perl extension Kwiki::OpenSearch::Service
+
+0.02  Mon Jan  9 19:03:44 UTC 2006
+        - Upgraded to OpenSearch 1.1 response format.
+          No Auto-Discovery support yet, since Kwiki doesn't allow doing
+          it easily.
+
+0.01  Thu Mar 31 00:06:47 2005
+	- original version

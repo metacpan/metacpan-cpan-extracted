@@ -1,0 +1,50 @@
+# How to store a complicated data structure into KDB+ and retrieve it
+#########################
+
+# change 'tests => 2' to 'tests => last_test_to_print';
+
+use Test::More tests => 3;
+use Kx;
+use Data::Dumper;
+$Data::Dumper::Indent = 0; # no newlines, important
+
+my $k = new Kx(host=>"localhost", port=>2222, check_for_errors=>1);
+ok( defined $k, 'New');
+my $rv = $k->connect;
+ok(defined $rv, 'Connect');
+die "Can't connect to KDB+ " unless $rv;
+
+# create new table
+$k->Tnew(name=>'mytab',cols=>[qw/id data ts/]);
+
+# Build complicated Perl structure
+my $arr = { a=>['a','b','c',1,2,3], b=>'this is a test'};
+for (0..100)
+{
+	$arr->{$_} = {$_ => $_};
+	$arr->{"a$_"} = [$_, $_];
+}
+
+# Serialise it as a KDB+ symbol. Data::Dumper doesn't use double quotes 
+my $arrsym = '`$"' . Dumper($arr) . '"';
+
+# Insert it into a table
+$k->Tinsert('mytab',0,$arrsym,'.z.z');
+
+# Select a single row from the table
+$k->Tselect('rtn','select data from mytab where id=0');
+
+# Pull the new table back into local memory
+$k->Tget('rtn');
+
+# Get the data back into Perl string form
+$arrsym = $k->Tindex(0,0);
+print $arrsym,"\n";
+
+# Eval the string into a Perl data structure
+my $VAR1;
+eval $arrsym;
+ok($VAR1->{'b'} eq 'this is a test', "Perl data");
+print $VAR1->{'b'},"\n";
+
+print "End\n";

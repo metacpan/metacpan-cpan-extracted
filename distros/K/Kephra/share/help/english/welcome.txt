@@ -1,0 +1,36 @@
+
+       ---------
+      | Welcome |
+       ---------
+
+
+Any developer of our team is pleased to bring you this program. Please enjoy
+and visit our website for news, help or updates:
+
+                       http://kephra.sf.net   
+
+In case you have questions or comments feel invited to send us them. But please 
+be careful, your suggestions may already be fulfilled or part of our roadmap.
+
+                    kephra-tester@lists.sourceforge.net
+
+We are far away from our goal and standing nearly at the beginning so you can
+track the evolve of something beautiful, enjoy. And if you like to join us,
+your always welcome.
+
+It is our goal to create an editor with a rich featureset that ease all your 
+work as much as it makes sense. It is designed to be crossplatform, 
+very configurable and extensible that it can fit perfectly to you and your tasks.
+Knowing that this is nearly standart these days we also try to stay down to earth
+and build this program with wisdom and love, that it can become a real universal
+editor. But first will we serve ourselves and make it a good one for Perl and 
+HTML.
+
+
+
+                                                              Thanks
+
+
+
+
+P.S. This file cannot be changed, this is considered by the developer as a feature.

@@ -1,0 +1,23 @@
+---
+abstract: 'Bcrypt your passwords (Kelp module)'
+author:
+  - 'Stefan Geneshky <minimal@cpan.org>'
+build_requires:
+  Kelp: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Kelp-Module-Bcrypt
+requires:
+  Crypt::Eksblowfish::Bcrypt: '0'
+  Kelp::Base: '0'
+resources:
+  homepage: https://github.com/naturalist/kelp-module-bcrypt
+  repository: https://github.com/naturalist/kelp-module-bcrypt.git
+version: '0.2'

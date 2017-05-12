@@ -1,0 +1,58 @@
+1.0:
+ - plugins: tree, commandline, projects, filesystem
+ - tools: outline, tidy, debugger
+
+
+0.7 Toolintegration
+ + error highlighting/simple debugger
+ + App::Ack
+
+0.6 Plugin API
+ + commandline and tree tool extention
+ + simple file browser
+ + tidy
+
+0.5 polish for daily use
+
+0.4.5 
+0.4.4 fresh docs, about dialog, more localisations
+
+0.4.3 utf safe, cpan install, marker
+0.4.2 new tabbar, better folding
+0.4.1 folding, more converter
+
+0.4 fully configurable
+
+0.3.10 output and notepad panels
+0.3.9 inline default configs now complete
+0.3.8 move tabs
+0.3.7 autosave, autonotify
+0.3.6 new formater
+0.3.5 file history and templates menu
+0.3.4 open dir
+0.3.3 new configurable GUI, commands and event system
+0.3.2 brace navigation, contextmenu on text selection
+0.3.1 searchbar, bookmarks, goto last edit, DnD files
+
+0.3 more comfort
+ + autoindent, bracelight, braceindent, block navigation
+ + search and replace in files, search item history
+ + file sessions, info symbols in tabbar, drag'n'drop of files
+ + enhanced statusbar is now interactive and has contextmenus
+
+0.2.3 file sessions, save on exit dialog
+0.2.2 search and replace in files
+ 
+0.2 multi document handling
+ + find and replace dialog
+ + opens with same docs and settings as on close, otional ask before close
+ + autodetect EOL mode and write protection, faster IO
+ + more customizable Syntaxstyles with autoselect by fileending
+ + more visual helper, win XP look
+
+
+0.1 first public stable release
+ + edit only one document
+ + syntaxhighlighting
+ + basic file IO
+ + some graphic marker

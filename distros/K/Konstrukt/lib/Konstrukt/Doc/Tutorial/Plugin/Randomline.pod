@@ -1,0 +1,132 @@
+=head1 NAME
+
+Konstrukt::Doc::Tutorial::Plugin::Randomline - Create a really simple plugin putting out a random line
+
+=head1 DESCRIPTION
+
+This tutorial will teach you how to create a very L<simple plugin|Konstrukt::SimplePlugin>,
+that you can use in your web pages.
+
+=head1 SETUP
+
+Note: For the general setup of a new website see L<Konstrukt::Doc::Tutorial::Usage::Blog/SETUP>.
+
+For your plugin to be loaded, Perl must find it in its @INC paths. To create
+a plugin for a local website only, you can easily create a new directory
+for it and add this directory to Perl's @INC:
+
+=over
+
+=item 1. Create a new directory for your custom plugins
+
+For example C</path/to/your/site/lib>. Inside that directory create the
+directories C<Konstrukt/Plugin>, where you will put your plugin module.
+So the whole path to the directory for your custom plugin modules will be
+
+C</path/to/your/site/lib/Konstrukt/Plugin>
+
+=item 2. Let Perl know to look for additional modules in this directory.
+
+Add this line to your C<konstrukt.settings>:
+
+C<lib /path/to/your/site/lib>
+	
+See also L<Konstrukt::Doc::Installation/Installation of custom plugins>.
+
+=back
+
+=head1 CREATE THE PLUGIN
+
+We will create a very simple plugin, that will print a random line out of the
+embedded content.
+
+Create a file (e.g. C<random.html>) with this content:
+
+	<& randomline &>
+		some of
+		these lines
+		will be
+		put out
+		randomly
+	<& / &>
+
+Create a file C<randomline.pm> in your custom plugin directory with this
+skeleton:
+
+	package Konstrukt::Plugin::randomline;
+	
+	use strict;
+	use warnings;
+	
+	use base 'Konstrukt::SimplePlugin';
+	
+	#the default action for your plugin
+	sub default : Action {
+		my ($self, $tag, $content, $params) = @_;
+		print 'hi!';
+	}
+	
+	1;
+
+You can now point your web browser to the web page (e.g. C<random.html>) and
+you will see the text:
+
+	hi!
+
+=head1 ADD THE LOGIC
+
+We want to pick a random line of the embedded text and print it out.
+Replace the C<print> statement in the default action with this code:
+
+	#split the content into lines
+	my @lines = split /[ \t]*\r?\n[ \t]*/, $content;
+	#remove empty lines
+	@lines = grep { !/^\s*$/ } @lines;
+	#print a random line
+	print $lines[int rand @lines];
+
+That's it!
+
+You need to restart/reload your Apache, if you're using mod_perl, so that it
+loads your plugin module again.
+
+=head1 APPENDIX: THE COMPLETE PLUGIN
+
+	package Konstrukt::Plugin::randomline;
+	
+	use strict;
+	use warnings;
+	
+	use base 'Konstrukt::SimplePlugin';
+	
+	#the default action for your plugin
+	sub default : Action {
+		my ($self, $tag, $content, $params) = @_;
+		#split the content into lines
+		my @lines = split /[ \t]*\r?\n[ \t]*/, $content;
+		#remove empty lines
+		@lines = grep { !/^\s*$/ } @lines;
+		#print a random line
+		print $lines[int rand @lines];
+	}
+	
+	1;
+
+=head1 AUTHOR
+
+Copyright 2006 Thomas Wittek (mail at gedankenkonstrukt dot de). All rights reserved. 
+
+This document is free software.
+It is distributed under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+Next: L<Konstrukt::Doc::Tutorial::Plugin::Note::Actions>
+
+Previous: L<Konstrukt::Doc::Tutorial::Usage::Blog>
+
+Parent: L<Konstrukt::Doc>
+
+See also: L<Konstrukt::SimplePlugin>, L<Konstrukt::Doc::CreatingPlugins>
+
+=cut

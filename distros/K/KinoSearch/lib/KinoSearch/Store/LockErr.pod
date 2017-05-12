@@ -1,0 +1,56 @@
+
+# Auto-generated file -- DO NOT EDIT!!!!!
+
+=head1 NAME
+
+KinoSearch::Store::LockErr - Lock exception.
+
+=head1 DEPRECATED
+
+The KinoSearch code base has been assimilated by the Apache L<Lucy> project.
+The "KinoSearch" namespace has been deprecated, but development continues
+under our new name at our new home: L<http://lucy.apache.org/>
+
+=head1 SYNOPSIS
+
+    while (1) {
+        my $bg_merger = eval {
+            KinoSearch::Index::BackgroundMerger->new( index => $index );
+        };
+        if ( blessed($@) and $@->isa("KinoSearch::Store::LockErr") ) {
+            warn "Retrying...\n";
+        }
+        elsif (!$bg_merger) {
+            # Re-throw.
+            die "Failed to open BackgroundMerger: $@";
+        }
+        ...
+    }
+
+
+
+=head1 DESCRIPTION
+
+LockErr is a subclass of L<Err|KinoSearch::Object::Err> which indicates
+that a file locking problem occurred.
+
+
+
+
+
+
+
+=head1 INHERITANCE
+
+KinoSearch::Store::LockErr isa L<KinoSearch::Object::Err> isa L<KinoSearch::Object::Obj>.
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005-2011 Marvin Humphrey
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
+

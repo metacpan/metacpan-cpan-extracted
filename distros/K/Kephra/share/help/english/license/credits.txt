@@ -1,0 +1,33 @@
+
+       ---------
+      | Credits |
+       ---------
+
+
+Kephra by (C) Herbert Breunung and other, uses all the things listed below and is
+    licensed under GPL. (help/license/gpl.txt or www.fsf.org/licenses/gpl.txt)
+    Icons (in /config/ico/jenne) are made by Jens Neuwerk (www.stockicons.org)
+    starter-exe under Windows by Robin Haberkorn (Shai-Hulud)
+
+Perl (in /pre) by (C) Larry Wall and many others is licensed under the artistic 
+      license (help/license/artistic.txt or www.perl.com/language/misc/Artistic.html)
+      and GPL (see above)
+
+WxPerl (in /pre/wx) by Mattia Barbon wrappes WxWidgets for Perl 
+        and is licensed under the same terms as Perl itself (artistic license)
+
+Wx::Perl::ProcessStream by Mark Dootson, artistic license
+
+WxWidgets by Julian Smart, Robert Roebling, Vadim Zeitlin and others is licensed
+          under the wxWidgets license (help/license/wx.txt) wich is based upon
+          LGPL (help/license/lgpl.txt or www.fsf.org/licenses/lgpl.txt)
+          Portions (c) 1996 Artificial Intelligence Applications Institute
+
+Scintilla by (c) Neil Hodgson, see Neils license under (help/license/sci.txt)
+          it is included in WxWidgets as an contribution called wxSTC
+
+Strawberry (this Distribution of Perl) by Adam Kennedy and others is licensed as Perl
+
+Config::General (in /pre/cpan/config) by (c) 2000-2010 Thomas Linden ... Perl
+
+YAML::Tiny       Adam Kennedy, Perl

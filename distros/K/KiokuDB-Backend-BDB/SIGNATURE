@@ -1,0 +1,35 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.62.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 57b14635f42a471220b503671ecd9d31ac2288c8 Changes
+SHA1 27e8f0f72839c1124795ea761e3e9b96733ee4d5 MANIFEST
+SHA1 190e9058eb9c6446a1a3f3ddf15b082f1ecde152 MANIFEST.SKIP
+SHA1 ccfc7529acc57b5ba58bf8f2f7410369569ce3f7 META.yml
+SHA1 161c0106479f0c3c8c4ead33243e1b6d22256bb2 Makefile.PL
+SHA1 85cf8bcfd6102830a0d77323b52229ed8d2e8b30 check_bdb_version.PL
+SHA1 4ad6144c870957c2d4bf6897d7bc9787181d35b6 lib/KiokuDB/Backend/BDB.pm
+SHA1 c807f0cf000235c9338e18c07f72cd4fc377c2e2 lib/KiokuDB/Backend/BDB/GIN.pm
+SHA1 4bc81855939a9002f747712f8b2178ee5671fd65 lib/KiokuDB/Backend/BDB/Manager.pm
+SHA1 503c8f1ee070cb098ce1a9fa8f5b8a0671c1b4f9 t/bdb.t
+SHA1 5a96ec77caf91bc44a48d887cfc6ab0c3f7aa93d t/bdb_backend.t
+SHA1 920a767747efd05aa46b3e295f1a70fe678a47ee t/bdb_gin.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG/MacGPG2 v2.0.12 (Darwin)
+
+iEYEARECAAYFAkwTws4ACgkQVCwRwOvSdBjZmwCghad/EgZ7lpbvo+4Y+5a0b+o6
+IE8AnjDC1huTQy234czL7cUH1sk1+g01
+=KcO/
+-----END PGP SIGNATURE-----

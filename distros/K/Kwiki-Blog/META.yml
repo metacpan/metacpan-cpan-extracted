@@ -1,0 +1,13 @@
+name: Kwiki-Blog
+version: 0.10
+abstract: Sort of Blogging for Kwiki
+author: Chris Dent <cdent@burningchrome.com>
+license: perl
+distribution_type: module
+requires:
+  Kwiki: 0.38
+  Kwiki::Keywords: 0
+no_index:
+  directory:
+    - inc
+generated_by: Module::Install version 0.36

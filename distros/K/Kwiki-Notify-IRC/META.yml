@@ -1,0 +1,17 @@
+name: Kwiki-Notify-IRC
+version: 0.05
+abstract: announce updates to your Kwiki on IRC channels
+author: Ian Langworth <ian@cpan.org>
+license: perl
+distribution_type: module
+requires:
+  perl: 5.6.1
+  Kwiki: 0.32
+  POE::Component::IKC::ClientLite: 0
+  POE::Component::IRC: 0
+  YAML: 0
+  Term::ANSIColor: 0
+no_index:
+  directory:
+    - inc
+generated_by: Module::Install version 0.39

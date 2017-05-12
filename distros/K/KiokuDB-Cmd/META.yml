@@ -1,0 +1,26 @@
+--- #YAML:1.0
+name:               KiokuDB-Cmd
+version:            0.03
+abstract:           ~
+author:  []
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    App::Cmd:             0.202
+    KiokuDB:              0.45
+    MooseX::App::Cmd:     0
+    MooseX::Getopt:       0
+    MooseX::Types::Path::Class:  0
+    Proc::InvokeEditor:   1
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

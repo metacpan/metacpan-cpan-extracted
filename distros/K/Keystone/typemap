@@ -1,0 +1,6 @@
+TYPEMAP
+
+ks_engine    *      T_PTROBJ
+ks_arch             T_ENUM
+ks_mode             T_ENUM
+ks_err              T_ENUM

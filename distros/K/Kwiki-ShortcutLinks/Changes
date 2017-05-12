@@ -1,0 +1,15 @@
+version: 0.03
+date:	 Mon Aug  1 13:30:00 BST 2005
+changes:
+- Support link text override via "|alttext", as suggested by Ricardo Signes.
+---
+version: 0.02
+date:	 Thu Jul  8 15:35:32 BST 2004
+changes:
+- Support %s in shortcut expansions, as suggested by Alex Goller.
+- Supply extra examples using %s.
+---
+version: 0.01
+date:    Thu Jul  1 10:23:18 BST 2004
+changes:
+- Initial release

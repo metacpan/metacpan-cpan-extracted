@@ -1,0 +1,39 @@
+#!/usr/local/bin/perl
+
+# A very simple client using Authen::Krb4
+
+use IO::Socket;
+use Authen::Krb4;
+
+$SERVER='servername'; # change this to your server
+$SERVER_PORT=6789;
+$SERVICE='rcmd';
+
+$sock=new IO::Socket::INET(
+	PeerAddr	=> $SERVER,
+	PeerPort	=> $SERVER_PORT,
+	Proto		=> 'tcp'
+);
+
+$sock or die "couldn't connect to server: $!";
+
+# get realm of server
+$realm=Authen::Krb4::realmofhost($SERVER);
+
+# get instance of server
+$phost=Authen::Krb4::get_phost($SERVER);
+
+# get a ticket object for SERVICE.phost@realm
+$ticket=Authen::Krb4::mk_req($SERVICE,$phost,$realm,0);
+
+$ticket or die "mk_req failed";
+
+# send the ticket over with an end tag (it's variable-length binary data)
+print $sock $ticket->dat,"___END_TICKET\n";
+
+# print what we get back
+while($line=<$sock>) {
+	print $line;
+}
+
+close($sock);

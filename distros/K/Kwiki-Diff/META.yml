@@ -1,0 +1,15 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Kwiki-Diff
+version:      0.03
+version_from: lib/Kwiki/Diff.pm
+installdirs:  site
+requires:
+    Algorithm::Diff:               1.18
+    Kwiki:                         0.34
+    Kwiki::Revisions:              0.12
+    Spiffy:                        0.22
+    Test::More:                    0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

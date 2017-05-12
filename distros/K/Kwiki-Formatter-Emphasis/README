@@ -1,0 +1,34 @@
+Kwiki-Formatter-Emphasis
+
+This module was developed to fix what I consider a bug in Kwiki. The
+documentation indicates that /foo/ mean to make "foo" italics. But the
+implementation uses the <em> tag. It has used the <em> tag since the start but
+it has always conveyed the message that your are making the text italics.
+
+You may wonder why all this matters since most browsers render both tags the
+same anyway? The reason is because we have a wiki where sometimes we want to
+make text italics and other times we want to emphasize text. The styles are set
+to make them look different so our wiki will not only carry the correct semantic
+meaning but render the element visually different. Since people are used to the
+idea that /foo/ means make it italics we didn't want to change that. But at the
+same time we don't want our new syntax to use the <i> tag just because the <em>
+tag is already being used because even if we style it how we want it won't
+convey the correct symantic meaning.
+
+So what this module does to correct the problem is it make /foo/ output
+<i>foo</i> and makes ~foo~ output <em>foo</em>. This will break existing themes
+that count of <em> meaning italics but we are only concerned about our theme
+(and any theme that agrees with us).
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    kwiki -install Kwiki::Formatter::Emphasis
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 CorData
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. See http://www.perl.com/perl/misc/Artistic.html

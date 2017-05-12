@@ -1,0 +1,13 @@
+name: Kwiki-CoolURI
+version: 0.04
+abstract: makes the Kwiki url cleaner
+author: Jon Åslund <aslund.org>
+license: perl
+distribution_type: module
+requires:
+  perl: 5.6.1
+  Kwiki: 0.36
+no_index:
+  directory:
+    - inc
+generated_by: Module::Install version 0.34

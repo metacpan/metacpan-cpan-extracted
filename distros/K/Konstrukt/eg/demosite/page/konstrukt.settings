@@ -1,0 +1,8 @@
+autoinstall 1
+
+session/use 1
+log/use 1
+
+dbi/source dbi:mysql:test:localhost
+dbi/user   test
+dbi/pass   tset

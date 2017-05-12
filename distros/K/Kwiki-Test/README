@@ -1,0 +1,9 @@
+
+Kwiki::Test is a helper class for testing Kwiki::Plugins. It is 
+based, conceptually,  on a similar thing Dave Rolsky set up for
+Socialtext.
+
+The test files in the t directory can be used as examples for 
+how to use it.
+
+Please consider this alpha software.

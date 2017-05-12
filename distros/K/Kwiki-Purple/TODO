@@ -1,0 +1,16 @@
+
+* Wow, really need some docs
+
+* Create a sequence demon
+
+* Support adding nids to wafl blocks.
+
+* More tests. The existing tests only cover the very basics.
+
+* Give more nodes nids
+
+* Save more metadata when writing nodes, to eventually support fancy
+  things like node type controlled editors.
+
+* Clean up all the globbing, sub overrides, and other stuff that I 
+  didn't know how to do well.

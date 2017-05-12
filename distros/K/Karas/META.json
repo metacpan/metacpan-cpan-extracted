@@ -1,0 +1,86 @@
+{
+   "abstract" : "Yet another O/R Mapper.",
+   "author" : [
+      "Tokuhiro Matsuno E<lt>tokuhirom AAJKLFJEF@ GMAIL COME<gt>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Karas",
+   "no_index" : {
+      "directory" : [
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "DBD::PassThrough" : "0.02",
+            "DBD::SQLite" : "1.37",
+            "Test::More" : "0.98",
+            "Test::Requires" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor::Lite" : "0.05",
+            "Class::Trigger" : "0.14",
+            "DBI" : "v1.6.14",
+            "DBIx::Handler" : "0.04",
+            "DBIx::Inspector" : "0",
+            "DBIx::TransactionManager" : "1.11",
+            "Data::Page::NoTotalEntries" : "0",
+            "Module::Load" : "0",
+            "SQL::Maker" : "1.09",
+            "Scalar::Util" : "0",
+            "String::CamelCase" : "0",
+            "parent" : "0",
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "provides" : {
+      "Karas" : {
+         "file" : "lib/Karas.pm",
+         "version" : "0.07"
+      },
+      "Karas::Dumper" : {
+         "file" : "lib/Karas/Dumper.pm",
+         "version" : 0
+      },
+      "Karas::Loader" : {
+         "file" : "lib/Karas/Loader.pm",
+         "version" : 0
+      },
+      "Karas::Plugin::Timestamp" : {
+         "file" : "lib/Karas/Plugin/Timestamp.pm",
+         "version" : 0
+      },
+      "Karas::QueryBuilder" : {
+         "file" : "lib/Karas/QueryBuilder.pm",
+         "version" : 0
+      },
+      "Karas::Row" : {
+         "file" : "lib/Karas/Row.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.07"
+}

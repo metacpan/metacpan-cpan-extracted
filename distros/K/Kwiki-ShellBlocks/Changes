@@ -1,0 +1,18 @@
+---
+version: 0.02
+date:    Sun Jun 27 16:37:56 CEST 2004
+changes:
+- < clkao> autrijus: now it gives too many blank lines
+- <@autrijus> ".shell" counts as a blank line
+- < clkao> i mean:
+- < clkao> * something
+- < clkao> .shell
+- < clkao> something
+- < clkao> .shell
+- < clkao> this is already too many
+- <@autrijus> fixing
+---
+version: 0.01
+date:    Sun Jun 27 16:24:20 CEST 2004
+changes:
+- Initial release

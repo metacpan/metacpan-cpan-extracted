@@ -1,0 +1,38 @@
+Revision history for Kavorka-TraitFor-Parameter-doc
+
+0.1104 2016-01-26T19:10:56Z UTC
+ [Other Changes]
+ - Rebuilt with current Dist::Iller::Config::Author::CSSON.
+
+ [Requirements]
+ - Moops dependency moved to testing where it belongs.
+
+ [Testing]
+ - Modify test class to avoid a potential kwalitee issue.
+
+0.1103 2015-02-16T20:32:18Z CET
+ [Meta]
+ - Added travis config.
+
+ [Requirements]
+ - Specified versions on some prereqs.
+ - Updated dist.ini/weaver.ini (a few new plugins).
+
+0.1102 2015-01-17T03:48:47Z CET
+ [Meta]
+ - Added Moose as prereq.
+
+0.1101 2015-01-15T16:11:06Z CET
+ [Documentation]
+ - Fixed documentation for ::ReturnType::doc.
+
+ [Enhancements]
+ - Added test for ::ReturnType::doc.
+
+0.1100 2015-01-14T00:53:54Z CET
+ [New Features]
+ - Added ReturnType::doc
+
+0.1000 2015-01-12T00:27:46Z CET
+ - Initial release
+

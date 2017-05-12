@@ -1,0 +1,195 @@
+Revision history for Perl module Koha::Contrib::Tamil
+
+0.049 2016-09-28
+
+  - Indexing for version >= 16.05
+
+0.048 2016-05-04
+
+  - Follow-up for special indexing
+
+0.047 2016-04-25
+
+  - koha-coce-url new script
+
+0.046 2016-04-11
+
+  - Special indexing
+
+0.044 2016-02-03
+
+  - Fix file logger encoding + default file name
+  - Fix doc
+
+0.043 2016-01-15
+
+  - Fix shipped Marc21 authoritization configuration file.
+
+0.042 2015-10-30
+
+  - Authoritization of an ISO2709 file
+
+0.041 2015-10-14
+
+  - Improve overdue processing. Give access to guarator info.
+
+0.040 2015-06-17
+
+  - Biblio/authority records are normalized before beeing exported for indexing
+
+0.039 2015-06-25
+
+  - koha-dump-biblio: fix empty biblio record exporting
+
+0.038 2015-06-09
+
+  - Indexing bug with 3.20: Koha version is not retrieved anymore with
+    KOHAVERSION()
+
+0.037 2015-04-08
+
+  - Paramatrized date format. Get item branch home/holding.
+
+0.036 2015-04-07
+
+  - Add a script koha-overdue to process overdues, send them by email, and or
+    print them. Uses Text::Xslate templating engine. Allow complex matching
+    criteria.
+
+0.034 2014-10-29
+
+  - Improve doc
+
+0.033 2014-06-20
+
+  - Fix a bug preventing koha-dump-biblio to export biblio records without
+    items, when neither branches nor a query was provided.
+
+0.032 2013-01-03
+
+  - Indexing bug when IncludeSeeFromInSearches enabled--When
+    IncludeSeeFromInSearches in enabled, items are not embedded in biblio
+    records. Fix it.
+
+0.031 2013-07-10
+
+  - Improve koha-dump-biblio
+    - Add a -query parameter to select biblio recorc to export
+    - Fix items selection
+
+0.030 2013-07-03
+
+  - Add script koha-dump-biblio
+
+0.029 2013-01-07
+
+  - Fix new authorities loading bug.
+
+0.028 2012-10-25
+
+  - Suppress Koha::RecordProcessor dependency which is useless prior 3.10
+    version, and can fail module installation
+
+0.027 2012-10-21
+
+  - Use syntax (marc21/unimarc) from koha-conf.xml in ZOOM connection to Zebra
+    server. Required when Koha Z39.50 is able to return not only usmarc.
+  - For Koha >3.09, take into accout IncludeSeeFromInSearches syspref. This
+    slow down, again, indexing, by a 2 orders of magnitude (20 time slower).
+
+0.026 2012-10-04
+
+  - Force DBD::mysql to reconnect automaticaly. Required by (very) long running
+    process, like webapps.
+
+0.025 2012-09-24
+
+  - Add a --keep parameter to koha-index command
+
+0.024 2012-07-18
+
+  - Fix koha-index. Authority deletion wasn't working when DOM indexing enabled
+
+0.023 2012-06-25
+
+  - Fix koha-claim for 3.8.2 which introduces an hourly loan
+
+0.022 2012-05-10
+
+  - Fix a test failing depending on Koha version
+
+0.021 2012-05-09
+
+  - Fix a bug in koha_auth preventing loading configuration file
+
+0.020 2012-04-07
+
+  - Fix a bug in zebraqueue handling
+  - DOM indexing
+  - Claimer change due to Koha bug 7001
+
+0.019 2012-03-29
+
+  - Hot fix bug introduced by 0.017
+
+0.018 2012-03-26
+
+  - koha-claim: overdues claim script.
+
+0.017 2012-03-24
+
+  - Report an error if koha-index is run in a directory where the user hasn't
+    permission to create a subdirectory
+
+0.016
+
+  - Fix authorities loading and logging
+
+0.015
+
+  - AnyEvent::Processor integration
+  - Fix Conversion error, doubling call to writer end() method
+
+0.014
+
+  - Missing writer->end() call at the end of Conversion process
+  - MooseX::RW integration
+
+0.013 2011-02-07
+
+  - Skip a compile test if Koha modules can't be included during installation.
+
+0.012 2011-01-20
+
+  - Drop DOM filter authorities indexing
+
+0.011 2012-01-15
+
+  - Add some tests
+  - Authorities related scripts translability
+  - New script koha-sitemap
+
+0.010 2012-01-12
+
+  - Authorities indexing works both for Koha instance using DOM filter and
+    GRS-1 filter.
+
+0.009 2012-01-09
+
+ - koha-auth uses heading exact matching
+ - Authorities indexer uses ISO2709 rather than MARCXML, required for
+   Zebra DOM filter
+
+0.008 2012-01-07
+
+ - Bug in koha-auth
+
+0.007 2012-01-07
+
+ - Doc
+ - Multi-lingual, French, German
+
+0.006 2012-01-02
+
+ - Initial release
+

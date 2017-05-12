@@ -1,0 +1,47 @@
+
+# Auto-generated file -- DO NOT EDIT!!!!!
+
+=head1 NAME
+
+KinoSearch::Analysis::Analyzer - Tokenize/modify/filter text.
+
+=head1 DEPRECATED
+
+The KinoSearch code base has been assimilated by the Apache L<Lucy> project.
+The "KinoSearch" namespace has been deprecated, but development continues
+under our new name at our new home: L<http://lucy.apache.org/>
+
+=head1 SYNOPSIS
+
+    # Abstract base class.
+
+
+
+=head1 DESCRIPTION
+
+An Analyzer is a filter which processes text, transforming it from one form
+into another.  For instance, an analyzer might break up a long text into
+smaller pieces (L<Tokenizer|KinoSearch::Analysis::Tokenizer>), or it might
+perform case folding to facilitate case-insensitive search
+(L<CaseFolder|KinoSearch::Analysis::CaseFolder>).
+
+
+
+
+
+
+
+=head1 INHERITANCE
+
+KinoSearch::Analysis::Analyzer isa L<KinoSearch::Object::Obj>.
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005-2011 Marvin Humphrey
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
+

@@ -1,0 +1,6 @@
+# $Id: feature-include-servicetype.in,v 1.3 2007-09-20 16:56:33 mike Exp $
+
+# Derived from the "zetoc-sauroposeidon1" test.
+
+genre=article&sid=mimas%3Azetoc&title=ACTA+PALAEONTOLOGICA+POLONICA&issn=0567-7920&date=2000&volume=45&issue=4&spage=343&epage=388&atitle=Osteology%2C+paleobiology%2C+and+relationships+of+the+sauropod+dinosaur+Sauroposeidon&aulast=Wedel&auinit=M.+J.&dctype=scientific-paper
+

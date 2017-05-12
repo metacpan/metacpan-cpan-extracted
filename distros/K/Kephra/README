@@ -1,0 +1,137 @@
+NAME
+    kephra - crossplatform, GUI-Texteditor designed along Perl's Paradigms 
+
+SYNOPSIS
+        > kephra [<files>]   # start with certain files open
+
+DESCRIPTION
+    This module install's a complete editor application with all its configs
+    and documentation for your programming, web and text authoring.
+
+  Philosophy
+  
+    Main Goals
+
+    A visually harmonic and beautiful, sparing and elegantly programed Editor,
+    that helpes you with all your daily tasks. It should be also able to operate
+    in the way you prefer and be not afraid to try new things.
+
+    In Depth
+    I know, I know, there are plenty text editors out there, even some really
+    mighty IDE, but still no perfect solution for many programmers. So lets
+    learn from Perl 5 and 6 what it takes to build a tool thats powerful and fun
+    to play with for hours and months.
+    
+    * make a low entry barrier (usable like notepad)
+    * copy what people like and are used to and whats not inherently broken
+    * give choices (TimTowtdi) 
+      * (e.g. deliver vi and emacs input style)
+      * usable with menu, contextmenu, bars, mouse combo, key combos, commands ...
+      * configure via dialog and yaml/conf files ...
+    * highly configurable / adaptable to personal preferences
+    * beauty / good integration on GUI, code and config level
+    * solve things with minimal effort (no bloat / minimal dependencies)
+    * still everything extendable by easy to write plugins
+    
+    I believe strongly that there is much more possible with GUI editors
+    and text editors in general than we are used today. So I try to weave
+    fresh ideas wherever I can and design Kephra in a way, that every 
+    programmer can alter and extend it easily. That can speed up progress
+    or at least makes Kephra more comfortable for you.
+
+    That is the plan, but we are currently not nearly that far.
+
+  Features
+    Beside all the basic stuff that would you expect from a notepad, we have
+    file sessions, simple templates, recent closed files, and file functions
+    applied to all files, where it makes sense.
+    
+    We have also a pile of advanced text navigation (on braces or blockwise),
+    goto last edit or 10 doc spanning Bookmarks as well as find in files. 
+    
+    Advanced undo, line editing (edit functions that take the current line as
+    input), move selected text by mouse or keyboard. Formating funtions like 
+    blockformat, align blocks, indenting, commenting ...
+    
+    Documents have several properties like syntax styling, auto indention, tab
+    width, tab use, write protection.
+
+    View options contain switches for any GUI element and marker for: current
+    line, end of line bytes, right margin, indetion guides, bracehiglighting,
+    line wrap and font.
+
+    Every menu and toolbar is evaluated from a simple yaml file, so you can 
+    change it easily by opening this files from the config menu.
+
+
+ROADMAP
+
+  Overview
+  
+    Stable Release 0.4
+
+    This release was about getting the editor liquid or highly configurable.
+    Its also about improvements in the user interface and of course the little
+    things we missed. It also contains interpreter output panel and a notepad.
+
+    Stable Release 0.5
+
+    This release is about getting Kephra into the world out there and adding
+    feature that are most needed and removing most hindering barriers.
+
+    Stable Release 0.6
+
+    This release will be about extending Kephra internal extentions and Plugins.
+
+  This Cycle
+
+    Testing 0.4.1 - code folding
+
+    Testing 0.4.2 - folding and GUI refined, movable tabs, 2 more tools, doc data
+
+    Testing 0.4.3 - utf, marker, folding finished, 3 more tools, help links
+
+    Testing 0.4.4 - new mouse control, 2 more tools, docs updated
+
+    Testing 0.4.5 - more encodings, config dialog
+
+    Stable 0.5 - about dialog
+
+  Future
+
+    command line vor vi like usage
+    tree lib extention: snippet lib and toolbox in one
+    file browser
+    Plugin API
+
+Coding support like L<Perl::Tidy>, outlining, help integration, debugger
+autocompletition and so on will be long time goals. Lets see where they fit in.
+
+
+SUPPORT
+    OS: Linux, Mac and Win32 (Basically same es the module named Wx.)
+    
+    Perl: >= 5.6             (we use our :) )
+
+
+AUTHORS
+    * Herbert Breunung <lichtkind@cpan.org> (main author)
+
+    * Jens Neuwerk (author of icons, GUI advisor)
+
+    * Andreas Kaschner (linux and mac ports)
+    
+    * Adam Kennedy <adamk@cpan.org> (cpanification)
+ 
+    * Renee Bäcker E<lt>module@renee-baecker.deE<gt> (color picker)
+
+    * many more since we study other editors a lot and also the padre sources
+
+COPYRIGHT
+    This Copyright applies only to the "Kephra" Perl software distribution, not 
+    the icons bundled within.
+    
+    Copyright 2004 - 2010 Herbert Breunung. All rights reserved.
+    
+    This program is free software, licensed under the GNU GPL as you can see in
+    the LICENSE file in same directory or under http://www.gnu.org/licenses/.

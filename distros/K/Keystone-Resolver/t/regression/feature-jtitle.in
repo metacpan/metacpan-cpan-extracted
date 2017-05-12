@@ -1,0 +1,13 @@
+# $Id: feature-jtitle.in,v 1.1 2007-01-26 12:25:45 mike Exp $
+
+# This tests the ability of the resolver to identify which serial an
+# article is from based on journal title rather than ISSN, and
+# matching against the definitive name rather than an alias.
+#
+# It's a lightly tweaked version of "openly-04.test" with "Science
+# Magazine" instead of just "Science" as rft.jtitle.  Because of the
+# way our resource database is set up, the original matches the alias
+# that is just "Science".
+
+url_ver=Z39.88-2004&url_tim=2004-01-09&url_ctx_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Actx&ctx_ver=Z39.88-2004&ctx_enc=info%3Aofi%2Fenc%3AUTF-8&ctx_id=345871&ctx_tim=2002-03-20T08%3A55%3A12Z&rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Ajournal&rft.atitle=Isolation%20of%20a%20common%20receptor%20for%20coxsackie%20B&rft.jtitle=Science+Magazine&rft.aulast=Bergelson&rft.auinit=J&rft.date=1997&rft.volume=275&rft.spage=1320&rft.epage=1323&rfe_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Ajournal&rfe.atitle=p27-p16%20Chimera%3A%20A%20Superior%20Antiproliferative&rfe.jtitle=Molecular%20Therapy&rfe.aulast=McArthur&rfe.aufirst=James&rfe.date=2001&rfe.volume=3&rfe.issue=1&rfe.spage=8&rfe.epage=13&req_ref_fmt=http%3A%2f%2Flib.caltech.edu%2Ffmt%2Fldap-mtx.html&req_ref=http%3A%2F%2Fldap.caltech.edu%2Fjaned%2Frecord.txt
+

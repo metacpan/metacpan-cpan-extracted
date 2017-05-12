@@ -1,0 +1,407 @@
+=head1 NAME
+
+Konstrukt::Plugin::wiki::syntax - Overview of the Syntax of the wiki plugin. For more details, take a look at the documentation of each markup plugin.
+
+=head1 BLOCK SYNTAX
+
+=head2 definition
+
+
+
+This one will match if the first line of the block start with a semicolon ";"
+followed by at least one whitespace or tab.
+
+Multiple definition terms (indicated by a ";" at the beginning of the line)
+per list and multiple definitions per term (indicated by a ":" at the beginning
+of the line) are possible.
+
+This plugin has some similarities with L<Konstrukt::Plugin::wiki::markup::list>.
+
+Example:
+
+	; definition term
+	: first definition
+	: second definition
+	; another definition term
+	: first definition
+	: second definition
+
+=head2 headline
+
+
+
+This one will match if the first character of the first line of the block is a C<=>.
+
+The block will then be enclosed by <hX> and </hX> (X = number of ='s before the
+first character).
+
+Any trailing ='s at the end of the block will be removed.
+
+Example:
+
+	= headline of level 1
+	
+	some text
+	
+	== headline of level 2
+	
+	some other text
+
+=head2 hr
+
+
+
+This one will match if the block consists of only one line that just contains
+dashes (-).
+
+The block will be replaced by a <hr>-tag.
+
+Example:
+
+	those two paragraphs
+	
+	------
+	
+	will be separated by a horizontal rule
+
+=head2 list
+
+
+
+This one will match if the first character of the first line of the block is a
+* (-> unordered list) or # (->ordered list).
+
+The block will then be enclosed by <ul> and </ul> or <ol> and </ol>.
+Each line with leading bullets will be added as a list item. Deeper levels in
+the list can be achieved by putting more than one bullet in from of the line.
+
+Example:
+
+	* this
+	** is
+	*** an
+	** unordered
+	* list
+	
+	# this
+	## one
+	### will
+	## be
+	# ordered
+
+=head2 paragraph
+
+
+
+This one won't do much more but putting <p> and </p> around a block.
+
+It matches all blocks and should be the last plugin in your filter chain so it
+will catch all block that didn't match any other plugin.
+
+Example:
+
+	this is
+	one paragraph and will be surrounded
+	by <p> and </p>
+	
+	this one also
+
+=head2 pre
+
+
+
+This one will match if the first character of the first line of the block is a
+whitespace or a tab.
+
+The block will then be enclosed by <pre> and </pre>. All child nodes will be
+tagged as finished to prevent further wiki parsing on them.
+
+Example:
+
+	 although only the first line is indented
+	the whole block will be marked as code.
+
+=head2 quote
+
+
+
+This one will match if the first line of the block start with a colon ":"
+followed by at least one whitespace or tab.
+
+The block will then be surrounded by <blockquote> and </blockquote> tags.
+
+Example:
+
+	: 640kb should be enough for everyone.
+	
+	: God does not play dice
+	- Albert Einstein
+
+=head1 INLINE SYNTAX
+
+=head2 acronym
+
+
+
+This one will look for acronyms with an explanation and replace it:
+
+	IP(Internet Protocol) => <span title="Internet Protocol">IP</span>
+
+Actually it will work for every "word" that does not contain spaces and is
+followed by some text in parenthesis.
+
+Example:
+
+	TCP(Transmission Control Protocol)/IP(Internet Protocol)
+	
+	Foo-Bar(baz)
+
+=head2 basic
+
+
+
+This one will handle all basic text formatting markup and substitute it
+with html-markup.
+
+Example:
+
+	*strong*
+	_strong2_
+	/empathized/
+	-deleted-
+	+inserted+
+	^superscript^
+	~subscript~
+	`code`
+
+=head2 htmlescape
+
+
+
+This one will do a simple search and replace for a some critical characters
+(i.e. <, >, & and ") and will replace them.
+
+The replacement will only be done on text nodes, that are not wiki_finished.
+
+You might want to put this one as late as possible in the filter chain.
+
+Example:
+
+	This <html> will be escaped.
+	
+	<nowiki><em>This</em> HTML won't be escaped.</nowiki>
+	
+=head2 link
+
+
+
+This one will look for (internal and external, implicit and explicit) links
+and converts them into HTML-links.
+
+Example:
+
+Implicit links
+
+	CamelCase or SomePage
+	
+	http://foo.bar/baz
+	
+	!NoLink
+	
+Explicit links
+
+	Explicit links are required here [[nocamelcase]] or here [[NoSpaceAroundLink]].
+	
+	[[SomePage|But with some other description]]
+	
+	[[http://foo.bar/baz|somthing here]]
+
+=head2 link::article
+
+
+
+This one will be responsible for all wiki links (CamelCase, [[nocamelcase]]).
+
+You should put this one at the end of the list of the link plugins since it will
+act like a 'catch all' plugin to match all links that haven't been matched by another
+plugin.
+
+Example:
+
+Implicit links
+
+	CamelCaseLink
+	
+	!ThisLinkWontMatch
+
+Explicit links (with description)
+
+	[[thislinkwillmatch]]
+
+	[[CamelCaseLink|but with another description]]
+	
+	[[linikwith#anchor]]
+
+=head2 link::external
+
+
+
+This one will be responsible for all external links (http://, ftp://, mailto:,
+news:, ...). The links will be surrounded by <a> and </a>.
+
+Example:
+
+Implicit links
+
+	http://foo.bar/baz
+	
+Explicit links (with description)
+
+	[[http://foo.bar/baz]]
+
+	[[http://foo.bar/baz|something here]]
+
+=head2 link::file
+
+
+
+This one will be responsible for all internal files.
+
+A link to the file will be created. If the target file doesn't exist, the user may
+upload it.
+
+Note that the filename will be normalized. All characters but letters, numbers,
+parenthesis and dots will be replaced by underscores.
+
+Example:
+
+Implicit
+
+	file:somefile.zip
+	
+Explicit
+
+	[[file:some other file.rar|with a different link text]]
+	
+=head2 link::image
+
+
+
+This one will be responsible for all internal and external image links.
+
+Internal images will be displayed on the page with a default width of 180px.
+They will link to a page with the full sized image.
+
+External images will just be linked and not displayed unless you define a
+parameter to show them.
+
+Note that the filename of internal images will be normalized.
+All characters but letters, numbers, parenthesis and dots will be replaced
+by underscores.
+
+Example:
+
+Internal images
+
+	inline image: image:foo.jpg
+	explicit image with alternative text: [[image:foo bar baz|alternative text (default = image name)]]
+	explicit image with specified width: [[image:foo|200px]]
+	
+	Parameter reference:
+	left: align the image on the left side
+	right: align the image on the right side
+	center: centered alignment of the image
+	123px: width in pixels
+	thumb: alias for 100px width
+	text at the end: caption text (also alt-text)
+	
+	Default alignment: No special alignment, but may be overridden by the
+	template/stylesheet. 
+	
+External images (.gif, .jpg, .png)
+
+	implicit image: http://foo.bar/baz.gif
+	explicit image: [[http://foo.bar/baz bar foo.jpg|link text]]
+	explicit image displayed on the page: [[http://foo.bar/baz bar foo.jpg|embed|link text]]
+	
+	When an explicit image is displayed using the embed parameter the parameters
+	available for internal images will also work.
+	
+=head2 link::nolink
+
+
+
+This one will catch !NoLink's and remove the exclamation mark.
+
+Example:
+
+	!NoLink -> NoLink
+	
+	!Nocamelcase -> !Nocamelcase
+	
+=head2 replace
+
+
+
+This one will do a simple search and replace for a configurable list of
+replacements.
+
+Example:
+
+Note that most of these symbols have to be surrounded by whitespaces to prevent
+the replacement in some abmiguous/unwanted cases.
+
+Quotes:
+
+	some >>beautifully quoted<< text
+
+Asterisk:
+
+	beautiful asterisk * here
+
+Fractions:
+	
+	0 < 1/4 < 1/2 < 3/4 < 1
+
+Arrows:
+	
+	small -> rightarrow
+	
+	small <- leftarrow
+	
+	small <-> leftrightarrow
+	
+	big => rightarrow
+
+	big <= leftarrow
+	
+	big <=> leftrightarrow
+
+Dashes:
+	
+	small - dash
+	
+	long -- dash
+	
+Symbols:
+
+	copyright (C)
+	
+	registered (R)
+	
+Horizontal Ellipsis:
+	
+	The End...
+	
+=head1 AUTHOR
+
+Copyright 2006 Thomas Wittek (mail at gedankenkonstrukt dot de). All rights reserved.
+
+This document is free software.
+It is distributed under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<Konstrukt::Doc>, L<Konstrukt::Plugin::wiki>
+
+=cut

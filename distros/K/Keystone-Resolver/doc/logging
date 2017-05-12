@@ -1,0 +1,37 @@
+$Id: logging,v 1.4 2008-04-01 20:23:48 mike Exp $
+
+Logging behaviour in Keystone Resolver is specified by a combination
+of logging levels, documented in the Keystone::Resolver::LogLevel
+manual.  The simplest way to generate logging of a resolution is to
+set the "loglevel" option, which can be achieved by including an
+"opt_loglevel" component in the OpenURL to be resolved.  For example,
+including:
+	opt_loglevel=dblookup,sql
+will cause logging to be emitted describing both application-level use
+of the database ("dblookup", which notes calls such as
+genre_by_mformat() and services_by_type()), and the low-level SQL
+statements issued in order to fulfil those requests.
+
+Another way to set the logging level, useful mostly when running test
+scripts from the command-line, is by setting the KRloglevel
+environment variable.  This can also be set from the web-server
+configuration (along with KRuser, KRpw, etc.) to indicate a default
+logging-level.
+
+In additional to Keystone Resolver's own logging, Perl's DBI libarary
+(the layer that uses the underlying database software) can generate
+low-level logging of its own.  This is most simply achieved by
+providing the opt_dbi_trace query parameter with a value that is a
+small integer.
+
+Where does logging appear?  It is written to the standard error
+stream, which should mean that it appears in an Apache log-file when
+running under Apache.  Unfortunately, under Apache 2.x, it resolutely
+appears in the global error.log rather than in the
+application-specific keystone-resolver-error.log, where it appears
+under Apache 1.x.  I've not been able to find a way to fix this wart,
+not even by aliasing CORE::warn() to Apache2::ServerRec::warn().  See
+the comments function on the function apache_non_moronic_logging() in
+Keystone::Resolver::Utils for details.  The upshot is that you have to
+watch _both_ logs.
+

@@ -1,0 +1,29 @@
+Kwiki-UserName-Cookie
+
+VERSION 0.01
+
+Displays a user name set by a cookie.  Mostly adds the ability to specify 
+an external login script.
+
+INSTALLATION
+    
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+    cd /path/to/kwiki
+		kwiki -add Kwiki::UserName::Cookie
+		echo "login_url: /login.html"    >> config.yaml
+
+Based on Kwiki::UserName::Remote by Ian Langworth <langworth.com>
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 John cappiello
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

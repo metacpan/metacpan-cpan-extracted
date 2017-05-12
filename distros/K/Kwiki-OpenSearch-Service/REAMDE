@@ -1,0 +1,19 @@
+This is Kwiki::OpenSearch::Service module.
+
+INSTALLATION
+
+Kwiki::OpenSearch::Service installation is straightforward. If your CPAN shell
+is set up, you should just be able to do:
+
+    % perl -MCPAN -e 'install Kwiki::OpenSearch::Service'
+
+Download it, unpack it, ehtn build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+Tatsuhiko Miyagawa <miyagawa@bulknews.net>

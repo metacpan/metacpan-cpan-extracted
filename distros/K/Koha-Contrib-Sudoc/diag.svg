@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/PR-SVG-20010719/DTD/svg10.dtd">
+<svg width="14cm" height="38cm" viewBox="69 -3249 269 760" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <g>
+    <ellipse style="fill: #ffffff" cx="111.769" cy="-3195.07" rx="29.645" ry="27.5311"/>
+    <ellipse style="fill: none; fill-opacity:0; stroke-width: 1.05833; stroke: #000000" cx="111.769" cy="-3195.07" rx="29.645" ry="27.5311"/>
+    <text font-size="6.77333" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="111.769" y="-3197.29">
+      <tspan x="111.769" y="-3197.29">Début</tspan>
+      <tspan x="111.769" y="-3188.82">transfert</tspan>
+    </text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="72.049" y="-3134" width="78.1666" height="47.4"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 1.05833; stroke: #000000" x="72.049" y="-3134" width="78.1666" height="47.4"/>
+    <text font-size="6.77333" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="111.132" y="-3116.75">
+      <tspan x="111.132" y="-3116.75">Extraction</tspan>
+      <tspan x="111.132" y="-3108.28">des mises à jour</tspan>
+      <tspan x="111.132" y="-3099.82">de l'ILN</tspan>
+    </text>
+  </g>
+  <g>
+    <polygon style="fill: #ffffff" points="84.3538,-3052.46 151.417,-3052.46 137.246,-3013.53 70.1832,-3013.53 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 1.05833; stroke: #000000" points="84.3538,-3052.46 151.417,-3052.46 137.246,-3013.53 70.1832,-3013.53 "/>
+    <text font-size="6.77333" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="110.8" y="-3035.21">
+      <tspan x="110.8" y="-3035.21">Fichiers de </tspan>
+      <tspan x="110.8" y="-3026.74">l'ILN</tspan>
+    </text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="73.3216" y="-2982.32" width="76.2932" height="47.4"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 1.05833; stroke: #000000" x="73.3216" y="-2982.32" width="76.2932" height="47.4"/>
+    <text font-size="6.77333" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="111.468" y="-2965.07">
+      <tspan x="111.468" y="-2965.07">Envoi message</tspan>
+      <tspan x="111.468" y="-2956.6">fichiers prêts</tspan>
+      <tspan x="111.468" y="-2948.14">"status 9</tspan>
+    </text>
+  </g>
+  <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="111.468" y="-2958.62">
+    <tspan x="111.468" y="-2958.62"></tspan>
+  </text>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1.05833; stroke: #000000" x1="111.132" y1="-3086.6" x2="110.938" y2="-3055.31"/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 1.05833; stroke: #000000" points="105.993,-3064.15 110.931,-3054.12 115.993,-3064.09 "/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1.05833; stroke: #000000" x1="111.064" y1="-3012.99" x2="111.437" y2="-2984.69"/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 1.05833; stroke: #000000" points="106.321,-2993.44 111.453,-2983.5 116.32,-2993.57 "/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="236.874" y="-2983.06" width="81.5462" height="47.4"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 1.05833; stroke: #000000" x="236.874" y="-2983.06" width="81.5462" height="47.4"/>
+    <text font-size="6.77333" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="277.647" y="-2965.81">
+      <tspan x="277.647" y="-2965.81">Réception</tspan>
+      <tspan x="277.647" y="-2957.34">message</tspan>
+      <tspan x="277.647" y="-2948.88">"status 9"</tspan>
+    </text>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1.05833; stroke: #000000" x1="150.143" y1="-2958.79" x2="233.969" y2="-2959.17"/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 1.05833; stroke: #000000" points="225.175,-2954.13 235.152,-2959.17 225.13,-2964.13 "/>
+  </g>
+  <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="277.648" y="-2959.36">
+    <tspan x="277.648" y="-2959.36"></tspan>
+  </text>
+  <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="277.648" y="-2959.36">
+    <tspan x="277.648" y="-2959.36"></tspan>
+  </text>
+  <text font-size="6.77333" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="176.415" y="-2961.74">
+    <tspan x="176.415" y="-2961.74">email</tspan>
+  </text>
+  <g>
+    <rect style="fill: #ffffff" x="238.274" y="-2906.54" width="80.7476" height="46.4583"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 1.05833; stroke: #000000" x="238.274" y="-2906.54" width="80.7476" height="46.4583"/>
+    <text font-size="6.77333" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="278.648" y="-2889.76">
+      <tspan x="278.648" y="-2889.76">Demande</tspan>
+      <tspan x="278.648" y="-2881.29">envoi fichier</tspan>
+      <tspan x="278.648" y="-2872.83">GTD</tspan>
+    </text>
+  </g>
+  <text font-size="6.77333" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="278.648" y="-2883.32">
+    <tspan x="278.648" y="-2883.32"></tspan>
+  </text>
+  <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="111.468" y="-2958.62">
+    <tspan x="111.468" y="-2958.62"></tspan>
+  </text>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1.05833; stroke: #000000" x1="111.769" y1="-3167.54" x2="111.428" y2="-3136.88"/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 1.05833; stroke: #000000" points="106.526,-3145.76 111.415,-3135.7 116.526,-3145.64 "/>
+  </g>
+  <text font-size="9.03111" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:700" x="98.7132" y="-3238.64">
+    <tspan x="98.7132" y="-3238.64">ABES</tspan>
+  </text>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1.05833; stroke: #000000" x1="277.966" y1="-2935.13" x2="278.335" y2="-2907.07"/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 1.05833; stroke: #000000" points="273.22,-2915.82 278.351,-2905.88 283.219,-2915.95 "/>
+  </g>
+  <text font-size="9.03111" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:700" x="258.288" y="-3240.24">
+    <tspan x="258.288" y="-3240.24">Koha</tspan>
+  </text>
+  <g>
+    <rect style="fill: #ffffff" x="73.2162" y="-2906.86" width="82.2583" height="47.4"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 1.05833; stroke: #000000" x="73.2162" y="-2906.86" width="82.2583" height="47.4"/>
+    <text font-size="6.77333" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="114.345" y="-2889.61">
+      <tspan x="114.345" y="-2889.61">Réception</tspan>
+      <tspan x="114.345" y="-2881.14">message</tspan>
+      <tspan x="114.345" y="-2872.68">GTD</tspan>
+    </text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="74.2766" y="-2831.84" width="81.7984" height="47.4"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 1.05833; stroke: #000000" x="74.2766" y="-2831.84" width="81.7984" height="47.4"/>
+    <text font-size="6.77333" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="115.176" y="-2814.59">
+      <tspan x="115.176" y="-2814.59">Début envoi des</tspan>
+      <tspan x="115.176" y="-2806.12">fichiers par</tspan>
+      <tspan x="115.176" y="-2797.66">FTP/SFTP</tspan>
+    </text>
+  </g>
+  <g>
+    <polygon style="fill: #ffffff" points="245.867,-2831.32 325.439,-2831.32 308.53,-2784.86 228.958,-2784.86 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 1.05833; stroke: #000000" points="245.867,-2831.32 325.439,-2831.32 308.53,-2784.86 228.958,-2784.86 "/>
+    <text font-size="6.77333" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="277.199" y="-2810.31">
+      <tspan x="277.199" y="-2810.31">Fichiers de</tspan>
+      <tspan x="277.199" y="-2801.84">notices ILN</tspan>
+    </text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="75.3482" y="-2759.1" width="79.6552" height="46.4583"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 1.05833; stroke: #000000" x="75.3482" y="-2759.1" width="79.6552" height="46.4583"/>
+    <text font-size="6.77333" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="115.176" y="-2742.32">
+      <tspan x="115.176" y="-2742.32">Fin envoi</tspan>
+      <tspan x="115.176" y="-2733.85">des fichiers par</tspan>
+      <tspan x="115.176" y="-2725.39">FTP/SFTP</tspan>
+    </text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="76.777" y="-2690.28" width="78.5836" height="46.4583"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 1.05833; stroke: #000000" x="76.777" y="-2690.28" width="78.5836" height="46.4583"/>
+    <text font-size="6.77333" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="116.069" y="-2673.5">
+      <tspan x="116.069" y="-2673.5">Notification</tspan>
+      <tspan x="116.069" y="-2665.03">fin transfert</tspan>
+      <tspan x="116.069" y="-2656.57">"status 0"</tspan>
+    </text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="236.938" y="-2690.38" width="78.5836" height="46.4583"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 1.05833; stroke: #000000" x="236.938" y="-2690.38" width="78.5836" height="46.4583"/>
+    <text font-size="6.77333" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="276.23" y="-2673.6">
+      <tspan x="276.23" y="-2673.6">Réception</tspan>
+      <tspan x="276.23" y="-2665.13">message</tspan>
+      <tspan x="276.23" y="-2656.67">"status 0"</tspan>
+    </text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="238.366" y="-2619.3" width="78.5836" height="46.4583"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 1.05833; stroke: #000000" x="238.366" y="-2619.3" width="78.5836" height="46.4583"/>
+    <text font-size="6.77333" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="277.658" y="-2602.52">
+      <tspan x="277.658" y="-2602.52">Chargement</tspan>
+      <tspan x="277.658" y="-2594.05">des notices</tspan>
+      <tspan x="277.658" y="-2585.59">dans Koha</tspan>
+    </text>
+  </g>
+  <g>
+    <ellipse style="fill: #ffffff" cx="277.657" cy="-2517.13" rx="29.645" ry="27.5311"/>
+    <ellipse style="fill: none; fill-opacity:0; stroke-width: 1.05833; stroke: #000000" cx="277.657" cy="-2517.13" rx="29.645" ry="27.5311"/>
+    <text font-size="6.77333" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="277.657" y="-2519.35">
+      <tspan x="277.657" y="-2519.35">Fin</tspan>
+      <tspan x="277.657" y="-2510.88">transfert</tspan>
+    </text>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1.05833; stroke: #000000" x1="156.075" y1="-2808.14" x2="235.045" y2="-2808.08"/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 1.05833; stroke: #000000" points="226.225,-2803.09 236.229,-2808.08 226.232,-2813.09 "/>
+  </g>
+  <text font-size="6.77333" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="185.684" y="-2812.78">
+    <tspan x="185.684" y="-2812.78">FTP/SFTP</tspan>
+  </text>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1.05833; stroke: #000000" x1="238.274" y1="-2883.32" x2="158.359" y2="-2883.22"/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 1.05833; stroke: #000000" points="167.17,-2888.23 157.176,-2883.22 167.182,-2878.23 "/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1.05833; stroke: #000000" x1="114.345" y1="-2859.46" x2="114.746" y2="-2834.73"/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 1.05833; stroke: #000000" points="109.604,-2843.46 114.765,-2833.54 119.602,-2843.62 "/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1.05833; stroke: #000000" x1="115.484" y1="-2712.1" x2="115.73" y2="-2693.18"/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 1.05833; stroke: #000000" points="110.616,-2701.93 115.745,-2692 120.615,-2702.06 "/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1.05833; stroke: #000000" x1="155.884" y1="-2667.08" x2="234.048" y2="-2667.12"/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 1.05833; stroke: #000000" points="225.234,-2662.12 235.231,-2667.13 225.228,-2672.12 "/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1.05833; stroke: #000000" x1="276.707" y1="-2643.39" x2="277.133" y2="-2622.19"/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 1.05833; stroke: #000000" points="271.957,-2630.91 277.157,-2621.01 281.955,-2631.11 "/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1.05833; stroke: #000000" x1="277.658" y1="-2572.32" x2="277.657" y2="-2547.4"/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 1.05833; stroke: #000000" points="272.657,-2556.22 277.657,-2546.22 282.657,-2556.22 "/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" points="316.984,-2808.08 336.638,-2808.08 336.638,-2704.14 337.354,-2704.14 337.354,-2596.08 325.568,-2596.08 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" points="318.068,-2596.08 328.068,-2601.08 325.568,-2596.08 328.068,-2591.08 "/>
+  </g>
+  <text font-size="6.77333" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="190.39" y="-2887.24">
+    <tspan x="190.39" y="-2887.24">email</tspan>
+  </text>
+  <text font-size="6.77333" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="184.365" y="-2670.74">
+    <tspan x="184.365" y="-2670.74">email</tspan>
+  </text>
+</svg>

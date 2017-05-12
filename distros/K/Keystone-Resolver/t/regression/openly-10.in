@@ -1,0 +1,8 @@
+# $Id: openly-10.in,v 1.1 2007-01-26 12:25:45 mike Exp $
+
+# Lifted from Openly Informatics' OpenURL 1.0 test suite
+# Metadata Format Tests
+# By-Reference Metadata in By-Ref OpenURL
+
+url_ver=Z39.88-2004&url_tim=2004-04-25&url_ctx_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Actx&url_ctx_ref=http%3A%2F%2Fwww.openly.com%2F1cate%2Ftest%2Fbyref.kev
+

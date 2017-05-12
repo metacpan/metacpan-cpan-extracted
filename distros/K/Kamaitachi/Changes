@@ -1,0 +1,25 @@
+Revision history for Perl extension Kamaitachi
+
+0.05 2010-02-25T10:13:40+09:00
+     - fix compile error caused latest Moose is no longer export Carp::confess in latest version
+
+0.04 2009-09-11T17:13:17+09:00
+     - fix example
+
+0.03 2008-12-22T18:14:50+09:00
+     - add URL based ACL service
+     - add invoke error response handler
+
+0.02002 2008-12-05T15:49:17+09:00
+     - just a pod fix
+
+0.02001 2008-12-05T13:27:21+09:00
+     - add missing dependency, Test::TCP.
+
+0.02 2008-12-05T11:15:44+09:00
+     - add AudienceCounter service
+     - add simple connection test
+     - upgrade examples
+
+0.01 2008-12-03T22:03:33+09:00
+     - initial release

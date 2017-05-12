@@ -1,0 +1,316 @@
+
+       ---------------------------
+      | Kephra Funktionsübersicht |
+       ---------------------------
+
+Dies ist der beste Ort um Fragen zu beantworten wie: "Kann Kephra... ?" , "Wie 
+verstell ich...?" oder "Wie macht man...in Kephra?". In vielen ist das Hauptmenü
+dabei schneller.
+
+Auch wenn der Editor noch nicht alles vermag, was wir gerne hätten, so möchten
+wir ihn mächtig nennen weil diese Liste lang ist. Wenn euch Texteditoren bereits
+vertraut sind, kann vieles hier übersprungen werden. Dann empfehle ich die
+'besondere_funktionen.txt' zu lesen, die im Menü auch unter Hilfe > Nützliches
+zu findet ist.
+
+Sollte euch eine vollständige, thematisch nach dem Hauptmenü sortierte Übersicht 
+der Funktionen dennoch interessieren, so schreitet weiter. Alle Config-Schlüssel 
+beziehen sich auf die Datei "config/general/autosaved.conf" (Haupteinstellungen).
+
+
+Inhalt:
+
+  1 im Text Navigieren
+  2 Text Markieren 
+  3 Textbearbeitung (Bearbeiten Menü)
+  4 History (Bearbeiten Menü)
+  5 Zwischenablage (Bearbeiten Menü)
+  6 Suchen-Menü und Suchen-Dialog
+  7 Werkzeuge-Menü
+  8 Datei-Menü
+  9 Dokument-Menü
+ 10 Ansicht-Menü
+ 11 Konfgurations-Menü
+ 12 Hilfe-Menü
+
+
+
+ 1 Im Text Navigieren - Caret Bewegen
+   - Richtungstasten (Tasten mit den Pfeilen drauf) oder ein Links-Klick an die
+     entsprechende Position mit der Maus bewegt den Caret (Textcursor)
+     -
+     -
+     
+   - <Pos1> Taste bewegt den Caret zum ersten Zeichen der aktuellen Zeile, das 
+     kein Leerzeichen ist. Drückt man nochmal <Pos1> steht der Caret am 
+     Zeilenanfang. Die <Ende>-Taste bewegt Caret zum letzten Zeichen der Zeile.
+   - <Strg>+<Pos1> springt zum Anfang des Textes und <Strg>+<Ende> zum letzten 
+     Zeichen der letzten Zeile
+   - <Bild hoch> und <Bild runter> bewegen den Caret seitenweise wobei eine
+     Seite dem sichtbaren Textfenster entspricht
+   - <Strg>+<Bild hoch> oder <Bild runter> wählen das vorige oder nächste 
+     Dokument an. Das zuletzt benutzte Dokument wird mit <Strg>+<Enter> oder einem
+     Klick auf das aktuelle Tab angewählt.
+   - <Strg>+<Links> oder <Rechts> (Pfeiltasten) lässt den Caret wortweise springen
+   - <Strg>+<Hoch> oder <Runter> scrollt zeilenweise
+   - <Alt>+<Hoch> oder <Runter> blättert absatzweise (Absätze werden durch leere
+     Zeilen getrennt)
+   - Wenn man weiss in welche Zeile man möchte hilft auch <Strg>+<G>.
+   - Mit <Strg>+<Shift>+<+> oder <-> kann man den Text auch zoomen lassen
+
+ 2 Text Markieren
+   - Hält man <Shift> oder linke Maus-Taste gedrückt wird Text markiert (ausgewählt)
+   - Um einen rechteckigen Bereich auszuwählen, hält man dabei Alt gedrückt.
+   - Markierten Text kann man entweder durch gedrückt-halten der linken Maustaste
+     mit der Maus verschieben oder durch gedrückt-halten von <Strg>+<Alt> mit den
+     Richtungstasten verschieben. Ist nichts markiert verschiebt <Strg>+<Alt>+<Hoch>
+     oder <Runter> die aktuelle Zeile.
+   - Hält man Strg gedrückt, verschiebt man mit der Maus eine Kopie des markierten
+     Textes.
+   - <Strg>+<A> markiert den gesamten Text
+
+ 3 Textbearbeitung (Bearbeiten Menü)
+   Meist wählt man durch markieren einen Text aus um diesen speziell zu bearbeiten.
+   Ist kein Text ausgewählt nehmen viele pce-Funktionen das gesamte Dokument.
+   Das Hinzunehmen der <Shift> Taste kehrt die Bedeutung einer Tastenkombination
+   meistens um.
+   - Gibt man Text ein während noch etwas markiert ist wird das Markierte gelöscht.
+   - <Einfg> lässt die Caret-Form wechseln. Steht er senkrecht wird der eingegebene
+     Text eingefügt, ist er waagerecht, wird der vorhandene Text überschrieben.
+   - <Entf> löscht das Zeichen rechts neben dem Caret, <Strg>+<Entf> das ganze
+     Wort rechts neben dem Caret. Die <Rück>-Taste (<--) löscht das Zeichen links 
+     neben dem Zeiger, <Strg>+<Rück> wieder das ganze Wort.
+   - Es gibt 3 Gruppen mit Funktionen zur Textbearbeitung mit gleichnamigen
+     Untermenüs im Menü Bearbeiten(unten). Formatieren bedeutet dabei in eine
+     andere Form bringen, konvertieren den Text umzuwandeln und kommentieren ihn
+     je nach Sprache zu de/aktivieren.
+   - <Strg>+<Leertaste> rückt die aktuelle Zeile ein, bewegt sie 1 Zeichen nach
+     rechts. Dies geschieht unabhängig von der Caretposition und kann durch
+     markieren auch auf mehrere Zeilen zugleich angewendet werden.
+     <Strg>+<Shift>+<Leertaste> rückt ensprechend auch. (1 Zeichen nach links)
+   - Verwendet man dabei statt der Leertaste die <Tab>-Taste (|<- ->|) rückt man
+     die Zeile(n) mehrere Zeichen aus einmal ein oder aus. Wieviel Zeichen hängt
+     von den aktuell eingestellten Länge eines Tabulators ab.
+   - Über das Hauptmenü kann man auch mehrere Zeilen gleichtief einrücken lassen
+     (an erster Zeile ausrichten), Zeilen verbinden und abstehende Leerzeichen
+     entfernen. (Leerzeichen nach denen kein Schriftzeichen mehr in der Zeile
+     folgt)
+
+ 5 History (Bearbeiten Menü)
+   - der Editor merkt sich jede Änderung so das man mit <Strg>+<Z> beliebig viele
+     Änderungen zurücknehmen kann, sozusagen rückwärts in der Geschichte der
+     Änderungen geht.
+   - Wenn man nur mal nachschauen wollte und wieder "vorwärts" gehen will kann
+     man die "rückwärts-Schritte" mit <Strg>+<Shift>+<Z> zurücknehmen. Allerdings
+     ist der Weg "vorwärts" versperrt sobald man in der Vergangenheit eine
+     Änderung unternimmt. (es wäre ja nicht merh die gleiche Zukunft).
+   - Nimmt man dabei die <Alt>-Taste hinzu kann man die Sprünge beschleunigen,
+     denn dabei werden mehrere Schritte aus einmal gesprungen. Die genaue Anzahl
+     kann man in der config unter editpanel > history festlegen.
+   - <Strg>+<Alt>+<Z> macht alle Änderungen rückgängig und <Strg>+<Alt>+<Shift>+<Z>
+     lässt sofort wieder zum aktuellen Stand zurückkehren.
+
+ 4 Zwischenablage (Bearbeiten Menü)
+   Jeder neuere Desktop oder Betriebssystem hat einen Speicher wo Programme Daten
+   ablegen und wieder aufnehmen können. Damit kann man auch Texte zwischen den
+   Programmen austauschen aber auch nur "zwischenparken" um sie später wieder
+   mit dem gleichen Programm weiterzuverwenden.
+   - <Strg>+<C> oder ein Klick auf das Kopieren-Icon in der Toolbar, Hauptmenü >
+     Bearbeiten oder im Kontextmenü kopiert den markierten Text in die
+     Zwischenablage.
+   - <Strg>+<V> (oder Einfügen) fügt den Text der Zwischenablage an der Stelle
+     in das Dokument ein, an dem sich der Caret befindet. Der dabei markierte 
+     Text wird überschrieben.
+   - <Strg>+<W> (oder Tauschen) tauscht den markierten Text mit dem in der 
+      Zwischenablage.
+   - <Strg>+<X> (oder Auschneiden) entfernt den markierten Text und kopiert ihn 
+     in die Zwischenablage.
+   - <Entf> (oder Entfernen) löscht ohne zu kopieren.
+   - Ausschneiden, Kopieren und Löschen kann man auch auf die aktuelle Zeile
+     anwenden wenn man die Shift Taste hinzunimmt.
+   - <Strg>+<Shift>+<L> oder <R> löschen die aktuelle Zeile links oder rechts des 
+     Carets
+   - <Strg>+<Shift>+<D> doppelt die aktuelle Zeile.
+   - Eigentlich könnt man aber auch Texte per DND (markieren, anklicken + linke
+     Taste gedrückt lassen, zum ziel ziehen und loslassen) auch in andere
+     Programme verschieben. Gedrückt-lassen der <Strg> bewirkt das nur eine Kopie
+     verschoben wird.
+
+ 6 Suchen-Menü und Suchen-Dialog
+   Der Editor kann das aktuelle Dokument, alle offenen Dokumente oder nur 
+   innerhalb einer Markierung nach einem bestimmten Text suchen. Das geht
+   mit oder auch ohne den Suchdialog, aber Suchoptionen lassen sich nur über den
+   Dialog verändern (oder über die config, auch wenn das kein eleganter Weg ist.)
+   - <Strg>+<F> öffnet den Suchdialog. Er erwartet die Eingabe des zu suchenden 
+     Textes. Bereits verwendete Suchbegriffe können mit den Richtungstasten 
+     <Hoch> und <Runter> angefordert werden.
+   - Hat man vorher einen Text markiert, wird dieser automatisch als 
+     Suchbegriff eingefügt. Ging die Markierung aber über mehrere Zeilen, 
+     erkennt er dies als Suchbereich an. 
+     Man beachte dass man bei einer  Suche in einem markierten Bereich nur den 
+     ersten Fund anzeigen kann und die ursprüngliche Markierung dann weg ist.
+   - Drückt man nach Eingabe des Suchbegriffes <Enter>, beginnt die Suche von 
+     oben nach unten. Hält man dabei <Shift> gedrückt sucht er "rückwärts" von 
+     unten nach oben. Ein gehaltenes <Strg> beendet den Dialog nach der Suche.
+   - Zum vorwärts und rückwärts suchen gibt es auch 2 Icons in der Toolbar 
+     (Lupe mit Pfeilen) die eine Navigation per Maus ermöglichen. Im Suchdialog 
+     befindet sich ganz rechts mehrere Knöpfe die ebenfalls eine Bedienung per 
+     Maus ermöglichen.
+     Dieses Such Pad ermöglicht auch schnelle Suche sowie Springen zum ersten 
+     und untersten Fund sowie vorwärts und rückwärts suchen mit ersetzen.
+   - Unterhalb der Suchbereich-Auswahl ist die Checkbox "Springe zw. Enden".
+     Ist sie aktiviert findet der Editor am Dokumentende als nächsten Fund
+     den obersten oder springt auch vom obersten rückwärts wieder zum letzten
+     Fund, wenn man dessen Vorgänger sucht.
+   - Ist die Option inkrementelle Suche aktiviert, wird mit jeder Veränderung 
+     der neue Suchbegriff vom Dokumentanfang beginnend gesucht.
+   - Suchoptionen: 
+      + Gross/klein-schreibung des Suchbegriffes (nicht)beachten.
+      + der Suchbegriff muss (nicht) Anfang eines Wortes sein. 
+      + der Suchbegriff muss (nicht) ganzes Wortes sein.
+      + der Suchbegriff kann durch einfache reguläre Ausdrücke gebildet werden.
+   - Wenn man ohne Dialog Suchen möchte kann man sich mit <F3> vorwärts suchen
+     und rückwärts mit <Shift>+<F3>. <Strg>+<Alt>+<F3> springt zum obersten und 
+     <Shift>+<Strg>+<Alt>+<F3> zum letzten Fund. Der "Suchen"-Knopf in der 
+     untersten Zeile des Dialogs entspricht <Strg>+<Alt>+<F3>. Möchte man einen 
+     neuen Suchbegriff ohne Dialog definieren, markiert man ihn im Text 
+     und drückt <Strg>+<F3>.
+   - Wenn man den Dialog mit <Shift>+<Strg>+<F> ruft, erwartet er den Text mit 
+     dem ersetzt werden kann. Der letzte Suchbegriff wird automatisch eingesetzt.
+     Entsprechend dem Suchverhalten wird hier auch ein etwaiger markierter Text
+     als Ersetzen-Begriff eingesetzt, geht die Markierung über mehrere Zeilen
+     wird die als Suchbereich verstanden. Auch diese Eingabezeile ermöglicht mit
+     den vertikalen Pfeiltastet oder mit der Maus in den letztbenutzen Begriffen
+     zu blättern.
+   - Drückt man <Enter> wird sofort im angegeben Suchbereich alles ersetzt, was
+     dem Knopf "Alle Ersetzen" in der untersten Zeile entspricht. Hält man dabei
+     <Strg> gedrückt, wird der Dialog nach dem Ersetzen geschlossen. Hält man 
+     dabei jedoch <Alt> gedrückt entspricht das der Funktion des Knopfes 
+     "Mit Bestätigung". Dabei wird vor jedem Ersetzen nachgefragt ob dieses 
+     Ersetzen erwünscht ist.
+   - Die andere Möglichkeit dies zu erreichen ist das bereits erwähnte Searchpad
+     im rechten Drittel des Dialogs.
+   - Der Dialog kann mit der <Esc>-Taste oder dem "Schliessen"-Knopf beendet 
+     werden.
+   -"Gehe zu Zeile" oder <Strg>+<G> ruft einen Dialog mit dem man zu einer
+     angegeben Zeilennummer im aktuellen Dokument springen kann.
+
+ 7 Werkzeuge-Menü
+   Der Notizblock ist eine paralleles Panel in dem einfach etwas unformatierter
+   Text gespeichert wird.
+   - Mit <F4> springt der Cursor in den Notizblock und zurück. <Strg>+<F4> läßt
+     den Notizblock nur auf- und zuklappen. Ein <F5> im Notizblock evaluiert den
+     Inhalt als Perlcode. Das Ergebnis wird im Ausgabepanel angezeigt.
+   - <F5> startet einen Interpreter mit dem aktuellen Dokument als Eingabe. Der
+     Prozess kann jederzeit mit <Shift>+<F5> angehalten werden. Das Ergebnis oder
+     Fehlermeldung werden im Ausgabepanel angezeigt, daß mit <Strg>+<F5> auf oder
+     zugeklappt werden kann.
+
+ 8 Datei-Menü
+   Enthält alle Funktionen die auf die Festplatte zugreifen, einzige Ausnahmen 
+   sind "neu" und "beenden" die aber noch am ehesesten hierher gehören.
+   - "neu" erstellt neues leeres Dokument das noch keinem Dateinamen zugeordnet 
+     ist.
+   - "öffnen" liest eine Datei ein und fügt den Inhalt in ein neues Dokument.
+     der Dateiname bleibt dem Dokument zugeordnet.
+   - "neu einlesen" Liest die einem Dokument zugeordnete Datei erneut ein und 
+     ersetzt den Text des Dokumentes mit dem Inhalt der Datei. Dadurch wird die 
+     letzte gespeicherte Version wiederhergestellt.
+   - "einfügen" fügt den Inhalt einer ausgewählten Datei am aktuellen Textcursor
+     (caret) ein.
+   - "speichern" sichert den aktuell sichtbaren Text in der zugehörigen Datei.
+   - "speichern unter" speichert den Text unter einem ausgewählten Dateinamen,
+     der nun dem Dokument zugeordnet wird.
+   - "kopie speichern" speichert auch den Text unter einem ausgewählten Dateinamen,
+     allerding bleibt das Dokument dem vorigen Dateinamen zugeordnet.
+   - "alle/anderen" Alle beziet sich immer auf alle offenen Dateien und anderen
+     auf alle ausser der aktuellen Datei.
+   - "Gruppe" meint die Zusammenfassung aller zu einem Zeitpunkt geöffneten
+     Dokumente. Die in dem Untermenü gezeigten Funktionen dienen dem Speichern
+     aller ÜBER die Dokument-Gruppe bekannten Informationen, die auch später mit
+     öffnen oder hinzufügen wieder hergestellt werden können. Da andere Editoren
+     andere Formate benutzen solche Gruppen zu speichern bietet der Editor
+     auch die Möglichkeit an, diese zu importieren oder zu exportieren.
+
+ 9 Dokument-Einstellungen
+   sind (meistens) Eigenschaften die für jedes Dokument getrennt gespeichert und
+   verändert werden können. Das Meiste davon verstellt man über das Dokument-Menü
+   oder direkt in der Haupkonfigurationsdatei: "config/general/autosaved.conf" .
+   Syntaxstyle und Tabmode lassen sich aber auch über die Statuszeile verstellen.
+   - Das Syntaxstyle bestimmt die Einfärbung des Textes und entspricht der
+     Grammatik der jewailigen Sprache. Die Auswahl des Styles erfolgt meist beim
+     öffnen der Datei automatisch anhand der Datei-Endung. Die Zugehörigkeit
+     eines Styles zu einer Endung definieren die file > endings Einstellungen in
+     der config.
+   - Klammerhervorhebung lässt zugehöriges Klammerpaare aufleuchten und zeigt
+     auch an wenn die Klammer keinen Partner hat. Die Farbeinstellungen dazu sind
+     unter editpanel > indicator > bracelight. Diese Eigenschaft ist derzeit
+     nur global an und abschaltbar.
+   - Klammereinrückung(block indent) bedeutet dass ein <Enter> nach öffnenden
+     Klammern einrücken lässt und nach schliessenden Klammern ausrücken lässt.
+     siehe editpanel > blockindent. Dort finden sich auch die Schlüssel
+     brace_autojoin und brace_automake mit die den Editor veranlassen bei
+     blockindent gleich die zugehörige Klammer zu erzeugen bzw. bei blockdedent
+     eventuell dann doppelt vorhandene schliesende Klammern zu löschen.
+   - Autoeinrückung(autoindent) lässt jede neue Zeile sofort so weit einrücken
+     wie die Vorige. Diese Eigenschaft ist derzeit, wie auch Klammereinrückung,
+     nur global an und abschaltbar.
+   - Tabs sind nicht sichtbare Zeichen die zum Formatieren des Textes dienen und
+     die den Platz mehrere Leerzeichen einnehmen können. Wie viele dies sind kann
+     man unter Tab Breite einstellen. der Wert dafür in neuen Dateien richtet
+     sich nach der config Einstellung in file > defaultsetting > tab_size.
+   - Soft Tabs nennt man entsprechend viele Leerzeichen die anstatt
+     eines Tabs eingefügt werden wenn die Tab-Taste(|<-- -->|) gedrückt wird.
+     Siehe Menü tabulatoren und config: file > defaultsetting > tab_use.
+   - EOL: Windows, Unix(Linux) und Mac benutzen verschiedene Zeilentrennzeichen.
+     der Editor erkennt nicht nur alle sondern erzeugt standardmässig auch die
+     jeweils in dem Dokument verwendeten EOL's. Man kann jedoch auch in der
+     config: file > defaultsetting > EOL_open von auto auf cr|lf|cr+lf stellen.
+     Dann werden geöffnete Dateien automatisch konvertiert.
+     file > defaultsetting > EOL_new bestimmt den EOL neuer Dokumente.
+   - Schreibschutz. Manche Dateien dürfen vom Benutzer nich geschrieben werden.
+     um spätere Konflikte zu vermeiden werden die ensprechenden Dokumente mit
+     einer Raute im Reiter gekennzeichnet und können nicht im Editor bearbeitet
+     werden. Der Schreibschutz ist aber über das Menü an und abschaltbar.
+     
+ 10 Ansicht-Einstellungen
+    Ändern nichts am Text sondern nur an der Optik des Textes oder des Programmes.
+    Sie gelten für alle Dokumente in gleicher Weise.
+    - "Im Vordergrund" ist er mit <Strg>+<T> aktiviert überlagert der Editor jedes
+      andere Fenster und bleibt ständig sichtbar.
+    - "Symbolleiste"-"Statuskontext" Dieser Block im Ansichtmenü dient zum Ein- 
+      und Ausblenden von Teilen der Programmoberfläche. Alle Einstellungen 
+      unterhalb beziehen sich auf das Textfeld.
+    - "Zeilennummern" bestimmt die Breite der Anzeige der Zeilennummern. Diese 
+      passt sich den Bedürfnissen an, solange die Breite nicht 0 ist oder 
+      config: editpanel > margin > linenumber > autosize aktiv ist. Auch Farben 
+      und Mindestbreite können dort eingestellt werden.
+    - "Extrarand": Damit kann ein zusätzlicher Abstand an den Rändern des
+      Textfeldes links und rechts eingestellt werden.
+    - "Rechter Rand" blendet eine senkrechte Linie ein oder aus, an der man die 
+       Zeilenenden ausrichten kann. Farbe und Position sind in der Config-Datei
+       unter editpanel > indicator > right_margin gespeichert.
+    - "Einrückmarkierung" blendet auch senkrechte Linien ein/aus, an denen man 
+       die Einrückungen der Zeilen orientieren kann. Diese Linien erscheinen
+       nur dort wo Leerzeichen sind, in Abständen, die der aktuellen 
+       Tabulatorbreite entsprechen.
+    - "Aktuelle Zeile" markiert die Zeile in der sich der Caret befindet mit 
+       einer besonderen Hintergrundfarbe. (editpanel > indicator > caret_line)
+    - "Zeilenumbruch" bricht Zeilen am Fensterrand um, und stellt lange Zeilen in 
+       mehreren Teilen untereinander dar.
+    - "Zeilenendsymbol" blendet Symbole für die sonst unsichtbaren Zeilentrenn-
+       zeichen ein oder aus.
+    - "Leerzeichen" mache Leerzeichen und Tabulatoren mit Punkten und Pfeilen
+       sichtbar oder unsichtbar.
+    - "Schriftart" ruft einen Dialog mit dem man alle Eigenschaften der 
+      verwendeten Schriftart einstellen kann.
+
+ 11 Konfgurations-Menü:
+    Ist eine Übersicht über alle Konfigurtaions-Dateien die hiermit direkt geöffnet,
+    werden können.
+    Vorsicht: Erscheint im Reiter ein $, werden alle Änderungen beim Speichern
+    sofot angwandt.
+   
+ 12 Hilfe-Menü:
+    Texte, Verknüpfungen und Dialoge mit Informationen über das Programm und
+    seine Benutzung. 

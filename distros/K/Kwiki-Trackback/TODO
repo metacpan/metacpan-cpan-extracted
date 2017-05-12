@@ -1,0 +1,9 @@
+* There are obviously some pretty serious spam concerns with allowing wiki
+  pages to get trackback pings. That's going to need to be addressed.
+
+* Will need to deal with configuration or preference setting for the number of
+  trackbacks to display (or to display them at all).
+
+* Output is not pretty.
+
+* There are probably issues with HTML escaping and the excerpt.

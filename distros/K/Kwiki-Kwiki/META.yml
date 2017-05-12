@@ -1,0 +1,15 @@
+abstract: ~
+author: "Ingy d\xC3\xB6t Net <ingy@cpan.org>"
+distribution_type: module
+generated_by: Module::Install version 0.61
+license: perl
+name: Kwiki-Kwiki
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Archive::Tar: 0
+  IO::All: 0.3
+  perl: 5.8.4
+version: 0.10

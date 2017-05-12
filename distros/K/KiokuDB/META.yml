@@ -1,0 +1,866 @@
+---
+abstract: 'Object Graph storage engine'
+author:
+  - 'Yuval Kogman <nothingmuch@woobling.org>'
+build_requires:
+  Cache::Ref::CART: '0'
+  Cache::Ref::CLOCK: '0'
+  Data::Dumper: '0'
+  Data::Stream::Bulk::Callback: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Search::GIN::Driver::Hash: '0'
+  Search::GIN::Extract::Class: '0'
+  Search::GIN::Extract::Delegate: '0'
+  Test::More: '0.88'
+  base: '0'
+  if: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 5.014, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: KiokuDB
+provides:
+  KiokuDB:
+    file: lib/KiokuDB.pm
+    version: '0.57'
+  KiokuDB::Backend:
+    file: lib/KiokuDB/Backend.pm
+    version: '0.57'
+  KiokuDB::Backend::Hash:
+    file: lib/KiokuDB/Backend/Hash.pm
+    version: '0.57'
+  KiokuDB::Backend::Role::BinarySafe:
+    file: lib/KiokuDB/Backend/Role/BinarySafe.pm
+    version: '0.57'
+  KiokuDB::Backend::Role::Broken:
+    file: lib/KiokuDB/Backend/Role/Broken.pm
+    version: '0.57'
+  KiokuDB::Backend::Role::Clear:
+    file: lib/KiokuDB/Backend/Role/Clear.pm
+    version: '0.57'
+  KiokuDB::Backend::Role::Concurrency::POSIX:
+    file: lib/KiokuDB/Backend/Role/Concurrency/POSIX.pm
+    version: '0.57'
+  KiokuDB::Backend::Role::GC:
+    file: lib/KiokuDB/Backend/Role/GC.pm
+    version: '0.57'
+  KiokuDB::Backend::Role::Prefetch:
+    file: lib/KiokuDB/Backend/Role/Prefetch.pm
+    version: '0.57'
+  KiokuDB::Backend::Role::Query:
+    file: lib/KiokuDB/Backend/Role/Query.pm
+    version: '0.57'
+  KiokuDB::Backend::Role::Query::GIN:
+    file: lib/KiokuDB/Backend/Role/Query/GIN.pm
+    version: '0.57'
+  KiokuDB::Backend::Role::Query::Simple:
+    file: lib/KiokuDB/Backend/Role/Query/Simple.pm
+    version: '0.57'
+  KiokuDB::Backend::Role::Query::Simple::Linear:
+    file: lib/KiokuDB/Backend/Role/Query/Simple/Linear.pm
+    version: '0.57'
+  KiokuDB::Backend::Role::Scan:
+    file: lib/KiokuDB/Backend/Role/Scan.pm
+    version: '0.57'
+  KiokuDB::Backend::Role::TXN:
+    file: lib/KiokuDB/Backend/Role/TXN.pm
+    version: '0.57'
+  KiokuDB::Backend::Role::TXN::Memory:
+    file: lib/KiokuDB/Backend/Role/TXN/Memory.pm
+    version: '0.57'
+  KiokuDB::Backend::Role::TXN::Memory::Scan:
+    file: lib/KiokuDB/Backend/Role/TXN/Memory/Scan.pm
+    version: '0.57'
+  KiokuDB::Backend::Role::TXN::Nested:
+    file: lib/KiokuDB/Backend/Role/TXN/Nested.pm
+    version: '0.57'
+  KiokuDB::Backend::Role::UnicodeSafe:
+    file: lib/KiokuDB/Backend/Role/UnicodeSafe.pm
+    version: '0.57'
+  KiokuDB::Backend::Serialize:
+    file: lib/KiokuDB/Backend/Serialize.pm
+    version: '0.57'
+  KiokuDB::Backend::Serialize::Delegate:
+    file: lib/KiokuDB/Backend/Serialize/Delegate.pm
+    version: '0.57'
+  KiokuDB::Backend::Serialize::JSON:
+    file: lib/KiokuDB/Backend/Serialize/JSON.pm
+    version: '0.57'
+  KiokuDB::Backend::Serialize::JSPON:
+    file: lib/KiokuDB/Backend/Serialize/JSPON.pm
+    version: '0.57'
+  KiokuDB::Backend::Serialize::JSPON::Collapser:
+    file: lib/KiokuDB/Backend/Serialize/JSPON/Collapser.pm
+    version: '0.57'
+  KiokuDB::Backend::Serialize::JSPON::Converter:
+    file: lib/KiokuDB/Backend/Serialize/JSPON/Converter.pm
+    version: '0.57'
+  KiokuDB::Backend::Serialize::JSPON::Expander:
+    file: lib/KiokuDB/Backend/Serialize/JSPON/Expander.pm
+    version: '0.57'
+  KiokuDB::Backend::Serialize::Memory:
+    file: lib/KiokuDB/Backend/Serialize/Memory.pm
+    version: '0.57'
+  KiokuDB::Backend::Serialize::Null:
+    file: lib/KiokuDB/Backend/Serialize/Null.pm
+    version: '0.57'
+  KiokuDB::Backend::Serialize::Storable:
+    file: lib/KiokuDB/Backend/Serialize/Storable.pm
+    version: '0.57'
+  KiokuDB::Backend::Serialize::YAML:
+    file: lib/KiokuDB/Backend/Serialize/YAML.pm
+    version: '0.57'
+  KiokuDB::Backend::TypeMap::Default:
+    file: lib/KiokuDB/Backend/TypeMap/Default.pm
+    version: '0.57'
+  KiokuDB::Backend::TypeMap::Default::JSON:
+    file: lib/KiokuDB/Backend/TypeMap/Default/JSON.pm
+    version: '0.57'
+  KiokuDB::Backend::TypeMap::Default::Storable:
+    file: lib/KiokuDB/Backend/TypeMap/Default/Storable.pm
+    version: '0.57'
+  KiokuDB::Class:
+    file: lib/KiokuDB/Class.pm
+    version: '0.57'
+  KiokuDB::Collapser:
+    file: lib/KiokuDB/Collapser.pm
+    version: '0.57'
+  KiokuDB::Collapser::Buffer:
+    file: lib/KiokuDB/Collapser/Buffer.pm
+    version: '0.57'
+  KiokuDB::Entry:
+    file: lib/KiokuDB/Entry.pm
+    version: '0.57'
+  KiokuDB::Entry::Skip:
+    file: lib/KiokuDB/Entry/Skip.pm
+    version: '0.57'
+  KiokuDB::Error:
+    file: lib/KiokuDB/Error.pm
+    version: '0.57'
+  KiokuDB::Error::MissingObjects:
+    file: lib/KiokuDB/Error/MissingObjects.pm
+    version: '0.57'
+  KiokuDB::Error::UnknownObjects:
+    file: lib/KiokuDB/Error/UnknownObjects.pm
+    version: '0.57'
+  KiokuDB::GC::Naive:
+    file: lib/KiokuDB/GC/Naive.pm
+    version: '0.57'
+  KiokuDB::GC::Naive::Mark:
+    file: lib/KiokuDB/GC/Naive/Mark.pm
+    version: '0.57'
+  KiokuDB::GC::Naive::Mark::Results:
+    file: lib/KiokuDB/GC/Naive/Mark.pm
+    version: '0.57'
+  KiokuDB::GC::Naive::Sweep:
+    file: lib/KiokuDB/GC/Naive/Sweep.pm
+    version: '0.57'
+  KiokuDB::GC::Naive::Sweep::Results:
+    file: lib/KiokuDB/GC/Naive/Sweep.pm
+    version: '0.57'
+  KiokuDB::GIN:
+    file: lib/KiokuDB/GIN.pm
+    version: '0.57'
+  KiokuDB::LinkChecker:
+    file: lib/KiokuDB/LinkChecker.pm
+    version: '0.57'
+  KiokuDB::LinkChecker::Results:
+    file: lib/KiokuDB/LinkChecker/Results.pm
+    version: '0.57'
+  KiokuDB::Linker:
+    file: lib/KiokuDB/Linker.pm
+    version: '0.57'
+  KiokuDB::LiveObjects:
+    file: lib/KiokuDB/LiveObjects.pm
+    version: '0.57'
+  KiokuDB::LiveObjects::Guard:
+    file: lib/KiokuDB/LiveObjects/Guard.pm
+    version: '0.57'
+  KiokuDB::LiveObjects::Scope:
+    file: lib/KiokuDB/LiveObjects/Scope.pm
+    version: '0.57'
+  KiokuDB::LiveObjects::TXNScope:
+    file: lib/KiokuDB/LiveObjects/TXNScope.pm
+    version: '0.57'
+  KiokuDB::Meta::Attribute::DoNotSerialize:
+    file: lib/KiokuDB/Meta/Attribute/DoNotSerialize.pm
+    version: '0.57'
+  KiokuDB::Meta::Attribute::Lazy:
+    file: lib/KiokuDB/Meta/Attribute/Lazy.pm
+    version: '0.57'
+  KiokuDB::Meta::Instance:
+    file: lib/KiokuDB/Meta/Instance.pm
+    version: '0.57'
+  KiokuDB::Reference:
+    file: lib/KiokuDB/Reference.pm
+    version: '0.57'
+  KiokuDB::Role::API:
+    file: lib/KiokuDB/Role/API.pm
+    version: '0.57'
+  KiokuDB::Role::Cacheable:
+    file: lib/KiokuDB/Role/Cacheable.pm
+    version: '0.57'
+  KiokuDB::Role::ID:
+    file: lib/KiokuDB/Role/ID.pm
+    version: '0.57'
+  KiokuDB::Role::ID::Content:
+    file: lib/KiokuDB/Role/ID/Content.pm
+    version: '0.57'
+  KiokuDB::Role::ID::Digest:
+    file: lib/KiokuDB/Role/ID/Digest.pm
+    version: '0.57'
+  KiokuDB::Role::Immutable:
+    file: lib/KiokuDB/Role/Immutable.pm
+    version: '0.57'
+  KiokuDB::Role::Immutable::Transitive:
+    file: lib/KiokuDB/Role/Immutable/Transitive.pm
+    version: '0.57'
+  KiokuDB::Role::Intrinsic:
+    file: lib/KiokuDB/Role/Intrinsic.pm
+    version: '0.57'
+  KiokuDB::Role::Scan:
+    file: lib/KiokuDB/Role/Scan.pm
+    version: '0.57'
+  KiokuDB::Role::TypeMap:
+    file: lib/KiokuDB/Role/TypeMap.pm
+    version: '0.57'
+  KiokuDB::Role::UUIDs:
+    file: lib/KiokuDB/Role/UUIDs.pm
+    version: '0.57'
+  KiokuDB::Role::UUIDs::DataUUID:
+    file: lib/KiokuDB/Role/UUIDs/DataUUID.pm
+    version: '0.57'
+  KiokuDB::Role::UUIDs::LibUUID:
+    file: lib/KiokuDB/Role/UUIDs/LibUUID.pm
+    version: '0.57'
+  KiokuDB::Role::UUIDs::SerialIDs:
+    file: lib/KiokuDB/Role/UUIDs/SerialIDs.pm
+    version: '0.57'
+  KiokuDB::Role::Upgrade::Data:
+    file: lib/KiokuDB/Role/Upgrade/Data.pm
+    version: '0.57'
+  KiokuDB::Role::Upgrade::Handlers:
+    file: lib/KiokuDB/Role/Upgrade/Handlers.pm
+    version: '0.57'
+  KiokuDB::Role::Upgrade::Handlers::Table:
+    file: lib/KiokuDB/Role/Upgrade/Handlers/Table.pm
+    version: '0.57'
+  KiokuDB::Role::Verbosity:
+    file: lib/KiokuDB/Role/Verbosity.pm
+    version: '0.57'
+  KiokuDB::Role::WithDigest:
+    file: lib/KiokuDB/Role/WithDigest.pm
+    version: '0.57'
+  KiokuDB::Serializer:
+    file: lib/KiokuDB/Serializer.pm
+    version: '0.57'
+  KiokuDB::Serializer::JSON:
+    file: lib/KiokuDB/Serializer/JSON.pm
+    version: '0.57'
+  KiokuDB::Serializer::Memory:
+    file: lib/KiokuDB/Serializer/Memory.pm
+    version: '0.57'
+  KiokuDB::Serializer::Storable:
+    file: lib/KiokuDB/Serializer/Storable.pm
+    version: '0.57'
+  KiokuDB::Serializer::YAML:
+    file: lib/KiokuDB/Serializer/YAML.pm
+    version: '0.57'
+  KiokuDB::Set:
+    file: lib/KiokuDB/Set.pm
+    version: '0.57'
+  KiokuDB::Set::Base:
+    file: lib/KiokuDB/Set/Base.pm
+    version: '0.57'
+  KiokuDB::Set::Deferred:
+    file: lib/KiokuDB/Set/Deferred.pm
+    version: '0.57'
+  KiokuDB::Set::Loaded:
+    file: lib/KiokuDB/Set/Loaded.pm
+    version: '0.57'
+  KiokuDB::Set::Storage:
+    file: lib/KiokuDB/Set/Storage.pm
+    version: '0.57'
+  KiokuDB::Set::Stored:
+    file: lib/KiokuDB/Set/Stored.pm
+    version: '0.57'
+  KiokuDB::Set::Transient:
+    file: lib/KiokuDB/Set/Transient.pm
+    version: '0.57'
+  KiokuDB::Stream::Objects:
+    file: lib/KiokuDB/Stream/Objects.pm
+    version: '0.57'
+  KiokuDB::Test:
+    file: lib/KiokuDB/Test.pm
+    version: '0.57'
+  KiokuDB::Test::BLOB:
+    file: lib/KiokuDB/Test/Fixture/Overwrite.pm
+    version: '0.57'
+  KiokuDB::Test::Company:
+    file: lib/KiokuDB/Test/Company.pm
+    version: '0.57'
+  KiokuDB::Test::Digested:
+    file: lib/KiokuDB/Test/Digested.pm
+    version: '0.57'
+  KiokuDB::Test::Employee:
+    file: lib/KiokuDB/Test/Employee.pm
+    version: '0.57'
+  KiokuDB::Test::Fixture:
+    file: lib/KiokuDB/Test/Fixture.pm
+    version: '0.57'
+  KiokuDB::Test::Fixture::Binary:
+    file: lib/KiokuDB/Test/Fixture/Binary.pm
+    version: '0.57'
+  KiokuDB::Test::Fixture::CAS:
+    file: lib/KiokuDB/Test/Fixture/CAS.pm
+    version: '0.57'
+  KiokuDB::Test::Fixture::Clear:
+    file: lib/KiokuDB/Test/Fixture/Clear.pm
+    version: '0.57'
+  KiokuDB::Test::Fixture::Concurrency:
+    file: lib/KiokuDB/Test/Fixture/Concurrency.pm
+    version: '0.57'
+  KiokuDB::Test::Fixture::GIN::Class:
+    file: lib/KiokuDB/Test/Fixture/GIN/Class.pm
+    version: '0.57'
+  KiokuDB::Test::Fixture::MassInsert:
+    file: lib/KiokuDB/Test/Fixture/MassInsert.pm
+    version: '0.57'
+  KiokuDB::Test::Fixture::ObjectGraph:
+    file: lib/KiokuDB/Test/Fixture/ObjectGraph.pm
+    version: '0.57'
+  KiokuDB::Test::Fixture::Overwrite:
+    file: lib/KiokuDB/Test/Fixture/Overwrite.pm
+    version: '0.57'
+  KiokuDB::Test::Fixture::Refresh:
+    file: lib/KiokuDB/Test/Fixture/Refresh.pm
+    version: '0.57'
+  KiokuDB::Test::Fixture::RootSet:
+    file: lib/KiokuDB/Test/Fixture/RootSet.pm
+    version: '0.57'
+  KiokuDB::Test::Fixture::Scan:
+    file: lib/KiokuDB/Test/Fixture/Scan.pm
+    version: '0.57'
+  KiokuDB::Test::Fixture::Sets:
+    file: lib/KiokuDB/Test/Fixture/Sets.pm
+    version: '0.57'
+  KiokuDB::Test::Fixture::SimpleSearch:
+    file: lib/KiokuDB/Test/Fixture/SimpleSearch.pm
+    version: '0.57'
+  KiokuDB::Test::Fixture::Small:
+    file: lib/KiokuDB/Test/Fixture/Small.pm
+    version: '0.57'
+  KiokuDB::Test::Fixture::TXN:
+    file: lib/KiokuDB/Test/Fixture/TXN.pm
+    version: '0.57'
+  KiokuDB::Test::Fixture::TXN::Nested:
+    file: lib/KiokuDB/Test/Fixture/TXN/Nested.pm
+    version: '0.57'
+  KiokuDB::Test::Fixture::TXN::Scan:
+    file: lib/KiokuDB/Test/Fixture/TXN/Scan.pm
+    version: '0.57'
+  KiokuDB::Test::Fixture::TypeMap::Default:
+    file: lib/KiokuDB/Test/Fixture/TypeMap/Default.pm
+    version: '0.57'
+  KiokuDB::Test::Fixture::Unicode:
+    file: lib/KiokuDB/Test/Fixture/Unicode.pm
+    version: '0.57'
+  KiokuDB::Test::Person:
+    file: lib/KiokuDB/Test/Person.pm
+    version: '0.57'
+  KiokuDB::Thunk:
+    file: lib/KiokuDB/Thunk.pm
+    version: '0.57'
+  KiokuDB::TypeMap:
+    file: lib/KiokuDB/TypeMap.pm
+    version: '0.57'
+  KiokuDB::TypeMap::ClassBuilders:
+    file: lib/KiokuDB/TypeMap/ClassBuilders.pm
+    version: '0.57'
+  KiokuDB::TypeMap::Composite:
+    file: lib/KiokuDB/TypeMap/Composite.pm
+    version: '0.57'
+  KiokuDB::TypeMap::Composite::TypeMapAttr:
+    file: lib/KiokuDB/TypeMap/Composite.pm
+    version: '0.57'
+  KiokuDB::TypeMap::Default:
+    file: lib/KiokuDB/TypeMap/Default.pm
+    version: '0.57'
+  KiokuDB::TypeMap::Default::Canonical:
+    file: lib/KiokuDB/TypeMap/Default/Canonical.pm
+    version: '0.57'
+  KiokuDB::TypeMap::Default::JSON:
+    file: lib/KiokuDB/TypeMap/Default/JSON.pm
+    version: '0.57'
+  KiokuDB::TypeMap::Default::Passthrough:
+    file: lib/KiokuDB/TypeMap/Default/Passthrough.pm
+    version: '0.57'
+  KiokuDB::TypeMap::Default::Storable:
+    file: lib/KiokuDB/TypeMap/Default/Storable.pm
+    version: '0.57'
+  KiokuDB::TypeMap::Entry:
+    file: lib/KiokuDB/TypeMap/Entry.pm
+    version: '0.57'
+  KiokuDB::TypeMap::Entry::Alias:
+    file: lib/KiokuDB/TypeMap/Entry/Alias.pm
+    version: '0.57'
+  KiokuDB::TypeMap::Entry::Callback:
+    file: lib/KiokuDB/TypeMap/Entry/Callback.pm
+    version: '0.57'
+  KiokuDB::TypeMap::Entry::Closure:
+    file: lib/KiokuDB/TypeMap/Entry/Closure.pm
+    version: '0.57'
+  KiokuDB::TypeMap::Entry::Compiled:
+    file: lib/KiokuDB/TypeMap/Entry/Compiled.pm
+    version: '0.57'
+  KiokuDB::TypeMap::Entry::JSON::Scalar:
+    file: lib/KiokuDB/TypeMap/Entry/JSON/Scalar.pm
+    version: '0.57'
+  KiokuDB::TypeMap::Entry::MOP:
+    file: lib/KiokuDB/TypeMap/Entry/MOP.pm
+    version: '0.57'
+  KiokuDB::TypeMap::Entry::Naive:
+    file: lib/KiokuDB/TypeMap/Entry/Naive.pm
+    version: '0.57'
+  KiokuDB::TypeMap::Entry::Passthrough:
+    file: lib/KiokuDB/TypeMap/Entry/Passthrough.pm
+    version: '0.57'
+  KiokuDB::TypeMap::Entry::Ref:
+    file: lib/KiokuDB/TypeMap/Entry/Ref.pm
+    version: '0.57'
+  KiokuDB::TypeMap::Entry::Set:
+    file: lib/KiokuDB/TypeMap/Entry/Set.pm
+    version: '0.57'
+  KiokuDB::TypeMap::Entry::Std:
+    file: lib/KiokuDB/TypeMap/Entry/Std.pm
+    version: '0.57'
+  KiokuDB::TypeMap::Entry::Std::Compile:
+    file: lib/KiokuDB/TypeMap/Entry/Std/Compile.pm
+    version: '0.57'
+  KiokuDB::TypeMap::Entry::Std::Expand:
+    file: lib/KiokuDB/TypeMap/Entry/Std/Expand.pm
+    version: '0.57'
+  KiokuDB::TypeMap::Entry::Std::ID:
+    file: lib/KiokuDB/TypeMap/Entry/Std/ID.pm
+    version: '0.57'
+  KiokuDB::TypeMap::Entry::Std::Intrinsic:
+    file: lib/KiokuDB/TypeMap/Entry/Std/Intrinsic.pm
+    version: '0.57'
+  KiokuDB::TypeMap::Entry::StorableHook:
+    file: lib/KiokuDB/TypeMap/Entry/StorableHook.pm
+    version: '0.57'
+  KiokuDB::TypeMap::Resolver:
+    file: lib/KiokuDB/TypeMap/Resolver.pm
+    version: '0.57'
+  KiokuDB::TypeMap::Shadow:
+    file: lib/KiokuDB/TypeMap/Shadow.pm
+    version: '0.57'
+  KiokuDB::Util:
+    file: lib/KiokuDB/Util.pm
+    version: '0.57'
+  Moose::Meta::Attribute::Custom::Trait::KiokuDB::DoNotSerialize:
+    file: lib/Moose/Meta/Attribute/Custom/Trait/KiokuDB/DoNotSerialize.pm
+    version: '0.57'
+  Moose::Meta::Attribute::Custom::Trait::KiokuDB::Lazy:
+    file: lib/Moose/Meta/Attribute/Custom/Trait/KiokuDB/Lazy.pm
+    version: '0.57'
+requires:
+  B: '0'
+  B::Deparse: '0'
+  Cache::Ref: '0.02'
+  Carp: '0'
+  Class::Load: '0'
+  Data::Stream::Bulk: '0.08'
+  Data::Stream::Bulk::Util: '0'
+  Data::Swap: '0'
+  Data::UUID: '1.203'
+  Data::Visitor: '0.24'
+  Digest::SHA: '0'
+  Encode: '0'
+  Hash::Util::FieldHash::Compat: '0'
+  IO::Handle: '0'
+  JSON: '2.12'
+  JSON::XS: '2.231'
+  List::Util: '0'
+  Module::Pluggable::Object: '0'
+  Moose: '2.0000'
+  Moose::Exporter: '0'
+  Moose::Role: '0'
+  Moose::Util: '0'
+  Moose::Util::MetaRole: '0'
+  Moose::Util::TypeConstraints: '0'
+  MooseX::Clone: '0.04'
+  MooseX::Clone::Meta::Attribute::Trait::NoClone: '0'
+  MooseX::Role::Parameterized: '0.10'
+  MooseX::YAML: '0.04'
+  POSIX: '0'
+  PadWalker: '1.9'
+  Path::Class: '0'
+  Scalar::Util: '0'
+  Scope::Guard: '0'
+  Search::GIN::Driver: '0'
+  Search::GIN::Extract: '0'
+  Search::GIN::Query::Class: '0.03'
+  Set::Object: '1.26'
+  Storable: '0'
+  Sub::Exporter: '0'
+  Symbol: '0'
+  Test::Exception: '0'
+  Test::Moose: '0'
+  Test::More: '0.88'
+  Throwable: '0'
+  Tie::RefHash: '0'
+  Tie::ToObject: '0'
+  Try::Tiny: '0'
+  YAML::XS: '0.30'
+  constant: '0'
+  namespace::clean: '0.08'
+  overload: '0'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kiokudb/kiokudb/issues
+  homepage: http://www.iinteractive.com/kiokudb/
+  repository: git://github.com/kiokudb/kiokudb.git
+version: '0.57'
+x_Dist_Zilla:
+  perl:
+    version: '5.018002'
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::FileFinder::Filter
+      name: WeaverFiles
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: test
+          type: requires
+      name: '@Filter/TestMoreDoneTesting'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::GatherDir
+      name: '@Filter/GatherDir'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@Filter/PruneCruft'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@Filter/ManifestSkip'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@Filter/MetaYAML'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::License
+      name: '@Filter/License'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::RunExtraTests
+      config:
+        Dist::Zilla::Role::TestRunner:
+          default_jobs: 1
+      name: '@Filter/RunExtraTests'
+      version: '0.018'
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@Filter/ExecDir'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: '@Filter/ShareDir'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::MakeMaker
+      config:
+        Dist::Zilla::Role::TestRunner:
+          default_jobs: 1
+      name: '@Filter/MakeMaker'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@Filter/Manifest'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: '@Filter/TestRelease'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@Filter/ConfirmRelease'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: '@Filter/MetaConfig'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: '@Filter/MetaJSON'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::NextRelease
+      name: '@Filter/NextRelease'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::CheckChangesHasContent
+      name: '@Filter/CheckChangesHasContent'
+      version: '0.006'
+    -
+      class: Dist::Zilla::Plugin::PkgVersion
+      name: '@Filter/PkgVersion'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::Authority
+      name: '@Filter/Authority'
+      version: '1.006'
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: '@Filter/PodSyntaxTests'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::NoTabsTests
+      config:
+        Dist::Zilla::Plugin::Test::NoTabs:
+          module_finder:
+            - ':InstallModules'
+          script_finder:
+            - ':ExecFiles'
+      name: '@Filter/NoTabsTests'
+      version: '0.06'
+    -
+      class: Dist::Zilla::Plugin::EOLTests
+      name: '@Filter/EOLTests'
+      version: '0.02'
+    -
+      class: Dist::Zilla::Plugin::Test::Compile
+      config:
+        Dist::Zilla::Plugin::Test::Compile:
+          filename: t/00-compile.t
+          module_finder:
+            - ':InstallModules'
+          script_finder:
+            - ':ExecFiles'
+      name: '@Filter/Test::Compile'
+      version: '2.039'
+    -
+      class: Dist::Zilla::Plugin::Metadata
+      name: '@Filter/Metadata'
+      version: '3.03'
+    -
+      class: Dist::Zilla::Plugin::MetaResources
+      name: '@Filter/MetaResources'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::Git::Check
+      name: '@Filter/Git::Check'
+      version: '2.020'
+    -
+      class: Dist::Zilla::Plugin::Git::Commit
+      name: '@Filter/Git::Commit'
+      version: '2.020'
+    -
+      class: Dist::Zilla::Plugin::Git::Tag
+      name: '@Filter/Git::Tag'
+      version: '2.020'
+    -
+      class: Dist::Zilla::Plugin::Git::NextVersion
+      name: '@Filter/Git::NextVersion'
+      version: '2.020'
+    -
+      class: Dist::Zilla::Plugin::ContributorsFromGit
+      name: '@Filter/ContributorsFromGit'
+      version: '0.006'
+    -
+      class: Dist::Zilla::Plugin::MetaProvides::Package
+      config:
+        Dist::Zilla::Plugin::MetaProvides::Package:
+          finder_objects:
+            -
+              class: Dist::Zilla::Plugin::FinderCode
+              name: '@Filter/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
+              version: '5.014'
+        Dist::Zilla::Role::MetaProvider::Provider:
+          inherit_missing: '1'
+          inherit_version: '1'
+          meta_noindex: '1'
+      name: '@Filter/MetaProvides::Package'
+      version: '2.000001'
+    -
+      class: Dist::Zilla::Plugin::PodWeaver
+      config:
+        Dist::Zilla::Plugin::PodWeaver:
+          finder:
+            - WeaverFiles
+          plugins:
+            -
+              class: Pod::Weaver::Plugin::EnsurePod5
+              name: '@CorePrep/EnsurePod5'
+              version: '4.006'
+            -
+              class: Pod::Weaver::Plugin::H1Nester
+              name: '@CorePrep/H1Nester'
+              version: '4.006'
+            -
+              class: Pod::Weaver::Plugin::SingleEncoding
+              name: '@Default/SingleEncoding'
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Name
+              name: '@Default/Name'
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Version
+              name: '@Default/Version'
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Region
+              name: '@Default/prelude'
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: SYNOPSIS
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: DESCRIPTION
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: OVERVIEW
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: ATTRIBUTES
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: METHODS
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: FUNCTIONS
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Leftovers
+              name: '@Default/Leftovers'
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Region
+              name: '@Default/postlude'
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Authors
+              name: '@Default/Authors'
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Legal
+              name: '@Default/Legal'
+              version: '4.006'
+      name: '@Filter/PodWeaver'
+      version: '4.005'
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@Filter/UploadToCPAN'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::AutoPrereqs
+      name: AutoPrereqs
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: develop
+          type: requires
+      name: DevelopRequires
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::PerlVersionPrereqs
+      config:
+        Dist::Zilla::Plugin::PerlVersionPrereqs:
+          perl_version: '5.010'
+      name: '5.010'
+      version: '0.01'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':IncModules'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':MainModule'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':AllFiles'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':NoFiles'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: '@Filter/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
+      version: '5.014'
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: '0'
+    version: '5.014'
+x_authority: cpan:NUFFIN
+x_contributors:
+  - 'Andreas Marienborg <andreas.marienborg@gmail.com>'
+  - 'Ask Bjørn Hansen <ask@develooper.com>'
+  - 'Bruno Vecchi <vecchi.b@gmail.com>'
+  - 'Chris Prather <chris@prather.org>'
+  - 'Dan Dascalescu <bigbang7@gmail.com>'
+  - 'Dan Dascalescu <ddascaNOSPAMlescu@gmail.com>'
+  - 'Dave Rolsky <autarch@urth.org>'
+  - 'David Leadbeater <dgl@dgl.cx>'
+  - 'Dylan William Hardison <dylan@hardison.net>'
+  - 'Florian Ragwitz <rafl@debian.org>'
+  - 'Frank Wiegand <fwie@cpan.org>'
+  - 'Graham Barr <gbarr@pobox.com>'
+  - 'Jason May <jason.a.may@gmail.com>'
+  - 'Jesse Luehrs <doy@tozt.net>'
+  - 'Moritz Lenz <mlenz@wvbh074.physik.uni-wuerzburg.de>'
+  - 'Pedro Melo <melo@simplicidade.org>'
+  - 'Piers Cawley <Piers.Cawley@bbc.co.uk>'
+  - 'Rob Hoelz <rhoelz@inoc.com>'
+  - 'Salve J. Nilsen <sjn+gnurf@kaizendo.org>'
+  - 'Shawn M Moore <sartak@gmail.com>'
+  - 'Shlomi Fish <shlomif@iglu.org.il>'
+  - 'Thomas Klausner <domm@plix.at>'
+  - 'Torsten Raudssus <torsten@metaluna4.de>'
+  - 'chromatic <chromatic@wgz.org>'
+  - 'franck cuny <franck@lumberjaph.net>'
+  - 'jrockway <jrockway@3efe9002-19ed-0310-8735-a98156148065>'
+  - 'ktat <ktat.is@gmail.com>'
+  - 'perigrin <chris@prather.org>'

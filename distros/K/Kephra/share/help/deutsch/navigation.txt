@@ -1,0 +1,73 @@
+
+       -------------------------
+      | Kephra Navigationshilfe |
+       -------------------------
+
+  Dies ist eine Übersicht wo ihr welches Bedienelement findet, was es kann und
+  wozu es dient. Auch steht hier welche Haltung wir dazu haben, was euch auch
+  sehr helfen kann euch zurechtzufinden, auch wenn ihr das meisste hier schon
+  kennt. Denn wo es Sinn macht haben wir uns natürlich an die bekannten
+  Standarts gehalten. Bedenkt auch Bitte das vieles hier Beschriebene
+  Standarteinstellungen sind die darauf warten nach euren Vorstellungen
+  angepasst zu werden.
+
+ 
+ Hauptmenü:
+
+    Liegt in der oberste Zeile des Programmfensters und ist als thematisch
+    geordnete Übersicht über alle verfügbaren Funktionen gedacht. Hier kann man
+    auch zu jeder Funktion auch eine Kurzbeschreibung erhalten (erscheint dann
+    in der Statuszeile), erfahren welches Icon der Funktion zugeordnet ist und
+    mit welchen Tastaturkombination man die Funktion auch aufrufen kann.
+    Allerdings  ist das Hauptmenü mit seinen Unter- und Unteruntermenüs recht
+    umfangreich und verlangt bei der Benutzung manchmal einige Klicks mehr als
+    andere Teile der Bedieoberfläche, deswegen sollte man sich häufig gebrauchte
+    Funktion an leichter erreichbare Orte auslagern oder man auch unerwünschte
+    Funktionen und Menüs herausnehmen. <Strg>+<Alt>+<M> schaltet Sichtbarkeit
+    ein oder aus.
+
+
+ Werkzeugleiste(Toolbar):
+
+    Liegt meist direkt unterhalb des Hauptmenüs und ist die Sammlung häufig
+    verwendeter und deshalb schnell erreichbarer Funktionen.  Von denen werden
+    nur die Icons(Symbolbilder) angezeigt, wodurch mehr Funktionen in die
+    Toolbar passen und auch das Erkennen der Funktion schneller ist, da man
+    Bilder schneller erkennt als Text. Wenn ihr euch unsicher seid welche
+    Funktion einem Icon zugeordnet ist, haltet den Cursor(Mauszeiger) darüber
+    und wartet kurz. Der name der Funktion wird neben dem Icon erscheinen und
+    eine kurze Beschreibung in der Statuszeile.
+
+
+ Reiterleiste(Tabbar):
+
+    Liegt wiederum direkt unterhalb der Werkzeugleiste und zeigt an, welche 
+    Dateien grad offen sind und ermöglicht die direkte Wahl der aktuellen Datei
+    mit der Maus. Sie können auch mit Maus oder Tastur verschoben, oder auch
+    direkt geschloßen werden. Die Reiter zeigen auch an ob eine Datei nicht
+    gespeichert ist (*), ob sie schreibgeschützt ist (#) oder ob es eine aktive 
+    Einstellungsdatei ($) ist. <Strg>+<Alt>+<T> die Sichtbarkeit ein oder aus.
+
+
+ Kontextmenü:
+
+    Wird meist mit einem Rechts-Klick gerufen und öffnet wo sich der Mauszeiger
+    befindet ein Menü. Der Inhalt des Menüs bezieht sich auch meißt auf das
+    angeklickte Bedienelement (daher der Name). Der Zweck eines Kontextmenüs ist
+    ähnlich dem der Werzeugleiste, man hat häufig gebrauchtes "schnell bei der
+    Hand", auch wenn hier Icon, Name und Tastaturkürzel eines Befehles angezeigt
+    wird. Vorteile zur Werkzeugleiste: man muss den Mauszeiger nichts zur
+    Werkzeugleiste oder Menüü bewegen und vieles wird auch verständlicher wenn
+    man es "anfassen" und direkt "verändern" kann. Derzeit gibt es Kontextmenüs
+    nur zum aktuellen Dokument, dem markierten Text, dem linken Rand, 
+    der Suchzeile und über den meisten Feldern der Statuszeile.
+
+
+ Statusleiste:
+ 
+    Ist die unterste Zeile des Programmfensters und liefert verschiedene
+    Informationen zum aktuellen Dokument und auch Mitteilungen aufgerufener
+    Befehle. Einige Zellen der Statuszeile ändern ihren Inhalt oder Funktion
+    wenn man die mit der linken Maustaste anklickt und öffnen ein Kontextmenü
+    bei Rechtsklick.
+

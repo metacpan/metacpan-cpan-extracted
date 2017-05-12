@@ -1,0 +1,217 @@
+/* $Id: style.css,v 1.16 2007-09-12 22:28:33 mike Exp $ */
+
+<%once>
+use Keystone::Resolver::Admin;
+</%once>
+<%perl>
+my $admin = Keystone::Resolver::Admin->admin();
+my $host = $ENV{HTTP_HOST}; # Or we could use SERVER_NAME
+my $tag = $admin->hostname2tag($host);
+my $site = $admin->site($tag);
+# $m->notes("site");
+</%perl>
+
+body {
+	color: black;
+	background: <% $site->bg_colour() %>
+}
+
+#prologue {
+	background: #306090;
+	padding: 0.5em 1em;
+}
+
+#usermenu {
+	background: #b9d2ec;
+	padding: 0.25em 1em;
+}
+
+#umleft {
+	text-align: left;
+	float: left;
+}
+
+#umright {
+	text-align: right;
+}
+
+h1, h1 a {
+	margin: 0;
+	padding: 0;
+	font-family: Verdana, "Sans Serif", Sans;
+	color: #99b2cc;
+	text-decoration: none;
+}
+
+#menu {
+	float: left;
+	width: 11em;
+	background: #ffffc0;
+	margin: 0.5em 0em;
+	padding: 0.5em 1em;
+}
+
+#menu a, #usermenu a {
+	text-decoration: none;
+}
+
+#main {
+	margin-left: 13em;
+	max-width: 51em;
+	padding: 0.5em 1em;
+}
+
+#epilogue {
+	background: #f0f0f0;
+	clear: both;
+	padding: 0.5em 1em;
+	font-size: small;
+	text-align: right;
+	color: gray;
+}
+
+#epilogue a {
+	text-decoration: none;
+}
+
+#epilogue a {
+	color: gray;
+}
+
+.thleft tr th {
+	text-align: left;
+	vertical-align: top;
+}
+
+.searchform tr th {
+	text-align: right;
+}
+
+.searchform tr td input, .searchform tr td select input.searchform, textarea.searchform {
+	background: #fff0f0;
+}
+
+table.searchform tr {
+	vertical-align: top;
+}
+
+h2, h3 {
+	color: #306090;
+}
+
+.result {
+	text-indent: -3em;
+	padding-left: 3em;
+}
+
+.continue {
+	padding-left: 3em;
+}
+
+.disabled {
+	color: gray;
+}
+
+.error {
+	color: red;
+	font-weight: bold;
+}
+
+.keywords {
+	background: #ffffc0;
+	padding: 0em 1em;
+	border: solid 1px grey;
+}
+
+.keywords ul {
+	padding: 0em;
+}
+
+.keywords ul li {
+	list-style-type: none;
+	cursor: pointer;
+}
+
+img {
+	border: 0;
+}
+
+.debug {
+	background: lightgrey;
+	color: black;
+	border: 1px solid black;
+	padding: 0.5em;
+}
+
+.tight {
+	margin-top: -1em; /* This is a bit of a hack */
+	margin-left: 0;
+	padding-left: 0;
+}
+
+.tight li {
+	margin-left: 0;
+	padding-left: 1em;
+	list-style-type: none;
+}
+
+.pinkform input {
+	background: #ffe0e0;
+}
+
+.unpink input {
+	background: #f8f5f2;
+}
+
+th {
+	background: #d0e0ff;
+	text-align: left;
+	padding: 0.25em;
+}
+
+.td-s-enum, .td-s-t, .td-s-c, .td-s-n, .td-s-b, .td-s-error,
+.td-l-enum, .td-l-t, .td-l-c, .td-l-n, .td-l-b, .td-l-error,
+.td-e-enum, .td-e-t, .td-e-c, .td-e-n, .td-e-b, .td-e-error,
+.td-admin {
+	background: #e0e8ff;
+	padding: 0.25em;
+}
+
+.td-s-enum a, .td-s-t a, .td-s-c a, .td-s-n a, .td-s-b a, .td-s-error a,
+.td-l-enum a, .td-l-t a, .td-l-c a, .td-l-n a, .td-l-b a, .td-l-error a,
+.td-e-enum a, .td-e-t a, .td-e-c a, .td-e-n a, .td-e-b a, .td-e-error a,
+.td-admin a {
+	text-decoration: none;
+}
+
+.td-s-c,
+.td-l-c,
+.td-e-c {
+	font-family: Courier, fixed;
+	font-weight: bold;
+}
+
+.td-s-n { /* but not .td-l-n or .td-e-n */
+	text-align: right;
+}
+
+.td-s-error,
+.td-l-error,
+.td-e-error {
+	color: red;
+	font-weight: bold;
+}
+
+.td-admin {
+	color: darkgreen;
+	font-weight: bold;
+}
+
+table.center {
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.readonly {
+	background: #e0e0e0;
+}

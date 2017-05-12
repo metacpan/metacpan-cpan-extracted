@@ -1,0 +1,16 @@
+abstract: A Markdown formatter for Kwiki.
+author: Kang-min Liu <gugod@gugod.org>.
+build_requires: 
+  Test::Base: 0
+distribution_type: module
+generated_by: Module::Install version 0.60
+license: perl
+name: Kwiki-Markdown
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Kwiki: 0.38
+  perl: 5.6.1
+version: 0.01

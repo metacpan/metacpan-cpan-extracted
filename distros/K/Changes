@@ -1,0 +1,35 @@
+0.10 Mon. Sep 30, 2013
+    - Stop including k.h to minimize the chances of a k.h / c.o conflict.
+    - Set KXVER variable during build.
+    - Fix bug where test suite hangs with newer qs.
+
+0.09 Wed. Apr 25, 2012
+    - Throw an exception if no arg is passed to K->cmd or K->async_cmd
+
+0.08 Wed. Apr 25, 2012
+    - Fix bug where null values in q dictionaries causes a segfault
+
+0.07 Sun. Apr 22, 2012
+    - Support connection timeouts
+    - Represent paritioned tables and unparttioned tables the same way
+
+0.06 Sun. Apr 08, 2012
+    - Provide mechansim for receiving messages
+    - Improve error detection and reporting
+    - Support Perls with and without native 64-bit ints
+
+0.05 Thu. Apr 05, 2012
+    - Make sure version and abstract are set properly
+
+0.04 Tue. Mar 27, 2012
+    - Handle undocumented K struct types 100,102, and 103
+
+0.03 Mon. Mar 26, 2012
+    - Handle nulls and infinites
+    - Fix a couple memory leaks
+    - Make build work on 64-bit Linux
+    - Support asynchronous commands in OO interface
+
+0.02 Mon. Mar 26, 2012
+    - Improve docs
+    - Declare Moose dependency in Makefile.PL

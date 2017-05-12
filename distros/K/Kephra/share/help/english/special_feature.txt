@@ -1,0 +1,89 @@
+
+       -----------------------------
+      | Special Features of Kephra  |
+       -----------------------------
+
+Many standard functions, like opening a file or moving the blinking cursor (that's
+called caret), don't need any explanation, or Kephra wouldn't be a good editor. 
+Nevertheless there are some functionalities that are very helpful, but are often
+overlooked. Maybe because you don't expect them, or they are not in the main menu.
+Thatswhy they are listed here, sorted by topic.
+
+ - Text Navigation
+    + <Ctrl>+<Shift>+<G> jumps to the position of last change text in the current
+    document.
+    + <Alt>+<Shift>+<cursor keys> makes a rectangular text selection.
+    + brace navigation: <Alt>+<cursor keys> moves the cursor between braces. Up
+      and down goes to the matching brace or to the next brace of the same kind.
+      Left and right jumps to the previous or next brace of any kind.
+    + block navigation: Holding <Alt>, you can jump with <PageUp> and <PageDown>
+      block wise. Blocks are junks of lines, separated by empty lines.
+
+ - Text Editing
+    + With <Alt>[+<Shift>]+<Z> several changes are undone or redone. Add <Ctrl>,
+      and you move to the begin or endpoint of the edit history.
+    + <Ctrl>+<W> puts the selected text into the clipboard and vice versa.
+    + <Ctrl>+<D> pastes, a copy of the selected text or the current line under
+      under the original.
+    + move: <Ctrl>+<Alt>+<cursor|page keys> moves the selected text inside the
+      document. If nothing is selected, the current line will be moved.
+    + edit line wise: Add <Shift> and most simple edit functions will be applied
+      to the current line. But <Ctrl>+<Shift>+<L> and <Ctrl>+<Shift>+<R> do only
+      apply to line. They delete the left or right part of the cursor.
+
+ - Files
+    In this menu is nearly everything self explaining. Even reload or close other
+    (all but the visible) are easy to understand, from there positioning in the
+    menu. But 2 items should be highlighted.
+    + <Alt>+<Shift>+<S> saves current text under a different file name, but the
+      document is still associated with the previous file name.
+    + <Ctrl>+<Alt>+<Shift>+<S> does save the content and change the file name.
+
+ - View Options
+    + The tabbar has many possibilities of configuration.
+      * 2 optional icons: one leftmost for a new document and one rightmost to
+        close the current document.
+      * Right-click calls a context menu with all filenames with the full path.
+      * A click with the middle mouse button does the same, but that behavior
+        can be changed.
+      * A left-click on the highlighted tab switches back to the last used doc.
+    + Searchbar is mostly self explaining. All search options are hidden behind
+      a left click. And if the cursor is in the search input you can jump between
+      all search findings with <Enter> (forward) and <Shift>+<Enter> (backward).
+      <Ctrl>+<Enter> jumps to the first and <Ctrl>+<Shift>+<Enter> to the last
+      finding. And if you hold <Ctrl> down, you move the text like inside the
+      editor with the cursor keys, including <page up> and <page down>, which
+      switches between the docs.
+    + The status bar shows a lot of recent doc settings, which can be changed
+      also via right click and a context menu. A left click switches this property
+      on or off. Only exception ist the rightmost panel, which can show different
+      infos about the current doc/file.
+    + The editor panel has a lot of visual helpers to highlight the current line,
+      spaces and tabs or a right margin. But more unusual are indention guides, 
+      vertical dotted lines, which can help to recognize indention depths. The
+      distance between the indention guides equals the set tab size and they can
+      highlight if they connect 2 highlighted braces.
+
+ - Configurations
+    + Main or general configs is the internal name for the apps settings.
+    + The command list contains all commands a user can give the application.
+      * In the first part, every name (ID) gets an internal function (<call>).
+        Change that only if you really know what you're doing.
+      * The <enable> section gives to some ID a function that determines with a
+        positive result, if its currently possible to call the command.
+      * <enable_event> should fire, when the result of <enable> changes.
+      * <state> function return the command status, e.g. for toolbar switch button.
+      * <state_event> triggeres if the <state> changes.
+      * <icon> assigns to some calls a filename, containing a bitmap.
+      * <key> is the last and maybe most interesting section, because it sets the
+        global key binding, that is also displayed (translated) in the main menu.
+        Please use here lowercase and English key names only.
+    + Menu definitions are just (sometimes nested) lists of commands, and thats
+      why very readable. To comment a menu entry out, just append a "#".
+    + Localization files contain all labels and short help texts for the commands,
+      but also labels to all buttons and dialogs. You can translate the whole app
+      by translating this file.
+    + Syntax modes holding all the coloring definitions per programming language
+      and its keywords. The parsing rules unfortunate.
+    + Templates are often used chunks of text, that may contain special variables,
+      that will replaced with current data. They are listed in the file menu.

@@ -1,0 +1,23 @@
+Revision history for Perl extension KeyedMutex::Memcached
+
+0.05 2015-02-25T15:35:21Z
+
+        - Fixed dependencies.
+        - Fixed boundary testing.
+
+0.04 2015-02-18T00:41:38Z
+
+        - Merged diff from `ZIGOROU/KeyedMutex-Memcached-0.03`.
+
+0.03 2015-02-17T11:58:10Z
+
+        - Fixed test dependency.
+        - Switch to M::B::Tiny
+
+0.02    Fri Feb 18 16:28:28 2011
+        - use Time::HiRes::sleep instread of usleep
+        - wait interval is rand value. So It is considered collision on retry
+          like CSMA/CD (thanks by Kazuho Oku)
+
+0.01    Tue Feb 15 20:44:37 2011
+        - original version

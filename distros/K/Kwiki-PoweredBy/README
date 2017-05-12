@@ -1,0 +1,23 @@
+NAME
+    Kwiki::PoweredBy - Kwiki Powered-By Plugin
+
+SYNOPSIS
+        > kwiki -add Kwiki::PoweredBy
+
+DESCRIPTION
+    Provides a "Powered by Kwiki" logo for your Kwiki site.
+
+CREDITS
+    Powered By image created/donated by Florian "|fire|" Merges.
+
+AUTHOR
+    Brian Ingerson <ingy@cpan.org>
+
+COPYRIGHT
+    Copyright (c) 2005. Brian Ingerson. All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See http://www.perl.com/perl/misc/Artistic.html
+

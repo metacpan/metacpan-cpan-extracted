@@ -1,0 +1,120 @@
+#!/usr/bin/perl
+
+package main;
+$main::VERSION = '0.049';
+# PODNAME: koha-claim
+# ABSTRACT: Claim overdues each day, grouping same overdues
+
+
+use strict;
+use warnings;
+use Koha::Contrib::Tamil::Claimer;
+use Pod::Usage;
+use Getopt::Long;
+
+my $test     = 0;
+my $to       = '';
+my $help     = 0;
+my $doit     = 0;
+GetOptions( 
+    'test'   => \$test,
+    'to=s'   => \$to,
+    'help'   => \$help,
+    'doit'   => \$doit,
+);
+
+usage() if $help;          
+
+
+binmode(STDOUT, ':utf8');
+my $claimer = Koha::Contrib::Tamil::Claimer->new( doit => $doit, to => $to, );
+$claimer->claim_all_overdues( );
+
+
+sub usage {
+    pod2usage( -verbose => 2 );
+} 
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+koha-claim - Claim overdues each day, grouping same overdues
+
+=head1 VERSION
+
+version 0.049
+
+=head1 SYNOPSIS
+
+  koha-claim
+  koha-claim --doit
+  koha-claim --doit --to myself@tamil.fr
+
+=head1 DESCRIPTION
+
+This script creates claim notifications to borrowers for their overdues based
+on claim rules.  Notification are inserted into Koha standard notification
+queue (message_queue table). They have then to be processed by
+process_message_queue.pl script. The notifications group overdues. So for
+example, if a borrower has 3 overdues, 1 for 10 days and 2 for 20 days, and if
+you have 2 rules, one for 10 days and another one for 20 days, 2 notifications
+(not 3, one for each overdue) will be prepared: the 20 days notification will
+group the 2 20 days overdues.
+
+Rules are found in C<ClaimRules> Koha system preference.
+
+  # Branch itype days action notice
+  # action => 1=email, 2=debarre
+  *    *   15  1   REL1
+  MAIN *   25  1   REL1
+  *    BK  40  1   REL1
+  *    *   55  1   REL1
+  *    *   75  1   REL1
+  *    *   85  1   REL4
+  *    *   90  1   REL1
+
+This script MUST be run every day. It matches overdues on a exact number of
+days of overdue.
+
+Without C<--doit> parameter, the notifications are sent to the terminal (stdout)
+rather than to the notification queue.
+
+The notifications are entered in Koha in Tools > Notifications. Items
+information must be enclosed into <items> </items> tag. For example:
+
+  Library <<branches.branchname>>
+  <<branches.branchaddress1>>
+  <<branches.branchzip>> <<branches.branchcity>>
+  <<branches.branchphone>>
+  
+  Miss, Madam, Sir,
+  
+  This is overdue:
+  
+  <items>
+    Title:       <<biblio.title>>
+    Author:      <<biblio.author>>
+    Call Number: <<items.itemcallnumber>>
+    Borrowed at: <<item_branch>>
+    Due date:    <<issues.date_due>>
+    Type:        <<itemtypes.description>>
+  </items>
+
+=head1 AUTHOR
+
+Frédéric Demians <f.demians@tamil.fr>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2016 by Fréderic Démians.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

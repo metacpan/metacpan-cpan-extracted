@@ -1,0 +1,5 @@
+0.02
+	- use MooseX::StrictConstructor
+
+0.01
+	- Initial release

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<results>
+  <data entity="rft">
+    <metadata key="auinit">J</metadata>
+    <metadata key="aulast">Hunter</metadata>
+    <metadata key="btitle">Java Servlet Programming, 2nd Edition</metadata>
+    <metadata key="date">2001-04</metadata>
+    <metadata key="genre">book</metadata>
+    <metadata key="isbn">0-596-00040-5</metadata>
+    <metadata key="pub">O'Reilly</metadata>
+    <metadata key="tpages">780</metadata>
+  </data>
+  <result type="id" tag="http"
+	>http://www.oreilly.com/catalog/jservlet2/</result>
+  <result type="citeref" priority="15" tag=""
+	service="Endnote citation"
+	>http://example.com/resolve?rft_id=http%3A%2F%2Fwww.oreilly.com%2Fcatalog%2Fjservlet2%2F&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Abook&amp;rft.auinit=J&amp;rft.aulast=Hunter&amp;rft.btitle=Java%20Servlet%20Programming%2C%202nd%20Edition&amp;rft.date=2001-04&amp;rft.genre=book&amp;rft.isbn=0-596-00040-5&amp;rft.pub=O'Reilly&amp;rft.tpages=780&amp;rfr_id=info%3Asid%2Fopenly.com%3A&amp;svc_dat=indexdata:citation:Endnote</result>
+  <result type="bookstore" priority="10" tag=""
+	service="Amazon.com"
+	>http://www.amazon.com/exec/obidos/ASIN/0596000405/thedinosaurrea0a</result>
+  <result type="bookstore" priority="10" tag="amazon-de"
+	service="Amazon.de"
+	>http://www.amazon.de/exec/obidos/ASIN/0596000405</result>
+  <result type="authorsearch" priority="10" tag=""
+	service="Google"
+	>http://www.google.com/search?q=%22J Hunter%22</result>
+  <result type="citation" priority="20" tag="APP"
+	service="APP-style citation" mimetype="text/html"
+	>Hunter, J.  2001-04.  Java Servlet Programming, 2nd Edition.  O'Reilly.</result>
+  <result type="citation" priority="20" tag="author"
+	service="Author and year" mimetype="text/html"
+	>Hunter, J.  2001-04.</result>
+</results>

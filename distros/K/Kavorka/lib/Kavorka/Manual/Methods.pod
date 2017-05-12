@@ -1,0 +1,193 @@
+=pod
+
+=encoding utf-8
+
+=for stopwords invocant invocants lexicals unintuitive yada globals
+
+=head1 NAME
+
+Kavorka::Manual::Methods - method/classmethod/objectmethod keywords
+
+=head1 DESCRIPTION
+
+Kavorka provides the C<method>, C<classmethod> and C<objectmethod>
+keywords for the purpose of defining methods.
+
+The anatomy of a method:
+
+=over
+
+=item 1.
+
+The keyword introducing the method.
+
+=item 2.
+
+The method name (optional).
+
+=item 3.
+
+The signature (optional).
+
+=item 4.
+
+Traits (optional).
+
+=item 5.
+
+The prototype (optional).
+
+=item 6.
+
+The attribute list (optional).
+
+=item 7.
+
+The method body.
+
+=back
+
+Example:
+
+   #  (1)    (2)    (3)    (4)     (5)  (6)     (7)
+      method foobar ($foo) is cool :($) :cached { return $foo + $self->bar }
+   
+   #          (1)    (6)
+      my $m = method { return $_[0] + $self->bar };
+
+=head2 The Keyword
+
+By default, only the C<method> keyword is exported. The others can be
+exported by request:
+
+   use Kavorka qw( method classmethod objectmethod );
+
+=head2 The Method Name
+
+If present, it specifies the name of the method being defined. If no
+name is present, the declaration is an expression that evaluates to a
+reference to the method in question.
+
+Although methods are compiled at compile-time (and variables are closed
+over then), methods are installed into the class at run-time. So this
+works:
+
+   if ($ENV{DEBUG}) {
+      method foobar { ... }
+   }
+   else {
+      method foobar { ... }
+   }
+
+It is possible to add the method to the class at compile time using
+the C<begin> L<trait|/Traits>:
+
+   method foobar but begin { ... }
+
+This may be useful for role composition, if roles are composed before
+methods are defined, but the roles require certain methods to exist in
+your class.
+
+It is possible to define lexical (i.e. truly private) methods using a
+lexical variable for a method name:
+
+   objectmethod get_name () {
+      return $self->{name};
+   }
+   objectmethod my $set_name (Str $new) {
+      $self->{name} = $new;
+   }
+   
+   $obj->$set_name("Bob");
+   $obj->get_name;            # Bob
+
+See also: L<Lexical::Accessor>.
+
+=head2 The Signature
+
+See L<Kavorka::Manual::Signatures>.
+
+The C<method> keyword has a default invocant called C<< $self >>, but
+it does not have a type constraint, so can equally be used for class or
+object methods. The C<objectmethod> keyword works the same, but does
+define a type constraint for C<< $self >>, requiring it to be a blessed
+object. The C<classmethod> keyword defines an invocant called
+C<< $class >> which has a type constraint requiring it to be a string.
+
+In any case, it is perfectly possible to define your own name and type
+constraint for the invocant:
+
+   method foo ( ClassName $me: Int $foo ) { ... }
+
+=head2 Traits
+
+See L<Kavorka::Manual::ExtendingKavorka>.
+
+Two traits for methods are bundled with Kavorka: C<override> and
+C<fresh>.
+
+The C<fresh> trait will throw an exception if the method you are
+defining already exists in the inheritance hierarchy for this class.
+The idea of this trait is to increase safety when subclassing.
+
+Suppose a future release of your parent class adds a new method with
+the same name as one of yours, but differing functionality; your
+method would normally override the one in the parent class. With the
+C<fresh> trait, an exception would be thrown, giving you opportunity to
+resolve the conflict.
+
+The C<override> trait does the opposite; it will throw an exception if
+the method being defined I<< does not >> already exist.
+
+=head2 The Prototype
+
+See L<Kavorka::Manual::PrototypeAndAttributes>.
+
+Note however that prototypes are fairly useless for methods.
+
+=head2 The Attributes
+
+Attributes may alternatively be provided I<< before the signature >>.
+
+See L<Kavorka::Manual::PrototypeAndAttributes>.
+
+The C<method>, C<objectmethod> and C<classmethod> keywords
+automatically add the C<< :method >> attribute to methods.
+
+=head2 The Method Body
+
+This is more or less what you'd expect from the method body you'd
+write with L<sub|perlsub>, however the lexical variables for parameters
+are pre-declared and pre-populated, and invocants have been shifted
+off C<< @_ >>.
+
+=head1 BUGS
+
+Please report any bugs to
+L<http://rt.cpan.org/Dist/Display.html?Queue=Kavorka>.
+
+=head1 SEE ALSO
+
+L<Kavorka::Manual>,
+L<Kavorka::Manual::Signatures>,
+L<Kavorka::Manual::PrototypeAndAttributes>,
+L<Kavorka::Manual::MultiSubs>,
+L<Kavorka::Manual::MethodModifiers>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2013-2014, 2017 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

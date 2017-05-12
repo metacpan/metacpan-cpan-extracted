@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<results>
+  <data entity="rft">
+    <metadata key="atitle"></metadata>
+    <metadata key="auinit">H</metadata>
+    <metadata key="aulast">Sørensen</metadata>
+    <metadata key="date">1989</metadata>
+    <metadata key="epage"></metadata>
+    <metadata key="jtitle">Råstoffer</metadata>
+    <metadata key="spage"></metadata>
+    <metadata key="volume"></metadata>
+  </data>
+  <result type="citeref" priority="15" tag=""
+	service="Endnote citation"
+	>http://example.com/resolve?req_id=mailto%3Amike%40indexdata.com&amp;rft_id=&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Abook&amp;rft.atitle=&amp;rft.auinit=H&amp;rft.aulast=S%C3%B8rensen&amp;rft.date=1989&amp;rft.epage=&amp;rft.jtitle=R%C3%A5stoffer&amp;rft.spage=&amp;rft.title=R%C3%A5stoffer&amp;rft.volume=&amp;rfr_id=&amp;rfe_id=&amp;svc_dat=indexdata:citation:Endnote</result>
+  <result type="authorsearch" priority="10" tag=""
+	service="Google"
+	>http://www.google.com/search?q=%22H Sørensen%22</result>
+  <result type="citation" priority="20" tag="APP"
+	service="APP-style citation" mimetype="text/html"
+	>Sørensen, H.  1989.  [unspecified article title].  &lt;i&gt;Råstoffer&lt;/i&gt;, [unspecified volume]: -.</result>
+  <result type="citation" priority="20" tag="author"
+	service="Author and year" mimetype="text/html"
+	>Sørensen, H.  1989.</result>
+  <result type="websearch" priority="5" tag="masterkey"
+	service="MasterKey"
+	>http://masterkey.indexdata.com/author=Sørensen&amp;title=&amp;date=1989</result>
+  <result type="websearch" priority="5" tag="reindex"
+	service="Reindex"
+	>http://www.reindex.org/mailto:mike@indexdata.com/main/Hits.php?qe=lfo=Sørensen+and+lti=Råstoffer</result>
+  <result type="websearch" priority="10" tag=""
+	service="Google"
+	>http://www.google.com/search?q=%22Råstoffer%22</result>
+  <result type="websearch" priority="20" tag=""
+	service="Alltheweb"
+	>http://alltheweb.com/search?q=%22Råstoffer%22</result>
+  <result type="websearch" priority="30" tag=""
+	service="AltaVista"
+	>http://www.altavista.com/web/results?q=%22Råstoffer%22</result>
+</results>

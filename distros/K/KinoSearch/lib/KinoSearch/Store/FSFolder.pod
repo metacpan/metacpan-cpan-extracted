@@ -1,0 +1,65 @@
+
+# Auto-generated file -- DO NOT EDIT!!!!!
+
+=head1 NAME
+
+KinoSearch::Store::FSFolder - File System implementation of Folder.
+
+=head1 DEPRECATED
+
+The KinoSearch code base has been assimilated by the Apache L<Lucy> project.
+The "KinoSearch" namespace has been deprecated, but development continues
+under our new name at our new home: L<http://lucy.apache.org/>
+
+=head1 SYNOPSIS
+
+    my $folder = KinoSearch::Store::FSFolder->new(
+        path   => '/path/to/folder',
+    );
+
+
+
+=head1 DESCRIPTION
+
+Implementation of L<KinoSearch::Store::Folder> using a single file system
+directory and multiple files.
+
+=head1 CONSTRUCTORS
+
+=head2 new( I<[labeled params]> )
+
+    my $folder = KinoSearch::Store::FSFolder->new(
+        path   => '/path/to/folder',
+    );
+
+=over
+
+=item *
+
+B<path> - Location of the index. If the specified directory does
+not exist already, it will NOT be created, in order to prevent
+misconfigured read applications from spawning bogus files -- so it may
+be necessary to create the directory yourself.
+
+=back
+
+
+
+
+
+
+
+=head1 INHERITANCE
+
+KinoSearch::Store::FSFolder isa L<KinoSearch::Store::Folder> isa L<KinoSearch::Object::Obj>.
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005-2011 Marvin Humphrey
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
+

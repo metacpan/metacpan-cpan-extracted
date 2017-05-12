@@ -1,0 +1,19 @@
+TYPEMAP
+Kstruct *	T_PTROBJ
+Kstruct **	T_PTROBJ
+long long	T_J
+int *		T_PTROBJ
+short *		T_PTROBJ
+long long *	T_PTROBJ
+float *		T_PTROBJ
+double *	T_PTROBJ
+
+
+INPUT
+T_J
+    $var = ($type)SvUV($arg)
+
+OUTPUT
+T_J
+    sv_setuv($arg, (UV)$var);
+	

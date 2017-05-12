@@ -1,0 +1,73 @@
+
+# Auto-generated file -- DO NOT EDIT!!!!!
+
+=head1 NAME
+
+KinoSearch::Index::SegReader - Single-segment IndexReader.
+
+=head1 DEPRECATED
+
+The KinoSearch code base has been assimilated by the Apache L<Lucy> project.
+The "KinoSearch" namespace has been deprecated, but development continues
+under our new name at our new home: L<http://lucy.apache.org/>
+
+=head1 SYNOPSIS
+
+    my $polyreader = KinoSearch::Index::IndexReader->open(
+        index => '/path/to/index',
+    );
+    my $seg_readers = $polyreader->seg_readers;
+    for my $seg_reader (@$seg_readers) {
+        my $seg_name = $seg_reader->get_seg_name;
+        my $num_docs = $seg_reader->doc_max;
+        print "Segment $seg_name ($num_docs documents):\n";
+        my $doc_reader = $seg_reader->obtain("KinoSearch::Index::DocReader");
+        for my $doc_id ( 1 .. $num_docs ) {
+            my $doc = $doc_reader->fetch_doc($doc_id);
+            print "  $doc_id: $doc->{title}\n";
+        }
+    }
+
+
+
+=head1 DESCRIPTION
+
+SegReader interprets the data within a single segment of an index.
+
+Generally speaking, only advanced users writing subclasses which manipulate
+data at the segment level need to deal with the SegReader API directly.  
+
+Nearly all of SegReader's functionality is implemented by pluggable
+components spawned by L<Architecture|KinoSearch::Plan::Architecture>'s
+factory methods.
+
+
+
+
+
+=head1 METHODS
+
+=head2 get_seg_name()
+
+Return the name of the segment.
+
+=head2 get_seg_num()
+
+Return the number of the segment.
+
+
+
+=head1 INHERITANCE
+
+KinoSearch::Index::SegReader isa L<KinoSearch::Index::IndexReader> isa L<KinoSearch::Index::DataReader> isa L<KinoSearch::Object::Obj>.
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005-2011 Marvin Humphrey
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
+

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<results>
+  <data entity="rft">
+    <metadata key="aufirst">David</metadata>
+    <metadata key="aulast">Dodds</metadata>
+    <metadata key="btitle">Professional+XML+meta+Data</metadata>
+    <metadata key="date">2001</metadata>
+    <metadata key="dclanguage">de</metadata>
+    <metadata key="genre">book</metadata>
+    <metadata key="isbn">1861004516</metadata>
+  </data>
+  <result type="bookstore" priority="10" tag="amazon-de"
+	service="Amazon.de"
+	>http://www.amazon.de/exec/obidos/ASIN/1861004516</result>
+</results>

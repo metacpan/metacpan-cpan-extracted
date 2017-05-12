@@ -1,0 +1,12 @@
+Changes
+lib/KiokuX/User.pm
+lib/KiokuX/User/ID.pm
+lib/KiokuX/User/Password.pm
+lib/KiokuX/User/Util.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+t/basic.t
+t/parameterized.t
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

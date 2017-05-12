@@ -1,0 +1,10 @@
+Changes
+COPYING
+Krb4.pm
+Krb4.xs
+MANIFEST
+Makefile.PL
+README
+sample_client
+sample_server
+typemap

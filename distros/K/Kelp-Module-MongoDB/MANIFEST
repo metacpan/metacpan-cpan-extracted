@@ -1,0 +1,13 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+README
+cpanfile
+dist.ini
+lib/Kelp/Module/MongoDB.pm
+t/conf/config.pl
+t/main.t
+t/release-pod-syntax.t

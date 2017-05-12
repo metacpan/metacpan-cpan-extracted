@@ -1,0 +1,29 @@
+---
+abstract: 'Wrapper for kernel keyring syscalls'
+author:
+  - 'Viktor Liu'
+build_requires:
+  Encode: '0'
+  ExtUtils::MakeMaker: '0'
+  MIME::Base64: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Kernel-Keyring
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+resources:
+  bugtracker: https://github.com/lixmal/Kernel-Keyring/issues
+  homepage: https://github.com/lixmal/Kernel-Keyring
+  repository: git://github.com/lixmal/Kernel-Keyring.git
+version: '0.07'

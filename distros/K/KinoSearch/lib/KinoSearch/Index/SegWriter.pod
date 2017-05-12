@@ -1,0 +1,93 @@
+
+# Auto-generated file -- DO NOT EDIT!!!!!
+
+=head1 NAME
+
+KinoSearch::Index::SegWriter - Write one segment of an index.
+
+=head1 DEPRECATED
+
+The KinoSearch code base has been assimilated by the Apache L<Lucy> project.
+The "KinoSearch" namespace has been deprecated, but development continues
+under our new name at our new home: L<http://lucy.apache.org/>
+
+
+
+=head1 DESCRIPTION
+
+SegWriter is a conduit through which information fed to Indexer passes.  It
+manages L<Segment|KinoSearch::Index::Segment> and Inverter, invokes the
+L<Analyzer|KinoSearch::Analysis::Analyzer> chain, and feeds low
+level L<DataWriters|KinoSearch::Index::DataWriter> such as
+PostingListWriter and DocWriter.
+
+The sub-components of a SegWriter are determined by
+L<Architecture|KinoSearch::Plan::Architecture>.  DataWriter components
+which are added to the stack of writers via add_writer() have
+add_inverted_doc() invoked for each document supplied to SegWriter's
+add_doc().
+
+
+
+
+
+=head1 METHODS
+
+=head2 add_doc( I<[labeled params]> )
+
+Add a document to the segment.  Inverts C<< doc >>, increments
+the Segment's internal document id, then calls add_inverted_doc(),
+feeding all sub-writers.
+
+=head2 add_writer(writer)
+
+Add a DataWriter to the SegWriter's stack of writers.
+
+=head2 register( I<[labeled params]> )
+
+Register a DataWriter component with the SegWriter.  (Note that
+registration simply makes the writer available via fetch(), so you may
+also want to call add_writer()).
+
+=over
+
+=item *
+
+B<api> - The name of the DataWriter api which C<< writer >>
+implements.
+
+=item *
+
+B<component> - A DataWriter.
+
+=back
+
+=head2 fetch(api)
+
+Retrieve a registered component.
+
+=over
+
+=item *
+
+B<api> - The name of the DataWriter api which the component
+implements.
+
+=back
+
+
+
+=head1 INHERITANCE
+
+KinoSearch::Index::SegWriter isa L<KinoSearch::Index::DataWriter> isa L<KinoSearch::Object::Obj>.
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005-2011 Marvin Humphrey
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
+

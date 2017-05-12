@@ -1,0 +1,21 @@
+<p>Le(s) document(s) actuellement en retard:</p>
+<ul>
+: for $items -> $item {
+  <li>
+    <b><: $item.title :></b>,
+    : for ['unititle', 'volume', 'collectiontitle', 'collectionvolume'] -> $name {
+    	: if ($item[$name]) {
+    	  <: $item[$name] :>,
+    	: }
+    : }
+    <small>
+    : for ['enumchron', 'homebranch', 'itemcallnumber', 'barcode'] -> $name {
+    	: if ($item[$name]) {
+    	  <: $item[$name] :>,
+    	: }
+    : }
+    attendu le <: $item.date_due :>
+    </small>
+  </li>
+: }
+</ul>

@@ -1,0 +1,45 @@
+---
+abstract: 'Document method parameters in the signature'
+author:
+  - 'Erik Carlsson <info@code301.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Moops: '0.034'
+  Moose: '2.0000'
+  Test::More: '0.96'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, Dist::Iller version 0.1204, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Kavorka-TraitFor-Parameter-doc
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Kavorka::TraitFor::Parameter::doc:
+    file: lib/Kavorka/TraitFor/Parameter/doc.pm
+    version: '0.1104'
+  Kavorka::TraitFor::ReturnType::doc:
+    file: lib/Kavorka/TraitFor/ReturnType/doc.pm
+    version: '0.1104'
+requires:
+  Module::Runtime: '0.014'
+  Moo::Role: '0'
+  perl: '5.014000'
+resources:
+  bugtracker: https://github.com/Csson/p5-Kavorka-TraitFor-Parameter-doc/issues
+  homepage: https://metacpan.org/release/Kavorka-TraitFor-Parameter-doc
+  repository: https://github.com/Csson/p5-Kavorka-TraitFor-Parameter-doc.git
+version: '0.1104'

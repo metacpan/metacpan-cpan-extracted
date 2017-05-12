@@ -1,0 +1,11 @@
+# It took a while to find an article on dinosaurs, in English, that
+# Elsevier definitely has; but I found it, and it is:
+#	http://www.sciencedirect.com/science?_ob=ArticleURL&_udi=B6VR4-4349J3T-3&_user=10&_handle=V-WA-A-W-B-MsSAYZW-UUW-U-AAACWAAWDU-AAAWDEWUDU-WVEYDCDB-B-U&_fmt=summary&_coverDate=03%2F31%2F2001&_rdoc=3&_orig=browse&_srch=%23toc%236224%232001%23999129998%23251774!&_cdi=6224&view=c&_acct=C000050221&_version=1&_urlVersion=0&_userid=10&md5=059b6281170220953b3fc9a70c321b55
+# That is:
+#	Mateus, O. and M. Telles Antunes.  2001.  Draconyx loureiroi,
+#	a new camptosauridae (Dinosauria, Ornithopoda) from the late
+#	Jurassic of Lourinhã, Portugal.  Annales de Paléontologie
+#	87(1): 61-73.  doi:10.1016/S0753-3969(01)88003-4
+
+export KRuser=kr_read KRpw=kr_read_3636
+exec perl -I ../lib ../web/htdocs/mod_perl/resolve "genre=article&sid=mimas%3Azetoc&title=ACTA+PALAEONTOLOGICA+POLONICA&issn=0567-7920&date=2000&volume=45&issue=4&spage=343&epage=388&atitle=Osteology%2C+paleobiology%2C+and+relationships+of+the+sauropod+dinosaur+Sauroposeidon&aulast=Wedel&auinit=M.+J.&dctype=scientific-paper&opt_xml=1&opt_loglevel=lifecycle"

@@ -1,0 +1,76 @@
+
+# Auto-generated file -- DO NOT EDIT!!!!!
+
+=head1 NAME
+
+KinoSearch::Search::Collector::BitCollector - Collector which records doc nums in a BitVector.
+
+=head1 DEPRECATED
+
+The KinoSearch code base has been assimilated by the Apache L<Lucy> project.
+The "KinoSearch" namespace has been deprecated, but development continues
+under our new name at our new home: L<http://lucy.apache.org/>
+
+=head1 SYNOPSIS
+
+    my $bit_vec = KinoSearch::Object::BitVector->new(
+        capacity => $searcher->doc_max + 1,
+    );
+    my $bit_collector = KinoSearch::Search::Collector::BitCollector->new(
+        bit_vector => $bit_vec, 
+    );
+    $searcher->collect(
+        collector => $bit_collector,
+        query     => $query,
+    );
+
+
+
+=head1 DESCRIPTION
+
+BitCollector is a Collector which saves matching document ids in a
+L<BitVector|KinoSearch::Object::BitVector>.  It is useful for recording the
+entire set of documents which matches a query.
+
+=head1 CONSTRUCTORS
+
+=head2 new( I<[labeled params]> )
+
+    my $bit_collector = KinoSearch::Search::Collector::BitCollector->new(
+        bit_vector => $bit_vec,    # required
+    );
+
+=over
+
+=item *
+
+B<bit_vector> - A KinoSearch::Object::BitVector.
+
+=back
+
+
+
+
+
+=head1 METHODS
+
+=head2 collect(doc_id)
+
+Set bit in the object's BitVector for the supplied doc id.
+
+
+
+=head1 INHERITANCE
+
+KinoSearch::Search::Collector::BitCollector isa L<KinoSearch::Search::Collector> isa L<KinoSearch::Object::Obj>.
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005-2011 Marvin Humphrey
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
+

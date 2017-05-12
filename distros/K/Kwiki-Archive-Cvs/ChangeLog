@@ -1,0 +1,13 @@
+2008-11-20: version 0.104
+
+	* Include ChangeLog (#38278)
+
+2008-07-16: version 0.103
+
+	* Changes for more recent Kwiki
+	* Get rid of quote marks from old CVS commit messages (#32306)
+	* CVS revision number should start with major version number (#13846)
+
+2004-11-27: version 0.102
+
+	* Initial working release

@@ -1,0 +1,27 @@
+KiokuDB::Backend::Redis - Redis backend for KiokuDB
+
+SYNOPSIS
+
+
+    use KiokuDB::Backend::Redis;
+
+    my $kiokudb = KiokuDB->connect('Redis:server=127.0.0.1;debug=1);
+    ...
+
+DESCRPTION
+
+This is a KiokuDB backend for Redis, a self proclaimed data structures server.
+It is rather embryonic, but passes the tests.  I expect to expand it as I
+explore Redis and KiokuDB.
+
+SEE ALSO
+
+http://code.google.com/p/redis/
+
+AUTHOR
+
+Cory G Watson, C<< <gphat at cpan.org> >>
+
+COPYRIGHT & LICENSE
+
+Copyright 2009 Cory G Watson.

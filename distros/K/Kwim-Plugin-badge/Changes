@@ -1,0 +1,23 @@
+0.0.7 Thu Aug 21 14:04:35 PDT 2014
+ - Fix indexing bug (Kwim::Pod was being indexed).
+
+0.0.6 Sat Aug 16 14:04:53 PDT 2014
+ - Remove =travis section
+
+0.0.5 Sat Aug 16 11:26:37 PDT 2014
+ - Meta 0.0.2
+
+0.0.4 Fri Aug 15 15:59:28 PDT 2014
+ - Add t/000-compile-modules.t
+ - CPAN Day 2014 - 21 Release Salute!
+
+0.0.3 Tue Aug  5 10:05:32 PDT 2014
+ - Change doc to swim
+
+0.0.2 Sun Jun 15 11:33:33 PDT 2014
+ - Requires at least Kwim 0.0.13
+ - Changes file was wrong
+
+0.0.1 Sat Jun 14 10:32:01 PDT 2014
+ - First Release
+

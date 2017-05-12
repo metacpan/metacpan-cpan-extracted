@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Kwiki-EscapeURI.t
+lib/Kwiki/EscapeURI.pm
+META.yml                                 Module meta-data (added by MakeMaker)

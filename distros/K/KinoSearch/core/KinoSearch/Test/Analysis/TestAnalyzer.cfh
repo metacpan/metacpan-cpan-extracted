@@ -1,0 +1,24 @@
+parcel KinoSearch cnick Kino;
+
+inert class KinoSearch::Test::Analysis::TestAnalyzer {
+    inert void
+    run_tests();
+}
+
+class KinoSearch::Test::Analysis::DummyAnalyzer inherits KinoSearch::Analysis::Analyzer {
+    inert incremented DummyAnalyzer*
+    new();
+
+    inert DummyAnalyzer*
+    init(DummyAnalyzer *self);
+
+    public incremented Inversion*
+    Transform(DummyAnalyzer *self, Inversion *inversion);
+}
+
+/* Copyright 2005-2011 Marvin Humphrey
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the same terms as Perl itself.
+ */
+

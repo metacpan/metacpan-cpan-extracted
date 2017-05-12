@@ -1,0 +1,64 @@
+
+# Auto-generated file -- DO NOT EDIT!!!!!
+
+=head1 NAME
+
+KinoSearch::Plan::BlobType - Default behaviors for binary fields.
+
+=head1 DEPRECATED
+
+The KinoSearch code base has been assimilated by the Apache L<Lucy> project.
+The "KinoSearch" namespace has been deprecated, but development continues
+under our new name at our new home: L<http://lucy.apache.org/>
+
+=head1 SYNOPSIS
+
+    my $string_type = KinoSearch::Plan::StringType->new;
+    my $blob_type   = KinoSearch::Plan::BlobType->new( stored => 1 );
+    my $schema      = KinoSearch::Plan::Schema->new;
+    $schema->spec_field( name => 'id',   type => $string_type );
+    $schema->spec_field( name => 'jpeg', type => $blob_type );
+
+
+
+=head1 DESCRIPTION
+
+BlobType is an implementation of FieldType tuned for use with fields
+containing binary data, which cannot be indexed or searched -- only stored.
+
+=head1 CONSTRUCTORS
+
+=head2 new( I<[labeled params]> )
+
+    my $blob_type = KinoSearch::Plan::BlobType->new(
+        stored => 1,  # default: false
+    );
+
+=over
+
+=item *
+
+B<stored> - boolean indicating whether the field should be stored.
+
+=back
+
+
+
+
+
+
+
+=head1 INHERITANCE
+
+KinoSearch::Plan::BlobType isa L<KinoSearch::Plan::FieldType> isa L<KinoSearch::Object::Obj>.
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005-2011 Marvin Humphrey
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
+

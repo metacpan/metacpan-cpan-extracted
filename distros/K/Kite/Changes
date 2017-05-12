@@ -1,0 +1,69 @@
+#========================================================================
+#
+# Changes 
+#
+# DESCRIPTION
+#   Revision history for Kite::* Perl modules.
+#
+# AUTHOR
+#   Andy Wardley   <abw@kfs.org>
+#
+#------------------------------------------------------------------------
+# $Id: Changes,v 1.4 2000/10/18 08:37:49 abw Exp $
+#========================================================================
+
+#------------------------------------------------------------------------
+# Version 0.04  2001/02/28
+#------------------------------------------------------------------------
+
+* Extended Kite::PScript::Defs to include definitions for Boxes.
+  Updated and extended documentation.
+
+#------------------------------------------------------------------------
+# Version 0.03  2000/10/17
+#------------------------------------------------------------------------
+
+* Added Kite::XML::Parser, Kite::XML::Node and Kite::XML::Node::Kite 
+  modules for parsing XML files and constructing object hierarchies
+  accordingly.
+
+* Improved PostScript code in Kite::PScript::Defs and added some new
+  features such as border control, crop lines, better page tiling, 
+  automatic centering, in-image tiling map showing where a page fits 
+  within a tiling set, and various other minor enhancements.
+
+* Changed Kite::XML2PS to generate PostScript from a template using 
+  the Template Toolkit.  Changed parser from XML::EasyObj to new 
+  Kite::XML::Parser.  Also added 'border' and 'map' options and updated
+  okxml2ps accordingly.
+ 
+* Changed Kite::Base::AUTOLOAD to update public object members when 
+  called with an argument, e.g. $obj->title('The New Title');
+
+* Tentatively renamed some of the elements in the xml/kiteparts.dtd.
+  'wording' is now 'text', and 'layup' is now 'layout'.
+
+* Added various new test scripts.
+
+#------------------------------------------------------------------------
+# Version 0.02  2000/10/12
+#------------------------------------------------------------------------
+
+* Added the Kite::XML2PS, Kite::PScript::Defs modules and bin/okxml2ps
+  script, based on a repackaging of Simon Stapleton's xml2ps.pl script.
+  Also added xml/kiteparts.dtd and xml/test.xml.
+
+* changed Kite::Base::_init() method to init() (i.e. removed leading 
+  underscore) and added functionality to intialise the object using a 
+  hash reference defined as the $PARAMS variable in the derived class 
+  package to specify acceptable configuration keys and default values.
+  Also added an AUTOLOAD method to provide accessor methods to these
+  parameters.
+
+* Extended and updated test suite.
+
+#------------------------------------------------------------------------
+# Version 0.01  2000/06/13
+#------------------------------------------------------------------------
+
+* first public release.

@@ -1,0 +1,16 @@
+
+There are surely many, Kwiki-Purple does a lot of rooting around
+in places where it maybe ought not.
+
+* Some units in the formatter are not written out correctly when
+  Kwiki::Purple attempts to write content back to disk after 
+  adding nids. titledhyperlink is one such example, there are 
+  others.
+
+  This is a big bug as it means some content you created is now
+  just plain gone.
+
+  One way around this problem may be to only do nid adding and 
+  to_text operations on blocks, rather than everything. Seems
+  sort of special case'ish, though. It would be nice to address
+  all units with the same interface.

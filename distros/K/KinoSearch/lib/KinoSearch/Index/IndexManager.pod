@@ -1,0 +1,152 @@
+
+# Auto-generated file -- DO NOT EDIT!!!!!
+
+=head1 NAME
+
+KinoSearch::Index::IndexManager - Policies governing index updating, locking, and file deletion.
+
+=head1 DEPRECATED
+
+The KinoSearch code base has been assimilated by the Apache L<Lucy> project.
+The "KinoSearch" namespace has been deprecated, but development continues
+under our new name at our new home: L<http://lucy.apache.org/>
+
+=head1 SYNOPSIS
+
+    use Sys::Hostname qw( hostname );
+    my $hostname = hostname() or die "Can't get unique hostname";
+    my $manager = KinoSearch::Index::IndexManager->new( 
+        host => $hostname,
+    );
+
+    # Index time:
+    my $indexer = KinoSearch::Index::Indexer->new(
+        index => '/path/to/index',
+        manager => $manager,
+    );
+
+    # Search time:
+    my $reader = KinoSearch::Index::IndexReader->open(
+        index   => '/path/to/index',
+        manager => $manager,
+    );
+    my $searcher = KinoSearch::Search::IndexSearcher->new( index => $reader );
+
+
+
+=head1 DESCRIPTION
+
+IndexManager is an advanced-use class for controlling index locking,
+updating, merging, and deletion behaviors.
+
+IndexManager and L<Architecture|KinoSearch::Plan::Architecture> are
+complementary classes: Architecture is used to define traits and behaviors
+which cannot change for the life of an index; IndexManager is used for
+defining rules which may change from process to process.
+
+=head1 CONSTRUCTORS
+
+=head2 new( I<[labeled params]> )
+
+    my $manager = KinoSearch::Index::IndexManager->new(
+        host => $hostname,    # default: ""
+    );
+
+=over
+
+=item *
+
+B<host> - An identifier which should be unique per-machine.
+
+=item *
+
+B<lock_factory> - A LockFactory.
+
+=back
+
+
+
+
+
+=head1 METHODS
+
+=head2 make_write_lock()
+
+Create the Lock which controls access to modifying the logical content
+of the index.
+
+=head2 recycle( I<[labeled params]> )
+
+Return an array of SegReaders representing segments that should be
+consolidated.  Implementations must balance index-time churn against
+search-time degradation due to segment proliferation. The default
+implementation prefers small segments or segments with a high
+proportion of deletions.
+
+=over
+
+=item *
+
+B<reader> - A PolyReader.
+
+=item *
+
+B<del_writer> - A DeletionsWriter.
+
+=item *
+
+B<cutoff> - A segment number which all returned SegReaders must
+exceed.
+
+=item *
+
+B<optimize> - A boolean indicating whether to spend extra time
+optimizing the index for search-time performance.
+
+=back
+
+=head2 set_folder(folder)
+
+Setter for C<< folder >> member.  Typical clients (Indexer,
+IndexReader) will use this method to install their own Folder instance.
+
+=head2 get_folder()
+
+Getter for C<< folder >> member.
+
+=head2 get_host()
+
+Getter for C<< host >> member.
+
+=head2 set_write_lock_timeout(timeout)
+
+Setter for write lock timeout.  Default: 1000 milliseconds.
+
+=head2 get_write_lock_timeout()
+
+Getter for write lock timeout.
+
+=head2 set_write_lock_interval(timeout)
+
+Setter for write lock retry interval.  Default: 100 milliseconds.
+
+=head2 get_write_lock_interval()
+
+Getter for write lock retry interval.
+
+
+
+=head1 INHERITANCE
+
+KinoSearch::Index::IndexManager isa L<KinoSearch::Object::Obj>.
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005-2011 Marvin Humphrey
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
+

@@ -1,0 +1,8 @@
+# PODNAME: KiokuDB::Tutorial::JA
+=encoding utf8
+
+=pod
+
+L<POD2::JA::KiokuDB::Tutorial> にリネームされました。
+
+=cut

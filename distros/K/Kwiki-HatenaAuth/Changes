@@ -1,0 +1,14 @@
+0.04    2007-01-18T21:12:34+09:00
+        - added to MANIFEST.SKIP
+
+0.03    2007-01-18T21:06:56+09:00
+        - added to requires Kwiki::UserName in Makefile.PL. thanks to tokuhirom
+
+0.02    2006-05-04T15:00:00+09:00
+        - change to Module::Install was used. 
+        - added replace tt2 files for search_content.html and list_pages_content.html and display_changed_by.html.
+        - It came to return to the page before it logged it in when logging it in. 
+        - change of user page url.
+
+0.01  Tue Apr 25 2006
+	- inital version

@@ -1,0 +1,103 @@
+use Test::More tests => 1;
+BEGIN { use_ok('Kx') };
+
+use Data::Dumper;
+my $k = new Kx(host=>"localhost", port=>2222);
+
+my $rv = $k->connect || die "Can't connect to KDB+ ";
+
+my $ref = $k->oscmd("ls stream-kdb");
+die "Can't get access to stream-kdb tables" unless defined $ref->[2];
+
+my @table = @$ref;
+print "Tables are: @table\n";
+my $time = time;
+
+# Load each table
+$k->cmd("c:0");
+my %CONV;
+foreach(@table)
+{
+	my $t = $_;
+	$k->Tload($t,"stream-kdb/$t");
+	$k->cmd("c: c + count $t");
+	my @meta = $k->Tmeta($t);
+	print "$t\n";
+	next if $t eq 'live';
+	my $cmd = '';
+	my @cols = map {$_->[0]} @meta;
+	if($t eq 'allhostinterfaces')
+	{
+		fixtable($t,undef,'HOSTID',@cols);
+	}
+	elsif($t eq 'cats')
+	{
+		fixtable($t,undef,'STREAMID',@cols);
+	}
+	elsif($t eq 'enums')
+	{
+		fixtable($t,undef,'ID',@cols);
+	}
+	elsif($t =~ /^hostreference|^hosts$/)
+	{
+		fixtable($t,'HOSTID','ID',@cols);
+	}
+	elsif($t eq 'indexes')
+	{
+		fixtable($t,'IDXID','ID',@cols);
+	}
+	elsif($t eq 'metrics')
+	{
+		fixtable($t,'METRICID','ID',@cols);
+	}
+	elsif($t eq 'pollers')
+	{
+		fixtable($t,'POLLERID','ID',@cols);
+	}
+	elsif($t eq 'streams')
+	{
+		fixtable($t,'STREAMID','ID',@cols);
+	}
+	print "\n";
+}
+
+print Dumper(\%CONV),"\n";
+
+my $name = 'CISCO CPU Utilisation';
+my $search = '0<(select METRICID from metrics where NAME = `$"'.$name.'")[0][`METRICID]';
+$k->cmd($search);
+my $val = $k->val;
+print $val,"\n";
+
+# my $val = $k->Tcol(3);
+# my $data = $val->[0][0];
+# print $data,"\n";
+
+exit;
+
+sub fixtable
+{
+	my $t = shift;
+	my $n = shift;
+	my $c = shift;
+	my @cols = @_;
+
+	my $cmd;
+
+	@cols = grep {!/^$c$/} @cols;
+	unshift(@cols,$c);
+	my $cols = join(',',@cols);
+	if(defined $n)
+	{
+		$cmd = "a: `$n xasc select $n:$cols from $t";
+		$k->cmd($cmd);
+		$k->cmd("`$n xkey `a");
+	}
+	else
+	{
+		$cmd = "a: `$c xasc select $cols from $t";
+		$k->cmd($cmd);
+		$k->cmd("`$c xkey `a");
+	}
+	$k->cmd("$t: a");
+}

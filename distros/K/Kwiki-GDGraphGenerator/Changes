@@ -1,0 +1,22 @@
+---
+version: 0.04
+date:    Sun Nov 13 23:12:50 EST 2005
+changes:
+    - added kwalitee
+---
+version: 0.03
+date:    Wed Aug 25 23:23:22 EDT 2004
+changes:
+    - made it work. (i tried changing something at 2:30AM before releasing)
+    - logo key is now not permitted for security reasons
+    - YAML input is now eval'ed for better user feedback
+---
+version: 0.02
+date:    ~
+changes:
+    - quick fix
+---
+version: 0.01
+date:    Wed Aug 25 00:49:20 EDT 2004
+changes:
+    - initial release

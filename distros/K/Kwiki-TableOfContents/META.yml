@@ -1,0 +1,16 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Kwiki-TableOfContents
+version:      0.01
+version_from: lib/Kwiki/TableOfContents.pm
+installdirs:  site
+requires:
+    JSON:                          0
+    Kwiki::JSON:                   0
+    Kwiki::Prototype:              0
+    Kwiki::Scriptaculous:          0
+    Kwiki::Search:                 0
+    Test::More:                    0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

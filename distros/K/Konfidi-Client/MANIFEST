@@ -1,0 +1,19 @@
+Build.PL
+Changes
+lib/Konfidi/Client.pm
+lib/Konfidi/Client/Error.pm
+lib/Konfidi/Response.pm
+MANIFEST
+MANIFEST.SKIP
+META.yml			# Will be created by "make dist"
+README
+t/00-load.t
+t/boilerplate.t
+t/dev/critic.t
+t/dev/functional.t
+t/pod-coverage.t
+t/pod.t
+t/unit-Client.t
+t/unit-Error.t
+t/unit-Response.t
+SIGNATURE    Added here by Module::Build

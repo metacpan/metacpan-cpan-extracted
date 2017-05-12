@@ -1,0 +1,8 @@
+Revision history for Kwiki-RecentChanges-Atom
+
+0.02    Aug. 20, 2004
+        Fix for minor XHTML parsing issues in "img" tag.
+
+0.01    Aug. 20, 2004
+        First version released.
+

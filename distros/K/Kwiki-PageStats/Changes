@@ -1,0 +1,29 @@
+---
+version: 0.06
+date: Tue Mar 28 18:06:43 PST 2006
+changes:
+- Add a logo from Henry Laxen
+---
+version: 0.05
+date: Tue Jun 12 23:15:53 PDT 2005
+changes:
+- Fix stupid typo in sorting
+---
+version: 0.04
+date: Tue Jun 12 23:15:53 PDT 2005
+changes:
+- Handle when a page stats info does not yet exist
+---
+version: 0.03
+date: Mon Jun 12 23:15:53 PDT 2005
+changes:
+- From Gugod: provide a page stats summary page
+---
+version: 0.02
+date: Wed Apr 27 01:30:47 PDT 2005
+changes:
+- From Henry Laxen: if time_zone plugin is present, use it
+---
+version: 0.01
+date:   Thu Feb 17 22:06:19 PST 2005
+changes: - Initial release

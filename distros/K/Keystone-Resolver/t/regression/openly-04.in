@@ -1,0 +1,8 @@
+# $Id: openly-04.in,v 1.1 2007-01-26 12:25:45 mike Exp $
+
+# Lifted from Openly Informatics' OpenURL 1.0 test suite
+# ContextObject, Part 2 example 4
+# In-Line OpenURL
+
+url_ver=Z39.88-2004&url_tim=2004-01-09&url_ctx_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Actx&ctx_ver=Z39.88-2004&ctx_enc=info%3Aofi%2Fenc%3AUTF-8&ctx_id=345871&ctx_tim=2002-03-20T08%3A55%3A12Z&rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Ajournal&rft.atitle=Isolation%20of%20a%20common%20receptor%20for%20coxsackie%20B&rft.jtitle=Science&rft.aulast=Bergelson&rft.auinit=J&rft.date=1997&rft.volume=275&rft.spage=1320&rft.epage=1323&rfe_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Ajournal&rfe.atitle=p27-p16%20Chimera%3A%20A%20Superior%20Antiproliferative&rfe.jtitle=Molecular%20Therapy&rfe.aulast=McArthur&rfe.aufirst=James&rfe.date=2001&rfe.volume=3&rfe.issue=1&rfe.spage=8&rfe.epage=13&req_ref_fmt=http%3A%2f%2Flib.caltech.edu%2Ffmt%2Fldap-mtx.html&req_ref=http%3A%2F%2Fldap.caltech.edu%2Fjaned%2Frecord.txt
+

@@ -1,0 +1,45 @@
+NAME
+      Kwiki::UserName::Auth - Online user regsitration plugin for Kwiki
+
+SYNOPSIS
+      # Replce other UserName plugin with Kwiki::UserName::Auth
+      % vim plugins
+      # Use Kwiki::Users::Auth as a alternative of Kwiki::Users
+      % echo "users_class: Kwiki::Users::Auth" >> config.yaml
+      % kwiki -update
+
+DESCRIPTION
+    For people who want to have a little control over their Kwiki site
+    visitors, this is the plugin for them. It provides a registration
+    process for users, instead of just a preference field in the preferences
+    page. User are asked to give their email address and password to login.
+
+    It only works with Kwiki::Users::Auth, which could read proper account
+    information from cookie after user login. So you must edit your
+    config.yaml and put this line in:
+
+      users_class: Kwiki::Users::Auth
+
+    Please remove or comment any other lines if they also set users_class.
+
+    Upon registration, user are asked to fill 3 fields: email, display name,
+    and password. email and password are required as they are used to
+    identify a particular user. The display name is optional, if it's not
+    given, it would be the account name (anything before '@') in the email
+    address..
+
+CAUTION
+    This plugin is still in early alpha. Which means it's still too early to
+    be deployed to any production site. Use at your on risk, and give me
+    help if you want.
+
+    So far the password are stored in clear text.
+
+COPYRIGHT
+    Copyright 2005 by Kang-min Liu <gugod@gugod.org>.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See <http://www.perl.com/perl/misc/Artistic.html>
+

@@ -1,0 +1,23 @@
+---
+abstract: 'Use Redis within Kelp'
+author:
+  - 'Stefan Geneshky <minimal@cpan.org>'
+build_requires:
+  Kelp: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300032, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Kelp-Module-Redis
+requires:
+  Kelp::Base: 0
+  Redis: 0
+resources:
+  homepage: https://github.com/naturalist/kelp-module-redis
+  repository: https://github.com/naturalist/kelp-module-redis.git
+version: 0.01

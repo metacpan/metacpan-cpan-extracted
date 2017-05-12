@@ -1,0 +1,146 @@
+---
+current_nr: 0
+document:
+  -
+    EOL: auto
+    codepage: utf8
+    config_file: ~
+    cursor_pos: 639
+    edit_pos: 115
+    file_path: '/home/lichtkind/txt/artikel/heise/Moose.txt'
+    folded_lines: []
+    marked_lines: []
+    readonly: protect
+    syntaxmode: none
+    tab_size: 4
+    tab_use: 1
+  -
+    EOL: auto
+    codepage: utf8
+    config_file: ~
+    cursor_pos: 68
+    edit_pos: '-1'
+    file_path: '/home/lichtkind/txt/artikel/heise/material.txt'
+    folded_lines: []
+    marked_lines: []
+    readonly: protect
+    syntaxmode: none
+    tab_size: 4
+    tab_use: 0
+  -
+    EOL: auto
+    codepage: 8bit
+    config_file: ~
+    cursor_pos: 37
+    edit_pos: 624
+    file_path: '/home/lichtkind/code/perl/test/oop/simple.pl'
+    folded_lines: []
+    marked_lines: []
+    readonly: protect
+    syntaxmode: perl
+    tab_size: 4
+    tab_use: 1
+  -
+    EOL: lf
+    codepage: utf8
+    config_file: ~
+    cursor_pos: 26
+    edit_pos: 242
+    file_path: '/home/lichtkind/code/perl/project/editor/dev/xp/Kephra/lib/Kephra/Document.pm'
+    folded_lines: []
+    marked_lines: []
+    readonly: protect
+    syntaxmode: perl
+    tab_size: 4
+    tab_use: 0
+  -
+    EOL: lf
+    codepage: utf8
+    config_file: ~
+    cursor_pos: 521
+    edit_pos: 2806
+    file_path: '/home/lichtkind/code/perl/project/editor/dev/xp/Kephra/lib/Kephra/App/Window.pm'
+    folded_lines: []
+    marked_lines: []
+    readonly: protect
+    syntaxmode: perl
+    tab_size: 4
+    tab_use: 0
+  -
+    EOL: auto
+    codepage: utf8
+    config_file: ~
+    cursor_pos: 191
+    edit_pos: 566
+    file_path: '/home/lichtkind/code/perl/project/notiz/bn.pl'
+    folded_lines: []
+    marked_lines: []
+    readonly: protect
+    syntaxmode: perl
+    tab_size: 4
+    tab_use: 0
+  -
+    EOL: auto
+    codepage: utf8
+    config_file: ~
+    cursor_pos: 2740
+    edit_pos: 2035
+    file_path: '/home/lichtkind/txt/artikel/$foo/wxperl-tut_9.txt'
+    folded_lines: []
+    marked_lines: []
+    readonly: protect
+    syntaxmode: none
+    tab_size: 4
+    tab_use: auto
+  -
+    EOL: auto
+    codepage: 8bit
+    config_file: ~
+    cursor_pos: 151
+    edit_pos: 372
+    file_path: '/home/lichtkind/code/perl/test/wx/widget/cb.pl'
+    folded_lines: []
+    marked_lines: []
+    readonly: protect
+    syntaxmode: perl
+    tab_size: 4
+    tab_use: 1
+  -
+    EOL: lf
+    codepage: ascii
+    config_file: ~
+    cursor_pos: 282
+    edit_pos: 791
+    file_path: '/home/lichtkind/code/perl/project/editor/dev/xp/Kephra/doc/Drumbeat.pod'
+    folded_lines: []
+    marked_lines: []
+    readonly: protect
+    syntaxmode: perl
+    tab_size: 4
+    tab_use: 1
+  -
+    EOL: lf
+    codepage: ascii
+    config_file: ~
+    cursor_pos: 24
+    edit_pos: 24
+    file_path: '/home/lichtkind/code/perl/project/editor/dev/xp/Kephra/doc/Overview.pod'
+    folded_lines: []
+    marked_lines: []
+    readonly: protect
+    syntaxmode: perl
+    tab_size: 4
+    tab_use: 1
+  -
+    EOL: auto
+    codepage: 8bit
+    config_file: ~
+    cursor_pos: 96
+    edit_pos: 235
+    file_path: '/home/lichtkind/code/perl/project/editor/dev/xp/Kephra/doc/Components.txt'
+    folded_lines: []
+    marked_lines: []
+    readonly: protect
+    syntaxmode: none
+    tab_size: 4
+    tab_use: auto

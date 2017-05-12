@@ -1,0 +1,7 @@
+---
+version: 0.04
+date: Wed Jan 19 15:32:53 PST 2005
+changes:
+- Improved error handling
+- Move use statements to requires
+- Move methods out of wafl class to make them more accessible

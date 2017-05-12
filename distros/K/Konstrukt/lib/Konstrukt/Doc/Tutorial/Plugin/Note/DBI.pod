@@ -1,0 +1,538 @@
+=head1 NAME
+
+Konstrukt::Doc::Tutorial::Plugin::Note::DBI - 3) Using Perl DBI to store your data in a database
+
+=head1 DESCRIPTION
+
+This tutorial will teach you how to use L<DBI|Konstrukt::DBI>
+to store your data.
+
+Additionally we will extend the plugin to allow the creation of multiple notes.
+
+Note: This tutorial builds up on the results of L<the previous tutorial|Konstrukt::Doc::Tutorial::Plugin::Note::Template>.
+
+=head1 CONVENTIONS AND SETTINGS
+
+By L<convention|Konstrukt::Doc::CreatingPlugins/CONVENTIONS> the backends for
+each plugin are implemented as a separate plugin module. This way the backends
+are easily exchangeable by setting up a different backend in the
+C<konstrukt.settings>.
+
+Thus the main plugin will have a new setting
+
+	note/backend DBI #default backend: DBI
+
+which will be initialized in the C<init> method, where the specified backend will
+also be loaded. So we add those lines to the C<init> method:
+
+	$Konstrukt::Settings->default("note/backend" => 'DBI');
+	$self->{backend} = use_plugin "note::" . $Konstrukt::Settings->get('note/backend') or return undef;
+
+=head1 THE DBI BACKEND PLUGIN
+
+=head2 Backend Settings
+
+Create a new directory C</path/to/your/site/lib/Konstrukt/Plugin/note> and
+inside this directory create a file named C<DBI.pm>.
+
+The backend plugin itself should also be configurable with these settings:
+
+	note/backend/DBI/source       dbi:mysql:database:host
+	note/backend/DBI/user         user
+	note/backend/DBI/pass         pass
+
+If no database settings are set, the website-wide defaults of the
+L<Konstrukt DBI helper|Konstrukt::DBI/CONFIGURATION> will be used automatically.
+
+You should specify the website-wide database defaults in your C<konstrukt.settings>:
+
+	dbi/source dbi:mysql:database:host
+	dbi/user   user
+	dbi/pass   pass
+
+It it doesn't exist, you have to create this database now. An example query
+for this can be found in the L<blog tutorial|Konstrukt::Doc::Tutorial::Usage::Blog/SETUP>.
+
+=head2 Skeleton
+
+The skeleton for the backend module including the C<init> method will look like
+this:
+
+	package Konstrukt::Plugin::note::DBI;
+	
+	use strict;
+	use warnings;
+	
+	use base 'Konstrukt::Plugin';
+	
+	sub init {
+		my ($self) = @_;
+		
+		#get connection settings
+		my $db_source = $Konstrukt::Settings->get('blog/backend/DBI/source');
+		my $db_user   = $Konstrukt::Settings->get('blog/backend/DBI/user');
+		my $db_pass   = $Konstrukt::Settings->get('blog/backend/DBI/pass');
+		
+		#save settings in a handy hashref for later use
+		$self->{db_settings} = [$db_source, $db_user, $db_pass];
+		
+		return 1;
+	}
+	
+	1;
+
+=head2 Auto installation
+
+As for templates, there is also a handy
+L<auto installation feature|Konstrukt::Lib/plugin_dbi_install_helper> for
+database backends.
+
+So we create an install method for this plugin, which uses this feature:
+
+	sub install {
+		my ($self) = @_;
+		return $Konstrukt::Lib->plugin_dbi_install_helper($self->{db_settings});
+	}
+
+Then we add a C<__DATA__> token at the end of the module file and after that we
+add the table definitions, which are separated like described in L<Konstrukt::Lib/plugin_dbi_install_helper>:
+
+	-- 8< -- dbi: create -- >8 --
+	
+	CREATE TABLE IF NOT EXISTS note
+	(
+	  id          INT UNSIGNED     NOT NULL AUTO_INCREMENT,
+	  text        TEXT             NOT NULL,
+	  PRIMARY KEY(id)
+	);
+
+=head2 Backend interface
+
+We can identify these methods, which represent the interface to the backend:
+
+=over
+
+=item * C<get_notes($id)>: Returns all notes as an arrayref of hashrefs, if C<$id>
+is not defined:
+
+	[
+		{ id => 1, text => 'foo bar baz' },
+		{ id => 2, text => '...' },
+		...
+	]
+
+If C<$id> is defined, this method returns the note as an hashref:
+
+	{ id => 1, text => 'foo bar baz' }
+
+or C<undef> if no note with that id exists.
+
+=item * C<add_note($text)>: Adds a note with the specified text. Returns true on
+success.
+
+=item * C<update_note($id, $text)>: Updates the text for the note with the specified
+id. Returns true on success.
+
+=item * C<delete_note($id)>: Deleted the specified note, if exists. Returns true
+on success.
+
+=back
+
+=head2 Backend code
+
+Each method has to create a database connection, call the SQL queries and
+return the result.
+
+The database connection should be done using the L<Konstrukt DBI helper|Konstrukt::DBI>,
+which will connect to the right database according to the settings, maintains
+a pool of database connections and will also handle errors that may occur during
+the database queries:
+
+	my $dbh = $Konstrukt::DBI->get_connection(@{$self->{db_settings}}) or return undef;
+
+Then you can then use any method that L<DBI> offers for a database handle.
+
+The code for C<get_notes> will look like this:
+
+	sub get_notes {
+		my ($self, $id) = @_;
+		
+		my $dbh = $Konstrukt::DBI->get_connection(@{$self->{db_settings}}) or return undef;
+		my $where = (defined $id ? "WHERE id = " . int($id) : "");
+		
+		my $rv = $dbh->selectall_arrayref("SELECT id, text FROM note $where", { Columns => {} });
+		$rv = $rv->[0] if defined $id and defined $rv;
+		
+		return $rv;
+	}
+
+The code for the other methods is similar, mainly differing in the SQL queries.
+You can find the other methods L<below|/Backend>.
+
+=head1 MODIFY THE CODE OF THE MAIN PLUGIN
+
+Basically we just have to replace the file operations with calls to our backend
+plugin.
+
+But with a database in the background it's easy to store multiple notes.
+This will lead to some more changes to the code and the templates.
+(Additionally it might be a good idea to rename the plugin to "noteB<s>", what
+we won't do now.)
+
+For example, we now must create a new action C<add> with appropriate templates:
+
+	#show a form to add a new note. save the note, if a new one is entered
+	sub add : Action {
+		my ($self, $tag, $content, $params) = @_;
+		
+		my $template = use_plugin 'template';
+		if (exists $params->{text}) {
+			#create note
+			$self->{backend}->add_note($params->{text});
+			$self->add_node($template->node("$self->{template_path}messages/add_successful.template"));
+			$self->default($tag, $content, $params);
+		} else {
+			#display a form to add a note
+			$self->add_node($template->node("$self->{template_path}layout/note_add.template"));
+		}
+	}
+
+We also have to modify the C<default> action and the C<note_show> template to
+display a list of notes and not only a single note. In the template, the variable
+
+	<+$ text $+>(no text)<+$ / $+>
+
+will basically be replaced by a list with the name C<notes>:
+
+	<+@ notes @+>
+		<+$ text $+>(no text)<+$ / $+>
+		<hr />
+	<+@ / @+>
+
+Additionally the C<edit> and C<delete> actions and templates now need to know,
+B<which> note to edit or delete.
+
+As it would not contribute to your learning effort to discuss every code change
+to let the plugin work with multiple notes, these changes won't be listed here.
+
+You can take a look at the modified and new methods and templates L<below|/Main plugin>.
+
+=head1 WHAT YOU HAVE NOW
+
+The result of this tutorial is a
+
+=over
+
+=item * Note taking application
+
+=item * that stores multiple notes in a database
+
+=item * which can be edited and deleted.
+
+=item * It has full separation of code, content and presentation.
+
+=item * It has an easily exchangeable, configurable backend.
+
+=item * The presentation is fully customizable through templates - no need to touch the code!
+
+=item * The database tables and templates are installed automatically.
+
+=item * The application can be embedded everywhere in your website with no work:
+
+	<& note / &>
+
+=back
+
+=head1 WHAT'S NEXT?
+
+You might want to add the L<author|Konstrukt::Plugin::usermanagement/Perl interface>
+of each note to the data model. You might also
+L<restrict|Konstrukt::Plugin::usermanagement::level/Perl interface> the creation
+and deletion of notes to registered users.
+
+Addionally there are some special cases that should be communicated to the user:
+Empty note list, note to edit/delete does not exist, errors while modifying the
+DB, ... .
+
+But these details are out of the scope of this tutorial. Feel free to look at the
+source of the L<existing plugins|Konstrukt::Doc::PluginList> to get an idea, how
+you can accomplish your tasks.
+
+=head1 APPENDIX: THE COMPLETE PLUGINS
+
+=head2 Main plugin
+
+	package Konstrukt::Plugin::note;
+	
+	use strict;
+	use warnings;
+	
+	use base 'Konstrukt::SimplePlugin';
+	use Konstrukt::Plugin; #import use_plugin
+	
+	sub init {
+		my ($self) = @_;
+		
+		$Konstrukt::Settings->default("note/template_path" => '/templates/note/');
+		$Konstrukt::Settings->default("note/backend"       => 'DBI');
+		
+		$self->{backend} = use_plugin "note::" . $Konstrukt::Settings->get('note/backend') or return undef;
+		$self->{template_path} = $Konstrukt::Settings->get("note/template_path");
+		
+		return 1;
+	}
+	
+	sub install {
+		my ($self) = @_;
+		return $Konstrukt::Lib->plugin_file_install_helper($self->{template_path});
+	}
+	
+	#show the note if exists
+	sub default : Action {
+		my ($self, $tag, $content, $params) = @_;
+		
+		my $template = use_plugin 'template';
+		my $notes = $self->{backend}->get_notes();
+		if (@$notes) {
+			#add a template node to the result, that will display the notes
+			$self->add_node(
+				$template->node("$self->{template_path}layout/notes_show.template", { notes => $notes })
+			);
+		} else {
+			$self->add_node($template->node("$self->{template_path}layout/notes_show_empty.template"));
+		}
+	}
+	
+	#show a form to add a new note. save the note, if a new one is entered
+	sub add : Action {
+		my ($self, $tag, $content, $params) = @_;
+		
+		my $template = use_plugin 'template';
+		if (exists $params->{text}) {
+			#create note
+			$self->{backend}->add_note($params->{text});
+			$self->add_node($template->node("$self->{template_path}messages/add_successful.template"));
+			$self->default($tag, $content, $params);
+		} else {
+			#display a form to add a note
+			$self->add_node($template->node("$self->{template_path}layout/note_add.template"));
+		}
+	}
+	
+	#show a form to edit the note or save the note, if a new one is entered
+	sub edit : Action {
+		my ($self, $tag, $content, $params) = @_;
+		
+		my $template = use_plugin 'template';
+		if (exists $params->{id} and exists $params->{text}) {
+			#update note
+			$self->{backend}->update_note($params->{id}, $params->{text});
+			$self->add_node($template->node("$self->{template_path}messages/edit_successful.template"));
+			$self->default($tag, $content, $params);
+		} elsif (exists $params->{id}) {
+			#display a form to edit the note
+			$self->add_node(
+				$template->node(
+					"$self->{template_path}layout/note_edit.template",
+					$self->{backend}->get_notes($params->{id})
+				)
+			);
+		}
+	}
+	
+	#show a confirmation to delete to note
+	#or delete the note if the deletion has been confirmed
+	sub delete : Action {
+		my ($self, $tag, $content, $params) = @_;
+		
+		my $template = use_plugin 'template';
+		if (exists $params->{id} and exists $params->{delete} and $params->{delete}) {
+			#delete note
+			$self->{backend}->delete_note($params->{id});
+			$self->add_node($template->node("$self->{template_path}messages/delete_successful.template"));
+			$self->default($tag, $content, $params);
+		} elsif (exists $params->{id}) {
+			#display a confirmation form
+			$self->add_node($template->node("$self->{template_path}layout/note_delete.template", { id => $params->{id} }));
+		}
+	}
+	
+	1;
+	
+	__DATA__
+	
+	-- 8< -- textfile: layout/notes_show.template -- >8 --
+	
+	<div class="note entries">
+		<h1>Notes</h1>
+		<+@ notes @+>
+			<+$ text $+>(no text)<+$ / $+>
+			<br />
+			<a href="?note_action=edit;id=<+$ id / $+>">[ edit ]</a>
+			<a href="?note_action=delete;id=<+$ id / $+>">[ delete ]</a>
+			<hr />
+		<+@ / @+>
+	</div>
+	
+	-- 8< -- textfile: layout/notes_show_empty.template -- >8 --
+	
+	<div class="note entries">
+		<h1>No notes yet!</h1>
+	</div>
+	
+	-- 8< -- textfile: layout/note_add.template -- >8 --
+	
+	<div class="note form add">
+		<form action="" method="post">
+			<input type="hidden" name="note_action" value="add" />
+			<textarea name="text">(new note)</textarea>
+			<input type="submit" value="Add" />
+		</form>
+	</div>
+	
+	-- 8< -- textfile: layout/note_edit.template -- >8 --
+	
+	<div class="note form edit">
+		<form action="" method="post">
+			<input type="hidden" name="note_action" value="edit" />
+			<input type="hidden" name="id" value="<+$ id / $+>" />
+			<textarea name="text"><+$ text $+>(no text yet)<+$ / $+></textarea>
+			<input type="submit" value="Save" />
+		</form>
+	</div>
+	
+	-- 8< -- textfile: layout/note_delete.template -- >8 --
+	
+	<div class="note form delete">
+		<form action="" method="post">
+			<input type="hidden" name="note_action" value="delete" />
+			<input type="hidden" name="id" value="<+$ id / $+>" />
+			<input type="checkbox" id="delete" name="delete" value="1" />
+			<label for="delete">Really delete the note?</label>
+			<input type="submit" value="Delete" />
+		</form>
+	</div>
+	
+	-- 8< -- textfile: messages/add_successful.template -- >8 --
+	
+	<div class="note message success">
+		<h1>Note added!</h1>
+		<p>The note has been added successfully.</p>
+	</div>
+	
+	-- 8< -- textfile: messages/edit_successful.template -- >8 --
+	
+	<div class="note message success">
+		<h1>Note updated!</h1>
+		<p>The note has been updated successfully.</p>
+	</div>
+	
+	-- 8< -- textfile: messages/delete_successful.template -- >8 --
+	
+	<div class="note message success">
+		<h1>Note deleted!</h1>
+		<p>The note has been deleted successfully.</p>
+	</div>
+
+=head2 Backend
+
+	package Konstrukt::Plugin::note::DBI;
+	
+	use strict;
+	use warnings;
+	
+	use base 'Konstrukt::Plugin';
+	
+	sub init {
+		my ($self) = @_;
+		
+		my $db_source = $Konstrukt::Settings->get('blog/backend/DBI/source');
+		my $db_user   = $Konstrukt::Settings->get('blog/backend/DBI/user');
+		my $db_pass   = $Konstrukt::Settings->get('blog/backend/DBI/pass');
+		
+		$self->{db_settings} = [$db_source, $db_user, $db_pass];
+		
+		return 1;
+	}
+	
+	sub install {
+		my ($self) = @_;
+		return $Konstrukt::Lib->plugin_dbi_install_helper($self->{db_settings});
+	}
+	
+	sub get_notes {
+		my ($self, $id) = @_;
+		
+		my $dbh = $Konstrukt::DBI->get_connection(@{$self->{db_settings}}) or return undef;
+		my $where = (defined $id ? "WHERE id = " . int($id) : "");
+		
+		my $rv = $dbh->selectall_arrayref("SELECT id, text FROM note $where ORDER BY id", { Columns => {} });
+		$rv = $rv->[0] if defined $id and defined $rv;
+		
+		return $rv;
+	}
+	
+	sub add_note {
+		my ($self, $text) = @_;
+		
+		my $dbh = $Konstrukt::DBI->get_connection(@{$self->{db_settings}}) or return undef;
+		$text = $dbh->quote($text);
+		
+		return $dbh->do("INSERT INTO note(text) VALUES($text)");
+	}
+	
+	sub update_note {
+		my ($self, $id, $text) = @_;
+		
+		my $dbh = $Konstrukt::DBI->get_connection(@{$self->{db_settings}}) or return undef;
+		$id   = $dbh->quote($id);
+		$text = $dbh->quote($text);
+		
+		return $dbh->do("UPDATE note SET text = $text WHERE id = $id");
+	}
+	
+	sub delete_note {
+		my ($self, $id) = @_;
+		
+		my $dbh = $Konstrukt::DBI->get_connection(@{$self->{db_settings}}) or return undef;
+		return $dbh->do("DELETE FROM note WHERE id = " . int($id));
+	}
+	
+	
+	1;
+	
+	__DATA__
+	
+	-- 8< -- dbi: create -- >8 --
+	
+	CREATE TABLE IF NOT EXISTS note
+	(
+	  id          INT UNSIGNED     NOT NULL AUTO_INCREMENT,
+	  text        TEXT             NOT NULL,
+	  PRIMARY KEY(id)
+	);
+
+=head2 Page
+
+	<& note / &>
+	
+	<a href="?note_action=add">[ add note ]</a>
+	<br />
+	<a href="?">[ all notes ]</a>
+
+=head1 AUTHOR
+
+Copyright 2006 Thomas Wittek (mail at gedankenkonstrukt dot de). All rights reserved. 
+
+This document is free software.
+It is distributed under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+Previous: L<Konstrukt::Doc::Tutorial::Plugin::Note::Template>
+
+Parent: L<Konstrukt::Doc>
+
+See also: L<Konstrukt::SimplePlugin>, L<Konstrukt::Doc::CreatingPlugins>, L<Konstrukt::DBI>, L<DBI>
+
+=cut

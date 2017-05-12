@@ -1,0 +1,5 @@
+---
+version: 0.10
+date: Wed Jun 29 11:22:41 PDT 2005
+changes:
+- Initial version of Kwiki::Orphans

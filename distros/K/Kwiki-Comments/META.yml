@@ -1,0 +1,13 @@
+name: Kwiki-Comments
+version: 0.06
+abstract: Post Comments to Kwiki Pages
+author: Kang-min Liu (gugod@gugod.org)
+license: perl
+distribution_type: module
+requires:
+  Kwiki: 0.36
+  DBD::SQLite: 0
+no_index:
+  directory:
+    - inc
+generated_by: Module::Install version 0.36

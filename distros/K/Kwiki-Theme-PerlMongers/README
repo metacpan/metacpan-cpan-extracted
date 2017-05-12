@@ -1,0 +1,31 @@
+NAME
+    Kwiki::Theme::PerlMongers - A theme for Perl Mongers websites
+
+SYNOPSIS
+    In your Kwiki's plugins file simply use "Kwiki::Theme::PerlMongers"
+    instead of "Kwiki::Theme::Basic". Add a line to your config.yaml like
+    this:
+
+     group_name: My Perl Mongers
+
+    That's it!
+
+DESCRIPTION
+    I wanted to make the Minneapolis PM site a wiki, but thought it'd be
+    nice to have a Perl Mongers theme.
+
+AUTHOR
+    Dave Rolsky, <autarch@urth.org>
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-kwiki-theme-perlmongers@rt.cpan.org", or through the web interface
+    at <http://rt.cpan.org>. I will be notified, and then you'll
+    automatically be notified of progress on your bug as I make changes.
+
+COPYRIGHT & LICENSE
+    Copyright 2006 Dave Rolsky, All Rights Reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

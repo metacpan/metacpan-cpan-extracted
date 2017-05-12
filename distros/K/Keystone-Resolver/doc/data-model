@@ -1,0 +1,241 @@
+$Id: data-model,v 1.5 2008-02-07 13:37:15 mike Exp $
+
+
+Entity Relationship Diagram
+---------------------------
+
+Here is a diagram of the eleven main classes in the Keystone Resolver
+data model, represented in the initial implementation by MySQL
+tables.  (In the relational database implementation, additional tables
+are used to represent the many-to-many links genre:service-type
+and server:serial, and to provide each serial's multiple aliases and
+each credential's multiple key=value pairs.)
+
+       +---------+                            +----------+
+       | MFORMAT |                            | PROVIDER |
+       |         |                            |          |
+       | name    |                            | name     |
+       | uri     |                            | priority |
+       |         |                            | contact  |
+       +---------+                            +----------+
+         \  |  /                                   /|\
+          \ | /                                   / | \
+           \|/                                   /  |  \
+        +-------+      +--------------+      +-------------+      +--------+
+        | GENRE |      | SERVICE TYPE |      | SERVICE     |      | SERIAL |
+        |       |\_  _/|              | ____/|             |\_  _/|        |
+        | tag   |__\/__| tag          |/_____| name        |__\/__| name   |
+        | name  | _/\_ | name         |\____ | priority    | _/\_ | alias* |
+        |       |/    \| plugin       |     \| url recipe  |/    \| issn   |
+        |       |      | priority     |      | auth recipe |      |        |
+        |       |      | [CODEREF]    |      | disabled    |      |        |
+        +-------+      +--------------+      +-------------+      +--------+
+                                                   /|\
+                                                  / | \
+                                                 /  |  \
+                                             +-------------+
+                                             | CREDENTIALS |
+                                             |             |
+                                             | key=value*  |
+    +--------+      +----------+             +-------------+
+    | SID    |      | SOURCE   |                 \  |  /
+    |        | ____/|          |                  \ | /
+    | sid    |/_____| name     |                   \|/
+    | tag    |\____ | url      |             +-------------+
+    | recipe |     \| encoding |             | IDENTITY    |
+    +--------+      +----------+             |             |
+                                             | name        |
+                                             | level       |
+					     | parent ---> |
+					     +-------------+
+
+	+--------+      +--------+
+	| CONFIG |      | DOMAIN |
+	|        |      |        |
+	| name   |      | domain |
+	| value  |      | status |
+	+--------+      +--------+
+
+
+Description
+-----------
+
+Genres are the kinds of things that you might find a reference for in
+a resource discovery service such as an abstracts-and-indexing service
+or a metasearch site.  The most common and complex case is journal
+articles, but books are also important.  The complete list (from the
+widely-implemented v0.1 of the OpenURL standard) is:
+	journal, book, conference, article, preprint, proceeding,
+	bookitem
+And the list in v1.0 (Part 2, page 39) is:
+	journal, issue, article, conference, proceeding, preprint,
+	unknown
+It may appear that v1.0 of the standard has dropped support for
+representing books, but this is not so: in OpenURL 1.0, books are
+represented by a completely different metadata format (refered to here
+as an mformat).  The standard's specification of the San Antonio
+Profile (Part 2, page 77) lists five KEV metadata formats:
+	book, dissertation, journal, patent, sch_svc
+of which only journal is described in the standard (Part 2, page 35).
+Each mformat has a default genre, which is assumed for entities that
+do not explicitly specify one; multiple mformats may share the same
+default genre.
+
+(The only use of the mformat table is to map a metadata-format URI onto a
+default genre in the case of v1.0 OpenURLs that specify the former but
+not the latter.)
+
+Service types are the kinds of things that an OpenURL might resolve
+to.  The most common and important case is the full text of the
+article (typically but not always as a PDF), as provided by a content
+aggregator.  Other important cases include abstracts, web-searches,
+on-line book-stores, local library catalogue's holdings, ILL requests
+and citations in some specific format.  Each service-type is
+implemented by a plugin module whose name is stated in the "plugin"
+field, or in the "tag" if that is empty.
+
+There is a complex many-to-many relationship between genres and
+service types.  For example, the genre "book" can be resolved by an
+online-bookstore or web-search service, but not by content aggregators
+as they deal in serials.  Conversely, the genre "article" can be
+resolved by an aggregator or a web-search service, but not by an
+online book-store.
+
+	### David observes that some of the content aggregators
+	(e.g. Ovid) deal in books and other publications as well as
+	serial articles.  We can't tell how to represent this in the
+	RDB until we get sample data from TDNet.
+
+Service Providers, or just Providers for short, are organisations that
+provide services that a link might resolve to.  For example, Elsevier
+and Gale are both providers.  Each provider provides one or more
+services.
+
+Services are specific implementations of a given service type, and
+each is provided by a particular provider.  For example, Elsevier
+provides a service of type "aggregator", and Google and Alltheweb are
+both services of type "web search".  Each service has exactly one
+service type and one provider; but there may be any number of services
+of each type, and any number of services may be provided by a single
+provider.  Services may be disabled.
+
+Serials (including journals, proceedings, etc.) are places where
+individual articles, papers, etc. are published.  A service may
+provide access to many serials, and many services may provide access
+to a serial, so this is a many-to-many relationship.
+
+An identity is anyone or anything that might be trying to resolve an
+OpenURL: an individual, a group, a department, an organisation, a
+consortium or anything in between.  In all cases, the identity
+consists of a name, a level (person, group, etc.) and a parent pointer
+indicating the containing identity if any: for example, Index Data is
+the parent of Mike Taylor, and ILCSO is the parent of Champaign
+Library; but ILCSO itself has no parent.
+
+Credentials are sets of context=value pairs, such as the set
+user=mike, password=fruit.  Each such credential set is associated
+with a particular identity and particular service (typically but not
+necessarily an aggregator service).  A given set of credentials is
+what a particular identity needs to use in order to access a
+particular service.  For example, Index Data might need to use
+user=index pass=apple to access Elsevier, but user=id pass=pear to
+access Science Direct.
+
+	### One deficiency in this model is that it does not appear to
+	handle the situation where an identity has a time-limited
+	subscription for a service, e.g. Index Data has access to all
+	of Elsevier's articles from the start of 1998 until six months
+	ago.
+
+Some OpenURLs contain non-standard opaque identifiers such as local
+catalogue numbers.  According to the standard, OpenURLs that do this
+must also include an indication of the vocabulary from which the
+identifier is drawn, e.g "this is a Library of Croyden call number".
+Such an identifier is called a SID.
+
+A Source is a site that can generate OpenURLs.  Several sites may use
+the same non-standard identifier, so there is a one-to-many
+relationship between SIDs and sources.
+
+Configuration information is held as a set of name=value pairs called
+Config objects, which can be thought of as broadly analogous to
+environment variables.
+
+And, finally, domains associate specific Internet domains with a
+status drawn from a small set of allowable values, indicating what
+approach we should take to fetching ContextObjects, Descriptors and
+Identifier results from them.  The "status" field may contains the
+values:
+	0 (always) -- fetch data from this domain when an OpenURL says
+		to do so, and treat failure as fatal.
+	1 (never) -- never try to fetch data from this domain, but
+		continue with the resolution process.
+	2 (ignore) -- try to fetch data from this domain when
+		requested, but ignore failure and continue resolving.
+
+
+Examples
+--------
+
+Example objects of various types:
+
+GENRE: book, journal article, online document
+SERVICE TYPE: full text, abstract, web search, on-line book store, citation
+PROVIDER: Elsevier, Gale, EBSCO
+SERVICE:
+	Full Text: Elsevier, Gale, EBSCO
+	Abstract: Elsevier, Gale, EBSCO, GAIA
+	Web Search: Google, Alltheweb, Inktomi
+	Book Store: Amazon, Barnes & Noble
+	Citation: JVP format, BMJ format
+SERIAL: JVP, Acta Palaeontologica Polonica, BMJ, Paleobios, Ariadne
+IDENTITY: Mike Taylor, Index Data, Champaign Library, ICLSO
+CREDENTIALS: user=mike pass=chickens, user=index pass=kebab
+SID: Ovid:Medline, ERL:BX4, EBSCO:MFA
+SOURCE: Library of Texas, LC Voyager
+CONFIG: logfile=/tmp/kr.log, verbosity=2
+DOMAIN: ldap.caltech.edu with status=2 (this domain is used in req_ref
+	for some sample v1.0 OpenURLs, but doesn't exist)
+
+
+Admin UI
+--------
+
+The adminstrative web-site for the resolver's RDB uses some further
+tables for its own purposes.  These are:
+
+       +---------------+      +---------+
+       | SITE          |      | SESSION |
+       |               | ____/|         |
+       | tag           |/_____| cookie  |
+       | name          |\____ | dest    |
+       | bg_colour     |     \|         |
+       | email_address |      |         |
+       +---------------+      +---------+
+              /|\               \  |  /
+             / | \               \ | /
+            /  |  \               \|/
+       +---------------+           |
+       | USER          |           |
+       |               |           |
+       | admin         |__________/
+       | name          |
+       | email_address |
+       | password      |
+       +---------------+
+
+The admin web-site setup actually hosts an arbitrary number of similar
+sites which are cosmetically branded and may have different rights and
+responsibilities, though implemented with the same core functionality:
+each such site is represented by a Site record.
+
+Users of the admin site are allocated a session on their first page
+impression, implemented using a cookie.  That cookie is used as the
+key to the Session records, which must be stored in the database
+rather than in server memory because subsequent page requests may be
+directed to different server instances.
+
+Users may register and log in, at which point their Session object is
+updated to point to the relevant User record.  Users are allocated on
+a per-site basis, so that multiple users with the same email address
+may exist so long as each is associated with a different site.

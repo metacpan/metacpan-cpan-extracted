@@ -1,0 +1,15 @@
+---
+version: 0.12
+date:    Tue Jan 11 08:09:03 PST 2005
+changes:
+- Remove load_class calls per Spoon-0.21
+---
+version: 0.11
+date:    Wed Dec 15 15:26:31 PST 2004
+changes:
+- Make compatible with Kwiki-0.34
+---
+version: 0.10
+date:    Sat Jun 26 02:34:26 PDT 2004
+changes:
+- Initial release

@@ -1,0 +1,22 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+use Data::Hexdumper qw( hexdump );
+
+die "Usage: hexdebug FILE FILE_POS BYTES_TO_DUMP"
+    unless @ARGV == 3;
+
+open( my $fh, '<', $ARGV[0] )
+    or die "Couldn't open file '$ARGV[0]': $!";
+
+seek $fh, $ARGV[1], 0;
+
+my $content;
+read( $fh, $content, $ARGV[2] );
+
+print hexdump(
+    data           => $content,
+    space_as_space => 1,
+);
+

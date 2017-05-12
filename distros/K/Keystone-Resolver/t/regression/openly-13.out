@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<results>
+  <data entity="rft">
+    <metadata key="atitle">Exposing+Cross-Domain+Resources+for+Researchers+and+Learners</metadata>
+    <metadata key="auinit">A</metadata>
+    <metadata key="aulast">Apps</metadata>
+    <metadata key="date">2002</metadata>
+    <metadata key="epage">80</metadata>
+    <metadata key="genre">proceeding</metadata>
+    <metadata key="isbn">8884530431</metadata>
+    <metadata key="pub">Firenze+University+Press</metadata>
+    <metadata key="spage">71</metadata>
+  </data>
+  <result type="citeref" priority="15" tag=""
+	service="Endnote citation"
+	>http://example.com/resolve?rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Abook&amp;rft.atitle=Exposing%2BCross-Domain%2BResources%2Bfor%2BResearchers%2Band%2BLearners&amp;rft.auinit=A&amp;rft.aulast=Apps&amp;rft.date=2002&amp;rft.epage=80&amp;rft.genre=proceeding&amp;rft.isbn=8884530431&amp;rft.pub=Firenze%2BUniversity%2BPress&amp;rft.spage=71&amp;rfr_id=info%3Asid%2Fmimas.ac.uk%3Azetoc&amp;rfe_dat=zetocid%3ACN046568515&amp;svc_dat=indexdata:citation:Endnote</result>
+  <result type="bookstore" priority="10" tag=""
+	service="Amazon.com"
+	>http://www.amazon.com/exec/obidos/ASIN/8884530431/thedinosaurrea0a</result>
+  <result type="bookstore" priority="10" tag="amazon-de"
+	service="Amazon.de"
+	>http://www.amazon.de/exec/obidos/ASIN/8884530431</result>
+  <result type="authorsearch" priority="10" tag=""
+	service="Google"
+	>http://www.google.com/search?q=%22A Apps%22</result>
+  <result type="citation" priority="20" tag="APP"
+	service="APP-style citation" mimetype="text/html"
+	>Apps, A.  2002.  Exposing+Cross-Domain+Resources+for+Researchers+and+Learners.  &lt;i&gt;[unspecified journal]&lt;/i&gt;, [unspecified volume]: 71-80.</result>
+  <result type="citation" priority="20" tag="author"
+	service="Author and year" mimetype="text/html"
+	>Apps, A.  2002.</result>
+  <result type="websearch" priority="5" tag="masterkey"
+	service="MasterKey"
+	>http://masterkey.indexdata.com/author=Apps&amp;title=Exposing+Cross-Domain+Resources+for+Researchers+and+Learners&amp;date=2002</result>
+  <result type="websearch" priority="10" tag=""
+	service="Google"
+	>http://www.google.com/search?q=%22Exposing+Cross-Domain+Resources+for+Researchers+and+Learners%22</result>
+  <result type="websearch" priority="20" tag=""
+	service="Alltheweb"
+	>http://alltheweb.com/search?q=%22Exposing+Cross-Domain+Resources+for+Researchers+and+Learners%22</result>
+  <result type="websearch" priority="30" tag=""
+	service="AltaVista"
+	>http://www.altavista.com/web/results?q=%22Exposing+Cross-Domain+Resources+for+Researchers+and+Learners%22</result>
+</results>

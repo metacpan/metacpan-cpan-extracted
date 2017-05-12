@@ -1,0 +1,1344 @@
+<?xml version="1.0" encoding="utf-8"?>
+<html>
+<head>
+<title>KGS Protocol Description</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<!--
+    Copyright (C) 2003,2004 Marc Lehmannn &lt;pcg@goof.com&gt;
+ 
+    You can redistribute and/or modify this document under the terms of
+    the GNU General Public License as published by the Free Software
+    Foundation; either version 2 of the License, or (at your option) any
+    later version.
+
+    This document is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc. 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-->
+</head>
+<body>
+
+<h1>$Revision: 1.78 $</h1>
+
+<h1>KGS Protocol Description</h1>
+
+   <p>This XML document describes the KGS protocol. It is also used
+   to automatically generate the perl parser for all the messages and
+   structures in the protocol. Adapting it to other languages should be
+   almost trivial (and partly has been done).</p>
+
+   <p>If you feel you need to update the visual appearance of this
+   document, feel free to look at <tt>doc/doc2html.xsl</tt> and improve
+   it.</p>
+
+   <p>The current version of this document can always be found at 
+   <a href="http://cvs.schmorp.de/browse/*checkout*/kgsueme/doc/protocol.xml">here</a>, while
+   the HTML version of it can be found
+   <a href="http://cvs.schmorp.de/browse/*checkout*/kgsueme/doc/protocol.html">here</a>.</p>
+
+<h2>Structure and conventions of this document and the protocol</h2>
+
+   <p>"ORIGIN: CLIENT" means messages send from the client to the server,
+   while "ORIGIN: SERVER" means messages send by the server to the
+   client.</p>
+
+   <p>Everything on the wire is in little-endian format (what a shame).</p>
+
+   <p>Primitive types are mostly integers (signed
+   "<code>I</code>&lt;bits&gt;", unsigned "<code>U</code>&lt;bits&gt;"),
+   ascii strings ("<code>username</code>"), zero- or non-terminated
+   UCS2-Strings ("<code>ZSTRING</code>" or "<code>STRING</code>"). Yes,
+   I know java is supposed to do UTF-16, but no implementation seems to
+   care...</p>
+
+   <p>To get a feel for the protocol, get the <tt>KGS</tt> perl module
+   from CPAN, install it an run <tt>kgstrace</tt>, then conenct to
+   <tt>127.0.0.1</tt> with your client. <tt>kgstrace</tt> will dump all
+   messages from and to the server.</p>
+
+   <p>For the rest, go figure or bug me, <a
+   href="mailto:pcg@goof.com">Marc Lehmann &lt;pcg@goof.com&gt;</a></p>
+
+<h2>Stream and message structure.</h2>
+
+   <p>After connecting to the server, a handshake byte is sent. It's
+   the major version number of the protocol the client expects to
+   receive. Version 3 and 4 are mostly the same, except that Version 4
+   clients expect server messages to be compressed, version 3 clients
+   do not. (version 3 probably is no longer supported).</p>
+
+   <p>The server sends back his protocol number, which is always 3 in
+   the current protocol. Most of the protocol variation is determined by
+   the server using the client version that is used in the initial login
+   message, not the initial handshake byte.</p>
+
+   <p>After the initial handshake, the client sends uncompressed
+   messages, while the server sends back a zlib-compressed
+   stream (<a href="http://rfc1950.x42.com/">rfc1950</a> and <a
+   href="http://rfc1950.x42.com/">rfc1951</a>).</p>
+
+   <p>All messages have the same header:</p>
+
+   <struct name="message_header">
+      <member name="length" type="U16"/>
+
+      <p>The length is the length of the full message including the header.</p>
+
+      <p>Beginning with version 2.5.x, a number is xored into the low
+      byte of the length in <em>sent</em> packages only, as given by the
+      following recurrence: <code>rand[0] = 0; rand[i+1] = msg[i].length
+      + (rand[i] * 0x04c2af9b + 0xfffffffb); xorbyte = rand &gt;&gt;
+      24</code>, all in 32 bit unsigned iso-c arithmetic.</p>
+
+      <member name="type" type="U16"/>
+      <p>If the type is &gt;= 0x4000 this is a message for a specific channel. The channel
+      number is always the next U16. All of these channel values are valid, including zero.</p>
+
+      <p>Beginning with version 2.5.x, a number is <em>added</em> on <em>received</em>
+      messages only. The algorithm is as follows:
+      
+      <pre>
+         msglen &lt; 44: type = typefield
+         msglen &gt; 44: type = (typefield + rand[i]) % 0x10000
+            rand[0] = 0
+            rand[i+1] = username[type % length username] + rand[i] * (type - 0x6cdd)
+               where username is the user name of the logged-in user. coooool.
+      </pre>
+      </p>
+
+   </struct>
+
+<h2>Primitive types used in the protocol.</h2>
+
+   <p>Apart from the basic types, I need to define some extra types to
+   deal with fixed-point values (based on integer types) or fixed-length
+   strings (either 7-bit-ascii or more limited (<code>A</code>), or UCS-2
+   based (<code>S</code>)).</p>
+
+   <type name="username" type="A" length="10"/>
+
+   <p>The basic user or login name, used throughout the protocol
+   as a handle to the user.</p>
+
+   <type name="roomname" type="S" length="25"/><!-- argh, how horribly broken -->
+
+   <p>Many strings in the protocol are fixed-width for no good reason
+   (maybe this is one reason for using compression in newer versions, as
+   the packets itself are wasting lots of space.</p>
+
+   <type name="realname" type="S" length="50"/>
+   <type name="email" type="S" length="70"/>
+   <type name="userinfo" type="S" length="1000"/>
+   <type name="url" type="A" length="100"/>
+
+   <p>Used in user_record.</p>
+
+   <type name="locale" type="A" length="5"/>
+
+   <p>A kind of locale specifier. It seems the general format seems to be
+   lowercase language, underscore, uppercase location, e.g. en_US. More
+   fancy specifications don't fit.</p>
+
+   <type name="flag" type="U8" multiplier="1"/>
+
+   <p>Just a simple boolean value. 0 means false, and 1 generally true,
+   but I suggest accepting != 0 as true.</p>
+
+   <type name="komi16_2" type="I16" multiplier="2"/>
+   <type name="komi16_4" type="I16" multiplier="4"/>
+   <type name="komi32_2" type="I32" multiplier="2"/>
+   <type name="komi32_4" type="I32" multiplier="4"/>
+
+   <p>Komi values are multiplied by 2 or 4 to make them integer in the
+   protocol.</p>
+
+   <type name="result" type="I32" multiplier="2"/>
+
+   <p>The game result is also multiplied by 2 to give it higher
+   resolution. There are also special values for wins by time etc., either
+   in result or in the score* types, or both :)</p>
+
+   <type name="score16_2" type="I16" multiplier="2"/>
+   <type name="score16_4" type="I16" multiplier="4"/>
+   <type name="score32_4" type="I32" multiplier="4"/>
+   <type name="score32_1000" type="I32" multiplier="1000"/>
+
+   <p>A score value (used for displaying the score at the end of a game)
+   are multiplied by 2 or 4 for a change (the 0.25 resolution is not
+   used). In game structures it is encoded by dividing by two, though, so
+   watch out! And in some others, it's encoded by multiplying by 1000...
+   yuck!</p>
+
+   <type name="time" type="U32" multiplier="1000"/>
+
+   <p>Time values are multiplied by 1000, giving them millisecond
+   accuracy.</p>
+
+   <type name="timestamp" type="U64" multiplier="1000"/>
+
+   <p>64 bit timeval, milliseconds since posix epoch, e.g. <code>my
+   ($year, $month, $day) = (gmtime $date * 0.001)[5,4,3];</code></p>
+
+   <type name="password" type="U64"/>
+
+   <p>Password is a number calculated as follows (VERY insecure, basically
+   plaintext!): <code>password = 0; for char in characters do password ←
+   password * 1055 + ascii_code (char)</code></p>
+
+   <type name="CLIENTID16" type="U16" multiplier="1"/>
+   <type name="CLIENTID8" type="U8" multiplier="1"/>
+
+   <p>An id chosen by the client, usually starting at one, to identify
+   some handshakes initiated by the client, such as new games or memos.</p>
+
+<h2>Enumeration and set types used in the protocol.</h2>
+
+   <enum name="GAMETYPE">
+      <member name="DEMONSTRATION" value="0"/>
+      <member name="EDITING"       value="1"/>
+      <member name="TEACHING"      value="2"/>
+      <member name="SIMUL"         value="3"/>
+      <member name="FREE"          value="4"/>
+      <member name="RATED"         value="5"/>
+      <member name="PRIVATE"       value="128"/>
+      <p>PRIVATE is or'ed onto DEMONSTRATION or TEACHING</p>
+   </enum>
+
+   <set name="GAMEFLAG">
+      <member name="SCORED"    value="1"/>
+      <member name="ADJOURNED" value="2"/>
+      <member name="UPLOADED"  value="4"/>
+   </set>
+
+   <set name="ROOMFLAG">
+      <member name="ADMIN"    value="0x01"/>
+      <p>Admins only(?)</p>
+      <member name="DEFAULT"  value="0x04"/>
+      <p>Seems to be set on the english room. Or maybe not.</p>
+      <member name="PRIVATE"  value="0x10"/>
+      <p>This room is private.</p>
+   </set>
+
+   <set name="GAMESTATUS">
+      <member name="INPLAY"    value="0x80"/>
+   </set>
+
+   <enum name="SCORE">
+      <p>Special score values, in addition to numerical scores. Some are also used with their
+      negative value. Unfortunately, these are the raw vaues, before scaling. WMS loves code duplication.</p>
+
+      <member name="TIMEOUT"   value="16384"/>
+      Also used negatively to score for white instead of black.
+
+      <member name="RESIGN"    value="16385"/>
+      Also used negatively to score for white instead of black.
+
+      <member name="FORFEIT"   value="    0"/>
+      Also used negatively to score for white instead of black.
+
+      <member name="JIGO"      value="16386"/>
+
+      <member name="NO_RESULT" value="16386"/>
+      <member name="ADJOURNED" value="16387"/>
+      <member name="UNKNOWN"   value="16389"/>
+   </enum>
+
+   <enum name="RULESET">
+      <member name="JAPANESE"    value="0"/>
+      <member name="CHINESE "    value="1"/>
+      <member name="AGA"         value="2"/>
+      <member name="NEW_ZEALAND" value="3"/>
+   </enum>
+
+   <enum name="TIMESYS">
+      <member name="NONE"     value="0"/>
+      <member name="ABSOLUTE" value="1"/>
+      <member name="BYO_YOMI" value="2"/>
+      <member name="CANADIAN" value="3"/>
+   </enum>
+
+   <enum name="COLOUR">
+      <p>Convinience constants used in several places.</p>
+      <member name="BLACK" value="0"/>
+      <member name="WHITE" value="1"/>
+      <member name="NONE" value="2"/>
+      <p>Sometimes used to mark absence of marks, or no player or etc...</p>
+   </enum>
+
+<h2>Structs used in send &amp; receive messages</h2>
+
+   <struct name="user" class="KGS::User">
+
+      <p>Almost everywhere a user + flags is required, even used in some places
+      where only a username is required. I see no general rule on when a
+      complete user and when a partial user is required.</p>
+
+      <member name="name" type="username"/>
+      <member name="flags" type="U32" value="1"/>
+   </struct>
+
+   <struct name="rules" class="KGS::Rules">
+
+      <p>This structure is used for challenges as well as in the special
+      TREE "subprotocol". It tightly encodes the game parameters.</p>
+
+      <member name="ruleset" type="U8"/>
+      <member name="size" type="U8"/>
+      <member name="handicap" type="U8"/>
+      <member name="komi" type="komi16_2"/>
+      <member name="timesys" type="U8"/>
+      <member name="time" type="U32"/>
+      <member name="interval" type="U32"/>
+      byo-yomi time / canadian time
+      <member name="count" type="U16"/>
+      periods / moves
+   </struct>
+
+<h2>Structs used in messages from the client</h2>
+
+<h2>Client-generated messages</h2>
+
+   <message type="0000" name="login" src="client">
+
+      <p>Sent to login, usually the first message sent. The password needs to be set when the
+      guest flag is true.
+      Possible replies: <ref reply="login"/>. Followed by: <ref reply="timewarning_default"/> <ref reply="chal_defaults"/>
+      </p>
+
+      <member name="ver_major" type="U32" value="2"/>
+      <member name="ver_minor" type="U32" value="6"/>
+      <member name="ver_micro" type="U32" value="1"/>
+      <member name="name" type="username"/>
+      <member name="password" type="password" value="0"/>
+      <member name="guest" type="flag" value="1"/>
+      <member name="_unknown3" type="U16" value="0"/>
+      <member name="locale" type="locale" value='"en_US"'/>
+      <member name="clientver" type="DATA" value='"1.4.2_03:Swing app:Sun Microsystems Inc."'/>
+      The "default" is the java vm version, not exactly he client version. However,
+      you should always send a text like "Jonathan's C client version 0.6" or somesuch,
+      so the server can, if necessary, block broken clients or client versions.
+   </message>
+
+   <message type="0007" name="req_userinfo" src="client">
+      <p>Request info about a certain user. Possible reply: <ref reply="userinfo"/></p>
+      <member name="name" type="username"/>
+   </message>
+
+   <message type="0007" name="update_userinfo" src="client">
+      <p>Update user info. Message structure is very similar
+      to <ref ref="userinfo"/>.</p>
+      <member name="setpass" type="flag"/>
+      Should the password be updated?
+      <member name="password" type="password" value="0"/>
+      <member name="realname" type="realname"/>
+      <member name="email" type="email"/>
+      <member name="info" type="userinfo"/>
+      <member name="homepage" type="url"/>
+      <member name="_unused" type="U64" value="0"/>
+      <member name="_unused" type="U64" value="0"/>
+   </message>
+
+   <message type="0013" name="msg_chat" src="client">
+      <p>This message is sent to initiate or continue a private chat with
+      a user.  You'll always receive a copy of what you have sent back
+      from the server (as usual).</p>
+
+      <member name="name" type="username"/>
+      Name of sender ("yourself").
+      <member name="name2" type="username"/>
+      Name of recipient.
+      <member name="message" type="STRING"/>
+      The message.
+   </message>
+
+   <message type="0014" name="req_stats" src="client">
+      <p>Request server statistics. Replied with <ref reply="stats"/></p>
+   </message>
+
+   <message type="0016" name="idle_reset" src="client">
+      <p>Send in response to <ref reply="idle_warn"/> to keep the server from disconnecting.</p>
+   </message>
+
+   <message type="001d" name="ping" src="client">
+      <p>No idea. Not used anymore?</p>
+   </message>
+
+   <message type="001e" name="req_usergraph" src="client">
+      <p>Request user graph data, replied with <ref reply="usergraph"/>.</p>
+      <member name="name" type="username"/>
+   </message>
+
+   <message type="0021" name="req_pic" src="client">
+      <p>Request a user picture from the server. Results in a <ref reply="userpic"/>
+      or a timeout.</p>
+      <member name="name" type="username"/>
+   </message>
+
+   <message type="0021" name="upload_pic" src="client">
+      Same code as pic_req, but with an additional data section that
+      must contain a JPEG image that is &lt;=7KB. It must have 141×200 pixels.
+      <member name="name" type="username"/>
+      <member name="data" type="DATA"/>
+   </message>
+
+   <message type="0023" name="send_memo" src="client">
+      <member name="name" type="username"/>
+      <member name="cid" type="CLIENTID16"/>
+      <p>A boolean, probably. Always true for me.</p>
+      <member name="msg" type="STRING"/>
+   </message>
+
+   <message type="0024" name="delete_memos" src="client">
+      <p>Unconditionally deletes all memos.</p>
+   </message>
+
+   <message type="0100" name="gnotice" src="client">
+      <p>Send a global message. Maybe. Never tried, for obvious reasons :/. Results
+      in a <ref reply="gnotice"/> sent to all users.</p>
+      <member name="notice" type="STRING"/>
+   </message>
+
+   <message type="0200" name="notify_add" src="client">
+
+      <p>Probably setting a notifier on a username, to get informed about
+      changes using <ref reply="notify_upd"/> messages. sending your own
+      username gives you a disconnect, so don't do that at home, kids!</p>
+
+      <member name="name" type="username"/>
+   </message>
+
+   <message type="0201" name="notify_del" src="client">
+
+      <p>Probably remove the notifier again.</p>
+
+      <member name="name" type="username"/>
+   </message>
+
+   <message type="0318" name="list_rooms" src="client">
+      <p>List the rooms in a specific group/category. Results in a <ref reply="upd_rooms"/> message.</p>
+      <member name="group" type="U8"/>
+   </message>
+
+   <message type="031a" name="new_room" src="client">
+      Create a new room. Not verified.
+      <member name="name" type="username"/>
+      <member name="i1" type="U32" value="0"/>
+      <member name="b1" type="U8" value="0"/>
+      <member name="b2" type="U8" value="255"/>
+      <member name="b3" type="U8" value="255"/>
+      <member name="group" type="U8" value="1"/>
+      <member name="name" type="ZSTRING"/>
+      <member name="description" type="ZSTRING"/>
+      <member name="flags" type="U8"/>
+      See ROOMFLAGs
+   </message>
+
+   <message type="031b" name="req_upd_rooms" src="client">
+      <p>Request a rooms update message for the given room.</p>
+      <member name="channel" type="U16"/>
+   </message>
+
+   <message type="0413" name="req_game_record" src="client">
+      <p>Requests part of the users game record to be sent. Results in a <ref reply="game_record"/> or maybe a timeout.</p>
+      <member name="name" type="username"/>
+      <member name="timestamp" type="timestamp"/>
+      <p>If zero, start at the newest games, else this should be the timestamp
+      of the first gamerecord sent in the <ref reply="game_record"/> response.</p>
+   </message>
+
+   <message type="4300" name="join_room" src="client">
+      <p>Joins the given room. <ref reply="join_room"/> messages for yourself
+      and all users in that room, as well as the initial gamelist, are
+      send if the room exists. If not, timeout...</p>
+      <member name="channel" type="U16"/>
+      <member name="user" type="user"/>
+   </message>
+
+   <message type="4301" name="msg_room" src="client">
+      Send a message to the room.
+      <member name="channel" type="U16"/>
+      <member name="name" type="username"/>
+      Must be the login-name of the user.
+      <member name="message" type="STRING"/>
+   </message>
+
+   <message type="4302" name="part_room" src="client">
+      Remove yourself (or maybe others as admin) from a room.
+      <member name="channel" type="U16"/>
+      <member name="name" type="username"/>
+   </message>
+
+   <message type="4305" name="new_game" src="client">
+      <p>Create a new game.</p>
+
+      <member name="channel" type="U16"/>
+      <p>The room where to start the new game</p>
+      <member name="cid" type="CLIENTID16"/>
+      <member name="gametype" type="U8"/>
+      <p>
+         GAMETYPE_UPLOAD probably not allowed. GAMETYPE_PRIVATE
+         only allowd together with GAMETYPE_TEACHING, GAMETYPE_DEMONSTRATION.
+      </p>
+      <member name="flags" type="U8"/>
+      <p>
+         0x2 == global open game list
+      </p>
+      <member name="rules" type="rules"/>
+      <p>When cloning a game, the rules are set up like this:
+         count => 65535, ruleset => 0, time => 4294967295, timesys => 0, interval => 4294967295.
+         Cloning itself seems to be implemented solely in the client (somewhat sane, for a change).
+      </p>
+      <member name="notes" type="STRING"/>
+   </message>
+
+   <message type="430a" name="load_game" src="client">
+      Load an existing game into a room(?)
+      There is no indication that a new game is there except
+      for a upd_observers message with your name in it. Which means
+      you have to watch upd_observers messages that are not for any
+      currently open game and open one. Ugh.
+      <member name="channel" type="U16"/>
+      The room to load the game into.
+      <member name="timestamp" type="timestamp"/>
+      From the game record.
+      <member name="user" type="username"/>
+      <member name="flags" type="U8"/>
+      0 == public, 2 == private
+   </message>
+
+   <message type="430b" name="req_games" src="client">
+      Request to update room game list (send this once per minute to get
+      updated). Results in upd_games messages.
+      <member name="channel" type="U16"/>
+   </message>
+
+   <message type="4319" name="req_desc" src="client">
+      Request room description.
+      <member name="channel" type="U16"/>
+   </message>
+
+   <message type="4400" name="challenge" src="client">
+      <p>Used to send challenges to existing games.</p>
+      <member name="channel" type="U16"/>
+      <member name="black" type="user"/>
+      <member name="white" type="user"/>
+      <member name="gametype" type="U8"/>
+      <member name="cid" type="CLIENTID8"/>
+      <p>Possibly an id. No idea. Better echo this from the challenge request.</p>
+      <member name="rules" type="rules"/>
+   </message>
+
+   <message type="4403" name="join_game" src="client">
+      Join a game. See join_room.
+      <member name="channel" type="U16"/>
+      <member name="user" type="user"/>
+   </message>
+
+   <message type="4404" name="part_game" src="client">
+      Leave (or kick as admin?) a certain user from a game.
+      <member name="channel" type="U16"/>
+      <member name="name" type="username"/>
+   </message>
+
+   <message type="4405" name="set_tree" src="client">
+      Possibly upload an initial game to an empty room. Not tested.
+
+      <member name="channel" type="U16"/>
+      <member name="tree" type="TREE"/>
+   </message>
+
+   <message type="4406" name="upd_tree" src="client">
+      <p>Upload a partial game tree to the server. This is used to send moves
+      and even in-game comments to the server. For the comments, the
+      server prepends the username and rank.</p>
+      <member name="channel" type="U16"/>
+      <member name="tree" type="TREE"/>
+   </message>
+
+   <message type="4407" name="mark_dead" src="client">
+      <p>Marks stones ad dead (or alive?) by the client. Details unclear</p>
+      <member name="channel" type="U16"/>
+      <member name="x" type="U8"/>
+      <member name="y" type="U8"/>
+      <member name="dead" type="flag"/>
+      <p>Possibly true means mark dead and false unmark, but that's just a wild guess.</p>
+   </message>
+
+   <message type="4408" name="get_tree" src="client">
+      <p>Request the game tree starting at a given node. This is used when
+      the server only sends a partial tree (with end code "more").</p>
+      <member name="channel" type="U16"/>
+      <member name="node" type="U32"/>
+   </message>
+
+   <message type="440a" name="game_done" src="client">
+      <p>Sent by the client to mark the game as done.</p>
+      <member name="channel" type="U16"/>
+      <member name="id" type="U32"/>
+      <p>An id field (start at one please) to make sure that the client responds to the correct done click.</p>
+   </message>
+
+   <message type="440c" name="claim_win" src="client">
+      <p>Used by the client to claim a win.</p>
+      <member name="channel" type="U16"/>
+      <member name="player" type="U8 "/>
+   </message>
+
+   <message type="440d" name="add_time" src="client">
+      <p>Adds the given amount of time to your opponent's clock.</p>
+      <member name="channel" type="U16"/>
+      <member name="time" type="U32"/>
+      <member name="player" type="U8"/>
+   </message>
+
+   <message type="440e" name="req_undo" src="client">
+      <member name="channel" type="U16"/>
+   </message>
+
+   <message type="440f" name="grant_undo" src="client">
+      Can be send after a req_undo message was received to grant the undo.
+      <member name="channel" type="U16"/>
+   </message>
+
+   <message type="4410" name="resign_game" src="client">
+      Resign the game.
+      <member name="channel" type="U16"/>
+      <member name="player" type="U8"/>
+   </message>
+
+   <message type="441a" name="set_teacher" src="client">
+      <p>Change the teacher to somebody else (or possibly yourself == take it). If the
+      name is empty, the game will continue normally.</p>
+      <member name="channel" type="U16"/>
+      <member name="name" type="username"/>
+   </message>
+
+   <message type="4422" name="allow_user" src="client">
+      <p>Unclear. Maybe allow users to talk? No idea, really.</p>
+
+      <member name="channel" type="U16"/>
+      <member name="othername" type="username"/>
+      <member name="name" type="username"/>; # gives user access to the game (to what? ;)
+   </message>
+
+   <message type="4423" name="set_privacy" src="client">
+      Probably sets the "quiet" flag. Not checked.
+      <member name="channel" type="U16"/>
+      <member name="private" type="flag"/>
+   </message>
+
+   <message type="4427" name="game_move" src="client">
+      <p>Only during playing, moves.</p>
+      <member name="channel" type="U16"/>
+      <member name="x" type="U8"/>
+      <member name="y" type="U8"/>
+   </message>
+
+   <message type="4429" name="reject_challenge" src="client">
+      Reject a challenge from a given user. Not checked.
+
+      <member name="channel" type="U16"/>
+      <member name="name" type="username"/>
+      <member name="gametype" type="U8"/>
+      <member name="cid" type="CLIENTID8"/>
+      <p>Possibly an id. No idea. Better echo this from the challenge request.</p>
+      <member name="rules" type="rules"/>
+   </message>
+
+   <message type="442d" name="more_comments" src="client">
+      <p>Quite brokenly, the want this to send you more comments.
+      Reply to <ref ref="more_comments"/>.</p>
+      <member name="channel" type="U16"/>
+      <member name="node" type="U32"/>
+   </message>
+
+   <message type="442e" name="save_game" src="client">
+      <p>Is send when a game is closed and should be saved on the gamerecord.</p>
+
+      <member name="channel" type="U16"/>
+   </message>
+
+   <message type="4433" name="req_result" src="client">
+      I forgot.
+
+      <member name="channel" type="U16"/>
+   </message>
+
+   <message type="4434" name="set_quiet" src="client">
+      <p>Sets (or clears) the quiet flag on a game.</p>
+      <member name="channel" type="U16"/>
+      <member name="quiet" type="flag"/>
+   </message>
+
+   <message type="4436" name="msg_game" src="client">
+      <member name="channel" type="U16"/>
+      <member name="message" type="STRING"/>
+   </message>
+
+   <message type="ffff" name="quit" src="client">
+      <p>Sent by the client just before it logs out.</p>
+   </message>
+
+<h2>Structs mainly used in messages send by the server</h2>
+
+   <struct name="challenge_defaults">
+      Send soon after log-in to set the defaults for game challenges.
+      <member name="gametype" type="U8"/>
+      <member name="ruleset" type="U8"/>
+      <p>The ruleset member is a pure guess, please verify. it could also be after size for example.</p>
+      <member name="size" type="U32"/>
+      <member name="timesys" type="U32"/>
+      <member name="time" type="U32"/>
+      <member name="byo_time" type="U32"/>
+      <member name="byo_periods" type="U32"/>
+      <member name="can_time" type="U32"/>
+      <member name="can_stones" type="U32"/>
+      <member name="notes" type="STRING"/>
+   </struct>
+
+   <struct name="game" class="KGS::Game">
+      Basic information about a game. Used in rooms for the gamelist and
+      in games to detect when a game is saved, changed type (e.g. R => D)
+      etc.
+
+      <member name="channel" type="U16"/>
+      <member name="type" type="U8"/>
+      <member name="black" type="user"/>
+      White
+      <member name="white" type="user"/>
+      Black
+      <member name="owner" type="user"/>
+      Owner
+      <member name="size" type="U8"/>
+      <member name="handicap" type="I8"/>
+      &lt; 0 not fully setup
+      <member name="komi" type="komi16_2"/>
+      <member name="moves" type="I16"/>
+      This field reflects either the movenum or the score, sorry, not even guards help, as
+      the flags to determine that are _after_ the field. Arg. Divide by two to get the actual
+      score (arg²).
+      <member name="flags" type="U16"/>
+      <member name="observers" type="U32"/>
+      <member name="saved" type="flag"/>
+      <member name="notes" type="ZSTRING" guard-member="handicap" guard-cond="&lt; 0"/>
+   </struct>
+
+   <struct name="room_game">
+      A game with the room id prepended.
+
+      <member name="channel" type="U16"/>
+      <p>The room channel.</p>
+      <member name="game" type="game"/>
+   </struct>
+
+   <struct name="room_obs">
+      Obsolete.
+      
+      <member name="name" type="roomname"/>
+      <member name="channel" type="U16"/>
+      <member name="flags" type="U32"/>
+      <member name="users" type="U32"/>
+   </struct>
+
+   <struct name="room" class="KGS::Room">
+      <member name="channel" type="U16"/>
+      <member name="flags" type="U8"/>
+      <member name="group" type="U8"/>
+      <member name="users" type="U16"/>
+      <member name="games" type="U16"/>
+      <member name="name" type="STRING"/>
+   </struct>
+
+   <struct name="scorevalues" class="KGS::Score">
+      <member name="score" type="score32_4"/>
+      <member name="territory" type="U32"/>
+      <member name="captures" type="U32"/>
+      <member name="i3" type="U32"/>
+      <member name="f2" type="U32"/>
+      <member name="komi" type="komi32_4"/>
+      <member name="i4" type="U32"/>
+      Apparently the i3, f2, i4 are zero.
+   </struct>
+
+   <struct name="game_record" class="KGS::GameRecord">
+      <p>A single game record entry, as seen in <ref ref="userinfo"/>.</p>
+
+      <member name="timestamp" type="timestamp"/>
+      Time this game was played.
+      <member name="type" type="U8"/>
+      <member name="handicap" type="U8"/>
+
+      <member name="revision" type="U16"/>
+      <p>A revision number in case there are multiple similar games.</p>
+
+      <member name="black" type="user"/>
+      <member name="white" type="user"/>
+      <member name="owner" type="user"/>
+
+      <member name="komi" type="U16"/>
+      <p>0:11 == komi * 2; 12:15 == no idea, always 1-0-0-0?</p>
+      <member name="score" type="score16_2"/>
+      <member name="size" type="U8"/>
+      <p>0:5 == size; 6 no idea; 7 == inprogress</p>
+      <member name="flags" type="U8"/>
+      <p>No idea. I see many values here.</p>
+
+   </struct>
+
+<h2>Server-generated messages</h2>
+
+   <message type="0001" name="login" src="server">
+      <member name="message" type="CONSTANT" value='login successful'/>
+      <member name="success" type="CONSTANT" value="1"/>
+
+      <member name="user" type="user"/>
+      <member name="unknown1" type="U16"/>
+      <member name="unknown2" type="U16"/>
+   </message>
+
+   <message type="0002" name="login" src="server">
+      <member name="message" type="CONSTANT" value='login successful: client version is outdated.'/>
+      <member name="success" type="CONSTANT" value="1"/>
+
+      <member name="user" type="user"/>
+      <member name="unknown1" type="U16"/>
+      <member name="unknown2" type="U16"/>
+   </message>
+
+   <message type="0003" name="login" src="server">
+      <member name="message" type="CONSTANT" value='login failed: client version out of date'/>
+
+      <member name="user" type="user"/>
+      <member name="unknown1" type="U16"/>
+      <member name="unknown2" type="U16"/>
+   </message>
+
+   <message type="0004" name="login" src="server">
+      <member name="message" type="CONSTANT" value='login failed: wrong password'/>
+
+      <member name="user" type="user"/>
+      <member name="unknown1" type="U16"/>
+      <member name="unknown2" type="U16"/>
+   </message>
+
+   <message type="0005" name="login" src="server">
+      <member name="message" type="CONSTANT" value='login failed: specified user does not exist'/>
+
+      <member name="user" type="user"/>
+      <member name="unknown1" type="U16"/>
+      <member name="unknown2" type="U16"/>
+   </message>
+
+   <message type="0006" name="login" src="server">
+      <member name="message" type="CONSTANT" value='login failed: other user of same name already exists'/>
+
+      <member name="user" type="user"/>
+      <member name="unknown1" type="U16"/>
+      <member name="unknown2" type="U16"/>
+   </message>
+
+   <message type="0008" name="userinfo" src="server">
+      User info.
+      <member name="_unused0" type="flag"/>
+      <member name="user" type="user"/>
+      <member name="_unused1" type="U64"/>
+      <member name="realname" type="realname"/>
+      <member name="email" type="email"/>
+      <member name="info" type="userinfo"/>
+      <member name="homepage" type="url"/>
+      <member name="regdate" type="timestamp"/>
+      When the user registered (0 == never registered).
+      <member name="lastlogin" type="timestamp"/>
+      When the user logged in for the last time.
+      <!-- maybe more? -->
+   </message>
+
+   <message type="0009" name="upd_userinfo_result" src="server">
+      <member name="name" type="username"/>
+      <member name="message" type="CONSTANT" value='Thanks for registering.'/>
+   </message>
+
+   <message type="000a" name="upd_userinfo_result" src="server">
+      <member name="name" type="username"/>
+      <member name="message" type="CONSTANT" value='The user &quot;%s&quot; has been successfully updated.'/>
+   </message>
+
+   <message type="000b" name="upd_userinfo_result" src="server">
+      <member name="name" type="username"/>
+      <member name="message" type="CONSTANT" value='There is no user &quot;%s&quot;. Update failed.'/>
+   </message>
+
+   <message type="0012" name="userinfo_failed" src="server">
+      <p>Sent when no userinfo for the requested user could be found(?)</p>
+      <member name="name" type="username"/>
+   </message>
+
+   <message type="0013" name="msg_chat" src="server">
+      <member name="name" type="username"/>
+      Name of sender (either yourself (echo) or other)
+      <member name="name2" type="username"/>
+      Name of recipient.
+      <member name="message" type="STRING"/>
+   </message>
+
+   <message type="0015" name="stats" src="server">
+      <member name="ver_major" type="U16"/>
+      <member name="ver_minor" type="U16"/>
+      <member name="ver_micro" type="U16"/>
+      <member name="boot_time" type="timestamp"/>
+      <member name="users_cur" type="U32"/>
+      <member name="users_max" type="U32"/>
+      <member name="users_lim" type="U32"/>
+      <member name="accts_cur" type="U32"/>
+      <member name="accts_max" type="U32"/>
+      <member name="unknown1" type="U32"/>
+      <member name="work_max" type="U32"/>
+      <member name="rooms_cur" type="U32"/>
+      <member name="rooms_max" type="U32"/>
+      <member name="rooms_lim" type="U32"/>
+      <member name="games_cur" type="U32"/>
+      <member name="games_max" type="U32"/>
+      <member name="games_lim" type="U32"/>
+      <member name="results_cur" type="U32"/>
+      <member name="results_max" type="U32"/>
+      <member name="unknown2" type="U32"/>
+      <member name="params_cur" type="U32"/>
+      <member name="params_max" type="U32"/>
+      <member name="bytes_in" type="U64"/>
+      <member name="packets_in" type="U64"/>
+      <member name="bytes_out" type="U64"/>
+      <member name="packets_out" type="U64"/>
+   </message>
+
+   <message type="0016" name="idle_warn" src="server">
+      <p>idle warning, autologout soon (10 minutes...). Responding with <ref ref="ping"/> usually helps.</p>
+   </message>
+
+   <message type="0018" name="login" src="server">
+      <member name="message" type="CONSTANT" value='logged out: another client logged in with your username'/>
+   </message>
+
+   <message type="001c" name="login" src="server">
+      <member name="message" type="CONSTANT" value='logged out: idle for too long'/>
+   </message>
+
+   <message type="0020" name="error" src="server">
+      <member name="message" type="CONSTANT" value='Sorry, you have too many unfinished games. You cannot turn on your rank. Please finish some of your games, then try again.'/>
+   </message>
+
+   <message type="0022" name="login" src="server">
+      I was blocked sooo many times for developing this client that it was
+      easy to figure out. The KGS admins sure need no extra nazi training
+      :(
+      <member name="reason" type="STRING"/>
+      <member name="result" type="CONSTANT" value='user or ip blocked'/>
+   </message>
+
+   <message type="001b" name="timewarning_default" src="server">
+      WILD guess
+      <member name="channel" type="U16"/>
+      <member name="time" type="U16"/>
+   </message>
+
+   <message type="001c" name="idle_err" src="server">
+      autologout
+   </message>
+
+   <message type="001d" name="ping" src="server">
+      Sent by the server regularly, but not answering them
+      isn't valid. Strange form of keepalive?
+   </message>
+
+   <message type="001e" name="usergraph" src="server">
+      User graph data.
+      <member name="name" type="username"/>
+      <member name="data" type="I16" array="yes"/>
+      If empty, no graph is available. The unit seems to
+      be centi-kyu, with 1 dan == 0, 2 dan == 100, 1 kyu == -100.
+      There is probably one entry per day, the newest one last.
+   </message>
+
+   <message type="0021" name="userpic" src="server">
+      <member name="name" type="username"/>
+      Reply to pic_req, contains an image in jpeg format.
+      <member name="data" type="DATA"/>
+   </message>
+
+   <message type="0025" name="memo_error" src="server">
+      <p>Account unknown.</p>
+      <member name="name" type="username"/>
+      <member name="cid" type="CLIENTID16"/>
+      <member name="message" type="CONSTANT" value='memo send failed: account already exists'/>
+      <member name="subtype" type="CONSTANT" value='25'/>
+   </message>
+
+   <message type="0026" name="memo_error" src="server">
+      <p>Just a guess.</p>
+      <member name="name" type="username"/>
+      <member name="cid" type="CLIENTID16"/>
+      <member name="message" type="CONSTANT" value='memo send failed: error 26'/>
+      <member name="subtype" type="CONSTANT" value='26'/>
+   </message>
+
+   <message type="0027" name="memo_error" src="server">
+      <p>User is currently online, please use chat.</p>
+      <member name="name" type="username"/>
+      <member name="cid" type="CLIENTID16"/>
+      <member name="message" type="CONSTANT" value='memo send failed: user is online, use chat'/>
+      <member name="subtype" type="CONSTANT" value='27'/>
+   </message>
+
+   <message type="0028" name="memo_error" src="server">
+      <p>Just a guess.</p>
+      <member name="name" type="username"/>
+      <member name="cid" type="CLIENTID16"/>
+      <member name="message" type="CONSTANT" value='memo send failed: error 28'/>
+      <member name="subtype" type="CONSTANT" value='28'/>
+   </message>
+
+   <message type="0029" name="memo" src="server">
+      <member name="name" type="username"/>
+      <member name="time" type="timestamp"/>
+      <member name="message" type="ZSTRING"/>
+   </message>
+
+   <message type="002a" name="memo_sent" src="server">
+      <p>The memo was sent successfully</p>
+      <member name="name" type="username"/>
+      <member name="cid" type="CLIENTID16"/>
+   </message>
+
+   <message type="0100" name="gnotice" src="server">
+      global notice, sent to everybody
+      <member name="notice" type="STRING"/>
+   </message>
+
+   <message type="0202" name="notify_event" src="server">
+      # maybe soe notify? Totally unclear.
+      # loc 0" type="userinfo, flags etc. loc 1 => gameinfo?, loc 2 => game result (more data)
+      <member name="event" type="U32"/>
+      <member name="user" type="user"/>
+      <member name="gamerecord" type="game_record" guard-member="event" guard-cond="== 2"/>
+      <p>Game result record?</p>
+      
+   </message>
+
+   <message type="030c" name="login_done" src="server">
+      <p>Is sent after the initial messages, probably
+      to signify the end of the login process.</p>
+   </message>
+
+   <message type="0310" name="priv_room" src="server">
+      "permission denied" when joining a room
+      <member name="name" type="STRING"/>
+   </message>
+
+   <message type="0318" name="upd_rooms" src="server">
+      <member name="rooms" type="room" array="yes"/>
+   </message>
+
+   <message type="0411" name="chal_defaults" src="server">
+      <member name="channel" type="U16"/>
+      <member name="defaults" type="challenge_defaults"/>
+   </message>
+
+   <message type="0412" name="already_playing" src="server">
+      Unable to create new game.
+      <member name="message" type="CONSTANT" value='Sorry, you are already playing in one game, so you can&apos;t start playing in another.'/>
+      <member name="cid" type="CLIENTID16"/>
+      <p>The cid of the new_game etc. request.</p>
+   </message>
+
+   <message type="0414" name="game_record" src="server">
+      The users game record.
+      <member name="name" type="username"/>
+      <member name="more" type="flag"/>
+      <p>Wether more games are available (must be requested manually by
+      another <ref reply="req_game_record"/> message with the timestamp set
+      to the timestamp of the <em>first</em> game of this packet.</p>
+      <member name="games" type="game_record" array="yes"/>
+      <p>Game records, from oldest to newest.</p>
+   </message>
+
+   <message type="0417" name="error" src="server">
+      <member name="message" type="CONSTANT" value='Sorry, your opponent is currently not logged in, so you can&apos;t resume this game.'/>
+   </message>
+
+   <message type="0418" name="error" src="server">
+      <member name="message" type="CONSTANT" value='Sorry, your opponent is already playing in a game, so you cannot continue this one.'/>
+   </message>
+
+   <message type="0419" name="error" src="server">
+      <member name="message" type="CONSTANT" value='Sorry, the server is out of boards! Please wait a few minutes and try to start a game again.'/>
+   </message>
+
+   <message type="041c" name="upd_game2" src="server">
+      Unclear.
+      <member name="channel_junk" type="U16"/>
+      <member name="game" type="game"/>
+   </message>
+
+   <message type="041f" name="error" src="server">
+      <member name="message" type="CONSTANT" value='Sorry, the game you tried to load was not correctly saved...probably caused by the server crashing. It cannot be recovered.'/>
+   </message>
+
+   <message type="0420" name="error" src="server">
+      <member name="message" type="CONSTANT" value='Sorry, user &quot;%s&quot; has left the game you are starting before you could challenge them. You will have to play against somebody else.'/>
+   </message>
+
+   <message type="0421" name="error" src="server">
+      <member name="message" type="CONSTANT" value='Sorry, this game is a private lesson. You will not be allowed to observe it.'/>
+   </message>
+
+   <!-- added recently -->
+   <message type="043a" name="add_global_challenges" src="server">
+      <p>
+         Adds or updates a global challenge (open game list).
+      </p>
+      <member name="games" type="room_game" array="yes"/>
+      <p>The game. The "moves" member contains a small number. Probably garbage.</p>
+   </message>
+
+<h3>Room messages</h3>
+
+   <p>Not all room messages are for rooms only, and rooms need to parse
+   not only these messages. Orthogonality, what for?</p>
+
+   <message type="4300" name="join_room" src="server">
+      <member name="channel" type="U16"/>
+      <member name="users" type="user" array="yes"/>
+   </message>
+
+   <message type="4301" name="msg_room" src="server">
+      <member name="channel" type="U16"/>
+      <member name="name" type="username"/>
+      <member name="message" type="STRING"/>
+   </message>
+
+   <message type="4302" name="part_room" src="server">
+      <member name="channel" type="U16"/>
+      <member name="user" type="user"/>
+   </message>
+
+   <message type="4303" name="del_room" src="server">
+      <member name="channel" type="U16"/>
+   </message>
+
+   <message type="4304" name="upd_games" src="server">
+      <member name="channel" type="U16"/>
+      <member name="games" type="game" array="yes"/>
+   </message>
+
+   <message type="4319" name="desc_room" src="server">
+      <member name="channel" type="U16"/>
+      <member name="owner" type="username"/>
+      <member name="description" type="STRING"/>
+   </message>
+
+<h3>Game messages</h3>
+
+   <message type="4400" name="challenge" src="server">
+      Unclear.
+      <member name="channel" type="U16"/>
+      <member name="black" type="user"/>
+      <member name="white" type="user"/>
+      <member name="gametype" type="U8"/>
+      <member name="cid" type="CLIENTID8"/>
+      <p>Possibly an id. No idea. Better echo this from the challenge request.</p>
+      <member name="rules" type="rules"/>
+      <member name="notes" type="STRING"/>
+      <p>This field is optional</p>
+   </message>
+
+   <message type="4401" name="upd_game" src="server">
+      <member name="channel" type="U16"/>
+      <member name="game" type="game"/>
+   </message>
+
+   <message type="4402" name="del_game" src="server">
+      <member name="channel" type="U16"/>
+   </message>
+
+   <message type="4403" name="upd_observers" src="server">
+      <member name="channel" type="U16"/>
+      <member name="users" type="user" array="yes"/>
+   </message>
+
+   <message type="4404" name="del_observer" src="server">
+      <member name="channel" type="U16"/>
+      <member name="name" type="username"/>
+   </message>
+
+   <message type="4405" name="set_tree" src="server">
+      <member name="channel" type="U16"/>
+      <member name="tree" type="TREE"/>
+   </message>
+
+   <message type="4406" name="upd_tree" src="server">
+      <member name="channel" type="U16"/>
+      <member name="tree" type="TREE"/>
+   </message>
+
+   <message type="4409" name="superko" src="server">
+      Superko-warning.
+      <member name="channel" type="U16"/>
+   </message>
+
+   <message type="440a" name="game_done" src="server">
+      <p>Send by the server when one of the players sends a done.</p>
+      <member name="channel" type="U16"/>
+      <member name="id" type="U32"/>
+      <p>An id field to make sure that the client responds to the correct done click.</p>
+      <p>The high bit has the "please press done again" warning function, i.e. if set, opponent has changed board.</p>
+      <member name="black" type="flag"/>
+      <member name="white" type="flag"/>
+   </message>
+
+   <message type="440b" name="final_result" src="server">
+      <member name="channel" type="U16"/>
+      <member name="blackscore" type="scorevalues"/>
+      <member name="whitescore" type="scorevalues"/>
+   </message>
+
+   <message type="440c" name="out_of_time" src="server">
+      <p>Sent when the opponent is out of time and moves, or when the other
+      requests <ref reply="userinfo"/>.</p>
+      <member name="channel" type="U16"/>
+      <member name="player" type="U8"/>
+      <p>Colour who ran out of time (lost).</p>
+   </message>
+
+   <message type="440e" name="req_undo" src="server">
+      <member name="channel" type="U16"/>
+   </message>
+
+   <message type="4410" name="resign_game" src="server">
+      <member name="channel" type="U16"/>
+      <member name="player" type="U8"/>
+   </message>
+
+   <message type="4415" name="game_error" src="server">
+      <member name="channel" type="U16"/>
+      <member name="message" type="CONSTANT" value='Sorry, this is a lecture game. Only authorized players are allowed to make comments.'/>
+   </message>
+
+   <message type="441a" name="set_teacher" src="server">
+      <member name="channel" type="U16"/>
+      <member name="name" type="username"/>
+   </message>
+
+   <message type="441d" name="owner_left" src="server">
+      <member name="channel" type="U16"/>
+      <member name="message" type="CONSTANT" value='Sorry, the owner of this game has left. Nobody will be allowed to edit it until the owner returns.'/>
+   </message>
+
+   <message type="441e" name="teacher_left" src="server">
+      Unclear.
+      <member name="channel" type="U16"/>
+   </message>
+
+   <message type="4422" name="allow_user_result" src="server">
+      <member name="message" type="CONSTANT" value='User &quot;%s&quot; will now be allowed full access to your game.'/>
+      <member name="channel" type="U16"/>
+   </message>
+
+   <message type="4424" name="allow_user_result" src="server">
+      <member name="message" type="CONSTANT" value='Sorry, user &quot;%s&quot; is a guest and cannot be allowed full access to your game.'/>
+      <member name="channel" type="U16"/>
+   </message>
+
+   <message type="4425" name="allow_user_result" src="server">
+      <member name="message" type="CONSTANT" value='Sorry, user &quot;%s&quot; does not seem to exist and cannot be allowed into your game.'/>
+      <member name="channel" type="U16"/>
+   </message>
+
+   <message type="4428" name="add_tree" src="server">
+      <p>See <ref ref="set_tree"/>. In addition, flags the tree as being
+      uploaded completely.</p>
+      <member name="channel" type="U16"/>
+      <member name="tree" type="TREE"/>
+   </message>
+
+   <message type="4429" name="reject_challenge" src="server">
+      Reject a challenge by a given user. Not checked.
+      <!-- should become a record type somehow... -->
+
+      <member name="channel" type="U16"/>
+      <member name="name" type="username"/>
+      <member name="gametype" type="U8"/>
+      <member name="cid" type="CLIENTID8"/>
+      <p>Possibly an id. No idea. Better echo this from the challenge request.</p>
+      <member name="rules" type="rules"/>
+   </message>
+
+   <message type="442b" name="set_comments" src="server">
+      <p>Sent at end of games to set the comments not seen previously.</p>
+      <member name="channel" type="U16"/>
+      <member name="node" type="U32"/>
+      <member name="comments" type="STRING"/>
+   </message>
+
+   <message type="442c" name="add_comments" src="server">
+      <p>Sent at end of games to add all game commentary.</p>
+      <member name="channel" type="U16"/>
+      <member name="node" type="U32"/>
+      <member name="comments" type="STRING"/>
+   </message>
+
+   <message type="442d" name="more_comments" src="server">
+      <p>Quite brokenly, the server sends you this to make you ask for more comments.
+      Reply with <ref reply="more_comments"/>.</p>
+      <member name="channel" type="U16"/>
+      <member name="node" type="U32"/>
+   </message>
+
+   <message type="442f" name="new_game" src="server">
+      <p>Notifies the client that a new game has been created. This
+      message is sent long *after* upd_games and upd_observers etc.
+      have been received. *sigh*</p>
+
+      <member name="channel" type="U16"/>
+      <p>The newly created game.</p>
+      <member name="cid" type="CLIENTID16"/>
+      <p>The ID sent to the server in new_game.</p>
+   </message>
+
+   <message type="4433" name="req_result" src="server">
+       Unclear.
+       <member name="channel" type="U16"/>
+       # # recv_result(?)
+   </message>
+
+   <message type="4434" name="set_quiet" src="server">
+      <p>Sets (or clears) the quiet flag on a game.</p>
+      <member name="channel" type="U16"/>
+      <member name="quiet" type="flag"/>
+   </message>
+
+   <message type="4437" name="set_gametime" src="server">
+      <p>Sent when joining a running game. Gives the remaining time +
+      periods/moves for the players, to correctly initialize the clocks.</p>
+      <member name="channel" type="U16"/>
+      <member name="black_time" type="time"/>
+      <member name="black_moves" type="U16"/>
+      <member name="white_time" type="time"/>
+      <member name="white_moves" type="U16"/>
+   </message>
+
+   <message type="443b" name="del_global_challenge" src="server">
+      <p>
+         Remove a game from the global challenge list (open game list).
+      </p>
+      <member name="channel" type="U16"/>
+      <p>The game id to remove.</p>
+      <member name="game" type="U16"/>
+      <p>Probably the same. I suggest to use this id for no good reason.</p>
+   </message>
+</body>
+</html>
+

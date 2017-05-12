@@ -1,0 +1,44 @@
+---
+abstract: 'form validator'
+author:
+  - 'Masahiro Nagano <kazeburo@gmail.com>'
+build_requires:
+  HTTP::Message::PSGI: 0
+  HTTP::Request::Common: 0
+  Plack::Request: 0
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.7.5, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Kossy-Validator
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Kossy::Validator:
+    file: lib/Kossy/Validator.pm
+    version: 0.01
+  Kossy::Validator::Result:
+    file: lib/Kossy/Validator.pm
+requires:
+  Hash::MultiValue: 0
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/kazeburo/Kossy-Validator/issues
+  homepage: https://github.com/kazeburo/Kossy-Validator
+  repository: git://github.com/kazeburo/Kossy-Validator.git
+version: 0.01

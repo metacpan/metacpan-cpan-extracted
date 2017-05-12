@@ -1,0 +1,8 @@
+Build.PL
+CHANGES
+lib/Acme/Colour.pm
+MANIFEST			This list of files
+META.yml
+Makefile.PL
+README
+test.pl

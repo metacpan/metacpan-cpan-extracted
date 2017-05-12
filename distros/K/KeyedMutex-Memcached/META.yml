@@ -1,0 +1,45 @@
+---
+abstract: 'An interprocess keyed mutex using memcached'
+author:
+  - 'Toru Yamaguchi <zigorou@cpan.org>'
+build_requires:
+  Cache::Memcached::Fast: '0'
+  File::Which: '0'
+  Proc::Guard: '0'
+  Test::More: '0'
+  Test::Skip::UnlessExistsExecutable: '0'
+  Test::TCP: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+  perl: 5.008_001
+dynamic_config: 0
+generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: KeyedMutex-Memcached
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  KeyedMutex::Memcached:
+    file: lib/KeyedMutex/Memcached.pm
+    version: '0.05'
+requires:
+  Scope::Guard: '0'
+  Time::HiRes: '0'
+resources:
+  bugtracker: https://github.com/zigorou/p5-keyedmutex-memcached/issues
+  homepage: https://github.com/zigorou/p5-keyedmutex-memcached
+  repository: git://github.com/zigorou/p5-keyedmutex-memcached.git
+version: '0.05'
+x_contributors:
+  - 'karupanerura <karupa@cpan.org>'

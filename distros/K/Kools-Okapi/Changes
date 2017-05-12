@@ -1,0 +1,27 @@
+# Changes log for Kools-Okapi
+=============================
+
+263.005   2009/03/02
+          - implemented the set_fds_callback and select_msg_callback functions.
+
+263.004   2009/02/28
+          - implementated the ICC_multixxxxx functions. The Perl versions
+            just take an array of ICC objects.
+          - fixed a bug with client data (ICC_CLIENT_DATA). Works well now.
+            receives a scalar a a parameter, but that can be a reference to
+            an array, hash ...
+
+263.003   2009/02/25
+          - changed numbering scheme so something a bit more simple and user
+            friendly. It will still follow the Kondor+ version number with a
+            sequence number added. Will see how this evolves with time ...
+          - added most callbacks (still missing the SET_FDS callback)
+          - added ICC_main_xxx functions
+
+2.6.3.L3.002  2009/02/22
+              - Now have a working tradekast and kis client (see the test
+                scripts). Still basic/strict minimum functionality is supported
+                but still a proper working client is possible.
+
+2.6.3.L3.001  2009/02/17
+              - Initial release

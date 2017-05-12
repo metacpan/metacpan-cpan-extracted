@@ -1,0 +1,26 @@
+--- 
+abstract: high-level invindex management interface
+author: 
+  - Hans Dieter Pearcey, C<< <hdp@cpan.org> >>
+build_requires: 
+  Test::MockObject: 1.06
+  Test::More: 0.62
+distribution_type: module
+generated_by: Module::Install version 0.68
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: KSx-IndexManager
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Carp::Clan: 5.3
+  Class::Accessor::Grouped: 0.06000
+  Data::OptList: 0.101
+  KinoSearch: 0.20_04
+  Module::Pluggable: 3.1
+  perl: 5.00.004
+version: 0.004

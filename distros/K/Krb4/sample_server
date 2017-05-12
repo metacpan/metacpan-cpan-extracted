@@ -1,0 +1,50 @@
+#!/usr/local/bin/perl
+
+# An exceedingly simple server using Authen::Krb4
+
+use IO::Socket;
+use Sys::Hostname;
+use Authen::Krb4;
+
+$SERVER_PORT=6789;
+$SERVICE='rcmd';
+
+$sock=new IO::Socket::INET(
+	LocalPort	=> $SERVER_PORT,
+	Proto		=> 'tcp',
+	Listen		=> 5,
+	Reuse		=> 1
+);
+
+$sock or die "couldn't create socket";
+
+# get instance for requested service
+$phost=Authen::Krb4::get_phost(hostname());
+
+while ($new_sock=$sock->accept()) {
+	while (defined($buf=<$new_sock>)) {
+		$dat.=$buf;
+
+		# read up to ___END_TICKET
+		if ($buf=~/___END_TICKET/) {
+			$dat=~s/___END_TICKET\n//;
+			last;
+		}
+
+	}
+
+	# create a new ticket with the data from the client
+	$ticket=new Authen::Krb4::Ticket($dat);
+
+	# decrypt ticket & see what we've got
+	$ad=Authen::Krb4::rd_req($ticket,$SERVICE,$phost,"");
+
+	# send a message back to the client
+	if ($ad) {
+		print $new_sock "Hello, ",$ad->pname,"!\n";
+	}
+	else {
+		print $new_sock "Couldn't decode your ticket!\n";
+	}
+	close($new_sock);
+}

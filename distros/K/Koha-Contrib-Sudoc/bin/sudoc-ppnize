@@ -1,0 +1,68 @@
+#!/usr/bin/perl 
+
+# PODNAME: sudoc--ppnize
+# ABSTRACT: Ajout de PPN aux notices biblio d'un Catalogue Koha
+
+package Main;
+$Main::VERSION = '2.23';
+use Modern::Perl;
+use Getopt::Long;
+use Pod::Usage;
+use Koha::Contrib::Sudoc;
+use Koha::Contrib::Sudoc::PPNize::Reader;
+use Koha::Contrib::Sudoc::PPNize::Updater;
+
+my ($help, $doit);
+GetOptions(
+    'help|h'   => \$help,
+    'doit'     => \$doit,
+);
+
+my $iln = shift @ARGV;
+if ( $help ) {
+    pod2usage( -verbose => 2 );
+    exit;
+}
+my $sudoc  = Sudoc->new;
+
+my $file = shift @ARGV;
+unless ($file) {
+    pod2usage( -verbose => 2 );
+    exit;
+}
+
+my $updater = Koha::Contrib::Sudoc::PPNize::Updater->new(
+    reader  => Koha::Contrib::Sudoc::PPNize::Reader->new( file => $file ),
+    sudoc   => $sudoc,
+    doit    => $doit,
+    verbose => 1,
+);
+$updater->run();
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+sudoc--ppnize - Ajout de PPN aux notices biblio d'un Catalogue Koha
+
+=head1 VERSION
+
+version 2.23
+
+=head1 AUTHOR
+
+Frédéric Demians <f.demians@tamil.fr>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2016 by Fréderic Demians.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

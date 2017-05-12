@@ -1,0 +1,8 @@
+Build.PL
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+README
+lib/Kwiki/PPerl.pm
+t/pod-coverage.t
+t/pod.t

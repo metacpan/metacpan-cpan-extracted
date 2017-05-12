@@ -1,0 +1,37 @@
+0.06
+    - Catch the exception for opening a nonexistent file and make it nonfatal
+
+0.05
+    - Add new concurrency test
+
+0.04
+    - Die if a file already exists but there is no prev entry (insert instead
+      of update).
+
+0.03
+    - Allow passing 'nfs', 'global_lock' and 'auto_commit' flags to
+      Directory::Transactional
+    - Update dependency on Directory::Transactional to 0.03
+
+0.02
+    - Delegate txn_do methods
+    - Update dependency on Directory::Transactional to 0.02
+
+0.02_02
+    - Update dep on KiokuDB
+
+0.02_01
+    - Use Directory::Transactional to provide transaction support
+
+0.01 (JSPON 0.06)
+    - Rename to KiokuDB::Backend::Files
+    - add 'create' attribute
+    - switch to Serialize::Delegate
+    - add trie support
+
+0.05
+    - Depend on a more recent IO (binmode method is missing in older ones)
+    - Refactor JSON handling and move to KiokuDB core
+
+0.04
+    - update test suite to not use KiokuDB::Resolver

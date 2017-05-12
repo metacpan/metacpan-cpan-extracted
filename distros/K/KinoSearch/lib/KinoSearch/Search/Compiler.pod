@@ -1,0 +1,219 @@
+
+# Auto-generated file -- DO NOT EDIT!!!!!
+
+=head1 NAME
+
+KinoSearch::Search::Compiler - Query-to-Matcher compiler.
+
+=head1 DEPRECATED
+
+The KinoSearch code base has been assimilated by the Apache L<Lucy> project.
+The "KinoSearch" namespace has been deprecated, but development continues
+under our new name at our new home: L<http://lucy.apache.org/>
+
+=head1 SYNOPSIS
+
+    # (Compiler is an abstract base class.)
+    package MyCompiler;
+    use base qw( KinoSearch::Search::Compiler );
+
+    sub make_matcher {
+        my $self = shift;
+        return MyMatcher->new( @_, compiler => $self );
+    }
+
+
+
+=head1 DESCRIPTION
+
+The purpose of the Compiler class is to take a specification in the form of
+a L<Query|KinoSearch::Search::Query> object and compile a
+L<Matcher|KinoSearch::Search::Matcher> object that can do real work.  
+
+The simplest Compiler subclasses -- such as those associated with
+constant-scoring Query types -- might simply implement a make_matcher()
+method which passes along information verbatim from the Query to the
+Matcher's constructor.
+
+However it is common for the Compiler to perform some calculations which
+affect it's "weight" -- a floating point multiplier that the Matcher will
+factor into each document's score.  If that is the case, then the Compiler
+subclass may wish to override get_weight(), sum_of_squared_weights(), and
+apply_norm_factor().
+
+Compiling a Matcher is a two stage process. 
+
+The first stage takes place during the Compiler's constructor, which is
+where the Query object meets a L<Searcher|KinoSearch::Search::Searcher>
+object for the first time.  Searchers operate on a specific document
+collection and they can tell you certain statistical information about the
+collection -- such as how many total documents are in the collection, or
+how many documents in the collection a particular term is present in.
+KinoSearch's core Compiler classes plug this information into the classic
+TF/IDF weighting algorithm to adjust the Compiler's weight; custom
+subclasses might do something similar.
+
+The second stage of compilation is make_matcher(), method, which is where
+the Compiler meets a L<SegReader|KinoSearch::Index::SegReader> object.
+SegReaders are associated with a single segment within a single index on a
+single machine, and are thus lower-level than Searchers, which may
+represent a document collection spread out over a search cluster
+(comprising several indexes and many segments).  The Compiler object can
+use new information supplied by the SegReader -- such as whether a term is
+missing from the local index even though it is present within the larger
+collection represented by the Searcher -- when figuring out what to feed to
+the Matchers's constructor, or whether make_matcher() should return a
+Matcher at all.
+
+=head1 CONSTRUCTORS
+
+=head2 new( I<[labeled params]> )
+
+    my $compiler = MyCompiler->SUPER::new(
+        parent     => $my_query,
+        searcher   => $searcher,
+        similarity => $sim,        # default: undef
+        boost      => undef,       # default: see below
+    );
+
+Abstract constructor.
+
+=over
+
+=item *
+
+B<parent> - The parent Query.
+
+=item *
+
+B<searcher> - A KinoSearch::Search::Searcher, such as an
+IndexSearcher.
+
+=item *
+
+B<similarity> - A Similarity.
+
+=item *
+
+B<boost> - An arbitrary scoring multiplier.  Defaults to the boost of
+the parent Query.
+
+=back
+
+
+
+=head1 ABSTRACT METHODS
+
+=head2 make_matcher( I<[labeled params]> )
+
+Factory method returning a Matcher.
+
+=over
+
+=item *
+
+B<reader> - A SegReader.
+
+=item *
+
+B<need_score> - Indicate whether the Matcher must implement score().
+
+=back
+
+Returns: a Matcher, or undef if the Matcher would have matched no
+documents.
+
+
+
+=head1 METHODS
+
+=head2 get_weight()
+
+Return the Compiler's numerical weight, a scoring multiplier.  By
+default, returns the object's boost.
+
+=head2 sum_of_squared_weights()
+
+Compute and return a raw weighting factor.  (This quantity is used by
+normalize()).  By default, simply returns 1.0.
+
+=head2 apply_norm_factor(factor)
+
+Apply a floating point normalization multiplier.  For a TermCompiler,
+this involves multiplying its own weight by the supplied factor;
+combining classes such as ORCompiler would apply the factor recursively
+to their children.  
+
+The default implementation is a no-op; subclasses may wish to multiply
+their internal weight by the supplied factor.
+
+=over
+
+=item *
+
+B<factor> - The multiplier.
+
+=back
+
+=head2 normalize()
+
+Take a newly minted Compiler object and apply query-specific
+normalization factors.  Should be called at or near the end of
+construction.
+
+For a TermQuery, the scoring formula is approximately:
+
+    ( tf_d * idf_t / norm_d ) * ( tf_q * idf_t / norm_q ) 
+
+normalize() is theoretically concerned with applying the second half of
+that formula to a the Compiler's weight. What actually happens depends
+on how the Compiler and Similarity methods called internally are
+implemented.
+
+=head2 get_parent()
+
+Accessor for the Compiler's parent Query object.
+
+=head2 get_similarity()
+
+Accessor for the Compiler's Similarity object.
+
+=head2 highlight_spans( I<[labeled params]> )
+
+Return an array of Span objects, indicating where in the given
+field the text that matches the parent query occurs.  In this case,
+the span's offset and length are measured in Unicode code points.
+The default implementation returns an empty array.
+
+=over
+
+=item *
+
+B<searcher> - A Searcher.
+
+=item *
+
+B<doc_vec> - A DocVector.
+
+=item *
+
+B<field> - The name of the field.
+
+=back
+
+
+
+=head1 INHERITANCE
+
+KinoSearch::Search::Compiler isa L<KinoSearch::Search::Query> isa L<KinoSearch::Object::Obj>.
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005-2011 Marvin Humphrey
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
+

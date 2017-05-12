@@ -1,0 +1,13 @@
+: include print::header
+
+<p>Sauf erreur de notre part, les documents ci-dessous sont toujours en
+votre possession. Veuillez les rapporter au plus tôt. A bientôt pour de
+nouvelles lectures.</p>
+
+<p>Si vous possédez un identifiant et un mot de passe pour vous connecter à
+notre catalogue en ligne (http://biblio.sevran.fr), vous pouvez depuis
+celui-ci prolonger la durée de prêt des documents.</p>
+
+: include print::items
+
+: include print::footer

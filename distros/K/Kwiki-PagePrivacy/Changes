@@ -1,0 +1,5 @@
+---
+version: 0.10
+date: Tue Dec 28 21:26:08 PST 2004
+changes:
+- Initial version of Kwiki::PagePrivacy

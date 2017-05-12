@@ -1,0 +1,149 @@
+=pod
+
+=encoding utf-8
+
+=for stopwords invocant invocants lexicals unintuitive yada globals
+
+=head1 NAME
+
+Kavorka::Manual::MethodModifiers - before/after/around keywords
+
+=head1 DESCRIPTION
+
+Kavorka provides the C<before>, C<after> and C<around> keywords for
+method modifiers.
+
+Method modifiers should work in L<Moose>, L<Moo>, L<Mouse> and
+L<Role::Tiny> classes and roles. In other classes they will fall back
+to using L<Class::Method::Modifiers>.
+
+The keywords C<augment> and C<override> are also available, but will
+only work in classes backed by a framework that supports these
+modifiers (i.e. L<Moose> or L<Mouse>, but I<not> L<Moo>).
+
+The anatomy of a method modifier:
+
+=over
+
+=item 1.
+
+The keyword introducing the method.
+
+=item 2.
+
+The method names.
+
+=item 3.
+
+The signature (optional).
+
+=item 4.
+
+Traits (optional).
+
+=item 5.
+
+The prototype (optional).
+
+=item 6.
+
+The attribute list (optional).
+
+=item 7.
+
+The modifier body.
+
+=back
+
+Example:
+
+   #  (1)   (2)    (3)    (4)     (5)  (6)     (7)
+      after foobar ($foo) is cool :($) :cached { $self->log("foobar $foo") }
+
+=head2 The Keyword
+
+By default, these keywords are exported. They must be exported by
+request:
+
+   use Kavorka qw( before after around );
+   use Kavorka qw( -modifiers );
+
+=head2 The Method Names
+
+These are the names of the methods being wrapped. 
+
+Multiple names may be separated by colons:
+
+   after foo, bar, baz { ... }
+
+=head2 The Signature
+
+See L<Kavorka::Manual::Signatures>.
+
+The C<before> and C<after> keywords have a default invocant called
+C<< $self >>, but it does not have a type constraint, so can equally
+be used for class or object methods.
+
+The C<around> modifier defines two invocants called C<< $next >> and
+C<< $self >>. (C<< ${^NEXT} >> is also available as an alias for
+C<< $next >> for backwards compatibility with Moops::MethodModifiers.)
+
+Beware using type constraints for method modifiers (which are
+essentially wrappers); constraints will be checked at each level of
+wrapping which will slow down method calls.
+
+=head2 Traits
+
+See L<Kavorka::Manual::ExtendingKavorka>.
+
+=head2 The Prototype
+
+See L<Kavorka::Manual::PrototypeAndAttributes>.
+
+Note however that prototypes are fairly useless for methods.
+
+=head2 The Attributes
+
+Attributes may alternatively be provided I<< before the signature >>.
+
+See L<Kavorka::Manual::PrototypeAndAttributes>.
+
+Note that this applies the attribute to the modifier code, and not to
+the method being modified.
+
+=head2 The Modifier Body
+
+This is more or less what you'd expect from the modifier body you'd
+write with L<Moose>, however the lexical variables for parameters
+are pre-declared and pre-populated, and invocants have been shifted
+off C<< @_ >>.
+
+=head1 BUGS
+
+Please report any bugs to
+L<http://rt.cpan.org/Dist/Display.html?Queue=Kavorka>.
+
+=head1 SEE ALSO
+
+L<Kavorka::Manual>,
+L<Kavorka::Manual::Signatures>,
+L<Kavorka::Manual::PrototypeAndAttributes>,
+L<Kavorka::Manual::Methods>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2013-2014, 2017 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

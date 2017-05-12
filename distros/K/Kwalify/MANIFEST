@@ -1,0 +1,17 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+pkwalify
+t/compat.t
+t/Kwalify.t
+t/pkwalify.t
+t/testdata/document05a.yaml
+t/testdata/document05b.yaml
+t/testdata/kwalify.yaml
+t/testdata/schema05.yaml
+t/testdata/META-spec-1.3.yml
+lib/Kwalify.pm
+lib/Schema/Kwalify.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

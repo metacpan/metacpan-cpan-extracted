@@ -1,0 +1,19 @@
+Kwiki-Edit-BackgroundSave
+
+Adds a button to the edit screen which will allow a user to save without
+existing the page. By default this button is called "BACKGROUND SAVE" but
+it can be configured to be something else. I often suggest it be configured
+to be simply "SAVE" and reconfigure the normal save button to be "FINISH".
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    kwiki -install Kwiki::Edit::BackgroundSave
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 CorData
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

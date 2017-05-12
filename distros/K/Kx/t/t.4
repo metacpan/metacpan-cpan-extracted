@@ -1,0 +1,67 @@
+# How to store a complicated data structure into KDB+ and retrieve it in
+# binary
+#########################
+
+# change 'tests => 2' to 'tests => last_test_to_print';
+
+use Test::More tests => 3;
+use Kx;
+use Time::HiRes (gettimeofday);
+use Compress::Zlib qw/compress uncompress/;
+use Storable qw/nfreeze thaw/;
+
+my $k = new Kx(host=>"localhost", port=>2222, check_for_errors=>1);
+ok( defined $k, 'New');
+my $rv = $k->connect;
+ok(defined $rv, 'Connect');
+die "Can't connect to KDB+ " unless $rv;
+
+# create new table
+$k->Tnew(name=>'mytab',cols=>[qw/id data ts/]);
+
+my $t0 = gettimeofday;
+# Build complicated Perl structure 10,002 hash variables
+my $arr = { a=>['a','b','c',1,2,3], b=>'this is a test'};
+for (0..10000)
+{
+	$arr->{$_} = {$_ => $_};
+	$arr->{"a$_"} = [$_, $_];
+}
+
+my $t1 = gettimeofday;
+print "Time to build data structure = ", $t1-$t0, " secs\n";
+# Serialise it as a compressed piece of data
+my $arrsym =  nfreeze($arr);
+print "Dumper size is: ", length $arrsym, "\n";
+$arrsym = compress( $arrsym );
+print "Compress Dumper size is: ", length $arrsym, "\n";
+
+my $data = $k->listof(length($arrsym),Kx::KG());  # list of length bytes
+$data->setbin($arrsym);
+my $t2 = gettimeofday;
+print "Time to Dump and Compress = ", $t2-$t1, " secs\n";
+
+# Insert it into a table
+$k->cmd('{[x]insert[`mytab](0;x;.z.z)}',$data->kval);
+#my $rtn = Kx::kn($k->{'kdb'},'{[x]insert[`mytab](0;x;.z.z)}',$data->{'K'});
+#warn Kx::dump($rtn),"\n";
+my $t3 = gettimeofday;
+print "Time to insert data = ", $t3-$t2, " secs\n";
+
+# Select a single row from the table, and return it's data
+my $binary = $k->cmd('(select data from mytab where id=0)[0;`data]');
+
+# Get the data back into Perl string form
+$arrsym = uncompress($binary);
+#print $arrsym,"\n";
+my $t4 = gettimeofday;
+print "Time to select and uncompress data = ", $t4-$t3, " secs\n";
+
+# Eval the string into a Perl data structure
+my $narr = thaw($arrsym);
+my $t5 = gettimeofday;
+print "Time to eval data structure = ", $t5-$t4, " secs\n";
+ok($narr->{'b'} eq 'this is a test', "Perl data");
+#print $VAR1->{'b'},"\n";
+
+print "End\n";

@@ -1,0 +1,17 @@
+Revision history for Konfidi
+
+1.0.4    6 Jan 2008
+        Update to work with 1.1.0 release of trustserver frontend
+            e.g. no pgpquery option
+        URI escape query parameters
+        No default strategy
+        Uses full topic URIs
+1.0.3    6 Jan 2007
+        Remove tests' unnecessary and undeclared usage of Acme::Comment
+1.0.2    2 Jan 2007
+        Fixed dependency declaration on Error.pm
+1.0.1    1 Jan 2007
+        Reorganized tests so only the important ones run
+1.0.0    1 Jan 2007
+        First release
+

@@ -1,0 +1,12 @@
+name: Kwiki-SocialMap
+version: 0.09
+abstract: Kwiki plugin that render social relations
+author: Kang-min Liu (gugod@gugod.org)
+license: perl
+distribution_type: module
+requires:
+  Kwiki: 0.31
+no_index:
+  directory:
+    - inc
+generated_by: Module::Install version 0.35

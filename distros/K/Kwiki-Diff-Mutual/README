@@ -1,0 +1,27 @@
+This is Perl module Kwiki::Diff::Mutual.
+
+INSTALLATION
+
+Kwiki::Diff::Mutual installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan Kwiki::Diff::Mutual
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+DOCUMENTATION
+
+Kwiki::Diff::Mutual documentation is available as in POD. So you can do:
+
+    % perldoc Kwiki::Diff::Mutual
+
+to read the documentation online with your favorite pager.
+
+Kazuhiro Osawa

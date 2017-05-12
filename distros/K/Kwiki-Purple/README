@@ -1,0 +1,26 @@
+
+Kwiki-Purple is a suite of tools for adding support for purple
+numbers to Kwiki. See http://purple.blueoxen.net/ and 
+http://purplewiki.blueoxen.net/ for an introduction to the
+concepts and goals of Purple Numbers.
+
+This is an improving alpha version. That means:
+
+* Do not rely on the data structures and text formats used in
+  this version to remain supported in the future. There's no
+  guarantee of backwards compatibility.
+
+* This plugin rewrites your wiki page text before saving it to
+  disk. If something goes wrong in this process, your content
+  may be lost. Please backup your wiki before experimenting
+  with Kwiki::Purple
+
+If you have questions or comments, please contact the author:
+Chris Dent <cdent@burningchrome.com>. I'm also around on #kwiki
+as cdent.
+
+There is a demo Purple Kwiki running at 
+
+  http://www.burningchrome.com/pwiki/
+
+

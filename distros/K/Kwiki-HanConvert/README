@@ -1,0 +1,13 @@
+Kwiki::HanConvert - Convert page display to simplified / traditional Chinese.
+
+This Kwiki plugin make use of Encode::HanConvert, and adds [Simp] and
+[Trad] on your toolbar, which conver your page display to Simplified
+Chinese or Traditional Chinese on the fly. The conversion is
+accomplished after page rendering, so the page content is not changed.
+
+Cheers,
+Kang-min "Gugod" Liu
+
+
+
+

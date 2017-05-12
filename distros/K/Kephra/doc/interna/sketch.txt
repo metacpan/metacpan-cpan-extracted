@@ -1,0 +1,80 @@
+[name]
+ pce = perfect coding enviroment |
+       perl crypted extension |
+       polymorphic code elements ....
+
+ pce -  pse? namensgebung aus kosmologischen gründen
+        mit ein paar quantenphysikalischen Überlegungen(bootstrap-aufbau)
+        aus elementen aufgebau soll der editor soll universal einsetzbar sein
+
+ Perfekt - natürlich soll die software die beste sein
+
+ perl - ist die sprache in der der editor geschrieben ist
+        der geist von perl:(tismtowtdi)(maximale freiheit -
+            kombinierbarkeit der kräfte von elementen )
+            alles ist schöpfung also auch wandlung nur gott ist ewig
+
+ coding - es geht um textbeabeitung es geht um schiffrierung und sinngebung
+          in verschiedenem syntax
+
+ enviroment - nicht emacs aber es sollte alles bieten was ein programmierer
+              braucht um texte zu bearbeiten
+
+
+[warum perl?]
+ - perl ist effektiv, mächtig, unaufdringlich, schnell genug und meine lieblingssprache
+ - idealer textprozessor/es geht um textbasierendes editieren
+ - perl als scriptsprache erlaubt einheitliches format für quellcode, config, macros,plugins
+   im einheitlichen namensraum!!!
+ - da der quellcode perl ist, braucht man nur den editor um den editor zu verbessern
+   (+eingebaute hilfen)
+
+
+[softwaredesign]
+- für win / lin(gtk)
+ - bin anteil platformabhängig
+ - src(perl + wx) plattformunabhängig
+ - installer: NSIS / rpm
+- visual toolkit:wxPerl
+- nutzung vieler wichtiger open source gemeindschaften: scintilla(wxSTC),
+  wxwindows, mozilla(wxMozilla), CPAN
+- autonom / keine detein benötigt ausser das was der interaktive downloadmanager ausspuckt
+- minimal perl(800kB) und andere opensource tools(tidy,cvs,7z,bzip) enthalten(je bedarf)
+- < 9MB incl perl und wxperl; <1 MB eigentlicher quellcode
+- autonome Module mit autoerkennung
+
+[config]
+- config in lokalen text-datein die jeden umzug überstehen
+- alles Konfigurierbar(graphisch und in textdatein)
+- teilverhalten in subconfigs splitbar / subconfigs frei einbindbar
+- alles ist automatisierbar / jede Aktion ist ein macrokommando
+- leichte übersetzung in andere sprachen
+
+
+[visual design]
+- viele Module - 1 Fenster
+- möglichst wenig dialogboxen
+- optionale kommandozeile (z.B 1für shell und eine für suchbefehle)
+- wiederverwendbare gleichstrukturierte module
+- mit gehaltener taste sollen module frei positionierbar sein
+- exotische schriftsätze später, dank pango
+
+geplante module/bennung noch unklar
+mehrfache instanzen eines module(2 texte parralel) sollen möglich sein
+[module]
+
+(neutron) kern/oberfläche/plugin,update& statuszentrale
+(proton) editorkomponente / visuals
+(elektron) kommandozeile / kommandozentral4
+
+weitere:
+-projektverwaltung
+-schnittstelle zum dateisystem
+-semantische struktur
+-textbibliothek
+-kurzhilfen zur aktuellen programmiersprache / sprachbaum
+-shortcuts
+-vorschau/wxMozilla/wxIE vielleicht später auch für tex uä
+-streng geheime visualisierungs werkzeuge
+
+[extensions]

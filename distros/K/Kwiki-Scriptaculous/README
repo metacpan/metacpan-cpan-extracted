@@ -1,0 +1,25 @@
+Kwiki-Scriptaculous
+
+Will add the Script.aculo.us javascript library to a Kwiki installation. It
+serves no purpose but to allow other modules (mainly Web 2.0 modules) access to
+this javascript library without having to include them. This module also
+requires the Kwiki::Prototype module automatically for you.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+%> kwiki -install Kwiki::Scriptaculous
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Kwiki::Scriptaculous
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 Eric Anderson
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. See http://www.perl.com/perl/misc/Artistic.html

@@ -1,0 +1,36 @@
+/* $Id: create_db.oracle,v 1.3 2008-04-24 16:50:35 mike Exp $ */
+
+/*
+ * Create the database as follows:
+ *	sqlplus -S system/******** @create_db.oracle
+ *
+ * After that, create the tables and sequences as follows:
+ *	sqlplus -S ko_admin/ko_adm_3636 @create_tables.oracle
+ *	sqlplus -S ko_admin/ko_adm_3636 @create_sequences.oracle
+ *
+ * For now (while we are in the development phase), this script is
+ * DESTRUCTIVE, and will destroy any existing dastabase in order to
+ * make a new one.
+ *
+ * Note that the term "database" in the application sense that we are
+ * using it here does not correspond to Oracle's similarly named
+ * concept, but to the set of tables, indexes etc. owned by a user,
+ * which together constitute (in Oracle terms) a "schema".  Thus, to
+ * make a database we use CREATE USER.  Strange but true.
+ *
+ * Note, too, that each application database in Oracle is owned by a
+ * single user, so we use that same single user for both read-only and
+ * read-write access.  (There must be a way around this, but that is
+ * for another day.)
+ *
+ * For direct invocation of SQL, from sqlplus or DBD::Oracle, it
+ * suffices for the user to have RESOURCE privileges; but this does
+ * _not_ allow you to create objects from within stored procedures --
+ * hence the explicit additional grants the creation actions that we
+ * need to make from within a procedure.
+ */
+
+DROP USER ko_admin CASCADE;
+CREATE USER ko_admin IDENTIFIED BY ko_adm_3636;
+GRANT CREATE SESSION, RESOURCE, CREATE SEQUENCE, CREATE TRIGGER TO ko_admin;
+QUIT

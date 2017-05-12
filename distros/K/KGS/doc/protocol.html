@@ -1,0 +1,8276 @@
+<html>
+<head>
+<title>KGS Protocol Description</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!--
+    Copyright (C) 2003,2004 Marc Lehmannn &lt;pcg@goof.com&gt;
+ 
+    You can redistribute and/or modify this document under the terms of
+    the GNU General Public License as published by the Free Software
+    Foundation; either version 2 of the License, or (at your option) any
+    later version.
+
+    This document is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc. 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-->
+</head>
+<body>
+
+<h1>$Revision: 1.78 $</h1>
+
+<h1>KGS Protocol Description</h1>
+
+   <p>This XML document describes the KGS protocol. It is also used
+   to automatically generate the perl parser for all the messages and
+   structures in the protocol. Adapting it to other languages should be
+   almost trivial (and partly has been done).</p>
+
+   <p>If you feel you need to update the visual appearance of this
+   document, feel free to look at <tt>doc/doc2html.xsl</tt> and improve
+   it.</p>
+
+   <p>The current version of this document can always be found at 
+   <a href="http://cvs.schmorp.de/browse/*checkout*/kgsueme/doc/protocol.xml">here</a>, while
+   the HTML version of it can be found
+   <a href="http://cvs.schmorp.de/browse/*checkout*/kgsueme/doc/protocol.html">here</a>.</p>
+
+<h2>Structure and conventions of this document and the protocol</h2>
+
+   <p>"ORIGIN: CLIENT" means messages send from the client to the server,
+   while "ORIGIN: SERVER" means messages send by the server to the
+   client.</p>
+
+   <p>Everything on the wire is in little-endian format (what a shame).</p>
+
+   <p>Primitive types are mostly integers (signed
+   "<code>I</code>&lt;bits&gt;", unsigned "<code>U</code>&lt;bits&gt;"),
+   ascii strings ("<code>username</code>"), zero- or non-terminated
+   UCS2-Strings ("<code>ZSTRING</code>" or "<code>STRING</code>"). Yes,
+   I know java is supposed to do UTF-16, but no implementation seems to
+   care...</p>
+
+   <p>To get a feel for the protocol, get the <tt>KGS</tt> perl module
+   from CPAN, install it an run <tt>kgstrace</tt>, then conenct to
+   <tt>127.0.0.1</tt> with your client. <tt>kgstrace</tt> will dump all
+   messages from and to the server.</p>
+
+   <p>For the rest, go figure or bug me, <a href="mailto:pcg@goof.com">Marc Lehmann &lt;pcg@goof.com&gt;</a>
+    </p>
+
+<h2>Stream and message structure.</h2>
+
+   <p>After connecting to the server, a handshake byte is sent. It's
+   the major version number of the protocol the client expects to
+   receive. Version 3 and 4 are mostly the same, except that Version 4
+   clients expect server messages to be compressed, version 3 clients
+   do not. (version 3 probably is no longer supported).</p>
+
+   <p>The server sends back his protocol number, which is always 3 in
+   the current protocol. Most of the protocol variation is determined by
+   the server using the client version that is used in the initial login
+   message, not the initial handshake byte.</p>
+
+   <p>After the initial handshake, the client sends uncompressed
+   messages, while the server sends back a zlib-compressed
+   stream (<a href="http://rfc1950.x42.com/">rfc1950</a> and <a href="http://rfc1950.x42.com/">rfc1951</a>).</p>
+
+   <p>All messages have the same header:</p>
+
+   <h4>STRUCTURE message_header</h4>
+    <p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>length</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+
+      <p>The length is the length of the full message including the header.</p>
+
+      <p>Beginning with version 2.5.x, a number is xored into the low
+      byte of the length in <em>sent</em> packages only, as given by the
+      following recurrence: <code>rand[0] = 0; rand[i+1] = msg[i].length
+      + (rand[i] * 0x04c2af9b + 0xfffffffb); xorbyte = rand &gt;&gt;
+      24</code>, all in 32 bit unsigned iso-c arithmetic.</p>
+
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>type</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      <p>If the type is &gt;= 0x4000 this is a message for a specific channel. The channel
+      number is always the next U16. All of these channel values are valid, including zero.</p>
+
+      <p>Beginning with version 2.5.x, a number is <em>added</em> on <em>received</em>
+      messages only. The algorithm is as follows:
+      
+      <pre>
+         msglen &lt; 44: type = typefield
+         msglen &gt; 44: type = (typefield + rand[i]) % 0x10000
+            rand[0] = 0
+            rand[i+1] = username[type % length username] + rand[i] * (type - 0x6cdd)
+               where username is the user name of the logged-in user. coooool.
+      </pre>
+      </p>
+
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+<h2>Primitive types used in the protocol.</h2>
+
+   <p>Apart from the basic types, I need to define some extra types to
+   deal with fixed-point values (based on integer types) or fixed-length
+   strings (either 7-bit-ascii or more limited (<code>A</code>), or UCS-2
+   based (<code>S</code>)).</p>
+
+   <h4>TYPE username</h4>
+   BASE TYPE A, LENGTH 10, MULTIPLIER <br />
+
+   <p>The basic user or login name, used throughout the protocol
+   as a handle to the user.</p>
+
+   <h4>TYPE roomname</h4>
+   BASE TYPE S, LENGTH 25, MULTIPLIER <br />
+    <!-- argh, how horribly broken -->
+
+   <p>Many strings in the protocol are fixed-width for no good reason
+   (maybe this is one reason for using compression in newer versions, as
+   the packets itself are wasting lots of space.</p>
+
+   <h4>TYPE realname</h4>
+   BASE TYPE S, LENGTH 50, MULTIPLIER <br />
+   <h4>TYPE email</h4>
+   BASE TYPE S, LENGTH 70, MULTIPLIER <br />
+   <h4>TYPE userinfo</h4>
+   BASE TYPE S, LENGTH 1000, MULTIPLIER <br />
+   <h4>TYPE url</h4>
+   BASE TYPE A, LENGTH 100, MULTIPLIER <br />
+
+   <p>Used in user_record.</p>
+
+   <h4>TYPE locale</h4>
+   BASE TYPE A, LENGTH 5, MULTIPLIER <br />
+
+   <p>A kind of locale specifier. It seems the general format seems to be
+   lowercase language, underscore, uppercase location, e.g. en_US. More
+   fancy specifications don't fit.</p>
+
+   <h4>TYPE flag</h4>
+   BASE TYPE U8, LENGTH , MULTIPLIER 1<br />
+
+   <p>Just a simple boolean value. 0 means false, and 1 generally true,
+   but I suggest accepting != 0 as true.</p>
+
+   <h4>TYPE komi16_2</h4>
+   BASE TYPE I16, LENGTH , MULTIPLIER 2<br />
+   <h4>TYPE komi16_4</h4>
+   BASE TYPE I16, LENGTH , MULTIPLIER 4<br />
+   <h4>TYPE komi32_2</h4>
+   BASE TYPE I32, LENGTH , MULTIPLIER 2<br />
+   <h4>TYPE komi32_4</h4>
+   BASE TYPE I32, LENGTH , MULTIPLIER 4<br />
+
+   <p>Komi values are multiplied by 2 or 4 to make them integer in the
+   protocol.</p>
+
+   <h4>TYPE result</h4>
+   BASE TYPE I32, LENGTH , MULTIPLIER 2<br />
+
+   <p>The game result is also multiplied by 2 to give it higher
+   resolution. There are also special values for wins by time etc., either
+   in result or in the score* types, or both :)</p>
+
+   <h4>TYPE score16_2</h4>
+   BASE TYPE I16, LENGTH , MULTIPLIER 2<br />
+   <h4>TYPE score16_4</h4>
+   BASE TYPE I16, LENGTH , MULTIPLIER 4<br />
+   <h4>TYPE score32_4</h4>
+   BASE TYPE I32, LENGTH , MULTIPLIER 4<br />
+   <h4>TYPE score32_1000</h4>
+   BASE TYPE I32, LENGTH , MULTIPLIER 1000<br />
+
+   <p>A score value (used for displaying the score at the end of a game)
+   are multiplied by 2 or 4 for a change (the 0.25 resolution is not
+   used). In game structures it is encoded by dividing by two, though, so
+   watch out! And in some others, it's encoded by multiplying by 1000...
+   yuck!</p>
+
+   <h4>TYPE time</h4>
+   BASE TYPE U32, LENGTH , MULTIPLIER 1000<br />
+
+   <p>Time values are multiplied by 1000, giving them millisecond
+   accuracy.</p>
+
+   <h4>TYPE timestamp</h4>
+   BASE TYPE U64, LENGTH , MULTIPLIER 1000<br />
+
+   <p>64 bit timeval, milliseconds since posix epoch, e.g. <code>my
+   ($year, $month, $day) = (gmtime $date * 0.001)[5,4,3];</code>
+    </p>
+
+   <h4>TYPE password</h4>
+   BASE TYPE U64, LENGTH , MULTIPLIER <br />
+
+   <p>Password is a number calculated as follows (VERY insecure, basically
+   plaintext!): <code>password = 0; for char in characters do password ←
+   password * 1055 + ascii_code (char)</code>
+    </p>
+
+   <h4>TYPE CLIENTID16</h4>
+   BASE TYPE U16, LENGTH , MULTIPLIER 1<br />
+   <h4>TYPE CLIENTID8</h4>
+   BASE TYPE U8, LENGTH , MULTIPLIER 1<br />
+
+   <p>An id chosen by the client, usually starting at one, to identify
+   some handshakes initiated by the client, such as new games or memos.</p>
+
+<h2>Enumeration and set types used in the protocol.</h2>
+
+   <h4>enum: GAMETYPE</h4>
+    <p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>DEMONSTRATION</td>
+        <td></td>
+        <td>0 </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>EDITING</td>
+        <td></td>
+        <td>1 </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>TEACHING</td>
+        <td></td>
+        <td>2 </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>SIMUL</td>
+        <td></td>
+        <td>3 </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>FREE</td>
+        <td></td>
+        <td>4 </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>RATED</td>
+        <td></td>
+        <td>5 </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>PRIVATE</td>
+        <td></td>
+        <td>128 </td>
+        <td>
+      <p>PRIVATE is or'ed onto DEMONSTRATION or TEACHING</p>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>set: GAMEFLAG</h4>
+    <p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>SCORED</td>
+        <td></td>
+        <td>1 </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>ADJOURNED</td>
+        <td></td>
+        <td>2 </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>UPLOADED</td>
+        <td></td>
+        <td>4 </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>set: ROOMFLAG</h4>
+    <p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>ADMIN</td>
+        <td></td>
+        <td>0x01 </td>
+        <td>
+      <p>Admins only(?)</p>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>DEFAULT</td>
+        <td></td>
+        <td>0x04 </td>
+        <td>
+      <p>Seems to be set on the english room. Or maybe not.</p>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>PRIVATE</td>
+        <td></td>
+        <td>0x10 </td>
+        <td>
+      <p>This room is private.</p>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>set: GAMESTATUS</h4>
+    <p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>INPLAY</td>
+        <td></td>
+        <td>0x80 </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>enum: SCORE</h4>
+    <p>
+      <p>Special score values, in addition to numerical scores. Some are also used with their
+      negative value. Unfortunately, these are the raw vaues, before scaling. WMS loves code duplication.</p>
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>TIMEOUT</td>
+        <td></td>
+        <td>16384 </td>
+        <td>
+      Also used negatively to score for white instead of black.
+
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>RESIGN</td>
+        <td></td>
+        <td>16385 </td>
+        <td>
+      Also used negatively to score for white instead of black.
+
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>FORFEIT</td>
+        <td></td>
+        <td>    0 </td>
+        <td>
+      Also used negatively to score for white instead of black.
+
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>JIGO</td>
+        <td></td>
+        <td>16386 </td>
+        <td>
+
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>NO_RESULT</td>
+        <td></td>
+        <td>16386 </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>ADJOURNED</td>
+        <td></td>
+        <td>16387 </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>UNKNOWN</td>
+        <td></td>
+        <td>16389 </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>enum: RULESET</h4>
+    <p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>JAPANESE</td>
+        <td></td>
+        <td>0 </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>CHINESE </td>
+        <td></td>
+        <td>1 </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>AGA</td>
+        <td></td>
+        <td>2 </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>NEW_ZEALAND</td>
+        <td></td>
+        <td>3 </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>enum: TIMESYS</h4>
+    <p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>NONE</td>
+        <td></td>
+        <td>0 </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>ABSOLUTE</td>
+        <td></td>
+        <td>1 </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>BYO_YOMI</td>
+        <td></td>
+        <td>2 </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>CANADIAN</td>
+        <td></td>
+        <td>3 </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>enum: COLOUR</h4>
+    <p>
+      <p>Convinience constants used in several places.</p>
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>BLACK</td>
+        <td></td>
+        <td>0 </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>WHITE</td>
+        <td></td>
+        <td>1 </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>NONE</td>
+        <td></td>
+        <td>2 </td>
+        <td>
+      <p>Sometimes used to mark absence of marks, or no player or etc...</p>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+<h2>Structs used in send &amp; receive messages</h2>
+
+   <h4>STRUCTURE user</h4>
+      CLASS: KGS::User<br />
+    <p>
+
+      <p>Almost everywhere a user + flags is required, even used in some places
+      where only a username is required. I see no general rule on when a
+      complete user and when a partial user is required.</p>
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>name</td>
+        <td>username</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>flags</td>
+        <td>U32</td>
+        <td>1 </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>STRUCTURE rules</h4>
+      CLASS: KGS::Rules<br />
+    <p>
+
+      <p>This structure is used for challenges as well as in the special
+      TREE "subprotocol". It tightly encodes the game parameters.</p>
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>ruleset</td>
+        <td>U8</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>size</td>
+        <td>U8</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>handicap</td>
+        <td>U8</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>komi</td>
+        <td>komi16_2</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>timesys</td>
+        <td>U8</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>time</td>
+        <td>U32</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>interval</td>
+        <td>U32</td>
+        <td> </td>
+        <td>
+      byo-yomi time / canadian time
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>count</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      periods / moves
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+<h2>Structs used in messages from the client</h2>
+
+<h2>Client-generated messages</h2>
+
+   <h4>
+      <a name="C0000"></a>ORIGIN: CLIENT;
+      MESSAGE: login</h4>
+   NUMERIC TYPE (hex): 0000<p>
+
+      <p>Sent to login, usually the first message sent. The password needs to be set when the
+      guest flag is true.
+      Possible replies: <a href="#S0001">login(0001)</a>
+        <a href="#S0002">login(0002)</a>
+        <a href="#S0003">login(0003)</a>
+        <a href="#S0004">login(0004)</a>
+        <a href="#S0005">login(0005)</a>
+        <a href="#S0006">login(0006)</a>
+        <a href="#S0018">login(0018)</a>
+        <a href="#S001c">login(001c)</a>
+        <a href="#S0022">login(0022)</a>. Followed by: <a href="#S001b">timewarning_default(001b)</a> <a href="#S0411">chal_defaults(0411)</a>
+      </p>
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>ver_major</td>
+        <td>U32</td>
+        <td>2 </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>ver_minor</td>
+        <td>U32</td>
+        <td>6 </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>ver_micro</td>
+        <td>U32</td>
+        <td>1 </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>name</td>
+        <td>username</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>password</td>
+        <td>password</td>
+        <td>0 </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>guest</td>
+        <td>flag</td>
+        <td>1 </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>_unknown3</td>
+        <td>U16</td>
+        <td>0 </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>locale</td>
+        <td>locale</td>
+        <td>"en_US" </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>clientver</td>
+        <td>DATA</td>
+        <td>"1.4.2_03:Swing app:Sun Microsystems Inc." </td>
+        <td>
+      The "default" is the java vm version, not exactly he client version. However,
+      you should always send a text like "Jonathan's C client version 0.6" or somesuch,
+      so the server can, if necessary, block broken clients or client versions.
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="C0007"></a>ORIGIN: CLIENT;
+      MESSAGE: req_userinfo</h4>
+   NUMERIC TYPE (hex): 0007<p>
+      <p>Request info about a certain user. Possible reply: <a href="#S0008">userinfo(0008)</a>
+      </p>
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>name</td>
+        <td>username</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="C0007"></a>ORIGIN: CLIENT;
+      MESSAGE: update_userinfo</h4>
+   NUMERIC TYPE (hex): 0007<p>
+      <p>Update user info. Message structure is very similar
+      to <a href="#S0008">userinfo(0008)</a>.</p>
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>setpass</td>
+        <td>flag</td>
+        <td> </td>
+        <td>
+      Should the password be updated?
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>password</td>
+        <td>password</td>
+        <td>0 </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>realname</td>
+        <td>realname</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>email</td>
+        <td>email</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>info</td>
+        <td>userinfo</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>homepage</td>
+        <td>url</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>_unused</td>
+        <td>U64</td>
+        <td>0 </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>_unused</td>
+        <td>U64</td>
+        <td>0 </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="C0013"></a>ORIGIN: CLIENT;
+      MESSAGE: msg_chat</h4>
+   NUMERIC TYPE (hex): 0013<p>
+      <p>This message is sent to initiate or continue a private chat with
+      a user.  You'll always receive a copy of what you have sent back
+      from the server (as usual).</p>
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>name</td>
+        <td>username</td>
+        <td> </td>
+        <td>
+      Name of sender ("yourself").
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>name2</td>
+        <td>username</td>
+        <td> </td>
+        <td>
+      Name of recipient.
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>message</td>
+        <td>STRING</td>
+        <td> </td>
+        <td>
+      The message.
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="C0014"></a>ORIGIN: CLIENT;
+      MESSAGE: req_stats</h4>
+   NUMERIC TYPE (hex): 0014<p>
+      <p>Request server statistics. Replied with <a href="#S0015">stats(0015)</a>
+      </p>
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="C0016"></a>ORIGIN: CLIENT;
+      MESSAGE: idle_reset</h4>
+   NUMERIC TYPE (hex): 0016<p>
+      <p>Send in response to <a href="#S0016">idle_warn(0016)</a> to keep the server from disconnecting.</p>
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="C001d"></a>ORIGIN: CLIENT;
+      MESSAGE: ping</h4>
+   NUMERIC TYPE (hex): 001d<p>
+      <p>No idea. Not used anymore?</p>
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="C001e"></a>ORIGIN: CLIENT;
+      MESSAGE: req_usergraph</h4>
+   NUMERIC TYPE (hex): 001e<p>
+      <p>Request user graph data, replied with <a href="#S001e">usergraph(001e)</a>.</p>
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>name</td>
+        <td>username</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="C0021"></a>ORIGIN: CLIENT;
+      MESSAGE: req_pic</h4>
+   NUMERIC TYPE (hex): 0021<p>
+      <p>Request a user picture from the server. Results in a <a href="#S0021">userpic(0021)</a>
+      or a timeout.</p>
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>name</td>
+        <td>username</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="C0021"></a>ORIGIN: CLIENT;
+      MESSAGE: upload_pic</h4>
+   NUMERIC TYPE (hex): 0021<p>
+      Same code as pic_req, but with an additional data section that
+      must contain a JPEG image that is &lt;=7KB. It must have 141×200 pixels.
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>name</td>
+        <td>username</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>data</td>
+        <td>DATA</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="C0023"></a>ORIGIN: CLIENT;
+      MESSAGE: send_memo</h4>
+   NUMERIC TYPE (hex): 0023<p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>name</td>
+        <td>username</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>cid</td>
+        <td>CLIENTID16</td>
+        <td> </td>
+        <td>
+      <p>A boolean, probably. Always true for me.</p>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>msg</td>
+        <td>STRING</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="C0024"></a>ORIGIN: CLIENT;
+      MESSAGE: delete_memos</h4>
+   NUMERIC TYPE (hex): 0024<p>
+      <p>Unconditionally deletes all memos.</p>
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="C0100"></a>ORIGIN: CLIENT;
+      MESSAGE: gnotice</h4>
+   NUMERIC TYPE (hex): 0100<p>
+      <p>Send a global message. Maybe. Never tried, for obvious reasons :/. Results
+      in a <a href="#S0100">gnotice(0100)</a> sent to all users.</p>
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>notice</td>
+        <td>STRING</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="C0200"></a>ORIGIN: CLIENT;
+      MESSAGE: notify_add</h4>
+   NUMERIC TYPE (hex): 0200<p>
+
+      <p>Probably setting a notifier on a username, to get informed about
+      changes using  messages. sending your own
+      username gives you a disconnect, so don't do that at home, kids!</p>
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>name</td>
+        <td>username</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="C0201"></a>ORIGIN: CLIENT;
+      MESSAGE: notify_del</h4>
+   NUMERIC TYPE (hex): 0201<p>
+
+      <p>Probably remove the notifier again.</p>
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>name</td>
+        <td>username</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="C0318"></a>ORIGIN: CLIENT;
+      MESSAGE: list_rooms</h4>
+   NUMERIC TYPE (hex): 0318<p>
+      <p>List the rooms in a specific group/category. Results in a <a href="#S0318">upd_rooms(0318)</a> message.</p>
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>group</td>
+        <td>U8</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="C031a"></a>ORIGIN: CLIENT;
+      MESSAGE: new_room</h4>
+   NUMERIC TYPE (hex): 031a<p>
+      Create a new room. Not verified.
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>name</td>
+        <td>username</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>i1</td>
+        <td>U32</td>
+        <td>0 </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>b1</td>
+        <td>U8</td>
+        <td>0 </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>b2</td>
+        <td>U8</td>
+        <td>255 </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>b3</td>
+        <td>U8</td>
+        <td>255 </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>group</td>
+        <td>U8</td>
+        <td>1 </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>name</td>
+        <td>ZSTRING</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>description</td>
+        <td>ZSTRING</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>flags</td>
+        <td>U8</td>
+        <td> </td>
+        <td>
+      See ROOMFLAGs
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="C031b"></a>ORIGIN: CLIENT;
+      MESSAGE: req_upd_rooms</h4>
+   NUMERIC TYPE (hex): 031b<p>
+      <p>Request a rooms update message for the given room.</p>
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="C0413"></a>ORIGIN: CLIENT;
+      MESSAGE: req_game_record</h4>
+   NUMERIC TYPE (hex): 0413<p>
+      <p>Requests part of the users game record to be sent. Results in a <a href="#S0414">game_record(0414)</a> or maybe a timeout.</p>
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>name</td>
+        <td>username</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>timestamp</td>
+        <td>timestamp</td>
+        <td> </td>
+        <td>
+      <p>If zero, start at the newest games, else this should be the timestamp
+      of the first gamerecord sent in the <a href="#S0414">game_record(0414)</a> response.</p>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="C4300"></a>ORIGIN: CLIENT;
+      MESSAGE: join_room</h4>
+   NUMERIC TYPE (hex): 4300<p>
+      <p>Joins the given room. <a href="#S4300">join_room(4300)</a> messages for yourself
+      and all users in that room, as well as the initial gamelist, are
+      send if the room exists. If not, timeout...</p>
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>user</td>
+        <td>user</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="C4301"></a>ORIGIN: CLIENT;
+      MESSAGE: msg_room</h4>
+   NUMERIC TYPE (hex): 4301<p>
+      Send a message to the room.
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>name</td>
+        <td>username</td>
+        <td> </td>
+        <td>
+      Must be the login-name of the user.
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>message</td>
+        <td>STRING</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="C4302"></a>ORIGIN: CLIENT;
+      MESSAGE: part_room</h4>
+   NUMERIC TYPE (hex): 4302<p>
+      Remove yourself (or maybe others as admin) from a room.
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>name</td>
+        <td>username</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="C4305"></a>ORIGIN: CLIENT;
+      MESSAGE: new_game</h4>
+   NUMERIC TYPE (hex): 4305<p>
+      <p>Create a new game.</p>
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      <p>The room where to start the new game</p>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>cid</td>
+        <td>CLIENTID16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>gametype</td>
+        <td>U8</td>
+        <td> </td>
+        <td>
+      <p>
+         GAMETYPE_UPLOAD probably not allowed. GAMETYPE_PRIVATE
+         only allowd together with GAMETYPE_TEACHING, GAMETYPE_DEMONSTRATION.
+      </p>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>flags</td>
+        <td>U8</td>
+        <td> </td>
+        <td>
+      <p>
+         0x2 == global open game list
+      </p>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>rules</td>
+        <td>rules</td>
+        <td> </td>
+        <td>
+      <p>When cloning a game, the rules are set up like this:
+         count =&gt; 65535, ruleset =&gt; 0, time =&gt; 4294967295, timesys =&gt; 0, interval =&gt; 4294967295.
+         Cloning itself seems to be implemented solely in the client (somewhat sane, for a change).
+      </p>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>notes</td>
+        <td>STRING</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="C430a"></a>ORIGIN: CLIENT;
+      MESSAGE: load_game</h4>
+   NUMERIC TYPE (hex): 430a<p>
+      Load an existing game into a room(?)
+      There is no indication that a new game is there except
+      for a upd_observers message with your name in it. Which means
+      you have to watch upd_observers messages that are not for any
+      currently open game and open one. Ugh.
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      The room to load the game into.
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>timestamp</td>
+        <td>timestamp</td>
+        <td> </td>
+        <td>
+      From the game record.
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>user</td>
+        <td>username</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>flags</td>
+        <td>U8</td>
+        <td> </td>
+        <td>
+      0 == public, 2 == private
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="C430b"></a>ORIGIN: CLIENT;
+      MESSAGE: req_games</h4>
+   NUMERIC TYPE (hex): 430b<p>
+      Request to update room game list (send this once per minute to get
+      updated). Results in upd_games messages.
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="C4319"></a>ORIGIN: CLIENT;
+      MESSAGE: req_desc</h4>
+   NUMERIC TYPE (hex): 4319<p>
+      Request room description.
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="C4400"></a>ORIGIN: CLIENT;
+      MESSAGE: challenge</h4>
+   NUMERIC TYPE (hex): 4400<p>
+      <p>Used to send challenges to existing games.</p>
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>black</td>
+        <td>user</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>white</td>
+        <td>user</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>gametype</td>
+        <td>U8</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>cid</td>
+        <td>CLIENTID8</td>
+        <td> </td>
+        <td>
+      <p>Possibly an id. No idea. Better echo this from the challenge request.</p>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>rules</td>
+        <td>rules</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="C4403"></a>ORIGIN: CLIENT;
+      MESSAGE: join_game</h4>
+   NUMERIC TYPE (hex): 4403<p>
+      Join a game. See join_room.
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>user</td>
+        <td>user</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="C4404"></a>ORIGIN: CLIENT;
+      MESSAGE: part_game</h4>
+   NUMERIC TYPE (hex): 4404<p>
+      Leave (or kick as admin?) a certain user from a game.
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>name</td>
+        <td>username</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="C4405"></a>ORIGIN: CLIENT;
+      MESSAGE: set_tree</h4>
+   NUMERIC TYPE (hex): 4405<p>
+      Possibly upload an initial game to an empty room. Not tested.
+
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>tree</td>
+        <td>TREE</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="C4406"></a>ORIGIN: CLIENT;
+      MESSAGE: upd_tree</h4>
+   NUMERIC TYPE (hex): 4406<p>
+      <p>Upload a partial game tree to the server. This is used to send moves
+      and even in-game comments to the server. For the comments, the
+      server prepends the username and rank.</p>
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>tree</td>
+        <td>TREE</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="C4407"></a>ORIGIN: CLIENT;
+      MESSAGE: mark_dead</h4>
+   NUMERIC TYPE (hex): 4407<p>
+      <p>Marks stones ad dead (or alive?) by the client. Details unclear</p>
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>x</td>
+        <td>U8</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>y</td>
+        <td>U8</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>dead</td>
+        <td>flag</td>
+        <td> </td>
+        <td>
+      <p>Possibly true means mark dead and false unmark, but that's just a wild guess.</p>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="C4408"></a>ORIGIN: CLIENT;
+      MESSAGE: get_tree</h4>
+   NUMERIC TYPE (hex): 4408<p>
+      <p>Request the game tree starting at a given node. This is used when
+      the server only sends a partial tree (with end code "more").</p>
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>node</td>
+        <td>U32</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="C440a"></a>ORIGIN: CLIENT;
+      MESSAGE: game_done</h4>
+   NUMERIC TYPE (hex): 440a<p>
+      <p>Sent by the client to mark the game as done.</p>
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>id</td>
+        <td>U32</td>
+        <td> </td>
+        <td>
+      <p>An id field (start at one please) to make sure that the client responds to the correct done click.</p>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="C440c"></a>ORIGIN: CLIENT;
+      MESSAGE: claim_win</h4>
+   NUMERIC TYPE (hex): 440c<p>
+      <p>Used by the client to claim a win.</p>
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>player</td>
+        <td>U8 </td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="C440d"></a>ORIGIN: CLIENT;
+      MESSAGE: add_time</h4>
+   NUMERIC TYPE (hex): 440d<p>
+      <p>Adds the given amount of time to your opponent's clock.</p>
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>time</td>
+        <td>U32</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>player</td>
+        <td>U8</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="C440e"></a>ORIGIN: CLIENT;
+      MESSAGE: req_undo</h4>
+   NUMERIC TYPE (hex): 440e<p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="C440f"></a>ORIGIN: CLIENT;
+      MESSAGE: grant_undo</h4>
+   NUMERIC TYPE (hex): 440f<p>
+      Can be send after a req_undo message was received to grant the undo.
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="C4410"></a>ORIGIN: CLIENT;
+      MESSAGE: resign_game</h4>
+   NUMERIC TYPE (hex): 4410<p>
+      Resign the game.
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>player</td>
+        <td>U8</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="C441a"></a>ORIGIN: CLIENT;
+      MESSAGE: set_teacher</h4>
+   NUMERIC TYPE (hex): 441a<p>
+      <p>Change the teacher to somebody else (or possibly yourself == take it). If the
+      name is empty, the game will continue normally.</p>
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>name</td>
+        <td>username</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="C4422"></a>ORIGIN: CLIENT;
+      MESSAGE: allow_user</h4>
+   NUMERIC TYPE (hex): 4422<p>
+      <p>Unclear. Maybe allow users to talk? No idea, really.</p>
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>othername</td>
+        <td>username</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>name</td>
+        <td>username</td>
+        <td> </td>
+        <td>; # gives user access to the game (to what? ;)
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="C4423"></a>ORIGIN: CLIENT;
+      MESSAGE: set_privacy</h4>
+   NUMERIC TYPE (hex): 4423<p>
+      Probably sets the "quiet" flag. Not checked.
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>private</td>
+        <td>flag</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="C4427"></a>ORIGIN: CLIENT;
+      MESSAGE: game_move</h4>
+   NUMERIC TYPE (hex): 4427<p>
+      <p>Only during playing, moves.</p>
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>x</td>
+        <td>U8</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>y</td>
+        <td>U8</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="C4429"></a>ORIGIN: CLIENT;
+      MESSAGE: reject_challenge</h4>
+   NUMERIC TYPE (hex): 4429<p>
+      Reject a challenge from a given user. Not checked.
+
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>name</td>
+        <td>username</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>gametype</td>
+        <td>U8</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>cid</td>
+        <td>CLIENTID8</td>
+        <td> </td>
+        <td>
+      <p>Possibly an id. No idea. Better echo this from the challenge request.</p>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>rules</td>
+        <td>rules</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="C442d"></a>ORIGIN: CLIENT;
+      MESSAGE: more_comments</h4>
+   NUMERIC TYPE (hex): 442d<p>
+      <p>Quite brokenly, the want this to send you more comments.
+      Reply to <a href="#S442d">more_comments(442d)</a>.</p>
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>node</td>
+        <td>U32</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="C442e"></a>ORIGIN: CLIENT;
+      MESSAGE: save_game</h4>
+   NUMERIC TYPE (hex): 442e<p>
+      <p>Is send when a game is closed and should be saved on the gamerecord.</p>
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="C4433"></a>ORIGIN: CLIENT;
+      MESSAGE: req_result</h4>
+   NUMERIC TYPE (hex): 4433<p>
+      I forgot.
+
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="C4434"></a>ORIGIN: CLIENT;
+      MESSAGE: set_quiet</h4>
+   NUMERIC TYPE (hex): 4434<p>
+      <p>Sets (or clears) the quiet flag on a game.</p>
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>quiet</td>
+        <td>flag</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="C4436"></a>ORIGIN: CLIENT;
+      MESSAGE: msg_game</h4>
+   NUMERIC TYPE (hex): 4436<p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>message</td>
+        <td>STRING</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="Cffff"></a>ORIGIN: CLIENT;
+      MESSAGE: quit</h4>
+   NUMERIC TYPE (hex): ffff<p>
+      <p>Sent by the client just before it logs out.</p>
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+    </table>
+
+<h2>Structs mainly used in messages send by the server</h2>
+
+   <h4>STRUCTURE challenge_defaults</h4>
+    <p>
+      Send soon after log-in to set the defaults for game challenges.
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>gametype</td>
+        <td>U8</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>ruleset</td>
+        <td>U8</td>
+        <td> </td>
+        <td>
+      <p>The ruleset member is a pure guess, please verify. it could also be after size for example.</p>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>size</td>
+        <td>U32</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>timesys</td>
+        <td>U32</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>time</td>
+        <td>U32</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>byo_time</td>
+        <td>U32</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>byo_periods</td>
+        <td>U32</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>can_time</td>
+        <td>U32</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>can_stones</td>
+        <td>U32</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>notes</td>
+        <td>STRING</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>STRUCTURE game</h4>
+      CLASS: KGS::Game<br />
+    <p>
+      Basic information about a game. Used in rooms for the gamelist and
+      in games to detect when a game is saved, changed type (e.g. R =&gt; D)
+      etc.
+
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>type</td>
+        <td>U8</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>black</td>
+        <td>user</td>
+        <td> </td>
+        <td>
+      White
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>white</td>
+        <td>user</td>
+        <td> </td>
+        <td>
+      Black
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>owner</td>
+        <td>user</td>
+        <td> </td>
+        <td>
+      Owner
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>size</td>
+        <td>U8</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>handicap</td>
+        <td>I8</td>
+        <td> </td>
+        <td>
+      &lt; 0 not fully setup
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>komi</td>
+        <td>komi16_2</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>moves</td>
+        <td>I16</td>
+        <td> </td>
+        <td>
+      This field reflects either the movenum or the score, sorry, not even guards help, as
+      the flags to determine that are _after_ the field. Arg. Divide by two to get the actual
+      score (arg²).
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>flags</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>observers</td>
+        <td>U32</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>saved</td>
+        <td>flag</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>notes</td>
+        <td>ZSTRING</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b>handicap</b> &lt; 0
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>STRUCTURE room_game</h4>
+    <p>
+      A game with the room id prepended.
+
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      <p>The room channel.</p>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>game</td>
+        <td>game</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>STRUCTURE room_obs</h4>
+    <p>
+      Obsolete.
+      
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>name</td>
+        <td>roomname</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>flags</td>
+        <td>U32</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>users</td>
+        <td>U32</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>STRUCTURE room</h4>
+      CLASS: KGS::Room<br />
+    <p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>flags</td>
+        <td>U8</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>group</td>
+        <td>U8</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>users</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>games</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>name</td>
+        <td>STRING</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>STRUCTURE scorevalues</h4>
+      CLASS: KGS::Score<br />
+    <p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>score</td>
+        <td>score32_4</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>territory</td>
+        <td>U32</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>captures</td>
+        <td>U32</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>i3</td>
+        <td>U32</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>f2</td>
+        <td>U32</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>komi</td>
+        <td>komi32_4</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>i4</td>
+        <td>U32</td>
+        <td> </td>
+        <td>
+      Apparently the i3, f2, i4 are zero.
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>STRUCTURE game_record</h4>
+      CLASS: KGS::GameRecord<br />
+    <p>
+      <p>A single game record entry, as seen in <a href="#S0008">userinfo(0008)</a>.</p>
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>timestamp</td>
+        <td>timestamp</td>
+        <td> </td>
+        <td>
+      Time this game was played.
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>type</td>
+        <td>U8</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>handicap</td>
+        <td>U8</td>
+        <td> </td>
+        <td>
+
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>revision</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      <p>A revision number in case there are multiple similar games.</p>
+
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>black</td>
+        <td>user</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>white</td>
+        <td>user</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>owner</td>
+        <td>user</td>
+        <td> </td>
+        <td>
+
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>komi</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      <p>0:11 == komi * 2; 12:15 == no idea, always 1-0-0-0?</p>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>score</td>
+        <td>score16_2</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>size</td>
+        <td>U8</td>
+        <td> </td>
+        <td>
+      <p>0:5 == size; 6 no idea; 7 == inprogress</p>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>flags</td>
+        <td>U8</td>
+        <td> </td>
+        <td>
+      <p>No idea. I see many values here.</p>
+
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+<h2>Server-generated messages</h2>
+
+   <h4>
+      <a name="S0001"></a>ORIGIN: SERVER;
+      MESSAGE: login</h4>
+   NUMERIC TYPE (hex): 0001
+         (possibly in response to
+         <a href="#C0000">login(0000)</a>
+         )
+      <p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>message</td>
+        <td>CONSTANT</td>
+        <td>login successful </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>success</td>
+        <td>CONSTANT</td>
+        <td>1 </td>
+        <td>
+
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>user</td>
+        <td>user</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>unknown1</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>unknown2</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S0002"></a>ORIGIN: SERVER;
+      MESSAGE: login</h4>
+   NUMERIC TYPE (hex): 0002
+         (possibly in response to
+         <a href="#C0000">login(0000)</a>
+         )
+      <p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>message</td>
+        <td>CONSTANT</td>
+        <td>login successful: client version is outdated. </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>success</td>
+        <td>CONSTANT</td>
+        <td>1 </td>
+        <td>
+
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>user</td>
+        <td>user</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>unknown1</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>unknown2</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S0003"></a>ORIGIN: SERVER;
+      MESSAGE: login</h4>
+   NUMERIC TYPE (hex): 0003
+         (possibly in response to
+         <a href="#C0000">login(0000)</a>
+         )
+      <p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>message</td>
+        <td>CONSTANT</td>
+        <td>login failed: client version out of date </td>
+        <td>
+
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>user</td>
+        <td>user</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>unknown1</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>unknown2</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S0004"></a>ORIGIN: SERVER;
+      MESSAGE: login</h4>
+   NUMERIC TYPE (hex): 0004
+         (possibly in response to
+         <a href="#C0000">login(0000)</a>
+         )
+      <p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>message</td>
+        <td>CONSTANT</td>
+        <td>login failed: wrong password </td>
+        <td>
+
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>user</td>
+        <td>user</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>unknown1</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>unknown2</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S0005"></a>ORIGIN: SERVER;
+      MESSAGE: login</h4>
+   NUMERIC TYPE (hex): 0005
+         (possibly in response to
+         <a href="#C0000">login(0000)</a>
+         )
+      <p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>message</td>
+        <td>CONSTANT</td>
+        <td>login failed: specified user does not exist </td>
+        <td>
+
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>user</td>
+        <td>user</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>unknown1</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>unknown2</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S0006"></a>ORIGIN: SERVER;
+      MESSAGE: login</h4>
+   NUMERIC TYPE (hex): 0006
+         (possibly in response to
+         <a href="#C0000">login(0000)</a>
+         )
+      <p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>message</td>
+        <td>CONSTANT</td>
+        <td>login failed: other user of same name already exists </td>
+        <td>
+
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>user</td>
+        <td>user</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>unknown1</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>unknown2</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S0008"></a>ORIGIN: SERVER;
+      MESSAGE: userinfo</h4>
+   NUMERIC TYPE (hex): 0008
+         (possibly in response to
+         <a href="#C0007">req_userinfo(0007)</a>
+         )
+      <p>
+      User info.
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>_unused0</td>
+        <td>flag</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>user</td>
+        <td>user</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>_unused1</td>
+        <td>U64</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>realname</td>
+        <td>realname</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>email</td>
+        <td>email</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>info</td>
+        <td>userinfo</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>homepage</td>
+        <td>url</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>regdate</td>
+        <td>timestamp</td>
+        <td> </td>
+        <td>
+      When the user registered (0 == never registered).
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>lastlogin</td>
+        <td>timestamp</td>
+        <td> </td>
+        <td>
+      When the user logged in for the last time.
+      <!-- maybe more? -->
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S0009"></a>ORIGIN: SERVER;
+      MESSAGE: upd_userinfo_result</h4>
+   NUMERIC TYPE (hex): 0009<p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>name</td>
+        <td>username</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>message</td>
+        <td>CONSTANT</td>
+        <td>Thanks for registering. </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S000a"></a>ORIGIN: SERVER;
+      MESSAGE: upd_userinfo_result</h4>
+   NUMERIC TYPE (hex): 000a<p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>name</td>
+        <td>username</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>message</td>
+        <td>CONSTANT</td>
+        <td>The user "%s" has been successfully updated. </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S000b"></a>ORIGIN: SERVER;
+      MESSAGE: upd_userinfo_result</h4>
+   NUMERIC TYPE (hex): 000b<p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>name</td>
+        <td>username</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>message</td>
+        <td>CONSTANT</td>
+        <td>There is no user "%s". Update failed. </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S0012"></a>ORIGIN: SERVER;
+      MESSAGE: userinfo_failed</h4>
+   NUMERIC TYPE (hex): 0012<p>
+      <p>Sent when no userinfo for the requested user could be found(?)</p>
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>name</td>
+        <td>username</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S0013"></a>ORIGIN: SERVER;
+      MESSAGE: msg_chat</h4>
+   NUMERIC TYPE (hex): 0013<p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>name</td>
+        <td>username</td>
+        <td> </td>
+        <td>
+      Name of sender (either yourself (echo) or other)
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>name2</td>
+        <td>username</td>
+        <td> </td>
+        <td>
+      Name of recipient.
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>message</td>
+        <td>STRING</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S0015"></a>ORIGIN: SERVER;
+      MESSAGE: stats</h4>
+   NUMERIC TYPE (hex): 0015
+         (possibly in response to
+         <a href="#C0014">req_stats(0014)</a>
+         )
+      <p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>ver_major</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>ver_minor</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>ver_micro</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>boot_time</td>
+        <td>timestamp</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>users_cur</td>
+        <td>U32</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>users_max</td>
+        <td>U32</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>users_lim</td>
+        <td>U32</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>accts_cur</td>
+        <td>U32</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>accts_max</td>
+        <td>U32</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>unknown1</td>
+        <td>U32</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>work_max</td>
+        <td>U32</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>rooms_cur</td>
+        <td>U32</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>rooms_max</td>
+        <td>U32</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>rooms_lim</td>
+        <td>U32</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>games_cur</td>
+        <td>U32</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>games_max</td>
+        <td>U32</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>games_lim</td>
+        <td>U32</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>results_cur</td>
+        <td>U32</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>results_max</td>
+        <td>U32</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>unknown2</td>
+        <td>U32</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>params_cur</td>
+        <td>U32</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>params_max</td>
+        <td>U32</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>bytes_in</td>
+        <td>U64</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>packets_in</td>
+        <td>U64</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>bytes_out</td>
+        <td>U64</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>packets_out</td>
+        <td>U64</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S0016"></a>ORIGIN: SERVER;
+      MESSAGE: idle_warn</h4>
+   NUMERIC TYPE (hex): 0016
+         (possibly in response to
+         <a href="#C0016">idle_reset(0016)</a>
+         )
+      <p>
+      <p>idle warning, autologout soon (10 minutes...). Responding with <a href="#S001d">ping(001d)</a> usually helps.</p>
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S0018"></a>ORIGIN: SERVER;
+      MESSAGE: login</h4>
+   NUMERIC TYPE (hex): 0018
+         (possibly in response to
+         <a href="#C0000">login(0000)</a>
+         )
+      <p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>message</td>
+        <td>CONSTANT</td>
+        <td>logged out: another client logged in with your username </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S001c"></a>ORIGIN: SERVER;
+      MESSAGE: login</h4>
+   NUMERIC TYPE (hex): 001c
+         (possibly in response to
+         <a href="#C0000">login(0000)</a>
+         )
+      <p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>message</td>
+        <td>CONSTANT</td>
+        <td>logged out: idle for too long </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S0020"></a>ORIGIN: SERVER;
+      MESSAGE: error</h4>
+   NUMERIC TYPE (hex): 0020<p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>message</td>
+        <td>CONSTANT</td>
+        <td>Sorry, you have too many unfinished games. You cannot turn on your rank. Please finish some of your games, then try again. </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S0022"></a>ORIGIN: SERVER;
+      MESSAGE: login</h4>
+   NUMERIC TYPE (hex): 0022
+         (possibly in response to
+         <a href="#C0000">login(0000)</a>
+         )
+      <p>
+      I was blocked sooo many times for developing this client that it was
+      easy to figure out. The KGS admins sure need no extra nazi training
+      :(
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>reason</td>
+        <td>STRING</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>result</td>
+        <td>CONSTANT</td>
+        <td>user or ip blocked </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S001b"></a>ORIGIN: SERVER;
+      MESSAGE: timewarning_default</h4>
+   NUMERIC TYPE (hex): 001b
+         (possibly in response to
+         <a href="#C0000">login(0000)</a>
+         )
+      <p>
+      WILD guess
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>time</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S001c"></a>ORIGIN: SERVER;
+      MESSAGE: idle_err</h4>
+   NUMERIC TYPE (hex): 001c<p>
+      autologout
+   </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S001d"></a>ORIGIN: SERVER;
+      MESSAGE: ping</h4>
+   NUMERIC TYPE (hex): 001d<p>
+      Sent by the server regularly, but not answering them
+      isn't valid. Strange form of keepalive?
+   </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S001e"></a>ORIGIN: SERVER;
+      MESSAGE: usergraph</h4>
+   NUMERIC TYPE (hex): 001e
+         (possibly in response to
+         <a href="#C001e">req_usergraph(001e)</a>
+         )
+      <p>
+      User graph data.
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>name</td>
+        <td>username</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>data</td>
+        <td>I16</td>
+        <td> </td>
+        <td>
+      If empty, no graph is available. The unit seems to
+      be centi-kyu, with 1 dan == 0, 2 dan == 100, 1 kyu == -100.
+      There is probably one entry per day, the newest one last.
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S0021"></a>ORIGIN: SERVER;
+      MESSAGE: userpic</h4>
+   NUMERIC TYPE (hex): 0021
+         (possibly in response to
+         <a href="#C0021">req_pic(0021)</a>
+         )
+      <p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>name</td>
+        <td>username</td>
+        <td> </td>
+        <td>
+      Reply to pic_req, contains an image in jpeg format.
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>data</td>
+        <td>DATA</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S0025"></a>ORIGIN: SERVER;
+      MESSAGE: memo_error</h4>
+   NUMERIC TYPE (hex): 0025<p>
+      <p>Account unknown.</p>
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>name</td>
+        <td>username</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>cid</td>
+        <td>CLIENTID16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>message</td>
+        <td>CONSTANT</td>
+        <td>memo send failed: account already exists </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>subtype</td>
+        <td>CONSTANT</td>
+        <td>25 </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S0026"></a>ORIGIN: SERVER;
+      MESSAGE: memo_error</h4>
+   NUMERIC TYPE (hex): 0026<p>
+      <p>Just a guess.</p>
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>name</td>
+        <td>username</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>cid</td>
+        <td>CLIENTID16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>message</td>
+        <td>CONSTANT</td>
+        <td>memo send failed: error 26 </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>subtype</td>
+        <td>CONSTANT</td>
+        <td>26 </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S0027"></a>ORIGIN: SERVER;
+      MESSAGE: memo_error</h4>
+   NUMERIC TYPE (hex): 0027<p>
+      <p>User is currently online, please use chat.</p>
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>name</td>
+        <td>username</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>cid</td>
+        <td>CLIENTID16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>message</td>
+        <td>CONSTANT</td>
+        <td>memo send failed: user is online, use chat </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>subtype</td>
+        <td>CONSTANT</td>
+        <td>27 </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S0028"></a>ORIGIN: SERVER;
+      MESSAGE: memo_error</h4>
+   NUMERIC TYPE (hex): 0028<p>
+      <p>Just a guess.</p>
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>name</td>
+        <td>username</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>cid</td>
+        <td>CLIENTID16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>message</td>
+        <td>CONSTANT</td>
+        <td>memo send failed: error 28 </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>subtype</td>
+        <td>CONSTANT</td>
+        <td>28 </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S0029"></a>ORIGIN: SERVER;
+      MESSAGE: memo</h4>
+   NUMERIC TYPE (hex): 0029<p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>name</td>
+        <td>username</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>time</td>
+        <td>timestamp</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>message</td>
+        <td>ZSTRING</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S002a"></a>ORIGIN: SERVER;
+      MESSAGE: memo_sent</h4>
+   NUMERIC TYPE (hex): 002a<p>
+      <p>The memo was sent successfully</p>
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>name</td>
+        <td>username</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>cid</td>
+        <td>CLIENTID16</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S0100"></a>ORIGIN: SERVER;
+      MESSAGE: gnotice</h4>
+   NUMERIC TYPE (hex): 0100
+         (possibly in response to
+         <a href="#C0100">gnotice(0100)</a>
+         )
+      <p>
+      global notice, sent to everybody
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>notice</td>
+        <td>STRING</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S0202"></a>ORIGIN: SERVER;
+      MESSAGE: notify_event</h4>
+   NUMERIC TYPE (hex): 0202<p>
+      # maybe soe notify? Totally unclear.
+      # loc 0" type="userinfo, flags etc. loc 1 =&gt; gameinfo?, loc 2 =&gt; game result (more data)
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>event</td>
+        <td>U32</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>user</td>
+        <td>user</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>gamerecord</td>
+        <td>game_record</td>
+        <td> </td>
+        <td>
+      <p>Game result record?</p>
+      
+   
+            
+       </td>
+        <td>
+          <b>event</b> == 2
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S030c"></a>ORIGIN: SERVER;
+      MESSAGE: login_done</h4>
+   NUMERIC TYPE (hex): 030c<p>
+      <p>Is sent after the initial messages, probably
+      to signify the end of the login process.</p>
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S0310"></a>ORIGIN: SERVER;
+      MESSAGE: priv_room</h4>
+   NUMERIC TYPE (hex): 0310<p>
+      "permission denied" when joining a room
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>name</td>
+        <td>STRING</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S0318"></a>ORIGIN: SERVER;
+      MESSAGE: upd_rooms</h4>
+   NUMERIC TYPE (hex): 0318
+         (possibly in response to
+         <a href="#C0318">list_rooms(0318)</a>
+         )
+      <p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>rooms</td>
+        <td>room</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S0411"></a>ORIGIN: SERVER;
+      MESSAGE: chal_defaults</h4>
+   NUMERIC TYPE (hex): 0411
+         (possibly in response to
+         <a href="#C0000">login(0000)</a>
+         )
+      <p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>defaults</td>
+        <td>challenge_defaults</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S0412"></a>ORIGIN: SERVER;
+      MESSAGE: already_playing</h4>
+   NUMERIC TYPE (hex): 0412<p>
+      Unable to create new game.
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>message</td>
+        <td>CONSTANT</td>
+        <td>Sorry, you are already playing in one game, so you can't start playing in another. </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>cid</td>
+        <td>CLIENTID16</td>
+        <td> </td>
+        <td>
+      <p>The cid of the new_game etc. request.</p>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S0414"></a>ORIGIN: SERVER;
+      MESSAGE: game_record</h4>
+   NUMERIC TYPE (hex): 0414
+         (possibly in response to
+         <a href="#C0413">req_game_record(0413)</a>
+         )
+      <p>
+      The users game record.
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>name</td>
+        <td>username</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>more</td>
+        <td>flag</td>
+        <td> </td>
+        <td>
+      <p>Wether more games are available (must be requested manually by
+      another  message with the timestamp set
+      to the timestamp of the <em>first</em> game of this packet.</p>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>games</td>
+        <td>game_record</td>
+        <td> </td>
+        <td>
+      <p>Game records, from oldest to newest.</p>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S0417"></a>ORIGIN: SERVER;
+      MESSAGE: error</h4>
+   NUMERIC TYPE (hex): 0417<p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>message</td>
+        <td>CONSTANT</td>
+        <td>Sorry, your opponent is currently not logged in, so you can't resume this game. </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S0418"></a>ORIGIN: SERVER;
+      MESSAGE: error</h4>
+   NUMERIC TYPE (hex): 0418<p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>message</td>
+        <td>CONSTANT</td>
+        <td>Sorry, your opponent is already playing in a game, so you cannot continue this one. </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S0419"></a>ORIGIN: SERVER;
+      MESSAGE: error</h4>
+   NUMERIC TYPE (hex): 0419<p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>message</td>
+        <td>CONSTANT</td>
+        <td>Sorry, the server is out of boards! Please wait a few minutes and try to start a game again. </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S041c"></a>ORIGIN: SERVER;
+      MESSAGE: upd_game2</h4>
+   NUMERIC TYPE (hex): 041c<p>
+      Unclear.
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel_junk</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>game</td>
+        <td>game</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S041f"></a>ORIGIN: SERVER;
+      MESSAGE: error</h4>
+   NUMERIC TYPE (hex): 041f<p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>message</td>
+        <td>CONSTANT</td>
+        <td>Sorry, the game you tried to load was not correctly saved...probably caused by the server crashing. It cannot be recovered. </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S0420"></a>ORIGIN: SERVER;
+      MESSAGE: error</h4>
+   NUMERIC TYPE (hex): 0420<p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>message</td>
+        <td>CONSTANT</td>
+        <td>Sorry, user "%s" has left the game you are starting before you could challenge them. You will have to play against somebody else. </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S0421"></a>ORIGIN: SERVER;
+      MESSAGE: error</h4>
+   NUMERIC TYPE (hex): 0421<p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>message</td>
+        <td>CONSTANT</td>
+        <td>Sorry, this game is a private lesson. You will not be allowed to observe it. </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <!-- added recently -->
+   <h4>
+      <a name="S043a"></a>ORIGIN: SERVER;
+      MESSAGE: add_global_challenges</h4>
+   NUMERIC TYPE (hex): 043a<p>
+      <p>
+         Adds or updates a global challenge (open game list).
+      </p>
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>games</td>
+        <td>room_game</td>
+        <td> </td>
+        <td>
+      <p>The game. The "moves" member contains a small number. Probably garbage.</p>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+<h3>Room messages</h3>
+
+   <p>Not all room messages are for rooms only, and rooms need to parse
+   not only these messages. Orthogonality, what for?</p>
+
+   <h4>
+      <a name="S4300"></a>ORIGIN: SERVER;
+      MESSAGE: join_room</h4>
+   NUMERIC TYPE (hex): 4300
+         (possibly in response to
+         <a href="#C4300">join_room(4300)</a>
+         )
+      <p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>users</td>
+        <td>user</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S4301"></a>ORIGIN: SERVER;
+      MESSAGE: msg_room</h4>
+   NUMERIC TYPE (hex): 4301<p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>name</td>
+        <td>username</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>message</td>
+        <td>STRING</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S4302"></a>ORIGIN: SERVER;
+      MESSAGE: part_room</h4>
+   NUMERIC TYPE (hex): 4302<p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>user</td>
+        <td>user</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S4303"></a>ORIGIN: SERVER;
+      MESSAGE: del_room</h4>
+   NUMERIC TYPE (hex): 4303<p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S4304"></a>ORIGIN: SERVER;
+      MESSAGE: upd_games</h4>
+   NUMERIC TYPE (hex): 4304<p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>games</td>
+        <td>game</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S4319"></a>ORIGIN: SERVER;
+      MESSAGE: desc_room</h4>
+   NUMERIC TYPE (hex): 4319<p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>owner</td>
+        <td>username</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>description</td>
+        <td>STRING</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+<h3>Game messages</h3>
+
+   <h4>
+      <a name="S4400"></a>ORIGIN: SERVER;
+      MESSAGE: challenge</h4>
+   NUMERIC TYPE (hex): 4400<p>
+      Unclear.
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>black</td>
+        <td>user</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>white</td>
+        <td>user</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>gametype</td>
+        <td>U8</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>cid</td>
+        <td>CLIENTID8</td>
+        <td> </td>
+        <td>
+      <p>Possibly an id. No idea. Better echo this from the challenge request.</p>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>rules</td>
+        <td>rules</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>notes</td>
+        <td>STRING</td>
+        <td> </td>
+        <td>
+      <p>This field is optional</p>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S4401"></a>ORIGIN: SERVER;
+      MESSAGE: upd_game</h4>
+   NUMERIC TYPE (hex): 4401<p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>game</td>
+        <td>game</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S4402"></a>ORIGIN: SERVER;
+      MESSAGE: del_game</h4>
+   NUMERIC TYPE (hex): 4402<p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S4403"></a>ORIGIN: SERVER;
+      MESSAGE: upd_observers</h4>
+   NUMERIC TYPE (hex): 4403<p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>users</td>
+        <td>user</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S4404"></a>ORIGIN: SERVER;
+      MESSAGE: del_observer</h4>
+   NUMERIC TYPE (hex): 4404<p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>name</td>
+        <td>username</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S4405"></a>ORIGIN: SERVER;
+      MESSAGE: set_tree</h4>
+   NUMERIC TYPE (hex): 4405<p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>tree</td>
+        <td>TREE</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S4406"></a>ORIGIN: SERVER;
+      MESSAGE: upd_tree</h4>
+   NUMERIC TYPE (hex): 4406<p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>tree</td>
+        <td>TREE</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S4409"></a>ORIGIN: SERVER;
+      MESSAGE: superko</h4>
+   NUMERIC TYPE (hex): 4409<p>
+      Superko-warning.
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S440a"></a>ORIGIN: SERVER;
+      MESSAGE: game_done</h4>
+   NUMERIC TYPE (hex): 440a<p>
+      <p>Send by the server when one of the players sends a done.</p>
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>id</td>
+        <td>U32</td>
+        <td> </td>
+        <td>
+      <p>An id field to make sure that the client responds to the correct done click.</p>
+      <p>The high bit has the "please press done again" warning function, i.e. if set, opponent has changed board.</p>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>black</td>
+        <td>flag</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>white</td>
+        <td>flag</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S440b"></a>ORIGIN: SERVER;
+      MESSAGE: final_result</h4>
+   NUMERIC TYPE (hex): 440b<p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>blackscore</td>
+        <td>scorevalues</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>whitescore</td>
+        <td>scorevalues</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S440c"></a>ORIGIN: SERVER;
+      MESSAGE: out_of_time</h4>
+   NUMERIC TYPE (hex): 440c<p>
+      <p>Sent when the opponent is out of time and moves, or when the other
+      requests <a href="#S0008">userinfo(0008)</a>.</p>
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>player</td>
+        <td>U8</td>
+        <td> </td>
+        <td>
+      <p>Colour who ran out of time (lost).</p>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S440e"></a>ORIGIN: SERVER;
+      MESSAGE: req_undo</h4>
+   NUMERIC TYPE (hex): 440e<p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S4410"></a>ORIGIN: SERVER;
+      MESSAGE: resign_game</h4>
+   NUMERIC TYPE (hex): 4410<p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>player</td>
+        <td>U8</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S4415"></a>ORIGIN: SERVER;
+      MESSAGE: game_error</h4>
+   NUMERIC TYPE (hex): 4415<p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>message</td>
+        <td>CONSTANT</td>
+        <td>Sorry, this is a lecture game. Only authorized players are allowed to make comments. </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S441a"></a>ORIGIN: SERVER;
+      MESSAGE: set_teacher</h4>
+   NUMERIC TYPE (hex): 441a<p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>name</td>
+        <td>username</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S441d"></a>ORIGIN: SERVER;
+      MESSAGE: owner_left</h4>
+   NUMERIC TYPE (hex): 441d<p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>message</td>
+        <td>CONSTANT</td>
+        <td>Sorry, the owner of this game has left. Nobody will be allowed to edit it until the owner returns. </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S441e"></a>ORIGIN: SERVER;
+      MESSAGE: teacher_left</h4>
+   NUMERIC TYPE (hex): 441e<p>
+      Unclear.
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S4422"></a>ORIGIN: SERVER;
+      MESSAGE: allow_user_result</h4>
+   NUMERIC TYPE (hex): 4422<p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>message</td>
+        <td>CONSTANT</td>
+        <td>User "%s" will now be allowed full access to your game. </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S4424"></a>ORIGIN: SERVER;
+      MESSAGE: allow_user_result</h4>
+   NUMERIC TYPE (hex): 4424<p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>message</td>
+        <td>CONSTANT</td>
+        <td>Sorry, user "%s" is a guest and cannot be allowed full access to your game. </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S4425"></a>ORIGIN: SERVER;
+      MESSAGE: allow_user_result</h4>
+   NUMERIC TYPE (hex): 4425<p>
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>message</td>
+        <td>CONSTANT</td>
+        <td>Sorry, user "%s" does not seem to exist and cannot be allowed into your game. </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S4428"></a>ORIGIN: SERVER;
+      MESSAGE: add_tree</h4>
+   NUMERIC TYPE (hex): 4428<p>
+      <p>See <a href="#S4405">set_tree(4405)</a>. In addition, flags the tree as being
+      uploaded completely.</p>
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>tree</td>
+        <td>TREE</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S4429"></a>ORIGIN: SERVER;
+      MESSAGE: reject_challenge</h4>
+   NUMERIC TYPE (hex): 4429<p>
+      Reject a challenge by a given user. Not checked.
+      </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>name</td>
+        <td>username</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>gametype</td>
+        <td>U8</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>cid</td>
+        <td>CLIENTID8</td>
+        <td> </td>
+        <td>
+      <p>Possibly an id. No idea. Better echo this from the challenge request.</p>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>rules</td>
+        <td>rules</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S442b"></a>ORIGIN: SERVER;
+      MESSAGE: set_comments</h4>
+   NUMERIC TYPE (hex): 442b<p>
+      <p>Sent at end of games to set the comments not seen previously.</p>
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>node</td>
+        <td>U32</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>comments</td>
+        <td>STRING</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S442c"></a>ORIGIN: SERVER;
+      MESSAGE: add_comments</h4>
+   NUMERIC TYPE (hex): 442c<p>
+      <p>Sent at end of games to add all game commentary.</p>
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>node</td>
+        <td>U32</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>comments</td>
+        <td>STRING</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S442d"></a>ORIGIN: SERVER;
+      MESSAGE: more_comments</h4>
+   NUMERIC TYPE (hex): 442d<p>
+      <p>Quite brokenly, the server sends you this to make you ask for more comments.
+      Reply with <a href="#S442d">more_comments(442d)</a>.</p>
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>node</td>
+        <td>U32</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S442f"></a>ORIGIN: SERVER;
+      MESSAGE: new_game</h4>
+   NUMERIC TYPE (hex): 442f<p>
+      <p>Notifies the client that a new game has been created. This
+      message is sent long *after* upd_games and upd_observers etc.
+      have been received. *sigh*</p>
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      <p>The newly created game.</p>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>cid</td>
+        <td>CLIENTID16</td>
+        <td> </td>
+        <td>
+      <p>The ID sent to the server in new_game.</p>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S4433"></a>ORIGIN: SERVER;
+      MESSAGE: req_result</h4>
+   NUMERIC TYPE (hex): 4433<p>
+       Unclear.
+       </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+       # # recv_result(?)
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S4434"></a>ORIGIN: SERVER;
+      MESSAGE: set_quiet</h4>
+   NUMERIC TYPE (hex): 4434<p>
+      <p>Sets (or clears) the quiet flag on a game.</p>
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>quiet</td>
+        <td>flag</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S4437"></a>ORIGIN: SERVER;
+      MESSAGE: set_gametime</h4>
+   NUMERIC TYPE (hex): 4437<p>
+      <p>Sent when joining a running game. Gives the remaining time +
+      periods/moves for the players, to correctly initialize the clocks.</p>
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>black_time</td>
+        <td>time</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>black_moves</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>white_time</td>
+        <td>time</td>
+        <td> </td>
+        <td>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>white_moves</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+
+   <h4>
+      <a name="S443b"></a>ORIGIN: SERVER;
+      MESSAGE: del_global_challenge</h4>
+   NUMERIC TYPE (hex): 443b<p>
+      <p>
+         Remove a game from the global challenge list (open game list).
+      </p>
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <th width="10%">NAME</th>
+        <th width="8%">TYPE</th>
+        <th width="4%">VALUE</th>
+        <th>DESCRIPTION</th>
+        <th width="10%">GUARD</th>
+      </tr>
+      <tr>
+        <td>channel</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      <p>The game id to remove.</p>
+      
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+      <tr>
+        <td>game</td>
+        <td>U16</td>
+        <td> </td>
+        <td>
+      <p>Probably the same. I suggest to use this id for no good reason.</p>
+   
+            
+       </td>
+        <td>
+          <b></b> 
+            
+       </td>
+      </tr>
+    </table>
+</body>
+</html>

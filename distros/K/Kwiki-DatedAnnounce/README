@@ -1,0 +1,42 @@
+NAME
+    Kwiki::DatedAnnounce - Create a date sensitive section of output
+
+SYNOPSIS
+     $ cd /path/to/kwiki
+     $ kwiki -install Kwiki::DatedAnnounce
+
+DESCRIPTION
+    This module allows you to wrap a section of wikitext to be displayed
+    only after a certain time for an optional number of seconds. For
+    example:
+
+        .dated
+        datespec: 1095056602 172800
+
+        Hello, it's around Monday, September 13, 2004.
+        .dated
+
+    datespec is two numbers representing the number of seconds since the
+    epoch and a duration in seconds. Duration defaults to zero if none is
+    provided. Zero means infinite duration. If the time of the current
+    display is within the window described by the datespec, the content will
+    be displayed.
+
+CREDITS
+    This was my first plugin, trying to figure out what was going on. I've
+    pulled it out of the dusty corners to make it go with Kwiki::Test
+
+AUTHORS
+    Chris Dent <cdent@burningchrome.com>
+
+    Based on Ian Langworth's Kwiki::VimMode
+
+SEE ALSO
+    Kwiki
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2005 by Chris Dent
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

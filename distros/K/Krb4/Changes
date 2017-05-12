@@ -1,0 +1,19 @@
+1.1     Fix PL_ macros for Perl 5.6 compatibility.
+
+1.0	First production release.
+	Moved module into the Authen:: namespace.  This should get the Krb4
+	on the main module list, making it easier to find.
+
+0.93	Implemented get_svc_in_tkt, read_service_key, and dest_tkt.
+	Added DESTROY methods for all Krb4 objects to avoid memory leaks.
+
+0.92	Replaced system memory functions with Perl macros.
+	Implemented krb_get_pw_in_tkt for password authentication.
+	Better sample code, including both client and server scripts.
+	Cleaned up some code to make compilation somewhat quieter.
+
+0.91	Implemented sendauth and recvauth.  Fixed a bug in mk_priv and
+	rd_priv where empty strings weren't being encrypted/decrypted
+	correctly.  Cleaned up some of the code.
+
+0.9	Added object oriented interface.  Beta version released.

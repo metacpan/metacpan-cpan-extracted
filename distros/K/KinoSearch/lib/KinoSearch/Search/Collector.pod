@@ -1,0 +1,81 @@
+
+# Auto-generated file -- DO NOT EDIT!!!!!
+
+=head1 NAME
+
+KinoSearch::Search::Collector - Process hits.
+
+=head1 DEPRECATED
+
+The KinoSearch code base has been assimilated by the Apache L<Lucy> project.
+The "KinoSearch" namespace has been deprecated, but development continues
+under our new name at our new home: L<http://lucy.apache.org/>
+
+=head1 SYNOPSIS
+
+    # Abstract base class.
+
+
+
+=head1 DESCRIPTION
+
+A Collector decides what to do with the hits that a
+L<Matcher|KinoSearch::Search::Matcher> iterates through, based on how the
+abstract collect() method is implemented.
+
+Collectors operate on individual segments, but must operate within the
+context of a larger collection.  Each time the collector moves to a new
+segment, set_reader(), set_base() and set_matcher() will be called, and the
+collector must take the updated information into account.
+
+=head1 CONSTRUCTORS
+
+=head2 new()
+
+    package MyCollector;
+    use base qw( KinoSearch::Search::Collector );
+    our %foo;
+    sub new {
+        my $self = shift->SUPER::new;
+        my %args = @_;
+        $foo{$$self} = $args{foo};
+        return $self;
+    }
+
+Abstract constructor.  Takes no arguments.
+
+
+
+=head1 ABSTRACT METHODS
+
+=head2 collect(doc_id)
+
+Do something with a doc id.  (For instance, keep track of the docs
+with the ten highest scores.)
+
+=over
+
+=item *
+
+B<doc_id> - A segment document id.
+
+=back
+
+
+
+
+
+=head1 INHERITANCE
+
+KinoSearch::Search::Collector isa L<KinoSearch::Object::Obj>.
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005-2011 Marvin Humphrey
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
+

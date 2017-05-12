@@ -1,0 +1,9 @@
+Revision history for Perl extension Kwiki::DisableWikiNames.
+
+0.02  Sun Apr 2 17:17:00 2006
+	- bugfix (don't disable titled forced links)
+
+0.01  Fri Mar 31 10:13:30 2006
+	- original version; created by h2xs 1.23 with options
+		-AX Kwiki::DisableWikiNames
+

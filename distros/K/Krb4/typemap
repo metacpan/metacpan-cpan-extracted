@@ -1,0 +1,9 @@
+TYPEMAP
+
+Authen::Krb4::Ticket		T_PTROBJ
+Authen::Krb4::AuthDat		T_PTROBJ
+Authen::Krb4::Creds		T_PTROBJ
+Authen::Krb4::KeySchedule	T_PTROBJ
+
+struct sockaddr_in *	T_PV
+

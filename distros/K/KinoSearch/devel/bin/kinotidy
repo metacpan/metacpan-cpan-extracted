@@ -1,0 +1,14 @@
+#!/usr/local/bin/perl
+use strict;
+use warnings;
+use Perl::Tidy;
+
+my $perltidyrc
+    = '--perl-best-practices '
+    . '--nostandard-output '
+    . '--nostandard-error-output '
+    . '--noblanks-before-comments '
+    . '--noblanks-before-subs';
+
+Perl::Tidy::perltidy( perltidyrc => \$perltidyrc );
+

@@ -1,0 +1,6 @@
+
+Kwiki-PageStats keeps track of page views and presents the count.
+It also provides a link to a report of hit counts for all the pages.
+
+It was written as an extra-cheesy demonstration of a quick and
+dirty plugin, but is evolving into something pretty useful.

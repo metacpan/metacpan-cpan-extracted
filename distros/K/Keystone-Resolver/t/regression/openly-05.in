@@ -1,0 +1,8 @@
+# $Id: openly-05.in,v 1.1 2007-01-26 12:25:45 mike Exp $
+
+# Lifted from Openly Informatics' OpenURL 1.0 test suite
+# ContextObject, Part 2 example 4
+# By-Value OpenURL
+
+url_ver=Z39.88-2004&url_tim=2004-04-23&url_ctx_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Actx&url_ctx_val=ctx_ver%3DZ39.88-2004%26ctx_enc%3Dinfo%253Aofi%252Fenc%253AUTF-8%26ctx_id%3D345871%26ctx_tim%3D2002-03-20T08%253A55%253A12Z%26rft_val_fmt%3Dinfo%253Aofi%252Ffmt%253Akev%253Amtx%253Ajournal%26rft.atitle%3DIsolation%2520of%2520a%2520common%2520receptor%2520for%2520coxsackie%2520B%26rft.jtitle%3DScience%26rft.aulast%3DBergelson%26rft.auinit%3DJ%26rft.date%3D1997%26rft.volume%3D275%26rft.spage%3D1320%26rft.epage%3D1323%26rfe_val_fmt%3Dinfo%253Aofi%252Ffmt%253Akev%253Amtx%253Ajournal%26rfe.atitle%3Dp27-p16%2520Chimera%253A%2520A%2520Superior%2520Antiproliferative%26rfe.jtitle%3DMolecular%2520Therapy%26rfe.aulast%3DMcArthur%26rfe.aufirst%3DJames%26rfe.date%3D2001%26rfe.volume%3D3%26rfe.issue%3D1%26rfe.spage%3D8%26rfe.epage%3D13%26req_ref_fmt%3Dhttp%253A%252f%252Flib.caltech.edu%252Ffmt%252Fldap-mtx.html%26req_ref%3Dhttp%253A%252F%252Fldap.caltech.edu%252Fjaned%252Frecord.txt
+

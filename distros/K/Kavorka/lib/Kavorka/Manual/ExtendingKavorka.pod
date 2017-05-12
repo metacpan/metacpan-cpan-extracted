@@ -1,0 +1,124 @@
+=pod
+
+=encoding utf-8
+
+=for stopwords invocant invocants
+
+=head1 NAME
+
+Kavorka::Manual::ExtendingKavorka - extending Kavorka with traits and new keywords
+
+=head1 DESCRIPTION
+
+=head2 Traits
+
+Many of the code constructs handled by Kavorka allow a list of traits
+to be given. Subs can have traits:
+
+   method xyz ($x, $y, $z) is friendly { ... }
+
+So can parameters within signatures:
+
+   method xyz ($x is hot, $y does warm, $z but cool) { ... }
+
+And return types:
+
+   method get_age (Date $date → Num $age is years) { ... }
+
+When a trait is used which isn't natively handled by L<Kavorka::Sub>,
+L<Kavorka::Parameter> or L<Kavorka::ReturnType>, Kavorka will attempt
+to load a L<Moo::Role> to handle the trait. These will be loaded from
+the following namespaces, as appropriate:
+
+=over
+
+=item *
+
+C<< Kavorka::TraitFor::Sub::* >>
+
+=item *
+
+C<< Kavorka::TraitFor::Parameter::* >>
+
+=item *
+
+C<< Kavorka::TraitFor::ReturnType::* >>
+
+=back
+
+For example, C<Kavorka::TraitFor::Sub::friendly>.
+
+=head2 Trait Parameters
+
+Although none of Kavorka's native traits make use of this syntax,
+traits can be followed by trait parameters in parentheses:
+
+   BEGIN {
+      package Kavorka::TraitFor::Parameter::debug;
+      use Moo::Role;
+      around injection => sub
+      {
+         my $next = shift;
+         my $self = shift;
+         my $code = $self->$next(@_);
+         $code .= sprintf(
+            "printf STDERR %s, %s, %s;",
+            B::perlstring($self->traits->{debug}[0]),
+            B::perlstring($self->name),
+            $self->name,
+         );
+         return $code;
+      };
+   }
+   
+   use Kavorka;
+   
+   fun foo ( $x but debug("%s is %s\n") ) {
+      ## Injected:
+      ## printf STDERR "%s is %s\n", "\$x", $x;
+      return $x;
+   }
+   
+   foo(42);  # says to STDERR: '$x is 42'
+
+=head2 Keywords
+
+Traits are not applied to subs until I<after> they've been parsed,
+which means that traits cannot, say, alter how the signature is parsed,
+because the signature occurs before the traits.
+
+For more advanced control over the parsing and behaviour of subs, you
+would need to create a new keyword. A keyword is just a L<Moo> class
+which consumes the L<Kavorka::Sub> role. L<Kavorka::Sub::Method> and
+L<Kavorka::Sub::Fun> are simple examples of such keyword classes.
+
+People can use your new keyword like this:
+
+   use Kavorka yourkeyword => { implementation => "Your::Class" };
+
+=head1 BUGS
+
+Please report any bugs to
+L<http://rt.cpan.org/Dist/Display.html?Queue=Kavorka>.
+
+=head1 SEE ALSO
+
+L<Kavorka::Manual>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2013-2014, 2017 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

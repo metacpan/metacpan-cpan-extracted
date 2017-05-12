@@ -1,0 +1,539 @@
+---
+full_menubar:
+  -
+    menu file:
+      - item file-new
+      -
+      -
+        menu file_open file-open:
+          - item file-open
+          - item file-open-dir
+          -
+          - item file-insert 
+          -
+          - item file-reload
+          - item file-reload-all
+      - menu file_history
+      -
+      -
+        menu file_session:
+          - item file-session-open
+          - item file-session-add
+          - item file-session-save
+          -
+          - item file-session-backup-open
+          - item file-session-backup-save
+          -
+          - item file-session-import
+          - item file-session-export
+      -
+      - menu file_save:#
+      - item file-save-current
+      - item file-save-all
+      - item file-save-as
+      - item file-save-copy-as
+      - item file-rename
+      - item file-print#
+      -
+      -
+        menu file_close file-close-current:
+          - item file-close-current
+          - item file-close-other
+          - item file-close-all
+          -
+          - item file-close-unsaved
+          - item file-close-other-unsaved
+          - item file-close-all-unsaved
+      -
+      - item app-exit-unsaved
+      - item app-exit
+  -
+    menu edit:
+      - item edit-changes-undo
+      - item edit-changes-redo
+      -
+        menu edit_changes:
+          - item edit-changes-undo-several
+          - item edit-changes-redo-several
+          -
+          - item edit-changes-goto-begin
+          - item edit-changes-goto-end
+          -
+          - item edit-changes-delete
+      -
+      - item edit-cut
+      - item edit-copy
+      - item edit-paste
+      - item edit-replace
+      - item edit-delete
+      -
+      -
+        menu current_line:
+          - item edit-line-cut
+          - item edit-line-copy
+          - item edit-line-duplicate
+          - item edit-line-replace
+          - item edit-line-swap
+          - item edit-line-delete
+          - item edit-line-delete-left
+          - item edit-line-delete-right
+          -
+          - item edit-line-move-line-up
+          - item edit-line-move-line-down
+          - item edit-line-move-page-up
+          - item edit-line-move-page-down
+      -
+        menu select:
+          - item select-document
+          - item select-toggle-simple
+          - item select-toggle-content
+      -
+        menu selection:
+          - item edit-selection-move-char-left
+          - item edit-selection-move-char-right
+          - item edit-selection-move-line-up
+          - item edit-selection-move-line-down
+          - item edit-selection-move-page-up
+          - item edit-selection-move-page-down
+      -
+      -
+        menu selection_format:
+          - item edit-selection-format-indent-char
+          - item edit-selection-format-dedent-char
+          - item edit-selection-format-indent-tab
+          - item edit-selection-format-dedent-tab
+          - item edit-selection-format-align-on-begin
+          -
+          - item edit-selection-format-join-lines
+          -
+          - item edit-selection-format-block-on-right-margin
+          - item edit-selection-format-block-on-width
+          - item edit-selection-format-linewrap-on-right-margin
+          - item edit-selection-format-linewrap-on-width
+          -
+          - item edit-selection-format-del-trailing-whitespace
+      -
+        menu selection_comment:
+          - item edit-selection-comment-add-perl
+          - item edit-selection-comment-del-perl
+          - item edit-selection-comment-toggle-perl
+          -
+          - item edit-selection-comment-add-c
+          - item edit-selection-comment-del-c
+          -
+          - item edit-selection-comment-add-xml
+          - item edit-selection-comment-del-xml
+      -
+        menu selection_convert:
+          - item edit-selection-convert-uppercase
+          - item edit-selection-convert-lowercase
+          - item edit-selection-convert-titlecase
+          - item edit-selection-convert-sentencecase
+          -
+          - item edit-selection-convert-spaces2tabs
+          - item edit-selection-convert-tabs2spaces
+          -
+          - item edit-selection-convert-spaces2entities
+          - item edit-selection-convert-entities2spaces
+          - item edit-selection-convert-chars2entities
+          - item edit-selection-convert-entities2chars
+  -
+    menu search:
+      - item view-searchbar-goto
+      - item view-dialog-find
+      - item view-dialog-replace
+      -
+        menu find_functions:
+          - item find-prev
+          - item find-next
+          - item find-first
+          - item find-last
+          - item find-selection
+      -
+        menu replace_functions:
+          - item replace-prev
+          - item replace-next
+          - item replace-all
+          - item replace-with-confirm
+          - item replace-selection
+      -
+        menu search_attributes:
+          - checkitem search-attribute-incremental-switch
+          - checkitem search-attribute-autowrap-switch
+          -
+          - checkitem search-attribute-regex-switch
+          - checkitem search-attribute-match-whole-word-switch
+          - checkitem search-attribute-match-word-begin-switch
+          - checkitem search-attribute-match-case-switch
+          -
+          - radioitem search-range-selection
+          - radioitem search-range-document
+          - radioitem search-range-open-docs
+      -
+      - item goto-line
+      - item goto-last-edit
+      -
+      -
+        menu marker:
+          - item marker-goto-prev-doc
+          - item marker-goto-next-doc
+          - item marker-goto-prev-all
+          - item marker-goto-next-all
+          - item marker-toggle-here
+          - item marker-delete-doc
+          - item marker-delete-all
+      -
+      -
+        menu bookmark_goto:
+          - item bookmark-goto-1
+          - item bookmark-goto-2
+          - item bookmark-goto-3
+          - item bookmark-goto-4
+          - item bookmark-goto-5
+          - item bookmark-goto-6
+          - item bookmark-goto-7
+          - item bookmark-goto-8
+          - item bookmark-goto-9
+          - item bookmark-goto-0
+      -
+        menu bookmark_toggle:
+          - item bookmark-toggle-1
+          - item bookmark-toggle-2
+          - item bookmark-toggle-3
+          - item bookmark-toggle-4
+          - item bookmark-toggle-5
+          - item bookmark-toggle-6
+          - item bookmark-toggle-7
+          - item bookmark-toggle-8
+          - item bookmark-toggle-9
+          - item bookmark-toggle-0
+      - item bookmark-delete-doc
+      - item bookmark-delete-all
+  -
+    menu tools:
+      - item tool-interpreter-run-document
+      - item tool-interpreter-stop-document
+      -
+        menu tool_output:
+          - item tool-output-selection-dec
+          - item tool-output-selection-hex
+          -
+          - item tool-output-env
+          - item tool-output-inc
+      -
+      - menu insert_templates
+      - item tool-choose-color
+      - item tool-insert-time-date
+      -
+      - item tool-perl-insert-last-var
+      - item tool-perl-copy-string
+      -
+      - item tool-note
+      - item tool-note-selection
+      -
+      - checkitem tool-auto-indention
+      - checkitem tool-brace-indention
+      - checkitem tool-brace-completion
+  -
+    menu document:
+      -
+        menu document_change:
+          - item document-change-prev
+          - item document-change-next 
+          - item document-change-back
+          -
+          - item document-move-right
+          - item document-move-left
+      -
+      -
+        menu document_syntaxmode:
+          - item document-syntaxmode-auto
+          - checkitem document-syntaxmode-none
+          -
+          -
+            menu document_syntaxmode_A-M:
+              - checkitem document-syntaxmode-ada
+              - checkitem document-syntaxmode-as
+              - checkitem document-syntaxmode-asm
+              - checkitem document-syntaxmode-ave
+              - checkitem document-syntaxmode-baan
+              - checkitem document-syntaxmode-batch
+              - checkitem document-syntaxmode-c
+              - checkitem document-syntaxmode-cs
+              - checkitem document-syntaxmode-conf
+              - checkitem document-syntaxmode-context
+              - checkitem document-syntaxmode-css
+              - checkitem document-syntaxmode-diff
+              - checkitem document-syntaxmode-eiffel
+              - checkitem document-syntaxmode-err
+              - checkitem document-syntaxmode-forth
+              - checkitem document-syntaxmode-fortran
+              - checkitem document-syntaxmode-html
+              - checkitem document-syntaxmode-idl
+              - checkitem document-syntaxmode-java
+              - checkitem document-syntaxmode-js
+              - checkitem document-syntaxmode-latex
+              - checkitem document-syntaxmode-lisp
+              - checkitem document-syntaxmode-lua
+              - checkitem document-syntaxmode-make
+              - checkitem document-syntaxmode-matlab
+          -
+            menu document_syntaxmode_N-Z:
+              - checkitem document-syntaxmode-nsis
+              - checkitem document-syntaxmode-pascal
+              - checkitem document-syntaxmode-perl
+              - checkitem document-syntaxmode-php
+              - checkitem document-syntaxmode-property
+              - checkitem document-syntaxmode-ps
+              - checkitem document-syntaxmode-python
+              - checkitem document-syntaxmode-ruby
+              - checkitem document-syntaxmode-scheme
+              - checkitem document-syntaxmode-sh
+              - checkitem document-syntaxmode-sql
+              - checkitem document-syntaxmode-tcl
+              - checkitem document-syntaxmode-tex
+              - checkitem document-syntaxmode-vb
+              - checkitem document-syntaxmode-vbs
+              - checkitem document-syntaxmode-xml
+              - checkitem document-syntaxmode-yaml
+          -
+          -
+            menu document_syntaxmode_compiled:
+              - checkitem document-syntaxmode-asm
+              - checkitem document-syntaxmode-c
+              - checkitem document-syntaxmode-cs
+              - checkitem document-syntaxmode-eiffel
+              - checkitem document-syntaxmode-forth
+              - checkitem document-syntaxmode-fortran
+              - checkitem document-syntaxmode-java
+              - checkitem document-syntaxmode-pascal
+          -
+            menu document_syntaxmode_interpreted:
+              - checkitem document-syntaxmode-batch
+              - checkitem document-syntaxmode-js
+              - checkitem document-syntaxmode-lisp
+              - checkitem document-syntaxmode-lua
+              - checkitem document-syntaxmode-nsis
+              - checkitem document-syntaxmode-perl
+              - checkitem document-syntaxmode-php
+              - checkitem document-syntaxmode-ps
+              - checkitem document-syntaxmode-python
+              - checkitem document-syntaxmode-ruby
+              - checkitem document-syntaxmode-scheme
+              - checkitem document-syntaxmode-sh
+              - checkitem document-syntaxmode-tcl
+              - checkitem document-syntaxmode-vb
+              - checkitem document-syntaxmode-vbs
+          -
+            menu document_syntaxmode_document:
+              - checkitem document-syntaxmode-context
+              - checkitem document-syntaxmode-css
+              - checkitem document-syntaxmode-html
+              - checkitem document-syntaxmode-latex
+              - checkitem document-syntaxmode-ps
+              - checkitem document-syntaxmode-tex
+          -
+            menu document_syntaxmode_data_structure:
+              - checkitem document-syntaxmode-conf
+              - checkitem document-syntaxmode-property
+              - checkitem document-syntaxmode-sql
+              - checkitem document-syntaxmode-xml
+              - checkitem document-syntaxmode-yaml
+          -
+            menu document_syntaxmode_web:
+              - checkitem document-syntaxmode-as
+              - checkitem document-syntaxmode-css
+              - checkitem document-syntaxmode-html
+              - checkitem document-syntaxmode-js
+              - checkitem document-syntaxmode-perl
+              - checkitem document-syntaxmode-php
+              - checkitem document-syntaxmode-vbs
+          -
+            menu document_syntaxmode_special:
+              - checkitem document-syntaxmode-baan
+              - checkitem document-syntaxmode-diff
+              - checkitem document-syntaxmode-err
+              - checkitem document-syntaxmode-idl
+              - checkitem document-syntaxmode-make
+              - checkitem document-syntaxmode-matlab
+      -
+        menu document_encoding:
+          - radioitem document-encoding-ascii
+          - radioitem document-encoding-latin1#
+          - radioitem document-encoding-utf8
+      - checkitem document-tabs-use
+      -
+        menu document_tab_width:
+          - radioitem document-tabs-width-1
+          - radioitem document-tabs-width-2
+          - radioitem document-tabs-width-3
+          - radioitem document-tabs-width-4
+          - radioitem document-tabs-width-5
+          - radioitem document-tabs-width-6
+          - radioitem document-tabs-width-8
+      -
+        menu document_lineendchar:
+          - radioitem document-EOL-lf
+          - radioitem document-EOL-cr
+          - radioitem document-EOL-cr+lf
+      -
+        menu document_readonly:
+          - radioitem document-readonly-as-attr
+          - radioitem document-readonly-on
+          - radioitem document-readonly-off
+  -
+    menu view:
+      -
+        menu view_window:
+          - checkitem view-window-fullscreen
+          - checkitem view-editpanel-maximize
+          - checkitem view-window-stay-on-top
+          - checkitem view-window-transparent
+      -
+        menu view_panel:
+          - checkitem view-panel-output
+          - checkitem view-panel-notepad
+      -
+        menu view_bars:
+          - checkitem view-menubar
+          - checkitem view-toolbar
+          - checkitem view-tabbar
+          - checkitem view-searchbar
+          - checkitem view-statusbar
+      -
+        menu view_contextmenu:
+          - checkitem view-tabbar-contexmenu#
+          -
+            menu view_editpanel_contexmenu:
+              - radioitem view-editpanel-contextmenu-custom
+              - radioitem view-editpanel-contextmenu-default
+              - radioitem view-editpanel-contextmenu-no
+          - checkitem view-editpanel-margin-contexmenu
+          - checkitem view-searchbar-contexmenu
+          - checkitem view-statusbar-contexmenu
+      -
+      - checkitem view-editpanel-margin-marker
+      - checkitem view-editpanel-margin-line-number
+      - checkitem view-editpanel-margin-text-fold
+      -
+        menu view_text_fold:
+          - item view-editpanel-fold-toggle-here
+          - item view-editpanel-fold-toggle-recursively
+          - item view-editpanel-fold-toggle-level
+          - item view-editpanel-fold-toggle-all
+      -
+        menu view_textmargin:
+          - radioitem view-editpanel-margin-text-0
+          - radioitem view-editpanel-margin-text-1
+          - radioitem view-editpanel-margin-text-2
+          - radioitem view-editpanel-margin-text-3
+          - radioitem view-editpanel-margin-text-4
+          - radioitem view-editpanel-margin-text-6
+          - radioitem view-editpanel-margin-text-8
+          - radioitem view-editpanel-margin-text-10
+          - radioitem view-editpanel-margin-text-12
+      -
+      - checkitem view-editpanel-right-margin
+      - checkitem view-editpanel-line-wrap
+      - checkitem view-editpanel-indicator-indention-guide
+      - checkitem view-editpanel-indicator-brace-light
+      - checkitem view-editpanel-indicator-caret-line
+      - checkitem view-editpanel-indicator-EOL
+      - checkitem view-editpanel-indicator-whitespace
+      - item view-editpanel-font
+      -
+        menu view_zoom:
+          - item view-editpanel-zoom-in
+          - item view-editpanel-zoom-out
+          - item view-editpanel-zoom-normal
+  -
+    menu config:
+      - item view-dialog-config#
+      - #
+      - menu config_app_lang
+      -
+      -
+        menu config_global:
+          - item config-file-global-open
+          - item config-file-global-reload
+          - item config-file-global-save
+          -
+          - item config-file-global-load-from
+          - item config-file-global-merge
+          - item config-file-global-save-as
+          -
+          - item config-file-global-load-backup
+          - item config-file-global-load-defaults
+      -
+        menu config_interface:
+          - item config-file-interface-commandlist
+          - item config-file-interface-menubar
+          - item config-file-interface-contextmenu
+          - item config-file-interface-toolbar
+          - item config-file-interface-maintoolbar#
+          - item config-file-interface-searchbar#
+          - item config-file-interface-statusbar#
+      - menu config_localisation
+      -
+        menu config_syntaxmode_A-M:
+          - item config-file-syntaxmode-ada
+          - item config-file-syntaxmode-as
+          - item config-file-syntaxmode-asm
+          - item config-file-syntaxmode-ave
+          - item config-file-syntaxmode-baan
+          - item config-file-syntaxmode-batch
+          - item config-file-syntaxmode-c
+          - item config-file-syntaxmode-cs
+          - item config-file-syntaxmode-conf
+          - item config-file-syntaxmode-context
+          - item config-file-syntaxmode-css
+          - item config-file-syntaxmode-diff
+          - item config-file-syntaxmode-eiffel
+          - item config-file-syntaxmode-err
+          - item config-file-syntaxmode-forth
+          - item config-file-syntaxmode-fortran
+          - item config-file-syntaxmode-html
+          - item config-file-syntaxmode-idl
+          - item config-file-syntaxmode-java
+          - item config-file-syntaxmode-js
+          - item config-file-syntaxmode-latex
+          - item config-file-syntaxmode-lisp
+          - item config-file-syntaxmode-lua
+          - item config-file-syntaxmode-make
+          - item config-file-syntaxmode-matlab
+      -
+        menu config_syntaxmode_N-Z:
+          - item config-file-syntaxmode-nsis
+          - item config-file-syntaxmode-pascal
+          - item config-file-syntaxmode-perl
+          - item config-file-syntaxmode-php
+          - item config-file-syntaxmode-property
+          - item config-file-syntaxmode-ps
+          - item config-file-syntaxmode-python
+          - item config-file-syntaxmode-ruby
+          - item config-file-syntaxmode-scheme
+          - item config-file-syntaxmode-sh
+          - item config-file-syntaxmode-sql
+          - item config-file-syntaxmode-tcl
+          - item config-file-syntaxmode-tex
+          - item config-file-syntaxmode-vb
+          - item config-file-syntaxmode-vbs
+          - item config-file-syntaxmode-xml
+          - item config-file-syntaxmode-yaml
+      - item config-file-templates
+  -
+    menu help:
+      - item view-documentation-welcome
+      - item view-documentation-this-version
+      - item view-documentation-navigation-guide
+      - item view-documentation-feature-list
+      - item view-documentation-advanced-tour
+      - item view-documentation-credits
+      -
+      - item view-webpage-documentation
+      - item view-webpage-forum
+      - item view-webpage-bug-tracker
+      - item view-webpage-feature-wish
+      -
+      - item view-dialog-keymap
+      - item view-dialog-info

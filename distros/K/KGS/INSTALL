@@ -1,0 +1,31 @@
+Standard perl module building:
+
+   perl Makefile.PL
+   make
+   make install
+
+Running kgsueme example client:
+
+  kgsueme
+
+Running the protocol tracer app (run it and connect to localhost instead
+of kgs.kiseido.com):
+
+  kgstrace
+
+For the KGS modules, all you need is below the lib/ directory. It should not
+need any special modules.
+
+gtp-controller and kgstrace need these modules:
+
+   Event
+
+The sample client needs these (nonstandard) modules:
+
+   Audio::Data
+   Audio::Play
+   Gtk2
+
+For Gtk2, I used the gtk-xs version (now on CPAN, so fetch it there).
+
+

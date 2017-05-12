@@ -1,0 +1,107 @@
+
+# Auto-generated file -- DO NOT EDIT!!!!!
+
+=head1 NAME
+
+KinoSearch::Index::DeletionsWriter - Abstract base class for marking documents as deleted.
+
+=head1 DEPRECATED
+
+The KinoSearch code base has been assimilated by the Apache L<Lucy> project.
+The "KinoSearch" namespace has been deprecated, but development continues
+under our new name at our new home: L<http://lucy.apache.org/>
+
+=head1 SYNOPSIS
+
+    my $polyreader  = $del_writer->get_polyreader;
+    my $seg_readers = $polyreader->seg_readers;
+    for my $seg_reader (@$seg_readers) {
+        my $count = $del_writer->seg_del_count( $seg_reader->get_seg_name );
+        ...
+    }
+
+
+
+=head1 DESCRIPTION
+
+Subclasses of DeletionsWriter provide a low-level mechanism for declaring a
+document deleted from an index.
+
+Because files in an index are never modified, and because it is not
+practical to delete entire segments, a DeletionsWriter does not actually
+remove documents from the index.  Instead, it communicates to a search-time
+companion DeletionsReader which documents are deleted in such a way that it
+can create a Matcher iterator.
+
+Documents are truly deleted only when the segments which contain them are
+merged into new ones.
+
+
+
+=head1 ABSTRACT METHODS
+
+=head2 delete_by_term( I<[labeled params]> )
+
+Delete all documents in the index that index the supplied term.
+
+=over
+
+=item *
+
+B<field> - The name of an indexed field. (If it is not spec'd as
+C<< indexed >>, an error will occur.)
+
+=item *
+
+B<term> - The term which identifies docs to be marked as deleted.  If
+C<< field >> is associated with an Analyzer, C<< term >>
+will be processed automatically (so don't pre-process it yourself).
+
+=back
+
+=head2 delete_by_query(query)
+
+Delete all documents in the index that match C<< query >>.
+
+=over
+
+=item *
+
+B<query> - A L<Query|KinoSearch::Search::Query>.
+
+=back
+
+=head2 updated()
+
+Returns true if there are updates that need to be written.
+
+=head2 seg_del_count(seg_name)
+
+Return the number of deletions for a given segment.
+
+=over
+
+=item *
+
+B<seg_name> - The name of the segment.
+
+=back
+
+
+
+
+
+=head1 INHERITANCE
+
+KinoSearch::Index::DeletionsWriter isa L<KinoSearch::Index::DataWriter> isa L<KinoSearch::Object::Obj>.
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005-2011 Marvin Humphrey
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
+

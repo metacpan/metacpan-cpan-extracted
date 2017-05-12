@@ -1,0 +1,125 @@
+#!/usr/bin/perl
+
+package Main;
+$Main::VERSION = '0.049';
+# PODNAME: koha-overdue
+# ABSTRACT: Claim overdues each day, grouping same overdues
+
+
+use Modern::Perl;
+use Koha::Contrib::Tamil::Overdue;
+use Pod::Usage;
+use Getopt::Long;
+
+
+binmode(STDOUT, ':encoding(utf8)');
+
+
+my ($verbose, $help, $doit) = (0, 0, 0);
+GetOptions( 
+    'verbose' => \$verbose,
+    'help'    => \$help,
+    'doit'    => \$doit,
+);
+
+
+sub usage {
+    pod2usage( -verbose => 2 );
+    exit;  
+}
+
+usage()  if @ARGV == 0 || $help;
+
+my $overdue = Koha::Contrib::Tamil::Overdue->new( doit => $doit, verbose => $verbose );
+
+no strict "refs";
+for (@ARGV) {
+    usage()  unless /process|clear|email|print/;
+    $overdue->meta->get_method($_)->($overdue);
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+koha-overdue - Claim overdues each day, grouping same overdues
+
+=head1 VERSION
+
+version 0.049
+
+=head1 DESCRIPTION
+
+Process Koha overdues.
+
+The script requires to operate a configuration file (config.yaml) located in
+Koha etc/overdue directory. 
+
+=head1 USAGE
+
+=over
+
+=item koha-overdue [--verbose|--help|--doit] process|clear|email|print 
+
+=back
+
+=head1 PARAMETERS
+
+=over
+
+=item B<--doit>
+
+Do effectively the required action. Otherwise show what the action would do.
+
+=item B<--verbose|-v>
+
+Enable script verbose mode. 
+
+=item B<--help|-h>
+
+Print this help page.
+
+=back
+
+=head1 ACTIONS
+
+=over
+
+=item B<process>
+
+Process all overdues.
+
+=item B<clear>
+
+Delete from message_queue table all messages that have been added the last
+hours, that are 'email' or 'print' message with 'pending' status.
+
+=item B<email>
+
+Send by email all 'email' messages that are pending.
+
+=back
+
+=item B<print>
+
+Print all 'print' messages that are pending.
+
+=back
+
+=head1 AUTHOR
+
+Frédéric Demians <f.demians@tamil.fr>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2016 by Fréderic Démians.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

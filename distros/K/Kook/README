@@ -1,0 +1,147 @@
+=============
+plKook README
+=============
+
+Release::  0.0100
+
+
+About
+-----
+
+plKook is a smart build tool similar to Make, Rake, Ant, Scons, or Cook.
+Kookbook.pl, which is a task definition file for plKook, is written in Perl.
+You can write any Perl code in your Kookbook.pl.
+
+
+*NOTICE* plKook is under alpha release. Specs and features are subject to
+change without notice.
+
+
+Installation
+------------
+
+   $ cpanm Kook
+
+Or:
+
+   $ tar xzf Kook-0.0100.tar.gz
+   $ cd plkook-0.0100/
+   $ perl Makefile.PL
+   $ make
+   $ make test
+   $ sudo make install
+
+
+Example
+-------
+
+Kookbook.pl::
+
+    ## default task name
+    $kook_default = 'all';
+    
+    ## properties
+    my $release = prop('release', '1.0.0');
+    my $CC      = prop('CC', 'gcc');
+    
+    ## file recipe
+    recipe 'hello', {                    # product
+        ingreds => ['hello.o'],          # ingredients
+        kind    => 'file',
+        desc    => "build 'hello' command",
+        method  => sub {
+            my ($c) = @_;
+            sys "$CC -o $c->{product} $c->{ingred}";
+        }
+    };
+    
+    ## file recipe
+    recipe '*.o', {                      # product
+        ingreds => ['$(1).c', '$(1).h'], # ingredients
+        desc    => "compile *.c into *.o",
+        method  => sub {
+            my ($c) = @_;
+            sys "$CC -c $c->{ingred}";
+        }
+    };
+
+    ## task recipe
+    recipe 'package', {
+        ingreds => ['hello'],             # ingredients
+        desc    => "create package",
+        method  => sub {
+            my $base    = "hello-$release";
+            my $pkgdir  = "build/$base";
+            rm_rf $pkgdir;
+            mkdir_p $pkgdir;
+            cp 'README', 'hello', $pkgdir;
+            cd "build", sub {
+                sys "tar czf $base.tar.gz $base";
+            };
+        }
+    };
+    
+    ## task recipe
+    recipe 'all', {
+        ingreds => ['package'],       # ingredients
+        desc    => "build all",
+    };
+    
+    ## task recipe
+    recipe 'clean', {
+        desc    => "remove *.o",
+        method  => sub {
+            rm_f '*.o';
+        }
+    };
+
+
+Command-line example::
+
+    bash> kk -l    # or plkook -l
+    Properties:
+      release              : "1.0.0"
+      CC                   : "gcc"
+    
+    Task recipes (default=all):
+      package              : create package
+      all                  : build all
+      clean                : remove *.o
+    
+    File recipes:
+      hello                : build 'hello' command
+      *.o                  : compile *.c into *.o
+    
+    (Tips: it is able to separate properties into 'Properties.pl' file.)
+
+    bash> kk    # or plkook
+    ### **** hello.o (recipe=*.o)
+    $ gcc -c hello.c
+    ### *** hello (recipe=hello)
+    $ gcc -o hello hello.o
+    ### ** package (recipe=package)
+    $ rm -rf build/hello-1.0.0
+    $ mkdir -p build/hello-1.0.0
+    $ cp README hello build/hello-1.0.0
+    ### * all (recipe=all)
+
+    bash> kk clean   # or plkook clean
+    ### * clean (recipe=task_clean)
+    $ rm -f *.o
+
+
+#See 'doc/users-guide.html' for details.   <- coming soon!
+
+
+License
+-------
+
+MIT License
+
+
+Author
+------
+
+makoto kuwata <kwa(at)kuwata-lab.com>
+
+copyright(c) 2009-2011 kuwata-lab.com all rights reserved.

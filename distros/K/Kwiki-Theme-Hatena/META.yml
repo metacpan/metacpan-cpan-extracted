@@ -1,0 +1,13 @@
+abstract: Kwiki Hatena Theme
+author: Kazuhiro Osawa <ko@yappo.ne.jp>
+build_requires: 
+  Test::More: 0.42
+distribution_type: module
+generated_by: Module::Install version 0.61
+license: perl
+name: Kwiki-Theme-Hatena
+no_index: 
+  directory: 
+    - inc
+    - t
+version: 0.01

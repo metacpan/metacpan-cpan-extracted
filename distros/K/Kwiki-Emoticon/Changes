@@ -1,0 +1,8 @@
+0.03 2006-01-15T10:38:50Z
+- Fix config preloading bug
+
+0.02 2006/01/13
+- Now it adds method to config properly
+
+0.01
+- Initial Release

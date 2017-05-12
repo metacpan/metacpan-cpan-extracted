@@ -1,0 +1,97 @@
+---
+version: 0.39
+date:    Tue Mar  6 12:13:40 PST 2007
+changes:
+- Adding documentation for Kwiki 2
+- Explain that people should use Kwiki from SVN rather than CPAN for now
+---
+version: 0.38
+date:    Mon Apr  4 07:44:29 PDT 2005
+changes:
+- Tweak for Kwiki-HomePagePreference
+- Allow the hub to be hooked.
+- Socialtext changes
+- Allow ; in addition to & in query strings
+- Get rid of -M operators
+- Make redirects RFC compliant
+- Refactored themes
+- empty links cause double page loads
+- Refactors to get rid of hub connections
+- eliminate use_class
+- COmment support
+- Kwid Formatter for Spork
+- Also prints command usage from plugins.
+- copyright 2005
+- tweak space on usage()
+- eliminate cleanup undef warning when doing 'kwiki -update'
+---
+version: 0.37
+date:    Tue Jan 11 07:45:24 PST 2005
+changes:
+- Remove load_class calls per Spoon 0.21
+- Move archive commit hook into super class
+- Split Kwiki::COmmand into Spoon::Command
+- Make kwiki -compress work again :\
+- Change -subwiki to -new_view
+- List all plugins commented out in plugins file
+- Support PagePrivacy
+- Support multiple config*.*
+- Make toolbar, widgets, and status prereqs of theme
+---
+version: 0.36
+date:    Sat Dec 18 00:52:03 PST 2004
+changes:
+- Make dependent on new Spoon which cures memory cycles
+- Add more of Dave Rolsky's tests
+---
+version: 0.35
+date:    Sat Dec 18 00:38:39 PST 2004
+changes:
+- Make compatible with Kwiki-0.34
+---
+version: 0.35
+date:    Fri Dec 17 02:46:43 PST 2004
+changes:
+- Fixed archive commit hook
+- Don't fail tests if no HTTP::BrowserDetect
+---
+version: 0.34
+date:    Wed Dec 15 13:55:58 PST 2004
+- Kwiki is now memory cycle free, which makes it much more suitable for use
+  under mod_perl (Dave Rolsky)
+- Added Pane superclass for Toolbar Widgets and Status
+- Added BrowserDetect module
+- Removed Htaccess module
+- Added Kwiki::WebFile base class
+- Use new Spoon::Hook for archive
+- Make path configurable for templates, css, and javascript
+- Add -subwiki and -update_all actions to installer.
+- Add -quiet/-q options to installer
+- Add BEGIN/END comments to templates automatically
+- Make installer smarter
+- Plugins can specify prerequisites
+- Add ip address to page metadata
+---
+version: 0.33
+date:    Sun Aug  8 23:12:30 PDT 2004
+changes:
+- Archive API supports svk
+- Full unicode support
+---
+version: 0.32
+date:    Tue Jul 20 03:01:51 PDT 2004
+changes:
+- Make kwiki -update take a directory parameter
+- kwiki -update checks that wiki directory is valid
+- Added status pane
+---
+version: 0.31
+date:    Tue Jun 22 09:39:29 PDT 2004
+changes:
+- Installer was clobbering some files
+- Allow installer to take a directory argument
+---
+version: 0.30
+date:    Sun Jun 20 13:48:35 PDT 2004
+changes:
+- Initial release.

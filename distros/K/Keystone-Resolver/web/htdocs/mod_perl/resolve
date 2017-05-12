@@ -1,0 +1,73 @@
+#!/usr/bin/perl -w
+
+# $Id: resolve,v 1.9 2008-04-11 12:03:31 mike Exp $
+#
+# This is the front end for Keystone Resolver when invoked either as
+# an OpenURL 0.1 resolver, or as a Z39.88 (OpenURL 1.0) resolver using
+# any of the transports
+#	info:ofi/tsp:http:openurl-by-val
+#	info:ofi/tsp:http:openurl-by-ref
+#	info:ofi/tsp:http:openurl-inline
+# or their secure HTTPS equivalents, as defined in Part 1, section
+# 15.1 of the standard, and as described in Part 2, section 9.  It
+# works using both HTTP GET and HTTP POST.
+#
+# The classes that do the actual work are designed to work with other
+# Z39.88 transports too, but none have been defined yet.
+
+use strict;
+use warnings;
+use CGI;
+use Keystone::Resolver;
+
+Keystone::Resolver::Utils::apache_non_moronic_logging();
+
+{
+my $cgi = new CGI();
+if (0) {
+    ### Temporary measure.  We will want better logging down the line.
+    my $file = "/usr/local/src/cvs/resolver/samples/openurls/samples";
+    open F, ">>$file"
+	or die "can't write to OpenURL log file '$file': $!";
+
+    print F $cgi->query_string(), "\n";
+    close F;
+}
+
+binmode STDERR, ":utf8"; # For any temporary debugging output
+my $referer = $ENV{HTTP_REFERER} || "http://made.up.referrer/foo";
+my $resolver = new Keystone::Resolver();
+my $openURL = Keystone::Resolver::OpenURL->newFromCGI($resolver, $cgi, $referer);
+
+my($type, $content);
+eval {
+    ($type, $content) = $openURL->resolve();
+}; if ($@ && !ref $@ && $@ =~ /DBI connect.*failed/) {
+    print <<__EOT__;
+It was not possible to connect to the Keystone Resolver database.
+Please see /usr/share/libkeystone-resolver-perl/db/README
+
+Detailed error message follows, but you can probably ignore it:
+--
+$@
+__EOT__
+} elsif ($@ && (!ref $@ || $@->isa("HTML::Mason::Exception")) && $@ =~ /Unknown column/) {
+    print <<__EOT__;
+A column was missing from a table in the Keystone Resolver database.
+This probably means that the structure of your database is out of date
+Please see /usr/share/libkeystone-resolver-perl/db/README.update
+
+Detailed error message follows, but you can probably ignore it:
+--
+$@
+__EOT__
+    return;
+} elsif ($@) {
+    print "Uh-oh!\n$@";
+    exit;
+}
+
+my $r = Keystone::Resolver::Utils::apache_request($cgi);
+$r->content_type($type);
+print $content;
+}

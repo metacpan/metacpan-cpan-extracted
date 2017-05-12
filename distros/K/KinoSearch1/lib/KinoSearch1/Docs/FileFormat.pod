@@ -1,0 +1,237 @@
+=head1 NAME
+
+KinoSearch1::Docs::FileFormat - overview of invindex file format
+
+=head1 OVERVIEW
+
+It is not necessary to understand the guts of the Lucene-derived "invindex"
+file format in order to use KinoSearch1, but it may be helpful if you are
+interested in tweaking for high performance, exotic usage, or debugging and
+development.  
+
+On a file system, all the files in an invindex exist in one, flat directory.
+Conceptually, the files have a hierarchical relationship: an invindex is made
+up of "segments", each of which is an independent inverted index, and each
+segment is made up of several subsections.
+
+    [invindex]--|
+                |-"segments" file
+                |
+                |-[segments]------|
+                                  |--[seg _0]--|
+                                  |            |--[postings]
+                                  |            |--[stored fields]
+                                  |            |--[deletions]
+                                  |
+                                  |--[seg _1]--|
+                                  |            |--[postings]
+                                  |            |--[stored fields]
+                                  |            |--[deletions]
+                                  |
+                                  |--[ ... ]---| 
+                                
+
+The "segments" file keeps a list of the segments that make up an invindex.
+When a new segment is being written, KinoSearch1 may put files into the
+directory, but until the segments file is updated, a Searcher reading the
+index won't know about them.
+
+Each segment is an independent inverted index.  All the files which belong to
+a given segment share a common prefix which consists of an underscore followed
+by 1 or more decimal digits: _0, _67, _1058.  A fully optimized index has only
+a single segment.
+
+In theory there are many files which make up each segment.  However, when you
+look inside an invindex not in the process of being updated, you'll probably
+see only the segments file and files with either a .cfs or .del extension.
+The .cfs file, a "compound" file which is consolidated when a segment is
+finalized, "contains" all the other per-segment files.
+
+Segments are written once, and with the exception of the deletions file, are
+never modified once written.  They are deleted when their data is written to
+new segments during the process of optimization.
+
+=head1 A segment's component parts
+
+Each segment can be said to have four logical parts: postings, stored fields,
+the deletions file, and the term vectors data.
+
+=head2 Stored fields
+
+The stored fields are organized into two files.
+
+=over
+
+=item *
+
+[seg_name]B<.fdx> - Field inDeX - pointers to field data
+
+=item * 
+
+[seg_name]B<.fdt> - Field DaTa - the actual stored fields
+
+=back
+
+When a document turns up as a hit in a search and must be retrieved,
+KinoSearch1 looks at the Field inDeX file to see where in the data file the
+document's stored fields start, then retrieves all of them from the .fdt file 
+in one lump.
+
+    _1.fdx--|
+            |--[doc#0  =>   0]----->_1.fdt--|
+            |                               |--[bodytext]
+            |                               |--[title]
+            |                               |--[url]
+            |--[doc#1  => 305]----->_1.fdt--|             # byte 305
+            |                               |--[bodytext]
+            |                               |--[title]
+            |                               |--[url]
+            |--[...]--------------->_1.fdt--|--[...]
+
+If a field is marked as "vectorized", its "term vectors" are also stored in
+the .fdx file.
+
+=head2 Postings
+
+"Posting" is a technical term from the field of Information Retrieval which
+refers to an single instance of a one term indexing one document.  If you are
+looking at the index in the back of a book, and you see that "freedom" is
+referenced on pages 8, 86, and 240, that would be three postings, which taken
+together form a "posting list".  The same terminology applies to an index in
+electronic form.
+
+The postings data is spread out over 4 main files (not including field
+normalization data, which we'll get to in a moment).  From lowest to highest
+in the hierarchy, they are...
+
+[seg_name]B<.prx> - PRoXimity data. A list of the positions at which terms
+appear in any given document.  The .prx file is just a raw stream of VInts;
+the document numbers and terms are implicitly indicated by files higher up the
+hierarchy.
+
+[seg_name]B<.frq> - FReQuency data for terms.  If a term has a frequency of 5
+in a given document, that implies that there will be 5 entries in the .prx
+file.  The terms themselves are implicitly specified by the .tis file.
+
+    _1.frq--|
+            |--[doc#40 => 2]----->_1.prx--|--[54,107]
+            |--[doc#0  => 1]----->_1.prx--|--[6]
+            |--[doc#6  => 1]----->_1.prx--|--[504]
+            |--[doc#36 => 3]----->_1.prx--|--[2,33,747]
+            |--[...]------------->_1.frq--|--[...]
+
+[seg_name]B<.tis> - TermInfoS.  Among the items stored here is the term's
+doc_freq, which is the number of documents the term appears in.  If a term has
+a doc_freq of 22 in a given collection, that implies that there will be 22
+corresponding entries in the .frq file.  Terms are ordered lexically, first by
+field, then by term text.
+
+    _1.tis--|
+            |--[...]----------------------->_1.frq--|--[...]
+            |--[bodytext:mule      =>  1]-->_1.frq--|--[doc#40 => 2]
+            |--[bodytext:multitude =>  3]-->_1.frq--|--[doc#0  => 1]
+            |                                       |--[doc#6  => 1]
+            |                                       |--[doc#36 => 3]
+            |--[bodytext:navigate  =>  1]-->_1.frq--|--[doc#21 => 1]
+            |--[...]----------------------->_1.frq--|--[...]
+            |--[title:amendment    => 27]-->_1.frq--|--[doc#21 => 1]
+            |                                       |--[doc#22 => 1]
+            |--[...]----------------------->_1.frq--|--[...]
+
+[seg_name]B<.tii> - TermInfos Index.  This file, which is decompressed and
+loaded into RAM as soon as the IndexReader is initialized, contains a small
+subset of the .tis data, with pointers to locations in the .tis file.  It is
+used to locate the right general vicinity in the .tis file as quickly as
+possible. 
+
+    _1.tii--|
+            |--[bodytext:a => 20]---------->_1.tis--|--[bodytext:a] # byte 20
+            |                                       |--[bodytext:about]
+            |                                       |--[bodytext:absolute]
+            |                                       |--[...]
+            |--[bodytext:mule => 27065]---->_1.tis--|--[bodytext:mule]
+            |                                       |--[bodytext:multitude]
+            |                                       |--[...]
+            |--[title:amendment => 56992]-->_1.tis--|--[title:amendment]
+                                                    |--[...]
+
+Here's a simplified version of how a search for "freedom" against a given
+segment plays out:
+
+=over
+
+=item 1
+
+The searcher asks the .tii file, "Do you know anything about 'freedom'?"  The
+.tii file replies, "Can't say for sure, but if the .tis file does, 'freedom' is
+probably somewhere around byte 21008".  
+
+=item 2
+
+The .tis file tells the searcher "Yes, we have 2 documents which contain
+'freedom'.  You'll find them in the .frq file starting at byte 66991."
+
+=item 3
+
+The .frq file says "document number 40 has 1 'freedom', and document 44 has 8.
+If you need to know more, like if any 'freedom' is part of the phrase 'freedom
+of speech', take a look at the .prx file starting at..."
+
+=item 4
+
+If the searcher is only looking for 'freedom' in isolation, that's where it
+stops.  It already knows enough to assign the documents scores against
+"freedom", with the 8-freedom document scoring higher than the single-freedom
+document.
+
+=back
+
+=head2 Deletions
+
+When a document is "deleted" from a segment, it is not actually purged from
+the postings data and the stored fields data right away; it is merely marked
+as "deleted", via the .del file.  The .del file contains a bit vector with one
+bit for each document in the segment; if bit #254 is set then document 254 is
+deleted, and if it turns up in a search it will be masked out.
+
+It is only when a segment's contents are rewritten to a new segment during the
+segment-merging process that deleted documents truly go away.
+
+=head2 Field Normalization Files
+
+For the sake of simplicity, the example search scenario above omits the
+role played the field normalization files, or "fieldnorms" for short.  These
+files have the (theoretical) suffix of .f followed by an integer -- .f0, .f1,
+etc.  Each segment contains one such file for every indexed field.  
+
+By default, the fieldnorms' job is to make sure that a field which is 100 terms
+long and contains 10 mentions of the word 'freedom' scores higher than a field
+which also contains 10 mentions of the word 'freedom', but is 1000 terms in
+length.  The idea is that the higher the density of the desired term, the
+more relevant the document.
+
+The fieldnorms files contain one byte per document per indexed field, and all
+of them must be loaded into RAM before a search can be executed.
+
+=head1 Document Numbers
+
+Document numbers are ephemeral.   They change every time a document gets moved
+from one segment to a new one during optimization.  If you need to assign a
+primary key to each document, you need to create a field and populate it with
+an externally generated unique identifier.
+
+=head1 Not compatible with Java Lucene
+
+The file format used by KinoSearch1 is closely related to the Lucene compound
+index format. (The technical specification for Lucene's file format is
+distributed along with Lucene.)  However, indexes generated by Lucene and
+KinoSearch1 are not compatible.
+
+=head1 COPYRIGHT
+
+Copyright 2005-2010 Marvin Humphrey
+
+=head1 LICENSE, DISCLAIMER, BUGS, etc.
+
+See L<KinoSearch1> version 1.01.
+

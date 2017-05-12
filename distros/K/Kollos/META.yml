@@ -1,0 +1,30 @@
+---
+abstract: 'A placeholder for the Kollos::* hierarchy'
+author:
+  - 'Ron Savage (ron@savage.net.au)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '1.001002'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.22, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Kollos
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Moo: '2.003'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Kollos
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/ronsavage/Kollos.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

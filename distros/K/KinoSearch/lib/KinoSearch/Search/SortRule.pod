@@ -1,0 +1,90 @@
+
+# Auto-generated file -- DO NOT EDIT!!!!!
+
+=head1 NAME
+
+KinoSearch::Search::SortRule - Element of a SortSpec.
+
+=head1 DEPRECATED
+
+The KinoSearch code base has been assimilated by the Apache L<Lucy> project.
+The "KinoSearch" namespace has been deprecated, but development continues
+under our new name at our new home: L<http://lucy.apache.org/>
+
+=head1 SYNOPSIS
+
+    my $sort_spec = KinoSearch::Search::SortSpec->new(
+        rules => [
+            KinoSearch::Search::SortRule->new( field => 'date' ),
+            KinoSearch::Search::SortRule->new( type  => 'doc_id' ),
+        ],
+    );
+
+
+
+=head1 DESCRIPTION
+
+SortRules are the building blocks used to assemble
+L<SortSpecs|KinoSearch::Search::SortSpec>; each SortRule defines a single
+level of sorting.  For example, sorting first by "category" then by score
+requires a SortSpec with two SortRule elements.
+
+=head1 CONSTRUCTORS
+
+=head2 new( I<[labeled params]> )
+
+    my $by_title   = KinoSearch::Search::SortRule->new( field => 'title' );
+    my $by_score   = KinoSearch::Search::SortRule->new( type  => 'score' );
+    my $by_doc_id  = KinoSearch::Search::SortRule->new( type  => 'doc_id' );
+    my $reverse_date = KinoSearch::Search::SortRule->new(
+        field   => 'date',
+        reverse => 1,
+    );
+
+=over
+
+=item *
+
+B<type> - Indicate whether to sort by score, field, etc.  (The
+default is to sort by a field.)
+
+=item *
+
+B<field> - The name of a C<< sortable >> field.
+
+=item *
+
+B<reverse> - If true, reverse the order of the sort for this rule.
+
+=back
+
+
+
+
+
+=head1 METHODS
+
+=head2 get_field()
+
+Accessor for "field" member.
+
+=head2 get_reverse()
+
+Accessor for "reverse" member.
+
+
+
+=head1 INHERITANCE
+
+KinoSearch::Search::SortRule isa L<KinoSearch::Object::Obj>.
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005-2011 Marvin Humphrey
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
+

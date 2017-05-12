@@ -1,0 +1,33 @@
+Revision history for Keyword-Declare
+
+0.000001  Sun Apr 19 09:07:56 2015
+       Initial release.
+
+
+0.000002  Wed Jul 22 10:38:57 2015
+
+       First public release
+
+
+0.000003  Mon Aug 10 20:56:05 2015
+
+       Split test prereq out in Makefile.PL
+       (Thanks Karen)
+
+       Added metadata to stop demos being indexed
+       (Thanks Olivier)
+
+
+
+0.000004  Thu Jun 23 18:45:39 2016
+
+       Added export example in SYNOPSIS
+       (Thanks Steven)
+
+       Set minimal version to 5.14, which it should always
+       have been. (Thanks Hunter)
+
+
+0.000005  Thu Jun 30 15:49:12 2016
+
+       Corrected dependencies into (Thanks, Father C.)

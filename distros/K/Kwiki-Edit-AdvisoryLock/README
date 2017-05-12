@@ -1,0 +1,31 @@
+Kwiki-Edit-AdvisoryLock
+
+Implements an advisor locking system for Kwiki. This will not stop anyone from
+stomping on your changes. It just provides the user with some information that
+may help avoid a collision of edits.
+
+It notes who and when a user starts editing a page. Then it modifies
+ALL links on the page to go through the "clear_lock" action so if they
+navigate to another page it will remove that information. If another user
+attempts to edit the page while the lock is in place they will get a message
+that says:
+
+"User XYZ started editing the page at HH:MM:SS on MMM DD, YYYY...blah blah blah"
+
+The user can then look at that time and use good judgement to determine if they
+should start their edit or if they should first contact the user to see if they
+are really done. This module is ideal for environments where all editors of the
+content are working it close contact.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    kwiki -install Kwiki::Edit::AdvisoryLock
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 CorData
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

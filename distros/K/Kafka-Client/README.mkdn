@@ -1,0 +1,72 @@
+# NAME
+
+Kafka::Client - Client for LinkedIn's Kafka
+
+# WARNING
+
+This module is almost completely untested, save that it actually gets messages
+to send to Kafka. It cannot consume and might set things on fire. It might not
+be encoded correctly. Patches are welcome!!!
+
+# DESCRIPTION
+
+Kafka::Client is a client for LinkedIn's <Kafka|http://sna-projects.com/kafka/>.
+It was pretty much translated directly from kafka.py that is included in the
+kafka source code.
+
+# SYNOPSIS
+
+  use Kafka::Client;
+
+  my $kafka = Kafka::Client->new( host => '127.0.0.1' );
+
+  my @messages = ( 'One', 'Two', 'Three' );
+  my $topic = 'test';
+
+  $kafka->send( \@messages, $topic );
+
+# ATTRIBUTES
+
+## host
+
+The host to which we are connecting.
+
+## port
+
+The port to which we are connecting.  Defaults to 9092.
+
+# METHODS
+
+## send ($messags, $topic, $parition)
+
+Send one (or many!) messages to a specitic topic.
+
+## encode_message
+
+Encodes a message, using the following format:
+
+- MAGIC_BYTE: char
+
+- CRC32: int
+
+- PAYLOAD: bytes
+
+## encode_produce_request
+
+# AUTHOR
+
+Cory G Watson, `<gphat at cpan.org>`
+
+# CONTRIBUTORS
+
+J. Shirley
+
+# COPYRIGHT & LICENSE
+
+Copyright 2011 Magazines.com, LLC
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.

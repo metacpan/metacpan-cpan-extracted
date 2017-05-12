@@ -1,0 +1,131 @@
+#!/usr/bin/perl
+
+# PODNAME: koha-rebuild-editors
+# ABSTRACT: Populates EDITORS authorities based on biblio records
+
+use 5.010;
+use utf8;
+use strict;
+use warnings;
+use Koha::Contrib::Tamil::Koha;
+use Koha::Contrib::Tamil::Authority::EditorsBuilder;
+use Koha::Contrib::Tamil::Authority::EditorsUpdater;
+use Getopt::Long;
+use Pod::Usage;
+use YAML;
+
+my ($help, $verbose, $doit, $delete, $dump);
+$verbose = 1;
+GetOptions(
+    'help|h'   => \$help,
+    'verbose!' => \$verbose,
+    'doit'     => \$doit,
+    'delete|d' => \$delete,
+    'dump'     => \$dump,
+);
+
+if ( $help ) {
+    pod2usage( -verbose => 2 );
+    exit;
+}
+
+say "** Test mode **" unless $doit;
+
+my $koha = Koha::Contrib::Tamil::Koha->new();
+my $builder = Koha::Contrib::Tamil::Authority::EditorsBuilder->new(
+    koha    => $koha,
+    doit    => $doit,
+    verbose => $verbose,
+);
+$builder->run();
+if ( $dump ) {
+    binmode(STDOUT, ":utf8");
+    print "Editeurs sans ISBN :\n",
+          Dump( sort keys %{$builder->editor_without_isbn} ), "\n",
+          "Editeurs avec ISBN invalide :\n",
+          Dump( sort keys %{$builder->editor_with_invalid_isbn} ), "\n",
+          "Editeurs avec ISBN valide :\n", Dump( $builder->editor_from_isbn );
+}
+
+my $updater = Koha::Contrib::Tamil::Authority::EditorsUpdater->new(
+    koha             => $koha,
+    doit             => $doit,
+    verbose          => $verbose,
+    editor_from_isbn => $builder->editor_from_isbn,
+);
+$updater->run($delete);
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+koha-rebuild-editors - Populates EDITORS authorities based on biblio records
+
+=head1 VERSION
+
+version 0.049
+
+=head1 DESCRIPTION
+
+This script add entries in EDITORS authorities list based on what is found in
+the current Koha biblio records catalog. EDITORS list is used by unimarc_210c
+and unimarc_225a plugins.
+
+Those plugins will work only if you have an EDITORS authority type, with:
+
+  200a being the first 2 parts of an ISBN
+  200b being the editor name
+  200c (repeatable) being the series title
+
+=head1 USAGE
+
+ koha-rebuild-editors
+ koha-rebuild-editors --noverbose --dump
+ koha-rebuild-editors --doit
+ koha-rebuild-editors --doit --delete
+
+=head1 PARAMETERS
+
+=over
+
+=item --help, -h
+
+Display this help.
+
+=item --verbose, --noverbose
+
+Verbose mode. By default, the script operates in verbose mode.
+
+=item --doit
+
+Effective operations. Without this flag, Koha DB is not updated.
+
+=item --delete, -d
+
+Delete all existing entries in EDITORS before adding new entries found in
+biblio records.
+
+=item --dump
+
+After processing all biblio records, dumps a YAML representation of the
+isbn-editor-collection found.
+
+=back
+
+=head1 AUTHOR
+
+Frédéric Demians <f.demians@tamil.fr>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2016 by Fréderic Démians.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

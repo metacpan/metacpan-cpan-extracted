@@ -1,0 +1,99 @@
+
+# Auto-generated file -- DO NOT EDIT!!!!!
+
+=head1 NAME
+
+KinoSearch::Plan::FieldType - Define a field's behavior.
+
+=head1 DEPRECATED
+
+The KinoSearch code base has been assimilated by the Apache L<Lucy> project.
+The "KinoSearch" namespace has been deprecated, but development continues
+under our new name at our new home: L<http://lucy.apache.org/>
+
+=head1 SYNOPSIS
+
+
+    my @sortable;
+    for my $field ( @{ $schema->all_fields } ) {
+        my $type = $schema->fetch_type($field);
+        next unless $type->sortable;
+        push @sortable, $field;
+    }
+
+
+
+
+=head1 DESCRIPTION
+
+FieldType is an abstract class defining a set of traits and behaviors which
+may be associated with one or more field names. 
+
+Properties which are common to all field types include C<< boost >>,
+C<< indexed >>, C<< stored >>, C<< sortable >>,
+C<< binary >>, and C<< similarity >>.
+
+The C<< boost >> property is a floating point scoring multiplier
+which defaults to 1.0.  Values greater than 1.0 cause the field to
+contribute more to a document's score, lower values, less.
+
+The C<< indexed >> property indicates whether the field should be
+indexed (so that it can be searched). 
+
+The C<< stored >> property indicates whether to store the raw field
+value, so that it can be retrieved when a document turns up in a search.
+
+The C<< sortable >> property indicates whether search results should
+be sortable based on the contents of the field.
+
+The C<< binary >> property indicates whether the field contains
+binary or text data.  Unlike most other properties, C<< binary >> is
+not settable.
+
+The C<< similarity >> property is a
+L<Similarity|KinoSearch::Index::Similarity> object which defines matching
+and scoring behavior for the field.  It is required if the field is
+C<< indexed >>.
+
+
+
+
+
+=head1 METHODS
+
+=head2 get_boost()
+
+Accessor for C<< boost >>.
+
+=head2 indexed()
+
+Accessor for C<< indexed >>.
+
+=head2 stored()
+
+Accessor for C<< stored >>.
+
+=head2 sortable()
+
+Accessor for C<< sortable >>.
+
+=head2 binary()
+
+Indicate whether the field contains binary data.
+
+
+
+=head1 INHERITANCE
+
+KinoSearch::Plan::FieldType isa L<KinoSearch::Object::Obj>.
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005-2011 Marvin Humphrey
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
+

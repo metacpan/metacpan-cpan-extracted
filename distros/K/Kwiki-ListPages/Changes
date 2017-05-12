@@ -1,0 +1,8 @@
+Revision history for Perl extension Kwiki::ListPages.
+
+0.10  Fri Mar 18 10:15:43 2005
+    - original version
+
+0.11 Fri Aug 19
+    - Fixed anchor links so they work properly (removed '#' in
+      targets).

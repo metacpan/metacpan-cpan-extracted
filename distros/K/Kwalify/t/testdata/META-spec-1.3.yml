@@ -1,0 +1,128 @@
+# META.yml specification 1.3
+type: map
+mapping:
+  meta-spec:
+    type: map
+    required: yes
+    comment: exact specification missing
+    mapping:
+      version: &optional_version
+        type: text
+        pattern: /^[\d_]+(\.[\d_]+)*$/
+        required: no
+      url: &required_url
+        type: text
+        pattern: /^((ftp|https?):\/\/|mailto:.*@)/
+        required: yes
+  name:
+    type: text
+    required: yes
+  version: &required_version
+    type: text
+    pattern: /^[\d_]+(\.[\d_]+)*$/
+    required: yes
+  abstract:
+    type: text
+    required: yes
+  author:
+    type: seq
+    comment: preferred form is "author-name <email-address>"
+    required: yes
+    sequence:
+      - type: text
+  license:
+    type: text
+    required: yes
+    enum:
+      - perl
+      - gpl
+      - lgpl
+      - artistic
+      - bsd
+      - open_source
+      - unrestricted
+      - restrictive
+  distribution_type:
+    type: text
+    required: no
+    enum:
+      - module
+      - script
+  requires: &requires
+    type: map
+    required: no
+    mapping:
+      =:
+        &required_version_range
+        type: text
+        pattern: "/^((>|>=|==|!=|<|<=)\s*)?[\d_]+(\.[\d_]+)*(,\s*((>|>=|==|!=|<|<=)\s*)?[\d_]+(\.[\d_]+)*)*$/"
+        required: yes
+  recommends: *requires
+  optional_features:
+    type: map
+    mapping:
+      =:
+        type: map
+        mapping:
+          description:
+            type: text
+          requires: *requires
+          build_requires: *requires
+          conflicts: *requires
+          requires_packages:
+            comment: exact specification missing
+            type: any
+          requires_os:
+            comment: exact specification missing
+            type: any
+          excludes_os:
+            comment: exact specification missing
+            type: any
+  build_requires: *requires
+  conflicts: *requires
+  dynamic_config:
+    type: bool
+    required: no
+  provides:
+    type: map
+    required: no
+    mapping:
+      =:
+        type: map
+        mapping:
+          file:
+            type: text
+          version: *optional_version
+  no_index: &no_index
+    type: map
+    required: no
+    mapping:
+      file: &no_index_element
+        type: seq
+        required: no
+        sequence:
+          - type: text
+      directory: *no_index_element
+      package: *no_index_element
+      namespace: *no_index_element
+  private: *no_index
+  keywords:
+    type: seq
+    required: no
+    sequence:
+      - type: text
+  resources:
+    type: map
+    required: no
+    mapping:
+      license: &optional_url
+        type: text
+        pattern: /^((ftp|https?|git):\/\/|mailto:.*@)/
+        required: no
+      homepage: *optional_url
+      bugtracker: *optional_url
+      repository: *optional_url # missing in spec
+      =: *optional_url
+  generated_by:
+    type: text
+    required: yes

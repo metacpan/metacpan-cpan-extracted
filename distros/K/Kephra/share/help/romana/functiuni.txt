@@ -1,0 +1,328 @@
+
+      ,--------------------.
+      ! Kephra - Funcțiuni |
+      `--------------------´
+
+Acesta este locul cel mai bun în care puteți găsi răspuns la întrebări de
+genul: "Kephra face...:", "Cum să modific...?" sau "Cum să face în Kephra?".
+Chiar dacă meniul principal ar putea să facă aceasta mai rapid.
+
+Chiar dacă acesta editor de texte nu are implementate toate funcțiunile
+pe care le dorim, el incorporează deja o sumă importantă de funcțiuni. Dacă
+sunteți deja familiarizat cu editoarele de text, puteți sări direct la
+secțiunea "Tur Avansat", de asemenea din meniul ajutor.
+
+Dar dacă sunteți interesat de lista completă și ordonată a funcțiunilor
+(ordonate ca în meniul principal) atunci citiți mai departe. Cheile de
+configurare sunt cele din "config/general/autosaved.conf", fișierul principal
+de configurare.
+
+Conținut:
+
+  1 Navigare în text
+  2 Selectare text
+  3 Editare text (meniul editare)
+  4 Istoria modificărilor (meniul editare)
+  5 Funcții clipboard (meniul editare)
+  6 Meniu și dialog de căutare
+  7 Meniu unelte
+  8 Meniu Fișiere
+  9 Meniu document - setări document
+ 10 Meniu vizualizare
+ 11 Meniu configurare
+ 11 Meniu ajutor
+
+ 1 Navigare în text - mutarea cursorului
+   - tastele cu săgeți mută cursorul în text (ca de obicei), iar un clic cu
+     mouse-ul va repoziționa cursorul în punctul respectiv.
+   - tasta <Home> mută cursorul pe primul caracter diferit de spațiu din linia
+     curentă. Dacă tastăm <Home> încă o dată, cursorul va fi mutat pe prima
+     coloană din linie. <End> mută cursorul al sfârșitul liniei.
+   - Combinația de taste <Ctrl>+<Home> va muta cursorul pe primul caracter din
+     text, iar <Ctrl>+<End> pe ultimul caracter.
+   - Tastele <Page Up> și <Page Down> mută cursorul cu câte o pagină în sus
+     respectiv în jos. Pagina find definită ca dimensiunea vizibilă a textului.
+   - Combinația de taste <Ctrl>+<Page Up> sau <Page Down> comută la următorul
+     sau precedentul document. Ordinea este cea definită de file (Tabs în limba
+     engleză).
+   - <Ctrl>+<Enter> sau clic stânga pe fila curentă în bara de pagini comută
+     la ultimul document utilizat (comută înapoi).
+   - <Ctrl>+<Săgeată stânga sau Dreapta> salt al cursorului la începutul sau
+     sfârșitul cuvântului următor sau al celui precedent.
+   - <Ctrl>+<Sus sau Jos> derulează textul linie cu linie în sus sau în jos.
+   - <Alt>+<Sus sau Jos> salt al cursorului la paragraful următor sau la cel
+     precedent. Paragraful este un bloc de text, separat de linii goale.
+   - Ca să sari la o anumită linie, tastează <Ctrl>+<g> și introdu numărul
+     liniei.
+   - Tastează <Ctrl>+<+> și <Ctrl>+<-> focalizează în text.
+
+ 2 Selectare text
+   - Ținând apăsată tasta <Shift> sau butonul stâng al mouse-ului este posibil
+     să selectăm text prin mutarea cursorului. Textul selectat va fi marcat.
+   - Ca să selectați text în formă de pătrat (coloane), țineți apăsată tasta
+     <Alt>. Aceasta se mai numește și selecție rectangulară.
+   - Ca să mutați textul selectat cu mouse-ul, țineți apăsat butonul stâng al
+     mouse-ului.
+     Este de asemenea posibil să mutați text cu ajutorul tastelor cu săgeți în
+     timp ce țineți apăsat <Ctrl>+<Alt>. În cazul în care nu este text marcat
+     <Ctrl>+<Alt>+<Sus> sau <Jos> va muta linia curentă.
+   - Dacă țineți apăsată tasta <Ctrl> în timpul mutării textului cu mouse-ul,
+     veți efectua în schimb o copie a lui.
+   -  <Ctrl>+<A> marchează tot textul.
+
+ 3 Editare text (meniul editare)
+   În cele mai multe cazuri veți selecta o fâșie de text, pentru a face ceva cu
+   ea și cele mai multe funcții de modificare a textului de aici presupun că ați
+   selectat un text în prealabil. În cazul în care nu ați selectat nimic,
+   funcțiile for folosii întregul document curent ca intrare. Dacă apăsați
+   suplimentar împreună cu o combinație de taste și tasta <Shift>, funcția
+   va fi probabil inversată.
+   - Orice text selectat va fi șters la tastarea oricărui caracter.
+   - Tasta <Ins> comută forma cursorului. O bară verticală permite inserarea
+   textului (mod inserare), o bară orizontală de subliniere indică modul de
+   suprascriere a textului existent.
+   - <Del> șterge caracterul de la stânga cursorului.  <Ctrl>+<Del> șterge
+   cuvântul întreg. Tasta <Backspace> (<--) șterge un caracter din partea
+   stângă a cursorului, în mod corespunzător, <Ctrl>+<Backspace> șterge un
+   cuvânt.
+   - Sunt 3 grupe de funcții de editare a textului și fiecare are propriul
+   submeniu în meniul "Editare". Formatarea înseamnă rearanjarea textului prin
+   inserarea sau ștergerea spațiilor și caracterelor linie nouă, dar fără
+   schimbarea conținutului. Comentarea înseamnă inserarea în text sau ștergerea
+   din text a unui caracter pentru a activa sau dezactiva conținutul ales în
+   limbajul de programare specific. Filtrul de conversie poate face înlocuiri
+   de caractere și conținut într-un anumit mod.
+   - <Ctrl>+<Space> indentează linia curentă prin inserarea unui spațiu în
+   poziția cea mai din stânga indiferent unde este poziționat cursorul. Dacă
+   sunt mai multe rânduri selectate, funcția va fi aplicată la toate rândurile,
+   <Ctrl>+<Shift>+<Space> vor aplica funcția inversată.
+   - <Ctrl>+<Tab> (|<- ->|) face indentare în mod similar, dar cu caractere tab.
+   Dimensiunile și tipul acestor taburi depind de setări. Multe alte astfel
+   ce funcții de editare a textului pot fi accesate cu ajutorul meniului, ca
+   de exemplu "Unește liniile", "Șterge spațiile de la sfârșitul liniilor" și
+   altele asemenea.
+
+ 4 Istoria modificărilor (meniul editare)
+   Editorul reține fiecare modificare, așa încât se poate merge înapoi sau
+   înainte în istoria sesiunii de editare a textului. Singura limită aici este
+   memoria calculatorului.
+   - <Ctrl>+<z> merge un pas înapoi și <Ctrl>+<Shift>+<z> un pas înainte.
+   Rog să fiți conștienți că dacă modificați ceva din "trecut", nu vor mai fi
+   exista pași înainte.
+   - Când aveți o istorie lungă a modificărilor este câteodată util să săriți
+   câțiva pași dintr-o dată.  <Alt>+<z> and <Alt>+<Shift>+<z> este pentru acest
+   lucru. Numărul de pași săriți se poate seta din cheia de configurare
+    "editpanel > history > fast_undo_steps".
+    - Este posibil de asemenea să aruncați o privire la momentul în care a
+    început totul.
+    <Ctrl>+<Alt>+<z> sare la început și <Ctrl>+<Alt>+<Shift>+<z> înapoi la
+    starea finală.
+
+ 5 Funcții clipboard (meniul editare)
+   Orice desktop nou sau sistem de operare este prevazut cu un clipboard pentru
+   a schimba text și alte date între programe într-un mod simplu. Cel mai des
+   veți folosii clipboardul pentru a muta textul selectat în interiorul
+   programului. Veți găsi toate aceste funcții de asemenea în partea de sus
+   a meniului "Editare" și de asemenea multe dintre ele în partea de mijloc
+   a bării de unelte.
+   - <Ctrl>+<X> ("Taie") șterge textul selectat și îl pune în clipboard.
+   - <Ctrl>+<C> ("Copiază") copiază textul selectat în clipboard.
+     <Ctrl>+<Ins> la fel.
+   - <Ctrl>+<V> ("Inserează") inserează conținutul clipboardului în documentul
+     curent la poziția cursorului. de asemenea <Shift>+<Ins>.
+   - <Ctrl>+<W> ("Înlocuiește") înlocuiește selecția cu conținutul clipboardului.
+   - <Del> ("Delete") șterge selecția.
+   - Taie, copiază și șterge pot fi aplicate la linia curentă dacă adăugăm și
+     <Shift> la combinația respectivă de taste.
+     (șterge linia = <Ctrl>+<Shift>+<Del>)
+   - <Ctrl>+<Shift>+<L> sau <R> șterge în linia curentă toate caracterele de la
+     stânga sau dreapta cursorului.
+   - <Ctrl>+<Shift>+<d> dublează linia curentă, inserează o copie a liniei
+     sub linia curentă.
+   - Puteți de asemenea să mutați text prin tragere și plasare (drag'n Drop)
+     în document și în alte programe, dacă suportă acest lucru. Când doriți
+     să copiați text în acest mod, selectați-l, mențineți selecția prin
+     clic pe ea și păstrând apăsat butonul mouse-ului, apăsați <Ctrl> (atunci
+     va apărea un pătrat cu semnul "+" sub cursor) și lăsați liber butonul
+     mouse-ului la poziția în care doriți să copiați textul selectat.
+
+ 6 Meniu și dialog de căutare
+   Editorul are funcții de căutare o frază dată în documentul curent, în toate
+   documentele deschise, sau doar în textul selectat.
+   Aceasta se poate face cu sau fără dialogul de
+   căutare, dar setarea opțiunilor de căutare se poate face numai prin
+   intermediul dialogului de căutare sau în fișierul de configurare dar
+   cred că asta este un pic cam neclar.
+   - <Ctrl>+<f> activează dialogul de căutare și înlocuire, și așteaptă
+   introducerea frazei de căutat, o eventuală selecție existentă va fi
+   suprascrisă ca de obicei. Cu ajutorul tastelor <Sus> și <Jos> puteți naviga
+   în istoria căutărilor.
+   - Dacă ați selectat un text scurt înainte de activarea dialogului, textul
+     selectat va fi inserat ca frază de căutat, dar dacă selecția cuprinde mai
+     multe linii, atunci editorul va căuta numai în interiorul textului selectat.
+     Rog atenție, odată ce ați găsit în interiorul selecției fraza căutată,
+     aceasta va fi selectată și căutarea în selecția precedentă nu mai poate
+     continua.
+   - După ce ați tastat fraza de căutare trebuie să tastați <Enter> ca să
+     navigați între rezultatele căutării în josul paginii. Dacă țineți apăsată
+     tasta <Shift> în timp ce apăsați <Enter>, direcția va fi în sus.
+     Dacă țineți apăsată tasta <Ctrl> în timp ce apăsați <Enter>, fereastra
+     de dialog va fi închisă înainte de începerea căutării.
+   - Pentru a căuta "înainte" și "înapoi" puteți de asemenea folosii mouse-ul.
+     Faceți clic pe butoanele cu lupa și săgețile albastre pentru a naviga
+     printre rezultatele căutării.
+     În dialogul de căutare sunt mai multe butoane pe partea dreaptă pentru
+     scopuri similare ca de exemplu căutări rapide, du-te la primul sau ultimul
+     rezultat al căutării.
+   - Sub butoanele radio în mijlocul ferestrei de dialog, unde se poate selecta
+     scopul căutării, există un buton căsuță de bifare numită "Auto încadrare".
+     Dacă este bifată opțiunea, "următoarea" potrivire găsită după ultima de
+     la sfârșitul documentului va fi prima de la începutul documentului și
+     vice versa.
+   - Dacă este bifată opțiunea "Căutare incrementală", editorul va începe
+     căutarea (de la începutul documentului) imediat și de fiecare dată când
+     e introdus un caracter.
+   - opțiuni de căutare:
+     + potrivire caracter: căutare care ține cont de majuscule și minuscule
+     + început de cuvânt: rezultatul trebuie să fie un început de cuvânt
+     + cuvinte întregi: rezultatul trebuie să fie un cuvânt întreg
+     + expresii regulare: se pot folosi expresii regulare simple în fraza
+       de căutat
+   - Este de asemenea posibilă căutarea fără ajutorul dialogului de căutare
+     folosind combinația de taste <Ctrl>+<F3> și textul selectat va fi folosit
+     ca următoarea frază de căutare. Acum puteți folosi <F3> ca să navigați
+     înainte și <Shift>+<F3> pentru a naviga înapoi între rezultatele căutării.
+     <Ctrl>+<Alt>+<F3> sare la prima potrivire și <Ctrl>+<Alt>+<Shift>+<F3>
+     la ultima potrivire în interiorul scopului selectat.
+   - Când apelați dialogul de căutare cu <Shift>+<Ctrl>+<f>, programul așteaptă
+   să introduceți fraza de înlocuire, în câmpul de introducere a textului va
+   fi inserată ultima frază de căutare folosită. În cazul în care ați selectat
+   un text înainte de apelarea dialogului, modul de comportare a dialogului de
+   înlocuire va fi același cu acela al dialogului de căutare și de asemenea
+   va fi înregistrată istoria, așa încât veți putea selecta fraze cu mouse-ul
+   sau cu tastele săgeți verticale.
+   - Apăsând <Enter> în timp ce cursorul este în interiorul câmpului înlocuire
+   va cauza aceleași acțiuni ca și activarea butonului "Înlocuiește totul".
+   Toate potrivirile frazei de căutare în scopul căutării vor fi înlocuite cu
+   cu fraza de înlocuire. Dacă țineți apăsat <Ctrl> odată cu <Enter> se va
+   închide dialogul după terminarea operațiunii.  Dacă țineți apăsat <Alt>
+   odată cu <Enter>, aceeași funcțiune ca a butonului "Cu confirmare" va fi
+   inițiată. Diferă de funcția "Înlocuiește totul" numai prin faptul că editorul
+   va cere confirmarea înainte de orice înlocuire.
+   - Altă metodă de a ajunge la același rezultat este folosirea butoanelor din
+   partea dreaptă. Aici puteți decide liber unde să sară și ce să înlocuiască
+   prin activarea butoanelor pe care le-am descris mai sus.
+   - Dialogul poate fi închis prin apăsarea tastei <Esc> sau cu butonul
+   "Închide" care este în colțul din dreapta jos.
+   - "Poziționare la linia" sau <Ctrl>+<g> activează un dialog unde puteți
+   introduce numărul liniei la care doriți să sară cursorul.
+
+  7 Meniu unelte
+  Carnețelul este un panou paralel în care puteți ține text neformatat.
+  - <F4> sare la panoul carnețelului și înapoi. <Ctrl>+<F4> îl deschide sau îl
+  închide. <F5> în interiorul lui execută o evaluare Perl (eval) a conținutului.
+  Rezultatul va fi afișat în panoul de rezultate. Acesta poate fi deschis și
+  închis cu  <Ctrl>+<F5>.
+
+ 8 Meniu Fișiere
+  Conține toate funcțiunile care au acces la dispozitivele de stocare permanentă
+  (ex: disc dur). Singurele excepții sunt "Nou" și "Ieșire", dar cred că ele
+  aparțin tot aici.
+  - "Nou" creează un document gol nou care nu are încă nici o relație cu vreun
+  fișier.
+  - "Deschide" citește un fișier pe care l-ați selectat cu ajutorul unui dialog
+  și îi afișează conținutul într-un document nou.
+  - "Reîncarcă" citește un fișier ce are deja un document atașat și înlocuiește
+    conținutul afișat cu datele nou citite de pe disc. În acest fel puteți
+     restaura conținutul dela ultima salvare.
+  - "Inserează din ..." inserează conținutul fișierului selectat în documentul
+    vizibil curent la locația cursorului.
+  - "Salvează" scrie conținutul documentului vizibil curent în fișierul atașat
+    dacă există dacă este un document nou cere un nume de fișier.
+  - "Salvează ca" întotdeauna cere un nume de fișier în care să scrie conținutul
+    documentului curent. Dar documentul va fi atașat la numele anterior al
+    fișierului.
+  - "Toate/Celelalte" Multe funcțiuni din acest meniu au un echivalent care
+  conține cuvintele "Toate" sau "Celelalte". Așa cum vă așteptați "Toate"
+  înseamnă că funcția va fi aplicată la toate fișierele deschise iar "Celelalte"
+  înseamnă că funcția va fi aplicată la toate fișierele deschise cu excepția
+  celui curent.
+  - O "Sesiune" este suma tuturor fișierelor deschise. O astfel de sesiune poate
+  fi salvată într-un fișier de sesiuni care conține locația și toate
+  proprietățile tuturor fișierelor deschise astfel că puteți restaura sau
+  adăuga această sesiune cu ajutorul acestui fișier. Doresc de asemenea ca editorul să poată citi (importa) și scrie (exporta) fișiere de sesiune ale altor
+  editoare, dar deocamdată doar fișierul de sesiune al editorului SciTE este
+  suportat.
+
+ 9 Meniu document - setări document
+   Schimbă o proprietate a documentului curent. Modul evidențiere sintaxă și
+   comutarea utilizării spații tab-uri poate fi de asemenea schimbat din bara
+   de stare interactivă. Toate proprietățile documentului vor fi salvate în
+   fișierul de sesiune și vor fi restaurate la următoarea pornire a programului.
+   - Modul evidențiere sintaxă determină culorile utilizate în document și
+   corespund cu sintaxa unui limbaj anume. În mod normal selecția se face automat
+   în funcție de extensia numelui fișierului. Sub cheia de configurare
+   file > endings este stabilit ce extensie aparține fiecărui limbaj. Modul
+   evidențiere sintaxă poate fi de asemenea stabilit manual, folosind opțiunea
+   "Mod sintaxă" din meniul Document, sau cu  meniul contextual din bara de
+   stare. (clic dreapta pe stilul curent). Dacă doriți să schimbați culorile
+   unui stil, căutați opțiune la sfârșitul meniului.
+  - Evidențierea parantezelor este activată la "atingerea" lor cu ajutorul
+   cursorului.
+   Parantezele fără o pereche potrivită vor fi colorate diferit pentru a atrage
+   atenția programatorului că ar putea fi o problemă. Culoarea și altele pot
+   fi setate sub cheia de configurare: editpanel > indicator > bracelight.
+   În prezent aceste setări sunt globale, dar vor face parte din setările noi
+   pentru evidențiere sintaxă.
+  - Indentarea blocului înseamnă că orice <Enter> după o paranteză deschisă
+   indentează linia următoare mai mult ca cea curentă iar un <Enter> după o
+   paranteză închisă mai puțin. Mărimea indentării depinde de mărimea tab-ului,
+   vezi și cheia de configurare: editpanel > blockindent. Vezi de asemenea și
+   cheile editpanel > brace_automake și editpanel > brace_autojoin care vor
+   adăuga automat paranteze de închidere sau șterg cea auto generată dacă
+   există una făcută manual.
+  - Auto indentarea inserează același număr de caractere în orice linie nouă, ca
+   în linia precedentă. În prezent este un comportament global, cheia de
+  configurare fiind: editpanel > autcoindent.
+  - Tab-urile nu sunt caractere vizibile, vor fi afișate ca o sumă de spații.
+   Câte spații înseamnă un tab, depinde de setări. Notați vă rog, chiar dacă
+   setările spun că acest număr este 4, un tab poate fi afișat ca 3, 2 sau un
+   spațiu, deoarece un tab ajunge la o poziție care este un multiplu al
+   dimensiunii sale maxime. În documente noi sau deja deschise, setați valoarea
+   în cheia de configurare "file > defaultsetting > tab_size".
+  - Tab-uri soft înseamnă că dacă apăsați tasta  <Tab>  (cea cu simbolurile
+  |<-- -->| ), editorul nu va crea un număr de spații cu aceeași dimensiune
+  ca cea pe care ar fi avut-o tab-urile. Cheia de configurare
+  file > defaultsetting > tab_use.
+  - EOL: Unix (Linux), Mac și Windows utilizează caractere diferite pentru a
+  marca sfârșitul liniei, dar aceasta nu este o problemă pentru editor, pentru
+  că liniile vor fi afișate în toate cazurile corect. Editorul, recunoaște
+  de asemenea ce caractere sfârșit de linie care sunt utilizate în document și
+  dacă îl editați, vor fi inserate caracterele corecte. Când doriți să schimbați
+  caracterele sfârșit de linie dintr-un document, folosiți sub meniul EOL sau
+  meniul de context din bara de stare. Trebuie să dați clic dreapta pe câmpul
+  care afișează caracterele sfârșit de linie curente.
+  Caracterele sfârșit de linie ale unui document nou vor fi setate conform cu
+  cheia de configurare: "file > defaultsetting > EOL_new" iar valorile pot fi
+  "cr,lf sau cr+lf". Dacă cheia: "file > defaultsetting > EOL_open" este setată
+  la una din aceste valori, fișierul va fi convertit la deschidere. Implicit
+  este auto care păstrează setarea originală.
+  - Protecție la scriere. Când utilizatorul nu are permisiuni de acces la fișier,
+  editorul va bloca automat documentul și va face acest lucru vizibil prin
+  adăugarea unui caracter '#' după numele documentului. Aceasta ar trebui să
+  prevină conflicte ulterioare, dar veți putea totuși salva documentul sub un
+  nume diferit. Sau poate doriți să folosiți acestă facilitate pentru a proteja
+  un text împotriva neatenției proprii.
+
+ 10 Meniu vizualizare
+   Funcții ce afectează numai vizual textul sau programul sunt descrise sumar
+   aici. Toate setările de aici afectează toate documentele în mod egal.
+    - "Întotdeauna vizibil" poate fi comutat cu ajutorul combinației de taste
+    <Ctrl>+<T> și înseamnă că fereastra principală va fi afișată întotdeauna
+    deasupra celorlalte ferestre.
+    - "Context Menus"-"Statuscontext"
+
+    ...
+
+  To be continued ...  :)
+

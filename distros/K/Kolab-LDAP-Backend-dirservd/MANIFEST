@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Kolab-LDAP-Backend-dirservd.t
+lib/Kolab/LDAP/Backend/dirservd.pm
+META.yml                                 Module meta-data (added by MakeMaker)

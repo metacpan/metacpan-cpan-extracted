@@ -1,0 +1,275 @@
+$Id: README,v 1.21 2008-04-30 11:36:10 mike Exp $
+
+
+Introduction
+------------
+
+This directory contains the source code for Index Data's open source
+link resolver, Keystone Resolver, which is part of the Keystone
+Digital Library suite.  It is implemented as a Perl module called
+"Keystone::Resolver".
+
+TROUT was our earlier proof-of-concept implementation of a trivial
+OpenURL resolver: its name stood for Trout Resolves Open URLs
+Trivially.  The code was trivial because it was based on a trivial
+standard: OpenURL v0.1, as described in the ten-page document
+	http://www.openurl.info/registry/docs/pdf/openurl-01.pdf
+
+The new code does not have this luxury for three reasons:
+
+    1.	It is not limited to resolving OpenURLs, but also intends to
+	handle DOIs and, in principle at least, other forms of
+	metadata-based link.
+
+    2.	Its OpenURL support is based on the newer and much more
+	verbose version of the standard as produced by ANSI/NISO
+	Committee AX and described at
+		http://library.caltech.edu/openurl/Standard.htm
+	This standard abstracts and indirects absolutely everything,
+	whether it needs abstracting or not, and the code needs to
+	reflect this.
+
+    3.	Unlike TROUT, Keystone Resolver needs to do non-trivial things
+	in order to resolve links: in particular, it needs a big,
+	complex knowledge-base that tells it what resources are
+	available to link to and what they contain.
+
+Accordingly, the new code comes in lots of classes, which are
+described in the file "Classes".  If you are about to read the
+resolver code, that file is a good place to start.
+
+
+Public CVS Download
+-------------------
+
+ cvs -d :pserver:cvs@bagel.indexdata.dk:/cvs login
+
+ use password 'anonymous'
+
+ cvs -d :pserver:cvs@bagel.indexdata.dk:/cvs co openurl-resolver 
+
+
+Directory Structure
+-------------------
+
+The Keystone Resolver distribution is laid out in the following
+directories:
+
+bin/	Resolver-related scripts to be run from the command-line.
+
+db/	Resource database material, including schemas, sample data and
+	database-creation utilities.  At present, this is set up to
+	make a tiny "toy" database.  In future releases, it will be
+	expanded to make further databases, including one based on
+	CUFTS data.
+
+doc/	Embryonic documentation, in plain text format.  Eventually
+	this will either be moved into Perl POD format (in the "lib"
+	directory with the source code) or formatted using a proper
+	system such as DocBook or OpenOffice.
+
+etc/	Various configuration files, including XML DTDs and XSLT
+	stylesheets.
+
+lib/	The resolver source-code library.  (The actual resolver
+	program is a trivial seven-line script in the
+	web/htdocs/mod_perl/ area -- the library does all the work.)
+
+t/	Test scripts, invoked by the distribution's "make test" rule.
+	See also the t/regression subdirectory and its README file.
+
+web/	The resolver's web-server files: server configuration files,
+	CGI/mod_perl scripts, HTML pages, images, stylesheets ...
+
+The purpose and contents of most of these directories are described in
+more detail in their own README files.
+
+If you got this software via CVS rather than as a distribution
+tarball, then you will also have an "archive" directory.  The whole
+purpose of this is to contain all the stuff that's not interesting to
+anyone except the developers, so just delete it :-)
+
+
+Prerequisites
+-------------
+
+-> A web-server.
+Any web server that supports the CGI standard should work, but we use
+Apache 1.3 and Apache 2.0 with mod_perl.  The rest of these
+instructions assume that's what you're using, and the Debian packaging
+includes support for these servers.
+
+-> The Perl module CGI
+This is not used by the main resolver entry point, but by the
+utility method Keystone::Resolver::OpenURL->newFromCGI(), which uses
+it to gather the arguments to pass into the Resolver library proper.
+So in theory at least we can use the same library to make resolvers
+that get their arguments some other way, e.g. link resolution by
+email.
+
+-> The Perl module DBI
+This is used to access the resource database.  You also need the Perl
+module forwhatever driver you use, e.g. DBD::MySQL.
+
+-> The actual database software, e.g. MySQL
+You should be able to use any relational database (MySQL,
+PostgreSQL, Oracle, etc.), but the development has been done
+using MySQL and it'll be simpler to use that unless you have a
+compelling reason to do something different.
+
+-> The Perl module LWP
+This is used to resolve the enormous number of network indirections
+that a v1.0 OpenURL can have, e.g. the OpenURL itself can use a
+By-Reference transport, the ContextObject can specify any or all of
+the six entities by reference.
+
+-> The Perl module XML::LibXSLT
+This is used to transform the resolver's XML output into pretty,
+user-facing HTML.
+	-> Gnome libxslt, including development kit
+	-> The Perl module XML::LibXML
+		-> Gnome libxml2, including development kit
+		-> The Perl module XML::SAX
+		-> The Perl module XML::NamespaceSupport
+		-> The Perl module XML::LibXML::Common
+
+-> The Perl module Text::Iconv
+This is used to translate between different character encodings.
+	-> The iconv library, but this seems to be included in libc
+	   (the standard C library) in Red Hat 9, and therefore
+	   probably also in most modern operating systems.
+
+-> The Perl module Digest::MD5
+This is needed to calculate the checksums that Elsevier requires in
+the customer-specific URLs that access its full-text documents.
+
+-> The Perl module HTML::Mason
+This is needed to power the admin pages.
+
+
+Installation
+------------
+
+To install this module type the following:
+
+	perl Makefile.PL
+	make
+	make test
+	sudo make install
+
+You will also need to build the "toy" resource database (or of course
+a proper one if you have the data).  To do this, run "make" in the
+"db" subdirectory, providing the root MySQL password when requested to
+do so.  This will allow the bin/kr-test and
+web/htdocs/mod_perl/resolve scripts to run successfully.
+
+Once the toy database has been built, it's possible to run a simple
+sanity-test without installing or even building anything, using the
+kr-test script:
+
+	perl -I lib bin/kr-test t/regression/zetoc-suuwassea
+
+
+Testing against a non-standard configution
+------------------------------------------
+
+The test-scripts are set up to run against the toy database if you
+just do "make test", using default values for environment variables
+that tell it how to connect to the vanilla MySQL database setup.  But
+those settings do not take precendence over any existing environment
+variable values.
+
+It's therefore possible, for example, to run this script using the
+read-only user, with something like:
+	$ KRrwuser=kr_read KRrwpw=kr_read_3636 make test
+(So that the admin.t test-script will fail after test 28, when it
+tries to modify the database.)
+
+More usefully, appropriate environment variable settings make it
+possible to run the test-suite against an Oracle database:
+	$ ORACLE_HOME=/usr/lib/oracle/xe/app/oracle/product/10.2.0/server LD_LIBRARY_PATH=/usr/lib/oracle/xe/app/oracle/product/10.2.0/server/lib KRdbms=Oracle KRdb=XE KRuser=ko_admin KRpw=ko_adm_3636 KRrwuser=ko_admin KRrwpw=ko_adm_3636 make test
+
+
+Installation the Debian way
+---------------------------
+
+Building Debian packages
+
+        perl Makefile.PL
+        dpkg-buildpackage -rfakeroot
+        
+        cd ../
+        sudo dpkg -i libkeystone-resolver-perl_1.15-1_all.deb
+        sudo dpkg -i keystone-resolver_1.15-1_all.deb
+
+
+Configuration
+-------------
+
+To set up Keystone Resolver, you need to do the following steps:
+
+* If you're going to run the resolver as a virtual host (which is what
+  I do), create an entry in /etc/hosts for the hostname, for example
+  x.resolver.indexdata.com -- or of course set up DNS to serve that
+  name's IP address.
+
+  Notice that the example MySQL RDB only includes the service names 
+  'id', 'dbc', 'talis', 'resolver', and 'localhost', and your virtual host 
+  name needs to use one of those if you do not add another ressource name 
+  in the RDB.
+
+
+* Configure your web server so it can execute the resolver code.  If
+  you're using Apache 1.3, you can use a lightly tweaked copy of the
+  sample configuration file
+	web/conf/apache1.3/xeno.conf
+  from this distribution.  Just drop it into the server's
+  configuration directory, usually /etc/httpd/conf.d or something
+  similar depending on what operating system you're using.  Note that
+  you will in general need to change the hostnames in this file.
+
+
+Non-standard installation directory
+-----------------------------------
+
+This software expects to be unpacked into the directory
+	/usr/local/src/cvs/resolver/
+That path is wired into several places.  If you want to run it from
+somewhere else, you'll need to change them all:
+
+* The DocumentRoot, Directory, PerlSetEnv and Alias directives in
+  web/conf/apache1.3/xeno.conf (or whatever Apache configuration
+  you're using)
+* The "xsltdir" setting in lib/Keystone/Resolver.pm
+
+Clearly this is too many places; we should try to find a way to reduce
+it, ideally to a single place.
+
+
+Support
+-------
+
+Informal support is available on the Keystone Resolver community
+mailing list at
+	http://www.indexdata.dk/mailman/listinfo/resolver
+which any user is free to join.
+
+Commercial support is available from Index Data.
+Email <info@indexdata.com> for details.
+
+
+Copyright and Licence
+---------------------
+
+Copyright (C) 2004-2008 Index Data Aps.
+
+This library is free-as-in-freedom software (which means it's also
+open source); it is distributed under the GNU General Public Licence,
+version 2.0, which allows you every freedom in your use of this
+software except those that involve limiting the freedom of others.
+A copy of this licence is in the file "GPL-2"; it is described and
+discussed in detail at
+	http://www.gnu.org/copyleft/gpl.html
+
+The primary author is Mike Taylor <mike@indexdata.com>
+

@@ -1,0 +1,21 @@
+---
+bookmark: {}
+find:
+  history:
+    - That
+    - '$row2'
+    - '$kundenmail'
+    - vorgestellt
+    - static
+    - Panel
+    - 'man '
+    - Verständnis
+    - gespräch
+    - auch
+    - welche
+    - nur
+  item: exci
+replace:
+  history:
+    - "<br>\n"
+  item: "<br>\n"

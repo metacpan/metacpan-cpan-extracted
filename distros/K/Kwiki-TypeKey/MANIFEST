@@ -1,0 +1,9 @@
+Changes
+lib/Kwiki/Edit/TypeKeyRequired.pm
+lib/Kwiki/TypeKey.pm
+lib/Kwiki/Users/TypeKey.pm
+Makefile.PL
+MANIFEST			This list of files
+REAMDE
+t/00_compile.t
+META.yml                                 Module meta-data (added by MakeMaker)

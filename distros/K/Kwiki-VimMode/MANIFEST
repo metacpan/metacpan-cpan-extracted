@@ -1,0 +1,22 @@
+.releaserc
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Kwiki/VimMode.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+SIGNATURE
+t/0-signature.t
+t/compile.t
+t/functionality.t
+t/no-modelines.t
+t/pod-coverage.t
+t/pod.t

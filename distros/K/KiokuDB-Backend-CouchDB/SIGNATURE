@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.69.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 00624e721b88ad7094667d9236c6bb276e873a3f .includepath
+SHA1 a2a80168152b082cdf1503eb1e5037b82392e0ff .project
+SHA1 71035f0aaee69450d00ab64da2b696b8f4cf0952 Changes
+SHA1 438a00d8f482fb7bb71a235aa4a608399d00c655 MANIFEST
+SHA1 ee0635a1183a7e149c8cc186b7a7856bcf616324 META.json
+SHA1 8497e3bec72c47f759756638315bdfabee55607e META.yml
+SHA1 8a6f3e777d168519240d4ba83a28382d8eaea01e Makefile.PL
+SHA1 464138073201ab0f3e1027ed09bf4f99fe92d505 README
+SHA1 f4f35f207b48ae603a7f487b5f0ab2772d1c61aa lib/KiokuDB/Backend/CouchDB.pm
+SHA1 43f01888f8bde448cb5e6087445a18893015bd93 lib/KiokuDB/Backend/CouchDB/Exceptions.pm
+SHA1 da5926fea26bbedfb485dc05dac454aedf3783a9 lib/KiokuX/CouchDB/Role/View.pm
+SHA1 069387a027cb17848a63a4e36d1d3929fa64cb7c t.pl
+SHA1 67af79bb9443fb77cdd723658821e68243995064 t/01load.t
+SHA1 1c67e511245153a7582025cdc3417f88eb50a571 t/couchdb.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iQIcBAEBAgAGBQJQs9TTAAoJEJ36XCbNIT0IlAcQAIQwEzRKfHXRaWqwqvyQ15wG
+d/bkQe4pCFAI3uRLWYYH4JKLCb4OJSscFtN14js8FrUbKTUPgzab5MTiQe+TP5oJ
+RoIlHXt3UAGq9dti2dj9DM51Di3wcyqdmkCKkigcBncaylgy4RXC+S/1EbndHpSj
+iNO7DcPjHCDcq3k7cEpxRSH3Va3dW6hVEjhqWk8VNQs0NEMdOd0UYerSKaItZpgK
+XTOFvPxapC8MpGsFYErNaMSWMw2USsluymaY7NntIGGCPycllGc920rmuVGp7gwi
+MRGCdzZ/+ZLXbNLRbfvHEBfTehYSbB8aS/65p6qUrSlOrF2VcijpzlA1rUZEgA4l
+rLkq3K3RMw18b4zq5SSnFGwHYwZcVI3lx7qpdbb1kkohr3t2dn+o9c4OE+oCWvWh
+mefnaxy86ONCE4PPNzx3onq6LhYu4Tlq2raC8sdDsn4Syq1KdYXV0MjOaB+DTVBq
+ZhMZGyuQSMiz62b/VQAF9VU33wB7Kyz4AeO3jWPxxrOhpWvfZMfUivPnHZtajGyU
+OPLOYomif1KPLcjTpPXRTVp5Yo/pTtrJexAZbG4FJcG4iBqorD+T5APAEwhe6pe3
+PZxyD9jdlvnECcTZupTxKWF9LpcbpO3D+t6KQIm26UPNNJXGFgdgCermwCNhWtPu
+ZIDjOnfNKDddstLxmNk+
+=mbdC
+-----END PGP SIGNATURE-----

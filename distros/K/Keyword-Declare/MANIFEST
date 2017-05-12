@@ -1,0 +1,24 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+t/keytype.t
+t/simple.t
+dlib/Show.pm
+dlib/Multilingual/Code.pm
+dlib/Perl6/Loops.pm
+dlib/Perl6/Try.pm
+dlib/Test/Expr.pm
+dlib/Var/Javan.pm
+dlib/Var/Your.pm
+lib/Keyword/Declare.pm
+demo/inline_subs.pl
+demo/javar.pl
+demo/loop.pl
+demo/multilingual.pl
+demo/show.pl
+demo/test.pl
+demo/track.pl
+demo/try.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

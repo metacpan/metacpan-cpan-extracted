@@ -1,0 +1,80 @@
+{
+   "abstract" : "form validator",
+   "author" : [
+      "Masahiro Nagano <kazeburo@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.7.5",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Kossy-Validator",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Hash::MultiValue" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "HTTP::Message::PSGI" : "0",
+            "HTTP::Request::Common" : "0",
+            "Plack::Request" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Kossy::Validator" : {
+         "file" : "lib/Kossy/Validator.pm",
+         "version" : "0.01"
+      },
+      "Kossy::Validator::Result" : {
+         "file" : "lib/Kossy/Validator.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kazeburo/Kossy-Validator/issues"
+      },
+      "homepage" : "https://github.com/kazeburo/Kossy-Validator",
+      "repository" : {
+         "url" : "git://github.com/kazeburo/Kossy-Validator.git",
+         "web" : "https://github.com/kazeburo/Kossy-Validator"
+      }
+   },
+   "version" : "0.01"
+}

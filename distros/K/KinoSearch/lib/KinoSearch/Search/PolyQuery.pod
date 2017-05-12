@@ -1,0 +1,60 @@
+
+# Auto-generated file -- DO NOT EDIT!!!!!
+
+=head1 NAME
+
+KinoSearch::Search::PolyQuery - Base class for composite Query objects.
+
+=head1 DEPRECATED
+
+The KinoSearch code base has been assimilated by the Apache L<Lucy> project.
+The "KinoSearch" namespace has been deprecated, but development continues
+under our new name at our new home: L<http://lucy.apache.org/>
+
+=head1 SYNOPSIS
+
+    sub walk {
+        my $query = shift;
+        if ( $query->isa("KinoSearch::Search::PolyQuery") ) {
+            if    ( $query->isa("KinoSearch::Search::ORQuery") )  { ... }
+            elsif ( $query->isa("KinoSearch::Search::ANDQuery") ) { ... }
+            elsif ( $query->isa("KinoSearch::Search::RequiredOptionalQuery") ) {
+                ...
+            }
+            elsif ( $query->isa("KinoSearch::Search::NOTQuery") ) { ... }
+        }
+        else { ... }
+    }
+
+
+
+=head1 DESCRIPTION
+
+PolyQuery serves as a shared base class for
+L<ANDQuery|KinoSearch::Search::ANDQuery>,
+L<ORQuery|KinoSearch::Search::ORQuery>,
+L<NOTQuery|KinoSearch::Search::NOTQuery>, and
+L<RequiredOptionalQuery|KinoSearch::Search::RequiredOptionalQuery>.  All of
+these classes may serve as nodes in composite Query with a tree structure
+which may be walked.
+
+
+
+
+
+
+
+=head1 INHERITANCE
+
+KinoSearch::Search::PolyQuery isa L<KinoSearch::Search::Query> isa L<KinoSearch::Object::Obj>.
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005-2011 Marvin Humphrey
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
+

@@ -1,0 +1,130 @@
+NAME
+    Kite - collection of modules useful in Kite design and construction.
+
+SYNOPSIS
+        use Kite;
+
+        my $profile = Kite->profile(...)
+            || die $Kite::ERROR;
+
+        my $xml2ps = Kite->xml2ps(...)
+            || die $Kite::ERROR;
+
+        my $xml_parser = Kite->xml_parser(...)
+            || die $Kite::ERROR;
+
+DESCRIPTION
+    The Kite::* modules are a collection of Perl modules and scripts written
+    to help with various tasks in the design and construction of traction
+    kites.
+
+    The Kite module acts as a general interface to the other modules in the
+    collection, providing factory methods for loading and instantiating
+    them.
+
+METHODS
+  profile()
+
+    Loads the Kite::Profile module and calls the new() constructor. All
+    parameters are forwarded to the constructor.
+
+    This example:
+
+        use Kite;
+    
+        my $profile = Kite->profile( name => 'My Profile', ... )
+            || die $Kite::ERROR, "\n";
+
+    is equivalent to:
+
+        use Kite::Profile;
+
+        my $profile = Kite::Profile->new( name => 'My Profile', ... )
+            || die $Kite::Profile::ERROR, "\n";
+
+  xml2ps()
+
+    Loads the Kite::XML2PS module and calls the new() constructor. All
+    parameters are forwarded to the constructor as per the previous example.
+
+  xml_parser()
+
+    Loads the Kite::XML::Parser module and calls the new() constructor. All
+    parameters are forwarded to the constructor as per the previous
+    examples.
+
+MODULES
+    The following modules are distributed with the Kite bundle.
+
+  Kite
+
+    Front-end for the Kite::* modules. Contains factory methods for loading
+    modules and instantiating objects of other Kite::* classes.
+
+  Kite::Base
+
+    Base class implementing common functionality such as error reporting.
+
+  Kite::Profile
+
+    Module defining an object class used to represent and manipulate 2D
+    profiles.
+
+  Kite::XML2PS
+
+    Module to convert a curve definition from OpenKite XML format to
+    PostScript. Provides automatic page tiling, path following text,
+    registration marks, etc.
+
+  Kite::XML::Parser
+
+    Module for parsing an XML file and generating a representative tree of
+    node (element) objects.
+
+  Kite::XML::Node
+
+    Base class for XML element nodes created by Kite::XML::Parser.
+
+  Kite::XML::Node::Kite
+
+    Derived node elements specific to Kite markup (e.g. Kite, Part, Outline,
+    Curve, Point, etc.)
+
+  Kite::PScript::Defs
+
+    Module defining a number of PostScript definitions useful for generating
+    PostScript documents for kite part layout, etc.
+
+SCRIPTS
+    The following scripts are distributed with the Kite bundle.
+
+  okprof
+
+    Utility script providing a user interface to the Kite::Profile module.
+    Allows 2D profiles to be loaded and manipulated via simple commands. See
+    'perldoc okprof' or 'okprof -h'.
+
+  okxml2ps
+
+    Utility script for converting XML kite part definition and layout markup
+    to PostScript. Uses the Kite::XML2PS module.
+
+AUTHORS
+    Andy Wardley <abw@kfs.org> is the primary author and current maintainer
+    of the Kite::* bundle.
+
+    Simon Stapleton <simon@tufty.co.uk> is another key contributor.
+
+VERSION
+    This is version 0.4 of the Kite bundle.
+
+COPYRIGHT
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    See also the Kite::Profile manpage, the Kite::XML2PS manpage, the
+    Kite::XML::Parser manpage, the Kite::XML::Node manpage, the
+    Kite::XML::Node::Kite manpage, the Kite::PScript::Defs manpage, the
+    Kite::Base manpage, the okprof manpage and the okxml2ps manpage.
+

@@ -1,0 +1,19 @@
+Kwiki::PageInclude
+
+After you install this plugin, your are able to use {include: PageName}
+wafl phrase in your Kwiki page content, and that will include
+ all content of that page in this one. So it allows you to
+"modualize" your Kwiki pages. You can give a list of page names
+sepearated by comma, or space. They will be included in order.
+
+For example:
+
+  {include: PageOne}
+
+  {include: PageOne,PageTwo}
+
+  {include: PageOne PageTwo}
+
+
+Cheers,
+Kang-min "Gugod" Liu

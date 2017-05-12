@@ -1,0 +1,24 @@
+ChangeLog for Acme::Colour
+
+1.00 Sun Sep 28 17:50:26 BST 2003
+	- moved to Module::Build
+	- throw exceptions using Error when given unknown colours
+
+0.20 Tue Aug 20 19:35:23 BST 2002
+	- require 5.6.1 as it runs out of memory for some
+          reason on 5.005_003 (spotted by Daniel)
+
+0.19 Tue Jul  2 11:31:32 BST 2002
+	- Fix minor warning
+
+0.18 Mon Jun 17 15:33:38 GMT 2002
+	- Minor doc patch and support for colour constants
+	  by James Duncan
+
+0.17 ?
+
+0.16 Thu Apr 11 16:02:43 GMT 2002
+	- Fixed minor typo (thanks to Leo Lapworth)
+
+0.15 ?
+	- First released version

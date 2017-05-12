@@ -1,0 +1,27 @@
+## Installation with cpanm
+
+> cpanm Kernel::Keyring
+
+If there's no permission to install modules to the system dirs, cpanm
+will automatically set up and install to a local::lib in the home directory.
+See the local::lib documentation (https://metacpan.org/pod/local::lib).
+
+## Installing with the CPAN shell
+
+> cpan Kernel::Keyring
+
+## Manual installation
+
+> perl Makefile.PL
+> make
+> make test
+
+> make install
+
+## Documentation
+
+The documentation is available as pod.
+Run perldoc from a shell to read it.
+
+> perldoc Kernel::Keyring
+

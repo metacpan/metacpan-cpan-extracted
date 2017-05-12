@@ -1,0 +1,7 @@
+
+Kwiki-Backlinks is a Pane (currently a widget) plugin that 
+presents links to all the pages in the wiki that link to the
+current page.
+
+It keeps a database of links that is updated every time a
+page is saved. 

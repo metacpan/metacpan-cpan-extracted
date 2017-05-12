@@ -1,0 +1,51 @@
+#!/usr/bin/perl -w
+
+# $Id: index.html,v 1.8 2008-02-05 01:48:25 mike Exp $
+
+my $host = $ENV{'HTTP_HOST'};
+### or maybe one of the following which all seem correctly set:
+#	REDIRECT_HTTP_HOST
+#	REDIRECT_SERVER_NAME
+#	SERVER_NAME
+
+my $uri = $ENV{'REQUEST_URI'};
+$uri =~ s/(.*)\/.*/$1/;
+
+use Keystone::Resolver::Utils qw(mod_perl_version);
+my $ver = mod_perl_version();
+my $sw = $ver ? "<tt>mod_perl</tt> version $ver" : "CGI, most likely";
+my $realhost = `hostname`;
+chomp($realhost);
+
+my $docroot = $ENV{DOCUMENT_ROOT};
+#my $env = join('', map { "$_=" . $ENV{$_} . "\n" } sort keys %ENV);
+
+print <<__EOT__;
+<html>
+ <head>
+  <title>Keystone Resolver</title>
+ </head>
+ <body>
+  <p>
+   This is an installation of
+   <b>Keystone Resolver</b><br/>
+   running under $sw on <tt>$realhost</tt><br/>
+   from <tt>$docroot</tt>
+  </p>
+  <p>
+  Use
+   <a href="resolve"
+       ><tt>http://$host${uri}/resolve</tt></a>
+   as the BaseURL of your OpenURL resolver.
+  </p>
+  <p>
+   OpenURLs for this resolver can be generated using
+   <a href="/mod_perl/form2.html">a simple form</a>.
+  </p>
+  <p>
+   The resolver's resource database can be maintained using
+   <a href="/admin/">the admin UI</a>.
+  </p>
+ </body>
+<html>
+__EOT__

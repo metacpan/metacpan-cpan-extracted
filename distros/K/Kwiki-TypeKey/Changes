@@ -1,0 +1,34 @@
+Revision history for Perl extension Kwiki::TypeKey
+
+0.08  Wed Nov 29 14:36:54 PST 2006
+        * Fixed UTF-8 Cookie paraemters bug.
+          (Thanks to Ingy dot Net)
+
+0.07  2006-03-03T06:01:46Z
+        * Fixed UTF-8 CGI parameters bug.
+          (Thansk to Yappo)
+
+0.06  Mon Jan  9 21:06:46 UTC 2006
+        * Now it shows your picture taken from TypeKey when you're logged in.
+        * Integrated with Recent Changes page, showing your pic there too.
+          (Thanks to Ingy dot Net for his Kwiki-fu)
+
+0.05  Wed Apr  6 15:45:29 JST 2005
+	- Make sure need_email=0 with Kwiki::Edit::TypeKeyRequired
+
+0.04  Tue Apr  5 13:35:51 JST 2005
+	- Now it requires Spoon 0.22 and Kwiki 0.38
+
+0.03  Fri Apr  1 20:16:20 JST 2005
+	* Added logout feature (wacky code to override Spoon cookie capability)
+	- Now $tk->skip_expiry_check is always 1
+	- need_email=0
+
+0.02  Wed Mar 30 04:47:19 JST 2005
+	* Fixed timing of plugin/users creation to avoid perms problem
+	  (Old installers: Make sure plugins/users is writable by Kwiki user)
+	* Added Kwiki::Edit::TypeKeyRequired
+	- add PREREQ to Makefile.PL
+
+0.01  Wed Mar 30 04:12:27 2005
+	- original version

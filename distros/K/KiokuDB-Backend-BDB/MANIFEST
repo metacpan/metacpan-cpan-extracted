@@ -1,0 +1,13 @@
+Changes
+check_bdb_version.PL
+lib/KiokuDB/Backend/BDB.pm
+lib/KiokuDB/Backend/BDB/GIN.pm
+lib/KiokuDB/Backend/BDB/Manager.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+t/bdb.t
+t/bdb_backend.t
+t/bdb_gin.t
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

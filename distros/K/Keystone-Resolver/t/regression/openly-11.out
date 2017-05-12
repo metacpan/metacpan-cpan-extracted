@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<results>
+  <data entity="rft">
+    <metadata key="auinit">J.-R.</metadata>
+    <metadata key="aulast">Vergnaud</metadata>
+    <metadata key="btitle">DÃÂ©pendances et niveaux de reprÃÂ©sentationen syntaxe</metadata>
+    <metadata key="date">1985</metadata>
+    <metadata key="genre">book</metadata>
+    <metadata key="place">Amsterdam, Philadelphia</metadata>
+    <metadata key="pub">Benjamins</metadata>
+  </data>
+  <data entity="rfe">
+    <metadata key="aulast">Chomsky</metadata>
+    <metadata key="btitle">The Minimalist Program</metadata>
+    <metadata key="date">1995</metadata>
+    <metadata key="genre">book</metadata>
+    <metadata key="init">N</metadata>
+    <metadata key="isbn">0262531283</metadata>
+    <metadata key="place">Cambridge, Mass</metadata>
+    <metadata key="pub">The MIT Press</metadata>
+  </data>
+  <result type="bookstore" priority="10" tag=""
+	service="Amazon.com"
+	text="http://www.amazon.com/exec/obidos/ASIN/9027231141/thedinosaurrea0a"/>
+  <result type="authorsearch" priority="10" tag=""
+	service="Google"
+	text="http://www.google.com/search?q=%22J.-R. Vergnaud%22"/>
+  <result type="citation" priority="20" tag="APP"
+	service="APP-style citation" mimetype="text/html"
+	text="Vergnaud, J.-R.  1985.  DÃÂ©pendances et niveaux de reprÃÂ©sentationen syntaxe.  Benjamins.  Amsterdam, Philadelphia."/>
+  <result type="websearch" priority="10" tag=""
+	service="Google"
+	text="http://www.google.com/search?q=%22{UNSPECIFIED-atitle}%22"/>
+  <result type="websearch" priority="20" tag=""
+	service="Alltheweb"
+	text="http://alltheweb.com/search?q=%22{UNSPECIFIED-atitle}%22"/>
+  <result type="websearch" priority="30" tag=""
+	service="AltaVista"
+	text="http://www.altavista.com/web/results?q=%22{UNSPECIFIED-atitle}%22"/>
+</results>

@@ -1,0 +1,52 @@
+$Id: README.sites,v 1.2 2008-02-07 12:51:02 mike Exp $
+
+You're probably here because you got a message like:
+
+	Unknown Keystone Resolver site 'fish' (host fish.somesite.com:81)
+	Please see /usr/share/libkeystone-resolver-perl/db/README.sites
+
+Keystone Resolver in general hosts several functionally similar but
+cosmetically different virtual sites on a single installation: that's
+so that, for example, a library consortium can run a single
+installation and use it to provide separately branded resolver sites
+to each of its members.
+
+The specification of each supported site is provided by a database
+record in the "site" table, and the correct site to use is chosen on
+the basis of the virtual host name used to access the resolver: the
+first of the "."-separated components is used, so that if for example
+you access the resolver via the site "foo.bar.com", then a site record
+with tag="foo" will be sought.
+
+So if you get a message like the one above, there are two things you
+can do to fix it.  One is to change the virtual host name that you use
+to access the resolver, changing it to match one of those supported by
+a site record in the database; the other is to add a new site record
+to the database, describing your own site, and having its "tag" field
+equal to the first component of the virtual host name.
+
+To see the list of sites supported by the database, you can use SQL
+like the following (assuming you are using MySQL -- details may vary
+with other RDBMSs):
+
+	mysql> select * from site;
+	+----+-----------+----------------+-------------+--------------------+
+	| id | tag       | name           | bg_colour   | email_address      |
+	+----+-----------+----------------+-------------+--------------------+
+	|  1 | id        | Index Data     | white       | mike@indexdata.com | 
+	|  2 | dbc       | DBC            | lightblue   | mike@indexdata.com | 
+	|  3 | talis     | Talis          | pink        | mike@indexdata.com | 
+	|  4 | resolver  | Local Resolver | lightyellow | mike@indexdata.com | 
+	|  5 | localhost | Localhost      | white       | mike@indexdata.com | 
+	+----+-----------+----------------+-------------+--------------------+
+
+And you can add a new site (if you connect to the database as a user
+with read-write privileges on the database) with SQL like this:
+
+	mysql> insert into site (tag, name, bg_colour, email_address) values
+            -> ('fish', 'The fish portal', 'lightgreen', 'you@somesite.com');
+
+(At the moment, customisation of the individual sites is very limited:
+just background colour.  That will change, and the site objects will
+become more complex.)
+

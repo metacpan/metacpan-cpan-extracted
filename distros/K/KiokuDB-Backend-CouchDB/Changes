@@ -1,0 +1,52 @@
+0.16
+  - Added option to throw exception if there is a conflict when storing
+    docs.
+
+0.12
+  - Added README (to make Github and others happy).
+  - Removed noisy debugging code that should never have been made generally
+    available.
+
+0.11
+  - Enhanced debug output provided by Martin Parm.
+  - Minor code cleanup.
+  - Updated documentation.
+
+0.10
+  - Version bump (no changes to functionality).
+
+0.09
+  - Version bump (no changes to functionality).
+
+0.08
+  - Optimized view() method by avoiding to recurse into newly deserialized
+    objects.
+
+0.07
+   - The view() method now respects object metadata, avoiding update
+     conflicts and lost attachments(!) if updating objects returned by
+     this method.
+
+0.06
+   - Supporting non-standard method: view() that will query CouchDB and return
+     a data structure containing live objects wherever KiokuDB entries are
+     found in the result.
+   - Respecting attachments (the prior versions would silently drop them).
+   
+0.05
+   - (Not published.) Improved stability and error checking.
+
+0.04
+    - Add new concurrency test
+
+0.03
+    - Memory buffered transactions. Atomicity is guaranteed by CouchDB, so long
+      as the entire transactions is submitted at once in the top level
+      C<txn_commit>.
+
+0.02
+    - Various test suite fixes
+    - Add class_meta_field to serialize runtime role information
+
+0.01
+    - Initial release

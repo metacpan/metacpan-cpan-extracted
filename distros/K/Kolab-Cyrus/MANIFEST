@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Kolab-Cyrus.t
+lib/Kolab/Cyrus.pm
+META.yml                                 Module meta-data (added by MakeMaker)

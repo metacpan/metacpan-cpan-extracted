@@ -1,0 +1,44 @@
+#! /usr/bin/perl -w
+#############################################################################
+## Author:      Herbert Breunung
+## Purpose:     Kephra starter
+## Created:     09/5/2008
+## Copyright:   (c) Herbert Breunung
+## Licence:     GPL
+#############################################################################
+
+=head1 NAME
+
+kephra - Kephra starter script
+
+=head1 SYNOPSIS
+
+    > kephra [<files>]   # start with certain files open
+
+for main Docs please go to the main Module named L<Kephra>.
+
+=cut
+
+use strict;
+use vars qw{ $ALLINC $DEV_START};
+our $VERSION = '0.14';
+our $STANDALONE = '';
+
+
+
+BEGIN {
+	# set it true if you like to have a relocatable (by simple copy) editor
+	$STANDALONE = 'dev' if $ENV{KEPHRA_DEV_START};
+	# set it true if this distro includes a full runtime env (KRE)
+	$ALLINC = 0;
+
+	push @INC, 'kre/lib', 'kre/site' if $ALLINC;
+	push @INC, 'src' if $STANDALONE;
+}
+
+use Kephra;
+
+$Kephra::STANDALONE = $STANDALONE;
+$Kephra::LOGLEVEL = 0;            # switch for benchmark output
+
+Kephra::start();                  # starter for the main app

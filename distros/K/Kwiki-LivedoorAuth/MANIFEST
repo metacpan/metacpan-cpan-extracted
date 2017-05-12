@@ -1,0 +1,9 @@
+Changes
+lib/Kwiki/Edit/LivedoorAuthRequired.pm
+lib/Kwiki/LivedoorAuth.pm
+lib/Kwiki/Users/LivedoorAuth.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00_compile.t

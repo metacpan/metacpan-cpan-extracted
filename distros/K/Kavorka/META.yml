@@ -1,0 +1,152 @@
+---
+abstract: 'function signatures with the lure of the animal'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires:
+  Test::Fatal: '0'
+  Test::More: '0.96'
+  Test::Requires: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 1
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.150005'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Kavorka
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  Kavorka:
+    file: lib/Kavorka.pm
+    version: '0.037'
+  Kavorka::MethodModifier:
+    file: lib/Kavorka/MethodModifier.pm
+    version: '0.037'
+  Kavorka::Multi:
+    file: lib/Kavorka/Multi.pm
+    version: '0.037'
+  Kavorka::Parameter:
+    file: lib/Kavorka/Parameter.pm
+    version: '0.037'
+  Kavorka::ReturnType:
+    file: lib/Kavorka/ReturnType.pm
+    version: '0.037'
+  Kavorka::Signature:
+    file: lib/Kavorka/Signature.pm
+    version: '0.037'
+  Kavorka::Sub:
+    file: lib/Kavorka/Sub.pm
+    version: '0.037'
+  Kavorka::Sub::After:
+    file: lib/Kavorka/Sub/After.pm
+    version: '0.037'
+  Kavorka::Sub::Around:
+    file: lib/Kavorka/Sub/Around.pm
+    version: '0.037'
+  Kavorka::Sub::Augment:
+    file: lib/Kavorka/Sub/Augment.pm
+    version: '0.037'
+  Kavorka::Sub::Before:
+    file: lib/Kavorka/Sub/Before.pm
+    version: '0.037'
+  Kavorka::Sub::ClassMethod:
+    file: lib/Kavorka/Sub/ClassMethod.pm
+    version: '0.037'
+  Kavorka::Sub::Fun:
+    file: lib/Kavorka/Sub/Fun.pm
+    version: '0.037'
+  Kavorka::Sub::Method:
+    file: lib/Kavorka/Sub/Method.pm
+    version: '0.037'
+  Kavorka::Sub::ObjectMethod:
+    file: lib/Kavorka/Sub/ObjectMethod.pm
+    version: '0.037'
+  Kavorka::Sub::Override:
+    file: lib/Kavorka/Sub/Override.pm
+    version: '0.037'
+  Kavorka::TraitFor::Parameter::alias:
+    file: lib/Kavorka/TraitFor/Parameter/alias.pm
+    version: '0.037'
+  Kavorka::TraitFor::Parameter::assumed:
+    file: lib/Kavorka/TraitFor/Parameter/assumed.pm
+    version: '0.037'
+  Kavorka::TraitFor::Parameter::locked:
+    file: lib/Kavorka/TraitFor/Parameter/locked.pm
+    version: '0.037'
+  Kavorka::TraitFor::Parameter::optional:
+    file: lib/Kavorka/TraitFor/Parameter/optional.pm
+    version: '0.037'
+  Kavorka::TraitFor::Parameter::ref_alias:
+    file: lib/Kavorka/TraitFor/Parameter/ref_alias.pm
+    version: '0.037'
+  Kavorka::TraitFor::Parameter::ro:
+    file: lib/Kavorka/TraitFor/Parameter/ro.pm
+    version: '0.037'
+  Kavorka::TraitFor::ReturnType::assumed:
+    file: lib/Kavorka/TraitFor/ReturnType/assumed.pm
+    version: '0.037'
+  Kavorka::TraitFor::Sub::begin:
+    file: lib/Kavorka/TraitFor/Sub/begin.pm
+    version: '0.037'
+  Kavorka::TraitFor::Sub::fresh:
+    file: lib/Kavorka/TraitFor/Sub/fresh.pm
+    version: '0.037'
+  Kavorka::TraitFor::Sub::override:
+    file: lib/Kavorka/TraitFor/Sub/override.pm
+    version: '0.037'
+  MooseX::KavorkaInfo:
+    file: lib/MooseX/KavorkaInfo.pm
+    version: '0.037'
+  MooseX::KavorkaInfo::DummyInfo:
+    file: lib/MooseX/KavorkaInfo.pm
+  MooseX::KavorkaInfo::Trait::Method:
+    file: lib/MooseX/KavorkaInfo.pm
+    version: '0.037'
+  MooseX::KavorkaInfo::Trait::WrappedMethod:
+    file: lib/MooseX/KavorkaInfo.pm
+    version: '0.037'
+  Parse::KeywordX:
+    file: lib/Parse/KeywordX.pm
+    version: '0.037'
+recommends:
+  Type::Tiny::XS: '0.010'
+requires:
+  Exporter::Tiny: '0.026'
+  Module::Runtime: '0'
+  Moo: '1.003001'
+  PadWalker: '0'
+  Parse::Keyword: '0.06'
+  Return::Type: '0.004'
+  Sub::Util: '0'
+  Type::Parser: '0.032'
+  Type::Registry: '0.032'
+  Type::Utils: '0.032'
+  Types::Standard: '0.032'
+  match::simple: '0'
+  namespace::sweep: '0.006'
+  perl: '5.014'
+resources:
+  IRC: irc://irc.perl.org/#moops
+  Identifier: http://purl.org/NET/cpan-uri/dist/Kavorka/project
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=Kavorka
+  homepage: https://metacpan.org/release/Kavorka
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-kavorka.git
+version: '0.037'
+x_contributors:
+  - 'Grzegorz Rożniecki (XAERXESS) <xaerxess@cpan.org>'
+  - 'Aaron James Trevena (TEEJAY) <teejay@cpan.org>'
+  - 'Piers Cawley (PDCAWLEY) <pdcawley@cpan.org>'
+  - 'Thibaut Le Page (THILP) <thilp@cpan.org>'
+  - 'Chris Tijerina (CAMSPI) <camspi@cpan.org>'
+  - 'Daniel Dehennin'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

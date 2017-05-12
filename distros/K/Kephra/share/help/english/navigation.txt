@@ -1,0 +1,39 @@
+
+       -------------------------
+      | Kephra Navigation Guide |
+       -------------------------
+
+ Despite the editor is designed to be nonintrusive, every element of the user
+ interface has its planned purpose and task. The usage will be easier if you
+ know something about but please don't be bored because much of it is common
+ knowledge. And if you want to change something just look into the menu "Config".
+
+Mainmenu: 
+ Is located topmost at the main window and gives you an overview about
+ most available features. To be be able to search features in context it is
+ thematically structured with many submenus and subsubmenus and provides a quick
+ overview about every feature with information about its keyboard shortcut, its
+ representing icon and a short help text in the statusbar. <Ctrl>+<Alt>+<M>
+ does toggle its visibility.
+ 
+Toolbar: 
+ Is located below the main menu and contains only the icons of the most used 
+ functions. That should enable fast work for people who prefer to work with
+ the mouse. 
+
+Tabbar:
+ shows which files are currently open and if the file is unsaved (*),
+ readonly (#) or an activ config file($). Tabs can be selected, moved and closed.
+ <Ctrl>+<Alt>+<T> does toggle its visibility.
+
+Context menu: 
+ opens with a click of the right mouse button and provides most important 
+ functions that stay in connection with the place the menu is called. This
+ menus are connected with the edit panel, selected text, left margin, search bar
+ and most status panes.
+ 
+Status bar: 
+ Is located at the bottom line of the main window. It provides
+ informations about the current status and feedback from your instructions.
+ Some parts of it are interactive(left-click) and have their own 
+ context menu(right-click).

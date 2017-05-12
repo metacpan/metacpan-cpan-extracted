@@ -1,0 +1,105 @@
+Revision history for KiokuDB-Backend-DBI
+
+1.23  2014-03-31
+    - Fix deprecation warning from Class::MOP::load_class (pecastro, #3)
+
+1.22  2012-07-06
+    - Fix lookup of invalid entries that differ from a valid entry only in case
+
+1.21  2011-10-04
+    - Fix undocumented gin_index option to define_kiokudb_schema (frew)
+
+1.20  2011-05-04
+    - Fix some stuff with recent DBIx::Class (arcanez)
+
+1.19  2011-03-07
+	- Merge releases
+
+1.16  2011-03-07
+    - (NUFFIN release)
+    - Updated to support change in DBIC object hierarchy
+
+1.18  2011-01-04
+    - Fix set subquery building. Bad use of parenthesis.
+    - Includes an actual test for the set query.
+
+1.17  2010-12-18
+    - Small fix in release process
+
+1.16  2010-12-18
+    - (DRUOSO release)
+    - Adds support for Set GIN queries
+
+1.15  2010-07-02
+    - Constructing a KiokuDB directory handle is no longer mandatory, you can
+      get it from the DBIC schema (domm, nothingmuch)
+
+1.14  2010-07-01
+    - documentation fixes
+
+1.13  2010-06-28
+    - fix ordered loading of DBIC Core component in example code
+    - FOR UPDATE added to SELECT queries on MySQL, PG and Oracle
+    - compound operations now create a txn guard by default
+
+1.12  2010-06-27
+    - Fix FLORA's botched upload ;-) (typo in dist.ini)
+
+1.11  2010-06-27
+    - Support for DBIx::Class integration (KiokuDB objects and DBIC rows can
+      point to each other, DBIC resultsets can be serialized in KiokuDB)
+    - All SQL operations that use placeholders now support limiting of the
+      number of placeholders, splitting the operation into batches (this is
+      enabled by default for SQLite which limits SQL statements to 999
+      placeholders) (Jason May)
+    - DBIx::Class::Optional::Dependencies now used in Makefile.PL to avoid
+      problems with 'create => 1'
+
+1.10  2010-03-17
+    - NOTE: this was supposed to be 0.10... oops
+    - Added mysql_strict attribute, true by default, causes SQL's strict mode
+      to be set
+    - Now specifies 'longblob' instead of 'blob' as the type for the 'data'
+      column when deploying to MySQL because the "large" in blob apparently
+      means 64k and MySQL was truncating it by default
+    - Added more bitter comments about MySQL to the documentation
+    - Make the table_info fix from 0.09 only apply to SQLite
+
+0.09  2010-03-03
+    - Fix double deployment with recent versions of DBD::SQLite
+    - Pod fixes
+
+0.08  2009-11-27
+    - Fix GIN key update (FIXME no coverage in KiokuDB test suite yet)
+    - uses done_testing in test suite
+
+0.07  2009-07-30
+    - Various documentation fixes
+    - ID stream optimization
+    - use the new sqlt_deploy_callback
+    - Don't use execute_array for DELETE
+    - Explicitly call $schema->disconnect on destruction
+    - Allow coderef in DBI DSN
+    - Don't reuse DBIC's txn_do
+
+0.06  2009-01-07
+    - Skip tests if SQL::Translator is missing
+
+0.05  2009-01-05
+    - Use an update statement when an entry the 'prev' attribute, and insert
+      otherwise.
+    - Add a 'schema_hook' attribute, to allow modification of the cloned schema
+      before connecting
+
+0.04  2008-12-24
+    - Remove DBD::Pg usage (DBIC handles those parts now)
+
+0.03  2008-12-23
+    - Switch to Serialize::Delegate
+    - add 'create' attribute
+
+0.02  2008-12-22
+    - Skip tests if DBD::SQLite is not available
+
+0.01  2008-12-22
+    - Initial release

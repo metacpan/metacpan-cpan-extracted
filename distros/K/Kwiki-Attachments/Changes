@@ -1,0 +1,28 @@
+Revision history for Perl extension Kwiki::Attachments.
+
+0.15  Mon Apr 18
+      - Fixed missing cgi parameter 'uploaded_file'.
+      - Changed filename filter for uploaded_file so that '-' is
+        not changed to '_'.
+
+0.16  Mon Aug 16 2005
+      - Added thumbnail support if Imager or Image::Magick is installed.
+      - Includes a wafl directive {thumb:[page/]filename}.
+
+0.17  Tue Aug 17 2005
+      - Amended pod in Attachments.pm
+
+0.18  Fri Sep 9 2006
+      - Fixed code typos in thumbnail creation code when Imager.pm is used.
+      - Embellished the pod in Attachments.pm.
+      - Added config options:
+         make_thumbnails : turn thumbnail creation on/off
+         im_override : use Image::Magick instead of Imager if both installed
+      - Added more tests
+      - Updated README.
+
+0.19  Sun 31 May 2009
+      - Fixed test case which required a file that wasn't included in the distro.
+
+0.21  Tue 14 Jul 2009
+      - Removed Mac OS X related garbage files in release tarball.

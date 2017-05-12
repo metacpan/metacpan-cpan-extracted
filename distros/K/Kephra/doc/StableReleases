@@ -1,0 +1,140 @@
+release notes of all Kephra stable versions
+
+0.5 {0.4.3}
+ * new document property: encoding (8bit/utf-8)
+   + utf works now
+ * code folding support
+   + 4 toggle functions: fold here, recursive, level, all
+   + usable with mouse (fold margin) and keys ((<alt>|<ctrl>)[+<shift>]+<+>)
+   + 2 styles for folding marker: boxes and arrows
+   + optional flagline shows where text is folded
+ * new tabbar
+   + move tabs with mouse and keys
+   + close icons on each tab
+   + document menu in the right corner
+ * marker added (F2+ or Searchbar or Left Click in Marker margin)
+ + new tools
+   + display @INC and %ENV
+   + output selection in dec and hex
+   + color picker, displays also selected color value
+   + note selection on shift+f4
+   + changeable interpreter path-conf key: app > panel > output > interpreter_path
+ + 3 new main window modes: fullscreen, max edit, transparent
+ + improved stausbar, from a config file, with context help
+ + save and restore textfold state in sessions and file history
+ + convert HTML enteties
+ + new help menu items open default browser with
+   + online doc, native lang forum
+   + bug tracker, feature wish tracker
+ + file missing dialog
+ + writes files also in missing dirs
+ ~ end of line chars of new docs depends now on the running OS
+ [ on splitters can now be clicked
+ 
+0.4
+ * Searchbar
+ * notepad panel extension
+ * output panel extension for perl programs
+ * new contextmenus: (on selected text, on searchbar, on tabbar, on statusbar)
+ * customizable mainmenu, toolbars, contextmenus
+ * File history menu
+ * 10 doc spanning bookmarks
+ * 8 new lexer: avennue BAAN .bat diff errorlist makefile matlab property
+ * german with umlauts
+ * files directories and can now be dragged into editpanel
+ + new file with a template menu
+ + open all files from a dir
+ + rename files through file menu
+ + load and store a backup file session
+ + delete back tab, <shift>+<back> deletes now to next indention level
+ + brace navigation with <alt>+<arrow keys>
+ + goto last edit (<Ctrl>+<Shift>+<G>)
+ + search dialog now quicker, less flicker and with drag n drop in 
+ + customizable title bar
+ + optional new and close icon in tabbar
+ + rectangular selection with keyboard (<alt>+<shift>)
+ + number of selected lines are displayed in statusbar
+ + blockformat <ctrl>+<shift>+<b>, menu edit > format
+ + line wrap under menu edit > format
+ + firstname: new document property holds filname without ending
+ + can use [$$firstname] as template variable too
+ + reload templates on save
+ + move document line and page wise from searchbar input
+ + tabbar tabs numbering optional config key: app > tabbar > number_tabs
+ + tabbar filename ending optional: app > tabbar > file_info = [first]name
+ + autonotify (conf key file > open > auto_notify )
+ + autosave (conf key file > save > auto_save )
+ + Perl 5.10 keywords in the perl lexer
+ + doc navigation from searchbar (hold <ctrl>)
+ ~ changed statusbar onclick behaviour
+ ~ better goto line dialog
+ ~ format and convert function much faster
+ ~ block navigation now on <Alt>+<PgUp>|<PgDown>
+ ~ document switch back now on <Ctrl>+<back>
+ ~ much less flicker in toolbar and tabbar
+ ~ menu und toolbar items can now disable, be checked by internal events
+ [ checkable and disable menu items
+ [ shown pathes now OS compatibel
+ ] runs with newest Wx and newest Perl
+ ] added and removed dependencies
+
+0.3
+ ? full stable release, more comfort
+ * autoindent
+ * bracelight and bracebadlight
+ + braceindent and bracededent
+ + leftclick on statusbar for changing settings shortcuts
+ + leftclick on rightmost statusbarfield for getting infos about file
+ + show unsaved and readonly status in tabs
+ + show number of selected chars / cursor pos in %
+ + optional warning dialog while overwriting files
+ + replace line
+ [ new fresher icons, several new for coming new functions
+ [ 2 more functions in the toolbar
+ [ more responsive cursor position display
+ [ linenumbermargin has always enough width
+ [ quit dialog now shows numbers and "unsaved files"
+ [ faster splashscreen
+ ] remember directory of session file
+ ! php lexer fixed
+ ! over 35 bugfixes
+
+0.2
+ * multiple document handling with properies for each doc
+   start cursorpos, syntaxstyle, EOL Mode, Tab usage
+ * find and replace dialog
+ + autosaves now all properties and configs and autoreload on next start
+ + backup autosave file and restore ist in emergency case
+ + visual feature: switch back if you click on current
+ + file option: start with an empty file, open each file once, open text files only
+ ' help text: this version texts
+ + ask now for unsaved files to save on quit
+ + view option: intention guides, caret line highlighting
+ + autodetect EOL Mode, write protection
+ + direct doc selection with Alt+Number
+ + win XP look
+ + customizable Syntaxstyle, select them and autoselect
+ + german localisation
+ + much faster reading of large files
+ file menu: insert file, edit menu: format functions, convert functions
+ document menu: eol mode, styles, spaces, write protection
+ Statusbar: cursorpos, eol, spaces, style
+ save and load external configs, handling close window event
+ config: many new styles, contextmenu, color and caret settings
+ file menu: reopen, save copy as,
+ edit menu: Replace, Undo History, brace comment, Selection Move, line move
+            indent unindent,  script comment uncomment,
+ search menu: find, find next, find previous, find selection, 3Bookmarks
+              goto line number,
+ view menu: hard tabs, whitespace, 4Margins, Line Wrap, font dialog, View EOL
+ config menu: open, load and save config on the fly, default config file
+ save before exit, Keyboard Map, Licenses
+ C-style, CSS Style, HTML-Style, select and autoselect Syntaxstyle
+ remember file, asks for filename if you save new file, better Perl-style
+
+0.1: 
+   starter exe, english Menu,
+   file menu: new file, open, save file, save as
+   edit menu: undo, redo, cut, copy, paste, clear, select all
+   view menu: linenumbermargin, long line indikator,
+   colored gutter, first syntaxstyle(perl), filename in tab and the title

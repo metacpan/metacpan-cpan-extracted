@@ -1,0 +1,113 @@
+
+# Auto-generated file -- DO NOT EDIT!!!!!
+
+=head1 NAME
+
+KinoSearch::Plan::FullTextType - Full-text search field type.
+
+=head1 DEPRECATED
+
+The KinoSearch code base has been assimilated by the Apache L<Lucy> project.
+The "KinoSearch" namespace has been deprecated, but development continues
+under our new name at our new home: L<http://lucy.apache.org/>
+
+=head1 SYNOPSIS
+
+    my $polyanalyzer = KinoSearch::Analysis::PolyAnalyzer->new(
+        language => 'en',
+    );
+    my $type = KinoSearch::Plan::FullTextType->new(
+        analyzer => $polyanalyzer,
+    );
+    my $schema = KinoSearch::Plan::Schema->new;
+    $schema->spec_field( name => 'title',   type => $type );
+    $schema->spec_field( name => 'content', type => $type );
+
+
+
+=head1 DESCRIPTION
+
+KinoSearch::Plan::FullTextType is an implementation of
+L<KinoSearch::Plan::FieldType> tuned for "full text search".  
+
+Full text fields are associated with an
+L<Analyzer|KinoSearch::Analysis::Analyzer>, which is used to tokenize and
+normalize the text so that it can be searched for individual words.
+
+For an exact-match, single value field type using character data, see
+L<StringType|KinoSearch::Plan::StringType>.
+
+=head1 CONSTRUCTORS
+
+=head2 new( I<[labeled params]> )
+
+    my $type = KinoSearch::Plan::FullTextType->new(
+        analyzer      => $analyzer,    # required
+        boost         => 2.0,          # default: 1.0
+        indexed       => 1,            # default: true
+        stored        => 1,            # default: true
+        sortable      => 1,            # default: false
+        highlightable => 1,            # default: false
+    );
+
+=over
+
+=item *
+
+B<analyzer> - An Analyzer.
+
+=item *
+
+B<boost> - floating point per-field boost.
+
+=item *
+
+B<indexed> - boolean indicating whether the field should be indexed.
+
+=item *
+
+B<stored> - boolean indicating whether the field should be stored.
+
+=item *
+
+B<sortable> - boolean indicating whether the field should be sortable.
+
+=item *
+
+B<highlightable> - boolean indicating whether the field should be
+highlightable.
+
+=back
+
+
+
+
+
+=head1 METHODS
+
+=head2 set_highlightable(highlightable)
+
+Indicate whether to store data required by
+L<KinoSearch::Highlight::Highlighter> for excerpt selection and search
+term highlighting.
+
+=head2 highlightable()
+
+Accessor for "highlightable" property.
+
+
+
+=head1 INHERITANCE
+
+KinoSearch::Plan::FullTextType isa L<KinoSearch::Plan::TextType> isa L<KinoSearch::Plan::FieldType> isa L<KinoSearch::Object::Obj>.
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005-2011 Marvin Humphrey
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
+

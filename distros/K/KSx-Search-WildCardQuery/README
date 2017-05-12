@@ -1,0 +1,58 @@
+KSx::Search::WildCardQuery and KSx::Search::RegexpTermQuery,
+version 0.05 (beta)
+
+
+KSx::Search::WildCardQuery provides KinoSearch with simple wild-card
+search capabilities. It is a subclass of--
+
+KSx::Search::RegexpTermQuery, which allows one to search for all terms
+that match a given regular expression.
+
+
+INSTALLATION
+
+The easiest way to install this module is to use the CPAN module or
+the cpan script:
+
+    [sudo] perl -MCPAN -e "install KSx::Search::WildCardQuery"
+
+    [sudo] cpan KSx::Search::WildCardQuery
+
+Or you can use the following:
+
+    perl Makefile.PL
+    make
+    make test
+    [sudo] make install
+
+
+DEPENDENCIES
+
+This module requires perl and the following Perl modules:
+
+• Hash::Util::FieldHash::Compat
+• The development version of KinoSearch, which one can get from
+  http://www.rectangular.com/svn/kinosearch/trunk/, revision
+  4810 or later.
+
+
+DOCUMENTATION
+
+After installing, you can find documentation for these modules with
+the perldoc command.
+
+    perldoc KSx::Search::WildCardQuery
+    perldoc KSx::Search::RegexpTermQuery
+
+Or try using man (it’s faster, in my experience):
+
+    man KSx::Search::WildCardQuery
+    man KSx::Search::RegexpTermQuery
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008-9 Father Chrysostomos
+
+This program is free software; you may redistribute it or modify it
+(or both) under the same terms as perl.

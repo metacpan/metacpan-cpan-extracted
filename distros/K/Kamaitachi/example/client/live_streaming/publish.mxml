@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="init()">
+    <mx:Script source="publish.as"/>
+    <mx:Panel title="simple live publish example" paddingTop="10" paddingBottom="10" paddingLeft="10" paddingRight="10">
+        <mx:HBox>
+            <mx:Label text="Host:"/>
+            <mx:TextInput id="host" width="120" text="rtmp:/stream/live" />
+            <mx:Button id="connectConn_button" label="connect" click="connectConn()" enabled="true"/>
+            <mx:Button id="closeConn_button" label="close" click="closeConn()" enabled="true"/>
+        </mx:HBox>
+        <mx:HBox>
+            <mx:Label text="Name:"/>
+            <mx:TextInput id="input" width="120"/>
+            <mx:Button id="publish_button" label="publish" click="publishNs()"/>
+            <mx:Button id="unpublish_button" label="unpublish" click="unpublishNs()"/>
+        </mx:HBox>
+        <mx:VideoDisplay id="video" width="320" height="240" />
+        <mx:VBox>
+        <mx:Label id="status" text="Connecting..."/>
+        <mx:Label id="message_label" text=""/>
+        </mx:VBox>
+    </mx:Panel>
+</mx:Application>

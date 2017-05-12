@@ -1,0 +1,29 @@
+GUI:
+
+- almost all useful features are missing ;)
+
+- users duplicate over time.. maybe games too?
+
+- games don't get updated it seems
+
+- trivial: remember the time of the last move for restarting the timer
+
+- or is it a flag(?):
+  lavalyn: "~" is what you get if you have played 5 more than twice the number of games you've played against "?" "-" or "not stronger" players
+
+- some user'ess prefers the ggo board. well...
+
+- seperate goboard etc. from the rest.
+
+VIEWER:
+
+- labels, resize bg colour
+- board colour => traditional yellowish kaya
+
+BUGS (should report to wms, but since he started a war, maybe we should try to
+      avoid attention).
+
+- one can get random memory dumps from the server (passwords if you try long enough? :)
+  (UPDATE: indeed, the server leaks passwords, unfortunately the associated usernames
+  are not near, still troubling...)
+- it seems the client is extremely easy to crash...

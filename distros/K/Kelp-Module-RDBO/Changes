@@ -1,0 +1,11 @@
+Revision history for perl module Kelp::Module::RDBO
+
+0.205 2014-09-21
+    - Allow rdb and rdbo to specify optional database domain and type
+
+0.106 2014-03-10 NEILB
+    - This changes the =head1 TITLE to =head1 NAME, which is the convention for defining the abstract.
+
+0.105 2013-08-09 MINIMAL
+    - first release to CPAN
+

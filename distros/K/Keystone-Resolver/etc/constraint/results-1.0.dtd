@@ -1,0 +1,19 @@
+<!-- $Id: results-1.0.dtd,v 1.2 2007-02-09 17:13:25 mike Exp $ -->
+
+<!-- This the Keystone Resolver Results DTD, version 1.0 -->
+
+<!ELEMENT results (data*, result+)>
+
+<!ELEMENT data (metadata+)>
+<!ATTLIST data entity CDATA #REQUIRED>
+
+<!ELEMENT metadata (#PCDATA)>
+<!ATTLIST metadata key CDATA #REQUIRED>
+
+<!ELEMENT result (#PCDATA)>
+<!ATTLIST result type CDATA #REQUIRED
+                 priority CDATA #REQUIRED
+                 tag CDATA #REQUIRED
+                 service CDATA #REQUIRED
+                 mimetype CDATA #IMPLIED>
+

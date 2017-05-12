@@ -1,0 +1,38 @@
+---
+version: 0.15
+date:    Sun Dec  4 20:36:15 EST 2005
+changes:
+    - Fixed missing tests
+
+---
+version: 0.14
+date:    Sun Nov 13 23:19:38 EST 2005
+changes:
+    - Improved Kwalitee
+
+---
+version: 0.13
+date:    Thu Jun 24 08:44:50 EDT 2004
+changes:
+    - Just kidding about recent changes, I was confused. The *Revisions* button is now the same as the Previous Revision icon.
+
+---
+version: 0.12
+date:    Wed Jun 23 20:48:49 EDT 2004
+changes:
+    - It helps if the module returns true
+
+---
+version: 0.11
+date:    Wed Jun 23 18:32:40 EDT 2004
+changes:
+    - Documentation touch-ups
+    - Created new_page.png from stock_about.png and stock_new.png
+    - Recent Changes icon is now the same as the Previous Revision icon
+    - Add GPL as LICENSE file for consistancy
+
+---
+version: 0.10
+date:    Mon Jun 21 06:57:09 PDT 2004
+changes:
+    - Initial release

@@ -1,0 +1,31 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 a53c0f5b45c0965a1ab1766bde13722001bba775 Changes
+SHA1 8691ba0a51e740f7026848639489ead4186a69eb MANIFEST
+SHA1 190e9058eb9c6446a1a3f3ddf15b082f1ecde152 MANIFEST.SKIP
+SHA1 d55928c2194d0d2cc6bffc1cf8601801ba5d9b11 META.yml
+SHA1 ffc0ab7d025fa69e8651167bad001d9c6e5dc010 Makefile.PL
+SHA1 d7a3d3d432f932c402affab1741c63a99e824219 lib/KiokuDB/Backend/Files.pm
+SHA1 5e4ce2ffc8e4f83ffcbd6c8274ecfc1131733b5a lib/KiokuDB/Backend/JSPON.pm
+SHA1 1443007ce5f574b866672fdfe196038b10566ad6 t/files.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG/MacGPG2 v2.0.12 (Darwin)
+
+iEYEARECAAYFAkr8EisACgkQVCwRwOvSdBgHPgCgrmnxsVeSac3qtYhakazSuwWu
+XJMAoKnhJUKtQh482fmllqX3SbpwVDkF
+=O7gO
+-----END PGP SIGNATURE-----

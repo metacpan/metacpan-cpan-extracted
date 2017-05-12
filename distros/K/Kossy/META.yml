@@ -1,0 +1,85 @@
+---
+abstract: 'Sinatra-ish Simple and Clear web application framework'
+author:
+  - 'Masahiro Nagano <kazeburo {at} gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.4.1, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Kossy
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Kossy:
+    file: lib/Kossy.pm
+    version: '0.40'
+  Kossy::Connection:
+    file: lib/Kossy/Connection.pm
+    version: '0.40'
+  Kossy::Exception:
+    file: lib/Kossy/Exception.pm
+    version: '0.40'
+  Kossy::Request:
+    file: lib/Kossy/Request.pm
+    version: '0.40'
+  Kossy::Response:
+    file: lib/Kossy/Response.pm
+    version: '0.40'
+requires:
+  Class::Accessor::Lite: '0'
+  Cookie::Baker: '0.03'
+  Cookie::Baker::XS: '0.03'
+  Cwd: '0'
+  Data::Section::Simple: '0'
+  File::Basename: '0'
+  File::ShareDir: '0'
+  HTML::FillInForm::Lite: '1.11'
+  HTTP::Entity::Parser: '0.12'
+  HTTP::Headers::Fast: '0.19'
+  HTTP::Message: '0'
+  Hash::MultiValue: '0'
+  JSON: '2'
+  Kossy::Validator: '0.01'
+  Number::Format: '0'
+  Plack: '1.0029'
+  Plack::Middleware::ReverseProxy: '0'
+  Plack::Middleware::Static: '0'
+  Router::Boom: '1.01'
+  Scalar::Util: '0'
+  Test::More: '0.88'
+  Text::Xslate: v3.2.4
+  Text::Xslate::Bridge::TT2Like: '0'
+  Try::Tiny: '0.09'
+  WWW::Form::UrlEncoded: '0.19'
+  WWW::Form::UrlEncoded::XS: '0.19'
+  parent: '0'
+  perl: '5.008004'
+resources:
+  bugtracker: https://github.com/kazeburo/Kossy/issues
+  homepage: https://github.com/kazeburo/Kossy
+  repository: git://github.com/kazeburo/Kossy.git
+version: '0.40'
+x_contributors:
+  - 'FUJIWARA Shunichiro <fujiwara.shunichiro@gmail.com>'
+  - 'sonots <sonots@gmail.com>'
+  - 'Nobuhiro Nikushi <deneb.ge@gmail.com>'
+  - 'Yutaka Imoto <yutaka.imoto@dena.com>'
+  - 'hisaichi5518 <hisaichi5518@gmail.com>'
+  - 'Syohei YOSHIDA <syohex@gmail.com>'
+  - 'Songmu <y.songmu@gmail.com>'
+  - 'Masahiro Nagano <kazeburo@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

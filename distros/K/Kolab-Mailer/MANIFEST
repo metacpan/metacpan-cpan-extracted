@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Kolab-Mailer.t
+lib/Kolab/Mailer.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,12 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.md
+dist.ini
+lib/Kelp/Module/Template/Toolkit.pm
+t/config.pl
+t/main.t
+t/release-pod-syntax.t

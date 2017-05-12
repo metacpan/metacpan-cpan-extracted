@@ -1,0 +1,10 @@
+
+Kwiki::FetchRSS provides a system for retrieving RSS from
+from the web with WAFL phrases. 
+
+You can see Kwiki::FetchRSS in action at http://www.burningchrome.com/wiki
+
+Please read the POD for more information.
+
+Contact Chris Dent <cdent@burningchrome.com> with questions,
+comments, suggestions, howdies.

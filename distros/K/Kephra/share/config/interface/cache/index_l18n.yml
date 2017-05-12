@@ -1,0 +1,49 @@
+---
+cesky.conf:
+  age: 1307527878
+  author: 'Herbert Breunung'
+  coding: UTF-8
+  iso_code: cs
+  language: cesky
+  purpose: 'global localisation'
+  version: 0.4.3.4
+deutsch.conf:
+  age: 1307527878
+  author: 'Herbert Breunung'
+  coding: UTF-8
+  iso_code: de
+  language: deutsch
+  purpose: 'global localisation'
+  version: 0.4.3.14
+english.conf:
+  age: 1307527878
+  author: 'Herbert Breunung'
+  coding: ASCII
+  iso_code: en
+  language: english
+  purpose: 'global localisation'
+  version: 0.4.3.14
+espanol.conf:
+  age: 1307527878
+  author: 'Enrique Nell'
+  coding: UTF-8
+  iso_code: es
+  language: espanol
+  purpose: 'global localisation'
+  version: 0.4.3.14
+norsk.conf:
+  age: 1307527878
+  author: ' '
+  coding: UTF-8
+  iso_code: nb
+  language: norsk
+  purpose: 'global localisation'
+  version: 0.4.3.4
+romana.conf:
+  age: 1307527878
+  author: 'Stefan Suciu'
+  coding: UTF-8
+  iso_code: ro
+  language: romana
+  purpose: 'global localisation'
+  version: 0.4.3.13

@@ -1,0 +1,47 @@
+NAME
+    Kwiki::Icons::Gnome - Kwiki Gnome Icons plugin
+
+SYNOPSIS
+     $ cpan Kwiki::Icons::Gnome
+     $ cd /path/to/kwiki
+     $ vim plugins
+     $ kwiki -update
+
+DESCRIPTION
+    This is a Kwiki icons package that includes icons from Gnome.
+    Specifically, they were copied from the gnome-icon-theme Debian package.
+
+  Icons
+    The following icons are provided:
+
+    * edit
+    * favorites
+    * guest_book
+    * home
+    * new_page
+    * plugin_index
+    * recent_changes
+    * revisions (now the same as revisions_previous)
+    * revisions_current
+    * revisions_next
+    * revisions_previous
+    * user_preferences
+    * weather
+
+AUTHOR
+    The icons have been packaged by Ian Langworth <langworth.com>.
+
+    Credits to Brian Ingerson and Jooon for further tweaks.
+
+SEE ALSO
+    Kwiki, Kwiki::Icon, <http://tigert.gimp.org/>
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2004. Ian Langworth. All rights reserved.
+
+    Since the Gnome(tm) icons are distributed under the terms of the Gnu
+    General Public License (GPL), this module is also distributed under the
+    terms of the GPL.
+
+    See http://www.gnu.org/copyleft/gpl.html
+

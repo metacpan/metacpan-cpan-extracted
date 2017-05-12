@@ -1,0 +1,12 @@
+name: Kwiki-Outline2Html
+version: 0.02
+abstract: Kwiki Formatter using outline2html syntax
+author: Kang-min Liu (gugod@gugod.org)
+license: perl
+distribution_type: module
+requires:
+  Kwiki: 0.31
+no_index:
+  directory:
+    - inc
+generated_by: Module::Install version 0.36

@@ -1,0 +1,17 @@
+Revision history for KSx-IndexManager
+
+0.004   2007-12-07
+
+        add_docs now returns the number of objects (not documents) processed
+
+0.003   2007-12-04
+
+        allow to_doc to return multiple documents
+
+0.002   2007-07-02
+
+        Add eg/ to MANIFEST
+
+0.001   2007-07-01
+
+        First release.

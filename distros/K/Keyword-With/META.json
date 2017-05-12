@@ -1,0 +1,50 @@
+{
+   "abstract" : "provide new syntax to use a 'given' statement without an experimental warning",
+   "author" : [
+      "Hunter McMillen <mcmillhj@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Keyword-With",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Keyword::Declare" : "0",
+            "perl" : "5.014",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/mcmillhj/Keyword-With/issues"
+      },
+      "homepage" : "https://metacpan.org/release/Keyword-With",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/mcmillhj/Keyword-With.git",
+         "web" : "http://github.com/mcmillhj/Keyword-With"
+      }
+   },
+   "version" : "0.003"
+}
+

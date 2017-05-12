@@ -1,0 +1,15 @@
+# $Id: tail.d2m,v 1.1 2008-04-25 16:53:45 mike Exp $
+#
+# See "head.d2m"
+
+*credentials=service_id,identity_id
+3,1	# Mike Taylor's access to Science Magazine's service
+5,3	# Someone in Azle has access to EBSCO, if we can figure out how
+
+*credentials_details=credentials_id,name,value
+1,name,user
+1,pass,waft-alone
+2,name,user
+2,pass,Seymour-write
+2,referrer,http://www.texshare.edu/azle/
+

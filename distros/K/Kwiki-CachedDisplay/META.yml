@@ -1,0 +1,15 @@
+abstract: Speed-up Kwiki page display by caching
+author: Kang-min Liu <gugod@gugod.org>
+build_requires: 
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: Kwiki-CachedDisplay
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Kwiki: 0.37
+version: 0.07

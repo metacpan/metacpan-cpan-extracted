@@ -1,0 +1,19 @@
+examples/example1.pl
+INSTALL
+Keystone.xs
+lib/Keystone.pm
+lib/Keystone_const.pm
+LICENSE
+Makefile.PL
+MANIFEST
+ppport.h
+README
+README.md
+scripts/build_releases.sh
+scripts/gen_cpan_zip.sh
+scripts/gen_readmes.sh
+t/Keystone.t
+t/x86_Keystone.t
+typemap
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

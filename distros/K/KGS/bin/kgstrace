@@ -1,0 +1,115 @@
+#!/usr/bin/perl
+
+use IO::Socket::INET;
+
+use KGS::Protocol;
+use KGS::Messages;
+
+use KGS::Listener::Debug;
+
+use Fcntl;
+use FileHandle;
+
+my $l = new IO::Socket::INET LocalPort => 2379, Listen => 1, ReuseAddr => 1;
+
+my $prot = new KGS::Protocol;
+my $sgen = new KGS::Protocol::Generator;
+
+(my $listener = mylistener->new)->listen ($prot, "any");
+
+print "connect with cgoban2 to localhost:2379 to see a protocol dump.\n";
+print "ready.\n";
+
+sysopen TRACE, "cgoban2.trace", O_CREAT|O_APPEND|O_WRONLY
+   or die "cgoban2.trace: $!";
+TRACE->autoflush(1);
+
+while (my $l = $l->accept) {
+   if (fork == 0) {
+      printf TRACE "$$ + %d\n", int time;
+
+      my $r = new IO::Socket::INET PeerHost => KGS::Protocol::KGSHOST, PeerPort => KGS::Protocol::KGSPORT;
+      $prot->handshake ($r);
+      {
+         sysread $l, my $buf, 1;
+         $buf = chr 3;
+         syswrite $l, $buf, 1;
+      }
+
+      my $rlen = 0;
+      my $sbuf = "";
+
+      my $Rb = "";
+      print "connection established\n";
+      (vec $Rb, fileno $l, 1) = 1;
+      (vec $Rb, fileno $r, 1) = 1;
+      while (select my $rb = $Rb, undef, undef, undef) {
+         if (vec $rb, fileno $l, 1) {
+            last unless sysread $l, my $buf, 8192;
+            syswrite $r, $buf, 8192;
+
+            printf TRACE "$$ C %d %4d %s\n", int time, length $buf, unpack "H*", $buf;
+
+            $sbuf .= $buf;
+
+            for (;;) {
+               if (!$rlen and 2 <= length $sbuf) {
+                  $rlen = ($sgen->{client_state} >> 24) ^ unpack "v", $sbuf;
+               }
+
+               if ($rlen and $rlen <= length $sbuf) {
+                  my $pkt = substr $sbuf, 0, $rlen, "";
+                  $sgen->dec_client ($pkt);
+
+                  my $type = unpack "xx v", $pkt;
+                  my $msg = eval { $KGS::Messages::dec_client{$type} };
+                  warn "ERROR: $@" if $@;
+                  if ($msg) {
+                     $msg = $msg->(substr $pkt, 4);
+
+                     $prot->{generator}->set_server_seed ($msg->{name}) if $msg->{type} eq "login";
+
+                     delete $msg->{data} if $msg->{type} eq "userpic";
+
+                     print KGS::Listener::Debug::dumpmsg "\nCLIENT", $msg;
+                  } else {
+                     print "\007\n\nUNKNOWN PACKET TYPE RECEIVED FROM CLIENT:\n";
+                     print KGS::Listener::Debug::dumpmsg "CLIENT: UNKNOWN PACKET", $msg;
+                  }
+
+                  $rlen = 0;
+               } else {
+                  last;
+               }
+            }
+         }
+         if (vec $rb, fileno $r, 1) {
+            last unless sysread $r, my $buf, 8192;
+            syswrite $l, $buf, 8192;
+
+            printf TRACE "$$ S %d %4d %s\n", int time, length $buf, unpack "H*", $buf;
+
+            eval {
+               $prot->feed_data ($buf);
+            };
+            warn "ERROR: $@" if $@;
+         }
+      }
+      print "closing connection.\n";
+      exit;
+   }
+}
+
+package mylistener;
+
+use base KGS::Listener;
+
+sub inject {
+   my ($self, $msg) = @_;
+
+   delete $msg->{data} if $msg->{type} eq "userpic";
+
+   print KGS::Listener::Debug::dumpmsg "\nSERVER", $msg;
+}
+
+

@@ -1,0 +1,51 @@
+Revision history for Perl extension KGS.
+
+0.99 Tue Aug 10 03:58:58 CEST 2004
+	- fix wrong resign output.
+        - many gui improvements, clickable users, more to come.
+        - better user info window, courtesy of elmex.
+        - channel #0 is a valid channel.
+
+0.95 Fri Jun  4 04:43:30 CEST 2004
+	- the converted html documentation lacked most of
+          the descriptions. Doh!
+        - the polyphase resampling destroyed some sounds.
+        - much better behaviour on connection close.
+        - suicide now supported by Board.pm.
+        - major speedup for Board.pm by caching wether captures
+          are required for a given move.
+        - simple ko detection and display.
+        - much better portability to old Gtk2 versions and gtk+-2.2.
+        - better default layout.
+
+0.9  Mon May 31 05:06:39 CEST 2004
+	- played a few test games, fixed the "Done" problem
+          and corrected a few minor glitches. Is playable,
+          at least for my type of games.
+        - added a less obtrusive "info" sound for things like
+          game end etc.
+
+0.4  Mon May 31 03:08:17 CEST 2004
+	- the adventerous user might try to play games with
+          the sample client now.
+        - Gtk2::GoBoard now uses zerobased coordinates.
+	- added and corrected many challenge- and play-related
+          protocol messages.
+        - renamed user1/user2/user3 to black/white/owner.
+
+0.3  Tue May 25 22:24:45 CEST 2004
+	- 2.6.0 protocol changes triggered this release. a few
+          details are probably not worked out yet.
+	- more packet types and info.
+        - more resistance against the mysterios node type 26.
+        - kgstrace no longer displays userpic data.
+        - major code cleanup in sample client (still horrible :).
+
+0.2  Mon May 17 03:35:10 CEST 2004
+	- added a Changes file.
+	- lots of bugfixes.
+        - lots of protocol updates.
+        - more correct tree d-/encoding.
+        - bin/gtp-controller, lets you join games etc. using gtp.
+
+

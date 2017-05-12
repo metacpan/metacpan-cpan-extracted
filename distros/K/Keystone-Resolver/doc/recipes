@@ -1,0 +1,96 @@
+$Id: recipes,v 1.5 2007-07-12 10:38:09 mike Exp $
+
+
+1. Introduction
+---------------
+
+Once Keystone Resolver has chosen a particular service to resolve an
+OpenURL, the information about that service in the knowledge base is
+consulted.  Two fields in the service record are important here:
+"recipe" and "tag".
+
+The way the most important service-type (fulltext) works is that if a
+service has a recipe then it's used as a template to build the URL to
+the item (see section 2 below); and otherwise the service's tag is
+used as the name of a Service-level plugin to load and use (see
+section 3 below).
+
+
+2. Recipes
+----------
+
+URL recipes typically look something like this example, from the PNAS
+service:
+	http://www.pnas.org/cgi/content/full/%v/%i/%p
+Most of a recipe is literal text, but as in a printf() format string a
+% sign introduces a special, which is substituted with the value of a
+particular field in the data.
+
+Recipes are interpreted by the _makeURI() method in
+lib/Keystone/Resolver/OpenURL.pm and the source code of course is the
+definitive statement of support, but briefly:
+
+%% yields a literal percent character.  Specials may be indicated
+either by single characters, as in %i, or by curly-bracket-enclosed
+words, as in %{issue}.  The supported single-letter specials are:
+
+	%v = %{volume} = volume number
+	%i = %{issue} = issue number
+	%p = %{spage} = article's start-page
+	%t = %{atitle} = article's title
+	%I = %{issn} = journal's ISSN
+	%a = %{aulast} = lead author's last name
+	%A = %{auinit} = lead author's first and middle initials
+	%j = %{isbn} = book's ISBN
+
+%{THIS} is special, and yields the OpenURL currently being resolved.
+(Actually, its an equivalent, but not in general identical, URL.  In
+particular, it is always a v1.0 OpenURL, even if what was originally
+submitted was v0.1.)
+
+%{anythingElse} is substituted by the same-named data from the
+OpenURL's referent, for example %{jtitle} for the journal title -- see
+the OpenURL standard Z39.88-2004 for a full list.  Such field-names
+may be simple, as in "volume" and "issue", or fully specified, with a
+descriptor name and underscore or full stop as a prefix, as in
+"req_id" and "rft.title".
+
+The special letter or curly-bracketed-word may optionally be preceded
+by one or more of the following, in the specified order:
+
+	* -- strip hyphens from the data (e.g. for ISSNs)
+	_ -- strip spaces from the data
+	0 -- use zero-padding, if required, rather than space-padding
+	(number) -- pad the data to the specified width
+
+So for example the recipe for fetching full text from the
+Paleontological Journals Online service is:
+	http://www.psjournals.org/paleoonline/?request=get-abstract&issn=%I&volume=%03v&issue=%02i&page=%04p
+in which the volume, issue and start-page are zero-padded to three,
+two and four digits respectively.
+
+When a curly-brackets fieldname is used (rather than a single-letter
+shortcut), multiple candidate fieldnames may be provided, separated by
+forward slashes: the first one that is defined is used.  For example,
+%{jtitle/btitle/title} will use jtitle if that is defined, otherwise
+%btitle if that is defined, otherwise plain title.
+
+
+3. Plugins
+----------
+
+A plugin must be provided for each service that cannot be implemented
+by a recipe as describe above.  These are placed in
+	resolver/lib/Keystone/Resolver/plugins/Service
+and can be thought of as, in some senses, part of the resolver's
+knowledge base.
+
+As an example, see the plugin for Acta Palaeontologica Polonica at:
+	resolver/lib/Keystone/Resolver/plugins/Service/APP.pm
+
+As you can see, the service plugin API is very simple: the plugin
+provides a single method, uri(), which is passed a
+Keystone::Resolver::OpenURL object and must return a URL for the
+referenced entity in that service.  If it can't make a URL, then it
+returns an undefined value, together with an error-message.
+

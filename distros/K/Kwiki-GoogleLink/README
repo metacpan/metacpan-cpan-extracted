@@ -1,0 +1,38 @@
+NAME
+    Kwiki::GoogleLink - GoogleLink preformatted text
+
+SYNOPSIS
+     $ cpan Kwiki::GoogleLink
+     $ cd /path/to/kwiki
+     $ echo "Kwiki::GoogleLink" >> plugins
+     $ kwiki -update
+
+DESCRIPTION
+   This was written as a demonstration of a plugin to add a
+   new WAFL phrase to the Kwiki formatting rules.
+
+   This plugin makes it quick and easy to add a Google search
+   link to a Kwiki page, for example:
+
+       Search Google for: {google:Kwiki}
+
+   will be rendered as
+
+       Search Google for: 
+       <a href="http://www.google.com/search?q=Kwiki">Kwiki</a>
+
+   This example can be used as the basis for custom shortcuts
+   at your own site.
+
+AUTHORS
+    Michael Gray <mjg17@eng.cam.ac.uk>
+
+SEE ALSO
+    Kwiki
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2004 by Michael Gray
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

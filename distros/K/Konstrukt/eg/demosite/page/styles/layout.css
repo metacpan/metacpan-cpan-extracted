@@ -1,0 +1,233 @@
+/* Layout */
+
+body {
+	width: 860px;
+	margin: 0 auto 0 auto;	
+	background: #eef0f2 url(/img/layout/bg.png) center repeat-y;
+	font-family: verdana, tahoma, arial, helvetica, sans-serif;
+}
+
+#konstrukt-logo {
+	display: block;
+	border: 0;
+	margin-top: 10px;
+	margin-bottom: 20px;
+	width: 860px;
+	height: 39px;
+	background: url(/img/layout/logo.png) no-repeat top right;
+	vertical-align: middle;
+}
+
+#nav {
+	padding: 0;
+}
+#nav li {
+	font-size: 1.4em;
+	float: left;
+	list-style-type: none;
+	padding: 0 20px 0 15px;
+	background: url(/img/layout/nav_arrow.gif) center left no-repeat;
+}
+/* clear nav floats */
+#nav:after {
+	clear: both;
+	content: ".";
+	display: block;
+	height: 0;
+	visibility: hidden;
+}
+/* Hides from IE-mac \*/
+* html #nav {height: 1%;} /* hack for iE */
+/* End hide from IE-mac */
+
+
+h1.page-title {
+	color: #3b8bc8;
+	border-bottom: 1px solid #3b8bc8;
+}
+
+p {
+	margin: 0 0 1em 0;
+}
+
+p.clear, br.clear {
+   height: 0;
+   clear: both;
+   visibility: hidden;
+}
+
+hr {
+	border: none;
+	background-color: #3b8bc8;
+	height: 1px;
+	text-align: center; /* alignment for iE */
+}
+
+img {
+	border: none;
+}
+
+/* Lists */
+
+ul {
+	list-style-type: square;
+	padding-left: 23px;
+}
+
+
+/* Links */
+
+a:link {
+	color: #3b8bc8;
+	text-decoration: underline;
+}
+
+a:visited {
+	color: #2f6e9d;
+	text-decoration: underline;
+}
+
+a:active {
+	color: #439ee3;
+	text-decoration: none;
+}
+
+a:hover {
+	color: #2f6e9d;
+	text-decoration: underline;
+}
+
+
+/* Form boxes, messages */
+
+div.form, div.message, div.error {
+	background-color: #eef0f2;
+	padding: 15px;
+	border: 1px solid #3b8bc8;
+	margin: 20px 0 20px 0;
+}
+div.message.failure, div.error {
+	background-color: #c8a7a1;
+}
+div.success {
+	background-color: #a0c8a2;
+}
+
+
+/* Table */
+
+table {
+	width: 100%;
+	margin-top: 10px;
+	border-collapse: collapse;
+}
+
+table, table th, table td {
+	border: 1px solid #3b8bc8;
+	padding: 5px;
+}
+
+table th {
+	background-color: #d0ebff;
+}
+
+
+/* Font size */
+
+body, textarea {
+	font-size: 62.5%;
+}
+
+h1 {
+	font-size: 1.8em;
+}
+h2 {
+	font-size: 1.6em;
+}
+h3 {
+	font-size: 1.4em;
+}
+h1, h2, h3 {
+	margin: 0.5em 0 0.3em 0;	
+}
+
+p, label, textarea, td, th, dt, dd, blockquote, pre {
+	font-size: 1.2em;
+}
+
+ul li {
+	font-size: 1.2em;
+}
+ul li ul li {
+	font-size: 1.0em;
+}
+
+
+/* Forms */
+
+form {
+	margin: 15px auto 0 auto;
+	padding: 0;
+}
+
+form div, form p {
+	float: left;
+}
+form p {
+	margin-top: 4px;
+}
+form div p {
+	float: none;
+}
+
+form span.inline {
+	float: left;
+	margin: 3px 3px 0 3px;
+}
+
+form br {
+	clear: both;
+}
+
+fieldset {
+	border: 2px solid #3b8bc8;
+	margin: 15px auto 15px auto;
+	padding: 10px;
+}
+
+legend {
+	border: 2px solid #3b8bc8;
+	padding: 3px 7px 3px 7px;
+	margin: 0 0 5px 0;
+	font-weight: bold;
+}
+
+input, select, textarea {
+	margin-bottom: 4px;
+	vertical-align: middle;
+	float: left;
+}
+
+textarea {
+	height: 150px;
+}
+
+label {
+	display: block;
+	width: 150px;
+/*	height: 20px; */
+	margin: 4px;
+	float: left;
+	text-align: left;
+}
+
+label.checkbox {
+	width: 500px;
+}
+
+/* override the size for checkboxes and options */
+body form input.checkbox, body form input.radio {
+	width: 15px;
+	height: 15px;
+	margin: 5px 0 5px 0;
+}

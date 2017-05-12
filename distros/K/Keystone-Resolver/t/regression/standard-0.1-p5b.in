@@ -1,0 +1,7 @@
+# $Id: standard-0.1-p5b.in,v 1.1 2007-01-26 12:25:45 mike Exp $
+
+# This example is taken from the OpenURL 0.1 standard.
+# It occurs in the middle of page 5.
+
+issn=1234-5678&date=1998&volume=12&issue=2&spage=134
+

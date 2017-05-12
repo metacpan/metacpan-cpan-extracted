@@ -1,0 +1,101 @@
+=head1 NAME
+
+Konstrukt::Example::Demosite - Explanation for the supplied demonstration page
+
+=head1 DESCRIPTION
+
+This is a small demosite, which gives an insight into the functionality of the
+Konstrukt Framework and some of the existing plugins.
+
+
+=head1 INSTALLATION
+
+=over
+
+=item 1. Copy the directories cache, log and page into a directory of your choice.
+Apache will need read and write access to this directories.
+	
+=item 2. Create a new vhost for your Apache2 like this:
+(differs slightly for Apache1 -
+See the doc/html/Konstrukt/Doc/Installation.html#CONFIGURATION):
+
+	<VirtualHost *>
+		ServerName   your.domain
+		
+		ErrorLog     /path/to/the/demosite/logs/error.log
+		TransferLog  /path/to/the/demosite/logs/access.log
+		
+		# docs
+		DocumentRoot /path/to/the/demosite/page
+		<Directory "/path/to/the/demosite/page">
+			Order allow,deny
+			Allow from all
+			
+			# do not allow access to *.template, *.form and konstrukt.setting files
+			<FilesMatch "(\.template|\.form|konstrukt\.settings)$">
+				Deny from All
+			</FilesMatch>
+			
+			# serve html files with the Konstrukt Framework
+			<FilesMatch "\.html$">
+				SetHandler modperl
+				PerlResponseHandler Konstrukt::Handler::Apache
+			</FilesMatch>
+		</Directory>
+	</VirtualHost>
+
+=item 3. Create a MySQL database according to the settings in the
+page/konstrukt.settings (look at the dbi settings).
+That's a database called "test" for the user "test" with the password "tset":
+
+	CREATE DATABASE test;
+	GRANT ALL ON test.* TO test@'%' IDENTIFIED by 'tset';
+
+=item 4. Restart your apache and you're done!
+
+=back
+
+=head1 AUTOINSTALLATION
+
+As the setting C<autoinstall> is enabled in the supplied konstrukt.settings,
+the plugins will create the templates, stylesheets and database tables automatically.
+So as you use the page, your database and the /templates directory will get filled.
+Note that your web server needs write-access for your document root. At least as
+long as the C<autoinstall> option is enabled.
+
+Of course, this will affect the performance negatively. So after every plugin/
+page has been used once, you can turn it off (set it to 0 or remove the setting).
+
+=head1 USAGE
+
+To create content (blog entries, calendar entries, bookmarks, wiki pages, ...)
+you need to register yourself on the page. That will be done on the
+"usermanagement" page.
+
+You will get an email with the password for your account. By default, the
+framework will use the `sendmail` command on your server. You can also configure
+it to use a local SMTP server (See doc/html/Konstrukt/Lib.html#CONFIGURATION):
+
+	mail/transport smtp
+
+=head1 TROUBLESHOOTING
+
+Any errors will be put into your Apache error.log, as the setting
+C<debug/warn_error_messages> is enabled by default.
+So this is the first place to look.
+
+In Apache2 the messages will go to the global server log and not to the log
+specified in the vhost.
+
+=head1 AUTHOR 
+
+Copyright 2006 Thomas Wittek (mail at gedankenkonstrukt dot de). All rights reserved. 
+
+This document is free software.
+It is distributed under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<Konstrukt::Doc>
+
+=cut

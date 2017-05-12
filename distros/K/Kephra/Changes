@@ -1,0 +1,1763 @@
+todo:
+   l18n version update
+   l18n compare tool
+   Config::Tree join & split keys
+ ! update configs when update cpan installation 
+ ! EOL problem in UTF files
+
+0.4.3.33
+ ' typos as reported by fabreg@fabreg.it
+
+0.4.3.32
+ ] optimise CPAN appearance
+ 
+0.4.3.31
+ ] installer, no .svn files
+ 
+0.4.3.30
+ ] fixed module type :)
+
+0.4.3.29
+ ] grmpfl, repair Meta.yml
+
+0.4.3.28
+ ] with META.yml again
+ 
+0.4.3.27
+ ] included Module::Install again
+
+0.4.3.26
+ ? deleted xt which only can fail
+
+0.4.3.25
+ ^ just released as stable on CPAN
+
+0.4.3.24
+ ~ see all file in file dialogs even under linux and mac
+ [ fixing layout of search dialog
+
+0.4.3.23
+ ~ suspend interface caching due coding problems in cache files
+ " ignore backup localisation files while creating l18n menus
+
+0.4.3.22
+ + added spanish localisation (thanks to enriquee nell)
+ [ less clutter in menu labels
+ / moved dev to linux
+
+0.4.3.21
+ + select content - just quotings
+ [ add toggle script comment to selected text context menu
+ ! repaired some POD's
+
+0.4.3.20
+ ~ move selection moves now wordwise when part of line selected
+ ' 2 doc typo in Kephra.pm
+
+0.4.3.19
+ ~ move selection moves now only complete lines when selected none or several
+ ! old l18n key in romana.conf
+
+0.4.3.18
+ + insert rectangular selections
+ + move line tabwise left and right with <ctrl>+<alt>+<left|right>
+ ~ brace nav is caret pos aware (jumps from inside to inside or outside to outside)
+ ~ toggle # comment with <ctrl>+<alt>+<k>
+ ] automatically hides incomplete translations in enduser releases
+ ! closed unnamed docs appeared in file history
+ ! proper titelbar and tabbar visual updates while rename file
+ ! folding and marker setting with left click on margin works again
+
+ 0.4.3.17
+  + selecting right to left and right click deletes (clear) selection (left to right just cuts)
+  ] hardening the feature of previous version
+  ] config reload when changing current l18n works again
+  " improved english l18n (mostly by enrico)++
+
+0.4.3.16
+ ! lang selection menu works again
+
+0.4.3.15
+ ! wrong literals in default commandlist
+
+0.4.3.14
+ ~ correcting toggle select
+ ~ changing command ID select-toggle > select-toggle-simple
+ ~ changing command ID select-content > select-toggle-content, 
+
+0.4.3.13
+ ] introduce command node type sub
+ ] remove old unused command ID
+ ] splashscreen closes on right time
+ ! forgot last_edit pos after restart
+ ! correcting prev_related_brace when jump to previous closinf brace of same depths
+ ! crash while editing after closing doc
+
+0.4.3.12
+ ~ jump from doc end to doc end (auto wrap) when navigating in related braces
+ [ move edit_line submenu 2 up
+ ' update and fix keymap
+ ! left click on selection does copy in output panel too
+ ! missing komma and bad arrows in default command list
+ ! while brace navigation caret cant hidden in folded lines
+
+0.4.3.11
+ + note selection works also in output panel
+ + copy selection in output panel with <enter>
+ + left click on selection does copy in output panel too
+ ~ leaving notepad with F12
+ ~ moving zoom keybinding to strl+shift to allow type ~ again
+ ~ # is written sharp in keymap to prevent quoting a la /#
+ ] init commandline module
+ ' keymap shows marker keybinding back to f2
+ ! note selection really appends
+ ! fixed statusbar context menu
+ ! fixed eol switch
+ ! template menu updates again after saving active template file
+
+0.4.3.10
+ + toggle select with ctrl+y
+ + zoom in, out and back with <ctrl>+<alt>+<+>,<ctrl>+<alt>+<-> and <ctrl>+<alt>+<0>
+ ~ marker keybinding back to f2
+ [ adding zoom and select menu 
+ ! fixed goto_prev_marker_in_doc
+
+0.4.3.9
+ ~ reorder tool menu
+ ~ moved keybinding of marker to f4 and notepad to f12
+ ' updated keymap
+ ' typos in en l18n
+ ! insert on cursor
+ ! copy quoted string works again
+
+0.4.3.8
+ + new menu item tool-brace-completion
+ + new tool: insert time/date
+ ~ doc attr config_file now saved by session files
+ ~ esc in searchbar closes bar, use ctrl+f to just leave
+ ' improved docs: this version, all functions, TestReleases, README
+ [ moved document-auto-indention and document-brace-indention into tools menu
+ ] outsource all visual stuff inside the editpanel to Kephra::App::EditPanel::Indicator
+ ! only recent l18n file open with *
+ ! Kephra::Config::path_matches works as always intended, matches subpathes not just eq
+
+0.4.3.7
+ ~ refined editpanel mouse control
+ [ start Kephra::Macro.pm
+ ! open toolbar file works again
+ ! templates works again
+ 
+0.4.3.6
+ + left click on selection does copy
+ + middle click inserts selection
+ ~ middle click on searchbar finds next / goto last edit
+ ! acme unselect selected half document
+
+0.4.3.5
+ + acme like mouse control: cut (left+middle) and paste (left+right)
+ + acme like mouse control: search (middle) or goto last edit (if no text selected)
+ ~ color picker understands now comma seperated decimal values too
+ " switch position of last 2 tool menu item
+ " new command ID: tool insert date time
+ ' improved docs: navigation and this version
+
+0.4.3.4
+ + bug and request tracker links in help menu
+ ~ search in all current block for last_perl_var
+ ? implemented 7 tests for t/04_config_data_tree.t
+ ? uncommented 17 tests for t/02_config.t
+ ' pod fixed by kristian++
+
+0.4.3.3
+ + insert_last_perl_var
+ ~ replace to nothing again
+ ? added t/04_config_data_tree.t
+ " advanced czech localisation
+ " added keyword default to perl lexer def 
+ ' updated keymap
+ ' updated navigation
+ [ added tool-perl-copy-string and tool-perl-insert-last-var to tool menu
+ ! doc lang selection
+
+0.4.3.2
+ ^ rerelease as CPAN stable version
+
+0.4.3.1
+ ] xp mode for boot sequence
+ " tool-output-selection-hex now on key alt+shift+f5
+
+0.4.3
+ ' update credits
+
+0.4.2.39
+ + copy surrounding quoted string with <strg>+<alt>+<C>
+ " getting default settings of new files when opening empty files
+ [ moving insert templates into tools menu
+ ! file history menu works again
+ ! crash when open empty files
+
+
+0.4.2.38
+ + marker function do also from context menu pos
+
+0.4.2.37
+ + folding per context menu on mouse position (idea my murphy++)
+ " item view-editpanel-fold-toggle-level in markermargin_contextmenu was missing
+ " searchbar autofocus no longer default
+ ! cripple statusbarbar coding field to make it save for now
+
+0.4.2.36
+ ! update of module::install to 1.0
+
+0.4.2.35
+ ! bug in makefile
+
+0.4.2.34
+ ! utf labels now work on windows too (linux did it automaticlly right)
+
+0.4.2.33
+ ! release tool now does tgz with the right rights
+
+0.4.2.32
+ ! fold all nodes works now even if caret is in area without folding
+ ! fixed function and cursor visibility of toggle recursive code folding
+ ! remerged forgotten win default settings
+
+0.4.2.31
+ + refresh autosaved configs after cpan update
+ ~ changed folding keybinding 
+   ~ fold here: ctrl+plus, level: alt+plus, recursively: alt+shift+plus
+
+0.4.2.30
+ ~ xml formater keybinding is now Ctrl[+Shift]+I
+ ! unified logic behind both transparency settings - 0 = no transparency
+
+0.4.2.29
+ + safety belt for window modes on esc key
+ [ +key code for hide tab bar at ctrl+alt+t
+ ! new docs show correct codepage
+
+0.4.2.28
+ + fullscreen mode
+ + max editpanel mode (disables all bars)
+ + transparent mode
+ + you can combine stay on top and transparent mode with Ctrl+Alt+F11
+ [ new menu: view > main window; 
+ [ move cmd view-window-stay-on-top there
+ [ created commands view-window-fullscreen, view-window-transparent, view-editpanel-maximize
+ " changed default font of output panel to arial , 10 px
+
+0.4.2.27
+ ] finer event freeze and thaw
+ ! delete unnecessary ecaping of vars in title content definition
+ ! save copy as ... works again
+ ! fixed eventhandling in Kephra::Document::Data::evaluate_attributes
+ ! fixed test suite
+
+0.4.2.26
+ + writes files also in missing dirs
+ ! new Kephra::Dialog API fix
+ ! redo comment function calls in commands.conf to older less flexible but working way
+ 
+0.4.2.25
+ + romanian localisation
+ " bad config: invisible main menu
+ ! old API uses
+
+0.4.2.24
+ + add support for latin 1 coding (codepage property)
+ ! reload and and insert file works again
+
+0.4.2.23
+ + autorecognition via encode::guess
+ + read and write utf
+
+0.4.2.22
+ + save and restore textfold state in sessions and file history
+ ~ change sibling to level fold
+ 
+0.4.2.21
+ + file history is now a session, restore file with all saved property
+ + switch menubar visibility
+ ] localize some of last temp var
+ ] simplify Dialog API
+
+0.4.2.20
+ [ new icons for search abr ops, marker, script run, color picker
+ ] starting dater due freezing text change event
+ ] event group doc_change_went smaller: docchanges now faster due less events fired
+ ! right linenumber margin size when starting with autosaved.conf as current doc
+
+0.4.2.19
+ [ update menu view > contextmenus and make 2 new calls vor it (markermargin searchbar)
+ ~ statusbar contextmenus have own switch, interactive means switch leftclick
+ ~ changed markermargin contextmenu acording the order of margins
+ " search date has own config file
+ " new dir for config data files: search.yml and notepad_content.txt
+
+0.4.2.18
+ ~ expanded markermargin contextmenu
+ " repaired some issues in l18n and default global configs (due tools/confer.pl)
+ ! folding works again
+ ! global marker prev|next now can jump back to current doc if there more marker
+
+0.4.2.17
+ + goto next and previous marker in all docs
+ ~ global marker goto is now in search bar
+ ~ not appending empty selection on notepad text
+ ! fix marker save in session
+
+0.4.2.16
+ + set bookmarks directly by mouse middleclick
+ + save marked lines in the session file
+ [ switched move left and right in document > change menu
+ [ changed marker key binding to standard compliance
+ ] refined add/restore in Kephra::File::Session
+ 
+0.4.2.15
+ " move search data file into global/sub dir
+ [ contextmenu on markermargin
+ [ + marker menu
+
+0.4.2.14
+ + output selection in dec and hex
+ [ output menu
+ [ file close submenu has icon
+ ! file history works again
+
+0.4.2.13
+ + set search dialo transparency unter dialog > search > transparency
+ + notepad has line move
+ ! fixed cursor pos on line move
+
+0.4.2.12
+ + new tool: output the %ENV 
+ [ marker nav in searchbar
+
+0.4.2.11
+ * marker functions
+ + set marker by mouse
+ [ bookmarks have now individual icons (jenne++)
+ ] missing helpstring for menu entry causes no more warning
+
+0.4.2.10
+ ~ autoconverts of EOL are now visible
+ " minor bit in german tab status field help
+ [ config access only through API
+ [ cleaned Kephra.pm
+ ! bookmarks work again
+ ! fixed property handling for the different file defaults
+
+0.4.2.9
+ " different default setting for new und open files
+ " new icons from jenne++
+
+0.4.2.8
+ + color picker
+ + statusbar has context help while mouse hover
+ ] reformat to one API module
+ ! tab info char in wrong tab
+ ! encodings menu visible, also in the statusbar
+
+0.4.2.7
+ ~ current dir is now always synched with current file
+ ! wrong titlebar content after some close doc events
+
+0.4.2.6
+ ] rest of renaming plugin -> panel for notepad and output
+ ] rename bookmark.pm -> marker
+ ! splashscreen works again
+
+0.4.2.5
+ + can assign icons to menus
+ [ rearranged file menu
+ ! crash while folding
+
+0.4.2.4
+ [ added encoding menu
+ [ splitter are now without live update, has lot less flicker
+ ' updated german help-forum link
+
+0.4.2.3
+ ~ linenr margin width autosize works now per doc
+ ] separated fold functions in own module
+ ! change font works again on all edit tabs
+
+0.4.2.2
+ ! most visual settings work global again
+ ! dont loose caret while find and defold
+
+0.4.2.1
+ + loading stautsbar from config
+ + status field codepage
+ " added keys app > statusbar > file and app > statusbar > node
+ ] refactor Kephra::API::EventTable -> Kephra::EventTable
+ ] refactor Kephra::API::CommandList -> Kephra::CommandList
+ ] refactor Notepad, Output: Kephra::Plugin::* -> Kephra::App::Panel::*
+ ] refactor Menu, ToolBar: Kephra::App::* -> Kephra::*
+ ! all event react on selection correct again
+
+0.4.2 testing release: new tabbar
+ ~ event driven stuff works again
+ ~ smaller tab width in notepad
+ ! open autoconfig file works again
+ ! reload global configs works again
+ ! file changed notify works again
+
+0.4.1.19
+ [ reduce clutter while boot and shut down
+ ] changed all constants to &Wx::... syntax
+
+0.4.1.18
+ ~ session save now docs in visual order
+ ~ search findings even visible when hidden in folded line
+
+0.4.1.17
+ ! sessions save does work again
+ ! tabs and other doc settings work again
+ ! file save works again
+ ! reload file works without flaws
+
+0.4.1.16
+ ! sessions do load again
+
+0.4.1.15
+ ] 2 level tab number translation
+ ~ moved motto from info box into localisation
+ ~ visibility of tabbar can be set again
+ ! move tabs by mouse has no side effects
+ ! move tabs by keyboard works again
+
+0.4.1.14
+ ' added doc/Roadmap file
+ ~ doubleclick on panel splitter now reacts properly
+ ! Bookmarks work again
+
+0.4.1.13
+ + tabs are moveable by mouse now and still change in right order
+ " english l18n synced with defaults
+ ] extended/reformed Kephra::Document::Data a bit
+ ! new tabbar works suddenly, ahm finally
+ ! file save works again
+ ! toolbar icon respond properly
+
+0.4.1.12
+ " default l18n nsync again 
+ ! folding works again
+
+0.4.1.11
+ ~ note-selection gets key binding: shift+f4
+ " new key     : app > tabbar > movable_tabs
+ " new key     : app > tabbar > close_button
+ " new key     : app > tabbar > tablist_button
+ " removed key : app > tabbar > visible
+ ] shwitched Wx::NoteBook > Wx::AuiNoteBook
+ ] win distro updates to Wx 0.93
+ ] displays Scintilla version correct for newest Wx
+
+0.4.1.10
+ ! bug with output panel
+
+0.4.1.9
+ ] new stc ref handling
+ ] rewrite of whole Kephra::Document namespace
+ ! new docs ain't readonly
+
+0.4.1.8
+ + display @INC pathes
+ + open online doc and native lang forum URL in default browser
+ + recognizes now tab mode of opened file
+ + conf_key tab_use_new and tab_use_open (default auto)
+ ~ renamed fold margin label
+ ~ doc property bracelight is now view option
+ ~ tool-run-doc => tool-interpreter-run-doc (stop also)
+
+0.4.1.7
+ + file > defaultsettings > EOL_new can now be 'OS' => 
+   new files have lineendings according the OS you currently run
+ - no menu icons under mac
+ ~ rearrange main app layout (right panel goes from toolbar to statusbar)
+ ] define event groups
+ ] new module Kephra::Document::Property for by user changeable doc property
+ ! fixed autwrap on text search: finding next
+
+0.4.1.6
+ + rearranged context menu of tab status bar cell, can change tab width there now
+ ] patches from Andreas Kaschner++:
+ ! fixes in 02_config.t, Notepad.pm, StatusBar.pm, Default/CommandList.pm
+
+0.4.1.5
+ + convert spaces to its HTML entity
+ [ moving folding menu to fold margin in view menu
+ ] convert all ISO 8859-1 enteties except whitespace
+
+0.4.1.4
+ + fold all (alt+shift+plus)
+ + fold recursively (alt+shift+minus)
+ + these calls now on right click on fold margin
+ ~ changed key binding for fold: fold => alt+minus, fold siblings => alt+plus
+ ~ fold mouse binding: left => here, midd => recursive, right => siblings, l+f => all
+ ~ editpanel autofocus is now off per default
+ [ unfolding when goto a hidden line
+ ] convert more entities
+ " some locale strings were translated to wrong language
+
+0.4.1.3
+ + 2 new converter HTML entities to char and back
+ + second fold marker style set editpanel > margin > fold > style to arrows or boxes
+ + can set text margin to width of 3 px
+ + note selection
+ ~ config key app > panel > notepad > content renamed to content_file
+ [ folding functions now in menu visible
+ ! when text margin set 0 menu shows it now
+
+0.4.1.2
+ + optional flagline shows where text is folded
+ + option for keeping caret visible while folding
+ ! fold siblings works now also in the first line
+
+0.4.1.1
+ + key binding for fold ops: fold => alt+plus, fold siblings => alt+shift+plus
+ ! fixed commandlist cache logic, refreshes now if needed
+
+0.4.1 testing release: folding
+
+0.4.0.12
+ [ unfolds all if hides folding margin
+ [ less intrusive default color for folding markers
+ [ less intrusive default color for line number
+
+0.4.0.11
+ * code folding support
+ + fold sibling nodes
+ [ editpanel context menus don't open over margin anymore
+
+0.4.0.10
+ + commandlist cache
+ [ moved menu view_bars one position down
+ ] commandlist and localisation modules nor hold their data internal (was global)
+ " editpanel > margin > fold  is now a node that holds forecolor, back and visible
+ ! typo in Config::Default::GlobalSettings
+ ! crash: typo in event resigning of Dialog::Search
+ ! crash: old api call in file::session
+ ! crash if hide main toolbar by next event
+
+0.4.0.9
+ [ uncomment foldmargin view option 
+ [ darker (yellow) caret line (was nearly unvisible)
+ ] new commandlist leaf: keycode
+ ] rehashed parts of Kephra::API::CommandList
+
+0.4.0.8
+ + autoplugging localisation system
+ + added key editpanel > auto > focus
+ ~ changed name convention for icons no more underscore => new-names.xpm
+ ' updated roadmap in kephra.pm POD
+ " panel icons were missing in default commandlist
+
+0.4.0.7
+ + intial norsk localisation
+ + new submodule Kephra::Config::Localisation, refactoring
+ - removed stupid restrictions not to open emty files
+ ~ open binary files (only_text = 0)is now default, problems with utf files
+ ~ activate UTF8 for Config::General when locale file requires
+ ] open localisation files function moved into Config::Localisation
+ ! typo in localisation column, not cloumn
+
+0.4.0.6
+ ] moving codepage setting from hard wired to config set
+ ~ moving File::_age into File::IO
+ ! output panel didn't worked
+ 
+0.4.0.5
+ [ cleaner search dialog
+ ! updating in localisation default config
+
+0.4.0.4
+ + select interpreter with config key app > panel > output > interpreter_path
+ + file missing dialog
+ - remove dangerous <Ctrl>+<Alt>+<Q> keybinding ( triggeres when want create @)
+ [ find item history realtime update now works in search dialog
+ [ cleaner search dialog
+ ] rebuild notify dialog
+ ] renewed parts of search module
+ ! comboboxes in search dialog process enter
+ ! crash on moving tabs
+
+0.4.0.3
+ ! keep calm when just a unnamed doc is unsaved
+
+0.4.0.2
+ ' updating key layout docs 
+ ~ close all key binding changed <Alt>+<Q> => <Ctrl>+<Alt>+<Q>
+ ~ close app key binding changed <Alt>+<F4> => <Ctrl>+<Q>
+ ! UTF problems on files with syntaxmode none 
+
+0.4.0.1
+ ' updating key layout docs 
+ ! quoting doc name in output panel eval
+ ! crash while delete all bookmarks
+
+0.4 stable release
+ ' finished end user docs
+
+0.3.10.24
+ ~ background color for brace highlighting
+ ' more docs translation
+ ! a Config::Global sub required a gone module
+ ! internal doc propert reset didn't delete file name
+ ! file > open > each_once works again
+
+0.3.10.23
+ ~ hide config dialog
+ ' update docs
+ ! change doc
+
+0.3.10.22
+ ! move tab right crashed
+
+0.3.10.21
+ ~ in searchbar input now works ctrl+
+ ! fixed Config::load_defaults
+
+0.3.10.20
+ [ forward calls from doc to doc::Internal via glob
+ ! invalid Doc::name call in file.pm
+
+0.3.10.19
+ + define output colors by config
+ ~ new config option: interpreter for notpad eval
+ ~ added '&' as default wordchar
+ ! output used removed Doc API
+ ! output restores cwd
+
+0.3.10.18
+ ! 0 div in indent guid highlighting
+ ! restore doc attribute from doc nr 0 correctly
+ ! umlaut problem no longer
+ ! clean up all lexer words
+
+0.3.10.17
+ ] massive refactoring of Kephra::Document namespace
+ ! restart timer when canceled app shutdown
+
+0.3.10.16
+ ] sane doc nr validation
+ ! false trigger of file changed notify dialog
+ ! wrong win titel when open file
+ ! fix default global settings hash
+
+0.3.10.15
+ ! output panel can run scripts again
+
+0.3.10.14
+ + perl eval of notepad
+ + define find and replace item in notepad
+ ! enable right tool button after doc change
+
+0.3.10.13
+ ! cleanup doc internal mess
+ ! fix stting of current syntaxmode 
+
+0.3.10.12
+ [ search finding better visible
+ ! safer conf file parser init
+ ! didn't remember changed syntaxstyle of opened file
+ ! proper file dialog filter for config files
+
+0.3.10.11
+ + exit without save
+ ] rewritten parts of Edit::Goto.pm
+ ] made localisation configs saner
+ ! goto line dialog showed 1 line less than current
+ ! fixing default localisation
+
+0.3.10.10
+ ] founding Kephra::Log
+ ] adapt makefile becaue no longer need Log::Dispatch
+ ! wount crash when not find splashscreen image file
+ ! reload settings when save active config file works again
+
+0.3.10.9
+ ~ rename file > "Instert ..." into "insert from ..."
+ ! searchbar input works again (they changes standart behavior when press enter)
+
+0.3.10.8
+ ! fix event table data structure
+ ! repair (beginnings of) czech localisation
+
+0.3.10.7
+ - append option in output panel 
+ ] changed session.conf to yaml due sorting problems with current (2.4) C::G
+ ] switch to Module::install 0.77
+ ! reload configs works again
+
+0.3.10.6
+ + 3 close unsaved functions
+ ' extend Kephra.pm POD
+ [ save notepad with when resize
+ [ rearrange file menu
+
+0.3.10.5
+ ] copy configs unto userconfig when configs are old
+ ] current filepath is known to interpreter when run script
+ ! copied config files where readonly
+ ! could not write autosaved file sessions when no file was there
+ ! changed_notify_check could not handle deleted files
+
+0.3.10.4
+ ' rewritten parts of Kephra.pm POD
+ ! fix install problem hopefully
+
+0.3.10.3
+ ] Keymap Dialog had no Version number
+ ! caret visible on app start
+ ! tried to load non existing notepad cache
+
+0.3.10.2
+ ! fixed codepage setting
+ ! fixed wordchar settings
+ ! fixed and moved dev.pl outside the distro
+
+0.3.10.1
+ [ changed panel layout: column division first
+ ' POD fix for Panel API
+ ! workaround for a Wx bug
+
+0.3.10
+ ! add missing panel localisation
+ ! resized output panel when started closed
+
+0.3.9.18
+ + Output is resizable ans remembers its size
+ + Notepad is resizable ans remembers its size
+ ! Notepad knows its split staus after closed per mouse
+ 
+0.3.9.17
+ + output panel has now a stop function to kill hanging prozesses
+ [ enhance Notepad as STC that shares some settings with main STC
+ ! fix perl lexer color definition
+
+0.3.9.16
+ * notepad panel works completely
+ + output panel recoveres its visibility state after restart
+ ~ output panel open if run script
+ ! output panel handles multiline output
+ ! can run files with whitespace in name (patch by reneeb)
+
+0.3.9.15
+ * output panel works now
+
+0.3.9.14
+ ] internal file namespace cleanup
+
+0.3.9.13
+ + added View Panel Menu
+ + 2 entry for Notepad and Output
+ ~ renamed Module API to Panel
+ [ basic visuals for output panel
+
+0.3.9.12
+ [ + goto line icon
+ ~ switched to Config::General 2.4 in windistro 
+ ! fixed about dialog
+
+0.3.9.11
+ ! restore curser pos in current file after restart
+ ~ added __WARN__ and __DIE__ to perl lexer
+ ! wordchar settings where missing
+
+0.3.9.10
+ ] Gabor: added first logging functions
+ ] renamed Config::Default::Global_Settings to Config::Default::GlobalSettings
+ ! Gabor: optimized config file type recogition
+ ! mismatch in 2 other Default modules names
+
+0.3.9.9
+ ' documented API modules
+ ' repaired some POD in main module
+ [ fixed tabbar icon tooltip texts
+ ] switched from YAML to YAML::Tiny (less code, less memory, all we need)
+ ] new starter.exe that starts kre\wperl.exe
+
+0.3.9.8
+ ' extending Kephra.pm's POD
+ ] making DragAcceptFiles optional because not supported by GTK
+ 
+0.3.9.7
+ ! seperator in Config::Embedded
+ ] renamed Config::Embedded -> Config::Defaults
+ ] rename pre dir into kre (kephra runtime environment)
+ ] externalized into single files
+
+0.3.9.6
+ ] complete new starter
+ ] new Kephra::Config::init() method
+
+0.3.9.5
+ ' added POD in Kephra.pm
+
+0.3.9.4
+ + avennue highlighter
+ + BAAN highlighter
+ + .bat highlighter
+ + diff highlighter
+ + errorlist highlighter
+ + makefile highlighter
+ + matlab highlighter
+ + property file highlighter
+ ] configs and localisation for 8 new styles
+ ' removed "all rightes reserved" 
+
+0.3.9.3
+ ! crash on file open
+ ' this_version.txt update
+ ] finished last Kephra::Config::Tree functions
+ ] deleted not used Dialog::Search subs
+
+0.3.9.2
+ + reintroduce fast splashscreen
+ ~ splashscreen img and app icon now as xpm too
+ ] shrinking strawberry distro from 28 to 23MB
+
+0.3.9.1
+ ' POD fix
+ ! toolbar appeared in wrong status bar cell
+
+0.3.9 0.4 RC 2
+
+0.3.8.14
+ ' formated and updated documentation
+ ~ updated credits.txt (PCE -> Kephra)
+ ~ rewritten Config::Tree functions so i could
+ - remove Hash::Merge and Clone as dependencies
+
+0.3.8.13
+ + added pbp.conf according to damians perl best practices
+ ] cleaned Kephra::Edit::Search.pm
+ ! crash when open global autoconfigs
+
+0.3.8.12
+ ] cleaned bit the sub load_from() in Config::Global
+ ] cleaned Config::Global a bit
+ ] WxKeycodes for search dialog
+ ! crash when searching with dialog
+
+0.3.8.11
+ + added replace selection into context menu over selected text in editpanel 
+ ~ cleared replace selection labels
+ ~ ignore in filechange notify dialog now works until next file change happens
+
+0.3.8.10
+ - removed global default conf, replaced by embedded conf
+ ] search dialog is now real dialog
+ ! debugged embedded global conf
+
+0.3.8.9
+ + embedded main menu settings
+ ! can handle missing file session file 
+ ! hang while searching after closing search dialog
+
+0.3.8.8
+ + <ctrl>+<A> works in searchbar
+ + embedded toolbar settings
+ + embedded context menu settings
+ ] rewritten parts of Kephra::Config::File
+ ! debugged embedded localisation
+
+0.3.8.7
+ + embedded commandlist
+ ! prevent thread hangup due late fired timer event on shutdown
+ ! added unicore utfdb to winball
+ ! blockformat on width
+
+0.3.8.6
+ + context menu over statusbar info field
+ - select app language menu
+ ! search dialog carret keeps position
+ ! crash when ask for not existing menus
+
+0.3.8.5
+ ] fixed and updated embedded configs
+ ? more compile tests for modules that arent loaded on start
+ ! crash on replace
+
+0.3.8.4
+ ] thrown wx icons out of the distro
+ ! crash on select all
+
+0.3.8.3
+ [ put file sessions menu out of file menu on top level
+ [ put goto-line into searchbar
+ ] added Kephra::API::CommandList::run_cmd_by_keycode
+ ~ document switch  backs works out of search bar
+ ! pos1 and end works in searchbar again
+
+0.3.8.2
+ ! crash on search
+
+0.3.8.1
+ + menu item switch view of tabbar contextmenu
+ ~ folding view menu
+ ! fix php lexer, new constant
+ ! fix xml lexer
+ ! crash while open help files in winball distro
+
+0.3.8 bugfix release, 0.4 RC 1
+
+0.3.7.12
+ + position searchbar in the middle between tabbar and edit panel
+ ] hack to disabling acceleratorTable 
+ ~ new wx constants
+ ! runs with latest Wx (0.83) again
+ ! doc attr getter was flawed
+
+0.3.7.11
+ ! empty statusbar syntaxmode field if kephra sarted with last doc with mode: "none"
+
+0.3.7.10
+ [ nicer menus due fake transparent icons for menu items with no bitmaps
+ ~ take config dialog again in the toolbar
+ ! old Searchbar on config reload won't go
+
+0.3.7.9
+ ! could't open first file
+ ~ hiding print, expanding file menu again
+
+0.3.7.8
+ [ new splashscreen (finally one with the right name in it)
+ ! doc history can handle if non doc is open
+ ! didnt start with no file open
+
+0.3.7.7
+ ! fixed color of syntax mpode "none" after switiching from php
+ ! rot tabs correctly while moving
+
+0.3.7.6
+ ~ change Switch doc back to <ctrl>+<shift>+<back>
+ ~ redesigned file menu
+ ! added missing doclist event on doc switch
+ ! open all files of dir now appears in right dir
+
+0.3.7.5
+ + move tabs with <ctrl>+<shift>+<pgup|pgdn>
+ ] cleaned up App::TabBar API
+
+0.3.7.4
+ + Ctrl+Shift+G works from the searchbar input
+
+0.3.7.3
+ ! more internal doc add fixes
+
+0.3.7.2
+ ~ move xml comment from <ctrl>+<b> to <ctrl>+<h>
+ ! lot of internal bugs introduced due 0.3.7.1
+
+0.3.7.1
+ ! EOL status works on empty docs again
+ ! doc attributes and data is now deleted correctly while closing doc
+
+0.3.7 testing release
+
+0.3.6.12
+ ! fix naming convention in CPAN distro
+
+0.3.6.11
+ ] updated tests to ned app name
+
+0.3.6.10
+ + autonotify Dialog
+ ] saner file open syntax
+ ~ no autosave on unnamed files
+ ~ autonify just once
+ ! false autonotify on config files
+
+0.3.6.9
+ ! small fixes
+
+0.3.6.8
+ + autosave, define it under config key file > save > auto_save
+
+0.3.6.7
+ ~ StatusBar Info with dotted numers
+ ~ renamed API::Module.pm to Extention.pm
+
+0.3.6.6
+ + tools to make CPAN distro (make_cpan_pl)
+
+0.3.6.5
+ ' added POD documentation
+
+0.3.6.4
+ ' translated this_version.txt from de to en
+ ' translated special_feature.txt from de to en
+ ~ changed item order in tab contextmenu
+
+0.3.6.3
+ + new perl 5.10 keywords in Perl.pm
+ + started Module for Plugin API : Kephra::API::Module
+ + wrote Documentation of Perl main module
+ ~ join lines now leaves a space between joined lines
+ ~ join lines has key binding : <ctrl>+<shift>+<J>
+ ! search dialog holds correct replace item when non text selected as new item
+ ! fixing doc change in search bar input
+
+0.3.6.2
+ + jump to doc begin and end from searchbar input whith <ctrl>+(<home>|<end>)
+ + change doc from searchbar input whith <ctrl>+(<pgup>|<pgdown>)
+ ~ changed tablabel configfile marker from circumfix | | to prefix $
+ ~ empty config dialog visible again
+
+0.3.6.1
+ + marking config files in tabs optionally with straight lines
+ + added replace line Command to main menu
+ ' wrote 'besondere_funktionen.txt'
+ ] update embedded config
+
+0.3.6 round up, bug fix and minor feature release
+
+0.3.5.8
+ + load and store a backup file session
+ + close searchbar now also with <ctrl>+<Q> while in the searchbar input
+ + more menuoptions to set width of textmargin
+ ' updated diese_version.txt
+ ! search dialog crash (uncompled API module refactor)
+
+0.3.5.7
+ + take autoautoindtion in statusbar tab-cell contextmenu
+ ~ rename linebreak to line wrap
+ ~ changing name in the docs
+ ] upgrading windistro to PPI 1.2
+ ! fixing and fine tuning blockformat and line wrap
+
+0.3.5.6
+ + blockformat <ctrl>+<shift>+<b>, menu edit > format
+ + line break, menu edit > format
+ [ removed ambiguity in german mainmenu navigation with keyboard 
+ ! optimizing speed and undef value handling of menu data generation
+
+0.3.5.5
+ + tabbar tabs numbering optional config key: app > tabbar > number_tabs
+ + tabbar filename optional without ending: app > tabbar > file_info = [first]name
+ ! seach dialog icon shows again
+ ! file firs names now correct when it has no file ending
+ ' some more documenting in default.conf
+ 
+0.3.5.4
+ + firstname: new document property holds filname without ending
+ + can use [$$firstname] as template variable too
+ ] clean up ::Config::General.pm
+ ] less subconfugs
+ ~ renamed 'global\sub\localisation' to 'global\sub\documentation'
+
+0.3.5.3
+ ! move document line and page wise from searchbar input
+ [ use wx keycodes, less error prone
+ 
+0.3.5.2
+ + reload templates on save
+ + move document line and page wise from searchbar input
+ [ internal cleanups
+ ! reload all docs switched to last doc
+ 
+0.3.5.1
+ ' advanced feature tour
+ ' wrote german 'this version text' for release 0.4
+ ' reneame 'feature.txt' to 'all_feature.txt'
+ ' some preparations for czech localisation
+
+0.3.5 bug fix and feature release
+
+0.3.4.15
+ ] moved icon path from \config\icon to \config\interface\icon\
+
+0.3.4.14
+ ~ changed File Menu order
+ ! current pathes now contain volume name
+
+0.3.4.13
+ - auto brace join
+ ] beginnings of Modules and its handling
+ ! cursor in searchbar's edit field now holds its position whilse writing
+
+0.3.4.12
+ ~ insert templates
+
+0.3.4.11
+ * Template Menu
+ ] config nodes file > session and file history
+ ] new config node file > templates
+ ] renamed Edit::Changes in Edit::History
+ ] cleaned up file session directory handling
+ ] cleaned up path splitting
+
+0.3.4.10
+ [ cleaned Kephra::App namespace
+
+0.3.4.9
+ ! document editing commands did crash
+
+0.3.4.8
+ ! refresh of find item history in searchbar
+ ! chrash when context menu calls
+
+0.3.4.7
+ * history File menu
+ 
+0.3.4.6
+ + custom title bar
+ 
+0.3.4.5
+ + multiple events on GUI element
+ ! redo button 
+ ! better tabbar context menu (still some flaws)
+ 
+0.3.4.4
+ + nonreactive toolbars (disable events)
+ 
+0.3.4.3
+ ! reload config file when saving it in editor
+ 
+0.3.4.2
+ ! searchbar fixes
+
+
+0.3.4.1
+ ! exit dialog entitles also unnamed files
+
+0.3.4 bug fix release
+
+[LOST due crash]
+
+0.3.3.17
+ + switch syntaxhighlight when left click on third status pane
+ ~ correct refresh while rename file
+ [ file rename got shortcut <ctrl>+<alt>+<shift>+<S>
+
+0.3.3.16
+ + find next and prev in searchbar now also with F3 and shift+F3
+ ~ perl sigils and namespaceseparator now word chars
+ ! searched first when setting find item with strg+F3
+ ! crash while call replace with confirmation
+
+0.3.3.15
+ ~ doclist menu shows untitled
+ ~ less events on doc change fired
+ ! correct window title while open file or session reload if current doc is last
+ ! state of find menu items
+ ! crash when saving a file that was in a recently deleted dir
+
+0.3.3.14
+ [ proper searchdialog replace input update
+ [ put config dialog call into main menu
+ [ searchbar find input size now changeable due config file
+ ] config node "file > current > session" renamed to "file > session"
+ ] config node "file > filter" renamed to "file > group"
+ ! dynamic doc list menu is updating again
+
+0.3.3.13
+ ~ config dialog cleanup
+ ~ extracting ::Edit::Changes.pm
+ ~ proper searchbar find input update
+ ~ proper searchdialog find input update
+ ~ doc edit commands much faster now, they use event freeze
+ [ exit dialog shows file names again
+ ! event freeze was brokes
+
+0.3.3.12
+ ~ updated starter exe in win distro
+ ~ benchmark output switchable
+
+0.3.3.11
+ ~ search range items in main and searchbar context menu
+ ~ doc change items in doclist menu
+
+0.3.3.10
+ ~ merged with adams code version
+ ~ cleaned eventlist freeze implementation
+ ! crash while find or replace in all open docs with dialog
+ ! search dialog lost icon when config in nonstandart path
+
+0.3.3.9
+ + subconfigs from nested nodes
+ + ability to store single contextmenu in seperate file
+ ! warnings on empty commandlist nodes
+
+0.3.3.8
+ ~ using Kephra::Config::File::load not YAML directly
+ ~ simplified session files
+ ] started Kephra::Config::Tree
+ ' more benchmarks
+
+0.3.3.7
+ [ german localisation correctoin, spell checks
+ ~ build searchbar from configs, findinput is now sizeable
+
+0.3.3.6
+ ! crash on view EOL
+
+0.3.3.5
+ ! save first time rightmost doc
+
+0.3.3.4
+ ~ some text folding preparations
+ ! searchbar and search dialog dind't run
+
+0.3.3.3
+ ~ reduced code in App::Window::load_icon
+ ~ dissolving depreciated lib Kepher::App::STC > Kepher::App::EditPanel
+ ! DND on Seachbarbar input
+
+0.3.3.2
+ ! fix config for rename
+ [ hiding error logs
+
+0.3.3.1
+ ~ edit contex menu fixed and chenged
+ [ item label: Fortran -> Fortran 90
+ ! change font
+
+0.3.3 rounded up for test release
+
+0.3.2.21
+ ] new namespace for line number margin
+ ] slimmed events, faster now
+
+0.3.2.20
+ ! fix toolbars visibilities
+ ! fix searchbar contextmenu connector
+ ! sane app gui part layout when changing language
+
+0.3.2.19
+ + configurable middle click on tabbar
+ ~ correct tooltip and status help msg on tabbar
+ ! repaired tabbar
+
+0.3.2.18
+ ~ lot of internal cleanup
+ ] internal unified namespace App::ToolBar
+
+0.3.2.17
+ + repairing subconfs
+ + nearly comlete set of embedded config (interface missing)
+
+0.3.2.16
+ + toolbar toggle buttons
+ + eventsystem
+ + dynamic toolbar with events
+
+0.3.2.15
+ [ removed most search dialog button flicker
+ ~ faster search dialog
+
+0.3.2.14
+ ] toolbar rebuild
+ - remove xrc interna
+ ! crash on edit document calls
+
+0.3.2.13
+ ] Config menu rebuild
+ ] Help menu rebuild
+ ] Menubar completly set to new Interface text compiler
+ ~ ::App::Window::create
+ - most xrc files except toolbar
+
+0.3.2.12
+ ] View menu rebuild
+ ] Document menu rebuild
+ ] Search menu rebuild
+ ] Document menu rebuild
+ ] View menu rebuild
+ ] moved braced nav to edit::goto modul
+ ! brace nav crash
+
+0.3.2.11
+ ] Edit menu rebuild
+ ! crash while text refresh
+ ! set bookmark annoyance
+
+0.3.2.10
+ [ EOL checks
+ ! fixed tabbar context menu
+
+0.3.2.9
+ ] new Document::SyntaxMode, Edit::Goto and Edit::Select namespaces
+ ] File menu rebuild
+ ] dispatch own key events
+ - shorten Events.pm
+ ! replace all replaced with zero
+
+0.3.2.8
+ ] moved last parts of visual.pm code Statusbar.pm and Toolbar.pm
+ [ checkitem in syntaxmodeinfo contextmenu
+ [ can_save_all now much faster
+
+0.3.2.7
+ + rename files
+ ! fixed check and radio item update
+
+0.3.2.6
+ [ better goto line dialog
+ ] + can_save_all Event which is set whenn there is an unsaved doc
+ ! correct checkings and disabling on all menu items
+ ! tab change event echo
+ ! del mismatch in searchbar combobox
+
+0.3.2.5
+ [ first main menu works with a submenu
+ ] PCE::Config::Stettings to PCE::Config::Global, cleaned namespace
+ ! fixing search dialog find combo loosing search item while search
+
+0.3.2.4
+ [ no cursor or text deselection jump when save all files
+ ] PCE::App namespace newly ordered
+ ! crash on search dialog Drag'n Drop
+
+0.3.2.3
+ + searchbar contextmenu
+ ! pathname mismatch with numbers
+ ! opening changing and save rightmost doc
+
+0.3.2.2
+ + drag n drop in search dialog
+ [ single wrong indention on tabbar contexmenu
+ ] overall slimmed and cleaned up code
+ ! no proper eol mode display in statusbar
+
+0.3.2.1
+ ] cleaned up statusbar internals
+ ! forgotten update call for document list update
+ ! statusbar showed not correct number of document lines
+
+0.3.2
+ ] more checks when loading GUI configs
+
+0.3.1.14
+ + menuitem radiogroups
+ + disable menuitems
+
+0.3.1.13
+ ] unified commandlist value loading
+ ! crash while change Localisation Language again
+
+0.3.1.12
+ + documents contextmenu
+ ] lot of cleadup in Edit.pm
+ [ slightly changed goto behaviour
+
+0.3.1.11
+ ] all contexmenu on gtc
+ ] contexmenu-editpanel eval connector
+ [ new german iso lacalisation
+ ! crash when current doc setting in session file is to high
+
+0.3.1.10
+ + icons in new contex menus
+ ! crash while change Localisation Language
+
+0.3.1.9
+ + contextmenu on selected text
+ ] editpanel contextmenus working in minimal mode
+
+0.3.1.8
+ ] adding contextmenu gui config file
+ ] info dialog cleanup
+ ] added embedded emergency localisation
+
+0.3.1.7
+ ] cleaned app namespace
+ ] cleaned up program name handling
+
+0.3.1.6
+ + searchbar takes eventual selection as search item
+ ! open button did disappear for after cliscked
+
+0.3.1.5
+ + config key {app}{searchbar}{autofocus} sets focus to input while onmouseover
+ ! cursor jump to begin when deleting bookmark
+ ! deleting all bookmark
+ ! crash if reload nonexisting file
+
+0.3.1.4
+ ' keymap updated
+ ~ goto last edit now on <Ctrl>+<Shift>+<G>
+ ! open files from command line with pce was broken since 0.3.0
+ ! current doc pointer now correct even if there is only one doc
+
+0.3.1.3
+ + brace navigation with <alt>+<arrow keys>
+ [ <Ctrl>+<F> now also switches focus back to editpanel
+ [ button added on searchbar to call search dialog
+ ] cleaned PCE::App::Event::key_down_filter
+
+0.3.1.2
+ + delete back tab, <shift>+<back> deletes now to naxt indention level
+ ~ switch back now on <Ctrl>+<back>
+ ] property handling while restoring file session now much slicker
+ ! warning caused by checking more filenames that exist while open file
+ ! fixing file session loading and restoring
+
+0.3.1.1
+ [ fix in german toolbar "Suchdialog"
+ [ caret position better visible when switching to document
+ ! warning in info dialog when there is no patchlevel
+
+0.3.1
+ ? testing release
+ [ closing street holes
+
+0.3.0.27
+ + block navigation reestablished
+
+0.3.0.26
+ ! fixed blockindent
+
+0.3.0.25
+ + Bookmarks are working now
+
+0.3.0.24
+ ! fixed tab converter
+
+0.3.0.23
+ + restoring bookmarks
+ ! display of selection lines now correct
+
+0.3.0.22
+ ! typo in toolbar
+
+0.3.0.21
+ ! no label for unnamed files
+
+0.3.0.20
+ + show selected lines in statusbar
+ ~ shorter format::join_lines algorithm
+ ! typo in searchflag refresh
+
+0.3.0.19
+ + opens whole dir when dragged onto
+ ! crash when try to drag dir into edititor
+ ! find and replace dialog repaired and slightly optimized
+
+0.3.0.18
+ + PCE now remembers current search and replace item
+ ] rebuild some PCE::Edit::Search.pm sub, renamed config keys
+
+0.3.0.17
+ + find input can now recieve dragged text
+
+0.3.0.16
+ ~ searchbar hints do work now
+ ~ find input history now works
+ + introduced function mark all matches
+ + editpanel can now recieve dragged files
+
+0.3.0.15
+ ! repairing linenumbermargin autosize
+ ! repairing english goto line menu call
+
+0.3.0.14
+ ~ building up simple but usable Searchbar with some jitters
+
+0.3.0.13
+ ! file data got lost after closing empty files
+
+0.3.0.12
+ ~ toggle searchbar visibility
+ ~ start SearchBar
+ ! repair exit dialog
+
+0.3.0.11
+ ~ established standart way of normalizing path slashes
+ ~ better way to position context menus
+ ~ Replace with confirm now on <Alt>+<Enter> on replace dialog
+ ! tabbar buttons has right background color
+
+0.3.0.10
+ + toggle visibilty of tabbar icons
+ + toggle visibilty of tabbar seperator line
+ ~ Show.pm now opens help & config files with full path
+ ] simplified edit: line copy
+ ! shown pathes now compatible to current OS
+ ! reinsert tab seperator line
+ ! toggle visibilty of tabbar works now
+
+0.3.0.9
+ ~ rename config/general -> config/global
+ ! rename tablabel when change language
+ ! ensure inner data current doc pointer always set correct
+
+0.3.0.8
+ + put EOL switch visibility into EOL status context menu
+ ~ modulnames now all uppercase, sources cranked throug perltidy
+
+0.3.0.7
+ ~ introducing use strict 2 all.pm
+ ~ rewrite document namespace
+ ~ Reorganising into a CPAN-compatible distribution
+
+0.3.0.6
+ ~ refaktoring the app namespace (packages, methods, config keys)
+ [ introducing pce::App::TabBar
+ ! no more hang up on empty docs
+
+0.3.0.5
+ ! fix tabbar consume too much height
+ ! dont clear editpanel when close last writeprotected file -> pl2
+ ! dont recognize protection when open first write protected file -> pl2
+
+0.3.0.4
+ + goto last edit
+ ! mainframe was invisible under win when minimize and then close  -> pl2
+
+0.3.0.3
+ ~ update to wxperl 0.25
+ ] pce::document::internal founded pce::document::property deleted
+ [ 2 icons in tabbar
+ [ 3 new icons in toolbar config dialog aktivated
+
+0.3.0.2
+ ! bugfix starting minized search dialog  -> pl2
+ ] changed to sizer based searchdialog
+ ] find modules renamed in search because its more than find like search menu
+
+0.3.0.1
+ ! increment search lost caret visible  -> pl2
+ [ rename localisation ref
+ ] new icons left of search icons
+
+0.3
+ ? full stable release
+
+0.2.3.47
+ ] info dialog now displayes patch level
+ ' finish english docu
+
+0.2.3.46
+ + replace line
+ ' translating doku
+ ] new fresher icons, several new for coming new functions
+ ] 2 more functions in the toolbar
+ ] slicker help menu
+
+0.2.3.45
+ ! fixed CVS vs Clone.pm clash
+
+0.2.3.44
+ ' doku improvements
+ ] faster splashscreen
+
+0.2.3.43
+ ] Boundary check vor app_frame
+
+0.2.3.42
+ ! Bugfix in pce::edit::format::del_trailing_spaces
+... missing some
+
+0.2.3.19
+ + strg+Enter menu item document_switch_back
+... missing some
+
+0.2.3
+ ? feature enhancement and bug fix
+ * file sessions
+ * on quit dialog for selecting files to save
+ + open multiple files via dialog
+ + history for search and replace strings
+ + xp style now optional
+ ] close current file with middle click on tabbar
+ ! open empty files
+
+0.2.2
+ ? feature enhancement and bug fix
+ * search and replace in files
+ + asm style
+ + save on change doc
+ + open statusmenu files via mainmenu
+ [ internal sub now only have one _ prefix
+ ! bug in search prev
+ ! style repaint on save as bug
+...yes here is inconsistancy due change
+
+0.2.11
+ ? feature enhancement and bugfix release
+ + find in selection
+ + replace all in selection
+ + replace with confirm in selection
+ + menu item find from start
+ + recognise selection from menu calls
+ + Ctrl+Enter (in search dialog) closes dialog and finds first
+   (find button behaviour)
+ + set max tab width via config
+ [ more benchmark
+ ! reload autosettings fixed
+ ! status context menu changes language properly
+ ! dialog saves search and replace text first time like it should
+ ! minor checkbox selection fix in search dialog
+ ! bug in font change
+ ! line wrap bug
+
+0.2.10:
+ ? new feature and maintain release
+ * contextmenus on statusbar
+ + shift+Enter in search dialog searches backward
+ [  massive refracturing fore new namespace
+ [  several new modules
+ !  minor fixes in menu
+
+0.2.09:
+ ? testing and maintain release
+ + call replace in find dialog
+ ~ DND Files now only over tabbar
+ ~ close other now with ctrl+shift+Q
+ ~ better search menu
+ [  massive refracturing fore new namespace
+ !  minor fixes in menu, statusbar, and keymap
+
+0.2.08:
+ ? shiny little feature enhancement release
+ + Drag 'n Drop Files from Explorer into the Editor
+
+0.2.07:
+ ?  suporting porters release
+ +  pce.pl can now called under win from anywhere
+ !  small bugs in show files
+
+0.2.06:
+ ? minor enhancement release
+ + block navigation
+ + open files in current directory
+
+0.2.05:
+ ? maintaince release for linux usage
+ - direct document selection with Alt+Number
+ [ path for config and help can now be set freely
+
+0.2.04:
+ ? major stable and bugfix release
+ + view option: stay on top
+ ] internal changes and cleanups
+ ! bugfixes in menu and logic
+
+0.2.03:
+ ~ converter take now the whole text when nothing is selected
+ ]  internal cleanup
+
+0.2.02:
+ + delete trailing spaces
+ ] cleaning internals
+
+0.2.01:
+ + 2 new options for opening files, replace new empty docs
+ + single document mode
+ + save last tilde files like that: file.name~
+ ! Bugfix in EOL Mode, the editor produced always cr+lf
+ ! 2 Bugfixes in Main menu
+
+0.2.00:
+ ? major stable and bugfix release
+
+0.1.99:
+ + backup autosave file, and restore ist in emergency case
+ - Bookmarks
+ ! bugfixes
+
+0.1.98:
+ + save dialog on close and exit now contain cancel
+ ] internal improvements
+ ! bugfixes in Config
+
+0.1.97:
+ + jumpes to the file if you open an already opened file
+ ] internal improvements
+ ! bugfixes in main, config, file, document, STC
+ ! bugfix in General::Config
+
+0.1.96:
+ + visual feature: switch back if you click on current a la opera
+ + new option: start with an empty file
+ + new option: open each file once
+ + new option: open text files only
+ ! bugfixes
+
+0.1.95:
+ + autoreload for config files
+ + this version texts
+ ~ better menus
+ ! bugfixes
+
+0.1.94:
+ ! fix from ugly bug that eating docs, therefor HIGHLY RECOMMANDED updated
+ + ask now for unsaved files to save on quit
+ ~ minor optikal fixes in search dialog, save all icon, color of LLI
+
+0.1.93:
+ * settings for each document will handled seperately and saved to the next start
+   these settings are at start cursorpos, syntaxstyle, EOL Mode, Tab usage
+ + intention guides
+ + caret line highlighting
+ + autodetect EOL Mode
+ + autodetect write protection
+ + direct doc selection with Alt+Number
+ ~ right margin color changesd
+ ~ another app icon
+ ~ search menu unfolded
+
+0.1.89: ? bugfix release
+0.1.87:
+ * multiple document handling
+   find, replace and bookmarks are still single document oriented
+
+0.1.84:
+ * find and replace dialog
+ + win XP look
+
+0.1.68: autosave options, customizable Syntaxstyle autoselect
+0.1.64: german localisation
+0.1.60: config: many new styles, contextmenu
+        file menu: insert file, edit menu: format functions, convert functions
+        document menu: eol mode, styles, spaces, write protection
+        Statusbar: cursorpos, eol, spaces, style
+        faster file reading, several bugs
+0.1.31: save and load external configs, handling close window event
+        many bug fixes, color and caret settings
+0.1.24: SECOND COMPLETE RELEASE (incl. PRE 0.2pre1)! new config file,
+        old removed, holds now all properties, default.conf, open, load and
+        save config on the fly, release history, reopen, save copy as,
+        Replace, Undo History, brace comment, 3Bookmarks, find selection
+        new view options: hard tabs, whitespace, 4Margins, Line Wrap
+
+0.1.12: Fontselect and many other fixes
+0.1.11: Selection Move, fixes & updates
+0.1.10: indent unindent,  script comment uncomment, CSS Style, several fixes
+0.1. 9: open Configfiles, goto line number, line move, fixes
+0.1. 8: holds file, save before exit, fixed and updates
+0.1. 7: find previous, C-style fixed, setEOLMode removed
+0.1. 6: find, find next
+0.1. 5: setEOLMode(removed), select and autoselect Syntaxstyle, C - Style,
+0.1. 4: asks for filename if you save new file, better Perl-style
+0.1. 3: Keyboard Map, Licenses, fix
+0.1. 2: View Menu, View EOL, HTML-Style
+0.1. 1: checkable Menuitems, english Toolbarhints, show License
+0.1. 0: FIRST COMPLETE RELEASE(incl. PRE 0.2)!, smaller startexe, english Menu,
+        long line indikator, colored gutter,
+0.0.20: first syntaxstyle(perl), filename in tab, toggle linenumbermargin, fixes
+0.0.19: pce.exe, undo, redo, cut, copy, paste, clear, select all
+        filename in the title, warningboxes bugfixes
+0.0.18: save file, bugfix
+0.0.17: new file, open & save as
+0.0.15: First Public Release!: shows the editbox!
+
+
+Legend:
+ ^ purpose
+ * big new feature
+ + new feature
+ ~ change
+ - remove
+ ? tests
+ ! bugfix
+ [ interface
+ ] internals
+ " configs
+ ' help/docu
+ / comment 

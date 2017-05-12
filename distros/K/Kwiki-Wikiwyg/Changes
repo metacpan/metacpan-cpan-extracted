@@ -1,0 +1,23 @@
+---
+version: 0.13
+date:    Wed Jan 18 04:12:28 PST 2006
+changes:
+- Support IE Now
+- Works better in general
+---
+version: 0.12
+date:    Tue Oct  4 08:46:53 PDT 2005
+changes:
+- Support CamelCase links
+---
+version: 0.11
+date:    Tue Oct  4 07:11:24 PDT 2005
+changes:
+- Latest wikiwyg code from Socialtext
+- HTML->wiki is all in Javascript now
+- Very simple module from the Perl side
+---
+version: 0.10
+date:    Fri Aug 19 14:15:21 PDT 2005
+changes:
+- Initial version of Kwiki::Wikiwyg

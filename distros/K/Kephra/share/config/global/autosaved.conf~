@@ -1,0 +1,400 @@
+<about>
+    purpose = build in global settings
+    version = 0.4.3.32
+</about>
+<app>
+    app_data_sub_dir = interface
+    <cache>
+        file = commands.yaml
+        sub_dir = cache
+        use = 1
+    </cache>
+    <commandlist>
+        file = interface/commands.conf
+        node = commandlist
+    </commandlist>
+    <contextmenu>
+        defaultfile = interface/contextmenus.yml
+        <id>
+            document_context = editpanel_contextmenu
+            document_list = &document_change
+            document_selection = textselection_contextmenu
+            file_history = &file_history
+            insert_templates = &insert_templates
+            marker_margin = markermargin_contextmenu
+            status_encoding = status_encoding_contextmenu
+            status_eol = status_lineendchar_contextmenu
+            status_info = status_info_contexmenu
+            status_syntaxmode = status_syntaxstyle_contextmenu
+            status_tab = status_whitespace_contextmenu
+            toolbar_search = searchbar_contextmenu
+        </id>
+    </contextmenu>
+    error_output = panel
+    iconset_path = interface/icon/set/jenne
+    <localisation>
+        directory = localisation
+        file = english.conf
+    </localisation>
+    <menubar>
+        file = interface/mainmenu.yml
+        node = full_menubar
+        responsive = 1
+        visible = 1
+    </menubar>
+    <panel>
+        <notepad>
+            content_file = global/data/notepad_content.txt
+            eval_with = eval
+            font_family = Nimbus Sans L
+            font_size = 10
+            size = -1584
+            splitter_pos = 300
+            visible = 1
+        </notepad>
+        <output>
+            append = 0
+            back_color = 000022
+            font_family = DejaVu Sans Mono
+            font_size = 9
+            fore_color = ffffff
+            interpreter_path = perl
+            size = -1047
+            visible = 1
+        </output>
+    </panel>
+    <searchbar>
+        autofocus = 0
+        autohide = 0
+        contextmenu = toolbar_search
+        contextmenu_visible = 1
+        file = interface/appbars.conf
+        node = searchbar
+        position = below
+        visible = 1
+    </searchbar>
+    <statusbar>
+        contextmenu_visible = 1
+        file = interface/appbars.yml
+        interactive = 1
+        msg_nr = 1
+        node = statusbar
+        visible = 1
+    </statusbar>
+    <tabbar>
+        close_button = current
+        contextmenu = document_list
+        contextmenu_visible = 1
+        file_info = file_name
+        info_symbol = 1
+        insert_new_tab = rightmost
+        mark_configs = 1
+        max_tab_width = 25
+        middle_click = file-close-current
+        movable_tabs = 1
+        number_tabs = 0
+        switch_back = 1
+        tablist_button = 1
+        visible = 1
+    </tabbar>
+    <toolbar>
+        contextmenu = 0
+        file = interface/appbars.yml
+        node = main_toolbar
+        responsive = 1
+        size = 16
+        visible = 1
+    </toolbar>
+    <window>
+        <default>
+            position_x = 0
+            position_y = 0
+            size_x = 800
+            size_y = 600
+        </default>
+        fullscreen = 0
+        icon = interface/icon/app/proton.xpm
+        max_number = 1
+        maximize_editpanel = 0
+        position_x = 0
+        position_y = 24
+        save_position = 1
+        size_x = 1920
+        size_y = 1176
+        stay_on_top = 0
+        title = \$filepath - \$appname \$version
+        transparency = 0.2
+        transparent = 0
+    </window>
+    xp_style = 1
+</app>
+<dialog>
+    button_handing = right
+    <config>
+        position_x = 100
+        position_y = 100
+        save_position = 1
+        tooltips = 1
+    </config>
+    <search>
+        position_x = 524
+        position_y = 175
+        save_position = 1
+        tooltips = 1
+        transparency = 0.2
+        width = 496
+    </search>
+</dialog>
+<editpanel>
+    DND_mode = copy
+    <auto>
+        <brace>
+            glue_tangent = 0
+            indention = 1
+            join = 1
+            make = 1
+        </brace>
+        focus = 0
+        indention = 1
+    </auto>
+    <contextmenu>
+        ID_margin = marker_margin
+        ID_normal = document_context
+        ID_selection = document_selection
+        margin = 1
+        visible = custom
+    </contextmenu>
+    <control>
+        <mouse>
+            left-middle = edit-paste
+            left-right = edit-cut
+            left-selection = edit-copy
+            middle = goto-last-edit
+            middle-selected = edit-insert-selection-at-cursor
+            middle-selection = find-selection, find-next
+        </mouse>
+        use_advanced_mouse_functions = 1
+    </control>
+    <font>
+        family = DejaVu Sans Mono
+        size = 10
+        style = normal
+        weight = normal
+    </font>
+    <history>
+        fast_undo_steps = 7
+    </history>
+    <indicator>
+        <bracelight>
+            back_color = 99ff99
+            bad_color = ff0000
+            good_color = 0000ff
+            mode = adjacent
+            visible = 1
+        </bracelight>
+        <caret>
+            color = 0000ff
+            period = 500
+            width = 2
+        </caret>
+        <caret_line>
+            color = f5f5a5
+            visible = 1
+        </caret_line>
+        end_of_line_marker = 0
+        <indent_guide>
+            color = bbbbbb
+            visible = 1
+        </indent_guide>
+        <right_margin>
+            color = ccccff
+            position = 80
+            style = 1
+        </right_margin>
+        <selection>
+            back_color = 001177
+            fore_color = f3f3f3
+        </selection>
+        <whitespace>
+            color = cccc99
+            visible = 1
+        </whitespace>
+    </indicator>
+    line_wrap = 0
+    <margin>
+        <fold>
+            back_color = fff5f5
+            flag_line = 1
+            fore_color = aa9977
+            keep_caret_visible = 1
+            style = boxes
+            visible = 1
+        </fold>
+        <linenumber>
+            autosize = 1
+            back_color = d8d8d4
+            fore_color = 777788
+            min_width = 3
+            visible = 1
+        </linenumber>
+        <marker>
+            back_color = 0022ff
+            fore_color = 000055
+            visible = 1
+        </marker>
+        text = 6
+    </margin>
+    scroll_width = 640
+    word_chars = \$%-@_abcdefghijklmnopqrstuvwxyzäöüßABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ0123456789
+</editpanel>
+<file>
+    <current>
+        directory = /home/lichtkind/code/perl/project/editor/dev/xp/Kephra/doc/
+    </current>
+    <defaultsettings>
+        <new>
+            EOL = OS
+            codepage = ascii
+            cursor_pos = 0
+            readonly = 0
+            syntaxmode = perl
+            tab_size = 4
+            tab_use = 1
+        </new>
+        <open>
+            EOL = auto
+            codepage = auto
+            cursor_pos = 0
+            readonly = protect
+            syntaxmode = auto
+            tab_size = 4
+            tab_use = auto
+        </open>
+    </defaultsettings>
+    <endings>
+        ada = ada ads adb
+        as = as
+        asm = s asm
+        ave = ave
+        baan = bc cln
+        batch = bat cmd nt
+        conf = conf
+        context = tuo sty
+        cpp = c cc cpp cxx h
+        cs = cs
+        css = css
+        diff = diff patch
+        eiffel = e
+        err = err errorlist
+        forth = forth
+        fortran = f for f77 f90 f95 f2k
+        haskell = hs
+        html = htm html ssi shtml xhtml tag stag
+        idl = idl odl
+        java = jav java
+        js = js
+        latex = aux toc idx
+        lisp = el jl lsp lisp
+        lua = lua
+        make = makefile Makefile mak configure
+        matlab = m octave
+        nsis = nsi nsh
+        pascal = pas dpr dpk dfm inc pp
+        perl = pl ple plx plex pm pod cgi
+        php = php php3 php4 phtml
+        property = properties session ini inf reg url cfg cnf aut
+        ps = ps
+        python = py pyw
+        ruby = rb
+        scheme = scm smd ss
+        sh = bsh sh
+        sql = sql
+        tcl = tcl tk itk
+        tex = tex sty
+        text = txt nfo
+        vb = vb bas frm cls ctl pag dsr dob
+        vbs = vbs dsm
+        xml = xml xsl svg xul xsd dtd xslt axl xrc rdf
+        yaml = yaml yml
+    </endings>
+    <group>
+        config = conf
+        perl = perl
+        text = text
+        web = css html php perl js
+    </group>
+    <open>
+        dir_recursive = 1
+        each_once = 1
+        in_current_dir = 1
+        into_empty_doc = 0
+        into_only_empty_doc = 1
+        notify_change = 30
+        only_text = 0
+        single_doc = 0
+    </open>
+    <save>
+        auto_save = 30
+        b4_close = ask
+        b4_quit = ask
+        change_doc = 0
+        empty = 0
+        on_leave = 0
+        overwrite = ask
+        reload_config = 1
+        tilde_backup = 0
+        unchanged = 0
+    </save>
+    <session>
+        <auto>
+            file = current.yaml
+            node = 
+            save = 1
+        </auto>
+        backup = backup.yaml
+        directory = session
+        <history>
+            file = history.yml
+            length = 13
+            node = 
+            save = 1
+        </history>
+    </session>
+    <templates>
+        directory = template
+        file = perl.conf
+    </templates>
+</file>
+<search>
+    <attribute>
+        auto_wrap = 1
+        fast_steps = 7
+        in = document
+        incremental = 1
+        match_case = 0
+        match_regex = 0
+        match_whole_word = 0
+        match_word_begin = 0
+    </attribute>
+    data_file = global/data/search.yml
+    <history>
+        length = 12
+        remember_only_matched = 1
+        save = 1
+        use = 1
+    </history>
+    <marker>
+        any = 1
+        wrap = 1
+    </marker>
+</search>
+<texts>
+    credits = english/license/credits.txt
+    feature = english/all_feature.txt
+    keymap = english/keymap.txt
+    license = english/license/gpl.txt
+    navigation = english/navigation.txt
+    special = english/special_feature.txt
+    version = english/this_version.txt
+    welcome = english/welcome.txt
+</texts>

@@ -1,0 +1,17 @@
+Revision history for Perl extension KiokuDB::Navigator
+
+0.04 Monday, March 15, 2010
+    - adding support for custom typemaps with the
+      --typemap opton (thanks to Gerhard Gossen)
+    - fixed handling of nulls in Javascript UI
+      (thanks to Gerhard Gossen)
+
+0.03 Friday, Feb. 5, 2010
+    - fixed the CPU eating issue, it now blocks to
+      wait for the backgrounded web server to exit
+
+0.02 Friday, Jan. 22, 2010
+    - forgot to add Browser::Open to the Makefile.PL
+
+0.01 Friday, Jan. 22, 2010
+    - releasing module and seeing what happens

@@ -1,0 +1,118 @@
+#!/usr/bin/perl
+
+use strict 'vars';
+
+use Glib;
+use Gtk2;
+
+use KGS::Protocol;
+use KGS::Listener::Debug;
+
+use Audio::Data;
+use Audio::Play;
+
+use IO::Socket::INET;
+use List::Util;
+use Errno;
+
+use Storable;
+use Carp;
+
+init Gtk2;
+
+$SIG{QUIT} = sub { Carp::confess "SIGQUIT" };
+
+our $HACK = 1; # do NEVER enable. ;)
+our $DEBUG_EXPOSE = 0;
+
+if ($HACK) {
+   $KGS::debug = 1;
+}
+
+BEGIN {
+   our $VERSION = "0.1";
+
+   our $config;
+   our $LIBDIR = ".";
+
+   use KGS::Constants;
+
+   for (qw(util.pl gtk.pl chat.pl sound.pl user.pl gamelist.pl userlist.pl
+           game.pl room.pl roomlist.pl app.pl)) {
+      require (KGS::Constants::findfile "KGS/kgsueme/$_");
+      die if $@;
+   }
+}
+
+if ($ENV{KGSUEME_DEBUG}) {
+   use KGS::Constants;
+
+   my $window = new Gtk2::Window 'toplevel';
+   $window->add (new game::userpanel colour => 0);
+   $window->show_all;
+
+   main Gtk2;
+
+   for (19) {
+      my $game = new game size => $_;
+
+      $game->event_challenge (
+bless( {
+                type => 0,
+                black => bless( {
+                                  flags => 2633,
+                                  name => 'dorkusx'
+                                }, 'KGS::User' ),
+                rules => bless( {
+                                  count => 5,
+                                  time => 900,
+                                  timesys => 2,
+                                  interval => 30,
+                                  komi => '6.5',
+                                  size => 19,
+                                  ruleset => 0,
+                                  handicap => 2,
+                                }, 'KGS::Rules' ),
+                white => bless( {
+                                  flags => 436220808,
+                                  name => 'Nerdamus'
+                                }, 'KGS::User' )
+              }, 'KGS::Challenge' ));
+
+      
+      if (0) {
+         my $data = Storable::retrieve "board2.dat";
+         while (my ($k, $v) = each %$data) {
+            $game->{$k} = $v;
+         }
+         $game->event_update_tree;
+      }
+
+      if (0) {
+         $game->{cur_board} = new KGS::Game::Board;
+
+         $game->{cur_board}{board}[0][0] = MARK_B;
+         $game->{cur_board}{board}[1][1] = MARK_GRAY_B | MARK_SMALL_W;
+         $game->{cur_board}{board}[2][2] = MARK_W | MARK_TRIANGLE;
+         $game->{cur_board}{board}[1][2] = MARK_B | MARK_LABEL;
+         $game->{cur_board}{label}[1][2] = "198";
+         $game->{cur_board}{board}[0][2] = MARK_W | MARK_LABEL;
+         $game->{cur_board}{label}[0][2] = "AWA";
+         $game->{board}->set_board ($game->{cur_board});
+      }
+   }
+   main Gtk2;
+
+}
+
+our $app = new app;
+
+main Gtk2;
+
+$app->destroy;
+
+Gtk2->main_iteration while Gtk2->events_pending;
+
+1;
+
+

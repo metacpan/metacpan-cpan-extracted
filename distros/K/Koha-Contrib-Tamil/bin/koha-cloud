@@ -1,0 +1,191 @@
+#!/usr/bin/perl
+
+package Main;
+$Main::VERSION = '0.049';
+# PODNAME: koha-cloud
+# ABSTRACT: Creates HTML keywords clouds from Koha Zebra Indexes
+
+use Modern::Perl;
+use Carp;
+use YAML::Syck;
+use Pod::Usage;
+use Getopt::Long;
+use Fatal qw( open );
+use Koha::Contrib::Tamil::Koha;
+use Koha::Contrib::Tamil::Zebra::Clouder;
+
+
+my ($verbose, $help, $conf) = (0, 0, '');
+GetOptions( 
+    'verbose'   => \$verbose,
+    'help'      => \$help,
+    'conf=s'    => \$conf,
+);
+
+sub usage {
+    pod2usage( -verbose => 2 );
+    exit;
+} 
+
+
+sub run() {
+    usage() if $help || !$conf;          
+    
+    my @clouds;
+    say "Reading configuration file: $conf" if $verbose;
+    eval {
+        @clouds = LoadFile( $conf );
+    };
+    croak "Unable to read configuration file: $conf\n" if $@;
+    
+    for my $cloud ( @clouds ) {
+        print "Create a cloud\n",
+              "  Koha conf file:  ", $cloud->{KohaConf} ? $cloud->{KohaConf} : "default", "\n",
+              "  Zebra Index:     ", $cloud->{ZebraIndex}, "\n",
+              "  Koha Keyword:    ", $cloud->{KohaIndex}, "\n",
+              "  Count:           ", $cloud->{Count}, "\n",
+              "  Withcss:         ", $cloud->{Withcss}, "\n",
+              "  Output:          ", $cloud->{Output}, "\n",
+          if $verbose;  
+    
+        # Set Koha context if KohaConf is present
+        my $k;
+        if ( $cloud->{KohaConf} ) { 
+            $k = Koha::Contrib::Tamil::Koha->new( conf => $cloud->{KohaConf} );
+        }
+        else {
+            $k = Koha::Contrib::Tamil::Koha->new();
+        }
+ 
+        # Create output file    
+        open my $fh, ">", $cloud->{Output};
+    
+        my $clouder = Koha::Contrib::Tamil::Zebra::Clouder->new( 
+            koha    => $k,
+            index   => $cloud->{ZebraIndex},
+            verbose => $verbose,
+        );
+        $clouder->run( $cloud->{Count} );
+    
+        my $withcss = $cloud->{Withcss} =~ /^yes/i;
+        print $fh $clouder->html_cloud( $cloud->{KohaIndex}, $withcss );
+        close $fh;
+    }
+}
+
+
+run();
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+koha-cloud - Creates HTML keywords clouds from Koha Zebra Indexes
+
+=head1 VERSION
+
+version 0.049
+
+=head1 USAGE
+
+=over
+
+=item koha-cloud [--verbose|--help] --conf=F<cloud.conf> 
+
+Creates multiple HTML files containing kewords cloud with top terms sorted by
+their logarithmic weight. F<cloud.conf> is a YAML configuration file driving
+cloud generation process.
+
+=back
+
+=head1 PARAMETERS
+
+=over
+
+=item B<--conf=configuration file>
+
+Specify configuration file name
+
+=item B<--verbose|-v>
+
+Enable script verbose mode. 
+
+=item B<--help|-h>
+
+Print this help page.
+
+=back
+
+=head1 CONFIGURATION
+
+Configuration file looks like that:
+
+ --- 
+  # Koha configuration file for a specific installation
+  # If not present, defaults to KOHA_CONF
+  KohaConf: /home/koha/mylibray/etc/koha-conf.xml
+  # Zebra index to scan
+  ZebraIndex: Author
+  # Koha index used to link found kewords with an opac search URL
+  KohaIndex: au
+  # Number of top keyword to use for the cloud
+  Count: 50
+  # Include CSS style directives with the cloud
+  # This could be used as a model and then CSS directives are
+  # put in the appropriate CSS file directly.
+  Withcss: Yes
+  # HTML file where to output the cloud
+  Output: /home/koha/mylibrary/koharoot/koha-tmpl/cloud-author.html
+ --- 
+  KohaConf: /home/koha/yourlibray/etc/koha-conf.xml
+  ZebraIndex: Subject
+  KohaIndex: su
+  Count: 200
+  Withcss: no
+  Output: /home/koha/yourlibrary/koharoot/koha-tmpl/cloud-subject.html
+
+=head1 IMPROVEMENTS
+
+Generated top terms have more informations than those outputted from the time
+beeing. Some parameters could be easily added to improve this script:
+
+=over
+
+=item B<WithCount>
+
+In order to output terms with the number of occurences they have been found in
+Koha Catalogue by Zebra.
+
+=item B<CloudLevels>
+
+Number of levels in the cloud. Now 24 levels are hardcoded.
+
+=item B<Weithing>
+
+Weighting method used to distribute terms in the cloud. We could have two
+values: Logarithmic and Linear. Now it's Logarithmic by default.
+
+=item B<Order>
+
+Now terms are outputted in the lexical order. They could be sorted by their
+weight.
+
+=back
+
+=head1 AUTHOR
+
+Frédéric Demians <f.demians@tamil.fr>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2016 by Fréderic Démians.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

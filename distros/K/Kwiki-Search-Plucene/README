@@ -1,0 +1,12 @@
+Kwiki::Search::Plucene
+
+This plugin is intend to be an alternative of Kwiki::Search,
+which use a simple 'grep' upon search, and will be slow
+after the number of pages grow larger and larger.
+
+It use Plucene::Simple to index page content upon saving.
+Plucene is a Perl port of the Lucene search engine.
+
+Cheers,
+Kang-min "Gugod" Liu
+

@@ -1,0 +1,14 @@
+name: Kwiki-DNSBL
+version: 0.01
+abstract: Blocks edit from ip addresses in DNS Blackhole lists
+author: Jon Aslund <aslund.org>
+license: perl
+distribution_type: module
+requires:
+  perl: 5.6.1
+  Kwiki: 0.36
+  Net::DNSBLLookup: 0
+no_index:
+  directory:
+    - inc
+generated_by: Module::Install version 0.34

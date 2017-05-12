@@ -1,0 +1,425 @@
+#TODO: Update list of dependencies
+#TODO: documentataion for CGI configuration
+
+=head1 NAME
+
+Konstrukt::Doc::Installation - Installation and configuration
+
+=head1 INSTALLATION
+
+=head2 Module installation (from source)
+
+This will be done just as with every other perl module (will probably vary in
+Windows):
+
+	tar -xvzf Konstrukt-X.Y.tar.gz
+	cd Konstrukt-X.Y
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+As several other modules are used you might have to install other perl modules
+first, which is done best via CPAN.
+
+On most (modern) systems you can open the cpan console just with the cpan
+command:
+
+	# cpan
+	cpan> install Some::Module
+
+You may also specify the modules you want to install at the command line:
+
+	# cpan Some::Module
+
+So a shortcut to install a recommended set of modules would be
+
+	# cpan Module::Build CGI Storable Time::HiRes Scalar::Util::Clone Session DBI DBD::mysql \
+	Data::Dump Date::Calc Digest::SHA HTTP::BrowserDetect Image::Magick \
+	Text::Diff Time::Local Time::Zone
+
+Note that it might be better to install some modules from the package manager
+of your operating system.
+
+On Debian for example there are several packages for common perl modules
+available (e.g. Image::Magick -> perlmagick; DBD::mysql ->
+lib-dbd-mysql-perl; DBI -> libdbi-perl; CGI -> libCGI-perl; Apache ->
+libapache-dbi-perl, libapache-request-perl, libapache-session-perl;
+Apache2 -> libapache2-mod-apreq2, libapache2-mod-perl2).
+
+On some systems you might have to call CPAN via a perl command:
+
+	# perl -MCPAN -e shell
+
+=head2 Windows notes
+
+First of all, C<./Build> as stated above will most probably not work.
+You must run it like this: C<perl Build>.
+
+On B<Windows> it might be a good idea to install needed perl modules via C<ppm>
+(note the hyphen instead of the double colons):
+
+	C:\> ppm
+	ppm> install Some-Module
+	
+Or short:
+
+	C:\>ppm install Some-Module
+
+As the (default) ActiveState repositories might miss some modules, you can try to
+add additional repositories:
+
+	ppm> rep add <name> <url>
+
+Info about and lists of some repositories can be found here:
+L<http://www.google.com/Top/Computers/Programming/Languages/Perl/Win32/PPM_Repositories/>,
+L<http://cpan.uwinnipeg.ca/htdocs/faqs/ppm.html>,
+L<http://theoryx5.uwinnipeg.ca/ppms/>.
+
+=head2 Prerequisites
+
+This is a (hopefully) complete list of 3rd-party perl modules used in this framework.
+
+B<Test dependencies:>
+
+=over
+
+=item * Module::Build
+
+=item * Test::More
+
+=item * Test::Pod
+
+=item * Test::Pod::Coverage
+
+=back
+
+B<General dependencies:>
+
+=over
+
+=item * Clone
+
+=item * Cwd
+
+=item * CGI
+
+=item * Devel::UseAnyFunc
+
+=item * MIME::Base64
+
+=item * Storable
+
+=item * Time::HiRes
+
+=item * Time::Zone
+
+=back
+
+B<Apache/Apache2 dependencies (when using mod_perl -- should be shipped with mod_perl(2)):>
+
+Apache/mod_perl:
+
+=over
+
+=item * Apache::Constants
+
+=back
+
+Apache2/mod_perl2:
+
+=over
+
+=item * Apache2::Const
+
+=item * Apache2::Cookie
+
+=item * Apache2::RequestIO
+
+=item * Apache2::RequestRec
+
+=item * Apache2::RequestUtil
+
+=back
+
+B<Dependencies when using the session management:>
+
+=over
+
+=item * Session
+
+=back
+
+B<Dependencies when using the database connection management (which most plugins
+use):>
+
+=over
+
+=item * DBI
+
+=back
+
+B<Dependencies when running in debug mode:>
+
+=over
+
+=item * Data::Dump
+
+=back
+
+B<Dependencies when sending emails:>
+
+=over
+
+=item * Digest::HMAC_MD5
+
+=item * Mail::Sender
+
+=back
+
+B<Dependencies of some plugins:>
+
+=over
+
+=item * Date::Calc
+
+=item * Digest::SHA
+
+=item * HTTP::BrowserDetect
+
+=item * Image::Magick
+
+=item * Text::Diff
+
+=item * Time::Local
+
+=back
+
+=head2 Local Module installation (non-root)
+
+Basically the same as above, with some differences:
+
+	tar -xvzf Konstrukt-X.Y.tar.gz
+	cd Konstrukt-X.Y
+	perl Build.PL --install_base $HOME/perl
+	./Build
+	./Build test
+	./Build install
+
+Using CPAN for local installation: You might want to take a look at
+L<http://sial.org/howto/perl/life-with-cpan/non-root/>
+
+=head1 CONFIGURATION
+
+=head2 Apache configuration
+
+Basically the configuration inside an apache vhost would look like this:
+
+	#Do not allow access to *.template, *.form and konstrukt.setting files
+	<FilesMatch "(\.template|\.form|konstrukt\.settings)$">
+		Deny from All
+	</FilesMatch>
+	
+	#Preload script. Will load all modules on server startup.
+	#An example is provided in the scripts/ directory of the distribution package.
+	#The modules to preload may vary with the plugins you want to use.
+	#You can also just comment this line out, which will lead in a bit more
+	#memory usage of your apache.
+	PerlRequire /path/to/your/website/KonstruktStartup.pl
+	
+	#Every .html-file should be handled by the Konstrukt framework.
+	#You may also define other file types as well.
+	<FilesMatch "\.html$">
+		SetHandler perl-script
+		PerlHandler Konstrukt::Handler::Apache
+	</FilesMatch>
+
+=head2 Apache2 configuration
+
+This is similar, but a bit different to the apache configuration and will look
+like this:
+	
+	#Do not allow access to *.template, *.form and konstrukt.setting files
+	<FilesMatch "(\.template|\.form|konstrukt\.settings)$">
+		Deny from All
+	</FilesMatch>
+	
+	#Preload script. Description see above at Apache configuration.
+	#WARNING: There seems to be a bug in mod_perl2 when modules are preloaded:
+	#Many Konstrukt plugins store their default DB table definitions and
+	#templates in a __DATA__ section at the end of the file.
+	#When the plugins are preloaded, the pointer to this __DATA__ section will
+	#be wrong and thus it cannot be read correctly resulting in an invalid
+	#autoinstallation for these plugins. So you should not preload the plugins
+	#when running mod_perl2. Preloading of every module without a __DATA__
+	#section at the end will be safe though.
+	#PerlRequire /path/to/your/website/KonstruktStartup.pl
+	
+	#Load handler module
+	PerlModule Konstrukt::Handler::Apache
+	
+	#Every .html-file should be handled by the Konstrukt framework.
+	<FilesMatch "\.html$">
+		SetHandler modperl
+		PerlResponseHandler Konstrukt::Handler::Apache
+	</FilesMatch>
+
+Note that you might want to limit the processing of the files only to the files
+inside your document root. So you might want to put these directives just inside
+your
+
+	<Directory "/path/to/your/docroot"> 
+
+directive.
+
+The apache module mod_apreq2.so might be needed. So you need a line
+
+	LoadModule apreq_module /usr/lib/apache2/modules/mod_apreq2.so
+	
+in your config. In Debian, you would just enable the mod like this:
+
+	a2enmod apreq
+
+=head2 Apache .htaccess configuration
+
+You can put all of these commands in an .htaccess file, but you need
+
+	AllowOverride Limit FileInfo
+
+In your vhost. You should also load the preload script directly in the vhost-
+configuration and not not in an .htaccess (especially, when you specify
+additional library-paths here):
+
+	PerlRequire /path/to/your/website/KonstruktStartup.pl
+	
+The rest of the configuration can then be done in the .htaccess.
+	
+=head2 Other web servers/CGI
+
+As this is currently not really tested (but should work easily) the documentation
+has yet to be written.
+
+=head2 Troubleshooting
+
+If the web server fails to restart, the most common reason is that there is a
+perl module missing.
+
+Apache will bail out something like this:
+
+	[error] Can't locate Apache2/Cookie.pm in @INC [..]
+	
+This means that the perl module Apache2::Cookie is missing. You have to install
+it using CPAN or maybe as a package of your operating system.
+	
+=head2 Web site specific configuration
+
+All the configuration is done through an "konstrukt.settings"-file in the document
+root of each website.
+
+Some modules/plugins need a backend, where they store their data. These backends
+have to be initialized before the first use of the website. There is an
+L<auto-installation mechanism|/Auto-Installation>, which is turned off by default
+for performance reasons.
+You may turn it on before the first use, try out all pages/plugins and turn it
+off again.
+
+For each plugin you want to use, you may have to define some settings (although
+the defaults will do in most cases). See L<below|/PLUGIN INSTALLATION AND CONFIGURATION>.
+
+Additionally there are some plugin-independent settings which are also explained
+in the appropriate modules:
+
+=over
+
+=item * L<Konstrukt::Cache>
+
+=item * L<Konstrukt::DBI>
+
+=item * L<Konstrukt::Parser>
+
+=item * L<Konstrukt::Session>
+
+=back
+
+The served files can be processed by different handlers, whose configuration is
+documented in the appropriate modules:
+
+=over
+
+=item * L<Konstrukt::Handler::Apache>
+
+=item * L<Konstrukt::Handler::CGI>
+
+=item * L<Konstrukt::Handler::File>
+
+=back
+
+=head1 PLUGIN INSTALLATION AND CONFIGURATION
+
+=head2 Configuration
+
+There are a lot of plugins that are already bundled with this package. So you
+don't have to install the modules separately.
+
+But for some plugins you have to specify some settings for them to work.
+These will be explained in the documentation (CONFIGURATION section) for each
+plugin. Basically you have to define a database and maybe the template path.
+
+=head2 Auto-Installation
+
+Additionally many plugins need some database tables and templates to work
+correctly. Each plugin has the definitions for those appended at itself.
+So when using any plugin for the first time, you may want to define:
+
+	autoinstall 1
+
+in your konstrukt.settings and load the page containing the plugin.
+Then the plugins will create the database tables and templates themselves.
+
+Note that your web server needs write-access for your document root. At least as
+long as the C<autoinstall> option is enabled.
+
+For performance reasons you should turn it off after everything has been
+installed.
+
+Defaults to 0.
+
+=head2 Installation of custom plugins
+
+You may define a path which will be added to the perl library search path
+in your konstrukt.settings:
+
+	lib  /home/someuser/perl/lib;/some/other/perl/lib
+
+There you may put additional plugins that will only be accessible for this
+website.
+
+You have to use absolute paths - not relative to your document root.
+Multiple paths may be separated by semicolons.
+
+Defaults to "undefined".
+
+=head2 Mailserver Configuration
+
+If your plugins send out emails (usermanagement does, the logging facilities\
+eventually do, ...), you may have to adjust your email settings.
+
+As the L<Konstrukt::Lib> core module is used to send emails, you will find 
+a L<description of the configuration|Konstrukt::Lib/CONFIGURATION> there.
+
+=head1 AUTHOR 
+
+Copyright 2006 Thomas Wittek (mail at gedankenkonstrukt dot de). All rights reserved. 
+
+This document is free software.
+It is distributed under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+Next: L<Konstrukt::Doc::Basics>
+
+Previous: L<Konstrukt::Doc::About>
+
+Parent: L<Konstrukt::Doc>
+
+=cut

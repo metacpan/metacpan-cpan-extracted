@@ -1,0 +1,54 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+# PODNAME: kioku
+
+use KiokuDB;
+use Try::Tiny;
+
+unless ( try_run() ) {
+    if ( $INC{"KiokuDB/Cmd.pm"} ) {
+        print "KiokuDB::Cmd is not up to date ($KiokuDB::REQUIRED_CMD_VERSION is required, $KiokuDB::Cmd::VERSION installed)\n";
+    } else {
+        print "KiokuDB::Cmd is not installed (it's now shipped in a separate distribution).\n";
+    }
+}
+
+print "\nPlease install an up to date KiokuDB::Cmd from CPAN\n";
+exit 1;
+
+
+sub try_run {
+    return unless try { require KiokuDB::Cmd; 1 };
+    return unless KiokuDB::Cmd->is_up_to_date;
+
+    KiokuDB::Cmd->run;
+    exit;
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+kioku
+
+=head1 VERSION
+
+version 0.57
+
+=head1 AUTHOR
+
+Yuval Kogman <nothingmuch@woobling.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Yuval Kogman, Infinity Interactive.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

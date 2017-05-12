@@ -1,0 +1,36 @@
+---
+abstract: 'Learn programming with a robot that understands few simple commands.'
+author:
+  - 'E. Choroba <choroba@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::Exception: '0'
+  Test::Spec: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Karel
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Clone: '0'
+  Cwd: '0'
+  Exporter: '0'
+  List::Util: '1.33'
+  Marpa::R2: '2.084'
+  Module::Load: '0'
+  Moo: '0'
+  Syntax::Construct: '0'
+  constant: '0'
+  namespace::clean: '0'
+  perl: '5.01'
+version: '0.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

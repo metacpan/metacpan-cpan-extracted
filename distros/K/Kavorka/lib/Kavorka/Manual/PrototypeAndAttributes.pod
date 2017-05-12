@@ -1,0 +1,60 @@
+=pod
+
+=encoding utf-8
+
+=for stopwords invocant invocants lexicals unintuitive yada globals
+
+=head1 NAME
+
+Kavorka::Manual::PrototypeAndAttributes - the more rarely used features of Perl subroutines
+
+=head1 DESCRIPTION
+
+=head2 The Prototype
+
+Like with the L<sub|perlsub> keyword, a prototype may be provided for
+functions. Method dispatch ignores this, so it's only likely to be
+useful for C<fun>, and even then, rarely.
+
+Like L<Function::Parameters>, Kavorka uses C<< :(...) >> to indicate
+a prototype. This avoids ambiguity between signatures, prototypes and
+attributes.
+
+For compatibility with Perl 5.20, the special attribute
+C<< :prototype(...) >> is supported as an alternative mechanism for
+expressing prototypes.
+
+=head2 The Attributes
+
+Attributes are parsed as per L<perlsub/Subroutine Attributes>.
+
+For anonymous functions, some attributes (e.g. C<:lvalue>) may be
+applied too late to take effect. Attributes should mostly work for
+named functions though.
+
+=head1 BUGS
+
+Please report any bugs to
+L<http://rt.cpan.org/Dist/Display.html?Queue=Kavorka>.
+
+=head1 SEE ALSO
+
+L<Kavorka::Manual>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2013-2014, 2017 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

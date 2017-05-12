@@ -1,0 +1,21 @@
+---
+version: 0.04
+date: Sun Mar 20 02:34:42 PST 2005
+changes:
+- Improved testing
+- Ingy hub fixes
+---
+version: 0.03
+date: Sun Feb 13 20:52:00 PST 2005
+changes:
+- Insure error messages from FetchRSS make their way through Technorati. No
+  really, this time.
+---
+version: 0.02
+date: Sun Jan 30 23:08:50 PST 2005
+changes:
+- Insure error messages from FetchRSS make their way through Technorati
+---
+version: 0.01
+date:   Tue Jan 18 14:04:54 PST 2005
+changes: - Initial release

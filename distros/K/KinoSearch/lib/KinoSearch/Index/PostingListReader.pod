@@ -1,0 +1,69 @@
+
+# Auto-generated file -- DO NOT EDIT!!!!!
+
+=head1 NAME
+
+KinoSearch::Index::PostingListReader - Read postings data.
+
+=head1 DEPRECATED
+
+The KinoSearch code base has been assimilated by the Apache L<Lucy> project.
+The "KinoSearch" namespace has been deprecated, but development continues
+under our new name at our new home: L<http://lucy.apache.org/>
+
+=head1 SYNOPSIS
+
+    my $posting_list_reader 
+        = $seg_reader->obtain("KinoSearch::Index::PostingListReader");
+    my $posting_list = $posting_list_reader->posting_list(
+        field => 'title', 
+        term  => 'foo',
+    );
+
+
+
+=head1 DESCRIPTION
+
+PostingListReaders produce L<PostingList|KinoSearch::Index::PostingList>
+objects which convey document matching information.
+
+
+
+=head1 ABSTRACT METHODS
+
+=head2 posting_list( I<[labeled params]> )
+
+Returns a PostingList, or undef if either C<< field >> is undef or
+C<< field >> is not present in any documents.
+
+=over
+
+=item *
+
+B<field> - A field name.
+
+=item *
+
+B<term> - If supplied, the PostingList will be pre-located to this
+term using seek().
+
+=back
+
+
+
+
+
+=head1 INHERITANCE
+
+KinoSearch::Index::PostingListReader isa L<KinoSearch::Index::DataReader> isa L<KinoSearch::Object::Obj>.
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005-2011 Marvin Humphrey
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
+

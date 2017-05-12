@@ -1,0 +1,24 @@
+Kwiki-TableOfContents-Print
+
+A addon to the Kwiki-TableOfContents module that allows you to print an entire
+section. When the print function (provided by a javascript function) is
+executed then a new window opens which is a concationation of the current page
+followed by all pages below it. Pages are included in a depth-first order.
+The print dialog will be already activated so all the user has to do is press
+the print button.
+
+If you are on the home page it will print the entire site (based on the TOC
+so pages not in the TOC will not be printed) with the home page prepended.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    kwiki -install Kwiki::TableOfContents::Print
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 CorData
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. See http://www.perl.com/perl/misc/Artistic.html

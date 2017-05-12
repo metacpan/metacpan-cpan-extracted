@@ -1,0 +1,147 @@
+
+# Auto-generated file -- DO NOT EDIT!!!!!
+
+=head1 NAME
+
+KinoSearch::Highlight::Highlighter - Create and highlight excerpts.
+
+=head1 DEPRECATED
+
+The KinoSearch code base has been assimilated by the Apache L<Lucy> project.
+The "KinoSearch" namespace has been deprecated, but development continues
+under our new name at our new home: L<http://lucy.apache.org/>
+
+=head1 SYNOPSIS
+
+    my $highlighter = KinoSearch::Highlight::Highlighter->new(
+        searcher => $searcher,
+        query    => $query,
+        field    => 'body'
+    );
+    my $hits = $searcher->hits( query => $query );
+    while ( my $hit = $hits->next ) {
+        my $excerpt = $highlighter->create_excerpt($hit);
+        ...
+    }
+
+
+
+=head1 DESCRIPTION
+
+The Highlighter can be used to select relevant snippets from a document,
+and to surround search terms with highlighting tags.  It handles both stems
+and phrases correctly and efficiently, using special-purpose data generated
+at index-time.
+
+=head1 CONSTRUCTORS
+
+=head2 new( I<[labeled params]> )
+
+    my $highlighter = KinoSearch::Highlight::Highlighter->new(
+        searcher       => $searcher,    # required
+        query          => $query,       # required
+        field          => 'content',    # required
+        excerpt_length => 150,          # default: 200
+    );
+
+=over
+
+=item *
+
+B<searcher> - An object which inherits from 
+L<Searcher|KinoSearch::Search::Searcher>, such as an
+L<IndexSearcher|KinoSearch::Search::IndexSearcher>.
+
+=item *
+
+B<query> - Query object or a query string.
+
+=item *
+
+B<field> - The name of the field from which to draw the excerpt.  The
+field must marked as be C<highlightable> (see
+L<FieldType|KinoSearch::Plan::FieldType>).
+
+=item *
+
+B<excerpt_length> - Maximum length of the excerpt, in characters.
+
+=back
+
+
+
+
+
+=head1 METHODS
+
+=head2 create_excerpt(hit_doc)
+
+Take a HitDoc object and return a highlighted excerpt as a string if
+the HitDoc has a value for the specified C<< field >>.
+
+=head2 highlight(text)
+
+Highlight a small section of text.  By default, prepends pre-tag and
+appends post-tag.  This method is called internally by create_excerpt()
+when assembling an excerpt.
+
+=head2 encode(text)
+
+Encode text with HTML entities. This method is called internally by
+create_excerpt() for each text fragment when assembling an excerpt.  A
+subclass can override this if the text should be encoded differently or
+not at all.
+
+=head2 set_pre_tag(pre_tag)
+
+Setter.  The default value is "<strong>".
+
+=head2 get_pre_tag()
+
+Accessor.
+
+=head2 set_post_tag(post_tag)
+
+Setter.  The default value is "</strong>".
+
+=head2 get_post_tag()
+
+Accessor.
+
+=head2 get_searcher()
+
+Accessor.
+
+=head2 get_query()
+
+Accessor.
+
+=head2 get_compiler()
+
+Accessor for the KinoSearch::Search::Compiler object derived from
+C<< query >> and C<< searcher >>.
+
+=head2 get_excerpt_length()
+
+Accessor.
+
+=head2 get_field()
+
+Accessor.
+
+
+
+=head1 INHERITANCE
+
+KinoSearch::Highlight::Highlighter isa L<KinoSearch::Object::Obj>.
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005-2011 Marvin Humphrey
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
+

@@ -1,0 +1,42 @@
+---
+abstract: 'Validate parameters in a Kelp Route Handler'
+author:
+  - 'Gurunandan R. Bhat <gbhat@pobox.com>'
+build_requires:
+  HTTP::Request::Common: 0
+  Kelp: 0
+  Kelp::Test: 0
+  Test::More: 0.88
+  strict: 0
+configure_requires:
+  Module::Build::Tiny: 0.019
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.2, Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Kelp-Module-ValidateTiny
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Class::Load: 0
+  Kelp: 0.2191
+  Kelp::Base: 0
+  Module::Build::Tiny: 0
+  Scalar::Util: 0
+  Sub::Install: 0
+  Validate::Tiny: 0
+  parent: 0
+  perl: v5.10.1
+resources:
+  bugtracker: https://github.com/Bhat-Gurunandan/Kelp-Module-ValidateTiny/issues
+  homepage: https://github.com/Bhat-Gurunandan/Kelp-Module-ValidateTiny
+  repository: https://github.com/Bhat-Gurunandan/Kelp-Module-ValidateTiny.git
+version: 0.04

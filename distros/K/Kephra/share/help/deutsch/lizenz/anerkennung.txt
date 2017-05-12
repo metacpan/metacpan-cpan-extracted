@@ -1,0 +1,35 @@
+
+       ------------------
+      | Autoren und Dank |
+       ------------------
+
+Kephra von (C) Herbert Breunung und andere, es gebraucht all die hier aufgelisteten
+    Dinge und ist unter der GPL lizensiert die hier lokal unter
+    help/deutsch/lizens/gpl.txt liegt oder im netz unter
+    www.fsf.org/licenses/gpl.html.
+    Beteiligt an Entwicklung sind/waren: Manuel Renz, Maik Glatki, Wanja Chresta
+    Die Icons (in /config/ico/jenne) sind von Jens Neuwerk (www.stockicons.org)
+    starter-exe unter Windows ist ein Werk von Robin Haberkorn (Shai-Hulud)
+
+Perl (in /pre) von (C) Larry Wall und vielen vielen andere ist unter der GPL 
+     (siehe oben) und der artistic license (help/license/artistic.txt) oder 
+     (www.perl.com/language/misc/Artistic.html) lizensiert
+
+WxPerl (in /pre/wx) von Mattia Barbon ermöglicht Perl die WxWidgets zu steuern
+        und wurde unter der selben Lizens wie Perl veröffentlicht
+
+WxWidgets von Julian Smart, Robert Roebling, Vadim Zeitlin und andere steht 
+          unter der wxWidgets lizens (help/license/wx.txt) die auf der LGPL 
+          basiert (help/license/lgpl.txt oder www.fsf.org/licenses/lgpl.txt)
+          Teile: (c) 1996 Artificial Intelligence Applications Institute
+
+Scintilla (c) Neil Hodgson, Neils eigene Lizens unter (help/license/sci.txt)
+          ist als contrib Teil der WxWidgets der sich wxSTC nennt
+
+ActivePerl (diese Distribution von Perl) von Active State ist lizensiert unter
+            der ActiveState Community License (help/license/asl.txt oder
+            www.activestate.com/Products/ActivePerl/license_agreement.plex)Config::General (in /pre/cpan/config) von (c) 2000-2003 Thomas Linden 
+                 Diese Bibliothek ist freie Software; verbreite oder ändere sie
+                 unter den gleichen Bedingungen wie Perl selbst.
+
+YAML            Brian Ingerson aka Ingy döt Net, gleiche Lizenz wie Perl

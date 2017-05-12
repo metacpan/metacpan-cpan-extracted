@@ -1,0 +1,47 @@
+---
+abstract: 'Log4perl for Kelp applications'
+author:
+  - 'Konstantin Yakunin'
+build_requires:
+  HTTP::Request::Common: '0'
+  Kelp: '0'
+  Kelp::Test: '0'
+  Test::More: '0'
+  Test::Output: '0'
+  Test::Pod: '0'
+  perl: '5.008'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+  perl: '5.008'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.16, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Kelp-Module-Logger-Log4perl
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Kelp::Module::Logger::Log4perl:
+    file: lib/Kelp/Module/Logger/Log4perl.pm
+    version: '0.003'
+requires:
+  Data::Dumper: '0'
+  Kelp: '0'
+  Log::Log4perl: '0'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/yakudzo/Kelp-Module-Logger-Log4perl/issues
+  homepage: https://github.com/yakudzo/Kelp-Module-Logger-Log4perl
+  repository: https://github.com/yakudzo/Kelp-Module-Logger-Log4perl.git
+version: '0.003'
+x_contributors:
+  - 'Konstantin Yakunin <twinhooker@gmail.com>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

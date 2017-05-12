@@ -1,0 +1,196 @@
+$Id: process,v 1.3 2008-02-07 13:37:52 mike Exp $
+
+
+1. Building the ContextObject
+=============================
+
+The ContextObject is the name that v1.0 of the OpenURL standard uses
+for the object that holds all the information about a requested
+resolution.  It contains six so-called entities, each of which
+contains information about something different:
+* Referent -- the resource to be resolved
+* ReferringEntity -- where the reference came from, e.g. an article
+* Requester -- the person or robot requesting the resolution
+* ServiceType -- "full-text", "on-line bookstore", etc.
+* Resolver -- the resolver that the request is being made of.
+* Referrer -- the service the reference came from, e.g. Elsevier
+Note the subtle distinction between a ReferringEntity and a Referrer
+entity!
+
+In practice, the first of these is by far the most important, and
+indeed the only one addressed by OpenURL v0.1.  Apart from the
+ServiceType, it's unlikely that the others will be involved in the
+resolution process at all.
+
+A ContextObject needs to be built from the URL parameters.  This is
+done differently for v0.1 and v1.0 OpenURLs, as their parameters have
+completely different names; but in either case, the same canonical
+ContextObject is built.  In the case of OpenURL 1.0, this may involve
+up to seven additional network fetches to get a by-reference
+ContextObject whose URI is given, and then to fetch the six entities
+it holds, as they might also be specified by URI.  <sigh>
+
+In theory, other link-resolution protocols could also easily be
+handled simply by arranging for their parameters, too, to be built
+into a ContextObject.
+
+
+2. Normalising the ContextObject
+================================
+
+2.1. Character Encoding
+-----------------------
+
+Different OpenURL sources may generate OpenURLs that use different
+character encodings for their data.  (The v1.0 standard uses the
+phrase "character encoding" to mean the combination of a character
+repertoire with a particular encoding, so that "Unicode" is not a
+character encoding, but UTF-8 is.)  v1.0 OpenURLs are supposed to
+include a parameter indicating the character encoding they use, e.g.
+	ctx_enc=info:ofi/enc:UTF-8
+When a ContextObject is built that uses a different character
+encoding, it is transliterated into our canonical character encoding,
+UTF-8.
+
+Version 0.1 of the standard does not directly address the issue of
+character encodings, beyond observing that RFC 2396 syntax rules for
+URIs must be observed so that special characters have to be escaped.
+So it is in general impossible to know from a v0.1 OpenURL what
+character encoding is in use.
+
+	Aside: it appears from RFC 2396 that this may mean OpenURL
+	v0.1 always uses US-ASCII: "Internet protocols that transmit
+	octet sequences intended to represent character sequences are
+	expected to provide some way of identifying the charset used,
+	if there might be more than one", interpreted in the light of
+	the v0.1 standard's silence on the matter, seems to mean that
+	there is only one character encoding used, and that must be
+	the URI default of US-ASCII.
+
+To cater for v0.1 OpenURLs from sources that (maybe in contravention
+of the standard) supply data in non-ASCII character sets, and also to
+work around buggy sources of v1.0 OpenURLs, our data model includes a
+representation of OpenURL sources which indicates the character
+encoding used by the source.  We assume this is in use when no other
+indication is given.
+
+
+2.2. Private identifier
+-----------------------
+
+Against all common-sense OpenURLs may contain a Private Identifier
+(PID) rather than the nice, open metadata we always imagine.  This
+gaping blot on the standard is somewhat mitigated by the fact that
+OpenURLs using a PID have to specify the vocabulary it's drawn from.
+This is called a Source Identifier (SID).
+
+This is v0.1 terminology: as usual, all the vocabulary is totally
+changed in v1.0, but the concept is the same.  A PID is called Private
+Data, and a SID is called an Identifier Descriptor of the Referrer
+(section 5.2.4)
+
+The resolver supports a number (probably zero) of private identifiers.
+When it encounters one, it resolves it by a means not specified in the
+standard, using an out-of-band agreement with the referrer.  This
+results in the ContextObject being populated with normal metadata.
+
+It is possible that some sources will generate non-compliant OpenURLs
+that include a PID but no corresponding SID.  To cater for such
+sources, our data model's notion of an OpenURL source includes an
+indication of the default SID used by that source.
+
+
+2.3. DOI and other Public Identifiers
+-------------------------------------
+
+If an OpenURL provides a DOI or other public identifier such as an
+ISBN instead of metadata, then that DOI is resolved using an external
+resolution service, and the ContextObject populated with the resulting
+metadata.  DOIs can be resolved at http://dx.doi.org/
+
+
+3. Finding the User's Identity
+==============================
+
+In order to generate appropriate authentication tokens for the
+resolution services, the resolver needs to know who the user is.  This
+information can come from various sources:
+* The Requester Entity of the ContextObject.
+* An HTTP cookie
+* IP address that the request came from
+* (what else?)
+Once we have a notion of the user's identity, we will in general need
+more information, e.g. mapping an ID into a name.  This lookup can
+also be done in  various ways:
+* Local register (e.g. part of the database)
+* LDAP to an institution's existing user register
+* (other ways of connection to existing user registers)
+
+
+4. Locating Services
+====================
+
+Once the metadata format of the Referent is known, it's possible to
+find the set of service-types that can resolve references of that
+metadata format.  This set is then filtered by service-type rules; the
+set of services of each remaining type is assembled; and these
+services are in turn filtered by rules.
+
+Both service-type rules and service rules work in the same way: if a
+nominated data element in the OpenURL has a specified value, then --
+depending on a boolean flag in the rule -- either one or more service
+types or services are nominated in place of the otherwise available
+set, or the specified service types or services are removed from the
+available set.
+
+For each available service, we need to establish what credentials the
+user has to access the service.  This is a recursive process that
+makes its way up the identity tree as follows:
+
+	sub find_credentials(identity, service) {
+		c = credentials(identity, service);
+		if (c) return c;
+		if (!identity->parent) return null;
+		return find_credentials(identity->parent, service);
+	}
+
+That is, of all the identities that the user is member of, the most
+specific one that has credentials for a given service is used to
+access that service.
+
+
+5. Locating Resources
+=====================
+
+For each available service, code is invoked that is dependent on the
+service type.  (In other words, the full definition of a service type
+can not be found in the database alone, but also in the resolver
+code.)  For example:
+* For web seaches, build a query URL.
+* For on-line book-stores, build a URL.
+* For generating references, assemble a string.
+Each service-type is implemented by a plugin module whose name is
+stated in the "plugin" field, or in the "tag" if that is empty.
+
+By far the most complex case is serial articles, which we describe in
+more detail.
+
+The approach is first to look up the serial in the serials database: we
+use the ISSN if we have it, and otherwise fall back on some kind of
+string matching using the serial name.  Exactly how we do this is an
+open research question.  For example, JVP = J. Vert. Paleont. =
+Journal of Vertebrate Paleontology = (British misspelling) Journal of
+Vertebrate Palaeontology.  And JVP is also the Journal of Veterinary
+Pharmacology!
+
+Once we have established which serial contains the Referent, we
+determine which services provide the text of that serial.  Assuming
+that one or more of these services is available to the user
+(i.e. either does not require authentication, or if it does then we
+have credentials), we assemble access URLs and make the necessary
+authentication manoeuvres.  It is not yet clear what kind of
+authentication tokens the resolver will need to be able to present,
+and in what way, so the representation of the authentication recipe
+will need generalasing as support for new sources is added.
+
+

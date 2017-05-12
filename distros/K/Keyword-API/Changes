@@ -1,0 +1,10 @@
+Revision history for Perl extension Keyword::API.
+
+0.0004 Wed Apr 20 16:43:31 BST 2011
+    - removed confusing use of word 'token'
+    - stop calling install_keyword as a class method
+    - updated docs to reflect changes.
+    - tweaked the XS to build on 5.12.2
+
+0.0003  Sun 17 Apr 2011 14:23:07 BST
+    - released to cpan.

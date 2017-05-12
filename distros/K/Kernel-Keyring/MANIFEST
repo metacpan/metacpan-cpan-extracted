@@ -1,0 +1,14 @@
+INLINE.h
+INSTALL
+Keyring.xs
+lib/Kernel/Keyring.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/00_load.t
+t/01_roundtrip.t
+typemap
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

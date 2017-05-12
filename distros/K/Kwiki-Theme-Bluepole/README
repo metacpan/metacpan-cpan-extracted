@@ -1,0 +1,31 @@
+NAME
+       Kwiki::Theme::Bluepole - A nice, blue Kwiki Theme
+
+SYNOPSIS
+        $ cd /path/to/kwiki
+        $ kwiki -add Kwiki::Theme::Bluepole
+
+DESCRIPTION
+       This theme was taken from a Kwiki theme at http://maypole.perl.org and
+       altered slightly so you could replace the text in the header.
+
+       Configuration
+
+       The default config variables that you can override in config.yaml are:
+
+        header_left: theme/bluepole/images/header_left.png
+        header_top: theme/bluepole/images/header_top.png
+        header_text: Bluepole
+
+AUTHOR
+       Jon Åslund <aslund.org> - just modified and uploaded it
+
+       gabbana - who is the greatest - created it
+
+COPYRIGHT
+       Copyright (c) 2005. Jon Åslund. All rights reserved.
+
+       This program is free software; you can redistribute it and/or modify it
+       under the same terms as Perl itself.
+
+       See http://www.perl.com/perl/misc/Artistic.html

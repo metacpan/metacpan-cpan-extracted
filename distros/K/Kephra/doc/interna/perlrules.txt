@@ -1,0 +1,92 @@
+warum ich kein python mag?
+--------------------------
+Ehrlich gesagt hab ich mich von python bedroht gefühlt, so stark, dass ich unbedingt was
+machen musste um python ordentlich schlecht zu machen. Jetzt hinterher merk ich deutlicher,
+dass meine Angst, mit Perl nicht mehr in zu sein, kleingeistig war und dass mein Perl nie
+in der Versenkung verschwinden wird, eher glaub ich, dass perl6 die Python Entwickler hart
+fordern wird. Aber am Anfang machte es mich schon ärgerlich, dass Python in aller Munde
+und Perl nur noch von Historikern und Journalisten erwähnt wurde. Dass viele die ich bewundere
+Python als beste Scriptsprache schätzen war noch in Ordung aber das ganze verlor sein
+natürliches Gleichgewicht zumal die meisten Argumente nicht die cleversten sind. Gerade
+dass mir die ganze Diskussion um die beste Scriptsprache billig vorkam lockte meinen Senf
+dazu hervor.
+
+Computersprachen
+Generell bei Programmiersprachen gibt es grob 2 Kontraste. Einer liegt zwischen Mensch und
+Maschiene. Also vereinfacht zwischen langsamen und komplexen Programmiersprachen(perl, python,
+ruby oder haskell) die dem menschlichen denken nah sein sollen und den schnellen und (für
+Maschienen) einfachen Sprachen (assembler). C und C++ liegen irgendwo in der Mitte.  Weil
+Computer immer schneller und breiter werden, waren Sprachen wie Ruby und Perl erst in den
+letzten Jahren praxistauglich. Der andere Kontrast liegt zwischen schlanken und umfangreichen
+Sprachen. Also die Frage was gehört zur Sprache und was gehört in die Bibliotheken und
+Erweiterungen. Weil Programme immer mehr werden und immer mehr Aufgaben übernehmen wird es
+auch hier immer sinnvoller Standartbibliotheken zu verwenden und Sprachen zu erweitern, damit
+es nicht jeder Nutzer für sich machen muss. Grade dafür sind wieder die maschienennahen
+Sprachen sehr gut. Grad die Standartbibliotheken (zB Wx) sollten so wie Perl auch in C
+geschrieben sein. Damit sind Perl-Programme schneller als mit in Perl geschrieben
+Bibliotheken. Doch warum kümmere ich mich nur um Perl und Python? Weil diese beiden Sprachen
+in der Praxiswelt grad ganz vorne stehen. Klar gibt es noch Visual Basic von Microsoft, das
+natürlich verbreitet wie Hölle ist, reiche Bibliotheken hat und auch so schön langsam ist das
+es sogar von Perl überhohlt wird. Aber das beachte ich nicht weil es nicht frei ist und auch
+nicht innovativ ist sondern ein MS UrBasic+OOP+COM. Auch TCL vernachlässige ich weil es Perl
+seit Jahren hinterherhechelt ohne dessen Mut zu besitzen. Lua ist eher das was TCL einmal sein
+wollte: eine kleine schnelle Erweiterungssprache und auch Ruby ist noch zu jung um wirklich hier
+mithalten zu können. Haskell, zuletzt, ist wirklich innovativ aber noch viel zu langsam und
+nicht tauglich für echte Programme. PHP wird gerne als beliebteste Scriptsprache genannt, aber
+PHP ist wie XLST Versuch die Datenstruktur über das Programm zu stellen. Für Leute die nicht
+einsehen wollen das man zum programmieren eine Programmiersprache brauch. PHP ist an HTML und
+XLST an XML gefesselt, aber ich wollte ja von freien Sprachen schreiben, es bleiben also die 2:
+
+Perl und Python technisch.
+Perl ist etwas älter, ausgereifter, hat mehr verwendbare Erweiterungen schreckt aber Anfänger
+mit vielen sehr sonderbaren Konstrukten ab die zum Teil noch aus der Saurierzeit der alten
+Unixwelt stammen und hat auch einige Entwicklungen(Unicode) etwas verschlafen. Python ist
+aufgeräumter und äusserlich konsequenter und versucht grad auf den letzten Feldern wie der
+Regex, nested scopes usw, wo Perl noch vorraus ist, dies aufzuhohlen. Python hat aber selber
+schon viele Eigenheiten die erst mal gelernt sein wollen (wie zb. open, open2, open3, open4;
+""" usw). Aber zu sehr Einzelheiten gegeneinander aufzuwiegen macht nicht so viel sinn weil
+beide Sprachen noch wachsen, fehlentwicklungen zurückgenommen werden und voneinander gelernt
+wird. Es gibt grosse Überschneidungen in vielen Dingen die sich praktisch bewährt haben.
+
+Wo liegen dann die grossen Unterschiede?
+Perl und Python wurden mit recht verschiedenen Denkansetzen geschaffen. Der grösste Unterschied
+zwischen Perl und Python liegt darin, dass Individualität und Genialität von Perl mehr zugelassen
+und gefördert wird als von Python. Python wurde geschaffen um leichter seinen Job zu machen und
+in der Freizeit genial zu sein. Perl lässt dem Entwickler mehr Freiheit zu entscheiden was gut
+ist. Dieses Vertrauen in meinen Stil dass mir Perl entgegenbringt hilft mir mich wohl zu fühlen.
+Grad emotionale Sachen werden von technisch orientierten Menschen als weniger wichtig abgetan,
+aber Grundvertrauen dass alles gut ist und dass jeder selber weiss was für ihn gut ist, ist sehr sehr
+wichtig und mehr als gesund: heilend! Ich sage aber nicht dass Python böse ist und mich schikanieren
+will. Python stammt von Schulsprachen wie ABC und Modula(Pascal). Auch wenn ich finde dass die
+Schöpfer von ABC und Pascal in der guten Absicht bessere Programmierer zu erziehen die Menschen
+etwas von ihren natürlichen Antrieben abbrachten, wollten sie den Schülern wertvolle Ideen mitgeben
+die ihnen helfen sollten. Es ist aber grundverkehrt die Nutzer zu diesen Prinzipien zu zwingen.
+Jeder Pädagoge weiss dass Zuneigung, Offenheit und Förderung der natürlichen Talente viel viel mehr
+bringt als zusammenhangslose Ratschläge und Zwänge, die nur Trotz oder Selbstzweifel fördern. Und
+der ausgelernte Programmierer mit eigener Persönlichkeit brauch nun überhaupt gar keinen der einem
+was vorschreibt, sondern ein Werkzeug, dass genau das macht was er möchte. Python meint auch, dass
+es wichtiger ist den Einstieg leicht zu machen als ganze Potentiale einzelner komplexer Befehle
+al gusto verknüpfen zu können. Damit wird Python aber zum schlechteren Werkzeug für die Erfahrenen
+und zu dem was Python von Anfang sein wollte: eine Lern- und Ausbildungssprache. Darin wird sie Perl
+immer überlegen sein obgleich man mit Auslassen der anspruchsvollen Konstrukte auch Perl leicht
+lernen kann wenn man keine Lust auf Schikane hat. Python's Papa Guido van Rossum sagt oft sinngemäss:
+"es ist besser sich anzupassen weil es die Zusammenarbeit erleichtert und man auch so nach Monaten
+leichter seine eigene Programme versteht", was ja grad bei komplexen Sprachen wie Perl oder Python
+wichtiger ist als in einfacheren wie C. Diese rückgratlose Jobmentalität widert mich an. Wenn ich
+FREUDE und BEGEISTERUNG beim verstehen von Algorithmen und deren Implementierung empfinde, kann ich
+mir sehr gut alles merken. Demenz ist Anzeichen unbewusster Verdrängung, fragen sie hierzu ihren
+Heilpraktiker. Und wenn ich Menschen mag, versteh ich auch leichter ihre Art zu denken und zu
+programmieren, auch wenn ich selber es anders machen würde. Die Krücke der Vereinheitlichung nuschelt
+immer zu mir, dass Leute gar nicht vorhaben einander zu mögen. Man erinnere sich: Liebe ist die Freude
+am Andersein des Gegenübers. Perls Schöpfer Larry Wall ist gottesgläubig und weiss das. Er meint, dass
+es für das Ganze besser ist wenn jeder er selbst bleibt und Freude daran hat. Und wenn es mir Spass
+macht möchte ich frei sein den verworrensten Quellcode schreiben der jeden obfuscation-contest gewinnt.
+Python würde mir diese Freiheit nie lassen. Das Ideal der Sauberkeit ist dort wichtiger als Freiheit,
+erinnert mich etwas an 33, auch wenn es unfair ist. Es gibt kein höheres Ideal dass mich zu etwas
+verpflichtet, dass man nicht möchte. Auch nicht in der Computerwissenschaft. Es ist sinnlos etwas zum
+Wohle von etwas anderem zu verletzen. Leider merkt das nicht jeder. Deswegen werden mit Python die
+zerbrechlichen kaum beachteten Seelen zum Wohle der Computerwissenschaft verbogen. Dabei sollen grad
+Scriptsprachen dem Menschen dienen. Grad hier sind soziale und spirituelle Dinge viel wichtiger als in
+früheren Computersprachen wo es noch mehr darum ging den Computer erstmal zum Funktionieren zu bekommen.
+Es ist faszinierend etwas Funktionierendes aufzubauen, aber Menschen wollen mehr als nur funktionieren.
+Warum gibt es Perl Poetry aber kaum mir bekannte Python Poetry?

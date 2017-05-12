@@ -1,0 +1,46 @@
+---
+# http://module-build.sourceforge.net/META-spec.html
+name:         Kephra
+version:      0.4.3.34
+abstract:     crossplatform GUI-Texteditor along Perl alike Paradigms 
+distribution_type: module
+author:       Herbert Breunung <lichtkind@cpan.org>
+license:      gpl_2
+build_requires:
+  Wx: 0.74
+  Test::More: 0.47
+  Test::Script: 0
+  Test::NoWarnings: 0
+  Test::Exception: 0
+  Test::CheckManifest: 0.9
+  Test::Pod: 1.22
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+generated_by: 'Module::Install'
+no_index:
+  directory:
+    - inc
+    - share
+    - t
+requires:
+  perl: 5.6.0
+  Cwd: 0
+  Encode: 0
+  Encode::Guess: 0
+  File::Find: 0
+  File::Spec::Functions: 0
+  File::UserConfig: 0
+  Config::General: 0
+  YAML::Tiny: 0
+  Wx: 0.74
+  Wx::Perl::ProcessStream: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Kephra
+  homepage: http://kephra.sourceforge.net
+  repository: http://sourceforge.net/scm/?type=svn&group_id=169747
+  license: http://www.gnu.org/licenses/gpl-2.0.txt
+meta-spec:
+  version: 1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+

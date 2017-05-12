@@ -1,0 +1,11 @@
+Revision history for Kelp-Module-Config-ConfigGeneral
+
+0.03  2017-02-08 22:48:53 MSK
+        
+        - Depricated! Moved to Kelp-Module-Config-General
+        
+0.02  2017-02-05 15:49:47 MSK
+        - Update documentation
+        
+0.01  2017-02-04 19:57:25 MSK
+        - Initial release

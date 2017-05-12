@@ -1,0 +1,26 @@
+---
+version: 0.15
+date:    Fri Apr 15 11:29:14 PDT 2005
+changes:
+- eliminate use_class
+---
+version: 0.14
+date:    Tue Jan 11 08:12:05 PST 2005
+changes:
+- Remove load_class calls per Spoon-0.21
+---
+version: 0.13
+date:    Wed Dec 15 15:35:53 PST 2004
+changes:
+- Make compatible with Kwiki-0.34
+- Fix so that toolbar buttons are smart again.
+---
+version: 0.12
+date:    Sat Aug 14 21:59:14 PDT 2004
+changes:
+- autrijus changes
+---
+version: 0.10
+date:    Thu Jun 24 01:19:54 PDT 2004
+changes:
+- Initial release

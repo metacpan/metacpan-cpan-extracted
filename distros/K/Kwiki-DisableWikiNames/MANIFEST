@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Kwiki-DisableWikiNames.t
+lib/Kwiki/DisableWikiNames.pm
+META.yml                                 Module meta-data (added by MakeMaker)

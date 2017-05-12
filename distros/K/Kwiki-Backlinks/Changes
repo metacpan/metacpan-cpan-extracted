@@ -1,0 +1,50 @@
+---
+version: 0.10
+date: Sun Aug 14 13:54:41 PDT 2005
+changes:
+- Shows backines on the edit page too, via rjbs
+---
+version: 0.09
+date: Wed Jun 29 11:53:25 PDT 2005
+changes:
+- Make the database externally queryable
+- Don't add backlinks for wikiwords that have a ! in front
+---
+version: 0.08
+date: Tue Mar 29 09:44:37 PST 2005
+changes:
+- Create directory at the right time to avoid perms problems
+---
+version: 0.07
+date: Mon Mar  7 12:33:39 PST 2005
+changes:
+- Incorporate filename length fixes from Socialtext
+---
+version: 0.06
+date: Sun Feb 27 21:54:14 PST 2005
+changes:
+- Convert to using Kwiki::Test
+---
+version: 0.05
+date: Sat Feb  5 19:13:37 PST 2005
+changes:
+- Account for page edits that remove links and deleted pages
+---
+version: 0.04
+date: Wed Feb  2 03:34:32 PST 2005
+changes:
+- Make a little easier to subclass
+---
+version: 0.03
+date: Sun Jan 30 23:55:46 PST 2005
+changes:
+- Sort backlink pages by reversed modified time
+---
+version: 0.02
+date:    Fri Jan 21 11:53:31 EST 2005
+changes:
+- Correct utf8 destination filenames.
+---
+version: 0.01
+date:   Fri Jan 21 00:55:08 PST 2005
+changes: - Initial release

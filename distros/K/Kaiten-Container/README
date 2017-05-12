@@ -1,0 +1,74 @@
+Kaiten-Container
+
+This module resolve dependency injection conception in easiest way ever.
+You are just create some code first and put it on kaiten in named
+container. Later you take it by name and got yours code result fresh and
+crispy.
+
+No more humongous multi-level dependency configuration, service provider
+and etc.
+
+You got what you put on, no more, no less. 
+Ok, little bit more - Kaiten::Container run |probe| sub every time when you want to take
+something to ensure all working properly.
+And another one - KC try to re-use |handler| return if it requested.
+
+    use Kaiten::Container;
+
+    my $config = {
+         ExampleP => {
+             handler  => sub { return DBI->connect( "dbi:ExampleP:", "", "", { RaiseError => 1 } ) or die $DBI::errstr },
+             probe    => sub { shift->ping() },
+             settings => { reusable => 1 }
+         }
+    };
+
+    my $container = Kaiten::Container->new( init => $config );
+    my $dbh = $container->get_by_name('ExampleP');
+
+All done, now we are have container and may get DB handler on call.
+Simple!
+
+Ah, deep dependencies worked, see documentation.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Kaiten::Container
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Kaiten-Container
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Kaiten-Container
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Kaiten-Container
+
+    Search CPAN
+        http://search.cpan.org/dist/Kaiten-Container/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2011 Meettya
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

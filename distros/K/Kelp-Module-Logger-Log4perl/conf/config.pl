@@ -1,0 +1,15 @@
+{
+    modules => [ 'Logger::Log4perl' ],
+    modules_init => {
+        'Logger::Log4perl' => {
+            category => '',
+            conf     => {
+                'log4perl.rootLogger'                                  => 'DEBUG, CommonLog',
+                'log4perl.appender.CommonLog'                          => 'Log::Log4perl::Appender::Screen',
+                'log4perl.appender.CommonLog.layout'                   => 'Log::Log4perl::Layout::PatternLayout',
+                'log4perl.appender.CommonLog.layout.ConversionPattern' => '%d{yyyy-MM-dd HH:mm:ss} - %p - %m%n',
+                'log4perl.appender.CommonLog.stderr'                   => '0',
+            }
+        }
+    }
+};

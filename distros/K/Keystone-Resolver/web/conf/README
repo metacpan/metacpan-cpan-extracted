@@ -1,0 +1,18 @@
+$Id: README,v 1.3 2007-02-06 09:55:11 mike Exp $
+
+This directory contains configuration fragments for running Keystone
+Resolver under various web servers.  In particular:
+
+apache1.3 -- configuration-file segments for the 1.3.x series of the
+	Apache web server with mod_perl 1.x.  Each file in this
+	directory is named after the host where is is used.  Pick
+	whichever is closest to what you need and tweak it as needed.
+
+apache2.0 -- configuration-file segments for the 2.0.x series of
+	Apache with mod_perl 2.x.  The provided files are tweaked
+	versions of what various customers are using, but WE DO NOT
+	USE THEM OURSELVES so they're provided "as is" for guidance
+	only.
+
+Maybe IIS fragments and similar to follow one day.
+

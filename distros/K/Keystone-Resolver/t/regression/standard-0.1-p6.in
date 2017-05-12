@@ -1,0 +1,12 @@
+# $Id: standard-0.1-p6.in,v 1.1 2007-01-26 12:25:45 mike Exp $
+
+# This example is taken from the OpenURL 0.1 standard.
+# It occurs at the top of page 6.
+#
+# I have replaced the third ampersand from this example with its
+# encoded form, %26, as the accompanying prose in the standard
+# suggests is intended ("As can be seen, the pid value is encoded as a
+# whole.")
+
+sid=EBSCO:MFA&id=pmid:203456&pid=%3Cauthor%3ESmith%2C%20Paul%20%3B%20Klein%2C%20Calvin%3C%2Fauthor%3E%26%3Cyr%3E98%2F1%3C%2Fyr%3E.
+

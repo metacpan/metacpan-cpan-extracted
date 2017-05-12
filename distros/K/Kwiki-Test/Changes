@@ -1,0 +1,5 @@
+---
+version: 0.03
+date: Sun Mar 20 02:43:07 PST 2005
+changes:
+- Improved initializing of plugins to insure config values are seen

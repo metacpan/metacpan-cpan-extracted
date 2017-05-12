@@ -1,0 +1,94 @@
+# $Id: head.d2m,v 1.3 2008-04-25 16:53:53 mike Exp $
+
+# Simple sample resource database for Keystone Resolver.
+# This is largely derived from descriptions in ../doc/data-model
+#
+# This is in data-to-MySQL (d2m) format: see data2mysql.pl
+
+*genre=tag,name
+# "tag" is used for OpenURLs that have no value for rft.genre
+journal,Journal		# from the journal mformat
+book,Book		# from the book mformat
+conference,Conference	# from the journal/book mformats
+article,Article		# from the journal mformat
+preprint,Preprint	# from the journal mformat
+proceeding,Proceeding	# from the journal/book mformats
+bookitem,Book Item	# from the book mformat
+issue,Issue		# from the journal mformat
+unknown,[Unknown]	# from the journal/book mformats
+report,Report		# from the book mformat
+document,Document	# from the book mformat
+
+*mformat=genre_id,name,uri
+4,Journal,info:ofi/fmt:kev:mtx:journal
+2,Book,info:ofi/fmt:kev:mtx:book
+0,Patent,info:ofi/fmt:kev:mtx:patent			# no genres defined
+0,Dissertation,info:ofi/fmt:kev:mtx:dissertation	# no genres defined
+0,Scholarly Service,info:ofi/fmt:kev:mtx:sch_svc	# no genres defined
+0,Dublin Core,info:ofi/fmt:kev:mtx:dc			# no genres defined
+
+*service_type=tag,name,priority
+# These tags MUST NOT CHANGE -- code switches on them
+fulltext,Full Text,10
+websearch,Web Search,60
+bookstore,On-Line Book Store,40
+holdings,Local Holdings,20
+ill,Inter-Library Loan,30
+citation,Citation,50
+abstract,Abstract,15
+authorsearch,Author Search,45
+citeref,Abstract,25
+
+*genre_service_type=genre_id,service_type_id
+#   ###	This is nowhere near complete.  We only deal with articles,
+#	books and proceedings.  By inspection of a single proceeding
+#	ContextObject, http://www.openly.com/1cate/test/myeg.txt, it
+#	seems that proceedings are more like books than articles
+#	(e.g. they have ISBNs), so for now we just treat them as
+#	books.  But we know this is inadequate.
+4,1
+4,2
+4,4
+4,5
+4,6
+4,7
+4,8
+4,9
+2,2
+2,3
+2,4
+2,5
+2,6
+2,8
+2,9
+6,2
+6,3
+6,4
+6,5
+6,6
+6,8
+6,9
+
+*identity=id,name,level,parent_id
+5,TSLAC,consortium,
+4,Azle Public Library,library,5
+3,Someone from Azle,person,4
+2,Index Data,organisation,
+1,Mike Taylor,person,2
+
+*sid=tag,recipe
+### This example is totally made up.  We can do better.
+MikeId,http://z3950.org/resolveMikeId?id=%i
+
+*source=sid_id,name,url,encoding
+### This example is totally made up.  We can do better.
+1,Secret Source,http://ss.z3950.org/,iso-8859-1
+
+*config=name,value
+logfile,/tmp/kr.log
+verbosity,2
+
+*domain=domain,status
+google.com,2
+amazon.co.uk,0
+ldap.caltech.edu,1

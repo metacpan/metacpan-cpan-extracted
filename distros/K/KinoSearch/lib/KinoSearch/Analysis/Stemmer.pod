@@ -1,0 +1,69 @@
+
+# Auto-generated file -- DO NOT EDIT!!!!!
+
+=head1 NAME
+
+KinoSearch::Analysis::Stemmer - Reduce related words to a shared root.
+
+=head1 DEPRECATED
+
+The KinoSearch code base has been assimilated by the Apache L<Lucy> project.
+The "KinoSearch" namespace has been deprecated, but development continues
+under our new name at our new home: L<http://lucy.apache.org/>
+
+=head1 SYNOPSIS
+
+    my $stemmer = KinoSearch::Analysis::Stemmer->new( language => 'es' );
+    
+    my $polyanalyzer = KinoSearch::Analysis::PolyAnalyzer->new(
+        analyzers => [ $case_folder, $tokenizer, $stemmer ],
+    );
+
+This class is a wrapper around L<Lingua::Stem::Snowball>, so it supports the
+same languages.  
+
+
+
+=head1 DESCRIPTION
+
+Stemmer is an L<Analyzer|KinoSearch::Analysis::Analyzer> which reduces
+related words to a root form (using the "Snowball" stemming library).  For
+instance, "horse", "horses", and "horsing" all become "hors" -- so that a
+search for 'horse' will also match documents containing 'horses' and
+'horsing'.
+
+=head1 CONSTRUCTORS
+
+=head2 new( I<[labeled params]> )
+
+    my $stemmer = KinoSearch::Analysis::Stemmer->new( language => 'es' );
+
+=over
+
+=item *
+
+B<language> - A two-letter ISO code identifying a language supported
+by Snowball.
+
+=back
+
+
+
+
+
+
+
+=head1 INHERITANCE
+
+KinoSearch::Analysis::Stemmer isa L<KinoSearch::Analysis::Analyzer> isa L<KinoSearch::Object::Obj>.
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005-2011 Marvin Humphrey
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
+

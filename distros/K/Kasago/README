@@ -1,0 +1,173 @@
+NAME
+    Kasago - A Perl source code indexer
+
+SYNOPSIS
+      my $kasago = Kasago->new({ dbh => $dbh });
+      $kasago->init; # this creates the tables for you
+  
+      # import/update a directory
+      $kasago->import($source, $dir);
+      # delete a directory
+      $kasago->delete($source);
+
+      my @sources = $kasago->sources;
+      my @files   = $kasago->files($source);
+      my @tokens  = $kasago->tokens($source, $file);
+
+      # search for a token
+      foreach my $token ($kasago->search('orange')){
+        print $token->source . "/"
+          . $token->file . "@"
+          . $token->col . ","
+          . $token->row . ": "
+          . $token->line . "\n";
+      }
+
+      # search for a token, merging lines
+      foreach my $hit ($kasago->search_merged($search)) {
+        print $hit->source . "/"
+          . $hit->file . "@"
+          . $hit->row . ": "
+          . $hit->line . "\n";
+        foreach my $token (@{ $hit->tokens }) {
+          print "  @" . $token->col . ": " . $token->value . "\n";
+        }
+      }  
+
+      # search for tokens
+      foreach my $token ($kasago->search_more($search)) {
+        print $token->source . "/"
+          . $token->file . "@"
+          . $token->col . ","
+          . $token->row . ": "
+          . $token->line . "\n";
+      }
+
+      # searh for tokens, merging lines
+      foreach my $hit ($kasago->search_more_merged($search)) {
+        print $hit->source . "/"
+          . $hit->file . "@"
+          . $hit->row . ": "
+          . $hit->line . "\n";
+        foreach my $token (@{ $hit->tokens }) {
+          print "  @" . $token->col . ": " . $token->value . "\n";
+        }
+      }
+  
+DESCRIPTION
+    Kasago is a module for indexing Perl source code. You can index source
+    trees, and then query the index for symbols, strings, and documentation.
+
+    Kasago uses the PPI module to parse Perl and stores the index in a
+    PostegreSQL database. Thus you need to have DBD::Pg installed and a
+    database available for Kasago.
+
+    Why is this called Kasago? Because that's the Japanese name for a
+    beautiful fish.
+
+METHODS
+  new
+    This is the constructor. It takes a DBI database handle as a parameter.
+    This must be a valid dababase handle for a PostgreSQL database,
+    constructed along the lines of 'my $dbh =
+    DBI->connect("DBI:Pg:dbname=kasago", "", "")':
+
+      my $kasago = Kasago->new({ dbh => $dbh });
+
+  delete
+    This deletes a source from the index:
+
+      $kasago->delete($source);
+
+  files
+    Given a source, returns a list of the files indexed in that source:
+
+      my @files   = $kasago->files($source);
+
+  import
+    This recursively imports a directory into Kasago. If the source is
+    already indexed, the index is updated. You pass a source name and the
+    directory path:
+
+      $kasago->import($source, $dir);
+
+  init
+    This created the tables needed by Kasago in the database. You only need
+    run this once. If you run this after initialisation, it will delete the
+    index.
+
+      $kasago->init;
+
+  search
+    This searches the index for an individual token:
+
+        foreach my $token ($kasago->search('orange')){
+          print $token->source . "/"
+            . $token->file . "@"
+            . $token->col . ","
+            . $token->row . ": "
+            . $token->line . "\n";
+        }
+
+  search_merged
+    This searches the index for an individual token, but merges multiple
+    tokens on the same line together:
+
+        foreach my $hit ($kasago->search_merged($search)) {
+          print $hit->source . "/"
+            . $hit->file . "@"
+            . $hit->row . ": "
+            . $hit->line . "\n";
+          foreach my $token (@{ $hit->tokens }) {
+            print "  @" . $token->col . ": " . $token->value . "\n";
+          }
+        }  
+    
+  search_more
+    This searches the index for tokens. "orange" would return all hits for
+    orange, "orange leon" would return all hits for both "orange" and
+    "leon". "orange -leon" shows all the hits for "orange" but without files
+    that contain "leon", "+orange +leon" returns hits in files that contain
+    both "orange" and "leon":
+
+      foreach my $token ($kasago->search_more($search)) {
+        print $token->source . "/"
+          . $token->file . "@"
+          . $token->col . ","
+          . $token->row . ": "
+          . $token->line . "\n";
+      }
+  
+  search_more_merged
+    This searches the index for tokens as search_more, but merges multiple
+    tokens on the same line together:
+
+      foreach my $hit ($kasago->search_more_merged($search)) {
+        print $hit->source . "/"
+          . $hit->file . "@"
+          . $hit->row . ": "
+          . $hit->line . "\n";
+        foreach my $token (@{ $hit->tokens }) {
+          print "  @" . $token->col . ": " . $token->value . "\n";
+        }
+      }
+
+  sources
+    This returns a list of the sources currently indexed:
+
+      my @sources = $kasago->sources;
+  
+  tokens
+    Given a source and a file, returns a list of the tokens indexed:
+
+      my @tokens  = $kasago->tokens($source, $file);
+
+AUTHOR
+    Leon Brocard <acme@astray.com>.
+
+COPYRIGHT
+    Copyright (C) 2005, Leon Brocard
+
+    This module is free software; you can redistribute it or modify it under
+    the same terms as Perl itself.
+

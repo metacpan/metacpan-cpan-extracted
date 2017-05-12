@@ -1,0 +1,17 @@
+---
+version: 0.03
+date:    Sun Nov 13 21:28:42 EST 2005
+changes:
+- Adding pod.t and pod-coverage.t
+
+---
+version: 0.02
+date:    Wed Jun 23 23:05:19 EDT 2004
+changes:
+- Now strips trailing newlines before </pre>
+
+---
+version: 0.01
+date:    Wed Jun 23 21:56:07 EDT 2004
+changes:
+- Initial release

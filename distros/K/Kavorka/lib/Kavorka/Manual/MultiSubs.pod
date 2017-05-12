@@ -1,0 +1,123 @@
+=pod
+
+=encoding utf-8
+
+=for stopwords invocant invocants lexicals unintuitive yada globals
+
+=head1 NAME
+
+Kavorka::Manual::MultiSubs - multi subs and multi methods
+
+=head1 DESCRIPTION
+
+Kavorka supports multi methods and multi subs:
+
+   multi method process (ArrayRef $x) { say "here" }
+   multi method process (HashRef $x) { say "there" }
+   
+   __PACKAGE__->process( [] );    # here
+   __PACKAGE__->process( {} );    # there
+
+Multi subs and multi methods must be named (cannot be anonymous
+coderefs).
+
+This feature is shared with Perl 6 signatures, though Kavorka does
+not support some of Perl 6's more advanced features such as multi
+method prototypes. (Though method modifiers should more or less work
+with multi methods!) Kavorka includes both type constraints and value
+constraints in the dispatch decision, while Perl 6 only uses type
+constraints.
+
+=head2 Multi methods versus multi subs
+
+The word after C<multi> (i.e. C<method> in the above example) can be
+any Kavorka keyword that has been set up in the current lexical scope,
+provided the implementation class provides a non-undef
+C<invocation_style> method (see L<Kavorka::Sub>).
+
+If the C<invocation_style> is "fun" (like L<Kavorka::Sub::Fun>), then
+the signature of each candidate function in package is checked in the
+order in which they were defined, and the first matching candidate is
+dispatched to.
+
+If the C<invocation_style> is "method" (like L<Kavorka::Sub::Method>),
+then if no successful candidate is found in the current class,
+candidates in superclasses are also considered.
+
+=head2 Long names
+
+It is possible to define alternative "long names" for the candidates
+of a multi method or multi sub using the C<:long> attribute:
+
+   multi fun process (ArrayRef $x) :long(process_array) {
+      say "here";
+   }
+   
+   multi fun process (HashRef $x) :long(process_hash) {
+      say "there";
+   }
+   
+   process($a);          # multi dispatch
+   process_array($b);    # single dispatch
+   process_hash($c);     # single dispatch
+
+(Actually, C<< :long >> isn't a real attribute; we just borrow the
+syntax. If you try to use L<attributes>' introspection stuff, you won't
+find it.)
+
+Prototypes, subroutine attributes, etc. declared on the multi subs will
+appear on the "long name" subs, but not the multi sub.
+
+=head2 Definition at run time
+
+Multi subs and multi methods are added to the symbol at run time
+(like methods, see L<Kavorka::Manual::Methods/The Method Name>).
+
+This means that it's possible to partly define a multi sub, call it,
+then further define it, before calling it again.
+
+   use Kavorka qw( multi fun );
+   use Try::Tiny;
+   
+   multi fun plus_one (Int $x) { $x + 1 }
+   
+   try {
+      plus_one(41);      # 42
+      plus_one(1.1);     # throws
+   };
+   
+   multi fun plus_one (Num $x) { $x + 1 }
+   
+   plus_one(41);      # 42
+   plus_one(1.1);     # 2.1
+
+=head1 BUGS
+
+Please report any bugs to
+L<http://rt.cpan.org/Dist/Display.html?Queue=Kavorka>.
+
+=head1 SEE ALSO
+
+L<Kavorka::Manual>,
+L<Kavorka::Manual::Signatures>,
+L<Kavorka::Manual::PrototypeAndAttributes>,
+L<Kavorka::Manual::Functions>,
+L<Kavorka::Manual::Methods>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2013-2014, 2017 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

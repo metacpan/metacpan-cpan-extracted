@@ -1,0 +1,207 @@
+/* $Id: create_tables.oracle,v 1.13 2008-04-25 16:58:02 mike Exp $ */
+
+/*
+ * See comments in "create_tables.mysql"
+ *
+ * In Oracle, column types are a bit different than in MySQL:
+ *
+ * CHAR to CHAR
+ * VARCHAR to VARCHAR2
+ * various Large Object types to RAW or BLOB
+ * DATE, DATETIME, and TIME to DATE
+ * TIMESTAMP and YEAR to NUMBER
+ * INT datatypes to NUMBER(16, 0), or shorter?
+ * FLOAT, DOUBLE, REAL, and DECIMAL to FLOAT
+ * TEXT (max 65.535 chars) to VARCHAR2(4096)
+ * BOOL to NUMBER(1, 0)
+ * KEY to INDEX
+ *
+ * LEVEL is an Oracle reserved word, and therefore TABLE identity
+ * fails to create unless the column name "level" is quoted.  SESSION
+ * and USER are reserved words as well, therefore creation of TABLE
+ * session and TABLE user fail.  The simplest approach is to quote
+ * _all_ field and column names.  For a list of reserved words, see:
+ * http://www.lsbu.ac.uk/oracle/oracle7/api/doc/PCC18/apb.htm
+ *
+ * Oracle does not like blank lines in the middle of commands. Avoid!
+ */
+
+CREATE TABLE "genre" (
+	"id"		NUMBER(16, 0) NOT NULL PRIMARY KEY,
+	"tag"		VARCHAR2(4000),
+	"name"		VARCHAR2(4000)
+);
+
+CREATE TABLE "mformat" (
+	"id"		NUMBER(16, 0) NOT NULL PRIMARY KEY,
+	"genre_id"	NUMBER(16, 0),
+	"name"		VARCHAR2(4000),
+       	"uri"		VARCHAR2(4000),
+	FOREIGN KEY("genre_id") REFERENCES "genre"("id")
+);
+
+CREATE TABLE "service_type" (
+	"id"		NUMBER(16, 0) NOT NULL PRIMARY KEY,
+	"tag"		VARCHAR2(4000),
+	"name"		VARCHAR2(4000),
+	"plugin"	VARCHAR2(4000),
+	"priority"	NUMBER(16, 0)
+);
+
+CREATE TABLE "genre_service_type" (
+	"genre_id"	NUMBER(16, 0),
+	"service_type_id"	NUMBER(16, 0),
+	FOREIGN KEY("genre_id") REFERENCES "genre"("id"),
+	FOREIGN KEY("service_type_id") REFERENCES "service_type"("id")
+);
+
+CREATE TABLE "provider" (
+	"id"		NUMBER(16, 0) NOT NULL PRIMARY KEY,
+	"name"		VARCHAR2(4000),
+	"priority"	NUMBER(16, 0),
+	"contact"	VARCHAR2(4000)
+);
+
+CREATE TABLE "service" (
+	"id"		NUMBER(16, 0) NOT NULL PRIMARY KEY,
+	"service_type_id"	NUMBER(16, 0),
+	"provider_id"	NUMBER(16, 0),
+	"tag"		VARCHAR2(4000),
+	"name"		VARCHAR2(4000),
+	"priority"	NUMBER(16, 0),
+	"url_recipe"	VARCHAR2(4000),
+	"need_auth"	NUMBER(1,0),
+	"auth_recipe"	VARCHAR2(4000),
+	"disabled"	NUMBER(1,0),
+	FOREIGN KEY("service_type_id") REFERENCES "service_type"("id"),
+	FOREIGN KEY("provider_id") REFERENCES "provider"("id")
+);
+
+CREATE TABLE "serial" (
+	"id"		NUMBER(16, 0) NOT NULL PRIMARY KEY,
+	"name"		VARCHAR2(4000),
+	"issn"		VARCHAR2(4000)
+);
+
+CREATE TABLE "serial_alias" (
+	"id"		NUMBER(16, 0) NOT NULL PRIMARY KEY,
+	"serial_id"	NUMBER(16, 0),
+	"alias"		VARCHAR2(4000),
+	FOREIGN KEY("serial_id") REFERENCES "serial"("id")
+);
+
+CREATE TABLE "service_serial" (
+	"service_id"	NUMBER(16, 0),
+	"serial_id"	NUMBER(16, 0),
+	FOREIGN KEY("service_id") REFERENCES "service"("id"),
+	FOREIGN KEY("serial_id") REFERENCES "serial"("id")
+);
+
+CREATE TABLE "identity" (
+	"id"		NUMBER(16, 0) NOT NULL PRIMARY KEY,
+	"name"		VARCHAR2(4000),
+	"level"		VARCHAR2(4000),
+	"parent_id"	NUMBER(16, 0),
+	FOREIGN KEY("parent_id") REFERENCES "identity"("id")
+);
+
+CREATE TABLE "credentials" (
+	"id"		NUMBER(16, 0) NOT NULL PRIMARY KEY,
+	"service_id"	NUMBER(16, 0),
+	"identity_id"	NUMBER(16, 0),
+	CONSTRAINT credentials_service FOREIGN KEY("service_id") REFERENCES "service"("id"),
+	CONSTRAINT credentials_identity FOREIGN KEY("identity_id") REFERENCES "identity"("id")
+);
+
+CREATE TABLE "credentials_details" (
+	"id"		NUMBER(16, 0) NOT NULL PRIMARY KEY,
+	"credentials_id"	NUMBER(16, 0),
+	"name"		VARCHAR2(4000),
+	"value"		VARCHAR2(4000),
+	FOREIGN KEY("credentials_id") REFERENCES "credentials"("id")
+);
+
+CREATE TABLE "sid" (
+	"id"		NUMBER(16, 0) NOT NULL PRIMARY KEY,
+	"tag"		VARCHAR2(4000),
+	"recipe"		VARCHAR2(4000)
+);
+
+CREATE TABLE "source" (
+	"id"		NUMBER(16, 0) NOT NULL PRIMARY KEY,
+	"sid_id"		NUMBER(16, 0),
+	"name"		VARCHAR2(4000),
+	"url"		VARCHAR2(4000),
+	"encoding"	VARCHAR2(4000),
+	FOREIGN KEY("sid_id") REFERENCES "sid"("id")
+);
+
+CREATE TABLE "config" (
+	"id"		NUMBER(16, 0) NOT NULL PRIMARY KEY,
+	"name"		VARCHAR2(64) NOT NULL,
+	"value"		VARCHAR2(4000) NOT NULL
+);
+
+CREATE TABLE "domain" (
+	"id"		NUMBER(16, 0) NOT NULL PRIMARY KEY,
+	"domain"	VARCHAR2(4000),
+	"status"	NUMBER(16, 0)
+);
+
+CREATE TABLE "service_type_rule" (
+	"id"		NUMBER(16, 0) NOT NULL PRIMARY KEY,
+	"fieldname"	VARCHAR2(255),
+	"value"		VARCHAR2(255),
+	"deny"		NUMBER(1,0),
+	"tags"		VARCHAR2(4000),
+	UNIQUE("fieldname", "value")
+);
+
+CREATE TABLE "service_rule" (
+	"id"		NUMBER(16, 0) NOT NULL PRIMARY KEY,
+	"fieldname"	VARCHAR2(255),
+	"value"		VARCHAR2(255),
+	"deny"		NUMBER(1,0),
+	"tags"		VARCHAR2(4000),
+	UNIQUE("fieldname", "value")
+);
+
+/*
+ * Pathetically, "not null" on non-PK columns in MySQL doesn't mean
+ * "don't allow rows to be created where this field has no value", but
+ * "make up some crappy default value if none is specified", at least
+ * as far as release 4.0.18.  That's why all the NOT NULL constrains
+ * were commented out in create_tables.mysql.  Happily, Oracle does
+ * better: it's impossible to add a row which violates the constraint.
+ */
+CREATE TABLE "site" (
+	"id"		NUMBER(16, 0) NOT NULL PRIMARY KEY,
+	"tag"		VARCHAR2(255) NOT NULL,
+	"name"		VARCHAR2(4000) NOT NULL,
+	"bg_colour"	VARCHAR2(4000),
+	"email_address"	VARCHAR2(255),
+	UNIQUE("tag")
+);
+
+CREATE TABLE "session" (
+	"id"		NUMBER(16, 0) NOT NULL PRIMARY KEY,
+	"site_id"	NUMBER(16, 0) NOT NULL,
+	"cookie"	VARCHAR2(255) NOT NULL,
+	"user_id"	NUMBER(16, 0),
+	"dest"		VARCHAR2(4000),
+	"query"		VARCHAR2(4000),
+	UNIQUE("cookie")
+);
+
+CREATE TABLE "user" (
+	"id"		NUMBER(16, 0) NOT NULL PRIMARY KEY,
+	"site_id"	NUMBER(16, 0) NOT NULL,
+	"admin"		NUMBER(16, 0) DEFAULT 0 NOT NULL,
+	"name"		VARCHAR2(4000) NOT NULL,
+	"email_address"	VARCHAR2(255) NOT NULL,
+	"password"	VARCHAR2(255) NOT NULL,
+	FOREIGN KEY("site_id") REFERENCES "site"("id"),
+	UNIQUE("site_id", "email_address")
+);
+
+QUIT

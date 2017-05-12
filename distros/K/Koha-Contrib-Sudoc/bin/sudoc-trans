@@ -1,0 +1,123 @@
+#!/usr/bin/perl 
+
+# PODNAME: sudoc-trans
+# ABSTRACT: Service de transfert de fichiers ABES
+
+use Modern::Perl;
+use Sys::Syslog qw(:standard :macros);
+use File::Copy;
+use Mail::Box::Manager;
+use YAML::Tiny qw/ LoadFile /;
+ 
+
+my $root = $ENV{SUDOC};
+unless ($root) {
+    say "Il manque la variable d'environnement SUDOC.";
+    exit;
+}
+my $c = LoadFile("$root/etc/sudoc.conf");
+my $iln = $c->{iln};
+$c = $c->{trans};
+
+openlog("sudoc-trans-$iln", "ndelay,pid", LOG_LOCAL0);
+syslog(LOG_INFO, "Démarrage du service de transfert ABES" );
+
+chdir "$root/var/spool";
+my $mgr = Mail::Box::Manager->new;
+
+while (1) {
+    transfert_abes();
+    sleep $c->{timeout};
+}
+# FIN
+
+
+# Envoi à l'ABES d'un email GTD en réponse à un message 'status 9'. Celui-ci
+# contient le numéro du job
+sub send_gtd {
+    my $content = shift;
+
+    # Récupération dans le courriel de l'ABES des info dont on a besoin pour
+    # construire la réponse
+    my ($jobid) = $content =~ /JobId\s*:\s*(\d*)/;
+
+    # La date
+    my $year = time();
+    (undef, undef, undef, undef, undef, $year) = localtime($year);
+    $year += 1900;
+
+    syslog(LOG_INFO, "Réception 'status 9'. Envoi GTD: ILN $iln, job $jobid, année $year" );
+
+    my $head = Mail::Message::Head->new;
+    $head->add( From => $c->{email}->{koha} );
+    $head->add( To => $c->{email}->{abes} );
+    $head->add( Subject => 'GET TITLE DATA' );
+
+    my $body = Mail::Message::Body::Lines->new(
+        data =>
+            "GTD_ILN = $iln\n" .
+            "GTD_YEAR = $year\n" .
+            "GTD_FILE_TO = " . $c->{ftp_host} . "\n" .
+            "GTD_ORDER = TR$jobid*\n" .
+            "GTD_REMOTE_DIR = staged\n",
+    );
+
+    my $message = Mail::Message->new(
+        head => $head,
+        body => $body );
+    $message->send;
+}
+
+
+sub move_to_waiting {
+    syslog(LOG_INFO, "Réception 'status 0'. Fin transfert: 'staged' déplacé en 'waiting'");
+
+    my $staged = 'staged';
+    opendir(my $hdir, $staged) || die "Impossible d'ouvrir $staged: $!";
+    my @files = sort grep { not /^\./ } readdir($hdir);
+    move("$staged/$_", "waiting") for @files;
+}
+
+
+sub transfert_abes {
+    my $self = shift;
+
+    # Ne rien faire si la MBOX est vide
+    my $mbox = $c->{mbox};
+    return unless -f $mbox;
+
+    # Lit toute la MBOX qui ne peut contenir qu'un message à la fois, étant de
+    # type status 0 ou status 9
+    my $content = do { local(@ARGV, $/) = $mbox; <> };
+    if    ( $content =~ /status is 9/ ) { send_gtd($content);        }
+    elsif ( $content =~ /status: 0/ )   { move_to_waiting(); }
+    unlink $mbox;
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+sudoc-trans - Service de transfert de fichiers ABES
+
+=head1 VERSION
+
+version 2.23
+
+=head1 AUTHOR
+
+Frédéric Demians <f.demians@tamil.fr>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2016 by Fréderic Demians.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

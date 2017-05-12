@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Kolab-LDAP-Backend-slurpd.t
+lib/Kolab/LDAP/Backend/slurpd.pm
+META.yml                                 Module meta-data (added by MakeMaker)

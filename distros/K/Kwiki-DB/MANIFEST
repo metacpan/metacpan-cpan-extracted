@@ -1,0 +1,24 @@
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Kwiki/DB.pm
+lib/Kwiki/DB/ClassDBI.pm
+lib/Kwiki/DB/DBI.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00.use.t
+t/01.dbi-sqlite.t
+t/02.classdbi-sqlite.t
+t/config.classdbi.yaml
+t/config.dbi.yaml
+t/lib/Kwiki/DB/Music.pm
+t/lib/Kwiki/DB/Music/Artist.pm
+t/lib/Kwiki/DB/Music/CD.pm
+t/lib/Kwiki/DB/Test.pm

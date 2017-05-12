@@ -1,0 +1,25 @@
+NAME
+    Kwiki::DNSBL - Blocks edit from ip addresses in DNS Blackhole lists
+
+DESCRIPTION
+    Much of the current WikiSpam comes from open proxies. This plugin
+    queries a number of DNS blackhole lists to check if users are using an
+    open proxy and blocks them if they do.
+
+    It uses Net::DNSBLLookup which also queries blackhole lists that report
+    if an ip address is known to have an open e-mail relay. This plugin
+    blocks these users anyway, even though WikiSpam has nothing to do with
+    normal e-mail spam.
+
+AUTHORS
+    Jon Aslund <aslund.org>, Jooon at #kwiki on Freenode
+
+SEE ALSO
+    Kwiki Net::DNSBLLookup
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2005, Jon Aslund
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

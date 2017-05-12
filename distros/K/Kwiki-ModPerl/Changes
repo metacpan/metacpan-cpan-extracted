@@ -1,0 +1,48 @@
+version: 0.09
+date:    Wed Sep 21 16:29:17 CST 2005
+- Fix the issue that it doesn't work with Kwiki::PagePrivacy
+---
+version: 0.08
+date:    Fri May 27 15:06:11 CST 2005
+changes:
+- Fix that sub-view are reconized as a page_name in coolURI_handler()
+---
+version: 0.07
+date:    Sat May  7 20:33:35 CST 2005
+changes:
+- Fix a bug that default page_name goes wrong if "KwikiBaseDir" contains trailing slashes.
+---
+version: 0.06
+date:    Wed Mar 30 09:04:15 CST 2005
+changes:
+- more compatible on mod_perl and mod_perl2
+- cooluri support (even if it's not installed) [halkeye]
+---
+version: 0.05
+date:    Tue Feb 15 21:56:29 CST 2005
+changes:
+- support sub_view automatically
+- request to "index.cgi" doesn't show it's source anymore
+- print_error() doesn't require CGI.pm again.
+---
+version: 0.04
+date:    Sun Jan 23 04:02:10 CST 2005
+changes:
+- work with mod_perl 2
+- Safari-friendly URI redirection
+---
+version: 0.03
+date:    Thu Aug 19 17:53:21 EDT 2004
+changes:
+- removed object caching stuff because it doesn't do much
+- moved chdir [cpan #7414]
+---
+version: 0.02
+date:    Thu Aug 19 01:23:58 EDT 2004
+changes:
+- oops! forgot a README, though placeholder
+---
+version: 0.01
+date:    Wed Aug 18 23:57:55 EDT 2004
+changes:
+- initial release

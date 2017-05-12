@@ -1,0 +1,7 @@
+Revision history for Perl extension Kwiki::Export
+
+0.02  2006-01-15T09:41:46Z
+        - Now support tar.gz export using Archive::Any::Create
+
+0.01  Fri Jan 13 08:41:33 2006
+	- original version

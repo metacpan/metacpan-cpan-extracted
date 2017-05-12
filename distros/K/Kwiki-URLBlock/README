@@ -1,0 +1,42 @@
+NAME
+    Kwiki::URLBlock - Blocks edit based on added URLs
+
+DESCRIPTION
+    It blocks an edit if you add too many URLs or if you enter a blacklisted
+    one.
+
+  Configuration
+    The default config variables that you can override in config.yaml are:
+
+     urlblock_max_allowed: 3
+     urlblock_blacklist:
+
+    urlblock_blacklist is a path to a blacklist file.
+
+    The syntax is a list of newline separated regexps. Anything after # is
+    treated as a comment. Whitespace is ignored.
+
+    Example taken from <http://wiki.mozilla.org/wiki/Spam_blacklist>:
+
+     # some known "bad" domains
+     ltjz2000\.com
+     ticketsmyway\.com
+     emmss\.com
+     [0-9][0-9][0-9][0-9][0-9][0-9]*\.com # 5 or more character numeric .coms
+     # some words frequently used by spammers in urls
+     camgirl
+     parishilton
+     online-casino
+
+AUTHORS
+    Jon Aslund <aslund.org>, Jooon at #kwiki on Freenode
+
+SEE ALSO
+    Kwiki URI::Find
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2005, Jon Aslund
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

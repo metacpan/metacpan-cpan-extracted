@@ -1,0 +1,69 @@
+Revision history for Perl extension Kwalify.
+
+1.22
+	- cease possible "unitinialized value" warnings
+
+1.21
+	- fixed RT #48800 (unique in mappings did not work correctly)
+
+1.20
+	- test failure fix
+	- fixed RT #48714 (return early if not a hash was given)
+
+1.19
+	- allow the new "class" (previously "classname")
+	- more documentation about unclear schema definition
+	- -h/-help is not anymore "accidentaly" showing the usage
+
+1.18
+	- additional checks were not run with type 'any'
+	- ceasing a warning if undef was used in enum
+	- added warnings::compat prereq for 5.005 and older
+
+1.17
+	- documentation change: the URL of the schema user guide
+	  changed (thanks to Christoph Lamprecht for the pointer)
+
+1.16
+	- get rid of backquote in error and warning messages (after reading
+	  http://www.cl.cam.ac.uk/~mgk25/ucs/quotes.html)
+	- protect from blib warnings (perl 5.6.x) in pkwalify.t test
+
+1.15 (not released)
+	- include experimental META.yml spec (version 1.3) to test directory
+	- new -v version in pkwalify
+	- new tests
+
+1.14
+	- stricter checks if schema itself is correct
+	  (croak on unhandled keys)
+
+1.13
+	- fixed bug in range/max test
+	- fixed bug in Schema::Kwalify::validate
+	- better test coverage
+
+1.12
+	- added another test for older perls
+
+1.11
+	- fixed another test problem (occurred if
+	  IPC::Run was not installed)
+
+1.10
+	- just some test fixes
+
+1.09
+	- fixed endless recursion when using recursive
+	  schemas or data structures
+	- implemented -s option in pkwalify (like in
+	  ruby's kwalify)
+	- pkwalify output now looks closer to the original
+	- pkwalify outputs most things to STDOUT instead of
+	  STDERR
+
+1.08
+	- fixed warnings in pkwalify
+	- inc version in Kwalify.pm to force reinstalling
+
+1.07	first and maybe last version :-)

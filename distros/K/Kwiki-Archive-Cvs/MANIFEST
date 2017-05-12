@@ -1,0 +1,7 @@
+MANIFEST
+README
+Makefile.PL
+Cvs.pm
+t/compile.t
+META.yml
+ChangeLog

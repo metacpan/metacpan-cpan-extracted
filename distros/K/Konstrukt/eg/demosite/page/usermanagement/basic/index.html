@@ -1,0 +1,38 @@
+<& template src="/templates/layout.template" title="usermanagement::basic" &>
+	<$ content $>
+		<& perl executionstage="2" &>
+			#create box with admin links
+			
+			#load plugins
+			use_plugin 'browserstats';
+			use_plugin 'hitstats';
+			use_plugin 'log';
+			my $user_level = use_plugin 'usermanagement::level';
+			my $template   = use_plugin 'template';
+			
+			my $level = $user_level->level();
+			
+			my @links;
+			push @links, ["/usermanagement/level/", "User-Levels"] if $level >= $Konstrukt::Settings->get('usermanagement/level/superuser_level');
+			push @links, ["/usermanagement/personal/", "Personal information"] if $level;
+			push @links, ["/browserstats/", "Browser statistics"] if $level >= $Konstrukt::Settings->get('browserstats/userlevel_view');
+			push @links, ["/hitstats/", "Hit statistics"] if $level >= $Konstrukt::Settings->get('hitstats/userlevel_view');
+			push @links, ["/log/", "Logs"] if $level >= $Konstrukt::Settings->get('log/userlevel_view');
+			
+			if (@links) {
+				print "<div class=\"usermanagement form\">\n<ul>\n";
+				foreach my $link (@links) {
+					print "<li><a href=\"$link->[0]\">$link->[1]</a></li>\n";
+				}
+				print "</ul>\n</div>";
+			}
+		<& / &>
+		<& perl &>
+			#preload plugins, which will react on events (register, deregister)
+			#that may be fired by the basic user management
+			use_plugin 'usermanagement::level';
+			use_plugin 'usermanagement::personal';
+		<& / &>
+		<& usermanagement::basic / &>
+	<$ / $>
+<& / &>

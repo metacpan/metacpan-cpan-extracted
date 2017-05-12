@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<results>
+  <data entity="rft">
+    <metadata key="atitle">Reference Linking for Journal Articles</metadata>
+    <metadata key="aufirst">Priscilla</metadata>
+    <metadata key="aulast">Caplan</metadata>
+    <metadata key="date">1999</metadata>
+    <metadata key="genre">article</metadata>
+    <metadata key="issn">1082-9873</metadata>
+    <metadata key="issue">7/8</metadata>
+    <metadata key="volume">5</metadata>
+  </data>
+  <data entity="rfe">
+    <metadata key="atitle">Open Linking in the Scholarly Information Environment using the OpenURL Framework</metadata>
+    <metadata key="aufirst">Herbert</metadata>
+    <metadata key="aulast">Van de Sompel</metadata>
+    <metadata key="date">2001</metadata>
+    <metadata key="genre">article</metadata>
+    <metadata key="issn">1082-9873</metadata>
+    <metadata key="issue">3</metadata>
+    <metadata key="volume">7</metadata>
+  </data>
+  <result type="id" tag="info:doi"
+	>http://www.dlib.org/dlib/july99/caplan/07caplan.html</result>
+  <result type="error"
+	>the resource database doesn't cover ISSN 1082-9873</result>
+  <result type="citeref" priority="15" tag=""
+	service="Endnote citation"
+	>http://example.com/resolve?rft_id=info%3Adoi%2F10.1045%2Fjuly99-caplan&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Ajournal&amp;rft.atitle=Reference%20Linking%20for%20Journal%20Articles&amp;rft.aufirst=Priscilla&amp;rft.aulast=Caplan&amp;rft.date=1999&amp;rft.genre=article&amp;rft.issn=1082-9873&amp;rft.issue=7%2F8&amp;rft.volume=5&amp;rfr_id=info%3Asid%2Fdlib.org%3Adlib&amp;rfe_id=info%3Adoi%2F10.1045%2Fmarch2001-vandesompel&amp;rfe_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Ajournal&amp;rfe.atitle=Open%20Linking%20in%20the%20Scholarly%20Information%20Environment%20using%20the%20OpenURL%20Framework&amp;rfe.aufirst=Herbert&amp;rfe.aulast=Van%20de%20Sompel&amp;rfe.date=2001&amp;rfe.genre=article&amp;rfe.issn=1082-9873&amp;rfe.issue=3&amp;rfe.volume=7&amp;svc_dat=indexdata:citation:Endnote</result>
+  <result type="citation" priority="20" tag="APP"
+	service="APP-style citation" mimetype="text/html"
+	>Caplan, Priscilla.  1999.  Reference Linking for Journal Articles.  &lt;i&gt;ISSN 1082-9873&lt;/i&gt;, 5.</result>
+  <result type="citation" priority="20" tag="author"
+	service="Author and year" mimetype="text/html"
+	>Caplan, Priscilla.  1999.</result>
+  <result type="websearch" priority="5" tag="masterkey"
+	service="MasterKey"
+	>http://masterkey.indexdata.com/author=Caplan&amp;title=Reference Linking for Journal Articles&amp;date=1999</result>
+  <result type="websearch" priority="10" tag=""
+	service="Google"
+	>http://www.google.com/search?q=%22Reference Linking for Journal Articles%22</result>
+  <result type="websearch" priority="20" tag=""
+	service="Alltheweb"
+	>http://alltheweb.com/search?q=%22Reference Linking for Journal Articles%22</result>
+  <result type="websearch" priority="30" tag=""
+	service="AltaVista"
+	>http://www.altavista.com/web/results?q=%22Reference Linking for Journal Articles%22</result>
+</results>

@@ -1,0 +1,141 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: Kavorka
+Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
+Source: https://metacpan.org/release/Kavorka
+
+Files: README
+ lib/Kavorka.pm
+ lib/Kavorka/Manual.pod
+ lib/Kavorka/Manual/API.pod
+ lib/Kavorka/Manual/ExtendingKavorka.pod
+ lib/Kavorka/Manual/Functions.pod
+ lib/Kavorka/Manual/MethodModifiers.pod
+ lib/Kavorka/Manual/Methods.pod
+ lib/Kavorka/Manual/MultiSubs.pod
+ lib/Kavorka/Manual/PrototypeAndAttributes.pod
+ lib/Kavorka/Manual/Signatures.pod
+ lib/Kavorka/Parameter.pm
+ lib/Kavorka/Signature.pm
+ lib/Kavorka/Sub.pm
+ lib/MooseX/KavorkaInfo.pm
+ t/01basic.t
+ t/02named-functions.t
+ t/03anon-functions.t
+ t/04named-methods.t
+ t/05anon-methods.t
+ t/10positional.t
+ t/11named.t
+ t/12invocant.t
+ t/13slurpy.t
+ t/14underscores.t
+ t/20modifiers-moo.t
+ t/21modifiers-moose.t
+ t/22modifiers-mouse.t
+ t/23modifiers-tiny.t
+ t/24multimodifiers.t
+ t/28modifiers-augment.t
+ t/29modifiers-override.t
+ t/30multi.t
+ t/31multimulti.t
+ t/32multiredefine.t
+ t/33cacheinvalidationishard.t
+ t/50types.t
+ t/51coerce.t
+ t/52typeexpr.t
+ t/53typeexpr-moosextypes.t
+ t/54typefallback.t
+ t/59valueconstraints.t
+ t/60alias.t
+ t/61ro.t
+ t/62locked.t
+ t/63freshoverride.t
+ t/69traits.t
+ t/70introspection.t
+ t/71moosemeta.t
+ t/80returntype.t
+ t/90closures.t
+ t/91lvalue.t
+ t/92weirdvars.t
+ t/93prototypes.t
+Copyright: This software is copyright (c) 2013-2014, 2017 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: Changes
+ META.json
+ META.yml
+ dist.ini
+ doap.ttl
+ lib/Kavorka/MethodModifier.pm
+ lib/Kavorka/Multi.pm
+ lib/Kavorka/ReturnType.pm
+ lib/Kavorka/Sub/After.pm
+ lib/Kavorka/Sub/Around.pm
+ lib/Kavorka/Sub/Augment.pm
+ lib/Kavorka/Sub/Before.pm
+ lib/Kavorka/Sub/ClassMethod.pm
+ lib/Kavorka/Sub/Fun.pm
+ lib/Kavorka/Sub/Method.pm
+ lib/Kavorka/Sub/ObjectMethod.pm
+ lib/Kavorka/Sub/Override.pm
+ lib/Kavorka/TraitFor/Parameter/alias.pm
+ lib/Kavorka/TraitFor/Parameter/assumed.pm
+ lib/Kavorka/TraitFor/Parameter/locked.pm
+ lib/Kavorka/TraitFor/Parameter/optional.pm
+ lib/Kavorka/TraitFor/Parameter/ref_alias.pm
+ lib/Kavorka/TraitFor/Parameter/ro.pm
+ lib/Kavorka/TraitFor/ReturnType/assumed.pm
+ lib/Kavorka/TraitFor/Sub/begin.pm
+ lib/Kavorka/TraitFor/Sub/fresh.pm
+ lib/Kavorka/TraitFor/Sub/override.pm
+ lib/Parse/KeywordX.pm
+ t/lib/Local/Bad.pm
+Copyright: Copyright 2017 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: INSTALL
+ LICENSE
+ Makefile.PL
+ TODO
+ examples/benchmarks-named.pl
+ examples/benchmarks-pos.pl
+ examples/dancer2/example.pl
+ examples/dancer2/lib/KavorkaX/Dancer2.pm
+ examples/meta.pl
+Copyright: Unknown
+License: Unknown
+
+Files: examples/benchmarks.pl
+ t/94bypassparsing.t
+ t/95rolesatisfaction.t
+ t/98undefer.t
+Copyright: This software is copyright (c) 2014, 2017 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: COPYRIGHT
+ CREDITS
+ SIGNATURE
+Copyright: None
+License: public-domain
+
+Files: examples/benchmarks-multisub.pl
+ examples/fibonacci.pl
+Copyright: This software is copyright (c) 2013 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/99threads.t
+Copyright: This software is copyright (c) 2014, 2017 by Aaron James Trevena.
+License: GPL-1.0+ or Artistic-1.0
+
+License: Artistic-1.0
+ This software is Copyright (c) 2017 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The Artistic License 1.0
+
+License: GPL-1.0
+ This software is Copyright (c) 2017 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The GNU General Public License, Version 1, February 1989

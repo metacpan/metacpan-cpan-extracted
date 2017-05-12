@@ -1,0 +1,29 @@
+Keyword::Declare version 0.000005
+
+Declare new Perl keywords with a keyword: 'keyword'
+
+See the examples in the demo/ and dlib/ subdirectories.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+DEPENDENCIES
+
+Keyword::Simple
+PPI
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2015, Damian Conway
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

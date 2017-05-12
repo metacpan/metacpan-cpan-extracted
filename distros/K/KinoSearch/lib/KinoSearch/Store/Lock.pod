@@ -1,0 +1,135 @@
+
+# Auto-generated file -- DO NOT EDIT!!!!!
+
+=head1 NAME
+
+KinoSearch::Store::Lock - Abstract class representing an interprocess mutex lock.
+
+=head1 DEPRECATED
+
+The KinoSearch code base has been assimilated by the Apache L<Lucy> project.
+The "KinoSearch" namespace has been deprecated, but development continues
+under our new name at our new home: L<http://lucy.apache.org/>
+
+=head1 SYNOPSIS
+
+    my $lock = $lock_factory->make_lock(
+        name    => 'write',
+        timeout => 5000,
+    );
+    $lock->obtain or die "can't get lock for " . $lock->get_name;
+    do_stuff();
+    $lock->release;
+
+
+
+=head1 DESCRIPTION
+
+The Lock class produces an interprocess mutex lock.  The default subclass
+uses dot-lock files, but alternative implementations are possible.
+
+Each lock must have a name which is unique per resource to be locked.  Each
+lock also has a "host" id which should be unique per machine; it is used to
+help clear away stale locks.
+
+=head1 CONSTRUCTORS
+
+=head2 new( I<[labeled params]> )
+
+    my $lock = KinoSearch::Store::Lock->new(
+        name     => 'commit',     # required
+        folder   => $folder,      # required
+        host     => $hostname,    # required
+        timeout  => 5000,         # default: 0
+        interval => 1000,         # default: 100
+    );
+
+Abstract constructor.
+
+=over
+
+=item *
+
+B<folder> - A Folder.
+
+=item *
+
+B<name> - String identifying the resource to be locked, which must
+consist solely of characters matching [-_.A-Za-z0-9].
+
+=item *
+
+B<host> - A unique per-machine identifier.
+
+=item *
+
+B<timeout> - Time in milliseconds to keep retrying before abandoning
+the attempt to obtain() a lock.
+
+=item *
+
+B<interval> - Time in milliseconds between retries.
+
+=back
+
+
+
+=head1 ABSTRACT METHODS
+
+=head2 request()
+
+Make one attempt to acquire the lock. 
+
+The semantics of request() differ depending on whether shared() returns
+true.  If the Lock is shared(), then request() should not fail if
+another lock is held against the resource identified by
+C<< name >> (though it might fail for other reasons).  If it is
+not shared() -- i.e. it's an exclusive (write) lock -- then other locks
+should cause request() to fail.
+
+Returns: true on success, false on failure (sets KinoSearch->error).
+
+=head2 release()
+
+Release the lock.
+
+=head2 is_locked()
+
+Indicate whether the resource identified by this lock's name is
+currently locked.
+
+Returns: true if the resource is locked, false otherwise.
+
+=head2 clear_stale()
+
+Release all locks that meet the following three conditions: the lock
+name matches, the host id matches, and the process id that the lock
+was created under no longer identifies an active process.
+
+
+
+=head1 METHODS
+
+=head2 obtain()
+
+Call request() once per C<< interval >> until request() returns
+success or the C<< timeout >> has been reached.
+
+Returns: true on success, false on failure (sets KinoSearch->error).
+
+
+
+=head1 INHERITANCE
+
+KinoSearch::Store::Lock isa L<KinoSearch::Object::Obj>.
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005-2011 Marvin Humphrey
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
+

@@ -1,0 +1,6 @@
+# $Id: feature-include-service.in,v 1.1 2007-09-20 17:45:44 mike Exp $
+
+# Derived from the "openly-12" test.
+
+url_ver=Z39.88-2004&url_tim=2004-04-10T17%3A12%3A15TZD&url_ctx_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Actx&url_ctx_val=%26ctx_id%3D11_6%26ctx_tim%3D2004-04-10T17%253A11%253A30TZD%26rft_id%3Durn%253Aisbn%253A1861004516%26rft_val_fmt%3Dinfo%253Aofi%252Ffmt%253Akev%253Amtx%253Abook%26rft.genre%3Dbook%26rft.aulast%3DDodds%26rft.aufirst%3DDavid%26rft.isbn%3D1861004516%26rft.date%3D2001%26rft.btitle%3DProfessional%2BXML%2Bmeta%2BData%26rfe_id%3Dhttp%253A%252F%252Fwww.amazon.com%252Fexec%252Fobidos%252FASIN%252F1861004516%26req_id%3Dxri%253A104-011434-4639158%26svc_id%3Dxri%253AaddToCart%26rfr_id%3Dinfo%253Asid%252Famazon.com%26rft.dclanguage%3Dde
+

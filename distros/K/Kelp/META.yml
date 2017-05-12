@@ -1,0 +1,53 @@
+---
+abstract: 'A web framework light, yet rich in nutrients.'
+author:
+  - 'Stefan G. <minimal@cpan.org>'
+build_requires:
+  File::Temp: 0
+  HTTP::Request::Common: 0
+  IO::File: 0
+  Plack::Middleware::Session: 0
+  Test::Exception: 0
+  Test::Harness: 0
+  lib: 0
+  parent: 0
+  perl: v5.10.0
+  utf8: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Kelp
+requires:
+  Carp: 0
+  Class::Inspector: 0
+  Data::Dumper: 0
+  Encode: 0
+  File::Basename: 0
+  File::Path: 0
+  File::Slurp: 0
+  FindBin: 0
+  Getopt::Long: 0
+  HTTP::Cookies: 0
+  JSON: 0
+  Log::Dispatch: 0
+  Plack::Test: 0
+  Plack::Util: 0
+  Scalar::Util: 0
+  Sys::Hostname: 0
+  Template::Tiny: 0
+  Test::Deep: 0
+  Test::More: 0
+  Try::Tiny: 0
+  feature: 0
+  strict: 0
+  warnings: 0
+resources:
+  homepage: https://github.com/naturalist/kelp
+  repository: https://github.com/naturalist/kelp.git
+version: 0.9081
+x_serialization_backend: 'YAML::Tiny version 1.51'

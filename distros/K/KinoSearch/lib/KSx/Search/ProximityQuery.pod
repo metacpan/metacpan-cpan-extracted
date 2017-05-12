@@ -1,0 +1,79 @@
+
+# Auto-generated file -- DO NOT EDIT!!!!!
+
+=head1 NAME
+
+KSx::Search::ProximityQuery - Query matching an ordered list of terms.
+
+=head1 DEPRECATED
+
+The KinoSearch code base has been assimilated by the Apache L<Lucy> project.
+The "KinoSearch" namespace has been deprecated, but development continues
+under our new name at our new home: L<http://lucy.apache.org/>
+
+=head1 SYNOPSIS
+
+    my $proximity_query = KSx::Search::ProximityQuery->new( 
+        field  => 'content',
+        terms  => [qw( the who )],
+        within => 10,    # match within 10 positions
+    );
+    my $hits = $searcher->hits( query => $proximity_query );
+
+
+
+=head1 DESCRIPTION
+
+ProximityQuery is a subclass of L<KinoSearch::Search::Query> for matching
+against an ordered sequence of terms.
+
+=head1 CONSTRUCTORS
+
+=head2 new( I<[labeled params]> )
+
+=over
+
+=item *
+
+B<field> - The field that the phrase must occur in.
+
+=item *
+
+B<terms> - The ordered array of terms that must match.
+
+=back
+
+
+
+
+
+=head1 METHODS
+
+=head2 get_field()
+
+Accessor for object's field attribute.
+
+=head2 get_terms()
+
+Accessor for object's array of terms.
+
+=head2 get_within()
+
+Accessor for object's within attribute.
+
+
+
+=head1 INHERITANCE
+
+KSx::Search::ProximityQuery isa L<KinoSearch::Search::Query> isa L<KinoSearch::Object::Obj>.
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005-2011 Marvin Humphrey
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
+

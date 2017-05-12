@@ -1,0 +1,124 @@
+
+# Auto-generated file -- DO NOT EDIT!!!!!
+
+=head1 NAME
+
+KinoSearch::Plan::Architecture - Configure major components of an index.
+
+=head1 DEPRECATED
+
+The KinoSearch code base has been assimilated by the Apache L<Lucy> project.
+The "KinoSearch" namespace has been deprecated, but development continues
+under our new name at our new home: L<http://lucy.apache.org/>
+
+=head1 SYNOPSIS
+
+    package MyArchitecture;
+    use base qw( KinoSearch::Plan::Architecture );
+
+    use KSx::Index::ZlibDocWriter;
+    use KSx::Index::ZlibDocReader;
+
+    sub register_doc_writer {
+        my ( $self, $seg_writer ) = @_; 
+        my $doc_writer = KSx::Index::ZlibDocWriter->new(
+            snapshot   => $seg_writer->get_snapshot,
+            segment    => $seg_writer->get_segment,
+            polyreader => $seg_writer->get_polyreader,
+        );  
+        $seg_writer->register(
+            api       => "KinoSearch::Index::DocReader",
+            component => $doc_writer,
+        );  
+        $seg_writer->add_writer($doc_writer);
+    }
+
+    sub register_doc_reader {
+        my ( $self, $seg_reader ) = @_; 
+        my $doc_reader = KSx::Index::ZlibDocReader->new(
+            schema   => $seg_reader->get_schema,
+            folder   => $seg_reader->get_folder,
+            segments => $seg_reader->get_segments,
+            seg_tick => $seg_reader->get_seg_tick,
+            snapshot => $seg_reader->get_snapshot,
+        );  
+        $seg_reader->register(
+            api       => 'KinoSearch::Index::DocReader',
+            component => $doc_reader,
+        );  
+    }
+ 
+    package MySchema;
+    use base qw( KinoSearch::Plan::Schema );
+    
+    sub architecture { 
+        shift;
+        return MyArchitecture->new(@_); 
+    }
+
+
+
+=head1 DESCRIPTION
+
+By default, a KinoSearch index consists of several main parts: lexicon,
+postings, stored documents, deletions, and highlight data.  The readers and
+writers for that data are spawned by Architecture.  Each component operates
+at the segment level; Architecture's factory methods are used to build up
+L<SegWriter|KinoSearch::Index::SegWriter> and
+L<SegReader|KinoSearch::Index::SegReader>.
+
+=head1 CONSTRUCTORS
+
+=head2 new()
+
+    my $arch = KinoSearch::Plan::Architecture->new;
+
+Constructor.  Takes no arguments.
+
+
+
+
+
+=head1 METHODS
+
+=head2 register_doc_writer(writer)
+
+Spawn a DataWriter and register() it with the supplied SegWriter,
+adding it to the SegWriter's writer stack.
+
+=over
+
+=item *
+
+B<writer> - A SegWriter.
+
+=back
+
+=head2 register_doc_reader(reader)
+
+Spawn a DocReader and register() it with the supplied SegReader.
+
+=over
+
+=item *
+
+B<reader> - A SegReader.
+
+=back
+
+
+
+=head1 INHERITANCE
+
+KinoSearch::Plan::Architecture isa L<KinoSearch::Object::Obj>.
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005-2011 Marvin Humphrey
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
+

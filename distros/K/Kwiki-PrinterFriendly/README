@@ -1,0 +1,31 @@
+PrinterFriendly version 0.12
+============================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+NAME
+    Kwiki::PrinterFriendly - Kwiki PrinterFriendly Plugin
+
+Formats only the content of the current page, removing the
+headers, toolbars, backlinks, etc. from what is normally
+displayed.  Should cut down on the number of trees killed in the
+name of Kwiki.
+
+After installing remember to run kwiki -update in your kwiki directory
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Henry Laxen
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,8 @@
+#db connection
+dbi/source   dbi:mysql:test:localhost
+dbi/user     witte
+dbi/pass     foobar23
+
+#session management
+session/use        1
+session/store      MySQL

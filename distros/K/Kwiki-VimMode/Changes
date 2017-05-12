@@ -1,0 +1,26 @@
+---
+version: 0.05
+date:    Sun Nov 13 23:38:05 EST 2005
+changes:
+    - Improved Kwalitee
+---
+version: 0.04
+date:    Tue Aug 10 21:36:41 EDT 2004
+changes:
+    - Discovered bug https://rt.cpan.org/NoAuth/Bug.html?id=7316
+    - Made sure that tests don't fail with versions of Vim prior to 6.1.
+---
+version: 0.031
+date:    unknown
+changes:
+    - We don't talk about 0.031. It was supposed to be a beta -- 0.03_1 -- but it turns out that I'm completely hopeless.
+---
+version: 0.02
+date:    Tue Jul 27 23:05:25 EDT 2004
+changes:
+    - Disabled Vim modelines for extra protection
+---
+version: 0.01
+date:    Wed Jun 23 23:14:08 EDT 2004
+changes:
+    - Initial release

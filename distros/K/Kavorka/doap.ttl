@@ -1,0 +1,1123 @@
+@prefix cpan-uri: <http://purl.org/NET/cpan-uri/terms#> .
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-bugs: <http://ontologi.es/doap-bugs#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/Kavorka/project>
+	a                    doap:Project;
+	cpan-uri:x_IRC       <irc://irc.perl.org/#moops>;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-bugs:issue      <http://purl.org/NET/cpan-uri/rt/ticket/91557>, <http://purl.org/NET/cpan-uri/rt/ticket/92634>, <http://purl.org/NET/cpan-uri/rt/ticket/94015>;
+	doap-deps:develop-suggestion [ doap-deps:on "Data::Alias"^^doap-deps:CpanId ], [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
+	doap-deps:runtime-recommendation [
+		doap-deps:on "Type::Tiny::XS 0.010"^^doap-deps:CpanId;
+	];
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.014"^^doap-deps:CpanId ], [
+		doap-deps:on "Exporter::Tiny 0.026"^^doap-deps:CpanId;
+	], [ doap-deps:on "Type::Utils 0.032"^^doap-deps:CpanId ], [
+		doap-deps:on "Types::Standard 0.032"^^doap-deps:CpanId;
+	], [ doap-deps:on "match::simple"^^doap-deps:CpanId ], [
+		doap-deps:on "namespace::sweep 0.006"^^doap-deps:CpanId;
+	], [ doap-deps:on "Module::Runtime 0"^^doap-deps:CpanId ], [ doap-deps:on "Moo 1.003001"^^doap-deps:CpanId ], [ doap-deps:on "PadWalker 0"^^doap-deps:CpanId ], [
+		doap-deps:on "Parse::Keyword 0.06"^^doap-deps:CpanId;
+	], [ doap-deps:on "Return::Type 0.004"^^doap-deps:CpanId ], [ doap-deps:on "Sub::Util"^^doap-deps:CpanId ], [
+		doap-deps:on "Type::Parser 0.032"^^doap-deps:CpanId;
+		rdfs:comment "Fix for comma-delimited type lists.";
+	], [
+		doap-deps:on "Type::Registry 0.032"^^doap-deps:CpanId;
+	];
+	doap-deps:test-recommendation [ doap-deps:on "Moose 2.0000"^^doap-deps:CpanId ], [ doap-deps:on "Mouse 1.00"^^doap-deps:CpanId ], [ doap-deps:on "Class::Tiny"^^doap-deps:CpanId ], [
+		doap-deps:on "Role::Tiny 1.003000"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "Class::Method::Modifiers 2.03"^^doap-deps:CpanId;
+	];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ], [ doap-deps:on "Test::Fatal"^^doap-deps:CpanId ], [ doap-deps:on "Test::Requires"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Kavorka>;
+	doap:created         "2013-09-23"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/Kavorka>;
+	doap:homepage        <https://metacpan.org/release/Kavorka>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "Kavorka";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-000_01>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-000_02>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-000_03>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-000_04>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-000_05>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-000_06>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-000_07>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-000_08>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-000_09>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-000_10>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-000_11>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-008>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-009>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-010>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-011>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-012>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-013>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-014>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-015>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-016>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-017>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-018>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-019>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-020>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-021>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-022>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-023>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-024>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-025>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-026>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-027>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-028>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-029>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-030>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-031>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-032>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-033>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-034>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-035>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-036>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-037>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-kavorka>;
+	];
+	doap:shortdesc       "function signatures with the lure of the animal".
+
+<http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-000_01>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	rdfs:label           "Preview release";
+	dc:identifier        "Kavorka-0.000_01"^^xsd:string;
+	dc:issued            "2013-10-03"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Kavorka-0.000_01.tar.gz>;
+	doap:revision        "0.000_01"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-000_02>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	dc:identifier        "Kavorka-0.000_02"^^xsd:string;
+	dc:issued            "2013-10-04"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix syntax error compiling functions using non-inlinable type constraints in the signature.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix error finding the position to start slurping from in signatures that have a slurpy after zero positional parameters.";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "Add some rudimentary tests for type constraints.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Include benchmarking script as an example.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Kavorka-0.000_02.tar.gz>;
+	doap:revision        "0.000_02"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-000_03>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	dc:identifier        "Kavorka-0.000_03"^^xsd:string;
+	dc:issued            "2013-10-05"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Error message for unknown named parameters isn't unintentionally always thrown for all named parameters except the first.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "The `default` attribute of Kavorka::Signature::Parameter is now a coderef rather than a string.";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "Add tests for the `method` keyword.";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "Add tests for positional parameters.";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "Add tests for named parameters.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Include my TODO file.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Kavorka-0.000_03.tar.gz>;
+	doap:revision        "0.000_03"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-000_04>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	dc:identifier        "Kavorka-0.000_04"^^xsd:string;
+	dc:issued            "2013-10-06"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Allow anonymous slurpy parameters.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Minor speed-ups.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Also populate the %_ hash for functions with a hash(ref) slurpy but zero named parameters.";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "Add tests for invocants.";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "Add tests for slurpy parameters.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Kavorka-0.000_04.tar.gz>;
+	doap:revision        "0.000_04"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-000_05>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	dc:identifier        "Kavorka-0.000_05"^^xsd:string;
+	dc:issued            "2013-10-07"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Tests;
+			rdfs:label "Add tests for non-inlinable type constraints.";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "Add tests for type coercions.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix off-by-one bug failing to populate a slurpy array/arrayref if it would only have one item.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix warning assigning odd number of items to %_ which should have been fatal instead.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Kavorka-0.000_05.tar.gz>;
+	doap:revision        "0.000_05"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-000_06>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	dc:identifier        "Kavorka-0.000_06"^^xsd:string;
+	dc:issued            "2013-10-07"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Tests;
+			rdfs:label "Add tests for method modifiers in Moo.";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "Add tests for method modifiers in Mouse.";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "Add tests for method modifiers in Moose.";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "Add tests for method modifiers in Class::Tiny/Role::Tiny.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix installing of method modifiers into Moo::Role roles.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Kavorka-0.000_06.tar.gz>;
+	doap:revision        "0.000_06"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-000_07>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	dc:identifier        "Kavorka-0.000_07"^^xsd:string;
+	dc:issued            "2013-10-08"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Tests;
+			rdfs:label "Add tests for various traits.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Implemented the 'alias' trait.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Implemented the 'ro' trait.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Implemented the 'locked' trait.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Documented traits better.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Documented an 'rw' trait which is just a no-op.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Long overdue refactoring of the code-generating internals of Kavorka::Signature::Parameter.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Kavorka-0.000_07.tar.gz>;
+	doap:revision        "0.000_07"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-000_08>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	dc:identifier        "Kavorka-0.000_08"^^xsd:string;
+	dc:issued            "2013-10-08"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Tests;
+			rdfs:label "Add tests for introspection API.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Documented Kavorka::Signature::Parameter.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Documented Kavorka::Signature.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Documented Kavorka::Sub.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Improve 'Introspection API' section of documentation for Kavorka.pm itself.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Tidy up the Kavorka::Sub API.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Tidy up and improve the Kavorka::Signature API.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Function objects doing the Kavorka::Sub role now keep track of which keyword they were declared with.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Kavorka-0.000_08.tar.gz>;
+	doap:revision        "0.000_08"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-000_09>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	dc:identifier        "Kavorka-0.000_09"^^xsd:string;
+	dc:issued            "2013-10-08"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Tests;
+			rdfs:label "Tests for lvalue subs.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Better support for subroutine attributes.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Change parsing technique for named subs.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Document the yadayada operator.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Kavorka-0.000_09.tar.gz>;
+	doap:revision        "0.000_09"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-000_10>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	dc:identifier        "Kavorka-0.000_10"^^xsd:string;
+	dc:issued            "2013-10-09"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Minor documentation improvements.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "MooseX::KavorkaInfo provides Kavorka->info data through Moose meta objects.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Allow Function::Parameters-style type constraint expressions.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Kavorka-0.000_10.tar.gz>;
+	doap:revision        "0.000_10"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-000_11>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	dc:identifier        "Kavorka-0.000_11"^^xsd:string;
+	dc:issued            "2013-10-09"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Fix MooseX::KavorkaInfo SYNOPSIS.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Provide an example script using MooseX::KavorkaInfo.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Document Kavorka's exports.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Throw an exception if people use method modifier keywords to define anonymous functions.";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "Check that it's possible to define a method called `method`.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Kavorka-0.000_11.tar.gz>;
+	doap:revision        "0.000_11"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "First public release";
+	dc:identifier        "Kavorka-0.001"^^xsd:string;
+	dc:issued            "2013-10-09"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Kavorka-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "Kavorka-0.002"^^xsd:string;
+	dc:issued            "2013-10-11"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Refactor some of the code generation in Kavorka::Signature.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Kavorka::Signature now provides args_min and args_max methods.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Kavorka-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-003>
+	a                    doap:Version;
+	dc:identifier        "Kavorka-0.003"^^xsd:string;
+	dc:issued            "2013-10-12"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Improve sanity checking for signatures.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Allow @_ and %_ to be used in signatures.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Kavorka-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-004>
+	a                    doap:Version;
+	dc:identifier        "Kavorka-0.004"^^xsd:string;
+	dc:issued            "2013-10-13"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Correct minor typo.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Implement multi subs and multi methods.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Kavorka-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-005>
+	a                    doap:Version;
+	dc:identifier        "Kavorka-0.005"^^xsd:string;
+	dc:issued            "2013-10-13"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix error parsing `where` clauses.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "$parameter->constraints is now an arrayref of coderefs rather than an arrayref of strings of Perl code.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Changed error message resulting from failed value constraint.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Included fibonnacci.pl example of using multi subs.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Kavorka-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-006>
+	a                    doap:Version;
+	dc:identifier        "Kavorka-0.006"^^xsd:string;
+	dc:issued            "2013-10-15"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Document interplay between multi subs and multiple inheritance.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Use invocant as starting point for searching for multi method candidates.";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "Test cases for multi subs versus multiple inheritance.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Kavorka-0.006.tar.gz>;
+	doap:revision        "0.006"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-007>
+	a                    doap:Version;
+	dc:identifier        "Kavorka-0.007"^^xsd:string;
+	dc:issued            "2013-10-16"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Allow named parameters to have multiple \"outside\" names.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Make the parentheses surrounding long named parameters optional.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Refactor Kavorka::Sub.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Kavorka-0.007.tar.gz>;
+	doap:revision        "0.007"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-008>
+	a                    doap:Version;
+	dc:identifier        "Kavorka-0.008"^^xsd:string;
+	dc:issued            "2013-10-17"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Make subclassing Kavorka.pm itself a little easier.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Include an example of extending Kavorka to cover some Dancer2 concepts.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Minor documentation fixes.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Kavorka-0.008.tar.gz>;
+	doap:revision        "0.008"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-009>
+	a                    doap:Version;
+	dc:identifier        "Kavorka-0.009"^^xsd:string;
+	dc:issued            "2013-10-22"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Minor fix to KavorkaX::Dancer2 example extension module.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Package my TODO list.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Kavorka-0.009.tar.gz>;
+	doap:revision        "0.009"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-010>
+	a                    doap:Version;
+	dc:identifier        "Kavorka-0.010"^^xsd:string;
+	dc:issued            "2013-10-23"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Support 'my' and 'our' prefixes to variable names in signatures.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Allow package variables such as $Foo::Bar in signatures.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "General refactoring of variable name parsing.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Kavorka-0.010.tar.gz>;
+	doap:revision        "0.010"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-011>
+	a                    doap:Version;
+	dc:identifier        "Kavorka-0.011"^^xsd:string;
+	dc:issued            "2013-10-25"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Rename ${^NEXT} variable to $next for `around` method modifiers.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Support Perl 5.20 style :prototype(...) attribute.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Allow multiple method names to be modified with a single method modifier.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Split up documentation into a manual with bite-sized chunks.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Kavorka-0.011.tar.gz>;
+	doap:revision        "0.011"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-012>
+	a                    doap:Version;
+	dc:identifier        "Kavorka-0.012"^^xsd:string;
+	dc:issued            "2013-10-26"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Various documentation improvements.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Optimization: compile dispatchers for multi subs on demand.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Optimization: avoid double type checks in multi subs.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Kavorka-0.012.tar.gz>;
+	doap:revision        "0.012"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-013>
+	a                    doap:Version;
+	dc:identifier        "Kavorka-0.013"^^xsd:string;
+	dc:issued            "2013-10-27"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Compiled dispatchers introduced in Kavorka 0.012 are essentially a form of cache. No cache invalidation was in place, leading to issues when adding extra same-named multi method candidates to parent classes after a multi method had already been invoked in a child class. Cache invalidation now works.";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "Test that definition of multi subs happens at runtime, and definition can continue even after the multi sub has been invoked.";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "Test for cache invalidation of compiled multi sub dispatchers.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Kavorka-0.013.tar.gz>;
+	doap:revision        "0.013"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-014>
+	a                    doap:Version;
+	rdfs:label           "Gunpowder, treason and plot";
+	dc:identifier        "Kavorka-0.014"^^xsd:string;
+	dc:issued            "2013-11-05"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "Work with (and indeed require Type::Tiny 0.032).";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Return types, optionally with coercion.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Lexical functions and methods.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Kavorka-0.014.tar.gz>;
+	doap:revision        "0.014"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-015>
+	a                    doap:Version;
+	dc:identifier        "Kavorka-0.015"^^xsd:string;
+	dc:issued            "2013-11-07"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Most of the closure issues associated with Parse::Keyword are now worked around.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "$sub->signature now returns undef if no signature was given in the declaration.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Checking if @_ < 0 is silly; stop doing that.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Document that fun ($x, $y=$x) {...} doesn't work how you might expect it to, and some work-arounds.";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "Tidy up some of the closure tests.";
+		], [
+			a doap-changeset:BackCompat;
+			rdfs:label "Change the syntax of lexical functions and methods to include the `my` keyword in their declaration.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Kavorka-0.015.tar.gz>;
+	doap:revision        "0.015"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-016>
+	a                    doap:Version;
+	dc:identifier        "Kavorka-0.016"^^xsd:string;
+	dc:issued            "2013-11-07"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Bypass the Internals::SvREADONLY prototype because handling of the ($;$) prototype changed in 5.16.0 and we were relying on the new behaviour.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Kavorka-0.016.tar.gz>;
+	doap:revision        "0.016"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-017>
+	a                    doap:Version;
+	dc:identifier        "Kavorka-0.017"^^xsd:string;
+	dc:issued            "2013-11-18"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Extensibility via parameter traits.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Rename Kavorka::Signature::Parameter -> Kavorka::Parameter.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Rename Kavorka::Signature::ReturnType -> Kavorka::ReturnType.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Kavorka-0.017.tar.gz>;
+	doap:revision        "0.017"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-018>
+	a                    doap:Version;
+	dc:identifier        "Kavorka-0.018"^^xsd:string;
+	dc:issued            "2013-11-18"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Allow non-Type::Tiny type constraints to be returned by type constraint expressions, provided they can be converted to Type::Tiny objects via Types::TypeTiny::to_TypeTiny.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Kavorka-0.018.tar.gz>;
+	doap:revision        "0.018"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-019>
+	a                    doap:Version;
+	dc:identifier        "Kavorka-0.019"^^xsd:string;
+	dc:issued            "2013-11-23"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Provide an `override` keyword which will work in Moose/Mouse, but not Moo.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Allow named parameters to be passed in as a hashref rather than a hash.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Split out some of the Kavorka::Parameter features (aliases, locked hashrefs, read-only parameters) into parameter traits.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Provide an `augment` keyword which will work in Moose/Mouse, but not Moo.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Kavorka-0.019.tar.gz>;
+	doap:revision        "0.019"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-020>
+	a                    doap:Version;
+	dc:identifier        "Kavorka-0.020"^^xsd:string;
+	dc:issued            "2013-11-27"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Split out the assumed trait for return types as Kavorka::TraitFor::ReturnType::assumed.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Kavorka::TraitFor::Parameter::assumed.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Can now use 'but' as another alias for 'is'/'does'.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Explain different ways to extend Kavorka.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Subs can now have traits.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Kavorka-0.020.tar.gz>;
+	doap:revision        "0.020"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-021>
+	a                    doap:Version;
+	dc:identifier        "Kavorka-0.021"^^xsd:string;
+	dc:issued            "2013-11-30"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Disallow the `assumed` parameter trait for multi subs.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Implement a `ref_alias` trait, inspired by Method::Signatures.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Rearrange some of the traits documentation.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Split out most of the implementation for the `optional` trait (except for special parsing rules) into Kavorka::TraitFor::ReturnType::optional.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Split out some sanity_check stuff into the trait modules.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Kavorka-0.021.tar.gz>;
+	doap:revision        "0.021"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-022>
+	a                    doap:Version;
+	dc:identifier        "Kavorka-0.022"^^xsd:string;
+	dc:issued            "2013-12-16"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Kavorka::TraitFor::Sub::fresh.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Kavorka::TraitFor::Sub::override.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Fix typos in Kavorka::Manual::MultiSubs.";
+			doap-changeset:blame <http://purl.org/NET/cpan-uri/person/xaerxess>;
+			doap-changeset:fixes <tdb:2013:https://github.com/tobyink/p5-kavorka/issue/1>;
+			rdfs:seeAlso <https://github.com/tobyink/p5-kavorka/pull/1>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Kavorka-0.022.tar.gz>;
+	doap:revision        "0.022"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-023>
+	a                    doap:Version;
+	dc:identifier        "Kavorka-0.023"^^xsd:string;
+	dc:issued            "2013-12-17"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix test case - should not depend on Moops!";
+			doap-changeset:fixes <tdb:2013:https://github.com/tobyink/p5-kavorka/issue/2>;
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/syohex>;
+			rdfs:seeAlso <https://github.com/tobyink/p5-kavorka/issue/2>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Kavorka-0.023.tar.gz>;
+	doap:revision        "0.023"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-024>
+	a                    doap:Version;
+	dc:identifier        "Kavorka-0.024"^^xsd:string;
+	dc:issued            "2013-12-18"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "s/namespace::clean/namespace::sweep/";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Kavorka-0.024.tar.gz>;
+	doap:revision        "0.024"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-025>
+	a                    doap:Version;
+	dc:identifier        "Kavorka-0.025"^^xsd:string;
+	dc:issued            "2013-12-23"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Value constraints for parameters without type constraints were being ignored.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Support non-block form of value constraints, taken from Perl 6 / Method::Signatures.";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "Tests for value constraints.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Kavorka-0.025.tar.gz>;
+	doap:revision        "0.025"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-026>
+	a                    doap:Version;
+	dc:identifier        "Kavorka-0.026"^^xsd:string;
+	dc:issued            "2014-01-30"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Allow keywords to detect when the keyword sub has been called in a way that bypasses the Perl keyword API's custom parsing (e.g. using a prototype, or as a coderef). By default, keywords croak when this is detected.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Method modifier keywords can now detect when the keyword sub has been called bypassing custom parsing, and act sanely rather than croaking.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Kavorka-0.026.tar.gz>;
+	doap:revision        "0.026"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-027>
+	a                    doap:Version;
+	dc:identifier        "Kavorka-0.027"^^xsd:string;
+	dc:issued            "2014-01-30"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Minor change to the hook allowing keywords to deal with calls that bypass the Perl keyword API.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Kavorka-0.027.tar.gz>;
+	doap:revision        "0.027"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-028>
+	a                    doap:Version;
+	rdfs:label           "The 'perlsub-compat' Release";
+	dc:identifier        "Kavorka-0.028"^^xsd:string;
+	dc:issued            "2014-02-21"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Make parsing of parameter defaults laxer so that an equals sign followed by no expression is allowed.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Allow attributes to *precede* signatures.";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "Add test cases covering bare @ and % sigils.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Kavorka-0.028.tar.gz>;
+	doap:revision        "0.028"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-029>
+	a                    doap:Version;
+	dc:identifier        "Kavorka-0.029"^^xsd:string;
+	dc:issued            "2014-02-26"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Kavorka::TraitFor::Sub::begin.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Kavorka-0.029.tar.gz>;
+	doap:revision        "0.029"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-030>
+	a                    doap:Version;
+	dc:identifier        "Kavorka-0.030"^^xsd:string;
+	dc:issued            "2014-03-20"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Introduce `f` as an alternative to `fun`.";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "Add test using Kavorka on threaded Perls.";
+			doap-changeset:blame <http://purl.org/NET/cpan-uri/person/teejay>;
+			rdfs:seeAlso <http://purl.org/NET/cpan-uri/rt/ticket/94015>;
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Eliminate dependency on Devel::Pragma, which fixes Kavorka on threaded Perls.";
+			doap-changeset:blame <http://purl.org/NET/cpan-uri/person/pdcawley>;
+			doap-changeset:fixes <http://purl.org/NET/cpan-uri/rt/ticket/94015>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Kavorka-0.030.tar.gz>;
+	doap:revision        "0.030"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-031>
+	a                    doap:Version;
+	dc:identifier        "Kavorka-0.031"^^xsd:string;
+	dc:issued            "2014-08-13"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Add `multi` to @EXPORT_OK.";
+			doap-changeset:blame <http://purl.org/NET/cpan-uri/person/thilp>;
+		], [
+			a doap-changeset:Bugfix, doap-changeset:Documentation;
+			rdfs:label "Fix link to Kavorka::Manual::Signatures.";
+			doap-changeset:blame <http://purl.org/NET/cpan-uri/person/thilp>;
+		], [
+			a doap-changeset:Update;
+			rdfs:label "Cope with changes to Exporter::Tiny; avoid triggering warnings.";
+		], [
+			a doap-changeset:Update;
+			rdfs:label "Bump required version of Return::Type.";
+		], [
+			a doap-changeset:Documentation, doap-changeset:Update;
+			rdfs:label "Update benchmarks given that Type::Tiny::XS is hellishly fast.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Recommend Type::Tiny::XS.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Kavorka-0.031.tar.gz>;
+	doap:revision        "0.031"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-032>
+	a                    doap:Version;
+	dc:identifier        "Kavorka-0.032"^^xsd:string;
+	dc:issued            "2014-08-13"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Work around a bug in Moo(?) or maybe the Perl keyword API(?) by undeferring Moo's deferred subs.";
+			doap-changeset:fixes <http://purl.org/NET/cpan-uri/rt/ticket/95786>;
+			doap-changeset:thanks <urn:uuid:e56483ab-8752-412c-a519-294b8d83345c>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Kavorka-0.032.tar.gz>;
+	doap:revision        "0.032"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-033>
+	a                    doap:Version;
+	dc:identifier        "Kavorka-0.033"^^xsd:string;
+	dc:issued            "2014-08-22"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix, doap-changeset:Update;
+			rdfs:label "Type::Registry::DWIM changed its API. (Kavorka probably shouldn't be using it anyway because it's an undocumented internal part of Type::Utils.)";
+			doap-changeset:thanks [ foaf:nick "SpiceMan" ];
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Kavorka-0.033.tar.gz>;
+	doap:revision        "0.033"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-034>
+	a                    doap:Version;
+	dc:identifier        "Kavorka-0.034"^^xsd:string;
+	dc:issued            "2014-09-07"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Avoid triggering RT#98666.";
+		], [
+			a doap-changeset:Update;
+			rdfs:label "Switch from Sub::Name+Sub::Identify to the shiny new Sub::Util.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Kavorka-0.034.tar.gz>;
+	doap:revision        "0.034"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-035>
+	a                    doap:Version;
+	dc:identifier        "Kavorka-0.035"^^xsd:string;
+	dc:issued            "2014-09-30"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Make it easier to do weird things subclassing Kavorka::Multi.";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "Add a test case for Sub::Defer-related weirdness.";
+			rdfs:seeAlso <http://purl.org/NET/cpan-uri/rt/ticket/95786>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Kavorka-0.035.tar.gz>;
+	doap:revision        "0.035"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-036>
+	a                    doap:Version;
+	dc:identifier        "Kavorka-0.036"^^xsd:string;
+	dc:issued            "2014-11-01"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Avoid inadvertantly autovivifying things in Sub::Defer's big hash of deferred subs.";
+			doap-changeset:blame <http://purl.org/NET/cpan-uri/person/camspi>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Kavorka-0.036.tar.gz>;
+	doap:revision        "0.036"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-037>
+	a                    doap:Version;
+	dc:identifier        "Kavorka-0.037"^^xsd:string;
+	dc:issued            "2017-01-31"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix, doap-changeset:Update;
+			rdfs:label "Eliminate dependency on Data::Alias in modern versions of Perl.";
+			doap-changeset:blame [ foaf:name "Daniel Dehennin" ];
+			doap-changeset:fixes <tdb:2013:https://github.com/tobyink/p5-kavorka/issues/18>;
+			rdfs:comment "Used a modified version of code from PR#19.";
+			rdfs:seeAlso <https://github.com/tobyink/p5-kavorka/issues/18>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Kavorka-0.037.tar.gz>;
+	doap:revision        "0.037"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/camspi>
+	a                    foaf:Person;
+	foaf:name            "Chris Tijerina";
+	foaf:nick            "CAMSPI";
+	foaf:page            <https://metacpan.org/author/CAMSPI>.
+
+<http://purl.org/NET/cpan-uri/person/pdcawley>
+	a                    foaf:Person;
+	foaf:name            "Piers Cawley";
+	foaf:nick            "PDCAWLEY";
+	foaf:page            <https://metacpan.org/author/PDCAWLEY>.
+
+<http://purl.org/NET/cpan-uri/person/syohex>
+	a                    foaf:Person;
+	foaf:name            "Syohei Yoshida";
+	foaf:nick            "SYOHEX";
+	foaf:page            <https://metacpan.org/author/SYOHEX>.
+
+<http://purl.org/NET/cpan-uri/person/teejay>
+	a                    foaf:Person;
+	foaf:name            "Aaron James Trevena";
+	foaf:nick            "TEEJAY";
+	foaf:page            <https://metacpan.org/author/TEEJAY>.
+
+<http://purl.org/NET/cpan-uri/person/thilp>
+	a                    foaf:Person;
+	foaf:name            "Thibaut Le Page";
+	foaf:nick            "THILP";
+	foaf:page            <https://metacpan.org/author/THILP>.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+
+<http://purl.org/NET/cpan-uri/person/xaerxess>
+	a                    foaf:Person;
+	foaf:name            "Grzegorz Rożniecki";
+	foaf:nick            "XAERXESS";
+	foaf:page            <https://metacpan.org/author/XAERXESS>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/91557>
+	a                    doap-bugs:Issue;
+	rdfs:label           "Perhaps make `fun` and `method` install methods at compile time.";
+	dc:created           "2013-12-21T11:00:32Z"^^xsd:dateTime;
+	dc:reporter          _:B1;
+	doap-bugs:id         "91557";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=91557>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/92634>
+	a                    doap-bugs:Issue;
+	rdfs:label           "Investigate compatibility with forthcoming native signatures";
+	dc:created           "2014-02-01T08:10:12Z"^^xsd:dateTime;
+	dc:reporter          _:B1;
+	doap-bugs:id         "92634";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=92634>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/94015>
+	a                    doap-bugs:Issue;
+	rdfs:label           "segfault on joining multiple threads using Kavorka";
+	dc:created           "2014-03-19T20:25:02Z"^^xsd:dateTime;
+	dc:reporter          [ a foaf:Agent; foaf:mbox <mailto:ajt@thermeon.com> ];
+	doap-bugs:id         "94015", "94015"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=94015>, <https://rt.cpan.org/Ticket/Display.html?id=94015>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/patched>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/95786>
+	a                    doap-bugs:Issue;
+	doap-bugs:id         "95786"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=95786>.
+
+<urn:uuid:e56483ab-8752-412c-a519-294b8d83345c>
+	foaf:mbox_sha1sum    "18b01a46900ed3428b71cacdf010d47c26cc6cff";
+	foaf:name            "Jonathan Cast".
+
+_:B1
+	a                    foaf:Agent;
+	foaf:mbox            <mailto:mail@tobyinkster.co.uk>.
+

@@ -1,0 +1,13 @@
+name: Kwiki-BreadCrumbs
+version: 0.12
+abstract: Kwiki BreadCrumbs Plugin
+author: Brian Ingerson <ingy@cpan.org>
+license: perl
+distribution_type: module
+requires:
+  perl: 5.6.1
+  Kwiki: 0.37
+no_index:
+  directory:
+    - inc
+generated_by: Module::Install version 0.36

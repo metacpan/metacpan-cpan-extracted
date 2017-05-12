@@ -1,0 +1,14 @@
+KeybinderHandler T_CV
+gboolean         T_IV
+
+INPUT
+T_CV
+	$var = ($type)($arg);
+T_IV
+	$var = ($type)SvIV($arg);
+
+OUTPUT
+T_CV
+	$var = $arg;
+T_IV
+	sv_setiv($arg, (IV)$var);

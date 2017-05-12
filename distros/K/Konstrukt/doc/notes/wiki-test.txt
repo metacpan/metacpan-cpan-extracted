@@ -1,0 +1,44 @@
+= hi!
+
+das ist son wikitext
+jetzt hier
+
+ code
+hier
+
+: quote
+hier
+
+; definition
+: here
+: and here
+
+hier soll <nowiki>kein -wiki-
+
+angewendet werden
+</nowiki>
+wie werden _/kombinierte/_ formatierungen erkannt?
+
+_zwei
+
+*unterstrichene* /absaetze/_
+
+EinLink [[keinlink]] !WirklichKeinLink
+
+* ungeordnete liste
+** mit
+*** vier
+da hier wird ein neuer text-absatz
+
+neuer absatz
+**** das wird keine liste sondern normaler text!
+
+# nummerierte
+## liste
+
+== h2
+illegaler text hier. gehoert jetzt zur ueberschrift
+
+http://autodeteted/link hier
+
+autodetected_image.jpg

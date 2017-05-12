@@ -1,0 +1,46 @@
+Keyword-Simple
+
+define new keywords in pure Perl
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Keyword::Simple
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Keyword-Simple
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Keyword-Simple
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Keyword-Simple
+
+    MetaCPAN
+        https://metacpan.org/module/Keyword::Simple
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012, 2013 Lukas Mai
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

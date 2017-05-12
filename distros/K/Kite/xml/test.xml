@@ -1,0 +1,79 @@
+<kite name="testkite" title="Test Kite XML File">
+  <part name="part1">
+    <outline>
+      <curve>
+        <point x="0" y="0"/>
+        <point x="0" y="100"/>
+        <point x="100" y="100"/>
+        <point x="100" y="0"/>
+        <point x="0" y="0"/>
+      </curve>
+    </outline>
+    <markup>
+      <curve linetype="normal">
+        <point x="90" y="90"/>
+        <point x="90" y="0"/>
+        <point x="0" y="0"/>
+        <point x="0" y="90"/>
+        <point x="90" y="90"/>
+        <text>
+          TestPart
+        </text>
+      </curve>
+      <curve linetype="dotted">
+        <point x="10" y="10"/>
+        <point x="10" y="100"/>
+        <point x="100" y="100"/>
+        <point x="100" y="10"/>
+        <point x="10" y="10"/>
+      </curve>
+      <curve linetype="heavy">
+        <point x="30" y="30"/>
+        <point x="30" y="70"/>
+        <point x="70" y="70"/>
+        <point x="70" y="30"/>
+        <point x="30" y="30"/>
+        <text font="Times-Roman" size="8">Dotted Line</text>
+      </curve>
+    </markup>
+    <layout x="0" y="0" angle="0"/>
+  </part> 
+  <part name="part2">
+    <outline>
+      <curve>
+        <point x="100" y="100"/>
+        <point x="200" y="100"/>
+        <point x="200" y="200"/>
+        <point x="100" y="200"/>
+        <point x="100" y="100"/>
+      </curve>
+    </outline>
+    <markup>
+      <curve>
+        <point x="100" y="100"/>
+        <point x="200" y="100"/>
+        <point x="200" y="200"/>
+        <point x="100" y="200"/>
+        <point x="100" y="100"/>
+      </curve>
+      <curve linetype="normal">
+        <point x="110" y="100"/>
+        <point x="200" y="190"/>
+      </curve>
+      <curve linetype="dotted">
+        <point x="120" y="100"/>
+        <point x="200" y="180"/>
+        <text font="Times" size="15">
+          Test Of Words
+        </text>
+      </curve>
+      <curve linetype="heavy">
+        <point x="130" y="100"/>
+        <point x="200" y="170"/>
+      </curve>
+    </markup>
+    <layout  x="80" y="0" angle="20"/>
+  </part> 
+</kite>
+
+

@@ -1,0 +1,26 @@
+---
+name: Kasago
+version: 0.29
+author:
+  - Leon Brocard <acme@astray.com>.
+abstract: A Perl source code indexer
+license: perl
+requires:
+  Class::Accessor::Chained::Fast: 0
+  DBD::Pg: 0
+  DBI: 0
+  File::Find::Rule: 0
+  File::Slurp: 0
+  File::stat: 0
+  PPI: 0
+  Path::Class: 0
+  Test::More: 0
+provides:
+  Kasago:
+    file: lib/Kasago.pm
+    version: 0.29
+  Kasago::Hit:
+    file: lib/Kasago/Hit.pm
+  Kasago::Token:
+    file: lib/Kasago/Token.pm
+generated_by: Module::Build version 0.2611

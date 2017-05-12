@@ -1,0 +1,13 @@
+README for Kwiki::IRCMode
+
+This module registers a ".irc" block, which will format IRC conversations like
+the following:
+
+ .irc
+ <rjbs> Hey, is there an IRC block for Kwiki?
+ <z00s> No.  Why don't you shut up and write one?
+ <rjbs> Maybe I will!
+ <z00s> Maybe you should!
+ <rjbs> FINE!
+ .irc
+

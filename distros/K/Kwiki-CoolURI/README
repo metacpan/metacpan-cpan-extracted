@@ -1,0 +1,50 @@
+NAME
+       Kwiki::CoolURI - makes the Kwiki url cleaner
+
+SYNOPSIS
+        $ cd /path/to/kwiki
+        $ kwiki -add Kwiki::CoolURI
+
+DESCRIPTION
+       Changes the internal links that Kwiki create. Instead of
+       /index.cgi?SandBox, it will just be /SandBox.
+
+       It only changes the url for the display plugin. Edit will still look
+       like /index.cgi?action=edit&page_name=SandBox.
+
+       Configuration
+
+       Kwiki needs to be able to read request on the form /SandBox. With
+       Apache this can be solved by putting the following mod_rewrite config
+       in a .htaccess file in the directory where index.cgi is located.
+
+        RewriteEngine  on
+        RewriteCond    $1 !(css/|icons/|index.cgi|local/|palm90.png|plugin/|theme/)
+        RewriteRule    ^(.*)$ index.cgi?action=display&page_name=$1 [L]
+
+       If you add new top directories, or files, that you still want to be
+       readable, you have to add them in the RewriteCond.
+
+BUGS
+       Does not currently fix the redirect that for instance happens after an
+       edit.
+
+       Should use new Kwiki 0.37 hooks.
+
+       The mod_rewrite config could probably be better.
+
+       The code is just copied from the original methods and slightly changed
+       to output different urls. If Kwiki had a way to configure what the link
+       urls should look like, this plugin wouldn't be needed.
+
+AUTHOR
+       Jon Åslund
+
+COPYRIGHT
+       Copyright (c) 2005. Jon Åslund. All rights reserved.
+
+       This program is free software; you can redistribute it and/or modify it
+       under the same terms as Perl itself.
+
+SEE ALSO
+       Cool URIs don't change <http://www.w3.org/Provider/Style/URI.html>

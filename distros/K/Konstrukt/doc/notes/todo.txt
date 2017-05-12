@@ -1,0 +1,118 @@
+operativ:
+==== spaeter
+-	doc: devdoc (parser, wiki) in die modul-POD uebernehmen
+-	plugin-todos / -features
+-	complete test suite. see TODOs in *.t
+	test coverage?
+
+regelmaessiges code cleanup:
+-	warn'ings/Data::Dump loeschen
+
+strategisch:
+-	Wiki fertigbauen
+-	globale und seitenspezifische config
+-	Text::Balanced zum parsen?
+	http://search.cpan.org/~dconway/Text-Balanced-1.95/lib/Text/Balanced.pm
+-	Andere Tree-Module checken:
+	http://search.cpan.org/search?query=Tree&mode=all&n=20&sourceid=mozilla-search
+-	konkurrenz: catalyst, jifty, http://www.plainblack.com/webgui ...
+-	Wiki-Diff als Text:Diff::HTMLTable veröffentlichen
+-	"formvalidator":
+	evtl integrierteres form-handling (xforms, xml-definition oder sowas, evtl. aus explizitem datenmodell/tabellen ableiten)
+	bei serverseitigem fehler, die felder wieder mit den uebergebenen daten fuellen
+-	Performance:
+	-	template lists vs. viele einzelne templates (z.b. guestbook)
+		=> interessanterweise bei N = 4 einzelne templates schneller!
+	-	template: vielleicht kann man es sich sparen, fuer plaintext eigene nodes
+		samt parent node zu erstellen (schneller zu clonen).
+	-	?vielleicht neuer node-typ: static_plaintext fuer plaintext, der nicht mehr geparst werden muss.
+	-	perl vs. C :)
+	-	(mod_perl) benchmarking
+		http://search.cpan.org/~salva/Devel-SmallProf-1.15/SmallProf.pm
+		http://search.cpan.org/~fwiles/Apache-DB-0.11/lib/Apache/SmallProf.pm
+		Apache::DProf
+		Apache::SmallProf
+		Apache::FakeRequest
+		http://perl.apache.org/docs/1.0/guide/performance.html
+		http://perl.apache.org/docs/1.0/guide/performance.html#Code_Profiling_Techniques
+-	<& template::simple / &>? => speed
+-	mehrsprachigkeit
+	language/client vielleicht in template.pm integriegen:
+	<$ val language="de" $>deutsch <$ / $>
+	<$ val language="*" $> englisch<$ / $>
+	<$ val browser="ie" language="de" $>Deutsch iE<$ / $>
+-	mehrere ausgabemedien? pdf, xml, text, print, ... ?
+-	URL rewriting/dispatching?
+-	Apache::SessionManager anstatt Konstrukt::Session ?
+
+einheitliches system zur erstellung, auswertung, validierung, uebermittlung und speicherung von formulardaten ("DTD")
+	konvertierung zwischen den formaten: db (sql-escaping), text (html-escaping), formular, perl.
+	schnittstelle zwischen formular-definition, darstellung, speicherung in db, validation etc
+
+globale <$>'s. teils aus %ENV %COOKIE %PARAM %SESSION etc...
+globale $'s, die ueberall eingesetzt werden, wo kein $ angegeben ist. muessen nicht an template uebergeben werden, sondern existieren global
+my $'s, die _innerhalb_ eines templates gesetzt werden koennen und nicht zuerst uebergeben werden mussen
+
+-	Linecount im Parser
+
+plugins
+	- onlineedit
+		- ganze dateien bearbeiten
+		- teile von dateien bearbeiten
+	- "htmltidy"
+	- <& http method="get" url="http://foo/bar?field=value" / &>
+	  <& http method="post" url="http://foo/bar" &>
+	  	<$ field $>value<$ / $>
+	  <& / &>
+
+content noch deutlicher vom layout trennen?
+	- Flexible URL'S / CMS
+	- content in db/hierarchie ablegen
+	- <& template src="/content/register/text1.content" />
+
+Online-Authoring/Admin-System:
+  <&iblock src="blub" read="@all" write="@admin,@news,!@lamos,!arsch,ruler"/>
+  Allg. Admin.:
+   Users, Aliases, Blocks (lokale/cached), Rules, Groups, (Sites) verwalten.
+
+
+Online-Library:
+  -Als User registrieren/einloggen
+  -Anonymen Einblick erhalten
+   -Demopage zur Veraenderung
+  -Eigene Bloecke verwalten
+   -uppen (jeder upload resultiert in einer neuen id. aktualiesierung=upload)
+   -loeschen (intern durch deleted block oder link auf solchen implementierbar)
+  -Rechte vergeben
+   -public, free
+   -private
+   -block-list
+   -allow-list
+   -billing
+    -preis. aenderbar durch erneuten upload mit neuem preis.
+    -negativer preis!
+     gutschrift auf den aufrufenden user. z.b. fuer werbebloecke.
+     auszahlungsobergrenze (per user) festlegbar, um ein limit nicht zu ueberschreiten
+     log: user/sourcepage/sourceurl
+   -kategorisierung eigener bloecke
+  -User-bewertung/Punktesystem
+  
+
+Client-Server-Kommunikation:
+  Client:
+   Block: 1984
+   User: xen
+   Pass: moeglichstlangumsicherzusein
+  Server:
+   User/Pass ueberpruefen
+   Geforderten Block analysieren
+    Existenz
+    Billing
+    Rules
+   Block ggf. mit User/Pass encrypten und an den Client schicken
+   Evtl. Logging
+  Client:
+   Evtl. cachen
+   Ggf. entschluesseln -> hier kann der entschl block "geklaut" werden!
+   Parsen/Ausgeben
+

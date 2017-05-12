@@ -1,0 +1,56 @@
+NAME
+    Kwiki::Image - More comprehensive WAFL support for images.
+
+SYNOPSIS
+     $ cpan Kwiki::Image
+     $ cd /path/to/kwiki
+     $ echo "Kwiki::Image" >> plugins
+     $ kwiki -update
+
+DESCRIPTION
+    This plugin provides more comprehensive support for images in Kwiki.
+
+    It allows assigning a class to an image, surrounding the image with
+    a link tag, and adding an alt attribute.  It also allows a dynamically
+    created image to be treated as an image, even if it doesn't have one of the
+    standard image extensions that the Kwiki formatter looks for.
+
+    The Kwiki format is {image:src url alt class}.  The last 1, 2, or 3 items
+    in the list may be omitted.
+
+    For example:
+
+      {image:http://www.google.com/images/logo.gif http://www.google.com Google inline}
+
+    will render as:
+
+      <a href="http://www.google.com"><img src="http://www.google.com/images/logo.gif" alt="Google" class="inline" /></a>
+
+    For XHTML compliance, a default alt attribute is included if omitted:
+
+      {image:http://www.google.com/images/logo.gif http://www.google.com}
+
+    will render as:
+
+      <a href="http://www.google.com"><img src="http://www.google.com/images/logo.gif" alt="Image" /></a>
+
+    Another example:
+
+      {image:http://www.nowhere.com/images/fancygraph?type=onthefly}
+
+    will render as:
+
+      <img src="http://www.nowhere.com/images/fancygraph?type=onthefly" alt="Image" />
+
+
+AUTHORS
+    Dave Mabe <dmabe@runningland.com>
+
+SEE ALSO
+    Kwiki
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2004 by Dave Mabe
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.

@@ -1,0 +1,18 @@
+abstract: The selection of revision of both parties of Diff is enabled.
+author: Kazuhiro Osawa <ko@yappo.ne.jp>
+build_requires: 
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: Kwiki-Diff-Mutual
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Algorithm::Diff: 0
+  Kwiki: 0
+  Kwiki::Diff: 0
+  String::Diff: 0
+version: 0.01

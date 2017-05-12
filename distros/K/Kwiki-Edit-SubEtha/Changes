@@ -1,0 +1,56 @@
+____________________________________________________________________________
+[  2489] By: autrijus                              on 2004/07/27  16:51:37
+        Log: * This be 0.02 on cpan.
+	   ! lib/Kwiki/Edit/SubEtha.pm
+____________________________________________________________________________
+[  2487] By: ingy                                  on 2004/07/27  16:32:46
+        Log: * faster mkdir.
+	   ! lib/Kwiki/Edit/SubEtha.pm
+____________________________________________________________________________
+[  2486] By: autrijus                              on 2004/07/27  16:32:17
+        Log: * make subetha launch a bit more explicit.
+	   ! lib/Kwiki/Edit/SubEtha.pm
+____________________________________________________________________________
+[  2479] By: autrijus                              on 2004/07/27  15:25:07
+        Log: * oops, wrong place
+	   ! lib/Kwiki/Edit/SubEtha.pm
+____________________________________________________________________________
+[  2477] By: autrijus                              on 2004/07/27  15:01:03
+        Log: * keep homepage off from SEE
+	   ! lib/Kwiki/Edit/SubEtha.pm
+____________________________________________________________________________
+[  2473] By: autrijus                              on 2004/07/27  12:07:22
+        Log: * Initial commit of Kwiki::Edit::SubEtha.
+	   ! MANIFEST Makefile.PL README
+	   ! lib/Kwiki/Edit/SubEtha.pm
+	   ! script/subethakwiki.pl t/compile.t
+____________________________________________________________________________
+[  2468] By: ingy                                  on 2004/07/26  16:11:27
+        Log: * pack see_start_content.html to the module.
+	   ! lib/Kwiki/Edit/SubEtha.pm
+____________________________________________________________________________
+[  2462] By: ingy                                  on 2004/07/26  01:56:14
+        Log: .
+	   ! lib/Kwiki/Edit/SubEtha.pm
+____________________________________________________________________________
+[  2460] By: ingy                                  on 2004/07/26  01:28:06
+        Log: .
+	   ! lib/Kwiki/Edit/SubEtha.pm
+____________________________________________________________________________
+[  2459] By: autrijus                              on 2004/07/26  01:18:15
+        Log: * all scripts for K<=>S bridge.
+	   + script/forward.pl script/subethakwiki.pl
+	   + script/tcpxd.pl
+____________________________________________________________________________
+[  2458] By: autrijus                              on 2004/07/26  00:42:37
+        Log: * add macosx probing code.
+	   ! lib/Kwiki/Edit/SubEtha.pm
+____________________________________________________________________________
+[  2456] By: autrijus                              on 2004/07/26  00:30:36
+        Log: * logic.
+	   ! lib/Kwiki/Edit/SubEtha.pm
+____________________________________________________________________________
+[  2452] By: ingy                                  on 2004/07/25  23:19:36
+        Log: .
+	   + Changes MANIFEST Makefile.PL README
+	   + lib/Kwiki/Edit/SubEtha.pm t/compile.t

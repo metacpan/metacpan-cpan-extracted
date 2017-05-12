@@ -1,0 +1,141 @@
+=head1 NAME
+
+KappaCUDA - Easy access to NVIDIA CUDA from Perl using the Kappa Library.
+
+=head1 SYNOPSIS
+
+  use strict;
+  use warnings;
+  use threads;
+  # When Kappa keyword Perl is available, then variables can be
+  # shared between this main perl interpreter and the perl interpreters
+  # running as 'kernels' in the scheduled execution context.
+  # Perl interpreters do not run on the GPU--they run on the CPU's
+  # --but when they are running in the scheduled execution context they can
+  # access the Kappa Variables and properties of of the CUDA GPU
+  # for the given CUDA GPU context.
+  use threads::shared;
+  use KappaCUDA;
+
+  my $kappa = KappaCUDA::Kappa::Instance("","",0);
+
+  my $process = $kappa->GetProcess(0,0);
+
+  # Setup CUDA context
+  $process->ExecuteString ('<kappa>' . "\n" .
+     '!Context ->  context;' . "\n" .
+   '</kappa>' . "\n");
+
+  # Setup dimensions
+  $process->ExecuteString ('<kappa>' . "\n" .
+    '!Value -> WA = (3 * {BLOCK_SIZE}); // Matrix A width' . "\n" .
+    '!Value -> HA = (5 * {BLOCK_SIZE}); // Matrix A height' . "\n" .
+    '!Value -> WB = (8 * {BLOCK_SIZE}); // Matrix B width' . "\n" .
+    '!Value -> HB = #WA;                // Matrix B height' . "\n" .
+    '!Value -> WC = #WB;                // Matrix C width' . "\n" .
+    '!Value -> HC = #HA;                // Matrix C height' . "\n" .
+  '</kappa>' . "\n");
+
+  # Load matrixMul_kernel CUDA or PTX code
+  $process->ExecuteString ('<kappa>' . "\n" .
+    '!CUDA/Module MODULE_TYPE=%KAPPA{CU_MODULE} -> matrixMul = \'matrixMul_kernel.cu\';' . "\n" .
+  '</kappa>' . "\n");
+
+  # Create Variables
+  $process->ExecuteString ('<kappa>' . "\n" .
+    '!Variable -> A(#WA,#HA,%sizeof{float});' . "\n" .
+    '!Variable -> B(#WB,#HB,%sizeof{float});' . "\n" .
+    '!Variable VARIABLE_TYPE=%KAPPA{Device} DEVICEMEMSET=true ' . "\n" .
+    '-> C(#WC,#HC,%sizeof{float});' . "\n" .
+  '</kappa>' . "\n");
+
+  # Free Variables
+  $process->ExecuteString ('<kappa>' . "\n" .
+    '!Free -> A;' . "\n" .
+    '!Free -> B;' . "\n" .
+    '!Free -> C;' . "\n" .
+  '</kappa>' . "\n");
+
+  # Get CUDA kernel attributes
+  $process->ExecuteString ('<kappa>' . "\n" .
+    '!CUDA/Kernel/Attributes MODULE=matrixMul -> matrixMul;' . "\n" .
+  '</kappa>' . "\n");
+
+  # Unload CUDA module
+  $process->ExecuteString ('<kappa>' . "\n" .
+    '!CUDA/ModuleUnload -> matrixMul;' . "\n" .
+  '</kappa>' . "\n");
+
+  # Reset CUDA context
+  $process->ExecuteString ('<kappa>' . "\n" .
+    '!ContextReset -> Context_reset;' . "\n" .
+  '</kappa>' . "\n");
+
+  # Stop and Finish
+  $process->ExecuteString ('<kappa>' . "\n" .
+    '!Stop;' . "\n" .
+    '!Finish;' . "\n" .
+  '</kappa>' . "\n");
+
+  # wait for completion
+  $kappa->WaitForAll();
+
+=head1 DESCRIPTION
+
+This module gives access (via the Kappa Library) to all NVIDA CUDA
+driver functionality (a superset of the NVIDIA CUDA runtime
+functionality).  Since the Kappa Library is written in C++ and most
+(host) processing occurs within the Kappa library, the KappaCUDA
+module gives CUDA performance comparable to a C++ CUDA driver program.
+Since the Kappa Library automatically chooses NVIDIA suggested
+performance optimizations for the given NVIDIA GPU's and implements
+automatic concurrent CUDA kernel execution on FERMI GPU's, the
+KappaCUDA module can give CUDA performance better than C++ CUDA driver
+or runtime API programs (however, a hand tuned C++ Kappa Library or
+CUDA driver program will be faster).
+
+The (Commercial) Kappa Library is required and is available from
+psilambda.com.  The Kappa Library requires an appropriate NVIDIA CUDA
+GPU and driver--see the installation guides for the Kappa Library for
+other prerequisites.
+
+=head1 Kappa classes, methods, and syntax
+
+The following Kappa Library classes are available:
+
+F<Kappa.h>
+F<KappaConfig.h>
+F<kappa/ArgumentsDirection.h>
+F<kappa/ExceptionHandler.h>
+F<kappa/Process.h>
+F<kappa/Result.h>
+F<kappa/Namespace.h>
+F<kappa/Values.h>
+F<kappa/Value.h>
+F<kappa/Resource.h>
+F<kappa/Instruction.h>
+F<kappa/Attributes.h>
+F<kappa/Arguments.h>
+F<kappa/ProcessControlBlock.h>
+F<kappa/Context.h>
+
+The Kappa User Guide and the Kappa Reference Manual which are available at
+L<http://psilambda.com/support/documentation> document these classes, their methods, and the kappa syntax.
+
+When using these classes, the class name in the documentation must be changed to the wrapped perl version by prepending the 'KappaCUDA::' prefix.  For example: the C++ Kappa::Instance static method becomes the KappaCUDA::Kappa::Instance method.
+
+=head1 Generation of KappaCUDA.pm and KappaCUDA_wrap.cxx.
+
+This Perl module was generated using SWIG version 1.3.39.  Assuming
+that the CUDA toolkit is installed in /usr/local/cuda and the Kappa
+Library header files are installed in /usr/include, the following
+command will regenerate the KappaCUDA.pm and KappaCUDA_wrap.cxx files:
+
+swig -c++ -outcurrentdir -I/usr/local/cuda/include -I/usr/include -perl KappaCUDA.i
+
+=head2 AUTHOR
+
+Brian H. Dunford-Shore 
+
+Psi Lambda LLC <kappa@psilambda.com>.
+

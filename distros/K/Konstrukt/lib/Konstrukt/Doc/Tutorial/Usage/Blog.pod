@@ -1,0 +1,181 @@
+=head1 NAME
+
+Konstrukt::Doc::Tutorial::Usage::Blog - Using the blog plugin to create a blog
+
+=head1 DESCRIPTION
+
+This tutorial will teach you how to set up a website and use an existing
+application plugin.
+
+It will show you how easy it is to integrate full featured applications like a
+blog into your website.
+
+=head1 SETUP
+
+First of all, you have to create the directories, database and the configuration
+file needed for your website.
+
+=over
+
+=item 1. Create the directories C<cache>, C<log> and C<page> somewhere in a
+directory of your choice.
+Apache will need read and write access to this directories.
+Your directory structure should look like this:
+
+	cache/           #the directory where the objects get cached
+	 \- ...
+	
+	logs/            #your apache logs might be stored here
+	 |- access.log
+	 \- error.log
+	
+	page/            #the document root: all your pages and \
+	 \- ...
+
+=item 2. Create a MySQL database. For exmple create a database called "blog" for
+the user "blog" with the password "foobar":
+
+	CREATE DATABASE blog;
+	GRANT ALL ON blog.* TO blog@'%' IDENTIFIED by 'foobar';
+
+=item 3. Create a new vhost for this website. Advice on this can be found in
+the L<installation documentation|Konstrukt::Doc::Installation/Apache configuration>.
+
+=item 4. Create the page configuration file C<page/konstrukt.settings> and enter
+this settings:
+
+	#the plugins should create the database tables and templates automatically
+	#the web server will need write-access to your document root
+	autoinstall 1
+	
+	#activate the session management
+	session/use 1
+	
+	#specify the database we want to use
+	dbi/source dbi:mysql:blog:localhost
+	dbi/user   blog
+	dbi/pass   foobar
+	
+	#anonymous visitors can create blog
+	#entries and have admin rights
+	blog/userlevel_write          0
+	blog/userlevel_admin          0
+
+=item 4. Restart your apache and you're done with the setup!
+
+=back
+
+=head1 CREATE THE BLOG PAGE
+
+Now we will create the web page, that will contain the blog.
+
+Create a file C<index.html> inside the C<page> directory:
+
+	<html>
+		<head><title>my blog</title></head>
+		<body>
+			<& blog / &>
+		</body>
+	</html>
+
+That's already enough to embed a blog in your website!
+
+=head1 RUN IT
+
+Point your web browser to this page. You will see a page, that says, that there
+are no blog entries, yet. On the right you should see a link to create a new
+entry. Click on it and add an entry. You can even use
+L<wiki syntax|Konstrukt::Plugin::wiki::syntax> to format your blog entry.
+
+After you added the entry, it will be shown and you can edit and delete it.
+
+That's it! All needed database tables and templates have been created
+automatically (take a look into your database and in the page directory).
+You can wasily customize the look and feel by modifying the default templates.
+
+=head1 SEPARATING THE LAYOUT
+
+It's a good idea to keep common components like the layout in separate templates.
+
+Create a new template file C<layout.template> in the directory C<page/templates>:
+
+	<html>
+		<head><title><+$ title $+>default title<+$ / $+></title></head>
+		<body>
+			<+$ content $+>no content specified for this page<+$ / $+>
+		</body>
+	</html>
+
+Now chage C<index.html> to look like that:
+
+	<& template src="/templates/layout.template" title="my blog" &>
+		<$ content $>
+			<& blog / &>
+		<$ / $>
+	<& / &>
+
+The page will then load the layout template and put the specified title (which is
+"my blog") and the specified content (which is the blog) into it.
+You now can easily reuse your layout on other pages and only have to touch one
+file, when the layout changes.
+
+=head1 INCORPORATING USER MANAGEMENT
+
+Probably it's not your intention that every visitor can edit blog entries.
+In reality you just want a registered user to do that.
+
+Remove the lines:
+
+	blog/userlevel_write          0
+	blog/userlevel_admin          0
+
+from your C<konstrukt.settings>. Now only registered users with the appropriate
+permissions can write blog entries. (The existing entry can still be edited
+as it has been created by an anonymous user.)
+
+You now need to use the usermanagement to create a user and log in.
+
+Create a file C<login.html> and put this code into it:
+
+	<& template src="/templates/layout.template" title="usermanagement" &>
+		<$ content $>
+			<& perl &>
+				#preload plugins, which will react on events (register, deregister)
+				#that may be fired by the basic user management
+				use_plugin 'usermanagement::level';
+				use_plugin 'usermanagement::personal';
+			<& / &>
+			<& usermanagement::basic / &>
+		<$ / $>
+	<& / &>
+
+This page will use the L<basic usermanagement plugin|Konstrukt::Plugin::usermanagement::basic>
+to allow users to register themselves on the website and to log in.
+
+In the registration progress a mail with the initial password will be sent to the
+specified email address. So maybe you have to
+L<configure your mail settings|Konstrukt::Lib/CONFIGURATION>, if
+the defaults don't fit.
+
+Point your web browser to C<login.html> and register yourself with your email
+address. You'll get your initial password sent to that address and then can
+log in with your email address and your password. You then can edit blog entries
+again.
+
+Take a look at L<Konstrukt::Plugin::usermanagement::level> and
+L<Konstrukt::Plugin::blog/CONFIGURATION> to adjust the user permissions.
+
+=head1 AUTHOR
+
+Copyright 2006 Thomas Wittek (mail at gedankenkonstrukt dot de). All rights reserved. 
+
+This document is free software.
+It is distributed under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+Next: L<Konstrukt::Doc::Tutorial::Plugin::Randomline>
+
+Parent: L<Konstrukt::Doc>
+
+=cut

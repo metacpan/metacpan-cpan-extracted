@@ -1,0 +1,54 @@
+0.15
+    - Fix test due to changed buffer API
+
+0.14
+    - slight speed improvement for GIN insertions using a temp hash
+    - new concurrency test
+    - handle DB_NOTFOUND in get/exists
+
+0.13
+    - Update test suite for removal of private method from KiokuDB::Collapser
+
+0.12
+    - Add documentation section about backups and recovery.
+
+0.11
+    - Update test suite for KiokuDB 0.20
+    - Bump deps on KiokuDB and BerkeleyDB
+    - Die with correct error on insert
+    - Add all_entry_ids method
+
+0.10
+    - Specify DB_NOOVERWRITE to db_put if there is no previous entry to
+      disallow overwrite on insert.
+
+0.09
+    - Switch to Serialize::Delegate
+
+0.08
+    - Die if do "check_bdb_version.PL" fails (I forgot do is an implicit eval)
+
+0.07
+    - Depend on BDB 4.6 instead of 4.7
+
+0.06
+    - KiokuDB::Resolver was removed, update test suite
+
+0.05
+    - Try to reduce false positive test fails by using a PL_FILES trick in the
+      Makefile.PL, in order to get an NA instead of a FAIL if BDB is not recent
+      enough
+
+0.04
+    - for better compat with BDB's tools, stop using logs/data subdirs (old
+      layout is still detected)
+
+0.03
+    - Update for renamed backend roles
+
+0.02
+    - Dependency fixes
+    - GIN extractor is optional when dumping/loading database
+
+0.01
+    - Initial release

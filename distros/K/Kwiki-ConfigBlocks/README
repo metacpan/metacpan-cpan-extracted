@@ -1,0 +1,9 @@
+Kwiki::ConfigBlocks
+Config kwiki page behavior in the kwiki page
+
+Use this plugin to temporarily control the behavior of other plugins,
+if they have provide such spport. :)
+
+Cheers,
+Kang-min Liu
+

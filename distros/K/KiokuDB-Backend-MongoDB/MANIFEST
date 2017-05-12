@@ -1,0 +1,17 @@
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/KiokuDB/Backend/MongoDB.pm
+t/00-compile.t
+t/00-load.t
+t/mongodb.dsn.t
+t/mongodb.t
+t/pod.t
+t/release-dist-manifest.t
+t/release-distmeta.t
+t/release-has-version.t

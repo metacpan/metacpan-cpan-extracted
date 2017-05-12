@@ -1,0 +1,35 @@
+---
+abstract: 'perl flash media server'
+author:
+  - 'Daisuke Murase <typester@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+  Test::TCP: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Kamaitachi
+no_index:
+  directory:
+    - example
+    - inc
+    - t
+requires:
+  Danga::Socket: 0
+  Danga::Socket::Callback: 0
+  Data::AMF: 0.02004
+  Filter::Util::Call: 0
+  Moose: 0.60
+  MooseX::LogDispatch: 0
+  Path::Class: 0
+  Text::Glob: 0
+  perl: 5.008001
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.05

@@ -1,0 +1,24 @@
+---
+version: 0.04
+date: Thu Jun 30 19:21:51 PDT 2005
+changes:
+- Add a sequence index for recording nid to url
+- Adjust retrieval system to handle retrieval of content from Kwikis
+  that share the same sequence
+- Enable remote sequence handling
+---
+version: 0.03
+date: Tues Jun 28 19:21:17 PDT 2005
+changes:
+- Stabilized to somewhat working version
+---
+version: 0.02
+date: Mon Feb 28 00:04:42 PST 2005
+changes: 
+- Use Kwiki::Test
+- Slight improvements to INSTALL and README
+- First release to CPAN
+---
+version: 0.01
+date: Sat Feb 12 00:43:43 PST 2005
+changes: - Initial release

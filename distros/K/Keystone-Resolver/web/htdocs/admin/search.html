@@ -1,0 +1,10 @@
+%# $Id: search.html,v 1.2 2007-05-25 10:57:28 mike Exp $
+<%args>
+$_class => undef;
+</%args>
+<%perl>
+my $title = "Search";
+$title .= " for $_class" if defined $_class;
+</%perl>
+<& /mc/layout.mc, %ARGS, title => $title,
+    component => "/mc/search/search.mc" &>

@@ -1,0 +1,23 @@
+
+This distribution includes two plugins: Kwiki::Purple and 
+Kwiki::Purple::Sequence. The first requires the second.
+
+If you have already installed the modules from CPAN or have
+them in your SVN repository do this:
+
+  $ cd /path/to/kwiki
+  $ kwiki -add Kwiki::Purple::Sequence
+  $ kwiki -add Kwiki::Purple
+
+Otherwise you ca do this:
+
+  $ cd /path/to/kwiki
+  $ kwiki -install Kwiki::Purple::Sequence
+  $ kwiki -install Kwiki::Purple
+
+Keep in mind the Kwiki::Purple will alter the content of your
+wiki pages in a way that will take some effort to revert. If
+you are interested in experimenting with Kwiki::Purple, either
+do so on an experimental wiki, or one where you won't mind
+lots of purple nids in your pages.
+

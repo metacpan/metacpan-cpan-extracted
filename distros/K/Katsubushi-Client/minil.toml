@@ -1,0 +1,6 @@
+name = "Katsubushi-Client"
+# badges = ["travis"]
+authority="cpan:FUJIWARA"
+
+module_maker="ModuleBuildTiny"
+

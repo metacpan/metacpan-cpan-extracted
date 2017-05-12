@@ -1,0 +1,39 @@
+# $Id: Register,v 1.9 2008-04-01 20:20:43 mike Exp $
+
+pass	fail-jtitle
+pass	feature-jtitle
+pass	feature-single
+pass	feature-charset
+pass	feature-include-servicetype
+pass	feature-exclude-servicetype
+pass	feature-include-service
+pass	feature-exclude-service
+pass	openly-04
+pass	openly-05
+# Test "openly-11" actually works fine, but at present I can't figure
+# out how to get the necessary non-ASCII unicode sequences into the
+# test-case file.
+	openly-11
+pass	openly-12
+pass	openly-14
+	standard-0.1-p5a
+pass	standard-0.1-p5b
+	standard-0.1-p6
+pass	zetoc-sauroposeidon1
+pass	zetoc-sauroposeidon2
+pass	zetoc-suuwassea
+
+end
+
+# The following tests need network access for various reasons
+pass	openly-01	# to resolve a DOI
+pass	openly-02	# to resolve a DOI
+pass	openly-03	# to defererence the context object
+pass	openly-03a	# to defererence the context object
+pass	openly-06	# to defererence the context object
+pass	openly-07	# to resolve a DOI
+pass	openly-08	# to defererence an entity
+pass	openly-09	# to defererence an entity
+pass	openly-10	# to defererence the context object
+pass	openly-13	# to defererence the context object
+pass	standard-0.1-p4	# to resolve a DOI

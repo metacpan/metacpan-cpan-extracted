@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<results>
+  <data entity="rft">
+    <metadata key="atitle">Sauroposeidon proteles, a new sauropod from the early Cretaceous of Oklahoma</metadata>
+    <metadata key="auinit">M. J.</metadata>
+    <metadata key="aulast">WEDEL</metadata>
+    <metadata key="date">2000</metadata>
+    <metadata key="epage">114</metadata>
+    <metadata key="genre">article</metadata>
+    <metadata key="issn">0272-4634</metadata>
+    <metadata key="issue">1</metadata>
+    <metadata key="jtitle">JOURNAL OF VERTEBRATE PALEONTOLOGY</metadata>
+    <metadata key="spage">109</metadata>
+    <metadata key="volume">20</metadata>
+  </data>
+  <result type="abstract" priority="10" tag=""
+	service="BioOne"
+	>http://www.bioone.org/bioone/?request=get-document&amp;issn=0272-4634&amp;volume=020&amp;issue=01&amp;page=0109</result>
+  <result type="citeref" priority="15" tag=""
+	service="Endnote citation"
+	>http://example.com/resolve?rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Ajournal&amp;rft.atitle=Sauroposeidon%20proteles%2C%20a%20new%20sauropod%20from%20the%20early%20Cretaceous%20of%20Oklahoma&amp;rft.auinit=M.%20J.&amp;rft.aulast=WEDEL&amp;rft.date=2000&amp;rft.epage=114&amp;rft.genre=article&amp;rft.issn=0272-4634&amp;rft.issue=1&amp;rft.jtitle=JOURNAL%20OF%20VERTEBRATE%20PALEONTOLOGY&amp;rft.spage=109&amp;rft.title=JOURNAL%20OF%20VERTEBRATE%20PALEONTOLOGY&amp;rft.volume=20&amp;rfr_id=info%3Asid%2Fmimas%3Azetoc&amp;svc_dat=indexdata:citation:Endnote</result>
+  <result type="authorsearch" priority="10" tag=""
+	service="Google"
+	>http://www.google.com/search?q=%22M. J. WEDEL%22</result>
+  <result type="citation" priority="20" tag="APP"
+	service="APP-style citation" mimetype="text/html"
+	>WEDEL, M. J.  2000.  Sauroposeidon proteles, a new sauropod from the early Cretaceous of Oklahoma.  &lt;i&gt;JOURNAL OF VERTEBRATE PALEONTOLOGY&lt;/i&gt;, 20: 109-114.</result>
+  <result type="citation" priority="20" tag="author"
+	service="Author and year" mimetype="text/html"
+	>WEDEL, M. J.  2000.</result>
+  <result type="websearch" priority="5" tag="masterkey"
+	service="MasterKey"
+	>http://masterkey.indexdata.com/author=WEDEL&amp;title=Sauroposeidon proteles, a new sauropod from the early Cretaceous of Oklahoma&amp;date=2000</result>
+  <result type="websearch" priority="10" tag=""
+	service="Google"
+	>http://www.google.com/search?q=%22Sauroposeidon proteles, a new sauropod from the early Cretaceous of Oklahoma%22</result>
+  <result type="websearch" priority="20" tag=""
+	service="Alltheweb"
+	>http://alltheweb.com/search?q=%22Sauroposeidon proteles, a new sauropod from the early Cretaceous of Oklahoma%22</result>
+  <result type="websearch" priority="30" tag=""
+	service="AltaVista"
+	>http://www.altavista.com/web/results?q=%22Sauroposeidon proteles, a new sauropod from the early Cretaceous of Oklahoma%22</result>
+</results>

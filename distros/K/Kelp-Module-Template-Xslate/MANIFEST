@@ -1,0 +1,12 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.md
+dist.ini
+lib/Kelp/Module/Template/Xslate.pm
+t/conf/config.pl
+t/main.t
+t/release-pod-syntax.t
+t/views/home.tx

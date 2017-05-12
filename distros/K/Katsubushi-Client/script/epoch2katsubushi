@@ -1,0 +1,7 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Katsubushi::Converter;
+
+my $epoch = shift;
+print Katsubushi::Converter::epoch_to_id($epoch), "\n";

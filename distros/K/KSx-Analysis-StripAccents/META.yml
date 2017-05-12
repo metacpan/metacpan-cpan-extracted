@@ -1,0 +1,19 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         KSx-Analysis-StripAccents
+version:      0.05
+version_from: lib/KSx/Analysis/StripAccents.pm
+installdirs:  site
+requires:
+    base:                          0
+    Encode:                        0
+    KinoSearch:                    0.2
+    KinoSearch::Analysis::Analyzer: 0
+    strict:                        0
+    Test::More:                    0
+    Text::Unaccent:                0
+    utf8:                          0
+    warnings:                      0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

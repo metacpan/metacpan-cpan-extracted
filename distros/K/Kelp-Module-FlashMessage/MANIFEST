@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.pod
+dist.ini
+lib/Kelp/Module/FlashMessage.pm
+t/00_basic.t
+t/01_custom_conf.t
+t/conf/config.pl
+t/release-pod-syntax.t

@@ -1,0 +1,42 @@
+---
+version: 0.16
+date:    Tue Aug 4 9:49:00 CDT 2009
+changes:
+- Fixed a remotely exploitable hole, please update ASAP
+---
+version: 0.15
+date:    Fri Apr 15 11:24:48 PDT 2005
+changes:
+- Accomdate Spoon Changes
+- Fixed rcs lock issues
+- eliminate rcs warnings
+---
+version: 0.14
+date:    Tue Jan 11 07:58:27 PST 2005
+changes:
+- Add archive if none for new page
+- Move commit hook to super class
+- Fix unix time to work for older stuff
+---
+version: 0.13
+date:    Fri Dec 17 02:49:38 PST 2004
+changes:
+- commit is also called by commit_all. so it can't itself be a hook.
+version: 0.12
+date:    Wed Dec 15 14:41:31 PST 2004
+changes:
+- Make compatible with Kwiki-0.34
+- method to determine whether a revisions button should be shown
+- Add ability to save any generic metadata fields
+- Support older rcs files with older metadat formats
+- commit method support new Spoon::Hook
+---
+version: 0.11
+date:    Sat Aug 14 21:45:20 PDT 2004
+changes:
+- Archive API changes by autrijus
+---
+version: 0.10
+date:    Mon Jun 21 15:53:33 PDT 2004
+changes:
+- Initial release

@@ -1,0 +1,66 @@
+$Id: README.apache2-mod_perl,v 1.2 2008-01-29 14:48:57 mike Exp $
+
+We had some difficulty initially in getting the resolver to run under
+Apache2/mod_perl2 -- it was initially developed under Apache the 1.3
+series.  The results of our experiments are in the file
+	web/conf/apache2.0/development.conf
+which is a good starting point for making custom configurations.
+
+
+=== FINDING THE RESOLVER LIBRARIES
+
+For reasons we don't fully understand, mod_perl 2 (at least as
+packaged for Debian) runs with taint-checking turned on, whereas
+mod_perl 1 didn't.  Because of this, the PERL5LIB environment variable
+is ignored, and so another approach is required to make the
+development versions of the resolver Perl libraries available
+(i.e. not whatever versions may have been installed from Debian
+packages).  The best way seems to be to use the PerlSwitches
+directive to pass in a "-I <dir>" option:
+	PerlSwitches -I/usr/local/src/cvs/openurl-resolver/lib
+
+In order for the PerlSwitches directive to be honoured, it's also
+necessary to set "PerlOption +Parent", which means that a new and
+dedicated Perl interpreter is created for each virtual host.
+
+
+=== OBTAINING THE REQUEST OBJECT
+
+At one point, it seemed as though in order to be able to obtain the
+Apache request object using Apache2::RequestUtil->request(), we had to
+set another Perl option in the Apache configuration:
+	PerlOptions +GlobalRequest
+As I write, this does _not_ seem to be necessary, but its worth noting
+here as something to try if all does not go according to plan.
+
+
+=== OBTAINING A USEFUL REQUEST OBJECT
+
+The request object $r supplied by Apache2/mod_perl2 is not an
+Apache2::Request, but an Apache2::RequestRec, which, astonishingly,
+does not have the indispensible param() method.  To use param() you
+need to create an Apache2::Request, which you can do using:
+	$rr = new Apache2::Request($r);
+
+
+=== DEFEATING THE UNDEFINED-SYMBOL DEMONS OF APREQ_HANDLE_APACHE
+
+You may find that when you invoke one of various Apache2 functions --
+such as creating an Apache2::Request object as suggested above -- you
+run into this mysterious error message:
+	/usr/sbin/apache2: symbol lookup error: /usr/lib/perl5/auto/APR/Request/Apache2/Apache2.so: undefined symbol: apreq_handle_apache2
+You can do what I did and waste the best part of your life casting
+wildly around for a fix, or you can just enable the "apreq" (Apache
+Request?) module in Apache2:
+	sudo a2enmod apreq
+Well, of course!  How obvious!
+
+(You may ask why, when mod_perl2 is enabled in the web server, the
+ability to access a meaningful request object is not also enabled, or
+at least why things are not arranged so that you get a comprehensible
+and informative error-message if you try to use facilities that are
+not enabled.  I certainly ask why.)
+
+
+=== Stay tuned for more exciting adventures with Apache2.
+

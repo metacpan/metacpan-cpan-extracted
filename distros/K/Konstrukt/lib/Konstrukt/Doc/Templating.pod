@@ -1,0 +1,97 @@
+=head1 NAME
+
+Konstrukt::Doc::Templating - Using templating to create static web sites
+
+=head1 DESCRIPTION
+
+This framework cannot only be used to create dynamic websites but also to
+create modular and maintainable static websites.
+The L<template plugin|Konstrukt::Plugin::template> can be used to modularize
+your website:
+
+You are enouraged to encapsulate your web site components that are used in several
+places in templates, which then can be reused to avoid redundancy.
+A website usually consists of several components, that are used in many pages
+(layout, navigation, message boxes, tables, ...).
+
+Each template consists of static text and variable parts, that can be
+substituted on the usage of the template.
+
+=head1 BASIC TEMPLATE EXAMPLE
+
+The simplest example for this is the encapsulation of the layout. The layout
+will probably be the same across all your pages, so reuse of the layout instead
+of copy and paste is a good idea. With Konstrukt you will do it like that:
+
+B<layout.template> (define the layout and the variable fields):
+
+	<html>
+	<head><title><+$ title +$>Default Title<+$ / $+></title></head>
+	<body>
+		<div id="navigation">
+			Navigation: (Some Links...)
+		</div>
+		<div id="content">
+			Content: <+$ content $+>No content<+$ / $+>
+		</div>
+	</body>
+	</html>
+
+Where C<title> and C<content> are variables, that will be replaced by
+page-specific values. The text between the variable tags is the default for
+the variable, if no value is specified.
+
+B<index.html> (use the layout and replace the variable fields with custom content):
+
+	<& template src=“layout"layout.template" &>
+		<$ title $>My web page<$ / $>
+		<$ content $>
+			Some great content
+		<$ / $>
+	<& / &>
+
+So in every page you only specify the essential data like the title and the
+content of this page. Recurring data like the layout, which is wrapped around
+your content, will be cleanly separated in the template files.
+
+B<Result> (some whitespaces may vary...):
+
+	<html>
+	<head><title>My web page</title></head>
+	<body>
+		<div id="navigation">
+			Navigation: (Some Links...)
+		</div>
+		<div id="content">
+			Content: Some great content
+		</div>
+	</body>
+	</html>
+
+=head1 TEMPLATE SYNTAX
+
+Basically you define some slots in your template using C<E<lt>+$ field_name $+E<gt>> and
+C<E<lt>+@ list_name @+E<gt>> tags and fill them using a C<E<lt>& template &E<gt>> tag containing
+C<E<lt>$ field_name $E<gt>valueE<lt>$ / $E<gt>> and C<E<lt>@ list_name @E<gt>list_fields...E<lt>@ / @E<gt>> tags
+that define the content to fill the slots.
+
+For a complete reference of the templating syntax see L<Konstrukt::Plugin::template>.
+
+=head1 AUTHOR 
+
+Copyright 2006 Thomas Wittek (mail at gedankenkonstrukt dot de). All rights reserved. 
+
+This document is free software.
+It is distributed under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+Next: L<Konstrukt::Doc::FunctionPlugins>
+
+Previous: L<Konstrukt::Doc::Basics>
+
+Parent: L<Konstrukt::Doc>
+
+See also: L<Konstrukt::Doc::PluginList>
+
+=cut

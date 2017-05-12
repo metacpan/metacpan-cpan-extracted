@@ -1,0 +1,166 @@
+
+# Auto-generated file -- DO NOT EDIT!!!!!
+
+=head1 NAME
+
+KinoSearch::Object::Obj - Base class for all KinoSearch objects.
+
+=head1 DEPRECATED
+
+The KinoSearch code base has been assimilated by the Apache L<Lucy> project.
+The "KinoSearch" namespace has been deprecated, but development continues
+under our new name at our new home: L<http://lucy.apache.org/>
+
+=head1 SYNOPSIS
+
+    package MyObj;
+    use base qw( KinoSearch::Object::Obj );
+    
+    # Inside-out member var.
+    my %foo;
+    
+    sub new {
+        my ( $class, %args ) = @_;
+        my $foo = delete $args{foo};
+        my $self = $class->SUPER::new(%args);
+        $foo{$$self} = $foo;
+        return $self;
+    }
+    
+    sub get_foo {
+        my $self = shift;
+        return $foo{$$self};
+    }
+    
+    sub DESTROY {
+        my $self = shift;
+        delete $foo{$$self};
+        $self->SUPER::DESTROY;
+    }
+
+
+
+=head1 DESCRIPTION
+
+All objects in the KinoSearch:: hierarchy descend from
+KinoSearch::Object::Obj.  All classes are implemented as blessed scalar
+references, with the scalar storing a pointer to a C struct.
+
+=head2 Subclassing
+
+The recommended way to subclass KinoSearch::Object::Obj and its descendants is
+to use the inside-out design pattern.  (See L<Class::InsideOut> for an
+introduction to inside-out techniques.)
+
+Since the blessed scalar stores a C pointer value which is unique per-object,
+C<$$self> can be used as an inside-out ID.
+
+    # Accessor for 'foo' member variable.
+    sub get_foo {
+        my $self = shift;
+        return $foo{$$self};
+    }
+
+
+Caveats:
+
+=over
+
+=item *
+
+Inside-out aficionados will have noted that the "cached scalar id" stratagem
+recommended above isn't compatible with ithreads -- but KinoSearch doesn't
+support ithreads anyway, so it doesn't matter.
+
+=item *
+
+Overridden methods must not return undef unless the API specifies that
+returning undef is permissible.  (Failure to adhere to this rule currently
+results in a segfault rather than an exception.)
+
+=back
+
+=head1 CONSTRUCTOR
+
+=head2 new()
+
+Abstract constructor -- must be invoked via a subclass.  Attempting to
+instantiate objects of class "KinoSearch::Object::Obj" directly causes an
+error.
+
+Takes no arguments; if any are supplied, an error will be reported.
+
+=head1 DESTRUCTOR
+
+=head2 DESTROY
+
+All KinoSearch classes implement a DESTROY method; if you override it in a
+subclass, you must call C<< $self->SUPER::DESTROY >> to avoid leaking memory.
+
+
+
+
+=head1 ABSTRACT METHODS
+
+=head2 to_i64()
+
+Convert the object to a 64-bit integer.
+
+=head2 to_f64()
+
+Convert the object to a double precision floating point number.
+
+=head2 load(dump)
+
+Create an object from the output of a call to dump().  Implementations
+must not reference the caller.
+
+=over
+
+=item *
+
+B<dump> - The output of dump().
+
+=back
+
+
+
+=head1 METHODS
+
+=head2 to_string()
+
+Generic stringification: "ClassName@hex_mem_address".
+
+=head2 equals(other)
+
+Indicate whether two objects are the same.  By default, compares the
+memory address.
+
+=over
+
+=item *
+
+B<other> - Another Obj.
+
+=back
+
+=head2 dump()
+
+Return a representation of the object using only scalars, hashes, and
+arrays.  Some implementations support JSON serialization via dump() and
+its companion method, load(); for others, dump() is only a debugging
+aid.  The default simply calls to_string().
+
+
+
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005-2011 Marvin Humphrey
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
+

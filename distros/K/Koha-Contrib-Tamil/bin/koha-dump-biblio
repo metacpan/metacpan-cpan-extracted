@@ -1,0 +1,164 @@
+#!/usr/bin/perl
+
+# PODNAME: koha-dump-biblio
+# ABSTRACT: Dump a Koha Catalog
+
+use Modern::Perl;
+use Pod::Usage;
+use Getopt::Long;
+use Koha::Contrib::Tamil::Biblio::Dumper;
+
+
+my $verbose  = 0;
+my $help     = 0;
+my $formater = 'iso2709';
+my @branches;
+my $query    = '';
+GetOptions( 
+    'verbose|v'    => \$verbose,
+    'branch|b=s'   => \@branches,
+    'query|q=s'    => \$query,
+    'formater|f=s' => \$formater,
+    'help|h'       => \$help,
+);
+
+
+sub usage {
+    pod2usage( -verbose => 2 );
+    exit;
+} 
+
+
+usage() if $help;          
+
+my $file = $ARGV[0] // 'dump.mrc';
+
+my $dumper = Koha::Contrib::Tamil::Biblio::Dumper->new(
+    verbose  => $verbose,
+    file     => $file,
+    branches => \@branches,
+    query    => $query,
+    formater => $formater,
+);
+$dumper->run();
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+koha-dump-biblio - Dump a Koha Catalog
+
+=head1 VERSION
+
+version 0.049
+
+=head1 DESCRIPTION
+
+With this script you can export a Koha Catalog in whole or in part. Without
+parameter, the whole catalog is exported in an ISO2709 file named dump.mrc.
+Playing with parameters, you can:
+
+=over
+
+=item *
+
+Specify the name of the file containing the exported records.
+
+=item *
+
+Specifiy the format of the file: ISO2709 or MARCXML.
+
+=item *
+
+Select the exported biblio records and items, based on branch names, and/or a
+SQL query. For example, you can export all the biblio records from a specific
+library that have been added the last week, with an item call number beginning
+with a specific letter.
+
+=back
+
+=head1 NAME
+
+koha-dump-biblio - Dump a Koha Catalog
+
+=head1 SYNOPSYS
+
+ koha-dump-biblio
+ koha-dump-biblio --branch MAIN
+ koha-dump-biblio --branch MAIN --branch EAST catalog.mrc
+ koha-dump-biblio --branch MAIN --formater marcxml catalog.xml
+ koha-dump-biblio --branch MAIN --query "SELECT biblionumber FROM items WHERE barcode LIKE 'X%' --formater marcxml catalog.xml
+
+=head1 PARAMETERS
+
+=over
+
+=item B<-formater=iso2709|marcxml|text|yaml|json>
+
+Specify the format of the file containing the exported records. You can choose
+between ISO2709 format and MARCXML, but also textual formts. By default
+C<iso2709>.
+
+=item B<-branch>
+
+Select the library of the items to be included to the exported biblio records.
+You can select several libraries by repeating this parameter. For example:
+B<-branch MAIN -branch EAST>. If the B<-query> parameter isn't used, the
+B<-branch> parameter select also the biblio records. In other words, biblio
+records without items belonging the the specifed libraries won't be exported.
+
+=item B<-query>
+
+This parameter contains an SQL query which select the biblio records to export
+with their biblionumber.
+
+For example:
+
+=over
+
+=item Select two records, biblionumber 10 and 100:
+
+-query "SELECT 10 AS biblionumber UNION ALL SELECT 11 AS biblionumber"
+
+=item Select records containing items which barcode start with a X:
+
+-query "SELECT biblionumber FROM items WHERE barcode LIKE 'X%'"
+
+=back
+
+=item B<--verbose|-v>
+
+Display a progress status of the export process.
+
+=item B<--help|-h>
+
+Print this help page.
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2013 by Tamil, s.a.r.l.
+
+L<http://www.tamil.fr>
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl 5 itself.
+
+=head1 AUTHOR
+
+Frédéric Demians <f.demians@tamil.fr>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2016 by Fréderic Démians.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

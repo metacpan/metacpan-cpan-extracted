@@ -1,0 +1,14 @@
+name: Kwiki-Template-TT2-UTF8
+version: 0.02
+abstract: UTF8-safe Template
+author: Kang-min Liu <gugod@gugod.org>
+license: perl
+distribution_type: module
+build_requires:
+  Test::More: 0
+requires:
+  Kwiki: 0.36
+no_index:
+  directory:
+    - inc
+generated_by: Module::Install version 0.36

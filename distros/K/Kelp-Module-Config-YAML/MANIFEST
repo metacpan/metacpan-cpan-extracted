@@ -1,0 +1,11 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.md
+dist.ini
+lib/Kelp/Module/Config/YAML.pm
+t/conf/config.yml
+t/main.t
+t/release-pod-syntax.t

@@ -1,0 +1,4 @@
+0.02	2005-01-02 Kang-min Liu <gugod@gugod.org>
+	* Use Kwiki 0.36's Hook to use only one module instead of two.
+	* Now it out images in png,jpeg, or gif.
+	  Depends on your GD.pm support.

@@ -1,0 +1,241 @@
+---
+name: Konstrukt
+version: 0.5
+author:
+  - 'Thomas Wittek <mail@gedankenkonstrukt.de>'
+abstract: Web application/design framework
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Bundle::LWP: 1
+  CGI: 3
+  Clone: 0.2
+  Cwd: 0
+  DBI: 1.4
+  Date::Calc: 5.4
+  DateTime: 0.2
+  DateTime::Format::Mail: 0.28
+  Devel::UseAnyFunc: 1
+  Digest::SHA: 5.32
+  HTTP::BrowserDetect: 0.98
+  Image::Magick: 6.2.4
+  MIME::Base64: 3
+  POSIX: 1
+  Session: 0.01
+  Storable: 2.1
+  Text::Diff: 0.35
+  Time::HiRes: 1.5
+  Time::Local: 1
+  Time::Zone: 2
+  perl: 5.6.1
+build_requires:
+  Cwd: 0
+  File::Temp: 0
+  Module::Build: 0.26
+  Test::More: 0
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+  Test::Strict: 0
+recommends:
+  Clone::Fast: 0.9
+  Data::Dump: 1
+  Digest::HMAC_MD5: 1
+  Mail::Sender: 0.8.13
+  Scalar::Util::Clone: 0.04
+provides:
+  Konstrukt:
+    file: lib/Konstrukt.pm
+    version: 0.5
+  Konstrukt::Attributes:
+    file: lib/Konstrukt/Attributes.pm
+  Konstrukt::Cache:
+    file: lib/Konstrukt/Cache.pm
+  Konstrukt::DBI:
+    file: lib/Konstrukt/DBI.pm
+  Konstrukt::Debug:
+    file: lib/Konstrukt/Debug.pm
+  Konstrukt::Event:
+    file: lib/Konstrukt/Event.pm
+  Konstrukt::File:
+    file: lib/Konstrukt/File.pm
+  Konstrukt::Handler:
+    file: lib/Konstrukt/Handler.pm
+  Konstrukt::Handler::Apache:
+    file: lib/Konstrukt/Handler/Apache.pm
+  Konstrukt::Handler::CGI:
+    file: lib/Konstrukt/Handler/CGI.pm
+  Konstrukt::Handler::File:
+    file: lib/Konstrukt/Handler/File.pm
+  Konstrukt::Lib:
+    file: lib/Konstrukt/Lib.pm
+  Konstrukt::Parser:
+    file: lib/Konstrukt/Parser.pm
+  Konstrukt::Parser::Node:
+    file: lib/Konstrukt/Parser/Node.pm
+  Konstrukt::Plugin:
+    file: lib/Konstrukt/Plugin.pm
+  Konstrukt::Plugin::blog:
+    file: lib/Konstrukt/Plugin/blog.pm
+  Konstrukt::Plugin::blog::DBI:
+    file: lib/Konstrukt/Plugin/blog/DBI.pm
+  Konstrukt::Plugin::bookmarks:
+    file: lib/Konstrukt/Plugin/bookmarks.pm
+  Konstrukt::Plugin::bookmarks::DBI:
+    file: lib/Konstrukt/Plugin/bookmarks/DBI.pm
+  Konstrukt::Plugin::browserstats:
+    file: lib/Konstrukt/Plugin/browserstats.pm
+  Konstrukt::Plugin::browserstats::DBI:
+    file: lib/Konstrukt/Plugin/browserstats/DBI.pm
+  Konstrukt::Plugin::calendar:
+    file: lib/Konstrukt/Plugin/calendar.pm
+  Konstrukt::Plugin::calendar::DBI:
+    file: lib/Konstrukt/Plugin/calendar/DBI.pm
+  Konstrukt::Plugin::captcha:
+    file: lib/Konstrukt/Plugin/captcha.pm
+  Konstrukt::Plugin::captcha::text:
+    file: lib/Konstrukt/Plugin/captcha/text.pm
+  Konstrukt::Plugin::date:
+    file: lib/Konstrukt/Plugin/date.pm
+  Konstrukt::Plugin::diff:
+    file: lib/Konstrukt/Plugin/diff.pm
+  Konstrukt::Plugin::env:
+    file: lib/Konstrukt/Plugin/env.pm
+  Konstrukt::Plugin::errors:
+    file: lib/Konstrukt/Plugin/errors.pm
+  Konstrukt::Plugin::formvalidator:
+    file: lib/Konstrukt/Plugin/formvalidator.pm
+  Konstrukt::Plugin::guestbook:
+    file: lib/Konstrukt/Plugin/guestbook.pm
+  Konstrukt::Plugin::guestbook::DBI:
+    file: lib/Konstrukt/Plugin/guestbook/DBI.pm
+  Konstrukt::Plugin::hitstats:
+    file: lib/Konstrukt/Plugin/hitstats.pm
+  Konstrukt::Plugin::hitstats::DBI:
+    file: lib/Konstrukt/Plugin/hitstats/DBI.pm
+  Konstrukt::Plugin::if:
+    file: lib/Konstrukt/Plugin/if.pm
+  Konstrukt::Plugin::kill:
+    file: lib/Konstrukt/Plugin/kill.pm
+  Konstrukt::Plugin::log:
+    file: lib/Konstrukt/Plugin/log.pm
+  Konstrukt::Plugin::log::DBI:
+    file: lib/Konstrukt/Plugin/log/DBI.pm
+  Konstrukt::Plugin::mail::obfuscator:
+    file: lib/Konstrukt/Plugin/mail/obfuscator.pm
+  Konstrukt::Plugin::param:
+    file: lib/Konstrukt/Plugin/param.pm
+  Konstrukt::Plugin::perl:
+    file: lib/Konstrukt/Plugin/perl.pm
+  Konstrukt::Plugin::perlvar:
+    file: lib/Konstrukt/Plugin/perlvar.pm
+  Konstrukt::Plugin::sortlines:
+    file: lib/Konstrukt/Plugin/sortlines.pm
+  Konstrukt::Plugin::sql:
+    file: lib/Konstrukt/Plugin/sql.pm
+  Konstrukt::Plugin::svar:
+    file: lib/Konstrukt/Plugin/svar.pm
+  Konstrukt::Plugin::tags:
+    file: lib/Konstrukt/Plugin/tags.pm
+  Konstrukt::Plugin::tags::DBI:
+    file: lib/Konstrukt/Plugin/tags/DBI.pm
+  Konstrukt::Plugin::template:
+    file: lib/Konstrukt/Plugin/template.pm
+  Konstrukt::Plugin::upcase:
+    file: lib/Konstrukt/Plugin/upcase.pm
+  Konstrukt::Plugin::uriencode:
+    file: lib/Konstrukt/Plugin/uriencode.pm
+  Konstrukt::Plugin::usermanagement:
+    file: lib/Konstrukt/Plugin/usermanagement.pm
+  Konstrukt::Plugin::usermanagement::basic:
+    file: lib/Konstrukt/Plugin/usermanagement/basic.pm
+  Konstrukt::Plugin::usermanagement::basic::DBI:
+    file: lib/Konstrukt/Plugin/usermanagement/basic/DBI.pm
+  Konstrukt::Plugin::usermanagement::level:
+    file: lib/Konstrukt/Plugin/usermanagement/level.pm
+  Konstrukt::Plugin::usermanagement::level::DBI:
+    file: lib/Konstrukt/Plugin/usermanagement/level/DBI.pm
+  Konstrukt::Plugin::usermanagement::personal:
+    file: lib/Konstrukt/Plugin/usermanagement/personal.pm
+  Konstrukt::Plugin::usermanagement::personal::DBI:
+    file: lib/Konstrukt/Plugin/usermanagement/personal/DBI.pm
+  Konstrukt::Plugin::wiki:
+    file: lib/Konstrukt/Plugin/wiki.pm
+  Konstrukt::Plugin::wiki::backend:
+    file: lib/Konstrukt/Plugin/wiki/backend.pm
+  Konstrukt::Plugin::wiki::backend::article:
+    file: lib/Konstrukt/Plugin/wiki/backend/article.pm
+  Konstrukt::Plugin::wiki::backend::article::DBI:
+    file: lib/Konstrukt/Plugin/wiki/backend/article/DBI.pm
+  Konstrukt::Plugin::wiki::backend::file:
+    file: lib/Konstrukt/Plugin/wiki/backend/file.pm
+  Konstrukt::Plugin::wiki::backend::file::DBI:
+    file: lib/Konstrukt/Plugin/wiki/backend/file/DBI.pm
+  Konstrukt::Plugin::wiki::backend::image:
+    file: lib/Konstrukt/Plugin/wiki/backend/image.pm
+  Konstrukt::Plugin::wiki::backend::image::DBI:
+    file: lib/Konstrukt/Plugin/wiki/backend/image/DBI.pm
+  Konstrukt::Plugin::wiki::markup::acronym:
+    file: lib/Konstrukt/Plugin/wiki/markup/acronym.pm
+  Konstrukt::Plugin::wiki::markup::basic:
+    file: lib/Konstrukt/Plugin/wiki/markup/basic.pm
+  Konstrukt::Plugin::wiki::markup::basic_string:
+    file: lib/Konstrukt/Plugin/wiki/markup/basic_string.pm
+  Konstrukt::Plugin::wiki::markup::blockplugin:
+    file: lib/Konstrukt/Plugin/wiki/markup/blockplugin.pm
+  Konstrukt::Plugin::wiki::markup::definition:
+    file: lib/Konstrukt/Plugin/wiki/markup/definition.pm
+  Konstrukt::Plugin::wiki::markup::headline:
+    file: lib/Konstrukt/Plugin/wiki/markup/headline.pm
+  Konstrukt::Plugin::wiki::markup::hr:
+    file: lib/Konstrukt/Plugin/wiki/markup/hr.pm
+  Konstrukt::Plugin::wiki::markup::htmlescape:
+    file: lib/Konstrukt/Plugin/wiki/markup/htmlescape.pm
+  Konstrukt::Plugin::wiki::markup::inlineplugin:
+    file: lib/Konstrukt/Plugin/wiki/markup/inlineplugin.pm
+  Konstrukt::Plugin::wiki::markup::link:
+    file: lib/Konstrukt/Plugin/wiki/markup/link.pm
+  Konstrukt::Plugin::wiki::markup::link::article:
+    file: lib/Konstrukt/Plugin/wiki/markup/link/article.pm
+  Konstrukt::Plugin::wiki::markup::link::external:
+    file: lib/Konstrukt/Plugin/wiki/markup/link/external.pm
+  Konstrukt::Plugin::wiki::markup::link::file:
+    file: lib/Konstrukt/Plugin/wiki/markup/link/file.pm
+  Konstrukt::Plugin::wiki::markup::link::image:
+    file: lib/Konstrukt/Plugin/wiki/markup/link/image.pm
+  Konstrukt::Plugin::wiki::markup::link::nolink:
+    file: lib/Konstrukt/Plugin/wiki/markup/link/nolink.pm
+  Konstrukt::Plugin::wiki::markup::linkplugin:
+    file: lib/Konstrukt/Plugin/wiki/markup/linkplugin.pm
+  Konstrukt::Plugin::wiki::markup::list:
+    file: lib/Konstrukt/Plugin/wiki/markup/list.pm
+  Konstrukt::Plugin::wiki::markup::list_template:
+    file: lib/Konstrukt/Plugin/wiki/markup/list_template.pm
+  Konstrukt::Plugin::wiki::markup::paragraph:
+    file: lib/Konstrukt/Plugin/wiki/markup/paragraph.pm
+  Konstrukt::Plugin::wiki::markup::pre:
+    file: lib/Konstrukt/Plugin/wiki/markup/pre.pm
+  Konstrukt::Plugin::wiki::markup::quote:
+    file: lib/Konstrukt/Plugin/wiki/markup/quote.pm
+  Konstrukt::Plugin::wiki::markup::replace:
+    file: lib/Konstrukt/Plugin/wiki/markup/replace.pm
+  Konstrukt::PrintRedirector:
+    file: lib/Konstrukt/PrintRedirector.pm
+  Konstrukt::Request:
+    file: lib/Konstrukt/Request.pm
+  Konstrukt::Response:
+    file: lib/Konstrukt/Response.pm
+  Konstrukt::Session:
+    file: lib/Konstrukt/Session.pm
+  Konstrukt::Settings:
+    file: lib/Konstrukt/Settings.pm
+  Konstrukt::SimplePlugin:
+    file: lib/Konstrukt/SimplePlugin.pm
+  Konstrukt::TagHandler:
+    file: lib/Konstrukt/TagHandler.pm
+  Konstrukt::TagHandler::Plugin:
+    file: lib/Konstrukt/TagHandler/Plugin.pm
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

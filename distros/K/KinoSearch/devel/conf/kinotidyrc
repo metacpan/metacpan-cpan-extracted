@@ -1,0 +1,6 @@
+--perl-best-practices
+--nostandard-output
+--nostandard-error-output
+--noblanks-before-comments 
+--noblanks-before-subs 
+

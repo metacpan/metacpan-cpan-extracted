@@ -1,0 +1,66 @@
+NAME
+    Kwiki::Edit::SubEtha - SubEthaEdit Plugin for Kwiki
+
+VERSION
+    This document describes version 0.01 of Kwiki::Edit::SubEtha, released
+    July 26, 2004.
+
+SYNOPSIS
+    A live SubEthaKwiki is available at <http://wiki.oreillynet.com/oscon/>
+    for the duration of O'Reilly Open Source Convention 2004.
+
+DESCRIPTION
+  SubEtha Machine
+    You need OS X 10.3 or above, with *UI Scripting* enabled; see
+    <http://www.apple.com/applescript/uiscripting/01.html> for instructions
+    on how to enable it.
+
+    Tweak the configuration constants in script/subethakwiki.pl and run it.
+    It will do several things every 15 seconds:
+
+     * force an autosave
+     * svn up
+     * check for each "A edits/*", set TTL
+     * open the documents in SubEthaEdit and share them
+     * svn ci
+     * check for each "M pages/*" and refresh their TTL
+     * for pages that has TTL expired, close the document, record it.
+     * svn rm edits/* those pages.
+     * svn ci
+     * loop
+
+    Note that the SubEthaEdit window will pop out constantly; currently, you
+    really need a dedicated machine to do this.
+
+  Kwiki Machine
+    First, install the Kwiki::Archive::SVK plugin, run index.cgi once, then
+    share the repository located at kwiki_path/plugin/archive using svnserve
+    or WebDAV, and make it accessible form the SubEtha machine.
+
+    Now install the Kwiki::Edit::SubEtha plugin. For nonshared (normal)
+    pages, the user will see:
+
+     * provides an "Edit" item as normal.
+     * for OSX people, an additional "SubEthaEdit" button:
+     ** shows a page explaining what's it about
+     ** explain the rules
+     ** offer a link that, when clicked, does "svk mkdir edits/Pagename"
+     ** and redirects to see://hostname/PageName/
+
+    For shared (subetha-editable) pages, the user will see:
+
+     * a "Lock" item explaining it's being locked by SubEthaEdit
+     * for OSX people, a "SubEthaEdit" button that just links to see://see_url.
+
+AUTHORS
+    Autrijus Tang <autrijus@autrijus.org>, Brian Ingerson <INGY@cpan.org>.
+
+COPYRIGHT
+    Copyright 2004 by Autrijus Tang <autrijus@autrijus.org>, Brian Ingerson
+    <INGY@cpan.org>.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See <http://www.perl.com/perl/misc/Artistic.html>
+

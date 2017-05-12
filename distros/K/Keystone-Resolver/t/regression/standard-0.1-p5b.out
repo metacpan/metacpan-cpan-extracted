@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<results>
+  <data entity="rft">
+    <metadata key="date">1998</metadata>
+    <metadata key="genre">article</metadata>
+    <metadata key="issn">1234-5678</metadata>
+    <metadata key="issue">2</metadata>
+    <metadata key="spage">134</metadata>
+    <metadata key="volume">12</metadata>
+  </data>
+  <result type="error" tag=""
+	>the resource database doesn't cover ISSN 1234-5678</result>
+  <result type="citeref" priority="15" tag=""
+	service="Endnote citation"
+	>http://example.com/resolve?rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Ajournal&amp;rft.date=1998&amp;rft.genre=article&amp;rft.issn=1234-5678&amp;rft.issue=2&amp;rft.spage=134&amp;rft.volume=12&amp;svc_dat=indexdata:citation:Endnote</result>
+  <result type="citation" priority="20" tag="APP"
+	service="APP-style citation" mimetype="text/html"
+	>[Unspecified author].  1998.  [unspecified article title].  &lt;i&gt;ISSN 1234-5678&lt;/i&gt;, 12: 134 ff..</result>
+  <result type="citation" priority="20" tag="author"
+	service="Author and year" mimetype="text/html"
+	>[Unspecified author].  1998.</result>
+</results>

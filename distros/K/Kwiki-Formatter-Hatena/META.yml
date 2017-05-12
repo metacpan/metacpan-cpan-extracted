@@ -1,0 +1,17 @@
+abstract: Kwiki Formatter with Haten Style
+author: Kazuhiro Osawa <ko@yappo.ne.jp>
+build_requires: 
+  Test::More: 0.42
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: Kwiki-Formatter-Hatena
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Cache::File: 0
+  Hatena::Formatter: 0
+  URI::Escape: 0
+version: 0.05

@@ -1,0 +1,32 @@
+Copyright (c) 2000 Jeff Horwitz (jeff@smashing.org).  All rights reserved.
+This module is free software; you can redistribute it and/or modify it under   
+the same terms as Perl itself.
+
+Authen::Krb4 provides an object oriented interface to several functions in
+the Kerberos 4 API.  It is compatible with both AFS and MIT Kerberos.
+
+The latest version of Krb4 can be obtained from CPAN.
+
+
+REQUIREMENTS
+------------
+The Kerberos 4 libraries (libkrb.a, libdes.a) and include files must be 
+installed on the host on which you are building.
+
+
+BUILDING & INSTALLATION
+-----------------------
+Four easy steps:
+1) edit Makefile.PL, and change LIBS and INC to reflect the paths to your
+   Kerberos libraries and include files, respectively.  Add any other
+   customizations you might need.
+2) perl Makefile.PL
+3) make
+4) make install
+
+
+DOCUMENTATION
+-------------
+Pod documentation is supplied in Krb4.pm.  'make install' should generate
+a man page for you.  The documentation is not extensive, and assumes 
+familiarity with Kerberos.

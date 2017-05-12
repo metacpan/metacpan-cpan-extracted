@@ -1,0 +1,78 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+use Text::Diff qw( diff );
+use File::Find qw( find );
+use Getopt::Std qw( getopts );
+
+$File::Find::dont_use_nlink = 1;
+
+use vars qw( $opt_s $opt_v );
+getopts('sv:');
+die "usage: predit [-s] [-v pattern] [perl code] [file ...]"
+    unless @ARGV >= 2;
+
+my $code = shift @ARGV;
+
+my $exclude;
+if (defined $opt_v) {
+    $exclude = qr/$opt_v/;
+}
+
+for my $start (@ARGV) {
+    find(
+        {   wanted   => \&maybe_edit,
+            no_chdir => 1,
+        },
+        $start,
+    );
+}
+    
+sub maybe_edit {
+    my $filepath = $File::Find::name;
+    return if ( defined $exclude and $File::Find::name =~ $exclude );
+    return unless -f $filepath;
+
+    open( my $fh, "<", $filepath )
+        or die "Couldn't open '$filepath' for reading: $!";
+
+    my $orig = '';
+    my $edited = '';
+    if ($opt_s) {
+        local $/;
+        $orig = $edited = <$fh>;
+        for ($edited) {
+            eval $code;
+            die $@ if $@;
+        }
+    }
+    else {
+        while (<$fh>) {
+            $orig .= $_;
+            eval $code;
+            die $@ if $@;
+            $edited .= $_;
+        }
+    }
+    close $fh or die "Couldn't close '$filepath': $!";
+
+	if ($edited eq $orig) {
+        print "No change to $filepath\n";
+        return;
+    }
+
+    # confirm with user that the change worked as intended.
+    my $diff = diff( \$orig, \$edited );
+	print "\nFILE: $filepath\n$diff\nApply? ";
+    my $response = <STDIN>;
+    return unless $response =~ /^y/i;
+
+    print "Applying edit...\n";
+    open( $fh, ">", $filepath )
+        or die "Couldn't open '$filepath' for writing: $!";
+    print $fh $edited;
+    close $fh or die "Couldn't close '$filepath': $!";
+}
+
+

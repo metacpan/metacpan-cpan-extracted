@@ -1,0 +1,11 @@
+Changes
+lib/Kwiki/Edit/HatenaAuthRequired.pm
+lib/Kwiki/HatenaAuth.pm
+lib/Kwiki/Users/HatenaAuth.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/00_compile.t
+t/98-pod.t
+t/99-pod-coverage.t

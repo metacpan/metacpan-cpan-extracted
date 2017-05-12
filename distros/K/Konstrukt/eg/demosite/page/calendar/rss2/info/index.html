@@ -1,0 +1,19 @@
+<& template src="/templates/layout.template" title="calendar rss2 info" &>
+	<$ content $>
+		<h1>About the RSS 2.0 export functionality of the calendar</h1>
+
+		<p>This calendar can be exported as an <strong>RSS 2.0-Feed</strong>. You can poll the upcoming events as an RSS feed and integrate them easily into your RSS reader (mail client, browser, ext. program, ...).</p>
+		<p>The <strong>URL</strong> pointing to the feed is:</p>
+		<p><a href="/calendar/rss2/">http://your.site/calendar/rss2/</a>.</p>
+		<p>You can pass some <strong>options</strong> to the feed. So you can define, how far in the future the polled events may be:</p>
+		<p><a href="/calendar/rss2/?preview=14">http://your.site/calendar/rss2/?preview=14</a></p>
+		<p>Where 14 is the <strong>number of days</strong>. The number of days is limited to 31. The default is 7 days.</p>
+		<p>As you can create private appointments, you may want to specify your <strong>username and password</strong>, so that your private appointments also get exported:</p>
+		<p><a href="/calendar/rss2/?email=email@server.tld;pass=password">http://your.site/calendar/rss2/?email=email@server.tld;pass=password</a></p>
+		<p>Where "email@server.tld" is your email address, with which you are registered on this site, and "password" must be substituted by your login password.</p>
+		<p>These option can be <strong>combined</strong>:</p>
+		<p><a href="/calendar/rss2/?preview=14;email=email@server.tld;pass=password">http://your.site/kalender/rss2/?preview=14;email=email@server.tld;pass=passwort</a></p>
+		<p>That's it :)</p>
+		
+	<$ / $>
+<& / &>

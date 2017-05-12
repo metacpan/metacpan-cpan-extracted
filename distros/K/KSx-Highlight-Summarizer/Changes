@@ -1,0 +1,36 @@
+Revision history for KSx::Highlight::Summarizer
+
+0.06    21 May, 2009
+        Updated to work with the latest KinoSearch working copy  (now
+        requires 4604)
+
+0.05    10 May, 2009
+        Updated to work with KinoSearch revision 4551 (now
+        requires 4496)
+
+0.04    26 March, 2008
+        Just bug fixes:
+      • A highlighted word at the beginning or end of an indexed field
+        used to warn in page break mode.
+      • In summary and page break mode,  an ellipsis at the end of one
+        excerpt would cause the start of the following excerpt,  if it
+        occurred on another page, not to be trimmed to a word boundary
+        and not to have an ellipsis mark after the page marker, unless
+        there were a sentence boundary to trim to.
+
+0.03    14 March, 2008
+        One bug fix:  In ‘page break mode’  (when there is a page han-
+        dler),  an excerpt that trails on to the next  page  is  trun-
+        cated  (starting excerpt_length * 2/3 chars before the end of
+        the excerpt)  to just before the page break  (this is  a  fea-
+        ture).  Before,  the text from the starting point up to  (and
+        including) the page break would be deleted instead.
+
+0.02    2 March, 2008
+      • Updated to work with the current working copy of KinoSearch
+        (it no longer works with revisions earlier than 3091)
+      • encoder now expects a code ref
+      • formatter has been replaced with pre_tag and post_tag
+
+0.01    8 February, 2008
+        First release

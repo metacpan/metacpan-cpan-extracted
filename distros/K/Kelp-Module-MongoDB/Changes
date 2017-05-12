@@ -1,0 +1,6 @@
+Revision history for Kelp-Module-MongoDB
+
+1.000  2013-09-06 16:53:03 EDT
+	- Cleanup module
+  - Use milla
+  - Verify dependency list

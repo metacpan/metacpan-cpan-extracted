@@ -1,0 +1,31 @@
+---
+abstract: 'Perl bindings for k (aka q, aka kdb, aka kx)'
+author:
+  - 'Whitney Jackson C<< <whitney@cpan.org> >>'
+build_requires:
+  ExtUtils::Depends: 0
+  ExtUtils::MakeMaker: 6.59
+  File::Which: 0
+  FindBin: 0
+  Test::Exception: 0
+  Test::More: 0
+  Test::TCP: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: K
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Math::Int64: 0
+  Moose: 0
+  namespace::autoclean: 0
+  perl: 5.010
+version: 0.10

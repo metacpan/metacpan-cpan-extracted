@@ -1,0 +1,55 @@
+Because measuring text is slow, Scintilla avoids doing this as much
+as possible. If you want to find the width of the widest line, ensure
+the document is all styled (SCI_COLOURISE) then call
+SCI_POINTXFROMPOSITION on the last position of each line. 
+
+---
+
+use Encode;
+sub AppendText {
+    my ($self, $text) = @_;
+    my $string = decode("utf8", $text);
+    $self->SUPER::AppendText($string);
+}
+  my $string = utf8::is_utf8($text) ? $text : decode('utf8', $text); 
+---  
+ my @methods = reverse sort $text =~ m{^sub\s+(\w+)}gm;
+--- 
+ #!/usr/bin/perl -w
+
+use strict;
+use utf8;
+use CGI;
+use Encode qw(decode_utf8);
+
+binmode STDOUT, ':encoding(UTF-8)';
+binmode STDIN,  ':encoding(UTF-8)';
+
+my $q = CGI->new;
+$q->charset('UTF-8');
+print $q->header();
+
+---
+
+print "הצü";
+use PerlIO::encoding; binmode($FH, ":encoding(cp1252)") ":encoding(iso- 8859-1)
+print decode_utf8($q->param('name'))
+
+---
+
+    $self->SetAcceleratorTable
+      ( Wx::AcceleratorTable->new
+        ( [ wxACCEL_ALT, 'P', $ID_ACCEL_SEARCH ],
+          ...
+          ) );
+
+    EVT_MENU( $self, $ID_ACCEL_SEARCH,
+              sub { $self->_controls->set_focus_text } ); 
+
+---
+
+Wx::AcceleratorEntry(
+ 	 wxACCEL_ALT || wxACCEL_SHIFT || wxACCEL_CTRL || wxACCEL_NORMAL,
+ 	 'D' || WXK_NUMPAD1, # ASCII must be UPPERCASE.  see %Keycodes% 
+ 	 66666,		# EVT_MENU( $frame, 66666, \&DoSomething );
+ );

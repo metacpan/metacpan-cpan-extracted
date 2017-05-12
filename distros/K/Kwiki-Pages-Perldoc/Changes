@@ -1,0 +1,14 @@
+---
+version: 0.12
+date:    Wed Dec 15 16:15:28 PST 2004
+changes:
+- Pause upload got messed up
+version: 0.11
+date:    Wed Dec 15 15:13:17 PST 2004
+changes:
+- Make compatible with Kwiki-0.34
+---
+version: 0.10
+date:    Wed Jun 30 15:54:10 PDT 2004
+changes:
+- Initial release

@@ -1,0 +1,34 @@
+NAME
+    Kwiki::Archive::Cvs - Kwiki Page Archival Using CVS
+
+SYNOPSIS
+    A Kwiki::Archive that stores changes in a CVS repository.
+
+DESCRIPTION
+    This is a direct modification of Brian Ingerson's Kwiki::Archive::Rcs
+    module to work with CVS instead of RCS. It was written and tested
+    against the 0.39 release of Kwiki.
+
+    *   The underlying CVS command must support the -Q option (specifies
+        'really quiet' operation).
+
+    *   Install the module, then add 'Kwiki::Archive::Cvs' to the plugins
+        file and run 'kwiki -update'.
+
+    *   Make sure the 'database' directory holds a checked-out CVS sandbox.
+
+AUTHOR
+    Brian Ingerson <INGY@cpan.org>
+
+    Joseph Walton <joe@kafsemo.org>
+
+COPYRIGHT
+    Copyright (c) 2004. Brian Ingerson. All rights reserved.
+
+    Modifications for CVS copyright 2004 Joseph Walton.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See http://www.perl.com/perl/misc/Artistic.html
+

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<results>
+  <data entity="rft">
+    <metadata key="atitle">A new diplodocoid sauropod dinosaur from the Upper Jurassic Morrison Formation of Montana, USA</metadata>
+    <metadata key="auinit">J. D.</metadata>
+    <metadata key="aulast">Harris</metadata>
+    <metadata key="date">2004</metadata>
+    <metadata key="epage">210</metadata>
+    <metadata key="genre">article</metadata>
+    <metadata key="issn">0567-7920</metadata>
+    <metadata key="issue">2</metadata>
+    <metadata key="jtitle">ACTA PALAEONTOLOGICA POLONICA</metadata>
+    <metadata key="spage">197</metadata>
+    <metadata key="volume">49</metadata>
+  </data>
+  <result type="fulltext" priority="10" tag="APP"
+	service="Acta Palaeontologica Polonica"
+	>http://app.pan.pl/acta49/app49-197.pdf</result>
+  <result type="fulltext" priority="10" tag="Elsevier"
+	service="Elsevier"
+	>http://www.sciencedirect.com/science?_ob=GatewayURL&amp;_origin=KEYSTONE&amp;_method=citationSearch&amp;_volkey=05677920%2349%23197%232&amp;_version=1&amp;md5=1db03de3fbb28fd6163ce6318062c5f7</result>
+  <result type="citeref" priority="15" tag=""
+	service="Endnote citation"
+	>http://example.com/resolve?rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Ajournal&amp;rft.atitle=A%20new%20diplodocoid%20sauropod%20dinosaur%20from%20the%20Upper%20Jurassic%20Morrison%20Formation%20of%20Montana%2C%20USA&amp;rft.auinit=J.%20D.&amp;rft.aulast=Harris&amp;rft.date=2004&amp;rft.epage=210&amp;rft.genre=article&amp;rft.issn=0567-7920&amp;rft.issue=2&amp;rft.jtitle=ACTA%20PALAEONTOLOGICA%20POLONICA&amp;rft.spage=197&amp;rft.title=ACTA%20PALAEONTOLOGICA%20POLONICA&amp;rft.volume=49&amp;rfr_id=info%3Asid%2Fmimas%3Azetoc&amp;svc_dat=indexdata:citation:Endnote</result>
+  <result type="authorsearch" priority="10" tag=""
+	service="Google"
+	>http://www.google.com/search?q=%22J. D. Harris%22</result>
+  <result type="citation" priority="20" tag="APP"
+	service="APP-style citation" mimetype="text/html"
+	>Harris, J. D.  2004.  A new diplodocoid sauropod dinosaur from the Upper Jurassic Morrison Formation of Montana, USA.  &lt;i&gt;ACTA PALAEONTOLOGICA POLONICA&lt;/i&gt;, 49: 197-210.</result>
+  <result type="citation" priority="20" tag="author"
+	service="Author and year" mimetype="text/html"
+	>Harris, J. D.  2004.</result>
+  <result type="websearch" priority="5" tag="masterkey"
+	service="MasterKey"
+	>http://masterkey.indexdata.com/author=Harris&amp;title=A new diplodocoid sauropod dinosaur from the Upper Jurassic Morrison Formation of Montana, USA&amp;date=2004</result>
+  <result type="websearch" priority="10" tag=""
+	service="Google"
+	>http://www.google.com/search?q=%22A new diplodocoid sauropod dinosaur from the Upper Jurassic Morrison Formation of Montana, USA%22</result>
+  <result type="websearch" priority="20" tag=""
+	service="Alltheweb"
+	>http://alltheweb.com/search?q=%22A new diplodocoid sauropod dinosaur from the Upper Jurassic Morrison Formation of Montana, USA%22</result>
+  <result type="websearch" priority="30" tag=""
+	service="AltaVista"
+	>http://www.altavista.com/web/results?q=%22A new diplodocoid sauropod dinosaur from the Upper Jurassic Morrison Formation of Montana, USA%22</result>
+</results>

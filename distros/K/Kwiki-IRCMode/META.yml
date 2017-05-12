@@ -1,0 +1,13 @@
+--- #YAML:1.0
+name:                Kwiki-IRCMode
+version:             0.302
+abstract:            ~
+license:             perl
+generated_by:        ExtUtils::MakeMaker version 6.31
+distribution_type:   module
+requires:     
+    Kwiki:                         0.33
+    Parse::IRCLog:                 1.101
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2

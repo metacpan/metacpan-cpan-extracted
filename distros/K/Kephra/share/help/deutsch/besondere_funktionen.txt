@@ -1,0 +1,104 @@
+
+       --------------------------------
+      | Besondere Funktion von Kephra  |
+       --------------------------------
+
+Viele Standardfunktionen wie das Öffnen einer Datei oder das Bewegen des kleinen
+blinkenden Striches braucht normalerweise nicht erklärt werden, oder Kephra wäre 
+kein guter Editor. Dennoch hat er eine Reihe Funktionen die man übersehen kann, 
+die aber sehr nützlich sind. Dieser Text erzählt von diesen Funktionen, 
+inhaltlich geordnet.
+
+ - Navigation im Text
+    + <Strg>+<Shift>+<G> springt im aktuellen Dokument zu der Stelle, die als 
+      letztes bearbeitet wurde, <Strg>+<Rück> zum zuletzt gesehenen Dokument.
+    + <Alt>+<Shift>+<Richtungstasten> markiert einen rechteckigen Textausschnitt.
+    + Klammernavigation: <Alt>+<Richtungstasten> bewegt den Cursor zwischen den 
+      Klammern. Vertikal entspricht zusammenhängenden Klammern einer Art und 
+      horizontal dem Sprung zwischen Klammern aller Arten.
+    + Blocknavigation: Hält man <Alt>, kann man mit <Bildhoch> und <Bildrunter>
+      blockweise springen. Blöcke werden durch Leerzeilen getrennt.
+
+ - Bearbeiten von Text
+    + Mit <Alt>[+<Shift>]+<Z> kann man mehrere Änderungen auf einmal rückgängig 
+      machen oder weiderholen. Nimmt man noch <Strg> hinzu, bewegt man sich 
+      zwischen den Endpunkten der Aufzeichnung.
+    + <Strg>+<W> ersetzt die Markierung mit dem Inhalt der Zwischenablage.
+    + <Strg>+<D> verDoppelt, fügt eine Kopie hinter den markierten Text an.
+    + Verschieben: <Strg>+<Alt>+<Richtungstasten oder Bildhochrunter> bewegt den
+      markierten Text. Ist nichts markiert, wird die aktuelle Zeile bewegt.
+    + Zeilenweises bearbeiten: Füge <Shift> hinzu, und die meißten Funktionen
+      der einfachen Textbearbeitung beziehen sich auf die aktuelle zeile. Zwei
+      jedoch (<Strg>+<Shift>+<L> und <Strg>+<Shift>+<R>) sind hier besonders.
+      Sie löschen vom Cursor aus gesehen den linken oder rechten Teil der Zeile.
+
+ - Datei
+    In diesem Menü ist fast alles selbsterklärend. Auch Datei erneut laden oder
+    andere schließen (alle Dokumente außer dem Sichtbaren) sollte beim blättern
+    einleuten. 2 Funktionen die Dateien speichern möchte ich jedoch hervorheben.
+    + Mit <Alt>+<Shift>+<S> wird der aktuelle Stand des Dokumentes in einer Datei
+      gespeichert, dem Dokument ist jedoch weiterhin die alte Datei zugehörig.
+    + <Strg>+<Alt>+<Shift>+<S> speichert und verändert den Dateiname.
+
+ - Ansicht
+    + Reiterleiste: bietet sehr viele Einstellmöglichkeiten.
+      * Optional gibt es hier ganz links einen Knopf für ein neues Dokument und
+        ganz rechts einen zum schließen des aktuellen Textes.
+      * Gleiches tut auch ein Klick mit der mittlere Maustaste, kann aber gegen
+        jede andere Funktion ersetzt werden.
+      * Ein Rechtsklick ruft ein Kontextmenü, mit dem man alle Dateien mit vollem
+        Pfad sehen und auch die aktuelle Datei wählen kann.
+      * Ein Linksklick aus den hervorgehoben Reiter wechselt zum letztbenutzen
+        text (switch_back).
+    + Suchzeile: ist an sich selbsterklärend. Hier offenbaht Ein Klick mit der 
+      rechten Maustaste ein Menü mit den Suchoptionen. Und ist man in der 
+      Eingeabezeile und blättert die Suchergebnisse mit <Enter> kann man auch mit
+      <Shift>+<Enter> rückwärts blättern, mit <Strg>+<Enter> zum ersten 
+      Suchergebnis und mit <Strg>+<Shift>+<Enter> zum letzten. Hältst du <Strg>
+      gedrückt, so kannst du auch aus der Eingabe der Suchzeile aus den Text
+      bewegen, wie im Text auch. Mit <Bildhoch> und <Bildrunter> kannst du wie
+      im Text seitenweise blättern und hältst du dabei <Strg>, sogar das Dokument
+      wechseln.
+    + Die Statuszeile liefert viele aktuelle Information, ermöglicht aber auch,
+      Eigenschaften des Dokumentes zu verändern. Dabei wechselt ein Linksklick 
+      zwischen den üblichsten Einstellungen und der Rechtsklick ein Menü mit mehr
+      Möglichkeiten. Die meißten Zellen sind dabei weitestgehend selbsterklärend.
+      Nicht offensichtlich ist lediglich das mit jedem Linksklick auf die Zelle
+      ganz rechts andere Informationen über die aktuelle Datei angezeigt werden.
+    + Die Editorkomponente kann vieles sichtbar machen, wie die aktuelle Zeile,
+      einen rechten Rand, die Tabs und Leerzeichen aber was wirklich erklärenswert
+      sein könnte, sind die Einrückmarkierungen. Das sind senkrechte, gepunktete
+      Hilfslinien, die in Einrückungen (Leerzeichen oder Tabs) zu sehen sind. Sie
+      haben einen Abstand von einer aktuellen Tabbreite zueinander und können auch
+      aufläuchten wenn die 2 zugehörige Klammern verbinden, die du mit dem Cursor
+      berührst.
+
+ - Konfiguration
+    + Haupteinstellungen sind die generellen Einstellungen, die das Verhalten und
+      das Aussehen des Programmes bestimmen.
+    + Kommandoliste ist eine Liste über fast alle Befehle die der Benutzer dem
+      Programm geben kann. 
+      * Im ersten Teil werden jedem Namen (ID) die interne Funktion (<call>)
+        zugeordnet. Ändert hier nur etwas wenn ihr wirklich wisst was ihr da tut.
+      * Die <enable> Sektion bestimmt wann diese Kommandos überhaupt gerufen
+        dürfen (wenn angegebene routinen wahr zurück geben).
+      * <enable_event> gibt die events an bei denen sich das der "enable"-Wert
+        ändern könnte.
+      * <state> gibt einen 0|1-Zustand zurück, zum beispiel für Kippschalter in
+        der Werkzeugleiste. 
+      * <state_event> ist entsprechend das Ereignis wenn sich der <state> ändert.
+      * <icon> ordnet den Befehlen eine Bitmapdatei zu.
+      * <key> ist die letzte und vielleicht für euch interessanteste sektion.
+        Hier könnt ihr den Funktionen Tastaturkombinationen zuordnen. Sind diese
+        einmal gültig, seht ihr das auch in allen Menüs und Leisten, aber bitte
+        denkt daran, es heißt hier ctrl, nicht strg, auch wenn in einem deutschen
+        Menü ctrl zu Strg übersetzt wird.
+    + Menüdefinitionen sind nur noch eine Liste aus Kommandos, und daher sehr
+      übersichtlich. Zum Kommentieren hier die Raute(#) bitte ans Zeilenende.
+    + Sprachdateien enthalten zu jedem Kommando die Beschriftung und Kurzhilfe,
+      aber auch die Beschriftung aller Dialoge und sonstigen Anzeigen. Mit solch
+      einer Datei könnt ihr das ganze Programm übersetzen.
+    + Syntaxmodi enthalen alle Farbdefinitionen und Schlüsselwörter für eine 
+      Programmiersprache, den Parser kann man damit leider noch nicht ändern.
+    + Templates sind oft verwendete Textbausteine die durch Sondervariablen
+      aktuelle Informationen enthalten können. Sie sind im Dateimenü aufgelistet.

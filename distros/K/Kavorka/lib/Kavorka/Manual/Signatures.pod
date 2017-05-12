@@ -1,0 +1,595 @@
+=pod
+
+=encoding utf-8
+
+=begin stopwords
+
+invocant invocants lexicals unintuitive yada globals ro rw
+boolification rightwards scalarref smartmatch smartmatch-like
+superset
+
+=end stopwords
+
+=head1 NAME
+
+Kavorka::Manual::Signatures - experience the lure of the animal
+
+=head1 DESCRIPTION
+
+The signature consists of a list of parameters for the function.
+
+Kavorka signatures are a superset of the sub signature syntax
+introduced in Perl 5.20 (well, 5.19.9 to be exact). See L<perlsub>.
+
+Each parameter is a variable name which will be available within the
+body of the function. Variable names are assumed to be lexicals unless
+they look like punctuation variables or escape-character global
+variables, in which case they'll be implicitly localized within the
+function.
+
+Parameters are separated with commas, however if one of the commas
+is replaced by a colon, all parameters to the left are assumed to be
+invocants and are shifted off C<< @_ >>. If no invocants are explicitly
+listed as part of the signature, the module implementing the keyword
+may assume a default invocant - for example, C<method> assumes an
+invocant called C<< $self >> while C<around> assumes two invocants
+called C<< $next >> and C<< $self >>.
+
+=head2 Positional parameters
+
+Parameters which are not explicitly named, slurpy or invocants, are
+positional. For example:
+
+   method foo ( $x, $y ) { ... }
+
+Is roughly equivalent to:
+
+   sub foo {
+      my $self = shift;
+      die "Expected two parameters" unless @_ == 2;
+      my ($x, $y) = @_;
+      ...
+   }
+
+This feature is shared with Perl 5.20 signatures, Perl 6 signatures,
+L<Function::Parameters>, and L<Method::Signatures>.
+
+=head2 Invocants
+
+Invocants are a type of positional parameter, which instead of being
+copied from the C<< @_ >> array are shifted off it.
+
+Invocants are always required, and cannot have defaults. Some keywords
+(such as C<< method >> and C<< classmethod >>) provide a standard
+invocant for you (respectively C<< $self >> and C<< $class >>).
+
+You may specify invocants in the signature manually, in which case the
+default provided by the keyword is ignored.
+
+   # The invocant is called $me instead of $self
+   method ($me: $x, $y?) { ... }
+
+This feature is shared with Perl 6 signatures, L<Function::Parameters>,
+and L<Method::Signatures>. Unique to Kavorka is the ability to specify
+multiple invocants.
+
+=head2 Named parameters
+
+Parameters can be named by preceding them with a colon:
+
+   method foo ( :$x, :$y ) { ... }
+
+The method would be called like this:
+
+   $object->foo( x => 1, y => 2 );
+
+Or this:
+
+   $object->foo({ x => 1, y => 2 });
+
+This feature is shared with Perl 6 signatures, L<Function::Parameters>,
+and L<Method::Signatures>.
+
+Positional parameters (if any) must precede named parameters.
+
+If you have any named parameters, they will also be made available in
+the magic global hash C<< %_ >>. If you pass a I<hashref> (rather than
+a I<hash>) of named parameters, then C<< %_ >> will be an alias for the
+referenced hash.
+
+=head2 Long name parameters
+
+Named parameters can be given a different name "inside" and "outside"
+the function:
+
+   fun bar ( :public_house($pub) ) { ... }
+
+The function would be called like this:
+
+   bar( public_house => "Rose & Crown" );
+
+... But within the function, the variable would be named C<< $pub >>.
+
+This feature is shared with Perl 6 signatures.
+
+Long named parameters will be available in C<< %_ >> under their
+"outside" name, not their "inside" name.
+
+A function can have multiple long names:
+
+   fun xxx ( :foo(:bar(:baz($x))) ) { ... }
+
+This unwieldy syntax is borrowed from Perl 6 signatures.
+
+Kavorka provides an experimental shortcut - you may omit the
+parentheses:
+
+   fun xxx ( :foo :bar :baz $x ) { ... }
+
+=head2 Global variables
+
+The variables established by Kavorka are normally plain old lexicals
+(C<my> variables). However, you can instead make them into localised
+package variables (C<our> variables):
+
+   fun xxx ( Int our $x ) { ... }
+
+Variables containing "::", the special globals C<< $_ >>, C<< @_ >>,
+and C<< %_ >>, and variables named like C<< ${^HELLO} >> are
+automatically localized.
+
+(The other special punctuation variables listed in L<perlvar> are not
+supported.)
+
+=head2 Optional and required parameters
+
+A trailing exclamation mark makes an attribute required. A trailing
+question mark makes an attribute optional.
+
+This feature is shared with Perl 6 signatures and L<Method::Signatures>.
+
+In the absence of explicit indicators, positional parameters will be
+required unless a default is provided for them, and named parameters
+will be optional.
+
+You can not use named parameters and optional positional parameters in
+the same signature.
+
+For long named parameters, the trailing indicator should appear
+after the close parentheses:
+
+   fun xxx ( :foo($x)! ) { ... }
+   fun xxx ( :foo($x!) ) { ... }   # NO!
+
+=head2 Slurpy parameters
+
+The final parameter in the signature may be an array or hash, which
+will consume all remaining arguments:
+
+   fun foo ( $x, $y, %z ) { ... }
+   
+   foo(1..4);  # %z is (3 => 4)
+
+This feature is shared with Perl 6 signatures, L<Function::Parameters>,
+and L<Method::Signatures>.
+
+A slurpy array may not be used if the signature contains any named
+parameters.
+
+Unique to Kavorka is the ability to specify slurpy arrayrefs or
+hashrefs.
+
+   fun foo ( $x, $y, slurpy HashRef $z ) { ... }
+   
+   foo(1..4);  # $z is { 3 => 4 }
+
+For slurpy references you should specify a type constraint (see
+L</Type Constraints>) so that Kavorka can create the correct type of
+reference.
+
+The variables C<< @_ >> and C<< %_ >> I<< may >> be used as slurpy
+parameters, I<< but only if their use as a parameter does not interfere
+with their usual meaning >>.
+
+   # ok
+   fun foo ( @_ ) {
+      ...;
+   }
+   
+   # disallowed because the @_ array would usually include $x
+   fun bar ( $x, @_ ) {
+      ...;
+   }
+   
+   # ok because the invocant $x would usually be shifted off @_
+   fun baz ( $x: @_ ) {
+      ...;
+   }
+
+=head2 Type constraints
+
+Type constraints may be specified for each parameter in the signature:
+
+   fun foo ( Int $x, HTTP::Tiny $y ) { ... }
+
+This feature is shared with Perl 6 signatures, L<Function::Parameters>,
+and L<Method::Signatures>.
+
+Type constraints are parsed as per C<dwim_type> from L<Type::Utils>,
+which should mostly do what you mean.
+
+Type constraints for slurpy hashes and arrays are applied to each value
+in the hash or each item in the array. Type constraints for slurpy
+references are instead applied to the reference as a whole. Therefore
+the following are roughly equivalent:
+
+   fun foo ( Str %z ) { my $z = \%z; ... }
+   fun foo ( slurpy HashRef[Str] $z ) { ... }
+
+Type constraints may be surrounded with parentheses, in which case,
+instead of parsing them with C<dwim_type>, they'll be evaluated (at
+compile time) as an expression which is expected to return a blessed
+L<Type::Tiny> object, or any other value that L<Types::TypeTiny> can
+coerce to a Type::Tiny object.
+
+   use Types::Standard qw( LaxNum StrictNum );
+   
+   fun foo ( ($ENV{AUTOMATED_TESTING} ? StrictNum : LaxNum) $x ) {
+      ...;
+   }
+
+This feature is shared with L<Function::Parameters>.
+
+=head2 Value constraints
+
+Value constraints can be used to further constrain values. Value
+constraints are specified using the C<where> keyword followed by a
+block.
+
+   fun foo ( Int $even where { $_ % 2 == 0 } )
+
+Multiple C<where> blocks may be provided:
+
+   fun foo ( Int $even where { $_ % 2 == 0 } where { $_ > 0 } )
+
+This feature is shared with Perl 6 signatures and L<Method::Signatures>.
+
+A smartmatch-like shortcut is supported:
+
+   # This is a shortcut:
+   #
+   method foo ( Int $x where TERM ) {
+      ...
+   }
+   
+   # For this:
+   #
+   use match::simple ();
+   method foo ( Int $x where { match::simple::match($_, TERM) } ) {
+      ...
+   }
+
+However, the use of any lexical variables within the term is currently
+broken.
+
+=head2 Defaults
+
+Defaults may be provided using an equals sign:
+
+   fun foo ( $greeting = "Hello world" ) {
+      ...
+   }
+
+This feature is shared with Perl 5.20 signatures, Perl 6 signatures,
+L<Function::Parameters>, and L<Method::Signatures>.
+
+Kavorka will use the default if the argument is not given when the
+function is invoked. If an explicit undef is passed to the function
+when it is called, this is accepted as the value for the parameter, and
+the default is not used.
+
+If instead you want the default to take effect when an explicit undef
+is passed to the function, use C<< //= >>:
+
+   fun foo ( $greeting //= "Hello world" ) {
+      ...
+   }
+
+This feature is shared with L<Method::Signatures>. Kavorka doesn't
+support Method::Signatures' C<when> keyword.
+
+C<< ||= >> is also supported for setting defaults. It kicks in when any
+false value (undef, zero, the empty string, or objects overloading
+boolification to return false) is passed to the function, though this
+is rarely of much use.
+
+Slurpy parameters may take defaults:
+
+   fun foo ( @bar = (1, 2, 3) ) { ... }
+
+For slurpy references, the syntax is a little unintuitive:
+
+   fun foo ( slurpy ArrayRef $bar = (1, 2, 3) ) { ... }
+
+B<< Caveat: >> unlike Perl 5.20 signatures, the following B<< does
+not work >>:
+
+   fun foo ($x, $y = $x) { ... }
+
+The lexical variable C<< $x >> has scope in the body of the sub, but
+not within the signature itself, so it cannot be used as the default
+value for C<< $y >>. This can be worked around by making C<< $x >> a
+package variable:
+
+   fun foo (our $x, $y = our $x) { ... }
+
+Or simply set the default manually in the body of the function.
+
+   fun foo ($x, $y?) {
+      $y = $x if @_ == 1;
+      ...;
+   }
+
+You hadn't forgotten how to do that already, had you?
+
+=head2 Traits
+
+Traits may be added to each parameter using the C<is> keyword:
+
+   fun foo ( $greeting is polite = "Hello world" ) { ... }
+   
+   fun bar ( $baz is quux is xyzzy ) { ... }
+
+This feature is shared with Perl 6 signatures and L<Method::Signatures>.
+
+The keywords C<does> and C<but> are also available which are simply
+aliases for C<is>.
+
+Many traits are recognized by Kavorka natively. If you use an
+unrecognized trait, such as C<foo>, Kavorka will attempt to load it
+as a Moo::Role (see L<Kavorka::Manual::ExtendingKavorka>).
+
+The traits Kavorka understands natively are:
+
+=head3 alias
+
+This makes your lexical variable into an alias for an item within
+the C<< @_ >> array.
+
+   fun increment (Int $i is alias) { ++$i }
+   
+   my $count = 0;
+   increment($count);
+   increment($count);
+   increment($count);
+   say $count;          # says 3
+
+But please don't use this for parameters with coercions!
+
+This feature is shared with L<Method::Signatures>.
+
+=head3 assumed
+
+Switches off the type constraint check, though the original type
+constraint is still visible through the introspection API.
+
+   fun increment (Int $i is alias but assumed) { ++$i }
+   
+   my $count = 1.1;
+   increment($count);  # called incorrectly but will not die
+
+This can be used to switch off slow type constraint checks while
+keeping the original type constraint in the signature to express your
+intent.
+
+This trait cannot be used in multi subs, where the type check is
+instrumental in deciding which candidate sub to dispatch to. It I<can>
+be used in conjunction with the C<coerce> trait, in which case the type
+constraint I<will> be checked to determine whether coercion is
+necessary, but no type check will be performed on the result of the
+coercion.
+
+=head3 coerce
+
+See L</Type coercion> below.
+
+=head3 copy
+
+This is the opposite of alias, and is the default. It makes the lexical
+variable a (very shallow) copy of the argument from C<< @_ >>. That is,
+it's equivalent to doing:
+
+   my $param = $_[$i];
+   
+   # whereas the `alias` trait does this...
+   Data::Alias::alias(my $param = $_[$i]);
+
+=head3 locked
+
+This locks hash(ref) keys - see L<Hash::Util>. For references
+this trait has the unfortunate side-effect of leaving the hashref
+locked I<outside> the function too!
+
+This trait has special support for the C<Dict> type constraint from
+L<Types::Standard>, including optional keys in the list of allowed
+keys, unless the type constraint includes a C<slurpy> component.
+
+   fun foo (HashRef $x is locked) {
+      $x->{foo} = 1;
+   }
+   
+   my $var1 = { foo => 42 };
+   foo($var1);
+   say $var1->{foo};           # says 1
+   
+   my $var2 = { bar => 42 };
+   foo($var2);                 # dies
+
+=head3 optional
+
+The C<?> and C<!> syntax is just a shortcut for applying or not
+applying this trait.
+
+   fun foo ($x is optional) { ... }            # These two declarations
+   fun foo ($x?) { ... }                       # are equivalent.
+
+=head3 ref_alias
+
+The C<ref_alias> trait allows you to pass an arrayref, hashref or
+scalarref to the function, and have it available as a plain array,
+hash or scalar. For example:
+
+   fun get_key_from_hash(%h is ref_alias, $key) {
+      return $h{$key};
+   }
+   
+   my %data = ( foo => 42 );
+   get_key_from_hash(\%data, 'foo');   # returns 42
+
+It's the only useful way to define non-slurpy hash or array parameters
+within a signature.
+
+A backslash before the variable name can be used as a shortcut for
+this trait:
+
+   fun get_key_from_hash(\%h, $key) {
+      return $h{$key};
+   }
+
+This feature is shared with L<Method::Signatures>.
+
+=head3 ro
+
+This makes the parameter a (shallow) read-only variable.
+
+   fun foo ($x is ro) { $x++ }
+   
+   foo(42);   # dies
+
+This feature is shared with Perl 6 signatures.
+
+=head3 rw
+
+This is the default, so is a no-op, but if you have a mixture
+of read-only and read-write variables, it may aid clarity to explicitly
+add C<is rw> to the read-write ones.
+
+=head3 slurpy
+
+The slurpy prefix to the type constraint is just a shortcut for a
+trait.
+
+   fun foo ( ArrayRef $bar is slurpy ) { ... } # These two declarations
+   fun foo ( slurpy ArrayRef $bar ) { ... }    # are equivalant
+
+=head2 Type coercion
+
+Coercion can be enabled for a parameter using the C<coerce> trait.
+
+   use Types::Path::Tiny qw(AbsPath);
+   
+   method print_to_file ( AbsFile $file does coerce, Str @lines ) {
+      $file->spew(@lines);
+   }
+
+This feature is shared with L<Method::Signatures>.
+
+=head2 The Yada Yada
+
+Normally passing additional parameters to a function declared with a
+signature will throw an exception:
+
+   fun foo ($x) {
+      return $x;
+   }
+   
+   foo(1, 2);    # error - too many arguments
+
+Adding the yada yada operator to the end of the signature allows the
+function to accept extra trailing parameters:
+
+   fun foo ($x, ...) {
+      return $x;
+   }
+   
+   foo(1, 2);    # ok
+
+This feature is shared with L<Method::Signatures>.
+
+See also L<http://en.wikipedia.org/wiki/The_Yada_Yada>.
+
+=head2 Return types
+
+After a Unicode rightwards arrow character (C<< → >>) or the ASCII
+equivalent (C<< --> >>), you may list return type constraints.
+
+For a function which takes three values and returns an integer:
+
+   fun foo ($a, $b, $c → Int) { ... }
+
+It is possible to include a return type for functions which take
+no parameters:
+
+   fun foo (→ Int) { ... }
+
+For a function which returns a list in list context, you can use the
+C<list> and C<scalar> traits to specify return types for each context.
+
+   fun foo ($a → Int is scalar, ArrayRef[Int] is list) { ... }
+
+Note that the list of returned values is validated as if it were an
+arrayref (or a hashref if that seems more appropriate).
+
+If no type constraint is provided for list context, then the type
+constraint is assumed to be an arrayref of whatever type constraint
+was given for scalar context.
+
+Return types can be coerced:
+
+   fun foo ($a → Int does coerce) { ... }
+
+Return types are implemented using L<Return::Type> which adds a wrapper
+around your function. Although this wrapper should be invisible to
+C<caller> (thanks to L<Scope::Upper>), it does add some overhead to
+your function calls, so return types are a feature to use
+conservatively.
+
+If a return type has the C<assumed> trait, it will I<not> be checked
+at run time; we just assume the function is doing its job properly and
+returning an appropriate value. This avoids the overhead of checking
+return types at run time, but still includes the return type constraint
+in the introspection API.
+
+   fun plus_one (Int $x → Int but assumed)
+   {
+      # No need to check return type.
+      # If $x is an Int, then $x+1 must be too!
+      return $x + 1;
+   }
+
+=head1 BUGS
+
+Please report any bugs to
+L<http://rt.cpan.org/Dist/Display.html?Queue=Kavorka>.
+
+=head1 SEE ALSO
+
+L<Kavorka::Manual>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2013-2014, 2017 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

@@ -1,0 +1,18 @@
+
+Kwiki::SOAP provides a system for interacting with SOAP services
+on the web through WAFL phrases. Kwiki::SOAP is a base class
+for other classes which implement the handling of WSDL files,
+selecting methods, and formatting output. Kwiki::SOAP::Fortune
+is provided as an example. Kwiki::SOAP::Google is available
+as a separate module distribution.
+
+There's a great deal here to improve and refactor, but it
+demonstrates the point: A SOAP walf phrase plugin acting
+as a base class for various uses of SOAP APIs.
+
+You can see Kwiki::SOAP in action at http://www.burningchrome.com/wiki
+
+Please read the POD for more information.
+
+Contact Chris Dent <cdent@burningchrome.com> with questions,
+comments, suggestions, howdies.

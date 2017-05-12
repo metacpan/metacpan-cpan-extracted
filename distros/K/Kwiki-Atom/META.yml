@@ -1,0 +1,14 @@
+name: Kwiki-Atom
+version: 0.14
+abstract: Kwiki Atom Plugin
+author: Autrijus Tang <autrijus@autrijus.org>
+license: perl
+distribution_type: module
+requires:
+  perl: 5.6.1
+  Kwiki: 0.33
+  XML::Atom: 0.09
+no_index:
+  directory:
+    - inc
+generated_by: Module::Install version 0.36

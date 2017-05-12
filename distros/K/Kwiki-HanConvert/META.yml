@@ -1,0 +1,15 @@
+name: Kwiki-HanConvert
+version: 0.01
+abstract: Trad./Simp. Chinese convertor
+author: Kang-min Liu <gugod@gugod.org>
+license: perl
+distribution_type: module
+build_requires:
+  Test::More: 0
+requires:
+  Kwiki: 0.36
+  Encode::HanConvert: 0
+no_index:
+  directory:
+    - inc
+generated_by: Module::Install version 0.36

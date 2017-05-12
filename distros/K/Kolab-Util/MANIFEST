@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Kolab-Util.t
+lib/Kolab/Util.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,14 @@
+This module provide a Template::Providor hack to deal with UTF8
+characters in templates. With the base class any nonâASCII characters
+wouldd be encoded to utf8 as latinâ1, which means Kanji characters
+will be split into byes, and displaied corruptly.
+
+This module is not a Kwiki plugin, therefore it’s useless to edit the
+"plugins" file.
+
+See the perldoc of Kwiki::Template::TT2::UTF8 for how to enable
+this module.
+
+Cheers,
+Kang-min "Gugod" Liu
+

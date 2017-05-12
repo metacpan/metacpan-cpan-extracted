@@ -1,0 +1,32 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"> 
+<& browserstats / &>
+<& hitstats / &>
+<html>
+	<head>
+		<style type="text/css">
+			@import url("/styles/layout.css");
+			
+			@import url("/styles/blog.css");
+			@import url("/styles/bookmarks.css");
+			@import url("/styles/browserstats.css");
+			@import url("/styles/calendar.css");
+			@import url("/styles/wiki.css");
+		</style>
+		<link rel="icon" href="/favicon.ico" type="image/ico" />
+		<title><+$ title $+>(default title)<+$ / $+></title>
+	</head>
+	<body>
+		<a href="/" id="konstrukt-logo" title="Konstrukt Framework"></a>
+		<ul id="nav">
+			<li><a href="/blog/">blog</a></li>
+			<li><a href="/bookmarks/">bookmarks</a></li>
+			<li><a href="/calendar/">calendar</a></li>
+			<li><a href="/guestbook/">guestbook</a></li>
+			<li><a href="/usermanagement/">usermanagement</a></li>
+			<li><a href="/wiki/">wiki</a></li>
+		</ul>
+		<h1 class="page-title"><a href="?"><+$ title $+>(default title)<+$ / $+></a></h1>
+		<& errors / &>
+		<+$ content / $+>
+	</body>
+</html>

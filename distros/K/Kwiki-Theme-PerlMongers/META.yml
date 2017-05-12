@@ -1,0 +1,16 @@
+---
+name: Kwiki-Theme-PerlMongers
+version: 0.01
+author:
+  - 'Dave Rolsky, <autarch@urth.org>'
+abstract: A theme for Perl Mongers websites
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Test::More: 0
+provides:
+  Kwiki::Theme::PerlMongers:
+    file: lib/Kwiki/Theme/PerlMongers.pm
+    version: 0.01
+generated_by: Module::Build version 0.2703

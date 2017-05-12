@@ -1,0 +1,72 @@
+[Changes for 0.15 - 2005-04-01]
+
+* Tatsuhiko Miyagawa submitted a patch to make Kwiki::Atom
+  work better with cutting-edge Spoon.pm.
+
+[Changes for 0.14 - 2004-09-09]
+
+* Fix atom_feed.png installation error as pointed out by Ingy.
+
+[Changes for 0.13 - 2004-09-05]
+
+* Removed dependency on XML::XPath.
+* (XML::XPath is still supported, but may cause problems
+   with non-ASCII characters in the HTML feed.)
+
+[Changes for 0.12 - 2004-09-04]
+
+* Support for using LibXML with XML::Atom.
+
+[Changes for 0.11 - 2004-09-04]
+
+* HTML feeds with "&flavor=html".
+* CSS styling for feeds and entries.
+* Now outputs 'text/xml' for user agents not willing to accept Atom.
+
+[Changes for 0.10 - 2004-09-04]
+
+* We no longer send out text after a 201.
+* Corrected error handling by sending out proper SOAP Fault code.
+
+[Changes for 0.09 - 2004-09-03]
+
+* Unicode entities are decoded properly from text/html posts.
+* Also, strip all tags from text/html posts.
+
+[Changes for 0.08 - 2004-09-03]
+
+* We now send out unescaped UTF8 in XML files, instead of
+  malformed ones.
+
+[Changes for 0.07 - 2004-09-03]
+
+* Correctly set Username for page metadata.
+
+[Changes for 0.06 - 2004-09-03]
+
+* Beginning of Kwiki::Username support.
+* Header output is no longer suppressed.
+
+[Changes for 0.05 - 2004-09-02]
+
+* Correct output of 201 redirect after a POST.
+
+[Changes for 0.04 - 2004-09-01]
+
+* Adina reported setting cgi->page_name is bad form in older Kwikis.
+* Eliminated GET warnings.
+
+[Changes for 0.03 - 2004-09-01]
+
+* Made interoperable with ecto.
+* Remove accidental leftover debug statements.
+
+[Changes for 0.02 - 2004-08-25]
+
+* Cleaned up the documentations.
+* Removed redundant files.
+* Implemented POST and PUT; confirmed interop with "wxAtomClientApp.py".
+
+[Changes for 0.01 - 2004-08-25]
+
+* Initial release.

@@ -1,0 +1,123 @@
+$Id: README,v 1.6 2008-04-24 18:00:35 mike Exp $
+
+You're probably here because you got a message like:
+
+	It was not possible to connect to the Keystone Resolver database.
+	Please see /usr/share/libkeystone-resolver-perl/db/README
+
+Keystone Resolver works by reference to a resource database: if that
+database is not available, it cannot run.
+
+There are two possible reasons why you got this message.  Either there
+is no database on the system, or your web server is providing the
+wrong configuration information to the resolver, so that it can't find
+the database.  If this is the first time you've installed the
+resolver, then the odds are you have the first problem -- but we'll
+deal with the second one first, because it's easier.
+
+
+Configuration of database details incorrect
+-------------------------------------------
+
+Check your web-server's Keystone Resolver configuration file.  If
+you're using Apache 1.3, it's probably
+	/etc/apache/conf.d/keystone-resolver.conf
+and if you're using Apache 2.0, it's probably
+	/etc/apache2/sites-enabled/keystone-resolver
+
+Whichever dialect of Apache you're using, you'll find directives like
+these:
+	PerlSetEnv KRdbms mysql
+	PerlSetEnv KRdb kr
+	PerlSetEnv KRuser kr_read
+	PerlSetEnv KRpw kr_read_3636
+	PerlSetEnv KRrwuser kr_admin
+	PerlSetEnv KRrwpw kr_adm_3636
+
+In order, these indicate the RDBMS to use, the name of the resource
+database with the RDBMS, the username and password to use for
+accessing the database in readonly mode (as the resolver itself does)
+and the username and password to use when accessing the database in
+read-write mode (as the admin UI does).
+
+If your resource database is configured differently from how the
+installed Apache configuration expects, modify the settings to match
+your installation and restart the web-server.
+
+
+No resource database
+--------------------
+
+If you don't have Keystone Resolver resource database on your system
+(perhaps because it's the first time you've installed the software)
+then you need to make one.  You can use whatever RDBMS you want
+(provided it's supported by Perl's DBI system), name the database what
+you want, and use whatever usernames and passwords you want to access
+the database in read-only and read-write modes.
+
+Establishing a resource database is a three-step process: 1, create
+the database; 2, create the tables; 3, populate the tables.
+
+1. The way to create a database, set up users, and specify
+   passwords and permissions for those users is different depending on
+   what RDBMS you're using.
+
+   - For MySQL (which is what Keystone Resolver was developed on), the
+     commands are listed in the script "create_db.mysql" in this
+     directory.  In fact, you can simply feed that script to MySQL if
+     you like, once you've made any changes you want to make to
+     database names, users, etc.
+
+   - For Oracle, which is what DBC use in production, the commands are
+     listed in create_db.oracle.
+
+   These RDBMS-specific files include comments suggesting how they can
+   be fed to the relevant software.
+
+2. Then you need to create the tables in the database.  Unlike the
+   initial database creation, this does not need to be done as the
+   RDBMS superuser: you should be able to do this as the read-write
+   user that you set up in step 1.  The precise syntax needed to crate
+   the tables is different for different RDBMSs (ah, the glories of
+   standardisation!) so you will need to use the "create_tables"
+   script for your chosen RDBMS.
+
+   The table-creation scripts in this directory constitute an
+   implementation of the data model described in
+   /usr/share/doc/libkeystone-resolver-perl/data-model
+
+3. Once the tables are in place, they must be populated with data.
+   Doing this is of course a huge job in its own right, and there are
+   companies whose whole business model is maintaining and selling
+   resource databases for OpenURL resolvers.  But we supply a simple
+   database that is sufficient to allow the resolver to run against a
+   tiny set of resources.  Once more the precise syntax to populate
+   the tables is different for different RDBMSs, so you will need to
+   use "simple.mysql", "simple.oracle", or whatever matches your
+   RDBMS.
+
+So, for example, if you are using MySQL and you are satisfied with the
+default database name, usernames and passwords, you can create a
+database as follows:
+
+	$ mysql -u root -p < create_db.mysql
+	$ Enter password: ********
+	$ mysql -u'kr_admin' -p'kr_adm_3636' kr < create_tables.mysql
+	$ mysql -u'kr_admin' -p'kr_adm_3636' kr < simple.mysql
+
+And if you are using Oracle (substituing the correct system password):
+
+	$ sqlplus -S system/KillTheKing @create_db.oracle
+	$ sqlplus -S ko_admin/ko_adm_3636 @create_tables.oracle
+	$ sqlplus -S ko_admin/ko_adm_3636 @create_sequences.oracle
+	$ make simple.oracle
+	$ sqlplus -S ko_admin/ko_adm_3636 @simple.oracle
+
+Note that if you are importing an existing database into Oracle, then
+you should do this BEFORE creating the sequences, so that they can be
+set to start after the last record in each table:
+
+	# Import any existing records that have established IDs
+	$ sqlplus -S ko_admin/ko_adm_3636 @create_sequences.oracle
+	# Roll in any new records that are to have IDs assigned
+

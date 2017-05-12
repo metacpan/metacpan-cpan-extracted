@@ -1,0 +1,30 @@
+Revision history for Kaiten-Container
+
+0.37    2011-12-22 01:24 AM
+        Fix test - change |given| to |if|
+
+0.35    2011-12-21 07:58 PM
+        Change DEBUG mode settings to normal properties (from abs::def),
+        add CANCEL_REUSE properties, fix docs, add another example.
+
+0.31    2011-12-20 10:38 PM
+        Add simple example to show main futures at one place.
+
+0.29    2011-12-20 08:51 PM
+        Add original error text at |probe| if check fail
+        
+0.27    2011-12-20 05:04 PM
+        Fix docs
+
+0.25    2011-12-20 03:51 AM
+        Add deep dependencies resolving
+
+0.23    2011-12-19 12:35 PM
+        Fix tests and docs
+
+0.21    2011-12-19 05:32 AM
+        Fix MANIFEST to add tests
+
+0.19    2011-12-19 05:10 AM
+        First released version.
+

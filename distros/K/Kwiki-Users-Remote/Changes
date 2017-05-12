@@ -1,0 +1,21 @@
+---
+version: 0.04
+date:    Sun Nov 13 23:29:37 EST 2005
+changes:
+    - Improved Kwalitee
+---
+version: 0.03
+date:    Wed Sep  7 20:32:34 EDT 2005
+changes:
+    - Added patch from Gerald Richter
+---
+version: 0.02
+date:    Wed Apr 27 14:19:00 PDT 2005
+changes:
+    - Made work with new hub improvements -- ingy
+    - Added version number to Remote.pm
+---
+version: 0.01
+date:    Thu Aug 19 19:05:46 EDT 2004
+changes:
+    - initial release

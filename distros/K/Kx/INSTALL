@@ -1,0 +1,31 @@
+=head1 NAME
+
+INSTALL - How to install Kx
+
+=head1 SYNOPSIS
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+=head1 DESCRIPTION
+
+This is experimental at the moment. Mark developed it on MacOSX and Linux,
+x86. And now my (Stephan's) development platform is Linux (x86).
+
+You need to first get a copy of c.o from L<http://kx.com/q/c/> for your
+architecture. Make libkdb.a from c.o for easy linking like below in the
+same path as the package source.
+
+    ar -r libkdb.a c.o
+
+or
+    libtool -static -o libkdb.a c.o
+
+For make test to actually do anything, you need to have a 'q' process
+running on localhost port 2222 (or other port specified by environment
+variable C<KX_PORT>).
+
+    q -p 2222
+

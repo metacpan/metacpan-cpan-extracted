@@ -1,0 +1,13 @@
+name: Kwiki-Ajax-Toolman
+version: 0.10
+abstract: Tool-man Javascript Libraries for Kwiki
+author: Brian Ingerson <ingy@cpan.org>
+license: perl
+distribution_type: module
+requires:
+  perl: 5.6.1
+  Kwiki::Ajax: 0
+no_index:
+  directory:
+    - inc
+generated_by: Module::Install version 0.36

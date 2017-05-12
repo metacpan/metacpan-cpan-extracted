@@ -1,0 +1,82 @@
+# Before `make install' is performed this script should be runnable with
+# `make test'. After `make install' it should work as `perl Kx.t'
+
+#########################
+
+# change 'tests => 2' to 'tests => last_test_to_print';
+
+use Test::More tests => 1;
+use Kx;
+
+my %config = (
+	host=>"localhost", 
+	port=>2222, 
+	ktype=>'symbol', 
+	vtype=>'int', 
+	dict=>'x', 
+	create=>1
+);
+tie(%x, 'Kx::HASH', %config);
+
+print "Size of hash x is :". scalar %x ."\n";
+for(0..5)
+{
+	$x{"a$_"} = $_;
+}
+
+%y = %x;
+
+for(0..5)
+{
+	print $y{"a$_"}," " if exists $y{"a$_"};
+}
+print "\n";
+
+while(($k,$v) = each %x)
+{
+	print "Key=>$k is $v\n";
+}
+untie(%x);
+
+#  OK now Lists
+
+my %config = (
+	host=>"localhost", 
+	port=>2222, 
+	type=>'symbol', 
+	list=>'d', 
+	create=>1
+);
+tie(@a, 'Kx::LIST', %config);
+
+# push lost of stuff on an array
+my @array = (qw/aaaaaaaa bbbbbbbbb ccccccccc ddddddddd e f j h i j k l/) x 30000;
+push(@a,@array);
+push(@a,@array);
+push(@a,@array);
+print "\@a has ", scalar(@a)," elements\n";
+
+# Store
+$a[3] = "Help me";
+print "Elementt 3 is ",$a[3],"\n";
+
+# Shift
+my $za = shift(@a);
+print "Shifted $za";
+print " \@a has ", scalar(@a)," elements\n";
+
+# unshift
+unshift(@a,$za);
+print "UnShifted $za";
+print " \@a has ", scalar(@a)," elements\n";
+
+# pop
+$za = pop(@a);
+print "After pop: $za";
+print " \@a has ", scalar(@a)," elements\n";
+
+# splice the d back in
+splice(@a,3,1,('d'));
+print "After splice:";
+print " \@a has ", scalar(@a)," elements\n";
+print "Elementt 3 is ",$a[3],"\n";

@@ -1,0 +1,52 @@
+#!/usr/bin/perl
+
+
+package Main;
+$Main::VERSION = '0.0.5';
+use Modern::Perl;
+use Koha::Contrib::Mirabel;
+use Getopt::Long;
+
+
+binmode(STDOUT, ':encoding(utf8)');
+
+my ($doit, $verbose) = (0, 1);
+GetOptions( 
+    'doit'     => \$doit,
+    'verbose!' => \$verbose,
+);
+
+my $mirabel = Koha::Contrib::Mirabel->new( verbose => $verbose, doit => $doit );
+
+for (@ARGV) {
+    $mirabel->sync()       if /sync/;
+    $mirabel->clean()      if /^clean/;
+    $mirabel->full_clean() if /^fullclean/;
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Main
+
+=head1 VERSION
+
+version 0.0.5
+
+=head1 AUTHOR
+
+Frédéric Demians <f.demians@tamil.fr>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Frédéric Demians.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

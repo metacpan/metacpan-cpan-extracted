@@ -1,0 +1,9 @@
+Changes
+lib/KSx/Search/RegexpTermQuery.pm
+lib/KSx/Search/WildCardQuery.pm
+Makefile.PL
+MANIFEST
+README
+t/wcq.t
+t/retq.t
+META.yml                                 Module meta-data (added by MakeMaker)

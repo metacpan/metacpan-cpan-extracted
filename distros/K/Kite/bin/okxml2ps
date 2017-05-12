@@ -1,0 +1,194 @@
+#!/usr/bin/perl -w
+#============================================================= -*-perl-*-
+#
+# okxml2ps
+#
+# DESCRIPTION
+#   Utility for converting XML kite part descriptions and layout markup
+#   to PostScript, with automatic page tiling, registration mark control,
+#   and path following text.  Calls on the Kite::XML2PS module to do all
+#   the work.
+#
+# AUTHOR
+#   Simon Stapleton <simon@tufty.co.uk> wrote the original xml2ps.pl
+#   utility which performs the XML -> PostScript conversion.
+#
+#   Andy Wardley <abw@kfs.org> re-packaged it into a module for 
+#   integration into the Kite bundle.
+#
+# COPYRIGHT
+#   Copyright (C) 2000 Simon Stapleton, Andy Wardley.  All Rights Reserved.
+#
+#   This is free software; you can redistribute it and/or
+#   modify it under the same terms as Perl itself.
+#
+# VERSION
+#   $Id: okxml2ps,v 1.3 2000/10/17 11:58:16 abw Exp $
+#
+#========================================================================
+
+# for testing
+# use lib qw( ./lib ../lib );
+use strict;
+use Kite::XML2PS;
+use Getopt::Long;
+
+my $PROGRAM   = 'okxml2ps';
+my $VERSION   = 0.2;
+my $COPYRIGHT = 'Copyright 2000 Simon Stapleton, Andy Wardley';
+
+my $infile;       # the input file 
+my $outfile;	  # the output file (STDOUT by default)
+my $title;        # title for the document
+my $regmarks = 1; # registration marks disabled by default
+my $map = 1;      # show tiling map
+my $border = 0;   # border width in mm
+my $help;         # help flag
+
+# read command line options
+eval {
+    GetOptions (
+	"infile=s"  => \$infile,
+	"outfile=s" => \$outfile,
+	"title=s"   => \$title,
+        "border=s"  => \$border,
+	"reg!"      => \$regmarks, 
+	"map!"      => \$map, 
+	"help"      => \$help, 
+    );
+};
+die error($@) if $@;
+die help() if $help;
+
+# read input file from next command line argument unless $infile set
+$infile ||= shift(@ARGV);
+die error("no input file specified")
+    unless $infile;
+
+# create Kite::XML2PS object to convert XML to PS
+my $ps = Kite::XML2PS->new({
+    filename => $infile, 
+    regmarks => $regmarks,
+    map      => $map,
+    title    => $title,
+    border   => $border,
+}) || die error($Kite::XML2PS::ERROR);
+
+# generate output document
+if ($outfile) {
+    local *FH;
+    open(FH, "> $outfile") || die error("$outfile: $!");
+    print FH $ps->doc();
+    close(FH);
+}
+else {
+    print $ps->doc();
+}
+
+
+#------------------------------------------------------------------------
+# help()
+#
+# Return a string containing the program information and usage.
+#------------------------------------------------------------------------
+
+sub help {
+    return <<EOF . usage();
+$PROGRAM version $VERSION
+
+  Convert a curve definition from OpenKite XML format to PostScript,
+  with automatic page tiling and registration mark control.
+
+  $COPYRIGHT.  All Rights Reserved.
+
+  This is free software; you can redistribute it and/or modify it under 
+  the same terms as Perl itself.
+
+EOF
+}
+
+#------------------------------------------------------------------------
+# error($msg)
+#
+# Return a string containing the error message passed with the usage 
+# appended.
+#------------------------------------------------------------------------
+
+sub error {
+    my $error = shift;
+    return "$PROGRAM version $VERSION\n\n"
+	  . ($error ? "  ERROR: $error\n\n" : '')
+          . usage();
+}
+
+#------------------------------------------------------------------------
+# usage()
+#
+# Return a string detailing the script usage.
+#------------------------------------------------------------------------
+
+sub usage {
+    return <<EOF;
+usage: $PROGRAM [options] filename
+
+options:
+    --infile=file    Alternate way of specifying input file
+    --outfile=file   Specify output file
+    --title=text     Specify document title (overrides title in XML file)
+    --border=width   Specify border width in mm (default: 0)
+    --reg / --noreg  Enable (default) / disable registration marks
+    --map / --nomap  Enable (default) / disable tiling map 
+    --help           This help
+EOF
+}
+
+1;
+
+__END__
+
+=head1 NAME
+
+okxml2ps - convert an XML kite part markup file to PostScript
+
+=head1 DESCRIPTION
+
+The F<okxml2ps> script provides a simple user-interface to the Kite::XML2PS
+module.  It reads in an XML file containing kite part defintions an layup
+and generates the relevant PostScript.
+
+=head1 AUTHORS
+
+Simon Stapleton <simon@tufty.co.uk> wrote the original xml2ps.pl
+utility which performs the XML -> PostScript conversion.
+
+Andy Wardley <abw@kfs.org> re-packaged it as a module and accompanying
+script for integration into the Kite bundle.
+
+=head1 VERSION
+
+$Revision: 1.3 $
+
+=head1 COPYRIGHT
+
+Copyright (C) 2000 Simon Stapleton, Andy Wardley.  All Rights Reserved.
+
+This is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+See also L<Kite::XML2PS>
+
+=cut
+
+
+
+
+
+
+
+
+
+
+
+

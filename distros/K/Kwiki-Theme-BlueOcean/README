@@ -1,0 +1,32 @@
+Kwiki-Theme-BlueOcean
+
+Provides a blue looking them for Kwiki. It is based on the GreenHouse theme
+with a focus on making it easier to read. Simply remove the existing theme
+and add this theme to your Kwiki installation.
+
+This theme is special in the fact that it is built to work with
+Kwiki::TableOfContents. It would be nice to get this theme to work without
+this module also but I don't have time for that right now. So if you use this
+theme you must install Kwiki::TableOfContents
+
+It also depends on some other Kwiki modules. Again it would be nice to remove
+these dependencies and make those modules optional.
+
+INSTALLATION
+
+To install this module and add it to your kwiki,
+run the following commands as root:
+
+%> kwiki -install Kwiki::Theme::BlueOcean
+
+You many already have a theme installed. If that is the case simply remove the
+existing theme. Below is an example:
+
+%> kwiki -remove Kwiki::Theme::Basic
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 CorData
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. See http://www.perl.com/perl/misc/Artistic.html

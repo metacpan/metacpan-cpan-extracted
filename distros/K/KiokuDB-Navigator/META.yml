@@ -1,0 +1,34 @@
+---
+abstract: 'KiokuDB Database Navigator'
+author:
+  - 'Stevan Little <stevan.little@iinteractive.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::Exception: 0.21
+  Test::More: 0.62
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: KiokuDB-Navigator
+no_index:
+  directory:
+    - inc
+    - share
+    - t
+requires:
+  Browser::Open: 0.03
+  File::ShareDir: 1.00
+  JSORB: 0.04
+  KiokuDB: 0.34
+  KiokuDB::Cmd: 0.02
+  MooseX::Types::Path::Class: 0.05
+  POSIX: 0
+  Path::Class: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.04

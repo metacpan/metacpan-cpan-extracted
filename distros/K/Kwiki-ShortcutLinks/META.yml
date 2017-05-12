@@ -1,0 +1,13 @@
+name: Kwiki-ShortcutLinks
+version: 0.03
+abstract: WAFL shortcuts for common URI links
+author: Michael Gray <mjg17@eng.cam.ac.uk>
+license: perl
+distribution_type: module
+requires:
+  perl: 5.6.1
+  Kwiki: 0.30
+no_index:
+  directory:
+    - inc
+generated_by: Module::Install version 0.33

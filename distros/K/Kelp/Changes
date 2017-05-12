@@ -1,0 +1,209 @@
+2016-11-08: Version 0.9091
+            [Changes]
+            - Change bridge error respose. Bridges will return 403 Forbidden (Konstantin Yakunin)
+            - attr can be ether scalar, undef or CODEref but not HASHREF or ARRAYREF (Nikolay Mishin)
+            - POD (Nikolay Mishin)
+
+2015-08-10: Version 0.9071
+            [Bug Fixes]
+
+            - Bridges will correctly return 401 (instead of 500) when non existing location is accessed (Konstantin Yakunin)
+            - Undefined value warning fixed. (Ben Hengst)
+            - Correct handle errors on deployment and silence STDERR in Stack Trace tests (Konstantin Yakunin)
+
+            [New Features]
+            - New attributes request_obj and response_obj used to specify the name of the request and response classes. (Ben Hengst)
+
+2015-04-02: Version 0.9051
+            [Bug Fixes]
+
+            - Stringify 500 errors avoiding the JSON-ification of returned structures and blessed objects. (basiliscos)
+            - Increate the level of Test::Bulder in Kelp::Test, providing more relevant messages upon error. (basiliscos)
+            - POD typos corrected
+            
+            [New Features]
+            - Add json_content method to Kelp::Test, allowing for the testing of the returned JSON structure.
+            - Abstract the initialization of the Config and Routes modules
+            - More POD and examples added (roy-tate, Christian Froemmel, Perlover)
+
+2014-12-14: Version 0.9021
+
+            [Bug Fixes]
+
+            - POD fixes
+
+            [New features]
+
+            - Session now accepts hashref, which also allows for the destruction
+              of the enitire session.
+            - Add "include" function to config files, making it possible to include
+              other file into the configuration.
+
+2014-08-08: Version 0.9015
+
+            [Bug Fixes]
+
+            - Fix a typo causing a fatal error in Routes::Controller
+            - Fix debug and error keywords in Kelp::Less
+            - Remove an explicit return undef, per Perl::Critic
+
+            [New Features and Improvements]
+
+            - Allow for route methods outside of base class
+              It is now possible to add a route that lives outside of the base class
+              by prefixing it with '+'. This works for both Perl and camelized
+              strings.
+
+            - Add config keyword to Kelp::Less
+
+            - Virtualize the logger instantiation
+              Add a _logger function in Module::Logger, which creates the logger
+              instance, making it easier to subclass the Logger module.
+              Add a Logger::Simple module, which dumps everything to STDERR
+              This module is convenient to use during development with Kelp::Less.
+
+            - Update bin/Kelp
+              * bin/Kelp --less <name> will now create a psgi file with the specified name
+                (previously it would always create app.psgi).
+              * Existing files will not be overwritten, unless --force specified.
+
+            - Simplify Less application boilerplate
+              Add a Config subclass with simplified configuration that will be used by
+              default by any Kelp::Less application. This configuration will not load
+              any modules or middleware, leaving it up to the user to manually load
+              any modules needed.
+              Additionally, bin/Kelp --less <name> will now only generate the psgi
+              application, and not any other folders, views, templates etc.
+
+            - Downgrade confess to croak and croak to die
+              Kelp::Response used confess and croak excessively. Both changed to die,
+              so that the user can control how much stack trace they want via the
+              'long_error' attribute or the KELP_LONG_ERROR env variable.
+
+
+2014-07-12: Version 0.9012
+
+            [New features]
+            - Add access to the application instance from the config files
+            - Kelp.pm methods 'requiest' and 'response' renamed to 'build_request' and 'build_response', in order
+              to minimize cofusion. NOTE: If your application is overriding any of those, make sure to rename them too.
+            - Replace explicit UTF-8 encoding with $app->charset
+            - Rename pattern attribute 'via' to 'method'. 'via' will still work as a shortcut to 'method', so
+              this will not break backwards compatibility.
+
+            [Fixes]
+            - POD fixes
+
+            [Other]
+            - Using Pod::Markdown::Github to generate README.md from Kelp.pm
+
+2014-05-30: Version 0.9001
+
+            [Bug Fixes:]
+            - Curly braces get stripped from pattern checks
+            - Remove HTTP_X headers from Kelp::Request (security hole)
+
+            [New features]
+            - Allow for extending Kelp::Routes and using custom routers (Maurice Aubrey)
+            - Create Kelp::Routes::Controller, which reblesses the web app into a controller class (Maurice Aubrey)
+            - Set env KELP_CONFIG_WARN to warn for missing config files
+            - Set rendered to true when redirecting (Julio Fraire)
+            - Add request_ok method to Kelp::Test
+            - Config module optionally registers _cfg method, to help manipulate the configuration.
+            - Add a cookie jar to Kelp::Test
+
+
+2014-03-31: Version 0.4602
+            Replace $json->property with $json->get_utf8 in order to maintain compatibility across different JSON implementations
+
+2014-03-27: Version 0.4601
+            If no placeholders in route, param array should be empty (Maurice Aubrey)
+            Move route cache to a CHI-like interface, in order to allow for custom cache modules
+            Don't double encode JSON repsonse (Ruslan Zakirov)
+
+2014-03-02: Version 0.4570
+            Allow attributes to set undef values
+            do not append default template extension if ext() is undef
+            Added POD
+            Added tests
+
+2013-11-19: Version 0.4560
+            Allow for fully qualified Kelp module names
+            Config merge sigils will now only work for ARRAY
+            POD and typo fixes
+
+2013-11-11: Version 0.4550
+            Flip nginx env vars.
+            Change param to accept no JSON content or non-hash JSON
+            Make Kelp::Test::request only load the PSGI app once
+            POD and comments typo fixes
+
+2013-08-14: Version 0.4501
+            Minor fixes
+            Add render_binary
+            Add missing header_like
+            POD changes
+
+2013-07-05: Version 0.4011
+            Removed modules_disable and middleware_disable, and added the ability to add and remove elements in an array by adding a '+' or '-' in front of the key name.
+
+2013-07-02: Version 0.4001
+            Added modules_disable and middleware_disable arrays in config
+            Added a REMOTE_USER fallback for nginx
+            Added loaded_modules attribute to Kelp
+            Fixed utf8 encoding for OSX
+            Added a session convenience method
+            PSGI creation remodeled to leverage the StackTrace middleware
+            Introduced render_error method in Kelp::Response, which will look for error templates (404, 500, etc)
+
+2013-06-13: Version 0.3101
+            Remove dependency of Template, replace it with Template::Tiny.
+            Reason being that Template does not pass its tests under Perl 5.18.
+            Use Kelp::Module::Template::Toolkit (available on CPAN) if your code
+            depends on Template.
+
+2013-05-25: Version 0.3001
+            Fix typo in test paths
+            Bridges accessed directly will now return 401 - Unathorized
+            Introduce "panic" and "finalize" methods
+            Add "long_error" attribute
+            Rename "before_render" to "before_finalize"
+            Change all _croak statements to return panic, improving the natural flow of the route logic
+
+2013-05-14: Version 0.2191
+            Add arguments to load_module
+            Fix tests and small issues
+
+2013-05-05: Version 0.2190
+            Add property for partial rendering
+            Address an issue with nginx and headers
+            Add more pod
+
+2013-05-02: Version 0.2182
+            Fix issue with content-type params
+            Set explicit utf8 encoding for module Template
+            Replace wizardly Perl code with Class::Inspector
+
+2013-04-20: Version 0.2181
+            Fix test failing under Perl 5.10
+
+2013-04-19: Version 0.218
+            Add auto load class when adding a route.
+
+2013-04-17: Version 0.217
+            Fix Github issue #1
+            Revamp the Template module to allow for more standard subclassing
+            Remove Config::Hash from test units
+
+2013-04-16: Version 0.21
+            Allow for using templates w/o extension.
+            Allow for subclassing the templates module.
+            Implement testing of a Less app, via the psgi attribute.
+
+2013-04-13: Version 0.2
+            Complete rewrite of the Config module, allow for subclassing of it.
+            Write more tests.
+            Write more POD.
+
+2013-04-12: Version 0.1
+            First upload to CPAN

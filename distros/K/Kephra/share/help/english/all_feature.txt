@@ -1,0 +1,339 @@
+
+       ---------------------
+      | Kephra Feature List |
+       ---------------------
+
+This is the best place to answer questions like : "Does Kephra...?" , "How to
+change...?" or "How do I...in Kephra?". Even if the main menu might do that in
+some cases faster.
+
+Even if the editor currently doesn't do everything we wish, he already has a big
+pile of features. If you're already familiar with text editors, you can skip a
+lot of the following and switch to the "Advanced Tour", also to be found in the 
+help menu.
+
+But if you're interested in a complete and sorted (order as main menu) overview
+of all features, go on. The config keys refer to "config/general/autosaved.conf",
+the main config file.
+
+
+Content:
+
+  1 Navigation in text
+  2 Selecting text
+  3 Text editing (edit menu)
+  4 History of changes (edit menu)
+  5 Clipboard functions (edit menu)
+  6 Search menu and search dialog
+  7 Tools Menu
+  8 File menu
+  9 Document menu - Document settings
+ 10 View menu
+ 11 Config menu
+ 11 Help menu
+
+
+
+ 1 Navigation in text - move caret
+   - direction keys move the textcursor(caret) through the text (as usual), and
+     a left-click with the mouse can set the caret to this position.
+   - <Home> moves the caret to the first non-whitespace character in the current
+     row. Pressing <Home> again moves the caret to the first position.
+     <end> moves the caret to the end of the row.
+   - <Ctrl>+<Home> jumps to the first character of your text and <Ctrl>+<end>
+     to the last.
+   - The <page up> and <page down> keys move the caret page-wise up or down.
+     Page means here the size of the visible part of the text.
+   - <Ctrl>+<page up> or <page down> let the editor turn to next or previous
+     document. Next refers to the order that is shown in the tabbar.
+   - <Ctrl>+<enter> or an left-click an the current tab in tabbar turns to the
+     last used document (switch back).
+   - <Ctrl>+<left or right arrow> let the caret jump to the start of the next
+     or previous word.
+   - <Ctrl>+<up> or <down> scrolls the text line-wise up or down.
+   - <Alt>+<up> or <down> let the caret jump to the next or previous paragraph.
+     Paragraphs are blocks of text, sparated by empty lines.
+   - to jump directly to a specific row press <Ctrl>+<G> and enter the number
+   - press <Ctrl>++<Shift><+> and <Ctrl>+<-> to zoom your source/text
+
+ 2 Selecting text
+   - Holding <Shift> or the left mouse button makes it possible to select text by
+     moving the caret. The selected text will be marked.
+   - To select a square of text (cols), hold down the <Alt> key. This is also
+     called rectangular selection.
+   - To move a selected text with your mouse, hold down the left mouse button.
+     It's also possible to move text with your arrow keys while you're
+     holding <Ctrl>+<Alt>. In case there is no text marked, <Ctrl>+<Alt>+<Up> or
+     <Down> moves the current line.
+   - When you hold down <Ctrl> while you're moving text with your mouse,
+     you instead make a copy of it.
+   - <Ctrl>+<A> marks the whole text.
+
+ 3 Text editing (edit menu)
+   In most cases you do select a stripe of text, to make something with it and
+   most text-modifying functions here expect that you selected some text before.
+   In case you selected nothing the function will use the whole current document
+   as input. If you add the <Shift>-key to a hot key, its meaning will most
+   likely reversed.
+   - Any selected text will be deleted if you type ordinary character key.
+   - The <Ins>-Key toggles the caret form. An upright line let you insert text
+     as you type(insert mode), a horizontal underline showes you that you
+     currently overwriting the old text.
+   - <Del> deletes the character on the right side of the caret. <Ctrl>+<Del>
+     erases the whole word. The <backspace> key (<--) deletes the character on
+     the left side of the caret, accordingly <Ctrl>+<backspace> deletes a word.
+   - There are 3 groups of text editing functions and each has its own submenu
+     in the "edit"-menu. Format stands for rearranging the text by inserting or
+     removing spaces and linebreaks, but not changing the content. Comment means
+     to insert or remove some character from the text to activate or deactivate
+     the chosen content in the specific computer language. Convert filter can do
+     change character and the content in a chosen way.
+   - <Ctrl>+<Space> indent the current line by inserting one space on leftmost
+     position no matter where the caret is located. If there are several rows
+     selected, the function will be applied to all rows, <Ctrl>+<Shift>+<Space>
+     provide a reverse funcion.
+   - <Ctrl>+<Tab> (|<- ->|) does indenting in similar way, only with tabs.
+     The size and type of these tabs depends on your settings.
+   - Several more text editing functions can also accessed via menu like
+     "Align Indention", "Join Lines", "Delete Trailing Spaces" and much more.
+
+ 4 History of changes (edit menu)
+   The editor does remember every change, so that you can always go backward and
+   forward in the history of this text editing session. The only limit here is
+   the memory of your computer.
+   - <Ctrl>+<Z> goes one step back and <Ctrl>+<Shift>+<Z> one step forward.
+     Please be aware of, that if you do change something in the "past" there will
+     be no more steps forward.
+   - When you have a long history it is sometimes handy to make several steps at
+     once. <Alt>+<Z> and <Alt>+<Shift>+<Z> works this way. The number of overleaped
+     steps can be set at the config key: "editpanel > history > fast_undo_steps".
+   - It is also possible to sneak quickly where things started. <Ctrl>+<Alt>+<Z>
+     jumpes to the begin and <Ctrl>+<Alt>+<Shift>+<Z> back to the latest state.
+
+ 5 Clipboard functions (edit menu)
+   Every newer desktop or operating system provides a clipboard to exchange
+   text and other data between the Programs in a simple way. Most often you will
+   use the clipboard to move some selected text inside the program . You will
+   find all these following functions also in the upper part of the "edit" menu,
+   many of them also in the middle part of the toolbar.
+   - <Ctrl>+<X> ("Cut") deletes the selected text and put it into the clipboard.
+   - <Ctrl>+<C> ("Copy") just copy the selected text into the clipboard.
+     <Ctrl>+<Ins> does the same.
+   - <Ctrl>+<V> ("Insert") insert the clipboard content into the current document
+     at the location of the caret. also with <Shift>+<Ins>.
+   - <Ctrl>+<W> ("Swap") swaps the selection with the clipboard.
+   - <Del> ("Delete") just deletes selection.
+   - Cut, copy and delete can also applied to the current line(row) by adding
+     <Shift> to the respective hotkey. (delete line = <Ctrl>+<Shift>+<Del>)
+   - <Ctrl>+<Shift>+<L> or <R> deletes in the current line all character left
+      or right hand from the caret.
+   - <Ctrl>+<Shift>+<D> doubles the current line, it inserts a copy of the
+     current line below the current line.
+   - You can also move text by DND (drag'n Drop) in the text and into other
+     programs, if they supporting that. When you want to copy text this way,
+     select it, hold the selection by left-clicking on it and holding the mouse
+     button, hold the <Ctrl> (than you see a box with a "+" within under the
+     cursor) and release the mouse button when the caret is at the position where
+     you want to copy the selection to.
+
+ 6 Search menu and search dialog
+   The editor can search after a given phrase in the current document, in all
+   open docs or just only inside a selected text. This can be done with or
+   without the search dialog, but search opptions can only set by the search
+   dialog or via the config file but i think this is a bit messy.
+   - <Ctrl>+<F> calls the search and replace dialog, waiting for you to type the
+     search phrase, an existing selection inside the dialog will be as usual
+     overwritten. With the <Up> und <Down> keys you can browse the history of
+     search phrases.
+   - If you selected some short text before you call the dialog, this selected
+     text will be inserted as the search phrase, but the selection ranges over
+     multiple lines, the editor will asume that you want to only search inside
+     this selection. Please mind that once you found inside a selection a
+     matching phrase, the match will be selected and you can't no longer search
+     inside the previous selection.
+   - After you typed in your search phrase you should press <Enter> to jump
+     between the findings of the search phrase in top down direction. If you
+     hold <Shift> while you press <Enter>, the direction will be bottom up.
+     If you hold <Ctrl> while <Enter>, the dialog will be closed befor searching.
+   - To search "forward" and "backward" you can also use the mouse. Just click
+     on the toolbar icons with the lens and the blue arrows to jump between
+     finings of the search phrase.
+     In the search dialog are more buttons on the right side for similar
+     purposes like fast search, goto first or last findning and replace.
+   - Below the radio box in the middle of the dialog, where you can select the
+     search scope, is a chackbox called "Auto Wrap". If activ the "next" finding
+     after the last on the bottom of the document is the first at top of the
+     document and vici versa.
+   - If the "Incremental Search" option is activ, the editor searches after the
+     given phrase (starting his search at the top of the document) immediately,
+     every time you type in a new character.
+   - search options:
+     + case sesitive: follow search phrase literally with upper and lowercases
+     + the finding has to be the begin of a word
+     + the finding has to be a complete word
+     + understand simple regular expressions within the search phrase
+   - It is also possible to search without the dialog. Just press <Ctrl>+<F3>
+     and the currently selected text will become the next search phrase. Now you
+     can use <F3> to skip forward and <Shift>+<F3> to skip backward between the
+     matches to the search phrase. <Ctrl>+<Alt>+<F3> jumpes to the first and
+     <Ctrl>+<Alt>+<Shift>+<F3> to the last match inside the selected scope.
+   - When you call the search dialog with <Shift>+<Ctrl>+<F> it expect you to
+     type in the replace phrase, in the search input line will be inserted the
+     last used search phrase. In case you selected some text before calling the
+     dialog, the behaviour of the replace input will be the same as search input
+     and also the replase input line do remembers its history, so you can select
+     previous phrases with the with the mouse or the 2 vertical arrow keys.
+   - Pushing <enter> while active cursor is inside the replace input line will
+     cause the same action as clicking on the "Replace All" button. All matches
+     to the search phrase in the search scope will be replaced with the replace
+     phrase. Holding <Ctrl> while <Enter> closes the dialog after replacing all.
+     If you hold <Alt> while you press <Enter>, the same function as the 
+     "With Confirmation" button does will be called. It differs only from 
+     "Replace All" function in the fact that the editor ask for your permission
+     before each single text replacement. 
+   - Another way to achieve the same is to use the search pad rightmost in the 
+     dialog. Here can you decide freely where to jump and what to replace by
+     clicking the buttons I described above.
+   - The dialog can be closed by push the <Esc>-Key with the "Close" button,
+     which is in the bottom right corner.
+   -"Goto Line" or <Ctrl>+<G> calls a Dialog where you can type into the number
+     of the line, you wish to jump to.
+
+ 7 Tools Menu
+   The notepad is a parallel panel, just for keeping a bit of unformatted text.
+   - <F4> jumps into the notepad and back. <Ctrl>+<F4> opens or closes it. <F5>
+     inside the notepad does a Perl eval with the content. Results will be shown
+     in the output panel.
+   - <F5> runs the current document with a defined interpreter. This process can
+      be stopped with <Shift>+<F5>. The result will be displayed  in the output 
+      panel. This can be opened and closed with <Ctrl>+<F5>.
+  
+ 8 File menu
+   Containes all the functionality that has access to your permanent storage
+   (harddrive e.g.). The only exceptions are new and quit, but they belong here
+   too i think.
+   - "New" creates a new empty document which has no relation to any file.
+   - "Open" reads a file which you select by dialog and display it in a new 
+     document.
+   - "Reopen" reads an already open file and replaces the displayed content with
+     newly read data from the hard drive. This way will be the last saved version
+     restored.
+   - "Insert" inserts the content of a selected file into the current visible 
+     file at the location of the caret (textcursor).
+   - "Save" writes the content of the current visible document into that file 
+     from where it was opened. If it was a new file it asks for a filename.
+   - "Save As" always asks for a filename which to write the current doc into.
+     Further calls of the save function will write the doc into the new file.
+   - "Save Copy" does the opposite. It also asks always for a new filename to
+     write the current document into. But the document keeps related to the old
+     file name.
+   - "All/Other" Many of the functions in this menu has an equivalent which 
+     conain the words "All" or "Other". As expected "All" means this function
+     will be applied to all open files and "Other" means that it will applied
+     to all open files but not to the current file.
+   - A "Session" is the sum of all current opened files. Such a session can be 
+     saved into a sassion file which containes the location and all properties 
+     of all open files so you can restore or add this session with this file.
+     I want also that the edito is able to read (import) and write (export)
+     session files from other editors but currently is only SciTE session file
+     format supportet.
+
+ 9 Document menu - Document settings
+   do (mostly) change a property of the current document. The syntaxstyle und the
+   tabmode can also be set by using the interactive statusbar. All document
+   properties will be saved in the session file and will be restored be the next
+   start of the program.
+   - The syntaxstyle determinates the colouring of document and corresponds with
+     the syntax of the particular language. Normally do the editor selecting the
+     syntaxstyle automaticly according die ending of the file. Under the config
+     key: file > endings is set which ending belongs to what language. The
+     syntaxstyle can also be set manually by the Syntaxstyle submenu in the
+     document menu or by the context menu in statusbar. (right click onto display
+     of current style). If you want change the colouring of a style, look at the
+     bottom of the config menu.
+   - Bracelight highlights matching braces when you "touch" them with the caret.
+     Braces without a matching counterpart will be coloured different to warn
+     the programmer that there might be a problem. The colour and more can be
+     set in the config key: editpanel > indicator > bracelight. Currently these
+     options are global settings but will become part of new syntaxmode settings.
+   - Blockindent means that every <enter> after an opening brace indents the
+     next line more than the current and an <enter> after an closing brace
+     dedents. The width depends on the current tab size. see config key:
+     editpanel > blockindent. look also at the keys editpanel > brace_automake
+     and editpanel > brace_autojoin that will automaticly make an matching brace
+     or remove the autogenerated brace if it turnes out that you made one
+     manually.
+   - Autoindent inserts in any new line and indention that has same witdth as in
+     the last line. Currently is it only a global behaviour. config key:
+     editpanel > autcoindent.
+   - Tabs are not visible character that will be displayed as a bunch of
+     whitespaces. How many spaces equals one tab depends on your settings. And
+     please note if even your settings say that this number is 4, a tab can also
+     be displayed like 3,2 or one space because a tab reaches to a row position
+     that is a multible of its maximus size. In new or opened files the editor
+     set the value of the config key: "file > defaultsetting > tab_size"
+     as the current tab size.
+   - Soft Tabs means if you press the <Tab> key (with |<-- -->| symbols on it),
+     the editor will not create several whitespaces with the same width the tab
+     would have instead. config key: file > defaultsetting > tab_use
+   - EOL: Unix(Linux), Mac and Windows are using different characters to indicate
+     the end of a line, but that no problem for the editor because the lines
+     will be cut in any case properly. The editor also recognises which
+     lineending is used by the document and if you edit the doc, proper endings
+     will be inserted. When you want to change the lineendings of an document,
+     use the EOL mode submenu or the context menu on the stausbar. You have to
+     right-click onto the field that displayes the current lineending.
+     The lineending of new documents will be set by the config key: " file >
+     defaultsetting > EOL_new" the values of this key can be: "cr,lf or cr+lf".
+     If the key: "file > defaultsetting > EOL_open" is set with one of these
+     values the file will be converted while opening the file. The default is
+     auto, that keeps the original ending.
+   - Write Protection. When the user has no permission to acess a file,, the
+     editor will automatically lock the document and make the lock visible with
+     a "#"-character after the documents name. That should avoid later conflicts
+     but you can still safe the doc under another name. Or you maybe want to use
+     this feature to protect some mature text against your own inattention.
+
+ 10 View menu
+    Functions that do only visual changes to the text or the program are
+    summarized here. All Settings here effect all documents equally.
+    - "Stay On Top" you can toggle with <Ctrl>+<T> and it means that the main
+      window will always displayed above all other windows.
+    - "Toolbar"-"Statuscontext" This block of menu items switches (toggles) the
+      visibility of the visual(GUI) elements of the program. The elements are
+      sorted from top to the bottom of the applikation window. All menu items
+      blow this block refer to the text area.
+    - "Numbermargin" defines the width of the line number margin. Normally is the
+      width always sufficient to display all line number, but in case you turned
+      the autosize off(config key: editpanel > margin > linenumber > autosize),
+      or want to switch the visibility of the line number margin you can use this
+      submenu. Also color and default width can be changed in the config files.
+    - "Textmargin": Width of the extra margin (in pixel) on the left and right
+      side of the text area. here can you adjust the spacing between the pure
+      text and the margins on the left side.
+    - "Right Margin" Switches visibility of a vertical line that indicates how
+      long the text lines should be at maximum. Color and position of this line
+      can be set in the config at the key: editpanel > indicator > right_margin.
+    - "Indention Guide" toggles vertical lines that do indicating how far to
+      indent your source code. These lines appear above text indention
+      (whitespace) at intervals of the current width of a tab.
+    - "Caret Line", if activated, the current text line will be highlighting with
+       a chosen background color. config key: editpanel > indicator > caret_line
+    - "Line Wrap" means that text lines that don't fit into the current window
+       size will displayed in several parts among each other.
+    - "end Of Line" (EOL) makes the (otherwise invisible) control character that
+       are marking the end of the line visible. They are 3 different types
+       symbolized by 3 different indicators.
+    - "Whitespace" sets whitespaces and tabs visible with dot and arrow symbols.
+       the color of these symbols can be changed by config file.
+    - "Font" calls an dialog, which allows you to change all properties of the
+       displayed font. see also config key editpanel > font
+
+ 11 Config menu:
+    Shortcuts for opening all config files directly in the editor.
+    Hint: Files with a leading $ in the tab will be applied immediately while
+    saving them.
+
+ 12 Help menu:
+    Contains texts, links and dialogs with information about this programm and 
+    its usage.

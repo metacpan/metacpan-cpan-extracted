@@ -1,0 +1,19 @@
+NAME
+      Kwiki::UserPhoto - User Photo Widget
+
+SYNOPSIS
+      % kwiki -install Kwiki::UserPhoto
+      % kwiki -update
+
+DESCRIPTION
+    This plugin provide each site user to have a photo uploaded, and
+    displayed on the widget pane.
+
+COPYRIGHT
+    Copyright 2005 by Kang-min Liu <gugod@gugod.org>.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See <http://www.perl.com/perl/misc/Artistic.html>
+

@@ -1,0 +1,127 @@
+# NAME
+
+Keystone - Perl extension for keystone-engine
+
+# SYNOPSIS
+
+    use Keystone ':all';
+
+    $ks = Keystone->new(KS_ARCH_X86, KS_MODE_64) || die "Can't init Keystone\n";
+    @opcodes = $ks->asm("pop rax; inc rbx; ret");
+
+    foreach(@opcodes) {
+      printf "0x%.2x ", $_;
+    }
+    print "\n";
+
+# DESCRIPTION
+
+This module is a Perl wrapper for the keystone-engine library.
+
+Keystone is a lightweight multi-platform, multi-architecture assembler framework.
+
+Further information are available at http://www.keystone-engine.org
+
+## METHODS
+
+- new(arch, mode)
+
+        $ks = Keystone->new(KS_ARCH_X86, KS_MODE_32);
+
+    Create a new keystone object.
+    Take two arguments, the arch (KS\_ARCH\_\*) and the mode (KS\_MODE\_\*).
+    See ks\_open() in keystone-engine documentation
+
+- asm(code, address)
+
+        @opcodes = $ks->asm("pop rax; ret");
+
+    Assemble code, and return a list of opcodes.
+
+    See ks\_asm() in keystone-engine documentation.
+
+- strerror()
+
+        printf "%s\n", $ks->strerror();
+
+    Get the last error string
+
+    See ks\_strerror() in keystone-engine documentation.
+
+- errno()
+
+        printf "%d\n", $ks->errno();
+
+    Get the last error code (KS\_ERR\_\* constants)
+
+    See ks\_errno() in keystone-engine documentation.
+
+## FUNCTIONS
+
+- version()
+
+        ($maj, $min) = Keystone::version();
+
+    Get the major and the minor version of the Keystone engine.
+    See ks\_version() in keystone-engine documentation
+
+- arch\_supported(arch)
+
+        printf "%d\n", Keystone::arch_supported(KS_ARCH_X86);
+
+    Return 1 if the KS\_ARCH\_\* is supported, 0 overwise.
+    See ks\_arch\_supported() in keystone-engine documentation
+
+## EXAMPLES
+
+    #!/usr/bin/perl
+
+    use ExtUtils::testlib;
+    use Keystone ':all';
+
+    use strict;
+    use warnings;
+
+    my @asm = ("push ebp",
+               "mov rdx, rdi",
+               "int 0x80",
+               "inc rdx",
+               "mov eax, 0x12345678",
+               "mov bx, 5");
+
+    # Open a Keystone object
+    my $ks = Keystone->new(KS_ARCH_X86, KS_MODE_64) ||
+        die "[-] Can't open Keystone\n";
+
+
+    for my $ins(@asm) {
+
+        # Assemble...
+        my @opcodes = $ks->asm($ins);
+
+        if(!scalar(@opcodes)) {
+            printf "Assembly failed (\"$ins\") : %s\n", $ks->strerror();
+        } else {
+            # Print opcodes
+            printf "%-20s %s\n", join(' ', map {sprintf "%.2x", $_} @opcodes), $ins;
+        }
+    }
+
+# SEE ALSO
+
+http://keystone-engine.org/
+
+https://github.com/t00sh/perl-keystone
+
+# AUTHOR
+
+Tosh, <tosh@t0x0sh.org>
+
+# COPYRIGHT AND LICENSE
+
+Copyright (C) 2016 by Tosh
+
+This library is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.

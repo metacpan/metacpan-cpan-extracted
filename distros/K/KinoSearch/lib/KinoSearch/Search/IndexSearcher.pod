@@ -1,0 +1,164 @@
+
+# Auto-generated file -- DO NOT EDIT!!!!!
+
+=head1 NAME
+
+KinoSearch::Search::IndexSearcher - Execute searches against a single index.
+
+=head1 DEPRECATED
+
+The KinoSearch code base has been assimilated by the Apache L<Lucy> project.
+The "KinoSearch" namespace has been deprecated, but development continues
+under our new name at our new home: L<http://lucy.apache.org/>
+
+=head1 SYNOPSIS
+
+    my $searcher = KinoSearch::Search::IndexSearcher->new( 
+        index => '/path/to/index' 
+    );
+    my $hits = $searcher->hits(
+        query      => 'foo bar',
+        offset     => 0,
+        num_wanted => 100,
+    );
+
+
+
+=head1 DESCRIPTION
+
+Use the IndexSearcher class to perform search queries against an index.
+(For searching multiple indexes at once, see
+L<PolySearcher|KinoSearch::Search::PolySearcher>).
+
+IndexSearchers operate against a single point-in-time view or
+L<Snapshot|KinoSearch::Index::Snapshot> of the index.  If an index is
+modified, a new IndexSearcher must be opened to access the changes.
+
+=head1 CONSTRUCTORS
+
+=head2 new( I<[labeled params]> )
+
+    my $searcher = KinoSearch::Search::IndexSearcher->new( 
+        index => '/path/to/index' 
+    );
+
+=over
+
+=item *
+
+B<index> - Either a string filepath, a Folder, or an IndexReader.
+
+=back
+
+
+
+
+
+=head1 METHODS
+
+=head2 hits( I<[labeled params]> )
+
+Return a Hits object containing the top results.
+
+=over
+
+=item *
+
+B<query> - Either a Query object or a query string.
+
+=item *
+
+B<offset> - The number of most-relevant hits to discard, typically
+used when "paging" through hits N at a time.  Setting
+C<< offset >> to 20 and C<< num_wanted >> to 10 retrieves
+hits 21-30, assuming that 30 hits can be found.
+
+=item *
+
+B<num_wanted> - The number of hits you would like to see after
+C<< offset >> is taken into account.
+
+=item *
+
+B<sort_spec> - A L<KinoSearch::Search::SortSpec>, which will affect
+how results are ranked and returned.
+
+=back
+
+=head2 collect( I<[labeled params]> )
+
+Iterate over hits, feeding them into a
+L<Collector|KinoSearch::Search::Collector>.
+
+=over
+
+=item *
+
+B<query> - A Query.
+
+=item *
+
+B<collector> - A Collector.
+
+=back
+
+=head2 doc_max()
+
+Return the maximum number of docs in the collection represented by the
+Searcher, which is also the highest possible internal doc id.
+Documents which have been marked as deleted but not yet purged are
+included in this count.
+
+=head2 doc_freq( I<[labeled params]> )
+
+Return the number of documents which contain the term in the given
+field.
+
+=over
+
+=item *
+
+B<field> - Field name.
+
+=item *
+
+B<term> - The term to look up.
+
+=back
+
+=head2 fetch_doc(doc_id)
+
+Retrieve a document.  Throws an error if the doc id is out of range.
+
+=over
+
+=item *
+
+B<doc_id> - A document id.
+
+=back
+
+=head2 get_schema()
+
+Accessor for the object's C<< schema >> member.
+
+=head2 get_reader()
+
+Accessor for the object's C<< reader >> member.
+
+
+
+=head1 INHERITANCE
+
+KinoSearch::Search::IndexSearcher isa L<KinoSearch::Search::Searcher> isa L<KinoSearch::Object::Obj>.
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005-2011 Marvin Humphrey
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
+

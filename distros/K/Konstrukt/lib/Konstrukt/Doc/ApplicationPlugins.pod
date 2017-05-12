@@ -1,0 +1,219 @@
+=head1 NAME
+
+Konstrukt::Doc::ApplicationPlugins - Use existing application plugins to
+integrate complex functionality into your website in an instant
+
+=head1 DESCRIPTION
+
+I will only give a brief overview of some of the existing "high level" plugins.
+For more detailed information about all of the plugins and their configuration take
+a look at the manual pages of each plugin.
+
+These "high level" plugins represent complex applications that can be easily and
+seamlessly integrated into your web site.
+
+There are also L<"low level" plugins|Konstrukt::Doc::FunctionPlugins>,
+which perform rather basic tasks and will be used to add
+some logic to the presentation/templates.
+
+If the existing plugins don't offer the funktionality you need, you usually
+would L<implement|Konstrukt::Doc::CreatingPlugins> your own application logic
+as a plugin.
+
+=head1 "HIGH LEVEL" PLUGINS: APPLICATIONS
+
+Almost any "high level" plugin currently uses a (MySQL) DBI backend and some
+templates for the output.
+
+The table definitions as well as the default templates are stored at the end of
+each plugin module and can be automatically created for your website using the
+L<autoinstallation feature|Konstrukt::Doc::Installation/Auto-Installation>.
+
+You can adjust the path to the templates and the database settings as described
+in the plugin and backend module documentation.
+
+This is just a very short introduction into the described plugins and you are
+encouraged to take a closer look at the specific documentation for each plugin,
+which is linked for each plugin.
+
+=head2 blog
+
+L<blog|Konstrukt::Plugin::blog>: Konstrukt blogging engine. A simple blog plugin
+offering wiki markup, tagging and RSS-export.
+
+B<Usage:>
+
+	<& blog / &>
+	
+=head2 bookmarks
+
+L<bookmarks|Konstrukt::Plugin::bookmarks>: Bookmark management (for registered users).
+Bookmarks can be organized by registered users in a folder structure. Private and
+public bookmarks. Public ones can be viewed by every visitor.
+
+B<Usage:>
+
+	<& bookmarks / &>
+
+B<Result:>
+
+A tree of the bookmarks.
+
+=head2 browserstats
+
+L<browserstats|Konstrukt::Plugin::browserstats>: Browser statistics plugin.
+
+B<Usage:>
+
+	<!-- add browser request to the db -->
+	<& browserstats / &>
+
+or
+
+	<!-- display the overall top browsers -->
+	<& browserstats show="all" / &>
+
+or
+
+	<!-- display the top browsers grouped by year -->
+	<!-- month and day will also work, if the data is stored in such a fine granularity -->
+	<!-- the display aggregation should not be finer than the setting browserstats/aggregate -->
+	<& browserstats show="year" / &>
+	
+B<Result:>
+
+A table displaying the statistics, if the attribute C<show> is set. Nothing otherwise.
+
+=head2 calendar
+
+L<calendar|Konstrukt::Plugin::calendar>: Management of private and public calendar
+items (for registered users). Including RSS-export
+
+B<Usage:>
+
+	<& calendar / &>
+	
+=head2 errors
+
+L<errors|Konstrukt::Plugin::errors>: Display the error messages that occured
+during the page processing.
+
+B<Usage:>
+
+	<& errors / &>
+
+B<Result:>
+
+A list of the errors, that occurred during the processing of the file, if any.
+
+=head2 guestbook
+
+L<guestbook|Konstrukt::Plugin::guestbook>: Konstrukt guestbook. Plain simple
+guestbook with multipage view and admin features.
+
+B<Usage:>
+
+	<& guestbook / &>
+
+=head2 hitstats
+
+L<hitstats|Konstrukt::Plugin::hitstats>: Hit statistics plugin. Collect and
+display/sort/order hit statistics.
+
+B<Usage:>
+
+	<!-- count hit. use the current filename as title -->
+	<& hitstats / &>
+	
+	<!-- display the overall top sites -->
+	<& hitstats show="all" / &>
+	
+	<!-- many more options. see plugin doc -->
+
+=head2 log
+
+L<log|Konstrukt::Plugin::log>: Konstrukt logging facilities. Log important
+web site events like user registration.
+
+B<Usage:>
+
+	<!-- add a log entry.
+	     key1-5 are optional. -->
+	<& log
+   	action="put" 
+      type="login"
+      description="user 'foo' logged in"
+      key1="some additional info"
+      key2="some additional info"
+      key3="some additional info"
+      key4="some additional info"
+      key5="some additional info"
+   / &>
+   
+   <!-- display log entries -->
+   <& log
+      type="log type"
+      keycount="number of additional keys to display"
+      orderby="column"
+      limit="42"
+   / &>
+
+=head2 usermanagement
+
+L<usermanagement|Konstrukt::Plugin::usermanagement>: User management. Extensible with plugins.
+Current plugins are
+L<basic|Konstrukt::Plugin::usermanagement::basic>,
+L<level|Konstrukt::Plugin::usermanagement::level> and
+L<personal|Konstrukt::Plugin::usermanagement::parsonal>, which provide basic
+user management (register, login, ...), user level management (for access
+control) and personal data (name, email, ...).
+
+B<Usage:>
+
+	<!-- example for a page for basic user management -->
+	<& usermanagement::basic show="login, register, sendpass, changepass" / &>
+	
+	<!-- user level management -->
+	<!-- Show the level of the current user. May be useful in conditional templates. -->
+	<& usermanagement::level show="level" / &>
+	<!-- Show a list of all users and forms to change each user's level -->
+	<& usermanagement::level show="users" / &>
+	
+	<!-- personal info/management -->
+	<& usermanagement plugin="personal" / &>
+
+=head2 wiki
+
+L<wiki|Konstrukt::Plugin::wiki>: Plugin to convert wiki markup and manage wiki content.
+Extensible with plugins for markup and content. Currently supports articles,
+images and files as content.
+You may also be interested in the L<syntax reference|Konstrukt::Plugin::wiki::syntax>.
+
+B<Usage:>
+
+	<& wiki &>
+	= Headline
+	
+	some text
+	<& / &>
+	
+	<& wiki page="FooBar" / &>
+
+=head1 AUTHOR 
+
+Copyright 2006 Thomas Wittek (mail at gedankenkonstrukt dot de). All rights reserved. 
+
+This document is free software.
+It is distributed under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+Next: L<Konstrukt::Doc::CreatingPlugins>
+
+Previous: L<Konstrukt::Doc::FunctionPlugins>
+
+Parent: L<Konstrukt::Doc>
+
+See also: L<Konstrukt::Doc::PluginList>
+
+=cut

@@ -1,0 +1,73 @@
+
+# Auto-generated file -- DO NOT EDIT!!!!!
+
+=head1 NAME
+
+KinoSearch::Index::DocReader - Retrieve stored documents.
+
+=head1 DEPRECATED
+
+The KinoSearch code base has been assimilated by the Apache L<Lucy> project.
+The "KinoSearch" namespace has been deprecated, but development continues
+under our new name at our new home: L<http://lucy.apache.org/>
+
+=head1 SYNOPSIS
+
+    my $doc_reader = $seg_reader->obtain("KinoSearch::Index::DocReader");
+    my $doc        = $doc_reader->fetch_doc($doc_id);
+
+
+
+=head1 DESCRIPTION
+
+DocReader defines the interface by which documents (with all stored fields)
+are retrieved from the index.  The default implementation returns
+L<HitDoc|KinoSearch::Document::HitDoc> objects.
+
+
+
+=head1 ABSTRACT METHODS
+
+=head2 fetch_doc(doc_id)
+
+Retrieve the document identified by C<< doc_id >>.
+
+Returns: a HitDoc.
+
+
+
+=head1 METHODS
+
+=head2 aggregator( I<[labeled params]> )
+
+Returns a DocReader which divvies up requests to its sub-readers
+according to the offset range.
+
+=over
+
+=item *
+
+B<readers> - An array of DocReaders.
+
+=item *
+
+B<offsets> - Doc id start offsets for each reader.
+
+=back
+
+
+
+=head1 INHERITANCE
+
+KinoSearch::Index::DocReader isa L<KinoSearch::Index::DataReader> isa L<KinoSearch::Object::Obj>.
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005-2011 Marvin Humphrey
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
+

@@ -1,0 +1,97 @@
+#!/usr/bin/perl -w
+
+# $Id: cookiepusherpusher,v 1.2 2007-05-10 14:30:14 mike Exp $
+
+# "cpp" is the cookiepusher pusher
+#
+# Generates URLs like this one, from user input:
+#	http://www.info.com/cgi-bin/pushcookie.cgi
+#		BASE-URL=http://sfx.rug.ac.be/gent
+#		Redirect=http://www.info.com/cgi-bin/start.cgi
+
+use strict;
+use warnings;
+use URI::Escape;
+
+use CGI qw/:standard/;
+
+my $title = "Cookiepusher pusher";
+my $cgi = new CGI();
+
+my $pusher = $cgi->param('pusher');
+my $service = $cgi->param('service');
+my $resolver = $cgi->param('resolver');
+
+my $xpusher = _xmlencode($pusher);
+my $xservice = _xmlencode($service);
+my $xresolver = _xmlencode($resolver);
+
+my $id = q[$Id: cookiepusherpusher,v 1.2 2007-05-10 14:30:14 mike Exp $];
+
+print $cgi->header(), <<__EOT__;
+<html>
+ <head>
+  <title>$title</title>
+ </head>
+ <body>
+  <h1>$title</h1>
+  <p>
+   <small>$id</small>
+  </p>
+  <form method="get">
+   <table>
+    <tr>
+     <td>Service URL</td>
+     <td>&nbsp;</td>
+     <td><input name="service" value="$xservice" size="60"/></td>
+    </tr>
+    <tr>
+     <td>Pusher URL</td>
+     <td>&nbsp;</td>
+     <td><input name="pusher" value="$xpusher" size="60"/></td>
+     <!-- a nicer version of this facility would fill this in from service -->
+    </tr>
+    <tr>
+     <td>Resolver URL </td>
+     <td>&nbsp;</td>
+     <td><input name="resolver" value="$xresolver" size="60"/></td>
+    </tr>
+    <tr>
+     <td></td>
+     <td>&nbsp;</td>
+     <td><input type="submit"/></td>
+    </tr>
+   </table>
+  </form>
+__EOT__
+
+if ($cgi->param()) {
+    my $qresolver = uri_escape($resolver);
+    my $qservice = uri_escape($service);
+    my $url = qq[$pusher?BASE-URL=$qresolver&Redirect=$qservice];
+    my $xurl = _xmlencode($url);
+
+    print "  <hr/>\n";
+    print "  Cookiepusher URL is: \n";
+    print qq[  <a href="$xurl">$xurl</a>\n];
+}
+
+print <<__EOT__;
+ </body>
+</html>
+__EOT__
+
+
+# This utility encoding function is from:
+#	cvs co openurl/src/Resolver/OpenURL.pm
+#
+sub _xmlencode {
+    my($x) = @_;
+
+    $x =~ s/&/&amp;/g;
+    $x =~ s/</&lt;/g;
+    $x =~ s/>/&gt;/g;
+    $x =~ s/\"/&quot;/g;
+
+    return $x;
+}

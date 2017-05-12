@@ -1,0 +1,163 @@
+
+# Auto-generated file -- DO NOT EDIT!!!!!
+
+=head1 NAME
+
+KinoSearch::Search::Searcher - Base class for searching collections of documents.
+
+=head1 DEPRECATED
+
+The KinoSearch code base has been assimilated by the Apache L<Lucy> project.
+The "KinoSearch" namespace has been deprecated, but development continues
+under our new name at our new home: L<http://lucy.apache.org/>
+
+=head1 SYNOPSIS
+
+    # Abstract base class.
+
+
+
+=head1 DESCRIPTION
+
+Abstract base class for objects which search.  Core subclasses include
+L<KinoSearch::Search::IndexSearcher> and
+L<KinoSearch::Search::PolySearcher>.
+
+=head1 CONSTRUCTORS
+
+=head2 new( I<[labeled params]> )
+
+    package MySearcher;
+    use base qw( KinoSearch::Search::Searcher );
+    sub new {
+        my $self = shift->SUPER::new;
+        ...
+        return $self;
+    }
+
+Abstract constructor.
+
+=over
+
+=item *
+
+B<schema> - A Schema.
+
+=back
+
+
+
+=head1 ABSTRACT METHODS
+
+=head2 collect( I<[labeled params]> )
+
+Iterate over hits, feeding them into a
+L<Collector|KinoSearch::Search::Collector>.
+
+=over
+
+=item *
+
+B<query> - A Query.
+
+=item *
+
+B<collector> - A Collector.
+
+=back
+
+=head2 doc_max()
+
+Return the maximum number of docs in the collection represented by the
+Searcher, which is also the highest possible internal doc id.
+Documents which have been marked as deleted but not yet purged are
+included in this count.
+
+=head2 doc_freq( I<[labeled params]> )
+
+Return the number of documents which contain the term in the given
+field.
+
+=over
+
+=item *
+
+B<field> - Field name.
+
+=item *
+
+B<term> - The term to look up.
+
+=back
+
+=head2 fetch_doc(doc_id)
+
+Retrieve a document.  Throws an error if the doc id is out of range.
+
+=over
+
+=item *
+
+B<doc_id> - A document id.
+
+=back
+
+
+
+=head1 METHODS
+
+=head2 hits( I<[labeled params]> )
+
+Return a Hits object containing the top results.
+
+=over
+
+=item *
+
+B<query> - Either a Query object or a query string.
+
+=item *
+
+B<offset> - The number of most-relevant hits to discard, typically
+used when "paging" through hits N at a time.  Setting
+C<< offset >> to 20 and C<< num_wanted >> to 10 retrieves
+hits 21-30, assuming that 30 hits can be found.
+
+=item *
+
+B<num_wanted> - The number of hits you would like to see after
+C<< offset >> is taken into account.
+
+=item *
+
+B<sort_spec> - A L<KinoSearch::Search::SortSpec>, which will affect
+how results are ranked and returned.
+
+=back
+
+=head2 glean_query(query)
+
+If the supplied object is a Query, return it; if it's a query string,
+create a QueryParser and parse it to produce a query against all
+indexed fields.
+
+=head2 get_schema()
+
+Accessor for the object's C<< schema >> member.
+
+
+
+=head1 INHERITANCE
+
+KinoSearch::Search::Searcher isa L<KinoSearch::Object::Obj>.
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005-2011 Marvin Humphrey
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
+

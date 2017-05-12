@@ -1,0 +1,16 @@
+---
+version: 0.12
+date:    Tue Jan 11 08:07:52 PST 2005
+changes:
+- Remove load_class calls per Spoon-0.21
+---
+version: 0.11
+date:    Wed Dec 15 15:23:49 PST 2004
+changes:
+- Make compatible with Kwiki-0.34
+- Make cache a runtime prereq
+---
+version: 0.10
+date:    Sat Jun 26 01:05:42 PDT 2004
+changes:
+- Initial release

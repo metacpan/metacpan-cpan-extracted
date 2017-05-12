@@ -1,0 +1,26 @@
+ChangeLog
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Share.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/KiokuDB/Cmd/Command/Nav.pm
+lib/KiokuDB/Navigator.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+share/css/style.css
+share/index.html
+share/js/jquery-1.2.6.js
+share/js/json2.js
+share/js/JSORB.js
+share/js/lib/KiokuDB.js
+share/js/lib/KiokuDB/Navigator.js
+share/js/lib/KiokuDB/Navigator/UI.js
+t/000_load.t
+t/001_basic.t

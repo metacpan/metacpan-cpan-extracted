@@ -1,0 +1,135 @@
+=head1 NAME
+
+Konstrukt::Doc::CreatingPlugins - Create your own plugins
+
+=head1 BASICS
+
+Basically you subclass the L<SimplePlugin|Konstrukt::SimplePlugin> or
+L<Plugin|Konstrukt::Plugin> module and add your own logic by overwriting
+the stub methods. So you might want to take a look at the documentation
+of those plugins, which explains the plugin creation interfaces.
+
+=head1 CONVENTIONS
+
+TODO
+
+=head1 PARSE-TREE AND CACHING
+
+TODO: Motivation, tree, nodes, caching.
+
+=head1 CORE MODULES
+
+The goals of this framework include rapid development and code reuse.
+This includes that most nasty work like session management and so on will
+already be done for you.
+
+You are encouraged to use the existing core modules and plugins to do the
+basic work and focus on your application.
+
+=head2 Mostly interesting for plugin development
+
+Here's a list of the core modules, which are immediately interesting for plugin
+development.
+
+=over
+
+=item * L<Konstrukt::Cache> - Caching functionalities. Useful to read if you're developing high performance plugins and want to cache data yourself or want to use the automatic cache validation when using files from disk.
+
+=item * L<Konstrukt::DBI> - Database handle pool. Eases the access to databases. Features DB connection settings management, DB handle pooling and automatic error handling.
+
+=item * L<Konstrukt::Debug> - Debug and error message handling. Here you can configure (in the source) how noisy the debug output will be.
+
+=item * L<Konstrukt::Event> - Event management. Plugins can register for events and other plugins can trigger them. Allows for a very loose coupled plugin interaction.
+
+=item * L<Konstrukt::File> - Comfortable handling of files, file names and paths.
+
+=item * L<Konstrukt::Lib> - Common function library. Some smaller, useful functions like HTML-escaping, sending mails etc. are collected here.
+
+=item * L<Konstrukt::Plugin> - Base class for the Konstrukt plugins. You have to subclass this one if you want to create a "fully featured" (say low level/fast) Konstrukt plugin.
+
+=item * L<Konstrukt::Request> - Class for everything related to the page request. Provides access to the request method, URI and headers.
+
+=item * L<Konstrukt::Response> - Class for everything related to the generated response. You can specify the response's HTTP status and headers here.
+
+=item * L<Konstrukt::Session> - Session management (Cookies/Session). Automatically creates a session for each visitor and tracks it using a cookie. You can easily store and access persistent data with this module.
+
+=item * L<Konstrukt::Settings> - Settings management. All settings are stored in the C<konstrukt.settings> file, which is read by this module. You can easily access these settings, modify them or use it to define default settings for your plugin.
+
+=item * L<Konstrukt::SimplePlugin> - Base class for simple Konstrukt plugins. Provides a rather simple interface to create your own plugins and applications. You don't have to know much about the Framework to create plugins using this base class. The downside of the simplicity is a loss in performance over the creation using the L<lower level plugin base class|Konstrukt::Plugin>.
+
+=back
+
+=head2 Mostly interesting for core development
+
+This are the remaining core modules, which you probably won't need to develop
+your own plugins. These are rather used internally.
+
+=over
+
+=item * L<Konstrukt::Attributes> - Sub attribute handling.
+
+=item * L<Konstrukt::Handler> - Base class for handlers that control the processing of the requests. There already exist some handlers and you can create your own ones.
+
+=item * L<Konstrukt::Parser> - Parser for the tag syntax. Usually only used internally unless you want to develop plugins that offer an own tag syntax. Features parsing of text against special tags and execution of those tags.
+
+=item * L<Konstrukt::PrintRedirector> - Catches the C<print> statements and fires an event on each print. Used in the L<perl|Konstrukt::Plugin::perl> plugin.
+
+=item * L<Konstrukt::TagHandler> - Base class for the tag handlers. Using this baseclass you can create own tag types that will be recognized in the parsing process.
+
+=back
+
+=head1 EXISTING PLUGINS
+
+Also most of the plugins have a perl interface that offers some methods to
+utilize these plugins.
+
+This will usually be done like this:
+
+	my $someplugin = use_plugin 'someplugin';
+	$someplugin->method($arg);
+
+The perl interface of each plugin is documented in the SYNOPSIS and the
+DESCRIPTION of the plugins. Additionally each method of each plugin is also
+documented with it's purpose, parameters and return value.
+
+So the best idea would be just to take a look at the documentation of the
+plugins.
+
+A complete L<list of the plugins|Konstrukt::Doc::PluginList> that are shipped
+with this package is available L<here|Konstrukt::Doc::PluginList>.
+
+=head1 TROUBLESHOOTING
+
+=head2 The prepare method won't be executed
+
+If you feel like the C<prepare>-method of your plugin doesn't
+get executed, the reason will probably be that you're using a cached page.
+
+One main feature of the cache architecture is to run C<prepare> only once
+and cache the results.
+
+To fix this, delete the cached file or disable the cache if you're working
+on your plugin.
+
+=head1 TODO
+
+Complete this document.
+
+=head1 AUTHOR 
+
+Copyright 2006 Thomas Wittek (mail at gedankenkonstrukt dot de). All rights reserved. 
+
+This document is free software.
+It is distributed under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+Next: L<Konstrukt::Doc::CoreDevelopment>
+
+Previous: L<Konstrukt::Doc::ApplicationPlugins>
+
+Parent: L<Konstrukt::Doc>
+
+See also: L<Konstrukt::Doc::PluginList>
+
+=cut

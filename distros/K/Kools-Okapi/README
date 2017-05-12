@@ -1,0 +1,49 @@
+Kools-Okapi
+===========
+
+This is the Kools OKAPI Perl wrapper package around the OKAPI Kondor+
+API.
+The OKAPI allows one to connect to the Kondor+ tradekast (export) and
+kis (import) servers which allow one to export or import (mostly) trade
+data into Kondor+.
+
+The reason for writing this wrapper is simply because Perl is a
+perfect language for data manipulation/transformation, something we
+do so often with Kondor+ addons (and interfaces).
+Furthermore almost every wrapper exists in Perl - we have tibco rv, triarch,
+Sybase wrappers making Perl a near perfect choice - the only thing
+missing was an OKAPI wrapper.
+
+The version of this module matches the Kondor+ version that it is built
+for plus a sequencial number.
+This does not mean this module will not compile with a later version of
+OKAPI - it does however mean that latest features may not be supported.
+
+Finally please note that this package DOES NOT SUPPLY the Okapi API itself
+you should find it in your Kondor+ distribution and it is under a different
+license from this package.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  -none-
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 by Gabriel Galibourg
+
+This library is free software; you can redistribute it and/or modify
+it under the terms of the Artistic License 2.0, or at your option, any later
+version of the License you may have available.
+

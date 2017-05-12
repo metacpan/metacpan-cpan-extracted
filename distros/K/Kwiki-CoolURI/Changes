@@ -1,0 +1,11 @@
+---
+version: 0.04
+date:    Sun Jan 30 00:06:40 CET 2005
+changes:
+- This is the initial release
+- Still things todo, added info to BUGS
+---
+version: 0.03
+date:    Sun Jan 23 03:50:00 CET 2005
+changes:
+- Initial release

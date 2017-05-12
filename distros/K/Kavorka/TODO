@@ -1,0 +1,1 @@
+Calling Kavorka->info(\&sub) on a multisub returns undef because the candidate subs are Kavorka::Sub consumers, but the main entry point is not. This needs work.

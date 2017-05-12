@@ -1,0 +1,70 @@
+Revision history for Perl module Koha::Contrib::Sudoc
+
+2.23 2016-09-21
+
+  - Fix un warning sur $5 en 035 ne contenant pas un RCR
+
+2.22 2016-07-06
+
+  - Récupération de tous les champs locaux Sudoc en vue conversion en
+    exemplaires Koha. 
+  - sudoc-localisation capable de traiter des notices MARC21
+
+2.21 2016-05-18
+
+  - Supprime avertissement inutile quand converter vide dans sudoc.conf.
+
+2.19 2016-02-17
+
+  - Commande de suppression des fichiers vides du spool.
+
+2.18 2016-02-06
+
+  - Fix dédoublonne 035$a + $5
+  - Fix encodage des logs
+
+2.17 2016-01-23
+
+  - Amélioration de sudoc-localisation afin de produire un fichier de
+    localisation auto à partir de PPN.
+
+2.16 2015-11-24
+
+  - Typo logs
+
+2.15 2015-09-10
+
+  - Remplace "sudoc trans jobid" par "sudoc gtd".
+  - Doc
+
+2.10 2015-06-25
+
+  - Perl 5.18
+
+2.09 2015-03-30
+
+  - Fonctionnement sans service de transfert: envoi GTD-attente-chargement.
+
+2.07 2015-03-29
+
+  - Déclenchement auto du chargement après fin transfert.
+
+2.06 2015-03-16
+
+  - Envoi d'un GTD dans réception préalable d'un "status 9".
+
+2.05 2015-03-15
+
+  - Amélioration doc, y compris CPAN. Logger dans Converter.
+
+2.02 2015-03-10
+
+  - Amélioration du service de transfert
+
+2.02 2015-03-09
+
+  - Stabilisé pour un site en prod
+
+2.01 2015-03-09
+
+  - First release on CPAN

@@ -1,0 +1,45 @@
+/* $Id: create_sequences.oracle,v 1.4 2008-04-24 17:08:01 mike Exp $ */
+
+/*
+ * See the README file in this directory.
+ */
+
+-- You would not _believe_ how long it took to get this working 
+CREATE OR REPLACE PROCEDURE CREATE_AUTOINC
+	(tname IN VARCHAR2, cname in VARCHAR2)
+  IS
+    seqname VARCHAR2(4000) := tname || '_' || cname || '_seq';
+    seqnum VARCHAR2(12);
+    cmd VARCHAR2(4000);
+  BEGIN
+    cmd := 'SELECT NVL(MAX("' || cname || '"),0) + 1 FROM "' || tname || '"';
+    EXECUTE IMMEDIATE cmd INTO seqnum;
+--  EXECUTE IMMEDIATE 'DROP SEQUENCE "' || seqname || '"';
+    EXECUTE IMMEDIATE 'CREATE SEQUENCE "' || seqname || '" START WITH ' || seqnum;
+    EXECUTE IMMEDIATE 'CREATE OR REPLACE TRIGGER "' || tname || '_' || cname || '_trigger" BEFORE INSERT ON "' || tname || '" FOR EACH ROW WHEN(new."' || cname || '" IS NULL) BEGIN SELECT "' || seqname || '".nextval INTO :new."' || cname || '" FROM dual; END;';
+    -- exception when others then dbms_output.put_line (sqlcode||sqlerrm);
+END CREATE_AUTOINC;
+/
+													
+EXECUTE CREATE_AUTOINC('genre', 'id');
+EXECUTE CREATE_AUTOINC('mformat', 'id');
+EXECUTE CREATE_AUTOINC('service_type', 'id');
+EXECUTE CREATE_AUTOINC('provider', 'id');
+EXECUTE CREATE_AUTOINC('service', 'id');
+EXECUTE CREATE_AUTOINC('serial', 'id');
+EXECUTE CREATE_AUTOINC('serial_alias', 'id');
+EXECUTE CREATE_AUTOINC('identity', 'id');
+EXECUTE CREATE_AUTOINC('credentials', 'id');
+EXECUTE CREATE_AUTOINC('credentials_details', 'id');
+EXECUTE CREATE_AUTOINC('sid', 'id');
+EXECUTE CREATE_AUTOINC('source', 'id');
+EXECUTE CREATE_AUTOINC('config', 'id');
+EXECUTE CREATE_AUTOINC('domain', 'id');
+EXECUTE CREATE_AUTOINC('service_type_rule', 'id');
+EXECUTE CREATE_AUTOINC('service_rule', 'id');
+EXECUTE CREATE_AUTOINC('site', 'id');
+EXECUTE CREATE_AUTOINC('session', 'id');
+EXECUTE CREATE_AUTOINC('user', 'id');
+QUIT;
+
+// No auto-IDs for service_serial and genre_service_type link tables.

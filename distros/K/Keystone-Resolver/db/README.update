@@ -1,0 +1,28 @@
+$Id: README.update,v 1.1 2008-02-07 13:26:27 mike Exp $
+
+You're probably here because you got a message like:
+
+	A column was missing from a table in the Keystone Resolver database.
+	This probably means that the structure of your database is out of date
+	Please see /usr/share/libkeystone-resolver-perl/db/README.update
+
+As the resolver changes, modifications are required to the database,
+but the Debian package installation process does not apply these
+silently for fear of Deep And Terrible Consequences.  You will have to
+make the necessary changes by hand.
+
+The change files are in /usr/share/libkeystone-resolver-perl/db/updates
+
+Each file is named "update-<version>.<rdbms>", where <version> is the
+Debian package version number in which it was introduced and <rdbms>
+is the name of the RDBMS for which the file is intended.  (Different
+RDBMSs, predictable, require different SQL to make the changes).  So,
+for example, when upgrading from an earlier version to 1.17, if
+running against MySQL with the database name "kr", use something like:
+
+	mysql --user=kr_admin --password=kr_adm_3636 kr < update-1.17.mysql
+
+Note that you must apply ALL updates, starting from the version
+immediately after the one you are running and continuing until the
+most recent, and that you must apply them in sequential order.
+

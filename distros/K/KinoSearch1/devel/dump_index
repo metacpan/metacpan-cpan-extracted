@@ -1,0 +1,82 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+use KinoSearch1::Index::IndexReader;
+
+my $where = shift @ARGV;
+if( !$where || ! -e $where ){
+    die "please specify an index location at the command line\n"; 
+}
+
+my $r = KinoSearch1::Index::IndexReader->new( invindex => $where );
+
+my @readers = ref $r->{sub_readers} eq 'ARRAY' ? @{ $r->{sub_readers} } : $r;
+print "We have " . @readers . " readers\n"; 
+
+print "\n\nDocuments:\n";
+for my $reader (@readers) {
+    print "Segment "
+      . $reader->get_seg_name . " has "
+      . $reader->max_doc
+      . " docs\n"; 
+    my $finfos    = $reader->get_finfos;
+    my $term_enum = $reader->terms;
+    print "Fields:\n";
+    my %fields;
+    for my $field ( $finfos->get_infos ) {
+        $fields{ $field->get_field_num } = $field->get_name; 
+        print "\t" . $field->get_field_num . ": " . $field->get_name;
+        my @info;
+        foreach my $i (qw(indexed stored analyzed vectorized binary compressed))
+        {
+            my $method = "get_$i";
+            push @info, $i if ( $field->$method );
+        }
+        print " [" . join( ',', map { substr( $_, 0, 1 ) } sort @info ) . "]"
+          if (@info); 
+        print "\n";
+    }
+    print "Terms:\n";
+    my $td = $reader->term_docs;
+    while ( $term_enum->next ) {
+        my $term = $term_enum->get_term;
+        print $term->to_string . "\n";
+        $td->seek($term);
+        while ( $td->next ) {
+            print "\t Doc "
+              . $td->get_doc . " (" 
+              . $td->get_doc_freq
+              . " occurrences)\n";
+        }
+    }
+}
+print "Total documents: " . $r->max_doc . " in " . @readers . " segments\n"; 
+
+__END__
+
+=head1 NAME
+
+dump_index - dump the contents of an index
+
+=head1 SYNOPSIS
+
+	perl dump_index $INDEX_LOCATION
+
+=head1 DESCRIPTION
+
+This will dump out an index in human readable form.
+
+=head1 AUTHOR
+
+Adapted from a Plucene-based version by Brian Phillips.
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright 2006 Brian Phillips.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
+

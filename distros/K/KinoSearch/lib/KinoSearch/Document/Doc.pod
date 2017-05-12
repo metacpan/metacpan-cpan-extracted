@@ -1,0 +1,87 @@
+
+# Auto-generated file -- DO NOT EDIT!!!!!
+
+=head1 NAME
+
+KinoSearch::Document::Doc - A document.
+
+=head1 DEPRECATED
+
+The KinoSearch code base has been assimilated by the Apache L<Lucy> project.
+The "KinoSearch" namespace has been deprecated, but development continues
+under our new name at our new home: L<http://lucy.apache.org/>
+
+=head1 SYNOPSIS
+
+    my $doc = KinoSearch::Document::Doc->new(
+        fields => { foo => 'foo foo', bar => 'bar bar' },
+    );
+    $indexer->add_doc($doc);
+
+Doc objects allow access to field values via hashref overloading:
+
+    $doc->{foo} = 'new value for field "foo"';
+    print "foo: $doc->{foo}\n";
+
+
+
+=head1 DESCRIPTION
+
+A Doc object is akin to a row in a database, in that it is made up of one
+or more fields, each of which has a value.
+
+=head1 CONSTRUCTORS
+
+=head2 new( I<[labeled params]> )
+
+    my $doc = KinoSearch::Document::Doc->new(
+        fields => { foo => 'foo foo', bar => 'bar bar' },
+    );
+
+=over
+
+=item *
+
+B<fields> - Field-value pairs.
+
+=item *
+
+B<doc_id> - Internal KinoSearch document id.  Default of 0 (an
+invalid doc id).
+
+=back
+
+
+
+
+
+=head1 METHODS
+
+=head2 set_doc_id(doc_id)
+
+Set internal KinoSearch document id.
+
+=head2 get_doc_id()
+
+Retrieve internal KinoSearch document id.
+
+=head2 get_fields()
+
+Return the Doc's backing fields hash.
+
+
+
+=head1 INHERITANCE
+
+KinoSearch::Document::Doc isa L<KinoSearch::Object::Obj>.
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005-2011 Marvin Humphrey
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
+

@@ -1,0 +1,34 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.64.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 7dca238ec224fef913f02c11f2f54d48a932b698 Changes
+SHA1 328c61504a3b080c874fd23b5d9ed416edd724af MANIFEST
+SHA1 97e90f64a4deddd38e7726164bbb63012916d254 MANIFEST.SKIP
+SHA1 3d41abe57c2abbea61c7251f3f3c02e50361e894 META.yml
+SHA1 a1219f608cc1ba0228d0bf9ae229a3eb132f1ca7 Makefile.PL
+SHA1 968b20adb76176a26dd119121d369a5232feb479 lib/KiokuX/User.pm
+SHA1 bc3875ae03ee9b96c420fb58c3ae2be61f117629 lib/KiokuX/User/ID.pm
+SHA1 7bfc324379a5ba6f546d9745f9bde8a479fcacc2 lib/KiokuX/User/Password.pm
+SHA1 96033add19da7e046612baa9c966d9b6a31d6d5f lib/KiokuX/User/Util.pm
+SHA1 2c119575e08970ca3218404004844d34d17901a6 t/basic.t
+SHA1 7f0ef1f5c72bb8bd25a9a55ed6bdb8de62a9af54 t/parameterized.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAkxelr4ACgkQdC8qQo5jWl7hFgCeJpa2rrJp5n7ZBWiO0uzpa+u7
+TqsAoIQFNOoxDtR1APoVvjg6LP3nAySB
+=cWik
+-----END PGP SIGNATURE-----

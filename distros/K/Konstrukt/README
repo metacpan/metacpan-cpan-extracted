@@ -1,0 +1,67 @@
+NAME
+    Konstrukt - Web application/design framework
+
+SYNOPSIS
+    use Konstrukt;
+
+DESCRIPTION
+    This framework aims (beside others) for separation of presentation,
+    logic and content.
+
+    The presentation is basically accomplished with a very powerful
+    templating system, which allows fine grained modularization of the
+    presentation components (templates can be nested as deep as you want)
+    and has an easy to use interface, that any non-programmer will
+    understand.
+
+    The logic is encapsulated in plugins, which can be integrated seamlessly
+    into the websites using a simple tag-interface. You can develop your own
+    plugins easily and also use the existing plugins for your own ones
+    through the perl-interface of the existing plugins. The Konstrukt core
+    will do all the nasty donkeywork for you, so you can concentrate on the
+    logic of your application.
+
+    The content for each application-plugin is stored in a database using
+    perl DBI. The data backends for each plugin are implemented as a
+    separate plugin, which can be exchanged easily, so the applications can
+    adapt to various data stores. Static content (layout, static web pages,
+    ...) will be stored in modular templates.
+
+    Your web pages will only describe what they contain, not how they are
+    generated. They will be as simple as:
+
+            <!-- use a template for the page layout, set the page title to "blog"
+                 and use the blog plugin as the content -->
+        
+            <& template src="/templates/layout.template" title="blog" &>
+                    <$ content $>
+                            <& blog / &>
+                    <$ / $>
+            <& / &>
+
+    For more information about the Konstrukt Framework and its design goals
+    take a look at Konstrukt::Doc::About.
+
+    An overview of the supplied documentation can be found in
+    Konstrukt::Doc.
+
+BUGS
+    Many... Currently tracked for each module at its beginning:
+
+            #FIXME: ...
+            #TODO: ...
+            #FEATURE: ...
+
+    You may get an overview of these by using the supplied "todo_list.pl"
+    script or looking in the TODO file.
+
+AUTHOR
+    Copyright 2006 Thomas Wittek (mail at gedankenkonstrukt dot de). All
+    rights reserved.
+
+    This document is free software. It is distributed under the same terms
+    as Perl itself.
+
+SEE ALSO
+    Konstrukt::Doc, HTML::Mason, Template, Embperl, perl
+

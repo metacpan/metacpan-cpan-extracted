@@ -1,0 +1,7 @@
+Avec nos remerciements.
+
+<: $borrower.branchname :>
+<: $borrower.branchphone :>
+<: $borrower.branchemail :>
+
+PS: Merci de ne pas répondre à ce message.

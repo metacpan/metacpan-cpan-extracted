@@ -1,0 +1,81 @@
+#! /usr/bin/perl -w
+
+# Run like this:
+#	perl -I ../lib kr-recipe "[%_{title}]" title="a long-boring story"
+
+# $Id: kr-recipe,v 1.4 2008-04-11 12:03:30 mike Exp $
+
+use strict;
+use warnings;
+use CGI;
+use Keystone::Resolver;
+
+if (@ARGV < 2) {
+    print STDERR "Usage: $0 <recipe> <query-string>\n";
+    exit 1;
+}
+my $recipe = shift();
+
+my $cgi = new CGI();
+my $referer = $ENV{HTTP_REFERER} || "http://made.up.referrer/foo";
+my $resolver = new Keystone::Resolver();
+my $openURL = Keystone::Resolver::OpenURL->newFromCGI($resolver, $cgi, $referer);
+my $val = Keystone::Resolver::OpenURL::_makeURI($openURL, $recipe);
+if (defined $val) {
+    print $val;
+} else {
+    print "$0: can't resolve recipe '$recipe'\n";
+}
+
+=head1 NAME
+
+kr-recipe - test Keystone Resolver's "recipe"-based result formatting
+
+=head1 SYNOPSIS
+
+C<kr-test>
+[
+I<recipe>
+]
+[
+I<query-string>
+]
+
+=head1 DESCRIPTION
+
+C<kr-test> exercises the "recipe"-based formatter used by Keystone
+Resolver to build strings (typically but not necessarily URLs) that
+can be used to locate resources described by an OpenURL.  For example,
+the recipe
+C<http://www.pnas.org/cgi/content/full/%v/%i/%p>
+can be used to transform OpenURLs including the parameters
+C<volume=49&issue=2&spage=197>
+into the URL
+C<http://www.pnas.org/cgi/content/full/49/2/197>
+
+=head1 SEE ALSO
+
+The C<Keystone::Resolver> module.
+
+The file
+C</usr/share/doc/libkeystone-resolver-perl/recipes>
+for the recipe format.
+
+=head1 AUTHOR
+
+Mike Taylor E<lt>mike@indexdata.comE<gt>
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright (C) 2004-2007 Index Data Aps.
+
+This library is free-as-in-freedom software (which means it's also
+open source); it is distributed under the GNU General Public Licence,
+version 2.0, which allows you every freedom in your use of this
+software except those that involve limiting the freedom of others.
+A copy of this licence is in the file "GPL-2"; it is described and
+discussed in detail at
+	http://www.gnu.org/copyleft/gpl.html
+
+=cut
+

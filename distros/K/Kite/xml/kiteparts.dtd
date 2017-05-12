@@ -1,0 +1,26 @@
+<?xml version="1.1">
+<!DOCTYPE kiteparts [
+
+<!ELEMENT kite (part+)>
+<!ATTLIST kite name CDATA #REQUIRED>
+
+<!ELEMENT part (outline, markup, layout)>
+<!ATTLIST part name CDATA #REQUIRED>
+
+<!ELEMENT outline (curve+)>
+
+<!ELEMENT markup (curve+)>
+
+<!ELEMENT curve (point+, text+)>
+<!ATTLIST curve linetype (heavy|normal|light|dotted) "normal">
+
+<!ELEMENT point EMPTY>
+<!ATTLIST point x CDATA #REQUIRED y CDATA #REQUIRED>
+
+<!ELEMENT text (CDATA)>
+<!ATTLIST text font CDATA "Helvetica" size CDATA "6">
+
+<!ELEMENT layout>
+<!ATTLIST layout sheet CDATA #REQUIRED x CDATA #REQUIRED y CDATA #REQUIRED angle CDATA #REQUIRED>
+
+]>

@@ -1,0 +1,36 @@
+
+       ------------
+      | Willkommen |
+       ------------
+      
+Alle beteiligten Entwickler sind begeistert daß Du diesen Editor probierst oder 
+benutzt. Hab Freude damit und besuch auch unsere Internetseite für Neuigkeiten,
+Hilfe und Updates zu bekommen:
+
+                           http://kephra.sf.net
+
+Anregungen und Kritik sind immer erwünscht. Wenn du dir sicher bist das deine
+Vorschläge nicht bereits in der neusten Version umgesetzt wurden oder wir nicht 
+bereits änliches planen(siehe roadmap), schreib eine Mail an:
+
+                        kephra-tester@lists.sourceforge.net
+
+Wir sind natürlich noch lange nicht am Ziel, eher noch ziemlich am Anfang
+also freu dich, dass du bei der Enstehung von was schönem dabei bist. 
+Falls du mitmachen willst, Hilfe ist uns immer wilkommen.
+
+Unser Ziel ist es einen Editor zu machen der reich an Funktionen ist, damit er 
+schwere Arbeiten so weit es geht erleichtern kann. Er soll dabei soweit wie 
+möglich einstellbar und erweiterbar sein damit er wie ein Handschuh zu zu dir
+und deinen Aufgaben passt und für dich einfach bedienbar ist. Er sollte deine
+Kreativität unterstützt, nicht ablenken. Auch wenn es ein Universaleditor wird,
+liegt unser Hauptanwendungsgebiet im Bereich Perl und HTML. 
+
+
+
+                                                            Danke 
+
+
+
+
+P.S. Dieser Text ist schreibgeschützt, was vom Entwickler als Feature angesehen wird.

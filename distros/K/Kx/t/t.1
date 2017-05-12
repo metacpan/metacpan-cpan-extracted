@@ -1,0 +1,59 @@
+# Before `make install' is performed this script should be runnable with
+# `make test'. After `make install' it should work as `perl Kx.t'
+
+#########################
+
+# change 'tests => 2' to 'tests => last_test_to_print';
+
+#use Test::More tests => 1;
+use Test::More qw(no_plan);
+BEGIN { use_ok('Kx') };
+
+my $k = new Kx(host=>"localhost", port=>2222);
+my $rv = $k->connect;
+
+my @var = @{$k->variables};
+print "Variables defined are: @var\n";
+$ref = $k->GMToffset;
+print "GMToffset is $ref\n";
+
+my $time = time;
+
+# Properties table id property value and timestamp.
+$k->Tnew(name=>"prop", cols=>[qw/id p v tm/]);
+my $now = time;
+my $c = 500;
+my $z = [('.z.Z') x $c];
+my $prop = [ map {"`\$\"property name $_\""} 1..$c ];
+
+for my $i (0..(int(3000000/$c)))
+{
+#	$k->Tinsert("t",".z.z",$_*2,$_*3);
+#	$k->Tinsert("t",".z.z",$_*2,$_*4);
+#	$k->Tinsert("t",".z.z",$_*2,$_*5);
+
+	my $v    = [ map {'`$"Value number '. $_ * $i .'"'} (1..$c) ];
+	my $id   = [("`\$\"identifier $i\"") x $c];
+	$k->Tbulkinsert('prop',id=>$id,p=>$prop,v=>$v,tm=>$z);
+}
+print "Took ",time-$now,"s\n";
+
+# Now lets save it and append to it on disk then read it back
+$k->Tsave('prop');   # saves to name prop
+#$k->Tnew(name=>"newprop",keys=>['id','p'], cols=>[qw/v tm/]);
+$k->Tnew(name=>"newprop", cols=>[qw/id p v tm/]);
+$k->Tinsert('newprop',sym("identifier 0"),sym("noname"),sym("noval"),".z.z");
+$k->Tappend('newprop','prop'); # appends row to file
+$k->Tload('prop');
+
+# $k->Tselect('a',"select from mytab$C where i=2");
+
+my $numrows = $k->Tnumrows('prop');
+my $numcols = $k->Tnumcols('prop');
+
+# create a symbol from string data
+sub sym
+{
+    return map { '`$"'. $_ . '"' } @_ ;
+}
+

@@ -1,0 +1,60 @@
+=head1 NAME
+
+Konstrukt::Doc - Documentation of the Konstrukt framework
+
+=head1 DESCRIPTION
+
+General Documentation:
+
+=over
+
+=item * L<Konstrukt::Doc::About> - About the Konstrukt framework and its design.
+
+=item * L<Konstrukt::Doc::Installation> - Installation and configuration.
+
+=item * L<Konstrukt::Doc::Basics> - General website organization and tag syntax.
+
+=item * L<Konstrukt::Doc::Templating> - Using templating to create static web sites.
+
+=item * L<Konstrukt::Doc::FunctionPlugins> - Using plugins to add dynamics to your web page.
+
+=item * L<Konstrukt::Doc::ApplicationPlugins> - Use existing application plugins to integrate complex functionality into your website in an instant.
+
+=item * L<Konstrukt::Doc::CreatingPlugins> - Create your own plugins.
+
+=item * L<Konstrukt::Doc::CoreDevelopment> - Hacking on the Konstrukt core.
+
+=item * L<Konstrukt::Doc::PluginList> - Complete list of the plugins that are shipped with this package.
+
+=back
+
+Tutorials:
+
+=over
+
+=item * L<Konstrukt::Doc::Tutorial::Usage::Blog> - Using the blog plugin to create a blog.
+
+=item * L<Konstrukt::Doc::Tutorial::Plugin::Randomline> - Create a really simple plugin putting out a random line.
+
+=item * L<Konstrukt::Doc::Tutorial::Plugin::Note::Actions> - 1) Create a simple note taking plugin performing different actions.
+
+=item * L<Konstrukt::Doc::Tutorial::Plugin::Note::Template> - 2) Using templates for the presentation.
+
+=item * L<Konstrukt::Doc::Tutorial::Plugin::Note::DBI> - 3) Using Perl DBI to store your data in a database.
+
+=back
+
+=head1 AUTHOR 
+
+Copyright 2006 Thomas Wittek (mail at gedankenkonstrukt dot de). All rights reserved. 
+
+This document is free software.
+It is distributed under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+Next: L<Konstrukt::Doc::About>
+
+Parent: L<Konstrukt>
+
+=cut

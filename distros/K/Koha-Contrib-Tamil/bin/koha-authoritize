@@ -1,0 +1,165 @@
+#!/usr/bin/perl 
+
+package Main;
+$Main::VERSION = '0.049';
+use Modern::Perl;
+use utf8;
+use Pod::Usage;
+use Koha::Contrib::Tamil::Koha;
+use MARC::Moose::Reader::File::Iso2709;
+use MARC::Moose::Writer;
+use MARC::Moose::Parser::Iso2709;
+use Koha::Contrib::Tamil::Authority::FromFile;
+
+
+binmode(STDOUT, ':utf8');
+binmode(STDERR, ':utf8');
+
+
+sub usage {
+    pod2usage( -verbose => 2 );
+    exit;
+}
+
+
+sub run {
+    my ($from, $to, $authority) = (shift, shift, shift);
+    my $equival = @_ ? shift : '';
+
+    open my $fh, ">:encoding(utf8)", $to;
+    my $fp = Koha::Contrib::Tamil::Authority::FromFile->new(
+        koha      => Koha::Contrib::Tamil::Koha->new(),
+        authority => $authority,
+        reader    => MARC::Moose::Reader::File::Iso2709->new(
+            file => $from,
+        ),
+        writer    => MARC::Moose::Writer->new(
+            fh       => $fh,
+            formater => MARC::Moose::Formater::Iso2709->new() ),
+        verbose   => 1,
+        log_filename => "./authoritize.log",
+    );
+    $fp->equivalence($equival) if $equival;
+    $fp->log->info(
+        "AUTORITISATION\n" .
+        "  fichier source          : $from\n" .
+        "  fichier destination     : $to\n" .
+        "  fichier des candidats   : $authority\n" .
+        ( $equival ?
+        "  fichier des équivalence : $equival\n" :
+        "" ) .
+        "\n"
+    );
+    $fp->run();
+}
+
+
+usage() if $#ARGV != 2 and $#ARGV != 3;
+run(@ARGV);
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Main
+
+=head1 VERSION
+
+version 0.049
+
+=head1 DESCRIPTION
+
+=head1 NOM
+
+koha-autoritize -- Authoritization of a ISO2709 file
+
+=head1 USAGE
+
+frantiq-authoritize <source> <target> <authority> [equivalence]
+
+Authoritize C<source> ISO2709 file. Write the result in C<target> ISO2709 file.
+Authorities which haven't been found are optionaly moved in the biblio records
+file, and are written in C<authority> file. If C<equivalence> is given as
+argument, it is a text file of authorities to be linked to Koha authorities
+identified by their ID (authid).
+
+=head1 CONFIGURATION
+
+A file named config.yaml drives the authoritization process. It contains a
+description of authorities to be processed.
+
+ ---
+ authtype:
+   tag: 942
+   letter: a
+ authorities:
+   - name: Authors
+     id: PERSONNAGE
+     heading: 100
+     idx:
+       - Personal-name-heading
+       - Personal-name-see-from
+     biblio:
+       de:
+         idx: Personal-name
+         tag:
+           - 100
+           - 700
+   - name: Collectivity
+     id: CORPO_NAME
+     heading: 110
+     idx:
+       - Corporate-name-heading
+       - Corporate-name-see-from
+     biblio:
+       de:
+         idx: Personal-name
+         tag:
+           - 110
+           - 710
+   - name: Thematic
+     id: THE
+     description: ''
+     heading: 150
+     idx:
+       - Heading
+       - See-from
+     biblio:
+       de:
+         idx: Subject-Thema
+         tag: 690
+       cd:
+         idx: Subject-Thema
+         tag: 690
+   - name: Geographic
+     id: GEO
+     description: ''
+     heading: 151
+     idx:
+       - Heading
+       - See-from
+     biblio:
+       de:
+         idx: Subject-Geo
+         tag: 691
+       cd:
+         idx: Subject-Geo
+         tag: 691
+
+=head1 AUTHOR
+
+Frédéric Demians <f.demians@tamil.fr>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2016 by Fréderic Démians.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

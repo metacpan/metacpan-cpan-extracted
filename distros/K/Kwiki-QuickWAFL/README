@@ -1,0 +1,34 @@
+Kwiki-QuickWAFL
+
+By default the Kwiki will simply surround any unknown WAFL blocks for phrases
+with a div or span tag depending on if it is a WAFL Block or Phrase. This module
+will change that behaviour for specified WAFL blocks and phrases and do one
+additional step of processing the contents of the WAFL with the normal kwiki
+formatter.
+
+This will allow someone to easily extend the syntax without having to do a lot
+of work. For example if you wanted to have a specially formatted bit of text
+that is a "warning". You could have the user type:
+
+.warning
+Here is a warning
+.warning
+
+Then in your stylesheet you could style it to appear in a box, perhaps indented
+with a image inserted to grab the readers attention all with CSS on the "div"
+created by the WALF formatter. This module adds the ability for all normal
+Kwiki formatting to take place inside the box. So the box can contain bulleted
+lists, paragraphs, images, etc.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    kwiki -install Kwiki::QuickWAFL
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 CorData
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. See http://www.perl.com/perl/misc/Artistic.html

@@ -1,0 +1,15 @@
+name: Kwiki-Theme-ColumnLayout
+version: 0.08
+abstract: Provide Two/Three-column layout Kwiki Theme
+author: Kang-min Liu (gugod@gugod.org)
+license: perl
+distribution_type: module
+requires:
+  Kwiki: 0
+  Kwiki::ConfigBlocks: 0
+  Kwiki::Infobox: 0
+  Kwiki::NavigationToolbar: 0
+no_index:
+  directory:
+    - inc
+generated_by: Module::Install version 0.36

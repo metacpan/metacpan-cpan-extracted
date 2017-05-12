@@ -1,0 +1,29 @@
+NAME
+    Kwiki::Yahoo - Wafl Phrase for including RSS feeds in a Kwiki Page
+
+DESCRIPTION
+      {yahoo-doc <query> |args}
+
+    Kwiki::Yahoo uses the Yahoo::Search module to use the Yahoo API for web,
+    video, image, news, local, spelling, and related searches.
+
+    This is a simple proof of concept that probably has many roads for
+    improvement. A lot of flexibility would be gained by accessing the
+    Results directly rather than using the generated HTML.
+
+DEMONSTRATION
+    There's a demonstration, with some explanatory text at
+    http://www.burningchrome.com/wiki/index.cgi?KwikiYahoo
+
+AUTHORS
+    Chris Dent <cdent@burningchrome.com>
+
+SEE ALSO
+    Kwiki Yahoo::Search
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2005, Chris Dent
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,5 @@
+cache/create 1
+cache/file_ext .cached
+#comment
+cache/use 1#foobar
+sendmail/default_name streawkceurs homepage

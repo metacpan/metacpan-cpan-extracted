@@ -1,0 +1,1368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 1.5.2">
+<meta name="author" content="Tamil s.a.r.l.">
+<title>Chargeur Sudoc Koha par Tamil</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400">
+<link rel="stylesheet" href="./asciidoctor.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="./coderay-asciidoctor.css">
+</head>
+<body class="article toc2 toc-right">
+<div id="header">
+<h1>Chargeur Sudoc Koha par Tamil</h1>
+<div class="details">
+<span id="author" class="author">Tamil s.a.r.l.</span><br>
+<span id="email" class="email"><a href="mailto:contact@tamil.fr">contact@tamil.fr</a></span><br>
+<span id="revnumber">version 2.18,</span>
+<span id="revdate">février 2016</span>
+</div>
+<div id="toc" class="toc2">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_introduction">Introduction</a></li>
+<li><a href="#_principes">Principes</a></li>
+<li><a href="#_installation">Installation</a></li>
+<li><a href="#_chargements_réguliers">Chargements réguliers</a>
+<ul class="sectlevel2">
+<li><a href="#_transferts_sudoc_koha">Transferts Sudoc &gt; Koha</a></li>
+<li><a href="#_les_fichiers_sudoc">Les fichiers Sudoc</a></li>
+<li><a href="#_chargements_dans_le_catalogue_koha">Chargements dans le Catalogue Koha</a></li>
+<li><a href="#_fichiers_de_log">Fichiers de log</a></li>
+<li><a href="#_fichier_de_configuration_sudoc_conf">Fichier de configuration sudoc.conf</a></li>
+<li><a href="#_configuration_de_koha_et_zebra">Configuration de Koha et Zebra</a></li>
+<li><a href="#_automatisation">Automatisation</a></li>
+</ul>
+</li>
+<li><a href="#_chargement_initial">Chargement initial</a>
+<ul class="sectlevel2">
+<li><a href="#_sudoc_localisation">sudoc-localisation</a></li>
+<li><a href="#_sudoc_ppnize">sudoc-ppnize</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="_introduction">Introduction</h2>
+<div class="sectionbody">
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Une version en-ligne de ce document est disponible à l&#8217;URL suivante :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>HTML</strong> :
+<a href="http://www.tamil.fr/sudoc/sudoc.html">http://www.tamil.fr/sudoc/sudoc.html</a></p>
+</li>
+<li>
+<p><strong>PDF</strong> :
+<a href="http://www.tamil.fr/sudoc/sudoc.pdf">http://www.tamil.fr/sudoc/sudoc.pdf</a></p>
+</li>
+</ul>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="title">Résumé</div>
+<div class="paragraph">
+<p>Le <strong>Chargeur Sudoc Koha</strong> est un logiciel sous licence GNU GPL. Il permet
+de déployer un Catalogue <a href="http://koha-community.org">Koha</a> dans le Sudoc.
+Ses principales caractéristiques sont les suivantes :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Gestion du protocole d&#8217;envoi des fichiers par l&#8217;ABES à l&#8217;établissement
+en mode PUT.</p>
+</li>
+<li>
+<p>Multi-établissements (ILN). L&#8217;outil peut gérer les chargements de
+plusieurs ILN fonctionnant sur un même serveur en tant qu&#8217;instances
+distinctes de Koha.</p>
+</li>
+<li>
+<p>Dédoublonnage des notices bibliographiques et d&#8217;autorités entrantes.</p>
+</li>
+<li>
+<p>Gestion des liens aux autorités.</p>
+</li>
+<li>
+<p>Création des exemplaires en ajout de notice. Pour chaque ILN, il est
+possible de mettre en oeuvre une logique spécifique
+d&#8217;exemplarisation. On peut ainsi créer entièrement ses exemplaires
+dans WinIBW et générer automatiquement des exemplaires Koha.</p>
+</li>
+<li>
+<p>Logique de fusion de notices bibliographiques paramétrable et
+programmable.</p>
+</li>
+<li>
+<p>Outils d&#8217;aide au déploiement initial d&#8217;un ILN dans le Sudoc.</p>
+</li>
+</ul>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_principes">Principes</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Le catalogue du Système Universitaire de Documentation
+<a href="http://www.sudoc.abes.fr">Sudoc</a> est le catalogue collectif français
+réalisé par les bibliothèques et centres de documentation de
+l&#8217;enseignement supérieur et de la recherche. Le Sudoc est géré par
+l&#8217;Agence bibliographique nationale de l&#8217;enseignement supérieur
+(<a href="http://www.abes.fr">ABES</a>).  Le Sudoc comprend plus de 9
+millions de notices bibliographiques qui décrivent tous les types de
+documents (livres, thèses, revues, ressources électroniques, documents
+audiovisuels, microformes, cartes, partitions, manuscrits et livres
+anciens&#8230;&#8203;)</p>
+</div>
+<div class="paragraph">
+<p>Le <strong>Chargeur Sudoc Koha</strong> est une boîte à outils permettant l&#8217;échange de
+données entre le SIGB <a href="http://www.koha-community.org">Koha</a> et le Sudoc.
+Différentes opérations sont à réaliser afin de <strong>déployer</strong> dans le Sudoc
+un établissement (ILN pour l&#8217;ABES) constitué d&#8217;une ou plusieurs
+bibliothèques (RCR). À chaque ILN, correspond une instance de Koha et à
+chaque RCR d&#8217;un ILN correspond une bibliothèque d&#8217;une instance Koha.</p>
+</div>
+<div class="paragraph">
+<p>Il y a une phase préalable de localisation des ressources de l&#8217;ILN dans le
+Sudoc. Cette opération peut être automatisée dans une certaine mesure. Le
+Chargeur Sudoc propose des outils d&#8217;extraction des données bibliographiques
+d&#8217;un Catalogue Koha dans des formats reconnus par le Sudoc. Au moyen de ces
+fichiers, un ILN évalue le taux de recouvrement de son Catalogue dans le
+Sudoc, le localise automatiquement et en retour enrichit son Catalogue de
+liens vers les notices du Sudoc.</p>
+</div>
+<div class="paragraph">
+<p>On passe ensuite à la phase de fonctionnement avec le Sudoc. À cette
+étape, l&#8217;ILN utilise le logiciel WinIBW afin de saisir ses notices
+bibliographiques et d&#8217;autorités directement dans le Sudoc. Les notices
+ainsi créées sont renvoyées par l&#8217;ABES à l&#8217;ILN qui les charge
+périodiquement dans son Catalogue Koha. Le Chargeur Sudoc gère à la fois
+les transferts de fichiers par l&#8217;ABES et le chargement des notices dans
+un Catalogue Koha.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_installation">Installation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Le Chargeur Sudoc est une collection de scripts Perl qui fonctionnent sous tout
+système d&#8217;exploitation Linux/Unix. Le Chargeur est disponible sous la forme
+d&#8217;un module CPAN qui s&#8217;installe par la commande suivante :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="sh">cpan Koha::Contrib::Sudoc</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Une fois le module installé, il faut créer un répertoire par ILN dans lequel
+seront placés les fichiers de notices fournis par l&#8217;ABES, ainsi que le fichier
+de configuration du Chargeur, ses fichiers de log et, éventuellement, ses
+bibliothèques spécifiques de conversion/exemplariasation de notices.</p>
+</div>
+<div class="paragraph">
+<p>Pour exécuter les scripts du Chargeur, une variable d&#8217;environnement <code>Sudoc</code>
+doit pointer sur le répertoire de l&#8217;ILN.  Et bien sûr, il faut que vous ayez au
+moins une instance de Koha installée, avec les variables d&#8217;environnement
+<code>KOHA_CONF</code> et <code>PERL5LIB</code> correctement initialisées.</p>
+</div>
+<div class="paragraph">
+<p>Par exemple, vous créez un répertoire pour le Chargeur <code>/usr/local/koha/sudoc</code>,
+puis vous l&#8217;initialisez avec tous les sous-répertoires nécessaires en exécutant
+la séquence suivante de commandes shell :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="sh">cd /usr/local/koha
+mkdir sudoc
+cd sudoc
+export Sudoc=/usr/local/koha/sudoc
+sudoc init</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Vous aurez un répertoire <code>/usr/local/koha/sudoc</code> contenant une
+arborescence de sous-répertoires et les fichiers du Chargeur. Quelque
+chose comme ceci :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>.
+|-- etc
+|   `-- sudoc.conf
+|-- lib
+`-- var
+    |-- log
+    |   |-- Authorities.log
+    |   `-- Biblios.log
+    `-- spool
+        |-- done
+        |-- staged
+        `-- waiting
+            |-- ILN186-TEST-933r374B001.raw
+            |-- ILN186-TEST-933r374C001.raw
+            `-- ILN186-TEST-933r376A001.raw</pre>
+</div>
+</div>
+<div class="admonitionblock caution">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-caution" title="Caution"></i>
+</td>
+<td class="content">
+Lisez attentivement la suite de ce document pour comprendre le
+fonctionnement du Chargeur Sudoc. Configurer soigneusement le chargeur
+lui-même et la/les instances de Koha avec lesquelles vous l&#8217;utiliserez.
+Avant toute utilisation, adaptez à vos besoins le fichier
+<code>sudoc.conf</code> Faites des essais sur une instance de test de Koha avant
+d&#8217;utiliser le Chargeur sur votre instance de production.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_chargements_réguliers">Chargements réguliers</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Le Chargeur Sudoc distingue le transfert des fichiers de l&#8217;ABES de leur
+chargement dans un/des catalogues Koha. Le chargeur peut fonctionner sur
+un serveur partagé disposant de plusieurs instances de Koha
+correspondant à des ILN distincts.</p>
+</div>
+<div class="paragraph">
+<p>Pour chaque ILN, il y a un <strong>spool</strong> de fichiers Sudoc qui sont placés
+dans trois sous-répertoires. Les fichiers passent d&#8217;un sous-répertoire à
+l&#8217;autre en fonction de l&#8217;avancement des traitements :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Les fichiers arrivent de l&#8217;ABES dans le sous-répertoire <strong>staged</strong> de
+l&#8217;ILN. Ils y restent tout le temps du transfert par FTP.</p>
+</li>
+<li>
+<p>Quand ils sont entièrement téléchargés, les fichiers sont déplacés
+du sous-répertoire <strong>staged</strong> dans le sous-répertoire <strong>waiting</strong>.</p>
+</li>
+<li>
+<p>À une heure déterminée, a priori quand le serveur Koha est peu
+utilisé, le chargement des fichiers est lancé. Ce traitement peut être
+programmé ou lancé à la main en période de test.</p>
+</li>
+</ul>
+</div>
+<div style="page-break-after: always;"></div>
+<div class="imageblock">
+<div class="content">
+<img src="diag.svg" alt="Diagrammme du Chargeur" width="200">
+</div>
+</div>
+<div class="sect2">
+<h3 id="_transferts_sudoc_koha">Transferts Sudoc &gt; Koha</h3>
+<div class="paragraph">
+<p>Le transfert de fichiers du serveur du Sudoc sur le serveur Koha se
+fait au moyen de la méthode <strong>PUT</strong> proposée par l&#8217;ABES. Le serveur Sudoc
+et le serveur Koha réalisent des actions et échangent des messages par
+courriel selon le protocole suivant :</p>
+</div>
+<div class="hdlist">
+<table>
+<tr>
+<td class="hdlist1">
+Sudoc
+</td>
+<td class="hdlist2">
+<p>Les notices de l&#8217;ILN sont extraites selon la périodicité
+qui a été demandée à l&#8217;ABES.  Quand les fichiers sont
+prêts, un message est envoyé au serveur Koha, le message
+<strong>status 9</strong>.</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+Koha
+</td>
+<td class="hdlist2">
+<p>Le message <strong>status 9</strong> est reçu par le serveur Koha. Un
+message GTD est envoyé au serveur de l&#8217;ABES. Il est
+demandé que les fichiers soient transférés dans le
+répertoire <code>var/spool/staged</code> de l&#8217;ILN.
+Le serveur FTP/SFTP du serveur Koha est configuré pour que sa
+racine pointe sur <code>var/spool</code>. La commande GTD demande à l&#8217;ABES
+d&#8217;envoyer les fichiers dansle sous-répertoire <code>staged</code>.</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+Sudoc
+</td>
+<td class="hdlist2">
+<p>Réception du message GTD de l&#8217;ILN. Transfert des fichiers
+par FTP sur le serveur Koha dans le sous-répertoire de
+l&#8217;ILN. Quand le transfert est terminé, envoi par l&#8217;ABES du
+message <strong>GTD Status 0</strong>.</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+Koha
+</td>
+<td class="hdlist2">
+<p>Réception du message <strong>GTD Status 0</strong>. Les fichiers sont
+déplacés dans le spool de <strong>staged</strong> en <strong>waiting</strong>.</p>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Les éléments suivants doivent être définis/configurés :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Email du serveur Sudoc</p>
+</li>
+<li>
+<p>Email du serveur Koha</p>
+</li>
+<li>
+<p>FTP sur serveur Koha, hôte, login, password</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Un serveur FTP/SFTP (racine sur <code>var/spool</code>) doit être configuré sur le
+serveur Koha ainsi qu&#8217;un serveur SMTP.</p>
+</div>
+<div class="paragraph">
+<p>La commande <code>sudoc trans</code> gère ce protocole de transfert. Le programme
+examine la boîte aux lettres locale MBOX définie dans le fichier de
+configuration par son chemin d&#8217;accès. Il traite deux messages en
+provenance du Sudoc :</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>Message status 9</strong> qui indique qu&#8217;un lot de notices destinées à un
+ILN ont été extraites du Sudoc. <code>sudoc-trans</code> répond à ce message en
+renvoyant immédiatement une demande de transfert par FTP : GTD.</p>
+</li>
+<li>
+<p><strong>Message GTD Status 0</strong> qui indique que les fichiers ont été transmis
+par le Sudoc sur le serveur FTP dans le répertoire <strong>staged</strong> du spool
+de l&#8217;ILN.  <code>sudoc-trans</code> déplace les fichiers dans le répertoire
+<strong>waiting</strong> du spool de l&#8217;ILN.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Le fonctionnement du daemon <code>sudoc trans</code> est piloté par la section
+<a href="#conf-trans">Transfert</a> de <code>sudoc.conf</code>.</p>
+</div>
+<div class="admonitionblock caution">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-caution" title="Caution"></i>
+</td>
+<td class="content">
+<code>sudoc trans</code> doit avoir les droits suffisants pour lire et écrire le
+fichier MBOX de la boîte aux lettres contenant les courriels envoyés par
+l&#8217;ABES.
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Dans certaines circonstances, il peut être nécessaire d&#8217;envoyer à l&#8217;ABES une
+demande d&#8217;envoi de fichiers sans avoir reçu au préalable le message <em>status
+9</em>. Pour ce faire, il est nécessaire de connaître le <em>jobid</em> ABES de son
+établissement : c&#8217;est l&#8217;identifiant ABES de la tâche automatisée qui extrait
+du Sudoc les notices de l&#8217;établissement récemmment mises à jour. Cet
+identifiant se trouve dans les messages envoyés par l&#8217;ABES.</p>
+</div>
+<div class="paragraph">
+<p>On peut alors lancer la commande suivante : <code>sudoc gtd</code>. Cette commande force
+l&#8217;envoi à l&#8217;ABES d&#8217;un message GTD. Le jobid demandé se trouve dans le paramètre
+<em>loading &gt; jobid</em>. Le GTD demande à l&#8217;ABES de placer les fichiers directement
+dans le sous-répertoire <code>waiting</code> du spool.</p>
+</div>
+<div class="paragraph">
+<p>On peut alternativement utiliser la commande <code>sudoc chargeauto</code>. Cette commande
+envoie le GTD à l&#8217;ABES attend un certain délai (paramètre <em>loading &gt; timeout &gt;
+transfer</em>) ; déplace les fichiers de <code>staged</code> dans <code>waiting</code> ; puis, si le
+paramètre <em>loading &gt; auto</em> est à 1, lance directement le chargement des notices.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_les_fichiers_sudoc">Les fichiers Sudoc</h3>
+<div class="paragraph">
+<p>Les fichiers de notices bibliographiques et d&#8217;autorité sont stockés dans
+le <strong>spool</strong> du Chargeur Sudoc. La variable d&#8217;environnement <code>Sudoc</code> pointe
+sur le répertoire racine du Chargeur. Le sous-répertoire <code>var/spool</code>
+contient les fichiers de notices.</p>
+</div>
+<div class="paragraph">
+<p><strong>Liste des fichiers du spool</strong>&#8201;&#8212;&#8201;On examine les fichiers de notices avec la
+commande <code>sudoc spool</code>. Cette commande renvoie la liste de tous les fichiers
+qui sont en cours de transfert, en attente de chargement ou qui ont été
+chargées. On a donc trois sous-répertoires :</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>staged</strong> contenant les fichiers en cours de transfert par l&#8217;ABES</p>
+</li>
+<li>
+<p><strong>waiting</strong> contenant les fichiers en attente de chargement</p>
+</li>
+<li>
+<p><strong>done</strong> contenant les fichiers qui ont été chargés.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>La commande <code>sudoc spool</code> répondra par exemple :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>Fichiers des autorités chargées :
+Fichiers des notices biblio chargées :
+Fichiers des autorités en attente de chargement :
+  1. ILN186-TEST-933r374C001.raw
+Fichiers des notices biblio en attente de chargement :
+  1. ILN186-TEST-933r374B001.raw
+  2. ILN186-TEST-933r376A001.raw</pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Visualisation de fichiers</strong>&#8201;&#8212;&#8201;On peut également voir le contenu d&#8217;un fichier
+spécifique avec la commande : <code>sudoc spool fichier1 fichier2 &#8230;&#8203;</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Nettoyage</strong>&#8201;&#8212;&#8201;Les chargements réguliers peuvent transférer de l&#8217;ABES sur le
+serveur Koha des fichiers vides. C&#8217;est spécialement vrai si l&#8217;ILN a choisi des
+transferts quotidiens.  Ces fichiers peuvent être tous supprimés avec cette
+commande : <code>sudoc spool vide</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_chargements_dans_le_catalogue_koha">Chargements dans le Catalogue Koha</h3>
+<div class="paragraph">
+<p>L&#8217;ILN définit avec l&#8217;ABES les fichiers qu&#8217;il souhaite recevoir
+régulièrement. Les notices bibliographiques des ressources cataloguées
+par l&#8217;établissement dans le Sudoc sont toujours transmises. Le chargeur
+Sudoc requiert que les notices envoyées soient encodées en UTF-8/NFC. Il est
+possible de demander à recevoir également les notices liées, les notices
+de collection par exemple. Enfin, l&#8217;ABES peut également transmettre des
+fichiers des autorités contenues dans les différentes notices
+bibliographiques.</p>
+</div>
+<div class="paragraph">
+<p>Le Chargeur Sudoc dispose de deux commandes distinctes de chargement des
+notices : une première pour les notices bibliographiques et une seconde
+pour les notices d&#8217;autorité.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Si vous n&#8217;avez pas utilisé <code>sudoc trans</code> pour placer vos fichiers de
+notices dans le spool de votre ILN, vous pouvez le faire à la main :
+Copiez dans <code>var/spool/waiting</code> les fichiers de l&#8217;ABES. Vous pouvez
+ensuite les lister avec la comamnde <code>sudoc spool</code>, puis les charger avec
+les commandes décrites ci-dessous.
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+Il faut toujours commencer par charger les autorités afin de permettre
+la création des liens entre notices bibliographiques et notices
+d&#8217;autorité.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_notices_d_autorité">Notices d&#8217;autorité</h4>
+<div class="paragraph">
+<p>La commande de chargement des autorités <code>sudoc autorité</code> examine le répertoire
+des fichiers en attente de chargement. Les fichiers d&#8217;autorités sont traités
+un-à-un.</p>
+</div>
+<div class="paragraph">
+<p>Pour chaque autorité, on détermine s&#8217;il s&#8217;agit d&#8217;une nouveauté ou de la mise à
+jour d&#8217;une autorité existante. <strong>Les nouveautés</strong> sont ajoutées à Koha. <strong>Les
+mises à jour</strong> remplacent les autorités Koha correspondantes.  On interroge
+les autorités Koha pour savoir s&#8217;il en existe une ayant l&#8217;identifiant de la
+notice entrante (son PPN en 001). Si c&#8217;est le cas, il s&#8217;agit d&#8217;une autorité
+déjà présente dans Koha et qui a été modifiée dans le Sudoc.</p>
+</div>
+<div class="paragraph">
+<p>Le Chargeur traite également le cas des <strong>Fusions Sudoc</strong>. La zone 035 est
+examinée afin de déterminer si l&#8217;autorité est marquée comme étant une fusion
+Sudoc d&#8217;autorités.  Dans ce cas, on peut savoir si une autorité Koha existe
+déjà ayant l&#8217;identifiant (PPN) de l&#8217;autorité obsolète ayant fusionnée avec
+l&#8217;autorité entrante. Les notices bibliographiques liées à l&#8217;ancienne autorité
+sont retrouvées et elles sont rattachées à la nouvelle autorité.</p>
+</div>
+<div class="paragraph">
+<p>Après chargement, chaque fichier d&#8217;autorités est déplacé dans le
+répertoire <strong>done</strong> des fichiers ayant été traités.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="title">Indexation</div>
+<div class="paragraph">
+<p>Concernant l&#8217;indexation des autorités chargées, il y a plusieurs
+stratégies possibles. Il est nécessaire que toutes les autorités
+chargées soient indexées avant de passer à l&#8217;étape de chargement des
+notices bibliographiques, sans quoi le lien biblio &#8594; autorités ne pourra
+pas être réalisé.</p>
+</div>
+<div class="paragraph">
+<p>Si on est sûr de ne pas avoir des volumes trop importants d&#8217;autorités,
+on peut laisser Koha indexer les autorités en tâche de fond. On attend
+un certain délai avant de lancer le chargement des notices
+bibliographiques.</p>
+</div>
+<div class="paragraph">
+<p>Une autre stratégie consiste à arrêter l&#8217;indexeur Zebra de Koha avant le
+lancement du chargement des autorités. À la fin du chargement, on indexe
+manuellement les autorités ajoutées/modifiées, puis on redémarre
+l&#8217;indexeur.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_notices_bibliographiques">Notices bibliographiques</h4>
+<div class="paragraph">
+<p>Le chargement des notices bibliographiques est réalisé par la commande
+<code>sudoc biblio</code>. Tout en ayant la même logique de fonctionnement que le chargeur
+des autorités, ce script réalise des traitements supplémentaires et
+paramétrables. On peut par exemple avoir pour un établissement donné une
+logique spécifique de création des exemplaires reprenant des données de champs
+locaux (niveau 2) de la notice entrante. Pour les mises à jour, il peut y
+avoir des règles de fusion entre la notice entrante et la notice existante. On
+peut décider de ne pas charger certaines notices sur la base de critères
+paramétrables.</p>
+</div>
+<div class="sect4">
+<h5 id="_fusion">Fusion</h5>
+<div class="paragraph">
+<p>Pour chaque notice bibliographique, on détermine s&#8217;il s&#8217;agit d&#8217;une
+nouveauté ou de la mise à jour d&#8217;une notice existante. Les nouveautés
+sont ajoutées à Koha.  Les mises à jour remplacent les notices Koha
+correspondantes.</p>
+</div>
+<div class="paragraph">
+<p>Il y a trois cas de figure où l&#8217;on a affaire à une mise à jour :</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>Mise à jour dans le Sudoc</strong>&#8201;&#8212;&#8201;On interroge les notices Koha pour
+savoir s&#8217;il en existe une ayant le PPN de la notice entrante.  Si
+c&#8217;est le cas, il s&#8217;agit d&#8217;une notice déjà présente dans Koha et qui
+a été modifiée dans le Sudoc.</p>
+</li>
+<li>
+<p><strong>Localisation Sudoc</strong>&#8201;&#8212;&#8201;On peut marquer dans le Sudoc qu&#8217;une notice
+est déjà présente dans Koha, soit manuellement en saisissant une zone
+035 contenant un de ses RCR, soit automatiquement au moment du
+déploiement initial de l&#8217;ILN dans le Sudoc. On a alors une zone 035
+avec un sous-champ <code>$5</code> contenant un des RCR de l&#8217;ILN et en <code>$a</code> le
+numéro (biblionumber) de la notice Koha correspondante.</p>
+</li>
+<li>
+<p><strong>Fusion Sudoc</strong>&#8201;&#8212;&#8201;La zone 035 est examinée afin de déterminer si la notice
+est marquée comme étant une fusion Sudoc de notices.  On cherche une zone 035
+contenant un <code>$9 sudoc</code>. Le <code>$a</code> contient le PPN de l&#8217;ancienne notice qui a
+été fusionnée. Dans ce cas, on peut savoir si une notice Koha existe déjà
+ayant le PPN de la notice qui a été fusionnée à la notice entrante. Le
+Chargeur Sudoc ne peut effectuer la fusion de la notice entrante à une notice
+existante dans Koha que si une fusion n&#8217;est pas déjà nécessaire pour une des
+raisons précédentes (mise à jour dans le Sudoc ou localisation) et s&#8217;il n&#8217;y a
+bien qu&#8217;une notice Koha correspondante à une fusion Sudoc. En cas de fusion
+nécessaire mais que le chargeur ne peut pas effectuer, un message d&#8217;alerte est
+écrit dans les logs.</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_exemplarisation">Exemplarisation</h5>
+<div class="paragraph">
+<p>Pour les nouvelles notices, des exemplaires Koha peuvent être créés. Ce mode
+de fonctionnement est paramétrable : voir <code>sudoc.conf</code> paramètre <strong>itemize</strong>.
+Pour une mise à jour, la notice bibliographique est fusionnée avec la notice
+entrante mais ses exemplaires ne sont pas affectés. Il n&#8217;y pas de logique de
+fusion des exemplaires en standard.</p>
+</div>
+<div class="paragraph">
+<p>En standard, le Chargeur Sudoc crée automatiquement des exemplaires Koha (zones
+995) à partir du contenu des zones 915 et 930 des notices entrantes. Les
+sous-champs suivants de la zone 995 sont créés de la façon suivante :</p>
+</div>
+<div class="hdlist">
+<table>
+<tr>
+<td class="hdlist1">
+<strong>$b</strong>
+</td>
+<td class="hdlist2">
+<p>contient le code bibliothèque Koha du RCR de l&#8217;exemplaire Sudoc. Ce code
+est obtenu à partir de la table d&#8217;équivalence RCR:code Koha de <code>sudoc.conf</code>.</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>$c</strong>
+</td>
+<td class="hdlist2">
+<p>idem. On a donc toujours $c = $b.</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>$f</strong>
+</td>
+<td class="hdlist2">
+<p>contient le code à barres de l&#8217;exemplaire : 915$b ou, en son absence,
+l&#8217;EPN (le n° d&#8217;exemplaire Sudoc). Si l&#8217;EPN est utilisé, il est préférable de
+modifier par la suite les codes à barres dans Koha.</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>$k</strong>
+</td>
+<td class="hdlist2">
+<p>contient la cote qui se trouve en 930$a.</p>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_autoritisation">Autoritisation</h5>
+<div class="paragraph">
+<p>Pour toute notice, il est possible "d&#8217;autoritiser" les zones contrôlées
+par autorités (7xx, 6xx, etc.), c.-à-d. leur ajouter l&#8217;identifiant des
+autorités Koha. En effet, les notices entrantes ont un PPN Sudoc dans le
+sous-champ $3. Il convient d&#8217;y ajouter un sous-champ $9 contenant le
+numéro d&#8217;autorité Koha. On peut choisir de ne pas effectuer ce
+traitement, auquel cas on n&#8217;aura que des identifiants d&#8217;autorités Sudoc,
+ce qui peut convenir à un établissement dont tout le Catalogue Koha
+provient du Sudoc sans notices locales.  Voir <code>sudoc.conf</code> paramètre
+<code>authoritize</code>.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_fichiers_de_log">Fichiers de log</h3>
+<div class="paragraph">
+<p>Les chargeurs des notices bibliographiques et des autorités affichent à l&#8217;écran
+quelques informations sur les traitements qu&#8217;ils effectuent. Le détail de
+l&#8217;activité des chargeurs est écrit dans des fichiers de log se trouvant dans le
+répertoire <code>var/log</code> :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Biblios.log</p>
+</li>
+<li>
+<p>Authorities.log</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Ces log contiennent les informations suivantes :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Nom du fichier chargé</p>
+</li>
+<li>
+<p>Nombre de notices/autorités chargées dont nombre de notices fusionnées</p>
+</li>
+<li>
+<p>Notice/autorité Sudoc entrante brute</p>
+</li>
+<li>
+<p>Notice/autorité avant chargement dans Koha, donc avec exemplaires, liens aux
+autorités, fusion, etc.</p>
+</li>
+<li>
+<p>Rapport d&#8217;anomalie</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>En phase de test, on peut utiliser le chargeur sans le paramètre <code>--doit</code>.
+Ainsi les notices/autorités sont préparées pour être chargées dans Koha mais ne
+sont pas effectivement chargées. En examinant les log, on peut voir les
+traitements réalisés et vérifier qu&#8217;ils correspondent bien à ce que l&#8217;on
+souhaitait obtenir.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_fichier_de_configuration_sudoc_conf">Fichier de configuration sudoc.conf</h3>
+<div class="paragraph">
+<p>Un fichier de configuration <code>sudoc.conf</code> contient tous les paramètres
+nécessaires au bon fonctionnement du Chargeur Sudoc. Il y a deux grandes
+sections : une première qui pilote le fonctionnement du transfert de
+fichiers et une seconde qui pilote le chargement des notices. Le fichier
+<code>sudoc.conf</code> se trouve dans le sous-répertoire <code>etc</code> du répertoire
+d&#8217;installation du Chargeur Sudoc.</p>
+</div>
+<div class="sect3">
+<h4 id="conf-trans">Section <strong>transfert</strong></h4>
+<div class="paragraph">
+<p>Une section <strong>trans</strong> détermine le fonctionnement du service de transfert
+<code>sudoc trans</code> des fichiers ABES :</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">timeout</dt>
+<dd>
+<p>Délai en minutes entre deux réveils du service de transfert. Par
+exemple, une valeur de <code>10</code> signifie que la boîte aux lettres Sudoc
+sera examinée toutes les dix minutes.</p>
+</dd>
+<dt class="hdlist1">email</dt>
+<dd>
+<p>Section contenant les adresses de courrier électronique utilisées par
+le protocole de transfert de fichiers entre l&#8217;ABES et le serveur
+Koha :</p>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">abes</dt>
+<dd>
+<p>Email de l&#8217;ABES à laquelle envoyer les messages. A priori c&#8217;est
+toujours l&#8217;adresse <code>abes_ftp@carmin.sudoc.abes.fr</code></p>
+</dd>
+<dt class="hdlist1">koha</dt>
+<dd>
+<p>Email du serveur Koha. C&#8217;est la boîte aux lettres de cette adresse
+qui est examinée par le service de transfert.</p>
+</dd>
+</dl>
+</div>
+</dd>
+<dt class="hdlist1">mbox</dt>
+<dd>
+<p>Chemin d&#8217;accès à la boîte aux lettres
+<a href="http://fr.wikipedia.org/wiki/Mbox">MBOX</a> contenant les messages
+adressés au serveur par l&#8217;ABES.</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>La section <strong>loading</strong> détermine si les notices seront chargées automatiquement
+dans Koha par le service de transfert après que les fichiers ont été transférés
+par FTP/SFTP sur le serveur Koha. Les info de cette section sont également
+utilisées par la commande <code>sudoc chargeauto</code>.</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">auto</dt>
+<dd>
+<p>Indique si les fichiers qui se trouvent dans le répertoire <code>waiting</code> du
+spool doivent être chargés dans le Catalogue Koha. 1=oui, 0=non. Le
+chargement est déclanché par la réception du message <em>status 0</em> envoyé par
+l&#8217;ABES quand le transfert par FTP/SFTP est achevé. En phase de test, on
+laisse ce paramètre à 0, et on utilise les commandes de chargement manuel des
+notices : <code>sudoc autorité</code> et <code>sudoc biblio</code>.</p>
+</dd>
+<dt class="hdlist1">doit</dt>
+<dd>
+<p>Indique si le chargement est effectif ou non. Mettre ce paramètre à la
+valeur 0 (non) permet de tester le fonctionnement du chargement automatique
+après réception des fichiers.</p>
+</dd>
+<dt class="hdlist1">timeout</dt>
+<dd>
+<p>Délai en minutes entre les deux étapes du chargement, envoi GTD et chargement
+proprement dit.</p>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">transfer</dt>
+<dd>
+<p>Délai entre l&#8217;envoi à l&#8217;ABES de la commande GTD et le début du chargement
+automatique des fichiers de notices. Ce paramètre est utilisé par les
+commandes <code>sudoc trans</code> et <code>sudoc chargeauto</code>.</p>
+</dd>
+<dt class="hdlist1">indexing</dt>
+<dd>
+<p>Délai entre les chargements des fichiers du spool <code>waiting</code>. Les fichiers
+du spool sont chargées dans l&#8217;ordre suivant : par type (autorités, notices
+liées, notices) et pour chaque type, par date. Ce paramètre est à définir
+en fonction des réglages du service d&#8217;idexation en continue de Koha. Si par
+exemple, les notices sont indexées toutes les cinq minutes, un timeout de
+sept minutes entre les chargements est une valeur appropriées.</p>
+</dd>
+</dl>
+</div>
+</dd>
+<dt class="hdlist1">log</dt>
+<dd>
+<p>Un log du chargement est envoyé par email à un administrateur de Koha. On peut
+régler le niveau du log ainsi que son destinataire.</p>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">level</dt>
+<dd>
+<p>Niveau du log : <code>notice</code> ou <code>debug</code>. Le mode <code>debug</code> remplit le log avec
+d&#8217;avantage d&#8217;informations.</p>
+</dd>
+<dt class="hdlist1">from</dt>
+<dd>
+<p>Email de l’émetteur de l&#8217;email.</p>
+</dd>
+<dt class="hdlist1">to</dt>
+<dd>
+<p>Email du destinataire de l&#8217;email.</p>
+</dd>
+</dl>
+</div>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_section_strong_chargement_strong">Section <strong>chargement</strong></h4>
+<div class="paragraph">
+<p>Les paramètres de chargement sont définis ainsi :</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">iln</dt>
+<dd>
+<p>Numéro de l&#8217;ILN.</p>
+</dd>
+<dt class="hdlist1">rcr</dt>
+<dd>
+<p>Liste des équivalences entre les RCR et les bibliothèques Koha.</p>
+</dd>
+<dt class="hdlist1">auth</dt>
+<dd>
+<p>Cette section contient tous les paramètres du chargeur des autorités
+<code>sudoc autorité</code> :</p>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">ppn_move</dt>
+<dd>
+<p>Tag dans lequel déplacer le PPN de l&#8217;autorité avant son chargement.
+Le PPN est en 001. On le déplace généralement en 009. On peut
+également le déplacer en 090$p : ppn_move = 090p. On ne peut pas le
+laisse en 001 car Koha utilise toujours cette zone pour son propre
+identifiant (authid). Ce n&#8217;est pas le cas pour les notices
+bibliographiques.</p>
+</dd>
+<dt class="hdlist1">typefromtag</dt>
+<dd>
+<p>Liste des équivalences entre la zone contenant la vedette dans
+l&#8217;autorité entrante et le type d&#8217;autorité Koha. Par exemple, si on a
+un type d&#8217;autorité Koha Nom de personne <code>NP</code> et que les autorités
+auteurs entrantes ont leur vedette en <code>200</code>, on aura alors :
+<code>200: NP</code>.</p>
+</dd>
+</dl>
+</div>
+</dd>
+<dt class="hdlist1">biblio</dt>
+<dd>
+<p>Cette section contient tous les paramètres du chargeur des notices
+bibliographiques <code>sudoc biblio</code> :</p>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">ppn_move</dt>
+<dd>
+<p>Tag dans lequel déplacer le PPN de la notice bibliographique avant
+son chargement.  Le PPN est en 001. On le déplace généralement en
+<code>009</code>. On peut également le déplacer en 090$p : <code>ppn_move:090p</code>.</p>
+</dd>
+<dt class="hdlist1">framework</dt>
+<dd>
+<p>Le code Koha de la grille de saisie à laquelle affecter toutes les notices
+entrantes. Un <em>converter</em> spécifique peut permettre d&#8217;aller au-delà et de,
+par exemple, ventiler les notices entrantes dans différentes grilles en
+fonction du type des notices.</p>
+</dd>
+<dt class="hdlist1">authoritize</dt>
+<dd>
+<p>Est-ce qu&#8217;on autoritise les notices entrantes ? Oui = 1, Non = 0. Le
+chargement de notices bibliographiques est sensiblement plus rapide en
+l&#8217;absence d&#8217;autoritisation.</p>
+</dd>
+<dt class="hdlist1">itemize</dt>
+<dd>
+<p>Exemplarise-t-on les notices entrantes ? Oui = 1, Non = 0.</p>
+</dd>
+<dt class="hdlist1">converter</dt>
+<dd>
+<p>Généralement laissé vide. Peut contenir le nom d&#8217;une sous-classe
+Perl spécifique de conversion des notices. Accessible uniquement à
+un programmeur Perl.</p>
+</dd>
+<dt class="hdlist1">exclure</dt>
+<dd>
+<p>Contient la liste des champs de la notice Sudoc qu&#8217;il faut supprimer.</p>
+</dd>
+<dt class="hdlist1">proteger</dt>
+<dd>
+<p>Contient la liste des champs de la notice Koha qu&#8217;il faut "protéger" en
+cas de fusion avec une notice Sudoc. Les champs protégés sont conservés de
+la notices Koha. Tous les autres champs sont remplacés par les champs de la
+notice Sudoc. Il y a un dédoublonnage des champs protégés qui s&#8217;effectue
+sur tous les sous-champs mis bout à bout et passés en minuscule, sauf les
+sous-champs 0 à 9.</p>
+</dd>
+</dl>
+</div>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_exemple">Exemple</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="head"><span class="head">---</span></span>
+<span class="key">iln</span>: <span class="string"><span class="content">1234</span></span>
+<span class="key">rcr</span>:
+  <span class="key">692755301</span>: <span class="string"><span class="content">BIB1</span></span>
+  <span class="key">692767892</span>: <span class="string"><span class="content">BIB2</span></span>
+<span class="key">trans</span>:
+  <span class="key">timeout</span>: <span class="string"><span class="content">10</span></span>
+  <span class="key">email</span>:
+    <span class="key">abes</span>: <span class="string"><span class="content">abes_ftp@carmin.sudoc.abes.fr</span></span>
+    <span class="key">koha</span>: <span class="string"><span class="content">sudoc@bibliotheque.fr</span></span>
+  <span class="key">mbox</span>: <span class="string"><span class="content">/var/mail/sudoc</span></span>
+  <span class="key">ftp_host</span>: <span class="string"><span class="content">ftp.bibliotheque.fr</span></span>
+<span class="key">loading</span>:
+  <span class="key">auto</span>: <span class="string"><span class="content">1</span></span>
+  <span class="key">doit</span>: <span class="string"><span class="content">1</span></span>
+  <span class="key">timeout</span>: <span class="string"><span class="content">5</span></span>
+  <span class="key">log</span>:
+    <span class="key">level</span>: <span class="string"><span class="content">notice</span></span>
+    <span class="key">from</span>: <span class="string"><span class="content">contact@bibliotheque.fr</span></span>
+    <span class="key">to</span>: <span class="string"><span class="content">sudoc@bibliotheque.fr</span></span>
+<span class="key">auth</span>:
+  <span class="key">ppn_move</span>: <span class="string"><span class="content">009</span></span>
+  <span class="key">typefromtag</span>:
+    <span class="key">200</span>: <span class="string"><span class="content">NP</span></span>
+    <span class="key">210</span>: <span class="string"><span class="content">CO</span></span>
+    <span class="key">215</span>: <span class="string"><span class="content">SNG</span></span>
+<span class="key">biblio</span>:
+  <span class="key">ppn_move</span>: <span class="string"><span class="content">009</span></span>
+  <span class="key">authoritize</span>: <span class="string"><span class="content">1</span></span>
+  <span class="key">linking</span>: <span class="string"><span class="content">1</span></span>
+  <span class="key">itemize</span>: <span class="string"><span class="content">1</span></span>
+  <span class="key">framework</span>: <span class="string"><span class="content">PROPRE</span></span>
+  <span class="key">converter</span>:
+  <span class="key">exclure</span>:
+    - <span class="string"><span class="content">680</span></span>
+    - <span class="string"><span class="content">801</span></span>
+  <span class="key">proteger</span>:
+    - <span class="string"><span class="content">610</span></span></code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_configuration_de_koha_et_zebra">Configuration de Koha et Zebra</h3>
+<div class="paragraph">
+<p>Une des tâches du Chargeur Sudoc consiste à mettre en correspondance les
+notices d&#8217;autorité et bibliographiques en provenance du Sudoc avec les
+notices déjà présentes dans Koha. Dans le Sudoc, chaque notice,
+d&#8217;autorité et bibliographique, est identifiée par un numéro unique
+appelé le PPN qui se trouve dans la zone 001.</p>
+</div>
+<div class="paragraph">
+<p>Il est nécessaire que les notices Sudoc chargées dans Koha conservent
+leur PPN car c&#8217;est au moyen de cet identifiant que le Chargeur peut
+savoir si une notice entrante doit être ajoutée à Koha ou bien si elle
+doit écraser (partiellement éventuellement) une notice existante. Le PPN
+des autorités sert également à <strong>autoritiser</strong> les zones des notices
+bibliographiques liées à des autorités.</p>
+</div>
+<div class="paragraph">
+<p>En fonction de son paramétrage de Koha, il peut être nécessaire de
+déplacer le PPN dans une zone différente qui n&#8217;entre pas en conflit avec
+les zones déjà utilisées. Par exemple, il arrive que la zone 001 des
+notices bibliographiques Koha contienne le <strong>biblionumber</strong> (numéro
+interne des notices Koha). Il est recommandé de déplacer la zone 001 des
+autorités et des notices bibliographiques dans la zone 009. Cette zone
+cible est définie via le paramètre <strong>ppn_move</strong> de la section biblio/auth
+de <code>sudoc.conf</code>. Ce déplacement est même indispensable pour les
+autorités parce que l&#8217;identifiant interne de Koha est placé en 001. Ce
+n&#8217;est pas le cas nécessairement pour les notices bibliographiques.</p>
+</div>
+<div class="paragraph">
+<p>Afin que le Chargeur Sudoc puisse interroger les PPN, il faut ajouter aux
+fichiers de configuration de Zebra un nouvel index <strong>PPN</strong>. Par exemple, si on
+déplace les PPN en 009, il faudra ajouter la ligne suivante aux fichiers
+<code>authority-koha-indexdefs.xml</code> ou <code>biblio-koha-indexdefs.xml</code> des autorités et
+des notices bibliographiques :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;index_control_field</span> <span class="attribute-name">tag</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">009</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>
+  <span class="tag">&lt;target_index&gt;</span>PPN:w<span class="tag">&lt;/target_index&gt;</span>
+  <span class="tag">&lt;target_index&gt;</span>PPN:n<span class="tag">&lt;/target_index&gt;</span>
+<span class="tag">&lt;/index_control_field&gt;</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_automatisation">Automatisation</h3>
+<div class="paragraph">
+<p>Les différents programmes du Chargeur Sudoc doivent être utilisés conjointement
+et en séquence afin de réaliser les opérations de chargement des notices : 1°)
+autorités, 2°) notices liées, 3°) notices bibliographiques. De plus, entre
+chaque chargement, l&#8217;indexation des nouvelles données doit être réalisée.</p>
+</div>
+<div class="paragraph">
+<p>Toutes ces tâches peuvent être automatisées en activant le paramètre
+<code>loading:auto</code>. On peut alternativement lancer les commandes de chargement au
+moyen d&#8217;un script Shell. Par exemple :</p>
+</div>
+<div class="listingblock">
+<div class="title">sudoc-charge.sh</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">#!/bin/sh
+
+CLIENT='mabibli'
+ILN='123'
+DOIT='--doit'
+EMAIL_FROM='Tamil e-Biblio Service &lt;contact@tamil.fr&gt;'
+EMAIL_TO='xx@yy.fr'
+EMAIL_CC='yy@zz.fr'
+SLEEP='5m'
+TMP_FILE=&quot;/tmp/sudoc_$CLIENT&quot;
+
+export LANG='fr_FR.UTF-8'
+export PERL5LIB=/usr/local/koha/lib
+export KOHA_CONF=/usr/local/koha/koha-conf.xml
+export SUDOC=/usr/local/koha/sudoc <i class="conum" data-value="1"></i><b>(1)</b>
+
+exec 1&gt;$TMP_FILE 2&gt;&amp;1 <i class="conum" data-value="2"></i><b>(2)</b>
+echo &quot;Chargement Sudoc&quot;
+
+sudoc autorité $DOIT <i class="conum" data-value="3"></i><b>(3)</b>
+echo ----------------------------------------
+sleep $SLEEP <i class="conum" data-value="4"></i><b>(4)</b>
+sudoc biblio $DOIT<i class="conum" data-value="5"></i><b>(5)</b>
+echo ----------------------------------------
+sleep $SLEEP <i class="conum" data-value="6"></i><b>(6)</b>
+sudoc biblio $DOIT <i class="conum" data-value="7"></i><b>(7)</b>
+
+iconv -f utf8 -t latin1 -c $TMP_FILE | \
+  mail -a &quot;FROM: $EMAIL_FROM&quot; -s 'Chargement Sudoc' -c $EMAIL_CC $EMAIL_TO <i class="conum" data-value="8"></i><b>(8)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Définition de l’environnement d&#8217;exécution du Chargeur Sudoc</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Renvoi dans un fichier temporaire de la sortie standard</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>On charge d&#8217;abord les autorités</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>On laisse le temps à l&#8217;indexeur Zebra d&#8217;indexer les autorités ajoutées/modifiées</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>On charge les notices bibliographiques liées (collections par ex.)</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>Idem 3 pour l&#8217;indexation des notices biblio</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>Chargement des notices bibliographiques.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="8"></i><b>8</b></td>
+<td>Envoi par email du résultat des différents chargements</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_chargement_initial">Chargement initial</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Opération de chargement initial des notices d&#8217;un établissement dans le
+Sudoc.</p>
+</div>
+<div class="sect2">
+<h3 id="_sudoc_localisation">sudoc-localisation</h3>
+<div class="paragraph">
+<p>Cette commande est à utiliser en vue d&#8217;une localisation automatique d&#8217;un
+Catalogue Koha dans le Sudoc.</p>
+</div>
+<div class="paragraph">
+<p>La procédure et les fichiers attendus sont
+<a href="http://documentation.abes.fr/sudoc/manuels/echanges/exemplarisation_automatique/explmonogr.html">documentés
+par l&#8217;ABES</a>.</p>
+</div>
+<div class="paragraph">
+<p>À partir d&#8217;un Catalogue Koha, ce script génère des fichiers de clés de
+dédoublonnage qui doivent permettre à l&#8217;ABES de repérer dans le Sudoc les
+notices Koha. Ces fichiers sont demandés par l&#8217;ABES afin de réaliser soit un
+test de recouvrement soit une localisation automatique. Ces fichiers suivent la
+convention de nommage demandée par l&#8217;ABES : commence par une lettre (<strong>p</strong> pour
+des PPN, <strong>i</strong> pour des ISBN, <strong>r</strong> pour Date-Auteur-Titre), suivi du RCR de la
+bibliothèque, puis le code de PEB (<strong>u</strong> disponible pour le PEB, ou <strong>g</strong> non
+disponible). Ces noms de fichiers sont suffixés d&#8217;un index. Par exemple :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>i3641767u_0001.txt
+i3641767g_0002.txt</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Plusieurs fichiers sont créés, chacun contenant un maximum de 1000 lignes.
+Chaque ligne contient une clé de dédoublonnage (ISBN, date-auteur-tire ou PPN),
+suivie d&#8217;une cote et du biblionumber de la notice Koha, séparés par un point
+virgule. Un groupe de fichiers est généré par RCR tel que défini dans
+<code>sudoc.conf</code>. Exemple de fichier :</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>ISBN;930 $a;L035 $a
+0140222421;GEN ETU KUP 5.1981;263
+0195089464;GEN ETU DAD 5.1993;301
+031209809X;HIS CONT NASS 5.1984;404</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Pour les notices ayant plusieurs exemplaires dans une même bibliothèque (RCR),
+on retient la cote du premier exemplaire.</p>
+</div>
+<div class="paragraph">
+<p>Si une même clé de dédoublonnage (ISBN ou Date-Auteur-Titre) pointe sur
+plusieurs ISBN, la clé n&#8217;est pas retenue. Elle est envoyée dans un fichier des
+<strong>clés multiples</strong>, un fichier par RCR. Vous pouvez choisir de dédoublonner
+ces notices dans Koha ou bien de les localiser manuellement dans le Sudoc.
+Exemple de fichier de clés multiples : <code>i641767u_clemult.txt</code> :</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>2858310009
+  1753 POL IDE 3.1978
+  1754 POL IDE 3.1978
+  1783 POL IDE 3.1978
+  1784 POL IDE 3.1981
+2863640046
+  822 LIT NOU AHA ԱՀԱ 3.1978
+  3255 LIT NOU AHA ԱՀԱ 3.1979</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Ces fichiers sont envoyés à l&#8217;ABES qui, en retour, soit renvoie un rapport de
+taux de recouvrement soit procède à la localisation automatique des notices de
+chaque bibliothèque dans le Sudoc.</p>
+</div>
+<div class="paragraph">
+<p>Ce script dispose de plusieurs paramètres :</p>
+</div>
+<div class="sect3">
+<h4 id="__type">--type</h4>
+<div class="paragraph">
+<p>Spécifie le type de clé de dédoublonnage produite. Trois valeurs possibles :
+<strong>isbn</strong> pour des clés extraites de la zone 010 ; <strong>ppn</strong> pour des clés
+extraites par défaut de la zone 001, ou d&#8217;une autre zone avec le paramètre
+--ppn ; <strong>dat</strong> pour des clés extraites des champs date-auteur-titre.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="__ppn">--ppn</h4>
+<div class="paragraph">
+<p>Le champ contenant le PPN peut être spécifié explicitemnt : <code>--ppn 001</code> ou
+<code>--ppn 912a</code>. Par défaut <code>001</code>.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="__select_clause_select_sur_base_koha">--select &lt;clause SELECT sur base KOHA&gt;</h4>
+<div class="paragraph">
+<p>Sélection des biblionumber des notices pour lesquelles générer les fichiers de
+localisation. Par défaut, on prend toutes les notices. Exemple :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>--select "SELECT biblionumber FROM biblioitems WHERE itemtype='OUV'"
+--select "SELECT biblionumber FROM biblioitems WHERE isbn IS NULL"</pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="__lignes">--lignes</h4>
+<div class="paragraph">
+<p>Les fichiers clés contiennent au plus &lt;lignes&gt; lignes, y compris la première
+ligne qui indique ce que contiennent les lignes suivantes. Par défaut 1000
+lignes.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="__test">--test</h4>
+<div class="paragraph">
+<p>Fichiers de clés uniquement pour un test de recouvrement.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="__coteabes">--coteabes</h4>
+<div class="paragraph">
+<p>Spécifie le champ de la notice ABES où placer la cote Koha. Par exemple, pour
+une rétroconversion : <code>--coteabes 991\ \$a</code>. Par défaut, <code>930 $a</code>.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="__peb_nopeb">--peb | --nopeb</h4>
+<div class="paragraph">
+<p>Notices disponibles pour le PEB ? Si non fourni, disponibles pour le PEB. Les
+fichiers générés pour le PEB contiennent <strong>u</strong> dans leur nom. Ceux contenant des
+notices non disponibles pour le PEB ont un nom comprenant un <strong>g</strong>.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_sudoc_ppnize">sudoc-ppnize</h3>
+<div class="paragraph">
+<p>Cette commande ajoute à un catalogue Koha les PPN Sudoc des notices qui
+y ont été localisées automatiquement.</p>
+</div>
+<div class="paragraph">
+<p>Après une localisation automatique, l&#8217;ABES fournit un fichier d&#8217;équivalences
+entre les PPN des notices Sudoc et les biblionumber des notices Koha. Ce script
+modifie les notices Koha en y ajoutant en 009 le PPN du Sudoc.</p>
+</div>
+<div class="paragraph">
+<p>Le fichier fourni est consitué d&#8217;une ligne par équivalence, chaque ligne ayant
+le format suivant :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>PPN &lt;PPN&gt; : &lt;biblionumber&gt;</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Par exemple :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>PPN 000004405 : 17417
+PPN 000006475 : 11841
+PPN 000007323 : 5810</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Usage :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="sh">sudoc-ppnize [--doit --verbose]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Synopsis :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="sh">sudoc-ppnize L035-ILN80-abcd.raw
+sudoc-ppnize L035-ILN80-abcd.raw --verbose
+sudoc-ppnize L035-ILN80-abcd.raw --doit</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Version 2.18<br>
+Last updated 2016-07-06 08:14:32 CEST
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,104 @@
+DESCRIPTION
+    This module logs all referers coming from external sites to your Kwiki
+    wiki, and displays them in a convenient, stylable table. That's all.
+    It's very basic but you can easily redefine/change most of the
+    functionality by overriding the appropriate methods (see below).
+
+OPTIONS
+    The following configurationoptions can be overriden in your config.yaml
+    file:
+
+    "keep_days"
+         This determines after which number of days, a log entry gets
+        deleted from the store, if there weren't any requests coming in from that
+        URL. Don't set this value too high. (default is: 2)
+
+    "date_format"
+         The date format that is used in the display of logged referrers.
+        This is directly passed to the L<strftime> function of the L<POSIX> package,
+        so don't hate me, if you specify a wrong pattern (default is: %d.%m.%Y %H:%M)
+
+    "exclude_referrers"
+         This is a list of domains, that won't be logged as
+        referrers. You should set this at least to the domain your Kwiki installation is
+        running on, so the clicking around on your wiki won't result in a flood of
+        referrers showing up in you referrer log.
+        The list must be in a YAML anonymous array format, that looks like this:
+
+exclude_referrers:
+- example.com
+- site.org
+
+    "exclude_subdomains"
+        This boolean value specifies (0 is false, everything else is true),
+        is subdomains of the configured exclude_referrers domains should be
+        exluded too, or if they should be logged. Example: If
+        exclude_referrers is set to exclude the domain example.com, then
+        requests coming from sample.example.com will be logged if
+        exclude_subdomains is set to 0, while they won't be logged when
+        exclude_subdomains is set to 1. (default value: 1)
+
+    "truncate_referrers"
+         This number defines, after how much characters the referring
+        address should be truncated in the ReferrerLog Display (default value: 40).
+
+METHODS
+    The behaviour of the Kwiki::ReferrerLog module can be changed quite
+    easily. Simply stuff the module in your @ISA array (or use it as a base
+    class) and override selected methods. The module provides the following
+    methods, which can be overridden:
+
+    "show_referrerlog()"
+        This method loads the stored referrers and renders the template for
+        showing the result back to the browser. It is registered as the
+        action-method for this module.
+
+    "log_referrer"
+        This method logs the referrer. For this it checks if the referrer
+        comes from an external site. If this is not the case, the control
+        flow leaves the method. Otherwise the stored referrers are loaded
+        and the current one is appended to the list. Afterwards it checks,
+        if some of the referrers are older than the configured value for
+        keep_days. If this is the case, the corresponding referrers are
+        deleted from the list.
+
+    "file_path"
+        This method returns a relative path to the location of the referrer
+        log file (default: plugin_directory/referrerlog/referrers.log).
+
+    "load_log"
+        This method loads the stored referrer entries and returns them as an
+        hash reference, that contains, keyed by referring URLs, array
+        references.
+
+        The following example should clarify the structure:
+
+    "store_log"
+        This method takes a hash reference as described above and stores it,
+        so that the load_log method can retrieve it later.
+
+    "date_fmt"
+        This method uses the date_format configuration option, to format the
+        timestamp that is passed as the first and only parameter, as the
+        user/admin wishes.
+
+    "delete_old_logs"
+        This method is called before every call to store_log, and deletes
+        entries, that are older than the number of days specified by the
+        keep_days option (see above).
+
+AUTHOR
+    Benjamin Reitzammer "cpan@nur-eine-i.de"
+
+COPYRIGHT
+    Copyright (c) 2004. Benjamin Reitzammer. All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See http://www.perl.com/perl/misc/Artistic.html
+
+SEE ALSO
+    POSIX for strftime date format syntax, Storable is used for referrer
+    storage
+

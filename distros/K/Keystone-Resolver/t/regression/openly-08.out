@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<results>
+  <data entity="rft">
+    <metadata key="atitle">Isolation of a common receptor for coxsackie B</metadata>
+    <metadata key="auinit">J</metadata>
+    <metadata key="aulast">Bergelson</metadata>
+    <metadata key="date">1997</metadata>
+    <metadata key="epage">1323</metadata>
+    <metadata key="jtitle">Science</metadata>
+    <metadata key="rfe_val_fmt">info:ofi/fmt:kev:mtx:journal</metadata>
+    <metadata key="spage">1320</metadata>
+    <metadata key="volume">275</metadata>
+  </data>
+  <result type="fulltext" priority="10" tag="Science"
+	service="Science Magazine Full Text"
+	>http://www.sciencemag.org/cgi/content/full/275/5304/1320</result>
+  <result type="fulltext" priority="10" tag="Infotrac"
+	service="Gale Infotrac"
+	>http://www.infotrac.galegroup.com/itw/infomark/1/1/1/purl=rc11%5FITOF%5F%5Fjn_Science_AND_sp_1320_AND_vo_275?sw_aep=indexdata</result>
+  <result type="abstract" priority="10" tag="ScienceAbstracts"
+	service="Science Magazine Abstracts"
+	>http://www.sciencemag.org/cgi/content/abstract/275/5304/1320</result>
+  <result type="citeref" priority="15" tag=""
+	service="Endnote citation"
+	>http://example.com/resolve?rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Ajournal&amp;rft.atitle=Isolation%20of%20a%20common%20receptor%20for%20coxsackie%20B&amp;rft.auinit=J&amp;rft.aulast=Bergelson&amp;rft.date=1997&amp;rft.epage=1323&amp;rft.jtitle=Science&amp;rft.rfe_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Ajournal&amp;rft.spage=1320&amp;rft.volume=275&amp;svc_dat=indexdata:citation:Endnote</result>
+  <result type="authorsearch" priority="10" tag=""
+	service="Google"
+	>http://www.google.com/search?q=%22J Bergelson%22</result>
+  <result type="citation" priority="20" tag="APP"
+	service="APP-style citation" mimetype="text/html"
+	>Bergelson, J.  1997.  Isolation of a common receptor for coxsackie B.  &lt;i&gt;Science&lt;/i&gt;, 275: 1320-1323.</result>
+  <result type="citation" priority="20" tag="author"
+	service="Author and year" mimetype="text/html"
+	>Bergelson, J.  1997.</result>
+  <result type="websearch" priority="5" tag="masterkey"
+	service="MasterKey"
+	>http://masterkey.indexdata.com/author=Bergelson&amp;title=Isolation of a common receptor for coxsackie B&amp;date=1997</result>
+  <result type="websearch" priority="10" tag=""
+	service="Google"
+	>http://www.google.com/search?q=%22Isolation of a common receptor for coxsackie B%22</result>
+  <result type="websearch" priority="20" tag=""
+	service="Alltheweb"
+	>http://alltheweb.com/search?q=%22Isolation of a common receptor for coxsackie B%22</result>
+  <result type="websearch" priority="30" tag=""
+	service="AltaVista"
+	>http://www.altavista.com/web/results?q=%22Isolation of a common receptor for coxsackie B%22</result>
+</results>

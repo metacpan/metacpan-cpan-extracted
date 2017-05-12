@@ -1,0 +1,5 @@
+---
+version: 0.10
+date: Fri Feb  4 16:32:29 PST 2005
+changes:
+- Initial version of Kwiki::HomePagePreference

@@ -1,0 +1,11 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+use File::Spec::Functions qw( catfile );
+use Perl::Tidy;
+
+my $rc_filepath = catfile( 'devel', 'kinotidyrc' );
+
+Perl::Tidy::perltidy( perltidyrc => $rc_filepath );
+

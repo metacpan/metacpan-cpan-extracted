@@ -1,0 +1,23 @@
+Kwiki-CachedDisplay
+
+This distribution provide a page-level cache facility of your
+Kwiki system. It's a Kwiki plugin.
+
+To build this module, extract the tarball and execute:
+
+    perl Makefile.PL
+    make
+
+To perform test, execute:
+
+    make test
+
+To install the module, execute:
+
+    make install
+
+For detail use please see the POD of Kwiki::CachedDisplay.
+
+Cheers,
+Kang-min Liu
+

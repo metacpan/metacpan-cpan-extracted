@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<results>
+  <data entity="rft">
+    <metadata key="atitle">Osteology, paleobiology, and relationships of the sauropod dinosaur Sauroposeidon</metadata>
+    <metadata key="auinit">M. J.</metadata>
+    <metadata key="aulast">Wedel</metadata>
+    <metadata key="date">2000</metadata>
+    <metadata key="dctype">scientific-paper</metadata>
+    <metadata key="epage">388</metadata>
+    <metadata key="genre">article</metadata>
+    <metadata key="issn">0567-7920</metadata>
+    <metadata key="issue">4</metadata>
+    <metadata key="jtitle">ACTA PALAEONTOLOGICA POLONICA</metadata>
+    <metadata key="spage">343</metadata>
+    <metadata key="volume">45</metadata>
+  </data>
+  <result type="fulltext" priority="10" tag="APP"
+	service="Acta Palaeontologica Polonica"
+	>http://app.pan.pl/acta45-4.htm#Wedel</result>
+  <result type="fulltext" priority="10" tag="Elsevier"
+	service="Elsevier"
+	>http://www.sciencedirect.com/science?_ob=GatewayURL&amp;_origin=KEYSTONE&amp;_method=citationSearch&amp;_volkey=05677920%2345%23343%234&amp;_version=1&amp;md5=72dd8ca47ee1f2650ec9095e7ee849c3</result>
+  <result type="citation" priority="20" tag="APP"
+	service="APP-style citation" mimetype="text/html"
+	>Wedel, M. J.  2000.  Osteology, paleobiology, and relationships of the sauropod dinosaur Sauroposeidon.  &lt;i&gt;ACTA PALAEONTOLOGICA POLONICA&lt;/i&gt;, 45: 343-388.</result>
+  <result type="citation" priority="20" tag="author"
+	service="Author and year" mimetype="text/html"
+	>Wedel, M. J.  2000.</result>
+</results>

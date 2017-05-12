@@ -1,0 +1,46 @@
+INSTALL for Geo::KML::PolyMap v 1.34
+
+2007-09-19
+
+
+-----
+1. Prerequisites
+-----
+
+This modules requires Carp, GD (>=2.0), Archive::Zip, File::Temp, and
+Statistics::Descriptive. You could, technically, get away without the last one,
+as it supports code that is not enabled in the default configuration. To do
+this, you may have to delete code, however.
+
+You should have at least one TrueType font installed on your system in order to
+make maps with legends.
+
+-----
+2. Installation procedure
+-----
+
+Installation is mostly routine - run perl Makefile.PL, then make, and make install.
+
+There is one post-installation step you must complete if you wish to generate
+KMZ files with built-in legends. The variable $FONT_PATH, in PolyMap.pm, must
+be changed to the pathname of a TrueType font that you would like to use to
+render the legends. I realize this is suboptimal; it will probably change in a
+later version.
+
+If you do not have any TrueType font files lying around, you can try grabbing
+the GPL'ed freefont package:
+	 http://download.savannah.gnu.org/releases/freefont/
+
+The FreeSans font in there should work well.
+
+The perldoc says there is another configurable parameter - binning algorithm.
+This is true, but it's set up such that you shouldn't need to change it out of
+the box; if you're curious, read the perldoc to understand the advantages and
+disadvantages of the different options.
+
+
+
+Imran Haque
+ihaque@cs.stanford.edu
+http://www.cs.stanford.edu/people/ihaque
+http://gecensus.stanford.edu

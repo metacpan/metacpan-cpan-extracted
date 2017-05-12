@@ -1,0 +1,478 @@
+Kavorka
+=======
+
+Created:      2013-09-23
+Home page:    <https://metacpan.org/release/Kavorka>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Kavorka>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.037	2017-01-31
+
+ [ Bug Fixes ]
+ - Eliminate dependency on Data::Alias in modern versions of Perl.
+   Daniel Dehennin++
+   <https://github.com/tobyink/p5-kavorka/issues/18>
+
+0.036	2014-11-01
+
+ [ Bug Fixes ]
+ - Avoid inadvertantly autovivifying things in Sub::Defer's big hash of
+   deferred subs.
+   Chris Tijerina++
+
+0.035	2014-09-30
+
+ [ Test Suite ]
+ - Add a test case for Sub::Defer-related weirdness.
+   <http://purl.org/NET/cpan-uri/rt/ticket/95786>
+
+ [ Other ]
+ - Make it easier to do weird things subclassing Kavorka::Multi.
+
+0.034	2014-09-07
+
+ - Avoid triggering RT#98666.
+ - Updated: Switch from Sub::Name+Sub::Identify to the shiny new Sub::Util.
+
+0.033	2014-08-22
+
+ [ Bug Fixes ]
+ - Type::Registry::DWIM changed its API. (Kavorka probably shouldn't be
+   using it anyway because it's an undocumented internal part of
+   Type::Utils.)
+   SpiceMan++
+
+0.032	2014-08-13
+
+ [ Bug Fixes ]
+ - Work around a bug in Moo(?) or maybe the Perl keyword API(?) by
+   undeferring Moo's deferred subs.
+   Fixes RT#95786.
+   Jonathan Cast++
+   <https://rt.cpan.org/Ticket/Display.html?id=95786>
+
+0.031	2014-08-13
+
+ [ Bug Fixes ]
+ - Add `multi` to @EXPORT_OK.
+   Thibaut Le Page++
+ - Fix link to Kavorka::Manual::Signatures.
+   Thibaut Le Page++
+
+ [ Documentation ]
+ - Update benchmarks given that Type::Tiny::XS is hellishly fast.
+
+ [ Packaging ]
+ - Recommend Type::Tiny::XS.
+
+ [ Other ]
+ - Updated: Bump required version of Return::Type.
+ - Updated: Cope with changes to Exporter::Tiny; avoid triggering warnings.
+
+0.030	2014-03-20
+
+ [ Bug Fixes ]
+ - Eliminate dependency on Devel::Pragma, which fixes Kavorka on threaded
+   Perls.
+   Fixes RT#94015.
+   Piers Cawley++
+   <https://rt.cpan.org/Ticket/Display.html?id=94015>
+
+ [ Test Suite ]
+ - Add test using Kavorka on threaded Perls.
+   Aaron James Trevena++
+   <http://purl.org/NET/cpan-uri/rt/ticket/94015>
+
+ [ Other ]
+ - Added: Introduce `f` as an alternative to `fun`.
+
+0.029	2014-02-26
+
+ - Added: Kavorka::TraitFor::Sub::begin.
+
+0.028	2014-02-21	The 'perlsub-compat' Release
+
+ [ Test Suite ]
+ - Add test cases covering bare @ and % sigils.
+
+ [ Other ]
+ - Allow attributes to *precede* signatures.
+ - Make parsing of parameter defaults laxer so that an equals sign followed
+   by no expression is allowed.
+
+0.027	2014-01-30
+
+ - Minor change to the hook allowing keywords to deal with calls that
+   bypass the Perl keyword API.
+
+0.026	2014-01-30
+
+ - Allow keywords to detect when the keyword sub has been called in a way
+   that bypasses the Perl keyword API's custom parsing (e.g. using a
+   prototype, or as a coderef). By default, keywords croak when this is
+   detected.
+ - Method modifier keywords can now detect when the keyword sub has been
+   called bypassing custom parsing, and act sanely rather than croaking.
+
+0.025	2013-12-23
+
+ [ Bug Fixes ]
+ - Value constraints for parameters without type constraints were being
+   ignored.
+
+ [ Test Suite ]
+ - Tests for value constraints.
+
+ [ Other ]
+ - Added: Support non-block form of value constraints, taken from Perl 6 /
+   Method::Signatures.
+
+0.024	2013-12-18
+
+ [ Bug Fixes ]
+ - s/namespace::clean/namespace::sweep/
+
+0.023	2013-12-17
+
+ [ Bug Fixes ]
+ - Fix test case - should not depend on Moops!
+   Syohei Yoshida++
+   <https://github.com/tobyink/p5-kavorka/issue/2>
+
+0.022	2013-12-16
+
+ [ Documentation ]
+ - Fix typos in Kavorka::Manual::MultiSubs.
+   Grzegorz Rożniecki++
+   <https://github.com/tobyink/p5-kavorka/pull/1>
+
+ [ Other ]
+ - Added: Kavorka::TraitFor::Sub::fresh.
+ - Added: Kavorka::TraitFor::Sub::override.
+
+0.021	2013-11-30
+
+ [ Documentation ]
+ - Rearrange some of the traits documentation.
+
+ [ Other ]
+ - Added: Implement a `ref_alias` trait, inspired by Method::Signatures.
+ - Disallow the `assumed` parameter trait for multi subs.
+ - Split out most of the implementation for the `optional` trait (except
+   for special parsing rules) into Kavorka::TraitFor::ReturnType::optional.
+ - Split out some sanity_check stuff into the trait modules.
+
+0.020	2013-11-27
+
+ [ Documentation ]
+ - Explain different ways to extend Kavorka.
+
+ [ Other ]
+ - Added: Kavorka::TraitFor::Parameter::assumed.
+ - Can now use 'but' as another alias for 'is'/'does'.
+ - Split out the assumed trait for return types as
+   Kavorka::TraitFor::ReturnType::assumed.
+ - Subs can now have traits.
+
+0.019	2013-11-23
+
+ - Added: Provide an `augment` keyword which will work in Moose/Mouse, but
+   not Moo.
+ - Added: Provide an `override` keyword which will work in Moose/Mouse, but
+   not Moo.
+ - Allow named parameters to be passed in as a hashref rather than a hash.
+ - Split out some of the Kavorka::Parameter features (aliases, locked
+   hashrefs, read-only parameters) into parameter traits.
+
+0.018	2013-11-18
+
+ - Allow non-Type::Tiny type constraints to be returned by type constraint
+   expressions, provided they can be converted to Type::Tiny objects via
+   Types::TypeTiny::to_TypeTiny.
+
+0.017	2013-11-18
+
+ - Extensibility via parameter traits.
+ - Rename Kavorka::Signature::Parameter -> Kavorka::Parameter.
+ - Rename Kavorka::Signature::ReturnType -> Kavorka::ReturnType.
+
+0.016	2013-11-07
+
+ [ Bug Fixes ]
+ - Bypass the Internals::SvREADONLY prototype because handling of the ($;$)
+   prototype changed in 5.16.0 and we were relying on the new behaviour.
+
+0.015	2013-11-07
+
+ [ BACK COMPAT ]
+ - Change the syntax of lexical functions and methods to include the `my`
+   keyword in their declaration.
+
+ [ Bug Fixes ]
+ - $sub->signature now returns undef if no signature was given in the
+   declaration.
+ - Most of the closure issues associated with Parse::Keyword are now worked
+   around.
+
+ [ Documentation ]
+ - Document that fun ($x, $y=$x) {...} doesn't work how you might expect it
+   to, and some work-arounds.
+
+ [ Test Suite ]
+ - Tidy up some of the closure tests.
+
+ [ Other ]
+ - Checking if @_ < 0 is silly; stop doing that.
+
+0.014	2013-11-05	Gunpowder, treason and plot
+
+ - Added: Lexical functions and methods.
+ - Added: Return types, optionally with coercion.
+ - Updated: Work with (and indeed require Type::Tiny 0.032).
+
+0.013	2013-10-27
+
+ [ Bug Fixes ]
+ - Compiled dispatchers introduced in Kavorka 0.012 are essentially a form
+   of cache. No cache invalidation was in place, leading to issues when
+   adding extra same-named multi method candidates to parent classes after
+   a multi method had already been invoked in a child class. Cache
+   invalidation now works.
+
+ [ Test Suite ]
+ - Test for cache invalidation of compiled multi sub dispatchers.
+ - Test that definition of multi subs happens at runtime, and definition
+   can continue even after the multi sub has been invoked.
+
+0.012	2013-10-26
+
+ [ Documentation ]
+ - Various documentation improvements.
+
+ [ Other ]
+ - Optimization: avoid double type checks in multi subs.
+ - Optimization: compile dispatchers for multi subs on demand.
+
+0.011	2013-10-25
+
+ [ Documentation ]
+ - Split up documentation into a manual with bite-sized chunks.
+
+ [ Other ]
+ - Allow multiple method names to be modified with a single method
+   modifier.
+ - Rename ${^NEXT} variable to $next for `around` method modifiers.
+ - Support Perl 5.20 style :prototype(...) attribute.
+
+0.010	2013-10-23
+
+ - Allow package variables such as $Foo::Bar in signatures.
+ - General refactoring of variable name parsing.
+ - Support 'my' and 'our' prefixes to variable names in signatures.
+
+0.009	2013-10-22
+
+ [ Documentation ]
+ - Minor fix to KavorkaX::Dancer2 example extension module.
+
+ [ Packaging ]
+ - Package my TODO list.
+
+0.008	2013-10-17
+
+ [ Documentation ]
+ - Include an example of extending Kavorka to cover some Dancer2 concepts.
+ - Minor documentation fixes.
+
+ [ Other ]
+ - Make subclassing Kavorka.pm itself a little easier.
+
+0.007	2013-10-16
+
+ - Allow named parameters to have multiple "outside" names.
+ - Make the parentheses surrounding long named parameters optional.
+ - Refactor Kavorka::Sub.
+
+0.006	2013-10-15
+
+ [ Documentation ]
+ - Document interplay between multi subs and multiple inheritance.
+
+ [ Test Suite ]
+ - Test cases for multi subs versus multiple inheritance.
+
+ [ Other ]
+ - Use invocant as starting point for searching for multi method
+   candidates.
+
+0.005	2013-10-13
+
+ [ Bug Fixes ]
+ - Fix error parsing `where` clauses.
+
+ [ Documentation ]
+ - Included fibonnacci.pl example of using multi subs.
+
+ [ Other ]
+ - $parameter->constraints is now an arrayref of coderefs rather than an
+   arrayref of strings of Perl code.
+ - Changed error message resulting from failed value constraint.
+
+0.004	2013-10-13
+
+ [ Documentation ]
+ - Correct minor typo.
+
+ [ Other ]
+ - Added: Implement multi subs and multi methods.
+
+0.003	2013-10-12
+
+ - Allow @_ and %_ to be used in signatures.
+ - Improve sanity checking for signatures.
+
+0.002	2013-10-11
+
+ - Added: Kavorka::Signature now provides args_min and args_max methods.
+ - Refactor some of the code generation in Kavorka::Signature.
+
+0.001	2013-10-09	First public release
+
+0.000_11	2013-10-09
+
+ [ Documentation ]
+ - Document Kavorka's exports.
+ - Fix MooseX::KavorkaInfo SYNOPSIS.
+ - Provide an example script using MooseX::KavorkaInfo.
+
+ [ Test Suite ]
+ - Check that it's possible to define a method called `method`.
+
+ [ Other ]
+ - Throw an exception if people use method modifier keywords to define
+   anonymous functions.
+
+0.000_10	2013-10-09
+
+ [ Documentation ]
+ - Minor documentation improvements.
+
+ [ Other ]
+ - Added: MooseX::KavorkaInfo provides Kavorka->info data through Moose
+   meta objects.
+ - Allow Function::Parameters-style type constraint expressions.
+
+0.000_09	2013-10-08
+
+ [ Documentation ]
+ - Document the yadayada operator.
+
+ [ Test Suite ]
+ - Tests for lvalue subs.
+
+ [ Other ]
+ - Better support for subroutine attributes.
+ - Change parsing technique for named subs.
+
+0.000_08	2013-10-08
+
+ [ Documentation ]
+ - Documented Kavorka::Signature.
+ - Documented Kavorka::Signature::Parameter.
+ - Documented Kavorka::Sub.
+ - Improve 'Introspection API' section of documentation for Kavorka.pm
+   itself.
+
+ [ Test Suite ]
+ - Add tests for introspection API.
+
+ [ Other ]
+ - Function objects doing the Kavorka::Sub role now keep track of which
+   keyword they were declared with.
+ - Tidy up and improve the Kavorka::Signature API.
+ - Tidy up the Kavorka::Sub API.
+
+0.000_07	2013-10-08
+
+ [ Documentation ]
+ - Documented an 'rw' trait which is just a no-op.
+ - Documented traits better.
+
+ [ Test Suite ]
+ - Add tests for various traits.
+
+ [ Other ]
+ - Implemented the 'alias' trait.
+ - Implemented the 'locked' trait.
+ - Implemented the 'ro' trait.
+ - Long overdue refactoring of the code-generating internals of
+   Kavorka::Signature::Parameter.
+
+0.000_06	2013-10-07
+
+ [ Bug Fixes ]
+ - Fix installing of method modifiers into Moo::Role roles.
+
+ [ Test Suite ]
+ - Add tests for method modifiers in Class::Tiny/Role::Tiny.
+ - Add tests for method modifiers in Moo.
+ - Add tests for method modifiers in Moose.
+ - Add tests for method modifiers in Mouse.
+
+0.000_05	2013-10-07
+
+ [ Bug Fixes ]
+ - Fix off-by-one bug failing to populate a slurpy array/arrayref if it
+   would only have one item.
+ - Fix warning assigning odd number of items to %_ which should have been
+   fatal instead.
+
+ [ Test Suite ]
+ - Add tests for non-inlinable type constraints.
+ - Add tests for type coercions.
+
+0.000_04	2013-10-06
+
+ [ Test Suite ]
+ - Add tests for invocants.
+ - Add tests for slurpy parameters.
+
+ [ Other ]
+ - Allow anonymous slurpy parameters.
+ - Also populate the %_ hash for functions with a hash(ref) slurpy but zero
+   named parameters.
+ - Minor speed-ups.
+
+0.000_03	2013-10-05
+
+ [ Bug Fixes ]
+ - Error message for unknown named parameters isn't unintentionally always
+   thrown for all named parameters except the first.
+
+ [ Documentation ]
+ - Include my TODO file.
+
+ [ Test Suite ]
+ - Add tests for named parameters.
+ - Add tests for positional parameters.
+ - Add tests for the `method` keyword.
+
+ [ Other ]
+ - The `default` attribute of Kavorka::Signature::Parameter is now a
+   coderef rather than a string.
+
+0.000_02	2013-10-04
+
+ [ Bug Fixes ]
+ - Fix error finding the position to start slurping from in signatures that
+   have a slurpy after zero positional parameters.
+ - Fix syntax error compiling functions using non-inlinable type
+   constraints in the signature.
+
+ [ Documentation ]
+ - Include benchmarking script as an example.
+
+ [ Test Suite ]
+ - Add some rudimentary tests for type constraints.
+
+0.000_01	2013-10-03	Preview release

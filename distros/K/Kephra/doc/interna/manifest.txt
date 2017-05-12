@@ -1,0 +1,137 @@
+Dieser Text soll den Leser davon überzeugen das es noch einen Editor geben sollte, den PCE!
+Keine Angst vor der Textlänge, es macht Freude zu lesen, nur wen Eigenlob stört sollte den
+ersten Absatz verpassen.Weiter Beleidigung der Konkurenz unter EDITOREN.
+--------------------------
+ Hilfe! noch einen Editor
+--------------------------
+Winsle nicht um Gnade, wenn dir dein Editor reicht fliehe. Doch weil kein Editor perfekt sein kann
+wirst du wohl noch ein paar Zeilen lang interessiert weiterlesen.   Perl rulez!
+Ja, angeblich gibt es genug Editoren, für jeden Programmierertyp und Anlass den passenden. Es gibt
+mächtige Entwicklungsumgebungen(IDE's) für 'ne Programmiersprache, es gibt kleine schnelle Editoren
+mit denen man Text eingeben und speichern kann und Editoren die dies und das sehr gut können, sogar
+Betriebsysteme, die von sich behaupten sie seien ein Editor(Emacs), aber keinen perfekten Editor,
+kein perfect coding enviroment das alles kann was mit dem Bearbeiten von Textdateien zu tun hat.
+Viele Editoren haben Werkzeuge die nur auf bestimmte Probleme getrimmt sind. Kaum geht das Leben
+einen Schritt weiter wird es wenig brauchbar, richtig intelligente Werkzeuge sehe ich selten bis
+gar nicht und sind die Editoren in manchen Bereichen wirklich gut, braucht man eh noch einen zweiten
+oder dritten sobald man ein anderes Aufgabenfeld betritt. Die Grossen sind meist zu schwerfällig,
+fressen zu viel Platz und brauchen ihr eigenes Lernprogramm weil viele Funktionen nur auf umwegen
+erreichbar sind oder nur mit Tastenkombinationen die ich als Anfänger nicht kenne. Die kleinen
+Editoren sind meist nur ein notepad mit einigen zusätzlichen Möglichkeiten die die Überlegenheit
+dieser Programme zeigen sollen. Bis ich weiss welcher dieser 50 Editoren der überlegene ist wechsle
+ich mit einem Tastendruck lieber in den abgespeckten Modus des PCE und hol mir die Funktionen dazu
+die ich brauche. Mit dem PCE vor Augen wird man einsehen das die allermeisten Editoren halbfertig
+sind und das aufgespreizte Gefieder ihrer Features einen geistigen Rohbau verdecken soll. Und genau
+deswegen lässt das Thema Editor viele Coder zum Hulk werden, weil sie meinen genug getestet zu haben
+und lieber etwas programmieren statt sich ein Programm anzuschaun das sie eh nicht benutzen werden.
+Schreiben ist eigentlich 'ne Sache die nichts weiter braucht als Inspiration, einen Stift und den
+Drang etwas zu erschaffen. Das weiss ich. Doch wenn Software dann richtig. Und die Heuschreckenschwärme
+von Editoren die in den Downloadarchiven ihr Unwesen treiben beweisen doch: Alle Lebewesen streben im
+grossen Strudel gen Perfektion die leider noch nicht erreicht wurde. Also treffen wir einfach das Ziel
+mit dem
+--------------
+ Geheimrezept
+--------------
+Ich denke diese Dinge sind:
+1. eine universale Anwenbarkeit durch universale Anpassbarkeit und Erweiterbarkeit
+2. zur Vermeidung jeglicher Dummenarbeit universale Automatisierbarkeit
+2. einfache benutzung, klare struktur, gute hilfe
+3. Sparsamkeit mit Speicher, Festplattenplatz, nicht zu langsame Ausführung
+4. Freude an der Sache
+Und ich behaupte mal PCE wird all das erfüllen können.
+-------------------------
+ PCE- das allheilmittel?
+-------------------------
+So ungefähr. PCE soll jedes Problem das mit Textbearbeitung(kein Office oder DTP) zu tun hat lösen
+können und jeden anderen Editor ersetzen. Er soll auch mit einigen neuen frischen Ideen
+kommen, für Begeisterung sorgen und die leute zum teilen und gegenseitigem helfen ermuntern.
+PCE wird sogar die Probleme lösen an die du noch nicht dachtest. Aber ich will nicht blenden,
+deswegen jetzt anfassbare
+--------
+ Fakten
+--------
+PCE wird NICHT GROSS, zwischen 4 und 12MB, je nachdem welche Komponenten schon auf dem Rechner da sind.
+(1,2MB Perl) (7MB wxPerl incl Scintilla und erweiterungen) (1MB CVS) (1-2MB quellcode) (1MB hilfe)
+zur zeit ist das zip 3MB gross, wird wohl auf 4MB anwachsen, also ist der PCE auch downloadbar!
+
+PCE wird auch NICHT LANGSAM weil er Komponenten aus dem vorkompiliertem Wx-Framework benutzt und nur
+mit dem Kern bootet und Perl zur Laufzeit alles gebrauchte nachladen kann. Perl rulez!
+Im Moment startet er noch in 2,3 sec auf meinem 800 Duron und XP.
+
+PCE ist NICHT KOMPLIZIERT. Er wird installiert wie jedes andere Programm und soll einfacher benutzbar
+sein als andere Editoren. Er kann per Dialog oder direkt per xml/pm config-text-datei configuriert
+werden, und ohne Neuinstallation überall auf rechner der gleichen Platform hinkopiert werden.
+
+PCE ist PORTIERBAR zwischen Linux, Windows, später auch mac, weil der perl-quellcode identisch bleibt.
+Nur die für die Platform komilierten Packete müssen ausgetauscht werden. Das könnte man auch mit
+installieren und kopieren von Perl und WxPerl und einigem mehr selbst machen weil die Komponenten in
+einer einfachen Dateistruktur abgelegt sind.
+
+PCE ist LEICHT ERWEITERBAR. Obwohl Plugins in allen Sprachen möglich sein werden (für die es wollen),
+tun es ein paar zeilen perl auch. dafür muss man nicht wirklich Perl können javascipt niveau reicht.
+PCE versorgt einen mit allen Infos die man dafür braucht
+
+Alles bis jetzt ist ja nicht schlecht, aber nichts besonderes. der wirkliche Vorteil vom PCE kommt im
+folgenden Tennismatch.
+---------------
+ Advantage PCE
+---------------
+Mit PCE geht es mir um das ultimative Editierspielzeug. Und ich weiss das ich es nie allein oder mit
+einem kleinen Team schaffen werde dieses Spielzeug bis zur Perfektion zu bauen. Deswegen wird PCE
+Opensorce unter der OSL-Lizens(www.opensource.org) veröffentlicht. So kann ich Opensource Software(OSS)
+wie z.B.Perl, wxPerl, Scintilla, CVS, Gecko und mehr nutzen und brauch nur den Rahmen zu entwerfen und
+hinzufügen was noch fehlt. Unterste Schicht bildet Perl darauf wxPerl und darauf liegt der eigentliche
+PCE in dessen Modulen noch mehr externe Programme oder Bibliotheken eingebunden sind. So kann ich mir
+das Beste was andere machen rauspicken. Fehler und Mehrfachentwicklungen werden vermieden und wir
+kommen so auch schnell aus dem Knick um etwas Nützliches zu schaffen: Einen Editor der allen erlaubt
+ihre selbsgemachten Verbesserungen auszutauschen. Das geht weil dank Perl und wxPerl der eigentliche
+Quellcode unter Linux und Windows(Mac später) identisch ist. Und dank Modularität kann auch jeder
+Nutzer nach Herzenslust Module austauschen, weglassen oder verbessern. Gerade dadurch das alle aus dem
+gleichen Baukasten schöpfen kann noch ein Webdesigner vom Scriptkiddie profitieren und ein
+Systemprogrammierer lernt Funktionen zu schätzen die sich Latex-Setzer ausgedacht hat.
+Aber eine offene Architektur hat noch mehr Vorteile:
+----------------------------
+ das unperfekte ist perfekt
+----------------------------
+Warum wird soviel Software geschrieben? - weil es spass macht etwas zu erschaffen. Aber auch weil
+Menschen unterschiedlich denken und fühlen. Das meiste an Software ist leider viel zu unbeweglich.
+Wenn jeder alles leicht anpassen könnte gebe es weniger Neuentwicklungen und man hätte mehr
+Potential das man zusammenführen kann um etwas grösseres oder besseres zu schaffen. Am besten nutzt
+man dabei die Erfahrungen seiner Vorgänger. Informatiker sagen dazu: auf den Lebenszyklus von
+Sofware vertrauen. Das bedeutet man macht eine Sache so gut es geht (gut genug ist eine masseinheit
+für einen JAPH) um die Aufgaben zu lösen die man grad hat oder die auf kurz kommen werden. Dadurch
+kann kann man zügiger einen Stand abschliessen, um über den Bullshit den man verzapft zu reflektieren
+und es beim nächsten mal besser zu machen wenn man wieder bei 0 anfängt (rebuild from scratch).
+So schafft man sauberen code und auch ein programm zum wohlfühlen das die meisten praxisnahen
+Probleme lösen kann. Wenn man von Anfang an so plant, zeigt man Weisheit und Kenntnis von den
+Grundregeln des Lebens. Larry Wall(Perl - Gründer) macht das auch und ist deswegen ein guter Mensch.
+------------------------
+ Bauklötze prägten mich
+------------------------
+Was einen guten Menschen auch ausmacht, ist Vertrauen in die Eigeninitiative und den guten Willen
+sich zu einigen. Auch deswegen ist der PCE ein Baukasten. Wenn die Module durch einfache und saubere
+Schnittstellen getrennt sind können verschiedene Leuten an verschiedenen Orten sie unabhängig schreiben.
+Diese Module geben dem PCE immer eine Gruppe an Funktionen die nach Bedarf, während PCE läuft, rein und
+raus geladen werden können. Diese kleineren Codebatzen kann man besser überblicken und was sehr schön ist:
+sie haben kleinere Lebenszyklen und reifen deswegen schneller. Und sie gliedern sich ein wie ein normaler
+Programmteil der alles überall aufrufen kann ohne das ich was dafür tun muss. Das kommt durch die als
+veraltet oder unseriös verlachte Offenheit der Perl-sprache. Viele moderen Sprachendesigner  glauben
+wenn man alles kontrollieren kann wird alles besser. Als wenn Gesetze jemals für Gerechtigkeit sorgen
+können. Komplexe Strukturen sind zuweilen das elegante Mittel. Wann man es benutzt, sollte aber nich
+vorgeschrieben sein. Freiheit und Austausch ist wichtiger. Und Perl kann nun mal OOP und SP parallel.
+Warum wählte ich noch ausgerechnet Perl für PCE?
+-------------
+ Perl rulez!
+-------------
+Perl steht für praktisches und cleveres denken das bis zu einer Spiritualität reichen kann. Letztlich
+plane ich hier aber einen Texteditor. Und Perl ist berühmt und berüchtigt für seine Fähigkeit
+Text zu bearbeiten. Perl ist sogar die schnellste Sprache darin, was echt überrascht da Perl sonst
+nicht das schnellste ist. Grade weil Compiler-Sprachen viel schneller sind meinen viele Programmierer
+das Scriptsprachen wie Perl für Applikationen(grosse Programme) nicht gut sind. Scriptsprachen haben
+haben aber grad für grosse Programme den Vorteil das sie viel kürzer sind. 10mal kürzer ist aus
+erfahrung normal. Das kommt, weil man bei Scriptsprachen mehr mit weniger sagen kann. Das gefällt mir.
+Die Entscheidung war gefallen. Ausserdem sind heutige Rechner schnell genug. Wozu eigentlich? Damit es
+einem die Arbeit erleichtert denk ich. Also bleibts bei Perl oder einer anderen grossen Scriptsprachen.
+Von denen es in echt nur 3 gibt. Und alles in allem ist Perl die beste Wahl. Allen Anhängern einer
+Kampfkunst kann ich das auch unter 4 Augen genauer erklären. Letztlich glaub ich ist
+Perl die ausgereifteste Computersprache überhaupt und wird es mit Perl 6 noch eine Weile bleiben.

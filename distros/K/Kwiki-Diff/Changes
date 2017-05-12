@@ -1,0 +1,22 @@
+---
+version: 0.03
+date:    Sun Nov 13 21:40:38 EST 2005
+changes:
+    - improving kwalitee
+
+---
+version: 0.02
+date:    Sun Jan 30 09:36:22 EST 2005
+changes:
+    - updated to work with latest Kwiki
+    - page_id -> page_name i think
+    - module returns true
+    - minor code tweak with $hub->archive
+    - documentation improvement
+    - ran the code through perltidy
+
+---
+version: 0.01
+date:    Wed Aug 25 12:00:39 EDT 2004
+changes:
+    - initial release

@@ -1,0 +1,15 @@
+---
+version: 0.03
+date: Sun Mar 20 00:22:41 PST 2005
+changes:
+- ingy hub cleanups
+- key as field with init
+- testing with Kwiki::Test
+---
+version: 0.02
+date: Wed Jan 19 15:32:53 PST 2005
+changes:
+- Improved error handling
+- Move methods out of wafl class to make them more accessible
+- API key from config
+- Correct a missing div in template

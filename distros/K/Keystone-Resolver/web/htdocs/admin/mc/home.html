@@ -1,0 +1,195 @@
+%# $Id: home.html,v 1.4 2007-09-13 09:58:56 mike Exp $
+  <p>
+   <a href="/mod_perl/form2.html">[Simple form]</a>
+  </p>
+  <h2>A brief guide to the resolver objects</h2>
+  <p>
+   <b>Genres</b>
+   are the kinds of things that you might find a reference for in
+   a resource discovery service such as an abstracts-and-indexing service
+   or a metasearch site.  The most common and complex case is journal
+   articles, but books are also important.  The complete list (from the
+   widely-implemented v0.1 of the OpenURL standard) is:
+   <blockquote>
+	journal, book, conference, article, preprint, proceeding,
+	bookitem
+   </blockquote>
+   And the list in v1.0 (Part 2, page 39) is:
+   <blockquote>
+	journal, issue, article, conference, proceeding, preprint,
+	unknown
+   </blockquote>
+   It may appear that v1.0 of the standard has dropped support for
+   representing books, but this is not so: in OpenURL 1.0, books are
+   represented by a completely different metadata format (refered to here
+   as an mformat).  The standard's specification of the San Antonio
+   Profile (Part 2, page 77) lists five KEV metadata formats:
+   <blockquote>
+	book, dissertation, journal, patent, sch_svc
+   </blockquote>
+   of which only journal is described in the standard (Part 2, page 35).
+   Each mformat has a default genre, which is assumed for entities that
+   do not explicitly specify one; multiple mformats may share the same
+   default genre.
+  </p>
+  <p>
+   (The only use of the mformat table is to map a metadata-format URI onto a
+   default genre in the case of v1.0 OpenURLs that specify the former but
+   not the latter.)
+  </p>
+  <p>
+   <b>Service types</b>
+   are the kinds of things that an OpenURL might resolve
+   to.  The most common and important case is the full text of the
+   article (typically but not always as a PDF), as provided by a content
+   aggregator.  Other important cases include abstracts, web-searches,
+   on-line book-stores, local library catalogue's holdings, ILL requests
+   and citations in some specific format.
+  </p>
+  <p>
+   There is a complex many-to-many relationship between genres and
+   service types.  For example, the genre ``book'' can be resolved by an
+   online-bookstore or web-search service, but not by content aggregators
+   as they deal in serials.  Conversely, the genre ``article'' can be
+   resolved by an aggregator or a web-search service, but not by an
+   online book-store.
+  </p>
+  <p>
+   Service Providers, or just
+   <b>Providers</b>
+   for short, are organisations that
+   provide services that a link might resolve to.  For example, Elsevier
+   and Gale are both providers.  Each provider provides one or more
+   services.
+  </p>
+  <p>
+   <b>Services</b>
+   are specific implementations of a given service type, and
+   each is provided by a particular provider.  For example, Elsevier
+   provides a service of type ``aggregator'', and Google and Alltheweb are
+   both services of type ``web search''.  Each service has exactly one
+   service type and one provider; but there may be any number of services
+   of each type, and any number of services may be provided by a single
+   provider.  Services may be disabled.
+  </p>
+  <p>
+   <b>Serials</b>
+   (including journals, proceedings, etc.) are places where
+   individual articles, papers, etc. are published.  A service may
+   provide access to many serials, and many services may provide access
+   to a serial, so this is a many-to-many relationship.
+  </p>
+  <p>
+   An
+   <b>identity</b>
+   is anyone or anything that might be trying to resolve an
+   OpenURL: an individual, a group, a department, an organisation, a
+   consortium or anything in between.  In all cases, the identity
+   consists of a name, a level (person, group, etc.) and a parent pointer
+   indicating the containing identity if any: for example, Index Data is
+   the parent of Mike Taylor, and ILCSO is the parent of Champaign
+   Library; but ILCSO itself has no parent.
+  </p>
+  <p>
+   <b>Credentials</b>
+   are sets of context=value pairs, such as the set
+   user=mike, password=fruit.  Each such credential set is associated
+   with a particular identity and particular service (typically but not
+   necessarily an aggregator service).  A given set of credentials is
+   what a particular identity needs to use in order to access a
+   particular service.  For example, Index Data might need to use
+   user=index pass=apple to access Elsevier, but user=id pass=pear to
+   access Science Direct.
+  </p>
+  <p>
+   Some OpenURLs contain non-standard opaque identifiers such as local
+   catalogue numbers.  According to the standard, OpenURLs that do this
+   must also include an indication of the vocabulary from which the
+   identifier is drawn, e.g ``this is a Library of Croyden call number''.
+   Such an identifier is called a
+   <b>SID</b>.
+  </p>
+  <p>
+   A
+   <b>Source</b>
+   is a site that can generate OpenURLs.  Several sites may use
+   the same non-standard identifier, so there is a one-to-many
+   relationship between SIDs and sources.
+  </p>
+  <p>
+   Configuration information is held as a set of name=value pairs called
+   <b>Config</b>
+   objects, which can be thought of as broadly analogous to
+   environment variables.
+  </p>
+  <p>
+   And, finally,
+   <b>Domains</b>
+   associate specific Internet domains with a
+   status drawn from a small set of allowable values, indicating what
+   approach we should take to fetching ContextObjects, Descriptors and
+   Identifier results from them.  The C<status> field may contains the
+   values:
+   <ul>
+    <li>
+	0 (always) -- fetch data from this domain when an OpenURL says
+		to do so, and treat failure as fatal.
+    </li>
+    <li>
+	1 (never) -- never try to fetch data from this domain, but
+		continue with the resolution process.
+    </li>
+    <li>
+	2 (ignore) -- try to fetch data from this domain when
+		requested, but ignore failure and continue resolving.
+    </li>
+   </ul>
+  </p>
+  <p>
+  </p>
+
+  <h2>Examples</h2>
+  <p>
+   Example objects of various types:
+  </p>
+  <p>
+   GENRE: book, journal article, online document
+  </p>
+  <p>
+   SERVICE TYPE: full text, abstract, web search, on-line book store, citation
+  </p>
+  <p>
+   PROVIDER: Elsevier, Gale, EBSCO
+  </p>
+  <p>
+   SERVICE:
+   <ul>
+	<li>Full Text: Elsevier, Gale, EBSCO</li>
+	<li>Abstract: Elsevier, Gale, EBSCO, GAIA</li>
+	<li>Web Search: Google, Alltheweb, Inktomi</li>
+	<li>Book Store: Amazon, Barnes &amp; Noble</li>
+	<li>Citation: JVP format, BMJ format</li>
+   </ul>
+  </p>
+  <p>
+   SERIAL: JVP, Acta Palaeontologica Polonica, BMJ, Paleobios, Ariadne
+  </p>
+  <p>
+   IDENTITY: Mike Taylor, Index Data, Champaign Library, ICLSO
+  </p>
+  <p>
+   CREDENTIALS: user=mike pass=chickens, user=index pass=kebab
+  </p>
+  <p>
+   SID: Ovid:Medline, ERL:BX4, EBSCO:MFA
+  </p>
+  <p>
+   SOURCE: Library of Texas, LC Voyager
+  </p>
+  <p>
+   CONFIG: logfile=/tmp/kr.log, verbosity=2
+  </p>
+  <p>
+   DOMAIN: ldap.caltech.edu with status=2 (this domain is used in req_ref
+	for some sample v1.0 OpenURLs, but doesn't exist)
+  </p>

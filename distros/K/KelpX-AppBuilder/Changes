@@ -1,0 +1,15 @@
+Revision history for KelpX-AppBuilder
+
+0.005   23/04/2016
+        - Added a way to use templates from child apps and updated the pod to reflect that change.
+        - Removed documentation about config as it's not quite ready
+
+0.004   22/04/2016
+        - Major overhaul. Figured out I was actually doing things backwards. README.md has been fixed up with new and easier instructions. Reusing apps is now far less complicated and problematic. kelpx-appbuilder script is no longer needed.
+
+0.002   29/07/2014
+        - Off to a great start. I screwed up Pod formatting
+
+0.001   28/07/2014
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,30 @@
+type:      seq                                # new rule
+sequence:
+  -
+    type:      map                            # new rule
+    mapping:
+      name:
+        type:       str                       # new rule
+        required:   yes
+      email:
+        type:       str                       # new rule
+        required:   yes
+        pattern:    /@/
+      password:
+        type:       text                      # new rule
+        length:     { max: 16, min: 8 }
+      age:
+        type:       int                       # new rule
+        range:      { max: 30, min: 18 }
+        # or assert: 18 <= val && val <= 30
+      blood:
+        type:       str                       # new rule
+        enum:
+          - A
+          - B
+          - O
+          - AB
+      birth:
+        type:       date                      # new rule
+      memo:
+        type:       any                       # new rule

@@ -1,0 +1,12 @@
+name: Kwiki-Orphans
+version: 0.11
+abstract: Kwiki Orphan Finder
+author: Chris Dent <cdent@burningchrome.com>
+license: perl
+distribution_type: module
+requires:
+  Kwiki::Backlinks: 0
+no_index:
+  directory:
+    - inc
+generated_by: Module::Install version 0.36

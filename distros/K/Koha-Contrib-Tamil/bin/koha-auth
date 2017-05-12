@@ -1,0 +1,167 @@
+#!/usr/bin/perl
+
+package main;
+# PODNAME: koha-auth
+# ABSTRACT: Generate authorities from bibliographic records
+$main::VERSION = '0.049';
+use 5.010;
+use utf8;
+use strict;
+use warnings;
+
+use diagnostics;
+use Pod::Usage;
+use Getopt::Long;
+
+use Koha::Contrib::Tamil::Authority::FromBiblioTask;
+use Koha::Contrib::Tamil::Authority::LoadFileTask;
+use Koha::Contrib::Tamil::Authority::LinkBiblioTask;
+
+
+binmode( STDOUT, ":utf8" );
+binmode( STDERR, ":utf8" );
+
+my $verbose     = 0;
+my $help        = 0;
+my $truncate    = 0;
+my $doit        = 0;
+GetOptions( 
+    'verbose'   => \$verbose,
+    'help'      => \$help,
+    'truncate'  => \$truncate,
+    'doit'      => \$doit,
+);
+
+usage() if $help;          
+
+my $command = @ARGV ? shift : '';
+if ( $command eq 'create_from_biblio' ) {
+    usage() if $#ARGV != 1;
+    my $conf_file = shift;
+    my $authorities_file = shift;
+    my $task = Koha::Contrib::Tamil::Authority::FromBiblioTask->new(
+        conf_file => $conf_file,
+        output    => $authorities_file,
+        verbose   => 1,
+    );
+    $task->run();
+}
+elsif ( $command eq 'load_from_file' ) {
+    usage() if $#ARGV != 1;
+    my $conf_file = shift;
+    my $authorities_file = shift;
+    my $task = Koha::Contrib::Tamil::Authority::LoadFileTask->new(
+        conf_file => $conf_file,
+        file      => $authorities_file,
+        truncate  => $truncate, 
+        doit      => $doit,
+        verbose   => 1,
+    );
+    $task->run();
+}
+elsif ( $command eq 'link_biblio_to' ) {
+    usage() if $#ARGV != 0;
+    my $conf_file = shift;
+    my $task = Koha::Contrib::Tamil::Authority::LinkBiblioTask->new(
+        conf_file => $conf_file,
+        verbose   => 1,
+        doit      => $doit,
+    );
+    $task->run();
+}
+else {
+    usage();
+}
+
+
+sub usage {
+    pod2usage( -verbose => 2 );
+} 
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+koha-auth - Generate authorities from bibliographic records
+
+=head1 VERSION
+
+version 0.049
+
+=head1 DESCRIPTION
+
+With this script, it's possible to extract authorities from Koha bibliographic
+records, load them into the authorities table, and link authorities to biblios.
+
+=head1 USAGE
+
+=over
+
+=item koha-auth create_from_biblio F<auth.conf> F<authorities.txt>
+
+Creates a text file F<authorities.txt> containing authorities extracted
+from Koha biblio records using F<auth.conf> authorities configuration.
+
+=item koha-auth [--truncate] [--doit] load_from_file F<auth.conf> 
+F<authorities.txt>
+
+Load authorities from F<authorities.txt> into Koha using F<auth.conf>
+authorities configuration. With --truncate, auth_head Koha table is
+truncated before loading new authorities. After this processing,
+authorities have to be indexed with Zebra in order to be searchable. Without
+--doit, the file processing is done but authorities are not effectively loaded
+into Koha DB.
+
+=item koha-auth link_biblio_to [--doit] F<auth.conf>
+
+Link biblio records fields with authorities via $9 subfield.  Authorities must
+have been indexed with Zebra.  After this processing, it is necessary to index
+bibliographic records with Zebra. Without --doit, the processing is done, but
+biblio records are not modified. This way you can check that authority heading
+matching works properly.
+
+=back
+
+=head1 CONFIGURATION
+
+Authorities configuration file looks like that:
+
+ --- 
+ authcode: NP
+ authletters: abcd
+ authtag: 200
+ bibliotags: 
+   - 700
+   - 701
+   - 702
+ --- 
+ authcode: CO
+ authletters: abcd
+ authtag: 210
+ bibliotags: 
+   - 710
+   - 711
+   - 712
+ --- 
+
+Two sample configuration files are provided with this distribution and can be
+found in the dist local directory: F<auth-marc21.conf> and
+F<auth-unimarc.conf>.
+
+=head1 AUTHOR
+
+Frédéric Demians <f.demians@tamil.fr>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2016 by Fréderic Démians.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

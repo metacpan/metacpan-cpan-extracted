@@ -1,0 +1,143 @@
+
+       --------------------
+      | Kephra Version 0.5 |
+       --------------------
+
+ 1. Vorbemerkungen
+ 2. Zusammenfassung
+ 2. Neuigkeiten
+ 4. Probleme
+ 5. Hinweise
+ 6. Pläne
+
+
+ 1.  1. Vorbemerkungen:
+
+ - Willkommen bei Kephra. Dieser Editor wird entwickelt um deine Vorstellungen
+   zu Verwirklichen. Für Anregung, Dank und Änderungswünsche besuch unsere Seite.
+   Die Verknüpfungen dazu und ein vollständiges Willkommen findest du im Hilfe-Menü.
+
+ - Dies ist eine sogenannte stabile Version für den täglichen Gebrauch. Sie
+   enthält nur gut getestete Funktionen und Fehler werden schnellstmöglich
+   mit dem nächsten Patchlevel behoben, welches keine neue Funktionen einführt.
+   Wenn du aber neuere Funktionen gleich verwenden willst oder beim Testen dieser
+   mithelfen möchtest, verwende Bitte Testversionen mit dreistellige Nummern.
+   Tägliche Entwicklerversionen mit 4 Stellen sind nur für ganz mutige.
+
+
+ 2. Zusammenfassung der Neuheiten
+    * lesen und schreiben von Unicode-Dateien
+    * neue Maussteuerung
+    * Code falten
+    + Marker
+    + bewegliche Reiter
+    + 8 neue Werkzeuge
+    + 3 neue Hauptfenstermodi
+    + definierbare Statuszeile
+    + Verbindungen zu Netzhilfen im Menü
+    * Installation über CPAN für Linux, Win und Mac
+    + vieles mehr
+
+
+ 3. NEU in dieser Version (ausführlich)
+
+ - Unicode
+    + UTF-8 Dateien werden beim öffnen erkannt und auch als solche gespeichert.
+    + Das vierte Feld in der Statuszeile zeigt an ob utf oder ascii aktuell sind.
+    + Kodierung leerer Dateien kann im Menü Dokument > Zeichensatz geändert werden,
+    was sonst (noch) zu Problemen führen kann.
+ 
+ - Neue Maussteuerung
+    Folgende Einstellungen sind alle änderbar und auf einmal auch abschaltbar.
+    + Der Linksklick auf die Markierung kopiert sie.
+    + Der Mittelklick fügt die Markierung ein.
+    + Der Mittelklick auf die Markierung läßt das nächste Vorkommen suchen.
+    + Ansonsten lässt der Mittelklick zur letzten Bearbeitung springen.
+    + Der kombinierte Links- dann Mittelklick fügt ein.
+    + Der kombinierte Links- dann Rechtsklick schneidet aus.
+
+ - Code falten
+    + Zwischen Zeilennummern und Textfeld gibt es einen neuen Faltrand der vor
+    allem Stellen hervorhebt, an denen Text gefaltet oder entfaltet werden kann.
+    + Linksklick oder <Strg>+<+> faltet oder entfaltet nur den aktuellen Knoten.
+    + Mittelklick oder <Strg>+<Shift>+<+> faltet oder entwaltet den aktuellen 
+    Knoten und alle seine Kinder.
+    + Rechtsklick oder <Alt>+<+> faltet oder entfaltet alle Knoten auf einer Ebene.
+    Alle Knoten ohne Eltern liegen auf der Ebene 1, deren Kinder auf Ebene 2 u.s.w.
+    + Links- und Rechtsklick oder <Alt>+<Shift>+<+> faltet oder entfaltet alle Knoten.
+    + Wird eine Datei aus dem Menü der kürzlich geschlossenen Dateien wieder
+    geöffnet, sind auch alle Faltungen wieder hergestellt.
+ 
+ - Marker
+    Grüne Pfleie links neben den Zeilennummern markieren wichtige Textstellen.
+    + Sie können einfach mit einem Linksklick auf den Rand oder <Strg>+<F2>
+    gesetzt oder gelöscht werden.
+    + <F2> oder <Shift>+<F2> ermöglicht Sprünge zum nächsten oder vorigen Marker.
+    + Nimmt man <Alt>+ hinzu, werden Marker in allen Dokumenten berücksichtigt.
+    + Dies entspricht den grünen Pfleien in der Suchzeile.
+    + Ein Untermenü mit allen Markerfunktionen ist im Suchmenü.
+    + Auch Lesezeichen können jetzt mit einem (mittlerem) Mausklick in Markerrand
+    gesetzt oder gelöscht werden.
+ 
+ - Reichere Oberfläche
+    + Das Hauptfenster kennt 3 neue Modi, alle mit <Esc> beendbar.
+      + <F11>-Vollbild, Fenster nimmt ganzen Bildschirm ein und hat keinen Rand mehr.
+      + <Shift>+<F11>-Max Editfläche, alle leisten werden geschlossen oder geöffnet.
+      + <Alt>+<F11>-Durchsichtig, Fenster wird halb transparent.
+      + <Strg>+<F11> sorgt jetzt dafür das das Fenster nicht verdeckt werden darf. 
+    + Reiterleiste (<Strg>+<Alt>+<T>) und Menüleiste (<Strg>+<Alt>+<M>) können
+    jetzt einzeln durch Tasten an- oder abgestellt werden.
+    + Die Reiter sind jetzt auch mit der Maus bewegbar.
+    + Das Symbol am rechten Rand der Reiterleiste, öffnet ein Menü für die Auswahl
+    des aktuellen Dokuments.
+    + Im linken Rand läßt sich ein neues Kontextmenü öffnen.
+    + Die Statuszeile ist jetzt, ähnlich wie andere Leisten, durch eine YAML-Datei
+    definierbar, die über das Menü Einstellungen > Benutzerschnittstellen erreichbar
+    ist.
+    + Wurde eine geöffnete Datei anderweitig gelöscht, so weist ein neuer Dialog
+    jetzt darauf hin und bietet mehrere Möglichkeiten damit umzugehen.
+    + Mehrer Symbole wurden von Jens Neuwerk neu gezeichnet.
+
+ - Mehr Werkzeuge
+    + <Shift>+<F4> kopiert die Markierung in den Notizablage.
+    + Ein Farbdialog kann markierte Farbwerte sichtbar machen und ausgewählte
+    Farben wieder in hexadezimale Zahlen umwandeln.
+    + Inhalte der Spezialvariablen können im Ausgabefenster @INC %ENV erscheinen.
+    + Markierte Zeichen können in dezimal oder hexadezimal ausgegeben werden.
+    + Befindet sich der Caret innerhalb einer in Anführungszeichen gesetzten
+    Zeichenkette so kann dies direkt mit <Alt>+<Shift>+<C> kopiert werden.
+    + <Strg>+<Shift>+<V> fügt die in dem Block zuletzt benutzte Perlvariable ein.
+    + Über das Werkzeugmenü kann auch aktuelle Zeit und Datum eingefügt werden.
+    + Umlaute können zu HTML-Kodierung und zurück konvertiert werden.
+
+ - Mehr Hilfe
+    + Alle Dokumentation wurde überarbeitet und auf den neusten Stand gebracht.
+    + Im Hilfemenü ist ein neuer Eintrag um die Netzversion der Dokumentation im
+    Browser zu öffnen.
+    + Ein weiterer öffnet eine Hilfeforum für Perlprogrammierer.
+    + Auch bei Wünschen oder Fehlerberichten kann die passende Seite direkt vom
+    Menü aus geöffnet werden.
+ 
+ - Installation jetzt auch über CPAN-Shell für Linux, Win und Mac
+ 
+
+ 4. bekannte Fehler und Probleme
+
+    Derzeit bitte nicht die Kodierung der Datei wechseln.
+
+
+ 5. Hinweise
+
+    + Lest die "Nützliche Funktionen - Tour". Es gibt einige leicht übersehbare,
+      aber umso mächtigere Funktionen hier zu entdecken.
+
+    + Um die Haupteinstellungsdatei besser zu verstehen hilft es die englischen
+      Kommentare im Modul Kephra::Config::Default::GlobalSettings zu lesen.
+
+
+ 6. Plan für nächste Versionen
+
+    + Plugin API
+    + Baumerweiterung für Codeschnipsel und selbst definierte Werkzeuge
+    + Kommandozeilenerweiterung für eine Benutzung wie im Vi
+    + Konfiguratationsdialog

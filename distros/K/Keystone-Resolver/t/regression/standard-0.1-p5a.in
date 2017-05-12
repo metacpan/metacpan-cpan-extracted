@@ -1,0 +1,7 @@
+# $Id: standard-0.1-p5a.in,v 1.1 2007-01-26 12:25:45 mike Exp $
+
+# This example is taken from the OpenURL 0.1 standard.
+# It occurs at the top of page 5.
+
+id=oai%3AarXiv%3Aphysics%2F0003005
+

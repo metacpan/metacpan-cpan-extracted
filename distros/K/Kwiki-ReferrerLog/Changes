@@ -1,0 +1,13 @@
+---
+version: 0.05
+date: Wed Sep 22 11:01:26 CEST 2004 @417 /Internet Time/
+changes:
+- removed dependency on site_uri config paramter
+- made normal plugin that does it's processing after content is served
+  instead of a display-action replacement
+- adapted content template a little
+- added new config parameters:
+  - truncate_referrers
+  - exclude_subdomains
+  - exclude_referrers
+

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<results>
+  <data entity="rft">
+    <metadata key="genre">article</metadata>
+  </data>
+  <result type="error"
+	>invalid DOI (123/345678)</result>
+  <result type="error"
+	>Resolution of PubMed IDs is unsupported</result>
+  <result type="error"
+	>no journal information provided</result>
+  <result type="citeref" priority="15" tag=""
+	service="Endnote citation"
+	>http://example.com/resolve?rft_id=info%3Adoi%2F123%2F345678&amp;rft_id=info%3Apmid%2F202123&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Ajournal&amp;rft.genre=article&amp;svc_dat=indexdata:citation:Endnote</result>
+  <result type="citation" priority="20" tag="APP"
+	service="APP-style citation" mimetype="text/html"
+	>[Unspecified author].  [unspecified date].  [unspecified article title].  &lt;i&gt;[unspecified journal]&lt;/i&gt;, [unspecified volume].</result>
+  <result type="citation" priority="20" tag="author"
+	service="Author and year" mimetype="text/html"
+	>[Unspecified author].  [unspecified date].</result>
+</results>

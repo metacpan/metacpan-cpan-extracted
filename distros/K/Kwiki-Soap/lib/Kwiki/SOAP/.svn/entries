@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="43"
+   name=""
+   committed-date="2005-03-20T11:31:38.767746Z"
+   url="http://svn.kwiki.org/cdent/Kwiki-Soap/lib/Kwiki/SOAP"
+   last-author="cdent"
+   kind="dir"
+   uuid="afe85c52-cbef-0310-8b32-ab9ca7265083"
+   revision="71"/>
+<entry
+   committed-rev="43"
+   name="Fortune.pm"
+   text-time="2005-03-20T11:28:39.000000Z"
+   committed-date="2005-03-20T11:31:38.767746Z"
+   checksum="4375e0c41c35f37d447aaecc4f0bb1ff"
+   last-author="cdent"
+   kind="file"
+   prop-time="2005-03-20T08:00:42.000000Z"/>
+</wc-entries>

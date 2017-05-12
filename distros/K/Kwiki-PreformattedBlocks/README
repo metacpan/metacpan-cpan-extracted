@@ -1,0 +1,27 @@
+NAME
+    Kwiki::PreformattedBlocks - Kwiki Preformatted Blocks Plugin
+
+SYNOPSIS
+        .pre
+        sub to_html {
+            join '',
+              qq{<pre class="formatter_pre">\n},
+              $self->block_text,
+              "</pre>\n";
+        }
+        .pre
+
+DESCRIPTION
+    Mark blocks of preformatted text without indenting.
+
+AUTHOR
+    Brian Ingerson <ingy@cpan.org>
+
+COPYRIGHT
+    Copyright (c) 2004. Brian Ingerson. All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See http://www.perl.com/perl/misc/Artistic.html
+

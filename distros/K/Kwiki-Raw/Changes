@@ -1,0 +1,8 @@
+---
+version: 0.02
+date: Tue Jun 28 00:31:51 PDT 2005
+changes: - Add show_for so raw only shows on display
+---
+version: 0.01
+date: Tue Mar 29 22:32:52 PST 2005
+changes: - Initial release

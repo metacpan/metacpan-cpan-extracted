@@ -1,0 +1,19 @@
+---
+version: 0.04
+date: Tue Jun 14 22:38:47 PDT 2005
+changes:
+- Handle utf-8 a bit better
+---
+version: 0.03
+date: Mon Mar  7 12:46:24 PST 2005
+changes:
+- Get more in line with yahoo service agreement
+- Adjust style
+---
+version: 0.02
+date: Thu Mar  3 11:23:37 PST 2005
+changes: - Bug fix in eval handling
+---
+version: 0.01
+date: Tue Mar  1 22:10:46 PST 2005
+changes: - Initial release

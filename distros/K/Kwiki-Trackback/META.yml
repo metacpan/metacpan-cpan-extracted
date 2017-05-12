@@ -1,0 +1,14 @@
+name: Kwiki-Trackback
+version: 0.01
+abstract: Trackback server and tracker for Kwiki pages
+author: Chris Dent <cdent@burningchrome.com>
+license: perl
+distribution_type: module
+requires:
+  Kwiki: 0.37
+  Spoon: 0.22
+  Net::Trackback: 0
+no_index:
+  directory:
+    - inc
+generated_by: Module::Install version 0.36

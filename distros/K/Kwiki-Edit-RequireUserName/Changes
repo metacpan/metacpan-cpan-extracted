@@ -1,0 +1,12 @@
+Revision history for Kwiki-Edit-RequireUserName
+
+0.02    2005/01/20
+        No new features.
+        Compatible with latest Kwiki 0.37 (changed how it hooks into Kwiki).
+        There is a possibility that a bug in 0.01 existed where any edit
+        always edited the top-level page.  This went undetected because I only
+        tested with the top-level page.  This is now fixed.
+
+0.01    2004/11/23
+        First version, released on an unsuspecting world.
+

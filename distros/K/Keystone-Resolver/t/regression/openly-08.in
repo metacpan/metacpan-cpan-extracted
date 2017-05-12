@@ -1,0 +1,8 @@
+# $Id: openly-08.in,v 1.1 2007-01-26 12:25:45 mike Exp $
+
+# Lifted from Openly Informatics' OpenURL 1.0 test suite
+# Metadata Format Tests
+# By-Reference Metadata in In-Line OpenURL
+
+url_ver=Z39.88-2004&rft_ref_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Ajournal&rft_ref=http%3A%2F%2Fwww.openly.com%2F1cate%2Ftest%2Fjotest.kev
+

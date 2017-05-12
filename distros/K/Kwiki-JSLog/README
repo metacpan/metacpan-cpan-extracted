@@ -1,0 +1,18 @@
+Kwiki-JSLog
+
+Provides the JSLog library to help debug javascript code. Ideally this module
+should only be installed for developers. See module documentation on how
+to create your module so it can be use with or without this module installed.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    kwiki -install Kwiki::JSON
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 CorData
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. See http://www.perl.com/perl/misc/Artistic.html

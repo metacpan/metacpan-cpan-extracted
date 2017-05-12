@@ -1,0 +1,99 @@
+
+# Auto-generated file -- DO NOT EDIT!!!!!
+
+=head1 NAME
+
+KinoSearch::Index::BackgroundMerger - Consolidate index segments in the background.
+
+=head1 DEPRECATED
+
+The KinoSearch code base has been assimilated by the Apache L<Lucy> project.
+The "KinoSearch" namespace has been deprecated, but development continues
+under our new name at our new home: L<http://lucy.apache.org/>
+
+=head1 SYNOPSIS
+
+    my $bg_merger = KinoSearch::Index::BackgroundMerger->new(
+        index  => '/path/to/index',
+    );
+    $bg_merger->commit;
+
+
+
+=head1 DESCRIPTION
+
+Adding documents to an index is usually fast, but every once in a while the
+index must be compacted and an update takes substantially longer to
+complete.  See L<KinoSearch::Docs::Cookbook::FastUpdates> for how to use
+this class to control worst-case index update performance.
+
+As with L<Indexer|KinoSearch::Index::Indexer>, see
+L<KinoSearch::Docs::FileLocking> if your index is on a shared volume.
+
+=head1 CONSTRUCTORS
+
+=head2 new( I<[labeled params]> )
+
+    my $bg_merger = KinoSearch::Index::BackgroundMerger->new(
+        index   => '/path/to/index',    # required
+        manager => $manager             # default: created internally
+    );
+
+Open a new BackgroundMerger.
+
+=over
+
+=item *
+
+B<index> - Either a string filepath or a Folder.
+
+=item *
+
+B<manager> - An IndexManager.  If not supplied, an IndexManager with
+a 10-second write lock timeout will be created.
+
+=back
+
+
+
+
+
+=head1 METHODS
+
+=head2 commit()
+
+Commit any changes made to the index.  Until this is called, none of
+the changes made during an indexing session are permanent.
+
+Calls prepare_commit() implicitly if it has not already been called.
+
+=head2 prepare_commit()
+
+Perform the expensive setup for commit() in advance, so that commit()
+completes quickly.  
+
+Towards the end of prepare_commit(), the BackgroundMerger attempts to
+re-acquire the write lock, which is then held until commit() finishes
+and releases it.
+
+=head2 optimize()
+
+Optimize the index for search-time performance.  This may take a
+while, as it can involve rewriting large amounts of data.
+
+
+
+=head1 INHERITANCE
+
+KinoSearch::Index::BackgroundMerger isa L<KinoSearch::Object::Obj>.
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005-2011 Marvin Humphrey
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
+

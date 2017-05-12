@@ -1,0 +1,9 @@
+
+* Configuration through preferences and wiki configuration, rather
+  than code
+
+* Caching?
+
+* Improved Error handling
+
+* Tests which actually test, rather than skipping because of templates

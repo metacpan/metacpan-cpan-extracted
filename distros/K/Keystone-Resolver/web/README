@@ -1,0 +1,6 @@
+$Id: README,v 1.1 2007-01-26 12:38:27 mike Exp $
+
+This directory contains everything you need to set up Keystone
+Resolver as a running web service.  Configuration for various
+web-servers is in the "conf" directory, and the document root is in
+"htdocs".

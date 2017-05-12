@@ -1,0 +1,7 @@
+# $Id: standard-0.1-p4.in,v 1.1 2007-01-26 12:25:45 mike Exp $
+
+# This example is taken from the OpenURL 0.1 standard.
+# It occurs at the bottom of page 4.
+
+id=doi:123%2F345678&id=pmid:202123
+

@@ -1,0 +1,22 @@
+version: 0.07
+date:    Sun Apr 22 17:23:23 CST 2007
+changes:
+- Improve Kwalitee
+- Regenerate inc/
+----
+version: 0.06
+date:    Mon Nov 14 21:02:40 CST 2005
+changes:
+- Apply the 'cache_display_dependencies' patch from Tobias Oetiker.
+- Improve Kwalitee
+----
+version: 0.05
+date:    Wed Sep 14 14:06:48 CST 2005
+changes:
+- Fix server error due to 0.04
+---
+version: 0.04
+date:    Tue May 31 07:49:56 CST 2005
+changes:
+- Add an ignore list in config
+

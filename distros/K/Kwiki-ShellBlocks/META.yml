@@ -1,0 +1,13 @@
+name: Kwiki-ShellBlocks
+version: 0.02
+abstract: Kwiki Shell Blocks Plugin
+author: Autrijus Tang <autrijus@autrijus.org>
+license: perl
+distribution_type: module
+requires:
+  perl: 5.6.1
+  Kwiki: 0.31
+no_index:
+  directory:
+    - inc
+generated_by: Module::Install version 0.33

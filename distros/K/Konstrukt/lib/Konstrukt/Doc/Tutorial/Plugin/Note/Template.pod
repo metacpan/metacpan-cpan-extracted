@@ -1,0 +1,318 @@
+=head1 NAME
+
+Konstrukt::Doc::Tutorial::Plugin::Note::Template - 2) Using templates for the presentation
+
+=head1 DESCRIPTION
+
+This tutorial will teach you how to use L<templates|Konstrukt::Plugin::template>
+for the output of your plugin. This is the preferred way to handle the
+presentation layer of your application.
+
+Note: This tutorial builds up on the results of L<the previous tutorial|Konstrukt::Doc::Tutorial::Plugin::Note::Actions>.
+
+=head1 CONVENTIONS AND SETTINGS
+
+By L<convention|Konstrukt::Doc::CreatingPlugins/CONVENTIONS> the templates for
+each plugin are stored in a separate directory for each plugin. The path
+to this directory will usually be defined as a L<setting|Konstrukt::Settings>,
+which L<defaults|Konstrukt::Settings/default> to C</templates/plugin_name/>.
+
+So we add the C<init> method, in which we set the default template path for
+this plugin:
+
+	sub init {
+		my ($self) = @_;
+		$Konstrukt::Settings->default("note/template_path" => '/note/blog/');
+		$self->{template_path} = $Konstrukt::Settings->get("note/template_path");
+		return 1;
+	}
+
+Additionally the templates are usually divided into two groups, which will
+be stored in these subdirectories:
+
+=over
+
+=item * layout: Templates to display the data
+
+=item * messages: Templates to display messages like errors (e.g. "permission
+denied") and confirmations (e.g. "entry successfully created") 
+
+=back
+
+=head1 THE TEMPLATES
+
+For our note taking plugin, we can identify these views, for each we will use
+a template:
+
+=over
+
+=item * layout/note_show.template: Show the note.
+
+=item * layout/note_edit.template: Show the form to edit the note.
+
+=item * layout/note_delete.template: Show the confirmation to delete the note.
+
+=item * messages/edit_successful.template: The update was successful.
+
+=item * messages/delete_successful.template: The deletion was successful.
+
+=back
+
+We won't offer a separate message for possible failures here, although you might
+do so for common errors that can occur.
+
+The Konstrukt Framework offers a nifty
+L<autoinstallation feature|Konstrukt::Lib/plugin_file_install_helper> for your
+templates (as well as for database definitions).
+
+So we create an C<install> method for this plugin first, which uses this feature:
+
+	sub install {
+		my ($self) = @_;
+		return $Konstrukt::Lib->plugin_file_install_helper($self->{template_path});
+	}
+
+Then we add a C<__DATA__> token at the end of the module file and after that we
+add the templates, which are separated like described in L<Konstrukt::Lib/plugin_file_install_helper>:
+
+	-- 8< -- textfile: layout/note_show.template -- >8 --
+	
+	<div class="note entry">
+		<h1>Current note</h1>
+		<+$ text $+>(no text)<+$ / $+>
+	</div>
+	
+	-- 8< -- textfile: layout/note_edit.template -- >8 --
+	
+	<div class="note form edit">
+		<form action="" method="post">
+			<input type="hidden" name="note_action" value="edit" />
+			<textarea name="text"><+$ text $+>(no text yet)<+$ / $+></textarea>
+			<input type="submit" value="Save" />
+		</form>
+	</div>
+	
+	-- 8< -- textfile: layout/note_delete.template -- >8 --
+	
+	<div class="note form delete">
+		<form action="" method="post">
+			<input type="hidden" name="note_action" value="delete" />
+			<input type="checkbox" id="delete" name="delete" value="1" />
+			<label for="delete">Really delete the note?</label>
+			<input type="submit" value="Delete" />
+		</form>
+	</div>
+	
+	-- 8< -- textfile: messages/edit_successful.template -- >8 --
+	
+	<div class="note message success">
+		<h1>Note updated!</h1>
+		<p>The note has been updated successfully.</p>
+	</div>
+	
+	-- 8< -- textfile: messages/delete_successful.template -- >8 --
+	
+	<div class="note message success">
+		<h1>Note deleted!</h1>
+		<p>The note has been deleted successfully.</p>
+	</div>
+
+The templates will then be created automatically when the plugin is used and the
+setting C<autoinstall> is set to C<1>. So we enable the autoinstallation in the
+C<konstrukt.settings> file:
+
+	autoinstall 1
+
+=head1 MODIFY THE CODE
+
+Until now, we print HTML markup directly from the code. We will now change the
+code to use the templates, we defined above.
+
+We will use the L<template plugin|Konstrukt::Plugin::template> to put out
+the templates. First we add
+
+	use Konstrukt::Plugin; #import use_plugin
+
+at the top of the module to import the C<use_plugin> function.
+Within the methods we can then get a template plugin object like this:
+
+	my $template = use_plugin 'template';
+
+In general, we will replace each C<print> statements with a commmand, that
+will add a L<template node|Konstrukt::Plugin::template/Perl interface> to the
+result of this plugin request.
+
+For example the C<print> statement of the C<default> action
+
+	print "
+		<form action=\"\" method=\"post\">
+			<input type=\"hidden\" name=\"note_action\" value=\"edit\" />
+			<textarea name=\"text\">$text</textarea>
+			<input type=\"submit\" value=\"Save\" />
+		</form>";
+
+will be replaced by
+
+	$self->add_node(
+		$template->node("$self->{template_path}layout/note_show.template", { text => $text })
+	);
+
+This command will add new L<node|Konstrukt::Parser::Node> to the result. In
+particular it is a template plugin node, which loads the template
+C<layout/note_show.template> and fills the variables of this template with the
+specified values ("fill the C<text> template-variable with the contents of the
+C<$text> perl-variable").
+
+As the procedure is mostly the same for the other methods, it won't be described
+for every single change.
+See L<below|/APPENDIX: THE COMPLETE PLUGIN> for the code with templates instead
+of C<print> statements.
+
+=head1 WHAT'S NEXT?
+
+Saving dynamic content in text files doesn't scale well. It would be better to
+save it in a database.
+
+This will be done in the L<next tutorial|Konstrukt::Doc::Tutorial::Plugin::Note::DBI>.
+
+=head1 APPENDIX: THE COMPLETE PLUGIN
+
+	package Konstrukt::Plugin::note;
+	
+	use strict;
+	use warnings;
+	
+	use base 'Konstrukt::SimplePlugin';
+	
+	use Konstrukt::Plugin; #import use_plugin
+	
+	sub init {
+		my ($self) = @_;
+		$Konstrukt::Settings->default("note/template_path" => '/templates/note/');
+		$self->{template_path} = $Konstrukt::Settings->get("note/template_path");
+		return 1;
+	}
+	
+	sub install {
+		my ($self) = @_;
+		return $Konstrukt::Lib->plugin_file_install_helper($self->{template_path});
+	}
+	
+	#show the note if exists
+	sub default : Action {
+		my ($self, $tag, $content, $params) = @_;
+		
+		my $template = use_plugin 'template';
+		my $text = $Konstrukt::File->read("/note.txt");
+		if (defined $text) {
+			#add a template node to the result, that will display the specified template
+			$self->add_node(
+				$template->node("$self->{template_path}layout/note_show.template", { text => $text })
+			);
+		} else {
+			$self->edit($tag, $content, $params);
+		}
+	}
+	
+	#show a form to edit the note or save the note, if a new one is entered
+	sub edit : Action {
+		my ($self, $tag, $content, $params) = @_;
+		
+		my $template = use_plugin 'template';
+		if (exists $params->{text}) {
+			#overwrite note
+			$Konstrukt::File->write("/note.txt", $params->{text});
+			$self->add_node($template->node("$self->{template_path}messages/edit_successful.template"));
+			$self->default($tag, $content, $params);
+		} else {
+			#display a form to edit the note
+			$self->add_node(
+				$template->node(
+					"$self->{template_path}layout/note_edit.template",
+					{ text => $Konstrukt::File->read("/note.txt") }
+				)
+			);
+		}
+	}
+	
+	#show a confirmation to delete to note
+	#or delete the note if the deletion has been confirmed
+	sub delete : Action {
+		my ($self, $tag, $content, $params) = @_;
+		
+		my $template = use_plugin 'template';
+		if (exists $params->{delete} and $params->{delete}) {
+			#delete note
+			unlink $Konstrukt::File->absolute_path("/note.txt");
+			$self->add_node($template->node("$self->{template_path}messages/delete_successful.template"));
+			$self->default($tag, $content, $params);
+		} else {
+			#display a confirmation form
+			$self->add_node($template->node("$self->{template_path}layout/note_delete.template"));
+		}
+	}
+	
+	1;
+	
+	__DATA__
+	
+	-- 8< -- textfile: layout/note_show.template -- >8 --
+	
+	<div class="note entry">
+		<h1>Current note</h1>
+		<+$ text $+>(no text)<+$ / $+>
+	</div>
+	
+	-- 8< -- textfile: layout/note_edit.template -- >8 --
+	
+	<div class="note form edit">
+		<form action="" method="post">
+			<input type="hidden" name="note_action" value="edit" />
+			<textarea name="text"><+$ text $+>(no text yet)<+$ / $+></textarea>
+			<input type="submit" value="Save" />
+		</form>
+	</div>
+	
+	-- 8< -- textfile: layout/note_delete.template -- >8 --
+	
+	<div class="note form delete">
+		<form action="" method="post">
+			<input type="hidden" name="note_action" value="delete" />
+			<input type="checkbox" id="delete" name="delete" value="1" />
+			<label for="delete">Really delete the note?</label>
+			<input type="submit" value="Delete" />
+		</form>
+	</div>
+	
+	-- 8< -- textfile: messages/edit_successful.template -- >8 --
+	
+	<div class="note message success">
+		<h1>Note updated!</h1>
+		<p>The note has been updated successfully.</p>
+	</div>
+	
+	-- 8< -- textfile: messages/delete_successful.template -- >8 --
+	
+	<div class="note message success">
+		<h1>Note deleted!</h1>
+		<p>The note has been deleted successfully.</p>
+	</div>
+
+=head1 AUTHOR
+
+Copyright 2006 Thomas Wittek (mail at gedankenkonstrukt dot de). All rights reserved. 
+
+This document is free software.
+It is distributed under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+Next: L<Konstrukt::Doc::Tutorial::Plugin::Note::DBI>
+
+Previous: L<Konstrukt::Doc::Tutorial::Plugin::Note::Actions>
+
+Parent: L<Konstrukt::Doc>
+
+See also: L<Konstrukt::SimplePlugin>, L<Konstrukt::Doc::CreatingPlugins>, L<Konstrukt::Plugin::template>
+
+=cut

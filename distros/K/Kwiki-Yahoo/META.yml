@@ -1,0 +1,13 @@
+name: Kwiki-Yahoo
+version: 0.04
+abstract: Access Yahoo API with with WAFL
+author: Chris Dent <cdent@burningchrome.com>
+license: perl
+distribution_type: module
+requires:
+  Kwiki: 0
+  Yahoo::Search: 0
+no_index:
+  directory:
+    - inc
+generated_by: Module::Install version 0.36

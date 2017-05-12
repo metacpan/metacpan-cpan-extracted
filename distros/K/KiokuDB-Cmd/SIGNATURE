@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.62.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 02a97a126893d11d001aad0c6aadd8ec492429f0 Changes
+SHA1 5fb6b1d4b5afcc8b90fcbcdbe420b316fab388f6 MANIFEST
+SHA1 190e9058eb9c6446a1a3f3ddf15b082f1ecde152 MANIFEST.SKIP
+SHA1 0c567acc5b171b4db742c0ad28f83d6b5203f8d2 META.yml
+SHA1 6b5240176cc4bc57dd1192b43337677804e755e6 Makefile.PL
+SHA1 7224b939a65297932ef47232278e1ef5c4febfd7 lib/KiokuDB/Cmd.pm
+SHA1 c2b8d2dd6edfc090994d32c2b41bbc407fc31208 lib/KiokuDB/Cmd/Base.pm
+SHA1 1e844fdee41beedf77b41a4d2003a230788602f4 lib/KiokuDB/Cmd/Command/Dump.pm
+SHA1 570583bb78f94a320a173210088f4dea6a816fc2 lib/KiokuDB/Cmd/Command/Edit.pm
+SHA1 e87a44690e89e0408a3d92120b442710587759ce lib/KiokuDB/Cmd/Command/FSCK.pm
+SHA1 8f06dc4c0295474978794f01af842fb34ca54fbc lib/KiokuDB/Cmd/Command/GC.pm
+SHA1 4fc03c4a9c502f07d702a654729dcd06f00692ea lib/KiokuDB/Cmd/Command/Load.pm
+SHA1 441202768ae62b59002e3ffe8b07e19e07c95304 lib/KiokuDB/Cmd/DumpFormatter.pm
+SHA1 0c746e5bd47eedcd10ae4738ed0a540dbe934a8f lib/KiokuDB/Cmd/InputHandle.pm
+SHA1 71fb2d0cddd099081b5d9513dc9b106d331e3ed4 lib/KiokuDB/Cmd/OutputHandle.pm
+SHA1 217f0a6e8c4076730a5f06ce69a2035d496d35e0 lib/KiokuDB/Cmd/SpecifiedEntries.pm
+SHA1 1464142db5b39818a68ba4afafeccb340eefef5c lib/KiokuDB/Cmd/TXN.pm
+SHA1 db0e8ed6394d414889ac24db9c253e7ff9a9eb26 lib/KiokuDB/Cmd/Verbosity.pm
+SHA1 a16785428d29074624e3078185bb7a97a2b34500 lib/KiokuDB/Cmd/WithDSN.pm
+SHA1 943033b792d17e89862ca67185d4c6643afb5e51 lib/KiokuDB/Cmd/WithDSN/Create.pm
+SHA1 fd1d9d0928dc63da6d3bd606f3006ad4ee1c02de lib/KiokuDB/Cmd/WithDSN/Read.pm
+SHA1 7af19adbbeafa992554f0d0808218ab9bab3ba06 lib/KiokuDB/Cmd/WithDSN/Write.pm
+SHA1 ccb04e03aa1d6bde0cd668de3573ce813507fce6 t/dump.t
+SHA1 d789036e319c4fd43eb7b2f6ba862c91f3fec1e7 t/load.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG/MacGPG2 v2.0.12 (Darwin)
+
+iEYEARECAAYFAkwKkzoACgkQVCwRwOvSdBgArwCeNqhaE+Fuulk2ZBR+YHjjcYWh
+dwcAn0iibAwF7n+Jsi6N/u0nCMiib6ZJ
+=eoY7
+-----END PGP SIGNATURE-----
