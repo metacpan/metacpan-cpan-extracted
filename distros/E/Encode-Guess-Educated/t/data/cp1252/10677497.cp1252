@@ -1,0 +1,1525 @@
+   [1]PNAS
+   [2]Proceedings of the National Academy of Sciences of the United States
+   of America
+
+   [3]Skip to main page content
+     * [4]Info for Authors
+     * [5]Editorial Board
+     * [6]About
+     * [7]Subscribe
+     * [8]Advertise
+     * [9]Contact
+     * [10]Feedback
+     * [11]Site Map
+
+     * [12]Anatrace® High-Purity Detergents and Lipids
+     * [13]Sign up for PNAS eTOCs
+     * [14]Science Sessions: PNAS Podcast Program
+
+     * Institution: UNIV COLORADO HLTH SCI CTR
+     * [15]Sign In as Member / Individual
+
+ §1§ Determination of the binding sites of the proton transfer inhibitors
+Cd^2+ and Zn^2+ in bacterial reaction centers  §1§
+
+    1. [16]H. L. Axelrod,
+    2. [17]E. C. Abresch,
+    3. [18]M. L. Paddock,
+    4. [19]M. Y. Okamura, and
+    5. [20]G. Feher [21]*
+
+    1.
+
+
+    Department of Physics 0319, 9500 Gilman Drive, University of
+    California at San Diego, La Jolla, CA 92093
+
+    1. Contributed by George Feher
+
+
+   [22]Next Section
+
+ §2§ Abstract §2§
+
+   The reaction center (RC) from Rhodobacter sphaeroides couples
+   light-driven electron transfer to protonation of a bound quinone
+   acceptor molecule, Q[B], within the RC. The binding of Cd^2+ or Zn^2+
+   has been previously shown to inhibit the rate of reduction and
+   protonation of Q[B]. We report here on the metal binding site,
+   determined by x-ray diffraction at 2.5-Å resolution, obtained from RC
+   crystals that were soaked in the presence of the metal. The structures
+   were refined to R factors of 23% and 24% for the Cd^2+ and Zn^2+
+   complexes, respectively. Both metals bind to the same location,
+   coordinating to Asp-H124, His-H126, and His-H128. The rate of electron
+   transfer from Q[A] ^&#x2212; to Q[B] was measured in the Cd^2+-soaked crystal
+   and found to be the same as in solution in the presence of Cd^2+. In
+   addition to the changes in the kinetics, a structural effect of Cd^2+
+   on Glu-H173 was observed. This residue was well resolved in the x-ray
+   structure—i.e., ordered—with Cd^2+ bound to the RC, in contrast to its
+   disordered state in the absence of Cd^2+, which suggests that the
+   mobility of Glu-H173 plays an important role in the rate of reduction
+   of Q[B]. The position of the Cd^2+ and Zn^2+ localizes the proton entry
+   into the RC near Asp-H124, His-H126, and His-H128. Based on the
+   location of the metal, likely pathways of proton transfer from the
+   aqueous surface to Q[B]&#x2a2a; are proposed.
+     * [23]bacterial photosynthesis
+     * [24]Rhodobacter sphaeroides
+     * [25]metal ion binding
+     * [26]cation binding
+     * [27]x-ray crystallography
+
+   In the photosynthetic bacterium Rhodobacter (Rb.) sphaeroides, a
+   100-kDa integral membrane pigment–protein complex called the reaction
+   center (RC) performs the initial light-driven electron and proton
+   transfer reactions leading to the formation of a proton gradient across
+   the bacterial membrane ([28]1–[29]3). The three-dimensional atomic
+   structure of the RC from Rb. sphaeroides is known ([30]4–[31]7), and
+   the functions of several key amino acid residues and cofactors have
+   been established ([32]1–[33]3). The RC is composed of three protein
+   subunits (L, M, and H) and a number of bound cofactors. Light drives
+   the transfer of an electron from the primary donor of the RC, a
+   bacteriochlorophyll dimer (D) through an intermediate acceptor, a
+   bacteriopheophytin (&#x3c6;[A]), to the primary acceptor, a tightly bound
+   ubiquinone molecule (Q[A]). From Q[A]&#x2a2a;, the electron is transferred to
+   a loosely bound secondary quinone acceptor, Q[B]. An exogenous
+   cytochrome c [2] reduces D^+, thereby allowing a second electron to be
+   transferred to Q[B]. This transfer is coupled with proton uptake and
+   results in the formation of quinol, Q[B]H[2], which serves as a mobile
+   carrier of protons to the cytochrome bc [1] complex ([34]8–[35]10).
+   Cytochrome bc [1] oxidizes quinol and mediates proton transfer across
+   the membrane.
+
+   The proton transfer pathways in the RC have been investigated by
+   kinetic optical spectroscopy, site-directed mutagenesis, and x-ray
+   crystallography. In the vicinity of Q[B], Ser-L223 ([36]11), Glu-L212
+   ([37]12, [38]13), and Asp-L213 ([39]14, [40]15) have been shown to be
+   critical residues for proton transfer to Q[B]&#x2a2a;. Guided by the x-ray
+   crystal structure, three possible pathways for proton transfer,
+   consisting of a chain of protonatable groups ([41]16, [42]17) from the
+   cytoplasmic surface to Q[B], were postulated ([43]6, [44]7, [45]18,
+   [46]19), each having different entry points for the protons.
+
+   The recent finding that the stoichiometric binding of Cd^2+ or Zn^2+ to
+   the RC decreased the rate of proton transfer to reduced Q[B] &#x2265;100-fold
+   suggests that the physiological proton transfer occurs through a single
+   pathway that is inhibited by the bound metal ion ([47]20). Here we
+   report on the localization, through x-ray crystallography, of the bound
+   Cd^2+ and Zn^2+, thereby identifying the region of proton entry and the
+   dominant proton transfer pathway(s) leading from the surface of the RC
+   to Q[B]&#x2a2a;.
+   [48]Previous Section[49]Next Section
+
+ §2§ Experimental Procedures §2§
+
+ §3§ Purification of RCs. §3§
+
+   RCs from Rb. sphaeroides were isolated in buffer containing 15 mM
+   Tris&#x22c5;HCl at pH 8.0, 0.025% lauryldimethylamine N-oxide (LDAO; Fluka),
+   and 0.1 mM EDTA and purified from the R26 strain as described ([50]21).
+   The RCs were extensively dialyzed against 10 mM Tris&#x22c5;HCl, pH 8.0/0.1%
+   LDAO to remove EDTA, and were concentrated to &#x2248;20 mg/ml by using a 1-ml
+   diethylaminoethyl (DEAE) Toyopearl 650M (Supelco) column.
+
+ §3§ Crystallization. §3§
+
+   Crystals of the RC were obtained by vapor diffusion ([51]22) at 19°C in
+   35-&#x3bc;l sitting drops with 1-ml reservoirs in Cryschem type plates
+   (Charles Supper, Natick, MA). The crystals belong to the tetragonal
+   P4[3]2[1]2 space group as first reported by Allen ([52]23). The unit
+   cell dimensions are a = b = 140.1 Å and c = 271.6 Å ([53]7); they
+   contain two RC molecules in the asymmetric unit.
+
+ §3§ X-Ray Data Collection. §3§
+
+   X-ray data were collected on three different crystals, containing: (i)
+   Cd^2+ bound to the RC in the dark-adapted charge neutral state of the
+   RC (DQ[A]Q[B]); (ii) Cd^2+ bound to the RC in the light-adapted,
+   charge-separated state (D^+Q[A]Q[B]&#x2a2a;); (iii) Zn^2+ bound to the RC in
+   the dark-adapted state. One day prior to data collection, crystals were
+   soaked in mother liquor [15% (wt/vol) PEG 4000/30 mM Tris&#x22c5;HCl, pH
+   8.0/0.18% LDAO, 12% (wt/vol) heptanetriol/0.1 M NaCl] containing either
+   CdSO[4] or ZnSO[4] at 10 mM. Crystals were mounted on nylon loops and
+   plunged into liquid nitrogen as described ([54]7, [55]24). To trap the
+   RCs in the light-activated state, crystals were illuminated before
+   cooling as described in ref. [56]7.
+
+   X-ray diffraction data were collected at the Stanford Synchrotron
+   Radiation Laboratory on Beamline 9-1, using synchrotron radiation at a
+   wavelength of 0.98 Å. During data collection, the crystal was cooled to
+   &#x2248;100 K with a stream of liquid nitrogen. To minimize overlap of
+   reflections, crystals were oriented with the longest (c) axis along the
+   rotation axis of the goniostat. X-ray reflections were recorded in 0.5°
+   increments until more than 45° of data had been collected. Diffraction
+   data were recorded on a Mar345 x-ray imaging plate (X-ray Research,
+   Hamburg, Germany). For the determination of crystal orientation and the
+   integration of reflection intensity, the mosflm ([57]25) software
+   package was used. The CCP4 (Collaborative Computational Project Number
+   4) ([58]26) crystallographic software package was used to reduce the
+   x-ray diffraction intensities to structure factor amplitudes. The data
+   processing statistics are shown in Table [59]1.
+   View this table:
+     * [60]In this window
+     * [61]In a new window
+
+   Table 1
+
+   X-ray data collection and refinement statistics
+
+ §3§ X-Ray Refinement. §3§
+
+   The coordinates of the RC in the dark-adapted state [Protein Data Bank
+   entry [62]1AIJ ([63]7, [64]27)] were used as a starting model for the
+   refinement of the Cd^2+- and Zn^2+-containing structures. Water and
+   detergent molecules were omitted from the starting model. In the later
+   stages of the refinement, water molecules were added into |F [o]| &#x2212; |F
+   [c]| difference electron density peaks that were at least 3&#x3c3; above the
+   background level of the map and were within 4 Å of hydrogen bonding
+   acceptor or donor atoms, using the CCP4 programs peakmax and waterpeak
+   ([65]26). Rigid-body, positional, and isotropic temperature factor
+   refinement of the starting model were carried out for each data set by
+   using the cns ([66]28) software package with a maximum-likelihood
+   refinement target function ([67]29, [68]30) and noncrystallographic
+   symmetry restraints. During the refinement, the metal-to-ligand
+   distances were constrained to 2.30 Å for Cd^2+ and 2.15 Å for Zn^2+.
+   These distances correspond to the mean metal-to-ligand distances
+   summarized in a recent survey ([69]31). Electron density maps with
+   coefficients 2|F [o]| &#x2212; |F [c]| and |F [o]| &#x2212; |F [c]| were computed
+   with the CCP4 ([70]26) software package. The maps were contoured with
+   the program mapman ([71]32) and displayed on a Silicon Graphics Indy
+   R5000 Workstation with the program tom-frodo ([72]33). The refined
+   coordinates of the dark-adapted structure with Cd^2+ were used as a
+   starting model for the refinement of the light-activated state of the
+   RC with Cd^2+. To reduce phase bias, the coordinates of both Cd^2+ and
+   Q[B] were removed from the starting model prior to the refinement of
+   the light-activated state.
+
+ §3§ Measurements of Electron Transfer Kinetics in Crystals. §3§
+
+   A microspectrophotometer of local design ([73]34, [74]35) was used to
+   measure the electron transfer rate from Q[A]&#x2a2a; to Q[B] (k [AB] ^(1)) in
+   RC crystals. To increase the occupancy of Q[B] in the crystals, 1 mM
+   ubiquinone-4 (Sigma) was added to the mother liquor. To measure the
+   effect of the bound metal ion on the electron transfer rate, 10 mM
+   CdSO[4] was added to the mother liquor. To remove Cd^2+ from the RC
+   crystals, they were washed with mother liquor containing 10 mM EDTA.
+
+   Charge separation in RCs was accomplished with a single pulse of a
+   PhaseR DL2100c laser (&#x3bb; = 590 nm, 0.2 J per pulse, 0.4-&#x3bc;s pulsewidth at
+   half maximum), directed onto the RC crystal that was placed between two
+   sealed glass coverslips. After the laser flash, the absorbance at 460
+   nm ([75]36, [76]37) was monitored by using a Bausch and Lomb xenon lamp
+   to provide a high-intensity measuring beam. To improve the
+   signal-to-noise ratio, 40 traces were averaged. Data were analyzed by
+   using commercial software (Jandel peakfit).
+   [77]Previous Section[78]Next Section
+
+ §2§ Results §2§
+
+ §3§ Structure of the Metal Ion Complexes in the Dark-Adapted (DQ[A]Q[B])
+State.  §3§
+
+   The structures of the RC from Rb. sphaeroides with bound Cd^2+ and
+   Zn^2+ were determined in the dark-adapted (DQ[A]Q[B]) state.
+   Examination of the |F [o]| &#x2212; |F [c]| difference electron density maps,
+   after rigid-body refinement, revealed the existence of a large
+   difference density peak, 25&#x3c3; above the background level in the
+   Cd^2+-containing crystal and 10&#x3c3; above background for the
+   Zn^2+-containing crystal. This observation suggests a high occupancy of
+   the binding sites. Cd^2+ and Zn^2+ bind at the same location. The metal
+   ion site is located &#x2248;20 Å from the Q[B] site at the cytoplasmic surface
+   of the RC (see Fig. [79]1). Adjacent to the peak and within
+   coordination distance are the imidazole side chains of two histidines
+   (His-H126 and His-H128) and the side chain of an aspartic acid
+   (Asp-H124). For both metal complexes, the height of the electron
+   density peaks and the location of the ligands, which are commonly found
+   in metalloproteins, are consistent with the assignment of the peaks to
+   a bound metal ion. The metal ions were modeled into difference density
+   peaks, and further refinement at a resolution 2.5 Å was carried out.
+   [80]Figure 1
+   View larger version:
+     * [81]In this window
+     * [82]In a new window
+
+     * [83]Download as PowerPoint Slide
+
+   Figure 1
+
+   Structure of the RC from Rb. sphaeroides, showing the location of the
+   Cd^2+ and Zn^2+ binding sites (orange), L subunit (yellow), M subunit
+   (blue), H subunit (green), and cofactors (red) with Q[B] labeled.
+   Difference electron density (|F [o]| &#x2212; |F [c]|) contoured at 10&#x3c3; above
+   the mean value of the map is shown in purple surrounding Cd^2+.
+   Illustration made with the programs bobscript ([84]38) and raster3d
+   ([85]39).
+
+   The most significant structural difference between the RC with and
+   without a bound metal ion is the positions of the side-chain ligands.
+   Both His-H126 and His-H128 appear to undergo side-chain conformational
+   changes that enable them to bind to the metal ions. Both histidines
+   coordinate Cd^2+ or Zn^2+ at the N^&#x3b4; atoms of the imidazole side chains
+   (Fig. [86]2). To model a covalent bond to the metal, the imidazole of
+   His-H126 had to be rotated about the C^&#x3b2;–C^&#x3b3; axis. One of the oxygens
+   of the side chain of Asp-H124 is also coordinated to the metal ions
+   (Fig. [87]2). There are no significant conformational changes in the
+   polypeptide backbone conformation.
+   [88]Figure 2
+   View larger version:
+     * [89]In this window
+     * [90]In a new window
+
+     * [91]Download as PowerPoint Slide
+
+   Figure 2
+
+   Stereoview of the Cd^2+ binding site (orange) on the RC from Rb.
+   sphaeroides. The six Cd^2+ ligands are His-H126, His-H128, Asp-H124
+   (green), and three water molecules (red). Two nearby aspartic acid
+   residues, Asp-L210 (yellow) and Asp-M17 (blue), are part of a hydrogen
+   bonding network that leads from the metal site to Q[B]&#x2a2a; (see Fig.
+   [92]5). |F [o]| &#x2212; |F [c]| difference electron density (purple) is
+   contoured at 2.5&#x3c3; and superimposed on the structure. To reduce phase
+   bias, ligands were excluded in the calculation of the map.
+
+   Additional rounds of coordinate and isotropic temperature factor
+   refinement for the metal complexes led to R factors of 23% (R [free] =
+   26%) and 26% (R [free] = 27%) for Cd^2+ and Zn^2+, respectively (Table
+   [93]1). A few other difference peaks were observed, but they were much
+   smaller (&#x2264; Formula ) than the height of the major density peak. These
+   peaks could represent anion or detergent binding sites.
+
+   From a least-squares overlap of the Cd^2+ structure in the dark-adapted
+   state with the native structure ([94]7), a 0.4-Å root-mean-square
+   deviation between all protein atoms in the two sets of coordinates was
+   determined. This value is within experimental uncertainty of the
+   coordinates. Thus, at our resolution, no additional differences between
+   the dark-adapted structures, with and without the metal, could be
+   discerned. Further comparison of the structures also shows that Q[B]
+   occupies the same position in RCs with and without a bound metal.
+
+   Subsequent stages of refinement revealed three difference electron
+   density peaks (see Fig. [95]2) within 3 Å of the bound Cd^2+. These
+   peaks were modeled as water molecules with the oxygen atoms coordinated
+   to Cd^2+, at an average oxygen-to-metal distance of 2.7 ± 0.2 Å for the
+   three water molecules. This distance is larger than 2.3 Å, the expected
+   distance for strong coordination bonding between Cd^2+ and oxygen
+   ligands ([96]31). The larger distances indicate that the water
+   molecules are more weakly bound than the side-chain ligands. The bound
+   water molecules and the side-chain ligands suggest an octahedral
+   coordination geometry, which is commonly found in other metalloproteins
+   containing Cd^2+ ([97]31).
+
+   An important difference between the Zn^2+ and the Cd^2+ structures is
+   the coordination geometry of the metal site. The Zn^2+ structure shows,
+   in addition to the three amino acid residues, one water molecule,
+   suggesting tetrahedral coordination, which is the predominant geometry
+   found in Zn^2+-containing proteins ([98]27, [99]31, [100]40).
+
+ §3§ Structure of the Cd^2+ Complex in the Charge-Separated State.  §3§
+
+   In native RCs, the transfer of the second electron to Q[B] is coupled
+   to the rapid protonation of the semiquinone intermediate Q[B]&#x2a2a;.
+   Consequently, knowledge of the structure of the RC–Cd^2+ complex in the
+   light-activated state (Cd^2+–D&#x2a25;Q[A]Q[B]&#x2a2a;) may be important for
+   understanding the mechanism of Cd^2+ inhibition of proton transfer. We
+   determined, therefore, the structure of the RC–Cd^2+ complex in the
+   light-activated state. The difference electron density maps revealed a
+   peak, 20&#x3c3; above background. This strong peak is at the same location
+   and is within coordination distance to the same residues as in the dark
+   structure.
+
+   The structure of the charge-separated state with Cd^2+ has been refined
+   at a resolution of 2.5 Å and an R factor of 23% (R [free] = 25%) (Table
+   [101]1). No significant changes in the structure of the side-chain
+   ligands (His-H124, His-H126, and His-H128) are seen in the
+   light-activated structure compared with the dark-adapted Cd^2+
+   structure. At the present stage of refinement, electron densities
+   corresponding to two water molecules as ligands were observed. The
+   presence of one additional water ligand observed in the dark-adapted
+   state may be attributed to the better quality of the x-ray diffraction
+   data for the dark-adapted state (R [sym] = 6.5%, Table [102]1) compared
+   with the charge-separated state (R [sym] = 8.9%) (Table [103]1).
+
+   The refined coordinates of the charge-separated state with Cd^2+
+   overlap the native charge-separated coordinates without Cd^2+ (PDB
+   Entry [104]1AIG) ([105]7) with a root-mean-square difference of 0.65 Å
+   for all protein atoms. This is larger than the uncertainties in the
+   coordinates, suggesting structural changes in the light-activated state
+   of the RC upon Cd^2+ binding. Examination of the structures with and
+   without metal show no significant rearrangements of the polypeptide
+   backbone. Therefore, we attribute the structural differences to
+   side-chain rearrangements. A striking example of such a rearrangement
+   is exhibited by Glu-H173. In light-activated structures of the RC
+   without metal (see Fig. [106]3 b), we observe weak electron density for
+   the side chain of Glu-H173, which was reported by Stowell et al.
+   ([107]7), and was attributed to disorder. In the presence of Cd^2+, we
+   observe strong electron density for the side chain of Glu-H173,
+   indicating an ordered structure (see Fig. [108]3 a). The implication of
+   this structure for electron transfer is discussed in a later section.
+   An additional finding is that the position of Q[B]&#x2a2a; in the light
+   structure with Cd^2+ is the same as in RCs without Cd^2+.
+   [109]Figure 3
+   View larger version:
+     * [110]In this window
+     * [111]In a new window
+
+     * [112]Download as PowerPoint Slide
+
+   Figure 3
+
+   2|F [o]| &#x2212; |F [c]| electron density map at Glu-H173 in the
+   charge-separated state (D&#x2a25;Q[A]Q[B]&#x2a2a;) of the RC from Rb. sphaeroides
+   with Cd^2+ (a) and without Cd^2+ (b). The structure shown in b is
+   similar to the one reported by Stowell et al. ([113]7). Electron
+   density contours (purple) are displayed at 1&#x3c3; above the mean level of
+   the map with the Glu-H173 side chain excluded for the calculation of
+   phases. In the structure without Cd^2+, the electron density of the
+   side chain of Glu-H173 is weaker, indicating greater mobility of the
+   side chain, compared with the structure in the presence of Cd^2+.
+
+ §3§ Electron Transfer from Q[A]&#x2a2a; to Q[B] in RC Crystals.  §3§
+
+   It was previously shown that in solution the binding of Cd^2+ leads to
+   a decrease in the rate of proton transfer and the rate of electron
+   transfer from Q[A] ^&#x2212; to Q[B] ([114]20, [115]41). We used the electron
+   transfer kinetics as an assay to verify that the effect of Cd^2+ in the
+   crystal is the same as in solution.
+
+   The electron transfer rate was measured by monitoring the absorbance
+   change at 460 nm after a laser flash ([116]36, [117]37). The observed
+   absorbance changes in RCs without and with Cd^2+ are shown in Fig.
+   [118]4. The solid lines represent fits to biexponential functions with
+   rate constants of k [1] = 6000 s^&#x2212;1 and k [2] = 800 s^&#x2212;1. In the
+   absence of Cd^2+, the faster phase predominates (80%). Upon addition of
+   10 mM Cd^2+, the amplitude of the slower phase increases to &#x2265;50%. The
+   rate constant as well as the changes in the amplitudes upon addition of
+   Cd^2+ are similar to those observed in solution. After the crystals had
+   been washed with 10 mM EDTA to remove Cd^2+, the amplitude of the
+   faster phase again predominated (data not shown).
+   [119]Figure 4
+   View larger version:
+     * [120]In this window
+     * [121]In a new window
+
+     * [122]Download as PowerPoint Slide
+
+   Figure 4
+
+   Light-induced absorption changes at 460 nm after a laser flash in RC
+   crystals with and without Cd^2+. Each trace is an average of 40
+   flashes. The absorbance change is associated with electron transfer
+   from Q[A]&#x2a2a; to Q[B] (Q[A]&#x2a2a;Q[B] &#x2192; Q[A]Q[B]&#x2a2a;). Crystals were placed
+   between two sealed coverslips in artificial mother liquor without and
+   with 10 mM Cd^2+. The solid lines represent fits to a biexponential
+   function with rate constants k [1] = 6000 s^&#x2212;1 and k [2] = 800 s^&#x2212;1.
+   The rate constant and the increase in amplitude of the slower phase in
+   the presence of Cd^2+ are similar to those measured in solution (not
+   shown), showing that the binding site in the crystal is the same as in
+   solution.
+   [123]Previous Section[124]Next Section
+
+ §2§ Discussion §2§
+
+ §3§ The Metal Binding Site. §3§
+
+   The binding of a single Cd^2+ or Zn^2+ cation to the RC decreases the
+   rate of electron and proton transfer to reduced Q[B] ([125]20)[.] The
+   x-ray crystal structures reported here show one dominant Cd^2+ or Zn^2+
+   binding site on the RC. Both Cd^2+ and Zn^2+ bind at the same location,
+   consistent with the competitive binding results found in solution
+   ([126]20). To test whether the metal ion-binding site is the same as
+   that in solution, the kinetics of k [AB] ^(1) (Q[A]&#x2a2a;Q[B] &#x2192; Q[A]Q[B]&#x2a2a;)
+   in the crystal were measured. The observed kinetics in the presence and
+   absence of Cd^2+ were the same within experimental error as those
+   measured in solution, indicating that the crystallographic site is the
+   same as found in solution. Three residues on the H subunit (Asp-H124,
+   His-H126, and His-H128) and three water molecules form ligands to
+   Cd^2+. The location of the binding site of the metal inhibitors
+   suggests an important role for the H subunit in proton transfer to
+   Q[B]&#x2a2a;. The x-ray crystal structures with Cd^2+ and Zn^2+ show no
+   structural changes at the Q[B] site, which is consistent with the
+   relatively long distance (&#x2248;20 Å) between the two sites.
+
+ §3§ Effect of Metal Binding on Protein Dynamics. §3§
+
+   It has been previously reported that Cd^2+ or Zn^2+ binding decreases
+   the rate of the first electron transfer, k [AB] ^(1), to Q[B]
+   (DQ[A]&#x2a2a;Q[B] &#x2192; DQ[A]Q[B]&#x2a2a;) ([127]20, [128]41). Utschig et al. ([129]41)
+   attributed the decreased rate to a change in the dynamics of a
+   conformational change. Independent evidence also suggests that k [AB]
+   ^(1) is limited by a conformational change ([130]37, [131]42, [132]43).
+   The challenge is to determine the molecular details of the
+   conformational change. These can be obtained by comparing the RC
+   structures with and without Cd^2+. The most conspicuous difference is
+   the increased electron density of the Glu-H173 side chain (Fig. [133]3
+   a), indicating that it is more ordered, hence less mobile. We therefore
+   suggest that the mobility of the side chain of Glu-H173 plays an
+   important role in the conformationally gated step ([134]37) that
+   determines the rate of transfer of the first electron to Q[B].
+
+ §3§ Proton Transfer Pathways. §3§
+
+   A dramatic effect of metal ion binding to the RC is a &#x2265;100-fold
+   reduction in the proton transfer rate ([135]20). The x-ray structures
+   of the RC–metal ion complexes show no change in the structure near the
+   Q[B] site. Consequently the effect of metal ion must be associated with
+   changes in the vicinity of the binding site. The simplest explanation
+   of the inhibitory effect of the metals on the proton transfer rate is
+   that the metal impedes entry of protons into the RC ([136]20). Thus,
+   the position of the bound metal ion localizes the proton entry to a
+   region of the H subunit near Asp-H124, His-H126, and His-H128.
+
+   The possible pathways connecting the metal binding site with Q[B] are
+   shown by dashed lines in Fig. [137]5. They include water molecules
+   (Wat-70, Wat-74, and Wat-6), Asp-L210, Asp-L213, Asp-M17, and Ser-L223.
+   These pathways are structurally close to the one previously proposed by
+   Abresch et al. ([138]18). The importance of Asp-L213 and Ser-L223 for
+   proton transfer has been previously established ([139]11, [140]14,
+   [141]15) and that of Asp-L210 and Asp-M17 has been established by
+   site-directed mutagenesis as discussed by Paddock et al. in the
+   following paper ([142]44).
+   [143]Figure 5
+   View larger version:
+     * [144]In this window
+     * [145]In a new window
+
+     * [146]Download as PowerPoint Slide
+
+   Figure 5
+
+   Stereo representation of hydrogen bonding networks in the
+   charge-separated (D^+Q[A]Q[B]&#x2a2a;) state of the native RC ([147]7,
+   [148]18) from Rb. sphaeroides spanning the region between the Cd^2+ (or
+   Zn^2+) binding site (indicated by arrow) and Q[B]&#x2a2a;. L subunit (yellow),
+   M subunit (blue), and H subunit (green), and Q[B]&#x2a2a; and water molecules
+   (red). Dashed lines represent hydrogen bonds. Wat-72 is displaced when
+   Cd^2+ or Zn^2+ binds. The metal ion is located at the proton entry
+   point. The hydrogen bonded networks form possible proton transfer
+   pathways leading from the metal surface to Q[B]&#x2a2a;
+
+ §3§ Comparisons with Other Systems. §3§
+
+   All residues shown in Fig. [149]5 are conserved in the RC of a related
+   bacterium, Rhodobacter capsulatus ([150]45). We expect therefore, a
+   similar effect of metal ion binding on proton transfer. In another
+   related bacterium, Rhodopseudomonas (Rps.) viridis ([151]46, [152]47),
+   His-H126 and His-H128 are not conserved. However, an analogous acid–His
+   pair (Glu-L210 and His-H178) may provide an alternate metal binding
+   site in Rps. viridis.
+
+   Proton transfer pathways have been proposed for other bioenergetic
+   membrane–protein complexes such as cytochrome c oxidase ([153]48,
+   [154]49) and bacteriorhodopsin ([155]50, [156]51). Link et al.
+   ([157]52) reported that binding of Zn^2+ to cytochrome bc [1] blocks
+   protonation of a group near the hydroquinone oxidation site ([158]53,
+   [159]54). These pathways may share features with the pathway in Rb.
+   sphaeroides discussed in this work.
+   [160]Previous Section[161]Next Section
+
+ §2§ Acknowledgments §2§
+
+   We thank the staff at the Stanford Synchrotron Radiation Laboratory
+   (SSRL): A. Cohen, P. Ellis, M. Soltis, P. Kuhn, and T. McPhillips; A.
+   Yeh for helping with the data collection; and D. Rees for helpful
+   discussions. We thank R. Isaacson for his expert technical support in
+   designing and running the microspectrophotometer. This work has been
+   supported by National Institutes of Health Grant GM13191 and National
+   Science Foundation Grant MCB 94–16652. This work is based on research
+   conducted at SSRL, which is funded by the Department of Energy, Office
+   of Basic Energy Sciences. The SSRL Biotechnology Program is supported
+   by the National Institutes of Health, National Center for Research
+   Resources, Biomedical Technology Program, and the Department of Energy,
+   Office of Biological and Environmental Research.
+   [162]Previous Section[163]Next Section
+
+ §2§ Note Added in Proof §2§
+
+   The binding sites of two additional proton transfer inhibitors, Ni^2+
+   and Co^2+, were determined by x-ray diffraction analysis. They bind to
+   Asp-M17 and His-H126, near the location of Wat-70 (see Fig. [164]5).
+   [165]Previous Section[166]Next Section
+
+ §2§ Footnotes §2§
+
+     * [167]&#x21b5; * To whom reprint requests should be addressed. E-mail:
+       gfeher{at}ucsd.edu.
+     * Data deposition: The atomic coordinates have been deposited in the
+       Protein Data Bank, [168]www.rcsb.org (PDB ID codes [169]1DS8 for
+       the RC from Rhodobacter sphaeroides in the charge-neutral state
+       with Cd^2+, [170]1DV3 for the charge-separated state with Cd^2+,
+       and [171]1DV6 for the charge-neutral state with Zn^2+).
+     * Abbreviations:
+
+        RC,
+                reaction center;
+
+        D,
+                primary donor;
+
+        QA,
+                primary quinone electron acceptor;
+
+        QA&#x2a2a; semiquinone intermediate of QA,
+                QB, secondary quinone electron acceptor;
+
+        QB&#x2a2a;,
+                semiquinone intermediate of QB;
+
+        LDAO,
+                lauryldimethylamine N-oxide
+
+     * Copyright © 2000, The National Academy of Sciences
+
+   [172]Previous Section
+
+ §2§ References §2§
+
+    1. [173]&#x21b5;
+         1. Feher G ,
+         2. Allen J P ,
+         3. Okamura M Y ,
+         4. Rees D C
+       (1989) Nature (London) 339:111–116.
+       [174]CrossRef
+    2.
+         1. Michel-Beyerle M-E
+       , ed (1996) Reaction Center of Photosynthetic Bacteria: Structure
+       and Dynamics (Springer, Berlin).
+    3. [175]&#x21b5;
+         1. Breton J ,
+         2. Nabedryk E ,
+         3. Vermeglio A
+       , eds (1998) Photosynth Res 55:117–378.
+       [176]CrossRef
+    4. [177]&#x21b5;
+         1. Chang C H ,
+         2. Tiede D ,
+         3. Tang J ,
+         4. Smith U ,
+         5. Norris J ,
+         6. Schiffer M
+       (1986) FEBS Lett 205:82–86, pmid:3527749.
+       [178]CrossRef[179]Medline[180]Web of Science
+    5.
+         1. Allen J P ,
+         2. Feher G ,
+         3. Yeates T O ,
+         4. Komiya H ,
+         5. Rees D C
+       (1987) Proc Natl Acad Sci USA 84:6162–6166, pmid:2819866.
+       [181]Abstract/FREE Full Text
+    6. [182]&#x21b5;
+         1. Ermler U ,
+         2. Fritzsch G ,
+         3. Buchanan S K ,
+         4. Michel H
+       (1994) Structure 2:925–936, pmid:7866744.
+       [183]Medline
+    7. [184]&#x21b5;
+         1. Stowell M H B ,
+         2. McPhillips T M ,
+         3. Rees D C ,
+         4. Abresch E ,
+         5. Feher G
+       (1997) Science 276:812–816, pmid:9115209.
+       [185]Abstract/FREE Full Text
+    8. [186]&#x21b5;
+         1. Cramer W A ,
+         2. Knaff D B
+       (1990) Energy Transduction in Biological Membranes: A Textbook of
+       Bioenergetics (Springer, New York).
+    9.
+         1. Gennis R B ,
+         2. Barquera B ,
+         3. Hacker B ,
+         4. VanDoren S R ,
+         5. Arnaud S ,
+         6. Crofts A R ,
+         7. Davidson E ,
+         8. Gray K A ,
+         9. Daldal F
+       (1993) J Bioenerg Biomembr 25:195–209, pmid:8394316.
+       [187]CrossRef[188]Medline[189]Web of Science
+   10. [190]&#x21b5;
+         1. Crofts A R ,
+         2. Berry E A
+       (1998) Curr Opin Struct Biol 8:501–509, pmid:9729743.
+       [191]CrossRef[192]Medline[193]Web of Science
+   11. [194]&#x21b5;
+         1. Paddock M L ,
+         2. McPherson P H ,
+         3. Feher G ,
+         4. Okamura M Y
+       (1990) Proc Natl Acad Sci USA 87:6803–6807, pmid:2168561.
+       [195]Abstract/FREE Full Text
+   12. [196]&#x21b5;
+         1. Paddock M L ,
+         2. Rongey S H ,
+         3. Feher G ,
+         4. Okamura M Y
+       (1989) Proc Natl Acad Sci USA 86:6602–6606, pmid:2570421.
+       [197]Abstract/FREE Full Text
+   13. [198]&#x21b5;
+         1. Takahashi E ,
+         2. Wraight C A
+       (1992) Biochemistry 31:855–866, pmid:1731944.
+       [199]CrossRef[200]Medline
+   14. [201]&#x21b5;
+         1. Takahashi E ,
+         2. Wraight C A
+       (1990) Biochim Biophys Acta 1020:107–111.
+       [202]CrossRef
+   15. [203]&#x21b5;
+         1. Paddock M L ,
+         2. Rongey S H ,
+         3. McPherson P H ,
+         4. Juth A ,
+         5. Feher G ,
+         6. Okamura M Y
+       (1994) Biochemistry 33:734–745, pmid:8292601.
+       [204]CrossRef[205]Medline
+   16. [206]&#x21b5;
+         1. Nagle J F ,
+         2. Mille M ,
+         3. Morowitz H J
+       (1980) J Chem Phys 72:3959–3976.
+       [207]CrossRef
+   17. [208]&#x21b5;
+         1. Okamura M Y ,
+         2. Feher G
+         1. Blankenship R E ,
+         2. Madigan M T ,
+         3. Bauer C E
+       (1995) in Anoxygenic Photosynthetic Bacteria, eds Blankenship R E ,
+       Madigan M T , Bauer C E (Kluwer, Dordrecht, the Netherlands), pp
+       577–594.
+   18. [209]&#x21b5;
+         1. Abresch E C ,
+         2. Paddock M L ,
+         3. Stowell M H B ,
+         4. McPhillips T M ,
+         5. Axelrod H L ,
+         6. Soltis S M ,
+         7. Rees D C ,
+         8. Okamura M Y ,
+         9. Feher G
+       (1998) Photosynthesis Research 55:119–125.
+       [210]CrossRef
+   19. [211]&#x21b5;
+         1. Fritzsch G ,
+         2. Kampman L ,
+         3. Kapaun G ,
+         4. Michel H
+       (1998) Photosynth Res 55:127–132.
+       [212]CrossRef
+   20. [213]&#x21b5;
+         1. Paddock M L ,
+         2. Graige M S ,
+         3. Feher G ,
+         4. Okamura M Y
+       (1999) Proc Natl Acad Sci USA 96:6183–6188, pmid:10339562.
+       [214]Abstract/FREE Full Text
+   21. [215]&#x21b5;
+         1. Isaacson R A ,
+         2. Lendzian F ,
+         3. Abresch E C ,
+         4. Lubitz W ,
+         5. Feher G
+       (1995) Biophys J 69:311–322, pmid:8527644.
+       [216]Abstract/FREE Full Text
+   22. [217]&#x21b5;
+         1. McPherson A
+       (1999) Crystallization of Biological Macromolecules (Cold Spring
+       Harbor Lab. Press, Plainview, NY).
+   23. [218]&#x21b5;
+         1. Allen J P
+       (1994) Proteins Struct Funct Genet 20:283–286, pmid:7892177.
+       [219]CrossRef[220]Medline
+   24. [221]&#x21b5;
+         1. Rodgers D W
+       (1997) Methods Enzymol 276:183–203.
+   25. [222]&#x21b5;
+         1. Leslie A G W
+       (1992) Joint CCP4 and ESF-EACMB Newsletter on Protein
+       Crystallography (Daresbury Laboratory, Warrington, U.K.).
+   26. [223]&#x21b5;
+         1. Bailey S
+       (1994) Acta Crystallogr D 50:760–763, pmid:15299374.
+       [224]CrossRef[225]Medline
+   27. [226]&#x21b5;
+         1. Bernstein F C ,
+         2. Koetzle T F ,
+         3. Williams G J ,
+         4. Meyer E E ,
+         5. Brice M D ,
+         6. Rodgers J R ,
+         7. Kennard O ,
+         8. Shimanouchi T ,
+         9. Tasumi M
+       (1977) J Mol Biol 112:535–542, pmid:875032.
+       [227]Medline[228]Web of Science
+   28. [229]&#x21b5;
+         1. Brünger A T ,
+         2. Adams P D ,
+         3. Clore G M ,
+         4. DeLano W L ,
+         5. Gros P ,
+         6. Grosse-Kunstleve R W ,
+         7. Jiang J S ,
+         8. Kuszewski J ,
+         9. Nilges M ,
+        10. Pannu N S ,
+        11. et al.
+       (1998) Acta Crystallogr D 54:905–921, pmid:9757107.
+       [230]CrossRef[231]Medline
+   29. [232]&#x21b5;
+         1. Adams P D ,
+         2. Pannu N S ,
+         3. Read R J ,
+         4. Brünger A T
+       (1997) Proc Natl Acad Sci USA 94:5018–5023, pmid:9144182.
+       [233]Abstract/FREE Full Text
+   30. [234]&#x21b5;
+         1. Brünger A T ,
+         2. Adams P D ,
+         3. Rice L M
+       (1998) Curr Opin Struct Biol 8:606–611, pmid:9818265.
+       [235]CrossRef[236]Medline[237]Web of Science
+   31. [238]&#x21b5;
+         1. Rulisek L ,
+         2. Vondrasek J
+       (1998) J Inorg Biochem 71:115–127, pmid:9833317.
+       [239]CrossRef[240]Medline[241]Web of Science
+   32. [242]&#x21b5;
+         1. Kleywegt G J ,
+         2. Jones T A
+       (1996) Acta Crystallogr D 52:826–828, pmid:15299647.
+       [243]CrossRef[244]Medline
+   33. [245]&#x21b5;
+         1. Jones T A
+       (1985) Methods Enzymol 115:157–171, pmid:3841179.
+       [246]Medline[247]Web of Science
+   34. [248]&#x21b5;
+         1. Allen J P ,
+         2. Feher G
+       (1984) Proc Natl Acad Sci USA 81:4795–4799, pmid:6087348.
+       [249]Abstract/FREE Full Text
+   35. [250]&#x21b5;
+         1. Adir N ,
+         2. Axelrod H L ,
+         3. Beroza P ,
+         4. Isaacson R A ,
+         5. Rongey S H ,
+         6. Okamura M Y ,
+         7. Feher G
+       (1996) Biochemistry 35:2535–2547, pmid:8611557.
+       [251]CrossRef[252]Medline
+   36. [253]&#x21b5;
+         1. Li J ,
+         2. Gilroy D ,
+         3. Tiede D M ,
+         4. Gunner M R
+       (1998) Biochemistry 37:2818–2829, pmid:9485433.
+       [254]CrossRef[255]Medline
+   37. [256]&#x21b5;
+         1. Graige M S ,
+         2. Feher G ,
+         3. Okamura M Y
+       (1998) Proc Natl Acad Sci USA 95:11679–11684, pmid:9751725.
+       [257]Abstract/FREE Full Text
+   38. [258]&#x21b5;
+         1. Esnouf R M
+       (1999) Acta Crystallogr D 55:938–940, pmid:10089341.
+       [259]CrossRef[260]Medline
+   39. [261]&#x21b5;
+         1. Merritt E A ,
+         2. Bacon J D
+       (1997) Methods Enzymol 277:505–524.
+       [262]Web of Science
+   40. [263]&#x21b5;
+         1. Alberts I L ,
+         2. Nadassy K ,
+         3. Wodak S J
+       (1998) Protein Sci 7:1700–1716, pmid:10082367.
+       [264]Abstract
+   41. [265]&#x21b5;
+         1. Utschig L M ,
+         2. Ohigashi Y ,
+         3. Thurnauer M C ,
+         4. Tiede D M
+       (1998) Biochemistry 37:8278–8281, pmid:9622479.
+       [266]CrossRef[267]Medline
+   42. [268]&#x21b5;
+         1. Tiede D M ,
+         2. Vazquez J ,
+         3. Cordova J ,
+         4. Marone P A
+       (1996) Biochemistry 35:10763–10775, pmid:8718867.
+       [269]CrossRef[270]Medline
+   43. [271]&#x21b5;
+         1. Alexov E G ,
+         2. Gunner M R
+       (1999) Biochemistry 38:8253–8270, pmid:10387071.
+       [272]CrossRef[273]Medline
+   44. [274]&#x21b5;
+         1. Paddock M L ,
+         2. Feher G ,
+         3. Okamura M Y
+       (2000) Proc Natl Acad Sci USA 97:1548–1553, pmid:10677498.
+       [275]Abstract/FREE Full Text
+   45. [276]&#x21b5;
+         1. Williams J C ,
+         2. Steiner L A ,
+         3. Feher G
+       (1986) Proteins 1:312–325, pmid:3329732.
+       [277]CrossRef[278]Medline
+   46. [279]&#x21b5;
+         1. Michel H ,
+         2. Weyer K A ,
+         3. Gruenberg H ,
+         4. Lottspeich F
+       (1985) EMBO J 4:1667–1672, pmid:16453623.
+       [280]Medline[281]Web of Science
+   47. [282]&#x21b5;
+         1. Deisenhofer J ,
+         2. Epp O ,
+         3. Miki K ,
+         4. Huber R ,
+         5. Michel H
+       (1984) J Mol Biol 180:385–398, pmid:6392571.
+       [283]CrossRef[284]Medline[285]Web of Science
+   48. [286]&#x21b5;
+         1. Yoshikawa S ,
+         2. Shinzawa-Itoh K ,
+         3. Nakashima R ,
+         4. Yaono R ,
+         5. Yamashita E ,
+         6. Inoue N ,
+         7. Yao M ,
+         8. Fei M J ,
+         9. Libeu C P ,
+        10. Mizushima T ,
+        11. et al.
+       (1998) Science 280:1723–1729, pmid:9624044.
+       [287]Abstract/FREE Full Text
+   49. [288]&#x21b5;
+         1. Iwata S ,
+         2. Ostermeier C ,
+         3. Ludwig B ,
+         4. Michel H
+       (1995) Nature (London) 376:660–669, pmid:7651515.
+       [289]CrossRef[290]Medline
+   50. [291]&#x21b5;
+         1. Luecke H ,
+         2. Richter H T ,
+         3. Lanyi J K
+       (1998) Science 280:1934–1937, pmid:9632391.
+       [292]Abstract/FREE Full Text
+   51. [293]&#x21b5;
+         1. Luecke H ,
+         2. Schobert B ,
+         3. Richter H T ,
+         4. Cartailler J P ,
+         5. Lanyi J K
+       (1999) Science 286:255–261, pmid:10514362.
+       [294]Abstract/FREE Full Text
+   52. [295]&#x21b5;
+         1. Link T A ,
+         2. von Jagow G
+       (1995) J Biol Chem 270:25001–25006, pmid:7559629.
+       [296]Abstract/FREE Full Text
+   53. [297]&#x21b5;
+         1. Xia D ,
+         2. Yu C-A ,
+         3. Kim H ,
+         4. Xia J-Z ,
+         5. Kachurin A M ,
+         6. Zhang L ,
+         7. Yu L ,
+         8. Deisenhofer J
+       (1997) Science 277:60–66, pmid:9204897.
+       [298]Abstract/FREE Full Text
+   54. [299]&#x21b5;
+         1. Crofts A R ,
+         2. Hong S ,
+         3. Ugulava N ,
+         4. Barquera B ,
+         5. Gennis R ,
+         6. Guergova-Kuras M ,
+         7. Berry E A
+       (1999) Proc Natl Acad Sci USA 96:10021–10026, pmid:10468555.
+       [300]Abstract/FREE Full Text
+
+     * [301]Add to CiteULike CiteULike
+     * [302]Add to Complore Complore
+     * [303]Add to Connotea Connotea
+     * [304]Add to Del.icio.us Del.icio.us
+     * [305]Add to Digg Digg
+     * [306]Add to Facebook Facebook
+     * [307]Add to Twitter Twitter
+
+   [308]What's this?
+   [309]« Previous | [310]Next Article »[311]Table of Contents
+
+ §3§ This Article §3§
+
+    1. PNAS February 15, 2000 vol. 97 no. 4 1542-1547
+
+    1. [312]AbstractFree
+    2. [313]Figures Only
+    3. » Full Text
+    4. [314]Full Text (PDF)
+    5. [315]A correction has been published
+
+ §4§ Classifications §4§
+
+    1.
+          + Biological Sciences
+               o [316]Biophysics
+
+ §4§ Services §4§
+
+    1. [317]Email this article to a colleague
+    2. [318]Alert me when this article is cited
+    3. [319]Alert me if a correction is posted
+    4. [320]Similar articles in this journal
+    5. [321]Similar articles in ISI
+    6. [322]Similar articles in PubMed
+    7. [323]Add to My File Cabinet
+    8. [324]Download to citation manager
+    9. [325]Request copyright permission
+
+ §4§ Citing Articles §4§
+
+    1. [326]Load citing article information
+    2. [327]Citing articles via CrossRef
+    3. [328]Citing articles via Web of Science
+    4. [329]Articles citing this article
+
+ §4§ Google Scholar §4§
+
+    1. [330]Articles by Axelrod, H. L.
+    2. [331]Articles by Feher, G.
+    3. [332]Search for related content
+
+ §4§ PubMed §4§
+
+    1. [333]PubMed citation
+    2. [334]Articles by Axelrod, H. L.
+    3. [335]Articles by Feher, G.
+    4.
+
+ §4§ Related Content §4§
+
+    1. [336]Load related web page information
+
+ §4§ Social Bookmarking §4§
+
+    1.
+          + [337]Add to CiteULike CiteULike
+          + [338]Add to Complore Complore
+          + [339]Add to Connotea Connotea
+          + [340]Add to Del.icio.us Del.icio.us
+          + [341]Add to Digg Digg
+          + [342]Add to Facebook Facebook
+          + [343]Add to Twitter Twitter
+       [344]What's this?
+
+ §3§ Navigate This Article §3§
+
+    1. [345]Top
+    2. [346]Abstract
+    3. [347]Experimental Procedures
+    4. [348]Results
+    5. [349]Discussion
+    6. [350]Acknowledgments
+    7. [351]Note Added in Proof
+    8. [352]Footnotes
+    9. [353]References
+
+   Search PNAS ____________________ GO
+   [354]Link: Advanced Search
+
+ §3§ This Week's Issue §3§
+
+    1. [355]September 14, 2010, 107 (37)
+
+    1. [356]Current Issue
+
+ §4§ From the Cover §4§
+
+     * [357]Eyeing neural circuits in Drosophila
+     * [358]Optimizing live cell imaging
+     * [359]Public perceptions of energy use
+     * [360]Activating DNA mismatch repair
+     * [361]Evolution of collective migration
+
+    1. [362]Alert me to new issues of PNAS
+
+     * [363]Early Edition
+     * [364]Archives
+     * [365]Online Submission
+
+     * [366]Feature Articles
+       (Expanded research articles of exceptional breadth)
+     * [367]Commentaries
+       (Expert commentary on leading research)
+     * [368]Letters
+       (Online-only letters to the editor)
+     * [369]Inaugural Articles
+       (Articles by recently elected NAS members)
+     * [370]PNAS Profiles
+       (Biographical profiles of Academy members)
+     * [371]Sustainability Science
+       (Interactions of human and environmental systems)
+     * [372]Collected Papers
+       (Editorials, Perspectives, Reviews, Colloquia, etc.)
+     * [373]Special Features
+       (Solicited articles on exceptional research topics)
+     * [374]Sackler Colloquia
+       (Scientific reports held under NAS auspices)
+     * [375]Podcasts
+       Brief podcasts with leading scientists
+
+ §3§ Most §3§
+
+     *  §4§ Read §4§
+         1. [376]Molecular origins of fluorocarbon hydrophobicity
+         2. [377]Public perceptions of energy consumption and savings
+         3. [378]Detection of MLV-related virus gene sequences in blood of
+            patients with chronic fatigue syndrome and healthy blood
+            donors
+         4. [379]Inaugural Article: The Lucretian swerve: The biological
+            basis of human behavior and the criminal justice system
+         5. [380]The most influential journals: Impact Factor and
+            Eigenfactor
+       [381]» View all Most Read articles
+     *  §4§ Cited §4§
+         1. [382]DNA Sequencing with Chain-Terminating Inhibitors
+         2. [383]Electrophoretic Transfer of Proteins from Polyacrylamide
+            Gels to Nitrocellulose Sheets: Procedure and Some Applications
+         3. [384]Cluster analysis and display of genome-wide expression
+            patterns
+         4. [385]Significance analysis of microarrays applied to the
+            ionizing radiation response
+         5. [386]One-step inactivation of chromosomal genes in Escherichia
+            coli K-12 using PCR products
+       [387]» View all Most Cited articles
+
+     * [388]Current Issue
+     * [389]Archives
+     * [390]Online Submission
+     * [391]Info for Authors
+     * [392]Editorial Board
+     * [393]About
+
+     * [394]Subscribe
+     * [395]Advertise
+     * [396]Contact
+     * [397]Site Map
+
+   [398]Copyright ©2010 by the National Academy of Sciences
+
+References
+
+   Visible links
+   1. http://www.pnas.org/
+   2. http://www.pnas.org/
+   3. file://localhost/dev/paper.html#content-block
+   4. http://www.pnas.org/misc/iforc.shtml
+   5. http://www.pnas.org/misc/masthead.shtml
+   6. http://www.pnas.org/misc/about.shtml
+   7. http://www.pnas.org/subscriptions
+   8. http://www.pnas.org/misc/about.shtml#advertising
+   9. http://www.pnas.org/site/misc/contact.shtml
+  10. http://www.pnas.org/cgi/feedback
+  11. http://www.pnas.org/misc/sitemap.shtml
+  12. http://www.pnas.org/cgi/adclick/?ad=25494&adclick=true&url=http%3A%2F%2Fwww.affymetrix.com%2Festore%2Fbrowse%2Fbrand%2Fanatrace%2Fanatrace-overview.jsp%3Fcategory%3D35858%26categoryIdClicked%3D35858%26rootCategoryId%3D35677%26navMode%3D35858%26parent%3D35858%26aId%3DanatraceNav
+  13. http://www.pnas.org/cgi/adclick/?ad=21636&adclick=true&url=http%3A%2F%2Fwww.pnas.org%2Fcgi%2Falerts%2Fetoc
+  14. http://www.pnas.org/cgi/adclick/?ad=19262&adclick=true&url=http%3A%2F%2Fwww.pnas.org%2Fmisc%2Fpodcasts.shtml
+  15. http://www.pnas.org/login?uri=http%3A%2F%2Fwww.pnas.org%2Fcontent%2F97%2F4%2F1542.long
+  16. http://www.pnas.org/search?author1=H.+L.+Axelrod&sortspec=date&submit=Submit
+  17. http://www.pnas.org/search?author1=E.+C.+Abresch&sortspec=date&submit=Submit
+  18. http://www.pnas.org/search?author1=M.+L.+Paddock&sortspec=date&submit=Submit
+  19. http://www.pnas.org/search?author1=M.+Y.+Okamura&sortspec=date&submit=Submit
+  20. http://www.pnas.org/search?author1=G.+Feher&sortspec=date&submit=Submit
+  21. file://localhost/dev/paper.html#fn-1
+  22. file://localhost/dev/paper.html#sec-1
+  23. http://www.pnas.org/search?fulltext=bacterial+photosynthesis&sortspec=date&submit=Submit&andorexactfulltext=phrase
+  24. http://www.pnas.org/search?fulltext=Rhodobacter%0A+sphaeroides&sortspec=date&submit=Submit&andorexactfulltext=phrase
+  25. http://www.pnas.org/search?fulltext=metal+ion+binding&sortspec=date&submit=Submit&andorexactfulltext=phrase
+  26. http://www.pnas.org/search?fulltext=cation%0A+binding&sortspec=date&submit=Submit&andorexactfulltext=phrase
+  27. http://www.pnas.org/search?fulltext=x-ray+crystallography&sortspec=date&submit=Submit&andorexactfulltext=phrase
+  28. file://localhost/dev/paper.html#ref-1
+  29. file://localhost/dev/paper.html#ref-3
+  30. file://localhost/dev/paper.html#ref-4
+  31. file://localhost/dev/paper.html#ref-7
+  32. file://localhost/dev/paper.html#ref-1
+  33. file://localhost/dev/paper.html#ref-3
+  34. file://localhost/dev/paper.html#ref-8
+  35. file://localhost/dev/paper.html#ref-10
+  36. file://localhost/dev/paper.html#ref-11
+  37. file://localhost/dev/paper.html#ref-12
+  38. file://localhost/dev/paper.html#ref-13
+  39. file://localhost/dev/paper.html#ref-14
+  40. file://localhost/dev/paper.html#ref-15
+  41. file://localhost/dev/paper.html#ref-16
+  42. file://localhost/dev/paper.html#ref-17
+  43. file://localhost/dev/paper.html#ref-6
+  44. file://localhost/dev/paper.html#ref-7
+  45. file://localhost/dev/paper.html#ref-18
+  46. file://localhost/dev/paper.html#ref-19
+  47. file://localhost/dev/paper.html#ref-20
+  48. file://localhost/dev/paper.html#abstract-1
+  49. file://localhost/dev/paper.html#sec-7
+  50. file://localhost/dev/paper.html#ref-21
+  51. file://localhost/dev/paper.html#ref-22
+  52. file://localhost/dev/paper.html#ref-23
+  53. file://localhost/dev/paper.html#ref-7
+  54. file://localhost/dev/paper.html#ref-7
+  55. file://localhost/dev/paper.html#ref-24
+  56. file://localhost/dev/paper.html#ref-7
+  57. file://localhost/dev/paper.html#ref-25
+  58. file://localhost/dev/paper.html#ref-26
+  59. file://localhost/dev/paper.html#T1
+  60. http://www.pnas.org/content/97/4/1542/T1.expansion.html
+  61. http://www.pnas.org/content/97/4/1542/T1.expansion.html
+  62. http://www.pnas.org/external-ref?link_type=PDB&access_num=1AIJ
+  63. file://localhost/dev/paper.html#ref-7
+  64. file://localhost/dev/paper.html#ref-27
+  65. file://localhost/dev/paper.html#ref-26
+  66. file://localhost/dev/paper.html#ref-28
+  67. file://localhost/dev/paper.html#ref-29
+  68. file://localhost/dev/paper.html#ref-30
+  69. file://localhost/dev/paper.html#ref-31
+  70. file://localhost/dev/paper.html#ref-26
+  71. file://localhost/dev/paper.html#ref-32
+  72. file://localhost/dev/paper.html#ref-33
+  73. file://localhost/dev/paper.html#ref-34
+  74. file://localhost/dev/paper.html#ref-35
+  75. file://localhost/dev/paper.html#ref-36
+  76. file://localhost/dev/paper.html#ref-37
+  77. file://localhost/dev/paper.html#sec-1
+  78. file://localhost/dev/paper.html#sec-11
+  79. file://localhost/dev/paper.html#F1
+  80. http://www.pnas.org/content/97/4/1542/F1.expansion.html
+  81. http://www.pnas.org/content/97/4/1542/F1.expansion.html
+  82. http://www.pnas.org/content/97/4/1542/F1.expansion.html
+  83. http://www.pnas.org/powerpoint/97/4/1542/F1
+  84. file://localhost/dev/paper.html#ref-38
+  85. file://localhost/dev/paper.html#ref-39
+  86. file://localhost/dev/paper.html#F2
+  87. file://localhost/dev/paper.html#F2
+  88. http://www.pnas.org/content/97/4/1542/F2.expansion.html
+  89. http://www.pnas.org/content/97/4/1542/F2.expansion.html
+  90. http://www.pnas.org/content/97/4/1542/F2.expansion.html
+  91. http://www.pnas.org/powerpoint/97/4/1542/F2
+  92. file://localhost/dev/paper.html#F5
+  93. file://localhost/dev/paper.html#T1
+  94. file://localhost/dev/paper.html#ref-7
+  95. file://localhost/dev/paper.html#F2
+  96. file://localhost/dev/paper.html#ref-31
+  97. file://localhost/dev/paper.html#ref-31
+  98. file://localhost/dev/paper.html#ref-27
+  99. file://localhost/dev/paper.html#ref-31
+ 100. file://localhost/dev/paper.html#ref-40
+ 101. file://localhost/dev/paper.html#T1
+ 102. file://localhost/dev/paper.html#T1
+ 103. file://localhost/dev/paper.html#T1
+ 104. http://www.pnas.org/external-ref?link_type=PDB&access_num=1AIG
+ 105. file://localhost/dev/paper.html#ref-7
+ 106. file://localhost/dev/paper.html#F3
+ 107. file://localhost/dev/paper.html#ref-7
+ 108. file://localhost/dev/paper.html#F3
+ 109. http://www.pnas.org/content/97/4/1542/F3.expansion.html
+ 110. http://www.pnas.org/content/97/4/1542/F3.expansion.html
+ 111. http://www.pnas.org/content/97/4/1542/F3.expansion.html
+ 112. http://www.pnas.org/powerpoint/97/4/1542/F3
+ 113. file://localhost/dev/paper.html#ref-7
+ 114. file://localhost/dev/paper.html#ref-20
+ 115. file://localhost/dev/paper.html#ref-41
+ 116. file://localhost/dev/paper.html#ref-36
+ 117. file://localhost/dev/paper.html#ref-37
+ 118. file://localhost/dev/paper.html#F4
+ 119. http://www.pnas.org/content/97/4/1542/F4.expansion.html
+ 120. http://www.pnas.org/content/97/4/1542/F4.expansion.html
+ 121. http://www.pnas.org/content/97/4/1542/F4.expansion.html
+ 122. http://www.pnas.org/powerpoint/97/4/1542/F4
+ 123. file://localhost/dev/paper.html#sec-7
+ 124. file://localhost/dev/paper.html#ack-1
+ 125. file://localhost/dev/paper.html#ref-20
+ 126. file://localhost/dev/paper.html#ref-20
+ 127. file://localhost/dev/paper.html#ref-20
+ 128. file://localhost/dev/paper.html#ref-41
+ 129. file://localhost/dev/paper.html#ref-41
+ 130. file://localhost/dev/paper.html#ref-37
+ 131. file://localhost/dev/paper.html#ref-42
+ 132. file://localhost/dev/paper.html#ref-43
+ 133. file://localhost/dev/paper.html#F3
+ 134. file://localhost/dev/paper.html#ref-37
+ 135. file://localhost/dev/paper.html#ref-20
+ 136. file://localhost/dev/paper.html#ref-20
+ 137. file://localhost/dev/paper.html#F5
+ 138. file://localhost/dev/paper.html#ref-18
+ 139. file://localhost/dev/paper.html#ref-11
+ 140. file://localhost/dev/paper.html#ref-14
+ 141. file://localhost/dev/paper.html#ref-15
+ 142. file://localhost/dev/paper.html#ref-44
+ 143. http://www.pnas.org/content/97/4/1542/F5.expansion.html
+ 144. http://www.pnas.org/content/97/4/1542/F5.expansion.html
+ 145. http://www.pnas.org/content/97/4/1542/F5.expansion.html
+ 146. http://www.pnas.org/powerpoint/97/4/1542/F5
+ 147. file://localhost/dev/paper.html#ref-7
+ 148. file://localhost/dev/paper.html#ref-18
+ 149. file://localhost/dev/paper.html#F5
+ 150. file://localhost/dev/paper.html#ref-45
+ 151. file://localhost/dev/paper.html#ref-46
+ 152. file://localhost/dev/paper.html#ref-47
+ 153. file://localhost/dev/paper.html#ref-48
+ 154. file://localhost/dev/paper.html#ref-49
+ 155. file://localhost/dev/paper.html#ref-50
+ 156. file://localhost/dev/paper.html#ref-51
+ 157. file://localhost/dev/paper.html#ref-52
+ 158. file://localhost/dev/paper.html#ref-53
+ 159. file://localhost/dev/paper.html#ref-54
+ 160. file://localhost/dev/paper.html#sec-11
+ 161. file://localhost/dev/paper.html#notes-1
+ 162. file://localhost/dev/paper.html#ack-1
+ 163. file://localhost/dev/paper.html#fn-group-1
+ 164. file://localhost/dev/paper.html#F5
+ 165. file://localhost/dev/paper.html#notes-1
+ 166. file://localhost/dev/paper.html#ref-list-1
+ 167. file://localhost/dev/paper.html#xref-fn-1-1
+ 168. http://www.rcsb.org/
+ 169. http://www.pnas.org/external-ref?link_type=PDB&access_num=1DS8
+ 170. http://www.pnas.org/external-ref?link_type=PDB&access_num=1DV3
+ 171. http://www.pnas.org/external-ref?link_type=PDB&access_num=1DV6
+ 172. file://localhost/dev/paper.html#fn-group-1
+ 173. file://localhost/dev/paper.html#xref-ref-1-1
+ 174. http://www.pnas.org/external-ref?access_num=10.1038/339111a0&link_type=DOI
+ 175. file://localhost/dev/paper.html#xref-ref-3-1
+ 176. http://www.pnas.org/external-ref?access_num=10.1023/A:1017109609905&link_type=DOI
+ 177. file://localhost/dev/paper.html#xref-ref-4-1
+ 178. http://www.pnas.org/external-ref?access_num=10.1016/0014-5793(86)80870-5&link_type=DOI
+ 179. http://www.pnas.org/external-ref?access_num=3527749&link_type=MED
+ 180. http://www.pnas.org/external-ref?access_num=A1986D882000018&link_type=ISI
+ 181. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=pnas&resid=84/17/6162
+ 182. file://localhost/dev/paper.html#xref-ref-6-1
+ 183. http://www.pnas.org/external-ref?access_num=7866744&link_type=MED
+ 184. file://localhost/dev/paper.html#xref-ref-7-1
+ 185. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=sci&resid=276/5313/812
+ 186. file://localhost/dev/paper.html#xref-ref-8-1
+ 187. http://www.pnas.org/external-ref?access_num=10.1007/BF00762582&link_type=DOI
+ 188. http://www.pnas.org/external-ref?access_num=8394316&link_type=MED
+ 189. http://www.pnas.org/external-ref?access_num=A1993LH00400002&link_type=ISI
+ 190. file://localhost/dev/paper.html#xref-ref-10-1
+ 191. http://www.pnas.org/external-ref?access_num=10.1016/S0959-440X(98)80129-2&link_type=DOI
+ 192. http://www.pnas.org/external-ref?access_num=9729743&link_type=MED
+ 193. http://www.pnas.org/external-ref?access_num=000075505000014&link_type=ISI
+ 194. file://localhost/dev/paper.html#xref-ref-11-1
+ 195. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=pnas&resid=87/17/6803
+ 196. file://localhost/dev/paper.html#xref-ref-12-1
+ 197. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=pnas&resid=86/17/6602
+ 198. file://localhost/dev/paper.html#xref-ref-13-1
+ 199. http://www.pnas.org/external-ref?access_num=10.1021/bi00118a031&link_type=DOI
+ 200. http://www.pnas.org/external-ref?access_num=1731944&link_type=MED
+ 201. file://localhost/dev/paper.html#xref-ref-14-1
+ 202. http://www.pnas.org/external-ref?access_num=10.1016/0005-2728(90)90100-I&link_type=DOI
+ 203. file://localhost/dev/paper.html#xref-ref-15-1
+ 204. http://www.pnas.org/external-ref?access_num=10.1021/bi00169a015&link_type=DOI
+ 205. http://www.pnas.org/external-ref?access_num=8292601&link_type=MED
+ 206. file://localhost/dev/paper.html#xref-ref-16-1
+ 207. http://www.pnas.org/external-ref?access_num=10.1063/1.439674&link_type=DOI
+ 208. file://localhost/dev/paper.html#xref-ref-17-1
+ 209. file://localhost/dev/paper.html#xref-ref-18-1
+ 210. http://www.pnas.org/external-ref?access_num=10.1023/A:1006047519260&link_type=DOI
+ 211. file://localhost/dev/paper.html#xref-ref-19-1
+ 212. http://www.pnas.org/external-ref?access_num=10.1023/A:1006088232755&link_type=DOI
+ 213. file://localhost/dev/paper.html#xref-ref-20-1
+ 214. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=pnas&resid=96/11/6183
+ 215. file://localhost/dev/paper.html#xref-ref-21-1
+ 216. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=biophysj&resid=69/2/311
+ 217. file://localhost/dev/paper.html#xref-ref-22-1
+ 218. file://localhost/dev/paper.html#xref-ref-23-1
+ 219. http://www.pnas.org/external-ref?access_num=10.1002/prot.340200309&link_type=DOI
+ 220. http://www.pnas.org/external-ref?access_num=7892177&link_type=MED
+ 221. file://localhost/dev/paper.html#xref-ref-24-1
+ 222. file://localhost/dev/paper.html#xref-ref-25-1
+ 223. file://localhost/dev/paper.html#xref-ref-26-1
+ 224. http://www.pnas.org/external-ref?access_num=10.1107/S0907444994003112&link_type=DOI
+ 225. http://www.pnas.org/external-ref?access_num=15299374&link_type=MED
+ 226. file://localhost/dev/paper.html#xref-ref-27-1
+ 227. http://www.pnas.org/external-ref?access_num=875032&link_type=MED
+ 228. http://www.pnas.org/external-ref?access_num=A1977DK67100014&link_type=ISI
+ 229. file://localhost/dev/paper.html#xref-ref-28-1
+ 230. http://www.pnas.org/external-ref?access_num=10.1107/S0907444998003254&link_type=DOI
+ 231. http://www.pnas.org/external-ref?access_num=9757107&link_type=MED
+ 232. file://localhost/dev/paper.html#xref-ref-29-1
+ 233. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=pnas&resid=94/10/5018
+ 234. file://localhost/dev/paper.html#xref-ref-30-1
+ 235. http://www.pnas.org/external-ref?access_num=10.1016/S0959-440X(98)80152-8&link_type=DOI
+ 236. http://www.pnas.org/external-ref?access_num=9818265&link_type=MED
+ 237. http://www.pnas.org/external-ref?access_num=000076586300011&link_type=ISI
+ 238. file://localhost/dev/paper.html#xref-ref-31-1
+ 239. http://www.pnas.org/external-ref?access_num=10.1016/S0162-0134(98)10042-9&link_type=DOI
+ 240. http://www.pnas.org/external-ref?access_num=9833317&link_type=MED
+ 241. http://www.pnas.org/external-ref?access_num=000077038800002&link_type=ISI
+ 242. file://localhost/dev/paper.html#xref-ref-32-1
+ 243. http://www.pnas.org/external-ref?access_num=10.1107/S0907444995014983&link_type=DOI
+ 244. http://www.pnas.org/external-ref?access_num=15299647&link_type=MED
+ 245. file://localhost/dev/paper.html#xref-ref-33-1
+ 246. http://www.pnas.org/external-ref?access_num=3841179&link_type=MED
+ 247. http://www.pnas.org/external-ref?access_num=A1985AVT3900013&link_type=ISI
+ 248. file://localhost/dev/paper.html#xref-ref-34-1
+ 249. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=pnas&resid=81/15/4795
+ 250. file://localhost/dev/paper.html#xref-ref-35-1
+ 251. http://www.pnas.org/external-ref?access_num=10.1021/bi9522054&link_type=DOI
+ 252. http://www.pnas.org/external-ref?access_num=8611557&link_type=MED
+ 253. file://localhost/dev/paper.html#xref-ref-36-1
+ 254. http://www.pnas.org/external-ref?access_num=10.1021/bi971699x&link_type=DOI
+ 255. http://www.pnas.org/external-ref?access_num=9485433&link_type=MED
+ 256. file://localhost/dev/paper.html#xref-ref-37-1
+ 257. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=pnas&resid=95/20/11679
+ 258. file://localhost/dev/paper.html#xref-ref-38-1
+ 259. http://www.pnas.org/external-ref?access_num=10.1107/S0907444998017363&link_type=DOI
+ 260. http://www.pnas.org/external-ref?access_num=10089341&link_type=MED
+ 261. file://localhost/dev/paper.html#xref-ref-39-1
+ 262. http://www.pnas.org/external-ref?access_num=A1997BJ57S00026&link_type=ISI
+ 263. file://localhost/dev/paper.html#xref-ref-40-1
+ 264. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=protsci&resid=7/8/1700
+ 265. file://localhost/dev/paper.html#xref-ref-41-1
+ 266. http://www.pnas.org/external-ref?access_num=10.1021/bi980395n&link_type=DOI
+ 267. http://www.pnas.org/external-ref?access_num=9622479&link_type=MED
+ 268. file://localhost/dev/paper.html#xref-ref-42-1
+ 269. http://www.pnas.org/external-ref?access_num=10.1021/bi9605907&link_type=DOI
+ 270. http://www.pnas.org/external-ref?access_num=8718867&link_type=MED
+ 271. file://localhost/dev/paper.html#xref-ref-43-1
+ 272. http://www.pnas.org/external-ref?access_num=10.1021/bi982700a&link_type=DOI
+ 273. http://www.pnas.org/external-ref?access_num=10387071&link_type=MED
+ 274. file://localhost/dev/paper.html#xref-ref-44-1
+ 275. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=pnas&resid=97/4/1548
+ 276. file://localhost/dev/paper.html#xref-ref-45-1
+ 277. http://www.pnas.org/external-ref?access_num=10.1002/prot.340010405&link_type=DOI
+ 278. http://www.pnas.org/external-ref?access_num=3329732&link_type=MED
+ 279. file://localhost/dev/paper.html#xref-ref-46-1
+ 280. http://www.pnas.org/external-ref?access_num=16453623&link_type=MED
+ 281. http://www.pnas.org/external-ref?access_num=A1985AMH2400008&link_type=ISI
+ 282. file://localhost/dev/paper.html#xref-ref-47-1
+ 283. http://www.pnas.org/external-ref?access_num=10.1016/S0022-2836(84)80011-X&link_type=DOI
+ 284. http://www.pnas.org/external-ref?access_num=6392571&link_type=MED
+ 285. http://www.pnas.org/external-ref?access_num=A1984TX71000011&link_type=ISI
+ 286. file://localhost/dev/paper.html#xref-ref-48-1
+ 287. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=sci&resid=280/5370/1723
+ 288. file://localhost/dev/paper.html#xref-ref-49-1
+ 289. http://www.pnas.org/external-ref?access_num=10.1038/376660a0&link_type=DOI
+ 290. http://www.pnas.org/external-ref?access_num=7651515&link_type=MED
+ 291. file://localhost/dev/paper.html#xref-ref-50-1
+ 292. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=sci&resid=280/5371/1934
+ 293. file://localhost/dev/paper.html#xref-ref-51-1
+ 294. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=sci&resid=286/5438/255
+ 295. file://localhost/dev/paper.html#xref-ref-52-1
+ 296. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=jbc&resid=270/42/25001
+ 297. file://localhost/dev/paper.html#xref-ref-53-1
+ 298. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=sci&resid=277/5322/60
+ 299. file://localhost/dev/paper.html#xref-ref-54-1
+ 300. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=pnas&resid=96/18/10021
+ 301. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/97/4/1542&title=Determination%20of%20the%20binding%20sites%20of%20the%20proton%20transfer%20inhibitors%20Cd2%2B%20and%20Zn2%2B%20in%20bacterial%20reaction%20centers+--+Axelrod%20et%20al.%2097%20%284%29%3A%201542+--+PNAS&doi=&link_type=CITEULIKE
+ 302. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/97/4/1542&title=Determination%20of%20the%20binding%20sites%20of%20the%20proton%20transfer%20inhibitors%20Cd2%2B%20and%20Zn2%2B%20in%20bacterial%20reaction%20centers+--+Axelrod%20et%20al.%2097%20%284%29%3A%201542+--+PNAS&doi=&link_type=COMPLORE
+ 303. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/97/4/1542&title=Determination%20of%20the%20binding%20sites%20of%20the%20proton%20transfer%20inhibitors%20Cd2%2B%20and%20Zn2%2B%20in%20bacterial%20reaction%20centers+--+Axelrod%20et%20al.%2097%20%284%29%3A%201542+--+PNAS&doi=&link_type=CONNOTEA
+ 304. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/97/4/1542&title=Determination%20of%20the%20binding%20sites%20of%20the%20proton%20transfer%20inhibitors%20Cd2%2B%20and%20Zn2%2B%20in%20bacterial%20reaction%20centers+--+Axelrod%20et%20al.%2097%20%284%29%3A%201542+--+PNAS&doi=&link_type=DEL_ICIO_US
+ 305. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/97/4/1542&title=Determination%20of%20the%20binding%20sites%20of%20the%20proton%20transfer%20inhibitors%20Cd2%2B%20and%20Zn2%2B%20in%20bacterial%20reaction%20centers+--+Axelrod%20et%20al.%2097%20%284%29%3A%201542+--+PNAS&doi=&link_type=DIGG
+ 306. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/short/97/4/1542&title=Determination%20of%20the%20binding%20sites%20of%20the%20proton%20transfer%20inhibitors%20Cd2%2B%20and%20Zn2%2B%20in%20bacterial%20reaction%20centers+--+Axelrod%20et%20al.%2097%20%284%29%3A%201542+--+PNAS&doi=&link_type=FACEBOOK
+ 307. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/97/4/1542&title=Determination%20of%20the%20binding%20sites%20of%20the%20proton%20transfer%20inhibitors%20Cd2%2B%20and%20Zn2%2B%20in%20bacterial%20reaction%20centers+--+Axelrod%20et%20al.%2097%20%284%29%3A%201542+--+PNAS&doi=&link_type=TWITTER
+ 308. http://www.pnas.org/help/social_bookmarks.dtl
+ 309. http://www.pnas.org/content/97/4/1536.short
+ 310. http://www.pnas.org/content/97/4/1548.short
+ 311. http://www.pnas.org/content/97/4.toc
+ 312. http://www.pnas.org/content/97/4/1542.abstract
+ 313. http://www.pnas.org/content/97/4/1542.figures-only
+ 314. http://www.pnas.org/content/97/4/1542.full.pdf+html
+ 315. http://www.pnas.org/content/97/8/4410.1
+ 316. http://www.pnas.org/search?tocsectionid=Biophysics&sortspec=date&submit=Submit
+ 317. http://www.pnas.org/email?gca=pnas;97/4/1542&current-view-path=/content/97/4/1542.long
+ 318. http://www.pnas.org/cgi/alerts/ctalert?alertType=citedby&addAlert=cited_by&cited_by_criteria_resid=pnas;97/4/1542&saveAlert=no&return-type=article&return_url=http://www.pnas.org/content/97/4/1542.long
+ 319. http://www.pnas.org/cgi/alerts/ctalert?alertType=correction&addAlert=correction&correction_criteria_value=97/4/1542&saveAlert=no&return-type=article&return_url=http://www.pnas.org/content/97/4/1542.long
+ 320. http://www.pnas.org/search?qbe=pnas;97/4/1542&citation=Axelrod%20et%20al.%2097%20%284%29:%201542&submit=yes
+ 321. http://www.pnas.org/external-ref?access_num=pnas%3B97%2F4%2F1542&link_type=ISI_RELATEDRECORDS
+ 322. http://www.pnas.org/external-ref?access_num=10677497&link_type=MED_NBRS
+ 323. http://www.pnas.org/cgi/folders?action=addtofolder&wherefrom=JOURNALS&wrapped_id=pnas;97/4/1542
+ 324. http://www.pnas.org/citmgr?gca=pnas;97/4/1542
+ 325. http://www.pnas.org/misc/rightperm.shtml
+ 326. http://www.pnas.org/content/97/4/1542.long?cited-by=yes&legid=pnas;97/4/1542#cited-by
+ 327. http://www.pnas.org/cgi/crossref-forward-links/97/4/1542
+ 328. http://www.pnas.org/external-ref?access_num=pnas%3B97%2F4%2F1542&link_type=ISI_CITING
+ 329. http://www.pnas.org/external-ref?access_num=http://www.pnas.org/cgi/content/abstract/97/4/1542&link_type=GOOGLESCHOLAR
+ 330. http://scholar.google.com/scholar?q=%22author%3AAxelrod%20author%3AH.L.%22
+ 331. http://scholar.google.com/scholar?q=%22author%3AFeher%20author%3AG.%22
+ 332. http://www.pnas.org/external-ref?access_num=http://www.pnas.org/cgi/content/abstract/97/4/1542&link_type=GOOGLESCHOLARRELATED
+ 333. http://www.pnas.org/external-ref?access_num=10677497&link_type=PUBMED
+ 334. http://www.pnas.org/external-ref?access_num=Axelrod%20HL&link_type=AUTHORSEARCH
+ 335. http://www.pnas.org/external-ref?access_num=Feher%20G&link_type=AUTHORSEARCH
+ 336. http://www.pnas.org/content/97/4/1542.long?related-urls=yes&legid=pnas;97/4/1542#related-urls
+ 337. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/97/4/1542&title=Determination%20of%20the%20binding%20sites%20of%20the%20proton%20transfer%20inhibitors%20Cd2%2B%20and%20Zn2%2B%20in%20bacterial%20reaction%20centers+--+Axelrod%20et%20al.%2097%20%284%29%3A%201542+--+PNAS&doi=&link_type=CITEULIKE
+ 338. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/97/4/1542&title=Determination%20of%20the%20binding%20sites%20of%20the%20proton%20transfer%20inhibitors%20Cd2%2B%20and%20Zn2%2B%20in%20bacterial%20reaction%20centers+--+Axelrod%20et%20al.%2097%20%284%29%3A%201542+--+PNAS&doi=&link_type=COMPLORE
+ 339. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/97/4/1542&title=Determination%20of%20the%20binding%20sites%20of%20the%20proton%20transfer%20inhibitors%20Cd2%2B%20and%20Zn2%2B%20in%20bacterial%20reaction%20centers+--+Axelrod%20et%20al.%2097%20%284%29%3A%201542+--+PNAS&doi=&link_type=CONNOTEA
+ 340. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/97/4/1542&title=Determination%20of%20the%20binding%20sites%20of%20the%20proton%20transfer%20inhibitors%20Cd2%2B%20and%20Zn2%2B%20in%20bacterial%20reaction%20centers+--+Axelrod%20et%20al.%2097%20%284%29%3A%201542+--+PNAS&doi=&link_type=DEL_ICIO_US
+ 341. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/97/4/1542&title=Determination%20of%20the%20binding%20sites%20of%20the%20proton%20transfer%20inhibitors%20Cd2%2B%20and%20Zn2%2B%20in%20bacterial%20reaction%20centers+--+Axelrod%20et%20al.%2097%20%284%29%3A%201542+--+PNAS&doi=&link_type=DIGG
+ 342. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/short/97/4/1542&title=Determination%20of%20the%20binding%20sites%20of%20the%20proton%20transfer%20inhibitors%20Cd2%2B%20and%20Zn2%2B%20in%20bacterial%20reaction%20centers+--+Axelrod%20et%20al.%2097%20%284%29%3A%201542+--+PNAS&doi=&link_type=FACEBOOK
+ 343. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/97/4/1542&title=Determination%20of%20the%20binding%20sites%20of%20the%20proton%20transfer%20inhibitors%20Cd2%2B%20and%20Zn2%2B%20in%20bacterial%20reaction%20centers+--+Axelrod%20et%20al.%2097%20%284%29%3A%201542+--+PNAS&doi=&link_type=TWITTER
+ 344. http://www.pnas.org/help/social_bookmarks.dtl
+ 345. file://localhost/dev/paper.html#content-block
+ 346. file://localhost/dev/paper.html#abstract-1
+ 347. file://localhost/dev/paper.html#sec-1
+ 348. file://localhost/dev/paper.html#sec-7
+ 349. file://localhost/dev/paper.html#sec-11
+ 350. file://localhost/dev/paper.html#ack-1
+ 351. file://localhost/dev/paper.html#notes-1
+ 352. file://localhost/dev/paper.html#fn-group-1
+ 353. file://localhost/dev/paper.html#ref-list-1
+ 354. http://www.pnas.org/search
+ 355. http://www.pnas.org/content/current
+ 356. http://www.pnas.org/content/current
+ 357. http://www.pnas.org/content/107/37/16378
+ 358. http://www.pnas.org/content/107/37/16016
+ 359. http://www.pnas.org/content/107/37/16054
+ 360. http://www.pnas.org/content/107/37/16066
+ 361. http://www.pnas.org/content/107/37/16172
+ 362. http://www.pnas.org/cgi/alerts/etoc
+ 363. http://www.pnas.org/content/early/recent
+ 364. http://www.pnas.org/content
+ 365. http://www.pnas.org/site/misc/onlinesubmission.shtml
+ 366. http://www.pnas.org/cgi/collection/feature_articles
+ 367. http://www.pnas.org/content/by/section/Commentaries
+ 368. http://www.pnas.org/cgi/collection/letters
+ 369. http://www.pnas.org/cgi/collection/inaugurals
+ 370. http://www.pnas.org/cgi/collection/profiles
+ 371. http://www.pnas.org/site/misc/sustainability.shtml
+ 372. http://www.pnas.org/site/misc/collectedpapers.shtml
+ 373. http://www.pnas.org/site/misc/special.shtml
+ 374. http://www.pnas.org/site/misc/colloquia.shtml
+ 375. http://www.pnas.org/site/misc/podcasts.shtml
+ 376. http://www.pnas.org/cgi/content/short/107/31/13603?rss=1&ssource=mfc
+ 377. http://www.pnas.org/cgi/content/short/1001509107v1?rss=1&ssource=mfc
+ 378. http://www.pnas.org/cgi/content/short/1006901107v1?rss=1&ssource=mfc
+ 379. http://www.pnas.org/cgi/content/short/107/10/4499?rss=1&ssource=mfc
+ 380. http://www.pnas.org/cgi/content/short/106/17/6883?rss=1&ssource=mfc
+ 381. http://www.pnas.org/reports/mfr1.dtl
+ 382. http://www.pnas.org/cgi/content/short/74/12/5463?rss=1&ssource=mfc
+ 383. http://www.pnas.org/cgi/content/short/76/9/4350?rss=1&ssource=mfc
+ 384. http://www.pnas.org/cgi/content/short/95/25/14863?rss=1&ssource=mfc
+ 385. http://www.pnas.org/cgi/content/short/98/9/5116?rss=1&ssource=mfc
+ 386. http://www.pnas.org/cgi/content/short/97/12/6640?rss=1&ssource=mfc
+ 387. http://www.pnas.org/reports/mfc1.dtl
+ 388. http://www.pnas.org/content/current
+ 389. http://www.pnas.org/content
+ 390. http://www.pnas.org/misc/onlinesubmission.shtml
+ 391. http://www.pnas.org/misc/iforc.shtml
+ 392. http://www.pnas.org/misc/masthead.shtml
+ 393. http://www.pnas.org/misc/about.shtml
+ 394. http://www.pnas.org/subscriptions
+ 395. http://www.pnas.org/misc/about.shtml#advertising
+ 396. http://www.pnas.org/cgi/feedback
+ 397. http://www.pnas.org/misc/sitemap.shtml
+ 398. http://www.pnas.org/misc/terms.shtml
+
+   Hidden links:
+ 399. http://www.pnas.org/entrez-links/10677497

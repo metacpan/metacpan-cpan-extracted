@@ -1,0 +1,42 @@
+1
+2
+3
+[$if 1 $]4
+5
+[$endif$]   6
+7 [+ 7.1 +]      7.2
+8
+[$sub foo $]
+
+foo2 [$if 0 $] foo2.1 [$endif$] foo2.2
+
+[$endsub$]
+
+after sub foo
+
+call sub foo [- foo -]     more text
+
+call sub foo  2
+
+[- foo -]
+
+more text 2
+
+
+[$sub bar$]inbar[$endsub$]
+
+
+call sub bar [- bar -]      after call to bar
+
+call sub bar 2
+
+[- bar -] 
+
+after call to bar 2
+
+[$foreach $i (1..5) $]
+# new line [+ $i +]
+[$endforeach$]
+
+
+

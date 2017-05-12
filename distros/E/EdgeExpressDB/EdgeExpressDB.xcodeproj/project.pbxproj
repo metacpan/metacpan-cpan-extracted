@@ -1,0 +1,236 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 42;
+	objects = {
+
+/* Begin PBXFileReference section */
+		4C181DB60EAECF38009879CC /* www */ = {isa = PBXFileReference; lastKnownFileType = folder; path = www; sourceTree = "<group>"; };
+		4CA6414007959B130006EDE0 /* scripts */ = {isa = PBXFileReference; lastKnownFileType = folder; path = scripts; sourceTree = "<group>"; };
+		4CA6415507959B1B0006EDE0 /* sql */ = {isa = PBXFileReference; lastKnownFileType = folder; path = sql; sourceTree = "<group>"; };
+		4CC0BB990D7CE4E8006E483C /* align_view.cgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = align_view.cgi; sourceTree = "<group>"; };
+		4CC0BB9A0D7CE4E8006E483C /* edgeexpress.cgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = edgeexpress.cgi; sourceTree = "<group>"; };
+		4CC0BB9B0D7CE4E8006E483C /* edgeexpress.fcgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = edgeexpress.fcgi; sourceTree = "<group>"; };
+		4CC0BB9C0D7CE4E8006E483C /* edgeXpression.cgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; path = edgeXpression.cgi; sourceTree = "<group>"; };
+		4CC0BB9D0D7CE4E8006E483C /* ens_lookup.cgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = ens_lookup.cgi; sourceTree = "<group>"; };
+		4CC0BB9E0D7CE4E8006E483C /* geneview_data.cgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = geneview_data.cgi; sourceTree = "<group>"; };
+		4CC0BB9F0D7CE4E8006E483C /* getalign.cgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = getalign.cgi; sourceTree = "<group>"; };
+		4CC0BBA00D7CE4E8006E483C /* getcytoscape.cgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = getcytoscape.cgi; sourceTree = "<group>"; };
+		4CC0BBA10D7CE4E8006E483C /* getdbinfo.cgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = getdbinfo.cgi; sourceTree = "<group>"; };
+		4CC0BBA20D7CE4E8006E483C /* getedge.cgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = getedge.cgi; sourceTree = "<group>"; };
+		4CC0BBA30D7CE4E8006E483C /* getfeature.cgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = getfeature.cgi; sourceTree = "<group>"; };
+		4CC0BBA40D7CE4E8006E483C /* getfeature_express.cgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = getfeature_express.cgi; sourceTree = "<group>"; };
+		4CC0BBA50D7CE4E8006E483C /* getgoi.cgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = getgoi.cgi; sourceTree = "<group>"; };
+		4CC0BBA60D7CE4E8006E483C /* getgoi1.cgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = getgoi1.cgi; sourceTree = "<group>"; };
+		4CC0BBA70D7CE4E8006E483C /* getgoi2.cgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = getgoi2.cgi; sourceTree = "<group>"; };
+		4CC0BBA80D7CE4E8006E483C /* getgoi3.cgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = getgoi3.cgi; sourceTree = "<group>"; };
+		4CC0BBA90D7CE4E8006E483C /* getnetwork.cgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = getnetwork.cgi; sourceTree = "<group>"; };
+		4CC0BBAA0D7CE4E8006E483C /* GOI_logo.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = GOI_logo.gif; sourceTree = "<group>"; };
+		4CC0BBAB0D7CE4E8006E483C /* GOI_search.html */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.html; path = GOI_search.html; sourceTree = "<group>"; };
+		4CC0BBAC0D7CE4E8006E483C /* goiExpressionNTT.cgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; path = goiExpressionNTT.cgi; sourceTree = "<group>"; };
+		4CC0BBAD0D7CE4E8006E483C /* index.html */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.html; path = index.html; sourceTree = "<group>"; };
+		4CC0BBAE0D7CE4E8006E483C /* index_alt.html */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.html; path = index_alt.html; sourceTree = "<group>"; };
+		4CC0BBAF0D7CE4E8006E483C /* index_alt2.html */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.html; path = index_alt2.html; sourceTree = "<group>"; };
+		4CC0BBB10D7CE4E8006E483C /* align_view.cgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = align_view.cgi; sourceTree = "<group>"; };
+		4CC0BBB20D7CE4E8006E483C /* edgeexpress_v1.fcgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = edgeexpress_v1.fcgi; sourceTree = "<group>"; };
+		4CC0BBB30D7CE4E8006E483C /* edgeexpress_v2.cgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = edgeexpress_v2.cgi; sourceTree = "<group>"; };
+		4CC0BBB40D7CE4E8006E483C /* ens_lookup.cgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = ens_lookup.cgi; sourceTree = "<group>"; };
+		4CC0BBB50D7CE4E8006E483C /* fastcgi.fcgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = fastcgi.fcgi; sourceTree = "<group>"; };
+		4CC0BBB60D7CE4E8006E483C /* fastcgi2.fcgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = fastcgi2.fcgi; sourceTree = "<group>"; };
+		4CC0BBB70D7CE4E8006E483C /* fastcgi3.fcgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = fastcgi3.fcgi; sourceTree = "<group>"; };
+		4CC0BBB80D7CE4E8006E483C /* fastcgi4.fcgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = fastcgi4.fcgi; sourceTree = "<group>"; };
+		4CC0BBB90D7CE4E9006E483C /* fastcgi5.fcgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = fastcgi5.fcgi; sourceTree = "<group>"; };
+		4CC0BBBA0D7CE4E9006E483C /* fastcgi6.fcgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = fastcgi6.fcgi; sourceTree = "<group>"; };
+		4CC0BBBB0D7CE4E9006E483C /* fastcgi7.fcgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = fastcgi7.fcgi; sourceTree = "<group>"; };
+		4CC0BBBC0D7CE4E9006E483C /* fastcgi8.fcgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = fastcgi8.fcgi; sourceTree = "<group>"; };
+		4CC0BBBD0D7CE4E9006E483C /* firstscript.cgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = firstscript.cgi; sourceTree = "<group>"; };
+		4CC0BBBE0D7CE4E9006E483C /* geneview_data.cgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = geneview_data.cgi; sourceTree = "<group>"; };
+		4CC0BBBF0D7CE4E9006E483C /* getalign.cgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = getalign.cgi; sourceTree = "<group>"; };
+		4CC0BBC00D7CE4E9006E483C /* getedges.cgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = getedges.cgi; sourceTree = "<group>"; };
+		4CC0BBC10D7CE4E9006E483C /* getedges_orig.cgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = getedges_orig.cgi; sourceTree = "<group>"; };
+		4CC0BBC20D7CE4E9006E483C /* getexpression.cgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = getexpression.cgi; sourceTree = "<group>"; };
+		4CC0BBC30D7CE4E9006E483C /* getfeature2.cgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = getfeature2.cgi; sourceTree = "<group>"; };
+		4CC0BBC40D7CE4E9006E483C /* getgoi.cgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = getgoi.cgi; sourceTree = "<group>"; };
+		4CC0BBC50D7CE4E9006E483C /* getgoi1.cgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = getgoi1.cgi; sourceTree = "<group>"; };
+		4CC0BBC60D7CE4E9006E483C /* getgoi2.cgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = getgoi2.cgi; sourceTree = "<group>"; };
+		4CC0BBC70D7CE4E9006E483C /* getgoi3.cgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = getgoi3.cgi; sourceTree = "<group>"; };
+		4CC0BBC80D7CE4E9006E483C /* getgoi3.fcgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = getgoi3.fcgi; sourceTree = "<group>"; };
+		4CC0BBC90D7CE4E9006E483C /* getgoi3_fast.fcgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = getgoi3_fast.fcgi; sourceTree = "<group>"; };
+		4CC0BBCA0D7CE4E9006E483C /* getgoi3_fast2.fcgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = getgoi3_fast2.fcgi; sourceTree = "<group>"; };
+		4CC0BBCB0D7CE4E9006E483C /* getgoi3_fast3.fcgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = getgoi3_fast3.fcgi; sourceTree = "<group>"; };
+		4CC0BBCC0D7CE4E9006E483C /* getgoi3_fast4.fcgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = getgoi3_fast4.fcgi; sourceTree = "<group>"; };
+		4CC0BBCD0D7CE4E9006E483C /* getgoi3_fast5.fcgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = getgoi3_fast5.fcgi; sourceTree = "<group>"; };
+		4CC0BBCE0D7CE4E9006E483C /* getgoi3_orig.cgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = getgoi3_orig.cgi; sourceTree = "<group>"; };
+		4CC0BBCF0D7CE4E9006E483C /* getgoi3_v2.fcgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = getgoi3_v2.fcgi; sourceTree = "<group>"; };
+		4CC0BBD00D7CE4E9006E483C /* getgoi3_v3.fcgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = getgoi3_v3.fcgi; sourceTree = "<group>"; };
+		4CC0BBD10D7CE4E9006E483C /* getgoi3_v4.cgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = getgoi3_v4.cgi; sourceTree = "<group>"; };
+		4CC0BBD20D7CE4E9006E483C /* getgoi3b.cgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = getgoi3b.cgi; sourceTree = "<group>"; };
+		4CC0BBD30D7CE4E9006E483C /* getgoi4.cgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = getgoi4.cgi; sourceTree = "<group>"; };
+		4CC0BBD40D7CE4E9006E483C /* getgoi5.cgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = getgoi5.cgi; sourceTree = "<group>"; };
+		4CC0BBD50D7CE4E9006E483C /* getgoi7.cgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = getgoi7.cgi; sourceTree = "<group>"; };
+		4CC0BBD60D7CE4E9006E483C /* getgoi_v4.cgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = getgoi_v4.cgi; sourceTree = "<group>"; };
+		4CC0BBD70D7CE4E9006E483C /* getnetwork.fcgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = getnetwork.fcgi; sourceTree = "<group>"; };
+		4CC0BBD80D7CE4E9006E483C /* scftest.html */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.html; path = scftest.html; sourceTree = "<group>"; };
+		4CC0BBD90D7CE4E9006E483C /* search7.cgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = search7.cgi; sourceTree = "<group>"; };
+		4CC0BBDA0D7CE4E9006E483C /* search_goi.cgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = search_goi.cgi; sourceTree = "<group>"; };
+		4CC0BBDB0D7CE4E9006E483C /* python_test.cgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; path = python_test.cgi; sourceTree = "<group>"; };
+		4CC0BBDC0D7CE4E9006E483C /* scftest.html */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.html; path = scftest.html; sourceTree = "<group>"; };
+		4CC0BBDD0D7CE4E9006E483C /* search.cgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = search.cgi; sourceTree = "<group>"; };
+		4CC0BBDE0D7CE4E9006E483C /* search.html */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.html; path = search.html; sourceTree = "<group>"; };
+		4CC0BBDF0D7CE4E9006E483C /* search_goi.cgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = search_goi.cgi; sourceTree = "<group>"; };
+		4CC0BBE00D7CE4E9006E483C /* testremote.cgi */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.perl; path = testremote.cgi; sourceTree = "<group>"; };
+		4CC0BBE10D7CE4E9006E483C /* yhlab.css */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = yhlab.css; sourceTree = "<group>"; };
+		4CCA4E600F611A1600D10844 /* lib */ = {isa = PBXFileReference; lastKnownFileType = folder; path = lib; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		4CC0BB980D7CE4E8006E483C /* cgi */ = {
+			isa = PBXGroup;
+			children = (
+				4CC0BB990D7CE4E8006E483C /* align_view.cgi */,
+				4CC0BB9A0D7CE4E8006E483C /* edgeexpress.cgi */,
+				4CC0BB9B0D7CE4E8006E483C /* edgeexpress.fcgi */,
+				4CC0BB9C0D7CE4E8006E483C /* edgeXpression.cgi */,
+				4CC0BB9D0D7CE4E8006E483C /* ens_lookup.cgi */,
+				4CC0BB9E0D7CE4E8006E483C /* geneview_data.cgi */,
+				4CC0BB9F0D7CE4E8006E483C /* getalign.cgi */,
+				4CC0BBA00D7CE4E8006E483C /* getcytoscape.cgi */,
+				4CC0BBA10D7CE4E8006E483C /* getdbinfo.cgi */,
+				4CC0BBA20D7CE4E8006E483C /* getedge.cgi */,
+				4CC0BBA30D7CE4E8006E483C /* getfeature.cgi */,
+				4CC0BBA40D7CE4E8006E483C /* getfeature_express.cgi */,
+				4CC0BBA50D7CE4E8006E483C /* getgoi.cgi */,
+				4CC0BBA60D7CE4E8006E483C /* getgoi1.cgi */,
+				4CC0BBA70D7CE4E8006E483C /* getgoi2.cgi */,
+				4CC0BBA80D7CE4E8006E483C /* getgoi3.cgi */,
+				4CC0BBA90D7CE4E8006E483C /* getnetwork.cgi */,
+				4CC0BBAA0D7CE4E8006E483C /* GOI_logo.gif */,
+				4CC0BBAB0D7CE4E8006E483C /* GOI_search.html */,
+				4CC0BBAC0D7CE4E8006E483C /* goiExpressionNTT.cgi */,
+				4CC0BBAD0D7CE4E8006E483C /* index.html */,
+				4CC0BBAE0D7CE4E8006E483C /* index_alt.html */,
+				4CC0BBAF0D7CE4E8006E483C /* index_alt2.html */,
+				4CC0BBB00D7CE4E8006E483C /* old_cgi */,
+				4CC0BBDB0D7CE4E9006E483C /* python_test.cgi */,
+				4CC0BBDC0D7CE4E9006E483C /* scftest.html */,
+				4CC0BBDD0D7CE4E9006E483C /* search.cgi */,
+				4CC0BBDE0D7CE4E9006E483C /* search.html */,
+				4CC0BBDF0D7CE4E9006E483C /* search_goi.cgi */,
+				4CC0BBE00D7CE4E9006E483C /* testremote.cgi */,
+				4CC0BBE10D7CE4E9006E483C /* yhlab.css */,
+			);
+			path = cgi;
+			sourceTree = "<group>";
+		};
+		4CC0BBB00D7CE4E8006E483C /* old_cgi */ = {
+			isa = PBXGroup;
+			children = (
+				4CC0BBB10D7CE4E8006E483C /* align_view.cgi */,
+				4CC0BBB20D7CE4E8006E483C /* edgeexpress_v1.fcgi */,
+				4CC0BBB30D7CE4E8006E483C /* edgeexpress_v2.cgi */,
+				4CC0BBB40D7CE4E8006E483C /* ens_lookup.cgi */,
+				4CC0BBB50D7CE4E8006E483C /* fastcgi.fcgi */,
+				4CC0BBB60D7CE4E8006E483C /* fastcgi2.fcgi */,
+				4CC0BBB70D7CE4E8006E483C /* fastcgi3.fcgi */,
+				4CC0BBB80D7CE4E8006E483C /* fastcgi4.fcgi */,
+				4CC0BBB90D7CE4E9006E483C /* fastcgi5.fcgi */,
+				4CC0BBBA0D7CE4E9006E483C /* fastcgi6.fcgi */,
+				4CC0BBBB0D7CE4E9006E483C /* fastcgi7.fcgi */,
+				4CC0BBBC0D7CE4E9006E483C /* fastcgi8.fcgi */,
+				4CC0BBBD0D7CE4E9006E483C /* firstscript.cgi */,
+				4CC0BBBE0D7CE4E9006E483C /* geneview_data.cgi */,
+				4CC0BBBF0D7CE4E9006E483C /* getalign.cgi */,
+				4CC0BBC00D7CE4E9006E483C /* getedges.cgi */,
+				4CC0BBC10D7CE4E9006E483C /* getedges_orig.cgi */,
+				4CC0BBC20D7CE4E9006E483C /* getexpression.cgi */,
+				4CC0BBC30D7CE4E9006E483C /* getfeature2.cgi */,
+				4CC0BBC40D7CE4E9006E483C /* getgoi.cgi */,
+				4CC0BBC50D7CE4E9006E483C /* getgoi1.cgi */,
+				4CC0BBC60D7CE4E9006E483C /* getgoi2.cgi */,
+				4CC0BBC70D7CE4E9006E483C /* getgoi3.cgi */,
+				4CC0BBC80D7CE4E9006E483C /* getgoi3.fcgi */,
+				4CC0BBC90D7CE4E9006E483C /* getgoi3_fast.fcgi */,
+				4CC0BBCA0D7CE4E9006E483C /* getgoi3_fast2.fcgi */,
+				4CC0BBCB0D7CE4E9006E483C /* getgoi3_fast3.fcgi */,
+				4CC0BBCC0D7CE4E9006E483C /* getgoi3_fast4.fcgi */,
+				4CC0BBCD0D7CE4E9006E483C /* getgoi3_fast5.fcgi */,
+				4CC0BBCE0D7CE4E9006E483C /* getgoi3_orig.cgi */,
+				4CC0BBCF0D7CE4E9006E483C /* getgoi3_v2.fcgi */,
+				4CC0BBD00D7CE4E9006E483C /* getgoi3_v3.fcgi */,
+				4CC0BBD10D7CE4E9006E483C /* getgoi3_v4.cgi */,
+				4CC0BBD20D7CE4E9006E483C /* getgoi3b.cgi */,
+				4CC0BBD30D7CE4E9006E483C /* getgoi4.cgi */,
+				4CC0BBD40D7CE4E9006E483C /* getgoi5.cgi */,
+				4CC0BBD50D7CE4E9006E483C /* getgoi7.cgi */,
+				4CC0BBD60D7CE4E9006E483C /* getgoi_v4.cgi */,
+				4CC0BBD70D7CE4E9006E483C /* getnetwork.fcgi */,
+				4CC0BBD80D7CE4E9006E483C /* scftest.html */,
+				4CC0BBD90D7CE4E9006E483C /* search7.cgi */,
+				4CC0BBDA0D7CE4E9006E483C /* search_goi.cgi */,
+			);
+			path = old_cgi;
+			sourceTree = "<group>";
+		};
+		4CE41BC506C4CE650052E296 = {
+			isa = PBXGroup;
+			children = (
+				4CC0BB980D7CE4E8006E483C /* cgi */,
+				4CCA4E600F611A1600D10844 /* lib */,
+				4CA6414007959B130006EDE0 /* scripts */,
+				4C181DB60EAECF38009879CC /* www */,
+				4CA6415507959B1B0006EDE0 /* sql */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXProject section */
+		4CE41BC906C4CE650052E296 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 4C01860B08CDA0960078253C /* Build configuration list for PBXProject "EdgeExpress" */;
+			hasScannedForEncodings = 1;
+			mainGroup = 4CE41BC506C4CE650052E296;
+			projectDirPath = "";
+			targets = (
+			);
+		};
+/* End PBXProject section */
+
+/* Begin XCBuildConfiguration section */
+		4C01860C08CDA0960078253C /* Development */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Development;
+		};
+		4C01860D08CDA0960078253C /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Deployment;
+		};
+		4C01860E08CDA0960078253C /* Default */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Default;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		4C01860B08CDA0960078253C /* Build configuration list for PBXProject "EdgeExpress" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4C01860C08CDA0960078253C /* Development */,
+				4C01860D08CDA0960078253C /* Deployment */,
+				4C01860E08CDA0960078253C /* Default */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Default;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 4CE41BC906C4CE650052E296 /* Project object */;
+}

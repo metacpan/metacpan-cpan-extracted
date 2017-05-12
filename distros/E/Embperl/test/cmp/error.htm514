@@ -1,0 +1,57 @@
+<HTML><HEAD><TITLE>Embperl Error</TITLE></HEAD><BODY bgcolor="#FFFFFF">
+<H1>Internal Server Error</H1>
+The server encountered an internal error or misconfiguration and was unable to complete your request.<P>
+^Please contact the server administrator,.*?and inform them of the time the error occurred, and anything you might have done that may have caused the error.<P><P>
+<table cellspacing='2' cellpadding='5'>
+<tr bgcolor='#eeeeee'><td>
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+^\[\d+\]ERR:  32:  Warning in Perl code: Unquoted string &quot;qqqqqqqqqqqqqq&quot; may clash with future reserved word at /usr/msrc/embperl/test/html/error.htm line 23.
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+</td></tr>
+<tr bgcolor='#eeeeee'><td>
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+^\[\d+\]ERR:  32:  Warning in Perl code: 	\(in cleanup\) syntax error at /usr/msrc/embperl/test/html/error.htm line 23, at EOF
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+</td></tr>
+<tr bgcolor='#eeeeee'><td>
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+^\[\d+\]ERR:  32:  Warning in Perl code: 	\(in cleanup\) syntax error at /usr/msrc/embperl/test/html/error.htm line 32, near &quot;\+ \)&quot;
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+</td></tr>
+<tr bgcolor='#eeeeee'><td>
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+^\[\d+\]ERR:  32:  Warning in Perl code: Bareword found where operator expected at /usr/msrc/embperl/test/html/error.htm line 46, near &quot;\$error is&quot;
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+</td></tr>
+<tr bgcolor='#eeeeee'><td>
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+^\[\d+\]ERR:  32:  Warning in Perl code: 	\(Missing operator before is\?\)
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+</td></tr>
+<tr bgcolor='#eeeeee'><td>
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+^\[\d+\]ERR:  32:  Warning in Perl code: 	\(in cleanup\) syntax error at /usr/msrc/embperl/test/html/error.htm line 46, near &quot;\$error is here &quot;
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+</td></tr>
+<tr bgcolor='#eeeeee'><td>
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+^\[\d+\]ERR:  32:  Warning in Perl code: 	\(in cleanup\) syntax error at /usr/msrc/embperl/test/html/error.htm line 59, near &quot;;
+<br>&nbsp;&nbsp;&nbsp;&nbsp;
+<br>&nbsp;&nbsp;&nbsp;&nbsp;}&quot;
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+</td></tr>
+<tr bgcolor='#eeeeee'><td>
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+^\[\d+\]ERR:  32:  Warning in Perl code: 	\(in cleanup\) Missing right curly or square bracket at /usr/msrc/embperl/test/html/error.htm line 60, at end of line
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+</td></tr>
+<tr bgcolor='#eeeeee'><td>
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+^\[\d+\]ERR:  24:  Error in Perl code: Compilation error
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+</td></tr>
+</table>
+<br>
+^Embperl
+</BODY></HTML>
+

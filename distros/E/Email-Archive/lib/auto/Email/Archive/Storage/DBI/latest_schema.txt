@@ -1,0 +1,13 @@
+CREATE TABLE messages (
+  message_id  VARCHAR(50) PRIMARY KEY,
+  from_addr   VARCHAR(255) NOT NULL DEFAULT '',
+  to_addr     VARCHAR(255) NOT NULL DEFAULT '',
+  cc          VARCHAR(255) NOT NULL DEFAULT '',
+  subject     VARCHAR(255) NOT NULL DEFAULT '',
+  date        VARCHAR(255) NOT NULL DEFAULT '',
+  body        TEXT NOT NULL  DEFAULT ''
+);
+
+CREATE TABLE metadata (
+  schema_version INT PRIMARY KEY DEFAULT 0
+);

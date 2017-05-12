@@ -1,0 +1,15 @@
+,v$
+~$
+\#
+\/\.
+\.old$
+\.bak$
+\.tmp$
+\.tar\.gz$
+^blib\/
+^html\/
+^Ekahau-[\d\.]+\/
+^Makefile$
+^pm_to_blib$
+CVS
+notes.txt

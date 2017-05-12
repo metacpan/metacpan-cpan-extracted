@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Excel/CloneXLSX/Format.pm
+minil.toml
+t/00_compile.t
+t/01_basic.t
+t/bin/02_complex.pl
+t/bin/extract-xls.pl
+t/data/sample.xls
+t/data/sample.xlsx
+META.yml
+MANIFEST

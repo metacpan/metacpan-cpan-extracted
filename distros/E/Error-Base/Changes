@@ -1,0 +1,55 @@
+Revision history for Error-Base
+
+v1.0.2  2013-02-11 23:02:12
+    - Upgrade version.pm requirement to 0.99
+    - Yes, this is necessary.
+
+v1.0.1  2013-02-07 13:31:10
+    - Fix Test::Deep smoke failures.
+    - 100% test and POD coverage.
+
+v1.0.0  2013-02-04 16:38:29
+    - -mesg now accepts an array reference.
+    - Full set of get and put accessors.
+    - -top and -prepend_all deprecated. 
+
+v0.1.4  2011-11-19 16:10:47
+    - Resolve issue with optional tests loading Test::Trap. 
+
+v0.1.3  2011-11-18 18:19:00
+    - Enforce strictures and warnings in _late() string eval.
+    - Test internal error conditions. 
+
+v0.1.2  2011-11-18 14:27:10
+    - Minor POD fixes.
+    - Correct version.pm use-line.
+
+v0.1.1  2011-11-05 10:37:02
+    - New Error::Base::Cookbook (with integration tests).
+    - Massive POD rewrite. 
+    - Allow late interpolation of $self (by that name).
+
+v0.1.0  2011-11-04 23:04:40
+    - Add late interpolation feature.
+    - Change process of error message composition. ( -base, -type, -pronto )
+    - Massive POD rewrite. 
+
+v0.0.4  2011-10-30 04:40:00
+    - use version 0.77; per POD.
+    - Use leading 'v' per "strong recommendation".
+    - Skip crank() test, probably unnecessary anyway. 
+
+0.0.3   2011-10-28 17:28:11
+    - Localize warn handler in t/140-crank.t.
+
+0.0.2   2011-10-27 12:54:34
+    - Documentation changes only.
+
+0.0.1   2011-10-26 19:09:46
+    - Initial release.
+    - Implement all major features.
+    - Test coverage: > 95%
+
+0.0.0   2011-10-23 04:10:24
+    - Launch project.
+

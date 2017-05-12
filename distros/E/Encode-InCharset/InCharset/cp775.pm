@@ -1,0 +1,78 @@
+# This is auto-generated.  Do not edit by hand!
+package Encode::InCharset::cp775;
+our $VERSION = do {my @r = (q$Revision: 0.1 $ =~ /\d+/g); sprintf "%d."."%02d"x$#r, @r};
+sub InCP775{
+	return <<'END';
+0	7F
+A0
+A2	A4
+A6	A7
+A9
+AB	AE
+B0	B3
+B5	B7
+B9
+BB	BE
+C4	C6
+C9
+D3
+D5	D8
+DC
+DF
+E4	E6
+E9
+F3
+F5	F8
+FC
+100	101
+104	107
+10C	10D
+112	113
+116	119
+122	123
+12A	12B
+12E	12F
+136	137
+13B	13C
+141	146
+14C	14D
+156	157
+15A	15B
+160	161
+16A	16B
+172	173
+179	17E
+2019
+201C	201E
+2219
+2500
+2502
+250C
+2510
+2514
+2518
+251C
+2524
+252C
+2534
+253C
+2550	2551
+2554
+2557
+255A
+255D
+2560
+2563
+2566
+2569
+256C
+2580
+2584
+2588
+258C
+2590	2593
+25A0
+END
+}
+1;
+__END__

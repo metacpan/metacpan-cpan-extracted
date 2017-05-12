@@ -1,0 +1,524 @@
+#######################################################
+# Component Description File for: textutils
+#
+# Copyright 2000, Lineo Inc.
+#
+# Notes on binaries in textutils
+#
+# /bin/cat -
+# /usr/bin/cksum -
+# /usr/bin/comm -
+# /usr/bin/csplit -
+# /usr/bin/cut -
+# /usr/bin/expand -
+# /usr/bin/fmt -
+# /usr/bin/fold -
+# /usr/bin/head -
+# /usr/bin/join -
+# /usr/bin/md5sum -
+# /usr/bin/nl -
+# /usr/bin/od -
+# /usr/bin/paste -
+# /usr/bin/pr -
+# /usr/bin/sort -
+# /usr/bin/split -
+# /usr/bin/sum -
+# /usr/bin/tac -
+# /usr/bin/tail -
+# /usr/bin/tr -
+# /usr/bin/unexpand -
+# /usr/bin/uniq -
+# /usr/bin/wc -
+
+
+<GROUP Textprocessing>
+<GROUP Tools>
+<COMPONENT textutils> 
+
+	SRPM=textutils
+	<SPECPATCH></SPECPATCH>
+	<HELP>These are the GNU text processing utilities. Most of 
+	these programs have significant advantages over their Unix 
+	counterparts, such as greater speed, additional options,
+	and fewer arbitrary limits.
+
+	Busybox provides small, simple versions of many of these 
+	utilities. Consequently, most target systems only require
+	busybox. You should provide textutils if the target system
+	requires complete unix style textprocessing for the enduser.
+	Textutils may be required to support other specific scripts 
+	or utilities.
+	</HELP>
+	<REQUIRESEXPR>
+		(textutils == "CHILDREN_ENABLED")
+	</REQUIRESEXPR>
+
+<OPTION keep-cat>
+	TYPE=bool
+	DEFAULT_VALUE=1
+	PROMPT=Include /bin/cat?
+	<HELP>cat concatenates files and print them on the standard output 
+	</HELP>
+	STATIC_SIZE=7174
+	MIN_DYNAMIC_SIZE=0
+	STORAGE_SIZE=9240
+	<REQUIRES>
+	libc.so.6
+	ld-linux.so.2
+	</REQUIRES>
+	<PROVIDES>
+		cat
+	</PROVIDES>
+	KEEPLIST=/bin/cat
+</OPTION>
+
+<OPTION keep-cksum>
+	TYPE=bool
+	DEFAULT_VALUE=0
+	PROMPT=Include /usr/bin/cksum?
+	<HELP>cksum is used to checksum and count the bytes in a file.
+	</HELP>
+	STATIC_SIZE=4939
+	MIN_DYNAMIC_SIZE=0
+	STORAGE_SIZE=6812
+	<REQUIRES>
+	libc.so.6
+	ld-linux.so.2
+	</REQUIRES>
+	<PROVIDES>
+		cksum
+	</PROVIDES>
+	KEEPLIST=/usr/bin/cksum
+</OPTION>
+
+<OPTION keep-comm>
+	TYPE=bool
+	DEFAULT_VALUE=0
+	PROMPT=Include /usr/bin/comm?
+	<HELP>comm compares two sorted files line by line.
+	</HELP>
+	STATIC_SIZE=5396
+	MIN_DYNAMIC_SIZE=0
+	STORAGE_SIZE=7448
+	<REQUIRES>
+	libc.so.6
+	ld-linux.so.2
+	</REQUIRES>
+	<PROVIDES>
+		comm
+	</PROVIDES>
+	KEEPLIST=/usr/bin/comm
+</OPTION>
+
+<OPTION keep-csplit>
+	TYPE=bool
+	DEFAULT_VALUE=0
+	PROMPT=Include /usr/bin/csplit?
+	<HELP>csplit splits a file into sections determined by context lines
+	</HELP>
+	STATIC_SIZE=16167
+	MIN_DYNAMIC_SIZE=0
+	STORAGE_SIZE=17988
+	<REQUIRES>
+	libc.so.6
+	ld-linux.so.2
+	</REQUIRES>
+	<PROVIDES>
+		csplit
+	</PROVIDES>
+	KEEPLIST=/usr/bin/csplit
+</OPTION>
+
+<OPTION keep-cut>
+	TYPE=bool
+	DEFAULT_VALUE=0
+	PROMPT=Include /usr/bin/cut?
+	<HELP>cut is used to remove sections from each line of files.
+	</HELP>
+	STATIC_SIZE=8938
+	MIN_DYNAMIC_SIZE=0
+	STORAGE_SIZE=10760
+	<REQUIRES>
+	libc.so.6
+	ld-linux.so.2
+	</REQUIRES>
+	<PROVIDES>
+		cut
+	</PROVIDES>
+	KEEPLIST=/usr/bin/cut
+</OPTION>
+
+<OPTION keep-expand>
+	TYPE=bool
+	DEFAULT_VALUE=0
+	PROMPT=Include /usr/bin/expand?
+	<HELP>expand is used to convert tabs to spaces.
+	</HELP>
+	STATIC_SIZE=6038
+	MIN_DYNAMIC_SIZE=0
+	STORAGE_SIZE=7936
+	<REQUIRES>
+	libc.so.6
+	ld-linux.so.2
+	</REQUIRES>
+	<PROVIDES>
+		expand
+	</PROVIDES>
+	KEEPLIST=/usr/bin/expand
+</OPTION>
+
+<OPTION keep-fmt>
+	TYPE=bool
+	DEFAULT_VALUE=0
+	PROMPT=Include /usr/bin/fmt?
+	<HELP>fmt, a simple text formatter that fills and joins lines to 
+	produce output lines of (up to) the specified width. 
+	</HELP>
+	STATIC_SIZE=33964
+	MIN_DYNAMIC_SIZE=0
+	STORAGE_SIZE=10812
+	<REQUIRES>
+	libc.so.6
+	ld-linux.so.2
+	</REQUIRES>
+	<PROVIDES>
+		fmt
+	</PROVIDES>
+	KEEPLIST=/usr/bin/fmt
+</OPTION>
+
+<OPTION keep-fold>
+	TYPE=bool
+	DEFAULT_VALUE=0
+	PROMPT=Include /usr/bin/fold?
+	<HELP>fold wraps each input line to fit in specified width. 
+	</HELP>
+	STATIC_SIZE=6559
+	MIN_DYNAMIC_SIZE=0
+	STORAGE_SIZE=8544
+	<REQUIRES>
+	libc.so.6
+	ld-linux.so.2
+	</REQUIRES>
+	<PROVIDES>
+		fold
+	</PROVIDES>
+	KEEPLIST=/usr/bin/fold
+</OPTION>
+
+<OPTION keep-head>
+	TYPE=bool
+	DEFAULT_VALUE=1
+	PROMPT=Include /usr/bin/head?
+	<HELP>head is used to output the first part of files.
+	</HELP>
+	STATIC_SIZE=6254
+	MIN_DYNAMIC_SIZE=0
+	STORAGE_SIZE=8164
+	<REQUIRES>
+	libc.so.6
+	ld-linux.so.2
+	</REQUIRES>
+	<PROVIDES>
+		head
+	</PROVIDES>
+	KEEPLIST=/usr/bin/head
+</OPTION>
+
+<OPTION keep-join>
+	TYPE=bool
+	DEFAULT_VALUE=0
+	PROMPT=Include /usr/bin/join?
+	<HELP>join lines of two files on a common field.
+	</HELP>
+	STATIC_SIZE=12309
+	MIN_DYNAMIC_SIZE=0
+	STORAGE_SIZE=14320
+	<REQUIRES>
+	libc.so.6
+	ld-linux.so.2
+	</REQUIRES>
+	<PROVIDES>
+		join
+	</PROVIDES>
+	KEEPLIST=/usr/bin/join
+</OPTION>
+
+<OPTION keep-md5sum>
+	TYPE=bool
+	DEFAULT_VALUE=0
+	PROMPT=Include /usr/bin/md5sum?
+	<HELP>md5sum produces for each input  file  a  128-bit  "fingerprint" 
+	or "message-digest". Used to check for changed files.
+	</HELP>
+	STATIC_SIZE=13058
+	MIN_DYNAMIC_SIZE=0
+	STORAGE_SIZE=14996
+	<REQUIRES>
+	libc.so.6
+	ld-linux.so.2
+	</REQUIRES>
+	<PROVIDES>
+		md5sum
+	</PROVIDES>
+	KEEPLIST=/usr/bin/md5sum
+</OPTION>
+
+<OPTION keep-nl>
+	TYPE=bool
+	DEFAULT_VALUE=0
+	PROMPT=Include /usr/bin/nl?
+	<HELP>nl returns the number of lines in files. See the man page for
+	all of the obscure features.
+	</HELP>
+	STATIC_SIZE=11035
+	MIN_DYNAMIC_SIZE=0
+	STORAGE_SIZE=12912
+	<REQUIRES>
+	libc.so.6
+	ld-linux.so.2
+	</REQUIRES>
+	<PROVIDES>
+		nl
+	</PROVIDES>
+	KEEPLIST=/usr/bin/nl
+</OPTION>
+
+<OPTION keep-od>
+	TYPE=bool
+	DEFAULT_VALUE=0
+	PROMPT=Include /usr/bin/od?
+	<HELP>od, named for octal dump. od dumps files in several formats 
+	including octal, decimal, and hexidecimal. 
+	</HELP>
+	STATIC_SIZE=21775
+	MIN_DYNAMIC_SIZE=0
+	STORAGE_SIZE=23304
+	<REQUIRES>
+	libc.so.6
+	ld-linux.so.2
+	</REQUIRES>
+	<PROVIDES>
+		od
+	</PROVIDES>
+	KEEPLIST=/usr/bin/od
+</OPTION>
+
+<OPTION keep-paste>
+	TYPE=bool
+	DEFAULT_VALUE=0
+	PROMPT=Include /usr/bin/paste?
+	<HELP>paste is used to merge lines of files.
+	</HELP>
+	STATIC_SIZE=6882
+	MIN_DYNAMIC_SIZE=0
+	STORAGE_SIZE=8476
+	<REQUIRES>
+	libc.so.6
+	ld-linux.so.2
+	</REQUIRES>
+	<PROVIDES>
+		paste
+	</PROVIDES>
+	KEEPLIST=/usr/bin/paste
+</OPTION>
+
+<OPTION keep-pr>
+	TYPE=bool
+	DEFAULT_VALUE=0
+	PROMPT=Include /usr/bin/pr?
+	<HELP>pr is used to convert text files for printing. Use this to
+	add headers, margins, line numbers, and/or columnate text.
+	</HELP>
+	STATIC_SIZE=19520
+	MIN_DYNAMIC_SIZE=0
+	STORAGE_SIZE=21288
+	<REQUIRES>
+	libc.so.6
+	ld-linux.so.2
+	</REQUIRES>
+	<PROVIDES>
+		pr
+	</PROVIDES>
+	KEEPLIST=/usr/bin/pr
+</OPTION>
+
+<OPTION keep-sort>
+	TYPE=bool
+	DEFAULT_VALUE=0
+	PROMPT=Include /usr/bin/sort?
+	<HELP>sort is used to sort lines of text files.
+	</HELP>
+	STATIC_SIZE=26638
+	MIN_DYNAMIC_SIZE=0
+	STORAGE_SIZE=25136
+	<REQUIRES>
+	libc.so.6
+	ld-linux.so.2
+	</REQUIRES>
+	<PROVIDES>
+		sort
+		real-sort
+	</PROVIDES>
+	KEEPLIST=/usr/bin/sort
+</OPTION>
+
+<OPTION keep-split>
+	TYPE=bool
+	DEFAULT_VALUE=0
+	PROMPT=Include /usr/bin/split?
+	<HELP>split a file into pieces based on number of lines or bytes.
+	</HELP>
+	STATIC_SIZE=8503
+	MIN_DYNAMIC_SIZE=0
+	STORAGE_SIZE=10592
+	<REQUIRES>
+	libc.so.6
+	ld-linux.so.2
+	</REQUIRES>
+	<PROVIDES>
+		split
+	</PROVIDES>
+	KEEPLIST=/usr/bin/split
+</OPTION>
+
+<OPTION keep-sum>
+	TYPE=bool
+	DEFAULT_VALUE=0
+	PROMPT=Include /usr/bin/sum?
+	<HELP>sum is used to checksum and count the blocks in a file.
+	</HELP>
+	STATIC_SIZE=4787
+	MIN_DYNAMIC_SIZE=0
+	STORAGE_SIZE=6736
+	<REQUIRES>
+	libc.so.6
+	ld-linux.so.2
+	</REQUIRES>
+	<PROVIDES>
+		sum
+	</PROVIDES>
+	KEEPLIST=/usr/bin/sum
+</OPTION>
+
+<OPTION keep-tac>
+	TYPE=bool
+	DEFAULT_VALUE=0
+	PROMPT=Include /usr/bin/tac?
+	<HELP>tac is used to concatenate and print files, The order of
+	records in the files are reversed. The record separator can be
+	specified, default is newline.
+	</HELP>
+	STATIC_SIZE=16703
+	MIN_DYNAMIC_SIZE=0
+	STORAGE_SIZE=10376
+	<REQUIRES>
+	libc.so.6
+	ld-linux.so.2
+	</REQUIRES>
+	<PROVIDES>
+		tac
+	</PROVIDES>
+	KEEPLIST=/usr/bin/tac
+</OPTION>
+
+<OPTION keep-tail>
+	TYPE=bool
+	DEFAULT_VALUE=1
+	PROMPT=Include /usr/bin/tail?
+	<HELP>tail is used to output the last part of files.
+	</HELP>
+	STATIC_SIZE=13270
+	MIN_DYNAMIC_SIZE=0
+	STORAGE_SIZE=15144
+	<REQUIRES>
+	libc.so.6
+	ld-linux.so.2
+	</REQUIRES>
+	<PROVIDES>
+		tail
+	</PROVIDES>
+	KEEPLIST=/usr/bin/tail
+</OPTION>
+
+<OPTION keep-tr>
+	TYPE=bool
+	DEFAULT_VALUE=0
+	PROMPT=Include /usr/bin/tr?
+	<HELP>tr is used to translate or delete characters. The user provides
+	two ordered strings containing 'from' and 'to' characters. Read the 
+	man page for all the features. 
+	</HELP>
+	STATIC_SIZE=26688
+	MIN_DYNAMIC_SIZE=0
+	STORAGE_SIZE=19496
+	<REQUIRES>
+	libc.so.6
+	ld-linux.so.2
+	</REQUIRES>
+	<PROVIDES>
+		tr
+	</PROVIDES>
+	KEEPLIST=/usr/bin/tr
+</OPTION>
+
+<OPTION keep-unexpand>
+	TYPE=bool
+	DEFAULT_VALUE=0
+	PROMPT=Include /usr/bin/unexpand?
+	<HELP>unexpand is used to convert spaces to tabs.
+	</HELP>
+	STATIC_SIZE=6297
+	MIN_DYNAMIC_SIZE=0
+	STORAGE_SIZE=8176
+	<REQUIRES>
+	libc.so.6
+	ld-linux.so.2
+	</REQUIRES>
+	<PROVIDES>
+		unexpand
+	</PROVIDES>
+	KEEPLIST=/usr/bin/unexpand
+</OPTION>
+
+<OPTION keep-uniq>
+	TYPE=bool
+	DEFAULT_VALUE=0
+	PROMPT=Include /usr/bin/uniq?
+	<HELP>uniq is used to remove duplicate lines from a sorted file.
+	</HELP>
+	STATIC_SIZE=8320
+	MIN_DYNAMIC_SIZE=0
+	STORAGE_SIZE=10420
+	<REQUIRES>
+	libc.so.6
+	ld-linux.so.2
+	</REQUIRES>
+	<PROVIDES>
+		uniq
+	</PROVIDES>
+	KEEPLIST=/usr/bin/uniq
+</OPTION>
+
+<OPTION keep-wc>
+	TYPE=bool
+	DEFAULT_VALUE=0
+	PROMPT=Include /usr/bin/wc?
+	<HELP>wc is used to print the number of bytes, words, and lines in files. 
+	</HELP>
+	STATIC_SIZE=5432
+	MIN_DYNAMIC_SIZE=0
+	STORAGE_SIZE=7436
+	<REQUIRES>
+	libc.so.6
+	ld-linux.so.2
+	</REQUIRES>
+	<PROVIDES>
+		wc
+	</PROVIDES>
+	KEEPLIST=/usr/bin/wc
+</OPTION>
+
+</COMPONENT>
+</GROUP>
+</GROUP>

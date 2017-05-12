@@ -1,0 +1,16 @@
+# Relations for administration EekBoek Sample Administration
+# Created by EekBoek 2.01.03 on 2012-01-16
+# Content-Type: text/plain; charset = UTF-8
+
+relation --daybook=purchase \
+        "KPN"        "KPN"                                    6900 \
+        "XS4ALL"     "XS4All Internet B.V."                   6905
+
+relation --daybook=sales \
+        "ACME"       "Acme Corp."                             8100 \
+        "FOO"        "Foo"                                    8100
+
+relation --daybook=sales --vat=extra \
+        "ORA"        "O'Reilly & Associates"                  8200
+
+# End of Relations

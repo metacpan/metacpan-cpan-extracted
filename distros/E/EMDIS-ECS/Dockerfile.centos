@@ -1,0 +1,79 @@
+# This file defines a docker image based on CentOS 7 which can
+# be used for Perl ECS.
+#
+# For additional info about docker, see https://www.docker.com/
+#
+# Below are brief instructions for using this Dockerfile to set up
+# a docker image and container.
+#
+# 1) Rename this file to "Dockerfile", or else create a "Dockerfile"
+#    symbolic link to it.  For example, "ln -s Dockerfile.centos7
+#    Dockerfile".
+#
+# 2) Use the Dockerfile to build a docker image.  For example,
+#    "docker build -t perlecs:v0.39 .", where "." is the directory
+#    containing the Dockerfile and "perlecs:v0.39" is the
+#    repository name and tag for the new image.
+#
+# 3) Use the docker image to create a docker container.  For
+#    example, "docker run -t -i --name=perlecs_testing
+#    perlecs:v0.39 /bin/bash" to create a container named
+#    "perlecs_testing" and interactively run a bash shell
+#    within it, or "docker start -i perlecs_testing" to
+#    restart an interactive session with that container
+#    after stopping it.
+#
+# 4) Configure Perl ECS within the docker container.  For
+#    example, use "ecs_setup" to generate an ecs.cfg
+#    configuration file, "ecstool" to set up the node table,
+#    "gpg" to configure the GnuPG keyring, "ecs_scan_mail"
+#    to start the mail processing daemon, and "ecs_chk_com"
+#    to start the communication status daemon.
+#
+#    For additional info about Perl ECS, try "perldoc EMDIS::ECS",
+#    "perldoc EMDIS::ECS::Config", "perldoc ecstool", etc., or
+#    see the EMDIS::ECS documentation on CPAN.  For additional
+#    info about ECS, refer to the EMDIS and ECS specifications
+#    available from http://emdis.net/.
+
+# image is based on CentOS 7
+FROM centos:7
+MAINTAINER Joel Schneider <joel@joelschneider.net>
+LABEL Description="Perl ECS CentOS Image" Version="0.39"
+
+# install extra CentOS packages
+RUN yum -y install \
+ perl.x86_64 perl-Env.noarch perl-Data-Dumper.x86_64 \
+ make.x86_64 perl-ExtUtils-MakeMaker.noarch perl-CPAN.noarch \
+ perl-App-cpanminus.noarch gcc.x86_64 perl-Test-Simple.noarch
+
+# create perlecs user
+RUN useradd --comment "Perl ECS user" --create-home perlecs
+
+# define ${HOME} environment variable
+ENV HOME=/home/perlecs
+
+# as perlecs user, install latest CPAN versions of some
+# Perl packages into local-lib directory (because provided
+# CentOS 7 packages don't support SSL)
+USER perlecs
+WORKDIR $HOME
+RUN mkdir $HOME/perl5lib
+# 2015-06-26 note: problem installing libnet-3.06.tar.gz
+# from CPAN; similar problem reported under Debian 6, see:
+# https://rt.cpan.org/Public/Bug/Display.html?id=104545
+# ... leaving this commented out for now (so no SSL) ...
+#RUN cpanm --local-lib $HOME/perl5lib Net::POP3~3.06 && \
+# cpanm --local-lib $HOME/perl5lib IO::Socket::SSL~2.007
+
+# install EMDIS::ECS into local-lib directory
+RUN cpanm --local-lib $HOME/perl5lib EMDIS::ECS
+
+# set PATH and PERL5LIB environment variables to use
+# local-lib directory
+ENV PATH=$HOME/perl5lib/bin:$PATH \
+ PERL5LIB=$HOME/perl5lib/lib/perl5
+
+#USER root
+
+CMD echo "Welcome to Perl ECS CentOS Image"

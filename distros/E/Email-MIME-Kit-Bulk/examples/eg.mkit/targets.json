@@ -1,0 +1,22 @@
+[
+   {
+      "cc" : [
+         "someone+cc@somewhere.com"
+      ],
+      "language" : "en",
+      "template_params" : {
+         "superlative" : "Fantastic"
+      },
+      "to" : "someone@somewhere.com"
+   },
+   {
+      "cc" : [
+         "someone+frenchcc@somewhere.com"
+      ],
+      "language" : "fr",
+      "template_params" : {
+         "superlative" : "Extraordinaire"
+      },
+      "to" : "someone+french@somewhere.com"
+   }
+]

@@ -1,0 +1,10 @@
+<workbook>
+  <worksheet name="cell_type">
+    <cell type="string">String</cell>
+    <cell type="number">Number</cell>
+    <cell type="blank">Blank</cell>
+    <cell type="url">URL</cell>
+    <cell type="formula">Formula</cell>
+    <cell type="date_time">DateTime</cell>
+   </worksheet>
+</workbook>

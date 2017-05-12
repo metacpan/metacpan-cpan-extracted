@@ -1,0 +1,107 @@
+#!/usr/local/bin/perl
+
+use 5.006002;
+
+use strict;
+use warnings;
+
+use Encode;
+use Encode::Rad50;
+use Getopt::Long 2.33 qw{ :config auto_version };
+use Pod::Usage;
+
+our $VERSION = '0.012';
+
+my %opt;
+
+GetOptions( \%opt,
+    help => sub { pod2usage( { -verbose => 2 } ) },
+) and @ARGV or pod2usage( { -verbose => 0 } );
+
+my @cc = map {"<$_>"} qw{nul soh stx etx eot enq ack bel bs ht lf vt ff
+    cr so si dle dc1 dc2 dc3 dc4 nak syn etb can em sub esc fs gs rs
+    us};
+@cc[127 .. 159] = map {"<$_>"} qw{del pad hop bph nbh ind nel ssa esa
+    hts htj vts pld plu ri ss2 ss3 dcs pu1 pu2 sts cch mw spa epa sos
+    sgci sci csi st osc pm apc};
+
+foreach (@ARGV) {
+    my $value = m/^\d+\.$/ ? $_ + 0 :
+	m/^[0-7]+$/ ? oct ($_) :
+	m/^&([[:xdigit:]]+)$/ ? oct ("0x$1") :
+	m/^'(.)$/ ? ord ($1) :
+	m/^"(.{1,2})$/ ? unpack ('n', $1) :
+	m/^%(.{1,3})$/ ? unpack ('n', encode ('rad50', sprintf '%3s', $1)) :
+	do {warn "Invalid input '$_'\n"; next};
+    $value &= 0xffff;
+    my $oct = sprintf '%o', $value;
+    my $hex = sprintf '%X', $value;
+    my $chr = join '', map {$cc[ord $_] || $_} split '', pack ('n', $value);
+    my $r5 = decode ('rad50', pack 'n', $value);
+    $r5 =~ s/^\s+//;
+    print "$oct\t$value.\t&$hex\t\"$chr\t%$r5\n";
+}
+
+__END__
+
+=head1 TITLE
+
+cvt - Re-implementation of the same-named RSX-11 utility.
+
+=head1 SYNOPSIS
+
+ cvt data ...
+ cvt -help
+ cvt -version
+
+=head1 OPTIONS
+
+=head2 -help
+
+This option displays the documentation for this script. The script then
+exits.
+
+=head2 -version
+
+This option displays the version of this script. The script then exits.
+
+=head1 DETAILS
+
+This Perl script is a re-implementation of the RSX-11 utility F<cvt>,
+which converted data among various radices.
+
+The data to be converted are passed as arguments of the following form:
+
+   &xxxx  represents a hexadecimal number
+   %xxx   represents RAD50 characters
+   "cc    represents ASCII characters
+   nnnnn. represents a decimal number (note the trailing
+          decimal point)
+   nnnnn  represents an octal number.
+
+Users should be aware that the above specifications may well contain
+characters that your shell interprets as metacharacters.
+
+=head1 AUTHOR
+
+Thomas R. Wyant, III F<wyant at cpan dot org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2005-2007, 2011-2016 by Thomas R. Wyant, III
+(F<wyant at cpan dot org>). All rights reserved.
+
+PDP-11, RSTS-11, RSTS/E,  RSX-11, RSX-11M+, P/OS and RT-11 are
+trademarks of Hewlett-Packard Development Company, L.P.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut
+
+# ex: set textwidth=72 :

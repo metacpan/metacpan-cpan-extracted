@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Eidolon-Driver-Log-Basic
+version:             0.01
+abstract:            basic log driver for Eidolon.
+license:             ~
+author:              
+    - Anton Belousov <abel@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Eidolon:                       0.02
+    Fcntl:                         0
+    POSIX:                         0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

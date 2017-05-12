@@ -1,0 +1,59 @@
+Email-ConstantContact
+
+This module is a perl interface to the ConstantContact REST API.
+
+PREREQUISITES
+
+    * XML::Simple
+    * LWP
+    * Carp
+    * HTTP::Request
+    * XML::Writer
+    * POSIX
+    * URI::Escape
+
+INSTALLATION
+
+Email::ConstantContact installation is straightforward. If your CPAN shell
+is set up, you should just be able to do
+
+    % perl -MCPAN -e 'install Email::ConstantContact'
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Email::ConstantContact
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Email-ConstantContact
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Email-ConstantContact
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Email-ConstantContact
+
+    Search CPAN
+        http://search.cpan.org/dist/Email-ConstantContact/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009-2011 Adam Rich
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

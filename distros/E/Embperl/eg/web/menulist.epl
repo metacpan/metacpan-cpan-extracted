@@ -1,0 +1,19 @@
+[- 
+$r = shift ;
+
+$sub  = $r -> {curritem}{sub} ;
+$lang = $r -> param -> language ;
+$app  = $r -> app ;
+-]
+
+<table cellpadding=4>
+[$foreach $item (@$sub)$]
+    [$if $item -> {path} $]
+    <tr>
+        <td><a href="[+ $app -> languri ($r, !$item -> {url}?$r -> {baseuri} . $item -> {relurl}:$item -> {url}) +]">[+ $r -> gettext ($item -> {menu}) +]</a></td>
+        <td>[+ $item -> {desc}{$lang} +]</td>
+    </tr>
+    [$endif$]
+[$endforeach$]
+</table>
+

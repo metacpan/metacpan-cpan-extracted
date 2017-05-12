@@ -1,0 +1,62 @@
+Email-AutoReply
+===========================
+
+Email::AutoReply is a Perl extension for writing email autoresponders.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+An example vacation autoresponder is available at examples/on_vacation.
+You'll need Getopt::Declare installed for it to work.
+
+I made a vacation autoresponder with procmail by adding the following
+recipe to my ~/.procmailrc after all other recipes:
+
+  :0 c
+  | on_vacation
+
+on_vacation is in my path. Note that 'sendmail' must also be in your
+path if you're using the default send_method for Email::AutoReply.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Spiffy, File::Path, Email::Address, Email::Send, Email::Simple,
+  Mail::ListDetector, Test::More
+
+If you are using Email::AutoReply::DB::BerkeleyDB for cachedb_type
+(the default), the following other modules must be installed:
+
+  BerkeleyDB
+
+This module uses Email::Send's sendmail send method by default, which
+means sendmail must be in your path.
+
+BUGS
+
+To report bugs, go to
+  http://rt.cpan.org/NoAuth/Bugs.html?Dist=Email-AutoReply
+or send mail to bug-Email-AutoReply@rt.cpan.org
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004-2008 by Adam Monsen <haircut@gmail.com>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+See http://www.perl.com/perl/misc/Artistic.html
+
+
+-----------------------------------------------------------------------
+Last Updated $Date: 2008-06-05 13:23:24 -0700 (Thu, 05 Jun 2008) $
+$Revision: 3002 $$Author: adam $
+vim: tw=72

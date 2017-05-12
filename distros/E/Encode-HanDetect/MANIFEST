@@ -1,0 +1,8 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+SIGNATURE
+HanDetect.pm
+t/0-signature.t
+t/1-basic.t

@@ -1,0 +1,83 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with EntityModel::Template
+at lib/EntityModel/Template.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+EntityModel::Template - template handling for L<EntityModel>
+
+=head1 VERSION
+
+version 0.102
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=head2 from_now
+
+Duration from/since now
+
+=head2 long_date
+
+Long date format filter.
+
+=head2 short_date
+
+Short date format filter.
+
+=head2 ymd_date
+
+YMD date filter
+
+=head2 tidy_ymd
+
+YMD date filter
+
+=head2 as_duration
+
+Convert duration to MM:SS representation.
+
+=head2 template
+
+Return the TT2 object, created as necessary.
+
+=head2 as_text
+
+Return template output as text.
+
+=head2 processHTML
+
+Process HTML data.
+
+=head2 output
+
+Generate output via Apache2 print.
+
+=head2 error
+
+Handle any TT2 error messages.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<EntityModel::BaseClass>
+
+L<clone|EntityModel::BaseClass/clone>, L<dump|EntityModel::BaseClass/dump>, L<sap|EntityModel::BaseClass/sap>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <cpan@entitymodel.com>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2008-2011. Licensed under the same terms as Perl itself.

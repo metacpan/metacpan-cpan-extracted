@@ -1,0 +1,80 @@
+EBook-Tools
+===========
+
+EBook-Tools contains a library and a command-line tool for unpacking,
+creating, correcting, and repacking electronic books.
+
+Current unpacking support is limited to PalmDoc and Mobipocket and
+generation is limited to EPub.  The metadata correction tools are
+quite extensive, however.  For more details, see the POD information
+on EBook::Tools and EBook::Tools::Unpack.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Build.PL
+   ./Build test
+   ./Build install
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+ Perl 5.10.0 or higher
+ Archive::Zip
+ Bit::Vector
+ Compress::Zlib
+ Config::IniFiles
+ Data::UUID (or OSSP::UUID)
+ Date::Manip
+  * Under MS Windows, you will likely have to set the environment
+    variable TZ to the appropriate timezone for Date::Manip to work
+    properly
+ File::MimeInfo
+ File::Slurp
+ HTML::Parser
+ HTML::Tree
+ Image::Size
+ List::MoreUtils
+ Module::Build
+ Mojo::DOM
+ P5-Palm
+  * This may not be found by the CPAN builder.  If you have trouble
+    with the installation, try downloading it from the CPAN website
+    and building it manually.
+ String::CRC32
+ Tie::IxHash
+ Time::Local
+ XML::Twig
+
+
+INDIRECT DEPENDENCIES
+
+Although the modules listed in DEPENDENCIES are the only ones used
+directly, some of those modules have other requirements.  At the risk
+of starting to list every Perl module in CPAN, here are some
+additional packages that might not have been correctly installed
+automatically that could cause some of the above to break if missing:
+
+ Carp::Clan
+ File::BaseDir
+ IO::Stringy
+ Storable
+ Sub::Uplevel
+ Test::Exception
+ Unicode::String
+ Unicode::Map8
+ XML::Handler::YAWriter
+ XML::Parser::PerlSAX
+ XML::XPath
+ XML::XPathEngine
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 by Zed Pobre
+
+Licensed to the public under the terms of the GNU GPL, version 2.

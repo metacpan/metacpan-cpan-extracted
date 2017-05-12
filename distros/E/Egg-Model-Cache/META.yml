@@ -1,0 +1,32 @@
+---
+name: Egg-Model-Cache
+version: 0.01
+author:
+  - 'Masatoshi Mizuno E<lt>lusheE<64>cpan.orgE<gt>'
+abstract: lib/Egg/Model/Cache.pm
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Cache::Cache: 1.05
+  Egg::Release: 3.03
+  Test::More: 0
+  Test::Perl::Critic: 0
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+provides:
+  Egg::Helper::Model::Cache:
+    file: lib/Egg/Helper/Model/Cache.pm
+    version: 0.01
+  Egg::Model::Cache:
+    file: lib/Egg/Model/Cache.pm
+    version: 0.01
+  Egg::Model::Cache::Base:
+    file: lib/Egg/Model/Cache/Base.pm
+    version: 0.01
+  Egg::Model::Cache::handler:
+    file: lib/Egg/Model/Cache.pm
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

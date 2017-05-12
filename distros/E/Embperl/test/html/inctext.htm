@@ -1,0 +1,18 @@
+<html>
+
+<head>
+<title>Embperl Tests - Include literal text</title>
+</head>
+
+<body>
+
+
+[- $a = 'Start' ; $b = 'End' -]
+
+[+ $a +]
+[- Execute ({inputfile => 'SSIEP/ssiep.htm', syntax => 'Text'}) ; -]
+[+ $b +]
+
+</body>
+</html>
+

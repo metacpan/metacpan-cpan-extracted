@@ -1,0 +1,12 @@
+#===2.5.2(2008-12-08): fix bug "http://rt.cpan.org/Ticket/Display.html?id=34032",thanks to "Ursetti, Jerry" find this bug 
+#===2.5.1(2008-07-16): fix bug when traslate charset from utf8 to iso-2022-jp
+#        (2008-05-08): fix bug on dst = 'un'
+#===2.5.0(2008-03-12): add DIRECT send type,if you use DIRECT module "Net::DNS" is required
+#===2.4.4(2007-10-10): modify X-Mailer, remove Thread-Index and X-MimeOLE, fix BCC bug
+#===2.4.3(2006-08-28): fix parse mail list bugs
+#===2.4.2(2006-08-17): fix filter bugs
+#===2.4.1(2006-08-01): add email filter
+#===2.4.0(2006-07-31): document format
+#===2.3.0(2005-08-18): smtp support, non-ascii attachment file name support
+#===2.0.1(2005-08-12): modified _sendmail, die if sendmail_path not valid 
+#===2.0.0(2005-08-12): second version release, Simplify the first version, and add some function

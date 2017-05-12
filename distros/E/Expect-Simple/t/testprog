@@ -1,0 +1,17 @@
+
+use strict;
+use warnings;
+
+my $p = 'tpt %d> ';
+
+printf( $p, 0);
+while( <> )
+{
+    do { print "byebye\n"; last } 
+      if /quit/;
+
+    print uc( $_ );
+    printf( $p, $.);
+}
+
+print "quit> \n";

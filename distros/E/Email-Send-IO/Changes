@@ -1,0 +1,7 @@
+Revision history for CPAN distribution Email-Send-IO
+
+2.201     2013-08-18
+          update bugtracker, repo
+
+2.200     2007-04-06
+          split into its own dist from Email-Send

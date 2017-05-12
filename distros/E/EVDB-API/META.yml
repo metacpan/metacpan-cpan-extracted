@@ -1,0 +1,16 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         EVDB-API
+version:      0.99
+version_from: 
+installdirs:  site
+requires:
+    Carp:                          0
+    Digest::MD5:                   0.1
+    LWP::UserAgent:                0.1
+    Module::Pluggable::Object:     0
+    Test::More:                    0
+    XML::Simple:                   0.1
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

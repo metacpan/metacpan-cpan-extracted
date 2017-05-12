@@ -1,0 +1,820 @@
+\input texinfo  @c -*-texinfo-*-
+@c $Id: epl.texi,v 1.14 2001/02/13 05:18:33 jtobey Exp $
+@c %**start of header
+@setfilename epl.info
+
+@include version.texi
+@settitle EPL @value{VERSION} Reference Manual
+
+@setshortcontentsaftertitlepage
+
+@c Combine indices the way the Elisp manual does (from elisp.texi).
+@synindex cp fn
+@syncodeindex vr fn
+@syncodeindex ky fn
+@syncodeindex pg fn
+@c We use the "type index" to index new functions and variables.
+@c @syncodeindex tp fn
+
+@finalout
+
+@c XXX Makeinfo 4.0 doesn't seem to support putting this in the
+ @c <head>.  And anyway, the current elisp.html on GNU's site uses
+ @c texi2html anchor names (like "SEC20").
+@c @html
+@c <base href="http://www.gnu.org/manual/elisp/html_mono/">
+@c @end html
+
+@c %**end of header
+
+@dircategory Emacs
+@direntry
+* EPL: (epl).           Script Emacs with Perl.
+@end direntry
+
+@c Quoth texinfo.txi:
+@c Before release, run C-u C-c C-u C-a (texinfo-all-menus-update with a
+@c prefix arg).  This updates the node pointers, which texinfmt.el needs.
+
+@ifinfo
+This Info file documents EPL, an Emacs extension that supports the use
+of Perl to write other Emacs extensions.
+
+Copyright (C) 2001 John Tobey <jtobey@@john-edwin-tobey.org>
+
+This edition is for EPL version @value{VERSION}, @value{UPDATED}.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.1 or
+any later version published by the Free Software Foundation; with no
+Invariant Sections, no Front-Cover texts, and no Back-Cover Texts.  A
+copy of the license is included in the section entitled
+"GNU Free Documentation License".
+@end ifinfo
+
+@titlepage
+@title EPL Reference Manual
+@subtitle Revision @value{EDITION}, for EPL Version @value{VERSION}
+@subtitle @value{UPDATED}
+@author John Tobey
+@page
+@vskip 0pt plus 1filll
+Copyright @copyright{} 2001
+John Tobey @email{jtobey@@john-edwin-tobey.org}
+
+@sp 2
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.1 or
+any later version published by the Free Software Foundation; with no
+Invariant Sections, no Front-Cover texts, and no Back-Cover Texts.  A
+copy of the license is included in the section entitled
+"GNU Free Documentation License".
+@end titlepage
+@page
+
+@ifnottex
+@node Top
+@top EPL
+This is edition @value{EDITION} of the EPL Reference Manual,
+corresponding to EPL version @value{VERSION}.
+
+EPL (Emacs Perl) is a library of Lisp functions and Perl modules that
+let you write Emacs extensions in Perl.
+@end ifnottex
+
+@menu
+* Preface::                     Why I'm here.
+* Introduction::                Beginning with an example.
+* Features::                    How Perl looks to Lisp, how Lisp looks to Perl.
+* Configuration::               Changing the defaults.
+* Internals::                   What happens under the hood.
+
+Appendices
+
+* Copying Conditions::          The GNU Free Documentation License.
+* Index::                       Index to this manual.
+
+@detailmenu
+
+ --- The Detailed Node Listing ---
+
+Introduction to EPL
+
+* Perl Example::                An example: Find files containing regex.
+* History::                     EPL uses IPC, not translation or embedding.
+* Emacs Lisp::                  You need the Emacs Lisp Reference Manual.
+* Coding Conventions::          Why the Perl examples use @samp{&@var{function}()}.
+
+How Language Features Correspond
+
+* Data Conversion::             Working with each other's data types.
+* Functions::                   Transfering program control.
+* Control Structures::          Exceptions; @code{throw}, @code{signal}, @code{die}.
+* Input/Output::                Perl's primitives are redefined in Emacs.
+* Caveats::                     It's not always a happy marriage.
+
+Configuration
+
+* Installation::                Lisp files, Perl modules, documentation.
+* The Easy Way::                We like the defaults.
+* Starting a Perl Process in Emacs::   @code{make-perl-interpreter}.
+* Starting an Emacs Process in Perl::  @code{use Emacs;}.
+
+Internals
+
+* Debugging Options::           Dumping traffic to stderr or a buffer.
+* Transport Layer::             Media of interprocess communication.
+* Message Types::               What interpreters can say to each other.
+* State Transitions::           The message stream grammar.
+* Protocol::                    Current EPL protocol (@strong{subject to change}).
+
+@end detailmenu
+@end menu
+
+
+@node Preface
+@unnumbered Preface
+
+Like a lot of people, I learned Perl because of the Web.  I came to
+GNU from a Microsoft background early in 1996, when Microsoft had only
+begun to realize that the Internet was hot.  I was deeply infused with
+Web hype, willing to try something different, and aware that the Web
+ran on Unix and Perl.
+
+I came to Emacs because of genetic predisposition.  A tightly
+integrated, yet versatile, complex system with endless opportunities
+for learning and automation helps reduce my cholesterol and, I think,
+aids respiration and digestion.  It had all the good features of
+Microsoft Office, without all the headaches and nausea.
+
+Well, it had @emph{almost} all the good features.
+
+Emacs is an oasis of integration in the chaotic and disparate realm of
+Linux and Unix.  (I later learned that the Unix kernel is a thing of
+some elegance, but at the level of @file{/etc/resolv.conf},
+@acronym{X11R6}, and @file{~/.fvwmrc}, there was little cohesion.)  As
+I entered this realm, it irked me that I had to learn @emph{two}
+scripting languages to do what I wanted, whereas Visual Basic, clunky
+as it is, does everything on Windows.
+
+Speaking of that other---umm---language, Visual Basic shares an
+important feature with Perl: It is for ordinary people.
+
+Now, I am very glad that Emacs lets you do just about anything with
+Elisp (such as write EPL).  But my conceptual mapping from Windows
+onto Unix paired Visual Basic with Perl, not Lisp, as the general
+workhorse get-it-done tool.  It seemed to me not right that the
+standard, full-featured editor on my new system could not understand
+the standard, full-featured scripting language.  With EPL---Emacs
+PerL, or Emacs-Perl-Lisp---I hope to rectify the situation.
+
+
+@node Introduction
+@chapter Introduction
+
+EPL is an extension for @uref{http://www.gnu.org/software/emacs/, GNU
+Emacs} and @uref{http://www.xemacs.org, XEmacs} that lets you write
+commands in Perl.  It is also a programming interface for Elisp
+(@pxref{Emacs Lisp}) programs to use Perl features and an interface
+for Perl to use Emacs.
+
+This document assumes knowledge of Emacs terms such as ``the
+minibuffer'' and ``@kbd{M-x}'' (@pxref{Top,, Running Commands by Name,
+emacs, The GNU Emacs Manual}).  It assumes knowledge of Perl
+references and nested data structures
+(@uref{http://theoryx5.uwinnipeg.ca/CPAN/perl/pod/perlref.html,,
+perlref(1)}), and packages and modules
+(@uref{http://theoryx5.uwinnipeg.ca/CPAN/perl/pod/perlmod.html,,
+perlmod(1)}).
+@c or try http://www.perl.com/doc/manual/html/pod/
+
+@menu
+* Perl Example::                An example: Find files containing regex.
+* History::                     EPL uses IPC, not translation or embedding.
+* Emacs Lisp::                  You need the Emacs Lisp Reference Manual.
+* Coding Conventions::          Why the Perl examples use @samp{&@var{function}()}.
+@end menu
+
+
+@node Perl Example
+@section Perl Example
+
+Let's illustrate EPL with an example.  Suppose you often want to edit
+many files in the same directory based on some text that they contain.
+You want a command that will look for a specified regular expression
+in each file, and if found, open the file in a buffer.  You prefer
+Perl regular expressions to Emacs ones, and you are not interested in
+files that Perl considers to be binary.
+
+Here is some Emacs Perl code that will do it:
+
+@example
+use IO::Dir;
+use IO::File;
+
+sub find_my_files ($$) @{
+    my ($dirname, $regex) = @@_;
+
+    # @r{Convert "~" to home dir.}
+    $dirname = &expand_file_name ($dirname);
+
+    my $dh = IO::Dir->new ($dirname)
+        or die "$dirname: $!";
+
+    my $count = 0;
+    while (defined ($filename = $dh->read)) @{
+        $filename = "$dirname/$filename";
+
+        # @r{Skip directories and binary files.}
+        next unless -f($filename) && -T($filename);
+
+        my $fh = IO::File->new ($filename);
+        if (!$fh) @{
+            warn ("$filename: $!");
+            next;
+        @}
+        while (defined ($_ = <$fh>)) @{
+            if (/$regex/) @{
+                &find_file($filename);
+                $count++;
+                last;
+            @}
+        @}
+    @}
+    &message ("Found $regex in $count file(s)");
+@}
+
+defun (\*find_files_containing_regex,
+       "Open all files whose contents match a Perl regular expression.",
+       interactive("DLook in directory: \nsPerl regex: "),
+       \&find_my_files);
+@end example
+
+You would save this in a file, load it with @kbd{M-x perl-load-file}
+(@pxref{Evaluation}) or from @file{~/.emacs}, and use it as @kbd{M-x
+find-files-containing-regex}.
+
+The command prompts for a directory name (with @key{TAB}-completion
+and history) and an arbitrary string (regex).  It signals an error if
+it can't read the directory, and otherwise summarizes the results in
+the minibuffer.  You can access its documentation just like that of
+any Emacs command, using @kbd{C-h f find-files-containing-regex}.
+
+
+@node History
+@section History
+
+EPL works by starting a subprocess the first time a Perl interpreter
+is needed to carry out some function.  Emacs and Perl use interprocess
+communication (IPC) to invoke functions and send each other data until
+the parent process terminates.  Variations on this theme may involve
+Perl as the parent process or more than one child per parent.
+
+This is not the only possible implementation.  In principle, the same
+functionality could be achieved by translating Perl to Lisp.  That has
+been a goal of the GNU project since 1994, except that RMS wants to
+replace Elisp with Scheme first.  For details, see @ref{Lisp
+History,,, elisp, The Emacs Lisp Reference Manual}, and
+@uref{http://www.vanderburg.org/Tcl/war/}.
+
+Another possibility, which has been realized by a program called
+@uref{http://john-edwin-tobey.org/perlmacs/, Perlmacs}, is to embed
+the Perl interpreter in Emacs and let it operate directly at the C
+level the way the Elisp interpreter does.  This probably results in
+faster execution, but it ties an executable to specific versions of
+Perl and Emacs.  Perlmacs does not support XEmacs.
+
+
+@node Emacs Lisp
+@section Emacs Lisp
+
+Whether you write EPL programs or Elisp programs, you are writing
+Emacs programs.  The GNU and XEmacs projects maintain comprehensive
+and thorough documentation of the functions available to Emacs
+extensions.
+
+Of course, those documents assume that extensions use Lisp.  Still,
+they are an invaluable resource, and any programmer with a general
+understanding of functions and variables can make good use of them.
+This manual makes frequent reference to the
+@c XXX
+@ifhtml
+@uref{http://www.gnu.org/manual/elisp/, GNU Emacs Lisp Reference
+Manual}.
+@end ifhtml
+@iftex
+@cite{GNU Emacs Lisp Reference Manual}.
+@end iftex
+@ifnottex
+@ifnothtml
+@ref{Top, GNU Emacs Lisp Reference Manual, Introduction, elisp, GNU
+Emacs Lisp Reference Manual}.
+@end ifnothtml
+@end ifnottex
+If you don't have it, go get it!  It should be available wherever you
+got Emacs or from the @uref{http://www.gnu.org/doc/doc.html, Free
+Software Foundation}.
+
+Who knows?  You may fall in love with Lisp.
+
+
+@node Coding Conventions
+@section Coding Conventions
+
+
+@node Features
+@chapter Features
+
+This chapter describes EPL's mapping between Perl's language features
+and Emacs Lisp's.  Perl and Lisp are quite different, so some features
+favored by one language are imperfectly or awkwardly reproduced in the
+other.  EPL follows Perl's philosophy of making simple things easy and
+hard things possible.
+
+@menu
+* Data Conversion::             Working with each other's data types.
+* Functions::                   Calling each other's functions, @code{defun}.
+* Control Structures::          Exceptions; @code{throw}, @code{signal}, @code{die}.
+* Input/Output::                Perl's primitives are redefined in Emacs.
+* Caveats::                     It's not always a happy marriage.
+@end menu
+
+@node Data Conversion
+@section Data Conversion
+
+EPL provides essentially two mechanisms to transfer data between
+languages---as function arguments and return values.  In both cases,
+data may be passed either by value or by reference.  The default is by
+value, since references incur overhead (@pxref{References Incur
+Overhead}).
+
+In EPL, @dfn{by value} means recursively (or ``deeply'') copied.  That
+is, containers in the originating language are converted to analogous
+containers in the destination language, and any contained elements not
+explicitly marked as pass-by-reference are likewise converted.  This
+allows the recipient to examine a structure using its built-in
+accessors, but changes will not apply to the original.  Also, language
+peculiarities result in information loss during some conversions, so
+pass-by-value is not completely reversible (@pxref{Conversion Is
+Imperfect}).
+
+This section describes the conversions that apply to each language's
+scalar and container types.  For a complete description of Lisp types,
+see @ref{Lisp Data Types,,, elisp, The Emacs Lisp Reference Manual}.
+
+@menu
+* Scalars::                     Lisp has three scalar types.
+* The Null Value::              @code{undef} and @code{()} are @code{nil}.
+* Symbols and Globrefs::        @code{\*::sym} is @code{'sym}.
+* Lists and Arrayrefs::         @code{["fnord"]} is @code{'("fnord")}.
+* Vectors::                     @code{\[42]} is @code{[42]}.
+* Conses::                      The @code{Emacs::Lisp::Cons} type.
+* Scalar References::           The @code{perl-ref} type.
+* Code References::             @code{\&frob} is a lambda expression.
+* Hash Tables::                 Not yet implemented.
+* Blessed References::          Not yet implemented.
+* Emacs Types::                 Not yet implemented.
+@end menu
+
+@node Scalars
+@subsection Scalars
+
+Lisp integers, floats, and strings all become Perl scalars.  A simple
+Perl scalar becomes either an integer, a float, or a string.
+
+Unfortunately, it is hard to be certain which type will be chosen.  It
+depends on the value.  Perl 5.005 and later can distinguish among the
+literal constants @code{1}, @code{"1"}, and @code{1.0}, and EPL uses
+this information.  However, not all Perl integers fit into an Emacs
+integer (which is 28 bits, @pxref{Integer Type,,, elisp, The Emacs
+Lisp Reference Manual}).  Integers that would overflow are upgraded to
+floats when converted.
+
+You @emph{may} be able to specify string conversion by wrapping a
+variable in double quotes (@code{"$var"}), float by adding zero
+(@code{$var + 0}), and integer using (@code{int($var)}).  Perhaps a
+future version of EPL will provide an explicit means of specification.
+
+Interesting character encodings such as UTF-8 are not currently
+supported.  All strings are considered unibyte.  @xref{Text
+Representations,,, elisp, The Emacs Lisp Reference Manual}.
+
+
+@node The Null Value
+@subsection The Null Value
+
+As an exception to the rule for symbols (@pxref{Symbols and
+Globrefs}), @code{nil} in Lisp corresponds to @code{undef} in Perl.
+
+In Lisp, @code{nil} is really a symbol.  However, it is typically used
+as the boolean value @var{false}.  Perl symbols (glob references)
+evaluate to @var{true} in boolean context.  It is very natural to
+convert @code{nil} to @code{undef}.
+
+
+@node Symbols and Globrefs
+@subsection Symbols and Globrefs
+
+Glob references become symbols in Lisp.  Underscores are swapped with
+hyphens in the name, since Perl prefers underscores and Lisp prefers
+hyphens.
+
+
+@node Lists and Arrayrefs
+@subsection Lists and Arrayrefs
+
+Lists are a central data structure in Lisp.  To make it as easy as
+possible to pass lists to Lisp functions that require them, Perl array
+references are converted Lisp lists.  For example, the Perl expression
+
+@example
+["x", ["y", 1]]
+@end example
+is converted to
+@example
+'("x" ("y" 1))
+@end example
+
+in Lisp.  Note, however, that the empty list in Lisp is
+indistinguishable from @code{nil}, so it becomes the undefined value,
+not an arrayref.  @xref{The Null Value}.
+
+
+@node Vectors
+@subsection Vectors
+
+Adding @code{\} to an arrayref makes it an arrayref ref, which EPL
+treats as a vector in Lisp.  For example, Perl @code{\[1, 2, []]}
+becomes Lisp @code{[1 2 nil]}.
+
+
+@node Conses
+@subsection Conses
+
+Conses that are not lists become Emacs::Lisp::Cons objects.
+
+@strong{Compatibility note:}  In Perlmacs, such conses become opaque
+objects (@pxref{Pass-by-Reference}).
+
+@example
+$x = &cons("left", "right");
+print ref($x);                # "Emacs::Lisp::Cons"
+print $x->car;                # "left"
+print $x->cdr;                # "right"
+@end example
+But:
+@example
+$x = &cons ("top", undef);    # a Lisp list
+print ref($x);                # "ARRAY"
+print $x->[0];                # "top"
+@end example
+
+@c defun car, cdr
+
+
+@node Scalar References
+@subsection Scalar References
+
+
+@node Code References
+@subsection Code References
+
+
+@node Hash Tables
+@subsection Hash Tables
+
+The issue with hash tables is that Perl's built-in ones permit only
+string keys.  Right now, hash tables are passed by reference
+(@pxref{Pass-by-Reference}).
+
+
+@node Blessed References
+@subsection Blessed References
+
+
+@node Emacs Types
+@subsection Emacs Types
+
+
+@node Functions
+@section Functions
+
+@menu
+* Evaluation::                  @code{perl-eval}.
+* Ordinary Functions::          @code{perl-call}, @code{use Emacs::Lisp;}.
+* Pass-by-Reference::           How to inhibit data conversion.
+* Commands::                    Extending Emacs without Lisp, @code{defun}.
+@end menu
+
+@node Evaluation
+@subsection Evaluation
+
+@defun perl-eval string &optional context
+This function parses and executes @var{string} as Perl code and
+returns its converted value (@pxref{Data Conversion}).
+
+@var{context} can specify an evaluation context (see
+@uref{http://www.perldoc.org, perlsub documentation}) and affects how
+the results are returned.  It may be:
+
+@table @asis
+@item @code{scalar-context}
+Evaluate in scalar context and return the result as a Lisp object.
+This is the default if @var{context} is not given.
+
+@item @code{list-context}
+Evaluate in list context and return the result as a list.
+
+@item @code{void-context}
+Evaluate in void context and return @code{nil}.
+@end table
+@end defun
+
+@defun perl-eval-raw string &optional context
+This function executes @var{string} like @code{perl-eval} but does not
+convert its value.  Instead, it returns a @code{perl-value} object
+that keeps a reference to a value in Perl.
+@end defun
+
+@node Ordinary Functions
+@subsection Ordinary Functions
+
+@defun perl-call sub &rest arguments
+This function calls the Perl subroutine named @var{sub} with
+@var{arguments} and returns its value.  If the first argument is
+@code{scalar-context}, @code{list-context}, or @code{void-context}, it
+is not passed to the sub but affects the calling context as in
+@code{perl-eval}.  @xref{Evaluation}.
+@end defun
+
+@node Pass-by-Reference
+@subsection Pass-by-Reference
+
+XXX Rewrite.
+
+A @dfn{shallow copy} simply wraps a Perl scalar in a Lisp object or
+vice versa.  Wrapped Perl values appear as a Lisp objects of type
+@code{perl-value}.  Wrapped Lisp values appear in Perl as objects of
+class @code{Emacs::Lisp::Object}.  @xref{References Incur Overhead},
+for issues relating to wrapped data.
+
+In Perl, the @code{wrap} function wraps its argument in a Lisp object.
+This allows Perl data such as arrays to be passed by reference to Lisp
+functions.  Another way Lisp can obtain references to Perl data is by
+using @code{perl-eval-raw} or @code{perl-call-raw}.  Lisp can tell
+whether an object refers to Perl data by using the @code{perl-value-p}
+function.
+
+Of course, @code{wrap} is a Perl function, so the value it returns is
+really its argument wrapped in a Lisp object wrapped in a Perl object.
+But when you pass this object to Lisp as an argument or function
+return value, Lisp gets a reference to the original object, and no
+automatic conversion occurs.  Lisp may explicitly convert it at any
+time using the @code{perl-to-lisp} function, and any changes made by
+Perl will be visible at the time of conversion.
+
+The Lisp function @code{perl-wrap} is the counterpart of Perl's
+@code{wrap} function, and the @code{Emacs::Lisp::Object} package
+provides the equivalent of @code{perl-call-raw}.  The functions of
+package @code{Emacs::Lisp} return deep copies of Lisp function return
+values (see @pxref{Functions}).  However, the corresponding
+@code{Emacs::Lisp::Object} functions return references to live Lisp
+objects.
+
+Since a wrapped Lisp object appears in Perl as an
+@code{Emacs::Lisp::Object} blessed reference, if follows that it can
+be used with method syntax to invoke a function and pass itself as the
+first argument.  Thus, supposing @code{v} is a vector of conses and
+@code{$v} is its wrapper, this Perl code
+
+@example
+$v->aref(3)->setcdr(t);
+@end example
+has the effect of the following Lisp:
+@example
+(setcdr (aref v 3) t)
+@end example
+
+An Emacs::Lisp::Object's @code{to_perl} method performs a deep copy
+and is the counterpart of @code{perl-to-lisp}.
+
+Lisp functions called through package Emacs::Lisp convert their return
+values using deep copying.  The same functions are accessible through
+Emacs::Lisp::Object, which does shallow conversion and always returns
+an Emacs::Lisp::Object object.
+
+These examples show how the data wrapping functions work in Perl:
+
+@example
+$x = wrap [1, 2, 3];
+print ref($x);           # "Emacs::Lisp::Object"
+print ref($x->to_perl);  # "ARRAY"
+print @@@{&list(2, 3)@};    # "23"
+
+$x = Emacs::Lisp::Object::list(2, 3);
+print ref($x);           # "Emacs::Lisp::Object"
+print @@@{$x->to_perl@};    # "23"
+@end example
+
+And in Lisp:
+
+@example
+XXX
+@end example
+
+@node Commands
+@subsection Commands
+
+
+@node Control Structures
+@section Control Structures
+
+
+@node Input/Output
+@section Input/Output
+
+@node Caveats
+@section Caveats
+
+@menu
+* References Incur Overhead::   Memory management hurdles.
+* Conversion Is Imperfect::     Natural mappings are not always 1-to-1.
+@end menu
+
+@node References Incur Overhead
+@subsection References Incur Overhead
+
+@node Conversion Is Imperfect
+@subsection Conversion Is Imperfect
+
+
+@node Configuration
+@chapter Configuration
+
+@menu
+* Installation::                Lisp files, Perl modules, documentation.
+* The Easy Way::                We like the defaults.
+* Starting a Perl Process in Emacs::   @code{make-perl-interpreter}.
+* Starting an Emacs Process in Perl::  @code{use Emacs::Lisp;}.
+@end menu
+
+@node Installation
+@section Installation
+
+@node The Easy Way
+@section The Easy Way
+
+@node Starting a Perl Process in Emacs
+@section Starting a Perl Process in Emacs
+
+@node Starting an Emacs Process in Perl
+@section Starting an Emacs Process in Perl
+
+
+@node Internals
+@chapter Internals
+@cindex Internals
+@cindex protocol
+@cindex messages
+
+This chapter introduces the concepts involved in supporting
+single-threaded distributed exception handling and garbage collection
+for languages like Perl and Emacs Lisp.  These languages have a lot
+more in common underneath than meets the eye.
+
+The chapter ends with a more concrete description of EPL's protocol.
+This information changes with great frequency and may be completely
+outdated by the time you read this.
+
+@menu
+* Debugging Options::           Dumping traffic to stderr or a buffer.
+* Transport Layer::             Media of interprocess communication.
+* Message Types::               What interpreters can say to each other.
+* State Transitions::           The message stream grammar.
+* Protocol::                    Current EPL protocol (@strong{subject to change}).
+@end menu
+
+@node Debugging Options
+@section Debugging Options
+@cindex debugging EPL
+@cindex dumping message traffic
+@cindex stderr
+@cindex standard error stream
+
+You can make either or both processes log the messages sent between
+them.
+
+@defvr {Perl Variable} $Emacs::EPL::debugging
+When this variable holds a true value, the Perl side of EPL logs
+messages to and from Emacs.  Possible values are:
+
+@table @asis
+@item @code{"stderr"}
+Send debugging output to @code{STDERR}.  This works only when Perl is
+the parent process.
+
+@item a string
+Append debugging output to the file named by the string.
+
+@item a scalar reference
+Append debugging output to the scalar.  This requires the IO::Scalar
+module.
+
+@item a filehandle
+Print debugging output to the handle.
+@end table
+@end defvr
+
+@deffn {Perl Function} Emacs::EPL::debug string@dots{}
+This is the function used internally to send debugging output to the
+destination specified by @code{$Emacs::EPL::debugging}.
+@end deffn
+
+@defvr Variable epl-debugging
+When this variable's value is non-@code{nil}, the Emacs side of EPL
+logs messages to and from Perl.  If it is the symbol @code{stderr},
+the output goes to the standard error stream.  Otherwise, it goes to a
+buffer named @samp{*epl-debug*}.
+
+The log messages include the exact text sent to Perl, but the replies
+are printed as Lisp forms using @code{prin1}.  However, EPL always
+uses a buffer named @samp{*perl*} to receive text from Perl.
+Normally, it erases this buffer after every message, but when
+@samp{epl-debugging} is true, it does not.
+@end defvr
+
+@defun epl-debug &rest objects
+This is the function used internally to send output to the location
+specified by @code{epl-debugging}.
+@end defun
+
+
+@node Transport Layer
+@section Transport Layer
+@cindex Transport Layer
+@cindex pipe between Emacs and Perl
+@cindex connection types
+@cindex IPC
+@cindex interprocess communication
+
+
+@node Message Types
+@section Message Types
+@cindex Message Types
+
+
+@node State Transitions
+@section State Transitions
+@cindex State Transitions
+@cindex protocol states
+@cindex state diagram
+
+
+@node Protocol
+@section Protocol
+@cindex wire protocol
+
+
+@node Copying Conditions
+@appendix Copying Conditions
+
+You are welcome to distribute EPL under the terms of either the Perl
+Artistic License (as distributed with Perl 5.6.0) or the GNU General
+Public License.
+
+@quotation
+This library is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2, or (at your option)
+any later version.
+
+This software is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this library; see the file COPYING.  If not, write to
+the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+Boston, MA 02111-1307, USA.
+@end quotation
+
+You may distribute copies of this documentation in accordance with the
+@ref{GNU Free Documentation License}, Version 1.1 or any later version
+published by the Free Software Foundation; with no required Invariant
+Sections, Front-Cover texts, or Back-Cover Texts.
+
+@menu
+* GNU Free Documentation License::    The GNU FDL.
+@end menu
+
+
+@include fdl.texi
+
+
+@node Index
+@unnumbered Index
+@printindex fn
+
+@bye

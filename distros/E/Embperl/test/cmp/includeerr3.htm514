@@ -1,0 +1,27 @@
+
+<html>
+<head>
+<title>Embperl Tests - Errors in Include other Embperl pages via Execute 3</title>
+</head>
+
+<h1>Embperl Tests - Errors in Include other Embperl pages via Execute 3</h1>
+
+
+
+^\*\*\*errors: \[\d+\]ERR:  32:  Warning in Perl code: Subroutine _ep_main\d+ redefined at .+ line 1. \[\d+\]ERR:  24:  Error in Perl code: Can't locate object method &quot;is&quot; via package &quot;here&quot;.+at .+incerr.htm line 6.<br>
+
+
+***rc:0
+^\*\*\*errors: #(2|3)<br>
+^\*\*\*errors: \[\d+\]ERR:  32:  Warning in Perl code: Subroutine _ep_main\d+ redefined at .+ line 1.
+
+^\[\d+\]ERR:  24:  Error in Perl code: Can't locate object method &quot;is&quot; via package &quot;here&quot;.+at .+incerr.htm line 6.
+
+^testerrobj=HASH\(0x
+^\*\*\*errobj: testerrobj=HASH\(0x
+***errobj msg: Error Message from Object<br>
+***errors msg: Error Message from Object<br>
+
+
+</body>
+</html>

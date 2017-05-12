@@ -1,0 +1,39 @@
+#
+# $Id: Changes 6 2006-08-25 22:28:38Z naruse $
+# Revision history for Perl extension Encode::EUCJPMS.
+#
+$Revision: 6 $ $Date: 2006-08-26 07:28:38 +0900 (Sat, 26 Aug 2006) $
+0.07  Sat Aug 26 07:27:02 2006
+! EUCJPMS.pm
+   Fix alias of eucJP-ms
+! EUCJPMS.t
+   Add tests.
+! ucm/eucJP-ms.ucm
+   Change code_set_name as "eucJP-ms"
+0.06  Sat Jun 24 02:00:00 2006
+! EUCJPMS.pm
+   Support CP20220 and CP20221
+! ucm/eucJP-ms.ucm
+   Import glibc-EUC_JP_MS-2.3.3.ucm
+! ucm/cp51932.ucm
+   Remove some illegal mappings.
+! META.yaml
+   Added.
+0.05  Thu Oct 13 04:38:29 2005
+! EUCJPMS.pm
+   Fixed: qr/\bcp51932$/i was aliased to '"eucJP-ms"'
+0.04  Tue Oct 11 03:59:38 2005
+! ucm/eucJP-ms.ucm
+  Fixed: Can't convert User defined characters, multi defined characters,
+   JIS X 0212 without IBM extended characters in eucJP-ms to Unicode
+   http://msyk.at.webry.info/200509/article_5.html
+! ucm/cp51932.ucm
+   Don't convert PUA (U+E000～U+E757) in Unicode to cp51932 convertion
+   http://msyk.at.webry.info/200509/article_5.html
+0.03  Fri Sep 09 10:56:50 2005
+! ucm/cp51932.ucm
+   Added.
+0.02  Thu Sep 01 03:19:11 2005
+! various mistakes are fixed
+0.01  Thu Sep 01 03:19:11 2005
+! First Release

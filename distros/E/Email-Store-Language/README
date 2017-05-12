@@ -1,0 +1,66 @@
+NAME
+    Email::Store::Language - Add language identification to emails and lists
+
+SYNOPSIS
+    Remember to create the database table:
+
+        % make install
+        % perl -MEmail::Store="..." -e 'Email::Store->setup'
+
+    And now:
+
+        for( $mail->languages ) {
+            print $_->language . "\n";
+        }
+
+    or
+
+        for( $list->languages ) {
+            print $_->language . "\n";
+        }
+
+DESCRIPTION
+    This module will help you auto-identify the language of your messages
+    and lists. There are some options you can use to help refine the
+    process.
+
+  set_active_languages
+    This is a method from Lingua::Identify that will let you limit what
+    languages your messages should be checked against.
+
+        # limit to english and french
+        use Lingua::Identify qw( set_active_languages );
+        set_active_languages( qw( en fr ) );
+
+  $EMAIL::Store::Language::OPTIONS
+    This is a hashref of options that will be passed as the first argument
+    to "langof()". There is one exception: the "threshold" option.
+    "threshold" should be a number (percentage) between 0 and 1. The default
+    is 0.5.
+
+        $Email::Store::Language::OPTIONS = { threshold => 0.35 };
+
+    In the above example, a threshold of 0.35 means that, for mail language
+    identification, if Lingua::Identify claims to be 35% sure that the
+    message is a given language it will store that language. If no languages
+    are above the threshold, then the language of most confidence will be
+    used.
+
+    For list identification, it means that if 35% of the messages are
+    identified as being a given language, then it will store that language.
+    If no languages are above the threshold, then the language of most
+    confidence will be used.
+
+SEE ALSO
+    * Email::Store
+    * Lingua::Identify
+
+AUTHOR
+    * Brian Cassidy <bricas@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2006 by Brian Cassidy
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

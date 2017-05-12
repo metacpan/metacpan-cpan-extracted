@@ -1,0 +1,24 @@
+Revision history for Event-Distributor
+
+0.04    2015/11/27 21:53:07
+        [CHANGES]
+         * Added 'action' events
+         * Update documentation to barename function style
+
+0.03    2015/02/11 20:21:19
+        [CHANGES]
+         * Expose Ev:Dist::Signal/Query as user-accessible objects
+
+        [BUGFIXES]
+         * Don't corrupt internal state when subscriber functions trash $_
+
+0.02    2014/12/10 22:18:13
+        [CHANGES]
+         * Add query-like events
+         * Ensure Signals raise errors as failures if any of their subscribers
+           do
+         * Add TODO note about anonymous signals
+
+0.01    2014/08/16 19:04:30
+        First version, released on an unsuspecting world.
+

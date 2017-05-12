@@ -1,0 +1,27 @@
+Sun Jul  4 13:32:48 BST 2004    v1.3
+-----------------------------------------------
+Eeek - 1.2 didn't compile. Stupid Simon.
+
+
+
+Mon Jun 21 09:54:46 BST 2004    v1.2
+-----------------------------------------------
+Patch from Simon Cozens which should make things
+slightly saner if it can't find all the necessary
+hidden dictionary files.
+
+
+
+Sat Jun 19 18:21:17 BST 2004    v1.01
+-----------------------------------------------
+Well, it would have been the last release if I hadn't
+been a muppet and forgotten an 's' and something out
+of the MANIFEST.
+
+
+
+
+Thu Jun 17 19:17:49 BST 2004 	v1.0
+-----------------------------------------------
+First release. Unlikely to need another, I hope.
+

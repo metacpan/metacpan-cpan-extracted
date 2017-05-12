@@ -1,0 +1,14 @@
+[
+  "Test::Email::SMTPRig",
+  {
+    "smtp_host": "mx-all.pobox.com",
+    "smtp_port": 25
+  },
+  [
+    {
+      "from": null,
+      "to"  : null,
+      "result_class": "Email::Sender::Success"
+    }
+  ]
+]

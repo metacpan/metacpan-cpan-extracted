@@ -1,0 +1,73 @@
+"Errno::AnyString" allows you to place an arbitrary error message in the
+special $! variable, without disrupting $!'s ability to pick up the result
+of the next system call that sets "errno".
+
+It is useful if you are writing code that reports errors by setting $!, and
+none of the standard system error messages fit.
+
+  use Errno qw/EIO/;
+  use Errno::AnyString qw/custom_errstr/;
+
+  $! = custom_errstr "My hovercraft is full of eels";
+  print "$!\n"; # prints My hovercraft is full of eels
+
+  my $saved_errno = $!;
+
+  open my $fh, "<", "/no/such/file";
+  print "$!\n"; # prints No such file or directory
+
+  $! = EIO;
+  print "$!\n"; # prints Input/output error
+
+  $! = $saved_errno;
+  print "$!\n"; # prints My hovercraft is full of eels
+
+You can also set the error strings for particular error numbers, for the
+lifetime of the Perl interpreter:
+
+  use Errno::AnyString qw/register_errstr/;
+
+  register_errstr "Wetware failure", 339864;
+
+  $! = 339864;
+  print "$!\n"; # prints Wetware failure
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Errno::AnyString
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Errno::AnyString
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Errno::AnyString
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Errno::AnyString
+
+    Search CPAN
+        http://search.cpan.org/dist/Errno::AnyString
+
+
+COPYRIGHT AND LICENCE
+
+Copyright 2009 Dave Taylor, all rights reserved.
+
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

@@ -1,0 +1,9 @@
+Revision history for Exporter-Lexical
+
+0.02  2013-07-10
+      - Allow building the import method separately
+      - Allow getting the coderefs to export from somewhere other than the
+        current package
+
+0.01  2013-07-10
+      - Initial release

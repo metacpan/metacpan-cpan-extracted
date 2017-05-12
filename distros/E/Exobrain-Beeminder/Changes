@@ -1,0 +1,12 @@
+1.06      2014-03-03 18:47:34PST-0800 America/Los_Angeles
+
+    * BUILD: Compatbility fixes for Perl 5.10.x
+
+1.05      2014-03-03 17:45:17PST-0800 America/Los_Angeles
+
+    * META: Updated version number so components moved into this
+            distribution didn't go backwards.
+
+1.00      2014-03-03 17:39:06PST-0800 America/Los_Angeles
+
+    * Initial release to CPAN

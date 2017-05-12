@@ -1,0 +1,47 @@
+Revision history for Perl extension Excel::Table.
+
+Make sure you update the build number in the ./lib/Excel/Table.pm file!
+
+1.022	Tue, Oct 07, 2014  8:20:56 PM
+	- More CPANTS feedback.
+
+1.021	22-sep-2014
+	- CPAN Testers feedback and some CPANTS feedback.
+
+1.020	Thu, Jan 31, 2013 11:10:18 PM
+	- is_deeply has inconsistent results cross-platform, so 
+	  provide some explicit sorting, affects unit test harness only.
+
+1.018	Wed, Jan 23, 2013  9:29:48 PM
+	- fixed open_re/list_workbooks dependency on pathnames.
+
+1.017	Thu, Jan 03, 2013  8:17:18 PM
+	- changed PERL min version
+	- investigate looking for files in HOME dir
+	- minor POD update.
+
+1.016	Mon, Dec 03, 2012  9:01:55 PM
+	- casting on hashes in Excel-Table5.t
+
+1.015	Thu, Nov 29, 2012  7:29:44 PM
+	- corrected reference to Logfer
+
+1.014	Wed, Nov 28, 2012  9:30:27 PM
+	- corrected the clause ordering on select_hash to select
+	- additional conditions in Excel-Table5.t
+
+1.013	Sat, Nov 17, 2012  9:49:15 PM
+	- updated the PREREQ_PM values in Makefile.PL
+
+1.012  Thu, Nov 01, 2012 12:29:23 AM
+	- now makes Makefile.PL generate a build number and
+	- tags revisions into the dist using the Build V1.022 template
+
+1.011  Fri, Oct 26, 2012  6:37:02 AM
+	- corrected pod documentation,
+	- convert from rcs repository to git
+
+1.010  Thu Aug  2 17:28:38 2012
+	- original version; created by h2xs 1.23 with options
+		-X -n Excel::Table
+

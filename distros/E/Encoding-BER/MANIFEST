@@ -1,0 +1,15 @@
+MANIFEST
+Makefile.PL
+README
+INSTALL
+CHANGES
+lib/Encoding/BER.pm
+lib/Encoding/BER/CER.pm
+lib/Encoding/BER/DER.pm
+lib/Encoding/BER/SNMP.pm
+lib/Encoding/BER/Dumper.pm
+t/t1.t
+t/t2.t
+t/t3.t
+eg/snmpget
+META.yml                                 Module meta-data (added by MakeMaker)

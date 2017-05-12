@@ -1,0 +1,360 @@
+Revision history for Enbld.
+
+0.7041 2015/02/09
+	[Fixed Definition]
+	- Fixed the vm of rakudo -> moarVM
+
+0.7040 2014/09/25
+        [New Definition]
+        - Added support for libyaml
+
+0.7039 2014/08/31
+        [Bug Fix]
+        - Fixed libevent can be downloaded correctly by using the curl.
+
+0.7038 2014/05/29
+        [Fixed Definition]
+        - Supported git 2.x.x.
+
+0.7037 2014/04/02
+        [New Feature]
+        - Added support for installation the specific version of target.
+
+        [Refactoring]
+        - Replaced shebang (ytnobody++)
+        - Improved the specified method of a lib directory. (ytnobody++)
+        - Simplified the error handling.
+
+0.7036 2014/03/22
+        [Bug Fix]
+        - Fixed deploy mode at absolute path.
+          Compulsorily, it was lost that DSL is set as deploy mode.
+
+        [New Feature]
+        - Supported cpanfile at module installation for perl.
+
+0.7035 2014/03/08
+        [Improvement]
+        - Become able to receive relative path for deploying. (ytnobody++)
+
+0.7034 2014/02/26
+        - Improved definition for ruby.
+
+0.7033 2014/02/20
+        - Added check for Win32.
+          Since Enbld can't run on windows platforms.
+
+0.7032_1 2014/02/19
+        - test release for tester.
+
+0.7032 2014/02/18
+        - Replace HTTP module from 'LWP' to 'HTTP::Tiny'.
+          Since HTTP::Tiny 0.041 supported  authenticating proxy.
+
+0.7031 2014/02/06
+        [Fix Definition]
+        - Support development version for node.js.
+
+0.7030 2013/12/30
+        [Fix Definition]
+        - Support the new versioning of ruby.
+
+0.7029 2013/12/28
+        - Support Linux and BSD better.
+          At Linux, Enbld made it not solve a dependencies.
+          Please use package management manager.
+          At BSD, use GNU Make instead of BSD make.
+        - Add document for solution a dependencies.
+        - Change the minimum version of required perl into 5.10.1 from 5.12.
+
+0.7028 2013/12/21
+        - Fix test -> t/Target.t
+          At OS X, the File System which does not distinguish
+          an upper case and a lower-case letter.
+          I did not notice.
+
+0.7027 2013/12/21
+        - Fix lacking translation.
+
+0.7026 2013/12/21
+        - Rewrite all documents and add japanese documents.
+
+0.7025 2013/12/17
+        - Remove 'use Enbld::Copy' from Enbld::Target.
+
+0.7024 2013/12/07
+        - Add pod to definition modules.
+
+0.7023 2013/11/29
+        [Test Fix]
+        - t/App-Configuration.t is passed at other than Mac OS X.
+
+        [Definition]
+        - Mysql definition can analysis new archive file site.
+
+0.7022 2013/11/29
+        [Bug Fix]
+        -Fix META.json
+
+0.7021 2013/11/28
+        [Bug Fix]
+        - Remove dependency 'libtool' from 'apache'.
+        - Command 'getenbld' is corrected so that it might operate correctly. 
+        - Subcommand 'enblder list' displays unenabled targets.
+
+0.7020 2013/11/28
+        [Bug Fix]
+        - 'freeze' command displays correct DSL.
+
+        [New Definition]
+        - openssl for installation Ruby.
+
+        [Refactoring]
+        - It changes so that a CPAN module may be used as much as possible. 
+          A dependence module is indicated to Makefile.PL and cpanfile. 
+
+0.7019 2013/10/22
+        - re-packing
+        - fix .gitignore
+
+0.7018 2013/10/22
+		[Bug Fix]
+		- 'to' function in DSL came to operate normally. 
+
+0.7017 2013/10/20
+        [New Feature]
+        - Improve idempotence of a configuration file.
+
+          * Check digest of configuration file.
+          * Add 'copy' function for configuration file.
+
+        [Bug Fix]
+        - Fix HTTP client selection.
+          The problem which does not operate correctly
+          in the environment where only wget is installed
+          is corrected.
+
+0.7016 2013/10/17
+        [Document Improvement]
+        - Change installation document.
+          From GitHub to CPAN
+        
+        [Bug Fix]
+        - Subcommand 'selfupgrade' now run correctly.
+        - 'setup' command clear 'MYMETA.*' beforehand.
+
+0.7015 2013/10/16
+        - Re-packing.
+
+0.7014 2013/10/15
+        [New Feature]
+        - Add subcommand 'selfupgrade'.
+          
+          $ enblder selfupgrade
+          -> upgrade Enbld from CPAN
+
+        [Fix Document]
+        - Fix 'enblder' document.
+
+          The old command name remained. 
+          (Reported by aero++)
+
+        [Bug Fix]
+        - Remove incompleteness META.json.
+
+0.7013 2013/10/13
+        [Bug Fix]
+        - Fix Makefile.PL
+
+          EXE_FILES was added.
+          (Reported by aero++)
+
+
+0.7012 2013/10/13
+        - Add repository info to META.json.
+        - Remove unnecessary tests from t/.
+
+0.7011 2013/10/12
+        - Fix META.json
+
+0.7010 2013/10/12
+        - Replace build tool for module from 'Module::Build' to 'ExtUtils::MakeMaker'.
+        
+        [New Feature]
+        - add subcommand 'enblder readme'.
+        - add subcommand 'enblder tutorial'.
+
+        To show help message, use this commands.
+
+0.7009 2013/10/10
+        - Update Documents
+		- Rename 'bin/enbld' to 'bin/enblder'.
+
+0.7008 2013/10/07
+        - Update README
+
+0.7007 2013/10/05
+        [New Definition]
+        - apache
+        - apr
+        - aprutil
+        - libtool
+        - zsh
+
+0.7006 2013/10/05
+        [Improvement]
+        - Add POD to Enbld.pm
+
+        [New Definition]
+        - emacs
+
+0.7005 2013/10/03
+		[Improvement]
+		- Add support 'wget' for download archivefile.
+
+0.7004 2013/10/02
+		[Improvement]
+		- Remove restriction of running only by Mac OS X.
+
+0.7003 2013/10/01
+        [BugFix]
+        - Fix 'enbld help'...remove 'search' subcommand
+          'search' subcommand is not implimented yet.
+        - Fix 'enbld deploy'...fix syntax error...
+
+0.7002 2013/10/01
+        [BugFix]
+        - 'enbld use' subcommand can enable 'off'ed target.
+        - Add missing META.yml & Makefile.PL
+
+0.7001 2013/10/01
+        - Fix README's typo.
+        - Add META.json.
+
+0.7000 2013/09/28
+		- Rename product name 'Blender-Declare' to 'Enbld'.
+		  In order to avoid confusion with 3D CG soft 'blender'.
+
+0.6015 2013/09/14
+        [Bugfix]
+        - Fix broken version comparision.
+        - Fix broken test at perl 5.12.
+        - Fix installation for development version of perl.
+
+0.6014 2013/09/14
+        [New Definition]
+        - Ruby
+        - Python
+        - Node.js
+
+        [New Subcommand]
+        - 'blender info [target name]' displays installed versions of target.
+        - 'blender available [target name]' displays available versions
+          of target.
+
+        [New Attribute]
+        - add 'SortedVersionList'
+
+0.6013 2013/09/10
+        [New Definition]
+        - Cmake
+        - MySQL
+
+0.6012 2013/09/07
+        [Fix]
+        - Fix README.
+
+        [Bugfix]
+        - It corrects so that make_test can make test in DSL.
+
+0.6011 2013/09/07
+        [Fix]
+        - fix README
+
+0.6010 2013/09/06
+        [Fix]
+        - Rewrite README.
+        - Rename directory.
+          sample -> samples
+        - Rename setup script.
+          setup.plx -> setup
+
+        [Bugfix]
+        - It corrects so that man of perl may be set up correctly. 
+
+0.6009 2013/08/31
+        [Fix]
+        - 'freeze' command displays correct annotation.
+
+0.6008 2013/08/31
+        [New Definition]
+        - Rakudo Star
+
+        [New Feature]
+        - Add 'arguments' condition.
+
+        The contents specified by 'arguments' are passed to
+        the configure command as it is. 
+
+        - Add 'annotation' condition.
+
+        'annotation' is used to make a note of the conditions of building. 
+        Set-up annotation is expressed as the 'blender list' command. 
+
+0.6007 2013/08/21
+        [New Command]
+        - Add 'rehash' command.
+        'rehash' command remakes the symbolic link of a target. 
+        This is used when a excecutable command is installed with
+        the module managerial system of a target.
+
+0.6006 2013/08/11
+        [Fix Definition]
+        - Nginx's logs and confs are not linked to symbolic link.
+
+        [Fix Command]
+        - The freeze command operates correctly, even when there is
+          no configuration file now. 
+
+0.6005 2013/08/11
+        [New Definition]
+        - Nginx
+        - Pcre
+
+        [Fix Definition]
+        - Vim
+
+        The version by which the patch is not released
+        was not able to be installed. 
+
+0.6004 2013/08/10
+        [Fix]
+        - A normal message is corrected so that it may output to STDOUT. 
+        - 'Blender Off' command now work.
+
+0.6003 2013/08/06
+        [Improvement]
+        - Add support for load configuration file.
+
+0.6002 2013/07/20
+        [New Definition]
+        - Groff
+
+        [Improvement]
+        - Remove 'Blender::Require'
+          Blender::Require was replaced by Module::Load &
+          Module::Load::Conditional.
+
+        - Check return value of 'system' function.
+          In order to identify having been interrupted by Crl-C.
+
+        - Blender::Exception outputs stacktrace only when
+          $ENV{HARNESS_ACTIVE} is set.
+
+0.6001 2013/07/11
+		- 'Freeze' command displays modules condition.
+		- 'yes' command might be started automatically at installation
+		  cpan module.
+
+0.60 2013/07/07
+        - re-relase.

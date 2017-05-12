@@ -1,0 +1,324 @@
+Revision history for Perl extension ExtUtils::ModuleMaker.
+
+0.56    January 30, 2017
+
+Removed all test files using 'scripts/modulemaker' as first step in
+diagnosing problem reported in
+https://rt.cpan.org/Ticket/Display.html?id=111637.  No changes in
+functionality.
+
+0.55    January 03, 2016
+
+Prodded by Chris Kirke during the CPAN Pull Request Challenge, standardized
+$VERSION numbers and release dates across all files.  No changes in
+functionality or tests.
+
+0.54    March 13, 2015
+
+Correct error in TEST_REQUIRES: should have been IO::Capture rather than
+IO::CaptureOutput.
+
+0.53    March 10, 2015
+
+Add metadata to Makefile.PL.  Remove IO::Capture from distribution.  Instead,
+add it to TEST_REQUIRES metadata in Makefile.PL.
+
+0.52    July 4, 2014
+
+Move version control from Subversion to git.  Establish development
+repository at https://github.com/jkeenan/extutils-modulemaker.  Adapt
+code to prevent warnings to be added in Perl 5.22.
+
+0.51    February 8, 2008
+
+ExtUtils::ModuleMaker::Interactive:: Change prompt for Abstract; make it
+44-characters long.
+
+0.50    February 8, 2008
+
+'modulemaker' script was failing to initialize certain variables.  Diagnosed
+as problems in ExtUtils::ModuleMaker::Opts.  Perl 5.10-related upgrade to
+Getopts::Std required declaration of $Getopts::Std::STANDARD_HELP_VERSION with
+assignment of true value.  Eliminated croak(Usage()).
+
+0.49    March 27, 2007
+
+Responded to bug report http://rt.cpan.org/Ticket/Display.html?id=25830 that
+when either INCLUDE_POD_COVERAGE_TEST or INCLUDE_POD_TEST is used on Windows,
+using File::Spec::catfile to generate filenames for MANIFEST results in
+Windows-style path separators (\) appearing in MANIFEST.  Though most of the
+time you want to use catfile to generate system-specific paths, in this case
+you do not because ExtUtils::Manifest uses only Unix-style path separators
+(/).  Fixed.
+
+Responded to bug report 
+0.48    March 26, 2007
+
+Responded to bug report http://rt.cpan.org/Ticket/Display.html?id=25830 of
+warnings being thrown during 'make test' in a situation where requestor
+Paul_AV had added a local license to EU::MM::Licenses::Local.  It turned out
+that at line 80 of EU::MM::Interactive I had failed to s/Standard/Local/g.
+Fixed.
+
+0.47    May 17, 2006
+
+Added two more options:  INCLUDE_ID_LINE and INCLUDE_WARNINGS.  Both are off
+by default.  Setting either to a true value includes a Subversion-style 'Id'
+keyword at the top of each Perl module created by ModuleMaker or inserts 'use
+warnings;' in the same location.
+
+0.46    April 29, 2006
+
+Use of Devel::Cover for coverage analysis indicated that most subroutines in
+lib/ExtUtils/ModuleMaker/Utility.pm were no longer covered.  It turned out
+that, with one exception, they had all been superseded by calls to
+File::Save::Home functions.  Hence, they could safely be deleted from the file
+and the distribution.  The one exception, _get_dir_and_file(), was moved into
+lib/ExtUtils/ModuleMaker.pm.
+
+0.45    April 5, 2006
+
+In response to bug report from Gabriel Fortuna, corrected bug in t/01_ini.t.
+
+0.44    December 24, 2005
+
+Corrected one typo in ExtUtils/ModuleMaker.pm:  '\' before @ in e-mail 
+address in BUGS section.
+
+Corrected typo in POD erroneously crediting David Golden with
+ExtUtils::ModuleMaker::PBP.  It should have been ExtUtils::ModuleMaker::TT.
+
+Deleted File::Temp from PM_PREREQ key in Makefile.PL.  It's only used in the
+test suite, and when it appears there it's within SKIP blocks in case user is
+using Perl older than 5.6y.
+
+Per bug report from David Golden, changed remaining references to 
+generate_pm_file() in StandardText.pm and Utility.pm to refer to 
+complete_build().
+
+Rewrote Initializers::validate_values() and set_author_composite() in response
+to bug reports from David Golden and Terrence Brannon.  Added
+t/miscargs/919.t, 920.t and 921.t to test these revisions.  There remained one
+minor problem with the modulemaker command-line mode, however.  If in
+command-line mode you try to specify an empty string as the argument to -p
+(CPANID), -o (ORGANIZATION) or -w (WEBSITE) (and perhaps others not yet
+discovered), those values do *not* appear on the interactive mode's AUTHOR
+menu.  Instead, you get the default values -- either
+ExtUtils::ModuleMaker::Defaults or ExtUtils::ModuleMaker::Personal Defaults,
+if the latter is installed.  OTOH, if you store a personal defaults file with
+an empty string as the value for, say, ORGANIZATION, your lib/*.pm file will
+be created correctly (with no extra linespace for the missing attribute).
+Furthermore, if on the command-line you specify an empty string for any of
+those three attributes and you suppress interactive mode with -I option, the
+lib/*.pm file will use the default value, which is not what you wanted.
+
+By tossing in 'defined' at three points in ExtUtils::ModuleMaker::Opts, I
+solved the problem of supplying an empty string to CPANID, ORGANIZATION and
+WEBSITE in the modulemaker command-line utility.
+
+Modified 4 subs in lib/ExtUtils/ModuleMaker/Auxiliary.pm to use subs from new
+CPAN module File::Save::Home rather than subs from
+lib/ExtUtils/ModuleMaker/Utility.pm.  Added File::Save::Home to the PREREQ_PM
+key in Makefile.PL.
+
+0.43    September 29, 2005
+    - In response to report from CPAN tester imacat, corrected the number of
+      unskipped tests in the SKIP block call in all test files.  I had failed
+to account for the tests found within subroutines such as
+Auxiliary::_save_pretesting_status() (3) and _restore_pretesting_status (5) in
+computing the number of unskipped tests.  This became evident when I tested
+without Module::Build on the system.
+
+0.42    September 28, 2005
+
+    - Converted all test files (except t/01_ini.t) to have an END block which 
+does the 'reprocessing' of the .modulemaker directory and personal defaults
+files as needed, notwithstanding any die or croak.  In cases where t/*.t files
+encompassed several test blocks, this entailed extracting each block from such
+a file and creating a separate test file for it.  Thus, this meant the
+creation of several new directories beneath t/, including failsafe/, mmkr/, 
+miscargs/, license/, makedefaults/.
+
+0.41    September 19, 2005
+    - Corrected error in lib/ExtUtils/ModuleMaker/Utility.pm
+      _get_home_directory():  double backslashes messed up tests on Windows.
+
+0.40   September 18, 2005
+    - Extensive refactoring; additional documentation; new default values
+      added, particularly with regard to naming of tests.
+
+0.39   September 5, 2005
+    - v0.38 was reported by two beta-testers to fail in tests depending on
+      whether the user had or had not previously created a home/.modulemaker
+directory on user's system.  Set v0.38 for deletion from CPAN.
+
+0.38   September 4, 2005
+    - v0.37 failed to include t/testlib/ExtUtils/ModuleMaker/Alt_no_Todo.pm 
+in MANIFEST, which meant it wasn't bundled in tarball that went up to CPAN.
+Corrected MANIFEST; set v0.37 for deletion from CPAN.
+
+0.37   September 3, 2005
+    - Added method make_selections_defaults() to the public interface.  User
+      can now override the default values for attributes in the object created
+by ExtUtils::ModuleMaker::new().  The values which a user enters in a
+particular invocation of new() can be saved in a file called
+ExtUtils/ModuleMaker/Personal/Defaults.pm which overrides
+ExtUtils/ModuleMaker/Defaults.pm.  This file is saved in a .modulemaker/
+directory which is in turn located beneath the user's home directory or an
+equivalent thereto.  make_selections_defaults() can be activated from the
+modulemaker command line via the '-s' option or from modulemaker interactive
+mode's Main Menu, choice 'H'.
+    - Added capability for user to override particular methods called within
+      ExtUtils::ModuleMaker::complete_build.  This is done by setting the
+ALT_BUILD attribute passed to new() or by passing the name of a Perl package
+to the '-d' option to the modulemaker utility in command-line mode.
+    - To prepare for the two extensions to ExtUtils::ModuleMaker's
+      capabilities described above, most of the quasi-public methods
+previously found in ExtUtils/ModuleMaker.pm were moved to
+ExtUtils::ModuleMaker::Initializers.pm (in the case of methods called within
+new() for the purpose of initializing attributes with default values) or to
+ExtUtils/ModuleMaker/StandardText.pm (in the case of methods called within
+complete_build() for the purpose of creating directories, files and writing
+content to files.  These two packages are require-d into the
+ExtUtils::ModuleMaker object at run-time.
+    - Addition of the new capabilities described above required the creation
+      of many new tests.  Some test files were renumbered so that there are no
+longer gaps in their order.
+
+0.36 July 18, 2005
+        - Corrected error pointed out by CPAN tester Scott R. Godin:
+          IO::Capture and subclasses were omitted from MANIFEST, 
+          causing failure in t/11_miscargs.t.
+        - Added additional command-line option '-q' to suppress sub new() 
+          in .pm file created by modulemaker.  Added tests to t/09_mmkr.t 
+          to test suppression of POD and suppression of sub new() in 
+          .pm file created by modulemaker.  Along the way, wrote 
+          additional testing subroutines and added them to 
+          t/testlib/_Auxiliary.pm:
+               exported:  check_pm_file make_compact
+               not exported:  pod_present constructor_present
+        - Typographic cleanup of what modulemaker prints to STDOUT for 
+          Directives menu (mistake caused by my wrap settings in vi).
+        - Commented out SecondStyles.pm so it will no longer be bundled 
+          via make dist and no longer be uploaded to CPAN.
+
+0.35 July 17, 2005
+	- Removed support for Perl 4 style module names (e.g., D'oh).
+	- Added many tests, including tests for the modulemaker utility
+	  in non-interactive mode.
+	- Extensive refactoring, including extraction of most variable 
+          and subroutine declarations from modulemaker utility and 
+          placed them in lib/ExtUtils/ModuleMaker/Interactive.pm.  
+          Done to simplify future maintenance and make coverage results 
+          more transparent.
+	- Added partial_dump() method to ModuleMaker.pm.  This is not
+	  yet viewed as publicly available but is used to diagnose the
+          content of the EUMM object during development.
+	- Improvements in documentation; more to come.
+
+0.34    - Intermediate version not released to CPAN.
+
+0.33 July 8, 2005
+	- Primary maintenance taken over by James E Keenan
+	  (jkeenan@cpan.org).
+        - scripts/modulemaker
+	  - modulemaker utility revised with objective of making it
+	    possible to specify all options on the command-line
+          - Included ABSTRACT in Main Menu and created prompt for new abstract
+          - Allowed for additional command-line options for specification 
+            of abstract and author info
+          - Modified Usage message to reflect additional command-line 
+            options; placed options in alphabetical order
+        - lib/ExtUtils/ModuleMaker.pm:
+          - Corrected typing errors in several places
+          - Modified ORGANIZATION in POD to parallel wording of CPANID
+          - Changed $defaults{ABSTRACT} to 'Module abstract 
+            (<= 44 characters) goes here'
+          - Allowed for ORGANIZATION, where defined, to be included in 
+            AUTHOR COMPOSITE and thereby included in Author section of POD
+	  - Fixed Block_Begin() and Block_Begin_BareBones() to eliminate 
+            blank first line in .pm files
+	  - Deletion of superseded/deprecated subroutines and
+            corresponding POD
+        - t/*.t
+	  - Corrected names of test files on first lines of each of 
+            02_simple.t, 03_quick.t and 04_compact.t
+          - Created 05_abstract. to test current and new features:
+              -- correct Author and Email in Makefile.PL
+              -- placement of Abstract in POD
+              -- placement of Author info in POD
+              -- placement of History info in POD rather than in Changes
+          - Created t/06_build.t and t/07_proxy.t to test alternative
+            BUILD_SYSTEMs
+	  - Created t/08_modulemaker.t to pave the way for testing of
+	    the modulemaker utility (much to be done)
+
+--------------------------------------------------------------
+
+0.32 June 16 2003 (YAPC::Boca_Raton)
+	- Removed Fakefile.PL that was for testing but only caused
+	  problems.  The content has been held over after __END__
+	  in Makefile.PL
+	- Added missing fullname for libpng license which was causing
+	  an odd number of parts in a hash
+	- Added support for Module::Build (patch from Dave Rolsky)
+	- Fixed misplaced backslash when generating the new method
+	- Generated Makefile.PL now has a prerequisite of Test::Simple
+
+
+--------------------------------------------------------------
+
+0.312_29  September 2002 (YAPC::Munich)
+	- Complete rewrite from the ground up for the 0.3xxx line
+	- Created by ExtUtils::ModuleMaker 0.202
+	- Now object oriented for customizability
+	- Licenses in two new modules:
+		ExtUtils::ModuleMaker::Licenses::Standard
+		ExtUtils::ModuleMaker::Licenses::Local
+	- Customize for local environment by subclassing, example in
+		ExtUtils::ModuleMaker::SecondStyle
+	- Tests now use Test::More
+	- New interactive script 'modulemaker'
+	- Removed old scripts 'newmodule' and 'eumm'
+	- Old functions are deprecated, but still here for now
+		Quick_Module
+		Generate_Module_Files
+	- Fixed missing VERSION_FROM in Makefile.PL
+	- pod and new method can now be optional in extra modules
+		and different in each module
+
+--------------------------------------------------------------
+
+0.204_01 Fri May 31 2002 - joshua@cpan.org
+	- Renamed eumm to the more memorable newmodule
+	- Documented newmodule
+	- More testing. We use Test::More now
+	- Verbose prints to STDOUT not STDERR
+	- Minor internal changes
+
+0.202_02 Wed May 29 2002 - joshua@cpan.org
+	- New feature: create compact base directories
+	- New program: eumm (name TBD) frontend.
+
+0.202_01 Sat May 25 2002 - joshua@cpan.org
+	- Creates .cvsignore
+	- Creates MANIFEST.SKIP
+
+0.202  Fri Dec 28  2001
+	- Fixed typo on line 134 of Licences.pm
+
+0.201_02  Fri Jul 27  2001
+	- Coming out party for the module at TPC 5.0
+	- Change name of module from ModuleMaker to ExtUtils::ModuleMaker
+	- Added Licences.pm including:
+	  - LICENSE file added to the manifest
+	  - Now support all 21 licenses approved by opensource.org
+	- Added simple tests
+	- Need to add INLINE hooks, XS hooks, and better testing
+
+0.2001+  Wed Jul 18  2001
+	- Minor housekeeping details
+
+0.2  Sun Jul 08 20:47:34 2001
+	- original version; created by ModuleMaker 0.2
+	- Amazingly incestuous isn't it.

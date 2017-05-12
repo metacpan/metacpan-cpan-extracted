@@ -1,0 +1,8 @@
+first_name N varchar(30)
+last_name  N varchar(30)
+email      N varchar(255)
+street     N varchar(255)
+city       N varchar(25)
+post_code  N varchar(10)
+state      N varchar(25)
+country    N varchar(100)

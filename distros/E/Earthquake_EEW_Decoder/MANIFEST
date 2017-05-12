@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/EEWDATA.t
+lib/Earthquake/EEW/Decoder.pm

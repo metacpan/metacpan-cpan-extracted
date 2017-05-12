@@ -1,0 +1,19 @@
+---
+abstract: 'Use Mobi format as a target for EPublisher'
+author:
+  - 'Boris Däppen <boris_daeppen@bluewin.ch>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.120630'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: EPublisher-Target-Plugin-Mobi
+requires:
+  EBook::MOBI: 0.3
+  EPublisher: 0.5
+  File::Temp: 0.22
+version: 0.6

@@ -1,0 +1,100 @@
+<html>
+<body>
+<script language="epl">
+</script>
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td class="ltAlign">
+      <table width="100%" border="0" cellspacing="0" cellpadding="0">
+        <tr>
+          <td width="80%" class="breadCrumbs">Audience &gt; Multiple Upload</td>
+          <td width="20%" class="rcJustify">
+            <form name="fileSelectorForm" method="post">
+              <select name="fileSelector"  onChange="fileSelectorForm.submit()" class="controlText">
+                <option value="manual">Manual Upload</option>
+                <option value="1" selected>Single File Upload</option>
+                <option value="2">Multiple Upload: 2 Files</option>
+                <option value="4">Multiple Upload: 4 Files</option>
+                <option value="6">Multiple Upload: 6 Files</option>
+                <option value="8">Multiple Upload: 8 Files</option>
+                <option value="10">Multiple Upload: 10 Files</option>
+              </select>
+            </form>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  <tr>
+    <td class="textRowSpacer15">&nbsp;</td>
+  </tr>
+  <tr>
+    <td width="100%" class="thdPage">Upload Audience</td>
+  </tr>
+  <tr>
+    <td width="100%">
+      <table width="100%" border="1" cellspacing="2" cellpadding="0">
+        <tr>
+          <td class="cellBorder">
+            $VAR1 = [
+          ''
+        ];
+^\$VAR2 = \'?0\'?;
+^\$VAR3 = \'?0\'?;
+ <table width="100%" border="0" cellspacing="2" cellpadding="0">
+              <tr>
+                <td class="ltAlign">
+                  <table width="100%" border="0" cellspacing="2" cellpadding="0" name="filesourcetable">
+                    <tr>
+                      <td class="thdPage2ndLevel">Upload File </td>
+                    </tr>
+                    <tr>
+                      <td width="42%" class="text">&nbsp;</td>
+                    </tr>
+                    <tr>
+                      <td width="42%" class="text">Browse for File to Upload</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <input type="File" name="add_file_"  size="35" value=""  class="text">
+                      </td>
+                    </tr>
+                    <tr>
+                      <td width="42%" class="text">&nbsp;</td>
+                    </tr>
+                    <tr>
+                      <td width="42%" class="text">Website</td>
+                    </tr>
+                    <tr>
+                      <td width="42%" class="text">
+                        <select name="source"  class="text">
+                          <option>Make Selection</option>
+                        </select>
+<!--
+                        <select name="source"  class="text">
+                          <option>Make Selection</option>
+                        
+                          <option>Acme Vending</option>
+                        
+                          <option>ABC Rental</option>
+                        </select>
+-->
+                      </td>
+                    </tr>
+                    <tr>
+                      <td width="42%" class="text">&nbsp;</td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+</body>
+</html>
+

@@ -1,0 +1,26 @@
+Revision history for Perl extension EBook-EPUB-Check
+
+0.04 2014-02-13T15:53:07Z
+
+    - Added support for Cygwin platform
+
+0.03 2014-01-04T16:34:05Z
+
+    - Stop the installation process if 'java -version' throws JVM initialization error
+
+0.02 2014-01-04T14:34:16Z
+
+    - Added command line interface
+
+0.01 2014-01-03T06:00:07Z
+
+    - Kill if Java not found
+
+0.00_02 2014-01-03T02:02:07Z
+
+    - Skip test if some error occurrs during initialization of JVM
+
+0.00_01 2014-01-02T18:34:23Z
+
+    - original version
+

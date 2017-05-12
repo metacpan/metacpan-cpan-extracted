@@ -1,0 +1,29 @@
+
+<html>
+<head>
+<title>Embperl Tests - Errors in Include other Embperl pages via Execute 3</title>
+</head>
+
+<h1>Embperl Tests - Errors in Include other Embperl pages via Execute 3</h1>
+
+
+
+[# cause runtime error #]
+[- Execute ( {inputfile => 'incerr.htm', param => ['err', 'main'], errors => \@errors}) -]
+
+
+***errors: [+ "@errors" +]<br>
+
+
+[- $rc = Execute ( {inputfile => 'incerrobj.htm', errors => \@errors}) -]
+
+***rc: [+ $rc +]
+***errors: #[+ scalar(@errors) +]<br>
+***errors: [+ join ("\n\n", @errors) +]<br>
+***errobj: [- $e = $epreq -> errobj -][+ $e +]<br>
+***errobj msg: [+ $epreq -> errobj?$epreq -> errobj -> {msg}:'<undef>' +]<br>
+***errors msg: [+ ref $errors[-1]?$errors[-1] -> {msg}:'<undef>' +]<br>
+
+
+</body>
+</html>

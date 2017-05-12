@@ -1,0 +1,110 @@
+
+NAME
+    EO - A generic base class
+
+SYNOPSIS
+        package Some::Package
+        use EO;
+
+        use base qw(EO);
+
+        sub init {
+          my $self = shift;
+
+          if ($self->SUPER::init( @_ ) {
+            # .. perform initilisation
+            return 1;
+          }
+
+          return 0;
+        }
+
+DESCRIPTION
+    This is a base class for the EO module tree. EO is designed to be a well
+    tested, solid, simple, and long living base class that other modules can
+    rely on.
+
+CONSTRUCTOR
+    new()
+        The constructor takes no arguments and will call the init method.
+        The programmer should ensure that the init method in turn calls its
+        SUPER::init method. If the EO init method is not called then a
+        warning will be issued to the effect. Furthermore the init method
+        should return true to the constructor. Your init method should
+        probably look something like this:
+
+          sub init {
+            my $self = shift;
+            if ($self->SUPER::init( @_ )) {
+              # ... perform initialisation ...
+              return 1;
+            }
+            return 0;
+          }
+
+        This will ensure that the initialisation occurs all the way up the
+        parent-class chain.
+
+METHODS
+    oid()
+        Returns the object id of this object. Object id's are UUIDs as
+        created by the Data::UUID module.
+
+    generate_oid()
+        Returns a new object id.
+
+    clone()
+        The clone method is creates a copy of the object and returns it.
+        This is the only method that should be used for cloning in order to
+        preserve id's. The clone method guarantees that all objects
+        contained within an object that respond true to ->isa('EO') will
+        have their id's regenerated.
+
+ATTRIBUTES
+    abstract
+        The abstract attribute can be assigned to any method. When it is
+        assigned it will cause any attempt to call that method to throw an
+        EO::Error::Method::Abstract exception. This will happen at runtime.
+
+    private
+        The private attribute can be assigned to any method. Any attempt to
+        call this method from outside the package it is defined in will
+        cause an EO::Error::Method::Private exception to be thrown. This
+        will happen at runtime.
+
+EXCEPTIONS
+    EO::Error::New;
+        This exception is thrown whenever the constructor fails to
+        successfully initialise an object. This usually occurs when the
+        init() method does not return a true value.
+
+    EO::Error::Method::NotFound
+        This exception is thrown whenever a message sent to an object cannot
+        be successfully sent.
+
+    EO::Error::Method::Abstract
+        This exception is thrown whenever there is a method call on a method
+        marked with the abstract attribute.
+
+    EO::Error::Method::Private
+        This exception is thrown whenever there is a method call from
+        outside the defining package on a method marked with the private
+        attribute.
+
+    EO::Error::InvalidParameters
+        This exception is throw whenever the a message is sent to an object
+        with incorrect parameters.
+
+AUTHOR
+        Arthur Bergman <abergman@fotango.com> James A. Duncan
+        <jduncan@fotango.com>
+
+COPYRIGHT
+        Copyright 2004 Fotango Ltd. All Rights Reserved.
+
+        This program is free software; you can redistribute it and/or modify
+        it under the same terms as Perl itself.
+
+SEE ALSO
+        perl(1), Data::UUID(3)
+

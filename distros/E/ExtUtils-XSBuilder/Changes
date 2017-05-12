@@ -1,0 +1,96 @@
+* 0.28
+
+- More information output in case mapping between C and Perl
+  fails.
+- init_callbacks can take the object as a second argument
+- Documenatations updates  
+  
+
+* 0.27
+
+- add support for char arrays 
+- better handle win32 api
+
+* 0.26
+
+- Include a default POD Template object
+
+* 0.25
+
+- Make XSBuilder.pm compatible with CPAN.pm
+
+- Added minimal load test 
+
+* 0.03
+
+- Generation of pod files. (Based on a patch from Lyle Brooks)
+
+- Fix undef value which occurs when running under Perl 5.8.0. Patch
+  from Angus Lees.
+
+
+* 0.02
+
+- structs that are contained in another struct are now handled correctly. 
+  When reading the struct memeber a new object is returned, which can be used
+  to access the members of the contained struct. The contained struct cannot
+  be set directly.
+
+- In class name in xxx_types.map can end with :: to use single level classnames
+  (e.g. request_rec * | Apache::  for mod_perl 1.x)
+
+- Argspec of xxx_functions.map can specify argument as return only by prefixing
+  it with < e.g. 
+    dav_open_lockdb | | r, ro, <lockdb
+  will be called as ($error get the return value of the C function)
+    ($error, $lockdb) = $r -> open_lockdb (0) ;
+  The return argument (e.g. lockdb) will always be passed by address 
+  to the function.
+  
+- xs/xxxx_sv_convert.h now also contains macros to convert C data types to Perl
+  for non object types e.g. IV    
+
+- better handling for structs that for which a typedef doesn't exist.
+
+- method checkmaps & writemaps creates new_*.map with all 
+  functions/structures/types/callbacks that are not already in a map file.
+
+- ParseSource now scans for callbacks and generates a CallbackTable.pm
+  with similar format as FunctionTable.pm
+
+- WrapXS generates callbacks for struct members as method calls when the
+  struct doesn't contains any field where to store some userdata. An optimized
+  version which passes the perl object in some user data field need still to be done.
+
+- Extra include files now given in xs/maps/foo_types instead of hardcoded
+  in TypeMap.pm
+
+- prefixes for conversion macros and other generated functions are now
+  set via an overrideable method
+
+- support for passing structure by value as function argument / return type
+
+- macros in xxx_sv_convert.h now correctly convert NULL to undef and viceversa
+
+- Structure members can have a different name in Perl and C. Controlled via
+  the map file.
+
+- %convert_alias  has been moved into types.map
+
+- typemap ids (e.g. T_APACHEOBJ) has been moved into types.map
+
+- it possible to configure the way how memory for strings is allocated
+  via map files, by giveing a malloctype in type map file and allocation
+  code in structure map file.
+
+- a dispatch argspec can now given in the map file, this allows to pass
+  $r to the xs function and r -> pool to the C function by writing:
+
+  ap_make_array | ap_make_array(r->pool, nelts, elt_size) | request_rec *:r, nelts, elt_size
+
+- handle conversion from package name to directory correctly when more then two
+  levels of namespaces e.g. Apache::DAV::Resource -> Apache/DAV/Resource/Resource_pm 
+
+
+
+

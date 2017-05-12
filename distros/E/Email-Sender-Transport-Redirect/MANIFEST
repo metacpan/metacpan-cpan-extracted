@@ -1,0 +1,16 @@
+Changes
+lib/Email/Sender/Transport/Redirect.pm
+lib/Email/Sender/Transport/Redirect/Recipients.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00-load.t
+t/basic.t
+t/exclusions.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/recipients.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

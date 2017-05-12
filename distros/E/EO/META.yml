@@ -1,0 +1,91 @@
+--- #YAML:1.0
+name: EO
+version: 0.96
+author:
+  - |-
+    Arthur Bergman <abergman@fotango.com>
+    James A. Duncan <jduncan@fotango.com>
+abstract: A generic base class
+license: perl
+requires:
+  Attribute::Handlers: 0.01
+  Class::Accessor::Chained: 0
+  Clone: 0.01
+  Data::Structure::Util: 0.06
+  Data::UUID: 0.01
+  Error: 0.15
+  Path::Class: 0.01
+  Scalar::Util: 1.02
+  perl: 5.008
+recommends: {}
+build_requires:
+  Test::More: 0
+conflicts: {}
+provides:
+  EO:
+    file: lib/EO.pm
+    version: 0.96
+  EO::Array:
+    file: lib/EO/Array.pm
+    version: 0.96
+  EO::Attributes:
+    file: lib/EO/Attributes.pm
+    version: 0.96
+  EO::Class:
+    file: lib/EO/Class.pm
+    version: 0.96
+  EO::Collection:
+    file: lib/EO/Collection.pm
+    version: 0.96
+  EO::Data:
+    file: lib/EO/Data.pm
+    version: 0.96
+  EO::Error:
+    file: lib/EO/Error.pm
+    version: 0.96
+  EO::File:
+    file: lib/EO/File.pm
+    version: 0.96
+  EO::File::Stub:
+    file: lib/EO/Class.pm
+    version: 0.96
+  EO::Hash:
+    file: lib/EO/Hash.pm
+    version: 0.96
+  EO::Hierarchy:
+    file: lib/EO/Hierarchy.pm
+    version: 0.96
+  EO::Message:
+    file: lib/EO/Message.pm
+    version: 0.96
+  EO::Method:
+    file: lib/EO/Method.pm
+    version: 0.96
+  EO::NotAttributes:
+    file: lib/EO/NotAttributes.pm
+    version: 0.96
+  EO::Pair:
+    file: lib/EO/Pair.pm
+    version: 0.96
+  EO::Singleton:
+    file: lib/EO/Singleton.pm
+    version: 0.96
+  EO::Storage:
+    file: lib/EO/Storage.pm
+    version: 0.96
+  EO::System:
+    file: lib/EO/System.pm
+    version: 0.96
+  EO::System::OS:
+    file: lib/EO/System/OS.pm
+    version: 0.96
+  EO::System::Perl:
+    file: lib/EO/System/Perl.pm
+    version: 0.96
+  EO::WeakArray:
+    file: lib/EO/WeakArray.pm
+    version: 0.96
+  EO::delegate:
+    file: lib/EO/delegate.pm
+    version: 0.96
+generated_by: Module::Build version 0.22

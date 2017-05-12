@@ -1,0 +1,20 @@
+
+MODULE=Embperl PREFIX=embperl_
+
+! embperl_Init
+! embperl_InitRequest | | pApacheReqSV,pPerlParam,<ppReq
+! embperl_InitRequestComponent
+! embperl_ExecuteRequest
+
+MODULE=Embperl::Req PREFIX=embperl_
+
+ embperl_RunRequest       | embperl_RunRequest       | | embperl_run
+ embperl_CleanupRequest   | embperl_CleanupRequest   | | embperl_cleanup
+ embperl_SetupComponent   | embperl_SetupComponent   | r,pPerlParam,<ppComponent | embperl_setup_component     
+ embperl_ExecuteComponent | embperl_ExecuteComponent | | embperl_execute_component
+ embperl_GetText          | embperl_GetText          | | embperl_gettext
+
+MODULE=Embperl::Component PREFIX=embperl_
+
+ embperl_CleanupComponent | embperl_CleanupComponent | | embperl_cleanup
+ embperl_RunComponent     | embperl_RunComponent     | | embperl_run

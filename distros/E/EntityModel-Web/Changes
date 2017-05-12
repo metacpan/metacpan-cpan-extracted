@@ -1,0 +1,23 @@
+0.004     2012-08-02 00:11:05 Europe/London
+	* Provide overload for EntityModel::Web::Page::Handler which dumps
+	out some information about the request when used as a ->(coderef)
+	* Use "http_verb" instead of "method" to avoid some ambiguity in
+	EntityModel::Web::Page
+	* New ->update_uri_from method in EntityModel::Web::Request which
+	applies the hostname, path and query parameters from a URI object.
+	* Default to empty content when a section isn't found.
+	* Add additional debugging messages to help trace page lookup failures.
+	* Register plugin on import.
+
+0.003     2011-09-18 23:53:31 Europe/London
+	Pass (object, message) in log calls.
+	Accept /path/index.html as well as path/index.html.
+	Move ->context attribute into top-level ::Reponse class.
+
+0.002     2011-07-26 23:33:49 Europe/London
+	Fix list handling since EntityModel::Class changes.
+	Make mention of other frameworks in SEE ALSO section.
+
+0.001     2011-03-06 02:48:40 Europe/London
+	Initial CPAN release.
+

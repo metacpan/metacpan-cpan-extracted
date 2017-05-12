@@ -1,0 +1,127 @@
+#!/usr/bin/perl -w
+
+use strict;
+
+# use lib '/n/brio/x/gifford/lib/perl5';
+
+use constant TIMEOUT => 10;
+use constant GONEMISSES => 2;
+use constant ALRMTIME => 2;
+use constant STILLHERE_TIME => 60;
+
+use Getopt::Std;
+
+our $child_pid;
+
+$| = 1;
+
+use vars qw(%opt);
+getopts("",\%opt);
+
+sub sigint
+{
+    my($sig)=@_;
+    warn "$0 Received $sig signal, killing child $child_pid and exiting.\n";
+    kill $sig, $child_pid
+	if ($child_pid);
+    exit(1);
+
+}
+
+$SIG{INT}=\&sigint;
+$SIG{TERM}=\&sigint;
+$SIG{QUIT}=\&sigint;
+$SIG{PIPE}=\&sigint;
+
+$child_pid = open(D,"-|",@ARGV)
+    or die "Couldn't run @ARGV: $!\n";
+
+
+use vars qw(%see %expire);
+use vars qw($last_stillhere);
+
+$last_stillhere = time;
+
+print "DEBUG SUMMARIZER STARTING\n";
+
+$SIG{ALRM} = \&on_alarm;
+alarm(ALRMTIME);
+
+while (<D>)
+{
+    print;
+    if (/^ISEE\s+(\S+)\s+FROM\s+(\S+)\s+AT\s+(\S+)(.*)/)
+    {
+	my $t = time;
+	my($tid,$zone,$time,$rest)=($1,$2,$3,$4);
+	my($timeout,$expire);
+
+	if ($rest =~ /TIMEOUT\s+(\S+)/)
+	{
+	    $timeout = $1;
+	}
+	else
+	{
+	    $timeout = TIMEOUT;
+	}
+	$expire = $t + $timeout * GONEMISSES;
+
+	if (!$see{$zone}{$tid})
+	{
+	    print "WELCOME $tid TO $zone AT $time$rest\n";
+	}
+	$see{$zone}{$tid}=$t;
+	$expire{$zone}{$tid}=$expire;
+    }
+}
+
+sub on_alarm
+{
+    my $t = time;
+    while (my($zone,$zs)=each(%expire))
+    {
+	while(my($tid,$expire)=each(%$zs))
+	{
+	    if ($t > $expire)
+	    {
+		printf "BONVOYAGE %s FROM %s AT %ld LASTSEEN %ld\n",
+  		  $tid, $zone, $t, $see{$zone}{$tid};
+		delete $zs->{$tid};
+		delete $see{$zone}{$tid};
+	    }
+	}
+    }
+    if (($t -  $last_stillhere) >= STILLHERE_TIME)
+    {
+	stillhere();
+    }
+    else
+    {
+	alarm(ALRMTIME);
+    }
+}
+
+sub on_join
+{
+    # Somebody new is here.  Summarize what we know for them.
+    stillhere();
+}
+
+sub stillhere
+{
+    # Turn off alarms for now.
+    alarm(0);
+    my $time = time;
+    printf "IMOK %s AT %ld TIMEOUT %ld\n",
+      'summarizer', $time, (ALRMTIME*3);
+    while (my($zone,$zs)=each(%see))
+    {
+	while(my($tid,$t)=each(%$zs))
+	{
+	    printf "STILLHERE %s FROM %s AT %s SINCE %s\n",
+ 	      $tid, $zone, $time, $t;
+	}
+    }
+    $last_stillhere=$time;
+    alarm(ALRMTIME);
+}

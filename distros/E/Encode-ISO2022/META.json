@@ -1,0 +1,51 @@
+{
+   "abstract" : "ISO/IEC 2022 character encoding scheme",
+   "author" : [
+      "Hatuka*nezumi - IKEDA Soji <hatuka@nezumi.nu>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Encode-ISO2022",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode" : "2.10",
+            "perl" : "5.007003"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://hatuka.nezumi.nu/repos/Encode-ISO2022/"
+      }
+   },
+   "version" : "0.04"
+}

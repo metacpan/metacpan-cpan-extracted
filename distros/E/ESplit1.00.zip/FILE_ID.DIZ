@@ -1,0 +1,52 @@
+ESplit.pm - Modul zum Zerlegen von Strings an beliebigen Zeichen(-ketten).
+
+Dieses Perl-Modul liefert die Funktion e_split(), mit der sich Strings
+an beliebigen Trennzeichen(-ketten) bzw. REs in Tokes zerlegen
+lassen.
+	
+- Trenner in gequoteten Strings werden ebenso wie \-escapete
+  Trenner ignoriert.
+- Wird der Trenner in () gegeben, liefert e_split diesen als 
+  n + 1-tes Element des Ergebnisarrays zurück.
+- Man kann angeben, wieviele Elemente (falls vorhanden) zurück-
+  geliefert werden sollen - vom Stringanfang oder -ende her
+  gesehen.
+  
+e_split ist 2-5 mal schneller als Text::ParseWords::parse_line.
+e_split interpretiert Quotingzeichen in ungequoteten Strings
+  nicht als Beginn eines Trenner-escapenden Quotings.
+e_split interpretiert Kombinationen unterschiedlicher Quoting-
+  zeichen korrekt.
+
+
+- Modulversion:
+
+1.00 vom 07.06.2000
+
+
+- Inhalt dieses Archivs:
+
+FILE_ID.DIZ - diese Datei
+ESplit.pm    - das Modul
+ESplit.htm   - Dokumentation zu ESplit.pm im HTML-Format
+
+
+- Autor:
+
+Hartmut Camphausen
+Kirchstraße 8
+35043 Marburg
+Fon: 06424/923826
+Fax: 06424/923827
+Emil: h.camp@creagen.de
+WWW: http://www.creagen.de
+
+
+- Rechtliches:
+
+Dieses Modul ist Freeware. Es darf kostenlos genutzt werden.
+Es darf beliebig weitergereicht werden, sofern alle Dateien dieses Archives weitergereicht werden.
+Modifikationen sind gestattet, sofern sie als solche kenntlich gemacht werden.
+Für Fehler im Programm bzw. die Folgen seiner Anwendung übernimmt der Autor keine Haftung.
+
+Copyright 1999 by Hartmut Camphausen. Alle Rechte vorbehalten.

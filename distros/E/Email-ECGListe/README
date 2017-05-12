@@ -1,0 +1,26 @@
+NAME
+    ECGListe - a module for alignment emailadresses with ECGListe
+
+SYNOPSIS
+      use warnings;
+      use strict;
+      use ECGListe qw( Abgleich );
+        
+      # 1. Argument: ecg-liste
+      # 2. Argument: Eingabedatei
+      # 3. Argument: (D)elimited (F)ix (G)esamt (wenn nur die Emailadresse in der Eingabedatei steht)
+      # 4. Argument: wenn Delimited dann Feld der Emailadressen
+      #              wenn Fix       dann Stelle,Laenge der Emailadressen
+      #              wenn Gesamt    dann leer lassen
+      # 5. Argument: wenn Delimited dann Trennzeichen
+      #              sonst leer lassen
+
+      # Example
+      Abgleich("ecg-liste.hash", "Emailadressen.csv", "D", "1", ",");
+
+DESCRIPTION
+    ...
+
+AUTHOR AND LICENSE
+    copyright 2009 (c) Gernot Havranek
+

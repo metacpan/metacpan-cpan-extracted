@@ -1,0 +1,25 @@
+---
+abstract: 'Read/Write/Modify Perl/XS typemap files'
+author:
+  - 'Steffen Mueller <smueller@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.58, CPAN::Meta::Converter version 2.110930'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: ExtUtils-Typemap
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  ExtUtils::Typemaps: 1.00
+  File::Spec: 0
+  File::Temp: 0
+  Test::More: 0.44
+version: 1.00

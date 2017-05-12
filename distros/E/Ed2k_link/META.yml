@@ -1,0 +1,28 @@
+---
+abstract: 'module for creating eD2K links and working with them.'
+author:
+  - 'Valery Kalesnik <valkoles@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.044, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Ed2k_link
+requires:
+  Carp: '0'
+  Digest::MD4: '0'
+  Digest::SHA: '0'
+  Encode: '0'
+  Encode::Locale: '0'
+  File::Basename: '0'
+  URI::Escape: '0'
+  constant: '0'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+version: '20160412'

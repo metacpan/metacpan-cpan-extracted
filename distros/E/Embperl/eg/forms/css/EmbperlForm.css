@@ -1,0 +1,447 @@
+table {
+      font-family: Geneva,Arial,Helvetica;
+      font-size: 11px;
+      empty-cells:show;
+      }
+
+.cBody {
+            background: #ffffff;
+            font-family: Geneva,Arial,Helvetica;
+            font-size: 11px;
+            margin: 0px 0px 0px 0px;
+            height: 100%;
+            border-left:solid 1px;
+            /* overflow: scroll; */
+            }
+
+.cStd               {background: #ffffff; color: #000000; font-family: Geneva,Arial,Helvetica;  font-size: 11px; margin: 0px 0px 0px 0px; }
+.cStdInput          {background: #d4d4d4;  color: #000000; font-family: Geneva,Arial,Helvetica;  font-size: 11px; margin: 0px 0px 0px 0px; }
+.cStdNoFrame        {background: #ffffff; color: #000000; font-family: Geneva,Arial,Helvetica;  font-size: 11px;  }
+.cStdText           {background: #ffffff; color: #000000; font-family: Geneva,Arial,Helvetica;  font-size: 13px;  }
+.cCenter            { text-align: center ;}
+.cFooterText, .cFooterTextCenter
+                    {background: #ffffff; font-family: Geneva,Arial,Helvetica;  font-size: 10px; color: #444444;}
+.cFooterTextCenter  {text-align: center;}
+.cFooterTextBold    {font-weight: bold; color: #000000; }
+.cObjectDN          {font-size: 11px; color: #bbbbbb; }
+.cObjectInfo        {font-size: 11px; color: #ff0000; font-weight: bold ;}
+.cObjectText        {font-size: 11px; color: #000000; margin-right: 17px  }
+.cError             {font-size: 11px; color: #ff0000;}
+.cWarn              {font-size: 11px; color: #ff6600;}
+.cOK                {font-size: 11px; color: black;}
+
+.cHeadH1            {color: #fdd11a; font-size: 27px; font-weight: bold;  margin: 10px; padding: 0px;}
+.cHeadH2            {color: #ffffff; font-size: 17px; font-weight: bold;  margin: 10px; padding: 0px;}
+
+.cWizardDiv {margin-left: auto; width: 850px ;margin-right: auto ; margin-top: 20px ;}
+.cSetupWizardDiv {margin-left: auto; width: 730px ;margin-right: auto ; margin-top: 20px ;}
+.cPopupDiv  {margin-left: 20px; ;margin-right: 20px ; margin-top: 20px ;}
+
+
+/* --- Embperl::Form --- */
+#topdiv		{ width: 850px ; margin-left: auto; margin-right: auto }
+
+.cBase          {font-family: Geneva,Arial,Helvetica;  font-size: 11px;  }
+.cTableDiv      {background: #ffffff; border: black 1px solid; 
+		 padding: 2px; padding-left: 4px ; width: 100% ;
+                 margin: 0px }
+.cTableDivU     {background: #ffffff; border: black 1px solid; border-top: 0px ;
+		 padding: 2px; padding-left: 4px ; width: 100% ;
+                 margin: 0px }
+.cTable         {background: #ffffff; border-collapse: collapse; width: 100% ; 
+		 margin: 0px; padding: 0px ;}
+.cTableInput    {table-layout: fixed ; }
+.cLabelGroup      { width: 150px }
+.cControlGroup    { width: 208px ; }
+.cTableRow1     {background: #ffffff; }
+.cTableRow      {background: #ffffff; }
+.cControlBox    {background: #d4d4d4; color: #000000; margin: 0px 0px 0px 0px;
+                    padding: 2px 3px 2px 3px; border: 2px white solid; vertical-align: middle ; text-align: left ; }
+.xcControlBoxWidth1 { width: 570px ; /*80% ; */}
+.xcControlBoxWidth2 { width: 214px ; /*30% ; */ }
+.cControlBoxWidth4 { width: 40px ; /* 5% ; */ }
+.cControlBoxWidth5 { width: 40px ; /* 5% ; */ }
+.cControlBoxWidth6 { width: 40px ; /* 5% ; */ }
+.cControlBoxWidth7 { width: 40px ; /* 5% ; */ }
+.cControlButtonBox { text-align: center ; border: 2px white solid; padding: 6px;}
+.cControlAddRemoveBox { text-align: center ; border: 0px ; margin-left: auto; margin-right: auto}
+.cTransparentBox    {margin: 0px 0px 0px 0px;
+                    padding: 2px 3px 2px 3px; }
+.cControl          {border: 1px black solid; padding-left: 2px ;  
+                   font-family: Geneva,Arial,Helvetica; font-size: 11px;}
+.cGridCell .cControl          { border: 0px; padding: 0px ;}
+.cControlWidthInput           {margin-left: 0px ; width: 98%; }
+.cControlWidthSelect          {margin-left: 0px ; width: 85%; }
+.cControlWidthNumber           {margin-left: 0px ; width: 50%; text-align: right ; padding-right: 2px}
+.cControlButton    {background-image: url(/images/button_bg_off.gif); 
+                    background-position: 0px -4px ;
+                    padding: 3px; padding-left: 25px ;  
+                    height: 20px ;
+                    font-size: 11px; white-space: nowrap ;
+                    margin: 0px ;
+                    cursor:pointer; width: 150px ;
+                    }
+.cControlButton:hover    {background-image: url(/images/button_bg_on.gif);}
+.cControlButtonDiv    {background-image: url(/images/button_bg_off.gif); 
+                    background-position: -22px -2px ;
+                    padding: 2px; padding-left: 5px ;    
+                    
+                    border: 1px black solid;
+                    font-size: 11px; white-space: nowrap ;
+                    margin: 0px ;
+                    cursor:pointer;  width: 150px ;
+                    text-align: left ;
+                    }
+.cControlButtonDiv img { margin-bottom: -3px ; margin-right: 3px ;}                    
+.cControlButtonDiv:hover    {background-image: url(/images/button_bg_on.gif);background-position: -22px -2px ;}
+.xcControlLine       { border: 1px; color: black ; }
+
+.cControlAddonImg  { border: 0px ; vertical-align: middle; position: relative; top: -3px ;}
+.cControlAddonA  { border: 0px ; }
+.cLabelBox      {background: #fdd11a; color: #000000;  text-align: right; margin: 0px 0px 0px 0px;
+                    padding: 2px 3px 2px 3px; border: 2px white solid; vertical-align: middle ;}
+.xcLabelBoxWidth1 { width: 20% ; }
+.xcLabelBoxWidth2 { width: 20% ; }
+.xcLabelBoxWidth4 { width: 20% ; }
+
+.cTabTable      {background: #ffffff; padding: 0px; margin: 0px;
+                    border-collapse: collapse; 
+                     }
+.cTabRow        {background: #ffffff; padding: 0px; margin: 0px; width: 100%;
+                    border-collapse: collapse;
+                    vertical-align: bottom; }
+.cTabTD         {padding: 0px; margin: 0px; }
+.cTabCellOn     {background: white ; padding: 0px ; margin: 0px; border: 0px ;
+                    vertical-align: bottom; }
+.cTabCellOff    {background: white ; padding: 0px ; margin: 0px; border: 0px ;
+                    vertical-align: bottom; 
+		    }
+.cTabCellBlank  {background: white ; padding: 0px ; margin: 0px; border: 0px ;
+                    border-bottom: 1px black solid; vertical-align: bottom;
+                    width: 95%;}
+
+.cTabDivOn      {background-image: url(/images/bg_tab_on.gif) ; background-repeat: repeat-x ;
+                    border: black 1px solid;
+		    border-bottom: none ;
+                    border-left: #FFFFFF 1px solid; 
+                    padding: 4px;
+                    font-weight: bold ;
+                    font-size: 16px; white-space: nowrap ;
+                    }
+
+.cTabDivOff     {background-image: url(/images/bg_tab_off.gif); background-repeat: repeat-x ;
+                    border: black 1px solid; padding: 4px;
+                    border-left: #FFFFFF 1px solid; 
+                    font-size: 11px; white-space: nowrap ;
+                    }
+
+
+.cAutoCompDiv           {position:relative;margin:0px;width:99%;}
+.cAutoCompInput         {position:relative;}
+.cAutoCompContainer     {width:300px;border:1px solid #404040;overflow:auto;height:200px;background-color:white;z-index:9999;}
+.cAutoCompContainer ul   {list-style-type:none; margin:0px; padding:0px;width:300px;}
+.cAutoCompContainer li   {list-style-type:none;
+      display:block;
+      margin:0;
+      padding:2px;
+            white-space:nowrap;
+            cursor:pointer;}
+.cAutoCompContainer li.selected   {background:highlight;color: white;}
+.cAutoCompArrow         {cursor:default; display: inline ; background-image: url(/images/todown.gif) ; width: 18px; height: 18px; background-position: center; }
+
+.cControlWidthSelectDyn {margin-left: 0px ; width: 99%; }
+
+.cGridTable        {background: #ffffff; border-collapse: collapse; width: 100%;
+                    border: 1px solid black; position: relative; }
+                    
+.cGridTable td     {background: #ffffff; padding: 0px; margin: 0px;
+                     border: 1px solid black; }
+                     
+.cGridTitle     {background: #ffffff; padding: 0px; margin: 0px;
+                border-collapse: collapse; width: 100% ; }
+.cGridControlBox {background: #fdd11a;  text-align: right ; margin: 0px 0px 0px 0px;
+                    padding: 2px 3px 2px 3px; border: 0px; }
+.cGridLabelBox  {background: #fdd11a;  text-align: left; margin: 0px 0px 0px 0px;
+                    padding: 2px 3px 2px 3px; border: 0px; }
+
+.cGridHeader td      {background: #d4d4d4; padding: 2px; margin: 0px;
+                      height: 16px ; border: 1px solid black;}
+
+.cGridTable input, .cGridTable select { font-size: 11px; border: 0px; padding: 1px; margin: 0px; width: 98%;}                     
+
+.cGridRowSelected, .cGridRowSelected input, .cGridRowSelected select, .cGridRowSelected td { background-color: lightblue} 
+
+
+
+
+/* ---------- The main calendar widget.  DIV containing a table. ------------- */
+
+.calendar {
+  position: relative;
+  display: none;
+  border-top: 2px solid #fff;
+  border-right: 2px solid #000;
+  border-bottom: 2px solid #000;
+  border-left: 2px solid #fff;
+  font-size: 11px;
+  color: #000;
+  cursor: default;
+  background: #c8d4d0;
+  font-family: tahoma,verdana,sans-serif;
+}
+
+.calendar table {
+  border-top: 1px solid #000;
+  border-right: 1px solid #fff;
+  border-bottom: 1px solid #fff;
+  border-left: 1px solid #000;
+  font-size: 11px;
+  color: #000;
+  cursor: default;
+  background: #c8d4d0;
+  font-family: tahoma,verdana,sans-serif;
+}
+
+/* Header part -- contains navigation buttons and day names. */
+
+.calendar .button { /* "<<", "<", ">", ">>" buttons have this class */
+  text-align: center;
+  padding: 1px;
+  border-top: 1px solid #fff;
+  border-right: 1px solid #000;
+  border-bottom: 1px solid #000;
+  border-left: 1px solid #fff;
+}
+
+.calendar .nav {
+  background: transparent url(menuarrow.gif) no-repeat 100% 100%;
+}
+
+.calendar thead .title { /* This holds the current "month, year" */
+  font-weight: bold;
+  padding: 1px;
+  border: 1px solid #000;
+  background: #788480;
+  color: #fff;
+  text-align: center;
+}
+
+.calendar thead .headrow { /* Row <TR> containing navigation buttons */
+}
+
+.calendar thead .daynames { /* Row <TR> containing the day names */
+}
+
+.calendar thead .name { /* Cells <TD> containing the day names */
+  border-bottom: 1px solid #000;
+  padding: 2px;
+  text-align: center;
+  background: #e8f4f0;
+}
+
+.calendar thead .weekend { /* How a weekend day name shows in header */
+  color: #f00;
+}
+
+.calendar thead .hilite { /* How do the buttons in header appear when hover */
+  border-top: 2px solid #fff;
+  border-right: 2px solid #000;
+  border-bottom: 2px solid #000;
+  border-left: 2px solid #fff;
+  padding: 0px;
+  background-color: #d8e4e0;
+}
+
+.calendar thead .active { /* Active (pressed) buttons in header */
+  padding: 2px 0px 0px 2px;
+  border-top: 1px solid #000;
+  border-right: 1px solid #fff;
+  border-bottom: 1px solid #fff;
+  border-left: 1px solid #000;
+  background-color: #b8c4c0;
+}
+
+/* The body part -- contains all the days in month. */
+
+.calendar tbody .day { /* Cells <TD> containing month days dates */
+  width: 2em;
+  text-align: right;
+  padding: 2px 4px 2px 2px;
+}
+.calendar tbody .day.othermonth {
+  font-size: 80%;
+  color: #aaa;
+}
+.calendar tbody .day.othermonth.oweekend {
+  color: #faa;
+}
+
+.calendar table .wn {
+  padding: 2px 3px 2px 2px;
+  border-right: 1px solid #000;
+  background: #e8f4f0;
+}
+
+.calendar tbody .rowhilite td {
+  background: #d8e4e0;
+}
+
+.calendar tbody .rowhilite td.wn {
+  background: #c8d4d0;
+}
+
+.calendar tbody td.hilite { /* Hovered cells <TD> */
+  padding: 1px 3px 1px 1px;
+  border-top: 1px solid #fff;
+  border-right: 1px solid #000;
+  border-bottom: 1px solid #000;
+  border-left: 1px solid #fff;
+}
+
+.calendar tbody td.active { /* Active (pressed) cells <TD> */
+  padding: 2px 2px 0px 2px;
+  border-top: 1px solid #000;
+  border-right: 1px solid #fff;
+  border-bottom: 1px solid #fff;
+  border-left: 1px solid #000;
+}
+
+.calendar tbody td.selected { /* Cell showing selected date */
+  font-weight: bold;
+  border-top: 1px solid #000;
+  border-right: 1px solid #fff;
+  border-bottom: 1px solid #fff;
+  border-left: 1px solid #000;
+  padding: 2px 2px 0px 2px;
+  background: #d8e4e0;
+}
+
+.calendar tbody td.weekend { /* Cells showing weekend days */
+  color: #f00;
+}
+
+.calendar tbody td.today { /* Cell showing today date */
+  font-weight: bold;
+  color: #00f;
+}
+
+.calendar tbody .disabled { color: #999; }
+
+.calendar tbody .emptycell { /* Empty cells (the best is to hide them) */
+  visibility: hidden;
+}
+
+.calendar tbody .emptyrow { /* Empty row (some months need less than 6 rows) */
+  display: none;
+}
+
+/* The footer part -- status bar and "Close" button */
+
+.calendar tfoot .footrow { /* The <TR> in footer (only one right now) */
+}
+
+.calendar tfoot .ttip { /* Tooltip (status bar) cell <TD> */
+  background: #e8f4f0;
+  padding: 1px;
+  border: 1px solid #000;
+  background: #788480;
+  color: #fff;
+  text-align: center;
+}
+
+.calendar tfoot .hilite { /* Hover style for buttons in footer */
+  border-top: 1px solid #fff;
+  border-right: 1px solid #000;
+  border-bottom: 1px solid #000;
+  border-left: 1px solid #fff;
+  padding: 1px;
+  background: #d8e4e0;
+}
+
+.calendar tfoot .active { /* Active (pressed) style for buttons in footer */
+  padding: 2px 0px 0px 2px;
+  border-top: 1px solid #000;
+  border-right: 1px solid #fff;
+  border-bottom: 1px solid #fff;
+  border-left: 1px solid #000;
+}
+
+/* Combo boxes (menus that display months/years for direct selection) */
+
+.calendar .combo {
+  position: absolute;
+  display: none;
+  width: 4em;
+  top: 0px;
+  left: 0px;
+  cursor: default;
+  border-top: 1px solid #fff;
+  border-right: 1px solid #000;
+  border-bottom: 1px solid #000;
+  border-left: 1px solid #fff;
+  background: #d8e4e0;
+  font-size: 90%;
+  padding: 1px;
+  z-index: 100;
+}
+
+.calendar .combo .label,
+.calendar .combo .label-IEfix {
+  text-align: center;
+  padding: 1px;
+}
+
+.calendar .combo .label-IEfix {
+  width: 4em;
+}
+
+.calendar .combo .active {
+  background: #c8d4d0;
+  padding: 0px;
+  border-top: 1px solid #000;
+  border-right: 1px solid #fff;
+  border-bottom: 1px solid #fff;
+  border-left: 1px solid #000;
+}
+
+.calendar .combo .hilite {
+  background: #048;
+  color: #aef;
+}
+
+.calendar td.time {
+  border-top: 1px solid #000;
+  padding: 1px 0px;
+  text-align: center;
+  background-color: #e8f0f4;
+}
+
+.calendar td.time .hour,
+.calendar td.time .minute,
+.calendar td.time .ampm {
+  padding: 0px 3px 0px 4px;
+  border: 1px solid #889;
+  font-weight: bold;
+  background-color: #fff;
+}
+
+.calendar td.time .ampm {
+  text-align: center;
+}
+
+.calendar td.time .colon {
+  padding: 0px 2px 0px 3px;
+  font-weight: bold;
+}
+
+.calendar td.time span.hilite {
+  border-color: #000;
+  background-color: #667;
+  color: #fff;
+}
+
+.calendar td.time span.active {
+  border-color: #f00;
+  background-color: #000;
+  color: #0f0;
+}

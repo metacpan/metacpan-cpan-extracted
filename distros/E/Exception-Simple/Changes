@@ -1,0 +1,44 @@
+Revision history for perl module Exception::Simple
+
+1.000001 2014-05-12
+    - Fixed failing test on *bsd systems
+
+1.000000 2014-05-08
+    - added package alias option when importing
+    - removed "at filename line n" from stringify method
+    - renamed accessors for package, file, and line to _package, _file and _line
+    - added author tests (spelling/changes)
+
+0.009001 2014-02-22
+    - Changed github repo url
+
+0.009 2013-07-29
+    - Reformatted Changes file as per CPAN::Changes::Spec
+
+0.008 2013-07-28
+    - Added caveats section to docs
+    - Changed issue tracker to github
+
+0.007 2013-07-27
+    - Added caller information to thrown exception
+    - Improved stringifaction so it shows from where the exception was thrown
+    - Doc improvments
+    - Removed throwc
+
+0.006 2013-04-15
+    - No changes, I accidently deleted the tar.gz from cpan, had to reupload, can't upload same version twice
+
+0.005 2012-09-25
+    - Added throwc for pseudo class exceptions
+
+0.004 2011-04-15
+    - Bugfixes for derived class accessors and stringification
+
+0.003 2011-01-10
+    - Made accessor generation more robust
+
+0.002 2011-01-09
+    - Light refactoring
+
+0.001 2011-01-09
+    - First release

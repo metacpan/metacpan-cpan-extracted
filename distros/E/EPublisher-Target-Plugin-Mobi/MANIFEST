@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/EPublisher/Target/Plugin/Mobi.pm
+t/20_mobi.t
+xt/95_pm_have_version.t
+xt/96_pod_coverage.t
+xt/97_pod.t
+xt/changes.t

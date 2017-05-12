@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name:                Email-Verify-SMTP
+version:             0.003
+abstract:            Verify an email address by using SMTP.
+license:             ~
+author:              
+    - John Drago <jdrago_999@yahoo.com>
+generated_by:        Hand.
+distribution_type:   module
+test_requires:
+    Test::More:             0
+requires:
+    Carp:               0
+    IO::Socket::Telnet: 0
+    Net::Nslookup:      0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

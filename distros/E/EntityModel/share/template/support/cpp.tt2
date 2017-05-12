@@ -1,0 +1,40 @@
+[%#
+
+C++ support
+
+Looks a bit like this:
+
+class Thing {
+	Thing() { }
+virtual	~Thing() { }
+
+	Thing &name(const string &name) { name_ = name; return *this; }
+	const string &name() const { return name_; }
+
+private:
+	string &name_;
+};
+
+Has the following mappings:
+* int => int
+* text => string
+* float => float
+
+-%]
+[% BLOCK Support/CPP/Entity;
+  class_name = entity.name;
+-%]
+class [% class_name %] {
+	[% class_name %]() { }
+virtual	~[% class_name %]() { }
+[%  FOREACH field IN entity.field.arrayref -%]
+	[% class_name %] &[% field.name %]([% field.type %] [% field.name %]) { [% field.name %]_ = [% field.name %]; return *this; }
+	const [% field.type %] &[% field.name %]() const { return [% field.name %]_ }
+[%  END -%]
+
+private:
+[%  FOREACH field IN entity.field.arrayref -%]
+	[% field.type %] [% field.name %]_;
+[%  END -%]
+};
+[% END -%]

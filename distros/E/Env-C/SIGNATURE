@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.80.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 5e119214f0781a17ff086fd8e7f0493e597471e7 C.xs
+SHA1 e454db9f62968fce5dbc54c36e0f7c170aabff82 Changes
+SHA1 5c75bf9f6320be4f563a84f7ba395ae883aa25ab LICENSE
+SHA1 8fe3e8afbddb684c0663dddff6828fc8d46f2854 MANIFEST
+SHA1 57d8b06d73380688a7e9359265f9ae176438711e MANIFEST.SKIP
+SHA1 0995ab5740ad46c743aaa8ea867d7be9af117308 META.json
+SHA1 face233cb1a9e368072a6a031d39d980ce73fb6f META.yml
+SHA1 ab48fc29617c82d64acf50688884746248192a54 Makefile.PL
+SHA1 e67ddc76217966832df6f19ceb4ef3b63f902127 README
+SHA1 cbbb6ed1a4dc0a5cf027e6598d2b2638a0c8f35f lib/Env/C.pm
+SHA1 e2965242503050c505bb13de53735a4f2cc8b06a ppport.h
+SHA1 5387f8ed48de7ef64220c5ed2c77e41ed844adb2 t/author-pod-coverage.t
+SHA1 8efad25309730a4d501fb40fc03eda4697303372 t/author-pod-syntax.t
+SHA1 f875c4a0e0bb2c1dbd25f73dfcbf540d84a61d7c t/leak.t
+SHA1 f0c37746e0277de1ddb62c9227628a5ebe5a777a t/signature.t
+SHA1 4d47f438038868115696d97e069580474373916c t/smoke.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIVAwUBWN6jiKQl27WkM10aAQgaqhAAjnA/ffL7+ErwFtT+xd05Mn7/psCC4Frc
+La//3m+/ibndHVLHMvFdAAVyctMVWPsB476WnRqso4F+4fMbqGWVD6g0/sgt9ECQ
+OaSjZbxWs+Zr3/gEtawp2uxzIxD3qKBojSO0Qnfu6SF0S6znd4kDtBj0eK2WfMae
+jH4lv4K0j3aBVAahbWR61xidIBhjwmRUh2JsMGQTpWNg061BGfqXkRhRVbZUTRjv
+8O++ZhgHRTaVsPEUtBZ4jz++Kw1SQ+6aInhVQ3bY6mvGZEfMDvedOnIOf4+WMjHB
+BXT3Ie5tvmcnBauHhPTDsPXeSumInuVgiLpq8JeW6+tYnTd9u4cpU0olFoili5in
+N1JCd+zSgyQxJd3ldctm5jFcwbkY8iFJrYmIx3Vdwhuqa8sa6+DBCRjEkt/raJk+
+6xZBb/nIt6cB2g9C0oqWlsn6lyY26AHPLfNrSE9d0Bos1Wp35hqAPGERA2A071Ly
+cD9NZfxuG+R65GS1A9G6iQTAjczyXTMlBJDr4bTXASFTF8pv8yY5nTWkU4Z7g3BD
+nmbSTIgGhZ7vbzl9AzG4Gd/o/f3f9rhjpF06LgbRCip9t75AW5ql5YpJQBbMxcD2
+MAEDl++sX7h7yh9GUFD7v9uJqlwLiNKw/1aZ3Oq1zHRr1yO6IlZFBB8f2pL8ZNbu
+jMFJUxDcIdE=
+=DN8E
+-----END PGP SIGNATURE-----

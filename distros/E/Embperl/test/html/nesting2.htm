@@ -1,0 +1,58 @@
+<html>
+<head>
+<title>Tests for Embperl - Nesting of html and meta commands 2</title>
+</head>
+
+
+<body>
+
+[-
+$fdat{aa} = 11 ;
+$fdat{bb} = 22 ;
+$fdat{cc} = 33 ;
+$fdat{dd} = 44 ;
+
+$t = 1 ;
+$f = 0 ;
+
+%a2 = ( 'a' => 1, 'b' => 2 ) ;
+@a2 = sort keys %a2 ;
+
+-]
+[- @ks = sort keys %fdat -]
+
+<table>
+	<tr>
+		<td>[+ $ks[$row] +]</td><td>[+ $fdat{$ks[$row] || ''} +]</td>
+	</tr>
+</table>
+
+=== dl.1
+
+<dl><dt>[+ $ks[$row] +]</dt><dd><ul><li>[+ $a2[$row] +]</li></ul></dd></dl>
+
+=== dl.2
+
+<dl><dt>[+ $ks[$row] +]</dt><dd><ul>[+ $a2[$row] +]</ul></dd></dl>
+
+=== foreach.1
+
+[- $i = 1 -]
+[$foreach $a (@ks) $]
+   [$foreach $b (@a2) $]
+      [+ $i +]:[+ $a +] -> [+ $b +]
+   [$endforeach$]
+   [- $i++ -]
+[$endforeach$]
+
+.
+=== foreach.2
+
+[- $i = 1 -]
+[$foreach $a (@ks) $]
+   [$foreach $b (@a2) $]
+      [+ $i +]:[+ $a +] -> [+ $b +]
+   [- $i++ -]
+   [$endforeach$]
+[$endforeach$]
+

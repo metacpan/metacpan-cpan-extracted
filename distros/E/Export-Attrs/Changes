@@ -1,0 +1,30 @@
+Revision history for Export-Attrs
+
+v0.1.0  2016-02-12 20:08:54 EET
+	- Based on Perl6::Export::Attrs 0.000005.
+	- Renamed to Export::Attrs.
+	- Migrate to Dist::Milla.
+	- Fix a 0.000004 regression in exporting subroutines.
+
+0.000005 2015-11-24 09:16:01
+	- Added dependency for PadWalker
+	  (thanks Dave!)
+
+0.000004 2015-10-03 12:42:22
+	- Added export of package variables.
+	- Fixed filtering of args to IMPORT block (thanks Smylers)
+	- Updated docs to explain the syntactic constraints of the
+	  IMPORT block (thanks Smylers)
+	- Updated docs to note incompatibility with Memoize.pm
+	  (thanks David)
+	- Included META files
+	  (thanks Jarkko)
+
+0.0.3   2005-08-02 05:53:06
+	- No changes logged
+
+0.0.2   2005-08-02 05:52:27
+	- No changes logged
+
+0.0.1   2005-03-27 06:48:42
+	- Initial release.

@@ -1,0 +1,200 @@
+Revision history for Perl extension Email::Simple
+
+2.213     2017-01-11 09:21:54-05:00 America/New_York
+        - no changes since v2.212
+
+2.212     2016-12-18 20:05:09-05:00 America/New_York (TRIAL RELEASE)
+        - add an $index arg to ->header to get the nth header (thanks, Pali
+          Rohár)
+
+2.211     2016-11-12 09:39:09-05:00 America/New_York
+        - fix a fencepost error in headers and header_names that led to a
+          spurious undef in return and to a warning (thanks, Pali Rohár)
+
+2.210     2016-03-05 12:16:16-05:00 America/New_York
+        - fix a bug where folding treated the string "0" as an empty string
+          (thanks, Pali Rohár)
+
+2.209     2015-10-11 22:57:04-04:00 America/New_York (TRIAL RELEASE)
+        - avoid opportunity for pathological backtracking behavior on
+          malformed messages
+
+2.208     2015-07-20 20:34:04-04:00 America/New_York
+        - same as v2.207
+        - ...but bump perl required to v5.8
+
+2.207     2015-07-04 14:23:36-04:00 America/New_York (TRIAL RELEASE)
+        - fold headers passed to header arg in create method
+          https://github.com/rjbs/Email-Simple/issues/7
+
+2.206     2015-03-26 23:30:51-04:00 America/New_York
+        - the changes from 2.204 are back (and re-listed here), but now with
+          the added benefit of not breaking Email::MIME; see the git repository
+          for the sordid details
+        - provide header_raw and header_raw_set for consistent behavior between
+          Email::Simple and Email::MIME; also, header_raw_pairs
+
+2.205     2015-03-26 14:54:45-04:00 America/New_York
+        - undo changes from 2.204 until safe Email::MIME upgrade path is
+          available
+
+2.204     2015-03-25 22:50:49-04:00 America/New_York
+        - provide header_raw and header_raw_set for consistent behavior between
+          Email::Simple and Email::MIME; also, header_raw_pairs
+
+2.203     2014-02-14 21:56:14-05:00 America/New_York
+        - translate vertical whitespace in headers into horizontal whitespace,
+          with a warning
+
+2.202     2013-09-04 09:48:33 America/New_York
+          repackage with Dist::Zilla; update repo and bug tracker
+
+2.201     2013-04-16
+          no changes
+
+2.200_01  2013-04-09
+          preserve the original header layout unless changed
+
+2.103     2013-04-09
+          fix a bug in header unfolding where "0\n 1" could be unfolded to "01"
+
+2.102     2012-07-13
+          recognize crlf correctly even if there is no body (thanks, Christian
+          Walde)
+
+2.101     2011-12-23
+          remove instruction to use ::Creator instead of just ->create
+
+          documentation improvements (thanks, Michael Stevens)
+
+2.100     2009-11-03
+          merge Email-Simple-Creator into Email-Simple distribution
+
+2.005     2009-01-22
+          add repository metadata
+
+2.004     2008-06-25
+          publicize default_header_class method
+          remove the long-deprecated Headers.pm
+
+2.003     2007-07-19
+          improve tests, for 5.5 compat
+          remove conditional circular prereq on Email::MIME, replace it with a
+          warning and delay
+
+2.002     2007-07-14
+          change initialization order to unbreak Email::MIME
+          do not return ->body from ->body_set to simplify subclass behavior
+
+2.001     2007-07-13
+          fix t/perl-minver.t to properly skip if T::MV not installed
+          retroactively set 2.000 release date!
+
+2.000     2007-07-13
+          huge improvement to speed of bodyless message parsing
+            pointed out by Dan Dascalescu; thanks!
+          more documentation of header class
+          new Header crlf defaults to real CRLF
+          fix tests to avoid requiring 5.6
+
+1.999     2007-03-20
+          fix bug 25496: deletion of headers affected the wrong range,
+            sometimes deleting too many headers -- thanks, Nicholas Oxhoej!
+          fix bug 24922: errant space in last header of CRLF-delim email
+            thanks, Barry Downes and Alex Vandiver
+
+1.998     2007-02-07
+          MAJOR REFACTORING OF GUTS
+          If you run Email::MIME, you MUST be running Email::MIME 1.857 or
+            better.
+          require Email::MIME 1.857 in Makefile.PL only if an older
+            version is already installed
+          boldly moving forward with refactored headers and
+            Email::Simple:::Header
+          greatly reduce memory footprint
+          add crlf method to allow other modules to avoid ->{mycrlf}
+          fix broken header-junk test
+
+1.996    2006-11-27
+  - do not wrap Content-Type field; it can cause Outlook to go nuts
+    while this is a special case, it does not make E::S incorrect, as folding
+    long headers is allowed (for aesthetics) and not mandated
+
+1.995    2006-10-19
+  - tentative refactoring of headers
+
+1.992    2006-10-05
+
+  - fix a number of bugs when setting multiple headers, which would often
+    refuse to set more values than were currently present
+  - added a test for prepending (rather than appending) headers; while E::S
+    does not yet support this, the header behavior will be easier to replace in
+    future versions, and this is a forward-looking test
+
+1.990    2006-09-05
+
+  - ->header('foo') returns false if there is no foo header (formerly '')
+  - croak if an undef value is passed to new()
+
+1.980    2006-08-17
+
+  - fix _fold() to add a missing line ending [RT #20764] (Brian Cassidy)
+
+1.970    2006-08-17
+
+  - bring ->headers method into Email::Simple
+  - ->header_names and ->header_pairs
+
+1.96    2006-07-28
+
+  - output headers in predictable order
+  - give tests more meaningful names
+  - improved test coverage
+
+1.95    2006-07-21
+
+  - update PEP url
+  - reorganize dist
+
+1.94    2006-07-03
+
+  - Fix folding of long headers with \r as line ending (thanks Adam Worrall)
+  - add tests for message with no body
+
+1.92    2004-11-11
+
+  - Update dependencies.
+  - Update test suite to support proper Test::More syntax.
+
+1.91    2004-10-27
+
+  - Tests use alarm(), skip those tests on MSWin32.
+  - body() is initialized to '' if it isn't defined.
+  - Author changes.
+
+1.9   Fix our own damned line-wrapping.
+
+1.8   Do our own damned line-wrapping
+
+1.7   Sample, don't assume, what CRLF we're using.
+      This means that mail with funny crlfs is round-trippable.
+
+1.61  fixes to test suite.  there was a 5.6ish open my $fh which led to
+      test failures under 5.00503
+
+1.6 - fixes to test suite.  We were using no_plan which fails on
+      older versions of Test::Harness
+
+1.5 - fixes more warnings during ->as_string calls
+
+      Documents more strongly that Email::Simple is intended for use
+      with RFC2822 messages only
+
+1.4 - fixes a warning emitted during ->as_string calls
+      fix for header unfolding
+1.3 - Many fixes from Richard Clamp <richardc@unixbeard.net>
+1.2 - Text::Wrapper->Text::Wrap
+
+0.01  Thu Feb 13 15:07:01 2003
+    - original version; created by h2xs 1.22 with options
+    -b 5.5.3 -AX -n Email::Simple

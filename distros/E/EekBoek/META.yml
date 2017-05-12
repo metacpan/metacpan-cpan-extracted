@@ -1,0 +1,37 @@
+---
+name: EekBoek
+version: 2.02.05.1
+author:
+  - Johan Vromans (jvromans@squirrel.nl)
+abstract: Elementary Bookkeeping (for the Dutch/European market)
+license: perl
+resources:
+  MailingList: http://lists.sourceforge.net/lists/listinfo/eekboek
+  homepage: http://www.eekboek.nl
+  license: http://dev.perl.org/licenses/
+requires:
+  Archive::Zip: 1.16
+  DBD::SQLite: 1.13
+  DBI: 1.40
+  Getopt::Long: 2.13
+  Term::ReadLine: 0
+  Term::ReadLine::Gnu: 0
+build_requires:
+  IPC::Run3: 0.034
+  Module::Build: 0.26
+recommends:
+  DBD::Pg: 1.41
+  Getopt::Long: 2.32
+  HTML::Entities: 1.35
+provides:
+  EekBoek:
+    file: lib/EekBoek.pm
+    version: 2.02.05
+generated_by: Module::Build version 0.32
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+no_index:
+  directory:
+    - inc
+    - lib/EB

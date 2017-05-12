@@ -1,0 +1,12 @@
+lib/SVDtest1.pm
+MANIFEST
+Makefile.PL
+README
+lib/SVDtest1.pm
+lib/module1.pm
+t/SVDtest1.t
+t/Test/Tech.pm
+t/Data/Startup.pm
+t/Data/Secs2.pm
+t/Data/SecsPack.pm
+t/File/Package.pm

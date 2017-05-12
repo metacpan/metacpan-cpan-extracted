@@ -1,0 +1,44 @@
+language: perl
+matrix:
+  include:
+    - perl: "5.8"
+      env:  STERILIZE_ENV=0
+    - perl: "5.10"
+      env:  STERILIZE_ENV=0
+    - perl: "5.12"
+      env:  STERILIZE_ENV=0
+    - perl: "5.14"
+      env:  STERILIZE_ENV=0
+    - perl: "5.16"
+      env:  STERILIZE_ENV=0
+    - perl: "5.18"
+      env:  STERILIZE_ENV=0
+    - perl: "5.19"
+      env:  STERILIZE_ENV=0
+    - perl: "5.8"
+      env:  STERILIZE_ENV=1
+    - perl: "5.10"
+      env:  STERILIZE_ENV=1
+    - perl: "5.19"
+      env:  STERILIZE_ENV=1
+    - perl: "5.19"
+      env: STERILIZE_ENV=0 DEVELOPER_DEPS=1
+    - perl: "5.19"
+      env: STERILIZE_ENV=0 RELEASE_TESTING=1 AUTHOR_TESTING=1
+before_install:
+  - perlbrew list
+  - time perl ./maint-travis-ci/sterilize_env.pl
+install:
+  - time perl ./maint-travis-ci/install_deps.pl
+before_script:
+  - time perl ./maint-travis-ci/before_script.pl
+script:
+  - time perl ./maint-travis-ci/script.pl
+after_failure:
+  - perl ./maint-travis-ci/report_fail_ctx.pl
+branches:
+  only:
+    - "master"
+    - "build/master"
+    - "releases"
+

@@ -1,0 +1,211 @@
+#######################################################
+# Component Description File for: embedix_gui
+#
+# Copyright 2000, Lineo Inc.
+#
+# Notes on binaries in embedix_gui
+
+<GROUP Applications>
+<GROUP Browser>
+<COMPONENT embedix_gui>
+
+        SRPM=embedix_gui
+
+        <SPECPATCH></SPECPATCH>
+
+        <HELP>
+        (Embedix UI
+            (aka Embedix GUI 
+                (aka Embedix Browser 
+                    (aka Embrowser 
+                        (aka DR-WebSpyder)))));
+        </HELP>
+
+        TYPE=bool
+        DEFAULT_VALUE=0
+        PROMPT=Include Embedix GUI?
+
+        STATIC_SIZE=2138769
+        MIN_DYNAMIC_SIZE=0
+        STORAGE_SIZE=1501478
+
+        <REQUIRESEXPR>
+        libm.so.6 &&
+        libdl.so.2 &&
+        libpthread.so.0 &&
+        libc.so.6 &&
+        ld-linux.so.2 &&
+        (CONFIG_FB == "y") &&
+        (CONFIG_FB_VESA == "y") &&
+        (CONFIG_VGA_CONSOLE == "y") &&
+        (CONFIG_FBCON_ADVANCED == "y") &&
+        (CONFIG_FBCON_MFB == "y") &&
+        (EBXDUP_CONFIG_VIDEO_SELECT == "y") &&
+        (EBXDUP_CONFIG_FBCON_CFB2 == "y") &&
+        (EBXDUP_CONFIG_FBCON_CFB4 == "y") &&
+        (CONFIG_FBCON_CFB8 == "y") &&
+        (CONFIG_FBCON_CFB16 == "y") &&
+        (CONFIG_FBCON_CFB24 == "y") &&
+        (EBXDUP_CONFIG_FBCON_CFB32 == "y")
+        </REQUIRESEXPR>
+
+        <PROVIDES>
+        libdbcsxref.so.1
+        libpbm.so.1.0.0
+        libpgm.so.1.0.0
+        libpnm.so.1.0.0
+        libppm.so.1.0.0
+        libz.so.1
+        VGAOPT
+        </PROVIDES>
+
+        <AUTOVAR embedix_gui-VGAOPT>
+                TYPE=string
+                DEFAULT_VALUE=785
+        </AUTOVAR>
+
+        <KEEPLIST>
+        /usr/local/Embrowser/RPGraphics.dat
+        /usr/local/Embrowser/advan.gif
+        /usr/local/Embrowser/advan.jpg
+        /usr/local/Embrowser/advanc.gif
+        /usr/local/Embrowser/advance.htm
+        /usr/local/Embrowser/anback.gif
+        /usr/local/Embrowser/ancnct.gif
+        /usr/local/Embrowser/annext.gif
+        /usr/local/Embrowser/auto_err.htm
+        /usr/local/Embrowser/auto_ftr.htm
+        /usr/local/Embrowser/auto_hdr.htm
+        /usr/local/Embrowser/auto_ok.htm
+        /usr/local/Embrowser/auto_prg.htm
+        /usr/local/Embrowser/back.gif
+        /usr/local/Embrowser/backan.gif
+        /usr/local/Embrowser/bullet.jpg
+        /usr/local/Embrowser/button.gif
+        /usr/local/Embrowser/calogo.gif
+        /usr/local/Embrowser/cancel.gif
+        /usr/local/Embrowser/canclan.gif
+        /usr/local/Embrowser/click1.wav
+        /usr/local/Embrowser/connect.gif
+        /usr/local/Embrowser/coremsg.eng
+        /usr/local/Embrowser/dhcp
+        /usr/local/Embrowser/dialing.htm
+        /usr/local/Embrowser/dialing2.gif
+        /usr/local/Embrowser/eb
+        /usr/local/Embrowser/email.gif
+        /usr/local/Embrowser/emb.sh
+        /usr/local/Embrowser/err_dial.htm
+        /usr/local/Embrowser/err_mime.htm
+        /usr/local/Embrowser/err_net.htm
+        /usr/local/Embrowser/err_noip.htm
+        /usr/local/Embrowser/err_open.htm
+        /usr/local/Embrowser/err_pass.htm
+        /usr/local/Embrowser/err_pkt.htm
+        /usr/local/Embrowser/err_pop3.htm
+        /usr/local/Embrowser/err_ppp.htm
+        /usr/local/Embrowser/err_smtp.htm
+        /usr/local/Embrowser/err_snet.htm
+        /usr/local/Embrowser/err_ssl.htm
+        /usr/local/Embrowser/err_url.htm
+        /usr/local/Embrowser/faves.gif
+        /usr/local/Embrowser/fixed-ip
+        /usr/local/Embrowser/h_left.gif
+        /usr/local/Embrowser/help.gif
+        /usr/local/Embrowser/help.htm
+        /usr/local/Embrowser/help.jpg
+        /usr/local/Embrowser/help1.htm
+        /usr/local/Embrowser/helpan.gif
+        /usr/local/Embrowser/history.gif
+        /usr/local/Embrowser/history.org
+        /usr/local/Embrowser/hosts
+        /usr/local/Embrowser/hotlist.gif
+        /usr/local/Embrowser/hotlist.org
+        /usr/local/Embrowser/hwkeybd.dat
+        /usr/local/Embrowser/icons.htm
+        /usr/local/Embrowser/keybimg.dat
+        /usr/local/Embrowser/keyboard.dat
+        /usr/local/Embrowser/keyboard.ini
+        /usr/local/Embrowser/lastone.mid
+        /usr/local/Embrowser/lgbtnup.gif
+        /usr/local/Embrowser/lineo_logo_horz.jpg
+        /usr/local/Embrowser/logo.gif
+        /usr/local/Embrowser/lwp.msg
+        /usr/local/Embrowser/mailto.htm
+        /usr/local/Embrowser/movlogo.gif
+        /usr/local/Embrowser/next.gif
+        /usr/local/Embrowser/nextan.gif
+        /usr/local/Embrowser/oem.htm
+        /usr/local/Embrowser/oemset.jpg
+        /usr/local/Embrowser/opening.wav
+        /usr/local/Embrowser/opticon.jpg
+        /usr/local/Embrowser/options.htm
+        /usr/local/Embrowser/options.jpg
+        /usr/local/Embrowser/print.bmp
+        /usr/local/Embrowser/printer.jpg
+        /usr/local/Embrowser/prnt.bmp
+        /usr/local/Embrowser/prnticon.bmp
+        /usr/local/Embrowser/protocol
+        /usr/local/Embrowser/readme.txt
+        /usr/local/Embrowser/resolv.cfg
+        /usr/local/Embrowser/restv.dat
+        /usr/local/Embrowser/savan.gif
+        /usr/local/Embrowser/save.gif
+        /usr/local/Embrowser/screen1.htm
+        /usr/local/Embrowser/select.wav
+        /usr/local/Embrowser/services
+        /usr/local/Embrowser/setup.gif
+        /usr/local/Embrowser/setup.htm
+        /usr/local/Embrowser/setup1.htm
+        /usr/local/Embrowser/setup1f.htm
+        /usr/local/Embrowser/setupan.gif
+        /usr/local/Embrowser/setupf.htm
+        /usr/local/Embrowser/shrtkeys.htm
+        /usr/local/Embrowser/slideon.wav
+        /usr/local/Embrowser/smbtnup.gif
+        /usr/local/Embrowser/soundtop.htm
+        /usr/local/Embrowser/sslkey.bmp
+        /usr/local/Embrowser/statrght.bmp
+        /usr/local/Embrowser/status.bmp
+        /usr/local/Embrowser/top.gif
+        /usr/local/Embrowser/trash.gif
+        /usr/local/Embrowser/undo_ftr.htm
+        /usr/local/Embrowser/undo_hdr.htm
+        /usr/local/Embrowser/undo_nfl.htm
+        /usr/local/Embrowser/undo_ok.htm
+        /usr/local/Embrowser/urlentry.htm
+        /usr/local/Embrowser/usrset.jpg
+        /usr/local/Embrowser/version.vsn
+        /usr/local/Embrowser/web.gif
+        /usr/local/Embrowser/web32a.wf1
+        /usr/local/Embrowser/web32b.wf2
+        /usr/local/Embrowser/web32c.wf3
+        /usr/local/Embrowser/web32d.wf4
+        /usr/local/Embrowser/websplsh.gif
+        /usr/local/Embrowser/welcome.htm
+        /usr/local/Embrowser/welcomef.htm
+        /etc/Embrowser/allegro.cfg
+        /etc/Embrowser/dhcpdata
+        /etc/Embrowser/ipdata
+        /etc/Embrowser/core.cfg
+        /etc/Embrowser/dial.cfg
+        /etc/Embrowser/print.cfg
+        /etc/Embrowser/web32.cfg
+        /etc/ppp/peers
+        /etc/ppp/chatscripts
+        /etc/ppp/resolv.conf
+        /etc/ppp/pap-secrets
+        /etc/ppp/chap-secrets
+        /etc/ppp/ip-up
+        /usr/lib/libdbcsxref.so.1
+        /usr/lib/libpbm.so.1.0.0
+        /usr/lib/libpgm.so.1.0.0
+        /usr/lib/libpnm.so.1.0.0
+        /usr/lib/libppm.so.1.0.0
+        /usr/lib/libz.so.1
+        /dev/mouse
+        /version.vsn
+        </KEEPLIST>
+
+</COMPONENT>
+</GROUP>
+</GROUP>

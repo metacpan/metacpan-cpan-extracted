@@ -1,0 +1,45 @@
+Revision history for Email-MIME-Attachment-Stripper
+
+1.317     2013-08-31 23:44:32 America/New_York
+          update repo and bugtracker information
+
+          no significant changes, but please see a note on the future:
+          https://github.com/rjbs/Email-MIME-Attachment-Stripper/issues/2
+
+1.316     2009-01-22
+          add repo location metadata
+
+1.315     2008-07-08
+          http://rt.cpan.org/Public/Bug/Display.html?id=20536
+          improve docs, improve handling of nested multipart
+          thanks to DROLSKY and to the guys at Best Practical
+
+1.314     2007-10-02
+          bug fix: bump up prereq on Email::MIME::Modifier
+          (fixes a scalar deref issue, reported by JESSE)
+
+1.313     2006-11-25
+          resolve bug 19988, make content-type check for inline text case-insens
+          packaging improvements
+
+1.311     2006-08-01
+          no code changes
+          update Makefile.PL to be more mine-able
+
+1.31      2004-12-23
+          Rebuilt to use the Perl Email Project more effectively.
+          Change author.
+          WARNING: Interface will probably change in next release to
+                   return parts as Email::MIME objects!
+
+1.3       Wed Aug 25 12:26:34 BST 2004
+          force_filename option
+
+1.2       Sun Jul 11 17:24:34 BST 2004
+          Work OK on things that aren't even MIME messages.
+
+1.1       Sat Jul  3 17:52:40 BST 2004
+          We never checked the ->body! Horrors!
+
+1.00  
+          first CPAN release.

@@ -1,0 +1,84 @@
+Revision history for Email-ExactTarget
+
+v1.6.2  2014-04-20
+        - Fixed "package version matches dist version" for CPANTS.
+        - Fixed license declared in meta files.
+        - General cleanup.
+
+v1.6.1  2013-05-19
+        - Moved release tests to xt/, added new release tests.
+        - Modified Build.PL to add release tests to disttest.
+        - Added Test::FailWarnings to all tests.
+        - Moved request tracker from RT to GitHub.
+        - Changed links from Search CPAN to MetaCPAN.
+        - Added information on how to contribute examples.
+        - Switched to markdown for the readme.
+        - Added Travis-CI config for continuous integration.
+
+v1.6.0  2013-03-10
+        - Improved format of the configuration module used by the tests.
+        - Removed previously required 'all_subscribers_list_id' from new(), not
+          used anymore.
+        - Deprecated Email::ExactTarget->get_all_subscribers_list_id().
+        - Refactored tests.
+
+v1.5.0  2012-10-01
+        - Added SOAP reply status to the failure messages.
+        - Added option to restrict the list IDs retrieved when calling
+          Email::ExactTarget::SubscriberOperations->pull_list_subscriptions().
+        - Cleaned up filters with only one subscriber or one list ID.
+
+v1.4.1  2012-10-31
+        - Added missing valid statuses for list subscriptions.
+        - Cleaned up POD.
+
+v1.4.0  2012-10-26
+        - Reorganized and added documentation.
+        - Added support for ExactTarget's Subscriber Properties.
+        - Refactored Email::ExactTarget::Subscriber->get() to get_attribute().
+        - Refactored Email::ExactTarget::Subscriber->set() to set_attributes().
+
+v1.3.6  2012-10-03
+        - Relicensed as GPLv3.
+        - Fixed documentation.
+
+v1.3.5  2012-09-22
+        - Moved repository to GitHub.
+
+v1.3.4  2012-09-14
+        - Fixed _update_create() to return the success status of the batch,
+          instead of dieing when one of the elements of the batch couldn't be
+          synchronized.
+        - Fixed Email::ExactTarget::SubscriberOperation->retrieve() when called
+          with only one email.
+
+v1.3.3  2012-08-28
+        - Fixed warnings when unaccenting strings.
+
+v1.3.2  2012-08-13
+        - Refactored to use Test::Exception and Data::Validate::Type.
+        - Code and meta-information cleanup.
+
+v1.3.1  2012-05-29
+        - Set explicit POD encoding.
+        - Excluded non-core PerlCritic policies for tests.
+
+v1.3.0  2012-03-04
+        - Added method to delete subscriber records permanently.
+        - Added flag on the subscriber object to identify deleted objects.
+        - Added meta information and upgraded build.
+        - Cleaned up code and tests.
+
+v1.2.1  2012-01-20
+        - Cleanup to pass PerlCritic 'harsh'.
+
+v1.2.0  2012-01-17
+        - API cleanup, now using hashref instead of hashes for data.
+        - Generalized tests to work with an independent config file.
+        - Public release.
+
+v1.1.0  2011-11-25
+        - Added more documentation and tests.
+
+v1.0.0  2010-04-09
+        - First working version.

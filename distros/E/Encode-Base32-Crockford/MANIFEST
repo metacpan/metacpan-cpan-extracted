@@ -1,0 +1,15 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+SIGNATURE
+dist.ini
+lib/Encode/Base32/Crockford.pm
+t/base32.t
+t/encode_decode.t
+t/encode_decode_checksum.t
+t/pod.t
+t/pod_coverage.t

@@ -1,0 +1,60 @@
+
+=pod
+
+=head1 NAME
+
+Email::Blaster::Manual::Administration
+
+=head1 OVERVIEW
+
+The Email::Blaster software is intended to run for months or years on end without
+requiring constant babysitting or attention.
+
+=head2 OS Shutdown
+
+If the OS shuts down, the Email::Blaster will handle the C<TERM> signal by calling
+any/all C<server_shutdown> event handlers, and then will exit.
+
+=head2 OS Restarts
+
+If the OS restarts, the Email::Blaster will not automatically start up again when the
+OS comes back online.
+
+It is recommended that a service is added to the server configuration to ensure 
+that the Email::Blaster is automatically started (after MySQL has come online).
+
+=head2 User/Group
+
+The Email::Blaster software should be run under a normal user account - admin 
+permissions are B<not> required or recommended.
+
+=head2 Ports Used
+
+By default, no ports are used.  If Clustering mode is used, whatever port C<memcached>
+is listening to on the local and server should be open (port 11211 by default).
+
+=head2 RAM and CPU Usage
+
+Inordinate amounts of RAM and CPU should not be used, unless the emails sent are
+very large.
+
+=head1 SUPPORT
+
+Visit L<http://www.devstack.com/contact/> or email the author at <jdrago_999@yahoo.com>
+
+Commercial support and installation is available.
+
+=head1 AUTHOR
+
+John Drago <jdrago_999@yahoo.com>
+ 
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2008 by John Drago
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut
+

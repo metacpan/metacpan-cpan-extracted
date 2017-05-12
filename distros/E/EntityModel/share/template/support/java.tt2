@@ -1,0 +1,36 @@
+[%#
+
+Java support
+
+Looks a bit like this:
+
+class Thing {
+	Thing() { }
+
+	public Thing name(final String name) { this.name = name; return *this; }
+	public String name() { return name_; }
+
+	private String name;
+}
+
+Has the following mappings:
+* int => long
+* text => string
+* float => float
+
+-%]
+[% BLOCK Support/Java/Entity;
+  class_name = entity.name;
+-%]
+class [% class_name %] {
+	[% class_name %]() { }
+[%  FOREACH field IN entity.field.arrayref -%]
+	public [% class_name %] [% field.name %](final [% field.type %] [% field.name %]) { this.[% field.name %] = [% field.name %]; return this; }
+	public [% field.type %] [% field.name %]() { return [% field.name %]_ }
+[%  END -%]
+
+[%  FOREACH field IN entity.field.arrayref -%]
+	private [% field.type %] [% field.name %];
+[%  END -%]
+}
+[% END -%]

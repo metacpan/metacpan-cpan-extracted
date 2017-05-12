@@ -1,0 +1,28 @@
+Changes
+lib/Encode/JISX0213.pm
+lib/Encode/JISX0213/CCS.pm
+lib/Encode/ShiftJIS2004.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/JISX0213.t
+t/pod.t
+t/shiftjis2004.enc
+t/ShiftJIS2004.t
+t/shiftjis2004.utf
+t/x0213-1-ascii.utf
+t/x0213-1-compatible.enc
+t/x0213-1.enc
+t/x0213-1-strict.enc
+t/x0213-2.enc
+t/x0213-2.utf
+t/x0213-2000-1-ascii.utf
+t/x0213-2000-1.enc
+ucm/jis-x-0208.ucm
+ucm/jis-x-0208-0213.ucm
+ucm/jis-x-0213-annex1.ucm
+ucm/jis-x-0213-plane1-2000.ucm
+ucm/jis-x-0213-plane1.ucm
+ucm/jis-x-0213-plane2.ucm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

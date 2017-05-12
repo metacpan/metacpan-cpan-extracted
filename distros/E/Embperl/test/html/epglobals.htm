@@ -1,0 +1,10 @@
+
+
+epreq: [+ ref $epreq +]
+epapp: [+ ref $epapp +]
+
+epreq -> app [+ $epreq -> app +] epapp [+ $epapp +] 
+	eq [+ $epreq -> app eq $epapp?'yes':'no' +]
+
+appname [+ $epapp -> config -> app_name +]
+

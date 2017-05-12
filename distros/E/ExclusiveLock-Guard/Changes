@@ -1,0 +1,25 @@
+Revision history for Perl extension ExclusiveLock::Guard
+
+0.07  2014-01-14 13:26:40 JST
+        - win32 is not support
+
+0.06  2013-11-15 20:28:51 JST
+        - oops, 0.05-TRIAL is empty release...
+        - add fork process support. (reported by hirose31++, idea by kazuho++)
+
+0.05  2013-07-25 17:42:38 JST
+        - add fork process support. (reported by hirose31++, idea by kazuho++)
+        - milla migration
+
+0.04    2013-01-21T19:21:15+09:00
+        - change of the file stat timing (measures under high load)
+
+0.03    2012-11-08T21:57:01+09:00
+        - fixed to It had overlooked that inode of lock file had changed
+
+0.02    2012-11-08T20:03:53+09:00
+        - fixed to unlink handling was wrong
+        - added to retry_count option for new mthod
+
+0.01    Thu Nov  8 15:18:43 2012
+        - original version

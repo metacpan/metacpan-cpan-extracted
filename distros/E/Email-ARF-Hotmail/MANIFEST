@@ -1,0 +1,18 @@
+Makefile.PL
+t/complaint.t
+t/complaint3.t
+t/hotmail-complaint.t
+t/corpus/hotmail.msg
+t/corpus/hotmail2.msg
+t/corpus/hotmail-complaint.msg
+t/corpus/hotmail-brackets.msg
+t/Email-ARF-Hotmail.t
+t/pod_coverage.t
+t/pod.t
+t/complaint-bracket.t
+MANIFEST
+lib/Email/ARF/Hotmail.pm
+Changes
+README
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

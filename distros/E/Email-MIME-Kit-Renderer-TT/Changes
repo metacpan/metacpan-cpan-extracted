@@ -1,0 +1,12 @@
+Revision history for Email-MIME-Kit-Renderer-TT
+
+1.001     2013-08-12 21:49:46 America/New_York
+          update bugtracker and repo
+
+1.000     2010-09-04 15:51:21 America/New_York
+          add template_parameters and strict
+
+          fix bizarre misuses of lazy/default
+
+0.091870  2009-07-06
+          initial release

@@ -1,0 +1,31 @@
+1.001 - 18 Aug 2009 - Jonathan Yu <frequency@cpan.org>
+
+  + Use a simple string version, per David Golden's article:
+    http://www.dagolden.com/index.php/369/version-numbers-should-be-boring/
+  + No longer use Perl::Critic to test
+  + Resequenced test files
+
+1.0.2 - 15 Jun 2009 - Jonathan Yu <frequency@cpan.org>
+
+  + Fix description
+  + Overhaul test scripts, remove author tests from
+    Recommends (Alias' journal #5375)
+  + No longer test Perl::Critic during AUTOMATED_TESTING,
+    only RELEASE_TESTING. Thanks to Elliot Shank for the
+    discussion in a private mail.
+  + Require Internet (HAS_INTERNET) to do the signature
+    test, since it tries to download the key from a keyserver
+  + Removed a file carried over from Test::DistManifest,
+    which I copied the base structure from (CIRCULAR.SKIP)
+    and updated MANIFEST accordingly
+
+1.0.1 - 15 Jun 2009 - Jonathan Yu <frequency@cpan.org>
+
+  + Add test coverage information
+  + Fix Test::DistManifest test script so that it
+    doesn't depend on it
+  + Updated perlcriticrc
+
+1.0 - 14 Jun 2009 - Jonathan Yu <frequency@cpan.org>
+
+  + Initial release

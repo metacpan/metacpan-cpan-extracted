@@ -1,0 +1,297 @@
+NAME
+    ExtUtils::PerlPP - A Perl Preprocessor
+
+SYNOPSIS
+        use ExtUtils::PerlPP;
+        my $config = { 'version' => $VERSION,
+                       'driver' => $DRIVER };
+
+        # The long and winding road ...
+        my $self = ExtUtils::PerlPP->new();
+
+        $self->{'in_fh'} = IO::File->new('file.PL', 'r');
+        $self->{'out_fh'} = IO::File->new('file', 'w');
+        $self->{'config'} = 
+
+        $self->parse();
+
+        # And now a short cut for the same:
+        ppp('file.PL', 'file', $config);
+
+DESCRIPTION
+    Perl's installation suite, ExtUtils::MakeMaker, contains a mechanism for
+    installing preparsed files, so-called *PL* files: If the MakeMaker
+    utility detects files with the extension `.PL' then these files are
+    executed by *make*, usually creating a file of the same name, except the
+    `.PL' extension.
+
+    Writing these PL files is usually always the same, for example a typical
+    `.PL' file might look like this:
+
+        my $script = <<'SCRIPT';
+        ... # True file following here
+        SCRIPT
+
+        # Modify variable $script, depending on configuration, local
+        # site or whatever
+        ...
+
+        if (!open(FILE, ">file")  ||  !(print FILE $script)  ||
+            !close(FILE)) {
+            die "Cannot write file: $!";
+        }
+
+    But in essence, what else is this than a Perl preprocessor?
+
+    Traditionally you have to write such a Perl preprocessor for yourself
+    all the time, although I have found that they always do the same, for
+    example:
+
+    -       Fix defaults, for example installation paths.
+
+    -       Including or excluding code sections. It is a matter of taste
+            whether one likes to see
+
+                if ($] < 5.003) {
+                    # Thirty lines of code following here
+                    ...
+                } else {
+                    # A single line of code
+                    ...
+                }
+
+            when already using Perl 5.005. I don't.
+
+    This module is dedicated to simplify such tasks. In short, you can use
+    it like this:
+
+  Create a new preprocessor
+
+    You start with creating an instance of *ExtUtils::PerlPP* by calling the
+    *new* constructor:
+
+        my $ppp = ExtUtils::PerlPP->new(%attr);
+
+    The constructor accepts a list of attributes, including the following:
+
+    in_fh   The input file, any kind of IO object, for example an instance of
+            IO::File or IO::Scalar. More general: It can be any object that
+            offers a *getline* method.
+
+            A scalar value (to be distinguished from an IO::Scalar
+            instance!) will be interpreted as a file name that the method
+            opens for you.
+
+    out_fh  The output file; another IO object or any other object that offers a
+            *print* method. A scalar value is accepted as output file name.
+
+    config  A hash ref of preprocessor variables. In other words
+
+                $ppp->{'config'}->{'var'} = 1;
+
+            is what `-Dvar=val' is for the C preprocessor. Similarly you can
+            compare
+
+                delete $ppp->{'config'};
+
+            with `-Uvar'. See the section on "Macro replacements" below.
+            Unlike C, variables may be arbitrarily complex, in particular
+            you can use hash or array refs as values.
+
+            Surprisingly you may pass a scalar value again: In that case the
+            file of the same name evaluated and the result is used as a
+            configuration hash. In other words
+
+                $ppp->{'config'} = "myapp.cfg";
+
+            is similar to
+
+                $ppp->{'config'} = do "myapp.cfg";
+
+            Such config files can easily be created using the *Data::Dumper*
+            module. the Data::Dumper(3) manpage.
+
+    no_config_default
+            If a variable name is used, but no such attribute is present in
+            the *config* hash, then by default the variable is looked up in
+            the `$Config' from the *Config* module. This behaviour is
+            suppressed, if you set *no_config_default* to a TRUE value. the
+            Config(3) manpage.
+
+    no_makedirs
+            By default directories are created silently if required. For
+            example, if you pass a value of `/usr/local/foo/bar' as output
+            file and only `/usr/local' exists, then the subdirectory `foo'
+            will be created. The option *no_makedirs* suppresses this
+            behaviour.
+
+  Running the preprocessor
+
+    This is done by executing
+
+        $ppp->parse();
+
+    A Perl exception will be thrown in case of errors, thus the complete use
+    might look like this:
+
+        eval { $ppp->parse(); };
+        if ($@) { print "An error occurred: $@\n" }
+
+  Using the frontend
+
+    Most applications won't call the *new* or *parse* methods directly, but
+    rather do a
+
+        use ExtUtils::PerlPP;
+        ppp('infile', 'outfile', 'configfile');
+
+    This is equivalent to
+
+        my $parser = ExtUtils::PerlPP->new('in_fh' => 'infile',
+                                           'out_fh' => 'outfile',
+                                           'config' => 'configfile');
+        $parser->parse();
+
+    In order to be easily used within Makefiles, the ppp frontend can read
+    from @ARGV. That is, you can use the module like this:
+
+        perl -MExtUtils::PerlPP -e ppp <infile> <outfile> <configfile>
+
+    from the commandline.
+
+  Macro replacements
+
+    The primary use of preprocessor variables (aka attributes of `$ppp-
+    '{'config'}>) is replacing patterns in the stream written to the output
+    file. With `$c = $ppp-'{'config'}> in mind the typical patterns and
+    their replacements are:
+
+        ~~a~~               $c->{'a'}
+        ~~b~~               $c->{'b'}
+        ~~a->b~~            $c->{'a'}->{'b'}
+        ~~a->e~~            $c->{'a'}->{'e'}
+        ~~a->1~~            $c->{'a'}->[1]
+        ~~a->1->b~~         $c->{'a'}->[1]->{'b'}
+
+    I hope the idea is obvious. Real world examples might be:
+
+        my $config_file = "~~etc_dir~~/configuration";
+        my $VERSION = "~~version~~";
+
+    Preprocessor variables need not be scalar values: If a variable contains
+    a code ref, then the module will execute
+
+        &$var($ppp, $text);
+
+    and replace the pattern with the result. `$text' is the pattern being
+    replaced, for example, if `$ppp-'{'config'}->{'bar'}> has the value
+    `\&foo', then `~~bar~~' will be replaced with the result of
+
+        foo($ppp, "bar");
+
+    Arguments are not yet supported.
+
+  Creating macros
+
+    When talking about code refs, we need a possibility to create them. The
+    best possibility is creating them within the input file, as in
+
+        ~&foo&~ my($self, $text) = @_; $text x 2; ~&&~
+
+    This example is mainly equivalent to
+
+        $ppp->{'config'}->{'foo'} = sub {
+            my($self, $text) = @_; $text x 2;
+        };
+
+    The `~&var&~' definition must start at the beginning of a line, much
+    like the C preprocessor. The end pattern ~&&~ may appear at any point,
+    but the remaining line will be ignored.
+
+  Conditional output
+
+    The next application of a preprocessor is conditional output, as in an
+
+        #ifdef var
+        ...
+        #endif
+
+    segment. This can be done with
+
+        ~#if#~ <expression>
+        ...
+        ~#elsif#~ <expression>
+        ...
+        ~#else#~
+        ...
+        ~#endif#~
+
+    `<expression>' is handled as follows: First it is subject to the usual
+    pattern replacements and then it is evaluated as a Perl expression
+    returning a TRUE or FALSE value. Examples:
+
+        ~#if#~ "~~a~~"
+
+    is TRUE, if and only if $ppp->{'config'}->{'a'} is TRUE.
+
+    Currently conditionals must start at the beginning of a line and
+    expressions must not exceed a single line. Nesting conditions is
+    possible.
+
+  Embedding into MakeMaker
+
+    For using the preprocessor from within MakeMaker, I propose the
+    following: First of all you create a config file from within
+    Makefile.PL. For example the *libnet* suite creates a file `libnet.cfg'
+    and the *SNMP::Monitor* and *Cisco::Conf* modules create a file
+    `configuration'. The *Data::Dumper* module will aid you in that task.
+    the Data::Dumper(3) manpage.
+
+    Then you add the following to your Makefile.PL, I assume the name
+    `myapp.cnf' for the config file:
+
+        package MY;
+
+        sub processPL {
+            my($self) = shift;
+            return "" unless $self->{PL_FILES};
+            my(@m, $from, $to);
+            foreach $from (sort keys %{$self->{PL_FILES}}) {
+                $to = $self->{PL_FILES}->{$from};
+                push @m, "
+        all :: $self->{PL_FILES}->{$plfile}
+                $self->{NOECHO}\$(NOOP)
+
+        $self->{PL_FILES}->{$plfile} :: $plfile
+                \$(PERL) -I\$(INST_ARCHLIB) -I\$(INST_LIB) \
+                        -I\$(PERL_ARCHLIB) -I\$(PERL_LIB) \
+                        -MExtUtils::PerlPP -e 'ppp($from, $to, \"myapp.cnf\")'
+        ";
+            }
+            join "", @m;
+        }
+
+    Next you create your template files under their usual names, but add an
+    extension `.PL'. The MakeMaker utility will automatically detect these
+    files for you and add appropriate rules to the Makefile it generates.
+
+AUTHOR AND COPYRIGHT
+    This module is Copyright (C) 1998 by
+
+           Jochen Wiedmann
+           Am Eisteich 9
+           72555 Metzingen
+           Germany
+
+           Email: joe@ispsoft.de
+           Phone: +49 7123 14887
+
+    All rights reserved.
+
+    You may distribute this module under the terms of either the GNU General
+    Public License or the Artistic License, as specified in the Perl README
+    file.
+
+SEE ALSO
+    the ExtUtils::MakeMaker(3) manpage, the Data::Dumper(3) manpage
+

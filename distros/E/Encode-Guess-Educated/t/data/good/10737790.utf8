@@ -1,0 +1,1285 @@
+   [1]PNAS
+   [2]Proceedings of the National Academy of Sciences of the United States
+   of America
+
+   [3]Skip to main page content
+     * [4]Info for Authors
+     * [5]Editorial Board
+     * [6]About
+     * [7]Subscribe
+     * [8]Advertise
+     * [9]Contact
+     * [10]Feedback
+     * [11]Site Map
+
+     * [12]Invitrogen: Shaping Discovery, Improving Life
+     * [13]Sign up for PNAS eTOCs
+     * [14]Science Sessions: PNAS Podcast Program
+
+     * Institution: UNIV COLORADO HLTH SCI CTR
+     * [15]Sign In as Member / Individual
+
+ §1§ Accurate protein crystallography at ultra-high resolution: Valence
+electron distribution in crambin §1§
+
+    1. [16]Christian Jelsch [17]*,
+    2. [18]Martha M. Teeter [19]†,
+    3. [20]Victor Lamzin [21]‡,
+    4. [22]Virginie Pichon-Pesme [23]*,
+    5. [24]Robert H. Blessing [25]§, and
+    6. [26]Claude Lecomte [27]* , [28]¶
+
+    1.
+
+
+    ^*Laboratoire de Cristallographie et Modélisation des Matériaux
+    Minéraux et Biologiques, Université Henri Poincaré-Nancy 1-Centre
+    National de la Recherche Scientifique ESA 7036, BP 239, 54506
+    Vandoeuvre-lès-Nancy, France; ^†Department of Chemistry, Boston
+    College, Chestnut Hill, MA 02167; ^‡European Molecular Biology
+    Laboratory, Hamburg Outstation, c/o Deutsches Elektronen Synchrotron,
+    Notkestrasse 85, 22603 Hamburg, Germany; and ^§Hauptman-Woodward
+    Medical Research Institute, 73 High Street, Buffalo, NY 14203
+
+    1. Communicated by Herbert Hauptman, Hauptman-Woodward Medical
+       Research Institute, Buffalo, NY (received for review October 7,
+       1999)
+
+
+   [29]Next Section
+
+ §2§ Abstract §2§
+
+   The charge density distribution of a protein has been refined
+   experimentally. Diffraction data for a crambin crystal were measured to
+   ultra-high resolution (0.54 Å) at low temperature by using
+   short-wavelength synchrotron radiation. The crystal structure was
+   refined with a model for charged, nonspherical, multipolar atoms to
+   accurately describe the molecular electron density distribution. The
+   refined parameters agree within 25% with our transferable electron
+   density library derived from accurate single crystal diffraction
+   analyses of several amino acids and small peptides. The resulting
+   electron density maps of redistributed valence electrons (deformation
+   maps) compare quantitatively well with a high-level quantum mechanical
+   calculation performed on a monopeptide. This study provides validation
+   for experimentally derived parameters and a window into charge density
+   analysis of biological macromolecules.
+
+   The electronic charge density distribution of a molecule carries
+   information ([30]1) that determines its intermolecular interactions.
+   For example, the charge distribution of an enzyme complements that of
+   the substrate it recognizes and binds. The electrostatic potential and
+   electric moments derivable from the charge density ([31]1–[32]3)
+   provide maps that can guide the design of molecules for specified
+   interactions. Furthermore, powerful insights into the nature and
+   strength of hydrogen bonding and ionic interactions result from
+   analysis of the electron density gradient and Laplacian ([33]4–[34]6).
+   Extension of such analyses to proteins would permit a unique
+   understanding of the driving forces between biomolecules as well as the
+   subtleties of enzymatic reactions ([35]7).
+
+   Experimental electron density distributions are obtained by analysis of
+   single-crystal x-ray diffraction data measured to ultra-high
+   resolution, typically to a diffraction resolution limit d [min] ≈ 0.5 Å
+   ([36]1, [37]8, [38]9). The crystallographic studies usually map and
+   analyze the deformation density, which is the difference between the
+   actual electron density of the molecule and the density calculated for
+   the promolecule, a molecular superposition of spherical, neutral, i.e.,
+   free, atoms. The deformation density thus reveals the redistribution of
+   valence electron density caused by chemical bonding and intermolecular
+   interactions and also is used to calibrate theoretical electron density
+   calculations ([39]10). However, a difficulty in crystallography is the
+   separation of the anisotropic atomic mean-square displacements from the
+   static molecular electron distribution ([40]11). Proper experimental
+   deconvolution requires very accurate diffraction data to ultra-high
+   resolution. Thus, charge density studies have so far been limited to
+   small-unit-cell crystals, and proteins still await study.
+
+   We have shown ([41]12, [42]13) that effective thermal displacement
+   deconvolution and meaningful deformation density distributions can be
+   achieved for larger structures at lower resolution by transferring
+   average experimental electron density parameters. We have built a
+   database of such parameters derived from ultra-high resolution crystal
+   structures of amino acids and small peptides that are transferable to
+   polypeptides and small proteins. The limits of the transferability have
+   been analyzed in a study of a helical octapeptide with diffraction data
+   to d [min] = 0.82-Å resolution ([43]13). The deformation density showed
+   well-defined bond peaks between atoms with small to moderate
+   displacement parameters (B [eq] < 4 Å^2) when the Fourier synthesis was
+   performed with diffraction data complete to at least 0.9-Å resolution.
+   The analysis also yielded partial atomic charges that compare well with
+   the charges in the amber ([44]14) molecular modeling dictionary.
+
+   Here we report on the crystallographic charge density refinement of a
+   protein, crambin (46 residues), which is present in seeds of Crambe
+   abyssinica and homologous to membrane-active plant toxins ([45]15). The
+   structure of the protein (Fig. [46]1) at a resolution of 0.83 Å already
+   has been analyzed extensively to determine deviations from peptide
+   backbone geometry, crystallographic water structure, and disorder
+   correlations ([47]17–[48]19).
+   [49]Figure 1
+   View larger version:
+     * [50]In this window
+     * [51]In a new window
+
+     * [52]Download as PowerPoint Slide
+
+   Figure 1
+
+   Ribbon diagram ([53]16) showing the general fold of crambin. The
+   disulfide bridges are shown in yellow. β-sheet and extended chain are
+   shown in green and the helices are red.
+   [54]Previous Section[55]Next Section
+
+ §2§ Materials and Methods §2§
+
+ §3§ Data Collection. §3§
+
+   Crambin was purified and crystallized as described ([56]17). The
+   crystals belong to the space group P2[1] with unit cell parameters a =
+   40.82; b = 18.49; c = 22.37 Å; β = 90.47°, and one molecule per
+   asymmetric unit. X-ray diffraction data from a single crambin crystal
+   at T = 100 K were measured to d [min] = 0.54 Å by using λ = 0.54 Å
+   synchrotron radiation and a 300-mm MarResearch imaging plate detector
+   at the European Molecular Biology Laboratory BW7A beamline at the DORIS
+   storage ring, Deutsches Elektronen Synchrotron, Hamburg. Using the
+   denzo ([57]20) and drear ([58]21, [59]22) program suites, the data were
+   reduced to a 97.6% complete data set (Table [60]1). The structure was
+   refined against all of the reflections, except 5% of them used to
+   compute the free-R crystallographic residual ([61]23).
+   View this table:
+     * [62]In this window
+     * [63]In a new window
+
+   Table 1
+
+   X-ray diffraction data statistics
+
+ §3§ Electron Density Modeling. §3§
+
+   The electron density analysis used a simplified Hansen and Coppens
+   ([64]24) multipolar pseudoatom model, Formula Formula The first two
+   terms on the right describe spherically symmetric core-plus-valence
+   density, and the third term describes nonspherical, multipolar
+   redistribution of valence-shell density caused by chemical bonding. The
+   valence-shell electron populations P [val] adjust for inter-atomic
+   charge transfer, and the multipole populations P [lm] for aspherical
+   intra-atomic redistribution of valence electron density. The R [l] are
+   Slater-type radial functions, and the Y [lm±] are real spherical
+   harmonic angular functions (see ref. [65]24 for more details). The
+   dilatation coefficients of the spherical (κ) and multipolar (κ′)
+   valence electron density were not considered as variables and were set
+   to the standard value of unity (κ = 1.16 for hydrogen atoms).
+
+   The present analysis was performed by using the mopro least-squares
+   computer program (C.J. and C.L., unpublished work) for multipolar
+   charged atom modeling, which is a version of molly ([66]24) extensively
+   modified for protein applications. The conjugate gradient method has
+   been implemented, and stereochemical restraints, analogous to those of
+   the shelxl-97 structure refinement program ([67]25) have been
+   introduced. Distance restraints were applied in the disordered parts of
+   the structure. To facilitate the deconvolution of the deformation
+   density from vibrational smearing, rigid bond ([68]11) restraints were
+   applied to the thermal displacement parameters. All of the hydrogen
+   atoms in the ordered part of crambin were located in Fourier difference
+   maps. For nonhydrogen atoms, the multipole expansions included the
+   monopolar, dipolar, quadrupolar, and octupolar terms that have
+   significantly nonzero P [lm] values in the amino acid and peptide
+   database ([69]12, [70]13). For hydrogen atoms, only the P [val]
+   monopole and a dipole directed along the H-X covalent bond were
+   included.
+
+ §3§ Crystallographic Refinement. §3§
+
+   The electron density modeling was done in three stages. In refinement
+   I, a conventional, spherical, neutral atom model was used. Atomic
+   positions, anisotropic displacement parameters, and site occupancies
+   for solvent molecules and disordered protein atoms were refined by
+   using the programs shelxl-97 ([71]25) and mopro successively.
+
+   In refinement II, the multipolar charged atom model was applied with
+   electron density parameters (valence population and multipoles)
+   transferred from the database ([72]12, [73]13) to the protein
+   polypeptide main chain. For the side chains, only the multipole
+   parameters were transferred, as the valence populations P [val] show a
+   lower degree of transferability in the database. Water molecules were
+   considered spherical and neutral. The main-chain periodic moiety
+   -H^αC^αCONH- was set to be globally electrically neutral; as the
+   protein contains a variety of side chains, their global effect on the
+   polypeptide main-chain charge can be expected to cancel out.
+
+   The hydrogen atoms were moved outward along the X-H bond directions to
+   adjust the bond lengths to the values expected from neutron diffraction
+   studies ([74]26). The atomic positions and anisotropic thermal
+   displacement parameters were refined (alternatively) further with fixed
+   multipole and partial net charge parameters transferred from the
+   database. To ensure that the structure “forgot” the spherical atom
+   model, the temperature factors were annealed twice from random shifts
+   of up to ± 10%. As the convergence was slow, at least 400 refinement
+   cycles were necessary.
+
+   In refinement III, the average electron density parameters for the
+   polypeptide main chain were allowed to vary. All of the peptide groups
+   -C^a(-H^a)-C(=O)-N(-H^N)- were constrained to be electrically neutral
+   and equivalent. The disordered portions, accounting for 30% of the
+   protein atoms, were modeled with fixed electron density parameters that
+   were updated regularly during refinement III. The coordinates, the
+   thermal displacement parameters, and the charge density parameters were
+   refined alternatively.
+
+ §3§ Charge Refinement. §3§
+
+   Diffraction-derived atomic charges are given by q ^atom = N [val] ^atom
+   − P [val] ^atom, where N [val] is the number of valence electrons in
+   the neutral free atom and P [val] is the refined valence-shell
+   population in the bound pseudoatom. Charges derived from the P [val]
+   values might, however, be biased by effective charge transfer through
+   the multipoles. To compensate for this bias, the P [val] parameters
+   were refitted by using a spherical atom model. In this procedure
+   ([75]27), only the valence population and dilatation coefficient were
+   refined while the multipole population parameters were reset to and
+   held fixed at P [lm] = 0, and the atomic positional and thermal
+   parameters were held fixed at their refined values from refinement II
+   or III.
+
+ §3§ Electron Density Maps. §3§
+
+   Residual maps were computed as Fourier transforms of the structure
+   factor differences (|F [obs]| − |F [calc]|) exp (iφ[calc]).
+
+   The experimental static deformation density was computed from the
+   crystallographic modeling as the atomic superposition-sum over the
+   molecule Δρ = Σ[atom] ρ[atom] ^multipolar − ρ[atom] ^spherical. This
+   density is “static” in that it is computed for atoms at rest.
+
+   A theoretical static deformation density Δρ = ρ[molecule] − Σ[atom]
+   ρ[free-atom] had been computed from a wavefunction for a
+   pseudo-monopeptide ([76]5) from an ab initio Hartree-Fock
+   self-consistent-field molecular orbitals calculation performed with a
+   triplezeta-plus-(C,N,O-d and H-p)-polarization-function Gaussian basis
+   set.
+
+   The dynamic experimental deformation electron density was obtained by
+   Fourier transformation of the difference |F [obs]|exp(iΦ[calc]
+   ^multipolar) − |F [calc] ^spherical|exp(iΦ[calc] ^spherical). This
+   density is “dynamic” in that both the structure factor amplitudes and
+   phases are affected by atomic thermal vibrational smearing. It is
+   “experimental” in that the Fourier sum is truncated at the experimental
+   diffraction resolution limit, and the |F [obs]| coefficients
+   incorporate experimental error.
+   [77]Previous Section[78]Next Section
+
+ §2§ Results §2§
+
+ §3§ Residual Maps. §3§
+
+   An important question is whether significant deviations from the
+   spherical-atom approximation can be experimentally observed for
+   proteins. To address this issue, the crambin structure was first
+   refined classically, by using a spherical, neutral atom model
+   (refinement I). The quality of the fit to this spherical scattering
+   factor model was evaluated by residual electron density maps. These
+   maps show systematic bonding density features (Fig. [79]2 A), but also
+   contained a significant amount of random noise, which was not in favor
+   of a charge density refinement for individual atoms.
+   [80]Figure 2
+   View larger version:
+     * [81]In this window
+     * [82]In a new window
+
+     * [83]Download as PowerPoint Slide
+
+   Figure 2
+
+   Residual electron density in the peptide bond plane. (A) For the
+   peptide Ala-9–Arg-10 when using a spherical neutral atom model, contour
+   level 0.05 e^−/Å^3. (B) Averaged over the 34 nondisordered peptides in
+   crambin when using a spherical neutral atom model. (C) When using a
+   multipolar charged atom model transferred from the database and (D)
+   with average valence populations and multipoles refined, contour level
+   0.02 e^−/Å^3. Positive: red lines; negative: blue lines.
+
+   Taking advantage of the repetition of the same chemical motif along the
+   polypeptide main chain, the signal to noise ratio of the crambin
+   residual map was increased by averaging over the 34 nondisordered
+   peptide groups (Fig. [84]2 B). The averaged map displayed significant
+   positive residual density in the bonds between the nonhydrogen atoms
+   (with a maximum Δρ = 0.12 e^−/Å^3 in the C^α-C bond), and negative
+   residual density was found in the H^a and H^N hydrogen regions,
+   indicating unmodeled electron depletion on the hydrogen atoms. These
+   features in the residual map clearly demonstrate that the
+   spherical-atom model does not provide an adequate fit to the
+   experimental diffraction data ([85]13, [86]28).
+
+   After transfer of the statistically significant multipoles from the
+   database (Table [87]2 ), the residual features were greatly reduced in
+   the peptide-averaged residual electron density (Fig. [88]2 C). In fact,
+   residual bond densities were even negative, indicating that the
+   deformation density transferred from the database ([89]12) needs
+   further adjustments (V.P.-P., C.J., C.L., and B. Guillot, unpublished
+   work).
+   View this table:
+     * [90]In this window
+     * [91]In a new window
+
+   Table 2
+
+   Average valence and multipole populations for the atoms of the
+   polypeptide main chain
+
+   The well-defined peaks on the covalent bonds as well as the low noise
+   level in the averaged residual maps (Fig. [92]2 B and C) encouraged us
+   to obtain chemically meaningful deformation densities for the
+   main-chain peptide moiety. The average statistically significant
+   multipole and partial net charge parameters of the peptide main-chain
+   atoms thus were allowed to vary in the refinement. The resultant
+   peptide-averaged residual density map (Fig. [93]2 D) showed
+   substantially less negative residual density along the peptide bonds
+   with |ΔΦ| < 0.06 e^−/Å^3. The progressive flattening of residual
+   density features through the three stages of refinement (Fig. [94]2
+   B–D) is convincing physical evidence of real improvement in the
+   modeling. The remaining global negative residual density in the peptide
+   bond plane (Fig. [95]2 D) may be caused by the constrains applied:
+   first, the peptide moiety was constrained to be neutral; second, in
+   this version of the database, only the multipoles that are
+   significantly different from zero were considered and refined, and
+   third, the dilatation coefficients of the valence density were fixed.
+   Also the scale factor had decreased by 0.3% from the spherical atom
+   model to the final refinement, which also might account for a global
+   negative residual density.
+
+ §3§ Crystallographic Statistics. §3§
+
+   Although the spherical and multipolar atom models led to significantly
+   different (averaged) residual densities, they yielded only slightly
+   different values (Table [96]1) of their crystallographic amplitude
+   agreement indices and their phase agreement statistics from free-R
+   likelihood estimates computed with the rflexpl program ([97]29). The
+   unweighted average phase error is 6.3° and 6.0° when using the
+   spherical and multipolar atom model, respectively. The effect of the
+   atomic model on the calculated phase also has been analyzed. The
+   average phase difference between the spherical and multipolar
+   refinements is <|ΔΦ|> = 3.8°, which is smaller than the estimated phase
+   error itself. This difference is presumably small because the
+   anisotropic thermal displacement parameters in a spherical atoms model
+   can accommodate much of the valence density deformation ([98]13,
+   [99]30) that should be properly described by a multipolar model. The
+   importance of model testing against residual maps also must be
+   emphasized.
+
+ §3§ Electron Density Parameters. §3§
+
+   The charge density refinement of the average peptide led to a realistic
+   static deformation density, except for the peptide oxygen atom lone
+   pairs. The charge density parameters of the oxygen atom therefore were
+   readjusted to their database values. The oxygen lone pair density had
+   indeed showed up less clearly than the bonding deformation density in
+   Fig. [100]2 B. Proper refinement of the charge density parameters
+   describing the oxygen lone pairs would require even higher-resolution
+   diffraction data and a lower thermal motion as these features are only
+   0.3 Å distant from the oxygen nucleus.
+
+   As expected from the residual density in Fig. [101]2 C, the multipole
+   populations on the peptide nonhydrogen atoms generally decreased from
+   their database values in refinement III (Table [102]2), whereas for the
+   peptide hydrogen atoms H^a and H^N the dipole populations increased by
+   about 25%. This electron transfer in the H→X direction was compensated
+   by a corresponding increase of the electronic populations P [val] on
+   the hydrogen atoms (Table [103]2).
+
+ §3§ Deformation Maps. §3§
+
+   The static deformation density maps after transfer and refinement of
+   the statistically significant multipoles (refinements II and III) are
+   shown in Fig. [104]3 A and B. The two densities display a correlation
+   coefficient of 0.89 in the peptide bond plane displayed in Fig. [105]3.
+   As expected from Fig. [106]2 C, there is a decrease of the rms
+   deformation density from 0.24 to 0.18 e^−/Å^3 in the peptide bond
+   plane. The database deformation density is clearly overestimated, as
+   the rms value computed on a sample of 13 experimental deformation maps
+   of peptide bonds present in the database is 0.194 ± 0.005. A
+   preliminary analysis of the current version of the database seems to
+   indicate that the overestimation of the deformation density is caused
+   by the dilatation coefficients κ and κ′, which were fixed to unity for
+   the non-H atoms. When average contraction/expansion coefficients are
+   used, the database deformation density has a rms value of 0.18, and the
+   correlation coefficient with the crambin-derived map reaches 92%.
+   [107]Figure 3
+   View larger version:
+     * [108]In this window
+     * [109]In a new window
+
+     * [110]Download as PowerPoint Slide
+
+   Figure 3
+
+   Deformation map in peptide bond plane. (A) Static map obtained from the
+   database parameters. (B) Experimental static map obtained by using
+   atomic charges and multipole parameters refined against the crambin
+   diffraction data. (C) Theoretical static map computed for the
+   pseudo-monopeptide (Z)-N-acetyl-α,β-dehydrophenylalanine methylamide
+   ([111]5). (D) Experimental dynamic map for the peptide Ala-9–Arg-10 of
+   crambin. The contour level is 0.05 e^−/Å^3. Positive: red lines;
+   negative: blue lines.
+
+   To further validate the results, the crambin experimental deformation
+   density maps were compared with corresponding theoretical maps obtained
+   from quantum mechanical calculations on the monopeptide (Z)-N-acetyl-α,
+   β-dehydrophenylalanine methylamide ([112]5) (Fig. [113]3 C). The bond
+   peak heights display an almost quantitative agreement in the two static
+   maps (Fig. [114]3 B and C). The experimental and theoretical
+   deformation densities have rms values of 0.18 and 0.20 e^−/Å^3,
+   respectively and give a correlation coefficient of 0.88 (if the regions
+   within 0.15-Å radius around the atomic nuclei are ignored). The
+   excellent consistency between the experimental results of this charge
+   density analysis of a protein and theoretical results for a high-level
+   calculation on a small peptide is remarkable.
+
+   According to the rms deformation densities, the 6–311G++ calculations
+   on the monopeptide do not agree with the database transferred map,
+   which again seems overestimated. The theoretical map has a rms
+   deformation density (0.20) that is in good agreement with the
+   experimental values found on 13 peptide bonds (0.194 ± 0.005) present
+   in the database; it is, however, slightly higher than the crambin
+   refined value (0.18).
+
+   The slightly lower deformation density features of the crambin refined
+   map might be caused by the less than small molecule quality of the
+   diffraction data and by the higher thermal motion. This attenuation
+   effect has been observed even more dramatically in the refinement of
+   atomic charges (see next paragraph).
+
+   A usual X-X refinement ([115]24), where the deformation density is in
+   principle deconvoluted from the thermal motion, was not attempted, as
+   the electron density residual in Fig. [116]2 B was weaker than what is
+   usually observed for small molecules. Also, such a refinement is
+   possible only for atoms with a sufficiently low thermal motion that
+   have thus a contribution to the diffraction that extends to the
+   subatomic resolution level (0.5 Å). The charge density parameters
+   refinement turned out to have a slow convergence; it was thus performed
+   only after the database transfer, which is a point close to the real
+   structure and therefore yields the best coordinates and thermal
+   displacement parameters ([117]12).
+
+   To see the charge density on individual atoms, the (unaveraged) dynamic
+   deformation map after refinement III has been computed. This density
+   incorporates the thermal motion of the atoms and the errors of the
+   diffraction data. The dynamic deformation density is shown in Fig.
+   [118]3 D for the peptide bond Ala-9–Arg-10. The density peaks are
+   generally visible on the covalent bonds; however, they are strongly
+   affected by the vibrationnal smearing and presumably also by the noise
+   in the diffraction data. As expected, lone-pair peaks on the oxygen
+   atom are attenuated because of thermal-motion smearing.
+
+ §3§ Atomic Charges Refinement. §3§
+
+   An important longer-range aim of our studies is to determine
+   experimental electrostatic parameters for biological macromolecules and
+   to calibrate the theoretically derived electrostatic parameters used in
+   biomolecular modeling calculations ([119]31). Net atomic charges can,
+   for instance, be derived experimentally from x-ray diffraction data via
+   pseudoatom modeling ([120]3, [121]27, [122]31). In analyses of
+   small-molecule structures, spherical-atom charges refitted after
+   multipolar refinements have been shown to yield molecular electric
+   moments that agree well with independently measured experimental values
+   ([123]3, [124]27).
+
+   The refitted charges of the crambin peptide atoms after refinement II
+   were: C^a +0.06, C +0.32, O −0.18, N −0.44, H^a +0.08, and H^N +0.16
+   electrons. These are charges for volume-occupying spherical atoms, and
+   they are chemically sensible, although generally smaller than the
+   nuclear-centered effective point-charges in the amber molecular
+   modeling dictionary ([125]14). The refitted charges after refinement
+   III were further attenuated to unrealistically small values, despite
+   the apparent reasonableness of the refined bonding deformation density.
+   Presumably the refinement of atomic charges is more sensitive to the
+   quality of the diffraction data, the scale factor calculation, and the
+   level of thermal motion, and it requires more accurate data to even
+   higher resolution.
+   [126]Previous Section[127]Next Section
+
+ §2§ Discussion §2§
+
+   The resolution (0.54 Å) and the quality of the crambin diffraction data
+   presented in this study permit the refinement of the average multipole
+   parameters for the polypeptide backbone, but not of the individual
+   atoms as suggested by the noise level in the nonaveraged maps (Figs.
+   [128]2 A and [129]3 D). With the availability of intense
+   third-generation synchrotron sources, crystallographic data could be
+   collected with high signal/noise ratios to even higher resolution for
+   the current crambin crystals. This experiment might allow meaningful,
+   nonaveraged, individual-atom charge density analysis for the inner
+   region of the protein that has a low thermal motion. The high
+   diffraction power of the crambin crystals with respect to protein
+   crystallography is correlated with the low thermal displacement
+   parameters of the protein atoms ([130]13); the median value is only B
+   [eq] = 2.5 Å^2.
+
+   This moderate thermal motion may be attributed to the three disulfide
+   bridges present in the crambin structure, the small unit cell, and the
+   tight crystal packing with only 30% (vol/vol) solvent, nearly all of
+   which is ordered. Low thermal vibration (B [eq] < 4 Å^2) of the
+   molecular structure is a prerequisite for measuring diffraction
+   intensities to ultra-high resolution ([131]13). The thermal motion
+   level in crambin is, however, high compared with usual values found in
+   small molecules crystallography (B ≈1–2 Å^2).
+
+   The work described here opens the way to numerous electron density
+   studies for proteins, because atomic-resolution protein diffraction is
+   becoming more and more accessible and accurate ([132]32). Depositions
+   at the Protein Data Bank of crystal structures of small and even medium
+   size proteins at resolutions better than 1.2 Å are becoming more
+   frequent ([133]33). For instance, from crystals of human aldose
+   reductase ([134]34), a 36-kDa protein, a diffraction data set to 0.65-Å
+   resolution recently has been collected and the multipolar refinement is
+   underway.
+
+   Further enhancements in protein crystal diffraction to the ultra-high
+   resolution level will extend the number of proteins that can be studied
+   with electron density methods. Research in the manipulation of crystal
+   growth conditions and the use of cryo-crystallography will be crucial.
+   These techniques can reduce the crystal mosaicity and/or lower the
+   attenuating contribution of the atomic displacement parameters to
+   diffraction intensities. This study shows that, at least for small
+   proteins, the collection of diffraction data to the subatomic level has
+   become feasible because of the remarkable technological advances in
+   synchrotron beamline facilities and area detectors.
+
+   The determination of the charges and the electronic distribution for
+   the atoms in the active site of enzymes will provide new information
+   and enable a better understanding of their function ([135]7). Another
+   important application of charge density to structural biology would be
+   the determination of electronic properties and oxidation states of
+   reactive metallic centers in redox and electron transfer
+   metalloproteins. Ultra-high resolution crystallographic studies
+   performed in parallel on metalloproteins and biomimetic compounds
+   ([136]35, [137]36) in combination with quantum mechanical calculations
+   will yield new insights into redox processes in biology. With the
+   enhancement of charge density modeling, the development of the database
+   of transferable parameters and the continued technological advances of
+   experimental crystallography, analyzing the electronic structure of
+   macrobiomolecules has considerable unexplored potential ([138]8).
+   [139]Previous Section[140]Next Section
+
+ §2§ Acknowledgments §2§
+
+   We thank Dr. Marie-Madeleine Rohmer (Strasbourg) for her help in the
+   computation of Fig. [141]3 C, the two referees for their comments on
+   the database parameters, and the European Union for financial support
+   for part of this work through Framework IV Biotechnology Contract
+   BIO4-CT96–1809. R.H.B. is grateful for research support from National
+   Institutes of Health Grant GM56829.
+   [142]Previous Section[143]Next Section
+
+ §2§ Footnotes §2§
+
+     * [144]↵ ¶ To whom reprint requests should be addressed. E-mail:
+       lecomte{at}lcm3b.u-nancy.fr.
+     * Data deposition: The atomic coordinates have been deposited in the
+       Protein Data Bank, [145]www.rcsb.org (PDB ID code [146]1ejg).
+     * Copyright © 2000, The National Academy of Sciences
+
+   [147]Previous Section
+
+ §2§ References §2§
+
+    1. [148]↵
+         1. Coppens P
+       (1997) X-Ray Charge Densities and Chemical Bonding (Oxford Univ.
+       Press, Oxford), pp 233–286.
+    2.
+         1. Stewart R F ,
+         2. Craven B M
+       (1993) Biophys J 65:998–1005, pmid:8241415.
+       [149]Abstract/FREE Full Text
+    3. [150]↵
+         1. Spackman M A ,
+         2. Byrom P G
+       (1996) Acta Crystallogr B 52:1023–1035.
+       [151]CrossRef
+    4. [152]↵
+         1. Bader R W F
+         1. Helpern J ,
+         2. Green M L H
+       (1990) in Atoms in Molecules: A Quantum Theory, eds Helpern J ,
+       Green M L H (Oxford Science, Oxford), pp 288–315.
+    5. [153]↵
+         1. Souhassou M ,
+         2. Blessing R H
+       (1999) J Appl Crystallogr 32:210–217.
+       [154]CrossRef
+    6. [155]↵
+         1. Espinosa E ,
+         2. Molins E ,
+         3. Lecomte C
+       (1999) Chem Phys Lett 300:745–748.
+       [156]CrossRef
+    7. [157]↵
+         1. Mesecar A D ,
+         2. Stoddard B L ,
+         3. Koshland D E
+       (1997) Science 277:202–206, pmid:9211842.
+       [158]Abstract/FREE Full Text
+    8. [159]↵
+         1. Coppens P
+       (1998) Acta Crystallogr A 54:779–788.
+       [160]CrossRef
+    9. [161]↵
+         1. Lecomte C
+         1. Hargittai I ,
+         2. Hargittai M
+       (1995) in Advances in Molecular Structure Research, eds Hargittai I
+       , Hargittai M (JAI Press, Greenwich, CT), pp 261–302.
+   10. [162]↵
+         1. Souhassou M ,
+         2. Lecomte C ,
+         3. Ghermani N E ,
+         4. Rohmer M M ,
+         5. Wiest R ,
+         6. Bénard M ,
+         7. Blessing R H
+       (1992) J Am Chem Soc 114:2371–2382.
+   11. [163]↵
+         1. Hirshfeld F L
+       (1976) Acta Crystallogr A 32:239–244.
+       [164]CrossRef
+   12. [165]↵
+         1. Pichon-Pesme V ,
+         2. Lecomte C ,
+         3. Lachekar H
+       (1995) J Phys Chem 99:6242–6250.
+       [166]CrossRef
+   13. [167]↵
+         1. Jelsch C ,
+         2. Pichon-Pesme V ,
+         3. Lecomte C ,
+         4. Aubry A
+       (1998) Acta Crystallogr D 54:1306–1318, pmid:10089507.
+       [168]CrossRef[169]Medline
+   14. [170]↵
+         1. Bayly C I ,
+         2. Cieplak P ,
+         3. Cornell W D ,
+         4. Kollman P A
+       (1993) J Phys Chem 97:10269–10280.
+       [171]CrossRef
+   15. [172]↵
+         1. Rao U ,
+         2. Stec B ,
+         3. Teeter M M
+       (1995) Acta Crystallogr D 51:914–924, pmid:15299761.
+       [173]CrossRef
+   16. [174]↵
+         1. Kraulis P G
+       (1991) J Appl Crystallogr 24:946–950.
+       [175]CrossRef
+   17. [176]↵
+         1. Teeter M M ,
+         2. Roe S M ,
+         3. Heo N H
+       (1993) J Mol Biol 230:292–311, pmid:8450543.
+       [177]CrossRef[178]Medline
+   18.
+         1. Stec B ,
+         2. Zhou R ,
+         3. Teeter M M
+       (1995) Acta Crystallogr D 51:663–681, pmid:15299796.
+       [179]CrossRef[180]Medline
+   19. [181]↵
+         1. Yamano A ,
+         2. Heo N H ,
+         3. Teeter M M
+       (1997) J Biol Chem 272:9597–9600, pmid:9092482.
+       [182]Abstract/FREE Full Text
+   20. [183]↵
+         1. Otwinowski Z ,
+         2. Minor W
+       (1997) Methods Enzymol 276:307–326.
+       [184]Web of Science
+   21. [185]↵
+         1. Blessing R H
+       (1997) J Appl Crystallogr 30:421–426.
+       [186]CrossRef
+   22. [187]↵
+         1. Blessing R H ,
+         2. Guo D Y ,
+         3. Langs D A
+         1. Fortier S
+       (1998) in Direct Methods for Solving Macromolecular Structures,
+       NATO ASI Series Volume, Series C: Mathematical and Physical
+       Sciences, ed Fortier S (Kluwer, Dordrecht, The Netherlands), 507,
+       pp 47–71.
+   23. [188]↵
+         1. Brünger A T
+       (1992) Nature (London) 355:472–474.
+       [189]CrossRef
+   24. [190]↵
+         1. Hansen N K ,
+         2. Coppens P
+       (1978) Acta Crystallogr A 34:909–921.
+       [191]CrossRef
+   25. [192]↵
+         1. Sheldrick G M ,
+         2. Schneider T
+       (1997) Methods Enzymol 276:319–343.
+   26. [193]↵
+         1. Allen F H
+       (1986) Acta Crystallogr B 42:515–522.
+   27. [194]↵
+         1. Coppens P ,
+         2. Guru Row T N ,
+         3. Leung P ,
+         4. Stevens E D ,
+         5. Becker P J ,
+         6. Yang Y W
+       (1979) Acta Crystallogr A 35:63–72.
+   28. [195]↵
+         1. Lamzin V S ,
+         2. Morris R J ,
+         3. Dauter Z ,
+         4. Wilson K S ,
+         5. Teeter M M
+       (1999) J Biol Chem 274:20753–20755, pmid:10409612.
+       [196]Abstract/FREE Full Text
+   29. [197]↵
+         1. Urzhumtsev A G ,
+         2. Skovoroda T P ,
+         3. Lunin V Y
+       (1996) J Appl Crystallogr 29:741–744.
+       [198]CrossRef
+   30. [199]↵
+         1. Coppens P
+       (1967) Science 158:1577–1579.
+       [200]Abstract/FREE Full Text
+   31. [201]↵
+         1. Bouhmaida N ,
+         2. Ghermani N-E ,
+         3. Lecomte C ,
+         4. Thalal A
+       (1998) Acta Crystallogr 53:556–563.
+   32. [202]↵
+         1. Dauter Z ,
+         2. Lamzin V S ,
+         3. Wilson K S
+       (1997) Curr Opin Struct Biol 7:681–688, pmid:9345627.
+       [203]CrossRef[204]Medline[205]Web of Science
+   33. [206]↵
+         1. Longhi S ,
+         2. Czjzek M ,
+         3. Cambillau C
+       (1998) Curr Opin Struct Biol 8:730–737, pmid:9914254.
+       [207]CrossRef[208]Medline[209]Web of Science
+   34. [210]↵
+         1. Lamour V ,
+         2. Barth P ,
+         3. Rogniaux H ,
+         4. Poterszman A ,
+         5. Howard E ,
+         6. Mitschler A ,
+         7. Van Dorsselaer A ,
+         8. Podjarny A ,
+         9. Moras D
+       (1999) Acta Crystallogr D 55:721–723, pmid:10089480.
+       [211]Medline
+   35. [212]↵
+         1. Lecomte C ,
+         2. Blessing R H ,
+         3. Coppens P ,
+         4. Tabard A
+       (1986) J Am Chem Soc. 108:6942–6949.
+       [213]CrossRef
+   36. [214]↵
+         1. Lecomte C ,
+         2. Rohmer M M ,
+         3. Bénard M
+         1. Kadish K M ,
+         2. Smith K ,
+         3. Guilard R
+       (1999) in in The Porphyrin Handbook: Theoretical and Physical
+       Characterization, eds Kadish K M , Smith K , Guilard R (Academic,
+       New York), 7, pp 39–79.
+
+     * [215]Add to CiteULike CiteULike
+     * [216]Add to Complore Complore
+     * [217]Add to Connotea Connotea
+     * [218]Add to Del.icio.us Del.icio.us
+     * [219]Add to Digg Digg
+     * [220]Add to Facebook Facebook
+     * [221]Add to Twitter Twitter
+
+   [222]What's this?
+   [223]« Previous | [224]Next Article »[225]Table of Contents
+
+ §3§ This Article §3§
+
+    1. PNAS March 28, 2000 vol. 97 no. 7 3171-3176
+
+    1. [226]AbstractFree
+    2. [227]Figures Only
+    3. » Full Text
+    4. [228]Full Text (PDF)
+
+ §4§ Classifications §4§
+
+    1.
+          + Biological Sciences
+               o [229]Biophysics
+
+ §4§ Services §4§
+
+    1. [230]Email this article to a colleague
+    2. [231]Alert me when this article is cited
+    3. [232]Alert me if a correction is posted
+    4. [233]Similar articles in this journal
+    5. [234]Similar articles in ISI
+    6. [235]Similar articles in PubMed
+    7. [236]Add to My File Cabinet
+    8. [237]Download to citation manager
+    9. [238]Request copyright permission
+
+ §4§ Citing Articles §4§
+
+    1. [239]Load citing article information
+    2. [240]Citing articles via CrossRef
+    3. [241]Citing articles via Web of Science
+    4. [242]Articles citing this article
+
+ §4§ Google Scholar §4§
+
+    1. [243]Articles by Jelsch, C.
+    2. [244]Articles by Lecomte, C.
+    3. [245]Search for related content
+
+ §4§ PubMed §4§
+
+    1. [246]PubMed citation
+    2. [247]Articles by Jelsch, C.
+    3. [248]Articles by Lecomte, C.
+    4.
+
+ §4§ Related Content §4§
+
+    1. [249]Load related web page information
+
+ §4§ Social Bookmarking §4§
+
+    1.
+          + [250]Add to CiteULike CiteULike
+          + [251]Add to Complore Complore
+          + [252]Add to Connotea Connotea
+          + [253]Add to Del.icio.us Del.icio.us
+          + [254]Add to Digg Digg
+          + [255]Add to Facebook Facebook
+          + [256]Add to Twitter Twitter
+       [257]What's this?
+
+ §3§ Navigate This Article §3§
+
+    1. [258]Top
+    2. [259]Abstract
+    3. [260]Materials and Methods
+    4. [261]Results
+    5. [262]Discussion
+    6. [263]Acknowledgments
+    7. [264]Footnotes
+    8. [265]References
+
+   Search PNAS ____________________ GO
+   [266]Link: Advanced Search
+
+ §3§ This Week's Issue §3§
+
+    1. [267]September 14, 2010, 107 (37)
+
+    1. [268]Current Issue
+
+ §4§ From the Cover §4§
+
+     * [269]Eyeing neural circuits in Drosophila
+     * [270]Optimizing live cell imaging
+     * [271]Public perceptions of energy use
+     * [272]Activating DNA mismatch repair
+     * [273]Evolution of collective migration
+
+    1. [274]Alert me to new issues of PNAS
+
+     * [275]Early Edition
+     * [276]Archives
+     * [277]Online Submission
+
+     * [278]Feature Articles
+       (Expanded research articles of exceptional breadth)
+     * [279]Commentaries
+       (Expert commentary on leading research)
+     * [280]Letters
+       (Online-only letters to the editor)
+     * [281]Inaugural Articles
+       (Articles by recently elected NAS members)
+     * [282]PNAS Profiles
+       (Biographical profiles of Academy members)
+     * [283]Sustainability Science
+       (Interactions of human and environmental systems)
+     * [284]Collected Papers
+       (Editorials, Perspectives, Reviews, Colloquia, etc.)
+     * [285]Special Features
+       (Solicited articles on exceptional research topics)
+     * [286]Sackler Colloquia
+       (Scientific reports held under NAS auspices)
+     * [287]Podcasts
+       Brief podcasts with leading scientists
+
+ §3§ Most §3§
+
+     *  §4§ Read §4§
+         1. [288]Molecular origins of fluorocarbon hydrophobicity
+         2. [289]Public perceptions of energy consumption and savings
+         3. [290]Detection of MLV-related virus gene sequences in blood of
+            patients with chronic fatigue syndrome and healthy blood
+            donors
+         4. [291]Inaugural Article: The Lucretian swerve: The biological
+            basis of human behavior and the criminal justice system
+         5. [292]The most influential journals: Impact Factor and
+            Eigenfactor
+       [293]» View all Most Read articles
+     *  §4§ Cited §4§
+         1. [294]DNA Sequencing with Chain-Terminating Inhibitors
+         2. [295]Electrophoretic Transfer of Proteins from Polyacrylamide
+            Gels to Nitrocellulose Sheets: Procedure and Some Applications
+         3. [296]Cluster analysis and display of genome-wide expression
+            patterns
+         4. [297]Significance analysis of microarrays applied to the
+            ionizing radiation response
+         5. [298]One-step inactivation of chromosomal genes in Escherichia
+            coli K-12 using PCR products
+       [299]» View all Most Cited articles
+
+     * [300]Current Issue
+     * [301]Archives
+     * [302]Online Submission
+     * [303]Info for Authors
+     * [304]Editorial Board
+     * [305]About
+
+     * [306]Subscribe
+     * [307]Advertise
+     * [308]Contact
+     * [309]Site Map
+
+   [310]Copyright ©2010 by the National Academy of Sciences
+
+References
+
+   Visible links
+   1. http://www.pnas.org/
+   2. http://www.pnas.org/
+   3. file://localhost/dev/paper.html#content-block
+   4. http://www.pnas.org/misc/iforc.shtml
+   5. http://www.pnas.org/misc/masthead.shtml
+   6. http://www.pnas.org/misc/about.shtml
+   7. http://www.pnas.org/subscriptions
+   8. http://www.pnas.org/misc/about.shtml#advertising
+   9. http://www.pnas.org/site/misc/contact.shtml
+  10. http://www.pnas.org/cgi/feedback
+  11. http://www.pnas.org/misc/sitemap.shtml
+  12. http://www.pnas.org/cgi/adclick/?ad=23983&adclick=true&url=http%3A%2F%2Fwww.lifetech.com%2Fcontent%2Flifetech%2Fen%2Fhome%2Fglobal-citizenship%2Fenvironmental-health-safety%2Fgreener-product-alternatives.html%3FCID%3DBN-CO12398-PNAS-468x60
+  13. http://www.pnas.org/cgi/adclick/?ad=21636&adclick=true&url=http%3A%2F%2Fwww.pnas.org%2Fcgi%2Falerts%2Fetoc
+  14. http://www.pnas.org/cgi/adclick/?ad=19262&adclick=true&url=http%3A%2F%2Fwww.pnas.org%2Fmisc%2Fpodcasts.shtml
+  15. http://www.pnas.org/login?uri=http%3A%2F%2Fwww.pnas.org%2Fcontent%2F97%2F7%2F3171.long
+  16. http://www.pnas.org/search?author1=Christian+Jelsch&sortspec=date&submit=Submit
+  17. file://localhost/dev/paper.html#aff-1
+  18. http://www.pnas.org/search?author1=Martha+M.+Teeter&sortspec=date&submit=Submit
+  19. file://localhost/dev/paper.html#aff-1
+  20. http://www.pnas.org/search?author1=Victor+Lamzin&sortspec=date&submit=Submit
+  21. file://localhost/dev/paper.html#aff-1
+  22. http://www.pnas.org/search?author1=Virginie+Pichon-Pesme&sortspec=date&submit=Submit
+  23. file://localhost/dev/paper.html#aff-1
+  24. http://www.pnas.org/search?author1=Robert+H.+Blessing&sortspec=date&submit=Submit
+  25. file://localhost/dev/paper.html#aff-1
+  26. http://www.pnas.org/search?author1=Claude+Lecomte&sortspec=date&submit=Submit
+  27. file://localhost/dev/paper.html#aff-1
+  28. file://localhost/dev/paper.html#fn-1
+  29. file://localhost/dev/paper.html#sec-1
+  30. file://localhost/dev/paper.html#ref-1
+  31. file://localhost/dev/paper.html#ref-1
+  32. file://localhost/dev/paper.html#ref-3
+  33. file://localhost/dev/paper.html#ref-4
+  34. file://localhost/dev/paper.html#ref-6
+  35. file://localhost/dev/paper.html#ref-7
+  36. file://localhost/dev/paper.html#ref-1
+  37. file://localhost/dev/paper.html#ref-8
+  38. file://localhost/dev/paper.html#ref-9
+  39. file://localhost/dev/paper.html#ref-10
+  40. file://localhost/dev/paper.html#ref-11
+  41. file://localhost/dev/paper.html#ref-12
+  42. file://localhost/dev/paper.html#ref-13
+  43. file://localhost/dev/paper.html#ref-13
+  44. file://localhost/dev/paper.html#ref-14
+  45. file://localhost/dev/paper.html#ref-15
+  46. file://localhost/dev/paper.html#F1
+  47. file://localhost/dev/paper.html#ref-17
+  48. file://localhost/dev/paper.html#ref-19
+  49. http://www.pnas.org/content/97/7/3171/F1.expansion.html
+  50. http://www.pnas.org/content/97/7/3171/F1.expansion.html
+  51. http://www.pnas.org/content/97/7/3171/F1.expansion.html
+  52. http://www.pnas.org/powerpoint/97/7/3171/F1
+  53. file://localhost/dev/paper.html#ref-16
+  54. file://localhost/dev/paper.html#abstract-1
+  55. file://localhost/dev/paper.html#sec-7
+  56. file://localhost/dev/paper.html#ref-17
+  57. file://localhost/dev/paper.html#ref-20
+  58. file://localhost/dev/paper.html#ref-21
+  59. file://localhost/dev/paper.html#ref-22
+  60. file://localhost/dev/paper.html#T1
+  61. file://localhost/dev/paper.html#ref-23
+  62. http://www.pnas.org/content/97/7/3171/T1.expansion.html
+  63. http://www.pnas.org/content/97/7/3171/T1.expansion.html
+  64. file://localhost/dev/paper.html#ref-24
+  65. file://localhost/dev/paper.html#ref-24
+  66. file://localhost/dev/paper.html#ref-24
+  67. file://localhost/dev/paper.html#ref-25
+  68. file://localhost/dev/paper.html#ref-11
+  69. file://localhost/dev/paper.html#ref-12
+  70. file://localhost/dev/paper.html#ref-13
+  71. file://localhost/dev/paper.html#ref-25
+  72. file://localhost/dev/paper.html#ref-12
+  73. file://localhost/dev/paper.html#ref-13
+  74. file://localhost/dev/paper.html#ref-26
+  75. file://localhost/dev/paper.html#ref-27
+  76. file://localhost/dev/paper.html#ref-5
+  77. file://localhost/dev/paper.html#sec-1
+  78. file://localhost/dev/paper.html#sec-13
+  79. file://localhost/dev/paper.html#F2
+  80. http://www.pnas.org/content/97/7/3171/F2.expansion.html
+  81. http://www.pnas.org/content/97/7/3171/F2.expansion.html
+  82. http://www.pnas.org/content/97/7/3171/F2.expansion.html
+  83. http://www.pnas.org/powerpoint/97/7/3171/F2
+  84. file://localhost/dev/paper.html#F2
+  85. file://localhost/dev/paper.html#ref-13
+  86. file://localhost/dev/paper.html#ref-28
+  87. file://localhost/dev/paper.html#T2
+  88. file://localhost/dev/paper.html#F2
+  89. file://localhost/dev/paper.html#ref-12
+  90. http://www.pnas.org/content/97/7/3171/T2.expansion.html
+  91. http://www.pnas.org/content/97/7/3171/T2.expansion.html
+  92. file://localhost/dev/paper.html#F2
+  93. file://localhost/dev/paper.html#F2
+  94. file://localhost/dev/paper.html#F2
+  95. file://localhost/dev/paper.html#F2
+  96. file://localhost/dev/paper.html#T1
+  97. file://localhost/dev/paper.html#ref-29
+  98. file://localhost/dev/paper.html#ref-13
+  99. file://localhost/dev/paper.html#ref-30
+ 100. file://localhost/dev/paper.html#F2
+ 101. file://localhost/dev/paper.html#F2
+ 102. file://localhost/dev/paper.html#T2
+ 103. file://localhost/dev/paper.html#T2
+ 104. file://localhost/dev/paper.html#F3
+ 105. file://localhost/dev/paper.html#F3
+ 106. file://localhost/dev/paper.html#F2
+ 107. http://www.pnas.org/content/97/7/3171/F3.expansion.html
+ 108. http://www.pnas.org/content/97/7/3171/F3.expansion.html
+ 109. http://www.pnas.org/content/97/7/3171/F3.expansion.html
+ 110. http://www.pnas.org/powerpoint/97/7/3171/F3
+ 111. file://localhost/dev/paper.html#ref-5
+ 112. file://localhost/dev/paper.html#ref-5
+ 113. file://localhost/dev/paper.html#F3
+ 114. file://localhost/dev/paper.html#F3
+ 115. file://localhost/dev/paper.html#ref-24
+ 116. file://localhost/dev/paper.html#F2
+ 117. file://localhost/dev/paper.html#ref-12
+ 118. file://localhost/dev/paper.html#F3
+ 119. file://localhost/dev/paper.html#ref-31
+ 120. file://localhost/dev/paper.html#ref-3
+ 121. file://localhost/dev/paper.html#ref-27
+ 122. file://localhost/dev/paper.html#ref-31
+ 123. file://localhost/dev/paper.html#ref-3
+ 124. file://localhost/dev/paper.html#ref-27
+ 125. file://localhost/dev/paper.html#ref-14
+ 126. file://localhost/dev/paper.html#sec-7
+ 127. file://localhost/dev/paper.html#ack-1
+ 128. file://localhost/dev/paper.html#F2
+ 129. file://localhost/dev/paper.html#F3
+ 130. file://localhost/dev/paper.html#ref-13
+ 131. file://localhost/dev/paper.html#ref-13
+ 132. file://localhost/dev/paper.html#ref-32
+ 133. file://localhost/dev/paper.html#ref-33
+ 134. file://localhost/dev/paper.html#ref-34
+ 135. file://localhost/dev/paper.html#ref-7
+ 136. file://localhost/dev/paper.html#ref-35
+ 137. file://localhost/dev/paper.html#ref-36
+ 138. file://localhost/dev/paper.html#ref-8
+ 139. file://localhost/dev/paper.html#sec-13
+ 140. file://localhost/dev/paper.html#fn-group-1
+ 141. file://localhost/dev/paper.html#F3
+ 142. file://localhost/dev/paper.html#ack-1
+ 143. file://localhost/dev/paper.html#ref-list-1
+ 144. file://localhost/dev/paper.html#xref-fn-1-1
+ 145. http://www.rcsb.org/
+ 146. http://www.pnas.org/external-ref?link_type=PDB&access_num=1ejg
+ 147. file://localhost/dev/paper.html#fn-group-1
+ 148. file://localhost/dev/paper.html#xref-ref-1-1
+ 149. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=biophysj&resid=65/3/998
+ 150. file://localhost/dev/paper.html#xref-ref-3-1
+ 151. http://www.pnas.org/external-ref?access_num=10.1107/S0108768196008294&link_type=DOI
+ 152. file://localhost/dev/paper.html#xref-ref-4-1
+ 153. file://localhost/dev/paper.html#xref-ref-5-1
+ 154. http://www.pnas.org/external-ref?access_num=10.1107/S0021889898011923&link_type=DOI
+ 155. file://localhost/dev/paper.html#xref-ref-6-1
+ 156. http://www.pnas.org/external-ref?access_num=10.1016/S0009-2614(98)01399-2&link_type=DOI
+ 157. file://localhost/dev/paper.html#xref-ref-7-1
+ 158. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=sci&resid=277/5323/202
+ 159. file://localhost/dev/paper.html#xref-ref-8-1
+ 160. http://www.pnas.org/external-ref?access_num=10.1107/S0108767398008575&link_type=DOI
+ 161. file://localhost/dev/paper.html#xref-ref-9-1
+ 162. file://localhost/dev/paper.html#xref-ref-10-1
+ 163. file://localhost/dev/paper.html#xref-ref-11-1
+ 164. http://www.pnas.org/external-ref?access_num=10.1107/S0567739476000533&link_type=DOI
+ 165. file://localhost/dev/paper.html#xref-ref-12-1
+ 166. http://www.pnas.org/external-ref?access_num=10.1021/j100016a071&link_type=DOI
+ 167. file://localhost/dev/paper.html#xref-ref-13-1
+ 168. http://www.pnas.org/external-ref?access_num=10.1107/S0907444998004466&link_type=DOI
+ 169. http://www.pnas.org/external-ref?access_num=10089507&link_type=MED
+ 170. file://localhost/dev/paper.html#xref-ref-14-1
+ 171. http://www.pnas.org/external-ref?access_num=10.1021/j100142a004&link_type=DOI
+ 172. file://localhost/dev/paper.html#xref-ref-15-1
+ 173. http://www.pnas.org/external-ref?access_num=10.1107/S0108270194012552&link_type=DOI
+ 174. file://localhost/dev/paper.html#xref-ref-16-1
+ 175. http://www.pnas.org/external-ref?access_num=10.1107/S0021889891004399&link_type=DOI
+ 176. file://localhost/dev/paper.html#xref-ref-17-1
+ 177. http://www.pnas.org/external-ref?access_num=10.1006/jmbi.1993.1143&link_type=DOI
+ 178. http://www.pnas.org/external-ref?access_num=8450543&link_type=MED
+ 179. http://www.pnas.org/external-ref?access_num=10.1107/S0907444994014484&link_type=DOI
+ 180. http://www.pnas.org/external-ref?access_num=15299796&link_type=MED
+ 181. file://localhost/dev/paper.html#xref-ref-19-1
+ 182. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=jbc&resid=272/15/9597
+ 183. file://localhost/dev/paper.html#xref-ref-20-1
+ 184. http://www.pnas.org/external-ref?access_num=A1997BH42P00020&link_type=ISI
+ 185. file://localhost/dev/paper.html#xref-ref-21-1
+ 186. http://www.pnas.org/external-ref?access_num=10.1107/S0021889896014628&link_type=DOI
+ 187. file://localhost/dev/paper.html#xref-ref-22-1
+ 188. file://localhost/dev/paper.html#xref-ref-23-1
+ 189. http://www.pnas.org/external-ref?access_num=10.1038/355472a0&link_type=DOI
+ 190. file://localhost/dev/paper.html#xref-ref-24-1
+ 191. http://www.pnas.org/external-ref?access_num=10.1107/S0567739478001886&link_type=DOI
+ 192. file://localhost/dev/paper.html#xref-ref-25-1
+ 193. file://localhost/dev/paper.html#xref-ref-26-1
+ 194. file://localhost/dev/paper.html#xref-ref-27-1
+ 195. file://localhost/dev/paper.html#xref-ref-28-1
+ 196. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=jbc&resid=274/30/20753
+ 197. file://localhost/dev/paper.html#xref-ref-29-1
+ 198. http://www.pnas.org/external-ref?access_num=10.1107/S0021889896007194&link_type=DOI
+ 199. file://localhost/dev/paper.html#xref-ref-30-1
+ 200. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=sci&resid=158/3808/1577
+ 201. file://localhost/dev/paper.html#xref-ref-31-1
+ 202. file://localhost/dev/paper.html#xref-ref-32-1
+ 203. http://www.pnas.org/external-ref?access_num=10.1016/S0959-440X(97)80078-4&link_type=DOI
+ 204. http://www.pnas.org/external-ref?access_num=9345627&link_type=MED
+ 205. http://www.pnas.org/external-ref?access_num=A1997YB57900012&link_type=ISI
+ 206. file://localhost/dev/paper.html#xref-ref-33-1
+ 207. http://www.pnas.org/external-ref?access_num=10.1016/S0959-440X(98)80093-6&link_type=DOI
+ 208. http://www.pnas.org/external-ref?access_num=9914254&link_type=MED
+ 209. http://www.pnas.org/external-ref?access_num=000077614300010&link_type=ISI
+ 210. file://localhost/dev/paper.html#xref-ref-34-1
+ 211. http://www.pnas.org/external-ref?access_num=10089480&link_type=MED
+ 212. file://localhost/dev/paper.html#xref-ref-35-1
+ 213. http://www.pnas.org/external-ref?access_num=10.1021/ja00282a019&link_type=DOI
+ 214. file://localhost/dev/paper.html#xref-ref-36-1
+ 215. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/97/7/3171&title=Accurate%20protein%20crystallography%20at%20ultra-high%20resolution%3A%20Valence%20electron%20distribution%20in%20crambin+--+Jelsch%20et%20al.%2097%20%287%29%3A%203171+--+PNAS&doi=&link_type=CITEULIKE
+ 216. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/97/7/3171&title=Accurate%20protein%20crystallography%20at%20ultra-high%20resolution%3A%20Valence%20electron%20distribution%20in%20crambin+--+Jelsch%20et%20al.%2097%20%287%29%3A%203171+--+PNAS&doi=&link_type=COMPLORE
+ 217. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/97/7/3171&title=Accurate%20protein%20crystallography%20at%20ultra-high%20resolution%3A%20Valence%20electron%20distribution%20in%20crambin+--+Jelsch%20et%20al.%2097%20%287%29%3A%203171+--+PNAS&doi=&link_type=CONNOTEA
+ 218. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/97/7/3171&title=Accurate%20protein%20crystallography%20at%20ultra-high%20resolution%3A%20Valence%20electron%20distribution%20in%20crambin+--+Jelsch%20et%20al.%2097%20%287%29%3A%203171+--+PNAS&doi=&link_type=DEL_ICIO_US
+ 219. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/97/7/3171&title=Accurate%20protein%20crystallography%20at%20ultra-high%20resolution%3A%20Valence%20electron%20distribution%20in%20crambin+--+Jelsch%20et%20al.%2097%20%287%29%3A%203171+--+PNAS&doi=&link_type=DIGG
+ 220. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/short/97/7/3171&title=Accurate%20protein%20crystallography%20at%20ultra-high%20resolution%3A%20Valence%20electron%20distribution%20in%20crambin+--+Jelsch%20et%20al.%2097%20%287%29%3A%203171+--+PNAS&doi=&link_type=FACEBOOK
+ 221. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/97/7/3171&title=Accurate%20protein%20crystallography%20at%20ultra-high%20resolution%3A%20Valence%20electron%20distribution%20in%20crambin+--+Jelsch%20et%20al.%2097%20%287%29%3A%203171+--+PNAS&doi=&link_type=TWITTER
+ 222. http://www.pnas.org/help/social_bookmarks.dtl
+ 223. http://www.pnas.org/content/97/7/3166.short
+ 224. http://www.pnas.org/content/97/7/3177.short
+ 225. http://www.pnas.org/content/97/7.toc
+ 226. http://www.pnas.org/content/97/7/3171.abstract
+ 227. http://www.pnas.org/content/97/7/3171.figures-only
+ 228. http://www.pnas.org/content/97/7/3171.full.pdf+html
+ 229. http://www.pnas.org/search?tocsectionid=Biophysics&sortspec=date&submit=Submit
+ 230. http://www.pnas.org/email?gca=pnas;97/7/3171&current-view-path=/content/97/7/3171.long
+ 231. http://www.pnas.org/cgi/alerts/ctalert?alertType=citedby&addAlert=cited_by&cited_by_criteria_resid=pnas;97/7/3171&saveAlert=no&return-type=article&return_url=http://www.pnas.org/content/97/7/3171.long
+ 232. http://www.pnas.org/cgi/alerts/ctalert?alertType=correction&addAlert=correction&correction_criteria_value=97/7/3171&saveAlert=no&return-type=article&return_url=http://www.pnas.org/content/97/7/3171.long
+ 233. http://www.pnas.org/search?qbe=pnas;97/7/3171&citation=Jelsch%20et%20al.%2097%20%287%29:%203171&submit=yes
+ 234. http://www.pnas.org/external-ref?access_num=pnas%3B97%2F7%2F3171&link_type=ISI_RELATEDRECORDS
+ 235. http://www.pnas.org/external-ref?access_num=10737790&link_type=MED_NBRS
+ 236. http://www.pnas.org/cgi/folders?action=addtofolder&wherefrom=JOURNALS&wrapped_id=pnas;97/7/3171
+ 237. http://www.pnas.org/citmgr?gca=pnas;97/7/3171
+ 238. http://www.pnas.org/misc/rightperm.shtml
+ 239. http://www.pnas.org/content/97/7/3171.long?cited-by=yes&legid=pnas;97/7/3171#cited-by
+ 240. http://www.pnas.org/cgi/crossref-forward-links/97/7/3171
+ 241. http://www.pnas.org/external-ref?access_num=pnas%3B97%2F7%2F3171&link_type=ISI_CITING
+ 242. http://www.pnas.org/external-ref?access_num=http://www.pnas.org/cgi/content/abstract/97/7/3171&link_type=GOOGLESCHOLAR
+ 243. http://scholar.google.com/scholar?q=%22author%3AJelsch%20author%3AC.%22
+ 244. http://scholar.google.com/scholar?q=%22author%3ALecomte%20author%3AC.%22
+ 245. http://www.pnas.org/external-ref?access_num=http://www.pnas.org/cgi/content/abstract/97/7/3171&link_type=GOOGLESCHOLARRELATED
+ 246. http://www.pnas.org/external-ref?access_num=10737790&link_type=PUBMED
+ 247. http://www.pnas.org/external-ref?access_num=Jelsch%20C&link_type=AUTHORSEARCH
+ 248. http://www.pnas.org/external-ref?access_num=Lecomte%20C&link_type=AUTHORSEARCH
+ 249. http://www.pnas.org/content/97/7/3171.long?related-urls=yes&legid=pnas;97/7/3171#related-urls
+ 250. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/97/7/3171&title=Accurate%20protein%20crystallography%20at%20ultra-high%20resolution%3A%20Valence%20electron%20distribution%20in%20crambin+--+Jelsch%20et%20al.%2097%20%287%29%3A%203171+--+PNAS&doi=&link_type=CITEULIKE
+ 251. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/97/7/3171&title=Accurate%20protein%20crystallography%20at%20ultra-high%20resolution%3A%20Valence%20electron%20distribution%20in%20crambin+--+Jelsch%20et%20al.%2097%20%287%29%3A%203171+--+PNAS&doi=&link_type=COMPLORE
+ 252. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/97/7/3171&title=Accurate%20protein%20crystallography%20at%20ultra-high%20resolution%3A%20Valence%20electron%20distribution%20in%20crambin+--+Jelsch%20et%20al.%2097%20%287%29%3A%203171+--+PNAS&doi=&link_type=CONNOTEA
+ 253. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/97/7/3171&title=Accurate%20protein%20crystallography%20at%20ultra-high%20resolution%3A%20Valence%20electron%20distribution%20in%20crambin+--+Jelsch%20et%20al.%2097%20%287%29%3A%203171+--+PNAS&doi=&link_type=DEL_ICIO_US
+ 254. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/97/7/3171&title=Accurate%20protein%20crystallography%20at%20ultra-high%20resolution%3A%20Valence%20electron%20distribution%20in%20crambin+--+Jelsch%20et%20al.%2097%20%287%29%3A%203171+--+PNAS&doi=&link_type=DIGG
+ 255. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/short/97/7/3171&title=Accurate%20protein%20crystallography%20at%20ultra-high%20resolution%3A%20Valence%20electron%20distribution%20in%20crambin+--+Jelsch%20et%20al.%2097%20%287%29%3A%203171+--+PNAS&doi=&link_type=FACEBOOK
+ 256. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/97/7/3171&title=Accurate%20protein%20crystallography%20at%20ultra-high%20resolution%3A%20Valence%20electron%20distribution%20in%20crambin+--+Jelsch%20et%20al.%2097%20%287%29%3A%203171+--+PNAS&doi=&link_type=TWITTER
+ 257. http://www.pnas.org/help/social_bookmarks.dtl
+ 258. file://localhost/dev/paper.html#content-block
+ 259. file://localhost/dev/paper.html#abstract-1
+ 260. file://localhost/dev/paper.html#sec-1
+ 261. file://localhost/dev/paper.html#sec-7
+ 262. file://localhost/dev/paper.html#sec-13
+ 263. file://localhost/dev/paper.html#ack-1
+ 264. file://localhost/dev/paper.html#fn-group-1
+ 265. file://localhost/dev/paper.html#ref-list-1
+ 266. http://www.pnas.org/search
+ 267. http://www.pnas.org/content/current
+ 268. http://www.pnas.org/content/current
+ 269. http://www.pnas.org/content/107/37/16378
+ 270. http://www.pnas.org/content/107/37/16016
+ 271. http://www.pnas.org/content/107/37/16054
+ 272. http://www.pnas.org/content/107/37/16066
+ 273. http://www.pnas.org/content/107/37/16172
+ 274. http://www.pnas.org/cgi/alerts/etoc
+ 275. http://www.pnas.org/content/early/recent
+ 276. http://www.pnas.org/content
+ 277. http://www.pnas.org/site/misc/onlinesubmission.shtml
+ 278. http://www.pnas.org/cgi/collection/feature_articles
+ 279. http://www.pnas.org/content/by/section/Commentaries
+ 280. http://www.pnas.org/cgi/collection/letters
+ 281. http://www.pnas.org/cgi/collection/inaugurals
+ 282. http://www.pnas.org/cgi/collection/profiles
+ 283. http://www.pnas.org/site/misc/sustainability.shtml
+ 284. http://www.pnas.org/site/misc/collectedpapers.shtml
+ 285. http://www.pnas.org/site/misc/special.shtml
+ 286. http://www.pnas.org/site/misc/colloquia.shtml
+ 287. http://www.pnas.org/site/misc/podcasts.shtml
+ 288. http://www.pnas.org/cgi/content/short/107/31/13603?rss=1&ssource=mfc
+ 289. http://www.pnas.org/cgi/content/short/1001509107v1?rss=1&ssource=mfc
+ 290. http://www.pnas.org/cgi/content/short/1006901107v1?rss=1&ssource=mfc
+ 291. http://www.pnas.org/cgi/content/short/107/10/4499?rss=1&ssource=mfc
+ 292. http://www.pnas.org/cgi/content/short/106/17/6883?rss=1&ssource=mfc
+ 293. http://www.pnas.org/reports/mfr1.dtl
+ 294. http://www.pnas.org/cgi/content/short/74/12/5463?rss=1&ssource=mfc
+ 295. http://www.pnas.org/cgi/content/short/76/9/4350?rss=1&ssource=mfc
+ 296. http://www.pnas.org/cgi/content/short/95/25/14863?rss=1&ssource=mfc
+ 297. http://www.pnas.org/cgi/content/short/98/9/5116?rss=1&ssource=mfc
+ 298. http://www.pnas.org/cgi/content/short/97/12/6640?rss=1&ssource=mfc
+ 299. http://www.pnas.org/reports/mfc1.dtl
+ 300. http://www.pnas.org/content/current
+ 301. http://www.pnas.org/content
+ 302. http://www.pnas.org/misc/onlinesubmission.shtml
+ 303. http://www.pnas.org/misc/iforc.shtml
+ 304. http://www.pnas.org/misc/masthead.shtml
+ 305. http://www.pnas.org/misc/about.shtml
+ 306. http://www.pnas.org/subscriptions
+ 307. http://www.pnas.org/misc/about.shtml#advertising
+ 308. http://www.pnas.org/cgi/feedback
+ 309. http://www.pnas.org/misc/sitemap.shtml
+ 310. http://www.pnas.org/misc/terms.shtml
+
+   Hidden links:
+ 311. http://www.pnas.org/entrez-links/10737790

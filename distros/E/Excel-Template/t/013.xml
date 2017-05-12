@@ -1,0 +1,8 @@
+<workbook>
+  <worksheet name="backref">
+    <cell ref="foo" text="1" />
+    <cell ref="foo" text="2" />
+    <cell ref="foo" text="3" />
+    <cell>=SUM(<range ref="foo"/>)</cell>
+  </worksheet>
+</workbook>

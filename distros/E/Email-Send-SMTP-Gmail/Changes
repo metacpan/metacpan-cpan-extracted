@@ -1,0 +1,16 @@
+Revision history for Email-Send-SMTP-Gmail
+
+See github
+
+0.40    2013/02/11
+        Due to lack of response from Net::SMTP::SSL, we added TLS support using Net::SMTP::TLS::ButMaintained
+0.33    2013/01/24
+        Temporal patch due the issue with RT 81710
+0.32    2012/06/29
+        Minor improvements
+0.30    2012/06/12
+        Improvements: use this module with other SMTP servers than Google
+0.24    2012/02/02
+        Fixbugs and improvements: RT 71864 and 74625
+0.01    Date/time
+        First version, released on an unsuspecting world.

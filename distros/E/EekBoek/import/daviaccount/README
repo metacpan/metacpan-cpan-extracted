@@ -1,0 +1,39 @@
+*  UNSUPPORTED  *  UNSUPPORTED  *  UNSUPPORTED  *  UNSUPPORTED  *  UNSUPPORTED  *
+
+Importeren vanuit DaviAccount (DaviDos en DaviAccount2000)
+==========================================================
+
+Deze programma's kunnen behulpzaam zijn bij het omzetten van een
+bestaande administratie in DaviAccount.
+
+Kies daartoe in DaviAccount de opdracht Exporteren -> Exact.
+
+Deze produceert de volgende bestanden:
+
+  EXACT61.TXT       Beschrijving
+  GRTBK.CSV         Grootboekinformatie
+  FMUTA6.CSV        Mutaties
+  DEBITR.CSV        Debiteureninformatie
+  CREDIT.CSV        Crediteureninformatie
+
+Het programma dvimport.pl leest deze bestanden, en produceert een
+aantal .sql bestanden ten behoeve van het aanmaken van de EekBoek
+database. Dit kan dan gebeuren met:
+
+  createdb <databasenaame>
+  psql -f <EekBoekInstallDir>/EB/schema/eekboek.sql <databasenaam>
+
+Daarna kunnen de programma's exirel.pl en eximut.pl de EekBoek
+opdrachten produceren om respectievelijk de relaties en de mutaties
+aan te maken.
+
+Deze programma's dienen uitsluitend om u op weg te helpen en
+pretenderen onder geen enkel beding volledig en/of betrouwbaar te
+zijn.
+
+DaviDOS compatibility note
+--------------------------
+
+Voor bestanden aangemaakt door DaviDOS moet aan de programma's de
+command line optie '--ac5' worden meegegeven.
+

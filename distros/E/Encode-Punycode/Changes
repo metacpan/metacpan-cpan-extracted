@@ -1,0 +1,24 @@
+Revision history for Perl extension Encode::Punycode
+
+1.002 (2016-12-27)
+	- FIXES: #116796: Fix for SYNOPSIS (reported by DOLMEN)
+	- documentation and metadata update
+
+1.001 (2011-12-08)
+	- FIXES: #72615 faulty data in Build.PL causes a lack of
+	  meta files, which breaks carton.
+
+0.99_20091223 Wed Dec 23 00:00:00 2009
+	- switch to Module::Build
+	- cleanup after switch to Github
+
+0.99_20071013 Sat Oct 13 12:00:00 CEST 2007
+	- now based on Net::IDN::Punycode
+	- FIXES: #14883: make test failure
+
+0.02  Tue May  7 11:52:30 JST 2002
+	- separated Punycode logic out to IDNA::Punycode
+	- CPAN release
+
+0.01  Mon May  6 18:34:18 2002
+	- original version

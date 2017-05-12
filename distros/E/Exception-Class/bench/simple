@@ -1,0 +1,24 @@
+use strict;
+use warnings;
+
+use Moose;
+use Benchmark qw( timethese );
+
+use Exception::Class (
+    'Ex1',
+    Ex2 => { isa => 'Ex1' },
+);
+
+timethese(
+    10_000, {
+        'one arg' => sub {
+            eval { Ex1->throw('foo') };
+        },
+        'named error arg' => sub {
+            eval { Ex1->throw( error => 'foo' ) };
+        },
+        'several args' => sub {
+            eval { Ex1->throw( message => 'foo', ignore_class => 'Bar' ) };
+        },
+    }
+);

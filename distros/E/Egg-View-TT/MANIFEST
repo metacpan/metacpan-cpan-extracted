@@ -1,0 +1,24 @@
+Changes
+eg/Example/lib/Example.pm
+eg/Example/root/index.tt
+inc/Module/AutoInstall.pm
+inc/Module/Install.pm
+inc/Module/Install/AutoInstall.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Egg/View/TT.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00_use.t
+t/01_view.t
+t/87_pod_coverage.t
+t/88_perlcritic.t
+t/89_pod.t

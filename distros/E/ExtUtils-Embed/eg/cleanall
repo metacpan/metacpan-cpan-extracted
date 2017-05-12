@@ -1,0 +1,7 @@
+unlink "xsinit.c";
+
+for (<*.c>, <*.o>) {
+    s/\.c//;
+    print "removing $_\n";
+    unlink $_;
+}

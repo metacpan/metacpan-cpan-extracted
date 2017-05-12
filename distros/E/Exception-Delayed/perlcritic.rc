@@ -1,0 +1,6 @@
+[TestingAndDebugging::RequireUseStrict]
+equivalent_modules = strictures
+
+[TestingAndDebugging::RequireUseWarnings]
+equivalent_modules = strictures
+

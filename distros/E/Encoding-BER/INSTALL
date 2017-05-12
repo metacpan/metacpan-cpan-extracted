@@ -1,0 +1,15 @@
+
+Installing:
+
+unbundle the tarball.
+
+run 'perl Makefile.PL'
+
+run 'make'
+
+run 'make install'
+
+run 'perldoc Encoding::BER'
+
+you are finished, sing a happy song, or, optionally, send in a bug report
+

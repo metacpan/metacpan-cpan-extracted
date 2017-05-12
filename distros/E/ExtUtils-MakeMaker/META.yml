@@ -1,0 +1,37 @@
+---
+abstract: 'Create a module Makefile'
+author:
+  - 'Michael G Schwern <schwern@pobox.com>'
+build_requires: {}
+configure_requires: {}
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: ExtUtils-MakeMaker
+no_index:
+  directory:
+    - t
+    - inc
+    - bundled
+    - my
+  package:
+    - DynaLoader
+    - in
+    - version
+requires:
+  Data::Dumper: '0'
+  Encode: '0'
+  File::Basename: '0'
+  File::Spec: '0.8'
+  Pod::Man: '0'
+  perl: '5.006'
+resources:
+  MailingList: makemaker@perl.org
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=ExtUtils-MakeMaker
+  homepage: https://metacpan.org/release/ExtUtils-MakeMaker
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/Perl-Toolchain-Gang/ExtUtils-MakeMaker
+version: '7.24'

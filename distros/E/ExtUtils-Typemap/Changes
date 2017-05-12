@@ -1,0 +1,24 @@
+Revision history for Perl extension ExtUtils::Typemap
+
+1.00 Wed  3 Aug 2011
+  - ExtUtils::Typemap is now only the thinnest of wrappers around
+    ExtUtils::Typemaps (note the plural). Please migrate to using
+    ExtUtils::Typemaps directly. See the docs on why.
+
+0.05 Sat  3 Jul 2010
+  - Typemap creation from string
+
+0.04 Mon 14 Dec 2009
+  - Fix hairy validation bug for duplicate XS types in TYPEMAP.
+
+0.03 Mon 14 Dec 2009
+  - Typemap merging
+
+0.02 Wed  9 Sep 2009
+  - Add as_string method.
+  - Fix to typemap validation.
+  - More tests.
+
+0.01 Tue  1 Sep 2009
+  - Initial CPAN release.
+

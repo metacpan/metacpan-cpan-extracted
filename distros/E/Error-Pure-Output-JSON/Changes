@@ -1,0 +1,42 @@
+0.10 2015-09-16T15:04:57+02:00
+ - Improve SEE ALSO section in doc.
+ - Move author tests to xt/ directory.
+ - Remove obsolete code (encode_json).
+ - Update LICENSE AND COPYRIGHT section in doc.
+ - Update Module::Install to 1.16 version.
+ - Update copyright years.
+
+0.09 2014-11-23T11:00:35+01:00
+ - XXX Move JSON.pm in distribution to lib/Error/Pure/Output/JSON.pm due
+   Module::Install requires command problem with JSON.pm, which isn't JSON
+   module.
+ - Update Module::Install to 1.14 version.
+
+0.08 2014-11-14T23:34:17+01:00
+ - Fix err_json() input arguments.
+ - Remove blank ERRORS section in doc.
+
+0.07 2014-10-01T13:04:33+02:00
+ - Add tests.
+ - Fix LICENSE file.
+ - Update Module::Install to 1.11 version.
+
+0.06 2013-11-15
+ - Add 'readme_from' directive to Makefile.PL.
+ - Add dependency for JSON 2.50 as stable version.
+
+0.05 2013-11-07
+ - Add minimal Perl version.
+ - Rewrite B<> to C<> in doc for code.
+
+0.04 2013-09-21
+ - Reformatted Changes file as per CPAN::Changes::Spec.
+
+0.03 2013-09-02
+ - Add Exporter to dependencies.
+
+0.02 2013-08-31
+ - Add README file.
+
+0.01 2013-08-30
+ - First version.

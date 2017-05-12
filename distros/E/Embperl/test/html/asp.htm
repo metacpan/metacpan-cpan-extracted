@@ -1,0 +1,30 @@
+<html>
+
+<head>
+<title>Embperl Tests - use ASP syntax</title>
+</head>
+
+<body>
+
+[$ syntax ASP EmbperlHTML $]
+
+<% $a = 1 ; %>
+<table border=<%= $a %>>
+    <% foreach (1..5) { %>
+        <tr>
+            <td><%= $_ %></td>
+            <td><%= $a += 2 %></td>
+        </tr>
+    <% } %>
+</table>
+
+<a href="<%= $a %>">
+<% $esc = 'p%u&g=הצü' ; %>
+<a href="<%= $esc %>">
+<a <%= $esc %> href="xxx">
+esc = <%= $esc %>
+
+
+</body>
+</html>
+

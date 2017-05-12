@@ -1,0 +1,12 @@
+Revision history for Perl extension Erlang::Interface.
+
+0.03  Sat Jan 23 15:35:00 2010
+	- added macros
+
+0.02  Fri Jan 15 00:16:05 2010
+	- added function
+
+0.01  Mon Jan 11 00:16:05 2010
+	- original version; created by h2xs 1.23 with options
+		-A -n Erlang::Interface
+

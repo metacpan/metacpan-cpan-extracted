@@ -1,0 +1,49 @@
+From daemon@orphan.zombinet Sun, 11 Nov 2007 06:58:35 +0200
+Return-path: <daemon@1.orphan.zombinet>
+Envelope-to: root@1.orphan.zombinet
+Delivery-date: Sun, 11 Nov 2007 06:58:35 +0200
+Received: from orphan.zombinet ([192.168.0.1])
+ by orphan.zombinet with smtp (Exim 4.63)
+ (envelope-from <daemon@orphan.zombinet>)
+ id 1Ir4u3-0001Xb-MI
+ for root@orphan.zombinet; Sun, 11 Nov 2007 06:58:35 +0200
+From: <daemon@orphan.zombinet>
+To: <root@orphan.zombinet>
+Date: Sun, 11 Nov 2007 06:58:35 EET
+Subject: [Samhain at orphan.zombinet] 11-11-2007 06:58:35: CRIT
+Message-Id: <E1Ir4u3-0001Xb-MI@orphan.zombinet>
+Content-Length: 438
+X-Test: Just a bwahaha
+
+-----BEGIN MESSAGE-----
+[2007-11-11T06:58:35+0200] orphan.zombinet
+CRIT : [2007-11-11T06:57:43+0200] msg=<POLICY [ReadOnly] --------T->, path=</etc/ppp/resolv.conf>, ctime_old=<[2007-11-10T22:39:57]>, ctime_new=<[2007-11-11T04:16:55]>, mtime_old=<[2007-11-10T22:39:57]>, mtime_new=<[2007-11-11T04:16:55]>,
+-----BEGIN SIGNATURE-----
+72EC87DCB8E1B67324DFC76E8D1BF4956F1E9D6E6D03B015
+000023 1194292332::orphan.zombinet
+-----END MESSAGE-----
+
+From daemon@orphan.zombinet Sun, 11 Nov 2007 06:58:35 +0200
+Return-path: <daemon@2.orphan.zombinet>
+Envelope-to: root@2.orphan.zombinet
+Delivery-date: Sun, 11 Nov 2007 06:58:35 +0200
+Received: from orphan.zombinet ([192.168.0.1])
+ by orphan.zombinet with smtp (Exim 4.63)
+ (envelope-from <daemon@orphan.zombinet>)
+ id 1Ir4u3-0001Xb-MI
+ for root@orphan.zombinet; Sun, 11 Nov 2007 06:58:35 +0200
+From: <daemon@orphan.zombinet>
+To: <root@orphan.zombinet>
+Date: Sun, 11 Nov 2007 06:58:35 EET
+Subject: [Samhain at orphan.zombinet] 11-11-2007 06:58:35: CRIT
+Message-Id: <E1Ir4u3-0001Xb-MI@orphan.zombinet>
+Lines: 7
+X-Test: Just another bwahaha
+
+-----BEGIN MESSAGE-----
+[2007-11-11T06:58:35+0200] orphan.zombinet
+CRIT : [2007-11-11T06:57:43+0200] msg=<POLICY [ReadOnly] --------T->, path=</etc/ppp/resolv.conf>, ctime_old=<[2007-11-10T22:39:57]>, ctime_new=<[2007-11-11T04:16:55]>, mtime_old=<[2007-11-10T22:39:57]>, mtime_new=<[2007-11-11T04:16:55]>,
+-----BEGIN SIGNATURE-----
+72EC87DCB8E1B67324DFC76E8D1BF4956F1E9D6E6D03B015
+000023 1194292332::orphan.zombinet
+-----END MESSAGE-----

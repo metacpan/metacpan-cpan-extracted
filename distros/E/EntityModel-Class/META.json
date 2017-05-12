@@ -1,0 +1,68 @@
+{
+   "abstract" : "Helper module for generating class definitions",
+   "author" : [
+      "Tom Molesworth <cpan@entitymodel.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "EntityModel-Class",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "perl" : "5.010001"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.48"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41",
+            "Test::Synopsis" : "0",
+            "version" : "0.9901"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Check::UnitCheck" : "0.13",
+            "Class::ISA" : "0",
+            "EntityModel::Log" : "0.004",
+            "Exporter" : "0",
+            "IO::Handle" : "0",
+            "List::Util" : "0",
+            "Mixin::Event::Dispatch" : "1.006",
+            "parent" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::CheckDeps" : "0.010",
+            "Test::Deep" : "0",
+            "Test::Fatal" : "0.010",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-entitymodel-class at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=EntityModel-Class"
+      },
+      "homepage" : "http://search.cpan.org/dist/EntityModel-Class/"
+   },
+   "version" : "0.016"
+}
+

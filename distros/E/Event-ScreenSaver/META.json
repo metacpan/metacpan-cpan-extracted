@@ -1,0 +1,65 @@
+{
+   "abstract" : "Provides the ability to hook functions to the starting",
+   "author" : [
+      "Ivan Wills <ivan.wills@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Event-ScreenSaver",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::Warnings" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "List::MoreUtils" : "0",
+            "Module::Build" : "0",
+            "Moose" : "0",
+            "Pod::Usage" : "0",
+            "Test::More" : "0",
+            "Test::NoWarnings" : "0",
+            "perl" : "5.006",
+            "version" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Event::ScreenSaver" : {
+         "file" : "lib/Event/ScreenSaver.pm",
+         "version" : "v0.0.6"
+      },
+      "Event::ScreenSaver::Unix" : {
+         "file" : "lib/Event/ScreenSaver/Unix.pm",
+         "version" : "v0.0.6"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Event-ScreenSaver"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/ivanwills/Event-ScreenSaver"
+      }
+   },
+   "version" : "v0.0.6"
+}

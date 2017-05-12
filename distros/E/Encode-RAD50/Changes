@@ -1,0 +1,72 @@
+0.012		2016-01-06	T. R. Wyant
+  No changes since 0.011_02.
+
+0.011_02	2016-01-05	T. R. Wyant
+  Correct 'bugtracker' metadata.
+
+0.011_01	2016-01-01	T. R. Wyant
+  Add GitHub repository to metadata.
+
+0.011		2014-11-11	T. R. Wyant
+  No change since 0.010_01
+
+0.010_01	2014-11-03	T. R. Wyant
+  No code changes - just registering presence.
+
+0.010		2013-08-05	T. R. Wyant
+  Get rid of Regexp alias qr{^rad50$}i, which is unneeded, and seems not
+    to work as advertised.
+  Modernize the eg/ scripts.
+
+0.009		2012-01-06	T. R. Wyant
+  Make Changes file comply with Test::CPAN::Changes, and add author test
+    xt/author/changes.t to be sure it stays that way.
+
+0.008		2011-12-17	T. R. Wyant
+  Recover author test xt/author/manifest.t, which was clobbered shortly
+    before the release of 0.007.
+
+0.007		2011-12-01	T. R. Wyant
+  Convert most tests to Test::More. Require Test::More 0.88 for build.
+  Update GNU GPL in LICENSES/Copying to have current FSF address.
+
+0.006		2011-10-31	T. R. Wyant
+  No changes, other than version.
+
+0.005_90	2011-10-20	T. R. Wyant
+  Reorganize tests into distribution tests (t/*) and author tests
+    (xt/author/*). The POD tests go the latter place, plus new Perl
+    Critic and executable-bit tests. Author tests require Module::Build.
+  Eliminate prototypes on encode() and decode(). They probably weren't
+    doing anything anyway, since prototypes are ignored on method calls.
+  Require Perl 5.006 (for 'our'). Add strictures
+  Eliminate use of string eval to load modules.
+  Redid declared dependencies to reflect reality.
+  Eliminate unused variables.
+  Fixed warning on uninitialized $written variable.
+  Update to Perl-Foundation-Recommended license and copyright wording.
+
+0.005		2007-09-16	T. R. Wyant
+  Rewrite t/basic.t again to use PerlIO, since ActivePerl still
+    had trouble with 0.004.
+  Update copyright.
+  Add explicit license statement.
+  Remove shebang lines from Build.PL, t/*.t, and make sure not
+    executable.
+
+0.004		2006-10-24	T. R. Wyant
+  Eliminate use of File::Temp in t/basic.t, since some ActivePerls
+    seem to have trouble with it. No other changes.
+
+0.003		2006-09-30	T. R. Wyant
+  Acknowledge help finding more uses for RAD50 (Brian), and
+    cvt syntax (Nora Narum).
+  Restructure kit (to lib/Encode/RAD50.pm).
+  Add Build.PL.
+  Add examples.
+
+0.002		2005-10-15	T. R. Wyant
+  I decide to play the CPANTS game. No change to functionality.
+
+0.001		2005-02-26	T. R. Wyant
+  Initial release to CPAN.

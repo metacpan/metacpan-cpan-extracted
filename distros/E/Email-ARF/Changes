@@ -1,0 +1,38 @@
+Revision history for Email::ARF::Report
+
+0.010     2013-08-10 23:28:47 America/New_York
+          look for type/subtype in ContentType, not composite/discrete
+
+0.009     2013-08-09 23:08:01 America/New_York
+          ensure compatibility with Email::MIME 1.923
+
+0.008     2013-07-29 21:54:04 America/New_York
+          really document that this is for RFC-standard ARF
+
+          remove link to PEP
+
+0.007     2013-07-25 17:20:14 America/Los_Angeles
+          document that this is for RFC-standard ARF
+
+          update issue tracker
+
+0.006     2011-03-24 23:39:47 America/New_York
+          document means to add extra headers to report
+
+0.005     2009-12-16
+          the original message part is now returned as a MIME instead of Simple
+          email object
+
+0.004     2009-11-20
+          tweak docs and prereqs (thanks, mstevens @ github)
+
+0.003     2007-03-22
+          improve create method and the report/message dichotomy
+          improve documentation
+          improve tests
+
+0.001     2007-03-21
+          add a lousy first-pass at create method
+
+0.000     2007-03-20
+          initial, totally experimental release

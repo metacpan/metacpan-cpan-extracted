@@ -1,0 +1,574 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1 plus MathML 2.0 plus SVG 1.1//EN" "http://www.w3.org/2002/04/xhtml-math-svg/xhtml-math-svg.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+  <textarea id="historyStorageField" style="position: absolute; top: -1000px; left: -1000px;"></textarea>
+  <script src="../jscript/dhtmlHistory.js" type="text/javascript"></script>
+  <script src="../jscript/SpryAssets/xpath.js" type="text/javascript"></script>
+  <script src="../jscript/SpryAssets/SpryData.js" type="text/javascript"></script>
+  <script src="../jscript/SpryAssets/SpryNestedXMLDataSet.js" type="text/javascript"></script>
+  <link href="../jscript/SpryAssets/SpryCollapsiblePanel.css" rel="stylesheet" type="text/css">
+
+  <script src="./tooltip.js" type="text/javascript"></script>
+  <script src="./edgeExpress.js" type="text/javascript"></script>
+
+  <script language="Javascript" type="text/javascript" src="../jscript/prototype-1.6.0.3.js"></script>
+  <script language="Javascript" type="text/javascript" src="../jscript/eedb_common.js"></script>
+  <script language="Javascript" type="text/javascript" src="../jscript/eedb_search.js"></script>
+  <script>
+    eedbDefaultAssembly="hg18";
+  </script>
+
+  <title>EdgeExpressDB</title>
+  <link href="../css/f4_style.css" rel="stylesheet" type="text/css">
+  <link href="../css/edgeXpress.css" rel="stylesheet" type="text/css">
+</head>
+
+<body onLoad="document.getElementById('dataTable').style.display='block';document.getElementById('searchText').focus();initialize();eedbClearSearchResults('eedbSearchBox1');">">
+
+<div id="mainContainer">
+
+<!-- START OF HEADER -->
+<div id="header">
+<!--               -->
+<div id="logo-left">
+<a href="http://www.riken.jp"><img src="../images/riken-logo.png" style="float:left;"></img></a>
+<a href="http://www.osc.riken.jp"> <img src="../images/osc_color.png" style="float:left;"></img></a>
+</div>
+<span style="font-size:20px; font-weight:bold;"><span style="color:CornflowerBlue;">OMICS sciences center</span>
+<center>EEDB development website</center></span>
+
+<div id="top_menu" style="clear:both;"> 
+  <a href="/">Home</a>
+  <a href="/fantom44/gev/gbrowse/hg18">Genome Browser</a>
+  <a class="selected" href="../view">EdgeExpressDB</a>
+</div>
+
+<!-- Sub Header for EdgeExpressDB -->
+<div id="exdb_menu">
+<div class="text">
+<span class="geneStyle">RIKEN OSC EdgeExpressDB&nbsp;&nbsp;&nbsp;</span>
+<a href="../about">about</a>
+<a class="selected" href="../view">center view</a>
+<a href="../subnet">subnet view</a>
+<a href="../contents">contents</a>
+</div>
+</div>
+<!-- End Sub Header -->
+
+<!--               -->
+</div>
+<!-- END OF HEADER -->
+
+
+<!-- START OF MAIN CONTENTS OF THE WEB PAGE -->
+<div id="mainContents" class="main">
+<!--                                        -->
+
+<div id="toolTipLayer" style="position:absolute;visibility:hidden"></div>
+<script language="JavaScript">initToolTips();</script>
+
+
+<!-- EEDB search system -->
+<div id="eedbSearchBox1" class="EEDBsearchSet" width="100%">
+<form onsubmit="singleValue();return false;">
+<span onclick="eedbClearSearchResults('eedbSearchBox1')">Search:</span>
+<input id="searchText" type="text" autocomplete="off" onkeyup="eedbMultiSearch('eedbSearchBox1', this.value, event)" size="140"></input>
+</form>
+<div id="search1" class="EEDBsearch" sources=""></div>
+
+</div>
+<!--              -->
+<div id="message"></div>
+
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<tr align="center">
+<td width="40%">INPUT</td>
+<td width="1px" nowrap><img src="../images/arrow.png"></td>
+<td width="320px">NODE</td>
+<td width="1px" nowrap><img src="../images/arrow.png"></td>
+<td width="33%">OUTPUT</td>
+</tr></table>
+<div id="dataTable" class="dataBorder" style="display:none;">
+<table width="100%"  style="background-color:#AADDFF;" class="tableBorder" cellpadding="2" >
+  <tr>
+    <td width="40%">
+     <div spry:region="g2g_from promoter_from gene_p_from exp_from ptb_from chip_from mirna_from" class="linkStyle" id="fromResults">
+     <div spry:state="loading" id="notification">
+         <div align="center"><img src="../images/loading.gif"></div>
+     </div>
+     <div spry:state="error">Failed to load EdgeExpressDB data!</div>
+     <div spry:state="ready" id="notification">Sort By:
+     <a href="#" onClick="sortInput('@name');return false;">Name</a>
+     <a href="#" onClick="sortInput('@weight');return false;">Weight</a>
+     <br><br>
+
+     <div class="maxSize">
+
+<!------- Promoters and TFBS predictions ---------------->
+<!------- Promoters and TFBS predictions ---------------->
+
+
+
+<table border="0">
+<tr>
+  <td spry:if="'{gene_p_from::ds_RowCount}'>0" colspan="2" class="promoter">
+    TFBS predictions
+  </td>
+  <td spry:if="'{promoter_from::ds_RowCount}'>0" colspan="2" class="promoter">
+     <span spry:choose="spry:choose">
+        <div align="center" spry:when="'{promoter_from::@type}'!='TFBS'">Promoters</div>
+        <div align="center" spry:default="spry:default">TFBS Matrices</div>
+     </span>
+  </td>
+</tr>
+
+<tr spry:repeat="promoter_from" spry:even="promoter_from even" spry:odd="promoter_from odd">
+<td width="100%">
+<span spry:repeat="gene_p_from" onMouseOver="ttip('gene_p_from','{promoter_from::ds_RowNumber}','{gene_p_from::ds_RowNumber}')" onMouseOut="toolTip()" class="linkStyle dragme" id="{gene_p_from::@feature_id}"><a href="#{gene_p_from::@feature_id}" onClick="gf('{gene_p_from::@feature_id}');">{gene_p_from::@name}</a>&nbsp;<span spry:choose="spry:choose">
+      <span spry:when="'{gene_p_from::@type}'=='published'"><a href="#" onClick="pmd('{gene_p_from::@pubmed}');"><img border="0" src="../images/doc.gif" align="top"></a></span>
+		 <span spry:default="spry:default">{gene_p_from::@type}</span>
+      </span><span spry:choose="spry:choose">
+          <span spry:when="'{gene_p_from::@weight}' >= 2" class="pExp2">&nbsp;&nbsp;</span>
+          <span spry:when="'{gene_p_from::@weight}' < 2 && '{gene_p_from::@weight}' >= 1.5" class="pExp1">&nbsp;&nbsp;</span>
+          <span spry:when="'{gene_p_from::@weight}' <1.5  && '{gene_p_from::@weight}' >= -1.5" class="Exp0">&nbsp;&nbsp;</span>
+          <span spry:when="'{gene_p_from::@weight}' <-1.5  && '{gene_p_from::@weight}' >= -2" class="nExp1">&nbsp;&nbsp;</span>
+          <span spry:when="'{gene_p_from::@weight}' <= -2" class="nExp2">&nbsp;&nbsp;</span>
+      </span>&nbsp;&nbsp;  </span>	</td>
+      
+<td class="promoter" >
+       <div align="center">
+           <span spry:choose="choose">
+                   <span spry:when="'{promoter_from::@type}'=='TFBS'" nowrap onMouseOver="ttip('TFBS','{promoter_from::ds_RowNumber}')" onMouseOut="toolTip()" id="{promoter_from::@feature_id}"><a href="#{promoter_from::@feature_id}" onClick="gf('{promoter_from::@feature_id}');">Matrix&nbsp;{promoter_from::ds_RowNumberPlus1}</a>
+                   </span>
+                  
+                   <span spry:default="default">
+                        <a href="#" onClick="showPromoterRegion('{promoter_from::@loc}');" 
+                        		onMouseOver="ttip('promoter_from','{promoter_from::ds_RowNumber}')" onMouseOut="toolTip()">
+                    	<span class="dragme" id="{promoter_from::@feature_id}">P{promoter_from::ds_RowNumberPlus1}<sup style="text-decoration:none">&nbsp;L2</sup>								<span spry:if="'{promoter_from::@source}'.indexOf('antisense')>-1"><br>(Antisense)</span>
+                        </span>
+                        </a>
+                    </span>
+            </span>
+       </div>
+</td>
+
+<td class="L3" spry:if="'{promoter_from::@type}'!='TFBS' && '{promoter_from::@L3promoter}'!='undefined'">
+	<div align="center">
+    <a href="#" onClick="showPromoterRegion('{promoter_from::@L3promoter}');" onMouseOver="toolTip('{promoter_from::@L3promoter}')" onMouseOut="toolTip()">L3<span spry:if="'{promoter_from::@source}'.indexOf('antisense')>-1"><br>(Antisense)</span>
+        </a>
+    </div>
+</td>
+
+</tr></table>
+    
+<!----------------------->
+<!----------------------->
+
+    <span spry:if="'{gene_p_from::ds_RowCount}'>0">
+    <br>
+    </span>
+
+    
+    <div spry:if="'{exp_from::ds_RowCount}'>0" class="divider">
+    <br>Experimental    </div>   
+<span spry:repeat="exp_from" nowrap onMouseOver="ttip('exp_from','{exp_from::ds_RowNumber}')" onMouseOut="toolTip()"  class="linkStyle dragme" id="{exp_from::@feature_id}"><a href="#{exp_from::@feature_id}" onClick="gf('{exp_from::@feature_id}');">{exp_from::@name}</a>&nbsp;<span spry:choose="spry:choose">
+      <span spry:when="'{exp_from::@type}'=='published'"><a href="#" onClick="pmd('{exp_from::@pubmed}')"><img border="0" src="../images/doc.gif" align="top"></a></span>
+	  <span spry:default="spry:default">{exp_from::@type}</span>
+      </span>
+       <span spry:choose="spry:choose">
+          <span spry:when="'{exp_from::@weight}' >= 2" class="pExp2">&nbsp;&nbsp;</span>
+          <span spry:when="'{exp_from::@weight}' < 2 && '{exp_from::@weight}' >= 1.5" class="pExp1">&nbsp;&nbsp;</span>
+          <span spry:when="'{exp_from::@weight}' <1.5  && '{exp_from::@weight}' >= -1.5" class="Exp0">&nbsp;&nbsp;</span>
+          <span spry:when="'{exp_from::@weight}' <-1.5  && '{exp_from::@weight}' >= -2" class="nExp1">&nbsp;&nbsp;</span>
+          <span spry:when="'{exp_from::@weight}' <= -2" class="nExp2">&nbsp;&nbsp;</span>       </span>&nbsp;&nbsp;</span>
+
+    <span spry:if="'{exp_from::ds_RowCount}'>0">
+    <br><br>
+    </span>
+
+   <div spry:if="'{chip_from::ds_RowCount}'>0" class="divider">
+    <br>ChIP   </div>
+<span spry:repeat="chip_from" nowrap onMouseOver="ttip('chip_from','{chip_from::ds_RowNumber}')" onMouseOut="toolTip()"  class="linkStyle dragme" id="{chip_from::@feature_id}"><nobr><a href="#{chip_from::@feature_id}" onClick="gf('{chip_from::@feature_id}');">{chip_from::@name}</a>&nbsp;<span spry:if="'{chip_from::@type}' == 'published'"><a href="#" onClick="pmd('{chip_from::@pubmed}')"><img border="0" src="../images/doc.gif" align="top"></a></span>&nbsp;</nobr> </span>
+   <span spry:if="'{chip_from::ds_RowCount}'>0">
+    <br><br>
+   </span>
+
+
+   <div spry:if="'{ptb_from::ds_RowCount}'>0" class="divider">
+    <br>Perturbation   </div>
+ 
+<span spry:repeat="ptb_from" nowrap onMouseOver="ttip('ptb_from','{ptb_from::ds_RowNumber}')" onMouseOut="toolTip()"  class="linkStyle dragme" id="{ptb_from::@feature_id}"><a href="#{ptb_from::@feature_id}" onClick="gf('{ptb_from::@feature_id}');">{ptb_from::@name}</a>&nbsp;<span spry:choose="spry:choose">
+      <span spry:when="'{ptb_from::@type}' == 'published'"><a href="#" onClick="pmd('{ptb_from::@pubmed}')"><img border="0" src="../images/doc.gif" align="top"></a></span>
+	  <span spry:default="spry:default">{ptb_from::@type}</span>
+      </span>
+       <span spry:choose="spry:choose">
+          <span spry:when="'{ptb_from::@weight}' >= 2" class="pExp2">&nbsp;&nbsp;</span>
+          <span spry:when="'{ptb_from::@weight}' < 2 && '{ptb_from::@weight}' >= 1.5" class="pExp1">&nbsp;&nbsp;</span>
+          <span spry:when="'{ptb_from::@weight}' <1.5  && '{ptb_from::@weight}' >= -1.5" class="Exp0">&nbsp;&nbsp;</span>
+          <span spry:when="'{ptb_from::@weight}' <-1.5  && '{ptb_from::@weight}' >= -2" class="nExp1">&nbsp;&nbsp;</span>
+          <span spry:when="'{ptb_from::@weight}' <= -2" class="nExp2">&nbsp;&nbsp;</span>
+      </span>&nbsp; </span>
+   <span spry:if="'{ptb_from::ds_RowCount}'>0">
+    <br><br>
+   </span>
+
+
+   <div spry:if="'{mirna_from::ds_RowCount}'>0" class="divider">
+    <br>miRNA   </div>
+ 
+<span spry:repeat="mirna_from" nowrap onMouseOver="ttip('mirna_from','{mirna_from::ds_RowNumber}')" onMouseOut="toolTip()"  class="linkStyle dragme" id="{mirna_from::@feature_id}"><nobr><a href="#{mirna_from::@feature_id}" onClick="gf('{mirna_from::@feature_id}');">{mirna_from::@name}</a>&nbsp;<span spry:choose="spry:choose">
+      <span spry:when="'{mirna_from::@type}' == 'published'"><a href="#" onClick="pmd('{mirna_from::@pubmed}')"><img border="0" src="../images/doc.gif" align="top"></a></span>
+	  <span spry:default="spry:default">{mirna_from::@type}</span>
+      </span>
+       <span spry:choose="spry:choose">
+          <span spry:when="'{mirna_from::@weight}' >= 2" class="pExp2">&nbsp;&nbsp;</span>
+          <span spry:when="'{mirna_from::@weight}' < 2 && '{mirna_from::@weight}' >= 1.5" class="pExp1">&nbsp;&nbsp;</span>
+          <span spry:when="'{mirna_from::@weight}' <1.5  && '{mirna_from::@weight}' >= -1.5" class="Exp0">&nbsp;&nbsp;</span>
+          <span spry:when="'{mirna_from::@weight}' <-1.5  && '{mirna_from::@weight}' >= -2" class="nExp1">&nbsp;&nbsp;</span>
+          <span spry:when="'{mirna_from::@weight}' <= -2" class="nExp2">&nbsp;&nbsp;</span>
+       </span>&nbsp;</nobr> </span>
+   <span spry:if="'{mirna_from::ds_RowCount}'>0">
+    <br><br>
+   </span>
+
+
+
+   <div spry:if="'{ds_RowCount}'&gt;0" class="divider">
+    <br>Other   </div>
+   
+<span spry:repeat="g2g_from" nowrap onMouseOver="ttip('g2g_from','{g2g_from::ds_RowNumber}')" onMouseOut="toolTip()"  class="linkStyle dragme" id="{@feature_id}"><a href="#{@feature_id}" onClick="gf('{@feature_id}');">{@name}</a>&nbsp;<span spry:choose="spry:choose">
+      <span spry:when="'{@type}' == 'published'"><a href="#" onClick="pmd('{@pubmed}')"><img border="0" src="../images/doc.gif" align="top"></a></span>
+	  <span spry:default="spry:default">{@type}</span>
+      </span>
+       <span spry:choose="spry:choose">
+          <span spry:when="'{@weight}' >= 2" class="pExp2">&nbsp;&nbsp;</span>
+          <span spry:when="'{@weight}' < 2 && '{@weight}' >= 1.5" class="pExp1">&nbsp;&nbsp;</span>
+          <span spry:when="'{@weight}' <1.5  && '{@weight}' >= -1.5" class="Exp0">&nbsp;&nbsp;</span>
+          <span spry:when="'{@weight}' <-1.5  && '{@weight}' >= -2" class="nExp1">&nbsp;&nbsp;</span>
+          <span spry:when="'{@weight}' <= -2" class="nExp2">&nbsp;&nbsp;</span>      
+       </span>&nbsp; </span></div>
+</div>
+</div>
+ </td>
+
+
+<!----------------------->
+
+<!----------------------->
+
+
+    <td  class="tdBorder">
+    <div class="geneStyle maxSize" style="height:275px;">
+    <div spry:region="feature">
+    <div spry:state="loading" id="notification" class="linkStyle">
+      <div align="center">
+      <br><br><br><br><br><br><br><br>
+      <br><br><img src="../images/loading.gif"></div>
+    </div>
+    <div spry:state="error">Failed to load EdgeExpressDB data!</div>
+    <div spry:state="ready" id="notification">
+    <div class="featureName" align="center">{@desc}<br> 
+      <span style="font-style:italic;font-size:small">{@category}</span>
+    </div>
+    <span id="entrezAlias"></span>
+<span id="genomeLoc"></span>
+<span id="fantomLink"></span>
+<span id="selfRegulates"></span>
+<br>
+Category: {@category} <span id="entrezLink"></span>
+<br>
+</div>
+    </div>
+
+     <div spry:region="featureSymbols ppi"  id="featureResults">
+     <div spry:state="loading" id="notification"></div>
+     <div spry:state="ready" id="notification">
+      <table spry:repeatChildren="featureSymbols" spry:choose="spry:choose" border="0" cellspacing="0">
+        <tr spry:when="'{@type}'.search(/(Ensembl_ID)|(Interpro)|(miRBase)/i)&gt;-1" >
+          <td class="symbolStyle">{@type}:</td>
+          <td class="symbolStyle" spry:choose="spry:choose">
+          <span spry:when="'{@type}'=='EntrezID'"><a href="http://www.ncbi.nlm.nih.gov/sites/entrez?db=gene&cmd=Retrieve&dopt=full_report&list_uids={@value}" target="entrez">{@value}</a></span>
+          <span spry:when="'{@type}'.search(/miRBase/)>-1"><a href="http://microrna.sanger.ac.uk/cgi-bin/sequences/mirna_entry.pl?acc={@value}" target="miRNA">{@value}</a></span>			          <span spry:when="'{@type}'.search(/Ensembl_ID/)>-1"><a href="http://www.ensembl.org/Homo_sapiens/geneview?gene={@value}" target="Ensembl">{@value}</a></span>
+          <span spry:default="spry:default">{@value}</span></td>
+        </tr>
+      </table>
+
+      
+      <span id="extraInfo" style="display:block">
+ 	<table cellspacing="0" spry:repeatChildren="featureSymbols" spry:choose="spry:choose">
+        <tr spry spry:when="'{@type}'.search(/(Ensembl_ID)|(Entrez)|(Interpro)|(miRBase)|(description)/i)==-1" >
+          <td class="symbolStyle">{@type}:</td>
+          <td class="symbolStyle" spry:choose="spry:choose">
+          <span spry:when="'{@type}'.search(/RefSeq/)>-1"><a href="http://www.ncbi.nlm.nih.gov/entrez/viewer.fcgi?val={@value}" target="RefSeq">{@value}</a></span>
+          <span spry:when="'{@type}'.search(/UniGene/)>-1"><a href="http://www.ncbi.nlm.nih.gov/sites/entrez?db=unigene&orig_db=unigene&term={@value}" target="UniGene">{@value}</a></span>
+          <span spry:when="'{@type}'.search(/MIM_/)>-1"><a href="http://www.ncbi.nlm.nih.gov/entrez/dispomim.cgi?id={@value}" target="OMIM">{@value}</a></span>
+          <span spry:when="'{@type}'.search(/OMIM/)>-1"><a href="http://www.ncbi.nlm.nih.gov/entrez/dispomim.cgi?id={@value}" target="OMIM">{@value}</a></span>
+          <span spry:when="'{@type}'.search(/PMID/)==0"><a href="http://www.ncbi.nlm.nih.gov/pubmed/{@value}" target="Pubmed">{@value}</a></span>
+          <span spry:when="'{@type}'.search(/PubmedID/)==0"><a href="http://www.ncbi.nlm.nih.gov/pubmed/{@value}" target="Pubmed">{@value}</a></span>
+          <span spry:when="'{@type}'.search(/EMBL/)==0"><a href="http://www.ebi.ac.uk/cgi-bin/emblfetch?style=html&id={@value}" target="EMBL">{@value}</a></span>
+          <span spry:when="'{@type}'.search(/Uniprot/)>-1"><a href="http://beta.uniprot.org/uniprot/?sort=score&query={@value}" target="Uniprot">{@value}</a></span>
+          <span spry:when="'{@type}'.search(/GO/)==0"><a href="http://amigo.geneontology.org/cgi-bin/amigo/go.cgi?view=details&search_constraint=terms&depth=0&query={@value}" target="GO">{@value}</a></span>
+          <span spry:when="'{@type}'.search(/IPI/)>-1"><a href="http://srs.ebi.ac.uk/srsbin/cgi-bin/wgetz?-id+3Capq1W0mts+-e+[IPI:'{@value}']+-qnum+1+-enum+1" target="IPI">{@value}</a></span>
+ 			<span spry:default="spry:default">{@value}</span>           </td>
+        </tr>
+      </table>
+    </span>
+    <br><hr>Protein-Protein Interactions<br><div id="dimer"></div>
+  <span spry:repeat="ppi" nowrap onMouseOver="ttip('ppi','{ppi::ds_RowNumber}')" onMouseOut="toolTip()"  class="linkStyle dragme" id="{ppi::@feature_id}"><a href="#{ppi::@feature_id}" onClick="gf('{ppi::@feature_id}');">{ppi::@name}</a><span spry:choose="spry:choose">
+      <span spry:when="'{@type}' == 'published'">&nbsp;<a href="#" onClick="pmd('{@pubmed}')"><img border="0" src="../images/doc.gif" align="top"></a>&nbsp;</span>
+      </span>&nbsp;       </span>       </div>
+      </div>
+      </div></td>
+
+    <!----------------------->
+
+    <!----------------------->
+
+
+
+
+    <td width="33%">
+     <div spry:region="g2g_to tfbs_to promoter_to exp_to ptb_to chip_to mirna_to feature" class="linkStyle" id="toResults">
+     <div spry:state="loading" id="notification">
+       <div align="center"><img src="../images/loading.gif"></div>
+     </div>
+     <div spry:state="error" id="notification">Failed to load EdgeExpressDB data!</div>
+
+     <div spry:state="ready" id="notification">
+  Sort By:
+      <a href="#" onClick="sortOutput('@name');return false;">Name</a></span>
+      <a href="#" onClick="sortOutput('@weight');return false;">Weight</a></span>
+<br>
+<br>
+<div class="maxSize">
+
+<span spry:repeatChildren="promoter_to" class="promoter">
+<a href="#" onClick="showPromoterRegion('{promoter_to::@loc}');" onMouseOver="ttip('promoter_to','{promoter_to::ds_RowNumber}')" onMouseOut="toolTip()">{promoter_to::@name}&nbsp;</a></span>
+
+    <span spry:if="'{promoter_to::ds_RowCount}'>0">
+    <br><br>
+    </span>
+
+   <div spry:if="'{exp_to::ds_RowCount}'>0" class="divider">
+    <br>Experimental   </div>
+
+<span spry:repeat="exp_to" nowrap onMouseOver="ttip('exp_to','{exp_to::ds_RowNumber}')" onMouseOut="toolTip()" class="dragme" id="{exp_to::@feature_id}">
+      <a href="#{exp_to::@feature_id}" onClick="gf('{exp_to::@feature_id}');">{exp_to::@name}</a>&nbsp;<span spry:choose="spry:choose"><span spry:when="'{exp_to::@type}' == 'published'"><a href="#" onClick="pmd('{exp_to::@pubmed}')"><img border="0" src="../images/doc.gif" align="top"></a></span>
+		    <span spry:default="spry:default">{exp_to::@type}</span>
+      </span><span spry:choose="spry:choose">
+          <span spry:when="'{exp_to::@weight}' >= 2" class="pExp2">&nbsp;&nbsp;</span>
+          <span spry:when="'{exp_to::@weight}' < 2 && '{exp_to::@weight}' >= 1.5" class="pExp1">&nbsp;&nbsp;</span>
+          <span spry:when="'{exp_to::@weight}' <1.5  && '{exp_to::@weight}' >= -1.5" class="Exp0">&nbsp;&nbsp;</span>
+          <span spry:when="'{exp_to::@weight}' <-1.5  && '{exp_to::@weight}' >= -2" class="nExp1">&nbsp;&nbsp;</span>
+          <span spry:when="'{exp_to::@weight}' <= -2" class="nExp2">&nbsp;&nbsp;</span>
+       </span>&nbsp;&nbsp; </span>
+ 
+<span spry:if="'{exp_to::ds_RowCount}'>0">
+<br><br>
+</span>
+
+
+
+   <div spry:if="'{ptb_to::ds_RowCount}'>0" class="divider">
+    <br>Perturbation   </div>
+ 
+<span spry:repeat="ptb_to" nowrap onMouseOver="ttip('ptb_to','{ptb_to::ds_RowNumber}')" onMouseOut="toolTip()" class="dragme" id="{ptb_to::@feature_id}">
+      <a href="#{ptb_to::@feature_id}" onClick="gf('{ptb_to::@feature_id}');">{ptb_to::@name}</a>&nbsp;<span spry:choose="spry:choose"><span spry:when="'{ptb_to::@type}' == 'published'"><a href="#" onClick="pmd('{ptb_to::@pubmed}')"><img border="0" src="../images/doc.gif" align="top"></a></span>
+		    <span spry:default="spry:default">{ptb_to::@type}</span>
+      </span><span spry:choose="spry:choose">
+          <span spry:when="'{ptb_to::@weight}' >= 2" class="pExp2">&nbsp;&nbsp;</span>
+          <span spry:when="'{ptb_to::@weight}' < 2 && '{ptb_to::@weight}' >= 1.5" class="pExp1">&nbsp;&nbsp;</span>
+          <span spry:when="'{ptb_to::@weight}' <1.5  && '{ptb_to::@weight}' >= -1.5" class="Exp0">&nbsp;&nbsp;</span>
+          <span spry:when="'{ptb_to::@weight}' <-1.5  && '{ptb_to::@weight}' >= -2" class="nExp1">&nbsp;&nbsp;</span>
+          <span spry:when="'{ptb_to::@weight}' <= -2" class="nExp2">&nbsp;&nbsp;</span>
+       </span>&nbsp; </span>
+ 
+<span spry:if="'{ptb_to::ds_RowCount}'>0">
+<br><br>
+</span>
+
+
+   <div spry:if="'{mirna_to::ds_RowCount}'>0" class="divider">
+    <br>miRNA   </div>
+ 
+<span spry:repeat="mirna_to" nowrap onMouseOver="ttip('mirna_to','{mirna_to::ds_RowNumber}')" onMouseOut="toolTip()" class="dragme" id="{mirna_to::@feature_id}"><nobr><a href="#{mirna_to::@feature_id}" onClick="gf('{mirna_to::@feature_id}');">{mirna_to::@name}</a>&nbsp;<span spry:choose="spry:choose"><span spry:when="'{mirna_to::@type}' == 'published'"><a href="#" onClick="pmd('{mirna_to::@pubmed}')"><img border="0" src="../images/doc.gif" align="top"></a></span>
+		    <span spry:default="spry:default">{mirna_to::@type}</span>
+      </span><span spry:choose="spry:choose">
+          <span spry:when="'{mirna_to::@weight}' >= 2" class="pExp2">&nbsp;&nbsp;</span>
+          <span spry:when="'{mirna_to::@weight}' < 2 && '{mirna_to::@weight}' >= 1.5" class="pExp1">&nbsp;&nbsp;</span>
+          <span spry:when="'{mirna_to::@weight}' <1.5  && '{mirna_to::@weight}' >= -1.5" class="Exp0">&nbsp;&nbsp;</span>
+          <span spry:when="'{mirna_to::@weight}' <-1.5  && '{mirna_to::@weight}' >= -2" class="nExp1">&nbsp;&nbsp;</span>
+          <span spry:when="'{mirna_to::@weight}' <= -2" class="nExp2">&nbsp;&nbsp;</span>
+       </span>&nbsp;</nobr> </span>
+ 
+<span spry:if="'{mirna_to::ds_RowCount}'>0">
+<br><br>
+</span>
+
+
+
+<div spry:if="'{tfbs_to::ds_RowCount}'>0" class="divider">
+<br>TFBS predictions</div>
+
+<span spry:choose="choose">
+   <span spry:when="parseInt('{tfbs_to::ds_RowCount}')>4000">
+     Sorry, too many edges for this version of the viewer to display! (TFBS prediction edge count is {tfbs_to::ds_RowCount})
+     <br><center>
+     <a href="#" onClick="window.open('tfbsOverflow.html?id={feature::@id}','overflow','width=500,height=350,screenx=20,screeny=20,menubar=0,scrollbars=1,toolbar=0,resizable=1')">View in Overflow Window</a></center>
+   </span>
+   <span spry:default="default">
+      <span spry:repeat="tfbs_to" nowrap onMouseOver="ttip('tfbs_to','{tfbs_to::ds_RowNumber}')" onMouseOut="toolTip()" class="dragme" id="{tfbs_to::@feature_id}">
+         <a href="#{tfbs_to::@feature_id}" onClick="gf('{tfbs_to::@feature_id}');">{tfbs_to::@name}</a>&nbsp;
+         <span spry:choose="spry:choose"> 
+           <span spry:when="'{tfbs_to::@type}' == 'published'">
+             <a href="#" onClick="pmd('{tfbs_to::@pubmed}')"><img border="0" src="../images/doc.gif" align="top"></a>
+           </span>
+           <span spry:default="spry:default">{tfbs_to::@type}</span>
+         </span>
+         <span spry:choose="spry:choose">
+             <span spry:when="'{tfbs_to::@weight}' >= 2" class="pExp2">&nbsp;&nbsp;</span>
+             <span spry:when="'{tfbs_to::@weight}' < 2 && '{tfbs_to::@weight}' >= 1.5" class="pExp1">&nbsp;&nbsp;</span>
+             <span spry:when="'{tfbs_to::@weight}' <1.5  && '{tfbs_to::@weight}' >= -1.5" class="Exp0">&nbsp;&nbsp;</span>
+             <span spry:when="'{tfbs_to::@weight}' <-1.5  && '{tfbs_to::@weight}' >= -2" class="nExp1">&nbsp;&nbsp;</span>
+             <span spry:when="'{tfbs_to::@weight}' <= -2" class="nExp2">&nbsp;&nbsp;</span>
+         </span>&nbsp; 
+      </span>
+   </span>
+</span> 
+<span spry:if="'{tfbs_to::ds_RowCount}'>0">
+<br><br>
+</span>
+
+
+
+   <div spry:if="'{chip_to::ds_RowCount}'>0" class="divider">
+    <br>ChIP   </div>
+   
+   <span spry:choose="choose">
+   	<span spry:when="parseInt('{chip_to::ds_RowCount}')>4000">
+    	Sorry, too many edges for this version of the viewer to display! (ChIP-Chip edge count is {chip_to::ds_RowCount})
+    <br><center><a href="#" onClick="window.open('chipOverflow.html?id={feature::@id}','Chipoverflow','width=500,height=350,screenx=20,screeny=20,menubar=0,scrollbars=1,toolbar=0,resizable=1')">View in Overflow Window</a></center>
+    </span>
+    <span spry:default="default">
+            <span spry:repeat="chip_to" nowrap onMouseOver="ttip('chip_to','{chip_to::ds_RowNumber}')" onMouseOut="toolTip()" class="dragme" id="{chip_to::@feature_id}"><nobr><a href="#{chip_to::@feature_id}" onClick="gf('{chip_to::@feature_id}');">{chip_to::@name}</a>&nbsp;<span spry:if="'{chip_to::@type}' == 'published'"><a href="#" onClick="pmd('{chip_to::@pubmed}');"><img border="0" src="../images/doc.gif" align="top"></a></span>&nbsp;</nobr> </span></span>   </span>
+ 
+<span spry:if="'{chip_to::ds_RowCount}'>0">
+<br><br>
+</span>
+
+
+
+   <div spry:if="'{g2g_to::ds_RowCount}'>0" class="divider">
+    <br>Other   </div>
+
+<span spry:choose="choose">
+   	<span spry:when="parseInt('{g2g_to::ds_RowCount}')>4000">
+    	Sorry, too many edges for this version of the viewer to display! (edge count is {g2g_to::ds_RowCount})
+        <br><center><a href="#" onClick="window.open('geneOverflow.html?id={feature::@id}','overflow','width=500,height=350,screenx=20,screeny=20,menubar=0,scrollbars=1,toolbar=0,resizable=1')">View in Overflow Window</a></center>  
+    </span>
+    <span spry:default="default">
+        <span spry:repeat="g2g_to" nowrap onMouseOver="ttip('g2g_to','{g2g_to::ds_RowNumber}')" onMouseOut="toolTip()" class="dragme" id="{g2g_to::@feature_id}">
+              <a href="#{g2g_to::@feature_id}" onClick="gf('{g2g_to::@feature_id}');">{g2g_to::@name}</a>&nbsp;<span spry:choose="spry:choose"><span spry:when="'{g2g_to::@type}' == 'published'"><a href="#" onClick="pmd('{g2g_to::@pubmed}')"><img border="0" src="../images/doc.gif" align="top"></a></span>
+                    <span spry:default="spry:default">{g2g_to::@type}</span>
+              </span><span spry:choose="spry:choose">
+                  <span spry:when="'{g2g_to::@weight}' >= 2" class="pExp2">&nbsp;&nbsp;</span>
+                  <span spry:when="'{g2g_to::@weight}' < 2 && '{g2g_to::@weight}' >= 1.5" class="pExp1">&nbsp;&nbsp;</span>
+                  <span spry:when="'{g2g_to::@weight}' <1.5  && '{g2g_to::@weight}' >= -1.5" class="Exp0">&nbsp;&nbsp;</span>
+                  <span spry:when="'{g2g_to::@weight}' <-1.5  && '{g2g_to::@weight}' >= -2" class="nExp1">&nbsp;&nbsp;</span>
+                  <span spry:when="'{g2g_to::@weight}' <= -2" class="nExp2">&nbsp;&nbsp;</span>
+               </span>&nbsp; </span>      </span></span> </div>
+</div></td>
+  </tr>
+</table>
+</div>
+
+
+ <table border="0" class="geneStyle" style="display:none;">
+   <tr>
+     <td>Filter Displayed: </td>
+     <td>&nbsp;&nbsp;Experimental
+     <input type="checkbox" id="exp" checked onClick="filterResults();"></td>
+     <td>&nbsp;&nbsp;Predicted
+     <input type="checkbox" id="pred" checked onClick="filterResults();"></td>
+     <td>&nbsp;&nbsp;Published
+       <input type="checkbox" id="pub" checked onClick="filterResults();"></td>
+     <td>&nbsp;&nbsp;miRNA
+     <input type="checkbox" id="mirna" checked onClick="filterResults();"></td>
+     <td>&nbsp;&nbsp;siRNA
+     <input type="checkbox" id="sirna" checked onClick="filterResults();"></td>
+     <td>&nbsp;&nbsp;ChIP_chip
+     <input type="checkbox" id="chip" checked onClick="filterResults();"></td>
+   </tr>
+</table>
+<table width="100%" border="0">
+  <tr class="geneStyle">
+    <td spry:region="feature"><a href="#" onClick="saveSource('{feature::@id}')">Save Source XML File</a></td>
+    &nbsp;&nbsp;&nbsp;
+    <td spry:region="feature"><a href="#" onClick="saveExpressionXML('{@id}')">Save Expression XML File</a></td>
+    <td><div align="right">Key <span class="pExp2">&nbsp;&gt;2&nbsp;</span><span class="pExp1">&nbsp;&gt;1.5&nbsp;</span><span class="Exp0" >&nbsp;&gt;-1.5&nbsp;</span><span class="nExp1">&nbsp;&lt;-1.5&nbsp;</span><span class="nExp2">&nbsp;&lt;-2&nbsp;</span></div></td>
+  </tr>
+</table>
+
+
+
+
+<div class="box">
+  <div class="boxHeading" tabindex="0">Expression Graph</div>
+  <div class="boxContent" id="graphPanel" align="center">
+  <div id="expressionGraphs"></div>
+  <div id="graphValues" style="display:none"></div>
+  <br>
+    <span id="promoterOptions" style="display:inline">
+Promoters
+(L2<input type="radio" name="radio" id="L2" checked="checked" onClick="checkPromoters();" />
+ L3<input type="radio" name="radio" id="L3" onClick="checkPromoters();" />) 
+<span id="L2Promoters"></span>
+<span id="L3Promoters" style="display:none"></span>
+</span>
+  	<span class="gborder">
+    Riken Dataset:
+     1<input type="checkbox" id="riken1" onClick="updateGraphs();" checked>
+     3<input type="checkbox" id="riken3" onClick="updateGraphs();" checked>
+     6<input type="checkbox" id="riken6" onClick="updateGraphs();" checked>
+    </span>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    Show Data
+     <input type="checkbox" id="displayValuesCheck" onClick="javascript:document.getElementById('graphValues').style.display=(this.checked?'block':'none');return true;">
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      <input type="button" value="Reset Graphs" onClick="resetGraphs();">
+    <br>
+  </div>
+</div>
+<div class="box">
+  <div class="boxHeading" tabindex="0">Genome Browser</div>
+  <div class="boxContent">
+    <div align="center" id="fantomLink2"></div>
+  </div>
+</div>
+
+<!--                                     -->
+</div>
+<!--END OF MAIN CONTENTS OF THE WEB PAGE -->
+
+
+<!-- START OF FOOTER -->
+<div id="footer">
+<!--                 -->
+  <table width="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td nowrap><div align="left"><a href="http://www.gsc.riken.jp">RIKEN Genomic Sciences Center (GSC) RIKEN Yokohama Institute</a>&nbsp;</div></td>
+    <td nowrap>Copyright &copy; 2008 RIKEN, Japan. All rights reserved.&nbsp;</td>
+    <td nowrap><div align="right">&nbsp;</div></td>
+  </tr>
+</table>
+<!--               -->
+</div>
+<!-- END OF FOOTER -->
+</div>
+</body>
+</html>
+

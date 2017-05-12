@@ -1,0 +1,154 @@
+--- /Library/Perl/5.12/Email/ARF/Report.pm	2011-03-24 21:39:57.000000000 -0600
++++ Report.pm.new	2011-11-10 21:11:41.000000000 -0700
+@@ -1,10 +1,10 @@
+ use strict;
+ use warnings;
++
+ package Email::ARF::Report;
+ BEGIN {
+   $Email::ARF::Report::VERSION = '0.006';
+ }
+-# ABSTRACT: interpret Abuse Reporting Format (ARF) messages
+ 
+ use Carp ();
+ use Email::MIME 1.900 (); # ->subtypes
+@@ -12,7 +12,6 @@
+ use Scalar::Util ();
+ use Params::Util qw(_INSTANCE);
+ 
+-
+ sub new {
+   my ($class, $source) = @_;
+ 
+@@ -69,6 +68,16 @@
+ sub create {
+   my ($class, %arg) = @_;
+ 
++  # probably faster as global, but not for me to decide
++  # eat's time on every call to this sub
++  # while on the performance topic does this sub need to do
++  # any tear down when called repeatedly?
++  my %feedback_types = (
++    'abuse' => 1,
++    'fraud' => 1,
++    'other' => 1,
++    'virus' );
++
+   require Email::MIME::Creator;
+ 
+   my $description_part = Email::MIME->create(
+@@ -76,14 +85,14 @@
+     body       => $arg{description},
+   );
+ 
++  $description_part->header_set('Date');
++
+   my $original_body = ref $arg{original_email}
+                     ? Scalar::Util::blessed $arg{original_email}
+                       ? $arg{original_email}->as_string
+                       : ${ $arg{original_email} }
+                     : $arg{original_email};
+ 
+-  $description_part->header_set('Date');
+-
+   my $original_part = Email::MIME->create(
+     attributes => { content_type => 'message/rfc822' },
+     body       => $original_body,
+@@ -91,6 +100,10 @@
+ 
+   $original_part->header_set('Date');
+ 
++  # not sure how to handle this section, the docs say user
++  # can pass as either a HASHREF or ARRAYREF, I say just
++  # limit it to a HASHREF as that seems the intuitive data
++  # structure, leaving as is for now
+   my $field_pairs = ref $arg{fields} eq 'HASH'
+                   ? [ %{ $arg{fields} } ]
+                   : $arg{fields};
+@@ -107,11 +120,18 @@
+   }
+ 
+   unless (defined $fields->header('version')) {
+-    $fields->header_set('Version', "0.1");
++    # per the RFC draft
++    $fields->header_set('Version', '1');
+   }
+ 
+   unless (defined $fields->header('Feedback-Type')) {
+-    $fields->header_set('Feedback-Type', "other");
++    # it's ARF right, seems like we should default to abuse
++    $fields->header_set('Feedback-Type', 'abuse');
++  }
++  else {
++      unless (exists $field_headers{$field->headers('Feedback-Type')}) {
++          # throw an error rjbs will define how to handle
++      }
+   }
+ 
+   my $report_part = Email::MIME->create(
+@@ -125,7 +145,12 @@
+     attributes => {
+       # It is so asinine that I need to do this!  Only certain blessed
+       # attributes are heeded, here.  The rest are dropped. -- rjbs, 2007-03-21
+-      content_type  => 'multipart/report; report-type="feedback-report"',
++      # RFC shows the following example
++      # MIME-Version: 1.0
++      #    Content-Type: multipart/report; report-type=feedback-report;
++      #            boundary="part1_13d.2e68ed54_boundary"
++      # should the below be 
++      content_type  => 'multipart/report; report-type=feedback-report;',
+     },
+     parts  => [ $description_part, $report_part, $original_part ],
+ 
+@@ -136,20 +161,16 @@
+   $class->new($report);
+ }
+ 
+-
+ sub as_email {
+   return Email::MIME->new($_[0]->as_string)
+ }
+ 
+-
+ sub as_string { $_[0]->{mime}->as_string }
+ 
+-
+ sub original_email {
+   $_[0]->{original_email}
+ }
+ 
+-
+ sub _description_part { $_[0]->{description_part} }
+ 
+ sub description {
+@@ -158,16 +179,16 @@
+ 
+ sub _fields { $_[0]->{fields} }
+ 
+-
+ sub field {
+   my ($self, $field) = @_;
+ 
+   return $self->_fields->header($field);
+ }
+ 
+-
+ sub feedback_type { $_[0]->field('Feedback-Type'); }
++
+ sub user_agent    { $_[0]->field('User-Agent');    }
++
+ sub arf_version   { $_[0]->field('Version');       }
+ 
+ 
+@@ -240,9 +261,9 @@
+ 
+ Default values are provided for the following fields:
+ 
+-  version       - 0.1
++  version       - 1
+   user-agent    - Email::ARF::Report/$VERSION
+-  feedback-type - other
++  feedback-type - abuse
+ 
+ =head2 as_email
+ 

@@ -1,0 +1,41 @@
+---
+abstract: 'use ~/.forward plaggerable'
+author:
+  - 'Hiroyuki Akabane <hirobanex@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+  Test::Output: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Email-Forward-Dispatch
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Email::Forward::Dispatch:
+    file: lib/Email/Forward/Dispatch.pm
+    version: '0.04'
+  Email::Forward::Dispatch::Hooks:
+    file: lib/Email/Forward/Dispatch/Hooks.pm
+requires:
+  Email::MIME: '0'
+  Module::Pluggable: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/hirobanex/p5-Email-Forward-Dispatch/issues
+  homepage: https://github.com/hirobanex/p5-Email-Forward-Dispatch
+  repository: git://github.com/hirobanex/p5-Email-Forward-Dispatch.git
+version: '0.04'

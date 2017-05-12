@@ -1,0 +1,48 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 86e26a2a7c051798589383666a30f637c2795f28 ChangeLog
+SHA1 df53fc49fee9588c4bd782c86383040abd7ebed3 INSTALL
+SHA1 776b35de0d79370b17f9b26a61565d97aaee5acd LICENSE
+SHA1 21bf1c461c02e5ef0d21cdc54a9c478a0cbd97fa MANIFEST
+SHA1 80e3822333318b7676dde8df4624d90f0382d310 META.yml
+SHA1 3e9a898ed00244f7ba61fcb314fbe7eebacadc7b Makefile.PL
+SHA1 a07d94b0ae2a0b124a3233be79b6a8d5e0a82280 README
+SHA1 8467badb21d339d28716530282fc6123f35f1f08 lib/Event/Wrappable.pm
+SHA1 adb0a6399ff525a4439a7deeaadd2c9473f17bea t/method.t
+SHA1 05a7773551a9ce09e04ffdddd74d4e12a08b6cbf t/pod-coverage.t
+SHA1 b2131e5af08c2702a3742365d55f365e9cc0cf15 t/pod.t
+SHA1 455d1dd1867212a665ad5ea4126b572411de300c t/release-no-tabs.t
+SHA1 8d931d5c7b6fc03e39a744d59522e4b7077562a1 t/release-portability.t
+SHA1 25757ae58f7fcebb68b3dc5fd59d2b971ead6b7e t/scope_based.t
+SHA1 69a6e7e26cdfd38a41da62ea41d6eb612601c6f5 t/threads.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iQIcBAEBAgAGBQJQFe2oAAoJEF6ojHedHIiFNVkP/Rc25t6fx/lxAw2qJlZv3DD0
+tzah1yil8idPKum1u9/jKr6FmcaSBeVKLe7nOrMdDY3nwdijLlNMlU+kFd0DJDZ2
+g7ivWsxQrhgTsWdLiMwwS0RG4qEKFuZlmL4Z7cn4mhslCqYWVYv/kGx3VxB9eojm
+7dsWxeHenga5uj7GkWQPrcpmP30mQJxfMGuvZkc32t9VBaMO1h2njktnC3Jh39Rc
+N+6IvgwIMbreOWY7a1aTTCbapFVLDJv5uktbBuUKNJzVNL9MuN2fRGfzsvzbAM2A
+epfi/rWww3gbPLJyKvlDNzMKe3Kz91FZ7SfdHsee78v5tVfUoOycq0o2m+rSSOCX
+QoV/vY84vyrMVkYqjWvRs0cGEIdm6xYm+ylQx3pB9WUn3AYanpIVgx3QIU3vxcfC
+W0W6xJdIbIxeyiBpHyd+oauvxyZjjrLuiBA++yhIOX4H9uGDyFQB1+i4j1uxG864
+vOC4R/I8Pb5sSz9waRilvbvfj6nukOK1pMU9/Et8VJVbn2w+xFqEPxhL78FKprE0
+cRY4rB0nOUpN4QyPkDD2QMFo+KSqWp2/iAe6sk1I4SvV92/rvxtTwI8yKVJH43TU
+otBRyqEt/jD2+o452hqBx+hCCkL6etbsLYd48OIBH/j7ilv747FkXg3zmyUOTi/m
+ekrYWOlXmJPAYn+fPgpk
+=R93L
+-----END PGP SIGNATURE-----

@@ -1,0 +1,43 @@
+---
+abstract: 'Check for the presence of a compiler'
+author:
+  - 'Leon Timmermans <leont@cpan.org>'
+build_requires:
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: ExtUtils-HasCompiler
+provides:
+  ExtUtils::HasCompiler:
+    file: lib/ExtUtils/HasCompiler.pm
+    version: '0.017'
+requires:
+  Carp: '0'
+  DynaLoader: '0'
+  Exporter: '0'
+  ExtUtils::Mksymlists: '0'
+  File::Basename: '0'
+  File::Spec::Functions: '0'
+  File::Temp: '0'
+  base: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=ExtUtils-HasCompiler
+  repository: git://github.com/Leont/extutils-hascompiler.git
+version: '0.017'
+x_contributors:
+  - 'bulk88 <bulk88@hotmail.com>'
+  - 'Craig A. Berry <craigberry@mac.com>'
+  - 'Dave Rolsky <autarch@urth.org>'
+  - 'Leon Timmermans <fawaka@gmail.com>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

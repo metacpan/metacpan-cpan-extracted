@@ -1,0 +1,85 @@
+<?xml version="1.0" ?>
+<email_blaster_config>
+
+  <is_testing>1</is_testing>
+  <test_email_address>jdrago.999@gmail.com</test_email_address>
+  <max_bulk_workers>5</max_bulk_workers>
+  <hostname>localhost</hostname>
+  <maillog_path>/var/log/mail.log</maillog_path>
+  <maillog_watcher>Email::Blaster::MaillogWatcher::Postfix</maillog_watcher>
+  <message_assembler>Email::Blaster::MessageAssembler</message_assembler>
+  <mail_sender>Email::Blaster::MailSender</mail_sender>
+  
+  <!-- ONLY NECESSARY FOR "CLUSTERED" EMAIL BLASTERS! -->
+  <cluster>
+    <servers>
+      <server>localhost:11211</server>
+      <!--
+      <server>another.server.com</server>
+      <server>yet-another.server.com</server>
+      -->
+    </servers>
+  </cluster>
+
+  <libs>
+    <lib>@ServerRoot@/lib</lib>
+  </libs>
+
+  <database>
+    <dsn>DBI:mysql:email_blaster:localhost</dsn>
+    <username>root</username>
+    <password>j@p@n</password>
+    <orm_base_class>Email::Blaster::Model::MySQL</orm_base_class>
+  </database>
+  
+  <hosts>
+    <priority_smtp>localhost</priority_smtp>
+    <bulk_smtp>localhost</bulk_smtp>
+  </hosts>
+  
+  <throttled>
+    <throttle>
+      <domain>aol.com</domain>
+      <hourly_limit>1000</hourly_limit>
+    </throttle>
+    <throttle>
+      <domain>comcast.net</domain>
+      <hourly_limit>500</hourly_limit>
+    </throttle>
+  </throttled>
+  
+  <handlers>
+    <server_startup>
+      <handler>Email::Blaster::ClusteredStartupHandler</handler>
+      <handler>My::StartupHandler</handler>
+    </server_startup>
+    
+    <server_shutdown>
+      <handler>Email::Blaster::ClusteredShutdownHandler</handler>
+      <handler>My::ShutdownHandler</handler>
+    </server_shutdown>
+  
+    <!-- Called when a transmission has been queued -->
+    <!-- Should convert "recipients" into "sendlogs" -->
+    <init_transmission>
+      <handler>My::TransmissionInitHandler</handler>
+    </init_transmission>
+  
+    <!-- Called when a transmission has begun -->
+    <begin_transmission>
+      <handler>My::TransmissionBeginHandler</handler>
+    </begin_transmission>
+    
+    <!-- Called when a transmission has ended -->
+    <end_transmission>
+      <handler>My::TransmissionEndHandler</handler>
+    </end_transmission>
+    
+    <!-- Record that a message has "bounced." -->
+    <message_bounced>
+      <handler>Email::Blaster::BounceHandler</handler>
+    </message_bounced>
+  </handlers>
+  
+</email_blaster_config>
+

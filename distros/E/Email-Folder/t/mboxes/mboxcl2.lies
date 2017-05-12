@@ -1,0 +1,187 @@
+From chris@void.printf.net Wed Dec 18 19:59:00 2002
+Received: from void.printf.net ([213.253.1.202] ident=mail)
+	by penderel.state51.co.uk with esmtp (Exim 3.35 #1 (Debian))
+	id 18OkLM-0003lw-00
+	for <london.pm@london.pm.org>; Wed, 18 Dec 2002 19:59:00 +0000
+Received: from void
+	([127.0.0.1] helo=void.printf.net ident=chris)
+	by void.printf.net with esmtp (Exim 3.35 #1 (Debian))
+	id 18OkM9-0008Ql-00
+	for <london.pm@london.pm.org>; Wed, 18 Dec 2002 19:59:49 +0000
+To: london.pm@london.pm.org
+Subject: Fifteenth anniversary of Perl.
+From: Chris Ball <chris@void.printf.net>
+Message-ID: <86y96numh7.fsf@void.printf.net>
+User-Agent: Gnus/5.090007 (Oort Gnus v0.07) XEmacs/21.4 (Common Lisp,
+ i386-debian-linux)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Sender: london.pm-admin@london.pm.org
+Errors-To: london.pm-admin@london.pm.org
+X-BeenThere: london.pm@london.pm.org
+X-Mailman-Version: 2.0.11
+Precedence: bulk
+Reply-To: london.pm@london.pm.org
+List-Help: <mailto:london.pm-request@london.pm.org?subject=help>
+List-Post: <mailto:london.pm@london.pm.org>
+List-Subscribe: <http://london.pm.org/mailman/listinfo/london.pm>,
+	<mailto:london.pm-request@london.pm.org?subject=subscribe>
+List-Id: London.pm Perl M[ou]ngers <london.pm.london.pm.org>
+List-Unsubscribe: <http://london.pm.org/mailman/listinfo/london.pm>,
+	<mailto:london.pm-request@london.pm.org?subject=unsubscribe>
+List-Archive: <http://london.pm.org/pipermail/london.pm/>
+Date: Wed Dec 18 19:59:02 2002
+X-Original-Date: Wed, 18 Dec 2002 19:59:48 +0000
+Content-Length: 782
+Lines: 30
+
+From perl5-porters:
+
+==
+From: Mark Jason Dominus <mjd@plover.com>
+Subject: Today is the 15th anniversary of Perl
+To: perl5-porters@perl.org
+Organization: Plover Systems
+X-Sent: 2 minutes, 47 seconds ago
+
+
+
+PERLHIST(1)      Perl Programmers Reference Guide     PERLHIST(1)
+
+...
+        Larry   1.000          1987-Dec-18
+...
+
+
+Congratulations to Larry and everyone else involved.
+==
+
+It bothers me that people were writing Perl code when I was six.
+
+Happy birthday to Perl,  :-)
+
+- Chris.
+-- 
+$a="printf.net";  Chris Ball | chris@void.$a | www.$a | finger: chris@$a
+| Q. How do you tell an extrovert techie from an introvert techie?
+| A. He looks at your feet rather than his own.
+
+
+
+From david@cantrell.org.uk Thu Dec 19 02:13:23 2002
+Received: from cowshed-door.barnyard.co.uk ([195.149.50.59] helo=ibook.private.barnyard.co.uk)
+	by penderel.state51.co.uk with esmtp (Exim 3.35 #1 (Debian))
+	id 18OqBf-0005cg-00
+	for <london.pm@london.pm.org>; Thu, 19 Dec 2002 02:13:23 +0000
+Received: from localhost ([127.0.0.1] helo=ibook.local)
+	by ibook.private.barnyard.co.uk with esmtp (Exim 4.10)
+	id H7CGVO-0002D6-00
+	for london.pm@london.pm.org; Thu, 19 Dec 2002 02:14:12 +0000
+Received: (from david@localhost)
+	by ibook.local (8.12.2/8.12.2/Submit) id gBJ2EBwZ003065
+	for london.pm@london.pm.org; Thu, 19 Dec 2002 02:14:11 GMT
+X-Authentication-Warning: ibook.local: david set sender to david@cantrell.org.uk using -f
+From: David Cantrell <david@cantrell.org.uk>
+To: london.pm@london.pm.org
+Subject: Re: Fifteenth anniversary of Perl.
+Message-ID: <20021219021411.GE3018@plough.barnyard.co.uk>
+References: <86y96numh7.fsf@void.printf.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86y96numh7.fsf@void.printf.net>
+User-Agent: Mutt/1.4i
+X-Ddate: Today is Pungenday, day 61 in the season of The Aftermath, 3168.
+X-Message-Flag: Microsoft software is insecure, please consider using different mail software
+X-public-key-is-at: http://www.cantrell.org.uk/david/public-key.txt
+Sender: london.pm-admin@london.pm.org
+Errors-To: london.pm-admin@london.pm.org
+X-BeenThere: london.pm@london.pm.org
+X-Mailman-Version: 2.0.11
+Precedence: bulk
+Reply-To: london.pm@london.pm.org
+List-Help: <mailto:london.pm-request@london.pm.org?subject=help>
+List-Post: <mailto:london.pm@london.pm.org>
+List-Subscribe: <http://london.pm.org/mailman/listinfo/london.pm>,
+	<mailto:london.pm-request@london.pm.org?subject=subscribe>
+List-Id: London.pm Perl M[ou]ngers <london.pm.london.pm.org>
+List-Unsubscribe: <http://london.pm.org/mailman/listinfo/london.pm>,
+	<mailto:london.pm-request@london.pm.org?subject=unsubscribe>
+List-Archive: <http://london.pm.org/pipermail/london.pm/>
+Date: Thu Dec 19 02:14:02 2002
+X-Original-Date: Thu, 19 Dec 2002 02:14:11 +0000
+Content-Length: 431
+Lines: 14
+
+On Wed, Dec 18, 2002 at 07:59:48PM +0000, Chris Ball wrote:
+> PERLHIST(1)      Perl Programmers Reference Guide     PERLHIST(1)
+> ...
+>         Larry   1.000          1987-Dec-18
+> ...
+> It bothers me that people were writing Perl code when I was six.
+
+It bothers me that you are so young.
+
+-- 
+Lord Protector David Cantrell     |     http://www.cantrell.org.uk/david
+
+   o/~ we wish you a merry currency and a happy new euro o/~
+
+
+From chris@void.printf.net Thu Dec 19 02:40:00 2002
+Received: from void.printf.net ([213.253.1.202] ident=mail)
+	by penderel.state51.co.uk with esmtp (Exim 3.35 #1 (Debian))
+	id 18OqbQ-0005lo-00
+	for <london.pm@london.pm.org>; Thu, 19 Dec 2002 02:40:00 +0000
+Received: from void
+	([127.0.0.1] helo=void.printf.net ident=chris)
+	by void.printf.net with esmtp (Exim 3.35 #1 (Debian))
+	id 18OqcD-0002bB-00
+	for <london.pm@london.pm.org>; Thu, 19 Dec 2002 02:40:50 +0000
+To: london.pm@london.pm.org
+Subject: Re: Fifteenth anniversary of Perl.
+References: <86y96numh7.fsf@void.printf.net>
+	<20021219021411.GE3018@plough.barnyard.co.uk>
+From: Chris Ball <chris@void.printf.net>
+In-Reply-To: <20021219021411.GE3018@plough.barnyard.co.uk> (David Cantrell's
+ message of "Thu, 19 Dec 2002 02:14:11 +0000")
+Message-ID: <86el8eviha.fsf@void.printf.net>
+User-Agent: Gnus/5.090007 (Oort Gnus v0.07) XEmacs/21.4 (Common Lisp,
+ i386-debian-linux)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Sender: london.pm-admin@london.pm.org
+Errors-To: london.pm-admin@london.pm.org
+X-BeenThere: london.pm@london.pm.org
+X-Mailman-Version: 2.0.11
+Precedence: bulk
+Reply-To: london.pm@london.pm.org
+List-Help: <mailto:london.pm-request@london.pm.org?subject=help>
+List-Post: <mailto:london.pm@london.pm.org>
+List-Subscribe: <http://london.pm.org/mailman/listinfo/london.pm>,
+	<mailto:london.pm-request@london.pm.org?subject=subscribe>
+List-Id: London.pm Perl M[ou]ngers <london.pm.london.pm.org>
+List-Unsubscribe: <http://london.pm.org/mailman/listinfo/london.pm>,
+	<mailto:london.pm-request@london.pm.org?subject=unsubscribe>
+List-Archive: <http://london.pm.org/pipermail/london.pm/>
+Date: Thu Dec 19 02:40:04 2002
+X-Original-Date: Thu, 19 Dec 2002 02:40:49 +0000
+Content-Length: 554
+Lines: 13
+
+>> On 19 Dec 2002 02:14:11, David Cantrell <david@cantrell.org.uk> said:
+
+   > It bothers me that you are so young.
+
+It continues on down the loop.  I turn up to chess tournaments and play
+obnoxious 14 year-olds who spend an hour of their clock eating crisps
+and laughing with their mates before coming back to blitz the last
+half-hour and still win, so I definitely know what you mean.  :-)
+
+- Chris.
+-- 
+$a="printf.net";  Chris Ball | chris@void.$a | www.$a | finger: chris@$a
+| "Never go in against a Sicilian when DEATH is on the line!"  - Vizzini
+
+
+

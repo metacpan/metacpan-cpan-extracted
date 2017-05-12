@@ -1,0 +1,91 @@
+{
+   "abstract" : "A framework for managing and auditing ETL processing",
+   "author" : [
+      "Dan Horne <dan.horne at redbone.co.nz>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "ETLp",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CGI::Application" : "0",
+            "CGI::Application::Plugin::Config::General" : "0",
+            "CGI::Application::Plugin::Forward" : "0",
+            "CGI::Application::Plugin::HTMLPrototype" : "0",
+            "CGI::Application::Plugin::ParsePath" : "0",
+            "CGI::Application::Plugin::Redirect" : "0",
+            "CGI::Application::Plugin::Session" : "0",
+            "CGI::Application::Plugin::TT" : "0",
+            "CGI::Application::Plugin::ValidateRM" : "0",
+            "CGI::Session" : "0",
+            "CGI::Session::Driver::oracle" : "0",
+            "Config::General" : "2.43",
+            "Convert::NLS_DATE_FORMAT" : "0",
+            "Crypt::PasswdMD5" : "0",
+            "Cwd" : "0",
+            "DBD::Mock" : "0",
+            "DBD::SQLite" : "0",
+            "DBI" : "0",
+            "DBIx::Class" : "0.08121",
+            "DBIx::VersionedDDL" : "0.16",
+            "Data::Page::Navigation" : "0",
+            "DateTime::Format::SQLite" : "0",
+            "Exception::Class" : "0",
+            "File::Basename" : "0",
+            "File::Copy" : "0",
+            "File::Copy::Recursive" : "0",
+            "File::LocalizeNewlines" : "1.12",
+            "File::Path" : "0",
+            "File::Slurp" : "0",
+            "File::chdir" : "0",
+            "IPC::Cmd" : "0",
+            "Log::Dispatch::FileRotate" : "0",
+            "Log::Log4perl" : "0",
+            "Mail::Sendmail" : "0",
+            "Math::Base36" : "0.07",
+            "Modern::Perl" : "0",
+            "Module::Pluggable" : "0",
+            "Moose" : "0.83",
+            "MooseX::Declare" : "0.33",
+            "MooseX::Singleton" : "0",
+            "MooseX::Types::DateTime" : "0",
+            "Parallel::SubFork" : "0",
+            "Test::Class" : "0",
+            "Test::More" : "0",
+            "Text::CSV" : "0",
+            "Text::CSV_XS" : "0",
+            "Text::Wrapper" : "0",
+            "Time::Piece" : "0",
+            "Try::Tiny" : "0",
+            "UNIVERSAL::require" : "0",
+            "autodie" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.04"
+}

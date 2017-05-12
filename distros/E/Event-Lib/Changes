@@ -1,0 +1,118 @@
+Revision history for Perl extension Event::Lib.
+
+1.03 So Jul 29 07:14:45 EDT 2007
+    - also look for libevent in /opt/local which is where macports
+      installs libraries
+      (spotted by <cripto AT ecn DOT org>)
+
+1.02 Mo Mai 21 06:36:03 EDT 2007
+    - fixed exception handling such that exception objects will not be
+      stringified anymore 
+      (patch by Torsten Foertsch <torsten DOT foertsch AT gmx DOT net>)
+
+1.01 Sat Nov 18 09:44:30 EST 2006
+    - parens are needed for calls to croak to make it work on bleedperl
+      (spotted by Andreas Koenig <andk AT cpan DOT org>)
+
+1.0 Fri Mar 17 10:20:49 CET 2006
+    
+    **************************************************
+    **** THIS RELEASE IS NOT BACKWARDS COMPATIBLE ****
+    ****  TO PREVIOUS VERSIONS SO READ THE PODS   ****
+    **************************************************
+
+    - event_dispatch() is gone forever: Its job is now done by three separate
+      functions event_mainloop, event_one_loop, event_one_nbloop. Chose the one
+      most appropriate. Those are no longer instance methods either. See the section
+      "ENTERING THE EVENT-LOOP" in the documentation for details.
+    - new interface for exception handlers. See the section "EXCEPTION HANDLING"
+      in the documentation.
+    - event_free/free are gone and event_del/del have become remove().
+      See the section "EVENT LIFECYCLE" in the documentation to learn how event-cleanup
+      is now done.
+    - it's no longer OK to enter the event loop (previously with
+      event_dispatch) more than once. A warning will be raised in such a case
+      and it will be turned into a no-op.
+    - event_log_level() allows to specify which libevent log-messages to
+      display
+    - event_init no longer needs to be called in child processes
+    - there's an extensive debugging-interface, enabled via
+        $ perl Makefile.PL DEFINE=-DEVENT_LIB_DEBUG
+      in case you run into problems with your application. 
+    - access to the additional event arguments via the args() and args_del()
+      instance-methods. This will allow you to change the arguments on the fly
+      without having to create a fresh event.
+    - the documentation is a lot more comprehensive now hopefully less
+      ambiguous.
+    - a new and extensive test-suite.
+    
+    There is probably more which I forgot. All of the above has been done with
+    the help and imperturbable patience of the hackers at mailchannels.com
+    (Stas Bekman, Ken Simpson, Mike Smith). Event::Lib 1.0 owes them big time!
+     
+0.10  Thu Nov 10 07:49:00 CET 2005
+    - event_free() was advertised in the docs although
+      it didn't exist; now it does.
+      (spotted by Carlos Guzman <cguzman AT andestel DOT com>
+    - the prototype for event_new() prevented it to take
+      code-refs stored in a variable; the prototype is now gone
+      (patch by Stas Bekman <stas AT stason DOT org>
+    - a misspelling and some bad advice in the PODs of the
+      module rectified
+      (again thanks to Stas Bekman)
+    - only load Carp.pm on demand
+
+0.09  Tue Sep 27 08:01:52 CEST 2005
+    - fixed another memory leak showing up in the fh() method
+      (spotted by Thomas Yandell <tom AT vipercode DOT com>)
+    - make sure that Test::Pod and Test::Pod::Coverage are
+      installed in the required minimum versions
+      (thanks to Ricardo Signes <rjbs AT cpan DOT org>)
+
+0.08  Wed Jul  6 10:10:18 CEST 2005
+    - additional arguments passed to the event-callbacks
+      weren't freed due to a spurious reference count 
+      incrementation 
+      (spotted by Thomas Yandell <tom AT vipercode DOT com>)
+
+0.07  Sun Jun  5 11:05:57 CEST 2005
+    - tweaked Makefile.PL so that the capabilities of the installed
+      libevent are checked first: features that would require
+      a more recent version can thus be disabled at compile-time
+    - crudely included a test for priority_init()
+
+0.06  Fri May 27 09:33:22 CEST 2005
+    - some of the prototypes were apparently wrong:
+      the code given in the SYNOPSIS of the PODs can now be run again
+      (spotted by Simon Dassow <janus AT area319 DOT de>)
+    - the debug noise on stderr introduced with libevent-1.0c 
+      has been quietened. Only messages with _EVENT_LOG_ERR are
+      now displayed.
+
+0.05  Mon Apr  4 09:51:42 CEST 2005
+    - Event::Lib now in par with libevent-1.0c 
+      (might still compile on 1.0, though)
+    - support for event priorities added
+    - POD- and POD-coverage-tests
+
+0.04  Tue Aug 31 17:48:55 CEST 2004
+    - a hairy bug when spawning children:
+      no events could be scheduled in child processes
+      when kqueue(2) was used. This is now fixed by providing
+      the event_init() function to be called in child procs.
+    - Makefile.PL fixes for Darwin/FreeBSD
+      (both spotted and patched by Rocco Caputo <rcaputo AT pobox DOT com>)
+	
+0.03  Fri Aug 27 16:13:11 CEST 2004
+    - Makefile.PL should honor @ARGV
+    - some Win32 fixes for Lib.xs
+      (both patches via rt.cpan.org; there was no name attached to them)
+
+0.02  Fri Aug 27 08:22:38 CEST 2004
+    - the event callbacks were called without the event-type
+      argument. Now they receive this additional arg.
+
+0.01  Sat Aug 14 07:30:14 2004
+    - original version; created by h2xs 1.23 with options
+	    -O -b 5.6.0 -n Event::Lib /usr/local/include/event.h
+

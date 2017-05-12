@@ -1,0 +1,95 @@
+
+=head1 NAME
+
+SVN - Access to the Embperl SVN development tree
+
+=head1 SVN Access
+
+The Embperl development tree lives on the machine 
+svn.apache.org.  This tree contains the latest Embperl bug fixes and
+developments that have not made it to CPAN yet.  Welcome to the
+bleeding edge. 
+
+Just like SVN access to the Apache development tree, the Embperl code
+pulled from SVN is not guaranteed to do anything, especially not
+compile or work.  But - that's exactly why we are using SVN - so that
+everyone has access the latest version and can help ensure  that
+Embperl does compile and work on all platforms, with the various
+versions and configurations of Perl and Apache, once it is really 
+supposed to.  Patches are always
+welcome. Simply testing the latest snapshots is just as (if not 
+even more)
+helpful. 
+
+
+
+=head2 Anonymous Subversion
+
+To access the Subversion repositories anonymously, you will need a Subversion client. 
+You can also browse the ASF projects that are using Subversion with a Webbroswer via
+http://svn.apache.org/repos/asf/.
+
+Embperl can be found at the URL http://svn.apache.org/repos/asf/perl/embperl/
+
+To check it out use
+
+  svn checkout http://svn.apache.org/repos/asf/perl/embperl/trunk embperl
+
+To keep it up to date go into the embperl directory and run
+
+  svn up
+
+For more help on using Subversion, consult the Subversion website (http://subversion.tigris.org/)
+or Subversion book (http://svnbook.red-bean.com/). 
+The web site provides a list of clients and useful links (http://subversion.tigris.org/project_links.html).
+
+
+=head2 web-access
+
+As mentioned above you can browser the svn repository directly with a webbrowser at
+http://svn.apache.org/repos/asf/perl/embperl
+
+A more confortable way is to use http://svn.apache.org/viewcvs.cgi/perl/embperl/
+
+
+=head2 Snapshot
+
+A snapshot is rolled off the Embperl tree every 6 hours and placed
+here:
+
+http://svn.apache.org/snapshots/embperl/
+
+
+=head2 Embperl 1.x
+
+There is no further development in the Embperl 1.x branch, but case it
+will become necessary you can access the Embperl 1.x code via the branch
+B<ep1>, so when you checkout just run
+
+
+    svn checkout http://svn.apache.org/repos/asf/perl/embperl/branches/ep1/
+
+
+=head2 MAILING LIST
+
+There is a SVN mailing list for Embperl (This is SVN - B<not> a list for asking
+questions about Embperl!!!). This list receives all changes which are
+committed to the SVN. If you want to know what's going on which Embperl,
+you can subscribe by sending a mail to B<embperl-CVS-request@perl.apache.org>
+with B<subscribe> in the body.
+
+=head2 Building from SVN sources
+
+Before you can build Embperl from sources that are checked out from the SVN, you need
+to generate some glue code. This is done by the module ExtUtils::XSBuilder, so you
+need to install it first from CPAN. When it's installed run:
+
+    perl xsbuilder/source_scan.pl
+    perl xsbuilder/xs_generate.pl
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+

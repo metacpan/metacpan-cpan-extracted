@@ -1,0 +1,645 @@
+
+
+=head1 XSBuilder - Autogenerating XS-glue Code
+
+
+O'Reilly OpenSource Convention 2002 
+
+Gerald Richter
+
+ecos gmbh  
+
+http://www.ecos.de
+
+=head1 XSBuilder - What is it?
+
+
+=head2 It's purpose is to automaticly generate a Perl interface to C Code
+
+=head2 Solves the problem, that the Perl interface is not always uptodate with the C interface
+
+=head2 Saves a lot of Copy&Paste work
+
+=head2 Systematical changes have to be done only once
+
+For example changes in the memory management of strings.
+
+=head2 Is part of mod_perl 2.0 build system
+
+Most code is developed by Doug MacEachern. Additionaly I have 
+
+=over
+
+=item abstracted the code from mod_perl so it's useable for any C code
+
+=item added new features like callbacks and the ability to parse comments
+
+=item Replaced C::Scan with a Parse::RecDescent to be platform and compiler independend
+
+=back
+
+Goal is to replace the current mod_perl XS generation code with XSBuilder
+
+=head2 Inline versus XSBuilder
+
+=over
+ 
+=item Inline: embed C-Code into Perl
+
+=item XSBuilder: Create interface for existing C-libraries/applicationen
+
+=back
+
+=head1 XSBuilder - What does it do?
+
+=head2 Create Perl functions/methods for every C function
+
+The function can be assigned to different packages, also automaticly
+by inspecting the first parameter
+
+=head2 Create a Perl class for every C structure
+
+Every element of structure becomes a Perl method to get/set it's value.
+The object can be either a scalar reference (used by mod_perl) or
+a reference to a hash (use by Embperl), which allows to store extra 
+data by the Perl code into this hash.
+
+=head2 Create glue code to handle callbacks
+
+There several sorts of callback, not all are implemented right now
+
+=head2 Create Perl constant subs
+
+Coming soon...
+
+=head1 XSBuilder - How does it work?
+
+=head2 Parse the C header files
+
+Extract
+
+=over
+
+=item Functions, their arguments and return types
+
+=item Structures and it's members
+
+=item Constants
+
+=item Callbacks
+
+=back
+
+and create four tables which contains the results
+
+=head2 Create the XS code
+
+Input is
+
+=over
+
+=item The source tables
+
+=item Mapfiles which contains the mapping from C to Perl
+
+=item Addtional C and Perl code that can be used to customize the interface
+
+=back
+
+Output is
+
+=over
+
+=item The XS files (one form every generated class)
+
+=item Makefile.PL for every class
+
+=item pm files
+
+=back
+
+
+
+
+=head1 Parse the source
+
+=head2 Create your own ParseSource class and override methods...
+
+    package Apache::DAV::ParseSource;
+
+    use strict;
+    use vars qw{@ISA $VERSION} ;
+    use ExtUtils::XSBuilder::ParseSource  ;
+
+    @ISA = ('ExtUtils::XSBuilder::ParseSource') ;
+    $VERSION = '0.01';
+
+    my $dav_dir = 'C:\perl\msrc\cvs\mod_dav' ;
+    my $ap_dir  = 'c:\programme\apache group\apache' ;
+
+    # ============================================================================
+    sub find_includes {
+        my $self = shift;
+        return $self->{includes} if $self->{includes};
+        my @includes = ("$ap_dir/include/ap_alloc.h", "$dav_dir/mod_dav.h") ;
+        return $self->{includes} = $self -> sort_includes (\@includes) ;
+        }
+
+    # ============================================================================
+    sub package     { 'Apache::DAV' } 
+
+    # ============================================================================
+    sub preprocess {
+        my $self     = shift ;
+        $_[0] =~ s/(?:API_EXPORT)(?:_NONSTD)?\s*\(\s*(.*?)\s*\)/$1/g ;
+    }
+
+
+    1;
+
+=head2 ...run it
+
+    use FindBin ;
+    use lib ($FindBin::Bin) ;
+
+    require ParseSource ; 
+
+    Apache::DAV::ParseSource -> run ;
+
+=head2 ...and you get
+
+    C:\perl\msrc\davint>perl xsbuilder\source_scan.pl
+    Will use mod_dav in C:\perl\msrc\cvs\mod_dav
+    Will use Apache in c:\programme\apache group\apache
+    Initialize parser
+    scan c:\programme\apache group\apache/include/ap_alloc.h ...
+    constant: APACHE_ALLOC_H
+    func:     ap_init_alloc
+    func:     ap_cleanup_alloc
+    func:     ap_make_sub_pool
+    func:     ap_destroy_pool
+    constant: ap_pool_join
+    func:     ap_pool_join
+    func:     ap_find_pool
+    func:     ap_pool_is_ancestor
+    func:     ap_clear_pool
+    func:     ap_cleanup_for_exec
+    func:     ap_palloc
+    func:     ap_pcalloc
+    func:     ap_pstrdup
+    func:     ap_pstrndup
+    func:     ap_pstrcat
+    func:     ap_pvsprintf
+      valuefield: ap_pool * : pool
+      valuefield: int : elt_size
+      valuefield: int : nelts
+      valuefield: int : nalloc
+      valuefield: char * : elts
+    struct:    (type=array_header)
+    ...
+
+=head2 The result is stored in four tables
+
+=over
+
+=item xsbuilder/tables/Apache/DAV/FuntionTable.pm
+
+Contains all function, it arguments and comments
+
+=item xsbuilder/tables/Apache/DAV/ConstantTable.pm
+
+Contains all constants
+
+=item xsbuilder/tables/Apache/DAV/StructureTable.pm
+
+Contains all structures, it's members and their comments
+
+=item xsbuilder/tables/Apache/DAV/CallbackTable.pm
+
+Contains all callback function definitions
+
+=back
+
+=head1 Create the map files
+
+=head2 Mapfiles are used to tell XSBuilder how C datatypes, structures
+and function aruments should be mapped into Perl ones.
+
+=head2 Create your own WrapXS class and override methods
+
+    package Apache::DAV::WrapXS ;
+    use strict;
+    use vars qw{@ISA $VERSION} ;
+
+    use ExtUtils::XSBuilder::WrapXS ;
+
+    @ISA = ('ExtUtils::XSBuilder::WrapXS') ;
+    $VERSION = '0.01';
+
+    # ============================================================================
+    sub new_parsesource  { [ Apache::DAV::ParseSource->new ] }
+
+    # ============================================================================
+    sub my_xs_prefix  { 'davxs_' }
+
+    # ============================================================================
+    sub h_filename_prefix  { 'moddav_xs_' }
+
+    # ============================================================================
+    sub xs_includes {
+        my $self = shift ;
+        my $i = $self -> SUPER::xs_includes ;
+        my @i = grep (!/ap_alloc/, @$i) ;
+        return \@i ;
+    }
+
+
+=head2 XSBuilder can create/update initial maps for you
+
+    use FindBin ;
+    use lib ($FindBin::Bin) ;
+
+    require ParseSource ; 
+    require WrapXS ; 
+
+    Apache::DAV::WrapXS->checkmaps (' ');
+
+=head2 run it
+
+    C:\perl\msrc\davint>perl xsbuilder\xs_check.pl
+    Will use mod_dav in C:\perl\msrc\cvs\mod_dav
+    Will use Apache in c:\programme\apache group\apache
+    Parse xsbuilder\maps/_types.map...
+    WARNING: No *_function.map file found in xsbuilder\maps
+    WARNING: No *_callback.map file found in xsbuilder\maps
+    WARNING: No *_structure.map file found in xsbuilder\maps
+    Write xsbuilder\maps/new_function.map...
+    Write xsbuilder\maps/new_callback.map...
+    Write xsbuilder\maps/new_structure.map...
+    Write xsbuilder\maps/new_type.map...
+
+=head2 Now we have four map files
+
+
+=over 4
+
+=item new_types.map
+
+Contains the mapping from C type to Perl classes
+
+=item new_functions.map
+
+Contains the mapping form C functions to Perl functions. Can be used to 
+reorder arguments, tell XSBuilder which arguments are actualy return values 
+and in which Perl package the function will be created.
+
+=item new_structures.map
+
+Contains the mapping from C structures to Perl classes and defines for which
+members a access methods should be created. You can also specify if you want a
+C<new> method for the class.
+
+=item new_callbacks.map
+
+Contains the mapping form C callback functions to Perl callback functions. Can be used to 
+reorder arguments, tell XSBuilder which arguments are actualy return values 
+and in which Perl package the function will be created.
+
+=back
+
+It's a good idea to rename the prefix from C<new_> to something unique, here we use C<dav>
+
+Everytime you rerun checkmaps, XSBuilder will create new_* files with the items
+that are not already part of the other maps.
+
+=head2 Next step is to customize the maps...
+
+=head1 type map
+
+=head2 autogenerated dav_type.map
+
+    DIR	|
+    FILE	|
+    HANDLE	|
+    array_header	|
+    dav_buffer	|
+    dav_dyn_context	|
+    dav_dyn_hooks	|
+    dav_dyn_module	|
+    dav_dyn_provider	|
+    dav_error	|
+    dav_get_props_result	|
+    dav_hooks_liveprop	|
+    dav_hooks_locks	|
+    dav_hooks_repository	|
+    dav_if_header	|
+    dav_if_state_type	|
+    ...
+
+=head2 Add Perl classes
+
+    struct array_header         | Apache::Array
+    struct dav_buffer           |
+    struct dav_datum            | Apache::DAV::Datum
+    struct dav_dyn_context      | Apache::DAV::DynContext
+    struct dav_dyn_hooks        | Apache::DAV::DynHooks
+    struct dav_dyn_module       | Apache::DAV::DynModule
+    struct dav_dyn_provider     | Apache::DAV::DynProvider
+    struct dav_error            | Apache::DAV::Error
+    struct dav_get_props_result | Apache::DAV::PropsResult
+    struct dav_hooks_db         | Apache::DAV::HooksDb
+    struct dav_hooks_liveprop   | Apache::DAV::HooksLiveprop
+    struct dav_hooks_locks      | Apache::DAV::HooksLocks
+    struct dav_hooks_repository | Apache::DAV::HooksRepository
+    struct dav_hooks_vsn        | 
+    struct dav_if_header        | Apache::DAV::IfHeader
+    struct dav_if_state_list    | Apache::DAV::StateList
+    ...
+    struct pool                 | Apache::Pool
+    struct request_rec          | Apache::
+    struct server_rec           | Apache::Server
+    ...
+
+Defines the mapping from C datatypes to Perl datatypes and classes
+and tells XSBuilder which datatype are (like) structures
+
+=head1 function map
+
+Function map defines the mapping from C functions arguments to Perl arguments
+
+=over 
+
+=item Tell XSBuilder where to place functions and which prefix to strip
+
+    MODULE=Apache::DAV   PACKAGE=guess	PREFIX=dav_
+
+=item Simple entries in the function map will be mapped 1:1 from C to Perl
+
+     dav_add_response
+     dav_buffer_append
+     dav_buffer_init
+     dav_buffer_place
+     dav_buffer_place_mem
+     dav_check_bufsize
+     dav_close_propdb
+     dav_collect_liveprop_uris
+     dav_dyn_module_add
+     dav_empty_elem
+    ...
+
+=item The following map file entry tells XSBuilder that the value of C<res_p> should be returned
+
+     dav_get_resource		| | r, <res_p
+
+The C function
+
+    int dav_get_resource(request_rec *r, dav_resource **res_p) ;
+
+How to call it from Perl
+
+    # get a sub request of the actual document
+    $subr = $r -> lookup_uri($uri);
+
+    # get a mod_dav resource object
+    my ($err, $resource) =  $subr->get_resource;
+
+=item You can let XSBuilder insert your custom code, for the interface 
+
+If you call C<get_props> from Perl C<glue_dav_get_props> will be called, which can adjust
+the arguments and return types as necessary. The actual code for C<glue_dav_get_props> 
+will be taken from separate include file.
+
+     dav_get_props 	| glue_
+     dav_get_allprops	| glue_
+
+
+xsinclude\Apache\DAV\PropResult\Apache__DAV__PropResults.h
+
+    dav_get_props_result * dav_glue_get_props(dav_propdb * db, dav_xml_doc *doc)
+        {
+        dav_get_props_result * result = (dav_get_props_result *)ap_palloc (db -> p, sizeof (dav_get_props_result)) ;
+        *result = dav_get_props(db, doc) ;
+        return result ;
+        }
+
+
+=item Arguments can be replaced
+
+    MODULE=Apache::Array   PACKAGE=Apache::Array PREFIX=ap_
+
+     ap_make_array      | ap_make_array(r->pool, nelts, elt_size) | request_rec *:r, nelts, elt_size
+
+ap_make_array requires a pool a it's first parameter, we pass the request_rec from Perl and
+XSBuilder will take the pool from the request_rec.
+
+=back
+
+
+=head1 structure map
+
+
+     MALLOC=strdup:$dest = ($type)strdup($src)
+     FREE=strdup:free($src)
+
+     <dav_xml_elem>
+       name
+       ns
+       lang
+       first_cdata
+       following_cdata
+       parent
+       next
+       first_child
+       attr
+       last_child
+       ns_scope
+       propid
+       provider
+       ns_map
+       new
+     </dav_xml_elem>
+
+     MALLOC=strdup:$dest = ($type)ap_pstrdup(obj -> pool, $src)
+
+     <array_header>
+       pool
+       elt_size
+       nelts
+       nalloc
+       elts
+       private
+     </array_header>
+
+=head2 Create a accessor functions for every element and, if requested, a new method
+
+        $setprop = Apache::DAV::XMLElem -> new ({name => 'prop'}) ;
+        $elem    = Apache::DAV::XMLElem -> new ({name => $name, ns => $namespaces}) ; 
+        $setprop -> first_child($elem) ;
+        $first = $setprop -> first_child ;
+
+=head2 some datatypes, like strings, requires dynamic allocated memory
+
+
+From _types.map,which conatins a set of standard types
+
+    int             | IV
+    int *           | UNDEFINED
+    unsigned int    | UV
+    signed int      | IV
+    long            | IV
+    long int        | IV
+    unsigned long   | UV
+    unsigned        | UV
+
+    char *                   | PV           | | | strdup
+    const char *             | PV           | | | strdup
+    const char **            | UNDEFINED    
+    char const *             | PV           | | | strdup
+    unsigned char *          | PV           | | | strdup
+    const unsigned char *    | PV           | | | strdup
+    ...
+
+=head1 callback maps
+
+Callback maps have the same options a function maps
+
+    # dav_hooks_db -> open
+     
+     dav_error *(*)(pool * p,const dav_resource * resource,int ro,dav_db * * pdb)  | p, resource, ro=0, <pdb 
+    
+    
+    # dav_hooks_lock -> has_locks
+    
+     dav_error *(*)(dav_lockdb * lockdb,const dav_resource * resource,int * locks_present)
+
+
+=head1 Generate the XS files
+
+    use FindBin ;
+    use lib ($FindBin::Bin) ;
+
+    require ParseSource ; 
+    require WrapXS ; 
+
+    Apache::DAV::WrapXS->run;
+
+=head2 ...and run...
+
+    C:\perl\msrc\davint>perl xsbuilder\xs_generate.pl
+    Will use mod_dav in C:\perl\msrc\cvs\mod_dav
+    Will use Apache in c:\programme\apache group\apache
+    Parse xsbuilder\maps/_types.map...
+    Parse xsbuilder\maps/dav_type.map...
+    mkdir xs
+    writing...xs//typemap
+    Parse xsbuilder\maps/dav_functions.map...
+    WARNING: Cannot map type int(*)(void * ,const char * ,const char * ) for function ap_table_do
+    WARNING: Cannot map type dav_buffer * for function dav_buffer_append
+    WARNING: Cannot map type dav_buffer * for function dav_buffer_init
+    WARNING: Cannot map type dav_buffer * for function dav_buffer_place
+    WARNING: Cannot map type dav_buffer * for function dav_buffer_place_mem
+    WARNING: Cannot map type dav_buffer * for function dav_check_bufsize
+    WARNING: Cannot map return type int * for function dav_collect_liveprop_uris
+    WARNING: Cannot map type dav_resource * * for function dav_ensure_resource_writable
+    WARNING: Cannot map type dav_buffer * for function dav_lock_get_activelock
+    WARNING: Cannot map type dav_buffer * for function dav_set_bufsize
+    WARNING: Cannot map type int * for function dav_xml2text
+    struct array_header...
+    Parse xsbuilder\maps/dav_structure.map...
+         elt_size...
+         nelts...
+         nalloc...
+         elts...
+    struct dav_buffer...
+    struct dav_datum...
+         dptr...
+         dsize...
+    struct dav_dyn_context...
+
+=head1 Makefile.PL
+
+=head2 We need create a top level Makefile.PL
+
+    use ExtUtils::MakeMaker ();
+    
+    my $apdir  = '/path/to/apache';
+    my $davdir = '/path/to/moddav';
+
+    %MMARGS = (
+	       'INC'    => "-I\"$davdir\" -I\"$apdir/include\" -I\"$apdir/os/unix\" -I\"$dir/xs\"  -I\"$dir/xsinclude\"",
+	       ) ;
+
+
+    open FH, ">xs/mmargs.pl" or die "Cannot open xs/mmargs.pl ($!)" ;
+    print FH Data::Dumper -> Dump ([\%MMARGS], ['MMARGS']) ;
+    close FH ;
+
+
+    ExtUtils::MakeMaker::WriteMakefile(
+        'NAME'    => 'Apache::DAV',
+        'VERSION' => '0.13',
+        %MMARGS,
+    );
+
+
+=head2 Makefile.PL's for all class are generated automaticly
+
+    C:\perl\msrc\davint>perl Makefile.PL
+    Will use Apache in c:\programme\apache group\apache
+    Will use mod_dav in C:\perl\msrc\cvs\mod_dav
+    Checking if your kit is complete...
+    Looks good
+    Writing Makefile for Apache::Array
+    Writing Makefile for Apache::DAV::Datum
+    Writing Makefile for Apache::DAV::DynContext
+    Writing Makefile for Apache::DAV::DynHooks
+    Writing Makefile for Apache::DAV::DynModule
+    Writing Makefile for Apache::DAV::DynProvider
+    Writing Makefile for Apache::DAV::Error
+    Writing Makefile for Apache::DAV::HooksDb
+    Writing Makefile for Apache::DAV::HooksLiveprop
+    Writing Makefile for Apache::DAV::HooksLocks
+    Writing Makefile for Apache::DAV::HooksRepository
+    Writing Makefile for Apache::DAV::IfHeader
+    Writing Makefile for Apache::DAV::Lock
+    Writing Makefile for Apache::DAV::LockDB
+    Writing Makefile for Apache::DAV::LockTokenList
+    Writing Makefile for Apache::DAV::LockupResult
+    Writing Makefile for Apache::DAV::PropCtx
+    Writing Makefile for Apache::DAV::PropsResult
+    Writing Makefile for Apache::DAV::Resource
+    Writing Makefile for Apache::DAV::Response
+    Writing Makefile for Apache::DAV::StateList
+    Writing Makefile for Apache::DAV::Text
+    Writing Makefile for Apache::DAV::TextHeader
+    Writing Makefile for Apache::DAV::WalkerCtx
+    Writing Makefile for Apache::DAV::XMLAttr
+    Writing Makefile for Apache::DAV::XMLDoc
+    Writing Makefile for Apache::DAV::XMLElem
+    Writing Makefile for Apache::DAV
+    Writing Makefile for Apache::TableEntry
+    Writing Makefile for Apache
+    Writing Makefile for WrapXS
+    Writing Makefile for Apache::DAV
+
+=head2 and now compile...
+
+=head1 How does it go on...
+
+=head2 Generating documentation
+
+XSBuilder already extracts source comments for functions and structures. 
+It also parses doxygen comments, which are used in Apache 2.0.
+Lyle Brooks has started on automaticly createing POD files from this information.
+
+=head2 Improving callbacks
+
+Callbacks are the main area that needs improvement.
+
+=head2 Bring it back to mod_perl 2.0
+
+=head2 First version will be released just after the conference to CPAN
+
+=head2 Any feedback and help appreciated
+
+=head2 Questions?

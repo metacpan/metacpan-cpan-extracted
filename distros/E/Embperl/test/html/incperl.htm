@@ -1,0 +1,20 @@
+<html>
+
+<head>
+<title>Embperl Tests - Include perl script</title>
+</head>
+
+<body>
+
+
+[- $a = 'Start' ; $b = 'End' -]
+
+[+ $a +]
+[- Execute ({inputfile => 'registry/script.pl', syntax => 'Perl', param => ['a', 'b', 'c']}) ; -]
+[+ $b +]
+
+
+
+</body>
+</html>
+

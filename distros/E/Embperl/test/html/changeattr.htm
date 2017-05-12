@@ -1,0 +1,34 @@
+
+[$ syntax + Test2 $]
+
+
+[- $candy = "http://dairy milk"; -]
+
+<!-- 1 qq -->
+
+<qq href="ab">dairy</qq>
+
+<!-- 2 qq -->
+
+<qq href="[+ $candy +]">dairy</qq>
+
+<!-- 1 a -->
+
+<a href="ab">dairy</a>
+
+<!-- 2 a -->
+
+<a href="[+ $candy +]">dairy</a>
+
+
+<!-- foreach a -->
+
+[$ foreach $s ('a','b') $]
+<a href="[+ $s +]">XX</a>
+[$ endforeach $]
+
+<!-- if inside href -->
+
+<a href=" [$ if 1 $] before [+ $candy +] after [$ else $] never [$ endif$]"> ooooh </a>
+
+<!-- end -->

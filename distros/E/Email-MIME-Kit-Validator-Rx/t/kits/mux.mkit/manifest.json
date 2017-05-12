@@ -1,0 +1,34 @@
+{
+  "validator": [
+    "Rx",
+    {
+      "combine": "all",
+      "path": "rx.json",
+      "schema": [
+        {
+          "type": "//rec",
+          "rest": "//any",
+          "required": {
+            "friend": {
+              "type": "/perl/obj",
+              "isa" : "TestFriend"
+            }
+          }
+        },
+        {
+          "type": "//rec",
+          "rest": "//any",
+          "optional": {
+            "how_long": "//any"
+          }
+        }
+      ]
+    }
+  ],
+  "header": [
+    { "Subject": "Test Rx Message" },
+    { "From":    "test@test.com"   }
+  ],
+  "type": "text/plain",
+  "body": "This is a plaintext message."
+}

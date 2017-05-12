@@ -1,0 +1,28 @@
+NAME
+    Email::Valid::Loose - Email::Valid which allows dot before at mark
+
+SYNOPSIS
+      use Email::Valid::Loose;
+
+      # same as Email::Valid
+      my $addr     = 'read_rfc822.@docomo.ne.jp';
+      my $is_valid = Email::Valid::Loose->address($addr);
+
+DESCRIPTION
+    Email::Valid::Loose is a subclass of Email::Valid, which allows . (dot)
+    before @ (at-mark). It is invalid in RFC822, but is commonly used in
+    some of mobile phone addresses in Japan (like docomo.ne.jp or
+    jp-t.ne.jp).
+
+IMPLEMENTATION
+    This module overrides "rfc822" method in Email::Valid.
+
+AUTHOR
+    Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    the Email::Valid manpage, the Mail::Address::MobileJp manpage
+

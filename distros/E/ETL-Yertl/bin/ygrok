@@ -1,0 +1,282 @@
+#!/usr/bin/env perl
+package ygrok;
+our $VERSION = '0.028';
+# ABSTRACT: Build YAML by parsing lines of plain text
+
+use ETL::Yertl;
+use Pod::Usage::Return qw( pod2usage );
+use Getopt::Long qw( GetOptionsFromArray :config pass_through );
+use ETL::Yertl::Command::ygrok;
+
+$|++; # no buffering
+
+sub main {
+    my ( $class, @argv ) = @_;
+    my %opt;
+    GetOptionsFromArray( \@argv, \%opt,
+        'loose|l',
+        'help|h',
+        'version',
+    );
+    return pod2usage(0) if $opt{help};
+    if ( $opt{version} ) {
+        print "ygrok version $ygrok::VERSION (Perl $^V)\n";
+        return 0;
+    }
+
+    eval {
+        ETL::Yertl::Command::ygrok->main( @argv, \%opt );
+    };
+    if ( $@ ) {
+        return pod2usage( "ERROR: $@" );
+    }
+    return 0;
+}
+
+exit __PACKAGE__->main( @ARGV ) unless caller(0);
+
+__END__
+
+=pod
+
+=head1 NAME
+
+ygrok - Build YAML by parsing lines of plain text
+
+=head1 VERSION
+
+version 0.028
+
+=head1 SYNOPSIS
+
+    ygrok [-l|--loose] <pattern> [<file>...]
+    ygrok --pattern [<pattern_name> [<pattern>]]
+    yfrom -h|--help|--version
+
+=head1 DESCRIPTION
+
+This program takes lines of plain text and converts them into documents.
+
+=head1 ARGUMENTS
+
+=head2 pattern
+
+The pattern to match with. Any line that does not match the pattern will be ignored.
+
+See the full documentation for pattern syntax.
+
+=head2 file
+
+A file to read. The special file "-" refers to STDIN. If no files are
+specified, read STDIN.
+
+=head1 OPTIONS
+
+=head2 -l|--loose
+
+Match anywhere in the line. Normally, the pattern must match the full line.
+Setting this allows the pattern to match anywhere in the line (but still only once).
+
+=head2 --pattern
+
+View, add, and edit patterns. With no arguments, shows all the patterns. With
+C<pattern_name>, shows the specific pattern or pattern category. With C<pattern>,
+adds a custom pattern that can then be used in future patterns.
+
+    # Show all patterns
+    ygrok --pattern
+
+    # Show all "NET" patterns
+    ygrok --pattern NET
+
+    # Show the "NET.HOSTNAME" pattern
+    ygrok --pattern NET.HOSTNAME
+
+    # Add a new pattern
+    ygrok --pattern HOSTS_LINE '%{NET.HOSTNAME:host} %{NET.IPV4:ip}'
+
+    # Use the new pattern
+    ygrok '%{HOSTS_LINE}' < /etc/hosts
+
+=head2 -h | --help
+
+Show this help document.
+
+=head2 --version
+
+Print the current ygrok and Perl versions.
+
+=head1 PATTERNS
+
+A pattern is a match for the entire line, splitting the line into fields.
+
+A named ygrok match has the format: C<%{PATTERN_NAME:field_name}>. The
+C<PATTERN_NAME> is one of the available patterns, listed below. The
+C<field_name> is the field to put the matched data.
+
+Additionally, the pattern is a Perl regular expression, so any regular
+expression syntax will work. Any named captures
+(C<(?E<lt>field_nameE<gt>PATTERN)>) will be part of the document.
+
+=head2 BUILT-IN PATTERNS
+
+The built-in patterns are common patterns that are always available.
+
+=over 4
+
+=item Simple Patterns
+
+=over 4
+
+=item WORD
+
+A single word, C<\b\w+\b>.
+
+=item DATA
+
+A non-slurpy section of data, C<.*?>.
+
+=item INT
+
+An integer, positive or negative.
+
+=item NUM
+
+A floating-point number, positive or negative, with optional exponent.
+
+=back
+
+=item Date/Time Patterns
+
+=over 4
+
+=item DATE.MONTH
+
+A full or abbreviated month name for the "C" locale (January (Jan), February
+(Feb), etc...)
+
+=item DATE.ISO8601
+
+An ISO8601 date/time
+
+=item DATE.HTTP
+
+An RFC822 date/time, used by HTTP.
+
+=item DATE.SYSLOG
+
+A syslog date, like "Jan 01 01:23:45"
+
+=back
+
+=item Operating System Patterns
+
+=over 4
+
+=item OS.USER
+
+A username.
+
+=item OS.PROCNAME
+
+A process name
+
+=back
+
+=item Networking Patterns
+
+=over 4
+
+=item NET.IPV4
+
+An IPv4 address.
+
+=item NET.IPV6
+
+An IPv6 address.
+
+=item NET.HOSTNAME
+
+A network host name. Either an RFC1101 domain or an IPv4 or IPv6 address.
+
+=back
+
+=item URL Patterns
+
+=over 4
+
+=item URL
+
+A full URL with scheme
+
+=item URL.PATH
+
+The path part of a URL
+
+=back
+
+=item Log File Patterns
+
+=over 4
+
+=item LOG.HTTP_COMMON
+
+The Apache Common Log Format.
+
+=item LOG.HTTP_COMBINED
+
+The Apache Combined Log Format.
+
+=item LOG.SYSLOG
+
+The syslog format (RFC 3164)
+
+=back
+
+=item POSIX Command Output Patterns
+
+=over 4
+
+=item POSIX.LS
+
+Parse the output of C<ls -l>
+
+=item POSIX.PS
+
+Parse the output of C<ps>
+
+=item POSIX.PSX
+
+Parse the output of C<ps x> and C<ps w>
+
+=item POSIX.PSU
+
+Parse the output of C<ps u>
+
+=back
+
+=back
+
+=head1 ENVIRONMENT VARIABLES
+
+=over 4
+
+=item YERTL_FORMAT
+
+Specify the default format Yertl uses between commands. Defaults to C<yaml>. Can be
+set to C<json> for interoperability with other programs.
+
+=back
+
+=head1 AUTHOR
+
+Doug Bell <preaction@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Doug Bell.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

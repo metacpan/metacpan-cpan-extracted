@@ -1,0 +1,74 @@
+NAME
+    Erlang::Parser - Erlang source code parser
+
+VERSION
+    This document describes version 0.6 of Erlang::Parser released
+    2016-06-20.
+
+SYNOPSIS
+        use Erlang::Parser;
+
+        # Parse the code found in DATA; return all root-level nodes.
+        my @nodes = Erlang::Parser->parse(\*DATA);
+
+        # Each object in @nodes implements the Erlang::Parser::Node role, which
+        # is the function 'print'. It takes one argument, the filehandle to
+        # pretty-print to.
+        $_->print(*STDOUT) for @nodes;
+
+        # Use the accessors of each node type to get at the innards:
+        my ($directive, $def) = Erlang::Parser->parse(<<ERL);
+            -export([my_fun/2]).
+            my_fun(X, Y) -> X + Y.
+        ERL
+
+        # Have fun!
+
+DESCRIPTION
+    Erlang::Parser is an Erlang source code parser. You can feed "parse()"
+    any fragment of code which would be acceptable at the top-level of a
+    ".erl" file, including a full file.
+
+  Methods
+    "parse"
+        Parses an top-level Erlang declarations from a string, list of lines
+        of code, or filehandle. Returns a list of top-level nodes.
+
+            my @nodes = Erlang::Parser->parse(
+                'myfun(X) -> X + X.',
+                'myfun(X, Y) -> X + Y.',
+            );
+
+    "error"
+        Called when an error occurs. Reports based on the parser given as
+        the first argument.
+
+AUTHOR
+    Yuki Izumi (anneli@cpan.org)
+
+SUPPORT
+    You can find documentation for Erlang::Parser with the perldoc command.
+
+        perldoc Erlang::Parser
+
+    Other places of interest:
+
+    *   GitHub: source code repository
+
+        <http://github.com/kivikakk/Erlang--Parser>
+
+    *   GitHub: open an issue
+
+        <http://github.com/kivikakk/Erlang--Parser/issues>
+
+    *   Twitter: the author
+
+        <http://twitter.com/kivikakk>
+
+LICENSE AND COPYRIGHT
+    Copyright (c) 2011-2016, Yuki Izumi "<ANNELI@CPAN.org>". All rights
+    reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See perlartistic.
+

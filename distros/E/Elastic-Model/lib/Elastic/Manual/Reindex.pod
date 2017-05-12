@@ -1,0 +1,125 @@
+package Elastic::Manual::Reindex;
+
+# ABSTRACT: How to reindex your data from an old index to a new index
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Elastic::Manual::Reindex - How to reindex your data from an old index to a new index
+
+=head1 VERSION
+
+version 0.52
+
+=head1 INTRODUCTION
+
+While you can add to the L<mapping|Elastic::Manual::Terminology/Mapping> of
+an index, you can't change what is already there. Especially during development,
+you will need to L<reindex|Elastic::Model::Index/reindex()> your data to a new
+index.
+
+=head1 USE ALIASES INSTEAD OF INDICES
+
+The easiest way to work is to have the L<Elastic::Model::Namespace/name>
+be an L<index alias|Elastic::Manual::Terminology/Alias> which points at the
+current version of your index.  For instance:
+
+    my $ns = $model->namespace( 'myapp' );
+    $ns->index( 'myapp_v1' )->create;
+    $ns->alias->to( 'myapp_v1' );
+
+Now you're ready to start indexing data into C<myapp>:
+
+    my $domain = $model->domain( 'myapp' );
+    $domain->create( user => { name => 'John'} );
+
+When you need to change your mapping, you can just reindex to a new index:
+
+    # create 'myapp_v2' if it doesn't exist, and
+    # copy 'myapp_v1' to 'myapp_v2'
+    $ns->index( 'myapp_v2' )->reindex( 'myapp' );
+
+    # update alias 'myapp' to point to 'myapp_v2'
+    $ns->alias->to( 'myapp_v2' );
+
+    # delete the old 'myapp_v1'
+    $ns->index( 'myapp_v1' )->delete;
+
+=head1 UPDATING UIDS
+
+Imagine you have a C<$post> object which has a C<user> attribute.  The
+L<UID|Elastic::Model::UID> of the user is stored in Elasticsearch, which
+includes the index name.
+
+When you reindex your data from C<myapp_v1> to C<myapp_v2>,
+L<reindex()|Elastic::Model::Index/reindex()> will automatically update
+all UIDs in the reindexed data to point to the new index.
+
+=head1 UPDATING UIDS IN OTHER INDICES
+
+Now imagine that you have another index (one you're not reindexing) which also
+has UIDs which point to the old index.  These will no longer be valid. You
+need to update the old UIDs to point to the new index.
+
+This will also be done automatically by
+L<reindex()|Elastic::Model::Index/reindex()>, but you can disable it with:
+
+    $index->reindex( 'myapp:v1', repoint_uids => 0 );
+
+=head1 CHANGING DOC STRUCTURE WHILE REINDEXING
+
+If the structure of your Doc class has changed, then you may need to change
+the structure of each doc before reindexing it.  To do so, you can pass
+a C<transform> callback.
+
+The C<transform> sub is called before any other changes are made to your doc,
+and is passed the C<$doc> as its only parameter. It should return the new
+C<$doc>.
+
+For instance, to convert the single-value C<tag> field to an array of C<tags>,
+you could do:
+
+    $index->reindex(
+        'new_index',
+        'transform' => sub {
+            my $doc = shift;
+            $doc->{_source}{tags} = [ delete $doc->{_source}{tag} ];
+            return $doc
+        }
+    );
+
+=head1 TODO
+
+=over
+
+=item *
+
+Reindex in parallel
+
+=item *
+
+Reindex a live index
+
+=item *
+
+Keep two indices in sync
+
+=back
+
+=head1 AUTHOR
+
+Clinton Gormley <drtech@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Clinton Gormley.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

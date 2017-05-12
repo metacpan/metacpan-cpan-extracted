@@ -1,0 +1,36 @@
+Eidolon::Driver::DB::MySQL, version 0.01
+========================================
+
+The Eidolon::Driver::DB::MySQL is the MySQL database driver for Eidolon.
+MySQL versions 4.0+ are supported. 
+
+INSTALLATION
+
+To install the driver type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+To use this driver you must have the following packages installed:
+
+    DBI
+    DBD::mysql
+    Eidolon
+
+LICENCE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+AUTHOR
+
+Anton Belousov, <abel@cpan.org>
+
+COPYRIGHT
+
+Copyright (c) 2009, Atma 7, http://www.atma7.com
+

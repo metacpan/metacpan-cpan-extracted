@@ -1,0 +1,26 @@
+#!/usr/local/bin/perperl
+use strict;
+use FindBin qw($Bin);
+use ETLp::Audit::Browser::Controller::User;
+use CGI::Carp qw(fatalsToBrowser);
+use CGI;
+
+my $webapp = ETLp::Audit::Browser::Controller::User->new(
+    PARAMS => {
+        config_file   => "$Bin/../conf/etl.conf",
+        template_path => "$Bin/../view",
+        'table'       => [
+            'login'          => {rm => 'login'},
+            'validate_login' => {rm => 'validate_login'},
+            'logout'         => {rm => 'logout'},
+            'list'           => {rm => 'list'},
+            'save_password'  => {rm => 'save_password'},
+            'save'           => {rm => 'save'},
+            'error'          => {rm => 'error'},
+            'edit_password'  => {rm => 'edit_password'},
+            'edit/:user_id?' => {rm => 'edit'},
+        ]
+    }
+);
+
+$webapp->run;

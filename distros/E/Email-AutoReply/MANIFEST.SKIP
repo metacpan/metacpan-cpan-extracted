@@ -1,0 +1,16 @@
+#defaults
+^Makefile$
+\.swp$
+\.old$
+\.bak$
+~$
+^Email-AutoReply-
+^_build/
+^blib/
+^pm_to_blib$
+^blibdirs$
+^.*\.tmp$
+(^|/)CVS(/|$)
+(^|/)\.\#
+\.cvsignore$
+\.tar\.gz$

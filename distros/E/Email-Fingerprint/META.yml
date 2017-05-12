@@ -1,0 +1,40 @@
+---
+name: Email-Fingerprint
+version: 0.47
+abstract: 'Calculate a digest for recognizing duplicate emails'
+author:
+  - 'Len Budney <lbudney@pobox.com>'
+license: perl
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Hand, CPAN::Meta::Converter version 2.120921'
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  AnyDBM_File: 1
+  Carp: 0
+  Class::Std: 0
+  Fcntl: 0
+  File::Path: 2.08
+  File::Spec: 0.82
+  FileHandle: 0
+  FindBin: 0
+  List::MoreUtils: 0.04
+  LockFile::Simple: 0.2
+  Mail::Header: 1.4
+  Scalar::Util: 0
+  overload: 0
+  perl: 5.008001
+build_requires:
+  ExtUtils::MakeMaker: 0
+  File::Slurp: 0.01
+  Test::Exception: 0.07
+  Test::More: 0
+  Test::Warn: 0.09
+x_installdirs: site

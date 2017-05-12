@@ -1,0 +1,46 @@
+Exception::ThrowUnless
+======================
+
+This is a pretty simple module.  It provides functions much like the standard
+perl functions, except that if they fail, they will die instead of returning
+undef.  The messages are usually like:
+	"$func:@_:$!", with @_ comma separated.
+
+The functions to date are:
+
+schdir    sclose   sexec      sfork    slink
+smkdir    sopen    sreadlink  srename  srename_nc
+ssymlink  sunlink
+
+usually, they die if their namesake returns undef.
+
+exceptional functions are:
+	sexec:		dies if exec returns at all.
+	sunlink: 	does not die, unless one of the files it was asked to
+				unlink exists. retries unlink, in this case, to reset
+				errno (sometimes got ENOTTY, if all things).
+	srename_nc:	tails if $_[1] exists.
+	smkdir:		does not die, if $_[0] is a dir, and $! == 17 (EEXIST)
+
+buggy functions:
+	sopen:  I can find no prototype that will allow me to reproduce
+			the open function in all these cases:
+				open(STDIN,">x");
+				open(*STDIN,">x");
+				open(my $fh,">x");
+
+			and I didn't even try
+				our($STDIN) = "hysterical_porpuses";
+				open(STDIN);
+			
+			I'd love to know if/how this is possible.
+
+	return values may differ.
+
+	many are missing.  If you need one that ain't there, drop it in, and
+	I'll include it.
+
+	wantarray may differ in wrapped function from what would normally
+	happen.  Don't think it matters.  Let me know if I'm wrong.
+
+

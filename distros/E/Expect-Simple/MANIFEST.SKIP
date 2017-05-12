@@ -1,0 +1,11 @@
+^.hg
+.old$
+.bak$
+Makefile$
+blib/
+~$
+pm_to_blib
+t/.*.stdout
+t/.*.stderr
+blibdirs
+.gz$

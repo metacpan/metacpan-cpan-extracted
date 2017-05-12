@@ -1,0 +1,12 @@
+#
+# this AddType is used to trick IE to work with XHTML pages
+#
+AddType text/html .xhtml
+RewriteEngine on
+RewriteBase /
+RewriteCond %{HTTP_ACCEPT} application/xhtml\+xml
+RewriteCond %{HTTP_ACCEPT} !application/xhtml\+xml\s*;\s*q=0
+RewriteCond %{REQUEST_URI} \.xhtml$
+RewriteCond %{THE_REQUEST} HTTP/1\.1
+RewriteRule .* - [T=application/xhtml+xml]
+

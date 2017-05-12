@@ -1,0 +1,174 @@
+
+use File::Spec ;
+use File::Find ;
+use Cwd ;
+
+$win32 = ($^O eq 'MSWin32') ;
+
+my $prefix  ;
+my $prefix2  ;
+my $libs  ;
+my $libs2  ;
+my $cflags  ;
+my $cflags2  ;
+my $version ;
+my $version2 ;
+
+if (!$win32)
+    {
+    if (!open (C, "xml2-config --version|"))
+        {
+        print "Cannot execute xml2-config ($!). libxml2 and libxslt will not be linked into Embperl\n" ;
+        return undef ;
+        }
+    chomp ($version = <C>)  or die ("Cannot execute xml2-config to get version.") ;
+    close C ;
+
+    open C, "xml2-config --prefix --libs --cflags|" or die ("Cannot execute xml2-config ($!).") ;
+    chomp ($prefix = <C>) ;
+    chomp ($libs = <C>) ;
+    chomp ($cflags = <C>) ;
+    close C ;
+
+    print "Found libxml2 $version installed under $prefix\n" ;
+
+    if (!open (C, "xslt-config --version|"))
+        {
+        print "Cannot execute xslt-config ($!). libxml2 and libxslt will not be linked into Embperl\n" ;
+        return undef ;
+        }
+    chomp ($version2 = <C>)  or die ("Cannot execute xslt-config to get version.") ;
+    close C ;
+
+    open C, "xslt-config --prefix --libs |" or die ("Cannot execute xslt-config ($!).") ;
+    chomp ($prefix2 = <C>) ;
+    chomp ($libs2 = <C>) ;
+    close C ;
+
+    open C, "xslt-config --cflags|" or die ("Cannot execute xslt-config ($!).") ;
+    chomp ($cflags2 = <C>) ;
+    close C ;
+
+    print "Found libxslt $version2 installed under $prefix2\n" ;
+    
+    
+    return { cflags => "$cflags $cflags2", 
+             libs => "$libs $libs2", 
+             inc => $prefix eq $prefix2?"-I$prefix/include":"-I$prefix/include -I$prefix2/include",
+             defines => '-DLIBXSLT',
+             objects => 'driver/eplibxslt$(OBJ_EXT)',
+             save    => { '$LIBXSLTVERSION' => $version2 }} ;
+    }
+
+
+$path = $ENV{LIBXSLTPATH} || GetString ("Enter path of the directory where you have extracted libxml2 and libxslt or single dot for not using libxml", $LIBXSLTPATH) ;
+
+return undef if (!$path || $path eq '.') ;
+
+my $currdir = Cwd::fastcwd ;
+
+eval { find (\&libxslt, $path) ; } ;
+$@ = '' ;
+chdir ($currdir);
+if (!$libxslt)
+    {
+    print "libxslt.lib library not found under $path\n" ;
+    return undef ;
+    }
+
+eval { find (\&libxml2, $path) ; } ;
+$@ = '' ;
+chdir ($currdir);
+if (!$libxml2)
+    {
+    print "libxml2.lib library not found under $path\n" ;
+    return undef ;
+    }
+
+eval { find (\&iconv, $path) ; } ;
+$@ = '' ;
+chdir ($currdir);
+if (!$iconv)
+    {
+    print "iconv.lib library not found under $path\n" ;
+    return undef ;
+    }
+
+$path = File::Spec -> canonpath ($path) ;
+$inc1 = File::Spec -> canonpath ("$libxsltpath/../include") ;
+$inc2 = File::Spec -> canonpath ("$libxml2path/../include") ;
+$inc3 = File::Spec -> canonpath ("$iconvpath/../include") ;
+
+print "libxslt and libxml2 found under $libxsltpath and $libxml2path\n" ;
+
+return { 
+         libs => "-L\"$libxsltpath\" -L\"$libxml2path\"  -L\"$iconvpath\" -l$libxslt -l$libxml2 -l$iconv", 
+         cflags => "-I\"$inc1\" -I\"$inc2\" -I\"$inc3\"",
+         defines => '-DLIBXSLT',
+         objects => 'driver/eplibxslt$(OBJ_EXT)',
+         save    => { 
+                    '$LIBXSLTVERSION' => '2x',
+                    '$LIBXSLTPATH'    => $path,
+                     }} ;
+
+
+
+sub libxslt
+
+    {
+    if ($File::Find::dir ne $path && (($File::Find::dir =~ m#/\.#) || ($File::Find::dir !~ /libxslt/)))
+        {
+        $File::Find::prune = 1 ;
+        return ;
+        } 
+
+    if (/^libxslt\.lib/i)
+        {
+        $libxsltpath = $File::Find::dir ;
+        die $libxslt = $_ ;
+        }
+    }
+
+
+sub libxml2
+
+    {
+    if ($File::Find::dir ne $path && (($File::Find::dir =~ m#/\.#) || ($File::Find::dir !~ /libxml2/)))
+        {
+        $File::Find::prune = 1 ;
+        return ;
+        } 
+
+    if (/^libxml2\.lib/i)
+        {
+        $libxml2path = $File::Find::dir ;
+        die $libxml2 = $_ ;
+        }
+    }
+
+
+
+sub iconv
+
+    {
+    if ($File::Find::dir ne $path && (($File::Find::dir =~ m#/\.#) || ($File::Find::dir !~ /iconv/)))
+        {
+        $File::Find::prune = 1 ;
+        return ;
+        } 
+
+    if (/^iconv\.lib/i)
+        {
+        $iconvpath = $File::Find::dir ;
+        die $iconv = $_ ;
+        }
+    }
+
+
+
+
+
+
+print "libxml2/libxslt is currently not supported on Win32\n" ;
+return undef ;
+

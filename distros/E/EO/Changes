@@ -1,0 +1,43 @@
+0.96
+	- Altered the documentation for the base EO class to
+	  make it more true when talking about the clone() method.
+	- added the EO::Hierarchy class, which is nice for data
+	  inheritance
+
+0.95
+	- fixed a bug that meant you couldn't instantiate
+	  an Array with new_with_array( $scalar ), which of course
+	  should instantiate an array with one argument
+
+0.94    Friday 6th August 2004
+	- added Class::Accessor::Chained as the base
+	  class of EO, for easy accessors.
+
+0.93
+	Monday 5th July 2004
+	- removed test that fails if you are installing as root.
+	- bumped version in anticipation of a release
+
+0.92    Fri Jul  2 14:23:23 BST 2004
+	
+	Monday 28th June, 2004
+	- can get EO::Pair objects from EO::Hash's now.
+	- added select() and do() methods to the Collection classes
+	- added Deprecated attribute to mark deprecated methods
+	- started deprecation of object_at_index in favour of at method in all
+	  collection classes (jduncan)
+
+	Sometime before
+	- moved to Uppercase attribute names
+
+0.91	Thursday 20th May, 2004
+
+	26 Fri Mar 26 12:28:00 2004
+        - fixed bug in abstract attributes that when called as class name
+          gives wrong class name (mark)
+
+	March 5th 2004
+  	+ Changed oid generation to make it lazy
+
+0.90	25th February, 2004
+	Initial CPAN release

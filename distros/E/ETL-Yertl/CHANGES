@@ -1,0 +1,324 @@
+Changelog for ETL-Yertl
+
+0.028     2016-10-09 23:08:36-05:00 America/Chicago
+
+    [Added]
+
+    - The YAML::Tiny module is now officially supported
+    - The YERTL_FORMAT environment variable will set the default format
+      that Yertl uses to communicate. Set it to `json` for Yertl to
+      seamlessly interoperate with other JSON-based tools like `jq` and
+      `recs`.
+    - CSV conversion (`yto`/`yfrom`) now allows setting a delimiter so
+      we can parse colon-separated values or esoteric formats
+
+    [Fixed]
+
+    - `yq -x` now checks for definedness before trying to print. This
+      silences warnings from Perl about "Uninitialized value in print".
+      In the future, we may re-enable warnings through a `-w` or `-v`
+      switch.
+    - If one filter in a pipe returns empty, that empty result is
+      propagated through further filters. This makes the output of
+      something like `select( .foo == 1 ) | .bar` more intuitive: If
+      a document doesn't pass the first part, the result of the second
+      part is `empty`, not `undef` (`--- ~`).
+    - The `ysql` helpers and placeholders are now better documented in
+      the ysql guide.
+
+    [Other]
+
+    - ygrok tests are now split into more maintainable chunks based on
+      the patterns they are testing.
+
+0.027 2015-11-28T09:19:23
+ - use ipv4 and ipv6 patterns from Regexp::Common
+ - update Path::Tiny version to fix File::Path issue
+ - expand sql helpers docs to link related helpers
+ - add the --delete helper option to ysql
+ - return database handle from test setup function
+ - change variable name in test
+ - add release v0.026 announcement
+ - fix commit urls in blog posts
+ - fix release-blog script github URL
+
+0.026 2015-11-25T03:41:56Z
+ - add --order-by helper for ysql
+ - add sortable field to ysql test
+ - add --where helper for select queries
+ - add --select and --insert query helpers to ysql
+ - add flag to edit SQL query in text editor
+ - deploy to personal site
+ - redirect from github pages to personal site
+ - update docs to new website at preaction.me
+ - ignore the statocles directory
+ - remove obsolete site config attributes
+ - add release v0.025 announcement
+ - update theme from statocles default
+
+0.025 2015-08-24T03:12:13Z
+ - fix SQL error using --dsn printing error twice
+ - handle error in connect with useful error message
+ - update Regexp::Common to 2013031301
+ - make http log patterns more lenient
+ - upgrade perl in travis config
+ - update theme from statocles default
+ - add release v0.024 announcement
+
+0.024 2015-06-01T02:36:27Z
+ - add xargs mode to yq
+ - remove ModuleBuild to prevent toolchain confusion
+ - fix ps grok patterns to work on RHEL 5
+ - update default theme from statocles default
+ - add google analytics
+ - add release v0.023 announcement
+
+0.023 2015-02-26T18:35:35Z
+ - make yq use formatter modules
+ - update statocles theme from latest release
+ - update site theme for new statocles default theme
+ - add release v0.022 announcement
+
+0.022 2015-02-02T05:51:12Z
+ - add guides to the site main page
+ - fix ysql synopsis missing -- before config option
+ - add site intro and fix links to internal docs
+ - fix link to Yertl on metacpan.org
+ - update statocles default theme
+ - add release v0.021 announcement
+
+0.021 2015-02-02T05:20:13Z
+ - add ygrok to the Statocles-generated POD
+ - add release v0.020 announcement
+ - update statocles conf for new deploy system
+ - add --loose flag to ygrok to match partial lines
+ - add ygrok patterns for ps, ps u, and ps x
+ - allow really old files in ls -l ygrok parsing
+ - add ygrok pattern for POSIX `ls -l`
+ - add ygrok to the main page synopsis
+ - add syslog pattern to ygrok
+ - simplify "DATETIME" to just "DATE" in ygrok
+ - allow adding, editing, and listing ygrok patterns
+ - fix multiply-nested patterns
+ - document all existing ygrok patterns
+ - add pattern categories to ygrok
+ - add ysql help guide
+ - remove need for "query" when using ysql
+ - add combined log format pattern for grok
+ - add missing test collateral
+ - allow recursive grok patterns
+ - add ygrok patterns to parse http common log format
+ - fix warnings when an unknown grok pattern is used
+ - fix spurious contributor
+
+0.020 2015-01-28T04:42:06Z
+ - add short descriptions of all the Yertl tools
+ - add ysql to main page synopsis
+ - add links to yertl homepage
+ - exclude the website from the cpan dist
+ - fix "prototype mismatch" from Parse::RecDescent
+ - add initial ygrok script
+ - add dzil plugin for prereqs and compile tests
+ - add release v0.019 announcement
+
+0.019 2015-01-22T04:04:01Z
+ - fix test failure on DBD::SQLite 1.33
+
+0.018 2015-01-22T03:57:02Z
+ - add missing ABSTRACTs to Command modules
+ - add error checking when preparing or executing SQL
+ - allow using "--dsn" to edit config
+ - combine write and query in ysql
+ - Fix mailmap for my work e-mail
+ - add release 0.017 announcement
+
+0.017 2015-01-12T05:31:46Z
+ - add website using Statocles
+ - remove docs about trim option
+ - add validation for database driver
+ - add drivers ysql command to list database drivers
+ - remove root dotfiles and root ini files from dist
+ - document new ysql config read commands
+ - show error if a database key does not exist
+ - switch to dzil Git::GatherDir
+ - add read config commands to ysql
+ - add documentation for ymask
+ - make DBI completely optional
+ - add cookbook with embedded json recipe
+
+0.016 2015-01-06T02:36:59Z
+ - update Import::Base prereq
+ - fix contributors dependency
+ - update copyright year
+ - add contributors dzil plugin for proper attribution
+ - add saved queries with placeholders to ysql
+ - fix empty yaml file throws exception
+ - check for DBI and DBD::SQLite before loading ysql
+ - update Test::More to allow args to subtest refs
+ - add prereq on File::HomeDir
+ - use db config to query and write to saved dbs
+ - add ysql config command to add databases
+ - allow deep data structure interpolation in ysql
+ - change interpolation sigil to '$.'
+ - update Path::Tiny to 0.055
+ - add basic write command to ysql
+ - add ysql command with basic query support
+
+0.015 2014-12-29T23:15:29Z
+ - release v0.015
+ - only run format tests if we have a formatter
+ - use yaml formatter in ymask
+ - use yaml formatter in yto
+ - use yaml formatter in yfrom
+ - move YAML formatter to new stream-based API
+ - move JSON formatter to new stream-based API
+ - move CSV formatter to new stream-based API
+ - move test data into files
+ - move ymask to ETL::Yertl::Command::ymask
+ - move yfrom to ETL::Yertl::Command::yfrom
+ - move test for CSV trimming to format tests
+ - always document the -h, --help, and --version options
+ - move yto to ETL::Yertl::Command::yto
+ - require JSON::PP for testing
+ - fix default format module in yaml formatter
+ - fix default format module in csv format
+ - fix default format module in json formatter
+ - move yq into ETL::Yertl::Command::yq
+ - move yq support classes to ETL::Yertl::Command::yq
+ - add recommends for all supported formatter modules
+ - add yaml formatter class
+ - add csv format module
+ - add formatter object to format sub
+ - add json formatter class
+ - create new base/project-intro module
+ - rename to ETL-Yertl
+
+0.014 2014-12-12T07:28:58Z
+ - release v0.014
+ - trim leading whitespace from CSV cells by default
+ - rename ypick back to ymask
+
+0.013 2014-12-10T08:05:32Z
+ - release v0.013
+ - remove the Marpa version for now
+ - fix test failures due to whitespace differences
+ - add IRC link
+ - add ypick for simple field picking
+ - fix "yq::filter used only once" warning
+ - fix differences between JSON::PP and JSON::XS
+ - remove dependency on Marpa for now
+ - only ignore bundles in the dist root
+ - only remove .ini files from the dist root
+ - add dzil tag annotation with name, date, and changelog
+ - update weaver.ini from new defaults
+ - commit new build artifacts
+ - update generated READMEs for status badges
+ - update dist.ini for new best practices
+
+0.012 2014-10-19T22:25:41Z
+ - release v0.012
+ - add yfrom script to output YAML from JSON or CSV
+ - remove references to Test::Most
+ - add Marpa::R2 prereq
+ - add travis config
+ - add yto script to convert from YAML to other formats
+ - always use 5.10 features
+ - move away from Test::Most
+ - add an initial Marpa::R2 parser
+ - start on a parse-tree-based P::RD implementation
+ - int rule is unnecessary since float covers ints
+ - add some preprocessing to fix pipes
+ - fix comma combinator
+ - undef is a valid value, so return an empty list
+ - put use lines at the top of the parse
+ - fix the order of <|> and <=|>=
+ - use eval to get rid of the literal quote characters
+ - add the missing sort function
+ - fix the missing empty function
+ - fix number parsing (int, float, bin, hex, oct)
+ - add list object to differentiate arrays
+ - SurgicalPodWeaver -> PodWeaver
+ - initial test Parse::RecDescent implementation
+ - load the underlying interpreter at runtime
+ - add sort(EXPR) function to sort by string
+ - move the interpreter to a module
+ - add <,<=,>,>= numeric comparison operators
+ - test and document the == and != operators
+ - add length( EXPR ) function
+ - add keys(EXPR) function
+ - clarify and add some comments during the parsing
+
+0.011 2014-05-17T06:42:15Z
+ - release v0.011
+ - prevent undefined warnings
+ - add missing options to SYNOPSIS
+ - add --version option
+ - add raw numbers (int, dec, e, bin, oct, hex)
+ - add verbose flag to start writing diagnostics
+ - switch to using Regexp::Common for delimited text
+ - add pipe to use output from EXPR as input to next
+ - break tests out into individual categories
+
+0.010 2014-05-16T15:30:07Z
+ - add quoted strings using Text::Balanced
+
+0.009 2014-05-16T06:22:49Z
+ - release 0.009
+ - add hash and array constructors
+ - add group_by( EXPR ) function
+
+0.008 2014-05-14T05:05:14Z
+ - release v0.008
+ - turn off STDOUT buffering
+ - add note to grep() instead of using `if/else empty`
+ - implement grep(EXPR)
+ - allow `if .foo then .bar` for truthiness checking
+
+0.007 2014-05-09T04:27:11Z
+ - update build artifacts for v0.007
+ - test that -h and error messages are correct
+
+0.006 2014-05-09T02:41:31Z
+ - update build artifacts
+ - fix -h and --help option
+
+0.005 2014-05-07T03:45:17Z
+ - update build artifacts
+ - add .[] to flatten an array
+ - add , operator to join multiple filters
+ - forgot the test file needed for filename arg test
+ - allow filenames to be given as further arguments
+ - prevent "undefined" warnings
+ - filter documents that have no document separator
+ - prepare for using STDERR as an error channel
+
+0.004 2014-05-03T03:30:31Z
+ - increase required Getopt::Long version
+
+0.003 2014-05-01T05:54:23Z
+ - update build artifacts
+ - document the help option
+ - fix POD errors
+
+0.002 2014-05-01T05:34:09Z
+ - update build artifacts
+ - add array filters and allow combining filters
+
+0.001 2014-04-30T05:55:50Z
+ - fix gitignore for the app rename
+ - update build artifacts
+ - migrate to Import::Base
+ - rename to App-YAML-Filter
+ - document the else clause and the empty value
+ - add "empty" special value to suppress printing undef documents
+ - support else clauses in if statements
+ - don't need to collect output as we're only working with one document
+ - mark executables as executable
+ - forgot to import pod2usage
+ - add shebang line and remove modeline
+ - add URL for jq project
+ - remove <> because it's POD syntax and markdown thinks it's HTML
+ - add build artifacts
+ - add initial use-case - filtering documents based on a hash key
+ - initial skeleton
+

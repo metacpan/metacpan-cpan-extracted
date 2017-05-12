@@ -1,0 +1,258 @@
+# $Id: schema.dat,v 1.15 2010/01/09 21:36:28 jv Exp $ -*- coding: utf-8 -*-
+# EekBoek Rekeningschema voor eekboek_sample
+# Content-Type: text/plain; charset = UTF-8
+
+# Dit bestand definiëert alle vaste gegevens van een administratie of
+# groep administraties: het rekeningschema (balansrekeningen en
+# resultaatrekeningen), de dagboeken en de BTW tarieven.
+#
+# Algemene syntaxregels:
+#
+# * Lege regels en regels die beginnen met een hekje # worden niet
+#   geïnterpreteerd.
+# * Een niet-ingesprongen tekst introduceert een nieuw onderdeel.
+# * Alle ingesprongen regels zijn gegevens voor dat onderdeel.
+
+# REKENINGSCHEMA
+#
+# Het rekeningschema is hiërarchisch opgezet volgende de beproefde
+# methode Bakker. De hoofdverdichtingen lopen van 1 t/m 9, de
+# verdichtingen t/m 99. De grootboekrekeningen zijn verdeeld in
+# balansrekeningen en resultaatrekeningen.
+#
+# De omschrijving van de grootboekrekeningen wordt voorafgegaan door
+# een vlaggetje, een letter die resp. Debet/Credit (voor
+# balansrekeningen) en Kosten/Omzet/Neutraal (voor resultaatrekeningen)
+# aangeeft. De omschrijving wordt indien nodig gevolgd door extra
+# informatie. Voor grootboekrekeningen kan op deze wijze de BTW
+# tariefstelling worden aangegeven die op deze rekening van toepassing
+# is:
+#
+#   :btw=nul
+#   :btw=hoog
+#   :btw=laag
+#   :btw=privé
+#   :btw=anders
+#
+# Ook is het mogelijk aan te geven dat een rekening een koppeling
+# (speciale betekenis) heeft met :koppeling=xxx. De volgende koppelingen
+# zijn mogelijk:
+#
+#   crd		de standaard tegenrekening (Crediteuren) voor inkoopboekingen
+#   deb		de standaard tegenrekening (Debiteuren) voor verkoopboekingen
+#   btw_ih	de rekening voor BTW boekingen voor inkopen, hoog tarief
+#   btw_il	idem, laag tarief
+#   btw_vh	idem, verkopen, hoog tarief
+#   btw_vl	idem, laag tarief
+#   btw_ph	idem, privé, hoog tarief
+#   btw_pl	idem, laag tarief
+#   btw_ah	idem, anders, hoog tarief
+#   btw_al	idem, laag tarief
+#   btw_ok	rekening voor de betaalde BTW
+#   winst	rekening waarop de winst wordt geboekt
+#
+# De koppeling winst is verplicht en moet altijd in een administratie
+# voorkomen in verband met de jaarafsluiting.
+# De koppelingen voor BTW moeten worden opgegeven indien BTW
+# van toepassing is op de administratie.
+# De koppelingen voor Crediteuren en Debiteuren moeten worden
+# opgegeven indien er inkoop dan wel verkoopdagboeken zijn die gebruik
+# maken van de standaardwaarden (dus zelf geen tegenrekening hebben
+# opgegeven).
+
+# Normaal lopen hoofdverdichtingen van 1 t/m 9, en verdichtingen
+# van 10 t/m 99. Indien daarvan wordt afgeweken kan dit worden opgegeven
+# met de opdracht "Verdichting". De twee getallen geven het hoogste
+# nummer voor hoofdverdichtingen resp. verdichtingen.
+
+Verdichting 9 99
+
+# De nummers van de grootboekrekeningen worden geacht groter te zijn
+# dan de maximale verdichting. Daarvan kan worden afgeweken door
+# middels voorloopnullen de _lengte_ van het nummer groter te maken
+# dan de lengte van de maximale verdichting. Als bijvoorbeeld 99 de
+# maximale verdichting is, dan geeft 001 een grootboekrekening met
+# nummer 1 aan.
+
+Balansrekeningen
+
+  1  Vaste Activa
+     11  Materiële vaste activa
+         1100  D   Inventaris en inrichting                   :btw=hoog,kosten
+         1101  C   Afschrijving inv. & inr.
+         1110  D   Computers				      :btw=hoog,kosten
+         1111  C   Afschrijving computers
+         1120  D   Wagenpark				      :btw=hoog,kosten
+         1121  C   Afschrijving Wagenpark
+
+  2  Vlottende activa
+     21  Handelsvoorraden
+         2100  C   Voorraad
+     22  Vorderingen
+         2200  D   Debiteuren                                 :koppeling=deb
+     23  Liquide middelen
+         2300  D   Kas
+         2320  D   Postbank
+	 2330  D   Postbank Inbedrijf
+         2390  D   Kruisposten
+
+  3  Eigen vermogen
+     31  Kapitaal
+         3100  C   Kapitaal de heer/mevrouw                   :koppeling=winst
+         3110  C   Privé stortingen
+         3120  D   Privé opnamen
+
+  4  Vreemd vermogen
+     41  Leveranciers kredieten
+         4100  C   Crediteuren                                :koppeling=crd
+         4150  C   Nog te ontvangen fakturen
+     42  Belastingen & soc. lasten
+         4200  C   BTW Verkoop Hoog                           :koppeling=btw_vh
+         4210  C   BTW Verkoop Laag                           :koppeling=btw_vl
+         4212  C   BTW Verkoop Privé                          :koppeling=btw_vp
+         4220  D   BTW Inkoop Hoog                            :koppeling=btw_ih
+         4230  D   BTW Inkoop Laag                            :koppeling=btw_il
+         4232  D   BTW Inkoop Privé                           :koppeling=btw_ip
+         4240  C   BTW Autokostenvergoeding
+         4290  C   Omzetbelasting betaald                     :koppeling=btw_ok
+
+Resultaatrekeningen
+
+  6  Kosten
+     61  Verkoopkosten
+         6100  K   Reis- en verblijfkosten                    :btw=hoog
+         6110  K   Sponsoring
+     62  Huisvestingskosten
+         6200  K   Verzekeringen
+     63  Bedrijfsvoering
+	 6310  K   Kamer van Koophandel
+	 6320  K   Vakbond
+         6330  K   Branche-organisatiekosten
+     66  Autokosten
+         6600  K   Leasekosten auto                           :btw=hoog
+         6610  K   Brandstof auto                             :btw=hoog
+         6620  K   Onderhoud auto                             :btw=hoog
+         6630  K   Verzekering auto
+         6640  K   Kilometervergoedingen
+         6650  K   Huur auto                                  :btw=hoog
+         6660  K   Motorrijtuigenbelasting
+         6670  K   Boetes
+         6671  K   Boetes 0% aftrekbaar
+         6680  K   BTW privégebruik auto
+         6690  K   Overige autokosten                         :btw=hoog
+     67  Contributies & abonnementen
+         6700  K   Contributies & abonnementen                :btw=hoog
+         6710  K   Contr. & abonn. BTW 0%
+     68  Afschrijvingen
+         6800  K   Afschr. kosten inv. & inr.
+         6810  K   Afschr. kosten computers
+	 6820  K   Afschr. kosten wagenpark
+     69  Algemene kosten
+         6900  K   Telefoon- en faxkosten                     :btw=hoog
+         6905  K   Internetkosten                             :btw=hoog
+         6920  K   Kantoorartikelen                           :btw=hoog
+         6921  K   Computerbenodigdheden                      :btw=hoog
+         6930  K   Vakliteratuur                              :btw=laag
+         6940  K   Administratiekosten                        :btw=hoog
+         6950  K   Drukwerk & papier                          :btw=hoog
+         6970  K   Postzegels
+         6971  K   Verzending portikosten
+         6980  K   Bankkosten
+         6981  K   Kasverschillen
+         6982  K   Afrondingen
+         6990  K   Overige algemene kosten                    :btw=hoog
+
+  8  Bedrijfsopbrengsten
+     81  Omzet Consultancy
+         8100  O   Omzet advisering                           :btw=hoog
+         8110  O   Omzet advisering BTW vrij
+     82  Omzet Royalties
+         8200  O   Omzet royalties BTW vrij
+     83  Omzet Editing
+         8300  O   Omzet editing                              :btw=hoog
+     84  Omzet Cursussen
+         8400  O   Omzet cursussen                            :btw=hoog
+         8410  O   Omzet cursuslicenties                      :btw=hoog
+     85  Omzet Projekten
+         8500  O   Omzet projekten                            :btw=hoog
+     89	 Omzet Diversen
+         8900  O   Omzet diversen BTW hoog                    :btw=hoog
+         8910  O   Omzet diversen BTW laag                    :btw=laag
+         8920  O   Omzet diversen BTW vrij
+
+  9  Financiële baten & lasten
+     91  Rente baten
+         9120  O   Rente bate Postbank
+         9130  O   Rente bate Postbank Inbedrijf
+         9190  O   Rente bate overige
+     92  Rente- en overige financiële lasten
+         9220  K   Rente last Postbank
+         9230  K   Rente last Postbank Inbedrijf
+         9290  K   Rente last overige
+     93  Overige baten
+	 9380  O   Bijtelling privégebruik auto		      :btw=privé
+         9390  O   Kleine ondernemersregeling
+
+# DAGBOEKEN
+#
+# EekBoek ondersteunt vijf soorten dagboeken: Kas, Bank, Inkoop,
+# Verkoop en Memoriaal. Er kunnen een in principe onbeperkt aantal
+# dagboeken worden aangemaakt.
+# In de eerste kolom wordt de korte naam (code) voor het dagboek
+# opgegeven. Verder moet voor elk dagboek worden opgegeven van welk
+# type het is. Voor dagboeken van het type Kas en Bank moet een
+# tegenrekening worden opgegeven, voor de overige dagboeken mag een
+# tegenrekening worden opgegeven.
+# De optie :dc kan worden gebruikt om aan te geven dat het journaal
+# voor dit dagboek de boekstuktotalen in gescheiden debet en credit
+# moet tonen.
+
+Dagboeken
+
+  I     Inkoop                :type=inkoop
+  K     Kas                   :type=kas        :rekening=2300
+  M     Memoriaal             :type=memoriaal
+  P     Postbank              :type=bank       :rekening=2320
+  R     Inbedrijf             :type=bank       :rekening=2330
+  V     Verkoop               :type=verkoop
+
+# BTW TARIEVEN
+#
+# Er zijn vijf tariefgroepen: "hoog", "laag", "nul", "privé" en
+# "anders". De tariefgroep bepaalt het rekeningnummer waarop de
+# betreffende boeking plaatsvindt.
+# Binnen elke tariefgroep zijn meerdere tarieven mogelijk, hoewel dit
+# in de praktijk niet snel zal voorkomen.
+# In de eerste kolom wordt de (numerieke) code voor dit tarief
+# opgegeven. Deze kan o.m. worden gebruikt om expliciet een BTW tarief
+# op te geven bij het boeken. Voor elk gebruikt tarief (behalve die
+# van groep "nul") moet het percentage worden opgegeven. Met de
+# aanduiding :exclusief kan worden opgegeven dat boekingen op
+# rekeningen met deze tariefgroep standaard het bedrag exclusief BTW
+# aangeven.
+#
+# Indien een BTW-tarief niet geldig is op de boekingsdatum wordt
+# gekeken naar de configuratiesetting [strategy] btw_adapt. Indien
+# deze is gezet op een niet-nul waarde dan wordt gezocht naar een
+# alternatief BTW-tarief en deze gebruikt. In alle gevallen wordt een
+# adequate medlding gegeven.
+# Dit kan per boeking(sregel) worden onderdrukt door de tariefcode
+# expliciet mee te geven.
+#
+# BELANGRIJK: Mutaties die middels de command line shell of de API
+# worden uitgevoerd maken gebruik van het geassocieerde BTW tarief van
+# de grootboekrekeningen. Wijzigingen hierin kunnen dus consequenties
+# hebben voor de reeds in scripts vastgelegde boekingen.
+
+BTW Tarieven
+
+   0  BTW 0%                 :tariefgroep=nul
+   1  BTW 19% incl.          :tariefgroep=hoog :perc=19,00 :tot=2012-10-01
+   2  BTW 19% excl.          :tariefgroep=hoog :perc=19,00 :exclusief :tot=2012-10-01
+   3  BTW 6,0% incl.         :tariefgroep=laag :perc=6,00
+   4  BTW 6,0% excl.         :tariefgroep=laag :perc=6,00 :exclusief
+   5  BTW Privé 12% ex.	     :tariefgroep=privé :perc=12,00 :exclusief
+   6  BTW 21% incl.          :tariefgroep=hoog :perc=21,00 :vanaf=2012-10-01
+   7  BTW 21% excl.          :tariefgroep=hoog :perc=21,00 :exclusief :vanaf=2012-10-01
+
+# Einde EekBoek schema

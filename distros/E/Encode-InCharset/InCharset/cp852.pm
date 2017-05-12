@@ -1,0 +1,82 @@
+# This is auto-generated.  Do not edit by hand!
+package Encode::InCharset::cp852;
+our $VERSION = do {my @r = (q$Revision: 0.1 $ =~ /\d+/g); sprintf "%d."."%02d"x$#r, @r};
+sub InCP852{
+	return <<'END';
+0	7F
+A0
+A4
+A7	A8
+AB	AD
+B0
+B4
+B8
+BB
+C1	C2
+C4
+C7
+C9
+CB
+CD	CE
+D3	D4
+D6	D7
+DA
+DC	DD
+DF
+E1	E2
+E4
+E7
+E9
+EB
+ED	EE
+F3	F4
+F6	F7
+FA
+FC	FD
+102	107
+10C	111
+118	11B
+139	13A
+13D	13E
+141	144
+147	148
+150	151
+154	155
+158	15B
+15E	165
+16E	171
+179	17E
+2C7
+2D8	2D9
+2DB
+2DD
+2500
+2502
+250C
+2510
+2514
+2518
+251C
+2524
+252C
+2534
+253C
+2550	2551
+2554
+2557
+255A
+255D
+2560
+2563
+2566
+2569
+256C
+2580
+2584
+2588
+2591	2593
+25A0
+END
+}
+1;
+__END__

@@ -1,0 +1,16 @@
+{
+  "kit_reader": [
+    "SWAK",
+    { "fs_root": "." }
+  ],
+  "header": [
+    { "From": "nobody@example.com" },
+    { "To"  : "nobody@example.net" }
+  ],
+  "alternatives": [
+    { "type": "text/plain", "path": "first.txt"       },
+    { "type": "text/plain", "path": "/kit/second.txt" },
+    { "type": "text/plain", "path": "/dist/File-ShareDir/sample.txt" },
+    { "type": "text/plain", "path": "/fs/t/misc/fourth.txt" }
+  ]
+}

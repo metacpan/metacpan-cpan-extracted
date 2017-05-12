@@ -1,0 +1,8 @@
+Revision history for Perl extension ExtUtils::XSpp::Plugin::Cloning.
+
+0.02   Sun Jun 27 20:00:00 CEST 2010
+  - Remove dependency.
+
+0.01   Sat Jun  5 11:02:09 CEST 2010
+  - First release.
+

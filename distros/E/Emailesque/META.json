@@ -1,0 +1,63 @@
+{
+   "abstract" : "Lightweight To-The-Point Email",
+   "author" : [
+      "Al Newkirk <anewkirk@ana.io>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Emailesque",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Authen::SASL" : "0",
+            "Email::AddressParser" : "0",
+            "Email::Stuffer" : "0",
+            "File::Slurp" : "0",
+            "Hash::Merge::Simple" : "0.051",
+            "IO::Socket::SSL" : "0",
+            "Moo" : "2.000002",
+            "Net::SMTP::SSL" : "0",
+            "Net::SMTP::TLS" : "0",
+            "Net::SSLeay" : "0",
+            "perl" : "v5.10.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "perl" : "v5.10.0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/alnewkirk/Emailesque/issues"
+      },
+      "homepage" : "http://metacpan.org/release/Emailesque/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/alnewkirk/Emailesque.git",
+         "web" : "https://github.com/alnewkirk/Emailesque"
+      }
+   },
+   "version" : "1.26",
+   "x_authority" : "cpan:AWNCORP",
+   "x_contributors" : [
+      "Andrew Beverley <a.beverley@ctrlo.com>",
+      "Eric Johnson <eric.git@iijo.org>",
+      "Stefan Hornburg <racke@linuxia.de>"
+   ]
+}
+

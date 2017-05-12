@@ -1,0 +1,93 @@
+{
+   "abstract" : "Supports making bundles of modules recursively",
+   "author" : [
+      "Jens Rehsack <rehsack@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.141170",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "ExtUtils-BundleMaker",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Changes" : "0",
+            "Test::CheckManifest" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Pod::Spelling::CommonMistakes" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "CHI" : "0",
+            "HTTP::Tiny::Mech" : "0",
+            "MetaCPAN::Client" : "1.003000",
+            "WWW::Mechanize::Cached" : "0"
+         },
+         "requires" : {
+            "File::Basename" : "0",
+            "File::Path" : "0",
+            "File::Slurp" : "0",
+            "File::Spec" : "0",
+            "MetaCPAN::Client" : "0",
+            "Module::CoreList" : "2.99",
+            "Module::Runtime" : "0",
+            "Moo" : "0",
+            "MooX::ConfigFromFile" : "0",
+            "MooX::Options" : "4.000",
+            "Params::Util" : "0",
+            "version" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Module::Runtime" : "0",
+            "Test::Directory" : "0",
+            "Test::More" : "0.90",
+            "Test::WriteVariants" : "0.005"
+         },
+         "suggests" : {
+            "Config::AutoConf" : "0.27",
+            "ExtUtils::CBuilder" : "0.280216"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-extutils-bundlemaker@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/ReportBug.html?Queue=ExtUtils-BundleMaker"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/rehsack/ExtUtils-BundleMaker.git",
+         "web" : "https://github.com/rehsack/ExtUtils-BundleMaker"
+      }
+   },
+   "version" : "0.006"
+}

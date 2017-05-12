@@ -1,0 +1,126 @@
+Exporter-Tiny
+=============
+
+Created:      2013-09-05
+Home page:    <https://metacpan.org/release/Exporter-Tiny>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Exporter-Tiny>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.044	2017-01-30
+
+ [ Packaging ]
+ - Repackage as a stable release.
+
+0.043_02	2017-01-30
+
+ [ Packaging ]
+ - Release using newer versions of toolchain stuff.
+
+0.043_01	2014-11-09
+
+ [ Documentation ]
+ - Restructure documentation.
+
+ [ Other ]
+ - Support { -as => CODE } to programatically rename functions.
+
+0.042	2014-10-04
+
+ [ Documentation ]
+ - Document the warning emitted when you provide options to a function you
+   are unimporting.
+
+ [ Other ]
+ - Housekeeping on %TRACKED.
+
+0.041_02	2014-09-19
+
+ [ Bug Fixes ]
+ - Option validation needs to happen after expanding tags.
+
+0.041_01	2014-09-18
+
+ - Add an `unimport` feature.
+
+0.040	2014-09-17
+
+ [ Packaging ]
+ - Repackage as a stable release.
+
+0.039_01	2014-07-20
+
+ [ Documentation ]
+ - Document warning and error messages produced by Exporter::Tiny.
+
+ [ Other ]
+ - Exporter::Tiny would previously cause B.pm to be loaded into memory any
+   time it exported anything. It no longer does.
+ - No longer die when redefining locally defined subs.
+ - Warn when redefining any subs.
+
+0.038	2014-04-04
+
+0.037_03	2014-04-02
+
+ [ Bug Fixes ]
+ - Only attempt to merge hashes if we're sure they're both really hashes!
+
+0.037_02	2014-04-02
+
+ - Improved handling of hashrefs of options passed to tags, and hashrefs of
+   options found within %EXPORT_TAGS arrayrefs.
+
+0.037_01	2014-03-26
+
+ [ Documentation ]
+ - Fix minor error in documentation of generators.
+
+ [ Other ]
+ - Added: Support Exporter.pm's import negation syntax qw( !foo ).
+ - Added: Support Exporter.pm's regexp import syntax qw( /foo/ ).
+
+0.036	2014-03-11
+
+0.035_02	2014-03-01
+
+ [ Documentation ]
+ - Document exactly what Exporter::Shiny is supposed to do.
+
+ [ Test Suite ]
+ - Make t/02renaming.t less noisy.
+
+0.035_01	2014-03-01
+
+ [ Packaging ]
+ - Explicitly list minimum Perl version: 5.6.1.
+
+0.034	2014-01-19
+
+0.033_01	2014-01-19
+
+ - Added: Add a new wrapper module called Exporter::Shiny.
+
+0.032	2013-12-30
+
+0.031_01	2013-12-30
+
+ [ Test Suite ]
+ - No longer require a recent version of Test::More; the Test::More bundled
+   with Perl 5.6.2 should suffice.
+
+0.030	2013-09-26
+
+ [ Test Suite ]
+ - Test for the 'into' option.
+
+0.029_01	2013-09-26
+
+ [ Documentation ]
+ - Exporter::TypeTiny is being retired, so modify documentation and
+   distribution metadata for Exporter::Tiny to no longer point there.
+
+0.026	2013-09-05	Initial release
+
+ [ Packaging ]
+ - Split Exporter::Tiny out from Exporter::TypeTiny.
+   CHOCOLATEBOY++

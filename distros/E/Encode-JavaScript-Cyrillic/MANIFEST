@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Encode-JavaScript-Cyrillic.t
+lib/Encode/JavaScript/Cyrillic.pm
+META.yml                                 Module meta-data (added by MakeMaker)

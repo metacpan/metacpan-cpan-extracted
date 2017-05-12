@@ -1,0 +1,10 @@
+<html>
+<head>
+<title>[% e.page_title %]</title>
+</head>
+<body>
+<h1>[% s.test_title %]</h1>
+<div>TEST OK</div>
+<p>[% p.server_port %]</p>
+</body>
+</html>

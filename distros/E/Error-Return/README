@@ -1,0 +1,103 @@
+NAME
+    Error::Return - Really return() from a try/catch-block
+
+VERSION
+    version 1.110510
+
+SYNOPSIS
+        use Try::Tiny;
+        use Error::Return;
+
+        sub foo {
+            # ...
+            try {
+                # ...
+                # return() here doesn't do what you might think it does
+                RETURN 'bar';  # this actually returns from foo()
+                # ...
+            } catch {
+                warn "caught error [$_]\n";
+            };
+            # ...
+        }
+
+DESCRIPTION
+    This module provides a way to return from within try/catch blocks with
+    the expected semantics.
+
+FUNCTIONS
+  RETURN
+    A try/catch-block as provided by Try::Tiny looks like the kind of block
+    you might use in a for-loop or an if/then/else statement. However, it is
+    really an anonymous subroutine, so if you "return()" from a try-block or
+    a catch-block, you don't really return from the parent subroutine.
+
+    Like "return" except that it doesn't just return to its upper scope but
+    smashes right through it to the next-higher scope. Actually, it skips
+    two scopes, because it has to return from the "try()" subroutine as
+    well.
+
+    "RETURN" is automatically exported.
+
+ALTERNATIVES
+    Without this module, if you really wanted to return from a
+    try/catch-block's parent subroutine, you would have to resort to
+    something like this:
+
+        use Try::Tiny;
+
+        sub foo {
+            ...
+            my $should_return;
+            try {
+                ...
+                $should_return = 1;
+                ...
+            } catch {
+                ...
+                # if we caught an exception, we should probably set
+                # $should_return as well...
+                ...
+            };
+            return if $should_return;
+            ...
+        }
+
+PERFORMANCE
+    This module uses Scope::Upper, so there is a performance impact.
+    However, a benchmark has shown that if used with Try::Tiny, it only
+    takes about 5% more time than using the unsightly code given in the
+    "ALTERNATIVES" section above. That is because try/catch does quite a bit
+    of work itself, so the additional performance impact by munging scopes
+    is not overly severe.
+
+INSTALLATION
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests through the web interface at
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=Error-Return>.
+
+AVAILABILITY
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see <http://search.cpan.org/dist/Error-Return/>.
+
+    The development version lives at
+    <http://github.com/hanekomu/Error-Return> and may be cloned from
+    <git://github.com/hanekomu/Error-Return.git>. Instead of sending
+    patches, please fork this project using the standard git and github
+    infrastructure.
+
+AUTHOR
+    Marcel Gruenauer <marcel@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2009 by Marcel Gruenauer.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

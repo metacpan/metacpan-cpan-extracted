@@ -1,0 +1,42 @@
+---
+abstract: 'Modify environment variables according to files in a specified directory'
+author:
+  - 'Yoshihiro Sasaki <ysasaki at cpan.org>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.5.3, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: EnvDir
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  EnvDir:
+    file: lib/EnvDir.pm
+    version: 0.08
+  EnvDir::Guard:
+    file: lib/EnvDir.pm
+requires:
+  Storable: 2.15
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/ysasaki/p5-envdir/issues
+  homepage: https://github.com/ysasaki/p5-envdir
+  repository: git://github.com/ysasaki/p5-envdir.git
+version: 0.08
+x_contributors:
+  - 'ysasaki <aloelight@gmail.com>'

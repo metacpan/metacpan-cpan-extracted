@@ -1,0 +1,426 @@
+=pod
+
+=encoding utf8
+
+=head1 名前
+
+Enbld::Tutorial - Enbldのチュートリアル
+
+=head1 説明
+
+このチュートリアルは、EnbldのDSLの文法を解説します。
+
+=head1 DSLの文法
+
+Enbldではソフトウェアのインストール条件を専用のDSLで定義します。ここでは、そのDSLの文法を解説します。
+
+=head2 コンディションスクリプトの例
+
+  #!/usr/bin/perl
+
+  use strict;
+  use warnings;
+
+  use lib "$ENV{HOME}/.enbld/extlib/lib/perl5/";
+
+  use Enbld;
+
+  enbld 'mydevenv' => build {
+
+      target 'git' => define {
+          version 'latest';
+      };
+
+  };
+
+=head2 基本的な構造
+
+=over
+
+=item * shebangにsystem perlを指定する
+
+  #!/usr/bin/perl
+
+Enbldは必ずsystem perlから起動される必要があります。そのため、必ずshebangにはsystem perlへのパスを指定して下さい。
+
+=item * 必ずuse strictと、use warningsを指定する
+
+  use strict;
+  use warnings;
+
+モダンperlなスクリプトでは、必須です。
+
+=item * libプラグラマでEnbldモジュールへのパスを指定する
+
+  use lib "$ENV{HOME}/.enbld/extlib/lib/perl5/";
+
+Enbldモジュール(C<Enbld.pm>など)は、C<$HOME/.enbld/extlib/lib/perl5/>にインストールされるので、そのモジュールをロードできる様にlibプラグマでパスを指定します。
+
+=item * Enbldモジュールをロードする
+
+  use Enbld;
+
+Enbldモジュールは、DSLのメソッドをエクスポートします。
+
+=back
+
+=head2 ソフトウェアのインストールに使用する関数
+
+以下にEnbldのDSLで使える関数を解説します。これらの関数は全てC<use Enbld>の時点でエクスポートされています。
+
+EnbldのDSLはperlベースなので、ここに書かれていない事は全てperlの文法に従います。
+
+=head3 enbld
+
+  enbld 'mydevenv' => build {
+      ...
+  };
+
+enbldは、ソフトウェアのインストールを行う関数です。
+
+一つ目の引数は、環境の名前を指定します。文字列であれば何でもかまいません。
+
+二つ目の引数は、build関数が返すコードリファレンスです。enbldは、ソフトウェアのビルド条件が書かれたコードリファレンスを実行することで、ソフトウェアをビルドします。
+
+=head3 build
+
+buildは、enbld関数が使うコードリファレンスを返すだけの関数です。
+
+DSLとしての可読性を上げるための関数です :)
+
+=head3 target
+
+  target 'git' => define {
+      ....
+  };
+
+targetは、ソフトウェアごとのインストール条件を定義する関数です。
+
+一つ目の引数は、ソフトウェアの名前を指定します。ソフトウェアの名前は、C<enblder available>で表示される名前と一致させる必要があります。
+
+二つ目の引数は、define関数が返すコードリファレンスです。targetは、ビルド条件が書かれたコードリファレンスを実行することで、ビルド条件を定義します。
+
+=head3 define
+
+defineは、target関数が使うコードリファレンスを返すだけの関数です。
+
+DSLとしての可読性を上げるための存在です :)
+
+=head3 version
+
+  target 'perl' => define {
+      version '5.18.1';
+  };
+
+versionは、インストールしたいバージョン番号を指定する関数です。引数にバージョン番号を指定します。
+
+インストールできるバージョンの一覧は、C<enblder available [ソフトウェア名]>で確認することができます。
+
+なお、存在しないバージョン番号を指定すると、エラーになります。
+
+  target 'git' => define {
+      version 'latest';
+  };
+
+また、バージョンに'latest'と指定すると、Enbldは自動的に最新バージョンを特定し、インストールします。自分で最新バージョンを探す必要は有りません。
+
+  target 'perl' => define {
+      version 'development';
+  };
+
+加えて、一部のソフトウェアでは、開発中のバージョンを指定することができます。
+
+例えば、perlでは、バージョンナンバーが偶数は、開発中を示しますが、'development'と指定することで、最新の開発バージョンをインストールすることができます。
+
+詳しくは各Definitionモジュールのドキュメントを参照して下さい。
+
+=head3 make_test
+
+  target 'git' => define {
+      version 'latest';
+      make_test 1;
+  };
+
+make_testは、ビルド時にテストを実行するための関数です。
+
+引数にperlで真となる値を指定すると(つまり、udnefと、0と空文字列以外)、ソフトウェアのビルド時にテストを実行します。
+
+テストが失敗すると、ビルドも失敗します。
+
+通常、この機能はオフになっています。
+
+=head3 module_file
+
+  target 'perl' => define {
+      version 'latest';
+      module_file 'cpanfile';
+  };
+
+module_fileは、プログラミング言語が用意するモジュールインストール機能を使ってモジュールをインストールしたい時に使う関数です。
+
+例えば、perlでは、cpanmを呼び出し、cpanfileで指定されたモジュールをインストールします。
+
+引数は各言語用のモジュール定義ファイルのパスを指定します(Perlならcpanfile)
+
+詳しくは各Definitionモジュールのドキュメントを参照して下さい。
+
+=head3 arguments
+
+  target 'perl' => define 
+      version 'latest';
+      arguments '-Dusethreads';
+  };
+
+argumentsは、各ソフトウェアの'configure'スクリプトへの引数を追加する関数です。
+
+引数で指定した文字列がそのまま引き渡されます。
+
+=head3 annotation
+
+  target 'perl' => define 
+      version 'latest';
+      arguments '-Dusethreads';
+      annotation 'with thread support';
+  };
+
+annotationは、注釈を追加する関数です。
+
+単なるスクリプトのコメントと異なり、C<enblder freeze>でも再現されます。
+
+=head2 設定ファイルを作成するための関数
+
+  conf '.vimrc' => load {
+      from 'https://raw.github.com/magnolia-k/vimrc/master/.vimrc';
+  };
+
+Enbldは各ソフトウェアをビルドするだけでなく、各ソフトウェアの設定ファイル(DOTFILES)を作成するための機能も持ちます。
+
+上記の例では、vim用の設定ファイル(.vimrc)をGitHubからダウンロードして、ホームディレクトリに配置します。
+
+また、Enbldでは、インストールできるソフトウェアと、設定ファイルのファイル名の相関まではチェックしないので、どんな設定ファイルでも配置することができます。
+
+=head3 conf
+
+  conf '.vimrc' => load {
+  ...
+  };
+
+confは、設定ファイルを作成するための関数です。
+
+一つ目の引数は、設定ファイルのファイル名を指定します。
+
+ディレクトリ名を付けて指定した時は、以下の様に解釈されます。
+
+=over
+
+=item * 相対パス
+
+相対パスを指定すると、C<$HOME>からの相対パスとして設定ファイルを作成します。
+
+例えば、C<.module-starter/config>と指定すると、設定ファイル「config」は、C<$HOME/.module-starter/config>に作成されます。
+
+=item * 絶対パス
+
+絶対パスを指定すると、そのパスに設定ファイルを作成します。
+
+例えば、C</path/to/.module-starter/config>と指定すると、設定ファイル「config」は、C</path/to/.module-starter/config>に作成されます。
+
+ただし、パーミッションには注意して下さい。
+
+=back
+
+なお、conf関数は、build関数の引数に指定されたコードリファレンスの中であれば、どこに記述してもかまいません。
+
+  enbld 'mydevenv' => build {
+      target 'vim' => define {
+          version 'latest';
+
+          conf '.vimrc' => load {
+              from 'https://raw.github.com/magnolia-k/vimrc/master/.vimrc';
+          }; # -> これもOK
+
+      };
+
+      conf '.bashrc' => set {
+          content 'export PATH=$HOME/.enbld/bin:PATH';
+      }; # -> これもOK
+  };
+
+二つ目の引数は、設定ファイルをどこから取得するのか、指定する関数です。
+
+=head3 load
+
+  conf '.vimrc' => load {
+      from 'https://raw.github.com/magnolia-k/vimrc/master/.vimrc';
+  };
+
+設定ファイルをfrom関数の引数で指定したURLからダウンロードします。
+
+引数はコードリファレンスです。
+
+既に同じ内容のファイルが存在する場合は何もしません。ファイルが存在しても内容が異なる場合は、既存のファイルのファイル名を変更して、指定された通りにファイルを作成します。
+
+=head3 set
+
+  conf '.bashrc' => set {
+      content 'export PATH=$HOME/.enbld/bin:PATH';
+  };
+
+設定ファイルをcontent関数の引数で指定した内容で作成します。
+
+引数はコードリファレンスです。
+
+既に同じ内容のファイルが存在する場合は何もしません。ファイルが存在しても内容が異なる場合は、既存のファイルのファイル名を変更して、指定された通りにファイルを作成します。
+
+=head3 copy
+
+  conf '.vimrc' => copy {
+      from '/path/to/.vimrc';
+  };
+
+設定ファイルをfrom関数の引数で指定したファイルからコピーして作成します。
+
+引数はコードリファレンスです。
+
+既に同じ内容のファイルが存在する場合は何もしません。ファイルが存在しても内容が異なる場合は、既存のファイルのファイル名を変更して、指定された通りにファイルを配置します。
+
+=head3 from
+
+from関数は、設定ファイルの取得元を指定する関数です。
+
+引数には、URLか、フルパスを指定します。
+
+=head3 content
+
+  conf '.vimrc' => set {
+      content 'syntax on';
+  };
+
+content関数は、設定ファイルの内容を指定する関数です。
+
+  conf '.wgetrc' => load {
+      from 'http://xxx.xxx.xxx/.wgetrc';
+
+      content 'proxy_user = user';
+      content 'proxy_passwd = PassWord';
+  }
+
+ダウンロードしたファイルにcontent関数を使って、追記することもできます。
+
+=head3 to
+
+  conf 'filerc' => set {
+    to "$ENV{HOME}/fileconfig";
+    content 'setting string';
+  };
+
+to関数は、設定ファイルの配置先を指定する関数です。
+
+conf関数の引数にファイル名だけを指定した時でも、to関数にディレクトリを指定することで、配置場所を自由に制御できます。
+
+=head2 コンディションスクリプトのオプション指定
+
+コンディションスクリプトは、いくつかのオプションを取ることができます。ここでは、そのオプションを解説します。
+
+=head3 test
+
+  $ ./conditions.pl --test
+
+  $ ./conditions.pl -t
+
+'test'オプションは、インストール時にテストを実行します。
+
+=head3 force
+
+  $ ./conditions.pl --force
+
+  $ ./conditions.pl -f
+
+'force'オプションは、インストール済のソフトウェアも含めて全て強制的にインストールします。
+
+=head3 deploy
+
+  $ ./conditions.pl --deploy /path/to/install/
+
+  $ ./conditions.pl -d /path/to/install/
+
+'deploy'オプションは、コンディションスクリプトで定義したスクリプトのインストール先を指定します。
+
+デプロイパスは、相対パスか、絶対パスを指定できます。
+
+ただし、'deploy'でインストールしたソフトウェアの新バージョンのリリースチェックはできません。
+
+=head1 その他のトピック
+
+=head2 '.enbld'ディレクトリの構成
+
+'.enbld'ディレクトリは下記の様な構成になっています。
+
+ $HOME/.enbld --+
+                |
+                +-- bin/         実行コマンド              (シンボリックリンク)
+                |
+                +-- lib/         ライブラリ                (シンボリックリンク)
+                |
+                +-- include/     インクルードファイル      (シンボリックリンク)
+                |
+                +-- man/         マニュアルファイル        (シンボリックリンク)
+                |
+                +-- share/       共有ファイル              (シンボリックリンク)
+                |
+                +-- extlib/      Enbldのモジュールファイル (例: lib/Enbld.pm)
+                |
+                +-- dists/       ダウンロードしたアーカイブファイル
+                |
+                +-- etc/         その他の色々なファイル
+                |
+                +-- build/       ソフトウェアのビルドディレクトリ
+                |
+                +-- depository/  インストールされたソフトウェアの構成ファイル
+                |   |
+                |   +-- Software A
+                |   |   |
+                |   |   +-- version 1
+                |   |   |
+                |   |   +-- version 2
+                |   |   |
+                |   |
+                |   +-- Software B
+                |   |   |
+                |   |   +-- version 1
+                |   |   |
+                |
+                +--conf/         Enbldの設定ファイル
+                |
+                +--log/          Enbldのログファイル
+
+EnbldはソフトウェアをC<$HOME/.enbld/depository/[ソフトウェア名]/[バージョン]/>へインストールし、C<$HOME/.enbld/bin>や、C<$HOME/.enbld/lib>などのディレクトリへシンボリックリンクを作ります。
+
+これにより、簡単に新しいバージョンへ切り替えることができるようになっています。
+
+=head1 更なる情報
+
+L<Enbld>
+
+L<enblder>
+
+=head1 ウェブサイト
+
+L<https://github.com/magnolia-k/Enbld>
+
+L<http://code-stylistics.net/enbld>
+
+=head1 問題のレポート
+
+L<https://github.com/magnolia-k/Enbld/issues>
+
+=head1 コピーライト
+
+copyright 2013- Magnolia C<< <magnolia.k@me.com> >>.
+
+=head1 LICENSE
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

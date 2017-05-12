@@ -1,0 +1,52 @@
+---
+abstract: 'Various portability utilities for module builders'
+author:
+  - 'Ken Williams <kwilliams@cpan.org>'
+  - 'Leon Timmermans <leont@cpan.org>'
+build_requires:
+  Cwd: '0'
+  Test::More: '0'
+  lib: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: ExtUtils-Helpers
+provides:
+  ExtUtils::Helpers:
+    file: lib/ExtUtils/Helpers.pm
+    version: '0.026'
+  ExtUtils::Helpers::Unix:
+    file: lib/ExtUtils/Helpers/Unix.pm
+    version: '0.026'
+  ExtUtils::Helpers::VMS:
+    file: lib/ExtUtils/Helpers/VMS.pm
+    version: '0.026'
+  ExtUtils::Helpers::Windows:
+    file: lib/ExtUtils/Helpers/Windows.pm
+    version: '0.026'
+requires:
+  Carp: '0'
+  Exporter: '5.57'
+  File::Basename: '0'
+  File::Copy: '0'
+  File::Spec::Functions: '0'
+  Text::ParseWords: '3.24'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=ExtUtils-Helpers
+  repository: git://github.com/Leont/extutils-helpers.git
+version: '0.026'
+x_contributors:
+  - 'Christian Walde <walde.christian@googlemail.com>'
+  - 'Craig A. Berry <craigberry@mac.com>'
+  - 'Leon Timmermans <fawaka@gmail.com>'
+  - 'Olivier Mengué <dolmen@cpan.org>'

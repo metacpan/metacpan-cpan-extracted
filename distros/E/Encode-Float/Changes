@@ -1,0 +1,8 @@
+Revision history for Perl module Encode::Float
+
+0.10 28 Feb 2013
+  - Initial release to CPAN.
+
+0.11 4 Mar 2013
+  - Removed Data::Dump from test.
+  - Fixed documentation.

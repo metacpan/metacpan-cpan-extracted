@@ -1,0 +1,17 @@
+This is Perl module Encode::UTF8Mac.
+
+INSTALLATION
+
+Encode::UTF8Mac installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan Encode::UTF8Mac
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install

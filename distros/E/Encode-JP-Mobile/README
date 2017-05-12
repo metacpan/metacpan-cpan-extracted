@@ -1,0 +1,60 @@
+NAME
+    Encode::JP::Mobile - Shift_JIS variants of Japanese Mobile phones
+
+SYNOPSIS
+      use Encode::JP::Mobile;
+
+      my $char   = "\x82\xb1\xf9\x5d\xf8\xa0\x82\xb1";
+      my $string = decode("shift_jis-imode", $char);
+
+DESCRIPTION
+    Encode::JP::Mobile is an Encode module to support Shift_JIS variants
+    used in Japaese mobile phone browsers.
+
+    This module is EXPERIMENTAL. That means API and implementations will
+    sometimge be backward incompatible.
+
+ENCODINGS
+    This module currently supports the following encodings.
+
+    shift_jis-imode
+        for DoCoMo pictograms. "shift_jis-docomo" is alias.
+
+    shift_jis-vodafone
+        for Vodafone pictograms. Since it uses escape sequence, decoding
+        algorithm is not based on ucm file.
+
+    shift_jis-kddi
+        for KDDI/AU pictograms. "shift_jis-ezweb" is alias.
+
+    shift_jis-airedge
+        for AirEDGE pictograms. "shift_jis-airh" is alias.
+
+NOTES
+    *   ucm files are based on "cp932.ucm", not "shiftjis.ucm", since it
+        looks more appropriate for possible use cases. I'm open for any
+        suggesitions on this matter.
+
+    *   Pictogram characters are defined to be round-trip safe. However,
+        they use Unicode Private Area for such characters, that means you'll
+        have interoperability issues, which this module doesn't try to
+        solve.
+
+TODO
+    *   Support KDDI encodings for 7bit E-mail ("iso-2022-jp-kddi").
+
+    *   Implement all merged "shift_jis-mobile-jp" encoding.
+
+AUTHOR
+    Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+    This library is free software, licensed under the same terms with Perl.
+
+SEE ALSO
+    Encode, HTML::Entities::ImodePictogram
+
+    http://www.nttdocomo.co.jp/p_s/imode/make/emoji/
+    http://www.au.kddi.com/ezfactory/tec/spec/3.html
+    http://developers.vodafone.jp/dp/tool_dl/web/picword_top.php
+    http://www.willcom-inc.com/p_s/products/airh_phone/homepage.html
+

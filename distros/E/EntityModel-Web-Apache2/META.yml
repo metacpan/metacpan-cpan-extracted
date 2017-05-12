@@ -1,0 +1,20 @@
+---
+abstract: 'Apache2/mod_perl support for L<EntityModel::Web>'
+author:
+  - 'Tom Molesworth <cpan@entitymodel.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.110440'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: EntityModel-Web-Apache2
+requires:
+  APR::UUID: 0
+  Apache2::RequestRec: 0
+  EntityModel::Web: 0.001
+  perl: 5.010
+version: 0.001

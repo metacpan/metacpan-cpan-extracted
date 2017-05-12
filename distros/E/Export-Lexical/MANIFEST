@@ -1,0 +1,13 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/Export/Lexical.pm
+t/DoFatal.pm
+t/DoSilent.pm
+t/DoWarn.pm
+t/fatal.t
+t/silent.t
+t/warn.t
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,59 @@
+Revision history for Email-Public
+
+0.13    2010-07-05
+        added rocketmail.com
+
+0.12    2010-04-10
+	added ymail.com
+
+0.11    2009-10-13
+        added sfr.fr, mail2web and surfsimple
+
+0.10    2009-08-19
+        added a lot of domains
+
+0.09    2009-07-20
+        added few domains
+
+0.08    2008-09-01
+        added few domains
+
+0.07    2008-08-07
+        added few domains
+
+0.06    2008-06-16
+        added lot of domains
+
+0.05    2008-06-13
+	added live.be bt.com gmail.com.ar yopmail.com hotmail.be orangemail.es
+
+0.04    2008-05-01
+        added hotmail.com.br, hotmail.es, live.ie, xtra.co.nz
+
+0.03    2008-02-12
+        fixed bugs
+        32918	gawab.com is a public email
+        32772	inbox.ru is a public provider
+        32290	safe-mail.net
+        32128	aol.in	resolved
+
+0.02    2007-12-05
+        fixed bugs
+        31225	live.com missing
+        31221	add live.com	
+        31176	remove 6sens.com		
+        31175	jobtrans.info is not a public provider
+        
+        added telenet.be
+        live.nl
+
+        removed *.ac.za
+        removed tuks.co.za
+        added royalmail.com
+              virgin.net
+              mail.ru
+              aon.at
+
+0.01    2007-11-30
+        First version basic list.
+

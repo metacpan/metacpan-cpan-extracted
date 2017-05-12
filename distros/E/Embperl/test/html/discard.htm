@@ -1,0 +1,89 @@
+<html>
+<head>
+<title>Tests for Embperl - discarding errors</title>
+</head>
+
+
+<body>
+
+[!
+
+package test::discard ;
+
+sub id
+	{
+	my $self = shift ;
+	
+	return "id $self->{n}" ;
+	}
+
+sub name
+	{
+	my $self = shift ;
+	
+	return "name $self->{n}" ;
+	}
+
+sub new
+	{
+	my $class = shift ;
+	my $n     = shift ;
+	my $self  = {n=>$n} ;
+	bless $self, $class ;
+	return $self ;
+	}
+
+!]
+
+
+[-
+$obj[0] = test::discard->new (0) ;
+$obj[1] = test::discard->new (1) ;
+$obj[2] = test::discard->new (2) ;
+$obj[3] = test::discard->new (3) ;
+-]
+
+<TABLE BORDER=0 WIDTH=90%>
+	<TR><TH COLSPAN=2><H2>Objects</H2></TH></TR>
+	<TR>
+		<TD>
+			[- $o = $obj[$col] -]
+			<A HREF="index.html?id=[+ $o->id+]">[+$o->name+]</A>
+		</TD>
+		<TD>
+			[- $o = $obj[$col+5] -]
+			<A HREF="index.html?id=[+ $o->id+]">[+$o->name+]</A>
+		</TD>
+	</TR>
+</TABLE>
+
+[- "blabla -]
+[- $maxrow = 1 -]
+
+<TABLE BORDER=0 WIDTH=90%>
+	<TR><TH COLSPAN=2><H2>Objects</H2></TH></TR>
+	<TR>
+		<TD>
+			[- $o = $obj[$col] -][+ $o -> id +]
+			[- "blabla -]
+		</TD>
+	</TR>
+	[- $xyz[$row] = $row>0?undef:"blabla" -]
+	[- "blabla -]
+</TABLE>
+
+
+<TABLE BORDER=0 WIDTH=90%>
+	<TR><TH COLSPAN=2><H2>Objects</H2></TH></TR>
+	[- "blabla -]
+	<TR>
+		<TD>
+			[- $o = $obj[$col] -][+ $o -> id +]
+		</TD>
+	</TR>
+	[- $xyz[$row] = $row>0?undef:"blabla" -]
+</TABLE>
+
+
+</body>
+</html>

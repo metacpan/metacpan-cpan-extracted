@@ -1,0 +1,233 @@
+
+=pod
+
+=head1 USING PERL TO ADMINISTER LINUX SORCERER
+
+I am a confirmed Sorcerer Linux SA ( see L<http://sorcerer.wox.org> ).
+For several years now I have been steadily building up my base of
+Sorcerer installations ( eat your heart out Billy G. ), and have found
+it to be fast, lean, reliable, and down right fun to maintain. My
+users are happy, so I am happy.
+
+I have been seriously using Linux for about four years now, having come
+from the Microsoft world. Before I started using and administrating Linux
+I was one of Microsoft's minions and thought if the software didn't cost
+a lot of money and have the funny 'window' picture on the box, it was really
+just for amateurs and geeks. Not so, as I and many of you have discovered.
+
+Perl, for me, is a different story. I have been a 'serious' perl monger
+for almost ten years, reaching back to my Windows days. I am still more
+productive in perl than bash. When I started writing perl scripts to help
+me administer Sorcerer, I ran into the problem that the environment
+variables on which Sorcerer so heavily depends, are 'sourced' into the
+bash environment from B</etc/sorcery/config>. It is very hard to access
+them from perl. And variables that are bash arrays, good luck! Try this:
+
+  # . /etc/sorcery/config && \
+        perl -e 'print "$_ => $ENV{$_}\n" for sort keys %ENV'
+
+Look at the result. Yep, nary a Sorcerer variable appears. Now try:
+
+  # . /etc/sorcery/config
+  # export GRIMOIRE
+  # perl -e 'print "$_ => $ENV{$_}\n" for sort keys %ENV'
+
+Yep, GRIMORE appears in the output. So I had to write bash scripts to
+source /etc/sorcery/config, export the variables I wanted to use,
+and run my perl script. That got old quickly. And I still didn't have a good
+way to get to bash arrays.
+
+I have developed a solution, based on the CPAN module B<Env::Bash>. Please
+take a moment to glance at the documentation before continuing.
+
+=head1 A SIMPLE EXAMPLE
+
+I have written a small, more or less useless, perl script using Env::Bash
+with Sorcerer. The source is B<scripts/show-spell.pl> in the module's
+distribution. The script can list the spells in the grimoire and/or display
+spell details:
+
+  perl scripts/show-spell [-d] [-l] [<spell> ...]
+
+where:
+
+  -d      shows internal debugging information
+  -l      lists spells in the grimoire
+  <spell> display details of one or more spells.
+
+If the script is started without any arguments, spell linux is displayed.
+
+Here is a blow-by-blow description of show-spell.pl
+
+=head2 Starting
+
+  #!/usr/bin/perl
+  
+  use warnings;
+  use strict;
+  use Env::Bash;
+  use Data::Dumper;
+  use Getopt::Std;
+  
+  my %opt;
+  unless (getopts('dl', \%opt)) {
+      usage();
+  }
+
+Pretty standard; options are handled too.
+
+=head2 tie a HASH to the Environment
+
+  # tie a hash to /etc/sorcery/config, no ForceArray
+  my %env = ();
+  tie %env, "Env::Bash", Source => "/etc/sorcery/config",
+      Debug => $opt{d};
+
+This is the easiest way to interface to Env::Bash ( there is a simple,
+standard interface and an oo interface which are fully discussed in the
+module's documentation ). The tie statement says to interface to the
+environment through hash %env, with the option Source ( the script or
+list of scripts to source ), and conditionally set internal debugging.
+More on ForceArray below.
+
+=head2 Find the GRIMOIRE directory
+
+  # find the GRIMOIRE directory
+  my $grimoire = $env{GRIMOIRE} || die "cannot find GRIMOIRE\n";
+
+This is the first real use of the module; the grimoire directory ( defined
+in /etc/sorcery/config ), is returned.
+
+=head2 Perl code to list the GRIMOIRE and display spells
+
+  # display spells in the grimoire if option -l
+  if( $opt{l} ) {
+      print "---spells in grimoire-------------------------\n";
+      my @spells = ();
+      for my $spell( <$grimoire/*> ) {
+          $spell =~ s,.*/,,;
+          push @spells, $spell;
+      }
+      print "$_\n" for sort @spells;
+  }
+  
+  # show spells on command line, or linux if none given
+  show_spell( $_ ) for @ARGV;
+  show_spell( 'linux' ) unless @ARGV || $opt{l};
+
+Just perl code.
+
+=head2 show-spell subroutine
+
+  sub show_spell
+  {
+      my $spell = shift;
+    
+      # find the spell and DETAILS
+      unless( -e "$grimoire/$spell" ) {
+          warn "Spell '$spell' not found.\n";
+          return;
+      }
+      my $details = -d _ ? "$grimoire/$spell/DETAILS" : "$grimoire/$spell";
+      unless( -e "$details" ) {
+          warn "Spell '$spell' DETAILS not found.\n";
+          return;
+      }
+  
+      # tie a hash to /etc/sorcery/config and DETAILS w/ForceArray
+      my %env = ();
+      tie %env, "Env::Bash",
+      [],
+      Source => [ "/etc/sorcery/config", $details ],
+      Debug => $opt{d};
+  
+      print "---$spell-------------------------------------\n";
+      show_detail( VERSION   => \%env );
+      show_detail( CATEGORY  => \%env );
+      show_detail( ATTRIBUTE => \%env );
+      show_detail( SOURCE    => \%env );
+      show_detail( URL       => \%env );
+      show_detail( HOMEPAGE  => \%env );
+      show_detail( REQ       => \%env );
+      show_detail( PROTECT   => \%env );
+      show_detail( ESTIMATE  => \%env );
+      show_detail( DESC      => \%env );
+  }
+
+Here we do another tie for two reasons: 1) we want to source the spell's
+DETAILS script as well as /etc/sorcery/config, and 2) we want to be able to
+access any variables that are bash arrays - like VERSION. The Source option
+to the tie is a list reference - that's how Env::Bash knows how to use more
+than one source script. To access the environment, the module constructs a
+mini bash script, which in this case would be something like:
+
+  #!/bin/sh
+  . /etc/sorcery/config;. /var/state/sorcery/grimoire/<spell>/DETAILS;set
+
+The script is run by forking via backtics and the set output is parsed to
+get a list of environment names. Turn on debugging ( -d ) if you really want to
+see the the script.
+
+To access bash arrays, the ForceArray option ( shortcut: [] ) is specified.
+The module again creates and runs a bash script that returns all elements
+of any bash arrays; the results are stored in the tied hash as an array
+reference, B<whether or not the variable is a bash array>. Again, for the
+more curious, look at what's happening by turning
+on debugging.
+
+=head2 Show spell details
+
+  sub show_detail
+  {
+      my( $name, $env ) = @_;
+  
+      # get the requested detail ( return is an array because the
+      # the $env hash was tied with ForceArray ( [] ).
+      my $values = $env->{$name};
+  
+      # print each detail
+      my $eq = '=';
+      for my $value( @$values ) {
+          $value = join( "\n".' ' x 14, split /\n/, $value )
+              if $value =~ /\n/s;
+          printf "%12s%1s\"%s\"\n", $name, $eq, $value;
+          $name = $eq = '';
+      }
+  }
+
+Now we get the variable from the tied hash. As mentioned above, each hash
+element is an array reference ( because ForceArray was specified ). The
+resulting values are manipulated and printed.
+
+=head2 usage subroutine
+  
+  sub usage
+  {
+      my $progname = $0;
+      $progname =~ s,.*/,,;    # only basename left in progname
+      die "Usage: $progname [-d] [-l] <spell> [<spell> ...]\n";
+  }
+
+=head2 Summary
+
+OK, so you now have a script the demonstrates the use of Env::Bash.
+I admit it's slower and much harder than a few bash ls and cat commands,
+but that's not the point. Env::Bash has proved to open up Sorcerer to perl;
+I have written some perl scripts that are, in fact, useful; I will try
+to get them posted my my home page ( currently not available as I write this -
+December 2004 ) and let you know on the Sorcerer list. I hope you can find
+some use for Env::Bash.
+
+=head1 AUTHOR
+
+Beau E. Cox, E<lt>beaucox@hawaii.rr.comE<gt>.
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2004 by Beau E. Cox.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

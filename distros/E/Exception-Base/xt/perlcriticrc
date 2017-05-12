@@ -1,0 +1,50 @@
+# local defaults for perlcritic
+severity = 3
+verbose = 4
+
+[-BuiltinFunctions::ProhibitLvalueSubstr]
+
+[ControlStructures::ProhibitCascadingIfElse]
+max_elsif = 5
+
+[-ErrorHandling::RequireCarping]
+[-ErrorHandling::RequireCheckingReturnValueOfEval]
+
+[Modules::ProhibitExcessMainComplexity]
+max_mccabe = 30
+
+[-Modules::ProhibitMultiplePackages]
+
+[NamingConventions::ProhibitAmbiguousNames]
+forbid = last set left right no abstract contract record second
+
+[RegularExpressions::ProhibitComplexRegexes]
+max_characters = 70
+
+[RegularExpressions::RequireExtendedFormatting]
+minimum_regex_length_to_complain_about = 75
+
+[Subroutines::ProhibitExcessComplexity]
+max_mccabe = 100
+
+[-Subroutines::ProhibitSubroutinePrototypes]
+
+[-Subroutines::RequireArgUnpacking]
+
+[TestingAndDebugging::ProhibitNoStrict]
+allow = vars subs refs
+
+[TestingAndDebugging::ProhibitNoWarnings]
+allow = all numeric once redefine uninitialized utf8
+
+[TestingAndDebugging::ProhibitProlongedStrictureOverride]
+statements = 12
+
+[-ValuesAndExpressions::ProhibitConstantPragma]
+
+[Variables::ProhibitPackageVars]
+packages = DB
+
+[-Variables::RequireInitializationForLocalVars]
+
+[-Variables::RequireLocalizedPunctuationVars]

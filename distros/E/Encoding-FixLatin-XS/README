@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Encoding-FixLatin-XS,
+version 1.01:
+
+  XS implementation layer for Encoding::FixLatin
+
+This software is copyright (c) 2014 by Grant McLean.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

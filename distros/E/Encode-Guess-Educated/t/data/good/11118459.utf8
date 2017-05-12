@@ -1,0 +1,1130 @@
+   [1]The Journal of Biological Chemistry
+
+   [2]Skip to main page content
+     * [3]Home
+     * [4]Current issue
+     * [5]Archive
+     * [6]Papers in Press
+     * [7]Minireviews
+     * [8]Classics
+     * [9]Reflections
+     * [10]Papers of the Week
+
+   QUICK SEARCHAuthor: _________Keyword: ________________Year: ____Vol:
+   ____Page: ____ GO Go[11][Advanced Search][12][Browse the Archive]
+     * Institution: Univ Colorado - Denison Memorial Library
+     * [13]Sign In
+
+   Advertisement
+   Advertisement
+     * [14]ASBMB Membership: Find out what ASBMB can do for YOU!
+
+ §1§ Crystal Structure of Streptococcus pneumoniae
+N-Acetylglucosamine-1-phosphate Uridyltransferase Bound to Acetyl-coenzyme A
+Reveals a Novel Active Site Architecture[15]* §1§
+
+    1. [16]Gerlind Sulzenbacher[17]‡[18]§,
+    2. [19]Laurent Gal[20]‡[21]¶,
+    3. [22]Caroline Peneff[23]‡,
+    4. [24]Florence Fassy[25]‖ and
+    5. [26]Yves Bourne[27]‡[28]**
+
+    1.
+
+
+    From the ^‡AFMB-UMR6098, 31 Chemin Joseph Aiguier, 13402 Marseille
+    Cedex 20, France and ^‖Aventis Pharma-Hoechst Marion Roussel,
+    Infectious Diseases Group, 102 Route de Noisy, 93235 Romainville
+    Cedex, France
+
+
+   [29]Next Section
+
+ §2§ Abstract §2§
+
+   The bifunctional bacterial enzymeN-acetyl-glucosamine-1-phosphate
+   uridyltransferase (GlmU) catalyzes the two-step formation of
+   UDP-GlcNAc, a fundamental precursor in bacterial cell wall
+   biosynthesis. With the emergence of new resistance mechanisms against
+   β-lactam and glycopeptide antibiotics, the biosynthetic pathway of
+   UDP-GlcNAc represents an attractive target for drug design of new
+   antibacterial agents. The crystal structures of Streptococcus
+   pneumoniae GlmU in unbound form, in complex with acetyl-coenzyme A
+   (AcCoA) and in complex with both AcCoA and the end product UDP-GlcNAc,
+   have been determined and refined to 2.3, 2.5, and 1.75 Å, respectively.
+   TheS. pneumoniae GlmU molecule is organized in two separate domains
+   connected via a long α-helical linker and associates as a trimer, with
+   the 50-Å-long left-handed β-helix (LβH) C-terminal domains packed
+   against each other in a parallel fashion and the C-terminal region
+   extended far away from the LβH core and exchanged with the β-helix from
+   a neighboring subunit in the trimer. AcCoA binding induces the
+   formation of a long and narrow tunnel, enclosed between two adjacent
+   LβH domains and the interchanged C-terminal region of the third
+   subunit, giving rise to an original active site architecture at the
+   junction of three subunits.
+
+   GlmU catalyzes acetyltransfer from acetyl-coenzyme A (AcCoA)^1 to
+   glucosamine-1-P with release of GlcNAc-1-P, and subsequently
+   uridyltransfer from UTP to GlcNAc-1-P in the presence of Mg^2+,
+   yielding PPi and the nucleotide-activated precursor sugar UDP-GlcNAc
+   ([30]1) (see Fig.[31]1 A). UDP-GlcNAc is one of the main cytoplasmic
+   precursors of the bacterial cell wall, being situated at the branch
+   point of two important biosynthetic pathways, namely peptidoglycan and
+   lipid A biosynthesis ([32]2). In eukaryotes, a bifunctional enzyme
+   equivalent to GlmU is missing, and acetyltransfer and uridyltransfer
+   are accomplished by two distinct enzymes, both very distantly related
+   in sequence to GlmU, the latter thus advancing to an attractive target
+   for the development of new antibiotics.
+   [33]Figure 1
+   View larger version:
+     * [34]In this window
+     * [35]In a new window
+
+     * [36]Download as PowerPoint Slide
+
+   Figure 1
+
+   Catalytic reactions and sequence alignment of SpGlmU. A, schematic
+   representation of the two-step reaction catalyzed by GlmU:
+   acetyltransferase (I) and pyrophosphorylase (II). B, the SpGlmU
+   sequence is aligned with a consensus sequence calculated on the basis
+   of 12 known sequences of bacterial GlmU. Invariant residues
+   arehighlighted in white with a black background. h, s, p,c, and .
+   denote hydrophobic, small, polar, charged, and any residues,
+   respectively. Residues buried at the trimer interface (black circles
+   above sequence), involved in AcCoA (light gray triangles pointing
+   upwards), UDP-GlcNAc/Ca^2+ (gray triangles pointing downwards/gray
+   circles), and putative GlcN-1-P (gray triangles pointing downwards)
+   binding are shown; those forming the catalytic triad and involved in
+   the PPase activity are shown as gray circles above sequence and black
+   circles below sequence, respectively.
+
+   The crystal structures of a truncated form of Escherichia coli GlmU
+   (GlmU-Tr) and of a GlmU-Tr·UDP-GlcNAc complex have been recently
+   reported ([37]3). These structures confirmed that the enzyme is
+   organized in the following two separate domains as proposed previously
+   ([38]4, [39]5): (i) an N-terminal uridyltransferase (PPase) domain,
+   comprising Asn-3 to Arg-227, resembling the dinucleotide binding
+   Rossmann fold, first reported in the lactate dehydrogenase family
+   ([40]6), and containing the signature motif G-X-G-T-(R/S)-(X)[4]-P-K,
+   found in the majority of pyrophosphorylases, and (ii) a C-terminal
+   acetyltransferase domain, containing the hexapeptide repeat
+   (L/I/V)-(G/A/E/D)-X [2]-(S/T/A/V)-X, a signature of the unusual
+   left-handed β-helix (LβH) structural motif, typically found in other
+   bacterial acetyl- and acyltransferases ([41]7) (Fig. [42]1 B).
+   Furthermore, the GlmU-Tr·UDP-GlcNAc complex structure identified the
+   precise location of the uridyltransfer reaction, the pyrophosphorylase
+   activity of GlmU-Tr being retained. However, acetyltransferase activity
+   was lost because of spontaneous truncation during purification,
+   confirming that the bifunctional enzyme possesses indeed two distinct
+   active sites located in separate domains, with the acetyltransferase
+   activity residing in the C-terminal portion of the enzyme ([43]4).
+   Although the crystal structure of the E. coli enzyme, coupled to
+   mutagenesis studies, has revealed some residues crucial for
+   pyrophosphorylase activity ([44]3), the catalytic machineries
+   responsible for both pyrophosphorylase and acetyltransferase activity
+   remain to be elucidated.
+
+   Here we present the crystal structures of full-length GlmU from the
+   pathogenic organism Streptococcus pneumoniae in its unbound form and in
+   complex with AcCoA and both AcCoA and the product UDP-GlcNAc. These
+   structures define the precise location of the acetyltransferase active
+   site, reveal substantial conformational changes occurring both upon
+   AcCoA and UPD-GlcNAc binding, and highlight the structural elements
+   responsible for substrate recognition and catalysis in the two distinct
+   active sites of this bifunctional enzyme.
+   [45]Previous Section[46]Next Section
+
+ §2§ EXPERIMENTAL PROCEDURES §2§
+
+ §5§ Expression, Purification, and Crystallization §5§
+
+   The coding region of SpGlmU was amplified from S. pneumoniae strain R
+   800 DNA by polymerase chain reaction and inserted into the bacterial
+   expression plasmid PQE30 (Qiagen). Recombinant SpGlmU was overexpressed
+   in M15 cells and purified to homogeneity by nickel-nitrilotriacetic
+   acid-agarose and gel filtration chromatography. Enzyme activity has
+   been tested and found similar to that of full-length E. coli GlmU
+   ([47]3). Crystals were grown at 20 °C by the hanging-drop vapor
+   diffusion method by mixing equal volumes of protein solution (13 mg/ml)
+   with reservoir solution composed of 26% (v/v) PEG 400, 50 mm NaCl, and
+   300 mmCaCl[2] at pH 8.0 by TRIS-HCl. Small rhombohedral crystals with a
+   typical size of 0.1 × 0.1 × 0.1 mm appeared within 1 week. Crystals
+   belong to space group R3 and contain two molecules per asymmetric unit.
+   As molecular replacement with GlmU-Tr (Protein Data Bank entry
+   [48]1FXJ) failed, selenomethionine-substituted enzyme was produced
+   using the same bacterial strain grown in minimum medium and
+   supplemented, before induction, with selenomethionine and amino acids
+   known to inhibit methionine biosynthesis ([49]8). The yield of
+   selenomethionine substitution was about 50% as judged by
+   matrix-assisted laser desorption ionization/time of flight mass
+   spectroscopy analysis. Crystals of bigger dimensions and higher
+   diffraction quality were obtained for the selenomethionine-substituted
+   enzyme under the same crystallization conditions as adopted for the
+   native protein. Crystals for the AcCoA complex were obtained by
+   incubating the enzyme with 20 mm AcCoA prior to crystallization and
+   lowering the PEG 400 concentration to 18% (v/v). AcCoA·UDP-GlcNAc
+   complex crystals were obtained by cocrystallization with 20 mm AcCoA
+   followed by harvesting into a stabilizing solution made of 30% (v/v)
+   PEG 400, 50 mm NaCl, 300 mm CaCl[2] at pH 8.0 by TRIS-HCl and
+   supplemented with 10 mm UDP-GlcNAc.
+
+ §5§ Data Collection, Structure Solution, and Refinement §5§
+
+   All data sets were collected at 100 K on flash-frozen crystals.
+   Cryosolutions were of the same composition as the
+   crystallization/harvesting solutions with the addition of an increasing
+   amount of PEG 400 and supplemented with 5% (v/v) glycerol. A
+   3-wavelength multiple anomalous dispersion data set for
+   selenomethionine-substituted SpGlmU was collected on beamline BM14
+   (European Synchrotron Radiation Facility, Grenoble, France), a data set
+   for native SpGlmU and data for the AcCoA complex were collected on
+   beamlines ID14-EH2, and data for the AcCoA·UDP-GlcNAc complex were
+   collected on beamline ID14-EH3 (European Synchrotron Radiation
+   Facility, Grenoble, France). Data were indexed and integrated with
+   DENZO ([50]9), and all further computing was carried out with the CCP4
+   program suite ([51]10) unless otherwise stated. Data collection
+   statistics are summarized in Table [52]I and Table [53]II.
+   View this table:
+     * [54]In this window
+     * [55]In a new window
+
+   Table I
+
+   MAD data collection and statistics
+   View this table:
+     * [56]In this window
+     * [57]In a new window
+
+   Table II
+
+   Data collection and refinement statistics
+
+   The SpGlmU structure was solved using the program SOLVE ([58]11). The
+   initial multiple anomalous dispersion phases had a mean figure of merit
+   of 0.340- to 2.8-Å resolution and were improved by density modification
+   with the program DM ([59]12) and extended to the resolution of the
+   native data set (2.3 Å). Because of the low yield of selenomethionine
+   incorporation only a few of these residues could be located in the
+   experimental electron density maps, which were of mediocre quality.
+   Non-crystallography symmetry averaging and phase combination techniques
+   were of great help in overcoming these problems, and a preliminary
+   model could be constructed for most of the LβH domain and the core of
+   the N-terminal PPase domain using the program TURBO-FRODO ([60]13).
+   However, most of the loop regions, some of the α-helixes in the
+   N-terminal domain, and the last 25 C-terminal residues turned out to be
+   extremely disordered, if visible at all. A striking improvement of the
+   map quality was observed for the AcCoA complex. A continuous model
+   could be built comprising residues Ser-2—Gln-459. A crystal lattice
+   rearrangement occurred upon soaking of AcCoA complex crystals in the
+   solution containing UDP-GlcNAc, and the structure was solved by
+   molecular replacement with the program AMoRe ([61]14). Refinement was
+   carried out with the programs REFMAC ([62]15) and CNS ([63]16), using
+   the maximum likelihood method and incorporating bulk solvent
+   corrections, anisotropicF [obs] versus F [calc] scaling, and
+   non-crystallography symmetry restraints. 10% of the reflections were
+   set aside during refinement for cross-validation purposes. Automated
+   correction of the model and solvent building were performed with the
+   program ARP/wARP ([64]17). The stereochemistry of the final models was
+   verified with the program PROCHECK ([65]18). Refinement statistics are
+   summarized in Table[66]II. Coordinates have been deposited in the
+   Protein Data Bank under accession reference numbers [67]1HM0 for
+   apo-SpGlmU and [68]1HM8 and [69]1HM9 for the AcCoA and the
+   AcCoA·UDP-GlcNAc complex, respectively. Fig.[70]1 B was generated with
+   Alscript ([71]19), and Figs. [72]2-4 were generated with SPOCK ([73]20)
+   and Raster3D ([74]21).
+   [75]Previous Section[76]Next Section
+
+ §2§ RESULTS AND DISCUSSION §2§
+
+   The crystal structure of full-length SpGlmU was determined by multiple
+   anomalous dispersion techniques. The apo-SpGlmU, SpGlmU-AcCoA, and
+   SpGlmU-AcCoA·UDP-GlcNAc structures were refined to 2.3, 2.5, and 1.75
+   Å, respectively, and have good stereochemistry. The apo-SpGlmU
+   structure consists of residues Ser-2 to Val-142 and Val-149 to Glu-447.
+   The surface loop Arg-143—Glu-148, located in the pyrophosphorylase
+   domain, and the last 12 residues of the acetyltransferase domain,
+   Tyr-448—Gln-459, could not be built because of lack of electron
+   density. The two complex structures, SpGlmU·AcCoA· and
+   SpGlmU·AcCoA·UDP-GlcNAc, consist of residue Ser-2 to Gln-459, and clear
+   unbiased electron density could be observed for both AcCoA and
+   UDP-GlcNAc prior to the incorporation in the refinement (Fig. [77]2 a).
+   [78]Figure 2
+   View larger version:
+     * [79]In this window
+     * [80]In a new window
+
+     * [81]Download as PowerPoint Slide
+
+   Figure 2
+
+   Map quality and overall fold of the SpGlmU structure. A, stereo pair of
+   the 1.75-Å resolution 2F [o] − F [c]averaged electron density map,
+   calculated prior to the incorporation of AcCoA in the refinement and
+   contoured at 1.0 (blue) and 3.0 ς (black) around an AcCoA molecule.
+   Phases were calculated after rigid-body refinement based on the two apo
+   SpGlmU molecules present in the asymmetric unit. B, left, ribbon model
+   of a SpGlmU subunit, showing the PPase domain (orange), the α-helical
+   linker (magenta), the LβH domain (yellow with the unique insertion loop
+   inorange), and the C-terminal arm (cyan);right, the SpGlmU trimer with
+   bound AcCoA and UDP-GlcNAc (gray bonds with red oxygen, bluenitrogen,
+   green sulfur, and purple phosphorus atoms) viewed in the same
+   orientation as in the panel on theleft (top) and down the LβH axis
+   (bottom); for clarity a single subunit is color-coded as in the panel
+   on the left, with the remaining two subunits shown in gray. C, stereo
+   view overlay of the Cα trace of apo-SpGlmU (cyan) and SpGlmU·AcCoA
+   (orange), with the two respective C termini labeled. The overlap is
+   based on a least squares fit of 440 Cα positions.
+
+   The SpGlmU molecule assembles into a trimeric arrangement with overall
+   dimensions of 89 × 85 × 90 Å (Fig. [82]2 b). The LβH domains
+   (Val-252—Ile-437) are tightly packed against each other in a parallel
+   fashion, an α-helical linker (Arg-229—Met-248) sits on top of each
+   β-helix and projects the globular pyrophosphorylase domain
+   (Ser-2—Asn-227) far away from the trimer interface.
+
+   The SpGlmU apo-structure, except for the two missing regions
+   Arg-143—Glu-148 and Tyr-448—Gln-459, is highly similar to the
+   SpGlmU·AcCoA complex structure, with a root mean square deviation of
+   0.450 Å for 440 Cα positions (Fig. [83]2 c). The SpGlmU-AcCoA complex
+   structure, in turn, is almost identical to the SpGlmU·AcCoA·UDP-GlcNAc
+   complex structure in the acetyltransferase domain (root mean square
+   deviation of 0.17 Å for 208 Cα positions). However, the two complex
+   structures differ greatly in the pyrophosphorylase domain, as discussed
+   further below.
+
+   The SpGlmU overall fold for residues Ser-2 to His-330 is similar to
+   theE. coli-truncated enzyme ([84]3). However, the relative arrangement
+   of the pyrophosphorylase and the acetyltransferase domain differs
+   between the crystal structures of SpGlmU and E. coliGlmU-Tr (Fig. [85]3
+   a). Indeed, the two GlmU structures present a 20° deviation in the
+   direction of the α-helical linker, indicating that this is, in fact, a
+   flexible hinge. A direct consequence of this deviation are major
+   differences between GlmU-Tr and SpGlmU occurring in the regions of the
+   pyrophosphorylase domain neighboring the N-cap of the α-helical linker.
+   These conformational changes, together with a high overall mobility of
+   the pyrophosphorylase domain, as opposed to the acetyltransferase
+   domain, suggest that the presented structures may represent only
+   snapshots of a highly dynamic system.
+   [86]Figure 3
+   View larger version:
+     * [87]In this window
+     * [88]In a new window
+
+     * [89]Download as PowerPoint Slide
+
+   Figure 3
+
+   The pyrophosphorylase domain. A, stereo view overlay of the Cα trace of
+   E. coli GlmU-Tr (green) and SpGlmU·AcCoA (orange), with the
+   pyrophosphorylase signature motif color-coded in cyan. The overlap is
+   based on a least squares fit of 104 Cα positions of the central β-sheet
+   of the pyrophosphorylase domain. B, stereo view overlay of the PPase
+   domain of SpGlmU bound to AcCoA (yellow/cyan) and AcCoA·UDP-GlcNAc
+   (orange/green). Backbone regions with associated side chains that
+   deviate significantly between the two complex structures are
+   highlighted (cyan for the open form, and green for the closed form).
+   Secondary structure elements are labeled. C, close-up stereo view of
+   the UDP-GlcNAc/Ca^2+ binding site in the closed form; the molecule is
+   color-coded as in A with the signature motif incyan; solvent molecules
+   are red, and the Ca^2+ ion is green. Hydrogen bonds are shown asdotted
+   lines.
+
+ §5§ The Pyrophosphorylase Domain §5§
+
+   The SpGlmU PPase domain can be divided into two lobes separated by the
+   active site pocket. The first hundred residues, containing the
+   consensus sequence motif G-X-G-T-(RS)-(X)[4]-P-K, form the nucleotide
+   binding lobe, whereas the second lobe, responsible for recognition of
+   the sugar moiety, encompasses the remaining residues of the N-terminal
+   domain (Fig. [90]3 B).
+
+   Striking differences exist between the PPase domains of apo-SpGlmU and
+   the SpGlmU·AcCoA·UDP-GlcNAc complex (root mean square deviation of 2.2
+   Å for 226 Cα atoms), indicating that the enzyme undergoes a substantial
+   conformational change upon substrate/product binding. In the absence of
+   UDP-GlcNAc (apo-SpGlmU and SpGlmU·AcCoA), SpGlmU adopts an open
+   conformation, whereas in the UDP-GlcNAc complex two regions within the
+   sugar binding lobe move toward each other giving rise to a closed
+   conformation (Fig. [91]3 B). Upon product binding the entire region
+   encompassing residues Thr-132—Lys-166 moves as a rigid body, making a
+   20° tilt resulting in a 7-Å movement of the β5b-β6 surface loop. The
+   melting of the last turn of the α-helix α5, facing the β5b-β6 loop,
+   transforms the following α5-α6 surface loop (Asn-191—Tyr-197) into an
+   extended thumb-shaped hairpin. These movements bring the two above
+   surface loops close to each other, such that in the UDP-GlcNAc complex
+   the Ala-192 N hydrogen bonds Asp-157 OD1 (Fig. [92]3 b), whereas in the
+   unbound form these two residues are 14 Å apart. This suggests that the
+   two surface loops function like a pair of tongs, closing up upon
+   substrate binding and anchoring the sugar deep into the active site
+   pocket thereby shielding it from solvent.
+
+   The “breathing” of the PPase domain of SpGlmU could not be observed for
+   the E. coli GlmU-Tr enzyme, where the crystal structures reveal a
+   closed conformation for both the apo- and UDP-GlcNAc complexed forms
+   ([93]3). However, analysis of the crystal packing in the E. coli
+   GlmU-Tr structures reveals that the pyrophosphorylase domain is
+   constrained into its closed conformation in both the apo-form and the
+   GlmU-Tr·UDP-GlcNAc complex by the packing environment, whereas no such
+   constraints exist in apo- or complexed SpGlmU crystals.
+
+   The interactions of the enzyme with the nucleotide and the sugar are
+   largely conserved within the complex crystal structures from S.
+   pneumoniae and E. coli GlmU, yet significant differences reside in the
+   surroundings of the pyrophosphate moiety. Whereas in the
+   GlmU-Tr·UDP-GlcNAc complex both phosphates are solvent-exposed, in the
+   SpGlmU·AcCoA·UDP-GlcNAc complex the α-phosphate is stabilized through
+   weak hydrogen bonds to the side chains of sequence-conserved Arg-15 and
+   Lys-22, located within the signature motif. Moreover, both phosphate
+   groups interact through a calcium ion with Asp-102 and Asn-227,
+   situated in the β4-α4 hairpin and in the N-cap of the long α-helical
+   linker, respectively (Fig.[94]3 c). This calcium ion exhibits the
+   octahedral coordination geometry characteristic of Mg^2+ ions and thus
+   mimics the catalytically important Mg^2+ ion. Arg-15 presents static
+   disorder, with the conformation of minor occupancy contacting the
+   β-phosphate (Fig. [95]3 B). This disorder, together with the weak
+   hydrogen bond to Lys-22, indicates that instead of stabilizing the
+   product Arg-15 and Lys-22 must have a role either in substrate
+   recognition or transition-state stabilization during the single
+   displacement reaction ([96]22), consistent with mutagenesis data of
+   theE. coli GlmU enzyme ([97]3).
+
+   Surprisingly in the crystal structure of the E. coliGlmU-Tr·UDP-GlcNAc
+   complex the functional residues Arg-18, Lys-25, Asp-105, and Asn-227
+   are located far away from the pyrophosphate group. These residues are
+   carried by three structural elements in intimate contact with each
+   other, with the α-helical arm, and with the acetyltransferase domain of
+   a neighboring subunit. As mentioned above, the E. coli GlmU-Tr
+   structures differ from the SpGlmU structures in the relative
+   arrangement of the acetyltransferase and pyrophosphorylase domains,
+   probably because of enzyme truncation. Consequently in E. coli GlmU-Tr,
+   the α-helical arm pushes the signature motif Gly-14—Lys-25 away from
+   the substrate binding pocket of the pyrophosphorylase domain, which
+   might explain the 2-fold reduction in the k [cat] value of E. coli
+   GlmU-Tr, as compared with the wild-type enzyme ([98]3).
+
+ §5§ The Acetyltransferase Domain §5§
+
+   The C-terminal acetyltransferase LβH domain resembles an equilateral
+   prism, with the three sides formed by three parallel β-sheets composed
+   of short β-strands (Fig.[99]2 B). The 50-Å long β-helix of full-length
+   SpGlmU consists of 10 regular coils, whereas the E. coli GlmU-Tr
+   structure is truncated after the fourth coil. The buried surface area
+   to a 1.6-Å probe radius of a SpGlmU subunit upon trimer formation is
+   4690 Å^2, a value in the highest range when compared with other
+   homologous trimeric LβH structures. The regularity of the prism is
+   interrupted only at the seventh coil by a single insertion loop,
+   encompassing the sequence-conserved region Asn-385 to Lys-393, which
+   projects from one of the vertices of the prism and flanks an adjacent
+   subunit (Fig. [100]2 B). The dominant and striking feature of the
+   SpGlmU trimeric assembly is the domain exchange of the C-terminal
+   region. Although this is a novel feature within the family of bacterial
+   acetyltransferases, such a domain exchange has been reported for a
+   number of proteins and is referred to as three-dimensional domain
+   swapping ([101]23). After 10 1/3 complete turns the peptide chain is
+   exchanged with an adjacent subunit, thus forming the unique
+   antiparallel β-strand of an additional coil within the LβH domain.
+   Therefore, together with the α-helical linker sitting on top of the LβH
+   domain, the C-terminal domain exchange contributes to the stabilization
+   of the SpGlmU trimeric assembly. At residue Glu-447 the anti-parallel
+   β-strand reaches the vertex of the prism of a neighboring subunit. At
+   this point the polypeptide chain inserts between two neighboring
+   subunits and coils backwards in the direction of the N terminus,
+   forming two successive 3[10]-helices and ending in intimate contact
+   with the insertion loop Asn-385—Lys-393 of an adjacent subunit. An 8-Å
+   long and very narrow tunnel is formed in this way, enclosing bound
+   AcCoA located at the interface of two subunits, and closed from the
+   outside by the exchanged C-terminal arm of the third subunit and the
+   insertion loop Asn-385—Lys-393 (Fig.[102]4 A), revealing that the
+   trimeric assembly is required for the acetyltransferase activity. To
+   our knowledge, such an active site architecture located at the junction
+   of three subunits is novel and exemplifies how an oligomeric assembly,
+   coupled to a domain exchange, can create a specific binding site. The
+   C-terminal region past residue Glu-447 could not be observed in the
+   apo-structure, suggesting that this region is highly flexible and
+   becomes only structured upon AcCoA binding. No other major structural
+   rearrangements occur upon AcCoA binding in the acetyltransferase
+   domain, except maybe for the insertion loop Asn-385—Lys-393, which is
+   highly disordered in the apo-structure, as indicated by a main chain
+   average B-factor of 74 Å^2 as compared with an average main chain
+   B-factor of 35 Å^2 for the rest of the acetyltransferase domain.
+   [103]Figure 4
+   View larger version:
+     * [104]In this window
+     * [105]In a new window
+
+     * [106]Download as PowerPoint Slide
+
+   Figure 4
+
+   The acetyltransferase domain. A, surface representation of the trimeric
+   assembly in the LβH domain with the three subunits color-coded in
+   yellow(with the insertion loop in orange), green, andcyan,
+   respectively. AcCoA and GlcN-1-P are shown withwhite bonds. The side
+   chain of the proposed catalytic base His-362 (gray bonds) and the
+   backbone regions of the insertion loop (orange) and the C-terminal arm
+   (cyan) that form the tunnel are shown. Functionally important residues
+   are labeled. B, close-up stereo view of the SpGlmU acetyltransferase
+   active site with bound AcCoA and modeled GlcN-1-P (white bonds). The
+   backbone of each subunit is color-coded as in A; for clarity only the
+   C-terminal arm (cyan) of the third subunit is shown. The side chains of
+   the catalytic triad (gray bonds) and other functionally important
+   residues (subunit color-coded bonds) are shown.
+
+   Major stabilization of the AcCoA cofactor is ensured by stacking of the
+   adenine group between the side chains of Ile-437 and Arg-441, hydrogen
+   bonds from the 3′-phosphate group to Lys-445 NZ and Tyr-448 OH, and
+   electrostatic interactions with Arg-439. Additional stabilization
+   arises from hydrophobic interactions, and hydrogen bonds from the
+   β-mercaptoethylamine moiety to main-chain atoms of Asn-385, Ser-404,
+   and Ala-422. The pyrophosphate is exposed to the solvent and does not
+   interact with the protein.
+
+   Structural comparison of the SpGlmU·AcCoA complex with other related
+   bacterial acetyltransferases reveals a common location of the AcCoA
+   binding site. Indeed, AcCoA adopts a conformation very similar to the
+   fishhook-like conformation observed for CoA in the
+   tetrahydrodipicolinate N-succinyltransferase ([107]24), bent at the
+   pyrophosphate group and with an extended pantetheine arm running
+   parallel to the LβH domain (Fig. [108]4 A). Although the C-terminal
+   domain exchange, from which the AcCoA binding site emerges, is novel
+   and dissimilar to other related bacterial acetyltransferases,
+   structuring of the C-terminal portion upon CoA binding has been
+   previously reported for tetrahydrodipicolinateN-succinyltransferase
+   ([109]24).
+
+ §5§ Implications for Catalysis §5§
+
+   Acetyltransferases utilizing AcCoA as substrate donor transfer the
+   acetyl group, loosely bound through the weak thioester linkage, either
+   to a cysteine residue, forming a covalent acetyl-enzyme intermediate,
+   or directly to the substrate ([110]25,[111]26). In the light of the
+   first of these two mechanisms, the role of the four cysteine residues
+   in the E. coli enzyme was investigated by site-directed mutagenesis
+   studies ([112]27). However, none of the cysteine residues are conserved
+   between known GlmU sequences, and acetyltransferase activity was
+   dramatically decreased only by the Ala mutant of Cys-307, which is
+   disulfide-bridged and points toward the interior of the LβH domain in
+   the E. coli GlmU-Tr structure. SpGlmU contains only one single cysteine
+   residue, Cys-369, located 10 Å apart from the active site, excluding
+   thus the hypothesis of a covalent acetyl-cysteine enzyme intermediate.
+
+   Inspection of the SpGlmU active site points rather toward a direct
+   acetyl group transfer, based on a catalytic triad formed by the
+   conserved residues His-362, Glu-348, and Ser-404 (Fig. [113]4 B).
+   His-362 is the only residue located in close proximity of the
+   thioester, which may function as a general base catalyst, activating
+   the C-2 amine of glucosamine-1-P for nucleophilic attack. Hydrogen
+   bonding of His-362 ND1 to Glu-348 OE1 ensures the proper tautomeric
+   form of the imidazole, lacking one proton on NE2. Ser-404, located
+   behind the thioester, is well positioned to stabilize, together with
+   the main-chain nitrogen atom of Ala-379, the negative charge building
+   up on the thioester carbonyl at the transition state. The
+   sequence-conserved Asn-385 residue, within hydrogen bond distance to
+   the sulfur, could have a role in proton transfer at the end of the
+   catalytic cycle. The importance of His-362 is highlighted by a
+   superimposition of SpGlmU with the crystal structure of
+   tetrahydrodipicolinate N-succinyltransferase, which positions SpGlmU
+   His-362 similarly to tetrahydrodipicolinateN-succinyltransferase
+   Asp-141, a residue proposed to function as the general base ([114]24).
+   A histidine, His-79, has been suggested to function as the general
+   base, as well, in the related hexapeptide xenobiotic acetyltransferase
+   from Pseudomonas aeruginosa ([115]28).
+
+   In absence of a complex with GlcN-1-P, we have modeled GlcN-1-P into
+   the small pocket containing the catalytic triad and surrounded by bulky
+   side chains protruding from two neighboring subunits and the insertion
+   loop Asn-385—Lys-393. The orientation of GlcN-1-P is constrained by a
+   cluster of sequence-conserved electropositive residues (Arg-332,
+   Lys-350, and Lys-391), candidates for binding the C-1 phosphate group,
+   a hypothesis supported by earlier kinetic studies showing that GlcN is
+   a very poor substrate compared with GlcN-1-P for the acetyltransfer
+   reaction ([116]4). In our model the acceptor amino group on C-2 is
+   within hydrogen binding distance from the proposed catalytic base (NE2
+   of His-362) and ideally poised to make a nucleophilic attack on the
+   thioester (Fig. [117]4 B).
+
+   The three crystal structures of SpGlmU in unbound and complexed form
+   described in this paper highlight novel structural features necessary
+   to achieve the acetyltransferase reaction and define a structural
+   template to design new antibiotics. A detailed dissection of the two
+   distinct GlmU catalytic mechanisms must await further crystallographic
+   investigations of substrate and inhibitor complexes.
+   [118]Previous Section[119]Next Section
+
+ §2§ ACKNOWLEDGEMENTS §2§
+
+   We thank Anne Belaich for the S. pneumoniae cDNA library, the staff of
+   the European Synchrotron Radiation Facility for technical support in
+   data collection, and Dominique Mengin-Lecreulx, Bernard Henrissat,
+   Christian Cambillau, and Gideon Davies for helpful discussion.
+   [120]Previous Section[121]Next Section
+
+ §2§ Footnotes §2§
+
+     * [122]↵* This work was funded in part by a Groupement d'Intérèt
+       Public-Hoechst Marion Roussel grant and the Centre National de la
+       Recherche Scientifique (UMR 6098, Marseille, France).The costs of
+       publication of this article were defrayed in part by the payment of
+       page charges. The article must therefore be hereby marked
+       “advertisement” in accordance with 18 U.S.C. Section 1734 solely to
+       indicate this fact.
+       The atomic coordinates and the structure factors (code , , and )
+       have been deposited in the Protein Data Bank, Research
+       Collaboratory for Structural Bioinformatics, Rutgers University,
+       New Brunswick, NJ ([123]http://www.rcsb.org/).
+     * [124]↵§ Former post-doctoral fellow of Hoechst Marion Roussel.
+       Holder of an EMBO fellowship.
+     * [125]↵¶ Present address: ENSBANA, Département de Microbiologie, 1
+       Esplanade Erasme, 21000 Dijon, France. Former post-doctoral fellow
+       of Hoechst Marion Roussel.
+     * [126]↵** To whom correspondence should be addressed. Tel.:
+       33-4-91-16-45-08; Fax: 33-4-91-16-45-36; E-mail:
+       yves@afmb.cnrs-mrs.fr.
+     * Published, JBC Papers in Press, December 15, 2000, DOI
+       10.1074/jbc.M011225200
+     * Abbreviations:
+
+        AcCoA
+                acetyl-coenzyme A
+
+        GlmU
+                N-acetyl-glucosamine-1-phosphate uridyltransferase
+
+        GlmU-Tr
+                truncated form of Escherichia coli GlmU
+
+        PPase
+                pyrophosphorylase
+
+        LβH
+                left-handed β-helix
+
+        SpGlmU
+                Streptococcus pneumoniae GlmU
+
+        PEG
+                polyethylene glycol
+
+     *
+          + Received December 13, 2000.
+     * The American Society for Biochemistry and Molecular Biology, Inc.
+
+   [127]Previous Section
+
+ §2§ REFERENCES §2§
+
+    1. [128]↵
+         1. Mengin-Lecreulx D.,
+         2. van Heijenoort J. J.
+       (1993) J. Bacteriol. 175:6150–6157.
+    2. [129]↵
+         1. Neidhardt F. C.,
+         2. Lin E.,
+         3. Low K. B.,
+         4. Magasanik B.,
+         5. Reznikoff W. S.,
+         6. Riley M.,
+         7. Schaechter M.,
+         8. Umbarger H. E.
+         1. Raetz C. R. H.
+       (1996) in Escherichia coli and Salmonella: Cellular and Molecular
+       Biology, eds Neidhardt F. C., Lin E., Low K. B., Magasanik B.,
+       Reznikoff W. S., Riley M., Schaechter M., Umbarger H. E. (ASM
+       Press, Washington, D. C.) 2nd Ed. 10:1035–1063.
+    3. [130]↵
+         1. Brown K.,
+         2. Pompeo F.,
+         3. Dixon S.,
+         4. Mengin-Lecreulx D.,
+         5. Cambillau C.,
+         6. Bourne Y.
+       (1999) EMBO J. 18:4096–4107.
+    4. [131]↵
+         1. Gehring A. M.,
+         2. Lees W. J.,
+         3. Mindiola D. J.,
+         4. Walsh C. T.,
+         5. Brown E. D.
+       (1996) Biochemistry 35:579–585.
+    5. [132]↵
+         1. Mengin-Lecreulx D.,
+         2. van Heijenoort J.
+       (1994) J. Bacteriol. 176:5788–5795.
+    6. [133]↵
+         1. Boyer P. D.
+         1. Rossmann M. G.,
+         2. Liljas A.,
+         3. Branden C.-I.,
+         4. Bansazak L. J.
+       (1975) in The Enzymes, ed Boyer P. D. (Academic Press, New York),
+       11:61–102.
+    7. [134]↵
+         1. Vuorio R.,
+         2. Hirvas L.,
+         3. Vaara M.
+       (1991) FEBS Lett. 292:90–94.
+    8. [135]↵
+         1. Van Duyne G. D.,
+         2. Standaert R. F.,
+         3. Karplus P. A.,
+         4. Schreiber S. L.,
+         5. Clardy J.
+       (1993) J. Mol. Biol. 229:105–124.
+    9. [136]↵
+         1. Carter J. C. W.,
+         2. Sweet R. M.
+         1. Otwinowski Z.,
+         2. Minor W.
+       (1997) in Methods in Enzymology, eds Carter J. C. W., Sweet R. M.
+       (Academic Press, New York), pp 307–326.
+   10. [137]↵
+         1. CCP4
+       (1994) Acta Crystallogr. Sect. D Biol. Crystallogr. 50:760.
+   11. [138]↵
+         1. Terwilliger T. C.,
+         2. Berendzen J.
+       (1999) Acta Crystallogr. Sect. D Biol. Crystallogr. 55:849–861.
+   12. [139]↵
+         1. Cowtan K.
+       (1994) Joint CCP4 and ESF-EACMB Newsletter on Protein
+       Crystallography 31:34–38.
+   13. [140]↵
+         1. Roussel A.,
+         2. Cambillau C.
+       (1991) Silicon Graphics Geometry Partners Directory (Silicon
+       Graphics Corp. Mountain View, CA), p 81.
+   14. [141]↵
+         1. Navaza J.
+       (1994) Acta Crystallogr. Sect. A 50:157–163.
+   15. [142]↵
+         1. Murshudov G. N.,
+         2. Vagin A. A.,
+         3. Dodson E. J.
+       (1997) Acta Crystallogr. Sect. D Biol. Crystallogr. 53:240–255.
+   16. [143]↵
+         1. Brünger A. T.,
+         2. Adams P. D.,
+         3. Clore G. M.,
+         4. DeLano W. L.,
+         5. Gros P.,
+         6. Grosse-Kunstleve R. W.,
+         7. Jiang J. S.,
+         8. Kuszewski J.,
+         9. Nilges M.,
+        10. Pannu N. S.,
+        11. Read R. J.,
+        12. Rice L. M.,
+        13. Simonson T.,
+        14. Warren G. L.
+       (1998) Acta Crystallogr. Sect. D Biol. Crystallogr. 54:905–921.
+   17. [144]↵
+         1. Perrakis A.,
+         2. Morris R.,
+         3. Lamzin V. S.
+       (1999) Nat. Struct. Biol. 6:458–463.
+   18. [145]↵
+         1. Laskowski R.,
+         2. MacArthur M.,
+         3. Moss D.,
+         4. Thornton J.
+       (1993) J. Appl. Crystallogr. 26:91–97.
+   19. [146]↵
+         1. Barton G. J.
+       (1993) Protein Eng. 6:37–40.
+   20. [147]↵
+         1. Christopher J. A.
+       (1998) SPOCK . (The Center for Macromolecular Design, Texas A&M
+       University, College Station, TX).
+   21. [148]↵
+         1. Merritt E. A.,
+         2. Murphy M. E. P.
+       (1994) Acta Crystallogr. Sect. D Biol. Crystallogr. 50:869–873.
+   22. [149]↵
+         1. Sheu K. F.,
+         2. Frey P. A.
+       (1978) J. Biol. Chem. 253:3378–3780.
+   23. [150]↵
+         1. Schlunegger M. P.,
+         2. Bennett M. J.,
+         3. Eisenberg D.
+       (1997) Adv. Protein Chem. 50:61–122.
+   24. [151]↵
+         1. Beaman T. W.,
+         2. Blanchard J. S.,
+         3. Roderick S. L.
+       (1998) Biochemistry 37:10363–10369.
+   25. [152]↵
+         1. Cheon H. G.,
+         2. Hanna P. E.
+       (1992) Biochem. Pharmacol. 43:2255–2268.
+   26. [153]↵
+         1. De Angelis J.,
+         2. Gastel J.,
+         3. Klein D. C.,
+         4. Cole P. A.
+       (1998) J. Biol. Chem. 273:3045–3050.
+   27. [154]↵
+         1. Pompeo F.,
+         2. van Heijenoort J.,
+         3. Mengin-Lecreulx D.
+       (1998) J. Bacteriol. 180:4799–4803.
+   28. [155]↵
+         1. Beaman T. W.,
+         2. Sugantino M.,
+         3. Roderick S. L.
+       (1998) Biochemistry 37:6689–6696.
+
+     * [156]Add to CiteULike CiteULike
+     * [157]Add to Complore Complore
+     * [158]Add to Connotea Connotea
+     * [159]Add to Del.icio.us Del.icio.us
+     * [160]Add to Digg Digg
+
+   [161]What's this?
+   [162]« Previous | [163]Next Article »[164]Table of Contents
+
+ §3§ This Article §3§
+
+    1. First Published on December 15, 2000, doi: 10.1074/jbc.M011225200
+       April 13, 2001 The Journal of Biological Chemistry, 276,
+       11844-11851.
+
+    1. [165]AbstractFree
+    2. » Full TextFree
+    3. [166]Full Text (PDF)Free
+    4. All Versions of this Article:
+         1. [167]M011225200v1
+         2. 276/15/11844 most recent
+
+ §4§ Classifications §4§
+
+    1.
+          + [168]PROTEIN STRUCTURE AND FOLDING
+
+ §4§ Services §4§
+
+    1. [169]Email this article to a friend
+    2. [170]Alert me when this article is cited
+    3. [171]Alert me if a correction is posted
+    4. [172]Alert me when eletters are published
+    5. [173]Similar articles in this journal
+    6. [174]Similar articles in Web of Science
+    7. [175]Similar articles in PubMed
+    8. [176]Download to citation manager
+    9. [177]Request Permissions
+
+ §4§ Responses §4§
+
+    1. [178]Submit a Letter to the Editor
+
+ §4§ Citing Articles §4§
+
+    1. [179]Load citing article information
+    2. [180]Citing articles via Web of Science
+    3. [181]Citing articles via Google Scholar
+
+ §4§ Google Scholar §4§
+
+    1. [182]Articles by Sulzenbacher, G.
+    2. [183]Articles by Bourne, Y.
+    3. [184]Search for related content
+
+ §4§ PubMed §4§
+
+    1. [185]PubMed citation
+    2. [186]Articles by Sulzenbacher, G.
+    3. [187]Articles by Bourne, Y.
+    4.
+
+ §4§ Related Content §4§
+
+    1. [188]Load related web page information
+
+ §4§ Social Bookmarking §4§
+
+    1.
+          + [189]Add to CiteULike CiteULike
+          + [190]Add to Complore Complore
+          + [191]Add to Connotea Connotea
+          + [192]Add to Del.icio.us Del.icio.us
+          + [193]Add to Digg Digg
+       [194]What's this?
+
+ §3§ Navigate This Article §3§
+
+    1. [195]Top
+    2. [196]Abstract
+    3. [197]EXPERIMENTAL PROCEDURES
+    4. [198]RESULTS AND DISCUSSION
+    5. [199]ACKNOWLEDGEMENTS
+    6. [200]Footnotes
+    7. [201]REFERENCES
+
+ §3§ This Week's Issue §3§
+
+    1. [202]September 24, 2010, 285 (39)
+
+    1. [203]Current Issue
+
+    1. [204]Alert me to new issues of JBC
+
+     * [205]Authors
+     * [206]Submit
+     * [207]Subscribers
+     * [208]Editorial Board
+     * [209]RSS and Email Alerts
+     * [210]Article Statistics
+     * [211]Teaching Tools
+     * [212]Copyright Permissions
+     * [213]Advertise
+     * [214]Contact JBC
+
+     * Advertisement
+     * Advertisement
+
+   Copyright © 2010 by [215]American Society for Biochemistry and
+   Molecular Biology
+
+   [216]Alternate route to the JBC: http://intl.jbc.org
+
+   [217]Contact JBC | [218]Help Pages
+     * [219]asbmb_today_logo
+     * [220]jlr_logo
+     * [221]mcp_logo
+
+     * Print ISSN 0021-9258
+     * Online ISSN 1083-351X
+
+   Advertisement
+   Advertisement
+     * [222]2009 ASBMB Annual Meeting Lectures: Watch Video!
+
+References
+
+   Visible links
+   1. http://www.jbc.org/
+   2. file://localhost/dev/paper.html#content-block
+   3. http://www.jbc.org/
+   4. http://www.jbc.org/content/current
+   5. http://www.jbc.org/content/by/year
+   6. http://www.jbc.org/content/early/recent/0
+   7. http://www.jbc.org/content/by/section/Minireviews
+   8. http://www.jbc.org/content/by/section/Classics
+   9. http://www.jbc.org/content/by/section/Reflections
+  10. http://www.jbc.org/potw
+  11. http://www.jbc.org/search
+  12. http://www.jbc.org/content/by/year
+  13. http://www.jbc.org/login?uri=http%3A%2F%2Fwww.jbc.org%2Fcontent%2F276%2F15%2F11844.long
+  14. http://www.jbc.org/cgi/adclick/?ad=21401&adclick=true&url=http%3A%2F%2Fwww.asbmb.org%2Fmembership
+  15. file://localhost/dev/paper.html#fn-8
+  16. http://www.jbc.org/search?author1=Gerlind+Sulzenbacher&sortspec=date&submit=Submit
+  17. file://localhost/dev/paper.html#target-1
+  18. file://localhost/dev/paper.html#fn-9
+  19. http://www.jbc.org/search?author1=Laurent+Gal&sortspec=date&submit=Submit
+  20. file://localhost/dev/paper.html#target-1
+  21. file://localhost/dev/paper.html#fn-10
+  22. http://www.jbc.org/search?author1=Caroline+Peneff&sortspec=date&submit=Submit
+  23. file://localhost/dev/paper.html#target-1
+  24. http://www.jbc.org/search?author1=Florence+Fassy&sortspec=date&submit=Submit
+  25. file://localhost/dev/paper.html#target-2
+  26. http://www.jbc.org/search?author1=Yves+Bourne&sortspec=date&submit=Submit
+  27. file://localhost/dev/paper.html#target-1
+  28. file://localhost/dev/paper.html#fn-11
+  29. file://localhost/dev/paper.html#sec-1
+  30. file://localhost/dev/paper.html#ref-1
+  31. file://localhost/dev/paper.html#F1
+  32. file://localhost/dev/paper.html#ref-2
+  33. http://www.jbc.org/content/276/15/11844/F1.expansion.html
+  34. http://www.jbc.org/content/276/15/11844/F1.expansion.html
+  35. http://www.jbc.org/content/276/15/11844/F1.expansion.html
+  36. http://www.jbc.org/powerpoint/276/15/11844/F1
+  37. file://localhost/dev/paper.html#ref-3
+  38. file://localhost/dev/paper.html#ref-4
+  39. file://localhost/dev/paper.html#ref-5
+  40. file://localhost/dev/paper.html#ref-6
+  41. file://localhost/dev/paper.html#ref-7
+  42. file://localhost/dev/paper.html#F1
+  43. file://localhost/dev/paper.html#ref-4
+  44. file://localhost/dev/paper.html#ref-3
+  45. file://localhost/dev/paper.html#abstract-1
+  46. file://localhost/dev/paper.html#sec-6
+  47. file://localhost/dev/paper.html#ref-3
+  48. http://www.jbc.org/external-ref?link_type=PDB&access_num=1FXJ
+  49. file://localhost/dev/paper.html#ref-8
+  50. file://localhost/dev/paper.html#ref-9
+  51. file://localhost/dev/paper.html#ref-10
+  52. file://localhost/dev/paper.html#T1
+  53. file://localhost/dev/paper.html#T2
+  54. http://www.jbc.org/content/276/15/11844/T1.expansion.html
+  55. http://www.jbc.org/content/276/15/11844/T1.expansion.html
+  56. http://www.jbc.org/content/276/15/11844/T2.expansion.html
+  57. http://www.jbc.org/content/276/15/11844/T2.expansion.html
+  58. file://localhost/dev/paper.html#ref-11
+  59. file://localhost/dev/paper.html#ref-12
+  60. file://localhost/dev/paper.html#ref-13
+  61. file://localhost/dev/paper.html#ref-14
+  62. file://localhost/dev/paper.html#ref-15
+  63. file://localhost/dev/paper.html#ref-16
+  64. file://localhost/dev/paper.html#ref-17
+  65. file://localhost/dev/paper.html#ref-18
+  66. file://localhost/dev/paper.html#T2
+  67. http://www.jbc.org/external-ref?link_type=PDB&access_num=1HM0
+  68. http://www.jbc.org/external-ref?link_type=PDB&access_num=1HM8
+  69. http://www.jbc.org/external-ref?link_type=PDB&access_num=1HM9
+  70. file://localhost/dev/paper.html#F1
+  71. file://localhost/dev/paper.html#ref-19
+  72. file://localhost/dev/paper.html#F2
+  73. file://localhost/dev/paper.html#ref-20
+  74. file://localhost/dev/paper.html#ref-21
+  75. file://localhost/dev/paper.html#sec-1
+  76. file://localhost/dev/paper.html#ack-1
+  77. file://localhost/dev/paper.html#F2
+  78. http://www.jbc.org/content/276/15/11844/F2.expansion.html
+  79. http://www.jbc.org/content/276/15/11844/F2.expansion.html
+  80. http://www.jbc.org/content/276/15/11844/F2.expansion.html
+  81. http://www.jbc.org/powerpoint/276/15/11844/F2
+  82. file://localhost/dev/paper.html#F2
+  83. file://localhost/dev/paper.html#F2
+  84. file://localhost/dev/paper.html#ref-3
+  85. file://localhost/dev/paper.html#F3
+  86. http://www.jbc.org/content/276/15/11844/F3.expansion.html
+  87. http://www.jbc.org/content/276/15/11844/F3.expansion.html
+  88. http://www.jbc.org/content/276/15/11844/F3.expansion.html
+  89. http://www.jbc.org/powerpoint/276/15/11844/F3
+  90. file://localhost/dev/paper.html#F3
+  91. file://localhost/dev/paper.html#F3
+  92. file://localhost/dev/paper.html#F3
+  93. file://localhost/dev/paper.html#ref-3
+  94. file://localhost/dev/paper.html#F3
+  95. file://localhost/dev/paper.html#F3
+  96. file://localhost/dev/paper.html#ref-22
+  97. file://localhost/dev/paper.html#ref-3
+  98. file://localhost/dev/paper.html#ref-3
+  99. file://localhost/dev/paper.html#F2
+ 100. file://localhost/dev/paper.html#F2
+ 101. file://localhost/dev/paper.html#ref-23
+ 102. file://localhost/dev/paper.html#F4
+ 103. http://www.jbc.org/content/276/15/11844/F4.expansion.html
+ 104. http://www.jbc.org/content/276/15/11844/F4.expansion.html
+ 105. http://www.jbc.org/content/276/15/11844/F4.expansion.html
+ 106. http://www.jbc.org/powerpoint/276/15/11844/F4
+ 107. file://localhost/dev/paper.html#ref-24
+ 108. file://localhost/dev/paper.html#F4
+ 109. file://localhost/dev/paper.html#ref-24
+ 110. file://localhost/dev/paper.html#ref-25
+ 111. file://localhost/dev/paper.html#ref-26
+ 112. file://localhost/dev/paper.html#ref-27
+ 113. file://localhost/dev/paper.html#F4
+ 114. file://localhost/dev/paper.html#ref-24
+ 115. file://localhost/dev/paper.html#ref-28
+ 116. file://localhost/dev/paper.html#ref-4
+ 117. file://localhost/dev/paper.html#F4
+ 118. file://localhost/dev/paper.html#sec-6
+ 119. file://localhost/dev/paper.html#fn-group-1
+ 120. file://localhost/dev/paper.html#ack-1
+ 121. file://localhost/dev/paper.html#ref-list-1
+ 122. file://localhost/dev/paper.html#xref-fn-8-1
+ 123. http://www.rcsb.org/
+ 124. file://localhost/dev/paper.html#xref-fn-9-1
+ 125. file://localhost/dev/paper.html#xref-fn-10-1
+ 126. file://localhost/dev/paper.html#xref-fn-11-1
+ 127. file://localhost/dev/paper.html#fn-group-1
+ 128. file://localhost/dev/paper.html#xref-ref-1-1
+ 129. file://localhost/dev/paper.html#xref-ref-2-1
+ 130. file://localhost/dev/paper.html#xref-ref-3-1
+ 131. file://localhost/dev/paper.html#xref-ref-4-1
+ 132. file://localhost/dev/paper.html#xref-ref-5-1
+ 133. file://localhost/dev/paper.html#xref-ref-6-1
+ 134. file://localhost/dev/paper.html#xref-ref-7-1
+ 135. file://localhost/dev/paper.html#xref-ref-8-1
+ 136. file://localhost/dev/paper.html#xref-ref-9-1
+ 137. file://localhost/dev/paper.html#xref-ref-10-1
+ 138. file://localhost/dev/paper.html#xref-ref-11-1
+ 139. file://localhost/dev/paper.html#xref-ref-12-1
+ 140. file://localhost/dev/paper.html#xref-ref-13-1
+ 141. file://localhost/dev/paper.html#xref-ref-14-1
+ 142. file://localhost/dev/paper.html#xref-ref-15-1
+ 143. file://localhost/dev/paper.html#xref-ref-16-1
+ 144. file://localhost/dev/paper.html#xref-ref-17-1
+ 145. file://localhost/dev/paper.html#xref-ref-18-1
+ 146. file://localhost/dev/paper.html#xref-ref-19-1
+ 147. file://localhost/dev/paper.html#xref-ref-20-1
+ 148. file://localhost/dev/paper.html#xref-ref-21-1
+ 149. file://localhost/dev/paper.html#xref-ref-22-1
+ 150. file://localhost/dev/paper.html#xref-ref-23-1
+ 151. file://localhost/dev/paper.html#xref-ref-24-1
+ 152. file://localhost/dev/paper.html#xref-ref-25-1
+ 153. file://localhost/dev/paper.html#xref-ref-26-1
+ 154. file://localhost/dev/paper.html#xref-ref-27-1
+ 155. file://localhost/dev/paper.html#xref-ref-28-1
+ 156. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/276/15/11844&title=Crystal%20Structure%20of%20Streptococcus%20pneumoniae%20N-Acetylglucosamine-1-phosphate%20Uridyltransferase%20Bound%20to%20Acetyl-coenzyme%20A%20Reveals%20a%20Novel%20Active%20Site%20Architecture+--+Sulzenbacher%20et%20al.%20276%20%2815%29%3A%2011844+--+JBC&doi=10.1074/jbc.M011225200&link_type=CITEULIKE
+ 157. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/276/15/11844&title=Crystal%20Structure%20of%20Streptococcus%20pneumoniae%20N-Acetylglucosamine-1-phosphate%20Uridyltransferase%20Bound%20to%20Acetyl-coenzyme%20A%20Reveals%20a%20Novel%20Active%20Site%20Architecture+--+Sulzenbacher%20et%20al.%20276%20%2815%29%3A%2011844+--+JBC&doi=10.1074/jbc.M011225200&link_type=COMPLORE
+ 158. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/276/15/11844&title=Crystal%20Structure%20of%20Streptococcus%20pneumoniae%20N-Acetylglucosamine-1-phosphate%20Uridyltransferase%20Bound%20to%20Acetyl-coenzyme%20A%20Reveals%20a%20Novel%20Active%20Site%20Architecture+--+Sulzenbacher%20et%20al.%20276%20%2815%29%3A%2011844+--+JBC&doi=10.1074/jbc.M011225200&link_type=CONNOTEA
+ 159. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/276/15/11844&title=Crystal%20Structure%20of%20Streptococcus%20pneumoniae%20N-Acetylglucosamine-1-phosphate%20Uridyltransferase%20Bound%20to%20Acetyl-coenzyme%20A%20Reveals%20a%20Novel%20Active%20Site%20Architecture+--+Sulzenbacher%20et%20al.%20276%20%2815%29%3A%2011844+--+JBC&doi=10.1074/jbc.M011225200&link_type=DEL_ICIO_US
+ 160. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/276/15/11844&title=Crystal%20Structure%20of%20Streptococcus%20pneumoniae%20N-Acetylglucosamine-1-phosphate%20Uridyltransferase%20Bound%20to%20Acetyl-coenzyme%20A%20Reveals%20a%20Novel%20Active%20Site%20Architecture+--+Sulzenbacher%20et%20al.%20276%20%2815%29%3A%2011844+--+JBC&doi=10.1074/jbc.M011225200&link_type=DIGG
+ 161. http://www.jbc.org/help/social_bookmarks.dtl
+ 162. http://www.jbc.org/content/276/15/11838.short
+ 163. http://www.jbc.org/content/276/15/11852.short
+ 164. http://www.jbc.org/content/276/15.toc
+ 165. http://www.jbc.org/content/276/15/11844.abstract
+ 166. http://www.jbc.org/content/276/15/11844.full.pdf+html
+ 167. http://www.jbc.org/content/early/2000/12/15/jbc.M011225200
+ 168. http://www.jbc.org/search?tocsectionid=PROTEIN+STRUCTURE+AND+FOLDING&sortspec=date&submit=Submit
+ 169. http://www.jbc.org/email?gca=jbc;276/15/11844&current-view-path=/content/276/15/11844.long
+ 170. http://www.jbc.org/cgi/alerts/ctalert?alertType=citedby&addAlert=cited_by&cited_by_criteria_resid=jbc;276/15/11844&saveAlert=no&return-type=article&return_url=http://www.jbc.org/content/276/15/11844.long
+ 171. http://www.jbc.org/cgi/alerts/ctalert?alertType=correction&addAlert=correction&correction_criteria_value=276/15/11844&saveAlert=no&return-type=article&return_url=http://www.jbc.org/content/276/15/11844.long
+ 172. http://www.jbc.org/cgi/alerts/ctalert?alertType=eletter&addAlert=eletter&eletter_criteria_value=276/15/11844&saveAlert=no&return-type=article&return_url=http://www.jbc.org/content/276/15/11844.long
+ 173. http://www.jbc.org/search?qbe=jbc;M011225200&citation=Sulzenbacher%20et%20al.%20276%20%2815%29:%2011844&submit=yes
+ 174. http://www.jbc.org/external-ref?access_num=jbc%3B276%2F15%2F11844&link_type=ISI_RELATEDRECORDS
+ 175. http://www.jbc.org/external-ref?access_num=11118459&link_type=MED_NBRS
+ 176. http://www.jbc.org/citmgr?gca=jbc;276/15/11844
+ 177. https://s100.copyright.com/AppDispatchServlet?publisherName=ASBMB&publication=jbc&title=Crystal%20Structure%20of%20Streptococcus%20pneumoniae%20N-Acetylglucosamine-1-phosphate%20Uridyltransferase%20Bound%20to%20Acetyl-coenzyme%20A%20Reveals%20a%20Novel%20Active%20Site%20Architecture&publicationDate=04/13/2001&author=Gerlind%20Sulzenbacher,%20Laurent%20Gal,%20Caroline%20Peneff,%20Florence%20Fassy,%20Yves%20Bourne&startPage=11844&contentID=10.1074/jbc.M011225200&orderBeanReset=true&endPage=11851&volumeNum=276&issueNum=15
+ 178. http://www.jbc.org/letters/submit/jbc;276/15/11844
+ 179. http://www.jbc.org/content/276/15/11844.long?cited-by=yes&legid=jbc;276/15/11844#cited-by
+ 180. http://www.jbc.org/external-ref?access_num=jbc%3B276%2F15%2F11844&link_type=ISI_CITING
+ 181. http://www.jbc.org/external-ref?access_num=http://www.jbc.org/cgi/content/abstract/276/15/11844&link_type=GOOGLESCHOLAR
+ 182. http://scholar.google.com/scholar?q=%22author%3ASulzenbacher%20author%3AG.%22
+ 183. http://scholar.google.com/scholar?q=%22author%3ABourne%20author%3AY.%22
+ 184. http://www.jbc.org/external-ref?access_num=http://www.jbc.org/cgi/content/abstract/276/15/11844&link_type=GOOGLESCHOLARRELATED
+ 185. http://www.jbc.org/external-ref?access_num=11118459&link_type=PUBMED
+ 186. http://www.jbc.org/external-ref?access_num=Sulzenbacher%20G&link_type=AUTHORSEARCH
+ 187. http://www.jbc.org/external-ref?access_num=Bourne%20Y&link_type=AUTHORSEARCH
+ 188. http://www.jbc.org/content/276/15/11844.long?related-urls=yes&legid=jbc;276/15/11844#related-urls
+ 189. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/276/15/11844&title=Crystal%20Structure%20of%20Streptococcus%20pneumoniae%20N-Acetylglucosamine-1-phosphate%20Uridyltransferase%20Bound%20to%20Acetyl-coenzyme%20A%20Reveals%20a%20Novel%20Active%20Site%20Architecture+--+Sulzenbacher%20et%20al.%20276%20%2815%29%3A%2011844+--+JBC&doi=10.1074/jbc.M011225200&link_type=CITEULIKE
+ 190. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/276/15/11844&title=Crystal%20Structure%20of%20Streptococcus%20pneumoniae%20N-Acetylglucosamine-1-phosphate%20Uridyltransferase%20Bound%20to%20Acetyl-coenzyme%20A%20Reveals%20a%20Novel%20Active%20Site%20Architecture+--+Sulzenbacher%20et%20al.%20276%20%2815%29%3A%2011844+--+JBC&doi=10.1074/jbc.M011225200&link_type=COMPLORE
+ 191. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/276/15/11844&title=Crystal%20Structure%20of%20Streptococcus%20pneumoniae%20N-Acetylglucosamine-1-phosphate%20Uridyltransferase%20Bound%20to%20Acetyl-coenzyme%20A%20Reveals%20a%20Novel%20Active%20Site%20Architecture+--+Sulzenbacher%20et%20al.%20276%20%2815%29%3A%2011844+--+JBC&doi=10.1074/jbc.M011225200&link_type=CONNOTEA
+ 192. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/276/15/11844&title=Crystal%20Structure%20of%20Streptococcus%20pneumoniae%20N-Acetylglucosamine-1-phosphate%20Uridyltransferase%20Bound%20to%20Acetyl-coenzyme%20A%20Reveals%20a%20Novel%20Active%20Site%20Architecture+--+Sulzenbacher%20et%20al.%20276%20%2815%29%3A%2011844+--+JBC&doi=10.1074/jbc.M011225200&link_type=DEL_ICIO_US
+ 193. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/276/15/11844&title=Crystal%20Structure%20of%20Streptococcus%20pneumoniae%20N-Acetylglucosamine-1-phosphate%20Uridyltransferase%20Bound%20to%20Acetyl-coenzyme%20A%20Reveals%20a%20Novel%20Active%20Site%20Architecture+--+Sulzenbacher%20et%20al.%20276%20%2815%29%3A%2011844+--+JBC&doi=10.1074/jbc.M011225200&link_type=DIGG
+ 194. http://www.jbc.org/help/social_bookmarks.dtl
+ 195. file://localhost/dev/paper.html#content-block
+ 196. file://localhost/dev/paper.html#abstract-1
+ 197. file://localhost/dev/paper.html#sec-1
+ 198. file://localhost/dev/paper.html#sec-6
+ 199. file://localhost/dev/paper.html#ack-1
+ 200. file://localhost/dev/paper.html#fn-group-1
+ 201. file://localhost/dev/paper.html#ref-list-1
+ 202. http://www.jbc.org/content/current
+ 203. http://www.jbc.org/content/current
+ 204. http://www.jbc.org/cgi/alerts/etoc
+ 205. http://www.jbc.org/misc/itoa.xhtml
+ 206. http://submit.jbc.org/
+ 207. http://www.jbc.org/subscriptions/
+ 208. http://submit.jbc.org/journals/jbc/forms/editors.dtl
+ 209. http://www.jbc.org/site/home/about/rss_alerts.xhtml
+ 210. http://www.jbc.org/site/home/about/article_stats.xhtml
+ 211. http://www.jbc.org/site/home/teaching_tools/
+ 212. http://www.jbc.org/site/misc/Copyright_Permission.xhtml
+ 213. http://www.asbmb.org/uploadedFiles/Publications/2009ASBMBJournalsMediaKit.pdf
+ 214. http://www.jbc.org/cgi/feedback
+ 215. http://www.asbmb.org/
+ 216. http://intl.jbc.org/
+ 217. http://www.jbc.org/cgi/feedback
+ 218. http://www.jbc.org/help/
+ 219. http://www.asbmb.org/page.aspx?id=218
+ 220. http://www.jlr.org/
+ 221. http://mcponline.org/
+ 222. http://www.jbc.org/cgi/adclick/?ad=21399&adclick=true&url=http%3A%2F%2Fwww.asbmb.org%2FPage.aspx%3Fid%3D2690
+
+   Hidden links:
+ 223. http://www.jbc.org/entrez-links/11118459

@@ -1,0 +1,54 @@
+Email-Address-XS
+================
+
+This module implements RFC 2822 parser and formatter of email addresses
+and groups. It parses an input string from email headers which contain
+a list of email addresses or a groups of email addresses (like From,
+To, Cc, Bcc, Reply-To, Sender, ...). Also it can generate a string
+value for those headers from a list of email addresses objects.
+
+Parser and formatter functionality is implemented in XS and uses
+shared code from Dovecot IMAP server.
+
+It is a drop-in replacement for the Email::Address module which has
+several security issues. E.g. issue CVE-2015-7686 (Algorithmic
+complexity vulnerability) which allows remote attackers to cause
+denial of service, is still present in Email::Address version 1.908.
+
+Email::Address::XS module was created to finally fix CVE-2015-7686.
+
+Existing applications that use Email::Address module could be easily
+switched to Email::Address::XS module. In most cases only changing
+'use Email::Address' to 'use Email::Address::XS' and replacing every
+'Email::Address' occurrence with 'Email::Address::XS' is sufficient.
+
+So unlike Email::Address, this module does not use regular expressions
+for parsing but instead native XS implementation parses input string
+sequentially according to RFC 2822 grammar.
+
+Additionally it has support also for named groups and so can be use
+instead of the Email::Address::List module.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+None
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2015-2017 by Pali <pali@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.6.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+Dovecot parser is licensed under The MIT License and copyrighted by
+Dovecot authors.

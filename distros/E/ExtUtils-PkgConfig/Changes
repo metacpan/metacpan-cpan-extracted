@@ -1,0 +1,75 @@
+Revision history for Perl extension ExtUtils::PkgConfig.
+
+1.16  Thu Apr 20 18:51:36 PDT 2017
+    - Add exists() method, and update README (RT#77880)
+    - Handle removal of '.' from @INC for Perl 5.24 (RT#120819)
+
+1.15  Sat Sep 28 22:14:31 PDT 2013
+    - Gracefully handle empty fields in pkg-config files.
+
+1.14  Sun Feb  3 17:51:54 PDT 2013
+    - Skip tests for pkg-config binary with the '--max-version' switch on
+      OpenBSD 5.2, due to a bug in OpenBSD's implemenation of 'pkg-config'
+    - Updated Makefile.PL to use a META_MERGE block with WriteMakefile(); this
+      block is what MetaCPAN reads when generating page output
+
+1.13  Fri Apr 27 20:27:30 PDT 2012
+    - Correctly handle major-only versions, like '2' (RT #68246).
+    - Updated FSF address and copyrights
+
+1.12  Sun Oct 19 13:56:07 CEST 2008
+	- Try to fix a test failure.
+
+1.11  Sat Mar 15 00:35:35 CET 2008
+	- Fix test failures.
+	- If pkg-config isn't found, warn and exit with status 0 instead of
+          just dying so that CPAN testers don't send bogus failure reports.
+
+1.10  Sat Feb  9 20:29:22 CET 2008
+	- Fix test failures with older versions of perl and pkg-config.
+
+1.09  Tue Jan 22 21:34:35 CET 2008
+	- Add support for more pkg-config commands: cflags-only-I,
+          cflags-only-other, libs-only-other, and static-libs (RT #32426, patch
+          by Diab Jerius).
+	- Fix a test failure in t/4.t (RT #31966).
+	- Only print failure messages if appropriate; silence test suite.
+
+1.08  Fri Oct 19 22:04:08 CEST 2007
+	- add Makefile.PL to MANIFEST.
+	- In the version macro generator, handle non-numeric version number
+          parts by only using the leading digits.
+        - Make pkg-config print the errors it encounters so users know what went
+	  wrong.
+
+1.07  Sun Jan 23 13:22:03 EST 2005
+	- Disable the RPM-related postamble on Win32.  The 'date' command
+	  on windows is interactive, and caused Makefile.PL to hang.
+
+1.06  Sun Sep 19 23:29:23 CEST 2004
+	- Remove the "found package ..." message to make Makefile.PL's less
+	  verbose.
+
+1.05  Fri Jul 16 14:52:39 EDT 2004
+	- add configure-time check for pkg-config, don't build without it.
+	- add a pointer to pkg-config's webpage in the docs.
+
+1.04  Fri Mar  5 00:28:59 EST 2004
+	- add long-overdue version-checking import implementation.
+
+1.03  Thu Feb 05 22:16:44 2004
+	- add two new functions: create_version_macros and
+	  write_version_macros.
+
+1.02  Tue Nov 04 21:51:44 2003
+	- heavily modifed patch by Alberto Manuel Brandão Simões appliled that 
+	  adds some autoload stuff to extend basic functionality.
+
+1.01  Fri Oct 03 16:02:20 2003
+	- shuffle argument order to retain compatibility with newer versions
+	  of pkg-config 
+	- fixed some bugs with specfile creation
+
+1.00  Mon Sep 15 23:51:58 2003
+	- converted from Glib 1.00rc1's Glib::PkgConfig
+

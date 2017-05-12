@@ -1,0 +1,6 @@
+0.02  2013-05-25
+    - Support for hash references
+    - Support for blessed objects
+
+0.01  2013-05-07
+    - Initial release

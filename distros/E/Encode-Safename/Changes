@@ -1,0 +1,21 @@
+Revision history for Encode-Safename
+
+0.05    2014-04-21
+        - Remove code to fix characters.
+        - Change pragma warnings to fatal.
+        - Update build options for dependencies.
+        - Minor fixes.
+
+0.04    2014-02-09
+        - Change option parsing to Getopt::Long::Descriptive.
+        - Skip non-existent files.
+        - Fix uppercase characters in method decode.
+
+0.03    2013-11-16
+        - Refactor lexers into single lexer with start conditions
+
+0.02    2013-11-16
+        - Add long options.
+
+0.01    2013-11-16
+        - First working version.

@@ -1,0 +1,56 @@
+README for Email::LocalDelivery::Ezmlm 0.1
+
+=head1 NAME
+
+Email::LocalDelivery::Ezmlm - deliver mail into ezmlm archives
+
+=head1 SYNOPSIS
+
+ use Email::LocalDelivery;
+ Email::LocalDelivery->deliver($mail, "/some/box//") or die "couldn't deliver";
+
+
+=head1 DEPENDENCIES
+
+This module has external dependencies on the following modules:
+
+ Email::FolderType	0.6
+ Email::LocalDelivery
+
+=head1 INSTALLATION
+
+ perl Build.PL
+ perl Build test
+
+and if all goes well
+
+ perl Build install
+
+=head1 HISTORY
+
+What changed over the last 3 revisions
+
+=over
+
+=item 0.01 Friday 29th August, 2003
+
+	initial release
+=back
+
+=head1 AUTHOR
+
+Richard Clamp <richardc@unixbeard.net> based on the source of
+C<colobus> by Jim Winstead Jr.
+
+=head1 COPYRIGHT
+
+Copyright (C) 2003 Richard Clamp.  All Rights Reserved.
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<colobus|http://trainedmonkey.com/colobus/>, L<Email::LocalDelivery>,
+L<Email::FolderType>
+

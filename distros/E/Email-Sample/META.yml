@@ -1,0 +1,25 @@
+---
+abstract: 'generate sample email for testing'
+author:
+  - 'Cornelius <cornelius.howl@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.90'
+license: MIT
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Email-Sample
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Data::Random: 0
+resources:
+  license: http://opensource.org/licenses/mit-license.php
+version: 0.01

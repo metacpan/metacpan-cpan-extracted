@@ -1,0 +1,23 @@
+The WebIT embeded web server was created a long time ago to make a pure perl application that will interact 
+directly with I<Kannel>. The need was to relieve I<Kannel> from the need to wait for the web server to run 
+its scripts before going back to serve another SMS message. In this respect WebIT is a hack and can be 
+configured to behave in a manner which is not according to the RFC's for HTTP. Yet, creating Perl applications 
+with WebIT using embeded html pages as perl functions outperforms Apache with mod_perl installations. 
+
+For this reason I was asked by a few to release this code so that they can use it for their applications. 
+
+So even though WebIT is not complete (Workers and SSL not implemented yet) WebIT is already used by 
+14 perl applications that I know of excluding my personal work.
+
+To work with WebIT all you need to do is to create a new server object by giving to it the parameters
+that you want, and then at any point in time call the execute method to run the server. The execute method 
+returns only when the server has finished execution, and that can only be done by sending a TERM signal to 
+the process. 
+
+Once the server has started it will fork the predefined number of servers and workers. Since workers are not 
+implemented yet you are advised to ask for 0 workers on startup. From then on, WebIT will serve HTTP requests 
+by using external files in a configured directory and/or internal pages served by perl subroutines. The code
+of the cgi pages and subroutines is as you already know by Apache and mod_perl. You can use the CGI module to 
+get the request parameters, print on the standard output to form the response to the caller, and print to 
+standard error to log text to the logger of the server.
+

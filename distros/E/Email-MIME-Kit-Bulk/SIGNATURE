@@ -1,0 +1,51 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 7429642b13bff3767999db3e62ed9bb24b162af5 CONTRIBUTORS
+SHA1 373a95e2f3f4284d44f2e6f02b740cc807174ebe Changes
+SHA1 f9b8121dbbf298231cbdedb3d0e63c7fd75bc7be INSTALL
+SHA1 13b6cd3efb33f1f1f1972ca194fed93fb85456b4 LICENSE
+SHA1 36df136d8af3b7cf45f2f65103d4def8f4d8bb9c MANIFEST
+SHA1 e6154b9a518becff046e24567a0876d7f0244c3f META.json
+SHA1 d9788ec268c1de10b6ea212b00028439cdb0dcee META.yml
+SHA1 a980f807f8a59885013a3476865c4496384ae3bd Makefile.PL
+SHA1 10133fb2d0997d03c11a95fe810ba59fccc5f39b README.mkdn
+SHA1 84500cfc4d6db71f0ca1cd5ed01333684b16fc07 bin/emk_bulk
+SHA1 2bec9fcfbae1a87ec0919e2581d77beac6d4e210 cpanfile
+SHA1 feac32dbeca531838bcbe525e6c84da4eebad96d doap.xml
+SHA1 edd7e96af7b791a0a7dd1a1aa92c49457cb6d70e examples/eg.mkit/index.en.html
+SHA1 59f590ff775cdc7336bbf72275c13bd6cd120f58 examples/eg.mkit/index.fr.html
+SHA1 526f17ef4700562356665b993e306d91ebe60e01 examples/eg.mkit/manifest.en.json
+SHA1 6209959dfeefcbfd2b2a17bcee428e8a7812ad17 examples/eg.mkit/manifest.fr.json
+SHA1 14068bb83273353aecc6f019417bb76e7bc89997 examples/eg.mkit/targets.json
+SHA1 73f98abc2224fe2a579f8e542315580c86852d44 lib/Email/MIME/Kit/Bulk.pm
+SHA1 d424225aad224192ecc95ec83444422d37de2e40 lib/Email/MIME/Kit/Bulk/Command.pm
+SHA1 5361b5263a7c26ddad4272f1a83c2278589d99ea lib/Email/MIME/Kit/Bulk/Kit.pm
+SHA1 a64b83c95508dece90d2766f78cb3185cfd5943c lib/Email/MIME/Kit/Bulk/ManifestReader/JSON.pm
+SHA1 0bca38e513b1c85b9cd8492368475708c4843194 lib/Email/MIME/Kit/Bulk/Target.pm
+SHA1 1970262b72ff009c9f90919acd1af468d13fad54 t/00-compile.t
+SHA1 0cd62a85028e4c457745fe50bd5f91e31fd2acc3 t/00-report-prereqs.dd
+SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
+SHA1 147839088ad94d9d769986d8db3c70e66477e2a6 t/basic-script.t
+SHA1 bbacbf3a03c434a046ebe11452547bcf39261834 t/destinations.t
+SHA1 dc2f63618e5a553498569dba7d6295cc4fe7cefc t/lib/MyTestEmail.pm
+SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+
+iEYEARECAAYFAlja+ywACgkQ34Hwf+GwC4wzewCgs+dsouv1LM1TuEOQtq08egn/
+Gc8AoLZsjDzWi6wFCJ55E+S/Y888nc5L
+=QMZX
+-----END PGP SIGNATURE-----

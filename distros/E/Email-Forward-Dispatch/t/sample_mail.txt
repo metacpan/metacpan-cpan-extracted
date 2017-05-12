@@ -1,0 +1,62 @@
+From hirobanex+caf_=tenshouser=tensho-saki-host.com@gmail.com  Mon Nov 18 18:35:17 2013
+Return-Path: <hirobanex+caf_=tenshouser=tensho-saki-host.com@gmail.com>
+X-Original-To: tenshouser@tensho-saki-host.com
+Delivered-To: tenshouser@tensho-saki-host.com
+Received: from mail-ve0-f176.google.com (mail-ve0-f176.google.com [209.85.128.176])
+	by v1628.vir.kagoya.net (Postfix) with ESMTPS id 3667424FEC1A
+	for <tenshouser@tensho-saki-host.com>; Mon, 18 Nov 2013 18:35:17 +0900 (JST)
+Received: by mail-ve0-f176.google.com with SMTP id c14so4732160vea.21
+        for <tenshouser@tensho-saki-host.com>; Mon, 18 Nov 2013 01:35:15 -0800 (PST)
+X-Received: by 10.58.136.231 with SMTP id qd7mr14608129veb.1.1384767315376;
+        Mon, 18 Nov 2013 01:35:15 -0800 (PST)
+X-Forwarded-To: tenshouser@tensho-saki-host.com
+X-Forwarded-For: hirobanex@gmail.com tenshouser@tensho-saki-host.com
+Delivered-To: hirobanex@gmail.com
+Received: by 10.52.245.10 with SMTP id xk10csp197545vdc;
+        Mon, 18 Nov 2013 01:35:15 -0800 (PST)
+X-Received: by 10.236.30.70 with SMTP id j46mr2312552yha.73.1384767314704;
+        Mon, 18 Nov 2013 01:35:14 -0800 (PST)
+Received: from mail-pd0-x22e.google.com (mail-pd0-x22e.google.com [2607:f8b0:400e:c02::22e])
+        by mx.google.com with ESMTPS id v1si11086402yhg.307.2013.11.18.01.35.14
+        for <hirobanex@gmail.com>
+        (version=TLSv1 cipher=ECDHE-RSA-RC4-SHA bits=128/128);
+        Mon, 18 Nov 2013 01:35:14 -0800 (PST)
+Received-SPF: pass (google.com: domain of vanity.fair.meta@gmail.com designates 2607:f8b0:400e:c02::22e as permitted sender) client-ip=2607:f8b0:400e:c02::22e;
+Authentication-Results: mx.google.com;
+       spf=pass (google.com: domain of vanity.fair.meta@gmail.com designates 2607:f8b0:400e:c02::22e as permitted sender) smtp.mail=vanity.fair.meta@gmail.com;
+       dkim=pass header.i=@gmail.com;
+       dmarc=pass (p=NONE dis=NONE) header.from=gmail.com
+Received: by mail-pd0-x22e.google.com with SMTP id y13so162130pdi.19
+        for <hirobanex@gmail.com>; Mon, 18 Nov 2013 01:35:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20120113;
+        h=subject:from:content-type:message-id:date:to
+         :content-transfer-encoding:mime-version;
+        bh=v0LuvceDL6/cXu8rW4gasYfzT9chQzmx4uDpwJS7fc8=;
+        b=reW9/hH+wcQ9+cTr0BKVJ0q9bMxjSeDFvk6hieiTEsJN+wgfj4ofHLrb7Ibv/hCctA
+         B3SDGh+YZ3myWPDmV1SniAsgCo8hPMKvY1C9OsRQ8IDeGfHIsqRIdl16sq2uN/FeMpfi
+         QBKx6KI9iPHyHC+RGRBOLm9U2nCaj4w8Bm2xH6IdrAh4rDkpmBMFgU7BHszVu7sVAfBj
+         ik0ZXWW+PY9ycBIgUHaLvTfaOtsz7QYGC9wWdycYQ2fqr0UAXXfDfAT22h4VdF80FnWs
+         P93vxJsd9/zwjT1JXCGn6EdfrHRmV0dceNiSQn3l5JVe0gzlSJbo6I9IDO6dvMfbSm62
+         UFdg==
+X-Received: by 10.68.88.161 with SMTP id bh1mr20135652pbb.49.1384767314352;
+        Mon, 18 Nov 2013 01:35:14 -0800 (PST)
+Received: from [10.2.218.226] (pw126210107107.5.kyb.panda-world.ne.jp. [126.210.107.107])
+        by mx.google.com with ESMTPSA id yh1sm22125458pbc.21.2013.11.18.01.35.12
+        for <hirobanex@gmail.com>
+        (version=TLSv1 cipher=ECDHE-RSA-RC4-SHA bits=128/128);
+        Mon, 18 Nov 2013 01:35:13 -0800 (PST)
+Subject: =?iso-2022-jp?B?GyRCJT8lJCVIJWslRiU5JUgbKEIgdGl0bGU=?=
+From: =?iso-2022-jp?B?GyRCQFYxKTkoRzcbKEI=?= <vanity.fair.meta@gmail.com>
+Content-Type: text/plain;
+	charset=iso-2022-jp
+X-Mailer: iPhone Mail (10B146)
+Message-Id: <6EB8882D-F917-4CFC-9B16-5B67914BD71F@gmail.com>
+Date: Mon, 18 Nov 2013 18:35:10 +0900
+To: hirobanex@gmail.com
+Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0 (1.0)
+
+本文body
+
+iPhoneから送信

@@ -1,0 +1,28 @@
+#!/usr/bin/perl
+
+# $Id: execflow,v 1.1 2006/02/27 13:36:11 joern Exp $
+
+use strict;
+use Getopt::Std;
+
+my $USAGE = <<__EOU;
+Usage: execflow [-n nice] command options ...
+__EOU
+
+main: {
+    my %opt;
+    my $opt_ok = getopts ('n:', \%opt);
+    usage() if not $opt_ok or !@ARGV;
+
+    my $nice = $opt{n};
+
+    print STDERR "EXEC_FLOW_JOB_PID=$$\n";
+
+    exec "nice", "-n", $nice, @ARGV if $nice;
+    exec @ARGV;
+}
+
+sub usage {
+    print $USAGE;
+    exit 1;
+}

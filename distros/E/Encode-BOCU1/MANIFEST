@@ -1,0 +1,8 @@
+Changes
+ICU_LICENSE
+Makefile.PL
+MANIFEST
+README
+t/Encode-BOCU1.t
+lib/Encode/BOCU1.pm
+META.yml                                 Module meta-data (added by MakeMaker)

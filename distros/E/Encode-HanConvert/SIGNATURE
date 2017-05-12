@@ -1,0 +1,58 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 120e3282069bc2df32332b6f2ce4b105b17b76ce AUTHORS
+SHA1 8bde6389d6bf2577b1995010aba37a39d72d32e4 Changes
+SHA1 84496a87df88de01d5b41240d0a497cb86246686 MANIFEST
+SHA1 a3310f33e851432790eb42d550fb4eab11ea50c6 MANIFEST.SKIP
+SHA1 f40f3edf119ee54a248f6538d5dcfe9490147c46 META.yml
+SHA1 57c2b335a45093caf1fdf4f89f317d054e246f83 Makefile.PL
+SHA1 c6edab1a734173f149da66354bde789842c6f5d5 README
+SHA1 80faf8beaba1f6cf31c531c22f15f1c2bcd6a545 bin/b2g.pl
+SHA1 22815ed3d0a9f6c938006da3a1e31c8dc3593444 bin/g2b.pl
+SHA1 5c9e093b0facca46d50e3c69d5569aa7a98db0b8 inc/Module/Install.pm
+SHA1 465acb50b9006ce61f58a7bd02d0bb029ddceaa6 inc/Module/Install/Base.pm
+SHA1 8356d82167fc00550b4a3ceea8bd852a374d7509 inc/Module/Install/Can.pm
+SHA1 b47ce07fa6d6e38e3daa6cfc752b23f59a64754c inc/Module/Install/Fetch.pm
+SHA1 37ed4ccd7aba10119e6f2993b8082674ce2e5961 inc/Module/Install/Makefile.pm
+SHA1 4aa1c578faad51f31e62bed7b28d3d42b88219c3 inc/Module/Install/Metadata.pm
+SHA1 d7529d795a1304c88253b26a9089913edf31ae5e inc/Module/Install/Win32.pm
+SHA1 2a74aba5a78e7ab2776382e42106ebe941c2ac28 inc/Module/Install/WriteAll.pm
+SHA1 83d56990dafb021864dec0ec185b4095170767b3 lib/Encode/HanConvert.pm
+SHA1 243a7194b33ed558a82268c9a387fd5331e9274c lib/Encode/HanConvert/Perl.pm-orig
+SHA1 2eb4c272f5f3bb373ddebbb7a3cd744c852ad59f map/DerivedAge.txt
+SHA1 11adc15c8413b3f553bdb7702e0430ba4bff8d53 map/b2g_map.txt
+SHA1 08ef2e6393e1b7eb4522b5c5e97864b6b8341f11 map/b2g_map.utf8
+SHA1 dc06a5b3492fa75ae8471fd4784067f07e15e07d map/g2b_map.txt
+SHA1 609c65d7439a206e8f1388895dc603094c826ae3 map/g2b_map.utf8
+SHA1 401ad85e65656a18cdbff26a500678103dfec386 map/map2pm.pl
+SHA1 42c25ca29da3538ad270e6c77f3e38efd562dbc6 map/map2ucm.pl
+SHA1 17541f36803e232840444737f4b23f32defd6f66 map/ucm2map.pl
+SHA1 1a74a54007dd3a1827977e12049847e511688841 map/umap2ucm.pl
+SHA1 c444f867864a4e83c44a6e3da7ec46d0f7a505c9 t/1-basic.t
+SHA1 9306fcf697159a51e4979b96d8bbb1ae9d3834d3 t/daode.b5
+SHA1 9e3c273d27cbd6cb521238153add907fa935da58 t/daode.gbk
+SHA1 150be0f55f7911f4fa2ea660ba3396481e4a767f t/daode_g.b5
+SHA1 c78f9934ff08e2aa09d74e4b7352ed44e89fd3aa t/zhengqi.b5
+SHA1 325cecec4c25d579634f4a423ccf91b9330cb330 t/zhengqi.gbk
+SHA1 325cecec4c25d579634f4a423ccf91b9330cb330 t/zhengqi_b.gbk
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.3 (Darwin)
+
+iD8DBQFJfejitLPdNzw1AaARArxaAJ0fuf6t80odB7swUz3QGV7OYkdhHQCgsscq
+ie6twoA1PKxK4kjJIugpN5M=
+=uOgw
+-----END PGP SIGNATURE-----

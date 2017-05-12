@@ -1,0 +1,90 @@
+<html>
+
+<head>
+<title>Embperl Tests - Switch syntax</title>
+</head>
+
+<body>
+
+
+
+--- syntax Default ---
+
+	[+ $a = 'embperl 1' +]
+
+	<!--#set var="a" value="ssi 1" -->
+	<!--#echo var="a" -->
+
+
+--- syntax SSI ---
+
+[$ syntax SSI $]
+
+	[+ $a = 'embperl 1' +]
+
+	<!--#set var="a" value="ssi 1" -->
+	<!--#echo var="a" -->
+
+
+--- syntax Embperl ---
+
+<!--#syntax type="Embperl" -->
+
+	[+ $a = 'embperl 1' +]
+
+	<!--#set var="a" value="ssi 1" -->
+	<!--#echo var="a" -->
+
+
+--- syntax Embperl SSI ---
+
+[$ syntax Embperl SSI $]
+
+	[+ $a = 'embperl 1' +]
+
+	<!--#set var="a" value="ssi 1" -->
+	<!--#echo var="a" -->
+
+--- syntax - SSI = Embperl ---
+
+[$ syntax - SSI $]
+
+	[+ $a = 'embperl 1' +]
+
+	<!--#set var="a" value="ssi 1" -->
+	<!--#echo var="a" -->
+
+
+--- syntax + SSI =  Embperl SSI ---
+
+[$ syntax + SSI $]
+
+	[+ $a = 'embperl 1' +]
+
+	<!--#set var="a" value="ssi 1" -->
+	<!--#echo var="a" -->
+
+
+--- syntax - Embperl = SSI ---
+
+[$ syntax - Embperl $]
+
+	[+ $a = 'embperl 1' +]
+
+	<!--#set var="a" value="ssi 1" -->
+	<!--#echo var="a" -->
+
+
+--- syntax Text ---
+
+<!--#syntax type="Text" -->
+
+	[+ $a = 'embperl 1' +]
+
+	<!--#set var="a" value="ssi 1" -->
+	<!--#echo var="a" -->
+
+
+
+</body>
+</html>

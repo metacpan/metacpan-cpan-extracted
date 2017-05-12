@@ -1,0 +1,11 @@
+COPYING
+Changes
+Handler.pm
+MANIFEST
+Makefile.PL
+README
+t/1_canuseit.t
+t/2_isa.t
+t/3_can.t
+t/4_empty_subclass.t
+META.yml                                Module meta-data (added by MakeMaker)

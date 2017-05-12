@@ -1,0 +1,150 @@
+#!/usr/bin/perl
+
+use 5.006;
+use strict;
+use warnings FATAL => 'all';
+
+use Encode qw(decode encode);
+use Encode::Safename;
+use File::Basename;
+use File::Find;
+use Getopt::Long::Descriptive;
+
+my ($options, $usage) = describe_options(
+    '%c %o FILES',
+    [ 'command'     => hidden => {
+        required => 1,
+        one_of   => [
+            [ 'encode|e' => 'encode to safe filenames' ],
+            [ 'decode|d' => 'decode from safe filenames' ],
+            [ 'help|h'   => 'print help text' ],
+        ],
+    }],
+    [ 'recursive|r' => 'rename files recursively' ],
+    [ 'test|t'      => 'don\'t actually rename files' ],
+    [ 'verbose|v'   => 'print all renamed files' ],
+);
+
+# process options from the command line
+my $command   = $options->command;
+my $recursive = $options->recursive;
+my $testmode  = $options->test;
+my $verbose   = $options->verbose;
+
+# print the help text
+if ($command eq 'help') {
+    print $usage->text;
+    exit;
+}
+
+sub _rename {
+    # process arguments
+    my $old = shift;
+    $old = decode('utf-8', $old);
+
+    # skip non-existent files
+    if (! -e $old) {
+        return;
+    }
+
+    # split into directory and filename
+    my $filename = basename($old);
+    my $directory = dirname($old);
+
+    my $new;
+
+    if ($command eq 'encode') {
+        # try to encode the filename
+        $new = encode('safename', $filename, 1);
+        die "can't encode '$filename'" if $filename;
+        $new = "$directory/$new";
+    }
+    elsif ($command eq 'decode') {
+        # try to decode the filename
+        $new = decode('safename', $filename, 1);
+        die "can't decode '$filename'" if $filename;
+        $new = "$directory/$new";
+    }
+
+    # encode paths
+    $old = encode('utf-8', $old);
+    $new = encode('utf-8', $new);
+
+    if ($old ne $new) {
+        # old and new filename are not the same
+        if (! $testmode) {
+            # not in test mode
+            rename($old, $new);
+        }
+
+        if ($verbose) {
+            # verbose
+            print "'$old' -> '$new'\n";
+        }
+    }
+}
+
+foreach my $path (@ARGV) {
+    # process paths from the command line
+    if ($recursive && -d $path) {
+        # process paths recursively
+        finddepth({
+                no_chdir => 1,
+                wanted   => sub {
+                    _rename($File::Find::name);
+                },
+            },
+            $path,
+        );
+    }
+    else {
+        # process single path
+        _rename($path);
+    }
+}
+
+__END__
+
+=head1 NAME
+
+safename - rename files to safe filenames
+
+=head1 VERSION
+
+Version 0.05
+
+=head1 SYNOPSIS
+
+    safename [-dehrtv] [long options...] FILES
+
+=head1 OPTIONS
+
+    -e --encode      encode to safe filenames
+    -d --decode      decode from safe filenames
+    -h --help        print help text
+    -r --recursive   rename files recursively
+    -t --test        don't actually rename files
+    -v --verbose     print all renamed files
+
+=head1 EXAMPLES
+
+Rename a file to a safe filename:
+
+    $ safename -e Foo.txt
+
+Rename a file from a safe filename:
+
+    $ safename -d {f}oo.txt
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2014 Bert Vanderbauwhede.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU Lesser General Public License as published
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+See L<http://www.gnu.org/licenses/> for more information.
+
+=cut

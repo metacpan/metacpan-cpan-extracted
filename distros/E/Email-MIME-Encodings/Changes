@@ -1,0 +1,32 @@
+Revision history for Perl extension Email-MIME-Encodings
+
+1.315     2013-08-12 21:11:46 America/New_York
+          repackage to update repository and bug tracker
+
+1.314     2013-06-17
+          add a third argument to encode/decode/codec to allow a fallback
+          codec
+
+1.313     2009-04-16
+          bugfix by MKANAT to avoid QP-encoding CRLF
+
+1.312     2009-01-22
+          add repo metadata
+
+1.311     2007-03-22
+          packaging improvements
+
+1.31      2006-07-06
+          move tests to t/
+
+1.3       2004-10-22
+          Dependencies changed output formats. Thanks to many for
+          reporting but thanks to Nick Clark for finding the actual
+          problem.
+
+1.2       2004-09-25
+          Dependency fixes, author fixes.
+
+0.01      Thu Apr 10 15:00:16 2003
+          - original version; created by h2xs 1.2 with options
+            -AX -n Email::MIME::Encodings

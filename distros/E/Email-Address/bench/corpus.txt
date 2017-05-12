@@ -1,0 +1,993 @@
+
+"'''advocacy-- ATAT --perl.org ' ' '" <advocacy-- ATAT --perl.org>
+"''advocacy-- ATAT --perl.org ' '" <advocacy-- ATAT --perl.org>
+"'. Jerry a'" <JerryPanshen-- ATAT --aol.com>
+"'Adam Turoff'" <adam.turoff-- ATAT --isinet.com>, advocacy-- ATAT --perl.org
+"'Andy Lester'" <andy-- ATAT --petdance.com>, "'Gabor Szabo'" <gabor-- ATAT --tracert.com>, advocacy-- ATAT --perl.org
+"'Ask Bjoern Hansen'" <ask-- ATAT --perl.org>, <advocacy-- ATAT --perl.org>
+"'Chris Nandor'" <pudge-- ATAT --pobox.com> , "'David E. Wheeler'" <David-- ATAT --wheeler.net>
+"'Chris Nandor'" <pudge-- ATAT --pobox.com> , "'Elaine -HFB- Ashton'" <elaine-- ATAT --chaos.wustl.edu>
+"'Chris Nandor'" <pudge-- ATAT --pobox.com> , "'Jon Orwant'" <orwant-- ATAT --media.mit.edu>, <chip-- ATAT --valinux.com> , <tidbit-- ATAT --sri.net>, <advocacy-- ATAT --perl.org>
+"'Chris Nandor'" <pudge-- ATAT --pobox.com>, <advocacy-- ATAT --perl.org>, <perl5-porters-- ATAT --perl.org>
+"'Chris Nandor'" <pudge-- ATAT --pobox.com>, advocacy-- ATAT --perl.org
+"'Chris Nandor'" <pudge-- ATAT --pobox.com>, advocacy-- ATAT --perl.org, perl5-porters-- ATAT --perl.org
+"'David H. Adler '" <dha-- ATAT --panix.com>, "'advocacy-- ATAT --perl.org '" <advocacy-- ATAT --perl.org>
+"'Doucette, Bob'" <BDoucette-- ATAT --tesent.com>, 'Rich Bowen' <rbowen-- ATAT --rcbowen.com>
+"'Elaine -HFB- Ashton '" <elaine-- ATAT --chaos.wustl.edu>, "Turoff, Adam" <adam.turoff-- ATAT --isinet.com>
+"'Elaine -HFB- Ashton'" <elaine-- ATAT --chaos.wustl.edu>
+"'Elaine -HFB- Ashton'" <elaine-- ATAT --chaos.wustl.edu> , "'Larry Wall'" <larry-- ATAT --wall.org>
+"'Elaine -HFB- Ashton'" <elaine-- ATAT --chaos.wustl.edu> , "'Larry Wall'" <larry-- ATAT --wall.org> , "'Jon Orwant'" <orwant-- ATAT --media.mit.edu>, <chip-- ATAT --valinux.com> , <tidbit-- ATAT --sri.net>, <advocacy-- ATAT --perl.org>
+"'Elaine -HFB- Ashton'" <elaine-- ATAT --chaos.wustl.edu>, "'Larry Wall'" <larry-- ATAT --wall.org>, "'Jon Orwant'" <orwant-- ATAT --media.mit.edu>, <chip-- ATAT --valinux.com>, <tidbit-- ATAT --sri.net>, <advocacy-- ATAT --perl.org>
+"'Elaine -HFB- Ashton'" <elaine-- ATAT --chaos.wustl.edu>, <advocacy-- ATAT --perl.org>
+"'John Porter'" <jdporter-- ATAT --min.net>, "'advocacy-- ATAT --perl.org'" <advocacy-- ATAT --perl.org>
+"'Larry Wall'" <larry-- ATAT --wall.org> , "'Jon Orwant'" <orwant-- ATAT --media.mit.edu>, <chip-- ATAT --valinux.com> , <tidbit-- ATAT --sri.net>, <advocacy-- ATAT --perl.org>
+"'Madeline Schnapp '" <madeline-- ATAT --oreilly.com>, "'advocacy-- ATAT --perl.org '" <advocacy-- ATAT --perl.org>
+"'Mark Mielke'" <markm-- ATAT --nortelnetworks.com>
+"'Pamela Carter'" <pcarter150-- ATAT --comcast.net>, <advocacy-- ATAT --perl.org>
+"'Shlomi Fish'" <shlomif-- ATAT --vipe.technion.ac.il>
+"'Steve Lane'" <sml-- ATAT --zfx.com>, "'Chris Nandor'" <pudge-- ATAT --pobox.com>, advocacy-- ATAT --perl.org, perl5-porters-- ATAT --perl.org
+"'Tom Christiansen'" <tchrist-- ATAT --chthon.perl.com>, Horsley Tom <Tom.Horsley-- ATAT --ccur.com>, "'Steve Lane'" <sml-- ATAT --zfx.com>, advocacy-- ATAT --perl.org, perl5-porters-- ATAT --perl.org
+"'abigail-- ATAT --foad.org'" <abigail-- ATAT --foad.org>,	 "Michael R. Wolf"<MichaelRunningWolf-- ATAT --att.net>
+"'abigail-- ATAT --foad.org'" <abigail-- ATAT --foad.org>, Michael G Schwern <schwern-- ATAT --pobox.com>
+"'abigail-- ATAT --foad.org'" <abigail-- ATAT --foad.org>, Michael G Schwern <schwern-- ATAT --pobox.com>, Nicholas Clark <nick-- ATAT --ccl4.org>, Piers Cawley <pdcawley-- ATAT --bofh.org.uk>, advocacy-- ATAT --perl.org
+"'advocacy-- ATAT --perl.org '" <advocacy-- ATAT --perl.org>
+"'advocacy-- ATAT --perl.org '" <advocacy-- ATAT --perl.org>, "Turoff, Adam" <adam.turoff-- ATAT --isinet.com>
+"'advocacy-- ATAT --perl.org'" <advocacy-- ATAT --perl.org>
+"'bwarnock-- ATAT --capita.com'" <bwarnock-- ATAT --capita.com>, advocacy-- ATAT --perl.org
+"'duff-- ATAT --pobox.com'" <duff-- ATAT --pobox.com>
+"'london-list-- ATAT --happyfunball.pm.org'" <london-list-- ATAT --happyfunball.pm.org>
+"'perl-hackers-- ATAT --stlouis.pm.org'" <perl-hackers-- ATAT --stlouis.pm.org>
+"'perl-hackers-- ATAT --stlouis.pm.org'" <perl-hackers-- ATAT --stlouis.pm.org>, advocacy-- ATAT --perl.org, marsneedswomen-- ATAT --happyfunball.pm.org
+"<advocacy-- ATAT --perl.org>" <advocacy-- ATAT --perl.org>
+"Adam Turoff" <adam.turoff-- ATAT --isinet.com>, "Elaine -HFB- Ashton" <elaine-- ATAT --chaos.wustl.edu>
+"Adam Turoff" <adam.turoff-- ATAT --isinet.com>, "Elaine -HFB- Ashton" <elaine-- ATAT --chaos.wustl.edu>, "Brent Michalski" <brent-- ATAT --perlguy.net>, "Madeline Schnapp" <madeline-- ATAT --oreilly.com>, <advocacy-- ATAT --perl.org>, <betsy-- ATAT --oreilly.com>
+"Adam Turoff" <adam.turoff-- ATAT --isinet.com>, "Paul Prescod" <paul-- ATAT --prescod.net>
+"Alan Olsen" <alan-- ATAT --clueserver.org>, "Rich Bowen" <rbowen-- ATAT --rcbowen.com>
+"Andreas J. Koenig" <andreas.koenig-- ATAT --anima.de>
+"Andreas J. Koenig" <andreas.koenig-- ATAT --anima.de>, advocacy-- ATAT --perl.org
+"Andreas J. Koenig" <andreas.koenig-- ATAT --anima.de>, advocacy-- ATAT --perl.org, regn-- ATAT --ActiveState.com
+"Andy Wardley" <abw-- ATAT --cre.canon.co.uk>
+"Bas A. Schulte" <bschulte-- ATAT --zeelandnet.nl>
+"Bas A.Schulte" <bschulte-- ATAT --zeelandnet.nl>
+"Betsy Waliszewski" <betsy-- ATAT --oreilly.com>, "perl-advocacy" <advocacy-- ATAT --perl.org>
+"Bradley M. Kuhn" <bkuhn-- ATAT --ebb.org>
+"Brammer, Phil" <PBRA01-- ATAT --CONAGRAFROZEN.COM>
+"Brent Michalski" <brent-- ATAT --perlguy.net>, "Madeline Schnapp" <madeline-- ATAT --oreilly.com>, <advocacy-- ATAT --perl.org>, <betsy-- ATAT --oreilly.com>
+"Brian Wilson" <bwilson-- ATAT --songline.com>
+"Calvin Lee" <bodyshock911-- ATAT --hotmail.com>, <advocacy-- ATAT --perl.org>
+"Calvin Lee" <bodyshock911-- ATAT --hotmail.com>, advocacy-- ATAT --perl.org
+"Chip Salzenberg" <chip-- ATAT --valinux.com>
+"Chip Salzenberg" <chip-- ATAT --valinux.com>, "Elaine -HFB- Ashton" <elaine-- ATAT --chaos.wustl.edu>
+"Chris Devers" <cdevers-- ATAT --boston.com>, "Uri Guttman" <uri-- ATAT --stemsystems.com>
+"Chris Nandor" <pudge-- ATAT --pobox.com>
+"Chris Nandor" <pudge-- ATAT --pobox.com>, "Nathan Torkington" <gnat-- ATAT --frii.com>, "Peter Scott" <Peter-- ATAT --PSDT.com>
+"Chris Nandor" <pudge-- ATAT --pobox.com>, "Nathan Torkington" <gnat-- ATAT --frii.com>, <advocacy-- ATAT --perl.org>, "Peter Scott" <Peter-- ATAT --PSDT.com>
+"Clinton A. Pierce" <clintp-- ATAT --geeksalad.org>
+"Clinton A. Pierce" <clintp-- ATAT --geeksalad.org>, madeline-- ATAT --oreilly.com, pudge-- ATAT --pobox.com, advocacy-- ATAT --perl.org
+"Curtis Poe" <cp-- ATAT --onsitetech.com>, <advocacy-- ATAT --perl.org>
+"Curtis Poe" <cp-- ATAT --onsitetech.com>, advocacy-- ATAT --perl.org
+"Dave Cross" <dave-- ATAT --dave.org.uk>
+"David E. Wheeler" <David-- ATAT --Wheeler.net>
+"David E. Wheeler" <David-- ATAT --Wheeler.net>, "'Larry Wall'" <larry-- ATAT --wall.org>, "'Jon Orwant'" <orwant-- ATAT --media.mit.edu>, chip-- ATAT --valinux.com, tidbit-- ATAT --sri.net, advocacy-- ATAT --perl.org
+"David E. Wheeler" <David-- ATAT --Wheeler.net>, 'Elaine -HFB- Ashton' <elaine-- ATAT --chaos.wustl.edu>, 'Larry Wall' <larry-- ATAT --wall.org>, 'Jon Orwant' <orwant-- ATAT --media.mit.edu>, tidbit-- ATAT --sri.net, advocacy-- ATAT --perl.org
+"David Grove" <pete-- ATAT --petes-place.com>
+"David Grove" <pete-- ATAT --petes-place.com>, <advocacy-- ATAT --perl.org>
+"David H. Adler" <dha-- ATAT --panix.com>
+"David H. Adler" <dha-- ATAT --panix.com>, <advocacy-- ATAT --perl.org>, <simon-- ATAT --brecon.co.uk>
+"David H. Adler" <dha-- ATAT --panix.com>, advocacy-- ATAT --perl.org
+"David H. Adler" <dha-- ATAT --panix.com>, advocacy-- ATAT --perl.org, perl5-porters-- ATAT --perl.org
+"David H. Adler" <dha-- ATAT --panix.com>,advocacy-- ATAT --perl.org
+"Edwards, Darryl" <Darryl.Edwards-- ATAT --adc.com>
+"Elaine -HFB- Ashton" <elaine-- ATAT --chaos.wustl.edu>
+"Elaine -HFB- Ashton" <elaine-- ATAT --chaos.wustl.edu>, "Brent Michalski" <brent-- ATAT --perlguy.net>
+"Elaine -HFB- Ashton" <elaine-- ATAT --chaos.wustl.edu>, "Frank Schmuck, CFO" <fschmuck-- ATAT --lcch.org>
+"Elaine -HFB- Ashton" <elaine-- ATAT --chaos.wustl.edu>, "Peter Scott" <Peter-- ATAT --PSDT.com>
+"Elaine -HFB- Ashton" <elaine-- ATAT --chaos.wustl.edu>, "Tom Christiansen" <tchrist-- ATAT --chthon.perl.com>, <Ben_Tilly-- ATAT --trepp.com>, "David H. Adler" <dha-- ATAT --panix.com>, <advocacy-- ATAT --perl.org>
+"Elaine -HFB- Ashton" <elaine-- ATAT --chaos.wustl.edu>, "brian d foy" <tidbit-- ATAT --sri.net>, <advocacy-- ATAT --perl.org>
+"Elaine -HFB- Ashton" <elaine-- ATAT --chaos.wustl.edu>, <advocacy-- ATAT --perl.org>
+"Frank Schmuck, CFO" <fschmuck-- ATAT --lcch.org>
+"Frank Schmuck, CFO" <fschmuck-- ATAT --lcch.org>, "'abigail-- ATAT --foad.org'" <abigail-- ATAT --foad.org>, Michael G Schwern <schwern-- ATAT --pobox.com>,  Nicholas Clark <nick-- ATAT --ccl4.org>, advocacy-- ATAT --perl.org
+"G. Wade Johnson" <gwadej-- ATAT --anomaly.org>
+"Gabor Szabo" <gabor-- ATAT --tracert.com>
+"Greg Norris (humble visionary genius)" <nextrightmove-- ATAT --yahoo.com>, <advocacy-- ATAT --perl.org>
+"Greg Norris \(humble visionary genius\)" <nextrightmove-- ATAT --yahoo.com>
+"Greg Norris humble visionary genius\"" <nextrightmove-- ATAT --yahoo.com>
+"Helton, Brandon" <bhelton-- ATAT --harris.com>, perl6-language-- ATAT --perl.org, advocacy-- ATAT --perl.org
+"Jan Dubois" <jand-- ATAT --ActiveState.com>
+"Jason W. May" <jasonmay-- ATAT --pacbell.net>
+"Jason W. May" <jmay-- ATAT --pobox.com>
+"Jason W. May" <jmay-- ATAT --pobox.com>, <advocacy-- ATAT --perl.org>
+"Jason W. May" <jmay-- ATAT --pobox.com>, advocacy-- ATAT --perl.org
+"Jeremy D. Zawodny" <Jeremy-- ATAT --Zawodny.com>
+"John Adams" <jadams01-- ATAT --sprynet.com>,	<advocacy-- ATAT --perl.org>
+"John Porter" <jdporter-- ATAT --min.net>, "Chris Nandor" <pudge-- ATAT --pobox.com>
+"John Porter" <jdporter-- ATAT --min.net>, <advocacy-- ATAT --perl.org>
+"John Porter" <jdporter-- ATAT --min.net>, <advocacy-- ATAT --perl.org>, "Vanderhoof, Tzadik" <tvanderhoof-- ATAT --syscom-inc.com>
+"Jonathan Stowe" <jns-- ATAT --gellyfish.com>, <advocacy-- ATAT --perl.org>
+"Josh Hill" <josh-- ATAT --extropia.com>
+"Lori Pike" <lori.pike-- ATAT --sophos.com>
+"Madeline Schnapp" <madeline-- ATAT --oreilly.com>, <advocacy-- ATAT --perl.org>, <betsy-- ATAT --oreilly.com>
+"Matt Sergeant" <matt-- ATAT --sergeant.org>, "Dan Sugalski" <dan-- ATAT --sidhe.org>
+"Meltzer, Kevin" <KMeltzer-- ATAT --USCO.com>
+"Michael R. Wolf" <MichaelRunningWolf-- ATAT --att.net>
+"Michael R. Wolf" <MichaelRunningWolf-- ATAT --att.net>, jobs-discuss-- ATAT --perl.org, advocacy-- ATAT --perl.org, administrator-- ATAT --yetanother.org
+"Nathan Torkington" <gnat-- ATAT --frii.com>
+"Nathan Torkington" <gnat-- ATAT --frii.com>, "Chris Nandor" <pudge-- ATAT --pobox.com>
+"Nathan Torkington" <gnat-- ATAT --frii.com>, <advocacy-- ATAT --perl.org>, "Peter Scott" <Peter-- ATAT --PSDT.com>
+"Nathan Torkington" <gnat-- ATAT --oreilly.com>, "Kurt Starsinic" <kstar-- ATAT --cpan.org>
+"Paul Prescod" <paul-- ATAT --prescod.net>, <advocacy-- ATAT --perl.org>
+"Perl Advocacy List (E-mail)" <advocacy-- ATAT --perl.org>
+"Perl Advocacy" <advocacy-- ATAT --perl.org>
+"Peterson, Jonathan" <JPeterson-- ATAT --colt-telecom.com>
+"Peterson, Jonathan" <JPeterson-- ATAT --colt-telecom.com>, "'Elaine -HFB- Ashton'" <elaine-- ATAT --chaos.wustl.edu>, Johan Vromans <jvromans-- ATAT --squirrel.nl>
+"Peterson, Jonathan" <JPeterson-- ATAT --colt-telecom.com>, <advocacy-- ATAT --perl.org>
+"Peterson, Jonathan" <JPeterson-- ATAT --colt-telecom.com>, advocacy-- ATAT --perl.org
+"Randal L. Schwartz" <merlyn-- ATAT --stonehenge.com>
+"Randal L. Schwartz" <merlyn-- ATAT --stonehenge.com>, <advocacy-- ATAT --perl.org>
+"Randy J. Ray" <rjray-- ATAT --redhat.com>, advocacy-- ATAT --perl.org
+"Robert" <robert-- ATAT --bangkokwizard.com>
+"Robert" <robert-- ATAT --bangkokwizard.com>, "Elaine -HFB- Ashton" <elaine-- ATAT --chaos.wustl.edu>, <advocacy-- ATAT --perl.org>
+"Robert" <robert-- ATAT --bangkokwizard.com>, "Paul Prescod" <paul-- ATAT --prescod.net>, <advocacy-- ATAT --perl.org>
+"Robert" <robert-- ATAT --bangkokwizard.com>, <advocacy-- ATAT --perl.org>
+"Robert" <robert-- ATAT --bangkokwizard.com>,<advocacy-- ATAT --perl.org>
+"Scott R. Godin" <webmaster-- ATAT --webdragon.net>
+"Scott R. Godin" <webmaster-- ATAT --webdragon.net>, advocacy-- ATAT --perl.org, dbi-users-- ATAT --perl.org
+"Scott T. Hildreth" <shildreth-- ATAT --emsphone.com>
+"Selena Sol" <selena-- ATAT --eXtropia.com>
+"Shlomi Fish" <shlomif-- ATAT --vipe.technion.ac.il>
+"Simon Cozens" <simon-- ATAT --brecon.co.uk>
+"Steve Lane" <sml-- ATAT --zfx.com>, "Horsley Tom" <Tom.Horsley-- ATAT --ccur.com>
+"Turoff, Adam" <adam.turoff-- ATAT --isinet.com>
+"Turoff, Adam" <adam.turoff-- ATAT --isinet.com>, "'Madeline Schnapp '" <madeline-- ATAT --oreilly.com>
+"Uri Guttman" <uri-- ATAT --stemsystems.com>, <advocacy-- ATAT --perl.org>
+"Uri Guttman" <uri-- ATAT --sysarch.com>, <advocacy-- ATAT --perl.org>
+"Vanderhoof, Tzadik" <tvanderhoof-- ATAT --syscom-inc.com>
+"Vanderhoof, Tzadik" <tvanderhoof-- ATAT --syscom-inc.com>, Troy Denkinger <troy-- ATAT --whadda.com>, advocacy-- ATAT --perl.org
+"Vanderhoof, Tzadik" <tvanderhoof-- ATAT --syscom-inc.com>, advocacy-- ATAT --perl.org
+"Vanderhoof, Tzadik" <tvanderhoof-- ATAT --trainingserver.com>
+"Vanderhoof, Tzadik" <tvanderhoof-- ATAT --trainingserver.com>, <advocacy-- ATAT --perl.org>
+"Vanderhoof, Tzadik" <tvanderhoof-- ATAT --trainingserver.com>, advocacy-- ATAT --perl.org
+"W. Phillip Moore" <wpm-- ATAT --ms.com>
+"Wayne Haufler" <whaufler-- ATAT --MIGRATEC.COM>
+"Wiggins d'Anconia" <wiggins-- ATAT --danconia.org>
+"William R. Ward" <hermit-- ATAT --BayView.COM>
+"\"\\\"Scott R. Godin\\\"\"" <webmaster-- ATAT --webdragon.net>
+"advocacy-- ATAT --perl.org" <advocacy-- ATAT --perl.org>
+"advocacy-- ATAT --perl.org" <advocacy-- ATAT --perl.org>, orwant-- ATAT --oreilly.com
+"brian d foy" <tidbit-- ATAT --sri.net>, <advocacy-- ATAT --perl.org>
+"perl-advocacy" <advocacy-- ATAT --perl.org>
+''Elaine -HFB- Ashton ' ' <elaine-- ATAT --chaos.wustl.edu>
+'Andrew Simmons' <andrew-- ATAT --zpok.demon.co.uk>, 'perl-advocacy' <advocacy-- ATAT --perl.org>
+'Andy Lester' <andy-- ATAT --petdance.com>, 'Gabor Szabo' <gabor-- ATAT --tracert.com>,  <advocacy-- ATAT --perl.org>
+'Andy Lester' <andy-- ATAT --petdance.com>, Tzadik Vanderhoof <Tzadik.Vanderhoof-- ATAT --THINQ.com>
+'Ask Bjoern Hansen' <ask-- ATAT --perl.org>
+'Betsy Waliszewski' <betsy-- ATAT --oreilly.com>, Chris Benson <chrisb-- ATAT --jesmond.demon.co.uk>, advocacy-- ATAT --perl.org
+'Calvin Lee' <bodyshock911-- ATAT --hotmail.com>
+'Chris Nandor' <pudge-- ATAT --pobox.com>, Horsley Tom <Tom.Horsley-- ATAT --ccur.com>
+'Chris Nandor' <pudge-- ATAT --pobox.com>, advocacy-- ATAT --perl.org,  perl5-porters-- ATAT --perl.org
+'Dave Rolsky' <autarch-- ATAT --urth.org>,	 "'abigail-- ATAT --foad.org'"<abigail-- ATAT --foad.org>
+'Dave Rolsky' <autarch-- ATAT --urth.org>, abigail-- ATAT --foad.org
+'Elaine -HFB- Ashton ' <elaine-- ATAT --chaos.wustl.edu>
+'Elaine -HFB- Ashton' <elaine-- ATAT --chaos.wustl.edu>
+'Elaine -HFB- Ashton' <elaine-- ATAT --chaos.wustl.edu>, "Frank Schmuck, CFO" <fschmuck-- ATAT --lcch.org>
+'Elaine -HFB- Ashton' <elaine-- ATAT --chaos.wustl.edu>, "Turoff, Adam" <adam.turoff-- ATAT --isinet.com>
+'Elaine -HFB- Ashton' <elaine-- ATAT --chaos.wustl.edu>, Johan Vromans <jvromans-- ATAT --squirrel.nl>
+'Gabor Szabo' <gabor-- ATAT --tracert.com>,  <advocacy-- ATAT --perl.org>
+'Gabor Szabo' <gabor-- ATAT --tracert.com>, advocacy-- ATAT --perl.org
+'John Porter' <jdporter-- ATAT --min.net>
+'John Porter' <jdporter-- ATAT --min.net>, skud-- ATAT --netizen.com.au,  advocacy-- ATAT --perl.org
+'Madeline Schnapp ' <madeline-- ATAT --oreilly.com>
+'Madeline Schnapp ' <madeline-- ATAT --oreilly.com>, "'advocacy-- ATAT --perl.org '" <advocacy-- ATAT --perl.org>
+'Nathan Torkington ' <gnat-- ATAT --frii.com>, "'advocacy-- ATAT --perl.org '" <advocacy-- ATAT --perl.org>
+'Nathan Torkington ' <gnat-- ATAT --frii.com>, 'Paul Prescod ' <paul-- ATAT --prescod.net>
+'Peter Scott' <Peter-- ATAT --PSDT.com>, Stas Bekman <stas-- ATAT --stason.org>,  Tzadik Vanderhoof <Tzadik.Vanderhoof-- ATAT --THINQ.com>
+'Rich Bowen' <rbowen-- ATAT --rcbowen.com>
+'Steve Lane' <sml-- ATAT --zfx.com>, 'Chris Nandor' <pudge-- ATAT --pobox.com>,  advocacy-- ATAT --perl.org, perl5-porters-- ATAT --perl.org
+'Steve Lane' <sml-- ATAT --zfx.com>, Horsley Tom <Tom.Horsley-- ATAT --ccur.com>
+'Tom Christiansen' <tchrist-- ATAT --chthon.perl.com>, Horsley Tom <Tom.Horsley-- ATAT --ccur.com>
+'_brian_d_foy' <comdog-- ATAT --panix.com>, advocacy-- ATAT --perl.org
+6jrwvn6d02-- ATAT --sneakemail.com (Steffen Mueller)
+<<advocacy-- ATAT --perl.org>>
+<Brad.Murray-- ATAT --tas.alcatel.ca>
+<Izz1235-- ATAT --aol.com>, <advocacy-- ATAT --perl.org>
+<abigail-- ATAT --foad.org>, "Tommy Butler" <tommy-- ATAT --atrixnet.com>
+<ace-- ATAT --tidbits.com>
+<advocacy-- ATAT --perl.org>
+<advocacy-- ATAT --perl.org>, "Nathan Torkington" <gnat-- ATAT --frii.com>
+<advocacy-- ATAT --perl.org>, "Vanderhoof, Tzadik" <tvanderhoof-- ATAT --syscom-inc.com>
+<advocacy-- ATAT --perl.org>, "_brian_d_foy" <comdog-- ATAT --panix.com>
+<advocacy-- ATAT --perl.org>, <madeline-- ATAT --oreilly.com>, <betsy-- ATAT --oreilly.com>, <brent-- ATAT --perlguy.net>
+<advocacy-- ATAT --perl.org>, <marsneedswomen-- ATAT --happyfunball.pm.org>
+<advocacy-- ATAT --perl.org>, <stephen.adkins-- ATAT --officevision.com>
+<advocacy-- ATAT --perl.org>, Nathan Torkington <gnat-- ATAT --frii.com>
+<brent-- ATAT --perl.org>, <advocacy-- ATAT --perl.org>
+<bwarnock-- ATAT --capita.com>, <advocacy-- ATAT --perl.org>
+<jadams01-- ATAT --sprynet.com>, <advocacy-- ATAT --perl.org>
+<jobs-- ATAT --perl.org>, <advocacy-- ATAT --perl.org>
+<jobs-discuss-- ATAT --perl.org>,  <advocacy-- ATAT --perl.org>
+<kalim-- ATAT --erols.com>
+<kstar-- ATAT --cpan.org>
+<kstar-- ATAT --cpan.org>, <advocacy-- ATAT --perl.org>
+<madeline-- ATAT --oreilly.com>, <betsy-- ATAT --oreilly.com>, <brent-- ATAT --perlguy.net>, <pudge-- ATAT --pobox.com>
+<perl5-porters-- ATAT --perl.org>, <advocacy-- ATAT --perl.org>
+<selena-- ATAT --eXtropia.com>,"Betsy Waliszewski" <betsy-- ATAT --oreilly.com>, "perl-advocacy" <advocacy-- ATAT --perl.org>
+<stephen.adkins-- ATAT --officevision.com>
+<tim_meadowcroft-- ATAT --westlb.co.uk>, <advocacy-- ATAT --perl.org>
+=?ISO-8859-1?Q?Stig_Sj=F6berg_=28BCS=29?=
+=?iso-8859-1?Q?Fran=E7ois=20D=E9sarm=E9nien?= <desar-- ATAT --club-internet.fr>
+Abigail <abigail-- ATAT --abigail.nl>
+Abigail <abigail-- ATAT --foad.org>
+Abigail <abigail-- ATAT --foad.org>, Selena Sol <selena-- ATAT --eXtropia.com>, advocacy-- ATAT --perl.org
+Abigail <abigail-- ATAT --foad.org>, Sidharth Malhotra <smalhotr-- ATAT --jwmp.com>, perl-advocacy <advocacy-- ATAT --perl.org>
+Abigail <abigail-- ATAT --foad.org>, advocacy-- ATAT --perl.org
+Abigail <abigail-- ATAT --ucan.foad.org>
+Adam Turoff <adam.turoff-- ATAT --isinet.com>
+Adam Turoff <adam.turoff-- ATAT --isinet.com>, Elaine -HFB- Ashton <elaine-- ATAT --chaos.wustl.edu>, advocacy-- ATAT --perl.org
+Adam Turoff <adam.turoff-- ATAT --isinet.com>, Troy Denkinger <troy-- ATAT --whadda.com>
+Adam Turoff <adam.turoff-- ATAT --isinet.com>, advocacy-- ATAT --perl.org
+Adam Turoff <ziggy-- ATAT --panix.com>
+Adam Turoff <ziggy-- ATAT --panix.com>, Christopher Masto <chris-- ATAT --netmonger.net>, advocacy-- ATAT --perl.org, perl6-meta-- ATAT --perl.org
+Adam Turoff <ziggy-- ATAT --panix.com>, Perl Advocacy <advocacy-- ATAT --perl.org>
+Adam Turoff <ziggy-- ATAT --panix.com>, advocacy-- ATAT --perl.org
+Adam Turoff <ziggy-- ATAT --panix.com>, advocacy-- ATAT --perl.org, Jon Orwant <orwant-- ATAT --oreilly.com>
+Adam Turoff <ziggy-- ATAT --panix.com>, marsneedswomen-- ATAT --happyfunball.pm.org
+Adam Turoff <ziggy-- ATAT --panix.com>, marsneedswomen-- ATAT --happyfunball.pm.org, advocacy-- ATAT --perl.org, brian-- ATAT --smithrenaud.com
+Adam Turoff <ziggy-- ATAT --panix.com>, pressio main <info-- ATAT --pressio.com>, advocacy-- ATAT --perl.org
+Adam Turoff <ziggy-- ATAT --panix.com>,Abigail <abigail-- ATAT --foad.org>
+Ajit Deshpande <ajit-- ATAT --skycorp.net>
+Ajit Deshpande <ajit-- ATAT --skycorp.net>, advocacy-- ATAT --perl.org, pudge-- ATAT --pobox.com
+Alan Olsen <alan-- ATAT --clueserver.org>
+Alan Olsen <alan-- ATAT --clueserver.org>, Lisa Nyman <lnyman-- ATAT --census.gov>, advocacy-- ATAT --perl.org
+Alan Olsen <alan-- ATAT --clueserver.org>, advocacy-- ATAT --perl.org
+Andrew Mayo <ajmayo-- ATAT --my-Deja.com>
+Andrew Simmons <andrew-- ATAT --zpok.demon.co.uk>
+Andrew Sweger <andrew-- ATAT --sweger.net>
+Andrew Sweger <andrew-- ATAT --sweger.net>,	Shlomi Fish <shlomif-- ATAT --vipe.stud.technion.ac.il>, advocacy-- ATAT --perl.org
+Andrew.McGregor-- ATAT --amtrak.co.uk (Andrew McGregor)
+Andy Lester <andy-- ATAT --petdance.com>
+Andy Wardley <abw-- ATAT --kfs.org>
+Arron Hart <perlhead-- ATAT --hotmail.com>
+Ask Bjoern Hansen <ask-- ATAT --develooper.com>
+Ask Bjoern Hansen <ask-- ATAT --netcetera.dk>
+Ask Bjoern Hansen <ask-- ATAT --perl.org>
+Ask Bjoern Hansen <ask-- ATAT --perl.org>, advocacy-- ATAT --perl.org
+Ask Bjoern Hansen <ask-- ATAT --valueclick.com>
+Autarch <autarch-- ATAT --urth.org>
+BDoucette-- ATAT --tesent.com (Bob Doucette)
+Ben_Tilly-- ATAT --trepp.com
+Ben_Tilly-- ATAT --trepp.com (Ben Tilly)
+Ben_Tilly-- ATAT --trepp.com, "David H. Adler" <dha-- ATAT --panix.com>, advocacy-- ATAT --perl.org, perl5-porters-- ATAT --perl.org
+Ben_Tilly-- ATAT --trepp.com, pudge-- ATAT --pobox.com, advocacy-- ATAT --perl.org, perl5-porters-- ATAT --perl.org
+Bernhard van Staveren <madcat-- ATAT --ghostfield.com>
+Betsy Waliszewski <betsy-- ATAT --oreilly.com>
+Betsy Waliszewski <betsy-- ATAT --oreilly.com>, Adam Turoff <ziggy-- ATAT --panix.com>
+Betsy Waliszewski <betsy-- ATAT --oreilly.com>, Adam Turoff <ziggy-- ATAT --panix.com>, advocacy-- ATAT --perl.org, Jon Orwant <orwant-- ATAT --oreilly.com>
+Betsy Waliszewski <betsy-- ATAT --oreilly.com>, perl-advocacy <advocacy-- ATAT --perl.org>
+Brad Murray <murrayb-- ATAT --vansel.alcatel.com>
+Brad.Murray-- ATAT --tas.alcatel.ca (Brad Murray)
+Brad.Murray-- ATAT --tas.alcatel.ca, advocacy-- ATAT --perl.org
+Brand Hilton <bhilton-- ATAT --adc.com>
+Brent Michalski <brent-- ATAT --perlguy.net>
+Brent Michalski <brent-- ATAT --perlguy.net>, Madeline Schnapp <madeline-- ATAT --oreilly.com>, advocacy-- ATAT --perl.org, betsy-- ATAT --oreilly.com
+Brent Michalski <brent-- ATAT --perlguy.net>, abigail-- ATAT --foad.org
+Casey West <casey-- ATAT --geeknest.com>
+Charles Barilleaux <chbarr-- ATAT --rocketmail.com>, bwarnock-- ATAT --capita.com, advocacy-- ATAT --perl.org
+Charles Volkstorf <charlie_mumps-- ATAT --bangkok.com>, advocacy-- ATAT --perl.org
+Chip Salzenberg <chip-- ATAT --valinux.com>
+Chip Salzenberg <chip-- ATAT --valinux.com>, Elaine -HFB- Ashton <elaine-- ATAT --chaos.wustl.edu>
+Chip Salzenberg <chip-- ATAT --valinux.com>, advocacy-- ATAT --perl.org
+Chris <chrisl_ak-- ATAT --hotmail.com>
+Chris Benson <chrisb-- ATAT --jesmond.demon.co.uk>
+Chris Benson <chrisb-- ATAT --jesmond.demon.co.uk>, advocacy-- ATAT --perl.org
+Chris Devers <cdevers-- ATAT --boston.com>
+Chris Nandor <pudge-- ATAT --pobox.com>
+Chris Nandor <pudge-- ATAT --pobox.com>, Alan Olsen <alan-- ATAT --clueserver.org>, Lisa Nyman <lnyman-- ATAT --census.gov>, advocacy-- ATAT --perl.org
+Chris Nandor <pudge-- ATAT --pobox.com>, Autarch <autarch-- ATAT --urth.org>
+Chris Nandor <pudge-- ATAT --pobox.com>, Elaine -HFB- Ashton <elaine-- ATAT --chaos.wustl.edu>
+Chris Nandor <pudge-- ATAT --pobox.com>, Elaine -HFB- Ashton <elaine-- ATAT --chaos.wustl.edu>, Sarah Burcham <sarah-- ATAT --pound.perl.org>, advocacy-- ATAT --perl.org, marsneedswomen-- ATAT --happyfunball.pm.org, perl-hackers-- ATAT --stlouis.pm.org
+Chris Nandor <pudge-- ATAT --pobox.com>, George Rapp <grapp01-- ATAT --mail.dfas.msd.eds.com>, advocacy-- ATAT --perl.org, pyguy-- ATAT --prescod.net
+Chris Nandor <pudge-- ATAT --pobox.com>, Jon Orwant <orwant-- ATAT --media.mit.edu>, chip-- ATAT --valinux.com, tidbit-- ATAT --sri.net, advocacy-- ATAT --perl.org
+Chris Nandor <pudge-- ATAT --pobox.com>, Larry Wall <larry-- ATAT --wall.org>, Jon Orwant <orwant-- ATAT --media.mit.edu>, tidbit-- ATAT --sri.net, advocacy-- ATAT --perl.org
+Chris Nandor <pudge-- ATAT --pobox.com>, Paul Prescod <paul-- ATAT --prescod.net>, George Rapp <grapp01-- ATAT --mail.dfas.msd.eds.com>, advocacy-- ATAT --perl.org
+Chris Nandor <pudge-- ATAT --pobox.com>, abigail-- ATAT --foad.org, "Clinton A. Pierce" <clintp-- ATAT --geeksalad.org>, madeline-- ATAT --oreilly.com, advocacy-- ATAT --perl.org
+Chris Nandor <pudge-- ATAT --pobox.com>, advocacy-- ATAT --perl.org
+Chris Nandor <pudge-- ATAT --pobox.com>, advocacy-- ATAT --perl.org, Paul Prescod <paul-- ATAT --prescod.net>
+Chris Nandor <pudge-- ATAT --pobox.com>, advocacy-- ATAT --perl.org, brian-- ATAT --smithrenaud.com
+Chris Nandor <pudge-- ATAT --pobox.com>, tim_meadowcroft-- ATAT --westlb.co.uk
+Chris Nandor <pudge-- ATAT --pobox.com>,Larry Wall <larry-- ATAT --wall.org>
+Chris Nandor <pudge-- ATAT --pobox.com>,Nathan Torkington <gnat-- ATAT --frii.com>
+Chris Nandor <pudge-- ATAT --pobox.com>,advocacy-- ATAT --perl.org
+Chris Winters <chris-- ATAT --cwinters.com>
+Christine Wanta <cwanta-- ATAT --dra.com>
+Christopher Masto <chris-- ATAT --masto.com>
+Christopher Masto <chris-- ATAT --netmonger.net>
+Christopher Masto <chris-- ATAT --netmonger.net>, advocacy-- ATAT --perl.org, perl6-meta-- ATAT --perl.org
+Colin Weaver <WeaverC-- ATAT --Cardiff.ac.uk>
+Curtis Poe <cp-- ATAT --onsitetech.com>
+Curtis Poe <cp-- ATAT --onsitetech.com>, <advocacy-- ATAT --perl.org>
+D-- ATAT --i-works.com
+D-- ATAT --i-works.com (Tushar Samant)
+D-- ATAT --i-works.com, advocacy-- ATAT --perl.org
+DCTressler-- ATAT --SSALLC.com (Dara C. Tressler)
+Damian Conway <damian-- ATAT --conway.org>, administrator-- ATAT --yetanother.org
+Damien Sautereau <dsautereau-- ATAT --magic.fr>
+Dan Brian <dan-- ATAT --brians.org>
+Dan Brian <dan-- ATAT --brians.org>,advocacy-- ATAT --perl.org
+Dan Sugalski <dan-- ATAT --sidhe.org>
+Dan Sugalski <dan-- ATAT --sidhe.org>,  advocacy-- ATAT --perl.org, Kai Henningsen <kaih-- ATAT --khms.westfalen.de>,  perl6-language-- ATAT --perl.org
+Dan Sugalski <dan-- ATAT --sidhe.org>, advocacy-- ATAT --perl.org
+Dan Sugalski <dan-- ATAT --sidhe.org>, advocacy-- ATAT --perl.org, Kai Henningsen <kaih-- ATAT --khms.westfalen.de>, perl6-language-- ATAT --perl.org
+Darryl.Edwards-- ATAT --adc.com (Darryl Edwards)
+Dave Cross <dave-- ATAT --dave.org.uk>
+Dave Rolsky <autarch-- ATAT --urth.org>
+Dave Rolsky <autarch-- ATAT --urth.org>, advocacy-- ATAT --perl.org
+David Grove <pete-- ATAT --petes-place.com>
+David Grove <pete-- ATAT --petes-place.com>, Robert <robert-- ATAT --bangkokwizard.com>, advocacy-- ATAT --perl.org
+David Grove <pete-- ATAT --petes-place.com>, Uri Guttman <uri-- ATAT --sysarch.com>,  advocacy-- ATAT --perl.org
+David Wheeler <David-- ATAT --Wheeler.net>
+David Wheeler <david-- ATAT --kineticode.com>, Gabor Szabo <gabor-- ATAT --perl.org.il>
+David Wheeler <david-- ATAT --kineticode.com>, Gabor Szabo <gabor-- ATAT --perl.org.il>, advocacy-- ATAT --perl.org, Stas Bekman <stas-- ATAT --stason.org>, Ian Kallen <spidaman-- ATAT --arachna.com>
+David Wheeler <david-- ATAT --wheeler.net>
+David-- ATAT --Wheeler.net (David E. Wheeler)
+David-- ATAT --Wheeler.net (David Wheeler)
+Dick Hardt <DickH-- ATAT --ActiveState.com>
+Dick Hardt <DickH-- ATAT --ActiveState.com>, Larry Wall <larry-- ATAT --wall.org>, lembark-- ATAT --wrkhors.com, advocacy-- ATAT --perl.org
+DickH-- ATAT --ActiveState.com (Dick Hardt)
+Elaine -HFB- Ashton <elaine-- ATAT --chaos.wustl.edu>
+Elaine -HFB- Ashton <elaine-- ATAT --chaos.wustl.edu>,	Dave Rolsky <autarch-- ATAT --urth.org>, advocacy-- ATAT --perl.org
+Elaine -HFB- Ashton <elaine-- ATAT --chaos.wustl.edu>,   Dave Rolsky <autarch-- ATAT --urth.org>, <advocacy-- ATAT --perl.org>
+Elaine -HFB- Ashton <elaine-- ATAT --chaos.wustl.edu>,  Tom Christiansen <tchrist-- ATAT --chthon.perl.com>, Ben_Tilly-- ATAT --trepp.com,  "David H. Adler" <dha-- ATAT --panix.com>, advocacy-- ATAT --perl.org
+Elaine -HFB- Ashton <elaine-- ATAT --chaos.wustl.edu>, "Clinton A. Pierce" <clintp-- ATAT --geeksalad.org>, madeline-- ATAT --oreilly.com, advocacy-- ATAT --perl.org
+Elaine -HFB- Ashton <elaine-- ATAT --chaos.wustl.edu>, "Peterson, Jonathan" <JPeterson-- ATAT --colt-telecom.com>, advocacy-- ATAT --perl.org
+Elaine -HFB- Ashton <elaine-- ATAT --chaos.wustl.edu>, Adam Turoff <ziggy-- ATAT --panix.com>
+Elaine -HFB- Ashton <elaine-- ATAT --chaos.wustl.edu>, Adam Turoff <ziggy-- ATAT --panix.com>, Christopher Masto <chris-- ATAT --netmonger.net>, advocacy-- ATAT --perl.org, perl6-meta-- ATAT --perl.org
+Elaine -HFB- Ashton <elaine-- ATAT --chaos.wustl.edu>, Adam Turoff <ziggy-- ATAT --panix.com>, Christopher Masto <chris-- ATAT --netmonger.net>, advocacy-- ATAT --perl.org, perl6-meta-- ATAT --perl.org, cturner-- ATAT --redhat.com
+Elaine -HFB- Ashton <elaine-- ATAT --chaos.wustl.edu>, David Grove <pete-- ATAT --petes-place.com>, Robert <robert-- ATAT --bangkokwizard.com>, advocacy-- ATAT --perl.org
+Elaine -HFB- Ashton <elaine-- ATAT --chaos.wustl.edu>, Johan Vromans <jvromans-- ATAT --squirrel.nl>, advocacy-- ATAT --perl.org, perl5-porters-- ATAT --perl.org
+Elaine -HFB- Ashton <elaine-- ATAT --chaos.wustl.edu>, John Porter <jdporter-- ATAT --min.net>
+Elaine -HFB- Ashton <elaine-- ATAT --chaos.wustl.edu>, Jon Orwant <orwant-- ATAT --media.mit.edu>, chip-- ATAT --valinux.com, larry-- ATAT --wall.org, tidbit-- ATAT --sri.net, advocacy-- ATAT --perl.org
+Elaine -HFB- Ashton <elaine-- ATAT --chaos.wustl.edu>, Larry Wall <larry-- ATAT --wall.org>, Jon Orwant <orwant-- ATAT --media.mit.edu>, chip-- ATAT --valinux.com, tidbit-- ATAT --sri.net, advocacy-- ATAT --perl.org
+Elaine -HFB- Ashton <elaine-- ATAT --chaos.wustl.edu>, Larry Wall <larry-- ATAT --wall.org>, Jon Orwant <orwant-- ATAT --media.mit.edu>, tidbit-- ATAT --sri.net, advocacy-- ATAT --perl.org
+Elaine -HFB- Ashton <elaine-- ATAT --chaos.wustl.edu>, Lisa Nyman <lnyman-- ATAT --census.gov>, advocacy-- ATAT --perl.org
+Elaine -HFB- Ashton <elaine-- ATAT --chaos.wustl.edu>, Madeline Schnapp <madeline-- ATAT --oreilly.com>
+Elaine -HFB- Ashton <elaine-- ATAT --chaos.wustl.edu>, Sarah Burcham <sarah-- ATAT --pound.perl.org>, advocacy-- ATAT --perl.org, marsneedswomen-- ATAT --happyfunball.pm.org, perl-hackers-- ATAT --stlouis.pm.org
+Elaine -HFB- Ashton <elaine-- ATAT --chaos.wustl.edu>, Selena Sol <selena-- ATAT --eXtropia.com>, advocacy-- ATAT --perl.org
+Elaine -HFB- Ashton <elaine-- ATAT --chaos.wustl.edu>, advocacy-- ATAT --perl.org
+Elaine -HFB- Ashton <elaine-- ATAT --chaos.wustl.edu>, brian d foy <tidbit-- ATAT --sri.net>
+Elaine -HFB- Ashton <elaine-- ATAT --chaos.wustl.edu>, brian d foy <tidbit-- ATAT --sri.net>, advocacy-- ATAT --perl.org
+Elaine -HFB- Ashton <elaine-- ATAT --chaos.wustl.edu>, dns-- ATAT --pm.org,  advocacy-- ATAT --perl.org, perl5-porters-- ATAT --perl.org,  Nathan Torkington <gnat-- ATAT --frii.com>,  "Andreas J. Koenig" <andreas.koenig-- ATAT --anima.de>, chip-- ATAT --defender.perl.org
+Elaine -HFB- Ashton <elaine-- ATAT --chaos.wustl.edu>,advocacy-- ATAT --perl.org
+Elizabeth Mattijsen <liz-- ATAT --dijkmat.nl>
+Gabor Szabo <gabor-- ATAT --perl.org.il>
+Gabor Szabo <gabor-- ATAT --perl.org.il>, Ricardo Oliveira <rlmcdo-- ATAT --netcabo.pt>
+Gabor Szabo <gabor-- ATAT --tracert.com>
+Gabor Szabo <gabor-- ATAT --tracert.com>, "" <advocacy-- ATAT --perl.org>
+Gabor Szabo <gabor-- ATAT --tracert.com>, advocacy-- ATAT --perl.org
+Garry.Grierson-- ATAT --honeywell.com (Garry Grierson)
+Gavin Estey <gavin-- ATAT --bock.com>, advocacy-- ATAT --perl.org
+George Rapp <grapp01-- ATAT --mail.dfas.msd.eds.com>
+George Rapp <grapp01-- ATAT --mail.dfas.msd.eds.com>, advocacy-- ATAT --perl.org, pyguy-- ATAT --prescod.net
+Hasanuddin Tamir <hasant-- ATAT --trabas.com>
+Hasanuddin Tamir <hasant-- ATAT --trabas.com>, Selena Sol <selena-- ATAT --eXtropia.com>, advocacy-- ATAT --perl.org
+Hasanuddin Tamir <hasant-- ATAT --trabas.com>, Stas Bekman <stas-- ATAT --stason.org>, advocacy-- ATAT --perl.org
+Highway09-- ATAT --aol.com
+Horsley Tom <Tom.Horsley-- ATAT --ccur.com>
+Horsley Tom <Tom.Horsley-- ATAT --ccur.com>, advocacy-- ATAT --perl.org, perl5-porters-- ATAT --perl.org
+Iain Truskett <spoon-- ATAT --cpan.org>
+Izz1235-- ATAT --aol.com
+JAMESH-- ATAT --davistl.com (James Hamilton)
+JPeterson-- ATAT --colt-telecom.com (Jonathan Peterson)
+JVromans-- ATAT --Squirrel.nl (Johan Vromans)
+JVromans-- ATAT --squirrel.nl
+JVromans-- ATAT --squirrel.nl (Johan Vromans)
+Jan Dubois <JanD-- ATAT --ActiveState.com>
+Jan Dubois <JanD-- ATAT --ActiveState.com>, advocacy-- ATAT --perl.org
+Jan Dubois <jand-- ATAT --ActiveState.com>
+Jan Dubois <jand-- ATAT --ActiveState.com>, advocacy-- ATAT --perl.org
+JanD-- ATAT --ActiveState.com (Jan Dubois)
+Jarkko Hietaniemi <jhi-- ATAT --iki.fi>
+Jay Lawrence <jlawrenc-- ATAT --infonium.com>
+Jay-- ATAT --Lawrence.Net (Jay Lawrence)
+Jeff Yoak <jeff-- ATAT --yoak.com>
+Jeremy Zawodny <Jeremy-- ATAT --Zawodny.com>
+Jeremy Zawodny <jzawodn-- ATAT --yahoo-inc.com>
+Jeremy-- ATAT --Zawodny.com (Jeremy D. Zawodny)
+Jeremy-- ATAT --Zawodny.com (Jeremy Zawodny)
+Jesse Erlbaum <jesse-- ATAT --VM.COM>
+Jesse Erlbaum <jesse-- ATAT --VM.COM>, <advocacy-- ATAT --perl.org>, My Little Greppy <greg-- ATAT --mccarroll.demon.co.uk>
+Joel Divekar <joel-- ATAT --qlcomm.com>
+Johan Vromans <JVromans-- ATAT --squirrel.nl>
+Johan Vromans <JVromans-- ATAT --squirrel.nl>, advocacy-- ATAT --perl.org
+Johan Vromans <jvromans-- ATAT --squirrel.nl>
+Johan Vromans <jvromans-- ATAT --squirrel.nl>, advocacy-- ATAT --perl.org,  perl5-porters-- ATAT --perl.org
+Johan Vromans <jvromans-- ATAT --squirrel.nl>, advocacy-- ATAT --perl.org, perl5-porters-- ATAT --perl.org
+John Adams <jadams01-- ATAT --sprynet.com>
+John Adams <jadams01-- ATAT --sprynet.com>, John Porter <jdporter-- ATAT --min.net>, advocacy-- ATAT --perl.org
+John Adams <jadams01-- ATAT --sprynet.com>, advocacy-- ATAT --perl.org
+John Porter <jdporter-- ATAT --min.net>
+John Porter <jdporter-- ATAT --min.net>, advocacy-- ATAT --perl.org
+John Porter <jdporter-- ATAT --min.net>, advocacy-- ATAT --perl.org, "Vanderhoof, Tzadik" <tvanderhoof-- ATAT --syscom-inc.com>
+John Porter <jdporter-- ATAT --min.net>, perl-advocacy <advocacy-- ATAT --perl.org>
+John Porter <jdporter-- ATAT --min.net>,advocacy-- ATAT --perl.org
+John Von Essen <john-- ATAT --essenz.com>
+Johnathan Kupferer <johnathan-- ATAT --gnuthought.com>
+Johnathan Kupferer <johnathan-- ATAT --gnuthought.com>, Dave Rolsky <autarch-- ATAT --urth.org>, advocacy-- ATAT --perl.org
+Jon Orwant <orwant-- ATAT --media.mit.edu>
+Jon Orwant <orwant-- ATAT --media.mit.edu>, chip-- ATAT --valinux.com, larry-- ATAT --wall.org, tidbit-- ATAT --sri.net, advocacy-- ATAT --perl.org
+Jon Orwant <orwant-- ATAT --oreilly.com>
+Jon Orwant <orwant-- ATAT --oreilly.com>, advocacy-- ATAT --perl.org
+Jon Udell <udell-- ATAT --monad.net>
+Jonathan Scott Duff <duff-- ATAT --cbi.tamucc.edu>
+Jonathan Stowe <jns-- ATAT --gellyfish.com>
+KMeltzer-- ATAT --USCO.com (Kevin Meltzer)
+Kevin Weeks <kevin.weeks-- ATAT --coriolis.com>
+Kim Ryan <kimaryan-- ATAT --ozemail.com.au>
+Kirrily Skud Robert <skud-- ATAT --infotrope.net>
+Kurt Starsinic <kstar-- ATAT --cpan.org>
+Kurt Starsinic <kstar-- ATAT --cpan.org>, advocacy-- ATAT --perl.org
+Larry Wall <larry-- ATAT --wall.org>
+Larry Wall <larry-- ATAT --wall.org>, Elaine -HFB- Ashton <elaine-- ATAT --chaos.wustl.edu>, advocacy-- ATAT --perl.org
+Larry Wall <larry-- ATAT --wall.org>, Jon Orwant <orwant-- ATAT --media.mit.edu>, chip-- ATAT --valinux.com, tidbit-- ATAT --sri.net, advocacy-- ATAT --perl.org
+Larry Wall <larry-- ATAT --wall.org>, brian d foy <tidbit-- ATAT --sri.net>, advocacy-- ATAT --perl.org
+Larry Wall <larry-- ATAT --wall.org>, lembark-- ATAT --wrkhors.com
+Larry Wall <larry-- ATAT --wall.org>, lembark-- ATAT --wrkhors.com, advocacy-- ATAT --perl.org
+Lisa Nyman <lnyman-- ATAT --census.gov>
+Lisa Nyman <lnyman-- ATAT --census.gov>, advocacy-- ATAT --perl.org
+Lisa Nyman <lnyman-- ATAT --info.census.gov>
+Lisa Nyman <lnyman-- ATAT --info.census.gov>, <advocacy-- ATAT --perl.org>
+Lori Pike <lori.pike-- ATAT --sophos.com>
+Madeline Schnapp <madeline-- ATAT --oreilly.com>
+Madeline Schnapp <madeline-- ATAT --oreilly.com>, Adam Turoff <ziggy-- ATAT --panix.com>, Perl Advocacy <advocacy-- ATAT --perl.org>
+Madeline Schnapp <madeline-- ATAT --oreilly.com>, Perl Advocacy <advocacy-- ATAT --perl.org>
+Madeline Schnapp <madeline-- ATAT --oreilly.com>, advocacy-- ATAT --perl.org
+Madeline Schnapp <madeline-- ATAT --oreilly.com>, advocacy-- ATAT --perl.org, betsy-- ATAT --oreilly.com
+Mark Jacobsen <markj-- ATAT --oreilly.com>
+Mark Mielke <markm-- ATAT --nortelnetworks.com>
+Mark Mielke <markm-- ATAT --nortelnetworks.com>, advocacy-- ATAT --perl.org
+Mark Rafn <dagon-- ATAT --dagon.net>
+Martin Stricker <shugal-- ATAT --gmx.de>
+Matt Sergeant <matt-- ATAT --sergeant.org>, Elaine -HFB- Ashton <elaine-- ATAT --chaos.wustl.edu>
+Michael G Schwern <schwern-- ATAT --pobox.com>
+Michael G Schwern <schwern-- ATAT --pobox.com>, Adam Turoff <ziggy-- ATAT --panix.com>, Christopher Masto <chris-- ATAT --netmonger.net>, advocacy-- ATAT --perl.org, perl6-meta-- ATAT --perl.org
+Michael G Schwern <schwern-- ATAT --pobox.com>, advocacy-- ATAT --perl.org
+MichaelRunningWolf-- ATAT --att.net (Michael R. Wolf)
+Mike <nom_du_pere-- ATAT --yahoo.com>
+Mike Shapiro <mike-- ATAT --zoesis.com>
+Mohit Agarwal <mohit-- ATAT --foc.demonhosting.co.uk>
+Nathan Torkington <gnat-- ATAT --frii.com>
+Nathan Torkington <gnat-- ATAT --frii.com>, "Vanderhoof, Tzadik" <tvanderhoof-- ATAT --syscom-inc.com>
+Nathan Torkington <gnat-- ATAT --frii.com>, advocacy-- ATAT --perl.org
+Nathan Torkington <gnat-- ATAT --frii.com>,advocacy-- ATAT --perl.org
+Nathan Torkington <gnat-- ATAT --oreilly.com>
+Nathan Torkington <gnat-- ATAT --oreilly.com>,  Shlomi Fish <shlomif-- ATAT --vipe.stud.technion.ac.il>, advocacy-- ATAT --perl.org
+Nathan Torkington <gnat-- ATAT --oreilly.com>, advocacy-- ATAT --perl.org
+Nathan Torkington <gnat-- ATAT --oreilly.com>, advocacy-- ATAT --perl.org, "Scott R. Godin" <webmaster-- ATAT --webdragon.net>
+Nicholas Clark <nick-- ATAT --ccl4.org>
+Nicholas Clark <nick-- ATAT --ccl4.org>, Piers Cawley <pdcawley-- ATAT --bofh.org.uk>,  advocacy-- ATAT --perl.org
+Nicholas Clark <nick-- ATAT --ccl4.org>, Piers Cawley <pdcawley-- ATAT --bofh.org.uk>, advocacy-- ATAT --perl.org
+Nicholas Clark <nick-- ATAT --unfortu.net>
+Nicholas Clark <nick-- ATAT --unfortu.net>, Dave Rolsky <autarch-- ATAT --urth.org>,	 advocacy-- ATAT --perl.org
+Nicholas Clark <nick-- ATAT --unfortu.net>, advocacy-- ATAT --perl.org
+Otto Wyss <otto.wyss-- ATAT --bluewin.ch>
+PBRA01-- ATAT --CONAGRAFROZEN.COM (Phil Brammer)
+Paul Johnson <paul-- ATAT --pjcj.net>
+Paul Johnson <paul-- ATAT --pjcj.net>, Piers Cawley <pdcawley-- ATAT --bofh.org.uk>, advocacy-- ATAT --perl.org
+Paul Prescod <paul-- ATAT --prescod.net>
+Paul Prescod <paul-- ATAT --prescod.net>,  George Rapp <grapp01-- ATAT --mail.dfas.msd.eds.com>, advocacy-- ATAT --perl.org,  pyguy-- ATAT --prescod.net
+Paul Prescod <paul-- ATAT --prescod.net>, "David H. Adler" <dha-- ATAT --panix.com>, advocacy-- ATAT --perl.org
+Paul Prescod <paul-- ATAT --prescod.net>, advocacy-- ATAT --perl.org
+Perl Advocacy <advocacy-- ATAT --perl.org>
+Perl Advocacy <advocacy-- ATAT --perl.org>, betsy-- ATAT --oreilly.com
+Perl Advocacy List <advocacy-- ATAT --perl.org>
+PerlAdvoc <advocacy-- ATAT --perl.org>
+Peter Scott <Peter-- ATAT --PSDT.com>
+Peter Scott <Peter-- ATAT --PSDT.com>, Ajit Deshpande <ajit-- ATAT --skycorp.net>, advocacy-- ATAT --perl.org, pudge-- ATAT --pobox.com
+Peter Scott <Peter-- ATAT --PSDT.com>, John Porter <jdporter-- ATAT --min.net>,  advocacy-- ATAT --perl.org
+Peter Scott <Peter-- ATAT --PSDT.com>, Nathan Torkington <gnat-- ATAT --frii.com>,  advocacy-- ATAT --perl.org
+Peter Scott <Peter-- ATAT --PSDT.com>, Russ Allbery <rra-- ATAT --stanford.edu>, advocacy-- ATAT --perl.org
+Peter Scott <Peter-- ATAT --PSDT.com>, Sarah Burcham <sarah-- ATAT --pound.perl.org>, advocacy-- ATAT --perl.org, marsneedswomen-- ATAT --happyfunball.pm.org, perl-hackers-- ATAT --stlouis.pm.org
+Peter Scott <Peter-- ATAT --PSDT.com>, advocacy-- ATAT --perl.org
+Peter Scott <Peter-- ATAT --PSDT.com>, perl-advocacy <advocacy-- ATAT --perl.org>
+Peter Scott <peter-- ATAT --PSDT.com>
+Peter Scott <peter-- ATAT --PSDT.com>, advocacy-- ATAT --perl.org
+Peter Scott <peter-- ATAT --PSDT.com>, advocacy-- ATAT --perl.org,  Nat Torkington <gnat-- ATAT --frii.com>
+Peter-- ATAT --PSDT.com
+Peter-- ATAT --PSDT.com (Peter Scott)
+Peter-- ATAT --PSDT.com, advocacy-- ATAT --perl.org
+Phil.Moore-- ATAT --morganstanley.com
+Phil.Moore-- ATAT --morganstanley.com (Phil Moore)
+Phil.Moore-- ATAT --morganstanley.com, dan-- ATAT --sidhe.org, advocacy-- ATAT --perl.org, kaih-- ATAT --khms.westfalen.de, perl6-language-- ATAT --perl.org
+Phil.Moore-- ATAT --msdw.com
+Phil.Moore-- ATAT --msdw.com (Phil Moore)
+Phil.Moore-- ATAT --msdw.com, Johan Vromans <JVromans-- ATAT --squirrel.nl>,  advocacy-- ATAT --perl.org
+Philip Newton <newton-- ATAT --newton.digitalspace.net>
+Piers Cawley <pdcawley-- ATAT --bofh.org.uk>
+Piers Cawley <pdcawley-- ATAT --bofh.org.uk>, advocacy-- ATAT --perl.org
+Ricardo Oliveira <rlmcdo-- ATAT --netcabo.pt>
+Ricardo Oliveira <rlmcdo-- ATAT --netcabo.pt>, advocacy-- ATAT --perl.org
+Rich Bowen <rbowen-- ATAT --rcbowen.com>
+Rich Morin <rdm-- ATAT --cfcl.com>
+Robert <robert-- ATAT --bangkokwizard.com>
+Robert <robert-- ATAT --bangkokwizard.com>, advocacy-- ATAT --perl.org
+Rodney Clang <rclang-- ATAT --lewan.com>
+Rodney Clang <rclang-- ATAT --lewan.com>, advocacy-- ATAT --perl.org
+Ronald J Kimball <rjk-- ATAT --linguist.dartmouth.edu>
+Russ Allbery <rra-- ATAT --stanford.edu>,advocacy-- ATAT --perl.org
+Sami
+Sarah Burcham <sarah-- ATAT --pound.perl.org>
+Sarah Burcham <sarah-- ATAT --pound.perl.org>, advocacy-- ATAT --perl.org,  marsneedswomen-- ATAT --happyfunball.pm.org, perl-hackers-- ATAT --stlouis.pm.org
+Sarah Burcham <sarah-- ATAT --pound.perl.org>, advocacy-- ATAT --perl.org, marsneedswomen-- ATAT --happyfunball.pm.org, perl-hackers-- ATAT --stlouis.pm.org
+Selena Sol <selena-- ATAT --eXtropia.com>
+Selena Sol <selena-- ATAT --eXtropia.com>, <advocacy-- ATAT --perl.org>
+Selena Sol <selena-- ATAT --eXtropia.com>, advocacy-- ATAT --perl.org
+Selena Sol <selena-- ATAT --eXtropia.com>, advocacy-- ATAT --perl.org, stephen.adkins-- ATAT --officevision.com
+Shlomi Fish <shlomif-- ATAT --vipe.stud.technion.ac.il>
+Shlomi Fish <shlomif-- ATAT --vipe.stud.technion.ac.il>,  "David H. Adler" <dha-- ATAT --panix.com>, <advocacy-- ATAT --perl.org>
+Shlomi Fish <shlomif-- ATAT --vipe.stud.technion.ac.il>,  Simon Cozens <simon-- ATAT --simon-cozens.org>, advocacy-- ATAT --perl.org
+Shlomi Fish <shlomif-- ATAT --vipe.stud.technion.ac.il>, <advocacy-- ATAT --perl.org>
+Shlomi Fish <shlomif-- ATAT --vipe.stud.technion.ac.il>, advocacy-- ATAT --perl.org
+Shlomi Fish <shlomif-- ATAT --vipe.technion.ac.il>
+Sidharth Malhotra <smalhotr-- ATAT --jwmp.com>
+Sidharth Malhotra <smalhotr-- ATAT --jwmp.com>, perl-advocacy <advocacy-- ATAT --perl.org>
+Simon Cozens <simon-- ATAT --brecon.co.uk>
+Simon Cozens <simon-- ATAT --brecon.co.uk>, advocacy-- ATAT --perl.org
+Simon Cozens <simon-- ATAT --cozens.net>
+Simon Cozens <simon-- ATAT --cozens.net>, Nathan Torkington <gnat-- ATAT --frii.com>, advocacy-- ATAT --perl.org
+Simon Cozens <simon-- ATAT --netthink.co.uk>
+Simon Cozens <simon-- ATAT --simon-cozens.org>
+Simon Cozens <simon-- ATAT --simon-cozens.org>, <advocacy-- ATAT --perl.org>
+Simon Cozens <simon-- ATAT --simon-cozens.org>, advocacy-- ATAT --perl.org
+Stas Bekman <stas-- ATAT --stason.org>
+Stas Bekman <stas-- ATAT --stason.org>, Ian Kallen <spidaman-- ATAT --arachna.com>, Gabor Szabo <gabor-- ATAT --perl.org.il>, advocacy-- ATAT --perl.org
+Stas Bekman <stas-- ATAT --stason.org>, Tzadik Vanderhoof <Tzadik.Vanderhoof-- ATAT --THINQ.com>
+Stas Bekman <stas-- ATAT --stason.org>, advocacy-- ATAT --perl.org
+Stas Bekman <stas-- ATAT --stason.org>, perl-advocacy <advocacy-- ATAT --perl.org>
+Steffen Mueller <6jrwvn6d02-- ATAT --sneakemail.com>
+Steve Fink <sfink-- ATAT --digital-integrity.com>
+Steve Fink <sfink-- ATAT --digital-integrity.com>, advocacy-- ATAT --perl.org
+Steven Lembark <lembark-- ATAT --wrkhors.com>
+Steven Lembark <lembark-- ATAT --wrkhors.com>, advocacy-- ATAT --perl.org
+Swami VenkataRamanan <swamiv-- ATAT --granitar.com>
+Tad McClellan <tadmc-- ATAT --augustmail.com>
+Tim Bunce <Tim.Bunce-- ATAT --ig.co.uk>
+Tim Bunce <Tim.Bunce-- ATAT --ig.co.uk>, Chris Nandor <pudge-- ATAT --pobox.com>,  George Rapp <grapp01-- ATAT --mail.dfas.msd.eds.com>, advocacy-- ATAT --perl.org,  pyguy-- ATAT --prescod.net
+Tim Bunce <Tim.Bunce-- ATAT --ig.co.uk>, advocacy-- ATAT --perl.org
+Tim Bunce <Tim.Bunce-- ATAT --pobox.com>
+Tim Bunce <Tim.Bunce-- ATAT --pobox.com>, Selena Sol <selena-- ATAT --eXtropia.com>, advocacy-- ATAT --perl.org
+Tim.Bunce-- ATAT --ig.co.uk
+Tim.Bunce-- ATAT --ig.co.uk (Tim Bunce)
+Tim.Bunce-- ATAT --ig.co.uk, dagon-- ATAT --dagon.net, advocacy-- ATAT --perl.org, paul-- ATAT --prescod.net
+Tim.Bunce-- ATAT --pobox.com (Tim Bunce)
+Tom Christiansen <tchrist-- ATAT --chthon.perl.com>
+Tom Christiansen <tchrist-- ATAT --chthon.perl.com>, Ben_Tilly-- ATAT --trepp.com,  "David H. Adler" <dha-- ATAT --panix.com>, advocacy-- ATAT --perl.org,	perl5-porters-- ATAT --perl.org
+Tom Christiansen <tchrist-- ATAT --chthon.perl.com>, Ben_Tilly-- ATAT --trepp.com, "David H. Adler" <dha-- ATAT --panix.com>, advocacy-- ATAT --perl.org, perl5-porters-- ATAT --perl.org
+Tom.Horsley-- ATAT --ccur.com (Horsley Tom)
+Tommy Butler <tommy-- ATAT --atrixnet.com>
+Troy Denkinger <troy-- ATAT --whadda.com>
+Troy Denkinger <troy-- ATAT --whadda.com>, advocacy-- ATAT --perl.org
+Tushar Samant <D-- ATAT --i-works.com>
+Tushar Samant <tushar-- ATAT --i-works.com>
+Tushar Samant <tushar-- ATAT --i-works.com>, advocacy-- ATAT --perl.org
+Tzadik Vanderhoof <Tzadik.Vanderhoof-- ATAT --THINQ.com>
+Tzadik Vanderhoof <Tzadik.Vanderhoof-- ATAT --THINQ.com>, "'Gabor Szabo'" <gabor-- ATAT --tracert.com>, <advocacy-- ATAT --perl.org>
+Tzadik and Sheva Vanderhoof <stvhoof-- ATAT --nni.com>
+Tzadik.Vanderhoof-- ATAT --THINQ.com (Tzadik Vanderhoof)
+Uri Guttman <uri-- ATAT --stemsystems.com>
+Uri Guttman <uri-- ATAT --stemsystems.com>, advocacy-- ATAT --perl.org
+Uri Guttman <uri-- ATAT --sysarch.com>
+Uri Guttman <uri-- ATAT --sysarch.com>, advocacy-- ATAT --perl.org
+Uri Guttman <uri-- ATAT --sysarch.com>, daniel-- ATAT --chetlin.com, lembark-- ATAT --wrkhors.com
+Vicki Brown <vlb-- ATAT --cfcl.com>
+WPham-- ATAT --camico.com (Walter Pham)
+WWW <essenz-- ATAT --essenz.com>
+Wagner-David-- ATAT --vikingfreight.com (Wagner-David)
+Wayne Haufler <whaufler-- ATAT --MIGRATEC.COM>
+WeaverC-- ATAT --Cardiff.ac.uk (Colin Weaver)
+Wiggins d'Anconia <wiggins-- ATAT --danconia.org>
+William R Ward <bill-- ATAT --wards.net>
+William R Ward <bill-- ATAT --wards.net>, advocacy-- ATAT --perl.org
+_brian_d_foy <comdog-- ATAT --panix.com>
+_brian_d_foy <comdog-- ATAT --panix.com>, Lisa Nyman <lnyman-- ATAT --info.census.gov>
+_brian_d_foy <comdog-- ATAT --panix.com>, advocacy-- ATAT --perl.org
+abigail-- ATAT --abigail.nl
+abigail-- ATAT --abigail.nl (Abigail)
+abigail-- ATAT --foad.org
+abigail-- ATAT --foad.org (Abigail)
+abigail-- ATAT --foad.org, "Clinton A. Pierce" <clintp-- ATAT --geeksalad.org>, madeline-- ATAT --oreilly.com, advocacy-- ATAT --perl.org
+abigail-- ATAT --foad.org, Elaine -HFB- Ashton <elaine-- ATAT --chaos.wustl.edu>, "Clinton A. Pierce" <clintp-- ATAT --geeksalad.org>, madeline-- ATAT --oreilly.com, advocacy-- ATAT --perl.org
+abigail-- ATAT --foad.org, Nathan Torkington <gnat-- ATAT --frii.com>
+abigail-- ATAT --foad.org, advocacy-- ATAT --perl.org
+abigail-- ATAT --ucan.foad.org (Abigail)
+abw-- ATAT --cre.canon.co.uk (Andy Wardley)
+abw-- ATAT --kfs.org (Andy Wardley)
+acme-- ATAT --astray.com (Leon Brocard)
+adam.turoff-- ATAT --isinet.com
+adam.turoff-- ATAT --isinet.com (Adam Turoff)
+advocacy <advocacy-- ATAT --perl.org>
+advocacy-- ATAT --perl.org
+advocacy-- ATAT --perl.org, "Scott R. Godin" <webmaster-- ATAT --webdragon.net>
+advocacy-- ATAT --perl.org, "Vanderhoof, Tzadik" <tvanderhoof-- ATAT --syscom-inc.com>
+advocacy-- ATAT --perl.org, 6jrwvn6d02-- ATAT --sneakemail.com
+advocacy-- ATAT --perl.org, Chris Nandor <pudge-- ATAT --pobox.com>
+advocacy-- ATAT --perl.org, Jon Orwant <orwant-- ATAT --oreilly.com>
+advocacy-- ATAT --perl.org, Jon Udell <udell-- ATAT --monad.net>
+advocacy-- ATAT --perl.org, Kai Henningsen <kaih-- ATAT --khms.westfalen.de>
+advocacy-- ATAT --perl.org, Kai Henningsen <kaih-- ATAT --khms.westfalen.de>, perl6-language-- ATAT --perl.org
+advocacy-- ATAT --perl.org, Otto Wyss <otto.wyss-- ATAT --bluewin.ch>
+advocacy-- ATAT --perl.org, Paul Prescod <paul-- ATAT --prescod.net>
+advocacy-- ATAT --perl.org, Rusty Foster <rusty-- ATAT --intes.net>
+advocacy-- ATAT --perl.org, Stas Bekman <stas-- ATAT --stason.org>, Ian Kallen <spidaman-- ATAT --arachna.com>
+advocacy-- ATAT --perl.org, _brian_d_foy <comdog-- ATAT --panix.com>,  Lisa Nyman <lnyman-- ATAT --info.census.gov>
+advocacy-- ATAT --perl.org, abigail-- ATAT --foad.net
+advocacy-- ATAT --perl.org, ace-- ATAT --tidbits.com
+advocacy-- ATAT --perl.org, autarch-- ATAT --urth.org (Dave Rolsky)
+advocacy-- ATAT --perl.org, betsy-- ATAT --oreilly.com
+advocacy-- ATAT --perl.org, boston-pm-- ATAT --hfb.pm.org
+advocacy-- ATAT --perl.org, brian-- ATAT --smithrenaud.com
+advocacy-- ATAT --perl.org, colin_richard_weaver-- ATAT --hotmail.com
+advocacy-- ATAT --perl.org, daniel-- ATAT --chetlin.com, lembark-- ATAT --wrkhors.com
+advocacy-- ATAT --perl.org, dbi-users-- ATAT --perl.org
+advocacy-- ATAT --perl.org, dickh-- ATAT --activestate.com
+advocacy-- ATAT --perl.org, fwp-- ATAT --technofile.org
+advocacy-- ATAT --perl.org, gnat-- ATAT --frii.com, brian-- ATAT --smithrenaud.com
+advocacy-- ATAT --perl.org, jesse-- ATAT --VM.COM (Jesse Erlbaum)
+advocacy-- ATAT --perl.org, jobs-discuss-- ATAT --perl.org
+advocacy-- ATAT --perl.org, madeline-- ATAT --oreilly.com, betsy-- ATAT --oreilly.com
+advocacy-- ATAT --perl.org, marsneedswomen-- ATAT --happyfunball.pm.org
+advocacy-- ATAT --perl.org, marsneedswomen-- ATAT --happyfunball.pm.org, perl-hackers-- ATAT --stlouis.pm.org
+advocacy-- ATAT --perl.org, marsneedswomen-- ATAT --hfb.pm.org
+advocacy-- ATAT --perl.org, merlyn-- ATAT --stonehenge.com
+advocacy-- ATAT --perl.org, paul-- ATAT --prescod.net
+advocacy-- ATAT --perl.org, perl-mongers-general-- ATAT --pm.org
+advocacy-- ATAT --perl.org, perl5-porters-- ATAT --perl.org
+advocacy-- ATAT --perl.org, perl6-meta-- ATAT --perl.org
+advocacy-- ATAT --perl.org, pudge-- ATAT --pobox.com
+advocacy-- ATAT --perl.org, pyguy-- ATAT --prescod.net
+advocacy-- ATAT --perl.org, sara-- ATAT --oreilly.com, betsy-- ATAT --oreilly.com, kevin-- ATAT --oreilly.com
+advocacy-- ATAT --perl.org, shlomif-- ATAT --vipe.technion.ac.il (Shlomi Fish)
+advocacy-- ATAT --perl.org, submissions-- ATAT --perlmongers.org
+advocacy-- ATAT --perl.org, tchrist-- ATAT --perl.com
+advocacy-- ATAT --perl.org, twilde-- ATAT --dyndns.org
+advocacy-- ATAT --perl.org, webmaster-- ATAT --webdragon.net (Scott R. Godin)
+advocacy-- ATAT --perl.org,Chris Nandor <pudge-- ATAT --pobox.com>
+ajit-- ATAT --pobox.com (Ajit Deshpande)
+ajit-- ATAT --skycorp.net (Ajit Deshpande)
+ajit-- ATAT --skycorp.net, advocacy-- ATAT --perl.org, pudge-- ATAT --pobox.com
+ajsavige-- ATAT --yahoo.com.au (=?Iso-8859-1?Q?Andrew=20savige?=)
+alan-- ATAT --clueserver.org (Alan Olsen)
+aml-- ATAT --world.std.com (Andrew M. Langmead)
+andrew-- ATAT --sweger.net (Andrew Sweger)
+andrew-- ATAT --zpok.demon.co.uk (Andrew Simmons)
+andy-- ATAT --petdance.com (Andy Lester)
+angela-- ATAT --racsystem.com
+ashton-- ATAT --netcom.com (Ashub)
+ask-- ATAT --develooper.com (Ask Bjoern Hansen)
+ask-- ATAT --netcetera.dk
+ask-- ATAT --netcetera.dk (Ask Bjoern Hansen)
+ask-- ATAT --perl.org
+ask-- ATAT --perl.org (Ask Bjoern Hansen)
+ask-- ATAT --perl.org, <jobs-discuss-- ATAT --perl.org>, <advocacy-- ATAT --perl.org>
+ask-- ATAT --valueclick.com (Ask Bjoern Hansen)
+autarch-- ATAT --urth.org (Dave Rolsky)
+bah-- ATAT --ecnvantage.com (Benjamin Holzman)
+bah-- ATAT --orientation.com (Benjamin Holzman)
+bcamer1-- ATAT --hotmail.com (Bonnie M. Cameron)
+bdoucette-- ATAT --ixl.com
+bdoucette-- ATAT --ixl.com, advocacy-- ATAT --perl.org, gnat-- ATAT --frii.com, brian-- ATAT --smithrenaud.com
+betsy-- ATAT --oreilly.com
+betsy-- ATAT --oreilly.com (Betsy Waliszewski)
+betsy-- ATAT --oreilly.com, jdporter-- ATAT --min.net, advocacy-- ATAT --perl.org
+betsy-- ATAT --oreilly.com, madeline-- ATAT --oreilly.com
+bhilton-- ATAT --adc.com (Brand Hilton)
+bholzman-- ATAT --longitude.com (Benjamin Holzman)
+bill-- ATAT --fccj.org (Bill Jones)
+bill-- ATAT --wards.net (William R. Ward)
+bkuhn-- ATAT --ebb.org
+bkuhn-- ATAT --ebb.org (Bradley M. Kuhn)
+blowther-- ATAT --micron.com (Blowther)
+bodyshock911-- ATAT --hotmail.com (Calvin Lee)
+bogus-- ATAT --nntp.perl.org (Unknown Sender)
+brent-- ATAT --perl.org
+brent-- ATAT --perlguy.net (Brent Michalski)
+brian d foy <brian-- ATAT --smithrenaud.com>
+brian d foy <tidbit-- ATAT --sri.net>
+brian d foy <tidbit-- ATAT --sri.net>, advocacy-- ATAT --perl.org
+brian d foy <tidbit-- ATAT --sri.net>,advocacy-- ATAT --perl.org
+brian-- ATAT --smithrenaud.com
+brian-- ATAT --sri.net (Brian D Foy)
+bschulte-- ATAT --zeelandnet.nl (Bas A . Schulte)
+bschulte-- ATAT --zeelandnet.nl (Bas A. Schulte)
+burston-- ATAT --ledge.co.za (Ashley Burston)
+bwarnock-- ATAT --capita.com (Bryan C. Warnock)
+bwarnock-- ATAT --capita.com, advocacy-- ATAT --perl.org
+casey-- ATAT --geeknest.com (Casey West)
+casey-- ATAT --geeknest.com, advocacy-- ATAT --perl.org
+cdevers-- ATAT --boston.com (Chris Devers)
+cdevers-- ATAT --cis.usouthal.edu (Chris Devers)
+cdevers-- ATAT --pobox.com (Chris Devers)
+cdevers-- ATAT --tsunami.cis.usouthal.edu (Chris Devers)
+charlie_mumps-- ATAT --bangkok.com (Charles Volkstorf)
+chbarr-- ATAT --rocketmail.com (Charles Barilleaux)
+chichengzhang-- ATAT --home.com (Chicheng Zhang)
+chip-- ATAT --pobox.com (Chip Salzenberg)
+chip-- ATAT --valinux.com
+chip-- ATAT --valinux.com (Chip Salzenberg)
+chip-- ATAT --valinux.com, larry-- ATAT --wall.org, tidbit-- ATAT --sri.net, advocacy-- ATAT --perl.org
+chris-- ATAT --cwinters.com (Chris Winters)
+chris-- ATAT --devers.homeip.net (Chris Devers)
+chris-- ATAT --masto.com (Christopher Masto)
+chris-- ATAT --netmonger.net (Christopher Masto)
+chris_hill-- ATAT --mentorg.com (Chris Hill)
+chrisb-- ATAT --jesmond.demon.co.uk (Chris Benson)
+chrisl_ak-- ATAT --hotmail.com (Chris)
+chromatic <chromatic-- ATAT --wgz.org>
+chromatic-- ATAT --wgz.org (Chromatic)
+clintp-- ATAT --geeksalad.org (Clinton A . Pierce)
+clintp-- ATAT --geeksalad.org (Clinton A. Pierce)
+colin_richard_weaver-- ATAT --hotmail.com
+comdog-- ATAT --panix.com (Brian D Foy)
+comdog-- ATAT --panix.com (_brian_d_foy)
+cp-- ATAT --onsitetech.com (Curtis Poe)
+cwanta-- ATAT --dra.com (Christine Wanta)
+cwinters-- ATAT --intes.net (Chris Winters)
+dagon-- ATAT --dagon.net (Mark Rafn)
+dagon-- ATAT --dagon.net, advocacy-- ATAT --perl.org, paul-- ATAT --prescod.net
+dale-- ATAT --oreilly.com (Dale Dougherty)
+damian-- ATAT --conway.org (Damian)
+damian-- ATAT --conway.org, Phil.Moore-- ATAT --morganstanley.com, jobs-discuss-- ATAT --perl.org, advocacy-- ATAT --perl.org
+dan-- ATAT --brians.org (Dan Brian)
+dan-- ATAT --sidhe.org (Dan Sugalski)
+daniel-- ATAT --chetlin.com
+daniel-- ATAT --chetlin.com (Daniel Chetlin)
+daniel-- ATAT --chetlin.com, advocacy-- ATAT --perl.org
+dave-- ATAT --dave.org.uk (Dave Cross)
+david-- ATAT --kineticode.com (David Wheeler)
+david-- ATAT --wheeler.net (David Wheeler)
+david.cross-- ATAT --uk.fid-intl.com (David Cross)
+dbi-users-- ATAT --perl.org, advocacy-- ATAT --perl.org
+dean-- ATAT --oven.com
+dha-- ATAT --panix.com (David H. Adler)
+dha-- ATAT --panix.com, Ben_Tilly-- ATAT --trepp.com, pudge-- ATAT --pobox.com, advocacy-- ATAT --perl.org, perl5-porters-- ATAT --perl.org
+dickh-- ATAT --activestate.com
+dkt-- ATAT --registriesltd.com.au (David K. Trudgett)
+dlists-- ATAT --inbed.org (Dragons Spam Account)
+dsautereau-- ATAT --magic.fr (Damien Sautereau)
+dsilvia-- ATAT --ptc.com (Donald J Silvia)
+duff-- ATAT --cbi.tamucc.edu (Jonathan Scott Duff)
+duff-- ATAT --pobox.com
+duff-- ATAT --pobox.com, "Bas A. Schulte" <bschulte-- ATAT --zeelandnet.nl>
+elaine-- ATAT --chaos.wustl.edu
+elaine-- ATAT --chaos.wustl.edu (Elaine -Hfb- Ashton)
+elaine-- ATAT --chaos.wustl.edu (Elaine)
+elaine-- ATAT --chaos.wustl.edu, larry-- ATAT --wall.org, orwant-- ATAT --media.mit.edu, chip-- ATAT --valinux.com, tidbit-- ATAT --sri.net, advocacy-- ATAT --perl.org
+elaine-- ATAT --chaos.wustl.edu, larry-- ATAT --wall.org, tidbit-- ATAT --sri.net, advocacy-- ATAT --perl.org
+elfner-- ATAT --us.ibm.com
+essenz-- ATAT --beck.quonix.net (John Von Essen)
+essenz-- ATAT --essenz.com (Www)
+frowies-- ATAT --sfanet.com.ar (Fernando Rowies)
+fschmuck-- ATAT --lcch.org (Frank Schmuck)
+fsl-- ATAT --centroin.com.br (Fernando Lozano)
+fwp-- ATAT --perl.org, jobs-discuss-- ATAT --perl.org, advocacy-- ATAT --perl.org
+fwp-- ATAT --technofile.org, advocacy-- ATAT --perl.org
+fwp-- ATAT --technofile.org,advocacy-- ATAT --perl.org
+gabor-- ATAT --perl.org.il (Gabor Szabo)
+gabor-- ATAT --tracert.com (Gabor Szabo)
+gavin-- ATAT --bock.com (Gavin Estey)
+gcrowder-- ATAT --sonic.net (Greg Crowder)
+gnat-- ATAT --frii.com (Nathan Torkington)
+gnat-- ATAT --oreilly.com
+gnat-- ATAT --oreilly.com (Nathan Torkington)
+gnat-- ATAT --oreilly.com, advocacy-- ATAT --perl.org
+grapp01-- ATAT --mail.dfas.msd.eds.com (George Rapp)
+gwadej-- ATAT --anomaly.org (G . Wade Johnson)
+gwadej-- ATAT --anomaly.org (G. Wade Johnson)
+hasant-- ATAT --trabas.com (Hasanuddin Tamir)
+henning.nielsen-- ATAT --datagraf.dk (=?Iso-8859-1?Q?Henning_m=F8ller-Nielsen?=)
+henrypan-- ATAT --lucent.com (Henry ** Ctr ** Pan)
+hermit-- ATAT --BayView.COM (William R. Ward)
+hmn-- ATAT --datagraf.dk (=?Us-Ascii?Q?Henning_michael_moller-Nielsen?=)
+holm0440-- ATAT --tc.umn.edu (Ben Holmberg)
+info-- ATAT --pressio.com (Pressio Main)
+j.schroeder-- ATAT --rockwelldatacorp.com (J Schroeder)
+jadams01-- ATAT --sprynet.com
+jadams01-- ATAT --sprynet.com (John Adams)
+jadams01-- ATAT --sprynet.com, Chris Benson <chrisb-- ATAT --jesmond.demon.co.uk>, advocacy-- ATAT --perl.org
+jadams01-- ATAT --sprynet.com, advocacy-- ATAT --perl.org
+jand-- ATAT --ActiveState.com (Jan Dubois)
+jboes-- ATAT --nexcerpt.com (Jeff Boes)
+jdporter-- ATAT --min.net (John Porter)
+jeff-- ATAT --yoak.com
+jeff-- ATAT --yoak.com (Jeff Yoak)
+jesse-- ATAT --VM.COM (Jesse Erlbaum)
+jgsmith-- ATAT --moya.tamu.edu (Jim Smith)
+jkeeble-- ATAT --alpha.net.au (Jon Keeble)
+jlawrenc-- ATAT --infonium.com (Jay Lawrence)
+jmay-- ATAT --pobox.com
+jmay-- ATAT --pobox.com (Jason W. May)
+jmay-- ATAT --pobox.com, perl-advocacy <advocacy-- ATAT --perl.org>
+jmm-- ATAT --elegant.com, jhi-- ATAT --iki.fi, tchrist-- ATAT --mox.perl.com
+jns-- ATAT --btinternet.com (Jonathan Stowe)
+jns-- ATAT --gellyfish.com
+jns-- ATAT --gellyfish.com (Jonathan Stowe)
+jobs-discuss-- ATAT --perl.org, advocacy-- ATAT --perl.org
+jobs-discuss-- ATAT --perl.org, advocacy-- ATAT --perl.org, Damian Conway <damian-- ATAT --conway.org>, administrator-- ATAT --yetanother.org
+joel-- ATAT --qlcomm.com (Joel Divekar)
+john-- ATAT --essenz.com (John Von Essen)
+johnathan-- ATAT --gnuthought.com (Johnathan Kupferer)
+jon-- ATAT --orwant.com
+joseph-- ATAT --5sigma.com
+joseph-- ATAT --5sigma.com (Joseph N. Hall)
+jvromans-- ATAT --squirrel.nl (Johan Vromans)
+jzawodn-- ATAT --yahoo-inc.com (Jeremy Zawodny)
+kaasiein-- ATAT --yahoo.co.in (=?Iso-8859-1?Q?Kasi=20rama?=)
+kalim-- ATAT --erols.com (Asj)
+kalim-- ATAT --erols.com (Kalim)
+kcarlson-- ATAT --tpj.comadvocacy-- ATAT --perl.org
+kevin-- ATAT --oreilly.com (Kevin Bingham)
+kevin.weeks-- ATAT --coriolis.com (Kevin Weeks)
+kimaryan-- ATAT --ozemail.com.au
+kimaryan-- ATAT --ozemail.com.au (Kim Ryan)
+kimaryan-- ATAT --ozemail.com.au, advocacy-- ATAT --perl.org
+krissrolo-- ATAT --aol.com (Kriss Rolo)
+kstar-- ATAT --chapin.edu (Kurt D. Starsinic)
+kstar-- ATAT --cpan.org
+kstar-- ATAT --cpan.org (Kurt Starsinic)
+kstar-- ATAT --wolfetech.com (Kurt D. Starsinic)
+lalamaziwa-- ATAT --jca.apc.org (Lalamaziwa)
+larry-- ATAT --wall.org
+larry-- ATAT --wall.org (Larry Wall)
+lejm3-- ATAT --hermes.cam.ac.uk (Lucy McWilliam)
+lembark-- ATAT --wrkhors.com
+lembark-- ATAT --wrkhors.com (Steven Lembark)
+lembark-- ATAT --wrkhors.com, advocacy-- ATAT --perl.org
+liz-- ATAT --dijkmat.nl (Elizabeth Mattijsen)
+liza-- ATAT --publicinteractive.com (Liza Daly)
+lmui-- ATAT --oreilly.com, paula-- ATAT --oreilly.com
+lnyman-- ATAT --census.gov (Lisa Nyman)
+lnyman-- ATAT --info.census.gov (Lisa Nyman)
+london.pm-- ATAT --bang.meep.org (The Hatter)
+lori.pike-- ATAT --sophos.com (Lori Pike)
+lorip-- ATAT --ActiveState.com
+lorip-- ATAT --ActiveState.com (Lori Pike)
+madcat-- ATAT --ghostfield.com (Bernhard Van Staveren)
+madeline-- ATAT --oreilly.com (Madeline Schnapp)
+madeline-- ATAT --oreilly.com, advocacy-- ATAT --perl.org
+madeline-- ATAT --oreilly.com, betsy-- ATAT --oreilly.com
+madeline-- ATAT --oreilly.com, pudge-- ATAT --pobox.com
+madeline-- ATAT --oreilly.com, pudge-- ATAT --pobox.com, advocacy-- ATAT --perl.org
+mailing_list-- ATAT --hostpacific.com (Kman)
+mark.keegan-- ATAT --paradise.net.nz (Mark Keegan)
+markj-- ATAT --oreilly.com (Mark Jacobsen)
+markm-- ATAT --nortelnetworks.com (Mark Mielke)
+marsneedswomen-- ATAT --happyfunball.pm.org, perl-hackers-- ATAT --stlouis.pm.org
+matt-- ATAT --sergeant.org (Matt Sergeant)
+meconlen-- ATAT --obfuscated.net (Michael Conlen)
+merlyn-- ATAT --stonehenge.com (Randal L. Schwartz), advocacy-- ATAT --perl.org, jesse-- ATAT --VM.COM (Jesse Erlbaum)
+mjd-- ATAT --plover.com
+mjd-- ATAT --plover.com (Mark-Jason Dominus)
+mjd-- ATAT --plover.com, grapp01-- ATAT --mail.dfas.msd.eds.com
+modperl list <modperl-- ATAT --apache.org>
+mohit-- ATAT --foc.demonhosting.co.uk (Mohit Agarwal)
+murrayb-- ATAT --VANSEL.ALCATEL.COM (Brad Murray)
+murrayb-- ATAT --vansel.alcatel.com (Brad Murray)
+newton-- ATAT --newton.digitalspace.net (Philip Newton)
+nextrightmove-- ATAT --yahoo.com (Greg Norris \)
+nick-- ATAT --ccl4.org (Nicholas Clark)
+nick-- ATAT --talking.bollo.cx (Nicholas Clark)
+nick-- ATAT --unfortu.net (Nicholas Clark)
+nom_du_pere-- ATAT --yahoo.com (Mike)
+ofischer-- ATAT --SPM.DE (Oliver Fischer)
+orwant-- ATAT --media.mit.edu
+orwant-- ATAT --media.mit.edu (Jon Orwant)
+orwant-- ATAT --media.mit.edu, larry-- ATAT --wall.org
+orwant-- ATAT --media.mit.edu, tidbit-- ATAT --sri.net, advocacy-- ATAT --perl.org
+orwant-- ATAT --oreilly.com (Jon Orwant)
+p.carmichael-- ATAT --btinternet.com (P Carmichael)
+p.carmichael-- ATAT --btinternet.com (Patrick Carmichael)
+p.carmichael-- ATAT --btinternet.com, advocacy-- ATAT --perl.org
+paul-- ATAT --breslaw.demon.co.uk (Paul Breslaw)
+paul-- ATAT --pjcj.net (Paul Johnson)
+paul-- ATAT --prescod.net (Paul Prescod)
+pcarter150-- ATAT --comcast.net (Pamela Carter)
+pdcawley-- ATAT --bofh.org.uk
+pdcawley-- ATAT --bofh.org.uk (Piers Cawley)
+perl-advocacy <advocacy-- ATAT --perl.org>
+perl-advocacy <advocacy-- ATAT --perl.org>, Jonathan Stowe <jns-- ATAT --gellyfish.com>
+perl5-porters-- ATAT --perl.org
+perl5-porters-- ATAT --perl.org, Abigail <abigail-- ATAT --foad.org>
+perl5-porters-- ATAT --perl.org, advocacy-- ATAT --perl.org
+perl6-language-- ATAT --perl.org
+perl6-meta-- ATAT --perl.org, advocacy-- ATAT --perl.org
+perlhead-- ATAT --hotmail.com (Arron Hart)
+pete-- ATAT --petes-place.com
+pete-- ATAT --petes-place.com (David Grove)
+pete-- ATAT --petes-place.com (David T. Grove)
+peter-- ATAT --PSDT.com (Peter Scott)
+peter-- ATAT --psdt.com (Peter Scott)
+pressio main <info-- ATAT --pressio.com>
+pressio main <info-- ATAT --pressio.com>, advocacy-- ATAT --perl.org
+pressio-- ATAT --pressio.com (Pressio Main Email)
+pudge-- ATAT --pobox.com
+pudge-- ATAT --pobox.com (Chris Nandor)
+pudge-- ATAT --pobox.com, advocacy-- ATAT --perl.org, perl5-porters-- ATAT --perl.org
+pyguy-- ATAT --prescod.net
+rbowen-- ATAT --rcbowen.com (Rich Bowen)
+rclang-- ATAT --lewan.com (Rodney Clang)
+rdm-- ATAT --cfcl.com
+rdm-- ATAT --cfcl.com (Rich Morin)
+rice.audio-- ATAT --pobox.com (Robert Carl Rice)
+riceaudio-- ATAT --earthlink.net (Robert Rice)
+richard.foley-- ATAT --ubs.com (Richard Foley)
+richard.foley-- ATAT --ubs.com, advocacy-- ATAT --perl.org
+richly-- ATAT --samart.co.th (Robert White)
+rjk-- ATAT --linguist.dartmouth.edu (Ronald J Kimball)
+rjray-- ATAT --redhat.com (Randy J. Ray)
+rlmcdo-- ATAT --netcabo.pt (Ricardo Oliveira)
+robert-- ATAT --bangkokwizard.com (Robert)
+robert-- ATAT --richlybangkok.com (Robert)
+rodney.clang-- ATAT --lewan.com (Rodney Clang)
+roland.giersig-- ATAT --alcatel.at (Roland Giersig)
+sam_metu002-- ATAT --email.com (Sam Metu002)
+sara-- ATAT --oreilly.com, betsy-- ATAT --oreilly.com, kevin-- ATAT --oreilly.com
+sarah-- ATAT --pound.perl.org (Sarah Burcham)
+schwern-- ATAT --pobox.com
+schwern-- ATAT --pobox.com (Michael G Schwern)
+selena-- ATAT --eXtropia.com (Selena Sol)
+sfink-- ATAT --digital-integrity.com (Steve Fink)
+shildreth-- ATAT --emsphone.com (Scott T. Hildreth)
+shlomif-- ATAT --iglu.org.il (Shlomi Fish)
+shlomif-- ATAT --vipe.technion.ac.il (Shlomi Fish)
+shugal-- ATAT --gmx.de (Martin Stricker)
+silver-- ATAT --oreilly.com (Ellen Maremont Silver)
+simon-- ATAT --cozens.net (Simon Cozens)
+simon-- ATAT --netthink.co.uk (Simon Cozens)
+skud-- ATAT --infotrope.net (Kirrily "Skud" Robert)
+skud-- ATAT --netizen.com.au
+skud-- ATAT --netizen.com.au, advocacy-- ATAT --perl.org
+smalhotr-- ATAT --jwmp.com (Sidharth Malhotra)
+sml-- ATAT --zfx.com (Steve Lane)
+sneex-- ATAT --sneex.fccj.org (Systems Hacker)
+solrac-- ATAT --us.ibm.com (Frank Carlos)
+spm-- ATAT --star.arm.ac.uk (Scott Manley)
+spoon-- ATAT --cpan.org (Iain Truskett)
+squid-- ATAT --panix.com (Yeoh Yiu)
+stas-- ATAT --stason.org (Stas Bekman)
+stephenc-- ATAT --theiqgroup.com (Stephen Clouse)
+stvhoof-- ATAT --nni.com (Tzadik And Sheva Vanderhoof)
+submissions-- ATAT --perlmongers.org
+swamiv-- ATAT --granitar.com (Swami Venkataramanan)
+tadmc-- ATAT --augustmail.com (Tad McClellan)
+tadmc-- ATAT --metronet.com
+talbutt-- ATAT --seas.upenn.edu, skud-- ATAT --infotrope.net
+tchrist-- ATAT --chthon.perl.com (Tom Christiansen)
+tidbit-- ATAT --sri.net
+tidbit-- ATAT --sri.net (Brian D Foy)
+tidbit-- ATAT --sri.net, advocacy-- ATAT --perl.org
+tim_meadowcroft-- ATAT --westlb.co.uk
+tim_meadowcroft-- ATAT --westlb.co.uk (Tim Meadowcroft)
+tim_meadowcroft-- ATAT --westlb.co.uk, advocacy-- ATAT --perl.org
+tim_meadowcroft-- ATAT --westlb.co.uk, pete-- ATAT --petes-place.com
+tommy-- ATAT --atrixnet.com (Tommy Butler)
+troy-- ATAT --whadda.com (Troy Denkinger)
+turnerjh-- ATAT --pattern.net (Chip Turner)
+tushar-- ATAT --i-works.com (Tushar Samant)
+tvanderhoof-- ATAT --syscom-inc.com (Tzadik Vanderhoof)
+tvanderhoof-- ATAT --trainingserver.com (Tzadik Vanderhoof)
+uri-- ATAT --stemsystems.com (Uri Guttman)
+uri-- ATAT --sysarch.com (Uri Guttman)
+vlb-- ATAT --cfcl.com
+vlb-- ATAT --cfcl.com (Vicki Brown)
+vlb-- ATAT --cfcl.com, advocacy-- ATAT --perl.org
+waltman-- ATAT --pobox.com (Walt Mankowski)
+webmaster-- ATAT --tpj.com
+webmaster-- ATAT --webdragon.net (Scott R. Godin)
+whaufler-- ATAT --MIGRATEC.COM (Wayne Haufler)
+wiggins-- ATAT --danconia.org
+wiggins-- ATAT --danconia.org (Wiggins D'Anconia)
+will-- ATAT --coleda.com
+wpm-- ATAT --ms.com (W. Phillip Moore)
+wwv-- ATAT --mac.com (Ward Vuillemot)
+wwv-- ATAT --mac.com (Ward W. Vuillemot)
+xmtj-- ATAT --rims.com (Mark T. Johns)
+z153iq-- ATAT --yahoo.com (Zach I.)
+ziggy-- ATAT --panix.com (Adam Turoff)

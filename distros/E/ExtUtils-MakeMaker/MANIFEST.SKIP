@@ -1,0 +1,36 @@
+# THIS IS NOT THE REAL MANIFEST.SKIP FILE!!!!
+#
+# There is a default MANIFEST.SKIP file which ExtUtils::Manifest
+# uses and gets installed.  This is not it.  This is the normal
+# MANIFEST.SKIP that governs a distribution and should not be
+# installed.
+#
+# The default MANIFEST.SKIP file comes with the ExtUtils-Manifest
+# distribution.
+
+#!include_default
+
+
+\.ppd$
+t/lib/File/
+t/Big-Dummy/
+t/Problem-Module/
+t/dummy-install/
+MANIFEST.perl$
+merge_bleadperl$
+inc/
+
+\.patch$
+
+^ExtUtils-MakeMaker
+\.gz$
+
+\.orig$
+\.rej$
+
+^website
+^old_versions
+
+admin
+.gitignore
+.travis.yml

@@ -1,0 +1,79 @@
+use strict;
+use Config;
+use ExtUtils::MakeMaker;
+use lib qw(./lib);
+use ExtUtils::Embed;
+
+(my $name = shift) =~ s/\.c$//;
+my $makefile = shift || "Makefile";
+my $libperl = shift || ""; #might be -lperlm, etc.
+
+my $ldopts = ldopts "-std", $Config{static_exts}, [$libperl];
+
+WriteMakefile(
+    NORECURS => 1,
+    NAME => $name,
+    MAKEFILE => $makefile,	      
+    macro => {
+	LDOPTS => "$ldopts",
+    },
+    OBJECT => '$(NAME).$(OBJ_EXT) perlxsi.$(OBJ_EXT)',	      
+    clean => { FILES => "$name $name.o perlxsi.c perlxsi.o" },
+);
+
+package MY;
+
+#remove Makefile.PL dependency, since there isn't one!
+sub MY::makefile {
+    my $self = shift;
+    my $string = $self->MM::makefile;
+    $string =~ s/(Makefile.*:\s+)Makefile.PL(.*)/$1$2/s;
+    return $string;
+}
+
+sub MY::top_targets {
+    my $self = shift;
+    my $ret = $self->MM::top_targets;
+    my $name = $self->{NAME};
+    $ret =~ s/(all\s+::\s+)(.*)/$1 \$(NAME)/g;
+
+    $ret .= <<'EOF';
+
+perlxsi.c :
+	$(FULLPERL) -MExtUtils::Embed -e xsinit
+
+EOF
+
+    if($^O eq "MSWin32") {
+	$ret .= <<'EOF';
+
+LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
+ advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib\
+ odbccp32.lib /nologo /subsystem:console /incremental:no\
+ /pdb:"$(NAME).pdb" /machine:I386 /out:"$(NAME).exe" 
+LINK32_OBJS= \
+        "$(NAME).obj" \
+	"perlxsi.obj" \
+	"$(PERL_ARCHLIB)\CORE\perl.lib"
+
+$(NAME) : $(DEF_FILE) $(LINK32_OBJS)
+    $(LD) @<<
+  $(LINK32_FLAGS) $(LINK32_OBJS)
+<<
+
+EOF
+    }
+    else {
+    
+    $ret .= <<'EOF';
+
+$(NAME) :	perlxsi.o $(NAME).o
+	   $(CC) -o $(NAME) $(NAME).o perlxsi.o $(CCFLAGS) $(LDOPTS)
+
+EOF
+ 
+#    print $_;
+    }
+
+    return $ret;
+}

@@ -1,0 +1,108 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with EntityModel::Entity
+at lib/EntityModel/Entity.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+EntityModel::Entity - entity definition for L<EntityModel>
+
+=head1 VERSION
+
+version 0.102
+
+=head1 SYNOPSIS
+
+See L<EntityModel>.
+
+=head1 DESCRIPTION
+
+See L<EntityModel>.
+
+=head1 METHODS
+
+=head2 new
+
+Creates a new entity with the given name.
+
+=head2 new
+
+Instantiates a new object.
+
+Takes the following parameters:
+
+=over 4
+
+=item * name - the name to apply to this entity
+
+=item * field - an arrayref defining the field structure, see L<EntityModel::Field/new> for
+more information on the expected format here.
+
+=item * primary - which field(s) to use as the primary key, as a string or arrayref
+
+=item * auto_primary (optional) - automatically create an appropriate
+primary key and sequence
+
+=item * type (optional) - type information, currently unused
+
+=back
+
+Returns the new instance
+
+For backwards-compatibility reasons, when called with a single parameter
+this will have the same effect as the L</new_from_name> method.
+Use of this interface is strongly discouraged in new code, since it is
+likely to be deprecated in the near future.
+
+=head2 new_field
+
+Helper method to create a new field.
+
+=head2 dependencies
+
+Report on the dependencies for this entity.
+
+Returns a list of L<EntityModel::Entity> instances required for this entity.
+
+=head2 matches
+
+Returns true if this entity has identical content to another L<EntityModel::Entity>.
+
+=head2 create_from_definition
+
+Create a new L<EntityModel::Entity> from the given definition (hashref).
+
+=head2 add_field
+
+Add a new field to this entity.
+
+=head2 field_by_name
+
+Returns the L<EntityModel::Field> matching the given name.
+
+Takes $name as a single parameter.
+
+Returns undef if not found.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<EntityModel::BaseClass>
+
+L<clone|EntityModel::BaseClass/clone>, L<sap|EntityModel::BaseClass/sap>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <cpan@entitymodel.com>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2008-2011. Licensed under the same terms as Perl itself.

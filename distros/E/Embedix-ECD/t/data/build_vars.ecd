@@ -1,0 +1,16 @@
+	<OPTION enable-bb-feature-autowidth>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Enable BB_FEATURE_AUTOWIDTH?
+		<HELP>
+		This feature enables the calculation of terminal and
+		column widths (for more and ls).
+		</HELP>
+		STATIC_SIZE=0
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=0
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_FEATURE_AUTOWIDTH=BB_FEATURE_AUTOWIDTH
+		</BUILD_VARS>
+	</OPTION>

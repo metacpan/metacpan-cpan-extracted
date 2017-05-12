@@ -1,0 +1,30 @@
+
+[-
+
+$r = shift ;
+$p = $r -> param ;
+
+-]
+
+r before 
+global: [+ $Embperl::TEST::r +] 
+lokal:  [+ $r +]
+
+p before 
+global: [+ $Embperl::TEST::p +] 
+lokal:  [+ $p +]
+
+[-
+
+$Embperl::TEST::r = $r ;
+$Embperl::TEST::p = $p ;
+
+-]
+
+r after 
+global: [+ $Embperl::TEST::r +] 
+lokal:  [+ $r +]
+
+p after
+global: [+ $Embperl::TEST::p +] 
+lokal:  [+ $p +]

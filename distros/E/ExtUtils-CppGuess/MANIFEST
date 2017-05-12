@@ -1,0 +1,19 @@
+Makefile.PL
+Changes
+MANIFEST			This list of files
+README
+META.json
+META.yml
+lib/ExtUtils/CppGuess.pm
+t/001_load.t
+t/010_module_build.t
+t/011_makemaker.t
+t/lib/TestUtils.pm
+t/module/Build.PL
+t/module/CppGuessTest.xs
+t/module/MANIFEST
+t/module/Makefile.PL
+t/module/lib/CppGuessTest.pm
+t/module/t/001_load.t
+t/module/t/002_base.t
+t/module/typemap

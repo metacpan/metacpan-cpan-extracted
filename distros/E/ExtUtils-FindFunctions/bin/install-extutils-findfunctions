@@ -1,0 +1,49 @@
+#!/usr/bin/perl
+use strict;
+use ExtUtils::FindFunctions;
+use File::Copy;
+use File::Path;
+use File::Spec;
+
+my $dir = shift || die "usage: install-extutils-findfunctions <target directory>\n";
+my $path = File::Spec->catdir($dir, 'ExtUtils');
+
+mkpath $path;
+copy $INC{'ExtUtils/FindFunctions.pm'} => $path;
+
+__END__
+
+=head1 NAME
+
+install-extutils-findfunctions - Install ExtUtils::FindFunctions in a directory
+
+=head1 SYNOPSIS
+
+    install-extutils-findfunctions <target directory>
+
+=head1 OPTIONS
+
+None
+
+=head1 DESCRIPTION
+
+Use this program to install C<ExtUtils::FindFunctions> in an embedded directory 
+of your distribution, the target directory need not to exist: 
+
+    install-extutils-findfunctions inc
+
+will copy the module in the F<inc/> directory, typically used by other embedded 
+modules such.
+
+=head1 AUTHOR
+
+SE<eacute>bastien Aperghis-Tramoni, C<< <sebastien at aperghis.net> >>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2006 SE<eacute>bastien Aperghis-Tramoni, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

@@ -1,0 +1,49 @@
+=head1 NAME
+
+Config_m - compile ActivePerl mdoules with MinGW
+
+=head1 SYNOPSIS
+
+  perl -MConfig_m Makefile.PL
+  dmake
+  dmake test
+  dmake install
+
+with CPAN.pm/CPANPLUS.pm
+
+  # put MinGW bin directory in the path
+  set PERL5OPT=-MConfig_m
+  cpanp
+
+=head1 DESCRIPTION
+
+This module is only useful at Makefile.PL invocation time. It modifies
+some %Config values allowing compilation of Perl XS modules with
+MinGW GCC.
+
+=head1 REQUIREMENTS
+
+=over 4
+
+=item * MinGW GCC 2.95.2-1
+
+or later versions; download from
+L<http://www.mingw.org/download.shtml>.
+
+=item * ActivePerl
+
+build 6xx or 8xx; download from
+L<http://www.activestate.com/Products/ActivePerl/>.
+
+=item * dmake
+
+download from
+L<http://search.cpan.org/dist/dmake/>.
+
+=back
+
+=head1 AUTHOR
+
+Mattia Barbon <mbarbon@cpan.org>
+
+=cut

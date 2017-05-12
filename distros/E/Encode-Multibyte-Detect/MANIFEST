@@ -1,0 +1,11 @@
+Changes
+Detect.xs
+Makefile.PL
+MANIFEST
+README
+lib/Encode/Multibyte/Detect.pm
+src/encode.c
+src/encode.h
+t/all.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

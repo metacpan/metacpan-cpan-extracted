@@ -1,0 +1,97 @@
+[!
+
+
+sub title     { $epreq -> gettext ('txt:setup_do_title')} 
+
+!]
+
+[$ sub show $]
+[-
+$r = shift ;
+$error = '' ;
+$nostop = 0 ;
+run_setup() ;
+-]
+
+<center>
+[$if $error $]
+
+<h2>[= err:setup_do =]</h2>
+<br>
+<font color=red>[+ $error +]</font>
+<br>
+
+[$else$]
+
+
+
+<h2><div id="endblockmsg">[=  txt:setup_do_start =]</div></h2>
+
+[$if !$nostop $]
+<p>[= txt:setup_do_no_cfg =]</p>
+[$endif$]
+
+<p>[= txt:setup_do_ip_hint =]
+
+[$if !$nostop $]
+[# + do { local $escmode = 0; _t('txt:setup_do_wait1', '<a href="/">', '</a>', '<a href="/setup/s.epl/wizconfig.pl">', '</a>') } + #]<br>
+[$endif$]
+<b>[= txt:setup_do_wait2 =]</b></p>
+
+
+[$if $r -> {textonly} $]
+
+<p><b>[= txt:setup_do_wait3 =]</b></p>
+
+[$else$]
+        <iframe src="/bin/logger.pl?noalert=1&endmsg=Setup&endregex=(Setup|Importslave|Exportslave) (beendet|stopped)&nostop=[+ $nostop +]&filter=(setup|importslave|exportslave)&lang=[+ $fdat{'preferredLanguage'} +]" width=800 height=250></iframe>
+
+[$endif$]
+[$endif$]
+<br>
+<br>
+
+
+</center>
+
+
+[$endsub$]
+
+[$ sub abort_button $]
+    [* my $r = shift ; *]
+    <input type="submit" name="-start" value="Zum Setup Menu" id="next_button"  class="cStandardButton">&nbsp;&nbsp;&nbsp;
+    [$if $r -> {aborturl} $]<input type="submit" name="-abort" value="Setup Beenden" class="cStandardButton">&nbsp;&nbsp;&nbsp;[$endif$]
+[$ endsub $]
+
+[$ sub prev_button $]
+    [* my $r = shift ; *]
+[$ endsub $]
+
+[$ sub next_button $]
+    [* my $r = shift ; *]
+[$ endsub $]
+
+
+[$ sub prevnext $]
+    [* my $r = shift ; *]
+    <div id="endblock" [$if !$error $]style="display:none"[$endif$]>
+    [- $r -> SUPER::prevnext -]
+    </div>
+[$ endsub $]
+
+
+[!
+
+sub run_setup
+	{
+	my $data   = $r -> {data} ;
+	my $action = $data -> {action} ;
+
+
+#
+#   add action herer
+#
+
+	
+	}		
+!]	

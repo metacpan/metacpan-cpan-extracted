@@ -1,0 +1,45 @@
+{
+   "abstract" : "website support for L<EntityModel>",
+   "author" : [
+      "Tom Molesworth <cpan@entitymodel.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300021, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "EntityModel-Web",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "EntityModel" : "0.017",
+            "HTTP::Date" : "0",
+            "URI" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-entitymodel-web at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=EntityModel-Web"
+      },
+      "homepage" : "http://search.cpan.org/dist/EntityModel-Web/"
+   },
+   "version" : "0.004"
+}
+

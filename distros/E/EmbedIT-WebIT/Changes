@@ -1,0 +1,9 @@
+Revision history for EmbedIT-WebIT
+
+1.6.3   2010-03-08
+        Fixed bug related to SOAP::WSDL
+1.6.2   2009-10-07
+        Fixed dependencies checking
+1.6.1   2009-10-05
+        First public release on CPAN
+

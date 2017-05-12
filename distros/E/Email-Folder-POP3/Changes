@@ -1,0 +1,18 @@
+1.015     2014-01-03 19:58:02 America/New_York
+          fix VERSION mismatch
+
+1.014     2013-08-05 18:31:12 America/New_York
+          repackage to update bugtracker and repo
+
+1.013     2007-11-07
+          documentation fix (thanks devogon)
+
+1.012     2007-03-22
+          packaging improvements
+
+1.011     2006-08-01
+          no code changes
+          meet some PEP coding style requirements
+
+1.01      2004-12-28
+          Original version donated by GomoR.

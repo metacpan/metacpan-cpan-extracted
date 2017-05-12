@@ -1,0 +1,27 @@
+"RekNr","Verdichting/Grootboekrekening","Debet","Credit"
+1,"Vaste Activa",,
+11,"Materiële vaste activa",,
+1100,"Inventaris en inrichting","1344,37",
+1101,"Afschrijving inv. & inr.",,"1716,07"
+1110,"Computers","13378,48",
+1111,"Afschrijving computers",,"12503,60"
+11,"Totaal Materiële vaste activa","503,18",
+1,"Totaal Vaste Activa","503,18",
+2,"Vlottende activa",,
+23,"Liquide middelen",,
+2320,"Postbank","10334,68",
+23,"Totaal Liquide middelen","10334,68",
+2,"Totaal Vlottende activa","10334,68",
+3,"Eigen vermogen",,
+31,"Kapitaal",,
+3100,"Kapitaal de heer/mevrouw",,"2443,18"
+31,"Totaal Kapitaal",,"2443,18"
+3,"Totaal Eigen vermogen",,"2443,18"
+4,"Vreemd vermogen",,
+42,"Belastingen & soc. lasten",,
+4200,"BTW Verkoop Hoog",,"1463,00"
+4220,"BTW Inkoop Hoog","148,13",
+42,"Totaal Belastingen & soc. lasten",,"1314,87"
+4,"Totaal Vreemd vermogen",,"1314,87"
+,"<< Winst >>",,"7079,81"
+,"TOTAAL Balans","10837,86","10837,86"

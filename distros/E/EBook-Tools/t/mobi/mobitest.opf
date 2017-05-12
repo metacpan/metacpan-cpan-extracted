@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE package PUBLIC "+//ISBN 0-9673008-1-9//DTD OEB 1.2 Package//EN" "http://openebook.org/dtds/oeb-1.2/oebpkg12.dtd">
+
+<package xmlns="http://openebook.org/namespaces/oeb-package/1.0/" unique-identifier="UID">
+  <metadata>
+    <dc-metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
+      <dc:Identifier id="UID" scheme="GUID">{28D17050-173C-11D5-9303-0010DA63A409}</dc:Identifier>
+      <dc:Identifier scheme="ISBN">0-9999-XXXX-1</dc:Identifier>
+      <dc:Identifier scheme="ISBN">0-9999-XXXX-2</dc:Identifier>
+      <dc:Title>A Noncompliant OPF Test Sample</dc:Title>
+      <dc:Creator file-as="Pobre, Zed 1" role="aut">Zed 1 Pobre</dc:Creator>
+      <dc:Subject BASICCode="COM000000">Computing, Internet</dc:Subject>
+      <dc:Subject>Secondary subject</dc:Subject>
+      <dc:Subject BASICCode="EDU000000">Education</dc:Subject>
+      <dc:Description>&lt;P&gt;Description line 1 — &lt;EM&gt;emphasized&lt;/EM&gt; &lt;/P&gt; &lt;P&gt;Description line 2 — &lt;STRONG&gt;a bold move &lt;/STRONG&gt;&lt;/P&gt;</dc:Description>
+      <dc:Publisher>CPAN</dc:Publisher>
+      <dc:Contributor file-as="Myself, Me" role="ann">Me Myself</dc:Contributor>
+      <dc:Contributor file-as="Himself, Him" role="ill">Him Himself</dc:Contributor>
+      <dc:Date>10/01/2008</dc:Date>
+      <dc:Date>11/1/2008</dc:Date>
+      <dc:Type>Testing Type</dc:Type>
+      <dc:Format>text/xml</dc:Format>
+      <dc:Language>en</dc:Language>
+    </dc-metadata>
+    <x-metadata>
+      <DefaultLookupKey>DLK</DefaultLookupKey>
+      <output encoding="utf-8" content-type="text/x-oeb1-document" flatten-dynamic-dir="yes">
+      </output>
+      <Adult>yes</Adult>
+      <DefaultLookupIndex>DLI</DefaultLookupIndex>
+      <DictionaryInLanguage>de-at</DictionaryInLanguage>
+      <DictionaryOutLanguage>es-ar</DictionaryOutLanguage>
+      <Review>&lt;P&gt;Review line 1 — &lt;EM&gt;emphasized&lt;/EM&gt;&lt;/P&gt; &lt;P&gt;Review line 2 — &lt;STRONG&gt;a bold move&lt;/STRONG&gt;&lt;/P&gt;</Review>
+      <SRP Currency="USD">1.23</SRP>
+      <Territory>Territory</Territory>
+    </x-metadata>
+  </metadata>
+  <manifest>
+    <item media-type="application/xhtml+xml" href="test.html" id="item-text"/>
+  </manifest>
+  <spine>
+    <itemref idref="item-text"/>
+  </spine>
+</package>

@@ -1,0 +1,20 @@
+# http://module-build.sourceforge.net/META-spec.html
+name:         Erlang-Port
+version:      0.04
+version_from: lib/Erlang/Port.pm
+installdirs:  site
+author:       YAMASHINA Hio <hio@cpan.org>
+abstract: Erlang External Port
+license: perl
+#requires:
+#build_requires:
+no_index:
+  directory:
+    - inc
+    - t
+
+distribution_type: module
+generated_by: ExtUtils::MY_Metafile version 0.07, EUMM-6.17.
+meta-spec:
+  version: 1.2
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html

@@ -1,0 +1,41 @@
+#footer_edge {
+	clear:both;
+	border-top			: 2px solid #A4DDDB;
+}
+#footer {
+	position			: relative;
+	clear				: both;
+	margin-left			: 25em;
+	margin-right		: 10em;
+	height				: 1em;
+	width				: 20em;
+}
+#footer a, #copyright {
+	font-size			: x-small;
+	vertical-align		: top;
+}
+#riken	{
+	position			: relative;
+	margin-left			: -25em;
+	float				: left;
+	left				: 0px;
+	width				: 25em;
+	bottom				: 0px;
+}
+#copyright {
+	position			: relative;
+	float				: left;
+	left				: 0px;
+}
+#back {
+	position			: relative;
+	margin-right		: -10em;
+	float				: right;
+	right				: 0px;
+	width				: 10em;
+	text-align			: right;
+}
+#back img {
+	height				: 13px;
+	vertical-align		: top;
+}

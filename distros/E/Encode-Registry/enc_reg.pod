@@ -1,0 +1,121 @@
+=head1 INTRODUCTION
+
+The main purpose of the encoding registry is to allow encoding conversion 
+information to be installed once and used anywhere. The encoding registry 
+consists of an XML file providing:
+
+=over 4
+
+=item Byte Encoding
+
+A byte encoding is a non-Unicode encoding which is mappable too or from Unicode. 
+It contains a reference to a defining mapping that relates that encoding to 
+Unicode.
+
+=item Unicode Encoding
+
+A natural understanding of Unicode is that there is only one Unicode encoding: 
+Unicode. But Unicode is a very large encoding, and it is common to have 
+processes that work on subsets of Unicode. It is these subsets that we define as 
+Unicode encodings. Thus, for example, an IPA subset of Unicode would be a 
+Unicode encoding, along with lower ASCII. Notice that the subsets can be 
+overlapping.
+
+A Unicode encoding is defined in terms of a set of characters or as the set of 
+characters covered by a specified mapping.
+
+=item Mappings
+
+Mappings can be used for different processes other than simply converting 
+between bytes and Unicode. Other examples of mapping processes are:
+
+=over 4
+
+=item transcription
+
+Transcription is the process of sounding the words of one language in the script 
+of another. This is the process used for multi-script languages.
+
+=item transliteration
+
+Transliteration is the process of spelling the letters of words in one script in 
+another. For example, Hebrew is often transliterated into Roman script so that 
+each character is uniquely identifiable in the Roman script rendering.
+
+=back
+
+Each mapping may be implemented in multiple ways. For example, conversion from 
+SIL IPA to Unicode may be achieved using a TECkit binary mapping, a UTR22C XML 
+mapping or a TECkit source language mapping. Someone may have written a Python 
+transducer for the process or ICU may be able to do the conversion, or any of 
+many different ways. One of the aims of the encoding registry is to keep track 
+of all these different forms allowing an application to use whichever is most 
+suitable to it.
+
+=item Fonts
+
+A side issue of the data conversion issue is that of identifying which encoding 
+a particular font implies. While this is not necessarily immediately possible, 
+in some cases it is. For example, it is unlikely that text in SILDoulos IPA93 
+is in any other encoding than SilIPA93.
+
+=back
+
+=head1 Encoding REGISTRY
+
+The encoding registry consists of an XML file that contains all the information 
+needed. This allows different applications to make use of and manipulate the 
+information in a cross platform way.
+
+=head2 Locating the Registry
+
+On Windows the encoding registry may be found at:
+
+    HKLM\SOFTWARE\SIL\EncodingConverterRepository\Registry
+    
+which is a textual key containing the path and filename of the registry file. On 
+Linux the default locations of:
+
+    ~/.SIL/Converters/registry.xml
+    /etc/SIL/Converters/registry.xml
+    
+All these locations may be overriden using the environment variable MAPPINGPATH
+
+=head2 XML Format
+
+The module contains both a DTD and an XSD definition of the XML file format, but 
+the aim is that users do not need to know anything about the details of the file 
+format.
+
+=head1 Using the Registry
+
+The L<Encode::Registry> module is designed to make use of the encoding registry. 
+In addition, while other programs may use the registry as they may like, there 
+is a textual tool: encrem, included with this module to allow relatively easy 
+interaction with the registry.
+
+Encrem allows the addition, removal and listing of mappings, encodings and font 
+information. Since it uses a simple interface it can be scripted or used from 
+the command line.
+
+=head2 Example Session
+
+Here we examine a sample session with encrem:
+
+    encrem -o registry.xml
+    
+Runs encrem and will output the resulting XML to C<registry.xml>
+
+    encrem: help                lists known commands
+    encrem: create              creates an empty database
+    encrem: register            register the file on Windows in the registry
+    encrem: help add-encoding   get help on the add-encoding command
+    encrem: add-encoding silipa93 silipa93.tec
+
+This last command creates a new byte encoding called silipa93, a corresponding 
+unicode encoding with the same coverage and a mapping that converts between the 
+two which is implemented by C<silipa93.tec>. Names can be specified or else the 
+program will come up with its own.
+
+    encrem: add-alias sil_ipa93 silipa93    add some aliases for this encoding
+    encrem: add-alias sil-ipa93 silipa93

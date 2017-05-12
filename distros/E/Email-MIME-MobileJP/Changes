@@ -1,0 +1,40 @@
+Revision history for Perl extension Email::MIME::MobileJP
+
+0.08 2015-01-23T05:17:14Z
+
+    commit 96c15c15b161db8d0f450d9c5379cd4aa65da60e
+    Author: tanaka <banchou@peixe.biz>
+    Date:   Fri Jan 23 09:21:41 2015 +0900
+
+        docomo, softbankの場合decode方法を変更
+
+0.07 2013-08-10T03:08:30Z
+
+    Author: Uchiko <memememomo@gmail.com>
+    Date:   Sat Aug 10 11:02:44 2013 +0900
+
+    depend to email-mime 1.923
+
+0.06
+
+    - re-packaging
+
+0.05
+
+        - performance tuning
+
+0.04
+
+        - doc fix
+        - deps fix
+
+0.03
+
+        - fixed packaging issue
+
+0.02
+
+        - doc fix
+
+0.01    Tue Dec 21 21:36:58 2010
+        - original version

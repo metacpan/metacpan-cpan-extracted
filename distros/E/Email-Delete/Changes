@@ -1,0 +1,20 @@
+2.002     2013-07-30
+          update bug tracker, repackage
+
+2.001     2008-09-14
+          RT 33912, speed up "very slow" deletion from maildir
+          get version numbers in line
+
+1.022     2007-02-15
+          update prereqs to avoid test-breaking E::LocalDelivery 0.211, 0.212
+
+1.021     2006-11-13
+          fix documentation bug
+          improve packaging
+
+1.02      2004-12-17
+          Bug in Email::Delete::Mbox did not allow complete deletion of
+          all messages.
+
+1.01      2004-12-17
+          Initial release.

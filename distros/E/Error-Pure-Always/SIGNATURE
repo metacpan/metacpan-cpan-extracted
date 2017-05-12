@@ -1,0 +1,53 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 04c1bc92b10b498c4d15c02e4ee295cf1fa6c7d4 Always.pm
+SHA1 db52c7dcb6e0f26a8bbbaae84db1901ee5a50a21 Changes
+SHA1 59eb82858eb4fad4d198101c284fbf4254443437 LICENSE
+SHA1 2fc4bbf804498d6dd5612c88e0ffd88c7c9a1388 MANIFEST
+SHA1 90b29982572efbb3582a3861dcc9b88f9c9d12f8 META.yml
+SHA1 002723a4db98a85db0c3760f028c3d933a640b52 Makefile.PL
+SHA1 364d6a1565727d5dc5128cc741a4d21fd952bf61 README
+SHA1 9d7d1174f15317521fab93208b67e8eb97c2acea examples/ex1.pl
+SHA1 da7512f49e9192ccf3440b78b05ab3fc1624ce51 examples/ex2.pl
+SHA1 e905c1393f7babacb093c27854c7d892ef21460c examples/ex3.pl
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
+SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 3571deb409bb92ef4a43b52df4a39cf983f89c0b t/Error-Pure-Always/01-use.t
+SHA1 17ecb4c301b0b0ac9b065650a8087e20e5548d7a t/Error-Pure-Always/02-version.t
+SHA1 ee76766033ac61b749f6e8e8e9d4c8ca97f1a378 t/Error-Pure-Always/03-err.t
+SHA1 3e8f69f41b3147a43fc5ba791d05c45a5fab00bd xt/Error-Pure-Always/01-pod_coverage.t
+SHA1 3c84c9cff49e5160c4553bc391386e5926612dd2 xt/Error-Pure-Always/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJV+We7AAoJEJe+XXKaIuTlasIH/RaO2ktxH39OwpSk/5YUjv4N
+TUnzCHePKGZZ2eNUpaU67gD2sJVaf4vibcW76UmXGSOrDVAoUqokslrnVOdPFEW+
+bFbatNUQniGTNydVjEmlYR+JEwSaceSp7ue9QU+s0nG/1rZ4xJmUthrihP0SiD3U
+L/Y35dl4LA2GOzO8mWs46W0WZUx+3xowzJcAzHX7DTJySvjvml34aGwemI2cl4ba
+0EtynqIin0lzINCPDisW4gmLVWKweshMvS3ESdhtFordZUvR+Y1v07R9ATBDfFZi
+MsBVMAL2W0c9Ul41SiIBWMgQmI7yt5D43nIH9GnMx6gm40NbPvx9NfnzxVk9l00=
+=zevr
+-----END PGP SIGNATURE-----

@@ -1,0 +1,8 @@
+Revision history for Perl extension Error::Dumb.
+
+0.02  Thu Mar 29 11:59:28 2001
+        - corrected COPYRIGHT
+
+0.01  Mon Mar 26 11:59:28 2001
+	- original version; created by h2xs 1.19
+

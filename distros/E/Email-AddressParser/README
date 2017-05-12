@@ -1,0 +1,24 @@
+Email-AddressParser version 0.01
+================================
+
+A partial drop-in replacement for Email::Address. See pod documentation for
+more information.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+   None
+
+COPYRIGHT AND LICENCE
+
+All parsing code is Copyright (c) 1988-2006 University of Washington, under the
+Apache License 2.0. The Perl integration is licesened under the same terms as
+Perl itself.

@@ -1,0 +1,21 @@
+Revision history for Perl extension Exporter::Auto
+
+0.04 2014-08-16T18:45:21Z
+
+    - Renamed current SEE ALSO to DEPENDENCIES, and added a SEE ALSO section
+      that describes a selection of the other exporter modules.
+    - Tweaked abstract
+    - Added DESCRIPTION
+    - Ignore UNITCHECK and INIT
+    - Added github repo to pod
+
+0.03 2013-05-15T13:31:36Z
+
+    - minil release
+
+0.02 2013-02-08T08:18:52
+
+    - doc improvements
+
+0.01    Sat Oct 29 11:25:29 2011
+    - original version

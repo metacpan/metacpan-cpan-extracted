@@ -1,0 +1,16 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Email-MIME-XPath
+version:      0.005
+version_from: lib/Email/MIME/XPath.pm
+installdirs:  site
+requires:
+    Email::MIME:                   1.851
+    Scalar::Util:                  0
+    Sub::Exporter:                 0.972
+    Test::More:                    0
+    Test::use::ok:                 0
+    Tree::XPathEngine:             0.05
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

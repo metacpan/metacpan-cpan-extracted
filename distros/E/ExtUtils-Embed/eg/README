@@ -1,0 +1,67 @@
+
+Simply type "perl build cfile"
+Where "cfile" is the name of any *.c file in this directory.
+This script runs the same command used in the perlembed manpage examples.
+
+To build everything type "perl buildall"
+
+To test everything type "perl testall"
+
+To clean up type "perl cleanall"
+
+There's no Makefile on purpose, that's left as an exercise or something.
+
+You may also wish to build with "perl ../genmake cfile; make" for linking
+the xs_init function.
+
+Examples in this directory include:
+Jon Orwant's from the perlembed manpage:
+interp.c
+orig-match.c (replaced in 5.004_02)
+power.c
+showtime.c
+string.c
+
+Some of mine from the perlembed manpage:
+persistent.c
+multiplicity.c
+match.c (re-worked version of jono's original)
+
+A few of mine from the December 96 issue of The Perl Journal:
+uri-url.c
+regex.c
+
+Some other bits I've fiddled with and made into decent examples:
+
+hashref.{c,pl}:
+/* this example shows how to create a hash in C, 
+ * modify it, push a reference to it onto the stack,
+ * call a subroutine which modifies it, 
+ * then see the changes when we're back inside C
+ */
+
+call_anon.c: 
+/* this is an example of how to create and call 
+ * an anonymous subroutine in C.  Originally it did 
+ * the work of perl_eval_pv, which is now part of the 
+ * standard Perl API.  there still may be some use bits here...
+ */
+
+For some real-life embedding examples see:
+
+o Apache mod_perl - http://www.perl.com/CPAN/modules/by-module/Apache/
+
+o Ken Fox's C++ perlguts wrapper - http://www.perl.com/CPAN/authors/id/KENFOX/
+
+o nvi - http://www.perl.com/CPAN/src/misc/nvi-X.XX.tar.gz
+
+o inn - http://www.isc.org/isc/inn.html
+
+0 ePerl - http://www.engelschall.com/sw/eperl/
+
+o trn - ???
+
+If you have any you'd like to add, let me <dougm@osf.org> know.
+
+Happy embedding,
+-Doug

@@ -1,0 +1,19 @@
+$Id: README 276 2006-05-18 08:43:20Z lars $
+
+Ezmlm.pm
+
+Object methods for ezmlm mailing lists.
+
+Install by doing the following ...
+# perl Makefile.PL
+# make test
+# make install
+
+One thing. For some reason MakeMaker doesn't like symlinks. Please make sure
+you use the full canonical path for the qmail and ezmlm binaries.
+
+Documentation is in pod format. Please run perldoc Mail::Ezmlm after you have
+installed it.
+
+- Guy Antony Halse <guy-ezmlm@rucus.ru.ac.za>
+- Lars Kruse <devel@sumpfralle.de>

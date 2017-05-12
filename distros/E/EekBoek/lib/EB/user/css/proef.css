@@ -1,0 +1,13 @@
+@import "balres.css";
+
+.c_sdeb, .h_sdeb {
+    padding-left: 10pt;
+    padding-right: 10pt;
+    text-align: right;
+}
+
+.c_scrd, .h_scrd {
+    padding-left: 10pt;
+    padding-right: 10pt;
+    text-align: right;
+}

@@ -1,0 +1,7 @@
+<workbook>
+  <worksheet name="backref">
+    <cell ref="foo" text="not me" />
+    <cell ref="foo" text="me" />
+    <cell>=<backref ref="foo"/></cell>
+  </worksheet>
+</workbook>

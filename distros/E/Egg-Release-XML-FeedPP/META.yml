@@ -1,0 +1,31 @@
+---
+name: Egg-Release-XML-FeedPP
+version: 0.02
+author:
+  - 'Masatoshi Mizuno E<lt>lusheE<64>cpan.orgE<gt>'
+abstract: XML::FeedPP module kit for Egg.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Egg::Plugin::Cache: 2.01
+  Egg::Release: 2.2
+  Test::More: 0
+  Test::Perl::Critic: 0
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+  XML::FeedPP: 0.22
+provides:
+  Egg::Model::FeedPP:
+    file: lib/Egg/Model/FeedPP.pm
+    version: 0.01
+  Egg::Release::XML::FeedPP:
+    file: lib/Egg/Release/XML/FeedPP.pm
+    version: 0.02
+  Egg::View::FeedPP:
+    file: lib/Egg/View/FeedPP.pm
+    version: 0.01
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

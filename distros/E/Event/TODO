@@ -1,0 +1,67 @@
+finish up lexical warnings
+
+omitting parked=>1 should be a warning, not an error?
+
+demo/tail-f
+  see File::Tail or GNU textutils for implementation examples
+
+add timeout for var watchers?
+
+find owner for Win32 port
+
+perhaps some help with distributing SIGCHLD?
+
+documentation
+  how to design new event types (in perl)
+  how to design new event types (in C)??
+
+mjtg@cus.cam.ac.uk signal discussion:
+  The API rsignal overrides the current signal handler.  If the signal
+  watcher is cancelled (or otherwise disabled) then rsignal is reset to
+  SIG_DFL.  Maybe the original handler
+  should be restored.  On the other hand, assignment to %SIG will mess
+  up Event watchers so maybe Event should refuse to watch a signal if a
+  handler is already installed.
+
+optimization
+  update io event-mask without invalidating cache
+  determine IntervalEpsilon dynamically & make available from perl
+  use fancy profiler tricks to figure out how to boost performance
+    queue events from both sides?
+  try to hoist system calls from the inner loop
+
+there seems to be some sort of bug in the shutdown phase
+  Attempt to free unreferenced scalar during global destruction.
+  Use of uninitialized value during global destruction.
+  Explicit blessing to '' (assuming package main) during global
+  destruction.
+
+rethink
+  pe_check_recovery & ENTER/LEAVE points
+
+increase the number of priority levels?
+  ASYNC    0    1    2    3    4    5    6    7    8    9   IDLE
+                         HIGH           NORM
+
+loop
+  StarvePrio?
+
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+
+Move process.pm to external module?
+
+accept "%f minutes" & "%f hours" for all time specifications?
+
+
+On Wed, Aug 30, 2000 at 02:50:20PM -0400, Joshua N Pritikin wrote:
+> Wow!  I am reading about the Linux linked list implementation.  In
+> comparison to Linux, Event wastes an unnecessary pointer on every link.
+> I'd better fix this!  :-)
+
+False alarm?  Linux is able to make the assumption that the next & prev
+pointers are always the same offset from the top of the structure.  This
+assumption is true for pe_watcher.all, pe_event.peer, pe_event.que, and
+pe_qcallback.ring.  However, pe_timeable.ring is stored at lots of
+different offsets.  Hm hm.  I guess some bytes are wasted but otherwise
+Event will need two different kinds of linked lists...

@@ -1,0 +1,41 @@
+package ETLp::Manual::IterativeSteadyState;
+
+# ABSTRACT: Manual for Itervative Steady State Items
+
+__END__
+
+=pod
+
+=head1 STEADY STATE CHECKS
+
+Sometimes ETLp processing of a file shouldn't begin until the file stops changing. This check is performed by repeatedly checking the size of the files and pausing for a specified time. When the file size doesn't change, then the item completes. This is typically used in conjunction with a File Watcher:
+
+=over 4
+
+=item 1. The watcher monitors a directory for the appearance of one or more files that match a pattern. 
+
+=item 2. When one or more files appear, the watcher calls an iterative job to start processing the files. 
+
+=item 3. Because the processing is triggered the sudden appearance of the file(s), it should not proceed while the files are deemed to be "live." (still being written to).
+
+=item 4. The first item in the iterative processing is a steady state check. It will wait indefinitely until the file is deemed "steady."
+
+=over 8
+
+=item * B<name>. The name of this item.
+
+=item * B<interval>. How long to wait (seconds) before checking whether the file size has changed. If the file is not steady, the plugin loops indefinitely, pausing for an interval length of time between each check. The default is five seconds.
+
+=item * B<on_error>. Override the setting for the job. See L<ETLp::Manual::Index> for a detailed explanation of this parameter.
+
+=back
+
+=back
+
+=head2 Example
+
+    <item>
+        name     = customer file check
+        type     = steady_state_check
+        interval = 30
+    </item>

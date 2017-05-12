@@ -1,0 +1,20 @@
+<html>
+<head>
+<title>Tests for Embperl - Execute non exitent file</title>
+</head>
+
+
+<body>
+
+ 
+[- 
+$r = shift ;
+$rc = Execute ({ inputfile => 'notfound.htm', options => 262144 }) ;
+
+-]
+
+
+rc = [+ $rc +]<br>
+  
+<p>Done.</p>
+</body></html>

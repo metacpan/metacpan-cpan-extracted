@@ -1,0 +1,69 @@
+From: from@example.com
+Subject: Test Email
+To: to@example.com
+Date: [^\n]+
+MIME-Version: 1\.0
+Content-Type: multipart/mixed; boundary="[^"]+"
+Content-Transfer-Encoding: 7bit
+
+
+--\S+
+Date: [^\n]+
+MIME-Version: 1\.0
+Content-Type: multipart/alternative; boundary="[^"]+"
+Content-Transfer-Encoding: 7bit
+
+
+--\S+
+Date: [^\n]+
+MIME-Version: 1\.0
+Content-Type: text/plain
+
+This is a generic message for testing purposes only with regard to some stuff and things:
+
+\[IMAGE\]
+
+  \* Stuff
+
+  \* Things
+
+--\S+
+Date: [^\n]+
+MIME-Version: 1\.0
+Content-Type: multipart/related; boundary="[^"]+"
+Content-Transfer-Encoding: 7bit
+
+
+--\S+
+Date: [^\n]+
+MIME-Version: 1\.0
+[^:]+: [^\n]+
+[^:]+: [^\n]+
+
+
+                <p>
+                    This is a generic message for <b>testing purposes only<=
+/b>
+                    with regard to some stuff and things:
+                </p>
+                <img src=3D"cid:\d+">
+                <ul>
+                    <li>Stuff</li>
+                    <li>Things</li>
+                </ul>
+=20=20=20=20=20=20=20=20=20=20=20=20=
+
+--\S+
+Date: [^\n]+
+MIME-Version: 1\.0
+Content-Type: image/gif; name="blank\.gif"
+.*
+Content-ID: <\d+>
+
+\S+
+
+--[^\-]+--
+
+--[^\-]+--
+
+--[^\-]+--

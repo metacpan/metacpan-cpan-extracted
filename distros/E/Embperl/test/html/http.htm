@@ -1,0 +1,29 @@
+<html>
+<head>
+<title>Setup http header</title>
+</head>
+
+
+<body>
+
+
+<meta http-equiv="Formatter" content="Embperl">
+
+[- 
+$http_headers_out{'Locationx'} = "http://www.ecos.de/embperl/" ;
+$http_headers_out{'h1'} = "v0" ;
+$http_headers_out{'h2'} = ['v1', 'v2'] ;
+-]
+
+
+[- @ks = sort keys %http_headers_out -]
+<table>
+	<tr>
+		<td>[+ $ks[$row] +]</td><td>[+ $http_headers_out{$ks[$row]} +]</td>
+	</tr>
+</table>
+
+
+
+</body>
+</html>

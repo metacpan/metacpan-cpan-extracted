@@ -1,0 +1,4 @@
+#!/usr/bin/perl
+use EntityModel::App;
+EntityModel::App->new->from_argv(@ARGV);
+

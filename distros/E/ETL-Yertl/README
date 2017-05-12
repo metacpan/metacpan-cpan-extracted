@@ -1,0 +1,38 @@
+ETL::Yertl
+
+ETL::Yertl is an ETL (Extract, Transform, Load
+<https://en.wikipedia.org/wiki/Extract,_transform,_load>) for shells. It
+is designed to accept data from multiple formats (CSV, JSON), manipulate
+them using simple tools, and then convert them to an output format.
+
+Yertl will have tools for:
+
+Extracting data from databases (MySQL, Postgres, MongoDB)
+Loading data into databases
+Extracting data from web services
+Writing data to web services
+Distributing data through messaging APIs (ZeroMQ)
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Doug Bell.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,17 @@
+;; This is a template for a special .emacs file.
+;; Some other code will read this in and substitute actual locations for
+;; the strings XXX and YYY, and write the new value out to a mock home location.
+
+(setq load-path (list "/tmp" "XXX" "YYY"))
+
+(defvar emacs-run-testorama-garudabird-knock-off-i-am-not-a-number-i-am-unique-dammit
+        "6"
+        "Testing a defvar")
+
+;; "Testing a setq"
+(setq emacs-run-testorama-gadzornika-gadzooks-yowsa-mama-have-you-ever-seen-a-variable-like-me
+      "Only in Drupal.")
+
+;; Creating a spurious buffer to have another object to print
+(switch-to-buffer "bupkes")
+

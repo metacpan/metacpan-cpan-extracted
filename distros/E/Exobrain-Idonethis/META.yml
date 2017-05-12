@@ -1,0 +1,30 @@
+---
+abstract: 'Idonethis components for Exobrain'
+author:
+  - 'Paul Fenwick <pjf@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Exobrain-Idonethis
+requires:
+  Exobrain: 1.07
+  Exobrain::Agent: 0
+  Exobrain::Agent::Run: 0
+  Exobrain::Component: 0
+  Exobrain::Config: 0
+  Method::Signatures: 0
+  Moose: 0
+  Moose::Role: 0
+  POSIX: 0
+  WebService::Idonethis: 0.22
+  feature: 0
+resources:
+  bugtracker: https://github.com/pjf/exobrain-idonethis
+  repository: git://github.com/pjf/exobrain-idonethis
+version: 1.08

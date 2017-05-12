@@ -1,0 +1,55 @@
+{
+   "abstract" : "a find & replace engine for rep.pl and rep.el",
+   "author" : [
+      "Joseph Brenner <doom@kzsu.stanford.edu>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4, CPAN::Meta::Converter version 2.113640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Emacs-Rep",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "FindBin" : 0,
+            "Test::Differences" : 0,
+            "Test::More" : 0,
+            "Test::Trap" : 0,
+            "lib" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "Data::Dumper" : 0,
+            "Exporter" : 0,
+            "PPI" : 0,
+            "strict" : 0,
+            "warnings" : 0
+         }
+      }
+   },
+   "provides" : {
+      "Emacs::Rep" : {
+         "file" : "lib/Emacs/Rep.pm",
+         "version" : "1.00"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "1.00"
+}

@@ -1,0 +1,304 @@
+package Elastic::Manual::Analysis;
+
+# ABSTRACT: Controlling how your attributes are indexed
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Elastic::Manual::Analysis - Controlling how your attributes are indexed
+
+=head1 VERSION
+
+version 0.52
+
+=head1 INTRODUCTION
+
+Analysis plus the inverted index is the magic that makes full text search so
+powerful.
+
+=head2 Inverted index
+
+The inverted index is an index structure which is very efficient for performing
+fast full text searches.  For example, let's say we have three documents (taken
+from recent headlines):
+
+    1: Apple's patent absurdity exposed at last
+    2: Apple patents surfaced last year
+    3: Finally a sane judgement on patent trolls
+
+The first stage is to "tokenize" the text in each document. We'll explain how
+this happens later, but the tokenization process could give us:
+
+    1: [ 'appl',  'patent', 'absurd',    'expos',  'last'  ]
+    2: [ 'appl',  'patent', 'surfac',    'last',   'year'  ]
+    3: [ 'final', 'sane',   'judgement', 'patent', 'troll' ]
+
+Next, we invert this list, listing each token we find, and the documents that
+contain that token:
+
+             |  Doc_1  |  Doc_2  |  Doc_3
+  -----------+---------+---------+--------
+  absurd     |  xxx    |         |
+  appl       |  xxx    |  xxx    |
+  expos      |  xxx    |         |
+  final      |         |         |  xxx
+  judgement  |         |         |  xxx
+  last       |  xxx    |  xxx    |
+  patent     |  xxx    |  xxx    |  xxx
+  sane       |         |         |  xxx
+  surfac     |         |  xxx    |
+  troll      |         |         |  xxx
+  year       |         |  xxx    |
+  -----------+---------+---------+--------
+
+Now we can search the index.  Let's say we want to search for
+C<"apple patent troll judgement">.  First we need to tokenize the search terms
+in the same way that we did when we created the index.  (We can't find what
+isn't in the index.)  This gives us:
+
+    [ 'appl', 'patent', 'troll', 'judgement' ]
+
+If we compare these terms to the index we get:
+
+             |  Doc_1  |  Doc_2  |  Doc_3
+  -----------+---------+---------+--------
+  appl       |  xxx    |  xxx    |
+  judgement  |         |         |  xxx
+  patent     |  xxx    |  xxx    |  xxx
+  troll      |         |         |  xxx
+  -----------+---------+---------+--------
+  Relevance  |  2      |  2      | 3
+
+It is easy to see the Doc_3 is the most relevant document, because it has
+more of the search terms than either of the other two.
+
+This is an example of a simple inverted index.  Lucene (the full text search
+engine used by Elasticsearch) has a much more sophisticated scoring system which
+can consider, amongst other things:
+
+=over
+
+=item *
+
+Term frequency
+
+How often does a term/token appear in a document
+
+=item *
+
+Inverse document frequency
+
+How often does the term appear throughout all the documents in the index
+
+=item *
+
+Coord
+
+The number of terms in the query that were found in the document
+
+=item *
+
+Length norm
+
+Measure of the importance of a term according to the total number of terms in
+the field
+
+=item *
+
+Term position
+
+How close is each term to related terms
+
+=back
+
+=head2 Analysis / Tokenization
+
+What is obvious from the above, is that the way we "analyze" (ie convert text
+into terms) is very important.  Also, it is important that we use the
+same analyzer on the text that we store in the index (ie at index time) and on
+the search keywords (ie at search time).
+
+You can only find what is stored in the index.
+
+An B<analyzer> is a package containing 0 or more character filters, one tokenizer
+and 0 or more token filters.  Text is fed into the analyzer, and it produces
+a stream of tokens, with other metadata such as the position of each term
+relative to the others:
+
+=over
+
+=item Character filters
+
+Character filters work on a character-by-character basis, effecting some sort of
+transformation.  For instance, you may have a character filter which converts
+particular characters into others, eg:
+
+    ß  => ss
+    œ  => oe
+    ﬀ  => ff
+
+or a character filter which strips out HTML and converts HTML entities into
+their unicode characters.
+
+=item Tokenizer
+
+A tokenizer then breaks up the stream of characters into individual tokens.  Take
+this sentence, for example:
+
+    To order part #ABC-123 email "joe@foo.org"
+
+The L<whitespace tokenizer|http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/analysis-whitespace-tokenizer.html>
+would produce:
+
+    'To', 'order', 'part', '#ABC-123', 'email', '"joe@foo.org"'
+
+The L<letter tokenizer|http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/analysis-letter-tokenizer.html>
+would produce:
+
+    'To', 'order', 'part', 'ABC', 'email', 'joe', 'foo', 'org'
+
+The L<keyword tokenizer|http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/analysis-keyword-tokenizer.html>
+does NO tokenization - it just passes the input straight through, which isn't
+terribly useful in this example, but is useful for (eg) a tag cloud, where you
+don't want 'modern perl' to be broken up into two separate tokens: 'modern' and 'perl':
+
+    'To order part #ABC-123 email "joe@foo.org"'
+
+The L<standard tokenizer|http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/analysis-standard-tokenizer.html>
+which uses Unicodes word boundary rules would produce:
+
+    'To', 'order', 'part', 'ABC', '123', 'email', 'joe', 'foo.org'
+
+And the L<UAX URL Email tokenizer|http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/analysis-uaxurlemail-tokenizer.html>,
+which is like the standard tokenizer, but which recognises emails, URLs etc as
+single entities would produce:
+
+    'To', 'order', 'part', 'ABC', '123', 'email', 'joe@foo.org'
+
+=item Token filters
+
+Optionally, the token stream produced above can be passed through one or more
+token filters, which can remove, change or add tokens.  For instance:
+
+The L<lowercase filter|http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/analysis-lowercase-tokenfilter.html>
+would convert all uppercase letters to lowercase:
+
+    'to', 'order', 'part', 'abc', '123', 'email', 'joe@foo.org'
+
+Then the L<stopword filter|http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/analysis-stop-tokenfilter.html>
+could remove common (and thus generally irrelevant stopwords):
+
+    'order', 'part', 'abc', '123', 'email', 'joe@foo.org'
+
+=back
+
+=head1 USING BUILT IN ANALYZERS
+
+There are a number of analyzers that are built in to Elasticsearch, which can
+be used directly, (see
+L<http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/analysis.html> for a
+current list) which can be used directly.
+
+For instance the C<english> analyzer "stems" English words into their root,
+eg "foxy", "fox" and "foxes" would all be converted to the term "fox".
+
+    has 'title' => (
+        is       => 'ro',
+        isa      => 'Str',
+        analyzer => 'english'
+    );
+
+=head2 Configurable analyzers
+
+Some analyzers are configurable, for instance, the C<english> analyzer accepts
+a custom list of stop-words.  In your model class, you configure the built-in
+analyzer under a new name:
+
+    package MyApp;
+
+    use Elastic::Model;
+
+    has_namespace 'myapp'. {
+        post => 'MyApp::Post'
+    };
+
+    has_analyzer 'custom_english' => (
+        type        => 'english',
+        stopwords   => ['a','the','for']
+    );
+
+Then in your doc class, you specify the analyzer using the new name:
+
+    package MyApp::Post;
+
+    use Elastic::Doc;
+
+    has 'title' => (
+        is       => 'ro',
+        isa      => 'Str',
+        analyzer => 'custom_english'
+    );
+
+=head1 DEFINING CUSTOM ANALYZERS
+
+You can also combine character filters, a tokenizer and token filters together
+to form a custom analyzer,  For instance, in your model class:
+
+    has_char_filter 'charmap' => (
+        type        => 'mapping',
+        mapping     => [ 'ß=>ss','œ=>oe','ﬀ=>ff' ]
+    );
+
+    has_tokenizer 'ascii_letters', => (
+        type        => 'pattern',
+        pattern     => '[^a-z]+',
+        flags       => 'CASE_INSENSITIVE',
+    );
+
+    has_filter 'edge_ngrams' => (
+        type        => 'edge_ngrams',
+        min_gram    => 2,
+        max_gram    => 20
+    );
+
+    has_analyzer 'my_custom_analyzer' => (
+        type        => 'custom',
+        char_filter => ['mapping'],
+        tokenizer   => 'ascii_letters',
+        filter      => ['lowercase','stop','edge_ngrams']
+    );
+
+=head1 PUTTING YOUR ANALYZERS LIVE
+
+Analyzers can only be created on a new index.  You can't change them on
+an existing index, because the data stored in the index would be wrong.
+
+    my $myapp = MyApp->new;
+    my $index = $myapp->namespace('myapp')->index;
+
+    $index->delete;     # remove old index
+    $index->create;     # create new index with new analyzers
+
+It is, however, possible to ADD new analyzers to a closed index:
+
+    $index->close;
+    $index->update_analyzers;
+    $index->open;
+
+=head1 AUTHOR
+
+Clinton Gormley <drtech@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Clinton Gormley.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

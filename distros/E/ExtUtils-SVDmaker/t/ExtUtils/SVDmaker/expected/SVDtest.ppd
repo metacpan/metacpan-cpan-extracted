@@ -1,0 +1,13 @@
+<SOFTPKG NAME="ExtUtils-SVDmaker-SVDtest" VERSION="0,01,0,0">
+	<TITLE>ExtUtils-SVDmaker-SVDtest</TITLE>
+	<ABSTRACT>Objectify the Test module,
+adds the skip_test method to the Test module, and 
+adds the ability to compare complex data structures to the Test module.</ABSTRACT>
+	<AUTHOR>SoftwareDiamonds.com E&lt;lt&gt;support@SoftwareDiamonds.comE&lt;gt&gt;</AUTHOR>
+	<IMPLEMENTATION>
+		<DEPENDENCY NAME="Test-TestUtil" VERSION="0,0,0,0" />
+		<OS NAME="MSWin32" />
+		<ARCHITECTURE NAME="MSWin32-x86-multi-thread" />
+		<CODEBASE HREF="ExtUtils-SVDmaker-SVDtest-0.01.tar.gz" />
+	</IMPLEMENTATION>
+</SOFTPKG>

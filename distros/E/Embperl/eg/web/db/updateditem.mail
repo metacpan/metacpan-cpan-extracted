@@ -1,0 +1,29 @@
+Hi! [- $r = shift; $^W=0 -]
+
+[$ if $r->{error} $]
+There occured the following errors during item [+ $r->{is_update} ? 'update' : 'creation' +] by [+ $udat{user_email} || '[Unknown user]' +]:
+[+ $r->{error} +]
+[$ else $]
+There's a [+ $r->{is_update} < 0 ? 'deleted' : $r->{is_update} ? 'updated' : 'new' +] item on your Embperl Website by [+ $udat{user_email} || '[Unknown user]' +].
+[$ endif $]
+For details see http://[+ $ENV{SERVER_NAME} +][#:[+ $ENV{SERVER_PORT} +]#][+ $r->{config}->{baseuri} +]db/add.epl?[+ $r->{category_set}{table_type} +]_id=[+ $fdat{item_id} +]&-edit_item=1&category_id=[+ $fdat{category_id} +]
+
+
+---- Category "[+ $r->{category_set}{category} +]" ----
+[- $i = 0; -][$ while ($rec = $r->{item_set}[$i++]) $]
+===============================================================================
+[+ $rec->{name} +]:
+===============================================================================
+[$ foreach $type (@{$r->{category_fields}}) $][$ if $txt = $r -> {category_texts}{$type . '_text'} $]
+* [+ $txt +]: [+ $rec->{$type} +]
+[$ endif $][$ endforeach $][$ endwhile $]
+
+[#
+DEBUGGING:
+[! use Data::Dumper; !]
+[- $DBIx::Recordset::FetchsizeWarn = 0; -]
+[+ Dumper $r->{error},\%fdat,[keys %$r],{%{$r->{category_texts}}},{%{$r->{category_set}}},[@{$r->{item_set}}] +]
+#]
+
+-- 
+Regards, Your Embperl Website

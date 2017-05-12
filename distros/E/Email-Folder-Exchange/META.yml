@@ -1,0 +1,29 @@
+--- #YAML:1.0
+name:               Email-Folder-Exchange
+version:            2.0
+abstract:           Access your Microsoft Exchange 2000/2003/2007/2010 email from perl
+author:
+    - Warren Smith <wsmith@cpan.org>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Authen::NTLM:    0
+    Crypt::SSLeay:   0
+    Email::Folder:   0
+    Email::Simple:   0
+    LWP::UserAgent:  0
+    MIME::Base64:    0
+    SOAP::Lite:      0
+    URI:             0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.54
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

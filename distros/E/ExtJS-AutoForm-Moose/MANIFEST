@@ -1,0 +1,20 @@
+Changes
+lib/ExtJS/AutoForm/Moose.pm
+lib/ExtJS/AutoForm/Moose/Types.pm
+lib/ExtJS/AutoForm/Moose/Util.pm
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+t/10-moose-types.t
+t/20-moose-global.t
+t/boilerplate.t
+t/lib/MooseTests/Class0.pm
+t/lib/MooseTests/Class1.pm
+t/lib/MooseTests/Class2.pm
+t/lib/MooseTests/Class3.pm
+t/lib/MooseTests/Role1.pm
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

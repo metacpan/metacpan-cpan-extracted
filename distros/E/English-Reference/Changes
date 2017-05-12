@@ -1,0 +1,13 @@
+Revision history for Perl extension English::Reference.
+
+0.01  Thu Feb 26 01:59:32 2004
+	- original version; created by h2xs 1.19
+	never released
+0.02  Fri Aug 18 16:42:41 UTC 2000
+	- updated by Jerrad
+        system clock was off and I had to rebuild
+	cleaned up the POD
+	added deref
+0.03  Wed Aug 30 14:19:41 UTC 2000
+	- Updated by Jerrad Pierce
+	Was careless, added prototypes for DWIM with print SCALAR \"a", "\n";

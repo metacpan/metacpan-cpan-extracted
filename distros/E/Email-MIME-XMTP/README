@@ -1,0 +1,86 @@
+NAME
+    Email::MIME::XMTP - Extends Email::MIME objects to read and write XMTP
+
+SYNOPSIS
+        use Email::MIME;
+        use Email::MIME::XMTP;
+        my $mail = Email::MIME->new($text);
+
+        # Email::MIME::XMTP extra methods
+        my $xmlstring = $mail->as_XML;
+
+        my $mailer = Email::Simple->new;
+        my $mail = $mailer->parseXML( xml => $xmlstring );
+
+DESCRIPTION
+    "Email::MIME::XMTP" extends Email::MIME to read and write XMTP.
+
+    Read more about XMTP at http://www.openhealth.org/xmtp/
+
+METHODS
+    Methods are the same as the one of Email::MIME. With the addition of two
+    extra ones for reading (parsing) and writing XMTP format. Plus one to
+    set the elements/headers XML namespaces and prefixes.
+
+  parseXML
+    Parse an XML SOURCE containing an XMTP formatted message and return a
+    mail object.
+
+    The parseXML method takes any of the following parameters:
+
+                   filename
+                   xml
+                   ioref
+
+    One must be spacefied - it is an error if none is passed.
+
+    This uses the familiar hash syntax, so an example might be:
+
+            use Email::MIME::XMTP;
+            my $mailer = new Email::MIME::XMTP;
+
+            my $mail = $mailer->parseXML( filename => 'example-mail-xmtp.xml');
+
+    The parameters represent a filename, a string containing XML and an open
+    filehandle ref respectively.
+
+  set_namespace( PREFIX, URI )
+    Set the XML Namespace PREFIX to URI.
+
+    Note a particular XML-Namespace can also be set and transported using
+    the special MIME header X-XMTP-xmlns as follows:
+
+     X-XMTP-xmlns-<prefix>: <uri>
+
+    And then further referred into the MIME message using a X-XMTP-<prefix>
+    header like:
+
+     X-XMTP-<prefix>: value
+
+    In a multipart message each part can have its scoped namespaces.
+
+  as_XML( [@FILTER_HEADERS] )
+    Returns an XML XMTP representation of a message. Optionally the
+    FILTER_HEADERS array can be used to restrict the MIME headers to return.
+    In case any special XML namespace is set, in addition to XMTP; the
+    headers must be listed with their fully qualified XML QNAME e.g.
+    myprefix:My-Header.
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2005 All rights reserved Asemantics S.r.l
+
+    (see LICENSE file coming with this distribution)
+
+AUTHOR
+    Alberto Reggiori <alberto(at)asemantics.com>
+
+Email::MIME COPYRIGHT AND LICENSE
+    Copyright 2004 by Casey West
+
+    Copyright 2003 by Simon Cozens
+
+SEE ALSO
+    XMTP http://www.openhealth.org/xmtp/
+
+    Perl Email Project, http://pep.kwiki.org .
+

@@ -1,0 +1,134 @@
+Revision history for Perl extension ExtUtils::XSpp.
+
+0.18  Wed Sep 18 10:00:00 CEST 2013
+	- Upgrade to stable release.
+
+0.17_02  Wed Aug 28 22:35:02 CEST 2013
+	- Fixed getters for typemaps using %output_list annotation.
+
+0.17_01  Sat Aug 10 08:20:11 CEST 2013
+	- Added standard XS typemap for objects (disabled by default for
+	  backwards compatibility).x
+	- Allow specifying XS typemap code in the XS++ typemap declaration.
+	- Generate accessors for member variables.
+	- Handle multiple function/method annotations (used by plugins).
+	- Updated plugin interface (should be backwards-compatible).
+
+0.1700   Sun Feb 10 12:00:00 CET 2013
+	- %alias feature for aliasing XS++ wrappers.
+
+0.1603   Fri Dec 28 12:03:09 CEST 2012
+	- Fix blead-perl warning about unescaped { in regexps.
+	- Use ExtUtils::Typemaps instead of ExtUtils::Typemap (which
+	  had to be renamed).
+	- Somewhat improved examples.
+
+0.1602   Fri Jun  3 22:08:53 CEST 2011
+	- Fixed code generation for package_static methods.
+
+0.1601   Sat Mar 12 10:21:15 CET 2011
+	- Do not try to rebuld the grammar during CPAN installation.
+
+0.16     Fri Mar 11 20:40:12 CET 2011
+	- Allow renaming destructors and fixed parsing of virtual ones.
+
+0.15     Sat Aug 14 11:36:39 CEST 2010
+	- Improved support for conditional code (via #ifdef) in plugins.
+
+0.14     Wed Jul 21 17:00:00 CEST 2010
+	- This release demonstrates why it is a good idea
+	  to do developer releases.
+	- Fix problem with templated types and the shorthand
+	  for typemaps that was introduced in 0.13.
+
+0.13     Wed Jul 21 17:00:00 CEST 2010
+	- Add support for simplified typemap statements
+	  a la %typemap{type}; which are a shorthand for
+	  {simple} and {reference}.
+
+0.12     Sun Jul 11 17:00:00 CEST 2010
+	- Add new example using Module::Build::WithXSpp.
+
+0.11_02  Thu Jun 24 20:00:00 CEST 2010
+	- Allow applying parser plugin annotations to constructors
+	  and destructors.
+	- Use of {%...%} for the %cpp_type tag of parsed typemaps.
+	- Fix %length for anything but the most trivial wrappers.
+
+0.11_01  Sat Jun  5 11:02:09 CEST 2010
+	- Parse enum declarations.
+	- Added an experimental plugin interface.
+
+0.11  Mon May  3 20:16:23 CEST 2010
+	- Released 0.10_02 as 0.11.
+
+0.10_02  Tue Apr 27 08:06:04 CEST 2010
+	- Fix packaging error.
+
+0.10_01  Mon Apr 26 21:44:25 CEST 2010
+	- Improved and documented the syntax for complex "parsed" typemaps.
+	  The old syntax will be removed soon.
+	- Allow '&' and '|' operators in the default value of functions and
+	  methods.
+	- Do not generate XS code for the private and protected members of
+	  a class.
+
+0.10  Wed Apr 14 19:20:00 CET 2010
+	- Now requires ExtUtils::ParseXS 0.2202.
+	- C++ Exceptions can now be handled with code much like typemaps
+	  %exception{Name}{Exception}...
+	  int MethodFoo() %catch{Name};
+	  Detailed documentation in ExtUtils::XSpp::Exception.
+	- Grammar simplifications.
+	- Fixed 'methods' argument of Class node constructor.
+	- Parse 'static' as a synonym of 'package_static'.
+	- Parse pure virtual functions correctly.
+
+0.09  Wed Feb 10 19:20:00 CET 2010
+	- Automatically include an #include <exception> into the output
+	  for the exception handling.
+	- Documentation for ExtUtils::XSpp::Node and subclasses.
+	- Split ExtUtils/XSpp/Node.pm into separate per-class files.
+
+0.08  Fri Feb  5 19:00:00 CET 2010
+	- Catch all C++ exceptions in the generated wrapper XS.
+	  The exceptions are turned into plain Perl croak() calls
+	  for now but may be upgraded to configurable exception
+	  objects later. (Steffen Mueller)
+
+0.07  Fri Jan 22 18:07:10 CET 2010
+	- Fix issue with references as method arguments that have
+	  template types. (Steffen Mueller)
+
+0.06  Wed Jan 13 20:28:27 CET 2010
+	- When parsing a class declaration, automatically add a typemap
+	  for the class.
+	- Add default typemaps for basic C types (integral, floating point
+	  and char*).
+	- Automatically setup Perl inheritance for derived C++ classes.
+	- Support template types in function/method parameters and in typeamaps.
+	- Add command line options to run xsubpp directly from xspp.
+
+0.05  Sun Sep 20 14:29:16 CEST 2009
+	- Move the implementation of xspp to ExtUtils::XSpp::Cmd.
+
+0.04
+	- Let XS' length() feature pass through. (Steffen Mueller)
+	- If the length() feature is used, generate ANSI style
+	  XSUBs instead of the default K.-R. style. (Steffen Mueller)
+	- Add parsing deep class hierarchies. (Steffen Mueller)
+	- Fix two-part types (eg. unsigned int). (Steffen Mueller)
+	- Non-zero exit value on failure for more graceful build errors.
+	  (Steffen Mueller)
+
+0.03
+	- Include a renamed Parse::Yapp::Driver to eschew
+	  a dependency. (Steffen Mueller)
+
+0.02
+	- Added an example distribution (Steffen Mueller).
+
+0.01  Wed Jun 17 21:01:00 CEST 2009
+	- Extracted from wxPerl source tree.
+	- Pass through C and C++ comments.
+	- Added test suite.

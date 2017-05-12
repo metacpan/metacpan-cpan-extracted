@@ -1,0 +1,91 @@
+[- 
+use Embperl::Form::Validate;
+use File::Basename ;
+
+$epf1 = new Embperl::Form::Validate([ -key => 'user_email', required => 1, 
+                                     -key => 'user_password', 
+                                        required => 1,
+                                        length_min => 5],
+                                   'login');
+
+$epf2 = new Embperl::Form::Validate([ -key => 'user_email', required => 1],
+                                   'newuser');
+
+
+$r = shift ;
+$fdat{user_email} ||= $fdat{email} ;
+
+-]
+    <script>
+    [+ do { local $escmode = 0 ; $epf1 -> get_script_code } +]
+    [+ do { local $escmode = 0 ; $epf2 -> get_script_code } +]
+    </script>
+
+
+  [$ if not $udat{user_id}$]
+    [$ if ($fdat{-newuser} || $fdat{-newpassword}) && !$r -> {error}$]
+    <p>[= loginnew =]</P>
+  [$else$]
+        <p>[= login1 =]</P>
+  [$endif$]
+
+    <form action="[+ $param[0] +]" method="POST" name="login" onSubmit="return epform_validate_login()">
+        <table>
+            <tr>
+                <td class="cText">[= user_email =]</td>
+                <td class="cInput"><input type="text" name="user_email"></td>
+            </tr>
+            <tr>
+                <td class="cText">[= user_password =]</td>
+                <td class="cInput"><input type="password" name="user_password"></td>
+            </tr>
+        </table>
+        <p>
+        <input type="submit" name="-login" value="[= login =]">
+        [$ hidden $]
+        </p>
+    </form>
+
+    <p>[= cookie_note =]</p>
+
+    [$ if (!$fdat{-newuser} && !$dat{-newpassword}) ||$r -> {error} $]
+
+    <hr>
+    <P ALIGN="left">[= login2 =]</P>
+
+    <P ALIGN="left">[= login3 =]</P>
+
+    <form action="[+ $param[0] +][#+ $r -> app -> posturl('login.epl') +#]" method="POST" name="newuser" onSubmit="return epform_validate_newuser()">
+        <table>
+            <tr>
+                <td class="cText">[= user_email =]</td>
+                <td class="cInput"><input type="text" name="user_email"></td>
+            </tr>
+            <tr>
+                [- $fdat{user_name} ||= "$fdat{firstname} $fdat{lastname}" -]
+                <td class="cText">[= user_name =]</td>
+                <td class="cInput"><input type="text" name="user_name"></td>
+            </tr>
+        </table>
+        <p>
+        <input type="submit" name="-newuser" value="[= newuser =]">
+        <input type="submit" name="-newpassword" value="[= newpassword =]">
+        [$ hidden $]
+        </p>
+    </form>
+    [$ endif $]
+  [$ else $]
+    <form action="[+ $param[0] +]" method="POST">
+        <p>
+        [= already_logged_in_as =] [+ $udat{user_email} +]
+        [$ if $udat{user_admin} $]
+        [Admin]
+        [$ endif $]
+        <p>
+        [= logoff =]
+        <p>
+        <input type="submit" name="-logout" value="[= logout =]">
+        [$ hidden $]
+        </p>
+    </form>
+  [$ endif $]

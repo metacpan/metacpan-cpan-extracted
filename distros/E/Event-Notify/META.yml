@@ -1,0 +1,42 @@
+---
+abstract: 'Simple Observer/Notifier'
+author:
+  - 'Copyright (c) 2007 Daisuke Maki <daisuke@endeworks.jp>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.11.0, CPAN::Meta::Converter version 2.132140'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Event-Notify
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Event::Notify:
+    file: lib/Event/Notify.pm
+    version: 0.00005
+requires:
+  Carp: 0
+  Test::MockObject: 0
+  Test::More: 0
+resources:
+  bugtracker: https://github.com/lestrrat/p5-Event-Notify/issues
+  homepage: https://github.com/lestrrat/p5-Event-Notify
+  repository: git://github.com/lestrrat/p5-Event-Notify.git
+version: 0.00005
+x_contributors:
+  - 'Daisuke Maki <lestrrat+github@gmail.com>'

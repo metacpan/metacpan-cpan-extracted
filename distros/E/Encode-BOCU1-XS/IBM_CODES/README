@@ -1,0 +1,21 @@
+(Quote from http://www.unicode.org/notes/tn6/)
+
+5. Sample C Code
+
+The sample C code serves as the full specification of BOCU-1. Every conformant encoder and decoder must generate equivalent output and detect any illegal input code points and illegal input byte sequences. Recovery from illegal input is not specified. Single surrogates are encoded if present in the input (e.g., unmatched single surrogate code units in UTF-16). Proper input of supplementary code points (e.g., matched surrogate pairs in UTF-16) must be encoded by code points.
+
+This code uses International Components for Unicode [ICU] standard headers and the one implementation file icu/source/common/utf_impl.c. (It is not necessary to link the entire [ICU] common library.) This is for convenience in the surrounding test functions and not necessary for the core BOCU-1 functions. These headers and implementation file provide the following:
+
+    * Include inttypes.h or define its types.
+    * Define UChar for UTF-16 as an unsigned 16-bit type (wchar_t or uint16_t).
+    * Define UTF* macros to handle reading and writing of in-process UTF-8/16 strings.
+
+This code is under the X license (ICU version) [ICULicense].
+
+Files:
+
+    * bocu1.h (constants and macros)
+    * bocu1.c (encoder and decoder functions)
+    * bocu1tst.c (test code with main() function, see below)
+
+A complete, compiled sample executable for Windows(R) from this source code is available for download. Aside from basic implementation and consistency tests, this also provides file conversion between UTF-8 and BOCU-1. Use a command-line argument of ¡È?¡É or ¡È-h¡É for usage.

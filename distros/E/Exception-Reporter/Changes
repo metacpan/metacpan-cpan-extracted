@@ -1,0 +1,51 @@
+Revision history for Exception-Reporter
+
+0.014     2017-04-21 13:52:40-04:00 America/New_York
+        - the return value of report_exception has been documented
+        - the Reporter now has a collect_summaries method for performing
+          recursive summarization (thanks, Matthew Horsfall)
+
+0.013     2016-07-19 14:26:30-04:00 America/New_York
+        - add a Moose exception dumper
+        - add a Dir sender to write exception reports to the local filesystem
+
+0.012     2014-01-11 14:19:46-05:00 America/New_York
+        - YAML dumper now uses YAML::XS, as previous bugs (see 0.003) are,
+          I think, fixed now; on the other hand, there were some crazy
+          B-related bugs in 5.16 and later
+
+0.011     2013-12-31 13:41:12 America/New_York
+        - fix some infelicities in email subject and thread id construction
+
+0.010     2013-09-12 09:46:44 America/New_York
+        - when the YAML dumper fails to dump, include the reason why
+
+        - simplify code for ident guessing, avoiding newlines in idents
+
+0.008     2013-08-22 20:14:46 America/New_York
+        - fix tiny but quite significant documentation error (thanks, Tomohiro
+          Hosaka!)
+
+0.007     2013-08-22 17:35:07 America/New_York
+        - update bugtracker and repository
+
+        - add abstracts to all modules
+
+0.006     2013-03-18 15:41:35 America/New_York
+        - both simplify and improve the ident-generation for Text summarizer
+
+0.005     2013-02-06 12:00:07 America/New_York
+        - add the Text dumper to summarize simple strings literally
+
+0.004     2013-01-03 14:39:54 America/New_York
+        - numerous little improvements, including better broken-out Dumpers
+
+0.003     2012-07-05 15:19:21 America/New_York
+        - replace YAML::XS with YAML; YAML::XS was sometimes causing
+          unexplained "attempt to free unreferenced scalar" errors
+
+0.002     2012-07-05 14:28:12 America/New_York
+        - add the caller_level option
+
+0.001     2012-07-05 11:15:40 America/New_York
+        - first release

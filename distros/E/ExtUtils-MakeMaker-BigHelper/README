@@ -1,0 +1,101 @@
+ExtUtils-MakeMaker-BigHelper version 0.92
+=========================================
+
+This package extends or alters the functionality of ExtUtils::MakeMaker,
+in a way more suitable perhaps for large projects using a lot of perl XS.
+
+This allows multiple .xs files in your project, strewn about the lib directory
+hierarchy, hopefully side by each with the corresponding .pm file.  Multiple t
+directories are also allowed, hopefully located next to the .pm files they test.
+
+See the man page for perlxs for more information about perl XS.
+
+With ExtUtils::MakeMaker there can only be one .xs file, which limits the size
+of the project.  Well, there is a way to have more, but you're left with one master
+.xs file responsible for bootstrapping all the other ones.  The way to have two
+.xs files is documented, but not easy, and the way to have more than two is, well, unnatural.
+
+With ExtUtils::MakeMaker you're allowed to provide customizations for various
+MakeMaker methods in the package MY.  This gives you the ability to make a
+total overhaul of ExtUtils::MakeMaker.
+
+This package uses the customization facility built in to ExtUtils::MakeMaker to allow
+multiple .xs files, multiple t files, and multiple subproject (Makefile.PL and Build.PL)
+directories in the lib hierarchy rather than at the top level of the project.  This allows
+you to more conveniently use perlxs in your project, without having to package up multiple
+Makefile.PL projects embedded in your directories.  It also allows you to convert all those
+.pm files with Inline code into real perlxs without using dynamite.
+
+The methods here are meant to be exported into the package MY, to provide
+customizations of the ExtUtils::MakeMaker methods.
+
+For example, here's a possible project layout:
+
+  Changes
+  lib/Big/Project.pm
+  lib/Big/Project/Collections/MyLRU.xs
+  lib/Big/Project/Collections/MyLRU.pm
+  lib/Big/Project/Collections/t/00-usage.t
+  lib/Big/Project/Collections/t/10-testlru.t
+  lib/Big/Project/Worker.pm
+  lib/Big/Project/Slave.pm
+  lib/Big/Project/Dispatcher/Scheduler.xs
+  lib/Big/Project/Dispatcher/Scheduler.pm
+  lib/Big/Project/Dispatcher/t/00-usage.t
+  lib/Big/Project/Dispatcher/t/10-roundrobin.t
+  lib/Big/Project/clib/Makefile
+  lib/Big/Project/clib/toolbox.c
+  lib/Big/Project/clib/toolbox.h
+  lib/Big/Project/clib/hashmaker.c
+  lib/Big/Project/clib/hashmaker.h
+  Makefile.PL
+  MANIFEST
+  README
+
+The Makefile.PL would look like this:
+
+  use ExtUtils::MakeMaker;
+
+  WriteMakefile(
+    NAME => "Big::Project",
+    VERSION_FROM => "lib/Big/Project.pm",
+    ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
+      (ABSTRACT       => 'Big Project',
+       AUTHOR         => 'John Bigbooty <john.bigbooty@yoyodyne.com>') : ()),
+    DEFINE            => '',
+    LIBS              => ['-lm' ], # e.g., '-lm'
+    INC               => '-I. -Ilib/Big/Project/clib',
+    MYEXTLIB          => 'lib/Big/Project/clib/libmyextlib.a',
+  );
+
+  package MY;
+
+  use ExtUtils::MakeMaker::BigHelper qw(:MY);
+
+That should do it.  It uses File::Find to descend the hierarchy and find all the .xs files
+and t directories.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  ExtUtils::MakeMaker
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2013 by Rob Janes
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.12.3 or,
+at your option, any later version of Perl 5 you may have available.

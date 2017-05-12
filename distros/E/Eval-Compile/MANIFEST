@@ -1,0 +1,12 @@
+Changes
+Compile.xs
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/00-Eval-Compile.t
+t/01-methods.t
+t/02-simple-eval.t
+lib/Eval/Compile.pm
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

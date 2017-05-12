@@ -1,0 +1,228 @@
+# Content-Type: text/plain; charset = UTF-8
+
+# Inkopen (Dagboek: Inkoop)
+
+# Algemene vorm van de opdrachten:
+#
+#  dagboek [ datum ] argumenten
+#
+#  Argumenten inkoop: "Omschrijving" crediteurcode boekstukregel
+#  Boekstukregel: "Omschrijving" bedrag [ grootboekrekening ]
+#
+# Standaard wordt de met deze crediteur geassocieerde
+# grootboekrekening gebruikt (zie relaties.eb).
+#
+# Standaard wordt het met de grootboekrekening geassocieerde BTW
+# tarief gebruikt. Dit kan worden gewijzigd door een toevoeging aan
+# het bedrag:
+#     @0         geen BTW
+#     @H         pas het hoge tarief toe
+#     @L         pas het lage tarief toe
+#     @n         pas BTW code n toe (afgeraden)
+#
+# Een credit-boeking kan worden gespecificeerd door een negatief
+# bedrag.
+
+# Enkelvoudig, met één enkele boekstukregel.
+inkoop 05-01 "Internet" XS4ALL "ADSL" 22,80
+
+# Meerdere boekstukregels; de grootboekrekening is dan verplicht.
+# De totaaltelling is optioneel, maar sterk aangeraden om fouten
+# te voorkomen.
+inkoop 15-01 "ADSL + Telefoon" KPN --totaal=104,65 \
+        "ADSL"                        24,20  6905  \
+        "Telefoonkosten"              80,45  6900
+
+inkoop 09-02 "Internet" XS4ALL "ADSL" 22,80
+
+inkoop 08-03 "Internet" XS4ALL "ADSL" 22,80
+inkoop 18-03 "Telefoonkosten" KPN "ADSL + Telefoon" 101,52
+
+inkoop 05-04 "Internet" XS4ALL "ADSL" 22,80
+
+inkoop 10-05 "Internet" XS4ALL "ADSL" 22,80
+inkoop 20-05 "Telefoonkosten" KPN "ADSL + Telefoon" 102,22
+
+inkoop 07-06 "Internet" XS4ALL "ADSL" 22,80
+
+inkoop 05-07 "Internet" XS4ALL "ADSL" 22,80
+inkoop 15-07 "Telefoonkosten" KPN "ADSL + Telefoon" 104,66
+
+inkoop 09-08 "Internet" XS4ALL "ADSL" 22,80
+
+inkoop 06-09 "Internet" XS4ALL "ADSL" 22,80
+inkoop 16-09 "Telefoonkosten" KPN "ADSL + Telefoon" 108,72
+
+inkoop 11-10 "Internet" XS4ALL "ADSL" 22,80
+
+inkoop 07-11 "Internet" XS4ALL "ADSL" 2*11+0,80
+inkoop 17-11 "Telefoonkosten" KPN "ADSL + Telefoon" 109,67
+
+inkoop 06-12 "Internet" XS4ALL "ÁDSL" 22,80
+
+# Expliciet boekstuknummer:
+inkoop:20 07-12 "Internet" XS4ALL "ADSL" 22,80
+
+# Verwijderen:
+inkoop:23 07-12 "Internet" XS4ALL "ÄDSL" 22,80
+verwijder inkoop:23
+
+# Verkopen (Dagboek: Verkoop)
+#
+#  Argumenten verkoop: "Omschrijving" debiteurcode boekstukregel
+#  Boekstukregel: "Omschrijving" bedrag [ grootboekrekening ]
+#
+# Standaard wordt de met deze debiteur geassocieerde
+# grootboekrekening gebruikt (zie file relaties.eb).
+#
+# Zie de beschrijving bij Inkopen voor de mogelijkheden het
+# toegepaste BTW tarief te specificeren.
+#
+# Meerdere boekstukregels zijn mogelijk; de grootboekrekening is dan
+# verplicht. Zie bij Inkopen voor een voorbeeld.
+#
+# Een debet-boeking kan worden gespecificeerd door een negatief
+# bedrag.
+
+verkoop 18-02 "Perl Cursus" ACME "Perl Cursus 1e bet."      3.570 8400
+
+verkoop 18-03 "Perl Cursus" ACME "Perl Cursus 2e bet."      3,570 8400
+
+verkoop 18-04 "Perl Cursus" ACME "Perl Cursus rest"          600 8400
+
+verkoop 12-05 "Perl Cursus" ACME "Perl Cursus rest"           -5 8400
+
+verkoop 14-05 "Ondersteuning" ACME "Consultancy"             714
+
+verkoop 16-07 "Ondersteuning" ACME "Consultancy"             714
+
+verkoop 19-08 "Pocket Reference" ORA  "Produktie boek"      1.000 8300
+
+# Bank (Dagboek: Postbank)
+#
+#  Argumenten bankboeking: "Omschrijving" boekstukregel
+#  Boekstukregel:
+#    std "Omschrijving" bedrag grootboekrekening
+#    crd "Omschrijving" crediteurcode bedrag (negatief!)
+#    deb "Omschrijving" debiteurcode bedrag
+#
+# Standaard wordt het eerste met deze crediteur/debiteur geassocieerde
+# open inkoop/verkoop-boekstuk afgeboekt.
+#
+# Voor deze boekingen geldt dat een negatief getal het banksaldo
+# vermindert, en een positief getal het saldo vermeerdert.
+#
+# 'std' boekingen met BTW zijn ongebruikelijk.
+# Daarom moet in dat geval de toepassing van BTW expliciet worden
+# opgegeven met de "@" toevoeging:
+#     @0         geen BTW (onderdrukt de warschuwing)
+#     @H         pas het hoge tarief toe
+#     @L         pas het lage tarief toe
+#     @n         pas BTW code n toe (afgeraden)
+# BTW wordt geboekt op de BTW-Omzetrekening voor positieve bedragen,
+# en op de BTW-Kostenrekening voor negatieve bedragen. Dit kan worden
+# gewijzigd door aan de codering een "O" (Omzet) of "K" (Kosten) toe
+# te voegen.
+#
+# Door het eindsaldo op te geven wordt dit geverifieerd.
+
+postbank 31-01 "Afschrift 1" --saldo=1001,77       \
+         std 06-01 "Girotel"            -2,70 6980 \
+         crd 19-01 XS4ALL              -22,80      \
+         crd 31-01 KPN                -104,65
+
+postbank 28-02 "Afschrift 2" --saldo=976,27        \
+         std 10-02 "Girotel"            -2,70 6980 \
+         crd 23-02 XS4ALL              -22,80
+
+postbank 31-03 "Afschrift 3" --saldo=4419,25       \
+         std 09-03 "Girotel"            -2,70 6980 \
+         deb 18-03 ACME               3570,00      \
+         crd 31-03 XS4ALL              -22,80      \
+         crd 31-03 KPN                -101,52
+
+postbank 30-04 "Afschrift 4" --saldo=7963,75       \
+         std 06-04 "Girotel"            -2,70 6980 \
+         crd 06-04 XS4ALL              -22,80      \
+         deb 12-04 ACME               3570,00
+
+postbank 31-05 "Afschrift 5" --saldo=8436,03       \
+         std 11-05 "Girotel"            -2,70 6980 \
+         crd 31-05 XS4ALL              -22,80      \
+         deb 31-05 ACME                600,00      \
+         crd 31-05 KPN                -102,22
+
+postbank 30-06 "Afschrift 6" --saldo=9119,53       \
+         std 08-06 "Girotel"            -2,70 6980 \
+         deb 08-06 ACME                714,00      \
+         deb 12-06 ACME                 -5,00      \
+         crd 21-06 XS4ALL              -22,80
+
+postbank 31-07 "Afschrift 7" --saldo=8989,37       \
+         std 06-07 "Girotel"            -2,70 6980 \
+         crd 30-07 XS4ALL              -22,80      \
+         crd 31-07 KPN                -104,66
+
+postbank 31-08 "Afschrift 8" --saldo=10.677,87      \
+         std 10-08 "Girotel"            -2,70 6980 \
+         deb 10-08 ACME                714,00      \
+         crd 10-08 XS4ALL              -22,80      \
+         deb 19-08 ORA                1000,00
+
+postbank 30-09 "Afschrift 9" --saldo=10.543,65      \
+         std 17-09 "Girotel"            -2,70 6980 \
+         crd 30-09 XS4ALL              -22,80      \
+         crd 30-09 KPN                -108,72
+
+postbank 31-10 "Afschrift 10" --saldo=10518,15     \
+         std 12-10 "Girotel"            -2,70 6980 \
+         crd 13-10 XS4ALL              -22,80
+
+postbank 30-11 "Afschrift 11" --saldo=10.382,98     \
+         std 08-11 "Girotel"            -2,70 6980 \
+         crd 30-11 XS4ALL              -22,80      \
+         crd 30-11 KPN                -109,67
+
+# Er kan een expliciet volgnummer worden opgegeven.
+postbank:12 07-12 "Afschrift 12" --saldo 10357.48  \
+         std 06-12 "Girotel"            -2,70 6980 \
+         crd 07-12 XS4ALL              -22,80
+
+# Partiele betalingen door het boekstuk op te geven i.p.v. de
+# debiteur/crediteur.
+postbank 09-12 "Eerste deel ADSL" --saldo=10,347.48 \
+         crd 09-12 Inkoop:20           -10,00
+
+# De rest van de betaling kan met opgave van boekstuk, maar natuurlijk
+# ook op de 'handige' manier waarbij EekBoek het zelf uitzoekt.
+postbank 10-12 "Tweede deel ADSL" --saldo=10334,68 \
+         crd 10-12 XS4ALL              -12,80
+
+# Afschrijvingen
+#
+# Memoriaal is als een bankboeking, maar er is geen impliciete
+# grootboekrekening waarop het totaal wordt geboekt. Het boekstuk moet
+# dus precies in balans zijn.
+# Ook hier geldt dat een positief bedrag de betreffende rekening
+# crediteert (vermeerdert) en een negatief bedrag vermindert.
+# Eveneens van toepassing is de opmerking bij Bankboekingen over 'std'
+# boekingen met BTW.
+
+memoriaal 31-12 "Afschrijving inventaris" \
+          std "Afschrijving"          -411,26 6800 \
+          std "Afschrijving"           411,26 1101 
+
+memoriaal 31-12 "Afschrijving computers" \
+          std "Afschrijving"          -396,82 6810 \
+          std "Afschrijving"           396,82 1111
+
+
+# Rapportages voor de accountant.
+# balans                 --output=out/balans.html
+# balans   --detail=2    --output=out/balans2.html
+# result                 --output=out/result.html
+# result   --detail=2    --output=out/result2.html
+# journaal               --output=out/journaal.html
+# grootboek              --output=out/grootboek.html
+# btwaangifte            --output=out/btwaangifte.html
+# openstaand             --output=out/openstaand.html

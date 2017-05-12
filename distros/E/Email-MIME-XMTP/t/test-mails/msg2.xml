@@ -1,0 +1,14 @@
+<xmtp:Message
+	xmlns:xmtp="http://www.openhealth.org/xmtp#"
+	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	rdf:about="mid:12C50B343E32FC4EA257902D287AD57605843172@mail.chinglish.com">
+                <xmtp:Message-ID>mid:12C50B343E32FC4EA257902D287AD57605843172@mail.chinglish.com</xmtp:Message-ID>
+                <xmtp:From xml:lang="en">Riccardo Piatelli &lt;riccardo@piatelli.net</xmtp:From>
+                <xmtp:To xml:lang="en">Riccardo Piatelli &lt;riccardo@piatelli.net</xmtp:To>
+                <xmtp:CC xml:lang="en">Riccardo Piatelli &lt;riccardo@piatelli.net</xmtp:CC>
+                <xmtp:Subject xml:lang="en">Subject of the email</xmtp:Subject>
+                <xmtp:Date xml:lang="en">15/01/2005</xmtp:Date>
+                <xmtp:Content-Type>text/plain</xmtp:Content-Type>
+                <xmtp:In-Reply-To>bf50242c07ed0b2182d4504e4d3bc32d@asemantics.com</xmtp:In-Reply-To>
+</xmtp:Message>
+

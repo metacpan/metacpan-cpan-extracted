@@ -1,0 +1,36 @@
+---
+abstract: 'View Your MS Exchange Calendar as a Standalone Web App'
+author:
+  - 'Oliver Gorwits <oliver@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  File::ShareDir::Install: 0.03
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200011, CPAN::Meta::Converter version 2.110930001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: EWS-Calendar-Viewer
+requires:
+  Calendar::Simple: 0
+  Catalyst: 0
+  Catalyst::Action::RenderView: 0
+  Catalyst::Controller: 0
+  Catalyst::Model::Adaptor: 0
+  Catalyst::Plugin::ConfigLoader: 0
+  Catalyst::Plugin::Static::Simple: 0
+  Catalyst::ScriptRunner: 0
+  Catalyst::View::TT: 0
+  Config::General: 0
+  DateTime: 0
+  EWS::Client: 1.111981
+  File::ShareDir: 0
+  MRO::Compat: 0
+  Try::Tiny: 0
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=EWS-Calendar-Viewer
+  homepage: https://github.com/ollyg/EWS-Calendar-Viewer/wiki
+  repository: git://github.com/ollyg/EWS-Calendar-Viewer.git
+version: 1.111982

@@ -1,0 +1,67 @@
+Emacs-Run-ExtractDocs
+
+A perl/elisp lash-up to extract the docstrings from an
+elisp file to a html page.
+
+As of version 0.2, this is now a Module::Build-based project.
+Version 0.3 fixes dependencies (so that tests have a hope of passing).
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+        sudo cp lisp/extract-doctrings.el /usr/share/emacs/site-lisp
+        (or some other location in your emacs load-path)
+
+Note that last manual installation step (this is unfortunately
+standard for CPAN packages containing emacs lisp code).
+
+DEPENDENCIES
+
+This module depends on having Gnu/emacs installed on the system
+(it might work with xemacs but this is untested).
+
+This module requires these other modules and libraries:
+   Class::Base
+   Emacs::Run
+
+The tests require:
+   Test::Differences
+   Test::More
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Emacs::Run::ExtractDocs
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Emacs-Run-ExtractDocs
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Emacs-Run-ExtractDocs
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Emacs-Run-ExtractDocs
+
+    Search CPAN
+        http://search.cpan.org/dist/Emacs-Run-ExtractDocs/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008, 2010 Joseph Brenner
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

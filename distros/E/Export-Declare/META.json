@@ -1,0 +1,53 @@
+{
+   "abstract" : "Declarative Exporting, successor of Exporter-Declare.",
+   "author" : [
+      "Chad Granum <exodist@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Export-Declare",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Importer" : "0.010",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::Suite" : "0.000018",
+            "Test::Fatal" : "0.012"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/exodist/Export-Declare/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/exodist/Export-Declare/"
+      }
+   },
+   "version" : "0.002"
+}
+

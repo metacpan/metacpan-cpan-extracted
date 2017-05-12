@@ -1,0 +1,37 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.64.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 26c8abf0d13f4c037e1ffa36578ab80f0b05b6b4 Changes
+SHA1 a3a3190107fe5663058ed65688625a4ba0065f75 LICENSE
+SHA1 12973a891769a47cdb15ee50e85447f47ddc119e MANIFEST
+SHA1 b020d4b1dfa6a51446b8c75d31f24931e4a4a1f9 META.json
+SHA1 223ac4040fd8dff272f95360e1115a76c260b3f7 META.yml
+SHA1 ac4dc5a4fa994c3d4bb3004f83ff318bf48921de Makefile.PL
+SHA1 011bb5337f85badb39c99d6144d267dc42cbfcab README
+SHA1 ce33985e63feef7a90c65eaf1af046519129a969 dist.ini
+SHA1 8e42431af0592b3a94a6a227ec3ffbd3e9843b3a lib/Encode/Base32/Crockford.pm
+SHA1 9623bcc9220647ccea4ab94ff079ffef29e1a0bb t/base32.t
+SHA1 b02280c3d890954ec3d10614939ea9c424353e44 t/encode_decode.t
+SHA1 c622c21d1961ff392e7c5a4461b1d3879a6257db t/encode_decode_checksum.t
+SHA1 5be1454f5ed19abbcc5a461ebb8e85e21881f055 t/pod.t
+SHA1 23d7f9930239ff1f8585f8dc88819d9f3ec19d8b t/pod_coverage.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (Darwin)
+
+iEYEARECAAYFAk6oJg8ACgkQR0BL4gbYw3QF+ACfSe3gT/VTNNGfLCFiu/c8M6Ev
+pqMAoJR0Ov168JRuQmCex2Enrqbnsodr
+=iINv
+-----END PGP SIGNATURE-----

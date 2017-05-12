@@ -1,0 +1,42 @@
+---
+abstract: 'export all public functions from your package'
+author:
+  - 'Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ GMAIL COM>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.1.1, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Exporter-Auto
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Exporter::Auto:
+    file: lib/Exporter/Auto.pm
+    version: '0.04'
+requires:
+  B::Hooks::EndOfScope: '0'
+  Sub::Identify: '0'
+  parent: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/tokuhirom/Exporter-Auto/issues
+  homepage: https://github.com/tokuhirom/Exporter-Auto
+  repository: https://github.com/tokuhirom/Exporter-Auto.git
+version: '0.04'
+x_contributors:
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
+  - 'Neil Bowers <neil@bowers.com>'

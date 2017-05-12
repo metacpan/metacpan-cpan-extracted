@@ -1,0 +1,136 @@
+# NAME
+
+Email::Simple::Markdown - simple email creation with auto text and html multipart body
+
+# VERSION
+
+version 0.7.2
+
+# SYNOPSIS
+
+```perl
+use Email::Simple::Markdown;
+
+my $email = Email::Simple::Markdown->create(
+    header => [
+        From    => 'me@here.com',
+        To      => 'you@there.com',
+        Subject => q{Here's a multipart email},
+    ],
+    body => '[this](http://metacpan.org/search?q=Email::Simple::Markdown) is *amazing*',
+);
+
+print $email->as_string;
+```
+
+# DESCRIPTION
+
+_Email::Simple::Markdown_ behaves almost exactly like [Email::Simple](https://metacpan.org/pod/Email::Simple),
+excepts for one detail: when its method `as_string()` is invoked, the
+returned string representation of the email has multipart body with a 
+_text/plain_ element (the original body), and a _text/html_ element,
+the markdown rendering of the text body.
+
+The markdown convertion is done using [Text::MultiMarkdown](https://metacpan.org/pod/Text::MultiMarkdown).
+
+# METHODS
+
+_Email::Simple::Markdown_ inherits all the methods if [Email::Simple](https://metacpan.org/pod/Email::Simple). 
+In addition, it provides one more method: _with\_markdown_.
+
+## create( ... ) 
+
+Behaves like [Email::Simple](https://metacpan.org/pod/Email::Simple)'s `create()`, but accepts the following
+additional arguments:
+
+- markdown\_engine => $module
+
+    See `markdown_engine_set`. If not given, defaults to `auto`.
+
+- css => $stylesheet
+
+    If provided, the html part of the email will be prepended with the given
+    stylesheet, wrapped by a _css_ tag.
+
+- pre\_markdown\_filter => sub { ... }
+
+    See `pre_markdown_filter_set`.
+
+- charset => $charset
+
+    The character set supplied to `Email::MIME::create()`. By default, no character set 
+    is passed.
+
+## markdown\_engine
+
+Returns the markdown engine used by the object.
+
+## markdown\_engine\_set( $module )
+
+Sets the markdown engine to be used by the object. 
+Accepts `auto`, [Text::MultiMarkdown](https://metacpan.org/pod/Text::MultiMarkdown), [Text::Markdown](https://metacpan.org/pod/Text::Markdown), or any module
+implementing a `markdown` method.
+
+If not specified or set to `auto`, the object will use the first markdown module it finds
+between [Text::MultiMarkdown](https://metacpan.org/pod/Text::MultiMarkdown) and [Text::Markdown](https://metacpan.org/pod/Text::Markdown).
+
+## css
+
+Returns the cascading stylesheet that is applied to the html part of the
+email.
+
+## css\_set( $stylesheet )
+
+Sets the cascading stylesheet for the html part of the email to be
+_$stylesheet_.  
+
+```
+$email->css_set( <<'END_CSS' );
+    p   { color: red; }
+    pre { border-style: dotted; }
+END_CSS
+```
+
+The _$stylesheet_ can also be an array ref, holding key/value pairs where
+the key is the css selector and the value the attached style. For example, 
+the equivalent call to the one given above would be:
+
+```perl
+$email->css_set([
+    p   => 'color: red;',
+    pre => 'border-style: dotted;',
+]);
+```
+
+## pre\_markdown\_filter\_set( sub{ ... } );
+
+Sets a filter to be run on the body before the markdown transformation is
+done. The body will be passed as `$_` and should be modified in-place.
+
+E.g., to add a header to the email:
+
+```perl
+$mail->pre_markdown_filter_set(sub {
+    s#^#<div id="header">My Corp <img src='..' /></div>#;
+});
+```
+
+## charset\_set( $charset )
+
+Sets the charset to be used by the email.
+
+## with\_markdown()
+
+Returns an [Email::Abstract](https://metacpan.org/pod/Email::Abstract) representation of the email, with 
+its multipart body.
+
+# AUTHOR
+
+Yanick Champoux <yanick@cpan.org> [![endorse](http://api.coderwall.com/yanick/endorsecount.png)](http://coderwall.com/yanick)
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Yanick Champoux.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

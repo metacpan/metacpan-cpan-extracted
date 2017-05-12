@@ -1,0 +1,9 @@
+{
+  "validator": "Rx",
+  "header": [
+    { "Subject": "Test Rx Message" },
+    { "From":    "test@test.com"   }
+  ],
+  "type": "text/plain",
+  "body": "This is a plaintext message."
+}

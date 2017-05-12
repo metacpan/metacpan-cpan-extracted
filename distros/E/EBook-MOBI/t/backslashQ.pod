@@ -1,0 +1,14 @@
+=head1 This is a p[ special char \Q isnt it
+
+Text 1
+
+=head2 Two
+
+Text \Q 2
+
+=head1 Three
+
+Text 3
+
+=cut
+

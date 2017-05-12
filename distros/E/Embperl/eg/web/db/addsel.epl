@@ -1,0 +1,101 @@
+[- 
+use Embperl::Form::Validate ;
+use File::Basename ;
+
+
+$r = shift ;
+
+my $langset = $r -> {language_set} ;
+$$langset -> Reset ;
+while ($rec = $$langset -> Next)
+    {
+    push @rules, 
+        [
+        -key => "category_$rec->{id}",
+        -name => $rec -> {name},
+        'emptyok',
+        length_min => 5
+        ] ;
+    push @keys, "category_$rec->{id}" ;
+    }
+
+
+
+
+
+$epf = Embperl::Form::Validate -> new ([
+                                        -key => \@keys,
+                                        -name => { de => 'eine Kategorie', en => 'one category' },
+                                        'required',
+                                        @rules,
+                                        ]) ;
+
+$Embperl::Form::Validate::objects{'addsel'} = $epf ;
+
+-]
+<script>
+[+ do { local $escmode = 0 ; $epf -> get_script_code (undef, $r) } +]
+</script>
+
+<p class="cHeadline">[= addsel1 =]</p>
+
+<ul>
+    [- $rec = $r -> {category_set}[$row] ; -]
+    [$ if ($rec -> {edit_level} <= ($r -> {user_admin}?2:1)) $]
+    <li>
+        <a href="add.-category_id-[+ $rec -> {category_id} +]-.epl">[+ $rec -> {category} +]</a>
+    </li>
+    [$endif$]
+</ul>
+
+
+[$ if $r -> {user_id} $]
+
+<p class="cHeadline">[= addsel_upd =]</p>
+
+<ul>
+    [- $rec = $r -> {category_set}[$row] ;-]
+    [$if ($rec -> {edit_level} <= ($r -> {user_admin}?2:1))  $]
+    <li>
+        <a href="list.-category_id-[+ $rec -> {category_id} +]-.epl">[+ $rec -> {category} +]</a>
+    </li>
+    [$endif$]
+</ul>
+
+
+<p class="cHeadline"><a href="wiki/index.cgi">Wiki</a></p>
+
+
+[$else$]
+
+<p class="cHeadline">[= addsel_login1 =] <a href="login.epl">[= addsel_login2 =]</a> [= addsel_login3 =]</p>
+
+[$endif$]
+
+[#
+DEBUGGING:
+
+[! use Data::Dumper; !]
+<PRE>
+[+ Dumper $ENV{SERVER_NAME}, $ENV{SERVER_PORT}, [keys %$r] +]
+</PRE>
+#]
+
+[#
+<form action="[+ $r -> app -> posturl('addsel.epl') +]"  OnSubmit="">
+
+[= addsel2 =]<br> 
+[= addsel3 =]<br><br>
+
+<table>
+    <tr>
+        [- $rec = $r -> {language_set}[$row] -]
+        <td>[+ $rec -> {name} +]:</td><td><input type="text" name="category_[+ $rec -> {id} +]" size=80></td>
+    </tr>
+</table>
+
+<br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<input type="submit" name="-add_category" value="[=addsel4=]">
+
+</form>
+#]

@@ -1,0 +1,16 @@
+{
+  "renderer" : "TestRenderer",
+  "assembler": [
+    "Markdown",
+    {
+      "html_wrapper": "wrapper.html",
+      "text_wrapper": "wrapper.txt",
+      "munge_signature": 1
+    }
+  ],
+  "path"  : "body.mkdn",
+  "header": [
+    { "Subject": "this is a markdown test" },
+    { "From":    "\"Ricardo Signes\" <rjbs@example.com>" }
+  ]
+}

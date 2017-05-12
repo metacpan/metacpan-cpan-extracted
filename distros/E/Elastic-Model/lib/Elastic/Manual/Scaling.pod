@@ -1,0 +1,380 @@
+package Elastic::Manual::Scaling;
+
+# ABSTRACT: How to grow from a single node to a massive cluster
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Elastic::Manual::Scaling - How to grow from a single node to a massive cluster
+
+=head1 VERSION
+
+version 0.52
+
+=head1 DESCRIPTION
+
+Elasticsearch can run on a laptop, but it can also scale up to terrabytes of
+data on hundreds of nodes. L<Elastic::Model> is designed to make it easy to
+grow from humble beginnings to taking over the world.
+
+The basic unit in Elasticsearch is the L<shard|Elastic::Manual::Terminology/Shard>,
+which is a single Lucene instance (a search engine in its own right).
+An L<index|Elastic::Manual::Terminology/Index> is a "virtual namespace" which
+contains a collection of shards. By default, a new index is created with 5
+primary shards and 1 replica shard for each primary, making a total of 10 shards.
+
+A single shard can hold a lot of data. The exact amount depends on your hardware,
+your data and your search requirements. You can easily run 5 primary shards on
+a single node (server). However, if that node dies, you may lose your data.
+
+If you start a second node, Elasticsearch will bring up the 5 replica shards. Now,
+if one node dies, your other node will be able to continue functioning and
+your data will be safe.
+
+If your data grows to be more than two nodes to handle, then you can just add
+more nodes. Elasticsearch will move the shards around to balance them across
+all of your nodes. This strategy functions up to a maximum of 10 nodes, with
+1 shard on each node (5 primaries and 5 replicas).
+
+That already gives you more scale than 99% of applications need.
+
+But what if your business is particularly successful and you need more scale?
+What strategies are available to you? This document takes you from development
+on your laptop to massive scale in production.
+
+B<Note:> You B<cannot change the number of primary shards after creating an index>,
+but you can change the number of replicas that each primary shard has at any
+time.
+
+=head1 STARTING OUT
+
+For the examples below, we will assume a model definition as follows:
+
+    package MyApp;
+    use Elastic::Model;
+
+    has_namespace 'myapp' => {
+        user => 'MyApp::User',
+        post => 'MyApp::Post'
+    };
+
+=head2 Simple, but inflexible
+
+The simplest way to start out is as follows:
+
+    use MyApp;
+
+    my $model = MyApp->new;
+    $model->namespace('myapp')->index->create;
+
+This will create the index C<myapp>, and configure the mapping for types
+C<user> and C<post>, and you are ready to start storing data in it.
+
+This is fine for quick tests with throw-away data. However, what happens when
+you decide that you want to change the way your C<user> type is configured?
+You can B<add> to the mapping, but you can't change it. So you
+have two choices: either create a new index with a new name, and update
+your application to use that, or delete your index (and your data) and start again.
+
+Neither option is terribly appealing.
+
+=head2 Aliases - adding flexibility
+
+The key to flexibility is the L<index alias|Elastic::Manual::Terminology/Alias>.
+An alias can point at one or more indices, and can be updated atomically to
+switch from an old index to a new index.
+
+This makes it possible for your application to talk to the alias C<myapp>,
+which can be repointed to the current version of your index:
+
+    use MyApp;
+
+    my $model = MyApp->new;
+    my $ns    = $model->namespace('myapp');
+
+    my $index  = 'myapp_'.time();
+    $ns->index($index)->create;
+    $ns->alias->to($index);
+
+The above will create the index C<myapp_TIME> and point the alias C<myapp> at
+that index. Now, when you want to change your mapping, you can repeat the process
+with a new index name:
+
+    my $new_name = 'myapp_'.time();
+    my $new_index = $ns->index($new_name);
+    $new_index->create;
+
+Now you can L<reindex|Elastic::Manual::Reindex> your data from
+C<$index> to C<$new_index>:
+
+    $new_index->reindex( 'myapp' );
+
+And finally, update the alias and delete the old index:
+
+    my $current   = $ns->alias->aliased_to;
+    $ns->alias->to($new_index);
+    $ns->index($_)->delete for keys %$current;
+
+=head2 Namespaces, domains, aliases and indices
+
+Elastic::Model needs to know how the L<types|Elastic::Manual::Terminology/Type>
+in an index relate to your classes.  For this, you define a
+L<namespace|Elastic::Manual::Terminology/Namespace> in your model:
+
+    package MyApp;
+
+    use Elastic::Model;
+
+    has_namespace 'myapp' => {
+        user => 'MyApp::User',
+        post => 'MyApp::Post'
+    };
+
+This is sufficient for you to use the
+L<domain|Elastic::Manual::Terminology/Domain> C<myapp>, which can be
+either an L<index|Elastic::Manual::Terminology/Index> or an
+L<alias|Elastic::Manual::Terminology/Alias>.
+
+However, you can have multiple domains (aliases and indices), all associated
+with the same namespace.  For Elastic::Model to know which namespace to use
+for these domains, you have two options:
+
+=head3 Manually specify domain names
+
+You can manually specify the extra domains in your namespace declaration:
+
+    has_namespace 'myapp' => {
+        user => 'MyApp::User',
+        post => 'MyApp::Post'
+    },
+    fixed_domains => ['alias_1','index_2'];
+
+=head3 Automatically include new domain names
+
+The preferred method is to use the "main" domain (ie the C<< $namespace->name >>)
+as an alias for all indices associated with the namespace. Any other aliases
+associated with these indices will be automatically included in the namespace.
+
+For instance, let's create 3 indices:
+
+    $ns = $model->namespace('myapp');
+    $ns->index('myapp_1')->create;
+    $ns->index('myapp_2')->create;
+    $ns->index('myapp_3')->create;
+
+Create the alias C<myapp> (the main domain name) to point to all three indices:
+
+    $ns->alias->to('myapp_1', 'myapp_2', 'myapp_3');
+
+Create another alias:
+
+    $ns->alias('two_of_three')->to('myapp_1', 'myapp_2');
+
+You can now use any of these as domain names:  C<myapp>, C<myapp_1>, C<myapp_2>,
+C<myapp_3> or C<two_of_three>:
+
+    $two_of_three = $model->domain('two_of_three');
+
+An alias that points at a single index can be used for creating new docs,
+updating existing docs and for retrieving or searching for docs.
+
+An alias that points at MORE than one index cannot be used for creating
+new docs, but it can be used to retrieve and update an existing doc.
+
+=head1 SCALING STRATEGIES
+
+See L<Big data, search and analytics|https://speakerdeck.com/u/kimchy/p/elasticsearch-big-data-search-analytics>
+for a presentation discussing the strategies described below.
+
+=head2 Overallocation - the "Kagillion shards" solution
+
+The first scaling response to I<"our new business-started-on-a-shoestring will
+be HUGE!!!"> is: I<"Lets create an index with 10,000 shards and run it on an
+Amazon EC2 micro instance!">
+
+Unfortunately, this approach doesn't work. Each shard consumes resources:
+memory, filehandles, CPU.  Your ZX Spectrum won't handle 1,000 shards!
+
+Fortunately, querying an index with 50 shards is the same as querying 50 indices
+which have one shard each.  So, with judicious use of aliases, we can grow
+as needed.
+
+=head2 Time based indices
+
+If your data is easily segmentable by time, for instance logs or tweets, then
+you could use a new index per month, week, day or hour - depending
+on your requirements.  You may start with an index with 1 shard, then as
+requirements grow, you create your new indices with 5 shards, 10 shards or 100.
+
+Here is an example of how this could work. First, create an index for
+the current month:
+
+    $ns = $model->namespace('myapp');
+    $ns->index('myapp_2012_06')->create;
+
+Add it to the main alias for the namespace, C<myapp>:
+
+    $ns->alias->add('myapp_2012_06');
+
+Set the C<current> alias (for writing new data):
+
+    $ns->alias('current')->to('myapp_2012_06');
+
+Time keeps rolling on. You've repeated the above process many times.  Now
+you decide that, really, you're most interested in the data from the last two
+months (although, at times, you also want to query older data).
+
+So let's create a new alias C<last_two_months>:
+
+    $ns->alias('last_two_months')->to('myapp_2013_01','myapp_2013_02');
+
+Next month, you can update the C<last_two_months> alias with:
+
+    $ns->alias('last_two_months')->to('myapp_2013_02','myapp_2013_03');
+
+    # Or:
+
+    $last_2 = $ns->alias('last_two_months');
+    $last_2->remove('myapp_2013_01');
+    $last_2->add('myapp_2013_01');
+
+With the above, you can:
+
+=over
+
+=item *
+
+write new data to the C<current> alias:
+
+    $current = $model->domain('current');
+    $current->new_doc( user => \%args )->save;
+
+=item *
+
+query the most recent data with the C<last_two_months> alias:
+
+    my $results = $last_2->view->search;
+
+=item *
+
+query ALL data with the C<myapp> alias:
+
+    my $results = $model->domain('myapp')->view->search;
+
+=back
+
+=head2 Index-per-user
+
+Imagine you are running an email service. The ideal would be to have a single
+index for each user.  But this would be wasteful: the majority of users
+receive fewer than 1,000 emails a month, so a single shard could hold the
+emails for thousands of small users.
+
+Again, aliases come to the rescue.  We can create several aliases to the same
+index, and provide a default filter to restrict each alias to a single user.
+First we create the index:
+
+    my $ns    = $model->namespace('myapp');
+    $ns->index->create;
+
+Now we create aliases to the index C<myapp> for two users:
+
+    $ns->alias('john')->to( myapp => { filterb => { username => 'john' }});
+    $ns->alias('mary')->to( myapp => { filterb => { username => 'mary' }});
+
+When we want to work just with tweets for user C<john>, we can do:
+
+    $john = $model->domain('john');
+    $john->new_doc(post => \%args)->save;
+    $results = $john->view->search;
+
+The filter associated with the alias (C< username == 'john' >) is
+automatically applied to all queries or filters.
+
+You can still search all messages for C<john> and C<mary> with the main domain
+C<myapp>:
+
+    $results = $model->domain('myapp')->view->search;
+
+=head3 Routing - optimizing shard usage
+
+Elasticsearch decides which shard to store a new doc on by using a C<routing>
+string, which defaults to the doc's ID.  This routing string is hashed and
+a modulus of the number of primary shards is used to select the destination
+shard.  This is why you cannot change the number of primary shards in an index
+after it is created.
+
+To retrieve a doc by ID, the same process is repeated, and Elasticsearch
+can efficiently decide on which shard the doc is stored.
+
+However, for searching, things are not quite as efficient.  Elasticsearch has to
+run the search on ALL shards in order to get the results back.  Seeing that most
+of your searches will be related to a single user,
+it would be much more efficient to just store all docs belonging to that user
+on a single shard, and to send the search request to just that shard.
+
+This can be done by specifying a custom routing value for all docs belonging
+to C<john>, both when storing docs and when searching for them.  By far
+the easiest way to do this is again with aliases:
+
+    $ns->alias('john')->to(
+        myapp   => {
+            filterb => { username => 'john'},
+            routing => 'john'
+        }
+    );
+
+Now, when you use the domain C<john>, all requests will hit a single shard:
+
+    $john = $model->domain('john');
+    $john->new_doc( post => \%args );
+    $results = $john->view->search;
+
+=head3 Handling one BIG user
+
+Your new business is successful, and one day you get a new user, whom we shall
+call "twitter".  This single user starts out small, but soon grows to
+the size of a million average users. They have too much data to store on a
+single shard.  How do we handle this?
+
+Because we are using aliases, it is easy to create a new index just for this
+user, without having to change how your application works. First, we create
+a big index:
+
+    my $name  = 'twitter_'.time();
+    my $index = $ns->index( $name );
+    $index->create( settings => { number_of_shards => 100 });
+
+Once we have reindexed the existing data from the old C<twitter> alias to
+the new index:
+
+    $index->reindex( 'twitter' );
+
+... we add the new index to our main domain C<myapp>, so that Elastic::Model
+knows that it uses the same namespace:
+
+    $ns->alias->add($index);
+
+... and we update the C<twitter> alias to point to the new index:
+
+    $ns->alias('twitter')->to($index);
+
+And your application continues working without any changes.
+
+=head1 AUTHOR
+
+Clinton Gormley <drtech@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Clinton Gormley.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

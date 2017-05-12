@@ -1,0 +1,36 @@
+Content-Transfer-Encoding: binary
+Content-Type: multipart/mixed; boundary="_----------=_110780049136980"
+MIME-Version: 1.0
+X-Mailer: MIME::Lite 3.01 (F2.71; T1.13; A1.58; B3.05; Q3.03)
+Date: Mon, 7 Feb 2005 18:21:31 UT
+From: someone@example.com
+To: simon@example.com
+Subject: Mixed part message
+
+This is a multi-part message in MIME format.
+
+--_----------=_110780049136980
+Content-Disposition: inline
+Content-Length: 65
+Content-Transfer-Encoding: binary
+Content-Type: text/plain
+
+This (http://buscador.thegestalt.org) should come out in the text
+--_----------=_110780049136980
+Content-Disposition: attachment; filename="msg.html"
+Content-Length: 202
+Content-Transfer-Encoding: binary
+Content-Type: text/html; name="msg.html"
+
+<html>
+<body>
+<div>
+<font face="Arial">
+<a href="http://buscador.thegestalt.org" onClick="javascript:alert('Danger Will Robinson!')">this </a> should come out in the text
+</font>
+</div>
+</body>
+</html>
+
+--_----------=_110780049136980--
+

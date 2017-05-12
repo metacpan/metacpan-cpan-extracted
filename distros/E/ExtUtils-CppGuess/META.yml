@@ -1,0 +1,33 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  Capture::Tiny: '0'
+  Cwd: '0'
+  Data::Dumper: '0'
+  ExtUtils::MakeMaker: '0'
+  ExtUtils::Manifest: '0'
+  Fatal: '0'
+  File::Spec: '0'
+  Module::Build: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: ExtUtils-CppGuess
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Capture::Tiny: '0'
+  File::Basename: '0'
+resources:
+  repository: git://github.com/tsee/extutils-cppguess
+version: '0.11'

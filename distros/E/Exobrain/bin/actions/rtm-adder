@@ -1,0 +1,102 @@
+#!/usr/bin/perl -w
+use 5.010;
+use strict;
+use warnings;
+use autodie;
+use POSIX qw(strftime);
+
+use Exobrain;
+use WebService::RTMAgent;
+
+# PODNAME: rtm-adder
+# ABSTRACT: Add TODO items to RememberTheMilk from twitter
+
+use constant DEBUG => 1;
+
+my $exobrain = Exobrain->new;
+my $config   = $exobrain->config;
+
+my $rtm = WebService::RTMAgent->new;
+my $list = $config->{'RTM-ADDER'}{list};
+
+say "Adding to list: $list" if DEBUG;
+
+$rtm->api_key(    $config->{RTM}{api_key}    );
+$rtm->api_secret( $config->{RTM}{api_secret} );
+$rtm->init;
+
+$exobrain->watch_loop(
+    class  => "Measurement::Social",        # TODO: Watch 'Any' later on
+    filter => sub { grep { $_ eq 'todo' } @{$_->{tags}} },
+    then   => \&add_todo,
+);
+
+sub add_todo {
+    my $event = shift;
+
+    say "TODO event: " . $event->summary if DEBUG;
+
+    # Anti-troll. ;)
+
+    if ($event->summary =~ /sudo make me a sandwich/i) {
+        $event->respond("User not in the sudoers file. This incident will be reported.");
+        return;
+    }
+    elsif ($event->summary =~ /make me a sandwich/i) {
+        $event->respond("What? Make it yourself.");
+        return;
+    }
+    elsif ($event->summary =~ /dQw4w9WgXcQ/i) {
+        $event->respond("I'm never gonna let you down!");
+        return;
+    }
+
+    my $user = $event->from;
+    my $todo = $event->summary;
+
+    # Add to TODO list
+
+    my $res = $rtm->tasks_add(
+        "name=$todo",
+        "list_id=$list",
+    );
+
+    my $time = strftime("%Y-%m-%d %H:%M:%S UTC", gmtime($event->timestamp));
+
+    if (not defined $res) { 
+        $event->respond("Sorry, I couldn't add your TODO item posted at $time");
+
+        $exobrain->notify("$user FAILED to add to your TODO list: $todo",
+            priority => 1
+        );
+    }
+    else { 
+        $event->respond("Thanks! I've added your TODO item posted at $time");
+        $exobrain->notify("$user added to your TODO list: $todo");
+    }
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+rtm-adder - Add TODO items to RememberTheMilk from twitter
+
+=head1 VERSION
+
+version 1.08
+
+=head1 AUTHOR
+
+Paul Fenwick <pjf@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Paul Fenwick.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

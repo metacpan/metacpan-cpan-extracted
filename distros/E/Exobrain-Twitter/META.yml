@@ -1,0 +1,45 @@
+---
+abstract: 'Twitter components for exobrain'
+author:
+  - 'Paul Fenwick <pjf@cpan.org>'
+build_requires:
+  Exobrain: 1.04
+  Exobrain::Test: 0
+  Test::Deep: 0
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.013, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Exobrain-Twitter
+requires:
+  Date::Manip::Date: 0
+  Exobrain: 1.04
+  Exobrain::Agent: 0
+  Exobrain::Agent::Poll: 0
+  Exobrain::Agent::Run: 0
+  Exobrain::Component: 0
+  Exobrain::Config: 0
+  Exobrain::Intent: 0
+  Exobrain::Measurement::Social: 0
+  Method::Signatures: 0
+  Moose: 0
+  Moose::Role: 0
+  MooseX::Types: 0
+  MooseX::Types::Moose: 0
+  Net::Twitter: 0
+  autodie: 0
+  constant: 0
+  feature: 0
+  perl: 5.010
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/pjf/exobrain-twitter
+  repository: git://github.com/pjf/exobrain-twitter
+version: 1.04

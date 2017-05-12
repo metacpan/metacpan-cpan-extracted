@@ -1,0 +1,22 @@
+Changes
+lib/ExtUtils/Depends.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+perl-ExtUtils-Depends.spec.in
+README
+t/01_load.t
+t/02_save_load.t
+t/03_deps.t
+t/04_extra_libs.t
+t/inc/DepTest/DepTest.dll
+t/inc/DepTest/DepTest.lib
+t/inc/DepTest/Install/.keep
+t/inc/DepTest/libDepTest.dll.a
+t/inc/DepTest/PL_DepTest.dll
+t/inc/DepTest/PL_DepTest.lib
+t/inc/DepTest/PL_DepTest.so
+t/inc/DepTest/PL_libDepTest.dll.a
+t/lib/TestHelper.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,30 @@
+NAME
+    ExtUtils::Typemap - Read/Write/Modify Perl/XS typemap files
+
+SYNOPSIS
+    See "ExtUtils::Typemaps" instead!
+
+DESCRIPTION
+    This module exists merely as a compatibility wrapper around
+    ExtUtils::Typemaps. In a nutshell, "ExtUtils::Typemap" was renamed to
+    "ExtUtils::Typemaps" because the Typemap directory in lib/ could collide
+    with the typemap file on case-insensitive file systems.
+
+    The "ExtUtils::Typemaps" module is part of the ExtUtils::ParseXS
+    distribution and ships with the standard library of perl starting with
+    perl version 5.16.
+
+SEE ALSO
+    ExtUtils::Typemaps, ExtUtils::ParseXS.
+
+    For details on typemaps: perlxstut, perlxs.
+
+AUTHOR
+    Steffen Mueller "<smueller@cpan.org">
+
+COPYRIGHT & LICENSE
+    Copyright 2009, 2010, 2011 Steffen Mueller
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

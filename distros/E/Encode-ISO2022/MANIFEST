@@ -1,0 +1,39 @@
+Changes
+ISO2022/Makefile.PL
+ISOIRSingle/Makefile.PL
+JISLegacy/Makefile.PL
+lib/Encode/ISO2022.pm
+lib/Encode/ISO2022/CCS.pod
+lib/Encode/ISO2022JP2.pm
+lib/Encode/ISOIRSingle.pm
+lib/Encode/JISLegacy.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/Encode-ISO2022.t
+t/iso2022jp2.enc
+t/ISO2022JP2.t
+t/iso2022jp2.utf
+t/pod.t
+ucm/c1-ctrl.ucm
+ucm/iso-ir-13.ucm
+ucm/iso-ir-14.ucm
+ucm/iso-ir-100.ucm
+ucm/iso-ir-101.ucm
+ucm/iso-ir-109.ucm
+ucm/iso-ir-110.ucm
+ucm/iso-ir-126.ucm
+ucm/iso-ir-127.ucm
+ucm/iso-ir-138.ucm
+ucm/iso-ir-144.ucm
+ucm/iso-ir-148.ucm
+ucm/iso-ir-157.ucm
+ucm/iso-ir-166.ucm
+ucm/iso-ir-179.ucm
+ucm/iso-ir-199.ucm
+ucm/iso-ir-203.ucm
+ucm/iso-ir-226.ucm
+ucm/jis-x-0212-ascii.ucm
+ucm/jis-x-0212-cp932.ucm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

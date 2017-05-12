@@ -1,0 +1,21 @@
+---
+name: Egg-Plugin-Log-Syslog
+version: 0.01
+author:
+  - 'Masatoshi Mizuno E<lt>lusheE<64>cpan.orgE<gt>'
+abstract: lib/Egg/Plugin/Log/Syslog.pm
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Egg::Release: 2.26
+  Test::More: 0
+  Test::Pod: 0
+provides:
+  Egg::Plugin::Log::Syslog:
+    file: lib/Egg/Plugin/Log/Syslog.pm
+    version: 0.01
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

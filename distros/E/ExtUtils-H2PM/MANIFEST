@@ -1,0 +1,21 @@
+Build.PL
+Changes
+lib/ExtUtils/H2PM.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00use.t
+t/01constant.t
+t/02structure-numeric.t
+t/03structure-strarray.t
+t/04structure-constant.t
+t/10structure-with-tail.t
+t/11structure-args-hashref.t
+t/12structure-no-length-check.t
+t/20include_path.t
+t/21define.t
+t/99pod.t
+t/test.h

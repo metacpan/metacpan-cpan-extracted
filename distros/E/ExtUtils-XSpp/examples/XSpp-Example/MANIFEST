@@ -1,0 +1,15 @@
+Build.PL
+lib/XSpp/Example.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+src/Animal.cc
+src/Animal.h
+src/Dog.cc
+src/Dog.h
+src/ppport.h
+t/01basic.t
+xsp/Animal.xsp
+xsp/Dog.xsp
+xsp/mytype.map
+xsp/typemap.xsp

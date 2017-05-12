@@ -1,0 +1,55 @@
+0.07 2015-09-27T10:12:02+02:00
+ [Common]
+ - Improve SEE ALSO section in doc.
+ - Move author tests to xt/ directory.
+ - Update Module::Install to 1.16 version.
+
+0.06 2015-02-14T11:59:01+01:00
+ [Error::Pure::JSON]
+ - Rewrite tests to decode JSON to perl structure and compare. Thanks
+   Slaven Rezić for reporting (#102114, #102113).
+
+ [Error::Pure::JSON::Advance]
+ - Rewrite tests to decode JSON to perl structure and compare. Thanks
+   Slaven Rezić for reporting (#102114, #102113).
+
+0.05 2015-02-13T23:07:33+01:00
+ [Common]
+ - Update copyright years.
+ - Update dependency to Error::Pure::Output::JSON with 0.09 version (right
+   JSON dependency).
+
+ [Error::Pure::JSON]
+ - Add tests.
+ - Clean code across new err_helper().
+ - Update LICENSE AND COPYRIGHT section in doc.
+
+ [Error::Pure::JSON::Advance]
+ - Add tests.
+ - Update LICENSE AND COPYRIGHT section in doc.
+
+0.04 2014-11-16T22:44:21+01:00
+ [Common]
+ - Add readme_from directive to Makefile.PL.
+ - Fix LICENSE file.
+ - Rewrite B<> to C<> in doc for code.
+ - Update LICENSE AND COPYRIGHT section in doc to my standard.
+ - Update Module::Install to 1.14 version.
+
+ [Error::Pure::JSON]
+ - Add tests for err().
+ - Fix error with undef value.
+
+ [Error::Pure::JSON::Advance]
+ - Add tests for err().
+ - Fix error with undef value.
+
+0.03 2013-09-21
+ - Add dependency for perl (based on Error::Pure).
+ - Rewrite Changes file to CPAN::Changes::SPEC format.
+
+0.02 2013-08-31
+ - Add README.
+
+0.01 2013-08-30
+ - First version.

@@ -1,0 +1,62 @@
+EBI-FGPT-FuzzyRecogniser
+
+The module EBI::FGPT::FuzzyRecogniser takes in the constructor an ontology file (OWL/OBO/OMIM/MeSH) 
+and parses it into an internal table of ontology terms (type of EBI::FGPT::FuzzyRecogniser::OntologyTerm). 
+The module contains the find_match method which finds the best match  for the supplied term in the given ontology. 
+This can be then queried for ->match_similarity(), ->matched_value(), ->matched_label(), and ->matched_accession().
+The best match is based on the n-grams similarity metric.
+
+INSTALLATION
+
+Use:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+	
+DEPENDENCIES
+
+Moose
+IO::File;
+Getopt::Long;
+GO::Parser;
+OWL::Simple::Parser 1.00;
+MeSH::Parser::ASCII 0.02;
+Bio::Phenotype::OMIM::OMIMparser;
+EBI::FGPT::FuzzyRecogniser::OntologyTerm;
+EBI::FGPT::FuzzyRecogniser::OntologyTerm::Annotation;
+EBI::FGPT::FuzzyRecogniser::OntologyTerm::Label;
+EBI::FGPT::FuzzyRecogniser::OntologyTerm::Synonym;
+Log::Log4perl
+IO::Handle;
+Benchmark 
+List::Util
+Data::Dumper;
+
+
+
+DOCUMENTATION
+
+After installing, you can find documentation modules and scripts with the perldoc 
+command, e.g.:
+perldoc EBI-FGPT-FuzzyRecogniser
+
+or visit the respective page on CPAN
+
+COPYRIGHT AND LICENSE
+
+Copyright [2011] EMBL - European Bioinformatics Institute
+
+Licensed under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License. You may obtain a copy of the License at
+http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+either express or implied. See the License for the specific
+language governing permissions and limitations under the
+License.
+
+

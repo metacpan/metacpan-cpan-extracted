@@ -1,0 +1,58 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with EntityModel::Util
+at lib/EntityModel/Util.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+EntityModel::Util - helper functions for L<EntityModel>
+
+=head1 VERSION
+
+version 0.102
+
+=head1 SYNOPSIS
+
+=head1 METHODS
+
+=head2 as_transaction
+
+Helper function to run the given block as a transaction.
+
+Takes a block, which will be run under a transaction, and the
+following optional named parameters:
+
+=over 4
+
+=item * success - coderef to call on successful completion. The transaction will be committed
+before this is called.
+
+=item * failure - coderef to call on failure. This will be called after the transaction has
+been rolled back.
+
+=item * goodbye - coderef to call after success/failure. This will always be called regardless
+of status, and can be used to chain events similar to L<CPS>.
+
+=back
+
+Returns the transaction in list or scalar context, and in void
+context will clean up the transaction automatically.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<EntityModel::BaseClass>
+
+L<clone|EntityModel::BaseClass/clone>, L<dump|EntityModel::BaseClass/dump>, L<new|EntityModel::BaseClass/new>, L<sap|EntityModel::BaseClass/sap>
+
+=item L<Exporter>
+
+L<as_heavy|Exporter/as_heavy>, L<export|Exporter/export>, L<export_fail|Exporter/export_fail>, L<export_ok_tags|Exporter/export_ok_tags>, L<export_tags|Exporter/export_tags>, L<export_to_level|Exporter/export_to_level>, L<import|Exporter/import>, L<require_version|Exporter/require_version>
+
+=back

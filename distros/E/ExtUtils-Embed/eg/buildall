@@ -1,0 +1,7 @@
+
+for (<*.c>) {
+    next if /^(xsinit|perlxsi|perl_eval_pv)/;	
+    s/\.c//;
+    print "building $_\n";
+    system "$^X ./build $_";
+}

@@ -1,0 +1,50 @@
+api:
+  base_url: /api
+
+expose_resources: category operation currency operations_category user
+
+database:
+  production:
+    dsn: dbi:SQLite:dbname=data/production/expense_tracker.sqlite
+    user:
+    password:
+  development:
+    dsn: dbi:SQLite:dbname=data/production/expense_tracker.sqlite
+    user:
+    password:
+  test:
+    dsn: dbi:SQLite:dbname=data/test/expense_tracker.sqlite
+    user:
+    password:  
+
+# application menu 
+app_menu:
+  anonymous:
+    000_home:
+      text: Home
+      value: /
+    01_login:
+      text: Log In
+      value: /login
+    02_signup:
+      text: Sign Up
+      value: /sign-up
+    03_about:
+      text: About
+      value: /about
+
+  regular:  
+    000_home:
+      text: Home
+      value: /
+    01_user_menu:
+      text: My Account
+      value: /user/menu
+    03_logout:
+      text: Logout
+      value: /logout  
+    04_about:
+      text: About
+      value: /user/about
+
+google_analytics_code: UA-407609-8

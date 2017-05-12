@@ -1,0 +1,9 @@
+---
+Test:
+  source   :
+    type         : ReneePC
+    path         : ./t/scripts/mb_test.pl
+  utils    :
+    type         : test
+  target   :
+    type         : ModuleBundle

@@ -1,0 +1,41 @@
+NAME
+
+Excel-Template-XLSX
+
+DESCRIPTION
+
+Programmatically creates Excel (.xlsx) files from a template, and appends
+content by sub-classing Excel::Writer::XLSX. 
+
+SYNOPSIS
+
+	use Excel::Template::XLSX;
+	my $workbook = Excel::Template::XLSX->new('perl.xlsx', 'template.xlsx');
+	
+	# Add a worksheet, ... and anything else you would do with Excel::Writer::XLSX
+	$worksheet = $workbook->add_worksheet();
+
+INSTALLATION
+
+	Install with CPAN or cpanm
+	
+		cpan Excel::Template::XLSX
+		cpanm Excel::Template::XLSX
+
+	or, use the standard Unix style installation.
+ 
+	Unzip and untar the module as follows:
+ 
+		tar -zxvf Excel::Template::XLSX-nnn.tar.gz
+ 
+	The module can be installed using the standard Perl procedure:
+ 
+		perl Makefile.PL
+		make
+		make test
+		make install    # As sudo/root
+
+AUTHOR
+
+	David Clarke dclarke@cpan.org
+

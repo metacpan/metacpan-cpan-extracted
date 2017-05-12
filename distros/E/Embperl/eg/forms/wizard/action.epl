@@ -1,0 +1,144 @@
+
+[!
+
+sub title     { $epreq -> gettext ('txt:setup_action_title') } 
+
+!]
+
+[$ sub item ($action, $suffix) $]
+[-
+
+-]
+
+<p style="text-indent: -35px; margin-left: 35px">
+<span class="cNoWidthTextHead" style="font-size: 20px"><input type="radio" name="action" value="[+ $action +]"></span>
+<span style="font-size: 16px; font-weight: bold ;">[+ $epreq -> gettext ("txt:setup_${action}_title$suffix") +]</span>
+<br>
+[+ $epreq -> gettext ("txt:setup_${action}_text$suffix") +]
+</p>
+
+[$endsub$]
+
+
+[$ sub show $]
+
+[- 
+$r = shift ;
+
+init();
+
+-]
+
+<p>[= txt:setup_action_language =]<br>
+[= txt:setup_action_language_foreign =]</p>
+
+
+[-
+
+Embperl::MyForm -> showfields (
+	[
+	{ name => 'preferredLanguage', text => 'Sprache', type => 'select',
+          datasrc => 'languages',  noblank => 1,
+          event => ['onChange' => 'this.form.submit()']}
+        ]);
+-]
+
+<p>[= txt:setup_action_intro =]</p>
+
+[$if !$mini $]
+
+[- item ('master') -]
+
+[$if $isslave $]
+
+[- item ('standalone') -]
+
+[$else$]
+
+[- item ('addslave') -]
+
+[- item ('exportslave') -]
+
+[- item ('importslave') -]
+
+[#
+[- item ('initslave') -]
+,"$bbname in Slave-Modus umschalten",
+qq{Im Slave-Modus wartet $der $bbname, bis $er $seine Konfigurationsdaten
+vom Master erhält. Ist $der $bbname im Slave-Modus, kann $er nur noch vom Master
+aus konfiguriert werden.
+})-]
+#]
+
+[$endif$]
+
+[#
+<p>Mittels der Option "Admin Kennwort zurücksetzen" haben Sie die Möglichkeit, ein neues Kennwort
+für den Benutzer "admin" zu vergeben. Diese Option ist sinnvoll, wenn eine Anmeldung
+für den Administrator nicht mehr möglich ist. In diesem Fall kann dieser Punkt
+direkt über die Konsole des BB-5000 ausgeführt werden</p>
+#]
+
+[$else$]
+
+[- item ('master', '_sthc') -]
+
+[$endif$]
+
+[- item ('reset') -]
+
+<script>
+function epform_validate_setupform()
+    {
+    return 1 ;
+    }
+</script>
+
+
+[$endsub$]
+
+[!
+#use Data::Dumper ;
+
+sub init
+	{
+	$isslave = $r -> {data}{-isslave} ;
+        return if ($r -> {data}{-initialized}) ;
+
+	$fdat{action} = $r -> {data}{action} = 'master' ;	
+	}
+
+sub verify
+	{
+	($pageobj, $r, $wizard) = @_ ;
+	
+	return 1 if ($r -> {data}{-initialized}) ;
+	
+	
+	$r -> {data}{-initialized} = 1 ;	
+
+	if ($r -> {data}{action} eq 'importslave' || $r -> {data}{action} eq 'addslave')
+	    {
+	    $r -> {data}{hostcn} = '' ;
+	    }
+
+        foreach (qw{defaultgw dnsserver})
+	    {	
+            $r -> {data}{$_} = '' if (!$r -> {data}{$_}) ;
+	    }
+
+	my @cleanup = qw{hostdn} ;
+        push @cleanup, grep /^ldap_/, keys (%{$r -> {data}}) ;
+        
+        foreach (@cleanup)
+	    {	
+            delete $r -> {data}{$_}  ;
+	    }
+
+        $wizard -> callpages ('init', $r -> {data}) ;
+
+
+	return 1 ;
+	}
+!]	
+	

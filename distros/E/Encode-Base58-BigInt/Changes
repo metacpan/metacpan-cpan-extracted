@@ -1,0 +1,13 @@
+2013-03-09  SATOH Hiroh <cho45@lowreal.net>
+
+	* 0.03:
+	Fixed packaging problem. (by kentaro)
+	Fix test.
+
+2010-11-04  SATOH Hiroh <cho45@lowreal.net>
+
+	* 0.01:
+	initial release
+
+
+vim:set ft=changelog:

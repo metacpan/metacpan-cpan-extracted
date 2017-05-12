@@ -1,0 +1,5 @@
+This directory contains all the stuff for building the XS-glue code in 
+the xs directory. You need to have ExtUtils::XSBuilder installed to use it.
+Normaly this isn't necessary, only in case you have checked out the sources
+from SVN.
+

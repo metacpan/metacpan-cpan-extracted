@@ -1,0 +1,51 @@
+Revision history for Email-Sender-Transport-SMTP-TLS
+
+0.16    2017-04-05
+        POD update in favor of Email::Sender::Transport::SMTP
+
+0.15    2013-11-30
+        DEPERCATED in favor of Email::Sender::Transport::SMTPS (no code changes, it still works)
+
+0.14    2013.05.08
+        fix Wrong (?) Version of Email::Sender in Preqs (RT 85116)
+
+0.13    2013.04.16
+        fix Can't locate object method "code" via package "Net::SMTP::TLS::ButMaintained"
+
+0.12    2013.03.20
+        use Moo with latest Email::Sender
+
+0.11    2012.09.05
+        fix Can't locate object method "code" via package "Net::SMTP::TLS::ButMaintained"
+
+0.10    2011.06.18
+        trap errors when send email
+
+0.09    2011.01.02
+        code fixes
+
+0.08    2011.01.01
+        use Net::SMTP::TLS::ButMaintained instead of Net::SMTP::TLS
+
+0.07    2010.09.22
+        fix SYNOPSIS POD
+
+0.06    2010.09.21
+        remove debug warnings
+
+0.05    2010.09.21
+        fix 'Deprecation warning' (reported by Egor)
+        document updates
+
+0.04    2009.11.24
+        fix test warnings (GAURAV) (RT 52023)
+
+0.03    2009.06.18
+        with 'Email::Sender::Transport'; (rjbs) (RT 47096)
+
+0.02    2009.03.25
+        back to Moose as Email::Sender 0.004
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

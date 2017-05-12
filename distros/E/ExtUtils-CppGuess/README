@@ -1,0 +1,85 @@
+NAME
+    ExtUtils::CppGuess - guess C++ compiler and flags
+
+SYNOPSIS
+    With Extutils::MakeMaker:
+
+        use ExtUtils::CppGuess;
+    
+        my $guess = ExtUtils::CppGuess->new;
+    
+        WriteMakefile
+          ( # MakeMaker args,
+            $guess->makemaker_options,
+            );
+
+    With Module::Build:
+
+        my $guess = ExtUtils::CppGuess->new;
+    
+        my $build = Module::Build->new
+          ( # Module::Build arguments
+            $guess->module_build_options,
+            );
+        $build->create_build_script;
+
+DESCRIPTION
+    "ExtUtils::CppGuess" attempts to guess the system's C++ compiler that is
+    compatible with the C compiler that your perl was built with.
+
+    It can generate the necessary options to the Module::Build constructor
+    or to ExtUtils::MakeMaker's "WriteMakefile" function.
+
+METHODS
+  new
+    Creates a new "ExtUtils::CppGuess" object. Takes the path to the C
+    compiler as the "cc" argument, but falls back to the value of
+    $Config{cc}, which should be what you want anyway.
+
+    You can specify "extra_compiler_flags" and "extra_linker_flags" (as
+    strings) which will be merged in with the auto-detected ones.
+
+  module_build_options
+    Returns the correct options to the constructor of "Module::Build". These
+    are:
+
+        extra_compiler_flags
+        extra_linker_flags
+
+  makemaker_options
+    Returns the correct options to the "WriteMakefile" function of
+    "ExtUtils::MakeMaker". These are:
+
+        CCFLAGS
+        dynamic_lib => { OTHERLDFLAGS => ... }
+
+    If you specify the extra compiler or linker flags in the constructor,
+    they'll be merged into "CCFLAGS" or "OTHERLDFLAGS" respectively.
+
+  is_gcc
+    Returns true if the detected compiler is in the gcc family.
+
+  is_msvc
+    Returns true if the detected compiler is in the MS VC family.
+
+  add_extra_compiler_flags
+    Takes a string as argument that is added to the string of extra compiler
+    flags.
+
+  add_extra_linker_flags
+    Takes a string as argument that is added to the string of extra linker
+    flags.
+
+AUTHOR
+    Mattia Barbon <mbarbon@cpan.org>
+
+    Steffen Mueller <smueller@cpan.org>
+
+    Tobias Leich <froggs@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2010, 2011 by Mattia Barbon.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

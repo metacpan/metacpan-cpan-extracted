@@ -1,0 +1,38 @@
+SYNOPSIS
+
+     package YourModule;
+    
+     # most of the time, you only need to do this
+     use Exporter::Rinci qw(import);
+    
+     our %SPEC;
+    
+     # f1 will not be exported by default, but user can import them explicitly using
+     # 'use YourModule qw(f1)'
+     $SPEC{f1} = { v=>1.1 };
+     sub f1 { ... }
+    
+     # f2 will be exported by default because it has the export:default tag
+     $SPEC{f2} = { v=>1.1, tags=>[qw/a export:default/] };
+     sub f2 { ... }
+    
+     # f3 will never be exported, and user cannot import them via 'use YourModule
+     # qw(f1)' nor via 'use YourModule qw(:a)'
+     $SPEC{f3} = { v=>1.1, tags=>[qw/a export:never/] };
+     sub f3 { ... }
+
+DESCRIPTION
+
+    Exporter::Rinci is a simple wrapper for Exporter. Before handing out
+    control to Exporter's import(), it will look at the exporting module's
+    @EXPORT, @EXPORT_OK, and %EXPORT_TAGS and if they are empty will fill
+    them out with data from Rinci metadata (%SPEC). The rules are similar
+    to Perinci::Exporter: all functions will be put in @EXPORT_OK, except
+    functions with export:never tag will not be exported and functions with
+    export:default tag will be put in @EXPORT. %EXPORT_TAGS will also be
+    filled from functions' tags.
+
+SEE ALSO
+
+    Perinci::Exporter
+

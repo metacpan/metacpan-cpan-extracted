@@ -1,0 +1,73 @@
+package ETLp::Manual::SerialWatch;
+
+# ABSTRACT: Manual for File Watcher Items Items
+
+__END__
+
+=pod
+
+=head1 FILE WATCHER
+
+The file watcher monitors a directory for the appearance of one or files that match a defined pattern. The following parameters must be set in the config section:
+
+=over 4
+
+=item * B<directory>. The directory to monitor
+
+=item * B<call>.  The job to call when file(s) are detected. This should be a configuration file name (with or without the extension) and the section within the configuration file
+
+=back
+
+The file watched item parameters are:
+
+=over 4
+
+
+=item * B<name>. The name of this item.
+
+=item * B<duration>. How long to wait before the file watcher expires. This should be an integer concatenated with s, m, h or d for seconds, minutes, hours or days.
+
+=item * B<file_pattern>. A glob pattern.
+
+=item * B<wait time>. Time to wait between each successive poll of the directory. Defaults to one second.
+
+=item * B<raise_no_file_error>. Raise an error if no file is detected before the duration of the watcher.
+
+=item * B<exit_on_detaction>. Quit the file watcher if any files are detected.
+
+=back
+
+=head2 Example
+
+Below is an example of a complete file watcher job. Typically, a the job only has one item, the watcher itself.
+
+
+    <fw_file>
+        type = serial
+        
+        <config>
+            directory = %app_root%/data/incoming
+            call      = sales prep_sales_file
+        </config>
+        
+        <process>
+            <item>
+                name          = Billing Watch
+                type          = watch
+                duration      = 5h
+                file_pattern  = billing.tar.Z
+            </item>
+        </process>
+    </fw_file>
+
+=head3 Notes: 
+
+=over 4
+
+=item * If the file watcher does not exit on detection, the called job should move or delete any files that were detected, otherwise the watcher will be caught in an endless loop.
+
+=item * The call to the next job is synchronous. No further watching will happen until the called job exits.
+
+=item * All "next" calls are asynchronous. If the called job invokes yet another pipeline via "next", the watcher is released and can continue monitoring its directory
+
+=back

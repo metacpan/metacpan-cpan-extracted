@@ -1,0 +1,28 @@
+# this only contains nested nodes and comments
+
+<GROUP A>
+    <GROUP B>
+        <COMPONENT something>
+            <OPTION something_nice>
+            # the last stop before we hit our first closed tag
+            </OPTION>
+            <OPTION 1>
+            </OPTION>
+            <OPTION 2>
+            </OPTION>
+            <OPTION 3>
+            </OPTION>
+            <OPTION 4>
+            </OPTION>
+            <OPTION 5>
+            </OPTION>
+            <OPTION 6>
+            </OPTION>
+            <OPTION something_else>
+            # many closed tags ahead
+            </OPTION>
+        </COMPONENT>
+    </GROUP>
+</GROUP>
+
+# the end

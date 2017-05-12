@@ -1,0 +1,102 @@
+The following is a description of the example files that are provided with
+Excel::Writer::XLSX. They are intended to demonstrate the different features
+and options of the module.
+
+
+Getting started
+===============
+a_simple.pl             A simple demo of some of the features.
+bug_report.pl           A template for submitting bug reports.
+demo.pl                 A demo of some of the available features.
+formats.pl              All the available formatting on several worksheets.
+regions.pl              A simple example of multiple worksheets.
+stats.pl                Basic formulas and functions.
+
+
+Intermediate
+============
+autofilter.pl           Examples of worksheet autofilters.
+array_formula.pl        Examples of how to write array formulas.
+cgi.pl                  A simple CGI program.
+chart_area.pl           A demo of area style charts.
+chart_bar.pl            A demo of bar (vertical histogram) style charts.
+chart_column.pl         A demo of column (histogram) style charts.
+chart_line.pl           A demo of line style charts.
+chart_pie.pl            A demo of pie style charts.
+chart_doughnut.pl       A demo of dougnut style charts.
+chart_radar.pl          A demo of radar style charts.
+chart_scatter.pl        A demo of scatter style charts.
+chart_secondary_axis.pl A demo of a line chart with a secondary axis.
+chart_combined.pl       A demo of a combined column and line chart.
+chart_pareto.pl         A demo of a combined Pareto chart.
+chart_stock.pl          A demo of stock style charts.
+chart_data_table.pl     A demo of a chart with a data table on the axis.
+chart_data_tools.pl     A demo of charts with data highlighting options.
+chart_clustered.pl      A demo of a chart with a clustered axis.
+chart_styles.pl         A demo of the available chart styles.
+colors.pl               A demo of the colour palette and named colours.
+comments1.pl            Add comments to worksheet cells.
+comments2.pl            Add comments with advanced options.
+conditional_format.pl   Add conditional formats to a range of cells.
+data_validate.pl        An example of data validation and dropdown lists.
+date_time.pl            Write dates and times with write_date_time().
+defined_name.pl         Example of how to create defined names.
+diag_border.pl          A simple example of diagonal cell borders.
+filehandle.pl           Examples of working with filehandles.
+headers.pl              Examples of worksheet headers and footers.
+hide_row_col.pl         Example of hiding rows and columns.
+hide_sheet.pl           Simple example of hiding a worksheet.
+hyperlink1.pl           Shows how to create web hyperlinks.
+hyperlink2.pl           Examples of internal and external hyperlinks.
+indent.pl               An example of cell indentation.
+macros.pl               An example of adding macros from an existing file.
+merge1.pl               A simple example of cell merging.
+merge2.pl               A simple example of cell merging with formatting.
+merge3.pl               Add hyperlinks to merged cells.
+merge4.pl               An advanced example of merging with formatting.
+merge5.pl               An advanced example of merging with formatting.
+merge6.pl               An example of merging with Unicode strings.
+mod_perl1.pl            A simple mod_perl 1 program.
+mod_perl2.pl            A simple mod_perl 2 program.
+outline.pl              An example of outlines and grouping.
+outline_collapsed.pl    An example of collapsed outlines.
+panes.pl                An example of how to create panes.
+properties.pl           Add document properties to a workbook.
+protection.pl           Example of cell locking and formula hiding.
+rich_strings.pl         Example of strings with multiple formats.
+right_to_left.pl        Change default sheet direction to right to left.
+sales.pl                An example of a simple sales spreadsheet.
+shape1.pl               Insert shapes in worksheet.
+shape2.pl               Insert shapes in worksheet. With properties.
+shape3.pl               Insert shapes in worksheet. Scaled.
+shape4.pl               Insert shapes in worksheet. With modification.
+shape5.pl               Insert shapes in worksheet. With connections.
+shape6.pl               Insert shapes in worksheet. With connections.
+shape7.pl               Insert shapes in worksheet. One to many connections.
+shape8.pl               Insert shapes in worksheet. One to many connections.
+shape_all.pl            Demo of all the available shape and connector types.
+sparklines1.pl          Simple sparklines demo.
+sparklines2.pl          Sparklines demo showing formatting options.
+stats_ext.pl            Same as stats.pl with external references.
+stocks.pl               Demonstrates conditional formatting.
+tab_colors.pl           Example of how to set worksheet tab colours.
+tables.pl               Add Excel tables to a worksheet.
+write_handler1.pl       Example of extending the write() method. Step 1.
+write_handler2.pl       Example of extending the write() method. Step 2.
+write_handler3.pl       Example of extending the write() method. Step 3.
+write_handler4.pl       Example of extending the write() method. Step 4.
+write_to_scalar.pl      Example of writing an Excel file to a Perl scalar.
+
+
+Unicode
+=======
+unicode_2022_jp.pl      Japanese: ISO-2022-JP.
+unicode_8859_11.pl      Thai:     ISO-8859_11.
+unicode_8859_7.pl       Greek:    ISO-8859_7.
+unicode_big5.pl         Chinese:  BIG5.
+unicode_cp1251.pl       Russian:  CP1251.
+unicode_cp1256.pl       Arabic:   CP1256.
+unicode_cyrillic.pl     Russian:  Cyrillic.
+unicode_koi8r.pl        Russian:  KOI8-R.
+unicode_polish_utf8.pl  Polish :  UTF8.
+unicode_shift_jis.pl    Japanese: Shift JIS.

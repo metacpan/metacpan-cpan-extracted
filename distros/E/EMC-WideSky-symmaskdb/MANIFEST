@@ -1,0 +1,8 @@
+README
+bin/vcmshow
+Makefile.PL
+MANIFEST
+symmaskdb.pm
+Util.pm
+t/symmaskdb.t
+sample.xml

@@ -1,0 +1,79 @@
+NAME
+    Encode::JP::Emoji::FB_EMOJI_GMAIL - Emoji fallback functions with Gmail
+
+SYNOPSIS
+        use Encode;
+        use Encode::JP::Emoji;
+        use Encode::JP::Emoji::FB_EMOJI_GMAIL;
+
+        # DoCoMo Shift_JIS <SJIS+F89F> octets
+        # <img src="http://mail.google.com/mail/e/docomo_ne_jp/000" alt="[晴れ]" class="e" />
+        my $sun = "\xF8\x9F";
+        Encode::from_to($sun, 'x-sjis-emoji-docomo', 'x-sjis-emoji-none', FB_EMOJI_GMAIL());
+
+        # KDDI(web) Shift_JIS <SJIS+F665> octets
+        # <img src="http://mail.google.com/mail/e/ezweb_ne_jp/001" alt="[曇り]" class="e" />
+        my $cloud = "\xF6\x65";
+        Encode::from_to($cloud, 'x-sjis-emoji-kddiweb', 'x-sjis-emoji-none', FB_EMOJI_GMAIL());
+
+        # SoftBank UTF-8 <U+E524> string
+        # <img src="http://mail.google.com/mail/e/softbank_ne_jp/1CA" alt="[ハムスター]" class="e" />
+        my $hamster = "\x{E524}";
+        $hamster = Encode::encode('x-sjis-e4u-none', $hamster, FB_EMOJI_GMAIL());
+
+        # Google UTF-8 <U+FE1C1> octets
+        # <img src="http://mail.google.com/mail/e/1C1" alt="[クマ]" class="e" />
+        my $bear = "\xF3\xBE\x87\x81";
+        $bear = Encode::decode('x-utf8-e4u-none', $bear, FB_EMOJI_GMAIL());
+
+DESCRIPTION
+    This module exports the following fallback function. Use this with
+    "x-sjis-e4u-none" and "x-utf8-e4u-none" encodings which rejects any
+    emojis. Note that this is NOT an official service powered by Gmail.
+
+  FB_EMOJI_GMAIL()
+    This returns "img" element for PC to display emoji images. Having
+    conflicts with SoftBank encoding, KDDI(app) encoding is NOT recommended.
+
+  FB_EMOJI_GMAIL()
+LINKS
+    *   Subversion Trunk
+
+        <http://emoji4unicode-ll.googlecode.com/svn/trunk/lang/perl/Encode-J
+        P-Emoji-FB_EMOJI_GMAIL/trunk/>
+
+    *   Project Hosting on Google Code
+
+        <http://code.google.com/p/emoji4unicode-ll/>
+
+    *   Google Groups and some Japanese documents
+
+        <http://groups.google.com/group/emoji4unicode-ll>
+
+    *   RT: CPAN request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Encode-JP-Emoji-FB_EMOJI_G
+        MAIL>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Encode-JP-Emoji-FB_EMOJI_GMAIL>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Encode-JP-Emoji-FB_EMOJI_GMAIL/>
+
+BUGS
+    "Encode.pm" 2.22 and less would face a problem on fallback function. Use
+    latest version of "Encode.pm", or use with "EncodeUpdate.pm" in "t" test
+    directory of the package.
+
+AUTHOR
+    Yusuke Kawasaki, <http://www.kawa.net/>
+
+SEE ALSO
+    Encode::JP::Emoji
+
+COPYRIGHT
+    Copyright 2009 Yusuke Kawasaki, all rights reserved.
+

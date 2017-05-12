@@ -1,0 +1,23 @@
+Revision history for Perl extension Expect::Simple.
+
+0.04  Tue May  6 19:19:29 EDT 2008
+        - prevent deadlocks when spawn fails or command has exited
+	  prematurely
+	- improve error output	
+
+0.03  Thu Aug 16 17:25:29 EDT 2007
+	- release
+
+0.03_02 Tue Aug  7 18:05:46 EDT 2007
+	- added LICENSE to Makefile.PL
+
+0.03_01 Tue Jul 31 17:37:27 EDT 2007
+	- Modernized layout
+	- Cmd attribute can now take arrays 
+	  [Adriano Ferreira <a.r.ferreira@gmail.com>]
+	- Added RawPty attribute
+	- tests!
+
+0.02  Aug 13 2002 
+	- First public release
+

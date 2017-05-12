@@ -1,0 +1,16 @@
+Changes
+lib/Email/MIME/Creator/ISO_2022_JP.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00_load.t
+t/10_basic.t
+t/20_multipart.t
+t/30_header_str_set.t
+t/99_pod.t
+t/99_podcoverage.t
+t/lib/Email/MIME/Creator/ISO_2022_JP/Test/Base.pm
+t/lib/Email/MIME/Creator/ISO_2022_JP/Test/Basic.pm
+t/lib/Email/MIME/Creator/ISO_2022_JP/Test/HeaderStrSet.pm
+t/lib/Email/MIME/Creator/ISO_2022_JP/Test/Multipart.pm
+META.yml                                 Module meta-data (added by MakeMaker)

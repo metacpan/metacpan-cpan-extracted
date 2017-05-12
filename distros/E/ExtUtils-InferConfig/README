@@ -1,0 +1,65 @@
+NAME
+    ExtUtils::InferConfig - Infer Perl Configuration for non-running
+    interpreters
+
+SYNOPSIS
+      use ExtUtils::InferConfig;
+      my $eic = ExtUtils::InferConfig->new(
+        perl => '/path/to/a/perl'
+      );
+      
+  # Get that interpreters %Config as hash ref
+      my $Config = $eic->get_config;
+      
+  # Get that interpreters @INC as array ref
+      my $INC = $eic->get_inc;
+
+DESCRIPTION
+    This module can determine the configuration and @INC of a perl
+    interpreter given its path and that it is runnable by the current user.
+
+    It runs the interpreter with a one-liner and grabs the %Config hash via
+    STDOUT capturing. Getting the module load paths, @INC, works the same
+    way for @INC entries that are plain paths.
+
+METHODS
+  new
+    Requires one named parameter: "perl", the path to the perl interpreter
+    to query for information.
+
+  get_config
+    Returns a copy of the %Config::Config hash of the intepreter which was
+    specified as a parameter to the constructor.
+
+    The first time this method (or the get_inc method below) is called, the
+    perl binary is run. For subsequent calls of this method, the information
+    is cached.
+
+  get_inc
+    Returns a copy of the @INC array of the intepreter which was specified
+    as a parameter to the constructor. Caveat: This skips any references
+    (subroutines, "ARRAY" refs, objects) in the @INC array because they
+    cannot be reliably stringified!
+
+    The first time this method (or the get_config method avove) is called,
+    the perl binary is run. For subsequent calls of this method, the
+    information is cached.
+
+CAVEATS
+    This module cannot get the non-plain (i.e. non-string) entries of the
+    @INC array!
+
+SEE ALSO
+    You can use this module with ExtUtils::Installed to get information
+    about perl installations that aren't currently running.
+
+AUTHOR
+    Steffen Mueller, <smueller@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2007 by Steffen Mueller
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.6 or, at your
+    option, any later version of Perl 5 you may have available.
+

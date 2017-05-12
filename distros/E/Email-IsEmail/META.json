@@ -1,0 +1,55 @@
+{
+   "abstract" : "Checks an email address against the following RFCs: 3696, 1123, 4291, 5321, 5322",
+   "author" : [
+      "Leandr Khaliullov <leandr@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Email-IsEmail",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "1.302052",
+            "Test::Perl::Critic" : "1.03",
+            "Test::Pod" : "1.51"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Email-IsEmail"
+      },
+      "homepage" : "https://metacpan.org/module/Email-IsEmail",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/khaliullov/perl-Email-IsEmail.git",
+         "web" : "https://github.com/khaliullov/perl-Email-IsEmail"
+      }
+   },
+   "version" : "v3.04.8",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

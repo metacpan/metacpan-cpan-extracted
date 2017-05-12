@@ -1,0 +1,70 @@
+____________________________________________________________________________
+[ 10735] By: autrijus                              on 2004/06/03  14:08:57
+        Log: * This be 0.07.
+             * Add support for 5.6.2+ perl versions.
+	   ! lib/Encode/compat.pm
+____________________________________________________________________________
+[ 10025] By: autrijus                              on 2004/02/13  21:46:12
+        Log: * regen manifest and test.
+	   + t/0-signature.t
+	   ! MANIFEST
+____________________________________________________________________________
+[ 10024] By: autrijus                              on 2004/02/13  21:42:35
+        Log: * This be 0.06.
+             * Fix CPAN #3657 about incorrect decode('utf8', ...).
+             * Encode('utf8', ...) now correctly produces utf8-off
+	       strings.
+	   ! README lib/Encode/compat.pm
+	   ! lib/Encode/compat/common.pm t/1-basic.t
+____________________________________________________________________________
+[  2534] By: autrijus                              on 2002/12/02  00:33:16
+        Log: * 0.05.
+             * move Encode/Alias.pm to Encode/compat/Alias.pm so we
+             won't override the 'real' Alias.pm.
+	   + lib/Encode/compat/Alias.pm
+	   - lib/Encode/Alias.pm
+	   ! MANIFEST lib/Encode/compat.pm
+	   ! lib/Encode/compat/5006001.pm
+	   ! lib/Encode/compat/common.pm
+____________________________________________________________________________
+[  1131] By: autrijus                              on 2002/10/02  01:58:52
+        Log: * I really meant 0.04.
+	   ! lib/Encode/compat.pm
+____________________________________________________________________________
+[  1129] By: autrijus                              on 2002/10/02  01:56:45
+        Log: * This be 0.03.
+             * emulates all the functions now: encode_utf8, decode_utf8
+	       and encodings
+             * finally enables RT to be run on the emulation layer.
+	   ! lib/Encode/compat.pm
+	   ! lib/Encode/compat/common.pm
+____________________________________________________________________________
+[  1122] By: autrijus                              on 2002/10/01  01:40:18
+        Log: * This be 0.03.
+             * Encode::Alias inclusion, prompted by Robert Allerstorfer.
+	   + lib/Encode/Alias.pm
+	   ! MANIFEST lib/Encode/compat/common.pm
+	   ! t/1-basic.t
+____________________________________________________________________________
+[  1028] By: autrijus                              on 2002/09/24  14:41:58
+        Log: * switch from fb_queit to fb_default (die) as default.
+	   ! lib/Encode/compat/5006001.pm
+	   ! lib/Encode/compat/common.pm
+____________________________________________________________________________
+[  1014] By: autrijus                              on 2002/09/24  02:24:44
+        Log: * This be 0.02.
+             * don't require Text::Iconv on v5.7.1+.
+	   ! Makefile.PL
+____________________________________________________________________________
+[  1013] By: autrijus                              on 2002/09/24  02:23:48
+        Log: * Fixed 5.8 no-op problem poited out by Robert Allerstorfer
+             * utf8 => utf-8 translation and tests.
+	   ! lib/Encode/compat.pm
+	   ! lib/Encode/compat/common.pm t/1-basic.t
+____________________________________________________________________________
+[   985] By: autrijus                              on 2002/09/22  02:34:44
+        Log: * Encode::compat 0.01, initial release.
+	   + MANIFEST Makefile.PL README
+	   + lib/Encode/compat.pm
+	   + lib/Encode/compat/5006001.pm
+	   + lib/Encode/compat/common.pm t/1-basic.t

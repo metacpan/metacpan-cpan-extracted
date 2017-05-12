@@ -1,0 +1,383 @@
+--
+-- Table structure for table assembly
+--
+
+CREATE TABLE assembly (
+  assembly_id integer PRIMARY KEY AUTOINCREMENT,
+  taxon_id integer default NULL,
+  ncbi_version varchar(32) default NULL,
+  ucsc_name varchar(32) default NULL,
+  release_date date default NULL,
+  UNIQUE (taxon_id,ncbi_version,ucsc_name)
+);
+
+--
+-- Table structure for table chrom
+--
+
+CREATE TABLE chrom (
+  chrom_id integer PRIMARY KEY AUTOINCREMENT,
+  chrom_name char(64) default NULL,
+  assembly_id integer default NULL,
+  chrom_length integer default NULL,
+  chrom_type char(64) default NULL,
+  description char(255) default NULL,
+  UNIQUE (chrom_name,assembly_id)
+);
+
+--
+-- Table structure for table chrom_chunk
+--
+
+CREATE TABLE chrom_chunk (
+  chrom_chunk_id integer PRIMARY KEY AUTOINCREMENT,
+  chrom_id integer default NULL,
+  chrom_start integer default NULL,
+  chrom_end integer default NULL,
+  chunk_len integer default NULL,
+  UNIQUE (chrom_id,chrom_start,chrom_end)
+);
+CREATE INDEX chrom_chunk_chrom_id on chrom_chunk (chrom_id);
+
+--
+-- Table structure for table chrom_chunk_seq
+--
+
+CREATE TABLE chrom_chunk_seq (
+  chrom_chunk_id integer NOT NULL primary key autoincrement,
+  length integer NOT NULL default '0',
+  sequence longtext NOT NULL
+);
+
+--
+-- ------------------------------------------------------------------------------------------------
+--
+
+--
+-- Table structure for table feature_source
+--
+
+CREATE TABLE feature_source (
+  feature_source_id integer PRIMARY KEY AUTOINCREMENT,
+  name varchar(255) default NULL,
+  category varchar(255) default NULL,
+  is_active char(1) NOT NULL default '',
+  is_visible char(1) NOT NULL default '',
+  import_source varchar(255) default NULL,
+  import_date date default NULL,
+  feature_count integer default NULL,
+  UNIQUE (name)
+);
+
+--
+-- Table structure for table feature_source_2_metadata
+--
+
+CREATE TABLE feature_source_2_metadata (
+  feature_source_id int(11) default NULL,
+  metadata_id int(11) default NULL,
+  UNIQUE (metadata_id,feature_source_id)
+);
+CREATE INDEX fsrc2m_fsrc_id on feature_source_2_metadata (feature_source_id);
+CREATE INDEX fsrc2m_mdata_id on feature_source_2_metadata (metadata_id);
+
+--
+-- Table structure for table feature_source_2_symbol
+--
+
+CREATE TABLE feature_source_2_symbol (
+  feature_source_id int(11) default NULL,
+  symbol_id int(11) default NULL,
+  UNIQUE (symbol_id,feature_source_id)
+);
+CREATE INDEX fsrc2s_fsrc_id on feature_source_2_symbol (feature_source_id);
+CREATE INDEX fsrc2s_symbol_id on feature_source_2_symbol (symbol_id);
+
+
+--
+-- Table structure for table feature
+--
+
+CREATE TABLE feature (
+  feature_id integer PRIMARY KEY AUTOINCREMENT,
+  chrom_id integer default NULL,
+  feature_source_id integer NOT NULL default '0',
+  chrom_start integer default NULL,
+  chrom_end integer default NULL,
+  strand char(1) default NULL,
+  primary_name char(64) default NULL,
+  significance double default '1',
+  last_update timestamp NOT NULL default CURRENT_TIMESTAMP
+);
+CREATE INDEX feature_chromid on feature(chrom_id);
+CREATE INDEX feature_name on feature(primary_name);
+CREATE INDEX feature_fsid on feature(feature_source_id);
+
+--
+-- Table structure for table feature_2_chunk
+--
+
+CREATE TABLE feature_2_chunk (
+  feature_id integer default NULL,
+  chrom_chunk_id integer default NULL,
+  UNIQUE (feature_id, chrom_chunk_id)
+);
+CREATE INDEX f2c_fid on feature_2_chunk (feature_id);
+CREATE INDEX f2c_ccid on feature_2_chunk (chrom_chunk_id);
+
+--
+-- Table structure for table feature_2_metadata
+--
+
+CREATE TABLE feature_2_metadata (
+  feature_id integer default NULL,
+  metadata_id integer default NULL
+);
+CREATE INDEX f2m_fid on feature_2_metadata (feature_id);
+CREATE INDEX f2m_mid on feature_2_metadata (metadata_id);
+
+--
+-- Table structure for table feature_2_symbol
+--
+
+CREATE TABLE feature_2_symbol (
+  feature_id integer default NULL,
+  symbol_id integer default NULL,
+  UNIQUE (feature_id,symbol_id)
+);
+CREATE INDEX f2s_fid on feature_2_symbol(feature_id);
+CREATE INDEX f2s_sid on feature_2_symbol(symbol_id);
+
+--
+-- ------------------------------------------------------------------------------------------------
+--
+
+--
+-- Table structure for table experiment
+--
+
+CREATE TABLE experiment (
+  experiment_id integer PRIMARY KEY AUTOINCREMENT,
+  platform varchar(64) default NULL,
+  rna_lib_id varchar(255) default NULL,
+  sub_lib_id varchar(64) default NULL,
+  library_name varchar(64) default NULL,
+  cell_line_name varchar(255) default NULL,
+  exp_accession varchar(64) default NULL,
+  display_name varchar(255) default NULL,
+  condition_name varchar(255) default NULL,
+  tissue_type varchar(255) default NULL,
+  evoc_acc varchar(32) default NULL,
+  taxon_id integer default NULL,
+  tissue_id integer default NULL,
+  time_point_hr float default NULL,
+  library_id varchar(5) default NULL,
+  linker_id integer default NULL,
+  comment text,
+  collaboration_name varchar(255) default NULL,
+  data_collection_date date default NULL,
+  analysis_date date default NULL,
+  reference_pubmed_ids varchar(255) default NULL,
+  is_active char(1) NOT NULL default 'y',
+  UNIQUE (exp_accession)
+);
+CREATE INDEX experiment_library_name on experiment(library_name);
+
+--
+-- Table structure for table experiment_2_metadata
+--
+
+CREATE TABLE experiment_2_metadata (
+  experiment_id integer default NULL,
+  metadata_id integer default NULL
+);
+CREATE INDEX exp2m_expid on experiment_2_metadata(experiment_id);
+CREATE INDEX exp2m_mdid on experiment_2_metadata(metadata_id);
+
+--
+-- Table structure for table experiment_2_symbol
+--
+
+CREATE TABLE experiment_2_symbol (
+  experiment_id integer default NULL,
+  symbol_id integer default NULL
+);
+CREATE INDEX exp2s_expid on experiment_2_symbol(experiment_id);
+CREATE INDEX exp2s_symbol_id on experiment_2_symbol(symbol_id);
+
+--
+-- Table structure for table expression
+--
+
+CREATE TABLE expression (
+  expression_id integer PRIMARY KEY AUTOINCREMENT,
+  experiment_id integer NOT NULL default '0',
+  feature_id integer NOT NULL default '0',
+  type char(16) default NULL,
+  value double default NULL,
+  sig_error double default NULL,
+  UNIQUE(experiment_id, feature_id, type)
+);
+CREATE INDEX expression_fid on expression(feature_id);
+
+
+--
+-- ------------------------------------------------------------------------------------------------
+--
+
+--
+-- Table structure for table edge_source
+--
+
+CREATE TABLE edge_source (
+  edge_source_id integer PRIMARY KEY AUTOINCREMENT,
+  name varchar(255) default NULL,
+  display_name varchar(255) default NULL,
+  category varchar(255) default NULL,
+  classification varchar(64) default NULL,
+  is_active char(1) NOT NULL default 'y',
+  is_visible char(1) NOT NULL default 'y',
+  create_date date default NULL,
+  f1_ext_peer varchar(255)  default NULL,
+  f2_ext_peer varchar(255)  default NULL,
+  UNIQUE (name)
+);
+
+--
+-- Table structure for table edge_source_2_metadata
+--
+
+CREATE TABLE edge_source_2_metadata (
+  edge_source_id integer default NULL,
+  metadata_id integer default NULL,
+  UNIQUE (edge_source_id,metadata_id)
+);
+CREATE INDEX esrc2m_esrc_id on edge_source_2_metadata(edge_source_id);
+CREATE INDEX esrc2m_mdata_id on edge_source_2_metadata(metadata_id);
+
+--
+-- Table structure for table edge_source_2_symbol
+--
+
+CREATE TABLE edge_source_2_symbol (
+  edge_source_id integer default NULL,
+  symbol_id integer default NULL,
+  UNIQUE (edge_source_id,symbol_id)
+);
+CREATE INDEX esrc2s_esrc_id on edge_source_2_symbol(edge_source_id);
+CREATE INDEX esrc2m_symbol_id on edge_source_2_symbol(symbol_id);
+
+--
+-- Table structure for table edge
+--
+
+CREATE TABLE edge (
+  edge_id integer PRIMARY KEY AUTOINCREMENT,
+  edge_source_id integer default NULL,
+  feature1_id integer default NULL,
+  feature2_id integer default NULL,
+  direction char(1) default NULL,
+  sub_type char(16) default NULL,
+  weight float default NULL
+);
+CREATE INDEX edge_f1 on edge(feature1_id);
+CREATE INDEX edge_f2 on edge(feature2_id);
+CREATE INDEX edge_srcid on edge(edge_source_id);
+
+--
+-- Table structure for table edge_2_metadata
+--
+
+CREATE TABLE edge_2_metadata (
+  edge_id integer default NULL,
+  metadata_id integer default NULL,
+  UNIQUE (edge_id,metadata_id)
+);
+CREATE INDEX e2m_edge_id on edge_2_metadata(edge_id);
+CREATE INDEX e2m_mdata_id on edge_2_metadata(metadata_id);
+
+--
+-- Table structure for table edge_2_symbol
+--
+
+CREATE TABLE edge_2_symbol (
+  edge_id integer default NULL,
+  symbol_id integer default NULL,
+  UNIQUE (edge_id,symbol_id)
+);
+CREATE INDEX e2s_edge_id on edge_2_symbol(edge_id);
+CREATE INDEX e2s_symbol_id on edge_2_symbol(symbol_id);
+
+
+
+--
+-- ------------------------------------------------------------------------------------------------
+--
+
+--
+-- Table structure for table peer
+--
+
+CREATE TABLE peer (
+  uuid varchar(255) NOT NULL default '',
+  alias varchar(255) NOT NULL default '',
+  is_self tinyint(1) default '0',
+  db_url varchar(255) default NULL,
+  web_url varchar(255) default NULL,
+  PRIMARY KEY  (uuid)
+);
+
+--
+-- Table structure for table metadata
+--
+
+CREATE TABLE metadata (
+  metadata_id integer PRIMARY KEY AUTOINCREMENT,
+  data_type varchar(255) default NULL,
+  data mediumtext 
+);
+CREATE INDEX metadata_type on metadata (data_type);
+CREATE INDEX metadata_data on metadata (data);
+
+--
+--
+-- Table structure for table symbol
+--
+
+CREATE TABLE symbol (
+  symbol_id integer PRIMARY KEY AUTOINCREMENT,
+  sym_type char(32) default NULL,
+  sym_value char(255) default NULL,
+  UNIQUE (sym_type,sym_value)
+);
+CREATE INDEX symbol_type on symbol (sym_type);
+CREATE INDEX symbol_value on symbol (sym_value);
+
+
+--
+-- Table structure for table taxon
+--
+
+CREATE TABLE taxon (
+  taxon_id integer NOT NULL default '0',
+  genus varchar(50) default NULL,
+  species varchar(50) default NULL,
+  sub_species varchar(50) default NULL,
+  common_name varchar(100) default NULL,
+  classification mediumtext,
+  PRIMARY KEY  (taxon_id)
+); 
+CREATE INDEX taxon_genus on taxon (genus,species);
+CREATE INDEX taxon_cname on taxon (common_name);
+
+--
+-- Table structure for table tissue
+--
+
+CREATE TABLE tissue (
+  tissue_id integer PRIMARY KEY AUTOINCREMENT,
+  emap_id integer NOT NULL default '0',
+  tissue_name varchar(128) default NULL,
+  public_name varchar(128) default NULL
+);
+

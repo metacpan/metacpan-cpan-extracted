@@ -1,0 +1,52 @@
+------------------------------------------------------------------------
+0.0401 | Piotr Roszatycki <dexter@cpan.org> | 2000-11-29
+
+Changes:
+
+* Fix default warning message.
+
+------------------------------------------------------------------------
+0.04 | Piotr Roszatycki <dexter@cpan.org> | 2000-11-20
+
+Changes:
+
+* Use ":debug" tag for __WARN__ hook and verbosity 4.
+
+------------------------------------------------------------------------
+0.03 | Piotr Roszatycki <dexter@cpan.org> | 2008-12-05
+
+Changes:
+
+* Increased default verbosity to 3.
+
+* Requires Exception::Base >= 0.20.
+
+------------------------------------------------------------------------
+0.02 | Piotr Roszatycki <dexter@cpan.org> | 2008-10-13
+
+Changes:
+
+* Do not recurse on Exception::Died and Exception::Warning.
+
+* Adaptated to new Exception::Base.
+
+* Requires Exception::Base >= 0.19.
+
+------------------------------------------------------------------------
+0.0102 | Piotr Roszatycki <dexter@cpan.org> | 2008-05-29
+
+Changes:
+
+* Fixed POD coverage.
+
+------------------------------------------------------------------------
+0.0101 | Piotr Roszatycki <dexter@cpan.org> | 2008-05-09
+
+* Build requires Test::Unit::Lite >= 0.07.
+
+------------------------------------------------------------------------
+0.01 | Piotr Roszatycki <dexter@cpan.org> | 2008-05-08
+
+* Development release.
+
+------------------------------------------------------------------------

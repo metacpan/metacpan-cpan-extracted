@@ -1,0 +1,33 @@
+---
+abstract: 'Email::Sender joins Net::SMTPS'
+author:
+  - 'Fayland Lam <fayland@gmail.com>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.17, Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Email-Sender-Transport-SMTPS
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Email::Sender: '1.300006'
+  Net::SMTPS: '0.03'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/fayland/perl-Email-Sender-Transport-SMTPS/issues
+  homepage: https://github.com/fayland/perl-Email-Sender-Transport-SMTPS
+  repository: https://github.com/fayland/perl-Email-Sender-Transport-SMTPS.git
+version: '0.04'
+x_serialization_backend: 'YAML::Tiny version 1.70'

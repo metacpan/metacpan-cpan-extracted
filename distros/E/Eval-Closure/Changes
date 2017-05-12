@@ -1,0 +1,63 @@
+Revision history for Eval-Closure
+
+0.14  2016-05-29
+      - a couple minor optimizations (dolmen, #8)
+
+0.13  2015-05-12
+      - one more fix for blead (eserte, jplesnik, #6)
+
+0.12  2015-01-17
+      - fix tests under blead (sprout, #4)
+
+0.11  2013-07-30
+      - add "alias => 1" option for making closure variables actually alias the
+        closed over variables (so the variable referenced in the environment
+        hashref will actually be updated by changes made in the closure). (Toby
+        Inkster, #3)
+
+0.10  2013-07-10
+      - fix pod links
+
+0.09  2013-07-10
+      - support lexical subs on 5.18+
+
+0.08  2012-02-09
+      - Remove a double layer of string eval that was introduced in 0.07 as an
+        intermediate step in figuring out the unique package thing - it's not
+        necessary with the final implementation, and just makes things slower
+        and hides errors.
+
+0.07  2012-02-03
+      - the given source is now evaled in a unique package for every
+        eval_closure call (it used to always be evaled in the Eval::Closure
+        package, which was especially buggy). this is to avoid issues where one
+        eval_closure modifies the global environment (by, say, importing a
+        function), which could mess up a later call. unfortunately, this means
+        that the memoization stuff no longer works, since it will result in
+        memoized results using the original package, which defeats the purpose.
+        i'm open to suggestions on how to safely reenable it though.
+
+      - clean up a few stray lexicals we were still closing over in the eval
+
+0.06  2011-06-05
+      - The dumped source from setting $ENV{EVAL_CLOSURE_PRINT_SOURCE} didn't
+        show the captured variable creation properly. (Dave Rolsky)
+
+0.05  2011-04-25
+      - make sure Perl::Tidy doesn't look at @ARGV (rafl)
+
+0.04  2011-04-15
+      - stop using Memoize, it apparently doesn't work properly under mod_perl
+        in some situations (mateu)
+
+0.03  2011-03-02
+      - don't add #line directives when the debugger is active (alh)
+
+0.02  2011-01-26
+      - add terse_error option for throwing only the actual compilation error
+        (Shawn M Moore)
+      - allow also specifying the line number for error reporting
+        (Shawn M Moore)
+
+0.01  2010-11-14
+      - Initial release

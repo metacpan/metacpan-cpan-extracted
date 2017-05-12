@@ -1,0 +1,17 @@
+ APP
+
+ -> epapp
+ [$ foreach $key (sort keys %$epapp) $]
+    [+ $key +] = [+ $epapp -> {$key} +]
+ [$endforeach$]
+ <-
+
+ -> epreq
+ [$ foreach $key (sort keys %$epreq) $]
+    [+ $key +] = [+ $epreq -> {$key} +]
+ [$endforeach$]
+ <-
+
+ END APP
+
+

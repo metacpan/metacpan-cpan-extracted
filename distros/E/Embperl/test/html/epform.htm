@@ -1,0 +1,61 @@
+<html>
+<head>
+<title>Embperl Tests - Embperl::Form::Validate</title>
+</head>
+
+<body>
+
+[-
+use Embperl::Form::Validate;
+$epf = Embperl::Form::Validate -> new ([
+    [
+    -key     => 'datum',
+    -msg     => 'Bitte Datum eintragen',
+    required => 1,
+    -msg     => 'Datum &uuml;berpr&uuml;fen',
+    matches_regex => '\d+\.\d+\.\d+',
+    ],
+    [
+    -key     => 'stunden',
+    -msg     => 'Bitte Stunden eintragen',
+    required => 1,
+    -msg     => 'Stundenzahl nicht numerisch', # fail-msg for next test
+    -type    => 'Number',  # only Number and Default available
+    -msg     => 'Stundenzahl mu&szlig; >0 sein', # fail-msg for next test
+    gt       => 0,
+    ],
+    [
+    -key     => 'kommentar',
+    -msg     => 'Bitte (sinnvollen) Kommentar eingeben',
+    required => 1,
+    ],
+], 'foo');
+
+$failures = $epf -> validate_messages ;
+
+if (@$failures) 
+    {
+    print OUT "<font size="+2">Fehler:</font>\n";
+    foreach $msg (@$failures) {
+    print OUT "$msg<br>\n";
+    }
+}
+-]
+
+    <script>
+    [+ do { local $escmode = 0 ; $epf -> get_script_code } +]
+    </script>
+   
+  
+
+    <form name="foo" action="POST" onSubmit="return epform_validate_foo()">
+        stunden <input type=text name="stunden"><br>
+        datum <input type=text name="datum"><br>
+        kommentar <input type=text name="kommentar"><br>
+         <input type=submit><br>
+    </form>
+ 
+
+
+</body>
+</html>

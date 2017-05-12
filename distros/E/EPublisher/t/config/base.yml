@@ -1,0 +1,8 @@
+---
+Test:
+  source:
+    type: File
+    path: ./t/01_base.t
+  target:
+    type: Text
+    output: ./t/text.txt       

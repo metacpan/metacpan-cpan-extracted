@@ -1,0 +1,94 @@
+Revision history for Perl extension Env::C.
+
+0.14  2017-03-31
+- minor POD updates [Thanks José Joaquín Atria]
+- Add tests for override flag [Thanks José Joaquín Atria]
+- Use is() instead of ok() in tests [Thanks José Joaquín Atria]
+- apply skiplist to signature test
+
+0.13  2015-05-02
+- flip order of ppport.h and XSUB.h includes to fix duplicate declaration
+  warnings [Thanks Ian Bottomley]
+- Fix test failures in docker containers because smoke.t assumes $ENV{USER}
+  exists, but in docker this is not (necessarily) true.
+
+0.12  2014-11-03
+- Narrow down "panic: free from wrong pool" error to perl with both threads,
+  and PERL_TRACK_MEMPOOL (enabled implicitly with DEBUGGING).  work around
+  by using PL_use_safe_putenv only if building under threaded perl with
+  PERL_TRACK_MEMPOOL.  [#99962]
+
+0.11  2014-10-31
+- FreeBSD: fix SIGV at exit for perl < 5.19.6 by using PL_use_safe_putenv.
+  This causes setenv to leak memory, but seems to be the only way to avoid
+  SIGV. [#49872]
+- MANIFEST.SKIP: add MYMETA.json, MYMETA.yml
+- update to latest ppport.h
+- prereqs: require Test::More v0.88 or later, exclude optional
+  Module::Signature
+
+0.10  2013-04-09
+- fix memory leak due to PL_use_safe_putenv = 1 [#49872]
+
+0.09  2012-06-25
+
+- new maintainer: Michael Schout <mschout@cpan.org>
+- use Dist::Zilla for distribution management
+- fix: getallenv() segmentation fault under OS X 10.7
+
+0.08 Thu Sep  4 08:50:40 PDT 2008
+
+- fix the first test, where getenv returns undef on windows, rather
+than ''.
+
+- undo part of the patch for windows in wez@messagesystems.com's patch
+
+- another patch from wez@messagesystems.com, to solve the "panic: free
+from wrong pool during global destruction" problem he detected on his
+x64 linux build. using PL_use_safe_putenv.
+
+0.07 Sun Aug 31 15:14:09 PDT 2008
+
+- Env-C assumes that there are no native functions for manipulating the
+environment on Solaris 10, and this results in a segmentation fault when
+running the test script.
+
+The attached patch detects solaris versions that have these functions in
+libc by doing the same thing that the stdlib.h header does to reveal the
+prototype.  Ideally the Makefile.PL would detect the functions using a
+compiler check, but this seems like the simplest approach for the moment.
+[Patch by wez@messagesystems.com]
+
+- include the latest ppport.h
+
+
+0.06 Mon May 23 18:53:52 EDT 2005
+
+- As AIX has no unsetenv, reuse the code for Solaris to implement it [Larry Pells <lpells@spillman.com>]
+
+0.05 Thu May 19 15:05:37 EDT 2005
+
+- add Solaris support [Larry Pells <lpells@spillman.com>]
+
+0.04 Wed Jun 23 17:52:38 IDT 2004
+
+- add the missing license info
+
+- add MSWin32 support [Larry Pells <lpells@spillman.com>]
+
+0.03 Sun Mar  9 10:20:56 EST 2003
+
+- refuse to build for solaris and MSWin32, since it won't work
+
+- add the missing include #include <stdlib.h>
+
+0.02 Sat Mar  8 22:20:56 EST 2003
+
+- fix doc typo [Mark James <mrj@bigpond.net.au>]
+
+- add a warning that the app is not thread-safe
+
+0.01  Sat Aug 17 18:31:45 2002
+
+- first version
+

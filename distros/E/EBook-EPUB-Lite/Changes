@@ -1,0 +1,45 @@
+Revision history for EBook::EPUB
+
+0.71    Sun 27 Sep 2015
+        - Minor fix for older Moo
+
+0.7     Fri 21 Aug 2015
+        - Replaced Moose with Moo
+        - Replaced Data::UUID with UUID::Tiny
+        - Added tests
+
+0.6     Thu 22 Dec 2011
+        - Generate truly unique UUID 
+        - Propagate error during actual archive generation (pack_zip)
+           to upper level so user code can handle them
+        - Add setters for two DC items: publisher and coverage
+        - Set XML encoding explicitly in OPF file XML declaration
+
+0.5     Tue 17 Aug 2010
+        - add_item and add_dcitem renamed to add_meta_item and
+            add_meta_dcitem respectively
+        - Return ids of items added/created by add_xhtml, add_image,
+            copy_xhtml, etc. 
+        - Implicitly create UUID for new EPUB document. Treat urn:uuid
+            identifiers separately from other schemes. Module depends
+            on Data::UUID now.
+
+0.4     Mon 19 Jul 2010
+        - EPUB now can have multiple IDs
+        - Fixed invalid <meta> tags in metadata
+        - Authors list is now in sync in OPF and NCX files
+        - It's possible to have zero or more authors in NCX
+
+0.3     Wed  5 May 2010
+        - Added fonts encryption
+        - Fixed documentation (arguments order for several functions)
+        - Fixed typo in dc:description tag
+        - Fixed bug with playOrder attribute
+
+0.2     Wed 27 Jan 2010
+        - Fix requirements
+        - Add repository to module metadata
+
+0.1     Thu 21 Jan 2010
+        - First version, released on an unsuspecting world.
+

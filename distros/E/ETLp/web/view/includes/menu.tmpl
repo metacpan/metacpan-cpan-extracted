@@ -1,0 +1,17 @@
+[% INCLUDE header.tmpl %]    
+<div>    
+    <ul id="tabnav">
+        <li class="tab1"><a href="[% root_url %]/job"><span>Jobs</span></a></li>
+        <li class="tab2"><a href="[% root_url %]/item" class="here" id="here"><span>Items</span></a></li>
+        <li class="tab3"><a href="[% root_url %]/fileprocess"><span>File</span></a></li>
+        [% IF x %]<li class="tab3"><a href="[% root_url %]/schedule"><span>Schedule</span></a></li>[% END %]
+        [% IF c.session.param('admin') %]
+        <li class="tab3"><a href="[% root_url %]/user/list"><span>User Admin</span></a></li>
+        [% END %]
+        <li class="tab3"><a href="[% root_url %]/user/edit_password"><span>Edit Password</span></a></li>
+        <li class="tab3"><a href="[% root_url %]/user/logout"><span>Logout</span></a></li>
+    </ul>
+</div>
+[% IF message %]
+<p><span class="message" id="message">[% message %]</span> </p>
+[% END %]

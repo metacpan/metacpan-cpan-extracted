@@ -1,0 +1,57 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with EntityModel::Plugin
+at lib/EntityModel/Plugin.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+EntityModel::Plugin - base class for plugin handling
+
+=head1 VERSION
+
+version 0.102
+
+=head1 SYNOPSIS
+
+see L<EntityModel>.
+
+=head1 DESCRIPTION
+
+see L<EntityModel>.
+
+=head1 METHODS
+
+(the following is likely to be very inaccurate)
+
+Each plugin can register for a type:
+
+->registerForType('table') - registers as a handler for 'table' content, e.g.
+
+ <table>...</table>
+
+in XML definitions.
+
+Provides import and export for entity model definitions to a given interface.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<EntityModel::BaseClass>
+
+L<clone|EntityModel::BaseClass/clone>, L<dump|EntityModel::BaseClass/dump>, L<sap|EntityModel::BaseClass/sap>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <cpan@entitymodel.com>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2008-2011. Licensed under the same terms as Perl itself.

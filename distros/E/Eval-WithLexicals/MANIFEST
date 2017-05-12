@@ -1,0 +1,14 @@
+bin/tinyrepl
+Changes
+lib/Eval/WithLexicals.pm
+lib/Eval/WithLexicals/WithHintPersistence.pm
+maint/Makefile.PL.include
+Makefile.PL
+MANIFEST			This list of files
+t/hints.t
+t/lib/get_strictures_hints.pm
+t/lib/hint_hash_pragma.pm
+t/simple.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+README                                   README file (added by Distar)

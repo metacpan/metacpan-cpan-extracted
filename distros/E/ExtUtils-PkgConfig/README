@@ -1,0 +1,115 @@
+NAME
+    ExtUtils::PkgConfig - simplistic interface to pkg-config
+
+SYNOPSIS
+     use ExtUtils::PkgConfig;
+
+     $package = 'gtk+-2.0';
+
+     %pkg_info = ExtUtils::PkgConfig->find ($package);
+     print "modversion:  $pkg_info{modversion}\n";
+     print "cflags:      $pkg_info{cflags}\n";
+     print "libs:        $pkg_info{libs}\n";
+
+     $exists = ExtUtils::PkgConfig->exists($package);
+
+     $modversion = ExtUtils::PkgConfig->modversion($package);
+
+     $libs = ExtUtils::PkgConfig->libs($package);
+
+     $cflags = ExtUtils::PkgConfig->cflags($package);
+
+     $cflags_only_I = ExtUtils::PkgConfig->cflags_only_I($package);
+
+     $cflags_only_other = ExtUtils::PkgConfig->cflags_only_other($package);
+
+     $libs_only_L = ExtUtils::PkgConfig->libs_only_L($package);
+
+     $libs_only_l = ExtUtils::PkgConfig->libs_only_l($package);
+
+     $libs_only_other = ExtUtils::PkgConfig->libs_only_other($package);
+
+     $static_libs = ExtUtils::PkgConfig->static_libs($package);
+
+     $var_value = ExtUtils::PkgConfig->variable($package, $var);
+
+     if (ExtUtils::PkgConfig->atleast_version($package,$version)) {
+        ...
+     }
+
+     if (ExtUtils::PkgConfig->exact_version($package,$version)) {
+        ...
+     }
+
+     if (ExtUtils::PkgConfig->max_version($package,$version)) {
+        ...
+     }
+
+DESCRIPTION
+    The pkg-config program retrieves information about installed libraries,
+    usually for the purposes of compiling against and linking to them.
+
+    ExtUtils::PkgConfig is a very simplistic interface to this utility,
+    intended for use in the Makefile.PL of perl extensions which bind
+    libraries that pkg-config knows. It is really just boilerplate code that
+    you would've written yourself.
+
+  USAGE
+    HASH = ExtUtils::PkgConfig->find (STRING, [STRING, ...])
+        Call pkg-config on the library specified by *STRING* (you'll have to
+        know what to use here). The returned *HASH* contains the modversion,
+        cflags, and libs values under keys with those names. If multiple
+        STRINGS are passed they are attempted in the order they are given
+        till a working package is found.
+
+        If pkg-config fails to find a working *STRING*, this function croaks
+        with a message intended to be helpful to whomever is attempting to
+        compile your package.
+
+        For example:
+
+          *** can not find package bad1
+          *** check that it is properly installed and available
+          *** in PKG_CONFIG_PATH
+
+        or
+
+          *** can't find cflags for gtk+-2.0
+          *** is it properly installed and available in PKG_CONFIG_PATH?
+
+    STRING = ExtUtils::PkgConfig->create_version_macros (PACKAGE, STEM)
+        Create a set of version macros with the prefix *STEM* for the
+        library specified by *PACKAGE*. The result is returned.
+
+        Example input would be "gtk+-2.0" for *PACKAGE* and "GTK" for
+        *STEM*.
+
+    ExtUtils::PkgConfig->write_version_macros (FILE, PACKAGE, STEM,
+    [PACKAGE, STEM, ...])
+        Create one or more sets of version macros for the libraries and
+        prefixes specified by the *PACKAGE* and *STEM* pairs and write them
+        to the file *FILE*. If it doesn't exist, *FILE* will be created. If
+        it does exist, it will be overwritten.
+
+SEE ALSO
+    ExtUtils::PkgConfig was designed to work with ExtUtils::Depends for
+    compiling the various modules of the gtk2-perl project.
+
+      L<ExtUtils::Depends>
+
+      L<http://gtk2-perl.sourceforge.net/>
+
+    This module is really just an interface to the pkg-config utility
+    program. http://www.freedesktop.org/Software/pkgconfig
+
+AUTHORS
+    muppet <scott at asofyet dot org>.
+
+COPYRIGHT AND LICENSE
+    Copyright 2003-2004, 2012-2013 by muppet, Ross McFarland, and the
+    gtk2-perl team
+
+    This library is free software; you can redistribute it and/or modify it
+    under the terms of the Lesser General Public License (LGPL). For more
+    information, see http://www.fsf.org/licenses/lgpl.txt
+

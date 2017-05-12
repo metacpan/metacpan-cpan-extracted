@@ -1,0 +1,67 @@
+Eesh.pm Installation Instructions.
+
+I haven't automated any of this: this is in proof of concept stage.
+
+1. Obtain, configure, and make eesh.  This typically means getting 
+an Enlightenment package and configuring it, then CDing in to
+the 'eesh' directory and running 'make'.
+
+2. Copy all of the .o and .h files out of eesh/ and the econfig.h
+out of the enlightenment source root in to the same directory
+as Eesh.pm (Eesh-0.1/ as of this writing).
+
+3. Do the standard Perl module thing:
+
+perl Makefile.PL
+make
+make test
+make install
+
+Check out the test.pl for a quick guide: it's very simple at this
+point.
+
+See below for a typical process, once eesh has been made.
+
+Thanks,
+
+Barrie Slaymaker <barries@slaysys.com>
+
+------------------------------------------------------------------------------
+
+[barries@jester barries]$ tar xzf Eesh-0.01.tar.gz 
+[barries@jester barries]$ cd Eesh-0.01
+[barries@jester Eesh-0.01]$ cp ../enlightenment-0.16.3/econfig.h .
+[barries@jester Eesh-0.01]$ cp ../enlightenment-0.16.3/eesh/*.{o,h} .
+[barries@jester Eesh-0.01]$ perl Makefile.PL
+Checking if your kit is complete...
+Looks good
+Writing Makefile for Eesh
+[barries@jester Eesh-0.01]$ make
+mkdir blib
+mkdir blib/lib
+mkdir blib/arch
+mkdir blib/arch/auto
+mkdir blib/arch/auto/Eesh
+mkdir blib/lib/auto
+mkdir blib/lib/auto/Eesh
+mkdir blib/man3
+cp Eesh.pm blib/lib/Eesh.pm
+AutoSplitting blib/lib/Eesh.pm (blib/lib/auto/Eesh)
+/usr/bin/perl -I/usr/lib/perl5/5.00503/i686-linux -I/usr/lib/perl5/5.00503 /usr/lib/perl5/5.00503/ExtUtils/xsubpp  -typemap /usr/lib/perl5/5.00503/ExtUtils/typemap Eesh.xs >xstmp.c && mv xstmp.c Eesh.c
+Please specify prototyping behavior for Eesh.xs (see perlxs manual)
+cc -c  -Dbool=char -DHAS_BOOL -O2    -DVERSION=\"0.01\" -DXS_VERSION=\"0.01\" -fpic -I/usr/lib/perl5/5.00503/i686-linux/CORE  Eesh.c
+Running Mkbootstrap for Eesh ()
+chmod 644 Eesh.bs
+LD_RUN_PATH="/usr/X11R6/lib" cc -o blib/arch/auto/Eesh/Eesh.so  -shared -L/usr/local/lib Eesh.o alert.o comms.o file.o globals.o lists.o memory.o setup.o    -L/usr/X11R6/lib -lX11 
+chmod 755 blib/arch/auto/Eesh/Eesh.so
+cp Eesh.bs blib/arch/auto/Eesh/Eesh.bs
+chmod 644 blib/arch/auto/Eesh/Eesh.bs
+Manifying blib/man3/Eesh.3
+[barries@jester Eesh-0.01]$ make test
+PERL_DL_NONLAZY=1 /usr/bin/perl -Iblib/arch -Iblib/lib -I/usr/lib/perl5/5.00503/i686-linux -I/usr/lib/perl5/5.00503 test.pl
+1..1
+ok 1 #loaded
+ok 2 # init
+ok 3 # send
+ok 4 # recv
+

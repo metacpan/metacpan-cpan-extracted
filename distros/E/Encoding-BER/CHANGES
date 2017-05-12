@@ -1,0 +1,8 @@
+
+1.02 fix failing test
+
+1.01 fix for older Math::BigInt
+
+1.00 fix for perl 5.00503
+
+0.01 initial release

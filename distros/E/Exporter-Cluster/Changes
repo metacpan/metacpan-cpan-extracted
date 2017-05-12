@@ -1,0 +1,19 @@
+Exporter::Cluster Revision History
+==================================
+
+0.31  Mon Mar 24 01:41:08 2003
+	- Silly mistake with "use strict".
+
+0.30  Sun Mar 23 21:29:09 2003
+	- Change the version numbering scheme to something that perl likes
+	  a bit more.
+	- A few documentation tweaks and consistency corrections.
+
+0.2.5 Sat Jul 06 15:43:52 2002
+	- Removed code dependencies that required Perl 5.6.0 to allow the 
+	  the module to work on older Perl versions.
+	- Added some more documentation.
+
+0.2.0 Wed Jun 19 00:18:55 2002
+	- First working version of Exporter::Cluster
+

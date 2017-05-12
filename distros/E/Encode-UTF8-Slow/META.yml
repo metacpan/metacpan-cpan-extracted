@@ -1,0 +1,26 @@
+---
+abstract: 'A pure Perl, naive UTF-8 encoder/decoder'
+author:
+  - 'David Farrell'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Encode-UTF8-Slow
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Exporter: '5.57'
+  Test::More: '0'
+resources:
+  repository: https://github.com/dnmfarrell/Encode-UTF8-Slow.git
+version: 0.01
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

@@ -1,0 +1,92 @@
+{
+   "abstract" : "simple email creation with auto text and html multipart body",
+   "author" : [
+      "Yanick Champoux <yanick@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Email-Simple-Markdown",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0.96",
+            "Test::Vars" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Email::Abstract" : "0",
+            "Email::MIME" : "0",
+            "Email::Simple" : "0",
+            "Exporter" : "0",
+            "List::Util" : "1.29",
+            "Module::Runtime" : "0",
+            "Moo" : "0",
+            "Moo::Role" : "0",
+            "Role::Tiny" : "0",
+            "Text::MultiMarkdown" : "0",
+            "parent" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Email::Simple::Markdown" : {
+         "file" : "lib/Email/Simple/Markdown.pm",
+         "version" : "v0.7.2"
+      },
+      "Email::Simple::Markdown::Stuffer" : {
+         "file" : "lib/Email/Simple/Markdown/Stuffer.pm",
+         "version" : "v0.7.2"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/yanick/Email-Simple-Markdown/issues"
+      },
+      "homepage" : "https://github.com/yanick/Email-Simple-Markdown",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/yanick/Email-Simple-Markdown.git",
+         "web" : "https://github.com/yanick/Email-Simple-Markdown"
+      }
+   },
+   "version" : "0.7.2",
+   "x_author_pledge" : {
+      "version" : 1
+   },
+   "x_authority" : "cpan:YANICK",
+   "x_contributors" : [
+      "Alessandro Ranellucci <aar@cpan.org>",
+      "Gavin Carr <gavin@openfusion.com.au>"
+   ]
+}
+

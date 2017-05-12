@@ -1,0 +1,59 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 dd504ff49be552dcb3624a821506307c4932e95e Changes
+SHA1 8329eff434cab0ff20b39c9fa8afc1d13c71752b MANIFEST
+SHA1 077be97fac28545587fe4ad5e97b774a234f3a65 META.yml
+SHA1 b015f80bef89a552edf29f75cd194c80e9b0cf38 Makefile.PL
+SHA1 595054e40e31affc4a223c92a26226fc52d6fb53 README
+SHA1 78edb89a439463e44c33a72bbee84c54d0dc8aaf inc/Module/Install.pm
+SHA1 8ea4e37df83fd0c1c050be5c8da75545c3828d9b inc/Module/Install/Base.pm
+SHA1 1da6031583c32f0d1ec073b8376102fc51427dcc inc/Module/Install/Can.pm
+SHA1 1f1f9c9fd354fd92381e75e8daf377fa1fb46028 inc/Module/Install/External.pm
+SHA1 b779375b90c16af2f31f38a1dd2b5df223c7f2fb inc/Module/Install/Fetch.pm
+SHA1 2054450e1e9c1dd8056362bf4a64ae70d5d71476 inc/Module/Install/Makefile.pm
+SHA1 5d6189b2cad15cf9932a28faafd55130c8247e83 inc/Module/Install/Metadata.pm
+SHA1 02af973fae2ac3531fa6b704574b2b8cb2a08148 inc/Module/Install/Win32.pm
+SHA1 3a2eab96e91cca8d99938cda7791759ae9d97b3a inc/Module/Install/WriteAll.pm
+SHA1 0d71882e824d6c9ef390775b8b427f674173ea84 lib/Encode/HanExtra.pm
+SHA1 eb61efe307ff967a1f7011dd369d433d02a3d515 lib/Encode/TW/Unisys/SOSI1.pm
+SHA1 672a92379e4e816345f15599bf6cd6f31e8b3eea lib/Encode/TW/Unisys/SOSI2.pm
+SHA1 41afe2c04bb573b40e283e2b210ed70a47a3f8ba t/0-signature.t
+SHA1 1a20d7e9976365a84485b5c51b4f459a18ea5d5f t/1-basic.t
+SHA1 7a25e52defeb1b514f1a3668bbc9b20935f5ad57 t/2-alias.t
+SHA1 643f62ce6c366afcb2f1790ec22a6bab5f5dd6bf ucm/big5-1984.ucm
+SHA1 9d1ab975edbc5cce2aee4d253c12abfd53f45a37 ucm/big5-2003.ucm
+SHA1 18444cd13aa88dac5e42f37a06d91f447d44fa34 ucm/big5ext.ucm
+SHA1 e656324f141bc0f7412cfd777d9833d24f6df52b ucm/big5plus.ucm
+SHA1 4de2e48e41db737ce661f81adc7f3fd290da48e8 ucm/cccii.ucm
+SHA1 7694afeb05a43701a683b3f98c579a42e39d9dce ucm/cns11643-1.ucm
+SHA1 21a63165e918f9367db55d318681fb56f69e040c ucm/cns11643-2.ucm
+SHA1 7e9b32ae6de8a2cda09bb68f140b345d35d7fb07 ucm/cns11643-3.ucm
+SHA1 6660e3f81f1ff3787c4c94390016e6541c4822bb ucm/cns11643-4.ucm
+SHA1 20c8a1a7e18c22d488b0cd76d093b8baab713c25 ucm/cns11643-5.ucm
+SHA1 fca2dadc71a040ca9adf9a6e35017b0fded4c464 ucm/cns11643-6.ucm
+SHA1 2eb1ee3e01bb8f38f346d1d1afa4b3d24dd1bed4 ucm/cns11643-7.ucm
+SHA1 dac24ebec7d1ee31987c3b09c098333c9c8c3459 ucm/cns11643-f.ucm
+SHA1 7872ff8ada7de9e3f7f2c819573b6a3dd5ece5a2 ucm/euc-tw.ucm
+SHA1 a05002deed35e83570624a53a8544e029a19a1e4 ucm/gb18030.ucm
+SHA1 8b81ac96892adf5a1a25e9c14991e4ac80288dff ucm/unisys.ucm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.3 (Darwin)
+
+iD8DBQFHNZ/6tLPdNzw1AaARAi4tAKCiGTQ5FRE2jQ2IwHgRsn4IEY/gGQCfaR2+
+Z7xR8Q3T/u+leHIAz+MRD0I=
+=Cbj4
+-----END PGP SIGNATURE-----

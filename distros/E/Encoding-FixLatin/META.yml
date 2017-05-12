@@ -1,0 +1,22 @@
+---
+abstract: 'takes mixed encoding input and produces UTF-8 output'
+author:
+  - 'Grant McLean <grantm@cpan.org>'
+build_requires:
+  Test::More: 0.90
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300023, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Encoding-FixLatin
+recommends:
+  Encoding::FixLatin::XS: 1.00
+requires:
+  perl: 5.008
+resources:
+  repository: git://github.com/grantm/encoding-fixlatin.git
+version: 1.04

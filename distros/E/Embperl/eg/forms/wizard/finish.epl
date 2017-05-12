@@ -1,0 +1,84 @@
+[!
+
+sub title     { $epreq -> gettext ('txt:setup_finish_title') } 
+
+!]
+
+[$ sub show $]
+[-
+$r = shift ;
+$action = $r -> {data}{action} ;
+-]
+
+<center>
+
+[$if $action eq 'master' $]
+
+<h2>[= txt:attention =]</h2>
+<p><b>[= txt:setup_finish1 =]<br>
+[= txt:setup_finish2 =]<br>[= txt:setup_finish4 =]</b></p>
+
+[$elsif $action eq 'standalone' $]
+
+<h2>[= txt:attention =]</h2>
+<p><b>[= txt:setup_finish3 =]
+<br>
+[= txt:setup_finish4 =]</b></p>
+
+[$elsif $action eq 'initslave' $]
+
+<h2>[= txt:attention =]</h2>
+<p><b>[= txt:setup_finish5 =]
+<br>
+[= txt:setup_finish4 =]</b></p>
+
+[$elsif $action eq 'reset' $]
+
+<h2>[= txt:attention =]</h2>
+<p><b>[= txt:setup_finish6 =]<br>
+[= txt:setup_finish7 =]
+
+[= txt:setup_finish4 =]</b></p>
+
+[$elsif $action eq 'importslave' $]
+
+<h2>[= txt:setup_finish8 =]</h2>
+
+[$elsif $action eq 'exportslave' $]
+
+<h2>[= txt:setup_finish9 =]</h2>
+
+<h2>[= txt:attention =]</h2>
+<p><b>[= txt:setup_finish10 =]</b></p>
+<p><b>[= txt:setup_finish4 =]</b></p>
+
+[$elsif $action eq 'addslave' && $fdat{slaveexport} $]
+
+<h2>[= txt:setup_finish11 =]</h2>
+
+<h2>[= txt:attention =]</h2>
+<p><b>[= txt:setup_finish12 =]</b></p>
+<p><b>[= txt:setup_finish4 =]</b></p>
+
+[$elsif $action eq 'addslave' && !$fdat{slaveexport} $]
+
+<h2>[= txt:setup_finish13 =]</h2>
+
+<p><b>[= txt:setup_finish14 =]</b></p>
+<p><b>[= txt:setup_finish4 =]</b></p>
+
+[$endif$]
+
+<p>[= txt:setup_finish15 =]</p>
+
+</center>
+<script LANGUAGE="JavaScript" TYPE="text/javascript">
+ function epform_validate_setupform() { return 1; }
+</script>
+
+[$endsub$]
+
+[$ sub next_button $]
+    [* my $r = shift ; *]
+    <input type="submit" name="-next" value="[= ctl:Finish =]"  onClick="doValidate = 1;" class="cStandardButton">
+[$ endsub $]

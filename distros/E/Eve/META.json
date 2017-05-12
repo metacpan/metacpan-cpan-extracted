@@ -1,0 +1,58 @@
+{
+   "abstract" : "The web service creation framework written with events in mind.",
+   "author" : [
+      "Igor Zinovyev <zinigor@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Eve",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CGI::Session" : "0",
+            "Contextual::Return" : "0",
+            "DBD::Pg" : "0",
+            "DateTime" : "0",
+            "DateTime::Format::HTTP" : "0",
+            "DateTime::Format::Pg" : "0",
+            "Email::Sender::Simple" : "0",
+            "Exception::Class" : "0",
+            "Hash::MultiValue" : "0",
+            "JSON::XS" : "0",
+            "PadWalker" : "0",
+            "Plack::Request" : "0",
+            "Template" : "0",
+            "Test::Class" : "0",
+            "Test::MockObject" : "0",
+            "Test::More" : "0",
+            "Tie::IxHash" : "0",
+            "URI" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.06"
+}

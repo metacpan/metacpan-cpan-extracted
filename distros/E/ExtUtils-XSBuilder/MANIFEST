@@ -1,0 +1,18 @@
+README
+MANIFEST
+Changes
+Makefile.PL
+test.pl
+XSBuilder/CallbackMap.pm
+XSBuilder/FunctionMap.pm
+XSBuilder/MapUtil.pm
+XSBuilder/ParseSource.pm
+XSBuilder/StructureMap.pm
+XSBuilder/TypeMap.pm
+XSBuilder/WrapXS.pm
+XSBuilder/PODTemplate.pm
+XSBuilder/C/grammar.pm
+XSBuilder.pm
+XSBuilder.pod
+xsbuilder.osc2002.pod
+META.yml                                 Module meta-data (added by MakeMaker)

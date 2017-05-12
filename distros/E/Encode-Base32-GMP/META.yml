@@ -1,0 +1,27 @@
+---
+abstract: 'High speed Base32 encoding using GMP with BigInt and MD5 support'
+author:
+  - 'John Wang <johncwang@gmail.com>'
+build_requires:
+  Test::Base: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300038, CPAN::Meta::Converter version 2.130880'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Encode-Base32-GMP
+requires:
+  Carp: 0
+  Digest::MD5: 0
+  Exporter: 0
+  Math::GMPz: 0
+  Scalar::Util: 0
+  base: 0
+  perl: 5.008_009
+  strict: 0
+  warnings: 0
+version: 0.02

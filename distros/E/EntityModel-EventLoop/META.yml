@@ -1,0 +1,21 @@
+---
+abstract: 'Abstract interface for managing eventloop objects for EntityModel'
+author:
+  - 'Tom Molesworth <cpan@entitymodel.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300009, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: EntityModel-EventLoop
+requires:
+  EntityModel: 0.016
+  Time::HiRes: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=EntityModel-EventLoop
+  homepage: http://search.cpan.org/dist/EntityModel-EventLoop/
+version: 0.001

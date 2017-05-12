@@ -1,0 +1,21 @@
+Changes
+Excel-Table0.xls
+Excel-Table1.xlsx
+lib/Excel/Table.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README
+README.md
+README.pod
+t/Excel-Table1a.t
+t/Excel-Table1b.t
+t/Excel-Table1c.t
+t/Excel-Table1d.t
+t/Excel-Table2.t
+t/Excel-Table3.t
+t/Excel-Table4a.t
+t/Excel-Table4b.t
+t/Excel-Table5.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

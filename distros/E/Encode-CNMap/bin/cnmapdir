@@ -1,0 +1,253 @@
+#!/usr/bin/perl
+#use ExtUtils::testlib;
+our $VERSION = '0.32';
+$|=1;
+
+use 5.008;
+use Encode::CNMap;
+use strict;
+use File::Spec;
+use File::Basename;
+
+# Get Opts
+use Getopt::Std;
+my %opts;
+getopts('-helpust2cgbk5', \%opts);
+&VERSION_MESSAGE if defined( $opts{h} ) or scalar(%opts)==0;
+
+# Signal Handling
+our $quit_flag = 0;
+$SIG{__WARN__} = sub { };
+$SIG{'INT'} = sub {	$quit_flag = 1;	print "\n  [SIG] Received SIGINT/QUIT\n"; };
+
+# Show Help
+sub VERSION_MESSAGE {
+	print <<"USAGE";
+cnmapdir $VERSION under perl $]
+
+Usage: cnmapdir -command InputDir OutputDir
+  Traditional <-> Simplified Chinese batch converter
+
+  cnmapdir -h
+    Show help
+
+  cnmapdir -s2b5 gbkdir big5dir
+  cnmapdir -s2gb gbkdir gbdir
+  cnmapdir -s2c gbkdir utf8dir
+  cnmapdir -s2cgb gbkdir utf8-cnsimp-dir
+  cnmapdir -s2cb5 gbkdir utf8-cntrad-dir
+    Simplified GBK encoded files to other encodings
+
+  cnmapdir -t2gb big5dir gbdir
+  cnmapdir -t2gbk big5dir gbkdir
+  cnmapdir -t2c big5dir utf8dir
+  cnmapdir -t2cgb big5dir utf8-cnsimp-dir
+  cnmapdir -t2cb5 big5dir utf8-cntrad-dir
+    Traditioanl Big5 encoded files to other encodings
+
+  cnmapdir -u2b5 utf8dir big5dir
+  cnmapdir -u2gb utf8dir gbdir
+  cnmapdir -u2gbk utf8dir gbkdir
+  cnmapdir -u2cgb utf8dir utf8-cnsimp-dir
+  cnmapdir -u2cb5 utf8dir utf8-cntrad-dir
+    Utf8 encoded files to other encodings
+
+Supported transformed encodings
+  -?2gb   GB2312 only encodings, convert unkown GBK words into GB2312
+  -?2b5   Big5 only encodings, convert unkown GBK words into Big5
+  -?2gbk  GBK encodings, mixed GB2312 + Big5 + plus
+  -?2c    Utf8 encodings, mixed GB2312 + Big5 + plus
+  -?2cgb  Utf8 encodings with GB2312 words only, convert unkown GBK workds
+  -?2cb5  Utf8 encodings with Big5 words only, convert unkown GBK words
+
+USAGE
+	# Pause if required
+	if( defined $opts{p} ) {
+		print "Press any key to continue ... ";
+		getc(STDIN);
+	}
+	exit();
+}
+
+# Get in/out directory
+my ($dirin, $dirout);
+$dirin=$ARGV[0];
+$dirin=File::Spec->curdir() if $dirin eq '';
+$dirout=$ARGV[1];
+$dirout='/out' if $dirout eq '';
+
+# caculate from and to encodings
+my $from_encoding = $opts{s} ? ":encoding(gbk)" : $opts{t} ? ":encoding(big5-trad)" : ":utf8";
+my $to_func = $opts{c} ?
+	( $opts{5} ? *utf8_to_tradutf8 : $opts{k} ? *utf8_to_utf8 : $opts{b} ? *utf8_to_simputf8 : *utf8_to_utf8 ) :
+	( $opts{5} ? *utf8_to_utf8 : $opts{k} ? *utf8_to_utf8 : $opts{b} ? *utf8_to_utf8 : *utf8_to_utf8 );
+my $to_encoding = $opts{c} ? ":utf8" :
+	$opts{5} ? ":encoding(big5-trad)" : $opts{k} ? ":encoding(gbk)" : $opts{b} ? ":encoding(gb2312-simp)" : ":utf8";
+
+# do work
+&ProcessSub("", $dirin, $dirout);
+
+# Pause if required
+if( defined $opts{p} ) {
+	print "Press any key to continue ... ";
+	getc(STDIN);
+}
+
+sub ProcessSub($$$) {
+	my ($space, $fin, $fout)=@_;
+
+	if(-f $fin) {	# File Processing
+		printf "$space   %-24.24s -> %-24.24s ... ", basename($fin), basename($fout);
+		print "Overwriting " if -f $fout;
+		my ($fhin, $fhout);
+		open $fhin, "<$from_encoding", $fin or goto read_err;
+		my ( $dev, $ino, $mode, $nlink, $uid, $gid, $rdev, $size,
+       		 $atime, $mtime, $ctime, $blksize, $blocks) = stat( $fhin );
+		open $fhout, ">$to_encoding", $fout or goto write_err;
+		while ( <$fhin> ) { print {$fhout} &$to_func( $_ ); }
+		close $fhout or goto write_err;
+		close $fhin or goto read_err;
+		utime $mtime, $mtime, $fout;
+		print "OK\n";
+		return;
+
+		read_err:
+		print "Read Fail!\n";
+		return;
+
+		write_err:
+		print "Write Fail!\n";
+		return;
+	}
+
+	if(-d $fin) {	# Dir Processing
+		print "$space [$fin -> $fout] ... ";
+
+		my (@dir, $filename, $filein, $fileout);
+		opendir(DIR, $fin) or goto dir_err;
+		@dir=readdir(DIR) or goto dir_err;
+		closedir DIR or goto dir_err;
+
+		if( not(-d $fout) ) {
+			print "Mkdir ";
+			mkdir $fout or goto mkdir_err;
+		}
+
+		print "OK\n";
+		foreach $filename (@dir) {
+			&ProcessSub($space."  "
+				, File::Spec->catfile($fin, $filename)
+				, File::Spec->catfile($fout, $filename)
+			) if not($filename=~/^\./);
+			return if $quit_flag;
+		}
+		return;
+
+		dir_err:
+		print "Read Fail!\n";
+		return;
+
+		mkdir_err:
+		print "Fail!\n";
+		return;
+	}
+
+	print "$space Unkown $fin ... Skipped\n";
+}
+
+__END__
+
+=head1 NAME
+
+cnmapdir - Traditional <-> Simplified Chinese Converter
+
+=head1 SYNOPSIS
+
+B<cnmapdir> C<-command> I<inputdir/file> I<outputdir/file>
+
+=head1 USAGE
+
+    cnmapdir -h
+	cnmapdir -hp
+
+    cnmapdir -s2b5 gbkdir big5dir
+    cnmapdir -s2gb gbkdir gbdir
+    cnmapdir -s2c gbkdir utf8dir
+    cnmapdir -s2cgb gbkdir utf8-cnsimp-dir
+    cnmapdir -s2cb5 gbkdir utf8-cntrad-dir
+
+    cnmapdir -t2gb big5dir gbdir
+    cnmapdir -t2gbk big5dir gbkdir
+    cnmapdir -t2c big5dir utf8dir
+    cnmapdir -t2cgb big5dir utf8-cnsimp-dir
+    cnmapdir -t2cb5 big5dir utf8-cntrad-dir
+
+    cnmapdir -u2b5 utf8dir big5dir
+    cnmapdir -u2gb utf8dir gbdir
+    cnmapdir -u2gbk utf8dir gbkdir
+    cnmapdir -u2cgb utf8dir utf8-cnsimp-dir
+    cnmapdir -u2cb5 utf8dir utf8-cntrad-dir
+
+=head1 DESCRIPTION
+
+The B<cnmapdir> utility reads all files recursively under inputdir,
+converts from Traditional to Simplified Chinese or Simplified to
+Traditional Chinese according to command switch, then writes them to
+the outputdir.
+
+If outputdir is missing, then /out is assumped. If outputdir is not
+existed, it will be created automatically. If inputdir is a file, it
+will be converted to outputfile.
+
+The C<-h> switch: Show version and help infomation.
+
+The C<-p> switch: pause after execution.
+
+The C<-s2b5> switch: Mixed GB2312/GBK -> Traditional Big5.
+
+The C<-s2gb> switch: Mixed GB2312/GBK -> Simplified GB2312.
+
+The C<-s2c> switch: Mixed GB2312/GBK -> Utf8.
+
+The C<-s2cb5> switch: Mixed GB2312/GBK -> Tradiional Big5 -> Utf8.
+
+The C<-s2cgb> switch: Mixed GB2312/GBK -> Simplified GB2312 -> Utf8.
+
+The C<-t2gb> switch: Traditional Big5 -> Simplified GB2312.
+
+The C<-t2gbk> switch: Traditional Big5 -> Mixed GBK.
+
+The C<-t2c> switch: Traditional Big5 -> Utf8.
+
+The C<-t2cgb> switch: Traditional Big5 -> Simplified GB2312 -> Utf8.
+
+The C<-t2cb5> switch: Traditional Big5 -> Utf8.
+
+The C<-u2b5> switch: Mixed Utf8 -> Traditional Big5.
+
+The C<-u2gb> switch: Mixed Utf8 -> Simplified GB2312.
+
+The C<-u2gbk> switch: Mixed Utf8 -> Mixed GBK.
+
+The C<-u2cb5> switch: Mixed Utf8 -> Simplified GB2312 -> Utf8.
+
+The C<-u2cgb> switch: Mixed Utf8 -> Traditional Big5 -> Utf8.
+
+=head1 BUGS, REQUESTS, COMMENTS
+
+Please report any requests, suggestions or bugs via
+L<http://bookbot.sourceforge.net/>
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Encode-CNMap>
+
+=head1 SEE ALSO
+
+L<Encode::CNMap>, L<cnmapwx>, L<cnmap>, L<Encode::HanConvert>, L<Encode>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2003-2004 Qing-Jie Zhou E<lt>qjzhou@hotmail.comE<gt>
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut

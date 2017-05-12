@@ -1,0 +1,336 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+ <head>
+  <title>EekBoek</title>
+    <link rel="stylesheet" href="../css/site.css" type="text/css">
+      <meta name="keywords" content="boekhouden, mkb, midden- en kleinbedrijf, financi&amp;emul;n,
+                open source, boekhoudsoftware, boekhoud software,
+		boekhoudpakket, boekhoud pakket">
+  <meta name="robots" content="all">
+ </head>
+
+ <body bgcolor="#FFFFFF"
+       text="#000000" link="#0000FF"
+       vlink="#0000FF" alink="#C81900" background="../images/bg.gif" >
+  <table width="100%" border="0" cellpadding="0" cellspacing="5">
+
+  <tr valign="top">
+    <td width="161" align="left">
+      <a href="../index.html"><img src="../images/eb.jpg" alt="EekBoek Boekhouden" border="0" width="149" height="87"></a>
+
+    </td>
+    <td>
+              <h1 class="title">EekBoek</h1>
+<div class="info">
+  Electronisch Boekhouden voor het MKB
+</div>
+
+          </td>
+  </tr>
+
+  <tr>
+    <td>
+      <a href="../index.html"><img src="../images/ebname.jpg" alt="EekBoek" border="0" width="151" height="22"></a>
+
+    </td>
+    <td>
+      <table width="100%" border="0" cellpadding="0" cellspacing="0">
+  <tr valign="middle">
+    <td align="left">
+      <table border="0" cellpadding="0" cellspacing="2">
+  <tr valign="middle">
+
+    <td class="info"></td>
+    <td><a href="../intro/index.html" class="menu">Inleiding</a>
+</td>
+	<td> &#xbb; </td>
+    <td class="info"></td>
+    <td><a href="../intro/working.html" class="menu">Werkwijze</a>
+</td>
+	
+  </tr>
+</table>
+
+
+    </td>
+    <td align="right">
+      
+    </td>
+  </tr>
+</table>
+
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      <hr>
+
+    </td>
+    <td>
+      <hr>
+
+    </td>
+  </tr>
+
+  <tr valign="top">
+    <td>
+      <div class="sidemenu">
+<table border="0" cellpadding="0" cellspacing="0">
+  <tr>
+    <td align="left" class="menutitle">Documentatie
+    </td>
+  </tr>
+  <tr>
+    <td><hr>
+</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">
+      <a href="../intro/index.html" class="menuselect">Inleiding</a>
+<br>
+&nbsp;-&nbsp;<a href="../intro/working.html" class="menuselect">Werkwijze</a>
+<br>
+&nbsp;-&nbsp;<a href="../intro/backups.html" class="menu">Backups</a>
+<br>
+<br>
+<a href="../install/index.html" class="menu">Installeren</a>
+<br>
+<a href="../ebshell/index.html" class="menu">De EekBoek shell</a>
+<br>
+<a href="../ebwxshell/index.html" class="menu">De grafische EekBoek shell</a>
+<br>
+<a href="../config.html" class="menu">Configuratie</a>
+<br>
+<a href="../setup/index.html" class="menu">Opzetten administratie</a>
+<br>
+<a href="../bookings/index.html" class="menu">Boekingen</a>
+<br>
+<a href="../reports/index.html" class="menu">Overzichten</a>
+<br>
+<a href="../yearend.html" class="menu">Jaarafsluiting</a>
+<br>
+<a href="../inex.html" class="menu">Import en Export</a>
+<br>
+          </td>
+  </tr>
+</table>
+</div>
+
+      <div class="social">
+
+<table border='0' cellpadding='2' cellspacing='0'>
+  <tr>
+    <td><a href="http://www.twitter.com/EekBoek" target='_blank'>
+	<img border="0"
+	     src="../images/twitter-mini.png"
+	     alt="Volg EekBoek op Twitter"
+	     title="Volg EekBoek op Twitter"/></a>
+    </td>
+    <td><a href="http://www.linkedin.com/groups?gid=3649028" target='_blank'>
+	<img border="0"
+	     src="../images/linkedin-mini.png"
+	     alt="EekBoek op LinkedIn"
+	     title="EekBoek op LinkedIn"/></a>
+    </td>
+    <td><a href="http://www.youtube.com/EekBoek" target='_blank'>
+	<img border="0" src="../images/youtube-mini.png"
+	     alt="Bekijk video's op het YouTube kanaal van EekBoek"
+             title="Bekijk video's op het YouTube kanaal van EekBoek"/></a>
+    </td>
+    <td><a href="http://identi.ca/eekboek" target='_blank'>
+	<img border="0" src="../images/identi-ca-mini.png"
+	     alt="EekBoek op Identi.ca"
+             title="EekBoek op Identi.ca"/></a>
+    </td>
+  </tr>
+</table>
+</div>
+
+    </td>
+    <td>
+      <h2>Werkwijze</h2>
+
+<p>Zoals verderop in deze documentatie wordt beschreven, wordt een
+EekBoek administratie bepaald door twee zaken: het <dfn>schema</dfn>
+en de <dfn>mutaties</dfn>.</p>
+
+<p>Het schema bepaalt de <em>structuur</em> van de administratie,
+zoals het rekeningschema, de dagboeken en BTW tarieven. Het schema
+wordt aangemaakt en onderhouden in de vorm van een tekstbestand, dat
+bij het aanmaken van de administratie eenmalig wordt geladen in de
+database. Meer hierover in <a href="../setup/schema.html#acc">Het
+vullen van de database met de administratiegegevens</a>.</p>
+
+<p>De mutaties (in bredere zin) bepalen de <em>inhoud</em> van de
+administratie, zoals de debiteuren en crediteuren, openingsbalans, en
+de eigenlijke boekingen.</p>
+
+<p>Vanwege de batch-faciliteit van de <a
+href="../ebshell/index.html">EekBoek shell</a> is het mogelijk ook
+alle mutaties te onderhouden in een tekstbestand. Met een enkele druk
+op de knop kan te allen tijde de gehele administratie opnieuw worden
+opgebouwd door het verwerken van het schema en het mutatiebestand.</p>
+
+<p>Natuurlijk is het ook mogelijk om incrementeel te werken, en steeds
+interactief met de <a href="../ebshell/index.html">EekBoek command
+line shell</a> of de <a href="../ebwxshell/index.html">grafische
+shell</a> mutaties toe te voegen. Of een combinatie: elke nieuwe
+mutatie toevoegen aan het mutatiebestand en dan alleen de nieuw
+toegevoegde mutaties via de batch-faciliteit verwerken. De meeste
+tekst-editors beschikken over de mogelijkheid om een deel van een
+tekstbestand naar een programma te sturen.</p>
+
+<p>De EekBoek grafische shell werkt uiteraard incrementeel.</p>
+
+<a name="best4"></a><h2>Het vier-bestanden systeem</h2>
+
+<p>De aanbevolen werkwijze omvat vijf bestanden.</p>
+
+<p><strong>Het schema: <code>schema.dat</code></strong>
+<br>De structuur van de administratie.
+<br><a href="schema.dat">Bekijk een voorbeeld.</a>
+</p>
+
+<p><strong>De relaties: <code>relaties.eb</code></strong>
+<br>In dit bestand worden alle relaties gedefinieerd.
+<br><a href="relaties.eb">Bekijk een voorbeeld.</a>
+</p>
+
+<p><strong>De openingsgegevens: <code>opening.eb</code></strong>
+<br>Dit bestand bevat de openingsgegevens, zoals administratienaam,
+BTW-periode en openingsbalans.
+<br><a href="opening.eb">Bekijk een voorbeeld.</a>
+</p>
+
+<p><strong>De mutaties: <code>mutaties.eb</code></strong>
+<br>De boekingen. Voor een nieuwe administratie zal dit bestand nog
+leeg zijn.
+<br><a href="mutaties.eb">Bekijk een voorbeeld.</a>
+</p>
+
+<p><strong>De configuratiebeschrijving: <code>eekboek.conf</code></strong>
+<br>Dit bestand beschrijft eigenschappen als de naam van de database
+en de te gebruiken database driver.
+<br><a href="eekboek.conf">Bekijk een voorbeeld.</a>
+</p>
+
+<p><i>Het is ook mogelijk de relaties, opening en mutaties in een enkel
+bestand te onderhouden. In de praktijk werkt dit echter minder
+handig.</i></p>
+
+<p>Tijdens het werken met de administratie kunnen nieuwe boekingen
+worden toegevoegd aan het mutaties bestand. Nieuwe relaties komen
+vanzelfsprekend in het relaties bestand. Het schema dient doorgaans
+enkel te worden aangepast als nieuwe grootboekrekeningen nodig zijn.
+De openingsgegevens zullen niet wijzigen.</p>
+
+<p>Het is niet nodig om voor elke nieuwe boeking de gehele set
+bestanden opnieuw te verwerken. U kunt bijvoorbeeld de nieuwe
+boekingen in een afzonderlijk bestandje op te nemen, dit bestandje te
+verwerken in de bestaande administratie, en daarna de inhoud ervan
+toevoegen aan het mutaties bestand.</p>
+
+<p>Er zijn vele wegen die naar Rome leiden. De ondersteuning door de
+standaard EekBoek tools gaat uit van het hier beschreven
+vier-bestandensysteem.</p>
+
+<h2>Import en Export</h2>
+
+<p>Met behulp van de EekBoek import voorziening kan een set van de
+vier hierboven beschreven bestanden eenvoudig worden verwerkt. Met de
+export voorziening kan te allen tijde de volledige inhoud van de
+administratie weer worden weggeschreven naar een volledige set van
+vier bestanden. <br>Zie voor meer informatie <a
+href="../inex.html">Import en Export</a>.</p>
+
+<h2>Meerdere boekjaren</h2>
+
+<p>Na het einde van een boekjaar kan naar keuze in de huidige
+administratie worden doorgegaan met boeken, dan wel een nieuwe
+administratie worden opgezet. Beide methodes hebben voor- en
+nadelen.</p>
+
+<p>In het geval meerdere boekjaren in een enkele administratie
+voorkomen is het gemakkelijker om oude boekstukken terug te vinden en
+rapportages te maken die over boekjaargrenzen lopen. Denk bijvoorbeeld
+aan een resultaatrekening van mei tot en met april voor een
+seizoensgebonden bedrijf. Of een resultaatrekening die meerdere jaren
+omvat.</p>
+
+<p>Met &eacute;&eacute;n boekjaar per administratie blijft de
+administratie echter kleiner en gemakkelijker hanteerbaar.</p>
+
+<p>EekBoek biedt voor deze laatste werkwijze een extra faciliteit: bij
+het afsluiten van een boekjaar kunnen de openingsgegevens voor het
+eropvolgende boekjaar automatisch worden aangemaakt. Door deze door
+middel van de <code>include</code> opdracht in de opening van het
+nieuwe boekjaar op te nemen, kunnen meerdere boekjaren in
+onafhankelijke administraties worden gevoerd, terwijl elke
+administratie toch steeds automatisch de meest actuele eindgegevens
+van het voorgaande boekjaar kan gebruiken.</p>
+
+<p>Een voorbeeld. Stel u heeft de bestanden van boekjaar 2009 in de
+directory <code>adm2009</code>, en die van 2010 in
+<code>adm2010</code>. U neemt dan in <code>adm2009/mutaties.eb</code>
+als laatste opdracht op:</p>
+
+<blockquote class="code">jaareinde --eb=opening2010.eb</blockquote>
+
+<p>Bij het verwerken van de mutaties wordt het boekjaar afgesloten en de
+openingsgegevens voor het volgende boekjaar geplaatst in het bestand
+<code>opening2010.eb</code>.</p>
+
+<p>In het bestand <code>adm2010/opening.eb</code> neemt u dan de
+volgende opdrachten op:</p>
+
+<blockquote class="code">adm_naam "Mijn Administratie 2010"
+adm_begindatum 2010
+adm_btwperiode jaar
+include "../adm2009/opening2010.eb"
+adm_open
+</blockquote>
+
+<p>Bij het openen van de administratie worden dan steeds de meest
+recente, bij het afsluiten van het voorgaande boekjaar aangemaakte,
+gegevens gebruikt.</p>
+
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      <hr>
+
+    </td>
+    <td>
+      <hr>
+
+    </td>
+  </tr>
+
+  <tr valign="bottom">
+    <td valign="middle">
+      <a href="http://www.perl.org/"><img src="../images/perl_powered.png" alt="Powered by Perl" border="0" width="134" height="48"></a>
+    </td>
+    <td align="center">
+      <p style="float:right;margin-top:0pt">
+      <img src="../images/valid-html401.png" alt="[Valid HTML 4.01 Transitional]" border="0" width="88" height="31">
+
+      <img src="../images/validcss.png" alt="[Valid CSS]" border="0" width="88" height="31">
+
+      </p>
+      <p class="info">Copyright &copy; 2005-2010 <a href="http://www.squirrel.nl">Squirrel Consultancy</a>. All Rights Reserved.<br />
+Deze site is gemaakt met de 
+<a href='http://johan.vromans.org/tt2site/'>TT2Site
+Site Builder</a>.<br />
+intro/working.html laatste aanpassing 28 juli 2010, 20:24:19
+</p>
+
+    </td>
+  </tr>
+
+</table>
+
+ </body>
+</html>

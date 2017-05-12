@@ -1,0 +1,14 @@
+#
+# $Id: Changes,v 0.3 2002/10/21 20:56:49 dankogai Exp dankogai $
+#
+
+$Revision: 0.3 $ $Date: 2002/10/21 20:56:49 $
+! InCharset/*
+  Rebuilt via 'perl Makefile.PL UCMDIR=../Encode/ucm' since some of
+  ucm files are updated since Encode 1.75
+$Revision: 0.3 $ $Date: 2002/10/21 20:56:49 $
+! InCharset.pm
+  Scalar context vs. List context fix by miyagawa-kun
+  Message-Id: <86n0ul3xum.wl@mail.edge.co.jp>
+2002/05/03 05:12:38
+  First CPAN Release

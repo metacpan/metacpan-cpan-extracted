@@ -1,0 +1,22 @@
+[% title = 'Active SQL' %]
+[%INCLUDE menu.tmpl %]
+<h2>SQL</h2>
+    [% sql.replace('\n','<br/>').replace('\s', '&nbsp;&nbsp;&nbsp;') %]
+[% IF plan %]
+<h2>Explain Plan</h2>
+<table>
+    <tr>
+        <th>Operation</th>
+        <th>Object</th>
+        <th>Cost</th>
+    </tr>
+    [% FOREACH plan_line IN plan %]
+    <tr>
+        <td>[%plan_line.operation.replace('\s', '&nbsp;&nbsp;&nbsp;') %]</td><td>[% plan_line.object %]</td><td>[% plan_line.cost %]</td>
+    </tr>
+    [% END %]
+</table>
+
+[% END %]
+
+[% PROCESS footer.tmpl %]

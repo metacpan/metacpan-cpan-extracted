@@ -1,0 +1,42 @@
+NAME
+    Email::Barcode::Decode - decode barcodes out of an email
+
+SYNOPSIS
+        my $ebd = Email::Barcode::Decode->new(email => $msg);
+        my @symbols = $ebd->get_symbols;
+        foreach my $symbol (@symbols) {
+            print(
+                'decoded '  . $symbol->{type} .
+                ' symbol "' . $symbol->{data} .'"'.
+                ' file "'   . $symbol->{filename} .'"'.
+                "\n"
+            );
+        }
+
+DESCRIPTION
+    This module can extract barcode information out of email attachments. It
+    processes all email image attachments. When Ghostscript is installed it
+    converts every page into image. Images are scanned for barcodes using
+    Barcode::ZBar.
+
+PROPERTIES
+        email
+        header_obj
+        attached_files
+
+METHODS
+  new()
+    Object constructor. Requires `email' string.
+
+  get_symbols()
+    Returns an array of hashed with barcode information. Ex.:
+
+        my @symbols = ({
+            filename => 'vcard-pdf-page2.jpg',
+            type     => 'QR-Code',
+            data     => 'http://search.cpan.org/perldoc?Email%3A%3ABarcode%3A%3ADecode',
+        });
+
+AUTHOR
+    Jozef Kutej
+

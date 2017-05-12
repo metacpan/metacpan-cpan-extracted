@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name: Email-Store-Pristine
+version: 1.21
+author:
+  - Richard Clamp <richardc@unixbeard.net>
+abstract: keep a pristine copy of the mail
+license: perl
+requires:
+  Email::Store: 0
+  perl: 5.006
+build_requires:
+  DBD::SQLite: 0
+  Test::More: 0
+provides:
+  Email::Store::Pristine:
+    file: lib/Email/Store/Pristine.pm
+    version: 1.21
+generated_by: Module::Build version 0.2607

@@ -1,0 +1,68 @@
+{
+   "abstract" : "Enhance Exporter::Declare with some fancy magic.",
+   "author" : [
+      "Chad Granum <exodist7@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Exporter-Declare-Magic",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Fennec::Lite" : "0.004",
+            "Test::Exception" : "0.29",
+            "Test::Simple" : "0.88"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Devel::Declare::Parser" : "0.017",
+            "Exporter::Declare" : "0.107",
+            "Meta::Builder" : "0.003",
+            "Scalar::Util" : "0",
+            "aliased" : "0",
+            "perl" : "v5.8.0"
+         }
+      }
+   },
+   "provides" : {
+      "Exporter::Declare::Magic" : {
+         "file" : "lib/Exporter/Declare/Magic.pm",
+         "version" : "0.107"
+      },
+      "Exporter::Declare::Magic::Parser" : {
+         "file" : "lib/Exporter/Declare/Magic/Parser.pm",
+         "version" : 0
+      },
+      "Exporter::Declare::Magic::Sub" : {
+         "file" : "lib/Exporter/Declare/Magic/Sub.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/exodist/Exporter-Declare-Magic/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/exodist/Exporter-Declare-Magic"
+      }
+   },
+   "version" : "0.107"
+}

@@ -1,0 +1,16 @@
+Env::Sanctify
+=============
+
+1.04	Mon May 18 10:28:20 BST 2009
+	- Added auto_provides, auto_license and githubmeta to Makefile.PL
+
+1.02	Tue Apr  7 21:40:42 BST 2009
+	- Make auto_set_repository() only run at author-time
+
+1.00	Mon Apr  6 09:18:45 BST 2009
+	- Bumped the version number to a 'stable' release.
+	- added auto setting of repository to META.yml
+	- Added a zap %ENV test
+
+0.04	Tue Feb 10 12:02:14 GMT 2009
+	- Fixed the regex sanctification and updated the tests to check this

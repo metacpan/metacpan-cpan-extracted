@@ -1,0 +1,22 @@
+Revision history for Email::Mailer
+
+1.07      2017-04-28 11:04:26-04:00 America/New_York
+        - Looser tests to account for hash randomization
+
+1.06      2017-04-17 13:29:09-04:00 America/New_York
+        - Require version >= 1.940 of Email::MIME
+
+1.05      2017-03-20 19:06:51-07:00 America/Los_Angeles
+        - Bug fix for using the "transport" key (was previously ignoring value)
+
+1.04      2017-02-13 20:43:56-08:00 America/Los_Angeles
+        - Fix tiny but rather important documentation bug
+
+1.03      2017-02-13 17:12:55-08:00 America/Los_Angeles
+        - Support for arrayrefs of header data (like "to => ['a','b']")
+
+1.02      2017-02-09 09:37:19-08:00 America/Los_Angeles
+        - Fix date bug in test qr files
+
+1.01      2017-02-08 14:58:49-08:00 America/Los_Angeles
+        - First version, released on an unsuspecting world.

@@ -1,0 +1,155 @@
+NAME
+    Error::Pure - Perl module for structured errors.
+
+SYNOPSIS
+     use Error::Pure qw(err);
+     err 'This is a fatal error', 'name', 'value';
+
+SUBROUTINES
+    "err(@messages)"
+             Process error with messages @messages.
+
+VARIABLES
+    $LEVEL
+             Error level for Error::Pure.
+             Default value is 4.
+
+    $TYPE
+             Available are last names in Error::Pure::* modules.
+             Error::Pure::ErrorList means 'ErrorList'.
+             If does defined ENV variable 'ERROR_PURE_TYPE', system use it.
+             Default value is 'Die'.
+
+             Precedence:
+             1) $Error::Pure::TYPE
+             2) $ENV{'ERROR_PURE_TYPE'}
+             3) $Error::Pure::TYPE_DEFAULT = 'Die'
+
+EXAMPLE1
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Error::Pure qw(err);
+
+     # Set env error type.
+     $ENV{'ERROR_PURE_TYPE'} = 'Die';
+
+     # Error.
+     err '1';
+
+     # Output:
+     # 1 at example1.pl line 9.
+
+EXAMPLE2
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Error::Pure qw(err);
+
+     # Set env error type.
+     $ENV{'ERROR_PURE_TYPE'} = 'ErrorList';
+
+     # Error.
+     err '1';
+
+     # Output something like:
+     # #Error [path_to_script:12] 1
+
+EXAMPLE3
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Error::Pure qw(err);
+
+     # Set error type.
+     $Error::Pure::TYPE = 'AllError';
+
+     # Error.
+     err '1';
+
+     # Output something like:
+     # ERROR: 1
+     # main  err  path_to_script  12
+
+EXAMPLE4
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Error::Pure qw(err);
+
+     $SIG{__DIE__} = sub {
+             my $err = shift;
+             $err =~ s/ at .*\n//ms;
+             $Error::Pure::LEVEL = 5;
+             $Error::Pure::TYPE = 'ErrorList';
+             err $err;
+     };
+
+     # Error.
+     die 'Error';
+
+     # Output.
+     # #Error [path_to_script.pl:17] Error
+
+EXAMPLE5
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use English qw(-no_match_vars);
+     use Error::Pure qw(err);
+     use Error::Pure::Utils qw(err_msg_hr);
+
+     # Eval block.
+     eval {
+            err 'Error',
+                   'Key1', 'Value1',
+                   'Key2', 'Value2';
+     };
+     if ($EVAL_ERROR) {
+            print $EVAL_ERROR;
+            my $err_msg_hr = err_msg_hr();
+            foreach my $key (sort keys %{$err_msg_hr}) {
+                   print "$key: $err_msg_hr->{$key}\n";
+            }
+     }
+
+     # Output.
+     # Error
+     # Key1: Value1
+     # Key2: Value2
+
+DEPENDENCIES
+    English, Error::Pure::Utils, Exporter, Readonly.
+
+SEE ALSO
+    Task::Error::Pure
+        Install the Error::Pure modules.
+
+ACKNOWLEDGMENTS
+    Jakub Špičak and his Masser (<http://masser.sf.net>).
+
+REPOSITORY
+    <https://github.com/tupinek/Error-Pure>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © 2008-2015 Michal Špaček
+     BSD 2-Clause License
+
+VERSION
+    0.24
+

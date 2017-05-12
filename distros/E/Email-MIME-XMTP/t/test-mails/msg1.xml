@@ -1,0 +1,12 @@
+<Message xmlns="http://www.openhealth.org/xmtp#"
+        xmlns:mime="http//www.openhealth.org/xmtp#"
+        xmlns:web="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+        web:about="mid:xxxyyy@openhealth.org">
+  <Message-ID>xxxyyy@openhealth.org</Message-ID>
+  <From>jonathan@openhealth.org</From>
+  <To>xml-dev@lists.xml.org</To>
+  <Subject> An example</Subject>
+  <MIME-Version>1.0</MIME-Version>
+  <Content-Type>text/plain</Content-Type>
+  <mime:Body xmlns="">This is a simple message in MIME format</mime:Body>
+</Message>

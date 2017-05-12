@@ -1,0 +1,13 @@
+2.52      2017-03-02 09:42:39+00:00 UTC
+          merge previous version
+2.51      2017-03-02 07:36:05+00:00 UTC
+          remove VERSION from pod
+2.5       2017-02-28 02:09:54+00:00 UTC
+          update age verification check
+2.4       2017-02-24 02:47:54+00:00 UTC
+          Fix dependency of Test::NoWarnings
+2.3       2017-02-15 06:57:23+00:00 UTC
+          switch to dzil
+2.2       2015-11-24
+          * Added changes file
+          * Removed logger support and added warnings instead

@@ -1,0 +1,14 @@
+                                       Trial balance
+Period: through 2011-12-31
+EekBoek Sample Administration                                            EekBoek, 2011-12-31
+
+AccNr   Group/Account                                 Debet     Credit  Balance Db  Balance Cr
+--------------------------------------------------------------------------------------------
+1       Total Non-current Assets                   14722.85   14219.67     503.18
+2       Total Current Assets                       21126.68   10792.00   10334.68
+3       Total Assets                                           2443.18               2443.18
+4       Total Liabilities                           1075.97    2390.84               1314.87
+6       Total Costs                                 1620.19               1620.19
+8       Total Revenues                                         8700.00               8700.00
+--------------------------------------------------------------------------------------------
+        TOTAL                                      38545.69   38545.69   12458.05   12458.05

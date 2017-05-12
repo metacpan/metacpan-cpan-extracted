@@ -1,0 +1,21 @@
+[+ "Start include incerrobj" +]
+
+[!
+{
+package testerrobj ;
+
+sub new 
+
+    { 
+    return bless { msg => "Error Message from Object"} ;
+    }
+
+}
+
+!]
+
+[-
+die testerrobj -> new () ;
+-]
+
+[+ "End include incerrobj" +]

@@ -1,0 +1,7 @@
+Revision history for EntityModel-Web-PSGI:
+
+0.002     2011-10-23 02:09:16 Europe/London
+	Fix test error (caused by undef error). No other code changes in this version.
+
+0.001     2011-09-19 01:07:28 Europe/London
+	Initial CPAN release

@@ -1,0 +1,21 @@
+Build.PL
+Changes
+MANIFEST
+MANIFEST.SKIP
+META.yml
+Makefile.PL
+README
+SIGNATURE
+lib/Enumeration.pm
+t/0-signature.t
+t/Color.pm
+t/Enumeration.t
+t/SubClass.pm
+t/WeirdChars.pm
+t/doc.t
+t/equality.t
+t/free.t
+t/import.t
+t/no_import.t
+t/sub.t
+SIGNATURE    Added here by Module::Build

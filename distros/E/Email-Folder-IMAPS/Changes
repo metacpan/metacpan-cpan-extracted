@@ -1,0 +1,33 @@
+Revision history for Email-Folder-IMAPS
+
+1.105     2014-04-04 22:25:41-04:00 America/New_York
+          require URI::imap and URI::imaps
+
+1.104     2014-01-03 19:56:55 America/New_York
+          fix VERSION assignment mismatch
+
+1.103     2013-08-05 18:25:27 America/New_York
+          repackage to update bug tracker and repo data
+
+1.102     2007-04-01
+          be-a Email::Folder::IMAP without breaking Email::Folder::IMAP
+
+1.101     2007-03-22
+          packaging improvements
+          fix documentation
+
+1.10      2006-07-11
+          require newer Net::IMAP::Simple::SSL to allow port config
+
+1.04      2005-05-03
+          Fixed distribution broken by
+          metadata-aware tar on Mac OS X 10.4.
+
+1.03      2005-05-02
+          Documentation patch. (Sébastien Aperghis-Tramoni)
+
+1.02      2004-08-17
+          Synopsis screwup.
+
+1.01      2004-08-07
+          Initial version.

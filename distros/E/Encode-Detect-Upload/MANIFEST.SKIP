@@ -1,0 +1,4 @@
+.*.swp
+.git
+Makefile.old
+MANIFEST.bak

@@ -1,0 +1,1272 @@
+   [1]The Journal of Biological Chemistry
+
+   [2]Skip to main page content
+     * [3]Home
+     * [4]Current issue
+     * [5]Archive
+     * [6]Papers in Press
+     * [7]Minireviews
+     * [8]Classics
+     * [9]Reflections
+     * [10]Papers of the Week
+
+   QUICK SEARCHAuthor: _________Keyword: ________________Year: ____Vol:
+   ____Page: ____ GO Go[11][Advanced Search][12][Browse the Archive]
+     * Institution: Univ Colorado - Denison Memorial Library
+     * [13]Sign In
+
+   Advertisement
+   Advertisement
+     * [14]Celebrate 100 Years of ASBMB: ASBMB Histroy Book Now Avaiable!
+
+ §1§ The Crystal Structures of Apo and Complexed Saccharomyces cerevisiae
+GNA1 Shed Light on the Catalytic Mechanism of an Amino-sugar
+N-Acetyltransferase[15]* §1§
+
+    1. [16]Caroline Peneff[17]‡[18]§,
+    2. [19]Dominique Mengin-Lecreulx[20]¶ and
+    3. [21]Yves Bourne[22]‡[23]‖
+
+    1.
+
+
+    From the ^‡UMR 6098 CNRS, 31 chemin Joseph Aiguier, 13402 Marseille
+    Cedex 20, France and ^¶UMR 8619 CNRS, Université Paris-Sud, Bâtiment
+    430, 91405 Orsay Cedex, France
+
+
+   [24]Next Section
+
+ §2§ Abstract §2§
+
+   The yeast enzymes involved in UDP-GlcNAc biosynthesis are potential
+   targets for antifungal agents. GNA1, a novel member of the Gcn5-related
+   N-acetyltransferase (GNAT) superfamily, participates in UDP-GlcNAc
+   biosynthesis by catalyzing the formation of GlcNAc6P from AcCoA and
+   GlcN6P. We have solved three crystal structures corresponding to the
+   apo Saccharomyces cerevisiae GNA1, the GNA1-AcCoA, and the
+   GNA1-CoA-GlcNAc6P complexes and have refined them to 2.4, 1.3, and 1.8
+   Å resolution, respectively. These structures not only reveal a stable,
+   β-intertwined, dimeric assembly with the GlcNAc6P binding site located
+   at the dimer interface but also shed light on the catalytic machinery
+   of GNA1 at an atomic level. Hence, they broaden our understanding of
+   structural features required for GNAT activity, provide structural
+   details for related aminoglycosideN-acetyltransferases, and highlight
+   the adaptability of the GNAT superfamily members to acquire various
+   specificities.
+
+   The Gcn5-related N-acetyltransferases (GNATs)^1 represent a large
+   superfamily of functionally diverse enzymes that catalyze the transfer
+   of an acetyl group from AcCoA to the primary amine of a wide range of
+   acceptor substrates (for a review, see Ref. [25]1). Recently,
+   three-dimensional structural information has become available with the
+   structures of two aminoglycoside N-acetyltransferases fromSerratia
+   marcescens (SmAAT) ([26]2) and Enterococcus faecium (EfAAT) ([27]3);
+   five histone acetyltransferases (HATs): PCAF ([28]4), HAT1 ([29]5),
+   Tetrahymena GCN5 (tGCN5) ([30]6, [31]7), yeast GCN5 (yGCN5) ([32]8),
+   and Hpa2 ([33]9); and one arylalkylamineN-acetyltransferase, the
+   serotoninN-acetyltransferase (AANAT) ([34]10). These structures have
+   revealed a structurally conserved GNAT core that is largely involved in
+   AcCoA binding and incorporates elements from the four conserved
+   sequence motifs (A to D) initially identified by sequence analysis
+   ([35]11,[36]12).
+
+   Although the GNAT AcCoA binding site is well documented, the binding
+   site of the acceptor substrate has been characterized in only two
+   cases: the histone binding site in the tGCN5-CoA-H3 peptide complex
+   structure ([37]7) and the serotonin binding site in the
+   AANAT-bisubstrate analog complex structure ([38]10). These two
+   structures also provide the first glances into the catalytic machinery
+   of GNAT. Yet, a better understanding of the diverse modes of acceptor
+   substrate recognition and the catalytic mechanism of the GNATs as well
+   as further insights into the evolution of this superfamily still await
+   additional structural studies of GNAT-substrate complexes.
+
+   Glucosamine-6-phosphate N-acetyltransferase 1 (GNA1) is a novel
+   amino-sugar N-acetyltransferase member of the GNAT superfamily. GNA1
+   holds a key position in the pathway toward de novo synthesis of the
+   essential metabolite UDP-GlcNAc and is present in various eukaryotic
+   organisms (Fig. [39]1 A). The GNA1 murine homologue, EMeg32, which
+   possesses an extra 31-residue NH[2]-terminal region compared with the
+   yeast homologues, has recently been characterized ([40]13). EMeg32 is
+   essential for embryonic development, and its inactivation in mouse
+   embryonic fibroblasts generates resistance to apoptotic stimuli and
+   defects in cell proliferation ([41]14). GNA1 has also been
+   characterized in yeast ([42]15) and shown to be essential to the
+   survival of Saccharomyces cerevisiae in which it controls multiple cell
+   cycle steps ([43]16). In addition, Candida albicans GNA1 null mutants
+   exhibit reduced virulence when injected into mice ([44]17), making GNA1
+   a potential target for the development of new antifungal agents.
+   [45]Figure 1
+   View larger version:
+     * [46]In this window
+     * [47]In a new window
+
+     * [48]Download as PowerPoint Slide
+
+   Figure 1
+
+   Sequence conservation and quality of the GNA1 structure. A, sequence
+   alignment of GNA1 homologues. Conserved and similar residues are
+   highlighted withblack and gray backgrounds, respectively. GNA1
+   secondary structure elements forming the structurally conserved GNAT
+   core are shown in black. The sequence alignment for SmAAT and Hpa2 is
+   based on a structural comparison with GNA1. Subunit 1 residues involved
+   in the GlcNAc6P and AcCoA binding sites are identified by filled
+   circles and filled triangles, respectively, and are shown in black for
+   the residues making GNAT conserved interactions. The unfilled circles
+   indicate subunit 2 residues that complete the GlcNAc6P binding site of
+   subunit 1. The four GNAT sequence motifs areboxed. B, stereoview of the
+   1.3 Å resolution experimental, solvent-flattened, averaged electron
+   density map contoured at 1.25 ς around an AcCoA molecule.
+
+   We present here three high resolution crystal structures of GNA1. The
+   apo GNA1 and the binary GNA1-AcCoA complex structures were solved
+   independently using MAD techniques and refined to 2.4 and 1.3 Å
+   resolution, respectively (Table [49]I). The structure of the
+   GNA1-CoA-GlcNAc6P ternary complex was solved by molecular replacement
+   and refined to 1.8 Å resolution (Table[50]I). These three structures
+   reveal GNA1 catalytic features and provide the first complete picture
+   of an amino-sugar GNAT active site as a first step toward the
+   development of specific inhibitors.
+   View this table:
+     * [51]In this window
+     * [52]In a new window
+
+   Table I
+
+   Structural statistics
+   [53]Previous Section[54]Next Section
+
+ §2§ EXPERIMENTAL PROCEDURES §2§
+
+ §5§ Expression and Purification of the Native and Selenomethionyl
+Proteins §5§
+
+   Full-length GNA1 was amplified from genomic S. cerevisiae DNA, cloned
+   into the pQE30 expression vector, and transformed into M15pREP4
+   (Qiagen) Escherichia coli cells. Protein expression was induced with
+   0.1 mmisopropyl-1-thio-β-d-galactopyranoside for 20 h at 37 °C.
+   Selenomethionyl GNA1 was produced as previously published ([55]18). The
+   recombinant His-tagged native and selenomethionyl enzymes were purified
+   via nickel affinity and anion exchange chromatographies, dialyzed
+   against 10 mm Tris-HCl, pH 8, 150 mm NaCl, 1 mm dithiothreitol, and
+   concentrated to 10 mg/ml. The activity of these enzymes was verified.
+
+ §5§ Crystallization §5§
+
+   Crystals of the native and selenomethionyl protein were grown at 20 °C
+   using the hanging-drop vapor diffusion method by mixing equal volumes
+   of the protein solution and the reservoir, which contained 17–22%
+   polyethylene glycol 600 and 0.2/0.4m imidazole/malate, pH 5.1. Crystals
+   obtained from the apo protein belong to the orthorhombic space group
+   P2[1]2[1]2[1] and contain 6 molecules/asymmetric unit. Those obtained
+   from GNA1 preincubated overnight with 1 mm AcCoA or CoA belong to the
+   monoclinic space group C2 and contain 4 molecules/asymmetric unit. For
+   data collection, the crystals were transferred to a reservoir solution
+   containing 32% polyethylene glycol 600 and flash-frozen at 100 K in
+   gaseous nitrogen.
+
+ §5§ Data Collection §5§
+
+   A three-wavelength MAD experiment was performed at the ESRF beamline
+   ID14-4 (European Synchroton Radiation Facility, Grenoble, France) on
+   both the AcCoA-complexed and apo selenomethionyl protein crystals at
+   2.8 and 3.2 Å resolution, respectively. High resolution data sets were
+   collected at 2.4 and 1.3 Å resolution on an apo GNA1 crystal and a
+   GNA1-AcCoA complex crystal, respectively, on beamline ID14-2 (ESRF,
+   Grenoble). A 1.8 Å resolution data set was collected at EMBL-X31 (DESY,
+   Hamburg) from a GNA1-CoA complex crystal soaked in the reservoir
+   solution supplemented with 1 mm GlcNAc6P for 6 days.
+
+ §5§ Structure Solution, Model Building, and Refinement §5§
+
+   All data were processed and reduced using DENZO ([56]19) and the CCP4
+   program suite ([57]20). The apo and AcCoA-complexed GNA1 structures
+   were solved independently using SOLVE ([58]21). The experimental MAD
+   electron density maps were improved by solvent flattening,
+   non-crystallographic symmetry averaging, and phase extension with the
+   program DM ([59]20). The apo GNA1 model was built manually using
+   TURBO-FRODO ([60]22). The GNA1-AcCoA complex model was built
+   automatically using ARP/wARP ([61]23). These two models were refined
+   against their respective high resolution data set using the program CNS
+   ([62]24), including bulk solvent and anisotropic B-factor corrections.
+   NCS restraints were used only for the apo GNA1 model. High temperature
+   factors and weak electron density maps are associated with residues
+   Gln-52 to Lys-57 in the two models. The 3 intertwined dimers of the apo
+   GNA1 model have an average root mean square deviation of 0.7 Å for all
+   Cα atoms. In the GNA1-AcCoA complex model, the root mean square
+   deviation value between the 2 dimers is 0.4 Å for all Cα atoms. The
+   GNA1-CoA-GlcNAc6P complex structure was obtained from a rigid body
+   refinement using the GNA1-AcCoA complex as a starting model. Fourier
+   difference maps clearly revealed the location of the bound CoA and
+   GlcNAc6P in two of the four molecules. The structure of the
+   GNA1-CoA-GlcN6P complex was also solved at 2.5 Å; superimposition of
+   the two ternary complexes (GNA1-CoA-GlcNAc6P and GNA1-CoA-GlcN6P)
+   revealed that GlcN6P (the substrate) and GlcNAc6P (the reaction
+   product) were positioned similarly. Because the GNA1-CoA-GlcNAc6P
+   structure was obtained at a higher resolution than that of
+   GNA1-CoA-GlcN6P, we only considered in the analysis the
+   GNA1-CoA-GlcNAc6P complex structure. The stereochemistry of the refined
+   models was analyzed by PROCHECK ([63]25); no residue was found in the
+   disallowed regions of the Ramachandran plot. The coordinates of apo,
+   AcCoA-, and CoA-GlcNAc6P-complexed GNA1 have been deposited in the
+   Protein Data Bank (accession codes [64]1I21, [65]1I12, and [66]1I1D).
+
+   Figs. [67]1, 2, 4, and 5 were generated with SPOCK ([68]26) and
+   Raster3D ([69]27) except for Fig. [70]1 A, which was computed with
+   Alscript ([71]28).
+   [72]Previous Section[73]Next Section
+
+ §2§ RESULTS AND DISCUSSION §2§
+
+ §5§ Overall Structure §5§
+
+   The three-dimensional structures of GNA1 in its apo state and complexed
+   forms with AcCoA or with CoA and GlcNAc6P have been solved and refined
+   at 2.4, 1.3, and 1.8 Å resolution, respectively. Overall, the electron
+   density is well defined for these structures (Fig. [74]1 B) except for
+   a surface loop comprising residues Gln-52 to Lys-57 (cf.“Experimental
+   Procedures”). As predicted from sequence analysis, GNA1 shares
+   structural similarities with other GNAT superfamily members ([75]1,
+   [76]11). The GNA1 fold consists of a central core, composed of a mixed
+   5-stranded β-sheet flanked by 4 α-helices, and a COOH-terminal strand
+   β6, which is projected away from the central core (Fig.[77]2 A).
+   [78]Figure 2
+   View larger version:
+     * [79]In this window
+     * [80]In a new window
+
+     * [81]Download as PowerPoint Slide
+
+   Figure 2
+
+   Structure of GNA1 and AcCoA, GlcNAc6P binding sites. A, ribbon
+   representations of the GNA1 fold (left) and the intertwined GNA1 dimer
+   (right). In subunit 1, the GNA1 secondary structure elements forming
+   the structurally conserved GNAT core are shown ingreen, the exchanged
+   β-strand in yellow, and the remaining structural elements in cyan.
+   Subunit 2 is shown in magenta with its exchanged strand β6 inred. The
+   molecular surface of AcCoA-(B) and CoA-GlcNAc6P-(C) complexed GNA1,
+   oriented as in Fig.[82]1 B (left view) and color-coded (B) as in Fig.
+   [83]1 B, with the regions undergoing small structural rearrangements
+   upon AcCoA binding displayed under a transparent surface (the cyan and
+   yellow bonds refer to the apo and AcCoA-complexed GNA1 models,
+   respectively). AcCoA is shown with carbon (white), nitrogen (blue),
+   sulfur (green), oxygen (red), and phosphorous (purple) atoms. C, the
+   color code is according to the electrostatic potential with positive
+   and negative charges shown inblue and red, respectively. The essential
+   catalytic Tyr-143 is displayed through a transparent surface. CoA and
+   GlcNAc6P are shown with yellow carbon atoms. D, stereoview of the
+   GlcNAc6P binding site with residues from subunit 1 and 2 shown in cyan
+   and magenta, respectively. The dotted lines indicate hydrogen bonds.
+   Residues within the GNAT conserved β-bulge are displayed in green.
+
+   The GNA1 structure is dimeric in the crystal as well as in solution, as
+   attested from gel filtration data (not shown). The crystalline dimer is
+   made of two intertwined GNA1 monomers in which strand β6 of one subunit
+   exchanges with the identical strand from the other subunit (Fig. [84]2
+   A). A β-strand exchange between subunits in a dimer is an unusual
+   feature among GNATs and has been observed only in the HAT Hpa2
+   structure ([85]9). In all other structurally characterized GNAT, except
+   Hat1 that lacks a β6 strand ([86]5), the hinge loop preceding strand β6
+   folds back onto its own subunit. This difference is reminiscent of
+   three-dimensional domain-swapped proteins in which the loop that
+   precedes the exchanged domain can switch from a closed to an opened
+   conformation thereby leading to either a monomeric or a dimeric form
+   ([87]29). In the case of GNA1 or Hpa2, the α4–β6 loop is too small to
+   undergo such a conformational switch, and the dimeric assembly is
+   further stabilized by a hydrophobic interface, two features that make
+   three-dimensional domain swapping unlikely. Nonetheless, the monomeric
+   GNATs and the intertwined dimers of GNA1 and Hpa2 are most probably
+   related by divergent evolution from a common ancestor, and the
+   evolutionary mechanisms that have led to dimer formation may have
+   included three-dimensional domain swapping.
+
+ §5§ The Cofactor Binding Site §5§
+
+   In each subunit of the GNA1 dimer, AcCoA is positioned in a large
+   hydrophobic cleft located at the site where the two parallel strands,
+   β4 and β5, diverge because of a β-bulge in strand β4 that positions the
+   side chains of Glu-98 and Asp-99 on the same face of the β-sheet. The
+   presence of this β-bulge is remarkably well conserved among GNATs,
+   which suggests a critical role for this structural element in the
+   formation of the AcCoA binding site.
+
+   AcCoA adopts a conformation similar to that described in other
+   AcCoA-complexed GNAT structures ([88]1). The acetyl group of AcCoA,
+   which marks the active site, is located between strand β5 and the
+   β-bulge and is largely stabilized by contacts with the protein; the two
+   carbon atoms contract hydrophobic interactions with residues Ile-100,
+   Leu-133, and Tyr-143, and the carbonyl oxygen inserts into an oxyanion
+   hole formed by the backbone amides of residues Asp-99 and Ile-100. Such
+   an oxyanion hole has been observed in the structurally
+   relatedN-myristoyltransferase ([89]30) but is a unique feature within
+   the structurally characterized GNATs.
+
+   Superimposition of the apo and AcCoA-complexed GNA1 structures shows
+   that AcCoA binding induces subtle structural rearrangements that are
+   confined to the edges of the cleft and result in a slightly narrower
+   cleft. Residues 102–109 in the α3–β5 loop and 134–143 in the β5–α4 loop
+   plus the N-cap of α4 move by ∼1.3 and 1.1 Å, respectively, toward the
+   center of the cleft (Fig. [90]2 A). Whether these conformational
+   changes, induced upon cofactor binding, are a prerequisite for acceptor
+   substrate binding as shown for other GNATs ([91]31-33) needs to be
+   ascertained by kinetic studies. A detailed comparison with other GNATs
+   reveals that these rearrangements differ from those reported for (i)
+   tGCN5, in which the cofactor-binding cleft opens slightly upon AcCoA
+   binding to accommodate the histone tail ([92]7); and (ii) AANAT, in
+   which a major rearrangement of the α1-loop-α2 region occurs upon AcCoA
+   binding to complete the serotonin binding site ([93]10). Therefore,
+   although the binding of AcCoA is similar among GNATs, it induces
+   different conformational changes that can contribute to the specific
+   binding of the acceptor substrate.
+
+ §5§ The Acceptor Substrate Binding Site §5§
+
+   The GNA1 amino-sugar binding site exhibits an atypical architecture, as
+   it is built at the dimer interface and involves residues from the
+   exchanged β-strand, two features found only in a few intertwined
+   oligomeric structures such as that of bovine seminal ribonuclease
+   ([94]34). GlcNAc6P binds at the base of the AcCoA cleft within a small
+   pocket that is lined mostly with electronegative residues except for a
+   patch of positively charged residues that specifically accommodate the
+   6-phosphate group (Fig.[95]2 B). Remarkably, the GlcNAc6P acetyl group
+   is positioned similarly to the cofactor acetyl group in the GNA1-AcCoA
+   complex structure (Fig. [96]2 B). The sugar-6-phosphate establishes
+   numerous hydrogen bonds, mainly via side chain atoms, together with a
+   few hydrophobic contacts such as that found between Leu-27 and the
+   β-face of the sugar ring (Fig. [97]2 C). Superimposition of the
+   structures of the cofactor-complexed SmAAT ([98]2) or EfAAT ([99]3)
+   (the two structurally characterized aminoglycoside GNATs) on that of
+   the GNA1-CoA-GlcNAc6P complex shows that SmAAT Phe-51, EfAAT Trp-25,
+   and GNA1 Leu-27 are identically positioned, an observation that
+   supports a common functional role for these residues, thereby
+   identifying an aminoglycoside recognition feature of GNATs.
+
+ §5§ Catalytic Mechanism §5§
+
+   Several reports on GlcN6PN-acetyltransferases suggest that catalysis
+   requires sulfhydryl group-containing residues, such as a cysteine that
+   could act as a nucleophile in a two-step mechanism involving the
+   formation of a covalent acetyl-cysteine enzyme intermediate ([100]35,
+   [101]36). In contrast, structural and kinetic data available for GNATs
+   support a mechanism proceeding through a direct nucleophilic reaction
+   of acceptor substrate on AcCoA ([102]1, [103]32, [104]33).
+
+   In the GNA1-AcCoA complex structure, the cysteine residue closest to
+   the AcCoA acetyl group lies 6.5 Å apart, too far to play a role in
+   acetyl transfer. Furthermore, no other appropriate nucleophile residue
+   is found in the proximity of the acetyl group, which makes the
+   formation of an acetyl-enzyme intermediate very unlikely and supports
+   the hypothesis of a single-step mechanism as suggested for GNATs.
+   Consistent with this hypothesis is the position of the amino group of
+   the product GlcNAc6P (similar to that of the substrate GlcN6P;cf.
+   “Experimental Procedures”), which is ideal to allow a direct
+   nucleophilic attack at the AcCoA carbonyl (Fig.[105]2 B). In addition,
+   the nucleophilic character of the amine is enhanced by the hydrogen
+   bond it establishes with the backbone carbonyl of Asp-134 (Fig. [106]2
+   C). The AcCoA carbonyl is polarized via hydrogen bonds to the backbone
+   amides of Asp-99 and Ile-100, located in the oxyanion hole, a feature
+   that facilitates the nucleophilic attack and stabilizes the negative
+   charge building up on the oxygen atom of the tetrahedral reaction
+   intermediate (Fig.[107]3). Finally, the Tyr-143 hydroxyl group, which
+   lies within hydrogen bond distance of the AcCoA sulfur atom (Fig.[108]2
+   B), could serve to stabilize the thiolate anion of the departing CoA
+   molecule. Tyr-143 also establishes hydrophobic contacts with the acetyl
+   group, probably playing a role in correctly positioning the acetyl
+   group for the reaction. A critical role of Tyr-143 in catalysis is
+   supported by mutagenesis data ([109]15). A close inspection of the
+   active site of GNA1 also pinpoints two significant structural and
+   functional differences with others members of the GNAT superfamily.
+   [110]Figure 3
+   View larger version:
+     * [111]In this window
+     * [112]In a new window
+
+     * [113]Download as PowerPoint Slide
+
+   Figure 3
+
+   Schematic representation of the proposed GNA1 catalytic mechanism.
+
+   The first striking difference resides within the GNA1 β-bulge which,
+   when compared with the β-bulges in other GNAT structures, shows a
+   markedly different hydrogen bonding pattern. The GNAT β-bulge is an
+   irregularity of the antiparallel β structure in which two residues on
+   one strand are facing a single residue on the other strand ([114]37).
+   Such a β-bulge is formed when two consecutive residues in a β-strand
+   direct their backbone carbonyl or amide toward the same side of the
+   strand, thereby breaking the typical alternated pattern of a
+   β-structure. In GNA1, the backbone amides of Asp-99 and Ile-100 are
+   projected toward the active site and form the oxyanion hole, whereas
+   the carbonyls of Glu-98 and Asp-99 point toward β3. In all other
+   members of the GNAT superfamily (except EfAAT in which a proline
+   perturbs the bulge conformation ([115]3)), the situation is reversed;
+   the oxyanion hole is absent because the two consecutive backbone amides
+   are now directed toward strand β3 (establishing an hydrogen bond with
+   the backbone carbonyl of the facing residue), whereas two consecutive
+   main chain carbonyls are found pointing into the active site
+   (Fig.[116]4). These two carbonyls have been suggested to play a role in
+   acceptor substrate binding in tGCN5 ([117]7) and in the stabilization
+   of catalytic water molecules in AANAT ([118]10); this indicates that,
+   in addition to a common role in structuring the cofactor binding site,
+   the β-bulge could also fulfill other nonconserved catalytic functions.
+   [119]Figure 4
+   View larger version:
+     * [120]In this window
+     * [121]In a new window
+
+     * [122]Download as PowerPoint Slide
+
+   Figure 4
+
+   The β-bulge structure in GNA1 and comparison with another GNAT
+   superfamily member. The structure of GNA1-CoA-GlcNAc6P (thick sticks
+   withlight gray carbons) is superimposed with that of AANAT (thin sticks
+   with dark gray carbons) in the vicinity of the β-bulge. Nitrogen and
+   oxygen atoms from the protein main chain or the acetylated amine of
+   GlcNAc6P are shown inblack. Light and dark gray dotted lines indicate
+   hydrogen bonds in the structures of GNA1 and AANAT, respectively.
+
+   The second important difference concerns the deprotonation of the
+   acceptor substrate amino group prior to the reaction. In the case of
+   tGCN5 and AANAT, a chain of well ordered water molecules, or “proton
+   wire,” connecting the acceptor substrate amino group to the proposed
+   catalytic bases tGCN5 Glu-122 or AANAT His-120 was suggested to be
+   involved in this proton removal ([123]7, [124]10). In the
+   GNA1-CoA-GlcNAc6P complex, a similar proton wire is observed, leading
+   to Glu-98 in which the side chain occupies a similar position as that
+   of tGCN5 Glu-122 and AANAT His-120. However, the E98A mutation does not
+   abolish the GNA1 activity ([125]15), suggesting that Glu-98 might not
+   function as the general base. Nevertheless, deprotonation prior to the
+   reaction might not be necessary in the case of GNA1, because the pK [a]
+   of GlcN6P (∼7.75) is lower than that of other GNAT acceptor substrates
+   such as lysine (8.95) or serotonin (∼10). This hypothesis is also
+   supported by the fact that the optimum pH of purified mammalian GlcN6P
+   N-acetyltransferases lies in the alkaline range ([126]35, [127]36) and
+   by the lower K [m] value ofS. cerevisiae GNA1 for GlcN6P at pH 8 than
+   at pH 7.5 ([128]13), suggesting that GNA1 may preferentially bind the
+   basic/deprotonated form of GlcN6P.
+
+ §5§ Substrate Specificity among GNATs §5§
+
+   Although the GNAT enzymes share structural similarities, they have
+   distinct acceptor specificities, consistent with their implication in
+   various biological processes. A comparative analysis of the complexes
+   of GNA1-CoA-GlcNAc6P, tGCN5-CoA-H3 peptide ([129]7), and
+   AANAT-bisubstrate analog ([130]7, [131]10) highlights the structural
+   determinants responsible for the substrate specificities among GNATs.
+   Importantly, this knowledge is essential for the design of specific
+   inhibitors for medical applications.
+
+   The structural comparison of these three complexes reveals that both
+   the NH[2]- and COOH-terminal regions diverge between the different GNAT
+   structures and are important for substrate specificity. The
+   NH[2]-terminal structural differences concern the α1-loop-α2 region and
+   are relatively minor, whereas more dramatic changes occur in the
+   COOH-terminal end. In AANAT, the α4–β6 loop orients toward the active
+   site as it folds back on its own subunit. This loop, along with the
+   α1–α2 loop, almost covers the active site, thus facilitating the
+   binding of a hydrophobic substrate (Fig.[132]5 A). In tGCN5, the
+   20-residue segment inserted between α4 and β6 contributes to one side
+   of the substrate binding canal, providing specific binding residues for
+   the histone tail (Fig. [133]5 B).
+   [134]Figure 5
+   View larger version:
+     * [135]In this window
+     * [136]In a new window
+
+     * [137]Download as PowerPoint Slide
+
+   Figure 5
+
+   Structural comparison of substrate binding sites of AANAT , tGCN5, and
+   GNA1. The molecular surfaces around the active site of the
+   AANAT-bisubstrate analog (A), the tGCN5-CoA-H3peptide (B), and the
+   GNA1-CoA-GlcNAc6P complex structures (C) are viewed with a similar
+   orientation. From top to bottom, the serotonin-like moiety and the
+   acetyl group are shown in red, the H3 peptide backbone in yellow, with
+   its reactive Lys-14 side chain in orange, and GlcNAc6P in purple.
+   Structural divergences within the NH[2]- and COOH-terminal regions are
+   highlighted in dark blue andblue, respectively. The β3–β4 insertion
+   loop unique to AANAT is shown in brown.
+
+   In GNA1, the shorter α4–β6 loop does not participate directly in
+   acceptor substrate binding, but it forces strand β6 to extend and
+   exchange with the identical strand of the other subunit in the dimer.
+   Instead of using this loop, GNA1 exploits its intertwined oligomeric
+   state to achieve specific binding, because an important part of the
+   GNA1 active site consists of residues from the other subunit in the
+   dimer (Fig. [138]5 C). In contrast, this region is partly replaced in
+   monomeric AANAT by a long loop inserted between strands β3 and β4,
+   which contributes largely to one wall of the serotonin binding site
+   (Fig. [139]5 A). For the monomeric tGCN5, the short β3–β4 turn
+   contributes to the canal-shaped active site designed to accommodate a
+   long peptidic chain (Fig. [140]5 B).
+
+ §5§ Role in the Cell Cycle §5§
+
+   GNA1 was shown to control multiple cell cycle steps in S. cerevisiae
+   ([141]16). It is still unclear whether this role is related to the
+   N-acetyltransferase activity of GNA1 in UDP-GlcNAc biosynthesis (which
+   implies a physiological link between UDP-GlcNAc and cell cycle
+   progression) or if it is the consequence of an additional function of
+   GNA1.
+
+   The hypothesis of an additional HAT activity for GNA1 was addressed,
+   but no HAT activity could be detected in vitro([142]15). Interestingly,
+   a comparison of GNA1 with the related GNAT structures reveals that the
+   closest structural homologue of GNA1 is the HAT Hpa2, which also adopts
+   an intertwined dimeric structure ([143]9). Superimposition of the two
+   structures reveals differences in the relative arrangement of the two
+   subunits, resulting in different acceptor substrate binding sites. A
+   narrow open-ended channel, in which the histone tail could insert, is
+   found in the Hpa2 structure instead of the rounded pocket of GNA1,
+   which seems unlikely to accommodate an extended and bulky histone tail.
+
+   Could GNA1 fulfill an additional function via the noncovalent
+   association with a particular cell compartment or with a protein
+   partner? An association with the cytoplasmic face of organelle
+   membranes has been described for EMeg32 (the GNA1 murine homologue)
+   which also co-purifies with the cdc48 homologue protein (p97/VCP)
+   ([144]13). Double-hybrid systematic experiments performed in S.
+   cerevisiae revealed interactions between GNA1 and a priori unrelated or
+   unknown proteins ([145]38). Further biochemical experiments are needed
+   to determine the biological relevance of these protein/membrane
+   interactions.
+
+   UDP-GlcNAc is a key precursor of chitin (a component of the yeast and
+   fungal cell wall) as well as of the glycosylphosphatidylinositol anchor
+   of membrane-bound proteins and is essential to N-linked glycosylation
+   and O-GlcNAc modification of proteins. Glycosyltransferases involved in
+   N-glycosylation, such as the yeast GPT/alg7, which uses UDP-GlcNAc as a
+   substrate, have been suggested to play a role in the cell cycle
+   ([146]39). In addition, a recent report shows that EMeg32-dependent
+   UDP-GlcNAc levels influence cell cycle progression and apoptosis
+   signaling ([147]14). Hence, the role of GNA1 in cell cycle progression
+   appears to be linked to its key GlcN6P N-acetyltransferase activity in
+   de novo UDP-GlcNAc biosynthesis. The structural data presented here
+   have allowed us to propose a catalytic mechanism for GNA1, as well as
+   providing a structural template for GNA1 homologues and related
+   aminoglycosides GNATs. Finally, these results further exemplify the
+   remarkable diversity of the GNAT superfamily and represent a critical
+   step toward the development of specific inhibitors.
+   [148]Previous Section[149]Next Section
+
+ §2§ ACKNOWLEDGEMENTS §2§
+
+   We thank Véronique Charrier, Bernard Henrissat, Pascale Marchot,
+   Florence Fassy, and Gerlind Sulzenbacher for helpful discussions,
+   Frédérique Pompéo for enzymatic assays, and the ESRF staff for
+   technical support in data collection.
+   [150]Previous Section[151]Next Section
+
+ §2§ Footnotes §2§
+
+     * [152]↵* This work was supported by grants from the CNRS to UMR 6098
+       (Marseille, Y. B.) and to UMR 8619 (Orsay, D.  M.-L.).The costs of
+       publication of this article were defrayed in part by the payment of
+       page charges. The article must therefore be hereby marked
+       “advertisement” in accordance with 18 U.S.C. Section 1734 solely to
+       indicate this fact.
+       The atomic coordinates and the structure factors (code , , and )
+       have been deposited in the Protein Data Bank, Research
+       Collaboratory for Structural Bioinformatics, Rutgers University,
+       New Brunswick, NJ ([153]http://www.rcsb.org/).
+     * [154]↵§ Holder of a CNRS Ph.D. fellowship.
+     * [155]↵‖ To whom correspondence should be addressed. Tel.:
+       +33-4-91-16-45-08; Fax: +33-4-91-16-45-36; E-mail:
+       yves@afmb.cnrs-mrs.fr.
+     * Published, JBC Papers in Press, February 9, 2001, DOI
+       10.1074/jbc.M009988200
+     * Abbreviations:
+
+        GNAT
+                Gcn5-relatedN-acetyltransferase
+
+        HAT
+                histone acetyltransferase
+
+        AANAT
+                serotonin N-acetyltransferase
+
+        MAD
+                multi-wavelength anomalous dispersion
+
+     *
+          + Received November 2, 2000.
+          + Revision received February 9, 2001.
+     * The American Society for Biochemistry and Molecular Biology, Inc.
+
+   [156]Previous Section
+
+ §2§ REFERENCES §2§
+
+    1. [157]↵
+         1. Dyda F.,
+         2. Klein D. C.,
+         3. Hickman A. B.
+       (2000) Annu. Rev. Biophys. Biomol. Struct. 29:81–103.
+    2. [158]↵
+         1. Wolf E.,
+         2. Vassilev A.,
+         3. Makino Y.,
+         4. Sali A.,
+         5. Nakatani Y.,
+         6. Burley S. K.
+       (1998) Cell 94:439–449.
+    3. [159]↵
+         1. Wybenga-Groot L. E.,
+         2. Draker K.,
+         3. Wright G. D.,
+         4. Berghuis A. M.
+       (1999) Struct. Fold. Des. 7:497–507.
+    4. [160]↵
+         1. Clements A.,
+         2. Rojas J. R.,
+         3. Trievel R. C.,
+         4. Wang L.,
+         5. Berger S. L.,
+         6. Marmorstein R.
+       (1999) EMBO J. 18:3521–3532.
+    5. [161]↵
+         1. Dutnall R. N.,
+         2. Tafrov S. T.,
+         3. Sternglanz R.,
+         4. Ramakrishnan V.
+       (1998) Cell 94:427–438.
+    6. [162]↵
+         1. Lin Y.,
+         2. Fletcher C. M.,
+         3. Zhou J.,
+         4. Allis C. D.,
+         5. Wagner G.
+       (1999) Nature 400:86–89.
+    7. [163]↵
+         1. Rojas J. R.,
+         2. Trievel R. C.,
+         3. Zhou J.,
+         4. Mo Y.,
+         5. Li X.,
+         6. Berger S. L.,
+         7. Allis C. D.,
+         8. Marmorstein R.
+       (1999) Nature 401:93–98.
+    8. [164]↵
+         1. Trievel R. C.,
+         2. Rojas J. R.,
+         3. Sterner D. E.,
+         4. Venkataramani R. N.,
+         5. Wang L.,
+         6. Zhou J.,
+         7. Allis C. D.,
+         8. Berger S. L.,
+         9. Marmorstein R.
+       (1999) Proc. Natl. Acad. Sci. U. S. A. 96:8931–8936.
+    9. [165]↵
+         1. Angus-Hill M. L.,
+         2. Dutnall R. N.,
+         3. Tafrov S. T.,
+         4. Sternglanz R.,
+         5. Ramakrishnan V.
+       (1999) J. Mol. Biol. 294:1311–1325.
+   10. [166]↵
+         1. Hickman A. B.,
+         2. Namboodiri M. A.,
+         3. Klein D. C.,
+         4. Dyda F.
+       (1999) Cell 97:361–369.
+   11. [167]↵
+         1. Sternglanz R.,
+         2. Schindelin H.
+       (1999) Proc. Natl. Acad. Sci. U. S. A. 96:8807–8808.
+   12. [168]↵
+         1. Neuwald A. F.,
+         2. Landsman D.
+       (1997) Trends Biochem. Sci. 22:154–155.
+   13. [169]↵
+         1. Boehmelt G.,
+         2. Fialka I.,
+         3. Brothers G.,
+         4. McGinley M. D.,
+         5. Patterson S. D.,
+         6. Mo R.,
+         7. Hui C. C.,
+         8. Chung S.,
+         9. Huber L. A.,
+        10. Mak T. W.,
+        11. Iscove N. N.
+       (2000) J. Biol. Chem. 275:12821–12832.
+   14. [170]↵
+         1. Boehmelt G.,
+         2. Wakeham A.,
+         3. Elia A.,
+         4. Sasaki T.,
+         5. Plyte S.,
+         6. Potter J.,
+         7. Yang Y.,
+         8. Tsang E.,
+         9. Ruland J.,
+        10. Iscove N. N.,
+        11. Dennis J. W.,
+        12. Mak T. W.
+       (2000) EMBO J. 19:5092–5104.
+   15. [171]↵
+         1. Mio T.,
+         2. Yamada-Okabe T.,
+         3. Arisawa M.,
+         4. Yamada-Okabe H.
+       (1999) J. Biol. Chem. 274:424–429.
+   16. [172]↵
+         1. Lin R.,
+         2. Allis C. D.,
+         3. Elledge S. J.
+       (1996) Genes Cells 1:923–942.
+   17. [173]↵
+         1. Mio T.,
+         2. Kokado M.,
+         3. Arisawa M.,
+         4. Yamada-Okabe H.
+       (2000) Microbiology 146:1753–1758.
+   18. [174]↵
+         1. Van Duyne G. D.,
+         2. Standaert R. F.,
+         3. Karplus P. A.,
+         4. Schreiber S. L.,
+         5. Clardy J.
+       (1993) J. Mol. Biol. 229:105–124.
+   19. [175]↵
+         1. Carter J. C. W.,
+         2. Sweet R. M.
+         1. Otwinowski Z.,
+         2. Minor W.
+       (1997) in Methods in Enzymology, eds Carter J. C. W., Sweet R. M.
+       (Academic Press, New York), pp 307–26.
+   20. [176]↵
+         1. CCP4
+       (1994) Acta Crystallogr. Sect. D Biol. Crystallogr. 50:760.
+   21. [177]↵
+         1. Terwilliger T. C.,
+         2. Berendzen J.
+       (1999) Acta Crystallogr. Sect. D Biol. Crystallogr. 55:849–861.
+   22. [178]↵
+         1. Roussel A.,
+         2. Cambillau C.
+       (1991) Silicon Graphics Geometry Partners Directory (Silicon
+       Graphics Corp. Mountain View, CA), p 81.
+   23. [179]↵
+         1. Perrakis A.,
+         2. Morris R.,
+         3. Lamzin V. S.
+       (1999) Nat. Struct. Biol. 6:458–463.
+   24. [180]↵
+         1. Brünger A. T.,
+         2. Adams P. D.,
+         3. Clore G. M.,
+         4. DeLano W. L.,
+         5. Gros P.,
+         6. Grosse-Kunstleve R. W.,
+         7. Jiang J. S.,
+         8. Kuszewski J.,
+         9. Nilges M.,
+        10. Pannu N. S.,
+        11. Read R. J.,
+        12. Rice L. M.,
+        13. Simonson T.,
+        14. Warren G. L.
+       (1998) Acta Crystallogr. Sect. D Biol. Crystallogr. 54:905–921.
+   25. [181]↵
+         1. Laskowski R.,
+         2. MacArthur M.,
+         3. Moss D.,
+         4. Thornton J.
+       (1993) J. Appl. Crystallogr. 26:91–97.
+   26. [182]↵
+         1. Christopher J. A.
+       (1998) SPOCK (The Center for Macromolecular Design, Texas A&M
+       University, College Station, TX).
+   27. [183]↵
+         1. Merritt E. A.,
+         2. Murphy M. E. P.
+       (1994) Acta Crystallogr. Sect. D Biol. Crystallogr. 50:869–873.
+   28. [184]↵
+         1. Barton G. J.
+       (1993) Protein Eng. 6:37–40.
+   29. [185]↵
+         1. Schlunegger M. P.,
+         2. Bennett M. J.,
+         3. Eisenberg D.
+       (1997) Adv. Protein Chem. 50:61–122.
+   30. [186]↵
+         1. Bhatnagar R. S.,
+         2. Futterer K.,
+         3. Farazi T. A.,
+         4. Korolev S.,
+         5. Murray C. L.,
+         6. Jackson-Machelski E.,
+         7. Gokel G. W.,
+         8. Gordon J. I.,
+         9. Waksman G.
+       (1998) Nat. Struct. Biol. 5:1091–1097.
+   31. [187]↵
+         1. De Angelis J.,
+         2. Gastel J.,
+         3. Klein D. C.,
+         4. Cole P. A.
+       (1998) J. Biol. Chem. 273:3045–3050.
+   32. [188]↵
+         1. Lau O. D.,
+         2. Courtney A. D.,
+         3. Vassilev A.,
+         4. Marzilli L. A.,
+         5. Cotter R. J.,
+         6. Nakatani Y.,
+         7. Cole P. A.
+       (2000) J. Biol. Chem. 275:21953–21959.
+   33. [189]↵
+         1. Tanner K. G.,
+         2. Langer M. R.,
+         3. Kim Y.,
+         4. Denu J. M.
+       (2000) J. Biol. Chem. 275:22048–22055.
+   34. [190]↵
+         1. Vitagliano L.,
+         2. Adinolfi S.,
+         3. Sica F.,
+         4. Merlino A.,
+         5. Zagari A.,
+         6. Mazzarella L.
+       (1999) J. Mol. Biol. 293:569–577.
+   35. [191]↵
+         1. Oikawa S.,
+         2. Akamatsu N.
+       (1985) Int. J. Biochem. 17:73–80.
+   36. [192]↵
+         1. Vessal M.,
+         2. Jaberi-Pour M.
+       (1998) Comp. Biochem. Physiol. B Comp. Biochem. Mol. Biol.
+       121:379–384.
+   37. [193]↵
+         1. Richardson J. S.
+       (1981) Adv. Protein Chem. 34:167–339.
+   38. [194]↵
+         1. Uetz P.,
+         2. Giot L.,
+         3. Cagney G.,
+         4. Mansfield T. A.,
+         5. Judson R. S.,
+         6. Knight J. R.,
+         7. Lockshon D.,
+         8. Narayan V.,
+         9. Srinivasan M.,
+        10. Pochart P.,
+        11. Qureshi-Emili A.,
+        12. Li Y.,
+        13. Godwin B.,
+        14. Conover D.,
+        15. Kalbfleisch T.,
+        16. Vijayadamodar G.,
+        17. Yang M.,
+        18. Johnston M.,
+        19. Fields S.,
+        20. Rothberg J. M.
+       (2000) Nature 403:623–627.
+   39. [195]↵
+         1. Kukuruzinska M. A.,
+         2. Lennon-Hopkins K.
+       (1999) Biochim. Biophys. Acta 1426:359–372.
+
+     * [196]Add to CiteULike CiteULike
+     * [197]Add to Complore Complore
+     * [198]Add to Connotea Connotea
+     * [199]Add to Del.icio.us Del.icio.us
+     * [200]Add to Digg Digg
+
+   [201]What's this?
+   [202]« Previous | [203]Next Article »[204]Table of Contents
+
+ §3§ This Article §3§
+
+    1. First Published on February 9, 2001, doi: 10.1074/jbc.M009988200
+       May 11, 2001 The Journal of Biological Chemistry, 276, 16328-16334.
+
+    1. [205]AbstractFree
+    2. » Full TextFree
+    3. [206]Full Text (PDF)Free
+    4. All Versions of this Article:
+         1. [207]M009988200v1
+         2. 276/19/16328 most recent
+
+ §4§ Classifications §4§
+
+    1.
+          + [208]PROTEIN STRUCTURE AND FOLDING
+
+ §4§ Services §4§
+
+    1. [209]Email this article to a friend
+    2. [210]Alert me when this article is cited
+    3. [211]Alert me if a correction is posted
+    4. [212]Alert me when eletters are published
+    5. [213]Similar articles in this journal
+    6. [214]Similar articles in Web of Science
+    7. [215]Similar articles in PubMed
+    8. [216]Download to citation manager
+    9. [217]Request Permissions
+
+ §4§ Responses §4§
+
+    1. [218]Submit a Letter to the Editor
+
+ §4§ Citing Articles §4§
+
+    1. [219]Load citing article information
+    2. [220]Citing articles via Web of Science
+    3. [221]Citing articles via Google Scholar
+
+ §4§ Google Scholar §4§
+
+    1. [222]Articles by Peneff, C.
+    2. [223]Articles by Bourne, Y.
+    3. [224]Search for related content
+
+ §4§ PubMed §4§
+
+    1. [225]PubMed citation
+    2. [226]Articles by Peneff, C.
+    3. [227]Articles by Bourne, Y.
+    4.
+
+ §4§ Related Content §4§
+
+    1. [228]Load related web page information
+
+ §4§ Social Bookmarking §4§
+
+    1.
+          + [229]Add to CiteULike CiteULike
+          + [230]Add to Complore Complore
+          + [231]Add to Connotea Connotea
+          + [232]Add to Del.icio.us Del.icio.us
+          + [233]Add to Digg Digg
+       [234]What's this?
+
+ §3§ Navigate This Article §3§
+
+    1. [235]Top
+    2. [236]Abstract
+    3. [237]EXPERIMENTAL PROCEDURES
+    4. [238]RESULTS AND DISCUSSION
+    5. [239]ACKNOWLEDGEMENTS
+    6. [240]Footnotes
+    7. [241]REFERENCES
+
+ §3§ This Week's Issue §3§
+
+    1. [242]September 24, 2010, 285 (39)
+
+    1. [243]Current Issue
+
+    1. [244]Alert me to new issues of JBC
+
+     * [245]Authors
+     * [246]Submit
+     * [247]Subscribers
+     * [248]Editorial Board
+     * [249]RSS and Email Alerts
+     * [250]Article Statistics
+     * [251]Teaching Tools
+     * [252]Copyright Permissions
+     * [253]Advertise
+     * [254]Contact JBC
+
+     * Advertisement
+     * Advertisement
+
+   Copyright © 2010 by [255]American Society for Biochemistry and
+   Molecular Biology
+
+   [256]Alternate route to the JBC: http://intl.jbc.org
+
+   [257]Contact JBC | [258]Help Pages
+     * [259]asbmb_today_logo
+     * [260]jlr_logo
+     * [261]mcp_logo
+
+     * Print ISSN 0021-9258
+     * Online ISSN 1083-351X
+
+   Advertisement
+   Advertisement
+     * [262]Cytochrome P450: Special JBC Thematic Series. Read Free
+       Articles!
+
+References
+
+   Visible links
+   1. http://www.jbc.org/
+   2. file://localhost/dev/paper.html#content-block
+   3. http://www.jbc.org/
+   4. http://www.jbc.org/content/current
+   5. http://www.jbc.org/content/by/year
+   6. http://www.jbc.org/content/early/recent/0
+   7. http://www.jbc.org/content/by/section/Minireviews
+   8. http://www.jbc.org/content/by/section/Classics
+   9. http://www.jbc.org/content/by/section/Reflections
+  10. http://www.jbc.org/potw
+  11. http://www.jbc.org/search
+  12. http://www.jbc.org/content/by/year
+  13. http://www.jbc.org/login?uri=http%3A%2F%2Fwww.jbc.org%2Fcontent%2F276%2F19%2F16328.long
+  14. http://www.jbc.org/cgi/adclick/?ad=21396&adclick=true&url=http%3A%2F%2Fwww.asbmb.org%2FPage.aspx%3Fid%3D3362
+  15. file://localhost/dev/paper.html#fn-6
+  16. http://www.jbc.org/search?author1=Caroline+Peneff&sortspec=date&submit=Submit
+  17. file://localhost/dev/paper.html#target-1
+  18. file://localhost/dev/paper.html#fn-7
+  19. http://www.jbc.org/search?author1=Dominique+Mengin-Lecreulx&sortspec=date&submit=Submit
+  20. file://localhost/dev/paper.html#target-2
+  21. http://www.jbc.org/search?author1=Yves+Bourne&sortspec=date&submit=Submit
+  22. file://localhost/dev/paper.html#target-1
+  23. file://localhost/dev/paper.html#fn-8
+  24. file://localhost/dev/paper.html#sec-1
+  25. file://localhost/dev/paper.html#ref-1
+  26. file://localhost/dev/paper.html#ref-2
+  27. file://localhost/dev/paper.html#ref-3
+  28. file://localhost/dev/paper.html#ref-4
+  29. file://localhost/dev/paper.html#ref-5
+  30. file://localhost/dev/paper.html#ref-6
+  31. file://localhost/dev/paper.html#ref-7
+  32. file://localhost/dev/paper.html#ref-8
+  33. file://localhost/dev/paper.html#ref-9
+  34. file://localhost/dev/paper.html#ref-10
+  35. file://localhost/dev/paper.html#ref-11
+  36. file://localhost/dev/paper.html#ref-12
+  37. file://localhost/dev/paper.html#ref-7
+  38. file://localhost/dev/paper.html#ref-10
+  39. file://localhost/dev/paper.html#F1
+  40. file://localhost/dev/paper.html#ref-13
+  41. file://localhost/dev/paper.html#ref-14
+  42. file://localhost/dev/paper.html#ref-15
+  43. file://localhost/dev/paper.html#ref-16
+  44. file://localhost/dev/paper.html#ref-17
+  45. http://www.jbc.org/content/276/19/16328/F1.expansion.html
+  46. http://www.jbc.org/content/276/19/16328/F1.expansion.html
+  47. http://www.jbc.org/content/276/19/16328/F1.expansion.html
+  48. http://www.jbc.org/powerpoint/276/19/16328/F1
+  49. file://localhost/dev/paper.html#T1
+  50. file://localhost/dev/paper.html#T1
+  51. http://www.jbc.org/content/276/19/16328/T1.expansion.html
+  52. http://www.jbc.org/content/276/19/16328/T1.expansion.html
+  53. file://localhost/dev/paper.html#abstract-1
+  54. file://localhost/dev/paper.html#sec-8
+  55. file://localhost/dev/paper.html#ref-18
+  56. file://localhost/dev/paper.html#ref-19
+  57. file://localhost/dev/paper.html#ref-20
+  58. file://localhost/dev/paper.html#ref-21
+  59. file://localhost/dev/paper.html#ref-20
+  60. file://localhost/dev/paper.html#ref-22
+  61. file://localhost/dev/paper.html#ref-23
+  62. file://localhost/dev/paper.html#ref-24
+  63. file://localhost/dev/paper.html#ref-25
+  64. http://www.jbc.org/external-ref?link_type=PDB&access_num=1I21
+  65. http://www.jbc.org/external-ref?link_type=PDB&access_num=1I12
+  66. http://www.jbc.org/external-ref?link_type=PDB&access_num=1I1D
+  67. file://localhost/dev/paper.html#F1
+  68. file://localhost/dev/paper.html#ref-26
+  69. file://localhost/dev/paper.html#ref-27
+  70. file://localhost/dev/paper.html#F1
+  71. file://localhost/dev/paper.html#ref-28
+  72. file://localhost/dev/paper.html#sec-1
+  73. file://localhost/dev/paper.html#ack-1
+  74. file://localhost/dev/paper.html#F1
+  75. file://localhost/dev/paper.html#ref-1
+  76. file://localhost/dev/paper.html#ref-11
+  77. file://localhost/dev/paper.html#F2
+  78. http://www.jbc.org/content/276/19/16328/F2.expansion.html
+  79. http://www.jbc.org/content/276/19/16328/F2.expansion.html
+  80. http://www.jbc.org/content/276/19/16328/F2.expansion.html
+  81. http://www.jbc.org/powerpoint/276/19/16328/F2
+  82. file://localhost/dev/paper.html#F1
+  83. file://localhost/dev/paper.html#F1
+  84. file://localhost/dev/paper.html#F2
+  85. file://localhost/dev/paper.html#ref-9
+  86. file://localhost/dev/paper.html#ref-5
+  87. file://localhost/dev/paper.html#ref-29
+  88. file://localhost/dev/paper.html#ref-1
+  89. file://localhost/dev/paper.html#ref-30
+  90. file://localhost/dev/paper.html#F2
+  91. file://localhost/dev/paper.html#ref-31
+  92. file://localhost/dev/paper.html#ref-7
+  93. file://localhost/dev/paper.html#ref-10
+  94. file://localhost/dev/paper.html#ref-34
+  95. file://localhost/dev/paper.html#F2
+  96. file://localhost/dev/paper.html#F2
+  97. file://localhost/dev/paper.html#F2
+  98. file://localhost/dev/paper.html#ref-2
+  99. file://localhost/dev/paper.html#ref-3
+ 100. file://localhost/dev/paper.html#ref-35
+ 101. file://localhost/dev/paper.html#ref-36
+ 102. file://localhost/dev/paper.html#ref-1
+ 103. file://localhost/dev/paper.html#ref-32
+ 104. file://localhost/dev/paper.html#ref-33
+ 105. file://localhost/dev/paper.html#F2
+ 106. file://localhost/dev/paper.html#F2
+ 107. file://localhost/dev/paper.html#F3
+ 108. file://localhost/dev/paper.html#F2
+ 109. file://localhost/dev/paper.html#ref-15
+ 110. http://www.jbc.org/content/276/19/16328/F3.expansion.html
+ 111. http://www.jbc.org/content/276/19/16328/F3.expansion.html
+ 112. http://www.jbc.org/content/276/19/16328/F3.expansion.html
+ 113. http://www.jbc.org/powerpoint/276/19/16328/F3
+ 114. file://localhost/dev/paper.html#ref-37
+ 115. file://localhost/dev/paper.html#ref-3
+ 116. file://localhost/dev/paper.html#F4
+ 117. file://localhost/dev/paper.html#ref-7
+ 118. file://localhost/dev/paper.html#ref-10
+ 119. http://www.jbc.org/content/276/19/16328/F4.expansion.html
+ 120. http://www.jbc.org/content/276/19/16328/F4.expansion.html
+ 121. http://www.jbc.org/content/276/19/16328/F4.expansion.html
+ 122. http://www.jbc.org/powerpoint/276/19/16328/F4
+ 123. file://localhost/dev/paper.html#ref-7
+ 124. file://localhost/dev/paper.html#ref-10
+ 125. file://localhost/dev/paper.html#ref-15
+ 126. file://localhost/dev/paper.html#ref-35
+ 127. file://localhost/dev/paper.html#ref-36
+ 128. file://localhost/dev/paper.html#ref-13
+ 129. file://localhost/dev/paper.html#ref-7
+ 130. file://localhost/dev/paper.html#ref-7
+ 131. file://localhost/dev/paper.html#ref-10
+ 132. file://localhost/dev/paper.html#F5
+ 133. file://localhost/dev/paper.html#F5
+ 134. http://www.jbc.org/content/276/19/16328/F5.expansion.html
+ 135. http://www.jbc.org/content/276/19/16328/F5.expansion.html
+ 136. http://www.jbc.org/content/276/19/16328/F5.expansion.html
+ 137. http://www.jbc.org/powerpoint/276/19/16328/F5
+ 138. file://localhost/dev/paper.html#F5
+ 139. file://localhost/dev/paper.html#F5
+ 140. file://localhost/dev/paper.html#F5
+ 141. file://localhost/dev/paper.html#ref-16
+ 142. file://localhost/dev/paper.html#ref-15
+ 143. file://localhost/dev/paper.html#ref-9
+ 144. file://localhost/dev/paper.html#ref-13
+ 145. file://localhost/dev/paper.html#ref-38
+ 146. file://localhost/dev/paper.html#ref-39
+ 147. file://localhost/dev/paper.html#ref-14
+ 148. file://localhost/dev/paper.html#sec-8
+ 149. file://localhost/dev/paper.html#fn-group-1
+ 150. file://localhost/dev/paper.html#ack-1
+ 151. file://localhost/dev/paper.html#ref-list-1
+ 152. file://localhost/dev/paper.html#xref-fn-6-1
+ 153. http://www.rcsb.org/
+ 154. file://localhost/dev/paper.html#xref-fn-7-1
+ 155. file://localhost/dev/paper.html#xref-fn-8-1
+ 156. file://localhost/dev/paper.html#fn-group-1
+ 157. file://localhost/dev/paper.html#xref-ref-1-1
+ 158. file://localhost/dev/paper.html#xref-ref-2-1
+ 159. file://localhost/dev/paper.html#xref-ref-3-1
+ 160. file://localhost/dev/paper.html#xref-ref-4-1
+ 161. file://localhost/dev/paper.html#xref-ref-5-1
+ 162. file://localhost/dev/paper.html#xref-ref-6-1
+ 163. file://localhost/dev/paper.html#xref-ref-7-1
+ 164. file://localhost/dev/paper.html#xref-ref-8-1
+ 165. file://localhost/dev/paper.html#xref-ref-9-1
+ 166. file://localhost/dev/paper.html#xref-ref-10-1
+ 167. file://localhost/dev/paper.html#xref-ref-11-1
+ 168. file://localhost/dev/paper.html#xref-ref-12-1
+ 169. file://localhost/dev/paper.html#xref-ref-13-1
+ 170. file://localhost/dev/paper.html#xref-ref-14-1
+ 171. file://localhost/dev/paper.html#xref-ref-15-1
+ 172. file://localhost/dev/paper.html#xref-ref-16-1
+ 173. file://localhost/dev/paper.html#xref-ref-17-1
+ 174. file://localhost/dev/paper.html#xref-ref-18-1
+ 175. file://localhost/dev/paper.html#xref-ref-19-1
+ 176. file://localhost/dev/paper.html#xref-ref-20-1
+ 177. file://localhost/dev/paper.html#xref-ref-21-1
+ 178. file://localhost/dev/paper.html#xref-ref-22-1
+ 179. file://localhost/dev/paper.html#xref-ref-23-1
+ 180. file://localhost/dev/paper.html#xref-ref-24-1
+ 181. file://localhost/dev/paper.html#xref-ref-25-1
+ 182. file://localhost/dev/paper.html#xref-ref-26-1
+ 183. file://localhost/dev/paper.html#xref-ref-27-1
+ 184. file://localhost/dev/paper.html#xref-ref-28-1
+ 185. file://localhost/dev/paper.html#xref-ref-29-1
+ 186. file://localhost/dev/paper.html#xref-ref-30-1
+ 187. file://localhost/dev/paper.html#xref-ref-31-1
+ 188. file://localhost/dev/paper.html#xref-ref-31-1
+ 189. file://localhost/dev/paper.html#xref-ref-31-1
+ 190. file://localhost/dev/paper.html#xref-ref-34-1
+ 191. file://localhost/dev/paper.html#xref-ref-35-1
+ 192. file://localhost/dev/paper.html#xref-ref-36-1
+ 193. file://localhost/dev/paper.html#xref-ref-37-1
+ 194. file://localhost/dev/paper.html#xref-ref-38-1
+ 195. file://localhost/dev/paper.html#xref-ref-39-1
+ 196. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/276/19/16328&title=The%20Crystal%20Structures%20of%20Apo%20and%20Complexed%20Saccharomyces%20cerevisiae%20GNA1%20Shed%20Light%20on%20the%20Catalytic%20Mechanism%20of%20an%20Amino-sugar%20N-Acetyltransferase+--+Peneff%20et%20al.%20276%20%2819%29%3A%2016328+--+JBC&doi=10.1074/jbc.M009988200&link_type=CITEULIKE
+ 197. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/276/19/16328&title=The%20Crystal%20Structures%20of%20Apo%20and%20Complexed%20Saccharomyces%20cerevisiae%20GNA1%20Shed%20Light%20on%20the%20Catalytic%20Mechanism%20of%20an%20Amino-sugar%20N-Acetyltransferase+--+Peneff%20et%20al.%20276%20%2819%29%3A%2016328+--+JBC&doi=10.1074/jbc.M009988200&link_type=COMPLORE
+ 198. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/276/19/16328&title=The%20Crystal%20Structures%20of%20Apo%20and%20Complexed%20Saccharomyces%20cerevisiae%20GNA1%20Shed%20Light%20on%20the%20Catalytic%20Mechanism%20of%20an%20Amino-sugar%20N-Acetyltransferase+--+Peneff%20et%20al.%20276%20%2819%29%3A%2016328+--+JBC&doi=10.1074/jbc.M009988200&link_type=CONNOTEA
+ 199. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/276/19/16328&title=The%20Crystal%20Structures%20of%20Apo%20and%20Complexed%20Saccharomyces%20cerevisiae%20GNA1%20Shed%20Light%20on%20the%20Catalytic%20Mechanism%20of%20an%20Amino-sugar%20N-Acetyltransferase+--+Peneff%20et%20al.%20276%20%2819%29%3A%2016328+--+JBC&doi=10.1074/jbc.M009988200&link_type=DEL_ICIO_US
+ 200. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/276/19/16328&title=The%20Crystal%20Structures%20of%20Apo%20and%20Complexed%20Saccharomyces%20cerevisiae%20GNA1%20Shed%20Light%20on%20the%20Catalytic%20Mechanism%20of%20an%20Amino-sugar%20N-Acetyltransferase+--+Peneff%20et%20al.%20276%20%2819%29%3A%2016328+--+JBC&doi=10.1074/jbc.M009988200&link_type=DIGG
+ 201. http://www.jbc.org/help/social_bookmarks.dtl
+ 202. http://www.jbc.org/content/276/19/16318.short
+ 203. http://www.jbc.org/content/276/19/16335.short
+ 204. http://www.jbc.org/content/276/19.toc
+ 205. http://www.jbc.org/content/276/19/16328.abstract
+ 206. http://www.jbc.org/content/276/19/16328.full.pdf+html
+ 207. http://www.jbc.org/content/early/2001/02/09/jbc.M009988200
+ 208. http://www.jbc.org/search?tocsectionid=PROTEIN+STRUCTURE+AND+FOLDING&sortspec=date&submit=Submit
+ 209. http://www.jbc.org/email?gca=jbc;276/19/16328&current-view-path=/content/276/19/16328.long
+ 210. http://www.jbc.org/cgi/alerts/ctalert?alertType=citedby&addAlert=cited_by&cited_by_criteria_resid=jbc;276/19/16328&saveAlert=no&return-type=article&return_url=http://www.jbc.org/content/276/19/16328.long
+ 211. http://www.jbc.org/cgi/alerts/ctalert?alertType=correction&addAlert=correction&correction_criteria_value=276/19/16328&saveAlert=no&return-type=article&return_url=http://www.jbc.org/content/276/19/16328.long
+ 212. http://www.jbc.org/cgi/alerts/ctalert?alertType=eletter&addAlert=eletter&eletter_criteria_value=276/19/16328&saveAlert=no&return-type=article&return_url=http://www.jbc.org/content/276/19/16328.long
+ 213. http://www.jbc.org/search?qbe=jbc;M009988200&citation=Peneff%20et%20al.%20276%20%2819%29:%2016328&submit=yes
+ 214. http://www.jbc.org/external-ref?access_num=jbc%3B276%2F19%2F16328&link_type=ISI_RELATEDRECORDS
+ 215. http://www.jbc.org/external-ref?access_num=11278591&link_type=MED_NBRS
+ 216. http://www.jbc.org/citmgr?gca=jbc;276/19/16328
+ 217. https://s100.copyright.com/AppDispatchServlet?publisherName=ASBMB&publication=jbc&title=The%20Crystal%20Structures%20of%20Apo%20and%20Complexed%20Saccharomyces%20cerevisiae%20GNA1%20Shed%20Light%20on%20the%20Catalytic%20Mechanism%20of%20an%20Amino-sugar%20N-Acetyltransferase&publicationDate=05/11/2001&author=Caroline%20Peneff,%20Dominique%20Mengin-Lecreulx,%20Yves%20Bourne&startPage=16328&contentID=10.1074/jbc.M009988200&orderBeanReset=true&endPage=16334&volumeNum=276&issueNum=19
+ 218. http://www.jbc.org/letters/submit/jbc;276/19/16328
+ 219. http://www.jbc.org/content/276/19/16328.long?cited-by=yes&legid=jbc;276/19/16328#cited-by
+ 220. http://www.jbc.org/external-ref?access_num=jbc%3B276%2F19%2F16328&link_type=ISI_CITING
+ 221. http://www.jbc.org/external-ref?access_num=http://www.jbc.org/cgi/content/abstract/276/19/16328&link_type=GOOGLESCHOLAR
+ 222. http://scholar.google.com/scholar?q=%22author%3APeneff%20author%3AC.%22
+ 223. http://scholar.google.com/scholar?q=%22author%3ABourne%20author%3AY.%22
+ 224. http://www.jbc.org/external-ref?access_num=http://www.jbc.org/cgi/content/abstract/276/19/16328&link_type=GOOGLESCHOLARRELATED
+ 225. http://www.jbc.org/external-ref?access_num=11278591&link_type=PUBMED
+ 226. http://www.jbc.org/external-ref?access_num=Peneff%20C&link_type=AUTHORSEARCH
+ 227. http://www.jbc.org/external-ref?access_num=Bourne%20Y&link_type=AUTHORSEARCH
+ 228. http://www.jbc.org/content/276/19/16328.long?related-urls=yes&legid=jbc;276/19/16328#related-urls
+ 229. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/276/19/16328&title=The%20Crystal%20Structures%20of%20Apo%20and%20Complexed%20Saccharomyces%20cerevisiae%20GNA1%20Shed%20Light%20on%20the%20Catalytic%20Mechanism%20of%20an%20Amino-sugar%20N-Acetyltransferase+--+Peneff%20et%20al.%20276%20%2819%29%3A%2016328+--+JBC&doi=10.1074/jbc.M009988200&link_type=CITEULIKE
+ 230. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/276/19/16328&title=The%20Crystal%20Structures%20of%20Apo%20and%20Complexed%20Saccharomyces%20cerevisiae%20GNA1%20Shed%20Light%20on%20the%20Catalytic%20Mechanism%20of%20an%20Amino-sugar%20N-Acetyltransferase+--+Peneff%20et%20al.%20276%20%2819%29%3A%2016328+--+JBC&doi=10.1074/jbc.M009988200&link_type=COMPLORE
+ 231. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/276/19/16328&title=The%20Crystal%20Structures%20of%20Apo%20and%20Complexed%20Saccharomyces%20cerevisiae%20GNA1%20Shed%20Light%20on%20the%20Catalytic%20Mechanism%20of%20an%20Amino-sugar%20N-Acetyltransferase+--+Peneff%20et%20al.%20276%20%2819%29%3A%2016328+--+JBC&doi=10.1074/jbc.M009988200&link_type=CONNOTEA
+ 232. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/276/19/16328&title=The%20Crystal%20Structures%20of%20Apo%20and%20Complexed%20Saccharomyces%20cerevisiae%20GNA1%20Shed%20Light%20on%20the%20Catalytic%20Mechanism%20of%20an%20Amino-sugar%20N-Acetyltransferase+--+Peneff%20et%20al.%20276%20%2819%29%3A%2016328+--+JBC&doi=10.1074/jbc.M009988200&link_type=DEL_ICIO_US
+ 233. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/276/19/16328&title=The%20Crystal%20Structures%20of%20Apo%20and%20Complexed%20Saccharomyces%20cerevisiae%20GNA1%20Shed%20Light%20on%20the%20Catalytic%20Mechanism%20of%20an%20Amino-sugar%20N-Acetyltransferase+--+Peneff%20et%20al.%20276%20%2819%29%3A%2016328+--+JBC&doi=10.1074/jbc.M009988200&link_type=DIGG
+ 234. http://www.jbc.org/help/social_bookmarks.dtl
+ 235. file://localhost/dev/paper.html#content-block
+ 236. file://localhost/dev/paper.html#abstract-1
+ 237. file://localhost/dev/paper.html#sec-1
+ 238. file://localhost/dev/paper.html#sec-8
+ 239. file://localhost/dev/paper.html#ack-1
+ 240. file://localhost/dev/paper.html#fn-group-1
+ 241. file://localhost/dev/paper.html#ref-list-1
+ 242. http://www.jbc.org/content/current
+ 243. http://www.jbc.org/content/current
+ 244. http://www.jbc.org/cgi/alerts/etoc
+ 245. http://www.jbc.org/misc/itoa.xhtml
+ 246. http://submit.jbc.org/
+ 247. http://www.jbc.org/subscriptions/
+ 248. http://submit.jbc.org/journals/jbc/forms/editors.dtl
+ 249. http://www.jbc.org/site/home/about/rss_alerts.xhtml
+ 250. http://www.jbc.org/site/home/about/article_stats.xhtml
+ 251. http://www.jbc.org/site/home/teaching_tools/
+ 252. http://www.jbc.org/site/misc/Copyright_Permission.xhtml
+ 253. http://www.asbmb.org/uploadedFiles/Publications/2009ASBMBJournalsMediaKit.pdf
+ 254. http://www.jbc.org/cgi/feedback
+ 255. http://www.asbmb.org/
+ 256. http://intl.jbc.org/
+ 257. http://www.jbc.org/cgi/feedback
+ 258. http://www.jbc.org/help/
+ 259. http://www.asbmb.org/page.aspx?id=218
+ 260. http://www.jlr.org/
+ 261. http://mcponline.org/
+ 262. http://www.jbc.org/cgi/adclick/?ad=21402&adclick=true&url=http%3A%2F%2Fwww.jbc.org%2Fsite%2Fcollections%2Fp450%2F
+
+   Hidden links:
+ 263. http://www.jbc.org/entrez-links/11278591

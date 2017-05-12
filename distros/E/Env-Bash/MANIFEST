@@ -1,0 +1,14 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+README.sorcerer
+t/01-general.t
+t/02-standard.t
+t/03-oo.t
+t/04-tie.t
+t/test-source.sh
+lib/Env/Bash.pm
+lib/Env/README-sorcerer.pod
+scripts/show-spell.pl
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,43 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 0269aefae77b2ae68b5cb0705f9e160db3ecfe64 Changes
+SHA1 45a471bb0619ee7b381db72627ccb518eb3f50e0 MANIFEST
+SHA1 9b295b309193537eda8718c6cbca3206d097c0b8 META.yml
+SHA1 200745e9dd54084e22f824031400afdbdbace242 Makefile.PL
+SHA1 b1ab2fc2a1541a043264c59562abeb87ed338e55 README
+SHA1 3a6921aa79b512e1c47b9cb10ba2ea689aa610d6 example/perleval.beam
+SHA1 07199ec72b6bc820a26189ee0fad6691e6db59e8 example/perleval.erl
+SHA1 f1a4fb51cee29a61825e5b648f6345aa511518a0 example/perleval.pl
+SHA1 9a4e68f660f0f8b645764d0f4c3a0f8a1782284d example/perlport.beam
+SHA1 3deb16251e536330ef5945e26902a1b2d23e326a example/perlport.erl
+SHA1 0fe23dae644c20d020b40c2d2eb6d37f85374848 example/perlre.beam
+SHA1 bf980636a262561d4a94ec7e4e2767c4bb484226 example/perlre.erl
+SHA1 3dad892948c14231d1e680089e658e20d8dfa196 example/perlre.pl
+SHA1 3aca1cdbbdc13088fd636531f0d885560b64cd61 inc/ExtUtils/MY_Metafile.pm
+SHA1 93a6ac5db4e537543ca2b87bcba4bd8cc8613830 lib/Erlang/Port.pm
+SHA1 89363b86c4e16e1e1c1ff216b853ca85fccae641 t/00-load.t
+SHA1 2d71bf43586b58db95f5cd0c930443cff5b6eb8b t/97_podspell.t
+SHA1 e5ae02588a8cc092a3cb804bb99f9ba482d8c286 t/boilerplate.t
+SHA1 6da39b48ce64b584e4c3274bff96fc76ff484820 t/pod-coverage.t
+SHA1 0190346d7072d458c8a10a45c19f86db641dcc48 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.2 (GNU/Linux)
+
+iD8DBQFGUtMdewjCT38k4dkRArU+AJ9ifBsfVyjGohtqMmyHTNzZMLdmuACfQe6A
+JnMUujiGj5qO8VIe7dNO/lo=
+=NHpH
+-----END PGP SIGNATURE-----

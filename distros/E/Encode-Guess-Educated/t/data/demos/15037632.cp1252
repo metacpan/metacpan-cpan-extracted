@@ -1,0 +1,434 @@
+
+
+Transforming Acidic Coiled-coil Protein 3 (TACC3) Controls Friend of GATA-1 (FOG-1) Subcellular Localization and Regulates the Association between GATA-1 and FOG-1 during Hematopoiesis *
+
+Mireia Garriga-Canut and
+
+Stuart H. Orkin
+
+
+
+From the
+
+Division of Hematology/Oncology, Children's Hospital and Dana Farber Cancer Institute, Harvard Medical School and Howard Hughes Medical Institute, Boston, Massachusetts 02115
+
+
+
+
+
+Received for publication, December 22, 2003, and in revised form, March 18, 2004.
+
+
+
+
+
+ABSTRACT
+
+Physical association between the transcription factor GATA-1 and the cofactor, Friend of GATA-1 (FOG-1), is essential for the differentiation of two blood cell types, erythroid cells and megakaryocytes. However, little is known regarding the mechanisms that modulate their interaction within cells. In the present study, we have identified TACC3 as a FOG-1-interacting protein. Transforming acidic coiled-coil protein 3 (TACC3), a protein that is highly expressed in hematopoietic cells, has been reported to have a critical role in the expansion of immature hematopoietic progenitors. We show that TACC3 affects FOG-1 nuclear localization, altering the interaction between GATA-1 and FOG-1. However, GATA-1 competes with TACC3 in the interaction with FOG-1. We observe that high levels of TACC3 inhibit the function of FOG-1 as a transcriptional cofactor of GATA-1. Furthermore, forced expression of TACC3 to levels similar to those found in progenitor cells delays terminal maturation of MEL and G1ER cells, two cell models of erythroid cell development. We suggest a role for TACC3 in regulating the cellular distribution of FOG-1 and thus the direct interaction of GATA-1 and FOG-1 as a mechanism to control the transition between expansion of multipotential progenitor cell populations and final stages of erythroid maturation. 
+
+
+
+INTRODUCTION
+
+During the process of blood formation (hematopoiesis), multipotential progenitors or hematopoietic stem cells commit to different fates. Specific combinations of cell-restricted as well as widely expressed transcription factors direct the choice of the particular cell lineage. Among the various essential hematopoietic factors, the zinc finger protein GATA-1 has served to illuminate mechanisms of lineage selection (reviewed in Ref. 1 ). GATA-1 is expressed in erythroid, megakaryocytic, mast, and eosinophilic cells and at lower levels in multipotential progenitors ( 2 - 5 ). Consistent with this limited cellular distribution, GATA-1 is required for proper maturation of all four lineages (erythroid, megakaryocyte, mast, and eosinophil) in which it is normally expressed. Potential DNA binding motifs for GATA-1 have been identified in the promoter regions and enhancers of virtually all of the erythroid- and megakaryocyte-specific genes ( 2, 6 ). 
+
+
+
+Through its N-terminal zinc finger (zf), 1 GATA-1 protein interacts with a complex zinc finger cofactor, Friend of GATA-1 (FOG-1) ( 7 ). Of the nine zinc fingers of FOG-1, fingers 1, 5, 6, and 9 individually associate with GATA factors ( 7, 8 ). FOG-1 is abundantly expressed in erythroid and megakaryocytic cells and co-expressed with GATA-1 during embryonic development ( 7 ). 
+
+
+
+
+
+
+
+Analysis of GATA-1 - and FOG-1 -/- mice has revealed that the loss of function of either gene has a similar effect on erythroid maturation. Homozygotes for both knock-out mouse strains die at day 10.5 of embryonic gestation because of severe anemia, and erythroid cell maturation arrests at the proerythroblast stage ( 9, 10 ). Furthermore, a GATA-1 mutant with a specific amino acid substitution in its N-finger that reduces binding affinity for FOG-1 fails to rescue maturation in a GATA-1 - erythroid cell line ( 11 ). These findings indicate that direct association of GATA-1 and FOG-1 is critical for terminal erythroid differentiation. 
+
+
+
+In contrast to erythroid precursors, GATA-1 - megakaryocytes hyperproliferate and fail to complete their maturation ( 12 ), whereas FOG-1 -/- mice fail to produce any megakaryocytes ( 10 ). Differences in megakaryocyte differentiation between GATA-1- and FOG-1-deficient mice can be accounted for by overlapping functions of GATA-1 and GATA-2 as GATA-1 / GATA-2 double knock-in mice ablated for their interaction with FOG-1 phenocopy mice lacking FOG-1. Thus, at early stages, either GATA-1 or GATA-2 functions with FOG-1, whereas at later times megakaryocytic differentiation is dependent on GATA-1 and FOG-1 ( 13 ). Patients with a rare syndrome of congenital dyserythropoietic anemia and thrombocytopenia who exhibit hyperproliferation of abnormal megakaryocytes resembling GATA-1 - megakaryocytes harbor a point mutation in the GATA-1 gene that reduces its affinity for FOG-1 ( 14 ). These findings indicate that the physical interaction of GATA-1 and FOG-1 is also essential for megakaryocytic terminal differentiation. 
+
+
+
+Structure-function experiments based on rescue of differentiation of a bipotential erythroid/megakaryocytic FOG-1 -/- precursor cell line provide evidence for the complexity of the interaction between GATA-1 and FOG-1 in cell lineage specification ( 15 ). FOG-1 mutant protein with substitutions in critical tyrosine residues of all four GATA-1 interaction fingers fails to rescue terminal erythrocyte and megakaryocytic maturation. This provides further evidence that direct interaction between GATA-1 and FOG-1 is essential for the differentiation in both cell contexts. Distinct domains of FOG-1 appear to influence erythroid versus megakaryocytic maturation in a differential fashion. 
+
+
+
+Although these findings establish the biological relevance of the GATA-1-FOG-1 association, the mechanisms that control this interaction and by which FOG-1 cooperates with GATA factors to modulate gene expression are largely unknown. Because the identification of FOG-1-interacting proteins may provide insight into these issues, we sought FOG-1 partner proteins with a yeast two-hybrid screen. Fingers 2, 3, and 4 of FOG-1 are clustered together. Fingers 2 and 3 are separated by the evolutionary conserved His/Cys-link motif and closely resemble the "double zinc finger" motif responsible for DNA-protein and protein-protein interactions found in several zinc finger proteins, including members of the Ikaros family, Drosophila spalt (sal), Caenorhabditis elegans SEM-4, and human PRDII-BF1. Conservation of the double zinc finger across species ( 16 ) and between multiple factors suggests that this domain imparts a critical function to the FOG-1 protein. Hence, we used the N-terminal portion of FOG-1 (including fingers 1-4) as bait in the yeast two-hybrid assay. Here we report that we have isolated the mouse homologue of the previously described human transforming acidic coiled-coil protein 3 (TACC3) ( 17 ) as a FOG-1-interacting protein. 
+
+
+
+TACC3 was originally identified as a member of a family of three related proteins with highly conserved C-terminal coiled-coil domains. TACC1 ( 18 ) and TACC2 ( 19 ) genes are localized in centromeric regions of breast cancer amplicons, whereas the TACC3 gene ( 17 ) maps to a region disrupted in multiple myeloma. Murine homologues of TACC3 have been identified as interacting proteins of the transcription factors ARNT ( 20 ) and STAT5 ( 21 ) and as an erythropoietin-induced gene in erythroid progenitors ( 22 ). Expression of TACC3 ( 21 ) largely overlaps with that observed for GATA-1 and FOG-1, because it is expressed at high levels in all of the hematopoietic sites including bone marrow, fetal liver, thymus, and spleen. Expression of TACC3 is tightly regulated during development with maximal levels in cells undergoing rapid growth and high rates of differentiation ( 23 ). Loss of TACC3 function ( 21 ) in mice leads to growth retardation and embryonic lethality. Furthermore, hematopoietic stem cells of TACC3 -/- mice are capable of terminal differentiation but are unable to expand in vitro or in vivo. These findings have been interpreted to suggest that TACC3 function is required for cell expansion during embryonic development. 
+
+
+
+We find that high levels of TACC3 antagonize FOG-1 function as a transcriptional co-repressor of GATA-1 and negatively affect terminal erythroid maturation. We present a model whereby TACC3 blocks the function of FOG-1 by sequestration such that it is unable to interact with GATA-1 and cooperate in the transcriptional regulation of GATA-1 target genes. 
+
+
+
+MATERIALS AND METHODS
+
+Reporter Plasmid Construction —The yeast two-hybrid bait plasmids pGBT9 FOG-1 zf 1-4 (aa 252-430), pGBT9 FOG-1 N (aa 19-251), pGBT9 FOG-1 zf 5-6 (aa 559-760), pGBT9 FOG-1 zf 6-end (aa 614-990), pGBT9 GATA-1 zf N/C (aa 200-338), and pGBT9 GATA-1 C (aa 283-413) have been described previously ( 7 ). The plasmids pGBKT7 FOG-1 zf 1-4 (aa 250-388) and pGBKT7 zf 2-4 (aa 299-388) were generated as follows. PCR products containing FOG-1 fragments indicated in parentheses with BglII linker sites were cloned into the BamHI site of pGBKT7 (Clontech) in-frame with the Gal4-DNA-binding domain. pGex-AINTc, expressing glutathione S -transferase (GST) fused to TACC3 coiled-coil domain (aa 307-631), was kindly provided by Gustafsson and co-workers ( 20 ). To generate the Myc-tagged mammalian expression plasmid pMT GATA-1, the GATA-1-coding region was generated by PCR with XhoI linkers and cloned in-frame into pCS2+MT. To generate a FLAG-tagged TACC3 expression construct, a PCR product containing full-length TACC3 and BglII linkers was cloned into the BamHI site of pEFrFLAG-PGKpuro. The expression plasmid pEFrHA-PGKpuro FOG-1 has been described previously ( 24 ). A PCR fragment corresponding to FOG-1 (aa 299-388) was cloned into pEFrHA-PGKpuro to generate the HA-tagged FOG-1 zf 2-4 expression construct. The TACC3 coding sequence was cloned into the retroviral vector MMP ( 25 ). An internal ribosomal entry site-GFP cassette was cloned immediately 3' to TACC3 to generate MMP TACC3-IRES-GFP. The reporter plasmid D3-luciferase has been described previously ( 26 ). 
+
+
+
+Yeast Two-hybrid Screening —The zinc fingers 1-4 of FOG-1 (aa 250-388) were used as bait to screen a murine erythroleukemia (MEL) cDNA library cloned into the GAL4 activation domain plasmid pGAD10 ( 7 ) following the manufacturer's instructions (Clontech Matchmaker GAL4 two-hybrid system 3 protocol). Two million clones were screened, and library candidates were tested for their ability to specifically interact with FOG-1 zf 1-4 by re-transforming into AH109. Library plasmids producing interacting proteins were sequenced for identification. To determine the potential interaction of positive clones with different regions of FOG-1 or GATA-1, AH109 cells were co-transformed with pGAD10 TACC3 (aa 344-end) and pGBT9 or pGBKT7 as indicated in Fig. 2, and their ability to induce growth in SD-Ade/-His/-Tryp/-Leu was tested. 
+
+
+
+
+
+
+
+View larger version (30K):
+
+[in this window]
+
+[in a new window]
+
+F IG. 2. Interaction of FOG-1 zinc fingers with TACC3. a, zinc fingers 2-4 of FOG-1 interact with the coiled-coil domain of TACC3 in vitro. GST alone or GST-TACC3cc-bound glutathione-Sepharose beads were incubated with in vitro expressed 35 S-labeled FOG-1 zf 2-4 for 3 h at 4 °C. Beads were washed, and in vitro expressed protein was eluted and resolved in an 8-16% gradient-ready polyacrylamide gel. Lane 1 shows no interaction between FOG-1 zf 2-4 and control GST, whereas lane 2 shows interaction between FOG-1 zf 2-4 and GST-TACC3cc. b, FOG-1 and TACC3 interact in mammalian cells. MEL HA FOG-1 (MEL cells that constitutively express HA-tagged FOG-1 protein under the control of an EF1 promoter) whole cell extracts were immunoprecipitated with TACC3 antibody ( Ab ) or a mock Ab and analyzed by Western blotting with HA Ab (Santa Cruz Biotechnology). Lane 1 shows 1/100 of the protein. HA FOG-1 was immunoprecipitated by TACC3 Ab ( lane 2 ) but not by a mock Ab ( lane 3 ). c, whole cell extracts were prepared from MEL HA ( lane 1 ) or MEL HA FOG-1 cells ( lane 2 ). Protein extracts were immunoprecipitated ( IP ) with HA Ab and analyzed with anti-TACC3 Ab. TACC3 was able to immunoprecipitate with HA-FOG-1 ( lane 4 ) but not with the control HA tag alone ( lane 3 ), showing a specific interaction between FOG-1 and TACC3 in mammalian cells.
+
+
+
+GST Pull-down Assay —Recombinant pGBKT7 FOG-1 zf 2-4 (aa 299-388) was transcribed using T7 RNA polymerase (Roche Applied Science) and translated using wheat germ extract (Promega) according to the manufacturer's instructions. Bacteria (BL21) (Stratagene) containing pGex-AINTc or pGex2T as control were grown at 30 °C until A 600 reached 0.6. Protein expression was induced by adding isopropyl-1-thio- - D -galactopyranoside to 1 m M and growing for an additional 3 h. Bacteria were lysed by sonication in phosphate-buffered saline containing 0.5% Nonidet P-40, 0.1% SDS, 5 m M dithiothreitol, 1 x Complete (Roche Applied Science), and 0.4 mg/ml lysozyme. Triton X-100 was added to a final concentration of 0.2%, and lysates were incubated overnight at 4 °C. After centrifugation, supernatant was collected and loaded on glutathione-Sepharose 4B beads (Amersham Biosciences), mixed for 24 h, and then washed several times with phosphate-buffered saline. GST-AINTc-bound glutathione-Sepharose beads were incubated with in vitro expressed 35 S-labeled proteins for 3 h at 4 °C in a total volume of 250 µl of buffer containing 20 m M Tris, pH 8.0, 100 m M NaCl, 1m M EDTA, 0.5% Nonidet P-40, 5 m M dithiothreitol, 10% glycerol, 0.1% SDS, 0.15 mg/ml bovine serum albumin, 100 m M KCl, and 1 x Complete protease inhibitor mixture. Beads were washed with 30 volumes of the same buffer without bovine serum albumin, and in vitro expressed proteins were eluted and resolved in an 8-16% gradient-ready polyacrylamide gel (Bio-Rad). 
+
+
+
+Cell Culture and Benzidine Assay —Cell lines were cultured in 5% CO 2 at 37 °C. MEL cells and 293T cells were cultured in Dulbecco's modified Eagle's low glucose medium ( Invitrogen ) supplemented with 10% fetal calf serum (Hyclone, Logan, UT), 100 units/ml penicillin-streptomycin, and 2 m M L -glutamine ( Invitrogen ). Erythrocyte differentiation of MEL cells was induced with 1.6% Me 2 SO. G1ER cells ( 27 ) were grown in Iscove's modified Dulbecco's ( Invitrogen ) medium with 15% heat-inactivated fetal calf serum, 2 units/ml Epoetin (Amgen), 0.5% Chinese hamster ovary cell-kit ligand (KL, stem cell factor) conditioned medium, and 100 units/ml penicillin-streptomycin. To induce G1ER differentiation, -estradiol (Aldrich) was added to a final concentration of 10 -7 M. Cells were cytocentrifuged and stained for hemoglobin as described previously ( 28 ). For each sample, >500 cells were evaluated for benzidine positivity. 
+
+
+
+Immunoprecipitation Assay —For immunoprecipitation assay in MEL cells, whole cell extracts were prepared from actively proliferating MEL HA-FOG-1 cells (which stably express HA-tagged FOG-1 protein under the control of an EF1 promoter) and control MEL HA cells. For immunoprecipitation assays in 293T cells, cells were plated onto 10-cm plates and transfected with a total of 5 µg of Qiagen column-purified expression plasmids for GATA-1, HA-FOG-1, and TACC3 as indicated at a ratio of 1:1:1 and 15 µl of FuGENE 6. Cells were harvested 24 h later, and either whole cell extracts or nuclear protein extracts were prepared. Protein concentration was assayed by Lowry assay (Bio-Rad). For each immunoprecipitation, equal amounts of protein extracts were incubated with 1 µl of TACC3 antiserum (Upstate Biotechnology), 3 µl of GATA-1 N6 antiserum (Santa Cruz Biotechnology), or 3 µl of HA Y11 antiserum (Santa Cruz Biotechnology) overnight in 500 µl of binding buffer containing 20 m M Tris, pH 7.5, 1 m M EDTA, 150 m M NaCl, 0.1% Nonidet P-40, 1 m M dithiothreitol, and 1 x Complete protease inhibitor mixture. Protein G-Sepharose beads (Amersham Biosciences) were added, and samples were incubated for an additional 1 h. Samples were washed four times with binding buffer, and proteins were eluted with 12 µl of SDS-loading dye. Samples were run on a 4-15% gradient-ready polyacrylamide gel (Bio-Rad) and blotted onto Hybond C+ nylon membrane (Amersham Biosciences). The membrane was subjected to Western blot analysis using 1/2000 dilution of HA or TACC3 antiserum. 
+
+
+
+Protein Localization Assays —293T cells were plated onto 10-cm plates. Each plate was transfected with 5 µg of Qiagen column-purified plasmid and 15 µl of FuGENE 6 transfection reagent (Roche Applied Science). Cells were harvested 48 h post-transfection. Nuclear and cytoplasmic protein fractions were extracted as described by Dent and Latchman ( 29 ), and the concentration was determined by a Dc protein assay kit (Bio-Rad). Equal amounts of protein were electrophoresed through a 4-15% gradient-ready polyacrylamide gel and blotted onto Hybond C+ nylon membrane. Membranes were subjected to Western blot analysis using 1/2000 dilution of HA Y11 antiserum, 1/500 dilution of GATA-1 N6 antiserum, 1/2000 dilution of TACC3 antiserum, or 1/1000 dilution of P/CAF H369 antiserum (Santa Cruz Biotechnology). 
+
+
+
+DNA Transfections —Qiagen column-purified DNA was transfected into cells using FuGENE 6 transfection reagent at a 3:1 DNA:FuGENE 6 ratio according to manufacturer's instructions. Cells were plated onto 10-mm wells to a density of 50%. For reporter assays in 293T cells, 200 ng of plasmid, 1 ng of pRL-cytomegalovirus, and 0.6 µl of FuGENE 6 were mixed to a total volume of 100 µl with Opti-MEM ( Invitrogen ) and applied to cells for 1 h. Cells were harvested 24 h later into 60 µl of Passive lysis buffer (Promega) of which 30 µl were used in a Promega DLR TM assay system. Luminescence was measured using a Mediator PhL 1.8 luminometer, firefly luciferase was normalized to Renilla luciferase, and the results were expressed as percentage of normalized expression in the presence of D3 alone. 
+
+
+
+Retroviral Infection and Sorting —Vesicular stomatitis virus G protein-pseudotyped retroviral particles were generated via transient transfection of the stable packaging cell line 293 GPG ( 30 ) of the MMP-based retroviral vector. MEL or G1ER cells (10 7 ) were incubated with appropriate retroviral supernatants at a multiplicity of infection of 2-3 in cell line medium containing 8 mg of Polybrene/ml for 1 h at 4 °C followed by 4 h at 37 °C in 5% CO 2. Cells were washed and incubated in cell growth medium for 2 days. GFP + cells were isolated by two sequential rounds of fluorescence-activated cell sorting (FACS) using a Beckman-Coulter high speed sorter. Analysis of the final sorted cells demonstrated that they were typically >98% GFP +. 
+
+
+
+Reverse Transcription-PCR —RNA was extracted from cell lines using TriReagent (Sigma) and reverse-transcribed using oligo(dT) and Moloney murine leukemia virus reverse transcriptase (Promega). Oligonucleotides used to amplify the -major globin ( 31 ), E-ALAS, and the hypoxanthine-guanine phosphoribosyl transferase ( hprt ) genes ( 32 ) have been described previously. Aliquots of the reaction mixture were electrophoresed on a 2% agarose gel. 
+
+
+
+RESULTS
+
+TACC3 Interacts with the Zinc Fingers 2-4 of FOG-1 —To identify potential FOG-1-interacting proteins, we used an N-terminal region of FOG-1 (including fingers 1-4) as bait in a yeast two-hybrid screen. Four independent clones, repeated 32, 1, 2, and 3 times, respectively, were isolated from a MEL cell library and confirmed to interact with the zinc fingers 1-4 of FOG-1 with high specificity. Sequence analysis revealed that all four clones correspond to the previously reported TACC3 ( 17 ), also named AINT ( 20 ) and ERIC-1 ( Fig. 1 a ) ( 22 ). The shortest clone isolated (clone 1, isolated 32 times) comprises aa 344-631 of TACC3 and corresponds to its coiled-coil domain. This region is sufficient to mediate interaction with fingers 1-4 of FOG-1 and also interacts with a subregion encompassing fingers 2-4 ( Fig. 1 b ). Amino acids 344-631 of TACC3 are unable to interact with a region comprising the N terminus of FOG-1 (aa 19-251), zinc fingers 5-6 (aa 559-760), or zinc finger 6 C terminus (aa 614-end) of FOG-1 or with the N- and C-terminal zinc fingers of GATA-1 (aa 200-338) or the C-terminal domain of GATA-1 (aa 283-413) ( Fig. 1 b ). Thus, interaction between FOG-1 zf 2-4 and the coiled-coil domain of TACC3 is specific. 
+
+
+
+
+
+
+
+View larger version (43K):
+
+[in this window]
+
+[in a new window]
+
+F IG. 1. Isolation of TACC3 as a FOG-1-interacting protein in a yeast two-hybrid assay. A MEL cDNA library was screened using as bait the zinc fingers 1-4 of FOG-1 (aa 250-388) and the yeast strain AH109. Candidate clones were re-transformed into AH109-pGBT7 FOG-1 zf 1-4 and plated onto SD-Thr/-Leu/-His/-Ala + 20 m M 3AT. Positive clones were isolated and sequenced. a, schematic representation of murine TACC3. Amino acid repeats are shaded, and coiled-coil domains are indicated in gray. Amino acid position is indicated by numbers. Four independent clones isolated in the yeast two-hybrid assay are represented. Numbers on the right indicate the number of times the clone was isolated in the yeast two-hybrid screen. b, the coiled-coil domain of TACC3 interacts with zinc fingers 2-4 of FOG-1. The yeast strain AH109 was co-transformed with pGAD10 TACC3cc (aa 344-631), and the indicated yeast plasmids expressing FOG-1 and GATA-1 deletion proteins fused to the GAL4 DNA-binding domain were plated onto SD-Thr/-Leu/-His/-Ala. TACC3cc interacts with FOG-1 zf 1-4 (aa 250-388), FOG-1 zf 1-4 (aa 252-430), or FOG-1 zf 2-4 (299-388) as seen by yeast growth but does not interact with FOG-1 N terminus (aa 19-251), FOG-1 zf 5-6 (aa 559-760), FOG-1 zf 6-end (aa 614-end), or GATA-1 N/C zf (aa 200-338) and pGBT9 GATA-1 C (aa 283-413).
+
+
+
+In Vitro and in Vivo Association of FOG-1 and TACC3 —To examine further the specificity of the interaction between FOG-1 and TACC3, in vitro interactions were assessed by GST pull-down experiments. As shown in Fig. 2 a , in vitro expressed [ 35 S]methionine-labeled FOG-1 zf 2-4 interact with bacterially expressed GST-TACC3 (aa 307-631) fusion protein but not with GST alone. 
+
+
+
+Interaction of endogenous FOG-1 and TACC3 was also examined in mammalian cells. For this purpose, a stable cell line derived from MEL cells that express an HA-tagged form of FOG-1 (or HA alone for control cells) to a level similar to that seen for the endogenous protein was generated and utilized. As shown in Fig. 2 b , an anti-TACC3 antibody but not a mock antibody co-immunoprecipitates HA-FOG-1 from whole cell protein extract of MEL cells stably expressing HA-FOG-1. Reciprocal co-immunoprecipitation experiments performed with an anti-HA antibody on whole cell extract from either a stable MEL cell line expressing HA-FOG-1 or control MEL cells expressing HA tag showed that TACC3 co-precipitates with HAFOG-1 but not with HA-tag alone ( Fig. 2 c ). In summary, yeast two-hybrid GST pull-down and co-immunoprecipitation experiments demonstrate a specific interaction between zinc fingers 2-4 of FOG-1 and the coiled-coil domain of TACC3. 
+
+
+
+FOG-1 Changes Its Intracellular Localization in the Presence of TACC3 —FOG-1 and GATA-1 interact in the nucleus to control gene expression. However, TACC3 localizes in the cytoplasm and perinuclear region in interphase cells and associates with the centrosomal region and spindle in mitotic cells ( 20, 21 ). TACC3 has been shown to interact and affect the localization of the transcription factor ARNT, since ARNT loses its nuclear localization in cells that overexpress TACC3 ( 20 ). To test the effects of TACC3 expression on the intracellular localization of FOG-1, 293T cells were transfected with different combinations of expression plasmids. Nuclear and cytoplasmic protein extracts were prepared, and the localization of GATA-1, FOG-1, and TACC3 was analyzed by Western blotting ( Fig. 3 ). As reported previously, TACC3 was found predominantly in the cytoplasmic fraction and its localization was not affected by co-expression of GATA-1 or FOG-1 ( Fig. 3 a , lanes 3 and 4 ). GATA-1 was found in the nuclear fraction when expressed either alone ( lane 1 ) or in the presence of FOG-1 ( Fig. 3 b , lane 2 ). Co-expression of TACC3 did not change the localization of GATA-1 ( lanes 3 and 5 ). FOG-1 was found in the nuclear fraction when co-expressed with GATA-1 ( lanes 2 and 3 ). Interestingly, FOG-1 was markedly reduced in the nuclear-soluble fraction when FOG-1 and TACC3 were co-expressed ( Fig. 3 c , lane 4 ), suggesting that overexpression of TACC3 mediates subcellular relocation as well as possible degradation of nuclear FOG-1. FOG-1 maintained its nuclear localization in cells expressing GATA-1, FOG-1, and TACC3 ( lane 3 ), suggesting that the interaction between GATA-1 and FOG-1 retains FOG-1 in the nucleus. FOG-1 was detected at high levels in the cytoplasmic fraction in all cases, showing that FOG-1 can also exist as a cytoplasmic protein. Reduction of FOG-1 from the soluble nuclear fraction could be explained by the translocation of FOG-1 from the nucleus to the cytoplasm, as it has been observed for ARNT upon expression of TACC3 ( 20 ). However, the high level of FOG-1 in the cytoplasm does not allow us to distinguish between this possibility and others such as degradation of nuclear FOG-1 or subnuclear relocalization. As a control, localization of the unrelated transcription factor P/CAF was analyzed. As expected, endogenous P/CAF was found only in the nuclear fraction, and its localization did not change upon expression of GATA-1, FOG-1, or TACC3. 
+
+
+
+
+
+
+
+View larger version (31K):
+
+[in this window]
+
+[in a new window]
+
+F IG. 3. TACC3 sequesters FOG-1 in the cytoplasm. 293T cells were transfected with GATA-1 ( lane 1 ), GATA-1/FOG-1 ( lane 2 ), GATA-1/FOG-1/TACC3 ( lane 3 ), FOG-1/TACC3 ( lane 4 ), and GATA-1/TACC3 ( lane 5 ) and harvested 48 h post-transfection, and nuclear and cytoplasmic protein fractions were extracted. Proteins extracts were resolved in a 4-15% gradient-ready gel and analyzed by Western blotting with TACC3 Ab ( a ), c-Myc Ab ( b ), HA Ab ( c ), and P/CAF Ab ( d ).
+
+
+
+In summary, these experiments indicate that expression of TACC3 induces the targeted clearance of FOG-1 from the nucleus but does not affect the localization of GATA-1 or the unrelated transcription factor P/CAF. Furthermore, co-expression of GATA-1 is sufficient to maintain FOG-1 nuclear localization, suggesting that the interaction of FOG-1 with GATA-1 or TACC3 is competitive. 
+
+
+
+GATA-1 / FOG-1 and FOG-1 / TACC3 Interactions Are Competitive —To test the effect of GATA-1 on the association between FOG-1 and TACC3 as well as the effect of TACC3 on the interaction between GATA-1 and FOG-1, co-immunoprecipitation experiments were performed in 293T cells overexpressing different combinations of GATA-1, FOG-1, and TACC3 factors. Consistent with the hypothesis that GATA-1 and TACC3 compete for their interaction with FOG-1, reduced GATA-1/FOG-1 interaction was observed in cells expressing GATA-1/FOG-1/TACC3 ( Fig. 4, a and b , lane 4 ) compared with cells expressing GATA-1/FOG-1 alone ( lane 3 ). Reciprocally, reduced FOG-1/TACC3 interaction was observed in the presence of GATA-1 ( Fig. 4, c and d , compare lane 3 with 4 ). In summary, the interaction of FOG-1 with GATA-1 fosters nuclear localization of FOG-1, whereas interaction with TACC3 favors exclusion of FOG-1 from the nuclear-soluble fraction. 
+
+
+
+
+
+
+
+View larger version (45K):
+
+[in this window]
+
+[in a new window]
+
+F IG. 4. GATA-1 and TACC3 compete for their interaction with FOG-1. 293T cells were transiently transfected with a total of 5 µg of DNA consisting of different combinations of expression plasmids for GATA-1, HA-FOG-1, and TACC3 as indicated in the figure at a ratio of 1:1:1. Cells were harvested 24 h post-transfection, and either whole cell protein extracts ( a, b, and c ) or nuclear protein extracts ( d ) were prepared and used for immunoprecipitation assays. Protein extracts were immunoprecipitated with HA antiserum, which recognizes HA-FOG-1, and analyzed for the presence of TACC3 ( a ) or GATA-1 ( c ). Reciprocally, protein extracts were immunoprecipitated with either TACC3 ( b ) or GATA-1 ( d ) and analyzed for the presence of HA-FOG-1.
+
+
+
+TACC3 Affects GATA-1-mediated Transcription —Interaction between GATA-1 and FOG-1 is essential for the normal gene expression profile and differentiation of erythroid and megakaryocytic cell lineages ( 7, 10 ). FOG-1 acts either as a co-activator or co-repressor of GATA-1-mediated transcription depending on context ( 7, 8 ). Considering the effects of TACC3 expression on the localization of FOG-1, we examined the possibility that TACC3 may interfere with the function of FOG-1 as a cofactor of GATA-1 in transient transfection assays ( Fig. 5 ). To examine effects on transcription, we used the D3 promoter, which contains three GATA-1-binding sites, driving the expression of the luciferase reporter gene as a model reporter. GATA-1 acts as a transcriptional activator of this promoter, and FOG-1 represses GATA-1-mediated activation, reducing reporter gene activity by 3.5-fold ( Fig. 5 ). Increasing amounts of TACC3 relieve FOG-1-mediated repression in a dose-dependent manner. These results are consistent with a model in which TACC3 sequesters FOG-1 away from GATA-1, thereby inhibiting FOG-1 function as a transcriptional cofactor of GATA-1. 
+
+
+
+
+
+
+
+View larger version (31K):
+
+[in this window]
+
+[in a new window]
+
+F IG. 5. TACC3 blocks FOG-1 function as a transcriptional co-repressor for GATA-1. a, 293T cells were transfected with a total of 200 ng of DNA with final amount of DNA maintained constant by the addition of empty expression vector when required. Equal amounts of reporter construct (p D3) containing three GATA-1-binding sites driving expression of a luciferase gene, GATA-1 expression vector, and FOG-1 expression vector were used when indicated. TACC3 expression vector or FOG-1 zf 2-4 expression vector was added as indicated on the left side of the figure. Values are the averages of three independent transfections, each performed in triplicate, normalized to co-transfected cytomegalovirus- Renilla, and expressed as a percentage of the values obtained with reporter plasmid in the presence of empty expression vector.
+
+
+
+To ascertain whether the observed effects are due to direct interaction between FOG-1 and TACC3 and not to a nonspecific effect of TACC3 on transcription, we expressed increasing amounts of the FOG-1 zinc finger cluster (zinc fingers 2-4) in the reporter system. This domain interacts with TACC3 but not with GATA-1 and therefore would be expected to quench the interaction between TACC3 and wild-type FOG-1 but not affect the interaction between GATA-1 and FOG-1. As predicted, increasing amounts of FOG-1 zf 2-4 reduced reporter gene activity ( Fig. 5 ), a finding consistent with TACC3 relief of FOG-1-mediated repression due to a direct interaction between the two proteins. 
+
+
+
+TACC3 Inhibits GATA-1-induced Erythrocyte Differentiation —Considering the consequences of TACC3 expression on transcription of a GATA-1-dependent promoter, we next tested the effect of TACC3 on erythroid cell differentiation. MEL cells were infected with retrovirus containing either GFP or TACC3/GFP. GFP + cells were isolated by two sequential rounds of FACS 2 days after infection. Erythrocyte differentiation was induced by the addition of 1.6% Me 2 SO to the growth medium. TACC3 expression in infected cells was analyzed by Western blotting. As previously reported, TACC3 is expressed in actively proliferating cells, but the levels of expression decrease upon differentiation ( Fig. 6 a , lanes 1 and 2, respectively) ( 23 ). In cells infected with TACC3/GFP-expressing retrovirus, TACC3 protein levels were maintained upon Me 2 SO-induced differentiation ( Fig. 6 a , lanes 3 and 4 ). Benzidine staining (which identifies hemoglobinized cells) of infected cells showed a reduction in the number of benzidine-positive cells from 88% in GFP-expressing cells to 49% in TACC3/GFP-expressing cells ( Fig. 6 b ). As the experiments assayed bulk cultures rather than isolated clones, inhibition of this extent is significant and not due to clonal variation. Reverse transcription-semiquantitative PCR analysis of E-ALAS and -major globin genes, two GATA-1 target genes induced upon erythroid differentiation, revealed reduced expression of these transcripts in cells exogenously expressing TACC3 upon Me 2 SO-induced differentiation ( Fig. 6 c ). Expression of the ubiquitously expressed hprt gene was unaffected. Taken together, these results demonstrate that exogenous expression of TACC3 blunts erythroid differentiation. 
+
+
+
+
+
+
+
+View larger version (51K):
+
+[in this window]
+
+[in a new window]
+
+F IG. 6. TACC3 blocks terminal erythroid differentiation. MEL cells were infected with a retrovirus expressing either GFP or TACC3/GFP, sorted by FACS 2 days after infection, and induced with 1.6% Me 2 SO ( DMSO ). Two days after induction, cells were harvested and assayed as follows. a, for each sample, 10 µg (determined by Bio-Rad microassay) of whole cell protein extract was loaded into a 4-15% gradient-ready polyacrylamide gel and subjected to Western blot with anti-TACC3 antibody (Upstate Biotechnology). b, cells were cytocentrifuged and assayed by benzidine staining to detect hemoglobinized cells, which stain in a dark brown color. Percentage of benzidine-positive cells for induced GFP and TACC3/GFP-expressing cells is represented in the graph. c, mRNA was extracted from cells and reverse-transcribed, and serial dilution of cDNA was used for semi-quantitative PCR analysis with E-ALAS, -major globin, or hprt -specific primers. PCR products were electrophoresed through an agarose gel, visualized by ethidium bromide staining, and quantitated by digital image analysis with Quantity One-4.3.0. Quantitative data are shown in the graphs on the right.
+
+
+
+To test further the effect of TACC3 on erythrocyte differentiation, we performed similar experiments in G1ER cells, a GATA-1 - erythroid line that stably expresses a conditionally active form of murine GATA-1 fused to the human estrogen receptor ( 7 ). Activation of GATA-1 by estrogen induces terminal erythroid differentiation of G1ER cells. As seen in MEL cells, TACC3 negatively affected erythrocyte differentiation. The number of benzidine-positive cells upon estrogen activation of GATA-1 was reduced from 91% in control cells to 66% in cells infected with a TACC3-expressing retrovirus ( Fig. 7 a ). In addition, reverse transcription-semiquantitative PCR showed that expression of E-ALAS and -major globin genes, GATA-1 target genes, are also reduced ( Fig. 7 b ). In summary, forced expression of TACC3 in cells undergoing differentiation impairs terminal erythroid maturation in two different model cell systems. 
+
+
+
+
+
+
+
+View larger version (50K):
+
+[in this window]
+
+[in a new window]
+
+F IG. 7. TACC3 blocks terminal erythroid differentiation in two different model systems. G1ER cells were infected with a retrovirus expressing either GFP or TACC3/GFP, sorted by FACS 2 days after infection, and induced with -estradiol. One day after induction, cells were harvested and assayed as follows. a, cells were cytocentrifuged and assayed by benzidine staining to detect hemoglobinized cells, which stain in a dark brown color. Percentage of benzidine-positive cells for induced GFP and TACC3/GFP-expressing cells is represented in the graph. b, mRNA was extracted from cells and reverse-transcribed, and serial dilution of cDNA was used for semiquantitative PCR analysis with E-ALAS, -major globin, or hprt -specific primers. PCR products were electrophoresed through an agarose gel, visualized by ethidium bromide staining, and quantitated by digital image analysis with Quantity One-4.3.0. Quantitative data are shown in the graphs on the right.
+
+
+
+DISCUSSION
+
+Independent lines of evidence provide persuasive evidence that the direct physical interaction between the two zinc finger proteins GATA-1 and FOG-1 is essential for proper erythroid and megakaryocytic differentiation ( 7, 10, 11, 14, 15 ). However, the mechanisms that control this interaction and by which FOG-1 functions to regulate gene expression are less well understood. 
+
+
+
+In the present study, we used a yeast two-hybrid approach to identify potential proteins interacting with an evolutionary conserved zinc finger cluster of FOG-1 (zinc fingers 2-4). This domain is of special interest because it is conserved not only across species ( 16 ) but also among multiple transcription factors such as members of the Ikaros family and PRDII-BF1. In the case of Ikaros and other members of the same family, the conserved zinc finger cluster acts as a DNA-binding domain ( 33 ). This might suggest that zinc fingers 2, 3, and 4 of FOG may also bind DNA. However, to date, no sequence-specific DNA binding activity of intact FOG-1 protein has been detected. 2 Alternatively, FOG-1 may interact with other proteins, such as members of the basic transcription machinery, or recruit a chromatin-remodeling complex through zinc fingers 2, 3, and 4 and interact with GATA factors through zinc fingers 1, 5, 6, and 9, aiding in the formation of a functional complex to regulate transcription. Another possibility is that FOG-1 interacts through zinc fingers 2, 3, and 4 with a regulatory protein required to stabilize or destabilize the interaction between GATA-1 and FOG-1. 
+
+
+
+
+
+
+
+In this study, we identified the spindle/centrosome-associated protein TACC3 as a FOG-1-interacting protein and showed that the coiled-coil domain of TACC3 and the zinc fingers 2-4 of FOG-1 mediate this interaction. The expression profiles of GATA-1 ( 4, 34 ), FOG-1 ( 7 ), and TACC3 ( 21 ) largely overlap. These genes are expressed in all of the hematopoietic sites, including bone marrow, spleen, thymus, and fetal liver, and outside the hematopoietic system in the testis. Expression of TACC3 is tightly regulated. It is highly expressed in proliferating cells and at early stages of differentiation but rapidly down-regulated upon terminal differentiation ( 23 ). Within the cell cycle, a peak of TACC3 expression occurs in M phase ( 35 ). In mitotic cells, TACC3 is localized to the centrosomic region and associated with the spindle apparatus, whereas in inter-phase cells, it is cytoplasmic ( 21, 36 ). However, expression of both GATA-1 and FOG-1 is maintained upon differentiation ( 4, 7 ) where proteins interact in the nucleus and ultimately control expression of various target genes. 
+
+
+
+We find that TACC3 expression influences the subcellular localization of FOG-1. Indeed, the levels of FOG-1 were markedly reduced in the nuclear-soluble fraction in cells co-expressing TACC3 and FOG-1. Considering the reported cytoplasmic and centrosome/spindle-associated localization of TACC3, we suggest that TACC3 sequesters FOG-1 either to the cytoplasm or to an insoluble nuclear fraction because of association with centrosomic regions. Alternatively, TACC3 may induce targeted degradation of nuclear FOG-1. We observed that co-expression of GATA-1, FOG-1, and TACC3 retained nuclear localization of FOG-1, suggesting that GATA-1 competes with TACC3 in targeting FOG-1 to the nuclear-soluble fraction rather than to centrosomic or cytoplasmic compartments. Consistent with this hypothesis, FOG-1 has been found to shift from the nucleus to the cytoplasm in hair follicle cells of GATA-3 null mice ( 37 ). In our experiments, TACC3 had no effect on GATA-1 localization. TACC3 has previously been shown to affect the localization of ARNT, a transcription factor involved in xenobiotic and hypoxic response ( 20 ). Sadek et al. ( 20 ) found that, in cells overexpressing TACC3, ARNT lost its nuclear localization and appeared equally distributed across the cytoplasm. During mitosis, a large number of regulatory proteins become associated with the centrosome/spindle apparatus. This appears to be a mechanism of inactivation of their transcriptional function, a prerequisite for chromatin condensation and cell division. The tumor suppressor gene products Rb ( 38 ), BRCA1 ( 39 ), and p53 ( 40 ) are among some of the centrosomic-associated proteins in mitotic cells. Therefore, it is likely that TACC3 may aid in the inactivation of FOG-1 during mitosis by targeting FOG-1 to the centrosomic region. 
+
+
+
+The activities of several transcription factors are regulated by controlling their subcellular localization. For example, the Drosophila repressor cactus, which binds to the activator dorsal, obscures the nuclear localization signal and therefore prevents translocation of cactus to the nucleus ( 41 ). E2F4 activity also appears to be regulated by cell cycle-dependent changes in subcellular localization. E2F4 has two nuclear export signals, and its cytoplasmic localization is dependent on the nuclear export factor CRM1 ( 42 ). Cytoplasmic DRTF-polypeptide-E2F4 complexes cannot regulate E2F-responsive genes in vivo. However, association with pRB is sufficient to induce the nuclear localization of the complex in G 0 /G 1 cells where the complex associates with histone deacetylases and mediates transcriptional repression of E2F-responsive genes ( 43 ). TACC3 appears to have a role in regulating FOG-1 localization. Co-immunoprecipitation assays showed that TACC3 and GATA-1 compete for its interaction with FOG-1, because increasing the levels of TACC3 in the cell reduces FOG-1/GATA-1 interaction. Reciprocally, GATA-1 overexpression also reduces FOG-1/TACC3 association. Regulation of GATA-1/FOG-1 interaction by TACC3 may ultimately affect erythroid and megakaryocytic terminal maturation. 
+
+
+
+FOG-1 can act either as a co-activator or co-repressor of GATA-1. In erythroid cells harboring a GATA-1 mutant impaired for FOG-1 binding, a subset of GATA-1 target genes is expressed normally; however, the majority are deregulated and expressed to a greater or lesser extent ( 11 ). Consistent with these data, reporter assays have shown activation of the p45 NF-E2 promoter ( 7 ) and repression of the M1 and erythroid Kruppel-like factor promoters ( 8 ) upon overexpression of FOG-1. To test the effect of TACC3 on FOG-1 transcriptional function, we used a reporter assay in which the D3 promoter, which contains three GATA-1-binding sites, drives the expression of the luciferase gene ( 26 ). In this system, GATA-1 acts as a transcriptional activator, FOG-1 represses GATA-1-mediated activation, and increasing amounts of TACC3 relieve FOG-1 repression in a dose-dependent manner. Our data suggest strongly that this occurs through sequestration of FOG-1 by TACC3 to a compartment where it is unable to interact with GATA-1. 
+
+
+
+Inhibition of the interaction between GATA-1 and FOG-1 by TACC3 would be anticipated to affect GATA-1-mediated transcription in vivo. Because both GATA-1 and FOG-1 proteins as well as their direct interaction are required for erythroid and megakaryocytic differentiation, it is anticipated that expression of TACC3 would blunt cellular maturation by competition for GATA-1. Indeed, we find that levels of TACC3 similar to those seen in undifferentiated cells significantly retard terminal differentiation of two erythroid cell lines, MEL and G1ER, capable of differentiating into late stage red cell precursors upon Me 2 SO induction or GATA-1 activation, respectively. In this regard, it is relevant that TACC3 -/- mouse embryos die because of severe anemia. Hematopoietic colony assays using cells from TACC3 -/- embryos revealed a dramatic reduction not only in the frequency of colony-forming cells but also in the size of the individual colonies. Although progenitors committed to the erythroid lineage (CFU-E) were the least affected, the more primitive progenitors committed to the erythroid lineage (BFU-E) were greatly reduced. These findings suggest that no major defects in the terminal differentiation of all of the hematopoietic lineages in vitro or in vivo occur but rather a dramatic reduction in the ability of cells to proliferate exists ( 21 ). However, the molecular mechanism by which TACC3 affects progenitor cell proliferation is unknown. 
+
+
+
+We propose that TACC3 interacts with FOG-1 in actively proliferating cells at the time at which amplification of the hematopoietic progenitor population occurs and differentiation is initiated. In this setting, TACC3 expression is high and GATA-1 expression low ( 5, 23 ), thereby sequestering FOG-1 away from GATA-1. Thereafter, as the levels of TACC3 diminish, FOG-1 is released and becomes more available for physical interaction with the increasing levels of GATA-1. Cells would then proceed with the final steps of differentiation. We suggest that TACC3 acts as a key regulator of this transition between the phases of progenitor cell expansion and terminal maturation. 
+
+
+
+It has been reported recently that the evolutionary conserved His/Cys-link motifs between zinc fingers in the DNA-binding domain of Ikaros are phosphorylated during mitosis and that this phosphorylation correlates with an inhibition in Ikaros DNA binding and a loss in pericentromeric heterochromatin localization ( 44 ). It has been suggested that this phosphorylation/change of subnuclear localization process may play a role in the inactivation of Ikaros during mitosis. A similar evolutionary conserved H/C-link motif is present also between zinc fingers 2 and 3 of FOG-1 contained within the zinc finger cluster of FOG-1 shown to interact with TACC3. It remains to be seen whether TACC3 also interacts with Ikaros or any of the more than several hundred H/C linker-containing proteins, thereby acting as a general regulator protein for multiple transcription factors. 
+
+
+
+FOOTNOTES
+
+* This work was supported in part by a National Institutes of Health grant (to S. H. O.). The costs of publication of this article were defrayed in part by the payment of page charges. This article must therefore be hereby marked " advertisement " in accordance with 18 U.S.C. Section 1734 solely to indicate this fact.
+
+Investigator of the Howard Hughes Medical Institute. To whom correspondence should be addressed: Division of Hematology, Children's Hospital, 300 Longwood Ave., Boston, MA 02115. E-mail: stuart_orkin{at}dfci.harvard.edu <!--. 
+
+
+
+1 The abbreviations used are: zf, zinc finger; FOG-1, Friend of GATA-1; TACC3, transforming acidic coiled-coil protein 3; aa, amino acid; STAT, signal transducers and activators of transcription; E-ALAS, erythroid-5-aminolevulinate synthase; N, N-terminal; C, C-terminal; GST, glutathione S -transferase; HA, hemagglutinin; MEL, murine erythroleukemia; GFP, green fluorescent protein; FACS, fluorescence-activated cell sorting; Ab, antibody; GIER, GATA1 - cells containing GATA-1/estrogen receptor fusion protein.
+
+2 A. P. Tsang, S. G. Tevosian, M. Garriga-Canut, and S. H. Orkin, unpublished observations.
+
+ACKNOWLEDGMENTS
+
+We thank Jan-Ake Gustafsson for the GSTAINTc construct. We thank Hanno Hock and Shireen Saleque for practical advice with the retroviral infection procedure. We are grateful to Avtar Roopra and Ian C. Wood for helpful discussions and critical reading of the paper. 
+
+
+
+REFERENCES
+
+Orkin, S. H. (1998) Int. J. Dev. Biol. 42, 927-934 [Medline]
+
+[OrderarticleviaInfotrieve]
+
+Tsai, S. F., Martin, D. I., Zon, L. I., D'Andrea, A. D., Wong, G. G., and Orkin, S. H. (1989) Nature 339, 446-451 [CrossRef] [Medline]
+
+[OrderarticleviaInfotrieve]
+
+Romeo, P. H., Prandini, M. H., Joulin, V., Mignotte, V., Prenant, M., Vainchenker, W., Marguerie, G., and Uzan, G. (1990) Nature 344, 447-449 [CrossRef] [Medline]
+
+[OrderarticleviaInfotrieve]
+
+Martin, D. I., Zon, L. I., Mutter, G., and Orkin, S. H. (1990) Nature 344, 444-447 [CrossRef] [Medline]
+
+[OrderarticleviaInfotrieve]
+
+Sposi, N. M., Zon, L. I., Care, A., Valtieri, M., Testa, U., Gabbianelli, M., Mariani, G., Bottero, L., Mather, C., and Orkin, S. H. (1992) Proc. Natl. Acad. Sci. U. S. A. 89, 6353-6357 [Abstract]
+
+Evans, T., and Felsenfeld, G. (1989) Cell 58, 877-885 [Medline]
+
+[OrderarticleviaInfotrieve]
+
+Tsang, A. P., Visvader, J. E., Turner, C. A., Fujiwara, Y., Yu, C., Weiss, M. J., Crossley, M., and Orkin, S. H. (1997) Cell 90, 109-119 [CrossRef] [Medline]
+
+[OrderarticleviaInfotrieve]
+
+Fox, A. H., Liew, C., Holmes, M., Kowalski, K., Mackay, J., and Crossley, M. (1999) EMBO J. 18, 2812-2822 [Abstract/ Free FullText]
+
+Fujiwara, Y., Browne, C. P., Cunniff, K., Goff, S. C., and Orkin, S. H. (1996) Proc. Natl. Acad. Sci. U. S. A. 93, 12355-12358 [Abstract/ Free FullText]
+
+Tsang, A. P., Fujiwara, Y., Hom, D. B., and Orkin, S. H. (1998) Genes Dev. 12, 1176-1188 [Abstract/ Free FullText]
+
+Crispino, J. D., Lodish, M. B., MacKay, J. P., and Orkin, S. H. (1999) Mol. Cell 3, 219-228 [Medline]
+
+[OrderarticleviaInfotrieve]
+
+Shivdasani, R. A., Fujiwara, Y., McDevitt, M. A., and Orkin, S. H. (1997) EMBO J. 16, 3965-3973 [Abstract/ Free FullText]
+
+Chang, A. N., Cantor, A. B., Fujiwara, Y., Lodish, M. B., Droho, S., Crispino, J. D., and Orkin, S. H. (2002) Proc. Natl. Acad. Sci. U. S. A. 99, 9237-9242 [Abstract/ Free FullText]
+
+Nichols, K. E., Crispino, J. D., Poncz, M., White, J. G., Orkin, S. H., Maris, J. M., and Weiss, M. J. (2000) Nat. Genet. 24, 266-270 [CrossRef] [Medline]
+
+[OrderarticleviaInfotrieve]
+
+Cantor, A. B., Katz, S. G., and Orkin, S. H. (2002) Mol. Cell. Biol. 22, 4268-4279 [Abstract/ Free FullText]
+
+Deconinck, A. E., Mead, P. E., Tevosian, S. G., Crispino, J. D., Katz, S. G., Zon, L. I., and Orkin, S. H. (2000) Development 127, 2031-2040 [Abstract/ Free FullText]
+
+Still, I. H., Vince, P., and Cowell, J. K. (1999) Genomics 58, 165-170 [CrossRef] [Medline]
+
+[OrderarticleviaInfotrieve]
+
+Still, I. H., Hamilton, M., Vince, P., Wolfman, A., and Cowell, J. K. (1999) Oncogene 18, 4032-4038 [CrossRef] [Medline]
+
+[OrderarticleviaInfotrieve]
+
+Chen, F., Ma, L., Parrini, M. C., Mao, X., Lopez, M., Wu, C., Marks, P. W., Davidson, L., Kwiatkowski, D. J., Kirchhausen, T., Orkin, S. H., Rosen, F. S., Mayer, B. J., Kirschner, M. W., and Alt, F. W. (2000) Curr. Biol. 10, 758-765 [CrossRef] [Medline]
+
+[OrderarticleviaInfotrieve]
+
+Sadek, C. M., Jalaguier, S., Feeney, E. P., Aitola, M., Damdimopoulos, A. E., Pelto-Huikko, M., and Gustafsson, J. A. (2000) Mech. Dev. 97, 13-26 [CrossRef] [Medline]
+
+[OrderarticleviaInfotrieve]
+
+Piekorz, R. P., Hoffmeyer, A., Duntsch, C. D., McKay, C., Nakajima, H., Sexl, V., Snyder, L., Rehg, J., and Ihle, J. N. (2002) EMBO J. 21, 653-664 [Abstract/ Free FullText]
+
+McKeveney, P. J., Hodges, V. M., Mullan, R. N., Maxwell, P., Simpson, D., Thompson, A., Winter, P. C., Lappin, T. R., and Maxwell, A. P. (2001) Br. J. Haematol. 112, 1016-1024 [CrossRef] [Medline]
+
+[OrderarticleviaInfotrieve]
+
+Sadek, C. M., Pelto-Huikko, M., Tujague, M., Steffensen, K. R., Wennerholm, M., and Gustafsson, J. A. (2003) Gene Expr. 3, 203-211
+
+Katz, S. G., Cantor, A. B., and Orkin, S. H. (2002) Mol. Cell. Biol. 22, 3121-3128 [Abstract/ Free FullText]
+
+Klein, C., Bueler, H., and Mulligan, R. C. (2000) J. Exp. Med. 191, 1699-1708 [Abstract/ Free FullText]
+
+Evans, T., and Felsenfeld, G. (1991) Mol. Cell. Biol. 11, 843-853 [Medline]
+
+[OrderarticleviaInfotrieve]
+
+Gregory, T., Yu, C., Ma, A., Orkin, S. H., Blobel, G. A., and Weiss, M. J. (1999) Blood 94, 87-96 [Abstract/ Free FullText]
+
+Orkin, S. H., Harosi, F. I., and Leder, P. (1975) Proc. Natl. Acad. Sci. U. S. A. 72, 98-102 [Abstract]
+
+Dent, C. L., and Latchman, D. S. (1993) in Transcription Factors: A Practical Approach (Latchman, D. S., ed) pp. 1-26, IRL Press, Oxford
+
+Ory, D. S., Neugeboren, B. A., and Mulligan, R. C. (1996) Proc. Natl. Acad. Sci. U. S. A. 93, 11400-11406 [Abstract/ Free FullText]
+
+Weiss, M. J., Keller, G., and Orkin, S. H. (1994) Genes Dev. 8, 1184-1197 [Abstract]
+
+Suwabe, N., Takahashi, S., Nakano, T., and Yamamoto, M. (1998) Blood 92, 4108-4118 [Abstract/ Free FullText]
+
+Molnar, A., and Georgopoulos, K. (1994) Mol. Cell. Biol. 14, 8292-8303 [Abstract]
+
+Zon, L. I., Yamaguchi, Y., Yee, K., Albee, E. A., Kimura, A., Bennett, J. C., Orkin, S. H., and Ackerman, S. J. (1993) Blood 81, 3234-3241 [Abstract]
+
+Gergely, F., Draviam, V. M., and Raff, J. W. (2003) Genes Dev. 17, 336-341 [Abstract/ Free FullText]
+
+Gergely, F., Karlsson, C., Still, I., Cowell, J., Kilmartin, J., and Raff, J. W. (2000) Proc. Natl. Acad. Sci. U. S. A. 97, 14352-14357 [Abstract/ Free FullText]
+
+Kaufman, C. K., Zhou, P., Pasolli, H. A., Rendl, M., Bolotin, D., Lim, K. C., Dai, X., Alegre, M. L., and Fuchs, E. (2004) Genes Dev. 17, 2108-2122 [CrossRef]
+
+Thomas, R. C., Edwards, M. J., and Marks, R. (1996) Exp. Cell Res. 223, 227-232 [CrossRef] [Medline]
+
+[OrderarticleviaInfotrieve]
+
+Hsu, L. C., Doan, T. P., and White, R. L. (2001) Cancer Res. 61, 7713-7718 [Abstract/ Free FullText]
+
+Morris, V. B., Brammall, J., Noble, J., and Reddel, R. (2000) Exp. Cell Res. 256, 122-130 [CrossRef] [Medline]
+
+[OrderarticleviaInfotrieve]
+
+Kidd, S. (1992) Cell 71, 623-635 [Medline]
+
+[OrderarticleviaInfotrieve]
+
+Gaubatz, S., Lees, J. A., Lindeman, G. J., and Livingston, D. M. (2001) Mol. Cell. Biol. 21, 1384-1392 [Abstract/ Free FullText]
+
+Verona, R., Moberg, K., Estes, S., Starz, M., Vernon, J. P., and Lees, J. A. (1997) Mol. Cell. Biol. 17, 7268-7282 [Abstract]
+
+Dovat, S., Ronni, T., Russell, D., Ferrini, R., Cobb, B. S., and Smale, S. T. (2002) Genes Dev. 16, 2985-2990 [Abstract/ Free FullText]
+
+
+
+
+

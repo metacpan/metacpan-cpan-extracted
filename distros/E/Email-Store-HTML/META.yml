@@ -1,0 +1,24 @@
+--- #YAML:1.0
+name: Email-Store-HTML
+version: 0.1
+author:
+  - Simon Wistow <simon@thegestalt.org>
+abstract: |-
+  various HTML related functions for Email::Store::Mail
+license: perl
+requires:
+  Email::Store: 0
+  HTML::FormatText::WithLinks: 0
+  HTML::Scrubber: 0
+  perl: 5.006
+build_requires:
+  DBD::SQLite: 0
+  Test::More: 0
+provides:
+  Email::Store::HTML:
+    file: lib/Email/Store/HTML.pm
+    version: 0.1
+  Email::Store::Mail:
+    file: lib/Email/Store/HTML.pm
+    version: 0.1
+generated_by: Module::Build version 0.25

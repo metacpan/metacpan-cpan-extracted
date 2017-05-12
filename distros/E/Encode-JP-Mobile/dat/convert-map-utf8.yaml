@@ -1,0 +1,9650 @@
+---
+docomo:
+  E63E:
+    kddi:
+      type: pictogram
+      unicode: EF60
+    softbank:
+      type: pictogram
+      unicode: E04A
+  E63F:
+    kddi:
+      type: pictogram
+      unicode: EF65
+    softbank:
+      type: pictogram
+      unicode: E049
+  E640:
+    kddi:
+      type: pictogram
+      unicode: EF64
+    softbank:
+      type: pictogram
+      unicode: E04B
+  E641:
+    kddi:
+      type: pictogram
+      unicode: EF5D
+    softbank:
+      type: pictogram
+      unicode: E048
+  E642:
+    kddi:
+      type: pictogram
+      unicode: EF5F
+    softbank:
+      type: pictogram
+      unicode: E13D
+  E643:
+    kddi:
+      type: pictogram
+      unicode: EF41
+    softbank:
+      type: pictogram
+      unicode: E443
+  E644:
+    kddi:
+      type: pictogram
+      unicode: F0B5
+    softbank:
+      type: name
+      unicode: ［霧］
+  E645:
+    kddi:
+      type: pictogram
+      unicode: ECBC
+    softbank:
+      type: pictogram
+      unicode: E43C
+  E646:
+    kddi:
+      type: pictogram
+      unicode: EF67
+    softbank:
+      type: pictogram
+      unicode: E23F
+  E647:
+    kddi:
+      type: pictogram
+      unicode: EF68
+    softbank:
+      type: pictogram
+      unicode: E240
+  E648:
+    kddi:
+      type: pictogram
+      unicode: EF69
+    softbank:
+      type: pictogram
+      unicode: E241
+  E649:
+    kddi:
+      type: pictogram
+      unicode: EF6A
+    softbank:
+      type: pictogram
+      unicode: E242
+  E64A:
+    kddi:
+      type: pictogram
+      unicode: EF6B
+    softbank:
+      type: pictogram
+      unicode: E243
+  E64B:
+    kddi:
+      type: pictogram
+      unicode: EF6C
+    softbank:
+      type: pictogram
+      unicode: E244
+  E64C:
+    kddi:
+      type: pictogram
+      unicode: EF6D
+    softbank:
+      type: pictogram
+      unicode: E245
+  E64D:
+    kddi:
+      type: pictogram
+      unicode: EF6E
+    softbank:
+      type: pictogram
+      unicode: E246
+  E64E:
+    kddi:
+      type: pictogram
+      unicode: EF6F
+    softbank:
+      type: pictogram
+      unicode: E247
+  E64F:
+    kddi:
+      type: pictogram
+      unicode: EF70
+    softbank:
+      type: pictogram
+      unicode: E248
+  E650:
+    kddi:
+      type: pictogram
+      unicode: EF71
+    softbank:
+      type: pictogram
+      unicode: E249
+  E651:
+    kddi:
+      type: pictogram
+      unicode: EF72
+    softbank:
+      type: pictogram
+      unicode: E24A
+  E652:
+    kddi:
+      type: name
+      unicode: 〓
+    softbank:
+      type: name
+      unicode: 〓
+  E653:
+    kddi:
+      type: pictogram
+      unicode: EF93
+    softbank:
+      type: pictogram
+      unicode: E016
+  E654:
+    kddi:
+      type: pictogram
+      unicode: F0B6
+    softbank:
+      type: pictogram
+      unicode: E014
+  E655:
+    kddi:
+      type: pictogram
+      unicode: EF90
+    softbank:
+      type: pictogram
+      unicode: E015
+  E656:
+    kddi:
+      type: pictogram
+      unicode: EF8F
+    softbank:
+      type: pictogram
+      unicode: E018
+  E657:
+    kddi:
+      type: pictogram
+      unicode: EC80
+    softbank:
+      type: pictogram
+      unicode: E013
+  E658:
+    kddi:
+      type: pictogram
+      unicode: F0B7
+    softbank:
+      type: pictogram
+      unicode: E42A
+  E659:
+    kddi:
+      type: pictogram
+      unicode: EF92
+    softbank:
+      type: pictogram
+      unicode: E132
+  E65A:
+    kddi:
+      type: pictogram
+      unicode: F0B8
+    softbank:
+      type: name
+      unicode: ［ポケベル］
+  E65B:
+    kddi:
+      type: pictogram
+      unicode: EF8E
+    softbank:
+      type: pictogram
+      unicode: E01E
+  E65C:
+    kddi:
+      type: pictogram
+      unicode: F0EC
+    softbank:
+      type: pictogram
+      unicode: E434
+  E65D:
+    kddi:
+      type: pictogram
+      unicode: EF89
+    softbank:
+      type: pictogram
+      unicode: E435
+  E65E:
+    kddi:
+      type: pictogram
+      unicode: EF8A
+    softbank:
+      type: pictogram
+      unicode: E01B
+  E65F:
+    kddi:
+      type: pictogram
+      unicode: EF8A
+    softbank:
+      type: pictogram
+      unicode: E42E
+  E660:
+    kddi:
+      type: pictogram
+      unicode: EF88
+    softbank:
+      type: pictogram
+      unicode: E159
+  E661:
+    kddi:
+      type: pictogram
+      unicode: EC55
+    softbank:
+      type: pictogram
+      unicode: E202
+  E662:
+    kddi:
+      type: pictogram
+      unicode: EF8C
+    softbank:
+      type: pictogram
+      unicode: E01D
+  E663:
+    kddi:
+      type: pictogram
+      unicode: EF84
+    softbank:
+      type: pictogram
+      unicode: E036
+  E664:
+    kddi:
+      type: pictogram
+      unicode: EF86
+    softbank:
+      type: pictogram
+      unicode: E038
+  E665:
+    kddi:
+      type: pictogram
+      unicode: EC51
+    softbank:
+      type: pictogram
+      unicode: E153
+  E666:
+    kddi:
+      type: pictogram
+      unicode: EC52
+    softbank:
+      type: pictogram
+      unicode: E155
+  E667:
+    kddi:
+      type: pictogram
+      unicode: EF83
+    softbank:
+      type: pictogram
+      unicode: E14D
+  E668:
+    kddi:
+      type: pictogram
+      unicode: EF7B
+    softbank:
+      type: pictogram
+      unicode: E154
+  E669:
+    kddi:
+      type: pictogram
+      unicode: EC54
+    softbank:
+      type: pictogram
+      unicode: E158
+  E66A:
+    kddi:
+      type: pictogram
+      unicode: EF7C
+    softbank:
+      type: pictogram
+      unicode: E156
+  E66B:
+    kddi:
+      type: pictogram
+      unicode: F08E
+    softbank:
+      type: pictogram
+      unicode: E03A
+  E66C:
+    kddi:
+      type: pictogram
+      unicode: EF7E
+    softbank:
+      type: pictogram
+      unicode: E14F
+  E66D:
+    kddi:
+      type: pictogram
+      unicode: EF42
+    softbank:
+      type: pictogram
+      unicode: E14E
+  E66E:
+    kddi:
+      type: pictogram
+      unicode: EF7D
+    softbank:
+      type: pictogram
+      unicode: E151
+  E66F:
+    kddi:
+      type: pictogram
+      unicode: EF85
+    softbank:
+      type: pictogram
+      unicode: E043
+  E670:
+    kddi:
+      type: pictogram
+      unicode: F0B4
+    softbank:
+      type: pictogram
+      unicode: E045
+  E671:
+    kddi:
+      type: pictogram
+      unicode: EF9B
+    softbank:
+      type: pictogram
+      unicode: E044
+  E672:
+    kddi:
+      type: pictogram
+      unicode: EF9C
+    softbank:
+      type: pictogram
+      unicode: E047
+  E673:
+    kddi:
+      type: pictogram
+      unicode: EFAF
+    softbank:
+      type: pictogram
+      unicode: E120
+  E674:
+    kddi:
+      type: pictogram
+      unicode: EFF3
+    softbank:
+      type: pictogram
+      unicode: E13E
+  E675:
+    kddi:
+      type: pictogram
+      unicode: EFEF
+    softbank:
+      type: pictogram
+      unicode: E313
+  E676:
+    kddi:
+      type: pictogram
+      unicode: EFDC
+    softbank:
+      type: pictogram
+      unicode: E03C
+  E677:
+    kddi:
+      type: pictogram
+      unicode: EFF0
+    softbank:
+      type: pictogram
+      unicode: E03D
+  E678:
+    kddi:
+      type: pictogram
+      unicode: F071
+    softbank:
+      type: pictogram
+      unicode: E236
+  E679:
+    kddi:
+      type: name
+      unicode: 〓
+    softbank:
+      type: name
+      unicode: 〓
+  E67A:
+    kddi:
+      type: pictogram
+      unicode: EFE1
+    softbank:
+      type: pictogram
+      unicode: E30A
+  E67B:
+    kddi:
+      type: pictogram
+      unicode: F0B9
+    softbank:
+      type: pictogram
+      unicode: E502
+  E67C:
+    kddi:
+      type: pictogram
+      unicode: ECC9
+    softbank:
+      type: pictogram
+      unicode: E503
+  E67D:
+    kddi:
+      type: pictogram
+      unicode: F0BB
+    softbank:
+      type: name
+      unicode: 〓
+  E67E:
+    kddi:
+      type: pictogram
+      unicode: EF76
+    softbank:
+      type: pictogram
+      unicode: E125
+  E67F:
+    kddi:
+      type: pictogram
+      unicode: EF55
+    softbank:
+      type: pictogram
+      unicode: E30E
+  E680:
+    kddi:
+      type: pictogram
+      unicode: EF56
+    softbank:
+      type: pictogram
+      unicode: E208
+  E681:
+    kddi:
+      type: pictogram
+      unicode: EFEE
+    softbank:
+      type: pictogram
+      unicode: E008
+  E682:
+    kddi:
+      type: pictogram
+      unicode: EF74
+    softbank:
+      type: pictogram
+      unicode: E323
+  E683:
+    kddi:
+      type: pictogram
+      unicode: EF77
+    softbank:
+      type: pictogram
+      unicode: E148
+  E684:
+    kddi:
+      type: pictogram
+      unicode: F0BC
+    softbank:
+      type: pictogram
+      unicode: E314
+  E685:
+    kddi:
+      type: pictogram
+      unicode: EFA8
+    softbank:
+      type: pictogram
+      unicode: E112
+  E686:
+    kddi:
+      type: pictogram
+      unicode: F0BD
+    softbank:
+      type: pictogram
+      unicode: E34B
+  E687:
+    kddi:
+      type: pictogram
+      unicode: F0B3
+    softbank:
+      type: pictogram
+      unicode: E009
+  E688:
+    kddi:
+      type: pictogram
+      unicode: F0A5
+    softbank:
+      type: pictogram
+      unicode: E00A
+  E689:
+    kddi:
+      type: pictogram
+      unicode: EC65
+    softbank:
+      type: pictogram
+      unicode: E301
+  E68A:
+    kddi:
+      type: pictogram
+      unicode: EFDB
+    softbank:
+      type: pictogram
+      unicode: E12A
+  E68B:
+    kddi:
+      type: pictogram
+      unicode: EF9F
+    softbank:
+      type: name
+      unicode: ［ゲーム］
+  E68C:
+    kddi:
+      type: pictogram
+      unicode: EFE5
+    softbank:
+      type: pictogram
+      unicode: E126
+  E68D:
+    kddi:
+      type: pictogram
+      unicode: EC78
+    softbank:
+      type: pictogram
+      unicode: E20C
+  E68E:
+    kddi:
+      type: pictogram
+      unicode: F0BE
+    softbank:
+      type: pictogram
+      unicode: E20E
+  E68F:
+    kddi:
+      type: pictogram
+      unicode: F0BF
+    softbank:
+      type: pictogram
+      unicode: E20D
+  E690:
+    kddi:
+      type: pictogram
+      unicode: F0C0
+    softbank:
+      type: pictogram
+      unicode: E20F
+  E691:
+    kddi:
+      type: pictogram
+      unicode: F0C1
+    softbank:
+      type: pictogram
+      unicode: E419
+  E692:
+    kddi:
+      type: pictogram
+      unicode: F0C2
+    softbank:
+      type: pictogram
+      unicode: E41B
+  E693:
+    kddi:
+      type: pictogram
+      unicode: ED88
+    softbank:
+      type: pictogram
+      unicode: E010
+  E694:
+    kddi:
+      type: pictogram
+      unicode: F0C3
+    softbank:
+      type: pictogram
+      unicode: E011
+  E695:
+    kddi:
+      type: pictogram
+      unicode: F0C4
+    softbank:
+      type: pictogram
+      unicode: E012
+  E696:
+    kddi:
+      type: pictogram
+      unicode: F069
+    softbank:
+      type: pictogram
+      unicode: E238
+  E697:
+    kddi:
+      type: pictogram
+      unicode: F068
+    softbank:
+      type: pictogram
+      unicode: E237
+  E698:
+    kddi:
+      type: pictogram
+      unicode: ECEB
+    softbank:
+      type: pictogram
+      unicode: E536
+  E699:
+    kddi:
+      type: pictogram
+      unicode: ECEC
+    softbank:
+      type: pictogram
+      unicode: E007
+  E69A:
+    kddi:
+      type: pictogram
+      unicode: EFD7
+    softbank:
+      type: name
+      unicode: ［メガネ］
+  E69B:
+    kddi:
+      type: pictogram
+      unicode: EF57
+    softbank:
+      type: pictogram
+      unicode: E20A
+  E69C:
+    kddi:
+      type: pictogram
+      unicode: F0C5
+    softbank:
+      type: name
+      unicode: ●
+  E69D:
+    kddi:
+      type: pictogram
+      unicode: F0C6
+    softbank:
+      type: pictogram
+      unicode: E04C
+  E69E:
+    kddi:
+      type: pictogram
+      unicode: F0C7
+    softbank:
+      type: pictogram
+      unicode: E04C
+  E69F:
+    kddi:
+      type: pictogram
+      unicode: EF5E
+    softbank:
+      type: pictogram
+      unicode: E04C
+  E6A0:
+    kddi:
+      type: name
+      unicode: ○
+    softbank:
+      type: name
+      unicode: ○
+  E6A1:
+    kddi:
+      type: pictogram
+      unicode: EFBA
+    softbank:
+      type: pictogram
+      unicode: E052
+  E6A2:
+    kddi:
+      type: pictogram
+      unicode: EFB4
+    softbank:
+      type: pictogram
+      unicode: E04F
+  E6A3:
+    kddi:
+      type: pictogram
+      unicode: EF8D
+    softbank:
+      type: pictogram
+      unicode: E01C
+  E6A4:
+    kddi:
+      type: pictogram
+      unicode: EFA2
+    softbank:
+      type: pictogram
+      unicode: E033
+  E6A5:
+    kddi:
+      type: pictogram
+      unicode: F072
+    softbank:
+      type: pictogram
+      unicode: E239
+  E6AC:
+    kddi:
+      type: pictogram
+      unicode: EF97
+    softbank:
+      type: pictogram
+      unicode: E324
+  E6AD:
+    kddi:
+      type: name
+      unicode: ［ふくろ］
+    softbank:
+      type: name
+      unicode: ［ふくろ］
+  E6AE:
+    kddi:
+      type: pictogram
+      unicode: F0DA
+    softbank:
+      type: name
+      unicode: ［ペン］
+  E6B1:
+    kddi:
+      type: name
+      unicode: 〓
+    softbank:
+      type: name
+      unicode: 〓
+  E6B2:
+    kddi:
+      type: name
+      unicode: ［いす］
+    softbank:
+      type: pictogram
+      unicode: E11F
+  E6B3:
+    kddi:
+      type: pictogram
+      unicode: ECC5
+    softbank:
+      type: pictogram
+      unicode: E44B
+  E6B7:
+    kddi:
+      type: name
+      unicode: ［ＳＯＯＮ］
+    softbank:
+      type: name
+      unicode: ［ＳＯＯＮ］
+  E6B8:
+    kddi:
+      type: name
+      unicode: ［ＯＮ］
+    softbank:
+      type: name
+      unicode: ［ＯＮ］
+  E6B9:
+    kddi:
+      type: name
+      unicode: ［ｅｎｄ］
+    softbank:
+      type: name
+      unicode: ［ｅｎｄ］
+  E6BA:
+    kddi:
+      type: pictogram
+      unicode: F0B1
+    softbank:
+      type: pictogram
+      unicode: E02D
+  E6CE:
+    kddi:
+      type: pictogram
+      unicode: F0DF
+    softbank:
+      type: pictogram
+      unicode: E104
+  E6CF:
+    kddi:
+      type: pictogram
+      unicode: ED66
+    softbank:
+      type: pictogram
+      unicode: E103
+  E6D0:
+    kddi:
+      type: pictogram
+      unicode: EFF9
+    softbank:
+      type: pictogram
+      unicode: E00B
+  E6D1:
+    kddi:
+      type: name
+      unicode: ［ｉモード］
+    softbank:
+      type: name
+      unicode: ［ｉモード］
+  E6D2:
+    kddi:
+      type: name
+      unicode: ［ｉモード］
+    softbank:
+      type: name
+      unicode: ［ｉモード］
+  E6D3:
+    kddi:
+      type: pictogram
+      unicode: EFFA
+    softbank:
+      type: pictogram
+      unicode: E103
+  E6D4:
+    kddi:
+      type: name
+      unicode: ［ドコモ］
+    softbank:
+      type: name
+      unicode: ［ドコモ］
+  E6D5:
+    kddi:
+      type: name
+      unicode: ［ドコモポイント］
+    softbank:
+      type: name
+      unicode: ［ドコモポイント］
+  E6D6:
+    kddi:
+      type: pictogram
+      unicode: F09A
+    softbank:
+      type: name
+      unicode: ￥
+  E6D7:
+    kddi:
+      type: pictogram
+      unicode: F095
+    softbank:
+      type: name
+      unicode: ［ＦＲＥＥ］
+  E6D8:
+    kddi:
+      type: pictogram
+      unicode: EC5B
+    softbank:
+      type: pictogram
+      unicode: E229
+  E6D9:
+    kddi:
+      type: pictogram
+      unicode: EFF2
+    softbank:
+      type: pictogram
+      unicode: E03F
+  E6DA:
+    kddi:
+      type: pictogram
+      unicode: F079
+    softbank:
+      type: name
+      unicode: 〓
+  E6DB:
+    kddi:
+      type: pictogram
+      unicode: F0C8
+    softbank:
+      type: name
+      unicode: ［ＣＬ］
+  E6DC:
+    kddi:
+      type: pictogram
+      unicode: EFF1
+    softbank:
+      type: pictogram
+      unicode: E114
+  E6DD:
+    kddi:
+      type: pictogram
+      unicode: F0E5
+    softbank:
+      type: pictogram
+      unicode: E212
+  E6DE:
+    kddi:
+      type: pictogram
+      unicode: ECED
+    softbank:
+      type: name
+      unicode: 〓
+  E6DF:
+    kddi:
+      type: name
+      unicode: ［フリーダイヤル］
+    softbank:
+      type: pictogram
+      unicode: E211
+  E6E0:
+    kddi:
+      type: pictogram
+      unicode: ED89
+    softbank:
+      type: pictogram
+      unicode: E210
+  E6E1:
+    kddi:
+      type: pictogram
+      unicode: F048
+    softbank:
+      type: name
+      unicode: ［Ｑ］
+  E6E2:
+    kddi:
+      type: pictogram
+      unicode: EFFB
+    softbank:
+      type: pictogram
+      unicode: E21C
+  E6E3:
+    kddi:
+      type: pictogram
+      unicode: EFFC
+    softbank:
+      type: pictogram
+      unicode: E21D
+  E6E4:
+    kddi:
+      type: pictogram
+      unicode: F040
+    softbank:
+      type: pictogram
+      unicode: E21E
+  E6E5:
+    kddi:
+      type: pictogram
+      unicode: F041
+    softbank:
+      type: pictogram
+      unicode: E21F
+  E6E6:
+    kddi:
+      type: pictogram
+      unicode: F042
+    softbank:
+      type: pictogram
+      unicode: E220
+  E6E7:
+    kddi:
+      type: pictogram
+      unicode: F043
+    softbank:
+      type: pictogram
+      unicode: E221
+  E6E8:
+    kddi:
+      type: pictogram
+      unicode: F044
+    softbank:
+      type: pictogram
+      unicode: E222
+  E6E9:
+    kddi:
+      type: pictogram
+      unicode: F045
+    softbank:
+      type: pictogram
+      unicode: E223
+  E6EA:
+    kddi:
+      type: pictogram
+      unicode: F046
+    softbank:
+      type: pictogram
+      unicode: E224
+  E6EB:
+    kddi:
+      type: pictogram
+      unicode: F0C9
+    softbank:
+      type: pictogram
+      unicode: E225
+  E6EC:
+    kddi:
+      type: pictogram
+      unicode: F0B2
+    softbank:
+      type: pictogram
+      unicode: E022
+  E6ED:
+    kddi:
+      type: pictogram
+      unicode: ED79
+    softbank:
+      type: pictogram
+      unicode: E327
+  E6EE:
+    kddi:
+      type: pictogram
+      unicode: EF4F
+    softbank:
+      type: pictogram
+      unicode: E023
+  E6EF:
+    kddi:
+      type: pictogram
+      unicode: EF50
+    softbank:
+      type: pictogram
+      unicode: E327
+  E6F0:
+    kddi:
+      type: pictogram
+      unicode: EF49
+    softbank:
+      type: pictogram
+      unicode: E057
+  E6F1:
+    kddi:
+      type: pictogram
+      unicode: EF4A
+    softbank:
+      type: pictogram
+      unicode: E059
+  E6F2:
+    kddi:
+      type: pictogram
+      unicode: EC94
+    softbank:
+      type: pictogram
+      unicode: E058
+  E6F3:
+    kddi:
+      type: pictogram
+      unicode: EC97
+    softbank:
+      type: pictogram
+      unicode: E407
+  E6F4:
+    kddi:
+      type: pictogram
+      unicode: F0CB
+    softbank:
+      type: pictogram
+      unicode: E406
+  E6F5:
+    kddi:
+      type: pictogram
+      unicode: ECEE
+    softbank:
+      type: pictogram
+      unicode: E236
+  E6F6:
+    kddi:
+      type: pictogram
+      unicode: F0EE
+    softbank:
+      type: pictogram
+      unicode: E03E
+  E6F7:
+    kddi:
+      type: pictogram
+      unicode: EF95
+    softbank:
+      type: pictogram
+      unicode: E123
+  E6F8:
+    kddi:
+      type: name
+      unicode: 〓
+    softbank:
+      type: name
+      unicode: 〓
+  E6F9:
+    kddi:
+      type: pictogram
+      unicode: EFC4
+    softbank:
+      type: pictogram
+      unicode: E003
+  E6FA:
+    kddi:
+      type: pictogram
+      unicode: EC7E
+    softbank:
+      type: pictogram
+      unicode: E32E
+  E6FB:
+    kddi:
+      type: pictogram
+      unicode: EF4E
+    softbank:
+      type: pictogram
+      unicode: E10F
+  E6FC:
+    kddi:
+      type: pictogram
+      unicode: EFBE
+    softbank:
+      type: pictogram
+      unicode: E334
+  E6FD:
+    kddi:
+      type: pictogram
+      unicode: EFCC
+    softbank:
+      type: pictogram
+      unicode: E00D
+  E6FE:
+    kddi:
+      type: pictogram
+      unicode: EF52
+    softbank:
+      type: pictogram
+      unicode: E311
+  E6FF:
+    kddi:
+      type: pictogram
+      unicode: EFDE
+    softbank:
+      type: pictogram
+      unicode: E326
+  E700:
+    kddi:
+      type: pictogram
+      unicode: ECEF
+    softbank:
+      type: pictogram
+      unicode: E238
+  E701:
+    kddi:
+      type: pictogram
+      unicode: EF4D
+    softbank:
+      type: pictogram
+      unicode: E13C
+  E702:
+    kddi:
+      type: pictogram
+      unicode: EF5A
+    softbank:
+      type: pictogram
+      unicode: E021
+  E703:
+    kddi:
+      type: pictogram
+      unicode: ECF0
+    softbank:
+      type: name
+      unicode: ！？
+  E704:
+    kddi:
+      type: pictogram
+      unicode: ECF1
+    softbank:
+      type: name
+      unicode: ！！
+  E705:
+    kddi:
+      type: pictogram
+      unicode: F0CD
+    softbank:
+      type: name
+      unicode: 〓
+  E706:
+    kddi:
+      type: pictogram
+      unicode: F0CE
+    softbank:
+      type: pictogram
+      unicode: E331
+  E707:
+    kddi:
+      type: pictogram
+      unicode: EFBF
+    softbank:
+      type: pictogram
+      unicode: E331
+  E708:
+    kddi:
+      type: pictogram
+      unicode: EFCD
+    softbank:
+      type: pictogram
+      unicode: E330
+  E709:
+    kddi:
+      type: name
+      unicode: 〓
+    softbank:
+      type: name
+      unicode: 〓
+  E70A:
+    kddi:
+      type: pictogram
+      unicode: ECF2
+    softbank:
+      type: name
+      unicode: 〓
+  E70B:
+    kddi:
+      type: pictogram
+      unicode: F0CA
+    softbank:
+      type: pictogram
+      unicode: E24D
+  E70C:
+    kddi:
+      type: name
+      unicode: ［ｉアプリ］
+    softbank:
+      type: name
+      unicode: ［ｉアプリ］
+  E70D:
+    kddi:
+      type: name
+      unicode: ［ｉアプリ］
+    softbank:
+      type: name
+      unicode: ［ｉアプリ］
+  E70E:
+    kddi:
+      type: pictogram
+      unicode: F0E6
+    softbank:
+      type: pictogram
+      unicode: E006
+  E70F:
+    kddi:
+      type: pictogram
+      unicode: EFDD
+    softbank:
+      type: name
+      unicode: ［財布］
+  E710:
+    kddi:
+      type: pictogram
+      unicode: EFE2
+    softbank:
+      type: pictogram
+      unicode: E31C
+  E711:
+    kddi:
+      type: pictogram
+      unicode: ED7B
+    softbank:
+      type: name
+      unicode: ［ジーンズ］
+  E712:
+    kddi:
+      type: pictogram
+      unicode: EF91
+    softbank:
+      type: name
+      unicode: ［スノボ］
+  E713:
+    kddi:
+      type: pictogram
+      unicode: EFEB
+    softbank:
+      type: pictogram
+      unicode: E325
+  E714:
+    kddi:
+      type: name
+      unicode: ［ドア］
+    softbank:
+      type: name
+      unicode: ［ドア］
+  E715:
+    kddi:
+      type: pictogram
+      unicode: EFA0
+    softbank:
+      type: pictogram
+      unicode: E12F
+  E716:
+    kddi:
+      type: pictogram
+      unicode: F0E8
+    softbank:
+      type: pictogram
+      unicode: E00C
+  E717:
+    kddi:
+      type: pictogram
+      unicode: ED7C
+    softbank:
+      type: pictogram
+      unicode: E103E328
+  E718:
+    kddi:
+      type: pictogram
+      unicode: F0A4
+    softbank:
+      type: name
+      unicode: ［レンチ］
+  E719:
+    kddi:
+      type: pictogram
+      unicode: EF79
+    softbank:
+      type: pictogram
+      unicode: E301
+  E71A:
+    kddi:
+      type: pictogram
+      unicode: F0F9
+    softbank:
+      type: pictogram
+      unicode: E10E
+  E71B:
+    kddi:
+      type: pictogram
+      unicode: EFED
+    softbank:
+      type: pictogram
+      unicode: E034
+  E71C:
+    kddi:
+      type: pictogram
+      unicode: EF54
+    softbank:
+      type: name
+      unicode: ［砂時計］
+  E71D:
+    kddi:
+      type: pictogram
+      unicode: EF87
+    softbank:
+      type: pictogram
+      unicode: E136
+  E71E:
+    kddi:
+      type: pictogram
+      unicode: EC82
+    softbank:
+      type: pictogram
+      unicode: E338
+  E71F:
+    kddi:
+      type: pictogram
+      unicode: F097
+    softbank:
+      type: name
+      unicode: ［腕時計］
+  E720:
+    kddi:
+      type: pictogram
+      unicode: EC94
+    softbank:
+      type: pictogram
+      unicode: E403
+  E721:
+    kddi:
+      type: pictogram
+      unicode: EC99
+    softbank:
+      type: pictogram
+      unicode: E40A
+  E722:
+    kddi:
+      type: pictogram
+      unicode: EF49F0CE
+    softbank:
+      type: pictogram
+      unicode: E415E331
+  E723:
+    kddi:
+      type: pictogram
+      unicode: F0F6
+    softbank:
+      type: pictogram
+      unicode: E108
+  E724:
+    kddi:
+      type: pictogram
+      unicode: ED61
+    softbank:
+      type: pictogram
+      unicode: E416
+  E725:
+    kddi:
+      type: pictogram
+      unicode: EC9D
+    softbank:
+      type: pictogram
+      unicode: E40E
+  E726:
+    kddi:
+      type: pictogram
+      unicode: F0F4
+    softbank:
+      type: pictogram
+      unicode: E106
+  E727:
+    kddi:
+      type: pictogram
+      unicode: EFD2
+    softbank:
+      type: pictogram
+      unicode: E00E
+  E728:
+    kddi:
+      type: pictogram
+      unicode: EFC0
+    softbank:
+      type: pictogram
+      unicode: E105
+  E729:
+    kddi:
+      type: pictogram
+      unicode: F0F3
+    softbank:
+      type: pictogram
+      unicode: E405
+  E72A:
+    kddi:
+      type: pictogram
+      unicode: EC99
+    softbank:
+      type: pictogram
+      unicode: E40A
+  E72B:
+    kddi:
+      type: pictogram
+      unicode: EC96
+    softbank:
+      type: pictogram
+      unicode: E406
+  E72C:
+    kddi:
+      type: pictogram
+      unicode: EC93
+    softbank:
+      type: pictogram
+      unicode: E402
+  E72D:
+    kddi:
+      type: pictogram
+      unicode: EF4B
+    softbank:
+      type: pictogram
+      unicode: E411
+  E72E:
+    kddi:
+      type: pictogram
+      unicode: ED6D
+    softbank:
+      type: pictogram
+      unicode: E413
+  E72F:
+    kddi:
+      type: name
+      unicode: ［ＮＧ］
+    softbank:
+      type: name
+      unicode: ［ＮＧ］
+  E730:
+    kddi:
+      type: pictogram
+      unicode: EF78
+    softbank:
+      type: name
+      unicode: ［クリップ］
+  E731:
+    kddi:
+      type: pictogram
+      unicode: F074
+    softbank:
+      type: pictogram
+      unicode: E24E
+  E732:
+    kddi:
+      type: pictogram
+      unicode: F06A
+    softbank:
+      type: pictogram
+      unicode: E537
+  E733:
+    kddi:
+      type: pictogram
+      unicode: EF43
+    softbank:
+      type: pictogram
+      unicode: E115
+  E734:
+    kddi:
+      type: pictogram
+      unicode: EFCA
+    softbank:
+      type: pictogram
+      unicode: E315
+  E735:
+    kddi:
+      type: pictogram
+      unicode: ED7D
+    softbank:
+      type: name
+      unicode: 〓
+  E736:
+    kddi:
+      type: pictogram
+      unicode: F075
+    softbank:
+      type: pictogram
+      unicode: E24F
+  E737:
+    kddi:
+      type: pictogram
+      unicode: EF59
+    softbank:
+      type: pictogram
+      unicode: E252
+  E738:
+    kddi:
+      type: name
+      unicode: ［禁］
+    softbank:
+      type: name
+      unicode: ［禁］
+  E739:
+    kddi:
+      type: pictogram
+      unicode: EC5D
+    softbank:
+      type: pictogram
+      unicode: E22B
+  E73A:
+    kddi:
+      type: name
+      unicode: ［合］
+    softbank:
+      type: name
+      unicode: ［合］
+  E73B:
+    kddi:
+      type: pictogram
+      unicode: EC5C
+    softbank:
+      type: pictogram
+      unicode: E22A
+  E73C:
+    kddi:
+      type: pictogram
+      unicode: ED7E
+    softbank:
+      type: name
+      unicode: ⇔
+  E73D:
+    kddi:
+      type: pictogram
+      unicode: ED80
+    softbank:
+      type: name
+      unicode: ↑↓
+  E73E:
+    kddi:
+      type: pictogram
+      unicode: EC53
+    softbank:
+      type: pictogram
+      unicode: E157
+  E73F:
+    kddi:
+      type: pictogram
+      unicode: ED81
+    softbank:
+      type: pictogram
+      unicode: E43E
+  E740:
+    kddi:
+      type: pictogram
+      unicode: F0ED
+    softbank:
+      type: pictogram
+      unicode: E03B
+  E741:
+    kddi:
+      type: pictogram
+      unicode: EFEC
+    softbank:
+      type: pictogram
+      unicode: E110
+  E742:
+    kddi:
+      type: pictogram
+      unicode: EFAB
+    softbank:
+      type: name
+      unicode: ［チェリー］
+  E743:
+    kddi:
+      type: pictogram
+      unicode: EFBD
+    softbank:
+      type: pictogram
+      unicode: E304
+  E744:
+    kddi:
+      type: pictogram
+      unicode: ECF6
+    softbank:
+      type: name
+      unicode: ［バナナ］
+  E745:
+    kddi:
+      type: pictogram
+      unicode: EC8D
+    softbank:
+      type: pictogram
+      unicode: E345
+  E746:
+    kddi:
+      type: pictogram
+      unicode: ED82
+    softbank:
+      type: pictogram
+      unicode: E110
+  E747:
+    kddi:
+      type: pictogram
+      unicode: EFA7
+    softbank:
+      type: pictogram
+      unicode: E118
+  E748:
+    kddi:
+      type: pictogram
+      unicode: EFA3
+    softbank:
+      type: pictogram
+      unicode: E030
+  E749:
+    kddi:
+      type: pictogram
+      unicode: EFAE
+    softbank:
+      type: pictogram
+      unicode: E342
+  E74A:
+    kddi:
+      type: pictogram
+      unicode: EFA9
+    softbank:
+      type: pictogram
+      unicode: E046
+  E74B:
+    kddi:
+      type: pictogram
+      unicode: EC6A
+    softbank:
+      type: pictogram
+      unicode: E30B
+  E74C:
+    kddi:
+      type: pictogram
+      unicode: F0D1
+    softbank:
+      type: pictogram
+      unicode: E340
+  E74D:
+    kddi:
+      type: pictogram
+      unicode: EC83
+    softbank:
+      type: pictogram
+      unicode: E339
+  E74E:
+    kddi:
+      type: pictogram
+      unicode: ED83
+    softbank:
+      type: name
+      unicode: ［カタツムリ］
+  E74F:
+    kddi:
+      type: pictogram
+      unicode: EFB9
+    softbank:
+      type: pictogram
+      unicode: E523
+  E750:
+    kddi:
+      type: pictogram
+      unicode: EFB5
+    softbank:
+      type: pictogram
+      unicode: E055
+  E751:
+    kddi:
+      type: pictogram
+      unicode: EF72
+    softbank:
+      type: pictogram
+      unicode: E019
+  E752:
+    kddi:
+      type: pictogram
+      unicode: ECA1
+    softbank:
+      type: pictogram
+      unicode: E056
+  E753:
+    kddi:
+      type: pictogram
+      unicode: ED85
+    softbank:
+      type: pictogram
+      unicode: E404
+  E754:
+    kddi:
+      type: pictogram
+      unicode: EFB1
+    softbank:
+      type: pictogram
+      unicode: E01A
+  E755:
+    kddi:
+      type: pictogram
+      unicode: EFB7
+    softbank:
+      type: pictogram
+      unicode: E10B
+  E756:
+    kddi:
+      type: pictogram
+      unicode: EF9A
+    softbank:
+      type: pictogram
+      unicode: E044
+  E757:
+    kddi:
+      type: pictogram
+      unicode: F0F5
+    softbank:
+      type: pictogram
+      unicode: E107
+kddi:
+  EC40:
+    docomo:
+      type: pictogram
+      unicode: E747
+    softbank:
+      type: pictogram
+      unicode: E119
+  EC41:
+    docomo:
+      type: pictogram
+      unicode: E682
+    softbank:
+      type: pictogram
+      unicode: E11E
+  EC42:
+    docomo:
+      type: name
+      unicode: '[噴水]'
+    softbank:
+      type: pictogram
+      unicode: E121
+  EC43:
+    docomo:
+      type: name
+      unicode: '[キャンプ]'
+    softbank:
+      type: pictogram
+      unicode: E122
+  EC44:
+    docomo:
+      type: name
+      unicode: '[麻雀]'
+    softbank:
+      type: pictogram
+      unicode: E12D
+  EC45:
+    docomo:
+      type: name
+      unicode: '[VS]'
+    softbank:
+      type: pictogram
+      unicode: E12E
+  EC46:
+    docomo:
+      type: name
+      unicode: '[トロフィー]'
+    softbank:
+      type: pictogram
+      unicode: E131
+  EC47:
+    docomo:
+      type: name
+      unicode: '[カメ]'
+    softbank:
+      type: name
+      unicode: '[カメ]'
+  EC48:
+    docomo:
+      type: name
+      unicode: '[スペイン]'
+    softbank:
+      type: pictogram
+      unicode: E511
+  EC49:
+    docomo:
+      type: name
+      unicode: '[ロシア]'
+    softbank:
+      type: pictogram
+      unicode: E512
+  EC4A:
+    docomo:
+      type: name
+      unicode: '[工事中]'
+    softbank:
+      type: pictogram
+      unicode: E137
+  EC4B:
+    docomo:
+      type: pictogram
+      unicode: E6F7
+    softbank:
+      type: pictogram
+      unicode: E13F
+  EC4C:
+    docomo:
+      type: name
+      unicode: '[祝日]'
+    softbank:
+      type: pictogram
+      unicode: E143
+  EC4D:
+    docomo:
+      type: name
+      unicode: '[夕焼け]'
+    softbank:
+      type: pictogram
+      unicode: E146
+  EC4E:
+    docomo:
+      type: pictogram
+      unicode: E74F
+    softbank:
+      type: pictogram
+      unicode: E523
+  EC4F:
+    docomo:
+      type: name
+      unicode: '[株価]'
+    softbank:
+      type: pictogram
+      unicode: E14A
+  EC50:
+    docomo:
+      type: name
+      unicode: '[警官]'
+    softbank:
+      type: pictogram
+      unicode: E152
+  EC51:
+    docomo:
+      type: pictogram
+      unicode: E665
+    softbank:
+      type: pictogram
+      unicode: E153
+  EC52:
+    docomo:
+      type: pictogram
+      unicode: E666
+    softbank:
+      type: pictogram
+      unicode: E155
+  EC53:
+    docomo:
+      type: pictogram
+      unicode: E73E
+    softbank:
+      type: pictogram
+      unicode: E157
+  EC54:
+    docomo:
+      type: pictogram
+      unicode: E669
+    softbank:
+      type: pictogram
+      unicode: E158
+  EC55:
+    docomo:
+      type: pictogram
+      unicode: E661
+    softbank:
+      type: pictogram
+      unicode: E202
+  EC56:
+    docomo:
+      type: name
+      unicode: '[18禁]'
+    softbank:
+      type: pictogram
+      unicode: E207
+  EC57:
+    docomo:
+      type: name
+      unicode: '[バリ3]'
+    softbank:
+      type: pictogram
+      unicode: E20B
+  EC58:
+    docomo:
+      type: name
+      unicode: '[COOL]'
+    softbank:
+      type: pictogram
+      unicode: E214
+  EC59:
+    docomo:
+      type: name
+      unicode: '[割]'
+    softbank:
+      type: pictogram
+      unicode: E227
+  EC5A:
+    docomo:
+      type: name
+      unicode: '[サービス]'
+    softbank:
+      type: pictogram
+      unicode: E228
+  EC5B:
+    docomo:
+      type: pictogram
+      unicode: E6D8
+    softbank:
+      type: pictogram
+      unicode: E229
+  EC5C:
+    docomo:
+      type: pictogram
+      unicode: E73B
+    softbank:
+      type: pictogram
+      unicode: E22A
+  EC5D:
+    docomo:
+      type: pictogram
+      unicode: E739
+    softbank:
+      type: pictogram
+      unicode: E22B
+  EC5E:
+    docomo:
+      type: name
+      unicode: '[指]'
+    softbank:
+      type: pictogram
+      unicode: E22C
+  EC5F:
+    docomo:
+      type: name
+      unicode: '[営]'
+    softbank:
+      type: pictogram
+      unicode: E22D
+  EC60:
+    docomo:
+      type: name
+      unicode: ↑
+    softbank:
+      type: pictogram
+      unicode: E22E
+  EC61:
+    docomo:
+      type: name
+      unicode: ↓
+    softbank:
+      type: pictogram
+      unicode: E22F
+  EC62:
+    docomo:
+      type: name
+      unicode: '[占い]'
+    softbank:
+      type: pictogram
+      unicode: E23E
+  EC63:
+    docomo:
+      type: name
+      unicode: '[マナーモード]'
+    softbank:
+      type: pictogram
+      unicode: E250
+  EC64:
+    docomo:
+      type: name
+      unicode: '[ケータイOFF]'
+    softbank:
+      type: pictogram
+      unicode: E251
+  EC65:
+    docomo:
+      type: pictogram
+      unicode: E689
+    softbank:
+      type: pictogram
+      unicode: E301
+  EC66:
+    docomo:
+      type: name
+      unicode: '[ネクタイ]'
+    softbank:
+      type: pictogram
+      unicode: E302
+  EC67:
+    docomo:
+      type: name
+      unicode: '[ハイビスカス]'
+    softbank:
+      type: pictogram
+      unicode: E303
+  EC68:
+    docomo:
+      type: name
+      unicode: '[花束]'
+    softbank:
+      type: pictogram
+      unicode: E306
+  EC69:
+    docomo:
+      type: name
+      unicode: '[サボテン]'
+    softbank:
+      type: pictogram
+      unicode: E308
+  EC6A:
+    docomo:
+      type: pictogram
+      unicode: E74B
+    softbank:
+      type: pictogram
+      unicode: E30B
+  EC6B:
+    docomo:
+      type: pictogram
+      unicode: E672
+    softbank:
+      type: pictogram
+      unicode: E30C
+  EC6C:
+    docomo:
+      type: name
+      unicode: '[祝]'
+    softbank:
+      type: pictogram
+      unicode: E30D
+  EC6D:
+    docomo:
+      type: name
+      unicode: '[薬]'
+    softbank:
+      type: pictogram
+      unicode: E30F
+  EC6E:
+    docomo:
+      type: name
+      unicode: '[風船]'
+    softbank:
+      type: pictogram
+      unicode: E310
+  EC6F:
+    docomo:
+      type: name
+      unicode: '[クラッカー]'
+    softbank:
+      type: pictogram
+      unicode: E312
+  EC70:
+    docomo:
+      type: name
+      unicode: '[EZナビ]'
+    softbank:
+      type: name
+      unicode: '[EZナビ]'
+  EC71:
+    docomo:
+      type: name
+      unicode: '[帽子]'
+    softbank:
+      type: pictogram
+      unicode: E318
+  EC72:
+    docomo:
+      type: name
+      unicode: '[ブーツ]'
+    softbank:
+      type: pictogram
+      unicode: E31B
+  EC73:
+    docomo:
+      type: name
+      unicode: '[マニキュア]'
+    softbank:
+      type: pictogram
+      unicode: E31D
+  EC74:
+    docomo:
+      type: name
+      unicode: '[美容院]'
+    softbank:
+      type: pictogram
+      unicode: E31F
+  EC75:
+    docomo:
+      type: name
+      unicode: '[床屋]'
+    softbank:
+      type: pictogram
+      unicode: E320
+  EC76:
+    docomo:
+      type: name
+      unicode: '[着物]'
+    softbank:
+      type: pictogram
+      unicode: E321
+  EC77:
+    docomo:
+      type: name
+      unicode: '[ビキニ]'
+    softbank:
+      type: pictogram
+      unicode: E322
+  EC78:
+    docomo:
+      type: pictogram
+      unicode: E68D
+    softbank:
+      type: pictogram
+      unicode: E20C
+  EC79:
+    docomo:
+      type: pictogram
+      unicode: E6EC
+    softbank:
+      type: pictogram
+      unicode: E327
+  EC7A:
+    docomo:
+      type: pictogram
+      unicode: E6EC
+    softbank:
+      type: pictogram
+      unicode: E32A
+  EC7B:
+    docomo:
+      type: pictogram
+      unicode: E6EC
+    softbank:
+      type: pictogram
+      unicode: E32B
+  EC7C:
+    docomo:
+      type: pictogram
+      unicode: E6EC
+    softbank:
+      type: pictogram
+      unicode: E32C
+  EC7D:
+    docomo:
+      type: pictogram
+      unicode: E6EC
+    softbank:
+      type: pictogram
+      unicode: E32D
+  EC7E:
+    docomo:
+      type: pictogram
+      unicode: E6FA
+    softbank:
+      type: pictogram
+      unicode: E32E
+  EC80:
+    docomo:
+      type: pictogram
+      unicode: E657
+    softbank:
+      type: pictogram
+      unicode: E013
+  EC81:
+    docomo:
+      type: pictogram
+      unicode: E6A0
+    softbank:
+      type: pictogram
+      unicode: E332
+  EC82:
+    docomo:
+      type: pictogram
+      unicode: E71E
+    softbank:
+      type: pictogram
+      unicode: E338
+  EC83:
+    docomo:
+      type: pictogram
+      unicode: E74D
+    softbank:
+      type: pictogram
+      unicode: E339
+  EC84:
+    docomo:
+      type: name
+      unicode: '[ソフトクリーム]'
+    softbank:
+      type: pictogram
+      unicode: E33A
+  EC85:
+    docomo:
+      type: name
+      unicode: '[ポテト]'
+    softbank:
+      type: pictogram
+      unicode: E33B
+  EC86:
+    docomo:
+      type: name
+      unicode: '[だんご]'
+    softbank:
+      type: pictogram
+      unicode: E33C
+  EC87:
+    docomo:
+      type: name
+      unicode: '[せんべい]'
+    softbank:
+      type: pictogram
+      unicode: E33D
+  EC88:
+    docomo:
+      type: pictogram
+      unicode: E74C
+    softbank:
+      type: pictogram
+      unicode: E33E
+  EC89:
+    docomo:
+      type: name
+      unicode: '[パスタ]'
+    softbank:
+      type: pictogram
+      unicode: E33F
+  EC8A:
+    docomo:
+      type: name
+      unicode: '[カレー]'
+    softbank:
+      type: pictogram
+      unicode: E341
+  EC8B:
+    docomo:
+      type: name
+      unicode: '[おでん]'
+    softbank:
+      type: pictogram
+      unicode: E343
+  EC8C:
+    docomo:
+      type: name
+      unicode: '[すし]'
+    softbank:
+      type: pictogram
+      unicode: E344
+  EC8D:
+    docomo:
+      type: pictogram
+      unicode: E745
+    softbank:
+      type: pictogram
+      unicode: E345
+  EC8E:
+    docomo:
+      type: name
+      unicode: '[みかん]'
+    softbank:
+      type: pictogram
+      unicode: E346
+  EC8F:
+    docomo:
+      type: name
+      unicode: '[トマト]'
+    softbank:
+      type: pictogram
+      unicode: E349
+  EC90:
+    docomo:
+      type: name
+      unicode: '[ナス]'
+    softbank:
+      type: pictogram
+      unicode: E34A
+  EC91:
+    docomo:
+      type: name
+      unicode: '[弁当]'
+    softbank:
+      type: pictogram
+      unicode: E34C
+  EC92:
+    docomo:
+      type: name
+      unicode: '[鍋]'
+    softbank:
+      type: pictogram
+      unicode: E34D
+  EC93:
+    docomo:
+      type: pictogram
+      unicode: E72C
+    softbank:
+      type: pictogram
+      unicode: E402
+  EC94:
+    docomo:
+      type: pictogram
+      unicode: E720
+    softbank:
+      type: pictogram
+      unicode: E403
+  EC95:
+    docomo:
+      type: pictogram
+      unicode: E753
+    softbank:
+      type: pictogram
+      unicode: E404
+  EC96:
+    docomo:
+      type: pictogram
+      unicode: E72B
+    softbank:
+      type: pictogram
+      unicode: E406
+  EC97:
+    docomo:
+      type: pictogram
+      unicode: E6F3
+    softbank:
+      type: pictogram
+      unicode: E407
+  EC98:
+    docomo:
+      type: pictogram
+      unicode: E701
+    softbank:
+      type: pictogram
+      unicode: E408
+  EC99:
+    docomo:
+      type: pictogram
+      unicode: E721
+    softbank:
+      type: pictogram
+      unicode: E40A
+  EC9A:
+    docomo:
+      type: pictogram
+      unicode: E757
+    softbank:
+      type: pictogram
+      unicode: E40B
+  EC9B:
+    docomo:
+      type: name
+      unicode: '[風邪ひき]'
+    softbank:
+      type: pictogram
+      unicode: E40C
+  EC9C:
+    docomo:
+      type: name
+      unicode: '[熱]'
+    softbank:
+      type: pictogram
+      unicode: E40D
+  EC9D:
+    docomo:
+      type: pictogram
+      unicode: E725
+    softbank:
+      type: pictogram
+      unicode: E40E
+  EC9E:
+    docomo:
+      type: pictogram
+      unicode: E6F4
+    softbank:
+      type: pictogram
+      unicode: E410
+  EC9F:
+    docomo:
+      type: pictogram
+      unicode: E723
+    softbank:
+      type: pictogram
+      unicode: E40F
+  ECA0:
+    docomo:
+      type: pictogram
+      unicode: E6FF
+    softbank:
+      type: pictogram
+      unicode: E326
+  ECA1:
+    docomo:
+      type: pictogram
+      unicode: E6F0
+    softbank:
+      type: pictogram
+      unicode: E056
+  ECA2:
+    docomo:
+      type: name
+      unicode: (>３<)
+    softbank:
+      type: pictogram
+      unicode: E417
+  ECA3:
+    docomo:
+      type: name
+      unicode: (´３｀)
+    softbank:
+      type: pictogram
+      unicode: E418
+  ECA4:
+    docomo:
+      type: name
+      unicode: '[鼻]'
+    softbank:
+      type: pictogram
+      unicode: E41A
+  ECA5:
+    docomo:
+      type: pictogram
+      unicode: E6F9
+    softbank:
+      type: pictogram
+      unicode: E41C
+  ECA6:
+    docomo:
+      type: name
+      unicode: (>人<)
+    softbank:
+      type: pictogram
+      unicode: E41D
+  ECA7:
+    docomo:
+      type: name
+      unicode: '[拍手]'
+    softbank:
+      type: pictogram
+      unicode: E41F
+  ECA8:
+    docomo:
+      type: pictogram
+      unicode: E70B
+    softbank:
+      type: pictogram
+      unicode: E420
+  ECA9:
+    docomo:
+      type: pictogram
+      unicode: E700
+    softbank:
+      type: pictogram
+      unicode: E421
+  ECAA:
+    docomo:
+      type: pictogram
+      unicode: E695
+    softbank:
+      type: pictogram
+      unicode: E41E
+  ECAB:
+    docomo:
+      type: pictogram
+      unicode: E72F
+    softbank:
+      type: pictogram
+      unicode: E423
+  ECAC:
+    docomo:
+      type: pictogram
+      unicode: E70B
+    softbank:
+      type: pictogram
+      unicode: E424
+  ECAD:
+    docomo:
+      type: name
+      unicode: m(_ _)m
+    softbank:
+      type: pictogram
+      unicode: E426
+  ECAE:
+    docomo:
+      type: pictogram
+      unicode: E6ED
+    softbank:
+      type: pictogram
+      unicode: E425
+  ECAF:
+    docomo:
+      type: name
+      unicode: '[バニー]'
+    softbank:
+      type: pictogram
+      unicode: E429
+  ECB0:
+    docomo:
+      type: name
+      unicode: '[トランペット]'
+    softbank:
+      type: pictogram
+      unicode: E042
+  ECB1:
+    docomo:
+      type: name
+      unicode: '[ビリヤード]'
+    softbank:
+      type: pictogram
+      unicode: E42C
+  ECB2:
+    docomo:
+      type: name
+      unicode: '[水泳]'
+    softbank:
+      type: pictogram
+      unicode: E42D
+  ECB3:
+    docomo:
+      type: name
+      unicode: '[消防車]'
+    softbank:
+      type: pictogram
+      unicode: E430
+  ECB4:
+    docomo:
+      type: name
+      unicode: '[救急車]'
+    softbank:
+      type: pictogram
+      unicode: E431
+  ECB5:
+    docomo:
+      type: name
+      unicode: '[パトカー]'
+    softbank:
+      type: pictogram
+      unicode: E432
+  ECB6:
+    docomo:
+      type: name
+      unicode: '[ジェットコースター]'
+    softbank:
+      type: pictogram
+      unicode: E433
+  ECB7:
+    docomo:
+      type: name
+      unicode: '[門松]'
+    softbank:
+      type: pictogram
+      unicode: E436
+  ECB8:
+    docomo:
+      type: name
+      unicode: '[ひな祭り]'
+    softbank:
+      type: pictogram
+      unicode: E438
+  ECB9:
+    docomo:
+      type: name
+      unicode: '[卒業式]'
+    softbank:
+      type: pictogram
+      unicode: E439
+  ECBA:
+    docomo:
+      type: name
+      unicode: '[ランドセル]'
+    softbank:
+      type: pictogram
+      unicode: E43A
+  ECBB:
+    docomo:
+      type: name
+      unicode: '[こいのぼり]'
+    softbank:
+      type: pictogram
+      unicode: E43B
+  ECBC:
+    docomo:
+      type: pictogram
+      unicode: E645
+    softbank:
+      type: pictogram
+      unicode: E43C
+  ECBD:
+    docomo:
+      type: name
+      unicode: '[花嫁]'
+    softbank:
+      type: name
+      unicode: '[花嫁]'
+  ECBE:
+    docomo:
+      type: name
+      unicode: '[カキ氷]'
+    softbank:
+      type: pictogram
+      unicode: E43F
+  ECBF:
+    docomo:
+      type: name
+      unicode: '[線香花火]'
+    softbank:
+      type: pictogram
+      unicode: E440
+  ECC0:
+    docomo:
+      type: name
+      unicode: '[巻貝]'
+    softbank:
+      type: pictogram
+      unicode: E441
+  ECC1:
+    docomo:
+      type: name
+      unicode: '[風鈴]'
+    softbank:
+      type: pictogram
+      unicode: E442
+  ECC2:
+    docomo:
+      type: name
+      unicode: '[ハロウィン]'
+    softbank:
+      type: pictogram
+      unicode: E445
+  ECC3:
+    docomo:
+      type: name
+      unicode: '[お月見]'
+    softbank:
+      type: pictogram
+      unicode: E446
+  ECC4:
+    docomo:
+      type: name
+      unicode: '[サンタ]'
+    softbank:
+      type: pictogram
+      unicode: E448
+  ECC5:
+    docomo:
+      type: pictogram
+      unicode: E6B3
+    softbank:
+      type: pictogram
+      unicode: E44B
+  ECC6:
+    docomo:
+      type: name
+      unicode: '[虹]'
+    softbank:
+      type: pictogram
+      unicode: E44C
+  ECC7:
+    docomo:
+      type: pictogram
+      unicode: E669E6EF
+    softbank:
+      type: pictogram
+      unicode: E501
+  ECC8:
+    docomo:
+      type: pictogram
+      unicode: E63E
+    softbank:
+      type: pictogram
+      unicode: E449
+  ECC9:
+    docomo:
+      type: pictogram
+      unicode: E67C
+    softbank:
+      type: pictogram
+      unicode: E503
+  ECCA:
+    docomo:
+      type: name
+      unicode: '[デパート]'
+    softbank:
+      type: pictogram
+      unicode: E504
+  ECCB:
+    docomo:
+      type: name
+      unicode: '[城]'
+    softbank:
+      type: pictogram
+      unicode: E505
+  ECCC:
+    docomo:
+      type: name
+      unicode: '[城]'
+    softbank:
+      type: pictogram
+      unicode: E506
+  ECCD:
+    docomo:
+      type: name
+      unicode: '[工場]'
+    softbank:
+      type: pictogram
+      unicode: E508
+  ECCE:
+    docomo:
+      type: name
+      unicode: '[フランス]'
+    softbank:
+      type: pictogram
+      unicode: E50D
+  ECCF:
+    docomo:
+      type: name
+      unicode: '[ドイツ]'
+    softbank:
+      type: pictogram
+      unicode: E50E
+  ECD0:
+    docomo:
+      type: name
+      unicode: '[イタリア]'
+    softbank:
+      type: pictogram
+      unicode: E50F
+  ECD1:
+    docomo:
+      type: name
+      unicode: '[イギリス]'
+    softbank:
+      type: pictogram
+      unicode: E510
+  ECD2:
+    docomo:
+      type: name
+      unicode: '[中国]'
+    softbank:
+      type: pictogram
+      unicode: E513
+  ECD3:
+    docomo:
+      type: name
+      unicode: '[韓国]'
+    softbank:
+      type: pictogram
+      unicode: E514
+  ECD4:
+    docomo:
+      type: name
+      unicode: '[白人]'
+    softbank:
+      type: pictogram
+      unicode: E515
+  ECD5:
+    docomo:
+      type: name
+      unicode: '[中国人]'
+    softbank:
+      type: pictogram
+      unicode: E516
+  ECD6:
+    docomo:
+      type: name
+      unicode: '[インド人]'
+    softbank:
+      type: pictogram
+      unicode: E517
+  ECD7:
+    docomo:
+      type: name
+      unicode: '[おじいさん]'
+    softbank:
+      type: pictogram
+      unicode: E518
+  ECD8:
+    docomo:
+      type: name
+      unicode: '[おばあさん]'
+    softbank:
+      type: pictogram
+      unicode: E519
+  ECD9:
+    docomo:
+      type: name
+      unicode: '[赤ちゃん]'
+    softbank:
+      type: pictogram
+      unicode: E51A
+  ECDA:
+    docomo:
+      type: name
+      unicode: '[工事現場の人]'
+    softbank:
+      type: pictogram
+      unicode: E51B
+  ECDB:
+    docomo:
+      type: name
+      unicode: '[お姫様]'
+    softbank:
+      type: pictogram
+      unicode: E51C
+  ECDC:
+    docomo:
+      type: name
+      unicode: '[イルカ]'
+    softbank:
+      type: pictogram
+      unicode: E520
+  ECDD:
+    docomo:
+      type: name
+      unicode: '[ダンス]'
+    softbank:
+      type: pictogram
+      unicode: E51F
+  ECDE:
+    docomo:
+      type: pictogram
+      unicode: E751
+    softbank:
+      type: pictogram
+      unicode: E522
+  ECDF:
+    docomo:
+      type: name
+      unicode: '[ゲジゲジ]'
+    softbank:
+      type: pictogram
+      unicode: E525
+  ECE0:
+    docomo:
+      type: name
+      unicode: '[ゾウ]'
+    softbank:
+      type: pictogram
+      unicode: E526
+  ECE1:
+    docomo:
+      type: name
+      unicode: '[コアラ]'
+    softbank:
+      type: pictogram
+      unicode: E527
+  ECE2:
+    docomo:
+      type: name
+      unicode: '[牛]'
+    softbank:
+      type: pictogram
+      unicode: E52B
+  ECE3:
+    docomo:
+      type: name
+      unicode: '[ヘビ]'
+    softbank:
+      type: pictogram
+      unicode: E52D
+  ECE4:
+    docomo:
+      type: name
+      unicode: '[ニワトリ]'
+    softbank:
+      type: pictogram
+      unicode: E52E
+  ECE5:
+    docomo:
+      type: name
+      unicode: '[イノシシ]'
+    softbank:
+      type: pictogram
+      unicode: E52F
+  ECE6:
+    docomo:
+      type: name
+      unicode: '[ラクダ]'
+    softbank:
+      type: pictogram
+      unicode: E530
+  ECE7:
+    docomo:
+      type: name
+      unicode: '[A]'
+    softbank:
+      type: pictogram
+      unicode: E532
+  ECE8:
+    docomo:
+      type: name
+      unicode: '[B]'
+    softbank:
+      type: pictogram
+      unicode: E533
+  ECE9:
+    docomo:
+      type: name
+      unicode: '[O]'
+    softbank:
+      type: pictogram
+      unicode: E535
+  ECEA:
+    docomo:
+      type: name
+      unicode: '[AB]'
+    softbank:
+      type: pictogram
+      unicode: E534
+  ECEB:
+    docomo:
+      type: pictogram
+      unicode: E698
+    softbank:
+      type: pictogram
+      unicode: E536
+  ECEC:
+    docomo:
+      type: pictogram
+      unicode: E699
+    softbank:
+      type: pictogram
+      unicode: E007
+  ECED:
+    docomo:
+      type: pictogram
+      unicode: E6DE
+    softbank:
+      type: name
+      unicode: '[旗]'
+  ECEE:
+    docomo:
+      type: pictogram
+      unicode: E6F5
+    softbank:
+      type: pictogram
+      unicode: E236
+  ECEF:
+    docomo:
+      type: pictogram
+      unicode: E700
+    softbank:
+      type: pictogram
+      unicode: E238
+  ECF0:
+    docomo:
+      type: pictogram
+      unicode: E703
+    softbank:
+      type: name
+      unicode: ！？
+  ECF1:
+    docomo:
+      type: pictogram
+      unicode: E704
+    softbank:
+      type: name
+      unicode: ！！
+  ECF2:
+    docomo:
+      type: pictogram
+      unicode: E70A
+    softbank:
+      type: name
+      unicode: ～
+  ECF3:
+    docomo:
+      type: name
+      unicode: '[メロン]'
+    softbank:
+      type: name
+      unicode: '[メロン]'
+  ECF4:
+    docomo:
+      type: name
+      unicode: '[パイナップル]'
+    softbank:
+      type: name
+      unicode: '[パイナップル]'
+  ECF5:
+    docomo:
+      type: name
+      unicode: '[ブドウ]'
+    softbank:
+      type: name
+      unicode: '[ブドウ]'
+  ECF6:
+    docomo:
+      type: pictogram
+      unicode: E744
+    softbank:
+      type: name
+      unicode: '[バナナ]'
+  ECF7:
+    docomo:
+      type: name
+      unicode: '[とうもろこし]'
+    softbank:
+      type: name
+      unicode: '[とうもろこし]'
+  ECF8:
+    docomo:
+      type: name
+      unicode: '[キノコ]'
+    softbank:
+      type: name
+      unicode: '[キノコ]'
+  ECF9:
+    docomo:
+      type: name
+      unicode: '[栗]'
+    softbank:
+      type: name
+      unicode: '[栗]'
+  ECFA:
+    docomo:
+      type: name
+      unicode: '[モモ]'
+    softbank:
+      type: name
+      unicode: '[モモ]'
+  ECFB:
+    docomo:
+      type: name
+      unicode: '[やきいも]'
+    softbank:
+      type: name
+      unicode: '[やきいも]'
+  ECFC:
+    docomo:
+      type: name
+      unicode: '[ピザ]'
+    softbank:
+      type: name
+      unicode: '[ピザ]'
+  ED40:
+    docomo:
+      type: name
+      unicode: '[チキン]'
+    softbank:
+      type: name
+      unicode: '[チキン]'
+  ED41:
+    docomo:
+      type: name
+      unicode: '[七夕]'
+    softbank:
+      type: name
+      unicode: '[七夕]'
+  ED42:
+    docomo:
+      type: pictogram
+      unicode: E671
+    softbank:
+      type: pictogram
+      unicode: E044
+  ED43:
+    docomo:
+      type: name
+      unicode: '[辰]'
+    softbank:
+      type: name
+      unicode: '[辰]'
+  ED44:
+    docomo:
+      type: name
+      unicode: '[ピアノ]'
+    softbank:
+      type: name
+      unicode: '[ピアノ]'
+  ED45:
+    docomo:
+      type: pictogram
+      unicode: E712
+    softbank:
+      type: pictogram
+      unicode: E017
+  ED46:
+    docomo:
+      type: pictogram
+      unicode: E751
+    softbank:
+      type: pictogram
+      unicode: E019
+  ED47:
+    docomo:
+      type: name
+      unicode: '[ボーリング]'
+    softbank:
+      type: name
+      unicode: '[ボーリング]'
+  ED48:
+    docomo:
+      type: name
+      unicode: '[なまはげ]'
+    softbank:
+      type: name
+      unicode: '[なまはげ]'
+  ED49:
+    docomo:
+      type: name
+      unicode: '[天狗]'
+    softbank:
+      type: name
+      unicode: '[天狗]'
+  ED4A:
+    docomo:
+      type: name
+      unicode: '[パンダ]'
+    softbank:
+      type: name
+      unicode: '[パンダ]'
+  ED4B:
+    docomo:
+      type: pictogram
+      unicode: E728
+    softbank:
+      type: pictogram
+      unicode: E409
+  ED4C:
+    docomo:
+      type: pictogram
+      unicode: E755
+    softbank:
+      type: pictogram
+      unicode: E10B
+  ED4D:
+    docomo:
+      type: name
+      unicode: '[花]'
+    softbank:
+      type: pictogram
+      unicode: E305
+  ED4E:
+    docomo:
+      type: name
+      unicode: '[アイスクリーム]'
+    softbank:
+      type: name
+      unicode: '[アイスクリーム]'
+  ED4F:
+    docomo:
+      type: name
+      unicode: '[ドーナツ]'
+    softbank:
+      type: name
+      unicode: '[ドーナツ]'
+  ED50:
+    docomo:
+      type: name
+      unicode: '[クッキー]'
+    softbank:
+      type: name
+      unicode: '[クッキー]'
+  ED51:
+    docomo:
+      type: name
+      unicode: '[チョコ]'
+    softbank:
+      type: name
+      unicode: '[チョコ]'
+  ED52:
+    docomo:
+      type: name
+      unicode: '[キャンディ]'
+    softbank:
+      type: name
+      unicode: '[キャンディ]'
+  ED53:
+    docomo:
+      type: name
+      unicode: '[キャンディ]'
+    softbank:
+      type: name
+      unicode: '[キャンディ]'
+  ED54:
+    docomo:
+      type: name
+      unicode: (/_＼)
+    softbank:
+      type: name
+      unicode: (/_＼)
+  ED55:
+    docomo:
+      type: name
+      unicode: (・×・)
+    softbank:
+      type: name
+      unicode: (・×・)
+  ED56:
+    docomo:
+      type: name
+      unicode: '|(・×・)|'
+    softbank:
+      type: name
+      unicode: '|(・×・)|'
+  ED57:
+    docomo:
+      type: name
+      unicode: '[火山]'
+    softbank:
+      type: name
+      unicode: '[火山]'
+  ED58:
+    docomo:
+      type: pictogram
+      unicode: E6EC
+    softbank:
+      type: pictogram
+      unicode: E328
+  ED59:
+    docomo:
+      type: name
+      unicode: '[ABC]'
+    softbank:
+      type: name
+      unicode: '[ABC]'
+  ED5A:
+    docomo:
+      type: name
+      unicode: '[プリン]'
+    softbank:
+      type: name
+      unicode: '[プリン]'
+  ED5B:
+    docomo:
+      type: name
+      unicode: '[ミツバチ]'
+    softbank:
+      type: name
+      unicode: '[ミツバチ]'
+  ED5C:
+    docomo:
+      type: name
+      unicode: '[てんとう虫]'
+    softbank:
+      type: name
+      unicode: '[てんとう虫]'
+  ED5D:
+    docomo:
+      type: name
+      unicode: '[ハチミツ]'
+    softbank:
+      type: name
+      unicode: '[ハチミツ]'
+  ED5E:
+    docomo:
+      type: pictogram
+      unicode: E745
+    softbank:
+      type: pictogram
+      unicode: E345
+  ED5F:
+    docomo:
+      type: name
+      unicode: '[飛んでいくお金]'
+    softbank:
+      type: name
+      unicode: '[飛んでいくお金]'
+  ED60:
+    docomo:
+      type: name
+      unicode: '[クラクラ]'
+    softbank:
+      type: pictogram
+      unicode: E407
+  ED61:
+    docomo:
+      type: pictogram
+      unicode: E724
+    softbank:
+      type: pictogram
+      unicode: E416
+  ED62:
+    docomo:
+      type: pictogram
+      unicode: E724
+    softbank:
+      type: pictogram
+      unicode: E416
+  ED63:
+    docomo:
+      type: pictogram
+      unicode: E6B3
+    softbank:
+      type: pictogram
+      unicode: E44B
+  ED64:
+    docomo:
+      type: name
+      unicode: (´３｀)
+    softbank:
+      type: pictogram
+      unicode: E418
+  ED65:
+    docomo:
+      type: pictogram
+      unicode: E6F0
+    softbank:
+      type: pictogram
+      unicode: E057
+  ED66:
+    docomo:
+      type: pictogram
+      unicode: E6CF
+    softbank:
+      type: pictogram
+      unicode: E103
+  ED67:
+    docomo:
+      type: pictogram
+      unicode: E72A
+    softbank:
+      type: pictogram
+      unicode: E412
+  ED68:
+    docomo:
+      type: pictogram
+      unicode: E72A
+    softbank:
+      type: pictogram
+      unicode: E412
+  ED69:
+    docomo:
+      type: pictogram
+      unicode: E726
+    softbank:
+      type: pictogram
+      unicode: E106
+  ED6A:
+    docomo:
+      type: pictogram
+      unicode: E6F3
+    softbank:
+      type: pictogram
+      unicode: E403
+  ED6B:
+    docomo:
+      type: pictogram
+      unicode: E6F3
+    softbank:
+      type: pictogram
+      unicode: E403
+  ED6C:
+    docomo:
+      type: pictogram
+      unicode: E72E
+    softbank:
+      type: pictogram
+      unicode: E413
+  ED6D:
+    docomo:
+      type: pictogram
+      unicode: E72E
+    softbank:
+      type: pictogram
+      unicode: E413
+  ED6E:
+    docomo:
+      type: pictogram
+      unicode: E753
+    softbank:
+      type: pictogram
+      unicode: E404
+  ED6F:
+    docomo:
+      type: name
+      unicode: '[ドレス]'
+    softbank:
+      type: pictogram
+      unicode: E319
+  ED70:
+    docomo:
+      type: name
+      unicode: '[モアイ]'
+    softbank:
+      type: name
+      unicode: '[モアイ]'
+  ED71:
+    docomo:
+      type: name
+      unicode: '[駅]'
+    softbank:
+      type: pictogram
+      unicode: E039
+  ED72:
+    docomo:
+      type: name
+      unicode: '[花札]'
+    softbank:
+      type: name
+      unicode: '[花札]'
+  ED73:
+    docomo:
+      type: name
+      unicode: '[ジョーカー]'
+    softbank:
+      type: name
+      unicode: '[ジョーカー]'
+  ED74:
+    docomo:
+      type: name
+      unicode: '[エビフライ]'
+    softbank:
+      type: name
+      unicode: '[エビフライ]'
+  ED75:
+    docomo:
+      type: pictogram
+      unicode: E6D3
+    softbank:
+      type: pictogram
+      unicode: E103
+  ED76:
+    docomo:
+      type: pictogram
+      unicode: E733
+    softbank:
+      type: pictogram
+      unicode: E201
+  ED77:
+    docomo:
+      type: name
+      unicode: '[パトカー]'
+    softbank:
+      type: pictogram
+      unicode: E432
+  ED78:
+    docomo:
+      type: name
+      unicode: '[EZムービー]'
+    softbank:
+      type: name
+      unicode: '[EZムービー]'
+  ED79:
+    docomo:
+      type: pictogram
+      unicode: E6ED
+    softbank:
+      type: pictogram
+      unicode: E327
+  ED7A:
+    docomo:
+      type: pictogram
+      unicode: E74F
+    softbank:
+      type: pictogram
+      unicode: E523
+  ED7B:
+    docomo:
+      type: pictogram
+      unicode: E711
+    softbank:
+      type: name
+      unicode: '[ジーンズ]'
+  ED7C:
+    docomo:
+      type: pictogram
+      unicode: E717
+    softbank:
+      type: pictogram
+      unicode: E103E328
+  ED7D:
+    docomo:
+      type: pictogram
+      unicode: E735
+    softbank:
+      type: name
+      unicode: ↑↓
+  ED7E:
+    docomo:
+      type: pictogram
+      unicode: E73C
+    softbank:
+      type: name
+      unicode: ⇔
+  ED80:
+    docomo:
+      type: pictogram
+      unicode: E73D
+    softbank:
+      type: name
+      unicode: ↑↓
+  ED81:
+    docomo:
+      type: pictogram
+      unicode: E73F
+    softbank:
+      type: pictogram
+      unicode: E43E
+  ED82:
+    docomo:
+      type: pictogram
+      unicode: E746
+    softbank:
+      type: pictogram
+      unicode: E110
+  ED83:
+    docomo:
+      type: pictogram
+      unicode: E74E
+    softbank:
+      type: name
+      unicode: '[カタツムリ]'
+  ED84:
+    docomo:
+      type: pictogram
+      unicode: E753
+    softbank:
+      type: pictogram
+      unicode: E404
+  ED85:
+    docomo:
+      type: pictogram
+      unicode: E753
+    softbank:
+      type: pictogram
+      unicode: E404
+  ED86:
+    docomo:
+      type: name
+      unicode: '[Cメール]'
+    softbank:
+      type: name
+      unicode: '[Cメール]'
+  ED87:
+    docomo:
+      type: pictogram
+      unicode: E741
+    softbank:
+      type: pictogram
+      unicode: E110
+  ED88:
+    docomo:
+      type: pictogram
+      unicode: E693
+    softbank:
+      type: pictogram
+      unicode: E010
+  ED89:
+    docomo:
+      type: pictogram
+      unicode: E6E0
+    softbank:
+      type: pictogram
+      unicode: E210
+  ED8A:
+    docomo:
+      type: name
+      unicode: (^-^)/
+    softbank:
+      type: pictogram
+      unicode: E012
+  ED8B:
+    docomo:
+      type: name
+      unicode: ＼(^o^)／
+    softbank:
+      type: pictogram
+      unicode: E427
+  ED8C:
+    docomo:
+      type: pictogram
+      unicode: E6F3
+    softbank:
+      type: pictogram
+      unicode: E403
+  ED8D:
+    docomo:
+      type: pictogram
+      unicode: E724
+    softbank:
+      type: pictogram
+      unicode: E416
+  EF40:
+    docomo:
+      type: name
+      unicode: ☆彡
+    softbank:
+      type: name
+      unicode: ☆彡
+  EF41:
+    docomo:
+      type: pictogram
+      unicode: E643
+    softbank:
+      type: pictogram
+      unicode: E443
+  EF42:
+    docomo:
+      type: pictogram
+      unicode: E66D
+    softbank:
+      type: pictogram
+      unicode: E14E
+  EF43:
+    docomo:
+      type: pictogram
+      unicode: E733
+    softbank:
+      type: pictogram
+      unicode: E115
+  EF44:
+    docomo:
+      type: pictogram
+      unicode: E6FA
+    softbank:
+      type: pictogram
+      unicode: E32E
+  EF45:
+    docomo:
+      type: name
+      unicode: '[観覧車]'
+    softbank:
+      type: pictogram
+      unicode: E124
+  EF46:
+    docomo:
+      type: name
+      unicode: '[777]'
+    softbank:
+      type: pictogram
+      unicode: E133
+  EF47:
+    docomo:
+      type: name
+      unicode: '[オメデトウ]'
+    softbank:
+      type: name
+      unicode: '[オメデトウ]'
+  EF48:
+    docomo:
+      type: name
+      unicode: '[クジラ]'
+    softbank:
+      type: pictogram
+      unicode: E054
+  EF49:
+    docomo:
+      type: pictogram
+      unicode: E6F0
+    softbank:
+      type: pictogram
+      unicode: E057
+  EF4A:
+    docomo:
+      type: pictogram
+      unicode: E6F1
+    softbank:
+      type: pictogram
+      unicode: E059
+  EF4B:
+    docomo:
+      type: pictogram
+      unicode: E72D
+    softbank:
+      type: pictogram
+      unicode: E411
+  EF4C:
+    docomo:
+      type: pictogram
+      unicode: E72B
+    softbank:
+      type: pictogram
+      unicode: E406
+  EF4D:
+    docomo:
+      type: pictogram
+      unicode: E701
+    softbank:
+      type: pictogram
+      unicode: E13C
+  EF4E:
+    docomo:
+      type: pictogram
+      unicode: E6FB
+    softbank:
+      type: pictogram
+      unicode: E10F
+  EF4F:
+    docomo:
+      type: pictogram
+      unicode: E6EE
+    softbank:
+      type: pictogram
+      unicode: E023
+  EF50:
+    docomo:
+      type: pictogram
+      unicode: E6EF
+    softbank:
+      type: pictogram
+      unicode: E327
+  EF51:
+    docomo:
+      type: pictogram
+      unicode: E6FA
+    softbank:
+      type: pictogram
+      unicode: E32E
+  EF52:
+    docomo:
+      type: pictogram
+      unicode: E6FE
+    softbank:
+      type: pictogram
+      unicode: E311
+  EF53:
+    docomo:
+      type: name
+      unicode: '[炎]'
+    softbank:
+      type: pictogram
+      unicode: E11D
+  EF54:
+    docomo:
+      type: pictogram
+      unicode: E71C
+    softbank:
+      type: name
+      unicode: '[砂時計]'
+  EF55:
+    docomo:
+      type: pictogram
+      unicode: E67F
+    softbank:
+      type: pictogram
+      unicode: E30E
+  EF56:
+    docomo:
+      type: pictogram
+      unicode: E680
+    softbank:
+      type: pictogram
+      unicode: E208
+  EF57:
+    docomo:
+      type: pictogram
+      unicode: E69B
+    softbank:
+      type: pictogram
+      unicode: E20A
+  EF58:
+    docomo:
+      type: name
+      unicode: '[若葉マーク]'
+    softbank:
+      type: pictogram
+      unicode: E209
+  EF59:
+    docomo:
+      type: pictogram
+      unicode: E737
+    softbank:
+      type: pictogram
+      unicode: E252
+  EF5A:
+    docomo:
+      type: pictogram
+      unicode: E702
+    softbank:
+      type: pictogram
+      unicode: E021
+  EF5B:
+    docomo:
+      type: name
+      unicode: ？
+    softbank:
+      type: pictogram
+      unicode: E020
+  EF5C:
+    docomo:
+      type: pictogram
+      unicode: E72F
+    softbank:
+      type: pictogram
+      unicode: E137
+  EF5D:
+    docomo:
+      type: pictogram
+      unicode: E641
+    softbank:
+      type: pictogram
+      unicode: E048
+  EF5E:
+    docomo:
+      type: pictogram
+      unicode: E69F
+    softbank:
+      type: pictogram
+      unicode: E04C
+  EF5F:
+    docomo:
+      type: pictogram
+      unicode: E642
+    softbank:
+      type: pictogram
+      unicode: E13D
+  EF60:
+    docomo:
+      type: pictogram
+      unicode: E63E
+    softbank:
+      type: pictogram
+      unicode: E04A
+  EF61:
+    docomo:
+      type: pictogram
+      unicode: E69E
+    softbank:
+      type: pictogram
+      unicode: E04C
+  EF62:
+    docomo:
+      type: name
+      unicode: '[雪結晶]'
+    softbank:
+      type: name
+      unicode: '[雪結晶]'
+  EF63:
+    docomo:
+      type: name
+      unicode: ☆
+    softbank:
+      type: pictogram
+      unicode: E32F
+  EF64:
+    docomo:
+      type: pictogram
+      unicode: E640
+    softbank:
+      type: pictogram
+      unicode: E04B
+  EF65:
+    docomo:
+      type: pictogram
+      unicode: E63F
+    softbank:
+      type: pictogram
+      unicode: E049
+  EF66:
+    docomo:
+      type: pictogram
+      unicode: E63EE63F
+    softbank:
+      type: pictogram
+      unicode: E04AE049
+  EF67:
+    docomo:
+      type: pictogram
+      unicode: E646
+    softbank:
+      type: pictogram
+      unicode: E23F
+  EF68:
+    docomo:
+      type: pictogram
+      unicode: E647
+    softbank:
+      type: pictogram
+      unicode: E240
+  EF69:
+    docomo:
+      type: pictogram
+      unicode: E648
+    softbank:
+      type: pictogram
+      unicode: E241
+  EF6A:
+    docomo:
+      type: pictogram
+      unicode: E649
+    softbank:
+      type: pictogram
+      unicode: E242
+  EF6B:
+    docomo:
+      type: pictogram
+      unicode: E64A
+    softbank:
+      type: pictogram
+      unicode: E243
+  EF6C:
+    docomo:
+      type: pictogram
+      unicode: E64B
+    softbank:
+      type: pictogram
+      unicode: E244
+  EF6D:
+    docomo:
+      type: pictogram
+      unicode: E64C
+    softbank:
+      type: pictogram
+      unicode: E245
+  EF6E:
+    docomo:
+      type: pictogram
+      unicode: E64D
+    softbank:
+      type: pictogram
+      unicode: E246
+  EF6F:
+    docomo:
+      type: pictogram
+      unicode: E64E
+    softbank:
+      type: pictogram
+      unicode: E247
+  EF70:
+    docomo:
+      type: pictogram
+      unicode: E64F
+    softbank:
+      type: pictogram
+      unicode: E248
+  EF71:
+    docomo:
+      type: pictogram
+      unicode: E650
+    softbank:
+      type: pictogram
+      unicode: E249
+  EF72:
+    docomo:
+      type: pictogram
+      unicode: E651
+    softbank:
+      type: pictogram
+      unicode: E24A
+  EF73:
+    docomo:
+      type: name
+      unicode: '[蛇使座]'
+    softbank:
+      type: pictogram
+      unicode: E24B
+  EF74:
+    docomo:
+      type: pictogram
+      unicode: E682
+    softbank:
+      type: pictogram
+      unicode: E323
+  EF75:
+    docomo:
+      type: pictogram
+      unicode: E683
+    softbank:
+      type: pictogram
+      unicode: E148
+  EF76:
+    docomo:
+      type: pictogram
+      unicode: E67E
+    softbank:
+      type: pictogram
+      unicode: E125
+  EF77:
+    docomo:
+      type: pictogram
+      unicode: E683
+    softbank:
+      type: pictogram
+      unicode: E148
+  EF78:
+    docomo:
+      type: pictogram
+      unicode: E730
+    softbank:
+      type: name
+      unicode: '[クリップ]'
+  EF79:
+    docomo:
+      type: pictogram
+      unicode: E719
+    softbank:
+      type: pictogram
+      unicode: E301
+  EF7A:
+    docomo:
+      type: name
+      unicode: '[三角定規]'
+    softbank:
+      type: name
+      unicode: '[三角定規]'
+  EF7B:
+    docomo:
+      type: pictogram
+      unicode: E668
+    softbank:
+      type: pictogram
+      unicode: E154
+  EF7C:
+    docomo:
+      type: pictogram
+      unicode: E66A
+    softbank:
+      type: pictogram
+      unicode: E156
+  EF7D:
+    docomo:
+      type: pictogram
+      unicode: E66E
+    softbank:
+      type: pictogram
+      unicode: E151
+  EF7E:
+    docomo:
+      type: pictogram
+      unicode: E66C
+    softbank:
+      type: pictogram
+      unicode: E14F
+  EF80:
+    docomo:
+      type: name
+      unicode: '[バス停]'
+    softbank:
+      type: pictogram
+      unicode: E150
+  EF81:
+    docomo:
+      type: name
+      unicode: '[アンテナ]'
+    softbank:
+      type: pictogram
+      unicode: E14B
+  EF82:
+    docomo:
+      type: pictogram
+      unicode: E661
+    softbank:
+      type: pictogram
+      unicode: E202
+  EF83:
+    docomo:
+      type: pictogram
+      unicode: E667
+    softbank:
+      type: pictogram
+      unicode: E14D
+  EF84:
+    docomo:
+      type: pictogram
+      unicode: E663
+    softbank:
+      type: pictogram
+      unicode: E036
+  EF85:
+    docomo:
+      type: pictogram
+      unicode: E66F
+    softbank:
+      type: pictogram
+      unicode: E043
+  EF86:
+    docomo:
+      type: pictogram
+      unicode: E664
+    softbank:
+      type: pictogram
+      unicode: E038
+  EF87:
+    docomo:
+      type: pictogram
+      unicode: E71D
+    softbank:
+      type: pictogram
+      unicode: E136
+  EF88:
+    docomo:
+      type: pictogram
+      unicode: E660
+    softbank:
+      type: pictogram
+      unicode: E159
+  EF89:
+    docomo:
+      type: pictogram
+      unicode: E65D
+    softbank:
+      type: pictogram
+      unicode: E01F
+  EF8A:
+    docomo:
+      type: pictogram
+      unicode: E65E
+    softbank:
+      type: pictogram
+      unicode: E01B
+  EF8B:
+    docomo:
+      type: name
+      unicode: '[トラック]'
+    softbank:
+      type: pictogram
+      unicode: E42F
+  EF8C:
+    docomo:
+      type: pictogram
+      unicode: E662
+    softbank:
+      type: pictogram
+      unicode: E01D
+  EF8D:
+    docomo:
+      type: pictogram
+      unicode: E6A3
+    softbank:
+      type: pictogram
+      unicode: E01C
+  EF8E:
+    docomo:
+      type: pictogram
+      unicode: E65B
+    softbank:
+      type: pictogram
+      unicode: E01E
+  EF8F:
+    docomo:
+      type: pictogram
+      unicode: E656
+    softbank:
+      type: pictogram
+      unicode: E018
+  EF90:
+    docomo:
+      type: pictogram
+      unicode: E655
+    softbank:
+      type: pictogram
+      unicode: E015
+  EF91:
+    docomo:
+      type: pictogram
+      unicode: E712
+    softbank:
+      type: name
+      unicode: '[スノボ]'
+  EF92:
+    docomo:
+      type: pictogram
+      unicode: E659
+    softbank:
+      type: pictogram
+      unicode: E132
+  EF93:
+    docomo:
+      type: pictogram
+      unicode: E653
+    softbank:
+      type: pictogram
+      unicode: E016
+  EF94:
+    docomo:
+      type: name
+      unicode: '[フットボール]'
+    softbank:
+      type: pictogram
+      unicode: E42B
+  EF95:
+    docomo:
+      type: pictogram
+      unicode: E6F7
+    softbank:
+      type: pictogram
+      unicode: E123
+  EF96:
+    docomo:
+      type: pictogram
+      unicode: E74B
+    softbank:
+      type: pictogram
+      unicode: E30B
+  EF97:
+    docomo:
+      type: pictogram
+      unicode: E6AC
+    softbank:
+      type: pictogram
+      unicode: E324
+  EF98:
+    docomo:
+      type: pictogram
+      unicode: E6B3
+    softbank:
+      type: pictogram
+      unicode: E44B
+  EF99:
+    docomo:
+      type: name
+      unicode: '[東京タワー]'
+    softbank:
+      type: pictogram
+      unicode: E509
+  EF9A:
+    docomo:
+      type: pictogram
+      unicode: E756
+    softbank:
+      type: pictogram
+      unicode: E044
+  EF9B:
+    docomo:
+      type: pictogram
+      unicode: E671
+    softbank:
+      type: pictogram
+      unicode: E044
+  EF9C:
+    docomo:
+      type: pictogram
+      unicode: E672
+    softbank:
+      type: pictogram
+      unicode: E047
+  EF9D:
+    docomo:
+      type: name
+      unicode: '[肉]'
+    softbank:
+      type: name
+      unicode: '[肉]'
+  EF9E:
+    docomo:
+      type: name
+      unicode: '[的中]'
+    softbank:
+      type: pictogram
+      unicode: E130
+  EF9F:
+    docomo:
+      type: pictogram
+      unicode: E68B
+    softbank:
+      type: name
+      unicode: '[ゲーム]'
+  EFA0:
+    docomo:
+      type: pictogram
+      unicode: E715
+    softbank:
+      type: pictogram
+      unicode: E12F
+  EFA1:
+    docomo:
+      type: name
+      unicode: '[サイコロ]'
+    softbank:
+      type: name
+      unicode: '[サイコロ]'
+  EFA2:
+    docomo:
+      type: pictogram
+      unicode: E6A4
+    softbank:
+      type: pictogram
+      unicode: E033
+  EFA3:
+    docomo:
+      type: pictogram
+      unicode: E748
+    softbank:
+      type: pictogram
+      unicode: E030
+  EFA4:
+    docomo:
+      type: name
+      unicode: '[お化け]'
+    softbank:
+      type: pictogram
+      unicode: E11B
+  EFA5:
+    docomo:
+      type: name
+      unicode: '[日の丸]'
+    softbank:
+      type: pictogram
+      unicode: E50B
+  EFA6:
+    docomo:
+      type: name
+      unicode: '[スイカ]'
+    softbank:
+      type: pictogram
+      unicode: E348
+  EFA7:
+    docomo:
+      type: pictogram
+      unicode: E747
+    softbank:
+      type: pictogram
+      unicode: E118
+  EFA8:
+    docomo:
+      type: pictogram
+      unicode: E685
+    softbank:
+      type: pictogram
+      unicode: E112
+  EFA9:
+    docomo:
+      type: pictogram
+      unicode: E74A
+    softbank:
+      type: pictogram
+      unicode: E046
+  EFAA:
+    docomo:
+      type: name
+      unicode: '[フライパン]'
+    softbank:
+      type: pictogram
+      unicode: E147
+  EFAB:
+    docomo:
+      type: pictogram
+      unicode: E742
+    softbank:
+      type: name
+      unicode: '[さくらんぼ]'
+  EFAC:
+    docomo:
+      type: pictogram
+      unicode: E751
+    softbank:
+      type: pictogram
+      unicode: E019
+  EFAD:
+    docomo:
+      type: name
+      unicode: '[イチゴ]'
+    softbank:
+      type: pictogram
+      unicode: E347
+  EFAE:
+    docomo:
+      type: pictogram
+      unicode: E749
+    softbank:
+      type: pictogram
+      unicode: E342
+  EFAF:
+    docomo:
+      type: pictogram
+      unicode: E673
+    softbank:
+      type: pictogram
+      unicode: E120
+  EFB0:
+    docomo:
+      type: name
+      unicode: '[ウサギ]'
+    softbank:
+      type: pictogram
+      unicode: E52C
+  EFB1:
+    docomo:
+      type: pictogram
+      unicode: E754
+    softbank:
+      type: pictogram
+      unicode: E01A
+  EFB2:
+    docomo:
+      type: name
+      unicode: '[サル]'
+    softbank:
+      type: pictogram
+      unicode: E109
+  EFB3:
+    docomo:
+      type: name
+      unicode: '[カエル]'
+    softbank:
+      type: pictogram
+      unicode: E531
+  EFB4:
+    docomo:
+      type: pictogram
+      unicode: E6A2
+    softbank:
+      type: pictogram
+      unicode: E04F
+  EFB5:
+    docomo:
+      type: pictogram
+      unicode: E750
+    softbank:
+      type: pictogram
+      unicode: E055
+  EFB6:
+    docomo:
+      type: name
+      unicode: '[アリ]'
+    softbank:
+      type: name
+      unicode: '[アリ]'
+  EFB7:
+    docomo:
+      type: pictogram
+      unicode: E755
+    softbank:
+      type: pictogram
+      unicode: E10B
+  EFB8:
+    docomo:
+      type: pictogram
+      unicode: E6A1
+    softbank:
+      type: pictogram
+      unicode: E052
+  EFB9:
+    docomo:
+      type: pictogram
+      unicode: E74F
+    softbank:
+      type: pictogram
+      unicode: E523
+  EFBA:
+    docomo:
+      type: pictogram
+      unicode: E6A1
+    softbank:
+      type: pictogram
+      unicode: E052
+  EFBB:
+    docomo:
+      type: name
+      unicode: '[ビーチ]'
+    softbank:
+      type: pictogram
+      unicode: E307
+  EFBC:
+    docomo:
+      type: name
+      unicode: '[ひまわり]'
+    softbank:
+      type: pictogram
+      unicode: E305
+  EFBD:
+    docomo:
+      type: pictogram
+      unicode: E743
+    softbank:
+      type: pictogram
+      unicode: E304
+  EFBE:
+    docomo:
+      type: pictogram
+      unicode: E6FC
+    softbank:
+      type: pictogram
+      unicode: E334
+  EFBF:
+    docomo:
+      type: pictogram
+      unicode: E707
+    softbank:
+      type: pictogram
+      unicode: E331
+  EFC0:
+    docomo:
+      type: pictogram
+      unicode: E728
+    softbank:
+      type: pictogram
+      unicode: E105
+  EFC1:
+    docomo:
+      type: name
+      unicode: '[SOS]'
+    softbank:
+      type: name
+      unicode: '[SOS]'
+  EFC2:
+    docomo:
+      type: name
+      unicode: '[力こぶ]'
+    softbank:
+      type: pictogram
+      unicode: E14C
+  EFC3:
+    docomo:
+      type: pictogram
+      unicode: E6EC
+    softbank:
+      type: pictogram
+      unicode: E329
+  EFC4:
+    docomo:
+      type: pictogram
+      unicode: E6F9
+    softbank:
+      type: pictogram
+      unicode: E003
+  EFC5:
+    docomo:
+      type: name
+      unicode: '[宇宙人]'
+    softbank:
+      type: pictogram
+      unicode: E10C
+  EFC6:
+    docomo:
+      type: pictogram
+      unicode: E643
+    softbank:
+      type: name
+      unicode: '[なると]'
+  EFC7:
+    docomo:
+      type: pictogram
+      unicode: E698
+    softbank:
+      type: pictogram
+      unicode: E536
+  EFC8:
+    docomo:
+      type: name
+      unicode: '[アクマ]'
+    softbank:
+      type: pictogram
+      unicode: E11A
+  EFC9:
+    docomo:
+      type: name
+      unicode: '[花丸]'
+    softbank:
+      type: name
+      unicode: '[花丸]'
+  EFCA:
+    docomo:
+      type: pictogram
+      unicode: E734
+    softbank:
+      type: pictogram
+      unicode: E315
+  EFCB:
+    docomo:
+      type: name
+      unicode: '[100点]'
+    softbank:
+      type: name
+      unicode: '[100点]'
+  EFCC:
+    docomo:
+      type: pictogram
+      unicode: E6FD
+    softbank:
+      type: pictogram
+      unicode: E00D
+  EFCD:
+    docomo:
+      type: pictogram
+      unicode: E708
+    softbank:
+      type: pictogram
+      unicode: E330
+  EFCE:
+    docomo:
+      type: name
+      unicode: '[ウンチ]'
+    softbank:
+      type: pictogram
+      unicode: E05A
+  EFCF:
+    docomo:
+      type: name
+      unicode: '[人差し指]'
+    softbank:
+      type: pictogram
+      unicode: E00F
+  EFD0:
+    docomo:
+      type: name
+      unicode: '[得]'
+    softbank:
+      type: pictogram
+      unicode: E226
+  EFD1:
+    docomo:
+      type: name
+      unicode: '[ドクロ]'
+    softbank:
+      type: pictogram
+      unicode: E11C
+  EFD2:
+    docomo:
+      type: pictogram
+      unicode: E727
+    softbank:
+      type: pictogram
+      unicode: E00E
+  EFD3:
+    docomo:
+      type: pictogram
+      unicode: E6F0
+    softbank:
+      type: pictogram
+      unicode: E002
+  EFD4:
+    docomo:
+      type: pictogram
+      unicode: E6F0
+    softbank:
+      type: pictogram
+      unicode: E056
+  EFD5:
+    docomo:
+      type: pictogram
+      unicode: E6F0
+    softbank:
+      type: pictogram
+      unicode: E001
+  EFD6:
+    docomo:
+      type: name
+      unicode: '[フキダシ]'
+    softbank:
+      type: name
+      unicode: '[フキダシ]'
+  EFD7:
+    docomo:
+      type: pictogram
+      unicode: E69A
+    softbank:
+      type: name
+      unicode: '[メガネ]'
+  EFD8:
+    docomo:
+      type: name
+      unicode: ←
+    softbank:
+      type: pictogram
+      unicode: E230
+  EFD9:
+    docomo:
+      type: name
+      unicode: →
+    softbank:
+      type: pictogram
+      unicode: E231
+  EFDA:
+    docomo:
+      type: name
+      unicode: '[家族]'
+    softbank:
+      type: name
+      unicode: '[家族]'
+  EFDB:
+    docomo:
+      type: pictogram
+      unicode: E68A
+    softbank:
+      type: pictogram
+      unicode: E12A
+  EFDC:
+    docomo:
+      type: pictogram
+      unicode: E676
+    softbank:
+      type: pictogram
+      unicode: E03C
+  EFDD:
+    docomo:
+      type: pictogram
+      unicode: E70F
+    softbank:
+      type: name
+      unicode: '[財布]'
+  EFDE:
+    docomo:
+      type: pictogram
+      unicode: E6FF
+    softbank:
+      type: pictogram
+      unicode: E326
+  EFDF:
+    docomo:
+      type: name
+      unicode: '[ギター]'
+    softbank:
+      type: pictogram
+      unicode: E041
+  EFE0:
+    docomo:
+      type: name
+      unicode: '[バイオリン]'
+    softbank:
+      type: name
+      unicode: '[バイオリン]'
+  EFE1:
+    docomo:
+      type: pictogram
+      unicode: E67A
+    softbank:
+      type: pictogram
+      unicode: E30A
+  EFE2:
+    docomo:
+      type: pictogram
+      unicode: E710
+    softbank:
+      type: pictogram
+      unicode: E31C
+  EFE3:
+    docomo:
+      type: name
+      unicode: '[ピストル]'
+    softbank:
+      type: pictogram
+      unicode: E113
+  EFE4:
+    docomo:
+      type: name
+      unicode: '[エステ]'
+    softbank:
+      type: pictogram
+      unicode: E31E
+  EFE5:
+    docomo:
+      type: pictogram
+      unicode: E68C
+    softbank:
+      type: pictogram
+      unicode: E126
+  EFE6:
+    docomo:
+      type: pictogram
+      unicode: E70E
+    softbank:
+      type: pictogram
+      unicode: E006
+  EFE7:
+    docomo:
+      type: name
+      unicode: '[UFO]'
+    softbank:
+      type: pictogram
+      unicode: E10C
+  EFE8:
+    docomo:
+      type: name
+      unicode: '[UP!]'
+    softbank:
+      type: pictogram
+      unicode: E213
+  EFE9:
+    docomo:
+      type: name
+      unicode: '[注射]'
+    softbank:
+      type: pictogram
+      unicode: E13B
+  EFEA:
+    docomo:
+      type: name
+      unicode: '[スピーカ]'
+    softbank:
+      type: pictogram
+      unicode: E141
+  EFEB:
+    docomo:
+      type: pictogram
+      unicode: E713
+    softbank:
+      type: pictogram
+      unicode: E325
+  EFEC:
+    docomo:
+      type: pictogram
+      unicode: E741
+    softbank:
+      type: pictogram
+      unicode: E110
+  EFED:
+    docomo:
+      type: pictogram
+      unicode: E71B
+    softbank:
+      type: pictogram
+      unicode: E034
+  EFEE:
+    docomo:
+      type: pictogram
+      unicode: E681
+    softbank:
+      type: pictogram
+      unicode: E008
+  EFEF:
+    docomo:
+      type: pictogram
+      unicode: E675
+    softbank:
+      type: pictogram
+      unicode: E313
+  EFF0:
+    docomo:
+      type: pictogram
+      unicode: E677
+    softbank:
+      type: pictogram
+      unicode: E03D
+  EFF1:
+    docomo:
+      type: pictogram
+      unicode: E6DC
+    softbank:
+      type: pictogram
+      unicode: E114
+  EFF2:
+    docomo:
+      type: pictogram
+      unicode: E6D9
+    softbank:
+      type: pictogram
+      unicode: E03F
+  EFF3:
+    docomo:
+      type: pictogram
+      unicode: E674
+    softbank:
+      type: pictogram
+      unicode: E13E
+  EFF4:
+    docomo:
+      type: pictogram
+      unicode: E665
+    softbank:
+      type: pictogram
+      unicode: E101
+  EFF5:
+    docomo:
+      type: pictogram
+      unicode: E6D9
+    softbank:
+      type: pictogram
+      unicode: E144
+  EFF6:
+    docomo:
+      type: name
+      unicode: '[名札]'
+    softbank:
+      type: name
+      unicode: '[名札]'
+  EFF7:
+    docomo:
+      type: pictogram
+      unicode: E687
+    softbank:
+      type: pictogram
+      unicode: E009
+  EFF8:
+    docomo:
+      type: pictogram
+      unicode: E685
+    softbank:
+      type: pictogram
+      unicode: E112
+  EFF9:
+    docomo:
+      type: pictogram
+      unicode: E6D0
+    softbank:
+      type: pictogram
+      unicode: E00B
+  EFFA:
+    docomo:
+      type: pictogram
+      unicode: E6D3
+    softbank:
+      type: pictogram
+      unicode: E103
+  EFFB:
+    docomo:
+      type: pictogram
+      unicode: E6E2
+    softbank:
+      type: pictogram
+      unicode: E21C
+  EFFC:
+    docomo:
+      type: pictogram
+      unicode: E6E3
+    softbank:
+      type: pictogram
+      unicode: E21D
+  F040:
+    docomo:
+      type: pictogram
+      unicode: E6E4
+    softbank:
+      type: pictogram
+      unicode: E21E
+  F041:
+    docomo:
+      type: pictogram
+      unicode: E6E5
+    softbank:
+      type: pictogram
+      unicode: E21F
+  F042:
+    docomo:
+      type: pictogram
+      unicode: E6E6
+    softbank:
+      type: pictogram
+      unicode: E220
+  F043:
+    docomo:
+      type: pictogram
+      unicode: E6E7
+    softbank:
+      type: pictogram
+      unicode: E221
+  F044:
+    docomo:
+      type: pictogram
+      unicode: E6E8
+    softbank:
+      type: pictogram
+      unicode: E222
+  F045:
+    docomo:
+      type: pictogram
+      unicode: E6E9
+    softbank:
+      type: pictogram
+      unicode: E223
+  F046:
+    docomo:
+      type: pictogram
+      unicode: E6EA
+    softbank:
+      type: pictogram
+      unicode: E224
+  F047:
+    docomo:
+      type: name
+      unicode: '[10]'
+    softbank:
+      type: name
+      unicode: '[10]'
+  F048:
+    docomo:
+      type: pictogram
+      unicode: E6E1
+    softbank:
+      type: name
+      unicode: '[Q]'
+  F049:
+    docomo:
+      type: name
+      unicode: <
+    softbank:
+      type: pictogram
+      unicode: E23B
+  F04A:
+    docomo:
+      type: name
+      unicode: '>'
+    softbank:
+      type: pictogram
+      unicode: E23A
+  F04B:
+    docomo:
+      type: name
+      unicode: <<
+    softbank:
+      type: pictogram
+      unicode: E23D
+  F04C:
+    docomo:
+      type: name
+      unicode: '>>'
+    softbank:
+      type: pictogram
+      unicode: E23C
+  F04D:
+    docomo:
+      type: name
+      unicode: ■
+    softbank:
+      type: pictogram
+      unicode: E21B
+  F04E:
+    docomo:
+      type: name
+      unicode: ■
+    softbank:
+      type: pictogram
+      unicode: E21A
+  F04F:
+    docomo:
+      type: name
+      unicode: '[i]'
+    softbank:
+      type: name
+      unicode: '[i]'
+  F050:
+    docomo:
+      type: name
+      unicode: ■
+    softbank:
+      type: pictogram
+      unicode: E21B
+  F051:
+    docomo:
+      type: name
+      unicode: ■
+    softbank:
+      type: pictogram
+      unicode: E21A
+  F052:
+    docomo:
+      type: name
+      unicode: ◆
+    softbank:
+      type: pictogram
+      unicode: E21B
+  F053:
+    docomo:
+      type: name
+      unicode: ◆
+    softbank:
+      type: pictogram
+      unicode: E21B
+  F054:
+    docomo:
+      type: name
+      unicode: ■
+    softbank:
+      type: pictogram
+      unicode: E21B
+  F055:
+    docomo:
+      type: name
+      unicode: ■
+    softbank:
+      type: pictogram
+      unicode: E21A
+  F056:
+    docomo:
+      type: pictogram
+      unicode: E69C
+    softbank:
+      type: pictogram
+      unicode: E219
+  F057:
+    docomo:
+      type: pictogram
+      unicode: E69C
+    softbank:
+      type: pictogram
+      unicode: E219
+  F058:
+    docomo:
+      type: name
+      unicode: ＋
+    softbank:
+      type: name
+      unicode: ＋
+  F059:
+    docomo:
+      type: name
+      unicode: －
+    softbank:
+      type: name
+      unicode: －
+  F05A:
+    docomo:
+      type: name
+      unicode: ＊
+    softbank:
+      type: name
+      unicode: ＊
+  F05B:
+    docomo:
+      type: name
+      unicode: ↑
+    softbank:
+      type: pictogram
+      unicode: E232
+  F05C:
+    docomo:
+      type: name
+      unicode: ↓
+    softbank:
+      type: pictogram
+      unicode: E233
+  F05D:
+    docomo:
+      type: pictogram
+      unicode: E738
+    softbank:
+      type: name
+      unicode: '[禁止]'
+  F05E:
+    docomo:
+      type: name
+      unicode: ▼
+    softbank:
+      type: name
+      unicode: ▼
+  F05F:
+    docomo:
+      type: name
+      unicode: ▲
+    softbank:
+      type: name
+      unicode: ▲
+  F060:
+    docomo:
+      type: name
+      unicode: ▼
+    softbank:
+      type: name
+      unicode: ▼
+  F061:
+    docomo:
+      type: name
+      unicode: ▲
+    softbank:
+      type: name
+      unicode: ▲
+  F062:
+    docomo:
+      type: name
+      unicode: ◆
+    softbank:
+      type: pictogram
+      unicode: E21B
+  F063:
+    docomo:
+      type: name
+      unicode: ◆
+    softbank:
+      type: pictogram
+      unicode: E21B
+  F064:
+    docomo:
+      type: name
+      unicode: ■
+    softbank:
+      type: pictogram
+      unicode: E21B
+  F065:
+    docomo:
+      type: name
+      unicode: ■
+    softbank:
+      type: pictogram
+      unicode: E21A
+  F066:
+    docomo:
+      type: pictogram
+      unicode: E69C
+    softbank:
+      type: pictogram
+      unicode: E219
+  F067:
+    docomo:
+      type: pictogram
+      unicode: E69C
+    softbank:
+      type: pictogram
+      unicode: E219
+  F068:
+    docomo:
+      type: pictogram
+      unicode: E697
+    softbank:
+      type: pictogram
+      unicode: E237
+  F069:
+    docomo:
+      type: pictogram
+      unicode: E696
+    softbank:
+      type: pictogram
+      unicode: E238
+  F06A:
+    docomo:
+      type: pictogram
+      unicode: E732
+    softbank:
+      type: pictogram
+      unicode: E537
+  F06B:
+    docomo:
+      type: name
+      unicode: ×
+    softbank:
+      type: pictogram
+      unicode: E333
+  F06C:
+    docomo:
+      type: name
+      unicode: ×
+    softbank:
+      type: pictogram
+      unicode: E333
+  F06D:
+    docomo:
+      type: name
+      unicode: ×
+    softbank:
+      type: pictogram
+      unicode: E333
+  F06E:
+    docomo:
+      type: name
+      unicode: →
+    softbank:
+      type: pictogram
+      unicode: E234
+  F06F:
+    docomo:
+      type: name
+      unicode: ←
+    softbank:
+      type: pictogram
+      unicode: E235
+  F070:
+    docomo:
+      type: name
+      unicode: ÷
+    softbank:
+      type: name
+      unicode: ÷
+  F071:
+    docomo:
+      type: pictogram
+      unicode: E678
+    softbank:
+      type: pictogram
+      unicode: E236
+  F072:
+    docomo:
+      type: pictogram
+      unicode: E6A5
+    softbank:
+      type: pictogram
+      unicode: E239
+  F073:
+    docomo:
+      type: name
+      unicode: '[チェックマーク]'
+    softbank:
+      type: name
+      unicode: '[チェックマーク]'
+  F074:
+    docomo:
+      type: pictogram
+      unicode: E731
+    softbank:
+      type: pictogram
+      unicode: E24E
+  F075:
+    docomo:
+      type: pictogram
+      unicode: E736
+    softbank:
+      type: pictogram
+      unicode: E24F
+  F076:
+    docomo:
+      type: name
+      unicode: ▲
+    softbank:
+      type: name
+      unicode: ▲
+  F077:
+    docomo:
+      type: name
+      unicode: ▼
+    softbank:
+      type: name
+      unicode: ▼
+  F078:
+    docomo:
+      type: name
+      unicode: └→
+    softbank:
+      type: name
+      unicode: └→
+  F079:
+    docomo:
+      type: pictogram
+      unicode: E6DA
+    softbank:
+      type: name
+      unicode: ←┘
+  F07A:
+    docomo:
+      type: name
+      unicode: '[チェックマーク]'
+    softbank:
+      type: name
+      unicode: '[チェックマーク]'
+  F07B:
+    docomo:
+      type: pictogram
+      unicode: E70A
+    softbank:
+      type: name
+      unicode: '[スクロール]'
+  F07C:
+    docomo:
+      type: name
+      unicode: φ
+    softbank:
+      type: name
+      unicode: φ
+  F07D:
+    docomo:
+      type: pictogram
+      unicode: E689
+    softbank:
+      type: pictogram
+      unicode: E301
+  F07E:
+    docomo:
+      type: name
+      unicode: '[フロッピー]'
+    softbank:
+      type: pictogram
+      unicode: E316
+  F080:
+    docomo:
+      type: name
+      unicode: '[カレンダー]'
+    softbank:
+      type: name
+      unicode: '[カレンダー]'
+  F081:
+    docomo:
+      type: pictogram
+      unicode: E689
+    softbank:
+      type: pictogram
+      unicode: E301
+  F082:
+    docomo:
+      type: pictogram
+      unicode: E683
+    softbank:
+      type: pictogram
+      unicode: E148
+  F083:
+    docomo:
+      type: pictogram
+      unicode: E683
+    softbank:
+      type: pictogram
+      unicode: E148
+  F084:
+    docomo:
+      type: pictogram
+      unicode: E683
+    softbank:
+      type: pictogram
+      unicode: E148
+  F085:
+    docomo:
+      type: pictogram
+      unicode: E683
+    softbank:
+      type: pictogram
+      unicode: E148
+  F086:
+    docomo:
+      type: pictogram
+      unicode: E689
+    softbank:
+      type: pictogram
+      unicode: E301
+  F087:
+    docomo:
+      type: name
+      unicode: '[カレンダー]'
+    softbank:
+      type: name
+      unicode: '[カレンダー]'
+  F088:
+    docomo:
+      type: pictogram
+      unicode: E683
+    softbank:
+      type: pictogram
+      unicode: E148
+  F089:
+    docomo:
+      type: pictogram
+      unicode: E683
+    softbank:
+      type: pictogram
+      unicode: E148
+  F08A:
+    docomo:
+      type: name
+      unicode: '[画びょう]'
+    softbank:
+      type: name
+      unicode: '[画びょう]'
+  F08B:
+    docomo:
+      type: pictogram
+      unicode: E683
+    softbank:
+      type: pictogram
+      unicode: E148
+  F08C:
+    docomo:
+      type: pictogram
+      unicode: E683
+    softbank:
+      type: pictogram
+      unicode: E148
+  F08D:
+    docomo:
+      type: name
+      unicode: '[定規]'
+    softbank:
+      type: name
+      unicode: '[定規]'
+  F08E:
+    docomo:
+      type: pictogram
+      unicode: E66B
+    softbank:
+      type: pictogram
+      unicode: E03A
+  F08F:
+    docomo:
+      type: name
+      unicode: '[地図]'
+    softbank:
+      type: name
+      unicode: '[地図]'
+  F090:
+    docomo:
+      type: name
+      unicode: '[USA]'
+    softbank:
+      type: pictogram
+      unicode: E50C
+  F091:
+    docomo:
+      type: name
+      unicode: '[グラフ]'
+    softbank:
+      type: pictogram
+      unicode: E14A
+  F092:
+    docomo:
+      type: name
+      unicode: '[グラフ]'
+    softbank:
+      type: pictogram
+      unicode: E14A
+  F093:
+    docomo:
+      type: name
+      unicode: '[グラフ]'
+    softbank:
+      type: name
+      unicode: '[グラフ]'
+  F094:
+    docomo:
+      type: name
+      unicode: '[EZ]'
+    softbank:
+      type: name
+      unicode: '[EZ]'
+  F095:
+    docomo:
+      type: pictogram
+      unicode: E6D7
+    softbank:
+      type: name
+      unicode: '[FREE]'
+  F096:
+    docomo:
+      type: pictogram
+      unicode: E715
+    softbank:
+      type: pictogram
+      unicode: E12F
+  F097:
+    docomo:
+      type: pictogram
+      unicode: E71F
+    softbank:
+      type: name
+      unicode: '[腕時計]'
+  F098:
+    docomo:
+      type: pictogram
+      unicode: E71C
+    softbank:
+      type: name
+      unicode: '[砂時計]'
+  F099:
+    docomo:
+      type: name
+      unicode: '[カード]'
+    softbank:
+      type: name
+      unicode: '[カード]'
+  F09A:
+    docomo:
+      type: pictogram
+      unicode: E6D6
+    softbank:
+      type: name
+      unicode: ￥
+  F09B:
+    docomo:
+      type: pictogram
+      unicode: E677
+    softbank:
+      type: pictogram
+      unicode: E03D
+  F09C:
+    docomo:
+      type: name
+      unicode: '[包丁]'
+    softbank:
+      type: name
+      unicode: '[包丁]'
+  F09D:
+    docomo:
+      type: name
+      unicode: '[ビデオ]'
+    softbank:
+      type: pictogram
+      unicode: E129
+  F09E:
+    docomo:
+      type: name
+      unicode: '[ネジ]'
+    softbank:
+      type: name
+      unicode: '[ネジ]'
+  F09F:
+    docomo:
+      type: name
+      unicode: '[フロッピー]'
+    softbank:
+      type: pictogram
+      unicode: E316
+  F0A0:
+    docomo:
+      type: pictogram
+      unicode: E6FB
+    softbank:
+      type: name
+      unicode: '[懐中電灯]'
+  F0A1:
+    docomo:
+      type: name
+      unicode: '[電池]'
+    softbank:
+      type: name
+      unicode: '[電池]'
+  F0A2:
+    docomo:
+      type: pictogram
+      unicode: E715
+    softbank:
+      type: pictogram
+      unicode: E12F
+  F0A3:
+    docomo:
+      type: name
+      unicode: '[PDC]'
+    softbank:
+      type: name
+      unicode: '[PDC]'
+  F0A4:
+    docomo:
+      type: pictogram
+      unicode: E718
+    softbank:
+      type: name
+      unicode: '[レンチ]'
+  F0A5:
+    docomo:
+      type: pictogram
+      unicode: E688
+    softbank:
+      type: pictogram
+      unicode: E00A
+  F0A6:
+    docomo:
+      type: name
+      unicode: '[コンセント]'
+    softbank:
+      type: name
+      unicode: '[コンセント]'
+  F0A7:
+    docomo:
+      type: name
+      unicode: '[リンク]'
+    softbank:
+      type: name
+      unicode: '[リンク]'
+  F0A8:
+    docomo:
+      type: name
+      unicode: '[新聞]'
+    softbank:
+      type: name
+      unicode: '[新聞]'
+  F0A9:
+    docomo:
+      type: name
+      unicode: '　'
+    softbank:
+      type: name
+      unicode: '　'
+  F0AA:
+    docomo:
+      type: name
+      unicode: ''
+    softbank:
+      type: name
+      unicode: ''
+  F0AB:
+    docomo:
+      type: name
+      unicode: ''
+    softbank:
+      type: name
+      unicode: ''
+  F0AC:
+    docomo:
+      type: name
+      unicode: '[フォルダ]'
+    softbank:
+      type: name
+      unicode: '[フォルダ]'
+  F0AD:
+    docomo:
+      type: name
+      unicode: '[フォルダ]'
+    softbank:
+      type: name
+      unicode: '[フォルダ]'
+  F0AE:
+    docomo:
+      type: pictogram
+      unicode: E6CF
+    softbank:
+      type: pictogram
+      unicode: E103
+  F0AF:
+    docomo:
+      type: name
+      unicode: '[送信BOX]'
+    softbank:
+      type: name
+      unicode: '[送信BOX]'
+  F0B0:
+    docomo:
+      type: name
+      unicode: '[受信BOX]'
+    softbank:
+      type: name
+      unicode: '[受信BOX]'
+  F0B1:
+    docomo:
+      type: pictogram
+      unicode: E6BA
+    softbank:
+      type: pictogram
+      unicode: E02D
+  F0B2:
+    docomo:
+      type: pictogram
+      unicode: E6EC
+    softbank:
+      type: pictogram
+      unicode: E022
+  F0B3:
+    docomo:
+      type: pictogram
+      unicode: E687
+    softbank:
+      type: pictogram
+      unicode: E009
+  F0B4:
+    docomo:
+      type: pictogram
+      unicode: E670
+    softbank:
+      type: pictogram
+      unicode: E045
+  F0B5:
+    docomo:
+      type: pictogram
+      unicode: E644
+    softbank:
+      type: name
+      unicode: '[霧]'
+  F0B6:
+    docomo:
+      type: pictogram
+      unicode: E654
+    softbank:
+      type: pictogram
+      unicode: E014
+  F0B7:
+    docomo:
+      type: pictogram
+      unicode: E658
+    softbank:
+      type: pictogram
+      unicode: E42A
+  F0B8:
+    docomo:
+      type: pictogram
+      unicode: E65A
+    softbank:
+      type: name
+      unicode: '[ポケベル]'
+  F0B9:
+    docomo:
+      type: pictogram
+      unicode: E67B
+    softbank:
+      type: pictogram
+      unicode: E502
+  F0BA:
+    docomo:
+      type: name
+      unicode: '[演劇]'
+    softbank:
+      type: pictogram
+      unicode: E503
+  F0BB:
+    docomo:
+      type: pictogram
+      unicode: E67D
+    softbank:
+      type: name
+      unicode: '[イベント]'
+  F0BC:
+    docomo:
+      type: pictogram
+      unicode: E684
+    softbank:
+      type: pictogram
+      unicode: E314
+  F0BD:
+    docomo:
+      type: pictogram
+      unicode: E686
+    softbank:
+      type: pictogram
+      unicode: E34B
+  F0BE:
+    docomo:
+      type: pictogram
+      unicode: E68E
+    softbank:
+      type: pictogram
+      unicode: E20E
+  F0BF:
+    docomo:
+      type: pictogram
+      unicode: E68F
+    softbank:
+      type: pictogram
+      unicode: E20D
+  F0C0:
+    docomo:
+      type: pictogram
+      unicode: E690
+    softbank:
+      type: pictogram
+      unicode: E20F
+  F0C1:
+    docomo:
+      type: pictogram
+      unicode: E691
+    softbank:
+      type: pictogram
+      unicode: E419
+  F0C2:
+    docomo:
+      type: pictogram
+      unicode: E692
+    softbank:
+      type: pictogram
+      unicode: E41B
+  F0C3:
+    docomo:
+      type: pictogram
+      unicode: E694
+    softbank:
+      type: pictogram
+      unicode: E011
+  F0C4:
+    docomo:
+      type: pictogram
+      unicode: E695
+    softbank:
+      type: pictogram
+      unicode: E012
+  F0C5:
+    docomo:
+      type: pictogram
+      unicode: E69C
+    softbank:
+      type: name
+      unicode: ●
+  F0C6:
+    docomo:
+      type: pictogram
+      unicode: E69D
+    softbank:
+      type: pictogram
+      unicode: E04C
+  F0C7:
+    docomo:
+      type: pictogram
+      unicode: E69E
+    softbank:
+      type: pictogram
+      unicode: E04C
+  F0C8:
+    docomo:
+      type: pictogram
+      unicode: E6DB
+    softbank:
+      type: name
+      unicode: '[CL]'
+  F0C9:
+    docomo:
+      type: pictogram
+      unicode: E6EB
+    softbank:
+      type: pictogram
+      unicode: E225
+  F0CA:
+    docomo:
+      type: pictogram
+      unicode: E70B
+    softbank:
+      type: pictogram
+      unicode: E24D
+  F0CB:
+    docomo:
+      type: pictogram
+      unicode: E6F4
+    softbank:
+      type: pictogram
+      unicode: E406
+  F0CC:
+    docomo:
+      type: pictogram
+      unicode: E6ED
+    softbank:
+      type: pictogram
+      unicode: E327
+  F0CD:
+    docomo:
+      type: pictogram
+      unicode: E705
+    softbank:
+      type: name
+      unicode: '[ドンッ]'
+  F0CE:
+    docomo:
+      type: pictogram
+      unicode: E706
+    softbank:
+      type: pictogram
+      unicode: E331
+  F0CF:
+    docomo:
+      type: name
+      unicode: '[ezplus]'
+    softbank:
+      type: name
+      unicode: '[ezplus]'
+  F0D0:
+    docomo:
+      type: name
+      unicode: '[地球]'
+    softbank:
+      type: name
+      unicode: '[地球]'
+  F0D1:
+    docomo:
+      type: pictogram
+      unicode: E74C
+    softbank:
+      type: pictogram
+      unicode: E340
+  F0D2:
+    docomo:
+      type: name
+      unicode: '[オープンウェブ]'
+    softbank:
+      type: name
+      unicode: '[オープンウェブ]'
+  F0D3:
+    docomo:
+      type: name
+      unicode: '[カギ]'
+    softbank:
+      type: pictogram
+      unicode: E144
+  F0D4:
+    docomo:
+      type: name
+      unicode: '[ABCD]'
+    softbank:
+      type: name
+      unicode: '[ABCD]'
+  F0D5:
+    docomo:
+      type: name
+      unicode: '[abcd]'
+    softbank:
+      type: name
+      unicode: '[abcd]'
+  F0D6:
+    docomo:
+      type: name
+      unicode: '[1234]'
+    softbank:
+      type: name
+      unicode: '[1234]'
+  F0D7:
+    docomo:
+      type: name
+      unicode: '[記号]'
+    softbank:
+      type: name
+      unicode: '[記号]'
+  F0D8:
+    docomo:
+      type: name
+      unicode: '[可]'
+    softbank:
+      type: name
+      unicode: '[可]'
+  F0D9:
+    docomo:
+      type: name
+      unicode: '[チェックマーク]'
+    softbank:
+      type: name
+      unicode: '[チェックマーク]'
+  F0DA:
+    docomo:
+      type: pictogram
+      unicode: E6AE
+    softbank:
+      type: name
+      unicode: '[ペン]'
+  F0DB:
+    docomo:
+      type: name
+      unicode: '[ラジオボタン]'
+    softbank:
+      type: name
+      unicode: '[ラジオボタン]'
+  F0DC:
+    docomo:
+      type: pictogram
+      unicode: E6DC
+    softbank:
+      type: pictogram
+      unicode: E114
+  F0DD:
+    docomo:
+      type: name
+      unicode: '[←BACK]'
+    softbank:
+      type: pictogram
+      unicode: E235
+  F0DE:
+    docomo:
+      type: name
+      unicode: '[ブックマーク]'
+    softbank:
+      type: name
+      unicode: '[ブックマーク]'
+  F0DF:
+    docomo:
+      type: pictogram
+      unicode: E6CE
+    softbank:
+      type: pictogram
+      unicode: E104
+  F0E0:
+    docomo:
+      type: pictogram
+      unicode: E663
+    softbank:
+      type: pictogram
+      unicode: E036
+  F0E1:
+    docomo:
+      type: pictogram
+      unicode: E665
+    softbank:
+      type: pictogram
+      unicode: E101
+  F0E2:
+    docomo:
+      type: pictogram
+      unicode: E689
+    softbank:
+      type: pictogram
+      unicode: E301
+  F0E3:
+    docomo:
+      type: pictogram
+      unicode: E6D9
+    softbank:
+      type: pictogram
+      unicode: E144
+  F0E4:
+    docomo:
+      type: pictogram
+      unicode: E735
+    softbank:
+      type: name
+      unicode: ↑↓
+  F0E5:
+    docomo:
+      type: pictogram
+      unicode: E6DD
+    softbank:
+      type: pictogram
+      unicode: E212
+  F0E6:
+    docomo:
+      type: pictogram
+      unicode: E70E
+    softbank:
+      type: pictogram
+      unicode: E006
+  F0E7:
+    docomo:
+      type: pictogram
+      unicode: E699
+    softbank:
+      type: pictogram
+      unicode: E007
+  F0E8:
+    docomo:
+      type: pictogram
+      unicode: E716
+    softbank:
+      type: pictogram
+      unicode: E00C
+  F0E9:
+    docomo:
+      type: name
+      unicode: '[ラジオ]'
+    softbank:
+      type: pictogram
+      unicode: E128
+  F0EA:
+    docomo:
+      type: name
+      unicode: '[バラ]'
+    softbank:
+      type: pictogram
+      unicode: E032
+  F0EB:
+    docomo:
+      type: name
+      unicode: '[教会]'
+    softbank:
+      type: pictogram
+      unicode: E037
+  F0EC:
+    docomo:
+      type: pictogram
+      unicode: E65C
+    softbank:
+      type: pictogram
+      unicode: E434
+  F0ED:
+    docomo:
+      type: pictogram
+      unicode: E740
+    softbank:
+      type: pictogram
+      unicode: E03B
+  F0EE:
+    docomo:
+      type: pictogram
+      unicode: E6F6
+    softbank:
+      type: pictogram
+      unicode: E03E
+  F0EF:
+    docomo:
+      type: name
+      unicode: '[天使]'
+    softbank:
+      type: pictogram
+      unicode: E04E
+  F0F0:
+    docomo:
+      type: name
+      unicode: '[トラ]'
+    softbank:
+      type: pictogram
+      unicode: E050
+  F0F1:
+    docomo:
+      type: name
+      unicode: '[クマ]'
+    softbank:
+      type: pictogram
+      unicode: E051
+  F0F2:
+    docomo:
+      type: name
+      unicode: '[ネズミ]'
+    softbank:
+      type: pictogram
+      unicode: E053
+  F0F3:
+    docomo:
+      type: pictogram
+      unicode: E729
+    softbank:
+      type: pictogram
+      unicode: E405
+  F0F4:
+    docomo:
+      type: pictogram
+      unicode: E726
+    softbank:
+      type: pictogram
+      unicode: E106
+  F0F5:
+    docomo:
+      type: pictogram
+      unicode: E757
+    softbank:
+      type: pictogram
+      unicode: E410
+  F0F6:
+    docomo:
+      type: pictogram
+      unicode: E723
+    softbank:
+      type: pictogram
+      unicode: E108
+  F0F7:
+    docomo:
+      type: name
+      unicode: '[タコ]'
+    softbank:
+      type: pictogram
+      unicode: E10A
+  F0F8:
+    docomo:
+      type: name
+      unicode: '[ロケット]'
+    softbank:
+      type: pictogram
+      unicode: E10D
+  F0F9:
+    docomo:
+      type: pictogram
+      unicode: E71A
+    softbank:
+      type: pictogram
+      unicode: E10E
+  F0FA:
+    docomo:
+      type: pictogram
+      unicode: E6F9
+    softbank:
+      type: pictogram
+      unicode: E111
+  F0FB:
+    docomo:
+      type: name
+      unicode: '[ハンマー]'
+    softbank:
+      type: pictogram
+      unicode: E116
+  F0FC:
+    docomo:
+      type: name
+      unicode: '[花火]'
+    softbank:
+      type: pictogram
+      unicode: E117
+softbank:
+  E001:
+    docomo:
+      type: pictogram
+      unicode: E6F0
+    kddi:
+      type: pictogram
+      unicode: EFD5
+  E002:
+    docomo:
+      type: pictogram
+      unicode: E6F0
+    kddi:
+      type: pictogram
+      unicode: EFD3
+  E003:
+    docomo:
+      type: pictogram
+      unicode: E6F9
+    kddi:
+      type: pictogram
+      unicode: EFC4
+  E004:
+    docomo:
+      type: pictogram
+      unicode: E6F0
+    kddi:
+      type: pictogram
+      unicode: EFD5
+  E005:
+    docomo:
+      type: pictogram
+      unicode: E6F0
+    kddi:
+      type: pictogram
+      unicode: EFD3
+  E006:
+    docomo:
+      type: pictogram
+      unicode: E70E
+    kddi:
+      type: pictogram
+      unicode: F0E6
+  E007:
+    docomo:
+      type: pictogram
+      unicode: E699
+    kddi:
+      type: pictogram
+      unicode: F0E7
+  E008:
+    docomo:
+      type: pictogram
+      unicode: E681
+    kddi:
+      type: pictogram
+      unicode: EFEE
+  E009:
+    docomo:
+      type: pictogram
+      unicode: E687
+    kddi:
+      type: pictogram
+      unicode: F0B3
+  E00A:
+    docomo:
+      type: pictogram
+      unicode: E688
+    kddi:
+      type: pictogram
+      unicode: F0A5
+  E00B:
+    docomo:
+      type: pictogram
+      unicode: E6D0
+    kddi:
+      type: pictogram
+      unicode: EFF9
+  E00C:
+    docomo:
+      type: pictogram
+      unicode: E716
+    kddi:
+      type: pictogram
+      unicode: F0E8
+  E00D:
+    docomo:
+      type: pictogram
+      unicode: E6FD
+    kddi:
+      type: pictogram
+      unicode: EFCC
+  E00E:
+    docomo:
+      type: pictogram
+      unicode: E727
+    kddi:
+      type: pictogram
+      unicode: EFD2
+  E00F:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EFCF
+  E010:
+    docomo:
+      type: pictogram
+      unicode: E693
+    kddi:
+      type: pictogram
+      unicode: ED88
+  E011:
+    docomo:
+      type: pictogram
+      unicode: E694
+    kddi:
+      type: pictogram
+      unicode: F0C3
+  E012:
+    docomo:
+      type: pictogram
+      unicode: E695
+    kddi:
+      type: pictogram
+      unicode: F0C4
+  E013:
+    docomo:
+      type: pictogram
+      unicode: E657
+    kddi:
+      type: pictogram
+      unicode: EC80
+  E014:
+    docomo:
+      type: pictogram
+      unicode: E654
+    kddi:
+      type: pictogram
+      unicode: F0B6
+  E015:
+    docomo:
+      type: pictogram
+      unicode: E655
+    kddi:
+      type: pictogram
+      unicode: EF90
+  E016:
+    docomo:
+      type: pictogram
+      unicode: E653
+    kddi:
+      type: pictogram
+      unicode: EF93
+  E017:
+    docomo:
+      type: pictogram
+      unicode: E712
+    kddi:
+      type: pictogram
+      unicode: ED45
+  E018:
+    docomo:
+      type: pictogram
+      unicode: E656
+    kddi:
+      type: pictogram
+      unicode: EF8F
+  E019:
+    docomo:
+      type: pictogram
+      unicode: E751
+    kddi:
+      type: pictogram
+      unicode: EF72
+  E01A:
+    docomo:
+      type: pictogram
+      unicode: E754
+    kddi:
+      type: pictogram
+      unicode: EFB1
+  E01B:
+    docomo:
+      type: pictogram
+      unicode: E65E
+    kddi:
+      type: pictogram
+      unicode: EF8A
+  E01C:
+    docomo:
+      type: pictogram
+      unicode: E6A3
+    kddi:
+      type: pictogram
+      unicode: EF8D
+  E01D:
+    docomo:
+      type: pictogram
+      unicode: E662
+    kddi:
+      type: pictogram
+      unicode: EF8C
+  E01E:
+    docomo:
+      type: pictogram
+      unicode: E65B
+    kddi:
+      type: pictogram
+      unicode: EF8E
+  E01F:
+    docomo:
+      type: pictogram
+      unicode: E65D
+    kddi:
+      type: pictogram
+      unicode: EF89
+  E020:
+    docomo:
+      type: name
+      unicode: '[?]'
+    kddi:
+      type: pictogram
+      unicode: EF5B
+  E021:
+    docomo:
+      type: pictogram
+      unicode: E702
+    kddi:
+      type: pictogram
+      unicode: EF5A
+  E022:
+    docomo:
+      type: pictogram
+      unicode: E6EC
+    kddi:
+      type: pictogram
+      unicode: F0B2
+  E023:
+    docomo:
+      type: pictogram
+      unicode: E6EE
+    kddi:
+      type: pictogram
+      unicode: EF4F
+  E024:
+    docomo:
+      type: pictogram
+      unicode: E6BA
+    kddi:
+      type: pictogram
+      unicode: F0B1
+  E025:
+    docomo:
+      type: pictogram
+      unicode: E6BA
+    kddi:
+      type: pictogram
+      unicode: F0B1
+  E026:
+    docomo:
+      type: pictogram
+      unicode: E6BA
+    kddi:
+      type: pictogram
+      unicode: F0B1
+  E027:
+    docomo:
+      type: pictogram
+      unicode: E6BA
+    kddi:
+      type: pictogram
+      unicode: F0B1
+  E028:
+    docomo:
+      type: pictogram
+      unicode: E6BA
+    kddi:
+      type: pictogram
+      unicode: F0B1
+  E029:
+    docomo:
+      type: pictogram
+      unicode: E6BA
+    kddi:
+      type: pictogram
+      unicode: F0B1
+  E02A:
+    docomo:
+      type: pictogram
+      unicode: E6BA
+    kddi:
+      type: pictogram
+      unicode: F0B1
+  E02B:
+    docomo:
+      type: pictogram
+      unicode: E6BA
+    kddi:
+      type: pictogram
+      unicode: F0B1
+  E02C:
+    docomo:
+      type: pictogram
+      unicode: E6BA
+    kddi:
+      type: pictogram
+      unicode: F0B1
+  E02D:
+    docomo:
+      type: pictogram
+      unicode: E6BA
+    kddi:
+      type: pictogram
+      unicode: F0B1
+  E02E:
+    docomo:
+      type: pictogram
+      unicode: E6BA
+    kddi:
+      type: pictogram
+      unicode: F0B1
+  E02F:
+    docomo:
+      type: pictogram
+      unicode: E6BA
+    kddi:
+      type: pictogram
+      unicode: F0B1
+  E030:
+    docomo:
+      type: pictogram
+      unicode: E748
+    kddi:
+      type: pictogram
+      unicode: EFA3
+  E031:
+    docomo:
+      type: pictogram
+      unicode: E71A
+    kddi:
+      type: pictogram
+      unicode: F0F9
+  E032:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: F0EA
+  E033:
+    docomo:
+      type: pictogram
+      unicode: E6A4
+    kddi:
+      type: pictogram
+      unicode: EFA2
+  E034:
+    docomo:
+      type: pictogram
+      unicode: E71B
+    kddi:
+      type: pictogram
+      unicode: EFED
+  E035:
+    docomo:
+      type: pictogram
+      unicode: E71B
+    kddi:
+      type: pictogram
+      unicode: EFED
+  E036:
+    docomo:
+      type: pictogram
+      unicode: E663
+    kddi:
+      type: pictogram
+      unicode: EF84
+  E037:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: F0EB
+  E038:
+    docomo:
+      type: pictogram
+      unicode: E664
+    kddi:
+      type: pictogram
+      unicode: EF86
+  E039:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: ED71
+  E03A:
+    docomo:
+      type: pictogram
+      unicode: E66B
+    kddi:
+      type: pictogram
+      unicode: F08E
+  E03B:
+    docomo:
+      type: pictogram
+      unicode: E740
+    kddi:
+      type: pictogram
+      unicode: F0ED
+  E03C:
+    docomo:
+      type: pictogram
+      unicode: E676
+    kddi:
+      type: pictogram
+      unicode: EFDC
+  E03D:
+    docomo:
+      type: pictogram
+      unicode: E677
+    kddi:
+      type: pictogram
+      unicode: EFF0
+  E03E:
+    docomo:
+      type: pictogram
+      unicode: E6F6
+    kddi:
+      type: pictogram
+      unicode: F0EE
+  E03F:
+    docomo:
+      type: pictogram
+      unicode: E6D9
+    kddi:
+      type: pictogram
+      unicode: EFF2
+  E040:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: name
+      unicode: 〓
+  E041:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EFDF
+  E042:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: ECB0
+  E043:
+    docomo:
+      type: pictogram
+      unicode: E66F
+    kddi:
+      type: pictogram
+      unicode: EF85
+  E044:
+    docomo:
+      type: pictogram
+      unicode: E671
+    kddi:
+      type: pictogram
+      unicode: EF9B
+  E045:
+    docomo:
+      type: pictogram
+      unicode: E670
+    kddi:
+      type: pictogram
+      unicode: F0B4
+  E046:
+    docomo:
+      type: pictogram
+      unicode: E74A
+    kddi:
+      type: pictogram
+      unicode: EFA9
+  E047:
+    docomo:
+      type: pictogram
+      unicode: E672
+    kddi:
+      type: pictogram
+      unicode: EF9C
+  E048:
+    docomo:
+      type: pictogram
+      unicode: E641
+    kddi:
+      type: pictogram
+      unicode: EF5D
+  E049:
+    docomo:
+      type: pictogram
+      unicode: E63F
+    kddi:
+      type: pictogram
+      unicode: EF65
+  E04A:
+    docomo:
+      type: pictogram
+      unicode: E63E
+    kddi:
+      type: pictogram
+      unicode: EF60
+  E04B:
+    docomo:
+      type: pictogram
+      unicode: E640
+    kddi:
+      type: pictogram
+      unicode: EF64
+  E04C:
+    docomo:
+      type: pictogram
+      unicode: E69F
+    kddi:
+      type: pictogram
+      unicode: EF5E
+  E04D:
+    docomo:
+      type: pictogram
+      unicode: E63E
+    kddi:
+      type: pictogram
+      unicode: ECC8
+  E04E:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: F0EF
+  E04F:
+    docomo:
+      type: pictogram
+      unicode: E6A2
+    kddi:
+      type: pictogram
+      unicode: EFB4
+  E050:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: F0F0
+  E051:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: F0F1
+  E052:
+    docomo:
+      type: pictogram
+      unicode: E6A1
+    kddi:
+      type: pictogram
+      unicode: EFBA
+  E053:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: F0F2
+  E054:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EF48
+  E055:
+    docomo:
+      type: pictogram
+      unicode: E750
+    kddi:
+      type: pictogram
+      unicode: EFB5
+  E056:
+    docomo:
+      type: pictogram
+      unicode: E6F0
+    kddi:
+      type: pictogram
+      unicode: ECA1
+  E057:
+    docomo:
+      type: pictogram
+      unicode: E6F0
+    kddi:
+      type: pictogram
+      unicode: EF49
+  E058:
+    docomo:
+      type: pictogram
+      unicode: E6F2
+    kddi:
+      type: pictogram
+      unicode: EC97
+  E059:
+    docomo:
+      type: pictogram
+      unicode: E6F1
+    kddi:
+      type: pictogram
+      unicode: EF4A
+  E05A:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EFCE
+  E101:
+    docomo:
+      type: pictogram
+      unicode: E665
+    kddi:
+      type: pictogram
+      unicode: EFF4
+  E102:
+    docomo:
+      type: pictogram
+      unicode: E665
+    kddi:
+      type: pictogram
+      unicode: EFF4
+  E103:
+    docomo:
+      type: pictogram
+      unicode: E6CF
+    kddi:
+      type: pictogram
+      unicode: ED66
+  E104:
+    docomo:
+      type: pictogram
+      unicode: E6CE
+    kddi:
+      type: pictogram
+      unicode: F0DF
+  E105:
+    docomo:
+      type: pictogram
+      unicode: E728
+    kddi:
+      type: pictogram
+      unicode: EFC0
+  E106:
+    docomo:
+      type: pictogram
+      unicode: E726
+    kddi:
+      type: pictogram
+      unicode: F0F4
+  E107:
+    docomo:
+      type: pictogram
+      unicode: E757
+    kddi:
+      type: pictogram
+      unicode: F0F5
+  E108:
+    docomo:
+      type: pictogram
+      unicode: E723
+    kddi:
+      type: pictogram
+      unicode: F0F6
+  E109:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EFB2
+  E10A:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: F0F7
+  E10B:
+    docomo:
+      type: pictogram
+      unicode: E755
+    kddi:
+      type: pictogram
+      unicode: EFB7
+  E10C:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EFC5
+  E10D:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: F0F8
+  E10E:
+    docomo:
+      type: pictogram
+      unicode: E71A
+    kddi:
+      type: pictogram
+      unicode: F0F9
+  E10F:
+    docomo:
+      type: pictogram
+      unicode: E6FB
+    kddi:
+      type: pictogram
+      unicode: EF4E
+  E110:
+    docomo:
+      type: pictogram
+      unicode: E741
+    kddi:
+      type: pictogram
+      unicode: EFEC
+  E111:
+    docomo:
+      type: pictogram
+      unicode: E6F9
+    kddi:
+      type: pictogram
+      unicode: F0FA
+  E112:
+    docomo:
+      type: pictogram
+      unicode: E685
+    kddi:
+      type: pictogram
+      unicode: EFA8
+  E113:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EFE3
+  E114:
+    docomo:
+      type: pictogram
+      unicode: E6DC
+    kddi:
+      type: pictogram
+      unicode: EFF1
+  E115:
+    docomo:
+      type: pictogram
+      unicode: E733
+    kddi:
+      type: pictogram
+      unicode: EF43
+  E116:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: F0FB
+  E117:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: F0FC
+  E118:
+    docomo:
+      type: pictogram
+      unicode: E747
+    kddi:
+      type: pictogram
+      unicode: EFA7
+  E119:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EC40
+  E11A:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EFC8
+  E11B:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EFA4
+  E11C:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EFD1
+  E11D:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EF53
+  E11E:
+    docomo:
+      type: pictogram
+      unicode: E682
+    kddi:
+      type: pictogram
+      unicode: EC41
+  E11F:
+    docomo:
+      type: pictogram
+      unicode: E6B2
+    kddi:
+      type: name
+      unicode: 〓
+  E120:
+    docomo:
+      type: pictogram
+      unicode: E673
+    kddi:
+      type: pictogram
+      unicode: EFAF
+  E121:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EC42
+  E122:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EC43
+  E123:
+    docomo:
+      type: pictogram
+      unicode: E6F7
+    kddi:
+      type: pictogram
+      unicode: EF95
+  E124:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EF45
+  E125:
+    docomo:
+      type: pictogram
+      unicode: E67E
+    kddi:
+      type: pictogram
+      unicode: EF76
+  E126:
+    docomo:
+      type: pictogram
+      unicode: E68C
+    kddi:
+      type: pictogram
+      unicode: EFE5
+  E127:
+    docomo:
+      type: pictogram
+      unicode: E68C
+    kddi:
+      type: pictogram
+      unicode: EFE5
+  E128:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: F0E9
+  E129:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: F09D
+  E12A:
+    docomo:
+      type: pictogram
+      unicode: E68A
+    kddi:
+      type: pictogram
+      unicode: EFDB
+  E12B:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EFC5
+  E12C:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: name
+      unicode: 〓
+  E12D:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EC44
+  E12E:
+    docomo:
+      type: name
+      unicode: '[VS]'
+    kddi:
+      type: pictogram
+      unicode: EC45
+  E12F:
+    docomo:
+      type: pictogram
+      unicode: E715
+    kddi:
+      type: pictogram
+      unicode: EFA0
+  E130:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EF9E
+  E131:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EC46
+  E132:
+    docomo:
+      type: pictogram
+      unicode: E659
+    kddi:
+      type: pictogram
+      unicode: EF92
+  E133:
+    docomo:
+      type: name
+      unicode: '[777]'
+    kddi:
+      type: pictogram
+      unicode: EF46
+  E134:
+    docomo:
+      type: pictogram
+      unicode: E754
+    kddi:
+      type: pictogram
+      unicode: EFB1
+  E135:
+    docomo:
+      type: pictogram
+      unicode: E6A3
+    kddi:
+      type: pictogram
+      unicode: EF8D
+  E136:
+    docomo:
+      type: pictogram
+      unicode: E71D
+    kddi:
+      type: pictogram
+      unicode: EF87
+  E137:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EC4A
+  E138:
+    docomo:
+      type: name
+      unicode: '[♂]'
+    kddi:
+      type: name
+      unicode: '[♂]'
+  E139:
+    docomo:
+      type: name
+      unicode: '[♀]'
+    kddi:
+      type: name
+      unicode: '[♀]'
+  E13A:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: ECD9
+  E13B:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EFE9
+  E13C:
+    docomo:
+      type: pictogram
+      unicode: E701
+    kddi:
+      type: pictogram
+      unicode: EF4D
+  E13D:
+    docomo:
+      type: pictogram
+      unicode: E642
+    kddi:
+      type: pictogram
+      unicode: EF5F
+  E13E:
+    docomo:
+      type: pictogram
+      unicode: E674
+    kddi:
+      type: pictogram
+      unicode: EFF3
+  E13F:
+    docomo:
+      type: pictogram
+      unicode: E6F7
+    kddi:
+      type: pictogram
+      unicode: EC4B
+  E140:
+    docomo:
+      type: pictogram
+      unicode: E66E
+    kddi:
+      type: pictogram
+      unicode: EF7D
+  E141:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EFEA
+  E142:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EFEA
+  E143:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EC4C
+  E144:
+    docomo:
+      type: pictogram
+      unicode: E6D9
+    kddi:
+      type: pictogram
+      unicode: EFF5
+  E145:
+    docomo:
+      type: pictogram
+      unicode: E6D9
+    kddi:
+      type: pictogram
+      unicode: EFF5
+  E146:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EC4D
+  E147:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EFAA
+  E148:
+    docomo:
+      type: pictogram
+      unicode: E683
+    kddi:
+      type: pictogram
+      unicode: EF77
+  E149:
+    docomo:
+      type: name
+      unicode: '[$\]'
+    kddi:
+      type: name
+      unicode: '[$\]'
+  E14A:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EC4F
+  E14B:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EF81
+  E14C:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EFC2
+  E14D:
+    docomo:
+      type: pictogram
+      unicode: E667
+    kddi:
+      type: pictogram
+      unicode: EF83
+  E14E:
+    docomo:
+      type: pictogram
+      unicode: E66D
+    kddi:
+      type: pictogram
+      unicode: EF42
+  E14F:
+    docomo:
+      type: pictogram
+      unicode: E66C
+    kddi:
+      type: pictogram
+      unicode: EF7E
+  E150:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EF80
+  E151:
+    docomo:
+      type: pictogram
+      unicode: E66E
+    kddi:
+      type: pictogram
+      unicode: EF7D
+  E152:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EC50
+  E153:
+    docomo:
+      type: pictogram
+      unicode: E665
+    kddi:
+      type: pictogram
+      unicode: EC51
+  E154:
+    docomo:
+      type: pictogram
+      unicode: E668
+    kddi:
+      type: pictogram
+      unicode: EF7B
+  E155:
+    docomo:
+      type: pictogram
+      unicode: E666
+    kddi:
+      type: pictogram
+      unicode: EC52
+  E156:
+    docomo:
+      type: pictogram
+      unicode: E66A
+    kddi:
+      type: pictogram
+      unicode: EF7C
+  E157:
+    docomo:
+      type: pictogram
+      unicode: E73E
+    kddi:
+      type: pictogram
+      unicode: EC53
+  E158:
+    docomo:
+      type: pictogram
+      unicode: E669
+    kddi:
+      type: pictogram
+      unicode: EC54
+  E159:
+    docomo:
+      type: pictogram
+      unicode: E660
+    kddi:
+      type: pictogram
+      unicode: EF88
+  E15A:
+    docomo:
+      type: pictogram
+      unicode: E65E
+    kddi:
+      type: pictogram
+      unicode: EF8A
+  E201:
+    docomo:
+      type: pictogram
+      unicode: E733
+    kddi:
+      type: pictogram
+      unicode: ED76
+  E202:
+    docomo:
+      type: pictogram
+      unicode: E661
+    kddi:
+      type: pictogram
+      unicode: EC55
+  E203:
+    docomo:
+      type: name
+      unicode: '[ココ]'
+    kddi:
+      type: name
+      unicode: '[ココ]'
+  E204:
+    docomo:
+      type: pictogram
+      unicode: E6F8
+    kddi:
+      type: pictogram
+      unicode: F0B2
+  E205:
+    docomo:
+      type: pictogram
+      unicode: E6F8
+    kddi:
+      type: pictogram
+      unicode: EF51
+  E206:
+    docomo:
+      type: pictogram
+      unicode: E6F8
+    kddi:
+      type: pictogram
+      unicode: F05A
+  E207:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EC56
+  E208:
+    docomo:
+      type: pictogram
+      unicode: E680
+    kddi:
+      type: pictogram
+      unicode: EF56
+  E209:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EF58
+  E20A:
+    docomo:
+      type: pictogram
+      unicode: E69B
+    kddi:
+      type: pictogram
+      unicode: EF57
+  E20B:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EC57
+  E20C:
+    docomo:
+      type: pictogram
+      unicode: E68D
+    kddi:
+      type: pictogram
+      unicode: EC78
+  E20D:
+    docomo:
+      type: pictogram
+      unicode: E68F
+    kddi:
+      type: pictogram
+      unicode: F0BF
+  E20E:
+    docomo:
+      type: pictogram
+      unicode: E68E
+    kddi:
+      type: pictogram
+      unicode: F0BE
+  E20F:
+    docomo:
+      type: pictogram
+      unicode: E690
+    kddi:
+      type: pictogram
+      unicode: F0C0
+  E210:
+    docomo:
+      type: pictogram
+      unicode: E6E0
+    kddi:
+      type: pictogram
+      unicode: ED89
+  E211:
+    docomo:
+      type: pictogram
+      unicode: E6DF
+    kddi:
+      type: name
+      unicode: 〓
+  E212:
+    docomo:
+      type: pictogram
+      unicode: E6DD
+    kddi:
+      type: pictogram
+      unicode: F0E5
+  E213:
+    docomo:
+      type: name
+      unicode: '[UP]'
+    kddi:
+      type: pictogram
+      unicode: EFE8
+  E214:
+    docomo:
+      type: name
+      unicode: '[COOL]'
+    kddi:
+      type: pictogram
+      unicode: EC58
+  E215:
+    docomo:
+      type: name
+      unicode: '[有]'
+    kddi:
+      type: name
+      unicode: '[有]'
+  E216:
+    docomo:
+      type: name
+      unicode: '[無]'
+    kddi:
+      type: name
+      unicode: '[無]'
+  E217:
+    docomo:
+      type: name
+      unicode: '[月]'
+    kddi:
+      type: name
+      unicode: '[月]'
+  E218:
+    docomo:
+      type: name
+      unicode: '[申]'
+    kddi:
+      type: name
+      unicode: '[申]'
+  E219:
+    docomo:
+      type: pictogram
+      unicode: E69C
+    kddi:
+      type: pictogram
+      unicode: F066
+  E21A:
+    docomo:
+      type: pictogram
+      unicode: E69C
+    kddi:
+      type: pictogram
+      unicode: F067
+  E21B:
+    docomo:
+      type: pictogram
+      unicode: E69C
+    kddi:
+      type: pictogram
+      unicode: F067
+  E21C:
+    docomo:
+      type: pictogram
+      unicode: E6E2
+    kddi:
+      type: pictogram
+      unicode: EFFB
+  E21D:
+    docomo:
+      type: pictogram
+      unicode: E6E3
+    kddi:
+      type: pictogram
+      unicode: EFFC
+  E21E:
+    docomo:
+      type: pictogram
+      unicode: E6E4
+    kddi:
+      type: pictogram
+      unicode: F040
+  E21F:
+    docomo:
+      type: pictogram
+      unicode: E6E5
+    kddi:
+      type: pictogram
+      unicode: F041
+  E220:
+    docomo:
+      type: pictogram
+      unicode: E6E6
+    kddi:
+      type: pictogram
+      unicode: F042
+  E221:
+    docomo:
+      type: pictogram
+      unicode: E6E7
+    kddi:
+      type: pictogram
+      unicode: F043
+  E222:
+    docomo:
+      type: pictogram
+      unicode: E6E8
+    kddi:
+      type: pictogram
+      unicode: F044
+  E223:
+    docomo:
+      type: pictogram
+      unicode: E6E9
+    kddi:
+      type: pictogram
+      unicode: F045
+  E224:
+    docomo:
+      type: pictogram
+      unicode: E6EA
+    kddi:
+      type: pictogram
+      unicode: F046
+  E225:
+    docomo:
+      type: pictogram
+      unicode: E6EB
+    kddi:
+      type: pictogram
+      unicode: F0C9
+  E226:
+    docomo:
+      type: name
+      unicode: '[得]'
+    kddi:
+      type: pictogram
+      unicode: EFD0
+  E227:
+    docomo:
+      type: name
+      unicode: '[割]'
+    kddi:
+      type: pictogram
+      unicode: EC59
+  E228:
+    docomo:
+      type: name
+      unicode: '[サ]'
+    kddi:
+      type: pictogram
+      unicode: EC5A
+  E229:
+    docomo:
+      type: pictogram
+      unicode: E6D8
+    kddi:
+      type: pictogram
+      unicode: EC5B
+  E22A:
+    docomo:
+      type: pictogram
+      unicode: E73B
+    kddi:
+      type: pictogram
+      unicode: EC5C
+  E22B:
+    docomo:
+      type: pictogram
+      unicode: E739
+    kddi:
+      type: pictogram
+      unicode: EC5D
+  E22C:
+    docomo:
+      type: name
+      unicode: '[指]'
+    kddi:
+      type: pictogram
+      unicode: EC5E
+  E22D:
+    docomo:
+      type: name
+      unicode: '[営]'
+    kddi:
+      type: pictogram
+      unicode: EC5F
+  E22E:
+    docomo:
+      type: name
+      unicode: '[↑]'
+    kddi:
+      type: pictogram
+      unicode: EC60
+  E22F:
+    docomo:
+      type: name
+      unicode: '[↓]'
+    kddi:
+      type: pictogram
+      unicode: EC61
+  E230:
+    docomo:
+      type: name
+      unicode: '[←]'
+    kddi:
+      type: pictogram
+      unicode: EFD8
+  E231:
+    docomo:
+      type: name
+      unicode: '[→]'
+    kddi:
+      type: pictogram
+      unicode: EFD9
+  E232:
+    docomo:
+      type: name
+      unicode: '[↑]'
+    kddi:
+      type: pictogram
+      unicode: F05B
+  E233:
+    docomo:
+      type: name
+      unicode: '[↓]'
+    kddi:
+      type: pictogram
+      unicode: F05C
+  E234:
+    docomo:
+      type: name
+      unicode: '[→]'
+    kddi:
+      type: pictogram
+      unicode: F06E
+  E235:
+    docomo:
+      type: name
+      unicode: '[←]'
+    kddi:
+      type: pictogram
+      unicode: F06F
+  E236:
+    docomo:
+      type: pictogram
+      unicode: E678
+    kddi:
+      type: pictogram
+      unicode: F071
+  E237:
+    docomo:
+      type: pictogram
+      unicode: E697
+    kddi:
+      type: pictogram
+      unicode: F068
+  E238:
+    docomo:
+      type: pictogram
+      unicode: E696
+    kddi:
+      type: pictogram
+      unicode: F069
+  E239:
+    docomo:
+      type: pictogram
+      unicode: E6A5
+    kddi:
+      type: pictogram
+      unicode: F072
+  E23A:
+    docomo:
+      type: name
+      unicode: '[>]'
+    kddi:
+      type: pictogram
+      unicode: F04A
+  E23B:
+    docomo:
+      type: name
+      unicode: '[<]'
+    kddi:
+      type: pictogram
+      unicode: F049
+  E23C:
+    docomo:
+      type: name
+      unicode: '[>>]'
+    kddi:
+      type: pictogram
+      unicode: F04C
+  E23D:
+    docomo:
+      type: name
+      unicode: '[<<]'
+    kddi:
+      type: pictogram
+      unicode: F04B
+  E23E:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EC62
+  E23F:
+    docomo:
+      type: pictogram
+      unicode: E646
+    kddi:
+      type: pictogram
+      unicode: EF67
+  E240:
+    docomo:
+      type: pictogram
+      unicode: E647
+    kddi:
+      type: pictogram
+      unicode: EF68
+  E241:
+    docomo:
+      type: pictogram
+      unicode: E648
+    kddi:
+      type: pictogram
+      unicode: EF69
+  E242:
+    docomo:
+      type: pictogram
+      unicode: E649
+    kddi:
+      type: pictogram
+      unicode: EF6A
+  E243:
+    docomo:
+      type: pictogram
+      unicode: E64A
+    kddi:
+      type: pictogram
+      unicode: EF6B
+  E244:
+    docomo:
+      type: pictogram
+      unicode: E64B
+    kddi:
+      type: pictogram
+      unicode: EF6C
+  E245:
+    docomo:
+      type: pictogram
+      unicode: E64C
+    kddi:
+      type: pictogram
+      unicode: EF6D
+  E246:
+    docomo:
+      type: pictogram
+      unicode: E64D
+    kddi:
+      type: pictogram
+      unicode: EF6E
+  E247:
+    docomo:
+      type: pictogram
+      unicode: E64E
+    kddi:
+      type: pictogram
+      unicode: EF6F
+  E248:
+    docomo:
+      type: pictogram
+      unicode: E64F
+    kddi:
+      type: pictogram
+      unicode: EF70
+  E249:
+    docomo:
+      type: pictogram
+      unicode: E650
+    kddi:
+      type: pictogram
+      unicode: EF71
+  E24A:
+    docomo:
+      type: pictogram
+      unicode: E651
+    kddi:
+      type: pictogram
+      unicode: EF72
+  E24B:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EF73
+  E24C:
+    docomo:
+      type: name
+      unicode: '[TOP]'
+    kddi:
+      type: name
+      unicode: '[TOP]'
+  E24D:
+    docomo:
+      type: pictogram
+      unicode: E70B
+    kddi:
+      type: pictogram
+      unicode: F0CA
+  E24E:
+    docomo:
+      type: pictogram
+      unicode: E731
+    kddi:
+      type: pictogram
+      unicode: F074
+  E24F:
+    docomo:
+      type: pictogram
+      unicode: E736
+    kddi:
+      type: pictogram
+      unicode: F075
+  E250:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EC63
+  E251:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EC64
+  E252:
+    docomo:
+      type: pictogram
+      unicode: E737
+    kddi:
+      type: pictogram
+      unicode: EF59
+  E253:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: name
+      unicode: 〓
+  E254:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: name
+      unicode: 〓
+  E255:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: name
+      unicode: 〓
+  E256:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: name
+      unicode: 〓
+  E257:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: name
+      unicode: 〓
+  E258:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: name
+      unicode: 〓
+  E259:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: name
+      unicode: 〓
+  E25A:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: name
+      unicode: 〓
+  E301:
+    docomo:
+      type: pictogram
+      unicode: E689
+    kddi:
+      type: pictogram
+      unicode: EC65
+  E302:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EC66
+  E303:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EC67
+  E304:
+    docomo:
+      type: pictogram
+      unicode: E743
+    kddi:
+      type: pictogram
+      unicode: EFBD
+  E305:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EFBC
+  E306:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EC68
+  E307:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EFBB
+  E308:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EC69
+  E309:
+    docomo:
+      type: name
+      unicode: '[WC]'
+    kddi:
+      type: name
+      unicode: '[WC]'
+  E30A:
+    docomo:
+      type: pictogram
+      unicode: E67A
+    kddi:
+      type: pictogram
+      unicode: EFE1
+  E30B:
+    docomo:
+      type: pictogram
+      unicode: E74B
+    kddi:
+      type: pictogram
+      unicode: EC6A
+  E30C:
+    docomo:
+      type: pictogram
+      unicode: E672
+    kddi:
+      type: pictogram
+      unicode: EC6B
+  E30D:
+    docomo:
+      type: name
+      unicode: '[祝]'
+    kddi:
+      type: pictogram
+      unicode: EC6C
+  E30E:
+    docomo:
+      type: pictogram
+      unicode: E67F
+    kddi:
+      type: pictogram
+      unicode: EF55
+  E30F:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EC6D
+  E310:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EC6E
+  E311:
+    docomo:
+      type: pictogram
+      unicode: E6FE
+    kddi:
+      type: pictogram
+      unicode: EF52
+  E312:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EC6F
+  E313:
+    docomo:
+      type: pictogram
+      unicode: E675
+    kddi:
+      type: pictogram
+      unicode: EFEF
+  E314:
+    docomo:
+      type: pictogram
+      unicode: E684
+    kddi:
+      type: pictogram
+      unicode: F0BC
+  E315:
+    docomo:
+      type: pictogram
+      unicode: E734
+    kddi:
+      type: pictogram
+      unicode: EFCA
+  E316:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: F09F
+  E317:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EFEA
+  E318:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EC71
+  E319:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: ED6F
+  E31A:
+    docomo:
+      type: pictogram
+      unicode: E674
+    kddi:
+      type: pictogram
+      unicode: EFF3
+  E31B:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EC72
+  E31C:
+    docomo:
+      type: pictogram
+      unicode: E710
+    kddi:
+      type: pictogram
+      unicode: EFE2
+  E31D:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EC73
+  E31E:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EFE4
+  E31F:
+    docomo:
+      type: pictogram
+      unicode: E675
+    kddi:
+      type: pictogram
+      unicode: EC74
+  E320:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EC75
+  E321:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EC76
+  E322:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EC77
+  E323:
+    docomo:
+      type: pictogram
+      unicode: E682
+    kddi:
+      type: pictogram
+      unicode: EF74
+  E324:
+    docomo:
+      type: pictogram
+      unicode: E6AC
+    kddi:
+      type: pictogram
+      unicode: EF97
+  E325:
+    docomo:
+      type: pictogram
+      unicode: E713
+    kddi:
+      type: pictogram
+      unicode: EFEB
+  E326:
+    docomo:
+      type: pictogram
+      unicode: E6FF
+    kddi:
+      type: pictogram
+      unicode: EFDE
+  E327:
+    docomo:
+      type: pictogram
+      unicode: E6EC
+    kddi:
+      type: pictogram
+      unicode: EC79
+  E328:
+    docomo:
+      type: pictogram
+      unicode: E6ED
+    kddi:
+      type: pictogram
+      unicode: ED79
+  E329:
+    docomo:
+      type: pictogram
+      unicode: E6EC
+    kddi:
+      type: pictogram
+      unicode: EFC3
+  E32A:
+    docomo:
+      type: pictogram
+      unicode: E6EC
+    kddi:
+      type: pictogram
+      unicode: EC7A
+  E32B:
+    docomo:
+      type: pictogram
+      unicode: E6EC
+    kddi:
+      type: pictogram
+      unicode: EC7B
+  E32C:
+    docomo:
+      type: pictogram
+      unicode: E6EC
+    kddi:
+      type: pictogram
+      unicode: EC7C
+  E32D:
+    docomo:
+      type: pictogram
+      unicode: E6EC
+    kddi:
+      type: pictogram
+      unicode: EC7D
+  E32E:
+    docomo:
+      type: pictogram
+      unicode: E6FA
+    kddi:
+      type: pictogram
+      unicode: EC7E
+  E32F:
+    docomo:
+      type: name
+      unicode: '[☆]'
+    kddi:
+      type: pictogram
+      unicode: EF63
+  E330:
+    docomo:
+      type: pictogram
+      unicode: E708
+    kddi:
+      type: pictogram
+      unicode: EFCD
+  E331:
+    docomo:
+      type: pictogram
+      unicode: E706
+    kddi:
+      type: pictogram
+      unicode: F0CE
+  E332:
+    docomo:
+      type: pictogram
+      unicode: E6A0
+    kddi:
+      type: pictogram
+      unicode: EC81
+  E333:
+    docomo:
+      type: name
+      unicode: '[×]'
+    kddi:
+      type: pictogram
+      unicode: F06C
+  E334:
+    docomo:
+      type: pictogram
+      unicode: E6FC
+    kddi:
+      type: pictogram
+      unicode: EFBE
+  E335:
+    docomo:
+      type: name
+      unicode: '[☆]'
+    kddi:
+      type: pictogram
+      unicode: EF63
+  E336:
+    docomo:
+      type: name
+      unicode: '[?]'
+    kddi:
+      type: pictogram
+      unicode: EF5B
+  E337:
+    docomo:
+      type: pictogram
+      unicode: E702
+    kddi:
+      type: pictogram
+      unicode: EF5A
+  E338:
+    docomo:
+      type: pictogram
+      unicode: E71E
+    kddi:
+      type: pictogram
+      unicode: EC82
+  E339:
+    docomo:
+      type: pictogram
+      unicode: E74D
+    kddi:
+      type: pictogram
+      unicode: EC83
+  E33A:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EC84
+  E33B:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EC85
+  E33C:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EC86
+  E33D:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EC87
+  E33E:
+    docomo:
+      type: pictogram
+      unicode: E74C
+    kddi:
+      type: pictogram
+      unicode: EC88
+  E33F:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EC89
+  E340:
+    docomo:
+      type: pictogram
+      unicode: E74C
+    kddi:
+      type: pictogram
+      unicode: F0D1
+  E341:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EC8A
+  E342:
+    docomo:
+      type: pictogram
+      unicode: E749
+    kddi:
+      type: pictogram
+      unicode: EFAE
+  E343:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EC8B
+  E344:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EC8C
+  E345:
+    docomo:
+      type: pictogram
+      unicode: E745
+    kddi:
+      type: pictogram
+      unicode: EC8D
+  E346:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EC8E
+  E347:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EFAD
+  E348:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EFA6
+  E349:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EC8F
+  E34A:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EC90
+  E34B:
+    docomo:
+      type: pictogram
+      unicode: E686
+    kddi:
+      type: pictogram
+      unicode: F0BD
+  E34C:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EC91
+  E34D:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EC92
+  E401:
+    docomo:
+      type: pictogram
+      unicode: E723
+    kddi:
+      type: pictogram
+      unicode: F0F6
+  E402:
+    docomo:
+      type: pictogram
+      unicode: E72C
+    kddi:
+      type: pictogram
+      unicode: EC93
+  E403:
+    docomo:
+      type: pictogram
+      unicode: E720
+    kddi:
+      type: pictogram
+      unicode: EC94
+  E404:
+    docomo:
+      type: pictogram
+      unicode: E753
+    kddi:
+      type: pictogram
+      unicode: EC95
+  E405:
+    docomo:
+      type: pictogram
+      unicode: E729
+    kddi:
+      type: pictogram
+      unicode: F0F3
+  E406:
+    docomo:
+      type: pictogram
+      unicode: E72B
+    kddi:
+      type: pictogram
+      unicode: EC96
+  E407:
+    docomo:
+      type: pictogram
+      unicode: E6F3
+    kddi:
+      type: pictogram
+      unicode: EC97
+  E408:
+    docomo:
+      type: pictogram
+      unicode: E701
+    kddi:
+      type: pictogram
+      unicode: EC98
+  E409:
+    docomo:
+      type: pictogram
+      unicode: E728
+    kddi:
+      type: pictogram
+      unicode: EFC0
+  E40A:
+    docomo:
+      type: pictogram
+      unicode: E721
+    kddi:
+      type: pictogram
+      unicode: EC99
+  E40B:
+    docomo:
+      type: pictogram
+      unicode: E757
+    kddi:
+      type: pictogram
+      unicode: EC9A
+  E40C:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EC9B
+  E40D:
+    docomo:
+      type: pictogram
+      unicode: E72A
+    kddi:
+      type: pictogram
+      unicode: EC9C
+  E40E:
+    docomo:
+      type: pictogram
+      unicode: E725
+    kddi:
+      type: pictogram
+      unicode: EC9D
+  E40F:
+    docomo:
+      type: pictogram
+      unicode: E723
+    kddi:
+      type: pictogram
+      unicode: EC9A
+  E410:
+    docomo:
+      type: pictogram
+      unicode: E6F4
+    kddi:
+      type: pictogram
+      unicode: EC9E
+  E411:
+    docomo:
+      type: pictogram
+      unicode: E72D
+    kddi:
+      type: pictogram
+      unicode: EF4B
+  E412:
+    docomo:
+      type: pictogram
+      unicode: E6F0E72D
+    kddi:
+      type: pictogram
+      unicode: ED68
+  E413:
+    docomo:
+      type: pictogram
+      unicode: E72E
+    kddi:
+      type: pictogram
+      unicode: ED6D
+  E414:
+    docomo:
+      type: pictogram
+      unicode: E6F0
+    kddi:
+      type: pictogram
+      unicode: ECA1
+  E415:
+    docomo:
+      type: pictogram
+      unicode: E6F0
+    kddi:
+      type: pictogram
+      unicode: EF49
+  E416:
+    docomo:
+      type: pictogram
+      unicode: E724
+    kddi:
+      type: pictogram
+      unicode: ED61
+  E417:
+    docomo:
+      type: pictogram
+      unicode: E726
+    kddi:
+      type: pictogram
+      unicode: ECA2
+  E418:
+    docomo:
+      type: pictogram
+      unicode: E726
+    kddi:
+      type: pictogram
+      unicode: ECA3
+  E419:
+    docomo:
+      type: pictogram
+      unicode: E691
+    kddi:
+      type: pictogram
+      unicode: F0C1
+  E41A:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: ECA4
+  E41B:
+    docomo:
+      type: pictogram
+      unicode: E692
+    kddi:
+      type: pictogram
+      unicode: F0C2
+  E41C:
+    docomo:
+      type: pictogram
+      unicode: E6F9
+    kddi:
+      type: pictogram
+      unicode: ECA5
+  E41D:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: ECA6
+  E41E:
+    docomo:
+      type: pictogram
+      unicode: E695
+    kddi:
+      type: pictogram
+      unicode: ECAA
+  E41F:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: ECA7
+  E420:
+    docomo:
+      type: pictogram
+      unicode: E70B
+    kddi:
+      type: pictogram
+      unicode: ECA8
+  E421:
+    docomo:
+      type: pictogram
+      unicode: E700
+    kddi:
+      type: pictogram
+      unicode: ECA9
+  E422:
+    docomo:
+      type: pictogram
+      unicode: E695
+    kddi:
+      type: pictogram
+      unicode: ECAA
+  E423:
+    docomo:
+      type: pictogram
+      unicode: E72F
+    kddi:
+      type: pictogram
+      unicode: ECAB
+  E424:
+    docomo:
+      type: pictogram
+      unicode: E70B
+    kddi:
+      type: pictogram
+      unicode: ECAC
+  E425:
+    docomo:
+      type: pictogram
+      unicode: E6ED
+    kddi:
+      type: pictogram
+      unicode: ECAE
+  E426:
+    docomo:
+      type: name
+      unicode: '[m(_ _)m]'
+    kddi:
+      type: pictogram
+      unicode: ECAD
+  E427:
+    docomo:
+      type: name
+      unicode: '[＼(^o^)／]'
+    kddi:
+      type: pictogram
+      unicode: ED8B
+  E428:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: name
+      unicode: 〓
+  E429:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: ECAF
+  E42A:
+    docomo:
+      type: pictogram
+      unicode: E658
+    kddi:
+      type: pictogram
+      unicode: F0B7
+  E42B:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EF94
+  E42C:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: ECB1
+  E42D:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: ECB2
+  E42E:
+    docomo:
+      type: pictogram
+      unicode: E65F
+    kddi:
+      type: pictogram
+      unicode: EF8A
+  E42F:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EF8B
+  E430:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: ECB3
+  E431:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: ECB4
+  E432:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: ECB5
+  E433:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: ECB6
+  E434:
+    docomo:
+      type: pictogram
+      unicode: E65C
+    kddi:
+      type: pictogram
+      unicode: F0EC
+  E435:
+    docomo:
+      type: pictogram
+      unicode: E65D
+    kddi:
+      type: pictogram
+      unicode: EF89
+  E436:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: ECB7
+  E437:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: ED58
+  E438:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: ECB8
+  E439:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: ECB9
+  E43A:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: ECBA
+  E43B:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: ECBB
+  E43C:
+    docomo:
+      type: pictogram
+      unicode: E645
+    kddi:
+      type: pictogram
+      unicode: ECBC
+  E43D:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: F0EB
+  E43E:
+    docomo:
+      type: pictogram
+      unicode: E73F
+    kddi:
+      type: pictogram
+      unicode: ED81
+  E43F:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: ECBE
+  E440:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: ECBF
+  E441:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: ECC0
+  E442:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: ECC1
+  E443:
+    docomo:
+      type: pictogram
+      unicode: E643
+    kddi:
+      type: pictogram
+      unicode: EF41
+  E444:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: name
+      unicode: 〓
+  E445:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: ECC2
+  E446:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: ECC3
+  E447:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EC40
+  E448:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: ECC4
+  E449:
+    docomo:
+      type: pictogram
+      unicode: E63E
+    kddi:
+      type: pictogram
+      unicode: ECC8
+  E44A:
+    docomo:
+      type: pictogram
+      unicode: E63E
+    kddi:
+      type: pictogram
+      unicode: EC4D
+  E44B:
+    docomo:
+      type: pictogram
+      unicode: E6B3
+    kddi:
+      type: pictogram
+      unicode: ECC5
+  E44C:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: ECC6
+  E501:
+    docomo:
+      type: pictogram
+      unicode: E669E6EF
+    kddi:
+      type: pictogram
+      unicode: ECC7
+  E502:
+    docomo:
+      type: pictogram
+      unicode: E67B
+    kddi:
+      type: pictogram
+      unicode: F0B9
+  E503:
+    docomo:
+      type: pictogram
+      unicode: E67C
+    kddi:
+      type: pictogram
+      unicode: ECC9
+  E504:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: ECCA
+  E505:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: ECCB
+  E506:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: ECCC
+  E507:
+    docomo:
+      type: pictogram
+      unicode: E677
+    kddi:
+      type: pictogram
+      unicode: EFF0
+  E508:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: ECCD
+  E509:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EF99
+  E50A:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: name
+      unicode: 〓
+  E50B:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EFA5
+  E50C:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: F090
+  E50D:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: ECCE
+  E50E:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: ECCF
+  E50F:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: ECD0
+  E510:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: ECD1
+  E511:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EC48
+  E512:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EC49
+  E513:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: ECD2
+  E514:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: ECD3
+  E515:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: ECD4
+  E516:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: ECD5
+  E517:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: ECD6
+  E518:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: ECD7
+  E519:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: ECD8
+  E51A:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: ECD9
+  E51B:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: ECDA
+  E51C:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: ECDB
+  E51D:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: name
+      unicode: 〓
+  E51E:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: name
+      unicode: 〓
+  E51F:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: ECDD
+  E520:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: ECDC
+  E521:
+    docomo:
+      type: pictogram
+      unicode: E74F
+    kddi:
+      type: pictogram
+      unicode: EFB9
+  E522:
+    docomo:
+      type: pictogram
+      unicode: E751
+    kddi:
+      type: pictogram
+      unicode: ECDE
+  E523:
+    docomo:
+      type: pictogram
+      unicode: E74F
+    kddi:
+      type: pictogram
+      unicode: EFB9
+  E524:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: name
+      unicode: 〓
+  E525:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: ECDF
+  E526:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: ECE0
+  E527:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: ECE1
+  E528:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EFB2
+  E529:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EF67
+  E52A:
+    docomo:
+      type: pictogram
+      unicode: E6A1
+    kddi:
+      type: pictogram
+      unicode: EFBA
+  E52B:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: ECE2
+  E52C:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EFB0
+  E52D:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: ECE3
+  E52E:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: ECE4
+  E52F:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: ECE5
+  E530:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: ECE6
+  E531:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: pictogram
+      unicode: EFB3
+  E532:
+    docomo:
+      type: name
+      unicode: '[A]'
+    kddi:
+      type: pictogram
+      unicode: ECE7
+  E533:
+    docomo:
+      type: name
+      unicode: '[B]'
+    kddi:
+      type: pictogram
+      unicode: ECE8
+  E534:
+    docomo:
+      type: name
+      unicode: '[AB]'
+    kddi:
+      type: pictogram
+      unicode: ECEA
+  E535:
+    docomo:
+      type: name
+      unicode: '[O]'
+    kddi:
+      type: pictogram
+      unicode: ECE9
+  E536:
+    docomo:
+      type: pictogram
+      unicode: E698
+    kddi:
+      type: pictogram
+      unicode: ECEB
+  E537:
+    docomo:
+      type: pictogram
+      unicode: E732
+    kddi:
+      type: pictogram
+      unicode: F06A
+  E538:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: name
+      unicode: 〓
+  E539:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: name
+      unicode: 〓
+  E53A:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: name
+      unicode: 〓
+  E53B:
+    docomo:
+      type: name
+      unicode: 〓
+    kddi:
+      type: name
+      unicode: 〓
+  E53C:
+    docomo:
+      type: name
+      unicode: '[v'
+    kddi:
+      type: name
+      unicode: '[v'
+  E53D:
+    docomo:
+      type: name
+      unicode: oda
+    kddi:
+      type: name
+      unicode: oda
+  E53E:
+    docomo:
+      type: name
+      unicode: 'fone]'
+    kddi:
+      type: name
+      unicode: 'fone]'

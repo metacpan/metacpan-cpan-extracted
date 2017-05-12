@@ -1,0 +1,16 @@
+0.130
+	Should Select list context behavior be fetchall_hashref?
+	It is arguably more intuitive or 'EZ', requires DBI 1.20
+	arrayref is still available in fetchrow (scalar context)
+	This requires thought about single column Select results,
+	currently an array en lieu of an arrayref.
+
+	VRFY Selects (proper Insert-ion) in 02connect.t
+
+	Move FMTYEWK functions (Sql, Disconnect, Use) into EXPORT_OK?
+	How do we resolve this with maxQuery?
+
+0.120
+	Should Select list context behavior be fetchall_hashref?
+	It is arguably more intuitive or 'EZ', array is still
+	available in fetchrow

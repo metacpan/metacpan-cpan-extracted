@@ -1,0 +1,38 @@
+---
+abstract: 'Error/exception handling in an OO-ish way'
+author:
+  - 'Shlomi Fish ( http://www.shlomifish.org/ )'
+build_requires: {}
+configure_requires:
+  Module::Build: '0.280801'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.142060'
+keywords:
+  - deprecated
+  - exceptions
+  - oop
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Error
+provides:
+  Error:
+    file: lib/Error.pm
+    version: '0.17024'
+  Error::Simple:
+    file: lib/Error.pm
+    version: '0.17024'
+  Error::WarnDie:
+    file: lib/Error.pm
+  Error::subs:
+    file: lib/Error.pm
+requires:
+  Scalar::Util: '0'
+  perl: v5.6.0
+  strict: '0'
+  warnings: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://bitbucket.org/shlomif/perl-error.pm
+version: '0.17024'

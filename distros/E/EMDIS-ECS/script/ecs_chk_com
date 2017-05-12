@@ -1,0 +1,445 @@
+#!/usr/bin/perl -w
+#
+# Copyright (C) 2002-2016 National Marrow Donor Program. All rights reserved.
+#
+# For a description of this program, please refer to the POD documentation
+# embedded at the bottom of the file (e.g. perldoc ecs_chk_com).
+
+use EMDIS::ECS qw($ECS_CFG $ECS_NODE_TBL check_pid save_pid log_error log_info
+           remove_pidfile send_admin_email send_ecsmsg_email format_datetime
+           load_ecs_config);
+use Getopt::Long;
+use POSIX qw(setsid);
+use sigtrap;
+use strict;
+use Env qw(ECS_CONFIG_FILE);
+use Pod::Usage;
+use File::Basename;
+
+# process command line arguments
+my $opt_daemon = 1;
+my $opt_once = '';
+my $opt_config = 'ecs.cfg';
+my $opt_help = 0;
+my $prg = basename $0;
+
+if (defined $ECS_CONFIG_FILE && $ECS_CONFIG_FILE ne '') {
+   if (! -f $ECS_CONFIG_FILE) {
+      die "Error: invalid environment variable ECS_CONFIG_FILE='$ECS_CONFIG_FILE'!\n";
+   }
+   else {
+      $opt_config = $ECS_CONFIG_FILE;
+   }
+}
+
+if ( ! GetOptions('daemon!' => \$opt_daemon, "once" => \$opt_once,
+    'config=s' => \$opt_config, "help" => \$opt_help)
+){
+   print "Error:  unrecognized command line option.\n" .
+         "Usage:  $prg [--config ecs_cfg] [--nodaemon] [--once]\n" .
+         "For details, call $prg with the option -help\n";
+   exit 1;
+}
+
+$opt_daemon = 0 if $opt_once;    # --once implies --nodaemon
+
+if ( @ARGV ) {
+   print STDERR "ERROR in $prg: unexpected argument(s): @ARGV\n";
+   exit 1;
+}
+
+# initialize
+my $DEBUG_LABEL = "<DEBUG>: ";
+my ($t_chk_min,$t_chk_com);  # global config vars
+my $err = load_config($opt_config);
+die "$err\nUnable to initialize ECS.\n" if $err;
+my $interrupted = '';
+my $reload_config = '';
+$SIG{INT} = $SIG{TERM} = \&sigint_handler;   # install signal handler
+if ( $^O !~ /MSWin32/ ) {	# Unix only signal handler
+   $SIG{HUP} = \&sighup_handler;    # install signal handler
+}
+check_pid();                        # check whether already running
+pod2usage(-verbose=>2) if $opt_help;
+
+
+# if indicated, fork daemon process
+if($opt_daemon) {
+
+    if( $^O !~ /MSWin32/ ) {	# Unix only 
+        # fork child process
+        my $pid = fork;
+        exit if $pid;  # let parent exit
+        die "Error - unable to fork: $!"
+            unless defined $pid;
+    }
+
+    # update PID file
+    save_pid();
+
+    if( $^O !~ /MSWin32/ ) {	# Unix only 
+        # make child process leader of new session with no controlling terminal
+        POSIX::setsid()
+            or die "Error - unable to set up session: $!\n";
+    }
+}
+
+eval
+{
+    # main processing loop
+    while (1) {
+
+        last if $interrupted;        # exit loop if interrupted
+
+        if($reload_config) {
+            print "$DEBUG_LABEL reload_config($opt_config)\n"
+                if $ECS_CFG->ECS_DEBUG > 0;
+            my $err = load_config($opt_config);
+            log_error("unable to reload config: $err") if $err;
+            $reload_config = '';
+        }
+
+        # check communication status with remote nodes
+        chk_com();
+
+        last if $interrupted;        # exit loop if interrupted
+
+        last if $opt_once;  # 'once' option - exit main loop after one iteration 
+
+        print "$DEBUG_LABEL sleep " . $ECS_CFG->T_CHK . "\n"
+            if $ECS_CFG->ECS_DEBUG > 0;
+        sleep2 ($ECS_CFG->T_CHK);
+    }
+}
+or do
+{
+    log_error($@) if $@;
+    log_info("Execution terminated.");
+    die $@ if $@;
+};
+
+
+
+# successful exit
+exit 0;
+
+# ----------------------------------------------------------------------
+# Subroutine automatically called if program is shut down politely.
+END {
+    if (! $opt_help){
+      print "$DEBUG_LABEL END()\n" 
+        if ((not ref $ECS_CFG) or ($ECS_CFG->ECS_DEBUG > 0)) 
+             and ( $? != 1 );
+    }
+    remove_pidfile() if $EMDIS::ECS::pid_saved;
+}
+
+# ----------------------------------------------------------------------
+# A new sleep to solve the problem of windows won't break out during a 
+# normal sleep
+sub sleep2 {
+    my $cnt = shift;	
+    while ($cnt) { 
+        last if $interrupted; 
+        sleep(1); 		
+        $cnt--; 
+    }
+}
+
+# ----------------------------------------------------------------------
+# check communication status with each node
+sub chk_com
+{
+    my $err;
+    my @node_ids = ();
+    if(!$ECS_NODE_TBL->lock()) {  # lock node_tbl
+        log_error("chk_com(): unable to lock node_tbl: " .
+                  $ECS_NODE_TBL->ERROR);
+        return;
+    }
+    else {
+        @node_ids = $ECS_NODE_TBL->keys;
+        if($ECS_NODE_TBL->ERROR) {
+            log_error("chk_com(): unable to retrieve node_tbl keys: ",
+                      $ECS_NODE_TBL->ERROR);
+            @node_ids = ();
+        }
+    }
+    $ECS_NODE_TBL->unlock();
+
+    # check each node
+    for my $node_id (@node_ids)
+    {
+        # don't check comm status with self
+        next if $node_id eq $ECS_CFG->THIS_NODE;
+
+        # lock node_tbl
+        if(!$ECS_NODE_TBL->lock())
+        {
+            log_error("chk_com(): unable to lock node_tbl: " .
+                      $ECS_NODE_TBL->ERROR);
+            next;
+        }
+
+        my $node = $ECS_NODE_TBL->read($node_id);
+        # don't try to process if node not found
+        if(not ref $node)
+        {
+            log_error("chk_com(): unable to retrieve node $node_id status.");
+            $ECS_NODE_TBL->unlock();
+            next;
+        }
+        # is node marked as disabled?
+        if((exists $node->{node_disabled}) and
+            $node->{node_disabled} =~ /^\s*(yes|true)\s*$/i)
+        {
+            log_info("chk_com(): skipping node $node_id " .
+                "(node_disabled=$node->{node_disabled}).");
+            $ECS_NODE_TBL->unlock();
+            next;
+        }
+        my $current_time = time;
+        my $last_out = $node->{last_out};
+        my $last_in = $node->{last_in};
+
+        # check time since last communication sent to node
+        if(($current_time - $last_out) > $t_chk_min)
+        {
+            print "$DEBUG_LABEL sending READY message to node $node_id\n"
+                if $ECS_CFG->ECS_DEBUG > 0;
+            # send "I am alive" meta-message
+            $err = send_ecsmsg_email($node_id, '',
+                "msg_type=READY\n",
+                ((exists $node->{in_seq}) &&
+                    ((!exists $node->{ready_num_disabled}) ||
+                     ($node->{ready_num_disabled} !~ /(true|yes)/i))
+                    ? "last_recv_num=" . $node->{in_seq}
+                    : "") . "\n",
+                ((exists $node->{out_seq}) &&
+                    ((!exists $node->{ready_num_disabled}) ||
+                     ($node->{ready_num_disabled} !~ /(true|yes)/i))
+                    ? "last_sent_num=" . $node->{out_seq}
+                    : "") . "\n",
+                "# Hello Partner, I am alive.\n");
+            if($err)
+            {
+                log_error("chk_com(): unable to send READY meta-message " .
+                          "to node $node_id: $err");
+            }
+            else
+            {
+                log_info( "READY to $node_id sent.\n" );
+                $node->{last_out} = $current_time;
+            }
+        }
+
+        # check time since last communication received from node
+        if(($current_time - $last_in) > ($t_chk_com + $ECS_CFG->T_ADM_DELAY))
+        {
+            if(($current_time - $node->{last_in_adm}) > $ECS_CFG->T_ADM_REMIND)
+            {
+                # notify local administrator when comm lost
+                # (after "remind" period has elapsed)
+                log_info(
+                    "ECS communication loss detected: $node_id\n",
+                    "Nothing received from $node_id node since " .
+                        format_datetime($last_in) . "\n" .
+                    "(Is the ecs_scan_mail daemon still running?)\n");
+                $node->{last_in_adm} = $current_time
+                    unless $err;
+            }
+        }
+        else
+        {
+            $node->{last_in_adm} = 0;  # reset "remind" timer
+        }
+
+        # periodically send MSG_ACK if node has in_seq_ack < in_seq
+        if((!exists $node->{in_seq_ack}) or
+            ($node->{in_seq_ack} < $node->{in_seq}))
+        {
+            print "$DEBUG_LABEL sending MSG_ACK message ($node->{in_seq}) " .
+                "to node $node_id\n"
+                if $ECS_CFG->ECS_DEBUG > 0;
+            # send MSG_ACK meta-message
+            $err = send_ecsmsg_email($node_id, '', 
+                "msg_type=MSG_ACK\n",
+                "seq_num=$node->{in_seq}\n",
+                "# Acknowledged\n");
+            if($err)
+            {
+                log_error(
+                    "Unable to send MSG_ACK $node_id:$node->{in_seq}:\n",
+                    $err);
+            }
+            else
+            {
+                log_info( "MSG_ACK $node_id:$node->{in_seq} sent.\n" );
+                $node->{in_seq_ack} = $node->{in_seq};
+            }
+        }
+
+        # update node status
+        $ECS_NODE_TBL->write($node_id,$node);
+
+        # release node_tbl lock (enable other programs to access table)
+        $ECS_NODE_TBL->unlock();
+
+        last if $interrupted;  # exit loop if interrupted
+    }
+}
+
+# ----------------------------------------------------------------------
+# Read configuration.
+sub load_config
+{
+    my $cfg_file = shift;
+    my $err = load_ecs_config($cfg_file);
+    return $err if $err;
+    $t_chk_min = $ECS_CFG->T_CHK * 0.9;
+    $t_chk_com = $ECS_CFG->T_CHK * 2.2 + $ECS_CFG->T_SCN;
+    print "$DEBUG_LABEL load_config(): \$t_chk_min=$t_chk_min, " .
+        "\$t_chk_com=$t_chk_com\n"
+        if ($ECS_CFG->ECS_DEBUG > 0 && ! $opt_help);
+    return '';
+}
+
+# ----------------------------------------------------------------------
+# Re-read configuration when SIGHUP received.
+sub sighup_handler
+{
+    $reload_config = 1;
+}
+
+# ----------------------------------------------------------------------
+# Set flag indicating program has been interrupted.
+sub sigint_handler
+{
+    $interrupted = 1;
+}
+
+__END__
+
+# embedded POD documentation
+# for more info:  man perlpod
+
+=head1 NAME
+
+ecs_chk_com - ECS communication status monitoring daemon
+
+=head1 SYNOPSIS
+
+ ecs_chk_com
+
+ ecs_chk_com --config /opt/ecs/ecs.cfg
+
+ ech_chk_com --nodaemon
+
+ ecs_chk_com --once
+
+=head1 DESCRIPTION
+
+This program monitors ECS communication status with remote nodes.
+It periodically checks the following for each node:
+
+=over 4
+
+=item *
+
+If T_CHK * 0.9 has elapsed since the last message was sent to
+the remote node, send an READY meta-message to that node.
+
+=item *
+
+If T_CHK * 2.2 has elapsed since the last message was received
+from the remote node and notification has not been sent within the past
+T_ADM_REMIND seconds, send email notification to local administrator.
+
+=item *
+
+If the last message received from the remote node has not yet been
+acknowledged, send a MSG_ACK meta-message to that node.
+
+=back
+
+=head1 OPTIONS
+
+=over 5
+
+=item --config I<ecs_config_file>
+
+Specify the location of the ECS configuration file.  By default, the program
+looks for the file specified by the ECS_CONFIG_FILE environment variable;
+if that environment variable is not set, it looks for a file named "ecs.cfg"
+in the current directory.
+
+=item --daemon
+
+Spawn background process to continuously monitor remote node
+communication status.  This option is enabled by default.
+
+=item --nodaemon
+
+Do not spawn a background process.  Instead, use the foreground process
+process to continuously monitor remote node communication status.
+
+=item --once
+
+Perform one processing iteration and then exit.  Implies --nodaemon.
+
+=item --help
+
+Show embedded POD documentation
+
+=back
+
+=head1 RETURN VALUE
+
+Returns a non-zero exit code if a configuration error is detected.
+
+=head1 BUGS
+
+Possibly.
+
+=head1 NOTES
+
+To safely terminate this program, please use "kill -15" (not "kill -9").
+
+=head1 SEE ALSO
+
+EMDIS::ECS, ecs_scan_mail, ecs_setup, ecstool
+
+=head1 AUTHOR
+
+Joel Schneider <jschneid@nmdp.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED 
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF 
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+Copyright (C) 2002-2011 National Marrow Donor Program. All rights reserved.
+
+See LICENSE file for license details.
+
+=head1 HISTORY
+
+ECS, the EMDIS Communication System, was originally designed and
+implemented by the ZKRD (http://www.zkrd.de/).  This Perl implementation
+of ECS was developed by the National Marrow Donor Program
+(http://www.marrow.org/).
+
+2004-03-12	
+Canadian Blood Services - Tony Wai
+Added MS Windows support for Windows 2000 and Windows XP
+Added "DIRECTORY" inBox Protocol. This can interface with any mail
+system that can output the new messages to text files.
+
+2007-08-01
+ZKRD - emdisadm@zkrd.de
+Added environment variable ECS_CONFIG_FILE -> ecs.cfg
+Added new report management. Besides the LOG_LEVEL there is now a MAIL_LEVEL.
+If there is a difference between these levels, not every log message will
+be reported as email to admin. Furthermore only the filename and path of 
+non ECS messages will be documented (not the whole message).

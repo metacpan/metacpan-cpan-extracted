@@ -1,0 +1,28 @@
+[ ] user preferences config file
+[ ] check for an X-Spam-Level header and don't send if hits are at a
+    certain threshold (configurable)
+[ ] don't send email to an address with 'subscribe' in the user name,
+    ala tomcat-dev-subscribe@jakarta.apache.org
+[ ] reply to "Reply-To:" header if available (configurable)
+[ ] ability to save a copy of outgoing message
+[ ] support for re-sending autoreply after a time period has elapsed
+[ ] implement 'already sent to' storage mechanism with pluggable backend
+[ ] path separators are hardcoded as forward-slashes (not
+    cross-platform) use File::Spec->catdir() instead
+[ ] not using Berkeley DB transactions
+[ ] not using Berkeley DB locking
+[ ] Email::AutoReply::Filter
+[ ]   can't actually filter message... Email::Filter throws out the
+      envelope sender or procmail isn't giving it to us, or we need to
+      build it, or maybe I'm just doing something wrong, or ...?
+[ ] unit tests
+
+[X] sender shouldn't be taken from "To:" header since this can change.
+    This needs to be a configurable option.
+[X] add everything to Subversion or cvs
+[X] Email::Filter::AutoReply
+
+-----------------------------------------------------------------------
+Last Updated $Date: 2005-01-12 15:58:46 -0800 (Wed, 12 Jan 2005) $
+$Revision: 1155 $$Author: adamm $
+vim: tw=72

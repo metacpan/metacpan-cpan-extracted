@@ -1,0 +1,350 @@
+NAME
+    `ExtUtils::CChecker' - configure-time utilities for using C headers,
+    libraries, or OS features
+
+SYNOPSIS
+     use Module::Build;
+     use ExtUtils::CChecker;
+
+     my $cc = ExtUtils::CChecker->new;
+ 
+     $cc->assert_compile_run(
+        diag => "no PF_MOONLASER",
+        source => <<'EOF' );
+     #include <stdio.h>
+     #include <sys/socket.h>
+     int main(int argc, char *argv[]) {
+       printf("PF_MOONLASER is %d\n", PF_MOONLASER);
+       return 0;
+     }
+     EOF
+
+     Module::Build->new(
+       ...
+     )->create_build_script;
+
+DESCRIPTION
+    Often Perl modules are written to wrap functionality found in existing C
+    headers, libraries, or to use OS-specific features. It is useful in the
+    Build.PL or Makefile.PL file to check for the existance of these
+    requirements before attempting to actually build the module.
+
+    Objects in this class provide an extension around ExtUtils::CBuilder to
+    simplify the creation of a .c file, compiling, linking and running it,
+    to test if a certain feature is present.
+
+    It may also be necessary to search for the correct library to link
+    against, or for the right include directories to find header files in.
+    This class also provides assistance here.
+
+CONSTRUCTOR
+  $cc = ExtUtils::CChecker->new( %args )
+    Returns a new instance of a `ExtUtils::CChecker' object. Takes the
+    following named parameters:
+
+    defines_to => PATH
+            If given, defined symbols will be written to a C preprocessor .h
+            file of the given name, instead of by adding extra `-D*SYMBOL*'
+            arguments to the compiler flags.
+
+    quiet => BOOL
+            If given, sets the `quiet' option to the underlying
+            `ExtUtils::CBuilder' instance. If absent, defaults to enabled.
+            To disable quietness, i.e. to print more verbosely, pass a
+            defined-but-false value, such as `0'.
+
+    config => HASH
+            If given, passed through as the configuration of the underlying
+            `ExtUtils::CBuilder' instance.
+
+METHODS
+  $dirs = $cc->include_dirs
+    Returns the currently-configured include directories in an ARRAY
+    reference.
+
+  $flags = $cc->extra_compiler_flags
+    Returns the currently-configured extra compiler flags in an ARRAY
+    reference.
+
+  $flags = $cc->extra_linker_flags
+    Returns the currently-configured extra linker flags in an ARRAY
+    reference.
+
+  $cc->push_include_dirs( @dirs )
+    Adds more include directories
+
+  $cc->push_extra_compiler_flags( @flags )
+    Adds more compiler flags
+
+  $cc->push_extra_linker_flags( @flags )
+    Adds more linker flags
+
+  $success = $cc->try_compile_run( %args )
+  $success = $cc->try_compile_run( $source )
+    Try to compile, link, and execute a C program whose source is given.
+    Returns true if the program compiled and linked, and exited
+    successfully. Returns false if any of these steps fail.
+
+    Takes the following named arguments. If a single argument is given, that
+    is taken as the source string.
+
+    * source => STRING
+            The source code of the C program to try compiling, building, and
+            running.
+
+    * extra_compiler_flags => ARRAY
+            Optional. If specified, pass extra flags to the compiler.
+
+    * extra_linker_flags => ARRAY
+            Optional. If specified, pass extra flags to the linker.
+
+    * define => STRING
+            Optional. If specified, then the named symbol will be defined if
+            the program ran successfully. This will either on the C compiler
+            commandline (by passing an option `-D*SYMBOL*'), or in the
+            `defines_to' file.
+
+  $cc->assert_compile_run( %args )
+    Calls `try_compile_run'. If it fails, die with an `OS unsupported'
+    message. Useful to call from Build.PL or Makefile.PL.
+
+    Takes one extra optional argument:
+
+    * diag => STRING
+            If present, this string will be appended to the failure message
+            if one is generated. It may provide more useful information to
+            the user on why the OS is unsupported.
+
+  $success = $cc->try_find_include_dirs_for( %args )
+    Try to compile, link and execute the given source, using extra include
+    directories.
+
+    When a usable combination is found, the directories required are stored
+    in the object for use in further compile operations, or returned by
+    `include_dirs'. The method then returns true.
+
+    If no a usable combination is found, it returns false.
+
+    Takes the following arguments:
+
+    * source => STRING
+            Source code to compile
+
+    * dirs => ARRAY of ARRAYs
+            Gives a list of sets of dirs. Each set of dirs should be strings
+            in its own array reference.
+
+    * define => STRING
+            Optional. If specified, then the named symbol will be defined if
+            the program ran successfully. This will either on the C compiler
+            commandline (by passing an option `-D*SYMBOL*'), or in the
+            `defines_to' file.
+
+  $success = $cc->try_find_libs_for( %args )
+    Try to compile, link and execute the given source, when linked against a
+    given set of extra libraries.
+
+    When a usable combination is found, the libraries required are stored in
+    the object for use in further link operations, or returned by
+    `extra_linker_flags'. The method then returns true.
+
+    If no usable combination is found, it returns false.
+
+    Takes the following arguments:
+
+    * source => STRING
+            Source code to compile
+
+    * libs => ARRAY of STRINGs
+            Gives a list of sets of libraries. Each set of libraries should
+            be space-separated.
+
+    * define => STRING
+            Optional. If specified, then the named symbol will be defined if
+            the program ran successfully. This will either on the C compiler
+            commandline (by passing an option `-D*SYMBOL*'), or in the
+            `defines_to' file.
+
+  $cc->find_include_dirs_for( %args )
+  $cc->find_libs_for( %args )
+    Calls `try_find_include_dirs_for' or `try_find_libs_for' respectively.
+    If it fails, die with an `OS unsupported' message.
+
+    Each method takes one extra optional argument:
+
+    * diag => STRING
+            If present, this string will be appended to the failure message
+            if one is generated. It may provide more useful information to
+            the user on why the OS is unsupported.
+
+  $mb = $cc->new_module_build( %args )
+    Construct and return a new Module::Build object, preconfigured with the
+    `include_dirs', `extra_compiler_flags' and `extra_linker_flags' options
+    that have been configured on this object, by the above methods.
+
+    This is provided as a simple shortcut for the common use case, that a
+    Build.PL file is using the `ExtUtils::CChecker' object to detect the
+    required arguments to pass.
+
+EXAMPLES
+  Socket Libraries
+    Some operating systems provide the BSD sockets API in their primary
+    libc. Others keep it in a separate library which should be linked
+    against. The following example demonstrates how this would be handled.
+
+     use ExtUtils::CChecker;
+
+     my $cc = ExtUtils::CChecker->new;
+
+     $cc->find_libs_for(
+        diag => "no socket()",
+        libs => [ "", "socket nsl" ],
+        source => q[
+     #include <sys/socket.h>
+     int main(int argc, char *argv) {
+       int fd = socket(PF_INET, SOCK_STREAM, 0);
+       if(fd < 0)
+         return 1;
+       return 0;
+     }
+     ] );
+
+     $cc->new_module_build(
+        module_name => "Your::Name::Here",
+        requires => {
+           'IO::Socket' => 0,
+        },
+        ...
+     )->create_build_script;
+
+    By using the `new_module_build' method, the detected
+    `extra_linker_flags' value has been automatically passed into the new
+    `Module::Build' object.
+
+  Testing For Optional Features
+    Sometimes a function or ability may be optionally provided by the OS, or
+    you may wish your module to be useable when only partial support is
+    provided, without requiring it all to be present. In these cases it is
+    traditional to detect the presence of this optional feature in the
+    Build.PL script, and define a symbol to declare this fact if it is
+    found. The XS code can then use this symbol to select between differing
+    implementations. For example, the Build.PL:
+
+     use ExtUtils::CChecker;
+
+     my $cc = ExtUtils::CChecker->new;
+
+     $cc->try_compile_run(
+        define => "HAVE_MANGO",
+        source => <<'EOF' );
+     #include <mango.h>
+     #include <unistd.h>
+     int main(void) {
+       if(mango() != 0)
+         exit(1);
+       exit(0);
+     }
+     EOF
+
+     $cc->new_module_build(
+        ...
+     )->create_build_script;
+
+    If the C code compiles and runs successfully, and exits with a true
+    status, the symbol `HAVE_MANGO' will be defined on the compiler
+    commandline. This allows the XS code to detect it, for example
+
+     int
+     mango()
+       CODE:
+     #ifdef HAVE_MANGO
+         RETVAL = mango();
+     #else
+         croak("mango() not implemented");
+     #endif
+       OUTPUT:
+         RETVAL
+
+    This module will then still compile even if the operating system lacks
+    this particular function. Trying to invoke the function at runtime will
+    simply throw an exception.
+
+  Linux Kernel Headers
+    Operating systems built on top of the Linux kernel often share a looser
+    association with their kernel version than most other operating systems.
+    It may be the case that the running kernel is newer, containing more
+    features, than the distribution's libc headers would believe. In such
+    circumstances it can be difficult to make use of new socket options,
+    `ioctl()'s, etc.. without having the constants that define them and
+    their parameter structures, because the relevant header files are not
+    visible to the compiler. In this case, there may be little choice but to
+    pull in some of the kernel header files, which will provide the required
+    constants and structures.
+
+    The Linux kernel headers can be found using the /lib/modules directory.
+    A fragment in Build.PL like the following, may be appropriate.
+
+     chomp( my $uname_r = `uname -r` );
+
+     my @dirs = (
+        [],
+        [ "/lib/modules/$uname_r/source/include" ],
+     );
+
+     $cc->find_include_dirs_for(
+        diag => "no PF_MOONLASER",
+        dirs => \@dirs,
+        source => <<'EOF' );
+     #include <sys/socket.h>
+     #include <moon/laser.h>
+     int family = PF_MOONLASER;
+     struct laserwl lwl;
+     int main(int argc, char *argv[]) {
+       return 0;
+     }
+     EOF
+
+    This fragment will first try to compile the program as it stands, hoping
+    that the libc headers will be sufficient. If it fails, it will then try
+    including the kernel headers, which should make the constant and
+    structure visible, allowing the program to compile.
+
+  Creating an `#include' file
+    Sometimes, rather than setting defined symbols on the compiler
+    commandline, it is preferrable to have them written to a C preprocessor
+    include (.h) file. This may be beneficial for cross-platform portability
+    concerns, as not all C compilers may take extra `-D' arguments on the
+    command line, or platforms may have small length restrictions on the
+    length of a command line.
+
+     use ExtUtils::CChecker;
+
+     my $cc = ExtUtils::CChecker->new(
+        defines_to => "mymodule-config.h",
+     );
+
+     $cc->try_compile_run(
+        define => "HAVE_MANGO",
+        source => <<'EOF' );
+     #include <mango.h>
+     #include <unistd.h>
+     #include "mymodule-config.h"
+     int main(void) {
+       if(mango() != 0)
+         exit(1);
+       exit(0);
+     }
+     EOF
+
+    Because the mymodule-config.h file is written and flushed after every
+    define operation, it will still be useable in later C fragments to test
+    for features detected in earlier ones.
+
+    It is suggested not to name the file simply config.h, as the core of
+    Perl itself has a file of that name containing its own compile-time
+    detected configuration. A confusion between the two could lead to
+    surprising results.
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
+

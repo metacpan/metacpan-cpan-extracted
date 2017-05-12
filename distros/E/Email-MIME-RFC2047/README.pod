@@ -1,0 +1,34 @@
+=for html
+<p>
+<a href="https://travis-ci.org/nwellnhof/Email-MIME-RFC2047?branch=master"><img src="https://travis-ci.org/nwellnhof/Email-MIME-RFC2047.svg?branch=master"></a>
+<a href="https://coveralls.io/r/nwellnhof/Email-MIME-RFC2047?branch=master"><img src="https://coveralls.io/repos/nwellnhof/Email-MIME-RFC2047/badge.svg?branch=master" alt="Coverage Status"></a>
+<a href="http://badge.fury.io/pl/Email-MIME-RFC2047"><img src="https://badge.fury.io/pl/Email-MIME-RFC2047.svg" alt="CPAN version"></a>
+</p>
+
+=head1 Correct handling of non-ASCII MIME headers
+
+This distribution tries to provide a correct and usable implementation of
+RFC 2047 "MIME Part Three: Message Header Extensions for Non-ASCII Text".
+
+=head2 Installation from a CPAN tarball
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+=head2 Build from a repository checkout
+
+Make sure to install I<Dist::Zilla>. Then you can build and test with
+I<dzil>:
+
+    dzil test
+    dzil build
+
+=head2 Copyright
+
+This software is copyright (C) by Nick Wellnhofer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+

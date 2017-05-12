@@ -1,0 +1,5 @@
+THE FOLLOWING IS NOT A [% endorsement_type %] ENDORSEMENT
+
+[% wrapped_content %]
+
+THANK YOU FOR READING OUR [% endorsement_type %] ENDORSEMENT

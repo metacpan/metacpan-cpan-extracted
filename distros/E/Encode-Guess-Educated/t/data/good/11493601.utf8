@@ -1,0 +1,1604 @@
+   [1]The Journal of Biological Chemistry
+
+   [2]Skip to main page content
+     * [3]Home
+     * [4]Current issue
+     * [5]Archive
+     * [6]Papers in Press
+     * [7]Minireviews
+     * [8]Classics
+     * [9]Reflections
+     * [10]Papers of the Week
+
+   QUICK SEARCHAuthor: _________Keyword: ________________Year: ____Vol:
+   ____Page: ____ GO Go[11][Advanced Search][12][Browse the Archive]
+     * Institution: Univ Colorado - Denison Memorial Library
+     * [13]Sign In
+
+   Advertisement
+   Advertisement
+     * [14]Celebrate 100 Years of ASBMB: ASBMB Histroy Book Now Avaiable!
+
+ §1§ The ι-Carrageenase of Alteromonas fortis §1§
+
+ §2§ A β-HELIX FOLD-CONTAINING ENZYME FOR THE DEGRADATION OF A HIGHLY
+POLYANIONIC POLYSACCHARIDE[15]* §2§
+
+    1. [16]Gurvan Michel[17]‡[18]§,
+    2. [19]Laurent Chantalat[20]‡,
+    3. [21]Eric Fanchon[22]‡,
+    4. [23]Bernard Henrissat[24]¶,
+    5. [25]Bernard Kloareg[26]§ and
+    6. [27]Otto Dideberg[28]‡[29]‖
+
+    1.
+
+
+    From the ^‡Laboratoire de Cristallographie Macromoléculaire, Institut
+    de Biologie Structurale Jean-Pierre Ebel, CNRS/Commissariat Å
+    l'Energie Atomique, 41, rue Jules Horowitz, 38027 Grenoble Cedex 1,
+    France, the ^§Station Biologique de Roscoff, UMR 1931 (CNRS and
+    Laboratoires Goëmar), Place Georges Teissier, BP 74, 29682 Roscoff
+    Cedex, France, and the ^¶Architecture et Fonction des Macromolécules
+    Biologiques, UMR 6098 (CNRS, Universités d'Aix-Marseille I et II), 31
+    Chemin Joseph Aiguier, 13402 Marseille Cedex 20, France
+
+
+   [30]Next Section
+
+ §2§ Abstract §2§
+
+   Carrageenans are gel-forming hydrocolloids extracted from the cell
+   walls of marine red algae. They consist ofd-galactose residues bound by
+   alternate α(1→3) and β(1→4) linkages and substituted by one
+   (κ-carrageenan), two (ι-carrageenan), or three (λ-carrageenan)
+   sulfate-ester groups per disaccharide repeating unit. Both the κ- and
+   ι-carrageenan chains adopt ordered conformations leading to the
+   formation of highly ordered aggregates of double-stranded helices.
+   Several κ-carrageenases and ι-carrageenases have been cloned from
+   marine bacteria. κ-Carrageenases belong to family 16 of the glycoside
+   hydrolases, which essentially encompasses polysaccharidases specialized
+   in the hydrolysis of the neutral polysaccharides such as agarose,
+   laminarin, lichenan, and xyloglucan. In contrast, ι-carrageenases
+   constitute a novel glycoside hydrolase structural family. We report
+   here the crystal structure of Alteromonas fortisι-carrageenase at 1.6 Å
+   resolution. The enzyme folds into a right-handed parallel β-helix of 10
+   complete turns with two additional C-terminal domains. Glu^245,
+   Asp^247, or Glu^310, in the cleft of the enzyme, are proposed as
+   candidate catalytic residues. The protein contains one sodium and one
+   chloride binding site and three calcium binding sites shown to be
+   involved in stabilizing the enzyme structure.
+
+   Carrageenans are the main components of the cell walls of various
+   marine red algae (Rhodophyta) where they play a variety of structural
+   (cell-cell cohesion and exchange boundary) and signaling (cell-cell
+   recognition) roles ([31]1, [32]2). They consist of linear chains of
+   galactopyranose residues in the d-configuration linked by alternating
+   α(1→3) and β(1→4) linkages. This regular structure is modified by
+   3,6-anhydro bridges and substitution with sulfate-ester groups. On the
+   basis of the level and position of sulfate substitution, carrageenans
+   are classified into four types, namely furcellaran and κ-, ι-, and
+   λ-carrageenans. κ-Carrageenan consists of repeated units of the
+   disaccharide
+   4-sulfate-O-1,3-β-d-galactopyranosyl-1,4-α-3,6-anhydro-d-galactose,
+   also known as neocarrabiose sulfate. At the primary structure level,
+   ι-carrageenan differs from κ-carrageenan in the presence at C-2 on the
+   α-linked galactose residues of one additional sulfate substituent per
+   repeating disaccharide (Fig.[33]1). ι-Carrageenans therefore contain
+   two sulfate groups per repeat unit, i.e. one anionic group per
+   monosaccharide. Such a high linear charge density is reminiscent of
+   that seen in alginic acid, the main cell wall polysaccharide of brown
+   algae, and in polygalacturonic acid, the nonmethylated component of
+   higher plant pectins, which both contain one carboxyl group per
+   monomeric unit ([34]1).
+   [35]Figure 1
+   View larger version:
+     * [36]In this window
+     * [37]In a new window
+
+     * [38]Download as PowerPoint Slide
+
+   Figure 1
+
+   Schematic diagram showing two disaccharide repeating units of
+   ι-carrageenan. The two different glycosidic bonds in ι-carrageenan are
+   labeled, and further extensions of the polymer at the nonreducing and
+   reducing ends are indicated, respectively, by R′ and R". As
+   ι-carrageenase cleaves the β(1→4) glycosidic bond, its subsites for
+   substrate binding are labeled in accordance with the established
+   nomenclature ([39]49).
+
+   In aqueous solution, κ- and ι-carrageenans form thermoreversible gels
+   ([40]3) and are used in a variety of industrial applications as gelling
+   or thickening agents. The mechanism of gelation involves the formation
+   of double helices of carrageenan chains followed by the association of
+   the double helices into a macromolecular three-dimensional network
+   ([41]4, [42]5). Gelation is promoted by the presence of cations,
+   potassium in κ-carrageenan and calcium in ι-carrageenan. By binding to
+   the helices, either electrostatically or through specific binding
+   sites, these cations considerably reduce the charge density of the
+   helices and enhance their tendency to aggregate ([43]6). The fine
+   structure of ι-carrageenan in the solid state has been studied in
+   detail by x-ray diffraction of calcium carrageenate fibers ([44]7). The
+   polysaccharide chains were shown to adopt a twisted-ribbon conformation
+   with a 3[1] symmetry, stabilized by the formation of double helices,
+   themselves aggregated into larger clusters through the coordinated
+   binding of calcium ions ([45]7). In the cell walls of red algae,
+   carrageenans are laid out as highly ordered molecules associated with
+   the cellulose microfibrils or in the microfibril-less intercellular
+   matrix ([46]8). ι-Carrageenans are mainly located in the outer cortical
+   tissues, whereas κ-carrageenans constitute the walls of the inner
+   cortical and medullary cells ([47]9).
+
+   Enzymes that degrade carrageenans, namely κ-, ι-, and λ-carrageenases,
+   have been isolated from various marine bacteria. They all are
+   endohydrolases that cleave the internal β(1→4) linkages of carrageenans
+   yielding products of the neocarrabiose series ([48]10-13). Since these
+   galactan hydrolases display a strict substrate specificity, they
+   obviously recognize the sulfation pattern on the digalactose repeating
+   unit and thus provide an opportunity for investigating the
+   structure-function relationships of hydrolases that degrade sulfated
+   polysaccharides. With this aim, we have undertaken the structural
+   analysis of a representative set of carrageenases. Recently we reported
+   the deduced amino acid sequences of ι-carrageenase fromAlteromonas
+   fortis and Zobellia galactanovorans. They share no sequence similarity
+   with κ-carrageenases, and unlike β-agarases and κ-carrageenases, they
+   are inverting hydrolases. They represent the first members of a new
+   family of glycoside hydrolases ([49]14), family 82 (13). In this
+   context, a high-resolution three-dimensional structure for a
+   ι-carrageenase would be pivotal in determining the fold prevailing in
+   family 82 and in delineating the molecular bases for the recognition of
+   ι-carrageenan. To this end, we have recently overexpressed and
+   crystallized A. fortisι-carrageenase ([50]15), and we report here its
+   structure at 1.6 Å resolution.
+   [51]Previous Section[52]Next Section
+
+ §2§ EXPERIMENTAL PROCEDURES §2§
+
+ §5§ Expression, Purification, and Crystallization of Native and
+Selenomethionyl-ι-carrageenase §5§
+
+   Full details of the expression and purification of native
+   ι-carrageenase have been described previously ([53]15). Briefly,
+   ι-carrageenase was expressed using the pET20b vector ([54]Novagen) as a
+   His-tagged fusion protein in the periplasm of Escherichia coli
+   BL21(DE3) strain and purified by metal affinity chromatography on a
+   column of Chelating Fast Flow Sepharose (Amersham Pharmacia Biotech)
+   loaded with NiSO[4]. The yield was 7–8 mg/liter of culture medium, and
+   the purified protein was concentrated to 6 mg/ml using a dialyzing
+   concentrator (Amicon Co.). Single crystals were obtained with
+   polyethylene glycol, and the presence of calcium ions appeared to be
+   crucial for crystallization. High quality crystals, typically 0.25 ×
+   0.25 × 0.15 mm in dimensions, were grown with 0.1 m sodium cacodylate
+   at pH 6.5, 15–17% polyethylene glycol (M [r] = 6,000), and 200 mm
+   calcium acetate.
+
+   The seleno-l-methionine labeling procedure was identical to that
+   described for the expression of seleno-l-methionine
+   (Se-Met)^1-κ-carrageenase ([55]16). As the expression yield was only
+   800 μg/liter of culture medium, the volume had to be scaled up to
+   obtain a sufficient amount of protein. During the concentration step,
+   the Se-Met-ι-carrageenase appeared to be less soluble than the native
+   protein and could only be concentrated to 2 mg/ml. Crystallization of
+   Se-Met-ι-carrageenase was performed under similar conditions to those
+   already reported ([56]15) except for the addition of 1 mm
+   dithiothreitol and the replacement of sodium cacodylate by imidazole to
+   avoid the reaction between cacodylate and dithiothreitol ([57]17).
+   Under these conditions, small crystals with a maximal size of 100 × 100
+   × 50 μm were obtained in 1 month of equilibration, whereas large native
+   crystals appeared in a few days.
+
+ §5§ Data Collection and Processing §5§
+
+   Crystals were successively soaked for 30 s in crystallization solutions
+   in which the glycerol concentration was increased by steps of 5% to a
+   final concentration of 20%. A single crystal was mounted on a loop,
+   transferred to the goniometer head, and kept at 100 K in a nitrogen
+   stream. The multiple anomalous diffraction data were collected on a
+   Se-Met-ι-carrageenase crystal at three wavelengths around the K (λ =
+   0.9t95 Å) absorption edge of selenium (beamline FIP/BM 30, European
+   Synchrotron Radiation Facility (ESRF), Grenoble, France). A 345-mm
+   Marresearch image plate detector was used. All intensity data were
+   integrated and reduced using DENZO/SCALEPACK ([58]18). Based on unit
+   cell dimensions two molecules of protein are present in the asymmetric
+   unit. Using the Patterson method and SHELX 97 (19), the positions for 7
+   of the 16 selenium atoms expected were determined. This partial
+   structure was input into SHARP ([59]20) for a first approximation of
+   the phases. Five other selenium atoms were located in the Fourier
+   difference electron density map. The final partial structure therefore
+   contained 12 selenium atoms, and the final phases from SHARP resulted
+   in a figure of merit of 0.43–2.3 Å resolution. Low (up to 2.2 Å) and
+   high (up to 1.6 Å) resolution data were also collected on a native
+   ι-carrageenase crystal using a Marresearch charge-coupled device
+   detector (beamline ID14 EH2, ESRF). All intensity data were integrated
+   using DENZO ([60]18). At low temperature, the unit cell parameters were
+   slightly different: a = 55.87, b = 90.07, c = 124.12 Å, α = γ = 90°, β
+   = 93.53°. The low and high resolution data were merged and reduced with
+   SCALA ([61]21).
+
+ §5§ Structure Determination and Refinement §5§
+
+   Taking advantage of the noncrystallographic symmetry, the electron
+   density was improved by molecular averaging, histogram matching, and
+   solvent flattening (50% solvent) with DM ([62]21). Using the native
+   data, the phases were then extended to 1.6 Å resolution yielding a
+   figure of merit of 0.75. Due to the high quality of the electron
+   density map at 1.6 Å, wARP ([63]22) was used to build the model
+   automatically resulting in the assignment of 85 and 75% of the main and
+   side chain atoms, respectively. The rest of the model was built
+   manually using O ([64]23). However, no clear electronic density was
+   observed for residues 314–333 and 341–350, which are not included in
+   the final model. The refinement was performed with CNS ([65]24) using
+   the native data set to 1.6 Å with the maximum likelihood target
+   function. The program was set up to automatically compute a
+   cross-validated ς[a] estimate and the weighting scheme between the
+   x-ray refinement target and the geometric energy function. Corrections
+   for a flat bulk solvent and for anisotropy in the data were also
+   applied. The ς[a] weighted maps obtained from the subsequent refinement
+   models were used for further model building. The first group of water
+   molecules was added when peaks in the 2F [o] −F [c] density were >2 ς
+   and had a stereochemistry compatible with at least one hydrogen bond
+   with a protein atom or another water molecule. In the final stages, the
+   ς cut-off was reduced to 1.0 ς, and water molecules with a B factor >60
+   Å^2 were removed from the model. The final model refined at 1.6 Å has
+   an R[work] of 20.7% and an R[free] of 22.3% ([66]25) and consists of
+   6,840 protein atoms, 1,110 water molecules, six glycerol molecules, and
+   six calcium, six sodium, and two chloride ions. All these ions have an
+   occupancy of 1, and their B factors refine to a value close to
+   neighboring protein atom B factors. The stereochemistry of the final
+   structure was evaluated using the PROCHECK program ([67]26).
+
+ §5§ Calcium-dependent Activity Test and Proteolytic Digestion §5§
+
+   ι-Carrageenase activity was assayed as follows. Three enzyme solutions
+   were prepared by diluting a stock solution of the purified enzyme (6
+   mg/ml) in 100 mm Tris-HCl, pH 7.2, 200 mm NaCl and adding either 5 mm
+   EGTA or 5 mm CaCl[2]. Aliquots (100 μl) were incubated for 15 min at
+   40 °C with 2 ml of substrate solution consisting of 0.125% (w/v)
+   ι-carrageenan, 50 mm Tris-HCl, pH 7.2, 100 mm NaCl with or without 5 mm
+   CaCl[2], and the reaction mixture (200 μl) was assayed for reducing
+   sugars ([68]27) using boiled enzyme blanks. One unit of enzyme activity
+   is defined as the amount of enzyme that produces an increase of 0.1 A
+   [237 nm]/min in the reducing sugar assay.
+
+   Purified bovine pancreas trypsin (T1426, 10,000N-benzoyl-l-arginine
+   ethyl ester units/mg of protein) was purchased from Sigma. Limited
+   proteolysis of ι-carrageenase (6 mg/ml in 100 mm Tris-HCl, pH 7.2, 200
+   mm NaCl) was performed using trypsin/ι-carrageenase ratios of 1:100 and
+   1:20 (w/w) in the presence or absence of 5 mm EGTA or 5 mm CaCl[2]. The
+   samples were incubated for 1 h at 20 °C, and then the reaction was
+   stopped by adding SDS loading buffer and boiling the samples for 5 min
+   at 100 °C. The samples were then loaded onto a 15% SDS-polyacrylamide
+   gel for electrophoresis, and the gels were stained with Coomassie Blue.
+   [69]Previous Section[70]Next Section
+
+ §2§ RESULTS §2§
+
+ §5§ The Overall Structure of A. fortis ι-Carrageenase §5§
+
+   The three-dimensional crystal structure of ι-carrageenase lacking the
+   signal peptide (residues 1–27) was determined at 2.3 Å resolution by
+   the multiple anomalous diffraction method using a crystal of a
+   Se-Met-substituted form of the enzyme ([71]28). After phase extension
+   with a native data set at higher resolution, a high quality electron
+   density map was obtained (Fig. [72]2) allowing building and refinement
+   of the model at 1.6 Å resolution. The crystallographic statistics are
+   shown in Table [73]I. The asymmetric unit contains two mature
+   ι-carrageenase molecules, each containing amino acids 28–491. Residues
+   314–334 and 341–350 for molecule A and residues 313–334 and 341–351 for
+   molecule B are not visible in the 2F [o] − F [c] electron density map
+   and are presumed to exist in disordered or highly flexible
+   conformations. Superposition of molecules A and B reveals that the Cα
+   atoms overlay with a root mean square deviation of 0.21 Å.
+   Approximately 10 residues in each molecule presented clear alternate
+   conformations. The need to refine the occupancy for terminal atoms of
+   several residues, such as aspartate, glutamate, or methionine, suggests
+   that a fraction of the protein population in the crystal has been
+   subjected to radiation damage ([74]29).
+   [75]Figure 2
+   View larger version:
+     * [76]In this window
+     * [77]In a new window
+
+     * [78]Download as PowerPoint Slide
+
+   Figure 2
+
+   Solvent-flattened multiple anomalous diffraction electron density map
+   at 1.6 Å resolution. Map contoured at 2.0 ς of the N-terminal
+   calcium-binding hairpin loop. Calcium ion and water molecules are
+   indicated as yellow andred spheres, respectively. The oxygen, nitrogen,
+   and carbon atoms in the protein are shown in red, blue, andyellow,
+   respectively. This figure was created using O ([79]23).
+   View this table:
+     * [80]In this window
+     * [81]In a new window
+
+   Table I
+
+   Data reduction, phasing, and refinement statistics
+
+   The core of ι-carrageenase is folded into a right-handed parallel
+   β-helix of 10 complete turns (Fig. [82]3). This fold was first
+   encountered in pectate lyase C from Erwinia chrysanthemi ([83]30). The
+   lyase structure consists of three parallel β-sheets, PB1, PB2, and PB3.
+   PB2 and PB3 form planar surfaces almost perpendicular to each other,
+   while PB1 is in the form of a groove. In the lyase structure, the turns
+   or loops (depending on the number of amino acids inserted between
+   consecutive β-helical strands) are referred to as T1 (PB1-PB2), T2
+   (PB2-PB3), and T3 (PB3-PB1). In β-helix proteins, the assignment of
+   secondary structure elements is based on the DSSP algorithm ([84]31)
+   with the additional criterion that any residues with (Φ, ψ) angles in
+   the left-handed α-helix region are not included in the β-strand. Based
+   on these rules, PB2 can be divided into two parts, and the
+   ι-carrageenase β-helix consists of four parallel β-sheets, PB1, PB2a,
+   PB2b, and PB3, composed respectively of 10, 5, 11, and 10 β-strands.
+   These strands are relatively short with an average number of 4.0, 2.4,
+   4.1, and 4.0 residues, respectively. Interestingly, like almost all
+   β-helix proteins, ι-carrageenase contains in its N-terminal region an
+   amphipathic α-helix (residues 66–77) that shields the hydrophobic core
+   of the β-helix from the solvent.
+   [85]Figure 3
+   View larger version:
+     * [86]In this window
+     * [87]In a new window
+
+     * [88]Download as PowerPoint Slide
+
+   Figure 3
+
+   Folding of A. fortisι-carrageenase. A, stereo view of the Cα trace of
+   the protein. The N terminus, C terminus, and every 20th residue are
+   labeled, while every 10th residue is marked with ablack dot. The
+   secondary structures listed in the text are composed of the following
+   residues: β15, 187–189; β18, 200–204; β25, 240–245; β26, 258–260; β28,
+   267–270; β32, 302–304; β35, 378–381; β36, 383–386; β39, 434–436. B,
+   ribbon representation of the structure. The β-helix core, domain A, and
+   domain B are shown, respectively, in blue, gold, and red. The small T1
+   extension, containing an antiparallel sheet (β16-β17) and an α-helix
+   (α2), is shown ingreen. The red, yellow, andgreen spheres represent
+   sodium, calcium, and chloride ions, respectively. Figs. [89]3 and [90]4
+   were prepared using Molscript ([91]50).
+
+   The most striking difference between ι-carrageenase (Fig. [92]3) and
+   the 11 other β-helix proteins of known structure is the presence, in
+   the C-terminal region, of two large additional domains (both 67
+   residues long). Domain A (residues 307–373) replaces the T1 turn
+   between strands β32 and β35 (see legend of Fig. [93]3 A for
+   definition). Half of this domain (residues 314–333 and 341–350) could
+   not be built as no clear electron density was observed. The visible
+   part of domain A features a sheet of two short antiparallel β-strands,
+   β33 and β34, edged by one α-helix (residues 358–367) and has an average
+   B value (37.8 Å^2) twice that of the β-helix core (17.8 Å^2). At the
+   border of the visible part of domain A is a hydrophobic surface,
+   suggesting that the nonvisible residues complete a globular-shaped
+   domain. This domain is weakly bound to the β-helix by only four
+   hydrogen bonds (Glu^310 O-Lys^252 NZ, Asp^358OD1-Ser^442 OG, Asp^358
+   OD2-Lys^443 N, and Asp^362 OD1-Tyr^444 OH). Moreover, the visible part
+   of domain A makes no contact with neighboring molecules and is located
+   in a large solvent channel in the crystal. Domain B consists of
+   residues 387–430, located on a T3 turn that connect strands β36 and
+   β39, and the C-terminal extension (residues 469–491). Mainly composed
+   of long loops, it also features an antiparallel β-sheet (β37-β38), a
+   3[10] helix (residues 395–402), and a one-turn α-helix at the C
+   terminus. This domain, also globular in shape, is folded around an
+   independent hydrophobic core. In contrast to domain A, this bulky
+   structure is characterized by many side chain-side chain and side
+   chain-main chain hydrogen bonds, both within the domain and with the
+   β-helix. These hydrogen bonds have a clear stabilizing effect on domain
+   B since its average B value (22.0 Å^2) is close to that of the β-helix
+   core (17.8 Å^2).
+
+   Each strand of PB2a is connected to PB2b by an asparagine residue in a
+   left-handed α-helix conformation. Residues in the α[L]conformation are
+   also seen in the T2 turns in the structure. The presence of these
+   residues results in sharp bends of about 100° in the polypeptide chain
+   without disrupting the hydrogen bond pattern of the parallel β-strands.
+   PB1 also presents a striking repetition of a structural irregularity:
+   in each strand, one residue is in a right-handed helix conformation,
+   thus creating an alignment of nine β-bulges in the groove. With the
+   exceptions of Ser^186 and the Lys^464-Thr^465 β-bulge in the C
+   terminus, which are accessible to the solvent, all side chains in these
+   β-bulges are aliphatic amino acid residues and point toward the
+   hydrophobic core of the β-helix.
+
+   The turns and loops between the β-strands are of different sizes and
+   have different conformations. Whereas almost all of the T2 turns
+   consist of a single residue in the α[L] conformation, the T1 and T3
+   turns are longer and more irregular, their sizes ranging from 1 to 12
+   and from 2 to 8 residues, respectively. At the N-terminal edge of the
+   β-helix, the T3 loops form a bulky protrusion above PB1. On the
+   opposite side of this β-sheet, the T1 turn between strands β15 and β18
+   folds into a β-sheet of two antiparallel strands (β16 and β17), and the
+   T1 turn between β25 and β26 folds into a short α-helix. Strands β16 and
+   β17 and this short α-helix form a domain that is stabilized by a
+   hydrophobic core (Val^191, Leu^198, Leu^250, Met^251, and Tyr^254) and
+   hydrogen bonds between Glu^193OE2-Tyr^254 OH and Leu^198 O-Gln^256OE1.
+   At the surface, two hydrophilic networks (Arg^136-Asp^166-Arg^194 and
+   Arg^202-Trp^200-Asp^227-Arg^260-Gly^257-Gly^258) firmly bind this
+   domain to the β-helix core; these amino acids are also present in Z.
+   galactanovorans ι-carrageenase. On each edge of β-sheet PB1, the
+   N-terminal T1 and T3 extensions and the protruding domains A and B in
+   the C-terminal region create a long deep cleft. This large channel,
+   about 50 Å long and 10 Å wide, is probably the cleft that binds
+   ι-carrageenan chains.
+
+   A. fortis ι-carrageenase contains four disulfide bridges. The first,
+   Cys^269-Cys^298, is located within the β-helix core, connecting strand
+   β28 to the T3 turn between strands β31 and β32. The Cys^336-Cys^360
+   bridge, which links the 334–340 loop to helix α3, probably stabilizes
+   domain A. This disulfide bridge was opened by radiation damage, but its
+   existence was confirmed by the refinement of the structure (data not
+   shown) from the data at 2.0 Å resolution obtained with a less powerful
+   beamline ([94]15). However, even in this latter electron density map
+   with an intact disulfide bridge, the above-mentioned nonvisible part of
+   domain A could not be seen either. The two other disulfide bridges,
+   Cys^408-Cys^476 and Cys^412-Cys^484, which are strictly conserved in
+   the two ι-carrageenase sequences, bring the C-terminal extension of the
+   protein into close proximity with the main part of domain B. Finally,
+   the ι-carrageenase structure contains two chloride, six sodium, and six
+   calcium binding sites (see below).
+
+   A major characteristic of β-helix proteins is their internal stability
+   (mean B factor of 15.6 Å^2), which results from numerous intrahydrogen
+   bonds and side chain stacking of identical or similar residues
+   ([95]32). Consistent with these observations, the ι-carrageenase
+   structure is dominated by aliphatic stacking in the β-helix interior.
+   Four major stacks (Ile^209-Leu^234-Ile^267-Val^293-Val^383-Val^453,
+   Ile^229-Ile^262-Val^288-Val^378,
+   Ile^187-Ile^221-Leu^242-Val^276-Val^302-Val^434, and
+   Ile^113-Val^149-Ile^117) form the hydrophobic core, but short stacks
+   (Val^290-Val^380, Val^135-Val^167, Ile^187-Ile^221, Ile^172, and
+   Ile^206) also strengthen the β-helix cohesion. In the aligned β-bulges,
+   stacking of alanine residues (Ala^241-Ala^275-Ala^301-Ala^433), all in
+   the α[R] conformation, is also seen. In contrast to pectate lyases,
+   however, clusters of aromatic residues are of minor importance,
+   involving only short clusters (Phe^381-Phe^451, Phe^147-Phe^175,
+   Phe^127-Phe^162, Phe^184-Tyr^218). On the surface of the protein, two
+   rows of asparagine residues in the α[L] conformation
+   (Asn^102-Asn^137-Asn^169-Asn^203-Asn^228-Asn^261and
+   Asn^233-Asn^266-Asn^293) flank β-sheet PB2, but few of these amino
+   acids are engaged in successive hydrogen bonds, and only a short
+   portion of asparagine ladder (Asn^102-Asn^137-Asn^163) can be
+   identified. In contrast, as in Flavobactrium heparinumchondroitin lyase
+   B ([96]33), the ι-carrageenase β-helix features external basic stacks,
+   which consist of a short lysine pair (Lys^373-Lys^449) and a cluster of
+   arginines (Arg^136-Arg^168-Arg^202-Arg^260).
+
+ §5§ ι-Carrageenase Contains Binding Sites for Sodium, Chloride, and
+Calcium §5§
+
+   The structure of ι-carrageenase reveals six sodium, two chloride, and
+   six calcium ion binding sites. Four of the sodium ions are located at
+   the interface between molecules A and B in the asymmetric unit and form
+   two clusters related by the noncrystallographic symmetry. In one
+   cluster, sodium ions are bound to a carboxyl group, Asp^54 or Glu^108,
+   and to four water molecules, three of which are shared by the ions.
+   Since ι-carrageenase elutes as a monomer on gel filtration (data not
+   shown), the presence of these four sodium binding sites is probably due
+   to crystal packing. The last two sodium binding sites are located in
+   the same region of molecules A and B in the interior of the β-helix
+   core, 14–15 Å from the catalytic residues. In one molecule, the sodium
+   ion is coordinated by five ligands with a trigonal bipyramidal geometry
+   and at an average distance of 2.35 Å; these ligands are the oxygens of
+   Leu^159, Ile^183, and Phe^184, the hydroxyl of Thr^182, and one water
+   molecule. Thr^182, Ile^183, and Phe^184 are conserved in Z.
+   galactanovoransι-carrageenase ([97]13). Interestingly, Phe^184 adopts a
+   disallowed conformation (φ = 78, ψ = 139). Each protein molecule binds
+   one chloride ion, which is located on the surface of the groove,
+   slightly buried in a hydrophobic pocket and 7 Å from both the
+   above-mentioned sodium ion and the catalytic residues. This hydrophobic
+   cavity is composed of the conserved residues Phe^184, Ala^185, Leu^188,
+   and Tyr^284. The chloride ion is also in contact with the amide group
+   of the conserved Gln^222, the backbone amino group of Ala^185, and one
+   water molecule. The activity of ι-carrageenase is known to depend on
+   the presence of sodium chloride and to decrease rapidly on either side
+   of the optimum concentration of 100 mm NaCl; complete salt removal or
+   NaCl concentrations higher than 500 mmresult in complete loss of
+   activity ([98]34). However, how the presence of sodium and chloride
+   binding sites in ι-carrageenase accounts for its activation by sodium
+   chloride remains an open question.
+
+   Interestingly, each ι-carrageenase molecule also has three calcium ion
+   binding sites, all remote from the active site. The first is located at
+   the surface between the second and third T2 turns. The calcium ion
+   makes hydrogen bonds with the backbone oxygen and hydroxyl group of
+   Ser^109, the side chain carbonyl of Asn^145, the oxygen of Gly^146, and
+   four water molecules. As these ligands are not present in Z.
+   galactanovorans ι-carrageenase ([99]13) this site appears to be
+   specific to A. fortis ι-carrageenase. The second and third sites, which
+   display a hairpin topology, are well conserved between the two
+   ι-carrageenases. The second site precedes the N-terminal α-helical cap
+   (Fig. [100]2). The calcium ion, buried inside the hairpin loop,
+   establishes short contacts (average distance 2.37 Å) with Asn^58 O,
+   Asp^61 OD1, Ser^63 O, Asp^65 OD1 and OD2, and two water molecules.
+   Asn^58, Asp^61, and Asp^65 are strictly conserved in the two
+   ι-carrageenases. The hairpin loop is also structured and anchored to
+   the β-helix by numerous hydrogen bonds (Asn^58 OD1-Asn^60 N,
+   Gly^59O-Thr^91 N, Asp^61 OD1-Ser^63 N, Asp^64 OD1-Asp^65 N-Ser^66 N and
+   OH, Asp^65 OD1-Asn^58 N, and Asp^65OD2-His^93 N). The third calcium
+   binding site is in a more complex and irregular hairpin loop in the
+   C-terminal region. It is in interaction with Thr^438 OH, Asp^445 OD1,
+   Asp^445 OD2, Asp^447 OD1, and one water molecule. This site is
+   strengthened by Asp^436, which makes a hydrogen bond with Thr^438 OH
+   and the above-mentioned water molecule. Only Asp^436 and Thr^438 are
+   strictly conserved in the two enzymes, while Asp^445 and Asp^447 are
+   replaced by asparagine residues in Z. galactanovoraι-carrageenase.
+
+   The potential influence of calcium ions on the stability of
+   ι-carrageenase was tested. Compared with the activity in the
+   purification buffer (10 mm Tris-HCl, pH 7.2, 200 mm NaCl), the addition
+   of either 5 mmCaCl[2] or 5 mm EGTA had no effect on ι-carrageenase
+   activity. In contrast, the trypsin digestion pattern of ι-carrageenase
+   was clearly affected by the presence of either EGTA or CaCl[2] (Fig.
+   [101]4). In the control buffer, trypsin digestion of ι-carrageenase
+   (1:100 w/w) resulted in the release of several peptides with sizes
+   ranging from 5 to 53 kDa, but most of the protein was undegraded; under
+   the same conditions, this pattern was not affected by the presence of 5
+   mm EGTA. A trypsin/ι-carrageenase ratio of 1:20 resulted in greater
+   protein degradation especially in the presence of EGTA when the protein
+   was almost completely degraded. In contrast, at either
+   trypsin/ι-carrageenase ratio, the addition of 5 mmCaCl[2] significantly
+   protected ι-carrageenase from proteolysis. Although the enzyme was
+   purified in the absence of calcium, the marked differences seen in the
+   digestion patterns in the presence or absence of EGTA at the 1:20
+   trypsin/ι-carrageenase ratio indicate that the calcium binding sites
+   were at least partly occupied in the protein, suggesting that they have
+   a high affinity for calcium. Taken together, these findings demonstrate
+   that calcium is involved in maintaining the structural integrity of the
+   protein.
+   [102]Figure 4
+   View larger version:
+     * [103]In this window
+     * [104]In a new window
+
+     * [105]Download as PowerPoint Slide
+
+   Figure 4
+
+   Protection of A. fortisι-carrageenase from trypsin hydrolysis by
+   calcium binding. Proteins were separated by SDS-polyacrylamide gel
+   electrophoresis on a 15% polyacrylamide gel and detected by Coomassie
+   Blue staining. The number on the left indicates the size of the
+   molecular mass markers in kDa (Amersham Pharmacia Biotech), while the
+   band corresponding to trypsin is indicated on the right. Lane 1,
+   ι-carrageenase (4 μg) in the absence of trypsin; lanes 2–4,
+   trypsin/ι-carrageenase ratio of 1:100 (w/w); lanes 5–7,
+   trypsin/ι-carrageenase ratio of 1:20 (w/w). Lanes 2 and5, hydrolysis in
+   control buffer (100 mmTris-HCl, pH 7.2, 200 mm NaCl); lanes 3 and6,
+   hydrolysis in the presence of 5 mm EGTA;lanes 4 and 7, hydrolysis in
+   the presence of 5 mm CaCl[2].
+   [106]Previous Section[107]Next Section
+
+ §2§ DISCUSSION §2§
+
+ §5§ Comparison of ι-Carrageenases with Other Right-handed Parallel β-Helix
+Proteins §5§
+
+   Only 11 protein structures are known to contain a right-handed parallel
+   β-helix fold. Most are pectin-degrading enzymes and use a mechanism
+   involving either β-elimination, e.g. the pectate and pectin lyases of
+   family 1 of the polysaccharide lyases ([108]30, [109]35, [110]36), or
+   acid/base hydrolysis, e.g. Aspergillus nigerrhamnogalacturonase
+   ([111]37) and polygalacturonase ([112]38) as well asErwinia carotovora
+   polygalacturonase ([113]39), which constitute family 28 of the
+   glycoside hydrolases. Other right-handed parallel β-helix
+   fold-containing proteins include chondroitin lyase B fromF. heparinum
+   ([114]33), a virulence factor (P69 pertactin) from the whooping cough
+   agent, the bacterium Bordetella pertussis([115]40), the tailspike
+   rhamnosidase from phage P22 ([116]41), and a pectin methylesterase from
+   E. chrysanthemi ([117]42). It is worth noting thus that most β-helix
+   proteins (pectate lyases, rhamnogalacturonases, polygalacturonases,
+   chondroitin lyases, and ι-carrageenases) are enzymes involved in the
+   depolymerization of acidic polysaccharides with high linear charge
+   densities from the extracellular matrix of plants or animals. The
+   exceptions include pectin lyases, which can degrade the methylated form
+   of polygalacturonic acid, the P22 tailspike protein, an
+   endorhamnosidase involved in the recognition and degradation of the
+   neutral, rhamnose-rich oligosaccharides known as O-antigen receptors
+   ([118]43), and P69 pertactin, the specificity of which is unclear.
+
+   Although ι-carrageenase does not share sequence similarity with family
+   28 pectin hydrolases, its overall structure shows similarities with the
+   family 28 fold. As in these rhamnogalacturonase and polygalacturonases,
+   the ι-carrageenase β-helix fold consists of four parallel β-sheets. All
+   three of these glycoside hydrolases proceed with an inversion of the
+   anomeric configuration of their substrates. However, the
+   pectin-degrading enzymes cleave α(1→4) or α(1→2) glycosidic bonds,
+   whereas ι-carrageenase cleaves β(1→4) glycosidic linkages. It also
+   appears that the family 28 pectinase catalytic residues Asp^180,
+   Asp^201, and Asp^202 ([119]38, [120]44) are not structurally conserved
+   in ι-carrageenase. We thus conclude that ι-carrageenases represent a
+   genuinely new family of glycoside hydrolases referred to as family 82
+   (13). Hence, although families 28 and 82 display the same protein fold,
+   they act on different types of glycosidic bonds (α versusβ) and display
+   different catalytic amino acids, and therefore they do not belong to
+   the same clan of glycoside hydrolases ([121]14).
+
+ §5§ Structure of the Putative Active Site and Recognition of ι-Carrageenan
+Chains §5§
+
+   ι-Carrageenase hydrolyzes glycosidic bonds with a mechanism leading to
+   overall inversion of the anomeric configuration at the site of cleavage
+   ([122]13). In such an inverting hydrolytic mechanism, the glycosidic
+   bond is protonated by the acid/base catalyst to facilitate aglycon
+   departure. This protonation step occurs concomitantly with the attack
+   on the anomeric carbon by a water molecule activated by a base residue,
+   yielding a product with an anomeric stereochemistry opposite to that of
+   the substrate ([123]45, [124]46). In inverting glycoside hydrolases,
+   the acid/base and nucleophile catalysts consist of aspartate and/or
+   glutamate residues, their carboxyl groups being typically 10 Å apart
+   ([125]47). However, family 28 pectinases feature an active site
+   topology with a short distance (5–6 Å) between the catalytic residues
+   ([126]38, [127]44).
+
+   In the structure of E. chrysanthemi pectate lyase C complexed with a
+   plant cell wall fragment, the oligosaccharide is found on PB1, defining
+   the groove as the substrate binding site ([128]48). As discussed below,
+   the groove in ι-carrageenase also appears to be the binding site for
+   the ι-carrageenan chain. Of the acidic residues located in this cleft,
+   only three, Glu^245, Asp^247, and Glu^310, are conserved between the
+   two ι-carrageenase sequences. Glu^245 and Asp^247 are located at the
+   bottom of the groove between domains A and B, and their carboxyl groups
+   are separated by a distance of 4–5 Å. Glu^310 belongs to domain A, and
+   its carboxyl group, which points toward the cleft, is separated by a
+   distance of about 10 Å from the carboxyl groups of Glu^245 and Asp^247
+   (Fig. [129]5). According to the DSSP program, Glu^245, Asp^247, and
+   Glu^310 are all accessible to the solvent with respective accessible
+   surface values of 31, 46, and 61 Å^2. Interestingly the entire region
+   near these residues is well conserved in ι-carrageenases, and we
+   propose that the nucleophile and acid/base catalysts are a yet to be
+   determined pair among these three acidic amino acids.
+   [130]Figure 5
+   View larger version:
+     * [131]In this window
+     * [132]In a new window
+
+     * [133]Download as PowerPoint Slide
+
+   Figure 5
+
+   Stereo view of the potential active site ofA. fortis ι-carrageenase.
+   The conserved residues of ι-carrageenase are shown in red,blue, and
+   black for oxygen, nitrogen, and carbon atoms, respectively. The other
+   residues are shown in ribbon representation. The violet sphere
+   represents a chloride ion. Residues Glu^245, Asp^247, and Glu^310are
+   the potential catalytic amino acids, whereas His^281 may maintain the
+   correct pK [a] of Glu^245. The basic residues Arg^243, Arg^303, and
+   Arg^353 are probably involved in ι-carrageenan recognition.
+
+   The catalytic cleft of ι-carrageenase is not large enough to correctly
+   accommodate the double-stranded helix of ι-carrageenan for productive
+   binding. Therefore, ι-carrageenase presumably initiates its action on
+   single-stranded chains of the amorphous zones of ι-carrageenan gels. In
+   κ-carrageenan, the glycosidic backbone contains alternating negatively
+   charged units ofd-galactose-4-sulfate and hydrophobic
+   3,6-anhydro-d-galactose residues. Consistent with these observations,
+   the binding of κ-carrageenan by Pseudoalteromonas carrageenovora
+   κ-carrageenase has been shown to involve both ionic interactions with
+   sulfate-ester substituents and a specific hydrophobic environment for
+   the 3,6-anhydro-d-galactose units ([134]16). Since ι-carrageenan bears
+   a sulfate group at C-2 of the 3,6-anhydro-d-galactose moiety, this
+   α(1→4)-linked residue is less hydrophobic than in the κ-carrageenans,
+   and substrate binding by ι-carrageenases should mainly involve ionic
+   interactions. This assumption is confirmed by the paucity, in the
+   active site cleft of ι-carrageenase, of aromatic residues, which are
+   known to interact with neutral saccharides through aromatic
+   ring-pyranose ring stacking. The ι-carrageenase groove contains no
+   tryptophan residues and only three tyrosine residues, Tyr^218, Tyr^224,
+   and Tyr^400. In contrast, four arginine residues (Arg^125, Arg^243,
+   Arg^303, and Arg^353) and one lysine residue (Lys^122), which are also
+   present in Z. galactanovorans ι-carrageenase, point toward the cleft.
+   Fig.[135]6 A shows the mapping of these conserved basic residues and of
+   the catalytic residues on the surface of ι-carrageenase.
+   [136]Figure 6
+   View larger version:
+     * [137]In this window
+     * [138]In a new window
+
+     * [139]Download as PowerPoint Slide
+
+   Figure 6
+
+   ι-Carrageenan recognition by ι-carrageenase. A, view of the molecular
+   surface of the ι-carrageenase groove. The potential catalytic residues
+   and the conserved basic amino acids are shown inred and blue,
+   respectively. The distances between clusters of basic residues are
+   shown. Fig. [140]6 was created using Grasp ([141]51). B, ball and stick
+   representation of a ι-neocarrahexaose-sulfate ([142]7). Oxygen, sulfur,
+   and carbon atoms are shown in red, yellow, and black, respectively.
+   Distances between the sulfate substituents are shown.
+
+   Based on the three-dimensional structure of the ι-carrageenan double
+   helix ([143]7), the distribution of sulfate substituents along the
+   ι-carrageenan chain is not homogeneous. Within the same repeating unit,
+   the sulfate groups flank the α(1→3) glycosidic bond and are separated
+   only by 4.65 Å. The distance between two such successive sulfate pairs
+   is 11.5 Å, leaving the immediate vicinity of the β(1→4) linkages devoid
+   of negative charges. Finally, two neighboring pairs of sulfate-ester
+   substituents on the same side of the glycosidic backbone are separated
+   by 16 Å (Fig. [144]6 B). This topology of the sulfate substituents on
+   ι-carrageenan shows a striking match with the distribution of the
+   conserved basic amino acids in the ι-carrageenase groove (Fig. [145]6
+   A). Residues Arg^243 and Arg^303, separated by 7 Å, could form salt
+   bridges with one ester-sulfate pair; this would position the uncleaved
+   α(1→3) linkage between these two arginine residues and place the β(1→4)
+   linkage to be cleaved next to the potential catalytic residues Glu^245,
+   Asp^247, and Glu^310. This assumption is supported by the fact that
+   Arg^243 and Arg^303 are tightly hydrogen-bonded to Glu^245 and Asp^305,
+   respectively (Fig. [146]5). However, we do not know whether Arg^243
+   interacts withd-galactose-4-sulfate and Arg^303 interacts with
+   3,6-anhydro-d-galactose-2-sulfate or vice versa. Thus, Arg^243 and
+   Arg^303 participate either in subsites −1 and −2 or subsites +1 and +2,
+   and the directionality of the carbohydrate polymer chain with respect
+   to the protein structure remains to be identified. Two other basic
+   amino acids in the groove, Lys^122 and Arg^125, located 16 Å from
+   Arg^243 (Fig. [147]6 A), are in the correct topology to bind the
+   sulfate pair. Finally, the last basic residue, Arg^353, is 10 Å from
+   Arg^303, again in a correct position to establish a salt bridge with
+   the sulfate-ester substituent located 11.5 Å from the sulfate-ester
+   bound to Arg^303.
+   [148]Previous Section[149]Next Section
+
+ §2§ ACKNOWLEDGEMENTS §2§
+
+   We thank Dr. Ed Mitchell for invaluable help with the beamline ID14EH2
+   (ESRF), Dr. Thierry Vernet for support with the Se-Met-substituted
+   protein expression, Dr. Anne-Marie DiGuilmi for precious help with the
+   proteolysis analysis, and Dr. Tristan Barbeyron for helpful discussion.
+   [150]Previous Section[151]Next Section
+
+ §2§ Footnotes §2§
+
+     * [152]↵* This work was supported by grants from the Action Concertée
+       Coordonnée Sciences du Vivant (No. V) and Groupement de Rechereches
+       1002 of CNRS “Biology, Biochemistry and Genetics of Marine
+       Algae.”The costs of publication of this article were defrayed in
+       part by the payment of page charges. The article must therefore be
+       hereby marked “advertisement” in accordance with 18 U.S.C. Section
+       1734 solely to indicate this fact.
+       The atomic coordinates and the structure factors (code ) have been
+       deposited in the Protein Data Bank, Research Collaboratory for
+       Structural Bioinformatics, Rutgers University, New Brunswick, NJ
+       ([153]http://www.rcsb.org/).
+     * [154]↵‖ To whom correspondence should be addressed. Tel.:
+       33-4-38-78-56-09; Fax: 33-4-38-78-54-94; E-mail: otto@ibs.fr.
+     * Published, JBC Papers in Press, August 7, 2001, DOI
+       10.1074/jbc.M100670200
+     * Abbreviations:
+
+        Se-Met
+                seleno-l-methionine
+
+     *
+          + Received January 24, 2001.
+          + Revision received June 13, 2001.
+     * The American Society for Biochemistry and Molecular Biology, Inc.
+
+   [155]Previous Section
+
+ §2§ REFERENCES §2§
+
+    1. [156]↵
+         1. Kloareg B.,
+         2. Quatrano R. S.
+       (1988) Oceanogr. Mar. Biol. Annu. Rev. 26:259–315.
+    2. [157]↵
+         1. Potin P.,
+         2. Bouarab K.,
+         3. Kupper F.,
+         4. Kloareg B.
+       (1999) Curr. Opin. Microbiol. 2:276–283.
+       [158]CrossRef[159]Medline[160]Web of Science
+    3. [161]↵
+         1. Rees D. A.
+       (1969) Adv. Carbohydr. Chem. Biochem. 24:267–332.
+       [162]Medline
+    4. [163]↵
+         1. Morris E. R.,
+         2. Rees D. A.,
+         3. Robinson G.
+       (1980) J. Mol. Biol. 138:349–362.
+       [164]CrossRef[165]Medline[166]Web of Science
+    5. [167]↵
+         1. Viebke C.,
+         2. Piculell L.,
+         3. Nilsson S.
+       (1994) Macromolecules 27:4160–4166.
+       [168]CrossRef
+    6. [169]↵
+         1. Nishinari K.,
+         2. Doi E.
+         1. Piculell L.,
+         2. Svante N.,
+         3. Viebke C.,
+         4. Zhang W.
+       (1994) in Food Hydrocolloids: Structures, Properties and Functions,
+       eds Nishinari K., Doi E. (Plenum Press, New York), pp 35–44.
+    7. [170]↵
+         1. Arnott S.,
+         2. Scott W. E.,
+         3. Rees D. A.,
+         4. McNab C. G.
+       (1974) J. Mol. Biol. 90:253–267.
+       [171]CrossRef[172]Medline
+    8. [173]↵
+         1. Gordon-Mills E. M.,
+         2. McCandless E. L.
+       (1977) Phycologia 17:95–104.
+    9. [174]↵
+         1. Zablackis E.,
+         2. Vreeland V.,
+         3. Doboszewski B.,
+         4. Laetsch W. M.
+       (1991) J. Phycol. 27:241–248.
+       [175]CrossRef[176]Web of Science
+   10. [177]↵
+       Johnston, K. H., and McCandless, E. L. (1973) Can. J. Microbiol.
+       779–788.
+   11. [178]↵
+         1. Barbeyron T.,
+         2. Henrissat B.,
+         3. Kloareg B.
+       (1994) Gene (Amst.) 139:105–109.
+       [179]CrossRef[180]Medline
+   12. [181]↵
+         1. Barbeyron T.,
+         2. Gerard A.,
+         3. Potin P.,
+         4. Henrissat B.,
+         5. Kloareg B.
+       (1998) Mol. Biol. Evol. 15:528–537.
+       [182]Abstract
+   13. [183]↵
+         1. Barbeyron T.,
+         2. Michel G.,
+         3. Potin P.,
+         4. Henrissat B.,
+         5. Kloareg B.
+       (2000) J. Biol. Chem. 275:35499–35505.
+       [184]Abstract/FREE Full Text
+   14. [185]↵
+         1. Henrissat B.,
+         2. Davies G.
+       (1997) Curr. Opin. Struct. Biol. 7:637–644.
+       [186]CrossRef[187]Medline[188]Web of Science
+   15. [189]↵
+         1. Michel G.,
+         2. Flament D.,
+         3. Barbeyron T.,
+         4. Vernet T.,
+         5. Kloareg B.,
+         6. Dideberg O.
+       (2000) Acta Crystallogr. Sect. D Biol. Crystallogr. 56:766–768.
+       [190]CrossRef[191]Medline
+   16. [192]↵
+         1. Michel G.,
+         2. Chantalat L.,
+         3. Duée E.,
+         4. Barbeyron T.,
+         5. Henrissat B.,
+         6. Kloareg B.,
+         7. Dideberg O.
+       (2001) Structure 9:513–525.
+       [193]Medline
+   17. [194]↵
+         1. Maignan S.,
+         2. Guilloteau J. P.,
+         3. Zhou-Liu Q.,
+         4. Clement-Mella C.,
+         5. Mikol V.
+       (1998) J. Mol. Biol. 282:359–368.
+       [195]CrossRef[196]Medline[197]Web of Science
+   18. [198]↵
+         1. Otwinowski Z.,
+         2. Minor W.
+       (1997) Methods Enzymol. 276:307–326.
+       [199]CrossRef[200]Web of Science
+   19.
+         1. Sheldrick G. M.
+       (1997) Methods Enzymol. 276:628–641.
+       [201]CrossRef[202]Web of Science
+   20. [203]↵
+         1. de La Fortelle E.,
+         2. Bricogne G.
+       (1997) Methods Enzymol. 276:472–494.
+       [204]CrossRef[205]Web of Science
+   21. [206]↵
+         1. Collaborative Computational Project No. 4
+       (1994) Acta Crystallogr. Sect. D Biol. Crystallogr. 50:760–763.
+       [207]CrossRef[208]Medline
+   22. [209]↵
+         1. Perrakis A.,
+         2. Sixma T. K.,
+         3. Wilson K. S.,
+         4. Lamzin V. S.
+       (1997) Acta Crystallogr. Sect. D Biol. Crystallogr. 53:448–455.
+       [210]CrossRef[211]Medline
+   23. [212]↵
+         1. Jones T. A.,
+         2. Zou J.-Y.,
+         3. Cowan S. W.,
+         4. Kjeldgaard M.
+       (1991) Acta Crystallogr. Sect. A 47:110–119.
+   24. [213]↵
+         1. Brünger A. T.,
+         2. Adams P. D.,
+         3. Clore G. M.,
+         4. DeLano W. L.,
+         5. Gros P.,
+         6. Grosse-Kunstleve R. W.,
+         7. Jiang J. S.,
+         8. Kuszewski J.,
+         9. Nilges M.,
+        10. Pannu N. S.,
+        11. Read R. J.,
+        12. Rice L. M.,
+        13. Simonson T.,
+        14. Warren G. L.
+       (1998) Acta Crystallogr. Sect. D Biol. Crystallogr. 54:905–921.
+       [214]CrossRef[215]Medline
+   25. [216]↵
+         1. Brünger A. T.
+       (1992) Nature 355:472–475.
+       [217]CrossRef[218]Medline
+   26. [219]↵
+         1. Laskowski R. A.,
+         2. MacArthur M. W.,
+         3. Moss D. S.,
+         4. Thornton J. M.
+       (1993) J. Appl. Crystallogr. 26:283–291.
+       [220]CrossRef
+   27. [221]↵
+         1. Kidby D. K.,
+         2. Davidson D. J.
+       (1973) Anal. Biochem. 55:321–325.
+       [222]CrossRef[223]Medline[224]Web of Science
+   28. [225]↵
+         1. Hendrickson W. A.,
+         2. Horton J. R.,
+         3. LeMaster D. M.
+       (1990) EMBO J. 9:1665–1672.
+       [226]Medline[227]Web of Science
+   29. [228]↵
+         1. Ravelli R. B.,
+         2. McSweeney S. M.
+       (2000) Struct. Fold Des. 8:315–328.
+       [229]Medline
+   30. [230]↵
+         1. Yoder M. D.,
+         2. Keen N. T.,
+         3. Jurnak F.
+       (1993) Science 260:1503–1507.
+       [231]Abstract/FREE Full Text
+   31. [232]↵
+         1. Kabsch W.,
+         2. Sander C.
+       (1983) Biopolymers 22:2577–2637.
+       [233]CrossRef[234]Medline[235]Web of Science
+   32. [236]↵
+         1. Yoder M. D.,
+         2. Lietzke S. E.,
+         3. Jurnak F.
+       (1993) Structure 1:241–251.
+       [237]Medline
+   33. [238]↵
+         1. Huang W.,
+         2. Matte A.,
+         3. Li Y.,
+         4. Kim Y. S.,
+         5. Linhardt R. J.,
+         6. Su H.,
+         7. Cygler M.
+       (1999) J. Mol. Biol. 294:1257–1269.
+       [239]CrossRef[240]Medline[241]Web of Science
+   34. [242]↵
+         1. Greer C. W.,
+         2. Yaphe W.
+       (1984) Can. J. Microbiol. 30:1500–1506.
+   35. [243]↵
+         1. Pickersgill R.,
+         2. Jenkins J.,
+         3. Harris G.,
+         4. Nasser W.,
+         5. Robert-Baudouy J.
+       (1994) Nat. Struct. Biol. 1:717–723.
+       [244]CrossRef[245]Medline[246]Web of Science
+   36. [247]↵
+         1. Mayans O.,
+         2. Scott M.,
+         3. Connerton I.,
+         4. Gravesen T.,
+         5. Benen J.,
+         6. Visser J.,
+         7. Pickersgill R.,
+         8. Jenkins J.
+       (1997) Structure 5:677–689.
+       [248]Medline
+   37. [249]↵
+         1. Petersen T. N.,
+         2. Kauppinen S.,
+         3. Larsen S.
+       (1997) Structure 5:533–544.
+       [250]Medline
+   38. [251]↵
+         1. van Santen Y.,
+         2. Benen J. A.,
+         3. Schroter K. H.,
+         4. Kalk K. H.,
+         5. Armand S.,
+         6. Visser J.,
+         7. Dijkstra B. W.
+       (1999) J. Biol. Chem. 274:30474–30480.
+       [252]Abstract/FREE Full Text
+   39. [253]↵
+         1. Pickersgill R.,
+         2. Smith D.,
+         3. Worboys K.,
+         4. Jenkins J.
+       (1998) J. Biol. Chem. 273:24660–24664.
+       [254]Abstract/FREE Full Text
+   40. [255]↵
+         1. Emsley P.,
+         2. Charles I. G.,
+         3. Fairweather N. F.,
+         4. Isaacs N. W.
+       (1996) Nature 381:90–92.
+       [256]CrossRef[257]Medline
+   41. [258]↵
+         1. Steinbacher S.,
+         2. Seckler R.,
+         3. Miller S.,
+         4. Steipe B.,
+         5. Huber R.,
+         6. Reinemer P.
+       (1994) Science 265:383–386.
+       [259]Abstract/FREE Full Text
+   42. [260]↵
+         1. Jenkins J.,
+         2. Mayans O.,
+         3. Smith D.,
+         4. Worboys K.,
+         5. Pickersgill R. W.
+       (2001) J. Mol. Biol. 305:951–960.
+       [261]CrossRef[262]Medline[263]Web of Science
+   43. [264]↵
+         1. Steinbacher S.,
+         2. Baxa U.,
+         3. Miller S.,
+         4. Weintraub A.,
+         5. Seckler R.,
+         6. Huber R.
+       (1996) Proc. Natl. Acad. Sci. U. S. A. 93:10584–10588.
+       [265]Abstract/FREE Full Text
+   44. [266]↵
+         1. Armand S.,
+         2. Wagemaker M. J.,
+         3. Sanchez-Torres P.,
+         4. Kester H. C.,
+         5. van Santen Y.,
+         6. Dijkstra B. W.,
+         7. Visser J.,
+         8. Benen J. A.
+       (2000) J. Biol. Chem. 275:691–696.
+       [267]Abstract/FREE Full Text
+   45. [268]↵
+         1. Koshland D. E.
+       (1953) Biol. Rev. Camb. Philos. Soc. 28:416–436.
+       [269]CrossRef
+   46. [270]↵
+         1. Sinnott M. L.
+       (1990) Chem. Rev. 90:1171–1202.
+       [271]CrossRef[272]Web of Science
+   47. [273]↵
+         1. Davies G.,
+         2. Henrissat B.
+       (1995) Structure 3:853–859.
+       [274]Medline
+   48. [275]↵
+         1. Scavetta R. D.,
+         2. Herron S. R.,
+         3. Hotchkiss A. T.,
+         4. Kita N.,
+         5. Keen N. T.,
+         6. Benen J. A.,
+         7. Kester H. C.,
+         8. Visser J.,
+         9. Jurnak F.
+       (1999) Plant Cell 11:1081–1092.
+       [276]Abstract/FREE Full Text
+   49. [277]↵
+         1. Davies G. J.,
+         2. Wilson K. S.,
+         3. Henrissat B.
+       (1997) Biochem. J. 321:557–559.
+   50. [278]↵
+         1. Kraulis P. J.
+       (1991) J. Appl. Crystallogr. 24:946–950.
+       [279]CrossRef
+   51. [280]↵
+         1. Nicholls A.
+       (1992) GRASP: Graphical Representation and Analysis of Surface
+       Properties (Columbia University, New York).
+
+     * [281]Add to CiteULike CiteULike
+     * [282]Add to Complore Complore
+     * [283]Add to Connotea Connotea
+     * [284]Add to Del.icio.us Del.icio.us
+     * [285]Add to Digg Digg
+
+   [286]What's this?
+   [287]« Previous | [288]Next Article »[289]Table of Contents
+
+ §3§ This Article §3§
+
+    1. First Published on August 7, 2001, doi: 10.1074/jbc.M100670200
+       October 26, 2001 The Journal of Biological Chemistry, 276,
+       40202-40209.
+
+    1. [290]AbstractFree
+    2. » Full TextFree
+    3. [291]Full Text (PDF)Free
+    4. All Versions of this Article:
+         1. [292]M100670200v1
+         2. 276/43/40202 most recent
+
+ §4§ Classifications §4§
+
+    1.
+          + [293]PROTEIN STRUCTURE AND FOLDING
+
+ §4§ Services §4§
+
+    1. [294]Email this article to a friend
+    2. [295]Alert me when this article is cited
+    3. [296]Alert me if a correction is posted
+    4. [297]Alert me when eletters are published
+    5. [298]Similar articles in this journal
+    6. [299]Similar articles in Web of Science
+    7. [300]Similar articles in PubMed
+    8. [301]Download to citation manager
+    9. [302]Request Permissions
+
+ §4§ Responses §4§
+
+    1. [303]Submit a Letter to the Editor
+
+ §4§ Citing Articles §4§
+
+    1. [304]Load citing article information
+    2. [305]Citing articles via Web of Science
+    3. [306]Citing articles via Google Scholar
+
+ §4§ Google Scholar §4§
+
+    1. [307]Articles by Michel, G.
+    2. [308]Articles by Dideberg, O.
+    3. [309]Search for related content
+
+ §4§ PubMed §4§
+
+    1. [310]PubMed citation
+    2. [311]Articles by Michel, G.
+    3. [312]Articles by Dideberg, O.
+    4.
+
+ §4§ Related Content §4§
+
+    1. [313]Load related web page information
+
+ §4§ Social Bookmarking §4§
+
+    1.
+          + [314]Add to CiteULike CiteULike
+          + [315]Add to Complore Complore
+          + [316]Add to Connotea Connotea
+          + [317]Add to Del.icio.us Del.icio.us
+          + [318]Add to Digg Digg
+       [319]What's this?
+
+ §3§ Navigate This Article §3§
+
+    1. [320]Top
+    2. [321]Abstract
+    3. [322]EXPERIMENTAL PROCEDURES
+    4. [323]RESULTS
+    5. [324]DISCUSSION
+    6. [325]ACKNOWLEDGEMENTS
+    7. [326]Footnotes
+    8. [327]REFERENCES
+
+ §3§ This Week's Issue §3§
+
+    1. [328]September 24, 2010, 285 (39)
+
+    1. [329]Current Issue
+
+    1. [330]Alert me to new issues of JBC
+
+     * [331]Authors
+     * [332]Submit
+     * [333]Subscribers
+     * [334]Editorial Board
+     * [335]RSS and Email Alerts
+     * [336]Article Statistics
+     * [337]Teaching Tools
+     * [338]Copyright Permissions
+     * [339]Advertise
+     * [340]Contact JBC
+
+     * Advertisement
+     * Advertisement
+
+   Copyright © 2010 by [341]American Society for Biochemistry and
+   Molecular Biology
+
+   [342]Alternate route to the JBC: http://intl.jbc.org
+
+   [343]Contact JBC | [344]Help Pages
+     * [345]asbmb_today_logo
+     * [346]jlr_logo
+     * [347]mcp_logo
+
+     * Print ISSN 0021-9258
+     * Online ISSN 1083-351X
+
+   Advertisement
+   Advertisement
+     * [348]Cytochrome P450: Special JBC Thematic Series. Read Free
+       Articles!
+
+References
+
+   Visible links
+   1. http://www.jbc.org/
+   2. file://localhost/dev/paper.html#content-block
+   3. http://www.jbc.org/
+   4. http://www.jbc.org/content/current
+   5. http://www.jbc.org/content/by/year
+   6. http://www.jbc.org/content/early/recent/0
+   7. http://www.jbc.org/content/by/section/Minireviews
+   8. http://www.jbc.org/content/by/section/Classics
+   9. http://www.jbc.org/content/by/section/Reflections
+  10. http://www.jbc.org/potw
+  11. http://www.jbc.org/search
+  12. http://www.jbc.org/content/by/year
+  13. http://www.jbc.org/login?uri=http%3A%2F%2Fwww.jbc.org%2Fcontent%2F276%2F43%2F40202.long
+  14. http://www.jbc.org/cgi/adclick/?ad=21396&adclick=true&url=http%3A%2F%2Fwww.asbmb.org%2FPage.aspx%3Fid%3D3362
+  15. file://localhost/dev/paper.html#fn-6
+  16. http://www.jbc.org/search?author1=Gurvan+Michel&sortspec=date&submit=Submit
+  17. file://localhost/dev/paper.html#target-1
+  18. file://localhost/dev/paper.html#target-2
+  19. http://www.jbc.org/search?author1=Laurent+Chantalat&sortspec=date&submit=Submit
+  20. file://localhost/dev/paper.html#target-1
+  21. http://www.jbc.org/search?author1=Eric+Fanchon&sortspec=date&submit=Submit
+  22. file://localhost/dev/paper.html#target-1
+  23. http://www.jbc.org/search?author1=Bernard+Henrissat&sortspec=date&submit=Submit
+  24. file://localhost/dev/paper.html#target-3
+  25. http://www.jbc.org/search?author1=Bernard+Kloareg&sortspec=date&submit=Submit
+  26. file://localhost/dev/paper.html#target-2
+  27. http://www.jbc.org/search?author1=Otto+Dideberg&sortspec=date&submit=Submit
+  28. file://localhost/dev/paper.html#target-1
+  29. file://localhost/dev/paper.html#fn-7
+  30. file://localhost/dev/paper.html#sec-1
+  31. file://localhost/dev/paper.html#ref-1
+  32. file://localhost/dev/paper.html#ref-2
+  33. file://localhost/dev/paper.html#F1
+  34. file://localhost/dev/paper.html#ref-1
+  35. http://www.jbc.org/content/276/43/40202/F1.expansion.html
+  36. http://www.jbc.org/content/276/43/40202/F1.expansion.html
+  37. http://www.jbc.org/content/276/43/40202/F1.expansion.html
+  38. http://www.jbc.org/powerpoint/276/43/40202/F1
+  39. file://localhost/dev/paper.html#ref-49
+  40. file://localhost/dev/paper.html#ref-3
+  41. file://localhost/dev/paper.html#ref-4
+  42. file://localhost/dev/paper.html#ref-5
+  43. file://localhost/dev/paper.html#ref-6
+  44. file://localhost/dev/paper.html#ref-7
+  45. file://localhost/dev/paper.html#ref-7
+  46. file://localhost/dev/paper.html#ref-8
+  47. file://localhost/dev/paper.html#ref-9
+  48. file://localhost/dev/paper.html#ref-10
+  49. file://localhost/dev/paper.html#ref-14
+  50. file://localhost/dev/paper.html#ref-15
+  51. file://localhost/dev/paper.html#abstract-1
+  52. file://localhost/dev/paper.html#sec-8
+  53. file://localhost/dev/paper.html#ref-15
+  54. http://www.jbc.org/cgi/redirect-inline?ad=Novagen
+  55. file://localhost/dev/paper.html#ref-16
+  56. file://localhost/dev/paper.html#ref-15
+  57. file://localhost/dev/paper.html#ref-17
+  58. file://localhost/dev/paper.html#ref-18
+  59. file://localhost/dev/paper.html#ref-20
+  60. file://localhost/dev/paper.html#ref-18
+  61. file://localhost/dev/paper.html#ref-21
+  62. file://localhost/dev/paper.html#ref-21
+  63. file://localhost/dev/paper.html#ref-22
+  64. file://localhost/dev/paper.html#ref-23
+  65. file://localhost/dev/paper.html#ref-24
+  66. file://localhost/dev/paper.html#ref-25
+  67. file://localhost/dev/paper.html#ref-26
+  68. file://localhost/dev/paper.html#ref-27
+  69. file://localhost/dev/paper.html#sec-1
+  70. file://localhost/dev/paper.html#sec-13
+  71. file://localhost/dev/paper.html#ref-28
+  72. file://localhost/dev/paper.html#F2
+  73. file://localhost/dev/paper.html#T1
+  74. file://localhost/dev/paper.html#ref-29
+  75. http://www.jbc.org/content/276/43/40202/F2.expansion.html
+  76. http://www.jbc.org/content/276/43/40202/F2.expansion.html
+  77. http://www.jbc.org/content/276/43/40202/F2.expansion.html
+  78. http://www.jbc.org/powerpoint/276/43/40202/F2
+  79. file://localhost/dev/paper.html#ref-23
+  80. http://www.jbc.org/content/276/43/40202/T1.expansion.html
+  81. http://www.jbc.org/content/276/43/40202/T1.expansion.html
+  82. file://localhost/dev/paper.html#F3
+  83. file://localhost/dev/paper.html#ref-30
+  84. file://localhost/dev/paper.html#ref-31
+  85. http://www.jbc.org/content/276/43/40202/F3.expansion.html
+  86. http://www.jbc.org/content/276/43/40202/F3.expansion.html
+  87. http://www.jbc.org/content/276/43/40202/F3.expansion.html
+  88. http://www.jbc.org/powerpoint/276/43/40202/F3
+  89. file://localhost/dev/paper.html#F3
+  90. file://localhost/dev/paper.html#F4
+  91. file://localhost/dev/paper.html#ref-50
+  92. file://localhost/dev/paper.html#F3
+  93. file://localhost/dev/paper.html#F3
+  94. file://localhost/dev/paper.html#ref-15
+  95. file://localhost/dev/paper.html#ref-32
+  96. file://localhost/dev/paper.html#ref-33
+  97. file://localhost/dev/paper.html#ref-13
+  98. file://localhost/dev/paper.html#ref-34
+  99. file://localhost/dev/paper.html#ref-13
+ 100. file://localhost/dev/paper.html#F2
+ 101. file://localhost/dev/paper.html#F4
+ 102. http://www.jbc.org/content/276/43/40202/F4.expansion.html
+ 103. http://www.jbc.org/content/276/43/40202/F4.expansion.html
+ 104. http://www.jbc.org/content/276/43/40202/F4.expansion.html
+ 105. http://www.jbc.org/powerpoint/276/43/40202/F4
+ 106. file://localhost/dev/paper.html#sec-8
+ 107. file://localhost/dev/paper.html#ack-1
+ 108. file://localhost/dev/paper.html#ref-30
+ 109. file://localhost/dev/paper.html#ref-35
+ 110. file://localhost/dev/paper.html#ref-36
+ 111. file://localhost/dev/paper.html#ref-37
+ 112. file://localhost/dev/paper.html#ref-38
+ 113. file://localhost/dev/paper.html#ref-39
+ 114. file://localhost/dev/paper.html#ref-33
+ 115. file://localhost/dev/paper.html#ref-40
+ 116. file://localhost/dev/paper.html#ref-41
+ 117. file://localhost/dev/paper.html#ref-42
+ 118. file://localhost/dev/paper.html#ref-43
+ 119. file://localhost/dev/paper.html#ref-38
+ 120. file://localhost/dev/paper.html#ref-44
+ 121. file://localhost/dev/paper.html#ref-14
+ 122. file://localhost/dev/paper.html#ref-13
+ 123. file://localhost/dev/paper.html#ref-45
+ 124. file://localhost/dev/paper.html#ref-46
+ 125. file://localhost/dev/paper.html#ref-47
+ 126. file://localhost/dev/paper.html#ref-38
+ 127. file://localhost/dev/paper.html#ref-44
+ 128. file://localhost/dev/paper.html#ref-48
+ 129. file://localhost/dev/paper.html#F5
+ 130. http://www.jbc.org/content/276/43/40202/F5.expansion.html
+ 131. http://www.jbc.org/content/276/43/40202/F5.expansion.html
+ 132. http://www.jbc.org/content/276/43/40202/F5.expansion.html
+ 133. http://www.jbc.org/powerpoint/276/43/40202/F5
+ 134. file://localhost/dev/paper.html#ref-16
+ 135. file://localhost/dev/paper.html#F6
+ 136. http://www.jbc.org/content/276/43/40202/F6.expansion.html
+ 137. http://www.jbc.org/content/276/43/40202/F6.expansion.html
+ 138. http://www.jbc.org/content/276/43/40202/F6.expansion.html
+ 139. http://www.jbc.org/powerpoint/276/43/40202/F6
+ 140. file://localhost/dev/paper.html#F6
+ 141. file://localhost/dev/paper.html#ref-51
+ 142. file://localhost/dev/paper.html#ref-7
+ 143. file://localhost/dev/paper.html#ref-7
+ 144. file://localhost/dev/paper.html#F6
+ 145. file://localhost/dev/paper.html#F6
+ 146. file://localhost/dev/paper.html#F5
+ 147. file://localhost/dev/paper.html#F6
+ 148. file://localhost/dev/paper.html#sec-13
+ 149. file://localhost/dev/paper.html#fn-group-1
+ 150. file://localhost/dev/paper.html#ack-1
+ 151. file://localhost/dev/paper.html#ref-list-1
+ 152. file://localhost/dev/paper.html#xref-fn-6-1
+ 153. http://www.rcsb.org/
+ 154. file://localhost/dev/paper.html#xref-fn-7-1
+ 155. file://localhost/dev/paper.html#fn-group-1
+ 156. file://localhost/dev/paper.html#xref-ref-1-1
+ 157. file://localhost/dev/paper.html#xref-ref-2-1
+ 158. http://www.jbc.org/external-ref?access_num=10.1016/S1369-5274(99)80048-4&link_type=DOI
+ 159. http://www.jbc.org/external-ref?access_num=10383869&link_type=MED
+ 160. http://www.jbc.org/external-ref?access_num=000080853500009&link_type=ISI
+ 161. file://localhost/dev/paper.html#xref-ref-3-1
+ 162. http://www.jbc.org/external-ref?access_num=4913938&link_type=MED
+ 163. file://localhost/dev/paper.html#xref-ref-4-1
+ 164. http://www.jbc.org/external-ref?access_num=10.1016/0022-2836(80)90291-0&link_type=DOI
+ 165. http://www.jbc.org/external-ref?access_num=7411612&link_type=MED
+ 166. http://www.jbc.org/external-ref?access_num=A1980JN48100010&link_type=ISI
+ 167. file://localhost/dev/paper.html#xref-ref-5-1
+ 168. http://www.jbc.org/external-ref?access_num=10.1021/ma00093a017&link_type=DOI
+ 169. file://localhost/dev/paper.html#xref-ref-6-1
+ 170. file://localhost/dev/paper.html#xref-ref-7-1
+ 171. http://www.jbc.org/external-ref?access_num=10.1016/0022-2836(74)90371-4&link_type=DOI
+ 172. http://www.jbc.org/external-ref?access_num=4453016&link_type=MED
+ 173. file://localhost/dev/paper.html#xref-ref-8-1
+ 174. file://localhost/dev/paper.html#xref-ref-9-1
+ 175. http://www.jbc.org/external-ref?access_num=10.1111/j.0022-3646.1991.00241.x&link_type=DOI
+ 176. http://www.jbc.org/external-ref?access_num=A1991FH98300012&link_type=ISI
+ 177. file://localhost/dev/paper.html#xref-ref-10-1
+ 178. file://localhost/dev/paper.html#xref-ref-10-1
+ 179. http://www.jbc.org/external-ref?access_num=10.1016/0378-1119(94)90531-2&link_type=DOI
+ 180. http://www.jbc.org/external-ref?access_num=8112578&link_type=MED
+ 181. file://localhost/dev/paper.html#xref-ref-10-1
+ 182. http://www.jbc.org/cgi/ijlink?linkType=ABST&journalCode=molbiolevol&resid=15/5/528
+ 183. file://localhost/dev/paper.html#xref-ref-10-1
+ 184. http://www.jbc.org/cgi/ijlink?linkType=ABST&journalCode=jbc&resid=275/45/35499
+ 185. file://localhost/dev/paper.html#xref-ref-14-1
+ 186. http://www.jbc.org/external-ref?access_num=10.1016/S0959-440X(97)80072-3&link_type=DOI
+ 187. http://www.jbc.org/external-ref?access_num=9345621&link_type=MED
+ 188. http://www.jbc.org/external-ref?access_num=A1997YB57900006&link_type=ISI
+ 189. file://localhost/dev/paper.html#xref-ref-15-1
+ 190. http://www.jbc.org/external-ref?access_num=10.1107/S0907444900004844&link_type=DOI
+ 191. http://www.jbc.org/external-ref?access_num=10818359&link_type=MED
+ 192. file://localhost/dev/paper.html#xref-ref-16-1
+ 193. http://www.jbc.org/external-ref?access_num=11435116&link_type=MED
+ 194. file://localhost/dev/paper.html#xref-ref-17-1
+ 195. http://www.jbc.org/external-ref?access_num=10.1006/jmbi.1998.2002&link_type=DOI
+ 196. http://www.jbc.org/external-ref?access_num=9735293&link_type=MED
+ 197. http://www.jbc.org/external-ref?access_num=000075907300013&link_type=ISI
+ 198. file://localhost/dev/paper.html#xref-ref-18-1
+ 199. http://www.jbc.org/external-ref?access_num=10.1016/S0076-6879(97)76066-X&link_type=DOI
+ 200. http://www.jbc.org/external-ref?access_num=A1997BH42P00020&link_type=ISI
+ 201. http://www.jbc.org/external-ref?access_num=10.1016/S0076-6879(97)76083-X&link_type=DOI
+ 202. http://www.jbc.org/external-ref?access_num=A1997BH42P00037&link_type=ISI
+ 203. file://localhost/dev/paper.html#xref-ref-20-1
+ 204. http://www.jbc.org/external-ref?access_num=10.1016/S0076-6879(97)76073-7&link_type=DOI
+ 205. http://www.jbc.org/external-ref?access_num=A1997BH42P00027&link_type=ISI
+ 206. file://localhost/dev/paper.html#xref-ref-21-1
+ 207. http://www.jbc.org/external-ref?access_num=10.1107/S0907444994003112&link_type=DOI
+ 208. http://www.jbc.org/external-ref?access_num=15299374&link_type=MED
+ 209. file://localhost/dev/paper.html#xref-ref-22-1
+ 210. http://www.jbc.org/external-ref?access_num=10.1107/S0907444997005696&link_type=DOI
+ 211. http://www.jbc.org/external-ref?access_num=15299911&link_type=MED
+ 212. file://localhost/dev/paper.html#xref-ref-23-1
+ 213. file://localhost/dev/paper.html#xref-ref-24-1
+ 214. http://www.jbc.org/external-ref?access_num=10.1107/S0907444998003254&link_type=DOI
+ 215. http://www.jbc.org/external-ref?access_num=9757107&link_type=MED
+ 216. file://localhost/dev/paper.html#xref-ref-25-1
+ 217. http://www.jbc.org/external-ref?access_num=10.1038/355472a0&link_type=DOI
+ 218. http://www.jbc.org/external-ref?access_num=18481394&link_type=MED
+ 219. file://localhost/dev/paper.html#xref-ref-26-1
+ 220. http://www.jbc.org/external-ref?access_num=10.1107/S0021889892009944&link_type=DOI
+ 221. file://localhost/dev/paper.html#xref-ref-27-1
+ 222. http://www.jbc.org/external-ref?access_num=10.1016/0003-2697(73)90323-0&link_type=DOI
+ 223. http://www.jbc.org/external-ref?access_num=4753157&link_type=MED
+ 224. http://www.jbc.org/external-ref?access_num=A1973Q619400039&link_type=ISI
+ 225. file://localhost/dev/paper.html#xref-ref-28-1
+ 226. http://www.jbc.org/external-ref?access_num=2184035&link_type=MED
+ 227. http://www.jbc.org/external-ref?access_num=A1990DB52700040&link_type=ISI
+ 228. file://localhost/dev/paper.html#xref-ref-29-1
+ 229. http://www.jbc.org/external-ref?access_num=10745008&link_type=MED
+ 230. file://localhost/dev/paper.html#xref-ref-30-1
+ 231. http://www.jbc.org/cgi/ijlink?linkType=ABST&journalCode=sci&resid=260/5113/1503
+ 232. file://localhost/dev/paper.html#xref-ref-31-1
+ 233. http://www.jbc.org/external-ref?access_num=10.1002/bip.360221211&link_type=DOI
+ 234. http://www.jbc.org/external-ref?access_num=6667333&link_type=MED
+ 235. http://www.jbc.org/external-ref?access_num=A1983RV60400010&link_type=ISI
+ 236. file://localhost/dev/paper.html#xref-ref-32-1
+ 237. http://www.jbc.org/external-ref?access_num=8081738&link_type=MED
+ 238. file://localhost/dev/paper.html#xref-ref-33-1
+ 239. http://www.jbc.org/external-ref?access_num=10.1006/jmbi.1999.3292&link_type=DOI
+ 240. http://www.jbc.org/external-ref?access_num=10600383&link_type=MED
+ 241. http://www.jbc.org/external-ref?access_num=000084596800018&link_type=ISI
+ 242. file://localhost/dev/paper.html#xref-ref-34-1
+ 243. file://localhost/dev/paper.html#xref-ref-35-1
+ 244. http://www.jbc.org/external-ref?access_num=10.1038/nsb1094-717&link_type=DOI
+ 245. http://www.jbc.org/external-ref?access_num=7634076&link_type=MED
+ 246. http://www.jbc.org/external-ref?access_num=A1994QN60600015&link_type=ISI
+ 247. file://localhost/dev/paper.html#xref-ref-36-1
+ 248. http://www.jbc.org/external-ref?access_num=9195887&link_type=MED
+ 249. file://localhost/dev/paper.html#xref-ref-37-1
+ 250. http://www.jbc.org/external-ref?access_num=9115442&link_type=MED
+ 251. file://localhost/dev/paper.html#xref-ref-38-1
+ 252. http://www.jbc.org/cgi/ijlink?linkType=ABST&journalCode=jbc&resid=274/43/30474
+ 253. file://localhost/dev/paper.html#xref-ref-39-1
+ 254. http://www.jbc.org/cgi/ijlink?linkType=ABST&journalCode=jbc&resid=273/38/24660
+ 255. file://localhost/dev/paper.html#xref-ref-40-1
+ 256. http://www.jbc.org/external-ref?access_num=10.1038/381090a0&link_type=DOI
+ 257. http://www.jbc.org/external-ref?access_num=8609998&link_type=MED
+ 258. file://localhost/dev/paper.html#xref-ref-41-1
+ 259. http://www.jbc.org/cgi/ijlink?linkType=ABST&journalCode=sci&resid=265/5170/383
+ 260. file://localhost/dev/paper.html#xref-ref-42-1
+ 261. http://www.jbc.org/external-ref?access_num=10.1006/jmbi.2000.4324&link_type=DOI
+ 262. http://www.jbc.org/external-ref?access_num=11162105&link_type=MED
+ 263. http://www.jbc.org/external-ref?access_num=000166748300024&link_type=ISI
+ 264. file://localhost/dev/paper.html#xref-ref-43-1
+ 265. http://www.jbc.org/cgi/ijlink?linkType=ABST&journalCode=pnas&resid=93/20/10584
+ 266. file://localhost/dev/paper.html#xref-ref-44-1
+ 267. http://www.jbc.org/cgi/ijlink?linkType=ABST&journalCode=jbc&resid=275/1/691
+ 268. file://localhost/dev/paper.html#xref-ref-45-1
+ 269. http://www.jbc.org/external-ref?access_num=10.1111/j.1469-185X.1953.tb01386.x&link_type=DOI
+ 270. file://localhost/dev/paper.html#xref-ref-46-1
+ 271. http://www.jbc.org/external-ref?access_num=10.1021/cr00105a006&link_type=DOI
+ 272. http://www.jbc.org/external-ref?access_num=A1990EH74200007&link_type=ISI
+ 273. file://localhost/dev/paper.html#xref-ref-47-1
+ 274. http://www.jbc.org/external-ref?access_num=8535779&link_type=MED
+ 275. file://localhost/dev/paper.html#xref-ref-48-1
+ 276. http://www.jbc.org/cgi/ijlink?linkType=ABST&journalCode=plantcell&resid=11/6/1081
+ 277. file://localhost/dev/paper.html#xref-ref-49-1
+ 278. file://localhost/dev/paper.html#xref-ref-50-1
+ 279. http://www.jbc.org/external-ref?access_num=10.1107/S0021889891004399&link_type=DOI
+ 280. file://localhost/dev/paper.html#xref-ref-51-1
+ 281. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/276/43/40202&title=The%20%CE%B9-Carrageenase%20of%20Alteromonas%20fortis+--+Michel%20et%20al.%20276%20%2843%29%3A%2040202+--+JBC&doi=10.1074/jbc.M100670200&link_type=CITEULIKE
+ 282. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/276/43/40202&title=The%20%CE%B9-Carrageenase%20of%20Alteromonas%20fortis+--+Michel%20et%20al.%20276%20%2843%29%3A%2040202+--+JBC&doi=10.1074/jbc.M100670200&link_type=COMPLORE
+ 283. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/276/43/40202&title=The%20%CE%B9-Carrageenase%20of%20Alteromonas%20fortis+--+Michel%20et%20al.%20276%20%2843%29%3A%2040202+--+JBC&doi=10.1074/jbc.M100670200&link_type=CONNOTEA
+ 284. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/276/43/40202&title=The%20%CE%B9-Carrageenase%20of%20Alteromonas%20fortis+--+Michel%20et%20al.%20276%20%2843%29%3A%2040202+--+JBC&doi=10.1074/jbc.M100670200&link_type=DEL_ICIO_US
+ 285. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/276/43/40202&title=The%20%CE%B9-Carrageenase%20of%20Alteromonas%20fortis+--+Michel%20et%20al.%20276%20%2843%29%3A%2040202+--+JBC&doi=10.1074/jbc.M100670200&link_type=DIGG
+ 286. http://www.jbc.org/help/social_bookmarks.dtl
+ 287. http://www.jbc.org/content/276/43/40190.short
+ 288. http://www.jbc.org/content/276/43/40210.short
+ 289. http://www.jbc.org/content/276/43.toc
+ 290. http://www.jbc.org/content/276/43/40202.abstract
+ 291. http://www.jbc.org/content/276/43/40202.full.pdf+html
+ 292. http://www.jbc.org/content/early/2001/08/07/jbc.M100670200
+ 293. http://www.jbc.org/search?tocsectionid=PROTEIN+STRUCTURE+AND+FOLDING&sortspec=date&submit=Submit
+ 294. http://www.jbc.org/email?gca=jbc;276/43/40202&current-view-path=/content/276/43/40202.long
+ 295. http://www.jbc.org/cgi/alerts/ctalert?alertType=citedby&addAlert=cited_by&cited_by_criteria_resid=jbc;276/43/40202&saveAlert=no&return-type=article&return_url=http://www.jbc.org/content/276/43/40202.long
+ 296. http://www.jbc.org/cgi/alerts/ctalert?alertType=correction&addAlert=correction&correction_criteria_value=276/43/40202&saveAlert=no&return-type=article&return_url=http://www.jbc.org/content/276/43/40202.long
+ 297. http://www.jbc.org/cgi/alerts/ctalert?alertType=eletter&addAlert=eletter&eletter_criteria_value=276/43/40202&saveAlert=no&return-type=article&return_url=http://www.jbc.org/content/276/43/40202.long
+ 298. http://www.jbc.org/search?qbe=jbc;M100670200&citation=Michel%20et%20al.%20276%20%2843%29:%2040202&submit=yes
+ 299. http://www.jbc.org/external-ref?access_num=jbc%3B276%2F43%2F40202&link_type=ISI_RELATEDRECORDS
+ 300. http://www.jbc.org/external-ref?access_num=11493601&link_type=MED_NBRS
+ 301. http://www.jbc.org/citmgr?gca=jbc;276/43/40202
+ 302. https://s100.copyright.com/AppDispatchServlet?publisherName=ASBMB&publication=jbc&title=The%20%CE%B9-Carrageenase%20of%20Alteromonas%20fortis:A%20%CE%B2-HELIX%20FOLD-CONTAINING%20ENZYME%20FOR%20THE%20DEGRADATION%20OF%20A%20HIGHLY%20POLYANIONIC%20POLYSACCHARIDE&publicationDate=10/26/2001&author=Gurvan%20Michel,%20Laurent%20Chantalat,%20Eric%20Fanchon,%20Bernard%20Henrissat,%20Bernard%20Kloareg,%20Otto%20Dideberg&startPage=40202&contentID=10.1074/jbc.M100670200&orderBeanReset=true&endPage=40209&volumeNum=276&issueNum=43
+ 303. http://www.jbc.org/letters/submit/jbc;276/43/40202
+ 304. http://www.jbc.org/content/276/43/40202.long?cited-by=yes&legid=jbc;276/43/40202#cited-by
+ 305. http://www.jbc.org/external-ref?access_num=jbc%3B276%2F43%2F40202&link_type=ISI_CITING
+ 306. http://www.jbc.org/external-ref?access_num=http://www.jbc.org/cgi/content/abstract/276/43/40202&link_type=GOOGLESCHOLAR
+ 307. http://scholar.google.com/scholar?q=%22author%3AMichel%20author%3AG.%22
+ 308. http://scholar.google.com/scholar?q=%22author%3ADideberg%20author%3AO.%22
+ 309. http://www.jbc.org/external-ref?access_num=http://www.jbc.org/cgi/content/abstract/276/43/40202&link_type=GOOGLESCHOLARRELATED
+ 310. http://www.jbc.org/external-ref?access_num=11493601&link_type=PUBMED
+ 311. http://www.jbc.org/external-ref?access_num=Michel%20G&link_type=AUTHORSEARCH
+ 312. http://www.jbc.org/external-ref?access_num=Dideberg%20O&link_type=AUTHORSEARCH
+ 313. http://www.jbc.org/content/276/43/40202.long?related-urls=yes&legid=jbc;276/43/40202#related-urls
+ 314. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/276/43/40202&title=The%20%CE%B9-Carrageenase%20of%20Alteromonas%20fortis+--+Michel%20et%20al.%20276%20%2843%29%3A%2040202+--+JBC&doi=10.1074/jbc.M100670200&link_type=CITEULIKE
+ 315. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/276/43/40202&title=The%20%CE%B9-Carrageenase%20of%20Alteromonas%20fortis+--+Michel%20et%20al.%20276%20%2843%29%3A%2040202+--+JBC&doi=10.1074/jbc.M100670200&link_type=COMPLORE
+ 316. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/276/43/40202&title=The%20%CE%B9-Carrageenase%20of%20Alteromonas%20fortis+--+Michel%20et%20al.%20276%20%2843%29%3A%2040202+--+JBC&doi=10.1074/jbc.M100670200&link_type=CONNOTEA
+ 317. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/276/43/40202&title=The%20%CE%B9-Carrageenase%20of%20Alteromonas%20fortis+--+Michel%20et%20al.%20276%20%2843%29%3A%2040202+--+JBC&doi=10.1074/jbc.M100670200&link_type=DEL_ICIO_US
+ 318. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/276/43/40202&title=The%20%CE%B9-Carrageenase%20of%20Alteromonas%20fortis+--+Michel%20et%20al.%20276%20%2843%29%3A%2040202+--+JBC&doi=10.1074/jbc.M100670200&link_type=DIGG
+ 319. http://www.jbc.org/help/social_bookmarks.dtl
+ 320. file://localhost/dev/paper.html#content-block
+ 321. file://localhost/dev/paper.html#abstract-1
+ 322. file://localhost/dev/paper.html#sec-1
+ 323. file://localhost/dev/paper.html#sec-8
+ 324. file://localhost/dev/paper.html#sec-13
+ 325. file://localhost/dev/paper.html#ack-1
+ 326. file://localhost/dev/paper.html#fn-group-1
+ 327. file://localhost/dev/paper.html#ref-list-1
+ 328. http://www.jbc.org/content/current
+ 329. http://www.jbc.org/content/current
+ 330. http://www.jbc.org/cgi/alerts/etoc
+ 331. http://www.jbc.org/misc/itoa.xhtml
+ 332. http://submit.jbc.org/
+ 333. http://www.jbc.org/subscriptions/
+ 334. http://submit.jbc.org/journals/jbc/forms/editors.dtl
+ 335. http://www.jbc.org/site/home/about/rss_alerts.xhtml
+ 336. http://www.jbc.org/site/home/about/article_stats.xhtml
+ 337. http://www.jbc.org/site/home/teaching_tools/
+ 338. http://www.jbc.org/site/misc/Copyright_Permission.xhtml
+ 339. http://www.asbmb.org/uploadedFiles/Publications/2009ASBMBJournalsMediaKit.pdf
+ 340. http://www.jbc.org/cgi/feedback
+ 341. http://www.asbmb.org/
+ 342. http://intl.jbc.org/
+ 343. http://www.jbc.org/cgi/feedback
+ 344. http://www.jbc.org/help/
+ 345. http://www.asbmb.org/page.aspx?id=218
+ 346. http://www.jlr.org/
+ 347. http://mcponline.org/
+ 348. http://www.jbc.org/cgi/adclick/?ad=21402&adclick=true&url=http%3A%2F%2Fwww.jbc.org%2Fsite%2Fcollections%2Fp450%2F
+
+   Hidden links:
+ 349. http://www.jbc.org/entrez-links/11493601

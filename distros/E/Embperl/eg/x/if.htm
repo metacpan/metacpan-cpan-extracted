@@ -1,0 +1,37 @@
+
+<html>
+<head>
+<title>Embperl Examples - If Metacommands</title>
+</head>
+<body background="../images/jazzbkgd.gif">
+
+<h1>Embperl Examples - If Metacommands</h1>
+<hr><h3>The following displays an sentence depending on the method (GET, POST, other)</h3>
+
+[$ if $ENV{REQUEST_METHOD} eq 'GET' $]
+	This is a GET request
+[$ elsif $ENV{REQUEST_METHOD} eq 'POST' $]
+	This is a POST request
+[$ else $]
+	This is not GET and not POST
+[$ endif $]
+
+
+<hr><h3>The following displays an different sentence depending on the show parameter</h3>
+
+
+[$ if $fdat{show} eq 'yes' $]
+    The show parameter is 'yes'
+[$ elsif $fdat{show} eq 'no' $]
+    Nothing to show
+[$ else $]
+    Request with if.htm?show=yes<BR>
+    of with if.htm?show=no<BR>
+[$ endif $]
+
+<p><hr>
+
+<small>HTML::Embperl (c) 1997-1998 G.Richter</small>
+
+</body>
+</html>

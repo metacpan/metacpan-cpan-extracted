@@ -1,0 +1,38 @@
+From: test@user.com
+To: othertest@test.com
+Subject: your face
+Date: Fri, 20 Apr 2007 10:30:40 -0400
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="1177079440.B1A7b1.831"; charset="us-ascii"
+
+
+--1177079440.B1A7b1.831
+Date: Fri, 20 Apr 2007 10:30:40 -0400
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="1177079440.BEa6738d0.831"; charset="us-ascii"
+
+
+--1177079440.BEa6738d0.831
+Date: Fri, 20 Apr 2007 10:30:40 -0400
+MIME-Version: 1.0
+Content-Type: text/html; charset="us-ascii"
+
+this is a html part
+--1177079440.BEa6738d0.831
+Date: Fri, 20 Apr 2007 10:30:40 -0400
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+
+this is a plain part
+--1177079440.BEa6738d0.831--
+
+--1177079440.B1A7b1.831
+Date: Fri, 20 Apr 2007 10:30:40 -0400
+MIME-Version: 1.0
+Content-Type: image/png; charset="us-ascii"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="yourface.png"
+
+dGhpcyBpcyBhIGZha2UgcG5n
+
+--1177079440.B1A7b1.831--

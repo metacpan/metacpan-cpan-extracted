@@ -1,0 +1,113 @@
+=head1 NAME
+
+EntityModel::Tutorial - a guide to getting started with L<EntityModel>
+
+=head1 VERSION
+
+version 0.102
+
+=head1 OVERVIEW
+
+Start off by installing L<EntityModel> from CPAN. If you want access
+to all the features without having to chase around looking for modules,
+try L<Task::EntityModel>.
+
+=head1 Commandline client
+
+The B<entitymodel> script should be installed by default.
+
+ entitymodel --help
+ entitymodel ui=interactive
+ entitymodel ui=tickit
+
+=head2 Managing models
+
+Create a new model:
+
+ entitymodel create tutorial.json
+
+Add an entity:
+
+ entitymodel edit tutorial.json add entity name=something auto_primary=true
+
+Add a field to an existing entity:
+
+ entitymodel edit tutorial.json entity something add field name=whatever type=text
+
+Add another field, then delete it:
+
+ entitymodel edit tutorial.json entity something add field name=unwanted type=text
+ entitymodel edit tutorial.json entity something remove field name=unwanted
+
+Display the model:
+
+ entitymodel show tutorial.json
+
+=head2 Dealing with Data
+
+Once you have a model with some entities, you can start adding data:
+
+ entitymodel tutorial.json insert ...
+
+=head2 Integrating with other systems
+
+If you already have SQL schema as a starting point, you can import this and
+generate a new model.
+
+ entitymodel import tutorial.json from sql schema.sql
+
+The default dialect favours PostgreSQL but also allows some MySQL constructions,
+if you want a stricter import or if the default doesn't import correctly then
+you can specify the database engine instead:
+ 
+ entitymodel import tutorial.json from postgresql schema.sql
+ entitymodel import tutorial.json from sqlserver schema.sql
+ entitymodel import tutorial.json from oracle schema.sql
+ entitymodel import tutorial.json from db2 schema.sql
+ entitymodel import tutorial.json from sqlite schema.sql
+ entitymodel import tutorial.json from mysql schema.sql
+
+Since the model definition allows more control over the metadata than the originating
+SQL, the recommended approach is to import the SQL once then use the model for any
+future updates. The SQL can be imported or exported at any time if you'd prefer to
+maintain the SQL manually instead.
+
+=head2 Queries
+
+If you speak SQL, you might want to run ad-hoc queries thusly:
+
+ entitymodel load tutorial.json query sql 'select * from entity'
+
+=head1 Tickit client
+
+The next level up from the plain console client uses L<Tickit> to provide a text-based
+windowing interface for managing models and data. Primarily intended for low-bandwidth
+terminal connections or systems where you have SSH access but can't use the web interface
+for some reason.
+
+Run this to get the Tickit client:
+
+ entitymodel ui=tickit tutorial.json
+
+=head1 Web interface
+
+No one takes you seriously these days unless you have a web presence - and sometimes
+it's just easier to deal with larger layouts using the features of a web browser.
+
+ entitymodel ui=web tutorial.json
+
+This will start a mini webserver listening on a random port, connect to this to edit
+your model.
+
+=head1 Desktop client
+
+
+
+=head1 Android client
+
+If you start a REST or Tangence server, you can connect using the Android client. Any
+of these should do the trick:
+
+ entitymodel ui=web tutorial.json
+ entitymodel ui=rest tutorial.json
+ entitymodel ui=tangence tutorial.json

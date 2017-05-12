@@ -1,0 +1,33 @@
+Exporter::NoWork
+================
+
+This provides a trivial interface to exporting functions: all functions
+whose names do not begin with an underscore are considered exportable.
+There are options to handle automagically exporting all CONSTANT_SUBS.
+
+INSTALLATION
+
+It is possible to install this module manually, by typing
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+but it is highly recommended that you use CPAN.pm or one of the other
+automatic interfaces to CPAN to install it for you.
+
+DEPENDENCIES
+
+See the META.yml file in this distribution for details of the
+dependencies.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 Ben Morrow 
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

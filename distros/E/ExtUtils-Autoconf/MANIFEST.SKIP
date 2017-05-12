@@ -1,0 +1,12 @@
+^_darcs/
+^\.cvsignore$
+^MANIFEST\.bak$
+^ExtUtils-Autoconf-.*
+\.sw\w$
+^Makefile.old$
+^Makefile$
+^pm_to_blib$
+^svn-commit\.tmp$
+\.svn
+\bblib/
+#defaults

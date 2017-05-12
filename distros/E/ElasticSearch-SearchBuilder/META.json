@@ -1,0 +1,64 @@
+{
+   "abstract" : "A Perlish compact query language for ElasticSearch",
+   "author" : [
+      "Clinton Gormley <drtech@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.130880",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "ElasticSearch-SearchBuilder",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Scalar::Util" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Dump" : "0",
+            "Test::Deep" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/clintongormley/ElasticSearch-SearchBuilder/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/clintongormley/ElasticSearch-SearchBuilder.git",
+         "web" : "https://github.com/clintongormley/ElasticSearch-SearchBuilder"
+      }
+   },
+   "version" : "0.19"
+}
+

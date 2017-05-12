@@ -1,0 +1,45 @@
+Changes for Excel::Template::Plus
+
+0.06 Tues. Jan. 13, 2014
+    - Replace Class::MOP::load_class with 
+      Module::Runtime::use_module
+        - thanks to Alex Balhatchet
+
+0.05 Mon. Feb 22, 2010
+    - updates copyright on all files
+
+    * Test::Excel::Template::Plus
+      - Fixing some test failures because of an
+        internals change in Spreadsheet::ParseExcel
+        - thanks to Chris Travers
+
+0.04 Mon. Dec. 31, 2007
+    * Excel::Template::Plus
+      - added example template to the docs
+        thanks to Peter Karman for this.
+
+    * Excel::Template::Plus::TT
+      - removed the 'use FindBin' at the top
+        which was doing nothing at all
+
+0.03 Tues, July 3, 2007
+    * Excel::Template::Plus::TT
+      - added template_class to allow for using
+        subclasses of Template
+      - removed File::Tempfile and File::Slurp dependency
+        in favor of using IO::String instead
+
+0.02 Tues, March 13, 2007
+    * Excel::Template::Plus
+      - Now uses the Class::MOP::load_class
+        method (bumped up the Moose dependency
+        to make sure all is aligned)
+
+    * Excel::Template::Plus::TT
+      - removed param method and added the
+        MooseX::Param role instead
+
+0.01 Friday, March 2, 2007
+    - initial module release
+    - adapted from several in-house add-ons to
+      Excel::Template and Excel::Template::TT

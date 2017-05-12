@@ -1,0 +1,29 @@
+--- #YAML:1.0
+name:               EBook-FB2
+version:            0.2
+abstract:           ~
+author:
+    - Oleksandr Tymoshenko <gonzo@bluezbox.com>
+license:            bsd
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Carp:             0
+    MIME::Base64:     0
+    Moose:            0.90
+    Test::More:       0
+    XML::DOM:         0
+    XML::DOM::XPath:  0
+resources:
+    repository:  http://github.com/gonzoua/EBook-FB2
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

@@ -1,0 +1,6 @@
+---
+files :
+   - t/test.t
+   - index.cgi :
+       chmod : 755
+   - MANIFEST

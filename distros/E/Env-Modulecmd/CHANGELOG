@@ -1,0 +1,44 @@
+# $Id: CHANGELOG,v 5.2 2014/08/18 16:55:53 ronisaac Exp $
+
+# Copyright (c) 2001-2014, Morgan Stanley.
+# Distributed under the terms of the GNU General Public License.
+# Please see the copyright notice in Modulecmd.pm for more information.
+
+============================
+CHANGELOG FOR Env::Modulecmd
+============================
+
+1.0, 2001/06/04
+
+  - Initial release
+
+1.1, 2003/08/14
+
+  - Smart parsing of STDERR output, to handle warnings & fatal errors
+  - Defaults for PERL_MODULECMD and MODULEPATH at build time
+  - Better error message from test suite when modulecmd isn't found
+  - waitpid() after each call to modulecmd, to avoid leaving zombies
+
+1.2, 2004/05/07
+
+  - Support for modulecmd on MS Windows
+  - Better handling of perl warnings that occur inside eval'ed
+    modulecmd output
+
+1.2a, 2004/05/28
+
+  - Fixed installation problem under certain shells
+  - (No functionality changes)
+
+1.2b, 2004/06/09
+
+  - Fixed the improved error handling in the test suite when modulecmd
+    isn't found
+  - (No functionality changes)
+
+1.3, 2014/07/22
+
+  - Fixed a possible hang on MS Windows 7 and up
+  - Updated test suite to avoid false failure reports from CPAN
+    testers who don't have modulecmd installed (which is nearly all of
+    them!)

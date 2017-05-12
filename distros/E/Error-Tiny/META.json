@@ -1,0 +1,87 @@
+{
+   "abstract" : "Tiny exceptions",
+   "author" : [
+      "Viacheslav Tykhanovskyi, C<vti@cpan.org>."
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.7.5",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Error-Tiny",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Scalar::Util" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Fatal" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Error::Tiny" : {
+         "file" : "lib/Error/Tiny.pm",
+         "version" : "0.03"
+      },
+      "Error::Tiny::Catch" : {
+         "file" : "lib/Error/Tiny/Catch.pm"
+      },
+      "Error::Tiny::Exception" : {
+         "file" : "lib/Error/Tiny/Exception.pm"
+      },
+      "Error::Tiny::Then" : {
+         "file" : "lib/Error/Tiny/Then.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/vti/error-tiny/issues"
+      },
+      "homepage" : "https://github.com/vti/error-tiny",
+      "repository" : {
+         "url" : "git://github.com/vti/error-tiny",
+         "web" : "https://github.com/vti/error-tiny"
+      }
+   },
+   "version" : "0.03",
+   "x_contributors" : [
+      "vti <viacheslav.t@gmail.com>"
+   ]
+}

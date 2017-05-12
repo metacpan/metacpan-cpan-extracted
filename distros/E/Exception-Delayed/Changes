@@ -1,0 +1,14 @@
+Revision history for Exception-Delayed
+
+0.002 2015-04-18
+ [DOCUMENTATION]
+ - fix missing call in example
+
+ [ENHANCEMENTS]
+ - new method: wantany
+
+0.001 2015-04-18
+ - Initial release
+
+0.000 0000-00-00
+

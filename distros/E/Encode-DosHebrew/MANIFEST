@@ -1,0 +1,3 @@
+Makefile.PL
+MANIFEST
+lib/Encode/DosHebrew.pm

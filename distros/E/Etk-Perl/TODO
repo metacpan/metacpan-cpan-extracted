@@ -1,0 +1,10 @@
+TODO:
+	- Add initialization options
+	- Add support for creating new widgets from Perl
+	- complete callback system 
+	- Documentation
+	- complete Tests
+	- Image new from data
+	- fix DND
+
+BUGS:

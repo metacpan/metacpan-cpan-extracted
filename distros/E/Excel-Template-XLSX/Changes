@@ -1,0 +1,32 @@
+Revision history for Excel-Template-XLSX 
+
+v1.0.7  02-Jun-2016
+        Changed build script to require Excel::Writer::XLSX 0.90 
+        
+v1.0.6  02-Jun-2016
+        Ticket #114543: Changed XLSX.pm and test scripts to use EWX public api $worksheet->get_name()
+        issue arose from release of Excel::Writer::XLSX 0.90 
+
+v1.0.5  01-Mar-2016
+         Ticket #105683: Loosing format information in merged cells (rich strings)
+
+v1.0.4  25-Jun-2015
+        Fixed checking of duplicate sheet names in template, Cell A1 changed from A:1
+
+v1.0.3  06-Apr-2015
+        Fixed t\08-open-output.t to just use a null string
+
+v1.0.2  01-Apr-2015
+        Removed CPAN::Uploader from build script
+        Fixed t\08-open-output.t  '*' is a valid file name on
+        unix based systems.  Test failed.   
+        Changed test file to null character \x00invalid
+
+v1.0.1  30-Mar-2015
+        Fixed t\08-open-output.t  '*' is a valid file name on
+        unix based systems.  Test failed.   
+        Changed test file to null character \x00
+
+v1.0.0  26-Mar-2015
+        Initial Release of Excel-Template-XLSX to GitHub and CPAN
+

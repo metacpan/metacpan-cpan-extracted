@@ -1,0 +1,337 @@
+                                     QUICK SEARCH:  [advanced]         Author:   Keyword(s):                Home  Help  Feedback  Subscriptions  Archive  Search   Table of Contents           Institution: University of Colorado | Sign In as Individual 
+
+                                                                   First published online 16 June 2004     doi: 10.1242/dev.01219          Development 131, 3307-3317 (2004) Published by The Company of Biologists 2004                                            This Article          Summary                                                 Figures Only                                 Full Text (PDF)                                                                                All Versions of this Article:    dev.01219v1          131/14/3307   most recent                                          Alert me when this article is cited                 Alert me if a correction is posted                                  Services         Email this article to a friend             Related articles in Development                         Similar articles in this journal           Similar articles in PubMed              Alert me to new issues of the journal                Download to citation manager                                                                Citing Articles         Citing Articles via HighWire                        Citing Articles via Google Scholar                             Google Scholar         Articles by Kurokawa, D.                      Articles by Aizawa, S.                      Search for Related Content                          PubMed         PubMed Citation               Articles by Kurokawa, D.          Articles by Aizawa, S.                                                                                                                                                                          Regulation of Otx2 expression and its functions in mouse epiblast and anterior neuroectoderm     Daisuke Kurokawa 1,  Nobuyoshi Takasaki 1,  Hiroshi Kiyonari 2,  Rika Nakayama 2,  Chiharu Kimura-Yoshida 1,  Isao Matsuo 1 and  Shinichi Aizawa 1,2,*  
+
+   1 Laboratory for Vertebrate Body Plan, Center for Developmental Biology (CDB), RIKEN Kobe, 2-2-3 Minatojima-minamimachi, Chuo-ku, Kobe 650-0046, Japan  2 Laboratory for Animal Resources and Genetic Engineering, Center for Developmental Biology (CDB), RIKEN Kobe, 2-2-3 Minatojima-minamimachi, Chuo-ku, Kobe 650-0046, Japan  
+
+   * Author for correspondence (e-mail:  var u = "saizawa", d = "cdb.riken.jp"; document.getElementById("em0").innerHTML = ' ' + u + '@' + d + '<\/a>'//--> ) 
+
+      Accepted 8 April 2004 
+
+      SUMMARY       TOP   SUMMARY   Introduction   Materials and methods   Results   Discussion   REFERENCES     We have identified cis-regulatory sequences acting on Otx2 expression in epiblast (EP) and anterior neuroectoderm (AN) at about 90 kb 5' upstream. The activity of the EP enhancer is found in the inner cell mass at E3.5 and the entire epiblast at E5.5. The AN enhancer activity is detected initially at E7.0 and ceases by E8.5; it is found later in the dorsomedial aspect of the telencephalon at E10.5. The EP enhancer includes multiple required domains over 2.3 kb, and the AN enhancer is an essential component of the EP enhancer. Mutants lacking the AN enhancer have demonstrated that these cis-sequences indeed regulate Otx2 expression in EP and AN. At the same time, our analysis indicates that another EP and AN enhancer must exist outside of the –170 kb to +120 kb range. In  Otx2 AN/– mutants, in which one Otx2 allele lacks the AN enhancer and the other allele is null, anteroposterior axis forms normally and anterior neuroectoderm is normally induced. Subsequently, however, forebrain and midbrain are lost, indicating that  Otx2 expression under the AN enhancer functions to maintain anterior neuroectoderm once induced. Furthermore, Otx2 under the AN enhancer cooperates with Emx2 in diencephalon development. The AN enhancer region is conserved among mouse, human and Xenopus ; moreover, the counterpart region in Xenopus exhibited an enhancer activity in mouse anterior neuroectoderm. 
+
+    
+
+Key words: Otx2, Emx2, Enhancer, Epiblasts, Anterior neuroectoderm, Mouse
+
+       Introduction       TOP   SUMMARY   Introduction   Materials and methods   Results   Discussion   REFERENCES    The Otx family of paired-type homeobox genes comprises vertebrate homologs of Drosophila head gap gene otd (Simeone et al., 1992   ). Mammals possess two homologs, Otx1 and Otx2, whereas  Xotx4 and otx3 are present in the natural tetraploid genomes of Xenopus and zebrafish; Xotx4 and otx3 are divergent copies of Otx1. Otx2 is expressed in each step and at each site of head development throughout the tetrapod lineage. In mouse, its expression is seen in the epiblast, distal/anterior visceral endoderm, anterior mesendoderm, anterior neuroectoderm, forebrain/midbrain and cephalic mesenchyme. By contrast, Otx1 expression occurs later, in forebrain and midbrain (Simeone et al., 1992   ; Simeone et al., 1993   ; Li et al., 1994   ; Mori et al., 1994   ; Bally-Cuif et al., 1995   ; Mercier et al., 1995   ; Pannese et al., 1995   ; Kablar et al., 1996   ; Kimura et al., 1997   ; Kimura et al., 2000   ; Kimura et al., 2001   ). In zebrafish, however, the expression patterns of Otx homologs are divergent. otx1 is expressed in blastoderm prior to the shield stage. In addition, otx1 and otx3, but not  otx2, are expressed in the shield, i.e. the fish organizer (Mori et al., 1994   ). All zebrafish Otx genes are expressed in anterior mesendoderm. otx1 and  otx3 expression also precede otx2 expression in anterior neuroectoderm. 
+
+  Mutant studies in mouse have suggested that Otx2 plays essential roles in head development (Acampora et al., 1995   ; Acampora et al., 1997   ; Acampora et al., 1998   ; Ang et al., 1996   ; Matsuo et al., 1995   ; Rhinn et al., 1998   ; Rhinn et al., 1999   ; Suda et al., 1996   ; Suda et al., 1997   ; Suda et al., 1999   ; Suda et al., 2001   ; Tian et al., 2002   ; Kimura et al., 1997   ; Kimura et al., 2000   ; Kimura et al., 2001   ). However, owing to its expression in multiple sites, it has not to date been possible to distinguish clearly the functions of  Otx2 in each site. In addition, information is scarce regarding the upstream factors that regulate Otx2 expression at each developmental site. In light of the essential roles played by Otx genes in head development, it will be important to develop an understanding of how mechanisms governing the regulation of Otx expression in each vertebrate are related and altered. 
+
+  Previously, we have identified mouse enhancers of Otx2 expression in visceral endoderm (VE), definitive anterior mesendoderm (AME) and cephalic neural crest cells or mesenchyme (CM); the sites located proximal to the  Otx2 -coding region (Kimura et al., 1997   ; Kimura et al., 2000   ). However, no ectodermal enhancers were present in this proximal region. Enhancers of Otx2 expression in epiblast, anterior neuroectoderm and forebrain/midbrain were then sought by BAC transgenesis, and indications were that they existed within the –170 kb 5' upstream (A of the ATG translation start codon is taken as +1 bp). In the present study, we have analyzed the enhancers of Otx2 expression in epiblast (EP) and anterior neuroectoderm (AN); analysis of the enhancers of  Otx2 expression in forebrain and midbrain is described in an accompanying paper (Kurokawa et al., 2004   ). EP and AN enhancers were identified at about 90 kb 5' upstream. The EP activity was found in the inner cell mass of the blastocyst stage embryos and the entire epiblast of egg cylinder stage embryos. AN enhancer activity was detected initially at E7.0 and had ceased by E8.5. The EP enhancer included multiple required domains over 2.3 kb, and the AN enhancer was an essential component of the EP enhancer. Mutants lacking the AN enhancer were generated to demonstrate that these cis-sequences do indeed regulate Otx2 expression in EP and AN, but additional EP and AN enhancers must exist outside of the –170 kb to +120 kb range.  Otx2 expression under the AN enhancer was essential to maintaining the anterior neuroectoderm once induced. Furthermore, Otx2 under the AN enhancer cooperated with Emx2 in diencephalon development. 
+
+        Materials and methods       TOP   SUMMARY   Introduction   Materials and methods   Results   Discussion   REFERENCES     Genomic clones of the Otx2 locus of mouse and other animals  A mouse Otx2 genomic BAC clone 582F09 (hereafter referred to as BAC#1) was isolated from a C57BL/6 BAC library (Research Genetics). It was subdivided into about 10 to 15kb fragments by Sau 3AI partial digestion; the fragments were subcloned into the Bam HI site of pBluescript SK(–). These clones were aligned as shown in  Fig. 2A by walking. Lengths and primers used to isolate mouse genomic sequences containing the,, µ,,, o, and, domains ( Fig. 7A ) by PCR were as follows: 3.1 kb with 5'-GCAAAACATGTTACCTGCTAAGCAAC-3' and 5'-TGAATTCAGAGAATGCAGCGCATGC-3'; 3.3 kb with 5'-TCCTATGCAGACTTGGCTGGCCTGG-3' and 5'-TCCCTCTCTGGCACTCAGGCTGAGG-3'; 2.8 kb with 5'-CTAGCTTTTAGCTGCAATATAGAAAGG-3' and 5'-GGACCCTGAAGAACCGGGCAGAAAT-3'; 3.5 kb with 5'-GAGAGTAGTGCTGCATTGAACATGG-3' and 5'-CAAGGTTGTCAAGGAGTGTTCAATG-3'; 1.6 kb with 5'-CATAAATGTGCAATGGCAAGTGTCC-3' and 5'-CATCAGCGAGCAATCCGTAGCCAGG-3'; 1.9 kb with 5'-GAGATGATCATGCAGCTCTCGG-3' and 5'-CTCTGTGAACCATGTAAGACTGG-3'; 0.7 kb with 5'-GAGAGAGAGGAGATTTTGCTTTCTTGAAGC-3' and 5'-GTTCCCTTACCCTATCCACAATGCACTGTTCC-3'; and 0.7 kb with 5'-ACTATTTAACTGGCTGCCCTTTTTCGCACTGG-3' and 5'-GAGCAGGGAGGGCATCAGATCCGCTGTACAAG-3', respectively. The  Xenopus (Silurana) tropicalis genomic sequence containing domain  was 1.6 kb with 5'-TGGAGAAACACAATAAAAGAGC-3' and 5'-AACCAAAGAGTCTCCATAGC-3'. 
+
+   
+
+          View larger version (61K):  [in this window]  [in a new window]   Fig. 2. Dissection of ectodermal enhancers at 5' upstream. (A) Schematic diagram depicting the 15 fragments assayed for enhancer activity. Number of lines exhibiting ß-gal expression among permanent transgenic lines established is indicated in parenthesis. Fragments displaying enhancer activity are indicated in red. (B) ß-Gal expression driven by #12 (a-f), by endogenous enhancers in Otx2 +/lacZ knock-in embryos (g-k) and by #4 (l). The ß-gal expression indicated by arrows represents the expression in anterior visceral endoderm (b), anterior mesendoderm (d) and cephalic mesenchyme (e,l) by the 1.8 kb promoter (Kimura et al., 1997   ). The expression in e is solely due to the activity of the 1.8 kb promoter (compare with Fig. 1B, part d). Compare the expression in d with the 1.8 kb promoter with that in  Fig. 3B, part h with the  hsp68 promoter. The #4 fragment exhibited ß-gal expression in a region of the ventral diencephalon and dorsal mesencephalon. In lateral views (a,c-e,g-j,l), anterior is leftwards; (b) cross-section in the plane shown in a; (f,k) frontal views. Arrowheads and double arrows indicate the position of the isthmus and the expression in the eyes, respectively. a, anterior; p, posterior. Scale bars: 100 µm in a-d,g,h; 400 µm in e,f,i-l.
+
+        
+
+          View larger version (10K):  [in this window]  [in a new window]   Fig. 7. Genome organization in tetrapod Otx2 locus. Locations of the 22 domains in Otx2 locus conserved among mouse, human and  Xenopus. Black bars in mouse and human Otx2 locus define the locations of the nearest genes at the 5' and 3' sides, respectively. Domains that exhibited enhancer activity are shown by red bars [see Kurokawa et al. (Kurokawa et al., 2004   ) for details of the analysis of the 3' region]. The contiguous mapping is partial in the Xenopus Otx2 locus; however, domains – and – exist in the genome. White boxes indicate the Otx2 -coding regions.
+
+        Generation of BAC transgenic mice  BAC #1 reporter transgenic mice were generated as described by Helms et al. (Helms et al., 1998). The 3' terminal of BAC #1 was located at –30 kb 5' upstream from the Otx2 translation start site ( Fig. 1A ). Five kb DNA at –35 kb to –30 kb 5' upstream was ligated to 1.8 K- lacZ, which led to the production of 5'- lacZ. BAC #1 and 5'- lacZ were separated from vector-derived sequences via digestion with Not I and Sal I, respectively (Yang et al., 1997   ), followed by co-injection into the pronucleus of fertilized CD-1 mouse eggs (concentration of each, 1-2 ng/µl). Transgenic mice harboring the correct recombinant were identified by PCR. Primers employed for this purpose were 5'-GCCAAACACAGAATCAGCAAGGAGGAGGCCATGC-3' in BAC #1 and 5'-CCAGATTTACATTCAGAACACAAGTCTTATTTCCCCACCC-3' in the  lacZ gene. 
+
+   
+
+          View larger version (53K):  [in this window]  [in a new window]   Fig. 1. Search for enhancers of Otx2 expression in ectoderm at 5' upstream by BAC transgenesis. (A) BAC #1/lacZ reporter gene. A of the ATG translation start codon is taken as +1 bp. (B) ß-Gal expression in ectoderm at each stage by BAC #1 (a-c) and expression in cephalic mesenchyme (d) by the 1.8 kb promoter. Arrows indicate expression by the 1.8 kb promoter. Scale bars: 100 µm in a,b; 400 µm in c,d.
+
+        Production and genotyping of transgenic mice  The 1.8 kb lacZ reporter is a modified version of the VEcis- lacZ vector of Kimura et al. (Kimura et al., 1997   ). The  Not I- Pma CI- Sac II linker was inserted into the  Sal I/ Bgl II site of the 5' polylinker in the vector. Each DNA fragment was inserted between these Not I and Sac II sites. Permanent transgenic mice and transient transgenic embryos were generated and ß-gal expression was determined as described previously (Kimura et al., 1997   ; Kimura et al., 2000   ). 
+
+   PCR mutagenesis  Utilizing the PCR-based overlap extension method (Kucharczuk et al., 1999   ), each 15 bp block of EB165 bp AN core enhancer (#1-#11 in  Fig. 4B ) was replaced with the linker sequence 5'-AGACTGGATCCTGTG-3'. Putative transcription factor binding sites in each enhancer were also mutated by the transverse substitution of nucleotides using this approach. 
+
+   
+
+          View larger version (35K):  [in this window]  [in a new window]   Fig. 4. Deletion analysis of AN enhancer. (A) Fine mapping of the AN enhancer. (11-7) x 2 is a duplicate of the #11-#7 sequences (see B), whereas (11-10) x 5 is a quintuplet of the #11-#10 sequences. Percentages indicate the sequence identity of the fragment with the counterpart region of human or  Xenopus. (B) Nucleotide sequences of the mouse, human and  Xenopus EB 165 bp region. Linker-scanner mutations were introduced such that each 15 bp block was replaced with a transcriptionally inert 15 bp linker. The number of ß-gal-positive embryos among transient transgenic embryos in each block is provided in parenthesis; mutations affecting enhancer activity are indicated in red. Asterisks in #8, #9 and #11 represent residual expression as shown in C, part c. (C) ß-gal expression driven by the EcoT22I/ Bgl II(EB)165 bp subfragment (a), by the EB165 bp with the mutation at #10 (b), by the EB165 bp with the mutation at #11 (c), by the (11-7) x 2 fragment (d) and by a 1.6 kb Xotx2 region (e) at E7.75. (a-d) Lateral views, anterior is leftwards; (e) a frontal view. Note the loss of expression by the #10 mutation (b), residual expression by the #11 mutation (c) and significant expression with the (11-7) x 2 fragment (d) in the anterior neuroectoderm (arrowheads). Arrows indicate the expression in anterior mesoderm and endoderm by the 1.8 kb promoter. Scale bars: 100 µm.
+
+        Sequence analysis  All genomic DNAs isolated or mutagenized by PCR were sequenced to verify the absence of spurious mutations. Comparison of the mouse Otx2 genomic sequences with other species was conducted with the Berkeley Genome Pipeline and Genome VISTA (Couronne et al., 2003   ) programs. Additionally, sequence alignment was confirmed with the BLAST program (Mayor et al., 2000   ). Putative transcription binding sites were predicted with the TFSEARCH program (Heinemeyer et al., 1998   ). 
+
+   Generation of AN enhancer knockout mice  A neomycin resistance gene with Pgk1 promoter and SV40 polyadenylation signal was flanked by loxP sequences. This cassette (Neo) was replaced with the Spe I/ Bgl II 559 bp region, which harbors the AN enhancer. Lengths of the homologous regions were 8.0 kb and 4.0 kb at the 5' and 3' sides of the neo cassette, respectively. Diphtheria toxin A fragment gene with MC1 promoter was used for the negative selection of homologous recombinants as described (Yagi et al., 1993b   ). The targeting vector was linearized with  Sal I and electroporated into TT2 ES cells (Yagi et al., 1993a   ). Homologous recombinants were identified as those that generate 4.0 kb products by PCR with 5'-ATCGCCTTCTTGACGAGTTCTTCTG-3' in the neo gene as the 5' side primer and 5'-GATCCTCCTGCCTCTGCGTCAATAGC-3' as the 3' side primer; the 3' primer is located outside of the 3' side 4kb homologous region in Otx2 locus. The recombinants were confirmed by Southern blot analyses as described (Matsuo et al., 1995   ). Two mutant mouse strains were generated from independent homologous recombinant ES clones. The genotype of mutant mouse or embryo was routinely determined by PCR using tail or yolk sac specimens. Wild-type allele was detected with the sense primer of the 5'-CTGCAGATGCTTGGGCTTTCTGCAGC-3' and the antisense primer of the 5'-GGGGTCTTCATGAGTTTCTGTTGCAC-3'. The mutant allele was identified with the sense primer of 5'-ATCGCCTTCTTGACGAGTTCTTCTG-3' in the  neo gene and the antisense primer. The deletion of the neo insert by Cre-mediated loxp recombination was accomplished by mating  Otx2 +/ AN mice with Lefty-Cre mice (Yamamoto et al., 2001   ). 
+
+   Histological analysis  Mouse embryos were fixed overnight with Bouin's fixative solution at room temperature. Specimens were subsequently dehydrated and embedded in paraplast. Serial sections (10 µm) were prepared and stained with Hematoxylin and Eosin or with 0.1% Cresyl Violet. 
+
+   RNA in situ hybridization  Whole-mount and section in situ hybridization was performed using digoxigenin probes, as described by Suda et al. (Suda et al., 2001   ). The probes used in this study were for the genes: brachyury /T (Herrmann, 1991   ),  Fgf8 (Crossley and Martin, 1995   ), Cer1 (Belo et al., 1997   ), Dlx1 (Bulfone et al., 1993   )  Emx2 (Yoshida et al., 1997   ), Gbx2 (Bulfone et al., 1993   ), Lhx1 / Lim1 (Fujii et al., 1994   ),  Otx2 (Matsuo et al., 1995   ), Pax6 (Walther and Gruss, 1991   ), Six3 (Oliver et al., 1995   ) and  Tcf4 (Korinek et al., 1998   ). 
+
+   Quantitative RT-PCR  RNA isolation and reverse transcription PCR was performed according to Kimura et al. (Kimura et al., 2001   ). Primer sets used were as follows: Otx2, 5'-TCTTATCTAAAGCAACCGCCTTACGCAGTC-3' and 5'-GCACCCTGGATTCTGGCAAGTTGATTTTCA-3'; glyceraldehyde-3-phosphate dehydrogenase (GAPDH), 5'-TGTCATCAACGGGAAGCCCA-3' and 5'-TTGTCATGGATGACCTTGGC-3'. 
+
+   Animal housing  Animals were housed in environmentally controlled rooms in accordance with the Institute of Physical and Chemical Research (RIKEN) guidelines for animal experiments. 
+
+        Results       TOP   SUMMARY   Introduction   Materials and methods   Results   Discussion   REFERENCES     Otx2 expression in ectoderm is regulated by enhancers located remote from the coding region  We had previously searched the mouse genomic region from –50 kb 5' upstream to +10 kb 3' downstream of the Otx2 translation start site for sequences involved in regulation of Otx2 expression (Kimura et al., 1997   ; Kimura et al., 2000   ) (C.K.-Y., I.M. and S.A., unpublished). The major transcription start site of Otx2 expression exists at –207 bp 5' upstream of the translational start site (Guazzi et al., 1998   ; Courtois et al., 2003   ). The –1.8 kb 5' region adjacent to the translational start site is capable of directing the expression in VE, AME and CM (Kimura et al., 1997   ; Kimura et al., 2000   ); the construct in which the 1.8 kb genome was combined with the lacZ gene was designated as 1.8k- lacZ. However, no sequences were detected which directed Otx2 expression in epiblast, anterior neuroectoderm or forebrain/midbrain. In the present study, we generated transgenic mice harboring a genomic DNA spanning –170 kb to –30 kb 5' upstream (BAC #1) with 1.8k- lacZ ( Fig. 1A ) in order to identify these sequences. The 5' BAC#1/lacZ transgene was generated by homologous recombination in mouse zygotes (Helms and Johnson, 1998   ) by co-injecting BAC#1 and a lacZ reporter; the reporter had the 5kb 3' end of BAC#1 ligated to the 1.8k- lacZ. 
+
+  The 5 ' BAC#1/lacZ transgenic mouse line captured ß-gal expression in E6.5 epiblast, E7.75 anterior neuroectoderm and E9.5 forebrain and anterior midbrain ( Fig. 1B, parts a-c). ß-Gal expression was not detected in posterior midbrain ( Fig. 1B, part c). Subsequently, the Otx2 genomic region encompassing –170 kb to –30 kb was systematically dissected into 15 fragments with partial overlaps at both ends to determine the locations of regulatory elements ( Fig. 2A ). All enhancer analyses described below were conducted using the mouse Otx2 1.8 kb promoter. Expression by this promoter ( Fig. 1B, part d) is indicated by arrows in each figure. For several DNA fragments, enhancer activities were also assayed using Fugu Otx2 promoter (Kimura et al., 1997   ) or  hsp68 promoter. For example, an Eco RV/ Bgl II 2.3kb fragment capable of driving lacZ expression in epiblast with the 1.8 kb promoter ( Fig. 3B, parts b-d) exhibited the activity, though weak, using the hsp68 promoter ( Fig. 3B, parts e,f). An enhancer in the #13 fragment ( Fig. 2A ) that had the transcriptional activity in forebrain and midbrain with the 1.8 kb promoter showed a similar activity with the  Fugu promoter. By contrast, a Spe I 6.2 kb fragment ( Fig. 3A ) that exhibited activity in the anterior neuroectoderm did not show the same activity with the  Fugu promoter, and exhibited low activity in the ectoderm and ectopic activity in extra-embryonic ectoderm with the hsp68 promoter (data not shown). Moreover, a Eco RV/ Bgl II 2.3 kb fragment ( Fig. 3A ) exhibited similar activities in the anterior neuroectoderm with the hsp68 promoter and mouse 1.8 kb promoter ( Fig. 3B, parts g,h). Thus, the enhancer activity of several DNA fragments described below is promoter dependent. The details of the promoter dependence, however, remain a topic for future studies. Note that, in the present paper, the term `enhancer' is used in the broad sense of `cis-regulatory sequence'. 
+
+   
+
+          View larger version (38K):  [in this window]  [in a new window]   Fig. 3. Deletion analysis of EP enhancer. (A) Dissection of the #12 genomic fragment for EP and AN enhancers. The number of ß-gal-positive embryos among transient transgenic embryos obtained is indicated on the right (ND, not determined). Blue boxes indicate regions demonstrating in excess of 80% identity over more than 100 bp between mouse and human; yellow boxes indicate the regions demonstrating in excess of 80% identity over more than 100 bp between mouse and Xenopus. (B) ß-Gal expression driven by the  Eco RV/ Bgl II 2.3 kb fragment with 1.8 kb promoter (a-d) and with hsp68 promoter (e-h) at E3.5 (a), E5.5 (b), E6.5 (c-f) and E7.75 (g,h). In lateral views (c,e,g), anterior is leftwards; (d,f) cross-sections at the level indicated in b,d, respectively; (h) a sagittal section. Arrows in d indicate ß-gal expression in anterior visceral endoderm by the 1.8 kb mouse Otx2 promoter; this expression is absent with hsp68 promoter (f). The expression is absent in definitive anterior mesendoderm with  hsp68 promoter (an arrow in h, compare with  Fig. 2B, part d). Scale bars: 100 µm.
+
+       Transgenic lines were established for each of the 15 fragments as indicated in the parenthetical statement in Fig. 2A. Analyses of these lines mapped the enhancer of Otx2 expression in E6.5 epiblast and E7.75 anterior neuroectoderm to fragment #12, which was located about –80 kb to –95 kb 5' upstream. The enhancer of Otx2 expression in E9.5 forebrain and midbrain was mapped to fragment #13, which was located about –70 kb to –80 kb 5' upstream. In this mapping, heterozygous Otx2 +/lacZ embryos (Kimura et al., 2000   ) were stained in parallel to identify ß-gal expression from the endogenous  Otx2 locus ( Fig. 2B, parts g-k). When necessary, whole-mount RNA in situ hybridization analysis was performed in transgenic embryos to compare endogenous Otx2 and transgenic lacZ expression. These analyses unequivocally indicated that fragments #12 and #13 contain sequences necessary to direct Otx2 expression in ectoderm at each developmental stage. This study focuses on the enhancer activity in the #12 fragment; an analysis of the activity of the #13 fragment is reported (Kurokawa et al., 2004   ). In addition to #12 and #13 fragments, the #4 fragment drove ß-gal expression in a region of the ventral diencephalon and dorsal mesencephalon, the significance of which will be addressed in future studies ( Fig. 2B, part l). Some fragments exhibited ß-gal expression in structures where Otx2 is not expressed endogenously; no further analysis was made of these activities. 
+
+  The activity of the #12 fragment was initially noted in entire epiblast; at E6.5 it was absent in the posterior region ( Fig. 2B, parts a,b). At E7.75, ß-gal expression was restricted to the anterior neuroectoderm, which corresponds to the presumptive forebrain and midbrain ( Fig. 2B, parts c,d); this activity was lost by E8.5 ( Fig. 2B, part e). After E9.0, the fragment exhibited activity in the most dorsomedial aspect of the telencephalon and in the eyes ( Fig. 2B, part f). From this activity profile, the enhancer in the #12 fragment was designated as the EP/AN (epiblast/anterior neuroectoderm) enhancer. 
+
+  The expression of ß-gal in the epiblast at the Otx2 locus is noteworthy. Endogenous Otx2 is expressed in epiblast. However, ß-gal expression is not observed in the epiblast of  Otx2 +/lacZ embryos ( Fig. 2B, part g) (Boyl et al., 2001   ; Courtois et al., 2003   ). By contrast, ß-gal expression was evident in epiblast with the BAC #1/ lacZ transgene ( Fig. 1B, part a) and with the lacZ transgene under the #12 fragment ( Fig. 2B, parts a,b), respectively. The #12 fragment also drove ß-gal expression in epiblast under the Otx2 +/– background (data not shown); the discrepancy is not due to the Otx2 dose effect. Translational control has been suggested in the expression of transgenes knocked-in into  Otx2 locus (Boyl et al., 2001   ). However, in both the lacZ knock-in mutation into the Otx2 locus and the random lacZ transgenesis in the enhancer analysis, the lacZ gene was fused to the Otx2 5' untranslated region and SV40 3'UTR in exactly the same manner. The cause of these variations of ß-gal expression in epiblast is unclear. 
+
+   Epiblast enhancer  The 15 kb #12 fragment was subdivided by Spe I digestion ( Fig. 3A ) in order to define the EP/AN enhancer. The enhancer activity of each subfragment was determined by transient transgenic assay at E6.5 and E7.75. However, none of these  Spe I fragments drove ß-gal expression in epiblast at E6.5. Subsequently, the #12 fragment was re-subdivided into five fragments so that each Spe I site was preserved ( Fig. 3A ). In this subdivision, ß-gal expression in epiblast was driven by the Eco RV/ Bgl II 2.3 kb fragment ( Fig. 3A ), which was confirmed by generation of permanent transgenic lines. Activity of the  Eco RV/ Bgl II 2.3 kb fragment was initially found in the inner cell mass of blastocysts at E3.5 ( Fig. 3B, part a) and in the entire epiblast at E5.5 ( Fig. 3B, part b), and gradually declined in the posterior region with the progress of gastrulation in a manner similar to endogenous Otx2 expression ( Fig. 3B, parts c-f). At the headfold stage the fragment exhibited the activity in anterior neuroectoderm ( Fig. 3B, parts g,h). 
+
+  Unexpectedly, however, when the Eco RV/ Bgl II 2.3 kb fragment was subdivided further, fragments that lacked any of the following sequences lost their activity: (1) Eco RV/ Hin dIII 0.95 kb, (2) Sca I/ Nsp I 0.6 kb, (3) Nsp I/ Eco T22I 0.57 kb or (4) Eco T22I/ Bgl II 165 bp ( Fig. 3A ). Thus, all of these domains were essential for enhancer activity in epiblast. Regions homologous to the Eco RV/ Bgl II 2.3 kb fragment exist at similar positions relative to the Otx2 coding region in the rat, human and  Xenopus ( Silurana ) tropicalis (hereafter, with regard to the genome information, ` Xenopus ' refers to this species) genomes (see Fig. 7 ). Regions displaying greater than 80% sequence identity over more than 100 bp are present throughout the Eco RV/ Bgl II 2.3 kb fragment ( Fig. 3A ). 
+
+   Anterior neuroectoderm enhancer  In contrast to the epiblast enhancer, the regulatory sequences of  Otx2 expression in anterior neuroectoderm were present in the  Spe I 6.2 kb fragment ( Fig. 3A ). This fragment was successively dissected as shown in  Fig. 4A, and the transient transgenic assay at E7.75 revealed the existence of activity exclusively in the Spe I/ Bgl II 559 bp. With this fragment ß-gal expression in the anterior neuroectoderm was detected initially at E7.0 and ceased by E8.5. The caudal boundary of ß-gal expression was not distinct near the preotic sulcus ( Fig. 4C, part a; data not shown). 
+
+  The Spe I/ Bgl II 559 bp fragment was further dissected, and finally the Eco T22I/ Bgl II 165 bp fragment was found to retain the enhancer activity; this was confirmed by generation of permanent transgenic lines ( Fig. 4C, part a). A region exhibiting 92% identity to this 165 bp fragment is found about 5' 97 kb upstream in the human Otx2 locus ( Fig. 4B ; see  Fig. 7A ). The 5' part of the 165 bp fragment includes the sequences TGGCGACTGAC and TGGGCGCTGGC, which correspond to each other with the exception of two bases. Furthermore, these sequences are conserved in the human counterpart. Five tandem repeats of these sequences, however, did not direct ß-gal expression in anterior neuroectoderm ( Fig. 4A ). In the 165 bp fragment, potential OCT/HOX (Herr and Cleary, 1995   ) and SOX (van Beest et al., 2000   ) binding sites exist; however, AN activity was unaffected by mutations in these sites. 
+
+  A linker-scanner approach was then employed to define the core elements. Each 15 bp sequence of the EcoT22I/ Bgl II 165 bp fragment was replaced with the Bam HI linker ( Fig. 4B ) (Kucharczuk et al., 1999   ). Replacement of any of the six 5' side 15 bp blocks (#6-#11) affected ß-gal expression in the anterior neuroectoderm at E7.75. Such replacements in three of these blocks (mt#6, mt#7 and mt#10) essentially abolished the activity ( Fig. 4C, part b), whereas mutations in #8, #9 and #11 demonstrated faint ß-gal expression ( Fig. 4C, part c) at the frequencies indicated in the parentheses of  Fig. 4B (asterisks). In addition, when 75 bp sequences corresponding to #11-7 were duplicated in tandem and combined with 1.8 k- lacZ, the transgene exhibited significant ß-gal expression in E7.75 anterior neuroectoderm ( Fig. 4C, part d). A region homologous to EcoT22I/ Bgl II 165 bp is present about 5' 44 kb upstream in the Xenopus Otx2 locus ( Fig. 7, Fig. 4B ), displaying sequence identity of 77%. Identity is 87% in the #11-#6 90 bp sequences; however, no homologous region is present in the zebrafish or pufferfish genomes. A 1.6 kb  Xenopus DNA region covering this domain was then isolated by PCR, and its enhancer activity was tested using the mouse 1.8 kb promoter. The 1.6 kb region clearly directed ß-gal expression in mouse anterior neuroectoderm ( Fig. 4C, part e) 
+
+   Targeted disruption of Otx2 epiblast enhancer activity  The analysis described above indicated that the  Spe I/ Bgl II 559 bp region was essential for expression in epiblast, though not, by itself, sufficient. This fragment is located 90 kb away from the coding region, which raised a question regarding its involvement in the regulation of Otx2 expression in vivo. In order to examine this point, mutant mice ( Otx2 AN/ AN ) were generated in which the Spe I/ Bgl II 559 bp was replaced with a cassette encoding a neomycin-resistant gene ( Fig. 5A ). 
+
+   
+
+          View larger version (51K):  [in this window]  [in a new window]   Fig. 5. Targeted disruption of the EP/AN enhancer. (A) Wild-type Otx2 allele, targeting vector and recombinant allele. The black box indicates the  Spe I- Bgl II 559 bp region (AN) that is replaced with a neomycin-resistant gene (Neo, white boxes) flanked by loxP sequences (black triangles). DT-A is the diphtheria toxin-A fragment gene with MCI promoter, which is used for negative selection of homologous recombinants (Yagi et al., 1993b   ). Thick and thin lines indicate genomic and vector-derived sequences, respectively. Probe A is the Southern blotting probe used for identification of homologous recombinant ES cells displayed in the right panel. (B) Otx2 expression at E6.5 by whole-mount in situ hybridization (a,b) and by quantitative RT-PCR (c). +/+ and AN/ AN denote wild-type embryos and homozygous mutants lacking the Spe I/ Bgl II region, respectively. (C) Otx2 AN/– mutant phenotype at E6.5. Normal expression of cerberus-like in anterior visceral endoderm (a) and of T in primitive streak (b). Scale bars: 100 µm.
+
+       The epiblast develops in Otx2 -null mutant ( Otx2 –/– ) embryos (Kimura et al., 2000   ), and it also developed in Otx2 AN/ AN embryos. In this epiblast, the Otx2 expression was diminished but not abolished ( Fig. 5B, parts a,b). Quantitative RT-PCR confirmed a reduction in Otx2 expression ( Fig. 5B, part c), indicating that the Spe I/ Bgl II 559 bp region functions as an epiblast enhancer, but also that another enhancer of Otx2 expression in epiblast must be present. 
+
+  In mammals, the anteroposterior axis is first generated along the distoproximal axis. Prior to primitive streak formation, distal visceral endoderm cells move to the future anterior and proximal epiblast cells to the future posterior. This axis rotation does not occur in  Otx2 –/– mutants (Kimura et al., 2000   ). However, axis rotation proceeded normally in  Otx2 AN/ AN mutants as well as in  Otx2 AN/– embryos, in which one Otx2 allele lacks the Spe I/ Bgl II 500 bp and the other allele is null, as indicated by cerberus-like expression in the anterior visceral endoderm ( Fig. 5C, part a) and T expression in the primitive streak ( Fig. 5C, part b) at E6.5. This observation is consistent with our previous conclusion that  Otx2 -positive distal visceral endoderm cells, but not  Otx2 -positive epiblast, are responsible for the axis rotation defect in Otx2 –/– mutants (Kimura et al., 2000   ). 
+
+   Targeted disruption of Otx2 anterior neuroectoderm enhancer activity  The Spe I/ Bgl II 559 bp was essential and sufficient for driving Otx2 expression in anterior neuroectoderm. In  Otx2 AN/ AN mutants, however, no defects were found in the forebrain or midbrain. Otx2 expression was reduced but not eliminated in E7.5 Otx2 AN/ AN mutants (data not shown). Subsequently, Otx2 levels were reduced further via the generation of Otx2 AN/– mutants. At E12.5 the Otx2 AN/– mutant phenotype was variable. In milder cases forebrain was present though greatly deformed; in severe cases both forebrain and midbrain were lost ( Fig. 6A, part b). At E7.5 Six3 -positive anterior neuroectoderm was induced in all Otx2 AN/– mutants examined ( Fig. 6B, part b). At E8.5, however, Six3 -positive region was reduced ( Fig. 6B, part d), and concomitantly Fgf8 - or Gbx2 -negative anterior neuroectoderm was reduced but still present at E8.5 ( Fig. 6B, parts f,h). The phenotype became variable at E9.5, and in severe mutants Gbx2 -negative forebrain/midbrain and  Emx2 -positive forebrain were entirely missing ( Fig. 6B, parts j, l). Thus, the Spe I/ Bgl II 559 bp located 90 kb 5' upstream clearly regulates Otx2 expression in anterior neuroectoderm; however, another enhancer must also exist. 
+
+   
+
+          View larger version (92K):  [in this window]  [in a new window]   Fig. 6. AN enhancer mutant phenotype. (A) Histological features of forebrain defects in Otx2 AN/– (b) and  Emx2 –/– Otx2 AN/ AN (c) mutants at E12.5; (a) wild-type brain. These phenotypes were examined with both the Otx2 AN mutant in which the neo insert remained and the Otx2 AN mutant in which the insert was deleted by Cre recombination. No differences were found, and the following marker analyses were performed with the mutant that retained the neo insert. The E12.5 Otx2 AN/– phenotype was variable, and a severe phenotype is shown in b. Scale bars: 400 µm. (B) Marker analyses of wild-type (a,c,e,g,i,k) and  Otx2 AN/– mutant (b,d,f,h,j,l) embryos at E7.5 (a,b), E8.5 (c-h) and E9.5 (i-l); expression of Six3 (a-d),  Fgf8 (e,f), Gbx2 (g-j) and Emx2 (k,l). The E9.5 phenotype was variable; severe examples are shown. Scale bars: 100 µm in a,b; 150 µm in c-h; 400 µm in i-l. (C) Marker analyses of diencephalon in E11.5 wild-type (a,c,e,g,i) and  Emx2 –/– Otx2 AN/ AN mutant (b,d,f,h,j) embryos; expression of Pax6 (a,b), Dlx1 (c,d), Gbx2 (e,f), Tcf4 (g,h) and Lhx1 (i,j). Scale bars: 400 µm.
+
+       In our previous analysis of  Otx2 +/– Emx2 –/– mutants, we reported that Otx2 cooperates with Emx2 in diencephalon development (Suda et al., 2001   ). Emx2 expression occurs at the three-somite stage (E8.0) when the AN enhancer is active. To confirm that Emx2 cooperates with Otx2 under the AN enhancer,  Otx2 AN/ AN Emx2 –/– mutants were generated. In these mutants, diencephalon was lost ( Fig. 6A, part c); at E11.5  Pax6 - and Dlx1 -positive ventral thalamus and Tcf4 - and Gbx2 -positive dorsal thalamus were absent ( Fig. 6C, parts a-h), while  Lhx1 - and Tcf4- positive commissural region of the pretectum developed ( Fig. 6C, parts g-j). This phenotype was very similar to the  Otx2 +/– Emx2 –/– mutant phenotype. 
+
+   Search for the second EP/AN enhancer  Enhancer mutants indicated the presence of another enhancer of  Otx2 expression in epiblast and anterior neuroectoderm. Consequently, a search was conducted for the second enhancer in the 3' region of the  Otx2 gene. BAC#2 transgenic mice, which harbor a genomic DNA region spanning –50 kb to +120 kb 3' downstream, were generated ( Fig. 7 ) (Kurokawa et al., 2004   ). However, this region displayed no activity in epiblast or anterior neuroectoderm. 
+
+  Mouse Otx2 locates at chromosome14 19 cM; the nearest genes are encoded 350 kb upstream on the 5' side and 150 kb downstream on the 3' side ( Fig. 7 ). More than 100 highly conserved domains (sequence identity greater than 80% over more than 100 bp) exist in this 500 kb span among mouse, rat and human. Of these domains, 22 are also conserved in the Xenopus genome.  Fig. 7 depicts the locations of these domains in the mouse, human and Xenopus Otx2 loci. The organization is identical in mouse and human. The contiguous mapping is partial in the Xenopus Otx2 locus; however, domains -,  and locate in identical order in a more compact fashion. 
+
+  The EP/AN enhancer region identified above was one of the 22 domains conserved,. We next sought a second EP/AN enhancer among domains  -o, and, which exist outside of the regions analyzed with BAC#1 and #2. Depending on the sizes of the conserved regions, the lengths of genome DNAs isolated by PCR were 3.1, 3.3, 2.8, 3.5, 1.6, 1.9, 0.7 and 0.7 kb for,, µ,,, o, and domains, respectively. Subsequently, sequences were confirmed and enhancer activity was determined with the 1.8 kb promoter by transient transgenic assay. None of these domains, however, exhibited enhancer activity in E6.5 epiblast or E7.75 anterior neuroectoderm. 
+
+        Discussion       TOP   SUMMARY   Introduction   Materials and methods   Results   Discussion   REFERENCES    We previously identified enhancers of Otx2 expression in distal/anterior visceral endoderm (DVE/AVE), anterior mesendoderm (AME) and cephalic mesenchyme (CM) (Kimura et al., 1997   ; Kimura et al., 2000   ). In the present study, we have identified enhancers of  Otx2 expression in epiblast (EP) and anterior neuroectoderm (AN); Kurokawa et al. (Kurokawa et al., 2004   ) report enhancers of Otx2 expression in forebrain/midbrain (FM). DVE/AVE, AME and CM enhancers located near the  Otx2 -coding region; by contrast, all ectodermal enhancers occurred at great distances from the coding region. 
+
+   Otx2 epiblast and anterior neuroectoderm enhancers   Otx2 expression is differentially regulated in each germ layer. The regulation of these expressions by different enhancers could be reasonably expected; the existence of distinct VE, AME, CM and ectoderm enhancers was anticipated. In mouse, Otx2 expression in epiblast and anterior neuroectoderm is continuous. However, Otx2 expression in chick and in  Xenopus is consistent with discrete EP and ANE enhancers. In avian, following the disappearance of Otx2 expression in epiblast, expression occurs transiently in Hensen's node and in the anterior primitive streak exclusively and appears in the anterior neuroectoderm subsequently (Bally-Cuif et al., 1995   ; Kablar et al., 1996   ). AN enhancer activity begins around E7.0 and ceases by E8.5. Of note is that the EP enhancer also directed the expression in inner cell mass of blastocysts. 
+
+  Generally, the identification of enhancers is conducted solely by random transgenesis. This study unequivocally demonstrated the necessity of mutating the enhancer in vivo to determine whether and how the enhancer is responsible for endogenous gene expression. The EP/AN enhancer mutants indicated that another enhancer exists for Otx2 expression in epiblast and anterior neuroectoderm. However, the second enhancer was not present within the 3' 120 kb region covered by BAC #2. The overall sequences in EP and AN enhancer region are well conserved in mouse, human and Xenopus. Then the second EP/AN enhancers were searched for among domains conserved in mouse, human and Xenopus, outside of the 290 kb region covered by BAC#1 and BAC#2. However, no EP/AN activity was detected in any of these domains. The second enhancer might exist much farther away over the adjacent genes. At the same time, the possibility remains that the second EP/AN enhancer exists uniquely in rodent outside of the 290 kb genomic region, as the second enhancer of Otx2 expression in forebrain and midbrain, FM2, is not conserved in human or Xenopus, and is most probably unique to the rodent (Kurokawa et al., 2004   ). 
+
+  The EP enhancer appears to consist of multiple domains, and the AN enhancer is a component of the EP enhancer, the significance of which remains to be addressed in future studies. EP and AN enhancer regions are conserved in human and Xenopus, a Xotx2 1.6 kb region covering the AN enhancer region exhibited the enhancer activity in mouse anterior neuroectoderm. The EP/AN region is, however, not conserved in zebrafish or pufferfish. In zebrafish blastoderm Otx1, but not Otx2, is expressed. Fish blastoderm may be a product independent of the amniote epiblast. However, the lack of conservation of the AN enhancer region in fish genome was unexpected.  Otx2 alone in tetrapod and all Otx genes in zebrafish are expressed in the anterior neuroectoderm. It is possible that the ancient AN enhancer widely diverged between the lineages to the extant teleost and tetrapod to cope with the divergence in anterior neuroectoderm development, and so the molecular machinery involved in its development might be extremely varied between teleost and tetrapod (Kurokawa et al., 2004   ). Discussion of the phylogenetic significance of enhancer organization obviously requires the identification of the second EP/AN enhancer. In addition, a comprehensive enhancer analysis must be performed in fish Otx genes (Kimura et al., 1997   ; Kimura-Yoshida et al., 2004   ). 
+
+   Otx2 functions in anterior neuroectoderm  The generation of enhancer mutants to allow the dissection of Otx2 functions in each site at each step of head development was a primary objective of enhancer analysis in the present investigation. The presence of two enhancers of Otx2 expression in anterior neuroectoderm complicated the analysis. Nevertheless,  Otx2 AN/– mutants clearly demonstrated that  Otx2 expression under the AN enhancer functioned to maintain the anterior neuroectoderm once induced. This was originally suggested by analyses of Otx1 knock-in mutants into Otx2 locus ( Otx2 Otx1/Otx1 ) and a hypomorphic Otx2 mutant ( Otx2 frt-neo/frt-neo ) (Suda et al., 1999   ; Li and Joyner, 2001   ; Martinez-Barbera et al., 2001   ; Tian et al., 2002   ). However, in these mutants the role of Otx2 expression in anterior mesendoderm in the loss of the anterior neuroectoderm could not be ruled out. 
+
+  Studies of Otx2 +/– Emx2 –/– mutants have previously suggested that Otx2 cooperates with  Emx2 in the development of the diencephalic region (Suda et al., 2001   ). However, the onset of the defects was not clear.  Otx2 AN/ AN Emx2 –/– phenotypes were quite similar to  Otx2 +/– Emx2 –/– phenotypes; at E12.5 ventral thalamus, dorsal thalamus and anterior part of the pretectum were lost, but the commissural region of the pretectum had developed. No marker analyses were made, but histologically archipallium was not apparent, while neopallium and ganglionic eminences developed. Mesencephalon was largely normal, while cerebellum was enlarged in the double mutants. Emx2 expression takes place in the laterocaudal forebrain primordium around the three-somite stage (E8.0) when the AN enhancer is active. Furthermore, ß-gal expression under the AN enhancer was not detected at E8.5; ß-gal is stable and usually persists longer than endogenous gene products. Thus, we propose that the diencephalic region may be induced around the three-somite stage by cooperation between Emx2 and Otx2 under the AN enhancer. With loss of this cooperation, the structures that derive from the Emx2 -positive region at the three-somite stage may be lost. 
+
+         ACKNOWLEDGMENTS    We thank Ms S. Nagayoshi, T. Ohmura and Mr. N. Takeda for their technical assistance. We are indebted to Drs E. M. De Robertis, M. A. Frohman, N. Heintz, B. G. Herrmann, P. Gruss and G. R. Martin, who generously provided us a number of plasmids, and to Dr H. Hamada, who kindly provided us  Lefty-Cre mice. We are also grateful to the Laboratory for Animal Resource and Genetic Engineering for the housing of mice. This work was supported by a Grant-in-Aid for Scientific Research on Priority Areas from the Ministry of Education, Culture, Sports, Science and Technology of Japan. 
+
+           REFERENCES       TOP   SUMMARY   Introduction   Materials and methods   Results   Discussion   REFERENCES      
+
+ Acampora, D., Mazan, S., Lallemand, Y., Avantaggiato, V., Maury, M., Simeone, A. and Brulet, P. (1995). Forebrain and midbrain regions are deleted in Otx2 –/– mutants due to a defective anterior neuroectoderm specification during gastrulation.  Development 121,3279 -3290. [Abstract] 
+
+ 
+
+ Acampora, D., Avantaggiato, V., Tuorto, F. and Simeone, A. (1997). Genetic control of brain morphogenesis through Otx gene dosage requirement. Development  124,3639 -3650. [Abstract] 
+
+ 
+
+ Acampora, D., Avantaggiato, V., Tuorto, F., Briata, P., Corte, G. and Simeone, A. (1998). Visceral endoderm-restricted translation of Otx1 mediates recovery of Otx2 requirements for specification of anterior neural plate and normal gastrulation.  Development 125,5091 -5104. [Abstract] 
+
+ 
+
+ Ang, S. L., Jin, O., Rhinn, M., Daigle, N., Stevenson, L. and Rossant, J. A. (1996). Targeted mouse Otx2 mutation leads to severe defects in gastrulation and formation of axial mesoderm and to deletion of rostral brain. Development  122,243 -252. [Abstract] 
+
+ 
+
+ Bally-Cuif, L., Gulisano, M., Broccoli, V. and Boncinelli, E. (1995). c-Otx2 is expressed in two different phases of gastrulation and is sensitive to retinoic acid treatment in chick embryo.  Mech. Dev. 49,49 -63. [CrossRef] [Medline] 
+
+ 
+
+ Belo, J. A., Bouwemeester, T., Leyns, L., Ketrtesz, N., Gallo, M., Follettie, M. and de Robertis, E. M. (1997). Cerberus-like is a secreted factor with neutralizing activity expressed in the anterior primitive endoderm of the mouse gastrula. Mech. Dev. 68,45 -57. [CrossRef] [Medline] 
+
+ 
+
+ Boyl, P. P., Signore, M., Acampora, D., Martinez-Barbera, J. P., Ilengo, C., Annio, A., Corte, G. and Simeone, A. (2001). Forebrain and midbrain development requires epiblast-restricted Otx2 translational control mediated by its 3' UTR.  Development 128,2989 -3000. [Abstract/ Free FullText] 
+
+ 
+
+ Bulfone, P., di Blas, E., Gulisano, M. H., Frohman, M. A., Martin, G. R. and Rubenstein, J. L. R. (1993). Spatially restricted expression of Dlx-1, Dlx-2 (Tes-1), Gbx-2, and Wnt-3 in the embryonic day 12.5 mouse forebrain defines potential transverse and longitudinal segmental boundaries. J. Neurosci.  13,3155 -3172. [Abstract] 
+
+ 
+
+ Couronne, O., Poliakov, A., Bray, N., Ishkhanov, T., Ryaboy, D., Rubin, E., Pachter, L. and Dubchak, I. (2003). Strategies and tools for whole-genome alignments. Genome Res. 13,73 -80. [Abstract/ Free FullText] 
+
+ 
+
+ Courtois, V., Chatelain, G., Han, Z.-Y., Novere, N. L., Brun, G. and Lamonerie, T. (2003). New Otx2 mRNA isoforms expressed in the mouse brain. J. Neurochem.  84,840 -853. [CrossRef] [Medline] 
+
+ 
+
+ Crossley, P. H. and Martin, G. R. (1995). The mouse Fgf8 gene encodes a family of polypeptides and is expressed in regions that direct outgrowth and patterning in the developing embryo.  Development 121,439 -451. [Abstract] 
+
+ 
+
+ Fujii, T., Pichel, J. G., Taira, M., Toyama, R. and Dawid, I. B. (1994). Expression patterns of the murine LIM classes homeobox gene lim1 in the developing brain and excretory system.  Dev. Dyn. 199,73 -83. [Medline] 
+
+ 
+
+ Guazzi, S., Pintonello, M. L., Vigano, A. and Boncinelli, E. (1998). Regulatory interactions between the human HOXB1, HOXB2, and HOXB3 proteins and the upstream sequence of the Otx2 gene in embryonal carcinoma cells. J. Biol. Chem.  273,11092 -11099. [Abstract/ Free FullText] 
+
+ 
+
+ Helms, A. W. and Johnson, J. E. (1998). Progenitors of dorsal commissural interneurons are defined by MATH1 expression. Development  125,919 -928. [Abstract] 
+
+ 
+
+ Herr, W. and Cleary, M. A. (1995). The POU domain: versatility in transcriptional reguration by a flexible two-in-one DNA binding domain. Genes Dev.  9,1679 -1693. [ Free FullText] 
+
+ 
+
+ Herrmann, B. G. (1991). Expression pattern of the brachyury gene in whole-mount TWis/TWis mutant embryos.  Development 113,913 -917. [Abstract] 
+
+ 
+
+ Heinemeyer, T., Wingender, E., Reuter, I., Hermjakob, H., Kel, A. E., Kel, O. V., Ignatieva, E. V., Ananko, E. A., Podkolodnaya, O. A., Kolpakov, F. A., Podkolodny, N. L. and Kolchanov, N. A. (1998). Databases on transcriptional regulation: TRANSFAC, TRRD, and COMPEL. Nucleic Acids Res.  26,364 -370. 
+
+ 
+
+ Kablar, B., Vignali, R., Menotti, L., Pannese, M., Andreazzoli, M., Polo, C., Giribaldi, M. G., Boncinelli, E. and Baracchi, G. (1996). Xotx genes in the developing brain of Xenopus laevis.  Mech. Dev. 55,145 -158. [CrossRef] [Medline] 
+
+ 
+
+ Kimura, C., Takeda, N., Suzuki, M., Oshimura, M., Aizawa, S. and Matsuo, I. (1997). Cis-acting elements conserved between mouse and pufferfish Otx2 genes govern the expression in mesencephalic neural crest cells. Development  124,3929 -3941. [Abstract] 
+
+ 
+
+ Kimura, C., Yoshinaga, K., Tian, E., Suzuki, M., Aizawa, S. and Matsuo, I. (2000). Visceral endoderm mediates forebrain development by suppression posteriorizing signals. Dev. Biol. 225,304 -321. [CrossRef] [Medline] 
+
+ 
+
+ Kimura, C., Shen, M. M., Takeda, N., Aizawa, S. and Matsuo, I. (2001). Complementary functions of Otx2 and Cripto in initial patterning of mouse epiblast. Dev. Biol.  235, 12-32. [CrossRef] [Medline] 
+
+ 
+
+ Kimura-Yoshida, C., Kitajima, K., Oda-Ishii, I., Tian, E., Suzuki, M., Yamamoto, M., Suzuki, T., Kobayashi, M., Aizawa, S. and Matsuo, I. (2004). Characterization of the pufferfish  Otx2 cis-regulators reveals evolutionarily conserved genetic mechanisms for the vertebrate head specification.  Development 131,57 -71. [Abstract/ Free FullText] 
+
+ 
+
+ Korinek, V., Barker, N., Willert, K., Molenaar, M., Roose, J., Wagenaar, G., Markman, M., Lamers, W., Destree, O. and Clevers, H. (1998). Two members of the Tcf family implicated in Wnt/beta-catenin signaling during embryogenesis in the mouse. Mol. Cell. Biol. 18,1248 -1256. [Abstract/ Free FullText] 
+
+ 
+
+ Kucharczuk, K. L., Love, C. M., Dougherty, N. M. and Goldhamer, D. J. (1999). Fine-scale transgenic mapping of the MyoD core enhancer: MyoD is regulated by distinct but overlapping mechanisms in myotomal and non-myotomal muscle lineages. Development  126,1957 -1965. [Abstract] 
+
+ 
+
+ Kurokawa, D., Kiyonari, H., Nakayama, R., Kimura-Yoshida, C., Matsuo, I. and Aizawa, S. (2004). Regulation of  Otx2 expression and its functions in mouse forebrain and midbrain.  Development 131,3319 -3331. [Abstract/ Free FullText] 
+
+ 
+
+ Li, Y., Allende, M. L., Finkelstein, R. and Weinberg, E. S. (1994). Expression of two zebrafish orthodenticle-related genes in the embryonic brain. Mech. Dev.  48,229 -244. [CrossRef] [Medline] 
+
+ 
+
+ Li, J. Y. H. and Joyner, A. L. (2001).  Otx2 and Gbx2 are required for refinement and not induction of mid-hindbrain gene expression. Development  128,4979 -4991. 
+
+ 
+
+ Martinez-Barbera, J. P., Signore, M., Boyl, P. P., Puelles, E., Acampora, D., Gogoi, R., Schubert, F., Lumsden, A. and Simeone, A. (2001). Regionalization of anterior neuroectoderm and its competence in responding to forebrain and midbrain inducing activities depend on mutual antagonism between OTX2 and GBX2.  Development 128,4789 -4800. [Abstract/ Free FullText] 
+
+ 
+
+ Matsuo, I., Kuratani, S., Kimura, C., Takeda, N. and Aizawa, S. (1995). Mouse Otx2 functions in the formation and patterning of rostral head. Genes Dev.  9,2646 -2658. [Abstract/ Free FullText] 
+
+ 
+
+ Mayor, C., Brudno, M., Schwartz, J. R., Poliakov, A., Rubin, E. M., Frazer, K. A., Pachter, L. S. and Dubchak, I. (2000). VISTA: Visualizing Global DNA Sequence Alignments of Arbitrary Length. Bioinformatics  16,1046 -1047. [Abstract/ Free FullText] 
+
+ 
+
+ Mercier, P., Simeone, A., Cotelli, F. and Boncinelli, E. (1995). Expression pattern of two otx genes suggests a role in specifying anterior body structures in zebrafish. Int. J. Dev. Biol. 39,559 -573. [Medline] 
+
+ 
+
+ Mori, H., Miyazaki, Y., Morita, T., Nitta, H. and Mishina, M. (1994). Different spatio-temporal expression of three otx homeoprotein transcripts during zebrafish embryogenesis. Mol. Brain Res. 27,221 -231. [Medline] 
+
+ 
+
+ Oliver, G., Mailhos, A., Wehr, R., Copeland, N. G., Jenkins, N. A. and Gruss, P. (1995). Six3, a murine homologue of the sine oculis gene, demarcates the most anterior border of the developing neural plate and in expressed during eye development.  Development 121,4045 -4055. [Abstract] 
+
+ 
+
+ Pannese, M., Polo, C., Andreazzoli, M., Vignali, R., Kablar, B., Barsacchi, G. and Boncinelli, E. (1995). The  Xenopus homologue of Otx2 is a maternal homeobox gene that demarcates and specifies anterior body regions. Development  121,707 -720. [Abstract] 
+
+ 
+
+ Rhinn, M., Dierich, A., Shawlot, W., Behringer, R. R., le Meur, M. and Ang, S.-L. (1998). Sequential roles for Otx2 in visceral endoderm and neuroectoderm for forebrain and midbrain induction and specification. Development  125,845 -856. [Abstract] 
+
+ 
+
+ Rhinn, M., Dierich, A., le Meur, M. and Ang, S.-L. (1999). Cell autonomous and non-cell autonomous function of Otx2 in patterning the rostral brain. Development  126,4295 -4304. [Abstract] 
+
+ 
+
+ Simeone, A., Acampora, D., Gulisano, M., Stornaiuolo, A. and Boncinelli, E. (1992). Nested expression domains of four homeobox genes in the developing rostral brain.  Nature 358,687 -690. [CrossRef] [Medline] 
+
+ 
+
+ Simeone, A., Acampora, D., Mallamaci, A., Stornaiuolo, A., D'Apice, M. R., Nigro, V. and Boncinelli, E. (1993). A vertebrate gene related to orthodenticle contains a homeodomain of the bicoid class and demarcates anterior neuroectoderm in the gastrulating mouse embryo.  EMBO J. 12,2735 -2747. [Medline] 
+
+ 
+
+ Suda, Y., Matsuo, I., Kuratani, S. and Aizawa, S. (1996). Otx1 function overlap with Otx2 in development of mouse forebrain and midbrain. Genes Cells  1,1031 -1044. [Abstract] 
+
+ 
+
+ Suda, Y., Matsuo, I. and Aizawa, S. (1997). Cooperative between Otx1 and Otx2 genes in developmental patterning of rostral brain. Mech. Dev. 69,125 -141. [CrossRef] [Medline] 
+
+ 
+
+ Suda, Y., Nakabayashi, J., Matsuo, I. and Aizawa, S. (1999). Functional equivalency between Otx2 and Otx1 in development of the rostral head. Development  126,743 -757. [Abstract] 
+
+ 
+
+ Suda, Y., Hossain, Z. M., Kobayashi, C., Hatano, O., Yoshida, M., Matsuo, I. and Aizawa, S. (2001). Emx2 directs the development of diencephalon in cooperation with Otx2.  Development 128,2433 -2450. [Abstract/ Free FullText] 
+
+ 
+
+ Tian, E., Kimura, C., Takeda, N., Aizawa, S. and Matsuo, I. (2002). Otx2 is required to respond to signals from anterior neural ridge for forebrain specification. Dev. Biol.  242,204 -223. [CrossRef] [Medline] 
+
+ 
+
+ van Beest, M., Dooijes, D., van de Wetering, M., Kjaerulff, S., Bonvin, A., Nielsen, O. and Clevers. H. (2000). Sequence-specific high mobility group box factors recognize 10-12-base pair minor groove motifs. J. Biol. Chem.  275,27266 -27273. [Abstract/ Free FullText] 
+
+ 
+
+ Walther, C. and Gruss, P. (1991). Pax-6, a murine paired box gene, is expressed in the developing CNS.  Development 113,1435 -1449. [Abstract] 
+
+ 
+
+ Yagi, T., Tokunaga, T., Furuta, Y., Nada, S., Yoshida, M., Tsukada, T., Saga, Y., Takeda, N., Ikawa, Y. and Aizawa, S. (1993a). A novel ES cell line, TT2, with high germline-differentiating potency. Anal. Biochem.  214, 70-76. [CrossRef] [Medline] 
+
+ 
+
+ Yagi, T., Nada, S., Watanabe, N., Tamemoto, H., Kohmura, N., Ikawa, Y. and Aizawa, S. (1993b). A novel negative selection for homologous recombinants using diphtheria toxin A fragment gene.  Anal. Biochem. 214,77 -86. [CrossRef] [Medline] 
+
+ 
+
+ Yamamoto, M., Meno, C., Sakai, Y., Shiratori, H., Mochida, K., Ikawa, Y., Saijoh, Y. and Hamada, H. (2001). The transcription factor FoxH1 (FAST) mediates Nodal signaling during anterior-posterior patterning and node formation in the mouse.  Genes Dev. 15,1242 -1256. [Abstract/ Free FullText] 
+
+ 
+
+ Yang, X. W., Model, P. and Heintz, N. (1997). Homologous recombination based modification in Escherichia coli and germline transmission in transgenic mice of a bacterial artificial chromosome.  Nat. Biotechnol. 15,859 -865. [CrossRef] [Medline] 
+
+ 
+
+ Yoshida, M., Suda, Y., Matsuo, I., Miyamoto, N., Takeda, N., Kuratani, S. and Aizawa, S. (1997). Emx1 and Emx2 functions in development of dorsal telencephalon. Development  124,101 -111. [Abstract] 
+
+                               
+
+  Related articles in Development: 
+
+    Essential enhancers in the head    Development 2004 131: 1405.       [Full Text]    
+
+
+
+                     
+
+ This article has been cited by other articles:   
+
+                        R. L. Chandler, K. J. Chandler, K. A. McFarland, and D. P. Mortlock  Bmp2 Transcription in Osteoblast Progenitors Is Regulated by a Distant 3' Enhancer Located 156.3 Kilobases from the Promoter    Mol. Cell. Biol.,     April15,2007;  27(8):  2934 - 2951.   [Abstract]   [Full Text]  [PDF]                             D. Kurokawa, Y. Sakurai, A. Inoue, R. Nakayama, N. Takasaki, Y. Suda, T. Miyake, C. T. Amemiya, and S. Aizawa  Evolutionary constraint on Otx2 neuroectoderm enhancers-deep conservation from skate to mouse and unique divergence in teleost    PNAS,     December19,2006;  103(51):  19350 - 19355.   [Abstract]   [Full Text]  [PDF]                             T. Hirata, M. Nakazawa, O. Muraoka, R. Nakayama, Y. Suda, and M. Hibi  Zinc-finger genes Fez and Fez-like function in the establishment of diencephalon subdivisions    Development,     October15,2006;  133(20):  3993 - 4004.   [Abstract]   [Full Text]  [PDF]                             W. F. Odenwald, W. Rasband, A. Kuzin, and T. Brody  EVOPRINTER, a multigenomic comparative tool for rapid identification of functionally important DNA    PNAS,     October11,2005;  102(41):  14700 - 14705.   [Abstract]   [Full Text]  [PDF]                             R. A. Cameron, S. H. Chow, K. Berney, T.-Y. Chiu, Q.-A. Yuan, A. Kramer, A. Helguero, A. Ransick, M. Yun, and E. H. Davidson  An evolutionary constraint: Strongly disfavored class of change in DNA sequence during divergence of cis-regulatory modules    PNAS,     August16,2005;  102(33):  11769 - 11774.   [Abstract]   [Full Text]  [PDF]                             N. Nishioka, S. Nagano, R. Nakayama, H. Kiyonari, T. Ijiri, K. Taniguchi, W. Shawlot, Y. Hayashizaki, H. Westphal, R. R. Behringer, et al.  Ssdp1 regulates head morphogenesis of mouse embryos by activating the Lim1-Ldb1 complex    Development,     June1,2005;  132(11):  2535 - 2546.   [Abstract]   [Full Text]  [PDF]                             J. Kimura, Y. Suda, D. Kurokawa, Z. M. Hossain, M. Nakamura, M. Takahashi, A. Hara, and S. Aizawa  Emx2 and Pax6 Function in Cooperation with Otx2 and Otx1 to Develop Caudal Forebrain Primordium That Includes Future Archipallium    J. Neurosci.,     May25,2005;  25(21):  5097 - 5108.   [Abstract]   [Full Text]  [PDF]                             D. Kurokawa, H. Kiyonari, R. Nakayama, C. Kimura-Yoshida, I. Matsuo, and S. Aizawa  Regulation of Otx2 expression and its functions in mouse forebrain and midbrain    Development,     July15,2004;  131(14):  3319 - 3331.   [Abstract]   [Full Text]  [PDF]                                                         This Article          Summary                                                 Figures Only                                 Full Text (PDF)                                                                                All Versions of this Article:    dev.01219v1          131/14/3307   most recent                                          Alert me when this article is cited                 Alert me if a correction is posted                                  Services         Email this article to a friend             Related articles in Development                         Similar articles in this journal           Similar articles in PubMed              Alert me to new issues of the journal                Download to citation manager                                                             Citing Articles         Citing Articles via HighWire                        Citing Articles via Google Scholar                             Google Scholar         Articles by Kurokawa, D.                      Articles by Aizawa, S.                      Search for Related Content                          PubMed         PubMed Citation               Articles by Kurokawa, D.          Articles by Aizawa, S.                                                                                                                                                             
+
+ 
+
+      

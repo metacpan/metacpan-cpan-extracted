@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+README
+Makefile.PL
+Path.pm
+envpath
+test.pl
+examples/Whence
+examples/Whence.bat
+META.yml                                 Module meta-data (added by MakeMaker)

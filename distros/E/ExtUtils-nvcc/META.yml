@@ -1,0 +1,21 @@
+---
+name: ExtUtils-nvcc
+version: 0.03
+author:
+  - 'David Mertens <dcmertens.perl.csharp@gmail.com>'
+abstract: "CUDA compiler and linker wrapper for Perl's toolchain"
+license: perl
+configure_requires:
+  Module::Build: 0.340201
+generated_by: Module::Build version 0.340201
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+provides:
+  ExtUtils::nvcc:
+    file: lib/ExtUtils/nvcc.pm
+    version: 0.03
+  ExtUtils::nvcc::Backend:
+    file: lib/ExtUtils/nvcc/Backend.pm
+resources:
+  license: http://dev.perl.org/licenses/

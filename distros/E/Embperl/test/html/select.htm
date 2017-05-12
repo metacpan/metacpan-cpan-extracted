@@ -1,0 +1,17 @@
+[-  $values = [ [1, 2, 'a', 'aa'], [3, 4, 'b', 'bb'], [5, 6, 'c', 'cc'] ];  -]
+
+ <select id="udf_list" class="udf_list" onchange="SelectUDF()">
+ [$ foreach my $item (@$values) $]
+     <option value="[+ $item->[0] +]"
+             label="[+ $item->[2] +]"
+             title="[+ $item->[3] +]">[+ $item->[1] +]
+     </option>
+ [$ endforeach $]
+ </select>
+
+ <select id="udf_list" class="udf_list" onchange="SelectUDF()">
+     <option value="[+ $values->[$row][0] +]"
+           label="[+ $values->[$row][2] +]"
+           title="[+ $values->[$row][3] +]">[+ $values->[$row][1] +]
+     </option>
+ </select>

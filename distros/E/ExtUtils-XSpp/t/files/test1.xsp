@@ -1,0 +1,17 @@
+%module{Foo::Bar::Baz};
+
+#include <foo.h>
+
+%package{Foo::Bar::Baz::Buz};
+
+%typemap{int}{simple};
+
+%file{t/files/foo.h};
+{%
+/* header file */
+
+int foo( int, int, int );
+%}
+%file{-};
+
+int foo( int a, int b, int c );

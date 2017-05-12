@@ -1,0 +1,40 @@
+EOL version 0.0.2
+
+This module aids in the conversion of text file newline characters within the context of other perl code. There are several choices a user can specifiy; see POD for details on usage. A command line executable which utilizes this module is also included.
+
+After install:
+
+ perldoc EOL.pm
+ perldoc eol
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+
+DEPENDENCIES
+
+None.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005-2006, Todd Wylie
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

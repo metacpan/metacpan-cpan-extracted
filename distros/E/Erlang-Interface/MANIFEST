@@ -1,0 +1,14 @@
+Changes
+Interface.xs
+Interface_macros.xs
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/Erlang-Interface.t
+lib/Erlang/Interface.pm
+lib/Erlang/Interface/Eterm.pm
+typemap
+fallback/const-c.inc
+fallback/const-xs.inc
+META.yml                                 Module meta-data (added by MakeMaker)

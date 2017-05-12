@@ -1,0 +1,532 @@
+
+
+Regulation of stem cell factor receptor signaling by Cbl family proteins (Cbl-b/c-Cbl)
+
+Shan Zeng,
+
+Zhiheng Xu,
+
+Stan Lipkowitz, and
+
+Jack B. Longley
+
+
+
+
+
+From the Departments of Dermatology and Pathology, College of Physicians and Surgeons, Columbia University, New York, NY; and Laboratory of Cellular and Molecular Biology, National Cancer Institute, Bethesda, MD.
+
+
+
+
+
+
+
+Abstract
+
+Activation of the KIT receptor tyrosine kinase contributes to the pathogenesis of several human diseases, but the mechanisms regulating KIT signaling have not been fully characterized. Here, we show that stem cell factor (SCF), the ligand for KIT, induces the interaction between KIT and Cbl proteins and their mutual degradation. Upon SCF stimulation, KIT binds to and induces the phosphorylation of Cbl proteins, which in turn act as E3 ligases, mediating the ubiquitination and degradation of KIT and themselves. Tyrosine kinase binding and RING finger domains of Cbl are essential for Cbl-mediated ubiquitination and degradation of KIT. We propose a negative feedback loop controlling the SCF-KIT signaling pathway, in which SCF activates KIT. The activated KIT in turn induces phosphorylation and activation of Cbl proteins. The Cbl proteins then bind and direct the degradation of activated KIT, leading to down-regulation of KIT signaling. (Blood. 2005;105:226-232) 
+
+
+
+Introduction
+
+KIT, the stem cell factor (SCF) receptor, is a receptor protein tyrosine kinase (RTK) that is primarily expressed on mast cells, hematopoietic stem cells, germ cells, melanocytes, and the interstitial cells of Cajal. 1, 2 Studies in white-spotting and steel mice have shown that functional SCF and KIT are essential for the development of stem cells involved in hematopoiesis, pigmentation, and reproduction. 3 Stimulation of KIT with its ligand, SCF, induces the activation of KIT including its dimerization and autophosphorylation and its interaction with other proteins to initiate a signaling cascade. 4 Control of the KIT kinase activity is essential for mast cell growth and development and immune response regulation. Constitutive KIT activation caused by mutation of the c-KIT gene has been associated with cellular transformation and the pathogenesis of human mastocytosis and gastrointestinal stromal tumors. 4 - 6 However, despite the central role that KIT plays in diverse cellular systems, the mechanisms that regulate KIT signaling have not been completely elucidated. 
+
+
+
+Ubiquitination and subsequent degradation of proteins has been implicated as a key mechanism regulating duration and intensity of many intracellular signals, and it has been suggested that activated KIT is degraded through the polyubiquitination-dependent protein degradation pathway. 7 However, specific ubiquitin ligases responsible for KIT receptor ubiquitination have not been reported. 
+
+
+
+Cbl family members are newly established as components of the ubiquitin ligation machinery involved in the degradation of phosphorylated proteins. 8 In vitro assays have shown that Cbl proteins can function as E3 ubiquitin (Ub) ligases, and Cbl proteins have recently been implicated in the negative regulation of various RTK and non-receptor tyrosine kinase activities with diverse effects including regulation of the T-cell activation threshold. 9 - 13 The Cbl family proteins consist of an N-terminal tyrosine kinase binding (TKB) domain, a RING finger (RF) domain, and a C-terminal proline-rich domain with potential tyrosine phosphorylation sites. 14 The Cbl RF domain recruits a Ub-conjugating enzyme (E2), whereas the Cbl N-terminal TKB domain mediates Ub conjugation of target proteins. Uncoupling c-Cbl from RTKs may lead to receptor deregulation and tumor formation. 15, 16 
+
+
+
+We hypothesized that Cbl proteins may mediate the ubiquitination and degradation of activated KIT. In this study, we provide evidence that SCF stimulation induces KIT binding and phosphorylation of Cbl proteins. Furthermore, by using Cbl-b or c-Cbl and their ubiquitin ligase-deficient mutants in a reconstituted 293 cell system and in mast cell lines, we show that Cbl-b or c-Cbl acts as an E3 ligase and binds and leads to the ubiquitination and degradation of active KIT, at least partially through the proteasomal pathway upon SCF stimulation. 
+
+
+
+Materials and methods
+
+Materials 
+
+
+
+Antibodies against KIT (C-19), c-Cbl (C-20), and Cbl-b (G-1) were obtained from Santa Cruz Biotechnology (Santa Cruz, CA). Antihemagglutinin (anti-HA) and anti-myc antisera were purchased from Clontech (Palo Alto, CA). Antiphosphotyrosine (4G10) and anti-p85 subunits of phosphatidylinositol 3-kinase (PI3K; 06-195) were obtained from Upstate Biotechnology (Lake Placid, NY). Recombinant human SCF (rhSCF) and recombinant murine SCF (rmSCF) were from Sigma (St Louis, MO); lactacystin and protein phosphatase 2 (PP2) were from Calbiochem (La Jolla, CA). 
+
+
+
+cDNA constructs in mammalian expression vectors 
+
+
+
+All cDNA constructs of Cbl-b or c-Cbl in expression vector (pCEFL) have been described previously. 11 The full length of cDNAs of human wild-type c-KIT in pcDNA3.1 expression vector (Invitrogen, Carlsbad, CA) has been previously described. 17 Substitution of tyrosine with phenylalanine at position 568 ( c-KIT Y568F ) or 570 ( c-KIT Y570F ) in the juxtamembrane domain of c-kit or both sites ( c-KIT Y568F/Y570F ) were generated by site-directed mutagenesis (QuickChange kit; Stratagene, La Jolla, CA) in pcDNA3.1. All constructs were confirmed by DNA sequencing. 
+
+
+
+Cell culture 
+
+
+
+MC9 murine mast cells were kind gifts from Dr E. W. Gelfand (National Jewish Medical Center, Denver, CO) and were cultured in Dulbecco modified Eagle medium (DMEM) supplemented with 50 µM 2-mercapto-ethanol, 0.1 mM nonessential amino acids, 1.0 mM sodium pyruvate, 10% fetal calf serum (FCS), and 10% vol/vol Walter and Eliza Hall Institute 3 (WEHI-3)-derived interleukin 3 (IL-3)-containing conditioned medium. The 293 cells were maintained in culture in DMEM supplemented with 10% FCS as described. 18 
+
+
+
+Cell stimulation and transient transfection 
+
+
+
+The 293 cells were transfected with various constructs by calcium phosphate method as described. 18 After 20 hours, transfected cells were subjected to stimulation. For SCF stimulation, cells were starved with 0.5% FCS for 4 to 6 hours, then stimulated with rhSCF (100 ng/mL) at indicated times. To assess the effect of proteasome inhibitor, the cells were starved and treated for 4 hours with lactacystin (20 µM) prior to SCF stimulation. Src kinase inhibitor PP2 (10 µM) or vehicle (Me 2 SO) was used to examine the role of active Src kinase in some experiments. MC9 cells were washed to remove exogenous growth factors, cultured in medium without serum for 6 hours, then stimulated with rmSCF (100 ng/mL) for 15 and 30 minutes, respectively. 
+
+
+
+Coimmunoprecipitation and Western immunoblotting 
+
+
+
+Coimmunoprecipitatation and Western immunoblotting were performed as previously described. 18 
+
+
+
+Results
+
+Both Cbl-b and c-Cbl can induce ubiquitination and degradation of KIT 
+
+
+
+To determine whether KIT could be a target for Cbl family-induced degradation, 293 cells were mock transfected or transfected with c-KIT, with or without HA-tagged wild-type Cbl-b or c-Cbl. As expected, lysates from cells transfected with c-KIT alone, or in combination with either Cbl-b or c-Cbl, showed prominent SCF-induced tyrosine phosphorylation at 140 kDa, corresponding to KIT protein ( Figure 1A top panel and 1C middle panel). Immunoprecipitation with antibody specific to KIT confirmed the band was KIT ( Figure 1A,C ). In the absence of Cbl-b or c-Cbl, KIT only showed minimal degradation upon SCF stimulation ( Figure 1A second panel). However, we noted relatively lower levels of phosphorylated KIT in cells cotransfected with both c-KIT and Cbl-b or c-Cbl compared with cells transfected with c-KIT alone ( Figure 1A top panel), an observation suggesting that degradation of KIT protein in cells cotransfected with either Cbl-b or c-Cbl ( Figure 1A second panel). KIT degradation did not reflect a general decrease of cellular proteins, as the p85 subunit of PI3K protein levels did not change ( Figure 1A bottom panel). 
+
+
+
+View larger version (34K):
+
+[in this window]
+
+[in a new window]
+
+Figure 1. Cbl-b and c-CBL induce the ubiquitination and degradation of KIT. The 293 cells were transfected with c-KIT expression plasmid along with expression vector (pCEFL; Vect) or different HA tagged Cbl-b or c-Cbl constructs. c-KIT was cotransfected together with a plasmid encoding Myc-tagged ubiquitin to facilitate detection of ubiquitylated KIT in panels B and C. Twenty hours later, cells were starved and stimulated with or without SCF as described in "Materials and methods." (A) Cbl-b and c-Cbl induce the degradation of KIT. Whole-cell lysates were separated on sodium dodecyl sulfate-polyacrylamide gel electrophoresis (SDS-PAGE) gel and immunoblotted (IB) for phosphotyrosine ( -pTyr), KIT ( -KIT), HA ( -HA), Cbl-b ( -Cbl-b), Cbl ( -Cbl), and p85 subunit of phosphatidyl-inositol 3-kinase antibodies ( -p85) as indicated. (B) Cbl-b induces the ubiquitination of KIT. Cell lysates were subjected to immunoprecipitation (IP) with anti-KIT antibody followed by blotting with anti-myc (to detect ubiquitylated KIT) antibody, stripped, and reprobed with KIT antibody. (C) Lactacystin, a proteasome inhibitor, blocks the degradation of ubiquitylated KIT induced by SCF/KIT. Cell lysates were subjected to IP and blotted with anti-myc antibody as in panel B. The membrane was subsequently stripped and probed with -pTyr and -KIT. In panels B and C, Ub indicates ubiquitin.
+
+
+
+
+
+
+
+Interestingly, SCF activation of KIT-induced loss of both Cbl and KIT protein consistent with degradation of a KIT-Cbl complex ( Figure 1A ). Cbl proteins have been shown to act as E3 ubiquitin ligases, promoting degradation of proteins through the proteasomal pathway. 10, 19 To determine whether Cbl proteins promoted the ubiquitination of KIT and whether Cbl-induced degradation depends on the proteasomal pathway, 293 cells were transfected with c-KIT alone or c-KIT together with Cbl-b or c-Cbl. To facilitate detection of ubiquitinated proteins, cells were also cotransfected with plasmid-encoding Myc-tagged ubiquitin. Cells were stimulated with SCF in the presence or absence of lactacystin, a proteasome inhibitor. In cells co-overexpressing Cbl-b and c-KIT, there are light, broad, and poorly defined bands or smears of ubiquitinated species in the KIT immunoprecipitates ( Figure 1B ). These bands become stronger after SCF stimulation despite the fact that the level of KIT is decreased after SCF treatment (compare Figure 1B [bottom panel] lane 3 with 4 and Figure 1C [top panel] lanes 5 with 7). Similar results were obtained with c-Cbl (data not shown). These data indicate that Cbl proteins promote KIT ubiquitination and that activation of KIT by SCF further enhances SCF-induced ubiquitination and degradation of KIT, consistent with Cbl proteins functioning as E3 ligases for KIT. 
+
+
+
+Lactacystin suppresses Cbl-mediated and/or SCF stimulation-induced degradation of KIT ( Figure 1C bottom panel lanes 5-8). In the presence of lactacystin, the amount of ubiquitinated KIT increased (compare Figure 1C [top panel], lane 5 with 6 and lane 7 with 8), indicating that lactacystin inhibits the degradation of ubiquitinated KIT. In our system, however, lactacystin could not totally block the degradation of KIT. The reasons for this could be that the concentration of lactacystin we used is not sufficient to inhibit completely the activity of the proteasomal pathway or that another pathway, such as the lysosomal pathway, which can be inhibited by NH 4 Cl, also contributes to the degradation of KIT (data not shown). 
+
+
+
+In contrast, the ubiquitinated KIT smear is not so apparent in cells transfected with c-KIT alone and there is no apparent change even in the presence of both SCF and lactacystin ( Figure 1B lanes 1-2; Figure 1C lanes 1,3,4). Although in some experiments the KIT level in cells transfected with c-KIT alone decreased with SCF stimulation, it was always much less than in cells cotransfected with Cbl-b/c-Cbl. In addition, in the presence of lactacystin, there appeared a small amount of ubiquitinated KIT smear ( Figure 1C ). This suggests that there are low levels of endogenous E3 ligase activity for KIT in 293 cells. 
+
+
+
+Cbl-b and c-Cbl associate with KIT and are phosphorylated upon SCF stimulation 
+
+
+
+We next tested whether Cbl-b and c-Cbl interact with KIT. HA-tagged wild-type Cbl-b or c-Cbl was transfected into 293 cells together with c-KIT. Anti-KIT immunoprecipitates of these transfectants were immunoblotted with the indicated antibodies. Cbl-b or c-Cbl protein was associated with KIT receptor in the presence or absence of SCF stimulation ( Figure 2A bottom 2 panels). Cell lysates from the transfected cells showed a pattern similar to that in Figure 2A, in which SCF stimulation induced loss of both Cbl proteins and KIT (data not shown). This indicates that SCF induces the degradation of the KIT-Cbl complex and SCF may regulate Cbl proteins through KIT activation. This is reminiscent of our former study, which showed that epithelial growth factor (EGF) induces the coordinated degradation of EGF receptor (EGFR) and Cbl proteins. 10 Previous work has shown that endogenous c-Cbl can be phosphorylated upon SCF stimulation in hematopoietic cells, 20 but the tyrosine phosphorylation of Cbl-b has not been reported. Cotransfection of HA-tagged Cbl-b or c-Cbl and c-KIT showed that engagement of KIT receptor by SCF-induced tyrosine phosphorylation of both Cbl-b and c-Cbl ( Figure 2B top panel). The bands shown are phosphorylated Cbl-b or c-Cbl because they are not present in cells transfected with control plasmid and because they express the HA tag used for immunoprecipitation. A phosphoprotein that migrates at the size of KIT was also observed ( Figure 2B upper bands in top panel). 
+
+
+
+View larger version (21K):
+
+[in this window]
+
+[in a new window]
+
+Figure 2. Cbl-b and c-Cbl are associated with KIT and are phosphorylated upon SCF stimulation. Cells were transfected and treated as in Figure 1. (A) Cbl-b and c-Cbl associate with KIT. Cell lysate was immunoprecipitated with -KIT antibody and probed with antiphosphotyrosine and anti-KIT antibody. The membrane was also probed with anti-HA, anti-Cbl-b, or c-Cbl antibody to show the association of Cbl proteins with KIT. (B) Cbl-b and c-Cbl are phosphorylated upon SCF stimulation. Cell lysate was immunoprecipitated with anti-HA antibody and the blot was probed with -pTyr to show tyrosine phosphorylation of Cbl proteins in the presence of SCF. Membrane was stripped and reprobed with -HA to show HA-tagged Cbl-b and c-Cbl.
+
+
+
+
+
+
+
+The Cbl-b RF and TKB domains are required for KIT ubiquitination and degradation 
+
+
+
+The ring finger and TKB domains of Cbl-b/c-Cbl are directly involved in the ubiquitination process. 10, 11, 19, 21 Cbl RF domains are essential for their E3 ligase activity. Mutations of the conserved cysteines in the ring finger domains to alanines ( c-Cbl C381A and Cbl-b 373A ) disrupt their E2 binding and ligase activity. To determine the roles of ring finger domains in Cbl-KIT interactions and regulation of KIT, we cotransfected c-KIT with either wild-type or mutant Cbl-b/c-Cbl. Immunoprecipitates with anti-KIT showed that Cbl-b with a loss of function mutation affecting RF domain was significantly less effective in SCF-induced reduction of KIT protein levels ( Figure 3A top panel lane 7) than wild-type Cbl-b ( Figure 3A top panel lane 6). Similar results were obtained when cells were cotransfected with c-KIT and c-Cbl C381A mutant (compare Figure 4C middle panel lane 7 with 8). 
+
+
+
+View larger version (26K):
+
+[in this window]
+
+[in a new window]
+
+Figure 3. Cbl-b TKB and RF domains are required for Cbl-b-induced degradation and ubiquitination of KIT. The 293 cells were transfected with pCDNA3. c-KIT /pCEFL, pCDNA3/pCEFL. Cbl-b, or pCDNA3. c-KIT with different HA-tagged Cbl-b constructs in their expression vector (pCEFL) as indicated. Cells were starved and stimulated with or without SCF (100 ng/mL) for 10 minutes as in Figure 1. pCDNA3. c-KIT was cotransfected with a plasmid encoding Myc-tagged ubiquitin to facilitate detection of ubiquitylated KIT in panel B. (A) Cbl-b TKB and RF domains are required for Cbl-b-induced degradation of KIT. Cell lysate was immunoprecipitated with either -KIT or -HA antibody and probed with anti-KIT or -HA antibody to show their protein levels. (B) Cbl-b TKB and RF domains are required for Cbl-b-induced ubiquitination of KIT. Cell lysates were subjected to immunoprecipitation (IP) with anti-KIT antibody followed by blotting with anti-myc (to detect ubiquitylated KIT) antibody, stripped, and reprobed with anti-KIT antibody.
+
+
+
+View larger version (31K):
+
+[in this window]
+
+[in a new window]
+
+Figure 4. KIT Y568F/Y570F and Cbl RF domains are essential for SCF-induced degredation of KIT and Cbl proteins. The 293 cells were transfected with different combinations of cDNA constructs or empty vectors as indicated. Cells were starved and stimulated with or without SCF for 10 minutes (A) or 5 minutes (B-C). (A) Y568/Y570, the KIT juxtamembrane SH2 domain docking site, is required for tyrosine phosphorylation of Cbl-b and the degradation of both KIT and Cbl-b induced by SCF stimulation. Cell lysates were immunoprecipitated with anti-HA antibody followed by blotting with -pTyr to show tyrosine phosphorylation of Cbl-b protein stimulated with SCF. Membrane was stripped and reprobed with -HA to show Cbl-b levels, or lysates were subjected directly to probe with anti-HA antibody to detect Cbl-b and then stripped and reprobed with anti-KIT antibody to detect the expression of different KIT proteins (bottom 2 panels). (B) Y568/570 in KIT and Cbl-b TKB domain are essential for SCF/KIT-induced tyrosine phosphorylation and degradation of Cbl-b and KIT. Cell lysates were subjected directly to probe with -pTyr to detect tyrosine phosphorylation of wild-type and mutant Cbl-b or KIT proteins (top), with anti-KIT antibody to detect the expression of different KIT proteins (middle), or with -HA antibody to detect the levels of wild-type and mutant Cbl-b (bottom). (C) RF domain in c-Cbl is essential for the degradation of KIT and itself induced by SCF, and Y568/Y570 in KIT is essential for the tyrosine phosphorylation of c-Cbl and the degradation of both KIT and c-Cbl. Cell lysates were subjected to probe as in panel B except that -HA antibody was used to detect the levels of wild-type and mutant c-Cbl.
+
+
+
+
+
+
+
+
+
+
+
+TKB domains consist of Src homology 2 (SH2)-like motifs that mediate interactions between the Cbl proteins and RTKs and are essential for Cbl-dependent ubiquitination of RTKs. 22, 23 The C2/3 mutant (327-938) in Cbl-b includes normal RF and C-terminal proline-rich domains but lacks the N-terminal TKB domain. Cotransfection and immunoprecipitation with anti-KIT showed that Cbl-b C2/3 could not induce KIT degradation in the presence of SCF ( Figure 3A top panel, compare the difference between lanes 3 and 6 and lanes 5 and 8), indicating that a functional Cbl-b TKB domain is required for Cbl-b-mediated KIT degradation. 
+
+
+
+Because RF and TKB domains of Cbl-b are essential for Cbl-b-induced KIT degradation, we reasoned that mutation of those domains should compromise Cbl-b's ability to cause ubiquitination of KIT. As shown in Figure 3B, this was the case. Cells cotransfected with Cbl-b C373A or Cbl-b C2/3 and c-KIT do not show apparent ubiquitination of KIT even upon SCF stimulation ( Figure 3B lanes 5-8). Thus, the RF domain and the TKB domain of Cbl-b are required for the ubiquitination of KIT. 
+
+
+
+Mutual regulation between KIT and the Cbl family requires tyrosine 568 and 570 in the juxtamembrane domain of KIT 
+
+
+
+Binding of SCF to KIT induces homodimerization and intermolecular tyrosine phosphorylation of the receptor, creating docking sites for a number of SH2-containing signal transduction molecules, including the Src family kinases. 4 Src family kinases have been shown to be able to bind to c-Cbl in vitro, and c-Cbl functions as a negative regulator for Src family kinases. 13 In addition, an Src family kinase and KIT inhibitor, PP2, 24 apparently abolished the Cbl-b/c-Cbl-dependent degradation of KIT (data not shown). These data suggest that Src kinases may play a role in SCF-induced, Cbl-b/c-Cbl-mediated degradation of KIT. 
+
+
+
+Prior studies have shown that Tyr568 and Tyr570 in the juxtamembrane domain of KIT are consensus sites for binding of Src family kinases and serve as a docking site for SH2 domain of Src kinases. 25 We therefore generated different mutant constructs of c-KIT, c-KIT Y568F, and c-KIT Y570F , or double-mutant c-KIT Y568F/Y570F , in which tyrosine residue(s) in the docking sites were mutated with phenylalanine substitution. Mutation of Tyr568 leads to loss of activation of Src family kinase, whereas mutation of both Tyr568 and Tyr570 leads to complete loss of Src kinase activation following SCF stimulation. 25 Although Tyr568/570 double-mutant KIT is not able to activate Src and Ras/mitogen-activated protein (MAP) kinases in response to SCF stimulation, it does not lead to a general loss of KIT kinase activity. 25 
+
+
+
+The tyrosine phosphorylation of Cbl proteins induced by SCF through KIT single-mutant was weaker than that through wild-type KIT ( Figure 4A top panel; data for c-KIT Y570F , which is similar to c-KIT Y568F , is not shown). The tyrosine phosphorylation of Cbl-b and c-Cbl was almost abolished when c-kit Y568F/Y570F mutant was coexpressed ( Figure 4A-C top panels). In addition, Cbl-b- and c-Cbl-mediated degradation of KIT upon SCF stimulation is abolished with the double-mutant form of c-KIT Y568F/Y570F as is SCF-induced degradation of Cbl-b and c-Cbl ( Figure 4 ). These data indicate that the binding of Src kinases tyrosine 568 and tyrosine 570 in the juxtamembrane domain of KIT is essential for SCF/KIT-induced tyrosine phosphorylation and degradation of Cbl proteins. However, we cannot exclude the possibility that other proteins, besides Src kinases, are involved as well. 
+
+
+
+Furthermore, SCF induces the degradation of wild-type Cbl proteins ( Figure 4B bottom panel lanes 3-4; Figure 4C bottom panel lanes 5-6), but it fails to induce the degradation of Ring finger mutant form of Cbl proteins ( Figure 4C bottom panel lanes 7-8; data not shown) and Cbl-b C2/3 ( Figure 4B bottom panel lanes 5-6). 
+
+
+
+It is interesting to notice that induction of KIT tyrosine phosphorylation by SCF in cells expressing KIT Y568F/Y570F is not apparent compared with that in cells expressing wild-type KIT ( Figure 4B-C top panels), indicating that tyrosine 568/570 are the main tyrosine phosphorylation sites in KIT upon SCF stimulation. 
+
+
+
+SCF-induced interactions between KIT and Cbl proteins require the KIT juxtamembrane SH2-binding site and Cbl-b TKB domain 
+
+
+
+Thus far, we have demonstrated an interaction between KIT and Cbl proteins. However, the level of KIT in cells stimulated for 10 minutes with SCF is much lower than that in unstimulated cells. To further investigate the interaction between KIT and Cbl-b and c-Cbl, we transfected wild-type c-KIT or c-KIT Y568F/Y570F into 293 cells together with either wild-type or mutant forms of Cbl constructs. Cells were stimulated with SCF for 5 minutes instead of 10 minutes to limit degradation of KIT. Blotting of cell lysates showed that KIT Y568F/Y570F and the Cbl ring finger domain were required for SCF-induced polyubiquinization and degradation of KIT and Cbl proteins ( Figure 4B-C ). 
+
+
+
+To further investigate this interaction, cell lysates were immunoprecipitated with HA antibody. As shown in the middle panels of Figure 5, SCF stimulation induces KIT association with Cbl-b ( Figure 5A ) and C-Cbl (compare Figure 5B lanes 2 and 3). SCF also induces the association between KIT and c-Cbl 381A or Cbl-b 373A (compare Figure 5B middle panel lanes 4 and 5; data not shown), indicating that the Cbl ring finger domains are not required for the interaction induced between KIT and Cbl proteins. However, the amount of KIT associated with Cbl-b C2/3 after SCF stimulation is much less than that associated with wild-type Cbl-b, although there are many more Cbl-b C2/3 proteins in the immunoprecipitates (compare Figure 5A lanes 3 and 4). 
+
+
+
+View larger version (21K):
+
+[in this window]
+
+[in a new window]
+
+Figure 5. SCF-induced interactions between KIT and Cbl's requires the KIT juxtamembrane SH2 docking site and the Cbl-b TKB domain. (A) TKB domain of Cbl-b and Y568/Y570 in KIT are essential for SCF-induced interaction between Cbl-b and KIT and tyrosine phosphorylation of Cbl-b. Cell lysates used in Figure 4B were subjected to immunoprecipitation with anti-HA antibody followed by blotting as in Figure 4B. (B) Y568/Y570 in KIT is essential for SCF-induced tyrosine phosphorylation of c-Cbl and is important for interaction between c-Cbl and KIT. Cell lysates were subjected to immunoprecipitation with anti-HA antibody followed by blotting as in panel A. Considering that the level of c-Cbl in SCF-stimulated cells is much lower than that in nonstimulated cells, the induction of association between KIT and c-Cbl by SCF is very apparent.
+
+
+
+
+
+
+
+Coincident with SCF/KIT-induced association between KIT and Cbl proteins, SCF is able to induce tyrosine phosphorylation of the Cbl proteins with mutations in the ring finger domain ( Figure 5B top panel lanes 4-5; data not shown), but no apparent tyrosine phosphorylation of Cbl-b C2/3 is induced ( Figure 5A top panel lane 4). 
+
+
+
+To further test if the binding site on KIT is required for interactions between Cbl proteins and KIT, Cbl-b or c-Cbl were cotransfected with c-KIT or c-KIT Y568F/Y570F into 293 cells. Through immunoprecipitation with HA antibody, KIT associated with Cbl-b or c-Cbl was assayed. As shown in Figure 5A, upon SCF stimulation, the amount of KIT Y568F/Y570F associated with Cbl-b is much less than that of wild-type KIT (compare Figure 5A middle panel lanes 3 and 5). Similarly, in Figure 5B, the amount of KIT Y568F/Y570F associated with c-Cbl is relatively much less than that of wild-type KIT (compare Figure 5B middle panel lanes 3 and 6). It indicates that the interaction of KIT with Src kinases and maybe other proteins is important for SCF-induced association between Cbl proteins and KIT. In other words, SCF-induced association between Cbl proteins and KIT is possibly mediated by Src kinases. 
+
+
+
+Cbl-b-mediated negative regulation of KIT in mast cell line 
+
+
+
+From the above data, Cbl-b mediates the ubiquitination and degradation of KIT in our reconstituted 293 cell system. We attempted to establish the relevance of these observations in a murine mast cell line, MC9. In MC9, SCF stimulation induced rapid and prominent phosphorylation of KIT, followed by a gradual decrease of the KIT protein level ( Figure 6 ). The simultaneous appearance of a smear above the KIT band is very likely to be ubiquitinated KIT, consistent with ubiquitination-mediated KIT degradation after receptor engagement. Following SCF stimulation, Cbl-b as well as c-Cbl was phosphorylated and degraded in MC9 cells ( Figure 6 top panel; data not shown). This suggests that Cbl-b targets endogenous activated KIT for ubiquitination and degradation after receptor engagement just like that in 293 reconstituted system and suggests that this phenomenon occurs in mast cells expressing physiologic levels of Cbl's and KIT proteins. 
+
+
+
+View larger version (59K):
+
+[in this window]
+
+[in a new window]
+
+Figure 6. Cbl-b-mediated negative regulation of KIT in MC9 cells. MC9 cells were stimulated with SCF (100 ng/mL) for 0, 15, and 30 minutes as described in "Materials and methods." The cell lysates were blotted with -pTyr, -KIT, and -Cbl-b and -p85 antibodies, respectively.
+
+
+
+
+
+
+
+Discussion
+
+Cbl family members induce degradation of KIT that requires the proteasomal pathway 
+
+
+
+Recent data have emerged implicating Cbl family proteins, through their E3 ubiquitin ligase activity, functioning as negative regulators of several cellular RTKs. 10, 19, 22 Induction of ubiquitination of activated RTK is thought to be a key mechanism by which Cbl proteins negatively regulate different signal transduction pathways. 8, 26 Here, we provide direct evidence that KIT stability in mast cells is regulated by Cbl-b and c-Cbl ubiquitin ligases. 
+
+
+
+First, expression of Cbl-b and c-Cbl induce the ubiquitination and degradation of KIT and the induction is further stimulated by SCF. Second, KIT is degraded via the proteasomal and/or the lysosome pathways because lactacystin, a proteasome inhibitor, suppresses the degradation of KIT and leads to the accumulation of the ubiquitinated KIT. In addition, inhibition of lysosome function by NH 4 CL also blocks the degradation of KIT induced by Cbl proteins (data not shown). Third, Cbl-b/c-Cbl TKB and RF domains required for Cbl-b/c-Cbl to function as ubiquitin ligases are essential for Cbl-b/c-Cbl-induced ubiquitination and degradation of KIT. Therefore, Cbl-b/c-Cbl-dependent ubiquitination may provide a key mechanism of negative regulation of KIT activity. Finally, Cbl proteins are expressed in a mast cell line and SCF induces the phosphorylation and degradation of both KIT and Cbl proteins, indicating that Cbl proteins are biologically relevant to the regulation of KIT in mast cells. 
+
+
+
+Regulation of Cbl-b or c-Cbl by the SCF-KIT pathway 
+
+
+
+We noticed that Cbl proteins are expressed in a mast cell line (MC9) and are phosphorylated and degraded upon stimulation by SCF, and we show that in a reconstituted 293 cell system, c-Cbl and Cbl-b are phosphorylated and down-regulated in the presence of KIT, especially upon SCF stimulation. These data suggest that, in turn, Cbl proteins are regulated by the SCF-KIT pathway. To further support this hypothesis, we show that SCF stimulation induces the phosphorylation of Cbl-b/c-Cbl. In addition, Cbl-b/c-Cbl may preferentially bind to phosphorylated KIT because SCF induces the phosphorylation of KIT as well as promotes the interaction of KIT with Cbl-b/c-Cbl. The interaction is weaker between nonphosphorylated KIT and Cbl-b/c-Cbl. 
+
+
+
+SCF was able to induce the interaction between KIT and RF mutant forms of Cbl proteins. However, the interaction between KIT and Cbl-b C2/3 is very weak compared with that between KIT and wild-type Cbl-b with SCF stimulation. This indicates that the Cbl TKB domain plays an important, if not required, role for this phenomenon. The small amount of KIT associated with Cbl-b C2/3 is likely to be indirect via adaptors such as growth factor receptor-bound protein 2 (Grb2) or Src kinases, which also bind to KIT. RF mutant forms of Cbl-b/c-Cbl were tyrosine phosphorylated similarly to wild-type Cbl proteins by KIT/SCF stimulation, indicating that functional RF domains of Cbl-b/c-Cbl are not required for tyrosine phosphorylation of Cbl-b/c-Cbl. However, the tyrosine phosphorylation of C2/3 Cbl-b induced by KIT/SCF was not apparent. There are 3 notions for this. First, the N-terminal one third of Cbl-b, most likely the TKB domain but not the RF domain, is important for the binding of Cbl-b to KIT. Second, because Cbl-b C2/3 should still be able to interact with Src kinases via the C-terminal prolines and SH3 domain of Src kinases, it implies that the Cbl protein may have to be on the KIT to be phosphorylated, that the TKB domain is the major site(s) phosphorylated, or that it is essential for the phosphorylation of Cbl-b induced by SCF-KIT pathway. Third, the phosphorylation of Cbl-b may be required for its strong binding to KIT. 
+
+
+
+The possible role of Src kinase in mediating the mutual regulation between SCF-KIT and the Cbl family 
+
+
+
+It has been shown that SCF-induced internalization of KIT was diminished in a cell line in which expression of Lyn kinase was disrupted by homologous recombination. 27 Mutation of Y568/Y570 in KIT abolishes the ability of KIT to bind and to activate Src kinases 4, 25 as well as the internalization of KIT in the presence of SCF, 28 indicating that internalization of KIT is dependent on recruitment of Src. 
+
+
+
+Stimulation of cells expressing c-KIT Y568F/Y570F with SCF failed to induce the phosphorylation and degradation of Cbl-b/c-Cbl and their association with KIT, suggesting that the interaction between KIT and Src kinases is required for the regulation of Cbl-b/c-Cbl by SCF/KIT. In addition, SCF fails to induce the degradation of KIT Y568/Y570 double-mutant in the presence of Cbl-b/c-Cbl. This indicates that SCF/KIT signaling fails to go through Src kinases to activate Cbl-b/c-Cbl and therefore leads to the stabilization of mutant KIT. However, we cannot exclude the possibility that other proteins, besides Src kinase, are also involved in mediating the signaling between SCF/KIT and cbl proteins. 
+
+
+
+In conclusion, as depicted in Figure 7, upon SCF stimulation, KIT dimerizes and gets autophosphorylated, leading to recruitment of Src kinases and maybe other proteins to phosphorylated tyrosine 568/tyrosine 570 residues in the juxtamembrane domain of KIT. Once recruited, they may get activated and induce the phosphorylation of Cbl-b and c-Cbl directly or indirectly. Cbl-b and c-Cbl, acting as E3 ligases, then bind to and mediate the ubiquitination and degradation of activated KIT through the proteasome and/or lysosome pathway, leading to the desensitization of mast cells to SCF. Thereafter, Cbl-b/c-Cbl are degraded and the level of KIT could recover and cells get ready for further stimulation by SCF. This may explain why Cbl-b and KIT were degraded shortly after receptor engagement in mast cell lines, whereas prolonged treatment of mast cell lines with SCF lead to the consistent down-regulation of KIT and the gradual recovery of the Cbl-b protein level (data not shown). 
+
+
+
+View larger version (15K):
+
+[in this window]
+
+[in a new window]
+
+Figure 7. A schematic representation of Cbl-b/c-Cbl mediates KIT down-regulation. After ligand (SCF) binding, KIT is dimerized and autophosphorylated, leading to recruitment of Src kinases to phosphorylated KIT. Activated Src kinases may lead directly or indirectly to the phosphorylation of Cbl-b and c-Cbl. Cbl's then bind and lead to the ubiquitination and degradation of the activated KIT and themselves in a proteasome- and/or lysosome-dependent manner. In this way, cells become insensitive to SCF. It is possible that there is a feedback loop in this pathway.
+
+
+
+
+
+
+
+The pathophysiology of asthma is largely mediated by mast cells and lymphocytes. Studies of Cbl-b-deficient mice suggest that Cbl-b negatively regulates the activity of both B cells and T cells, sets the threshold of signaling in T and B cells, and prevents the development of autoimmunity. 9, 29, 30 This is represented by the hyperresponsiveness of Cbl-b -/- lymphocytes and the autoimmune phenotype of Cbl-b -/- mice. We show here that the activity of mast cells, represented by the SCF-KIT pathway, is also negatively regulated by Cbl-b/c-Cbl. It is reasonable to predict that the mast cells in Cbl-b -/- mice would be hyperresponsive like B cells and T cells. It is, therefore, very intriguing to test whether cbl-b-knockout mice are prone to have asthma. If that is the case, it would provide another animal model for asthma and improve our understanding of the mechanism of asthma and, furthermore, the therapy of asthma. 
+
+
+
+Acknowledgements
+
+We are very grateful to Lloyd Greene for all his support. 
+
+
+
+Footnotes
+
+Submitted May 11, 2004;
+
+accepted July 19, 2004.
+
+
+
+Prepublished online as Blood First Edition Paper, August 17, 2004; DOI 10.1182/blood-2004-05-1768. 
+
+
+
+Supported in part by grants from the National Institutes of Health (NIH)-National Institute of Neurological Disorders and Stroke (Lloyd A. Greene), NIH-Department of Health and Human Services (DHHS) (J.B.L.), and DHHS-Public Health Service (J.B.L.). 
+
+
+
+S.Z. and Z.X. contributed equally to this work. 
+
+
+
+The publication costs of this article were defrayed in part by page charge payment. Therefore, and solely to indicate this fact, this article is hereby marked "advertisement" in accordance with 18 U.S.C. section 1734. 
+
+
+
+Reprints: Zhiheng Xu, Department of Pathology, Columbia University, 630 W168th Street, New York, NY 10032; e-mail: zx18{at}columbia.edu <!--. 
+
+
+
+References
+
+Blume-Jensen P, Jiang G, Hyman R, et al. Kit/stem cell factor receptor-induced activation of phosphatidylinositol 3'-kinase is essential for male fertility. Nat Genet. 2000;24: 157-162. [CrossRef] [Medline]
+
+[OrderarticleviaInfotrieve] 
+
+
+
+Iemura A, Tsai M, Ando A, Wershil BK, Galli SJ. The c-kit ligand, stem cell factor, promotes mast cell survival by suppressing apoptosis. Am J Pathol. 1994;144: 321-328. [Abstract] 
+
+
+
+Besmer P, Manova K, Duttlinger R, et al. The kitligand (steel factor) and its receptor c-kit/W: pleiotropic roles in gametogenesis and melanogenesis. Dev Suppl. 1993; 125-137. 
+
+
+
+Linnekin D. Early signaling pathways activated by c-Kit in hematopoietic cells. Int J Biochem Cell Biol. 1999;31: 1053-1074. [CrossRef] [Medline]
+
+[OrderarticleviaInfotrieve] 
+
+
+
+Hirota S, Isozaki K, Moriyama Y, et al. Gain-of-function mutations of c-kit in human gastrointestinal stromal tumors. Science. 1998;279: 577-580. [Abstract/ Free FullText] 
+
+
+
+Timokhina I, Kissel H, Stella G, Besmer P. Kit signaling through PI 3-kinase and Src kinase pathways: an essential role for Rac1 and JNK activation in mast cell proliferation. EMBO J. 1998;17: 6250-6262. [Abstract/ Free FullText] 
+
+
+
+Miyazawa K, Toyama K, Gotoh A, et al. Ligand-dependent polyubiquitination of c-kit gene product: a possible mechanism of receptor down-modulation in M07e cells. Blood. 1994;83: 137-145. [Abstract/ Free FullText] 
+
+
+
+Joazeiro CA, Wing SS, Huang H, et al. The tyrosine kinase negative regulator c-Cbl as a RING-type, E2-dependent ubiquitin-protein ligase. Science. 1999;286: 309-312. [Abstract/ Free FullText] 
+
+
+
+Chiang YJ, Kole HK, Brown K, et al. Cbl-b regulates the CD28 dependence of T-cell activation. Nature. 2000;403: 216-220. [CrossRef] [Medline]
+
+[OrderarticleviaInfotrieve] 
+
+
+
+Ettenberg SA, Magnifico A, Cuello M, et al. Cbl-b-dependent coordinated degradation of the epidermal growth factor receptor signaling complex. J Biol Chem. 2001;276: 27677-27684. [Abstract/ Free FullText] 
+
+
+
+Fang D, Wang HY, Fang N, et al. Cbl-b, a RING-type E3 ubiquitin ligase, targets phosphatidylinositol 3-kinase for ubiquitination in T cells. J Biol Chem. 2001;276: 4872-4878. [Abstract/ Free FullText] 
+
+
+
+Rao N, Ghosh AK, Ota S, et al. The non-receptor tyrosine kinase Syk is a target of Cbl-mediated ubiquitylation upon B-cell receptor stimulation. EMBO J. 2001;20: 7085-7095. [Abstract/ Free FullText] 
+
+
+
+Yokouchi M, Kondo T, Sanjay A, et al. Src-catalyzed phosphorylation of c-Cbl leads to the interdependent ubiquitination of both proteins. J Biol Chem. 2001;276: 35185-35193. [Abstract/ Free FullText] 
+
+
+
+Tsygankov AY, Teckchandani AM, Feshchenko EA, Swaminathan G. Beyond the RING: CBL proteins as multivalent adapters. Oncogene. 2001;20: 6382-6402. [CrossRef] [Medline]
+
+[OrderarticleviaInfotrieve] 
+
+
+
+Hamilton E, Miller KM, Helm KM, Langdon WY, Anderson SM. Suppression of apoptosis induced by growth factor withdrawal by an oncogenic form of c-Cbl. J Biol Chem. 2001;276: 9028-9037. [Abstract/ Free FullText] 
+
+
+
+Peschard P, Fournier TM, Lamorte L, et al. Mutation of the c-Cbl TKB domain binding site on the Met receptor tyrosine kinase converts it into a transforming protein. Mol Cell. 2001;8: 995-1004. [Medline]
+
+[OrderarticleviaInfotrieve] 
+
+
+
+Ma Y, Cunningham ME, Wang X, et al. Inhibition of spontaneous receptor phosphorylation by residues in a putative alpha-helix in the KIT intracellular juxtamembrane region. J Biol Chem. 1999;274: 13399-13402. [Abstract/ Free FullText] 
+
+
+
+Xu Z, Kukekov NV, Greene LA. POSH acts as a scaffold for a multiprotein complex that mediates JNK activation in apoptosis. EMBO J. 2003;22: 252-261. [Abstract/ Free FullText] 
+
+
+
+Miyake S, Lupher ML Jr, Druker B, Band H. The tyrosine kinase regulator Cbl enhances the ubiquitination and degradation of the platelet-derived growth factor receptor alpha. Proc Natl Acad Sci U S A. 1998;95: 7927-7932. [Abstract/ Free FullText] 
+
+
+
+Brizzi MF, Dentelli P, Lanfrancone L, et al. Discrete protein interactions with the Grb2/c-Cbl complex in SCF- and TPO-mediated myeloid cell proliferation. Oncogene. 1996;13: 2067-2076. [Medline]
+
+[OrderarticleviaInfotrieve] 
+
+
+
+Ettenberg SA, Rubinstein YR, Banerjee P, et al. Cbl-b inhibits EGF-receptor-induced apoptosis by enhancing ubiquitination and degradation of activated receptors. Mol Cell Biol Res Commun. 1999;2: 111-118. [CrossRef] [Medline]
+
+[OrderarticleviaInfotrieve] 
+
+
+
+Ettenberg SA, Keane MM, Nau MM, et al. Cbl-b inhibits epidermal growth factor receptor signaling. Oncogene. 1999;18: 1855-1866. [CrossRef] [Medline]
+
+[OrderarticleviaInfotrieve] 
+
+
+
+Levkowitz G, Waterman H, Ettenberg SA, et al. Ubiquitin ligase activity and tyrosine phosphorylation underlie suppression of growth factor signaling by c-Cbl/Sli-1. Mol Cell. 1999;4: 1029-1040. [Medline]
+
+[OrderarticleviaInfotrieve] 
+
+
+
+Tatton L, Morley GM, Chopra R, Khwaja A. The Src-selective kinase inhibitor PP1 also inhibits Kit and Bcr-Abl tyrosine kinases. J Biol Chem. 2003;278: 4847-4753. [Abstract/ Free FullText] 
+
+
+
+Lennartsson J, Blume-Jensen P, Hermanson M, et al. Phosphorylation of Shc by Src family kinases is necessary for stem cell factor receptor/ckit mediated activation of the Ras/MAP kinase pathway and c-fos induction. Oncogene. 1999;18: 5546-5553. [CrossRef] [Medline]
+
+[OrderarticleviaInfotrieve] 
+
+
+
+Sanjay A, Horne WC, Baron R. The Cbl family: ubiquitin ligases regulating signaling by tyrosine kinases. Sci STKE. 2001;110: PE40. 
+
+
+
+Broudy VC, Lin NL, Liles WC, et al. Signaling via Src family kinases is required for normal internalization of the receptor c-Kit. Blood. 1999;94: 1979-1986. [Abstract/ Free FullText] 
+
+
+
+Jahn T, Seipel P, Coutinho S, et al. Analysing c-kit internalization using a functional c-kit-EGFP chimera containing the fluorochrome within the extracellular domain. Oncogene. 2002;21: 4508-4520. [CrossRef] [Medline]
+
+[OrderarticleviaInfotrieve] 
+
+
+
+Bachmaier K, Krawczyk C, Kozieradzki I, et al. Negative regulation of lymphocyte activation and autoimmunity by the molecular adaptor Cbl-b. Nature. 2000;403: 211-216. [CrossRef] [Medline]
+
+[OrderarticleviaInfotrieve] 
+
+
+
+Naramura M, Jang IK, Kole H, et al. C-Cbl and Cbl-b regulate T cell responsiveness by promoting ligand-induced TCR down-modulation. Nat Immunol. 2002;3: 1192-1199. [CrossRef] [Medline]
+
+[OrderarticleviaInfotrieve] 
+
+
+
+This Article
+
+All Versions of this Article:
+
+105/1/226
+
+most recent
+
+Services
+
+Google Scholar
+
+PubMed
+
+PubMed Citation
+
+Related Collections
+

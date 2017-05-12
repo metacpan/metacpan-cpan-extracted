@@ -1,0 +1,58 @@
+#!/usr/bin/perl
+use 5.010;
+use strict;
+use warnings;
+use utf8::all;
+use autodie qw(:all);
+
+use Exobrain::Bus;
+use Exobrain::Message;
+use JSON::Any;
+use Config::Tiny;
+use Date::Manip::Date;
+
+# PODNAME: inject-todo
+# ABSTRACT: Inject TODO packets directly onto the exobrain bus
+our $VERSION = '1.08'; # VERSION
+
+# TODO : This is using an ancient interface. Either clean it up,
+#        or retire it.
+
+my $bus  = Exobrain::Bus->new( type => 'PUB' );
+
+my $todo = "@ARGV";
+my $epoch_time = time();
+
+my $msg = Exobrain::Message->new(
+    namespace => 'TODO',
+    timestamp => $epoch_time,
+    source    => 'CMDLINE',
+    data      => { tags => ['todo'], },
+    raw       => { tags => ['todo'], text => $todo },
+    summary   => $todo,
+)->send_msg( $bus->_socket );
+
+__END__
+
+=pod
+
+=head1 NAME
+
+inject-todo - Inject TODO packets directly onto the exobrain bus
+
+=head1 VERSION
+
+version 1.08
+
+=head1 AUTHOR
+
+Paul Fenwick <pjf@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Paul Fenwick.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

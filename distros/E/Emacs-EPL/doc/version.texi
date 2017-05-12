@@ -1,0 +1,6 @@
+@c !!! THIS IS A GENERATED FILE !!!
+@c !!! DO NOT UPDATE THIS FILE !!!
+@c !!! UPDATE Makefile.PL INSTEAD !!!
+@set UPDATED 13 January 2001
+@set EDITION 0.2
+@set VERSION 0.7

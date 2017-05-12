@@ -1,0 +1,14 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/EveOnline/SSO.pm
+lib/EveOnline/SSO/Client.pm
+minil.toml
+t/00_compile.t
+t/01_sso.t
+t/02_client.t
+META.yml
+MANIFEST

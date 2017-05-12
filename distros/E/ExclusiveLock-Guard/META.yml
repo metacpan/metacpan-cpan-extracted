@@ -1,0 +1,32 @@
+---
+abstract: 'lexically-scoped lock management'
+author:
+  - 'Kazuhiro Osawa <yappo {at} shibuya {dot} pl>'
+build_requires:
+  Test::More: 0.88
+configure_requires:
+  Module::Build::Tiny: 0.027
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.4, Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.132620'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: ExclusiveLock-Guard
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/yappo/p5-ExclusiveLock-Guard/issues
+  homepage: https://github.com/yappo/p5-ExclusiveLock-Guard
+  repository: https://github.com/yappo/p5-ExclusiveLock-Guard.git
+version: 0.07
+x_contributors:
+  - 'Kazuhiro Osawa <yappo@shibuya.pl>'

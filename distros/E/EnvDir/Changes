@@ -1,0 +1,28 @@
+Revision history for Perl extension EnvDir
+
+0.08 2013-07-25T04:39:09Z
+    - Skips t/10_envdir_pl.t in MSWin32.
+
+0.07 2013-07-23T04:49:26Z
+    - Uses double quote instead of single quote in t/10_envdir_pl.t.
+
+0.06 2013-07-18T13:30:11Z
+    - Uploads to CPAN
+
+0.05 2013-07-18T13:13:28Z
+    - Updates pod.
+
+0.04 2013-07-18T12:59:30Z
+    - Changes the behavior of reading file that filesize equals zero.
+    - Adds envdir.pl
+
+0.03 2013-07-18T11:10:34Z
+    - Updates pod.
+    - Adds a example script.
+
+0.02 2013-07-18T10:32:42Z
+    - Implements the -clean option.
+
+0.01
+    - original version
+

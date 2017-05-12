@@ -1,0 +1,153 @@
+NAME
+    Error::Hierarchy - Support for hierarchical exception classes
+
+VERSION
+    version 1.103530
+
+SYNOPSIS
+        package Error::Hierarchy::ReadOnlyAttribute;
+
+        use warnings;
+        use strict;
+
+        use base 'Error::Hierarchy';
+
+        __PACKAGE__->mk_accessors(qw(attribute));
+
+        use constant default_message => '[%s] is a read only attribute';
+
+        use constant PROPERTIES => ( 'attribute' );
+
+    # Meanwhile...
+
+        package main;
+
+        use Error::Hierarchy::Mixin;
+
+        sub foo {
+            if (@_) {
+                Error::Hierarchy::ReadOnlyAttribute->
+                    throw(attribute => 'foo');
+            }
+        }
+
+DESCRIPTION
+    This class provides support for hierarchical exception classes. It
+    builds upon Error and is thus compatible with its "try"/"catch"
+    mechanism. However, it records a lot more information such as the
+    package, filename and line where the exception occurred, a complete
+    stack trace, the hostname and a UUID.
+
+    It provides a stringification that is extensible with any properties
+    your own exceptions might define.
+
+METHODS
+  depth
+    Get or set the caller depth, that is the number of call stack frames
+    that are skipped when reporting the package, filename and line the error
+    was thrown from. When an exception object is constructed, it defaults to
+    0. This is useful if you want to throw an exception from the perspective
+    of your own caller. For example:
+
+        sub assert_foo {
+            unless ($teh_foo) {
+                throw SomeException(depth => 1);
+            }
+        }
+
+    Without the "depth" argument, the exception would show that it was
+    thrown within "assert_foo()". Maybe that's what you want, but with
+    "depth()" you can make it appear as if the exception was thrown from the
+    place where "assert_foo()" was called from.
+
+    The actual exception depth is influenced by "error_depth()" as well.
+
+  error_depth
+    Like "depth()", but here the value should be defined within the
+    exception class code itself. Therefore, you can't set the value, but
+    subclasses can override it. Some exceptions should always be thrown from
+    the caller's perspective (or even higher up); use "error_depth()" for
+    this case. "depth()" by contrast is intended for the user to be set; the
+    two are added together to get the actual depth. In this class the
+    "error_depth()" defaults to 1 so the exception is at least reported from
+    the place where it was actually thrown - a value of 0 would mean that
+    the exception is reported as having occurred Error::Hierarchy itself,
+    which is probably not what you want.
+
+    If you override this value in a subclass, it's probably a good idea to
+    add the subclass' desired depth to the superclass's depth to accumulate
+    it. For example:
+
+        package MyException;
+        use base 'Error::Hierarchy';
+        sub error_depth {
+            my $self = shift;
+            1 + $self->SUPER::error_depth();
+        }
+
+  comparable
+    Support for Data::Comparable.
+
+  init
+    Initializes a newly constructed exception object.
+
+  get_properties
+    Actual exception classes will subclass this class and define properties.
+    Exception classes themselves can be subclassed. So this method returns
+    the inherited list of all the exception class' properties.
+
+  properties_as_hash
+    Constructs a hash whose keys are the exception's properties - see
+    "get_properties()" - and whose values are the values of each property in
+    the exception object. The properties "package", "filename" and "line"
+    are omitted.
+
+    In list context, the hash is returned as is. In scalar context, a
+    reference to the hash is returned.
+
+  stringify
+    Defines how the exception should look if the object is stringified. This
+    class inherits from Error::Hierarchy::Base, which overloads "" to call
+    "stringify()".
+
+    This class stringifies an itself by taking the "message()" attribute and
+    passing it to "sprintf()", along with the exception's properties.
+
+  transmute($exception, %args)
+    Transmutes an existing exception. It leaves the stack trace, filename,
+    line etc. as it is and just blesses it into the class on which
+    "transmute()" was called, adding the given additional arguments. This is
+    used when catching a generic exception and turning it into a more
+    specific one.
+
+INSTALLATION
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests through the web interface at
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=Error-Hierarchy>.
+
+AVAILABILITY
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see
+    <http://search.cpan.org/dist/Error-Hierarchy/>.
+
+    The development version lives at
+    <http://github.com/hanekomu/Error-Hierarchy> and may be cloned from
+    <git://github.com/hanekomu/Error-Hierarchy>. Instead of sending patches,
+    please fork this project using the standard git and github
+    infrastructure.
+
+AUTHOR
+    Marcel Gruenauer <marcel@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2004 by Marcel Gruenauer.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,41 @@
+---
+abstract: 'Extra sets of HP encodings'
+author:
+  - 'John Wang <johncwang@gmail.com>'
+build_requires:
+  Test::More: 0
+  strict: 0
+configure_requires:
+  Cwd: 0
+  ExtUtils::MM_Cygwin: 0
+  ExtUtils::MM_Unix: 0
+  ExtUtils::MM_Win32: 0
+  ExtUtils::MakeMaker: 0.34
+  ExtUtils::Manifest: 0
+  File::Basename: 0
+  File::Find: 0
+  File::Path: 0
+  File::Spec: 0
+  FileHandle: 0
+  FindBin: 0
+  LWP::Simple: 0
+  Module::Build: 0
+  Module::Install::Base: 0
+  Net::FTP: 0
+  Socket: 0
+  YAML: 0
+  perl: 5.007002
+  strict: 0
+  vars: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300038, CPAN::Meta::Converter version 2.130880'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Encode-HP
+requires:
+  Encode: 0
+  XSLoader: 0
+  perl: 5.007003
+version: 0.03

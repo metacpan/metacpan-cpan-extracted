@@ -1,0 +1,5 @@
+fix bug with C-level callbacks
+
+document API better
+
+gettimeofday isn't portable -- avoid it?

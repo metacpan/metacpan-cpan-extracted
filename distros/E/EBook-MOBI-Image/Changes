@@ -1,0 +1,31 @@
+0.16  2014-07-23
+
+    - added hint for Imlib2 as non-perl dependency to the docs
+
+0.15  2014-04-02
+
+    - renamed README.md to README
+    - hint to docs for creating images (in synopsis)
+
+0.14  2013-07-17
+
+    - Detect prereqs automatically
+
+0.13  2013-07-17
+
+    - Use temporary images which get unlinked after ebook creation
+
+0.12  2013-04-09
+
+    - Abort installation if Image::Imlib2 is not installed (dzil)
+      (because of errors at CpanTesters)
+    - Don't pack older builds (dzil)
+
+0.11  2013-01-16
+
+    - Fixed bugs discovered by CPAN-Testers
+
+0.1   2013-01-14
+
+    - Initial release to CPAN
+

@@ -1,0 +1,385 @@
+
+=head1 NAME
+
+ExtUtils::XSBuilder - Automatic Perl XS glue code generation
+
+=head1 DESCRIPTION
+
+ExtUtils::XSBuilder is a set modules to parse C header files and create XS
+glue code and documentation out of it. Idealy this allows to "write" an
+interface to a C library without coding a line. Since no C API is ideal,
+some adjuments are necessary most of the time. So to use this module you
+must still be familiar with C and XS programming, but it removes a lot of
+stupid work and copy & paste from you. Also when the C API changes, most
+of the time you only have to rerun XSBuilder to get your new Perl API.
+
+The creation process takes place in the following steps:
+
+=head2 Derive a class from ExtUtils::XSBuilder::ParseSource
+
+This class must override some methods to tell XSBuilder which C header files
+to parse and some other necessary parameters. You need at least to override
+the C<package> method to give the name of the package you want to create and 
+either the C<find_includes> method which returns all C header files to parse,
+or the C<include_dirs> method to return a list of all directories which
+should be scanned for C header files.
+
+Of course there are more methods you can overide. See 
+L<ExtUtils::XSBuilder::ParseSource> for a full list of overrideable methods.
+
+=head2 Scan the source files
+
+If your derived class is called MyClass::ParseSource you simply start the 
+source scan with
+
+    perl -MMyClass::ParseSource -e 'MyClass::ParseSource->run'
+
+You may also put this into a small script to ease usage, set the Perl libpath,
+etc.
+
+During the source scan, XSBuilder creates a set of tables which contain the
+results of parsing. If you haven't changed the default locations in your
+subclass, these tables are created under C<xs/tables>, followed by the
+name of the module returned by the C<package> method you created. There you
+will find four generated modules: C<FunctionTable.pm>, which holds the
+function declarations; C<StructureTable.pm>, which holds the structures;
+C<ConstantTable.pm>, which contains constants found in the header files; and
+C<CallbackTable.pm>, which contains definitions for callback types.
+
+Since source scanning may take some time, we create intermediate tables and
+transform them into XS code later, rather than creating XS code directly.
+Since we save the result, we can avoid rescanning the source files as long as
+they don't change.
+
+=head2 Derive a class from ExtUtils::XSBuilder::WrapXS
+
+The WrapXS class is responsible for taking the information generated both from
+the source files and from the map files (see below) to create the XS code.
+As with the ParseSource class, you must override this method with your own
+implementaion, to tell WrapXS what to do.
+
+See L<ExtUtils::XSBuilder::WrapXS> for a list of overrideable methods.
+
+=head2 Create map files
+
+XSBuilder will not automaticly create XS functions for all C functions and
+structures. You must provide hints in order for the XS files to be created
+properly. The map files are the mechanism to provide these hints. By default,
+the map files are found under C<xs/maps>. There are four map types, C<types>,
+C<functions>, C<structures>, and C<callbacks>. Each map file is named with
+a user selectable prefix (e.g. C<foo>,) followed by an underscore, the map
+type name, and the map extension C<.map>. For example, hints for functions
+relating to error processing in your source may be contained in a map file
+named C<error_functions.map>.
+
+=over 4
+
+=item foo_types.map
+
+Contains the mapping from C types to Perl classes.
+
+=item foo_functions.map
+
+Contains the mapping from C functions to Perl functions. Can be used to 
+reorder arguments, tell XSBuilder which arguments are actualy return values 
+and in which Perl package the function will be created.
+
+=item foo_structures.map
+
+Contains the mapping from C structures to Perl classes and defines for which
+classes the access methods should be created. You can also specify if you want
+a C<new> method for the class.
+
+=item foo_callbacks.map
+
+Contains the mapping form C callback functions to Perl callback functions. Can
+be used to reorder arguments, tell XSBuilder which arguments are return
+values, and in which Perl package the functions will be created.
+
+=back
+
+For a detailed description of the map file formats see below.
+
+To have a starting point, XSBuilder is able to create default map files which
+simply include all types, functions and structures. You can recreate the map
+files anytime and XSBuilder will append all items which are not already in the
+map files.
+
+First copy the _types.map file from the xsbuilder directory to your maps
+directory. This file contains the standard mapping for some basic types.
+
+If, for example, your derived class is called MyClass::WrapXS, you simply
+start the creation/update of the map files with
+
+    perl -MMyClass::WrapXS -e 'MyClass::WrapXS->checkmaps(" ")' 
+
+The argument to checkmaps supplies a character to be prepended to the first
+column of the new map entries. If you do not pass an argument to checkmaps, no
+map files are written, and checkmaps will only compare what is missing. (You
+need to print the result somehow e.g. by using Data::Dumper). You may also put
+this into a small script to ease usage, set the Perl libpath, etc.
+
+After you have created your default maps, you must edit the 
+C<xs/maps/new_type.map> file, which contains all types that were found in the
+source. Append a pipe (C<|>) followed by the class or type name, e.g.
+
+    int                 | IV
+    struct request_rec  | Apache::RequestRec
+
+.
+
+=head2 Create the XS files
+
+Now we can create the code. By running
+
+    perl -MMyClass::WrapXS -e 'MyClass::WrapXS->run'
+
+XSBuilder will create the XS, pm and Makefile.PL files for every module that 
+is mentioned in the maps. The result is placed as a directory hierarchy under
+WrapXS. To control the content of the C<Makefile.PL> and the C<pm> file, you
+can override the C<makefilepl_text> and C<pm_text> methods. You can include
+additional code in the XS files by writing an include file which is included
+at the top of the XS file. This file can contain helper functions that can't
+be automatically generated. The files must be placed under the C<xs>
+directory, with the correct path and name. For example, to have a header file
+included for the module Apache::DAV, create a file named
+C<xs/Apache/DAV/Apache__DAV.h>. The same can be done for inclusion in the pm
+file. Following the example above, the file name would be 
+C<xs/Apache/DAV/DAV_pm>.
+
+
+=head1 Format of the map files
+
+For all map files blank lines are ignored and lines starting with a C<#> are
+treated as comments and are also ignored.
+
+=head2 Types map file
+
+Contains the mapping from C type to Perl classes.
+
+Format is the name of the C type followed by the name of the Perl class
+or the XS type specifier, separated by a C<|>. Example:
+
+    int                 | IV
+    struct request_rec  | Apache::RequestRec
+
+If you have a Perl class with a single-level namespace (e.g. Apache) you need
+to postfix it with two colons (e.g. "Apache::"). When both a typedef and a
+structure share the same name, structures must be written as with a "struct "
+prefix (e.g. "struct foo".) Addionally, you can give the id for the typemap if
+you need a special conversion and one or more other names for the struct:
+
+    struct request_rec  | Apache::RequestRec | T_APACHEOBJ | r
+
+An optional fifth parameter specifies that the data needs to be copied
+when assigned to a struct member and selects the way how memory is allocated:
+
+    char *   | PV | | | strdup
+
+The actual code for memory allocation is provided inside the structure map,
+for example:
+
+    MALLOC=strdup:$dest = ($type)ap_pstrdup(obj -> pool, $src)
+    MALLOC=malloc:ap_palloc(obj -> pool, $src, sizeof($type)) ; memcpy($dest,$src,sizeof($type))
+
+This gives two ways to allocate memory and copy the data into it. The fifth
+parameter in the type map selects which of these two should be used. $src,
+$dest and $type are replaced by the source, the destination and the type.
+C<obj> is a pointer to the C-structure.
+
+=head3 Special Types
+
+=over
+
+=item String, PV and PVnull
+
+A string is represented in C as a pointer to an null terminated range of
+characters. In Perl the it is called C<PV> (pointer value). When converting
+a Perl C<undef> to a C string Perl by default converts it to an empty string.
+While this is save, this is not always what is required, because many
+C interfaces treat NULL as a special case. For this reason the C<PVnull> type
+is introduced, which converts C<undef> to C<NULL> and C<NULL> to C<undef>.
+
+To make it work you need the following line in your type map file:
+
+	PVnull		| PVnull | | | strdup
+
+Now you can defines any type, structure memeber or function argument
+as type C<PVnull>.
+	
+
+=back
+
+=head2 Functions map file
+
+Contains the mapping from C functions to Perl functions. This can be used to 
+reorder arguments, tell XSBuilder which arguments are return values, and in
+which Perl package the function will be created.
+
+There are some directives which affect the function mappings that follow it.
+Each directive may appear in the file more than once.
+
+=over 4
+
+=item MODULE
+
+the module name (file name) where the function should be defined, e.g. 
+
+    MODULE=Apache::Connection
+
+will define the functions that follow in files named Apache/Connection.{pm,xs}
+
+=item PACKAGE
+
+The name of the package that functions are defined in. If undefined, PACKAGE
+defaults to the value of MODULE. A value of 'guess' indicates that package
+name should be guessed based on first argument found that maps to a Perl
+class. Falls back on the prefix (ap_ -> Apache, apr_ -> APR).
+
+=item PREFIX
+
+The prefix to be stripped from C functions when creating the XS stubs.
+Defaults to the value of PACKAGE, converted to C naming convention. For
+example,
+
+    PREFIX=APR::Base64
+
+will strip C<apr_base64_> from the C functions. If the prefix does not match,
+it defaults to C<ap_> or C<apr_>.
+
+=back
+
+B<NOTE:> You must have at least one C<MODULE> definition
+otherwise all functions will be ignored.
+
+The format of entries is:
+
+    C function name | dispatch function name (dispatch argspec) | argspec | Perl alias
+
+The C<dispatch function name> (the C function that is actually called)
+defaults to C function name. If the dispatch function name is just a prefix
+(mpxs_, MPXS_), the C<C function name> is appended to it. The return type may
+be specified before the C<C function name>, and defaults to the C<return_type>
+in the C<{foo}::FunctionTable> module generated by the C<ParseSource> module.
+
+The C<dispatch argspec> is optional. If supplied, it can be used to pass
+different parameters to the dispatch function then to the XS function. If the
+function name begins with C<DEFINE_>, a new function is defined (for defining
+functions that are not parsed from the source). C<argspec> must be supplied.
+C<DEFINE_> is not included in the generated function name. 
+
+The C<argspec> defaults to arguments in C<{foo}::FunctionTable>, as generated
+by the C<ParseSource> module. Argument types can be specified to override
+those in the C<{foo}::FunctionTable>. Default values can also be specified,
+e.g. arg=default_value
+
+For example:
+  ap_get_client_block   | mpxs_ | r, SV *:buffer, bufsiz
+  ap_setup_client_block |       | r, read_policy=REQUEST_CHUNKED_ERROR
+  ap_make_array      | ap_make_array(r->pool, nelts, elt_size) | request_rec *:r, nelts, elt_size
+
+
+argspec of '...' indicates passthru, calling the function with
+
+    (aTHX_ I32 items, SP **sp, SV **MARK)
+
+To mark an argument as return only you can prefix it with < e.g. 
+
+    dav_open_lockdb | | r, ro, <lockdb
+
+will be called as ($error get the return value of the C function)
+
+    ($error, $lockdb) = $r -> open_lockdb (0) ;
+
+The return argument (e.g. lockdb) will always be passed by address 
+to the function.
+
+The function alias, if defined, will be created in the current C<PACKAGE>.
+
+Function names on lines that do not begin with a word character or a single
+space are skipped. Function names can be prefixed with the following symbols:
+
+    '!' => 'disabled or not yet implemented',
+    '~' => 'implemented but not auto-generated',
+    '-' => 'likely never be available to Perl',
+    '>' => '"private" to your C library',
+    '?' => 'unclassified',
+
+=head2 Structures map file
+
+Contains the mapping from C structures to Perl classes and defines the members
+for which access methods should be created. A C<new> method may be specified,
+if desired. The format looks like the following:
+
+    <struct_name>
+      member1
+      member2
+      new
+    </struct_name>
+
+An optional module name can be given, to specify in which module the code
+should be placed. To place the structure in My::Module, for example, specify:
+
+    <struct_name MODULE=My::Module>
+
+For all members that are listed here, XSBuilder will generate an access method
+to read and write it's content. If you want to name the perl access method
+differently than the C member, you can write
+
+   cMemberValue | member_value | type
+
+this will map the C<cMemberValue> structure member to the access function 
+C<member_value>. The default is to use the same name in Perl as in C.
+As third argument you can give a typename. This defaults to the type of the 
+variable. It can be used to specify a different type, for special conversion needs.
+(e.g. PV versus PVnull)
+If you give the C<new> member, XSBuilder will create a new method for that
+class, which can be used to create a new instance and initialize it with data.
+
+=head2 Callbacks map file
+
+The format of entries is:
+
+    C function name | argspec
+
+The content is the same as function map, it but contains the callbacks.
+
+=head1 Additional generated methods
+
+For structures, XSBuilder will generate two additional methods: C<new>, and
+C<init_callbacks>.
+
+=head2 new ($initialvalue)
+
+With C<new> you can create a new Perl object for an C structure. Optionally,
+you can pass either a hashref with initial data, or another object, who's
+data will be copied into the new object.
+
+=head2 init_callbacks
+
+C<init_callbacks> should be called during object initialization. It will fill
+in all callback members of a structure with pointers that cause a method call
+into the object, when the callback is called from C.
+
+You can call it either with
+
+    $obj -> init_callbacks
+
+or
+
+    MyModule -> init_callbacks ($obj) ;
+
+
+=head1 Callbacks
+
+A callback which is part of a structure will cause a call to the method with
+the same name as the structure member, prefixed with C<cb_>. For example, if
+you have a structure member named C<open>, then the Perl method C<cb_open>
+will be called whenever the C code calls the callback.
+
+If you want to call the callback on your own you need to call the method which
+is called like the structure member, e.g. C<open>.
+
+NOTE: You need to call C<init_callbacks> during your method initialzation to
+be able to call callbacks.
+

@@ -1,0 +1,132 @@
+0.102     2013-09-08 18:13:54 Europe/London
+	No changes to features.
+
+	Dependency fixes:
+	* List::MoreUtils and DateTime were not included in cpanfile
+
+0.101     2013-08-30 21:24:22 Europe/London
+	No functional changes.
+
+	Test fixes:
+	* Use Future rather than CPS::Future in the resolver.t test
+
+0.100     2013-08-28 23:01:14 Europe/London
+	EntityModel::Entity
+	* The ->new method has been expanded to accept a full entity definition
+	* New ->keyfield for key-value storage types
+	* Stringifies to entity:$name
+
+	EntityModel::Field
+	* Stringifies to field:$name
+
+	EntityModel::Resolver
+	* New class for providing helper functions for gathering values, might be renamed
+	in future so don't get too comfortable
+
+	Test::EntityModel
+	* Helper module for setting up models and other common functions
+
+	General:
+	* ->find can now be run without parameters to return all objects. Not sure how advisable this
+	is but presumably the caller knows what they're doing.
+	* Fix loading JSON from file.
+	* Automatically register plugins on load.
+	* "Default" model support for classes such as EntityModel::Resolver
+	* Drop DateTime::Format::Duration, seems to use $& in a croak statement and since we only use
+	this as a helper module there's no great benefit in keeping it around.
+
+	Bug fixes:
+	* Fixes for hash ordering and smartmatch removal for building on perl-5.18, should close RT82151
+	(thanks to Andreas J. König for reporting).
+
+	Documentation:
+	* Yet more ORMs for the list
+	* Sort out field names in example, thanks to Terrence Brannon for reporting this (a long time ago!)
+
+0.017     2012-06-10 16:27:04 Europe/London
+	Minor release to update EntityModel::Class dependency.
+	Also added more ORMs to the "see also" section.
+
+0.016     2012-03-05 01:25:35 Europe/London
+	Another minor update with some code cleanup and preparation for some changes and minor
+	restructuring planned for the next version:
+	* Clean up several minor dependency issues (the deprecated EntityModel::DB class was trying to
+	pull in DBI, and the SQL handling has a dependency on Parser::MGC).
+	* Enable some additional dzil tests (mainly author tests for compiling modules, testing
+	synopsis code, and the like)
+
+0.015     2012-02-27 02:54:02 Europe/London
+	This is a minor update only:
+	* Fixes to tests and handling for EntityModel::Collection
+	* Missing parameter in storage_ok() was causing failures on newer Test::Builder versions
+	 (e.g. http://www.cpantesters.org/cpan/report/fa389848-5f22-11e1-ac30-241d23a3b3ef )
+
+0.014     2011-10-02 03:43:40 Europe/London
+	Add the EntityModel::Collection and EntityModel::EntityCollection classes plus some basic tests.
+	Remove stray debug line in storage code.
+	Rename the rest of the EntityModel::Query methods to use_underscores instead of camelCase.
+	Add an example script for generating queries.
+	Initial SQL parser for converting raw SQL into an EntityModel::Query object.
+	Implemented the commandline client (basic functionality only so far).
+
+0.013     2011-08-02 02:33:36 Europe/London
+	Bug fix release: dropped Cache::Memcached::Fast dependency in last release but still had EntityModel::Cache::Memcached in place,
+	 and test files still referenced it. Also add a note to the async example file indicating that it's currently unfinished.
+
+0.012     2011-07-26 23:56:35 Europe/London
+	Provide EntityModel::Test::Storage and EntityModel::Test::Cache so that external modules
+	 can use a common testing interface to verify basic functionality.
+	Clean up module loading slightly.
+	Disable log output in tests.
+	Query interface uses PostgreSQL-style placeholders by default
+	 (hardcoded, will eventually come from the engine instead)
+	Add check for unique module names to 00-pod.t
+
+0.011     2011-06-21 21:16:13 Europe/London
+	Better performance for larger models.
+	Includes more backported async support, including EntityModel::Gather.
+	Cleaned up some of the tests.
+	Added more comments and alternatives to the SEE ALSO sections.
+
+0.010     2011-03-06 02:46:17 Europe/London
+	Move ->add_plugin method to EntityModel top level class.
+	Allow EntityModel plugins to be provided using the Name => { ... } format
+	 or as an instance, for compatibility with other methods such as
+	 add_storage
+
+0.009     2011-03-04 17:23:14 Europe/London
+	Fix EntityModel::Template handling, needed for EntityModel::Web
+
+0.008     2011-02-20 23:25:09 Europe/London
+	Backport some basic plugin support.
+
+0.007     2011-02-20 20:03:23 Europe/London
+	Tidy up some POD and package for the first non-trial release.
+
+0.006     2011-02-13 23:38:14 Europe/London
+	Attempt to fix test failure seen on Solaris where ref $v ~~ [...] was giving 'Argument "HASH" isn't numeric in
+	 smart match', and associated v-string error (http://www.cpantesters.org/cpan/report/f86d3c52-3792-11e0-bb29-ad544afd17af)
+
+0.005     2011-02-12 16:01:19 Europe/London
+	Fix dependencies and minor test cleanups.
+
+0.004     2011-02-06 06:02:05 Europe/London
+	Add remaining dependencies, including EntityModel::Class 0.002 which provides a UNITCHECK fix for
+	non-multiplicity-enabled perl versions.
+
+0.003     2011-02-06 02:46:11 Europe/London
+	Add missing XML::XPath dependency
+
+0.002     2011-02-06 00:31:18 Europe/London
+	Improve tests and handling for N:M join tables.
+	Enable handling for ->find in the Perl 'storage' module.
+	Copy across the missing update support for EntityModel::Query.
+	Allow fields that don't have an EntityModel::Field definition (and corresponding type).
+	Initial support for callback events on entities at EntityModel::Support::Perl level.
+	Fix some pod doc headers.
+	Do EntityModel load in general.t inside a BEGIN block in an attempt to trace why usemultiplicity
+	seems to be required for UNITCHECK blocks to work as required.
+
+0.001     2011-02-01 04:38:41 Europe/London
+	Preliminary release to CPAN.
+

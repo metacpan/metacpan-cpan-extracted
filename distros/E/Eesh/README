@@ -1,0 +1,26 @@
+Eesh.pm - Enlightenment Window Manager IPC Library
+
+This is alpha software: use at your own risk.
+
+Installation
+------------
+
+gunzip Eesh-XXX.tar.gz
+tar xf Eesh-XXX.tar
+cd Eesh-XXX
+perl Makefile.PL
+make 
+make test
+## become root if need be
+make install
+
+
+License
+-------
+
+Licensed under the same terms as enlightenment 16.3.  See COPYING.
+
+Copyright 2000, R. Barrie Slaymaker, Jr. <barries@slaysys.com>
+
+Licensed under the terms of the GNU General Public License, v2 or later,
+cesnsedAvailable from http://www.gnu.org/copyleft/gpl.html .

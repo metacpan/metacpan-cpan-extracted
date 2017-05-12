@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE package PUBLIC "+//ISBN 0-9673008-1-9//DTD OEB 1.2 Package//EN" "http://openebook.org/dtds/oeb-1.2/oebpkg12.dtd">
+
+<package unique-identifier="uid" xmlns="http://openebook.org/namespaces/oeb-package/1.0/">
+  <metadata>
+    <dc-metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oebpackage="http://openebook.org/namespaces/oeb-package/1.0/">
+      <dc:Identifier id="uid">DBMYVDRLPO-HUFFCDICTEST</dc:Identifier>
+      <dc:Title>Space Encyclopedia (HUFF/CDIC test)</dc:Title>
+      <dc:Creator>Mobipocket</dc:Creator>
+      <dc:Subject>
+      </dc:Subject>
+      <dc:Date>14/08/2001</dc:Date>
+      <dc:Language>en</dc:Language>
+      <dc:Rights>
+      </dc:Rights>
+    </dc-metadata>
+  </metadata>
+  <manifest>
+    <item id="main" href="main.htm" media-type="text/x-oeb1-document"/>
+    <item media-type="image/jpeg" href="outer.jpg" id="outer.jpg"/>
+  </manifest>
+  <spine>
+    <itemref idref="main"/>
+  </spine>
+  <tours>
+  </tours>
+</package>

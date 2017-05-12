@@ -1,0 +1,2659 @@
+---
+.comment:
+  offset: 456
+  size: 32
+T.282:
+  offset: 17304
+  size: 160
+__FRAME_END__:
+  offset: 16632
+  size: 672
+__do_global_ctors_aux:
+  offset: 125368
+  size: 118416
+__do_global_dtors_aux:
+  offset: 488
+  size: 128
+_get_tty_settings:
+  offset: 22328
+  size: 96
+_keyboard_input_timeout:
+  offset: 264648
+  size: 8
+_paren_blink_usec:
+  offset: 264508
+  size: 4
+_rl_abort_internal:
+  offset: 79832
+  size: 96
+_rl_add_macro_char:
+  offset: 85736
+  size: 160
+_rl_adjust_point:
+  offset: 122216
+  size: 224
+_rl_allow_pathname_alphabetic_chars:
+  offset: 247312
+  size: 8
+_rl_any_typein:
+  offset: 85896
+  size: 32
+_rl_arg_callback:
+  offset: 104920
+  size: 128
+_rl_arg_dispatch:
+  offset: 104360
+  size: 560
+_rl_arg_getchar:
+  offset: 104296
+  size: 64
+_rl_arg_init:
+  offset: 105160
+  size: 48
+_rl_arg_overflow:
+  offset: 104200
+  size: 96
+_rl_argcxt:
+  offset: 249008
+  size: 4
+_rl_backspace:
+  offset: 89992
+  size: 144
+_rl_bell_preference:
+  offset: 243820
+  size: 4
+_rl_bind_stty_chars:
+  offset: 243828
+  size: 4
+_rl_bind_tty_special_chars:
+  offset: 21816
+  size: 176
+_rl_block_sigint:
+  offset: 75864
+  size: 96
+_rl_callback_data:
+  offset: 247984
+  size: 24
+_rl_callback_data_alloc:
+  offset: 88248
+  size: 32
+_rl_callback_data_dispose:
+  offset: 88232
+  size: 16
+_rl_callback_func:
+  offset: 247976
+  size: 8
+_rl_callback_newline:
+  offset: 88408
+  size: 112
+_rl_caught_signal:
+  offset: 245452
+  size: 4
+_rl_char_search:
+  offset: 93912
+  size: 128
+_rl_char_search_callback:
+  offset: 94152
+  size: 48
+_rl_char_search_internal:
+  offset: 93448
+  size: 464
+_rl_char_value:
+  offset: 123096
+  size: 160
+_rl_clean_up_for_exit:
+  offset: 57656
+  size: 64
+_rl_clear_screen:
+  offset: 57160
+  size: 48
+_rl_clear_to_eol:
+  offset: 57272
+  size: 64
+_rl_col_width:
+  offset: 59480
+  size: 384
+_rl_comment_begin:
+  offset: 248776
+  size: 8
+_rl_compare_chars:
+  offset: 122568
+  size: 272
+_rl_complete_mark_directories:
+  offset: 264528
+  size: 4
+_rl_complete_mark_symlink_dirs:
+  offset: 244568
+  size: 4
+_rl_complete_show_all:
+  offset: 244560
+  size: 4
+_rl_complete_show_unmodified:
+  offset: 244564
+  size: 4
+_rl_completion_case_fold:
+  offset: 248840
+  size: 4
+_rl_completion_prefix_display_length:
+  offset: 244572
+  size: 4
+_rl_control_keypad:
+  offset: 89704
+  size: 64
+_rl_copy_to_kill_ring:
+  offset: 81048
+  size: 496
+_rl_copy_undo_entry:
+  offset: 84552
+  size: 160
+_rl_copy_undo_list:
+  offset: 84712
+  size: 96
+_rl_copy_word_as_kill:
+  offset: 81688
+  size: 160
+_rl_cs_dir:
+  offset: 244208
+  size: 4
+_rl_cs_orig_dir:
+  offset: 244212
+  size: 4
+_rl_current_display_line:
+  offset: 57000
+  size: 96
+_rl_digit_p:
+  offset: 77736
+  size: 16
+_rl_digit_value:
+  offset: 77752
+  size: 16
+_rl_disable_tty_signals:
+  offset: 22424
+  size: 256
+_rl_dispatch:
+  offset: 3688
+  size: 32
+_rl_dispatch_callback:
+  offset: 4104
+  size: 240
+_rl_dispatch_subseq:
+  offset: 2472
+  size: 1216
+_rl_dispatching_keymap:
+  offset: 248784
+  size: 8
+_rl_doing_an_undo:
+  offset: 247360
+  size: 4
+_rl_echoctl:
+  offset: 245456
+  size: 4
+_rl_echoing_p:
+  offset: 243840
+  size: 8
+_rl_enable_keypad:
+  offset: 248992
+  size: 4
+_rl_enable_meta:
+  offset: 264668
+  size: 4
+_rl_enable_meta_key:
+  offset: 89768
+  size: 64
+_rl_enable_paren_matching:
+  offset: 19112
+  size: 128
+_rl_erase_at_end_of_line:
+  offset: 58024
+  size: 128
+_rl_erase_entire_line:
+  offset: 57336
+  size: 48
+_rl_errmsg:
+  offset: 78152
+  size: 272
+_rl_find_completion_word:
+  offset: 28520
+  size: 976
+_rl_find_next_mbchar:
+  offset: 123256
+  size: 368
+_rl_find_prev_mbchar:
+  offset: 122840
+  size: 256
+_rl_fix_last_undo_of_type:
+  offset: 83320
+  size: 64
+_rl_fix_point:
+  offset: 92888
+  size: 112
+_rl_free_history_entry:
+  offset: 102408
+  size: 64
+_rl_free_match_list:
+  offset: 24696
+  size: 80
+_rl_free_saved_history_line:
+  offset: 102472
+  size: 32
+_rl_get_char_len:
+  offset: 122440
+  size: 128
+_rl_get_keyname:
+  offset: 40792
+  size: 592
+_rl_get_screen_size:
+  offset: 90520
+  size: 624
+_rl_get_string_variable_value:
+  offset: 51736
+  size: 528
+_rl_handle_signal:
+  offset: 77448
+  size: 208
+_rl_history_preserve_point:
+  offset: 248424
+  size: 8
+_rl_history_saved_point:
+  offset: 264672
+  size: 4
+_rl_horizontal_scroll_mode:
+  offset: 243904
+  size: 4
+_rl_in_stream:
+  offset: 248760
+  size: 8
+_rl_init_eightbit:
+  offset: 101816
+  size: 304
+_rl_init_file_error:
+  offset: 44904
+  size: 64
+_rl_init_line_state:
+  offset: 664
+  size: 64
+_rl_init_terminal_io:
+  offset: 91144
+  size: 1344
+_rl_input_available:
+  offset: 86488
+  size: 160
+_rl_input_queued:
+  offset: 86648
+  size: 64
+_rl_insert_char:
+  offset: 99928
+  size: 912
+_rl_insert_next:
+  offset: 101240
+  size: 128
+_rl_insert_next_callback:
+  offset: 101480
+  size: 48
+_rl_insert_typein:
+  offset: 87672
+  size: 176
+_rl_internal_char_cleanup:
+  offset: 4344
+  size: 240
+_rl_internal_pager:
+  offset: 28424
+  size: 96
+_rl_interrupt_immediately:
+  offset: 245448
+  size: 4
+_rl_intr_char:
+  offset: 245460
+  size: 4
+_rl_is_mbchar_matched:
+  offset: 122120
+  size: 96
+_rl_iscxt:
+  offset: 245008
+  size: 8
+_rl_isearch_callback:
+  offset: 55672
+  size: 48
+_rl_isearch_cleanup:
+  offset: 55256
+  size: 288
+_rl_isearch_dispatch:
+  offset: 53112
+  size: 2080
+_rl_isearch_terminators:
+  offset: 245000
+  size: 8
+_rl_keyseq_chain_dispose:
+  offset: 2424
+  size: 48
+_rl_keyseq_cxt_alloc:
+  offset: 1336
+  size: 80
+_rl_keyseq_cxt_dispose:
+  offset: 2408
+  size: 16
+_rl_kill_kbd_macro:
+  offset: 85352
+  size: 112
+_rl_kscxt:
+  offset: 243936
+  size: 8
+_rl_last_c_pos:
+  offset: 245056
+  size: 4
+_rl_last_command_was_kill:
+  offset: 243800
+  size: 4
+_rl_last_tty_chars:
+  offset: 244328
+  size: 32
+_rl_last_v_pos:
+  offset: 245060
+  size: 4
+_rl_lowercase_p:
+  offset: 78584
+  size: 48
+_rl_macro_dumper_internal:
+  offset: 41384
+  size: 464
+_rl_make_prompt_for_search:
+  offset: 57720
+  size: 304
+_rl_mark_modified_lines:
+  offset: 243908
+  size: 4
+_rl_match_hidden_files:
+  offset: 264532
+  size: 4
+_rl_meta_flag:
+  offset: 243956
+  size: 4
+_rl_move_cursor_relative:
+  offset: 61912
+  size: 864
+_rl_move_vert:
+  offset: 57384
+  size: 272
+_rl_next_macro_key:
+  offset: 85592
+  size: 144
+_rl_nscxt:
+  offset: 244232
+  size: 8
+_rl_nsearch_abort:
+  offset: 20664
+  size: 64
+_rl_nsearch_callback:
+  offset: 21288
+  size: 128
+_rl_nsearch_dispatch:
+  offset: 20728
+  size: 352
+_rl_nsearch_dosearch:
+  offset: 21080
+  size: 208
+_rl_out_stream:
+  offset: 248752
+  size: 8
+_rl_output_character_function:
+  offset: 90136
+  size: 16
+_rl_output_meta_chars:
+  offset: 243948
+  size: 4
+_rl_output_some_chars:
+  offset: 90152
+  size: 32
+_rl_overwrite_char:
+  offset: 101528
+  size: 256
+_rl_overwrite_rubout:
+  offset: 100840
+  size: 288
+_rl_page_completions:
+  offset: 264540
+  size: 4
+_rl_parsing_conditionalized_out:
+  offset: 243944
+  size: 4
+_rl_pop_executing_macro:
+  offset: 85464
+  size: 128
+_rl_prefer_visible_bell:
+  offset: 264584
+  size: 8
+_rl_print_completions_horizontally:
+  offset: 248852
+  size: 4
+_rl_pure_alphabetic:
+  offset: 78536
+  size: 48
+_rl_push_executing_macro:
+  offset: 84808
+  size: 64
+_rl_pushed_input_available:
+  offset: 86040
+  size: 32
+_rl_qsort_string_compare:
+  offset: 78824
+  size: 16
+_rl_quit_char:
+  offset: 245464
+  size: 4
+_rl_read_init_file:
+  offset: 50728
+  size: 656
+_rl_read_mbchar:
+  offset: 88008
+  size: 224
+_rl_read_mbstring:
+  offset: 87848
+  size: 160
+_rl_redisplay_after_sigwinch:
+  offset: 60840
+  size: 336
+_rl_release_sigint:
+  offset: 75816
+  size: 48
+_rl_replace_text:
+  offset: 99000
+  size: 96
+_rl_reset_argument:
+  offset: 102120
+  size: 64
+_rl_reset_completion_state:
+  offset: 24536
+  size: 32
+_rl_restore_tty_signals:
+  offset: 22248
+  size: 80
+_rl_revert_all_at_newline:
+  offset: 243952
+  size: 4
+_rl_revert_all_lines:
+  offset: 102744
+  size: 336
+_rl_rubout_char:
+  offset: 97304
+  size: 352
+_rl_saved_line_for_history:
+  offset: 248432
+  size: 8
+_rl_savestring:
+  offset: 78424
+  size: 32
+_rl_screenchars:
+  offset: 248996
+  size: 4
+_rl_screenheight:
+  offset: 249004
+  size: 4
+_rl_screenwidth:
+  offset: 249000
+  size: 4
+_rl_scxt_alloc:
+  offset: 55720
+  size: 256
+_rl_scxt_dispose:
+  offset: 55192
+  size: 64
+_rl_search_getchar:
+  offset: 55544
+  size: 128
+_rl_set_cursor:
+  offset: 89608
+  size: 96
+_rl_set_insert_mode:
+  offset: 102184
+  size: 16
+_rl_set_mark_at_pos:
+  offset: 93064
+  size: 32
+_rl_set_screen_size:
+  offset: 92536
+  size: 176
+_rl_set_the_line:
+  offset: 728
+  size: 32
+_rl_signal_handler:
+  offset: 77704
+  size: 32
+_rl_start_using_history:
+  offset: 102504
+  size: 48
+_rl_strindex:
+  offset: 78840
+  size: 128
+_rl_strip_prompt:
+  offset: 60824
+  size: 16
+_rl_subseq_getchar:
+  offset: 2344
+  size: 64
+_rl_subseq_result:
+  offset: 3720
+  size: 384
+_rl_suppress_redisplay:
+  offset: 245036
+  size: 4
+_rl_susp_char:
+  offset: 245468
+  size: 12
+_rl_term_DC:
+  offset: 248976
+  size: 8
+_rl_term_IC:
+  offset: 248872
+  size: 8
+_rl_term_at7:
+  offset: 248344
+  size: 8
+_rl_term_autowrap:
+  offset: 264664
+  size: 4
+_rl_term_backspace:
+  offset: 248944
+  size: 8
+_rl_term_clreol:
+  offset: 248904
+  size: 8
+_rl_term_clrpag:
+  offset: 248984
+  size: 8
+_rl_term_cr:
+  offset: 248968
+  size: 8
+_rl_term_dc:
+  offset: 248928
+  size: 8
+_rl_term_ei:
+  offset: 248896
+  size: 8
+_rl_term_forward_char:
+  offset: 248888
+  size: 8
+_rl_term_goto:
+  offset: 248936
+  size: 8
+_rl_term_ic:
+  offset: 248960
+  size: 8
+_rl_term_im:
+  offset: 248880
+  size: 8
+_rl_term_ip:
+  offset: 248912
+  size: 8
+_rl_term_kD:
+  offset: 248352
+  size: 8
+_rl_term_kH:
+  offset: 248336
+  size: 8
+_rl_term_kI:
+  offset: 248360
+  size: 8
+_rl_term_kd:
+  offset: 248288
+  size: 8
+_rl_term_ke:
+  offset: 248320
+  size: 8
+_rl_term_kh:
+  offset: 248328
+  size: 8
+_rl_term_kl:
+  offset: 248304
+  size: 8
+_rl_term_kr:
+  offset: 248296
+  size: 8
+_rl_term_ks:
+  offset: 248312
+  size: 8
+_rl_term_ku:
+  offset: 248280
+  size: 8
+_rl_term_mm:
+  offset: 248264
+  size: 8
+_rl_term_mo:
+  offset: 248272
+  size: 8
+_rl_term_pc:
+  offset: 248920
+  size: 8
+_rl_term_up:
+  offset: 248952
+  size: 8
+_rl_term_ve:
+  offset: 248376
+  size: 16
+_rl_term_vs:
+  offset: 248368
+  size: 8
+_rl_terminal_can_insert:
+  offset: 248220
+  size: 4
+_rl_to_lower:
+  offset: 78728
+  size: 96
+_rl_to_upper:
+  offset: 78632
+  size: 96
+_rl_top_level:
+  offset: 248552
+  size: 200
+_rl_trace:
+  offset: 77912
+  size: 240
+_rl_tracefp:
+  offset: 247320
+  size: 8
+_rl_trclose:
+  offset: 77768
+  size: 32
+_rl_tropen:
+  offset: 77800
+  size: 112
+_rl_tty_chars:
+  offset: 244312
+  size: 16
+_rl_ttymsg:
+  offset: 78968
+  size: 272
+_rl_undo_group_level:
+  offset: 247364
+  size: 4
+_rl_unget_char:
+  offset: 85928
+  size: 112
+_rl_untranslate_macro_value:
+  offset: 40184
+  size: 608
+_rl_update_final:
+  offset: 62776
+  size: 288
+_rl_uppercase_p:
+  offset: 78488
+  size: 48
+_rl_vi_append_forward:
+  offset: 8152
+  size: 144
+_rl_vi_backup:
+  offset: 8456
+  size: 96
+_rl_vi_callback_change_char:
+  offset: 17464
+  size: 96
+_rl_vi_callback_char_search:
+  offset: 9528
+  size: 96
+_rl_vi_callback_goto_mark:
+  offset: 7416
+  size: 32
+_rl_vi_callback_set_mark:
+  offset: 7592
+  size: 32
+_rl_vi_change_char:
+  offset: 10344
+  size: 224
+_rl_vi_doing_insert:
+  offset: 244024
+  size: 8
+_rl_vi_done_inserting:
+  offset: 15720
+  size: 208
+_rl_vi_goto_mark:
+  offset: 7224
+  size: 128
+_rl_vi_initialize_line:
+  offset: 6104
+  size: 48
+_rl_vi_last_key_before_insert:
+  offset: 244096
+  size: 4
+_rl_vi_last_motion:
+  offset: 244060
+  size: 12
+_rl_vi_last_repeat:
+  offset: 243852
+  size: 4
+_rl_vi_last_replacement:
+  offset: 244092
+  size: 4
+_rl_vi_last_search_mbchar:
+  offset: 244072
+  size: 16
+_rl_vi_last_search_mblen:
+  offset: 244088
+  size: 4
+_rl_vi_reset_last:
+  offset: 6152
+  size: 48
+_rl_vi_save_insert:
+  offset: 15512
+  size: 208
+_rl_vi_set_last:
+  offset: 6200
+  size: 32
+_rl_vi_set_mark:
+  offset: 7448
+  size: 80
+_rl_vi_stuff_insert:
+  offset: 8104
+  size: 48
+_rl_vi_textmod_command:
+  offset: 12408
+  size: 48
+_rl_vis_botlin:
+  offset: 245064
+  size: 4
+_rl_visible_bell:
+  offset: 248248
+  size: 8
+_rl_walphabetic:
+  offset: 79944
+  size: 80
+_rl_want_redisplay:
+  offset: 245040
+  size: 8
+_rl_with_macro_input:
+  offset: 84872
+  size: 48
+_set_tty_settings:
+  offset: 22168
+  size: 80
+add_history:
+  offset: 107592
+  size: 448
+add_history_time:
+  offset: 107496
+  size: 96
+alloc_history_entry:
+  offset: 106824
+  size: 112
+alphabetic:
+  offset: 125256
+  size: 16
+append_history:
+  offset: 119368
+  size: 16
+append_to_match:
+  offset: 25816
+  size: 640
+bind_arrow_keys_internal:
+  offset: 1416
+  size: 320
+bind_termcap_arrow_keys:
+  offset: 90344
+  size: 176
+boolean_varlist:
+  offset: 246344
+  size: 64
+bset.6766:
+  offset: 245608
+  size: 128
+clear_history:
+  offset: 107160
+  size: 96
+completed.7382:
+  offset: 243784
+  size: 8
+completion_changed_buffer:
+  offset: 244880
+  size: 4
+completion_matches:
+  offset: 125240
+  size: 16
+completion_y_or_n:
+  offset: 244884
+  size: 20
+compute_lcd_of_matches:
+  offset: 29496
+  size: 1456
+copy_history_entry:
+  offset: 106936
+  size: 128
+count_passed.7234:
+  offset: 264644
+  size: 4
+cpos_adjusted:
+  offset: 245076
+  size: 4
+cpos_buffer_position:
+  offset: 245080
+  size: 4
+cr:
+  offset: 57096
+  size: 64
+crlf:
+  offset: 125272
+  size: 16
+current_history:
+  offset: 105768
+  size: 64
+current_macro:
+  offset: 247384
+  size: 8
+current_macro_index:
+  offset: 247408
+  size: 24
+current_macro_size:
+  offset: 247404
+  size: 4
+current_readline_init_file:
+  offset: 244976
+  size: 8
+current_readline_init_include_level:
+  offset: 244984
+  size: 4
+current_readline_init_lineno:
+  offset: 244988
+  size: 4
+currently_reading_init_file:
+  offset: 244968
+  size: 8
+default_prefixes:
+  offset: 264728
+  size: 32
+delimiter.10391:
+  offset: 244768
+  size: 4
+delimiter.10488:
+  offset: 244720
+  size: 4
+ding:
+  offset: 125288
+  size: 16
+direction.7235:
+  offset: 264640
+  size: 4
+directory.10111:
+  offset: 244840
+  size: 8
+dirname.10113:
+  offset: 244824
+  size: 8
+display_matches:
+  offset: 34456
+  size: 336
+dtor_idx.7384:
+  offset: 243792
+  size: 4
+emacs_ctlx_keymap:
+  offset: 252136
+  size: 4128
+entry.10049:
+  offset: 244864
+  size: 8
+eof_found.8760:
+  offset: 243960
+  size: 4
+error_pointer:
+  offset: 248464
+  size: 8
+executing_macro_index:
+  offset: 247400
+  size: 4
+expand_prompt:
+  offset: 59864
+  size: 960
+explicit_arg_p.7233:
+  offset: 247332
+  size: 4
+filename.10112:
+  offset: 244832
+  size: 8
+filename_completion_function:
+  offset: 125208
+  size: 16
+filename_len.10115:
+  offset: 244808
+  size: 8
+find_boolean_var:
+  offset: 40088
+  size: 96
+first_char.10051:
+  offset: 244852
+  size: 4
+first_char_loc.10052:
+  offset: 244848
+  size: 4
+fnwidth:
+  offset: 32024
+  size: 240
+forced_display:
+  offset: 245224
+  size: 8
+frame_dummy:
+  offset: 616
+  size: 48
+free_history_entry:
+  offset: 107064
+  size: 96
+free_undo_list:
+  offset: 125352
+  size: 16
+full_completion.10484:
+  offset: 244736
+  size: 4
+funmap:
+  offset: 248816
+  size: 8
+funmap_entry:
+  offset: 244220
+  size: 4
+funmap_initialized:
+  offset: 244224
+  size: 8
+funmap_program_specific_entry_start:
+  offset: 248824
+  size: 4
+funmap_size:
+  offset: 244216
+  size: 4
+gen_completion_matches:
+  offset: 31848
+  size: 176
+get_history_event:
+  offset: 110488
+  size: 1312
+get_subst_pattern:
+  offset: 110024
+  size: 464
+get_tty_settings:
+  offset: 22680
+  size: 128
+get_y_or_n:
+  offset: 25080
+  size: 224
+glue_prefix_and_suffix:
+  offset: 123624
+  size: 192
+hist_error:
+  offset: 109752
+  size: 272
+history_arg_extract:
+  offset: 109336
+  size: 416
+history_base:
+  offset: 264676
+  size: 4
+history_comment_char:
+  offset: 248456
+  size: 4
+history_do_write:
+  offset: 118664
+  size: 672
+history_expand:
+  offset: 115432
+  size: 3008
+history_expand_internal:
+  offset: 111800
+  size: 3632
+history_expansion_char:
+  offset: 264680
+  size: 1
+history_filename:
+  offset: 118440
+  size: 224
+history_get:
+  offset: 105928
+  size: 64
+history_get_history_state:
+  offset: 106376
+  size: 96
+history_get_time:
+  offset: 108040
+  size: 48
+history_inhibit_expansion_function:
+  offset: 249032
+  size: 3104
+history_is_stifled:
+  offset: 106360
+  size: 16
+history_length:
+  offset: 249012
+  size: 4
+history_list:
+  offset: 105752
+  size: 16
+history_max_entries:
+  offset: 249020
+  size: 4
+history_no_expand_chars:
+  offset: 264688
+  size: 8
+history_offset:
+  offset: 249024
+  size: 8
+history_quotes_inhibit_expansion:
+  offset: 248460
+  size: 4
+history_search:
+  offset: 121528
+  size: 16
+history_search_delimiter_chars:
+  offset: 248520
+  size: 8
+history_search_internal:
+  offset: 120888
+  size: 624
+history_search_pos:
+  offset: 121544
+  size: 112
+history_search_prefix:
+  offset: 121512
+  size: 16
+history_search_string:
+  offset: 244272
+  size: 8
+history_set_history_state:
+  offset: 105576
+  size: 64
+history_set_pos:
+  offset: 105688
+  size: 64
+history_size:
+  offset: 248452
+  size: 4
+history_skip.7232:
+  offset: 247336
+  size: 8
+history_stifled:
+  offset: 248448
+  size: 4
+history_string_size:
+  offset: 244280
+  size: 16
+history_subst_char:
+  offset: 264681
+  size: 7
+history_tokenize:
+  offset: 109320
+  size: 16
+history_tokenize_internal:
+  offset: 108648
+  size: 672
+history_tokenize_word:
+  offset: 108088
+  size: 560
+history_total_bytes:
+  offset: 106472
+  size: 128
+history_truncate_file:
+  offset: 119384
+  size: 720
+history_word_delimiters:
+  offset: 264696
+  size: 16
+history_write_timestamps:
+  offset: 248512
+  size: 8
+ibuffer:
+  offset: 247464
+  size: 512
+if_stack:
+  offset: 244944
+  size: 8
+if_stack_depth:
+  offset: 244992
+  size: 4
+if_stack_size:
+  offset: 244996
+  size: 4
+in_handler:
+  offset: 248208
+  size: 8
+init_line_structures:
+  offset: 59000
+  size: 480
+insert_match:
+  offset: 25528
+  size: 288
+keymap_names:
+  offset: 246952
+  size: 96
+kseq.7763:
+  offset: 244952
+  size: 16
+last_isearch_string:
+  offset: 245016
+  size: 8
+last_isearch_string_len:
+  offset: 245024
+  size: 8
+last_lmargin:
+  offset: 245088
+  size: 8
+last_readline_init_file:
+  offset: 244936
+  size: 8
+lastc.8759:
+  offset: 243964
+  size: 4
+line_size:
+  offset: 264600
+  size: 8
+line_state_array:
+  offset: 245352
+  size: 96
+line_state_invisible:
+  offset: 264624
+  size: 8
+line_state_visible:
+  offset: 264616
+  size: 8
+line_structures_initialized:
+  offset: 245072
+  size: 4
+local_prompt:
+  offset: 245232
+  size: 8
+local_prompt_len:
+  offset: 245248
+  size: 4
+local_prompt_prefix:
+  offset: 245240
+  size: 8
+macro_list:
+  offset: 247392
+  size: 8
+make_history_line_current:
+  offset: 19576
+  size: 96
+make_quoted_replacement:
+  offset: 25304
+  size: 224
+match_list_index.10386:
+  offset: 244788
+  size: 4
+match_list_index.10481:
+  offset: 244748
+  size: 4
+match_list_size.10387:
+  offset: 244784
+  size: 4
+match_list_size.10482:
+  offset: 244744
+  size: 4
+matches.10385:
+  offset: 244792
+  size: 8
+matches.10480:
+  offset: 244752
+  size: 8
+max_input_history:
+  offset: 249016
+  size: 4
+maybe_replace_line:
+  offset: 125336
+  size: 16
+maybe_save_line:
+  offset: 125320
+  size: 16
+maybe_unsave_line:
+  offset: 125304
+  size: 16
+memory_error_and_abort:
+  offset: 105400
+  size: 48
+modmark:
+  offset: 245288
+  size: 8
+msg_buf:
+  offset: 245096
+  size: 128
+msg_saved_prompt:
+  offset: 245068
+  size: 4
+name_key_alist:
+  offset: 244168
+  size: 40
+namelen.10050:
+  offset: 244856
+  size: 8
+next_history:
+  offset: 105880
+  size: 48
+noninc_dosearch:
+  offset: 20312
+  size: 224
+noninc_history_pos:
+  offset: 244256
+  size: 4
+noninc_search:
+  offset: 21416
+  size: 336
+noninc_search_from_pos:
+  offset: 19400
+  size: 176
+noninc_search_string:
+  offset: 244248
+  size: 8
+nontrivial_lcd.10483:
+  offset: 244740
+  size: 4
+nosigstty:
+  offset: 244488
+  size: 64
+numbuf.10060:
+  offset: 244904
+  size: 32
+old_alrm:
+  offset: 246088
+  size: 160
+old_int:
+  offset: 245768
+  size: 160
+old_quit:
+  offset: 246248
+  size: 96
+old_term:
+  offset: 245928
+  size: 160
+old_tstp:
+  offset: 246408
+  size: 160
+old_ttin:
+  offset: 246728
+  size: 160
+old_ttou:
+  offset: 246568
+  size: 160
+old_winch:
+  offset: 246888
+  size: 64
+olevel.5515:
+  offset: 248008
+  size: 200
+orig_end.10389:
+  offset: 244776
+  size: 4
+orig_end.10486:
+  offset: 244728
+  size: 4
+orig_start.10388:
+  offset: 244780
+  size: 4
+orig_start.10485:
+  offset: 244732
+  size: 4
+orig_text.10384:
+  offset: 244800
+  size: 8
+orig_text.10479:
+  offset: 244760
+  size: 8
+oset.6767:
+  offset: 245480
+  size: 128
+otio:
+  offset: 244360
+  size: 64
+parser_else:
+  offset: 44968
+  size: 112
+parser_endif:
+  offset: 45080
+  size: 80
+parser_if:
+  offset: 44328
+  size: 576
+parser_include:
+  offset: 51384
+  size: 144
+pending_bytes:
+  offset: 248408
+  size: 16
+pending_bytes_length:
+  offset: 248400
+  size: 4
+pop_index:
+  offset: 247440
+  size: 4
+postprocess_matches:
+  offset: 30952
+  size: 688
+prev_line_found:
+  offset: 244240
+  size: 8
+previous_history:
+  offset: 105832
+  size: 48
+print_filename:
+  offset: 32264
+  size: 1200
+printable_part:
+  offset: 24936
+  size: 144
+prompt_invis_chars_first_line:
+  offset: 245276
+  size: 4
+prompt_last_invisible:
+  offset: 245268
+  size: 4
+prompt_last_screen_line:
+  offset: 245280
+  size: 4
+prompt_multibyte_chars:
+  offset: 245084
+  size: 4
+prompt_physical_chars:
+  offset: 245284
+  size: 4
+prompt_prefix_length:
+  offset: 245256
+  size: 4
+prompt_visible_length:
+  offset: 245252
+  size: 4
+ps:
+  offset: 248392
+  size: 8
+push_index:
+  offset: 247444
+  size: 20
+quote_char.10390:
+  offset: 244772
+  size: 4
+quote_char.10487:
+  offset: 244724
+  size: 4
+read_history:
+  offset: 120872
+  size: 16
+read_history_range:
+  offset: 120104
+  size: 768
+readline:
+  offset: 5944
+  size: 160
+readline_internal_char:
+  offset: 4584
+  size: 480
+readline_internal_setup:
+  offset: 5448
+  size: 352
+readline_internal_teardown:
+  offset: 5064
+  size: 384
+region_kill_internal:
+  offset: 81544
+  size: 144
+remove_history:
+  offset: 106200
+  size: 96
+replace_history_data:
+  offset: 105992
+  size: 208
+replace_history_entry:
+  offset: 106600
+  size: 224
+rl_abort:
+  offset: 79928
+  size: 16
+rl_add_defun:
+  offset: 51672
+  size: 64
+rl_add_funmap_entry:
+  offset: 17720
+  size: 224
+rl_add_undo:
+  offset: 84216
+  size: 112
+rl_alphabetic:
+  offset: 80024
+  size: 112
+rl_already_prompted:
+  offset: 243860
+  size: 4
+rl_arg_sign:
+  offset: 243812
+  size: 4
+rl_arrow_keys:
+  offset: 95816
+  size: 368
+rl_attempted_completion_function:
+  offset: 244624
+  size: 8
+rl_attempted_completion_over:
+  offset: 244632
+  size: 4
+rl_backward:
+  offset: 94888
+  size: 16
+rl_backward_byte:
+  offset: 93208
+  size: 96
+rl_backward_char:
+  offset: 94312
+  size: 176
+rl_backward_char_search:
+  offset: 94040
+  size: 112
+rl_backward_kill_line:
+  offset: 83160
+  size: 160
+rl_backward_kill_word:
+  offset: 82712
+  size: 112
+rl_backward_word:
+  offset: 94904
+  size: 336
+rl_basic_quote_characters:
+  offset: 264568
+  size: 8
+rl_basic_word_break_characters:
+  offset: 264560
+  size: 8
+rl_beg_of_line:
+  offset: 93000
+  size: 16
+rl_begin_undo_group:
+  offset: 84376
+  size: 48
+rl_beginning_of_history:
+  offset: 104072
+  size: 32
+rl_bind_key:
+  offset: 38504
+  size: 144
+rl_bind_key_if_unbound:
+  offset: 48504
+  size: 48
+rl_bind_key_if_unbound_in_map:
+  offset: 48552
+  size: 32
+rl_bind_key_in_map:
+  offset: 38648
+  size: 64
+rl_bind_keyseq:
+  offset: 48584
+  size: 32
+rl_bind_keyseq_if_unbound:
+  offset: 48488
+  size: 16
+rl_bind_keyseq_if_unbound_in_map:
+  offset: 48360
+  size: 128
+rl_bind_keyseq_in_map:
+  offset: 48344
+  size: 16
+rl_binding_keymap:
+  offset: 248856
+  size: 8
+rl_blink_matching_paren:
+  offset: 264504
+  size: 4
+rl_byte_oriented:
+  offset: 248528
+  size: 8
+rl_call_last_kbd_macro:
+  offset: 84936
+  size: 160
+rl_callback_handler_install:
+  offset: 89512
+  size: 48
+rl_callback_handler_remove:
+  offset: 88280
+  size: 128
+rl_callback_read_char:
+  offset: 88520
+  size: 992
+rl_capitalize_word:
+  offset: 99880
+  size: 16
+rl_catch_signals:
+  offset: 264632
+  size: 4
+rl_catch_sigwinch:
+  offset: 264636
+  size: 4
+rl_change_case:
+  offset: 99096
+  size: 784
+rl_char_is_quoted_p:
+  offset: 244704
+  size: 8
+rl_char_search:
+  offset: 94200
+  size: 112
+rl_character_len:
+  offset: 58472
+  size: 144
+rl_cleanup_after_signal:
+  offset: 76296
+  size: 48
+rl_clear_message:
+  offset: 58392
+  size: 80
+rl_clear_pending_input:
+  offset: 86264
+  size: 32
+rl_clear_screen:
+  offset: 96264
+  size: 80
+rl_clear_signals:
+  offset: 76008
+  size: 288
+rl_complete:
+  offset: 38360
+  size: 144
+rl_complete_internal:
+  offset: 37112
+  size: 1184
+rl_complete_with_tilde_expansion:
+  offset: 244600
+  size: 8
+rl_completer_quote_characters:
+  offset: 244656
+  size: 8
+rl_completer_word_break_characters:
+  offset: 244640
+  size: 8
+rl_completion_append_character:
+  offset: 264552
+  size: 4
+rl_completion_display_matches_hook:
+  offset: 244552
+  size: 8
+rl_completion_entry_function:
+  offset: 244608
+  size: 8
+rl_completion_found_quote:
+  offset: 248836
+  size: 4
+rl_completion_invoking_key:
+  offset: 248844
+  size: 4
+rl_completion_mark_symlink_dirs:
+  offset: 248832
+  size: 4
+rl_completion_matches:
+  offset: 31640
+  size: 208
+rl_completion_mode:
+  offset: 24456
+  size: 80
+rl_completion_query_items:
+  offset: 264536
+  size: 4
+rl_completion_quote_character:
+  offset: 248848
+  size: 4
+rl_completion_suppress_append:
+  offset: 244712
+  size: 4
+rl_completion_suppress_quote:
+  offset: 244716
+  size: 4
+rl_completion_type:
+  offset: 244636
+  size: 4
+rl_completion_word_break_hook:
+  offset: 244648
+  size: 8
+rl_copy_backward_word:
+  offset: 81848
+  size: 32
+rl_copy_forward_word:
+  offset: 81880
+  size: 32
+rl_copy_keymap:
+  offset: 18488
+  size: 48
+rl_copy_region_to_kill:
+  offset: 81912
+  size: 16
+rl_copy_text:
+  offset: 79624
+  size: 112
+rl_crlf:
+  offset: 89960
+  size: 32
+rl_delete:
+  offset: 96968
+  size: 336
+rl_delete_horizontal_space:
+  offset: 96712
+  size: 256
+rl_delete_or_show_completions:
+  offset: 97656
+  size: 48
+rl_delete_text:
+  offset: 96472
+  size: 240
+rl_deprep_term_function:
+  offset: 264520
+  size: 8
+rl_deprep_terminal:
+  offset: 23064
+  size: 128
+rl_digit_argument:
+  offset: 105272
+  size: 96
+rl_digit_loop:
+  offset: 105048
+  size: 112
+rl_ding:
+  offset: 89832
+  size: 128
+rl_directory_completion_hook:
+  offset: 244584
+  size: 8
+rl_directory_rewrite_hook:
+  offset: 244592
+  size: 8
+rl_discard_argument:
+  offset: 104152
+  size: 48
+rl_discard_keymap:
+  offset: 18216
+  size: 96
+rl_dispatching:
+  offset: 248792
+  size: 4
+rl_display_fixed:
+  offset: 245032
+  size: 4
+rl_display_match_list:
+  offset: 33464
+  size: 992
+rl_display_prompt:
+  offset: 245048
+  size: 8
+rl_display_search:
+  offset: 52840
+  size: 272
+rl_do_lowercase_version:
+  offset: 93048
+  size: 16
+rl_do_undo:
+  offset: 83384
+  size: 576
+rl_done:
+  offset: 248796
+  size: 4
+rl_downcase_word:
+  offset: 99896
+  size: 16
+rl_dump_functions:
+  offset: 45784
+  size: 80
+rl_dump_macros:
+  offset: 41880
+  size: 80
+rl_dump_variables:
+  offset: 52552
+  size: 80
+rl_echo_signal_char:
+  offset: 75560
+  size: 256
+rl_emacs_editing_mode:
+  offset: 102200
+  size: 64
+rl_end:
+  offset: 248812
+  size: 4
+rl_end_kbd_macro:
+  offset: 85096
+  size: 96
+rl_end_of_history:
+  offset: 104104
+  size: 48
+rl_end_of_line:
+  offset: 93016
+  size: 32
+rl_end_undo_group:
+  offset: 84328
+  size: 48
+rl_erase_empty_line:
+  offset: 243912
+  size: 8
+rl_event_hook:
+  offset: 247432
+  size: 8
+rl_exchange_point_and_mark:
+  offset: 93128
+  size: 80
+rl_execute_next:
+  offset: 86232
+  size: 32
+rl_executing_keymap:
+  offset: 248768
+  size: 8
+rl_executing_macro:
+  offset: 247376
+  size: 8
+rl_expand_prompt:
+  offset: 61176
+  size: 400
+rl_explicit_arg:
+  offset: 243804
+  size: 4
+rl_extend_line_buffer:
+  offset: 79736
+  size: 80
+rl_filename_completion_desired:
+  offset: 244680
+  size: 8
+rl_filename_completion_function:
+  offset: 26456
+  size: 1648
+rl_filename_dequoting_function:
+  offset: 244696
+  size: 8
+rl_filename_quote_characters:
+  offset: 244664
+  size: 8
+rl_filename_quoting_desired:
+  offset: 264548
+  size: 4
+rl_filename_quoting_function:
+  offset: 264576
+  size: 8
+rl_forced_update_display:
+  offset: 56664
+  size: 80
+rl_forward:
+  offset: 94872
+  size: 16
+rl_forward_byte:
+  offset: 93304
+  size: 144
+rl_forward_char:
+  offset: 94488
+  size: 384
+rl_forward_search_history:
+  offset: 56520
+  size: 16
+rl_forward_word:
+  offset: 95240
+  size: 368
+rl_free:
+  offset: 78456
+  size: 32
+rl_free_line_state:
+  offset: 75960
+  size: 48
+rl_free_undo_list:
+  offset: 84104
+  size: 112
+rl_function_dumper:
+  offset: 45256
+  size: 528
+rl_function_of_keyseq:
+  offset: 38824
+  size: 256
+rl_funmap_names:
+  offset: 18040
+  size: 176
+rl_gather_tyi:
+  offset: 86712
+  size: 624
+rl_generic_bind:
+  offset: 47544
+  size: 640
+rl_get_keymap:
+  offset: 39176
+  size: 16
+rl_get_keymap_by_name:
+  offset: 39944
+  size: 96
+rl_get_keymap_name:
+  offset: 39080
+  size: 64
+rl_get_keymap_name_from_edit_mode:
+  offset: 39256
+  size: 48
+rl_get_next_history:
+  offset: 103704
+  size: 368
+rl_get_previous_history:
+  offset: 103336
+  size: 368
+rl_get_screen_size:
+  offset: 89560
+  size: 48
+rl_get_termcap:
+  offset: 90184
+  size: 160
+rl_getc:
+  offset: 86296
+  size: 192
+rl_getc_function:
+  offset: 264656
+  size: 8
+rl_gnu_readline_p:
+  offset: 243796
+  size: 4
+rl_history_search_backward:
+  offset: 19992
+  size: 160
+rl_history_search_forward:
+  offset: 20152
+  size: 160
+rl_history_search_internal:
+  offset: 19672
+  size: 320
+rl_history_search_len:
+  offset: 244260
+  size: 4
+rl_history_search_pos:
+  offset: 244264
+  size: 8
+rl_history_search_reinit:
+  offset: 19240
+  size: 160
+rl_ignore_completion_duplicates:
+  offset: 264544
+  size: 4
+rl_ignore_some_completions_function:
+  offset: 244688
+  size: 8
+rl_inhibit_completion:
+  offset: 248828
+  size: 4
+rl_initialize:
+  offset: 1736
+  size: 608
+rl_initialize_funmap:
+  offset: 17944
+  size: 96
+rl_initialized:
+  offset: 243968
+  size: 8
+rl_insert:
+  offset: 101784
+  size: 32
+rl_insert_close:
+  offset: 18568
+  size: 544
+rl_insert_comment:
+  offset: 98824
+  size: 176
+rl_insert_completions:
+  offset: 38296
+  size: 32
+rl_insert_text:
+  offset: 97752
+  size: 368
+rl_instream:
+  offset: 243824
+  size: 4
+rl_invoking_keyseqs:
+  offset: 43864
+  size: 16
+rl_invoking_keyseqs_in_map:
+  offset: 42760
+  size: 1104
+rl_key_sequence_length:
+  offset: 243864
+  size: 8
+rl_kill_full_line:
+  offset: 82648
+  size: 64
+rl_kill_index:
+  offset: 247352
+  size: 4
+rl_kill_line:
+  offset: 83032
+  size: 128
+rl_kill_region:
+  offset: 82936
+  size: 96
+rl_kill_ring:
+  offset: 247344
+  size: 8
+rl_kill_ring_length:
+  offset: 247356
+  size: 4
+rl_kill_text:
+  offset: 81928
+  size: 96
+rl_kill_word:
+  offset: 82824
+  size: 112
+rl_last_func:
+  offset: 243816
+  size: 4
+rl_line_buffer:
+  offset: 243920
+  size: 8
+rl_line_buffer_len:
+  offset: 243928
+  size: 8
+rl_linefunc:
+  offset: 248864
+  size: 8
+rl_list_funmap_names:
+  offset: 42648
+  size: 112
+rl_macro_bind:
+  offset: 48184
+  size: 144
+rl_macro_dumper:
+  offset: 41848
+  size: 32
+rl_make_bare_keymap:
+  offset: 18312
+  size: 64
+rl_make_keymap:
+  offset: 18376
+  size: 112
+rl_mark:
+  offset: 248804
+  size: 4
+rl_maybe_replace_line:
+  offset: 103224
+  size: 112
+rl_maybe_save_line:
+  offset: 103080
+  size: 144
+rl_maybe_set_sighandler:
+  offset: 76552
+  size: 128
+rl_maybe_unsave_line:
+  offset: 102648
+  size: 96
+rl_menu_complete:
+  offset: 34792
+  size: 1376
+rl_menu_completion_entry_function:
+  offset: 244616
+  size: 8
+rl_message:
+  offset: 61576
+  size: 336
+rl_modifying:
+  offset: 84424
+  size: 128
+rl_named_function:
+  offset: 45160
+  size: 96
+rl_newline:
+  offset: 95608
+  size: 208
+rl_noninc_forward_search:
+  offset: 21784
+  size: 32
+rl_noninc_forward_search_again:
+  offset: 20600
+  size: 64
+rl_noninc_reverse_search:
+  offset: 21752
+  size: 32
+rl_noninc_reverse_search_again:
+  offset: 20536
+  size: 64
+rl_num_chars_to_read:
+  offset: 248800
+  size: 4
+rl_old_menu_complete:
+  offset: 36168
+  size: 944
+rl_on_new_line:
+  offset: 56552
+  size: 112
+rl_on_new_line_with_prompt:
+  offset: 63064
+  size: 416
+rl_outstream:
+  offset: 243832
+  size: 8
+rl_overwrite_mode:
+  offset: 102264
+  size: 96
+rl_parse_and_bind:
+  offset: 48616
+  size: 2112
+rl_pending_input:
+  offset: 243888
+  size: 8
+rl_point:
+  offset: 248808
+  size: 4
+rl_possible_completions:
+  offset: 38328
+  size: 32
+rl_pre_input_hook:
+  offset: 243880
+  size: 8
+rl_prefer_env_winsize:
+  offset: 248216
+  size: 4
+rl_prep_term_function:
+  offset: 264512
+  size: 8
+rl_prep_terminal:
+  offset: 23192
+  size: 1264
+rl_prompt:
+  offset: 243848
+  size: 4
+rl_push_macro_input:
+  offset: 84920
+  size: 16
+rl_quote_filename:
+  offset: 24568
+  size: 128
+rl_quoted_insert:
+  offset: 101368
+  size: 112
+rl_re_read_init_file:
+  offset: 51640
+  size: 32
+rl_read_init_file:
+  offset: 51528
+  size: 112
+rl_read_key:
+  offset: 87336
+  size: 336
+rl_readline_name:
+  offset: 264592
+  size: 8
+rl_readline_state:
+  offset: 243808
+  size: 4
+rl_redisplay:
+  offset: 68920
+  size: 6640
+rl_redisplay_function:
+  offset: 264608
+  size: 8
+rl_refresh_line:
+  offset: 96184
+  size: 80
+rl_replace_from_history:
+  offset: 102552
+  size: 96
+rl_replace_line:
+  offset: 96344
+  size: 128
+rl_reset_after_signal:
+  offset: 77320
+  size: 48
+rl_reset_line_state:
+  offset: 56744
+  size: 64
+rl_reset_screen_size:
+  offset: 92856
+  size: 32
+rl_reset_terminal:
+  offset: 92488
+  size: 48
+rl_resize_terminal:
+  offset: 92728
+  size: 128
+rl_restart_output:
+  offset: 23016
+  size: 48
+rl_restore_prompt:
+  offset: 58152
+  size: 240
+rl_restore_state:
+  offset: 1048
+  size: 288
+rl_reverse_search_history:
+  offset: 56536
+  size: 16
+rl_revert_line:
+  offset: 84024
+  size: 80
+rl_rubout:
+  offset: 101128
+  size: 96
+rl_rubout_or_delete:
+  offset: 97704
+  size: 48
+rl_save_prompt:
+  offset: 56808
+  size: 192
+rl_save_state:
+  offset: 760
+  size: 288
+rl_search_history:
+  offset: 55976
+  size: 544
+rl_set_key:
+  offset: 48328
+  size: 16
+rl_set_keyboard_input_timeout:
+  offset: 86072
+  size: 32
+rl_set_keymap:
+  offset: 39144
+  size: 32
+rl_set_keymap_from_edit_mode:
+  offset: 39192
+  size: 64
+rl_set_mark:
+  offset: 93096
+  size: 32
+rl_set_paren_blink_timeout:
+  offset: 18536
+  size: 32
+rl_set_prompt:
+  offset: 5800
+  size: 144
+rl_set_retained_kills:
+  offset: 80136
+  size: 16
+rl_set_screen_size:
+  offset: 92712
+  size: 16
+rl_set_sighandler:
+  offset: 76344
+  size: 208
+rl_set_signals:
+  offset: 76680
+  size: 640
+rl_show_char:
+  offset: 58616
+  size: 384
+rl_signal_handler:
+  offset: 77656
+  size: 48
+rl_sigwinch_handler:
+  offset: 77368
+  size: 80
+rl_sort_completion_matches:
+  offset: 264556
+  size: 4
+rl_special_prefixes:
+  offset: 244672
+  size: 8
+rl_start_kbd_macro:
+  offset: 85192
+  size: 160
+rl_startup_hook:
+  offset: 243872
+  size: 8
+rl_stop_output:
+  offset: 22968
+  size: 48
+rl_stuff_char:
+  offset: 86104
+  size: 128
+rl_tab_insert:
+  offset: 101224
+  size: 16
+rl_terminal_name:
+  offset: 243896
+  size: 8
+rl_tilde_expand:
+  offset: 79240
+  size: 384
+rl_translate_keyseq:
+  offset: 45912
+  size: 1280
+rl_transpose_chars:
+  offset: 98120
+  size: 400
+rl_transpose_words:
+  offset: 98520
+  size: 304
+rl_tty_set_default_bindings:
+  offset: 22952
+  size: 16
+rl_tty_status:
+  offset: 79816
+  size: 16
+rl_tty_unset_default_bindings:
+  offset: 21992
+  size: 176
+rl_unbind_command_in_map:
+  offset: 45864
+  size: 48
+rl_unbind_function_in_map:
+  offset: 38744
+  size: 80
+rl_unbind_key:
+  offset: 38712
+  size: 16
+rl_unbind_key_in_map:
+  offset: 38728
+  size: 16
+rl_undo_command:
+  offset: 83960
+  size: 64
+rl_undo_list:
+  offset: 247368
+  size: 8
+rl_universal_argument:
+  offset: 105208
+  size: 64
+rl_unix_filename_rubout:
+  offset: 82120
+  size: 288
+rl_unix_line_discard:
+  offset: 82024
+  size: 96
+rl_unix_word_rubout:
+  offset: 82408
+  size: 240
+rl_untranslate_keyseq:
+  offset: 41960
+  size: 688
+rl_upcase_word:
+  offset: 99912
+  size: 16
+rl_username_completion_function:
+  offset: 28104
+  size: 320
+rl_variable_bind:
+  offset: 43880
+  size: 448
+rl_variable_dumper:
+  offset: 52264
+  size: 288
+rl_variable_value:
+  offset: 52632
+  size: 208
+rl_vi_append_eol:
+  offset: 14920
+  size: 32
+rl_vi_append_mode:
+  offset: 8296
+  size: 48
+rl_vi_arg_digit:
+  offset: 15448
+  size: 64
+rl_vi_bWord:
+  offset: 6456
+  size: 256
+rl_vi_back_to_indent:
+  offset: 9624
+  size: 128
+rl_vi_bracktype:
+  offset: 7144
+  size: 80
+rl_vi_bword:
+  offset: 11032
+  size: 576
+rl_vi_change_char:
+  offset: 17560
+  size: 160
+rl_vi_change_to:
+  offset: 13864
+  size: 640
+rl_vi_char_search:
+  offset: 9144
+  size: 384
+rl_vi_check:
+  offset: 8344
+  size: 112
+rl_vi_column:
+  offset: 14856
+  size: 64
+rl_vi_complete:
+  offset: 16072
+  size: 224
+rl_vi_delete:
+  offset: 9800
+  size: 272
+rl_vi_delete_to:
+  offset: 14552
+  size: 304
+rl_vi_domove:
+  offset: 12456
+  size: 1152
+rl_vi_eWord:
+  offset: 6712
+  size: 336
+rl_vi_editing_mode:
+  offset: 102360
+  size: 48
+rl_vi_end_word:
+  offset: 12008
+  size: 112
+rl_vi_eof_maybe:
+  offset: 7816
+  size: 16
+rl_vi_eword:
+  offset: 10568
+  size: 464
+rl_vi_fWord:
+  offset: 6232
+  size: 224
+rl_vi_fetch_history:
+  offset: 16440
+  size: 112
+rl_vi_first_print:
+  offset: 9752
+  size: 16
+rl_vi_fword:
+  offset: 11608
+  size: 400
+rl_vi_goto_mark:
+  offset: 7352
+  size: 64
+rl_vi_insert_beg:
+  offset: 9768
+  size: 32
+rl_vi_insert_mode:
+  offset: 7112
+  size: 32
+rl_vi_insertion_mode:
+  offset: 7048
+  size: 32
+rl_vi_match:
+  offset: 8552
+  size: 592
+rl_vi_movement_mode:
+  offset: 15928
+  size: 96
+rl_vi_next_word:
+  offset: 12120
+  size: 144
+rl_vi_overstrike:
+  offset: 8024
+  size: 80
+rl_vi_overstrike_delete:
+  offset: 7832
+  size: 192
+rl_vi_prev_word:
+  offset: 12264
+  size: 144
+rl_vi_put:
+  offset: 15304
+  size: 144
+rl_vi_redo:
+  offset: 14952
+  size: 352
+rl_vi_replace:
+  offset: 7624
+  size: 192
+rl_vi_rubout:
+  offset: 10072
+  size: 272
+rl_vi_search:
+  offset: 16296
+  size: 80
+rl_vi_search_again:
+  offset: 16376
+  size: 64
+rl_vi_set_mark:
+  offset: 7528
+  size: 64
+rl_vi_start_inserting:
+  offset: 7080
+  size: 32
+rl_vi_subst:
+  offset: 14504
+  size: 48
+rl_vi_tilde_expand:
+  offset: 16024
+  size: 48
+rl_vi_undo:
+  offset: 16616
+  size: 16
+rl_vi_yank_arg:
+  offset: 16552
+  size: 64
+rl_vi_yank_to:
+  offset: 13608
+  size: 256
+rl_visible_prompt_length:
+  offset: 243856
+  size: 4
+rl_visible_stats:
+  offset: 244576
+  size: 8
+rl_yank:
+  offset: 80712
+  size: 80
+rl_yank_last_arg:
+  offset: 80456
+  size: 240
+rl_yank_nth_arg:
+  offset: 80696
+  size: 16
+rl_yank_nth_arg_internal:
+  offset: 80152
+  size: 304
+rl_yank_pop:
+  offset: 80792
+  size: 256
+rltty_set_default_bindings:
+  offset: 22808
+  size: 144
+saved_invis_chars_first_line:
+  offset: 245328
+  size: 4
+saved_last_invisible:
+  offset: 245312
+  size: 4
+saved_local_length:
+  offset: 245324
+  size: 4
+saved_local_prefix:
+  offset: 245304
+  size: 8
+saved_local_prompt:
+  offset: 245296
+  size: 8
+saved_physical_chars:
+  offset: 245332
+  size: 20
+saved_prefix_length:
+  offset: 245320
+  size: 4
+saved_visible_length:
+  offset: 245316
+  size: 4
+search_match:
+  offset: 248504
+  size: 8
+search_string:
+  offset: 248496
+  size: 8
+sh_get_env_value:
+  offset: 121768
+  size: 16
+sh_get_home_dir:
+  offset: 121720
+  size: 48
+sh_set_lines_and_columns:
+  offset: 121784
+  size: 208
+sh_single_quote:
+  offset: 121992
+  size: 128
+sh_unset_nodelay_mode:
+  offset: 121656
+  size: 64
+sigint_blocked:
+  offset: 247304
+  size: 8
+sigint_oset:
+  offset: 247176
+  size: 128
+sigint_set:
+  offset: 247048
+  size: 64
+sigmask_set.6765:
+  offset: 245736
+  size: 4
+signals_set_flag:
+  offset: 245740
+  size: 4
+sigstty:
+  offset: 244424
+  size: 64
+sigwinch_set_flag:
+  offset: 245744
+  size: 24
+space_to_eol:
+  offset: 57208
+  size: 64
+stat_char:
+  offset: 24776
+  size: 160
+stifle_history:
+  offset: 107256
+  size: 240
+stored_count.8570:
+  offset: 248404
+  size: 4
+subst_lhs:
+  offset: 248472
+  size: 8
+subst_lhs_len:
+  offset: 248488
+  size: 4
+subst_rhs:
+  offset: 248480
+  size: 8
+subst_rhs_len:
+  offset: 248492
+  size: 4
+sv_bell_style:
+  offset: 39752
+  size: 192
+sv_combegin:
+  offset: 39304
+  size: 112
+sv_compquery:
+  offset: 39480
+  size: 64
+sv_dispprefix:
+  offset: 39544
+  size: 64
+sv_editmode:
+  offset: 39608
+  size: 144
+sv_histsize:
+  offset: 39416
+  size: 64
+sv_isrchterm:
+  offset: 47192
+  size: 352
+sv_keymap:
+  offset: 40040
+  size: 48
+target.9492:
+  offset: 244016
+  size: 8
+tc_strings:
+  offset: 247112
+  size: 64
+tcap_initialized:
+  offset: 248240
+  size: 8
+term_buffer:
+  offset: 248232
+  size: 8
+term_has_meta:
+  offset: 248256
+  size: 8
+term_string_buffer:
+  offset: 248224
+  size: 8
+terminal_prepped:
+  offset: 244300
+  size: 12
+the_history:
+  offset: 248440
+  size: 8
+the_line:
+  offset: 243976
+  size: 32
+tilde_additional_prefixes:
+  offset: 264712
+  size: 8
+tilde_additional_suffixes:
+  offset: 264720
+  size: 8
+tilde_expand:
+  offset: 124376
+  size: 832
+tilde_expand_word:
+  offset: 123816
+  size: 560
+tilde_expansion_failure_hook:
+  offset: 248544
+  size: 8
+tilde_expansion_preexpansion_hook:
+  offset: 248536
+  size: 8
+tlen.9493:
+  offset: 244008
+  size: 8
+tty_sigs_disabled:
+  offset: 244296
+  size: 4
+undo_needed.7236:
+  offset: 247328
+  size: 4
+unstifle_history:
+  offset: 106296
+  size: 64
+update_line:
+  offset: 63480
+  size: 5440
+username.10048:
+  offset: 244872
+  size: 8
+username_completion_function:
+  offset: 125224
+  size: 16
+users_dirname.10114:
+  offset: 244816
+  size: 8
+using_history:
+  offset: 105640
+  size: 32
+vi_continued_command:
+  offset: 244044
+  size: 4
+vi_insert_buffer:
+  offset: 244048
+  size: 8
+vi_insert_buffer_size:
+  offset: 244056
+  size: 4
+vi_insertion_keymap:
+  offset: 260392
+  size: 4112
+vi_mark_chars:
+  offset: 244104
+  size: 64
+vi_movement_keymap:
+  offset: 256264
+  size: 4128
+vi_redoing:
+  offset: 244100
+  size: 4
+vi_replace_count:
+  offset: 244040
+  size: 4
+vi_replace_map:
+  offset: 244032
+  size: 8
+visible_first_line_len:
+  offset: 245272
+  size: 4
+visible_wrap_offset:
+  offset: 245260
+  size: 4
+where_history:
+  offset: 105672
+  size: 16
+wrap_offset:
+  offset: 245264
+  size: 4
+write_history:
+  offset: 119336
+  size: 32
+xfree:
+  offset: 105368
+  size: 32
+xmalloc:
+  offset: 105528
+  size: 48
+xrealloc:
+  offset: 105448
+  size: 80

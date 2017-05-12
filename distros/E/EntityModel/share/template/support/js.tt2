@@ -1,0 +1,40 @@
+[%#
+
+C++ support
+
+Looks a bit like this:
+
+class Thing {
+	Thing() { }
+virtual	~Thing() { }
+
+	Thing &name(const string &name) { name_ = name; return *this; }
+	const string &name() const { return name_; }
+
+private:
+	string &name_;
+};
+
+Has the following mappings:
+* int => int
+* text => string
+* float => float
+
+-%]
+[% BLOCK Support/JS/Entity;
+  struct_name = entity.name;
+-%]
+[% entity.name %].prototype = Entity.prototype;
+[%  FOREACH field IN entity.field.arrayref -%]
+[% entity.name %].prototype.[% field.name %] = function() {
+  if(arguments.length) {
+    this.[% field.name %] = arguments[0];
+    return this;
+  }
+  return this.[% field.name %];
+};
+[%  END -%]
+.prototype.X = function() {
+};
+[% END -%]
+

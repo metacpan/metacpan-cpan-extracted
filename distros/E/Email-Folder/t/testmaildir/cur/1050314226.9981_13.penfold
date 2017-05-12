@@ -1,0 +1,56 @@
+Received: from pallas.eruditorum.org ([63.251.136.85] ident=postfix)
+	by deep-dark-truthful-mirror.pad with esmtp (Exim 3.36 #1 (Debian))
+	id 18Vv9s-000703-00
+	for <rt@netthink.co.uk>; Tue, 07 Jan 2003 14:56:48 +0000
+Received: from pallas.eruditorum.org (localhost [127.0.0.1])
+	by pallas.eruditorum.org (Postfix) with ESMTP
+	id 420F11111E; Tue,  7 Jan 2003 09:55:07 -0500 (EST)
+Delivered-To: rt-users@pallas.eruditorum.org
+Received: from web13704.mail.yahoo.com (web13704.mail.yahoo.com [216.136.175.137])
+	by pallas.eruditorum.org (Postfix) with SMTP id CE9B31111E
+	for <rt-users@lists.fsck.com>; Tue,  7 Jan 2003 09:53:25 -0500 (EST)
+Message-ID: <20030107145325.33120.qmail@web13704.mail.yahoo.com>
+Received: from [217.162.24.136] by web13704.mail.yahoo.com via HTTP; Tue, 07 Jan 2003 06:53:25 PST
+From: Stanislav Sinyagin <ssinyagin@yahoo.com>
+Subject: Re: [rt-users] Configuration Problem
+To: rt-users@lists.fsck.com
+In-Reply-To: <20030107164205.E98585-100000@nemesis.eahd.or.ug>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Sender: rt-users-admin@lists.fsck.com
+Errors-To: rt-users-admin@lists.fsck.com
+X-BeenThere: rt-users@lists.fsck.com
+X-Mailman-Version: 2.0.12
+Precedence: bulk
+List-Help: <mailto:rt-users-request@lists.fsck.com?subject=help>
+List-Post: <mailto:rt-users@lists.fsck.com>
+List-Subscribe: <http://lists.fsck.com/mailman/listinfo/rt-users>,
+	<mailto:rt-users-request@lists.fsck.com?subject=subscribe>
+List-Id: For users of RT: Request Tracker <rt-users.lists.fsck.com>
+List-Unsubscribe: <http://lists.fsck.com/mailman/listinfo/rt-users>,
+	<mailto:rt-users-request@lists.fsck.com?subject=unsubscribe>
+List-Archive: <http://lists.fsck.com/pipermail/rt-users/>
+Date: Tue, 7 Jan 2003 06:53:25 -0800 (PST)
+Content-Length: 631
+Lines: 20
+
+Hi, 
+
+this means your Apache is not aware about mod_perl. 
+Check the installation instructions regarding Apache setup. 
+
+--- Kamara Eric R-M <kamara@eahd.or.ug> wrote:
+> Syntax error on line 562 of /etc/httpd/httpd.conf:
+> Invalid command 'PerlRequire', perhaps mis-spelled or defined by a module
+> not included in the server configuration
+> /usr/sbin/apachectl startssl: httpd could not be started
+
+Regards, 
+Stan
+_______________________________________________
+rt-users mailing list
+rt-users@lists.fsck.com
+http://lists.fsck.com/mailman/listinfo/rt-users
+
+Have you read the FAQ? The RT FAQ Manager lives at http://fsck.com/rtfm
+

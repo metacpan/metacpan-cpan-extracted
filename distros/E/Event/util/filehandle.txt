@@ -1,0 +1,321 @@
+----------------------------------------------------------------------------
+[Date Prev][Date Next] [Thread Prev][Thread Next] [Date Index][Thread
+Index][Top&Search][Original]
+----------------------------------------------------------------------------
+
+Re: your mail
+
+----------------------------------------------------------------------------
+
+   * From: Tom Christiansen <tchrist@jhereg.perl.com>
+   * To: Chip Salzenberg <chip@perl.org>
+   * Cc: Byron Brummer <byron@thrush.omix.com>, perlbug@perl.com,
+     tchrist@jhereg.perl.com
+   * Date: Tue, 19 May 1998 10:50:27 -0600
+   * Message-Id: <199805191650.KAA09658@jhereg.perl.com>
+
+----------------------------------------------------------------------------
+
+>You can call the readline() or glob() operators directly, if you like,
+>or else assign your handle to a scalar and say <$scalar>.
+
+Um, not quite.  Here's a FMTEYEWTK on Indirect FileHandles that
+didn't make the cut on the Perl Cookbook.  Check out talk
+about readln, er, readline.
+
+--tom
+
+You want to use a filehandle like a normal variable so you can
+pass it to or return it from a function, store it in a data
+structure, and so on. The solution is to use indirect filehandles
+by storing strings, typeglobs, typeglob references, or IO objects
+into scalar variables:
+
+    $fh =   SOME_FH;       # bareword is strict-subs hostile
+    $fh =  "SOME_FH";      # strict-refs hostile; same package only
+    $fh =  *SOME_FH;       # typeglob
+    $fh = \*SOME_FH;       # ref to typeglob (bless-able)
+    $fh =  *SOME_FH{IO};   # blessed IO::Handle from *SOME_FH typeglob
+
+Or to use the `new' method from the FileHandle or IO modules to
+create an anonymous filehandle, store that in a scalar variable,
+and use it as though it were a normal filehandle.
+
+    use FileHandle;
+    $fh = FileHandle->new();
+
+    use IO::Handle;                     # 5.004 or higher
+    $fh = IO::Handle->new();
+
+Then use any of these as you would a normal filehandle.
+
+Here's how this works:
+
+Anywhere that Perl is expecting a filehandle, an indirect
+filehandle may be used instead. An indirect filehandle is just a
+scalar variable that contains a filehandle. Functions like
+`print', `open', `seek', or the functions or the `<FH>' diamond
+operator will accept either a read filehandle or a scalar variable
+containing one:
+
+    ($ifh, $ofh, $efh) = (*STDIN, *STDOUT, *STDERR);
+    print $ofh "Type it: ";
+    $got = <$ifh>
+    print $efh "What was that: $got";
+
+In the spirit of there being more than one way to do it, here are
+seven ways to produce an indirect filehandle. Don't be
+intimidated: numbers 3, 6 and 7 are the most common (and 6 and 7
+are really the same thing):
+
+1. Barewords
+    The first, SOME_FH is rather dubious, because it's not merely a
+    string, but a bareword string. It won't be allowed if `use strict
+    'subs'' is in effect. Other than that, everything in the next entry
+    also applies.
+
+2. Strings
+    `"SOME_FH"' is still a string, but at least it's quoted. The big
+    problem with this is that it doesn't have package information, so
+    if you used it to call a function compiled in a different package,
+    that function could get confused unless it were one of the ubiquitous
+    handles, like ARGV, STDIN, STDOUT, and STDERR.  You could add the
+    package manually, saying perhaps `"main::SOME_FH"'. It won't be
+    allowed if `use strict 'refs'' is in effect. The function in question
+    can fix it up using the `Symbol::qualify' function, which adds in
+    the package. Its cousin, `Symbol::qualify_to_ref', does this and
+    produces a reference, silencing the complaints from `strict refs'.
+
+        use Symbol;
+        sub function_taking_filehandle_argument {
+            my $fh = shift;
+                    # produce typeglob
+            $fh = qualify($fh, scalar caller);
+
+        # or else this one:
+
+                    # produce typeglob ref
+            $fh = qualify_to_ref($fh, scalar caller);
+            ...
+        }
+
+    The `Symbol::qualify' function produces something useful for
+    passing to the `readline' function as described below.
+
+3. Typeglobs
+    The `*SOME_FH' notation is a typeglob, an entry in a package
+    symbol table. Typeglobs are often nominated as Perl's deepest
+    and blackest magic. If you see a star in front of an
+    identifier, there are typeglobs involved, and you know you
+    have entered a wizardly realm where even gurus fear to tread.
+
+    Unlike the string versions of filehandles shown previously,
+    you can do nearly anything with a typeglob you'd like--if not
+    a good bit more. They're extremely convenient and useful, once
+    you get the hang of them. You don't have to fight with
+    packages or any stricture. And although it's not `bless'able
+    because it's not a reference, it can be effectively returned
+    from functions. A reference to a typeglob can't.
+
+    Here's how typeglobs are typically used for I/O:
+
+        #!/usr/bin/perl
+        # demoglob - show how to return local filehandles
+
+        sub ropen {
+            my $path = shift;
+            local *FH;
+            open(FH, $path) || die $!;
+            return *FH;
+        }
+
+        $f = ropen("/etc/motd");
+        $g = ropen("/etc/termcap");
+        print scalar(<$f>), scalar(<$g>);
+
+    >>> Welcome to www.perl.com, the Perl Homepage >>> ########
+    TERMINAL TYPE DESCRIPTIONS SOURCE FILE
+
+    If a typeglob is passed in, it can be assigned to a local
+    filehandle using a typeglob. After that, normal operations
+    like `<>' or any I/O function can be applied to it.
+
+        sub read_N_lines using
+            local *FH = shift;
+            my $count = shift;
+            my @lines = ();
+            while (--$count > 0) {
+                push @lines, scalar <FH>;
+                last if eof(FH);
+            }
+            return @lines;
+        }
+
+        open(TCAP, "/etc/termcap") || die $!;
+        @some = read_N_lines(*TCAP, 3);
+        print @some;
+
+    >>> ######## TERMINAL TYPE DESCRIPTIONS SOURCE FILE >>> # >>>
+    # Version 9.12.0
+
+    It turns out that it also works if the caller forgets to star
+    the filehandle or passes it as a string, effectively using
+    techniques 1 and 2 from this list. It works only so long as
+    they're in the same package as the function in question and
+    `strict refs' isn't enabled, though.
+
+        @some = read_N_lines('TCAP', 5);
+
+    That's because assigning a string to a typeglob promotes the
+    string to a typeglob of that name, like this:
+
+        *newname = *oldname;
+        *newname = 'oldname';
+                # magically same; promote string to typeglob!
+
+    A careful function would have done either this to qualify its
+    filehandle argument:
+
+        use Symbol;
+        local *FH = qualify(shift, caller);
+
+    Or prototyped the function to take a typeglob, which
+    implicitly does the same thing:
+
+        sub read_N_lines(*$) {
+            # same definition
+        }
+
+    Once such a prototype is visible, a call like this:
+
+        @some = read_N_lines(TCAP, 5);
+
+    is really treated as though it were
+
+        @some = &read_N_lines(*TCAP, 5);
+
+4. Typeglob references
+    The ` \*SOME_FH' notation produces a reference to a typeglob.
+    It can be used to create an object by blessing the reference;
+    this is what the FileHandle and IO modules use. Don't try
+    passing one of these back from a function, though, because it
+    doesn't work. Instead, if you would like an anonymous one of
+    these, use the Symbol module.
+
+        use Symbol;
+        sub ropen {
+            my $path = shift;
+            my $fh = gensym();
+            open($fh, $path) || die $!;
+            return $fh;
+        }
+
+5. IO handles
+    The curious `*SOME_FH{IO}' construct is explained in greater
+    detail in perlref(1). It accesses the internal IO object
+    associated with the handle called SOME_FH. This is a real
+    object; it's already blessed even though it's built-in to
+    Perl.
+
+        printf "I have %s\n", *STDIN{IO};
+    >>> I have IO::Handle=IO(0x80784b8)
+
+    The only issue here is that it can't be used to generate a new
+    filehandle the way `Symbol::gensym' can. But if you've already
+    accessed the symbol as a filehandle, that's ok. This works
+    fine:
+
+        sub ropen {
+            my $path = shift;
+            local *FH;
+            open(FH, $path) || die $!;
+            return *FH{IO};
+        }
+
+6. FileHandle
+    The standard FileHandle module can be used to create a new filehandle
+    to use indirectly. It's just a bit expensive to load; as of the
+    5.004 release, merely saying `use FileHandle' loads fifteen text
+    files plus several shared libraries, plodding through nearly four
+    thousand lines of source code.
+
+        use FileHandle;
+        sub ropen {
+            my $path = shift;
+            my $fh = FileHandle->new();
+            open($fh, $path) || die $!;
+            return $fh;
+        }
+
+7. IO::Handle
+    This is works the same as the FileHandle module, except that
+    its name is different. The FileHandle module is really just a
+    front-end to this one.  It's still just as crazily expensive.
+
+There's a catch with these indirect filehandles. Only a simple scalar
+variable, not part of an array or hash or larger expression, can be
+used for things like `print', `printf', or the diamond operator. This
+is illegal and won't even compile:
+
+    @fd = (*STDIN, *STDOUT, *STDERR);
+    print $fd[1] "Type it: ";                           # WRONG
+    $got = <$fd[0]>                                     # WRONG
+    print $fd[2] "What was that: $got";                 # WRONG
+
+With `print', you can get around this problem by using a block and
+an expression:
+
+    print  { $fd[1] } "funny stuff\n";
+    printf { $fd[1] } "Pity the poor %x.\n", 3_735_928_559;
+>>> Pity the poor deadbeef.
+
+or even this, which sends the message out to one of two places:
+
+    $ok = -x "/bin/cat";
+    print { $ok ? $fd[1] : $fd[2] } "cat stat $ok\n";
+    print { $fd[ 1+ ($ok || 0) ]  } "cat stat $ok\n";
+
+This kind of thing doesn't work for the diamond operator. In some
+cases, though, you may be in luck. The angle bracket notation is
+mostly just an interface to the built-in function named
+`readline'. You may call it directly--providing that you pass it a
+typeglob. Not a string. Not a reference to a typeglob. Just a
+typeglob. Given the initialization of @fd above, this would work:
+
+    $got = readline($fd[0]);
+
+But if those had been typeglob references or strings instead of
+globs, `readline' wouldn't have worked.
+
+All this monkeying around will probably get to you eventually. If
+so, it may well be time to load the FileHandle module (or its
+newer alias, IO::Handle), which simplifies much of this. It has a
+`new' method to provide an anonymous filehandle, as we saw above.
+And it has `print' and `getline' methods (Yes, that's `getline' as
+a method, but `readline' when a function. I don't know what I was
+thinking when I wrote it.):
+
+    use FileHandle;
+    @fd = ( *STDIN{IO}, *STDOUT{IO}, *STDERR{IO} );
+    $fd[1]->print("Type it: ");
+    print { $fd[1] } ("Type it: ");      # same, but *much* faster
+    $got = $fd[0]->getline();
+    $fd[2]->print("What was that: $got");
+
+See also the `open' entry in perlfunc(1) (or Camel:3), FileHandle(3)
+(or Camel:7), the perlref(1) manpage's treatment of the so-called
+`*foo{THING}' syntax, and the IO modules.
+
+----------------------------------------------------------------------------
+
+Follow-Ups from:
+     Chip Salzenberg <chip@perl.org>
+     Steffen Beyer <sb@sdm.de>sb@engelschall.com (Steffen Beyer)
+
+References to:
+     Chip Salzenberg <chip@perl.org>
+
+----------------------------------------------------------------------------
+[Date Prev][Date Next] [Thread Prev][Thread Next] [Date Index][Thread
+Index][Top&Search][Original]
+----------------------------------------------------------------------------

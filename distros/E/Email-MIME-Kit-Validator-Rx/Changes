@@ -1,0 +1,22 @@
+Revision history for Email-MIME-Kit-Validator-Rx
+
+0.200001  2013-08-12 21:54:42 America/New_York
+          update bugtracker and repo
+
+0.200000  2012-09-18 11:00:07 America/New_York
+          update for use with Data::Rx 0.200000
+
+0.102010  2010-07-20 15:28:18 America/Los_Angeles
+          eliminate use of auto_deref
+
+0.003     2009-03-06
+          allow multiple schema to be passed; they can be //all-ed together
+
+0.002     2009-03-06
+          allow schema to be given inline in manifest
+          allow a different name for file containing schema definition
+          improve subclassability by moving bundle generation to BUILD
+
+0.001     2009-01-29
+          initial release!
+

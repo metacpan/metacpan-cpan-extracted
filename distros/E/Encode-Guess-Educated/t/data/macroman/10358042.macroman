@@ -1,0 +1,1128 @@
+   [1]The Journal of Biological Chemistry
+
+   [2]Skip to main page content
+     * [3]Home
+     * [4]Current issue
+     * [5]Archive
+     * [6]Papers in Press
+     * [7]Minireviews
+     * [8]Classics
+     * [9]Reflections
+     * [10]Papers of the Week
+
+   QUICK SEARCHAuthor: _________Keyword: ________________Year: ____Vol:
+   ____Page: ____ GO Go[11][Advanced Search][12][Browse the Archive]
+     * Institution: Univ Colorado - Denison Memorial Library
+     * [13]Sign In
+
+   Advertisement
+   Advertisement
+     * [14]F1000 papers in the JBC
+
+ §1§ Crystal Structure of Allophycocyanin from Red AlgaePorphyra yezoensis at
+2.2-Å Resolution[15]* §1§
+
+    1. [16]Jin-Yu Liu,
+    2. [17]Tao Jiang,
+    3. [18]Ji-Ping Zhang and
+    4. [19]Dong-Cai Liang[20]‡
+
+    1.
+
+
+    From the National Laboratory of Biomacromolecules, Institute of
+    Biophysics, Chinese Academy of Sciences, Chaoyang District, Beijing
+    100101, China
+
+
+   [21]Next Section
+
+ §2§ Abstract §2§
+
+   The crystal structure of allophycocyanin from red algae Porphyra
+   yezoensis (APC-PY) at 2.2-Å resolution has been determined by the
+   molecular replacement method. The crystal belongs to space group R32
+   with cell parameters a = b = 105.3 Å, c = 189.4 Å, &#x3b1; = &#x3b2; = 90°, &#x3b3; =
+   120°. After several cycles of refinement using program X-PLOR and model
+   building based on the electron density map, the crystallographic
+   R-factor converged to 19.3% (R-free factor is 26.9%) in the range of
+   10.0 to 2.2 Å. The r.m.s. deviations of bond length and angles are
+   0.015 Å and 2.9°, respectively.
+
+   In the crystal, two APC-PY trimers associate face to face into a
+   hexamer. The assembly of two trimers within the hexamer is similar to
+   that of C-phycocyanin (C-PC) and R-phycoerythrin (R-PE) hexamers, but
+   the assembly tightness of the two trimers to the hexamer is not so high
+   as that in C-PC and R-PE hexamers.
+
+   The chromophore-protein interactions and possible pathway of energy
+   transfer were discussed. Phycocyanobilin 1&#x3b1;84 of APC-PY forms 5
+   hydrogen bonds with 3 residues in subunit 2&#x3b2; of another monomer. In
+   R-PE and C-PC, chromophore 1&#x3b1;84 only forms 1 hydrogen bond with 2&#x3b2;77
+   residue in subunit 2&#x3b2;. This result may support and explain great
+   spectrum difference exists between APC trimer and monomer.
+
+   Phycobilisomes are large supramolecular aggregates attached to the
+   stromal side of the thylakoid membrane in cyanobacteria, red algae, and
+   cryptomonads. These supramolecular aggregates are light-harvesting
+   protein pigment complexes that are composed of phycobiliproteins and
+   linker proteins. Based on the absorption of visible light, the
+   phycobiliproteins can be divided into three main groups: phycoerythrin
+   (PE)^1 or phycoerythrocyanin (PEC), phycocyanin (PC), and
+   allophycocyanin (APC). With the help of linker proteins,
+   phycobiliproteins form the two distinct structural domains of
+   phycobilisome, the core and the rods. The core, which is composed of
+   three or more core cylinders associated by APC discs, is in proximity
+   of the reaction centers, whereas the rods are attached on the core and
+   are composed of PC discs in the middle and PE or PEC discs on the tip.
+   Light energy is transferred from PE or PEC via PC to APC and finally to
+   the reaction centers ([22]1).
+
+   The crystal structures of several phycobiliproteins have been solved;
+   among them, three are PEs ([23]2-4), three are C-phycocyanins (C-PCs)
+   ([24]5-7), one is PEC:PEC from Mastigocladus laminosus ([25]8), and one
+   is APC:APC from Spirulina platensis ([26]9). All these structures are
+   very similar. The basic building block is an &#x3b1;&#x3b2; monomer composed of &#x3b1;
+   and &#x3b2; subunits (R-phycoerythrin (R-PE) and B-phycoerythrin (B-PE) have
+   a third subunit &#x3b3; in the center of the molecule); three &#x3b1;&#x3b2; monomers are
+   arranged around a 3-fold symmetry axis to form an (&#x3b1;&#x3b2;)[3] trimer or two
+   (&#x3b1;&#x3b2;)[3] trimers, which are assembled face to face into an (&#x3b1;&#x3b2;)[6]
+   hexamer.
+
+   The crystal structure of APC is very special compared with other
+   phycobiliproteins. First, the spectrum difference between APC trimer
+   and its monomer is very large. When APC monomers aggregate to trimer,
+   the absorption spectrum has a 40-nm red shift; the CD spectrum also
+   changes a great deal, and exiton interaction in the trimer of APC was
+   suggested ([27]10), whereas the spectrum difference between C-PC
+   monomer and its trimer is not so large as in APC, although phycocyanin
+   has the same &#x3b1;84PCB and &#x3b2;84PCB as APC.
+
+   Second, the functional unit of APC was thought to be a trimer, whereas
+   the function unit of other phycobiliproteins were hexamer (&#x3b1;&#x3b2;)[6] or
+   (&#x3b1;&#x3b2;)[6]&#x3b3;. Brejc and co-workers solved the structure of APC-SP from blue
+   alga S. platensis([28]9) in the unit cell of APC-SP crystal; two
+   trimers are associated in a “back to back” manner that might represent
+   the assembly state of APC in nature. Red alga is higher than blue alga
+   in evolution, so it would be interesting to know the packing of APC
+   from red alga in the unit cell and in nature.
+
+   Third, in PE and PC, the two trimeric discs are superimposed along a
+   3-fold axis, but in PC and APC the two discs are connected
+   perpendicularly. The pathway of energy transfer between PC and APC is
+   still unknown.
+
+   The red algae Porphyra yezoensis is an algae that exists widely in
+   nature. Its phycobilisomes contain R-PE, C-PC, and APC. In this paper
+   we report the crystal structure of APC from P. yezoensis (APC-PY) at
+   2.2-Å resolution. The organization of APC trimers in the core cylinders
+   of phycobiliproteins and the pathway of energy transfer were discussed.
+   [29]Previous Section[30]Next Section
+
+ §2§ EXPERIMENTAL PROCEDURES §2§
+
+   Crystallization and data collection of APC-PY was reported earlier
+   ([31]11). The crystals of APC-PY belong to space group R32 with
+   parameters a = b = 105.3 Å, c = 189.4 Å, &#x3b1; = &#x3b2; = 90°, and &#x3b3; = 120°.
+
+   Molecular replacement using program AMoRe ([32]12) was carried out
+   using the 2.3-Å structure of APC-SP as a model. Model cell parameters
+   were a = b = c = 150.0 Å, &#x3b1; = &#x3b2; = &#x3b3; = 90°, integrate radius was 30 Å,
+   and rotation function calculation gave a rather high coefficient
+   solution, &#x3b1; = 60.07, &#x3b2; = 3.06, &#x3b3; = 88.03, Cc = 20.0. The orientations
+   and positions of one &#x3b1;&#x3b2; in the asymmetric unit were determined by the
+   translation function with a high correlation coefficient of 66.9%. The
+   R-factor in the range from 10 to 4 Å was 36.1%. After rigid-body
+   refinement, R-factor dropped to 33.1%, and the correlation coefficient
+   increased to 71.2%. The packing of molecules in the unit cell was
+   reasonable.
+
+   The structure was refined using X-PLOR ([33]13). The consensus sequence
+   was used for the initial model building. Fourier transform and electron
+   density were first calculated in the resolution range of 10 Å to 3.5 Å.
+   Residues that could not be fitted into the electron density map were
+   omitted from the phase calculation in the next refinement cycle. After
+   several cycles of rigid body, positional refinement, and manual model
+   adjustment, the R-factor dropped to 25.4%, and a 2Fo-Fc Fourier map
+   looked quite good. Then the resolution was extended to 2.2 Å. After the
+   chromophores were fitted in the map and followed by several cycles of
+   positional refinement and model adjustment, the electron density
+   improved further. At this stage almost all side chains were well
+   defined except those on the surface. Residue exchanges were carried out
+   at this stage according to the omit map. After several cycles of
+   positional refinement and model adjustment, the R-factor was converged
+   to 24.0%, the individual B-factors were then refined, and the R-factor
+   dropped to 21.5%. 169 water molecules were added to the model according
+   to the Fo-Fc and 2Fo-Fc maps, and the final R-factor of the model was
+   19.3% (R-free factor was 26.9%) in the range of 10 Å to 2.2 Å.
+   [34]Previous Section[35]Next Section
+
+ §2§ RESULTS AND DISCUSSION §2§
+
+ §5§ Amino Acid Sequence §5§
+
+   Because the amino acid sequence of APC from P. yezoensis is still
+   unknown, the following six APC amino acid sequences were used to get a
+   consensus sequence for model building. Among these sequences, four are
+   from cyanobacteria,Anabaena cylindrica ([36]14), Calotrix PCC7601
+   ([37]15),Fischerella PCC7603 ([38]16), and SynechococcusPCC6301
+   ([39]17), and two are from red algae, Aglaothamnion neglectum ([40]18)
+   and Cyanidium caldarium ([41]19). The alignment of these six sequences
+   is shown in Table[42]I.
+   View this table:
+     * [43]In this window
+     * [44]In a new window
+
+   Table I
+
+   The sequence alignment of the APCs
+
+ §5§ Quality of the Model §5§
+
+   The final crystallographic R-factor for APC-PY model is 19.3%, in the
+   range of 10.0 Å to 2.2 Å. The Luzzati plot gives a mean positional
+   error of 0.26 Å ([45]20). The r.m.s. deviations of bond lengths and
+   bond angles are 0.015 Å and 2.9°, respectively. The quality of the
+   final model is summarized in Table[46]II. The Ramachandran plot shows
+   that all dihedral angles fall into most favored or allowed regions with
+   the only exception of &#x3b2;77Thr (Fig. [47]1) ([48]21), which has a
+   conserved unusual dihedral angle in all known phycobiliprotein
+   structures. In APC-PY, the N atom of &#x3b2;77Thr forms a hydrogen bond with
+   OD (the oxygen atom in the ring D of chromophore) oxygen atom of
+   &#x3b1;84PCB. The electron density of this residue is well defined in APC-PY.
+   The consensus amino acid sequence (Table [49]I) was used to build the
+   initial model and later modified according to the electron density map.
+   In the 2.3-Å-resolution crystal structure of APC-SP ([50]9), 28
+   residues were not well defined with 102 atoms of zero occupancy; these
+   residues are &#x3b1;25 Asp, &#x3b1;35Glu, &#x3b1;36Arg, &#x3b1;49Glu, &#x3b1;50Arg, &#x3b1;53Lys, &#x3b1;54 Gln,
+   &#x3b1;76 Tyr, &#x3b1;79 Asp, &#x3b1;120Lys, &#x3b1;127Glu, &#x3b2;2 Gln, &#x3b2;10Asn, &#x3b2;17Lys, &#x3b2;20 Asp,
+   &#x3b2;25 Gln, &#x3b2;35Glu, &#x3b2;36Leu, &#x3b2;39Arg, &#x3b2;50Asn, &#x3b2;58Lys, &#x3b2;65 Asp, &#x3b2;68Arg,
+   &#x3b2;116Lys, &#x3b2;117Glu, &#x3b2;131 Gln, &#x3b2;138Glu, &#x3b2;150Lys. The fit of these residues
+   to our electron density map is better in APC-PY; most of them behave
+   well at 1&#x3c2; density level (Fig. [51]2); others behave well at 0.7&#x3c2;
+   density level except &#x3b1;76 in the loop, which has a density at 0.5&#x3c2;
+   density level.
+   View this table:
+     * [52]In this window
+     * [53]In a new window
+
+   Table II
+
+   Parameters of refined APC-PY model
+   [54]Figure 1
+   View larger version:
+     * [55]In this window
+     * [56]In a new window
+
+     * [57]Download as PowerPoint Slide
+
+   Figure 1
+
+   Ramachandran plot of the APC-PY residues. Glycine residues are marked
+   as squares. Nonglycine residues are marked as crosses. &#x3b2;77 (277) is in
+   an unusual region. PSI and PHI are dihedral angles &#x3c8; and &#x3c6;.
+   [58]Figure 2
+   View larger version:
+     * [59]In this window
+     * [60]In a new window
+
+     * [61]Download as PowerPoint Slide
+
+   Figure 2
+
+   Omit electron density map of residues &#x3b2;35Glu and &#x3b2;36Leu in APC-PY .
+
+   Comparing the crystallographic sequences of the final model of APC-PY
+   and APC-SP, there are 37 nonidentical residues, 25 in the &#x3b1; subunit and
+   12 in the &#x3b2; subunit (Table [62]III). In comparison with other APC
+   sequences, the 37 residues of APC-PY are more conserved than those of
+   APC-SP. For example, &#x3b1;52Val and &#x3b1;61Gln of APC-PY are identical to other
+   known sequences. The electron density of these two residues in APC-PY
+   are well defined.
+   View this table:
+     * [63]In this window
+     * [64]In a new window
+
+   Table III
+
+   Sequence comparison of APC-PY and APC-SP
+
+ §5§ Molecular Structure §5§
+
+   The asymmetric unit of APC-PY contains &#x3b1; and &#x3b2; subunit. The &#x3b1; subunit
+   is composed of 160 residues, and the &#x3b2; subunit contains 161 residues.
+   Three &#x3b1;&#x3b2; monomers are arranged around a 3-fold axis to form a disc
+   shaped (&#x3b1;&#x3b2;)[3] trimer of 30 Å in thickness and 110 Å in diameter with a
+   cave in the center. The &#x3b1; and &#x3b2; subunits in the &#x3b1;&#x3b2; monomer have similar
+   structures, with nine &#x3b1;-helices (X, Y, A, B, E, F, F’, G, H) separated
+   by irregular loops (Fig.[65]3).
+   [66]Figure 3
+   View larger version:
+     * [67]In this window
+     * [68]In a new window
+
+     * [69]Download as PowerPoint Slide
+
+   Figure 3
+
+   Ribbon representation of APC &#x3b1; subunit (a), APC &#x3b2; subunit (b).
+
+   The three-dimensional structure of APC-PY &#x3b1; and &#x3b2; subunits are very
+   similar to the known structure of APC-SP. The intersubunit interactions
+   within the (&#x3b1;&#x3b2;) monomer and the (&#x3b1;&#x3b2;)[3] trimer are also very similar to
+   these of APC-SP and other phycobiliproteins. In the (&#x3b1;&#x3b2;) monomer of
+   APC-PY, the ionic- and polar-interacting residues between the two
+   subunits are &#x3b1;3 Ser-&#x3b2;3 Asp, &#x3b1;13 Asp-&#x3b2;94 Tyr, &#x3b1;13 Asp-&#x3b2;110Arg,
+   &#x3b1;17Arg-&#x3b2;97 Tyr, &#x3b1;18 Tyr-&#x3b2;93Arg, &#x3b2;13 Asp-&#x3b1;93Arg, &#x3b2;13 Asp-&#x3b1;97 Tyr, &#x3b2;18
+   Tyr-&#x3b1;89 Asp.
+
+   In the APC-PY crystal, two trimers associate face to face into the
+   (&#x3b1;&#x3b2;)[6] hexamer through a crystallographic dyad perpendicular to the
+   triad. There are three (&#x3b1;&#x3b2;)[6]hexamers in a unit cell, locating at
+   (0,0,0), (2/3, 1/3, 1/3), and (1/3, 2/3, 2/3) (Fig. [70]4 a). The
+   assembly of two trimers in this hexamer is completely different from
+   that of APC-SP. In APC-SP crystal, the two trimers are associated
+   loosely through &#x3b2; subunits in a “back to back” manner (Fig. [71]4 b) in
+   the hexamer ([72]9), but in APC-PY crystal, the two trimers in the
+   hexamer contact through &#x3b1; subunits, and the assembly of the two trimers
+   is much tighter than that in APC-SP.
+   [73]Figure 4
+   View larger version:
+     * [74]In this window
+     * [75]In a new window
+
+     * [76]Download as PowerPoint Slide
+
+   Figure 4
+
+   a, packing of APC-PY in the unit cell.b, packing of APC-SP in the unit
+   cell.
+
+   The assembly of the hexamer in the APC-PY crystal is similar to that of
+   C-PC from Fremylla diplosiphon (C-PC-FR) and R-PE fromPolysiphonia
+   urceolata (R-PE-PU) hexamers; two (&#x3b1;&#x3b2;)[3] trimers associate face to
+   face in the hexamer. The &#x3b1; subunits provide the contacting surface, and
+   the two trimers fit complementarily in the hexamer.
+
+   Despite the similarity in assembly in APC-PY, C-PC-FR, and R-PE-PU
+   hexamers, the superposition of the C[&#x3b1;] atoms of APC-PY and C-PC-FR
+   hexamers shows that the assembly of the two trimers in APC-PY hexamer
+   is obviously looser than that in C-PC-FR and R-PE-PU hexamers. The
+   calculated accessible areas between the trimers in C-PC-FR and R-PE-PU
+   hexamers are about 5900 and 6900 Å^2. In APC-PY hexamer, this value is
+   about 3200 Å^2, which is much bigger than that in APC-SP (600 Å^2);
+   thus, the APC-PY hexamer can be described as a “loose hexamer.” The
+   interactions between the trimers in APC-PY hexamer are different from
+   those in C-PC-FR and R-PE-PU hexamers.
+
+   First, the number of the residues involved in the interactions between
+   the two trimers in APC-PY hexamer is smaller than that in C-PC-FR and
+   R-PE-PU hexamers, indicating a weaker association. This is consistent
+   with the calculated accessible areas between the two trimers in
+   C-PC-FR, R-PE-PU, and APC-PY hexamers. The special polar network
+   present in C-PC of Agmenellum quadruplaticum (C-PC-AQ), formed by
+   residues 1&#x3b2;46 Asn-6&#x3b1;164 Asn-1&#x3b1;21 Asn-6&#x3b1;161 Glu-6&#x3b1;33 Glu-6&#x3b1;30 Arg
+   ([77]6) is not conserved in APC-PY hexamer. In addition, the
+   electrostatic interactions between 1&#x3b1;2Lys-6&#x3b1;23Glu, 1&#x3b1;17Arg-6&#x3b1;108 Asp,
+   and 1&#x3b1;120Arg-4&#x3b1;174 C-terminal carboxyl group, which were suggested to
+   be involved in the hexamer formation in C-PC-FR ([78]22), are also not
+   present in APC-PY hexamer. Furthermore, the comparison of APC-PY with
+   C-PC-FR and R-PE-PU reveals that all the conserved polar and ionic
+   interactions between the two trimers in C-PC-FR and R-PE-PU hexamers
+   are not present in APC-PY hexamer.
+
+   Despite the above difference, the interactions that maintain APC-PY as
+   a loose hexamer seem still to be the polar and charged interactions
+   between the two trimers. In APC-PY hexamer, the polar and charged
+   interactions are 1&#x3b1;25 Asp-6&#x3b1;37Arg, 1&#x3b1;22 Gly-6&#x3b1;26Arg, 1&#x3b1;25 Asp-6&#x3b1;161Glu,
+   1&#x3b1;25 Asp-6&#x3b1;165 Tyr, and 1&#x3b1;28Lys-6&#x3b1;147 Asp. In APC-SP, only a few polar
+   and charged interactions (<4 Å) exist between the two trimers, such as
+   1&#x3b2;65 Asp-6&#x3b2;131 Gln and 1&#x3b2;120Asn–6&#x3b2;120Asn, indicating a very loose
+   packing.
+
+   Second, in C-PC-FR and R-PE-PU hexamers, the trimer-trimer association
+   is mediated almost exclusively by polar and charged residues ([79]6),
+   but in the APC-PY hexamer, some hydrophobic residues are also involved,
+   such as &#x3b1;21 Pro, &#x3b1;22 Gly, &#x3b1;104 Val, &#x3b1;164 Phe, &#x3b2;42 Ala, and &#x3b2;46 Ala.
+
+ §5§ Chromophores &#x3b1;84PCB and &#x3b2;84PCB §5§
+
+   In APC, two phycocyanobilins are covalently bound to cysteine residues
+   at position &#x3b1;84 and &#x3b2;84 (Fig. [80]5). Both chromophores are well
+   defined in APC-PY (Fig.[81]6). The geometry and protein environment of
+   these two chromophores resemble those of APC-SP. The &#x3b1;84 PCB
+   chromophores have a protein environment similar to that of &#x3b2;84PCB. The
+   polar and ionic protein-chromophore interactions in &#x3b1;84PCB and &#x3b2;84PCB
+   are shown in Table [82]IV.
+   [83]Figure 5
+   View larger version:
+     * [84]In this window
+     * [85]In a new window
+
+     * [86]Download as PowerPoint Slide
+
+   Figure 5
+
+   Chemical structure of PCB .
+   [87]Figure 6
+   View larger version:
+     * [88]In this window
+     * [89]In a new window
+
+     * [90]Download as PowerPoint Slide
+
+   Figure 6
+
+   The coincidence of chromophores in APC-PY with 2Fo-Fc electron density
+   map &#x3b1;84PCB (a), &#x3b2;84PCB (b).
+   View this table:
+     * [91]In this window
+     * [92]In a new window
+
+   Table IV
+
+   The polar and ionic protein-chromophore interactions in APC-PY (Å)
+
+   Chromophores &#x3b1;84PCB and &#x3b2;84PCB have similar hydrophobic environment;
+   there are three aromatic residues close to &#x3b1;84, such as &#x3b1;90 Tyr, &#x3b1;91
+   Tyr, and &#x3b1;119 Tyr, and three close to &#x3b2;84, such as &#x3b2;90 Tyr, &#x3b2;91 Tyr,
+   and &#x3b2;119 Tyr. In C-PC-FR, &#x3b1;90 and &#x3b1;91 are all Tyr, and &#x3b2;90 and &#x3b2;91 are
+   all Ile. In R-PE-PU, &#x3b1;90 and &#x3b1;91 are His and Tyr, respectively, and &#x3b2;90
+   and &#x3b2;91 are all Ile. But in all known APCs, &#x3b1;90, &#x3b1;91, &#x3b2;90, and &#x3b2;91 are
+   all Tyr. So the microenvironment of &#x3b1;84 and &#x3b2;84 in APC-PY is similar to
+   that in C-PC-FR and R-PE-PU, indicating that &#x3b1;84PCB and &#x3b2;84PCB have
+   similar conformation and spectrum character. &#x3b2;90 Tyr and &#x3b2;91 Tyr
+   stabilize the &#x3b2;84PCB ring D conformation, which may make PCB have
+   different spectrum characteristics in APC and C-PC.
+
+ §5§ Energy Transfer §5§
+
+   There are 12 PCBs in APC-PY hexamer; the arrangement of these
+   chromophores is shown in Fig.[93]7. The theory of shot-distance exiton
+   interaction ([94]23) and long distance dipole-dipole resonance
+   mechanism ([95]24) has been used to explain the energy transfer rate
+   between chromophores.
+   [96]Figure 7
+   View larger version:
+     * [97]In this window
+     * [98]In a new window
+
+     * [99]Download as PowerPoint Slide
+
+   Figure 7
+
+   The chromophores of APC-PY hexamer.
+
+   Inside trimer of APC-PY, the distance between 1&#x3b2;84PCB and 2&#x3b2;84PCB in
+   APC-PY is about 34 Å and that between 1&#x3b1;84PCB and 2&#x3b2;84PCB is about 21
+   Å. These values are similar to those in C-PCs. The chromophores are too
+   far away to have exiton interaction. It is also difficult to explain
+   why exiton interaction exists in APC but not in C-PC. Our study of
+   chromophore-protein interactions and comparison of microenvironments in
+   R-PE-PU, C-PC-FR, and APC-PY show that almost all the
+   chromophore-protein interactions exist within the same monomer (&#x3b1;&#x3b2;),
+   the only exception being &#x3b1;84PEB in R-PE-PU, which forms a hydrogen bond
+   with &#x3b2;77 Thr in another monomer. In C-PC-FR, the situation is the same
+   as in R-PE-PU. However, it is different in APC-PY; its &#x3b1;84PCB forms
+   five hydrogen bonds with the residues in other monomer, such as &#x3b1;84PCB
+   O2B-2&#x3b2;62 Tyr OH, O1C-2&#x3b2;62 Tyr N, O1C-2&#x3b2;67 Thr OG1, O2C-2&#x3b2;67 Thr OG1,
+   and OD-2&#x3b2;77 Thr N (see Table[100]IV). We believe this difference may
+   explain why the spectrum of APC changes greatly when its monomers
+   associate to trimer. In APC-SP, distances of &#x3b1;84PCB O2B-2&#x3b2;62 Tyr OH,
+   O1C-2&#x3b2;62 Tyr N, O1C-2&#x3b2;67 Thr OG1, O2C-2&#x3b2;67 Thr OG1, and OD-2&#x3b2;77 Thr N
+   are all within the distance of hydrogen bond formation. As we know, &#x3b2;62
+   Tyr and &#x3b2;67 Thr are close to chromophore &#x3b2;84PCB and may control the
+   conformation of chromophore and bridge between &#x3b1;84 PCB and &#x3b2;84 PCB to
+   make the exiton interaction occur.
+
+   The distances of chromophores between the two trimers in APC-PY hexamer
+   are similar to those in C-PC-FR and R-PE-PU hexamers. Based on the
+   1.9-Å resolution crystal structure, the possible pathway of energy
+   transfer within and between the two trimers of R-PE-PU were discussed
+   ([101]25). There are three pairs of short distance interactions between
+   two trimers, such as 1&#x3b1;84 &#x2192; 4&#x3b1;84,1&#x3b1;140a &#x2192;6&#x3b2;155, and 1&#x3b2;155 &#x2192; 6&#x3b2;155.
+   &#x3b1;84PEB is on the inner surface of R-PE-PU, and 1&#x3b1;84PEB &#x2192; 4&#x3b1;84PEB may be
+   the dominant energy transfer pathway between the two trimers. Similar
+   energy pathways (1&#x3b1;84PCB &#x2192; 4&#x3b1;84PCB) also exists in C-PC-FR hexamers
+   ([102]26). In C-PC-FR, R-PE-PU, and APC-PY hexamers, the distances
+   between 1&#x3b1;84 (C10 atom) and 4&#x3b1;84 (C10 atom) are 27.5, 28.7, and 30.3 Å,
+   respectively, which are comparable. Therefore, the distance between the
+   two chromophores of APC-PY seems adequate for effective energy
+   transfer.
+
+   In addition to the energy pathway composed of chromophores, the
+   aromatic pathway formed by aromatic residues may play an important role
+   in energy transfer. The energy transfer from chromophores to aromatic
+   residues vice versa can be explained by exiton interaction mechanism,
+   because the distances between some chromophores and aromatic residues,
+   such as &#x3b1;84PCB-&#x3b1;90 Tyr, &#x3b1;84PCB-&#x3b1;91 Tyr, &#x3b2;84PCB-&#x3b2;90 Tyr, &#x3b2;84PCB-&#x3b2;91 Tyr
+   are very short (&#x223c;4 Å). Förster’s dipole-dipole resonance transfer can
+   occur between different aromatic residues rather than between
+   chromophores and aromatic residues, because the overlap integral
+   between chromophore absorption (&#x3bb;[max] &#x2245; 650 nm for fluorescence
+   spectrum) and aromatic residue emission (&#x3bb;[max] &#x2245; 300 nm for
+   fluorescence spectrum and &#x3bb;[max] &#x2245; 400 nm for phosphorescence spectrum)
+   is quite small. In APC-PY there are two areas abundant in aromatic
+   residues as shown in Fig.[103]8. One is close to chromophore &#x3b1;84PCB and
+   composed of &#x3b1;164 Phe, &#x3b1;165 Tyr, &#x3b1;166 Phe, &#x3b1;168 Tyr, &#x3b1;90 Tyr, &#x3b1;91 Tyr,
+   &#x3b1;97 Tyr, &#x3b1;119 Tyr, and &#x3b2;18 Tyr. Another is close to chromophore &#x3b2;84 and
+   composed of &#x3b2;165 Tyr, &#x3b2;166 Phe, &#x3b2;168 Tyr, &#x3b2;90 Tyr, &#x3b2;91 Tyr, &#x3b2;94 Tyr,
+   &#x3b2;97 Tyr, &#x3b2;119 Tyr, and &#x3b1;18 Tyr. &#x3b1;164 Phe is involved in the hydrophobic
+   interactions between the two trimers. The aromatic residues in the &#x3b1;
+   subunit and the &#x3b2; subunit have high homology and similar locations.
+   Other aromatic residues are on the periphery of the disc, such as &#x3b1;76
+   Tyr, &#x3b1;60 Phe, &#x3b2;76 Tyr, &#x3b2;62 Tyr, &#x3b2;30 Tyr, &#x3b2;31 Phe, &#x3b1;30 Phe, and &#x3b2;81 Tyr;
+   among them &#x3b1;76 Tyr and &#x3b2;62 Tyr may mediate the energy transfer between
+   1&#x3b1;84PCB and 2&#x3b2;84PCB. Because PC and APC are connected perpendicularly
+   in vivo, aromatic residues on the periphery may mediate the energy
+   transfer from the chromophores of PC to those of APC.
+   [104]Figure 8
+   View larger version:
+     * [105]In this window
+     * [106]In a new window
+
+     * [107]Download as PowerPoint Slide
+
+   Figure 8
+
+   The location of aromatic residues in APC-PY .
+
+ §5§ Functional Unit §5§
+
+   In the core cylinders of phycobilisomes, several APC trimers are close
+   together, but the association manner of these APC trimers is still
+   unknown. Based on dissociation experiments, it was suggested that
+   allophycocyanin does not form hexamers ([108]27), because almost all
+   the residues involved in the trimer-trimer aggregation in C-PC-AQ and
+   C-PC-FR hexamers are not conserved in APC. Similar conclusions were
+   reported later ([109]6, [110]9). In the APC-PY hexamer, all the
+   interactions involved in the formation of C-PC-AQ and C-PC-FR hexamers
+   and all the conserved polar and charged interactions in C-PC-FR and
+   R-PE-PU hexamers are not present, but APC-PY can still associate face
+   to face to form a hexamer, which is maintained by some polar and
+   charged interactions, different from those in C-PC-FR and R-PE-PU.
+   Because the distances of chromophores between the two trimers in this
+   hexamer are also adequate for effective energy transfer, we assume that
+   the loose hexamer may represent the basic unit of APC in physiological
+   conditions. It is possible that linker proteins may help to stabilize
+   the loose hexamers.
+   [111]Previous Section[112]Next Section
+
+ §2§ ACKNOWLEDGEMENT §2§
+
+   We thank Professor Lu-Lu Gui, Institute of Biophysics, Chinese Academy
+   of Sciences and Professor You-Shang Zhang, Institute of Biochemistry,
+   Chinese Academy of Sciences for their support and concern.
+   [113]Previous Section[114]Next Section
+
+ §2§ Footnotes §2§
+
+     * [115]&#x21b5;* This work was supported by Chinese Academy of Sciences
+       (KJ85-04-40) and the National Natural Science Foundation of China
+       (39630090).The costs of publication of this article were defrayed
+       in part by the payment of page charges. The article must therefore
+       be hereby marked “advertisement” in accordance with 18 U.S.C.
+       Section 1734 solely to indicate this fact.
+     * [116]&#x21b5;‡ To whom correspondence should be addressed: National
+       Laboratory of Biomacromolecules, Institute of Biophysics, Chinese
+       Academy of Sciences, 15 Datun Rd., Chaoyang District, Beijing
+       100101, China. Tel.: 86-10-64889867; Fax: 86-10-64889867;
+       E-mail:dcliang{at}sun5.ibp.ac.cn.
+     * Abbreviations:
+
+        PE
+                phycoerythrin
+
+        APC
+                allophycocyanin
+
+        PC
+                phycocyanin
+
+        C-PC
+                C-phycocyanin
+
+        PEC
+                phycoerythrocyanin
+
+        APC-PY
+                allophycocyanin from P. yezoensis
+
+        APC-SP
+                APC from S. platensis
+
+        C-PC-AQ
+                C-PC from A. quadruplaticum
+
+        C-PC-FR
+                C-PC from F. diplosiphon
+
+        R-PE-PU
+                R-PE from Polysiphonia urceolata
+
+        PCB
+                phycocyanobilin
+
+        &#x3b1;
+                1&#x3b2;, 2&#x3b1;, 2&#x3b2;, &#x2009;… 6&#x3b2; stand for the individual subunits of
+                different monomers within the hexamer (according to
+                Schirmer et al. ([117]6))
+
+        r.m.s.
+                root mean square
+
+     *
+          + Received December 16, 1998.
+          + Revision received March 31, 1999.
+     * The American Society for Biochemistry and Molecular Biology, Inc.
+
+   [118]Previous Section
+
+ §2§ REFERENCES §2§
+
+    1. [119]&#x21b5;
+         1. Glazer A. N.
+       (1984) Biochim. Biophys. Acta 768:29–51.
+    2. [120]&#x21b5;
+         1. Ficner R.,
+         2. Huber R.
+       (1992) Eur. J. Biochem. 218:103–106.
+       [121]Medline
+    3. [122]&#x21b5;
+         1. Ficner R.,
+         2. Lobeck K.,
+         3. Schimdt G.,
+         4. Huber R.
+       (1992) J. Mol. Biol. 228:935–950.
+       [123]CrossRef[124]Medline
+    4. [125]&#x21b5;
+         1. Chang W. R.,
+         2. Jiang T.,
+         3. Wan Z. L.,
+         4. Zhang J. P.,
+         5. Yang Z. X.,
+         6. Liang D. C.
+       (1996) J. Mol. Biol. 262:721–731.
+       [126]CrossRef[127]Medline
+    5. [128]&#x21b5;
+         1. Schirmer T.,
+         2. Bode W.,
+         3. Huber R.,
+         4. Sidler W.,
+         5. Zuber H.
+       (1985) J. Mol. Biol. 184:257–277.
+       [129]CrossRef[130]Medline[131]Web of Science
+    6. [132]&#x21b5;
+         1. Schirmer T.,
+         2. Huber R.,
+         3. Schneider M.,
+         4. Bode W.,
+         5. Miller M.,
+         6. Hackert M. L.
+       (1986) J. Mol. Biol. 188:651–676.
+       [133]CrossRef[134]Medline
+    7. [135]&#x21b5;
+         1. Duerring M.,
+         2. Schmidt G. B.,
+         3. Huber R.
+       (1991) J. Mol. Biol. 217:577–592.
+       [136]CrossRef[137]Medline[138]Web of Science
+    8. [139]&#x21b5;
+         1. Duerring M.,
+         2. Huber R.,
+         3. Bode W.,
+         4. Ruembeli R.,
+         5. Zuber H.
+       (1990) J. Mol. Biol. 211:633–644.
+       [140]CrossRef[141]Medline[142]Web of Science
+    9. [143]&#x21b5;
+         1. Brejc K.,
+         2. Ficner R.,
+         3. Huber R.,
+         4. Steinbacher S.
+       (1995) J. Mol. Biol. 249:424–440.
+       [144]CrossRef[145]Medline[146]Web of Science
+   10. [147]&#x21b5;
+         1. Csatorday K.,
+         2. MacColl R.,
+         3. Csizmadia V.
+       (1984) Biochemistry 23:6466–6470.
+       [148]CrossRef[149]Medline
+   11. [150]&#x21b5;
+         1. Liu J. Y.,
+         2. Zhang J. P.,
+         3. Wan Z. L.,
+         4. Liang D. C.,
+         5. Zhang J. P.,
+         6. Wu H. J.
+       (1998) Acta Crystallogr. Sec. D 54:662–664.
+       [151]CrossRef[152]Medline
+   12. [153]&#x21b5;
+         1. Navaza J.
+       (1994) Acta Crystallogr. Sec. A 50:157–163.
+       [154]CrossRef[155]Web of Science
+   13. [156]&#x21b5;
+         1. Brünger A.
+       (1990) XPLOR, Version 2.1 (Yale University, New Haven, CN).
+   14. [157]&#x21b5;
+         1. Minami Y.,
+         2. Yamada F.,
+         3. Hase T.,
+         4. Matsubara H.,
+         5. Murakami A.,
+         6. Fujita Y.,
+         7. Takao T.,
+         8. Shimonishi T.
+       (1985) FEBS Lett. 191:216–220.
+       [158]CrossRef
+   15. [159]&#x21b5;
+         1. Houmard J.,
+         2. Capuano V.,
+         3. Coursin T.,
+         4. Tandeau de Marsac N.
+       (1988b) J. Bacteriol. 170:5515–5521.
+   16. [160]&#x21b5;
+         1. Sidler W.,
+         2. Gysi J.,
+         3. Isker E.,
+         4. Zuber H.
+       (1981) Hoppe-Seyler’s Z. Physiol. Chem. 362:611–628.
+       [161]Medline
+   17. [162]&#x21b5;
+         1. Houmard J.,
+         2. Mazel D.,
+         3. Moquet C.,
+         4. Bryant D. A.,
+         5. Tandeau de Marsac N.
+       (1986) Mol. Gen. Genet. 205:404–410.
+       [163]CrossRef[164]Medline
+   18. [165]&#x21b5;
+         1. Apt K. E.,
+         2. Grossman A. R.
+       (1993) Plant Mol. Biol. 21:27–38.
+       [166]CrossRef[167]Medline
+   19. [168]&#x21b5;
+         1. Offner G. D.,
+         2. Troxler R. F.
+       (1983) J. Biol. Chem. 258:9931–9940.
+       [169]Abstract/FREE Full Text
+   20. [170]&#x21b5;
+         1. Luzzati P. V.
+       (1952) Acta Crystallogr. 5:802–810.
+       [171]CrossRef
+   21. [172]&#x21b5;
+         1. Ramachandran G. N.,
+         2. Sasisekharan V.
+       (1968) Adv. Protein Chem. 23:283–291.
+       [173]Medline
+   22. [174]&#x21b5;
+         1. Karshikov A.,
+         2. Duerring M.,
+         3. Huber R.
+       (1991) Protein Eng. 4:681–690.
+       [175]Abstract/FREE Full Text
+   23. [176]&#x21b5;
+         1. Dexter D. L.
+       (1953) J. Chem. Phys. 21:836–850.
+       [177]CrossRef
+   24. [178]&#x21b5;
+       Förster, T. (1965) in Modern Quantum Chemistry(Sinanoglu, O., ed)
+       Part III, pp. 93–137, Academic Press, New York.
+   25. [179]&#x21b5;
+         1. Jiang T.,
+         2. Zhang J. P.,
+         3. Liang D. C.
+       (1999) Proteins Struct. Funct. Genet. 34:224–231.
+       [180]CrossRef[181]Medline
+   26. [182]&#x21b5;
+         1. Schirmer T.,
+         2. Border W.,
+         3. Huber R.
+       (1987) J. Mol. Biol. 196:677–695.
+       [183]CrossRef[184]Medline[185]Web of Science
+   27. [186]&#x21b5;
+         1. MacColl R.
+       (1983) Arch. Biochem. Biophys. 223:24–32.
+       [187]CrossRef[188]Medline
+
+     * [189]Add to CiteULike CiteULike
+     * [190]Add to Complore Complore
+     * [191]Add to Connotea Connotea
+     * [192]Add to Del.icio.us Del.icio.us
+     * [193]Add to Digg Digg
+
+   [194]What's this?
+   [195]« Previous | [196]Next Article »[197]Table of Contents
+
+ §3§ This Article §3§
+
+    1. doi: 10.1074/jbc.274.24.16945 June 11, 1999 The Journal of
+       Biological Chemistry, 274, 16945-16952.
+
+    1. [198]AbstractFree
+    2. » Full TextFree
+    3. [199]Full Text (PDF)Free
+
+ §4§ Classifications §4§
+
+    1.
+          + [200]PROTEIN CHEMISTRY AND STRUCTURE
+
+ §4§ Services §4§
+
+    1. [201]Email this article to a friend
+    2. [202]Alert me when this article is cited
+    3. [203]Alert me if a correction is posted
+    4. [204]Alert me when eletters are published
+    5. [205]Similar articles in this journal
+    6. [206]Similar articles in Web of Science
+    7. [207]Similar articles in PubMed
+    8. [208]Download to citation manager
+    9. [209]Request Permissions
+
+ §4§ Responses §4§
+
+    1. [210]Submit a Letter to the Editor
+
+ §4§ Citing Articles §4§
+
+    1. [211]Load citing article information
+    2. [212]Citing articles via Web of Science
+    3. [213]Citing articles via Google Scholar
+
+ §4§ Google Scholar §4§
+
+    1. [214]Articles by Liu, J.
+    2. [215]Articles by Liang, D.
+    3. [216]Search for related content
+
+ §4§ PubMed §4§
+
+    1. [217]PubMed citation
+    2. [218]Articles by Liu, J.
+    3. [219]Articles by Liang, D.
+    4.
+
+ §4§ Related Content §4§
+
+    1. [220]Load related web page information
+
+ §4§ Social Bookmarking §4§
+
+    1.
+          + [221]Add to CiteULike CiteULike
+          + [222]Add to Complore Complore
+          + [223]Add to Connotea Connotea
+          + [224]Add to Del.icio.us Del.icio.us
+          + [225]Add to Digg Digg
+       [226]What's this?
+
+ §3§ Navigate This Article §3§
+
+    1. [227]Top
+    2. [228]Abstract
+    3. [229]EXPERIMENTAL PROCEDURES
+    4. [230]RESULTS AND DISCUSSION
+    5. [231]ACKNOWLEDGEMENT
+    6. [232]Footnotes
+    7. [233]REFERENCES
+
+ §3§ This Week's Issue §3§
+
+    1. [234]September 24, 2010, 285 (39)
+
+    1. [235]Current Issue
+
+    1. [236]Alert me to new issues of JBC
+
+     * [237]Authors
+     * [238]Submit
+     * [239]Subscribers
+     * [240]Editorial Board
+     * [241]RSS and Email Alerts
+     * [242]Article Statistics
+     * [243]Teaching Tools
+     * [244]Copyright Permissions
+     * [245]Advertise
+     * [246]Contact JBC
+
+     * Advertisement
+     * Advertisement
+
+   Copyright © 2010 by [247]American Society for Biochemistry and
+   Molecular Biology
+
+   [248]Alternate route to the JBC: http://intl.jbc.org
+
+   [249]Contact JBC | [250]Help Pages
+     * [251]asbmb_today_logo
+     * [252]jlr_logo
+     * [253]mcp_logo
+
+     * Print ISSN 0021-9258
+     * Online ISSN 1083-351X
+
+   Advertisement
+   Advertisement
+     * [254]ASBMB Membership: Find out what ASBMB can do for YOU!
+
+References
+
+   Visible links
+   1. http://www.jbc.org/
+   2. file://localhost/dev/paper.html#content-block
+   3. http://www.jbc.org/
+   4. http://www.jbc.org/content/current
+   5. http://www.jbc.org/content/by/year
+   6. http://www.jbc.org/content/early/recent/0
+   7. http://www.jbc.org/content/by/section/Minireviews
+   8. http://www.jbc.org/content/by/section/Classics
+   9. http://www.jbc.org/content/by/section/Reflections
+  10. http://www.jbc.org/potw
+  11. http://www.jbc.org/search
+  12. http://www.jbc.org/content/by/year
+  13. http://www.jbc.org/login?uri=http%3A%2F%2Fwww.jbc.org%2Fcontent%2F274%2F24%2F16945.long
+  14. http://www.jbc.org/cgi/adclick/?ad=21365&adclick=true&url=http%3A%2F%2Fwww.jbc.org%2Fcgi%2Fbrowserellinks
+  15. file://localhost/dev/paper.html#fn-1
+  16. http://www.jbc.org/search?author1=Jin-Yu+Liu&sortspec=date&submit=Submit
+  17. http://www.jbc.org/search?author1=Tao+Jiang&sortspec=date&submit=Submit
+  18. http://www.jbc.org/search?author1=Ji-Ping+Zhang&sortspec=date&submit=Submit
+  19. http://www.jbc.org/search?author1=Dong-Cai+Liang&sortspec=date&submit=Submit
+  20. file://localhost/dev/paper.html#fn-2
+  21. file://localhost/dev/paper.html#sec-1
+  22. file://localhost/dev/paper.html#ref-1
+  23. file://localhost/dev/paper.html#ref-2
+  24. file://localhost/dev/paper.html#ref-5
+  25. file://localhost/dev/paper.html#ref-8
+  26. file://localhost/dev/paper.html#ref-9
+  27. file://localhost/dev/paper.html#ref-10
+  28. file://localhost/dev/paper.html#ref-9
+  29. file://localhost/dev/paper.html#abstract-1
+  30. file://localhost/dev/paper.html#sec-2
+  31. file://localhost/dev/paper.html#ref-11
+  32. file://localhost/dev/paper.html#ref-12
+  33. file://localhost/dev/paper.html#ref-13
+  34. file://localhost/dev/paper.html#sec-1
+  35. file://localhost/dev/paper.html#ack-1
+  36. file://localhost/dev/paper.html#ref-14
+  37. file://localhost/dev/paper.html#ref-15
+  38. file://localhost/dev/paper.html#ref-16
+  39. file://localhost/dev/paper.html#ref-17
+  40. file://localhost/dev/paper.html#ref-18
+  41. file://localhost/dev/paper.html#ref-19
+  42. file://localhost/dev/paper.html#T1
+  43. http://www.jbc.org/content/274/24/16945/T1.expansion.html
+  44. http://www.jbc.org/content/274/24/16945/T1.expansion.html
+  45. file://localhost/dev/paper.html#ref-20
+  46. file://localhost/dev/paper.html#T2
+  47. file://localhost/dev/paper.html#F1
+  48. file://localhost/dev/paper.html#ref-21
+  49. file://localhost/dev/paper.html#T1
+  50. file://localhost/dev/paper.html#ref-9
+  51. file://localhost/dev/paper.html#F2
+  52. http://www.jbc.org/content/274/24/16945/T2.expansion.html
+  53. http://www.jbc.org/content/274/24/16945/T2.expansion.html
+  54. http://www.jbc.org/content/274/24/16945/F1.expansion.html
+  55. http://www.jbc.org/content/274/24/16945/F1.expansion.html
+  56. http://www.jbc.org/content/274/24/16945/F1.expansion.html
+  57. http://www.jbc.org/powerpoint/274/24/16945/F1
+  58. http://www.jbc.org/content/274/24/16945/F2.expansion.html
+  59. http://www.jbc.org/content/274/24/16945/F2.expansion.html
+  60. http://www.jbc.org/content/274/24/16945/F2.expansion.html
+  61. http://www.jbc.org/powerpoint/274/24/16945/F2
+  62. file://localhost/dev/paper.html#T3
+  63. http://www.jbc.org/content/274/24/16945/T3.expansion.html
+  64. http://www.jbc.org/content/274/24/16945/T3.expansion.html
+  65. file://localhost/dev/paper.html#F3
+  66. http://www.jbc.org/content/274/24/16945/F3.expansion.html
+  67. http://www.jbc.org/content/274/24/16945/F3.expansion.html
+  68. http://www.jbc.org/content/274/24/16945/F3.expansion.html
+  69. http://www.jbc.org/powerpoint/274/24/16945/F3
+  70. file://localhost/dev/paper.html#F4
+  71. file://localhost/dev/paper.html#F4
+  72. file://localhost/dev/paper.html#ref-9
+  73. http://www.jbc.org/content/274/24/16945/F4.expansion.html
+  74. http://www.jbc.org/content/274/24/16945/F4.expansion.html
+  75. http://www.jbc.org/content/274/24/16945/F4.expansion.html
+  76. http://www.jbc.org/powerpoint/274/24/16945/F4
+  77. file://localhost/dev/paper.html#ref-6
+  78. file://localhost/dev/paper.html#ref-22
+  79. file://localhost/dev/paper.html#ref-6
+  80. file://localhost/dev/paper.html#F5
+  81. file://localhost/dev/paper.html#F6
+  82. file://localhost/dev/paper.html#T4
+  83. http://www.jbc.org/content/274/24/16945/F5.expansion.html
+  84. http://www.jbc.org/content/274/24/16945/F5.expansion.html
+  85. http://www.jbc.org/content/274/24/16945/F5.expansion.html
+  86. http://www.jbc.org/powerpoint/274/24/16945/F5
+  87. http://www.jbc.org/content/274/24/16945/F6.expansion.html
+  88. http://www.jbc.org/content/274/24/16945/F6.expansion.html
+  89. http://www.jbc.org/content/274/24/16945/F6.expansion.html
+  90. http://www.jbc.org/powerpoint/274/24/16945/F6
+  91. http://www.jbc.org/content/274/24/16945/T4.expansion.html
+  92. http://www.jbc.org/content/274/24/16945/T4.expansion.html
+  93. file://localhost/dev/paper.html#F7
+  94. file://localhost/dev/paper.html#ref-23
+  95. file://localhost/dev/paper.html#ref-24
+  96. http://www.jbc.org/content/274/24/16945/F7.expansion.html
+  97. http://www.jbc.org/content/274/24/16945/F7.expansion.html
+  98. http://www.jbc.org/content/274/24/16945/F7.expansion.html
+  99. http://www.jbc.org/powerpoint/274/24/16945/F7
+ 100. file://localhost/dev/paper.html#T4
+ 101. file://localhost/dev/paper.html#ref-25
+ 102. file://localhost/dev/paper.html#ref-26
+ 103. file://localhost/dev/paper.html#F8
+ 104. http://www.jbc.org/content/274/24/16945/F8.expansion.html
+ 105. http://www.jbc.org/content/274/24/16945/F8.expansion.html
+ 106. http://www.jbc.org/content/274/24/16945/F8.expansion.html
+ 107. http://www.jbc.org/powerpoint/274/24/16945/F8
+ 108. file://localhost/dev/paper.html#ref-27
+ 109. file://localhost/dev/paper.html#ref-6
+ 110. file://localhost/dev/paper.html#ref-9
+ 111. file://localhost/dev/paper.html#sec-2
+ 112. file://localhost/dev/paper.html#fn-group-1
+ 113. file://localhost/dev/paper.html#ack-1
+ 114. file://localhost/dev/paper.html#ref-list-1
+ 115. file://localhost/dev/paper.html#xref-fn-1-1
+ 116. file://localhost/dev/paper.html#xref-fn-2-1
+ 117. file://localhost/dev/paper.html#ref-6
+ 118. file://localhost/dev/paper.html#fn-group-1
+ 119. file://localhost/dev/paper.html#xref-ref-1-1
+ 120. file://localhost/dev/paper.html#xref-ref-2-1
+ 121. http://www.jbc.org/external-ref?access_num=8243457&link_type=MED
+ 122. file://localhost/dev/paper.html#xref-ref-2-1
+ 123. http://www.jbc.org/external-ref?access_num=10.1016/0022-2836(92)90876-L&link_type=DOI
+ 124. http://www.jbc.org/external-ref?access_num=1469725&link_type=MED
+ 125. file://localhost/dev/paper.html#xref-ref-2-1
+ 126. http://www.jbc.org/external-ref?access_num=10.1006/jmbi.1996.0547&link_type=DOI
+ 127. http://www.jbc.org/external-ref?access_num=8876649&link_type=MED
+ 128. file://localhost/dev/paper.html#xref-ref-5-1
+ 129. http://www.jbc.org/external-ref?access_num=10.1016/0022-2836(85)90379-1&link_type=DOI
+ 130. http://www.jbc.org/external-ref?access_num=3928897&link_type=MED
+ 131. http://www.jbc.org/external-ref?access_num=A1985AMS4300008&link_type=ISI
+ 132. file://localhost/dev/paper.html#xref-ref-5-1
+ 133. http://www.jbc.org/external-ref?access_num=10.1016/S0022-2836(86)80013-4&link_type=DOI
+ 134. http://www.jbc.org/external-ref?access_num=3090271&link_type=MED
+ 135. file://localhost/dev/paper.html#xref-ref-5-1
+ 136. http://www.jbc.org/external-ref?access_num=10.1016/0022-2836(91)90759-Y&link_type=DOI
+ 137. http://www.jbc.org/external-ref?access_num=1899708&link_type=MED
+ 138. http://www.jbc.org/external-ref?access_num=A1991EZ03400018&link_type=ISI
+ 139. file://localhost/dev/paper.html#xref-ref-8-1
+ 140. http://www.jbc.org/external-ref?access_num=10.1016/0022-2836(90)90270-V&link_type=DOI
+ 141. http://www.jbc.org/external-ref?access_num=2106585&link_type=MED
+ 142. http://www.jbc.org/external-ref?access_num=A1990CR81900010&link_type=ISI
+ 143. file://localhost/dev/paper.html#xref-ref-9-1
+ 144. http://www.jbc.org/external-ref?access_num=10.1006/jmbi.1995.0307&link_type=DOI
+ 145. http://www.jbc.org/external-ref?access_num=7783202&link_type=MED
+ 146. http://www.jbc.org/external-ref?access_num=A1995RB61600017&link_type=ISI
+ 147. file://localhost/dev/paper.html#xref-ref-10-1
+ 148. http://www.jbc.org/external-ref?access_num=10.1021/bi00321a029&link_type=DOI
+ 149. http://www.jbc.org/external-ref?access_num=6529563&link_type=MED
+ 150. file://localhost/dev/paper.html#xref-ref-11-1
+ 151. http://www.jbc.org/external-ref?access_num=10.1107/S0907444997017824&link_type=DOI
+ 152. http://www.jbc.org/external-ref?access_num=9761868&link_type=MED
+ 153. file://localhost/dev/paper.html#xref-ref-12-1
+ 154. http://www.jbc.org/external-ref?access_num=10.1107/S0108767393007597&link_type=DOI
+ 155. http://www.jbc.org/external-ref?access_num=A1994NG58500001&link_type=ISI
+ 156. file://localhost/dev/paper.html#xref-ref-13-1
+ 157. file://localhost/dev/paper.html#xref-ref-14-1
+ 158. http://www.jbc.org/external-ref?access_num=10.1016/0014-5793(85)80011-9&link_type=DOI
+ 159. file://localhost/dev/paper.html#xref-ref-15-1
+ 160. file://localhost/dev/paper.html#xref-ref-16-1
+ 161. http://www.jbc.org/external-ref?access_num=6792029&link_type=MED
+ 162. file://localhost/dev/paper.html#xref-ref-17-1
+ 163. http://www.jbc.org/external-ref?access_num=10.1007/BF00338074&link_type=DOI
+ 164. http://www.jbc.org/external-ref?access_num=3031427&link_type=MED
+ 165. file://localhost/dev/paper.html#xref-ref-18-1
+ 166. http://www.jbc.org/external-ref?access_num=10.1007/BF00039615&link_type=DOI
+ 167. http://www.jbc.org/external-ref?access_num=7678762&link_type=MED
+ 168. file://localhost/dev/paper.html#xref-ref-19-1
+ 169. http://www.jbc.org/cgi/ijlink?linkType=ABST&journalCode=jbc&resid=258/16/9931
+ 170. file://localhost/dev/paper.html#xref-ref-20-1
+ 171. http://www.jbc.org/external-ref?access_num=10.1107/S0365110X52002161&link_type=DOI
+ 172. file://localhost/dev/paper.html#xref-ref-21-1
+ 173. http://www.jbc.org/external-ref?access_num=4882249&link_type=MED
+ 174. file://localhost/dev/paper.html#xref-ref-22-1
+ 175. http://www.jbc.org/cgi/ijlink?linkType=ABST&journalCode=proeng&resid=4/6/681
+ 176. file://localhost/dev/paper.html#xref-ref-23-1
+ 177. http://www.jbc.org/external-ref?access_num=10.1063/1.1699044&link_type=DOI
+ 178. file://localhost/dev/paper.html#xref-ref-24-1
+ 179. file://localhost/dev/paper.html#xref-ref-25-1
+ 180. http://www.jbc.org/external-ref?access_num=10.1002/(SICI)1097-0134(19990201)34:2%3C224::AID-PROT8%3E3.0.CO;2-D&link_type=DOI
+ 181. http://www.jbc.org/external-ref?access_num=10022358&link_type=MED
+ 182. file://localhost/dev/paper.html#xref-ref-26-1
+ 183. http://www.jbc.org/external-ref?access_num=10.1016/0022-2836(87)90040-4&link_type=DOI
+ 184. http://www.jbc.org/external-ref?access_num=3119857&link_type=MED
+ 185. http://www.jbc.org/external-ref?access_num=A1987J731500018&link_type=ISI
+ 186. file://localhost/dev/paper.html#xref-ref-27-1
+ 187. http://www.jbc.org/external-ref?access_num=10.1016/0003-9861(83)90567-2&link_type=DOI
+ 188. http://www.jbc.org/external-ref?access_num=6407396&link_type=MED
+ 189. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/274/24/16945&title=Crystal%20Structure%20of%20Allophycocyanin%20from%20Red%20AlgaePorphyra%20yezoensis%20at%202.2-%C3%85%20Resolution+--+Liu%20et%20al.%20274%20%2824%29%3A%2016945+--+JBC&doi=10.1074/jbc.274.24.16945&link_type=CITEULIKE
+ 190. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/274/24/16945&title=Crystal%20Structure%20of%20Allophycocyanin%20from%20Red%20AlgaePorphyra%20yezoensis%20at%202.2-%C3%85%20Resolution+--+Liu%20et%20al.%20274%20%2824%29%3A%2016945+--+JBC&doi=10.1074/jbc.274.24.16945&link_type=COMPLORE
+ 191. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/274/24/16945&title=Crystal%20Structure%20of%20Allophycocyanin%20from%20Red%20AlgaePorphyra%20yezoensis%20at%202.2-%C3%85%20Resolution+--+Liu%20et%20al.%20274%20%2824%29%3A%2016945+--+JBC&doi=10.1074/jbc.274.24.16945&link_type=CONNOTEA
+ 192. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/274/24/16945&title=Crystal%20Structure%20of%20Allophycocyanin%20from%20Red%20AlgaePorphyra%20yezoensis%20at%202.2-%C3%85%20Resolution+--+Liu%20et%20al.%20274%20%2824%29%3A%2016945+--+JBC&doi=10.1074/jbc.274.24.16945&link_type=DEL_ICIO_US
+ 193. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/274/24/16945&title=Crystal%20Structure%20of%20Allophycocyanin%20from%20Red%20AlgaePorphyra%20yezoensis%20at%202.2-%C3%85%20Resolution+--+Liu%20et%20al.%20274%20%2824%29%3A%2016945+--+JBC&doi=10.1074/jbc.274.24.16945&link_type=DIGG
+ 194. http://www.jbc.org/help/social_bookmarks.dtl
+ 195. http://www.jbc.org/content/274/24/16940.short
+ 196. http://www.jbc.org/content/274/24/16953.short
+ 197. http://www.jbc.org/content/274/24.toc
+ 198. http://www.jbc.org/content/274/24/16945.abstract
+ 199. http://www.jbc.org/content/274/24/16945.full.pdf+html
+ 200. http://www.jbc.org/search?tocsectionid=PROTEIN+CHEMISTRY+AND+STRUCTURE&sortspec=date&submit=Submit
+ 201. http://www.jbc.org/email?gca=jbc;274/24/16945&current-view-path=/content/274/24/16945.long
+ 202. http://www.jbc.org/cgi/alerts/ctalert?alertType=citedby&addAlert=cited_by&cited_by_criteria_resid=jbc;274/24/16945&saveAlert=no&return-type=article&return_url=http://www.jbc.org/content/274/24/16945.long
+ 203. http://www.jbc.org/cgi/alerts/ctalert?alertType=correction&addAlert=correction&correction_criteria_value=274/24/16945&saveAlert=no&return-type=article&return_url=http://www.jbc.org/content/274/24/16945.long
+ 204. http://www.jbc.org/cgi/alerts/ctalert?alertType=eletter&addAlert=eletter&eletter_criteria_value=274/24/16945&saveAlert=no&return-type=article&return_url=http://www.jbc.org/content/274/24/16945.long
+ 205. http://www.jbc.org/search?qbe=jbc;274/24/16945&citation=Liu%20et%20al.%20274%20%2824%29:%2016945&submit=yes
+ 206. http://www.jbc.org/external-ref?access_num=jbc%3B274%2F24%2F16945&link_type=ISI_RELATEDRECORDS
+ 207. http://www.jbc.org/external-ref?access_num=10358042&link_type=MED_NBRS
+ 208. http://www.jbc.org/citmgr?gca=jbc;274/24/16945
+ 209. https://s100.copyright.com/AppDispatchServlet?publisherName=ASBMB&publication=jbc&title=Crystal%20Structure%20of%20Allophycocyanin%20from%20Red%20AlgaePorphyra%20yezoensis%20at%202.2-%C3%85%20Resolution&publicationDate=06/11/1999&author=Jin-Yu%20Liu,%20Tao%20Jiang,%20Ji-Ping%20Zhang,%20Dong-Cai%20Liang&startPage=16945&contentID=10.1074/jbc.274.24.16945&orderBeanReset=true&endPage=16952&volumeNum=274&issueNum=24
+ 210. http://www.jbc.org/letters/submit/jbc;274/24/16945
+ 211. http://www.jbc.org/content/274/24/16945.long?cited-by=yes&legid=jbc;274/24/16945#cited-by
+ 212. http://www.jbc.org/external-ref?access_num=jbc%3B274%2F24%2F16945&link_type=ISI_CITING
+ 213. http://www.jbc.org/external-ref?access_num=http://www.jbc.org/cgi/content/abstract/274/24/16945&link_type=GOOGLESCHOLAR
+ 214. http://scholar.google.com/scholar?q=%22author%3ALiu%20author%3AJ.%22
+ 215. http://scholar.google.com/scholar?q=%22author%3ALiang%20author%3AD.%22
+ 216. http://www.jbc.org/external-ref?access_num=http://www.jbc.org/cgi/content/abstract/274/24/16945&link_type=GOOGLESCHOLARRELATED
+ 217. http://www.jbc.org/external-ref?access_num=10358042&link_type=PUBMED
+ 218. http://www.jbc.org/external-ref?access_num=Liu%20J&link_type=AUTHORSEARCH
+ 219. http://www.jbc.org/external-ref?access_num=Liang%20D&link_type=AUTHORSEARCH
+ 220. http://www.jbc.org/content/274/24/16945.long?related-urls=yes&legid=jbc;274/24/16945#related-urls
+ 221. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/274/24/16945&title=Crystal%20Structure%20of%20Allophycocyanin%20from%20Red%20AlgaePorphyra%20yezoensis%20at%202.2-%C3%85%20Resolution+--+Liu%20et%20al.%20274%20%2824%29%3A%2016945+--+JBC&doi=10.1074/jbc.274.24.16945&link_type=CITEULIKE
+ 222. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/274/24/16945&title=Crystal%20Structure%20of%20Allophycocyanin%20from%20Red%20AlgaePorphyra%20yezoensis%20at%202.2-%C3%85%20Resolution+--+Liu%20et%20al.%20274%20%2824%29%3A%2016945+--+JBC&doi=10.1074/jbc.274.24.16945&link_type=COMPLORE
+ 223. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/274/24/16945&title=Crystal%20Structure%20of%20Allophycocyanin%20from%20Red%20AlgaePorphyra%20yezoensis%20at%202.2-%C3%85%20Resolution+--+Liu%20et%20al.%20274%20%2824%29%3A%2016945+--+JBC&doi=10.1074/jbc.274.24.16945&link_type=CONNOTEA
+ 224. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/274/24/16945&title=Crystal%20Structure%20of%20Allophycocyanin%20from%20Red%20AlgaePorphyra%20yezoensis%20at%202.2-%C3%85%20Resolution+--+Liu%20et%20al.%20274%20%2824%29%3A%2016945+--+JBC&doi=10.1074/jbc.274.24.16945&link_type=DEL_ICIO_US
+ 225. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/274/24/16945&title=Crystal%20Structure%20of%20Allophycocyanin%20from%20Red%20AlgaePorphyra%20yezoensis%20at%202.2-%C3%85%20Resolution+--+Liu%20et%20al.%20274%20%2824%29%3A%2016945+--+JBC&doi=10.1074/jbc.274.24.16945&link_type=DIGG
+ 226. http://www.jbc.org/help/social_bookmarks.dtl
+ 227. file://localhost/dev/paper.html#content-block
+ 228. file://localhost/dev/paper.html#abstract-1
+ 229. file://localhost/dev/paper.html#sec-1
+ 230. file://localhost/dev/paper.html#sec-2
+ 231. file://localhost/dev/paper.html#ack-1
+ 232. file://localhost/dev/paper.html#fn-group-1
+ 233. file://localhost/dev/paper.html#ref-list-1
+ 234. http://www.jbc.org/content/current
+ 235. http://www.jbc.org/content/current
+ 236. http://www.jbc.org/cgi/alerts/etoc
+ 237. http://www.jbc.org/misc/itoa.xhtml
+ 238. http://submit.jbc.org/
+ 239. http://www.jbc.org/subscriptions/
+ 240. http://submit.jbc.org/journals/jbc/forms/editors.dtl
+ 241. http://www.jbc.org/site/home/about/rss_alerts.xhtml
+ 242. http://www.jbc.org/site/home/about/article_stats.xhtml
+ 243. http://www.jbc.org/site/home/teaching_tools/
+ 244. http://www.jbc.org/site/misc/Copyright_Permission.xhtml
+ 245. http://www.asbmb.org/uploadedFiles/Publications/2009ASBMBJournalsMediaKit.pdf
+ 246. http://www.jbc.org/cgi/feedback
+ 247. http://www.asbmb.org/
+ 248. http://intl.jbc.org/
+ 249. http://www.jbc.org/cgi/feedback
+ 250. http://www.jbc.org/help/
+ 251. http://www.asbmb.org/page.aspx?id=218
+ 252. http://www.jlr.org/
+ 253. http://mcponline.org/
+ 254. http://www.jbc.org/cgi/adclick/?ad=21401&adclick=true&url=http%3A%2F%2Fwww.asbmb.org%2Fmembership
+
+   Hidden links:
+ 255. http://www.jbc.org/entrez-links/10358042

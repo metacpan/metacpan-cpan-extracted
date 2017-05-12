@@ -1,0 +1,52 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 3e805f957e3527ede9cacfba9794d00dfed4d64f Build.PL
+SHA1 3190e70495f4e09e8769204cb45c347fe0b56ff7 Changes
+SHA1 f939988925f19fecc806b85f1e4d752dc9d46a6e LICENSE
+SHA1 5ea66829080a41b80bb38b37e77a315b6f229135 MANIFEST
+SHA1 a1dbf257177f9f76372ac111f127bc34f4f3fb24 MANIFEST.SKIP
+SHA1 9222e25377dbd48230c571fea5f046dd81aa9b63 META.yml
+SHA1 f0f5a568f04a9c861d9d813909840043e441f401 Makefile.PL
+SHA1 1cdc1d3e68af75a171c29cd5a16dfbe6c1802ecb README
+SHA1 60c780705689c68349bdf7af5507b6937d6c078e eg/verbose_warn.pl
+SHA1 ab06d107c008970094e1db04290adf882f8b4991 eg/warn_catch.pl
+SHA1 1159bc45e74fad73821e3cae02a3835b2df931cb lib/Exception/Warning.pm
+SHA1 44125a66f3fa03bd4c3d0c9bfc6f0202870efeae t/all_tests.t
+SHA1 0989db24b8c0fc7a6dd3b86fc3b862489a6d8d16 t/test.pl
+SHA1 df28eadeecad4db7d571ec92d6d0b21b7206a7ec t/tlib/Exception/WarningTest.pm
+SHA1 59a28644e490c6221256aaabe2fa438761fad45f xt/benchmark.pl
+SHA1 90353a99ac0f719b6f3e58029804d8556cedc2ab xt/check_changes.t
+SHA1 a56d0c02b6c992e04a77d13a6ee89504bd718572 xt/consistent_version_numbers.t
+SHA1 67bb4c141ea95809f3db2d526ce91d9e6d894756 xt/copyright.t
+SHA1 650dccfa9b6f5a98cf731c89041bea8935dbc623 xt/cover.pl
+SHA1 f5aac658ae1888964274e68d179413782082b7ad xt/distribution.t
+SHA1 44147122d52fef90ab3a2c65ebba4f89342174f8 xt/kwalitee.t
+SHA1 e8daa0c73cfc304c240fad2d2c2b1b628175a89d xt/perlcritic.t
+SHA1 bc3447b88eb7e052140f312924a21f366d525131 xt/perlcriticrc
+SHA1 2c579b58def8daec94f41b628ac81c256faaa2b1 xt/pod.t
+SHA1 775b3ac02805b6d703614f42608732fb43af2a41 xt/pod_coverage.t
+SHA1 bef7d46eb5cbc3e67956d4e823ec199f41ab9268 xt/pod_spell.t
+SHA1 1407e4ee3fc642f3a376d576ba60945d47c1d0b0 xt/pod_spellrc
+SHA1 2c579b58def8daec94f41b628ac81c256faaa2b1 xt/pod_syntax.t
+SHA1 a38994922fda6d64e2ee75198fadc464a221fea9 xt/signature.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iEYEARECAAYFAksSyR8ACgkQhMHHe8CxCluvvgCeOrrMTEpsctuBJFZNiITJP+Fw
+w/sAnid0b5JnYDzy3C1frY/G+T9/guzR
+=tdsP
+-----END PGP SIGNATURE-----

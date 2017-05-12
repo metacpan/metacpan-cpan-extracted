@@ -1,0 +1,18 @@
+    <link href="/etlp/stylesheets/calendarview.css" rel="stylesheet" type="text/css" />
+    <script src="/etlp/javascript/calendarview.js" type="text/javascript"></script>
+    <script type="text/javascript">
+      window.onload = function() {
+        Calendar.setup({
+          dateField      : 'minimum_date',
+          dateFormat     :  '%d/%m/%Y',
+          triggerElement : 'but-min-date'
+        });
+        
+        Calendar.setup({
+          dateField      : 'maximum_date',
+          dateFormat     :  '%d/%m/%Y',
+          triggerElement : 'but-max-date'
+        });
+      }
+      
+    </script>

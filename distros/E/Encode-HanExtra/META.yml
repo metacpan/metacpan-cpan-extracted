@@ -1,0 +1,28 @@
+--- 
+abstract: Extra sets of Chinese encodings
+author: Audrey Tang <audreyt@audreyt.org>
+distribution_type: module
+generated_by: Module::Install version 0.67
+license: mit
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: Encode-HanExtra
+no_index: 
+  directory: 
+    - inc
+    - t
+provides: 
+  Encode::HanExtra: 
+    file: lib/Encode/HanExtra.pm
+    version: 0.23
+  Encode::TW::Unisys::SOSI1: 
+    file: lib/Encode/TW/Unisys/SOSI1.pm
+    version: 1.01
+  Encode::TW::Unisys::SOSI2: 
+    file: lib/Encode/TW/Unisys/SOSI2.pm
+    version: 1.01
+requires: 
+  Encode: 1.41
+  perl: 5.7.3
+version: 0.23

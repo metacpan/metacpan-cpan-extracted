@@ -1,0 +1,36 @@
+<?xml version="1.0" standalone="yes" ?>
+
+<SymCLI_ML>
+  <symmetrix id="000782400782">
+    <Devmask_Database_Record director="FA-4B" port="0">
+      <Db_Record originator_port_wwn="10000000c92292e5" awwn_node_name="sample3"
+           awwn_port_name="fchan1">
+        <Devices start_dev="0059" end_dev="00A8"/>
+        <Devices start_dev="0136" end_dev="0138"/>
+      </Db_Record>
+      <Db_Record originator_port_wwn="10000000c9318a5e" awwn_node_name="sample1"
+           awwn_port_name="fcs1">
+        <Devices start_dev="0150" end_dev="0150"/>
+        <Devices start_dev="0153" end_dev="0153"/>
+        <Devices start_dev="015E" end_dev="015E"/>
+        <Devices start_dev="0165" end_dev="0165"/>
+        <Devices start_dev="016C" end_dev="016C"/>
+        <Devices start_dev="0173" end_dev="0173"/>
+      </Db_Record>
+      <Db_Record originator_port_wwn="10000000c9318aa9" awwn_node_name="sample2"
+           awwn_port_name="fcs1">
+        <Devices start_dev="0150" end_dev="0150"/>
+        <Devices start_dev="0153" end_dev="0153"/>
+        <Devices start_dev="015E" end_dev="015E"/>
+        <Devices start_dev="0165" end_dev="0165"/>
+        <Devices start_dev="016C" end_dev="016C"/>
+        <Devices start_dev="0173" end_dev="0173"/>
+      </Db_Record>
+      <Db_Record originator_port_wwn="10000000c9318c71" awwn_node_name="sample2"
+           awwn_port_name="fcs0">
+        <Devices start_dev="01A4" end_dev="01A7"/>
+      </Db_Record>
+    </Devmask_Database_Record>
+  </symmetrix>
+</SymCLI_ML>
+

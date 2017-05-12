@@ -1,0 +1,6 @@
+Revision history for Perl extension Eixo::Queue.
+
+0.01  Mon Feb 16 11:05:40 2015
+	- original version; created by h2xs 1.23 with options
+		-AX Eixo::Queue
+

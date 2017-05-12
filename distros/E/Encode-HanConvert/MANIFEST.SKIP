@@ -1,0 +1,17 @@
+#defaults
+^MANIFEST\.bak$
+^HanConvert\.
+^big5-simp\.ucm$
+^gbk-trad\.ucm$
+^trad-simp\.ucm$
+^simp-trad\.ucm$
+^lib/Encode/HanConvert/Perl\.pm$
+^blib
+^[a-z][a-z]_\d\d
+^t/.*u$
+^Makefile$
+^Makefile\.old$
+^pm_to_blib$
+^\.git
+.*~
+\..*sw.

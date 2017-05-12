@@ -1,0 +1,1138 @@
+   [1]PNAS
+   [2]Proceedings of the National Academy of Sciences of the United States
+   of America
+
+   [3]Skip to main page content
+     * [4]Info for Authors
+     * [5]Editorial Board
+     * [6]About
+     * [7]Subscribe
+     * [8]Advertise
+     * [9]Contact
+     * [10]Feedback
+     * [11]Site Map
+
+     * [12]Keystone Symposia: 2010 Meetings
+     * [13]Sign up for PNAS eTOCs
+     * [14]Science Sessions: PNAS Podcast Program
+
+     * Institution: UNIV COLORADO HLTH SCI CTR
+     * [15]Sign In as Member / Individual
+
+ §1§ Structural evidence for a programmed general base in the active site of
+a catalytic antibody §1§
+
+    1. [16]Béatrice Golinelli-Pimpaneau [17]* , [18]†,
+    2. [19]Olivier Gonçalves [20]‡,
+    3. [21]Thierry Dintinger [22]‡,
+    4. [23]Dominique Blanchard [24]§,
+    5. [25]Marcel Knossow [26]*, and
+    6. [27]Charles Tellier [28]*
+
+    1.
+
+
+    ^*Laboratoire d'Enzymologie et Biochimie Structurales, Centre
+    National de la Recherche Scientifique, Bâtiment 34, 1 Avenue de la
+    Terrasse, 91198 Gif-sur-Yvette Cedex, France; ^‡Centre National de la
+    Recherche Scientifique-Formation de Recherche en Evolution 2230
+    Biocatalyse, Faculté des Sciences et des Techniques, 2 Rue de la
+    Houssinière, B.P. 92208, 44322 Nantes Cedex 03, France; and
+    ^§Laboratoire de Biotechnologie, Etablissement de Transfusion
+    Sanguine, 34 Boulevard Jean Monnet, 44011 Nantes Cedex 01, France
+
+    1. Edited by Richard A. Lerner, The Scripps Research Institute, La
+       Jolla, CA, and approved June 27, 2000 (received for review April
+       24, 2000)
+
+
+   [29]Next Section
+
+ §2§ Abstract §2§
+
+   The crystal structure of the complex of a catalytic antibody with its
+   cationic hapten at 1.9-Å resolution demonstrates that the hapten
+   amidinium group is stabilized through an ionic pair interaction with
+   the carboxylate of a combining-site residue. The location of this
+   carboxylate allows it to act as a general base in an allylic
+   rearrangement. When compared with structures of other antibody
+   complexes in which the positive moiety of the hapten is stabilized
+   mostly by cation–π interactions, this structure shows that the
+   amidinium moiety is a useful candidate to elicit a carboxylate in an
+   antibody combining site at a predetermined location with respect to the
+   hapten. More generally, this structure highlights the advantage of a
+   bidentate hapten for the programmed positioning of a chemically
+   reactive residue in an antibody through charge complementarity to the
+   hapten.
+
+   Allylic rearrangements play a fundamental role in the biosynthesis of
+   terpenes and steroid hormones and in the biodegradation of fatty acids
+   ([30]1). The enzymatic rearrangement of &#x3b2;-&#x3b3; unsaturated ketones
+   requires a general base, usually a carboxylate, to abstract the
+   &#x3b1;-proton of the ketone (Fig. [31]1; refs. [32]1 and [33]2). This
+   reaction leads to a dienol or dienolate high-energy intermediate 3 that
+   does not possess a charge complementing that of the carboxylate.
+   Therefore, antibodies elicited against a hapten that mimics the
+   transition state or the dienol intermediate of allylic rearrangement
+   would acquire a properly positioned general base carboxylate to
+   catalyze this reaction only by serendipity. However, the extensive
+   experience available on catalytic antibodies ([34]3, [35]4) and the
+   structures of catalytic antibodies elicited by transition state
+   analogue haptens show that properly positioned chemically reactive
+   residues are rarely present in the active site ([36]5). An alternative
+   approach that aims to generate functional residues, also termed “bait
+   and switch” ([37]6, [38]7), uses a charged hapten to induce the
+   required complementary charged residue ([39]8, [40]9). Haptens
+   containing a positive charge have provided antibody catalysts for
+   important reactions such as acyl transfer ([41]7), elimination ([42]9,
+   [43]10), and phosphodiester hydrolysis ([44]11). However, in the
+   absence of structural data, it is not possible to establish
+   unambiguously the nature and identity of the catalytic residue that has
+   been induced and the relationship between the location of the haptenic
+   charge and the position of the catalytic residue in the antibody
+   combining site.
+   [45]Figure 1
+   View larger version:
+     * [46]In this window
+     * [47]In a new window
+
+     * [48]Download as PowerPoint Slide
+
+   Figure 1
+
+   Scheme of the reaction catalyzed by antibody 4B2. 4B2 catalyzes allylic
+   rearrangement of &#x3b1;-cyclopent-1-en-1-yl-p-acetamidophenone 2 to
+   &#x3b1;-cyclopentylidien-p-acetamidophenone 4 via the enediol intermediate 3,
+   2-[4-(1-carboxy)propylamidobenzylamino]-3,4,5,6-tetrahydropyridinium.
+   1a is the hapten used to generate 4B2. The structure that was
+   determined is that of the complex of 4B2 with
+   2-(4-aminobenzylamino)-3,4,5,6-tetrahydropyridinium 1b. Antibody 5C8
+   was generated against hapten 5a, and its x-ray structure was determined
+   in the presence of inhibitor 5b ([49]12).
+
+   Indeed, in the few cases in which the use of a hapten containing a
+   positively charged moiety successfully induced catalytic antibodies and
+   in which the structure of the hapten–antibody complex was determined,
+   there was no negatively charged residue in the active site directly
+   facing the positive charge, but stabilization of the haptenic charge
+   was mediated mostly by cation–π interactions ([50]12–[51]14). Herein,
+   we report the structure, at 1.87-Å resolution, of the complex of an
+   antibody catalyzing an allylic rearrangement with its cationic hapten.
+   We provide direct evidence for an ionic pair interaction between the
+   amidinium function of the hapten and a combining site carboxylate,
+   which allows the precise positioning of this group, and show that this
+   carboxylate is the general base responsible for catalysis.
+   [52]Previous Section[53]Next Section
+
+ §2§ Materials and Methods §2§
+
+ §3§ Fab Preparation, Purification, and Crystallization. §3§
+
+   The 4B2 antibody was purified from the ascitic fluid as described
+   ([54]15). The Fab was generated by papain digestion of the antibody
+   under standard conditions (30 mM Tris, pH 7.4/138 mM NaCl/1.25 mM
+   EDTA/1.5 mM 2-mercaptoethanol) by using a 3% (wt/wt) papain-to-antibody
+   ratio and a 9-h digestion time. Undigested IgG and Fc fragment were
+   removed by DEAE anion exchange chromatography and gel filtration on a
+   Sephacryl S100 HR column, and the Fab was purified further by ion
+   exchange chromatography on a mono Q FPLC column by a NaCl gradient in
+   20 mM ethanolamine buffer at pH 9.3.
+
+   Crystals were grown at 4°C by using the hanging-drop procedure in wells
+   containing 1 ml of 16% (vol/vol) polyethylene glycol 4000, 3% (vol/vol)
+   dioxan, 20% (vol/vol) glycerol, 0.2 M ammonium sulfate, 5 mM strontium
+   chloride, and 20 mM sodium acetate (final pH 5). Drops consisting of a
+   2-&#x3bc;l aliquot of a protein solution with hapten (0.25 mM hapten and 11.6
+   mg of Fab per ml in 0.15 M NaCl/0.05% NaN[3]) were mixed with 2 &#x3bc;l of
+   the well solution. Despite the simultaneous growth of thin needles and
+   polyhedral-shaped crystals, this procedure yielded, in some drops,
+   monocrystals of dimensions up to 0.7 &#xd7; 0.45 &#xd7; 0.35 mm^3.
+
+ §3§ X-Ray Data Collection and Structure Determination. §3§
+
+   Diffraction data were recorded by using one crystal kept at 4°C on the
+   W32 station of the Laboratoire pour l'Utilisation du Rayonnement
+   Electromagnétique (Orsay, France) synchrotron with a MAR Image Plate
+   system. Data were processed with denzo and scalepack ([55]16), and
+   statistics are shown in Table [56]1. The structure of the 4B2 Fab
+   (IgG1, &#x3ba;) was solved by molecular replacement with the program amore
+   ([57]17); the models used were the Fv domain of Fab D23 (PDB code
+   [58]1yec) and the CL-CH1 dimer of Fab 36-71 (PDB code [59]6fab). The
+   atomic model was refined by alternating cycles of model reconstruction
+   with the program o ([60]18) and of refinement with cns ([61]19). The
+   final refinement statistics are given in Table [62]1. Fig. [63]2 A–C
+   was drawn with the program o ([64]18).
+   View this table:
+     * [65]In this window
+     * [66]In a new window
+
+   Table 1
+
+   Data collection and refinement statistics for Fab 4B2 complexed with 1b
+   [67]Figure 2
+   View larger version:
+     * [68]In this window
+     * [69]In a new window
+
+     * [70]Download as PowerPoint Slide
+
+   Figure 2
+
+   (A) Schematic view of the active site of the 4B2-1b complex. The ligand
+   is in red; water molecules are indicated as red crosses; Glu L34 is
+   indicated in green; the other polar residues are represented in blue.
+   The C&#x3b1;s of residues L32–L36, L89–L97, H35–H37, and H94–H99 in
+   hypervariable loops L1, L3, H1, and H3 are shown in yellow. The
+   aromatic residues (Trp H47, Phe L89, Tyr L96, Tyr L32, Trp H103, and
+   Phe L98) that have hydrophobic interactions with the hapten have been
+   represented, except Phe L98 and Trp H103 for reasons of clarity.
+   Nitrogen N&#x3b4;1 of His H35 is involved in a conserved H bond with N&#x25b;1 of
+   Trp H47. His H35 is therefore neutral but cannot play the role of a
+   general base, because its protonated nitrogen N&#x25b;2 points toward the
+   inside of the cavity. (B) Hydrogen bonding network established with
+   catalytic residue Glu L34. Hydrogen bonds are shown as dashed lines. A
+   Fobs-Fcalc electron density map calculated without the amidinium ligand
+   is superimposed on the structure. The map is contoured at the level of
+   two standard deviations. One of the oxygens of Glu L34 is hydrogen
+   bonded to the protonated nitrogen N&#x25b;2 of His L36. This tautomeric form
+   of His L36 is stabilized by an additional hydrogen bond between its N&#x3b4;1
+   and the NH&#x25b;1 of Trp H103. Residue His L36 is therefore neutral but
+   cannot play the role of a general base, because its unprotonated
+   nitrogen N&#x25b;1 points away from the substrate. (C) Comparison of the
+   environment of the charge of the hapten in antibodies 5C8 (in blue) and
+   4B2 (in yellow). 5C8 catalyzes the disfavored cyclization of an
+   epoxyalcohol ([71]12). The &#x3b1;-carbons of residues of the combining site
+   (L32–L38, L43–L50, L86–L93, L96, L98, H32–H39, H91–H95, and H102–H104)
+   of 5C8 have been superimposed on those of 4B2 (the rms deviation is
+   0.645 Å). The bottom of the active sites is formed by identical
+   residues in both antibodies (Phe L98, Trp H47, His H35, Trp H103, and
+   Val H37). The distance between the nitrogen of 5b of 5C8 (light green)
+   and the carbon between the two nitrogens of 1b of 4B2 (red) is 1.05 Å.
+   In addition to the ionic interaction with glutamate L34, the hapten
+   amidinium charge of 4B2 is stabilized through a cation–π interaction
+   with Phe L89, which is also involved in a stacking interaction with the
+   amidine cycle. Residues of 5C8 involved in cation–π interaction with
+   the quaternary amine of 5b are (distance to the nitrogen) Tyr L91 (4.97
+   Å), Trp H103 (5.59 Å), His H35 (4.55 Å), His L89 (4.96 Å), and Tyr L36
+   (5.39 Å). In addition, in 5C8, Asp H101 (for which there is no
+   equivalent in 4B2 because of the short H3 loop of this antibody) and
+   Asp H95, which are, respectively, 4 Å and 3.7 Å away from the positive
+   charge, provide a second sphere polar environment to the quaternary
+   amine ([72]12). Trp H47, Val H37, and Tyr L96 are not represented for
+   reasons of clarity.
+   [73]Previous Section[74]Next Section
+
+ §2§ Results §2§
+
+ §3§ Catalytic Activity and Mechanism. §3§
+
+   Antibody 4B2 was generated against a cyclic amidinium hapten 1a (Fig.
+   [75]1). This antibody catalyzes with significant rate enhancement (k
+   [cat]/k [non] = 1,500) the allylic rearrangement of &#x3b2;-&#x3b3; unsaturated
+   ketone 2, which is structurally related to the hapten ([76]15), and the
+   ring opening of 5-nitro-benzisoxazole in the Kemp elimination (k
+   [cat]/k [non] = 18,000; ref. [77]20). Both reactions would be catalyzed
+   by a residue acting as a general base to abstract the &#x3b1;-proton of &#x3b2;-&#x3b3;
+   unsaturated ketone in allylic isomerization or the proton of the
+   isoxazole ring in the Kemp elimination. Three lines of evidence
+   strongly suggest that a carboxylate residue acts as a base in the
+   catalytic mechanism of allylic isomerization: the stereoselectivity of
+   the &#x3b1;-proton exchange showed by deuterium NMR, the pH dependence of the
+   reaction rate, and the effect of specific chemical modification of
+   carboxylates ([78]15).
+
+ §3§ Interaction of the Hapten with the Active Site. §3§
+
+   The structure of 4B2 complexed to 1b, an analogue of hapten 1a lacking
+   the linker arm to the carrier protein (Fig. [79]1), shows that the
+   hapten is buried in a funnel-shaped deep cleft. The amidine is
+   accommodated at the bottom of the pocket, which constitutes a highly
+   hydrophobic environment where no water molecule was detected (Fig.
+   [80]2 A). Such a cavity at the interface of the heavy- and light-chain
+   variable domains has been described in antibodies catalyzing various
+   reactions such as ester hydrolysis ([81]21), pericyclic reactions
+   ([82]22, [83]23), epoxyalcohol cyclization ([84]12), or polyene
+   cyclization ([85]14).
+
+   The hapten establishes three hydrogen bonds with residues of the
+   antibody. The terminal amine function, which is linked to the carrier
+   protein for immunization is accessible to solvent and establishes a
+   hydrogen bond with a main chain carbonyl oxygen and with a water
+   molecule. The two NH groups of the amidinium are hydrogen bonded to the
+   two oxygens of the Glu L34 carboxylate (Fig. [86]2 B). At the
+   crystallization pH (pH = 5), which is close to the pH for optimal
+   catalysis of allylic isomerization (pH 4.6), the L34 carboxylate
+   deprotonated form is stabilized by a hydrogen bond network with His L36
+   and Trp H103, which also likely positions the carboxylate side chain at
+   the proper location to abstract a proton from the substrate
+   stereoselectively. There are three other polar residues in the
+   combining site (Fig. [87]2 A). They cannot play the role of a general
+   base either, because they point toward the external medium (Asp H95) or
+   because their protonated nitrogen points toward the hapten (His H35 and
+   His L36) (Fig. [88]2 A and B). Taken together with the biochemical
+   data, the structure identifies Glu L34 as the general base that
+   abstracts the &#x3b1;-proton in the first step of allylic isomerization of 2
+   to yield the dienol intermediate 3 (Fig. [89]1).
+
+   Glutamate occurs at position L34 of only 5% of antibody sequences
+   ([90]24). It is therefore tempting to suggest that the significant
+   stabilization of the antibody–hapten complex provided by the
+   glutamate–amidinium interaction because of the bidentate nature of both
+   groups has favored the selection of a glutamate at this position during
+   antibody maturation. As a consequence of its bidentate character, the
+   interactions that the amidinium group establishes are anisotropic. This
+   property confers on the amidinium the potential to generate a precisely
+   positioned complementary charged residue.
+
+ §3§ The Environment of the Charge of the Hapten. §3§
+
+   The directional property of the amidinium group is highlighted by a
+   comparison of the 4B2 combining site to that of another catalytic
+   antibody, 5C8, elicited against hapten 5a (Fig. [91]1) where the
+   amidine group of 1a is replaced by a quaternary amine ([92]12). The
+   piperidinium ring of inhibitor 5b and the amidinium ring of 1b occupy
+   very similar positions at the bottom of the combining sites (Fig. [93]2
+   C). Both haptens carry positively charged nitrogens that are positioned
+   close to aromatic rings, as often observed in proteins ([94]25). In
+   4B2, the charge of the amidinium group of the hapten is stabilized
+   mainly by the ion pair with glutamate L34. By contrast, in antibody
+   5C8, no carboxylate is available to stabilize the quaternary ammonium
+   of 5b through a direct ionic interaction. In the 5C8–5b complex, the
+   isotropic distribution of the charge of the quaternary ammonium group
+   induces an environment consisting of distant polar and
+   π-electron-containing residues that stabilize the charge in a diffuse
+   fashion (Fig. [95]2 C). Such charged nitrogen–aromatic interactions
+   have also been observed in the structures of small molecules ([96]26),
+   of antibody McPC603 bound to phosphorylcholine ([97]27), of antibody
+   catalysts complexed with their aminophosphonic acid ([98]13) or N-oxide
+   hapten ([99]14), and of acetylcholinesterase complexed with various
+   quaternary amine ligands ([100]28).
+   [101]Previous Section[102]Next Section
+
+ §2§ Discussion §2§
+
+   The induction of a precisely positioned carboxylate residue in an
+   antibody combining site is of general use to generate catalysts for
+   reactions requiring either a nucleophile ([103]29, [104]30) or a
+   general base or acid as in enzyme-catalyzed proton transfer reactions
+   ([105]2, [106]31, [107]32). The hapten–4B2 complex defines amidinium as
+   a useful candidate for that purpose and provides a starting point for
+   the design of haptens capable of eliciting more sophisticated
+   constellations of catalytic residues in antibody combining sites. The
+   induction of a second, planned, catalytic residue in the combining site
+   of an antibody, which would enhance its catalytic efficiency, would be
+   favored by incorporation in the same hapten structure of two bidentate
+   charged groups. Such molecules that have been developed as specific
+   protein binders ([108]33) would be logical hapten candidates to achieve
+   this goal.
+
+   Methods capable of eliciting chemically reactive groups in antibody
+   combining sites such as those using haptenic charge ([109]6–[110]9),
+   for which an unambiguous demonstration is presented here, or reactive
+   immunization ([111]34) are particularly useful to produce efficient
+   catalytic antibodies, especially when transition state analogues are
+   difficult to synthesize or when reactions proceed via multiple
+   transition states ([112]35). Indeed, these methods allow the use of a
+   hapten that does not need to match precisely the transition state of
+   the reaction but rather elicits a strategically positioned functional
+   residue. Therefore, antibodies resulting from these strategies have
+   been found to catalyze different reactions that use the same mechanism,
+   provided that the various substrates possess the common chemical
+   function with which the induced residue can react ([113]10, [114]36,
+   [115]37). This finding is also illustrated by antibody 4B2, which
+   catalyzes both the Kemp elimination ([116]20) and the allylic
+   rearrangement of a &#x3b2;-&#x3b3; unsaturated ketone.
+   [117]Previous Section[118]Next Section
+
+ §2§ Acknowledgments §2§
+
+   We thank L. Tchertanova (Institut des Substances Naturelles, Centre
+   National de la Recherche Scientifique, Gif-sur-Yvette) for surveying
+   the Cambridge Database, J. Perez for helping us to use facilities at
+   Laboratoire pour l'Utilisation du Rayonnement Electromagnétique, Orsay,
+   France, and J. Janin for reading the manuscript. Partial financial
+   support was provided by the European Union Training and Mobility
+   Research Grant ERBFMXCT 98-0193 (to M.K.), and the cost of this article
+   was covered by the Centre National de la Recherche Scientifique,
+   Groupement de Recherche 897.
+   [119]Previous Section[120]Next Section
+
+ §2§ Footnotes §2§
+
+     * [121]&#x21b5; † To whom reprint requests should be addressed. E-mail:
+       beatrice.golinelli{at}lebs.cnrs-gif.fr.
+     * This paper was submitted directly (Track II) to the PNAS office.
+     * Data deposition: The atomic coordinates have been deposited in the
+       Protein Data Bank, [122]www.rcsb.org (PDB ID code [123]1F3D).
+     * Copyright © 2000, The National Academy of Sciences
+
+   [124]Previous Section
+
+ §2§ References §2§
+
+    1. [125]&#x21b5;
+         1. Schwab J M ,
+         2. Henderson B S
+       (1990) Chem Rev 90:1203–1245.
+    2. [126]&#x21b5;
+         1. Kim S W ,
+         2. Cha S-S ,
+         3. Cho H-S ,
+         4. Kim J-S ,
+         5. Ha N-C ,
+         6. Cho M-J ,
+         7. Joo S ,
+         8. Kim K K ,
+         9. Choi K Y ,
+        10. Oh B-H
+       (1997) Biochemistry 36:14030–14036, pmid:9369474.
+       [127]CrossRef[128]Medline
+    3. [129]&#x21b5;
+         1. Schultz P G ,
+         2. Lerner R A
+       (1995) Science 269:1835–1842, pmid:7569920.
+       [130]Abstract/FREE Full Text
+    4. [131]&#x21b5;
+         1. Blackburn G M ,
+         2. Datta A ,
+         3. Denham H ,
+         4. Wentworth P
+       (1998) Adv Phys Org Chem 31:249–392.
+    5. [132]&#x21b5;
+         1. Thayer M M ,
+         2. Olender E H ,
+         3. Arvai A S ,
+         4. Koike C K ,
+         5. Canestrelli I L ,
+         6. Stewart J D ,
+         7. Benkovic S J ,
+         8. Getzoff E D ,
+         9. Roberts V A
+       (1999) J Mol Biol 291:329–345, pmid:10438624.
+       [133]CrossRef[134]Medline
+    6. [135]&#x21b5;
+         1. Janda K D ,
+         2. Weinhouse M I ,
+         3. Schloeder D M ,
+         4. Lerner R A ,
+         5. Benkovic S J
+       (1990) J Am Chem Soc 112:1274–1275.
+       [136]CrossRef
+    7. [137]&#x21b5;
+         1. Janda K D ,
+         2. Weinhouse M I ,
+         3. Danon T ,
+         4. Pacelli K A ,
+         5. Schloeder D M
+       (1991) J Am Chem Soc 113:5427–5434.
+       [138]CrossRef
+    8. [139]&#x21b5;
+         1. Shokat K M ,
+         2. Leumann C J ,
+         3. Sugasawara R ,
+         4. Schultz P G
+       (1989) Nature (London) 338:269–271, pmid:2922053.
+       [140]CrossRef[141]Medline
+    9. [142]&#x21b5;
+         1. Thorn S N ,
+         2. Daniels R G ,
+         3. Auditor M-T M ,
+         4. Hilvert D
+       (1995) Nature (London) 373:228–230, pmid:7816136.
+       [143]CrossRef[144]Medline
+   10. [145]&#x21b5;
+         1. Romesberg F E ,
+         2. Flanagan M E ,
+         3. Uno T ,
+         4. Schultz P G
+       (1998) J Am Chem Soc 120:5160–5167.
+       [146]CrossRef
+   11. [147]&#x21b5;
+         1. Wentworth P, Jr ,
+         2. Liu Y ,
+         3. Wentworth A D ,
+         4. Fan P ,
+         5. Foley M J ,
+         6. Janda K D
+       (1998) Proc Natl Acad Sci USA 95:5971–5975, pmid:9600901.
+       [148]Abstract/FREE Full Text
+   12. [149]&#x21b5;
+         1. Gruber K ,
+         2. Zhou B ,
+         3. Houk K N ,
+         4. Lerner R A ,
+         5. Shevlin C G ,
+         6. Wilson I A
+       (1999) Biochemistry 38:7062–7074, pmid:10353817.
+       [150]CrossRef[151]Medline
+   13. [152]&#x21b5;
+         1. Hsieh-Wilson L C ,
+         2. Schultz P G ,
+         3. Stevens R C
+       (1996) Proc Natl Acad Sci USA 93:5363–5367, pmid:8643580.
+       [153]Abstract/FREE Full Text
+   14. [154]&#x21b5;
+         1. Paschall C M ,
+         2. Hasserodt J ,
+         3. Jones T ,
+         4. Lerner R A ,
+         5. Janda K D ,
+         6. Christianson D W
+       (1999) Angew Chem Int Ed Engl 38:1743–1747.
+       [155]CrossRef
+   15. [156]&#x21b5;
+         1. Gonçalves O ,
+         2. Dintinger T ,
+         3. Lebreton J ,
+         4. Blanchard D ,
+         5. Tellier C
+       (2000) Biochem J 346:691–698, pmid:10698695.
+   16. [157]&#x21b5;
+         1. Otwinovsky Z ,
+         2. Minor W
+       (1997) Methods Enzymol 276:307–325.
+       [158]Web of Science
+   17. [159]&#x21b5;
+         1. Navaza J
+       (1994) Acta Crystallogr A 50:157–163.
+       [160]CrossRef[161]Web of Science
+   18. [162]&#x21b5;
+         1. Jones T A ,
+         2. Zhou J-Y ,
+         3. Cowan S W ,
+         4. Kjeldgaard M
+       (1991) Acta Crystallogr A 47:110–119, pmid:2025413.
+   19. [163]&#x21b5;
+         1. Adams P D ,
+         2. Pann N S ,
+         3. Read R J ,
+         4. Brünger A T
+       (1997) Proc Natl Acad Sci USA 94:5018–5023, pmid:9144182.
+       [164]Abstract/FREE Full Text
+   20. [165]&#x21b5;
+         1. Genre-Grandpierre A ,
+         2. Tellier C ,
+         3. Loirat M-J ,
+         4. Blanchard D ,
+         5. Hodgson D R W ,
+         6. Hollfelder F ,
+         7. Kirby A J
+       (1997) Bioorg Med Chem Lett 7:2497–2502.
+       [166]CrossRef
+   21. [167]&#x21b5;
+         1. Charbonnier J-B ,
+         2. Carpenter E ,
+         3. Gigant B ,
+         4. Golinelli-Pimpaneau B ,
+         5. Eshhar Z ,
+         6. Green B S ,
+         7. Knossow M
+       (1995) Proc Natl Acad Sci USA 92:11721–11725, pmid:8524836.
+       [168]Abstract/FREE Full Text
+   22. [169]&#x21b5;
+         1. Ulrich H D ,
+         2. Mundorff E ,
+         3. Santarsiero B D ,
+         4. Driggers E M ,
+         5. Stevens R C ,
+         6. Schultz P G
+       (1997) Nature (London) 389:271–274, pmid:9305839.
+       [170]CrossRef[171]Medline
+   23. [172]&#x21b5;
+         1. Heine A ,
+         2. Stura E A ,
+         3. Yli-Kauhaluoma J T ,
+         4. Gao C ,
+         5. Deng Q ,
+         6. Beno B R ,
+         7. Houk K N ,
+         8. Janda K D ,
+         9. Wilson I A
+       (1998) Science 279:1934–1940, pmid:9506943.
+       [173]Abstract/FREE Full Text
+   24. [174]&#x21b5;
+         1. Kabat E A ,
+         2. Wu T T ,
+         3. Perry H M ,
+         4. Gottesman K S ,
+         5. Foeller C
+       (1991) Sequences of Proteins of Immunological Interest (U.S. Public
+       Health Service, National Institutes of Health, Bethesda, MD), 5th
+       Ed..
+   25. [175]&#x21b5;
+         1. Gallivan J P ,
+         2. Dougherty D A
+       (1999) Proc Natl Acad Sci USA 96:9459–9464, pmid:10449714.
+       [176]Abstract/FREE Full Text
+   26. [177]&#x21b5;
+         1. Verdonk M L ,
+         2. Boks G J ,
+         3. Kooijman H ,
+         4. Kanters J A ,
+         5. Kroon J
+       (1993) J Comput Aided Mol Des 7:173–182, pmid:8320555.
+       [178]Medline
+   27. [179]&#x21b5;
+         1. Dougherty D A ,
+         2. Stauffer D A
+       (1990) Science 250:1558–1560, pmid:2274786.
+       [180]Abstract/FREE Full Text
+   28. [181]&#x21b5;
+         1. Harel M ,
+         2. Schalk I ,
+         3. Ehret-Sabatier L ,
+         4. Bouet F ,
+         5. Goeldner M ,
+         6. Hirth C ,
+         7. Axelsen P H ,
+         8. Silman I ,
+         9. Sussman J L
+       (1993) Proc Natl Acad Sci USA 90:9031–9035, pmid:8415649.
+       [182]Abstract/FREE Full Text
+   29. [183]&#x21b5;
+         1. Verschueren K H ,
+         2. Seljee F ,
+         3. Rozeboom H J ,
+         4. Kalk K H ,
+         5. Dijkstra B W
+       (1993) Nature (London) 363:693–698, pmid:8515812.
+       [184]CrossRef[185]Medline
+   30. [186]&#x21b5;
+         1. Zechel D L ,
+         2. Withers S G
+       (2000) Acc Chem Res 33:11–18, pmid:10639071.
+       [187]CrossRef[188]Medline[189]Web of Science
+   31. [190]&#x21b5;
+         1. Davenport R C ,
+         2. Bash P A ,
+         3. Seaton B A ,
+         4. Karplus M ,
+         5. Petsko G A ,
+         6. Ringe D
+       (1991) Biochemistry 30:5821–5826, pmid:2043623.
+       [191]CrossRef[192]Medline
+   32. [193]&#x21b5;
+         1. Mitra B ,
+         2. Kallarakal A T ,
+         3. Kozarich J W ,
+         4. Gerlt J A ,
+         5. Clifton J G ,
+         6. Petsko G A ,
+         7. Kenyon G L
+       (1995) Biochemistry 34:2777–2787, pmid:7893689.
+       [194]CrossRef[195]Medline
+   33. [196]&#x21b5;
+         1. Albert J S ,
+         2. Peczuh M W ,
+         3. Hamilton A D
+       (1997) Bioorg Med Chem 5:1455–1467, pmid:9313852.
+       [197]Medline
+   34. [198]&#x21b5;
+         1. Wagner J ,
+         2. Lerner R A ,
+         3. Barbas C F, III
+       (1995) Science 270:1797–1800, pmid:8525368.
+       [199]Abstract/FREE Full Text
+   35. [200]&#x21b5;
+         1. Koch T ,
+         2. Reymond J-L ,
+         3. Lerner R
+       (1995) J Am Chem Soc 117:9383–9387.
+   36. [201]&#x21b5;
+         1. Barbas C F, III ,
+         2. Heine A ,
+         3. Zhong G ,
+         4. Hoffman T ,
+         5. Gramatikova S ,
+         6. Björnestedt R ,
+         7. List B ,
+         8. Anderson J ,
+         9. Stura E A ,
+        10. Wilson I A ,
+        11. et al.
+       (1997) Science 278:2085–2092, pmid:9405338.
+       [202]Abstract/FREE Full Text
+   37. [203]&#x21b5;
+         1. Lin C-H ,
+         2. Hoffman T Z ,
+         3. Wirshing P ,
+         4. Barbas C F, III ,
+         5. Janda K D ,
+         6. Lerner R A
+       (1997) Proc Natl Acad Sci USA 94:11773–11776, pmid:9342312.
+       [204]Abstract/FREE Full Text
+
+     * [205]Add to CiteULike CiteULike
+     * [206]Add to Complore Complore
+     * [207]Add to Connotea Connotea
+     * [208]Add to Del.icio.us Del.icio.us
+     * [209]Add to Digg Digg
+     * [210]Add to Facebook Facebook
+     * [211]Add to Twitter Twitter
+
+   [212]What's this?
+   [213]« Previous | [214]Next Article »[215]Table of Contents
+
+ §3§ This Article §3§
+
+    1. PNAS August 29, 2000 vol. 97 no. 18 9892-9895
+
+    1. [216]AbstractFree
+    2. [217]Figures Only
+    3. » Full Text
+    4. [218]Full Text (PDF)
+
+ §4§ Classifications §4§
+
+    1.
+          + Biological Sciences
+               o [219]Biochemistry
+
+ §4§ Services §4§
+
+    1. [220]Email this article to a colleague
+    2. [221]Alert me when this article is cited
+    3. [222]Alert me if a correction is posted
+    4. [223]Similar articles in this journal
+    5. [224]Similar articles in ISI
+    6. [225]Similar articles in PubMed
+    7. [226]Add to My File Cabinet
+    8. [227]Download to citation manager
+    9. [228]Request copyright permission
+
+ §4§ Citing Articles §4§
+
+    1. [229]Load citing article information
+    2. [230]Citing articles via CrossRef
+    3. [231]Citing articles via Web of Science
+    4. [232]Articles citing this article
+
+ §4§ Google Scholar §4§
+
+    1. [233]Articles by Golinelli-Pimpaneau, B.
+    2. [234]Articles by Tellier, C.
+    3. [235]Search for related content
+
+ §4§ PubMed §4§
+
+    1. [236]PubMed citation
+    2. [237]Articles by Golinelli-Pimpaneau, B.
+    3. [238]Articles by Tellier, C.
+    4.
+
+ §4§ Related Content §4§
+
+    1. [239]Load related web page information
+
+ §4§ Social Bookmarking §4§
+
+    1.
+          + [240]Add to CiteULike CiteULike
+          + [241]Add to Complore Complore
+          + [242]Add to Connotea Connotea
+          + [243]Add to Del.icio.us Del.icio.us
+          + [244]Add to Digg Digg
+          + [245]Add to Facebook Facebook
+          + [246]Add to Twitter Twitter
+       [247]What's this?
+
+ §3§ Navigate This Article §3§
+
+    1. [248]Top
+    2. [249]Abstract
+    3. [250]Materials and Methods
+    4. [251]Results
+    5. [252]Discussion
+    6. [253]Acknowledgments
+    7. [254]Footnotes
+    8. [255]References
+
+   Search PNAS ____________________ GO
+   [256]Link: Advanced Search
+
+ §3§ This Week's Issue §3§
+
+    1. [257]September 14, 2010, 107 (37)
+
+    1. [258]Current Issue
+
+ §4§ From the Cover §4§
+
+     * [259]Eyeing neural circuits in Drosophila
+     * [260]Optimizing live cell imaging
+     * [261]Public perceptions of energy use
+     * [262]Activating DNA mismatch repair
+     * [263]Evolution of collective migration
+
+    1. [264]Alert me to new issues of PNAS
+
+     * [265]Early Edition
+     * [266]Archives
+     * [267]Online Submission
+
+     * [268]Feature Articles
+       (Expanded research articles of exceptional breadth)
+     * [269]Commentaries
+       (Expert commentary on leading research)
+     * [270]Letters
+       (Online-only letters to the editor)
+     * [271]Inaugural Articles
+       (Articles by recently elected NAS members)
+     * [272]PNAS Profiles
+       (Biographical profiles of Academy members)
+     * [273]Sustainability Science
+       (Interactions of human and environmental systems)
+     * [274]Collected Papers
+       (Editorials, Perspectives, Reviews, Colloquia, etc.)
+     * [275]Special Features
+       (Solicited articles on exceptional research topics)
+     * [276]Sackler Colloquia
+       (Scientific reports held under NAS auspices)
+     * [277]Podcasts
+       Brief podcasts with leading scientists
+
+ §3§ Most §3§
+
+     *  §4§ Read §4§
+         1. [278]Molecular origins of fluorocarbon hydrophobicity
+         2. [279]Public perceptions of energy consumption and savings
+         3. [280]Detection of MLV-related virus gene sequences in blood of
+            patients with chronic fatigue syndrome and healthy blood
+            donors
+         4. [281]Inaugural Article: The Lucretian swerve: The biological
+            basis of human behavior and the criminal justice system
+         5. [282]The most influential journals: Impact Factor and
+            Eigenfactor
+       [283]» View all Most Read articles
+     *  §4§ Cited §4§
+         1. [284]DNA Sequencing with Chain-Terminating Inhibitors
+         2. [285]Electrophoretic Transfer of Proteins from Polyacrylamide
+            Gels to Nitrocellulose Sheets: Procedure and Some Applications
+         3. [286]Cluster analysis and display of genome-wide expression
+            patterns
+         4. [287]Significance analysis of microarrays applied to the
+            ionizing radiation response
+         5. [288]One-step inactivation of chromosomal genes in Escherichia
+            coli K-12 using PCR products
+       [289]» View all Most Cited articles
+
+     * [290]Current Issue
+     * [291]Archives
+     * [292]Online Submission
+     * [293]Info for Authors
+     * [294]Editorial Board
+     * [295]About
+
+     * [296]Subscribe
+     * [297]Advertise
+     * [298]Contact
+     * [299]Site Map
+
+   [300]Copyright ©2010 by the National Academy of Sciences
+
+References
+
+   Visible links
+   1. http://www.pnas.org/
+   2. http://www.pnas.org/
+   3. file://localhost/dev/paper.html#content-block
+   4. http://www.pnas.org/misc/iforc.shtml
+   5. http://www.pnas.org/misc/masthead.shtml
+   6. http://www.pnas.org/misc/about.shtml
+   7. http://www.pnas.org/subscriptions
+   8. http://www.pnas.org/misc/about.shtml#advertising
+   9. http://www.pnas.org/site/misc/contact.shtml
+  10. http://www.pnas.org/cgi/feedback
+  11. http://www.pnas.org/misc/sitemap.shtml
+  12. http://www.pnas.org/cgi/adclick/?ad=22509&adclick=true&url=http%3A%2F%2Fwww.keystonesymposia.org%2F2010meetings
+  13. http://www.pnas.org/cgi/adclick/?ad=21636&adclick=true&url=http%3A%2F%2Fwww.pnas.org%2Fcgi%2Falerts%2Fetoc
+  14. http://www.pnas.org/cgi/adclick/?ad=19262&adclick=true&url=http%3A%2F%2Fwww.pnas.org%2Fmisc%2Fpodcasts.shtml
+  15. http://www.pnas.org/login?uri=http%3A%2F%2Fwww.pnas.org%2Fcontent%2F97%2F18%2F9892.long
+  16. http://www.pnas.org/search?author1=B%C3%A9atrice+Golinelli-Pimpaneau&sortspec=date&submit=Submit
+  17. file://localhost/dev/paper.html#aff-1
+  18. file://localhost/dev/paper.html#fn-1
+  19. http://www.pnas.org/search?author1=Olivier+Gon%C3%A7alves&sortspec=date&submit=Submit
+  20. file://localhost/dev/paper.html#aff-1
+  21. http://www.pnas.org/search?author1=Thierry+Dintinger&sortspec=date&submit=Submit
+  22. file://localhost/dev/paper.html#aff-1
+  23. http://www.pnas.org/search?author1=Dominique+Blanchard&sortspec=date&submit=Submit
+  24. file://localhost/dev/paper.html#aff-1
+  25. http://www.pnas.org/search?author1=Marcel+Knossow&sortspec=date&submit=Submit
+  26. file://localhost/dev/paper.html#aff-1
+  27. http://www.pnas.org/search?author1=Charles+Tellier&sortspec=date&submit=Submit
+  28. file://localhost/dev/paper.html#aff-1
+  29. file://localhost/dev/paper.html#sec-1
+  30. file://localhost/dev/paper.html#ref-1
+  31. file://localhost/dev/paper.html#F1
+  32. file://localhost/dev/paper.html#ref-1
+  33. file://localhost/dev/paper.html#ref-2
+  34. file://localhost/dev/paper.html#ref-3
+  35. file://localhost/dev/paper.html#ref-4
+  36. file://localhost/dev/paper.html#ref-5
+  37. file://localhost/dev/paper.html#ref-6
+  38. file://localhost/dev/paper.html#ref-7
+  39. file://localhost/dev/paper.html#ref-8
+  40. file://localhost/dev/paper.html#ref-9
+  41. file://localhost/dev/paper.html#ref-7
+  42. file://localhost/dev/paper.html#ref-9
+  43. file://localhost/dev/paper.html#ref-10
+  44. file://localhost/dev/paper.html#ref-11
+  45. http://www.pnas.org/content/97/18/9892/F1.expansion.html
+  46. http://www.pnas.org/content/97/18/9892/F1.expansion.html
+  47. http://www.pnas.org/content/97/18/9892/F1.expansion.html
+  48. http://www.pnas.org/powerpoint/97/18/9892/F1
+  49. file://localhost/dev/paper.html#ref-12
+  50. file://localhost/dev/paper.html#ref-12
+  51. file://localhost/dev/paper.html#ref-14
+  52. file://localhost/dev/paper.html#abstract-1
+  53. file://localhost/dev/paper.html#sec-4
+  54. file://localhost/dev/paper.html#ref-15
+  55. file://localhost/dev/paper.html#ref-16
+  56. file://localhost/dev/paper.html#T1
+  57. file://localhost/dev/paper.html#ref-17
+  58. http://www.pnas.org/external-ref?link_type=PDB&access_num=1yec
+  59. http://www.pnas.org/external-ref?link_type=PDB&access_num=6fab
+  60. file://localhost/dev/paper.html#ref-18
+  61. file://localhost/dev/paper.html#ref-19
+  62. file://localhost/dev/paper.html#T1
+  63. file://localhost/dev/paper.html#F2
+  64. file://localhost/dev/paper.html#ref-18
+  65. http://www.pnas.org/content/97/18/9892/T1.expansion.html
+  66. http://www.pnas.org/content/97/18/9892/T1.expansion.html
+  67. http://www.pnas.org/content/97/18/9892/F2.expansion.html
+  68. http://www.pnas.org/content/97/18/9892/F2.expansion.html
+  69. http://www.pnas.org/content/97/18/9892/F2.expansion.html
+  70. http://www.pnas.org/powerpoint/97/18/9892/F2
+  71. file://localhost/dev/paper.html#ref-12
+  72. file://localhost/dev/paper.html#ref-12
+  73. file://localhost/dev/paper.html#sec-1
+  74. file://localhost/dev/paper.html#sec-8
+  75. file://localhost/dev/paper.html#F1
+  76. file://localhost/dev/paper.html#ref-15
+  77. file://localhost/dev/paper.html#ref-20
+  78. file://localhost/dev/paper.html#ref-15
+  79. file://localhost/dev/paper.html#F1
+  80. file://localhost/dev/paper.html#F2
+  81. file://localhost/dev/paper.html#ref-21
+  82. file://localhost/dev/paper.html#ref-22
+  83. file://localhost/dev/paper.html#ref-23
+  84. file://localhost/dev/paper.html#ref-12
+  85. file://localhost/dev/paper.html#ref-14
+  86. file://localhost/dev/paper.html#F2
+  87. file://localhost/dev/paper.html#F2
+  88. file://localhost/dev/paper.html#F2
+  89. file://localhost/dev/paper.html#F1
+  90. file://localhost/dev/paper.html#ref-24
+  91. file://localhost/dev/paper.html#F1
+  92. file://localhost/dev/paper.html#ref-12
+  93. file://localhost/dev/paper.html#F2
+  94. file://localhost/dev/paper.html#ref-25
+  95. file://localhost/dev/paper.html#F2
+  96. file://localhost/dev/paper.html#ref-26
+  97. file://localhost/dev/paper.html#ref-27
+  98. file://localhost/dev/paper.html#ref-13
+  99. file://localhost/dev/paper.html#ref-14
+ 100. file://localhost/dev/paper.html#ref-28
+ 101. file://localhost/dev/paper.html#sec-4
+ 102. file://localhost/dev/paper.html#ack-1
+ 103. file://localhost/dev/paper.html#ref-29
+ 104. file://localhost/dev/paper.html#ref-30
+ 105. file://localhost/dev/paper.html#ref-2
+ 106. file://localhost/dev/paper.html#ref-31
+ 107. file://localhost/dev/paper.html#ref-32
+ 108. file://localhost/dev/paper.html#ref-33
+ 109. file://localhost/dev/paper.html#ref-6
+ 110. file://localhost/dev/paper.html#ref-9
+ 111. file://localhost/dev/paper.html#ref-34
+ 112. file://localhost/dev/paper.html#ref-35
+ 113. file://localhost/dev/paper.html#ref-10
+ 114. file://localhost/dev/paper.html#ref-36
+ 115. file://localhost/dev/paper.html#ref-37
+ 116. file://localhost/dev/paper.html#ref-20
+ 117. file://localhost/dev/paper.html#sec-8
+ 118. file://localhost/dev/paper.html#fn-group-1
+ 119. file://localhost/dev/paper.html#ack-1
+ 120. file://localhost/dev/paper.html#ref-list-1
+ 121. file://localhost/dev/paper.html#xref-fn-1-1
+ 122. http://www.rcsb.org/
+ 123. http://www.pnas.org/external-ref?link_type=PDB&access_num=1F3D
+ 124. file://localhost/dev/paper.html#fn-group-1
+ 125. file://localhost/dev/paper.html#xref-ref-1-1
+ 126. file://localhost/dev/paper.html#xref-ref-2-1
+ 127. http://www.pnas.org/external-ref?access_num=10.1021/bi971546+&link_type=DOI
+ 128. http://www.pnas.org/external-ref?access_num=9369474&link_type=MED
+ 129. file://localhost/dev/paper.html#xref-ref-3-1
+ 130. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=sci&resid=269/5232/1835
+ 131. file://localhost/dev/paper.html#xref-ref-4-1
+ 132. file://localhost/dev/paper.html#xref-ref-5-1
+ 133. http://www.pnas.org/external-ref?access_num=10.1006/jmbi.1999.2960&link_type=DOI
+ 134. http://www.pnas.org/external-ref?access_num=10438624&link_type=MED
+ 135. file://localhost/dev/paper.html#xref-ref-6-1
+ 136. http://www.pnas.org/external-ref?access_num=10.1021/ja00159a074&link_type=DOI
+ 137. file://localhost/dev/paper.html#xref-ref-7-1
+ 138. http://www.pnas.org/external-ref?access_num=10.1021/ja00014a039&link_type=DOI
+ 139. file://localhost/dev/paper.html#xref-ref-8-1
+ 140. http://www.pnas.org/external-ref?access_num=10.1038/338269a0&link_type=DOI
+ 141. http://www.pnas.org/external-ref?access_num=2922053&link_type=MED
+ 142. file://localhost/dev/paper.html#xref-ref-9-1
+ 143. http://www.pnas.org/external-ref?access_num=10.1038/373228a0&link_type=DOI
+ 144. http://www.pnas.org/external-ref?access_num=7816136&link_type=MED
+ 145. file://localhost/dev/paper.html#xref-ref-10-1
+ 146. http://www.pnas.org/external-ref?access_num=10.1021/ja9738992&link_type=DOI
+ 147. file://localhost/dev/paper.html#xref-ref-11-1
+ 148. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=pnas&resid=95/11/5971
+ 149. file://localhost/dev/paper.html#xref-ref-12-1
+ 150. http://www.pnas.org/external-ref?access_num=10.1021/bi990210s&link_type=DOI
+ 151. http://www.pnas.org/external-ref?access_num=10353817&link_type=MED
+ 152. file://localhost/dev/paper.html#xref-ref-13-1
+ 153. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=pnas&resid=93/11/5363
+ 154. file://localhost/dev/paper.html#xref-ref-14-1
+ 155. http://www.pnas.org/external-ref?access_num=10.1002/(SICI)1521-3773(19990614)38:12%3C1743::AID-ANIE1743%3E3.0.CO;2-3&link_type=DOI
+ 156. file://localhost/dev/paper.html#xref-ref-15-1
+ 157. file://localhost/dev/paper.html#xref-ref-16-1
+ 158. http://www.pnas.org/external-ref?access_num=A1997BH42P00020&link_type=ISI
+ 159. file://localhost/dev/paper.html#xref-ref-17-1
+ 160. http://www.pnas.org/external-ref?access_num=10.1107/S0108767393007597&link_type=DOI
+ 161. http://www.pnas.org/external-ref?access_num=A1994NG58500001&link_type=ISI
+ 162. file://localhost/dev/paper.html#xref-ref-18-1
+ 163. file://localhost/dev/paper.html#xref-ref-19-1
+ 164. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=pnas&resid=94/10/5018
+ 165. file://localhost/dev/paper.html#xref-ref-20-1
+ 166. http://www.pnas.org/external-ref?access_num=10.1016/S0960-894X(97)10003-8&link_type=DOI
+ 167. file://localhost/dev/paper.html#xref-ref-21-1
+ 168. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=pnas&resid=92/25/11721
+ 169. file://localhost/dev/paper.html#xref-ref-22-1
+ 170. http://www.pnas.org/external-ref?access_num=10.1038/38470&link_type=DOI
+ 171. http://www.pnas.org/external-ref?access_num=9305839&link_type=MED
+ 172. file://localhost/dev/paper.html#xref-ref-23-1
+ 173. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=sci&resid=279/5358/1934
+ 174. file://localhost/dev/paper.html#xref-ref-24-1
+ 175. file://localhost/dev/paper.html#xref-ref-25-1
+ 176. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=pnas&resid=96/17/9459
+ 177. file://localhost/dev/paper.html#xref-ref-26-1
+ 178. http://www.pnas.org/external-ref?access_num=8320555&link_type=MED
+ 179. file://localhost/dev/paper.html#xref-ref-27-1
+ 180. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=sci&resid=250/4987/1558
+ 181. file://localhost/dev/paper.html#xref-ref-28-1
+ 182. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=pnas&resid=90/19/9031
+ 183. file://localhost/dev/paper.html#xref-ref-29-1
+ 184. http://www.pnas.org/external-ref?access_num=10.1038/363693a0&link_type=DOI
+ 185. http://www.pnas.org/external-ref?access_num=8515812&link_type=MED
+ 186. file://localhost/dev/paper.html#xref-ref-30-1
+ 187. http://www.pnas.org/external-ref?access_num=10.1021/ar970172+&link_type=DOI
+ 188. http://www.pnas.org/external-ref?access_num=10639071&link_type=MED
+ 189. http://www.pnas.org/external-ref?access_num=000084992000003&link_type=ISI
+ 190. file://localhost/dev/paper.html#xref-ref-31-1
+ 191. http://www.pnas.org/external-ref?access_num=10.1021/bi00238a002&link_type=DOI
+ 192. http://www.pnas.org/external-ref?access_num=2043623&link_type=MED
+ 193. file://localhost/dev/paper.html#xref-ref-32-1
+ 194. http://www.pnas.org/external-ref?access_num=10.1021/bi00009a006&link_type=DOI
+ 195. http://www.pnas.org/external-ref?access_num=7893689&link_type=MED
+ 196. file://localhost/dev/paper.html#xref-ref-33-1
+ 197. http://www.pnas.org/external-ref?access_num=9313852&link_type=MED
+ 198. file://localhost/dev/paper.html#xref-ref-34-1
+ 199. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=sci&resid=270/5243/1797
+ 200. file://localhost/dev/paper.html#xref-ref-35-1
+ 201. file://localhost/dev/paper.html#xref-ref-36-1
+ 202. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=sci&resid=278/5346/2085
+ 203. file://localhost/dev/paper.html#xref-ref-37-1
+ 204. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=pnas&resid=94/22/11773
+ 205. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/97/18/9892&title=Structural%20evidence%20for%20a%20programmed%20general%20base%20in%20the%20active%20site%20of%20a%20catalytic%20antibody+--+Golinelli-Pimpaneau%20et%20al.%2097%20%2818%29%3A%209892+--+PNAS&doi=&link_type=CITEULIKE
+ 206. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/97/18/9892&title=Structural%20evidence%20for%20a%20programmed%20general%20base%20in%20the%20active%20site%20of%20a%20catalytic%20antibody+--+Golinelli-Pimpaneau%20et%20al.%2097%20%2818%29%3A%209892+--+PNAS&doi=&link_type=COMPLORE
+ 207. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/97/18/9892&title=Structural%20evidence%20for%20a%20programmed%20general%20base%20in%20the%20active%20site%20of%20a%20catalytic%20antibody+--+Golinelli-Pimpaneau%20et%20al.%2097%20%2818%29%3A%209892+--+PNAS&doi=&link_type=CONNOTEA
+ 208. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/97/18/9892&title=Structural%20evidence%20for%20a%20programmed%20general%20base%20in%20the%20active%20site%20of%20a%20catalytic%20antibody+--+Golinelli-Pimpaneau%20et%20al.%2097%20%2818%29%3A%209892+--+PNAS&doi=&link_type=DEL_ICIO_US
+ 209. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/97/18/9892&title=Structural%20evidence%20for%20a%20programmed%20general%20base%20in%20the%20active%20site%20of%20a%20catalytic%20antibody+--+Golinelli-Pimpaneau%20et%20al.%2097%20%2818%29%3A%209892+--+PNAS&doi=&link_type=DIGG
+ 210. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/short/97/18/9892&title=Structural%20evidence%20for%20a%20programmed%20general%20base%20in%20the%20active%20site%20of%20a%20catalytic%20antibody+--+Golinelli-Pimpaneau%20et%20al.%2097%20%2818%29%3A%209892+--+PNAS&doi=&link_type=FACEBOOK
+ 211. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/97/18/9892&title=Structural%20evidence%20for%20a%20programmed%20general%20base%20in%20the%20active%20site%20of%20a%20catalytic%20antibody+--+Golinelli-Pimpaneau%20et%20al.%2097%20%2818%29%3A%209892+--+PNAS&doi=&link_type=TWITTER
+ 212. http://www.pnas.org/help/social_bookmarks.dtl
+ 213. http://www.pnas.org/content/97/18/9886.short
+ 214. http://www.pnas.org/content/97/18/9896.short
+ 215. http://www.pnas.org/content/97/18.toc
+ 216. http://www.pnas.org/content/97/18/9892.abstract
+ 217. http://www.pnas.org/content/97/18/9892.figures-only
+ 218. http://www.pnas.org/content/97/18/9892.full.pdf+html
+ 219. http://www.pnas.org/search?tocsectionid=Biochemistry&sortspec=date&submit=Submit
+ 220. http://www.pnas.org/email?gca=pnas;97/18/9892&current-view-path=/content/97/18/9892.long
+ 221. http://www.pnas.org/cgi/alerts/ctalert?alertType=citedby&addAlert=cited_by&cited_by_criteria_resid=pnas;97/18/9892&saveAlert=no&return-type=article&return_url=http://www.pnas.org/content/97/18/9892.long
+ 222. http://www.pnas.org/cgi/alerts/ctalert?alertType=correction&addAlert=correction&correction_criteria_value=97/18/9892&saveAlert=no&return-type=article&return_url=http://www.pnas.org/content/97/18/9892.long
+ 223. http://www.pnas.org/search?qbe=pnas;97/18/9892&citation=Golinelli-Pimpaneau%20et%20al.%2097%20%2818%29:%209892&submit=yes
+ 224. http://www.pnas.org/external-ref?access_num=pnas%3B97%2F18%2F9892&link_type=ISI_RELATEDRECORDS
+ 225. http://www.pnas.org/external-ref?access_num=10963661&link_type=MED_NBRS
+ 226. http://www.pnas.org/cgi/folders?action=addtofolder&wherefrom=JOURNALS&wrapped_id=pnas;97/18/9892
+ 227. http://www.pnas.org/citmgr?gca=pnas;97/18/9892
+ 228. http://www.pnas.org/misc/rightperm.shtml
+ 229. http://www.pnas.org/content/97/18/9892.long?cited-by=yes&legid=pnas;97/18/9892#cited-by
+ 230. http://www.pnas.org/cgi/crossref-forward-links/97/18/9892
+ 231. http://www.pnas.org/external-ref?access_num=pnas%3B97%2F18%2F9892&link_type=ISI_CITING
+ 232. http://www.pnas.org/external-ref?access_num=http://www.pnas.org/cgi/content/abstract/97/18/9892&link_type=GOOGLESCHOLAR
+ 233. http://scholar.google.com/scholar?q=%22author%3AGolinelli-Pimpaneau%20author%3AB.%22
+ 234. http://scholar.google.com/scholar?q=%22author%3ATellier%20author%3AC.%22
+ 235. http://www.pnas.org/external-ref?access_num=http://www.pnas.org/cgi/content/abstract/97/18/9892&link_type=GOOGLESCHOLARRELATED
+ 236. http://www.pnas.org/external-ref?access_num=10963661&link_type=PUBMED
+ 237. http://www.pnas.org/external-ref?access_num=Golinelli-Pimpaneau%20B&link_type=AUTHORSEARCH
+ 238. http://www.pnas.org/external-ref?access_num=Tellier%20C&link_type=AUTHORSEARCH
+ 239. http://www.pnas.org/content/97/18/9892.long?related-urls=yes&legid=pnas;97/18/9892#related-urls
+ 240. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/97/18/9892&title=Structural%20evidence%20for%20a%20programmed%20general%20base%20in%20the%20active%20site%20of%20a%20catalytic%20antibody+--+Golinelli-Pimpaneau%20et%20al.%2097%20%2818%29%3A%209892+--+PNAS&doi=&link_type=CITEULIKE
+ 241. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/97/18/9892&title=Structural%20evidence%20for%20a%20programmed%20general%20base%20in%20the%20active%20site%20of%20a%20catalytic%20antibody+--+Golinelli-Pimpaneau%20et%20al.%2097%20%2818%29%3A%209892+--+PNAS&doi=&link_type=COMPLORE
+ 242. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/97/18/9892&title=Structural%20evidence%20for%20a%20programmed%20general%20base%20in%20the%20active%20site%20of%20a%20catalytic%20antibody+--+Golinelli-Pimpaneau%20et%20al.%2097%20%2818%29%3A%209892+--+PNAS&doi=&link_type=CONNOTEA
+ 243. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/97/18/9892&title=Structural%20evidence%20for%20a%20programmed%20general%20base%20in%20the%20active%20site%20of%20a%20catalytic%20antibody+--+Golinelli-Pimpaneau%20et%20al.%2097%20%2818%29%3A%209892+--+PNAS&doi=&link_type=DEL_ICIO_US
+ 244. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/97/18/9892&title=Structural%20evidence%20for%20a%20programmed%20general%20base%20in%20the%20active%20site%20of%20a%20catalytic%20antibody+--+Golinelli-Pimpaneau%20et%20al.%2097%20%2818%29%3A%209892+--+PNAS&doi=&link_type=DIGG
+ 245. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/short/97/18/9892&title=Structural%20evidence%20for%20a%20programmed%20general%20base%20in%20the%20active%20site%20of%20a%20catalytic%20antibody+--+Golinelli-Pimpaneau%20et%20al.%2097%20%2818%29%3A%209892+--+PNAS&doi=&link_type=FACEBOOK
+ 246. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/97/18/9892&title=Structural%20evidence%20for%20a%20programmed%20general%20base%20in%20the%20active%20site%20of%20a%20catalytic%20antibody+--+Golinelli-Pimpaneau%20et%20al.%2097%20%2818%29%3A%209892+--+PNAS&doi=&link_type=TWITTER
+ 247. http://www.pnas.org/help/social_bookmarks.dtl
+ 248. file://localhost/dev/paper.html#content-block
+ 249. file://localhost/dev/paper.html#abstract-1
+ 250. file://localhost/dev/paper.html#sec-1
+ 251. file://localhost/dev/paper.html#sec-4
+ 252. file://localhost/dev/paper.html#sec-8
+ 253. file://localhost/dev/paper.html#ack-1
+ 254. file://localhost/dev/paper.html#fn-group-1
+ 255. file://localhost/dev/paper.html#ref-list-1
+ 256. http://www.pnas.org/search
+ 257. http://www.pnas.org/content/current
+ 258. http://www.pnas.org/content/current
+ 259. http://www.pnas.org/content/107/37/16378
+ 260. http://www.pnas.org/content/107/37/16016
+ 261. http://www.pnas.org/content/107/37/16054
+ 262. http://www.pnas.org/content/107/37/16066
+ 263. http://www.pnas.org/content/107/37/16172
+ 264. http://www.pnas.org/cgi/alerts/etoc
+ 265. http://www.pnas.org/content/early/recent
+ 266. http://www.pnas.org/content
+ 267. http://www.pnas.org/site/misc/onlinesubmission.shtml
+ 268. http://www.pnas.org/cgi/collection/feature_articles
+ 269. http://www.pnas.org/content/by/section/Commentaries
+ 270. http://www.pnas.org/cgi/collection/letters
+ 271. http://www.pnas.org/cgi/collection/inaugurals
+ 272. http://www.pnas.org/cgi/collection/profiles
+ 273. http://www.pnas.org/site/misc/sustainability.shtml
+ 274. http://www.pnas.org/site/misc/collectedpapers.shtml
+ 275. http://www.pnas.org/site/misc/special.shtml
+ 276. http://www.pnas.org/site/misc/colloquia.shtml
+ 277. http://www.pnas.org/site/misc/podcasts.shtml
+ 278. http://www.pnas.org/cgi/content/short/107/31/13603?rss=1&ssource=mfc
+ 279. http://www.pnas.org/cgi/content/short/1001509107v1?rss=1&ssource=mfc
+ 280. http://www.pnas.org/cgi/content/short/1006901107v1?rss=1&ssource=mfc
+ 281. http://www.pnas.org/cgi/content/short/107/10/4499?rss=1&ssource=mfc
+ 282. http://www.pnas.org/cgi/content/short/106/17/6883?rss=1&ssource=mfc
+ 283. http://www.pnas.org/reports/mfr1.dtl
+ 284. http://www.pnas.org/cgi/content/short/74/12/5463?rss=1&ssource=mfc
+ 285. http://www.pnas.org/cgi/content/short/76/9/4350?rss=1&ssource=mfc
+ 286. http://www.pnas.org/cgi/content/short/95/25/14863?rss=1&ssource=mfc
+ 287. http://www.pnas.org/cgi/content/short/98/9/5116?rss=1&ssource=mfc
+ 288. http://www.pnas.org/cgi/content/short/97/12/6640?rss=1&ssource=mfc
+ 289. http://www.pnas.org/reports/mfc1.dtl
+ 290. http://www.pnas.org/content/current
+ 291. http://www.pnas.org/content
+ 292. http://www.pnas.org/misc/onlinesubmission.shtml
+ 293. http://www.pnas.org/misc/iforc.shtml
+ 294. http://www.pnas.org/misc/masthead.shtml
+ 295. http://www.pnas.org/misc/about.shtml
+ 296. http://www.pnas.org/subscriptions
+ 297. http://www.pnas.org/misc/about.shtml#advertising
+ 298. http://www.pnas.org/cgi/feedback
+ 299. http://www.pnas.org/misc/sitemap.shtml
+ 300. http://www.pnas.org/misc/terms.shtml
+
+   Hidden links:
+ 301. http://www.pnas.org/entrez-links/10963661

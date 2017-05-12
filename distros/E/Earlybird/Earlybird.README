@@ -1,0 +1,52 @@
+To install Earlybird:
+
+  - Check the configurable items after the VERSION number in
+  Earlybird.pm.  You probably don't need to change any of these, but
+  if you want to recommand different URLs, want a blind copy of
+  outgoing warnings, or a different expiration interval for the cache
+  of attacking sites, you can change it here.
+
+  - delete or change the
+ 
+      use lib qw(/usr/apache/perl5/5.005/sun4-solaris);
+
+  to suit your Apache mod_perl installation.   
+
+  - run `perl Makefile.PL'.  If you are missing any of the
+  dependencies, you can get them at your nearest CPAN site.
+
+  - run `make' and `make install'
+
+
+To configure Apache/mod_perl to use Earlybird:
+
+  - Make sure your Apache is compiled with mod_perl and that the
+  mod_perl is loaded.
+
+  - Add to your httpd.conf:
+
+	PerlModule	Apache::Earlybird
+
+	<LocationMatch "/(root|cmd)\.exe">
+	  ErrorDocument 403 "
+	  SetHandler perl-script
+	  PerlHandler Apache::Earlybird
+	</LocationMatch>
+
+	<Location /default.ida>
+	  ErrorDocument 403 "
+	  SetHandler perl-script
+	  PerlHandler Apache::Earlybird
+	</Location>
+
+   The `ErrorDocument' directives are optional, but since worms don't
+   read error messages, cutting them to the minimum saves bandwidth.
+
+   - restart Apache.
+
+You'll probably get acknowledgements from sites that are warned about
+the worms that have infected their IIS servers.
+
+				Ronald Florence
+				ron@18james.com
+				http://www.18james.com

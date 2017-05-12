@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<package version="2.0" xmlns="http://www.idpf.org/2007/opf" unique-identifier="emptyUID">
+  <metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf">
+    <dc:Identifier scheme="FWID">this-is-not-a-fwid</dc:Identifier>
+    <dc:title>A Noncompliant OPF Test Sample</dc:title>
+    <dc:creator opf:role="author" opf:file-as="Pobre, Zed 1">Zed 1 Pobre</dc:creator>
+    <dc:Creator opf:role="author">Zed 2 Pobre</dc:Creator>
+    <dc:creator role="coauthor">Zed 3 Pobre</dc:creator>
+    <dc:publisher>CPAN</dc:publisher>
+    <dc:date event="creation">2008-01-01</dc:date>
+    <dc:Date event="publication">03/01/2008</dc:Date>
+    <dc:date opf:event="badfebday">2/31/2004</dc:date>
+    <dc:Date opf:event="YYYY-xx-DD">2009-xx-01</dc:Date>
+    <dc:Type>Text</dc:Type>
+    <dc:format>text/html</dc:format>
+    <dc:identifier id="ISBN-10" scheme="ISBN">X-0000-9999-1</dc:identifier>
+    <dc:identifier id="eISBN">X-0000-9999-2</dc:identifier>
+    <dc:identifier scheme="ISBN-10">X-0000-9999-3</dc:identifier>
+    <dc:identifier id="emptyUID"></dc:identifier>
+    <dc:language>en-us</dc:language>
+    <dc:Language>en-us</dc:Language>
+    <dc:rights>Copyright &copy; 2008 by Zed Pobre</dc:rights>
+    <dc:subject>Samples</dc:subject>
+    <dc:Subject scheme="BISAC" code="030000">EDUCATION / Testing &amp; Measurement</dc:Subject>
+    <dc:identifier id="UID" scheme="GUID">{28D17050-173C-11D5-9303-0010DA63A409}</dc:identifier>
+  </metadata>
+  <manifest>
+    <item media-type="application/xhtml+xml" href="part1.html" id="item-text" />
+    <item media-type="application/xhtml+xml" href="missingfile.html" id="file-missing" />
+    <item href="toobusy.jpg" />
+  </manifest>
+  <spine>
+    <itemref idref="item-text" />
+    <itemref idref="file-missing" />
+  </spine>
+</package>

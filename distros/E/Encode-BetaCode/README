@@ -1,0 +1,44 @@
+Encode::BetaCode
+
+Encode::BetaCode is a Perl module. It provides functions that convert
+Beta Code strings to Unicode and reverse.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Encode::BetaCode
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Encode-BetaCode
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Encode-BetaCode
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Encode-BetaCode
+
+    Search CPAN
+        http://search.mcpan.org/dist/Encode-BetaCode/
+
+    GitHub
+	https://github.com/dgkontopoulos/Encode-BetaCode
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2012-16 Dimitrios - Georgios Kontopoulos
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

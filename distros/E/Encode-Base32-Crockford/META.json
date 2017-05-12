@@ -1,0 +1,39 @@
+{
+   "abstract" : "encode/decode numbers using Douglas Crockford's Base32 Encoding",
+   "author" : [
+      "Graham Barr"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300002, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Encode-Base32-Crockford",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Scalar::Util" : 0,
+            "Test::Warn" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/gbarr/Encode-Base32-Crockford.git",
+         "web" : "http://github.com/gbarr/Encode-Base32-Crockford"
+      }
+   },
+   "version" : "2.112991"
+}
+

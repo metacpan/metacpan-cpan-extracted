@@ -1,0 +1,37 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 18b09a995a9b8b41b56058a357fe32f9130e3b18 Build.PL
+SHA1 19018e52a40218fb976f1f5214107ec34989c58e Changes
+SHA1 81f9988f58f6b4d3396e279cbe4893ce828f0126 LICENSE
+SHA1 ee70658fb0b4af3b70ac83b6158490c19761df69 MANIFEST
+SHA1 8926a5ca9f9b38ec0caeb5af91f68c2884b74ec7 META.json
+SHA1 dfc62acfe336c02bea99ee68f0ac52cd10b5a0c5 META.yml
+SHA1 8724e35e331c430cdb8d280e7090d527d236f2a1 Makefile.PL
+SHA1 727360a64b3d8085fc09cc8eb9abc3a45cb53938 README
+SHA1 73c99dde385545e13f597497c9802354eb84fadb lib/Encode/Punycode.pm
+SHA1 ac244723239acf950f85d96e1fdb22da8fb494e8 t/00use.t
+SHA1 720c8c5b030148b9d2c4f14b665e834d9740777b t/vectors.t
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBCAAGBQJYYvG7AAoJEIS+srvgrWBmGToIAJ7jFCE0t8p226c03kgm3bqa
+TAhY5NmplOfXUeoXPUeDvTtE04WLe4vqihQP+2ljAKNrBCGqgxD8BSlb3Md/HQOP
+D6q98U0sLhB6I/hJAhDzZSgJFgGTjm2G6AGem2Rsp+2xeRjempU92sMzGv/8vvKO
+lloH+ecuNx4FA3mZlzaioiaQ2tXGSr/bq2VzNYoqopvETCsR4mU9QKGY5mjIx+NM
+OOEHiNM69wV8NCom5zCCZQVYXhjP38mw5U1+C3nmQ1TSL9itc+1uCBfMbRMxgQy5
+b2EYjyn3WSLpltj1sw7AlKUWeTt5pLxF45KxMyBtbXUrZquAW6oSuy5+i7XlMRQ=
+=3BZw
+-----END PGP SIGNATURE-----

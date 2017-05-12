@@ -1,0 +1,13 @@
+ARTISTIC-1.0
+Changes
+GPL-1
+GPL-2.0
+lib/ExtUtils/MakeMaker/Extensions.pm
+LICENSE
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README.md
+t/00-load.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

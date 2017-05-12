@@ -1,0 +1,135 @@
+#!perl
+
+use strict;
+use warnings;
+
+use version;
+
+use FindBin;
+use File::Basename 'dirname';
+
+use lib (
+    File::Spec->catdir( dirname(__FILE__), qw| .. lib perl5| ),
+);
+
+require Enbld::Home;
+Enbld::Home->initialize;
+
+my $target = shift @ARGV;
+my $condition = shift @ARGV;
+
+unless ( $target ) {
+    die "you must set target name parameter";
+}
+
+if ( $target =~ /[^a-z0-9]/ ) {
+    die( Enbld::Error->new( "invalid target name '$target'" ));
+}
+
+require Enbld::Definition;
+my $attributes = Enbld::Definition->new( $target )->parse;
+
+if ( $condition ) {
+    $attributes->add( 'VersionCondition', $condition );
+} else {
+    $attributes->add( 'VersionCondition' );
+}
+
+
+my @list = qw/
+AdditionalArgument
+AllowedCondition
+ArchiveName
+Dependencies
+DistName
+DownloadSite
+Extension
+Filename
+IndexParserForm
+IndexSite
+PatchFiles
+Prefix
+SortedVersionList
+URL
+Version
+VersionCondition
+VersionForm
+WebSite
+CommandConfigure
+CommandMake
+CommandTest
+CommandInstall
+/;
+
+print "target:" . $target . "\n";
+print "\n";
+
+foreach my $name ( sort @list ) {
+
+    my $value = $attributes->$name;
+
+    print $name . ':';
+
+    if ( ! $value ) {
+        print "\n";
+        next;
+    }
+
+    if ( ! ref( $value ) ) {
+        print $value . "\n";
+        next;
+    }
+
+    if ( ref( $value ) eq 'ARRAY' && $name ne 'SortedVersionList' ) {
+        print "\n";
+
+        foreach my $val ( sort @{ $value } ) {
+            print "    ";
+            print $val . "\n";
+        }
+
+        next;
+    }
+
+    if ( $name eq 'SortedVersionList' ) {
+        print "\n";
+
+        foreach my $val ( @{ $value } ) {
+            print "    ";
+            print $val . "\n";
+        }
+
+        next;
+ 
+    }
+
+}
+
+=pod
+
+=head1 NAME
+
+chkenbld - debug utility command for checking target's attributes.
+
+=head1 SYNOPSIS
+
+ $ chkenbld git           # displays all attributes for target software.
+
+=head1 DESCRIPTION
+
+chkenbld is debug utility command for checking target's attributes.
+
+chkenbld displays all attributes for target software.
+
+VersionCondition must set 'latest'.
+
+=head1 COPYRIGHT
+
+copyright 2013- Magnolia C<< <magnolia.k@me.com> >>.
+
+=head1 LICENSE
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

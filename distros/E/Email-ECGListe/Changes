@@ -1,0 +1,23 @@
+Revision history for Perl extension Email::ECGListe.
+
+0.01  Tue Oct 27 13:26:10 2009
+	- original version; created by h2xs 1.23 with options
+		-XA -n Email::ECGListe
+
+0.02  Wed Oct 28 13:17:04 2009
+	- problems with authorizations
+
+0.03  Fri Oct 28 15:59:04 2009
+	- problems with authorizations
+
+0.04  Fri Oct 28 16:11:04 2009
+	- problems with authorizations
+
+0.05  Fri Oct 28 18:41:09 2009
+	- problems with authorizations
+
+0.06  Fri Oct 28 20:11:44 2009
+	- problems with authorizations
+
+0.07  Tue Nov 10 11:26:12 2009
+	- problems with tests

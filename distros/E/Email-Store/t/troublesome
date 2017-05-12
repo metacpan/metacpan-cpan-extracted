@@ -1,0 +1,112 @@
+Return-Path: <rt@x1.develooper.com>
+Mailing-List: contact perl6-internals-help@perl.org; run by ezmlm
+Delivered-To: mailing list perl6-internals@perl.org
+Received: (qmail 14790 invoked by uid 76); 12 Jul 2002 05:54:54 -0000
+Received: from x1.develooper.com (HELO x1.develooper.com) (209.104.63.55)
+  by onion.perl.org (qpsmtpd/0.07b) with SMTP; Fri Jul 12 05:54:54 2002 -0000
+Received: (qmail 10331 invoked by uid 405); 12 Jul 2002 05:44:59 -0000
+Resent-Date: 12 Jul 2002 05:44:59 -0000
+Resent-Message-ID: <20020712054459.10330.qmail@x1.develooper.com>
+Resent-From: rt@x1.develooper.com
+MIME-Version: 1.0 
+In-Reply-To: <rt-801@netlabs> 
+X-Mailer: Perl5 Mail::Internet v1.47 
+Content-Type: multipart/mixed; boundary="----------=_1026452699-10321-0" 
+Reply-To: perl6-internals@perl.org
+RT-Originator: sorourke@cs.ucsd.edu 
+Resent-To: perl6-internals@perl.org
+Managed-BY: Request Tracker 2.0.12 (http://www.fsck.com/projects/rt/) 
+Subject: [netlabs #801] [PATCH] PerlArray in scalar context  
+Sender: <rt@x1.develooper.com>
+RT-Ticket: netlabs #801 
+Message-Id: <rt-801-3747.1.49050552378824@netlabs> 
+X-RT-Newticket: yes 
+Mail-Followup-To: perl6-internals@perl.org 
+X-RT-Loop-Prevention: netlabs 
+To: 'AdminCc of netlabs Ticket #801': ;
+From: "Sean O'Rourke" (via RT) <bugs-parrot@netlabs.develooper.com>
+
+------------=_1026452699-10321-0
+Content-Type: text/plain
+Content-Disposition: inline
+
+# New Ticket Created by  "Sean O'Rourke" 
+# Please include the string:  [netlabs #801]
+# in the subject line of all future correspondence about this issue. 
+# <URL: http://bugs6.perl.org/rt2/Ticket/Display.html?id=801 >
+
+
+This patch makes the following behave as it does in Perl 5:
+
+@a = 1..3; @b = 1..3;
+$x = @a + @b;		# x is 6 in Perl 5, undef in Parrot
+
+The problem was that the math vtable methods were giving up if the other
+side of the operator wasn't an int or a num.  So the current version of
+PerlArray would make $x undef.  I'm not sure getting the other thing's int
+value (as opposed to its num value) is the right thing, but it seems like
+a reasonable guess.
+
+/s
+
+
+-- attachment  1 ------------------------------------------------------
+url: http://bugs6.perl.org/rt2/attach/3747/3492/67a294/perlarray-711.patch
+
+
+------------=_1026452699-10321-0
+Content-Type: text/plain; name="perlarray-711.patch"
+Content-Disposition: inline; filename="perlarray-711.patch"
+Content-Transfer-Encoding: base64
+Content-Description: perlarray-711.patch
+
+SW5kZXg6IHBlcmxhcnJheS5wbWMNCj09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0N
+ClJDUyBmaWxlOiAvY3ZzL3B1YmxpYy9wYXJyb3QvY2xhc3Nlcy9wZXJsYXJy
+YXkucG1jLHYNCnJldHJpZXZpbmcgcmV2aXNpb24gMS4zMg0KZGlmZiAtcCAt
+dSAtcjEuMzIgcGVybGFycmF5LnBtYw0KLS0tIHBlcmxhcnJheS5wbWMJMjEg
+SnVuIDIwMDIgMTc6MjI6MzQgLTAwMDAJMS4zMg0KKysrIHBlcmxhcnJheS5w
+bWMJMTIgSnVsIDIwMDIgMDU6MzY6MjkgLTAwMDANCkBAIC0zODQsNiArMzg0
+LDExIEBAIHBtY2xhc3MgUGVybEFycmF5IHsNCiAgICAgICAgICAgICApOw0K
+ICAgICAgICAgfQ0KICAgICAgICAgZWxzZSB7DQorICAgICAgICAgICAgZGVz
+dC0+dnRhYmxlID0gJlBhcnJvdF9iYXNlX3Z0YWJsZXNbZW51bV9jbGFzc19Q
+ZXJsSW50XTsNCisgICAgICAgICAgICBkZXN0LT52dGFibGUtPnNldF9pbnRl
+Z2VyX25hdGl2ZShJTlRFUlAsIGRlc3QsIA0KKyAgICAgICAgICAgICAgICBT
+RUxGLT52dGFibGUtPmdldF9pbnRlZ2VyKElOVEVSUCwgU0VMRikgKw0KKwkJ
+dmFsdWUtPnZ0YWJsZS0+Z2V0X2ludGVnZXIoSU5URVJQLCB2YWx1ZSkNCisg
+ICAgICAgICAgICApOw0KICAgICAgICAgfQ0KICAgICB9DQogDQpAQCAtNDI5
+LDYgKzQzNCwxMSBAQCBwbWNsYXNzIFBlcmxBcnJheSB7DQogICAgICAgICAg
+ICAgKTsNCiAgICAgICAgIH0NCiAgICAgICAgIGVsc2Ugew0KKyAgICAgICAg
+ICAgIGRlc3QtPnZ0YWJsZSA9ICZQYXJyb3RfYmFzZV92dGFibGVzW2VudW1f
+Y2xhc3NfUGVybEludF07DQorICAgICAgICAgICAgZGVzdC0+dnRhYmxlLT5z
+ZXRfaW50ZWdlcl9uYXRpdmUoSU5URVJQLCBkZXN0LCANCisgICAgICAgICAg
+ICAgICAgU0VMRi0+dnRhYmxlLT5nZXRfaW50ZWdlcihJTlRFUlAsIFNFTEYp
+IC0NCisJCXZhbHVlLT52dGFibGUtPmdldF9pbnRlZ2VyKElOVEVSUCwgdmFs
+dWUpDQorICAgICAgICAgICAgKTsNCiAgICAgICAgIH0NCiAgICAgfQ0KIA0K
+QEAgLTQ3NCw2ICs0ODQsMTEgQEAgcG1jbGFzcyBQZXJsQXJyYXkgew0KICAg
+ICAgICAgICAgICk7DQogICAgICAgICB9DQogICAgICAgICBlbHNlIHsNCisg
+ICAgICAgICAgICBkZXN0LT52dGFibGUgPSAmUGFycm90X2Jhc2VfdnRhYmxl
+c1tlbnVtX2NsYXNzX1BlcmxJbnRdOw0KKyAgICAgICAgICAgIGRlc3QtPnZ0
+YWJsZS0+c2V0X2ludGVnZXJfbmF0aXZlKElOVEVSUCwgZGVzdCwgDQorICAg
+ICAgICAgICAgICAgIFNFTEYtPnZ0YWJsZS0+Z2V0X2ludGVnZXIoSU5URVJQ
+LCBTRUxGKSAqDQorCQl2YWx1ZS0+dnRhYmxlLT5nZXRfaW50ZWdlcihJTlRF
+UlAsIHZhbHVlKQ0KKyAgICAgICAgICAgICk7DQogICAgICAgICB9DQogICAg
+IH0NCiANCkBAIC01MTksNiArNTM0LDExIEBAIHBtY2xhc3MgUGVybEFycmF5
+IHsNCiAgICAgICAgICAgICApOw0KICAgICAgICAgfQ0KICAgICAgICAgZWxz
+ZSB7DQorICAgICAgICAgICAgZGVzdC0+dnRhYmxlID0gJlBhcnJvdF9iYXNl
+X3Z0YWJsZXNbZW51bV9jbGFzc19QZXJsSW50XTsNCisgICAgICAgICAgICBk
+ZXN0LT52dGFibGUtPnNldF9pbnRlZ2VyX25hdGl2ZShJTlRFUlAsIGRlc3Qs
+IA0KKyAgICAgICAgICAgICAgICBTRUxGLT52dGFibGUtPmdldF9pbnRlZ2Vy
+KElOVEVSUCwgU0VMRikgLw0KKwkJdmFsdWUtPnZ0YWJsZS0+Z2V0X2ludGVn
+ZXIoSU5URVJQLCB2YWx1ZSkNCisgICAgICAgICAgICApOw0KICAgICAgICAg
+fQ0KICAgICB9DQogDQpAQCAtNTU3LDYgKzU3NywxMSBAQCBwbWNsYXNzIFBl
+cmxBcnJheSB7DQogICAgICAgICAgICAgKTsNCiAgICAgICAgIH0NCiAgICAg
+ICAgIGVsc2Ugew0KKyAgICAgICAgICAgIGRlc3QtPnZ0YWJsZSA9ICZQYXJy
+b3RfYmFzZV92dGFibGVzW2VudW1fY2xhc3NfUGVybEludF07DQorICAgICAg
+ICAgICAgZGVzdC0+dnRhYmxlLT5zZXRfaW50ZWdlcl9uYXRpdmUoSU5URVJQ
+LCBkZXN0LCANCisgICAgICAgICAgICAgICAgU0VMRi0+dnRhYmxlLT5nZXRf
+aW50ZWdlcihJTlRFUlAsIFNFTEYpICUNCisJCXZhbHVlLT52dGFibGUtPmdl
+dF9pbnRlZ2VyKElOVEVSUCwgdmFsdWUpDQorICAgICAgICAgICAgKTsNCiAg
+ICAgICAgIH0NCiAgICAgfQ0KIA0K
+
+------------=_1026452699-10321-0--

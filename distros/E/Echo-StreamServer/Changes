@@ -1,0 +1,11 @@
+Revision history for Perl extension Echo::StreamServer::Client.
+
+0.04  Fri Jun 15 22:32:16 EDT 2012
+	- Completed basic test suite.
+	- Added EQLShell module to have an interactive shell.
+	- turned off DEBUG flag in distro.
+
+0.01  Mon May 21 11:57:54 2012
+	- original version; created by h2xs 1.23 with options
+		-XAn Echo::StreamServer::Client
+

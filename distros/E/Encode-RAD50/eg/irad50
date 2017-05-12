@@ -1,0 +1,93 @@
+#!/usr/local/bin/perl
+
+use strict;
+use warnings;
+
+use Encode::RAD50;
+use Getopt::Long 2.33 qw{ :config auto_version };
+use Pod::Usage;
+
+our $VERSION = '0.012';
+
+my %opt = (
+    uppercase	=> 1,
+);
+
+GetOptions( \%opt,
+    qw{ quiet! uppercase|uc! },
+    help => sub { pod2usage( { -verbose => 2 } ) },
+) or pod2usage( { -verbose => 0 } );
+
+Encode::RAD50->silence_warnings ($opt{quiet});
+
+binmode (STDOUT, 'encoding(rad50)');
+
+while (<>) {
+    $opt{uppercase}
+	and $_ = uc $_;
+    print;
+}
+
+__END__
+
+=head1 TITLE
+
+irad50 - Convert ASCII input to RAD50
+
+=head1 SYNOPSIS
+
+ irad50 <ascii.txt >rad50.dat
+ irad50 -help
+ irad50 -version
+
+=head1 OPTIONS
+
+=head2 -help
+
+This option displays the documentation for this script. The script then
+exits.
+
+=head2 -quiet
+
+If asserted, this option suppresses conversion warnings. The default is
+C<-noquiet>.
+
+=head2 -uppercase
+
+If asserted, this option causes the input to be converted to uppercase
+before conversion to RAD50. The default is C<-uppercase>, since RAD50
+does not have any representation for lower-case characters. But you can
+turn this off by specifying C<-nouppercase>.
+
+=head2 -version
+
+This option displays the version of this script. The script then exits.
+
+=head1 DETAILS
+
+This Perl script is essentially a Unix pipe, that reads ASCII on
+standard input, and converts it to RAD50 on standard output.
+
+=head1 AUTHOR
+
+Thomas R. Wyant, III F<wyant at cpan dot org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005-2007, 2011-2016 by Thomas R. Wyant, III
+(F<wyant at cpan dot org>). All rights reserved.
+
+PDP-11, RSTS-11, RSTS/E,  RSX-11, RSX-11M+, P/OS and RT-11 are
+trademarks of Hewlett-Packard Development Company, L.P.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut
+
+# ex: set textwidth=72 :

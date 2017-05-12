@@ -1,0 +1,83 @@
+{
+   "abstract" : "Mailgun transport for Email::Sender",
+   "author" : [
+      "Stephen Thirlwall <sdt@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.4",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Email-Sender-Transport-Mailgun",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Email::Sender" : "0",
+            "HTTP::Tiny" : "0",
+            "HTTP::Tiny::Multipart" : "0",
+            "IO::Socket::SSL" : "0",
+            "JSON::MaybeXS" : "0",
+            "Moo" : "0",
+            "MooX::Types::MooseLike::Base" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DateTime" : "0",
+            "Test::Differences" : "0",
+            "Test::Fatal" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Email::Sender::Transport::Mailgun" : {
+         "file" : "lib/Email/Sender/Transport/Mailgun.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/sdt/Email-Sender-Transport-Mailgun/issues"
+      },
+      "homepage" : "https://github.com/sdt/Email-Sender-Transport-Mailgun",
+      "repository" : {
+         "url" : "git://github.com/sdt/Email-Sender-Transport-Mailgun.git",
+         "web" : "https://github.com/sdt/Email-Sender-Transport-Mailgun"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

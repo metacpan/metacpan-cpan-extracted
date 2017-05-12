@@ -1,0 +1,7 @@
+<workbook>
+  <worksheet name="cell">
+    <cell comment='Test1'>Test1</cell>
+    <cell comment='Test2' text="Test2" />
+    <cell comment='' text="Test3" />
+  </worksheet>
+</workbook>

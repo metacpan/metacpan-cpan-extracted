@@ -1,0 +1,161 @@
+Revision history for Perl extension Embedix::DB.
+
++ means it still needs to be done
+- means it's done
+
+beyond 1.00
+    + move node.help and node.prompt to another table (node_description)
+      in order to facilitate localization.
+    + go back to California
+
+1.00  TARGET
+    + be able to configure an Embedix distribution (another module)
+    + add arch table?
+      If I do, the architectures should be exactly the same as the ones
+      found in /usr/src/linux/arch/*.
+    + figure out a way to do dependency checking (another module)
+    + figure out a way to do conflict resolution (another module)
+    + figure out how I want to deal with requires, requiresexpr, && if
+    + find a clever use for AUTOLOAD
+    + should root nodes have an entry in node_parent w/ parent_id = 0?
+    + cloneDistro(arch => $whatever);
+    + handle attributes I am currently ignoring:
+      choicelist
+      trideps 
+      license
+      if - the only non-trivial one
+    + implement unrelateNode() and maybe think of a better name
+      while I'm at it.
+    + eliminate unnecessary prepares and use $dbh->do() when
+      appropriate.
+    + write a test for getComponentList()
+    + I need to remove workOnDistro() from the public API and 
+      make it part of the constructor instead.
+    + implement deleteNode() and a test for it.
+    + implement deleteNodeDependencies() and a test for it.
+      This will just be a front-end to the 
+      plpgsql function node_dependencies_delete();
+    + using advanced perl OO-magick, make a subclass of Embedix::ECD
+      that has delayed node retrieval...  or maybe I should add hooks
+      to Embedix::ECD that makes it friendly towards delayed loaders.
+      That would be PIMP!
+
+0.05
+    - implemented getDistroList() which has similar behaviour to
+      getComponentList();
+    - document getDistroList
+    - added stub for admin functionality to bin/ebx
+
+0.04  Sun Feb 25 09:51:04 MST 2001
+    - [Pg] factor a function out of node_dependencies_delete() such that
+      there will exist a function called node_aggregates_delete(id) that
+      deletes aggregates but not child nodes;
+    - removed DB/CML2.pm, because it's going to go with the dep-handling
+      module (whatever I decide to call it).
+    - in the methods that insert aggregate attributes, I have
+      it skip blank lines -- it used to insert them.
+    - in the methods that insert aggregate attributes, it is now
+      able to prevent duplicates from being inserted.
+      Currently, postgres itself prevents an insertion, but
+      in doing so, it totally invalidates the current transaction.
+      This change pre-empts that behaviour.
+    - s/insertBuild_vars/insertBuildVars/g;
+    - finished implementing getNodePath() w/ a path_cache even.
+    - getComponentList() should be OK, too
+    - changed t/00_pg.t to clean up more rigorously
+    - removed getHierarchy
+    - s/arch/board/g;  Specifying the board is more specific,
+      and it flows better with the direction Stuart is taking
+      with building.  This affected DB/Pg.pm, sql/pg_schema.sql,
+      and t/00_pg.t -- "make test" survived.
+    - hashrefFromECD() no longer has a distro_id, because we're
+      going to be using the node_distro table.  distro_id was
+      also removed from the node table.
+    - selectNode() had its references to distro_id removed
+      "make test TEST_VERBOSE=1" looked ok.
+    - added relateNode() to make insertions into the node_distro
+      table.
+    - I need to make insertions into node_distro in:
+      -addDistro
+      -cloneDistro # of course
+      -insertNode
+    - I need to join node_distro in
+      -getNodePath
+      -selectNode
+      -getComponentList
+    - SERIOUS ISSUE:  If I allow nodes to be shared between distros,
+      then I will need to introduce a node_distro table similar to the
+      node_parent table that defines a mapping between node and distro.
+      Although a node may be shared between many distros, it doesn't
+      necessarily have to be shared.  This also means getting rid of the
+      distro_id column in the node table.  cloneDistro() is impossible 
+      to implement until this is done.  ...but I did it.
+    - fixed scripts in bin/ to use 'board' instead of 'arch'.
+    - fixed typo in select statement for getComponentList.
+    - [Pg] "conflicts" attribute added to node table.
+      I hope it's not one of those stealth multi-line attributes.
+    - changed getNodePath() to prepend '/' on all paths.
+    - implemented unrelateNode()
+    - massive documentation updates for Embedix::DB
+    - changed the *_size attributes into int arrays.
+      I'm able to evaluate the mathematical expressions before
+      inserting, too.
+    - [Pg] added "if" column to node table
+    - made t/01_pg.t fail gracefully.
+
+0.03  Tue Jan 16 04:22:43 MST 2001
+    - renamed addECD to updateDistro(ecd => $ecd, parent_id => $id).
+      parent_id is optional.
+    - made Embedix::DB::Pg::hashrefFromECD be able to
+      handle range attributes.  I implement them as
+      PostgreSQL arrays in the schema.
+    - [Pg] created indexes (indices?) on node for node_class and node_name
+    - [Pg] created an index on node_parent for parent_id
+    - [Pg] added an arch column for distro
+    - [Pg] added a license and node_license table
+    - [Pg] removed all the user_* tables for now, because I have to think
+      about them more.
+    - [Pg] addDistro and/or workOnDistro may have a subtle bug
+      I wrote some more test cases, and everything seemed to be OK, though.
+      It even behaves right in edb_populate.pl where I originally had the
+      problem.  I think the original errors may have been caused by not
+      cleaning up some tables properly.  workOnDistro() was probably
+      fine all along.
+    - use Carp;
+    - be able to add aggregate attributes qw(provides build_vars keeplist)
+    - can add provides and requires aggregate attributes
+    - make addDistro and workOnDistro care about arch
+    - implemented getHierarchy
+    - preserve the correct $dbh->errstr in those parts that say
+      croak($dbh->errstr . $q);  Added the method, rollbackAndCroak,
+      to distill this idiom and save space.
+    - [Pg] created a function and trigger combo to recursively delete
+      node dependencies when a node is deleted.
+    - [Pg] added tables for aggregates: choicelist build_vars
+    - [Pg] be able to insert requires attribute into node table
+    - [Pg] in insert(Provides|Keeplist|Build_vars), carp instead of
+      croak when a primary key is already taken.
+
+0.02  Mon Jan  1 18:55:20 MST 2001
+    - finally wrote a schema I could play around with.
+    - decided that Embedix::DB will be a factory class
+      that instantiates instances of Embedix::DB::* backend objects.
+      These backend objects will NOT be subclasses of Embedix::DB.
+      Embedix::ECD and friends may get reorganized similarly.
+    - added methods: qw(new workOnDistro addDistro addECD)
+      to Embedix::DB::Pg
+    - stole build_update_statement an build_insert_statement from
+      DBIx::Hotel
+    - added Embedix::DB::Pg::currval()
+    - added Embedix::DB::Pg::nextval()
+    - added sql/pg_reset.sql for making it easy to start over
+    - changed buildInsertStatement to use $dbh->quote
+    - changed buildUpdateStatement to use $dbh->quote
+    - added selectNode, updateNode, and insertNode.
+      I went to sleep before testing it.
+    - I am so fscking good.  addECD worked on the first try.
+      damn, I'm good.  (wait a few hours for my ego to deflate)
+      There were a few minor bugs, but all the inserts happened w/o dying.
+
+0.01  Sat Dec  9 12:58:40 MST 2000
+    - original version;

@@ -1,0 +1,50 @@
+
+<html>
+<head>
+<title>Define a SUbroutine within Embperl</title>
+</head>
+
+<body>
+
+
+Here we define a subroutine<P>
+
+NOTE: It must be defined within [[! ... !] to avoid redefinition!
+
+[!
+
+# Here we add a comment
+
+sub Hello
+
+	{
+    # not much to do ...
+	return 'Hello world' ;
+	}
+	
+!]
+
+Now we call the subroutine: [+ Hello () +] <P>
+
+$XXXXXX::var = [+ defined ($XXXXXX::var)?$XXXXXX::var:'<undef>' +] <br>
+
+Setup some variable outside our namespace, which should not be cleaned up<br>
+
+[- $XXXXXX::var = 1 -]
+
+$XXXXXX::var = [+ defined ($XXXXXX::var)?$XXXXXX::var:'<undef>' +] <br>
+
+
+[! sub CLEANUP
+	{
+	print LOG "This will be called before variable cleanup\n" ;
+	undef $XXXXXX::var ;
+	}
+!]
+
+ 
+<P>Ok.<P>
+
+
+</body>
+</html>

@@ -1,0 +1,23 @@
+---
+abstract: 'Typemaps that have been removed from the core'
+author:
+  - 'Steffen Mueller <smueller@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112621'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: ExtUtils-Typemaps-Excommunicated
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: 0
+  ExtUtils::Typemaps: 3.14
+version: 0.01

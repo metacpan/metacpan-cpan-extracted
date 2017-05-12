@@ -1,0 +1,12 @@
+Build.PL
+Changes
+lib/Email/Store/Language.pm
+MANIFEST			This list of files
+t/01-use.t
+t/10-language.t
+t/98-pod_coverage.t
+t/99-pod.t
+t/email.dat
+META.yml                                 Module meta-data (added by MakeMaker)
+Makefile.PL
+README

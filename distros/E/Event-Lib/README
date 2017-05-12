@@ -1,0 +1,63 @@
+Event-Lib version 1.03
+=========================
+
+This module is a Perl wrapper around libevent(3) as available from
+<http://www.monkey.org/~provos/libevent/>.  It allows to execute a function
+whenever a given event on a filehandle happens, a timeout occurs or a signal is
+received.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+In case you have several libevents installed and you'd like to use
+the one in /usr/local/(lib|include):
+
+   perl Makefile.PL INC=-I/usr/local/include LIBS="-L/usr/local/lib -levent"
+   make
+   make test
+   make install
+
+For debugging-support, do:
+
+    perl Makefile.PL DEFINE=-DEVENT_LIB_DEBUG
+    ...
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    + libevent(3) from <http://www.monkey.org/~provos/libevent/>;
+      it's advisable to always use the latest version but
+      everything >= 0.9 should work
+    + a C compiler
+    + recommended for the test-suite: GTop as available from the CPAN;
+      if you have it installed, the test-suite will run memory-leak 
+      tests as well.
+
+SOURCE
+
+Normally you'd get the latest version of Event-Lib from CPAN. But if you want to 
+try the cutting edge version (especially if you plan on sending patches), please 
+consider using the svn version, which can be checked out via:
+
+  svn co http://svn.perl.org/modules/Event-Lib/trunk/ Event-Lib  
+
+You can also browse the svn tree online via:
+
+  http://svn.perl.org/viewcvs/modules/Event-Lib/
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004-2007 by Tassilo von Parseval
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+

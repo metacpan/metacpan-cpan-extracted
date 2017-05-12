@@ -1,0 +1,34 @@
+Change Log for Email::MIME::Kit::Renderer::MicroMason
+
+1.21 - Tue Mar  5 15:19:44 EST 2013
+    Applies rjbs' patch to uses EMK's kit_reader to read files, instead of
+    chdir.
+
+    "Changing to the kit dir before rendering is a bit of a dirty hack,
+    but it works... as long as the kit's kitreader is Dir.  If you're
+    using something more complicated, like KitReader::SWAK, it doesn't
+    actually help.
+
+    Instead of doing that, this commit adds a mixin to the micromason
+    object, converting its reads of files-by-name into reads of kit
+    contents.
+
+    Admittedly, the way that the renderer is shoved into the mason
+    object is also a dirty hack, but presumably it's one that can be
+    corrected by someone more familiar with how micromason mixins are
+    meant to work."
+
+1.002 - Fri Oct 21 13:59:03 EDT 2011
+    Added cleanup code in case mason->render dies
+    - Always need to make sure we chdir back
+
+1.02 - Sat Nov 28 09:37:33 2009
+    Added support for the -Filters mixin
+    Perform a chdir so any included components can be relative to mkit dir
+
+2009-06-11  Mark Grimes <mgrimes@cpan.org>
+    Updated the SEE ALSO section of the pod and added another comment
+
+2009-06-11  Mark Grimes <mgrimes@cpan.org>
+    Added resources section for META.yaml
+

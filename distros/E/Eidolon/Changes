@@ -1,0 +1,11 @@
+Revision history for Eidolon.
+
+0.02  Wed May 27 04:44:44 2009
+    - driver initialization and inheritance code is rewritten from scratch
+    - routing code removed from core (routing is done using special drivers)
+    - debugging package now uses javascript for output
+    - a lot of bugfixes
+
+0.01  Mon Jan 26 06:33:50 2009
+    - initial release
+

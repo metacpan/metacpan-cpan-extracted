@@ -1,0 +1,42 @@
+Changelog for Extorter
+
+0.10 2015-02-02T07:02:25
+ - Added support for renaming imports.
+
+0.09 2015-01-03T02:36:29
+ - v0.09
+ - Fixed declaration parsing regex.
+
+0.08 2015-01-01T14:14:48
+ - v0.08
+ - Modified documentation.
+
+0.07 2015-01-01T04:01:15
+ - v0.07
+ - Modified documentation.
+
+0.06 2014-12-30T04:14:33
+ - v0.06
+ - Modified documentation.
+
+0.05 2014-12-30T02:15:02
+ - v0.05
+ - Added 2 and 3-arg versions of extort::into and updated the
+   documentation.
+
+0.04 2014-12-28T17:26:55
+ - v0.04
+ - Allow imorting on-demand via extort::into function.
+
+0.03 2014-12-26T06:43:04
+ - v0.03
+ - Allow importing packages-only.
+
+0.02 2014-12-26T05:03:15
+ - v0.02
+ - Initial commit.
+
+0.01 2014-12-26T04:49:58
+ - v0.01
+ - Initial commit.
+

@@ -1,0 +1,92 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with EntityModel::DB
+at lib/EntityModel/DB.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+EntityModel::DB - database management
+
+=head1 VERSION
+
+version 0.102
+
+=head1 DESCRIPTION
+
+Manages database connections and transactions.
+
+=head2 new
+
+Create a new L<EntityModel::DB> object.
+
+Does not attempt to connect any database handles, but prepares the context ready for the first
+request.
+
+=head2 dbh
+
+Returns a database handle.
+
+Can only be called within a transaction.
+
+=head2 dsn
+
+Data Source string used for connecting to the database.
+
+Currently hardcodes the dbi:Pg: prefix.
+
+=head2 transaction
+
+Call code within a transaction.
+
+Note that this does not map exactly onto a single database transaction. Nested transactions are supported, using
+savepoints, and a transaction may cover several active database handles.
+
+=head2 update
+
+Update information
+
+=head2 select
+
+Run a select query against the database and return the results as an orderly hash.
+
+=head2 select_iterator
+
+Run a select query against the database and return the results as an orderly hash.
+
+=head2 active_db
+
+Returns the currently active database handle.
+
+=head1 INTERNAL METHODS
+
+=head2 _run_query
+
+Run the given query.
+
+=head2 _fork_guard
+
+Internal method used to check whether we've forked recently and if so reset the internal state
+so that we don't try to reuse existing handles.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<EntityModel::BaseClass>
+
+L<clone|EntityModel::BaseClass/clone>, L<dump|EntityModel::BaseClass/dump>, L<sap|EntityModel::BaseClass/sap>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <cpan@entitymodel.com>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2008-2011. Licensed under the same terms as Perl itself.

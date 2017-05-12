@@ -1,0 +1,14 @@
+Changes
+ICU_LICENSE
+Makefile.PL
+MANIFEST
+ppport.h
+README
+XS.xs
+IBM_CODES/README
+IBM_CODES/bocu1.c
+IBM_CODES/bocu1.h
+IBM_CODES/bocu1tst.c
+t/Encode-BOCU1-XS.t
+lib/Encode/BOCU1/XS.pm
+META.yml                                 Module meta-data (added by MakeMaker)

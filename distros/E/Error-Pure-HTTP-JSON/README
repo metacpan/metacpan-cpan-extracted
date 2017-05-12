@@ -1,0 +1,102 @@
+NAME
+    Error::Pure::HTTP::JSON - Error::Pure module for JSON output over HTTP.
+
+SYNOPSIS
+     use Error::Pure::HTTP::JSON qw(err);
+     err 'This is a fatal error', 'name', 'value';
+
+SUBROUTINES
+    err(@messages)
+             Process error in JSON format with messages @messages over HTTP.
+             Output affects $Error::Pure::Output::JSON::PRETTY variable.
+
+EXAMPLE1
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Error::Pure::HTTP::JSON qw(err);
+
+     # Error.
+     err '1';
+
+     # Output like:
+     # Content-type: application/json
+     #
+     # [{"msg":["1"],"stack":[{"sub":"err","prog":"example1.pl","args":"(1)","class":"main","line":11}]}]
+
+EXAMPLE2
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Error::Pure::HTTP::JSON qw(err);
+
+     # Error.
+     err '1', '2', '3';
+
+     # Output like:
+     # Content-type: application/json
+     #
+     # [{"msg":["1","2","3"],"stack":[{"sub":"err","prog":"example2.pl","args":"(1, 2, 3)","class":"main","line":11}]}]
+
+EXAMPLE3
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Error::Pure::Output::JSON;
+     use Error::Pure::HTTP::JSON qw(err);
+
+     # Pretty print.
+     $Error::Pure::Output::JSON::PRETTY = 1;
+
+     # Error.
+     err '1';
+
+     # Output like:
+     # Content-type: application/json
+     #
+     # [
+     #    {
+     #       "msg" : [
+     #          "1"
+     #       ],
+     #       "stack" : [
+     #          {
+     #             "sub" : "err",
+     #             "prog" : "example3.pl",
+     #             "args" : "(1)",
+     #             "class" : "main",
+     #             "line" : 15
+     #          }
+     #       ]
+     #    }
+     # ]
+
+DEPENDENCIES
+    Error::Pure::Utils, Error::Pure::Output::JSON, Exporter,
+    List::MoreUtils, Readonly.
+
+SEE ALSO
+    Task::Error::Pure
+        Install the Error::Pure modules.
+
+REPOSITORY
+    <https://github.com/tupinek/Error-Pure-HTTP-JSON>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © 2013-2015 Michal Špaček
+     BSD 2-Clause License
+
+VERSION
+    0.05
+

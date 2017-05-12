@@ -1,0 +1,50 @@
+NAME
+    Exception::Warning - Convert simple warn into real exception object
+
+SYNOPSIS
+      # Convert warn into exception and throw it immediately
+      use Exception::Warning '%SIG' => 'die';
+      eval { warn "Boom!"; };
+      print ref $@;        # "Exception::Warning"
+      print $@->warning;   # "Boom!"
+
+      # Convert warn into exception without die
+      use Exception::Warning '%SIG' => 'warn', verbosity => 4;
+      warn "Boom!";   # dumps full stack trace
+
+      # Can be used in local scope only
+      use Exception::Warning;
+      {
+          local $SIG{__WARN__} = \&Exception::Warning::__WARN__;
+          warn "Boom!";   # warn via exception
+      }
+      warn "Boom!";       # standard warn
+
+      # Run Perl with verbose warnings
+      $ perl -MException::Warning=%SIG,warn,verbosity=>3 script.pl
+
+      # Run Perl which dies on first warning
+      $ perl -MException::Warning=%SIG,die,verbosity=>3 script.pl
+
+      # Run Perl which ignores any warnings
+      $ perl -MException::Warning=%SIG,warn,verbosity=>0 script.pl
+
+      # Debugging with increased verbosity
+      $ perl -MException::Warning=:debug script.pl
+
+DESCRIPTION
+    This class extends standard Exception::Base and converts warning into
+    real exception object. The warning message is stored in *warning*
+    attribute.
+
+AUTHOR
+    Piotr Roszatycki <dexter@cpan.org>
+
+LICENSE
+    Copyright (C) 2008, 2009 by Piotr Roszatycki <dexter@cpan.org>.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See http://www.perl.com/perl/misc/Artistic.html
+

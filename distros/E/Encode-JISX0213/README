@@ -1,0 +1,16 @@
+Encode-JISX0213 package.
+
+Copyright (C) 2013, 2015 by Hatuka*nezumi - IKEDA Soji
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+                                   ***
+
+Two main modules and some supporting modules are contained.  For more
+details read following POD documentations:
+
+    Encode::JISX0213 - JIS X 0213 encodings
+    Encode::ShiftJIS2004 - shift_jis-2004 - JIS X 0213 Annex 1 encoding
+
+$$

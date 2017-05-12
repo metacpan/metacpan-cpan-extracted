@@ -1,0 +1,28 @@
+[% title = 'Processed Files' %]
+[%INCLUDE menu.tmpl %][% IF canonical_file %]<h2>Canonical File: [%canonical_file.canonical_filename %]</h2>[% END %]
+    <table>
+        <tr>
+            <th>File Name</th>
+            <th>Item</th>
+            <th>Status</th>
+            <th>Message</th>
+            <th>Record Count</th>
+            <th>Date Created</th>
+            <th>Date Updated</th>
+        </tr>
+        [% WHILE (process = file_processes.next) %]
+        <tr>
+            <td><a href="[% script %]?file_id=[% process.file.file_id %]">[% process.filename %]</a></td>
+            <!--<td>[% process.file_id.canonical_filename %]</td>-->
+            <td><a href="[% root_url %]/item?item_id=[% process.item.item_id %]">[% process.item.item_name %]</a></td>
+            <td class="[% process.status.status_name %]">[% process.status.status_name %]</td>
+            <td>[% process.message %]</td>
+            <td>[% process.record_count %]</td>
+            <td>[% process.date_created.strftime('%d/%m/%Y %H:%M:%S') %]</td>
+            <td>[% process.date_updated.strftime('%d/%m/%Y %H:%M:%S') %]</td>
+        </tr>
+        [% END %]
+    </table>
+
+[% pager = file_processes.pager %]
+[% PROCESS footer.tmpl %]

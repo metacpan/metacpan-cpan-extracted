@@ -1,0 +1,60 @@
+Revision history for ExtUtils-H2PM
+
+0.10    2016/05/23 17:32:10
+        [CHANGES]
+         * Added 'include_path' and 'define' options for configuring the
+           compiler
+
+0.09    CHANGES:
+         * Allow member elements to be constants, which don't consume an input
+           value or return one
+
+        BUGFIXES:
+         * Specify 'signed char' in test.h to be specific to compilers (RT87583)
+
+0.08    CHANGES:
+         * Unpack functions now print the actual as well as expected length on
+           failures
+         * Updated FSF address in LICENSE file
+
+0.07    CHANGES:
+         * Allow constants and structures to be guarded by #ifdef preprocessor
+
+        BUGFIXES:
+         * Avoid C99's %zu and %td printf(3) formats
+
+0.06    BUGFIXES:
+         * Accept member names containing '.'
+         * gen_output() before opening the output file in case it fails
+         * Ensure warning-free handling of __unpack_u64 when given empty
+           string, in case of no_length_check
+
+0.05    CHANGES:
+         * Emulate pack/unpack 'Q' on 32bit perls to allow use of 64bit fields
+
+        BUGFIXES:
+         * Don't declare Test::Output as a dependency since it isn't required
+
+0.04    CHANGES:
+         * Allow member elements to be character arrays
+         * Allow generation of pack/unpack functions that use a hashref for
+           values, rather than a plain list
+
+0.03    CHANGES:
+         * Avoid warning about comparing unsigned int < 0
+         * Removed evil action-at-a-distance END{} block; now users must call
+           write_output()
+         * Try to use Module::Build's configuration if present - useful for
+           include_dirs, extra_compiler_flags, extra_linker_flags
+
+0.02    CHANGES:
+         * Allow structures to have a data tail; extra bytes at the end
+         * Allow renaming of generated constant functions
+        
+        BUGFIXES:
+         * Cast struct member pointers to char* so ptrdiff_t actually makes
+           sense
+         * Use the correct printf format specifiers for ptrdiff_t and size_t
+
+0.01    First version, released on an unsuspecting world.
+

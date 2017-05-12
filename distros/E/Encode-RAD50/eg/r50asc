@@ -1,0 +1,78 @@
+#!/usr/local/bin/perl
+
+use 5.006002;
+
+use strict;
+use warnings;
+
+use Encode::RAD50;
+use Getopt::Long 2.33 qw{ :config auto_version };
+use Pod::Usage;
+
+our $VERSION = '0.012';
+
+my %opt;
+
+GetOptions( \%opt,
+    help => sub { pod2usage( { -verbose => 2 } ) },
+) or pod2usage( { -verbose => 0 } );
+
+use open IN => ':encoding(rad50)';
+binmode (STDIN, 'encoding(rad50)');
+
+Encode::RAD50->silence_warnings( 1 );
+
+while (<>) {
+    print;
+}
+__END__
+
+=head1 TITLE
+
+r50asc - Convert RAD50 to ASCII
+
+=head1 SYNOPSIS
+
+ r50asc
+ r50asc -help
+ r50asc -version
+
+=head1 OPTIONS
+
+=head2 -help
+
+This option displays the documentation for this script. The script then
+exits.
+
+=head2 -version
+
+This option displays the version of this script. The script then exits.
+
+=head1 DETAILS
+
+This Perl script is essentially a Unix pipe, that reads RAD50 on
+standard input. and converts it to ASCII on standard output.
+
+=head1 AUTHOR
+
+Thomas R. Wyant, III F<wyant at cpan dot org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005-2007, 2011-2016 by Thomas R. Wyant, III
+(F<wyant at cpan dot org>). All rights reserved.
+
+PDP-11, RSTS-11, RSTS/E,  RSX-11, RSX-11M+, P/OS and RT-11 are
+trademarks of Hewlett-Packard Development Company, L.P.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut
+
+# ex: set textwidth=72 :

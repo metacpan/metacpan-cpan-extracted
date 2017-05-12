@@ -1,0 +1,22 @@
+---
+name: Exception-System
+version: 0.11
+author:
+  - 'Piotr Roszatycki <dexter@debian.org>'
+abstract: The exception class for system or library calls
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Exception::Base: 0.2
+  perl: 5.006
+build_requires:
+  Test::Unit::Lite: 0.1
+provides:
+  Exception::System:
+    file: lib/Exception/System.pm
+    version: 0.11
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,8 @@
+Build.PL
+CppGuessTest.xs
+MANIFEST
+Makefile.PL
+lib/CppGuessTest.pm
+t/001_load.t
+t/002_base.t
+typemap

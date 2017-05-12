@@ -1,0 +1,28 @@
+Render parts of your mail with Text::MicroMason
+
+You can install this module in the usual Perl fashion:
+
+	perl Build.PL
+	./Build 
+	./Build test
+	./Build install
+
+Copyright (c) 2009 by Mark V. Grimes. All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. 
+
+********************************************************************
+By using this module you agree to take all responsibility for any
+problems which occur including, but not limited to, any unexpected
+data loss.
+********************************************************************
+
+The documentation is included in the module file. Once the module is
+installed, view the documentation with:
+
+	perldoc Email::MIME::Kit::Renderer::MicroMason
+
+For convience, the documentaion is also reproduced in the README file.
+
+

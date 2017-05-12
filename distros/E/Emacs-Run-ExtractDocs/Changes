@@ -1,0 +1,12 @@
+Revision history for Emacs-Run-ExtractDocs
+
+0.01  Fri Mar  7 02:47:29 2008
+	- original version; created by h2xs 1.23 with options
+		-AX -nEmacs::Run::ExtractDocs -b5.8.0
+
+0.02  Fri Jan 22 04:33:54 2010
+        - switching to a Module::Build based project
+          (working with module-starter)
+
+0.03  Mon Jan 25 02:59:36 2010
+        - fixed missing dependencies in Build.PL

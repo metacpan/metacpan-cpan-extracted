@@ -1,0 +1,15 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Email/MIME/Kit/Renderer/TT.pm
+t/00-compile.t
+t/000-report-versions-tiny.t
+t/assemble.t
+t/kits/test.mkit/manifest.json
+xt/release/changes_has_content.t
+xt/release/pod-syntax.t

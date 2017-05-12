@@ -1,0 +1,84 @@
+{
+   "abstract" : "Perl API to Houdini, a zero-dependency C web escaping library",
+   "author" : [
+      "Yanick Champoux <yanick@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Escape-Houdini",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0.96",
+            "Test::Vars" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DynaLoader" : "0",
+            "Exporter" : "0",
+            "parent" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Escape::Houdini" : {
+         "file" : "lib/Escape/Houdini.pm",
+         "version" : "v0.3.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/yanick/Escape-Houdini/issues"
+      },
+      "homepage" : "https://github.com/yanick/Escape-Houdini",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/yanick/Escape-Houdini.git",
+         "web" : "https://github.com/yanick/Escape-Houdini"
+      }
+   },
+   "version" : "0.3.0",
+   "x_author_pledge" : {
+      "version" : 1
+   },
+   "x_authority" : "cpan:YANICK",
+   "x_contributors" : [
+      "Mike Doherty <doherty@cs.dal.ca>"
+   ]
+}
+

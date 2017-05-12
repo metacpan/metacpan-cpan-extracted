@@ -1,0 +1,76 @@
+                                   Proef- en Saldibalans
+Periode: t/m 2007-12-31
+EekBoek Demo Administratie                                               EekBoek, 2007-12-31
+
+RekNr   Verdichting/Grootboekrekening                 Debet     Credit   Saldo Db   Saldo Cr
+--------------------------------------------------------------------------------------------
+1       Vaste Activa
+11       Materiële vaste activa
+1100      Inventaris en inrichting                  1344,37       0,00    1344,37
+1101      Afschrijving inv. & inr.                     0,00    1716,07               1716,07
+1110      Computers                                13378,48       0,00   13378,48
+1111      Afschrijving computers                       0,00   12503,60              12503,60
+11       Totaal Materiële vaste activa             14722,85   14219,67     503,18
+
+1       Totaal Vaste Activa                        14722,85   14219,67     503,18
+
+2       Vlottende activa
+22       Vorderingen
+2200      Debiteuren                               10173,00   10173,00
+22       Totaal Vorderingen                        10173,00   10173,00
+
+23       Liquide middelen
+2320      Postbank                                 10963,68     629,00   10334,68
+23       Totaal Liquide middelen                   10963,68     629,00   10334,68
+
+2       Totaal Vlottende activa                    21136,68   10802,00   10334,68
+
+3       Eigen vermogen
+31       Kapitaal
+3100      Kapitaal de heer/mevrouw                     0,00    2443,18               2443,18
+31       Totaal Kapitaal                                       2443,18               2443,18
+
+3       Totaal Eigen vermogen                                  2443,18               2443,18
+
+4       Vreemd vermogen
+41       Leveranciers kredieten
+4100      Crediteuren                                927,84     927,84
+41       Totaal Leveranciers kredieten               927,84     927,84
+
+42       Belastingen & soc. lasten
+4200      BTW Verkoop Hoog                             0,80    1463,80               1463,00
+4220      BTW Inkoop Hoog                            148,13       0,00     148,13
+42       Totaal Belastingen & soc. lasten            148,93    1463,80               1314,87
+
+4       Totaal Vreemd vermogen                      1076,77    2391,64               1314,87
+
+6       Kosten
+68       Afschrijvingen
+6800      Afschr. kosten inv. & inr.                 411,26       0,00     411,26
+6810      Afschr. kosten computers                   396,82       0,00     396,82
+68       Totaal Afschrijvingen                       808,08                808,08
+
+69       Algemene kosten
+6900      Telefoon- en faxkosten                     510,29       0,00     510,29
+6905      Internetkosten                             269,42       0,00     269,42
+6980      Bankkosten                                  32,40       0,00      32,40
+69       Totaal Algemene kosten                      812,11                812,11
+
+6       Totaal Kosten                               1620,19               1620,19
+
+8       Bedrijfsopbrengsten
+81       Omzet Consultancy
+8100      Omzet advisering                             0,00    1200,00               1200,00
+81       Totaal Omzet Consultancy                              1200,00               1200,00
+
+83       Omzet Editing
+8300      Omzet editing                                0,00    1000,00               1000,00
+83       Totaal Omzet Editing                                  1000,00               1000,00
+
+84       Omzet Cursussen
+8400      Omzet cursussen                              4,20    6504,20               6500,00
+84       Totaal Omzet Cursussen                        4,20    6504,20               6500,00
+
+8       Totaal Bedrijfsopbrengsten                     4,20    8704,20               8700,00
+--------------------------------------------------------------------------------------------
+        TOTAAL                                     38560,69   38560,69   12458,05   12458,05

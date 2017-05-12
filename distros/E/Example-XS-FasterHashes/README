@@ -1,0 +1,30 @@
+Example-XS-FasterHashes version 0.01
+====================================
+
+A tutorial with working examples on how to build a XS module with improved
+hash access performance in XS.
+
+INSTALLATION
+
+It is not recommended to install this, since its not a library or API,
+if you really must install this module to run the benchmarking, type
+the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+   None
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012 by Daniel Dragan
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, at your option, any later version of
+Perl 5 you may have available.
+
+

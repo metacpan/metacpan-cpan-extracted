@@ -1,0 +1,29 @@
+
+Revision history for Perl module Eval::LineNumbers
+
+0.34 2013/10/07
+
+ - Fix Makefile.PL NAME
+
+0.33 2013/10/04
+
+ - Complete makeover by Olivier Mengu√:
+   - add caller-level support
+   - add a test
+   - fix typos, groom makefile and code
+
+0.32 2013/10/01
+
+ - use 'heredoc' instead of 'hereis'
+ - add Google copyright
+ - rename CHANGELOG to Changes
+ - add README
+ - create git repository, add link
+
+0.31 2009/09/01
+
+ - Minor documentation changes.
+
+0.3 2009/07/24
+
+ - Initial version

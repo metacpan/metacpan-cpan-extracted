@@ -1,0 +1,64 @@
+
+This directory contains the new Embperl website.
+It uses most of the new possibilites of Embperl 2.0b6+. To take a look at it 
+just type "make start" and then request http://localhost:8531/eg/web/ . 
+
+To get it fully working you need to have libxml installed and a database. 
+(see below for database setup).
+
+
+Here are a few notes on the included files, to make the first orientation
+easier:
+
+epwebapp.pl     Application object, which controls the whole execution logic
+                (the controller when you think in MVC terms)
+
+config.pl       Configuration, includeing the site structure
+messages.pl     Messages in multiple languages (currently german and english)
+base.epl        The base template for the site
+content.epl     The base template for the content part (right side) of the
+                base directory
+header.epl      The header
+footer.epl      The footer
+menuleft.epl    The menu on the left
+menulist.epl    Used by some files to display a list from the menu structure
+notfound.htm    This page is display when the user enters a unkown URL
+index.htm       Home page english
+indexD.htm      Home page german
+pod.xsl         Standard XSL stylesheet for displaying POD files
+
+pod/*           This dirtory contains the index pages for POD display
+                The actual POD files for documentation and introduction
+                are taken from the Embperl main directory, to avoid duplication
+                of files. How files are mapped to URIs is described in config.pl
+
+db/*            Database related pages, to display and add information
+db/epwebapp.pl  This application object overrides the one from the base directory
+                and adds functionality for database access.
+
+
+
+Database setup
+--------------
+
+Parts of the Website are database driven, so you need a
+database to use it. To setup a database and populate it
+with some initial content, do the following steps:
+
+- install DBI
+
+- install a DBD driver for your database
+
+- install DBIx::Recordset
+
+- create a database called 'embperl'
+    for example:
+    - for Mysql run 'mysqladmin create embperl'
+    - on Windows goto to control panel and ODBC Manager and setup a 
+      datasource called "embperl"
+
+- to create the tables run 'perl eg/webutil/setupdb.pl'
+
+If you don't want to name your database embperl or you need set specify a
+user name, you can configure this at the top of eg/web/config.pl.
+

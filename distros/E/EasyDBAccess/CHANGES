@@ -1,0 +1,31 @@
+#===3.1.2(2009-03-26): fix bug in batch_insert
+#===3.1.1(2006-12-27): change document for return value detail
+#===3.1.0(2006-12-07): fix bug in id() when concurrency
+#===3.0.9(2006-11-24): add DEFAULT for column default value
+#===3.0.8(2006-09-22): remove DESTROY function, when set InactiveDestroy true, you should not explicitly call to the disconnect method
+#===3.0.7(2006-09-13): modified batch_insert
+#===3.0.6(2006-07-21): change Makefile.PL
+#===3.0.5(2006-07-20): change META.yml
+#===3.0.4(2006-07-19): add insert_one_row(), update()
+#===3.0.3(2006-07-18): modified global constants, document format
+#===3.0.2(2006-07-13): modified function close(), modified select_one() for bugs
+#===3.0.1(2006-07-12): u can get err_str from $dba->err_string()
+#===3.0.0(2006-05-08): merge $param and $ext_option,more document
+#===2.9.2(2006-04-12): remove relation between $_name_utf8 and EasyTool, add _EasyDBAccess_EasyHandler, use this package instead if EasyTool not load
+#===2.9.1(2006-04-10): add option $_HIDE_CONN_PARAM, hide conn infomation by default when die, for security
+#===2.9.0(2006-04-10): replace globe constant modifier from 'my' to 'our'
+#===2.8.0(2006-04-05): add batch_insert function, add select_array function
+#===2.7.0(2006-02-13): BUG Fix ,check ^1
+#===2.6.0(2006-02-07): delete auto_die_handler function, delete install function, add note function
+#===2.5.0(2006-02-07): new usage: $dba->err_code() $dba->err_code('ER_DUP_ENTRY') $dba->err_code(1062) 
+#===2.4.0(2006-01-03): u can get err_code from $dba->err_code();
+#===2.2.2(2005-09-07): use socket to connect mysql server
+#===2.2.2(2005-08-10): change qquote check utf8::is_utf8 before use it,so that the program can run in perl low version
+#===2.2.1(2005-07-01): rename errcode to err_code, add err_code ER_PARSE_ERROR
+#===2.2.0(2005-07-01): return use wantarray
+#===2.1.1(2005-04-28): add errcode function
+#===2.1.0            : improve id function
+#===2.0.4            : add once function
+#===2.0.3            : some small bug fix
+#===2.0.2            : encoding bug fix
+#===2.0.1            : so that u can change $_debug in runtime >>my $_debug=1; => our $_debug=1;

@@ -1,0 +1,13 @@
+abstract: Encode strings in a first possible encoding
+author: Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+build_requires: 
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: Encode-First
+no_index: 
+  directory: 
+    - inc
+    - t
+version: 0.01

@@ -1,0 +1,270 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+ <head>
+  <title>EekBoek</title>
+    <link rel="stylesheet" href="../css/site.css" type="text/css">
+      <meta name="keywords" content="boekhouden, mkb, midden- en kleinbedrijf, financi&amp;emul;n,
+                open source, boekhoudsoftware, boekhoud software,
+		boekhoudpakket, boekhoud pakket">
+  <meta name="robots" content="all">
+ </head>
+
+ <body bgcolor="#FFFFFF"
+       text="#000000" link="#0000FF"
+       vlink="#0000FF" alink="#C81900" background="../images/bg.gif" >
+  <table width="100%" border="0" cellpadding="0" cellspacing="5">
+
+  <tr valign="top">
+    <td width="161" align="left">
+      <a href="../index.html"><img src="../images/eb.jpg" alt="EekBoek Boekhouden" border="0" width="149" height="87"></a>
+
+    </td>
+    <td>
+              <h1 class="title">EekBoek</h1>
+<div class="info">
+  Electronisch Boekhouden voor het MKB
+</div>
+
+          </td>
+  </tr>
+
+  <tr>
+    <td>
+      <a href="../index.html"><img src="../images/ebname.jpg" alt="EekBoek" border="0" width="151" height="22"></a>
+
+    </td>
+    <td>
+      <table width="100%" border="0" cellpadding="0" cellspacing="0">
+  <tr valign="middle">
+    <td align="left">
+      <table border="0" cellpadding="0" cellspacing="2">
+  <tr valign="middle">
+
+    <td class="info"></td>
+    <td><a href="../bookings/index.html" class="menu">Boekingen</a>
+</td>
+	
+  </tr>
+</table>
+
+
+    </td>
+    <td align="right">
+      
+    </td>
+  </tr>
+</table>
+
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      <hr>
+
+    </td>
+    <td>
+      <hr>
+
+    </td>
+  </tr>
+
+  <tr valign="top">
+    <td>
+      <div class="sidemenu">
+<table border="0" cellpadding="0" cellspacing="0">
+  <tr>
+    <td align="left" class="menutitle">Documentatie
+    </td>
+  </tr>
+  <tr>
+    <td><hr>
+</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">
+      <a href="../intro/index.html" class="menu">Inleiding</a>
+<br>
+<a href="../install/index.html" class="menu">Installeren</a>
+<br>
+<a href="../ebshell/index.html" class="menu">De EekBoek shell</a>
+<br>
+<a href="../ebwxshell/index.html" class="menu">De grafische EekBoek shell</a>
+<br>
+<a href="../config.html" class="menu">Configuratie</a>
+<br>
+<a href="../setup/index.html" class="menu">Opzetten administratie</a>
+<br>
+<a href="../bookings/index.html" class="menuselect">Boekingen</a>
+<br>
+&nbsp;-&nbsp;<a href="../bookings/payable.html" class="menu">Inkoopfakturen</a>
+<br>
+&nbsp;-&nbsp;<a href="../bookings/receivable.html" class="menu">Verkoopfakturen</a>
+<br>
+&nbsp;-&nbsp;<a href="../bookings/bank.html" class="menu">Bankafschriften</a>
+<br>
+&nbsp;-&nbsp;<a href="../bookings/cash.html" class="menu">Kas</a>
+<br>
+&nbsp;-&nbsp;<a href="../bookings/memorial.html" class="menu">Memoriaal</a>
+<br>
+<br>
+<a href="../reports/index.html" class="menu">Overzichten</a>
+<br>
+<a href="../yearend.html" class="menu">Jaarafsluiting</a>
+<br>
+<a href="../inex.html" class="menu">Import en Export</a>
+<br>
+          </td>
+  </tr>
+</table>
+</div>
+
+    </td>
+    <td>
+      <h2>BTW (Omzetbelasting)</h2>
+
+<p>Indien wordt geboekt op een grootboekrekening waaraan een
+BTW-tarief is gekoppeld, dan zal dit voor deze boeking worden
+doorberekend. Het opgegeven bedrag is dan het te boeken bedrag
+inclusief BTW. Het is mogelijk hiervan af te wijken door een
+expliciete BTW-specifcatie op te geven, zie verderop.</p>
+
+<p>Er zijn drie factoren die een rol spelen bij het bepalen van de
+omzetbelasting.</p>
+<ol>
+  <li>De BTW tariefgroep: Hoog, Laag, Priv&eacute;, Anders, of Nul.
+      <br>Dit bepaalt de hoogte van de in rekening te brengen BTW, en
+      waar deze op de BTW aangifte moet worden vermeld.</p></li>
+  <li>Voor inkoop- en verkoopboekingen: de BTW-status van de relatie.
+      <br>Bepalend is of de relatie binnen of buiten de EU is
+      gevestigd, of dat BTW is verlegd.</p></li>
+  <li>Of de boeking betrekking heeft op <em>Kosten</em>, 
+      <em>Omzet</em>, of <em>Neutraal</em>.
+      <br>BTW berekend op kostenboekingen wordt bij de uiteindelijke
+      BTW aangifte verrekend als voorheffing. De BTW berekend op omzet
+      moet bij de aangifte worden afgedragen. Daarnaast bepaalt deze
+      indeling of een boeking zonder BTW, dus met tarief
+      &lsquo;Nul&rsquo;, moet worden opgevoerd op de aangifte. Enkel
+      boekingen op neutrale grootboekrekeningen worden niet
+      meegenomen in de BTW aangifte.</p></li>
+</ol>
+
+<h2>BTW-specificatie in boekstukken</h2>
+
+<p>Met een expliciete BTW-specificatie kan worden bepaald of op een
+boeking BTW moet worden toegepast, en kan worden gekozen voor het hoge
+of lage tarief. Tevens kan worden opgegeven of het te boekden bedrag
+inclusief of exclusief BTW is. Tot slot kan worden bepaald of de
+boeking betrekking heeft op kosten of omzet. Elk van deze onderdelen
+mag ontbreken, en EekBoek zal dan de instellingen van de betreffende
+grootboekrekening gebruiken.</p>
+
+<p>Een BTW-specificatie wordt toegevoegd aan het te boeken bedrag in de
+vorm &lsquo;<code>@<var>XX</var></code>&rsquo;.
+<code><var>XX</var></code> bestaat uit drie tekens, die elk mogen
+ontbreken.</p>
+
+<table border="1" cellpadding="5">
+  <tr valign="top">
+    <td><code>N</code><br><code>H</code><br><code>L</code><br><code>0</code><br><code><var>n</var></code></td>
+    <td>(Neutraal) Pas geen BTW toe.
+	<br>(Hoog) Pas het hoge BTW tarief toe.
+	<br>(Laag) Pas het lage BTW tarief toe.
+	<br>(Het cijfer nul) BTW 0% toepassen.
+	<br>Pas de BTW toe volgens de BTW code
+	<code><var>n</var></code>.
+	<hr>Standaard wordt het BTW-tarief toegepast dat aan de
+	betreffende grootboekrekening is toegekend.
+    </td>
+  </tr>
+  <tr valign="top">
+    <td><code>-</code><br><code>+</code></td>
+    <td>Het opgegeven bedrag is <em>exclusief</em> BTW.
+    <br>Het opgegeven bedrag is <em>inclusief</em> BTW.
+	<hr>Het standaardgedrag wordt afgeleid van het BTW-type van de
+	betreffende grootboekrekening.
+	<br>Deze aanduiding kan niet worden gebruikt indien
+	voorafgaand een BTW code is opgegeven.
+    </td>
+  </tr>
+  <tr valign="top">
+    <td><code>K</code><br><code>O</code></td>
+    <td>De boeking betreft <em>Kosten</em>.
+    <br>(De letter O) De boeking betreft <em>Omzet</em>.
+	<hr>Standaard wordt de kosten/omzet indeling van de betreffende
+	grootboekrekening gebruikt. Deze aanduiding <em>moet</em> worden opgegeven indien BTW moet
+	worden toegepast bij boeking op een balansrekening, of op een
+	neutrale resultaatrekening.
+	<br>Voor boekingen in inkoop- en verkoopdagboeken, alsmede
+	boekingen gekoppeld aan een debiteuren of crediteurenbetaling
+	maakt het niet uit of kosten of omzet wordt aangegeven, in
+	deze gevallen bepaalt de debiteuren- of crediteurenrekening
+	altijd de aard van de boeking.
+    </td>
+  </tr>
+</table>
+
+<a name="Afr"></a><h2>BTW-afrondingen</h2>
+
+<p>Bij het boeken in een Inkoop- of Verkoopdagboek wordt de BTW
+berekend per boekstukregel. Soms worden in fakturen de boekstukregels
+opgeteld, en daarover de BTW berekend. Hierdoor kunnen
+afrondingsverschillen ontstaan. Wanneer aan een boeking een
+totaalbedrag is meegegenve (de <code>--totaal</code> optie) zal het
+boekstuktotaal niet kloppen met de opgegeven waarde en de boeking zal
+dan worden geweigerd.
+
+<p>EekBoek zal in dit geval echter eerst proberen zo'n boeking te
+corrigeren door de BTW te herberekenen over het totaal van de
+boekstukregels. Indien het opgeven totaalbedrag dan wel klopt met het
+boekstuktotaal dan wordt een melding gegeven, en een
+correctieboekstukregel aangemaakt.
+
+<p>Indien deze voorziening ongewenst is kan deze worden afgezet met
+de configuratie-optie <a href="../config.html#strategy_iv_vc"><code>iv_vc</code></a>.
+
+
+<h2>Zie ook ...</h2>
+
+<p><a href="../setup/schema.html#btwcodes">BTW codering in het schema.</a></p>
+<p><a href="../reports/btw.html">De BTW aangifte.</a></p>
+
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      <hr>
+
+    </td>
+    <td>
+      <hr>
+
+    </td>
+  </tr>
+
+  <tr valign="bottom">
+    <td valign="middle">
+      <a href="http://www.perl.org/"><img src="../images/perl_powered.png" alt="Powered by Perl" border="0" width="134" height="48"></a>
+    </td>
+    <td align="center">
+      <p style="float:right;margin-top:0pt">
+      <img src="../images/valid-html401.png" alt="[Valid HTML 4.01 Transitional]" border="0" width="88" height="31">
+
+      <img src="../images/validcss.png" alt="[Valid CSS]" border="0" width="88" height="31">
+
+      </p>
+      <p class="info">Copyright &copy; 2005-2010 <a href="http://www.squirrel.nl">Squirrel Consultancy</a>. All Rights Reserved.<br />
+Deze site is gemaakt met de 
+<a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
+Site Builder</a>.<br />
+bookings/btw.html laatste aanpassing 12 februari 2009, 16:37:33
+</p>
+
+    </td>
+  </tr>
+
+</table>
+
+ </body>
+</html>

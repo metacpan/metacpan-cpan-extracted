@@ -1,0 +1,65 @@
+package ETLp::Manual::ControlFiles;
+
+# ABSTRACT: Control file manual for ETLp
+
+__END__
+=pod
+
+=head1 CONTROL FILES
+
+Control files define the format of data files. Each line specifies a field in the data file:
+
+=over 4
+
+=item * The field name.
+
+=item * Whether the field is nullable.
+
+=item * Validation rules. These are only required by the validate plugin.
+
+=back
+
+=head2 Example Control File
+
+    custname   N    varchar(20)
+    cost       Y    integer
+    phone      Y    qr/^\d{3}-\d{4}$/
+    city       N    qr/^(Auckland|Wellington)$/
+    rec_date   N    date(%Y-%m-%d %H:%M:%S)   
+    period     N    integer;range(1,50)
+
+=over 4
+
+=item * custname is mandatory, and can be up to 20 characters in length.
+
+=item * cost is optional and is an integer.
+
+=item * The phone number is optional, but if it exists it must match the specified regular expression.
+
+=item * The city is mandatory must be either Auckland or Wellington.
+
+=item * The rec_date must comply with the specified POSIX date format.
+
+=item * The period must be an integer, and must be between one and fifty.
+
+=back
+
+=head1 VALIDATION RULES
+
+A field can have multiple rules, each separated by a semi-colon. The possible rules are:
+
+=over 4
+
+=item * B<varchar(n)>. A variable number of characters, up to the value of I<n>. I<Example>: varchar(200).
+
+=item * B<integer>. An integer value. I<Example>: 500.
+
+=item * B<float>. A floating point number. I<Example>: 3.14.
+
+=item * B<date(posix format)>. A date or date and time in the specified format. I<Example>: date(%d-%B-%Y).
+
+=item * B<range(lower, upper)>. The value is a numeric and must be between the upper and lower bounds. I<Example>: range(1,12) - between 1 and 12; range(,50) - there is no lower bound, but the upper value is 50; range(0,) - the minimum value is 0, and there us no maximum value.
+  
+=item * B<qr//>. A regular expression. I<Example>: qr/!^[A-Z]\d/.
+
+=back

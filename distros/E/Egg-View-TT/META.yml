@@ -1,0 +1,26 @@
+---
+name: Egg-View-TT
+version: 3.00
+author:
+  - 'Masatoshi Mizuno E<lt>lusheE<64>cpan.orgE<gt>'
+abstract: View for TemplateToolKit.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Egg::Release: 3.00
+  Template: 2.19
+  Test::More: 0
+  Test::Perl::Critic: 0
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+provides:
+  Egg::View::TT:
+    file: lib/Egg/View/TT.pm
+    version: 3.00
+  Egg::View::TT::handler:
+    file: lib/Egg/View/TT.pm
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

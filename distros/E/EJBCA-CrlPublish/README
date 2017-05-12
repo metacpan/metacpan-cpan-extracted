@@ -1,0 +1,22 @@
+ejbca-crlpublish
+================
+
+Implements a CRL publisher compatible with EJBCA PKI and others.
+
+Use case: you have a certificate authority, and need to periodically
+move certificate revocation lists onto one or more web servers.
+
+Supplies a /usr/bin/crlpublish invocation script for the purpose,
+and is config-file compatible with the earlier crlpublisher.sh script.
+
+Updates are atomic. New CRLs are pushed to a temporary file on the 
+target hosts, and moved into place. Multiple targets are supported
+by using a comma separated list.
+
+crlpublish checks the CRL on the remote host before publishing, and
+ensures the new crlNumber is higher than the old. This avoids problems
+caused by inconsistent queuing. The openssl binary is required on the
+remote host for this sanity check to work.
+
+Detailed documentation is in "man crlpublish" and in the Perl modules.
+

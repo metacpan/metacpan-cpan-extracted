@@ -1,0 +1,29 @@
+#!/usr/bin/perl -w
+our $rcsid = '$Id: on_vacation 822 2004-08-25 04:09:26Z adamm $';
+use strict;
+
+use Email::AutoReply;
+use Getopt::Declare;
+
+our $usage_spec = <<'UsageSpec';
+    [strict]
+    Normal operation is to accept an email to STDIN and bounce
+    a reply back to the sender.
+
+    --dbdump	
+        List names in the "already sent to" database.
+    --debug	
+        Turn on debugging
+UsageSpec
+
+my $args = new Getopt::Declare ($usage_spec) or die;
+
+my $auto = Email::AutoReply->new;
+
+if ($args->{'--dbdump'}) {
+  print "$_\n" for $auto->dbdump;
+  exit(0);
+}
+
+$auto->debug(1) if ($args->{'--debug'});
+$auto->reply();

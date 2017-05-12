@@ -1,0 +1,35 @@
+(c) 1997 Austin Schutz E<lt>F<ASchutz@users.sourceforge.net>E<gt> (retired)
+
+expect() interface & functionality enhancements (c) 1999-2006 Roland Giersig.
+
+This module is now maintained by Roland Giersig E<lt>F<RGiersig@cpan.org>E<gt>
+
+
+LICENSE
+
+This module can be used under the same terms as Perl.
+
+
+DISCLAIMER
+
+THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
+OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
+TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
+USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+DAMAGE.
+
+In other words: Use at your own risk.  Provided as is.  Your mileage
+may vary.  Read the source, Luke!
+
+And finally, just to be sure:
+
+Any Use of This Product, in Any Manner Whatsoever, Will Increase the
+Amount of Disorder in the Universe. Although No Liability Is Implied
+Herein, the Consumer Is Warned That This Process Will Ultimately Lead
+to the Heat Death of the Universe.

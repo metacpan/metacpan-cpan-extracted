@@ -1,0 +1,14 @@
+== Changes for 0.64 - September 12, 2016
+
+* Applied patch: https://rt.cpan.org/Public/Bug/Display.html?id=113923#txn-1619691
+
+== Changes for 0.63 - September 12, 2005
+
+* Added some text in the POD's synopsis regarding --defaultdeps and the
+  environment variable.
+
+== Changes for 0.62 - July 9, 2005
+
+* With CPANPLUS, we no longer probe $Config{sitelib} for writability
+  and suggest `sudo` for the entire installation process, as CPANPLUS
+  can handle this with `sudo` on `make install`.  Reported by Sungo.

@@ -1,0 +1,16 @@
+Revision history for Perl extension Encoding-FixLatin-XS
+
+1.01      2014-06-05 17:30:06 Pacific/Auckland
+    - replace strnlen with strlen for improved portability (with thanks to
+      Chris Williams for assistance in identifying the problem)
+
+1.00      2014-05-22 19:31:29 Pacific/Auckland
+    - replace gcc-specific 0b........ with more portable 0x..
+
+0.90      2014-05-21 22:25:46 Pacific/Auckland
+    - initial release to CPAN
+
+0.01  Sat May  3 17:17:00 2014
+    - original version; created by h2xs 1.23 with options
+        -A -b 5.10.0 --use-new-tests --skip-exporter -n Encoding::FixLatin::XS
+

@@ -1,0 +1,67 @@
+Egg::Release.
+=================================================
+
+The README is used to introduce the module and provide instructions on
+how to install the module, any machine dependencies it may have (for
+example C compilers and installed libraries) and any other information
+that should be provided before the module is installed.
+
+A README file is required for CPAN modules since CPAN extracts the
+README file from a module distribution so that people browsing the
+archive can use it get an idea of the modules uses. It is usually a
+good idea to provide version information here so that people can
+decide whether fixes for the module are worth downloading.
+
+
+  >>> WARNING <<<
+  The specification has changed a little with the VERSION 2.X system.
+  When the upgrade is done, the WEB application that has already operated
+  is influenced harmfully.
+
+
+INSTALLATION
+
+1. To install this module type the following:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+  
+  * Please set the following environment variables to complete the test.
+  EGG_UPLOAD_TEST    ... When Plugin::Upload is tested, 1 is set.
+  EGG_RC_NAME        ... For test of Plugin::rc.  default is 'egg_releaserc'.
+
+
+2. Helper script is generated.
+
+  % perl -MEgg::Helper -e "Egg::Helper->helper_script" > /path_to/bin/egg_helper.pl
+  
+  % chmod 755 /path_to/bin/egg_helper.pl
+  
+  * Please set 'PERL_PATH' in the environment variable if necessary.
+
+
+3. Project is generated.
+
+  % /path_to/bin/egg_helper.pl project [PROJECT_NAME] [-o /path/to/output]
+  
+  * Please use '-o' option when you specify the output destination.
+  
+  % cd /path/to/output/[PROJECT_NAME]/bin
+  % perl trigger.cgi
+  
+  * If trigger.cgi doesn't output the error, it is completion.
+
+
+AUTHOR
+
+Masatoshi Mizuno E<lt>lusheE<64>cpan.orgE<gt>
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 by Bee Flag, Corp. E<lt>http://egg.bomcity.com/E<gt>.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.

@@ -1,0 +1,110 @@
+
+<html>
+<head>
+<title>Some tests for Embperl UTF8 escaping</title>
+</head>
+
+<body>
+------------------------------------------------
+$epreq -> config -> output_esc_charset = 1 
+$escmode = $escmodestd ;
+abc!"$%&()<>=äöüÄÖÜß -> abc!'&quot;0&amp;()&lt;&gt;=&auml;&ouml;&uuml;&Auml;&Ouml;&Uuml;&szlig;&copy;
+<input name="test" value="abc!'&quot;0&amp;()&lt;&gt;=&auml;&ouml;&uuml;&Auml;&Ouml;&Uuml;&szlig;&copy;">
+<textarea name="test">abc!'&quot;0&amp;()&lt;&gt;=&auml;&ouml;&uuml;&Auml;&Ouml;&Uuml;&szlig;&copy;</textarea>
+utf8:
+abc!"$%&()<>=äöüÄÖÜß -> abc!'&quot;0&amp;()&lt;&gt;=Ã¤Ã¶Ã¼Ã„Ã–ÃœÃŸÂ©
+<input name="utf8" value="abc!'&quot;0&amp;()&lt;&gt;=Ã¤Ã¶Ã¼Ã„Ã–ÃœÃŸÂ©">
+<textarea name="utf8">abc!'&quot;0&amp;()&lt;&gt;=Ã¤Ã¶Ã¼Ã„Ã–ÃœÃŸÂ©</textarea>
+
+poststd:  <input name="poststd" value="abc&auml;&ouml;&uuml;">
+postutf8: <input name="postutf8" value="abcÃ¤Ã¶Ã¼">
+
+$escmode = 8 ;
+abc!"$%&()<>=äöüÄÖÜß -> abc!&apos;&quot;0&amp;()&lt;&gt;=äöüÄÖÜß©
+<input name="test" value="abc!&apos;&quot;0&amp;()&lt;&gt;=äöüÄÖÜß©">
+<textarea name="test">abc!&apos;&quot;0&amp;()&lt;&gt;=äöüÄÖÜß©</textarea>
+utf8:
+abc!"$%&()<>=äöüÄÖÜß -> abc!&apos;&quot;0&amp;()&lt;&gt;=Ã¤Ã¶Ã¼Ã„Ã–ÃœÃŸÂ©
+<input name="utf8" value="abc!&apos;&quot;0&amp;()&lt;&gt;=Ã¤Ã¶Ã¼Ã„Ã–ÃœÃŸÂ©">
+<textarea name="utf8">abc!&apos;&quot;0&amp;()&lt;&gt;=Ã¤Ã¶Ã¼Ã„Ã–ÃœÃŸÂ©</textarea>
+
+$escmode = 2 ;
+abc!"$%&()<>=äöüÄÖÜß -> abc!%27%220%26()%3C%3E%3D%E4%F6%FC%C4%D6%DC%DF%A9
+<input name="test" value="abc!%27%220%26()%3C%3E%3D%E4%F6%FC%C4%D6%DC%DF%A9">
+<textarea name="test">abc!%27%220%26()%3C%3E%3D%E4%F6%FC%C4%D6%DC%DF%A9</textarea>
+utf8:
+abc!"$%&()<>=äöüÄÖÜß -> abc!%27%220%26()%3C%3E%3D%C3%A4%C3%B6%C3%BC%C3%84%C3%96%C3%9C%C3%9F%C2%A9
+<input name="utf8" value="abc!%27%220%26()%3C%3E%3D%C3%A4%C3%B6%C3%BC%C3%84%C3%96%C3%9C%C3%9F%C2%A9">
+<textarea name="utf8">abc!%27%220%26()%3C%3E%3D%C3%A4%C3%B6%C3%BC%C3%84%C3%96%C3%9C%C3%9F%C2%A9</textarea>
+
+
+------------------------------------------------
+$epreq -> config -> output_esc_charset = 2 
+$escmode = $escmodestd ;
+abc!"$%&()<>=äöüÄÖÜß -> abc!'&quot;0&amp;()&lt;&gt;=&auml;&ouml;&uuml;&Auml;&Ouml;&Uuml;&szlig;&copy;
+<input name="test" value="abc!'&quot;0&amp;()&lt;&gt;=&auml;&ouml;&uuml;&Auml;&Ouml;&Uuml;&szlig;©">
+<textarea name="test">abc!'&quot;0&amp;()&lt;&gt;=&auml;&ouml;&uuml;&Auml;&Ouml;&Uuml;&szlig;&copy;</textarea>
+utf8:
+abc!"$%&()<>=äöüÄÖÜß -> abc!'&quot;0&amp;()&lt;&gt;=Ã¤Ã¶Ã¼Ã„Ã–ÃœÃŸÂ©
+<input name="utf8" value="abc!'&quot;0&amp;()&lt;&gt;=Ã¤Ã¶Ã¼Ã„Ã–ÃœÃŸÂ©">
+<textarea name="utf8">abc!'&quot;0&amp;()&lt;&gt;=Ã¤Ã¶Ã¼Ã„Ã–ÃœÃŸÂ©</textarea>
+
+poststd:  <input name="poststd" value="abc&auml;&ouml;&uuml;">
+postutf8: <input name="postutf8" value="abcÃ¤Ã¶Ã¼">
+
+$escmode = 8 ;
+abc!"$%&()<>=äöüÄÖÜß -> abc!&apos;&quot;0&amp;()&lt;&gt;=äöüÄÖÜß©
+<input name="test" value="abc!&apos;&quot;0&amp;()&lt;&gt;=äöüÄÖÜß©">
+<textarea name="test">abc!&apos;&quot;0&amp;()&lt;&gt;=äöüÄÖÜß©</textarea>
+utf8:
+abc!"$%&()<>=äöüÄÖÜß -> abc!&apos;&quot;0&amp;()&lt;&gt;=Ã¤Ã¶Ã¼Ã„Ã–ÃœÃŸÂ©
+<input name="utf8" value="abc!&apos;&quot;0&amp;()&lt;&gt;=Ã¤Ã¶Ã¼Ã„Ã–ÃœÃŸÂ©">
+<textarea name="utf8">abc!&apos;&quot;0&amp;()&lt;&gt;=Ã¤Ã¶Ã¼Ã„Ã–ÃœÃŸÂ©</textarea>
+
+$escmode = 2 ;
+abc!"$%&()<>=äöüÄÖÜß -> abc!%27%220%26()%3C%3E%3D%E4%F6%FC%C4%D6%DC%DF%A9
+<input name="test" value="abc!%27%220%26()%3C%3E%3D%E4%F6%FC%C4%D6%DC%DF%A9">
+<textarea name="test">abc!%27%220%26()%3C%3E%3D%E4%F6%FC%C4%D6%DC%DF%A9</textarea>
+utf8:
+abc!"$%&()<>=äöüÄÖÜß -> abc!%27%220%26()%3C%3E%3D%C3%A4%C3%B6%C3%BC%C3%84%C3%96%C3%9C%C3%9F%C2%A9
+<input name="utf8" value="abc!%27%220%26()%3C%3E%3D%C3%A4%C3%B6%C3%BC%C3%84%C3%96%C3%9C%C3%9F%C2%A9">
+<textarea name="utf8">abc!%27%220%26()%3C%3E%3D%C3%A4%C3%B6%C3%BC%C3%84%C3%96%C3%9C%C3%9F%C2%A9</textarea>
+
+
+------------------------------------------------
+$epreq -> config -> output_esc_charset = 0 
+$escmode = $escmodestd ;
+abc!"$%&()<>=äöüÄÖÜß -> abc!'&quot;0&amp;()&lt;&gt;=&auml;&ouml;&uuml;&Auml;&Ouml;&Uuml;&szlig;&copy;
+<input name="test" value="abc!'&quot;0&amp;()&lt;&gt;=äöüÄÖÜß©">
+<textarea name="test">abc!'&quot;0&amp;()&lt;&gt;=&auml;&ouml;&uuml;&Auml;&Ouml;&Uuml;&szlig;&copy;</textarea>
+utf8:
+abc!"$%&()<>=äöüÄÖÜß -> abc!'&quot;0&amp;()&lt;&gt;=Ã¤Ã¶Ã¼Ã„Ã–ÃœÃŸÂ©
+<input name="utf8" value="abc!'&quot;0&amp;()&lt;&gt;=Ã¤Ã¶Ã¼Ã„Ã–ÃœÃŸÂ©">
+<textarea name="utf8">abc!'&quot;0&amp;()&lt;&gt;=Ã¤Ã¶Ã¼Ã„Ã–ÃœÃŸÂ©</textarea>
+
+poststd:  <input name="poststd" value="abcäöü">
+postutf8: <input name="postutf8" value="abcÃ¤Ã¶Ã¼">
+
+$escmode = 8 ;
+abc!"$%&()<>=äöüÄÖÜß -> abc!&apos;&quot;0&amp;()&lt;&gt;=äöüÄÖÜß©
+<input name="test" value="abc!&apos;&quot;0&amp;()&lt;&gt;=äöüÄÖÜß©">
+<textarea name="test">abc!&apos;&quot;0&amp;()&lt;&gt;=äöüÄÖÜß©</textarea>
+utf8:
+abc!"$%&()<>=äöüÄÖÜß -> abc!&apos;&quot;0&amp;()&lt;&gt;=Ã¤Ã¶Ã¼Ã„Ã–ÃœÃŸÂ©
+<input name="utf8" value="abc!&apos;&quot;0&amp;()&lt;&gt;=Ã¤Ã¶Ã¼Ã„Ã–ÃœÃŸÂ©">
+<textarea name="utf8">abc!&apos;&quot;0&amp;()&lt;&gt;=Ã¤Ã¶Ã¼Ã„Ã–ÃœÃŸÂ©</textarea>
+
+$escmode = 2 ;
+abc!"$%&()<>=äöüÄÖÜß -> abc!%27%220%26()%3C%3E%3D%E4%F6%FC%C4%D6%DC%DF%A9
+<input name="test" value="abc!%27%220%26()%3C%3E%3D%E4%F6%FC%C4%D6%DC%DF%A9">
+<textarea name="test">abc!%27%220%26()%3C%3E%3D%E4%F6%FC%C4%D6%DC%DF%A9</textarea>
+utf8:
+abc!"$%&()<>=äöüÄÖÜß -> abc!%27%220%26()%3C%3E%3D%C3%A4%C3%B6%C3%BC%C3%84%C3%96%C3%9C%C3%9F%C2%A9
+<input name="utf8" value="abc!%27%220%26()%3C%3E%3D%C3%A4%C3%B6%C3%BC%C3%84%C3%96%C3%9C%C3%9F%C2%A9">
+<textarea name="utf8">abc!%27%220%26()%3C%3E%3D%C3%A4%C3%B6%C3%BC%C3%84%C3%96%C3%9C%C3%9F%C2%A9</textarea>
+
+------------------------------------------------
+$epreq -> config -> output_esc_charset = 1 
+$escmode = $escmodestd ;
+</body>
+</html>

@@ -1,0 +1,47 @@
+Event-Schedule
+
+Event::Schedule is a very simple module to manage a scheduled queue
+of events for use in interactive programs such as IRC bots.
+Events are added to the queue in the form of closures, then a clock
+tick is called periodically.  Events whose time has elapsed are
+called, then deleted from the schedule.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Event::Schedule
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Event-Schedule
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Event-Schedule
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Event-Schedule
+
+    Search CPAN
+        http://search.cpan.org/dist/Event-Schedule/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 Michael Roberts
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

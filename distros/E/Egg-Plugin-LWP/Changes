@@ -1,0 +1,25 @@
+Revision history for Perl extension Egg::Plugin::LWP.
+
+3.01  2008/04/17
+	- Build.PL is abolished.
+
+3.00  2008/02/24
+	- Corresponded to Egg::Release v3.00.
+
+2.02  2007/10/30
+	- Bug fixed.
+
+2.00  2007/05/02
+	- Corresponded to Egg::Release v2.00.
+
+0.03  2007/03/25
+	- bugfix.
+	- Maintenance for Pod coverage.
+
+0.02  2007/02/02
+	- It was made to correspond to Egg::Release-1.00.
+	  It doesn't operate in this correction and former version.
+
+0.01  Sat Dec 23 06:19:12 2006 GMT
+	- original version; created by Egg::Helper::PerlModuleMaker v0.02 with
+	  module name Egg-Plugin-LWP

@@ -1,0 +1,30 @@
+<html>
+<head>
+<title>Tests for Embperl - ErrorDocument</title>
+</head>
+
+<body>
+
+This page is shown due to an ErrorDocument redirection<p>
+
+
+main: 
+^prev: Apache2?(?:::RequestRec)?=SCALAR\(0x
+next: 
+^There are (2|4) errormessages:
+
+<table border=1>
+^-	<tr><td>\[\d+\]ERR:  32:  Warning in Perl code: 	\(in cleanup\) Can't locate bad_module_without_name.pm
+^-BEGIN failed--compilation aborted 
+^	<tr><td>\[\d+\]ERR:  24:  Error in Perl code: Can't locate bad_module_without_name.pm in 
+^BEGIN failed--compilation aborted
+^-BEGIN fa
+^-	<tr><td>\[\d+\]ERR:  32:  Warning in Perl code: 	\(in cleanup\) Can't locate bad_module_without_name.pm
+^-BEGIN failed--compilation aborted 
+^	<tr><td>\[\d+\]ERR:  24:  Error in Perl code: Can't locate bad_module_without_name.pm 
+^BEGIN failed--compilation aborted
+^-BEGIN failed
+</table>
+
+</body>
+</html>

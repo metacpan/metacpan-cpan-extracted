@@ -1,0 +1,193 @@
+#!/usr/bin/perl
+
+# | APP    | eol
+# | AUTHOR | Todd Wylie
+# | EMAIL  | perldev@monkeybytes.org
+# | ID     | $Id: eol 238 2006-10-31 19:08:15Z twylie $
+
+# ---------------------------------------------------------------------------
+# PURPOSE:
+# Simple script to convert newline endings; uses the EOL.pm module.
+# ---------------------------------------------------------------------------
+
+# INCLUDES
+use strict;
+use warnings;
+use Getopt::Long;
+use EOL;
+
+# LEGAL ARGUMENT CHECKS
+my ($in, $eol, $noback);
+GetOptions(
+           "in=s"   => \$in,    
+           "eol=s"  => \$eol,
+           "noback" => \$noback
+           );
+if (!$in) {
+    print "\nUSAGE: eol -in <file> -eol [CRLF; LF; CR]\n\n";
+    exit;
+}
+my $EOL;
+if ($eol) {
+    ($eol eq "CR")     ? ($EOL = "CR"  ) 
+    : ($eol eq "CRLF") ? ($EOL = "CRLF") 
+    : ($eol eq "LF"  ) ? ($EOL = "LF"  ) 
+    : die "\nNot legal EOL tag! Use only: CR; CRLF; LF.\n\n";
+}
+else {
+    $EOL = "LF";  # Default is Unix line feed.
+}
+
+# CONVERSION PATHS (backup vs non-backup)
+if (!$noback) {
+    # Make a backup if possible:
+    my $backup_file = $in . ".bak";
+    if (-f $backup_file) {
+        print "\nBad idea. There is already a backup file ($backup_file).\n";
+        print "--ABORTED-- [No changes to any files.]\n\n";
+        exit;
+    }
+    else {
+        my ($IN) = $ARGV[0] = $in; # Must prime @ARGV.
+        EOL::eol_same_file(
+                           in     => $IN,
+                           eol    => $EOL,
+                           backup => ".bak"
+                           );
+    }
+}
+else {
+    # No backup will force execution:
+    print "\nCheeky-monkey! Are you *sure* you don't want a backup? (y/n) ";
+    my $answer = <STDIN>;
+    unless($answer =~ /^[yY]$/) {
+        print "\n--ABORTED-- [No changes to any files.]\n\n";
+        exit;
+    }
+    else {
+        my ($IN) = $ARGV[0] = $in; # Must prime @ARGV.
+        EOL::eol_same_file(
+                           in  => $IN,
+                           eol => $EOL
+                           );
+    }
+}
+
+__END__
+
+# --------------------------------------------------------------------------
+# P O D : (area below reserved for documentation)
+# ==========================================================================
+
+=head1 NAME
+
+eol - Simple script to convert newline endings; uses the EOL.pm module.
+
+
+=head1 VERSION
+
+This document describes EOL version 0.0.2
+
+
+=head1 SYNOPSIS
+
+    eol --in <file> --eol [CRLF; LF; CR]
+
+=head1 DESCRIPTION
+
+This application provides newline conversions to a file in-place. It clobbers the file that you send as input. A backup of the original file will be made one time only (i.e., multiple runnings on the same file would try and overwrite the .bak file). 
+
+=head1 INTERFACE
+
+The following command line options are supported:
+
+=head2 --in <file>
+
+--in   Name of the file to convert.
+
+=head2 --eol [CRLF; LF; CR]
+
+--eol  End-of-line tag to convert to. For example, if you wanted MS-DOS style newlines, you would send "--eol CRLF".
+
+=head2 --noback
+
+--noback   A switch that tells the script to *not* make a backup of the original file. The file will be converted in-place without a backup. USE AT OWN RISK!
+
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+The eol script should have been copied to /usr/local/bin when EOL.pm was installed. Windows users will have to manually move the eol script to somewhere in their execution PATH.
+
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+EOL requires no configuration files or environment variables.
+
+
+=head1 DEPENDENCIES
+
+This module calls a few others: strict; warnings; Getopt::Long; EOL.
+
+
+=head1 INCOMPATIBILITIES
+
+None reported.
+
+
+=head1 BUGS AND LIMITATIONS
+
+No bugs have been reported.
+
+Please report any bugs or feature requests to
+C<bug-eol@rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org>.
+
+
+=head1 AUTHOR
+
+Todd Wylie  
+
+C<< <perldev@monkeybytes.org> >>  
+
+L<< http://www.monkeybytes.org >>
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2005, Todd Wylie C<< <perldev@monkeybytes.org> >>. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See perlartistic.
+
+
+=head1 DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENSE, BE
+LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
+OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
+THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES.
+
+=head1 NOTE
+
+This software was written using the latest version of GNU Emacs, the
+extensible, real-time text editor. Please see
+L<http://www.gnu.org/software/emacs> for more information and download
+sources.
+
+

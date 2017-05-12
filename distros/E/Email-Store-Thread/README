@@ -1,0 +1,30 @@
+NAME
+    Email::Store::Thread - Store threading information for a mail
+
+ABSTRACT
+    Remember to create the database table:
+
+        % make install
+        % perl -MEmail::Store="..." -e 'Email::Store->setup'
+
+    And now:
+
+        my $container = $mail->container;
+        if ($container->parent) {
+            print "Parent of this message is ".$container->parent->message;
+        }
+
+  DESCRIPTION
+    This adds to a mail the concept of a thread container. A thread
+    container is a node in a tree which represents the thread of an email
+    conversation. It plugs into the indexing process and works out where in
+    the tree the mail belongs; you can then ask a mail for its "container",
+    a container for its "message", and for its "parent", "child" and
+    "sibling" containers, which are used to navigate the thread tree.
+
+    This is distributed separately from the main "Email::Store" distribution
+    as it tends to slow down indexing somewhat.
+
+SEE ALSO
+    Email::Store, Mail::Thread
+

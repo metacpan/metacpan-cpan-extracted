@@ -1,0 +1,82 @@
+#header	{
+	position			: absolute;
+	top					: 0;
+	left				: 0;
+	margin-left			: 450px;
+	margin-right		: 30em;
+	width				: 10em;
+	height				: 4em;
+	height				: 50px;
+	z-index				: 200;
+}
+
+/*** fantom4 title log ***/
+#logo {
+	position			: relative;
+	width				: 450px;
+	z-index				: 100;
+	float				: left;
+	margin-top			: 15px;
+	margin-left			: -450px;
+	left				: 0px;
+}
+#logo img {
+	vertical-align		: top;
+	height				: 40px;
+#	height				: 2.6em;
+}
+
+
+/*** header link list ***/
+#header_link_menu {
+	position			: relative;
+	float				: left;
+	top					: 0;
+	z-index				: 1;
+	width				: 100%;
+	padding-top			: 3px;
+}
+#header_link_menu li {
+	padding-left		: 5px;
+	list-style			: none inside url( ../images/bullet3.gif );
+}
+#header_link_menu a {
+	font-size			: small;
+	color				: #000000;
+	white-space			: nowrap;
+}
+#header_search_menu {
+	position			: relative;
+	float				: left;
+	margin-right		: -30em;
+	padding				: 3px 0px 0px 2px;
+	right				: 0px;
+	top					: 0px;
+}
+#header_search_menu img {
+/*	height				: 12px;		*/
+	height				: 0.8em;
+}
+
+
+/*** header search menu ***/
+.keyword_search {
+	font-size			: x-small;
+	font-family			: 'Tahoma';
+	width				: 8em;
+	border				: 1px inset #CCCCCC ;
+}
+.bottun	{
+	font-size			: x-small;
+	font-family			: 'Tahoma';
+	font-weight			: bold;
+}
+#header_search_menu li {
+	padding-left		: 70px;
+	list-style			: none inside url( ../images/bullet4.gif );
+}
+#header_search_menu a {
+	font-size			: small;
+	color				: #000000;
+	white-space			: nowrap;
+}

@@ -1,0 +1,18 @@
+
+[- $subs = Execute ({'object' => 'eposubs2.htm'}) -]
+
+[- print LOG "subs $subs\n" ; -]
+[-
+$src1 = "eposub1: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa \[- \$subs -> eposub1 -\] \<br>" ;
+
+$src2 = "eposub2: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb \[- \$subs -> eposub2 -\] \<br>" ;
+
+Execute ({inputfile => "eposrc1", package => __PACKAGE__, input => \$src1}) ;
+
+Execute ({inputfile => "eposrc1", package => __PACKAGE__, input => \$src1}) ;
+
+Execute ({inputfile => "eposrc2", package => __PACKAGE__, input => \$src2}) ;
+
+Execute ({inputfile => "eposrc2", package => __PACKAGE__, input => \$src2}) ;
+-]
+

@@ -1,0 +1,210 @@
+#!/usr/bin/perl -w
+
+use strict;
+use File::Basename;
+use Getopt::Long;
+use Pod::Usage;
+use Embedix::ECD;
+use Embedix::ECD::XMLv1 qw(xml_from_cons);
+
+sub keep_comments {
+    my $fh     = shift;
+    my $string = shift;
+    my $opt    = shift;
+    my $cons = Embedix::ECD->consFromString($string);
+    print $fh xml_from_cons (
+        $cons,
+        shiftwidth => $opt->{shiftwidth},
+        indent     => $opt->{indent},
+    );
+}
+
+sub ignore_comments {
+    my $fh     = shift;
+    my $string = shift;
+    my $opt    = shift;
+    my $ecd = Embedix::ECD->newFromString($string);
+    print $fh $ecd->toXML(
+        shiftwidth => $opt->{shiftwidth}, 
+        indent     => $opt->{indent},
+        dtd        => 'yes',
+    );
+}
+
+my %opt;
+GetOptions(\%opt, 
+    'indent|i=i', 
+    'shiftwidth|sw|s=i', 
+    'help|h',
+    'keepcomments|k',
+    'autowrite|a',
+);
+
+if (defined $opt{help}) {
+    pod2usage(1); 
+}
+
+$opt{indent}     ||= 0;
+$opt{shiftwidth} ||= 2;
+
+if (@ARGV) {
+
+    foreach (@ARGV) {
+        my ($base, $path) = fileparse($_, '\..*');
+        my $xecd_name = $path . $base . ".xecd";
+        if ( -f $_ ) {
+            open(ECD, $_) || die($!);
+        } else {
+            die("$_ is not a file.\n");
+        }
+        if (defined $opt{autowrite}) {
+            open(XECD, "> $xecd_name") || die ($!);
+        } else {
+            *XECD = *STDOUT;
+        }
+
+        my $string = join('', <ECD>);
+        close(ECD);
+        if (defined $opt{keepcomments}) {
+            keep_comments(*XECD, $string, \%opt);
+        } else {
+            ignore_comments(*XECD, $string, \%opt);
+        }
+        close(XECD) if (defined $opt{autowrite});
+    }
+
+} else {
+
+    my $string = join('', <STDIN>);
+    if (defined $opt{keepcomments}) {
+        keep_comments(*STDOUT, $string, \%opt);
+    } else {
+        ignore_comments(*STDOUT, $string, \%opt);
+    }
+
+}
+
+__END__
+
+=head1 NAME
+
+ecd2xml - converts text in ECD format to an XML equivalent
+
+=head1 SYNOPSIS
+
+=over 8
+
+=item B<ecd2xml>
+
+[OPTION]... [FILE]...
+
+=item B<ecd2xml> 
+
+[OPTION]... < STDIN > STDOUT
+
+=back
+
+=head1 DESCRIPTION
+
+ecd2xml is a script that takes ECD data (whether it be in a file or
+a stream), and turns it into XML.  The benefit of this is buzzword
+compliance and faster parsing.  James Clark's expat can parse
+busybox.xecd 60 times faster than Embedix::ECD's Parse::RecDescent
+parser can parse busybox.ecd.  expat is probably more robust than
+the parser I made, too.
+
+=head1 OPTIONS
+
+=over 4
+
+=item -h
+
+=item --help
+
+This displays the help text.
+
+=item -s n
+
+=item -sw n
+
+=item --shiftwidth n
+
+This sets the number of spaces to indent for each new nesting level in the XML
+document.  The default value is 2.
+
+=item -i n
+
+=item --indent n
+
+This sets the number of spaces to indent the whole XML document.  The default
+value is 2.
+
+=item -a
+
+=item --autowrite
+
+Instead of printing the XML document to STDOUT, the document will be written
+to a file of the same name as that being worked on w/ the exception that its
+extension will be ".xecd" instead of ".ecd".
+
+This option is meaningless when working with an ECD coming in from STDIN.
+
+=item -k
+
+=item --keepcomments
+
+This will preserve the comments in the ECD by turning them into XML comments.
+The downside of this is that although the generated XML will be well-formed,
+it will not be valid according to the DTD.
+
+=back
+
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item $line: was expecting $TAGNAME, but found $CRAP instead.
+
+This error occurs whenever an imbalanced tag is found.
+
+=item $line: $ATTRIBUTE not allowed in $NODE_TYPE
+
+not implemented
+
+=back
+
+=head1 REQUIRES
+
+=over 4
+
+=item Embedix::ECD
+
+=item Embedix::ECD::XMLv1
+
+=item Pod::Usage
+
+=item Getopt::Long
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item related perl modules
+
+Embedix::ECD(3pm), Embedix::ECD::XMLv1(3pm)
+
+=item some programs of interest
+
+xmllint(1), checkecd(1)
+
+=back
+
+=head1 AUTHOR
+
+John BEPPU <beppu@lineo.com>
+
+=cut
+
+# $Id: ecd2xml,v 1.1 2001/01/19 00:26:38 beppu Exp $

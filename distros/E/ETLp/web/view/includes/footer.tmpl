@@ -1,0 +1,26 @@
+[% c.prototype.javascript_tag(c.prototype.visual_effect('highlight', 'message', {duration => '3'})) %]
+[%# criteria %]
+[% IF pager %]
+    [% IF pager.last_page > 1 %]
+        [% IF pager.previous_page %]
+            [% IF pager.previous_page != pager.first_page %]
+            <a href="[% script %]?page=[% pager.first_page %][% criteria %]">&lt;&lt;</a> 
+            [% END %]
+            <a href="[% script %]?page=[% pager.previous_page %][% criteria %]">&lt;</a>
+            [% END %]
+        [% FOREACH p IN pager.pages_in_navigation(10) %]
+            [% IF p == pager.current_page %]
+                [% p %]
+            [% ELSE %]
+                <a href="[% script %]?page=[% p %][% criteria %]">[% p %]</a>
+            [% END %]
+        [% END %]
+        [% IF pager.next_page %]
+            <a href="[% script %]?page=[% pager.next_page %][% criteria %]"> &gt;</a>
+            [%# IF pager.next_page != pager.last_page %]
+            <a href="[% script %]?page=[% pager.last_page %][% criteria %]"> &gt;&gt;</a>
+        [% END %]
+    [% END %]
+[% END %]
+</body>
+</html>

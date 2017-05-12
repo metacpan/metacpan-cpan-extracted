@@ -1,0 +1,75 @@
+<HTML><HEAD><TITLE>Embperl Error</TITLE></HEAD><BODY bgcolor="#FFFFFF">
+<H1>Internal Server Error</H1>
+The server encountered an internal error or misconfiguration and was unable to complete your request.<P>
+^Please contact the server administrator,.*?and inform them of the time the error occurred, and anything you might have done that may have caused the error.<P><P>
+<table cellspacing='2' cellpadding='5'>
+<tr bgcolor='#eeeeee'><td>
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+^\[\d+\]ERR:  32:  Warning in Perl code: Use of uninitialized value \$Embperl::__\d+::param\[0\] in concatenation \(\.\) or string at .+incsub.htm line 6.
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+</td></tr>
+<tr bgcolor='#eeeeee'><td>
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+^\[\d+\]ERR:  32:  Warning in Perl code: Use of uninitialized value \$Embperl::__\d+::param\[0\] in concatenation \(\.\) or string at .+incsub.htm line 6.
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+</td></tr>
+<tr bgcolor='#eeeeee'><td>
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+^\[\d+\]ERR:  32:  Warning in Perl code: Use of uninitialized value \$Embperl::__\d+::param\[0\] in concatenation \(\.\) or string at .+incsub.htm line 6.
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+</td></tr>
+<tr bgcolor='#eeeeee'><td>
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+^\[\d+\]ERR:  32:  Warning in Perl code: Use of uninitialized value \$Embperl::__\d+::param\[0\] in concatenation \(\.\) or string at .+incsub.htm line 6.
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+</td></tr>
+<tr bgcolor='#eeeeee'><td>
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+^\[\d+\]ERR:  24:  Error in Perl code: Can't locate object method &quot;is&quot; via package &quot;here&quot; \(perhaps you forgot to load &quot;here&quot;\?\) at .+incerr.htm line 6.
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+</td></tr>
+<tr bgcolor='#eeeeee'><td>
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+^\[\d+\]ERR:  32:  Warning in Perl code: Unquoted string &quot;table&quot; may clash with future reserved word at .+incerr.htm line 6.
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+</td></tr>
+<tr bgcolor='#eeeeee'><td>
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+^\[\d+\]ERR:  32:  Warning in Perl code: Unquoted string &quot;td&quot; may clash with future reserved word at .+incerr.htm line 8.
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+</td></tr>
+<tr bgcolor='#eeeeee'><td>
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+^\[\d+\]ERR:  32:  Warning in Perl code: Having no space between pattern and following word is deprecated at .+incerr.htm line 11.
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+</td></tr>
+^<tr bgcolor='#eeeeee'><td>
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+^\[\d+\]ERR:  24:  Error in Perl code: Transliteration replacement not terminated at .+incerr.htm line 12.
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+</td></tr>
+<tr bgcolor='#eeeeee'><td>
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+^\[\d+\]ERR:  32:  Warning in Perl code: Unquoted string &quot;table&quot; may clash with future reserved word at .+incerr.htm line 6.
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+</td></tr>
+<tr bgcolor='#eeeeee'><td>
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+^\[\d+\]ERR:  32:  Warning in Perl code: Unquoted string &quot;td&quot; may clash with future reserved word at .+incerr.htm line 8.
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+</td></tr>
+<tr bgcolor='#eeeeee'><td>
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+^\[\d+\]ERR:  32:  Warning in Perl code: Having no space between pattern and following word is deprecated at .+incerr.htm line 11.
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+</td></tr>
+^<tr bgcolor='#eeeeee'><td>
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+^\[\d+\]ERR:  24:  Error in Perl code: Transliteration replacement not terminated at .+incerr.htm line 12.
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+</td></tr>
+</table>
+<br>
+^Embperl
+</BODY></HTML>
+

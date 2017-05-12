@@ -1,0 +1,159 @@
+#!perl -w
+
+=head1 NAME
+
+screen-server-backend - TODO
+
+=head1 SYNOPSIS
+
+screen-server-backend [options]
+
+    --help                 TODO
+    --debug
+    --name <screen name>   TODO
+    --daemonize        (Default)
+    --no-daemonize
+
+=head1 DESCRIPTION
+
+TODO
+
+=cut
+
+
+use strict;
+
+# Seemingly socat doesn't seem to transmit STDERR automatically so
+# re-route it myself.
+#
+*STDERR = *STDOUT;
+
+# Option handling
+# 
+use Getopt::Long ();
+Getopt::Long::GetOptions(
+    help => \&pod2usage,
+    debug        => \ my $debug,
+    name => \ my $screen_name,
+    'daemonize!' => \ my $daemonize,
+)
+  or pod2usage();
+
+# Daemonization by default
+#
+if ( $daemonize ) {
+    fork && exit;
+    fork && exit;
+    umask 0;
+    chdir '/';
+}
+
+# Automatically clean up zombie children
+#
+$SIG{CHLD} = 'IGNORE';
+
+require File::Temp;
+my ( $log_fh, $log_fn ) = File::Temp::tempfile();
+my $top_pid = $$;
+my $child_pid = fork;
+if ( ! defined $child_pid ) {
+
+    # Oops, failure. Is there a fork bomb going on?
+    #
+    die "Can't fork: $!";
+}
+elsif ( 0 == $child_pid ) {
+    # Double-fork so our parent can reap us immediately and the
+    # exec() below will be reaped by init.
+    #
+    fork && exit;
+    fork && exit;
+
+    # Wait until either the parent socat has exited or it has logged
+    # the right thing.
+    #
+    require Time::HiRes;
+    Time::HiRes::sleep( 0.05 )
+        while    ! -s $log_fh
+              || kill 0, $top_pid;
+
+    # Read the PTY from the socat logfile and have /usr/bin/screen
+    # start a window against it. If all goes well, we'll exec() right
+    # out of this loop and never finish it.
+    #
+    while ( my $l = <$log_fh> ) {
+
+        # socat under `-d -d' flags will print a line like the
+        # following. In the parent, socat is configured to write its
+        # debugging log to a $log_fn which we have a handle to in
+        # $log_fh.
+        #
+        #   PTY is /dev/pts/4
+        #
+        if ( $l =~ m{PTY is (/dev/pts/\d+)} ) {
+            my $pty = $1;
+
+            # Clean up the log file. We don't need it anymore. socat
+            # itself may keep it open however. This is unfortunate.
+            #
+            truncate $log_fh, 0;
+            close $log_fh;
+            unlink $log_fn;
+
+            # exec screen to open a new window using the PTY allocated
+            # by socat.
+            #
+            my @screen_opts;
+            if ( $screen_name ) {
+                push @screen_opts, '-S' => $screen_name;
+            }
+            my @cmd = (
+                'screen',
+                @screen_opts,
+                '-X' => 'screen', $pty
+            );
+            if ( $debug ) {
+                print STDERR "exec( @cmd )\n";
+            }
+            exec @cmd;
+        }
+    }
+    
+    # This is an error condition.
+    #
+    # I was unable to read any "PTY is /dev/pts/#" lines in the
+    # socat log so something has gone wrong. Kill off the socat if
+    # it's still present.
+    #
+    # TODO: check for actual death, wait between signals
+    close $log_fh;
+    unlink $log_fn;
+    kill -2,  $top_pid; # SIGINT
+    kill -15, $top_pid; # SIGTERM
+    kill -9,  $top_pid; # SIGKILL
+}
+elsif ( $child_pid ) {
+    
+    # Tie our input to a new PTY and write the PTY's name to a log
+    # file so the child can pick it up.
+    #
+    # I request two levels of -d debug to get the a message "PTY is
+    # /dev/pts/#" in the log file at -lf. The child process is going
+    # to delete this log file.
+    #
+    my @cmd = (
+        'socat',
+        '-d', '-d',
+        "-lf$log_fn",
+        '-' =>  'PTY',
+    );
+    if ( $debug ) {
+        print STDERR "exec( @cmd )\n";
+    }
+    exec @cmd;
+}
+
+sub pod2usage {
+    require Pod::Usage;
+    goto &Pod::Usage::pod2usage;
+}

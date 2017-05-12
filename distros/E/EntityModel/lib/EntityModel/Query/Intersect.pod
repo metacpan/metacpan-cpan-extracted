@@ -1,0 +1,57 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with EntityModel::Query::Intersect
+at lib/EntityModel/Query/Intersect.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+EntityModel::Query::Intersect - intersection set logic
+
+=head1 VERSION
+
+version 0.102
+
+=head1 SYNOPSIS
+
+See L<Entitymodel::Query>.
+
+=head1 DESCRIPTION
+
+See L<Entitymodel::Query>.
+
+=head1 METHODS
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<EntityModel::Query::SubQuery>
+
+L<inlineSQL|EntityModel::Query::SubQuery/inlineSQL>, L<type|EntityModel::Query::SubQuery/type>
+
+=item L<EntityModel::Query>
+
+L<dbh|EntityModel::Query/dbh>, L<fieldsSQL|EntityModel::Query/fieldsSQL>, L<fromSQL|EntityModel::Query/fromSQL>, L<groupSQL|EntityModel::Query/groupSQL>, L<havingSQL|EntityModel::Query/havingSQL>, L<iterate|EntityModel::Query/iterate>, L<joinSQL|EntityModel::Query/joinSQL>, L<keyword_order|EntityModel::Query/keyword_order>, L<limitSQL|EntityModel::Query/limitSQL>, L<new|EntityModel::Query/new>, L<offsetSQL|EntityModel::Query/offsetSQL>, L<orderSQL|EntityModel::Query/orderSQL>, L<parse_base|EntityModel::Query/parse_base>, L<parse_group|EntityModel::Query/parse_group>, L<parse_limit|EntityModel::Query/parse_limit>, L<parse_spec|EntityModel::Query/parse_spec>, L<parse_where|EntityModel::Query/parse_where>, L<reclassify|EntityModel::Query/reclassify>, L<results|EntityModel::Query/results>, L<typeSQL|EntityModel::Query/typeSQL>, L<upgradeTo|EntityModel::Query/upgradeTo>, L<whereSQL|EntityModel::Query/whereSQL>
+
+=item L<EntityModel::Query::Base>
+
+L<asString|EntityModel::Query::Base/asString>, L<can_parse|EntityModel::Query::Base/can_parse>, L<decantQuotedValue|EntityModel::Query::Base/decantQuotedValue>, L<decantValue|EntityModel::Query::Base/decantValue>, L<normaliseInlineSQL|EntityModel::Query::Base/normaliseInlineSQL>, L<register|EntityModel::Query::Base/register>, L<sqlAndParameters|EntityModel::Query::Base/sqlAndParameters>, L<sqlString|EntityModel::Query::Base/sqlString>
+
+=item L<EntityModel::BaseClass>
+
+L<clone|EntityModel::BaseClass/clone>, L<dump|EntityModel::BaseClass/dump>, L<sap|EntityModel::BaseClass/sap>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <cpan@entitymodel.com>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2008-2011. Licensed under the same terms as Perl itself.

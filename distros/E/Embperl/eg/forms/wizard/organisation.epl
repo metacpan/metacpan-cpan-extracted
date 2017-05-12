@@ -1,0 +1,56 @@
+
+[!
+
+sub title   { $epreq -> gettext ('txt:setup_orga_title') } 
+sub condition { 
+    my ($self, $r) = @_ ;
+    if ($r -> {data}{action} ne 'master')
+    	{
+    	delete $r -> {data}{dc2} ; 
+    	delete $r -> {data}{dc1} ; 
+    	return 0 ;
+    	}
+	return 1 ;    	
+    }
+
+!]
+
+[$ sub show $]
+
+<br>
+[- $escmode = 0 -]
+<p class="cCenter">[= txt:setup_orga1 =]</p>
+<p class="cCenter">[= txt:setup_orga2 =]</p>
+<p class="cCenter">[= txt:setup_orga3 =]</p>
+<p class="cCenter">[= txt:setup_orga4 =]</p>
+[- $escmode = 7 -]
+<br>
+
+
+
+
+[-
+
+$fdat{timezone} ||= 'Europe/Berlin' ;
+
+Embperl::MyForm -> showfields (
+	[
+	{ name => 'dc2', text => 'Organisation dc', 
+	       validate => [required => 1, -msg => 'Organisation dc darf nur Buchstaben, Zahlen, Bindestrich und Leerzeichen enthalten',
+                matches_regex => '^[-a-zA-Z0-9 ]*$' ]},
+	{ name => 'dc1', text => 'Top-Level dc',
+			validate => [required => 1, -msg => 'Top-Level dc darf nur Buchstaben, Zahlen, Bindestrich und Leerzeichen enthalten',
+                matches_regex => '^[-a-zA-Z0-9 ]*$' ]},
+	{ name => 'description', text => 'Beschreibung', width=> 1},
+	{ name => 'admin_password', text => 'Admin Kennwort', type => 'password',
+				validate => [ required => 1, length_min => 5]},
+	{ name => 'admin_retype', text => 'Kennwort wiederholen', type => 'password',
+				validate => [same => 'admin_password:Admin Kennwort']},
+        { name => 'timezone', text => 'Zeitzone',  type => 'select', xdatasrc => 'timezones', noblank => 1 },
+            ]);
+-]
+
+
+[$endsub$]
+
+

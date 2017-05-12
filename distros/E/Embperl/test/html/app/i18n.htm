@@ -1,0 +1,95 @@
+[- $r = shift -]
+[-
+$r -> {language_set} = [{id => 'de', 'name' => 'Deutsch'}, {id => 'en', 'name' => 'English'}, ] ;
+$escmode = 3 ;
+-]
+
+<table width="100%">
+    <tr bgcolor="#fefcad">
+        <td><font size="4">[= add1 =] News</font></td>
+    </tr>
+</table>
+
+
+
+<form action="show.epl" method="POST">
+
+[= add2 =]<br><br>
+
+<table>
+    <tr>
+        <td>URL:</td><td><input type="text" name="url" size=80></td>
+    </tr>
+</table>
+
+<table width="100%">
+    <tr bgcolor="#fefcad"><font size="3">
+        [- $rec = $r -> {language_set}[$row] -]
+        <td>[+ $rec -> {name} +]</td>
+    </tr>
+    <tr>
+        <td>
+            <table>
+                <tr>
+                    <td>[= heading =]:</td><td><input type="text" name="heading_[+ $rec -> {id} +]" size=80></td>
+                </tr>
+                <tr>
+                    <td>[= url =]:</td><td><input type="text" name="url_[+ $rec -> {id} +]" size=80></td>
+                </tr>
+                <tr>
+                    <td>[= description =]:</td><td><textarea name="description_[+ $rec -> {id} +]" cols=60 rows=10></textarea></td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+<br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<input type="submit" name="-add_item" value="[= add3 =] News">
+
+<input type="hidden" name="category_id">
+
+Use gettext:
+
+description = [+ $r -> gettext ('description') +]
+heading =     [+ $r -> gettext ('heading') +]
+add3 =        [+ $r -> gettext ('add3') +]
+
+
+</form>
+
+[$ foreach $i (1..4) $]
+
+    addsel[+$i +] = [+ $r -> gettext ("addsel$i") +]<br>
+
+    [= next =]<br>
+
+    addsel[+$i +] (2) = [+ $r -> gettext ("addsel$i") +]<br>
+
+[$endforeach$]
+
+[$ foreach $i (1..4) $]
+
+    addsel[+$i +] = [+ $r -> gettext ("addsel$i") +]<br>
+
+    last: [= last =]<br>
+
+[$endforeach$]
+
+
+
+[$ foreach $i (1..4) $]
+
+    addsel[+$i +] = [+ $r -> gettext ("addsel$i") +]<br>
+
+    [= last =]<br>
+
+[$endforeach$]
+
+[= this is text with spaces =]
+
+[+ $r -> gettext('ÄÜÖ') +]
+
+[= test undef =]
+
+             

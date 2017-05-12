@@ -1,0 +1,78 @@
+---
+name: Egg-Release-Authorize
+version: 0.02
+author:
+  - 'Masatoshi Mizuno E<lt>lusheE<64>cpan.orgE<gt>'
+abstract: lib/Egg/Release/Authorize.pm
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Cache::Cache: 1.05
+  Crypt::Blowfish: 2.10
+  Crypt::CBC: 2.24
+  Crypt::Camellia: 2.01
+  Crypt::DES: 2.05
+  Digest::MD5: 2.36
+  Digest::SHA1: 2.11
+  Egg::Plugin::SessionKit: 3.02
+  Egg::Release: 3.01
+  Egg::Release::DBI: 0.02
+  Egg::Release::DBIC: 0.02
+  Test::More: 0
+  Test::Perl::Critic: 0
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+provides:
+  Egg::Helper::Model::Auth:
+    file: lib/Egg/Helper/Model/Auth.pm
+    version: 0.01
+  Egg::Model::Auth:
+    file: lib/Egg/Model/Auth.pm
+    version: 0.01
+  Egg::Model::Auth::API::DBI:
+    file: lib/Egg/Model/Auth/API/DBI.pm
+    version: 0.01
+  Egg::Model::Auth::API::DBIC:
+    file: lib/Egg/Model/Auth/API/DBIC.pm
+    version: 0.01
+  Egg::Model::Auth::API::File:
+    file: lib/Egg/Model/Auth/API/File.pm
+    version: 0.01
+  Egg::Model::Auth::Base:
+    file: lib/Egg/Model/Auth/Base.pm
+    version: 0.01
+  Egg::Model::Auth::Base::API:
+    file: lib/Egg/Model/Auth/Base/API.pm
+    version: 0.01
+  Egg::Model::Auth::Bind::Cookie:
+    file: lib/Egg/Model/Auth/Bind/Cookie.pm
+  Egg::Model::Auth::Crypt::CBC:
+    file: lib/Egg/Model/Auth/Crypt/CBC.pm
+    version: 0.01
+  Egg::Model::Auth::Crypt::Func:
+    file: lib/Egg/Model/Auth/Crypt/Func.pm
+    version: 0.01
+  Egg::Model::Auth::Crypt::MD5:
+    file: lib/Egg/Model/Auth/Crypt/MD5.pm
+    version: 0.01
+  Egg::Model::Auth::Crypt::SHA1:
+    file: lib/Egg/Model/Auth/Crypt/SHA1.pm
+    version: 0.01
+  Egg::Model::Auth::Plugin::Keep:
+    file: lib/Egg/Model/Auth/Plugin/Keep.pm
+    version: 0.02
+  Egg::Model::Auth::Session::FileCache:
+    file: lib/Egg/Model/Auth/Session/FileCache.pm
+    version: 0.01
+  Egg::Model::Auth::Session::SessionKit:
+    file: lib/Egg/Model/Auth/Session/SessionKit.pm
+  Egg::Model::Auth::handler:
+    file: lib/Egg/Model/Auth.pm
+  Egg::Release::Authorize:
+    file: lib/Egg/Release/Authorize.pm
+    version: 0.02
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

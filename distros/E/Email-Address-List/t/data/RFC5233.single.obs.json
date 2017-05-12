@@ -1,0 +1,70 @@
+[
+   {
+      "domain" : "example.com",
+      "local-part" : "john.q.public",
+      "address" : "john.q.public@example.com",
+      "mailbox" : "Joe Q. Public <john.q.public@example.com>",
+      "comments" : [],
+      "description" : "Appendix A.6.1.  Obsolete Addressing",
+      "display-name" : "Joe Q. Public"
+   },
+   {
+      "domain" : "example.net",
+      "local-part" : "mary",
+      "address" : "mary@example.net",
+      "mailbox" : "Mary Smith <@node.test:mary@example.net>",
+      "comments" : [],
+      "description" : "Appendix A.6.1.  Obsolete Addressing",
+      "display-name" : "Mary Smith"
+   },
+   {
+      "domain" : "test.example",
+      "local-part" : "jdoe",
+      "address" : "jdoe@test.example",
+      "mailbox" : "jdoe@test  . example",
+      "comments" : [],
+      "description" : "Appendix A.6.1.  Obsolete Addressing",
+      "display-name" : null
+   },
+   {
+      "domain" : "machine.example",
+      "local-part" : "jdoe",
+      "address" : "jdoe@machine.example",
+      "mailbox" : "John Doe <jdoe@machine(comment).  example>",
+      "comments" : [
+         "(comment)"
+      ],
+      "description" : "Appendix A.6.3.  Obsolete White Space and Comments",
+      "display-name" : "John Doe"
+   },
+   {
+      "domain" : "example.net",
+      "local-part" : "mary",
+      "address" : "mary@example.net",
+      "mailbox" : "Mary Smith\n  \n             <mary@example.net>",
+      "comments" : [],
+      "description" : "Appendix A.6.3.  Obsolete White Space and Comments",
+      "display-name" : "Mary Smith"
+   },
+   {
+      "domain" : "domain.com",
+      "local-part" : "baz.zoo",
+      "address" : "baz.zoo@domain.com",
+      "mailbox" : "(c1) foo (c2) bar (c3) < (c4) baz (c5) . (c6) zoo (c7) @ (c8) domain (c9) . (c10) com (c11) >",
+      "comments" : [
+         "(c1)",
+         "(c2)",
+         "(c3)",
+         "(c4)",
+         "(c5)",
+         "(c6)",
+         "(c7)",
+         "(c8)",
+         "(c9)",
+         "(c10)",
+         "(c11)"
+      ],
+      "description" : "comments all over the place",
+      "display-name" : "foo bar"
+   }
+]

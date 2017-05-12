@@ -1,0 +1,43 @@
+{
+   "abstract" : "Perl interface to EZID API - http://ezid.cdlib.org/doc/apidoc.html",
+   "author" : [
+      "Julian <julian.maurice@biblibre.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "EZID",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0,
+            "Test::More" : "1.001006"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Modern::Perl" : "1.20140107",
+            "String::Random" : "0.22"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.02"
+}

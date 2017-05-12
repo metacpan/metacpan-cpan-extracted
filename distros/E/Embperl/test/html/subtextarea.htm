@@ -1,0 +1,30 @@
+<html>
+<head>
+<title>Embperl Tests</title>
+</head>
+<body bgcolor="#ffffff">
+
+    [$ foreach $k (@ffld) $]
+        [+ $k +] = [+ $fdat{$k} +]<br>
+    [$endforeach$]
+
+     [$ sub EntryRow $]
+         <input name="[+ $_[1] +]" type=text size=40 maxlength=255><br>
+     [$ endsub $]
+
+    <form method=post action="ta3.htm">
+         <textarea name="summary" rows=4 cols=45></textarea>
+         <br>
+
+         [- EntryRow('Title*', 'title') -]
+         [- EntryRow('Pub. Date*', 'pubdate', '(m/d/y, "today"...)') -]
+
+         <br>
+         <textarea name="content" rows=15 cols=45></textarea>
+
+         <input name="more">
+
+        <input type="submit">
+    </form>
+
+</body>

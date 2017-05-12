@@ -1,0 +1,19 @@
+Exim-SpoolMessage
+
+Exim::SpoolMessage − read and parse Exim spool files
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Exim::SpoolMessage
+
+
+COPYRIGHT AND LICENCE
+
+Copyright 2009 Kirill Miazine.
+
+This software is distributed under an ISC-style license, please see
+<http://km.krot.org/code/license.txt> for details.

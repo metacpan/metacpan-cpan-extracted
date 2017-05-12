@@ -1,0 +1,129 @@
+=encoding utf8
+
+=head1 NAME
+
+Eixo::Rest - Base modules to build REST api clients
+
+=head1 SINOPSIS
+
+Build an api client:
+
+- Define the api products
+
+    package MyApiClient;
+
+    use strict;
+    use parent qw(Eixo::Rest::Api);
+
+    sub users {
+        $_[0]->produce('MyApi::User');
+    }
+
+    sub images {
+        $_[0]->produce('MyApi::Image');
+    }
+
+
+- Implement api products 
+
+    package MyApi::User;
+
+    use parent qw(Eixo::Rest::Product);
+
+    sub getUsers {
+
+        my ($self,%args) = @_;
+
+        my $list  = [];
+
+        my $args = {
+            all => $args{all} || undef,
+            limit => $args{limit} || 1000,
+        };
+
+        
+        $self->api->getUsers(
+
+            args => $args, 
+
+            get_params => [qw(all limit)],
+
+            __callback => sub {
+
+                foreach my $r (@{$_[0]}){
+
+                    push @$list, MyApi::User->new(%$r)
+                }
+
+                return $list;
+            }
+        );
+
+    }
+
+- Use it:
+
+    my $a = MyApiClient->new(http://api.acme.com);
+
+    my $user_list = $a->getUsers(
+        all => 1, 
+        limit => 10
+    );
+
+- Use it asynchronously:
+
+
+    my $a = MyApiClient->new(http://api.acme.com);
+
+    my $job = $a->getUsersAsync(
+        all => 1, 
+        limit => 10
+    );
+
+    # do other stuff
+    ...
+
+    # when you want the results
+    my $user_list = $a->wait_for_job($job);
+
+
+
+=head1 DESCRIPTION
+
+Perl modules to simplify the construction of REST api clients. 
+
+It provides a set of base classes from which derive and build api resources (Products) and simplify api calls.
+
+In addition, it allows send HTTP requests in sync and async mode (using threads).
+
+It also offers a tool for building REST APIs for testing purpouses.
+
+
+
+=head1 AUTHOR
+
+Francisco Maseda, E<lt>frmadem@gmail.comE<gt>
+
+Javier Gómez, E<lt>alambike@gmail.comE<gt>
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2014, Javier Gómez
+
+Copyright (C) 2014, Francisco Maseda
+
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+L<http://www.apache.org/licenses/LICENSE-2.0>
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+=cut

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<html xmlns="http://www.w3.org/TR/xhtml1/strict">
+<head>
+<title>POD</title>
+</head>
+<body>
+<h1>HEAD1</h1>
+some text under HEAD1
+
+<h2><img src="sq.gif" width="16" height="16" alt="-"/>HEAD2</h2><p/>
+some text under HEAD2
+
+HEAD3
+some text under HEAD3
+
+format bold <code>code</code> italic underline
+
+<ul>
+<li><b>first item</b></li><br/>
+text 1
+
+<li><b>second item</b></li><br/>
+text 2
+
+</ul>
+
+<ul>
+first item
+text 1
+
+second item
+text 2
+
+</ul>
+
+</body>
+</html>

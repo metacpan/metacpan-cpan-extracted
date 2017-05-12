@@ -1,0 +1,41 @@
+ETLp
+
+ETLp is a framework for managing ETL pipeline processing. 
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc ETLp
+
+You can also look for information at:
+
+    Project Website
+    
+        http://firefly.activestate.com/dhorne/etlp
+	
+ACKNOWLEDGEMENTS
+
+Thanks to http://www.generatedata.com for generating sample data
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2010 Redbone Systems Ltd
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See the accompanying LICENSE file for more information.
+

@@ -1,0 +1,58 @@
+{
+   "abstract" : "Zap Windows Western Gremlins",
+   "author" : [
+      "David E. Wheeler <david@justatheory.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Encode-ZapCP1252",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.36",
+            "Test::More" : "0.17"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.36"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Encode" : 0,
+            "Test::Pod" : "1.41"
+         },
+         "requires" : {
+            "perl" : "5.006002"
+         }
+      }
+   },
+   "provides" : {
+      "Encode::ZapCP1252" : {
+         "file" : "lib/Encode/ZapCP1252.pm",
+         "version" : "0.33"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/theory/encode-cp1252/issues/"
+      },
+      "homepage" : "http://search.cpan.org/dist/Encode-CP1252/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/theory/encode-cp1252/tree"
+      }
+   },
+   "version" : "0.33"
+}

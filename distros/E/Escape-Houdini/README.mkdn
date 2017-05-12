@@ -1,0 +1,91 @@
+# NAME
+
+Escape::Houdini - Perl API to Houdini, a zero-dependency C web escaping library
+
+# VERSION
+
+version 0.3.0
+
+# SYNOPSIS
+
+```perl
+use Escape::Houdini ':all';
+
+my $escaped = escape_html( '<foo>' );
+# $escaped is now '&lt;foo&gt;'
+```
+
+# DESCRIPTION
+
+_Escape::Houdini_ is a wrapper around the zero-depedency, minimalistic
+web escaping C library Houdini.
+
+This version of _Escape::Houdini_ has been built against 
+the commit
+[https://github.com/vmg/houdini/commit/3e2a78a2399bf3f58253c435278df6daf0e41740](https://github.com/vmg/houdini/commit/3e2a78a2399bf3f58253c435278df6daf0e41740)
+of Houdini.
+
+# FUNCTIONS
+
+## escape\_html( $text )
+
+See [https://github.com/vmg/houdini](https://github.com/vmg/houdini)
+
+## unescape\_html( $text )
+
+See [https://github.com/vmg/houdini](https://github.com/vmg/houdini)
+
+## escape\_xml( $text )
+
+See [https://github.com/vmg/houdini](https://github.com/vmg/houdini)
+
+## escape\_uri( $text )
+
+See [https://github.com/vmg/houdini](https://github.com/vmg/houdini)
+
+## unescape\_uri( $text )
+
+See [https://github.com/vmg/houdini](https://github.com/vmg/houdini)
+
+## escape\_url( $text )
+
+See [https://github.com/vmg/houdini](https://github.com/vmg/houdini)
+
+## unescape\_url( $text )
+
+See [https://github.com/vmg/houdini](https://github.com/vmg/houdini)
+
+## escape\_href( $text )
+
+See [https://github.com/vmg/houdini](https://github.com/vmg/houdini)
+
+## escape\_js( $text )
+
+See [https://github.com/vmg/houdini](https://github.com/vmg/houdini)
+
+## unescape\_js( $text )
+
+See [https://github.com/vmg/houdini](https://github.com/vmg/houdini)
+
+# EXPORTS
+
+_Escape::Houdini_ doesn't export any function by default. Functions can be  
+exported individually, or via the tags _:html_ (for _escape\_html_ and
+_unescape\_html_), _:uri_ (for _escape\_uri_ and _unescape\_uri_),
+_:url_ (for _escape\_url_ and _unescape\_url_), _:js_ (for _escape\_js_
+and _unescape\_js_) and _:all_ (for... well, all of them).
+
+# SEE ALSO
+
+Houdini (natch) - [https://github.com/vmg/houdini](https://github.com/vmg/houdini)
+
+# AUTHOR
+
+Yanick Champoux <yanick@cpan.org> [![endorse](http://api.coderwall.com/yanick/endorsecount.png)](http://coderwall.com/yanick)
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Yanick Champoux.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

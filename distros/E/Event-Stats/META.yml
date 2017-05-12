@@ -1,0 +1,29 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  Event: '0.58'
+  ExtUtils::MakeMaker: '0'
+  Test: '1'
+  Time::HiRes: '1.2'
+configure_requires:
+  Event::MakeMaker: '0'
+  ExtUtils::MakeMaker: '7.14'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.14, CPAN::Meta::Converter version 2.150001'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Event-Stats
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Event: '0.58'
+  Time::HiRes: '1.2'
+resources:
+  repository: https://github.com/mohawk2/Event-Stats.git
+version: '1.02'

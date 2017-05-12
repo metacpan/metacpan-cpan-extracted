@@ -1,0 +1,152 @@
+#!/usr/bin/perl -w
+
+eval 'exec /usr/bin/perl -w -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
+use strict;
+use ETLp;
+use ETLp::Config;
+use ETLp::Utility::Command;
+use FindBin qw($Bin);
+use Fcntl ':flock';
+use Data::Dumper;
+use Cwd 'abs_path';
+use lib "$Bin/../lib";
+use Try::Tiny;
+
+=head1 NAME
+
+etlp - Perl script to initiate an ETLp job run
+
+=head1 USAGE
+
+etlp <config file> <section>
+
+=head2 PARAMETERS
+
+=head3 config file
+
+The name of the configuration file... The file name must end in .conf, although 
+you are not required to use this suffix when passing the parameter.
+
+
+=head3 section
+
+This is the section with the configuration file that contains the job
+definition
+
+=head1 DIRECTORY STRUCTURE
+
+This script assumes the following directory structure:
+
+   /<app_root>
+   |
+   +---/bin
+   |   |
+   |   +----etlp (symbolic link to deployed etlp)
+   |
+   +---/conf
+   |   |
+   |   +----env.cfg
+   |   |
+   |   +----<source>.cfg
+   |   |
+   |   +----/control
+   |        |
+   |        +----<file>.ctl
+   |
+   +---/locks
+   |
+   +---/log
+
+ +------------+------------------------------------------------+
+ | Directory  | Purpose                                        |
+ +------------+------------------------------------------------+
+ | <app_root> | The name of the top-ldev directory             |
+ | bin        | Directory for scripts                          |
+ | conf       | pipeline configuration files                   |
+ | control    | control files. Define data file formats        |
+ | locks      | Prevents other files instances of the job      |
+ |            | from running                                   |
+ | log        | Records output of the Pipeline processes       |
+ +------------+------------------------------------------------+
+
+ +---------------+----------------------------------------------+
+ | File          | Purpose                                      |
+ +---------------+----------------------------------------------+
+ | etlp          | This script                                  |
+ | env.conf      | Defines the environment. Make sure this is   |
+ |               | only readable by the OS account:             |
+ |               |      chmod 600 env.cfg                       |
+ | <source>.conf | Configuration of the pipeline processing     |
+ | <file>.ctl    | Defines the data file fileds and validation  |
+ |               | rules                                        |
+ +---------------+----------------------------------------------+
+
+=head1 EXAMPLE
+
+   etlp sales eastern_region
+
+This is the same as
+
+   etlp sales.conf eastern_region
+
+=cut
+
+unless (@ARGV == 2) {
+   print "Usage $0 <config file> <section>\n";
+   exit 1;
+}
+
+my $config_file = $ARGV[0];
+my $section     = $ARGV[1];
+my $app_root    = abs_path("$Bin/..");
+
+my $etlp = ETLp->new(
+    config_directory => "$app_root/conf",
+    app_config_file  => $config_file,
+    env_config_file  => "env",
+    section          => $section,
+    log_dir          => "$app_root/log",
+    app_root         => $app_root,
+    localize         => 1,
+);
+
+my $lock_file = abs_path("$Bin/../locks/${config_file}-${section}.lck");
+
+open(my $flock_fh, ">>$lock_file");
+
+flock($flock_fh, LOCK_EX | LOCK_NB)
+ || ETLp::Config->logger->logdie(
+   "Job config_file: $config_file, section: $section already running");
+
+ETLp::Config->logger->info("Initiating: $config_file $section");
+
+try {
+    $etlp->run;
+} catch {
+    ETLp::Config->logger->debug("Error: $_");
+};
+
+my $next = $etlp->config->{config}->{next};
+if ($next) {
+   ETLp::Config->logger->info("Calling: $next");
+   my $command = "$0 $next &";
+   my $os = ETLp::Utility::Command->new();
+   $os->run($command);
+}
+
+
+# flush and unlock
+close $flock_fh;
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2010 Redbone Systems Ltd
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+The terms are in the LICENSE file that accompanies this application
+
+=cut

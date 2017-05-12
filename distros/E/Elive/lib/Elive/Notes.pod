@@ -1,0 +1,66 @@
+=pod
+
+=head1 NAME
+
+Elive::Notes - General Development Notes
+
+=head1 DATABASE USAGE
+
+Elluminate site instances by default use McKoi - a lightweight pure
+Java/JDBC database.
+
+You might want to consider using other databases, such as  SQL Server,
+Oracle or MySQL. These are supported by the Elluminate I<Live!> Manager (ELM)
+and have JDBC bridges available.
+
+Elluminate Live! also bundles JDBCScriptTool and JDBCQueryTool. At a pinch
+you can use either to obtain basic SQL access to McKoi databases.
+
+Note that will only work, if your site instance has been shutdown.
+
+They need to be run locally on the server:
+
+    % cd /opt/ElluminateLive/manager/tomcat/webapps/<instance>/WEB-INF/
+
+You will need to have write access to the database and log files.
+
+The first command to try might be 'show tables'.
+
+As always, be careful running update and delete commands on live production
+databases!
+
+=head2 JDBCScript Tool
+
+This can be used for text based queries.
+
+    % echo 'describe Meetings'|/opt/ElluminateLive/jre/bin/java -cp lib/mckoidb.jar com.mckoi.tools.JDBCScriptTool -url "jdbc:mckoi:local://./resources/db.conf" -u admin -p admin
+    Using JDBC Driver: com.mckoi.JDBCDriver
+    Connection established to: jdbc:mckoi:local://./resources/db.conf
+
+    > describe Meetings
+    +-------------------+----------------+----------+--------------+---------+
+    | name              | type           | not_null | index        | default |
+    +-------------------+----------------+----------+--------------+---------+
+    | startDate         | BIGINT         | false    | InsertSearch | NULL    |
+    | allModerators     | BOOLEAN(0,0)   | false    | InsertSearch | NULL    |
+    | restrictedMeeting | BOOLEAN(0,0)   | false    | InsertSearch | NULL    |
+    | privateMeeting    | BOOLEAN(0,0)   | false    | InsertSearch | NULL    |
+    | name              | VARCHAR(256,0) | false    | InsertSearch | NULL    |
+    | creatorId         | VARCHAR(64,0)  | false    | InsertSearch | NULL    |
+    | meetingId         | BIGINT         | true     | InsertSearch | NULL    |
+    | endDate           | BIGINT         | false    | InsertSearch | NULL    |
+    | adapter           | VARCHAR(64,0)  | false    | InsertSearch | NULL    |
+    | password          | VARCHAR(16,0)  | false    | InsertSearch | NULL    |
+    | deleted           | BOOLEAN(0,0)   | false    | InsertSearch | NULL    |
+    +-------------------+----------------+----------+--------------+---------+
+
+     --- FINISHED    
+
+=head2 JDBCQuery Tool
+
+This provides a command window and is suitable for interactive use.
+
+    % /opt/ElluminateLive/jre/bin/java -cp lib/mckoidb.jar com.mckoi.tools.JDBCQueryTool -url "jdbc:mckoi:local://./resources/db.conf" -u admin -p admin
+
+This should give you an SQL window, providing you have a X display to the server.
+

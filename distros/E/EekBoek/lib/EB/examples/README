@@ -1,0 +1,8 @@
+Deze directory bevat voorbeelden van EekBoek schema's en andere data
+bestanden.
+
+Alle bestanden zijn bedoeld als voorbeeld, en niet om een werkende
+administratie uit aan te maken. Gebruik daarvoor het bestand
+sampledb.ebz in de schema directory, of draai ebshell met de command
+line optie --createsampledb .
+

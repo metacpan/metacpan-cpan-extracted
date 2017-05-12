@@ -1,0 +1,25 @@
+---
+abstract: 'Send Email using Net::SMTP::TLS (esp. Gmail)'
+author:
+  - 'Fayland Lam <fayland@gmail.com>'
+build_requires:
+  Email::Address: 0
+  Email::Send: 0
+  Net::SMTP::TLS::ButMaintained: 0
+  Return::Value: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Email-Send-SMTP-TLS
+provides:
+  Email::Send::SMTP::TLS:
+    file: lib/Email/Send/SMTP/TLS.pm
+    version: 0.04
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.04

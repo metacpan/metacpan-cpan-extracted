@@ -1,0 +1,7 @@
+Revision history for Exceptions
+
+0.100     2016-09-05
+    - Dist::Zilla now used
+
+0.01  Wed Nov 27 13:48:49 1996
+    - original version; created by h2xs 1.1.1.10

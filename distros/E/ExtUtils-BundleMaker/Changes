@@ -1,0 +1,30 @@
+Revision history for ExtUtils-BundleMaker
+
+0.006	2014-05-05
+    - switch from Module::Build to ExtUtils::MakeMaker
+
+0.005	2014-05-05
+    - deal with required version of 0 as undef when checking a core
+      module. Without a specific version, it doesn't matter whether
+      no version or no specific version is requested.
+
+0.004	2014-05-05
+    - mention caching modules as recommended prereqisite together with
+      fixed MetaCPAN::Client 1.003000 (Sawyer X)
+    - generate some additional getters when generating bundle as separate
+      package
+    - improve documentation
+    - add some more tests for better test coverage
+
+0.003	2014-05-04
+    - fix some check_module issues
+    - "use" instead of "require" for optional modules
+    - don't mention caching modules as requirement
+    - improve pod
+
+0.002	2014-05-03
+    - fix some minor issues with 1st public customer (List::MoreUtils)
+
+0.001	2014-05-03
+    - First version, released on an unsuspecting world.
+

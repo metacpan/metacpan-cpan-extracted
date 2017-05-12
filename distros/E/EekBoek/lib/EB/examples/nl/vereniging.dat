@@ -1,0 +1,292 @@
+# Voorbeeld EekBoek Rekeningschema -*- coding: utf-8 -*-
+# Content-Type: text/plain; charset = UTF-8
+
+# Dit bestand definiëert alle vaste gegevens van een administratie of
+# groep administraties: het rekeningschema (balansrekeningen en
+# resultaatrekeningen), de dagboeken en de BTW tarieven.
+#
+# Algemene syntaxregels:
+#
+# * Lege regels en regels die beginnen met een hekje # worden niet
+#   geïnterpreteerd.
+# * Een niet-ingesprongen tekst introduceert een nieuw onderdeel.
+# * Alle ingesprongen regels zijn gegevens voor dat onderdeel.
+
+# REKENINGSCHEMA
+#
+# Het rekeningschema is hiërarchisch opgezet volgende de beproefde
+# methode Bakker. De hoofdverdichtingen lopen van 1 t/m 9, de
+# verdichtingen t/m 99. De grootboekrekeningen zijn verdeeld in
+# balansrekeningen en resultaatrekeningen.
+#
+# De omschrijving van de grootboekrekeningen wordt voorafgegaan door
+# een vlaggetje, een letter die resp. Debet/Credit (voor
+# balansrekeningen) en Kosten/Omzet/Neutraal (voor resultaatrekeningen)
+# aangeeft. De omschrijving wordt indien nodig gevolgd door extra
+# informatie. Voor grootboekrekeningen kan op deze wijze de BTW
+# tariefstelling worden aangegeven die op deze rekening van toepassing
+# is:
+#
+#   :btw=nul
+#   :btw=hoog
+#   :btw=laag
+#   :btw=privé
+#   :btw=anders
+#
+# Ook is het mogelijk aan te geven dat een rekening een koppeling
+# (speciale betekenis) heeft met :koppeling=xxx. De volgende koppelingen
+# zijn mogelijk:
+#
+#   crd		de standaard tegenrekening (Crediteuren) voor inkoopboekingen
+#   deb		de standaard tegenrekening (Debiteuren) voor verkoopboekingen
+#   btw_ih	de rekening voor BTW boekingen voor inkopen, hoog tarief
+#   btw_il	idem, laag tarief
+#   btw_vh	idem, verkopen, hoog tarief
+#   btw_vl	idem, laag tarief
+#   btw_ph	idem, privé, hoog tarief
+#   btw_pl	idem, laag tarief
+#   btw_ah	idem, anders, hoog tarief
+#   btw_al	idem, laag tarief
+#   btw_ok	rekening voor de betaalde BTW
+#   winst	rekening waarop de winst wordt geboekt
+#
+# De koppeling winst is verplicht en moet altijd in een administratie
+# voorkomen in verband met de jaarafsluiting.
+# De koppelingen voor BTW moeten worden opgegeven indien BTW
+# van toepassing is op de administratie.
+# De koppelingen voor Crediteuren en Debiteuren moeten worden
+# opgegeven indien er inkoop dan wel verkoopdagboeken zijn die gebruik
+# maken van de standaardwaarden (dus zelf geen tegenrekening hebben
+# opgegeven).
+
+# Normaal lopen hoofdverdichtingen van 1 t/m 9, en verdichtingen
+# van 10 t/m 99. Indien daarvan wordt afgeweken kan dit worden opgegeven
+# met de opdracht "Verdichting". De twee getallen geven het hoogste
+# nummer voor hoofdverdichtingen resp. verdichtingen.
+
+Verdichting 9 99
+
+# De nummers van de grootboekrekeningen worden geacht groter te zijn
+# dan de maximale verdichting. Daarvan kan worden afgeweken door
+# middels voorloopnullen de _lengte_ van het nummer groter te maken
+# dan de lengte van de maximale verdichting. Als bijvoorbeeld 99 de
+# maximale verdichting is, dan geeft 001 een grootboekrekening met
+# nummer 1 aan.
+
+Balansrekeningen
+
+  1  Vaste Activa
+     12  Materiele vaste activa
+      	 1210   D   Schouw
+         1211   C   Afschrijving Schouw
+	 1220   D   Buitenboordmotor 10pk
+	 1221   C   Afschrijving Buitenboordmotor 10pk
+		
+  2  Vlottende activa
+   21  Vooraden
+	 2110  D   Voorraad Educatief Materiaal  
+   22  Vorderingen
+         2200  D   Debiteuren                                 :koppeling=deb
+         2210  D   Debiteuren Scholenwerkgroep
+         2220  D   Vooruitbetaalde bedragen
+   24  Liquide middelen
+   	2400  D   Kas
+        2410  D   Postbank Bestuur
+        2420  D   Postbank Scholenwerkgroep
+      	2450  D   Postbank Plus rekening
+        2460  D   Postbank Loyaal rekening
+        2490  D   Kruisposten
+      	         
+  3  Eigen vermogen
+     31  Kapitaal
+         3100   C   Eigen Vermogen                             :koppeling=winst
+     32  Reserveringen
+         3210   C   Reservering Gidsencurus
+         3220   C   Reservering Huisvesting
+         3230   C   Reservering Inventaris en Inrichting
+         3240   C   Reservering Materieel
+         3250   C   Reservering Vaartuigen
+         3260   C   Reservering Baggerfonds
+         3270   C   Reservering Jubileum
+
+  4  Vreemd vermogen
+     46  Leveranciers kredieten
+         4600  C   Crediteuren                                :koppeling=crd
+
+Resultaatrekeningen
+
+  5  Opbrengsten
+     50  Tussenrekeningen opbrengsten
+         5010  O   Bijdragen van leden
+         5011  O   Contributie Leden
+         5012  O   Contributie Huisgenootleden
+         5013  O   Contributie donateurs
+         5014  O   Giften bij contributies
+         5015  O   Overige giften
+       	 5030  O   Bijdragen Rijk/Provincie
+         5050  O   Subsidie Gouda
+         5060  O   Subsidie Reeuwijk
+	 5080  O   Rente baten
+         5090  O   Overige baten
+      51  Baten Bestuur en algemeen
+         5110  O   Bijdragen van leden Bestuur
+         5120  O   Inkomsten uit verkopen Bestuur
+         5130  O   Bijdragen Rijk/Provincie Bestuur
+         5150  O   Subsidie Gouda Bestuur 
+  	 5160  O   Subsidie Reeuwijk Bestuur
+         5190  O   Overige baten Bestuur
+      52  Baten VLB
+         5210  O   Bijdragen van leden VLB
+         5220  O   Inkomsten uit verkopen VLB
+         5230  O   Bijdragen Rijk/Provincie VLB
+         5250  O   Subsidie Gouda VLB
+         5260  O   Subsidie Reeuwijk VLB
+	 5270  O   SOL Subsidies en Bijdragen
+	 5280  O   Subsidies Veen
+         5290  O   Overige baten VLB     
+     53  Baten Cursussen
+         5310  O   Bijdragen van leden Cursussen
+         5320  O   Inkomsten uit verkopen Cursussen
+         5330  O   Bijdragen Rijk/Provincie Cursussen
+         5350  O   Subsidie Gouda Cursussen
+         5360  O   Subsidie Reeuwijk Cursussen
+         5390  O   Overige baten Cursussen
+     54  Baten Excursies
+         5410  O   Bijdragen van leden Excursies
+         5420  O   Inkomsten uit verkopen Excursies
+         5430  O   Bijdragen Rijk/Provincie Excursies
+         5450  O   Subsidie Gouda Excursies
+         5460  O   Subsidie Reeuwijk Excursies
+         5490  O   Overige baten Excursies
+     55  O Baten Scholen
+         5510  O   Bijdragen van leden Scholen
+         5520  O   Inkomsten uit verkopen Scholen
+         5530  O   Bijdragen Rijk/Provincie Scholen
+         5550  O   Subsidie Gouda Scholen
+         5560  O   Subsidie Reeuwijk Scholen
+         5590  O   Overige baten Scholen
+     56  Baten Inktzwam
+         5610  O   Bijdragen van leden Inktzwam
+         5620  O   Inkomsten uit verkopen Inktzwam
+         5630  O   Bijdragen Rijk/Provincie Inktzwam
+         5650  O   Subsidie Gouda Inktzwam
+         5660  O   Subsidie Reeuwijk Inktzwam
+         5690  O   Overige baten Inktzwam
+     57  Baten Evenementen
+         5710  O   Bijdragen van leden Evenementen
+         5720  O   Inkomsten uit verkopen Evenementen
+         5730  O   Bijdragen Rijk/Provincie Evenementen
+         5750  O   Subsidie Gouda Evenementen
+         5760  O   Subsidie Reeuwijk Evenementen
+   	 5770  O   Subsidie NatuurNetwerk
+   	 5780  O   Subsidie Zuidhollandse Milieufederatie
+         5790  O   Overige baten Evenementen
+     58  Baten Educatief Materiaal
+         5810  O   Bijdragen van leden Educatief Materiaal
+         5820  O   Inkomsten uit verkopen Educatief Materiaal
+         5830  O   Bijdragen Rijk/Provincie Educatief Materiaal
+         5850  O   Subsidie Gouda Educatief Materiaal
+         5860  O   Subsidie Reeuwijk Educatief Materiaal
+         5890  O   Overige baten Educatief Materiaal
+      59  Baten Overig (incidenteel)	
+	5900 O Incidentele baten
+
+
+  6  Kosten werkgroepen 
+     60  Tussenrekeningen kosten
+	# Deze kosten zijn nog te verdelen over de werkgroepen
+         6010  K   Personeelskosten
+         6020  K   Huisvestingskosten
+         6030  K   Organisatiekosten
+         6040  K   Uitvoeringskosten
+         6090  K   Overige kosten
+     61  Kosten Bestuur en algemeen
+         6110  K   Personeelskosten Bestuur
+         6120  K   Huisvestingskosten Bestuur
+         6130  K   Organisatiekosten Bestuur
+         6140  K   Uitvoeringskosten Bestuur
+  	 6150  K   Kosten Ledenvergadering  
+ 	 6160  K   Afdracht district ZH 		
+	 6170  K   Afdracht landelijk IVN
+	 6180  K   Bankkosten
+         6190  K   Overige kosten Bestuur
+     62  Kosten Werkgroep VLB
+         6210  K   Personeelskosten VLB
+         6220  K   Huisvestingskosten VLB
+         6230  K   Organisatiekosten VLB
+         6240  K   Uitvoeringskosten VLB
+	 6250  K   Afschrijvingskosten VLB
+         6290  K   Overige kosten VLB
+     63  Kosten Werkgroep Cursussen
+         6310  K   Personeelskosten Cursussen
+         6320  K   Huisvestingskosten Cursussen
+         6330  K   Organisatiekosten Cursussen
+         6340  K   Uitvoeringskosten Cursussen
+         6390  K   Overige kosten Cursussen
+     64  Kosten Werkgroep Excursies en Lezingen
+         6410  K   Personeelskosten Excursies en Lezingen
+         6420  K   Huisvestingskosten Excursies en Lezingen
+         6430  K   Organisatiekosten Excursies en Lezingen
+         6440  K   Uitvoeringskosten Excursies
+         6450  K   Uitvoeringskosten Lezingen 
+	 6490  K   Overige kosten Excursies
+     65  Kosten Werkgroep Scholen
+         6510  K   Personeelskosten Scholen
+         6520  K   Huisvestingskosten Scholen
+         6530  K   Organisatiekosten Scholen
+         6540  K   Uitvoeringskosten Scholen
+         6590  K   Overige kosten Scholen
+     66  Kosten Werkgroep Inktzwam en PR
+         6610  K   Personeelskosten Inktzwam
+         6620  K   Huisvestingskosten Inktzwam
+         6630  K   Organisatiekosten Inktzwam
+         6640  K   Uitvoeringskosten Inktzwam
+	 6650  K   Kosten Website
+	 6660  K   Kosten PR
+	 6670  K   Drukkosten Inktzwam
+	 6680  K   Portokosten Inktzwam        
+         6690  K   Overige kosten Inktzwam
+     67  Kosten Werkgroep Evenementen
+         6710  K   Personeelskosten Evenementen
+         6720  K   Huisvestingskosten Evenementen
+         6730  K   Organisatiekosten Evenementen
+         6740  K   Uitvoeringskosten Evenementen
+	 6750  K   Uitvoeringskosten Seizoensopening
+	 6760  K   Uitvoeringskosten Symposium
+         6790  K   Overige kosten Evenementen
+     68  Kosten Werkgroep Educatied Materiaal
+         6810  K   Personeelskosten Educatief Materiaal
+         6820  K   Huisvestingskosten Educatief Materiaal
+         6830  K   Organisatiekosten Educatief Materiaal
+         6840  K   Uitvoeringskosten Educatief Materiaal
+         6890  K   Overige kosten Educatief Materiaal
+    
+     69  Overige kosten (incidenteel)
+         6900  K   Incidentele kosten
+
+# DAGBOEKEN
+#
+# EekBoek ondersteunt vijf soorten dagboeken: Kas, Bank, Inkoop,
+# Verkoop en Memoriaal. Er kunnen een in principe onbeperkt aantal
+# dagboeken worden aangemaakt.
+# In de eerste kolom wordt de korte naam (code) voor het dagboek
+# opgegeven. Verder moet voor elk dagboek worden opgegeven van welk
+# type het is. Voor dagboeken van het type Kas en Bank moet een
+# tegenrekening worden opgegeven, voor de overige dagboeken mag een
+# tegenrekening worden opgegeven.
+# De optie :dc kan worden gebruikt om aan te geven dat het journaal
+# voor dit dagboek de boekstuktotalen in gescheiden debet en credit
+# moet tonen.
+
+Dagboeken
+
+  Ink   Inkoop                :type=inkoop			
+  Kas   Kas                   :type=kas        :rekening=2400	:dc
+  Mem   Memoriaal             :type=memoriaal			
+  P_B   Postbank_bestuur      :type=bank       :rekening=2410	:dc
+  P_S	Postbank_scholen      :type=bank       :rekening=2420	:dc
+  P_P	Postbank_plus	      :type=bank       :rekening=2450	:dc
+  P_L	Postbank_Loyaal       :type=bank       :rekening=2460	:dc
+  Ver   Verkoop               :type=verkoop 
+
+# Einde EekBoek schema

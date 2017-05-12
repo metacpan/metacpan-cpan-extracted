@@ -1,0 +1,42 @@
+#!/usr/bin/perl -w
+use 5.010;
+use strict;
+use warnings;
+use autodie;
+
+# PODNAME: router
+# ABSTRACT: Exobrain router. This *must* be running for exobrain to work
+our $VERSION = '1.08'; # VERSION
+
+use Exobrain::Router;
+
+my $router = Exobrain::Router->new(
+    server => 1,
+);
+
+$router->start;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+router - Exobrain router. This *must* be running for exobrain to work
+
+=head1 VERSION
+
+version 1.08
+
+=head1 AUTHOR
+
+Paul Fenwick <pjf@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Paul Fenwick.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

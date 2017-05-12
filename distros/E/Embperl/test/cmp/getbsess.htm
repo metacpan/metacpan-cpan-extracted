@@ -1,0 +1,50 @@
+<html>
+<head>
+<title>Tests for Embperl - Set Session Data</title>
+</head>
+
+
+<body>
+
+
+	fdat:<br>
+	<table></table>
+
+	udat:<br>
+	<table>
+		<tr>
+			<td>b</td><td>2</td>
+		</tr>
+	</table>
+
+^	ok \(num=\d+\)<p>
+
+^	\$mdat\{cnt\} = -\d- <br>
+        $udat{cnt} = -- <br>
+
+
+	sessions:
+^	<table>
+^-		<tr>
+^-			<td>.*?<\/td><td>HASH.*?<\/td>
+^-		</tr>
+^-
+^-		<tr>
+^-			<td>.*?<\/td><td>HASH.*?<\/td>
+^-		</tr>
+^-
+^-		<tr>
+^-			<td>.*?<\/td><td>HASH.*?<\/td>
+^-		</tr>
+^-
+^-		<tr>
+^-			<td>.*?<\/td><td>HASH.*?<\/td>
+^-		</tr>
+^-
+^-		<tr>
+^-			<td>.*?<\/td><td>HASH.*?<\/td>
+^-		</tr>
+^-	</table>
+</body>
+</html>
+

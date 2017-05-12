@@ -1,0 +1,93 @@
+
+body {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 100%;
+}
+
+.info {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 80%;
+}
+
+.title {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 200%;
+    line-height: 30px;
+    font-weight: bold;
+    color: #000000;
+    margin-top: 0px;
+    margin-bottom: 2px;
+}
+
+
+a.menu {
+        font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 80%;
+    line-height: 18px;
+    text-decoration: none;
+    color: #0000FF;
+    white-space:nowrap;
+}
+
+a {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    text-decoration: none;
+    color: #0000FF;
+}
+
+a:hover {
+    color: #C81900;
+}
+
+a.menu {
+    margin-right: 1em;
+}
+
+.menutitle {
+    color: #C81900;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    white-space:nowrap;
+}
+
+a.menu:hover {
+    color: #C81900;
+}
+
+a.menuselect {
+        font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 80%;
+    line-height: 18px;
+    text-decoration: none;
+    color: #0000FF;
+    white-space:nowrap;
+    color: #C81900;
+    font-weight: bold;
+    margin-right: 1em;
+}
+
+a.menuselect:hover {
+    font-weight: bold;
+    color: #C81900;
+}
+
+/* Indentation for the left side menu */
+div.sidemenu {
+    margin-left: 0.2in;
+}
+
+blockquote.code {
+    margin-left: 2em;
+    margin-right: 2em;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+    background: #F0F0F0;
+    white-space: pre;
+    font-family: "Courier New", Courier, monospace;
+}
+
+dl dt {
+    font-weight: bold;
+}

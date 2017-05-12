@@ -1,0 +1,342 @@
+#!/usr/local/bin/perl
+#$Id$
+# modulemaker:  command-line utility implementing ExtUtils::ModuleMaker
+eval 'exec /usr/local/bin/perl  -S $0 ${1+"$@"}'
+  if 0;    # not running under some shell
+use strict;
+use warnings;
+use ExtUtils::ModuleMaker::Interactive;
+use ExtUtils::ModuleMaker::Opts;
+use vars qw ( $VERSION );
+$VERSION = 0.56;
+
+my $opt = ExtUtils::ModuleMaker::Opts->new(
+    q{ExtUtils::ModuleMaker},
+    q{modulemaker},
+);
+
+my $mod = ExtUtils::ModuleMaker::Interactive->new(
+    $opt->get_standard_options()
+);
+
+$mod->run_interactive() if $mod->{INTERACTIVE};
+
+$mod->complete_build();
+
+$mod->closing_message();
+
+################### DOCUMENTATION ################### 
+
+=head1 NAME
+
+modulemaker - interactive interface to ExtUtils::ModuleMaker; replaces C<h2xs -AXn [module]>
+
+=head1 VERSION
+
+This document references version 0.56 of modulemaker, released
+to CPAN on January 30 2017.
+
+=head1 USAGE::Simple
+
+=head2 Easy
+
+At the command-prompt, simply call:
+
+    % modulemaker
+
+... and answer each question.
+
+=head2 Not So Easy, But More Geeky
+
+At the command-prompt, call C<modulemaker> with as many options as you can type correctly:
+
+    modulemaker [-CIPVchqs] [-v version] [-n module_name] [-a abstract]
+        [-u author_name] [-p author_CPAN_ID] [-o organization]
+        [-w author_website] [-e author_e-mail]
+        [-l license_name] [-b build_system]
+
+=head2 Mix and Match
+
+You can specify some of the arguments on the command-line and then -- assuming
+you don't include the C<-I> option -- F<modulemaker> will then switch to
+interactive mode so that you can finish entering arguments at the prompts.
+
+=head1 USAGE::More
+
+=head2 Menus
+
+After calling C<modulemaker> at the command-prompt, you will be presented with 
+a series of menus looking something like this:
+
+=head3 Main Menu
+
+  ------------------------
+
+  modulemaker: Main Menu
+
+      Feature                     Current Value
+  N - Name of module              ''
+  S - Abstract                    'Module abstract (<= 44 characters) goes here'
+  A - Author information
+  L - License                     'perl'
+  D - Directives
+  B - Build system                'ExtUtils::MakeMaker'
+
+  G - Generate module
+  H - Generate module;
+      save selections as defaults
+
+  X - Exit immediately
+
+  Please choose which feature you would like to edit: 
+
+In many cases you make your selection by typing a single letter or number and
+hitting the C<Return> key.  In the remaining cases, you have to type what you
+want.
+
+Note that in the Main Menu:
+
+=over 4
+
+=item * G
+
+C<G> generates the directories and files requested, then exits.
+
+=item * H
+
+C<H> generates the directories and files requested, saves the values you have
+entered (with the exception of the module's name and abstract) in a personal
+defaults file, then exits.  (See the documentation for ExtUtils::ModuleMaker
+for a more complete discussion of this feature.)
+
+=item * X
+
+C<X> exits without generating directories or file.
+
+=back
+
+=head3 Author Menu
+
+  ------------------------
+
+  modulemaker: Author Menu
+
+      Feature       Current Value
+  N - Author        'A. U. Thor'
+  C - CPAN ID       'MODAUTHOR'
+  O - Organization  'XYZ Corp.'
+  W - Website       'http://a.galaxy.far.far.away/modules'
+  E - Email         'a.u.thor@a.galaxy.far.far.away'
+
+  R - Return to main menu
+  X - Exit immediately
+
+  Please choose which feature you would like to edit:
+
+The values you enter here to override the Current Values may be good choices
+for the C<H> 'save selections as defaults' feature in the Main Menu.
+
+Note that you cannot generate directories or files from this menu.  You must
+return (C<R>) to the Main Menu first.  You can, however, bail out of the
+program from this menu with C<X>.
+
+=head3 License Menu
+
+  ------------------------
+
+  modulemaker: License Menu
+
+  ModuleMaker provides many licenes to choose from, many of them approved by
+  opensource.org.
+
+          License Name
+  1       Apache Software License (1.1)
+  2       Artistic License
+  3       Artistic License w/ Aggregation
+  4       BSD License
+  5       BSD License(Raw)
+  6       CVW - MITRE Collaborative Virtual Workspace
+  7       GPL - General Public License (2)
+  8       IBM Public License Version (1.0)
+  9       Intel (BSD+)
+  10      Jabber (1.0)
+  11      LGPL - GNU Lesser General Public License (2.1)
+  12      MIT License
+  13      Mozilla Public License (1.0)
+  14      Mozilla Public License (1.1)
+  15      Nethack General Public License
+  16      Nokia Open Source License(1.0a)
+  17      Python License
+  18      Q Public License (1.0)
+  19      Ricoh Source Code Public License (1.0)
+  20***   Same terms as Perl itself
+  21      Sun Internet Standards Source License
+  22      The Sleepycat License
+  23      Vovida Software License (1.0)
+  24      zlib/libpng License
+  25      Loose Lips License (1.0)
+
+  # - Enter the number of the license you want to use
+  C - Display the Copyright
+  L - Display the License
+  R - Return to main menu
+  X - Exit immediately
+
+  Please choose which license you would like to use:
+
+=head3 Directives Menu
+
+  ------------------------
+ 
+  modulemaker: Directives Menu
+ 
+      Feature           Current Value
+  C - Compact          '0'
+  V - Verbose          '0'
+  D - Include POD      '1'
+  N - Include new      '1'
+  H - History in POD   '0'
+  P - Permissions      '0755 - 493'
+ 
+  R - Return to main menu
+  X - Exit immediately
+ 
+  Please choose which feature you would like to edit:
+
+As with the Author Menu above, the values you enter here to override the 
+Current Values may be good choices for the C<H> 'save selections as 
+defaults' feature in the Main Menu.
+
+=head3 Build System Menu
+
+  ------------------------
+
+  Here is the current build system:
+
+  ExtUtils::MakeMaker
+
+  E - ExtUtils::MakeMaker
+  B - Module::Build
+  P - Module::Build and proxy Makefile.PL
+  R - Return to main menu
+  X - Exit immediately
+
+  Please choose which build system you would like to use:
+
+=head2 Features Currently Supported with Command-Line Options
+
+=over 4
+
+=item * -a
+
+Specify (in quotes) an abstract for this extension
+
+=item * -b
+
+Specify a build system for this extension
+
+=item * -c
+
+Flag for compact base directory name
+
+=item * -C
+
+Omit creating the Changes file, add HISTORY heading to stub POD
+
+=item * -d
+
+Name of Perl module whose methods will override defaults provided in
+F<ExtUtils/ModuleMaker.pm> and F<ExtUtils/ModuleMaker/StandardText.pm>.
+
+=item * -e
+
+Specify author's e-mail address
+
+=item * -h
+
+Display this help message
+
+=item * -I
+
+Disable INTERACTIVE mode, the command line arguments better be complete
+
+=item * -l
+
+Specify a license for this extension
+
+=item * -n
+
+Specify a name to use for the extension (required)
+
+=item * -o
+
+Specify (in quotes) author's organization
+
+=item * -p
+
+Specify author's CPAN ID
+
+=item * -P
+
+Omit the stub POD section
+
+=item * -q
+
+Do not include a constructor (C<new()>) in the F<*.pm> file.
+
+=item * -r
+
+Set permissions.
+
+=item * -s
+
+Save the selections entered (either as command-line options or as responses to
+F<modulemaker>'s prompts) as your new personal defaults.  These will be the
+values provided by ExtUtils::ModuleMaker or F<modulemaker> the next time you
+invoke either one of them.
+
+=item * -u
+
+Specify (in quotes) author's name
+
+=item * -v
+
+Specify a version number for this extension
+
+=item * -V
+
+Flag for verbose messages during module creation
+
+=item * -w
+
+Specify author's web site
+
+=back
+
+The code handling the processing of these options is found in
+package ExtUtils::ModuleMaker::Opts.
+
+=head1 AUTHOR
+
+ExtUtils::ModuleMaker was originally written in 2001-02 by R. Geoffrey Avery
+(modulemaker [at] PlatypiVentures [dot] com).  Since version 0.33 (July
+2005) it has been maintained by James E. Keenan (jkeenan [at] cpan [dot]
+org).
+
+=head1 COPYRIGHT
+
+Copyright (c) 2001-2002 R. Geoffrey Avery.
+Revisions from v0.33 forward (c) 2005 James E. Keenan.  All rights reserved.
+This program is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.
+
+The full text of the license can be found in the
+LICENSE file included with this module.
+
+=head1 SEE ALSO
+
+F<ExtUtils::ModuleMaker>, F<ExtUtils::ModuleMaker::StandardText>, F<perlnewmod>, 
+F<h2xs>.
+
+=cut
+

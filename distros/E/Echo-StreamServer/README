@@ -1,0 +1,52 @@
+Echo-StreamServer-Client version 0.04
+=====================================
+
+This is a PERL version of the Echo StreamServer API.
+Echo StreamServer API is a REST interface using JSON.
+http://aboutecho.com/developers/index.html
+
+    feeds - Feeds API
+    items - Items API
+    kvs   - Key-Value Store API
+    users - User API
+
+Most API methods raise StreamServer exception strings.
+This indicates a server-side error, or malformed request.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   Data::Dumper
+   HTTP::Headers
+   HTTP::Request
+   JSON
+   LWP::UserAgent
+   Storable
+   Term::ReadLine >= 1.02
+   Term::ReadLine::Gnu >= 1.20
+   URI
+   URI::Escape
+
+READLINE SUPPORT FOR EQLShell
+
+The Term::ReadLine module alone does not provide true ReadLine support, edit keys and history.
+Another readline module such as Term::ReadLine::Gnu (shown avbove) must be installed *manually*.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012 by Andrew Droffner
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+

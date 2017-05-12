@@ -1,0 +1,7 @@
+<%args>
+$email
+$name
+$cid_for
+</%args>
+
+Dear <% $name %>:

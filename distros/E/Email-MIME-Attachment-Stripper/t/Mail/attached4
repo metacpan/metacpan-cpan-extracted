@@ -1,0 +1,43 @@
+From: example@example.example.com
+Date: Fri, 4 Aug 2006 19:07:26 -0400
+MIME-Version: 1.0
+Content-Disposition: inline
+Content-Type: multipart/mixed; boundary="1154732846.36fb2.2841";
+ charset="us-ascii"
+
+
+--1154732846.36fb2.2841
+Date: Fri, 4 Aug 2006 19:07:26 -0400
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="1154732846.De2211.2841";
+ charset="us-ascii"
+Content-Disposition: attachment
+
+
+--1154732846.De2211.2841
+Date: Fri, 4 Aug 2006 19:07:26 -0400
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="1154732846.0C1FE0.2841";
+ charset="US-ASCII"
+Content-Disposition: attachment
+
+
+--1154732846.0C1FE0.2841
+Date: Fri, 4 Aug 2006 19:07:26 -0400
+MIME-Version: 1.0
+Content-Type: text/plain; charset="US-ASCII"
+Content-Disposition: attachment
+
+HELLO THERE!
+--1154732846.0C1FE0.2841
+Date: Fri, 4 Aug 2006 19:07:26 -0400
+MIME-Version: 1.0
+Content-Type: text/plain; charset="US-ASCII"
+Content-Disposition: attachment
+
+GOODBYE THERE!
+--1154732846.0C1FE0.2841--
+
+--1154732846.De2211.2841--
+
+--1154732846.36fb2.2841--

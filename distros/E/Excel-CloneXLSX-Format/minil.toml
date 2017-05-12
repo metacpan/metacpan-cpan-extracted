@@ -1,0 +1,6 @@
+name = "Excel-CloneXLSX-Format"
+# badges = ["travis"]
+authority="cpan:FELLIOTT"
+
+module_maker="ModuleBuildTiny"
+

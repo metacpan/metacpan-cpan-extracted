@@ -1,0 +1,22 @@
+SUMMARY:
+    Encoding::BER - Perl module for encoding/decoding data using ASN.1
+    Basic Encoding Rules (BER)
+
+INSTALLATION:
+    see the file INSTALL
+
+COPYRIGHT:
+    see the copyright notice in each file.
+
+LICENSE INFORMATION:
+    This software may be copied and distributed under the terms
+    found in the Perl "Artistic License".
+
+    A copy of the "Artistic License" may be found in the standard
+    Perl distribution.
+
+DOCUMENTATION:
+    see the pod in each file.
+
+AUTHOR:
+    Jeff Weisberg  - http://www.tcp4me.com/

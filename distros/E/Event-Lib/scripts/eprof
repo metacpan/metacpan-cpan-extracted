@@ -1,0 +1,26 @@
+#!/usr/bin/perl
+
+use Text::Table;
+
+local @ARGV = shift || "eprof.out";
+
+my (%times, %calls);
+
+while (<>) {
+    chomp;
+    my ($func, $msecs) = split;
+    $times{ $func } += $msecs;
+    $calls{ $func}++;
+}
+
+my $t = Text::Table->new(qw"Function", \" | ", "Calls", \" | ",  "Time", \" | ", "Average");
+
+$t->load( map { [ $_, $calls{$_}, $times{$_}, sprintf "%.2f", $times{$_} / $calls{$_} ] } 
+	  sort { $times{$b} <=> $times{$a} } keys %times );
+
+print $t->title;
+print $t->rule("-", "+");
+for ($t->body) {
+    print;
+}
+

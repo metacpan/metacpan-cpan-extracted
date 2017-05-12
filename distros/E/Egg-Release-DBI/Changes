@@ -1,0 +1,21 @@
+Revision history for Perl extension .
+
+0.06  2008/07/25
+	- fixed for Egg::Mod::EasyDBI.
+
+0.05  2008/05/12
+	- fixed for Egg::Mod::EasyDBI.
+
+0.04  2008/03/15
+	- bugfix  for Egg::Plugin::EasyDBI
+	- bugfix  for Egg::Mod::EasyDBI.
+
+0.03  2008/03/05
+	- bugfix  for Egg::Plugin::EasyDBI
+
+0.02  2008/02/15
+	- It was made not to fail because of the package test.
+
+0.01  Sun Jan 27 18:20:22 2008
+	- original version; created by Egg::Helper::Build::Module v3.00
+	   with module name Egg::Release::DBI

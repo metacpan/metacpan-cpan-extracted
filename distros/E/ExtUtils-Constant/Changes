@@ -1,0 +1,44 @@
+Revision history for Perl extension ExtUtils::Constant.
+
+[Yes, this is out of date. In the interests of getting a release out onto
+CPAN sooner, I've deferred updating this. Since 0.16 all the development
+history can be found via http://perl5.git.perl.org/perl.git/tree/HEAD:/lib ]
+
+0.13  Mon Aug  5 20:20:21 2002
+	Copy the module and test from bleadperl
+        Find and fix a bug when there is only 1 item of a given length, but
+        it has the "check utf8 flag" set. Regression test 52 now tests this.
+
+0.14  Sun Aug 25 15:40:35 BST 2002
+        More aggressive switch code:
+        a: If the last character was used as the switch target, no need to
+           check it again with memEQ (ie memcmp)
+        b: If the first character is used as the switch target, no need to
+           check it again with memEQ  (this does need C code to move the
+           pointer target, so last character is preferred)
+        c: Three character strings are now done as 2 explicit character
+           comparisons after the switch, rather than memEQ. It may be worth
+           extending this to four character strings.
+        Refactor the regression test code to allow multiple test extensions
+        to be built. This way the various possibilities in the switch code can
+        easily be tested.
+        The "more aggressive" switch code shrinks bleadperl's extensions by a
+        grand total of 648(ish) bytes. Amazing! (well, every little helps)
+        Will now install into the core for perl 5.8.0 or later (as it's a core
+        module from 5.7.2ish)
+
+0.15  Thu Jan 13 21:54:21 GMT 2005
+	Avoid problems in dogfood() if a zero length name accidentally gets in
+	Docpatch from Steve Peters
+
+0.16  Sun Jan 23 13:33:33 GMT 2005
+	Refactoring to make parts of the code re-usable for other keyword
+	matching needs. Keep the XS specific functions in ExtUtils::Constant
+	Move the helper functions to ExtUtils::Constant::Utils
+	Turn the generic functions into methods in ExtUtils::Constant::Base,
+	with overrides in ExtUtils::Constant::XS for the existing use.
+	Move ExtUtils::Constant::Aaargh56Hash into its own file.
+	Add "weight" facility. Sorting keyword ordering with this gained
+	another 10% speedup on Perl_keyword. This makes me wonder if second
+	level switching would be a win.
+	Add two examples of subclassing in the examples/ directory.

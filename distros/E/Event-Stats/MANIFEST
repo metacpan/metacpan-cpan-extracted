@@ -1,0 +1,18 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Event/Stats.pm
+lib/Event/Stats.xs
+TODO
+t/die.t
+t/max.t
+t/nest.t
+t/stats.t
+inc/Devel/AssertOS/MSWin32.pm
+inc/Devel/CheckOS.pm
+inc/Devel/AssertOS/MicrosoftWindows.pm
+inc/Devel/AssertOS/Cygwin.pm
+inc/Devel/AssertOS.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

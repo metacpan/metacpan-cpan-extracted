@@ -1,0 +1,3 @@
+^MANIFEST\.bak$
+Makefile(\.old)?$
+\.rej$

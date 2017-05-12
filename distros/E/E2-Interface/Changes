@@ -1,0 +1,213 @@
+Revision history for Perl extension e2interface.
+
+0.34 Thu Aug 07 2003
+			- Fixed a bug in E2::Interface::extract_cookies:
+			  either HTTP::Cookies or e2's server is unreliable
+			  as to whether is structures the cookie as
+			  'userpass="...";' or 'userpass=...;'. I believe
+			  this hit me before, so I switched from one to
+			  the other--now I realize it needs to cover both.
+
+			- I think I finally found a usable workaround for
+			  the issue of E2 not escaping titles. E2::Interface::
+			  post_process now escapes all '<', '>', and '&'
+			  between "<e2link .*?>" and "</e2link>".
+
+0.33 Sun Jul 20 2003
+			- Resolved a problem with E2::Interface::parse_twig
+			  and unicode, so we no longer have to strip unicode
+			  to avoid parse errors.
+			  
+			- Updated E2::Interface::post_process to leave unicode
+			  intact--this also removes the requirement for
+			  Unicode::String. Also modified the demoronizer to
+			  convert nonstandard Microsoft encoding to html
+			  entities.
+
+			- Fixed a bug that caused E2::E2Node::get_my_writeup
+			  to often return undef even if the user has a
+			  writeup in the selected node.
+
+			- Various fixes to E2::UserSearch::compare (added a
+			  couple new keys, fixed a bug that terminated
+			  execution).
+
+			- Added softlink parameter to E2::Node::load and
+			  E2::Node::load_by_id.
+
+			- Removed 'TYPE' parameter in E2::Node::load_by_id
+			  and E2::Node::load_from_xml, because, basically,
+			  it didn't make any sense.
+
+			- Changed a bunch of use()s to require()s in
+			  E2::Interface so use_threads runs much, much faster
+			  if called early.
+
+			- Added a third parameter to E2::Interface::thread_then
+			  to allow a piece of code to be run after the deferred
+			  method finishes, regardless of whether exceptions
+			  were thrown.
+
+			- Fixed a couple bugs in E2::Interface::finish that
+			  were causing strange behaviour when it was called
+			  without a specified job.
+
+			- Added a workaround to the various e2 xmltrue exports
+			  that don't in fact escape fields that they should be
+			  escaping (E2::Interface::post_process)
+			
+0.32 Wed Jun 18 2003
+			- Removed E2::Ticker::scratch_pad and created
+			  E2::Scratchpad, adding the ability to update
+			  scratchpads.
+
+			- Various documentation tweaking and updating
+			  (writing a script to autoupdate online docs)
+
+			- Added the ability to use multiple parameters
+			  in calls to the E2::Message methods archive,
+			  unarchive, and delete; added E2::Message::perform
+			  to allow a list of messages to be archived,
+			  unarchived, and deleted all in the same HTTP request.
+
+			- Added E2::Writeup::vote (basically redundant
+			  with E2::E2Node::vote, but E2::Writeup should
+			  have the method as well for the sake of
+			  intuitiveness (intuititon?).
+
+			- Added E2::Writeup::reply
+
+			- E2::E2Nodes now call clone() on any E2::Writeups
+			  they create.
+
+			- Created generate_e2_docs, a script that automatically
+			  keeps e2interface's online documentation up-to-date
+			  with each release.
+
+			- Fixed a bug in E2::Writeup::update that caused a
+			  run-time error.
+
+0.31  Tue Jun 10 2003
+			- Fixed a bug in E2::Interface::extract_cookie
+			  introduced in 0.30--the method was writing
+			  directly to a reference rather than to the
+			  data the reference pointed to
+
+			- Simplified E2::Ticker::parse()
+
+			- Modified E2::Ticker and its descendants to be
+			  reentrant (or at least _more_ reentrant--strange
+			  things still might happen if one uses multiple
+			  threads AND calls more than one "update" type of
+			  methods simultaneously AND doesn't use 
+			  E2::Interface::thread_then() to retrieve the data
+			  immediately upon completion)
+
+			- Added E2::Ticker::use_string()--we can now load
+			  tickers from xml strings rather than directly
+			  from the e2 servers, if we wish
+
+			- Added E2::UserSearch::compare() and stats(), so
+			  E2::UserSearch can now do nodetracker-like
+			  comparisons
+
+			- Added threading to the list of data that is cloned
+			  by a call to E2::Interface::clone(), so background
+			  threads can now be shared between multiple objects
+
+			- Added E2::Interface::debug() and debugging info to
+			  all classes of e2interface
+
+			- Added E2::Interface::join_threads() and
+			  E2::Interface::detach_threads() to allow threads
+			  to be finished (getting tired of those "A thread
+			  exited while 14 other threads were still running"
+			  warnings.
+
+0.30  Wed May 14 2003
+			- Added multithreading for all network-dependant
+			  methods
+
+			- Reworked E2::Interface::clone() so that changes
+			  made to cloned objects after the call to clone()
+			  will be propogated
+
+			- Reworked E2::Interface::login() to request cookies
+			  instead of packing them itself (there was an issue
+			  with case-sensitivity of usernames they way it was
+			  originally implemented)
+
+			- Added E2::Interface::document()--callers now have
+			  access to the document most recently retrieved and
+			  processed.
+
+			- Added archive handling to E2::Message.
+
+			- Brought docs up-to-date.
+
+0.22  Sun Apr 20 2003 (unreleased)
+			- Brought E2::Ticker up to parity with the current
+			  everything2 tickers.
+
+			- Centralized parse code at E2::Interface::parse_twig
+
+			- Test cases are now included in the tarball.
+
+0.21  Sun Mar 16 2003
+			- Added E2::Room, E2::Session, and
+			  E2::ClientVersion.
+
+			- Added additional tickers to E2::Ticker.
+
+			- Various bugfixes and new test cases.
+
+			- Initial CPAN release.
+
+0.20  Sun Mar 02 2003
+			- Split most of the modules into either subclasses
+			  of E2::Node or E2::Ticker and consolidated a lot
+			  of the process_request and XML::Twig::parse
+			  calls.
+
+			- Standardized the exception handling and documented
+			  possible exceptions for each method.
+
+			- Split E2::User into E2::User and E2::UserSearch.
+
+			- Added E2::Usergroup and E2::Superdoc.
+
+			- Removed E2::Code and E2::Nodetrack for the time
+			  being.
+
+			- Updated all the documentation and added a couple
+			  test cases, in order to be ready for the initial
+			  public (e2-wide) release.
+
+0.13  Sun Feb 23 2003
+			- Migrated E2::User return values to hashrefs.
+
+			- Added E2::Xmltrue and edited E2::Node ande E2::User
+			  to inherit it (so they now provide a consistent
+			  interface).
+
+			- Added E2::Ticker
+
+0.12  Fri Feb 21 2003
+			- Migrated some list return values to hashrefs.
+			
+			- Fixed (workaround) the character encoding bug
+			  that caused expat to die on certain nodes.
+
+			- Added an (optional) dot directory to the user's
+			  home, allowing cookies and other data to persist.
+
+			- Added E2::Code, E2::Nodetrack
+
+0.11  Thu Nov 21 2002
+			- Replaced parser XML::Simple with XML::Twig for
+			  thread safety.
+
+			- Added E2::User, E2::Search
+
+0.10  Fri Nov 15 2002
+			- Initial release to clientdev usergroup on E2

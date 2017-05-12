@@ -1,0 +1,300 @@
+##############################################################################
+#
+#   Embperl - Copyright (c) 1997-2008 Gerald Richter / ecos gmbh  www.ecos.de
+#   Embperl - Copyright (c) 2008-2014 Gerald Richter
+#
+#   You may distribute under the terms of either the GNU General Public
+#   License or the Artistic License, as specified in the Perl README file.
+#   For use with Apache httpd and mod_perl, see also Apache copyright.
+#
+#   THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
+#   IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+#   WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+#
+#   $Id: db.schema 1578075 2014-03-16 14:01:14Z richter $
+#
+##############################################################################
+
+
+%DBDefault = 
+    (
+    '!Grant' => 
+        [
+        'select', 
+        'insert',
+        'update',
+        'delete',
+        ],
+    )
+     ;
+
+# ----------------------------------------------------------------------
+
+@DBSchema = (
+
+# ----------------------------------------------------------------------
+
+    {
+    '!Table' => 'item',
+    '!Fields' => 
+        [
+        'id'                            => 'counter',
+        'url'				=> 'tinytext',
+        'category_id'                   => 'integer',
+        'state'		                => 'integer',
+        'creationtime'			=> 'datetime',
+        'modtime'			=> 'datetime',
+        'user_id'		        => 'integer',
+        'checkcount'		        => 'integer',
+	],
+    '!PrimKey' => 'id',
+    '!Init' =>
+        [
+        { id => 1, category_id => 1, state => 1, creationtime => '2001-07-28', modtime => '2001-07-28' },
+        { id => 2, category_id => 1, state => 1, creationtime => '2001-11-20', modtime => '2001-11-20' },
+        { id => 3, category_id => 1, state => 1, creationtime => '2001-11-27', modtime => '2001-11-27' },
+        { id => 4, category_id => 1, state => 1, creationtime => '2001-12-05', modtime => '2001-12-05' },
+        { id => 5, category_id => 1, state => 1, creationtime => '2002-03-13', modtime => '2002-03-13' },
+        { id => 6, category_id => 1, state => 1, creationtime => '2002-03-21', modtime => '2002-03-21' },
+        { id => 7, category_id => 1, state => 1, creationtime => '2002-05-28', modtime => '2002-05-28' },
+        { id => 8, category_id => 1, state => 1, creationtime => '2002-06-25', modtime => '2002-06-25' },
+        { id => 9, category_id => 2, state => 1, creationtime => '2002-06-25', modtime => '2002-06-25' },
+        ]
+    },
+
+# ----------------------------------------------------------------------
+
+    {
+   '!Table' => 'itemtext',
+    '!Fields' => 
+        [
+        'id'                            => 'counter',
+        'item_id'                       => 'integer',
+        'language_id'                   => 'varchar(2)',
+        'heading'			=> 'tinytext',
+        'keywords'			=> 'text',
+        'description'			=> 'text',
+        'url'				=> 'tinytext',
+	],
+    '!PrimKey' => 'id',
+    '!Init' =>
+        [
+        { id => 1, item_id => 1, heading => '28.7.2001', language_id => 'de', description => 'David Lloyd wird einen Vortrag über Embperl auf der L<"AUUG Annual Conference"|http://www.auug.org.au/winter/auug2001/> in Sydney, Australien, am 26, 27 and 28 September 2001 halten.' },
+        { id => 2, item_id => 1, heading => '7/28/2001', language_id => 'en', description => 'David Lloyd is makeing a talk at the L<"AUUG Annual Conference"|http://www.auug.org.au/winter/auug2001/>, which will be held in Sydney, Australia, on 26, 27 and 28 September 2001 ' },
+
+        { id => 3, item_id => 2, heading => '20.11.2001', language_id => 'de', description => 'Embperl 2.0b4 freigegeben. Neu ist die Unterstützung für XML und XSLT, sowie das Zusammensetzen des Ergebnisses eines Requests durch mehrere frei kombinierbare Provider.' },
+        { id => 4, item_id => 2, heading => '11/20/2001', language_id => 'en', description => 'Embperl 2.0b4 released. This release introduces XML and XSLT support into Embperl, along with a new way of creating a request from a series of providers, which pluged together in a hierachial tree structure.' },
+
+        { id => 5, item_id => 3, heading => '27.11.2001', language_id => 'de', description => 'Embperl 2.0b5 freigegeben' },
+        { id => 6, item_id => 3, heading => '11/27/2001', language_id => 'en', description => 'Embperl 2.0b5 released' },
+
+        { id => 7, item_id => 4, heading => '12/5/2001', language_id => 'en', description => 'Embperl 1.3.4 released.' },
+        { id => 8, item_id => 4, heading => '5.12.2001', language_id => 'de', description => 'Embperl 1.3.4 freigegeben' },
+
+        { id => 9, item_id => 5, heading => '3/13/2002', language_id => 'en', description => 'Embperl 2.0b6 released: Enhancements of the Embperl object modell, form validation, internationalization speed improvments. Embperl 2.0 is now feature complete, mainly bugfixing and documetation will be done before final 2.0 release. Test it out!' },
+        { id =>10, item_id => 5, heading => '13.3.2002', language_id => 'de', description => 'Embperl 2.0b6 freigegeben: Verbesserungen des Embperl-Objekt-Modells, Formular Validierung, Internationalisierung, Performance Verbesserungen. Embperl 2 ist jetzt komplett und vor dem endgültigen Release werden hauptsächlich noch Fehler beseitigt.' },
+
+        { id =>11, item_id => 6, heading => '3/21/2002', language_id => 'en', description => 'Embperl 2.0b7 released ' },
+        { id =>12, item_id => 6, heading => '21.3.2002', language_id => 'de', description => 'Embperl 2.0b7 freigegeben' },
+
+        { id =>13, item_id => 7, heading => '28.5.2002', language_id => 'de', description => 'Auch auf der diesjährigen L<"O\'Reilly Open-Source Convention"|http://conferences.oreillynet.com/os2002/> in San Diego wird es wieder ein Vortrag über Embperl geben.' },
+        { id =>14, item_id => 7, heading => '5/28/2002', language_id => 'en', description => 'Again this year there will be a talk about Embperl at the L<"O\'Reilly Open-Source Convention"|http://conferences.oreillynet.com/os2002/> in San Diego in July.' },
+
+        { id =>15, item_id => 8, heading => '6/25/2002', language_id => 'en', description => 'Embperl 2.0b8 released. Contains many bugfixes, runs with mod_perl 2.' },
+        { id =>16, item_id => 8, heading => '25.6.2002', language_id => 'de', description => 'Embperl 2.0b8 freigegeben. Enthält viel Fehlerkorrekturen und läuft mit mod_perl 2.' },
+
+        { id => 17, item_id => 9, heading => 'http://bilder.ecos.de - Gerald Richter [richter@ecos.de]', language_id => 'de', description => 'Dies ist die Site für die Embperl ursprünglich geschrieben wurde. Es ist eine einfache Bilddatenbank die touristische Bilder aus Rheinland-Pflaz enthält. ' },
+        { id => 18, item_id => 9, heading => 'http://bilder.ecos.de - Gerald Richter [richter@ecos.de]', language_id => 'en', description => 'This was the site Embperl was originally written for. It\'s a simple picture database which contains pictures and tourist information for Rheinland-Pfalz/Germany. It\'s intended as press information, to reduce the need for sending photographs by real mail. You can view and search the pictures via the Internet or via a direct dial-in. Download is only available for valid users and via direct dial-in. It is also possible to maintain the database via the web and insert new pictures and descriptions and change or delete old ones.' },
+        ]
+    },
+
+# ----------------------------------------------------------------------
+
+    {
+    '!Table' => 'language',
+    '!Fields' => 
+        [
+        'id'                        => 'varchar(2) not null',
+        'name'                      => 'tinytext',
+        ],
+    '!PrimKey' => 'id',
+    '!Init' =>
+        [
+            { id => 'de', name => 'Deutsch'} ,
+            { id => 'en', name => 'English'} ,
+        ],
+    },
+
+# ----------------------------------------------------------------------
+
+    {
+    '!Table' => 'category',
+    '!Fields' => 
+        [
+        'id'                        => 'counter',
+        'state'                     => 'integer',
+	'table_type'		    => 'tinytext',
+	'view_level'		    => 'integer',
+	'edit_level'		    => 'integer',
+        ],
+    '!PrimKey' => 'id',
+    '!Default' =>
+        {
+        'view_level' => 0,
+        'edit_level' => 1,
+        },
+    '!Init' =>
+        [
+            { id => 1, state => 1, 'table_type' => 'item', edit_level => 2 } ,
+            { id => 2, state => 1, 'table_type' => 'item', edit_level => 1 } ,
+            { id => 3, state => 1, 'table_type' => 'item', edit_level => 1 } ,
+            { id => 4, state => 1, 'table_type' => 'item', edit_level => 1 } ,
+            { id => 5, state => 1, 'table_type' => 'item', edit_level => 1 } ,
+            { id => 6, state => 1, 'table_type' => 'item', edit_level => 1 } ,
+        ],
+    },
+
+# ----------------------------------------------------------------------
+
+    {
+    '!Table' => 'categoryfields',
+    '!Fields' => 
+        [
+        'category_id'	=> 'integer not null',
+        'language_id'	=> 'varchar(3) not null',
+	'fieldname'	=> 'varchar(32) not null',
+	'txt'		=> 'text',
+        'remark'        => 'text',
+	'typeinfo'      => 'tinytext',
+	'position'      => 'integer',
+        'nolang'        => 'integer',
+        'view_level'    => 'integer',
+        'edit_level'    => 'integer',
+        'validate'      => 'text',
+        ],
+    '!PrimKey' => 'category_id,language_id,fieldname',
+    '!Default' =>
+        {
+        'view_level' => 0,
+        'edit_level' => 1,
+        },
+
+    '!Init' =>
+        [
+	    # News
+            { category_id => 1, language_id => 'de', fieldname => 'description', typeinfo => 'textarea', txt => 'Neuigkeit', position => 1 } ,
+            { category_id => 1, language_id => 'en', fieldname => 'description', typeinfo => 'textarea', txt => 'News', position => 1 } ,
+
+	    # Emperl Websites
+            { category_id => 2, language_id => 'de', fieldname => 'heading',     txt => 'Überschrift', position => 1 } ,
+            { category_id => 2, language_id => 'de', fieldname => 'description', typeinfo => 'textarea', txt => 'Beschreibung', typeinfo => 'textarea', position => 3 } ,
+            { category_id => 2, language_id => 'de', fieldname => 'url',         txt => 'URL', typeinfo => 'url', position => 2 } ,
+
+            { category_id => 2, language_id => 'en', fieldname => 'heading',     txt => 'Heading', position => 1 } ,
+            { category_id => 2, language_id => 'en', fieldname => 'description', typeinfo => 'textarea', txt => 'Description', typeinfo => 'textarea', position => 3 } ,
+            { category_id => 2, language_id => 'en', fieldname => 'url',         txt => 'URL', typeinfo => 'url', position => 2 } ,
+
+	    # Books about Embperl
+            { category_id => 3, language_id => 'de', fieldname => 'heading',     txt => 'Titel', position => 1 } ,
+            { category_id => 3, language_id => 'de', fieldname => 'description', typeinfo => 'textarea', txt => 'Beschreibung', typeinfo => 'textarea', position => 3 } ,
+            { category_id => 3, language_id => 'de', fieldname => 'url',         txt => 'URL', typeinfo => 'url', position => 2 } ,
+
+            { category_id => 3, language_id => 'en', fieldname => 'heading',     txt => 'Title', position => 1 } ,
+            { category_id => 3, language_id => 'en', fieldname => 'description', typeinfo => 'textarea', txt => 'Description', typeinfo => 'textarea', position => 3 } ,
+            { category_id => 3, language_id => 'en', fieldname => 'url',         txt => 'URL', typeinfo => 'url', position => 2 } ,
+
+	    # Embperl articles
+            { category_id => 4, language_id => 'de', fieldname => 'heading',     txt => 'Titel', position => 1 } ,
+            { category_id => 4, language_id => 'de', fieldname => 'description', typeinfo => 'textarea', txt => 'Beschreibung', typeinfo => 'textarea', position => 3 } ,
+            { category_id => 4, language_id => 'de', fieldname => 'url',         txt => 'URL', typeinfo => 'url', position => 2 } ,
+
+            { category_id => 4, language_id => 'en', fieldname => 'heading',     txt => 'Title', position => 1 } ,
+            { category_id => 4, language_id => 'en', fieldname => 'description', typeinfo => 'textarea', txt => 'Description', typeinfo => 'textarea', position => 3 } ,
+            { category_id => 4, language_id => 'en', fieldname => 'url',         txt => 'URL', typeinfo => 'url', position => 2 } ,
+
+	    # Syntax highlighting
+            { category_id => 5, language_id => 'de', fieldname => 'heading',     txt => 'Editor', position => 1 } ,
+            { category_id => 5, language_id => 'de', fieldname => 'description', typeinfo => 'textarea', txt => 'Beschreibung', typeinfo => 'textarea', position => 3 } ,
+            { category_id => 5, language_id => 'de', fieldname => 'url',         txt => 'URL', typeinfo => 'url', position => 2 } ,
+
+            { category_id => 5, language_id => 'en', fieldname => 'heading',     txt => 'Editor', position => 1 } ,
+            { category_id => 5, language_id => 'en', fieldname => 'description', typeinfo => 'textarea', txt => 'Description', typeinfo => 'textarea', position => 3 } ,
+            { category_id => 5, language_id => 'en', fieldname => 'url',         txt => 'URL', typeinfo => 'url', position => 2 } ,
+
+	    # Modules and examples
+            { category_id => 6, language_id => 'de', fieldname => 'heading',     txt => 'Name', position => 1 } ,
+            { category_id => 6, language_id => 'de', fieldname => 'description', typeinfo => 'textarea', txt => 'Beschreibung', typeinfo => 'textarea', position => 3 } ,
+            { category_id => 6, language_id => 'de', fieldname => 'url',         txt => 'URL', typeinfo => 'url', position => 2 } ,
+
+            { category_id => 6, language_id => 'en', fieldname => 'heading',     txt => 'Name', position => 1 } ,
+            { category_id => 6, language_id => 'en', fieldname => 'description', typeinfo => 'textarea', txt => 'Description', typeinfo => 'textarea', position => 3 } ,
+            { category_id => 6, language_id => 'en', fieldname => 'url',         txt => 'URL', typeinfo => 'url', position => 2 } ,
+
+        ],
+    },
+
+# ----------------------------------------------------------------------
+
+    {
+    '!Table' => 'categorytext',
+    '!Fields' => 
+        [
+        'id'                            => 'counter',
+        'category_id'                   => 'integer',
+        'language_id'                   => 'varchar(2)',
+        'category'			=> 'tinytext',
+        'add_info'                      => 'text',
+        'headline'                      => 'tinytext',
+        'sendtext'                      => 'tinytext',
+        'logintext'                     => 'text',
+	],
+    '!PrimKey' => 'id',
+    '!Init' =>
+        [
+            { id =>  1, category_id => 1, language_id => 'de', 'category' => 'Neuigkeiten' } ,
+            { id =>  2, category_id => 1, language_id => 'en', 'category' => 'News' } ,
+
+            { id =>  3, category_id => 2, language_id => 'de', 'category' => 'Websites die Embperl nutzen',
+                        add_info    => 'Bitte geben Sie eine Kurzbeschreibung der Site, sowie Informationen zu deren Realisierung ein.' } ,
+            { id =>  4, category_id => 2, language_id => 'en', 'category' => 'Sites using Embperl',
+                        add_info    => 'Please enter a short description of the Site and some information how it has been setup.' } ,
+
+            { id =>  5, category_id => 3, language_id => 'de', 'category' => 'Bücher die Embperl behandeln' } ,
+            { id =>  6, category_id => 3, language_id => 'en', 'category' => 'Books that talk about Embperl' } ,
+
+            { id =>  7, category_id => 4, language_id => 'de', 'category' => 'Artikel über Embperl (on- und offline)' } ,
+            { id =>  8, category_id => 4, language_id => 'en', 'category' => 'Article about Embperl (on- and offline)' } ,
+
+            { id =>  9, category_id => 5, language_id => 'de', 'category' => 'Syntaxhervorhebungen für Texteditoren' } ,
+            { id => 10, category_id => 5, language_id => 'en', 'category' => 'Syntaxhighlighting for texteditors' } ,
+
+            { id => 11, category_id => 6, language_id => 'de', 'category' => 'Module und Beispiele für Embperl' } ,
+            { id => 12, category_id => 6, language_id => 'en', 'category' => 'Modules and examples for Embperl' } ,
+
+        ],
+    },
+
+# ----------------------------------------------------------------------
+
+
+# ----------------------------------------------------------------------
+
+    {
+    '!Table' => 'user',
+    '!Fields' => 
+        [
+        'id'                        => 'counter',
+        'user_name'                 => 'tinytext',
+        'email'                     => 'tinytext',
+        'password'                  => 'tinytext',
+        'admin'                     => 'bit',
+        ],
+    '!PrimKey' => 'id',
+    },
+
+) ;
+
+
+
+1 ;
+

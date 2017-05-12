@@ -1,0 +1,42 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 a39fa60da96e4c4464e63430deeb8c2bcd6be56e Build.PL
+SHA1 9dd5167e604b9d79ecded4d8db77c64579346d3a Changes
+SHA1 68150728880aef0132d3cc5a06a18630e60fe167 MANIFEST
+SHA1 c7738613ddfac45735325092e70ba842ca007384 MANIFEST.SKIP
+SHA1 9e852ef80c655c8b133ce84076da26254e057352 META.yml
+SHA1 fc3b5d228dfa633b5d6d03d768eb2e45d2fa5839 Makefile.PL
+SHA1 cb1d881e0bdbd68a6fcc0136f6cfad3d7dcc98a5 README
+SHA1 d734e56ee5bb5695af75d8bac2e087808a7194f8 lib/Enumeration.pm
+SHA1 ce44677f304fcef2a00e08954002ae778c13f768 t/0-signature.t
+SHA1 b8abba7f7e60cb1709ad25440a202a83ad866b85 t/Color.pm
+SHA1 00b68f56a36f62f93413f04eeed1f2c861d80180 t/Enumeration.t
+SHA1 d07156bcf4146071d64b957d420e486dc2fe9188 t/SubClass.pm
+SHA1 a72983b47843589d531a15f563598537005461ce t/WeirdChars.pm
+SHA1 fca0f467dce959442e87519261c2769d7585cb78 t/doc.t
+SHA1 12cc22119888336a7f4ad1dda00ee00d5a75c2d6 t/equality.t
+SHA1 e498fd3a8677a49ee61f4cdb26aef35684a245c8 t/free.t
+SHA1 6edf496af66ab3fd81c5f68e5d1cb483a17abb07 t/import.t
+SHA1 41698864a2f74bf4e3a2a8c14b628362cbb81f70 t/no_import.t
+SHA1 4520f03cc1004c247099dc176fd8893391756f08 t/sub.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.8 (Cygwin)
+
+iEYEARECAAYFAkfqxUQACgkQwoSYc5qQVqqHHACfTkMK16q0E1X+lcLCocWTb+ik
+O7oAnRCcPhSV3tGUj6440RvTp2ffbUxP
+=58WV
+-----END PGP SIGNATURE-----

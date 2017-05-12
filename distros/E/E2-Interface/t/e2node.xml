@@ -1,0 +1,42 @@
+<node node_id="11111" createtime="1999-08-27 21:39:54" type_nodetype="116" xsi:schemaLocation="http://www.everything2.com/?node_id=1259759">
+	<type>e2node</type>
+	<title>test</title>
+	<author user_id="0">root</author>
+	<firmlinks><e2link node_id="22222">test 2</e2link></firmlinks>
+	<writeup node_id="33333" createtime="1999-11-16 03:33:58" type_nodetype="117" marked="0">
+		<parent><e2link node_id="11111">test</e2link></parent>
+		<writeuptype>idea</writeuptype>
+		<reputation up="17" down="8" cast="1">9</reputation>
+		<cools><e2link node_id="44444">cooluser</e2link></cools>
+		<title>test (idea)</title>
+		<author user_id="55555">Simpleton</author>
+		<doctext>
+			This is what you'd probably call a simple test case.
+		</doctext>
+	</writeup>
+	<writeup node_id="66666" createtime="2000-08-25 19:23:11" type_nodetype="117" marked="0">
+		<parent><e2link node_id="11111">test</e2link></parent>
+		<writeuptype>thing</writeuptype>
+		<reputation up="25" down="4" cast="1">21</reputation>
+		<cools></cools>
+		<title>test (thing)</title>
+		<author user_id="88888">some other user</author>
+		<doctext>
+			And this, as well, is a test case.
+		</doctext>
+	</writeup>
+
+	<softlinks>
+		<e2link node_id="99999">a test node</e2link>
+		<e2link node_id="99998">and another</e2link>
+		<e2link node_id="99997">and one final softlink</e2link>
+	</softlinks>
+
+	<nodelock>Do not post tests anymore.</nodelock>
+
+	<sametitles>
+		<nodesuggest type="room">
+			<e2link node_id="99996">test</e2link>
+		</nodesuggest>
+	</sametitles>
+</node>

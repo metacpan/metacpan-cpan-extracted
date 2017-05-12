@@ -1,0 +1,62 @@
+
+[!
+
+sub title   { $epreq -> gettext ('txt:setup_export_title') } 
+sub condition { 
+    my ($self, $r) = @_ ;
+    if ($r -> {data}{action} ne 'exportslave' && $r -> {data}{action} ne 'addslave')
+    	{
+    	return 0 ;
+    	}
+    return 1 ;    	
+    }
+
+!]
+
+[$ sub show 
+
+$bbname     = $epreq -> {data}{-bbname};
+$exportonly = $epreq -> {data}{action} eq 'exportslave' ;
+$]
+
+[- $escmode = 0 -]
+<p>[= txt:setup_export1 =]</p>
+<p>[= txt:setup_im_export2 =]</p>
+<p>[= txt:setup_im_export3 =]</p>
+<p>[= txt:setup_im_export4 =]</p>
+[- $escmode = 7 -]
+
+ 
+<center>
+<table class="cInputTable" cellspacing=2 cellpadding=2>
+
+[-
+$fdat{slaveexport}    ||= 0 ;
+$fdat{slaveaddr}      ||= $fdat{ipaddr} ;
+$fdat{slaveadminuser} ||= 'admin' ;
+$fdat{slaveadminpass} ||= 'bb5000' if (!$exportonly);
+
+
+Embperl::MyForm -> showfields (
+
+	[
+	($exportonly?{ name => 'slavedn', text => 'Slave der exportiert werden soll',width=> 1,
+        	type => 'select', xdatasrc => 'real_slave', validate => [ required => 1, ]}:
+	{ name => 'slaveexport', text => 'Konfiguration direkt exportieren',width=> 1,
+        	type => 'radio', values => [1,0], options => ['Ja', 'Nein']}),
+	{ name => 'slaveadminuser', text => 'Name des Administratorbenutzers des neuen Gerätes', 
+	       validate => [ required => 1 ]},
+	{ name => 'slaveadminpass', type => 'password', text => 'Kennwort',
+			validate => [ required => 1, ]},
+	{ name => 'slaveaddr', nameprefix => 'export_', text => 'IP Adresse unter der das neue Gerät derzeit erreichbar ist', width=> 1,
+			validate => [ required => 1, ]},
+	#{ name => 'syncprovider', text => 'IP Adresse unter der der Slave den Master erreicht', width=> 1,
+	#		validate => [ required => 1, ]},
+            ]);
+-]
+</table>
+</center>
+
+[$endsub$]
+
+

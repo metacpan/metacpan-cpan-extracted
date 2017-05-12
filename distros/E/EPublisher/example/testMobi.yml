@@ -1,0 +1,11 @@
+---
+Test:
+  source:
+    -
+      type: File
+      path: ./EBook-MOBI.pod
+      title: EBook::MOBI
+  target:
+    type: Mobi
+    author: Renee Baecker
+    output: ./output.mobi

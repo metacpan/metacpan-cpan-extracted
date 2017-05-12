@@ -1,0 +1,15 @@
+name: Email-Auth-AddressHash
+version: 1.0
+abstract: Email extension hash authentication mechanism
+author: Tara Andrews <tla@mit.edu>
+license: perl
+distribution_type: module
+build_requires:
+  Test::More: 0
+requires:
+  perl: 5.005
+  Digest::MD5: 0
+no_index:
+  directory:
+    - inc
+generated_by: Module::Install version 0.31

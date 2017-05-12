@@ -1,0 +1,144 @@
+#!/usr/bin/perl
+##############################################################################
+#
+# Script:   fix_latin
+#
+# Author:   Grant McLean <grant@mclean.net.nz>
+#
+# Description:
+#
+# A transcoding filter which takes mixed ASCII, UTF8 and Latin-1 data input and
+# produces ASCII/UTF8 output.
+#
+# For documentation see: ./fix_latin -?
+#
+
+use strict;
+use warnings;
+
+require 5.008;
+
+use Pod::Usage;
+use Getopt::Long       qw(GetOptions);
+use Encoding::FixLatin qw(fix_latin);
+
+my %opt;
+
+if(!GetOptions(\%opt, 'help|?', 'version|v', 'use_xs|use-xs=s')) {
+    pod2usage(-exitval => 1,  -verbose => 0);
+}
+
+pod2usage(-exitstatus => 0, -verbose => 2) if($opt{'help'});
+
+if($opt{version}) {
+    fix_latin('');      # Load XS layer if available
+    my $xs_version = defined($Encoding::FixLatin::XS::VERSION)
+                     ? "version $Encoding::FixLatin::XS::VERSION"
+                     : 'not installed';
+    print "Encoding::FixLatin      version $Encoding::FixLatin::VERSION\n";
+    print "Encoding::FixLatin::XS  $xs_version\n";
+    exit;
+}
+
+my @use_xs = ( use_xs => $opt{use_xs} || 'auto' );
+
+while(<>) {
+    $_ = fix_latin($_, bytes_only => 1, @use_xs) if /[^\x00-\x7f]/;
+    print;
+}
+
+exit 0;
+
+__END__
+
+=head1 NAME
+
+fix_latin - filters a data stream that is predominantly utf8 and 'fixes' any
+latin (ie: non-ASCII 8 bit) characters
+
+=head1 SYNOPSIS
+
+  fix_latin options <input_file >output_file
+
+  Options:
+
+   --use-xs <value> 'auto' | 'always' | 'never'
+   --version        list version number
+   --help           detailed help message
+
+=head1 DESCRIPTION
+
+The script acts as a filter, taking source data which may contain a mix of
+ASCII, UTF8, ISO8859-1 and CP1252 characters, and producing output will be all
+ASCII/UTF8.
+
+Multi-byte UTF8 characters will be passed through unchanged (although over-long
+UTF8 byte sequences will be converted to the shortest normal form).  Single
+byte characters will be converted as follows:
+
+  0x00 - 0x7F   ASCII - passed through unchanged
+  0x80 - 0x9F   Converted to UTF8 using CP1252 mappings
+  0xA0 - 0xFF   Converted to UTF8 using Latin-1 mappings
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<< --use-xs 'auto' | 'always' | 'never' >>
+
+Override default ('auto') behaviour of trying to use XS module and falling back
+to pure-Perl version if not available.  Set to 'never' to always use the Perl
+version or 'always' to always use XS and die if not available.
+
+=item B<--version> (alias -v)
+
+Display version number of underlying Encoding::FixLatin and XS modules.
+
+=item B<--help> (alias -?)
+
+Display this documentation.
+
+=back
+
+=head1 EXAMPLES
+
+This script was originally written to assist in converting a Postgres database
+from SQL-ASCII encoding to UNICODE UTF8 encoding.  The following examples
+illustrate its use in that context.
+
+If you have a SQL format dump file that you would normally restore by piping
+into 'psql', you can simply filter the dump file through this script:
+
+  fix_latin < dump_file | psql -d database
+
+If you have a compressed dump file that you would normally restore using
+'pg_restore', you can omit the '-d' option on pg_restore and pipe the resulting
+SQL through this script and into psql:
+
+  pg_restore -O dump_file | fix_latin | psql -d database
+
+To take a look at non-ASCII lines in the dump file:
+
+  perl -ne '/^COPY (\S+)/ and $t = $1; print "$t:$_" if /[^\x00-\x7F]/' dump_file
+
+=head1 SEE ALSO
+
+This script is implemented using the Encoding::FixLatin Perl module.  For more
+details see the module documentation with the command:
+
+  perldoc Encoding::FixLatin
+
+In particular you should read the 'LIMITATIONS' section to understand the
+circumstances under which data corruption might occur.
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2009-2014 Grant McLean C<< <grantm@cpan.org> >>
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
+
+
+

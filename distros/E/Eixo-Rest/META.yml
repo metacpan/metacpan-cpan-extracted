@@ -1,0 +1,28 @@
+---
+abstract: 'Base modules to build REST api clients'
+author:
+  - 'Francisco Maseda <frmadem@gmail.com>'
+  - 'Javier Gomez <alambike@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Eixo-Rest
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Eixo::Base: '1.400'
+  HTTP::Server::Simple::CGI: '0'
+  JSON: '2.50'
+  LWP::Protocol::https: '6.06'
+  LWP::UserAgent: '6.06'
+  Net::HTTP: '6.06'
+version: '1.207'

@@ -1,0 +1,59 @@
+---
+abstract: 'Elluminate Live! Manager (ELM) Command Toolkit bindings'
+author:
+  - 'David Warring <david.warring@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  File::Temp: 0
+  Test::Fatal: 0
+  Test::More: 0.98
+  Test::Warn: 0
+  version: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Elive
+name: Elive
+no_index:
+  directory:
+    - inc
+    - t
+recommends:
+  Term::ReadLine::Perl: 0
+requires:
+  Carp: 0
+  Class::Accessor: 0
+  Class::Data::Inheritable: 0
+  Clone: 0
+  Date::Parse: 0
+  File::Basename: 0
+  File::Spec: 0
+  Getopt::Long: 2.35
+  HTML::Entities: 0
+  IO::Interactive: 0
+  MIME::Types: 0
+  Mouse: 0.81
+  Mouse::Util::TypeConstraints: 0
+  Pod::Usage: 1.33
+  SOAP::Lite: 0.712
+  Scalar::Util: 0
+  Term::ReadKey: 0
+  Term::ReadLine: 0
+  Time::Local: 0
+  Try::Tiny: 0
+  URI: 0
+  URI::Escape: 0
+  XML::Simple: 0
+  YAML::Syck: 0
+  parent: 0
+  perl: 5.8.3
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/dwarring/p5-Bb-Collaborate.git
+version: '1.37'

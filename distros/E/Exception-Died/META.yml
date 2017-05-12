@@ -1,0 +1,27 @@
+---
+name: Exception-Died
+version: 0.06
+author:
+  - 'Piotr Roszatycki <dexter@cpan.org>'
+abstract: Convert simple die into real exception object
+license: perl
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Exception-Died
+  license: http://dev.perl.org/licenses/
+  repository: http://dexter-cpan.googlecode.com/svn/Exception-Died
+requires:
+  Exception::Base: 0.21
+  constant::boolean: 0
+  perl: 5.006
+build_requires:
+  Test::Assert: 0.05
+  Test::Unit::Lite: 0.11
+  parent: 0
+provides:
+  Exception::Died:
+    file: lib/Exception/Died.pm
+    version: 0.06
+generated_by: Module::Build version 0.31012
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

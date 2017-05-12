@@ -1,0 +1,47 @@
+$Id: Changes,v 1.7 2009-12-19 11:47:38 joern Exp $
+
+Revision history and release notes for Event::ExecFlow:
+
+0.64 Sat Dec 19, 2009, joern
+    Bugfixes:
+    - Accumulated group member errors were not reported to
+      the frontend.
+    - Use Perl's builtin command execution with a subshell
+      instead of forking.
+    
+0.63 Fri Apr 13, 2007, joern
+    Features:
+    - Improved output layout of Event::ExecFlow::Term.
+    - Event::ExecFlow::Frontend::Term->set_quiet(1)
+      will print just warning and error messages.
+    - Added method Event::ExecFlow::Job->reset()
+    
+    Bugfixes:
+    - Increase group progress on child finish only when
+      it was successful.
+    - Group considered itself finished even when a child
+      job didn't finish successfully (cancelled or error).
+    
+0.62 Sat Jun 17, 2006, joern
+    Features:
+    - Executed programs are now set into C locale, so parsing
+      output is independent from the locale settings.
+    
+    Bugfix:
+    - set job into error state if post callbacks return
+      with error.
+
+0.61 Sun Apr 2, 2006, joern
+    Notes:
+    - added some helper methods to the Group class
+    - scheduler stuff is still work in progress and needs some cleanup
+    - shell commands maybe closures returning the shell code at runtime
+    - fixed a bug with depends_on argument to constructor not
+      processed correctly
+
+0.60 Mon Mar 27, 2006, joern
+    Notes:
+    - First public CPAN release
+    - API may change but should by fairly stable
+    - Documentation is mainly missing yet, only PODs with
+      SYNPOSIS and stub chapters.

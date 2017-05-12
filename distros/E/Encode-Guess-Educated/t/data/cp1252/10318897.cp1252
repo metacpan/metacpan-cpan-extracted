@@ -1,0 +1,1666 @@
+   [1]PNAS
+   [2]Proceedings of the National Academy of Sciences of the United States
+   of America
+
+   [3]Skip to main page content
+     * [4]Info for Authors
+     * [5]Editorial Board
+     * [6]About
+     * [7]Subscribe
+     * [8]Advertise
+     * [9]Contact
+     * [10]Feedback
+     * [11]Site Map
+
+     * [12]INTERFERin siRNA Transfection Reagent
+     * [13]Sign up for PNAS eTOCs
+     * [14]Science Sessions: PNAS Podcast Program
+
+     * Institution: UNIV COLORADO HLTH SCI CTR
+     * [15]Sign In as Member / Individual
+
+ §1§ The crystal structure of a multifunctional protein: Phosphoglucose
+isomerase/autocrine motility factor/neuroleukin §1§
+
+    1. [16]Yuh-Ju Sun [17]*,
+    2. [18]Chia-Cheng Chou [19]* , [20]†,
+    3. [21]Wei-Shone Chen [22]‡,
+    4. [23]Rong-Tsun Wu [24]§,
+    5. [25]Menghsiao Meng [26]¶, and
+    6. [27]Chwan-Deng Hsiao [28]* , [29]&#x2016;
+
+    1.
+
+
+    ^*Institute of Molecular Biology, Academia Sinica, Taipei, Taiwan
+    11529, Republic of China; ^†Graduate Institute of Life Science,
+    National Defense Medical Center, Taipei, Taiwan 11217, Republic of
+    China; ^‡Veterans General Hospital, Taipei, Taiwan 11221, Republic of
+    China; ^§Graduate Institute of Biopharmaceutical Science, National
+    Yang-Ming University, Taipei, Taiwan 11221, Republic of China; and
+    ^¶Graduate Institute of Agricultural Biotechnology, National Chung
+    Hsing University, Taichung, Taiwan 40227, Republic of China
+
+    1. Edited by Robert Huber, Max Planck Institute for Biochemistry,
+       Martinsried, Germany, and approved March 20, 1999 (received for
+       review December 21, 1998)
+
+
+   [30]Next Section
+
+ §2§ Abstract §2§
+
+   Phosphoglucose isomerase (PGI) plays a central role in both the
+   glycolysis and the gluconeogenesis pathways. We present here the
+   complete crystal structure of PGI from Bacillus stearothermophilus at
+   2.3-Å resolution. We show that PGI has cell-motility-stimulating
+   activity on mouse colon cancer cells similar to that of endogenous
+   autocrine motility factor (AMF). PGI can also enhance neurite outgrowth
+   on neuronal progenitor cells similar to that observed for neuroleukin.
+   The results confirm that PGI is neuroleukin and AMF. PGI has an open
+   twisted &#x3b1;/&#x3b2; structural motif consisting of two globular domains and two
+   protruding parts. Based on this substrate-free structure, together with
+   the previously published biological, biochemical, and modeling results,
+   we postulate a possible substrate-binding site that is located within
+   the domains’ interface for PGI and AMF. In addition, the structure
+   provides evidence suggesting that the top part of the large domain
+   together with one of the protruding loops might participate in inducing
+   the neurotrophic activity.
+
+   Phosphoglucose isomerase (PGI; EC [31]5.3.1.9) is a glycolytic enzyme
+   that catalyzes the reversible isomerization of glucose-6-phosphate to
+   fructose-6-phosphate. PGI deficiency in humans leads to nonspherocytic
+   hemolytic disease ([32]1, [33]2). In addition, the serum activity of
+   PGI has been established as a tumor marker in human cancer patients
+   ([34]3, [35]4), and elevation in PGI activity is closely correlated
+   with metastasis ([36]5, [37]6).
+
+   Recently, it has been shown that several important proteins,
+   neuroleukin (NLK; refs. [38]7–[39]9), autocrine motility factor (AMF;
+   refs. [40]10 and [41]11), and maturation factor (MF; refs. [42]11 and
+   [43]12), are closely related, if not identical, to PGI. Mouse and human
+   NLKs can be aligned with pig muscle PGI without any sequence insertions
+   or deletions. Including conservative substitutions, mouse NLK has 87%
+   and 90% sequence identity with human NLK ([44]8) and pig muscle PGI
+   ([45]7), respectively. The primary structural differences are mostly
+   conservative substitutions that probably reflect species and organ
+   specificities.
+
+   NLK is a neurotrophic growth factor. It promotes motor neuron
+   regeneration in vivo, fosters the survival of peripheral and central
+   neurons in vitro, and affects B cell Ig synthesis ([46]13, [47]14).
+   Interestingly, the dimeric form of NLK carries out its isomerase
+   activity, whereas the monomeric form of the protein is responsible for
+   the neurotrophic activity ([48]9). In the presence of monomeric PGI,
+   neuroblastoma cells have enhanced neurite extension and a reduced
+   proliferation rate ([49]9). These results suggest that PGI has a growth
+   factor-like activity and that PGI is potentially related to NLK.
+
+   AMF ([50]10, [51]15–[52]17) represents a class of cytokines: a group of
+   proteins that control cell growth and differentiation in embryogenesis,
+   immunity, and inflammation ([53]18). They are produced locally and act
+   in an autocrine or paracrine manner. AMF was identified originally by
+   its ability to induce directed random migration of cells. It has since
+   been implicated in stimulating motility during cell invasion and
+   metastasis ([54]10, [55]15).
+
+   AMF regulates growth and motility by a receptor-mediated signaling
+   pathway. On signal transduction, AMF binds to a cell surface
+   glycoprotein of 78 kDa ([56]19–[57]21), implying that AMF is the
+   natural ligand of the 78-kDa glycoprotein ([58]17). AMF secreted by
+   Gc-4 PF murine fibrosarcoma cells ([59]10) has PGI activity, whereas
+   rabbit heart PGI can stimulate mouse fibrosarcoma cell motility similar
+   to that of endogenous AMF. More importantly, two specific PGI
+   inhibitors, 6-phosphogluconic acid and erythrose 4-phosphate, can
+   inhibit the isomerase activity of PGI ([60]22) and abolish the
+   AMF-induced cell motility ([61]10). The results support the notion that
+   murine AMF is a PGI.
+
+   MF mediates the differentiation of human myeloid leukemic HL-60 cells
+   to terminal monocytic cells ([62]12). Interestingly, the purified MF
+   has been shown to have PGI enzymatic activity, and the purified PGI
+   also has the differentiation property for leukemia cells ascribed to
+   the MF ([63]12). The amino acid sequence of a tryptic and the enzyme
+   cleavage sites of MF is 100% homologous to both NLK and PGI ([64]12).
+
+   Although studies on PGI have proved a close enzymatic relationship with
+   NLK, AMF, and MF, nothing is known about the structural basis of these
+   activities. Previously, we have reported the expression of two Bacillus
+   stearothermophilus PGIs (PGI-A and PGI-B) in Escherichia coli ([65]23).
+   In this study, we show that Bacillus PGI stimulates the cell motility
+   of CT-26 mouse colon tumor cells and enhances the neurite outgrowth on
+   neuronal progenitor cells. We also present the crystal structure of
+   PGI-B at 2.3-Å resolution by x-ray diffraction.
+   [66]Previous Section[67]Next Section
+
+ §2§ MATERIALS AND METHODS §2§
+
+ §3§ Crystallization and Structure Determination. §3§
+
+   The isolation, purification, and crystallization of PGI have been
+   reported ([68]23). Crystals were grown by the hanging-drop
+   vapor-diffusion method from solutions containing ammonium phosphate as
+   the precipitant. The crystals belong to space group I222 with the cell
+   dimensions a = 75.1 Å, b = 93.7 Å, and c = 171.9 Å; one molecule per
+   asymmetric unit. After an extensive search, two useful derivatives,
+   KAu(CN)[2] and HgI[2], were obtained by soaking native crystals in
+   heavy-atom solutions. All data used for structure determination were
+   collected on a Rigaku (Tokyo) R-Axis II Imaging Plate mounted on a
+   Rigaku RU300 rotating-anode. The data were indexed, integrated, and
+   scaled by using denzo and scalepack (ref. [69]24; Table [70]1).
+   View this table:
+     * [71]In this window
+     * [72]In a new window
+
+   Table 1
+
+   X-ray crystallography&#x2009;data
+
+   The heavy-atom positions were located by difference Patterson
+   techniques and refined by using the CCP4 (Collaborative Computational
+   Project, November 4, 1994) implementation of mlphare ([73]24). The
+   isir-isas program ([74]25) was used to generate the initial miras
+   (multiple isomorphous replacement including anomalous scattering)
+   phases at 3.5-Å resolution followed by phase extension to 3.0 Å. The
+   resulting electron-density map showed a molecular boundary indicative
+   of a two-domain structure and evidence of several &#x3b1;-helices and &#x3b2;-sheet
+   strands in both domains. The initial miras phases were improved further
+   by the program dm ([75]26) by using a combination of solvent
+   flattening, histogram mapping, and Sayre’s equation (skeletonization
+   was not included in this calculation). The miras map showed continuous
+   electron density with well defined side chains for almost the entire
+   molecule. The initial model, which contained 440 residues and 3,508
+   nonhydrogen atoms, resulted in a conventional R factor of 39.8% from 8
+   Å to 2.8 Å with 2&#x3c3;(F).
+
+   The model was refined against data between 8.0 Å and 2.3 Å by simulated
+   annealing and positional refinement by using the program x-plor 3.1
+   ([76]27). Individual atoms were assigned isotropic B factors, which
+   were refined during the latter stages of the refinement. Fig. [77]1
+   shows a sample final omitted (2F [o]&#x2009;–&#x2009;F [c]) map. The final model
+   contains 3,699 nonhydrogen atoms, including 184 oxygen atoms from water
+   molecules. The first and the last two amino acid residues are
+   presumably disordered in the crystal structure. The R factor is 18.5%
+   for all 2&#x3c3;(F) data between 8.0-Å and 2.3-Å resolution. By using a 10%
+   reflection test set (2,319 reflections), the R [free]-value ([78]28) is
+   25.8%. The model has good stereochemistry with rms deviations in bond
+   lengths and angles of 0.012 Å and 1.348°, respectively. Analysis of the
+   Ramachandran plot ([79]29) shows no violations of accepted backbone
+   torsion angles. Atomic coordinates have been deposited with the Protein
+   Data Bank (ref. [80]30; ID code [81]2PGI).
+   [82]Figure 1
+   View larger version:
+     * [83]In this window
+     * [84]In a new window
+
+     * [85]Download as PowerPoint Slide
+
+   Figure 1
+
+   The omitted 2F [o]&#x2009;–&#x2009;F [c] electron density map of PGI from regions of
+   the proposed substrate-binding site. The map was calculated by omitting
+   Lys-139, Glu-285, His-306, and Lys-420 from the x-ray model.
+   Simulated-annealing refinement was performed with a 3-Å spherical shell
+   of fixed atoms surrounding the omitted regions and was contoured at the
+   1.0-&#x3c3; level. Residues His-306&#x2032; and Ser-307&#x2032; belong to the
+   symmetry-related subunit in a dimer.
+
+ §3§ Cell-Motility Assay. §3§
+
+   Cell motility of mouse CT-26 cells was measured by the method described
+   by Lin et al. ([86]31) with minor modifications.
+   Polyvinylpyrrolidone-free polycarbonate filters (Nuclepore; 8-&#x3bc;m pore
+   size) were soaked in 0.5 M acetic acid overnight. The filters were
+   washed with distilled water and coated with 50 &#x3bc;l of matrigel for 2 h.
+   Cells were placed on the top of a Boyden chamber at a cell dose of 5 ×
+   10^4 per 200 &#x3bc;l in MEM with 10% FBS. Incubation was carried out at 37°C
+   for 8 h. The filters were removed and fixed in 4% paraformaldehyde for
+   15 min at room temperature. Cells on the upper filter surface were
+   removed carefully with a cotton swab. The filters were stained with
+   hematoxylin for 40 min. Cells on the lower filter surface were counted
+   under a light microscope.
+
+ §3§ Neurite-Outgrowth Assay. §3§
+
+   Morphological responses to PGI of rat epidermal growth factor
+   (EGF)-responsive neuronal embryonic progenitor cells ([87]32, [88]33)
+   were assayed. The serum-free culture medium was made up of an equal
+   mixture of DMEM and F-12 nutrient (GIBCO), supplemented with insulin
+   (25 &#x3bc;g/ml), transferrin (50 &#x3bc;g/ml), progesterone (20 nM), putrescine
+   (100 &#x3bc;M), and selenium chloride (30 nM). Brains were removed from
+   17-day-old Sprague–Dawley rat embryos and dissociated mechanically with
+   a fire-polished Pasteur pipette. After culturing for 4–5 days in the
+   serum-free medium supplemented with 20 ng/ml EGF, the primary
+   EGF-responsive embryonic neuronal progenitor cells were dissociated
+   into single cells. The cells were then transferred to 96-well plates
+   and cultivated in the serum-free medium supplemented with EGF (10
+   ng/ml) in the presence or absence of PGI.
+   [89]Previous Section[90]Next Section
+
+ §2§ RESULTS AND DISCUSSION §2§
+
+ §3§ The Overall Structure. §3§
+
+   The overall folding of a PGI monomer is shown in Fig. [91]2. The
+   molecule is divided clearly into two globular domains (designated as
+   large and small domains) and an “arm-like” C-terminal tail. Both the
+   large and the small domain have a central core of a &#x3b2;-pleated sheet
+   flanked by &#x3b1;-helices to form a typical &#x3b1;/&#x3b2; folding motif. The large
+   domain also contains a protruding loop region diametrical to the
+   C-terminal tail. Therefore, the overall shape of the subunit is
+   somewhat ellipsoidal with an “arm-like” structure on each side.
+   [92]Figure 2
+   View larger version:
+     * [93]In this window
+     * [94]In a new window
+
+     * [95]Download as PowerPoint Slide
+
+   Figure 2
+
+   A ribbon drawing ([96]64, [97]65) of the PGI monomer with the small
+   domain on the top, the large domain on the bottom, and the C-terminal
+   domain on the left. &#x3b1;-Helices are colored gold and labeled &#x3b1;1–&#x3b1;18.
+   &#x3b2;-Strands are in green and labeled &#x3b2;1–&#x3b2;12. The proposed
+   substrate-binding site is indicated by an asterisk. The
+   crystallographic 2-fold axis that runs through the dimer is shown by an
+   arrow.
+
+   The secondary structure of the large domain containing the N-terminal
+   of the protein is built from two separate peptide segments (residues
+   2–34 and 236–403). This domain has two antiparallel strands (&#x3b2;10 and
+   &#x3b2;11) that are placed roughly perpendicularly to a central five-stranded
+   &#x3b2;-sheet (&#x3b2;1, &#x3b2;7, &#x3b2;8, &#x3b2;9, and &#x3b2;12). Consequently, &#x3b2;10 and &#x3b2;11 form an
+   arm-like protruding loop. There are two (&#x3b1;14 and &#x3b1;15) and three
+   &#x3b1;-helices (&#x3b1;12, &#x3b1;13, and &#x3b1;16) on either side of the central
+   five-stranded &#x3b2;-sheet. From the &#x3b1;3 helix, the chain progresses to form
+   the entire supersecondary structure of the small domain.
+
+   The small domain encompasses residues 56–217. It has also a
+   five-stranded &#x3b2;-sheet (&#x3b2;2, &#x3b2;3, &#x3b2;4, &#x3b2;5, and &#x3b2;6) at the core. The &#x3b2;-sheet
+   is sandwiched by three helices on one side (&#x3b1;4, &#x3b1;5, and &#x3b1;10) and four
+   &#x3b1;-helices on the other (&#x3b1;6, &#x3b1;7, &#x3b1;8, and &#x3b1;9), forming a typical open
+   twisted &#x3b1;/&#x3b2; folding structure. Lastly, the C-terminal 32 amino acids
+   (residues 414–445) of the protein fold into two consecutive helices
+   (&#x3b1;17 and &#x3b1;18) linked by a short turn.
+
+   Because the large domain is built from two separate peptide segments,
+   it is connected to the small domain by two helices, &#x3b1;3 (residues 43–51)
+   and &#x3b1;11 (residues 220–236). Despite the discontinuity in the large
+   domain, the sheet topologies are similar in both domains. All the
+   &#x3b2;-strands in both domains are parallel, except for the &#x3b2;1 and the
+   protruding loop (&#x3b2;10 and &#x3b2;11) in the large domain, which are
+   antiparallel. The &#x3b2;-strands of the small domain point toward the
+   C-terminal tail, whereas those from the large domain are oriented
+   antiparallel to those of the small domain and point toward the
+   protruding loop region. The arrangement of the small globular domain
+   and the C-terminal tail results in a slight cleft wherein the substrate
+   might be bound.
+
+   The functional form of the PGI is a dimer. However, there is only a
+   single subunit in the crystallographic asymmetric unit. The dimer is
+   globular in shape with dimensions of &#x2248;78 Å × 75 Å × 50 Å. The subunits
+   associate in an arm-to-arm hug fashion with intimate contacts and form
+   a hydrophilic channel that coincides with the crystallographic 2-fold
+   axis that runs through the dimer as indicated by an arrow in Fig.
+   [98]2. Most of the monomer–monomer interactions are formed among
+   helices and loops, because the &#x3b2;-sheets are in the cores and sandwiched
+   by helices. Intersubunit contacts are constituted mainly among &#x3b2;2, &#x3b1;6,
+   &#x3b1;7, &#x3b1;9, &#x3b1;13, &#x3b1;14, &#x3b1;15, &#x3b1;17, &#x3b1;18, and the loop regions. The dimer is
+   stabilized by a total of 76 intermolecular hydrogen bonds (&#x2264;3.5 Å) as
+   well as van der Waals interactions.
+
+ §3§ Structure Comparison with Other Isomerases. §3§
+
+   A crystal structure of pig muscle PGI was previously determined at
+   3.5-Å resolution ([99]34, [100]35). However, because of the resolution
+   limit and the lack of sequence information, the C[&#x3b1;] backbone of pig
+   PGI could not be traced throughout the whole structure and not all the
+   amino acid side chains could be defined. In that model, 85% of the C[&#x3b1;]
+   atoms were built, and both the N and the C termini were assigned
+   tentatively. Pig PGI is a dimeric enzyme and reportedly has an &#x3b1;/&#x3b2;
+   folding motif. Each subunit consists of a large and a small domain. The
+   large domain contains a six-stranded parallel &#x3b2;-sheet surrounded by
+   &#x3b1;-helices. The small domain contains a four-stranded parallel
+   &#x3b2;-structure surrounded by helices and an irregularly folded chain.
+   Similar to the PGI structure of B. stearothermophilus, the subunit is
+   somewhat ellipsoidal, and a slight cleft is observed between the two
+   domains.
+
+   It is interesting to compare the three-dimensional structure of PGI
+   with the structures of triose phosphate isomerase (TPI; ref. [101]36)
+   and d-xylose isomerase ([102]37–[103]39). TPI catalyses the
+   interconversion between d-glyceraldehyde-3-phosphate and
+   dihydroxyacetone phosphate ([104]36), whereas xylose isomerase is
+   involved in the transposition of xylose to xylulose. A
+   “hydride-transfer” mechanism has been proposed for xylose isomerase
+   ([105]40–[106]43). However, biological and biochemical studies
+   ([107]38, [108]44) suggest that both PGI and TPI use instead a
+   “proton-transfer” mechanism. The proton-transfer mechanism involves the
+   formation of an cis-enediol intermediate by transferring a proton
+   between C1 and C2 of the sugar ring. Although different mechanisms
+   pertain to the triose phosphate and the xylose isomerization reactions,
+   both enzymes form the typical eight-stranded &#x3b1;/&#x3b2; barrel (TIM barrel)
+   motif structure. In contrast, the PGI model from B. stearothermophilus
+   has an open twisted &#x3b1;/&#x3b2; structure.
+
+ §3§ PGI Stimulates Cell Motility. §3§
+
+   Rabbit PGI has been shown to induce directed random migration of tumor
+   cells and implicated as an AMF ([109]10, [110]17). Results from amino
+   acid sequencing analysis and immunological cross-reactivity also
+   suggest that mouse AMF is identical or closely related to PGI/NLK.
+   Whether B. stearothermophilus PGI has AMF activity can be addressed
+   directly by observing its migratory-stimulation activity in
+   cell-motility assays. Purified PGI from B. stearothermophilus
+   stimulates CT-26 mouse colon cancer cell motility in a dose-dependent
+   fashion and exerts maximal stimulating activity between 10 pg/ml and
+   100 pg/ml. Fig. [111]3 is a pictorial demonstration of the motility
+   assay and the stimulatory effect on CT-26 cells in the absence (Fig.
+   [112]3 A) or presence (Fig. [113]3 B and C) of PGI. The results are
+   consistent with those observed by Watanabe et al. ([114]10).
+   [115]Figure 3
+   View larger version:
+     * [116]In this window
+     * [117]In a new window
+
+     * [118]Download as PowerPoint Slide
+
+   Figure 3
+
+   Dose-dependent motility stimulation of CT-26 mouse colon cancer cells
+   by purified B. stearothermophilus PGI. CT-26 cells were plated in
+   culture medium in the absence or various concentrations of PGI.
+   Representative photomicrographs of cells plated in the absence (A) or
+   presence of 10 pg/ml (B) or 100 pg/ml (C) PGI are shown.
+
+ §3§ Identification of a Putative Substrate-Binding Site of PGI/AMF. §3§
+
+   After finding that Bacillus PGI is functionally equivalent to AMF, the
+   next obvious issue is to locate the substrate-binding site on PGI/AMF.
+   Because PGI and AMF share the same substrate and inhibitors (i.e.,
+   carbohydrate phosphates; ref. [119]10), the implicated binding site
+   should also be the same for both proteins.
+
+   The genes coding for PGI have been isolated from a variety of sources
+   ranging from bacteria to mammals ([120]35, [121]45–[122]47). Two
+   regions of conserved amino acids,
+   [LIVM]-G-G-R-[FY]-S-[LIVM]-x-[ST]-A-[LIVM]-G and
+   [FY]-D-Q-x-G-V-E-x-x-K, have been identified (Fig. [123]4) and are
+   documented as signature patterns for the PGI ([124]48) superfamily.
+   Members of this superfamily include B. stearothermophilus PGI, pig
+   muscle PGI, human PGI/NLK/AMF, and mouse PGI/NLK. Residues inside the
+   square brackets above represent the evolutionarily conserved residues.
+   The corresponding regions are residues 198–210 from the small domain
+   and 411–420 from the large domain in B. stearothermophilus PGI.
+   Interestingly, these two conserved regions are located within the
+   slight cleft area in our model. Therefore, it is reasonable to propose
+   that all PGIs have the same evolutionary origin and employ the same
+   catalytic mechanism.
+   [125]Figure 4
+   View larger version:
+     * [126]In this window
+     * [127]In a new window
+
+     * [128]Download as PowerPoint Slide
+
+   Figure 4
+
+   Multiple sequence alignment of the PGI superfamily. Amino acid
+   sequences of Bacillus PGI-B, Bacillus PGI-A, and PGI from pig, human,
+   and mouse were aligned. Residues that are identical among all five
+   sequences are highlighted in red. Positions of deletions are indicated
+   by dashes. Two signature patterns
+   ([LIVM]-G-G-R-[FY]-S-[LIVM]-x-[ST]-A-[LIVM]-G and
+   [FY]-D-Q-x-G-V-E-x-x-K) of the PGI superfamily are colored in green.
+   Amino acids that form the putative substrate-binding sites are denoted
+   by asterisks.
+
+   A base-catalyzed mechanism has been proposed for the interconversion of
+   aldose and ketose via a cis-enediol intermediate ([129]49, [130]50).
+   Based on chemical modification and affinity-labeling experiments,
+   histidine ([131]51), lysine ([132]52), glutamate ([133]53), and
+   arginine ([134]54) residues have been postulated to be involved in the
+   catalytic process. Results from site-directed mutagenesis and kinetic
+   studies ([135]47) also suggested that Lys-139, Arg-202, Lys-289, and
+   Lys-420 are located in the active site of the B. stearothermophilus
+   PGI. As determined by the crystallographic studies of pig ([136]34,
+   [137]35) and rabbit PGIs ([138]2), the active site is situated in a
+   cleft between the large and small domains of the monomer and is formed
+   by the association of the two subunits. Their results showed that
+   histidine and glutamate residues might be situated in the active site
+   of PGI. Kugler et al. ([139]2) also pointed out that the histidine
+   residue involved in enzymatic reaction is from the other subunit.
+   Moreover, the involvement of lysine and arginine residues in the
+   binding of phosphate groups by various enzymes, such as
+   6-phosphofructo-2-kinase ([140]55, [141]56), glycogen phosphorylase b
+   ([142]57), maltodextrin phosphorylase ([143]58), protein tyrosine
+   phosphatase 1B ([144]59), and protein phosphatase 1 ([145]60), have
+   been well studied.
+
+   Based on the substrate-free PGI structure described in this work,
+   together with the aforementioned biological and biochemical results, we
+   carried out molecular-modeling studies. A possible binding-site
+   geometry that may exist in a PGI-substrate (glucose-6-phosphate)
+   complex was generated by minimizing the distance and neutralizing the
+   opposite charges between the enzyme and the target substrate. A
+   speculative model showing how glucose-6-phosphate could be docked into
+   the putative PGI substrate-binding site is presented in Fig. [146]5.
+   The possible substrate-binding site of PGI is a deep binding pocket
+   located between the large domain, the small domain, and the C-terminal
+   tail.
+   [147]Figure 5
+   View larger version:
+     * [148]In this window
+     * [149]In a new window
+
+     * [150]Download as PowerPoint Slide
+
+   Figure 5
+
+   A ribbon drawing ([151]64, [152]65) showing the proposed
+   substrate-binding site as determined by the substrate-free PGI
+   structure. The glucose-6-phosphate is represented by balls and sticks
+   and is colored in red (oxygen), deep blue (carbon) and magenta
+   (phosphorus). The residues potentially involved in the enzymatic
+   reaction are labeled by name.
+
+   The isomerization reaction is initiated by a ring-opening step,
+   followed by a proton-transfer process and a ring-closure procedure. In
+   this postulated complex model, Arg-202, Glu-285, and His-306
+   participate in the catalytic process. Lys-139 forms three salt bridges
+   with the phosphate group to stabilize the substrate. Glu-417, Tyr-419,
+   and Lys-420 interact with the hydroxyl groups of C3 and C4 of the
+   substrate via hydrogen bonds. Glu-285 and His-306 are the two most
+   likely candidates for the base-catalytic and proton-transfer steps in
+   the phosphoglucose isomerization. It is interesting to point out that
+   the His-306 positioned in this possible binding site is from the other
+   subunit of the dimer. This positioning may explain why the active form
+   of the isomerase is a dimer. All these important residues, except
+   Tyr-419, are conserved in the multiple sequence alignment (Fig.
+   [153]4). Certainly, crystal structures of the
+   substrate/inhibitor-enzyme complex definitely are needed before the
+   role of these residues can be defined explicitly.
+
+ §3§ PGI Enhanced Neurite Outgrowth. §3§
+
+   Many studies ([154]7, [155]8, [156]10, [157]61) have shown that PGI has
+   a close functional relationship with NLK. Three different hypotheses
+   were raised by Gurney (as described in ref. [158]8) to explain the
+   potential relationship between PGI and NLK: (i) the enzymatic activity
+   of PGI may account for the biological response to NLK; (ii) PGI may act
+   as a carbohydrate-binding rather than receptor-binding ligand to
+   trigger the biological response to NLK; and (iii) either PGI or a
+   processed version of it may be a ligand for a cellular receptor.
+
+   To verify that PGI from B. stearothermophilus has neurotrophic
+   activity, we examined the morphological response to PGI administration
+   by using rat EGF-responsive neuronal embryonic progenitor cells
+   ([159]32, [160]33). Compared with controls (Fig. [161]6 A), the neurite
+   extensions in these neuronal progenitor cells were significantly
+   greater in number and longer in length when treated with PGI (Fig.
+   [162]6 B–D). The results are consistent with the neurotrophic
+   activities observed by Gurney et al. ([163]62) and Mizrachi ([164]9)
+   and confirmed that PGI is NLK.
+   [165]Figure 6
+   View larger version:
+     * [166]In this window
+     * [167]In a new window
+
+     * [168]Download as PowerPoint Slide
+
+   Figure 6
+
+   Morphological response of rat EGF-responsive neuronal embryonic
+   progenitor cells promoted by PGI. (A) After 4 days of cultivation in
+   the absence of PGI, the neuronal progenitor cells formed a single
+   sphere of undifferentiated morphology, compared with a differentiated
+   morphology of neurite outgrowth treated with 2 ng/ml PGI (B), 20 ng/ml
+   PGI (C), and 200 ng/ml PGI (D).
+
+   To identify the regions on PGI that are responsible for NLK activity,
+   we carried out a molecular-surface study on our PGI model. Fig. [169]7
+   shows the electrostatic surface potential of the B. stearothermophilus
+   PGI monomer displayed by the program grasp ([170]63). The negatively
+   charged surface (potential < 10 kT) is displayed in deep red, whereas
+   the positively charged surface (potential > 10 kT) is in deep blue. The
+   surface potential of the small domain and the C-terminal region is more
+   neutral and is depicted mostly in white. We have proposed in the last
+   section that the substrate-binding site for PGI/AMF is most likely
+   seated in the junction where the large domain, small domain, and the
+   C-terminal tail come together. In contrast, a strong acidic region is
+   found on the top half of the large domain and the protruding loop
+   (residues 329–352). These distinctive surface-potential regions may be
+   responsible for the NLK activity of PGI. Moreover, Mizrachi ([171]9)
+   reported that a synthetic peptide covering residues 401–421 of the
+   rabbit NLK has cell proliferative activity. In our PGI model, the
+   corresponding residues are 319–339 and located in &#x3b2;10 and the
+   protruding loop. We tentatively proposed that the top part of the large
+   domain and the protruding loop may play another biological function,
+   such as the neurotrophic activity. However, these speculations need to
+   be confirmed by further neurobiological and biochemical study.
+   [172]Figure 7
+   View larger version:
+     * [173]In this window
+     * [174]In a new window
+
+     * [175]Download as PowerPoint Slide
+
+   Figure 7
+
+   Electrostatic surface potential on the PGI molecule displayed with the
+   program grasp ([176]63). Negative potentials (<10 kT) are colored in
+   deep red, and positive potentials (>10 kT) are colored in deep blue.
+   The neutral surface potential regions are depicted in white. The
+   orientation of the molecule is the same as in Fig. [177]2.
+   [178]Previous Section[179]Next Section
+
+ §2§ CONCLUSIONS §2§
+
+   In the present study, we determined the three-dimensional structure of
+   PGI from B. stearothermophilus at 2.3-Å resolution by x-ray
+   crystallography. We also demonstrated by cell-migratory stimulation and
+   neurotrophic-activity experiments that PGI has AMF and NLK activities.
+   A putative substrate-binding site is proposed for further
+   investigation. Our x-ray studies implicate several residues as
+   important in the catalytic reaction. In addition, the structure
+   provides evidence to suggest that the top part of the large domain and
+   the protruding loop may participate in inducing neurotrophic activity
+   for PGI/NLK. However, many questions, such as how PGI exerts its effect
+   on nerve cells; how PGI performs its cell-motility activity; and how
+   PGI switches its enzymatic and biological functions, remain unanswered.
+   The complete high-resolution structure of PGI presented here offers a
+   starting point for further crystallographic, biochemical, genetic, and
+   neurobiological studies of PGI/NLK/AMF. The structure also provides a
+   framework for understanding the structure of other PGI/NLK/AMFs from
+   the same superfamily.
+   [180]Previous Section[181]Next Section
+
+ §2§ Acknowledgments §2§
+
+   We are grateful to Dr. M. F. Tam of the Institute of Molecular Biology,
+   Academia Sinica for helpful discussions. This work was supported in
+   part by National Science Council Grant NSC87-2311-B-001-025-B21 (to
+   C.-D.H.), Republic of China.
+   [182]Previous Section[183]Next Section
+
+ §2§ Footnotes §2§
+
+     * [184]&#x21b5; &#x2016; To whom reprint requests should be addressed.
+       e-mbhsiao{at}ccvax.sinica.edu.tw.
+     * This paper was submitted directly (Track II) to the Proceedings
+       Office.
+     * Data deposition: The atomic coordinates have been deposited in the
+       Protein Data Bank, Biology Department, Brookhaven National
+       Laboratory, Upton, NY 11973 (PDB ID code [185]2PGI).
+     * ABBREVIATIONS:
+
+        PGI,
+                phosphoglucose isomerase;
+
+        AMF,
+                autocrine motility factor;
+
+        NLK,
+                neuroleukin;
+
+        MF,
+                maturation factor;
+
+        EGF,
+                epidermal growth factor
+
+     * Copyright © 1999, The National Academy of Sciences
+
+   [186]Previous Section
+
+ §2§ References §2§
+
+    1. [187]&#x21b5;
+         1. Welch S G
+       (1971) Hum Hered 21:467–477, pmid:5169656.
+       [188]CrossRef[189]Medline
+    2. [190]&#x21b5;
+         1. Kugler W ,
+         2. Breme K ,
+         3. Laspe P ,
+         4. Muirhead H ,
+         5. Davies C ,
+         6. Winkler H ,
+         7. Schroter W ,
+         8. Lakomek M
+       (1998) Hum Genet 103:450–454, pmid:9856489.
+       [191]CrossRef[192]Medline[193]Web of Science
+    3. [194]&#x21b5;
+         1. Baumann M ,
+         2. Kappl A ,
+         3. Lang T ,
+         4. Brand K ,
+         5. Siegfried W ,
+         6. Paterok E
+       (1990) Cancer Invest 8:351–356, pmid:2207761.
+       [195]Medline[196]Web of Science
+    4. [197]&#x21b5;
+         1. Baumgart E ,
+         2. Fahimi H D ,
+         3. Stich A ,
+         4. Volkl A
+       (1996) J Biol Chem 271:3846–3855, pmid:8632003.
+       [198]Abstract/FREE Full Text
+    5. [199]&#x21b5;
+         1. Tor J ,
+         2. Segura R M ,
+         3. Pascual C ,
+         4. Vilaseca J ,
+         5. Guarner M L ,
+         6. Schwartz S
+       (1981) Med Clin (Barc) 77:236–239, pmid:7321637.
+       [200]Medline
+    6. [201]&#x21b5;
+         1. Tor J ,
+         2. Pascual C ,
+         3. Segura R M ,
+         4. Vilaseca J ,
+         5. Schwartz S
+       (1982) Rev Clin Esp 164:15–18, pmid:7071398.
+       [202]Medline
+    7. [203]&#x21b5;
+         1. Chaput M ,
+         2. Claes V ,
+         3. Portetelle D ,
+         4. Cludts I ,
+         5. Cravador A ,
+         6. Burny A ,
+         7. Gras H ,
+         8. Tartar A
+       (1988) Nature (London) 332:454–455, pmid:3352744.
+       [204]CrossRef[205]Medline
+    8. [206]&#x21b5;
+         1. Faik P ,
+         2. Walker J I ,
+         3. Redmill A A ,
+         4. Morgan M J
+       (1988) Nature (London) 332:455–457, pmid:3352745.
+       [207]CrossRef[208]Medline
+    9. [209]&#x21b5;
+         1. Mizrachi Y
+       (1989) J Neurosci Res 23:217–224, pmid:2547084.
+       [210]CrossRef[211]Medline[212]Web of Science
+   10. [213]&#x21b5;
+         1. Watanabe H ,
+         2. Takehana K ,
+         3. Date M ,
+         4. Shinozaki T ,
+         5. Raz A
+       (1996) Cancer Res 56:2960–2963, pmid:8674049.
+       [214]Abstract/FREE Full Text
+   11. [215]&#x21b5;
+         1. Niinaka Y ,
+         2. Paku S ,
+         3. Haga A ,
+         4. Watanabe H ,
+         5. Raz A
+       (1998) Cancer Res 58:2667–2674, pmid:9635595.
+       [216]Abstract/FREE Full Text
+   12. [217]&#x21b5;
+         1. Xu W ,
+         2. Seiter K ,
+         3. Feldman E ,
+         4. Ahmed T ,
+         5. Chiao J W
+       (1996) Blood 87:4502–4506, pmid:8639816.
+       [218]Abstract/FREE Full Text
+   13. [219]&#x21b5;
+         1. Gurney M E ,
+         2. Apatoff B R ,
+         3. Spear G T ,
+         4. Baumel M J ,
+         5. Antel J P ,
+         6. Bania M B ,
+         7. Reder A T
+       (1986) Science 234:574–581, pmid:3020690.
+       [220]Abstract/FREE Full Text
+   14. [221]&#x21b5;
+         1. Gurney M E
+       (1987) Immunol Rev 100:203–223, pmid:3326821.
+       [222]CrossRef[223]Medline
+   15. [224]&#x21b5;
+         1. Liotta L A ,
+         2. Mandler R ,
+         3. Murano G ,
+         4. Katz D A ,
+         5. Gordon R K ,
+         6. Chiang P K ,
+         7. Schiffmann E
+       (1986) Proc Natl Acad Sci USA 83:3302–3306, pmid:3085086.
+       [225]Abstract/FREE Full Text
+   16.
+         1. Nabi I R ,
+         2. Watanabe H ,
+         3. Raz A
+       (1990) Cancer Res 50:409–414, pmid:2153051.
+       [226]Abstract/FREE Full Text
+   17. [227]&#x21b5;
+         1. Watanabe H ,
+         2. Carmi P ,
+         3. Hogan V ,
+         4. Raz T ,
+         5. Silletti S ,
+         6. Nabi I R ,
+         7. Raz A
+       (1991) J Biol Chem 266:13442–13448, pmid:1649192.
+       [228]Abstract/FREE Full Text
+   18. [229]&#x21b5;
+         1. Thomas H ,
+         2. Balkwill F R
+       (1991) Pharmacol Ther 52:307–330, pmid:1726476.
+       [230]CrossRef[231]Medline
+   19. [232]&#x21b5;
+         1. Nabi I R ,
+         2. Watanabe H ,
+         3. Silletti S ,
+         4. Raz A
+       (1991) Experientia Suppl 59:163–177.
+   20.
+         1. Nabi I R ,
+         2. Watanabe H ,
+         3. Raz A
+       (1992) Cancer Metastasis Rev 11:5–20, pmid:1324804.
+       [233]CrossRef[234]Medline
+   21. [235]&#x21b5;
+         1. Silletti S ,
+         2. Yao J P ,
+         3. Pienta K J ,
+         4. Raz A
+       (1995) Int J Cancer 63:100–105, pmid:7558435.
+       [236]Medline
+   22. [237]&#x21b5;
+         1. Gracy R W ,
+         2. Tilley B E
+       (1975) Methods Enzymol 41:392–400, pmid:1128273.
+       [238]Medline
+   23. [239]&#x21b5;
+         1. Hsiao C D ,
+         2. Chou C C ,
+         3. Hsiao Y Y ,
+         4. Sun Y J ,
+         5. Meng M
+       (1997) J Struct Biol 120:196–200, pmid:9417984.
+       [240]CrossRef[241]Medline
+   24. [242]&#x21b5;
+         1. Otwinowski Z
+         1. Sawyer L ,
+         2. Isaacs N ,
+         3. Bailey S
+       (1993) in Proceedings of the CCP4 Study Weekend, eds Sawyer L ,
+       Isaacs N , Bailey S (Sci. Eng. Res. Counc. Warrington, UK), pp
+       56–62.
+   25. [243]&#x21b5;
+         1. Wang B-C
+       (1985) Methods Enzymol 115:90–112, pmid:4079800.
+       [244]Medline[245]Web of Science
+   26. [246]&#x21b5;
+         1. Cowtan K D
+       (1996) Acta Crystallogr D 52:43–48, pmid:15299724.
+       [247]CrossRef[248]Medline
+   27. [249]&#x21b5;
+         1. Brunger A T
+       (1992) x-plor 3.1, A System for Crystallography and NMR (Yale Univ.
+       New Haven, CT).
+   28. [250]&#x21b5;
+         1. Brunger A T
+       (1992) Nature (London) 355:472–475.
+       [251]CrossRef
+   29. [252]&#x21b5;
+         1. Ramakrishnan C ,
+         2. Ramachandran G N
+       (1965) Biophys J 5:909–933, pmid:5884016.
+   30. [253]&#x21b5;
+         1. Bernstein F C ,
+         2. Koetzle T F ,
+         3. Williams G J B ,
+         4. Meyer E F, Jr ,
+         5. Brice M D ,
+         6. Rodgers J R ,
+         7. Kennard O ,
+         8. Shimanouchi T ,
+         9. Tsaumi M
+       (1977) J Mol Biol 112:535–542, pmid:875032.
+       [254]Medline[255]Web of Science
+   31. [256]&#x21b5;
+         1. Lin M T ,
+         2. Wei S J ,
+         3. Wing L Y
+       (1992) Mol Cell Endocrinol 84:47–54, pmid:1379200.
+       [257]CrossRef[258]Medline
+   32. [259]&#x21b5;
+         1. Reynolds B A ,
+         2. Tetzlaff W ,
+         3. Weiss S
+       (1992) J Neurosci 12:4565–4574, pmid:1432110.
+       [260]Abstract
+   33. [261]&#x21b5;
+         1. Reynolds B A ,
+         2. Weiss S
+       (1992) Science 255:1707–1710, pmid:1553558.
+       [262]Abstract/FREE Full Text
+   34. [263]&#x21b5;
+         1. Shaw P J ,
+         2. Muirhead H
+       (1977) J Mol Biol 109:475–485, pmid:833853.
+       [264]CrossRef[265]Medline
+   35. [266]&#x21b5;
+         1. Achari A ,
+         2. Marshall S E ,
+         3. Muirhead H ,
+         4. Palmieri R H ,
+         5. Noltmann E A
+       (1981) Philos Trans R Soc London B 293:145–157, pmid:6115414.
+       [267]Medline
+   36. [268]&#x21b5;
+         1. Banner D W ,
+         2. Bloomer A C ,
+         3. Petsko G A ,
+         4. Phillips D C ,
+         5. Pogson C I ,
+         6. Wilson I A ,
+         7. Corran P H ,
+         8. Furth A J ,
+         9. Milman J D ,
+        10. Offord R E ,
+        11. et al.
+       (1975) Nature (London) 255:609–614, pmid:1134550.
+       [269]CrossRef[270]Medline
+   37. [271]&#x21b5;
+         1. Allen K N ,
+         2. Lavie A ,
+         3. Glasfeld A ,
+         4. Tanada T N ,
+         5. Gerrity D P ,
+         6. Carlson S C ,
+         7. Farber G K ,
+         8. Petsko G A ,
+         9. Ringe D
+       (1994) Biochemistry 33:1488–1494, pmid:7906142.
+       [272]CrossRef[273]Medline
+   38. [274]&#x21b5;
+         1. Lavie A ,
+         2. Allen K N ,
+         3. Petsko G A ,
+         4. Ringe D
+       (1994) Biochemistry 33:5469–5480, pmid:8180169.
+       [275]CrossRef[276]Medline
+   39. [277]&#x21b5;
+         1. Allen K N ,
+         2. Lavie A ,
+         3. Petsko G A ,
+         4. Ringe D
+       (1995) Biochemistry 34:3742–3749, pmid:7893671.
+       [278]Medline
+   40. [279]&#x21b5;
+         1. Farber G K ,
+         2. Glasfeld A ,
+         3. Tiraby G ,
+         4. Ringe D ,
+         5. Petsko G A
+       (1989) Biochemistry 28:7289–7297, pmid:2510821.
+       [280]CrossRef[281]Medline
+   41.
+         1. Lee C Y ,
+         2. Bagdasarian M ,
+         3. Meng M H ,
+         4. Zeikus J G
+       (1990) J Biol Chem 265:19082–19090, pmid:2229064.
+       [282]Abstract/FREE Full Text
+   42.
+         1. Collyer C A ,
+         2. Henrick K ,
+         3. Blow D M
+       (1990) J Mol Biol 212:211–235, pmid:2319597.
+       [283]CrossRef[284]Medline[285]Web of Science
+   43. [286]&#x21b5;
+         1. Collyer C A ,
+         2. Blow D M
+       (1990) Proc Natl Acad Sci USA 87:1362–1366, pmid:2304904.
+       [287]Abstract/FREE Full Text
+   44. [288]&#x21b5;
+         1. Albery W J ,
+         2. Knowles J R
+       (1976) Biochemistry 15:5627–5631, pmid:999838.
+       [289]CrossRef[290]Medline
+   45. [291]&#x21b5;
+         1. Mo Y ,
+         2. Young C D ,
+         3. Gracy R W
+       (1975) J Biol Chem 250:6747–6755, pmid:1158881.
+       [292]Abstract/FREE Full Text
+   46.
+         1. Muramatsu N ,
+         2. Noso Y
+       (1971) Arch Biochem Biophys 144:245–252, pmid:5117529.
+       [293]CrossRef[294]Medline
+   47. [295]&#x21b5;
+         1. Meng M ,
+         2. Chen Y-T ,
+         3. Hsiao Y-Y ,
+         4. Itoh Y ,
+         5. Bagdasarian M
+       (1998) Eur J Biochem 257:500–505, pmid:9826199.
+       [296]Medline
+   48. [297]&#x21b5;
+         1. Bairoch A ,
+         2. Bucher P ,
+         3. Hofmann K
+       (1996) Nucleic Acids Res 24:189–196, pmid:8594577.
+       [298]Abstract/FREE Full Text
+   49. [299]&#x21b5;
+         1. Dyson J E ,
+         2. Noltmann E A
+       (1968) J Biol Chem 243:1401–1414, pmid:5647261.
+       [300]Abstract/FREE Full Text
+   50. [301]&#x21b5;
+         1. Schray K J ,
+         2. Benkovic S J ,
+         3. Benkovic P A ,
+         4. Rose I A
+       (1973) J Biol Chem 248:2219–2224, pmid:4570471.
+       [302]Abstract/FREE Full Text
+   51. [303]&#x21b5;
+         1. Gibson D R ,
+         2. Gracy R W ,
+         3. Hartman F C
+       (1980) J Biol Chem 255:9369–9374, pmid:7410429.
+       [304]Abstract/FREE Full Text
+   52. [305]&#x21b5;
+         1. Schnackerz K D ,
+         2. Noltmann E A
+       (1971) Biochemistry 10:4837–4843, pmid:5134532.
+       [306]Medline
+   53. [307]&#x21b5;
+         1. O’Connell E L ,
+         2. Rose I A
+       (1973) J Biol Chem 248:2225–2231, pmid:4570472.
+       [308]Abstract/FREE Full Text
+   54. [309]&#x21b5;
+         1. Riordan J F ,
+         2. McElvany K D ,
+         3. Borders C L, Jr
+       (1977) Science 195:884–886, pmid:190679.
+       [310]Abstract/FREE Full Text
+   55. [311]&#x21b5;
+         1. Li L ,
+         2. Lin K ,
+         3. Kurland I J ,
+         4. Correia J J ,
+         5. Pilkis S J
+       (1992) J Biol Chem 267:4386–4393, pmid:1311308.
+       [312]Abstract/FREE Full Text
+   56. [313]&#x21b5;
+         1. Tsujikawa T ,
+         2. Watanabe F ,
+         3. Uyeda K
+       (1995) Biochemistry 34:6389–6393, pmid:7756268.
+       [314]Medline
+   57. [315]&#x21b5;
+         1. Lorek A ,
+         2. Wilson K S ,
+         3. Sansom M S ,
+         4. Stuart D I ,
+         5. Stura E A ,
+         6. Jenkins J A ,
+         7. Zanotti G ,
+         8. Hajdu J ,
+         9. Johnson L N
+       (1984) Biochem J 218:45–60, pmid:6424657.
+       [316]Medline[317]Web of Science
+   58. [318]&#x21b5;
+         1. Schinzel R ,
+         2. Drueckes P
+       (1991) FEBS Lett 286:125–128, pmid:1830850.
+       [319]Medline
+   59. [320]&#x21b5;
+         1. Barford D ,
+         2. Flint A J ,
+         3. Tonks N K
+       (1994) Science 263:1397–1404, pmid:8128219.
+       [321]Abstract/FREE Full Text
+   60. [322]&#x21b5;
+         1. Zhang L ,
+         2. Lee E Y
+       (1997) Biochemistry 36:8209–8214, pmid:9204865.
+       [323]CrossRef[324]Medline
+   61. [325]&#x21b5;
+         1. Baumann M ,
+         2. Brand K
+       (1988) Cancer Res 48:7018–7021, pmid:3191476.
+       [326]Web of Science
+   62. [327]&#x21b5;
+         1. Gurney M E ,
+         2. Heinrich S P ,
+         3. Lee M R ,
+         4. Yin H S
+       (1986) Science 234:566–574, pmid:3764429.
+       [328]Abstract/FREE Full Text
+   63. [329]&#x21b5;
+         1. Nicholls A ,
+         2. Sharp K A ,
+         3. Honig B
+       (1991) Proteins 11:281–296, pmid:1758883.
+       [330]CrossRef[331]Medline[332]Web of Science
+   64. [333]&#x21b5;
+         1. Kraulis P J
+       (1991) J Appl Crystallogr 24:946–950.
+       [334]CrossRef
+   65. [335]&#x21b5;
+         1. Merritt E A ,
+         2. Murphy M E P
+       (1994) Acta Crystallogr D 50:869–873, pmid:15299354.
+       [336]CrossRef[337]Medline
+
+     * [338]Add to CiteULike CiteULike
+     * [339]Add to Complore Complore
+     * [340]Add to Connotea Connotea
+     * [341]Add to Del.icio.us Del.icio.us
+     * [342]Add to Digg Digg
+     * [343]Add to Facebook Facebook
+     * [344]Add to Twitter Twitter
+
+   [345]What's this?
+   [346]« Previous | [347]Next Article »[348]Table of Contents
+
+ §3§ This Article §3§
+
+    1. PNAS May 11, 1999 vol. 96 no. 10 5412-5417
+
+    1. [349]AbstractFree
+    2. [350]Figures Only
+    3. » Full Text
+    4. [351]Full Text (PDF)
+
+ §4§ Classifications §4§
+
+    1.
+          + Biological Sciences
+               o [352]Biochemistry
+
+ §4§ Services §4§
+
+    1. [353]Email this article to a colleague
+    2. [354]Alert me when this article is cited
+    3. [355]Alert me if a correction is posted
+    4. [356]Similar articles in this journal
+    5. [357]Similar articles in ISI
+    6. [358]Similar articles in PubMed
+    7. [359]Add to My File Cabinet
+    8. [360]Download to citation manager
+    9. [361]Request copyright permission
+
+ §4§ Citing Articles §4§
+
+    1. [362]Load citing article information
+    2. [363]Citing articles via CrossRef
+    3. [364]Citing articles via Web of Science
+    4. [365]Articles citing this article
+
+ §4§ Google Scholar §4§
+
+    1. [366]Articles by Sun, Y.
+    2. [367]Articles by Hsiao, C.
+    3. [368]Search for related content
+
+ §4§ PubMed §4§
+
+    1. [369]PubMed citation
+    2. [370]Articles by Sun, Y.
+    3. [371]Articles by Hsiao, C.
+    4.
+
+ §4§ Related Content §4§
+
+    1. [372]Load related web page information
+
+ §4§ Social Bookmarking §4§
+
+    1.
+          + [373]Add to CiteULike CiteULike
+          + [374]Add to Complore Complore
+          + [375]Add to Connotea Connotea
+          + [376]Add to Del.icio.us Del.icio.us
+          + [377]Add to Digg Digg
+          + [378]Add to Facebook Facebook
+          + [379]Add to Twitter Twitter
+       [380]What's this?
+
+ §3§ Navigate This Article §3§
+
+    1. [381]Top
+    2. [382]Abstract
+    3. [383]MATERIALS AND METHODS
+    4. [384]RESULTS AND DISCUSSION
+    5. [385]CONCLUSIONS
+    6. [386]Acknowledgments
+    7. [387]Footnotes
+    8. [388]References
+
+   Search PNAS ____________________ GO
+   [389]Link: Advanced Search
+
+ §3§ This Week's Issue §3§
+
+    1. [390]September 14, 2010, 107 (37)
+
+    1. [391]Current Issue
+
+ §4§ From the Cover §4§
+
+     * [392]Eyeing neural circuits in Drosophila
+     * [393]Optimizing live cell imaging
+     * [394]Public perceptions of energy use
+     * [395]Activating DNA mismatch repair
+     * [396]Evolution of collective migration
+
+    1. [397]Alert me to new issues of PNAS
+
+     * [398]Early Edition
+     * [399]Archives
+     * [400]Online Submission
+
+     * [401]Feature Articles
+       (Expanded research articles of exceptional breadth)
+     * [402]Commentaries
+       (Expert commentary on leading research)
+     * [403]Letters
+       (Online-only letters to the editor)
+     * [404]Inaugural Articles
+       (Articles by recently elected NAS members)
+     * [405]PNAS Profiles
+       (Biographical profiles of Academy members)
+     * [406]Sustainability Science
+       (Interactions of human and environmental systems)
+     * [407]Collected Papers
+       (Editorials, Perspectives, Reviews, Colloquia, etc.)
+     * [408]Special Features
+       (Solicited articles on exceptional research topics)
+     * [409]Sackler Colloquia
+       (Scientific reports held under NAS auspices)
+     * [410]Podcasts
+       Brief podcasts with leading scientists
+
+ §3§ Most §3§
+
+     *  §4§ Read §4§
+         1. [411]Molecular origins of fluorocarbon hydrophobicity
+         2. [412]Public perceptions of energy consumption and savings
+         3. [413]Detection of MLV-related virus gene sequences in blood of
+            patients with chronic fatigue syndrome and healthy blood
+            donors
+         4. [414]Inaugural Article: The Lucretian swerve: The biological
+            basis of human behavior and the criminal justice system
+         5. [415]The most influential journals: Impact Factor and
+            Eigenfactor
+       [416]» View all Most Read articles
+     *  §4§ Cited §4§
+         1. [417]DNA Sequencing with Chain-Terminating Inhibitors
+         2. [418]Electrophoretic Transfer of Proteins from Polyacrylamide
+            Gels to Nitrocellulose Sheets: Procedure and Some Applications
+         3. [419]Cluster analysis and display of genome-wide expression
+            patterns
+         4. [420]Significance analysis of microarrays applied to the
+            ionizing radiation response
+         5. [421]One-step inactivation of chromosomal genes in Escherichia
+            coli K-12 using PCR products
+       [422]» View all Most Cited articles
+
+     * [423]Current Issue
+     * [424]Archives
+     * [425]Online Submission
+     * [426]Info for Authors
+     * [427]Editorial Board
+     * [428]About
+
+     * [429]Subscribe
+     * [430]Advertise
+     * [431]Contact
+     * [432]Site Map
+
+   [433]Copyright ©2010 by the National Academy of Sciences
+
+References
+
+   Visible links
+   1. http://www.pnas.org/
+   2. http://www.pnas.org/
+   3. file://localhost/dev/paper.html#content-block
+   4. http://www.pnas.org/misc/iforc.shtml
+   5. http://www.pnas.org/misc/masthead.shtml
+   6. http://www.pnas.org/misc/about.shtml
+   7. http://www.pnas.org/subscriptions
+   8. http://www.pnas.org/misc/about.shtml#advertising
+   9. http://www.pnas.org/site/misc/contact.shtml
+  10. http://www.pnas.org/cgi/feedback
+  11. http://www.pnas.org/misc/sitemap.shtml
+  12. http://www.pnas.org/cgi/adclick/?ad=25172&adclick=true&url=http%3A%2F%2Fwww.polyplus-transfection.com%2Ftransfection-reagents%2Fsirna-transfection-interferin%2F
+  13. http://www.pnas.org/cgi/adclick/?ad=21636&adclick=true&url=http%3A%2F%2Fwww.pnas.org%2Fcgi%2Falerts%2Fetoc
+  14. http://www.pnas.org/cgi/adclick/?ad=19262&adclick=true&url=http%3A%2F%2Fwww.pnas.org%2Fmisc%2Fpodcasts.shtml
+  15. http://www.pnas.org/login?uri=http%3A%2F%2Fwww.pnas.org%2Fcontent%2F96%2F10%2F5412.long
+  16. http://www.pnas.org/search?author1=Yuh-Ju+Sun&sortspec=date&submit=Submit
+  17. file://localhost/dev/paper.html#aff-1
+  18. http://www.pnas.org/search?author1=Chia-Cheng+Chou&sortspec=date&submit=Submit
+  19. file://localhost/dev/paper.html#aff-1
+  20. file://localhost/dev/paper.html#aff-1
+  21. http://www.pnas.org/search?author1=Wei-Shone+Chen&sortspec=date&submit=Submit
+  22. file://localhost/dev/paper.html#aff-1
+  23. http://www.pnas.org/search?author1=Rong-Tsun+Wu&sortspec=date&submit=Submit
+  24. file://localhost/dev/paper.html#aff-1
+  25. http://www.pnas.org/search?author1=Menghsiao+Meng&sortspec=date&submit=Submit
+  26. file://localhost/dev/paper.html#aff-1
+  27. http://www.pnas.org/search?author1=Chwan-Deng+Hsiao&sortspec=date&submit=Submit
+  28. file://localhost/dev/paper.html#aff-1
+  29. file://localhost/dev/paper.html#fn-1
+  30. file://localhost/dev/paper.html#sec-1
+  31. pending:yes
+  32. file://localhost/dev/paper.html#ref-1
+  33. file://localhost/dev/paper.html#ref-2
+  34. file://localhost/dev/paper.html#ref-3
+  35. file://localhost/dev/paper.html#ref-4
+  36. file://localhost/dev/paper.html#ref-5
+  37. file://localhost/dev/paper.html#ref-6
+  38. file://localhost/dev/paper.html#ref-7
+  39. file://localhost/dev/paper.html#ref-9
+  40. file://localhost/dev/paper.html#ref-10
+  41. file://localhost/dev/paper.html#ref-11
+  42. file://localhost/dev/paper.html#ref-11
+  43. file://localhost/dev/paper.html#ref-12
+  44. file://localhost/dev/paper.html#ref-8
+  45. file://localhost/dev/paper.html#ref-7
+  46. file://localhost/dev/paper.html#ref-13
+  47. file://localhost/dev/paper.html#ref-14
+  48. file://localhost/dev/paper.html#ref-9
+  49. file://localhost/dev/paper.html#ref-9
+  50. file://localhost/dev/paper.html#ref-10
+  51. file://localhost/dev/paper.html#ref-15
+  52. file://localhost/dev/paper.html#ref-17
+  53. file://localhost/dev/paper.html#ref-18
+  54. file://localhost/dev/paper.html#ref-10
+  55. file://localhost/dev/paper.html#ref-15
+  56. file://localhost/dev/paper.html#ref-19
+  57. file://localhost/dev/paper.html#ref-21
+  58. file://localhost/dev/paper.html#ref-17
+  59. file://localhost/dev/paper.html#ref-10
+  60. file://localhost/dev/paper.html#ref-22
+  61. file://localhost/dev/paper.html#ref-10
+  62. file://localhost/dev/paper.html#ref-12
+  63. file://localhost/dev/paper.html#ref-12
+  64. file://localhost/dev/paper.html#ref-12
+  65. file://localhost/dev/paper.html#ref-23
+  66. file://localhost/dev/paper.html#abstract-1
+  67. file://localhost/dev/paper.html#sec-5
+  68. file://localhost/dev/paper.html#ref-23
+  69. file://localhost/dev/paper.html#ref-24
+  70. file://localhost/dev/paper.html#T1
+  71. http://www.pnas.org/content/96/10/5412/T1.expansion.html
+  72. http://www.pnas.org/content/96/10/5412/T1.expansion.html
+  73. file://localhost/dev/paper.html#ref-24
+  74. file://localhost/dev/paper.html#ref-25
+  75. file://localhost/dev/paper.html#ref-26
+  76. file://localhost/dev/paper.html#ref-27
+  77. file://localhost/dev/paper.html#F1
+  78. file://localhost/dev/paper.html#ref-28
+  79. file://localhost/dev/paper.html#ref-29
+  80. file://localhost/dev/paper.html#ref-30
+  81. http://www.pnas.org/external-ref?link_type=PDB&access_num=2PGI
+  82. http://www.pnas.org/content/96/10/5412/F1.expansion.html
+  83. http://www.pnas.org/content/96/10/5412/F1.expansion.html
+  84. http://www.pnas.org/content/96/10/5412/F1.expansion.html
+  85. http://www.pnas.org/powerpoint/96/10/5412/F1
+  86. file://localhost/dev/paper.html#ref-31
+  87. file://localhost/dev/paper.html#ref-32
+  88. file://localhost/dev/paper.html#ref-33
+  89. file://localhost/dev/paper.html#sec-1
+  90. file://localhost/dev/paper.html#sec-11
+  91. file://localhost/dev/paper.html#F2
+  92. http://www.pnas.org/content/96/10/5412/F2.expansion.html
+  93. http://www.pnas.org/content/96/10/5412/F2.expansion.html
+  94. http://www.pnas.org/content/96/10/5412/F2.expansion.html
+  95. http://www.pnas.org/powerpoint/96/10/5412/F2
+  96. file://localhost/dev/paper.html#ref-64
+  97. file://localhost/dev/paper.html#ref-65
+  98. file://localhost/dev/paper.html#F2
+  99. file://localhost/dev/paper.html#ref-34
+ 100. file://localhost/dev/paper.html#ref-35
+ 101. file://localhost/dev/paper.html#ref-36
+ 102. file://localhost/dev/paper.html#ref-37
+ 103. file://localhost/dev/paper.html#ref-39
+ 104. file://localhost/dev/paper.html#ref-36
+ 105. file://localhost/dev/paper.html#ref-40
+ 106. file://localhost/dev/paper.html#ref-43
+ 107. file://localhost/dev/paper.html#ref-38
+ 108. file://localhost/dev/paper.html#ref-44
+ 109. file://localhost/dev/paper.html#ref-10
+ 110. file://localhost/dev/paper.html#ref-17
+ 111. file://localhost/dev/paper.html#F3
+ 112. file://localhost/dev/paper.html#F3
+ 113. file://localhost/dev/paper.html#F3
+ 114. file://localhost/dev/paper.html#ref-10
+ 115. http://www.pnas.org/content/96/10/5412/F3.expansion.html
+ 116. http://www.pnas.org/content/96/10/5412/F3.expansion.html
+ 117. http://www.pnas.org/content/96/10/5412/F3.expansion.html
+ 118. http://www.pnas.org/powerpoint/96/10/5412/F3
+ 119. file://localhost/dev/paper.html#ref-10
+ 120. file://localhost/dev/paper.html#ref-35
+ 121. file://localhost/dev/paper.html#ref-45
+ 122. file://localhost/dev/paper.html#ref-47
+ 123. file://localhost/dev/paper.html#F4
+ 124. file://localhost/dev/paper.html#ref-48
+ 125. http://www.pnas.org/content/96/10/5412/F4.expansion.html
+ 126. http://www.pnas.org/content/96/10/5412/F4.expansion.html
+ 127. http://www.pnas.org/content/96/10/5412/F4.expansion.html
+ 128. http://www.pnas.org/powerpoint/96/10/5412/F4
+ 129. file://localhost/dev/paper.html#ref-49
+ 130. file://localhost/dev/paper.html#ref-50
+ 131. file://localhost/dev/paper.html#ref-51
+ 132. file://localhost/dev/paper.html#ref-52
+ 133. file://localhost/dev/paper.html#ref-53
+ 134. file://localhost/dev/paper.html#ref-54
+ 135. file://localhost/dev/paper.html#ref-47
+ 136. file://localhost/dev/paper.html#ref-34
+ 137. file://localhost/dev/paper.html#ref-35
+ 138. file://localhost/dev/paper.html#ref-2
+ 139. file://localhost/dev/paper.html#ref-2
+ 140. file://localhost/dev/paper.html#ref-55
+ 141. file://localhost/dev/paper.html#ref-56
+ 142. file://localhost/dev/paper.html#ref-57
+ 143. file://localhost/dev/paper.html#ref-58
+ 144. file://localhost/dev/paper.html#ref-59
+ 145. file://localhost/dev/paper.html#ref-60
+ 146. file://localhost/dev/paper.html#F5
+ 147. http://www.pnas.org/content/96/10/5412/F5.expansion.html
+ 148. http://www.pnas.org/content/96/10/5412/F5.expansion.html
+ 149. http://www.pnas.org/content/96/10/5412/F5.expansion.html
+ 150. http://www.pnas.org/powerpoint/96/10/5412/F5
+ 151. file://localhost/dev/paper.html#ref-64
+ 152. file://localhost/dev/paper.html#ref-65
+ 153. file://localhost/dev/paper.html#F4
+ 154. file://localhost/dev/paper.html#ref-7
+ 155. file://localhost/dev/paper.html#ref-8
+ 156. file://localhost/dev/paper.html#ref-10
+ 157. file://localhost/dev/paper.html#ref-61
+ 158. file://localhost/dev/paper.html#ref-8
+ 159. file://localhost/dev/paper.html#ref-32
+ 160. file://localhost/dev/paper.html#ref-33
+ 161. file://localhost/dev/paper.html#F6
+ 162. file://localhost/dev/paper.html#F6
+ 163. file://localhost/dev/paper.html#ref-62
+ 164. file://localhost/dev/paper.html#ref-9
+ 165. http://www.pnas.org/content/96/10/5412/F6.expansion.html
+ 166. http://www.pnas.org/content/96/10/5412/F6.expansion.html
+ 167. http://www.pnas.org/content/96/10/5412/F6.expansion.html
+ 168. http://www.pnas.org/powerpoint/96/10/5412/F6
+ 169. file://localhost/dev/paper.html#F7
+ 170. file://localhost/dev/paper.html#ref-63
+ 171. file://localhost/dev/paper.html#ref-9
+ 172. http://www.pnas.org/content/96/10/5412/F7.expansion.html
+ 173. http://www.pnas.org/content/96/10/5412/F7.expansion.html
+ 174. http://www.pnas.org/content/96/10/5412/F7.expansion.html
+ 175. http://www.pnas.org/powerpoint/96/10/5412/F7
+ 176. file://localhost/dev/paper.html#ref-63
+ 177. file://localhost/dev/paper.html#F2
+ 178. file://localhost/dev/paper.html#sec-5
+ 179. file://localhost/dev/paper.html#ack-1
+ 180. file://localhost/dev/paper.html#sec-11
+ 181. file://localhost/dev/paper.html#fn-group-1
+ 182. file://localhost/dev/paper.html#ack-1
+ 183. file://localhost/dev/paper.html#ref-list-1
+ 184. file://localhost/dev/paper.html#xref-fn-1-1
+ 185. http://www.pnas.org/external-ref?link_type=PDB&access_num=2PGI
+ 186. file://localhost/dev/paper.html#fn-group-1
+ 187. file://localhost/dev/paper.html#xref-ref-1-1
+ 188. http://www.pnas.org/external-ref?access_num=10.1159/000084151&link_type=DOI
+ 189. http://www.pnas.org/external-ref?access_num=5169656&link_type=MED
+ 190. file://localhost/dev/paper.html#xref-ref-2-1
+ 191. http://www.pnas.org/external-ref?access_num=10.1007/s004390050849&link_type=DOI
+ 192. http://www.pnas.org/external-ref?access_num=9856489&link_type=MED
+ 193. http://www.pnas.org/external-ref?access_num=000077297400014&link_type=ISI
+ 194. file://localhost/dev/paper.html#xref-ref-3-1
+ 195. http://www.pnas.org/external-ref?access_num=2207761&link_type=MED
+ 196. http://www.pnas.org/external-ref?access_num=A1990ED25100006&link_type=ISI
+ 197. file://localhost/dev/paper.html#xref-ref-4-1
+ 198. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=jbc&resid=271/7/3846
+ 199. file://localhost/dev/paper.html#xref-ref-5-1
+ 200. http://www.pnas.org/external-ref?access_num=7321637&link_type=MED
+ 201. file://localhost/dev/paper.html#xref-ref-6-1
+ 202. http://www.pnas.org/external-ref?access_num=7071398&link_type=MED
+ 203. file://localhost/dev/paper.html#xref-ref-7-1
+ 204. http://www.pnas.org/external-ref?access_num=10.1038/332454a0&link_type=DOI
+ 205. http://www.pnas.org/external-ref?access_num=3352744&link_type=MED
+ 206. file://localhost/dev/paper.html#xref-ref-8-1
+ 207. http://www.pnas.org/external-ref?access_num=10.1038/332455a0&link_type=DOI
+ 208. http://www.pnas.org/external-ref?access_num=3352745&link_type=MED
+ 209. file://localhost/dev/paper.html#xref-ref-9-1
+ 210. http://www.pnas.org/external-ref?access_num=10.1002/jnr.490230212&link_type=DOI
+ 211. http://www.pnas.org/external-ref?access_num=2547084&link_type=MED
+ 212. http://www.pnas.org/external-ref?access_num=A1989AC60300011&link_type=ISI
+ 213. file://localhost/dev/paper.html#xref-ref-10-1
+ 214. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=canres&resid=56/13/2960
+ 215. file://localhost/dev/paper.html#xref-ref-11-1
+ 216. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=canres&resid=58/12/2667
+ 217. file://localhost/dev/paper.html#xref-ref-12-1
+ 218. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=bloodjournal&resid=87/11/4502
+ 219. file://localhost/dev/paper.html#xref-ref-13-1
+ 220. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=sci&resid=234/4776/574
+ 221. file://localhost/dev/paper.html#xref-ref-14-1
+ 222. http://www.pnas.org/external-ref?access_num=10.1111/j.1600-065X.1987.tb00533.x&link_type=DOI
+ 223. http://www.pnas.org/external-ref?access_num=3326821&link_type=MED
+ 224. file://localhost/dev/paper.html#xref-ref-15-1
+ 225. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=pnas&resid=83/10/3302
+ 226. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=canres&resid=50/2/409
+ 227. file://localhost/dev/paper.html#xref-ref-17-1
+ 228. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=jbc&resid=266/20/13442
+ 229. file://localhost/dev/paper.html#xref-ref-18-1
+ 230. http://www.pnas.org/external-ref?access_num=10.1016/0163-7258(91)90030-P&link_type=DOI
+ 231. http://www.pnas.org/external-ref?access_num=1726476&link_type=MED
+ 232. file://localhost/dev/paper.html#xref-ref-19-1
+ 233. http://www.pnas.org/external-ref?access_num=10.1007/BF00047599&link_type=DOI
+ 234. http://www.pnas.org/external-ref?access_num=1324804&link_type=MED
+ 235. file://localhost/dev/paper.html#xref-ref-21-1
+ 236. http://www.pnas.org/external-ref?access_num=7558435&link_type=MED
+ 237. file://localhost/dev/paper.html#xref-ref-22-1
+ 238. http://www.pnas.org/external-ref?access_num=1128273&link_type=MED
+ 239. file://localhost/dev/paper.html#xref-ref-23-1
+ 240. http://www.pnas.org/external-ref?access_num=10.1006/jsbi.1997.3913&link_type=DOI
+ 241. http://www.pnas.org/external-ref?access_num=9417984&link_type=MED
+ 242. file://localhost/dev/paper.html#xref-ref-24-1
+ 243. file://localhost/dev/paper.html#xref-ref-25-1
+ 244. http://www.pnas.org/external-ref?access_num=4079800&link_type=MED
+ 245. http://www.pnas.org/external-ref?access_num=A1985AVT3900008&link_type=ISI
+ 246. file://localhost/dev/paper.html#xref-ref-26-1
+ 247. http://www.pnas.org/external-ref?access_num=10.1107/S090744499500761X&link_type=DOI
+ 248. http://www.pnas.org/external-ref?access_num=15299724&link_type=MED
+ 249. file://localhost/dev/paper.html#xref-ref-27-1
+ 250. file://localhost/dev/paper.html#xref-ref-28-1
+ 251. http://www.pnas.org/external-ref?access_num=10.1038/355472a0&link_type=DOI
+ 252. file://localhost/dev/paper.html#xref-ref-29-1
+ 253. file://localhost/dev/paper.html#xref-ref-30-1
+ 254. http://www.pnas.org/external-ref?access_num=875032&link_type=MED
+ 255. http://www.pnas.org/external-ref?access_num=A1977DK67100014&link_type=ISI
+ 256. file://localhost/dev/paper.html#xref-ref-31-1
+ 257. http://www.pnas.org/external-ref?access_num=10.1016/0303-7207(92)90070-M&link_type=DOI
+ 258. http://www.pnas.org/external-ref?access_num=1379200&link_type=MED
+ 259. file://localhost/dev/paper.html#xref-ref-32-1
+ 260. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=jneuro&resid=12/11/4565
+ 261. file://localhost/dev/paper.html#xref-ref-33-1
+ 262. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=sci&resid=255/5052/1707
+ 263. file://localhost/dev/paper.html#xref-ref-34-1
+ 264. http://www.pnas.org/external-ref?access_num=10.1016/S0022-2836(77)80025-9&link_type=DOI
+ 265. http://www.pnas.org/external-ref?access_num=833853&link_type=MED
+ 266. file://localhost/dev/paper.html#xref-ref-35-1
+ 267. http://www.pnas.org/external-ref?access_num=6115414&link_type=MED
+ 268. file://localhost/dev/paper.html#xref-ref-36-1
+ 269. http://www.pnas.org/external-ref?access_num=10.1038/255609a0&link_type=DOI
+ 270. http://www.pnas.org/external-ref?access_num=1134550&link_type=MED
+ 271. file://localhost/dev/paper.html#xref-ref-37-1
+ 272. http://www.pnas.org/external-ref?access_num=10.1021/bi00172a027&link_type=DOI
+ 273. http://www.pnas.org/external-ref?access_num=7906142&link_type=MED
+ 274. file://localhost/dev/paper.html#xref-ref-38-1
+ 275. http://www.pnas.org/external-ref?access_num=10.1021/bi00184a016&link_type=DOI
+ 276. http://www.pnas.org/external-ref?access_num=8180169&link_type=MED
+ 277. file://localhost/dev/paper.html#xref-ref-39-1
+ 278. http://www.pnas.org/external-ref?access_num=7893671&link_type=MED
+ 279. file://localhost/dev/paper.html#xref-ref-40-1
+ 280. http://www.pnas.org/external-ref?access_num=10.1021/bi00444a022&link_type=DOI
+ 281. http://www.pnas.org/external-ref?access_num=2510821&link_type=MED
+ 282. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=jbc&resid=265/31/19082
+ 283. http://www.pnas.org/external-ref?access_num=10.1016/0022-2836(90)90316-E&link_type=DOI
+ 284. http://www.pnas.org/external-ref?access_num=2319597&link_type=MED
+ 285. http://www.pnas.org/external-ref?access_num=A1990CV28600021&link_type=ISI
+ 286. file://localhost/dev/paper.html#xref-ref-43-1
+ 287. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=pnas&resid=87/4/1362
+ 288. file://localhost/dev/paper.html#xref-ref-44-1
+ 289. http://www.pnas.org/external-ref?access_num=10.1021/bi00670a031&link_type=DOI
+ 290. http://www.pnas.org/external-ref?access_num=999838&link_type=MED
+ 291. file://localhost/dev/paper.html#xref-ref-45-1
+ 292. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=jbc&resid=250/17/6747
+ 293. http://www.pnas.org/external-ref?access_num=10.1016/0003-9861(71)90475-9&link_type=DOI
+ 294. http://www.pnas.org/external-ref?access_num=5117529&link_type=MED
+ 295. file://localhost/dev/paper.html#xref-ref-47-1
+ 296. http://www.pnas.org/external-ref?access_num=9826199&link_type=MED
+ 297. file://localhost/dev/paper.html#xref-ref-48-1
+ 298. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=nar&resid=24/1/189
+ 299. file://localhost/dev/paper.html#xref-ref-49-1
+ 300. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=jbc&resid=243/7/1401
+ 301. file://localhost/dev/paper.html#xref-ref-50-1
+ 302. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=jbc&resid=248/6/2219
+ 303. file://localhost/dev/paper.html#xref-ref-51-1
+ 304. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=jbc&resid=255/19/9369
+ 305. file://localhost/dev/paper.html#xref-ref-52-1
+ 306. http://www.pnas.org/external-ref?access_num=5134532&link_type=MED
+ 307. file://localhost/dev/paper.html#xref-ref-53-1
+ 308. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=jbc&resid=248/6/2225
+ 309. file://localhost/dev/paper.html#xref-ref-54-1
+ 310. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=sci&resid=195/4281/884
+ 311. file://localhost/dev/paper.html#xref-ref-55-1
+ 312. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=jbc&resid=267/7/4386
+ 313. file://localhost/dev/paper.html#xref-ref-56-1
+ 314. http://www.pnas.org/external-ref?access_num=7756268&link_type=MED
+ 315. file://localhost/dev/paper.html#xref-ref-57-1
+ 316. http://www.pnas.org/external-ref?access_num=6424657&link_type=MED
+ 317. http://www.pnas.org/external-ref?access_num=A1984SD69700006&link_type=ISI
+ 318. file://localhost/dev/paper.html#xref-ref-58-1
+ 319. http://www.pnas.org/external-ref?access_num=1830850&link_type=MED
+ 320. file://localhost/dev/paper.html#xref-ref-59-1
+ 321. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=sci&resid=263/5152/1397
+ 322. file://localhost/dev/paper.html#xref-ref-60-1
+ 323. http://www.pnas.org/external-ref?access_num=10.1021/bi9704865&link_type=DOI
+ 324. http://www.pnas.org/external-ref?access_num=9204865&link_type=MED
+ 325. file://localhost/dev/paper.html#xref-ref-61-1
+ 326. http://www.pnas.org/external-ref?access_num=A1988R284600008&link_type=ISI
+ 327. file://localhost/dev/paper.html#xref-ref-62-1
+ 328. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=sci&resid=234/4776/566
+ 329. file://localhost/dev/paper.html#xref-ref-63-1
+ 330. http://www.pnas.org/external-ref?access_num=10.1002/prot.340110407&link_type=DOI
+ 331. http://www.pnas.org/external-ref?access_num=1758883&link_type=MED
+ 332. http://www.pnas.org/external-ref?access_num=A1991GV03200006&link_type=ISI
+ 333. file://localhost/dev/paper.html#xref-ref-64-1
+ 334. http://www.pnas.org/external-ref?access_num=10.1107/S0021889891004399&link_type=DOI
+ 335. file://localhost/dev/paper.html#xref-ref-65-1
+ 336. http://www.pnas.org/external-ref?access_num=10.1107/S0907444994006396&link_type=DOI
+ 337. http://www.pnas.org/external-ref?access_num=15299354&link_type=MED
+ 338. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/96/10/5412&title=The%20crystal%20structure%20of%20a%20multifunctional%20protein%3A%20Phosphoglucose%20isomerase%2Fautocrine%20motility%20factor%2Fneuroleukin+--+Sun%20et%20al.%2096%20%2810%29%3A%205412+--+PNAS&doi=&link_type=CITEULIKE
+ 339. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/96/10/5412&title=The%20crystal%20structure%20of%20a%20multifunctional%20protein%3A%20Phosphoglucose%20isomerase%2Fautocrine%20motility%20factor%2Fneuroleukin+--+Sun%20et%20al.%2096%20%2810%29%3A%205412+--+PNAS&doi=&link_type=COMPLORE
+ 340. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/96/10/5412&title=The%20crystal%20structure%20of%20a%20multifunctional%20protein%3A%20Phosphoglucose%20isomerase%2Fautocrine%20motility%20factor%2Fneuroleukin+--+Sun%20et%20al.%2096%20%2810%29%3A%205412+--+PNAS&doi=&link_type=CONNOTEA
+ 341. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/96/10/5412&title=The%20crystal%20structure%20of%20a%20multifunctional%20protein%3A%20Phosphoglucose%20isomerase%2Fautocrine%20motility%20factor%2Fneuroleukin+--+Sun%20et%20al.%2096%20%2810%29%3A%205412+--+PNAS&doi=&link_type=DEL_ICIO_US
+ 342. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/96/10/5412&title=The%20crystal%20structure%20of%20a%20multifunctional%20protein%3A%20Phosphoglucose%20isomerase%2Fautocrine%20motility%20factor%2Fneuroleukin+--+Sun%20et%20al.%2096%20%2810%29%3A%205412+--+PNAS&doi=&link_type=DIGG
+ 343. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/short/96/10/5412&title=The%20crystal%20structure%20of%20a%20multifunctional%20protein%3A%20Phosphoglucose%20isomerase%2Fautocrine%20motility%20factor%2Fneuroleukin+--+Sun%20et%20al.%2096%20%2810%29%3A%205412+--+PNAS&doi=&link_type=FACEBOOK
+ 344. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/96/10/5412&title=The%20crystal%20structure%20of%20a%20multifunctional%20protein%3A%20Phosphoglucose%20isomerase%2Fautocrine%20motility%20factor%2Fneuroleukin+--+Sun%20et%20al.%2096%20%2810%29%3A%205412+--+PNAS&doi=&link_type=TWITTER
+ 345. http://www.pnas.org/help/social_bookmarks.dtl
+ 346. http://www.pnas.org/content/96/10/5406.short
+ 347. http://www.pnas.org/content/96/10/5418.short
+ 348. http://www.pnas.org/content/96/10.toc
+ 349. http://www.pnas.org/content/96/10/5412.abstract
+ 350. http://www.pnas.org/content/96/10/5412.figures-only
+ 351. http://www.pnas.org/content/96/10/5412.full.pdf+html
+ 352. http://www.pnas.org/search?tocsectionid=Biochemistry&sortspec=date&submit=Submit
+ 353. http://www.pnas.org/email?gca=pnas;96/10/5412&current-view-path=/content/96/10/5412.long
+ 354. http://www.pnas.org/cgi/alerts/ctalert?alertType=citedby&addAlert=cited_by&cited_by_criteria_resid=pnas;96/10/5412&saveAlert=no&return-type=article&return_url=http://www.pnas.org/content/96/10/5412.long
+ 355. http://www.pnas.org/cgi/alerts/ctalert?alertType=correction&addAlert=correction&correction_criteria_value=96/10/5412&saveAlert=no&return-type=article&return_url=http://www.pnas.org/content/96/10/5412.long
+ 356. http://www.pnas.org/search?qbe=pnas;96/10/5412&citation=Sun%20et%20al.%2096%20%2810%29:%205412&submit=yes
+ 357. http://www.pnas.org/external-ref?access_num=pnas%3B96%2F10%2F5412&link_type=ISI_RELATEDRECORDS
+ 358. http://www.pnas.org/external-ref?access_num=10318897&link_type=MED_NBRS
+ 359. http://www.pnas.org/cgi/folders?action=addtofolder&wherefrom=JOURNALS&wrapped_id=pnas;96/10/5412
+ 360. http://www.pnas.org/citmgr?gca=pnas;96/10/5412
+ 361. http://www.pnas.org/misc/rightperm.shtml
+ 362. http://www.pnas.org/content/96/10/5412.long?cited-by=yes&legid=pnas;96/10/5412#cited-by
+ 363. http://www.pnas.org/cgi/crossref-forward-links/96/10/5412
+ 364. http://www.pnas.org/external-ref?access_num=pnas%3B96%2F10%2F5412&link_type=ISI_CITING
+ 365. http://www.pnas.org/external-ref?access_num=http://www.pnas.org/cgi/content/abstract/96/10/5412&link_type=GOOGLESCHOLAR
+ 366. http://scholar.google.com/scholar?q=%22author%3ASun%20author%3AY.%22
+ 367. http://scholar.google.com/scholar?q=%22author%3AHsiao%20author%3AC.%22
+ 368. http://www.pnas.org/external-ref?access_num=http://www.pnas.org/cgi/content/abstract/96/10/5412&link_type=GOOGLESCHOLARRELATED
+ 369. http://www.pnas.org/external-ref?access_num=10318897&link_type=PUBMED
+ 370. http://www.pnas.org/external-ref?access_num=Sun%20Y&link_type=AUTHORSEARCH
+ 371. http://www.pnas.org/external-ref?access_num=Hsiao%20C&link_type=AUTHORSEARCH
+ 372. http://www.pnas.org/content/96/10/5412.long?related-urls=yes&legid=pnas;96/10/5412#related-urls
+ 373. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/96/10/5412&title=The%20crystal%20structure%20of%20a%20multifunctional%20protein%3A%20Phosphoglucose%20isomerase%2Fautocrine%20motility%20factor%2Fneuroleukin+--+Sun%20et%20al.%2096%20%2810%29%3A%205412+--+PNAS&doi=&link_type=CITEULIKE
+ 374. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/96/10/5412&title=The%20crystal%20structure%20of%20a%20multifunctional%20protein%3A%20Phosphoglucose%20isomerase%2Fautocrine%20motility%20factor%2Fneuroleukin+--+Sun%20et%20al.%2096%20%2810%29%3A%205412+--+PNAS&doi=&link_type=COMPLORE
+ 375. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/96/10/5412&title=The%20crystal%20structure%20of%20a%20multifunctional%20protein%3A%20Phosphoglucose%20isomerase%2Fautocrine%20motility%20factor%2Fneuroleukin+--+Sun%20et%20al.%2096%20%2810%29%3A%205412+--+PNAS&doi=&link_type=CONNOTEA
+ 376. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/96/10/5412&title=The%20crystal%20structure%20of%20a%20multifunctional%20protein%3A%20Phosphoglucose%20isomerase%2Fautocrine%20motility%20factor%2Fneuroleukin+--+Sun%20et%20al.%2096%20%2810%29%3A%205412+--+PNAS&doi=&link_type=DEL_ICIO_US
+ 377. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/96/10/5412&title=The%20crystal%20structure%20of%20a%20multifunctional%20protein%3A%20Phosphoglucose%20isomerase%2Fautocrine%20motility%20factor%2Fneuroleukin+--+Sun%20et%20al.%2096%20%2810%29%3A%205412+--+PNAS&doi=&link_type=DIGG
+ 378. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/short/96/10/5412&title=The%20crystal%20structure%20of%20a%20multifunctional%20protein%3A%20Phosphoglucose%20isomerase%2Fautocrine%20motility%20factor%2Fneuroleukin+--+Sun%20et%20al.%2096%20%2810%29%3A%205412+--+PNAS&doi=&link_type=FACEBOOK
+ 379. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/96/10/5412&title=The%20crystal%20structure%20of%20a%20multifunctional%20protein%3A%20Phosphoglucose%20isomerase%2Fautocrine%20motility%20factor%2Fneuroleukin+--+Sun%20et%20al.%2096%20%2810%29%3A%205412+--+PNAS&doi=&link_type=TWITTER
+ 380. http://www.pnas.org/help/social_bookmarks.dtl
+ 381. file://localhost/dev/paper.html#content-block
+ 382. file://localhost/dev/paper.html#abstract-1
+ 383. file://localhost/dev/paper.html#sec-1
+ 384. file://localhost/dev/paper.html#sec-5
+ 385. file://localhost/dev/paper.html#sec-11
+ 386. file://localhost/dev/paper.html#ack-1
+ 387. file://localhost/dev/paper.html#fn-group-1
+ 388. file://localhost/dev/paper.html#ref-list-1
+ 389. http://www.pnas.org/search
+ 390. http://www.pnas.org/content/current
+ 391. http://www.pnas.org/content/current
+ 392. http://www.pnas.org/content/107/37/16378
+ 393. http://www.pnas.org/content/107/37/16016
+ 394. http://www.pnas.org/content/107/37/16054
+ 395. http://www.pnas.org/content/107/37/16066
+ 396. http://www.pnas.org/content/107/37/16172
+ 397. http://www.pnas.org/cgi/alerts/etoc
+ 398. http://www.pnas.org/content/early/recent
+ 399. http://www.pnas.org/content
+ 400. http://www.pnas.org/site/misc/onlinesubmission.shtml
+ 401. http://www.pnas.org/cgi/collection/feature_articles
+ 402. http://www.pnas.org/content/by/section/Commentaries
+ 403. http://www.pnas.org/cgi/collection/letters
+ 404. http://www.pnas.org/cgi/collection/inaugurals
+ 405. http://www.pnas.org/cgi/collection/profiles
+ 406. http://www.pnas.org/site/misc/sustainability.shtml
+ 407. http://www.pnas.org/site/misc/collectedpapers.shtml
+ 408. http://www.pnas.org/site/misc/special.shtml
+ 409. http://www.pnas.org/site/misc/colloquia.shtml
+ 410. http://www.pnas.org/site/misc/podcasts.shtml
+ 411. http://www.pnas.org/cgi/content/short/107/31/13603?rss=1&ssource=mfc
+ 412. http://www.pnas.org/cgi/content/short/1001509107v1?rss=1&ssource=mfc
+ 413. http://www.pnas.org/cgi/content/short/1006901107v1?rss=1&ssource=mfc
+ 414. http://www.pnas.org/cgi/content/short/107/10/4499?rss=1&ssource=mfc
+ 415. http://www.pnas.org/cgi/content/short/106/17/6883?rss=1&ssource=mfc
+ 416. http://www.pnas.org/reports/mfr1.dtl
+ 417. http://www.pnas.org/cgi/content/short/74/12/5463?rss=1&ssource=mfc
+ 418. http://www.pnas.org/cgi/content/short/76/9/4350?rss=1&ssource=mfc
+ 419. http://www.pnas.org/cgi/content/short/95/25/14863?rss=1&ssource=mfc
+ 420. http://www.pnas.org/cgi/content/short/98/9/5116?rss=1&ssource=mfc
+ 421. http://www.pnas.org/cgi/content/short/97/12/6640?rss=1&ssource=mfc
+ 422. http://www.pnas.org/reports/mfc1.dtl
+ 423. http://www.pnas.org/content/current
+ 424. http://www.pnas.org/content
+ 425. http://www.pnas.org/misc/onlinesubmission.shtml
+ 426. http://www.pnas.org/misc/iforc.shtml
+ 427. http://www.pnas.org/misc/masthead.shtml
+ 428. http://www.pnas.org/misc/about.shtml
+ 429. http://www.pnas.org/subscriptions
+ 430. http://www.pnas.org/misc/about.shtml#advertising
+ 431. http://www.pnas.org/cgi/feedback
+ 432. http://www.pnas.org/misc/sitemap.shtml
+ 433. http://www.pnas.org/misc/terms.shtml
+
+   Hidden links:
+ 434. http://www.pnas.org/entrez-links/10318897

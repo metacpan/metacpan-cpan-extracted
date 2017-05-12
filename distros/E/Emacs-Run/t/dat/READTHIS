@@ -1,0 +1,22 @@
+Working location for tests of Emacs::Run
+
+ t/dat/
+       src/
+         templates/
+            .emacs-*
+         text
+       arc
+       tmp/
+         html
+         text
+       home
+       usr/
+        lib*
+
+  "src"  - source location for material that tests modify
+  "tmp"  - output for generated files
+  "arc"  - archive of reference copies to compare generated files to
+  "home" - location for dummy user home directories
+           contains .emacs files (generated from src/templates/.emacs-*)
+  "usr"  - contains elisp library locations included in .emacs load-path settings
+

@@ -1,0 +1,15 @@
+Build.PL
+Changes
+MANIFEST
+README
+TODO
+lib/Emacs/Rep.pm
+script/rep.pl
+elisp/rep.el
+t/01-Emacs-Rep-parse_perl_substitutions.t
+t/02-Emacs-Rep-do_finds_and_reps.t
+t/04-Emacs-Rep-do_finds_and_reps-bad_pattern.t
+t/05-Emacs-Rep-do_finds_and_reps-problem_case_1.t
+Makefile.PL
+META.yml
+META.json

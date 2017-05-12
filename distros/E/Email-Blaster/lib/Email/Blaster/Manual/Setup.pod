@@ -1,0 +1,89 @@
+
+=pod
+
+=head1 NAME
+
+Email::Blaster::Manual::Setup
+
+=head1 INSTALLATION
+
+Install the Perl module:
+
+  % cpan install Email::Blaster
+  ...
+
+Install the database tables (MySQL):
+
+  % mysql -u xxx -p
+  mysql> create database email_blaster;
+  mysql> quit;
+  % mysql -u xxx -p email_blaster < sbin/email_blaster.sql
+
+Edit the config file (available under C<t/conf> in this distribution).
+
+  % vi conf/email-blaster-config.xml
+
+Insert some fake data to play with:
+
+  % perl fake-transmission.pl
+
+Run the bulk blaster:
+
+  % perl email-blaster-standalone.pl
+
+Run the *throttled* blaster:
+
+  % perl throttled-blaster.pl
+
+=head1 STAND-ALONE MODE
+
+Run C<email-blaster-standalone.pl> for stand-alone mode.
+
+=head1 CLUSTERING MODE
+
+Run C<email-blaster-clustered.pl> for clustered mode.  You will also need to install
+C<libmemcached> and C<libevent>, as well as L<Cache::Memcached>.
+
+In addition, you will need to adjust the "<cluster>" section of your config file as shown here:
+
+  <!-- ONLY NECESSARY FOR "CLUSTERED" EMAIL BLASTERS! -->
+  <cluster>
+    <servers>
+      <server>localhost:11211</server>
+      <server>another.server.com:11211</server>
+      <server>yet-another.server.com:11211</server>
+    </servers>
+  </cluster>
+  
+  ...
+  
+  <handlers>
+    <server_startup>
+      <!-- Adds this server to the list of active servers. -->
+      <handler>Email::Blaster::ClusteredStartupHandler</handler>
+      ...
+  
+    <server_shutdown>
+      <!-- Removes this server from the list of active servers. -->
+      <handler>Email::Blaster::ClusteredShutdownHandler</handler>  
+
+=head1 SUPPORT
+
+Visit L<http://www.devstack.com/contact/> or email the author at <jdrago_999@yahoo.com>
+
+Commercial support and installation is available.
+
+=head1 AUTHOR
+
+John Drago <jdrago_999@yahoo.com>
+ 
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2008 by John Drago
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut
+

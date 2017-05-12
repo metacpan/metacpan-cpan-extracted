@@ -1,0 +1,277 @@
+<!-- <?xml version="1.0"?> -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+<xsd:element name="characterMapping">
+    <xsd:complexType>
+        <xsd:all>
+            <xsd:element ref="history" minOccurs="0"/>
+            <xsd:element ref="validity" minOccurs="0"/>
+            <xsd:element ref="assignments"/>
+            <xsd:element ref="contexts" minOccurs="0"/>
+        </xsd:all>
+        <xsd:attribute name="id" type="t.IDString" use="required"/>
+        <xsd:attribute name="version" type="xsd:positiveInteger" use="required"/>
+        <xsd:attribute name="description" type="xsd:string"/>
+        <xsd:attribute name="contact" type="xsd:anyURI"/>
+        <xsd:attribute name="registrationAuthority" type="xsd:string"/>
+        <xsd:attribute name="registrationName" type="xsd:string"/>
+        <xsd:attribute name="copyright" type="xsd:string"/>
+        <xsd:attribute name="bidiOrder" type="t.BidiOrder" default="logical"/>
+        <xsd:attribute name="normalization" type="t.NormalizationEnum" default="undetermined"/>
+    </xsd:complexType>
+</xsd:element>
+
+<xsd:element name="history">
+    <xsd:complexType>
+        <xsd:element name="modified" maxOccurs="unbounded">
+            <xsd:complexType>
+                <xsd:simpleContent>
+                    <xsd:extends base="xsd:string">
+                        <xsd:attribute name="version" type="xsd:positiveInteger"/>
+                        <xsd:attribute name="date" type="t.Date"/>
+                    </xsd:extends>
+                </xsd:simpleContent>
+            </xsd:complexType>
+        </xsd:element>
+    </xsd:complexType>
+</xsd:element>
+
+<xsd:element name="validity">
+    <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+            <xsd:element name="legal">
+                <xsd:complexType>
+                    <xsd:attribute name="next" type="xsd:string"/>
+                    <xsd:attributeGroup name="a.validity"/>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="illegal">
+                <xsd:complexType>
+                    <xsd:attributeGroup name="a.validity"/>
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:choice>
+    </xsd:complexType>
+</xsd:element>
+
+<xsd:element name="assignments">
+    <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+            <xsd:element ref="a"/>
+            <xsd:element ref="fub"/>
+            <xsd:element ref="fbu"/>
+            <xsd:element ref="range"/>
+        </xsd:choice>
+        <xsd:element ref="ordering" minOccurs="0" maxOccurs="2"/>
+        <xsd:attribute name="sub" type="t.Byte" default="1A"/>
+    </xsd:complexType>
+</xsd:element>
+
+<xsd:element name="a">
+    <xsd:complexType>
+        <xsd:attribute name="c" type="xsd:string"/>
+        <xsd:attributeGroup name="a.assign"/>
+        <xsd:attribute name="bbctxt" type="t.GroupRef"/>
+        <xsd:attribute name="bactxt" type="t.GroupRef"/>
+        <xsd:attribute name="ubctxt" type="t.GroupRef"/>
+        <xsd:attribute name="uactxt" type="t.GroupRef"/>
+    </xsd:complexType>
+</xsd:element>
+
+<xsd:element name="fub">
+    <xsd:complexType>
+        <xsd:attribute name="c" type="xsd:string"/>
+        <xsd:attribute name="ru" type="t.UnicodeList"/>
+        <xsd:attribute name="rc" type="xsd:string"/>
+        <xsd:attributeGroup name="a.assign"/>
+        <xsd:attribute name="ubctxt" type="t.GroupRef"/>
+        <xsd:attribute name="uactxt" type="t.GroupRef"/>
+    </xsd:complexType>
+</xsd:element>
+
+<xsd:element name="fbu">
+    <xsd:complexType>
+        <xsd:attributeGroup name="a.assign"/>
+        <xsd:attribute name="bbctxt" type="t.GroupRef"/>
+        <xsd:attribute name="bactxt" type="t.GroupRef"/>
+    </xsd:complexType>
+</xsd:element>
+
+<xsd:element name="range">
+    <xsd:complexType>
+        <xsd:attribute name="bFirst" type="t.ByteList" use="required"/>
+        <xsd:attribute name="bLast" type="t.ByteList" use="required"/>
+        <xsd:attribute name="uFirst" type="t.UnicodeList" use="required"/>
+        <xsd:attribute name="uLast" type="t.UnicodeList" use="required"/>
+        <xsd:attribute name="bMin" type="t.ByteList"/>
+        <xsd:attribute name="bMax" type="t.ByteList"/>
+        <xsd:attribute name="v" type="t.Version"/>
+    </xsd:complexType>
+</xsd:element>
+
+<xsd:element name="ordering">
+    <xsd:complexType>
+        <xsd:element name="order" maxOccurs="unbounded">
+            <xsd:complexType>
+                <xsd:attribute name="b" type="t.GroupRef" use="required"/>
+                <xsd:attribute name="u" type="t.GroupRef" use="required"/>
+            </xsd:complexType>
+        </xsd:element>
+    <xsd:attribute name="side" type="t.SizeEnum" use="required"/>
+    </xsd:complexType>
+</xsd:element>
+
+
+<xsd:element name="contexts">
+    <xsd:complexType>
+        <xsd:choice minOccurs="0" maxOccurs="unbounded">
+            <xsd:element ref="group"/>
+            <xsd:element ref="class"/>
+        </xsd:choice>
+    </xsd:complexType>
+</xsd:element>
+
+<xsd:element name="group">
+    <xsd:complexType>
+        <xsd:choice minOccurs="0" maxOccurs="unbounded">
+            <xsd:element ref="group"/>
+            <xsd:element name="class-ref">
+                <xsd:complexType>
+                    <xsd:attribute name="name" type="t.GroupName" use="required"/>
+                    <xsd:attribute name="neg" type="xsd:boolean"/>
+                    <xsd:attributeGroup name="a.RegexBasic"/>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="context-ref">
+                <xsd:complexType>
+                    <xsd:attribute name="name" type="t.GroupRef" use="required"/>
+                    <xsd:attributeGroup name="a.RegexBasic"/>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="eos"/>
+        </xsd:choice>
+        <xsd:attribute name="alt" type="xsd:boolean"/>
+        <xsd:attributeGroup name="a.RegexBasic"/>
+    </xsd:complexType>
+</xsd:element>
+
+<xsd:element name="class" mixed="true">
+    <xsd:complexType>
+        <xsd:choice minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="class-include">
+                <xsd:complexType>
+                    <xsd:attribute name="name" type="t.GroupName" use="required"/>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element ref="class-range">
+                <xsd:complexType>
+                    <xsd:attribute name="first" type="xsd:hexBinary" use="required"/>
+                    <xsd:attribute name="last" type="xsd:hexBinary" use="required"/>
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:choice>
+        <xsd:attribute name="size" type="t.SizeEnum"/>
+        <xsd:attribute name="name" type="t.GroupName" use="required"/>
+    </xsd:complexType>
+</xsd:element>
+
+<xsd:simpleType name="t.Byte">
+    <xsd:restriction base="xsd:hexBinary">
+        <xsd:minInclusive value="0"/>
+        <xsd:maxInclusive value="255"/>
+        <xsd:length value="2"/>
+    </xsd:restriction>
+</xsd:simpleType>
+
+<xsd:simpleType name="t.Unicode">
+    <xsd:restriction base="xsd:hexBinary">
+        <xsd:minInclusive value="0"/>
+        <xsd:maxInclusive value="1114111"/>
+        <xsd:minLength value="4"/>
+        <xsd:maxLength value="6"/>
+    </xsd:restriction>
+</xsd:simpleType>
+
+<xsd:simpleType name="t.ByteList">
+    <xsd:list itemType="Byte"/>
+</xsd:simpleType>
+
+<xsd:simpleType name="t.UnicodeList">
+    <xsd:list itemType="Unicode"/>
+</xsd:simpleType>
+
+<xsd:simpleType name="t.BidiOrder">
+    <xsd:restriction base="xsd:string">
+        <xsd:enumeration value="logical"/>
+        <xsd:enumeration value="LTR"/>
+        <xsd:enumeration value="RTL"/>
+    </xsd:restriction>
+</xsd:simpleType>
+
+<xsd:simpleType name="t.NormalizationEnum">
+    <xsd:restriction base="xsd:string">
+        <xsd:enumeration value="undetermined"/>
+        <xsd:enumeration value="neither"/>
+        <xsd:enumeration value="NFC"/>
+        <xsd:enumeration value="NFD"/>
+        <xsd:enumeration value="NFC_NFD"/>
+    </xsd:restriction>
+</xsd:simpleType>
+
+<xsd:simpleType name="t.SizeEnum">
+    <xsd:restriction base="xsd:string">
+        <xsd:enumeration value="unicode"/>
+        <xsd:enumeration value="bytes"/>
+    </xsd:restriction>
+</xsd:simpleType>
+
+<xsd:simpleType name="t.IDString">
+    <xsd:restriction base="xsd:string">
+        <xsd:pattern value="[^-]+-[^-]+-[^-]+"/>
+    </xsd:restriction>
+</xsd:simpleType>
+
+<xsd:simpleType name="t.GroupName">
+    <xsd:restriction base="xsd:string">
+        <xsd:pattern value="[^/\s]+"/>
+    </xsd:restriction>
+</xsd:simpleType>
+
+<xsd:simpleType name="t.GroupRef">
+    <xsd:restriction base="xsd:string">
+        <xsd:pattern value="[^/]*(/[^/]+)+"/>
+    </xsd:restriction>
+</xsd:simpleType>
+
+<xsd:simpleType name="t.Version">
+    <xsd:restriction base="xsd:string">
+        <xsd:pattern value="\d{4}[a-zA-Z]*"/>
+    </xsd:restriction>
+</xsd:simpleType>
+
+<xsd:simpleType name="t.Date">
+    <xsd:restriction base="xsd:string">
+        <xsd:pattern value="\d{4}-\d{2}-\d{2}"/>
+    </xsd:restriction>
+</xsd:simpleType>
+
+<xsd:attributeGroup name="a.RegexBasic">
+    <xsd:attribute name="id" type="GroupName"/>
+    <xsd:attribute name="min" type="unsignedByte"/>
+    <xsd:attribute name="max" type="unsignedByte"/>
+</xsd:attributeGroup>
+
+<xsd:attributeGroup name="a.assign">
+    <xsd:attribute name="b" type="t.ByteList" use="required"/>
+    <xsd:attribute name="u" type="t.UnicodeList" use="required"/>
+    <xsd:attribute name="v" type="t.Version"/>
+</xsd:attributeGroup>
+
+<xsd:attributeGroup name="a.validity">
+    <xsd:attribute name="type" type="xsd:string" default="start"/>
+    <xsd:attribute name="s" type="t.ByteList" use="required"/>
+    <xsd:attribute name="e" type="t.ByteList" use="required"/>
+</xsd:attributeGroup>
+
+</xsd:schema>
+

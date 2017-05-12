@@ -1,0 +1,36 @@
+                          BTW Aangifte
+Periode: Juli 2007
+EekBoek Demo Administratie                    EekBoek, 2007-12-31
+
+-----------------------------------------------------------------
+
+Binnenland
+
+1. Door mij verrichte leveringen/diensten
+
+1a   Belast met hoog tarief                         600       114
+1b   Belast met laag tarief                           0         0
+1e   Belast met 0% / verlegd                          0
+
+Buitenland
+
+3. Door mij verrichte leveringen
+
+3a   Buiten de EU                                     0
+3b   Binnen de EU                                     0
+
+4. Aan mij verrichte leveringen
+
+4a   Van buiten de EU                                 0         0
+4b   Verwervingen van goederen uit de EU              0         0
+
+Berekening
+
+5. Berekening totaal
+
+5a   Subtotaal                                                114
+5b   Voorbelasting                                             21
+5c   Subtotaal                                                 93
+5g   Totaal te betalen                                         93
+     Totaal te betalen (onafgerond)               93,65
+     Afrondingsverschil                            0,65

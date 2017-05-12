@@ -1,0 +1,17 @@
+Changes
+Build.PL
+META.yml
+Makefile.PL
+MANIFEST
+LICENSE
+README
+lib/Email/MIME/XMTP.pm
+t/test-mails/josey-nofold
+t/test-mails/long-msgid
+t/test-mails/josey-nofold.xml
+t/test-mails/joejob
+t/test-mails/mail-1
+t/test-mails/mail-2
+t/test-mails/msg1.xml
+t/test-mails/msg2.xml
+t/xmtp-1.t

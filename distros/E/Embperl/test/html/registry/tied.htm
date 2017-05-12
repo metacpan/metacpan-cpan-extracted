@@ -1,0 +1,108 @@
+#  
+# Test for magic and numeric vaiables within Embperl::Execute
+#
+# run this under mod_perl / Apache::Registry
+#
+
+	{
+	package Embperl::Test::Tie ;
+
+	sub TIESCALAR
+		{
+		my ($class, $var) = @_ ;
+
+		return bless \$var, $class ;
+		}
+
+
+	sub FETCH
+		{
+		my $self = shift ;
+
+		return $$self ;
+		}
+	}
+
+
+
+use Embperl ;
+
+my($r) = @_;
+
+$Embperl::DebugDefault = 811005 ;
+
+
+$tst1 = '<P>Here is some text</P>' ;
+
+$r -> status (200) ;
+$r -> send_http_header () ;
+
+print "<HTML><TITLE>Test for Embperl::Execute</TITLE><BODY>\n" ;
+print "<H1> 1.) Include from memory: ref to string</H1>\n" ;
+
+$rc = Embperl::Execute ({inputfile  => 'test_ref_string',
+						 input		=> \$tst1,
+						 mtime      => 1}) ;
+
+print "\nrc = $rc\n" ;
+
+print "<HTML><TITLE>Test for Embperl::Execute</TITLE><BODY>\n" ;
+print "<H1> 2.) Include from memory: numeric</H1>\n" ;
+
+$rc = Embperl::Execute ({inputfile  => 'test_numeric',
+						 input		=> 5,
+						 mtime      => 1,
+						 options    => Embperl::Constant::optReturnError}) ;
+
+print "\nrc = $rc\n" ;
+
+print "<HTML><TITLE>Test for Embperl::Execute</TITLE><BODY>\n" ;
+print "<H1> 3.) Include from memory: string</H1>\n" ;
+
+$rc = Embperl::Execute ({inputfile  => 'test_string',
+						 input		=> 'Hi',
+						 mtime      => 1,
+						 options    => Embperl::Constant::optReturnError}) ;
+
+
+print "\nrc = $rc\n" ;
+
+print "<HTML><TITLE>Test for Embperl::Execute</TITLE><BODY>\n" ;
+print "<H1> 4.) Include from memory: array</H1>\n" ;
+
+$rc = Embperl::Execute ({inputfile  => 'test_array',
+						 input		=> ['a', 'b', 'c'],
+						 mtime      => 1}) ;
+
+
+print "\nrc = $rc\n" ;
+
+tie $tiedvar1, 'Embperl::Test::Tie', $tst1 ;
+
+print "<HTML><TITLE>Test for Embperl::Execute</TITLE><BODY>\n" ;
+print "<H1> 5.) Include from memory: tied string ref</H1>\n" ;
+
+$rc = Embperl::Execute ({inputfile  => 'test_tied_string_ref',
+						 input		=> \$tiedvar1,
+						 mtime      => 1}) ;
+
+
+print "\nrc = $rc\n" ;
+
+
+
+print "<HTML><TITLE>Test for Embperl::Execute</TITLE><BODY>\n" ;
+print "<H1> 6.) Include from memory: tied string</H1>\n" ;
+
+$rc = Embperl::Execute ({inputfile  => 'test_tied_string',
+						 input		=> $tiedvar1,
+						 mtime      => 1,
+						 options    => Embperl::Constant::optReturnError}) ;
+
+
+print "\nrc = $rc\n" ;
+
+print "<H1> 6.) Done :-)</H1>\n" ;
+
+
+print "</body></html>\n";

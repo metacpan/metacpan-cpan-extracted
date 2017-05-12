@@ -1,0 +1,30 @@
+---
+abstract: '*DEPRECATED* A reader for Build.PL configuration files'
+author:
+  - 'Leon Timmermans <fawaka@gmail.com>'
+build_requires:
+  Cwd: 0
+  File::Find: 0
+  File::Temp: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300033, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: ExtUtils-BuildRC
+requires:
+  Carp: 0
+  Exporter: 5.57
+  ExtUtils::Helpers: 0.006
+  File::Spec::Functions: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=ExtUtils-BuildRC
+  repository: git://github.com/Leont/extutils-buildrc.git
+version: 0.005

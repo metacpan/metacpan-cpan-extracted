@@ -1,0 +1,86 @@
+#!/usr/bin/perl -w
+
+use strict;
+use Embedix::ECD;
+use Getopt::Long;
+
+my $ecd;
+my $exit_code = 0;
+
+if (@ARGV) {
+    foreach (@ARGV) {
+        eval { $ecd = Embedix::ECD->consFromFile($_) };
+        # eval { $ecd = Embedix::ECD->newFromFile($_) };
+        if ($@) {
+            $exit_code++;
+            print STDERR "$_: $@";
+        } else {
+            # print Data::Dumper::Dumper($ecd);
+            # print $ecd;
+            # print $ecd->toString(shiftwidth => 2, indent => 0);
+        }
+    }
+} else {
+    eval { $ecd = Embedix::ECD->newFromString(join('', <STDIN>)) }; 
+    if ($@) {
+        $exit_code++;
+        print $@;
+    } else {
+        # print $ecd;
+    }
+}
+
+exit $exit_code;
+
+=head1 NAME
+
+checkecd.pl - performs syntax checking of .ecd files
+
+=head1 SYNOPSIS
+
+    checkecd [OPTION]... [FILE]...
+    checkecd [OPTION]... < STDIN
+
+It returns meaningful exit codes so you can do things like:
+
+    checkecd FILE && echo "kosher";
+
+=head1 DESCRIPTION
+
+This checks the syntax of .ecd files for validity.
+
+=head1 OPTIONS
+
+None, yet.
+
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item $line: was expecting $TAGNAME, but found $CRAP instead.
+
+This error occurs whenever an imbalanced tag is found.
+
+=back
+
+=head1 REQUIRES
+
+=over 4
+
+=item Embedix::ECD
+
+This is used to parse ECD files.
+
+=back
+
+=head1 SEE ALSO
+
+Embedix::ECD(3pm)
+
+=head1 AUTHOR
+
+John BEPPU <beppu@lineo.com>
+
+=cut
+
+# $Id: checkecd,v 1.1 2001/01/19 00:26:38 beppu Exp $

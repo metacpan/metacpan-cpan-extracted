@@ -1,0 +1,28 @@
+Env-PS1 0.05
+============
+
+ABOUT
+
+  This package supplies variables that are "tied" to environment variables 
+  like 'PS1' and 'PS2', if read it takes the contents of the variable as a
+  format string like the ones bash(1) uses to format the prompt.
+
+DEPENDENCIES
+
+  You'll need the following modules:
+
+    POSIX
+    Autoloader
+    Sys::Hostname
+
+  all of which are core modules
+
+INSTALL
+
+  Try something like:
+
+    $ perl Build.PL
+    $ ./Build test
+    $ ./Build install
+
+  See the Module::Build documentation for advanced build options.

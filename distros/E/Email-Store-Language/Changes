@@ -1,0 +1,14 @@
+Revision history for Perl extension Email::Store::Language.
+
+0.03  Fri Feb 10 2006
+	- new schema to allow multiple languages
+	  per mail/list
+	- allow user to pass options to langof()
+	- use a threshold scheme to help refine the
+	  results
+
+0.02  Thu Mar 17 2005
+	- added some tests
+
+0.01  Mon Jan 10 2005
+	- original version;

@@ -1,0 +1,5 @@
+Makefile.PL		Makefile generator
+MANIFEST		This file
+README			Docs in Ascii format
+PerlPP.pm		What it's all about. :-)
+t/base.t		Base test

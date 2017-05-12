@@ -1,0 +1,12 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+examples/app.psgi
+lib/EntityModel/Web/PSGI.pm
+t/00-pod.t
+t/00-use.t
+t/psgi.t

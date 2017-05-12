@@ -1,0 +1,166 @@
+ExtUtils::F77 Changes list 
+--------------------------
+
+v1.20 released May 28th 2016
+------------------------------
+
+* Apply upstream FreeBSD patch thanks to srezic for submitting
+
+* Fix fallback compiler logic to support gcc-5.x and higher
+
+* Limited Improved gfortran linking on OS X Yosemite+ to OS X
+
+
+v1.19_3 released May 28th 2016
+------------------------------
+
+* Apply upstream FreeBSD patch thanks to srezic for submitting
+
+
+v1.19_2 released May 28th 2016
+------------------------------
+
+* Fix fallback compiler logic to support gcc-5.x and higher
+
+
+v1.19_1 released Mar 6th 2016
+----------------------------
+
+* Limited Improved gfortran linking on OS X Yosemite+ to OS X
+
+
+v1.19 released Dec 12th 2015
+----------------------------
+
+* Improved gfortran linking on OS X Yosemite+ which avoids PERL_DL_NONLAZY meltdowns
+
+
+v1.18 released Jul 7th 2015
+---------------------------
+* resolve rt.cpan.org bug #104495: MinGW now needs to link to libquadmath.a
+  Thanks for the patch, kmx.
+
+
+v1.17_01 released Jul 6th 2014
+------------------------------
+
+* Graham Bell's fix to "Add check for GNU fortran .so files as well as .a."
+* Typo fix by dsteinbrunner
+* Fix Cygwin table to use Generic GNU settings
+
+
+v1.17 released Jan 1st 2011
+---------------------------
+
+* Derek Lamb's patch to avoid an uninitialised variable error.
+* Diab Jarius's Solaris Studio 10 patch and his gfortran patch (with mods).
+  Note g77 is still the default if both it and gfortran are present. 
+* Rob's big Win32 patch (Nov 2010 version)
+*** IMPORTANT. Added in simplification of GNU fortran compilers (g77, gfortran, g95, fort77)
+  etc. suggested by Tim Jeness. I used his code but made a slightly different
+  implementaion introducing a 'Generic' 'GNU' database entry to which others point.
+  This also superceded some of the above patches.
+  Hope this works!
+* Removed places where .gcclibs() is added to the link line, this appears to no loner
+  be necessary. Routine left in there (but orphaned) just in case.
+  
+* Rob's further Win32 patch (16/12/2010)
+
+v1.16 released May 16th, 2007
+-----------------------------
+
+* Added new config entry for Darwin/OSX (using gcc 4.0 and g77, gfortran or g95)
+* Added new entry for gfortran under Linux (thanks to Thomas Erben).
+* Works fine under g77 on intel Mac OS X.
+
+v1.15 released Jan 3rd, 2006
+----------------------------
+
+* Jim Edwards f90 patch for SGI irix64
+* Added version number print to the startup
+* Solaris patches from Diab Jerius
+* OSX warning patch from Doug Burke
+* Win32 patches from Rob - Sisyphus <kalinabears@iinet.net.au> (2005/1/25)
+
+v1.14 released Jun 15th 2001
+----------------------------
+
+* Diab Jerius' Solaris regex patch
+* Tim Butler's Solaris patch
+* Now prints version on "use"
+* David Meleedy's Solaris patch?
+* My mix and match of all the above
+* Added COPYING file for Licence statement
+* Tim Jeness' latest Solaris patch
+* My own patch to make sure gcclibs are appended for g77
+
+v1.13 released May 8th 2000
+---------------------------
+
+* Small IRIX patch from Christian Soeller.
+* Tim Butler's Solaris patch (to make sure directories in path really
+  do contain libF77.a)
+* Charles Lane's latest VMS patch (properly blanks VMS libs)
+* Changed my email address.
+* Added Gokhan Ulu's <ulu@ultra.bu.edu> patch to use Solaris 
+  LD_LIBRARY_PATH variable to assist in locating F77 libs.
+
+v1.12 released Oct 26th 1999
+----------------------------
+
+* SGI coding suggestion from Tim Jenness to suppress a warning.
+
+v1.11 released Oct 15th 1999
+-----------------------------
+
+* Now removed from PGPLOT module distribution to avoid confusing CPAN,
+  now purely available standalone.
+* Got rid of some "for my $foo" ism's for 5.003 compatibility.
+* Christian's cygwin patches.
+* Patch to restore fallback to g77 behaviour if o/s compiler not found.
+  (e.g. solaris)
+* IRIX changes from Ovidiu Toader <ovi@physics.utoronto.ca>
+* Fixed g77 to use -lg2c in prefererence
+
+v1.10 released May 14th 1999
+-----------------------------
+
+Tim Jenness <t.jenness@jach.hawaii.edu>:
+* Fixes for Redhat 6.0 searching for libg2c.a
+* Better POD documentation
+* New runtimeok() method
+
+v1.09 released May 11th, 1999
+-----------------------------
+
+* Yet another IRIX patch (Allen Smith <easmith@beatrice.rutgers.edu>, Nov 1998)
+* Added -lg2c support provisionally
+* Yet another IRIX mod from Christian Soeller  <c.soeller@auckland.ac.nz>
+* Improved docs slightly.
+* Small VMS patch from Chuck Lane <lane@duphy4.physics.drexel.edu>
+
+
+v1.08 released Sep 11th, 1998
+-----------------------------
+
+* Better gcc detection (Anton Berezin)
+* Improved libf2c directory location
+* fixed pod2man bugs in documentation
+* IRIX n32 fix
+
+
+v1.07 released May 21st, 1998.
+------------------------------
+
+* Now supports VMS! Thanks to Charles Lane for his patch
+
+* Added -lxlf90 to AIX libs (Andreas Heitmann)
+
+* Added g77/f77/fort77 search for Generic g77/f2c
+
+* Fixed minor bug in falling back to g77/f2c
+
+* Added support for explicit overriding of Fortran libs
+  using the environment variable F77LIBS.
+  
+  

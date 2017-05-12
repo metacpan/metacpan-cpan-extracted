@@ -1,0 +1,39 @@
+---
+abstract: Excel::Template
+author:
+  - 'Rob Kinyon <rob.kinyon@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  File::Path: 0
+  File::Temp: 0
+  Test::Deep: 0.095
+  Test::Exception: 0.21
+  Test::More: 0.47
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Excel-Template
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  File::Basename: 0
+  IO::Scalar: 0
+  Spreadsheet::WriteExcel: 0.42
+  Spreadsheet::WriteExcel::Utility: 0
+  Test::More: 0
+  XML::Parser: 0
+  perl: 5.6.0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository:
+    type: git
+    url: git://git.shadowcat.co.uk/p5sagit/Excel-Template.git
+    web: http://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=p5sagit/Excel-Template.git;a=summary
+version: 0.34

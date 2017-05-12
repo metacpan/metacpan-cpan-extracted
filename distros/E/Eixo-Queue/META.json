@@ -1,0 +1,55 @@
+{
+   "abstract" : "Suite of Perl modules to work with task queues",
+   "author" : [
+      "Francisco Maseda <frmadem@gmail.com>",
+      "Javier Gomez <alambike@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Eixo-Queue",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Crypt::JWT" : "0.018",
+            "Data::UUID" : "1",
+            "Eixo::Base" : "1.400",
+            "JSON" : "2.5",
+            "MongoDB" : "0.708",
+            "Net::AMQP::RabbitMQ" : "2.3",
+            "perl" : "5.012"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/frmadem/eixo_queue.git",
+         "web" : "https://github.com/frmadem/eixo_queue"
+      }
+   },
+   "version" : "v0.5.5"
+}

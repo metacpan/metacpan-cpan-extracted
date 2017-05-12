@@ -1,0 +1,95 @@
+package ETLp::Manual::AuditBrowser;
+
+# ABSTRACT: Audit Browser manual for ETLp
+
+__END__
+=pod
+
+=head1 INTRODUCTION
+
+The Runtime Audit Browser provides a web-based interface to the ETL job runs. Sceenshots to accompany this documnetation can be viewed at L<http://trac.assembla.com/etlp/wiki/UsingTheAuditBrowser>
+
+=head1 SETTING UP USERS
+
+When ETLp is first installed, it creates a single account admin with the password of admin. The first thing the administrator should do is login and change the admin password, and create a new user.
+
+The login URL will typically be !http://<!MyHost>/etlp/user/login. Check with your system administrator if this is not the case in your environment.
+
+=head2 Changing the Admin Password
+
+=over 4
+
+=item 1. Click on the B<Edit Password> menu option.
+
+=item 2. Enter the existing password and the new password twice.
+
+=item 3. Save the changes.
+
+=back
+
+=head2 Create a New User
+
+=over 4
+
+=item 1. Select the B<User Admin> menu option.
+
+=item 2. Click on the B<New User> button.
+
+=item 3. Fill in the user's details. 
+
+=over 8
+
+=item * If the B<Active> checkbox is not selected, the user will not be able to log in.
+
+=item * The B<Administrator> option determines whether the user has administration privileges. This allows the user to create new users and edit user details
+
+=back
+
+=back
+
+=head1 JOBS
+
+The Jobs option allows you browse jobs that have run. The filter bar allows you to search jobs based on specific criteria
+
+=over 4
+
+=item * Config refers to the configuration file.
+
+=item * Section is the section within the configuration file. Together, the configuration file and the section uniquely define a job.
+
+=item * Status refers to the state of the job:
+
+=over 8
+
+=item * failed: The job dies.
+
+=item * reaped: The job died unexpectedly when running (e.g. it was killed from the operating system). This is not currently implemented.
+
+=item * running: The job is currently running.
+
+=item * succeeded: The job ran to completion successfully.
+
+=item * warning: One of the job's items failed, but the job continued to run. This will occur if the failed item's on_error status is skip or ignore
+
+=back
+
+=item * Min start date: specifies the minimum date when the job started.
+
+=item * Max startdate specifies the maximum date when the job started.
+
+=back
+
+=head1 ITEMS
+
+A job's items can be views by clicking on the items link on the job page. All items can be viewed - regardless of the job - by clicking on B<Items> in the menu
+
+The message column records any messages generated during the item execution
+
+When accessing the items report via a job, the items can be filtered by name or status. If the report is accessed from the ''Items'' menu, jobs can be filtered on status.
+
+=head1 FILES
+
+You can view information by an individual item's file processing by clicking on the filename. Alternativelt, you can view all files from the B<Files> menu option.
+
+Clicking on a filename will show all processing of that file, even if the file has been renamed during its lifetime.
+

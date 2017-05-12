@@ -1,0 +1,40 @@
+---
+abstract: 'Export symbols by attributes'
+author:
+  - 'David Zurborg <zurborg@cpan.org>'
+  - 'Marcel Gruenauer <marcel@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::CheckDeps: '0.010'
+  Test::More: '0.94'
+  blib: '1.01'
+  lib: '0'
+  perl: '5.016'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150005'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Exporter-Attributes
+requires:
+  Attribute::Universal: '0.003'
+  Carp: '0'
+  Exporter: '5.72'
+  namespace::clean: '0'
+  perl: '5.016'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/zurborg/libexporter-attributes-perl/issues
+  homepage: https://github.com/zurborg/libexporter-attributes-perl
+  repository: https://github.com/zurborg/libexporter-attributes-perl.git
+version: '0.002'
+x_contributors:
+  - 'Alexandr Ciornii <alexchorny@gmail.com>'
+  - 'David Zurborg <d.zurborg@vcare24.de>'

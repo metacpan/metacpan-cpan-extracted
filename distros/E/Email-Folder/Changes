@@ -1,0 +1,105 @@
+Revision history for Email-Folder
+
+0.860     2016-03-05 21:26:55 Europe/Prague
+          add messageid method
+          do not cut last line of last email
+          support for pipe
+
+0.859     2014-09-16 18:29:32-04:00 America/New_York
+        - all the changes in this release contributed by Pali Rohár
+        - support for mboxcl and mboxcl2
+        - add ability to read from a filehandle
+        - add next_from and next_messageref methods
+
+0.858     2014-01-07 10:54:18-05:00 America/New_York
+          typo fixes in docs (thanks, Florian Schlichting)
+
+0.857     2013-08-05 18:16:44 America/New_York
+          eliminate extra Pod tests
+
+0.856     2013-08-05 18:12:09 America/New_York
+          avoid duplicating headers when data is malformed (#31132)
+
+          make MH folder reader work on VMS
+
+0.855     2009-07-26
+          fix pod tests
+
+0.854     2007-12-23
+          fix a bug in which the last header of a mbox message could be lost
+
+0.853     2007-03-23
+          packaging improvements
+
+0.852     2006-08-22
+          README
+
+0.851     2006-08-01
+          use ExtUtils::MakeMaker, to standardize PEP
+          add pod coverage tests and improve coverage
+
+0.85      Tuesday 4th April, 2006
+          Fix clobbering of $_ in Mbox.pm
+          Put FH in binmode to fix non-ascii mails on Windows
+
+0.84      Friday 17th December, 2004
+          Added in ability for subclasses of Email::Folder::Mbox to override
+          IO::File creation.
+
+          Added in information about Perl Email Project
+
+HEAD
+          Added Email::Folder::MH by Ricardo SIGNES
+
+0.83      Sunday 9th May, 2004
+          Rerelease without a broken manifest (rt.cpan.org $6049)
+
+0.82      Monday 22nd March, 2003
+          Add Email::Folder::Ezmlm to the dist.
+
+          Switch to a trad Makefile.PL
+
+0.81
+          Slow down the release numbering a bit.  I'd like to be stable at
+          the point of 1.0 or so.
+
+          Added ->reader as an accessor to the Email::Reader subclass
+
+          Added ->tell to ::Mbox, and seek_to as an option
+
+0.8       29th May, 2003
+          mboxcl2 handling is now a little more paranoid, and will recover from
+          bad values
+
+          Mbox.pm now expects the From_ line to match either of
+              /^From (?:Mon|Tue|Wed|Thu|Fri|Sat|Sun)/
+              /^From \S+\s+(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun)/
+          (based on mutt mbox.c/from.c)
+
+          Document that ->messages is a one-shot operation.
+
+0.7       Tuesday 27th May, 2003
+          Mbox.pm can grok mboxcl2
+
+          INCOMPATIBLE CHANGE: Email::Folder::Mbox now takes line endings as
+          an explicit option rather than trying to guess.
+
+0.6       Sunday 11th May, 2003
+          Rename the files in the test maildir so we can unpack in Win32 systems
+          Release with a auto-generated Makefile.PL, for CPAN.pm users
+
+0.5       Tuesday 29th April, 2003
+          Add iterator interface, plus move the backends to be classes
+
+0.4       Thursday 24th April, 2003
+          Add line-ending detection to Email::Folder::MBox
+          temporarily disable signing, as it's confusing
+
+0.3       Tuesday 22nd April, 2003
+          Just another release of 0.2, now that CPAN repects my authoritay!
+
+0.2       Tuesday 22nd April, 2003
+          Lose the (hidden) dependency on UNIVERSAL::require
+
+0.1       Initial version
+          Very rough idea

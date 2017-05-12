@@ -1,0 +1,33 @@
+---
+abstract: 'Foursquare components for Exobrain'
+author:
+  - 'Paul Fenwick <pjf@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Exobrain-Foursquare
+requires:
+  Exobrain: 1.08
+  Exobrain::Agent: 0
+  Exobrain::Agent::Poll: 0
+  Exobrain::Component: 0
+  Exobrain::Config: 0
+  Exobrain::Measurement::Geo: 0
+  JSON::Any: 0
+  Method::Signatures: 0
+  Moose: 0
+  Moose::Role: 0
+  Try::Tiny: 0
+  WWW::Mechanize: 0
+  constant: 0
+  feature: 0
+resources:
+  bugtracker: https://github.com/pjf/exobrain-foursquare
+  repository: git://github.com/pjf/exobrain-foursquare
+version: 0.01

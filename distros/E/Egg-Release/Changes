@@ -1,0 +1,87 @@
+Revision history for Perl extension .
+
+3.14  2008/05/20
+	- fixed for Egg::Util::DebugScreen.
+	- bugfix for Egg::Dispatch::Standard.
+
+3.13  2008/05/19
+	- bugfix for Egg::Dispatch::Standard.
+
+3.12  2008/05/15
+	- fixed for Egg::Response.
+	- fixed for Egg::Response::TieCookie.
+	- 'referer_check' method of Egg::Plugin::Tools is corrected.
+	- fixed for Egg::Util::DebugScreen.
+	- Some specifications of Egg::Dispatch::Standard are changed.
+
+3.11  2008/05/14
+	- fixed for Egg::Util.
+	- The method of 'cookie_more' is added to Egg::Request.
+
+3.10  2008/05/12
+	- The defective operation when 'P::Encode' and 'P::Request::Upload' are used
+	  at the same time is corrected. for Egg::Plugin::Encode.
+	- fixed for Egg::Request::Upload::CGI.
+	- fixed for Egg::Request::CGI.
+
+3.09  2008/04/17
+	- Build.PL is abolished.
+	- fixed for Egg::Helper::Build::Project.
+	- fixed for Egg::Helper::Build::Module.
+
+3.08  2008/03/30
+	- fixed for Egg::Util::DebugScreen
+	- fixed for Egg.
+	- fixed for Egg::Log::STDERR.
+	- fixed for Egg::Plugin::Filter.
+	- fixed for Egg::Plugin::Mason.
+	- bugfix for Egg::Plugin::Tools.
+	- Egg::Plugin::Filter::Plugin::Japanese is added.
+	- Egg::Plugin::Filter::Plugin::EUC is added.
+	- Egg::Plugin::Filter::Plugin::Shift_JIS is added.
+	- Egg::Plugin::Filter::Plugin::UTF8 is added.
+	- Egg::Plugin::HTML::TagCloud.
+
+3.07  2008/03/05
+	- bugfix for Egg::Dispatch::Standard.
+	- fixed for Egg::Util::Debug.
+	- bugfix for Egg.
+	- bugfix for Egg::Plugin::Response::Redirect.
+
+3.06  2008/03/04
+	- bugfix  for Egg.
+	- fixed for Egg::Helper::Build::Project.
+
+3.05  2008/03/03
+	- bugfix for Egg::Dispatch::Standard.
+	- bugfix for Egg;
+	- fixed  for Egg::Component.
+	- fixed  for Egg::Dispatch::Standard.
+	- fixed  for Egg::Dispatch::Fast.
+
+3.04  2008/02/29
+	- fixed for Egg.
+	- fixed for Egg::Request.
+	- fixed for Egg::Helper::Build::Project.
+	- fixed for Egg::Dispatch::Fast.
+	- fixed for Egg::Dispatch::Standard.
+	- fixed for Egg::Component::Base.
+	- fixed for Egg::Plugin::Banner::Rotate.
+
+3.03  2008/02/27
+	- fixed for Egg::Manager.
+	- The method of 'config_to' is added to Egg::Base.
+
+3.02  2008/02/27
+	- fixed for Egg::Manager.
+	- fixed for Egg::Base.
+
+3.01  2008/02/18
+	- fixed for Egg::Component.
+	- The method of 'any_hook' is added to Egg::Manager.
+	- fixed for Egg::Helper.
+	- fixed for Egg::Helper::Util::Base.
+
+3.00  Fri Jan 25 09:32:20 2008
+	- original version; created by Egg::Helper::Build::Plugin::Maker v2.02
+	   with module name Egg::Release

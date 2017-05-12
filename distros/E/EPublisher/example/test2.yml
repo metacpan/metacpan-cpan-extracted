@@ -1,0 +1,10 @@
+---
+Test:
+  source:
+    -
+      type: File
+      path: ./test.pod
+  target:
+    type: EPub
+    author: Renee Baecker
+    output: ./test.epub

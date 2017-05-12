@@ -1,0 +1,65 @@
+{
+   "abstract" : "create an ebook in the MOBI format.",
+   "author" : [
+      "Boris Däppen <bdaeppen.perl@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.014, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "EBook-MOBI",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "File::Basename" : "0",
+            "File::Copy" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "FindBin" : "0",
+            "HTML::Entities" : "0",
+            "HTML::TreeBuilder" : "0",
+            "IO::String" : "0",
+            "Image::BMP" : "0",
+            "Image::Size" : "0",
+            "Module::Loaded" : "0",
+            "Pod::Parser" : "0",
+            "Text::Trim" : "0",
+            "constant" : "0",
+            "lib" : "0",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Encode" : "0",
+            "File::Slurp" : "0",
+            "Test::More" : "0",
+            "utf8" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/borisdaeppen/EBook--MOBI",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/borisdaeppen/EBook--MOBI.git",
+         "web" : "https://github.com/borisdaeppen/EBook--MOBI"
+      }
+   },
+   "version" : "0.72"
+}
+

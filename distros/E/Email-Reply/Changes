@@ -1,0 +1,23 @@
+Revision history for Email-Reply
+
+1.204     2015-11-29 22:28:08-05:00 America/New_York
+          update repo and bugtracker
+
+1.203     2013-08-16 22:23:32 America/New_York
+          update repo and bugtracker
+
+          reformat docs a bit
+
+1.202     2007-07-19
+          tests should also not rely on broken line endings
+          these tests are extremely anemic and should be improved
+          \r\n is not a safe way to generate CRLF
+
+1.201     2007-02-15
+          tests should not rely on super-exact stringifications
+
+1.200     2006-08-22
+          repair broken tests
+
+1.1       2004-07-09
+          Initial version.

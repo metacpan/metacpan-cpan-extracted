@@ -1,0 +1,9 @@
+Changes
+Ezmlm.pm
+MANIFEST
+README
+Makefile.PL
+test.pl
+META.yml
+Ezmlm/GpgKeyRing.pm
+Ezmlm/GpgEzmlm.pm

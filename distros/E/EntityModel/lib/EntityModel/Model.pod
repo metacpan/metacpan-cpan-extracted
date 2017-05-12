@@ -1,0 +1,125 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with EntityModel::Model
+at lib/EntityModel/Model.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+EntityModel::Model - base class for model definitions
+
+=head1 VERSION
+
+version 0.102
+
+=head1 SYNOPSIS
+
+see L<EntityModel>.
+
+=head1 DESCRIPTION
+
+see L<EntityModel>.
+
+=head1 METHODS
+
+=head2 pending_entities
+
+Returns a list of all pending entities for this model.
+
+These will be applied on L<commit>, or cleared on L<rollback>.
+
+=head2 rollback
+
+Revert any pending changes for this model.
+
+=head2 apply_fields
+
+Apply the field definitions for an entity.
+
+=head2 load_model
+
+Populate the entity model from any information we can get from
+the data source.
+
+=head2 update_from
+
+Update this entity model so that it matches the given model.
+
+=head2 matches
+
+Returns true if this entity model has identical content to another given model.
+
+=head2 read_tables
+
+Virtual method for reading table definitions.
+
+=head2 new_entity
+
+Helper method to create a new entity.
+
+=head2 create_entity
+
+Helper method to create a new entity and add it to our list.
+
+Takes the following parameters:
+
+=over 4
+
+=item *
+
+=back
+
+Returns
+
+=head2 add_table
+
+Generate an appropriate L<EntityModel::Entity> for the given table name.
+
+=head2 add_entity
+
+Add an L<EntityModel::Entity> to this model.
+
+=head2 commit
+
+Apply the actions, starting with the longest names first for removal, and shortest
+first for update and create.
+
+=head2 commit_pending_update
+
+=head2 commit_pending_remove
+
+=head2 commit_pending_add
+
+Add all pending items, ordering to resolve dependencies as required.
+
+=head2 add_field_to_table
+
+=head2 DESTROY
+
+Notify when there are pending uncommitted entries.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Mixin::Event::Dispatch>
+
+L<add_handler_for_event|Mixin::Event::Dispatch/add_handler_for_event>, L<clear_event_handlers|Mixin::Event::Dispatch/clear_event_handlers>, L<event_handlers|Mixin::Event::Dispatch/event_handlers>, L<invoke_event|Mixin::Event::Dispatch/invoke_event>, L<subscribe_to_event|Mixin::Event::Dispatch/subscribe_to_event>, L<unsubscribe_from_event|Mixin::Event::Dispatch/unsubscribe_from_event>
+
+=item L<EntityModel::BaseClass>
+
+L<clone|EntityModel::BaseClass/clone>, L<new|EntityModel::BaseClass/new>, L<sap|EntityModel::BaseClass/sap>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <cpan@entitymodel.com>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2008-2011. Licensed under the same terms as Perl itself.

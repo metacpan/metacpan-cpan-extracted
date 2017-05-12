@@ -1,0 +1,75 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with EntityModel::Gather
+at lib/EntityModel/Gather.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+EntityModel::Gather - asynchronous helper functions for L<EntityModel>
+
+=head1 VERSION
+
+version 0.102
+
+=head1 SYNOPSIS
+
+ use EntityModel::Gather;
+
+=head1 DESCRIPTION
+
+Wrapper class for executing code once data values have been populated.
+
+Given a set of data key => value pairs, this module will request population from each provider.
+Once all data values are available, the on_ready event is triggered, and the data values are
+passed to the provided handler. If it is impossible to retrieve data values for some reason,
+the on_error handler is called instead.
+
+Each of the values passed must be one of the following:
+
+=over 4
+
+=item * Subclass of L<EntityModel::Pending> - requests callback when data value has been populated
+
+=item * Subclass of L<EntityModel::EntityBase> - requests callback when populated
+
+=item * Scalar value - this will be used as-is
+
+=item * undef - this will be used as-is
+
+=back
+
+Any other value will cause the scalar handling to be used.
+
+=head1 METHODS
+
+=head2 new
+
+Create a new instance. Takes a list of key, value pairs indicating which data values to wait for.
+
+=head2 add_pending
+
+Adds the given key and value to the pending list. If the value is immediately available (simple scalar, for example) then this
+will pass the value through immediately.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<EntityModel::BaseClass>
+
+L<clone|EntityModel::BaseClass/clone>, L<dump|EntityModel::BaseClass/dump>, L<sap|EntityModel::BaseClass/sap>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <cpan@entitymodel.com>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2008-2011. Licensed under the same terms as Perl itself.

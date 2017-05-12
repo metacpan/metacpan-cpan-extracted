@@ -1,0 +1,729 @@
+# $Id$ -*- coding: utf-8 -*-
+# EekBoek Rekeningschema voor Belgische boekhoudingen
+# Content-Type: text/plain; charset = UTF-8
+
+# Dit bestand definiëert alle vaste gegevens van een administratie of
+# groep administraties: het rekeningschema (balansrekeningen en
+# resultaatrekeningen), de dagboeken en de BTW tarieven.
+#
+# Algemene syntaxregels:
+#
+# * Lege regels en regels die beginnen met een hekje # worden niet
+#   geïnterpreteerd.
+# * Een niet-ingesprongen tekst introduceert een nieuw onderdeel.
+# * Alle ingesprongen regels zijn gegevens voor dat onderdeel.
+
+# REKENINGSCHEMA
+#
+# Het rekeningschema is hiërarchisch opgezet volgende de beproefde
+# methode Bakker. De hoofdverdichtingen lopen van 1 t/m 9, de
+# verdichtingen t/m 99. De grootboekrekeningen zijn verdeeld in
+# balansrekeningen en resultaatrekeningen.
+#
+# De omschrijving van de grootboekrekeningen wordt voorafgegaan door
+# een vlaggetje, een letter die resp. Debet/Credit (voor
+# balansrekeningen) en Kosten/Omzet/Neutraal (voor resultaatrekeningen)
+# aangeeft. De omschrijving wordt indien nodig gevolgd door extra
+# informatie. Voor grootboekrekeningen kan op deze wijze de BTW
+# tariefstelling worden aangegeven die op deze rekening van toepassing
+# is:
+#
+#   :btw=nul
+#   :btw=hoog
+#   :btw=laag
+#
+# Ook is het mogelijk aan te geven dat een rekening een koppeling
+# (speciale betekenis) heeft met :koppeling=xxx. De volgende koppelingen
+# zijn mogelijk:
+#
+#   crd		de standaard tegenrekening (Crediteuren) voor inkoopboekingen
+#   deb		de standaard tegenrekening (Debiteuren) voor verkoopboekingen
+#   btw_ih	de rekening voor BTW boekingen voor inkopen, hoog tarief
+#   btw_il	idem, laag tarief
+#   btw_vh	idem, verkopen, hoog tarief
+#   btw_vl	idem, laag tarief
+#   btw_ok	rekening voor de betaalde BTW
+#   winst	rekening waarop de winst wordt geboekt
+#
+# De koppeling winst is verplicht en moet altijd in een administratie
+# voorkomen in verband met de jaarafsluiting.
+# De koppelingen voor BTW moeten worden opgegeven indien BTW
+# van toepassing is op de administratie.
+# De koppelingen voor Crediteuren en Debiteuren moeten worden
+# opgegeven indien er inkoop dan wel verkoopdagboeken zijn die gebruik
+# maken van de standaardwaarden (dus zelf geen tegenrekening hebben
+# opgegeven).
+
+# Normaal lopen hoofdverdichtingen van 1 t/m 9, en verdichtingen
+# van 10 t/m 99. Indien daarvan wordt afgeweken kan dit worden opgegeven
+# met de opdracht "Verdichting". De twee getallen geven het hoogste
+# nummer voor hoofdverdichtingen resp. verdichtingen.
+# De nummers van de grootboekrekeningen worden geacht groter te zijn
+# dan de maximale verdichting. Daarvan kan worden afgeweken door
+# middels voorloopnullen de _lengte_ van het nummer groter te maken
+# dan de lengte van de maximale verdichting. Als bijvoorbeeld 99 de
+# maximale verdichting is, dan geeft 001 een grootboekrekening met
+# nummer 1 aan.
+
+Balansrekeningen
+
+  1  Eigen vermogen, voorzieningen voor risico's en kosten en schulden op meer dan één jaar
+     10  Kapitaal
+         100   C   Geplaatst kapitaal
+         101   C   Niet opgevraagd kapitaal (-)
+     11  Uitgiftepremies
+     12  Herwaarderingsmeerwaarden
+         120   C   Herwaarderingsmeerwaarden op immateriële vaste activa
+         121   C   Herwaarderingsmeerwaarden op materiële vaste activa
+         122   C   Herwaarderingsmeerwaarden op financiële vaste activa
+         123   C   Herwaarderingsmeerwaarden op voorraden
+         124   C   Terugneming van waardeverminderingen op geldbeleggingen
+     13  Reservees
+         130   C   Wettelijke reserve
+	 131   C   Onbeschikbare reserve
+	 1310  C   Reserver voor eigen aandelen
+	 1311  C   Andere onbeschikbare reserve
+         132   C   Belastingvrije reserves
+	 133   C   Beschikbare reserves
+     14  Overgedragen winst/verlies                          
+     	 141   C   Overgedragen winst                           :koppeling=winst
+     15	 Kapitaalsubsidies
+     16  Voorzieningen en uitgestelde belastingen
+         160   C   Voorzieningen voor pensioenen en soortgelijke verplichtingen
+         161   C   Voorzieningen voor belastingen
+         162   C   Voorzieningen voor grote herstellingswerken en grote onderhoudswerken
+         163   C   Voorzieningen voor overige risico's en kosten
+         164   C   Voorzieningen voor overige risico's en kosten
+         165   C   Voorzieningen voor overige risico's en kosten
+         168   C   Uitgestelde belastingen
+         1680  C   Uitgestelde belastingen op kapitaalsubsidies 
+         1681  C   Uitgestelde belastingen op gerealiseerde meerwaarden op immateriële vaste activa
+         1682  C   Uitgestelde belastingen op gerealiseerde meerwaarden op materiële vaste activa
+         1688  C   Buitenlandse uitgestelde belastingen
+     17  Schulden op meer dan één jaar
+         170   C   Achtergestelde leningen
+         1700  C   Converteerbaar
+         1701  C   Niet converteerbaar
+         171   C   Niet-achtergestelde obligatieleningen 
+         1710  C   Converteerbaar
+         1711  C   Niet converteerbaar
+         172   C   Leasingschulden en soortgelijke
+         173   C   Kredietinstellingen
+         1730  C   Schulden op rekeningen
+         1731  C   Promessen
+         1732  C   Acceptkredieten
+         174   C   Overige leningen
+         175   C   Handelsschulden
+         1750  C   Leveranciers
+         1751  C   Te betalen wissels
+         176   C   Ontvangen vooruitbetalingen op bestellingen
+         178   C   Borgtochten ontvangen in contanten
+         179   C   Overige schulden
+	
+
+  2  Vlottende activa
+     20  Oprichtingskosten
+         200   D   Kosten van oprichting en kapitaalverhoging
+	 201   D   Kosten bij uitgifte van leningen
+	 202   D   Overige oprichtingskosten
+         204   D   Herstructureringskosten
+     21  Immateriële vaste activa
+         210   D   Kosten van onderzoek en ontwikkeling
+         211   D   Concessies, octrooien, licenties, know-how, merken en soortgelijke rechten
+         212   D   Goodwill
+     22  Terreinen en gebouwen
+         220   D   Terreinen
+         221   D   Gebouwen
+         222   D   Bebouwde terreinen
+         223   D   Overige zakelijke rechten op onroerende goederen
+     23  Installaties, machines en uitrusting
+     24  Meubilair en rollend materieel
+     25  Vaste activa in leasing of op grond van soortgelijke rechten
+         250   D   Terreinen en gebouwen
+         251   D   Installaties, machines en uitrusting
+         252   D   Meubilair en rollend materieel
+     26  Andere materiële vaste activa
+     27  Vaste activa in aanbouw en vooruitbetalingen
+     28  Financiële vaste activa
+         280   D   Deelnemingen in verbonden ondernemingen
+         2880  D   Aanschaffingswaarde
+         2801  D   Nog te storten bedragen (-)
+         2808  D   Geboekte meerwaarden
+         2809  D   Geboekte waardeverminderingen (-)
+         281   D   Vorderingen op verbonden ondernemingen 
+         2810  D   Vorderingen op rekening
+         2811  D   Te innen wissels
+         2812  D   Vastrentende effecten
+         2817  D   Dubieuze debiteuren
+         2819  D   Geboekte waardeverminderingen (-)
+         282   D   Deelnemingen in ondernemingen waarmee een deelnemingsverhouding bestaat
+         2820  D   Aanschaffingswaarde
+         2821  D   Nog te storten bedragen (-)
+         2828  D   Geboekte meerwaarden 
+         2829  D   Geboekte waardeverminderingen (-)
+         283   D   Vorderingen op ondernemingen waarmee een deelnemingsverhouding bestaat
+         2830  D   Vorderingen op rekening
+         2831  D   Te innen wissels
+         2832  D   Vastrentende effecten
+         2837  D   Dubieuze debiteuren
+         2839  D   Geboekte waardeverminderingen (-)
+         284   D   Andere aandelen
+         2840  D   Aanschaffingswaarde
+         2841  D   Nog te storten bedragen (-)
+         2848  D   Geboekte meerwaarden
+         2849  D   Geboekte waardeverminderingen (-)
+         285   D   Overige vorderingen
+         2850  D   Vorderingen op rekening 
+         2851  D   Te innen wissels
+         2852  D   Vastrentende effecten
+         2857  D   Dubieuze debiteuren
+         2859  D   Geboekte waardeverminderingen (-)
+         288   D   Borgtochten betaald in contanten
+      29 Vorderingen op meer dan één jaar
+         290   D   Handelsvorderingen
+         2900  D   Handelsdebiteuren
+         2901  D   Te innen wissels
+         2906  D   Vooruitbetalingen
+         2907  D   Dubieuze debiteuren
+         2909  D   Geboekte waardeverminderingen (-)
+         291   D   Overige vorderingen
+         2910  D   Vorderingen op rekening
+         2911  D   Te innen wissels
+         2917  D   Dubieuze debiteuren 
+         2919  D   Geboekte waardeverminderingen (-)
+
+  3  Voorraden en bestellingen in uitvoering
+     30  Grondstoffen
+         300   D   Aanschaffingswaarde
+         309   D   Geboekte waardeverminderingen (-)
+     31  Hulpstoffen
+         310   D   Aanschaffingswaarde
+         319   D   Geboekte waardeverminderingen (-)
+     32  Goederen in bewerking
+         320   D   Aanschaffingswaarde
+         329   D   Geboekte waardeverminderingen (-)
+     33  Gereed product
+         330   D   Aanschaffingswaarde
+         339   D   Geboekte waardeverminderingen (-)
+     34  Handelsgoederen
+         340   D   Aanschaffingswaarde
+         349   D   Geboekte waardeverminderingen (-)
+     35  Onroerende goederen bestemd voor verkoop
+         350   D   Aanschaffingswaarde
+         359   D   Geboekte waardeverminderingen (-)
+     36  Vooruitbetalingen op voorraadinkopen
+         360   D   Aanschaffingswaarde
+         369   D   Geboekte waardeverminderingen (-)
+     37  Bestellingen in uitvoering
+         370   D   Aanschaffingswaarde
+         379   D   Geboekte waardeverminderingen (-)
+
+  4  Vorderingen en schulden op ten hoogste één jaar
+     40  Handelsvorderingen
+         400   D   Handelsdebiteuren                          :koppeling=deb
+         401   D   Te innen wissels
+         404   D   Te innen opbrengsten
+#         406   D   Vooruitbetalingen                          :koppeling=crd
+         406   D   Vooruitbetalingen                          
+         407   D   Dubieuze debiteuren
+         409   D   Geboekte waardeverminderingen (-)
+     41  Overige vorderingen
+         410   D   Opgevraagd, niet-gestort kapitaal
+         411   D   Terug te vorderen BTW                      :koppeling=btw_ih
+         4111  D   Terug te vorderen BTW                      :koppeling=btw_il
+         412   D   Terug te vorderen belastingen en voorheffingen
+         4120  D   Belgische winstbelastingen
+         4121  D   Belgische winstbelastingen
+         4122  D   Belgische winstbelastingen
+         4123  D   Belgische winstbelastingen
+         4124  D   Belgische winstbelastingen
+         4125  D   Andere Belgische belastingen
+         4126  D   Andere Belgische belastingen
+         4127  D   Andere Belgische belastingen
+         4128  D   Buitenlandse belastingen
+         414   D   Te innen opbrengsten
+         416   D   Diverse vorderingen
+         417   D   Dubieuze debiteuren
+         418   D   Borgtochten betaald in contanten
+         419   D   Geboekte waardeverminderingen (-)
+     42  Schulden op meer dan één jaar die binnen het jaar vervallen
+         420   C   Achtergestelde leningen
+         4200  C   Converteerbaar
+         4201  C   Niet converteerbaar
+         421   C   Niet-achtergestelde obligatieleningen 
+         4210  C   Converteerbaar
+         4211  C   Niet converteerbaar
+         422   C   Leasingschulden en soortgelijke
+         423   C   Kredietinstellingen
+         4230  C   Schulden op rekeningen
+         4231  C   Promessen
+         4232  C   Acceptkredieten
+         424   C   Overige leningen
+         425   C   Handelsschulden
+         4250  C   Leveranciers
+         4251  C   Te betalen wissels
+         426   C   Ontvangen vooruitbetalingen op bestellingen
+         428   C   Borgtochten ontvangen in contanten
+         429   C   Overige schulden
+     43  Financiële schulden
+         430   C   Kredietinstellingen - Leningen op rekeningen met vaste termijn
+         431   C   Kredietinstellingen - Promessen
+         432   C   Kredietinstellingen - Acceptkredieten
+         433   C   Kredietinstellingen - Schulden in rekening courant
+         439   C   Overige leningen
+     44  Handelsschulden
+         440   C   Leveranciers                               :koppeling=crd
+         441   C   Te betalen wissels
+         444   C   Te ontvangen facturen
+     45  Schulden met betrekking tot belastingen, bezoldigingen en sociale lasten
+         450   C   Geraamd bedrag der belastingschulden
+         4500  C   Belgische winstbelastingen
+         4501  C   Belgische winstbelastingen
+         4502  C   Belgische winstbelastingen
+         4503  C   Belgische winstbelastingen
+         4504  C   Belgische winstbelastingen
+         4505  C   Andere Belgische belastingen en taksen
+         4506  C   Andere Belgische belastingen en taksen
+         4507  C   Andere Belgische belastingen en taksen
+         4508  C   Buitenlandse belastingen en taksen
+         451   C   Te betalen BTW                             :koppeling=btw_vh
+         4511  C   Te betalen BTW                             :koppeling=btw_vl
+         452   C   Te betalen belastingen en taksen
+         4520  C   Belgische winstbelastingen
+         4521  C   Belgische winstbelastingen
+         4522  C   Belgische winstbelastingen
+         4523  C   Belgische winstbelastingen
+         4524  C   Belgische winstbelastingen
+         4525  C   Andere Belgische belastingen en taksen
+         4526  C   Andere Belgische belastingen en taksen
+         4527  C   Andere Belgische belastingen en taksen
+         4528  C   Buitenlandse belastingen en taksen
+         453   C   Ingehouden voorheffingen
+         455   C   Bezoldigingen
+         456   C   Vakantiegeld
+         459   C   Andere sociale schulden
+      46 Ontvangen vooruitbetalingen op bestellingen
+#         460   C   Ontvangen vooruitbetalingen op bestellingen          :koppeling=deb
+         460   C   Ontvangen vooruitbetalingen op bestellingen         
+      47 Schulden uit de bestemming van het resultaat
+         470   C   Dividenden en tantièmes over vorige boekjaren
+         471   C   Dividenden over het boekjaar
+         472   C   Tantièmes over het boekjaar
+         473   C   Andere rechthebbenden
+      48 Diverse schulden
+         480   C   Vervallen obligaties en coupons
+         488   C   Borgtochten ontvangen in contanten
+         489   C   Andere diverse schulden
+      49 Overlopende rekeningen en wachtrekeningen
+         490   D   Over te dragen kosten
+         491   D   Verkregen opbrengsten
+         492   C   Toe te rekenen kosten
+         493   C   Over te dragen opbrengsten
+	 494   C   BTW R/C				:koppeling=btw_ok
+         499   D   Wachtrekeningen
+
+  5   Geldbeleggingen en liquide middelen
+      50 Eigen aandelen
+      51 Aandelen
+         510   D   Aanschaffingswaarde
+         511   D   Niet-opgevraagde bedragen (-) 
+	 519   D   Geboekte waardeverminderingen (-)
+      52 Vastrentende effecten
+         520   D   Aanschaffingswaarde
+         529   D   Geboekte waardeverminderingen (-)
+      53 Termijndeposito's
+         530   D   Op meer dan één jaar
+         531   D   Op meer dan één maand en op ten hoogste één jaar
+         532   D   Op ten hoogste één maand
+         539   D   Geboekte waardeverminderingen (-)
+      54 Te incasseren vervallen waarden
+      55 Kredietinstellingen
+         550   D   Bank A 
+         551   D   Bank B 
+         552   D   Bank C 
+         553   D   Bank D 
+         554   D   Bank E 
+         555   D   Bank F 
+         556   D   Bank G 
+         557   D   Bank H 
+         558   D   Bank I 
+         559   D   Bank J 
+      56 Postcheque en girodienst
+         560   D   Postchequerekening
+      57 Kassen
+         570   D   Kas A
+         571   D   Kas B
+         572   D   Kas C
+         573   D   Kas D
+         574   D   Kas E
+         575   D   Kas F
+         576   D   Kas G
+         577   D   Kas H
+      58 Interne overboekingen
+
+
+Resultaatrekeningen
+
+  6  Kosten
+     60  Handelsgoederen, grond- en hulpstoffen
+         600   K   Aankopen van grondstoffen
+         601   K   Aankopen van hulpstoffen
+         602   K   Aankopen van diensten, werk en studies
+         603   K   Algemene onderaannemingen
+         604   K   Aankopen van handelsgoederen
+         605   K   Aankopen van onroerende goederen bestemd voor verkoop
+         608   K   Ontvangen kortingen, ristorno's en rabatten (-)
+         609   K   Voorraadwijzigingen
+         6090  K   Voorraadwijzigingen van grondstoffen
+         6091  K   Voorraadwijzigingen van hulpstoffen
+         6094  K   Voorraadwijzigingen van handelsgoederen
+         6095  K   Voorraadwijzigingen van gekochte onroerende goederen bestemd voor verkoop 
+     61  Diensten en diverse goederen
+#	 611
+         611100 K  Huur en huurlasten terreinen
+	 611110	K  Huur en huurlasten gebouwen
+	 611120 K  Huur machines en materieel
+	 611130 K  Huurlasten op kantoormeubelen en materieel
+         611140 K  Huurlasten vervoermaterieel
+         611200 K  Leasing en soortgelijke rechten - Terreinen
+         611210 K  Leasing en soortgelijke rechten - Gebouwen
+         611230 K  Leasing en soortgelijke rechten - Materieel (installaties, machines, gereedschappen)
+         611240 K  Leasing en soortgelijke rechten - Kantoormeubilair en materieel
+         611300 K  Onderhoud en herstellingen terreinen
+         611310 K  Onderhoud en herstellingen gebouwen
+         611320 K  Onderhoud en herstellingen - Materieel (installaties, machines, gereedschappen)
+         611330 K  Onderhoud en herstellingen - Kantoormeubilair en materieel
+         611340 K  Onderhoud en herstelling personenwagens
+         611341 K  Onderhoud en herstelling bedrijfswagens
+#         612
+         612100 K  Water
+         612110 K  Gas
+         612120 K  Elektriciteit
+         612130 K  Gasoil-Materieel
+	 612140 K  Diesel Personenwagens
+	 612141 K  Diesel bedrijfswagens
+	 612150 K  Gasoil-verwarming
+	 612160 K  L.P.G.
+	 612170 K  Benzine
+	 612180 K  Propaan
+	 612200 K  Onderhoudsproducten
+	 612300 K  Boeken, tijdschriften en documentatie
+	 612400 K  Drukwerken
+	 612410 K  Aanbestedingsdocumenten
+	 612420 K  Diverse bureelbenodigdheden
+	 612500 K  Telefoon
+	 612504 K  GSM
+	 612505 K  Internet
+	 612510 K  Telegrammen
+	 612520 K  Telefax
+	 612530 K  Postzegels
+	 612610 K  Acide
+	 612620 K  Leeggoed
+	 612630 K  Papierwaren
+	 612640 K  Toegiften
+	 612650 K  Verpakking
+	 612660 K  Klein Materieel
+	 613100 K  Commissielonen aan derden
+	 613200 K  Erelonen advocaten
+	 613210 K  Erelonen architecten
+	 613220 K  Erelonen studiebureaus
+	 613230 K  Erelonen geneesheren
+	 613240 K  Erelonen bedrijfsrevisoren
+	 613250 K  Erelonen boekhouders
+	 613260 K  Notarissen
+	 613290 K  Erelonen, andere experten
+	 613300 K  Sociale secretariaten
+	 613310 K  Computerservicebureaus
+	 613311 K  Incassobureau
+	 613320 K  Erelonen accountants
+	 613330 K  Controle hijswerktuigen (kranen, liften, draaibanken, enz...)
+	 613331 K  Technische controle PW
+	 613332 K  Technische controle BW
+	 613333 K  Ijkkosten
+	 613334 K  Keur en controlekosten
+	 613340 K  Interimbureaus
+	 613350 K  Syndicus
+	 613351 K  Managementsvergoeding
+	 613352 K  Domicilievergoeding
+	 613360 K  Afvalverwerking
+	 613361 K  Brandbeveiliging
+	 613362 K  Bewakingskosten
+	 613363 K  Wasserijkosten
+	 613370 K  Auteursrechten, sabam
+	 613371 K  Verbruikcentrale
+	 613372 K  Billijke vergoeding
+	 613380 K  Telemarketing
+	 613400 K  Rechten en royalties op brevetten
+	 613410 K  Rechten en royalties op licenties
+ 	 613420 K  Andere rechten en royalties
+	 613500 K  Verzekering brand en algemene kosten
+	 613510 K  Verzekering tegen diefstal
+	 613520 K  Verzekering materieel en bouwplaatsinstallaties
+	 613530 K  Verzekering personenwagens
+ 	 613531 K  Verzekering bedrijfswagens
+	 613540 K  Verzekering Burgerlijke Aansprakelijkheid
+	 613550 K  Kredietverzekering
+	 613560 K  Controleverzekering
+	 613570 K  Bedrijfsschadeverzekering (All-risks)
+	 613580 K  Eigen verzekeraar en franchises
+	 614100 K  Vervoer van verkochte goederen en aanverwante kosten
+	 614200 K  Andere vervoerkosten
+	 614300 K  Vervoer van personeel
+	 615100 K  Reizen en verplaatsingen Binnenland
+	 615101 K  Reizen en verplaatsingen buitenland
+	 615110 K  Representatie binnenland
+	 615111 K  Representatie buitenland
+	 615120 K  Deelname aan cursussen, studiedagen, enz...
+	 615130 K  Relatiegeschenken
+ 	 615131 K  Commerciele kosten
+	 615200 K  Advertenties en inlassingen
+	 615210 K  Catalogi en drukwerken
+	 615220 K  Deelname aan beurzen, tentoonstellingen, zendingen
+	 615230 K  Promotiekosten
+	 615240 K  Decoratie- en etalagemateriaal
+	 615250 K  Trofeeen
+	 615260 K  Giften
+	 615300 K  Neerlegging jaarrekening
+	 615310 K  Inlassingen in Staatsblad en media
+	 615400 K  Bijdragen O.C.W.
+	 615410 K  Bijdragen W.T.C.B.
+	 615420 K  Bijdragen en Lidgelden
+	 615430 K  Abonnementen en lidgelden
+	 615440 K  Soc.kas vennootschappen
+	 615500 K  Fiscaal vrijgesteld
+	 615510 K  Fiscaal niet vrijgesteld
+	 615600 K  Kosten voor betwistingen
+         617   K   Uitzendkrachten en personen ter beschikking gesteld van de onderneming
+         618   K   Bezoldigingen, premies voor buitenwettelijke verzekeringen, ouderdoms- en overlevingspensioenen van bestuurders, zaakvoerders en werkende vennoten, die niet worden toegekend uit hoofde van een arbeidsovereenkomst
+     62  Bezoldigingen, sociale lasten en pensioenen
+         620   K   Bezoldigingen en rechtstreekse sociale voordelen
+         6200  K   Bezoldigingen bestuurders of zaakvoerders
+         6201  K   Directiepersoneel
+         6202  K   Bedienden
+         6203  K   Arbeiders
+         6204  K   Andere personeelsleden
+         621   K   Werkgeversbijdragen voor sociale verzekeringen
+         622   K   Werkgeverspremies voor bovenwettelijke verzekeringen
+         623   K   Andere personeelskosten
+         624   K   Ouderdoms- en overlevingspensioenen
+         6240  K   Bestuurders of zaakvoerders onder dienstcontract
+         6241  K   Personeel
+     63  Afschrijvingen, waardeverminderingen en voorzieningen voor risico's en kosten
+         630   K   Afschrijvingen en waardeverminderingen op vaste activa - Toevoeging
+         6300  K   Afschrijvingen op oprichtingskosten
+         6301  K   Afschrijvingen op immateriële vaste activa
+         6302  K   Afschrijvingen op materiële vaste activa
+         6308  K   Waardeverminderingen op immateriële vaste activa
+         6309  K   Waardeverminderingen op materiële vaste activa
+         631   K   Waardeverminderingen op voorraden
+         6310  K   Toevoeging
+         6311  K   Terugneming (-)	
+         632   K   Waardeverminderingen op bestellingen in uitvoering
+         6320  K   Toevoeging
+         6321  K   Terugneming (-)	
+         633   K   Waardeverminderingen op handelsvoerderingen op meer dan één jaar
+         6330  K   Toevoeging
+         6331  K   Terugneming (-)	
+         634   K   Waardeverminderingen op handelsvorderingen op ten hoogste één jaar
+         6340  K   Toevoeging
+         6341  K   Terugneming (-)	
+         635   K   Voorzieningen voor pensioenen en soortgelijke verplichtingen
+         6350  K   Toevoeging
+         6351  K   Besteding en terugneming (-) 
+         636   K   Voorzieningen voor grote herstellingswerken en grote onderhoudswerken
+         6360  K   Toevoeging
+         6361  K   Besteding en terugneming (-) 
+         637   K   Voorzieningen voor andere risico's en kosten
+         6370  K   Toevoeging
+         6371  K   Besteding en terugneming (-) 
+     64  Andere bedrijfskosten
+         640   K   Bedrijfsbelastingen
+         641   K   Minderwaarden op de courante realisatie van vaste activa
+         642   K   Minderwaarden op de realisatie van handelsvorderingen
+         643   K   Diverse bedrijfskosten
+         644   K   Diverse bedrijfskosten
+         645   K   Diverse bedrijfskosten
+         646   K   Diverse bedrijfskosten
+         647   K   Diverse bedrijfskosten
+         648   K   Diverse bedrijfskosten
+         649   K   Als herstructureringskosten geactiveerde bedrijfskosten (-)
+     65  Financiële kosten
+         650   K   Kosten van schulden
+         6500  K   Rente, commissies en kosten verbonden aan schulden
+         6501  K   Afschrijving van kosten bij uitgifte van leningen en van disagio
+         6502  K   Andere kosten van schulden
+         6503  K   Geactiveerde intercalaire interesten (-)
+         651   K   Waardeverminderingen op vlottende activa
+         6510  K   Toevoeging
+         6511  K   Terugneming (-)
+         652   K   Minderwaarden op de realisatie van vlottende activa
+         653   K   Discontokosten op vorderingen
+         654   K   Wisselresultaten
+         655   K   Resultaten uit de omrekening van vreemde valuta
+         656   K   Voorzieningen met financieel karakter
+         6560  K   Toevoegingen
+         6561  K   Bestedingen en terugnemingen (-)
+         657   K   Diverse financiele kosten
+         658   K   Diverse financiele kosten
+         659   K   Diverse financiele kosten
+
+     66  Uitzonderlijke kosten
+         660   K   Uitzonderlijke afschrijvingen en waardeverminderingen (toevoeging)
+         6600  K   Uitzonderlijke afschrijvingen en waardeverminderingen op oprichtingskosten (toevoeging)
+         6601  K   Uitzonderlijke afschrijvingen en waardeverminderingen op immatriële vaste activa (toevoeging)
+         6602  K   Uitzonderlijke afschrijvingen en waardeverminderingen op matriële vaste activa (toevoeging)
+	 661   K   Waardeverminderingen op financiële vaste activa (toevoeging)
+         662   K   Voorzieningen voor uitzonderlijke risico's en kosten
+         6620  K   Toevoegingen
+         6621  K   Bestedingen (-)
+         663   K   Minderwaarden op de realisatie van vaste activa
+         664   K   Andere uitzonderlijke kosten
+         665   K   Andere uitzonderlijke kosten
+         666   K   Andere uitzonderlijke kosten
+         667   K   Andere uitzonderlijke kosten
+         668   K   Andere uitzonderlijke kosten
+         669   K   Uitzonderlijke kosten als herstructureringskosten opgenomen onder de activa (-)
+     67  Belastingen op het resultaat
+         670   K   Belgische belastingen op het resultaat van het boekjaar
+         6700  K   Verschuldigde of gestorte belastingen en voorheffingen
+         6701  K   Geactiveerde overschotten van betaalde belastingen en voorheffingen (-)
+         6702  K   Geraamde belastingen
+         671   K   Belgische belastingen op het resultaat van vorige boekjaren
+         6710  K   Verschuldigde of gestorte belastingsupplementen
+         6711  K   Geraamde belastingsupplementen
+         6712  K   Gevormde fiscale voorzieningen
+         672   K   Buitenlandse belastingen op het resultaat van het boekjaar
+         673   K   Buitenlandse belastingen op het resultaat van vorige boekjaren
+     68  Overboeking naar de uitgestelde belastingen en naar de belastingvrije reserves
+         680   K   Overboeking naar de uitgestelde belastingen
+         689   K   Overboeking naar de belastingvrije reserves
+     69  Resultaatverwerking
+         690   K   Overgedragen verlies van het vorige boekjaar
+         691   K   Toevoeging aan het kapitaal en aan de uitgiftepremie
+         692   K   Toevoeging aan de reserves
+         6920  K   Toevoeging aan de wettelijke reserve
+         6921  K   Toevoeging aan de overige reserves
+         693   K   Over te dragen winst                        
+         694   K   Vergoeding van het kapitaal
+         695   K   Bestuurders of zaakvoerders
+         696   K   Andere rechthebbenden
+
+ 7  Opbrengsten
+     70  Omzet
+         700   O   Verkopen en dienstprestaties
+         701   O   Verkopen en dienstprestaties
+         702   O   Verkopen en dienstprestaties
+         703   O   Verkopen en dienstprestaties
+         704   O   Verkopen en dienstprestaties
+         705   O   Verkopen en dienstprestaties
+         706   O   Verkopen en dienstprestaties
+         707   O   Verkopen en dienstprestaties
+         708   O   Toegekende kortingen, ristorno's en rabatten (-)
+
+     71  Wijzigingen in de voorraden en in de bestellingen in uitvoering
+         712  O    In de voorraad goederen in bewerking
+         713  O    In de voorraad gereed product
+         715  O    In de voorraad onroerende goederen bestemd voor verkoop
+         717  O    In de bestellingen in uitvoering
+         7170 O    Aanschaffingswaarde
+         7171 O    Toegerekende winst
+     72  Geproduceerde vaste activa
+     74  Andere bedrijfsopbrengsten
+         740  O    Bedrijfssubsidies en compenserende bedragen
+         741  O    Meerwaarden op de courante realisatie van materiële vaste activa
+         742  O    Meerwaarden op de realisatie van handelsvorderingen
+         743  O    Diverse bedrijfsopbrengsten
+         744  O    Diverse bedrijfsopbrengsten
+         745  O    Diverse bedrijfsopbrengsten
+         746  O    Diverse bedrijfsopbrengsten
+         747  O    Diverse bedrijfsopbrengsten
+         748  O    Diverse bedrijfsopbrengsten
+         749  O    Diverse bedrijfsopbrengsten
+     75  Financiële opbrengsten
+         750  O    Opbrengsten uit financiële vaste activa
+         751  O    Opbrengsten uit vlottende activa
+         752  O    Meerwaarden op de realisatie van vlottende activa
+         753  O    Kapitaal- en interestsubsidies
+         754  O    Wisselresultaten
+         755  O    Resultaten uit de omrekening van vreemde valuta
+         756  O    Diverse financiële opbrengsten
+         757  O    Diverse financiële opbrengsten
+         758  O    Diverse financiële opbrengsten
+         759  O    Diverse financiële opbrengsten
+     76  Uitzonderlijke opbrengsten
+         760  O    Terugneming van afschrijvingen en waardeverminderingen
+         7600 O    op immateriële vaste activa
+         7601 O    op materiële vaste activa
+         761  O    Terugneming van waardeverminderingen op financiële vaste activa
+         762  O    Terugneming van voorzieningen voor uitzonderlijke risico's en kosten
+         763  O    Meerwaarden op de realisatie van vaste activa
+         764  O    Andere uitzonderlijke opbrengsten
+         765  O    Andere uitzonderlijke opbrengsten
+         766  O    Andere uitzonderlijke opbrengsten
+         767  O    Andere uitzonderlijke opbrengsten
+         768  O    Andere uitzonderlijke opbrengsten
+         769  O    Andere uitzonderlijke opbrengsten
+     77  Regularisering van belastingen en terugneming van fiscale voorzieningen
+         771  O    Belgische belastingen op het resultaat
+         7710 O    Regularisering van verschuldigde of betaalde belastingen
+         7711 O    Regularisering van geraamde belastingen
+         7712 O    Terugneming van fiscale voorzieningen
+         773  O    Buitenlandse belastingen op het resultaat
+     78  Onttrekking aan de belastingvrije reserves en de uitgestelde belastingen
+         780  O    Onttrekkingen aan de uitgestelde belastingen
+         789  O    Onttrekkingen aan de belastingvrije reserves
+     79  Resultaatverwerking
+         790  O    Overgedragen winst van het vorige boekjaar
+         791  O    Onttrekking aan het kapitaal en aan de uitgiftepremies
+         792  O    Onttrekking aan de reserves
+         793  O    Over te dragen verlies
+         794  O    Tussenkomst van vennoten (of van de eigenaar) in het verlies 
+
+# DAGBOEKEN
+#
+# EekBoek ondersteunt vijf soorten dagboeken: Kas, Bank, Inkoop,
+# Verkoop en Memoriaal. Er kunnen een in principe onbeperkt aantal
+# dagboeken worden aangemaakt.
+# In de eerste kolom wordt de korte naam (code) voor het dagboek
+# opgegeven. Verder moet voor elk dagboek worden opgegeven van welk
+# type het is. Voor dagboeken van het type Kas en Bank moet een
+# tegenrekening worden opgegeven, voor de overige dagboeken mag een
+# tegenrekening worden opgegeven.
+
+Dagboeken
+
+  I     Inkoop                :type=inkoop
+  K     Kas                   :type=kas        :rekening=570
+  D     Diversen              :type=memoriaal
+  P     Postbank              :type=bank       :rekening=550
+  V     Verkoop               :type=verkoop
+
+# BTW TARIEVEN
+#
+# Er zijn drie tariefgroepen: "hoog", "laag" en "nul". De tariefgroep
+# bepaalt het rekeningnummer waarop de betreffende boeking plaatsvindt.
+# Binnen elke tariefgroep zijn meerdere tarieven mogelijk, hoewel dit
+# in de praktijk niet snel zal voorkomen.
+# In de eerste kolom wordt de (numerieke) code voor dit tarief
+# opgegeven. Deze kan o.m. worden gebruikt om expliciet een BTW tarief
+# op te geven bij het boeken. Voor elk tarief (behalve die van groep
+# "nul") moet het percentage worden opgegeven. Met de aanduiding
+# :exclusief kan worden opgegeven dat boekingen op rekeningen met deze
+# tariefgroep standaard het bedrag exclusief BTW aangeven.
+#
+# BELANGRIJK: Mutaties die middels de command line shell of de API
+# worden uitgevoerd maken gebruik van het geassocieerde BTW tarief van
+# de grootboekrekeningen. Wijzigingen hierin kunnen dus consequenties
+# hebben voor de reeds in scripts vastgelegde boekingen.
+
+BTW Tarieven
+
+   0  BTW 0%                 :tariefgroep=nul
+   1  BTW 21% incl.          :tariefgroep=hoog :perc=21,00
+   2  BTW 21% excl.          :tariefgroep=hoog :perc=21,00 :exclusief
+#   3  BTW 12,0% incl.        :tariefgroep=midden :perc=12,00
+#   4  BTW 12,0% excl.        :tariefgroep=midden :perc=12,00 :exclusief
+   5  BTW 6,0% incl.         :tariefgroep=laag :perc=6,00
+   6  BTW 6,0% excl.         :tariefgroep=laag :perc=6,00 :exclusief
+
+# Einde EekBoek schema

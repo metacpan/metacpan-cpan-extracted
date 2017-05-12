@@ -1,0 +1,15 @@
+Revision history for Perl extension Exception::Handler.pm
+
+   1.00_4
+      Thu Dec 21 18:04:23 CST 2006
+      Added new method ::error() to retrieve the contents of the most recently
+		thrown error in a given Exception::Handler object
+
+   1.00_3
+      Fri Sep 19 00:37:33 CDT 2003
+      Corrected slight grammatical/spelling error in stack dumps produced
+      by method Exception::Handler::trace()
+
+   1.00_2
+      12/23/02, 1:44 am
+      Initial release of Exception::Handler.pm

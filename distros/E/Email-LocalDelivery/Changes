@@ -1,0 +1,79 @@
+Release history for Email-LocalDelivery
+
+1.200     2013-08-08 21:24:39 America/New_York
+          crank the version number *way* up to bring all the module versions in
+          sync without rolling any of them back
+
+0.218     2013-08-08 20:36:42 America/New_York
+          point to new repo, bugtracker; also reference Email::Sender
+
+0.217     2007-06-22
+          remove dross test file from dist
+
+0.216     2007-06-22
+          allow Maildir deliveries to be streamed to disk
+
+0.215     2007-04-15
+          mbox is /From / not /From\s/ (rt 26373 from Simon Law)
+
+0.214     2007-02-22
+          use strict everywhere
+
+0.213     2007-02-15
+          avoid manging strings passed to deliver
+          reorganize libs into ./lib
+
+0.212     2007-02-14
+          fix packaging glitches
+
+0.211     2007-02-14
+          St. Valentine's Day release: We love email!
+          stop breaking the encapsulation around Email::Simple
+
+0.21      2006-07-21
+          update PEP URL
+
+0.20      2006-07-07
+          try to be compat with perl 5.005
+          don't lose mail when delivering to maildirs! (check print() status)
+          avoid topicalization clashes during mailbox name/type matching
+
+0.09      2004-12-17
+          New author.
+          Allow for subclassing flexibility in Email::LocalDelivery::Mbox.
+          New contact information.
+
+0.08      Saturday 29th May, 2004
+	        Make fix_lines not be a no-op (Toby Johnson)
+
+0.07      Friday 14th November, 2003
+	        http://rt.cpan.org/NoAuth/Bug.html?id=4394 bug caused by flawed
+	        implementation of #2480.  the test suite is woefully poor not
+	        to have caught this
+
+0.06      Wednesday 29th October, 2003
+        	http://rt.cpan.org/NoAuth/Bug.html?id=2480 quoting of From_
+        	lines in bodies of messages in Mboxes
+
+          http://rt.cpan.org/NoAuth/Bug.html?id=2483 expansion of ~ elements
+
+0.05      Thursday 24th July 2003
+	        Fix bug in ::Maildir
+	        quell warning
+
+0.04      Fri May  2 12:56:34 BST 2003
+          Handle failure to open mboxen properly
+          Insert blank line before new message in mbox.
+
+0.03      Wednesday 16th April, 2003, just after the PAUSE indexer got in touch
+          Increment the version numbers in E::LD::{Mbox,Maildir}
+
+0.02      Wednesday 16th April, 2003
+          now depends on Email::Simple and Email::FolderType
+          changes to make code -w clean
+          http://rt.cpan.org/NoAuth/Bug.html?id=2356
+          http://rt.cpan.org/NoAuth/Bug.html?id=2357
+
+0.01      Fri Feb 21 13:26:07 2003
+	        original version; created by h2xs 1.2 with options
+        		-AX -n Email::LocalDelivery

@@ -1,0 +1,31 @@
+<html>
+<head>
+<title>Some tests for Embperl</title>
+</head>
+
+
+<body>
+
+[- use Cwd (); -]
+
+optDisableChdir:[+ $optDisableChdir +] <BR>
+optDisableFormData: [+ $optDisableFormData +] <BR>
+Script  CWD: [+ $script = Cwd::fastcwd() +] <BR>
+Embperl CWD: [+ $ep =     $HTML::Embperl::cwd +] <BR>
+
+Equal: [+ $script eq $ep?'Yes':'No' +]<BR>
+Diff CWD: [+ do { $script =~ /$ep/ ; ">$'<" } +]<BR>
+Test/html: [+ $script =~ /test(?:\/|\\)html$/?'yes':'no' +]
+
+[- @ks = sort keys %fdat -]
+
+	<table>
+		<tr>
+			<td>[+ $ks[$row] +]</td><td>[+ $fdat{$ks[$row] || ''} +]</td>
+		</tr>
+	</table>
+
+
+
+</body>
+</html>

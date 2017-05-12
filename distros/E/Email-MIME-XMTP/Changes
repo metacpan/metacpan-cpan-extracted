@@ -1,0 +1,81 @@
+Revision history for Perl extension Email::MIME::XMTP.
+
+0.42	Fri Dec 16 15:58:03 GMT 2005
+
+	- fixed misc UTF-8 bugs which caused double encoding nightmare
+	- force Content-Transfer-Encoding to 8bit of output message body if not
+	  binary - or already quoted-printable or base64 encoded
+	- added 'MIME-Q' decode of headers
+
+0.41	Fri Aug 19 12:40:42 CEST 2005
+
+	- fixed proper bug when decoding email body if no charset specified into
+	  Content-Type header; it is now default to UTF-8.
+
+0.40	Thu Aug 18 17:53:06 CEST 2005
+
+	- fixed nusty bug when serializing to XML headers combined with body. Make
+	  sure that headers as decoded and body is a valid UTF-8 string into XML.
+
+0.39	Thu Aug 18 01:44:46 CEST 2005
+
+	- fixed bug when Content-Type is not specified; and default to text/plain
+	  (and do not base64-encode body text)
+
+0.38	Mon Jul  4 19:22:27 CEST 2005
+
+	- fixed bug in _XMLbodyEncode() to make content-type checking
+	  case insensistive
+	- added POD patches as reported by Mike Castel <dalgoda@ix.netcom.com>
+
+0.37	Tue May 24 01:42:29 CEST 2005
+
+	-  avoid to emit xmtp:Body-Multipart and visit sub-parts of
+	   a MIME message if not explicitly requested (or no filters)
+
+0.36	Wed May 11 13:37:15 CEST 2005
+
+	- better fix for 0.35 body MIME encoding problem/issue. The
+	  original base64 or quoted-printable Content-Transfer-Encoding is
+	  left untouched. And encoded to UTF-8 and then base64 if necessary.
+
+0.35	Tue May 10 18:10:27 CEST 2005
+	
+	- fixed bug when decoding body of MIME messages and 
+	  their Content-Transfer-Encoding
+
+0.34	Tue May  3 00:15:26 CEST 2005
+
+	- various fixes to properly decode MIME headers and body part to UTF-8
+	- added more fire-safe XML escape or misc tag names and attribute values
+
+0.33	Mon Apr 25 02:02:41 CEST 2005
+
+	- added rdfs:seeAlso links for 'References' header
+	- added simple RDF threading using Annotea RDF Schema
+	  see http://www.w3.org/2001/03/thread
+	- updated namespace handling and custom tags and put them into standard
+	  MIME/SMTP extension header space X-XMTP-*
+	- force Content-Transfer-Encoding: base64 for non text and multipart things
+
+0.32	Sun Apr 24 14:25:20 CEST 2005
+
+	- added proper BSD LICENSE
+
+0.31	Tue Apr 19 01:43:19 CEST 2005
+
+	- fixed bug in XMTP spec when multipart message adding xmtp:Body-Multipart tag
+	- fixed bug when generating xmtp:Body
+	- fixed bug to generate XMTP properties only if header is valid XML tag
+
+0.3	Mon Apr 18 20:25:36 CEST 2005
+
+	- added headers filter to as_XML() method
+
+0.2	Fri Apr  8 15:19:30 CEST 2005
+
+	- fixed bug when set_namespace() and custom tags are being used
+
+0.1	Thu Apr  7 23:12:24 CEST 2005
+
+	- original version with no parseXML() method support

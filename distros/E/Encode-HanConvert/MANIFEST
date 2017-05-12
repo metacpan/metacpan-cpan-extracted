@@ -1,0 +1,36 @@
+AUTHORS				List of servers
+bin/b2g.pl			Convert from Big5 to GBK (CP936)
+bin/g2b.pl			Convert from GBK (CP936) to Big5
+Changes				Changelog
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Encode/HanConvert.pm	Traditional and Simplified Chinese mappings
+lib/Encode/HanConvert/Perl.pm-orig	Perl-based Encode::HanConvert
+Makefile.PL			Makefile generator
+MANIFEST			This list of files
+MANIFEST.SKIP			List of files to skip
+map/b2g_map.txt			Big5 to GBK Map - Not Installed
+map/b2g_map.utf8		Trad to Simp Map - Not Installed
+map/DerivedAge.txt		Unicode code points - Not Installed
+map/g2b_map.txt			GBK to Big5 Map - Not Installed
+map/g2b_map.utf8		Simp to Trad Map - Not Installed
+map/map2pm.pl			Generate Perl.pm from Map files - Not Installed
+map/map2ucm.pl			Generate UCM from Map files - Not Installed
+map/ucm2map.pl			Generate Map from UCM Files - Not Installed
+map/umap2ucm.pl			Generate UCM from UMap files - Not Installed
+META.yml			Module meta-data in YAML
+README				The Instructions
+SIGNATURE			Signature file
+t/1-basic.t			Sanity test
+t/daode.b5			Test data file
+t/daode.gbk			Test data file
+t/daode_g.b5			Test data file
+t/zhengqi.b5			Test data file
+t/zhengqi.gbk			Test data file
+t/zhengqi_b.gbk			Test data file

@@ -1,0 +1,51 @@
+==================================================
+Changes from 2008-02-10 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 1.06 at 2013-02-08 00:34:56 +0000
+-----------------------------------------
+
+  Change: 2e87678bc7962519b352f26592c04371a87f2920
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-02-08 00:34:56 +0000
+
+    Convert dist to dzil 
+
+  Change: e1b4e9dd4e46ed67ec7b7c3b51794ee9b0d90ca8
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-02-08 00:10:08 +0000
+
+    Converted to use Moo and MooX::late 
+
+-----------------------------------------
+version 1.04 at 2009-05-22 10:54:55 +0000
+-----------------------------------------
+
+  Change: 8a965639c39b5317877c69e022de947be43219e2
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2009-05-22 11:54:55 +0000
+
+    Finally got it all working. Thanks mst! 
+
+  Change: a28121a84f77e3af322ec2131e978f60b34b2e21
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2009-05-22 10:54:31 +0000
+
+    Updated README 
+
+  Change: 19b6d50ae771570fee54f091eed0d121483e1eb3
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2009-05-22 10:33:43 +0000
+
+    Tidied up pod_coverage test. 
+
+  Change: ee08fafb9d38741f10fa4abc697927424bf7a084
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2009-05-22 09:47:38 +0000
+
+    Initial commit of Env-Sanctify-Moosified 
+
+================
+End of releases.
+================

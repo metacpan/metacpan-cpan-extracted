@@ -1,0 +1,70 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- Komodo Project File - DO NOT EDIT -->
+<project kpf_version="2" name="proj">
+<preference-set id="">
+  <string id="import_dirname">D:\src\Encode-CNMap</string>
+</preference-set>
+<file name="Makefile.PL" url="Makefile.PL">
+</file>
+<file name="MANIFEST" url="MANIFEST">
+</file>
+<file name="META.yml" url="META.yml">
+</file>
+<file name="CNMap.pm" url="CNMap.pm">
+</file>
+<file name="README" url="README">
+</file>
+<folder name="t" url="t">
+<preference-set id="">
+  <string id="import_dirname">D:\src\Encode-CNMap\t</string>
+</preference-set>
+<file name="00base.t" url="t/00base.t">
+</file>
+<file name="zhengqi.b5" url="t/zhengqi.b5">
+</file>
+<file name="zhengqi.gb" url="t/zhengqi.gb">
+</file>
+<file name="zhengqi.gbk" url="t/zhengqi.gbk">
+</file>
+<file name="zheng_gb.b5" url="t/zheng_gb.b5">
+</file>
+</folder>
+<folder name="bin" url="bin">
+<file name="cnmap" url="bin/cnmap">
+</file>
+<file name="cnmapdir" url="bin/cnmapdir">
+</file>
+</folder>
+<folder name="ucm" url="ucm">
+<file name="big5-trad.ucm" url="ucm/big5-trad.ucm">
+</file>
+<file name="cntest.bat" url="ucm/cntest.bat">
+</file>
+<file name="cp950.ucm" url="ucm/cp950.ucm">
+</file>
+<file name="euc-cn.ucm" url="ucm/euc-cn.ucm">
+</file>
+<file name="gb2312-add.dat" url="ucm/gb2312-add.dat">
+</file>
+<file name="gb2312-simp.ucm" url="ucm/gb2312-simp.ucm">
+</file>
+<file name="gbk2gb.pl" url="ucm/gbk2gb.pl">
+</file>
+<file name="gbk2gb_check.pl" url="ucm/gbk2gb_check.pl">
+</file>
+<file name="gbkcode.pl" url="ucm/gbkcode.pl">
+</file>
+<file name="gbktest.pl" url="ucm/gbktest.pl">
+</file>
+<file name="makeall.bat" url="ucm/makeall.bat">
+</file>
+<file name="tab2ucm.pl" url="ucm/tab2ucm.pl">
+</file>
+</folder>
+<folder name="examples" url="examples">
+<file name="demo.pl" url="examples/demo.pl">
+</file>
+</folder>
+<file name="Changes" url="Changes">
+</file>
+</project>

@@ -1,0 +1,237 @@
+body {
+    color: #000;
+    background: #977;
+    font-family: verdana, tahoma, sans-serif;
+}
+
+#contentwrapper {
+    width: 95%;
+    min-width: 800px;
+    background: #d9d9d9;
+    border: 1px solid #aaa;
+    -moz-border-radius: 10px;
+    margin: 10px auto;
+}
+
+h1 {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    font-weight: bold;
+    font-size: 1.6em;
+    text-align: center;
+}
+
+h2 {
+    text-align: center;
+    color: #b00;
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+
+#content, #note{
+    font-size: 0.9em;
+    padding: 8px 10px;
+    margin: 10px;
+    -moz-border-radius: 10px;
+}
+
+#content {
+    border: 1px solid #aaa;
+    background: #fff;
+}
+
+#note {
+    background: #797;
+    border: 1px solid #575;
+    color: #fff;
+}
+
+a {
+    color: #b00;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #d00;
+}
+
+#content a:link,
+#content a:visited {
+    border-bottom: 1px dotted #DD0000;
+}
+
+#content a:hover,
+#content a:focus {
+    border-bottom-style: solid;
+}
+
+#content .calendar a:hover {
+    background: #f0f0f0;
+}
+
+/* MONTH TABLE */
+
+#content .calendar {
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 1em;
+}
+
+#content .calendar th {
+    padding: 5px;
+    border: 1px solid #ddd;
+    background: #f0f0f0;
+}
+
+#content .calendar td {
+    text-align: center;
+    padding: 0;
+    width: 14%;
+    vertical-align: top;
+}
+
+#content .calendar td.inmonth {
+    background-color: #f3f3f3;
+    height: 8em;
+}
+
+#content .calendar td.notinmonth {
+    height: 8em;
+}
+
+/* DAY TABLE */
+
+#content .day {
+    border-spacing: 0px;
+    width: 100%;
+}
+
+#content .day th,td {
+    font-size: x-small;
+    border: 0 solid white;
+    border-bottom: 1px solid white;
+}
+
+#content .day th {
+    background: #ffcaf4;
+    text-align: right;
+    font-weight: bold;
+    padding: 0 5px 0 0;
+}
+
+#content .day td {
+    background-color: #fdf9e0;
+    border-bottom-style: solid;
+    border-bottom-color: #d3d2d3;
+}
+
+#content .day th.today {
+    background-color: orange;
+}
+
+/* EVENT ROW */
+
+#content .allday td {
+    background-color: #e5e1ca;
+}
+
+#content .event td.time {
+    padding-right: 1px;
+    padding-left: 1px;
+    text-align: left;
+}
+
+#content .event td.subject {
+    padding-right: 1px;
+    padding-left: 1px;
+    text-align: left;
+    width: auto;
+}
+
+#content .event td.icons {
+    padding-right: 1px;
+    padding-left: 1px;
+    text-align: right;
+}
+
+/* Easy CSS Tooltip - by Koller Juergen [www.kollermedia.at] */
+
+a.tooltip {
+    color: black !important;
+    border: 0 !important;
+}
+
+a.tooltip span {
+    display: none;
+    margin-left: -75px;
+    margin-top: 30px;
+}
+
+a.tooltip:hover span {
+    display: inline; 
+    position: absolute; 
+    border: 2px ridge orange; 
+    background: #ffffff;
+    /* color: #6c6c6c; */
+}
+
+#content .tiprow td.tipkey {
+    text-align: left;
+    font-weight: bold;
+    background-color: #fdf9e0;
+}
+
+#content .tiprow td.tipval {
+    text-align: left;
+    width: auto;
+    background-color: #fdf9e0;
+}
+
+#content .tiprow td.tipbody {
+    width: 200px;
+}
+
+/* OTHER STUFF */
+
+.tiddler {
+    font-size: small;
+    vertical-align: middle;
+}
+
+.rss {
+    font-size: x-small;
+    text-align: right;
+}
+
+#pager {
+    border-top: 1px solid #e0e0e0;
+    list-style-type: none;
+    margin-left: 0;
+    padding: 0.4em;
+    position: relative;
+    width: 100%;
+}
+
+#pager li {
+    color: #c0c0c0;
+}
+
+#pager .next {
+    position: absolute;
+    right: 0.4em;
+    text-align: right;
+    width: 33%;
+}
+
+#pager .previous {
+    left: 0.4em;
+    position: absolute;
+    width: 33%;
+}
+
+@media print {
+    a {
+        color: black !important;
+        border: 0 !important;
+    }
+}

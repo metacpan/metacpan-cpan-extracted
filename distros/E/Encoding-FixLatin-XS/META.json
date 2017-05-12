@@ -1,0 +1,44 @@
+{
+   "abstract" : "XS implementation layer for Encoding::FixLatin",
+   "author" : [
+      "Grant McLean <grantm@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300023, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Encoding-FixLatin-XS",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encoding::FixLatin" : "1.03",
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.90"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/grantm/encoding-fixlatin-xs.git",
+         "web" : "http://github.com/grantm/encoding-fixlatin-xs"
+      }
+   },
+   "version" : "1.01"
+}
+

@@ -1,0 +1,1705 @@
+#!/usr/bin/perl -w
+#
+# Copyright (C) 2002-2016 National Marrow Donor Program. All rights reserved.
+#
+# For a description of this program, please refer to the POD documentation
+# embedded at the bottom of the file (e.g. perldoc ecs_scan_mail).
+
+use EMDIS::ECS qw(:ALL);
+use EMDIS::ECS::FileBackedMessage;
+use EMDIS::ECS::Message;
+use CPAN::Version;
+use File::Copy;
+use File::Spec::Functions qw(catdir catfile);
+use File::Temp qw(tempfile);
+use Getopt::Long;
+use Net::POP3;
+use POSIX qw(setsid);
+use sigtrap;
+use strict;
+use Env qw(ECS_CONFIG_FILE);
+use Pod::Usage;
+
+# load Mail::IMAPClient module at compile time (in BEGIN block),
+# without causing fatal error if module fails to load
+my $found_Mail_IMAPClient;
+BEGIN {
+    $found_Mail_IMAPClient = '';
+    $found_Mail_IMAPClient = 1
+        if(eval "require Mail::IMAPClient");
+}
+
+# process command line arguments
+my $opt_daemon = 1;
+my $opt_once = 0;
+my $opt_config = 'ecs.cfg';
+my $opt_help = 0;
+
+if (defined $ECS_CONFIG_FILE && $ECS_CONFIG_FILE ne '') {
+   if (! -f $ECS_CONFIG_FILE) {
+      die "Error: invalid environment variable ECS_CONFIG_FILE='$ECS_CONFIG_FILE'!\n";
+   }
+   else {
+      $opt_config = $ECS_CONFIG_FILE;
+   }
+}
+
+GetOptions('daemon!' => \$opt_daemon, "once!" => \$opt_once,
+    'config=s' => \$opt_config, "help" => \$opt_help)
+    or die "Error:  unrecognized command line option.\n" .
+           "Usage:  $0 [--config ecs_cfg] [--nodaemon] [--once]\n" .
+           "For details, refer to documentation:  perldoc $0\n";
+
+$opt_daemon = 0 if $opt_once;    # --once implies --nodaemon
+
+# initialize
+my $err = load_ecs_config($opt_config);
+die "$err\nUnable to initialize ECS.\n" if $err;
+my $DEBUG_LABEL = "<DEBUG>: ";
+my $interrupted = '';
+my $reload_config = '';
+my $pipe_broken = '';
+   $SIG{INT} = $SIG{TERM} = \&sigint_handler;   # install signal handler
+if ( $^O !~ /MSWin32/ ) {   # Unix only signal handler
+   $SIG{HUP} = \&sighup_handler;    # install signal handler
+}
+check_pid();                     # check whether already running
+my $mbox;
+pod2usage(-verbose=>2) if $opt_help;
+
+# if indicated, fork daemon process
+if($opt_daemon) {
+
+    if ( $^O !~ /MSWin32/ ) {   # Unix only
+       # fork child process
+       my $pid = fork;
+       exit if $pid;  # let parent exit
+       die "Error - unable to fork: $!\n"
+           unless defined $pid;
+    }
+
+    # update PID file
+    save_pid();
+
+    if ( $^O !~ /MSWin32/ ) {   # Unix only
+    # make child process leader of new session with no controlling terminal
+       POSIX::setsid()
+           or die "Error - unable to set up session: $!\n";
+    }
+}
+
+eval
+{
+    # main processing loop
+    while (1) {
+
+        last if $interrupted;  # quit now if interrupted
+        my $processing_start_time = time();
+
+        if($reload_config) {
+            print "$DEBUG_LABEL reload_config($opt_config)\n"
+                if $ECS_CFG->{ECS_DEBUG} > 0;
+            my $err = load_ecs_config($opt_config);
+            log_error($err) if $err;
+            $reload_config = '';
+        }
+
+        # scan mail
+        scan_mail();
+
+        last if $interrupted;  # quit now if interrupted
+
+        # process incoming messages in 'store' folder
+        process_store($processing_start_time);
+
+        if($ECS_NODE_TBL->lock())
+        {
+            # clear status info about message currently being processed
+            my $this_node = $ECS_NODE_TBL->read($ECS_CFG->THIS_NODE);
+            $this_node->{proc_node} = '';
+            $this_node->{proc_seq} = '';
+            $this_node->{proc_file} = '';
+            $ECS_NODE_TBL->write($ECS_CFG->THIS_NODE, $this_node);
+            $ECS_NODE_TBL->unlock();  # release lock
+        }
+        else
+        {
+            log_error("main: unable to lock ECS_NODE_TBL: " .
+                $ECS_NODE_TBL->ERROR . "\n");
+        }
+
+        last if $interrupted;  # quit now if interrupted
+
+        # process outbound message files in "maildrop" folder
+        my $to_dir = $ECS_CFG->ECS_TO_DIR;
+        if ((not defined $to_dir) or ($to_dir eq '' )) {
+           process_maildrop();
+        }
+        else {
+           process_to_XX( $processing_start_time );
+        }
+
+        last if $interrupted;  # quit now if interrupted
+
+        # 'once' option - exit loop after one iteration
+        last if $opt_once;
+
+        # sleep for up to T_SCN seconds
+        my $sleep_time =  $processing_start_time + $ECS_CFG->T_SCN - time();
+        if($sleep_time > 0) {
+            print "$DEBUG_LABEL sleep $sleep_time\n"
+                if $ECS_CFG->ECS_DEBUG > 0;
+            sleep2 ($sleep_time);
+        }
+    }
+}
+or do
+{
+    log_error($@) if $@;
+    log_info("Execution terminated.");
+    die $@ if $@;
+};
+
+exit 0;
+
+# ----------------------------------------------------------------------
+# Subroutine automatically called if program is shut down politely.
+END {
+   if (!$opt_help){
+      print "$DEBUG_LABEL END()\n"
+         if (not ref $ECS_CFG) or ($ECS_CFG->ECS_DEBUG > 0);
+   }
+  mbox_close();
+  remove_pidfile() if $EMDIS::ECS::pid_saved;
+}
+
+# ----------------------------------------------------------------------
+# A new sleep to solve the problem of windows won't break out during a
+# normal sleep
+sub sleep2 {
+   my $cnt = shift;
+   while ($cnt) {
+       last if $interrupted;
+       sleep(1);
+       $cnt--;
+   }
+}
+# ----------------------------------------------------------------------
+# We need to adjust the index based on the number of deleted messages
+# for DIRECTORY protocol
+sub indexAdj {
+   my $i = shift;
+   my $deleted = shift;
+
+   $ECS_CFG->INBOX_PROTOCOL =~ /DIRECTORY/ ?
+      ($i - $deleted) : $i;
+}
+
+
+# ----------------------------------------------------------------------
+# scan email inbox and process messages
+sub scan_mail
+{
+    my $mbox_err;
+    my $loopnum = 0;
+    my $msgcount = -1;
+    my $ignored_msgcount = 0;
+    until ($mbox_err or ($msgcount - $ignored_msgcount) == 0 or $loopnum >= 9)
+    {
+        $ignored_msgcount = 0;
+        $loopnum++;
+        ($mbox_err, $msgcount) = mbox_open();
+        if($mbox_err) {
+            log_error("scan_mail(): unable to open email inbox: $mbox_err");
+            last;
+        }
+        print "$DEBUG_LABEL msgcount = $msgcount\n"
+            if $ECS_CFG->ECS_DEBUG > 0;
+
+        if(not $mbox_err) {
+            my $numDelMsg = 0;   # init the number of deleted msg to 0
+            my $fname_dttm = format_datetime(
+                time, '%04d%02d%02d_%02d%02d%02d');
+            for my $msgnum (1..$msgcount) {
+                last if $interrupted;      # exit msgnum loop if int'd
+
+                # read email message
+                my ($err, $raw_msg) = mbox_get_message(indexAdj($msgnum,$numDelMsg));
+                if($err) {
+                    log_error("scan_mail(): unable to get message $msgnum " .
+                              "from email inbox: $err");
+                    next;
+                }
+
+                # construct EMDIS::ECS::Message object
+                my $msg = new EMDIS::ECS::Message($raw_msg);
+                if((not ref $msg) or (not $msg->is_ecs_message())) {
+                    my $template = sprintf('%s_%d_%04d_XXXX',
+                       $fname_dttm, $loopnum, $msgnum);
+                    my ($fh, $filename) = tempfile($template,
+                       DIR => catdir($ECS_CFG->ECS_DAT_DIR, 'mboxes', 'trash'),
+                       SUFFIX => '.msg');
+                    print $fh $raw_msg
+                       or $err = "unable to write file $filename: $!";
+                    close $fh;
+                    chmod $EMDIS::ECS::FILEMODE, $filename;
+                    log_info(
+                        "scan_mail(): received non-ECS message: $filename\n");
+                    mbox_delete_message(indexAdj($msgnum,$numDelMsg));
+                    $numDelMsg++;            # We just deleted a msg
+                    $ignored_msgcount++;
+                    next;
+                }
+                last if $interrupted;  # exit msgnum loop if int'd
+
+                # write message to temp file in $ECS_DAT_DIR/tmp
+                my $template = sprintf('%s_%d_%04d_XXXX',
+                    $fname_dttm, $loopnum, $msgnum);
+                my ($fh, $filename) = tempfile($template,
+                                               DIR => $ECS_CFG->ECS_TMP_DIR,
+                                               SUFFIX => '.msg');
+                print $fh $msg->full_msg()
+                    or $err = "unable to write file $filename: $!";
+                close $fh;
+                chmod $EMDIS::ECS::FILEMODE, $filename;
+                if($err) {
+                    log_error("scan_mail(): unable to create tempfile: $err");
+                    next;
+                }
+
+                # check if sender is this_node
+                if ($msg->sender eq $ECS_CFG->THIS_NODE) {
+                   # mailtoadmin - tell admin mail is in $filename
+                   print "$DEBUG_LABEL processing recipient = sender file: $filename\n"
+                      if $ECS_CFG->{ECS_DEBUG} > 0;
+
+                   send_admin_email("recipient and sender are the same." ,
+                      " The message can be found in $filename");
+                   mbox_delete_message(indexAdj($msgnum,$numDelMsg));
+                   $numDelMsg++;            # We just deleted a msg
+                   $ignored_msgcount++;
+                   next;
+                }
+
+                #check if sender is really a node
+                $ECS_NODE_TBL->lock();               # lock node_tbl
+                my @nodes = sort $ECS_NODE_TBL->keys();
+                $ECS_NODE_TBL->unlock();             # unlock node_tbl
+                my $sender = $msg->sender;
+
+                if ( ! ( grep { $_ =~ /$sender/ } @nodes)) {
+                   # mailtoadmin - tell admin that sender is not a node
+                   print "$DEBUG_LABEL making sure sender is a node\n"
+                      if $ECS_CFG->{ECS_DEBUG} > 0;
+                   send_admin_email(
+                      "ecs_scan_mail: node not found: $sender (@nodes)! "
+                    . "The message can be found in $filename\n");
+                   mbox_delete_message(indexAdj($msgnum,$numDelMsg));
+                   $numDelMsg++;            # We just deleted a msg
+                   $ignored_msgcount++;
+                   next;
+                }
+
+                # copy message to "in" folder
+                $err = copy_to_dir($filename, $ECS_CFG->ECS_MBX_IN_DIR);
+                if($err) {
+                    log_error("scan_mail(): unable to copy file $filename " .
+                              "to " . $ECS_CFG->ECS_MBX_IN_DIR . ": $err");
+                    $ignored_msgcount++;
+                    next;
+                }
+
+                # if configured, copy message to "in_bck" folder
+                if($ECS_CFG->BCK_DIR ne 'NONE') {
+                    $err = copy_to_dir($filename, $ECS_CFG->BCK_DIR);
+                    if($err) {
+                        log_error("scan_mail(): unable to back up file " .
+                                  "$filename to " . $ECS_CFG->BCK_DIR .
+                                  ": $err");
+                    }
+                }
+
+                if($msg->is_meta_message()) {
+                    # process meta-message
+                    $err = process_meta_message($msg, $filename);
+                    if($err) {
+                        log_error("scan_mail(): unable to process " .
+                                  "meta-message: $err");
+                    }
+                }
+                else {
+                    # copy regular ECS message to "store" folder
+                    # for later processing
+                    $err = move_to_dir($filename,
+                                       $ECS_CFG->ECS_MBX_STORE_DIR);
+                    if($err) {
+                        log_error("scan_mail(): unable to move file to " .
+                                  "\"store\" folder: $err");
+                    }
+
+                    # update $node->{last_in} (if node defined in node_tbl)
+                    $err = '';
+                    $ECS_NODE_TBL->lock()    # lock node_tbl
+                        or $err = "unable to lock node_tbl: " .
+                            $ECS_NODE_TBL->ERROR;
+                    if(not $err) {
+                        my $node = $ECS_NODE_TBL->read($msg->sender);
+                        $err = $ECS_NODE_TBL->ERROR;
+                        if($node and not $err) {
+                            $node->{last_in} = time;
+                            $ECS_NODE_TBL->write($msg->sender, $node);
+                            $err = $ECS_NODE_TBL->ERROR;
+                        }
+                    }
+                    $ECS_NODE_TBL->unlock(); # unlock node_tbl
+                    if($err) {
+                        log_error("scan_mail(): unable to update last_in " .
+                                  "for node " . $msg->sender . ": $err");
+                    }
+
+                }
+                mbox_delete_message(indexAdj($msgnum,$numDelMsg));
+                $numDelMsg++;   # We just deleted a msg
+            }
+
+            mbox_close();
+            last if $interrupted;        # exit msgcount loop if interrupted
+            last if $opt_once;           # 'once' option
+        }
+    }
+}
+
+# ----------------------------------------------------------------------
+# Process outgoing messages in "maildrop" folder
+sub process_maildrop
+{
+    print "$DEBUG_LABEL process_maildrop()\n"
+        if $ECS_CFG->{ECS_DEBUG} > 0;
+
+    # get sorted list of files in directory
+    if(not opendir(MAILDROP, $ECS_CFG->ECS_DRP_DIR)) {
+        log_error("process_maildrop(): unable to open \"maildrop\" " .
+                        "directory: " . $ECS_CFG->ECS_DRP_DIR);
+        return;
+    }
+    my $file;
+    my @filelist = ();
+    while(defined($file = readdir(MAILDROP))) {
+        push(@filelist, $file);
+    }
+    closedir(MAILDROP);
+    @filelist = sort @filelist;
+
+    if($#filelist >= 0) {
+        log_warn("process_maildrop(): the maildrop feature is deprecated " .
+            "and will removed in a future version of this software.");
+    }
+
+    # process each file
+    for $file (@filelist)
+    {
+        last if $interrupted;
+        next if($file eq '.') or ($file eq '..');
+        my $filename = catfile($ECS_CFG->ECS_DRP_DIR, $file);
+        next unless -f $filename;
+        print "$DEBUG_LABEL processing \"maildrop\" file: $filename\n"
+            if $ECS_CFG->{ECS_DEBUG} > 0;
+        my $msg = new EMDIS::ECS::FileBackedMessage($ECS_CFG->THIS_NODE,'',$filename);
+        if(not ref $msg)
+        {
+            log_error("process_maildrop(): unable to load file " .
+                      "$filename: $msg");
+            last; # don't continue
+        }
+
+        # retrieve node status from node_tbl
+        my $was_locked = $ECS_NODE_TBL->LOCK;
+        if(not $was_locked)
+        {
+            # lock ECS_NODE_TBL
+            if(not $ECS_NODE_TBL->lock())
+            {
+                log_error("process_maildrop(): unable to lock ECS_NODE_TBL: " .
+                          $ECS_NODE_TBL->ERROR);
+                last;
+            }
+        }
+
+        my $node = $ECS_NODE_TBL->read($msg->hub_rcv);
+        $ECS_NODE_TBL->unlock() unless $was_locked;
+
+        if (not defined $node) {
+           log_error("process_maildrop(): cannot read node '" . $msg->hub_rcv . "'");
+           next;
+        }
+
+        # don't process the message, if the receiving node is disabled
+        if (not ( (exists $node->{node_disabled}) and
+                  ($node->{node_disabled} =~ /^\s*(yes|true)\s*$/i) ) )
+        {
+           my $err = $msg->send_via_email($msg->hub_rcv);
+           undef $msg;   # closes file
+
+           if($err)
+           {
+              log_error("process_maildrop(): unable to send file " .
+                        "$filename: $err");
+              last;   # CAVE: don't continue,
+                      # otherwise you risk a inconsistent DB!
+           }
+           unlink $filename;
+        }
+        else {
+           log_info("process_maildrop(): skipping message '$filename' to " .
+                    "node " . $msg->hub_rcv . " (node_disabled=$node->{node_disabled})."
+                   );
+        }
+    }
+}
+
+# ----------------------------------------------------------------------
+# Process outgoing messages in to_XX folders (if $ECS_CFG->ECS_TO_DIR)
+sub process_to_XX
+{
+    my $processing_start_time = shift;
+    my $processing_end_time = $processing_start_time + $ECS_CFG->T_SCN;
+    my $to_dir = $ECS_CFG->ECS_TO_DIR;
+    print "$DEBUG_LABEL process_to_XX() --> to_XX directories\n"
+        if $ECS_CFG->{ECS_DEBUG} > 0;
+
+    # run over to_XX directories:
+    if ( $ECS_NODE_TBL->lock() ) {                # lock node_tbl
+       my @keys = sort $ECS_NODE_TBL->keys();
+       $ECS_NODE_TBL->unlock();                   # unlock node_tbl
+       foreach my $node_id ( @keys ) {
+          next if $node_id eq $ECS_CFG->THIS_NODE;
+
+          if(not $ECS_NODE_TBL->lock())
+          {
+             log_error("process_to_XX(): unable to lock ECS_NODE_TBL: " .
+                       $ECS_NODE_TBL->ERROR);
+             last;
+          }
+
+          my $node = $ECS_NODE_TBL->read($node_id);
+          $ECS_NODE_TBL->unlock();
+
+          if(not defined $node) {
+             log_error("process_to_XX(): cannot read node '$node_id'");
+             next;
+          }
+
+          # don't process the folder, if the receiving node is disabled
+          if((exists $node->{node_disabled}) and
+              $node->{node_disabled} =~ /^\s*(yes|true)\s*$/i)
+          {
+             log_info("process_to_XX(): skipping directory to_$node_id " .
+                      "(node_disabled=$node->{node_disabled}).");
+             next;
+          }
+
+          print "check node for outgoing mail --> $node_id\n"
+             if $ECS_CFG->{ECS_DEBUG} > 0;
+
+          # get sorted list of files in directory
+          my $to_xx = catdir($ECS_CFG->ECS_TO_DIR, "to_$node_id");
+
+          if (not opendir(TODIR, $to_xx)) {
+             log_error("process_to_XX(): unable to open \"to_$node_id\" " .
+                       "directory: " . $ECS_CFG->ECS_TO_DIR);
+             next;
+          }
+
+          my @filelist = grep -f,                      # only files, skips . and ..
+                         map { catfile($to_xx, $_) }   # make full pathname
+                         sort
+                         grep /^.+\.msg$/,
+                         readdir(TODIR);
+
+          closedir(TODIR);
+
+          foreach my $filename ( @filelist )
+          {
+             last if $interrupted;
+
+             print "$DEBUG_LABEL processing \"to_$node_id\" file: $filename\n"
+                if $ECS_CFG->{ECS_DEBUG} > 0;
+
+             my $msg = new EMDIS::ECS::FileBackedMessage(
+                 $ECS_CFG->THIS_NODE, '', $filename);
+             if(not ref $msg)
+             {
+                log_error("process_to_XX(): unable to load file " .
+                          "$filename: $msg");
+                last; # don't continue ...
+             }
+
+             my $err = $msg->send_via_email($node_id);
+             undef $msg;   # closes file
+
+             if($err)
+             {
+                log_error("process_to_XX(): unable to send file " .
+                          "$filename: $err");
+                last;   # CAVE: don't continue,
+                        # otherwise you risk an inconsistent DB !
+             }
+
+             unlink $filename;
+          }  # end foreach
+       }
+    }
+}
+
+# ----------------------------------------------------------------------
+# compare two underscore-delimited strings of the form "seqnum_partnum"
+# (for use with "sort")
+sub compare_seq_part
+{
+    my @a = split '_', $a;
+    my @b = split '_', $b;
+    my $c = $a[0] <=> $b[0];
+    return ($c != 0 ? $c : $a[1] <=> $b[1]);
+}
+
+# ----------------------------------------------------------------------
+# Process incoming messages in "store" folder
+sub process_store
+{
+    my $processing_start_time = shift;
+    my $processing_end_time = $processing_start_time + $ECS_CFG->T_SCN;
+
+    my @nodelist = ();
+    my $nodes = {};
+
+    print "$DEBUG_LABEL process_store()\n"
+        if $ECS_CFG->{ECS_DEBUG} > 0;
+
+    update_statistics(\@nodelist, $nodes);
+
+    # quick hack to help prevent single node from monopolizing processing loop
+    if($#nodelist > 0)
+    {
+        my $scan_seq = time() / $ECS_CFG->T_SCN;
+
+        # reverse list on even numbered interval
+        @nodelist = reverse @nodelist
+            if ($scan_seq % 2) == 0;
+
+        # shift through nodelist, giving each node a chance to go first
+        my $offset = ($scan_seq / 2) % ($#nodelist + 1);
+        my $pos;
+        for($pos = 0; $pos < $offset; $pos++)
+        {
+            my $node_id = shift @nodelist;
+            push @nodelist, $node_id;
+        }
+    }
+
+    # iterate through nodes and
+    # check whether any of the messages are able to be processed
+    NODE:
+    for my $node_id (@nodelist)
+    {
+        # retrieve node status from node_tbl
+        my $was_locked = $ECS_NODE_TBL->LOCK;
+        if(not $was_locked)
+        {
+            # lock ECS_NODE_TBL
+            if(not $ECS_NODE_TBL->lock())
+            {
+                log_error("process_store(): unable to lock ECS_NODE_TBL: " .
+                          $ECS_NODE_TBL->ERROR);
+                last NODE;
+            }
+        }
+        my $node = $ECS_NODE_TBL->read($node_id);
+        $ECS_NODE_TBL->unlock() unless $was_locked;
+        # don't try to process if node not found
+        if(not ref $node)
+        {
+            log_error(
+                "process_store(): unable to retrieve node $node_id status.");
+            next NODE;
+        }
+        # is node marked as disabled?
+        if((exists $node->{node_disabled}) and
+            $node->{node_disabled} =~ /^\s*(yes|true)\s*$/i)
+        {
+            log_info("process_store(): skipping node $node_id " .
+                "(node_disabled=$node->{node_disabled}).");
+            next NODE;
+        }
+        my $in_seq = $node->{in_seq};
+
+        # process message files in sequential order by seq_num
+        my $msgpart = $nodes->{$node_id}->{msgpart};
+        my @msglist = sort compare_seq_part keys %$msgpart;
+        my $processed_seq_num = -1;
+        NODE_MSG_PART:
+        for my $seq_part_num (@msglist)
+        {
+            my ($seq_num, $part_num) = split '_', $seq_part_num;
+
+            # skip if this file is part of an already processed message
+            next NODE_MSG_PART if $seq_num <= $processed_seq_num;
+
+            # don't process now if message is still "early"
+            if($seq_num > ++$in_seq)
+            {
+                my $q_gap_seq = (exists $node->{q_gap_seq} ?
+                    $node->{q_gap_seq} : 0);
+                my $q_gap_time = (exists $node->{q_gap_time} ?
+                    $node->{q_gap_time} : time());
+                # if q_gap_seq hasn't changed and T_RESEND_DELAY has
+                # elapsed, send a batch of up to 100 RE_SEND requests
+                if($seq_num == $q_gap_seq)
+                {
+                    if((time() - $q_gap_time) > $ECS_CFG->T_RESEND_DELAY)
+                    {
+                        my $max_resend_seq = $seq_num - 1;
+                        $max_resend_seq = $in_seq + 99
+                            if $max_resend_seq > ($in_seq + 99);
+                        log_info(
+                            "process_store(): requesting RE_SEND for " .
+                            "messages $node_id:$in_seq through " .
+                            "$node_id:$max_resend_seq");
+                        for(my $resend_seq = $in_seq;
+                            $resend_seq <= $max_resend_seq; $resend_seq++)
+                        {
+                            $err = send_ecsmsg_email($node_id, '',
+                                "msg_type=RE_SEND\n",
+                                "seq_num=$resend_seq\n",
+                                "# random noise: " . rand() . "\n");
+                            if($err)
+                            {
+                                log_error(
+                                    "process_store(): unable to send " .
+                                    "RE_SEND request to node $node_id: $err");
+                                last;
+                            }
+                        }
+                        $q_gap_time = time();
+                    }
+                }
+                else
+                {
+                    $q_gap_seq = $seq_num;
+                    $q_gap_time = time();
+                }
+                # update q_gap_seq and q_gap time in node_tbl
+                my $was_locked = $ECS_NODE_TBL->LOCK;
+                if(not $was_locked)
+                {
+                    if(not $ECS_NODE_TBL->lock())
+                    {
+                        log_error("process_store(): unable to lock " .
+                                  "ECS_NODE_TBL: " . $ECS_NODE_TBL->ERROR);
+                    }
+                }
+                if($ECS_NODE_TBL->LOCK)
+                {
+                    my $node = $ECS_NODE_TBL->read($node_id);
+                    $node->{q_gap_seq} = $q_gap_seq;
+                    $node->{q_gap_time} = $q_gap_time;
+                    $ECS_NODE_TBL->write($node_id, $node);
+                    $ECS_NODE_TBL->unlock() unless $was_locked;
+                }
+                last NODE_MSG_PART;
+            }
+
+            # assemble message part file name array, and
+            # determine whether all message parts are present
+            my @msg_part_filenames = ();
+            my @missing_parts = ();
+            for my $pn (1..$nodes->{$node_id}->{numparts}->{$seq_num})
+            {
+                if(exists $nodes->{$node_id}->{msgpart}->{"${seq_num}_${pn}"})
+                {
+                    push @msg_part_filenames,
+                        $nodes->{$node_id}->{msgpart}->{"${seq_num}_${pn}"};
+                }
+                else
+                {
+                    push @missing_parts, $pn;
+                }
+            }
+
+            # if indicated, request RE_SEND of any missing message parts
+            if($#missing_parts >= 0)
+            {
+                my $q_gap_seq = (exists $node->{q_gap_seq} ?
+                    $node->{q_gap_seq} : 0);
+                my $q_gap_time = (exists $node->{q_gap_time} ?
+                    $node->{q_gap_time} : time());
+                if($seq_num == $q_gap_seq)
+                {
+                    if((time() - $q_gap_time) > $ECS_CFG->T_RESEND_DELAY)
+                    {
+                        log_info(
+                            "process_store(): requesting RE_SEND for " .
+                            "message $node_id:$seq_num, parts " .
+                            join(',', @missing_parts));
+                        for my $pn (@missing_parts)
+                        {
+                            $err = send_ecsmsg_email($node_id, '',
+                                "msg_type=RE_SEND\n",
+                                "seq_num=$seq_num:$pn\n",
+                                "# random noise: " . rand() . "\n");
+                            if($err)
+                            {
+                                log_error(
+                                    "process_store(): unable to send " .
+                                    "RE_SEND request to node $node_id: $err");
+                                last;
+                            }
+                        }
+                        $q_gap_time = time();
+                    }
+                }
+                else
+                {
+                    $q_gap_seq = $seq_num;
+                    $q_gap_time = time();
+                }
+                # update q_gap_seq and q_gap time in node_tbl
+                my $was_locked = $ECS_NODE_TBL->LOCK;
+                if(not $was_locked)
+                {
+                    if(not $ECS_NODE_TBL->lock())
+                    {
+                        log_error("process_store(): unable to lock " .
+                                  "ECS_NODE_TBL: " . $ECS_NODE_TBL->ERROR);
+                    }
+                }
+                if($ECS_NODE_TBL->LOCK)
+                {
+                    my $node = $ECS_NODE_TBL->read($node_id);
+                    $node->{q_gap_seq} = $q_gap_seq;
+                    $node->{q_gap_time} = $q_gap_time;
+                    $ECS_NODE_TBL->write($node_id, $node);
+                    $ECS_NODE_TBL->unlock() unless $was_locked;
+                }
+
+                last NODE_MSG_PART;
+            }
+
+            # process message
+            my $filename = $msgpart->{$seq_part_num};
+            print "$DEBUG_LABEL processing \"store\" file: $filename\n"
+                if $ECS_CFG->{ECS_DEBUG} > 0;
+            my $msg = EMDIS::ECS::Message::read_from_file($filename);
+            if(not ref $msg)
+            {
+                log_error("process_store(): unable to read message " .
+                               "from file $filename: $msg");
+                last NODE_MSG_PART;
+            }
+            $processed_seq_num = $seq_num;
+            $err = process_message($msg, $filename, 1, \@msg_part_filenames);
+            if($err)
+            {
+                if($err =~ /unable to decrypt message/)
+                {
+                    log_error("process_store(): unable to decrypt message " .
+                              "from file $filename (kept in store): $err");
+                    # (don't) attempt to process message as clear-text
+                    # $err = process_message($msg, $filename, 0);
+                    last NODE_MSG_PART;
+                }
+                elsif( $err =~ /received (early|duplicate) message/ ) {
+                    log_info("process_store(): unable to process message " .
+                             "from file $filename: $err");
+                    next NODE_MSG_PART;
+                }
+                else {
+                    log_error("process_store(): unable to process message " .
+                              "from file $filename: $err");
+                    last NODE_MSG_PART;
+                }
+            }
+            foreach my $mpfn (@msg_part_filenames)
+            {
+                unlink $mpfn;
+            }
+
+            last NODE_MSG_PART if $processing_end_time < time();
+            last NODE if $interrupted;
+        }
+        last NODE if $processing_end_time < time();
+    }
+    @nodelist = ();
+    $nodes = {};
+    update_statistics(\@nodelist, $nodes);
+}
+# ----------------------------------------------------------------------
+# Updates statistics
+
+sub update_statistics
+{
+    my $nodelist = shift;
+    my $nodes = shift;
+
+    # get sorted list of files in directory
+    if(not opendir(STORE, $ECS_CFG->ECS_MBX_STORE_DIR))
+    {
+        log_error("process_store(): unable to open \"store\" " .
+                       "directory: " . $ECS_CFG->ECS_MBX_STORE_DIR);
+        return;
+    }
+    my $file;
+    my @filelist = ();
+    while(defined($file = readdir(STORE)))
+    {
+        push(@filelist, $file);
+    }
+    closedir(STORE);
+    @filelist = sort @filelist;
+
+    # initialize $nodes hash reference
+    if($ECS_NODE_TBL->lock())
+    {
+        my @keys = sort $ECS_NODE_TBL->keys();
+        for my $node_id (@keys)
+        {
+            if($node_id ne $ECS_CFG->THIS_NODE)
+            {
+                $nodes->{$node_id} = {};
+                $nodes->{$node_id}->{msgpart} = {};
+                $nodes->{$node_id}->{numparts} = {};
+
+                # read each node's in_seq from node_tbl, for use below
+                my $node = $ECS_NODE_TBL->read($node_id);
+                $err = $ECS_NODE_TBL->ERROR;
+                if($err)
+                {
+                    log_error("process_store(): unable to read node_tbl " .
+                              "($node_id): $err\n");
+                    $ECS_NODE_TBL->unlock();  # unlock node_tbl
+                    return;
+                }
+                else
+                {
+                    $nodes->{$node_id}->{in_seq} = $node->{in_seq};
+                }
+            }
+        }
+        $ECS_NODE_TBL->unlock();  # unlock node_tbl
+    }
+    else
+    {
+        log_error("process_store(): unable to lock node_tbl: " .
+            $ECS_NODE_TBL->ERROR . "\n");
+        return;
+    }
+
+    # extract ECS $node_id, $seq_num, $part_num, and $num_parts from each file
+    for $file (@filelist)
+    {
+        return if $interrupted;
+        next if($file eq '.') or ($file eq '..');
+        my $filename = catfile($ECS_CFG->ECS_MBX_STORE_DIR, $file);
+        next unless -f $filename;
+        my ($node_id, $seq_num, $part_num, $num_parts) =
+            read_ecs_message_id($filename);
+        if(not defined($node_id) or not defined($seq_num)
+            or not defined($part_num) or not defined($num_parts))
+        {
+            # move file to "trash" subdirectory
+            log_error("process_store(): unable to process file " .
+                            "$filename");
+            move_to_trash($filename);
+            next;
+        }
+
+        # check $seq_num vs. node's in_seq, to detect already processed message
+        if($seq_num <= $nodes->{$node_id}->{in_seq})
+        {
+            # move duplicate seq_num message file to "trash" subdirectory
+            log_warn("process_store(): encountered duplicate (already " .
+                     "processed) message part $node_id:$seq_num:" .
+                     "$part_num/$num_parts in file $filename");
+            move_to_trash($filename);
+            next;
+        }
+
+        # store information about message num_parts
+        my $numparts = $nodes->{$node_id}->{numparts};
+        if(not exists $numparts->{$seq_num})
+        {
+            $numparts->{$seq_num} = $num_parts;
+        }
+        elsif($num_parts != $numparts->{$seq_num})
+        {
+            log_warn("process_store(): num_parts discrepancy for message " .
+                     "$node_id:$seq_num: expected $num_parts, found " .
+                     $numparts->{$seq_num} .
+                     " in file $filename");
+        }
+
+        # store information about message part
+        my $msgpart = $nodes->{$node_id}->{msgpart};
+        my $msgkey = "${seq_num}_${part_num}";
+        if(not exists $msgpart->{$msgkey})
+        {
+            # store filename in hash
+            $msgpart->{$msgkey} = $filename
+        }
+        else
+        {
+            # move duplicate seq_num message file to "trash" subdirectory
+            log_warn("process_store(): encountered duplicate message " .
+                     "part $node_id:$seq_num:$part_num/$num_parts " .
+                     "in file $filename");
+            move_to_trash($filename);
+        }
+    }
+
+    # update queue status indicators for all nodes
+    @$nodelist = sort keys %$nodes;
+    if($ECS_NODE_TBL->lock())
+    {
+        for my $node_id (@$nodelist)
+        {
+            my $msgpart = $nodes->{$node_id}->{msgpart};
+            my $node = $ECS_NODE_TBL->read($node_id);
+            my @seq_part_num = sort compare_seq_part keys %$msgpart;
+            # compute node q_max_seq, q_min_seq, q_first_file, q_size
+            if($#seq_part_num >= 0)
+            {
+                $node->{q_max_seq} =
+                    (split '_', $seq_part_num[$#seq_part_num])[0];
+                $node->{q_min_seq} = (split '_', $seq_part_num[0])[0];
+                $node->{q_first_file} = $msgpart->{$seq_part_num[0]};
+                # compute number of complete messages in queue for this node
+                my $q_size = 0;
+                my $cur_seq = -1;
+                my $part_count = 0;
+                for my $spn (@seq_part_num)
+                {
+                    my ($seq_num, $part_num) = split '_', $spn;
+                    if($seq_num == $cur_seq) {
+                        $part_count++;
+                    }
+                    else {
+                        $cur_seq = $seq_num;
+                        $part_count = 1;
+                    }
+                    $q_size++ if ($part_count == $part_num) && ($part_num ==
+                        $nodes->{$node_id}->{numparts}->{$seq_num});
+                }
+                $node->{q_size} = $q_size;
+            }
+            else
+            {
+                $node->{q_max_seq} = '';
+                $node->{q_min_seq} = '';
+                $node->{q_first_file} = '';
+                $node->{q_size} = 0;
+            }
+            $ECS_NODE_TBL->write($node_id, $node);
+        }
+        $ECS_NODE_TBL->unlock();  # release lock
+    }
+    else
+    {
+        log_error("process_store(): unable to lock node_tbl [2]: " .
+            $ECS_NODE_TBL->ERROR . "\n");
+        return;
+    }
+}
+
+# ----------------------------------------------------------------------
+# Open connection to mail server.
+# returns two-element array containing ($err, $msgcount)
+sub mbox_open
+{
+    print "$DEBUG_LABEL mbox_open()\n"
+        if $ECS_CFG->ECS_DEBUG > 0;
+
+    my $use_ssl = ($ECS_CFG->INBOX_USE_SSL =~ /^YES$/io or $ECS_CFG->INBOX_USE_SSL =~ /^TRUE$/io);
+
+    # log in to mail server and check number of messages
+    for ($ECS_CFG->INBOX_PROTOCOL)
+    {
+        /POP3/ and do {
+            if($use_ssl) {
+                return("To use SSL please install Net::POP3 with version >= 3.05", undef)
+                    if CPAN::Version->vlt($Net::POP3::VERSION, '3.05');
+                my $port = $ECS_CFG->INBOX_PORT ? $ECS_CFG->INBOX_PORT : 995;
+                $mbox = new Net::POP3($ECS_CFG->INBOX_HOST,
+                                      Port     => $port,
+                                      Timeout  => $ECS_CFG->INBOX_TIMEOUT,
+                                      Debug    => $ECS_CFG->INBOX_DEBUG,
+                                      SSL      => 1);
+            }
+            else {
+                my $port = $ECS_CFG->INBOX_PORT ? $ECS_CFG->INBOX_PORT : 110;
+                $mbox = new Net::POP3($ECS_CFG->INBOX_HOST,
+                                      Port     => $port,
+                                      Timeout  => $ECS_CFG->INBOX_TIMEOUT,
+                                      Debug    => $ECS_CFG->INBOX_DEBUG);
+            }
+            return("Unable to create Net::POP3 object: $@", undef)
+                if not $mbox;
+            my $msgcount = $mbox->login($ECS_CFG->INBOX_USERNAME,
+                                        $ECS_CFG->INBOX_PASSWORD);
+            return("Unable to log in to POP server.", undef)
+                if not defined $msgcount;
+            return('', $msgcount);  # successful return
+        };
+        /IMAP/ and do {
+            return('Mail::IMAPClient module not available.', undef)
+                if not $found_Mail_IMAPClient;
+            $mbox = new Mail::IMAPClient;
+            return("Unable to create Mail::IMAPClient object: $@", undef)
+                if not $mbox;
+            $mbox->Server($ECS_CFG->INBOX_HOST);
+            my $port = $ECS_CFG->INBOX_PORT ? $ECS_CFG->INBOX_PORT : $use_ssl ? 993 : 143;
+            $mbox->Port($port);
+            $mbox->Timeout($ECS_CFG->INBOX_TIMEOUT);
+            $mbox->Debug($ECS_CFG->INBOX_DEBUG);
+            $mbox->User($ECS_CFG->INBOX_USERNAME);
+            $mbox->Password($ECS_CFG->INBOX_PASSWORD);
+            if($use_ssl) {
+                return('To use SSL please install Mail::IMAPClient with version >= 3.18', undef)
+                    if CPAN::Version->vlt($Mail::IMAPClient::VERSION, '3.18');
+                $mbox->Ssl(1);
+            }
+            $mbox->Uid(0);
+            $mbox->Clear(1);
+            $mbox->Ignoresizeerrors(1);
+            if(not $mbox->connect) {
+                return("Unable to connect to IMAP server " .
+                       "(" .     $ECS_CFG->INBOX_HOST .
+                       ":" .     $ECS_CFG->INBOX_PORT .
+                       ") as " . $ECS_CFG->INBOX_USERNAME .
+                       ": $!", undef);
+            }
+            if(not $mbox->select($ECS_CFG->INBOX_FOLDER)) {
+                return("Unable to select folder " . $ECS_CFG->INBOX_FOLDER . ".",
+                       undef);
+            }
+            my $msgcount = $mbox->message_count();
+            return("Unable to retrieve message count.", undef)
+                if not defined $msgcount;
+            return('', $msgcount);  # successful return
+        };
+        /DIRECTORY/ and do {
+            opendir(DIR, $ECS_CFG->INBOX_DIRECTORY)
+                or die "can't opendir " . $ECS_CFG->INBOX_DIRECTORY . ": $!";
+            my @files =  sort grep { !/^\./ && !/Deleted/i } readdir(DIR);
+            closedir (DIR);
+            return("",scalar(@files));
+        };
+    }
+    return("Unexpected mbox-protocol: $_", undef);
+}
+
+# ----------------------------------------------------------------------
+# Close mail server connection and delete any messages marked as deleted.
+# returns error message, if any
+sub mbox_close
+{
+  print "$DEBUG_LABEL mbox_close()\n"
+    if ($ECS_CFG->ECS_DEBUG > 0 && ! $opt_help);
+
+  if(defined $mbox) {
+    for ($ECS_CFG->INBOX_PROTOCOL) {
+      /POP3/ and do {
+          $mbox->quit();
+          undef $mbox;  # set undef so subroutine doesn't try to close it again
+          return '';    # successful
+      };
+      /IMAP/ and do {
+          if($mbox->IsConnected()) {
+              $mbox->expunge();
+              $mbox->logout();
+          }
+          undef $mbox;  # set undef so subroutine doesn't try to close it again
+          return '';    # successful
+      };
+      /DIRECTORY/ and do {
+          undef $mbox;  # set undef so subroutine doesn't try to close it again
+          return '';    # successful
+      };
+      undef $mbox;    # set undef so subroutine won't try to close it again
+      return "Unexpected mbox-protocol: $_";
+    }
+  }
+  return '';
+}
+
+# ----------------------------------------------------------------------
+# Get message corresponding to specified msgnum from mailbox.
+# returns two-element array containing ($err, $email_msg)
+sub mbox_get_message
+{
+    my $msgnum = shift;
+    print "$DEBUG_LABEL mbox_get_message($msgnum)\n"
+        if $ECS_CFG->ECS_DEBUG > 0;
+
+    for ($ECS_CFG->INBOX_PROTOCOL) {
+        /POP3/ and do {
+            my $msgsize = $mbox->list($msgnum);
+            if(not $msgsize) {
+                return("Unable to retrieve size of message # $msgnum.",
+                       undef);
+            }
+            if($msgsize > $ECS_CFG->INBOX_MAX_MSG_SIZE) {
+                return("Message " . $mbox->uidl($msgnum) .
+                       " size ($msgsize) exceeds maximum size limit (" .
+                       $ECS_CFG->INBOX_MAX_MSG_SIZE . ").",
+                       undef);
+            }
+            my $msglines = $mbox->get($msgnum);
+            if(not $msglines) {
+                return("Unable to get message # $msgnum.",
+                       undef);
+            }
+            return('', join('',@$msglines));  # successful
+        };
+        /IMAP/ and do {
+            my $msgsize = $mbox->size($msgnum);
+            if(not $msgsize) {
+                return("Unable to retrieve size of message # $msgnum.",
+                       undef);
+            }
+            if($msgsize > $ECS_CFG->INBOX_MAX_MSG_SIZE) {
+                return("Message " . $mbox->message_uid($msgnum) .
+                       " exceeds maximum size limit.",
+                       undef);
+            }
+            my $msg = $mbox->message_string($msgnum);
+            if(not $msg) {
+                return("Unable to get message # $msgnum.",
+                       undef);
+            }
+            return('', $msg);  # successful
+        };
+        /DIRECTORY/ and do {
+            opendir (DIR, $ECS_CFG->INBOX_DIRECTORY)
+                or die "can't opendir " . $ECS_CFG->INBOX_DIRECTORY . ": $!";
+            my @files =  sort grep { !/^\./ && !/Deleted/i }readdir(DIR);
+            closedir (DIR);
+            open TMPFILE,
+                catdir($ECS_CFG->INBOX_DIRECTORY, $files[$msgnum - 1]);
+            my @lines = <TMPFILE>;
+            close TMPFILE;
+            return('',join ("",@lines) );  # successful
+        }
+    }
+    return("Unexpected mbox-protocol: $_",
+           undef);
+}
+
+# ----------------------------------------------------------------------
+# Move file to trash directory
+sub move_to_trash
+{
+    my $filename = shift;
+    print "$DEBUG_LABEL move_to_trash($filename)\n"
+        if $ECS_CFG->ECS_DEBUG > 0;
+
+    my $trashdir = catdir($ECS_CFG->ECS_MBX_STORE_DIR, 'trash');
+    mkdir $trashdir unless -e $trashdir;
+    my $err = move_to_dir($filename, $trashdir);
+    if($err) {
+        log_error("process_store(): unable to move file " .
+                       "$filename: $err");
+    }
+}
+
+# ----------------------------------------------------------------------
+# Delete message corresponding to specified msgnum from mailbox.
+# returns error message, if any
+sub mbox_delete_message
+{
+    my $msgnum = shift;
+    print "$DEBUG_LABEL mbox_delete_message($msgnum)\n"
+        if $ECS_CFG->ECS_DEBUG > 0;
+
+    for ($ECS_CFG->INBOX_PROTOCOL) {
+        /POP3/ and do {
+            $mbox->delete($msgnum);
+            return '';  # successful
+        };
+        /IMAP/ and do {
+            $mbox->delete_message($msgnum);
+            return '';  # successful
+        };
+        /DIRECTORY/ and do {
+            opendir (DIR, $ECS_CFG->INBOX_DIRECTORY)
+                or die "can't opendir " . $ECS_CFG->INBOX_DIRECTORY . ": $!";
+            my @files =  sort grep { !/^\./ && !/Deleted/i }readdir(DIR);
+            closedir (DIR);
+            unlink catdir($ECS_CFG->INBOX_DIRECTORY, $files[$msgnum - 1]);
+            return '';  # successful
+        };
+    }
+    return "Unexpected mbox-protocol: $_";
+}
+
+# ----------------------------------------------------------------------
+# Process specified meta-message.
+# returns error message, if any
+sub process_meta_message
+{
+    my $msg = shift;
+    my $filename = shift;
+
+    print "$DEBUG_LABEL process_meta_message(\$msg, $filename)\n"
+        if $ECS_CFG->ECS_DEBUG > 0;
+
+    # compose command
+    my $cmd = sprintf("%s --config $opt_config %s %s",
+                      $ECS_CFG->M_MSG_PROC,
+                      $filename,
+                      $msg->sender);
+    print "$DEBUG_LABEL command: $cmd\n"
+        if $ECS_CFG->ECS_DEBUG > 0;
+
+    # execute command
+    my $result = timelimit_cmd($ECS_CFG->T_MSG_PROC, $cmd);
+
+    # format result, if needed
+    $result = "process_meta_message(): $result"
+        if($result);
+
+    return $result;
+}
+
+# ----------------------------------------------------------------------
+# Process specified ECS message.
+# returns error message, if any
+sub process_message
+{
+    my $msg = shift;
+    my $filename = shift;
+    my $decrypt = shift;
+    my $msg_part_filenames = shift;
+    my $err = '';
+    my @msgs = ();
+    my $child_pid;
+
+    print "$DEBUG_LABEL process_message(\$msg, $filename, $decrypt, (" .
+        join(', ', @$msg_part_filenames) . "))\n"
+        if $ECS_CFG->ECS_DEBUG > 0;
+
+    # look up node in ECS_NODE_TBL
+    my $was_locked = $ECS_NODE_TBL->LOCK;
+    if(not $was_locked) {
+        # lock ECS_NODE_TBL
+        return "process_message(): unable to lock ECS_NODE_TBL: " .
+            $ECS_NODE_TBL->ERROR
+                unless $ECS_NODE_TBL->lock();
+    }
+    # store information about message currently being processed
+    my $this_node = $ECS_NODE_TBL->read($ECS_CFG->THIS_NODE);
+    $this_node->{proc_node} = $msg->sender;
+    $this_node->{proc_seq} = $msg->seq_num;
+    $this_node->{proc_file} = $filename;
+    $ECS_NODE_TBL->write($ECS_CFG->THIS_NODE, $this_node);
+    # retrieve node info
+    my $node = $ECS_NODE_TBL->read($msg->sender);
+    $ECS_NODE_TBL->unlock() unless $was_locked;  # release node_tbl lock
+    if(not $node) {
+        # don't process message from unknown node
+        $err = "process_message(): $err; " . EOL()
+            if $err;
+        $err .= "process_message(): message from unknown node: " .
+            $msg->sender;
+        return $err;
+    }
+
+    # don't process "duplicate" message (seq_num too low)
+    if($msg->seq_num < ($node->{in_seq} + 1)) {
+        my @err = ();
+        push @err, "process_message(): received duplicate message: " .
+            $msg->sender . ":" . $msg->seq_num;
+        # move file(s) to 'trash' folder
+        for my $f (@$msg_part_filenames)
+        {
+            my $e = move_to_dir($f, $ECS_CFG->ECS_MBX_TRASH_DIR);
+            push @err, "process_message(): $e"
+                if $e;
+        }
+        return join EOL(), @err;
+    }
+
+    # don't process "early" message (seq_num too high)
+    if($msg->seq_num > ($node->{in_seq} + 1)) {
+        $err = "process_message(): $err; " . EOL()
+            if $err;
+        $err .= "process_message(): received early message: " .
+            $msg->sender . ":" . $msg->seq_num;
+        return $err;
+    }
+
+    # sanity checks on $msg_part_filenames
+    return "process_message(): unexpected error: \$msg_part_filenames " .
+        "not defined!"
+        if not defined $msg_part_filenames;
+    return "process_message(): unexpected error: \$msg_part_filenames " .
+        "not an ARRAY reference!"
+        if 'ARRAY' ne ref $msg_part_filenames;
+    return "process_message(): unexpected error: \$msg_part_filenames " .
+        "array is wrong size (expected " . $msg->num_parts . ", found " .
+        scalar(@$msg_part_filenames) . ")"
+        if $msg->num_parts != scalar(@$msg_part_filenames);
+
+    # create payload file for each message part
+    my @mp_payload_filename = ();
+    for my $msg_part_fname (@$msg_part_filenames)
+    {
+        # decrypt message part (if indicated)
+        my $dmsg;
+        if($decrypt) {
+            $dmsg = EMDIS::ECS::Message::read_from_encrypted_file($msg_part_fname);
+            if(not ref $dmsg)
+            {
+                $err = "process_message(): unable to decrypt message: $dmsg";
+                last;
+            }
+        }
+        else {
+            $dmsg = EMDIS::ECS::Message::read_from_file($msg_part_fname);
+            if(not ref $dmsg)
+            {
+                $err = "process_message(): unable to read message: $dmsg";
+                last;
+            }
+        }
+
+        # write FML message payload to temp file in $ECS_DAT_DIR/tmp
+        my $template = $filename;
+        $template =~ s/_\w{4}\.\w+$/_XXXX/;
+        my ($fh, $mp_payload_fname) = tempfile($template, SUFFIX => '.fml');
+        print $fh $dmsg->cleartext
+            or $err = "process_message: Unable to write file " .
+                "$mp_payload_fname: $!";
+        close $fh;
+        chmod $EMDIS::ECS::FILEMODE, $mp_payload_fname;
+        push @mp_payload_filename, $mp_payload_fname;
+        if($err)
+        {
+            last;
+        }
+    }
+
+    # if error encountered, remove any partial payload files and return error
+    if($err)
+    {
+        for my $fname (@mp_payload_filename)
+        {
+            unlink $fname;
+        }
+        return $err;
+    }
+
+    my $payload_filename;
+    # concatenate decrypted message part files as needed
+    if($#mp_payload_filename == 0)
+    {
+        $payload_filename = $mp_payload_filename[0];
+    }
+    else
+    {
+        my $fh;
+        my $template = catfile($ECS_CFG->ECS_TMP_DIR,
+            sprintf("%s_%s_%010d_XXXX", $msg->sender, $ECS_CFG->THIS_NODE,
+                    $msg->seq_num));
+        ($fh, $payload_filename) = tempfile($template, SUFFIX => '.fml');
+        binmode($fh);
+        for my $fname (@mp_payload_filename)
+        {
+            open(PART, $fname)
+                or $err = "process_message(): Unable to open message " .
+                    "part file $fname: $!";
+            last if $err;
+            binmode(PART);
+
+            while(1)
+            {
+                my $buffer;
+
+                my $readlen = sysread PART, $buffer, 65536;
+                if(not defined $readlen)
+                {
+                    $err = "process_message(): unexpected problem reading " .
+                        "file $fname: $!";
+                    last;
+                }
+
+                last if $readlen <= 0;
+
+                if(not print $fh $buffer)
+                {
+                    $err = "process_message(): unexpected problem writing " .
+                        "file $payload_filename: $!";
+                    last;
+                }
+            }
+            close(PART);
+
+            last if $err;
+        }
+        $fh->close();
+
+        # remove temp files
+        for my $fname (@mp_payload_filename)
+        {
+            unlink $fname;
+        }
+    }
+
+    if($err)
+    {
+        unlink $payload_filename;
+        return $err;
+    }
+
+    # store copy of decrypted FML in $ECS_MBX_IN_FML_DIR
+    my $in_fml_filename = catfile($ECS_CFG->ECS_MBX_IN_FML_DIR,
+        sprintf("%s_%s_%010d.fml", $msg->sender, $ECS_CFG->THIS_NODE,
+                $msg->seq_num));
+    if(not copy($payload_filename, $in_fml_filename))
+    {
+        $err = "process_message(): could not copy $payload_filename " .
+            "to $in_fml_filename: $!";
+        unlink $payload_filename;
+        return $err;
+    }
+    chmod $EMDIS::ECS::FILEMODE, $in_fml_filename;
+
+    # process file via ADAPTER_CMD (if ADAPTER_CMD is configured)
+    if( defined $ECS_CFG->ADAPTER_CMD and $ECS_CFG->ADAPTER_CMD ne '' )
+    {
+        # compose command
+        my $cmd = sprintf("%s %s %s %s",
+                          $ECS_CFG->MSG_PROC,
+                          $payload_filename,
+                          $msg->sender,
+                          $msg->seq_num);
+        print "$DEBUG_LABEL command: $cmd\n"
+            if $ECS_CFG->ECS_DEBUG > 0;
+
+        # set ADAPTER_CMD environment variable
+        $ENV{ADAPTER_CMD} = $ECS_CFG->ADAPTER_CMD;
+
+        # execute command
+        $err = timelimit_cmd($ECS_CFG->T_MSG_PROC, $cmd);
+        print "$DEBUG_LABEL command output:\n$EMDIS::ECS::cmd_output\n"
+            if $ECS_CFG->ECS_DEBUG > 0;
+
+        # format error message, if needed
+        # TODO:  automatically send MSG_DEN response ??
+        $err = "process_message(): $err"
+            if($err);
+    }
+
+    if($err)
+    {
+        unlink $payload_filename;
+        return $err;
+    }
+
+    # copy payload file to from_XX directory (if ECS_FROM_DIR is configured)
+    my $from_dir = $ECS_CFG->ECS_FROM_DIR;
+    if ( defined $from_dir and $from_dir ne '' ) {
+        # create temporary file (without extension .msg!)
+        # to prevent a race condition on the interface
+        $from_dir = catdir( $from_dir, 'from_' . $msg->sender );
+        my $template = sprintf( "tmp_msg_%010d.XXXXXX", $msg->seq_num );
+        my( $tmp_fh, $from_tmp_filename ) = tempfile( $template,
+                                                      DIR => $from_dir,
+                                                      UNLINK => 0 );
+        # close the filehandle. We just want to make sure we reserve the
+        # temporary filename
+        close( $tmp_fh );
+
+        # now copy the actual file content over
+        if ( not copy( $payload_filename, $from_tmp_filename ) ) {
+            $err = "process_message(): could not copy $payload_filename "
+                 . "to $from_tmp_filename: $!";
+        }
+
+        # put the final filename together ...
+        my $from_filename = catfile( $from_dir,
+                                     sprintf("%010d.msg", $msg->seq_num ) );
+        # ... and rename our temporary file in the same directory
+        if ( not rename( $from_tmp_filename, $from_filename ) )
+        {
+            $err = "process_message(): could not rename $from_tmp_filename "
+                 . "to $from_filename: $!";
+        }
+
+        chmod $EMDIS::ECS::FILEMODE, $from_filename;
+    }
+
+    # remove temp file
+    unlink $payload_filename;
+
+    return $err if $err ne '';
+
+    # message was processed
+    # if needed, update $node->{in_seq}
+    if(not $was_locked) {
+        $ECS_NODE_TBL->lock()     # lock ECS_NODE_TBL if needed
+            or return "process_message(): unable to (write) lock " .
+                "ECS_NODE_TBL: " . $ECS_NODE_TBL->ERROR;
+    }
+    $node = $ECS_NODE_TBL->read($msg->sender);
+    $err = $ECS_NODE_TBL->ERROR;
+    if((not $err) and (ref $node))
+    {
+        $node->{in_seq}++;
+        if($msg->seq_num == $node->{in_seq})
+        {
+            if($ECS_CFG->ALWAYS_ACK =~ /^YES$/io or $ECS_CFG->ALWAYS_ACK =~ /^TRUE$/io)
+            {
+                # only send MSG_ACK if $ECS_CFG->ALWAYS_ACK is set
+                # (adds rand() to help defend against encryption attack)
+                $err = send_ecsmsg_email($msg->sender, '',
+                    "msg_type=MSG_ACK\n",
+                    "seq_num=$node->{in_seq}\n",
+                    "# 10-4 " . rand() . "\n");
+                if($err)
+                {
+                    $err = "unable to send MSG_ACK $node->{in_seq} " .
+                        "meta-message to node " . $msg->sender . ": $err";
+                }
+                else
+                {
+                    $node->{in_seq_ack} = $node->{in_seq};
+                }
+            }
+            $ECS_NODE_TBL->write($msg->sender,$node);
+            $err = $ECS_NODE_TBL->ERROR;
+        }
+    }
+    $ECS_NODE_TBL->unlock() unless $was_locked;  # release node_tbl lock
+    return "process_message(): $err" if $err;
+
+    return '';
+}
+
+# ----------------------------------------------------------------------
+# Re-read configuration when SIGHUP received.
+sub sighup_handler
+{
+    $reload_config = 1;
+}
+
+# ----------------------------------------------------------------------
+# Set flag indicating program has been interrupted.
+sub sigint_handler
+{
+    $interrupted = 1;
+}
+
+
+__END__
+
+# embedded POD documentation
+
+=head1 NAME
+
+ecs_scan_mail - ECS email processing daemon
+
+=head1 SYNOPSIS
+
+ ecs_scan_mail
+
+ ecs_scan_mail --once
+
+ ecs_scan_mail --nodaemon
+
+=head1 DESCRIPTION
+
+This program monitors incoming ECS email.  It receives messages from
+the configured POP3 or IMAP mailbox and calls appropriate functions to
+trigger processing of ECS meta-messages and regular messages.
+
+=head1 OPTIONS
+
+=over 5
+
+=item --config I<ecs_config_file>
+
+Specify the location of the ECS configuration file.  By default, the program
+looks for the file specified by the ECS_CONFIG_FILE environment variable;
+if that environment variable is not set, it looks for a file named "ecs.cfg"
+in the current directory.
+
+=item --daemon
+
+Spawn background process to continuously monitor remote node
+communication status.  This option is enabled by default.
+
+=item --nodaemon
+
+Do not spawn a background process.  Instead, use the foreground process
+process to continuously monitor remote node communication status.
+
+=item --once
+
+Perform one processing iteration and then exit.  Implies --nodaemon.
+
+=item -help
+
+Show embedded POD documentation
+
+=back
+
+=head1 RETURN VALUE
+
+Returns a non-zero exit code if a configuration error is detected.
+
+=head1 BUGS
+
+Possibly.
+
+=head1 NOTES
+
+To safely terminate this program, please use "kill -15" (not "kill -9").
+
+=head1 SEE ALSO
+
+EMDIS::ECS, ecs_chk_com, ecs_proc_meta, ecs_proc_msg, ecs_setup, ecstool
+
+=head1 AUTHOR
+
+Joel Schneider <jschneid@nmdp.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+Copyright (C) 2002-2016 National Marrow Donor Program. All rights reserved.
+
+See LICENSE file for license details.
+
+=head1 HISTORY
+
+ECS, the EMDIS Communication System, was originally designed and
+implemented by the ZKRD (http://www.zkrd.de/).  This Perl implementation
+of ECS was developed by the National Marrow Donor Program
+(http://www.marrow.org/).
+
+2004-03-12
+Canadian Blood Services - Tony Wai
+Added MS Windows support for Windows 2000 and Windows XP
+Added "DIRECTORY" inBox Protocol. This can interface with any mail
+system that can output the new messages to text files.
+
+2007-08-01
+ZKRD - emdisadm@zkrd.de
+Added to_XX and from_XX directory support.
+Added new environment variable ECS_CONFIG_FILE -> ecs.cfg.
+For details please refer to README file.
+Added new error report management. All 'email to admin' statements are removed.
+In relation to the error code ECS.pm will send an email to admin or not.
+

@@ -1,0 +1,62 @@
+[!
+
+sub title   { $epreq -> gettext ('txt:setup_inet_title') } 
+
+sub condition 
+	{ 
+    my ($self, $r) = @_ ;
+    ($r -> {data}{action} eq 'master' || $r -> {data}{action} eq 'addslave')
+      ;
+    }
+    
+sub init 
+    {
+    my ($self, $r) = @_ ;
+
+    my $isdn = 1 ;
+    my $adsl = 1 ;
+		
+    
+    $r -> {inet_select} = 
+    	{ 
+        options => [
+	        'Ethernet über ein Gateway mit fester IP Adresse',
+	        $adsl?('xDSL'):(),
+	        $isdn?('ISDN'):(),
+	        "Der $epreq->{data}{-bbname} hat keine Verbindung zum Internet",
+	        ],
+        values => ['lan', $adsl?('dsl'):(), $isdn?('isdn'):(), 'no'],
+        } ;
+ 
+    return 0 ;
+    }
+
+!]
+
+[$ sub show $]
+
+<p>[= txt:setup_inet1 =]</p>
+
+
+
+
+[-
+$r = shift ;
+$r -> {data}{services_adsl} = 0 ;
+$r -> {data}{services_isdn} = 0 ;
+
+Embperl::MyForm -> showfields (
+	[
+            { text => 'Internetverbindung via', name => 'inetconnect',  type => 'radio',
+                      options => $r->{inet_select}{options},
+                      values  => $r->{inet_select}{values},
+                      vert => 2,
+		      width => 1  },
+
+            ]);
+-]
+
+
+[$endsub$]
+
+

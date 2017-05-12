@@ -1,0 +1,12 @@
+.*\.o$
+^pesh
+^enlighten
+^blib/
+^pm_to_blib
+CVS/
+\.sw[a-z]$
+\.tar\.gz$
+^Makefile$
+^Makefile.old$
+^econfig.h$
+^E.h$

@@ -1,0 +1,18 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Encode-EUCJPASCII
+version:      0.03
+version_from: EUCJPASCII.pm
+abstract:     eucJP-ascii - An eucJP-open mapping
+license:      perl
+author:
+    - Hatuka*nezumi - IKEDA Soji <hatuka@nezumi.nu>
+installdirs:  site
+requires:
+    Encode:                        1.41
+build_requires:
+    Test::More:                    0
+resources:
+    repository:  http://hatuka.nezumi.nu/repos/Encode-EUCJPASCII/
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

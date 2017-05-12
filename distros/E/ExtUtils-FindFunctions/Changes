@@ -1,0 +1,9 @@
+Revision history for ExtUtils-FindFunctions
+
+0.02    2006.10.03 - SAPER
+        [DIST] Now install the install-extutils-findfunctions command.
+        [DOC] Completed missing parts of the documentation.
+
+0.01    2006.10.03 - SAPER
+        First version, released on an unsuspecting world.
+

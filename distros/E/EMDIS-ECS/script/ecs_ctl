@@ -1,0 +1,317 @@
+#!/usr/bin/perl -w
+
+##############################################################################
+#                ZKRD - German Registry of Bone Marrow Donors                #
+#  Zentrales Knochenmarkspenderregister fuer die Bundesrepublik Deutschland  #
+#                          POB 4244,  D-89032 Ulm                            #
+#----------------------------------------------------------------------------#
+#   Project: EMDIS
+#      Unit:
+#      Task:
+#    Master:
+#    Author: Andreas Mack
+#   Created: Juni 2007
+#----------------------------------------------------------------------------#
+#   Purpose: Start | Stop | Restart | Status Perl-ECS daemons
+#      ToDo: add winXX support
+#----------------------------------------------------------------------------#
+
+use Getopt::Long;
+use Sys::Hostname;
+use File::Basename;
+use Env qw(ECS_USER);
+use strict;
+
+#--- options
+
+my $opt_help;
+my $opt_start;
+my $opt_status;
+my $opt_stop;
+my $opt_restart;
+my $user=$ECS_USER;
+my $prg = basename $0;
+
+if ( $#ARGV eq -1 ) {
+   print "the $prg was started without options. \n" ,
+         "to start $prg correctly at least one option is needed \n",
+         "for help, call $prg with the option -help \n";
+   exit 1;
+}
+
+if ( ! &GetOptions (
+         "help"      => \$opt_help,
+         "start"     => \$opt_start,
+         "status"    => \$opt_status,
+         "stop"      => \$opt_stop,
+         "restart"   => \$opt_restart,
+         "user=s"      => \$user
+)) {
+   print "$prg: wrong option, use help|start|status|stop|restart [user=]! \n";
+   exit 1;
+}
+
+if ( @ARGV ) {
+   print STDERR "ERROR in $prg: unexpected argument(s): @ARGV\n";
+   exit 1;
+}
+
+if ( $opt_help ) {
+   &help;
+   exit 0;
+}   
+
+if ( $opt_start ) {
+   &start;
+   exit 0;
+}
+
+if ( $opt_stop ) {
+   &stop;
+   exit 0;
+}
+
+if ( $opt_status ) {
+   &status;
+   exit 0;
+}
+
+if ( $opt_restart ) {
+   &stop;
+   &start;
+   &status;
+   exit 0;
+}   
+
+#--- Start all ECS-daemons
+sub start {
+   if ( ! get_PIDs('ecs_chk_com') ) {
+      system( "ecs_chk_com -config \$ECS_CONFIG_FILE" );
+                print "\necs_chk_com daemon is running.\n";
+   }
+   else {
+      print "\necs_chk_com is already running !!! \n";
+   }
+   if ( ! get_PIDs('ecs_scan_mail') ) {
+      system( "ecs_scan_mail -config \$ECS_CONFIG_FILE" );
+                print "\necs_scan_mail daemon is running.\n";
+   }
+   else {
+      print "\necs_scan_mail is already running !!! \n";
+   }   
+}
+
+#--- Stop all ECS daemons
+sub stop {
+   my @pids = get_PIDs( 'ecs_chk_com' );
+   if ( @pids ) {
+      foreach my $pid ( @pids ) {
+        system( "kill -9 $pid" );
+                  print "\necs_chk_com with PID $pid is killed. \n";
+      }   
+   }
+   else {
+      print "\necs_chk_com is NOT running !!! \n";
+   }   
+   @pids = get_PIDs( 'ecs_scan_mail' );
+   if ( @pids ) {
+      foreach my $pid ( @pids ) {
+           system( "kill -15 $pid" );
+                  print "\necs_scan_mail with PID $pid is killed. \n";
+      }   
+   }
+   else {
+      print "\necs_scan_mail is NOT running !!! \n";
+   }
+}   
+
+#--- Check status of ECS-daemons
+sub status {
+    # Script is intended to be executed by a cron job.
+    # Accordingly, no output is generated if dameons are running.
+    # If daemons are not running, cron sends email containing program output.
+
+    # check whether ECS daemons are running
+    my $errmsg = '';
+    $errmsg .= check_PIDs('ecs_chk_com');
+    $errmsg .= check_PIDs('ecs_scan_mail');
+
+    if($errmsg)
+    {
+        # print error message if daemon(s) currently not running
+        print STDERR "$errmsg\n";
+        exit -1;
+    }
+
+}
+
+exit 0;
+
+
+# retrieve array of PID numbers for specified program
+sub get_PIDs
+{
+    my $progname = shift;
+    my $PS;
+       if ( $^O =~ /linux/i ) {
+          if ( ! $user ) {
+             $PS = '/bin/ps -fA';         # this works under Linux
+          }
+          else {
+             $PS = "/bin/ps -f -U $user";
+          }
+       }
+       else {
+          $PS = '/usr/bin/ps -fA';     # this works under Solaris ...
+       }
+    # magical mystical one-liner to get PIDs
+    return map { /\s+(\d+)\s+/ ? $1 : () } grep /(\S+|^)$progname/, `$PS`;
+}
+
+# return error message unless specified program is running
+sub check_PIDs
+{
+    my $progname = shift;
+    my @pids = get_PIDs($progname);
+
+    if( $#pids < 0 )
+    {
+       return "\nERROR:  $progname is currently not running on " .
+            hostname() . ".\n";
+    }
+    elsif( $#pids == 0 ){
+       return "\n+++++:  $progname is currently running on " . 
+            hostname() . ".\n" if( -t STDIN && -t STDOUT );
+    }         
+
+    # check for more than one instance of a daemon 
+    elsif ( $#pids > 0 )
+    {
+      return "\nERROR:  more than one $progname ist still running on " .
+            hostname() . ".\n";
+    }         
+      
+    return '';
+}
+
+#=============================================================================
+sub help {
+#-----------------------------------------------------------------------------
+# Called by: MAIN
+#   Purpose: show help
+# Arguments: none
+#   Returns: nothing
+#      ToDo:
+#   Remarks:
+#-----------------------------------------------------------------------------
+
+print <<"__END_OF_HELP__";
+
+Name
+   $prg
+Purpose
+        Start, stop or status of the Perl-ECS daemons
+        (ecs_chk_com, ecs_scan_mail).
+Syntax
+        $prg [-help]
+        $prg [options]
+Options
+        -help    prints this help
+        -start   runs the ecs-daemons ecs_chk_com and ecs_scan_mail
+                 if they are not still running.
+        -status  checks the status of the ecs-daemons 
+        -stop    stops the ecs-daemons by (kill -15 PID)
+        -restart stops and starts the ecs-daemons 
+        -user=   start|stop|restart|status the ecs instance of user=
+Examples
+        $prg -start
+        $prg -stop
+        $prg -status
+
+__END_OF_HELP__
+
+} # End of sub help()
+
+__END__
+
+# embedded POD documentation
+
+=head1 NAME
+
+ecs_ctl - ECS control
+
+=head1 SYNOPSIS
+
+ ecs_ctl --start
+
+ ecs_ctl --stop
+
+ ecs_ctl --restart
+
+ ecs_ctl --status
+
+ ecs_ctl --start --user=emdistest
+
+=head1 DESCRIPTION
+
+This program is an administration utility for the Perl-ECS daemons.
+You can start | stop or restart the Perl-ECS daemons from the shell
+in a more easy and comfortable way.
+The status-function is similar to the ecs_pid_chk function.
+You can run it for a distinct ecs instance by using the --user parameter.
+
+=head1 OPTIONS
+
+=over 5
+
+=item --start
+
+Starts the Perl ECS daemons if they are not still running.
+
+=item --stop
+
+Stops the Perl ECS daemons with kill -15 <PID> command.
+
+=item --restart
+
+A combination of the --stop and --start function. Very useful for checking
+your hacks in frequent intervals.
+
+=item --status
+
+Checks whether and how many of the ECS daemons are running.
+If several daemons are running on purpose (i.e. for several
+ECS users) the --user option has to be used.
+
+=item --help
+
+This option shows you this information.
+
+=back
+
+=head1 BUGS
+
+Possibly.
+
+=head1 TO DO
+
+This utility should run on linux and solaris, but not on windows systems.
+
+=head1 AUTHOR
+
+Andreas Mack <andreas.mack@zkrd.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+Copyright (C) 2007-2011 ZKRD <http://www.zkrd.de>
+
+=head1 HISTORY
+
+ECS, the EMDIS Communication System, was originally designed and
+implemented by the ZKRD (http://www.zkrd.de/).  This Perl implementation
+of ECS was developed by the National Marrow Donor Program
+(http://www.marrow.org/).

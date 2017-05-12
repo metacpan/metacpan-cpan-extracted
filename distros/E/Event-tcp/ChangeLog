@@ -1,0 +1,62 @@
+2000-02-23  Joshua Pritikin  <joshua.pritikin@db.com>
+
+	* Release 0.14.
+
+2000-02-08  Joshua Pritikin  <joshua.pritikin@db.com>
+
+	* Fix potential timing problems with join.t.
+
+	* Added tons of diagnostics to track down Event 0.65 bug.
+
+2000-02-01  Joshua Pritikin  <joshua.pritikin@db.com>
+
+	* Release 0.13.
+
+	* Fix bugs exposed by Event 0.61.
+
+1999-10-27  Joshua Pritikin  <joshua.pritikin@db.com>
+
+	* Release 0.12.
+
+	* Add Ioctl to PREREQ_PM (eserte@cs.tu-berlin.de).
+
+	* Fix left over mention of _default_state_cb (rezic@onlineoffice.de).
+
+	* Use 4 byte lengths.  The 32k limit is history.
+
+1999-10-08  Joshua Pritikin  <joshua.pritikin@db.com>
+
+	* Release 0.11.
+
+1999-10-05  Joshua Pritikin  <joshua.pritikin@db.com>
+
+	* Check for overflow (the initial protocol maxs out at 32k).
+
+	* Rename tcpserv -> tcplisten.
+
+1999-09-10  Joshua Pritikin  <joshua.pritikin@db.com>
+
+	* Release 0.10.
+
+	* Complete rewrite.
+
+1999-05-06  Joshua Pritikin  <joshua.pritikin@db.com>
+
+	* Major code reorganization.
+
+1999-04-23  Joshua Pritikin  <joshua.pritikin@db.com>
+
+	* Release 0.05.
+
+	* Added more tests.
+
+1999-04-16  Joshua Pritikin  <joshua.pritikin@db.com>
+
+	* Release 0.04.
+
+	* Sync with Event 0.38.
+
+1999-03-31  Joshua Pritikin  <joshua.pritikin@db.com>
+
+	* Set default e_max_cb_tm.
+

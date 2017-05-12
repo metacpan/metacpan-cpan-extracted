@@ -1,0 +1,20 @@
+Revision history for Email-Date-Format
+
+1.005     2014-10-13 08:32:03-04:00 America/New_York
+          fix documentation of export names (thanks, Thomas Klausner!)
+
+1.004     2013-08-05 08:09:14 America/New_York
+          fix repo and bugtracker link (stupid case sensitivity!)
+          (thanks, Slaven Rezic!)
+
+1.003     2013-08-02 18:05:49 America/New_York
+          new repo, new bugtracker
+
+1.002     2007-12-03
+          brings all docs into agreement: this produces 2822, not 822, dates
+
+1.001     2007-12-01
+          be isa Exporter, since "use Exporter 'import'" wasn't in 5.006
+
+1.000     2007-11-30
+          refactored from Email::Date to avoid large prereq chain

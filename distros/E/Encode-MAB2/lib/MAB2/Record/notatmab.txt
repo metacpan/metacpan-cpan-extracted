@@ -1,0 +1,74 @@
+                               MAB2-NOTAT
+                       Online-Kurzreferenz-Version
+                            Stand: Mai 1998
+
+
+
+Vorbemerkung:
+
+Das vorliegende MAB-Format fuer Notationen und Klassifikationen
+resultiert aus dem Projekt der Verbundkooperation.
+MAB-NOTAT hat einen vorlaeufigen und provisorischen Status.
+In seiner aktuellen Fassung soll MAB-NOTAT zugleich als
+Ausgangspunkt und Diskussionsgrundlage fuer die Entwicklung
+eines umfassenden Formats fuer Notations- und Klassifikationsdaten
+dienen.
+
+
+
+          SATZKENNUNG
+
+
+001-088   SEGMENT 0--
+
+001-029   IDENTIFIKATIONSNUMMERN, DATUMS- UND VERSIONSANGABEN
+030-035   ALLGEMEINE VERARBEITUNGSTECHNISCHE ANGABEN
+036-049   ALLGEMEINE CODIERTE ANGABEN
+050-064   VEROEFFENTLICHUNGS- UND MATERIALSPEZIFISCHE ANGABEN
+070-075   ANWENDERSPEZIFISCHE DATEN UND CODES
+076-088   ANWENDERSPEZIFISCHE ANGABEN
+
+
+
+8--       SEGMENT KLASSIFIKATIONS- UND NOTATIONSDATEN
+
+800       NOTATION, SYSTEMATIKSTELLE USW.
+
+          Indikator:
+          blank = nicht definiert
+
+
+803       BESCHREIBUNG DER NOTATION, SYSTEMATIKSTELLE USW.
+
+          Indikator:
+          blank = nicht spezifiziert
+          a     = Umschreibung der Notation, Systematikstelle
+          b     = Synonyme Umschreibung der Notation, Systematikstelle
+          c     = Freie Umschreibung der Notation, Systematikstelle
+          d     = Begriffe zu einer Notation
+
+
+808       ERLAEUTERUNGEN, BEMERKUNGEN ZU EINER NOTATION, SYSTEMATIK-
+          STELLE USW.
+
+          Indikator:
+          blank = nicht definiert
+
+
+830       VERWEISUNGSFORMEN ZUR NOTATION, SYSTEMATIKSTELLE USW.
+
+          Indikator:
+          blank = nicht definiert
+
+
+840       KLASSENBEZEICHNUNG ZUR NOTATION, SYSTEMATIKSTELLE USW.
+
+          Indikator:
+          blank = nicht definiert
+
+
+845       VERWEISUNGSFORMEN ZUR KLASSENBEZEICHNUNG EINER NOTATION,
+          SYSTEMATIKSTELLE USW.
+
+          Indikator:
+          blank = nicht definiert

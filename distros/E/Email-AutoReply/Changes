@@ -1,0 +1,46 @@
+Revision history for Perl extension Mail::AutoReply.
+1.04  Mon Jun  9 14:58:22 PDT 2008
+	- patch from Pascal Gloor to improve bounce detection.
+
+1.02  Sat May 27 23:06:25 PDT 2006
+	- fixed URLs in default response text. Thanks: David Ljung Madison
+
+1.01  Tue Jan 18 08:19:19 PST 2005
+	- small POD fix for 'send_method_args'
+
+1.00  Mon Jan 17 23:02:12 PST 2005
+	- added 'send_method_args' field for modifying arguments passed
+	  to sendmail (or whatever send_method is used) to fix
+	  rt.cpan.org ticket #9205. Feature suggested by Sean T. Allen.
+	- POD updates
+
+0.06  Tue Dec 28 10:58:30 PST 2004
+	- updated patterns of addresses *never* sent autoreplies
+	- POD and comment updates
+
+0.05  Sat Oct 16 17:04:55 PDT 2004
+	- allow easy creation of From address for autoreply using new
+	  attributes from_realname and from_email (see POD)
+	- removed 'user' attribute
+	- fixed bug in creation of From address for autoreply
+	- Email::AutoReply is now in Public Beta release
+
+0.04  Wed Aug 25 08:39:55 PDT 2004
+	- more minor POD clean-ups. Try to encourage users to read
+	Email::AutoReply::DB instead of implementing classes' POD
+
+0.03  Wed Aug 25 08:39:55 PDT 2004
+	- major POD clean-up
+
+0.02  Tue Aug 24 19:27:58 PDT 2004
+	- first CPAN release
+
+0.01  Sat Aug 14 17:32:49 2004
+	- original version; created by h2xs 1.23 with options
+		-AX -n Mail::AutoReply
+
+
+-----------------------------------------------------------------------
+Last Updated $Date: 2008-06-09 14:59:36 -0700 (Mon, 09 Jun 2008) $
+$Revision: 3014 $$Author: adam $
+vim: noet tw=72 sw=8

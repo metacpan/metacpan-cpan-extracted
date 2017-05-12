@@ -1,0 +1,16 @@
+---
+Test:
+  source:
+    -
+      type: File
+      path: D:/Git/EPublisher/Backend/example/test.pod
+    -
+      type: Module
+      name: CGI::Application
+    -
+      type: File
+      path: D:/Git/EPublisher/Backend/lib/EPublisher.pm
+  target:
+    type: PDF
+    author: Renee Baecker
+    output: ./test.pdf

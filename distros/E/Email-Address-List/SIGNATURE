@@ -1,0 +1,48 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.69.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 3436e919e4b66f27f2ea395cb9d4e0351877aa58 Changes
+SHA1 17f8596db104ffaea586784e085f4824fb3741ff MANIFEST
+SHA1 83ef7f35c1129972703ce725157a1c9b7acc4ce2 META.yml
+SHA1 be4547d00d6c49fe4252da994378c2a7f161c3e5 Makefile.PL
+SHA1 2a014fe26766365a791f1020ca818ed06d2dc221 README
+SHA1 8a924add836b60fb23b25c8506d45945e02f42f4 inc/Module/Install.pm
+SHA1 2d0fad3bf255f8c1e7e1e34eafccc4f595603ddc inc/Module/Install/Base.pm
+SHA1 f0e01fff7d73cd145fbf22331579918d4628ddb0 inc/Module/Install/Can.pm
+SHA1 7328966e4fda0c8451a6d3850704da0b84ac1540 inc/Module/Install/Fetch.pm
+SHA1 b62ca5e2d58fa66766ccf4d64574f9e1a2250b34 inc/Module/Install/Makefile.pm
+SHA1 1aa925be410bb3bfcd84a16985921f66073cc1d2 inc/Module/Install/Metadata.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 e4196994fa75e98bdfa2be0bdeeffef66de88171 inc/Module/Install/Win32.pm
+SHA1 c3a6d0d5b84feb3280622e9599e86247d58b0d18 inc/Module/Install/WriteAll.pm
+SHA1 dd0647d12510f67cb4969da92c8bb41bd500793f lib/Email/Address/List.pm
+SHA1 2c008b60a3213c22fcd7db589456915db8d6825f t/basics.t
+SHA1 d47c146488047eefa8f5ecbee1510f503d26c7c9 t/data/RFC5233.single.obs.json
+SHA1 31183f86437e1a75001fe0b04dea12999881274c t/data/RFC5233.single.obs.txt
+SHA1 1092a16b40cf7e979d4f234d041b342269cacbb8 t/data/RFC5233.single.valid.json
+SHA1 ef4569d12c81789362ebe6d51591213ef160c1f7 t/data/RFC5233.single.valid.txt
+SHA1 d8dda26c6e798fc201747c621f41d10f714575f9 t/generate.pl
+SHA1 e261f8f0b71767ca094cce325eda1f1aba8dfd84 t/invalid.t
+SHA1 22c9725a9feac3242072e4c5cff6a6d8a7b53e82 t/pathological.t
+SHA1 8b01eef1e4a95ad6f4fd45153f60901d24fd1f5e t/random.combinations.t
+SHA1 b749d9f357f04d94da250c484b753aecc1eb5b1c t/single.suit.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAlMBDQkACgkQMflWJZZAbqAqSQCfUHrof8hyCQ8vZlQ+4e3Bu+tx
+pmsAoL6gz5r1uAMH/lju07RIdWNp0ZRl
+=bcjr
+-----END PGP SIGNATURE-----

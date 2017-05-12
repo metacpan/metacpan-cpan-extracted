@@ -1,0 +1,253 @@
+#!/usr/bin/perl
+
+use v5.10.0;
+use strict;
+use warnings;
+use autodie qw(:all);
+
+use Ubic::Multiservice::Simple;
+use Ubic::Service::SimpleDaemon;
+use File::Copy qw(copy);
+use autodie qw(copy);
+use Exobrain;
+use Getopt::Std;
+
+# PODNAME: exobrain
+# ABSTRACT: Exobrain cmdline tool and dispatcher
+our $VERSION = '1.08'; # VERSION
+
+
+# This file is both dispatcher and services file. When
+# called with no arguments, we provide UBIC services
+# info. When run with arguments, we start services.
+#
+# At some point it might make sense to split these functions.
+#
+# Commands:
+#
+#   - install [Component] - Install exobrain component?
+#   - run [Class]  - Run a given class (presumably inside ubic)
+#   - start/stop   - If we provide these, aliases to ubic
+
+my ($command, @args) = @ARGV;
+
+if (not $command) {
+    ubic_services();
+}
+elsif ($command eq 'setup') {
+    my @comps = @args;
+    
+    # If there are components listed, set them up...
+    
+    if (@comps) {
+        my $exobrain = Exobrain->new;
+        foreach my $comp (@comps) {
+            my $comp_module = 'Exobrain::' . $comp;
+            eval "use $comp_module";
+
+            if ($@) { die "Loading $comp_module failed. Did you install it first? (cpanm $comp_module)\n"; }
+
+            say "Configuring $comp_module...\n";
+
+            $comp_module->new->setup;
+        }
+        exit 0;
+    }
+
+    # Otherwise, configure exobrain itself.
+
+    say "Setting up exobrain...";
+
+    my $ubic = "$ENV{HOME}/ubic";
+    if (not -d $ubic) {
+        say "It doesn't look like ubic is installed; at least, I can't find $ubic.";
+        say "Have you run `cpanm Ubic` and `ubic-admin setup`?\n\n";
+        die "Halting (Ubic not found)\n";
+    }
+
+    my $exobrain_log = "$ubic/log/exobrain";
+
+    if (-d $exobrain_log) {
+        say "We already have $exobrain_log, skipping...";
+    }
+    else {
+        say "Creating $exobrain_log";
+        mkdir($exobrain_log);
+    }
+
+    my $exe     = $0;
+    my $service = "$ubic/service/";
+    
+    say "Copying $exe to $service";
+    copy($0, $service);
+
+    say "Done!\n";
+    say "\nYou should use 'ubic start exobrain.core' to start exobrain.";
+
+}
+elsif ($command eq "debug") {
+    my $exobrain = Exobrain->new;
+
+    # Options handling
+
+    local @ARGV  = @args;
+    my %opts = ( v => 0 );
+    getopts('v', \%opts);
+
+    # Loop forever showing packets off the bus, either verbosely
+    # or not. These use the lowest-level functions available, so
+    # should catch even malformed packets.
+
+    while (1) {
+        if ($opts{v}) {
+            say $exobrain->sub->get->dump;
+            say "-" x 50;
+        }
+        else {
+            say $exobrain->sub->get->summary;
+        }
+    }
+}
+elsif ($command eq "run") {
+    my ($class) = @args;
+    $class or die "Usage: $0 run class";
+
+    Exobrain->run($class);
+}
+else {
+    # Apparently ubic calls us with service names when it wants
+    # to know stuff. So assume that a weird argument is ubic
+    # doing its thing
+    ubic_services();
+    # die "$0: Unknown command: $command @args\n";
+}
+
+sub daemon {
+    my ($bin) = @_;
+
+    return Ubic::Service::SimpleDaemon->new(
+        common_options($bin),
+        bin      => $bin,
+    );
+}
+
+sub agent {
+    my ($name, $class) = @_;
+
+    # If our class can't be run, then don't return anything
+    if (not Exobrain->can_run($class)) { return () }
+
+    # Run is ourselves, with the run command.
+    my @run = ( __FILE__ , "run" );
+
+    my @opts = ( common_options($class), bin => "@run $class" );
+
+    return ($name => Ubic::Service::SimpleDaemon->new( @opts ) );
+
+}
+
+sub common_options {
+    my ($name) = @_;
+
+    my $LOG_HOME = "$ENV{HOME}/ubic/log/exobrain";
+
+    return (
+        stdout   => "$LOG_HOME/$name.stdout.log",
+        stderr   => "$LOG_HOME/$name.stderr.log",
+        ubic_log => "$LOG_HOME/$name.ubic.log",
+    );
+}
+
+sub ubic_services {
+
+    my $config = Exobrain->new->config;
+    my @component_services;
+
+    # Load optional components.
+    foreach my $component (keys %{ $config->{Components}}) {
+
+        my $class = 'Exobrain::'.$component;
+
+        # Magic component loading dance.
+        eval "require $class";
+        die $@ if $@;
+
+        my $namespace = $class->component;
+        my %services  = $class->services;
+
+        my %runnable_services = map { agent($_, $services{$_} ) } keys %services;
+
+        # Add these to the things we'll load
+        push(@component_services,
+            $namespace => Ubic::Multiservice::Simple->new(\%runnable_services)
+        );
+    }
+
+    return Ubic::Multiservice::Simple->new({
+
+        @component_services,
+
+        action => Ubic::Multiservice::Simple->new({
+            agent('bee-habit'      => 'Action::SimpleBeeHabit'),
+            agent('bee-inbox'      => 'Action::BeeInbox'),
+            agent('sentbox-reward' => 'Action::SendmailXP'),
+            agent('social-notify'  => 'Action::SocialNotify'),
+            agent('ping'           => 'Action::Ping'),
+            agent('geo-personallog'=> 'Action::GeoLog'),
+            'rtm-adder'            => daemon('rtm-adder'),
+            'geo-notify'           => daemon('geo-notify'),
+        }),
+
+        sink => Ubic::Multiservice::Simple->new({
+            pushover  => daemon('pushover'),
+            sms       => daemon('sms'),
+        }),
+
+        core => Ubic::Multiservice::Simple->new({
+            router => daemon("router"),
+        }),
+    });
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+exobrain - Exobrain cmdline tool and dispatcher
+
+=head1 VERSION
+
+version 1.08
+
+=head1 SYNOPSIS
+
+    $ exobrain setup           # Set up exobrain for use
+
+    $ cpanm Exobrain::Twitter; # Install Exobrain::Twitter
+    $ exobrain setup Twitter   # Set up Exobrain::Twitter
+
+    $ exobrain debug           # See what's happening
+    $ exobrain debug -v        # See more of what's happening
+
+=head1 DESCRIPTION
+
+This is a service file for Ubic which allows for the
+control of exobrain services. It must be placed in
+your F<~/ubic/service> directory to be operational,
+which will happen as part of the C<exobrain setup>
+process which you should run.
+
+=head1 AUTHOR
+
+Paul Fenwick <pjf@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Paul Fenwick.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

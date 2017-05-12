@@ -1,0 +1,77 @@
+#!/usr/bin/env perl
+
+use strictures 1;
+use Eval::WithLexicals;
+use Term::ReadLine;
+use Data::Dumper;
+use Getopt::Long;
+
+GetOptions(
+  "plugin=s" => \my @plugins
+);
+
+$SIG{INT} = sub { warn "SIGINT\n" };
+
+{ package Data::Dumper; no strict 'vars';
+  $Terse = $Indent = $Useqq = $Deparse = $Sortkeys = 1;
+  $Quotekeys = 0;
+}
+
+my $eval = @plugins
+ ? Eval::WithLexicals->with_plugins(@plugins)->new
+ : Eval::WithLexicals->new;
+
+my $read = Term::ReadLine->new('Perl REPL');
+while (1) {
+  my $line = $read->readline('re.pl$ ');
+  exit unless defined $line;
+  my @ret; eval {
+    local $SIG{INT} = sub { die "Caught SIGINT" };
+    @ret = $eval->eval($line); 1;
+  } or @ret = ("Error!", $@);
+  print Dumper @ret;
+}
+
+__END__
+
+=head1 NAME
+
+tinyrepl - Tiny REPL
+
+=head1 SYNOPSIS
+
+    $ tinyrepl
+    re.pl$ "s" x 5
+    "sssss"
+    re.pl$ exit
+
+    $ tinyrepl --plugin HintPersistence
+
+=head1 DESCRIPTION
+
+tinyrepl is a minimal pure-Perl REPL.  It is just a small wrapper
+around L<Eval::WithLexicals>.
+
+=head1 OPTIONS
+
+=over 4
+
+=item C<--plugin=>
+
+Loads a plugin into the REPL. See L<Eval::WithLexicals/with_plugins>.
+
+=back
+
+=head1 SUPPORT
+
+See L<Eval::WithLexicals> for support and contact information.
+
+=head1 AUTHORS
+
+See L<Eval::WithLexicals> for authors.
+
+=head1 COPYRIGHT AND LICENSE
+
+See L<Eval::WithLexicals> for the copyright and license.
+
+=cut

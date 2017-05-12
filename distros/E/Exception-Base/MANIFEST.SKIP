@@ -1,0 +1,74 @@
+# Avoid version control files.
+\bRCS\b
+\bCVS\b
+,v$
+\B\.svn\b
+\B\.cvsignore$
+\B\.git\b
+\B\.gitignore$
+\B\.bzr\b
+\B\.bzrignore$
+\B\.travis.yml$
+
+# Avoid Makemaker generated and utility files.
+\bMakefile$
+\bblib
+\bMakeMaker-\d
+\bpm_to_blib$
+\bblibdirs$
+
+# Avoid Module::Build generated and utility files.
+\bBuild$
+\bBuild.bat$
+\b_build
+\bDist.SH$
+
+# Avoid Devel::Cover generated files
+\bcover_db
+\btmon.out$
+
+# Avoid Devel::NYTProf generated files
+\bnytprof
+
+# Avoid temp and backup files.
+~$
+\.tmp$
+\.old$
+\.bak$
+\#$
+\.#
+\.rej$
+\.diff$
+
+# Avoid OS-specific files/dirs
+#   Mac OSX metadata
+\B\.DS_Store
+#   Mac OSX SMB mount metadata files
+\B\._
+
+# Avoid archives of this distribution
+\.gz$
+\.ppd$
+\.ppmx$
+\.tgz$
+\.deb$
+\bdebian
+\bDebian_CPANTS.txt$
+-stamp$
+
+# Avoid Eclipse files
+.cproject
+.includepath
+.project
+.settings
+
+# Avoid distdir
+\d+\.\d+\b
+^MYMETA.yml$
+^MYMETA\.json$
+
+# Avoid compiler artefacts
+\bcompilet
+\btest-
+\.exe$
+\.o$

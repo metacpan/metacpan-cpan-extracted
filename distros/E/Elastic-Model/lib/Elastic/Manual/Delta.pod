@@ -1,0 +1,225 @@
+package Elastic::Manual::Delta;
+
+# ABSTRACT: Important changes in Elastic::Model
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Elastic::Manual::Delta - Important changes in Elastic::Model
+
+=head1 VERSION
+
+version 0.52
+
+=head1 DESCRIPTION
+
+This documents any important or noteworthy changes in L<Elastic::Model>, with
+a focus on things that affect backwards compatibility. This does duplicate
+data from the Changes file, but aims to provide more details and when possible
+workarounds.
+
+=head2 0.52
+
+Elastic::Model is not compatible with Elasticsearch 2.x.  L<Search::Elasticsearch>,
+however, defaults to using a 2.x compatible client: C<2_0::Direct>.  You should specify
+the client version explicitly when creating a Search::Elasticsearch instance:
+
+    use Search::Elasticsearch;
+    use MyApp;
+
+    my $es = Search::Elasticsearch->new(
+        client => '1_0::Direct', #### explicit client ####
+        nodes  => [ "192.168.1.100:9200", "192.168.1.101:9200"]
+    );
+
+    my $model = MyApp->new( es => $es )
+
+=head2 0.51
+
+Requires Search::Elasticsearch v1.20 or above.  Tested on Elasticsearch v1.6
+
+=head2 0.50
+
+This is the first version which supports the B<1.x releases of Elasticsearch>,
+and it provides a migration path from the 0.90.x releases of Elasticsearch.
+
+=over
+
+=item L<Search::Elasticsearch>
+
+You can no longer use the temporary L<Search::Elasticsearch::Compat> client with
+Elastic::Model.  Instead, use the official L<Search::Elasticsearch> client:
+
+    use Search::Elasticsearch;
+    use MyApp;
+
+    my $es = Search::Elasticsearch->new(
+        client => '1_0::Direct',
+        nodes  => [ "192.168.1.100:9200", "192.168.1.101:9200"]
+    );
+
+    my $model = MyApp->new( es => $es )
+
+=item Migrating from 0.90.x to 1.x
+
+You cannot mix nodes from 0.90.x with nodes from 1.x.  This leaves you with
+two options:
+
+=over
+
+=item *
+
+Shutdown the 0.90.x cluster and replace it with a 1.x cluster.
+
+=item *
+
+Run two clusters in parallel during the transition period.
+
+=back
+
+Either way, the migration path available in Elastic::Model v0.50 will help you
+through the transition.
+
+You can enable a "compatibility mode" which will allow you to use the same
+code on 0.90.x and on 1.x by telling the Search::Elasticsearch module to use
+the C<0_90::Client>:
+
+    use Search::Elasticsearch;
+    use MyApp;
+
+    my $es = Search::Elasticsearch->new(
+        nodes  => [ "192.168.1.100:9200", "192.168.1.101:9200"],
+        client => '0_90::Client'
+    );
+
+    my $model = MyApp->new( es => $es )
+
+If you are planning on running two clusters in parallel, then you can specify
+a mixture of nodes from the 0.90.x cluster and the 1.x cluster in the C<nodes>
+list.  The client will use whatever nodes are available.  This allows you to
+start with just the 0.90.x cluster, bring up the 1.x cluster (it will talk to
+both clusters), then take down the 0.90.x cluster.
+
+Once the migration is finished, remove the `0_90::Client` and the 0.90.x nodes
+and the compatibility mode will be disabled.
+
+B<IMPORTANT>: If you writing to your index during transition, it is up to you
+to  ensure that writes go to both clusters.  A safer approach is to only allow
+reads during the transition phase.
+
+B<NOTE>: While compatibility mode is enabled, C<include_paths> and
+C<exclude_paths> (see L<Elastic::Model::View/"include_paths / exclude_paths">)
+will be ignored. Instead of retrieving just the paths specified, it will
+retrieve the whole document.
+
+=item C<ignore_missing>
+
+The C<ignore_missing> parameter is deprecated and should be replaced by, eg:
+
+    $namespace->index('foo')->delete(ignore => 404);
+
+For now, C<ignore_missing> will be translated to C<< ignore => 404 >> but will
+warn about deprecation.
+
+=item C<omit_norms> and C<omit_term_freq_and_positions>
+
+These two options have been removed from Elasticsearch and replaced by the following
+mapping:
+
+    { "my_string_field": {
+      "type":          "string",
+      "norms":       { "enabled": "false" },
+      "index_options": "docs"
+    }}
+
+These options were most useful for C<not_analyzed> fields, but they are no longer
+required as they are now the default settings for C<not_analyzed> fields. If you
+want to apply these settings to an C<analyzed>  string field, you can do so as
+follows:
+
+    has 'name' => (
+        is      => 'rw',
+        isa     => 'Str',
+        type    => 'string',
+        mapping => {
+            norms         => { enabled => 0 },
+            index_options => 'docs'
+        }
+    );
+
+=item Responses from Elasticsearch
+
+Some response formats have changed in Elasticsearch. The structure of the
+C<get-mapping> and C<get-settings> responses have changed, responses no longer
+include the C<ok> key, and the C<exists> has been replaced by C<found>.  The
+C<field> values are now returned as arrays rather than scalars.
+
+Compatibility mode makes some effort to normalize responses between 0.90.x and
+1.x, but you should test your code on 1.x before migrating.
+
+=item Scripting
+
+Mvel is no longer enabled by default in Elasticsearch, and in 1.4 it will be
+removed. However, the new scripting language (Groovy, which is available in
+1.3 and will become the default in 1.4) is not available in 0.90.x.  To aid
+migration, you should reenable Mvel scripting during transition. Once
+complete, update all scripts to use Groovy instead.
+
+See L<http://www.elasticsearch.org/blog/scripting/> for more.
+
+=item Queries
+
+Some queries have been removed in 1.x.  The C<text>, C<text_phrase>, and
+C<text_phrase_prefix> queries have been replaced by C<match>, C<match_phrase>,
+and C<match_phrase_prefix>.
+
+The C<custom_score>, C<custom_boost_factor>, and C<custom_filters_score> queries
+have been replaced by the C<function_score> query.
+
+The C<numeric_range> filter no longer exists.
+
+L<Elastic::Model::SearchBuilder> supports the C<match*> queries but still
+needs to be updated to support the C<function_score> query.  In the meantime,
+you can use the "raw" syntax.  See
+L<ElasticSearch::SearchBuilder/"RAW-ELASTICSEARCH-QUERY-DSL">.
+
+=item Aggregations
+
+Aggregations are now supported (see L<Elastic::Model::View/aggs>) but only
+in Elasticsearch 1.0 and above.
+
+=item Field attribute deprecations
+
+The following attribute deprecations are deprecated and will be removed in a future version:
+
+=over
+
+=item * field C<boost>
+
+=item * C<index_name>
+
+=item * C<precision_step>
+
+=item * C<path>
+
+=back
+
+=back
+
+=head1 AUTHOR
+
+Clinton Gormley <drtech@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Clinton Gormley.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

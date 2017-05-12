@@ -1,0 +1,60 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 14db8c7e3e9c838d1c04b89d7a93ffb14d38d46d Changes
+SHA1 0b3b715d6b387a613748affa0dc6030050e4b60a INSTALL
+SHA1 b94f06af32c2cebe5696645fe2a782b88b5b6f40 LICENSE
+SHA1 c13d8119649444107c4cebfac7bc4a492a0a5440 MANIFEST
+SHA1 657b5422af766124a0bff3eb1c8763786cf89998 META.json
+SHA1 a519eab3aba8cc8ef2a028c735362fbb7c1b0ce3 META.yml
+SHA1 bfe817f56c4a0ea86077f45e7b0679470ed8b4f8 Makefile.PL
+SHA1 f452c2923e667e24ce6821d4d1b592d0cf5c1b77 README
+SHA1 e5a36eeeb4324d2d3a8a0b9118df6bc8b2d60b18 cpanfile
+SHA1 9f5cf7df8f3d7f5eeefa82ed43b510c5c88f572f dist.ini
+SHA1 b897c414af89525abea11471449619720ba1fe5f lib/EntityModel/Array.pm
+SHA1 3900b24c04e7f0b10622238353cf098e9dcdd188 lib/EntityModel/Array.pod
+SHA1 478e5329287da1ba76bcf45dc7c228262bc03ef6 lib/EntityModel/BaseClass.pm
+SHA1 7c55800ca8531fae2cef61e29f5d7ef1968ed3f2 lib/EntityModel/Class.pm
+SHA1 81baaec96ef02bb519f109b0bab3d1dd56e94bc5 lib/EntityModel/Class/Accessor.pm
+SHA1 075a0f1c03797d3f63769e51624628a28ce8fe7a lib/EntityModel/Class/Accessor/Array.pm
+SHA1 ce020953947187b92803db0203602c6e50de8637 lib/EntityModel/Class/Accessor/Array.pod
+SHA1 b05a82c4753b5f1968dd5beb0f29c5c29411702d lib/EntityModel/Class/Accessor/Hash.pm
+SHA1 2fe6d47aad07a4d8a96fff30b82365cfdc249cd1 lib/EntityModel/Class/Accessor/Hash.pod
+SHA1 6fb90e0b5a32781d0dbf1522ff7479f51b0bce51 lib/EntityModel/Error.pm
+SHA1 17b6515c6a07677f890f73c09f5f0704aa6008a3 lib/EntityModel/Hash.pm
+SHA1 985d9ded8d8ed7e344a09e52b1402e878e91da28 t/00-check-deps.t
+SHA1 d51c99d8222d9feed38f06702b734d011980fe73 t/00-compile.t
+SHA1 711add1623102ed967932540fa37d4d9682ff327 t/000-report-versions-tiny.t
+SHA1 2f5e5d3e1c75588c0f9d14e0a38af24a624e05c2 t/array.t
+SHA1 8a99c83d0c944377738575d3a512297c1d7725ca t/class.t
+SHA1 3deeeb23243eeaa610780ec4eddc5736b25861cf t/hash.t
+SHA1 f242e380d897f0430a668ea3f2938df75c0bef55 xt/author/test-eol.t
+SHA1 198d1665317c3d91e3bb81f0a3b8dad8d4d66f20 xt/release/common_spelling.t
+SHA1 c6c3c9f7fe12058b4771449dff874b1c450c982c xt/release/mojibake.t
+SHA1 296928dbbcaffd1514ccc9b77a1e6e03cfe9b068 xt/release/pod-syntax.t
+SHA1 34513f89a70b96f6412fe2ef0ad4d475e8cac66c xt/release/synopsis.t
+SHA1 bbcd59d081d9940af5d43337ae85458075933829 xt/release/test-version.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJT8G1xAAoJEFKElMNpjtyDZt4IAJXeOyxgS38AyatjlWU7zDR1
+iC8Q+xzqJRGhRfw8aCboTyhJV8VLnFzC8GmnM8U1k3dihjZ6xUl6NmsNmLyBkm0t
++LjOQFdAfgv/FV5d1x7GkA+1cxXERJBL6choB8pboJ/XMh6QroqJdp/6Emp5MUe8
+7Bi2xO4nknBDeb+4FjKQmCdi7iAlVYXMOug+TLNfqjJ2Ds/iCYjUcWlrU446/rZh
+tJXSYHxfMXAmCpZGxCTfS/16pJv41KSVUt4FxrQaNxYTtfxw/zPFAD8sOdMopGbJ
+OMtjtguV90xm8gP2igteE79NEWjvK8v9AlcuOf7qU1jhXjSwivYcGmUAkF5MGyI=
+=H6WO
+-----END PGP SIGNATURE-----

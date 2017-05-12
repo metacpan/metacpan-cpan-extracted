@@ -1,0 +1,86 @@
+#!/usr/bin/perl -w
+use 5.010;
+use strict;
+use warnings;
+use autodie;
+use Exobrain;
+use Config::Tiny;
+use Data::Dumper;
+
+use constant DEBUG => 1;
+
+# ABSTRACT: Text people when you're in their area.
+# PODNAME: geo-sms
+our $VERSION = '1.08'; # VERSION
+
+my $exobrain = Exobrain->new;
+
+# TODO: use File::XDG or Exobrain::Config or *something* that
+# abstracts away the location of our config file.
+
+my $config = Config::Tiny->read("$ENV{HOME}/.config/exobrain/stalk-paul");
+
+# TODO: Configure area, either from tags in Geo packets, or actual
+# honest geolocation logic.
+
+# TODO: Only broadcast on seeing a tag in the geo packet indicating
+#       we should!
+
+my $area = 'PDX';
+
+my $phones = $config->{$area} or die "Cannot find people in $area";
+
+$exobrain->watch_loop(
+    class  => 'Measurement::Geo',
+    filter => sub { $_->is_me },
+    then   => sub {
+        my $event = $_;
+
+        my $location = $event->poi->name;
+        my $message  = $event->message;
+
+        my $text = "PJF is at '$location' with message: '$message'.";
+
+        say Dumper $event if DEBUG;
+
+        my $length = length($text);
+
+        # Truncate text to 160 characters for SMS.
+        # TODO: Split into multiple messages
+        $text =~ s/^(.{1,160}).*/$1/;
+
+        foreach my $person (keys %$phones) {
+            my $phone = $phones->{$person};
+
+            $exobrain->intent('SMS',
+                to   => $phone,
+                text => $text,
+            );
+        }
+    },
+);
+
+__END__
+
+=pod
+
+=head1 NAME
+
+geo-sms - Text people when you're in their area.
+
+=head1 VERSION
+
+version 1.08
+
+=head1 AUTHOR
+
+Paul Fenwick <pjf@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Paul Fenwick.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

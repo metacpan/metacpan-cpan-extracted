@@ -1,0 +1,861 @@
+From maypole-admin@lists.netthink.co.uk  Tue Jun  1 09:57:39 2004
+Received: from localhost ([127.0.0.1] helo=alibi.simon-cozens.org)
+	by alibi.simon-cozens.org with esmtp (Exim 3.35 #1 (Debian))
+	id 1BV55U-0004YF-00; Tue, 01 Jun 2004 09:57:36 +0100
+Received: from mail.tvskat.net ([213.16.56.1])
+	by alibi.simon-cozens.org with esmtp (Exim 3.35 #1 (Debian))
+	id 1BV54o-0004Xq-00
+	for <maypole@lists.netthink.co.uk>; Tue, 01 Jun 2004 09:56:54 +0100
+Received: from bugs (unknown [213.16.56.6])
+	by mail.tvskat.net (Postfix) with SMTP id 3EE8431D9
+	for <maypole@lists.netthink.co.uk>; Tue,  1 Jun 2004 11:55:59 +0300 (EEST)
+From: "raptor@tvskat.net" <raptor@tvskat.net>
+To: maypole@lists.netthink.co.uk
+Message-Id: <20040601115553.759d77ec@bugs>
+X-Mailer: Sylpheed version 0.9.10claws (GTK+ 1.2.10; i686-pc-linux-gnu)
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: [Maypole] apache2 or cgi?
+Sender: maypole-admin@lists.netthink.co.uk
+Errors-To: maypole-admin@lists.netthink.co.uk
+X-BeenThere: maypole@lists.netthink.co.uk
+X-Mailman-Version: 2.0.11
+Precedence: bulk
+List-Help: <mailto:maypole-request@lists.netthink.co.uk?subject=help>
+List-Post: <mailto:maypole@lists.netthink.co.uk>
+List-Subscribe: <http://lists.netthink.co.uk/listinfo/maypole>,
+	<mailto:maypole-request@lists.netthink.co.uk?subject=subscribe>
+List-Id: Maypole developers and user's list <maypole.lists.netthink.co.uk>
+List-Unsubscribe: <http://lists.netthink.co.uk/listinfo/maypole>,
+	<mailto:maypole-request@lists.netthink.co.uk?subject=unsubscribe>
+List-Archive: <http://lists.netthink.co.uk/pipermail/maypole/>
+Date: Tue, 1 Jun 2004 11:55:53 +0300
+X-Spam-Checker-Version: SpamAssassin 2.70-r6188 (2004-01-17) on 
+	alibi.simon-cozens.org
+X-Spam-Status: No, hits=-4.9 required=5.0 tests=BAYES_00 autolearn=ham 
+	version=2.70-r6188
+X-Spam-Level: 
+Status: RO
+Content-Length: 373
+Lines: 14
+
+hi,
+
+I "brusted" over the arhives and see there is some discussion about support 
+for Apache2... what are the steps to make maypole working under apache2, if possible?
+
+As worst case scenario how to run it under pure CGI ?
+
+tia
+
+_______________________________________________
+maypole mailing list
+maypole@lists.netthink.co.uk
+http://lists.netthink.co.uk/listinfo/maypole
+
+
+From maypole-admin@lists.netthink.co.uk  Tue Jun  1 10:18:04 2004
+Received: from localhost ([127.0.0.1] helo=alibi.simon-cozens.org)
+	by alibi.simon-cozens.org with esmtp (Exim 3.35 #1 (Debian))
+	id 1BV5PG-0004pS-00; Tue, 01 Jun 2004 10:18:02 +0100
+Received: from mag-sol.com ([217.160.181.186])
+	by alibi.simon-cozens.org with esmtp (Exim 3.35 #1 (Debian))
+	id 1BV5Oo-0004pA-00
+	for <maypole@lists.netthink.co.uk>; Tue, 01 Jun 2004 10:17:34 +0100
+Received: (qmail 10907 invoked by uid 10009); 1 Jun 2004 09:17:35 -0000
+From: Dave Cross <dave@dave.org.uk>
+To: "raptor@tvskat.net" <raptor@tvskat.net>
+Cc: maypole@lists.netthink.co.uk
+Subject: Re: [Maypole] apache2 or cgi?
+Message-ID: <20040601091735.GA10279@mag-sol.com>
+References: <20040601115553.759d77ec@bugs>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20040601115553.759d77ec@bugs>
+User-Agent: Mutt/1.4.1i
+Sender: maypole-admin@lists.netthink.co.uk
+Errors-To: maypole-admin@lists.netthink.co.uk
+X-BeenThere: maypole@lists.netthink.co.uk
+X-Mailman-Version: 2.0.11
+Precedence: bulk
+List-Help: <mailto:maypole-request@lists.netthink.co.uk?subject=help>
+List-Post: <mailto:maypole@lists.netthink.co.uk>
+List-Subscribe: <http://lists.netthink.co.uk/listinfo/maypole>,
+	<mailto:maypole-request@lists.netthink.co.uk?subject=subscribe>
+List-Id: Maypole developers and user's list <maypole.lists.netthink.co.uk>
+List-Unsubscribe: <http://lists.netthink.co.uk/listinfo/maypole>,
+	<mailto:maypole-request@lists.netthink.co.uk?subject=unsubscribe>
+List-Archive: <http://lists.netthink.co.uk/pipermail/maypole/>
+Date: Tue, 1 Jun 2004 10:17:35 +0100
+X-Spam-Checker-Version: SpamAssassin 2.70-r6188 (2004-01-17) on 
+	alibi.simon-cozens.org
+X-Spam-Status: No, hits=-4.5 required=5.0 tests=AWL,BAYES_00,
+	TO_ADDRESS_EQ_REAL autolearn=ham version=2.70-r6188
+X-Spam-Level: 
+Status: RO
+Content-Length: 714
+Lines: 27
+
+On Tue, Jun 01, 2004 at 11:55:53AM +0300, raptor@tvskat.net wrote:
+> hi,
+> 
+> I "brusted" over the arhives and see there is some discussion about
+> support for Apache2... what are the steps to make maypole working
+> under apache2, if possible?
+
+I got Maypole working fine under Apache2 by following the directions in
+
+http://lists.netthink.co.uk/pipermail/maypole/2004-May/000248.html
+
+I also had to install the Apache2 version of Apache::Request which I
+got from 
+
+http://search.cpan.org/dist/libapreq2-2.02_02-dev/
+
+Dave...
+
+-- 
+  New .sigs
+  Running in please parse
+
+_______________________________________________
+maypole mailing list
+maypole@lists.netthink.co.uk
+http://lists.netthink.co.uk/listinfo/maypole
+
+
+From maypole-admin@lists.netthink.co.uk  Tue Jun  1 13:42:17 2004
+Received: from localhost ([127.0.0.1] helo=alibi.simon-cozens.org)
+	by alibi.simon-cozens.org with esmtp (Exim 3.35 #1 (Debian))
+	id 1BV8as-00083d-00; Tue, 01 Jun 2004 13:42:14 +0100
+Received: from mail.tvskat.net ([213.16.56.1])
+	by alibi.simon-cozens.org with esmtp (Exim 3.35 #1 (Debian))
+	id 1BV8Zw-00083D-00
+	for <maypole@lists.netthink.co.uk>; Tue, 01 Jun 2004 13:41:17 +0100
+Received: from bugs (unknown [213.16.56.6])
+	by mail.tvskat.net (Postfix) with SMTP
+	id 2485D33B9; Tue,  1 Jun 2004 15:41:59 +0300 (EEST)
+From: "raptor@tvskat.net" <raptor@tvskat.net>
+To: Dave Cross <dave@dave.org.uk>
+Cc: maypole@lists.netthink.co.uk
+Subject: Re: [Maypole] apache2 or cgi?
+Message-Id: <20040601154154.6b4b02e0@bugs>
+In-Reply-To: <20040601091735.GA10279@mag-sol.com>
+References: <20040601115553.759d77ec@bugs>
+	<20040601091735.GA10279@mag-sol.com>
+X-Mailer: Sylpheed version 0.9.10claws (GTK+ 1.2.10; i686-pc-linux-gnu)
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Sender: maypole-admin@lists.netthink.co.uk
+Errors-To: maypole-admin@lists.netthink.co.uk
+X-BeenThere: maypole@lists.netthink.co.uk
+X-Mailman-Version: 2.0.11
+Precedence: bulk
+List-Help: <mailto:maypole-request@lists.netthink.co.uk?subject=help>
+List-Post: <mailto:maypole@lists.netthink.co.uk>
+List-Subscribe: <http://lists.netthink.co.uk/listinfo/maypole>,
+	<mailto:maypole-request@lists.netthink.co.uk?subject=subscribe>
+List-Id: Maypole developers and user's list <maypole.lists.netthink.co.uk>
+List-Unsubscribe: <http://lists.netthink.co.uk/listinfo/maypole>,
+	<mailto:maypole-request@lists.netthink.co.uk?subject=unsubscribe>
+List-Archive: <http://lists.netthink.co.uk/pipermail/maypole/>
+Date: Tue, 1 Jun 2004 15:41:54 +0300
+X-Spam-Checker-Version: SpamAssassin 2.70-r6188 (2004-01-17) on 
+	alibi.simon-cozens.org
+X-Spam-Status: No, hits=-4.9 required=5.0 tests=BAYES_00 autolearn=ham 
+	version=2.70-r6188
+X-Spam-Level: 
+Status: RO
+Content-Length: 665
+Lines: 25
+
+
+> http://search.cpan.org/dist/libapreq2-2.02_02-dev/
+
+what about :
+<<
+Maypole::Authentication::UserSessionCookie doesn't work yet here, 
+(segfaults) but I'm working on it.
+>>
+
+
+When I  try :
+ ./configure --with-apache2-apxs=/usr/sbin/apxs2 
+>>>>...............
+checking whether to enable maintainer-specific portions of Makefiles... no
+build/version_check.pl failed: no version_string found in ''.
+configure: error: Bad apache2 version
+
+
+--with-apache2-apxs  <-- what this mean path to apxs binary or some directory ?!
+
+_______________________________________________
+maypole mailing list
+maypole@lists.netthink.co.uk
+http://lists.netthink.co.uk/listinfo/maypole
+
+
+From maypole-admin@lists.netthink.co.uk  Tue Jun  1 14:08:15 2004
+Received: from localhost ([127.0.0.1] helo=alibi.simon-cozens.org)
+	by alibi.simon-cozens.org with esmtp (Exim 3.35 #1 (Debian))
+	id 1BV901-0000EO-00; Tue, 01 Jun 2004 14:08:13 +0100
+Received: from mail.tvskat.net ([213.16.56.1])
+	by alibi.simon-cozens.org with esmtp (Exim 3.35 #1 (Debian))
+	id 1BV8zZ-00008G-00
+	for <maypole@lists.netthink.co.uk>; Tue, 01 Jun 2004 14:07:45 +0100
+Received: from bugs (unknown [213.16.56.6])
+	by mail.tvskat.net (Postfix) with SMTP id C2428347E
+	for <maypole@lists.netthink.co.uk>; Tue,  1 Jun 2004 16:08:27 +0300 (EEST)
+From: "raptor@tvskat.net" <raptor@tvskat.net>
+To: maypole@lists.netthink.co.uk
+Message-Id: <20040601160823.7e3929e4@bugs>
+X-Mailer: Sylpheed version 0.9.10claws (GTK+ 1.2.10; i686-pc-linux-gnu)
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: [Maypole] CGI::Maypole
+Sender: maypole-admin@lists.netthink.co.uk
+Errors-To: maypole-admin@lists.netthink.co.uk
+X-BeenThere: maypole@lists.netthink.co.uk
+X-Mailman-Version: 2.0.11
+Precedence: bulk
+List-Help: <mailto:maypole-request@lists.netthink.co.uk?subject=help>
+List-Post: <mailto:maypole@lists.netthink.co.uk>
+List-Subscribe: <http://lists.netthink.co.uk/listinfo/maypole>,
+	<mailto:maypole-request@lists.netthink.co.uk?subject=subscribe>
+List-Id: Maypole developers and user's list <maypole.lists.netthink.co.uk>
+List-Unsubscribe: <http://lists.netthink.co.uk/listinfo/maypole>,
+	<mailto:maypole-request@lists.netthink.co.uk?subject=unsubscribe>
+List-Archive: <http://lists.netthink.co.uk/pipermail/maypole/>
+Date: Tue, 1 Jun 2004 16:08:23 +0300
+X-Spam-Checker-Version: SpamAssassin 2.70-r6188 (2004-01-17) on 
+	alibi.simon-cozens.org
+X-Spam-Status: No, hits=-4.9 required=5.0 tests=BAYES_00 autolearn=ham 
+	version=2.70-r6188
+X-Spam-Level: 
+Status: RO
+Content-Length: 1707
+Lines: 65
+
+Simultaneously I'm tring CGI variant too :
+
+...
+client denied by server configuration: /usr/htdocs
+Premature end of script headers: test.pl
+file error - frontpage: not found at /usr/lib/perl5/site_perl/5.8.2/Maypole/View/Base.pm line <DATA> 3077 ......
+
+
+As stated in the Wiki FAQ I'm tring to put slash at the end, but still get this error , can this be 'cause
+
+>>> client denied by server configuration: /usr/htdocs <<<
+
+What I've set is a lib directory where I put MyTest.pm :
+
+package MyTest;
+#use base 'Apache::MVC';
+use base 'CGI::Maypole';
+
+MyTest->setup("dbi:SQLite:/path/to/db/test.db");
+MyTest->config->{uri_base} = "http://localhost/maypole/";
+MyTest->config->{rows_per_page} = 10;
+MyTest->config->{display_tables} = [qw[test]];
+1;
+
+then test.pl like this :
+
+#!/usr/bin/perl -w
+use strict;
+use lib '/path/to/maypole/lib';
+use MyTest;
+MyTest->run();
+
+
+and fetched like this :
+
+wget http://x.x.x.x/maypole/test.pl/
+--15:47:12--  http://x.x.x.x/maypole/test.pl/
+           => `index.html'
+Connecting to x.x.x.x:80... connected.
+HTTP request sent, awaiting response... 500 Internal Server Error
+15:47:13 ERROR 500: Internal Server Error.
+
+this doesnt help either :
+
+wget http://x.x.x.x/maypole/test.pl/list
+--16:00:58--  http://x.x.x.x/maypole/test.pl/list
+           => `list'
+Connecting to x.x.x.x:80... connected.
+HTTP request sent, awaiting response... 500 Internal Server Error
+16:00:58 ERROR 500: Internal Server Error.
+
+
+wget http://x.x.x.x/maypole/test.pl/test/list
+
+either... the "test" is the name of the Table ...
+
+what i'm doing wrong ..
+
+tia
+
+_______________________________________________
+maypole mailing list
+maypole@lists.netthink.co.uk
+http://lists.netthink.co.uk/listinfo/maypole
+
+
+From maypole-admin@lists.netthink.co.uk  Tue Jun  1 14:23:15 2004
+Received: from localhost ([127.0.0.1] helo=alibi.simon-cozens.org)
+	by alibi.simon-cozens.org with esmtp (Exim 3.35 #1 (Debian))
+	id 1BV9EX-0000RF-00; Tue, 01 Jun 2004 14:23:13 +0100
+Received: from mail.tvskat.net ([213.16.56.1])
+	by alibi.simon-cozens.org with esmtp (Exim 3.35 #1 (Debian))
+	id 1BV9EB-0000Lf-00
+	for <maypole@lists.netthink.co.uk>; Tue, 01 Jun 2004 14:22:51 +0100
+Received: from bugs (unknown [213.16.56.6])
+	by mail.tvskat.net (Postfix) with SMTP id EDD17330B
+	for <maypole@lists.netthink.co.uk>; Tue,  1 Jun 2004 16:23:33 +0300 (EEST)
+From: "raptor@tvskat.net" <raptor@tvskat.net>
+To: maypole@lists.netthink.co.uk
+Subject: Re: [Maypole] CGI::Maypole
+Message-Id: <20040601162329.323a3f18@bugs>
+In-Reply-To: <20040601160823.7e3929e4@bugs>
+References: <20040601160823.7e3929e4@bugs>
+X-Mailer: Sylpheed version 0.9.10claws (GTK+ 1.2.10; i686-pc-linux-gnu)
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Sender: maypole-admin@lists.netthink.co.uk
+Errors-To: maypole-admin@lists.netthink.co.uk
+X-BeenThere: maypole@lists.netthink.co.uk
+X-Mailman-Version: 2.0.11
+Precedence: bulk
+List-Help: <mailto:maypole-request@lists.netthink.co.uk?subject=help>
+List-Post: <mailto:maypole@lists.netthink.co.uk>
+List-Subscribe: <http://lists.netthink.co.uk/listinfo/maypole>,
+	<mailto:maypole-request@lists.netthink.co.uk?subject=subscribe>
+List-Id: Maypole developers and user's list <maypole.lists.netthink.co.uk>
+List-Unsubscribe: <http://lists.netthink.co.uk/listinfo/maypole>,
+	<mailto:maypole-request@lists.netthink.co.uk?subject=unsubscribe>
+List-Archive: <http://lists.netthink.co.uk/pipermail/maypole/>
+Date: Tue, 1 Jun 2004 16:23:29 +0300
+X-Spam-Checker-Version: SpamAssassin 2.70-r6188 (2004-01-17) on 
+	alibi.simon-cozens.org
+X-Spam-Status: No, hits=-4.9 required=5.0 tests=AWL,BAYES_00 autolearn=ham 
+	version=2.70-r6188
+X-Spam-Level: 
+Status: RO
+Content-Length: 508
+Lines: 22
+
+Hmm :") i had to do it like this so I dont get Internal error ::
+
+> then test.pl like this :
+> 
+> #!/usr/bin/perl -w
+print "Content-type: text/html \n\n";
+> use strict;
+> use lib '/path/to/maypole/lib';
+> use MyTest;
+> MyTest->run();
+ 
+
+but still no success.. it seems I have to copy from somewhere --> somewhere-else templates ... but
+from where to where ?
+
+tia
+
+_______________________________________________
+maypole mailing list
+maypole@lists.netthink.co.uk
+http://lists.netthink.co.uk/listinfo/maypole
+
+
+From maypole-admin@lists.netthink.co.uk  Tue Jun  1 16:25:22 2004
+Received: from localhost ([127.0.0.1] helo=alibi.simon-cozens.org)
+	by alibi.simon-cozens.org with esmtp (Exim 3.35 #1 (Debian))
+	id 1BVB8g-0002Qh-00; Tue, 01 Jun 2004 16:25:18 +0100
+Received: from mail.tvskat.net ([213.16.56.1])
+	by alibi.simon-cozens.org with esmtp (Exim 3.35 #1 (Debian))
+	id 1BVB83-0002O0-00
+	for <maypole@lists.netthink.co.uk>; Tue, 01 Jun 2004 16:24:39 +0100
+Received: from bugs (unknown [213.16.56.6])
+	by mail.tvskat.net (Postfix) with SMTP
+	id 7D8743485; Tue,  1 Jun 2004 18:25:22 +0300 (EEST)
+From: "raptor@tvskat.net" <raptor@tvskat.net>
+To: "raptor@tvskat.net" <raptor@tvskat.net>
+Cc: maypole@lists.netthink.co.uk
+Subject: Re: [Maypole] CGI::Maypole
+Message-Id: <20040601182518.751490d0@bugs>
+In-Reply-To: <20040601160823.7e3929e4@bugs>
+References: <20040601160823.7e3929e4@bugs>
+X-Mailer: Sylpheed version 0.9.10claws (GTK+ 1.2.10; i686-pc-linux-gnu)
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Sender: maypole-admin@lists.netthink.co.uk
+Errors-To: maypole-admin@lists.netthink.co.uk
+X-BeenThere: maypole@lists.netthink.co.uk
+X-Mailman-Version: 2.0.11
+Precedence: bulk
+List-Help: <mailto:maypole-request@lists.netthink.co.uk?subject=help>
+List-Post: <mailto:maypole@lists.netthink.co.uk>
+List-Subscribe: <http://lists.netthink.co.uk/listinfo/maypole>,
+	<mailto:maypole-request@lists.netthink.co.uk?subject=subscribe>
+List-Id: Maypole developers and user's list <maypole.lists.netthink.co.uk>
+List-Unsubscribe: <http://lists.netthink.co.uk/listinfo/maypole>,
+	<mailto:maypole-request@lists.netthink.co.uk?subject=unsubscribe>
+List-Archive: <http://lists.netthink.co.uk/pipermail/maypole/>
+Date: Tue, 1 Jun 2004 18:25:18 +0300
+X-Spam-Checker-Version: SpamAssassin 2.70-r6188 (2004-01-17) on 
+	alibi.simon-cozens.org
+X-Spam-Status: No, hits=-4.5 required=5.0 tests=AWL,BAYES_00,
+	TO_ADDRESS_EQ_REAL autolearn=ham version=2.70-r6188
+X-Spam-Level: 
+Status: RO
+Content-Length: 2262
+Lines: 80
+
+I found the problem the following has to be added to MyTest :
+
+sub get_template_root { "/path/to/templates/" } 
+
+where I can find the .css stuff ... it looks very ugly not as shown on perl.com :")
+
+On Tue, 1 Jun 2004 16:08:23 +0300
+"raptor@tvskat.net" <raptor@tvskat.net> wrote:
+
+> Simultaneously I'm tring CGI variant too :
+> 
+> ...
+> client denied by server configuration: /usr/htdocs
+> Premature end of script headers: test.pl
+> file error - frontpage: not found at /usr/lib/perl5/site_perl/5.8.2/Maypole/View/Base.pm line <DATA> 3077 ......
+> 
+> 
+> As stated in the Wiki FAQ I'm tring to put slash at the end, but still get this error , can this be 'cause
+> 
+> >>> client denied by server configuration: /usr/htdocs <<<
+> 
+> What I've set is a lib directory where I put MyTest.pm :
+> 
+> package MyTest;
+> #use base 'Apache::MVC';
+> use base 'CGI::Maypole';
+> 
+> MyTest->setup("dbi:SQLite:/path/to/db/test.db");
+> MyTest->config->{uri_base} = "http://localhost/maypole/";
+> MyTest->config->{rows_per_page} = 10;
+> MyTest->config->{display_tables} = [qw[test]];
+> 1;
+> 
+> then test.pl like this :
+> 
+> #!/usr/bin/perl -w
+> use strict;
+> use lib '/path/to/maypole/lib';
+> use MyTest;
+> MyTest->run();
+> 
+> 
+> and fetched like this :
+> 
+> wget http://x.x.x.x/maypole/test.pl/
+> --15:47:12--  http://x.x.x.x/maypole/test.pl/
+>            => `index.html'
+> Connecting to x.x.x.x:80... connected.
+> HTTP request sent, awaiting response... 500 Internal Server Error
+> 15:47:13 ERROR 500: Internal Server Error.
+> 
+> this doesnt help either :
+> 
+> wget http://x.x.x.x/maypole/test.pl/list
+> --16:00:58--  http://x.x.x.x/maypole/test.pl/list
+>            => `list'
+> Connecting to x.x.x.x:80... connected.
+> HTTP request sent, awaiting response... 500 Internal Server Error
+> 16:00:58 ERROR 500: Internal Server Error.
+> 
+> 
+> wget http://x.x.x.x/maypole/test.pl/test/list
+> 
+> either... the "test" is the name of the Table ...
+> 
+> what i'm doing wrong ..
+> 
+> tia
+> 
+> _______________________________________________
+> maypole mailing list
+> maypole@lists.netthink.co.uk
+> http://lists.netthink.co.uk/listinfo/maypole
+> 
+
+_______________________________________________
+maypole mailing list
+maypole@lists.netthink.co.uk
+http://lists.netthink.co.uk/listinfo/maypole
+
+
+From maypole-admin@lists.netthink.co.uk  Tue Jun  1 17:11:17 2004
+Received: from localhost ([127.0.0.1] helo=alibi.simon-cozens.org)
+	by alibi.simon-cozens.org with esmtp (Exim 3.35 #1 (Debian))
+	id 1BVBr7-0003XE-00; Tue, 01 Jun 2004 17:11:13 +0100
+Received: from wsm.wineasy.no ([213.225.123.170])
+	by alibi.simon-cozens.org with esmtp (Exim 3.35 #1 (Debian))
+	id 1BVBqC-0003Wj-00
+	for <maypole@lists.netthink.co.uk>; Tue, 01 Jun 2004 17:10:16 +0100
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by wsm.wineasy.no (Postfix) with ESMTP id 5CA721DC15C
+	for <maypole@lists.netthink.co.uk>; Tue,  1 Jun 2004 18:08:02 +0200 (CEST)
+Received: from [10.0.0.2] (118.80-203-43.nextgentel.com [80.203.43.118])
+	by wsm.wineasy.no (Postfix) with ESMTP id 952B71DC108
+	for <maypole@lists.netthink.co.uk>; Tue,  1 Jun 2004 18:08:01 +0200 (CEST)
+Message-ID: <40BCAA44.3030100@thefeed.no>
+From: Marcus Ramberg <marcus@thefeed.no>
+User-Agent: Mozilla Thunderbird 0.6 (Macintosh/20040502)
+X-Accept-Language: en-us, en
+MIME-Version: 1.0
+To: maypole@lists.netthink.co.uk
+Subject: Re: [Maypole] apache2 or cgi?
+References: <20040601115553.759d77ec@bugs>	<20040601091735.GA10279@mag-sol.com> <20040601154154.6b4b02e0@bugs>
+In-Reply-To: <20040601154154.6b4b02e0@bugs>
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Virus-Scanned: by Song Networks AS - F-Secure
+Sender: maypole-admin@lists.netthink.co.uk
+Errors-To: maypole-admin@lists.netthink.co.uk
+X-BeenThere: maypole@lists.netthink.co.uk
+X-Mailman-Version: 2.0.11
+Precedence: bulk
+List-Help: <mailto:maypole-request@lists.netthink.co.uk?subject=help>
+List-Post: <mailto:maypole@lists.netthink.co.uk>
+List-Subscribe: <http://lists.netthink.co.uk/listinfo/maypole>,
+	<mailto:maypole-request@lists.netthink.co.uk?subject=subscribe>
+List-Id: Maypole developers and user's list <maypole.lists.netthink.co.uk>
+List-Unsubscribe: <http://lists.netthink.co.uk/listinfo/maypole>,
+	<mailto:maypole-request@lists.netthink.co.uk?subject=unsubscribe>
+List-Archive: <http://lists.netthink.co.uk/pipermail/maypole/>
+Date: Tue, 01 Jun 2004 18:09:40 +0200
+X-Spam-Checker-Version: SpamAssassin 2.70-r6188 (2004-01-17) on 
+	alibi.simon-cozens.org
+X-Spam-Status: No, hits=-52.4 required=5.0 tests=AWL,BAYES_00,RCVD_IN_SORBS 
+	autolearn=no version=2.70-r6188
+X-Spam-Level: 
+Status: RO
+X-Status: A
+Content-Length: 695
+Lines: 29
+
+raptor@tvskat.net wrote:
+
+>>http://search.cpan.org/dist/libapreq2-2.02_02-dev/
+>>    
+>>
+>
+>what about :
+><<
+>Maypole::Authentication::UserSessionCookie doesn't work yet here, 
+>(segfaults) but I'm working on it.
+>  
+>
+I have a working version of this, can't remember if I posted the last
+version of this to the list. Should be part of the next release of this
+module I guess. Sure wish someone had taken up Simon on the project
+manager mail.
+
+Marcus
+
+--
+This e-mail has been protected by Song Networks' virus-scan service:
+http://www.securemail.no
+
+
+_______________________________________________
+maypole mailing list
+maypole@lists.netthink.co.uk
+http://lists.netthink.co.uk/listinfo/maypole
+
+
+From maypole-admin@lists.netthink.co.uk  Tue Jun  1 18:05:19 2004
+Received: from localhost ([127.0.0.1] helo=alibi.simon-cozens.org)
+	by alibi.simon-cozens.org with esmtp (Exim 3.35 #1 (Debian))
+	id 1BVChQ-0004Lx-00; Tue, 01 Jun 2004 18:05:16 +0100
+Received: from simon by alibi.simon-cozens.org with local (Exim 3.35 #1 (Debian))
+	id 1BVCgN-0004Io-00; Tue, 01 Jun 2004 18:04:11 +0100
+From: Simon Cozens <simon@simon-cozens.org>
+To: maypole@lists.netthink.co.uk
+Subject: Re: [Maypole] apache2 or cgi?
+Message-ID: <20040601170411.GB26177@alibi.simon-cozens.org>
+References: <20040601115553.759d77ec@bugs> <20040601091735.GA10279@mag-sol.com> <20040601154154.6b4b02e0@bugs> <40BCAA44.3030100@thefeed.no>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <40BCAA44.3030100@thefeed.no>
+User-Agent: Mutt/1.3.28i
+X-Operating-System: Linux alibi 2.4.18
+X-POM: The Moon is Waxing Gibbous (96% of Full)
+X-Addresses: The simon@cozens.net address is deprecated due to being broken. simon@brecon.co.uk still works, but simon-cozens.org or netthink.co.uk are preferred.
+Sender: maypole-admin@lists.netthink.co.uk
+Errors-To: maypole-admin@lists.netthink.co.uk
+X-BeenThere: maypole@lists.netthink.co.uk
+X-Mailman-Version: 2.0.11
+Precedence: bulk
+List-Help: <mailto:maypole-request@lists.netthink.co.uk?subject=help>
+List-Post: <mailto:maypole@lists.netthink.co.uk>
+List-Subscribe: <http://lists.netthink.co.uk/listinfo/maypole>,
+	<mailto:maypole-request@lists.netthink.co.uk?subject=subscribe>
+List-Id: Maypole developers and user's list <maypole.lists.netthink.co.uk>
+List-Unsubscribe: <http://lists.netthink.co.uk/listinfo/maypole>,
+	<mailto:maypole-request@lists.netthink.co.uk?subject=unsubscribe>
+List-Archive: <http://lists.netthink.co.uk/pipermail/maypole/>
+Date: Tue, 1 Jun 2004 18:04:11 +0100
+X-Spam-Checker-Version: SpamAssassin 2.70-r6188 (2004-01-17) on 
+	alibi.simon-cozens.org
+X-Spam-Status: No, hits=-52.5 required=5.0 tests=AWL,BAYES_00 autolearn=ham 
+	version=2.70-r6188
+X-Spam-Level: 
+Status: RO
+Content-Length: 940
+Lines: 26
+
+Marcus Ramberg:
+> I have a working version of this, can't remember if I posted the last
+> version of this to the list. Should be part of the next release of this
+> module I guess. 
+
+I'd be happy for this module to spun off to you if you want.
+
+> Sure wish someone had taken up Simon on the project
+> manager mail.
+
+Oh, plenty of people did. Unfortunately, without a clear list of priorities,
+taking one of them up on the offer hasn't been a priority yet. :)
+
+I should have time to look at another batch of Maypole stuff in about two
+weeks. In the meantime, I'd sure love it if people told me what they thought I
+should be doing by sending change requests to bugs-Maypole@rt.cpan.org
+
+-- 
+Heh, heh, heh, heh... the NOISE of a bursar CHEWING Proctors' Memoranda.
+    - Henry Braun is Oxford Zippy
+
+_______________________________________________
+maypole mailing list
+maypole@lists.netthink.co.uk
+http://lists.netthink.co.uk/listinfo/maypole
+
+
+From maypole-admin@lists.netthink.co.uk  Tue Jun  1 21:04:25 2004
+Received: from localhost ([127.0.0.1] helo=alibi.simon-cozens.org)
+	by alibi.simon-cozens.org with esmtp (Exim 3.35 #1 (Debian))
+	id 1BVFUj-0006z8-00; Tue, 01 Jun 2004 21:04:21 +0100
+Received: from wsm.wineasy.no ([213.225.123.170])
+	by alibi.simon-cozens.org with esmtp (Exim 3.35 #1 (Debian))
+	id 1BVFTS-0006yU-00
+	for <maypole@lists.netthink.co.uk>; Tue, 01 Jun 2004 21:03:02 +0100
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by wsm.wineasy.no (Postfix) with ESMTP id A29811DC3C3
+	for <maypole@lists.netthink.co.uk>; Tue,  1 Jun 2004 22:00:46 +0200 (CEST)
+Received: from [10.0.0.2] (118.80-203-43.nextgentel.com [80.203.43.118])
+	by wsm.wineasy.no (Postfix) with ESMTP id 305E71DC06B
+	for <maypole@lists.netthink.co.uk>; Tue,  1 Jun 2004 22:00:40 +0200 (CEST)
+Message-ID: <40BCE0CC.6020202@thefeed.no>
+From: Marcus Ramberg <marcus@thefeed.no>
+User-Agent: Mozilla Thunderbird 0.6 (Macintosh/20040502)
+X-Accept-Language: en-us, en
+MIME-Version: 1.0
+To: maypole@lists.netthink.co.uk
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Virus-Scanned: by Song Networks AS - F-Secure
+Subject: [Maypole] Patch to allow different ok_tables and display_tables
+Sender: maypole-admin@lists.netthink.co.uk
+Errors-To: maypole-admin@lists.netthink.co.uk
+X-BeenThere: maypole@lists.netthink.co.uk
+X-Mailman-Version: 2.0.11
+Precedence: bulk
+List-Help: <mailto:maypole-request@lists.netthink.co.uk?subject=help>
+List-Post: <mailto:maypole@lists.netthink.co.uk>
+List-Subscribe: <http://lists.netthink.co.uk/listinfo/maypole>,
+	<mailto:maypole-request@lists.netthink.co.uk?subject=subscribe>
+List-Id: Maypole developers and user's list <maypole.lists.netthink.co.uk>
+List-Unsubscribe: <http://lists.netthink.co.uk/listinfo/maypole>,
+	<mailto:maypole-request@lists.netthink.co.uk?subject=unsubscribe>
+List-Archive: <http://lists.netthink.co.uk/pipermail/maypole/>
+Date: Tue, 01 Jun 2004 22:02:20 +0200
+X-Spam-Checker-Version: SpamAssassin 2.70-r6188 (2004-01-17) on 
+	alibi.simon-cozens.org
+X-Spam-Status: No, hits=-52.4 required=5.0 tests=AWL,BAYES_00,RCVD_IN_SORBS 
+	autolearn=no version=2.70-r6188
+X-Spam-Level: 
+Status: RO
+Content-Length: 1168
+Lines: 32
+
+Hi. Some of the tables I want only accessible through links from other 
+tables, others I want to display, so I've made this patch which allows 
+you to specify ok_tables as well as display_tables . It also allows 
+ok_tables to use the same format as display_tables.
+
+Marcus
+
+RCS file: /var/cvs/modules/Apache-MVC/lib/Maypole.pm,v
+retrieving revision 1.18
+diff -u -r1.18 Maypole.pm
+@@ -89,7 +90,10 @@
+ sub is_applicable {
+     my $self = shift;
+     my $config = $self->config;
+-    $config->{ok_tables} = {map {$_ => 1} @{$config->{display_tables}}};
++    $config->{ok_tables} ||= @{$config->{display_tables}};
++    $config->{ok_tables} = {map {$_=>1} @{$config->{ok_tables}}}
++       if ref $config->{ok_tables} eq "ARRAY";
+     warn "We don't have that table ($self->{table})"
+         if $self->debug and not $config->{ok_tables}{$self->{table}};
+     return DECLINED() unless exists $config->{ok_tables}{$self->{table}};
+
+--
+This e-mail has been protected by Song Networks' virus-scan service:
+http://www.securemail.no
+
+
+_______________________________________________
+maypole mailing list
+maypole@lists.netthink.co.uk
+http://lists.netthink.co.uk/listinfo/maypole
+
+
+From maypole-admin@lists.netthink.co.uk  Wed Jun  2 02:28:18 2004
+Received: from localhost ([127.0.0.1] helo=alibi.simon-cozens.org)
+	by alibi.simon-cozens.org with esmtp (Exim 3.35 #1 (Debian))
+	id 1BVKYB-0003JC-00; Wed, 02 Jun 2004 02:28:15 +0100
+Received: from www.hostsharing.net ([212.42.230.151] helo=pima.hostsharing.net)
+	by alibi.simon-cozens.org with esmtp (Exim 3.35 #1 (Debian))
+	id 1BVKXA-0003Is-00
+	for <maypole@lists.netthink.co.uk>; Wed, 02 Jun 2004 02:27:12 +0100
+Received: from localhost (dsl-082-082-173-079.arcor-ip.net [82.82.173.79])
+	(using TLSv1 with cipher RC4-MD5 (128/128 bits))
+	(No client certificate requested)
+	by pima.hostsharing.net (Postfix) with ESMTP id 061ECB000F20
+	for <maypole@lists.netthink.co.uk>; Wed,  2 Jun 2004 03:27:13 +0200 (CEST)
+From: Sebastian Willert <s.willert@media-net.de>
+To: Maypole <maypole@lists.netthink.co.uk>
+Content-Type: text/plain
+Message-Id: <1086139632.3760.11.camel@localhost>
+Mime-Version: 1.0
+X-Mailer: Evolution 1.5.8 
+Content-Transfer-Encoding: 7bit
+Subject: [Maypole] Using Maypole with existing Class::DBI classes
+Sender: maypole-admin@lists.netthink.co.uk
+Errors-To: maypole-admin@lists.netthink.co.uk
+X-BeenThere: maypole@lists.netthink.co.uk
+X-Mailman-Version: 2.0.11
+Precedence: bulk
+List-Help: <mailto:maypole-request@lists.netthink.co.uk?subject=help>
+List-Post: <mailto:maypole@lists.netthink.co.uk>
+List-Subscribe: <http://lists.netthink.co.uk/listinfo/maypole>,
+	<mailto:maypole-request@lists.netthink.co.uk?subject=subscribe>
+List-Id: Maypole developers and user's list <maypole.lists.netthink.co.uk>
+List-Unsubscribe: <http://lists.netthink.co.uk/listinfo/maypole>,
+	<mailto:maypole-request@lists.netthink.co.uk?subject=unsubscribe>
+List-Archive: <http://lists.netthink.co.uk/pipermail/maypole/>
+Date: Wed, 02 Jun 2004 03:27:12 +0200
+X-Spam-Checker-Version: SpamAssassin 2.70-r6188 (2004-01-17) on 
+	alibi.simon-cozens.org
+X-Spam-Status: No, hits=-4.9 required=5.0 tests=BAYES_00 autolearn=ham 
+	version=2.70-r6188
+X-Spam-Level: 
+Status: RO
+Content-Length: 2595
+Lines: 87
+
+Hi all,
+
+I am very impressed by Maypole and want to use it with a set of classes
+I've written using Class::DBI before I stubled on this framework. I
+could not use Maypole::Model::CDBI because the classes have names that
+are slightly different from those produced by Class::DBI::Loader. I have
+included my attempt to extend Maypole::Model::CDBI [1] to use this
+classes instead of autoloading some from Class::DBI::Loader, but I
+failed. The sources listed below do neither interact with the database
+(mysql logging is enabled but empty) nor produce any error messages:
+it's just like operating on empty datasets.
+
+I've tried to dig through the sources of Maypole (version 1.4) but lost
+my way after all this indirection and multiple inheritance and stuff, so
+I'd like to ask if anyone here can spot what I am doing wrong or even
+provide me with an example of a working model class for preexisting
+Class::DBI classes.
+
+Regards,
+  Sebastian
+
+P.S. Have mercy if I've done something completly braindead, I am fairly
+new to the wonderful world of Class::DBI and friends. 
+
+---
+
+[1] My attempt at Driver and Model classes for use with preexisting 
+    Class::DBI classes
+
+package Bar::A;
+use Class::DBI::FromCGI;
+use Class::DBI::mysql;
+use base 'Class::DBI::mysql';
+
+__PACKAGE__->set_db( 'Main', 'dbi:mysql:bar' );
+__PACKAGE__->set_up_table( 'tbl_a' );
+__PACKAGE__->has_many( addresses => 'Bar::A::B' );
+
+package Bar::A::B;
+use Class::DBI::FromCGI;
+use Class::DBI::mysql;
+use base 'Class::DBI::mysql';
+
+__PACKAGE__->set_db( 'Main', 'dbi:mysql:bar' );
+__PACKAGE__->set_up_table( 'tbl_a_b' );
+
+package Bar;
+
+use base 'Apache::MVC';
+
+Bar->setup("dbi:mysql:bar");
+Bar->config->{uri_base} = "http://bar.loc/";
+Bar->config->{rows_per_page} = 10;
+Bar->config->{model} = 'Bar::Model';
+Bar->config->{display_tables} = [qw[tbl_a tbl_b]];
+Bar::A->untaint_columns( printable => [qw/foo1 foo2/] );
+Bar::A::B->untaint_columns( email => [qw/email/] );
+
+
+package Bar::Model;
+
+use Maypole::Model::CDBI;
+use base 'Maypole::Model::CDBI';
+
+my %_classlist = ( tbl_a => 'Bar::A', tbl_a_b => 'Bar::A::B' );
+
+sub setup_database {
+  my ($self, $config, $namespace, $dsn, $u, $p) = @_;
+  $config->{dsn} = $dsn;
+  $config->{classes} = [ sort values %_classlist ];
+  $config->{tables} = [ sort keys %_classlist ];
+  $self->adopt($_) for @{$config->{classes}};
+}
+
+sub class_of {
+  my ($self, $r, $table) = @_;
+  return $_classlist{ $table } || $self->SUPER::class_of( $r, $table );
+}
+
+
+
+
+_______________________________________________
+maypole mailing list
+maypole@lists.netthink.co.uk
+http://lists.netthink.co.uk/listinfo/maypole
+

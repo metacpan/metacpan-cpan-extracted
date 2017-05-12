@@ -1,0 +1,31 @@
+Revision history for Perl extension Error::TryCatch.
+
+0.07    Tue Jul 28 19:45:43 2009
+        * fix RT#48089 (uncaught exceptions were not being rethrown)
+        * fix some typos in the docs
+
+0.06    Sat Jan  6 03:08:06 2007
+        * bugfix (patch by David M. Jones)
+        * 'with' word is now optional when declaring the catch block
+          (patch by David M. Jones)
+        * reformatted Changes file and many other cosmetic updates
+
+0.05    Wed Oct  5 20:23:50 2005
+        * Fixed Makefile.PL issues (damn windoze backlash)
+
+0.04    Tue Jul  5 11:20:28 2005
+        * Improved and corrected some documentation issues
+        * Reordered the Changes file
+
+0.03    February, 2, 2005
+        * First public version
+        * Removed some trash from the code
+        * Documentation written
+
+0.02    January, 30, 2005
+        * Line numbers preserved
+        * Small grammar issues fixed
+
+0.01    January 2005
+        * First version, not public
+        * Just works, but line numbers are not preserved

@@ -1,0 +1,17 @@
+COPYING
+MANIFEST
+Makefile.PL
+README
+README.system
+docs/ExtUtils/TBone.pm.html
+docs/ExtUtils/icons/h1bullet.gif
+docs/ExtUtils/icons/h2bullet.gif
+docs/ExtUtils/icons/itembullet.gif
+docs/ExtUtils/icons/zeegee.gif
+docs/index-menu.html
+docs/index.html
+docs/index.menu
+lib/ExtUtils/TBone.pm
+t/ExtUtils/TBone.pm
+t/catfile.t
+t/roman.t

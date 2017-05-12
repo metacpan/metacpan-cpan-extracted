@@ -1,0 +1,139 @@
+<html>
+<head>
+<title>Tests for Embperl - Execute Get Session Data</title>
+</head>
+
+
+<body>
+
+	<html>
+<head>
+<title>Tests for Embperl - Set Session Data</title>
+</head>
+
+
+<body>
+
+
+	fdat:<br>
+	<table></table>
+
+	udat:<br>
+	<table>
+		<tr>
+			<td>a</td><td>1</td>
+		</tr>
+	</table>
+
+^	ok \(num=\d+\)<p>
+
+^	\$mdat\{cnt\} = -\d- <br>
+        $udat{cnt} = -- <br>
+
+
+	sessions:
+^	<table>
+^-		<tr>
+^-			<td>.*?<\/td><td>HASH.*?<\/td>
+^-		<\/tr>
+^-	
+^-		<tr>
+^-			<td>.*?<\/td><td>HASH.*?<\/td>
+^-		<\/tr>
+^-	
+^-		<tr>
+^-			<td>.*?<\/td><td>HASH.*?<\/td>
+^-		<\/tr>
+^-	
+^-		<tr>
+^-			<td>.*?<\/td><td>HASH.*?<\/td>
+^-		<\/tr>
+^-	
+^-		<tr>
+^-			<td>.*?<\/td><td>HASH.*?<\/td>
+^-		<\/tr>
+^-	<\/table>
+	<a href="cont.htm">continue</a>
+	<a href="cont.htm?q=1">continue</a>
+	<a href="cont.htm?q=1&b=2">continue</a>
+	<form action="cont.htm">
+	</form>
+
+</body>
+</html>
+
+fdat:<br>
+	<table></table>
+
+	udat:<br>
+	<table>
+		<tr>
+			<td>a</td><td>1</td>
+		</tr>
+	</table>
+
+^	ok \(num=(1|6)\)<p>
+
+^	\$mdat\{cnt\} = -\d- <br>
+        $udat{cnt} = -- <br>
+
+
+	<html>
+<head>
+<title>Tests for Embperl - Set Session Data</title>
+</head>
+
+
+<body>
+
+
+	fdat:<br>
+	<table></table>
+
+	udat:<br>
+	<table>
+		<tr>
+			<td>a</td><td>1</td>
+		</tr>
+	</table>
+
+^	ok \(num=(1|6)\)<p>
+
+^	\$mdat\{cnt\} = -\d- <br>
+        $udat{cnt} = -- <br>
+
+
+	sessions:
+^	<table>
+^-		<tr>
+^-			<td>.*?<\/td><td>HASH.*?<\/td>
+^-		<\/tr>
+^-	
+^-		<tr>
+^-			<td>.*?<\/td><td>HASH.*?<\/td>
+^-		<\/tr>
+^-	
+^-		<tr>
+^-			<td>.*?<\/td><td>HASH.*?<\/td>
+^-		<\/tr>
+^-	
+^-		<tr>
+^-			<td>.*?<\/td><td>HASH.*?<\/td>
+^-		<\/tr>
+^-	
+^-		<tr>
+^-			<td>.*?<\/td><td>HASH.*?<\/td>
+^-		<\/tr>
+^-	<\/table>
+	<a href="cont.htm">continue</a>
+	<a href="cont.htm?q=1">continue</a>
+	<a href="cont.htm?q=1&b=2">continue</a>
+	<form action="cont.htm">
+	</form>
+
+</body>
+</html>
+
+</body>
+</html>
+

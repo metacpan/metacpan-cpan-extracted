@@ -1,0 +1,22 @@
+MANIFEST
+Changes
+Makefile.PL
+README.txt
+
+lib/Config_m.pod
+lib/Config_u.pm
+lib/ExtUtils/FakeConfig.pm
+
+spec/Config_ap.txt
+spec/ap_mingw.txt
+spec/ap_mingw_58.txt
+spec/ap_mingw_510.txt
+
+script/fill_template.pl
+script/make_implib.pl
+
+t/01_compile.t
+t/02_basic.t
+t/zy_pod_coverage.t
+t/zz_pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

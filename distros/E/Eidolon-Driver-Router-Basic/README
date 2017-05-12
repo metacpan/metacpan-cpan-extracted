@@ -1,0 +1,35 @@
+Eidolon::Driver::Router::Basic, version 0.02
+============================================
+
+The Eidolon::Driver::Router::Basic driver finds handler for each user request. 
+Routing is based on controller names and method attributes.
+
+INSTALLATION
+
+To install the driver type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+To use this driver you must have the following packages installed:
+
+    List::Util
+    Eidolon
+
+LICENCE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+AUTHOR
+
+Anton Belousov, <abel@cpan.org>
+
+COPYRIGHT
+
+Copyright (c) 2009, Atma 7, http://www.atma7.com
+

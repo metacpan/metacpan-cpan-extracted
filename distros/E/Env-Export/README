@@ -1,0 +1,103 @@
+Env::Export - Export environment variables as constant subroutines
+==================================================================
+
+Version: 0.22
+
+
+WHAT IS IT
+----------
+
+This module allows the user to specify one or more environment variables that
+should be "exported" to the calling namespace as constant subroutines. By
+doing this, their existence/inexistence can be detected at compile-time.
+
+
+USING Env::Export
+-----------------
+
+The difference is in how you detect the absence of the environment variable
+you need:
+
+    if (exists($ENV{PATH}) and ($ENV{PATH} =~ /.../))
+    {
+        # Do something
+    }
+
+versus:
+
+    use Env::Export 'PATH';
+
+    if (PATH =~ /.../)
+    {
+        # Do something
+    }
+
+The first form performs two tests, the first to ensure that the second does
+not cause a "Use of unitialized value in regular expression" warning. The
+second form only performs one test, but it also generates a compile-time
+error if there was no environment variable "PATH" present.
+
+
+BUILDING/INSTALLING
+-------------------
+
+This package provides a Makefile.PL file as is typical of CPAN modules.
+Building and installing is as easy as:
+
+        perl Makefile.PL
+        make
+        make test
+        # If tests pass
+        make install
+
+(The "make install" step may require super-user privileges.)
+
+
+PROBLEMS/BUG REPORTS
+--------------------
+
+Problems, bug reports, or suggestions for enhancements can be sent to the RT
+instance set up for all CPAN-based distributions:
+
+  http://rt.cpan.org/NoAuth/Bugs.html?Dist=Env-Export
+
+
+CHANGES
+-------
+
+  * t/00_load.t (deleted)
+
+  * t/01_pod.t (deleted)
+
+  * t/02_pod_coverage.t (deleted)
+
+  * xt/00_load.t
+
+  * xt/01_pod.t
+
+  * xt/02_pod_coverage.t
+
+Move author-only tests to the xt/ directory.
+
+  * t/20_regex.t
+
+  * t/25_glob.t
+
+  * t/40_all.t
+
+Consider volume when creating path to sub_count.pl.
+
+  * t/10_basic.t
+
+  * t/80_split.t
+
+Additions to increase code-coverage of tests.
+
+  * lib/Env/Export.pm
+
+Bug fixes, critic clean-up and some docs clean-up. Some fixes related to getting
+better code-coverage in test suites.
+
+  * lib/Env/Export.pm
+
+Removed a left-over debugging line, doc fixes.

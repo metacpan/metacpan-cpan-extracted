@@ -1,0 +1,29 @@
+---
+abstract: 'pure perl eval with persistent lexical variables'
+author:
+  - 'mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>'
+build_requires:
+  Test::More: '0.94'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Eval-WithLexicals
+no_index:
+  directory:
+    - t
+    - xt
+requires:
+  Moo: '0.009006'
+  perl: '5.008'
+  strictures: '1'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Eval-WithLexicals
+  license: http://dev.perl.org/licenses/
+  repository: git://git.shadowcat.co.uk/p5sagit/Eval-WithLexicals
+version: '1.003005'
+x_authority: cpan:MSTROUT

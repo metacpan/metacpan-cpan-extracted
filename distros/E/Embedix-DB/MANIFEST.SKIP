@@ -1,0 +1,4 @@
+\bCVS\b
+\.swp$
+^Makefile$
+^MANIFEST.bak$

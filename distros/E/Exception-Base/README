@@ -1,0 +1,128 @@
+NAME
+
+    Exception::Base - Lightweight exceptions
+
+SYNOPSIS
+
+      # Use module and create needed exceptions
+      use Exception::Base
+         'Exception::Runtime',              # create new module
+         'Exception::System',               # load existing module
+         'Exception::IO',          => {
+             isa => 'Exception::System' },  # create new based on existing
+         'Exception::FileNotFound' => {
+             isa => 'Exception::IO',        # create new based on previous
+             message => 'File not found',   # override default message
+             has => [ 'filename' ],         # define new rw attribute
+             string_attributes => [ 'message', 'filename' ],
+         };                                 # output message and filename
+    
+      # eval is used as "try" block
+      eval {
+        open my $file, '/etc/passwd'
+          or Exception::FileNotFound->throw(
+                message=>'Something wrong',
+                filename=>'/etc/passwd');
+      };
+      # syntax for Perl >= 5.10
+      use feature 'switch';
+      if ($@) {
+        given (my $e = Exception::Base->catch) {
+          when ($e->isa('Exception::IO')) { warn "IO problem"; }
+          when ($e->isa('Exception::Eval')) { warn "eval died"; }
+          when ($e->isa('Exception::Runtime')) { warn "some runtime was caught"; }
+          when ($e->matches({value=>9})) { warn "something happened"; }
+          when ($e->matches(qr/^Error/)) { warn "some error based on regex"; }
+          default { $e->throw; } # rethrow the exception
+        }
+      }
+      # standard syntax for older Perl
+      if ($@) {
+        my $e = Exception::Base->catch;   # convert $@ into exception
+        if ($e->isa('Exception::IO')) { warn "IO problem"; }
+        elsif ($e->isa('Exception::Eval')) { warn "eval died"; }
+        elsif ($e->isa('Exception::Runtime')) { warn "some runtime was caught"; }
+        elsif ($e->matches({value=>9})) { warn "something happened"; }
+        elsif ($e->matches(qr/^Error/)) { warn "some error based on regex"; }
+        else { $e->throw; } # rethrow the exception
+      }
+    
+      # $@ has to be recovered ASAP!
+      eval { die "this die will be caught" };
+      my $e = Exception::Base->catch;
+      eval { die "this die will be ignored" };
+      if ($e) {
+         (...)
+      }
+    
+      # the exception can be thrown later
+      my $e = Exception::Base->new;
+      # (...)
+      $e->throw;
+    
+      # ignore our package in stack trace
+      package My::Package;
+      use Exception::Base '+ignore_package' => __PACKAGE__;
+    
+      # define new exception in separate module
+      package Exception::My;
+      use Exception::Base (__PACKAGE__) => {
+          has => ['myattr'],
+      };
+    
+      # run Perl with changed verbosity for debugging purposes
+      $ perl -MException::Base=verbosity,4 script.pl
+
+DESCRIPTION
+
+    This class implements a fully OO exception mechanism similar to
+    Exception::Class or Class::Throwable. It provides a simple interface
+    allowing programmers to declare exception classes. These classes can be
+    thrown and caught. Each uncaught exception prints full stack trace if
+    the default verbosity is increased for debugging purposes.
+
+    The features of Exception::Base:
+
+      * fast implementation of the exception class
+
+      * fully OO without closures and source code filtering
+
+      * does not mess with $SIG{__DIE__} and $SIG{__WARN__}
+
+      * no external run-time modules dependencies, requires core Perl
+      modules only
+
+      * the default behavior of exception class can be changed globally or
+      just for the thrown exception
+
+      * matching the exception by class, message or other attributes
+
+      * matching with string, regex or closure function
+
+      * creating automatically the derived exception classes ("use" in
+      perlfunc interface)
+
+      * easily expendable, see Exception::System class for example
+
+      * prints just an error message or dumps full stack trace
+
+      * can propagate (rethrow) an exception
+
+      * can ignore some packages for stack trace output
+
+      * some defaults (i.e. verbosity) can be different for different
+      exceptions
+
+AUTHOR
+
+    Piotr Roszatycki <dexter@cpan.org>
+
+LICENSE
+
+    Copyright (c) 2007-2015 Piotr Roszatycki <dexter@cpan.org>.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See http://dev.perl.org/licenses/artistic.html
+

@@ -1,0 +1,4 @@
+Event::Stats is the default plug-in to collecting performance
+statistics for Event.
+
+Also see NetServer::ProcessTop.

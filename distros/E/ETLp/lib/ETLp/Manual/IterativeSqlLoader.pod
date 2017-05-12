@@ -1,0 +1,88 @@
+package ETLp::Manual::IterativeSqlLoader;
+
+# ABSTRACT: Manual for Oracle SQL*Loader Items
+
+__END__
+
+=pod
+
+=head1 SQL*LOADER
+
+The sql_loader plugin invokes Oracle SQL*Loader to load files into a database table. The SQL*Loader controlfile is generated from the specification in the item parameters:
+
+=over 4
+
+=item * B<name>. The name of this item.
+
+=item * B<user_id>. The username and password used to authenticate against the database, in the format <user>/<password>@<tns_alias> where @<tns_alias> is optional. If the userid is not supplied, the standard pipeline authentication settings are used.
+
+=item * B<controlfile>. The name of the SQL*Loader controlfile that will be generated.
+
+=item * B<specification>. The SQL*Loader control file specification. If the specification spans multiple lines, the final character of each line must be a backslash. The final field must be B<file_id constant %file_id%>.
+
+=item * B<table>. The name of the table being loaded.
+
+=item * B<mode>. append, truncate, insert or replace. Defaults to append.
+
+=item * B<is_warning_error>. Should a SQL*Loader warning be treated as an error (e.g. when a bad record is detected).
+
+=item * B<logfile>. The name of the SQL*Loader log file.
+
+=item * B<badfile>.  The name of the SQL*Loader bad file.
+
+=item * B<discardfile>. The name of the SQL*Loader discard file.
+
+=item * B<keep_logfile>. Whether the log file will be kept after the completion of the item. Defaults to yes (1).
+
+=item * B<keep_controlfile>. Whether the control file will be kept after the completion of the item. Defaults to no (0).
+
+=item * B<keep_badfile>. Whether the bad file will be kept after the completion of the item. Defaults to yes (1).
+
+=item * B<keep_discardfile>. Whether the discard file will be kept after the completion of the item. Defaults to yes (1).
+
+=item * B<localize>. A boolean setting that instructs the loader to localize the end-of-line markers for the current file system.
+ Defaults to 0.
+
+=item * B<parameters>. A section containing SQL*Loader options.
+
+=item * B<on_error>. Override the setting for the job..
+
+=back
+
+=head2 Example
+
+    <item>
+        name          = load scores
+        type          = sql_loader
+        controlfile   = %app_root%/log/%basename(filename)%.ctl # default = %filename%.ctl
+        table         = scores
+        mode          = truncate
+        is_warning_error = 1
+        
+        # Specification: use slash at the end-of-line to signal
+        # continuity. You must always include "file_id constant %file_id%"
+        
+        specification =  fields terminated by "," \
+                (id, name, score, file_id constant %file_id%)
+               
+        # These are optional. If the filename never changes (i.e. it
+        # has the same name with every load, you may wish to include $$
+        # in the name to include the OS process id in the name. This
+        # id will not be unique as process ids are reused.
+        
+        logfile          = %app_root%/log/%basename(filename)%.log
+        badfile          = %app_root%/log/%basename(filename)%.bad
+        discardfile      = %app_root%/log/%basename(filename)%.disc
+        
+        keep_controlfile = 1 # Default no, probably keep during initial dev
+        keep_logfile     = 1 # Optional. Default yes
+        keep_badfile = 1 # Optional. Default yes
+        
+        localize         = 0
+
+        # Optional SQL*Loader keywords
+        <parameters>
+            skip = 1
+            direct = true
+        </parameters>
+    </item>

@@ -1,0 +1,257 @@
+From simon@netthink.co.uk Tue Dec 10 11:07:36 2002
+Return-Path: <simon@netthink.co.uk>
+Delivered-To: simon@soto.kasei.com
+Received: by soto.kasei.com (Postfix, from userid 65534)
+	id 17FCF1C6AF; Tue, 10 Dec 2002 11:07:38 +0000 (GMT)
+Received: from deep-dark-truthful-mirror.pad (simoncozens-2.dsl.easynet.co.uk [217.204.174.162])
+	by soto.kasei.com (Postfix) with ESMTP id C5D021C699
+	for <simon@kasei.com>; Tue, 10 Dec 2002 11:07:36 +0000 (GMT)
+Received: from simon by deep-dark-truthful-mirror.pad with local (Exim 3.36 #1 (Debian))
+	id 18LiEi-0008WN-00
+	for <simon@kasei.com>; Tue, 10 Dec 2002 11:07:36 +0000
+Date: Tue, 10 Dec 2002 11:07:36 +0000
+From: Simon Cozens <simon@simon-cozens.org>
+To: simon@kasei.com
+Subject: Test Message
+Message-ID: <20021210110736.GA32736@deep-dark-truthful-mirror.pad>
+Mime-Version: 1.0
+Content-Type: multipart/mixed; boundary="3V7upXqbjpZ4EhLz"
+Content-Disposition: inline
+User-Agent: Mutt/1.4i-ja.1
+X-Operating-System: Linux deep-dark-truthful-mirror 2.4.9
+X-POM: The Moon is Waxing Crescent (38% of Full)
+X-Addresses: The simon@cozens.net address is deprecated due to being broken. simon@brecon.co.uk still works, but simon-cozens.org or netthink.co.uk are preferred.
+Sender: Simon Cozens <simon@netthink.co.uk>
+X-Spam-Status: No, hits=-0.6 required=5.0
+	tests=SPAM_PHRASE_03_05,USER_AGENT,USER_AGENT_MUTT
+	version=2.43
+X-Spam-Level: 
+
+
+--3V7upXqbjpZ4EhLz
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+Here is a test message with several attachments.
+
+-- 
+perl -le 'print (@) - $; +$ (- % _); * *+* *'
+
+--3V7upXqbjpZ4EhLz
+Content-Type: text/plain; charset=iso-2022-jp
+Content-Disposition: attachment; filename="wzl.dot"
+
+digraph G {
+	rankdir=LR;
+	node [shape=record];
+    list_post [ label = "list_post |<id>  id | <mail> mail | <list> list "];
+    addressee [ label = "addressee | <id> id | <name> email_name | <address> email_address | <org> organisation "];
+    correspondent [ label = "correspondent | <id> id | <mail> mail | type | <addressee> addressee "];
+    email [ label = "email | <id> id | <address> address "];
+    embedded_url [ label = "embedded_url | <id> urlid | <mail> mail | uri "];
+    mail [ label = "mail | <id> id | messageid | message_date | index_date | subject | message" ];
+    mailing_list [ label = "mailing_list | <id> id | name "];
+    name_ [ label = "name | <id> id | <name> name "];
+    organisation [ label = "organisation | <id> id | name "];
+
+    list_post:mail -> mail:id;
+    list_post:list -> mailing_list:id;
+    correspondent:addressee -> addressee:id;
+    correspondent:mail -> mail:id;
+    addressee:address -> email:id;
+    addressee:name -> name_:id;
+    embedded_url:mail -> mail:id;
+}
+
+
+--3V7upXqbjpZ4EhLz
+Content-Type: application/postscript
+Content-Disposition: attachment; filename="wzl.ps"
+Content-Transfer-Encoding: quoted-printable
+
+%!PS-Adobe-2.0=0A%%Creator: dot version 1.8.9 (Wed Oct  2 09:41:21 MDT 2002=
+)=0A%%For: (simon) Simon Cozens=0A%%Title: G=0A%%Pages: (atend)=0A%%Boundin=
+gBox: 35 35 415 500=0A%%EndComments=0Asave=0A%%BeginProlog=0A/DotDict 200 d=
+ict def=0ADotDict begin=0A=0A/setupLatin1 {=0Amark=0A/EncodingVector 256 ar=
+ray def=0A EncodingVector 0=0A=0AISOLatin1Encoding 0 255 getinterval putint=
+erval=0A=0AEncodingVector=0A  dup 306 /AE=0A  dup 301 /Aacute=0A  dup 302 /=
+Acircumflex=0A  dup 304 /Adieresis=0A  dup 300 /Agrave=0A  dup 305 /Aring=
+=0A  dup 303 /Atilde=0A  dup 307 /Ccedilla=0A  dup 311 /Eacute=0A  dup 312 =
+/Ecircumflex=0A  dup 313 /Edieresis=0A  dup 310 /Egrave=0A  dup 315 /Iacute=
+=0A  dup 316 /Icircumflex=0A  dup 317 /Idieresis=0A  dup 314 /Igrave=0A  du=
+p 334 /Udieresis=0A  dup 335 /Yacute=0A  dup 376 /thorn=0A  dup 337 /german=
+dbls=0A  dup 341 /aacute=0A  dup 342 /acircumflex=0A  dup 344 /adieresis=0A=
+  dup 346 /ae=0A  dup 340 /agrave=0A  dup 345 /aring=0A  dup 347 /ccedilla=
+=0A  dup 351 /eacute=0A  dup 352 /ecircumflex=0A  dup 353 /edieresis=0A  du=
+p 350 /egrave=0A  dup 355 /iacute=0A  dup 356 /icircumflex=0A  dup 357 /idi=
+eresis=0A  dup 354 /igrave=0A  dup 360 /dcroat=0A  dup 361 /ntilde=0A  dup =
+363 /oacute=0A  dup 364 /ocircumflex=0A  dup 366 /odieresis=0A  dup 362 /og=
+rave=0A  dup 365 /otilde=0A  dup 370 /oslash=0A  dup 372 /uacute=0A  dup 37=
+3 /ucircumflex=0A  dup 374 /udieresis=0A  dup 371 /ugrave=0A  dup 375 /yacu=
+te=0A  dup 377 /ydieresis  =0A=0A% Set up ISO Latin 1 character encoding=0A=
+/starnetISO {=0A        dup dup findfont dup length dict begin=0A        { =
+1 index /FID ne { def }{ pop pop } ifelse=0A        } forall=0A        /Enc=
+oding EncodingVector def=0A        currentdict end definefont=0A} def=0A/Ti=
+mes-Roman starnetISO def=0A/Times-Italic starnetISO def=0A/Times-Bold starn=
+etISO def=0A/Times-BoldItalic starnetISO def=0A/Helvetica starnetISO def=0A=
+/Helvetica-Oblique starnetISO def=0A/Helvetica-Bold starnetISO def=0A/Helve=
+tica-BoldOblique starnetISO def=0A/Courier starnetISO def=0A/Courier-Obliqu=
+e starnetISO def=0A/Courier-Bold starnetISO def=0A/Courier-BoldOblique star=
+netISO def=0Acleartomark=0A} bind def=0A=0A%%BeginResource: procset=0A/coor=
+d-font-family /Times-Roman def=0A/default-font-family /Times-Roman def=0A/c=
+oordfont coord-font-family findfont 8 scalefont def=0A=0A/InvScaleFactor 1.=
+0 def=0A/set_scale {=0A	dup 1 exch div /InvScaleFactor exch def=0A	dup scal=
+e=0A} bind def=0A=0A% styles=0A/solid { [] 0 setdash } bind def=0A/dashed {=
+ [9 InvScaleFactor mul dup ] 0 setdash } bind def=0A/dotted { [1 InvScaleFa=
+ctor mul 6 InvScaleFactor mul] 0 setdash } bind def=0A/invis {/fill {newpat=
+h} def /stroke {newpath} def /show {pop newpath} def} bind def=0A/bold { 2 =
+setlinewidth } bind def=0A/filled { } bind def=0A/unfilled { } bind def=0A/=
+rounded { } bind def=0A/diagonals { } bind def=0A=0A% hooks for setting col=
+or =0A/nodecolor { sethsbcolor } bind def=0A/edgecolor { sethsbcolor } bind=
+ def=0A/graphcolor { sethsbcolor } bind def=0A/nopcolor {pop pop pop} bind =
+def=0A=0A/beginpage {	% i j npages=0A	/npages exch def=0A	/j exch def=0A	/i=
+ exch def=0A	/str 10 string def=0A	npages 1 gt {=0A		gsave=0A			coordfont s=
+etfont=0A			0 0 moveto=0A			(\() show i str cvs show (,) show j str cvs sho=
+w (\)) show=0A		grestore=0A	} if=0A} bind def=0A=0A/set_font {=0A	findfont =
+exch=0A	scalefont setfont=0A} def=0A=0A% draw aligned label in bounding box=
+ aligned to current point=0A/alignedtext {			% width adj text=0A	/text exch=
+ def=0A	/adj exch def=0A	/width exch def=0A	gsave=0A		width 0 gt {=0A			tex=
+t stringwidth pop adj mul 0 rmoveto=0A		} if=0A		[] 0 setdash=0A		text show=
+=0A	grestore=0A} def=0A=0A/boxprim {				% xcorner ycorner xsize ysize=0A		4=
+ 2 roll=0A		moveto=0A		2 copy=0A		exch 0 rlineto=0A		0 exch rlineto=0A		pop=
+ neg 0 rlineto=0A		closepath=0A} bind def=0A=0A/ellipse_path {=0A	/ry exch =
+def=0A	/rx exch def=0A	/y exch def=0A	/x exch def=0A	matrix currentmatrix=
+=0A	newpath=0A	x y translate=0A	rx ry scale=0A	0 0 1 0 360 arc=0A	setmatrix=
+=0A} bind def=0A=0A/endpage { showpage } bind def=0A=0A/layercolorseq=0A	[	=
+% layer color sequence - darkest to lightest=0A		[0 0 0]=0A		[.2 .8 .8]=0A	=
+	[.4 .8 .8]=0A		[.6 .8 .8]=0A		[.8 .8 .8]=0A	]=0Adef=0A=0A/setlayer {/maxla=
+yer exch def /curlayer exch def=0A	layercolorseq curlayer get=0A	aload pop =
+sethsbcolor=0A	/nodecolor {nopcolor} def=0A	/edgecolor {nopcolor} def=0A	/g=
+raphcolor {nopcolor} def=0A} bind def=0A=0A/onlayer { curlayer ne {invis} i=
+f } def=0A=0A/onlayers {=0A	/myupper exch def=0A	/mylower exch def=0A	curla=
+yer mylower lt=0A	curlayer myupper gt=0A	or=0A	{invis} if=0A} def=0A=0A/cur=
+layer 0 def=0A=0A%%EndResource=0A%%EndProlog=0A%%BeginSetup=0A14 default-fo=
+nt-family set_font=0A1 setmiterlimit=0A% /arrowlength 10 def=0A% /arrowwidt=
+h 5 def=0A=0A% make sure pdfmark is harmless for PS-interpreters other than=
+ Distiller=0A/pdfmark where {pop} {userdict /pdfmark /cleartomark load put}=
+ ifelse=0A% make '<<' and '>>' safe on PS Level 1 devices=0A/languagelevel =
+where {pop languagelevel}{1} ifelse=0A2 lt {=0A    userdict (<<) cvn ([) cv=
+n load put=0A    userdict (>>) cvn ([) cvn load put=0A} if=0A=0A%%EndSetup=
+=0A%%Page: 1 1=0A%%PageBoundingBox: 36 36 415 500=0A%%PageOrientation: Port=
+rait=0Agsave=0A35 35 380 465 boxprim clip newpath=0A36 36 translate=0A0 0 1=
+ beginpage=0A0 0 translate 0 rotate=0A0.000 0.000 0.000 graphcolor=0A14.00 =
+/Times-Roman set_font=0A=0A%	list_post=0Agsave 10 dict begin=0Anewpath 30 2=
+07 moveto=0A100 207 lineto=0A100 287 lineto=0A30 287 lineto=0Aclosepath=0As=
+troke=0Agsave 10 dict begin=0A65 272 moveto 56 -0.5 (list_post) alignedtext=
+=0Aend grestore=0Anewpath 30 267 moveto=0A100 267 lineto=0Astroke=0Agsave 1=
+0 dict begin=0A65 252 moveto 12 -0.5 (id) alignedtext=0Aend grestore=0Anewp=
+ath 30 247 moveto=0A100 247 lineto=0Astroke=0Agsave 10 dict begin=0A65 232 =
+moveto 30 -0.5 (mail) alignedtext=0Aend grestore=0Anewpath 30 227 moveto=0A=
+100 227 lineto=0Astroke=0Agsave 10 dict begin=0A65 212 moveto 19 -0.5 (list=
+) alignedtext=0Aend grestore=0Aend grestore=0A=0A%	mail=0Agsave 10 dict beg=
+in=0Anewpath 160 225 moveto=0A268 225 lineto=0A268 365 lineto=0A160 365 lin=
+eto=0Aclosepath=0Astroke=0Agsave 10 dict begin=0A214 350 moveto 30 -0.5 (ma=
+il) alignedtext=0Aend grestore=0Anewpath 160 345 moveto=0A268 345 lineto=0A=
+stroke=0Agsave 10 dict begin=0A214 330 moveto 12 -0.5 (id) alignedtext=0Aen=
+d grestore=0Anewpath 160 325 moveto=0A268 325 lineto=0Astroke=0Agsave 10 di=
+ct begin=0A214 310 moveto 69 -0.5 (messageid) alignedtext=0Aend grestore=0A=
+newpath 160 305 moveto=0A268 305 lineto=0Astroke=0Agsave 10 dict begin=0A21=
+4 290 moveto 94 -0.5 (message_date) alignedtext=0Aend grestore=0Anewpath 16=
+0 285 moveto=0A268 285 lineto=0Astroke=0Agsave 10 dict begin=0A214 270 move=
+to 76 -0.5 (index_date) alignedtext=0Aend grestore=0Anewpath 160 265 moveto=
+=0A268 265 lineto=0Astroke=0Agsave 10 dict begin=0A214 250 moveto 48 -0.5 (=
+subject) alignedtext=0Aend grestore=0Anewpath 160 245 moveto=0A268 245 line=
+to=0Astroke=0Agsave 10 dict begin=0A214 230 moveto 56 -0.5 (message) aligne=
+dtext=0Aend grestore=0Aend grestore=0A=0A%	list_post -> mail=0Anewpath 100 =
+238 moveto=0A108 239 116 242 122 247 curveto=0A151 268 131 297 152 320 curv=
+eto=0Astroke=0Agsave 10 dict begin=0Asolid=0A0.000 0.000 0.000 edgecolor=0A=
+newpath 151 322 moveto=0A160 326 lineto=0A153 318 lineto=0Aclosepath=0Afill=
+=0A0.000 0.000 0.000 edgecolor=0Aend grestore=0A=0A%	mailing_list=0Agsave 1=
+0 dict begin=0Anewpath 167 147 moveto=0A262 147 lineto=0A262 207 lineto=0A1=
+67 207 lineto=0Aclosepath=0Astroke=0Agsave 10 dict begin=0A214 192 moveto 8=
+1 -0.5 (mailing_list) alignedtext=0Aend grestore=0Anewpath 167 187 moveto=
+=0A262 187 lineto=0Astroke=0Agsave 10 dict begin=0A214 172 moveto 12 -0.5 (=
+id) alignedtext=0Aend grestore=0Anewpath 167 167 moveto=0A262 167 lineto=0A=
+stroke=0Agsave 10 dict begin=0A214 152 moveto 38 -0.5 (name) alignedtext=0A=
+end grestore=0Aend grestore=0A=0A%	list_post -> mailing_list=0Anewpath 100 =
+212 moveto=0A108 211 115 209 122 207 curveto=0A140 200 141 193 157 187 curv=
+eto=0Astroke=0Agsave 10 dict begin=0Asolid=0A0.000 0.000 0.000 edgecolor=0A=
+newpath 158 189 moveto=0A167 184 lineto=0A157 184 lineto=0Aclosepath=0Afill=
+=0A0.000 0.000 0.000 edgecolor=0Aend grestore=0A=0A%	addressee=0Agsave 10 d=
+ict begin=0Anewpath 159 29 moveto=0A270 29 lineto=0A270 129 lineto=0A159 12=
+9 lineto=0Aclosepath=0Astroke=0Agsave 10 dict begin=0A214 114 moveto 64 -0.=
+5 (addressee) alignedtext=0Aend grestore=0Anewpath 159 109 moveto=0A270 109=
+ lineto=0Astroke=0Agsave 10 dict begin=0A214 94 moveto 12 -0.5 (id) aligned=
+text=0Aend grestore=0Anewpath 159 89 moveto=0A270 89 lineto=0Astroke=0Agsav=
+e 10 dict begin=0A214 74 moveto 85 -0.5 (email_name) alignedtext=0Aend gres=
+tore=0Anewpath 159 69 moveto=0A270 69 lineto=0Astroke=0Agsave 10 dict begin=
+=0A214 54 moveto 97 -0.5 (email_address) alignedtext=0Aend grestore=0Anewpa=
+th 159 49 moveto=0A270 49 lineto=0Astroke=0Agsave 10 dict begin=0A214 34 mo=
+veto 84 -0.5 (organisation) alignedtext=0Aend grestore=0Aend grestore=0A=0A=
+%	email=0Agsave 10 dict begin=0Anewpath 306 0 moveto=0A370 0 lineto=0A370 6=
+0 lineto=0A306 60 lineto=0Aclosepath=0Astroke=0Agsave 10 dict begin=0A338 4=
+5 moveto 37 -0.5 (email) alignedtext=0Aend grestore=0Anewpath 306 40 moveto=
+=0A370 40 lineto=0Astroke=0Agsave 10 dict begin=0A338 25 moveto 12 -0.5 (id=
+) alignedtext=0Aend grestore=0Anewpath 306 20 moveto=0A370 20 lineto=0Astro=
+ke=0Agsave 10 dict begin=0A338 5 moveto 50 -0.5 (address) alignedtext=0Aend=
+ grestore=0Aend grestore=0A=0A%	addressee -> email=0Anewpath 270 49 moveto=
+=0A279 48 288 45 297 43 curveto=0Astroke=0Agsave 10 dict begin=0Asolid=0A0.=
+000 0.000 0.000 edgecolor=0Anewpath 297 46 moveto=0A306 40 lineto=0A296 41 =
+lineto=0Aclosepath=0Afill=0A0.000 0.000 0.000 edgecolor=0Aend grestore=0A=
+=0A%	name_=0Agsave 10 dict begin=0Anewpath 311 78 moveto=0A365 78 lineto=0A=
+365 138 lineto=0A311 138 lineto=0Aclosepath=0Astroke=0Agsave 10 dict begin=
+=0A338 123 moveto 38 -0.5 (name) alignedtext=0Aend grestore=0Anewpath 311 1=
+18 moveto=0A365 118 lineto=0Astroke=0Agsave 10 dict begin=0A338 103 moveto =
+12 -0.5 (id) alignedtext=0Aend grestore=0Anewpath 311 98 moveto=0A365 98 li=
+neto=0Astroke=0Agsave 10 dict begin=0A338 83 moveto 38 -0.5 (name) alignedt=
+ext=0Aend grestore=0Aend grestore=0A=0A%	addressee -> name_=0Anewpath 270 8=
+9 moveto=0A281 91 292 94 302 97 curveto=0Astroke=0Agsave 10 dict begin=0Aso=
+lid=0A0.000 0.000 0.000 edgecolor=0Anewpath 301 99 moveto=0A311 100 lineto=
+=0A302 94 lineto=0Aclosepath=0Afill=0A0.000 0.000 0.000 edgecolor=0Aend gre=
+store=0A=0A%	correspondent=0Agsave 10 dict begin=0Anewpath 10 89 moveto=0A1=
+21 89 lineto=0A121 189 lineto=0A10 189 lineto=0Aclosepath=0Astroke=0Agsave =
+10 dict begin=0A65 174 moveto 97 -0.5 (correspondent) alignedtext=0Aend gre=
+store=0Anewpath 10 169 moveto=0A121 169 lineto=0Astroke=0Agsave 10 dict beg=
+in=0A65 154 moveto 12 -0.5 (id) alignedtext=0Aend grestore=0Anewpath 10 149=
+ moveto=0A121 149 lineto=0Astroke=0Agsave 10 dict begin=0A65 134 moveto 30 =
+-0.5 (mail) alignedtext=0Aend grestore=0Anewpath 10 129 moveto=0A121 129 li=
+neto=0Astroke=0Agsave 10 dict begin=0A65 114 moveto 30 -0.5 (type) alignedt=
+ext=0Aend grestore=0Anewpath 10 109 moveto=0A121 109 lineto=0Astroke=0Agsav=
+e 10 dict begin=0A65 94 moveto 64 -0.5 (addressee) alignedtext=0Aend gresto=
+re=0Aend grestore=0A=0A%	correspondent -> addressee=0Anewpath 121 99 moveto=
+=0A130 99 139 99 149 99 curveto=0Astroke=0Agsave 10 dict begin=0Asolid=0A0.=
+000 0.000 0.000 edgecolor=0Anewpath 149 102 moveto=0A159 99 lineto=0A149 97=
+ lineto=0Aclosepath=0Afill=0A0.000 0.000 0.000 edgecolor=0Aend grestore=0A=
+=0A%	correspondent -> mail=0Anewpath 121 148 moveto=0A121 148 122 149 122 1=
+49 curveto=0A178 202 106 265 153 320 curveto=0Astroke=0Agsave 10 dict begin=
+=0Asolid=0A0.000 0.000 0.000 edgecolor=0Anewpath 151 322 moveto=0A160 327 l=
+ineto=0A155 318 lineto=0Aclosepath=0Afill=0A0.000 0.000 0.000 edgecolor=0Ae=
+nd grestore=0A=0A%	embedded_url=0Agsave 10 dict begin=0Anewpath 8 305 movet=
+o=0A122 305 lineto=0A122 385 lineto=0A8 385 lineto=0Aclosepath=0Astroke=0Ag=
+save 10 dict begin=0A65 370 moveto 100 -0.5 (embedded_url) alignedtext=0Aen=
+d grestore=0Anewpath 8 365 moveto=0A122 365 lineto=0Astroke=0Agsave 10 dict=
+ begin=0A65 350 moveto 32 -0.5 (urlid) alignedtext=0Aend grestore=0Anewpath=
+ 8 345 moveto=0A122 345 lineto=0Astroke=0Agsave 10 dict begin=0A65 330 move=
+to 30 -0.5 (mail) alignedtext=0Aend grestore=0Anewpath 8 325 moveto=0A122 3=
+25 lineto=0Astroke=0Agsave 10 dict begin=0A65 310 moveto 19 -0.5 (uri) alig=
+nedtext=0Aend grestore=0Aend grestore=0A=0A%	embedded_url -> mail=0Anewpath=
+ 122 335 moveto=0A131 335 140 335 150 335 curveto=0Astroke=0Agsave 10 dict =
+begin=0Asolid=0A0.000 0.000 0.000 edgecolor=0Anewpath 150 338 moveto=0A160 =
+335 lineto=0A150 333 lineto=0Aclosepath=0Afill=0A0.000 0.000 0.000 edgecolo=
+r=0Aend grestore=0A=0A%	organisation=0Agsave 10 dict begin=0Anewpath 16 403=
+ moveto=0A114 403 lineto=0A114 463 lineto=0A16 463 lineto=0Aclosepath=0Astr=
+oke=0Agsave 10 dict begin=0A65 448 moveto 84 -0.5 (organisation) alignedtex=
+t=0Aend grestore=0Anewpath 16 443 moveto=0A114 443 lineto=0Astroke=0Agsave =
+10 dict begin=0A65 428 moveto 12 -0.5 (id) alignedtext=0Aend grestore=0Anew=
+path 16 423 moveto=0A114 423 lineto=0Astroke=0Agsave 10 dict begin=0A65 408=
+ moveto 38 -0.5 (name) alignedtext=0Aend grestore=0Aend grestore=0Aendpage=
+=0Agrestore=0A%%PageTrailer=0A%%EndPage: 1=0A%%Trailer=0A%%Pages: 1=0Aend=
+=0Arestore=0A%%EOF=0A
+--3V7upXqbjpZ4EhLz
+Content-Type: text/html; charset=us-ascii
+Content-Disposition: attachment; filename="zeldo.html"
+
+<head><title>Hello World</title></head><body><p>Hello World</p></body>
+
+--3V7upXqbjpZ4EhLz--
+

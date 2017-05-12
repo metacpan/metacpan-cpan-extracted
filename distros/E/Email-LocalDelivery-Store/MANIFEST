@@ -1,0 +1,6 @@
+README
+Store.pm
+MANIFEST
+Makefile.PL
+t/00compile.t
+META.yml

@@ -1,0 +1,31 @@
+Revision history for ExtUtils-MY_Metafile
+
+0.09    Mon Jan 28 11:32:24 JST 2008
+        fix, warn was raised when EUMM version is in devel.
+
+0.08    Thu Nov 29 11:38:20 JST 2007
+        support for META-spec v1.3.
+
+0.07    Tue Nov  7 16:41:42 JST 2006
+        fix, typo.
+
+0.06    Tue Nov  7 15:48:00 JST 2006
+        fix, better yaml format.
+
+0.05    Tue Nov  7 15:11:46 JST 2006
+        fix, no meta check in subdirs.
+
+0.04    Fri Nov  3 18:59:40 JST 2006
+        fix, overwriting requires directive.
+        add, check whether valid for meta-spec.
+        add, support LICENSE attribute of EUMM.
+
+0.03    Fri Oct 20 15:54:42 JST 2006
+        add tests.
+
+0.02    Tue Oct 17 19:31:13 JST 2006
+        fix, suppress some warnings.
+
+0.01    Tue Oct 17 15:51:42 JST 2006
+        First version.
+

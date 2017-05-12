@@ -1,0 +1,20 @@
+# Avoid version control files.
+\bRCS\b
+\bCVS\b
+\bSCCS\b
+,v$
+\B\.svn\b
+\b_darcs\b
+\.git
+
+# Avoid temp and backup files.
+~$
+\.old$
+\#$
+\b\.#
+\.bak$
+\.tmp$
+\.orig$
+
+# Avoid Devel::Cover files.
+\bcover_db\b

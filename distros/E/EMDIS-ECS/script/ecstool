@@ -1,0 +1,1294 @@
+#!/usr/bin/perl -w
+#
+# Copyright (C) 2002-2016 National Marrow Donor Program. All rights reserved.
+#
+# For a description of this program, please refer to the POD documentation
+# embedded at the bottom of the file (e.g. perldoc ecstool).
+
+use Data::Dumper;
+use EMDIS::ECS qw($ECS_CFG $ECS_NODE_TBL delete_old_files load_ecs_config
+           move_to_dir valid_encr_typ
+           pgp2_decrypt openpgp_decrypt read_ecs_message_id
+           send_ecsmsg_email format_datetime send_admin_email);
+use EMDIS::ECS::Message;
+use EMDIS::ECS::FileBackedMessage;
+use Fcntl qw(:DEFAULT :flock);
+use File::Basename qw(basename dirname);
+use File::Copy qw(copy move);
+use File::Spec::Functions qw(catdir catfile);
+use File::Temp qw(tempfile);
+use Getopt::Long;
+use Time::HiRes qw(gettimeofday);
+use Env qw(ECS_CONFIG_FILE);
+
+use strict;
+use vars qw($progress);
+
+# process command line arguments
+my $usage =
+    "ecstool - ECS administrative utility\n" .
+    "Usage:  $0 [--config ecs_cfg] [command]\n" .
+    "Recognized Commands:\n" .
+    "    --add <node> <addr> <addr_r> <encr_typ> [encr_sig]\n" .
+    "    --archive [delete_threshold]\n" .
+    "    --decrypt <filename>\n" .
+    "    --delete <node>\n" .
+    "    --export <filename> [delimiter]\n" .
+    "    --get <property> [node]\n" .
+    "    --help\n" .
+    "    --maildrop [filename]\n" .
+    "    --meta <node> <msg_type> [seq_num[:part_num] [seq2]]\n" .
+    "    --modify <node> <addr> <addr_r> <encr_typ> [encr_sig]\n" .
+    "    --nodedata <import|export> <filename> [node]\n" .
+    "    --overview\n" .
+    "    --prune <node> <seq1> <seq2>\n" .
+    "    --send [node] [filename]\n" .
+    "    --tweak <node> <property> <value>\n" .
+    "    --view [node]\n" .
+    "For details, refer to documentation:  perldoc $0\n";
+
+my $opt_config = 'ecs.cfg';
+if (defined $ECS_CONFIG_FILE && $ECS_CONFIG_FILE ne '') {
+   if (! -f $ECS_CONFIG_FILE) {
+      die "Error: invalid environment variable " .
+          "ECS_CONFIG_FILE='$ECS_CONFIG_FILE'!\n";
+   }
+   else {
+      $opt_config = $ECS_CONFIG_FILE;
+   }
+}
+
+my ($opt_add, $opt_archive, $opt_decrypt, $opt_delete, $opt_help,
+    $opt_maildrop, $opt_get, $opt_export,
+    $opt_meta, $opt_modify, $opt_prune, $opt_nodedata, $opt_overview, $opt_send,
+    $opt_tweak, $opt_view) =
+    ('','','','','','','','','','','','','');
+GetOptions('config=s' => \$opt_config,
+           'add'      => \$opt_add,
+           'archive'  => \$opt_archive,
+           'decrypt'  => \$opt_decrypt,
+           'delete'   => \$opt_delete,
+           'export'   => \$opt_export,
+           'get'      => \$opt_get,
+           'help'     => \$opt_help,
+           'maildrop' => \$opt_maildrop,
+           'meta'     => \$opt_meta,
+           'modify'   => \$opt_modify,
+           'nodedata' => \$opt_nodedata,
+           'overview' => \$opt_overview,
+           'prune'    => \$opt_prune,
+           'send'     => \$opt_send,
+           'tweak'    => \$opt_tweak,
+           'view'     => \$opt_view)
+    or die "Error:  unrecognized command line option.\n$usage";
+# accept only one command at a time
+my $command = '';
+for my $x ($opt_add, $opt_archive, $opt_decrypt, $opt_delete, $opt_help,
+           $opt_maildrop,
+           $opt_meta, $opt_modify, $opt_nodedata, $opt_overview, $opt_prune, $opt_send,
+           $opt_tweak, $opt_view)
+{
+    die "Error: unable to process multiple commands at once.\n$usage"
+        if($command and $x);
+    $command = 1 if $x;
+}
+$opt_view = 1 unless $command;  # default command = view
+$opt_view = 1 if $opt_overview;
+if($opt_help) {
+    print $usage;
+    exit 0;
+}
+
+# initialize
+my $err = load_ecs_config($opt_config);
+die "$err\nUnable to initialize ECS.\n" if $err;
+
+# add
+if($opt_add) {
+    die "Invalid number of parameters specified for --add command.\n$usage"
+        if ($#ARGV < 3) or ($#ARGV > 4);
+    my ($node_id, $addr, $addr_r, $encr_typ, $encr_sig) = @ARGV;
+    die "Error: unrecognized encr_typ: $encr_typ\n"
+        unless valid_encr_typ($encr_typ);
+    $encr_sig = $addr unless defined $encr_sig;
+    my $err = '';
+    $ECS_NODE_TBL->lock()     # lock node_tbl
+        or die "Error: unable to lock node_tbl: " .
+            $ECS_NODE_TBL->ERROR . "\n";
+    my $node = $ECS_NODE_TBL->read($node_id);
+    if(not $node) {
+        # add new node
+        my $new_node = {
+            ack_seq      => 0,
+            addr         => $addr,
+            addr_r       => $addr_r,
+            contact      => '',
+            encr_meta    => 'false',
+            encr_sig     => $encr_sig,
+            encr_typ     => $encr_typ,
+            in_seq       => 0,
+            in_seq_ack   => 0,
+            last_in      => 0,
+            last_in_adm  => 0,
+            last_out     => 0,
+            msg_part_size => 0,
+            node         => $node_id,
+            node_disabled => 'no',
+            out_seq      => 0,
+            q_first_file => '',
+            q_gap_seq    => 0,
+            q_gap_time   => 0,
+            q_max_seq    => '',
+            q_min_seq    => '',
+            q_size       => 0
+            };
+        $ECS_NODE_TBL->write($node_id, $new_node);
+        $err = $ECS_NODE_TBL->ERROR;
+        if ( defined $ECS_CFG->ECS_TO_DIR && $ECS_CFG->ECS_TO_DIR ne '' ) {
+           my $to_dir = catdir($ECS_CFG->ECS_TO_DIR, "to_$node_id");
+           mkdir $to_dir unless -e $to_dir;        # Make to_XX directory
+        }
+        if ( defined $ECS_CFG->ECS_FROM_DIR && $ECS_CFG->ECS_FROM_DIR ne '' ) {
+           my $from_dir = catdir($ECS_CFG->ECS_FROM_DIR, "from_$node_id");
+           mkdir $from_dir unless -e $from_dir;    # Make from_XX directory
+        }
+    }
+    $ECS_NODE_TBL->unlock();  # unlock node_tbl
+    die "Error: $err\n"
+        if $err;
+    die "Error: node '$node_id' already exists.\n"
+        if $node;
+}
+
+# archive
+if($opt_archive)
+{
+    die "Unexpected parameters specified for --archive command.\n$usage"
+        if ($#ARGV > 0);
+    my ($delete_threshold) = @ARGV;
+    my $delete_threshold_time = '';
+    if(defined $delete_threshold)
+    {
+        die "Error: delete_threshold not numeric: '$delete_threshold'\n"
+            unless $delete_threshold =~ /^\d+$/;
+
+        # compute $delete_threshold_time
+        my $timenow = time;
+        my @localtime = localtime($timenow);
+        my $last_midnight_time = $timenow - ($localtime[2] * 3600) -
+            ($localtime[1] * 60) - $localtime[0];
+        $delete_threshold_time = $last_midnight_time -
+            ($delete_threshold * 86400);
+    }
+
+    # is tar program available?
+    die "GNU tar program not available: " . $ECS_CFG->GNU_TAR
+        unless -x $ECS_CFG->GNU_TAR;
+
+    # compute archive and archive/tmp directory names;
+    # create directories, if needed
+    my $archive_dir = catdir($ECS_CFG->ECS_DAT_DIR, "archive");
+    mkdir $archive_dir unless -e $archive_dir;
+    my $archive_tmp_dir = catdir($archive_dir, "tmp");
+    mkdir $archive_tmp_dir unless -e $archive_tmp_dir;
+
+    # compute date string (to be used as part of filenames)
+    my @localtime = localtime(time);
+    my $datestring = sprintf('%04d%02d%02d', $localtime[5] + 1900,
+        $localtime[4] + 1, $localtime[3]);
+
+    # compute bigtar_filename and check whether file already exists
+    my $bigtar_filename = catfile($archive_dir, "archive_${datestring}.tgz");
+    die "Output file $bigtar_filename already exists!"
+        if -e $bigtar_filename;
+    open OUTPUT, ">$bigtar_filename";  # touch file, to prevent other
+    close OUTPUT;                      # simultaneous attempts to create it
+
+    # construct list of directories to be archived
+    my @dirlist = ();
+    opendir MBXDIR, $ECS_CFG->ECS_MBX_DIR
+        or die "Unable to open directory $ECS_CFG->ECS_MBX_DIR: $!\n";
+    my @names = readdir MBXDIR;
+    closedir MBXDIR;
+    foreach my $name (@names)
+    {
+        if($name !~ /^\.\.?$/)
+        {
+            my $pathname = catdir($ECS_CFG->ECS_MBX_DIR, $name);
+            push @dirlist, $pathname if -d $pathname;
+        }
+    }
+
+    # clean out archive_tmp directory (remove existing files)
+    print "Cleaning out directory $archive_tmp_dir\n";
+    opendir TMPDIR, $archive_tmp_dir
+        or die "Unable to open directory $archive_tmp_dir: $!\n";
+    @names = readdir TMPDIR;
+    closedir TMPDIR;
+    foreach my $name (@names)
+    {
+        if($name !~ /^\.\.?$/)
+        {
+            my $pathname = catdir($archive_tmp_dir, $name);
+            if(-f $pathname)
+            {
+                unlink $pathname
+                    or die "Unable to remove file $pathname\n";
+            }
+            push @dirlist, $pathname if -d $pathname;
+        }
+    }
+    @dirlist = sort @dirlist;
+
+    # copy cfg and node_tbl files to archive_tmp directory
+    # move log files to archive_tmp directory 
+    $ECS_NODE_TBL->lock()     # lock node_tbl
+        or die "Error: unable to lock node_tbl: " .
+            $ECS_NODE_TBL->ERROR . "\n";
+    my $errmsg = '';
+    # log files - move 
+    print "Archiving log files\n";
+    foreach my $name ('ecs_chk_com.log', 'ecs_scan_mail.log', 
+	                   'ecs_proc_meta.log', basename($ECS_CFG->LOG_FILE),
+                      basename($ECS_CFG->ERR_FILE))
+    {
+        my $filename1 = catfile($ECS_CFG->ECS_DAT_DIR, $name);
+        my $filename2 = catfile($archive_tmp_dir, "${datestring}_$name");
+        if(-e $filename1 and not -e $filename2)
+        {
+            move($filename1, $filename2)
+                or $errmsg .= "Unable to move file $filename1: $!\n";
+        }
+        elsif(-e $filename2)
+        {
+           # mail to admin "filename2 already exists!"
+           send_admin_email("$filename1 cannot not be moved to $filename2" ,
+              "because $filename2 already exists!\n");
+        }
+    }
+    # node_tbl files
+    print "Copying node_tbl files\n";
+    if(opendir DATDIR, $ECS_CFG->ECS_DAT_DIR)
+    {
+        @names = readdir DATDIR;
+        closedir DATDIR;
+        my $dirname = dirname($ECS_CFG->NODE_TBL);
+        my $basename = basename($ECS_CFG->NODE_TBL);
+        foreach my $name (@names)
+        {
+            if($name =~ /^$basename/)
+            {
+                my $filename1 = catfile($dirname, $name);
+                my $filename2 = catfile($archive_tmp_dir,
+                                        "${datestring}_$name");
+                copy($filename1, $filename2)
+                    or $errmsg .= "Unable to copy file $filename1: $!\n";
+            }
+        }
+    }
+    else
+    {
+        $errmsg .= "Unable to open directory $ECS_CFG->ECS_DAT_DIR: $!\n";
+    }
+    # ecs config file
+    print "Copying ecs config file\n";
+    foreach my $name (basename($opt_config))
+    {
+        my $filename3 = catfile($archive_tmp_dir, "${datestring}_$name");
+        if(-e $opt_config)
+        {
+            copy($opt_config, $filename3)
+                or $errmsg .= "Unable to copy file $opt_config: $!\n";
+        }
+    }
+    $ECS_NODE_TBL->unlock();  # unlock node_tbl
+
+    # for each directory:  delete old files, then tar the directory
+    foreach my $dirname (@dirlist)
+    {
+        my $basename = basename($dirname);
+        my $tarname = catfile($archive_tmp_dir, "${datestring}_$basename.tgz");
+        my $tardir = catdir("mboxes", $basename);
+        # delete old files, if indicated
+        if($delete_threshold_time)
+        {
+            print "Deleting old files from $dirname\n";
+            delete_old_files($dirname, $delete_threshold_time);
+        }
+        print "Creating tar archive of $tardir\n";
+        my $cmd = $ECS_CFG->GNU_TAR . " czf $tarname -C " .
+            $ECS_CFG->ECS_DAT_DIR . " $tardir";
+        system($cmd) and $errmsg .= "Error executing command: $cmd\n";
+    }
+
+    # delete old files from tmp directory, if indicated
+    if($delete_threshold_time)
+    {
+        print "Deleting old files from " . $ECS_CFG->ECS_TMP_DIR . "\n";
+        delete_old_files($ECS_CFG->ECS_TMP_DIR, $delete_threshold_time);
+    }
+
+    # combine individual files into one big tar file
+    opendir TMPDIR, $archive_tmp_dir
+        or die "${errmsg}Unable to open directory $archive_tmp_dir: $!\n";
+    @names = readdir TMPDIR;
+    closedir TMPDIR;
+    my @filelist = ();
+    foreach my $name (@names)
+    {
+        if($name !~ /^\.\.?$/)
+        {
+            my $pathname = catdir($archive_tmp_dir, $name);
+            push @filelist, $name
+                if -f $pathname;
+        }
+    }
+    @filelist = sort @filelist;
+    my $files = join ' ', @filelist;
+    unlink $bigtar_filename;
+    print "Creating tar archive $bigtar_filename\n";
+    my $cmd = $ECS_CFG->GNU_TAR . " czf $bigtar_filename " .
+        "-C $archive_tmp_dir $files";
+    system($cmd) and $errmsg .= "Error executing command: $cmd\n";
+
+    die "\nErrors encountered during processing:\n$errmsg" if $errmsg;
+    print "Done.\n";
+}
+
+# decrypt
+if($opt_decrypt) {
+    die "Invalid number of parameters specified for --decrypt command.\n$usage"
+        unless $#ARGV == 0;
+    my ($filename) = @ARGV;
+    my $msg = EMDIS::ECS::Message::read_from_file($filename);
+    die "Unable to load message from file: $msg\n"
+        unless ref $msg;
+    $ECS_NODE_TBL->lock()     # lock node_tbl
+        or die "Error: unable to lock node_tbl: " .
+            $ECS_NODE_TBL->ERROR . "\n";
+    my $node;
+    my $err = '';
+    if($msg->sender eq $ECS_CFG->THIS_NODE) {
+        # scan node_tbl for recipient email address
+        my $to = $msg->to();
+        my @keys = $ECS_NODE_TBL->keys();
+        for my $node_id (@keys) {
+            my $test_node = $ECS_NODE_TBL->read($node_id);
+            my $addr = $test_node->{addr};
+            if(ref($test_node) and $to =~ /$addr/i) {
+                $node = $test_node;
+                last;
+            }
+        }
+        $err = "email address not found in node_tbl: $to"
+            unless ref $node;
+    }
+    else {
+        # look up message sender in node_tbl
+        $node = $ECS_NODE_TBL->read($msg->sender);
+        $err = "node not found in node_tbl: " . $msg->sender
+            unless ref $node;
+    }
+    $ECS_NODE_TBL->unlock();  # unlock node_tbl
+    die "Error: $err\n"
+        if $err;
+    # decrypt the input file
+    my $decr_filename = "$filename.ecstool.asc";
+    unlink $decr_filename;
+    for($node->{encr_typ}) {
+        /PGP2/i and do {
+            $err = pgp2_decrypt(
+                $filename,
+                $decr_filename,
+                undef,
+                $node->{encr_out_passphrase});
+            last;
+        };
+        /OpenPGP/i and do {
+            $err = openpgp_decrypt(
+                $filename,
+                $decr_filename,
+                undef,
+                $node->{encr_out_passphrase});
+            last;
+        };
+        die "unrecognized encr_typ: $node->{encr_typ}\n";
+    }
+    if($err) {
+        unlink $decr_filename;
+        die "Unable to decrypt file $filename: $err\n";
+    }
+    # print the decrypted message
+    print $msg->headers() . "\n";
+    open INPUT, "< $decr_filename"
+        or die "Unable to open file $decr_filename: $!\n";
+    print <INPUT>;
+    close INPUT;
+    # remove temp file
+    unlink $decr_filename;
+    exit 0;
+}
+
+# delete
+if($opt_delete) {
+    die "Invalid number of parameters specified for --delete command.\n$usage"
+        unless $#ARGV == 0;
+    my ($node_id) = @ARGV;
+    $ECS_NODE_TBL->lock()     # lock node_tbl
+        or die "Error: unable to lock node_tbl: " .
+            $ECS_NODE_TBL->ERROR . "\n";
+    my $node = $ECS_NODE_TBL->read($node_id);
+    if($node) {
+        # delete node
+        $ECS_NODE_TBL->delete($node_id);
+        $err = $ECS_NODE_TBL->ERROR;
+
+        if ( $ECS_CFG->ECS_TO_DIR ) {
+           my $to_dir = catdir($ECS_CFG->ECS_TO_DIR, "to_$node_id");
+           $err .= "\nCannot remove directory $to_dir: $!\n"
+              if ! rmdir $to_dir;
+        }
+        if ( $ECS_CFG->ECS_FROM_DIR ) {
+           my $from_dir = catdir($ECS_CFG->ECS_FROM_DIR, "from_$node_id");
+           $err .= "\nCannot remove directory $from_dir: $!\n"
+              if ! rmdir $from_dir;
+        }
+    }
+    $ECS_NODE_TBL->unlock();  # unlock node_tbl
+    die "Error: $err\n"
+        if $err;
+    die "Error: node '$node_id' not found.\n"
+        if not $node;
+}
+
+# maildrop
+if($opt_maildrop)
+{
+    die "Invalid number of parameters specified for --maildrop command.\n" .
+        "$usage"
+        if ($#ARGV > 0);
+    my ($filename) = @ARGV;
+    my $msg = '';
+
+    if(defined $filename)
+    {
+        # check whether file exists
+        die "File not found: $filename\n"
+            unless -f $filename;
+    }
+
+    my $msg_text;
+    if(defined $filename)
+    {
+        # read from file
+        open INPUT, "< $filename"
+            or die "Unable to open file $filename: $!\n";
+        $msg_text = join('', <INPUT>);
+        close INPUT;
+    }
+    else
+    {
+        # read from STDIN
+        $msg_text = join('', <STDIN>);
+    }
+
+    # check existence of maildrop dir
+    my $targetdir = $ECS_CFG->ECS_DRP_DIR;
+    die "Maildrop directory not found:  $targetdir"
+        unless -d $targetdir;
+
+    # print $msg_text to newly created file in maildrop directory
+    my ($sec, $microsec) = gettimeofday;
+    my $template = format_datetime($sec, '%04d%02d%02d_%02d%02d%02d');
+    $template .= ".${microsec}_XXXX";
+    my ($fh, $tempfilename) = tempfile($template,
+                                       DIR    => $targetdir,
+                                       SUFFIX => '.fml');
+    die "Unable to open tempfile in directory $targetdir: $!"
+        unless $fh;
+    # get exclusive lock
+    # locking strategy is needed in order to avoid possibly of
+    # ecs_scan_mail daemon reading file before we're finished writing it
+    if(!flock($fh, LOCK_EX | LOCK_NB))
+    {
+        my $err = $!;
+        close $fh;
+        die "Unable to lock output file $tempfilename: $err";
+    }
+    my $err = '';
+    print $fh $msg_text
+        or $err = "Unable to write output file $tempfilename: $!";
+    flock($fh, LOCK_UN);
+    close $fh;
+    chmod $EMDIS::ECS::FILEMODE, $tempfilename;
+
+    print "Message copied to $targetdir directory.\n";
+}
+
+# meta
+if($opt_meta) {
+    die "Invalid number of parameters specified for --meta command.\n$usage"
+        unless $#ARGV >= 1;
+    my ($node_id, $msg_type, $seq1, $seq2) = @ARGV;
+    $ECS_NODE_TBL->lock()     # lock node_tbl
+        or die "Error: unable to lock node_tbl: " .
+            $ECS_NODE_TBL->ERROR . "\n";
+    my $node = $ECS_NODE_TBL->read($node_id);
+    $ECS_NODE_TBL->unlock();  # unlock node_tbl
+    die "Error: node '$node_id' not defined.\n"
+        unless $node;
+    for ($msg_type) {
+        /READY/i and do {
+            $err = send_ecsmsg_email($node_id, '',
+                "msg_type=READY\n",
+                ((exists $node->{in_seq}) &&
+                    ((!exists $node->{ready_num_disabled}) ||
+                     ($node->{ready_num_disabled} !~ /(true|yes)/i))
+                    ? "last_recv_num=" . $node->{in_seq}
+                    : "") . "\n",
+                ((exists $node->{out_seq}) &&
+                    ((!exists $node->{ready_num_disabled}) ||
+                     ($node->{ready_num_disabled} !~ /(true|yes)/i))
+                    ? "last_sent_num=" . $node->{out_seq}
+                    : "") . "\n",
+                "# Hello Partner, I am alive. " . rand() . "\n");
+            last;
+        };
+        /MSG_ACK/i and do {
+            die "Error: seq_num not defined.\n"
+                unless defined $seq1;
+            die "Error: seq_num not numeric: '$seq1'\n"
+                unless $seq1 =~ /^\d+$/;
+            if(defined $seq2)
+            {
+                die "Error: seq2 not numeric: '$seq2'\n"
+                    unless $seq2 =~ /^\d+$/;
+                die "Error: seq2 ($seq2) cannot be less than seq_num ($seq1)\n"
+                    if $seq2 < $seq1;
+            }
+            else
+            {
+                $seq2 = $seq1;
+            }
+            my $seq_num;
+            for($seq_num = $seq1; $seq_num <= $seq2; $seq_num++)
+            {
+                $err = send_ecsmsg_email($node_id, '',
+                    "msg_type=MSG_ACK\n",
+                    "seq_num=$seq_num\n",
+                    "# 10-4 " . rand() . "\n");
+                die "Error sending email message: $err\n"
+                    if $err;
+            }
+            last;
+        };
+        /RE_SEND/i and do {
+            die "Error: seq_num not defined.\n"
+                unless defined $seq1;
+            my $part_num = '';
+            if($seq1 =~ /^(\d+):(\d+)$/)
+            {
+                $seq1 = $1;
+                $part_num = $2;
+            }
+            elsif($seq1 !~ /^\d+$/)
+            {
+                die "Error: unable to parse seq_num: '$seq1'\n";
+            }
+            if(defined $seq2)
+            {
+                die "Error: seq2 not numeric: '$seq2'\n"
+                    unless $seq2 =~ /^\d+$/;
+                die "Error: seq2 ($seq2) cannot be less than seq_num ($seq1)\n"
+                    if $seq2 < $seq1;
+                die "Error: seq2 ($seq2) not expected when part_num " .
+                    "specified for seq_num ($seq1:$part_num)\n"
+                    if $part_num;
+            }
+            else
+            {
+                $seq2 = $seq1;
+            }
+            my $seq_num;
+            for($seq_num = $seq1; $seq_num <= $seq2; $seq_num++)
+            {
+                $err = send_ecsmsg_email($node_id, '', 
+                    "msg_type=RE_SEND\n",
+                    ($part_num ? "seq_num=$seq_num:$part_num\n" :
+                        "seq_num=$seq_num\n"));
+                die "Error sending email message: $err\n"
+                    if $err;
+            }
+            last;
+        };
+        die "Unrecognized msg_type: $msg_type\n";
+    }
+    die "Error sending email message: $err\n"
+        if $err;
+}
+
+# modify
+if($opt_modify) {
+    die "Invalid number of parameters specified for --modify command.\n$usage"
+        if ($#ARGV < 3) or ($#ARGV > 4);
+    my ($node_id, $addr, $addr_r, $encr_typ, $encr_sig) = @ARGV;
+    die "Error: unrecognized encr_typ: $encr_typ\n"
+        unless valid_encr_typ($encr_typ);
+    $encr_sig = $addr unless defined $encr_sig;
+    my $err = '';
+    $ECS_NODE_TBL->lock()     # lock node_tbl
+        or die "Error: unable to lock node_tbl: " .
+            $ECS_NODE_TBL->ERROR . "\n";
+    my $node = $ECS_NODE_TBL->read($node_id);
+    if($node) {
+        # modify existing node
+        $node->{addr} = $addr;
+        $node->{addr_r} = $addr_r;
+        $node->{encr_typ} = $encr_typ;
+        $node->{encr_sig} = $encr_sig;
+        $ECS_NODE_TBL->write($node_id, $node);
+        $err = $ECS_NODE_TBL->ERROR;
+    }
+    $ECS_NODE_TBL->unlock();  # unlock node_tbl
+    die "Error: $err\n"
+        if $err;
+    die "Error: node '$node_id' not found.\n"
+        if not $node;
+}
+
+# nodedata
+if($opt_nodedata) {
+    die "Invalid number of parameters specified for --nodedata command.\n$usage"
+        unless $#ARGV >= 1 and $#ARGV <= 2;
+    my ($operation, $filename, $node_selected) = @ARGV;
+    if($operation eq 'import') {
+        my $nodedata = {};
+        local $/ = undef;
+        my $fh = new IO::File;
+        die "Unable to open file: $filename"
+            unless $fh->open("< $filename");
+        my $filedata = <$fh>;
+        close $fh;
+
+        # simple sanity check before eval($filedata)
+        die "Error: unrecognized nodedata input ($filename).\n"
+            unless $filedata =~ /^\$nodedata = {/;
+        # note: potential security risk -- executing Perl code from input file
+        eval($filedata);
+
+        $ECS_NODE_TBL->lock()     # lock node_tbl
+            or die "Error: unable to lock node_tbl: " .
+                $ECS_NODE_TBL->ERROR . "\n";
+        for my $node_id (sort keys %$nodedata) {
+            next if $node_selected and not $node_selected eq $node_id;
+            print "Importing $node_id ...\n";
+            my $node = $ECS_NODE_TBL->read($node_id);
+            $node = {} if not $node;
+            my $import_node = $nodedata->{$node_id};
+            for my $property (sort keys %$import_node) {
+                if(check_prop($property)) {
+                    $node->{$property} = $import_node->{$property};
+                }
+                else {
+                    print "Unrecognized property: $property\n";
+                }
+            }
+            $ECS_NODE_TBL->write($node_id, $node);
+            if($ECS_NODE_TBL->ERROR) {
+                print "Error: " . $ECS_NODE_TBL->ERROR . "\n";
+            }
+        }
+        print "Done.\n";
+        $ECS_NODE_TBL->unlock();  # unlock node_tbl
+    }
+    elsif($operation eq 'export') {
+        $ECS_NODE_TBL->lock()     # lock node_tbl
+            or die "Error: unable to lock node_tbl: " .
+                $ECS_NODE_TBL->ERROR . "\n";
+        my $nodedata = {};
+        my @keys = $ECS_NODE_TBL->keys();
+        for my $node_id (sort @keys) {
+            next if $node_selected and not $node_selected eq $node_id;
+            $nodedata->{$node_id} = $ECS_NODE_TBL->read($node_id);
+        }
+        $ECS_NODE_TBL->unlock();  # unlock node_tbl
+
+        my $fh = new IO::File;
+        die "Unable to open file: $filename"
+            unless $fh->open("> $filename");
+        my $dumper = Data::Dumper->new([$nodedata],['nodedata']);
+        $dumper->Sortkeys(1);
+        print $fh $dumper->Dump();
+        close $fh;
+    }
+    else {
+        die "Unrecognized operation:  $operation.  Expected import or export.\n";
+    }
+}
+
+# overview
+if($opt_overview) {
+    die "Invalid number of parameters specified for --overview command.\n" .
+        $usage
+            unless $#ARGV == -1;
+    # display ECS configuration
+    $ECS_CFG->display();
+}
+
+# prune
+if($opt_prune) {
+    die "Invalid number of parameters specified for --prune command.\n$usage"
+        unless $#ARGV == 2;
+    my ($node_id, $seq1, $seq2) = @ARGV;
+    die "Error: seq1 not numeric: '$seq1'\n"
+        unless $seq1 =~ /^\d+$/;
+    die "Error: seq2 not numeric: '$seq2'\n"
+        unless $seq2 =~ /^\d+$/;
+    die "Error: seq2 ($seq2) cannot be less than seq_num ($seq1)\n"
+        if $seq2 < $seq1;
+
+    # get list of files in "store" directory
+    if(not opendir(STORE, $ECS_CFG->ECS_MBX_STORE_DIR))
+    {
+        die "Unable to open \"store\" directory: " .
+            $ECS_CFG->ECS_MBX_STORE_DIR;
+    }
+    my $file;
+    my @filelist = ();
+    while(defined($file = readdir(STORE)))
+    {
+        push(@filelist, $file);
+    }
+    closedir(STORE);
+
+    # move any files in specified node:seq_num range to trash subdirectory
+    my $examined_cnt = 0;
+    my $moved_cnt = 0;
+    my $trashdir = catdir($ECS_CFG->ECS_MBX_STORE_DIR, 'trash');
+    mkdir $trashdir unless -e $trashdir;
+    for $file (@filelist)
+    {
+        next if($file eq '.') or ($file eq '..');
+        my $filename = catfile($ECS_CFG->ECS_MBX_STORE_DIR, $file);
+        next unless -f $filename;
+        # extract ECS $msg_node_id and $msg_seq_num from each file
+        my ($msg_node_id, $msg_seq_num) = read_ecs_message_id($filename);
+        $examined_cnt++;
+        if(($node_id eq $msg_node_id) and ($seq1 <= $msg_seq_num) and
+            ($msg_seq_num <= $seq2))
+        {
+            # move (copy & delete) file to trash subdirectory
+            my $err = move_to_dir($filename, $trashdir);
+            if($err)
+            {
+                warn "Unable to move file $filename to trash: $err";
+            }
+            else
+            {
+                $moved_cnt++;
+            }
+        }
+    }
+    print "\nExamined $examined_cnt file" . ($examined_cnt == 1 ? "" : "s") .
+        ".  Moved $moved_cnt file" . ($moved_cnt == 1 ? "" : "s") .
+        " to trash.\n";
+}
+
+# send
+if($opt_send)
+{
+    die "Invalid number of parameters specified for --send command.\n$usage"
+        if ($#ARGV > 1);
+    my $rcv_node_id = '';
+    my $filename = '';
+    my $msg = '';
+
+    # process command line arguments
+    if($#ARGV == 1)
+    {
+        $rcv_node_id = $ARGV[0];
+        $filename = $ARGV[1];
+    }
+    elsif($#ARGV == 0)
+    {
+        my $node = '';
+        if($ARGV[0] ne '-')
+        {
+            $ECS_NODE_TBL->lock()     # lock node_tbl
+                or die "Error: unable to lock node_tbl: " .
+                    $ECS_NODE_TBL->ERROR . "\n";
+            $node = $ECS_NODE_TBL->read($ARGV[0]);
+            $ECS_NODE_TBL->unlock();  # unlock node_tbl
+        }
+        if($node)
+        {
+            # node exists -- interpret arg as rcv_node_id
+            $rcv_node_id = $ARGV[0];
+        }
+        else
+        {
+            # no such node -- interpret arg as filename
+            $filename = $ARGV[0];
+        }
+    }
+    $filename = '' if $filename eq '-';
+
+    if($filename)
+    {
+        # check whether file exists
+        die "File not found: $filename\n"
+            unless -f $filename;
+    }
+
+    # attempt to construct file backed message object from input data
+    $msg = new EMDIS::ECS::FileBackedMessage($filename);
+    die "Unable to construct FileBackedMessage object for file $filename: " .
+        "$msg\n"
+        unless ref $msg;
+
+    my $re_send = 0;
+    $re_send = 1 if $msg->{seq_num};
+    $err = $msg->send_via_email($rcv_node_id, $re_send);
+    die "Unable to send message: $err\n"
+        if $err;
+
+    print "Message sent.\n";
+}
+
+# tweak
+if($opt_tweak) {
+    die "Invalid number of parameters specified for --tweak command.\n$usage"
+        unless $#ARGV == 2;
+    my ($node_id, $property, $value) = @ARGV;
+    die "Error: unrecognized property: $property\n"
+          unless check_prop( $property );
+    my $err = '';
+    $ECS_NODE_TBL->lock()     # lock node_tbl
+        or die "Error: unable to lock node_tbl: " .
+            $ECS_NODE_TBL->ERROR . "\n";
+    my $node = $ECS_NODE_TBL->read($node_id);
+    if($node) {
+        # modify existing node
+        $node->{$property} = $value;
+        $ECS_NODE_TBL->write($node_id, $node);
+        $err = $ECS_NODE_TBL->ERROR;
+    }
+    $ECS_NODE_TBL->unlock();  # unlock node_tbl
+    die "Error: $err\n"
+        if $err;
+    die "Error: node '$node_id' not found.\n"
+        if not $node;
+    print "\n>>> Warning:  be very careful when using the --tweak " .
+        "command!! <<<\n";
+    $opt_view = 1;
+    @ARGV = ($node_id);
+}
+
+# getNodeInfo
+if( $opt_get ) {
+   die "Invalid number of parameters specified for --get command.\n$usage"
+      if @ARGV > 2 || @ARGV < 1;
+ 
+   $ECS_NODE_TBL->lock()     # lock node_tbl
+      or die "Error: unable to lock node_tbl: " .
+         $ECS_NODE_TBL->ERROR . "\n";
+
+   my ($prop, $nodeID);   
+   if ( @ARGV == 2 ) {
+      $prop = shift;
+      $nodeID = shift;
+   }
+   elsif ( @ARGV == 1 ) {
+      $prop = shift;
+   }
+   else {
+      die "Error: you must name a property";
+   }
+   
+   my @keys;
+   
+   die "Error: unrecognized property: $prop\n"
+      unless check_prop( $prop );
+   
+   if ( ! $nodeID ) {
+      @keys = sort $ECS_NODE_TBL->keys();
+   }
+   else {
+      @keys = $nodeID;
+   }
+   
+   foreach my $node_id (@keys) {
+      my $node = $ECS_NODE_TBL->read($node_id);
+      if ( $node_id eq $ECS_CFG->THIS_NODE ) {
+         next;
+      }
+      if(not $node) {
+         print "Unable to retrieve data for node: $node_id\n";
+      }
+      elsif ($prop =~ /^(last_in|last_out|last_in_adm|q_gap_time)$/) {
+         print $node_id . " : " . format_datetime($node->{$prop}) . "\n";
+      }
+      else {
+         print $node_id . " : " . $node->{$prop}."\n";
+      }
+   }
+   $ECS_NODE_TBL->unlock();  # unlock node_tbl
+   exit 0;
+}
+
+# export node_tbl 
+if($opt_export) {
+   die "Invalid number of parameters specified for --export command.\n$usage"
+      if @ARGV < 1 || @ARGV > 2;
+   
+   $ECS_NODE_TBL->lock()     # lock node_tbl
+      or die "Error: unable to lock node_tbl: " .
+         $ECS_NODE_TBL->ERROR . "\n";
+   my $filename  = shift;
+   my $delimiter = ( @ARGV ) ?  shift : "|";
+   my @keys = sort $ECS_NODE_TBL->keys();
+   my $fh = new IO::File;
+   die "unable to open file: $filename"
+      unless $fh->open("> $filename");
+   
+   my $file_body = "";
+   
+   foreach my $node_id (@keys) {
+      my $node = $ECS_NODE_TBL->read($node_id);
+      if( ! $node ) {
+         print "Unable to retrieve data for node: $node_id\n";
+      }
+      else {
+         foreach my $fld (sort keys %$node) {
+            if($fld =~ /^(last_in|last_out|last_in_adm|q_gap_time)$/) {
+               # display timestamp value
+               $file_body .= "" . format_datetime($node->{$fld}) 
+                             . $delimiter;
+            }
+            else {
+               $file_body .= "" . $node->{$fld} . $delimiter;
+            }
+         }
+         $file_body .= "\n";
+      }
+   }
+   $fh->print($file_body);
+   $fh->close();
+   $ECS_NODE_TBL->unlock();  # unlock node_tbl
+   exit 0;
+}
+
+# view
+if($opt_view) {
+    die "Invalid number of parameters specified for --view command.\n$usage"
+        if $#ARGV > 0;
+    # display configuration data for each remote node
+    print "\nECS_NODE_TBL\n";
+    print "----------------------------------------------------------------\n";
+    $ECS_NODE_TBL->lock()     # lock node_tbl
+        or die "Error: unable to lock node_tbl: " .
+            $ECS_NODE_TBL->ERROR . "\n";
+    my @keys;
+    if(@ARGV)
+    {
+        @keys = @ARGV;
+    }
+    else
+    {
+        @keys = sort $ECS_NODE_TBL->keys();
+    }
+    for my $node_id (@keys) {
+        my $node = $ECS_NODE_TBL->read($node_id);
+        if(not $node) {
+            print "Unable to retrieve data for node: $node_id\n";
+        }
+        else {
+            print "Node: $node_id\n";
+            for my $fld (sort keys %$node) {
+                if($fld =~ /^(last_in|last_out|last_in_adm|q_gap_time)$/) {
+                    # display timestamp value
+                    printf "  %-24s %-12s (%s)\n", $fld, $node->{$fld},
+                  format_datetime($node->{$fld});
+                }
+                else {
+                    # display data value only
+                    printf "  %-20s %s\n", $fld, $node->{$fld};
+                }
+            }
+        }
+    }
+    $ECS_NODE_TBL->unlock();  # unlock node_tbl
+}
+
+exit 0;
+
+# ----------------------------------------------------------------------
+# Check for correct properties
+# Returns true or false
+sub check_prop{
+   my $prop = shift;
+   return ($prop =~ /^(ack_seq|addr|addr_r|contact|encr_meta|
+                       encr_out_keyid|encr_out_passphrase|encr_sig|
+                       encr_typ|in_seq|in_seq_ack|last_in|last_in_adm|
+                       last_out|msg_part_size|node|node_disabled|out_seq|
+                       proc_node|proc_seq|proc_file|
+                       q_first_file|q_gap_seq|q_gap_time|q_max_seq|
+                       q_min_seq|q_size)$/x);
+}
+
+
+__END__
+
+# embedded POD documentation
+
+=head1 NAME
+
+ecstool - ECS administrative utility
+
+=head1 SYNOPSIS
+
+ ecstool --config ecs.cfg
+
+ ecstool --add FR emdis@emdisf.fgm.fr 0xA772E879 PGP2
+
+ ecstool --archive 32
+
+ ecstool --decrypt mboxes/in/20030320_183247_1_0005_FYUh.msg
+
+ ecstool --export file.txt "|"
+
+ ecstool --get ES addr
+
+ ecstool --maildrop pat_upd.fml
+
+ ecstool --meta FR RE_SEND 12345
+
+ ecstool --modify FR emdis@emdis.fgm.fr 0xA772E879 PGP2
+
+ ecstool --overview
+
+ ecstool --prune ES 106732 248443
+
+ ecstool --send FR pat_upd.fml
+
+ ecstool --tweak FR addr emdis@emdisf.fgm.fr
+
+ ecstool --view
+
+=head1 DESCRIPTION
+
+This program performs a variety of ECS administrative functions.
+
+=head1 OPTIONS
+
+=over 4
+
+=item --config I<ecs_config_file>
+
+Specify the location of the ECS configuration file.  By default, the program
+looks for the file specified by the ECS_CONFIG_FILE environment variable;
+if that environment variable is not set, it looks for a file named "ecs.cfg"
+in the current directory.
+
+=item --add I<node> I<addr> I<addr_r> I<encr_typ> [I<encr_sig>]
+
+Add new ECS node to node_tbl.  I<addr> is the node's email address,
+I<addr_r> identifies the node's PGP key (e.g. 0x44DEF332), I<encr_typ>
+identifies the node's encryption type (e.g. PGP2, PGP2-verify, OpenPGP,
+or OpenPGP-verify), and I<encr_sig> is the email address listed in the
+node's PGP or GnuPG key, if different from I<addr>.
+
+=item --archive [I<delete_threshold>]
+
+Create a tar archive of the current ECS status.  Also, rotate the
+ecs_chk_com.log and ecs_scan_mail.log log files.  If I<delete_threshold>
+is specified, delete files greater than this number of days old before
+creating the archive.
+
+=item --decrypt I<filename>
+
+Decrypt a message file.
+
+=item --delete I<node>
+
+Delete ECS node from node_tbl.
+
+=item --export <filename> [delimiter]
+
+Exports the node_tbl to a <delimiter>separated (default "|") list.
+Hint for Unixshells: Wrap special characters like |, &, * in quotes, e.g. "|".
+
+=item --get
+
+View value of node properties in node_tbl for all nodes (default).  
+If I<node> specified, view information for that node only.
+
+=item --help
+
+Display short summary of usage information.
+
+=item --maildrop [I<filename>]
+
+Send regular FML message.  Reads from standard input if filename not
+specified.  Instead of immediately sending the message, this command
+copies the message to the maildrop directory, for later processing by
+the ecs_scan_mail daemon (see also: --send).
+
+=item --meta I<node> I<msg_type> [I<seq_num> [I<seq2>]]
+
+Send meta-message to node.  I<msg_type> can be MSG_ACK, RE_SEND, or READY.
+If I<seq2> is specified for I<msg_type> of MSG_ACK or RE_SEND, multiple
+meta-messages are sent, covering the range I<seq_num> through I<seq2>
+(inclusive).
+
+=item --modify I<node> I<addr> I<addr_r> I<encr_typ> [I<encr_sig>]
+
+Modify existing ECS node in node_tbl.
+
+=item --nodedata I<import|export> I<filename> [I<node>]
+
+Import or export node_tbl data, using Data::Dumper format.
+
+=item --overview
+
+Print full overview of ECS configuration.
+
+=item --prune I<node> I<seq1> I<seq2>
+
+Prune input queue.  Examine files in mboxes/store directory and move all
+messages for specified I<node>, with sequence number between I<seq1> and
+I<seq2> (inclusive), to trash subdirectory.
+
+=item --send [I<node>] [I<filename>]
+
+Send regular FML message.  Reads from standard input if filename not
+specified.  If only one parameter specified, it is interpreted as
+a filename unless it happens to be a valid node id, in which case the
+parameter is treated as a node id and ecstool reads input from
+standard input.  This command sends the message immediately
+(see also:  --maildrop).
+
+=item --tweak I<node> I<property> I<value>
+
+Tweak existing node in node_tbl.  Use with caution.
+
+=item --view [I<node>]
+
+View information in node_tbl (default).  If I<node> specified, view
+information for that node only.
+
+=back
+
+=head1 EXAMPLES
+
+=head2 Outgoing Message Processor
+
+Using ecstool, an email account with procmail capability can be used as
+a processor for outgoing ECS messages.
+
+This setup makes it possible
+for programs to send ECS messages without needing to directly interact with
+the ECS command line programs.  Valid FML received by the email account can
+be sent out through ECS, and the ECS administrator is notified of any
+problems.
+
+See below for example F<.forward> and F<.procmailrc> files.
+
+=over 4
+
+=item B<Example .forward File>
+
+ "|IFS=' ' && p=/usr/local/bin/procmail && test -f $p
+   && exec $p -Yf- || exit 75 #ecsagent"
+
+=item B<Example .procmailrc File>
+
+ PATH=/bin:/usr/bin:/usr/local/bin
+ MAILDIR=$HOME/Mail
+ DEFAULT=$MAILDIR/mbox
+ LOGFILE=$MAILDIR/procmail.log
+ PERL5LIB=/home/emdis/ecs/lib
+ ECSADMIN=ecsadmin@transfuse.com.tm
+ ECSOUT=ecsout@transfuse.com.tm
+
+ # archive a copy of each incoming message
+ :0 c
+ archive/.
+
+ # detect mail loop (check for "X-Loop: $ECSOUT")
+ :0
+ * ^X-Loop: ecsout@transfuse.com.tm
+ /dev/null
+
+ # bounce "EMDIS Processing Error" directly to EMDIS admin
+ :0
+ * ^Subject:.*EMDIS Processing Error
+ | /usr/local/bin/formail -A "X-Loop: $ECSOUT" \
+   -I "Reply-To: $ECSADMIN" | \
+   $SENDMAIL $SENDMAILFLAGS $ECSADMIN
+
+ # attempt to send FML message, check ecstool exit code
+ :0 bw
+ | /home/emdis/ecs/script/ecstool \
+   --config /home/emdis/ecs/ecs.cfg --maildrop
+
+   # if above send command failed, notify EMDIS admin
+   :0 e
+   | /usr/local/bin/formail -A "X-Loop: $ECSOUT" \
+     -I "Reply-To: $ECSADMIN" \
+     -i 'Subject: EMDIS Send Error - see procmail.log' | \
+     $SENDMAIL $SENDMAILFLAGS $ECSADMIN
+
+=back
+
+=head1 RETURN VALUE
+
+Returns a non-zero exit code if an error is encountered.
+
+=head1 BUGS
+
+Possibly.
+
+=head1 NOTES
+
+TBD.
+
+=head1 SEE ALSO
+
+EMDIS::ECS, ecs_chk_com, ecs_scan_mail, ecs_setup
+
+=head1 AUTHOR
+
+Joel Schneider <jschneid@nmdp.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED 
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF 
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+Copyright (C) 2002-2016 National Marrow Donor Program. All rights reserved.
+
+See LICENSE file for license details.
+
+=head1 HISTORY
+
+ECS, the EMDIS Communication System, was originally designed and
+implemented by the ZKRD (http://www.zkrd.de/).  This Perl implementation
+of ECS was developed by the National Marrow Donor Program
+(http://www.marrow.org/).
+
+2004-03-12	
+Canadian Blood Services - Tony Wai
+Added MS Windows support for Windows 2000 and Windows XP
+Added "DIRECTORY" inBox Protocol. This can interface with any mail
+system that can output the new messages to text files.
+
+2007-08-01
+ZKRD - emdisadm@zkrd.de
+Added new environment variable ECS_CONFIG_FILE -> ecs.cfg.
+Added a export function to write the node_tbl delimiter separated 
+(default '|') to a textfile.
+Added a get function which returns a single value from a node | all nodes.
+Added optional to_XX and from_XX directory support.
+Added a property check to the --tweak function.

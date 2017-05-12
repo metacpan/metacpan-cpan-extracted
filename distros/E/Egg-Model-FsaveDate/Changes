@@ -1,0 +1,8 @@
+Revision history for Perl extension .
+
+0.02  2008/04/17
+	- Build.PL is abolished.
+
+0.01  Wed Feb 27 01:47:58 2008
+	- original version; created by Egg::Helper::Build::Module v3.00
+	   with module name Egg::Model::FsaveDate

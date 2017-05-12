@@ -1,0 +1,31 @@
+Revision history for Email-Date
+
+1.104     2013-08-02 18:00:42 America/New_York
+        point to new repo, new bug tracker, suggest users just use other
+        libraries when possible
+
+1.103   2007-11-30
+        generation of dates now done by Email::Date::Format
+
+1.102   2007-03-22
+        remove uneeded dep on Email::Simple
+        packaging improvements
+
+1.101   2006-08-01
+        fix a bug in testing; tests would only pass in second 2/3 of month
+        (thanks Danial Pearce)
+
+1.10    2006-07-21
+        add format_gmdate
+        if no date was found, return undef, not the current time
+        tests
+        list Email::Abstract as a prereq
+
+1.03    2004-09-23
+        Email::Abstract is not required, and is only loaded when needed.
+
+1.02    2004-07-25
+        s/gmtime/localtime/
+
+1.01    2004-07-17
+        Initial Revision.

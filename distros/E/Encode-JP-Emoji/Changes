@@ -1,0 +1,37 @@
+---
+
+Encode-JP-Emoji-0.60 (2010-10-24):
+  - News! Unicode 6.0 standard emoji supported.
+  - http://unicode.org/Public/UNIDATA/EmojiSources.txt
+  - Regexp property \p{InEmojiMixed} added in Propery.pm
+  - Note: a couple of Unicode 6.0 Standard emojis, U+1F532 and U+1F535, cannot make round-trip through x-utf8-e4u-unicode as Google maps them on the same code point U+FEB64.
+
+Encode-JP-Emoji-0.06 (2009-11-24):
+  - Encode.pm 2.38 does NOT "Use of uninitialized value in subroutine entry"
+  - Patched: #51204: Callback CHECK not supported for UTF-8 decoder/encoder
+
+Encode-JP-Emoji-0.05 (2009-07-06):
+  - Mapping.pm missing some character names added.
+  - Mapping.pm unused properties removed. Ex. \p{InEmojiDocomoCP932}.
+  - FB_EMOJI_TEXT.pm more safe.
+
+Encode-JP-Emoji-0.04 (2009-07-05):
+  - encoding lineup revised.
+  - x-utf8-e4u-mixed encoding added.
+  - x-*-*-kddi encoding renamed to x-*-*-kddiapp.
+  - x-*-*-kddiweb encoding added for undocumented version of KDDI's private code points.
+  - x-*-*-softbank encoding removed. use x-*-*-softbank3g instead.
+  - x-utf8-emoji-softbank2g-pp encoding added.
+  - x-*-*-softbank2g decoding bug fixed.
+  - FB_EMOJI_TEXT fallback function unified.
+  - FB_EMOJI_GMAIL fallback function split.
+  - all tests pass on Perl 5.8.8 + Encode 2.12 with t/EncodeUpdate.pm
+
+Encode-JP-Emoji-0.02 (2009-07-01):
+  - Some pods and tests added
+  - Japanese documents on Google Code.
+    http://groups.google.com/group/emoji4unicode-ll/web
+
+Encode-JP-Emoji-0.01 (2009-06-30):
+  - first release
+  - http://emoji4unicode-ll.googlecode.com/svn/trunk/lang/perl/Encode-JP-Emoji/trunk/

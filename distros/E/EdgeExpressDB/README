@@ -1,0 +1,110 @@
+README for EdgeExpressDB (eeDB) system
+
+EdgeExpressDB is a system for working with "systems biology" data.
+It is a federated database, webservice and AJAX client system
+with easy instance creation, many pre-made loader scripts
+and a standard set of webservices.  In addition the FANTOM4
+EdgeExpressDB website code is provided to be used as is or
+to give inspiration for new website creation.
+In order to main inter-operability, the webservices should
+not be altered, but new web-service engines can be made.
+In addition the system provides some levels of 
+data-processing capabilities through the EEDB::Tools.
+
+This initial release is not as well documented as hoped, 
+but the system is easy to install and use so I hope what
+we do provide will be OK for "early adopters".
+Future releases will include better documentation in
+addition to new features and services.
+
+Please also see our paper in GenomeBiology and please
+reference it if you use the EdgeExpressDB system for your research.
+
+FANTOM4 EdgeExpressDB: an integrated database of promoters, genes, microRNAs,
+expression dynamics and regulatory interactions.
+Genome Biol. 2009 Apr 19;10(4):R39. 
+Severin J, Waterhouse AM, Kawaji H, Lassmann T, van Nimwegen E, Balwierz PJ, de
+Hoon MJ, Hume DA, Carninci P, Hayashizaki Y, Suzuki H, Daub CO, Forrest AR.
+PMID: 19374773 [PubMed - as supplied by publisher]
+
+
+Refer to the pod for full documentation and an example script, 
+or to the following mirrors:
+
+1/ http://search.cpan.org/perldoc?EEDB
+2/ http://search.cpan.org/~jms
+
+copyright (c) 2006-2009 Jessica Severin
+
+CONTACT POINT
+-------------
+
+jessica.severin@gmail.com <Jessica Severin>
+http://search.cpan.org/~jms
+
+LICENSE
+-------
+
+* Software License Agreement (BSD License)
+* EdgeExpressDB [eeDB] system
+* copyright (c) 2006-2009 Jessica Severin
+* All rights reserved.
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions are met:
+*     * Redistributions of source code must retain the above copyright
+*       notice, this list of conditions and the following disclaimer.
+*     * Redistributions in binary form must reproduce the above copyright
+*       notice, this list of conditions and the following disclaimer in the
+*       documentation and/or other materials provided with the distribution.
+*     * Neither the name of Jessica Severin nor the
+*       names of its contributors may be used to endorse or promote products
+*       derived from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ''AS IS'' AND ANY
+* EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+* WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+* DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDERS BE LIABLE FOR ANY
+* DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+* ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+* SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+OVERVIEW
+--------
+MQdb.pm is a base toolkit for working with relational databases in the context
+of a federation of object databases. It provides some base federation support
+and a variation on other Object-relational-mapped template systems.
+
+VERSION
+-------
+0.953 Monday May 18, 2009
+
+DOCUMENTATION
+-------------
+The following documentation is available:
+USER_INSTALL
+and pod in perldoc format (type perldoc EEDB::... on command line)
+
+INSTALLATION INSTRUCTIONS
+-------------------------
+please see the USER_INSTALL document since this system is more than
+just perl modules.  There are scripts, schemas, and webservices
+that also need to be installed.
+
+the script install.sh and eedb_create_instance.pl will do most of the work
+
+
+KNOWN BUGS & ISSUES
+-------------------
+none at this time.
+
+COMMENTS/FEEDBACK
+-----------------
+Please email your feedback, comments, questions to the email address at the top
+of this document. I will do my best to answer promptly. 
+
+Jessica Severin <jessica.severin@gmail.com>
+

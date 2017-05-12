@@ -1,0 +1,69 @@
+------------------------------------------------------------------------
+0.06 | Piotr Roszatycki <dexter@cpan.org> | 2009-04-02
+
+New:
+
+* use Exception::Died ':debug' sets %SIG hook and verbosity level to 4. 
+
+Changes:
+
+* POD is mixed with the rest of code.
+
+------------------------------------------------------------------------
+0.05 | Piotr Roszatycki <dexter@debian.org> | 2009-01-01
+
+Changes:
+
+* Handles Carp output correctly.
+* Method "_collect_system_data" recovers attribute "eval_error" from variable
+  "$@" if it is an Exception::Died object.
+* Attribute "eval_error" is undefined if eval error was an empty string.
+* Requires constant::boolean.
+* Build requires Test::Assert and parent.
+
+------------------------------------------------------------------------
+0.04 | Piotr Roszatycki <dexter@debian.org> | 2008-12-05
+
+Changes:
+
+* Requires Exception::Base >= 0.20.
+
+------------------------------------------------------------------------
+0.03 | Piotr Roszatycki <dexter@debian.org> | 2008-10-13
+
+Changes:
+
+* Do not recurse on Exception::Died and Exception::Warning.
+
+* Adaptated to new Exception::Base.
+
+* Renamed "eval_thrown" attribute to "sig_die_handled".
+
+* Requires Exception::Base >= 0.19.
+
+------------------------------------------------------------------------
+0.0201 | Piotr Roszatycki <dexter@debian.org> | 2008-05-29
+
+Changes:
+
+* Fixed POD coverage.
+
+------------------------------------------------------------------------
+0.02 | Piotr Roszatycki <dexter@debian.org> | 2008-05-28
+
+* New overwritten method "catch".  It rebless the exception object if it is
+  thrown with __DIE__ hook.
+* Optional syntax: use Exception::Base '%SIG' => 'die';
+* New attribute "eval_thrown".
+
+------------------------------------------------------------------------
+0.0101 | Piotr Roszatycki <dexter@debian.org> | 2008-05-09
+
+* Build requires Test::Unit::Lite >= 0.07.
+
+------------------------------------------------------------------------
+0.01 | Piotr Roszatycki <dexter@debian.org> | 2008-05-08
+
+* Development release.
+
+------------------------------------------------------------------------

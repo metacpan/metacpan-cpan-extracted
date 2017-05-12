@@ -1,0 +1,67 @@
+#!/usr/local/bin/perl
+# This is analogous to the ksh 'whence' builtin, except that its
+# arguments are treated as patterns. Thus "Whence foo*" will print
+# the paths of all programs whose names match foo*.
+
+use Env::Path qw(:all);
+use constant MSWIN => $^O =~ /MSWin32|Windows_NT/i ? 1 : 0;
+use Getopt::Long;
+
+my %opt;
+GetOptions(\%opt, qw(first_only help));
+
+exit(system("perldoc $0") >> 8) if $opt{help};
+
+# In Windows, the cwd is always implicitly at the front of PATH.
+if (MSWIN) {
+    require Cwd;
+    (my $cwd = Cwd::getcwd()) =~ s%/%\\%g;
+    PATH->Remove($cwd);
+    PATH->Prepend($cwd);
+}
+
+for my $name (@ARGV) {
+    $name .= '.*' if MSWIN && $name !~ /(?:\.\w+|\*)$/;
+    for (PATH->Whence($name)) {
+	print "$_\n";
+	last if $opt{first_only};
+    }
+}
+
+__END__
+
+=head1 NAME
+
+Whence - Perl implementation/extension of ksh 'whence' builtin
+
+=head1 SYNOPSIS
+
+    Whence foo
+    Whence '?sh'
+    Whence '*stat'
+    Whence -f foo\*
+
+=head1 DESCRIPTION
+
+This is a Perl implementation of the I<ksh> B<whence> builtin, similar
+to I<csh> B<which> or I<bash> B<type -p>. It differs from these in two
+ways:  (1) it finds all occurrences of its arguments on PATH rather
+than just the first and (2) it treats its arguments as patterns, such
+that C<Whence cat*> will return all commands that I<start> with C<cat>
+rather than looking for a literal 'cat*'.
+
+=head1 AUTHOR
+
+David Boyce <dsbperl AT boyski.com>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2000-2002 David Boyce. All rights reserved.  This Perl
+program is free software; you may redistribute and/or modify it under
+the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+perl(1), ksh(1), "perldoc Env::Path"
+
+=cut

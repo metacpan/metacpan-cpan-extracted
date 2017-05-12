@@ -1,0 +1,82 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with EntityModel::StorageClass::KVStore::Layer::Memcached
+at lib/EntityModel/StorageClass/KVStore/Layer/Memcached.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head2 has_pending
+
+Returns true if there are pending tasks in the queue.
+
+=head2 run_pending
+
+Processes any tasks pending in the queue.
+
+=head2 is_connected
+
+Returns true if we have established a connection.
+
+=head2 queue_task
+
+Queues a task for processing when we get around to connecting
+later.
+
+Takes the following parameters:
+
+=over 4
+
+=item * $method - should be 'store' or 'retrieve'
+
+=item * @args - any parameters, will be passed verbatim when we get around to
+calling the method.
+
+=back
+
+Returns $self.
+
+=head2 store
+
+Store a value in the cache.
+
+Takes the following parameters:
+
+=over 4
+
+=item * $query - query to store under
+
+=item * $value - value to store in key (can be undef)
+
+=back
+
+Returns $self.
+
+=head2 cleanup
+
+Takes the following parameters:
+
+=over 4
+
+=item *
+
+=back
+
+Returns
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<EntityModel::StorageClass::KVStore::Layer>
+
+L<key_mangle|EntityModel::StorageClass::KVStore::Layer/key_mangle>, L<lookup|EntityModel::StorageClass::KVStore::Layer/lookup>, L<retrieval_fallback|EntityModel::StorageClass::KVStore::Layer/retrieval_fallback>, L<underlayer|EntityModel::StorageClass::KVStore::Layer/underlayer>
+
+=item L<EntityModel::StorageClass::KVStore::Mixin::Deferred>
+
+L<connection_complete|EntityModel::StorageClass::KVStore::Mixin::Deferred/connection_complete>
+
+=back
+

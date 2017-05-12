@@ -1,0 +1,23 @@
+---
+name: Encode-Detect
+version: 1.01
+author:
+  - 'John Gardiner Myers <jgmyers@proofpoint.com>'
+abstract: An Encode::Encoding subclass that detects the encoding of data
+license: mozilla
+resources:
+  license: http://opensource.org/licenses/mozilla1.1.php
+requires:
+  ExtUtils::CBuilder: 0
+  Module::Build: 0
+provides:
+  Encode::Detect:
+    file: Detect.pm
+    version: 1.01
+  Encode::Detect::Detector:
+    file: Detector.pm
+    version: 1.01
+generated_by: Module::Build version 0.2801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,17 @@
+Changes
+=======
+
+0.00005 2014-02-25T21:29:16Z
+  - Remove use of bare for qw()
+
+0.00004 - Thu 29 Nov 2007
+  - Allow observers to specify the name of the method to use when notified.
+
+0.00003 - Wed 14 Nov 2007
+  - Allow observer to be a subroutine reference
+
+0.00002 - Wed 14 Nov 2007
+  - Properly use Carp
+
+0.00001 - Tue 13 Nov 2007
+  - Initial release

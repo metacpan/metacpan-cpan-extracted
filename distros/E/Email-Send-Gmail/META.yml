@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name:                Email-Send-Gmail
+version:             0.33
+abstract:            Send Messages using Gmail
+license:             perl
+author:              
+    - Leon Brocard <acme@astray.com>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Authen::SASL:                  0
+    Email::Address:                0
+    Email::Send:                   0
+    Net::SMTP::SSL:                0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

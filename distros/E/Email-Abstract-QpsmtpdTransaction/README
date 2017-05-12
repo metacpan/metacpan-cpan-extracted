@@ -1,0 +1,27 @@
+This is Perl module Email::Abstract::QpsmtpdTransaction.
+
+INSTALLATION
+
+Email::Abstract::QpsmtpdTransaction installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan Email::Abstract::QpsmtpdTransaction
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+DOCUMENTATION
+
+Email::Abstract::QpsmtpdTransaction documentation is available as in POD. So you can do:
+
+    % perldoc Email::Abstract::QpsmtpdTransaction
+
+to read the documentation online with your favorite pager.
+
+Naoki Tomita

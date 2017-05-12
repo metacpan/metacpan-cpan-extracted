@@ -1,0 +1,47 @@
+{
+   "abstract" : "Lightweight exceptions",
+   "author" : [
+      "Piotr Roszatycki <dexter@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Exception-Base",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Unit::Lite" : "0.12"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Exception::Base" : {
+         "file" : "lib/Exception/Base.pm",
+         "version" : "0.2501"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/dex4er/perl-Exception-Base/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/dex4er/perl-Exception-Base"
+      }
+   },
+   "version" : "0.2501"
+}

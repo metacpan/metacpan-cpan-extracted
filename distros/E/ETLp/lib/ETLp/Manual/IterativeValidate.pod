@@ -1,0 +1,54 @@
+package ETLp::Manual::IterativeValidate;
+
+# ABSTRACT: Manual for Itervative Validate Items
+
+__END__
+
+=pod
+
+=head1 FILE VALIDATION
+
+The validate plugin provides functionality to validate files against the definition in the control file. It relies on a L<control file|ETLp::Manual::ControlFiles> to define the data file validation rules. The following parameters must be set in the config section:
+
+=over 4 
+
+=item * B<controlfile_dir>. The directory that contains the control file.
+
+=item * B<control_file>. The name of the [wiki:ControlFiles control file]
+
+=back
+
+The item parameters are:
+
+=over 4
+
+=item * B<name>. The name of this item.
+
+=item * B<ignore_field_count>. whether to continue if the number fields in the file don't match the number of fields in the control file.
+
+=item * B<skip>. The number of rows to skip in the file before loading begins. This allows header records to be ignored.
+
+=item * B<localize>. A boolean setting that instructs the loader to localize the end-of-line markers for the current file system.
+
+=item * B<file_type>. At present, the only type supported is ''csv''.
+
+=item * B<csv_options>. A section containing additional options for processing. See L<http://search.cpan.org/dist/Text-CSV/lib/Text/CSV.pm#new_%28\%attr%29>.
+
+=item * B<email_alerts>. A comma-delimited list of addresses to receive validation error emails. These will typically be interested users or the suppliers of the files. The ETLp admin address will receive the validation errors regardless.
+
+=item * B<on_error>. Override the setting for the job. 
+
+=back
+
+=head2 Example
+
+    <item>
+        name        = validate customer file
+        type        = validate
+        file_type   = csv
+        skip        = 1
+        <csv_options>
+            allow_whitespace = 1
+            sep_char         = |
+        </csv_options>
+    </item>

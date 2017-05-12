@@ -1,0 +1,29 @@
+==================================================
+Changes from 2015-06-18 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.001 at 2016-06-17 16:06:02 +0000
+------------------------------------------
+
+  Change: 05e7fcc37619b5a824d6c950ac5afc7df204acfc
+  Author: Katseres <tedkat@gmail.com>
+  Date : 2016-06-17 10:38:05 +0000
+
+    removed dist generated files 
+
+  Change: ef4548720b12da75b68d8d09a81eef7f7a43953d
+  Author: Katseres <tedkat@gmail.com>
+  Date : 2016-06-17 10:31:08 +0000
+
+    removed non-tap script 
+
+  Change: 5d4c0a2c86c7713f48c8362b8f6aa0385a597ae9
+  Author: Katseres <tedkat@gmail.com>
+  Date : 2016-06-17 10:30:06 +0000
+
+    Initial code commit 
+
+================
+End of releases.
+================

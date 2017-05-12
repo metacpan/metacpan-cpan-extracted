@@ -1,0 +1,14 @@
+
+.tableBorder {border: 1px solid #aaa;}
+
+tr.odd {background-color: #e0e0f5; font-family:arial; font-size:10px;}
+
+tr.even {background-color: #f5f5f5; font-family:arial; font-size:10px;}
+
+th.listView {vertical-align:bottom; background-color:#c1c1c1; text-align:left;
+			font-family:arial; font-size:10px; padding:4px 6px 4px 6px;}
+
+td.listCell {vertical-align:top; font-size:10px; padding:4px 6px 4px 6px;}
+
+table.listViewTable {width:100%;}
+

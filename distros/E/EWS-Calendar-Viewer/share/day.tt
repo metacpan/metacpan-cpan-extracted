@@ -1,0 +1,65 @@
+<table class="day">
+<tr><th colspan="3" [% IF (retrieved.year == now.year) AND (retrieved.month == now.month) AND (retrieved.day == day) %] class="today"[% END %]>[% day %]</th></tr>
+
+[% FOREACH item IN entries -%]
+[% NEXT IF item.IsCancelled OR item.IsDraft -%]
+[% NEXT IF privacy_level == 'public' AND item.Status == 'Free' %]
+
+[%# there should be a Model which does this business logic, and saves looping each day %]
+
+[% IF item.IsAllDayEvent %]
+    [% NEXT IF (day < item.Start.day OR  day >  item.End.day) %]
+    [% NEXT IF (day > item.Start.day AND day == item.End.day) %]
+[% ELSE %]
+    [% NEXT UNLESS item.Start.day == day %]
+[% END %]
+
+<tr class="event[% ' allday' IF item.IsAllDayEvent %]">
+    <td class="time">[% item.IsAllDayEvent ? '&nbsp;' : item.Start.strftime('%H:%M') %]</td>
+    <td class="subject">
+        [% IF privacy_level == 'private' %]
+            <a href="#" class="tooltip">
+                [% item.Subject | truncate(18) %]
+                <span>
+                    <table class="tiptable">
+                        <tr class="tiprow"><td class="tipkey">Title:</td>       <td class="tipval">[% item.Subject | html_entity %]</td></tr>
+                        <tr class="tiprow"><td class="tipkey">Location:</td>    <td class="tipval">[% item.Location | html_entity %]</td></tr>
+                        <tr class="tiprow"><td class="tipkey">Date:</td>        <td class="tipval">[% item.TimeSpan | html_entity %]</td></tr>
+                        <tr class="tiprow"><td class="tipkey">Visibility:</td>  <td class="tipval">[% item.Sensitivity | html_entity %]</td></tr>
+                        <tr class="tiprow"><td class="tipkey">Attendees:</td>   <td class="tipval">
+                            [% item.Organizer | html_entity %][% ', ' IF item.has_DisplayTo %][% item.DisplayTo.join(', ') | html_entity %]
+                        </td></tr>
+                        <tr class="tiprow"><td class="tipkey">Availability:</td><td class="tipval">[% item.Status | html_entity %]</td></tr>
+                        <tr class="tiprow"><td class="tipval tipbody" colspan="2">[% item.Body | html_entity | html_line_break %]</td></tr>
+                    </table>
+                </span>
+            </a>
+        [% ELSIF privacy_level == 'limited' AND item.Sensitivity == 'Normal' %]
+            <a href="#" class="tooltip">
+                [% item.Subject | truncate(18) %]
+                <span>
+                    <table class="tiptable">
+                        <tr class="tiprow"><td class="tipkey">Title:</td> <td class="tipval">[% item.Subject | html_entity %]</td></tr>
+                        <tr class="tiprow"><td class="tipkey">Date:</td>  <td class="tipval">[% item.TimeSpan | html_entity %]</td></tr>
+                    </table>
+                </span>
+            </a>
+        [% ELSE %]
+            [% IF item.IsAllDayEvent %]
+                All Day
+            [% ELSE %]
+                &nbsp;-&nbsp;[% item.End.strftime('%H:%M') %]
+            [% END %]
+        [% END %]
+    </td>
+    <td class="icons">
+        [% IF item.IsRecurring %]
+            <img src="[% c.uri_for( '/static/images/arrow_refresh_small.png' ) %]" alt="Recurring Event" />
+        [% ELSE %]
+            &nbsp;
+        [% END %]
+    </td>
+</tr>
+[% END %]
+
+</table>

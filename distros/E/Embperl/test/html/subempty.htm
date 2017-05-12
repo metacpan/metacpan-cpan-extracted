@@ -1,0 +1,18 @@
+[$sub entry $]
+[*
+my ($obj) = @_ ;
+
+return if (!$obj) ;
+*]
+[+ $obj +]
+[$endsub $]
+
+[$sub txt $]
+blablabla
+[$endsub$]
+
+[-
+entry (undef) ;
+entry ('not undef') ;
+txt ;
+-]

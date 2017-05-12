@@ -1,0 +1,22 @@
+---
+abstract: 'A simple example of XS++'
+author:
+  - 'Steffen Mueller, E<lt>smueller@cpan.orgE<gt>'
+build_requires:
+  ExtUtils::Typemap::ObjectMap: 0.01
+configure_requires:
+  Module::Build: 0.36
+  Module::Build::WithXSpp: 0.03
+generated_by: 'Module::Build version 0.3605'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: XSpp-Example
+provides:
+  XSpp::Example:
+    file: lib/XSpp/Example.pm
+    version: 0.01
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

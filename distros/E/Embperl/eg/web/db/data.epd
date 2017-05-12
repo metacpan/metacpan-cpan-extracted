@@ -1,0 +1,35 @@
+[-
+$r = shift ;
+$set = $r -> {item_set} ;
+
+$escmode = 0 ;
+-]
+
+=pod
+
+=head1 NAME
+
+[+ $r -> {category_set}{category} +]
+
+[$ while ($rec = $$set -> Next) $]
+
+[- 
+$date = $rec -> {modtime} ; 
+$date =~ /^(\d+)-(\d+)-(\d+)/ ;
+$date = $r -> param -> language eq 'de'?"$3.$2.$1":"$2/$3/$1" ;
+-]
+
+=head1 [+ $rec -> {heading} +]
+
+[# Without the if-then-else this goes wrong if description is empty #]
+[$ if $rec -> {description} $]
+[+ $rec -> {description} +] [[[+ $date +]]
+[$ else $]
+[[[+ $date +]]
+[$ endif $]
+
+[+ $rec -> {url} +]
+
+[$ if ($r->{user_id} && $r->{user_id} == $rec->{user_id}) || $r->{user_admin} $]L<Edit|../add.epl?item_id=[+ $rec->{item_id} +]&amp;-edit_item=1&amp;category_id=[+ $rec->{category_id} +]> | Status: [+ $r -> gettext ($r->{item_set}{state} ? 'display' : 'hide') +][$ endif $]
+
+[$ endwhile $]

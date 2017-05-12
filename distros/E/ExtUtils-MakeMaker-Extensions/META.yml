@@ -1,0 +1,29 @@
+---
+abstract: 'Helper for multiple ExtUtils::MakeMaker extensions'
+author:
+  - 'Jens Rehsack <rehsack@cpan.org>'
+build_requires:
+  Test::More: '0.9'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: ExtUtils-MakeMaker-Extensions
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Class::Method::Modifiers: '0'
+  ExtUtils::MakeMaker: '0'
+  perl: v5.8.3
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=ExtUtils-MakeMaker-Extensions
+  homepage: https://metacpan.org/release/ExtUtils-MakeMaker-Extensions
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/perl5-utils/ExtUtils-MakeMaker-Extensions
+version: '0.001'

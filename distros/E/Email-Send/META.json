@@ -1,0 +1,375 @@
+{
+   "abstract" : "Simply Sending Email",
+   "author" : [
+      "Casey West <casey@geeknest.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.032, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Email-Send",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41",
+            "version" : "0.9901"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Email::Abstract" : "0",
+            "Email::Address" : "1.80",
+            "Email::Simple" : "1.92",
+            "File::Spec" : "0",
+            "Module::Pluggable" : "2.97",
+            "Net::SMTP" : "0",
+            "Return::Value" : "0",
+            "Scalar::Util" : "1.02",
+            "Symbol" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "vars" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Cwd" : "0",
+            "File::Path" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "MIME::Entity" : "0",
+            "Mail::Internet" : "0",
+            "Test::More" : "0.88",
+            "lib" : "0",
+            "perl" : "5.006",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/rjbs/Email-Send/issues"
+      },
+      "homepage" : "https://github.com/rjbs/Email-Send",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/rjbs/Email-Send.git",
+         "web" : "https://github.com/rjbs/Email-Send"
+      }
+   },
+   "version" : "2.201",
+   "x_Dist_Zilla" : {
+      "perl" : {
+         "version" : "5.021009"
+      },
+      "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::Deprecated",
+            "name" : "Deprecated",
+            "version" : "0.002"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GatherDir",
+            "config" : {
+               "Dist::Zilla::Plugin::GatherDir" : {
+                  "exclude_filename" : [],
+                  "exclude_match" : [],
+                  "follow_symlinks" : "0",
+                  "include_dotfiles" : "0",
+                  "prefix" : "",
+                  "prune_directory" : [],
+                  "root" : "."
+               }
+            },
+            "name" : "@Basic/GatherDir",
+            "version" : "5.032"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PruneCruft",
+            "name" : "@Basic/PruneCruft",
+            "version" : "5.032"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ManifestSkip",
+            "name" : "@Basic/ManifestSkip",
+            "version" : "5.032"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaYAML",
+            "name" : "@Basic/MetaYAML",
+            "version" : "5.032"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::License",
+            "name" : "@Basic/License",
+            "version" : "5.032"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Readme",
+            "name" : "@Basic/Readme",
+            "version" : "5.032"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExtraTests",
+            "name" : "@Basic/ExtraTests",
+            "version" : "5.032"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExecDir",
+            "name" : "@Basic/ExecDir",
+            "version" : "5.032"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ShareDir",
+            "name" : "@Basic/ShareDir",
+            "version" : "5.032"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MakeMaker",
+            "config" : {
+               "Dist::Zilla::Role::TestRunner" : {
+                  "default_jobs" : 1
+               }
+            },
+            "name" : "@Basic/MakeMaker",
+            "version" : "5.032"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Manifest",
+            "name" : "@Basic/Manifest",
+            "version" : "5.032"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::TestRelease",
+            "name" : "@Basic/TestRelease",
+            "version" : "5.032"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ConfirmRelease",
+            "name" : "@Basic/ConfirmRelease",
+            "version" : "5.032"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::UploadToCPAN",
+            "name" : "@Basic/UploadToCPAN",
+            "version" : "5.032"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::VersionFromModule",
+            "name" : "VersionFromModule",
+            "version" : "0.08"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaConfig",
+            "name" : "MetaConfig",
+            "version" : "5.032"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaJSON",
+            "name" : "MetaJSON",
+            "version" : "5.032"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::AutoPrereqs",
+            "name" : "AutoPrereqs",
+            "version" : "5.032"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GithubMeta",
+            "name" : "GithubMeta",
+            "version" : "0.46"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Check",
+            "config" : {
+               "Dist::Zilla::Plugin::Git::Check" : {
+                  "untracked_files" : "die"
+               },
+               "Dist::Zilla::Role::Git::DirtyFiles" : {
+                  "allow_dirty" : [
+                     "dist.ini",
+                     "Changes"
+                  ],
+                  "allow_dirty_match" : [],
+                  "changelog" : "Changes"
+               },
+               "Dist::Zilla::Role::Git::Repo" : {
+                  "repo_root" : "."
+               }
+            },
+            "name" : "@Git/Check",
+            "version" : "2.030"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Commit",
+            "config" : {
+               "Dist::Zilla::Plugin::Git::Commit" : {
+                  "add_files_in" : [],
+                  "commit_msg" : "v%v%n%n%c",
+                  "time_zone" : "local"
+               },
+               "Dist::Zilla::Role::Git::DirtyFiles" : {
+                  "allow_dirty" : [
+                     "dist.ini",
+                     "Changes"
+                  ],
+                  "allow_dirty_match" : [],
+                  "changelog" : "Changes"
+               },
+               "Dist::Zilla::Role::Git::Repo" : {
+                  "repo_root" : "."
+               }
+            },
+            "name" : "@Git/Commit",
+            "version" : "2.030"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Tag",
+            "config" : {
+               "Dist::Zilla::Plugin::Git::Tag" : {
+                  "branch" : null,
+                  "signed" : 0,
+                  "tag" : "2.201",
+                  "tag_format" : "%v",
+                  "tag_message" : "v%v",
+                  "time_zone" : "local"
+               },
+               "Dist::Zilla::Role::Git::Repo" : {
+                  "repo_root" : "."
+               }
+            },
+            "name" : "@Git/Tag",
+            "version" : "2.030"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Push",
+            "config" : {
+               "Dist::Zilla::Plugin::Git::Push" : {
+                  "push_to" : [
+                     "origin"
+                  ],
+                  "remotes_must_exist" : 1
+               },
+               "Dist::Zilla::Role::Git::Repo" : {
+                  "repo_root" : "."
+               }
+            },
+            "name" : "@Git/Push",
+            "version" : "2.030"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::ChangesHasContent",
+            "name" : "Test::ChangesHasContent",
+            "version" : "0.007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
+            "name" : "PodSyntaxTests",
+            "version" : "5.032"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::Compile",
+            "config" : {
+               "Dist::Zilla::Plugin::Test::Compile" : {
+                  "bail_out_on_fail" : "0",
+                  "fail_on_warning" : "author",
+                  "fake_home" : "0",
+                  "filename" : "t/00-compile.t",
+                  "module_finder" : [
+                     ":InstallModules"
+                  ],
+                  "needs_display" : "0",
+                  "phase" : "test",
+                  "script_finder" : [
+                     ":ExecFiles"
+                  ],
+                  "skips" : []
+               }
+            },
+            "name" : "Test::Compile",
+            "version" : "2.051"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ReportVersions::Tiny",
+            "name" : "ReportVersions::Tiny",
+            "version" : "1.10"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::RemovePrereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::RemovePrereqs" : {
+                  "modules_to_remove" : [
+                     "Net::NNTP",
+                     "Net::SMTP::SSL",
+                     "Net::SMTP::TLS"
+                  ]
+               }
+            },
+            "name" : "RemovePrereqs",
+            "version" : "5.032"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":InstallModules",
+            "version" : "5.032"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":IncModules",
+            "version" : "5.032"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":TestFiles",
+            "version" : "5.032"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ExecFiles",
+            "version" : "5.032"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ShareFiles",
+            "version" : "5.032"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":MainModule",
+            "version" : "5.032"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":AllFiles",
+            "version" : "5.032"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":NoFiles",
+            "version" : "5.032"
+         }
+      ],
+      "zilla" : {
+         "class" : "Dist::Zilla::Dist::Builder",
+         "config" : {
+            "is_trial" : "0"
+         },
+         "version" : "5.032"
+      }
+   },
+   "x_deprecated" : 1
+}
+

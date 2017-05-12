@@ -1,0 +1,15 @@
+Revision history for Email-Thread
+
+0.712     2013-08-16 22:46:29 America/New_York
+          update bugtracker and repo
+
+0.71	    2006-07-21
+          allow META.yml to be generated
+          use strict!
+
+0.70	    2006-07-11
+          fix bug in documentation
+
+0.68      2003-12-10
+          Richard's new method.
+

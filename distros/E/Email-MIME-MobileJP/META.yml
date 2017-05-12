@@ -1,0 +1,57 @@
+---
+abstract: 'E-mail toolkit for Japanese Mobile Phones'
+author:
+  - 'Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ GMAIL COM>'
+build_requires:
+  MIME::Base64: '0'
+  Test::More: '0.98'
+  Test::Requires: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.2.0, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Email-MIME-MobileJP
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Email::MIME::MobileJP:
+    file: lib/Email/MIME/MobileJP.pm
+    version: '0.08'
+  Email::MIME::MobileJP::Creator:
+    file: lib/Email/MIME/MobileJP/Creator.pm
+  Email::MIME::MobileJP::Parser:
+    file: lib/Email/MIME/MobileJP/Parser.pm
+  Email::MIME::MobileJP::Template:
+    file: lib/Email/MIME/MobileJP/Template.pm
+requires:
+  Devel::Peek: '0'
+  Email::Address: '1.892'
+  Email::Address::JP::Mobile: '0.05'
+  Email::Address::Loose: '0.01'
+  Email::MIME: '1.923'
+  Encode: '2.4'
+  Encode::JP::Mobile: '0.27'
+  Tiffany: '0.03'
+  parent: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/tokuhirom/Email-MIME-MobileJP/issues
+  homepage: https://github.com/tokuhirom/Email-MIME-MobileJP
+  repository: git://github.com/tokuhirom/Email-MIME-MobileJP.git
+version: '0.08'
+x_contributors:
+  - 'Uchiko <memememomo@gmail.com>'
+  - 'tanaka <banchou@peixe.biz>'
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'

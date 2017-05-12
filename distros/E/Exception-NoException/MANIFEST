@@ -1,0 +1,15 @@
+#d.patch#
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Exception/NoException.pm
+lib/Exception/NoException/_obj.pm
+t/10load.t
+t/20basic.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t
+weaver.ini

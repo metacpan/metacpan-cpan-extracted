@@ -1,0 +1,40 @@
+Error-TryCatch
+==============
+
+Error::TryCatch implements exception handling (try-catch) blocks 
+functionality with an interface similiar to Error.pm (in fact, it's almost 
+a drop-in replacement). The main difference is that it's a source filter 
+module.
+
+As a source filter it can implement the same convenient interface without 
+those nasty memory leaks and implicit anonymous subroutines (which can trick 
+you, if you're not careful). Also after source parsing it converts the code
+into "native" perl code, so it's probably a little faster than Error.pm's
+approach.
+
+And, well. As far as I can tell, Error::TryCatch accomplishes its duty nicely.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Test::More
+  Filter::Simple
+  Parse::RecDescent
+  Class::Accessor
+
+COPYRIGHT AND LICENCE
+
+Copyright 2005-2009 Nilson Santos Figueiredo Junior.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

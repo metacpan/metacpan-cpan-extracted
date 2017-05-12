@@ -1,0 +1,15 @@
+Revision history for Ed2k_link
+
+20090419  2009-04-19
+        First version, released on an unsuspecting world.
+
+20090427  2009-04-27
+        Some punctuation symbols in filenames aren't percent-enoded anymore (as in eMule).
+        Fixed error, which could halt your script if you have link for file < 9mb and touch full hashset (e. g. 'equal' method).
+
+20090428  2009-04-28
+        Percent-encoding fix.  Previous changes brought in a serious error: percent-encoding didn't work at all.
+
+20160412  2016-04-12 14:11:56-04:00 America/New_York
+	Use core Digest::SHA module instead of external Digest::SHA1.
+	Filename is a character (not octet) string while passing/receiving to/from this module.

@@ -1,0 +1,18 @@
+Revision history for Perl extension Encode::DoubleEncodedUTF8
+
+0.05  Thu Jul  7 11:02:53 PDT 2011
+        - Added a big WARNINGS in the pod to prevent people from using in the production code.
+
+0.04  Wed Sep 30 18:45:40 PDT 2009
+        - Simplify POD example
+        
+0.03  Wed Aug 12 19:14:44 PDT 2009
+        - Fixed bugs in SYNOPSIS code
+
+0.02  Wed Feb 14 14:46:04 PST 2007
+        - Now the code to find dodgy utf-8 bytes is Encode.pm-free and all regexp based.
+          Easy to port to other languages and I guess it's even faster.
+          (Thanks to Dan Kogai and Mark Fowler for the regexps)
+
+0.01  Tue Feb 13 17:57:45 2007
+        - original version

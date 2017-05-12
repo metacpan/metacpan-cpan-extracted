@@ -1,0 +1,48 @@
+{
+   "abstract" : "An encoding for safe filenames.",
+   "author" : [
+      "Bert Vanderbauwhede <batlock666@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4205",
+   "license" : [
+      "lgpl_3_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Encode-Safename",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode::Encoding" : "0",
+            "Getopt::Long::Descriptive" : "0",
+            "Parse::Lex" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Encode::Safename" : {
+         "file" : "lib/Encode/Safename.pm",
+         "version" : "0.05"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.gnu.org/licenses/lgpl-3.0.txt"
+      ]
+   },
+   "version" : "0.05"
+}

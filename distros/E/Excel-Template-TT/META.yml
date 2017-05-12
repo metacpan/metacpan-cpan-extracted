@@ -1,0 +1,17 @@
+abstract: wrapper class for Excel::Template to using TT
+author: Taro Funaki <t@33rpm.jp>
+build_requires: 
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: Excel-Template-TT
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Excel::Template: 0
+  File::Temp: 0
+  Template: 0
+version: 0.0.1

@@ -1,0 +1,36 @@
+Changes file for Email::Filter
+
+1.034     2013-12-31 10:12:19 America/New_York
+          update github links
+
+1.033     2013-08-02 18:23:52 America/New_York
+          ->pipe can now pipe only the header [rt.cpan.org #3126]
+
+          updated bugtracker, repo info
+
+1.032     2008-09-14
+          attempt to address https://rt.cpan.org/Ticket/Display.html?id=31018
+
+1.031     2007-03-22
+          packaging improvements
+
+1.03      2006-07-21
+          fix link to emailproject.perl.org
+
+1.02      2004-11-06
+          pipe() is now safe against IPC::Run::run() death, in the
+          event of improper input.
+          Docs for pipe() now express proper input.
+          Dependency updates.
+          Doc fixes.
+          Author update.
+
+1.01	    Tuesday 29th June, 2004
+        	discard any From_ line before we hand it to Email::Simple
+        	pod fixes
+
+1.0     	2nd May, 2003
+        	Initial CPAN release
+
+0.000_1   Sun Mar 16 14:18:44 2003
+          Created

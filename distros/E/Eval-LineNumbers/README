@@ -1,0 +1,42 @@
+NAME
+    Eval::LineNumbers - Add line numbers to heredoc blocks that contain perl
+    source code
+
+SYNOPSIS
+     use Eval::LineNumbers qw(eval_line_numbes);
+
+     eval eval_line_numbers(<<END_HEREIS);
+       code
+     END_HEREIS
+
+     eval eval_line_numbers($caller_level, $code)
+
+DESCRIPTION
+    Add a "#line "this-file" 392" comment to heredoc/hereis text that is
+    going to be eval'ed so that error messages will point back to the right
+    place.
+
+    Please note: when you embed "\n" in your code, it gets expanded in
+    double-quote hereis documents so it will mess up your line numbering.
+    Use "\\n" instead when you can.
+
+  Caller Level Example
+    The second form of eval_line_numbers where a caller-level is provided is
+    for the situation where the code is generated in one place and eval'ed
+    in another place. The caller level should be the number of stack levels
+    between where the heredoc was created and where it is eval'ed.
+
+     sub example {
+       return <<END_HEREIS
+         code
+    END_HEREIS
+     }
+
+     eval eval_line_numbers(1, example())
+
+LICENSE
+    Copyright (C) 2009 David Muir Sharnoff. Copyright (C) 2013 Google, Inc.
+
+    This package may be used and redistributed under the terms of either the
+    Artistic 2.0 or LGPL 2.1 license.
+

@@ -1,0 +1,34 @@
+---
+abstract: 'decode barcodes out of an email'
+author:
+  - 'Jozef Kutej <jkutej@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Email-Barcode-Decode
+provides:
+  Email::Barcode::Decode:
+    file: lib/Email/Barcode/Decode.pm
+    version: '0.04'
+requires:
+  Barcode::ZBar: '0'
+  Capture::Tiny: '0'
+  Carp: '0'
+  Class::Accessor::Fast: '0'
+  Email::MIME: '0'
+  File::Find::Rule: '0'
+  File::Temp: '0'
+  File::Which: '0'
+  Image::Magick: '0'
+  Path::Class: '0.33'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

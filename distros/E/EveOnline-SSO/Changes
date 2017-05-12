@@ -1,0 +1,7 @@
+Revision history for Perl extension EveOnline-SSO
+
+0.02 2017-03-21T20:59:51Z
+    - Add EveOnline::SSO::Client for ESI API
+
+0.01 2017-03-20T23:09:37Z
+    - First version

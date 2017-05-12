@@ -1,0 +1,310 @@
+=head1 NAME
+
+crlpublish - CRL publisher configuration syntax
+
+=head1 DESCRIPTION
+
+crlpublish is a utility for pushing CRL updates to one or more target servers
+where other applications and processes pick them up. These are commonly
+referred to as Issuing Distribution Points and should ideally be encoded
+into the CRLs and CA certificates themselves.
+
+Often, there is not enough information encoded in the CRL and in the operating
+environment to deduce how this publishing should be accomplished. In those
+cases, details must be provided through configuration files. Their format,
+syntax, and usage are documented here.
+
+=head1 CONFIG FILE LOCATIONS
+
+Configuration files should be placed in one of these directories:
+
+=over 
+
+=item *
+
+/etc/crlpublish/*.cfg
+
+=item *
+
+$HOME/.crlpublish/*.cfg
+
+=back
+
+Additionally, as in-situ compatibility with the older crlpublisher.sh script
+is supported, the following directories are scanned for legacy config files:
+
+=over
+
+=item *
+
+/etc/crlpublisher/*.conf
+
+=item *
+
+$HOME/.crlpublisher/*.conf
+
+=back
+
+There is no particular naming convention required, nor even a need to use more
+than one file. Any file with the proper extension will be imported, in
+directory order.
+
+=head1 CONFIG FILE FORMAT
+
+Although there is a notion of an old and a new file format, they are read in
+by the same parser. Using "newness" in an old-style .conf file will generate
+a runtime error.
+
+Both file formats use a namedAttribute="value" basic syntax.
+
+There the similarity ends. The old version was parsed by the shell, and so was
+intolerant of whitespace and liberal about quoting and content. Backticks and
+other shell language were legal, although it is not known if anyone ever used
+such. crlpublish does not support this usage.
+
+The new format is parsed by Perl, and so backticks are not permitted. Quotes
+are optional, and whitespace is tolerated at the beginning and end of any line,
+and between the variable, equals, and value. Extra space is dropped; if you
+need control, use single or double quotes around the value.
+
+Also, the new format supports sections using the ini style [sectionName] syntax.
+The brackets are treated as quotes, and whitespace within is not dropped.
+
+=head1 CONFIG FILE EXAMPLES
+
+An example of the old syntax follows:
+
+ publisher=scp
+ remoteUser=crlowner
+ remoteHost=my.target.server.com
+ remoteLocation=crl/thisca.crl
+ privateKey=/path/to/ssh/privateKeyFile
+ issuerDn="CN=My CA,O=Example Inc.,C=ME"
+
+A roughly equivalent example of the new syntax follows:
+
+ [defaults]
+ publishMethod=scp
+ remoteUser=crlowner
+
+ [CN=My CA,O=Example Inc.,C=ME]
+ remotePath=crl
+ remoteFile=thisca.crl
+ remoteHost=crl.target.server.com
+
+ [crl.target.server.com]
+ remoteHost=crl-1.target.server.com,crl-2.target.server.com
+
+Note that such verbosity is not generally required, as will be explained
+below, and there is some redundancy to illustrate capabilities. The section
+for my.target.server.com needn't exist; the comma-separated list could have
+been specified above in the defaults, or in the issuerDn section.
+
+=head1 RUNTIME CONFIG RESOLVING ORDER
+
+In point of fact, any of those variables could have appeared in any of those
+sections, and the configuration parser would happily import and supply them
+at the appropriate point in the resolution order; see below.
+
+Cascaded defaults are supported by creating a container object and copying
+the configuration name-value pairs into that container in a particular order,
+allowing attributes of the same name to overwrite earlier values.
+
+First, fixed defaults are applied. At present, this is only publishMethod=scp.
+Next, the parsed parts of the Issuing Distribution Point URL, if any, are
+copied in, followed by all values in the [defaults] section. Then, the values
+from the issuerDn section are copied in. Finally, values from the remoteHost
+section are copied in.
+
+In this way, it is often unnecessary to supply any configuration at all, if
+the Issuing Distribution Point is supplied in the CRL. See below for defaults.
+
+It is also worth noting that attributes can be named anything and will be
+passed into the container object. No core code changes will be required to
+support new attributes for new publishing methods. It is up to the
+publishMethod implementation to make meaning of them.
+
+=head1 ATTRIBUTE NAMES AND AND MEANINGS
+
+=head2 Core Attributes
+
+=head3 publishMethod
+
+Specify the publishing method to use. Currently, only scp is supported.
+
+=head2 Target Attributes
+
+=head3 remoteFile
+
+Specify the filename to publish the CRL as, since crlpublish was probably
+invoked using a temporary file with a randomized name. If not specified,
+it will be parsed from the CRL if available.  If still not found, a
+runtime error will be generated.
+
+=head3 remoteHost
+
+Specify the remote host to connect to. It can be a hostname, short or
+long, or an address, IPv4 or IPv6. It will be passed verbatim to scp.
+If not specified, it will be parsed from the CRL if available. If still
+not found, a runtime error will be generated.
+
+Multiple targets are supported by supplying a comma-separated list.
+Whitespace around the commas is tolerated.
+
+=head3 remotePath
+
+Specify the subdirectory to place the remoteFile in. Relative paths are
+relative to the remoteUser's home directory on the remoteHost. It must
+exist. If not specified, it will be parsed from the CRL if available.
+If still not found, a runtime error will be generated. Note that this
+value can legally be empty, indicating the remoteUser@remoteHost's home
+directory.
+
+=head2 Authentication Attributes
+
+=head3 privateKeyFile
+
+Filename of a private key compatible with the publishMethod in use.
+
+=head3 remoteUser
+
+Specify the remote username to connect as. If not specified, none will
+be specified on the command line, and scp will default to the current
+user on the originating host.
+
+=head2 Legacy Compatibility Attributes
+
+=head3 issuerDn
+
+Only meaningful in a legacy style config file; specifies the issuerDn
+to which that config file refers. The new config syntax specifies this
+in a section name.
+
+=head3 privateKey
+
+Equivalent to privateKeyFile.
+
+=head3 publisher
+
+Equivalent to publishMethod.
+
+=head3 remoteLocation
+
+Combines remotePath and remoteFile into a single directive. Parsed
+at config-read time and stored internally as remotePath and remoteFile.
+
+=head1 SOFTWARE REQUIREMENTS
+
+crlpublish requires a CA that publishes CRLs by calling a script, such
+as EJBCA. Also, you will need a reasonably recent copy of Perl.
+
+The openssl binary must be present on the sending host, and should
+also be present on the target hosts.
+
+The scp publishing method requires ssh and scp to be installed on the
+local (CA) and remote (CRL distributing) hosts.
+
+=head1 INSTALLING CRLPUBLISH
+
+The easiest way is to run the 'cpan' tool and type:
+
+ install EJBCA::CrlPublish
+
+=head1 INSTALLATION TASKS WITH EJBCA
+
+This list presumes you have already set up your PKI, and that you have
+configured the correct CRL Issuing Distribution Point URL into the CRL
+via its CA certificate, and that you have installed crlpublish.
+
+=over
+
+=item 1.
+
+Set up user accounts.
+
+If your goal is to make life as easy as possible, create an account on the
+target server(s) with the same username as the CA runs under.
+
+Create an SSH key on the CA host, and install its public key on the target.
+
+=item 2.
+
+Set up publishing directory on target server(s).
+
+This is really web server administration, mostly. Create the directory, and
+make sure the user you created above can write to it.
+
+Create a symlink, or directory tree ending in a symlink, in the target user's
+home directory, matching the path (but not file) portion of the issuing URL.
+The goal is that if, with CWD equal to the home directory, you were to write
+to a filename like "path/to/rootca.crl", it would land in that directory.
+
+=item 3.
+
+Configure crlpublish.
+
+If you've followed these steps, you don't need any configuration, unless you
+have high-availability CRL distribution servers. If so, create the following
+file in the home directory of the CA server instance:
+
+$HOME/.crlpublish/targets.cfg
+
+with the following contents:
+
+ [targetNameFromUrl.example.com]
+ remoteHost=realtarget1.example.com,realtarget2.example.com
+
+Make sure this file is readable by the CA server process.
+
+=item 4.
+
+Set up the CRL Publisher in the EJBCA Administration Pages.
+
+=over
+
+=item a.
+
+Create a new publisher, perhaps named "CRL Publisher".
+
+=item b.
+
+Edit the newly created publisher.
+
+=item c.
+
+Change the type to "Custom Publisher".
+
+=item d.
+
+Add the following to the Properties box:
+
+ crl.application /usr/bin/crlpublish
+ crl.failOnStandardError false
+ crl.failOnErrorCode true
+
+=item e.
+
+Make sure the "Use queue for certificates" box is unchecked.
+
+=item f.
+
+Make sure the "Use queue for CRLs" box is checked.
+
+=item g.
+
+Click "Save".
+
+=back
+
+=item 5.
+
+Activate the publisher in each CA and each Certificate Profile.
+
+This is left as an exercise for the user. Check http://ejbca.org.
+
+=back
+
+=head1 AUTHOR
+
+Kevin Cody-Little <kcody@cpan.org>
+

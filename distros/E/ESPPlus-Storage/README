@@ -1,0 +1,31 @@
+ESPPlus/Storage version 0.01
+======================================================================
+
+This module provides an interface to the ESP+ Storage repository files.
+It allows you to read a .REP file as a series of original records. See
+ESPPlus::Storage::Reader::Tie for an especially easy interface for
+reading databases.
+
+For an even easier interface, see ESPPlus::Storage::Reader::Tie. It
+wraps the interface described below and in ESPPlus::Storage::Reader and
+ESPPlus::Storage::Record.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+    Copyright 2003, Joshua b. Jore. All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of either:
+
+    a) the GNU General Public License as published by the Free Software
+       Foundation; version 2, or
+
+    b) the "Artistic License" which comes with Perl.

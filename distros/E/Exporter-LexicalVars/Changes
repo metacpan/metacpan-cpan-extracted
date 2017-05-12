@@ -1,0 +1,20 @@
+Exporter-LexicalVars
+====================
+
+Created:      2014-03-30
+Home page:    <https://metacpan.org/release/Exporter-LexicalVars>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Exporter-LexicalVars>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.001	2014-04-03	Public release
+
+0.000_03	2014-04-03	Preview
+
+ - Support export tags.
+
+0.000_02	2014-03-31	Preview
+
+ - Allow lexical variable exporters to accept a list of which variables to
+   import.
+
+0.000_01	2014-03-30	Preview

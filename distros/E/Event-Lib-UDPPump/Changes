@@ -1,0 +1,6 @@
+Revision history for Perl extension Event::Lib::UDPPump.
+
+0.01  Thu Nov  2 16:40:31 2006
+	- original version; created by h2xs 1.23 with options
+		-A -O -n Event::Lib::UDPPump eventlib-test/blocked_read.h
+

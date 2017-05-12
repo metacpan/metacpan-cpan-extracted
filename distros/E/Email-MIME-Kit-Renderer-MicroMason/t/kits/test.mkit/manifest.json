@@ -1,0 +1,10 @@
+{
+  "renderer": "MicroMason",
+  "header": [
+    { "From": "WY Corp <noreplies@wy.example.com" },
+    { "To": "<% $ARGS{email} %>" },
+    { "Subject": "Welcome aboard, <% $ARGS{name} %>" }
+  ],
+  "type": "text/plain",
+  "body": "Hi there <% $ARGS{name} %>"
+}

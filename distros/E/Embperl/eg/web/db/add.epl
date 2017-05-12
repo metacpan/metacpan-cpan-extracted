@@ -1,0 +1,225 @@
+[-
+use File::Basename ;
+use Data::Dumper ;
+
+
+$DBIx::Recordset::Debug = 3;
+$maxrow = 30 ;
+
+$r = shift ;
+ $ct = $r->{category_texts};
+ $cy = $r->{category_types};
+ $cf = $r->{category_fields};
+ $cr = $r->{category_remarks};
+ $cfnl = $r->{category_fields_nolang};
+
+ @langs = ([{'id' => ''}, $cfnl]) ;
+ while ($rec = ${$r -> {language_set}} -> Next)
+	{
+	push @langs, [$rec, $cf] ;
+	}
+
+-]
+
+<script>
+    [+ do { local $escmode = 0 ; $r -> {validate} -> get_script_code } +]
+</script>
+
+
+
+[$ if $r -> {category_set}{headline} !~ /^\s+$/$]
+<table width="100%">
+    <tr bgcolor="#fefcad">
+        <td><font size="4">
+	    [$if $r -> {category_set}{headline} $]
+		[+ $r -> {category_set}{headline} +]
+	    [$else$]
+		[$ if $r -> {edit} $][= edit1 =] [$ else $][= add1 =] [$ endif $] [+ $r -> {category_set}{category} +]
+	    [$endif$]
+	</font></td>
+    </tr>
+</table>
+[$endif$]
+
+[$ if !$r->{error} $]
+
+<form action="[+ $r -> app -> posturl('show.epl') +]" method="POST"
+	name="form" onSubmit="return epform_validate_form()">
+
+[$if $cf && @$cf $]
+[= add2a =]<br>
+[= add2b =]<br><br>
+[$endif$]
+[$ if $r -> {category_set}{add_info}$]
+<B>[+ $r -> {category_set}{add_info} +]</b><br><br>
+[$ endif $]
+
+
+[$if $r -> {user_admin} $]
+<table>
+    <tr>
+        <td class="cText" rowspan="2" valign="top">[= state =]:&nbsp;</td><td class="cInput"><input type="radio" name="state" value="1"[$ if ($r->{item_set}{state}) $] CHECKED[$ endif $]>[= display =]</td>
+        <td class="cText" rowspan="2" valign="top">[= modtime =]:&nbsp;</td>
+        <td class="cInput" rowspan="2"><input type="input" name="modtime" value="[+ $r -> {edit}?$r -> {item_set}{modtime}:'' +]"></td>
+    </tr>
+    <tr>
+        <td class="cInput"><input type="radio" name="state" value="0"[$ if !$r->{item_set}{state} $] CHECKED[$ endif $]>[= hide =]</td>
+    </tr>
+</table>
+[$endif$]
+
+<table width="100%">
+    [$foreach $lang (@langs) $]
+    [-
+    $rec = $lang -> [0] ;
+    $cf  = $lang -> [1] ;
+    $postfix = $rec -> {id}?"_$rec->{id}":'' ;
+    -]
+    [$if $cf && @$cf $]
+    <tr bgcolor="#fefcad"><font size="3">
+        <td><font size=3><b>[+ $rec -> {name} +]</b></font></td>
+    </tr>
+    <tr>
+        <td>
+	    [$ syntax EmbperlBlocks $]
+            <table width="100%">
+                [$ foreach $type (@$cf) $]
+                    [$ if ($txt = $ct->{$type . '_text'}) && ($cy->{$type} !~ /^show/) $]
+                        <tr>
+			    [$ syntax Embperl $]
+   			    [# <td class="cText" valign="top" colspan="3">[+ $txt +] / [+ $type +] / [+ $i++ +]</td> #]
+                            [$ if $cy->{$type} =~ /static/ $]
+                                <td valign="top" colspan="3">[+ $txt +]&nbsp;</td>
+                            [$ elsif $cy->{$type} =~ /checkboxrow/ $]
+                                <td class="cText" valign="top">[+ $txt +]:&nbsp;</td>
+				<td class="cInput">
+				  [-
+				   if ($type =~ /^(.*?)_id$/) {
+				       $table = $1 ;
+				   } else {
+				       $table = $type;
+				   }
+				   $table =~ s/^.*__// ;
+				   $poss = $r->app->get_titles($r,$table);
+				   -]
+
+				  [# [+ $type +] / [+ $table +] / [+ $r->{category_title_type} +]<PRE>[+ Dumper $poss +]</PRE> #]
+
+				  [- $i = 0; -]
+				  [$ while ( $t = $poss->[$i++] ) $]
+				    <input type="checkbox" name="[+ $table +]" value="[+ $t->{id} +]" >[+ $t->{title} +]</input>
+				  [$ endwhile $]
+				</td>
+                            [$ elsif $cy->{$type} =~ /checkbox/ $]
+                                <td class="cText" valign="top">[+ $txt +]:&nbsp;</td>
+				<td class="cInput">
+                                    <input type="checkbox" name="[+ "$type$postfix" +]" value="1">
+                                </td>
+                            [$ elsif $cy->{$type} =~ /textarea/ $]
+                                <td class="cText" valign="top">[+ $txt +]:&nbsp;</td>
+				<td class="cInput">
+                                    <textarea name="[+ "$type$postfix" +]" style="width: 100%" cols="60" rows="10"></textarea>
+                                </td>
+                            [$ elsif $cy->{$type} =~ /pulldown/ $]
+                                <td class="cText" valign="top">[+ $txt +]:&nbsp;</td>
+				<td class="cInput">
+				  [-
+				   $type =~ /^(.*?)_id$/;
+				   $table = $1 ;
+				   $table ||= $type;
+				   $table =~ s/^.*__// ;
+				   $poss = $r->app->get_titles($r,$table);
+
+				   -]
+
+				  [# [+ $type +] / [+ $table +] / [+ $r->{category_title_type} +]<PRE>[+ Dumper $poss +]</PRE> #]
+
+				  <select name="[+ "$type$postfix" +]">
+				    [- $item = $poss->[$row] -]
+				    <option value="[+ $item->{id} +]">[+ $item->{title} +]</option>
+				  </select>
+				</td>
+                            [$ else $]
+                                <td class="cText" valign="top">[+ $txt +]:&nbsp;</td>
+				<td class="cInput"><input type="text" size="60" name="[+ "$type$postfix" +]" size="80"> </td>
+                            [$ endif $]
+			    <td valign="top" align="right">
+			    [+ $cr->{$type} +]
+			    </td>
+			    [$ syntax EmbperlBlocks $]
+                        </tr>
+                    [$ endif $]
+                [$ endforeach $]
+            </table>
+	    [$ syntax Embperl $]
+            <input type="hidden" name="id_[+ $rec -> {id} +]">
+        </td>
+    </tr>
+    [$endif$]
+    [$endforeach$]
+</table>
+
+[$ if $r -> {edit} $]
+<br>Owner: [+ $r->{item_set}{email} +]
+[$endif$]
+
+<br><br>
+[$ if $r -> {edit} $]
+&nbsp;&nbsp;&nbsp;&nbsp;<input type="submit" name="-update_item" value="[= update3 =]">
+&nbsp;&nbsp;&nbsp;&nbsp;<input type="submit" name="-delete_item" value="[= delete3 =]">
+[$ else $]
+&nbsp;&nbsp;&nbsp;&nbsp;<input type="submit" name="-add_item" value="[$ 
+if $r -> {category_set}{sendtext} $][+ $r -> {category_set}{sendtext} +][$else$]
+[= add3 =] [+ $r -> {category_set}{category} +][$endif$]">
+[$endif$]
+
+
+<input type="hidden" name="category_id">
+<input type="hidden" name="[+ $r -> {category_set}{table_type} +]_id">
+<input type="hidden" name="-logintext" value="[+ $r -> {category_set}{logintext} +]">
+
+</form>
+[$ endif $]
+
+[#
+<PRE>
+[+
+ Data::Dumper->Dump(
+		    [
+		     {%fdat},
+		     $r->{edit},
+		     $r->{category_set}{add_info},
+		     $r->{action_prefix},
+		     $r->{category_set}{category},
+		     $r->{user_admin},
+		     [keys %$r],
+		     $r->{category_fields},
+		     $r->{category_texts},
+$state,
+$item_set,
+#		     ${$r->{category_set}},
+#		     ${$r->{language_set}},
+#		     $r->{item_set},
+		     ],[qw[
+			   fdat
+			   edit
+			   add_info
+			   action_prefix
+			   category
+			   user_admin
+			   r_keys
+			   category_fields
+			   category_texts
+		            state
+                	   category_set
+			   language_set
+			   item_set
+			   ]
+			]
+		    )
++]
+</PRE>
+#]
+
+
+

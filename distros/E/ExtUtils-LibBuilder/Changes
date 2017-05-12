@@ -1,0 +1,31 @@
+Revision history for ExtUtils-LibBuilder
+
+0.08    Mon Oct 19 17:46:02 WEST 2015
+        - Minor spelling fix (thanks to Gregor Herrmann,
+        from Debian community).
+
+0.07    Mon Sep 28 14:53:40 WEST 2015
+        - Added minimum required Perl Version (kwalitee++).
+
+0.06    Sun Aug 31 21:02:44 WEST 2014
+        - Fixed metadata for metacpan (thanks to Gabor Szabo).
+
+0.05    Sun Aug 31 13:44:44 WEST 2014
+        - Added metadata for metacpan.
+
+0.04    Sun Nov 21 13:38:35 WET 2010
+        - Trying my luck on IRIX...
+
+0.03    Sat Oct  9 15:06:40 WEST 2010
+        - Mainly documentation fixes.
+
+0.02    Fri Sep 24 09:34:01 WEST 2010
+        - Fixed tests and their relative search paths.
+
+0.01    Thu Sep 23 21:19:17 WEST 2010
+        - Ported the code from Config::AutoConf::Linker to this new module
+        - Factorized the code for readability and usability
+        - Still missing real documentation (check t/01-simple.t for an example)
+        - Should work on Linux, MacOS X and Strawberry Perl.
+          Let me know of other supported operating systems. Thank you!
+

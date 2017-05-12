@@ -1,0 +1,33 @@
+---
+name: Emacs-Run
+version: 0.15
+author:
+  - 'Joseph Brenner <doom@kzsu.stanford.edu>'
+abstract: use emacs from perl via the shell
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Class::Base: 0.03
+  Data::Dumper: 0
+  File::Basename: 0
+  File::Copy: 0
+  File::Spec: 0
+  File::Temp: 0
+  Hash::Util: 0
+  List::MoreUtils: 0
+  List::Util: 0
+  Test::Differences: 0
+  Test::More: 0
+  base: 0
+  lib: 0
+  strict: 0
+  warnings: 0
+provides:
+  Emacs::Run:
+    file: lib/Emacs/Run.pm
+    version: 0.15
+generated_by: Module::Build version 0.3
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

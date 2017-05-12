@@ -1,0 +1,224 @@
+package Elastic::Manual::Scoping;
+
+# ABSTRACT: An optional in-memory cache, essential for keeping weak refs live
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Elastic::Manual::Scoping - An optional in-memory cache, essential for keeping weak refs live
+
+=head1 VERSION
+
+version 0.52
+
+=head1 Warning
+
+Scoping is an advanced topic - don't worry about L<Elastic::Model::Scope> until
+you need it.
+
+=head1 USES FOR Elastic::Model::Scope
+
+L<Elastic::Model::Scope> acts as an in-memory cache, and serves three
+futher purposes:
+
+=head2 Keep weak-ref Elastic::Doc attributes alive
+
+If you have a C<$post> object which has a C<user> attribute, and a C<$user>
+object with a C<posts> attribute, then you will want to make (eg) the
+C<< $posts->user >> attribute a
+L<weak ref|https://metacpan.org/module/Moose::Manual::Attributes#Weak-references>
+to avoid circular references.
+
+But then you would have a problem:
+
+    sub add_post_to_user {
+        my ( $domain, $user_id, $content )= @_;
+        my $user = $domain->get( user => $user_id );
+        my $post = $domain->create(
+            post => {
+                content => $content,
+                user    => $user;
+            }
+        );
+        $user->add_post($post);
+        $user->save;
+        return $post;
+    }
+
+    my $post = add_post_to_user($domain, 1234, 'my post content');
+
+    print $post->user->name;
+    # ERROR - user has disappeared!
+
+B<Scopes keep all your doc class objects in scope, so that they don't disappear
+out from under you>.
+
+So this would work:
+
+    my $post;
+    {
+        my $scope = $model->new_scope;
+        $post = add_post_to_user($domain, 1234, 'my post content');
+
+        print $post->user->name;
+        # Clint
+
+    }
+    # $scope has now disappeared
+
+    print $post->user->name;
+    # ERROR - user has disappeared!
+
+=head2 Reuse Elastic::Doc objects as singletons.
+
+By default, each object is a singleton.  For instance, if you do:
+
+    my $foo = $domain->get( user => 123 );
+    my $bar = $domain->get( user => 123 );
+
+    print $bar->name;
+    # Clint
+
+    $foo->name('John');
+
+    print $bar->name;
+    # John
+
+    print refaddr($foo) == refaddr($bar) ? 'TRUE' : 'FALSE';
+    # TRUE
+
+C<$foo> and C<$bar> are the same object.
+
+B<Scopes allow you to reuse objects.>
+
+=head2 Multiple versions of Elastic::Doc objects live at the same time.
+
+With any database, there are timing issues. Another process may change
+have changed C<user 123> between the first call to C<< $domain->get >> and the
+second.
+
+Also, because Elasticsearch has B< I<real time GET>> (ie if you retrieve
+a document by ID, you will get the latest version that exists) but B<I<NEAR real
+time search>> (search docs are refreshed only once every second, so may
+contain an older version of a doc), you could find yourself in this situation:
+
+    $user = $domain->get(user => 123);
+    print $user->name;
+    # Clint
+
+    print $user->uid->version;
+    # 1
+
+    $user->name('John');
+    $user->save;
+
+    print $user->uid->version;
+    # 2
+
+    $results = $domain->view->type('user')->queryb({ name => 'Clint' });
+    # results contain user 123, version 1
+    # even though version 2 no longer matches the search
+
+Depending on your requirements, you may want the C<user 123> object in
+C<$results> to be the same as it was in version 1 (eg so that the search
+results that you show the user make sense), or you may want to use
+the most up to date version (ie version 2).
+
+B<Multiple scopes allow you have different versions of an object live at the
+same time.>
+
+=head1 USING SCOPES WITH SEARCH RESULTS
+
+Documents from search results are a bit special.
+
+By default when we do a search in Elasticsearch, instead of just getting a UID
+back, we get back the whole object. Depending on timing, the version returned
+in search may be the same, older or newer than the version we have stored in
+our current scope.
+
+We don't try to retrieve the object from the scope, because we already have
+everything we need to create it.  But once we have created it, we do
+try to store it in the current scope:
+
+=head2 Object is not in current scope
+
+If an object with the same C<domain_name/type/id> DOESN'T exist in the
+current scope, then we store the new object in the current scope and return
+it.
+
+=head2 Object is in current scope
+
+If an object with the same C<domain_name/type/id> DOES exist in the
+current scope, then we compare versions: If the stored version is more recent
+than the new version, we return the stored object.
+
+Otherwise, we try to update the stored object (and therefore any instances
+of it that already exist in your application)    to the new version, but only
+if you haven't already looked at it! (You don't want your objects changing
+their values under you.)
+
+If you have looked at the stored version, then we move it to another
+cache for safe keeping, and store and return the new version.
+
+B<Note:> "Looking" at an object means calling any accessor on any attribute
+that is stored in Elasticsearch. This does not include the
+L<Elastic::Model::Role::Doc/"uid"> of the object.
+
+=head2 Object is in current scope, but is deleted
+
+    $scope_1 = $model->new_scope;
+    $results = $domain->view->filterb( -ids => 1 )->search;
+
+    $domain->delete( user => 1);
+
+    print $results->first_object->name;
+    # Throws error - deleted!
+
+=head2 Tie objects to the current scope
+
+The "current scope" for search results is the scope
+in place B<when the object is inflated> (or accessed for the first time), not
+at the time the search is run.)
+
+To ensure that the objects from search results are tied to a particular scope
+(eg the current scope), you can use:
+
+    $results->slice_objects();      # inflates all objects in the current scope
+    $results->slice_objects(0,10);  # inflates the first 10 objects
+
+The inflated objects are cached in the C<$results> object itself, so accessing
+the object later on will return the same object, even if you do:
+
+    $object = $results->next_result->object;
+
+=head1 SEE ALSO
+
+=over
+
+=item *
+
+L<Elastic::Manual>
+
+=item *
+
+L<Elastic::Model::Scope>
+
+=back
+
+=head1 AUTHOR
+
+Clinton Gormley <drtech@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Clinton Gormley.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

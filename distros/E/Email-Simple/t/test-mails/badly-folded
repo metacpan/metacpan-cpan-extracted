@@ -1,0 +1,48 @@
+Return-Path: <sundar@foo.com>
+Received: from murder ([unix socket])
+	 (authenticated user=adam bits=0)
+	 by mail1.foo.com (Cyrus v2.2.12-OS X 10.4.0) with LMTPA;
+	 Tue, 25 Oct 2005 07:26:59 -0400
+X-Sieve: CMU Sieve 2.2
+X-Original-To: adam@mail1.internal.foo.com
+Delivered-To: adam@mail1.internal.foo.com
+Received: from localhost (localhost [127.0.0.1])
+	by mail1.foo.com (Postfix) with ESMTP id C24ABADEA15
+	for <adam@mail1.internal.foo.com>; Tue, 25 Oct 2005 07:26:58 -0400 (EDT)
+Received: from mail1.foo.com ([127.0.0.1])
+ by localhost (localhost [127.0.0.1]) (amavisd-new, port 10024) with ESMTP
+ id 20330-05 for <adam@mail1.internal.foo.com>;
+ Tue, 25 Oct 2005 07:26:55 -0400 (EDT)
+Received: from mta.internal.foo.com (mta.internal.foo.com [0.0.0.0])
+	by mail1.foo.com (Postfix) with ESMTP id 1D919ADE9FE
+	for <adam@mail1.internal.foo.com>; Tue, 25 Oct 2005 07:26:55 -0400 (EDT)
+Received: from [0.0.0.0] ([0.0.0.0])
+	(authenticated bits=0)
+	by mta.internal.foo.com (8.12.8/8.12.8) with ESMTP id j9PBQoCT026374
+	(version=TLSv1/SSLv3 cipher=RC4-MD5 bits=128 verify=NO)
+	for <adam@foo.com>; Tue, 25 Oct 2005 07:26:53 -0400
+Message-ID: <blah@foo.com>
+Date: Tue, 25 Oct 2005 07:30:17 -0400
+From: x <x@foo.com>
+Reply-To: x@foo.com
+User-Agent: Mozilla Thunderbird 1.0.6 (Windows/20050716)
+X-Accept-Language: en-us, en
+MIME-Version: 1.0
+To: Adam Worrall <adam@foo.com>
+Subject: My subject
+X-Enigmail-Version: 0.91.0.0
+Content-Type: multipart/mixed;
+ boundary="------------040701020305070002070307"
+X-PMX-Version: 4.6.1.107272
+X-Virus-Scanned: by amavisd-new at foo.com
+
+This is a multi-part message in MIME format.
+--------------040701020305070002070307
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+
+Blah blah
+
+--------------040701020305070002070307--
+
+

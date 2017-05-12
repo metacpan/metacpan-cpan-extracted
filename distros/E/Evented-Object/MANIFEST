@@ -1,0 +1,25 @@
+Build.PL
+lib/Evented/Object.pm
+lib/Evented/Object/Collection.pm
+lib/Evented/Object/EventFire.pm
+lib/Evented/Object/Hax.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+t/00use.t
+t/01priorities.t
+t/02delete-event.t
+t/03delete-callback.t
+t/04cancel-callback.t
+t/05listener-priorities.t
+t/06callback-metadata.t
+t/07cancel-fire.t
+t/08before-after.t
+t/09callback-data.t
+t/10fire-data.t
+t/11complex-priorities.t
+t/12impossible-priorities.t
+README
+README.md

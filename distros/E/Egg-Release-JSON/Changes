@@ -1,0 +1,5 @@
+Revision history for Perl extension .
+
+0.01  Tue Aug  7 20:52:07 2007
+	- original version; created by Egg::Helper::Plugin::Maker v2.00
+	   with module name Egg::Release::JSON

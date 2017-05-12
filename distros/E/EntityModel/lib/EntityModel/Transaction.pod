@@ -1,0 +1,96 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with EntityModel::Transaction
+at lib/EntityModel/Transaction.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+EntityModel::Transaction - transaction co-ordinator
+
+=head1 VERSION
+
+version 0.102
+
+=head1 SYNOPSIS
+
+See L<EntityModel>.
+
+=head1 DESCRIPTION
+
+Contacts each L<EntityModel::Storage> instance and requests that they join a new
+transaction.
+
+See L<EntityModel>.
+
+=head2 apply
+
+Applies the current transaction. Typically called as the last
+step in the transaction codeblock. The &{} overload will call
+this method (so you can use C< $tran->() > or C< $tran->apply >
+interchangeably).
+
+Takes no parameters.
+
+Returns $self.
+
+=head2 mark_failure
+
+Mark this transaction as failed, applying rollback if required, and
+calls the failure coderef.
+
+Takes no parameters.
+
+Returns $self.
+
+=head2 mark_success
+
+Mark this transaction as successful, committing if required, and
+calls the success coderef.
+
+Takes no parameters.
+
+Returns $self.
+
+=head2 mark_goodbye
+
+Mark this transaction as completed. Calls the C<goodbye> coderef
+if available.
+
+Takes no parameters.
+
+Returns $self.
+
+=head2 run
+
+Takes the following (named) parameters:
+
+=over 4
+
+=item *
+
+=back
+
+Returns $self.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<EntityModel::BaseClass>
+
+L<clone|EntityModel::BaseClass/clone>, L<dump|EntityModel::BaseClass/dump>, L<new|EntityModel::BaseClass/new>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <cpan@entitymodel.com>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2008-2011. Licensed under the same terms as Perl itself.

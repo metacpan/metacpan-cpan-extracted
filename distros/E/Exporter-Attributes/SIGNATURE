@@ -1,0 +1,61 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 fb2fd61d9f093b806b73b1358c3c13eaa3c9565d CONTRIBUTORS
+SHA1 8538d89fd6d54bff1fe260fe03c6da30d63def26 Changes
+SHA1 21696e04788daf443832163be15c96a621ae5381 LICENSE
+SHA1 bb17bfc678ca7783ed020a0a33444c0032377ca0 MANIFEST
+SHA1 3c81d2805716c8f308f71205064fb6fccec4ac29 META.yml
+SHA1 5a2a7b81a508bea8001161cab0b983e901d83089 Makefile.PL
+SHA1 bd3b9d88bd42e53f58a75ba534aa49167ae1f2e1 README
+SHA1 e978d80f625764a1352a05a8ad0f8466db01341b cpanfile
+SHA1 324b299cfca573329de196b36e3034563bc8b2ac dist.ini
+SHA1 156f050f686a385fcb5f1f2db915d15dc2c911f9 lib/Exporter/Attributes.pm
+SHA1 a688f9aaba4f322cfbeb5bb31a7ab87c0639b14b t/00-check-deps.t
+SHA1 892b20dae8a409567b2cabf3bab1e219505cd716 t/00-compile.t
+SHA1 4f12b36a9f911dcf206c3372967f9ae273348600 t/01general.t
+SHA1 b4a0b860cd3aa511f067496bb8c810e658a2ffdd t/02nolist.t
+SHA1 5e14bea20511eb9aba795d21d026d86da420a2d4 t/03all.t
+SHA1 9baeb775b174dc20c05c8b3d33e53dd90b435b6e t/04greet.t
+SHA1 87259124c1c41701cb7d05b14fbcd62b05ddfa21 t/04us.t
+SHA1 bc658e2016607360639cc300b95c8738073c87da t/05module.t
+SHA1 f214de96cfe8b70da71201ab8859bb32cbdafe1d t/author-critic.t
+SHA1 2a5235c32ba029d5fb9db68fcd743a2310e13a7b t/author-eol.t
+SHA1 7db3f7080981026e2aafa4267e3cfb1028bcd2c7 t/author-no-tabs.t
+SHA1 1bf69b71b924777ef46b198af9435e8381149fc7 t/release-cpan-changes.t
+SHA1 04b1520e9a9c757e2af3ff47779d5968bfd29206 t/release-fixme.t
+SHA1 bdd52baa1a968cc0e1a577a7b073f046d563a317 t/release-kwalitee.t
+SHA1 ca37d7b91c2299a98877a6f36d3fab51e8dd906f t/release-pod-coverage.t
+SHA1 e7fc4d8f3f29ee522cb53914648393524fc7a6d4 t/release-pod-syntax.t
+SHA1 f58e75bc0da2a40f31c926d5e78af8ba956eb7f8 t/testlib/MyExport.pm
+SHA1 1157ac16e9b5fcaa10b442f844d6ff0bac3f1d83 t/testlib/TestMod.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJWr1S2AAoJEJVzeMw4kNoo1EYP/33de951p16bZ/YEHti4SJ00
+GBwzfSFMMgsLAqgMwXPIpshOjjM0wkGUSbS3k45mt+9l+7VTqR4ZesGeThydmyx+
+DU5PoDcas9OdtmnO/kkmTzuEKYSHjeSxcIWkRDp6sO/AJJg++aj0GqcS7cuZnCqz
+z6cTTTrpZ4uw3AtNdPM+VAgCUMmq+AIiR78W6aNd3n3cc8Fi1wLmAwp3tJTX3+0G
+Zb+90/SB4Eg0AVKPdnYPlUUIvzR8xglNm+B4sl4D3bacBUXMOjf021pvw8F0Ev07
+b4Q4X71Q4wTPeaOS1ADEOJJMNRBWU1QFn0ivJGRBJ6BX3bJnFdrBDQEcLAtiKbaC
+2SKP9LRN4M4BBTAE6GRieOrUDrA6dqlCOjCY5G0oOAbX+UnL4GqEp5SivGXZX5FX
+jJT4nD0Pu8qMqkyXOZVDDlVtR5Yq6RPjP5e3H2QJKPPq1WyNGEzBPU/MrueXcyEa
+q+sbrDXnnm1fSYqvbIVo/Ml68tE6wId37dkWVJ8+coz2AztzRhSHBe5wnYa9mqrn
+lGwh3K7zH0vA+aTGQNlpWpzmyXTwl7OmpZHOOrNE10+FFj2BL8BG0QtSnModd76w
+no4Yv2rNcWzztEVAUMuMW/qHkQuDxg1fnF+irOYCtuk2yLXnzZXMOGCceMsxyrAh
+nCR5k+79uEMW61dh5iId
+=AMbb
+-----END PGP SIGNATURE-----

@@ -1,0 +1,5 @@
+Revision history for Perl extension .
+
+0.01  Tue Nov  6 23:54:40 2007
+	- original version; created by Egg::Helper::Plugin::Maker v2.02
+	   with module name Egg::Plugin::Log::Syslog

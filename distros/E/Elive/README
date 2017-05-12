@@ -1,0 +1,240 @@
+Elluminate Live! is software for virtual online classrooms. It is suitable
+for meetings, demonstrations web conferences, seminars and general training
+and support.
+
+Elive is a set of Perl bindings and definitions for entities in the
+Elluminate Live! Manager (ELM) database. You can, for example, use it to
+create meetings (sessions) or manage users, groups and meeting participants.
+
+Elive connects to Elluminate Live! servers via http or https and
+utilises the Command Toolkit services SOAP ('default' adapter).
+
+Some additional configuration may be required on your Elluminate Live!
+server. Please see the Server Configuration section.
+
+COMPATIBILITY
+
+    The Elive distribution supports only self hosted Elluminate Live!
+    servers that are running Elluminate Live! Manager (ELM).
+
+    - works best with ELM versions 3.0 - 3.7.0 and Elluminate Live!
+      versions 9.5 - 12.5.4.
+
+    - does not support access to externally hosted servers deployed with
+      SAS (Session Administration System). See also the Bb::Collaborate::V3
+      distribution.
+
+INSTALLATION
+
+    To install this module, run the following commands:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+SERVER CONFIGURATION
+
+    You'll need to edit your site instance configuration to provide
+    SDK access to one or more users.
+
+    To do this, firstly stop the site using the Elluminate Live Instance
+    Manager (http://yourserver/elmcontrol).
+
+    Then you'll need to edit the configuration.xml for the site instance.
+
+      (*) Under Linux, the web application root is:
+
+          /opt/ElluminateLive/manager/tomcat/webapps
+
+      (*) or under Windows, it's:
+
+         C:/Program Files/ElluminateLive/manager/tomcat/webapps
+
+      (*) The actual configuration for the root instance is the sub-path:
+
+         ROOT/WEB-INF/resources/configuration.xml
+
+      (*) or for any additional sites built with the instance manager:
+
+                 mysite/WEB-INF/resources/configuration.xml
+
+    Edit the file and add an entry for the SDK user to the security section:
+
+            <elm>
+                ...
+               <proxymanager enable="true">
+                 <proxy name="web" ..>
+                  ...
+                  <security adapter-name="default">
+                    <permissions>
+                      <role id="0">
+                        <allow command="*" />
+                      </role>
+
+                      <!-- ++ ADD THIS -->
+                      <user name="some_user">
+                         <allow command="*" />
+                      </user>
+                      <!-- -- ADD THIS -->
+                    </permissions>
+                    ...
+                   </proxy>
+                   ...
+               </proxymanager>
+
+LIVE TESTING
+
+    There are additional live tests in t/soap-*.t and t/script-*t. By
+    default, these are either skipped or run offline as mock tests.
+
+    These may be run against a live server by setting up the environment
+    variables, and running tests, as shown below:
+
+        perl Makefile.PL
+        make
+        export ELIVE_TEST_URL=http://sdk_user@some_server.com/some_instance
+        export ELIVE_TEST_PASS=some_password
+        make test
+
+    There's also some additional environment variables that may be set
+    to extend the range of tests:
+
+    ELIVE_TEST_PRELOAD_SERVER_PATH - absolute path of an existing preload
+               file on the server. Set this to enable testing of the
+               Elive::Entity::Preload->import_from_server() method.
+
+    The following enable some of the more invasive tests:
+
+    ELIVE_TEST_USER_UPDATES - set this to true to enable insert and update
+               of user accounts on a live site (t/soap-user.t). 
+
+    ELIVE_TEST_GROUP_UPDATES - set this to true to enable insert and update
+               of groups on a live site (t/soap-group.t).
+
+    ELIVE_TEST_REPORT_UPDATES - set this to true to enable insert and
+              update of reports on a live site (t/soap-report.t).
+
+    The User and Group update tests can only be run on sites that have not
+    been configured for LDAP.
+
+    WARNING: Live testing will both create and delete various entities
+    instances. For this reason you should be wary of running the live
+    tests on production sites.
+
+    Consider restricting any live testing to designated development and
+    test sites, or newly created site instances!
+
+POST INSTALLATION
+
+    The elive_query script can be used to check basic operation of Elive
+    and access to your Elluminate server(s).
+
+        % elive_query --user some_account http://some_server.com/some_site
+
+    Where 'some_account' has been configured for SDK access.
+
+    You will need to enter a password. You should then get:
+
+        connecting to http://some_server.com/some_site...done
+        Elive query 1.xx (Elluminate Live 10.y.z) - type 'help' for help
+        elive>
+
+    You can then try a simple query:
+
+        elive> select * from users
+
+    See also elive_raise_meeting. This is a utility script that creates
+    meetings on an Elluminate server.
+
+        % elive_raise_meeting http://some_user@myserver/mysite -name 'Test'
+
+TROUBLESHOOTING
+
+    'User [<username>], not permitted to access the command <command>'
+    --------------------------------------------------------------------
+    You are connected to the SOAP services with an account that has not
+    been setup for full SDK access. Please see the Server Configuration
+    section above.
+    
+    'Unable to determine a command for the key Xxxxx'
+    -------------------------------------------------
+    This may indicate that some command definitions are missing from
+    your Elluminate configuration. This can be prone to likely to
+    happen with an Elluminate instance that has been through several
+    Elluminate upgrades.
+
+    You can use the installed script elive_lint_config to check for
+    missing commands.
+
+        % cd /opt/ElluminateLive/manager/tomcat/webapps
+        % elive_lint_config WEB-INF/resources/configuration.xml
+        missing 'default' adapter command: getUser
+        missing 'default' adapter command: deletePreload
+        missing 'default' adapter command: listPreloads
+
+    The missing commands can be added to your configuration file.
+
+    For example, if elive_lint_config returned the error:
+
+        "missing 'default' adapter command: getUser"
+
+    You'll need to first stop Elluminate services.
+
+    Save a backup copy of configuration.xml Then you can add an adapter
+    entry can be added to the list of adapters.
+
+    E.g., to add the getUser adapter:
+
+        <elm>
+            ...
+            <adapters>
+               <adapter name="default" class="com.elluminate.adapter.CommandAdapter" adapterType="ELM">
+                  <commands>
+                    ...
+                    <!-- ++ ADD COMMANDS HERE -->
+                    <command name="getUser" class="com.elluminate.adapter.command.GetUserCommand" />
+                    <!-- -- ADD COMMANDS HERE -->
+
+LDAP AUTHENTICATION
+
+    Elluminate Live! can also be configured to use an LDAP repository for
+    user authentication. Users and groups can  be retrieved or listed, but
+    cannot be updated.
+
+SUPPORT AND DOCUMENTATION
+
+    See the Elluminate Live documentation. In particular, this package
+    follows the entities and relationships described in DatabaseSchema.pdf.
+
+    You will find a copy on the installation disk; or if you have access to
+    the  server, you will will typically find this in
+    /opt/Elluminate/documentation. 
+
+    After installing, you can find documentation for this module with the
+    perldoc command.
+
+        perldoc Elive
+
+    You can also look for information at:
+
+        RT, CPAN's request tracker
+            http://rt.cpan.org/NoAuth/Bugs.html?Dist=Elive
+
+        AnnoCPAN, Annotated CPAN documentation
+            http://annocpan.org/dist/Elive
+
+        CPAN Ratings
+            http://cpanratings.perl.org/d/Elive
+
+        Search CPAN
+            http://search.cpan.org/dist/Elive/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009-2015 David Warring
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

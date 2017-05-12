@@ -1,0 +1,561 @@
+###################################################################################
+# MARK FOWLER's PERL CRITIC FILE
+###################################################################################
+
+###################################################################################
+# GLOBAL SETTINGS
+
+severity=3
+verbose=8
+
+###################################################################################
+# PERL::CRITIC BUILTIN RULES
+
+[BuiltinFunctions::ProhibitBooleanGrep]
+# DONT'T ENABLE THIS
+# While there's better ways to write this, it's not easy to write when you can't
+# rely on List::Util et al being installed (i.e. when I'm targetting older perls)
+severity=1
+
+[BuiltinFunctions::ProhibitComplexMappings]
+# DON'T ENABLE THIS
+# I don't want to prohibit writing multi line spanning maps.
+# While I think that *other* *people* shouldn't do this, I think that when I do it
+# it's fine. Hyprocritical?  You betcha.
+severity=1
+
+[BuiltinFunctions::ProhibitLvalueSubstr]
+# Force substr($x,$start,$len,$replacement) rather thatn substr($x,$start,$len) = $replacement
+# YES!
+severity=5
+
+[BuiltinFunctions::ProhibitReverseSortBlock]
+# Force "reverse sort { $a cmp $b } ..." not "sort { $b cmp $a } ..."
+# YES!
+severity=5
+
+[BuiltinFunctions::ProhibitSleepViaSelect]
+# prohibit writing select undef,undef,undef,0.25 to sleep
+# The only reason not to do this is the belief that it's not widely understood.
+# I think that it *is* widely understood.  And the alternatives require using
+# a module that doesn't ship with older Perls.  Therefore, don't do it.
+severity=1
+
+[BuiltinFunctions::ProhibitStringyEval]
+# DON'T ENABLE THIS
+# This is a biggy.  We probably shouldn't allow string eval at all, but the truth is
+# I know what I'm doing enough that if I used it, I meant it.  The reasons for
+# disallowing it is purely to stop you accidentally using it when you meant eval { ... }
+# and since I don't do that, I'm going to leave this off.
+severity=1
+
+[BuiltinFunctions::ProhibitStringySplit]
+# make it impossible to write split(":",$string)
+# YES! make it so you have to write split(/:/,$string) as that's what split(":",$string) does
+severity=5 
+
+[BuiltinFunctions::ProhibitUniversalCan]
+# Make it impossbile to write use UNIVERSAL::can($foo,...)?
+# YES! It breaks mocking.  Use blessed($foo) && $foo->can(...)
+severity=5
+
+[BuiltinFunctions::ProhibitUniversalIsa]
+# Make it impossbile to write use UNIVERSAL::isa($foo,...)?
+# YES! It breaks mocking.  Use blessed($foo) && $foo->isa(...)
+severity=5 
+
+[BuiltinFunctions::ProhibitVoidGrep]
+# Stop using grep as a loop?
+# YES! use a "for"
+severity=5
+
+[BuiltinFunctions::ProhibitVoidMap]
+# Stop using map as a loop?
+# YES! use a "for"
+severity=5
+
+[BuiltinFunctions::RequireBlockGrep]
+# Force you to write grep { /foo/ } @_ not grep /foo/, @_
+# YES! Everyone always gets the latter form wrong
+severity=5 
+
+[BuiltinFunctions::RequireBlockMap]
+# Force you to write map { foo($_) } @_ not map foo($_), @_
+# YES! Everyone always gets the latter form wrong
+severity=5 
+
+[BuiltinFunctions::RequireGlobFunction]
+# Stop writing <*.pl> to get all files called *.pl?
+# YES! use glob("*.pl") instead.  Or File::Find::Rule!
+severity=5
+
+[BuiltinFunctions::RequireSimpleSortBlock]
+# Don't allow complex sort blocks?
+# YES! My sort blocks should be fairly straight forward
+severity=1
+
+[ClassHierarchies::ProhibitAutoloading]
+# Stop writing AUTOLOADING code?
+# NO! It's a bad idea, but it's not something I'd do by accident
+severity=2
+
+[ClassHierarchies::ProhibitExplicitISA]
+# Don't write @ISA=() write "use base"
+# NO! It stops our code being backwards compatible
+severity=2
+
+[ClassHierarchies::ProhibitOneArgBless]
+# Don't let anyone write "return bless {};"
+# YES! That breaks inheritence
+severity=5
+
+[CodeLayout::ProhibitHardTabs]
+# Don't allow tabs in your sourcecode?
+# YES! TABS are the work of the devil!
+severity=5
+
+[CodeLayout::ProhibitParensWithBuiltins]
+# NO! Sometimes I need them for precidence
+severity=1
+
+[CodeLayout::ProhibitQuotedWordLists]
+# Force qw(foo bar baz) rather than ("foo","bar","baz")
+# NO! sometimes I need this for lists that often contain non-ascii
+# parts but simply don't happen to in this particular example
+severity=1
+
+[CodeLayout::ProhibitTrailingWhitespace]
+# ...probably a good idea
+severity=3
+
+[CodeLayout::RequireConsistentNewlines]
+# don't allow people to mix \n and \r\n
+# YES! subversion should protect us from this so turn it on
+severity=5
+
+[CodeLayout::RequireTrailingCommas]
+# force extra trailing commas in multiline lists
+# NO! This policy is too dumb to actually enforce that properly
+severity=1
+
+[ControlStructures::ProhibitCStyleForLoops]
+# NO! If I use them, I need them.
+severity=1
+
+[ControlStructures::ProhibitCascadingIfElse]
+# Force using a switch module instead?
+# NO! All the swtich modules suck.  When we've all got 5.10
+# with the inbuilt switch, we can start using this, but not until
+severity=1
+
+[ControlStructures::ProhibitDeepNests]
+# Don't allow deep nests of code
+# ...probably a good idea, if annoying
+severity=3
+
+[ControlStructures::ProhibitMutatingListFunctions]
+# Don't allow maps / grep to mutate the original elements
+# YES! people should use "for" for that
+severity=5
+
+[ControlStructures::ProhibitPostfixControls]
+# Don't allow  $foo if $bar;
+# NO! This makes my code more readable
+severity=1
+
+[ControlStructures::ProhibitUnlessBlocks]
+# NO! Unless blocks increase readability
+severity=1
+
+[ControlStructures::ProhibitUnreachableCode]
+# Checks for basic unreachable code (doesn't check for
+# if { return ... } else { return ...} unreachable)
+# YES! Writing stupid code should not be allowed
+severity=5
+
+[ControlStructures::ProhibitUntilBlocks]
+# Stop writing until() { ... }
+# NO! this increases readability
+severity=1
+
+[Documentation::RequirePodAtEnd]
+# Require all the pod at the end
+# NO! It should be throughout the code!
+severity=1
+
+[Documentation::RequirePodSections]
+# Require the pod throughout your code?
+# YES! It should be throughout the code!
+lib_sections    = NAME | SYNOPSIS | DESCRIPTION | AUTHOR | BUGS | SEE ALSO
+script_sections = NAME | SYNOPSIS | DESCRIPTION | AUTHOR | BUGS | SEE ALSO
+severity=5
+
+[ErrorHandling::RequireCarping]
+# make us use carp and croak not warn or die
+# ...probably a good idea
+severity=3
+
+[InputOutput::ProhibitBacktickOperators]
+# yes, we should be using open instead
+severity=4
+
+[InputOutput::ProhibitBarewordFileHandles]
+# Use bare filehandles In my source code?
+# NO! That's just insane!
+severity=5
+
+[InputOutput::ProhibitInteractiveTest]
+# This sounds like a bad idea.  Let's deny it
+severity=5
+
+[InputOutput::ProhibitJoinedReadline]
+# yeah, let's not be lazy and write this the proper way
+severity=4
+
+[InputOutput::ProhibitOneArgSelect]
+# one arg selects are fine in my book
+severity=1
+
+[InputOutput::ProhibitReadlineInForLoop]
+# this is just lazy. Don't allow it
+severity=5
+
+[InputOutput::ProhibitTwoArgOpen]
+# two arg opens lead to security bugs.  Get rid of them!
+severity=5
+
+[InputOutput::RequireBracedFileHandleWithPrint]
+# Yeah, you should be encouraged to do this
+severity=3
+
+[InputOutput::RequireCheckedClose]
+# you should *always* check closes, but I'm not too fussy
+severity=2
+
+[InputOutput::RequireCheckedOpen]
+# you should *always* check opens
+severity=5
+
+[Miscellanea::ProhibitFormats]
+# Formats suck
+severity=5
+
+[Miscellanea::ProhibitTies]
+# Stop ties?  NO! I LIKE TIES
+severity=1
+
+[Miscellanea::RequireRcsKeywords]
+# require $Revision: 1890$?
+# NO! I know how to use the svn command thankyou
+severity=1
+
+[Modules::ProhibitAutomaticExportation]
+# Prevent using @EXPORT and force @EXPORT_OK et al instead
+# NO! If I'm exporting, I mean it darnit
+severity=1
+
+[Modules::ProhibitEvilModules]
+# Don't allow use of Acme modules
+modules=/Acme::/
+
+[Modules::ProhibitExcessMainComplexity]
+# Don't allow me to write complex main code
+severity=3
+
+[Modules::ProhibitMultiplePackages]
+# Don't let me write multiple packages
+# NO! I use this to declare error classes
+severity=1
+
+[Modules::RequireBarewordIncludes]
+# Stop people writing "use 'foo'" with the quotes
+# YES! That's just crazy
+severity=1
+
+[Modules::RequireEndWithOne]
+# End our code with 1; rather than "Club Sandwitch"
+# ...boring, but probably a good idea
+severity=3
+
+[Modules::RequireExplicitPackage]
+# make sure that people start modules with "package ..."
+# YES...stops subtle bugs
+severity=5
+
+[Modules::RequireFilenameMatchesPackage]
+# catch the annoying case where you have one filename
+# but accidentally put in another package name?
+# YES! There's no reason not to do this
+severity=5
+
+[Modules::RequireVersionVar]
+# make us have a $VERSION in our modules?
+# ...probably a good idea
+severity=4
+
+[NamingConventions::ProhibitAmbiguousNames]
+# varnames we're not allowed to use because theu're ambigious
+severity=5
+forbid = last set left right no abstract contract record second close
+
+[NamingConventions::ProhibitMixedCaseSubs]
+# Don't allow camelcasing our subs? YES
+severity=5
+
+[NamingConventions::ProhibitMixedCaseVars]
+# Don't allow camelcasing our vars? YES
+severity=5
+
+[References::ProhibitDoubleSigils]
+# force people to write ${ @foo } rather than $@foo
+# YES! stops things being so darn confusing
+severity=5
+
+[RegularExpressions::ProhibitCaptureWithoutTest]
+# force peopel to test if re captures produced output
+# YES! Don't forget this
+severity=5
+
+[RegularExpressions::RequireExtendedFormatting]
+# force people to use /.../x
+# ...seems like a good idea
+severity=4
+
+[RegularExpressions::RequireLineBoundaryMatching]
+# force people to use /.../m
+# NO! I'm a perl programmer and find it confusing to use \A and \Z
+severity=1
+
+[Subroutines::ProhibitAmpersandSigils]
+# force people to write "foo()" not "&foo()"
+# YES!
+severity=5
+
+[Subroutines::ProhibitBuiltinHomonyms]
+# Prevent declaring "sub open {...}" and it's ilk
+# NO! because I might create an object like this and this module
+# is too dumb to realise that's what I'm doing
+severity=1
+
+[Subroutines::ProhibitExcessComplexity]
+# Seems like a good idea
+severity=2
+
+[Subroutines::ProhibitExplicitReturnUndef]
+# NO, if I say this I mean this
+severity=2
+
+[Subroutines::ProhibitManyArgs]
+# disallow writing subroutines that take more than five args
+# ...probably a good idea
+severity=1
+max_arguments=5
+
+[Subroutines::ProhibitNestedSubs]
+# prevent people from writing non anonymous subs in subs
+# YES! This is totally unreadable
+severity=1
+
+[Subroutines::ProhibitSubroutinePrototypes]
+# NO! I use this to create DSL
+severity=1
+
+[Subroutines::ProtectPrivateSubs]
+# catch people doing Foo::Bar::_baz
+severity=5
+allow=Encode::_utf8_on
+
+[Subroutines::RequireArgUnpacking]
+# NO, often I really mean it
+severity=1
+
+[Subroutines::RequireFinalReturn]
+# make sure all subroutines exit with a return (or other)
+# ...this seems like a good idea
+severity=4
+
+[TestingAndDebugging::ProhibitNoStrict]
+# make sure you can't turn strict off
+# allow overriding certain things though
+severity=5
+allow = vars subs refs
+
+[TestingAndDebugging::ProhibitNoWarnings]
+# make sure you can't turn warnings off
+# allow overriding certain things though
+severity=5
+allow = uninitialized once
+
+[TestingAndDebugging::ProhibitProlongedStrictureOverride]
+# make sure no strict isn't turned off for zillions of lines of code
+severity=5
+statements = 10 
+# more than the default, but not enough for the entire program
+
+[TestingAndDebugging::RequireTestLabels]
+# ensure that out tests have labels
+# YES! I tend to leave these off, then get confused
+severity=5
+
+[TestingAndDebugging::RequireUseStrict]
+# force use strict to be turned on
+severity=5
+
+[TestingAndDebugging::RequireUseWarnings]
+# Yes, but I also want code that runs on 5.005 and so, so
+# low severity
+severity=2
+
+[ValuesAndExpressions::ProhibitCommaSeparatedStatements]
+# catch where "," rather than ";" is used as a statement seperator (even by accident)
+# YES
+severity=5
+
+[ValuesAndExpressions::ProhibitConstantPragma]
+# make people write $FOO = 2 rather than "use constant FOO => 2"
+# YES, as constants keep biting you in hashes
+severity=5
+
+[ValuesAndExpressions::ProhibitEmptyQuotes]
+# make people write q{ } not ' ' for whitespace
+# NO, I find this harder to read as my brain thinks empty q{ } is a block
+severity=1
+
+[ValuesAndExpressions::ProhibitEscapedCharacters]
+# make people write \N{DELETE} rather than \x7f
+# NO, since after all these years it's harder for me to read the names than the char codes
+severity=2
+
+[ValuesAndExpressions::ProhibitImplicitNewlines]
+# don't let people put newlines in the middle of scripts!
+severity=5
+
+[ValuesAndExpressions::ProhibitInterpolationOfLiterals]
+# disallow writing "foo" instead of 'foo' for literals
+# NO! I write things like "It's a bad idea" all the time!
+severity=1
+
+[ValuesAndExpressions::ProhibitLeadingZeros]
+# disallow 0000123
+# YES! I can never remember that this is actualy octal
+severity=5
+
+[ValuesAndExpressions::ProhibitLongChainsOfMethodCalls]
+# disallow $a->b->c->d->e
+# NO! Good OO is often written like this
+severity=1
+
+[ValuesAndExpressions::ProhibitMismatchedOperators]
+# disallow "if ($a == '123')" and "if ($a eq 123)"
+# YES! It's a warning anyway
+severity=5
+
+[ValuesAndExpressions::ProhibitMixedBooleanOperators]
+# disallow "next if not ($a || $b)" (low and hight presidence booleans)
+# YES! Write readable code darnit
+severity=5
+
+[ValuesAndExpressions::ProhibitNoisyQuotes]
+# NO, this makes you code hard to read
+severity=1
+
+[ValuesAndExpressions::ProhibitQuotesAsQuotelikeOperatorDelimiters]
+# Disallow m"foo" and it's ilk
+# YES, this is just wrong
+severity=5
+
+[ValuesAndExpressions::ProhibitVersionStrings]
+# disallow $foo = v1.2.3.4
+# YES, this is just wrong
+severity=5
+
+[ValuesAndExpressions::RequireInterpolationOfMetachars]
+# complain about '\t' et al (not '\\t' or "\t")
+# YES, since this can bite you if you're not careful
+severity=5
+
+[ValuesAndExpressions::RequireNumberSeparators]
+# require that big numbers be written like 100_000 not 100000
+severity=5
+min_value = 10000
+# the default, but hardcoded here
+
+[ValuesAndExpressions::RequireQuotedHeredocTerminator]
+# For heredoc terminators to be quoted like <<'HEREDOC' or <<"HEREDOC"
+# YES! Because it makes you clear if interpolation is happening or not
+severity=5
+
+[ValuesAndExpressions::RequireUpperCaseHeredocTerminator]
+# force heredoc terminators to be UPPER_CASE
+# YES! It makes them readable
+severity=5
+
+[Variables::ProhibitConditionalDeclarations]
+# stop people writing "my $foo = $bar if $baz"
+# YES! This is very confusing code
+severity=5
+
+[Variables::ProhibitLocalVars]
+# While I agree with the ideas behind this, being not
+# able to write 'local $/' is confusing to me (I hate English.pm)
+severity=1
+
+[Variables::ProhibitMatchVars]
+# Don't let people use $`, $& and $'
+# YES! use capturing, or in 5.10 /p and ${^PREMATCH} et al
+severity=5
+
+[Variables::ProhibitPackageVars]
+# Not for this module.  Maybe it was a good idea, but in this
+# case, back in 2003 we made the interface use package
+# vars, so there's little I can do here...
+severity=1
+add_packages=Test::Builder Carp DBI
+
+[Variables::ProhibitPerl4PackageNames]
+# Don't allow people to write Foo'Bar'Baz not Foo::Bar::Baz
+# YES! This is just plain silly, and mucks up my editor
+severity=4
+
+[Variables::ProhibitPunctuationVars]
+# Disallow $/ and force people to use English
+# NO! $/ makes more sense to me than the english name
+severity=1
+
+[Variables::ProtectPrivateVars]
+# don't write $Foo::bar::_goo from another package
+# YES! infact, we shouldn't have those vars at all
+severity=5
+
+[Variables::RequireInitializationForLocalVars]
+# Require people initilize local vars?
+# YES! Forgetting so is a bad mistake
+severity=5
+
+[Variables::RequireLexicalLoopIterators]
+# Force people to use "for my $thingy (...)" with the my
+# YES! this is a common mistake!
+severity=5
+
+[Variables::RequireLocalizedPunctuationVars]
+# Stop people changing $/ et all without localising them?
+# YES! Say _no_ to sideeffects
+severity=5
+
+[Variables::RequireNegativeIndices]
+# make people write $foo[-1] rather than $foo[ $#foo - 1 ] ?
+# YES! I like my code readable
+severity=5
+
+[Subroutines::ProhibitUnusedPrivateSubroutines]
+# NO, since I'm emulating moose I need to create private
+# method calls that are called dynamically
+severity=1
+
+###################################################################################
+# PERL::CRITIC::MORE RULES
+
+#[CodeLayout::RequireASCII]
+# I hate unicode in source code.  Use escapes damnit
+#severity=5
+

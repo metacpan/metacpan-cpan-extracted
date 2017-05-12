@@ -1,0 +1,65 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with EntityModel::Definition::JSON
+at lib/EntityModel/Definition/JSON.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+EntityModel::Definition::JSON - definition support for L<EntityModel>
+
+=head1 VERSION
+
+version 0.102
+
+=head1 SYNOPSIS
+
+See L<EntityModel>.
+
+=head1 DESCRIPTION
+
+See L<EntityModel>.
+
+=head1 METHODS
+
+=head2 load_file
+
+=head2 load_string
+
+=head2 save_file
+
+Write output to a file.
+
+=head2 save_string
+
+Return output as a scalar.
+
+=head2 parse
+
+Create and parse the L<JSON::XS> object.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<EntityModel::Definition>
+
+L<add_entity_to_model|EntityModel::Definition/add_entity_to_model>, L<apply_model_from_structure|EntityModel::Definition/apply_model_from_structure>, L<entity_structure|EntityModel::Definition/entity_structure>, L<field_structure|EntityModel::Definition/field_structure>, L<load|EntityModel::Definition/load>, L<register|EntityModel::Definition/register>, L<save|EntityModel::Definition/save>, L<structure_from_model|EntityModel::Definition/structure_from_model>
+
+=item L<EntityModel::BaseClass>
+
+L<clone|EntityModel::BaseClass/clone>, L<dump|EntityModel::BaseClass/dump>, L<new|EntityModel::BaseClass/new>, L<sap|EntityModel::BaseClass/sap>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <cpan@entitymodel.com>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2008-2011. Licensed under the same terms as Perl itself.

@@ -1,0 +1,286 @@
+#!/usr/local/bin/perl
+
+use File::Basename;
+use Getopt::Long;
+
+use constant MSWIN => $^O =~ /MSWin32|Windows_NT/i ? 1 : 0;
+
+sub usage {
+    my $msg = shift;
+    my $rc = (defined($msg) && !$msg) ? 0 : 2;
+    if ($rc) {
+	select STDERR;
+	print $msg if $msg && $msg =~ /^\d+$/;
+    }
+    my $prog = basename($0, qw(.pl));
+    print <<EOF;
+Usage: $prog [VAR=TOKEN,TOKEN,...] ... [-N] [-U]
+                 [-E VAR [-A TOKEN] [-P TOKEN] [-I dir,-|+TOKEN]] [-C old=new]
+                 [--] command ...
+       $prog [VAR=TOKEN,TOKEN,...] [-E VAR] -L|-S
+Flags:
+   -help		Print this message and exit
+   -A TOKEN		Append TOKEN to the path variable named 'VAR'
+   -C olddir=newdir	Change <olddir> to <newdir> within 'VAR'
+   -P TOKEN		Prepend TOKEN to the path variable named 'VAR'
+   -I dir,(-|+)TOKEN]	Insert TOKEN before (-) or after (+) 'dir' in VAR
+   -L [VAR]		List specified pathvar(s) in one-entry-per-line fmt
+   -N			Remove entries which don't exist
+   -R TOKEN		Remove specified dir from path
+   -S [VAR]		Print specified pathvars in form suitable for `eval`
+   -U			Remove redundant entries from path
+   -W file		Like 'whence' ksh builtin - look for 'file' on PATH
+Examples:
+    $prog PATH=/tools/\@PLATFORM@/bin,\@PATH@ -- printenv PATH
+    $prog CLASSPATH=\@CLASSPATH@,\@JAVA_HOME@/classes printenv CLASSPATH
+    $prog -E LD_RUN_PATH -A /usr/openwin/lib -U -- ld ...
+    $prog -E LD_RUN_PATH -I /usr/openwin/lib,-\@LD_LIBRARY_PATH@ ld ...
+    $prog -L
+    $prog -E CLASSPATH -L
+    $prog -C /opt/netscape=/usr/local/netscape -L
+    eval `$prog -N -U -R /usr/ucb -S`
+    eval `$prog -E LD_RUN_PATH -I /usr/openwin/lib,-/usr/local/lib -S`
+    $prog -W cat
+
+In the above, TOKEN refers to a string which may optionally contain
+references to environment variables in the form \@VAR@. These will be
+replaced by the value \$VAR, and the commas will be replaced by the
+appropriate path separator (':' or ';') for the current platform.
+See "perldoc $prog" and "perldoc Env::Path" for full documentation.
+EOF
+    exit $rc;
+}
+
+sub expand {
+    my $ev = shift;
+    while (my($token) = ($ev =~ m%@(\w+)@%)) {
+	$ev =~ s%\@$token@%$ENV{$token}%;
+    }
+    return $ev;
+}
+
+usage() if !@ARGV;
+
+my @Paths;
+
+while (my($var, $where, $str) = ($ARGV[0] =~ m%^(\w+)([=+]+)(.*)%)) {
+    my $param = shift;
+    push(@Paths, $var);
+    my @val = split(/,/, $str);
+    for (@val) { $_ = expand($_) }
+    my $dsep = MSWIN ? ';' : ':';
+    if ($where eq '=') {
+	$ENV{$var} = join($dsep, @val);
+    } elsif ($where eq '+=') {
+	$ENV{$var} = join($dsep, @val, $ENV{$var});
+    } elsif ($where eq '=+') {
+	$ENV{$var} = join($dsep, $ENV{$var}, @val);
+    } else {
+	die "Error: $0: malformed parameter '$param'\n";
+    }
+}
+
+my %opt;
+my($opt_help, $opt_verbose);
+{
+    local $Getopt::Long::passthrough = 1;
+    GetOptions('help' => \$opt_help, 'verbose' => \$opt_verbose);
+    usage() if $opt_help;
+}
+local $Getopt::Long::order = $REQUIRE_ORDER;
+GetOptions(\%opt, qw(Env=s
+			    Append=s@ Change=s@ Prepend=s@ Insert=s@ Remove=s@
+			    Nonexistent Uniqify
+			    List:s@ Shell:s@ Whence=s)
+);
+
+usage() if !@ARGV && !($opt{List} || $opt{Shell} || $opt{Whence});
+
+if (%opt) {
+    require Env::Path;
+
+    push(@Paths, $opt{Env}) if $opt{Env};
+    push(@Paths, @{$opt{List}}) if $opt{List}->[0];
+    push(@Paths, @{$opt{Shell}}) if $opt{Shell}->[0];
+    push(@Paths, 'PATH') if !@Paths;
+
+    my $var = $Paths[-1] || 'PATH';
+    my $path = eval "Env::Path->$var";
+
+    for (@{$opt{Prepend}}) { $path->Prepend(expand($_)) }
+
+    for (@{$opt{Append}})  { $path->Append(expand($_)) }
+
+    for (@{$opt{Remove}})  { $path->Remove(expand($_)) }
+
+    for (@{$opt{Change}})  {
+	my($old, $new) = split '=', $_, 2;
+	$path->InsertBefore($old, $new);
+	$path->Remove(expand($old))
+    }
+
+    $path->DeleteNonexistent if $opt{Nonexistent};
+
+    $path->Uniqify if $opt{Uniqify};
+
+    for (@{$opt{Insert}}) {
+	if (!m%^(.+?),([+-])(.*)%) {
+	    warn "Warning: $0: malformed -Insert parameter '$_'\n";
+	    next;
+	}
+	my($marker, $where, $insert) = (expand($1), $2, expand($3));
+	if ($where eq '-') {
+	    $path->InsertBefore($marker, $insert);
+	} else {
+	    $path->InsertAfter($marker, $insert);
+	}
+    }
+
+    if ($opt{List} && @{$opt{List}}) {
+	usage(2) if ($opt{Shell} && @{$opt{Shell}}) || $opt{Whence};
+	for my $pathvar (@Paths) {
+	    my $path = eval "Env::Path->$pathvar";
+	    for ($path->List) { print $_, "\n" }
+	}
+	exit 0;
+    } elsif ($opt{Shell} && @{$opt{Shell}}) {
+	usage(2) if $opt{Whence};
+	for my $pathvar (@Paths) {
+	    print Env::Path->$pathvar->Shell, "\n";
+	}
+	exit 0;
+    } elsif ($opt{Whence}) {
+	for my $pathvar (@Paths) {
+	    my $path = eval "Env::Path->$pathvar";
+	    for ($path->Whence($opt{Whence})) { print $_, "\n" }
+	}
+	exit 0;
+    }
+}
+
+print STDERR "+ @ARGV\n" if $opt_verbose;
+if (MSWIN) {
+    exit system @ARGV;
+} else {
+    exec @ARGV;
+    die "$0: $ARGV[0]: $!\n";
+}
+
+__END__
+
+=head1 NAME
+
+envpath - Advanced operations on path variables
+
+=head1 SYNOPSIS
+
+Run this script with the C<-help> option for usage details.
+
+=head1 DESCRIPTION
+
+Parses the command line, modifies the specified path variable(s), and
+execs the remaining arguments. There are two modes, B<simple> and
+B<advanced>:
+
+=head2 SIMPLE MODE
+
+Simple mode presents an alternative, platform-independent syntax for
+specifying paths wherein the path separator is "," and environment
+variables can be expanded with @NAME@. For example
+
+    envpath PATH=@PATH@,/usr/ucb -- printenv PATH
+
+appends C</usr/ucb> to C<$PATH> and execs I<printenv PATH>. The C<-->
+is optional.
+
+You can also specify prepending or appending by using C<+=> or C<=+>
+respectively:
+
+    # place /usr/ucb at the front
+    envpath PATH+=/usr/ucb -- printenv PATH
+
+    # place /usr/ucb at the back
+    envpath PATH=+/usr/ucb -- printenv PATH
+
+Simple mode requires only this script; it does not require Env::Path
+to be installed.
+
+=head2 ADVANCED MODE
+
+Advanced mode basically provides command-line access to the features of
+Env::Path (see), which must be installed. The C<-E> flag selects the
+path variable to operate on and other flags specify operations on it.
+E.g.
+
+    envpath -E MANPATH -A /tmp -R /usr/share/man -N -U -- man ...
+
+would take MANPATH, append /tmp to it, remove any references to
+C</usr/share/man>, remove any dirs which don't exist (C<-N>) and
+remove redundant entries (C<-U>) before running I<man>.
+
+The -Whence option allows patterns. Thus
+
+    envpath -W "cat*"
+
+would find all programs on PATH which match cat*.
+
+=head1 CLEARCASE WINKINS
+
+A big part of the motivation for this script was for use with ClearCase
+builds; iff you know or care about ClearCase read on. Typically, during
+builds (and not just with ClearCase), pathvars such as PATH, CLASSPATH,
+and LD_LIBRARY_PATH must be strictly controlled.  One choice is to
+force static values of these into the environment during the build
+process, another is to simply require/expect users to set their paths
+appropriately. Each of these can lead to subtle build or runtime
+errors, however, and makes it hard for new users to get up to speed
+since their personal environment must be just so.
+
+Another common choice is to use only full pathnames within the
+Makefile, avoiding reliance on search paths at all. This is often the
+best way to go but can suppress ClearCase winkins.  For example, say
+you're generating ascii files of some type with a binary executable you
+just built:
+
+$(INCDIR)/foo.h: $(BINDIR)/foomaker
+	$(BINDIR)/foomaker ...
+
+The problem with this is that $(BINDIR) likely contains a platform part
+such as 'solaris' or 'hpux', which makes it impossible to wink in the
+foo.h file on other platforms even though it's ascii. This same thing
+could come up even with a standard pre-built utility that's in
+different places on different platforms; C<yacc>, for instance, is in
+/usr/bin on Linux and /usr/ccs/bin on Solaris.
+
+You could modify the path on the fly:
+
+$(INCDIR)/foo.h: $(BINDIR)/foomaker
+	PATH=$(BINDIR)$(SEP)$$PATH foomaker ...
+
+but this suffers from the same problem: since $(BINDIR) and $PATH are
+expanded literally within the build script they'll suppress winkins.
+Here's a solution using I<envpath>:
+
+$(INCDIR)/foo.h: $(BINDIR)/foomaker
+	envpath PATH=@BINDIR@,@PATH@ foomaker ...
+
+This hides the evaluation of BINDIR and PATH such that I<clearmake>
+never sees anything but the literals, thus clearing the field for
+winkins. Of course I<envpath> is capable of doing more than this, but
+it's the original reason it was written.
+
+=head1 AUTHOR
+
+David Boyce <dsbperl AT boyski.com>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2000-2001 David Boyce. All rights reserved.  This Perl
+program is free software; you may redistribute and/or modify it under
+the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+perl(1), "perldoc Env::Path"
+
+=cut

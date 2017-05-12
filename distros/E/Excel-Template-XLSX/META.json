@@ -1,0 +1,54 @@
+{
+   "abstract" : "\nRe-creates Excel (.xlsx) files from a template.  Excel\ncontent can be appended using Excel::Writer::XLSX. ",
+   "author" : [
+      "Dave Clarke <dclarke@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Excel-Template-XLSX",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Template::Tiny" : "0",
+            "Test::CheckManifest" : "1.29",
+            "Test::Differences" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Archive::Zip" : "0",
+            "Excel::Writer::XLSX" : "0.9",
+            "Graphics::ColorUtils" : "0",
+            "Scalar::Util" : "0",
+            "XML::Twig" : "0",
+            "perl" : "v5.12.0"
+         }
+      }
+   },
+   "provides" : {
+      "Excel::Template::XLSX" : {
+         "file" : "lib/Excel/Template/XLSX.pm",
+         "version" : "v1.0.7"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v1.0.7"
+}

@@ -1,0 +1,36 @@
+Revision history for ExtUtils-Scriptlet
+
+1.132640  2013-09-21 23:57:52 Europe/Berlin
+ - remove dep on strictures/autodie to get greater stability on perl 5.8
+
+1.132073  2013-07-26 19:38:32 Europe/Berlin
+ - more doc fixes
+
+1.132072  2013-07-26 17:14:02 Europe/Berlin
+ - more doc fixes
+ 
+1.132071  2013-07-26 16:59:07 Europe/Berlin
+ - small doc fix
+
+1.132070  2013-07-26 16:54:38 Europe/Berlin
+ - added documentation
+
+1.132060  2013-07-25 15:56:42 Europe/Berlin
+ - added a new option to populate @ARGV without quoting
+ - added a test for big payloads
+
+1.132010  2013-07-20 13:32:57 Europe/Berlin
+ - argv test shouldn't fail randomly anymore
+ - simplified os newline handling code to dtrt on win32 and ignore darwin
+
+1.131990  2013-07-18 14:49:33 Europe/Berlin
+ - added a bunch of explanatory comments
+ - forced transmission of code and payload segments to be binary
+
+1.131980  2013-07-17 17:33:35 Europe/Berlin
+ - first proper release to get it into the index once
+ - more tests
+ - protection against SIGPIPE terminating the host process
+
+1.131970  2013-07-16 21:59:07 Europe/Berlin
+ - initial trial release

@@ -1,0 +1,65 @@
+Revision history for Perl extension Exporter::Simple.
+
+1.10  Thu Nov 21 17:00:15 CET 2002
+    - Another almost-TOTAL rewrite. Version 1.00 *was* beautiful, but didn't
+      quite do what we wanted. Slaven Rezic pointed out that it was still
+      necessary to declare our() vars in packages that imported from a module
+      that used Exporter::Simple and asked if this requirement could be
+      removed. The solution turned out to be somewhat involved (read the
+      source for details). Basically the problem was that we exported
+      everything during INIT, but perl complains if it doesn't find a
+      variable in a package's symbol table during BEGIN. That's why the our()
+      declaration was still necessary. Now I've reworked things so that
+      scalars, arrays and hashes get exported during BEGIN, but subroutines
+      get exported during INIT. It's not that simple though; read the source
+      to find out what kinds of hoops I had to jump through.
+
+1.00  Sat Aug 31 18:38:27 CEST 2002
+	- TOTAL rewrite. Now that perl 5.8.0 is out, we have attributes
+	  on 'our' variables. This means we don't have to clumsily export
+	  globals, nor do we need to export lexicals (which was a weird
+	  concept anyway). So there's no need for Filter::Simple and
+	  PadWalker or any of the ugly workarounds that introduced. And
+	  once it occurred to me that Exporter::Simple could just subclass
+	  Exporter, and modules wanting to use Exporter::Simple could
+	  subclass it, things were a lot easier. Now using the attributes
+	  will populate the exporting package's @EXPORT, @EXPORT_OK
+	  and %EXPORT_TAGS direcltly, and we let Exporter have its way
+	  (with a few slight modifications).
+
+	  It's beautiful. And more proof of the old adage "if it's too
+	  complicated, there's probably something wrong with it" - when
+	  it's right, it's rather simple and elegant and things easily
+	  fall into place.
+
+0.13  Fri Mar 15 22:42:16 CET 2002
+	- Incorporated two patches sent by Richard Clamp in response
+	  to bug reports by Mark Fowler (thanks guys). First, Makefile.PL
+	  now contains Filter::Simple in its PREREQ_PM, and it builds with
+	  a newer Attribute::Handler and Filter::Simple, which mess
+	  around with our import() sub.
+
+0.12  Tue Jul  3 13:07:30 CEST 2001
+	- Changed source filter to insert lexical-inspecting code
+	  at the end of the calling module
+	- Added documentation effectively saying 'our attributes
+	  will be in 5.8.0, so we're not doing any fancy workarounds
+	  here'
+
+0.11  Thu Jun  7 14:00:35 2001
+	- Added source filter to rename custom import() routine,
+	  so no special name is necessary
+
+0.10  Tue Jun  6 18:37:20 2001
+	- Added exportable lexicals and support for a custom _import
+	  routine. Also export() and exportable() to manually export
+	  globals (as they can't take attributes).
+
+0.02  Wed May 30 13:53:50 2001
+	- Added tests, documentation. Renamed 'Export' to 'Exported'
+	  and 'ExportOk' to 'Exportable' (Damian's idea)
+
+0.01  Wed May 23 12:57:49 2001
+	- original version; created by h2xs 1.20 with options
+		-XAn Exporter::Simple
+

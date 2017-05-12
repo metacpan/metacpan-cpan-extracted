@@ -1,0 +1,71 @@
+{
+   "abstract" : "Eliza chatbot",
+   "author" : [
+      "Robert Acock <thisusedtobeanemail@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Eliza-Chatbot",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Array::Utils" : "0.5",
+            "Ref::Util" : "0.002",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moo" : "1.0010001",
+            "MooX::LazierAttributes" : "0.07",
+            "Ref::Util" : "0.002",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Eliza::Chatbot" : {
+         "file" : "lib/Eliza/Chatbot.pm",
+         "version" : "0.07"
+      },
+      "Eliza::Chatbot::Brain" : {
+         "file" : "lib/Eliza/Chatbot/Brain.pm"
+      },
+      "Eliza::Chatbot::Option" : {
+         "file" : "lib/Eliza/Chatbot/Option.pm"
+      },
+      "Eliza::Chatbot::ScriptParser" : {
+         "file" : "lib/Eliza/Chatbot/ScriptParser.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ThisUsedToBeAnEmail/Eliza-Chatbot.git",
+         "web" : "https://github.com/ThisUsedToBeAnEmail/Eliza-Chatbot"
+      }
+   },
+   "version" : "0.07",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

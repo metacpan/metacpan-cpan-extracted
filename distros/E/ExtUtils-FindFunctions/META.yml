@@ -1,0 +1,19 @@
+---
+name: ExtUtils-FindFunctions
+version: 0.02
+author:
+  - 'Sébastien Aperghis-Tramoni <sebastien@aperghis.net>'
+abstract: Find functions in external libraries
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Test::More: 0
+provides:
+  ExtUtils::FindFunctions:
+    file: lib/ExtUtils/FindFunctions.pm
+    version: 0.02
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,202 @@
+=encoding utf-8
+
+=head1 NAME
+
+Encode::JP::Mobile::CookBook - Encode::JP::Mobile のレシピ集
+
+=head1 DESCRIPTION
+
+このドキュメントでは、Encode::JP::Mobile の使い方についていくつかのヒントを紹介します。
+
+=head1 どのエンコーディングを使えばよいか
+
+各端末へ絵文字を相互変換しつつ出し分けるには、各端末に適したエンコーディングで decode/encode します。エンコーディング名は L<HTTP::MobileAgent> と組み合わせ以下のように決めるとよいでしょう。
+
+  use HTTP::MobileAgent;
+  
+  my $agent = HTTP::MobileAgent->new;
+  my $encoding = detect_encoding($agent);
+  
+  sub detect_encoding {
+      my $agent = shift;
+      if ($agent->is_docomo) {
+          return $agent->xhtml_compliant ? 'x-utf8-docomo' : 'x-sjis-docomo';
+      } elsif ($agent->is_ezweb) {
+          return 'x-sjis-kddi-auto';
+      } elsif ($agent->is_vodafone) {
+         return $agent->is_type_3gc ? 'x-utf8-softbank' : 'x-sjis-softbank';
+      } elsif ($agent->is_airh_phone) {
+          return 'x-sjis-airh';
+      } else { # $agent->is_non_mobile には utf-8 とします
+          return 'utf-8';
+      }
+  }
+
+=head2 さらに楽をする
+
+この例の C<detect_encoding()> サブルーチンを毎回コピーする必要はありません。これは L<HTTP::MobileAgent::Plugin::Charset> というモジュールとしてパッケージ化されています。これを利用すると、HTTP::MobileAgent オブジェクトで C<encoding()> メソッドが使えるようになり、以下のように楽に適したエンコーディング名を取得できます。
+
+  use HTTP::MobileAgent;
+  use HTTP::MobileAgent::Plugin::Charset;
+  
+  my $agent = HTTP::MobileAgent->new;
+  my $encoding = $agent->encoding; # これだけ！
+
+=head2 利用イメージ
+
+上記をふまえ、キャリア間で decode/encode するイメージをつかむため、簡略化した CGI スクリプトを示します。
+
+  use CGI;
+  use HTTP::MobileAgent;
+  use HTTP::MobileAgent::Plugin::Charset;
+  use Encode;
+  use Encode::JP::Mobile;
+  
+  my $cgi = CGI->new;
+  my $agent = HTTP::MobileAgent->new;
+  my $encoding = $agent->encoding;
+  
+  if ($cgi->request_method eq 'POST') {
+      # 端末からの入力は端末に合わせたエンコーディングで decode し任意の処理を行い...
+      my $data = decode($encoding, $cgi->param('text'));
+      
+      # DB などへは utf-8 で保存.
+      open(my $fh, '>>', '/tmp/test.txt');
+      print {$fh} encode('utf-8', $data);
+      close $fh;
+  }
+  
+  # DB などからは普通に utf-8 で取り出し任意の処理を行い...
+  open(my $fh, '<', '/tmp/test.txt');
+  my $data = decode('utf-8', join "", <$fh>);
+  
+  # 出力する時は、端末に合わせたエンコーディングで encode してやります.
+  my $charset = $encoding =~ /sjis/ ? 'shift_jis' : 'utf-8';
+  my $html = <<HTML
+  <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+  <html>
+  <head>
+  <meta http-equiv="Content-Type" content="text/html; charset=$charset" />
+  </head>
+  <body>
+  <form action="$ENV{SCRIPT_NAME}" method="POST">
+  <input type="text" name="text" />
+  <input type="submit">
+  </form>
+  <p>$data</p>
+  </body>
+  </html>
+  HTML
+  ;
+  print $cgi->header(-charset => $charset);
+  print encode($encoding, $html, Encode::JP::Mobile::FB_CHARACTER);
+
+この例のように C<Encode::encode()> で L<Encode::JP::Mobile::FB_CHARACTER|Encode::JP::Mobile::Fallback> を使うことで、絵文字 => 絵文字の相互変換だけでなく 絵文字 => 文字 の相互変換も行なうことができるため、キャリアが行なっている相互変換を模倣することができます。
+
+=head2 メール送信時のエンコーディング
+
+メール送信時のエンコーディングは html 出力時とは大体の場合で異なります。L<Mail::Address::MobileJp> を使い、以下の C<detect_mail_encoding()> のように決めるとよいでしょう。
+
+  use Mail::Address::MobileJp;
+  
+  sub detect_mail_encoding {
+      my $mobile_to_address = shift;
+      
+      my $code =
+          ( is_imode($mobile_to_address)    ) ? 'x-sjis-docomo'    :
+          ( is_softbank($mobile_to_address) ) ? 'x-utf8-softbank'  :
+          ( is_ezweb($mobile_to_address)    ) ? 'x-sjis-kddi-auto' :
+                                                'x-sjis-docomo'    ;
+      return $code;
+  }
+
+=head1 PC 向けに絵文字を代替表現する
+
+PC 向けに携帯で入力された絵文字を [台風] といったように文字で代替表現するには、L<':props' オプション|Encode::JP::Mobile/UNICODE_PROPERTIES>と L<Encode::JP::Mobile::Character> を使い以下のように全絵文字を置換することができます。
+
+  use Encode::JP::Mobile ':props';
+  use Encode::JP::Mobile::Charnames;
+  
+  $html =~ s{(\p{InMobileJPPictograms})}{
+      my $char = Encode::JP::Mobile::Character->from_unicode(ord $1);
+      sprintf '[%s]', $char->name;
+  }ge;
+  
+  print encode('utf-8', $html); # 例：いい天気[太陽]
+
+=head2 表現を変える
+
+上の方法だと PC ユーザーへ意味を伝えることはできますが、C<< $char->name >> はキャリアのページの絵文字一覧表にある名前を返すものなので、[丸に斜め線] や [羽のはえたお札] といった説明的表現になってしまうものがあります。
+
+これらについて、別の表現にしたい場合は以下のように自分でマップを持ち変換するとよいでしょう。
+
+  use utf8;
+  my $fallback_name = {
+      E => {
+          31 => '(禁止)',
+          459 => '（>人<）',
+          777 => '[お金]',
+      },
+  };
+  
+  $res =~ s{(\p{InMobileJPPictograms})}{
+      my $char = Encode::JP::Mobile::Character->from_unicode(ord $1);
+      $fallback_name->{$char->carrier}{$char->number} || 
+      sprintf('[%s]', $char->name);
+  }ge;
+
+=head2 画像で出す
+
+文字での表現には限界がありますので、結局 PC 用に絵文字の画像を用意し、それを出すのが一番再現度合いが高いです。例えば /img/pictogram/<unicode codepoint>.gif というパスに絵文字画像を用意した場合は以下のように置換することができます。
+
+  $res =~ s{(\p{InMobileJPPictograms})}{
+      my $char = Encode::JP::Mobile::Character->from_unicode(ord $1);
+      sprintf '<img src="/img/pictogram/%s.gif" />', $char->unicode_hex;
+  }ge;
+
+=head2 TT のフィルタで行なう
+
+Template-Toolkit を使っている場合、L<Template::Plugin::MobileJPPictogram> を使うとフィルタとしてこの方法を簡単に行なうことができ便利です。
+
+  [% USE MobileJPPictogram %]
+  [% body | pictogram_unicode('<img src="/img/pictogram/%X.gif" />') %]
+
+=head1 KDDI の表と裏の話題
+
+=head2 表を裏へコンバートする
+
+v0.06 以前の Encode::JP::Mobile を使っていた場合など、au の絵文字を含むテキストを C<shift_jis-kddi> や C<x-sjis-kddi> で decode し、DB へ utf-8 で保存していたケースがあると思います。それらのエンコーディングは仕様書にある Unicode コードポイントでマップしていますので、SoftBank との重複部分があり相互変換時に違う絵文字になってしまうことがあります。重複のない kddi-auto でのマッピングに変更するには、以下のような関数でデータをコンバートできます。
+
+  use Encode;
+  use Encode::JP::Mobile;
+  
+  sub kddi_to_auto {
+      my $bytes = shift;
+      Encode::from_to($bytes, "utf-8" => "x-sjis-kddi-cp932");
+      Encode::from_to($bytes, "x-sjis-kddi-auto" => "utf-8");
+      return $bytes;
+  }
+
+=head2  KDDI・SoftBank どちらからのテキストだったか
+
+L<Encode::JP::Mobile/UNICODE_PROPERTIES> の C<\p{InKDDISoftBankConflicts}> を利用し、以下のようなコードで、元々の絵文字が KDDI のものであったか、SoftBank のものであったか判定することが可能です（文字列に含まれる絵文字が重複部分のみの場合、判定することはできません）。
+
+  my $string = ...;
+
+  if ($string =~ /\p{InKDDISoftBankConflicts}/) {
+      eval { Encode::encode("x-sjis-kddi", $string, Encode::FB_CROAK) };
+      if ($@) {
+          # softbank
+      } else {
+          # KDDI
+      }
+  }
+
+=head1 SEE ALSO
+
+L<Encode::JP::Mobile>, L<http://coderepos.org/share/wiki/Mobile/Encoding>
+
+=head1 AUTHORS
+
+Encode::JP::Mobile committers.

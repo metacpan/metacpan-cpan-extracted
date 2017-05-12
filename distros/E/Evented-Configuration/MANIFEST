@@ -1,0 +1,7 @@
+Build.PL
+lib/Evented/Configuration.pm
+MANIFEST			This list of files
+Makefile.PL
+META.yml
+META.json
+README.md

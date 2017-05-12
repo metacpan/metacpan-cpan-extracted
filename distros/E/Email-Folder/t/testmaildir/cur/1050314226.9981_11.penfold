@@ -1,0 +1,74 @@
+Received: from pallas.eruditorum.org ([63.251.136.85] ident=postfix)
+	by deep-dark-truthful-mirror.pad with esmtp (Exim 3.36 #1 (Debian))
+	id 18Vu97-0006cD-00
+	for <rt@netthink.co.uk>; Tue, 07 Jan 2003 13:51:57 +0000
+Received: from pallas.eruditorum.org (localhost [127.0.0.1])
+	by pallas.eruditorum.org (Postfix) with ESMTP
+	id 7764611259; Tue,  7 Jan 2003 08:50:04 -0500 (EST)
+Delivered-To: rt-users@pallas.eruditorum.org
+Received: from nemesis.eahd.or.ug (nemesis.eahd.or.ug [216.129.132.178])
+	by pallas.eruditorum.org (Postfix) with ESMTP id 673F01121D
+	for <rt-users@lists.fsck.com>; Tue,  7 Jan 2003 08:48:20 -0500 (EST)
+Received: from localhost (localhost.eahd.or.ug [127.0.0.1])
+	by nemesis.eahd.or.ug (Postfix) with ESMTP id CB458187628
+	for <rt-users@lists.fsck.com>; Tue,  7 Jan 2003 16:48:36 +0300 (EAT)
+Received: by nemesis.eahd.or.ug (Postfix, from userid 1005)
+	id 16874187621; Tue,  7 Jan 2003 16:48:35 +0300 (EAT)
+Received: from localhost (localhost [127.0.0.1])
+	by nemesis.eahd.or.ug (Postfix) with ESMTP id 1337917DB04
+	for <rt-users@lists.fsck.com>; Tue,  7 Jan 2003 16:48:35 +0300 (EAT)
+From: Kamara Eric R-M <kamara@eahd.or.ug>
+To: rt-users@lists.fsck.com
+Message-ID: <20030107164205.E98585-100000@nemesis.eahd.or.ug>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+X-Virus-Scanned: by AMaViS
+Subject: [rt-users] Configuration Problem
+Sender: rt-users-admin@lists.fsck.com
+Errors-To: rt-users-admin@lists.fsck.com
+X-BeenThere: rt-users@lists.fsck.com
+X-Mailman-Version: 2.0.12
+Precedence: bulk
+List-Help: <mailto:rt-users-request@lists.fsck.com?subject=help>
+List-Post: <mailto:rt-users@lists.fsck.com>
+List-Subscribe: <http://lists.fsck.com/mailman/listinfo/rt-users>,
+	<mailto:rt-users-request@lists.fsck.com?subject=subscribe>
+List-Id: For users of RT: Request Tracker <rt-users.lists.fsck.com>
+List-Unsubscribe: <http://lists.fsck.com/mailman/listinfo/rt-users>,
+	<mailto:rt-users-request@lists.fsck.com?subject=unsubscribe>
+List-Archive: <http://lists.fsck.com/pipermail/rt-users/>
+Date: Tue, 7 Jan 2003 16:48:35 +0300 (EAT)
+Content-Length: 964
+Lines: 31
+
+Hello,
+
+This is my first time to set up WebRT and I have installed rt 2.0.15 on a
+SuSE 7.2 box.
+I am getting a problem with the httpd.conf file though..I want to set it
+up to run with other content on the server and i followed the instructions
+in the online manual.However on starting up apache i get the following
+error.
+***************************************
+Syntax error on line 562 of /etc/httpd/httpd.conf:
+Invalid command 'PerlRequire', perhaps mis-spelled or defined by a module
+not included in the server configuration
+/usr/sbin/apachectl startssl: httpd could not be started
+************************************
+
+All help will be greatly appreciated.
+
+Regards,
+Eric
+--------
+#!/usr/bin/perl
+while (!$you_are_around) {
+	my $heart= NULL;
+}
+_______________________________________________
+rt-users mailing list
+rt-users@lists.fsck.com
+http://lists.fsck.com/mailman/listinfo/rt-users
+
+Have you read the FAQ? The RT FAQ Manager lives at http://fsck.com/rtfm
+

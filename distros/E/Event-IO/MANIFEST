@@ -1,0 +1,9 @@
+Changes
+Build.PL
+Makefile.PL
+MANIFEST
+README
+test.pl
+META.yml
+lib/Event/IO/Record.pm
+lib/Event/IO/Server.pm

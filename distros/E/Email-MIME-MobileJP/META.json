@@ -1,0 +1,97 @@
+{
+   "abstract" : "E-mail toolkit for Japanese Mobile Phones",
+   "author" : [
+      "Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ GMAIL COM>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.2.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Email-MIME-MobileJP",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Devel::Peek" : "0",
+            "Email::Address" : "1.892",
+            "Email::Address::JP::Mobile" : "0.05",
+            "Email::Address::Loose" : "0.01",
+            "Email::MIME" : "1.923",
+            "Encode" : "2.4",
+            "Encode::JP::Mobile" : "0.27",
+            "Tiffany" : "0.03",
+            "parent" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "MIME::Base64" : "0",
+            "Test::More" : "0.98",
+            "Test::Requires" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Email::MIME::MobileJP" : {
+         "file" : "lib/Email/MIME/MobileJP.pm",
+         "version" : "0.08"
+      },
+      "Email::MIME::MobileJP::Creator" : {
+         "file" : "lib/Email/MIME/MobileJP/Creator.pm"
+      },
+      "Email::MIME::MobileJP::Parser" : {
+         "file" : "lib/Email/MIME/MobileJP/Parser.pm"
+      },
+      "Email::MIME::MobileJP::Template" : {
+         "file" : "lib/Email/MIME/MobileJP/Template.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tokuhirom/Email-MIME-MobileJP/issues"
+      },
+      "homepage" : "https://github.com/tokuhirom/Email-MIME-MobileJP",
+      "repository" : {
+         "url" : "git://github.com/tokuhirom/Email-MIME-MobileJP.git",
+         "web" : "https://github.com/tokuhirom/Email-MIME-MobileJP"
+      }
+   },
+   "version" : "0.08",
+   "x_contributors" : [
+      "Uchiko <memememomo@gmail.com>",
+      "tanaka <banchou@peixe.biz>",
+      "Tokuhiro Matsuno <tokuhirom@gmail.com>"
+   ]
+}

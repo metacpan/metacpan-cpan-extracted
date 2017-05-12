@@ -1,0 +1,45 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 6823ca704c04f83600fd2e2cd9343da3adba1d2b Build.PL
+SHA1 86a617b194bf08fb393869965074daa90c278ade Changes
+SHA1 d248039f60acda1b6508d556024192d81229cd60 LICENSE
+SHA1 0fd1a23ae49a1af77c715ab87a0b7e6983a2c726 MANIFEST
+SHA1 c1ef3014c0bc3ed78eec43db3590cecd28f39a12 MANIFEST.SKIP
+SHA1 9d76170204cdfdac0a4f97314e1e77ed4244749b META.yml
+SHA1 6935d4c89ba1946c26e1bdbddc7c16d3929e5f7a Makefile.PL
+SHA1 47f694df384368358e9f57791dc2627b5419e22c README
+SHA1 d41359756f028bbe81d564fa043f5595528062a5 examples/list.pl
+SHA1 b92c41ec5a382b3407108542ebf3c27ed92dccd4 lib/Env/Sanctify/Auto.pm
+SHA1 f84e80bcf9c575b92cd65d8f05c3a6d8c2766936 t/00signature.t
+SHA1 1b6860ddb4ea2f983129f31a55b2740aeb58a865 t/01manifest.t
+SHA1 082928f067fe14ebe3127ebb2b0e25747e19b2ab t/02compile.t
+SHA1 2420d2ef97804d5ec5a226832dea41c981249d44 t/03core.t
+SHA1 d39b66fb3433647c617f8a02adcef8b036a442d7 t/03defaults.t
+SHA1 ddcd02fdfbf8e89da6189f80ac4e2cd1a89d71b7 t/03exceptions.t
+SHA1 106addba5e49cfdbf52d8aad2b634a8b6126916b t/97pod.t
+SHA1 4b314b9eb53e3f51c02a6b2522531cdfdb6da3ec t/98pod-coverage.t
+SHA1 3cd493c2f2f580e3ccf8e581fc478874400f6af2 t/99kwalitee.t
+SHA1 679338678a0df3ffd92e35ef7e38c3669f02fe5f t/99meta.t
+SHA1 c7641aa95387e1632466a0e17761fc62b8a07661 t/99min-perl.t
+SHA1 8fe0ffbc842ca82e4033c54dc6c54772d5ea654f t/99portability.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iEYEARECAAYFAkqKsPUACgkQYYN9T93mai+XAACaAg2xGRush3zgXUF18WSJ6NH3
+rgIAniso0r3SLoSSpIoC1zQoSQLifYJi
+=eWr1
+-----END PGP SIGNATURE-----

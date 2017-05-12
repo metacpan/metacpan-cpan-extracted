@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution EntityModel-Web-Apache2,
+version 0.001:
+
+  Apache2/mod_perl support for L<EntityModel::Web>
+
+This software is copyright (c) 2011 by Tom Molesworth.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

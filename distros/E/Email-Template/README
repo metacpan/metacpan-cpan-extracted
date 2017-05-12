@@ -1,0 +1,51 @@
+Email-Template
+
+This is a fairly simple interface to generate "multipart/alternative"
+emails with both "text/html" and "text/plain" components using a single
+HTML based Template Toolkit template.
+
+The HTML, once processed by Template Toolkit, is converted to text
+using HTML::FormatText::WithLinks::AndTables. Both HTML and text ver‐
+sions are then attached and sent via MIME::Lite.
+
+Be sure to validate your sender and recipient addresses first (ie.
+Email::Valid−>rfc822 ).
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Email::Template
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Email-Template
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Email-Template
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Email-Template
+
+    Search CPAN
+        http://search.cpan.org/dist/Email-Template
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Shaun Fryer
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

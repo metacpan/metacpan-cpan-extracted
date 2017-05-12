@@ -1,0 +1,13 @@
+Revision history for Email-Sender-Transport-SMTPS
+
+0.04  2017-04-05 09:20:56 CST
+        - DEPRECATED in favour of Email::Sender::Transport::SMTP
+
+0.03  2014-08-06 22:44:06 CST
+        - add debug option
+
+0.02  2013-11-30 11:24:45 CST
+		- more examples
+
+0.01  2013-11-30 11:19:50 CST
+        - Initial release

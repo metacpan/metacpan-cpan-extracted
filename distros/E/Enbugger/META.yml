@@ -1,0 +1,27 @@
+---
+abstract: '"Enables the debugger at runtime"'
+author:
+  - 'Josh Jore <jjore@cpan.org>'
+build_requires:
+  ExtUtils::CBuilder: '0'
+  Test::More: '0'
+configure_requires:
+  B::Utils: '0.22'
+  ExtUtils::CBuilder: '0'
+  Test::More: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Enbugger
+requires:
+  B::Utils: '0.22'
+  Scalar::Util: '0'
+  perl: v5.6.0
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Enbugger
+  homepage: http://search.cpan.org/dist/Enbugger
+  repository: git://github.com/jbenjore/enbugger.git
+version: '2.016'

@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                Email-Filter-Rules
+version:             1.2
+abstract:            Simple Rules for Routing Mail with Email::Filter/Mail::Audit
+license:             perl
+author:              
+    - Jeff Bisbee (jbisbee@cpan.org)
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Email::Filter:                 0
+    Test::Simple:                  0.44
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

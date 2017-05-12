@@ -1,0 +1,447 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+# PODNAME: makeperlmod
+# ABSTRACT: Perl program for creating new modules with ExtUtils::ModuleMaker::TT
+our $VERSION = '0.94'; # VERSION
+
+use Config::Find 0.22;
+use Config::General 2.29;
+use Data::Dumper;
+use ExtUtils::ModuleMaker 0.46;
+use Getopt::Long;
+use Path::Class 0.15;
+
+#--------------------------------------------------------------------------#
+# usage
+#--------------------------------------------------------------------------#
+
+sub print_usage {
+    my $verbosity = shift;
+    
+    print << 'BASIC';
+    Usage: 
+    makeperlmod [ -c config_file ] mode_option [argument] [-e extra_info ]
+BASIC
+    return if $verbosity < 2;
+
+    print << 'LONG';
+
+    mode_options (one is required and only one may be used)
+
+       -d [CONFIG] or --defaults [CONFIG]
+       -l [CONFIG] or --locate_config [CONFIG]
+       -t DIRECTORY or --templates DIRECTORY
+       -n MODULE::NAME or --newdist MODULE::NAME
+       -m MODULE::NAME or --module MODULE::NAME
+       -s METHOD_NAME or --subroutine METHOD_NAME
+       -V or --version
+       -h or -? or --help
+LONG
+
+    return;
+}
+
+#--------------------------------------------------------------------------#
+# find_config
+#--------------------------------------------------------------------------#
+
+sub find_config {
+    my $filename = shift;
+    my $program_name = file($0)->basename;
+    my $config_file;
+    if ( $filename ) {
+        if ( file( $filename )->is_absolute ) {
+            $config_file = file( $filename );
+        }
+        else {
+            $config_file = file(
+                Config::Find->find(
+                    name => "${program_name}/$filename",
+                    mode => 'w',
+                )
+            );
+        }
+    }
+    else {
+        $config_file = file(
+            Config::Find->find( 
+                name => "${program_name}/default",
+                mode => 'w',
+            )
+        );
+    }
+    return $config_file;
+}
+
+#--------------------------------------------------------------------------#
+
+# Command line option handling:
+# Put option definitions in @opt_def as <name spec>[arg spec]
+# name spec is 'name' or 'name|alias'  (results will be in $opt{name})
+# arg spec is:
+#       blank (boolean), ! (negatable), + (incremental), =<type> (required), 
+#       :<type> (optional), :<number> (optional, w/ integer default),
+# types are "s" (string), "i" (int), "o" (int/octal/hex), "f" (real float)
+# can append a "@" or "%" to store multiples in a list or hash
+# put option defaults in %opts
+
+my @opt_def = ('help|h|?',
+               'config|c:s',
+               'defaults|d:s',
+               'templates|t:s',
+               'newdist|n:s',
+               'module|m:s',
+               'subroutine|s:s',
+               'extra|e:s@',
+               'locate_config|l:s',
+               'version|V',
+);
+
+my %opt = ('help' => 0);
+
+GetOptions(\%opt, @opt_def) or ( print_usage(2) and exit(1) );
+if ( $opt{help} ) {
+    print_usage(2);
+    exit(1);
+}
+
+my $cmd_opt_count = 
+    grep(/defaults|templates|newdist|module|subroutine|version|locate_config/, 
+        keys %opt); 
+unless ( $cmd_opt_count == 1  ) {
+    print_usage(1);
+    exit(1);
+}
+
+# Find config file if specified or use the default
+my $config_file = find_config( $opt{config} );
+
+# Throw an error if config file was requested and not found.
+die "Config file '$opt{config}' could not be read.  Aborting.\n"
+    if defined $opt{config} && ! -e $config_file;
+    
+# if the default doesn't exist, undef gives a null config
+my $config = Config::General->new( 
+    "-ConfigFile" => -e $config_file ? $config_file : undef, 
+    "-AutoTrue"   => 1 
+);
+
+# Process options
+
+my $mmtt;    
+
+SWITCH: for(1) {
+    
+    $opt{newdist} && do {
+        $mmtt = ExtUtils::ModuleMaker->new( 
+            COMPACT => 1,
+            ALT_BUILD => 'ExtUtils::ModuleMaker::TT',
+            $config->getall, 
+            NAME => $opt{newdist},
+        ) or die "Couldn't create ExtUtils::ModuleMaker object";
+        my $dist_dir = $mmtt->complete_build( NAME => $opt{newdist} );
+        for ( @{ $opt{extra} } ) {
+            $mmtt->build_single_pm($_);
+        }
+        last;
+    };
+
+    $opt{module} && do {
+        $mmtt = ExtUtils::ModuleMaker->new( 
+            COMPACT => 1,
+            ALT_BUILD => 'ExtUtils::ModuleMaker::TT',
+            $config->getall, 
+            NAME => 'bogus',
+        ) or die "Couldn't create ExtUtils::ModuleMaker object";
+        for ( $opt{module}, @{ $opt{extra} } ) {
+            $mmtt->build_single_pm($_);
+        }
+        last;
+    };
+
+    $opt{subroutine} && do {
+        $mmtt = ExtUtils::ModuleMaker->new( 
+            COMPACT => 1,
+            ALT_BUILD => 'ExtUtils::ModuleMaker::TT',
+            $config->getall, 
+            NAME => 'bogus',
+        ) or die "Couldn't create ExtUtils::ModuleMaker object";
+        for ( $opt{subroutine}, @{ $opt{extra} } ) {
+            print $mmtt->build_single_method($_) . "\n";
+        }
+        last;
+    };
+
+    defined $opt{defaults} && do {
+        $mmtt = ExtUtils::ModuleMaker->new( 
+            COMPACT => 1,
+            ALT_BUILD => 'ExtUtils::ModuleMaker::TT',
+            $config->getall, 
+            NAME => 'bogus',
+        ) or die "Couldn't create ExtUtils::ModuleMaker object";
+        my $defaults = $mmtt->default_values();
+        my $config_file = find_config( $opt{defaults} );
+        $config_file->dir->mkpath;
+        $config->save_file( $config_file, $defaults);
+        print "$config_file\n";
+        last;
+    };
+
+    $opt{templates} && do {
+        $mmtt = ExtUtils::ModuleMaker->new( 
+            COMPACT => 1,
+            ALT_BUILD => 'ExtUtils::ModuleMaker::TT',
+            $config->getall, 
+            NAME => 'bogus',
+        ) or die "Couldn't create ExtUtils::ModuleMaker object";
+        $mmtt->create_template_directory($opt{templates});
+        last;
+    };
+    
+    defined $opt{locate_config} && do {
+        my $target = $opt{locate_config} ? $opt{locate_config} : 'default';
+        print find_config( $opt{locate_config} ), "\n";
+        last;
+    };
+    
+    $opt{version} && do {
+        print "$0 version $main::VERSION\n";
+        print "Current config hash:\n" . Data::Dumper->Dump ( [{$config->getall}], [qw(config)]);
+        last;
+    }
+} 
+
+exit;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+makeperlmod - Perl program for creating new modules with ExtUtils::ModuleMaker::TT
+
+=head1 VERSION
+
+version 0.94
+
+=head1 SYNOPSIS
+
+ makeperlmod [ -c config_file ] mode_option [argument] [-e extra_info ]
+
+=head1 DESCRIPTION
+
+This program is a front-end to ExtUtils::ModuleMaker::TT.  It 
+supports:
+
+=over
+
+=item *
+
+reading/writing a configuration file
+
+=item *
+
+generating a directory of default templates
+
+=item *
+
+building new distribution directories
+
+=item *
+
+creating new .pm and .t files within an existing distribution
+directory
+
+=item *
+
+printing a skeleton method to STDOUT
+
+=back
+
+=head1 OPTIONS
+
+=head2 Mode Options
+
+One of the following mode options is required and only one may be used.
+
+=over
+
+=item -d [CONFIG] or --defaults [CONFIG]
+
+Writes out default options from ExtUtils::ModuleMaker to the given file in
+"Apache" config format. Use to create a new base for a custom config file.
+CONFIG is either a short configuration name or an absolute path to a file. A
+default value is used if CONFIG is not given. See L</CONFIGURATION FILES> below
+for details.  This option prints the location of the config file on completion.
+
+=item -l [CONFIG] or --locate_config [CONFIG]
+
+Prints the location of the named config file, or the default if CONFIG is not
+given. Helpful for finding the right config file to edit.  See 
+L</CONFIGURATION FILES> below for details.  
+
+=item -t DIRECTORY or --templates DIRECTORY
+
+Creates DIRECTORY if it doesn't exist and write all default templates as
+separate files in that directory for subsequent user customization (Add
+a TEMPLATE_DIR option with DIRECTORY to your custom config file to use 
+this as a custom template directory)
+
+=item -n MODULE::NAME or --newdist MODULE::NAME
+
+Creates a skeleton distribution for MODULE::NAME.  Directory name will be 
+determined by the COMPACT option set in the config file
+
+=item -m MODULE::NAME or --module MODULE::NAME
+
+Creates a new .pm and corresponding .t file in an existing distribution.  Must
+be called from within an existing distribution tree, though not necessarily
+at the top level.  I.e., can be called from lib/Sample/Module and will still
+place files correctly
+
+=item -s METHOD_NAME or --subroutine METHOD_NAME
+
+Prints to STDOUT a skeleton for a single method.  Most useful when called
+from within an editor to insert code.  See EXAMPLES.
+
+=item -V or --version
+
+Prints version information and current configuration settings (either default or 
+from a -c option)
+
+=item -h or -? or --help
+
+Prints usage information
+
+=back
+
+=head2 Additional Options
+
+=over
+
+=item -c CONFIG or --config CONFIG
+
+Specifies an alternate configuration file to use in place of the default one
+
+=item -e EXTRA or --extra EXTRA
+
+Defines an additional module (for -n and -m modes) or method (for -s mode) to
+be created.  May be used more than once to define multiple extras
+
+=back
+
+=head1 CONFIGURATION FILES
+
+=head2 Overview
+
+makeperlmod has a multi-level configuration system.  Options that control creation
+of a skeleton distribution are processed as follows, with each subsequent
+source extending or overriding the previous one:
+
+=over
+
+=item 1. Built-in defaults to ExtUtils::ModuleMaker
+
+=item 2. Defaults specified in an ExtUtils::ModuleMaker::Personal::Defaults
+file
+
+=item 3. makeperlmod built-in defaults (I<COMPACT> style and  
+ExtUtils::ModuleMaker::TT as the I<ALT_BUILD>)
+
+=item 4. makeperlmod config file, either the default one or one specified
+on the command line with the C<--config> option
+
+=back
+
+This preserves maximum flexibility and compatibility with the personal 
+defaults system in ExtUtils::ModuleMaker.  makeperlmod allows one or 
+more additional configuration files to customize those defaults for 
+special purposes.
+
+Generally, static information like I<AUTHOR> should probably go in the
+ExtUtils::ModuleMaker::Personal::Defaults file.  I<TEMPLATE_DIR> could 
+go in the makeperlmod config files to allow for different templates to
+be used for different projects.
+
+=head2 Config file locations
+
+The directory for config files is located in an operating system-specific
+fashion using L<Config::Find>.  For example, this is typically
+C<~/.makeperlmod/> on Unix-based systems or something in a C<makeperlmod>
+directory located somewhere under C<C:\Documents and Settings\Username\> on
+MSWin32.
+
+If no config file is specified, the default is 'default.conf'.  Short
+config names are found in the operating system specific directory with
+a '.conf' extension.  If an absolute file pathname is given, that is 
+used directly.  'makeperlmod -l CONFIG' will always show how a given
+CONFIG option is interpreted by makeperlmod.  For example, on Linux:
+
+ $ makeperlmod -l
+ /home/david/.makeperlmod/default.conf
+
+ $ makeperlmod -l default
+ /home/david/.makeperlmod/default.conf
+
+ $ makeperlmod -l freelance
+ /home/david/.makeperlmod/freelance.conf
+
+ $ makeperlmod -l /etc/makeperlmod/corp/std.conf
+ /etc/makeperlmod/corp/std.conf
+
+=head1 EXAMPLES
+
+Create a custom configuration file
+
+    makeperlmod -d 
+
+Create a custom template directory
+
+    makeperlmod -t ~/.makeperlmod.templates
+
+Edit the custom configuration file.  Set AUTHOR and other defaults as desired.
+Set TEMPLATE_DIR to the templates directory (e.g. ~/.makeperlmod.templates ) to
+use your own custom templates in place of the defaults.
+
+Create a new distribution
+
+    makeperlmod -n Sample::Module::Foo
+
+Create a new distribution with an extra module
+
+    makeperlmod -n Sample::Module::Foo -e Sample::Module::Bar 
+
+From within the new distribution, add another .pm
+
+    cd Sample-Module-Foo/lib/Sample/Module
+    makeperlmod -m Sample::Module::Baz
+
+From within an editor, insert a new subroutine skeleton.  E.g. from within
+vi,
+
+    :r! makeperlmod -s sample_method
+
+Or insert several subroutines
+
+    :r! makeperlmod -s sample_method -e method2 -e method3
+
+=head1 SEE ALSO
+
+See L<ExtUtils::ModuleMaker> and L<ExtUtils::ModuleMaker::TT> for more details.
+
+=head1 AUTHOR
+
+David Golden <dagolden@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by David Golden.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

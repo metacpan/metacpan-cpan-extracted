@@ -1,0 +1,38 @@
+1.111982  2011-07-17 16:51:10 Europe/London
+
+  * Need to re-release to fix botched deps
+
+1.111980  2011-07-17 14:07:24 Europe/London
+
+  * Move dependencies to EWS::Client
+
+1.111972  2011-07-16 23:58:51 Europe/London
+
+  * Fix missing use for File::ShareDir
+  * Set req'd version on LWP::Protocol::https
+  * Rename scripts to bin so it gets installed
+  * Unset Catalyst Debug mode
+
+1.111971  2011-07-16 20:33:37 Europe/London
+
+  * Many fixes to support running uninstalled or installed, from test script
+  * Add probably-needed dependencies to avoid user head-scratching
+  * Use ShareDir for static and template content
+  * Update documentation for new standalone script capability
+
+1.111970  2011-07-16 14:27:32 Europe/London
+
+  * Port to Dist::Zilla
+
+libews-calendar-viewer-perl (0.03) UNRELEASED; urgency=low
+
+  * Fix dependencies
+  * Fix tests
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Thu, 25 Feb 2010 15:18:02 +0000
+
+libews-calendar-viewer-perl (0.01) UNRELEASED; urgency=low
+
+  * Initial release on an unsuspecting world.
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Mon, 22 Feb 2010 23:51:24 +0000

@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+Email-Address-XS.xs
+t/Email-Address-XS.t
+t/taint-Email-Address-XS.t
+lib/Email/Address/XS.pm
+dovecot-parser.h
+dovecot-parser.c
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

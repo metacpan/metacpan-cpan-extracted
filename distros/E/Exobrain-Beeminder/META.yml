@@ -1,0 +1,43 @@
+---
+abstract: 'Beeminder components for exobrain'
+author:
+  - 'Paul Fenwick <pjf@cpan.org>'
+build_requires:
+  Exobrain::Test: 0
+  Test::Exception: 0
+  Test::More: 0
+  Test::Most: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.013, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Exobrain-Beeminder
+requires:
+  Carp: 0
+  Dancer: 0
+  Data::Dumper: 0
+  Exobrain: 1.05
+  Exobrain::Agent: 0
+  Exobrain::Agent::Run: 0
+  Exobrain::Component: 0
+  Exobrain::Config: 0
+  Exobrain::Intent: 0
+  Exobrain::Message: 0
+  Method::Signatures: 0
+  Moose: 0
+  Moose::Role: 0
+  Try::Tiny: 0
+  WebService::Beeminder: 0
+  autodie: 0
+  feature: 0
+  perl: 5.010
+resources:
+  bugtracker: https://github.com/pjf/exobrain-beeminder
+  repository: git://github.com/pjf/exobrain-beeminder
+version: 1.06

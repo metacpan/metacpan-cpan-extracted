@@ -1,0 +1,77 @@
+format-version: 1.2
+data-version: 2.15classified
+date: 05:08:2011 16:37
+auto-generated-by: OWL::Simple::OBOWriter 0.06
+default-namespace: efo
+
+[Term]
+id: EFO:0000001 ! experimental factor
+name: experimental factor
+def: "An experimental factor in Array Express which are essentially the variable aspects of an experiment design which can be used to describe an experiment  or set of experiments, in an increasingly detailed manner." []
+synonym: "ExperimentalFactor" EXACT []
+xref: MO:10
+
+[Term]
+id: EFO:0001741 ! submitter
+name: submitter
+synonym: "http://mged.sourceforge.net/ontologies/MGEDOntology.owl#submitter" EXACT []
+xref: MO:882
+is_a: EFO:0002012
+
+[Term]
+id: EFO:0001742 ! publication status
+name: publication status
+def: "An information entity about the status of a publication describing the experiment." []
+is_a: IAO:0000030
+
+[Term]
+id: EFO:0001743 ! cell component comparison design
+name: cell component comparison design
+synonym: "http://mged.sourceforge.net/ontologies/MGEDOntology.owl#cell_component_comparison_design" EXACT []
+synonym: "cell_component_comparison_design" EXACT []
+xref: MO:1019
+is_a: EFO:0001426
+
+[Term]
+id: UO:0000013 ! mole
+name: mole
+def: "A mole is a substance unit which is equal to the amount of substance of a molecular system which contains as many elementary entities as there are atoms in 0.012 kilogram of carbon 12." []
+synonym: "http://mged.sourceforge.net/ontologies/MGEDOntology.owl#mol" EXACT []
+synonym: "mol" EXACT []
+xref: MO:998
+is_a: UO:0000006
+
+[Term]
+id: UO:0000014 ! candela
+name: candela
+def: "A luminous intensity unit which equal to the luminous intensity  in a given direction, of a source that emits monochromatic radiation of frequency 540 x 1012 hertz and that has a radiant intensity in that direction of 1/683 watt per steradian." []
+synonym: "http://mged.sourceforge.net/ontologies/MGEDOntology.owl#candela" EXACT []
+synonym: "cd" EXACT []
+xref: MO:572
+is_a: UO:0000007
+
+[Term]
+id: EFO:0002611 ! hereditary breast and ovarian cancer
+name: hereditary breast and ovarian cancer
+synonym: "BRCA1" EXACT []
+synonym: "BRCA2" EXACT []
+synonym: "hereditary breast ovarian cancer" EXACT []
+synonym: "Familiar breast and Ovarian cancer syndrome" EXACT []
+xref: DOID:5683
+is_a: EFO:0000508
+is_a: EFO:0000305
+
+[Term]
+id: EFO:0002612 ! human herpesvirus 8
+name: human herpesvirus 8
+def: "A gammaherpesvirus that contributes to the development of Kaposi sarcoma." []
+synonym: "Kaposi sarcoma-associated herpesvirus" EXACT []
+synonym: "HHV8" EXACT []
+synonym: "HHV-8" EXACT []
+synonym: "KSHV" EXACT []
+synonym: "Kaposi Sarcoma-Associated Herpes Virus" EXACT []
+synonym: "Virus-HHV8" EXACT []
+synonym: "Kaposi Sarcoma Herpes Virus" EXACT []
+xref: NCIt:C14327
+is_a: EFO:0000763
+

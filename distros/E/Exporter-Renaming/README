@@ -1,0 +1,191 @@
+NAME
+    Exporter::Renaming - Allow renaming of symbols on import
+
+SYNOPSIS
+        # Enable renaming in Exporter
+        use Exporter::Renaming;
+
+        # Import File::Find::find as main::search
+        use File::Find Renaming => [ find => search];
+          
+    # Disable renaming
+        no Exporter::Renaming
+
+ABSTRACT
+    Allow Renaming of symbols on Import
+
+DESCRIPTION
+  Overview
+    This module adds the ability to rename symbols to the standard Exporter
+    module. After "use Exporter::Renaming", you can import symbols from
+    exporting modules not only under their original names, but also under
+    names of your choosing.
+
+    Here, *symbol* is used to mean anything that could be exported by a
+    Module, that is, a Perl function or variable. Thus a symbol begins with
+    an optional *type character* (one of "$", "@", "%", "&", and "*"),
+    followed by a name (a Perl identifier, made up of alphanumerics and "_",
+    starting with a non-digit).
+
+    To trigger renaming behavior, the import list of a subsequent "use
+    <module>" statement must begin with the keyword 'Renaming', followed by
+    a list reference, the <renaming list|/Renaming List>, which describes
+    the renaming imports (see below). After that, a normal import list may
+    follow, which Exporter processes as usual.
+
+  Renaming List
+    The renaming list contains *renaming pairs*, which are pairs of symbols.
+    The first part of a pair is the original symbol (as known to the
+    exporting module) and the second one is the renamed symbol (as you want
+    to use it after import). It is an error (fatal, as all "Renaming" or
+    "Exporter" errors) if the renaming list has an odd number of elements,
+    or if one of its symbols is invalid.
+
+    If none of the symbols in a *renaming pair* contains a *type character*,
+    an "&" is assumed. If only one has a *type character*, this type is
+    assumed for the other one too. If both have type characters, it is an
+    error if they don't agree.
+
+    If the renamed symbol (the second part) of a *renaming pair* is
+    undefined, the original symbol is imported unchanged, so you can include
+    normal imports in a renaming list without retyping the name.
+
+    It is an error for a symbol to appear more than once as the second part
+    of a *renaming pair*, that is, to specify the same thing twice as the
+    target of a renaming operation. It is allowed to import the same symbol
+    multiple times with different targets. Maybe it even makes sense in some
+    situations.
+
+  Operation
+    Exporter continues to behave normally for normal imports while renaming
+    behavior is switched on. Only the presence of the keyword "Renaming",
+    followed by an array reference in the first and second positions after a
+    "use" statement triggers renaming.
+
+    The renaming behavior of Exporter is thus compatible with its standard
+    behavior. If renaming must be switched off for some reason, this can be
+    done via "no Export::Renaming".
+
+    If an *import list* contains both a renaming list and a sequence of
+    normal import statements, the renaming is done first, as indicated by
+    its position. No cross-check is done between the results of renaming and
+    the normal imports, as if these resulted from two separate "use"
+    statements.
+
+EXAMPLES
+    All examples assume that
+
+        use Exporter::Renaming;
+
+    has been called (and that "no Exporter::Renaming" hasn't).
+
+    The most obvious application of "Exporter::Renaming" is to solve a name
+    conflict. Suppose our module already defines a function "find", and we
+    want to use the standard "File::Find" module. We could then rename
+    "find" from "File::Find" to "search" in our own module:
+
+        use File::Find Renaming => [ find => 'search' ];
+
+    Let's assume the "finddepth" function from File::Find doesn't cause a
+    name conflict, and we want to import it under its original name as well.
+
+    This does it in the renaming list:
+
+        use File::Find Renaming => [
+            find      => 'search',
+            finddepth => undef,
+        ];
+
+    ...as does this, but explicitly:
+
+        use File::Find Renaming => [
+            find      => 'search',
+            finddepth => 'finddepth',
+        ];
+
+    ...while this uses a regular import:
+
+        use File::Find Renaming => [ find => 'search' ], 'finddepth';
+
+    Should you find it annoying that a pedantic module author has chosen to
+    adorn all of the module's exports with a redundant prefix (these things
+    happen), you could do this:
+
+        use Mythical::Graphics::Module Renaming => [
+              gfxColor => '%color', # this imports a hash
+              gfxPen   => 'pen',
+              gfxLine  => 'line',
+              # ....
+              # etc
+        ];
+
+    ...lower-casing the names as well.
+
+    If you need to add clarifying prefixes that a sloppy module author has
+    neglected to provide in the exports (these things happen), you go the
+    other way around:
+
+        use Legendary::Graphics::Module Renaming [
+            Color => '%gfxColor',
+            Pen => 'gfxPen',
+            Line => 'gfxLine',
+            # ...
+            # etc
+        ];
+
+    ...also lower-casing the initial letters.
+
+    If you are confronted with a standard module that uses a slightly
+    non-standard naming convention (it happens), you can rectify the
+    situation:
+
+        use Data::Dumper Renaming => [ Dumper => 'dump' ];
+
+    Now you can say "print dump \ %some_hash" instead of "print Dumper ...";
+
+CAVEATS
+    *   As has been mentioned in section Operation, no cross-check is done
+        between renaming exports and normal exports that go on in the same
+        "use" statement. This means that a renaming import may later be
+        overwritten by a normal import without a clear indication. This
+        happens when one of the new names given in renaming coincides with
+        one of the original ones imported through normal import.
+
+    *   "Exporter::Renaming" only affects modules that do standard
+        exporting, that is, modules that inherit their "import" method from
+        Exporter. Modules that use a different "import" method are
+        unaffected and don't understand renaming lists.
+
+    *   Renaming doesn't affect the name c<caller> sees for a function. This
+        should come as no surprise, since normal export doesn't affect this
+        name either. It is always the (package-qualified) name the function
+        was originally compiled with.
+
+BUGS
+    *   The lack of a cross-check between renaming and normal imports is
+        regrettable, but unlikely to be fixed unless Renaming is made part
+        of Exporter. Except for the simplest cases, only Exporter can parse
+        an export list.
+
+    *   Calls of "use Exporter::Renaming" and "no Exporter::Renaming" don't
+        nest. Instead of switching unconditionally, "no Renaming" should
+        only switch off the behavior if it was off in the corresponding call
+        to "use Exporter::Renaming". A future release may address this.
+
+SEE ALSO
+    Exporter, Perl
+
+AUTHOR
+    Anno Siegel, <siegel@zrz.tu-berlin.de>
+
+ACKNOWLEDGEMENTS
+    Thanks to Avi Finkel (avi@finkel.org) and Simon Cozens
+    (simon@simon-cozens.org) for a discussion of this project on IRC. While
+    brief, their remarks helped me think about things the right way.
+
+COPYRIGHT AND LICENSE
+    Copyright 2003 by Anno Siegel
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

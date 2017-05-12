@@ -1,0 +1,115 @@
+#!/usr/bin/perl -w
+use 5.010;
+use strict;
+use warnings;
+use autodie;
+
+use IO::Socket::SSL qw(debug1);
+use Socket qw( SO_KEEPALIVE );
+use Net::IMAP::Client;
+use Term::ReadKey;
+
+use Exobrain;
+
+# PODNAME: imap
+# ABSTRACT: Report IMAP folder sizes to exobrain
+
+my $exobrain = Exobrain->new;
+
+my $user    = shift || die "Usage: $0 user server";
+my $server  = shift || die "Usage: $0 user server";
+
+say "Password?";
+
+ReadMode('noecho');
+my $password = ReadLine(0);
+ReadMode(0); # Reset term
+chomp($password);
+
+# Horrible, horrible hack that allows us to avoid
+# self-signed cert errors, at the expense of not
+# checking certs at all.
+
+my $socket = IO::Socket::SSL->new(
+    PeerAddr => $server,
+    PeerPort => 993,
+    Timeout  => 90,
+    Proto    => 'tcp',
+    Blocking => 1,
+    SSL_verify_mode => SSL_VERIFY_NONE,
+);
+
+$socket->sockopt(SO_KEEPALIVE, 1);
+
+my $imap = Net::IMAP::Client->new(
+    server => $server,
+    user   => $user,
+    pass   => $password,
+    ssl    => 1,
+    port   => 993,
+    socket => $socket,
+) or die "Could not connect to IMAP server";
+
+$imap->login or die "Can't login " . $imap->last_error;
+
+say "Connected...";
+
+my $sent_box;
+
+# These really should be configured or auto-sniffed on a per-server
+# baiss.
+
+if ($server =~ /gmail/) { $sent_box = '[Gmail]/Sent Mail'; }
+else                    { $sent_box = 'Sent'; }
+
+while (1) {
+
+    measure($imap, 'INBOX');
+    measure($imap, $sent_box);
+
+    sleep(60);
+}
+
+sub measure {
+    my ($imap, $mailbox) = @_;
+
+    my $data = $imap->status($mailbox);
+
+    my $count = $data->{MESSAGES};
+
+    my $msg = $exobrain->measure('Mailbox',
+        source    => 'IMAP',
+        count     => $count,
+        user      => $user,
+        server    => $server,
+        mailbox   => $mailbox,
+        raw       => $data,
+    );
+
+    return;
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+imap - Report IMAP folder sizes to exobrain
+
+=head1 VERSION
+
+version 1.08
+
+=head1 AUTHOR
+
+Paul Fenwick <pjf@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Paul Fenwick.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

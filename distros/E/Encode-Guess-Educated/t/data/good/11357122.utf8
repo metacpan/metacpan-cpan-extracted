@@ -1,0 +1,1563 @@
+    #[1]home [2]copyright [3]help [4]Nature current issue RSS feed
+   [5]nature.com [6]nature.com
+
+     * [7]Jump to main content
+     * [8]Jump to navigation
+     * [9]nature.com homepage
+     * [10]Publications A-Z index
+     * [11]Browse by subject
+
+     * [12]My account
+     * [13]Submit manuscript
+     * [14]Register
+     * [15]Subscribe
+
+   [16]Advertisement
+
+   Full text access provided to University of Colorado System
+   by c/o Denison Library
+   [17]Nature homepage
+   Search [this journal_____] ____________________ go [18]Advanced search
+
+   [19]Journal home > [20]Archive > [21]Article > Full Text
+
+ §1§ Article §1§
+
+   Nature 411, 269-276 (17 May 2001) | doi:10.1038/35077011; Received 4
+   January 2001; Accepted 21 March 2001
+
+ §2§ Crystal structure of an ACh-binding protein reveals the ligand-binding
+domain of nicotinic receptors §2§
+
+   Katju S breve a Brejc^[22]1, Willem J. van Dijk^[23]1, Remco V.
+   Klaassen^[24]2, Mascha Schuurmans^[25]2, John van der
+   Oost^[26]2,^[27]3, August B. Smit^[28]2 & Titia K. Sixma^[29]1
+    1. Division of Molecular Carcinogenesis, Netherlands Cancer Institute,
+       Plesmanlaan 121, 1066 CX Amsterdam, The Netherlands
+    2. Department of Molecular and Cellular Neurobiology, Research
+       Institute Neurosciences Vrije Universiteit, Faculty of Biology, De
+       Boelelaan 1087, 1081 HV Amsterdam, The Netherlands
+    3. Present address: Laboratory of Microbiology, Department of
+       Agrotechnology and Food Sciences, Wageningen University, Hesselink
+       van Suchtelenweg 4, 6703 CT Wageningen, The Netherlands.
+
+   Correspondence to: Titia K. Sixma^[30]1 Correspondence should be
+   addressed to T.K.S. (e-mail: Email: [31]sixma@nki.nl). The structure
+   has been deposited in the PDB with ID number 1I9B.
+
+   [32]Top of page
+
+ §3§ Abstract §3§
+
+   Pentameric ligand gated ion-channels, or Cys-loop receptors, mediate
+   rapid chemical transmission of signals. This superfamily of allosteric
+   transmembrane proteins includes the nicotinic acetylcholine (nAChR),
+   serotonin 5-HT[3], italic gamma -aminobutyric-acid (GABA[A] and
+   GABA[C]) and glycine receptors. Biochemical and electrophysiological
+   information on the prototypic nAChRs is abundant but structural data at
+   atomic resolution have been missing. Here we present the crystal
+   structure of molluscan acetylcholine-binding protein (AChBP), a
+   structural and functional homologue of the amino-terminal
+   ligand-binding domain of an nAChR alpha -subunit. In the AChBP
+   homopentamer, the protomers have an immunoglobulin-like topology.
+   Ligand-binding sites are located at each of five subunit interfaces and
+   contain residues contributed by biochemically determined 'loops' A to
+   F. The subunit interfaces are highly variable within the ion-channel
+   family, whereas the conserved residues stabilize the protomer fold.
+   This AChBP structure is relevant for the development of drugs against,
+   for example, Alzheimer's disease and nicotine addiction.
+
+   The superfamily of pentameric ligand-gated ion channels (LGICs),
+   including nAChR, 5-HT[3], GABA[A] and GABA[C], and glycine receptors,
+   mediates chemical synaptic transmission. All of these LGICs form homo-
+   or heteropentamers of related subunits, implying a common evolutionary
+   origin^[33]1. Each subunit is divided into an N-terminal or
+   ligand-binding domain (LBD), a transmembrane region and an
+   intracellular region^[34]2. The LBDs, which are around 210 amino-acid
+   residues long, contain ligand-binding sites for agonists and
+   competitive antagonists. Binding of an agonist induces rapid opening of
+   the transmembrane ion channel, leading to a change in membrane
+   potential. The signal transmission mechanism is explained by allosteric
+   interactions between subunits, involving numerous conformational
+   transitions^[35]3, ^[36]4.
+
+   The nAChRs are extensively studied and can be divided into muscle and
+   neuronal types^[37]2. The muscle type, with stoichiometry ( alpha
+   [1])[2] beta [1] italic gamma delta , is found at the neuromuscular
+   junction and in the electric organs of fish such as the electric ray
+   Torpedo californica. It presents a common drug target for muscle
+   relaxants. The neuronal nAChRs, which are hetero- or homomeric (for
+   example, ( alpha [4])[2]( beta [2])[3] or ( alpha [7])[5]), are located
+   on both pre- and postsynaptic nerve terminals. They are important drug
+   targets as they mediate nicotine addiction in smokers and the positive
+   effects of nicotine on cognition, memory and attention in patients
+   with, for example, schizophrenia or Alzheimer's and Parkinson's
+   diseases^[38]5.
+
+   In nAChRs, the ligand-binding site is located at the interface between
+   two subunits^[39]2, ^[40]4. Numerous biochemical studies showed that
+   the principal part is always formed by the alpha -subunit
+   residues—contributing to the so-called 'loops' A (ref. [41]6), B (ref.
+   [42]7) and C (refs [43]7, [44]8, [45]9, [46]10)—whereas the
+   neighbouring subunit residues—contributing to the 'loops' D (refs
+   [47]11, [48]12), E (refs [49]10, [50]13) and F (refs [51]14, [52]15,
+   [53]16)—form the complementary part of the binding pocket. Thus, the
+   muscle nAChR contains two different ligand-binding sites ( alpha [1]
+   delta and alpha [1] italic gamma ) with distinct affinities, whereas
+   the homopentameric alpha [7] receptor contains five identical
+   ligand-binding sites. In these sites acetylcholine is expected to bind
+   through cation- pi interactions, where the positive charge of the
+   quaternary ammonium of acetylcholine interacts with the electron-rich
+   aromatic side chains^[54]17.
+
+   So far, the only experimental structural information on the nAChRs came
+   from electron microscopy studies on Torpedo receptors^[55]18, ^[56]19,
+   ^[57]20. These low–medium-resolution studies revealed the overall shape
+   and dimensions of the receptor, a location of the ligand-binding site
+   and the organization of the ion channel. The most recent 4.6 Å
+   data^[58]21 showed acetylcholine-binding pockets surrounded by
+   seven-stranded beta -sheet structures. This fits with circular
+   dichroism measurements demonstrating that LBDs are predominantly beta
+   -structured^[59]22, ^[60]23, ^[61]24. No high-resolution data are
+   available yet and although soluble LBDs have been produced^[62]22,
+   ^[63]23, ^[64]24, ^[65]25, ^[66]26, protein quantities were
+   insufficient for high-resolution studies.
+   [67]Top of page
+
+ §3§ Acetylcholine-binding protein  §3§
+
+   Acetylcholine-binding protein (AChBP) is a soluble protein found in the
+   snail Lymnaea stagnalis^[68]27. It is produced and stored in glial
+   cells, and released in an acetylcholine-dependent manner into the
+   synaptic cleft, where it modulates synaptic transmission. Mature AChBP
+   is 210 residues long and forms a stable homopentamer. It aligns with
+   the N-terminal domains of pentameric LGICs ([69]Fig. 1) and lacks the
+   transmembrane and intracellular domains present in the
+   superfamily^[70]27. AChBP is most closely related to the alpha
+   -subunits of the nAChRs ([71]Fig. 1). Nearly all residues that are
+   conserved within the nAChR family are present in AChBP, including those
+   that are relevant for ligand binding. Moreover, AChBP binds known nAChR
+   agonists and competitive antagonists such as acetylcholine, nicotine,
+   d-tubocurarine and alpha -bungarotoxin^[72]27. Therefore, AChBP can be
+   used as an example of the N-terminal domain of an alpha -subunit
+   of nAChRs. Here we report the crystal structure of the AChBP
+   homopentamer at 2.7 Å resolution.
+
+ §5§ [73] Figure 1: Sequence alignment of AChBP with pentameric ligand-gated
+ion channels (LGICs). §5§
+
+   [74]Figure 1 : Sequence alignment of AChBP with pentameric ligand-gated
+   ion channels (LGICs). Unfortunately we are unable to provide accessible
+   alternative text for this. If you require assistance to access this
+   image, or to obtain a text description, please contact npg@nature.com
+
+   The alignment shows only the N-terminal domain of the LGIC subunits and
+   is based on a multi-sequence ClustalX^50 alignment of 92 full-length
+   pentameric LGIC sequences. Alignments are shown from first to last
+   AChBP residue (for example, starting at second residue of mature
+   Torpedo alpha , beta italic gamma and delta subunits, ending approx 4
+   residues into the first transmembrane domain^29). H: human, T.ca:
+   Torpedo californica. Secondary structure elements ( alpha : alpha
+   -helix, beta : beta -strand, eta : 3[10]-helix) are indicated in red
+   above the sequence, in accordance with Fig. 3a. Precise beginnings and
+   ends will change with higher resolution. AChBP shares 24% sequence
+   identity with the ligand-binding domain (LBD) of human alpha [7] (shown
+   in green), 20–24% with other nicotinic receptors and 15–18% with other
+   LGICs. The residues conserved in the superfamily are shown in bold with
+   grey background. Asterisk, beginning and end of the Cys loop. Colouring
+   of interface residues at the plus (yellow) and minus side (light blue)
+   shows the lack of sequence conservation in the subunit interface across
+   the pentameric LGIC family. Nicotinic receptor ligand-binding residues
+   on the principal (pink) and complementary (dark blue) side are
+   indicated.
+   [75]High resolution image and legend (140K)
+   [76]Top of page
+
+ §3§ Structure determination  §3§
+
+   The crystal structure of AChBP was solved using weak Pb
+   multiple-wavelength anomalous diffraction (MAD) data in two crystal
+   forms. The electron density map was improved substantially by
+   cross-crystal averaging of three crystal forms with 20, 10 and 5 copies
+   of the protomer in the asymmetric unit ([77]Table 1). The structure was
+   refined at 2.7 Å in space group P4[2]2[1]2, with one AChBP pentamer
+   in the asymmetric unit. Refinement with partial five-fold
+   non-crystallographic symmetry (NCS) restraints resulted in an R-factor
+   of 26.4% (R[free] = 30%).
+
+ §5§ [78] Table 1: Data collection statistics §5§
+
+   [79]Table 1 - Data collection statistics
+
+   [80]Full table
+   [81]Top of page
+
+ §3§ The AChBP pentamer  §3§
+
+   The AChBP homopentamer, when viewed along the five-fold axis, resembles
+   a windmill toy, with petal-like protomers ([82]Fig. 2a). When viewed
+   perpendicular to the five-fold axis it forms a 62-Å-high cylinder
+   ([83]Fig. 2b), with a diameter of 80 Å. The diameter of the central
+   hole is approx 18 Å, between side chains. These dimensions are in good
+   agreement with the N-terminal domain in the Torpedo nAChR electron
+   microscopy data^[84]21. In the pentamer the only subunit contacts are
+   dimer interfaces, of which each protomer has two, the plus side and the
+   minus side. We refer to the A (plus)–B (minus) interface as an example
+   for the five equivalent interfaces AB, BC, CD, DE and EA ([85]Fig. 2).
+
+ §5§ [86] Figure 2: The pentameric structure of AChBP. §5§
+
+   [87]Figure 2 : The pentameric structure of AChBP. Unfortunately we are
+   unable to provide accessible alternative text for this. If you require
+   assistance to access this image, or to obtain a text description,
+   please contact npg@nature.com
+
+   a, In this representation each protomer has a different colour.
+   Subunits are labelled anti-clockwise, with A–B, B–C, C–D, D–E and E–A
+   forming the plus and minus interface side, with the principal and
+   complementary ligand-binding sites, respectively (ball-and-stick
+   representation). b, Viewing the AChBP pentamer perpendicular to the
+   five-fold axis. The equatorially located ligand-binding site
+   (ball-and-stick representation) is highlighted only in the A (yellow)–B
+   (blue) interface.
+   [88]High resolution image and legend (165K)
+   [89]Top of page
+
+ §3§ The AChBP protomer  §3§
+
+   Each AChBP protomer is a single domain protein, asymmetric in shape,
+   with a size of around 62 times 47 times 34 Å^3 ([90]Fig. 3a). It
+   consists of an N-terminal alpha -helix, two short 3[10] helices and a
+   core of ten beta -strands, which form a beta -sandwich. The order of
+   beta -strands conforms to a modified immunoglobulin (Ig)
+   topology^[91]28 ([92]Fig. 3b) with an extra beta -hairpin (f'–f") and
+   an extra strand (b'). These additional strands introduce two 'Greek
+   key' folding motifs. An Ig-like topology had been predicted for
+   nAChRs^[93]2, ^[94]29, but the location of the ligand-binding site was
+   missed, owing to the presence of extra beta -strands. Compared with the
+   classical Ig-fold^[95]28, the AChBP beta -strands are considerably
+   twisted, with the beta -sheets rotated against each other, resulting in
+   two separate hydrophobic cores. Thus the three-dimensional fold does
+   not resemble other Ig-like proteins and comparison^[96]30 with the
+   protein database did not result in a significant match to any known
+   structure.
+
+ §5§ [97] Figure 3: Overview of the AChBP protomer structure. §5§
+
+   [98]Figure 3 : Overview of the AChBP protomer structure. Unfortunately
+   we are unable to provide accessible alternative text for this. If you
+   require assistance to access this image, or to obtain a text
+   description, please contact npg@nature.com
+
+   a, Stereo representation of the AChBP protomer as viewed from outside
+   the pentameric ring. This ribbon representation is coloured as a
+   rainbow gradient, from blue (N terminus) to red (C terminus).
+   Disulphide bridges are indicated in green ball-and-stick
+   representation. In a complete ion channel the N terminus would point
+   towards the synaptic cleft and the C terminus would enter the membrane
+   at the bottom, continuing into the first transmembrane domain. b,
+   Topology diagram of the AChBP protomer. For comparison with Ig-folds
+   the strands have been labelled a–g, showing the additional strand (b')
+   and hairpin (f'–f"). In this structure, strands have been labelled beta
+   1– beta 10 with loops (or turns) L1–L10 preceding each strand with the
+   same number. The beta 5 strand is broken ( beta 5– beta 5') with
+   internal loop L5'; beta 6 also has a small break, but it is shown
+   continuously (see Fig. 1). The precise beginnings and ends of strands
+   may change slightly with increasing resolution, but the topology seen
+   here will be highly conserved across the entire family of pentameric
+   LGICs. S: disulphide bridge.
+   [99]High resolution image and legend (38K)
+   [100]Top of page
+
+ §3§ Positioning of functional regions  §3§
+
+   In the structure, the N and C termini are located at 'top' and 'bottom'
+   of the pentamer, respectively. In the ion channels the transmembrane
+   domains are at the C-terminal end of the LBD, at the 'bottom' of the
+   AChBP structure ([101]Figs 2b and [102]3), starting directly at the end
+   of beta -strand beta 10.
+
+   In muscle type nAChRs, the main immunogenic region (MIR), comprising
+   residues alpha [1]67– alpha [1]76, acts as an epitope in the autoimmune
+   disease myasthenia gravis^[103]31. Although the MIR-related region in
+   AChBP (residues 65–72) has no sequence homology with the alpha
+   [1]-subunit, its location in a highly accessible position in loop L3 at
+   the 'top' of the pentamer agrees with the expected accessibility for
+   this region ([104]Fig. 3a). It also fits with electron microscopy
+   studies that located the MIR at the distal end of the receptor relative
+   to the membrane^[105]20.
+
+   The central pore of the pentamer is very hydrophilic, lined with
+   charged residues. On each AChBP promoter, a large pocket is visible,
+   accessible from the central pore. Each pocket, framed at the entrance
+   by beta -strands ( beta 3, beta 4, beta 5 and beta 5') ([106]Fig. 3a),
+   is uncharged and mainly hydrophobic. This region probably corresponds
+   to the tunnel framed by twisted beta -strands that was observed in the
+   alpha [1]-subunit of the Torpedo receptor at 4.6 Å resolution^[107]21.
+
+   There is a different cavity at each interface between the subunits.
+   These cavities are lined by residues, which were biochemically shown to
+   be involved in ligand binding in nAChRs^[108]2, ^[109]5, ^[110]6,
+   ^[111]7, ^[112]8, ^[113]9, ^[114]10, ^[115]11, ^[116]12, ^[117]13,
+   ^[118]14, ^[119]15, ^[120]16. These cavities are mostly buried from the
+   solvent, and located close to the outside of the pentameric ring
+   ([121]Fig. 2a). When viewed perpendicular to the five-fold axis, they
+   are roughly equatorially positioned, about 30 Å away from the C termini
+   ([122]Fig. 2b), conforming to the expected location of the Torpedo
+   receptor ligand-binding site, as determined by labelling^[123]32 and
+   electron microscopy studies^[124]18. We have concluded that these
+   cavities are the ligand-binding sites.
+   [125]Top of page
+
+ §3§ The ligand-binding site  §3§
+
+   Each ligand-binding site is found in a cleft formed by a series of
+   loops from the principal face of one subunit and a series of beta
+   -strands from the complementary face of an adjacent subunit ([126]Fig.
+   4). The principal side on the plus side of the AB interface consists of
+   residues coming from loop A (Tyr A89), loop B (Trp A143, A145) and loop
+   C (Tyr A185, the double cysteine A187–A188 and Tyr A192) ([127]Fig.
+   4c). The complementary part of this binding side is formed by beta
+   -strands in protomer B contributing loop D (Trp B53, Gln B55), loop E
+   (Arg B104, Val B106, Leu B112 and Met B114) and loop F (Tyr B164)
+   ([128]Fig. 4d). Four of the aromatic residues form the bottom half of
+   the cavity (Tyr A89, Tyr A185, Tyr B164 and Trp B53). The walls are
+   formed by Tyr A192, Trp A143, the main chain of A145, the side chains
+   of Met B114 and Gln B55, and the vicinal disulphide
+   (Cys A187–Cys A188). The hydrophobic parts of Arg B104, Val B106 and
+   Leu B112 form the top of the binding site ([129]Fig. 4a).
+
+ §5§ [130] Figure 4: The ligand-binding site. §5§
+
+   [131]Figure 4 : The ligand-binding site. Unfortunately we are unable to
+   provide accessible alternative text for this. If you require assistance
+   to access this image, or to obtain a text description, please contact
+   npg@nature.com
+
+   a, Stereo representation of the ligand-binding site in ball-and-stick
+   representation, showing the contribution of the principal 'loops':
+   A (Tyr A89/ alpha [1] Tyr 93, yellow), B (Trp A143/ alpha [1] Trp 149,
+   dark yellow) and C (Tyr A185/ alpha [1] Tyr 190, Cys A187/ alpha [1]
+   Cys 192, Cys A188/ alpha [1] Cys 193, Tyr A192/ alpha [1] Tyr 198,
+   orange), and the complementary 'loops' D (Trp B53/ italic gamma Trp 55,
+   Gln B55/ italic gamma Glu 57, violet), E (Arg B104/ italic gamma
+   Leu 109, Val B106/ italic gamma Tyr 111, Leu B112/ italic gamma
+   Tyr 117, Met B114/ italic gamma Leu 119, light blue) and F (Tyr B164,
+   blue). b, Stereo view of the electron density map displaying a HEPES
+   buffer molecule in the ligand-binding site. This experimental density
+   (contoured at 1  sigma ) is derived from cross-crystal averaging. c,
+   Location of the principal ligand-binding residues (colours as in a,
+   orientation as in Fig. 2b). d, Location of the complementary
+   ligand-binding residues (colours as in a, orientation as in Fig. 2b).
+   Note that loops D, E and F are all on beta -strands.
+   [132]High resolution image and legend (89K)
+
+   All residues in the binding site have been identified by photoaffinity
+   labelling and mutagenesis studies^[133]6, ^[134]7, ^[135]8, ^[136]9,
+   ^[137]10, ^[138]11, ^[139]12, ^[140]13, ^[141]14, ^[142]15, ^[143]16.
+   Although the side chain of His A145 is pointing away from the cavity,
+   its main chain is involved in the binding site. One residue identified
+   by labelling studies^[144]6, Trp A82 ( alpha [1] Trp 86), is involved
+   in hydrophobic core formation and located far from the pocket.
+   Therefore it probably does not participate directly in ligand binding.
+   Additional residues may be involved in binding large ligands such as
+   toxins^[145]13. Otherwise, the AChBP ligand-binding site entirely
+   confirms the available biochemical and mutational data on nAChRs. The
+   structure, however, reveals for the first time how these residues are
+   positioned with respect to each other, and will provide a valuable tool
+   for drug design studies.
+
+   All observed residues are conserved between known ligand-binding
+   subunits of nicotinic receptors except the loop F Tyr B164 residue. In
+   our structure the loop F region has an unusual conformation, but as it
+   is relatively weakly resolved, its precise analysis is difficult. The
+   loop F region has low sequence conservation in the nicotinic family
+   ([146]Fig. 1), and in other superfamily members it may have a different
+   conformation, providing different residues to the binding site. Such
+   changes could lead to variations in affinity, for example by changing
+   the size of the ligand-binding site or its access route.
+
+   Close to the loop F region, the electron density was interpreted as a
+   calcium ion, because the crystals were grown in the presence of Ca^2+.
+   The cation has Asp B161, Asp B175 and the main chain of B176 as
+   ligands. This putative Ca^2+ ion may help to orientate Tyr B164 and
+   could thus be involved in ligand binding. This agrees with observations
+   that the residue equivalent to Asp B161 in muscle/Torpedo subunits (
+   italic gamma Asp 174/ delta Asp 180) is important in ligand
+   binding^[147]14, ^[148]15. Additionally, calcium-binding sites that
+   enhance the response to agonist binding have been identified in a
+   homologous region (residue range 161–172) of the neuronal alpha
+   [7]-receptor^[149]33.
+
+   The most likely access routes to the ligand-binding sites are from
+   above or below the double-cysteine-containing loop C ([150]Fig. 4a).
+   This region buries the ligand-binding site from the solvent, preventing
+   access from the outside. Access of some of the larger ligands, such as
+   d-tubocurarine, would require the binding site to be opened up, for
+   example by movement of the beta -hairpin beta 9– beta 10 in the C-loop
+   region. Access from the central pore has been suggested^[151]21, but
+   this would require major structural rearrangements at the interface,
+   which are less likely.
+
+   From the location of the ligand-binding site, we can draw conclusions
+   about the arrangement of ligand-binding alpha [1]-subunits with respect
+   to their complementary partners in the Torpedo and muscle receptors. It
+   has been suggested that the alpha [1] italic gamma and alpha [1] delta
+   interfaces occur in a clockwise alpha [1] italic gamma alpha [1] delta
+   beta [1] arrangement when looking towards the membrane^[152]34. Our
+   structure would favour an anticlockwise alpha [1] italic gamma alpha
+   [1]delta beta [1] arrangement, as the principal ligand-binding site is
+   located on the anticlockwise side of its complementary partner
+   ([153]Fig. 2).
+   [154]Top of page
+
+ §3§ Ligand binding  §3§
+
+   To our surprise we found features of bulky electron density that
+   stacked onto Trp 143 in each ligand-binding site in the experimental
+   cross-crystal averaged electron density ([155]Fig. 4b). We have
+   assigned this to a HEPES
+   (N-2-hydroxyethylpiperazine-N'-2-ethanesulphonic acid) buffer molecule,
+   which contains a positively charged quaternary ammonium group and
+   therefore has some similarity to known nicotinic receptor ligands. Its
+   dissociation constant of 100 mM (data not shown) indicates that binding
+   under crystallization conditions (100–150 mM) is possible at low
+   occupancy. Although HEPES does not make any specific hydrogen bonds
+   with the protein, it stacks with its quaternary ammonium onto Trp 143,
+   making cation- pi interactions as expected for nicotinic
+   agonists^[156]17, ^[157]35 ([158]Fig. 4b). It buries equal amounts of
+   surface of the principal and complementary subunit. However, owing to
+   low occupancy and limited resolution of the data, the precise
+   orientation of the HEPES molecule cannot be definitely resolved. It has
+   been suggested^[159]3 that the ligand-binding site of nAChRs could be
+   similar to that of acetylcholinesterase (AChE). Although the size
+   of the binding site is roughly similar in AChBP and AChE, the observed
+   arrangement of aromatic residues is quite different. However, the
+   stacking of the quaternary ammonium of HEPES, as far as it can be
+   refined in the current AChBP structure, is similar to that of the
+   quaternary ammonium of the decamethonium in AChE on Trp 84 (ref.
+   [160]36).
+   [161]Top of page
+
+ §3§ Pentamer interface  §3§
+
+   The subunit interface consists on the plus side entirely of loop
+   regions (L1, L2, L4, L5, L7, L8 and L10), whereas the minus side mostly
+   presents secondary structure elements to the interface ( alpha 1, beta
+   1, beta 2, beta 3, beta 5, beta 6 and L9; [162]Fig. 5). Several
+   residues are important for both ligand binding and pentamer formation.
+   The interface buries a large surface area (2,700 Å^2), with a mainly
+   uncharged character including only a single bifurcated salt bridge
+   (Glu A149–Arg B3 and Arg B104). It is a very convoluted surface,
+   indicating that shape complementarity may be important in pentamer
+   formation ([163]Fig. 5a). The interface residues are not well conserved
+   between subfamilies of the superfamily of pentameric ligand-gated ion
+   channels ([164]Fig. 1). The residues change markedly between the
+   different ion-channel subtypes, with for example changes from
+   hydrophobic to charged and vice versa ([165]Fig. 1).
+
+ §5§ [166] Figure 5: Dimer interface. §5§
+
+   [167]Figure 5 : Dimer interface. Unfortunately we are unable to provide
+   accessible alternative text for this. If you require assistance to
+   access this image, or to obtain a text description, please contact
+   npg@nature.com
+
+   a, Stereo figure of the dimer interface. Representation of the
+   interface residues (ball-and-stick) on a schematic secondary structure.
+   The figure shows the plus face of subunit A (light yellow, orange
+   interface residues) and the minus face of subunit B (light blue, pink
+   interface side chains). b, Dimer interface interactions. Note that
+   owing to the low conservation of these interfaces (Fig. 1) the actual
+   interactions will not be conserved in any pentameric LGIC interface,
+   but that in all receptors these topological regions are likely to form
+   the interface.
+   [168]High resolution image and legend (58K)
+   [169]Top of page
+
+ §3§ Ligand-gated ion channels  §3§
+
+   The superfamily of ligand-gated ion channels has highly conserved LBDs,
+   and the function and location of the conserved residues can now be
+   analysed in the light of the structure. Most residues that are
+   conserved in the superfamily ([170]Fig. 1) are hydrophobic and help to
+   maintain the hydrophobic core of the protomer, grouped into
+   three clusters ([171]Fig. 6). The first cluster is involved in packing
+   of the N-terminal helix alpha 1 against the main framework of the
+   protomer. The second cluster is situated in the upper half of the beta
+   -core region. The third cluster is located at the lower end of the beta
+   -sandwich ([172]Fig. 6). In the superfamily, two residues are conserved
+   in the ligand-binding site. Only very few conserved residues are
+   hydrophilic; two of these maintain the turns of a Greek key motif
+   connecting strands beta 3, beta 5, beta 6 and beta 2, in which Asp 60
+   stabilizes the N terminus of a small 3[10] helix and Gly 109 enables
+   tight-turn formation. Conserved residues Asp 85 and Asn 90 are involved
+   in packing of the beta -sheets. Asp 85 forms hydrogen bonds to the
+   highly conserved Ser 142 and Thr 144, and residue Asn 90 brings
+   together the main-chain oxygens of Ser 122 and Arg 137, enabling
+   disulphide-bond formation of the nearby absolutely conserved disulphide
+   bond (123–136). This disulphide bond is topologically equivalent to the
+   'tyrosine cornerstone'^[173]37 found in Ig-like proteins, in which
+   tyrosine links the two beta -sheets together, and a similar role is
+   fulfilled by the disulphide bond in AChBP. This structural role for the
+   disulphide bond explains why, in the Torpedo receptor, the
+   Cys 128–Cys 142 bond is important for both preservation of subunit
+   conformational stability^[174]38 and complete nAChR assembly^[175]39.
+   As the conserved residues mainly contribute to the overall structure
+   formation, it is clear that all pentameric LGIC N-terminal domains will
+   have the same three-dimensional structure.
+
+ §5§ [176] Figure 6: Conservation in the pentameric LGIC superfamily. §5§
+
+   [177]Figure 6 : Conservation in the pentameric LGIC superfamily.
+   Unfortunately we are unable to provide accessible alternative text for
+   this. If you require assistance to access this image, or to obtain a
+   text description, please contact npg@nature.com
+
+   Conserved residues are indicated as viewed from the central pore.
+   Hydrophobic cluster I (red): residues 6, 10, 63, 65, 71, 81, 105, 111;
+   Cluster II (green): residues 20, 27, 29, 58, 82, 84, 86, 88, 140, 150,
+   152, 195; Cluster III (pink): residues 33, 35, 38, 41, 48, 52, 123,
+   125, 136, 138, 165, 171, 173, 199, 201. The hydrophilic conserved
+   residues (dark blue): Asp 60, Asp 85, Asn 90, Gly 109, Lys 203.
+   Conserved residues in the ligand-binding site (light blue): His 145,
+   Tyr 192, or close by: Ala 87. Very few conserved residues are at the
+   surface. Residues conserved between pentameric LGICs but not AChBP are
+   indicated by yellow main chain (14, 19, 170 and the Cys-loop124–135).
+   [178]High resolution image and legend (66K)
+
+   Contrary to the above residues, the Cys loop ([179]Fig. 3a) is well
+   conserved in the pentameric LGIC family but not in AChBP ([180]Fig. 1,
+   residues 129–141). It is hydrophobic in the receptors, whereas it is
+   hydrophilic in AChBP. The Cys loop is located at the bottom (membrane)
+   side of the protein, close to the dimer interface. This position, and
+   its hydrophobicity in the LGIC family, implies that it could interact
+   with the membrane or with the transmembrane region of the receptors,
+   functions that are absent in AChBP.
+
+   Finally, the interface region is among the least conserved regions in
+   the superfamily ([181]Fig. 1). Pentamer formation does not apparently
+   impose very stringent evolutionary requirements on these domains. The
+   high level of structural conservation, however, implies that the same
+   topological regions form these interface contacts in all superfamily
+   members ([182]Fig. 5b). But in these interfaces different combinations
+   of subunits will have different interactions, possibly creating
+   variations in the precise allosteric contacts and movements in the
+   various subclasses of these ion channels.
+   [183]Top of page
+
+ §3§ Activation mechanism  §3§
+
+   The location of the ligand-binding site is conserved among pentameric
+   LGIC receptors^[184]1 but the actual ligand-binding residues vary,
+   creating specificity for different ligands. However, all ligand-gated
+   ion channel LBDs have intrinsically the same function: the activation
+   of a membrane pore. Indeed, a nicotinic receptor LBD is capable of
+   activating a serotonin membrane channel in a chimaeric
+   receptor^[185]40. Thus, the essential activation mechanism is conserved
+   across the superfamily. One option is that activation takes place by
+   direct rotation of the protomer through a pivoting point at the
+   ligand-binding site. But for any other mechanism, the location of the
+   conserved residues implies that transmission of a signal from the
+   binding pocket to the transmembrane domain takes place within the
+   protomer and not through the interface region.
+
+   Within the protomer, several possible regions could transmit activation
+   signals: changes in loop C, induced by ligand binding, could be
+   transmitted directly into the transmembrane domain through the beta 9–
+   beta 10 beta -hairpin; alternatively, large structural changes in the
+   beta -sheet regions could be transmitting the signal through the
+   conserved Cys loop, acting directly on the membrane part of the
+   pentameric LGICs. The movement observed at 9 Å for the Torpedo nAChR
+   upon agonist binding^[186]19 fits well with the latter suggestion. We
+   see a twisted beta -sandwich, with two distinct hydrophobic cores, and
+   it is possible that these cores move with respect to each other upon
+   ligand binding. The effect of any of these activation mechanisms in the
+   protomer will then be modulated by the varying subunit interfaces in
+   the different subtypes of the receptor, allowing intricate specificity
+   in neuronal signal transmission.
+   [187]Top of page
+
+ §3§ Conclusions  §3§
+
+   This crystal structure shows that molluscan AChBP is a homologue of the
+   pentameric LGIC superfamily ligand-binding domains. It confirms the
+   predicted Ig-topology, the location of the binding site at the subunit
+   interface, the position of the MIR and the extensive data on the
+   nicotinic ligand-binding residues.
+
+   With this structure, we present the first detailed three-dimensional
+   information about the fold and the arrangement of the nicotinic
+   ligand-binding site. It also clarifies the arrangement of subunits in
+   nicotinic muscle receptors by showing the relative positioning of the
+   principal and complementary part of the ligand-binding site.
+
+   The AChBP crystal structure provides an explanation for the role of the
+   pentameric LGIC superfamily conserved residues. They stabilize the
+   protomer structure by the formation of hydrophobic cores and packing of
+   secondary structure elements. The crystal structure clarifies how the
+   LGIC pentamers are built up, and how weakly the pentamer interfaces are
+   conserved between LGICs, which has implications for the modes of
+   action.
+
+   It is unclear whether AChBP performs the allosteric and desensitization
+   movements that are important for pentameric LGIC function. AChBP is a
+   soluble protein with a natural role in the modulation of synaptic
+   transmission and lacks a transmembrane channel^[188]27. Thus, ligand
+   binding does not result in opening of a pore in AChBP, although some of
+   the movements could be conserved in its evolution. Similarly, it is
+   unclear whether non-competitive antagonist-binding sites are present in
+   AChBP. Such questions can be addressed with chimaeric molecules and
+   possibly by further crystallographic studies.
+
+   This structure will be highly relevant for the numerous drug-design
+   studies that are targeting the pentameric LGIC superfamily. The general
+   structural knowledge on its folding will be applicable to the GABA,
+   serotonin (5-HT[3]) and glycine receptor fields. It will help us to
+   understand their ligand-binding characteristics and hence could have an
+   impact on the development of, for example, anti-emetics aimed at the
+   5-HT[3] receptor or the mood-defining drugs that target the GABA
+   receptors. The availability of a three-dimensional description of the
+   nicotinic ligand-binding site will be especially relevant for the
+   design of new drugs against, for example, Alzheimer's disease, epilepsy
+   and addiction to smoking.
+   [189]Top of page
+
+ §3§ Methods §3§
+
+ §4§ Protein purification §4§
+
+   AChBP was cloned into expression vector pPIC9 (without residue Leu 1)
+   and overexpressed in yeast, Pichia pastoris GS115, according to the
+   Invitrogen manual. After 4 days of induction the medium was collected,
+   concentrated and dialysed against standard buffer (20 mM Tris–HCl
+   buffer (pH 8.0), 150 mM NaCl and 0.02% (w/v) NaN[3]). The protein was
+   purified by anion exchange (Poros50 HQ, MonoQ), and gel filtration
+   (Superdex 200). It was dialysed against 50 mM HEPES buffer (pH 7.0)
+   with 0.02% NaN[3] and concentrated to approx 20 mg ml^-1. N-terminal
+   sequencing revealed that part of the pPIC9-encoded signal sequence is
+   retained, before residue 2 (sequence EAEAYVEF). The experimental
+   relative molecular mass was 26,544 (MALDI), approx 2K more than the
+   calculated mass based on the sequence (24,649), owing to glycosylation
+   at position Asn 66, as confirmed by deglycosylation experiments (data
+   not shown).
+
+ §4§ Crystallization §4§
+
+   We grew the crystals at room temperature using the hanging-drop vapour
+   diffusion technique. All drops contained 2  micro l of protein
+   (10 mg ml^-1) and 2  micro l of reservoir solution (9–11% (w/v) PEG
+   4000, 100 mM HEPES (pH 7.0), 50–200 mM CaCl[2] and 0.02% NaN[3]).
+   Depending on the batch of protein and the CaCl[2] concentration, we
+   obtained three crystal forms. Orthorhombic and monoclinic crystals
+   appeared under high CaCl[2] concentration and were frequently twinned.
+   The orthorhombic crystals (P2[1]2[1]2[1]) have the following cell
+   constants: a = 120.6 Å, b = 137.0 Å, c = 161.5 Å, with two pentamer
+   molecules per asymmetric unit (asu). The monoclinic crystals (P2[1])
+   are very similar in morphology to the orthorhombic ones, but gave lower
+   resolution data ( approx 3.3 Å), with the following cell constants: a =
+   121.1 Å, b = 162.1 Å, c = 139.4 Å, beta = 90.13°, and four pentamers
+   per asu. The tetragonal crystal form (P4[2]2[1]2) was obtained from a
+   solution containing 11.5 (w/v) PEG 4000, 100 mM HEPES (pH 7.0), 150 mM
+   CaCl[2] and 0.02% (w/v) NaN[3]. They have the following cell constants:
+   a = b = 141.66 Å, c = 120.83 Å and one pentamer per asu. For MAD
+   experiments, orthorhombic and monoclinic crystals were soaked in mother
+   liquor solution containing 5 mM and 10 mM trimethyl-lead acetate (MePb)
+   respectively for 5 days. Before flash-cooling, all crystals were
+   gradually equilibrated against mother liquor with 30% glycerol.
+
+   In all three space groups AChBP forms a decamer structure with 52
+   symmetry, where 2 pentamers have contact with each other through a
+   calcium-binding site, at the 'top' of the alpha 1 helix. This binding
+   site (Asp 2 and Asp 5 from two protomers) is not conserved in the
+   pentameric LGIC family. In the tetragonal space group the two-fold of
+   the decamer coincides with a crystallographic two-fold. In solution,
+   the AChBP protein behaves as a pentamer^[190]27.
+
+ §4§ Structure determination and refinement §4§
+
+   We collected native data (X11) and the Pb-1 data sets (BW7A) at the
+   EMBL outstation at the DESY synchrotron in Hamburg and the Pb-2 data
+   sets (BM14) at the ESRF, Grenoble ([191]Table 1). Data were processed
+   with DENZO/SCALEPACK^[192]41 (native) or MOSFLM^[193]42/SCALA^[194]43
+   software (Pb-1, Pb-2). The Pb sites, located at the interface of two
+   pentamers, were found for both MAD sets by SOLVE^[195]44 and heavy atom
+   parameters were optimized with SHARP^[196]45. NCS operators were found
+   and refined with NCS6D and IMP^[197]46. Multi-crystal averaging was
+   executed with DM-multi^[198]47 using amplitudes from the monoclinic,
+   orthorhombic and native (tetragonal) data sets, and experimental phases
+   from the orthorhombic and monoclinic MAD experiments. The model was
+   built in O^[199]48 and refined with CNS^[200]49, against the tetragonal
+   2.7 Å data. Refinement included partial fivefold NCS restraints, an
+   overall anisotropic B factor and bulk solvent correction. The unusual
+   vicinal disulphide bridge^[201]8, Cys 187–Cys 188, was visible in the
+   electron density, but because of the limited resolution it was not
+   analysed in detail. The final model contains 1,025 residues of AChBP
+   pentamer, 5 HEPES molecules, 10 Ca^2+ ions and 15 water molecules. The
+   entire AChBP pentamer is well ordered, except for the N-terminus seven
+   residues (part of the signal sequence) and the last five C-terminal
+   residues. In addition, the HEPES, loop region 155–160 and the sugar
+   residues attached to residue Asn 66 are not well resolved in the
+   electron density. Root-mean-square deviations from ideal geometry for
+   bond distances and angles are 0.01 Å and 1.6°, respectively.
+
+   [202]Top of page
+
+ §3§ References §3§
+
+   ------------------
+
+   References
+   1. Ortells, M. O. & Lunt, G. G. Evolutionary history of the
+   ligand-gated ion-channel superfamily of receptors. Trends Neurosci. 18,
+   121-127 (1995). | [203]Article | [204]PubMed | [205]ISI |
+   2. Corringer, P. J., Le Novère, N. & Changeux, J. P. Nicotinic
+   receptors at the amino-acid level. Annu. Rev. Pharmacol. Toxicol. 40,
+   431-458 (2000). | [206]PubMed | [207]ISI |
+   3. Changeux, J. P. & Edelstein, S. J. Allosteric receptors after 30
+   years. Neuron 21, 959-980 (1998). | [208]PubMed | [209]ISI |
+   4. Arias, H. R. Localization of agonist and competitive antagonist
+   binding sites on nicotinic acetylcholine receptors. Neurochem. Int. 36,
+   595-645 (2000). | [210]Article | [211]PubMed | [212]ISI |
+   5. Paterson, D. & Nordberg, A. Neuronal nicotinic receptors in the
+   human brain. Prog. Neurobiol. 61, 75-111
+   (2000). | [213]Article | [214]PubMed | [215]ISI |
+   6. Galzi, J. L. et al. Identification of a novel amino acid
+   alpha-tyrosine 93 within the cholinergic ligands-binding sites of the
+   acetylcholine receptor by photoaffinity labeling. Additional evidence
+   for a three-loop model of the cholinergic ligands-binding sites. J.
+   Biol. Chem. 265, 10430-10437 (1990). | [216]PubMed | [217]ISI |
+   7. Dennis, M. et al. Amino acids of the Torpedo marmorata acetylcholine
+   receptor alpha subunit labeled by a photoaffinity ligand for the
+   acetylcholine binding site. Biochemistry 27, 2346-2357
+   (1988). | [218]PubMed | [219]ISI |
+   8. Kao, P. N. & Karlin, A. Acetylcholine receptor binding site contains
+   a disulfide cross-link between adjacent half-cystinyl residues. J.
+   Biol. Chem. 261, 8085-8088 (1986). | [220]PubMed | [221]ISI |
+   9. Middleton, R. E. & Cohen, J. B. Mapping of the acetylcholine binding
+   site of the nicotinic acetylcholine receptor: [3H]nicotine as an
+   agonist photoaffinity label. Biochemistry 30, 6987-6997
+   (1991). | [222]PubMed | [223]ISI |
+   10. Fu, D. X. & Sine, S. M. Competitive antagonists bridge the
+   alpha-gamma subunit interface of the acetylcholine receptor through
+   quaternary ammonium-aromatic interactions. J. Biol. Chem. 269,
+   26152-26157 (1994). | [224]PubMed | [225]ISI |
+   11. O'Leary, M. E., Filatov, G. N. & White, M. M. Characterization of
+   d-tubocurarine binding site of Torpedo acetylcholine receptor. Am. J.
+   Physiol. 266, C648-653 (1994). | [226]PubMed |
+   12. Corringer, P. J. et al. Identification of a new component of the
+   agonist binding site of the nicotinic alpha 7 homo-oligomeric receptor.
+   J. Biol. Chem. 270, 11749-11752 (1995). | [227]PubMed | [228]ISI |
+   13. Sine, S. M., Kreienkamp, H. J., Bren, N., Maeda, R. & Taylor, P.
+   Molecular dissection of subunit interfaces in the acetylcholine
+   receptor: identification of determinants of alpha-conotoxin M1
+   selectivity. Neuron 15, 205-211 (1995). | [229]PubMed | [230]ISI |
+   14. Czajkowski, C., Kaufmann, C. & Karlin, A. Negatively charged
+   amino-acid residues in the nicotinic receptor delta subunit that
+   contribute to the binding of acetylcholine. Proc. Natl Acad. Sci. USA
+   90, 6285-6289 (1993). | [231]PubMed | [232]ISI |
+   15. Martin, M., Czajkowski, C. & Karlin, A. The contributions of
+   aspartyl residues in the acetylcholine receptor gamma and delta
+   subunits to the binding of agonists and competitive antagonists. J.
+   Biol. Chem. 271, 13497-13503 (1996). | [233]PubMed | [234]ISI |
+   16. Prince, R. J. & Sine, S. M. Molecular dissection of subunit
+   interfaces in the acetylcholine receptor. Identification of residues
+   that determine agonist selectivity. J. Biol. Chem. 271, 25770-25777
+   (1996). | [235]PubMed | [236]ISI |
+   17. Dougherty, D. A. Cation-pi interactions in chemistry and biology: a
+   new view of benzene, Phe, Tyr, and Trp. Science 271, 163-168
+   (1996). | [237]PubMed | [238]ISI |
+   18. Unwin, N. Nicotinic acetylcholine receptor at 9 ï¿½ resolution. J.
+   Mol. Biol. 229, 1101-1124
+   (1993). | [239]Article | [240]PubMed | [241]ISI |
+   19. Unwin, N. Acetylcholine receptor channel imaged in the open state.
+   Nature 373, 37-43 (1995). | [242]PubMed | [243]ISI |
+   20. Beroukhim, R. & Unwin, N. Three-dimensional location of the main
+   immunogenic region of the acetylcholine receptor. Neuron 15, 323-331
+   (1995). | [244]PubMed | [245]ISI |
+   21. Miyazawa, A., Fujiyoshi, Y., Stowell, M. & Unwin, N. Nicotinic
+   acetylcholine receptor at 4.6 ï¿½ resolution: transverse tunnels in the
+   channel wall. J. Mol. Biol. 288, 765-786
+   (1999). | [246]Article | [247]PubMed | [248]ISI |
+   22. West, A. P.Jr, Bjorkman, P. J., Dougherty, D. A. & Lester, H. A.
+   Expression and circular dichroism studies of the extracellular domain
+   of the alpha subunit of the nicotinic acetylcholine receptor. J. Biol.
+   Chem. 272, 25468-25473 (1997). | [249]PubMed | [250]ISI |
+   23. Schrattenholz, A. et al. Expression and renaturation of the
+   N-terminal extracellular domain of Torpedo nicotinic acetylcholine
+   receptor alpha-subunit. J. Biol. Chem. 273, 32393-32399
+   (1998). | [251]PubMed | [252]ISI |
+   24. Alexeev, T. et al. Physicochemical and immunological studies of the
+   N-terminal domain of the Torpedo acetylcholine receptor alpha-subunit
+   expressed in Escherichia coli. Eur. J. Biochem. 259, 310-319
+   (1999). | [253]Article | [254]PubMed | [255]ISI |
+   25. Wells, G. B., Anand, R., Wang, F. & Lindstrom, J. Water-soluble
+   nicotinic acetylcholine receptor formed by alpha7 subunit extracellular
+   domains. J. Biol. Chem. 273, 964-973 (1998). | [256]PubMed | [257]ISI |
+   26. Tierney, M. L. & Unwin, N. Electron microscopic evidence for the
+   assembly of soluble pentameric extracellular domains of the nicotinic
+   acetylcholine receptor. J. Mol. Biol. 303, 185-196
+   (2000). | [258]Article | [259]PubMed | [260]ISI |
+   27. Smit, A. B. et al. A glia-derived acetylcholine-binding protein
+   that modulates synaptic transmission. Nature 411, 261-268
+   (2001). | [261]ISI |
+   28. Bork, P., Holm, L. & Sander, C. The immunoglobulin fold. Structural
+   classification, sequence patterns and common core. J. Mol. Biol. 242,
+   309-320 (1994). | [262]Article | [263]PubMed | [264]ISI |
+   29. Le Novère, N., Corringer, P. J. & Changeux, J. P. Improved
+   secondary structure predictions for a nicotinic receptor subunit:
+   incorporation of solvent accessibility and experimental data into a
+   two-dimensional representation. Biophys. J. 76, 2329-2345
+   (1999). | [265]PubMed | [266]ISI |
+   30. Holm, L. & Sander, C. Dali/FSSP classification of three-dimensional
+   protein folds. Nucleic Acids Res. 25, 231-234
+   (1997). | [267]Article | [268]PubMed | [269]ISI |
+   31. Tzartos, S. J. et al. The main immunogenic region (MIR) of the
+   nicotinic acetylcholine receptor and the anti-MIR antibodies. Mol.
+   Neurobiol. 5, 1-29 (1991). | [270]PubMed | [271]ISI |
+   32. Fernando Valenzuela, C., Weign, P., Yguerabide, J. & Johnson, D. A.
+   Transverse distance between the membrane and the agonist binding sites
+   on the Torpedo acetylcholine receptor: a fluorescence study. Biophys.
+   J. 66, 674-682 (1994). | [272]PubMed |
+   33. Galzi, J. L., Bertrand, S., Corringer, P. J., Changeux, J. P. &
+   Bertrand, D. Identification of calcium binding sites that regulate
+   potentiation of a neuronal nicotinic acetylcholine receptor. EMBO J.
+   15, 5824-5832 (1996). | [273]PubMed | [274]ISI |
+   34. Machold, J., Weise, C., Utkin, Y., Tsetlin, V. & Hucho, F. The
+   handedness of the subunit arrangement of the nicotinic acetylcholine
+   receptor from Torpedo californica. Eur. J. Biochem. 234, 427-430
+   (1995). | [275]PubMed | [276]ISI |
+   35. Zhong, W. et al. From ab initio quantum mechanics to molecular
+   neurobiology: a cation-pi binding site in the nicotinic receptor. Proc.
+   Natl Acad. Sci. USA 95, 12088-12093 (1998). | [277]PubMed | [278]ISI |
+   36. Harel, M. et al. Quaternary ligand binding to aromatic residues in
+   the active-site gorge of acetylcholinesterase. Proc. Natl Acad. Sci.
+   USA 90, 9031-9035 (1993). | [279]PubMed | [280]ISI |
+   37. Hemmingsen, J. M., Gernert, K. M., Richardson, J. S. & Richardson,
+   D. C. The tyrosine corner: a feature of most Greek key beta-barrel
+   proteins. Protein Sci. 3, 1927-1937 (1994). | [281]PubMed | [282]ISI |
+   38. Mishina, M. et al. Location of functional regions of acetylcholine
+   receptor alpha -subunit by site-directed mutagenesis. Nature 313,
+   364-369 (1985). | [283]PubMed | [284]ISI |
+   39. Green, W. N. & Wanamaker, C. P. Formation of the nicotinic
+   acetylcholine receptor binding sites. J. Neurosci. 18, 5555-5564
+   (1998). | [285]ISI |
+   40. Eisele, J. L. et al. Chimaeric nicotinic-serotonergic receptor
+   combines distinct ligand binding and channel specificities. Nature 366,
+   479-483 (1993). | [286]PubMed | [287]ISI |
+   41. Otwinowski, Z. & Minor, W. Processing of X-ray diffraction data
+   collected in oscillation mode. Methods Enzymol. 276, 307-326
+   (1997). | [288]ISI |
+   42. Leslie, A. G. Integration of macromolecular diffraction data. Acta
+   Crystallogr. D Biol. Crystallogr. 55, 1696-1702
+   (1999). | [289]Article | [290]PubMed | [291]ISI |
+   43. Collaborative Computational Project, Number 4. The CCP4 suite:
+   programs for protein crystallography. Acta Crystallogr. D 50, 760-763
+   (1994). | [292]Article |
+   44. Terwilliger, T. C. & Berendzen, J. Automated MAD and MIR structure
+   solution. Acta Crystallogr. D Biol. Crystallogr. 55, 849-861
+   (1999). | [293]Article | [294]PubMed | [295]ISI |
+   45. La Fortelle, E. de & Bricogne, G. Maximum-likelihood heavy-atom
+   parameter refinement in the MIR and MAD methods. Methods Enzymol. 276,
+   472-494 (1997).
+   46. Kleywegt, G. J. & Jones, T. A. in From First Map to Final Model
+   (eds Bailey, S., Hubbard, R. & Waller, D.) 59-66 (SERC Daresbury
+   Laboratory, Warrington, 1994).
+   47. Cowtan, K. Joint CCP4 and ESF-EACBM Newsletter on Protein
+   Crystallography 31, 34-38 (1994).
+   48. Jones, T. A., Zou, J-Y., Cowan, S. W. & Kjeldgaard, M. Improved
+   methods for building protein models in electron density maps and the
+   location of errors in these models. Acta Crystallogr. A 47, 110-119
+   (1991). | [296]Article | [297]PubMed | [298]ISI |
+   49. Brünger, A. T. et al. Crystallography & NMR system: A new software
+   suite for macromolecular structure determination. Acta Crystallogr. D
+   54, 905-921 (1998). | [299]Article | [300]ISI |
+   50. Thompson, J. D., Gibson, T. J., Plewniak, F., Jeanmougin, F. &
+   Higgins, D. G. The CLUSTAL_X windows interface: flexible strategies for
+   multiple sequence alignment aided by quality analysis tools. Nucleic
+   Acids Res. 25, 4876-4882
+   (1997). | [301]Article | [302]PubMed | [303]ISI |
+   [304]Top of page
+
+ §3§ Acknowledgements §3§
+
+   We thank R. van der Schors for mass spectrometry; R. van Elk for HEPES
+   binding assays; A. Perrakis and U. Gohlke for helpful suggestions; M.
+   Lamers for help with figure preparation; and beam line scientists at
+   ESRF and EMBL outstations Hamburg and Grenoble, in particular W.
+   Rypniewski and G. Leonard for assistance during data collection.
+   Nederlandse Organisatie voor Wetenschappelijk Onderzoek-Chemische
+   Wetenschappen and Stichting voor de Technische Wetenschappen are
+   acknowledged for financial support.
+   [305]Top of page
+
+ §1§ Main navigation §1§
+
+ §2§ Journal content §2§
+
+     * [306]Journal home
+     * [307]Advance online publication
+          + [308]About AOP
+     * [309]Current issue
+     * [310]Nature News
+     * [311]Archive
+     * [312]Supplements
+          + [313]Insights
+          + [314]Outlooks
+          + [315]Collections
+     * [316]Web focuses
+          + [317]Biological sciences
+          + [318]Earth and environment
+          + [319]Horizons
+          + [320]Physical sciences
+          + [321]Science and politics
+          + [322]Science, art and culture
+     * [323]Podcasts
+     * [324]Videos
+     * [325]News Specials
+
+ §2§ Journal information §2§
+
+     * [326]About the journal
+          + [327]Contact the journal
+          + [328]About the editors
+          + [329]Nature family of journals
+          + [330]History of the Journal Nature
+          + [331]For advertisers
+          + [332]For librarians
+     * [333]For authors
+          + [334]Formatting guide
+          + [335]Publication policies
+          + [336]For referees
+     * [337]Online submission
+     * [338]Nature Awards
+          + [339]Google Earth
+     * [340]Nature history
+
+ §2§ NPG Services §2§
+
+     * [341]Advertising
+     * [342]work@npg
+     * [343]Reprints & permissions
+     * [344]For librarians
+     * [345]Authors & referees
+
+ §2§ NPG Resources §2§
+
+     * [346]Gateways & databases
+     * [347]Nature Reports
+     * [348]Nature Network
+     * [349]nature.com blogs
+     * [350]Nature Conferences
+     * [351]Scitable Genetics
+
+ §2§ NPG Journals §2§
+
+ §3§ by Subject Area §3§
+
+     *  §4§ Chemistry §4§
+          + [352]Chemistry
+          + [353]Drug discovery
+          + [354]Biotechnology
+          + [355]Materials
+          + [356]Methods & Protocols
+     *  §4§ Clinical Practice & Research §4§
+          + [357]Cancer
+          + [358]Cardiovascular medicine
+          + [359]Dentistry
+          + [360]Endocrinology
+          + [361]Gastroenterology & Hepatology
+          + [362]Methods & Protocols
+          + [363]Pathology & Pathobiology
+          + [364]Urology
+     *  §4§ Earth & Environment §4§
+          + [365]Earth sciences
+          + [366]Evolution & Ecology
+     *  §4§ Life sciences §4§
+          + [367]Biotechnology
+          + [368]Cancer
+          + [369]Development
+          + [370]Drug discovery
+          + [371]Evolution & Ecology
+          + [372]Genetics
+          + [373]Immunology
+          + [374]Medical research
+          + [375]Methods & Protocols
+          + [376]Microbiology
+          + [377]Molecular cell biology
+          + [378]Neuroscience
+          + [379]Pharmacology
+          + [380]Systems biology
+     *  §4§ Physical sciences §4§
+          + [381]Physics
+          + [382]Materials
+
+ §3§ [383]by A - Z Index §3§
+
+ §1§ Extra navigation §1§
+
+   .
+   [384]Subscribe to Nature
+
+ §2§ ARTICLE NAVIGATION -FULL TEXT §2§
+
+   [385]Previous|[386]Next
+     * [387]Table of contents
+     * [388]Download PDF
+     * [389]Send to a friend
+     * [390]CrossRef lists 224 articles citing this article
+     * [391]Scopus lists 925 articles citing this article
+     * [392]Export citation
+     * [393]Export references
+     * [394]Rights and permissions
+     * [395]Order commercial reprints
+     * [396]Bookmark in Connotea
+     * [397]Abstract
+     * [398]Acetylcholine-binding protein
+     * [399]Structure determination
+     * [400]The AChBP pentamer
+     * [401]The AChBP protomer
+     * [402]Positioning of functional regions
+     * [403]The ligand-binding site
+     * [404]Ligand binding
+     * [405]Pentamer interface
+     * [406]Ligand-gated ion channels
+     * [407]Activation mechanism
+     * [408]Conclusions
+     * [409]Methods
+     * [410]References
+     * [411]Acknowledgements
+     * [412]Figures and tables
+
+ §2§ SEE ALSO §2§
+
+     * [413]News and Views by Dougherty & Lester
+
+ §2§ SEARCH PUBMED FOR §2§
+
+     * [414]Katju S breve a Brejc
+     * [415]Willem J. van Dijk
+     * [416]Remco V. Klaassen
+     * [417]Mascha Schuurmans
+     * [418]John van der Oost
+     * [419]August B. Smit
+     * [420]more authors of this article
+
+ §2§ [421]Open Innovation Challenges §2§
+
+     *  §3§ [422]Maintaining Fully Differentiated Human Primary Renal
+       Proximal Tubular Epithelial Cells §3§
+          + Deadline: Oct 27 2010
+          + Reward: $30,000 USD
+       A validated protocol is required for maintaining and expanding
+       Human Primary Renal Proximal Tubular …
+     *  §3§ [423]Chordoma Cancer Cell Lines Needed to Save Lives! §3§
+          + Deadline: Dec 13 2010
+          + Reward: $10,000 USD
+       The Chordoma Foundation requests cell lines that can be used for
+       research into chordoma – a sl…
+
+     * [424]More Challenges
+     * Powered by:[425] InnoCentive
+
+ §2§ [426]nature jobs §2§
+
+     *  §3§ [427]Head of Safety Publishing §3§
+          + Quintiles Technologies (India) Pvt. Ltd
+          + Bangalore, Karnataka India
+     *  §3§ [428]Chief Research Manager / Dy. General Manager
+       (Biotechnology) §3§
+          + Indian Oil Corporation Ltd
+          + Faridabad India
+
+   [429]More science jobs
+   [430]Post a job for free
+   ADVERTISEMENT
+   [431]Advertisement
+
+   [432]Top
+     * Nature
+     * ISSN: 0028-0836
+     * EISSN: 1476-4687
+
+     * [433]About NPG
+     * [434]Contact NPG
+     * [435]RSS web feeds
+     * [436]Help
+
+     * [437]Privacy policy
+     * [438]Legal notice
+     * [439]Accessibility statement
+     * [440]Terms
+
+     * [441]Nature News
+     * [442]Nature jobs
+     * [443]Nature Asia
+     * [444]Nature Education
+
+   Search: ____________________ go
+
+     * [445]© 2010 Nature Publishing Group, a division of Macmillan
+       Publishers Limited. All Rights Reserved.
+     * partner of [446]AGORA, HINARI, OARE, INASP, CrossRef and COUNTER
+
+References
+
+   1. http://www.nature.com/nature/
+   2. http://www.nature.com/info/copyright_statement.html
+   3. http://www.nature.com/help/
+   4. http://www.nature.com/nature/current_issue/rss/index.html
+   5. http://www.nature.com/opensearch/opensearch.xml
+   6. http://www.nature.com/opensearch/request
+   7. file://localhost/dev/paper.html#content
+   8. file://localhost/dev/paper.html#journalnav
+   9. http://www.nature.com/
+  10. http://www.nature.com/siteindex/
+  11. http://www.nature.com/browse/
+  12. http://www.nature.com/myaccount/
+  13. http://mts-nature.nature.com/cgi-bin/main.plex
+  14. http://www.nature.com/register/
+  15. https://secure.nature.com/subscribe/nature
+  16. http://ad.doubleclick.net/jump/nature.com/article;abr=!NN2;tile=1;type=af;artid=411269a0;date=200105;issue=6835;chaco=;keywd=;njdis=;njreg=;crstg=;pos=top;mesh=Acetylcholine;mesh=Amino%20Acid%20Sequence;mesh=Animals;mesh=Binding%20Sites;mesh=Carrier%20Proteins;mesh=Crystallography,%20X-Ray;mesh=Dimerization;mesh=Immunoglobulins;mesh=Ion%20Channel%20Gating;mesh=Ion%20Channels;mesh=Ligands;mesh=Lymnaea;mesh=Models,%20Molecular;mesh=Molecular%20Sequence%20Data;mesh=Pichia;mesh=Protein%20Structure,%20Quaternary;mesh=Protein%20Structure,%20Tertiary;mesh=Protein%20Subunits;mesh=Receptors,%20Nicotinic;mesh=Recombinant%20Proteins;mesh=Sequence%20Alignment;sz=728x90;ptile=1;ord=123456789?
+  17. http://www.nature.com/nature/
+  18. http://www.nature.com/search/adv_search?sp-a=sp1001702d&sp-x-1=ujournal&sp-q-1=Nature
+  19. http://www.nature.com/nature/index.html
+  20. http://www.nature.com/nature/archive/
+  21. http://www.nature.com/nature/journal/v411/n6835/index.html#af
+  22. file://localhost/dev/paper.html#a1
+  23. file://localhost/dev/paper.html#a1
+  24. file://localhost/dev/paper.html#a2
+  25. file://localhost/dev/paper.html#a2
+  26. file://localhost/dev/paper.html#a2
+  27. file://localhost/dev/paper.html#a3
+  28. file://localhost/dev/paper.html#a2
+  29. file://localhost/dev/paper.html#a1
+  30. file://localhost/dev/paper.html#a1
+  31. mailto:sixma|[commat]|nki.nl
+  32. file://localhost/dev/paper.html#top
+  33. file://localhost/dev/paper.html#B1
+  34. file://localhost/dev/paper.html#B2
+  35. file://localhost/dev/paper.html#B3
+  36. file://localhost/dev/paper.html#B4
+  37. file://localhost/dev/paper.html#B2
+  38. file://localhost/dev/paper.html#B5
+  39. file://localhost/dev/paper.html#B2
+  40. file://localhost/dev/paper.html#B4
+  41. file://localhost/dev/paper.html#B6
+  42. file://localhost/dev/paper.html#B7
+  43. file://localhost/dev/paper.html#B7
+  44. file://localhost/dev/paper.html#B8
+  45. file://localhost/dev/paper.html#B9
+  46. file://localhost/dev/paper.html#B10
+  47. file://localhost/dev/paper.html#B11
+  48. file://localhost/dev/paper.html#B12
+  49. file://localhost/dev/paper.html#B10
+  50. file://localhost/dev/paper.html#B13
+  51. file://localhost/dev/paper.html#B14
+  52. file://localhost/dev/paper.html#B15
+  53. file://localhost/dev/paper.html#B16
+  54. file://localhost/dev/paper.html#B17
+  55. file://localhost/dev/paper.html#B18
+  56. file://localhost/dev/paper.html#B19
+  57. file://localhost/dev/paper.html#B20
+  58. file://localhost/dev/paper.html#B21
+  59. file://localhost/dev/paper.html#B22
+  60. file://localhost/dev/paper.html#B23
+  61. file://localhost/dev/paper.html#B24
+  62. file://localhost/dev/paper.html#B22
+  63. file://localhost/dev/paper.html#B23
+  64. file://localhost/dev/paper.html#B24
+  65. file://localhost/dev/paper.html#B25
+  66. file://localhost/dev/paper.html#B26
+  67. file://localhost/dev/paper.html#top
+  68. file://localhost/dev/paper.html#B27
+  69. file://localhost/dev/paper.html#f1
+  70. file://localhost/dev/paper.html#B27
+  71. file://localhost/dev/paper.html#f1
+  72. file://localhost/dev/paper.html#B27
+  73. http://www.nature.com/nature/journal/v411/n6835/fig_tab/411269a0_F1.html
+  74. http://www.nature.com/nature/journal/v411/n6835/fig_tab/411269a0_F1.html
+  75. http://www.nature.com/nature/journal/v411/n6835/fig_tab/411269a0_F1.html
+  76. file://localhost/dev/paper.html#top
+  77. file://localhost/dev/paper.html#t1
+  78. http://www.nature.com/nature/journal/v411/n6835/fig_tab/411269a0_T1.html
+  79. http://www.nature.com/nature/journal/v411/n6835/fig_tab/411269a0_T1.html
+  80. http://www.nature.com/nature/journal/v411/n6835/fig_tab/411269a0_T1.html
+  81. file://localhost/dev/paper.html#top
+  82. file://localhost/dev/paper.html#f2
+  83. file://localhost/dev/paper.html#f2
+  84. file://localhost/dev/paper.html#B21
+  85. file://localhost/dev/paper.html#f2
+  86. http://www.nature.com/nature/journal/v411/n6835/fig_tab/411269a0_F2.html
+  87. http://www.nature.com/nature/journal/v411/n6835/fig_tab/411269a0_F2.html
+  88. http://www.nature.com/nature/journal/v411/n6835/fig_tab/411269a0_F2.html
+  89. file://localhost/dev/paper.html#top
+  90. file://localhost/dev/paper.html#f3
+  91. file://localhost/dev/paper.html#B28
+  92. file://localhost/dev/paper.html#f3
+  93. file://localhost/dev/paper.html#B2
+  94. file://localhost/dev/paper.html#B29
+  95. file://localhost/dev/paper.html#B28
+  96. file://localhost/dev/paper.html#B30
+  97. http://www.nature.com/nature/journal/v411/n6835/fig_tab/411269a0_F3.html
+  98. http://www.nature.com/nature/journal/v411/n6835/fig_tab/411269a0_F3.html
+  99. http://www.nature.com/nature/journal/v411/n6835/fig_tab/411269a0_F3.html
+ 100. file://localhost/dev/paper.html#top
+ 101. file://localhost/dev/paper.html#f2
+ 102. file://localhost/dev/paper.html#f3
+ 103. file://localhost/dev/paper.html#B31
+ 104. file://localhost/dev/paper.html#f3
+ 105. file://localhost/dev/paper.html#B20
+ 106. file://localhost/dev/paper.html#f3
+ 107. file://localhost/dev/paper.html#B21
+ 108. file://localhost/dev/paper.html#B2
+ 109. file://localhost/dev/paper.html#B5
+ 110. file://localhost/dev/paper.html#B6
+ 111. file://localhost/dev/paper.html#B7
+ 112. file://localhost/dev/paper.html#B8
+ 113. file://localhost/dev/paper.html#B9
+ 114. file://localhost/dev/paper.html#B10
+ 115. file://localhost/dev/paper.html#B11
+ 116. file://localhost/dev/paper.html#B12
+ 117. file://localhost/dev/paper.html#B13
+ 118. file://localhost/dev/paper.html#B14
+ 119. file://localhost/dev/paper.html#B15
+ 120. file://localhost/dev/paper.html#B16
+ 121. file://localhost/dev/paper.html#f2
+ 122. file://localhost/dev/paper.html#f2
+ 123. file://localhost/dev/paper.html#B32
+ 124. file://localhost/dev/paper.html#B18
+ 125. file://localhost/dev/paper.html#top
+ 126. file://localhost/dev/paper.html#f4
+ 127. file://localhost/dev/paper.html#f4
+ 128. file://localhost/dev/paper.html#f4
+ 129. file://localhost/dev/paper.html#f4
+ 130. http://www.nature.com/nature/journal/v411/n6835/fig_tab/411269a0_F4.html
+ 131. http://www.nature.com/nature/journal/v411/n6835/fig_tab/411269a0_F4.html
+ 132. http://www.nature.com/nature/journal/v411/n6835/fig_tab/411269a0_F4.html
+ 133. file://localhost/dev/paper.html#B6
+ 134. file://localhost/dev/paper.html#B7
+ 135. file://localhost/dev/paper.html#B8
+ 136. file://localhost/dev/paper.html#B9
+ 137. file://localhost/dev/paper.html#B10
+ 138. file://localhost/dev/paper.html#B11
+ 139. file://localhost/dev/paper.html#B12
+ 140. file://localhost/dev/paper.html#B13
+ 141. file://localhost/dev/paper.html#B14
+ 142. file://localhost/dev/paper.html#B15
+ 143. file://localhost/dev/paper.html#B16
+ 144. file://localhost/dev/paper.html#B6
+ 145. file://localhost/dev/paper.html#B13
+ 146. file://localhost/dev/paper.html#f1
+ 147. file://localhost/dev/paper.html#B14
+ 148. file://localhost/dev/paper.html#B15
+ 149. file://localhost/dev/paper.html#B33
+ 150. file://localhost/dev/paper.html#f4
+ 151. file://localhost/dev/paper.html#B21
+ 152. file://localhost/dev/paper.html#B34
+ 153. file://localhost/dev/paper.html#f2
+ 154. file://localhost/dev/paper.html#top
+ 155. file://localhost/dev/paper.html#f4
+ 156. file://localhost/dev/paper.html#B17
+ 157. file://localhost/dev/paper.html#B35
+ 158. file://localhost/dev/paper.html#f4
+ 159. file://localhost/dev/paper.html#B3
+ 160. file://localhost/dev/paper.html#B36
+ 161. file://localhost/dev/paper.html#top
+ 162. file://localhost/dev/paper.html#f5
+ 163. file://localhost/dev/paper.html#f5
+ 164. file://localhost/dev/paper.html#f1
+ 165. file://localhost/dev/paper.html#f1
+ 166. http://www.nature.com/nature/journal/v411/n6835/fig_tab/411269a0_F5.html
+ 167. http://www.nature.com/nature/journal/v411/n6835/fig_tab/411269a0_F5.html
+ 168. http://www.nature.com/nature/journal/v411/n6835/fig_tab/411269a0_F5.html
+ 169. file://localhost/dev/paper.html#top
+ 170. file://localhost/dev/paper.html#f1
+ 171. file://localhost/dev/paper.html#f6
+ 172. file://localhost/dev/paper.html#f6
+ 173. file://localhost/dev/paper.html#B37
+ 174. file://localhost/dev/paper.html#B38
+ 175. file://localhost/dev/paper.html#B39
+ 176. http://www.nature.com/nature/journal/v411/n6835/fig_tab/411269a0_F6.html
+ 177. http://www.nature.com/nature/journal/v411/n6835/fig_tab/411269a0_F6.html
+ 178. http://www.nature.com/nature/journal/v411/n6835/fig_tab/411269a0_F6.html
+ 179. file://localhost/dev/paper.html#f3
+ 180. file://localhost/dev/paper.html#f1
+ 181. file://localhost/dev/paper.html#f1
+ 182. file://localhost/dev/paper.html#f5
+ 183. file://localhost/dev/paper.html#top
+ 184. file://localhost/dev/paper.html#B1
+ 185. file://localhost/dev/paper.html#B40
+ 186. file://localhost/dev/paper.html#B19
+ 187. file://localhost/dev/paper.html#top
+ 188. file://localhost/dev/paper.html#B27
+ 189. file://localhost/dev/paper.html#top
+ 190. file://localhost/dev/paper.html#B27
+ 191. file://localhost/dev/paper.html#t1
+ 192. file://localhost/dev/paper.html#B41
+ 193. file://localhost/dev/paper.html#B42
+ 194. file://localhost/dev/paper.html#B43
+ 195. file://localhost/dev/paper.html#B44
+ 196. file://localhost/dev/paper.html#B45
+ 197. file://localhost/dev/paper.html#B46
+ 198. file://localhost/dev/paper.html#B47
+ 199. file://localhost/dev/paper.html#B48
+ 200. file://localhost/dev/paper.html#B49
+ 201. file://localhost/dev/paper.html#B8
+ 202. file://localhost/dev/paper.html#top
+ 203. http://dx.doi.org/10.1016%2F0166-2236%2895%2993887-4
+ 204. http://www.ncbi.nlm.nih.gov/htbin-post/Entrez/query?db=m&form=6&Dopt=r&uid=7754520
+ 205. http://isilinks.com/LINKS.cgi?Func=FullRecord&PID=Nature&AID=35077011&RID=b1
+ 206. http://www.ncbi.nlm.nih.gov/htbin-post/Entrez/query?db=m&form=6&Dopt=r&uid=10836143
+ 207. http://isilinks.com/LINKS.cgi?Func=FullRecord&PID=Nature&AID=35077011&RID=b2
+ 208. http://www.ncbi.nlm.nih.gov/htbin-post/Entrez/query?db=m&form=6&Dopt=r&uid=9856454
+ 209. http://isilinks.com/LINKS.cgi?Func=FullRecord&PID=Nature&AID=35077011&RID=b3
+ 210. http://dx.doi.org/10.1016%2FS0197-0186%2899%2900154-0
+ 211. http://www.ncbi.nlm.nih.gov/htbin-post/Entrez/query?db=m&form=6&Dopt=r&uid=10771117
+ 212. http://isilinks.com/LINKS.cgi?Func=FullRecord&PID=Nature&AID=35077011&RID=b4
+ 213. http://dx.doi.org/10.1016%2FS0301-0082%2899%2900045-3
+ 214. http://www.ncbi.nlm.nih.gov/htbin-post/Entrez/query?db=m&form=6&Dopt=r&uid=10759066
+ 215. http://isilinks.com/LINKS.cgi?Func=FullRecord&PID=Nature&AID=35077011&RID=b5
+ 216. http://www.ncbi.nlm.nih.gov/htbin-post/Entrez/query?db=m&form=6&Dopt=r&uid=2355008
+ 217. http://isilinks.com/LINKS.cgi?Func=FullRecord&PID=Nature&AID=35077011&RID=b6
+ 218. http://www.ncbi.nlm.nih.gov/htbin-post/Entrez/query?db=m&form=6&Dopt=r&uid=3382627
+ 219. http://isilinks.com/LINKS.cgi?Func=FullRecord&PID=Nature&AID=35077011&RID=b7
+ 220. http://www.ncbi.nlm.nih.gov/htbin-post/Entrez/query?db=m&form=6&Dopt=r&uid=3722144
+ 221. http://isilinks.com/LINKS.cgi?Func=FullRecord&PID=Nature&AID=35077011&RID=b8
+ 222. http://www.ncbi.nlm.nih.gov/htbin-post/Entrez/query?db=m&form=6&Dopt=r&uid=2069955
+ 223. http://isilinks.com/LINKS.cgi?Func=FullRecord&PID=Nature&AID=35077011&RID=b9
+ 224. http://www.ncbi.nlm.nih.gov/htbin-post/Entrez/query?db=m&form=6&Dopt=r&uid=7929328
+ 225. http://isilinks.com/LINKS.cgi?Func=FullRecord&PID=Nature&AID=35077011&RID=b10
+ 226. http://www.ncbi.nlm.nih.gov/htbin-post/Entrez/query?db=m&form=6&Dopt=r&uid=8166227
+ 227. http://www.ncbi.nlm.nih.gov/htbin-post/Entrez/query?db=m&form=6&Dopt=r&uid=7744821
+ 228. http://isilinks.com/LINKS.cgi?Func=FullRecord&PID=Nature&AID=35077011&RID=b12
+ 229. http://www.ncbi.nlm.nih.gov/htbin-post/Entrez/query?db=m&form=6&Dopt=r&uid=7619523
+ 230. http://isilinks.com/LINKS.cgi?Func=FullRecord&PID=Nature&AID=35077011&RID=b13
+ 231. http://www.ncbi.nlm.nih.gov/htbin-post/Entrez/query?db=m&form=6&Dopt=r&uid=8327511
+ 232. http://isilinks.com/LINKS.cgi?Func=FullRecord&PID=Nature&AID=35077011&RID=b14
+ 233. http://www.ncbi.nlm.nih.gov/htbin-post/Entrez/query?db=m&form=6&Dopt=r&uid=8662820
+ 234. http://isilinks.com/LINKS.cgi?Func=FullRecord&PID=Nature&AID=35077011&RID=b15
+ 235. http://www.ncbi.nlm.nih.gov/htbin-post/Entrez/query?db=m&form=6&Dopt=r&uid=8824205
+ 236. http://isilinks.com/LINKS.cgi?Func=FullRecord&PID=Nature&AID=35077011&RID=b16
+ 237. http://www.ncbi.nlm.nih.gov/htbin-post/Entrez/query?db=m&form=6&Dopt=r&uid=8539615
+ 238. http://isilinks.com/LINKS.cgi?Func=FullRecord&PID=Nature&AID=35077011&RID=b17
+ 239. http://dx.doi.org/10.1006%2Fjmbi.1993.1107
+ 240. http://www.ncbi.nlm.nih.gov/htbin-post/Entrez/query?db=m&form=6&Dopt=r&uid=8445638
+ 241. http://isilinks.com/LINKS.cgi?Func=FullRecord&PID=Nature&AID=35077011&RID=b18
+ 242. http://www.ncbi.nlm.nih.gov/htbin-post/Entrez/query?db=m&form=6&Dopt=r&uid=7800037
+ 243. http://isilinks.com/LINKS.cgi?Func=FullRecord&PID=Nature&AID=35077011&RID=b19
+ 244. http://www.ncbi.nlm.nih.gov/htbin-post/Entrez/query?db=m&form=6&Dopt=r&uid=7544140
+ 245. http://isilinks.com/LINKS.cgi?Func=FullRecord&PID=Nature&AID=35077011&RID=b20
+ 246. http://dx.doi.org/10.1006%2Fjmbi.1999.2721
+ 247. http://www.ncbi.nlm.nih.gov/htbin-post/Entrez/query?db=m&form=6&Dopt=r&uid=10329178
+ 248. http://isilinks.com/LINKS.cgi?Func=FullRecord&PID=Nature&AID=35077011&RID=b21
+ 249. http://www.ncbi.nlm.nih.gov/htbin-post/Entrez/query?db=m&form=6&Dopt=r&uid=9325259
+ 250. http://isilinks.com/LINKS.cgi?Func=FullRecord&PID=Nature&AID=35077011&RID=b22
+ 251. http://www.ncbi.nlm.nih.gov/htbin-post/Entrez/query?db=m&form=6&Dopt=r&uid=9829968
+ 252. http://isilinks.com/LINKS.cgi?Func=FullRecord&PID=Nature&AID=35077011&RID=b23
+ 253. http://dx.doi.org/10.1046%2Fj.1432-1327.1999.00041.x
+ 254. http://www.ncbi.nlm.nih.gov/htbin-post/Entrez/query?db=m&form=6&Dopt=r&uid=9914508
+ 255. http://isilinks.com/LINKS.cgi?Func=FullRecord&PID=Nature&AID=35077011&RID=b24
+ 256. http://www.ncbi.nlm.nih.gov/htbin-post/Entrez/query?db=m&form=6&Dopt=r&uid=9422757
+ 257. http://isilinks.com/LINKS.cgi?Func=FullRecord&PID=Nature&AID=35077011&RID=b25
+ 258. http://dx.doi.org/10.1006%2Fjmbi.2000.4137
+ 259. http://www.ncbi.nlm.nih.gov/htbin-post/Entrez/query?db=m&form=6&Dopt=r&uid=11023785
+ 260. http://isilinks.com/LINKS.cgi?Func=FullRecord&PID=Nature&AID=35077011&RID=b26
+ 261. http://isilinks.com/LINKS.cgi?Func=FullRecord&PID=Nature&AID=35077011&RID=b27
+ 262. http://dx.doi.org/10.1006%2Fjmbi.1994.1583
+ 263. http://www.ncbi.nlm.nih.gov/htbin-post/Entrez/query?db=m&form=6&Dopt=r&uid=7932691
+ 264. http://isilinks.com/LINKS.cgi?Func=FullRecord&PID=Nature&AID=35077011&RID=b28
+ 265. http://www.ncbi.nlm.nih.gov/htbin-post/Entrez/query?db=m&form=6&Dopt=r&uid=10233052
+ 266. http://isilinks.com/LINKS.cgi?Func=FullRecord&PID=Nature&AID=35077011&RID=b29
+ 267. http://dx.doi.org/10.1093%2Fnar%2F25.1.231
+ 268. http://www.ncbi.nlm.nih.gov/htbin-post/Entrez/query?db=m&form=6&Dopt=r&uid=9016542
+ 269. http://isilinks.com/LINKS.cgi?Func=FullRecord&PID=Nature&AID=35077011&RID=b30
+ 270. http://www.ncbi.nlm.nih.gov/htbin-post/Entrez/query?db=m&form=6&Dopt=r&uid=1725702
+ 271. http://isilinks.com/LINKS.cgi?Func=FullRecord&PID=Nature&AID=35077011&RID=b31
+ 272. http://www.ncbi.nlm.nih.gov/htbin-post/Entrez/query?db=m&form=6&Dopt=r&uid=8011898
+ 273. http://www.ncbi.nlm.nih.gov/htbin-post/Entrez/query?db=m&form=6&Dopt=r&uid=8918460
+ 274. http://isilinks.com/LINKS.cgi?Func=FullRecord&PID=Nature&AID=35077011&RID=b33
+ 275. http://www.ncbi.nlm.nih.gov/htbin-post/Entrez/query?db=m&form=6&Dopt=r&uid=8536684
+ 276. http://isilinks.com/LINKS.cgi?Func=FullRecord&PID=Nature&AID=35077011&RID=b34
+ 277. http://www.ncbi.nlm.nih.gov/htbin-post/Entrez/query?db=m&form=6&Dopt=r&uid=9770444
+ 278. http://isilinks.com/LINKS.cgi?Func=FullRecord&PID=Nature&AID=35077011&RID=b35
+ 279. http://www.ncbi.nlm.nih.gov/htbin-post/Entrez/query?db=m&form=6&Dopt=r&uid=8415649
+ 280. http://isilinks.com/LINKS.cgi?Func=FullRecord&PID=Nature&AID=35077011&RID=b36
+ 281. http://www.ncbi.nlm.nih.gov/htbin-post/Entrez/query?db=m&form=6&Dopt=r&uid=7703839
+ 282. http://isilinks.com/LINKS.cgi?Func=FullRecord&PID=Nature&AID=35077011&RID=b37
+ 283. http://www.ncbi.nlm.nih.gov/htbin-post/Entrez/query?db=m&form=6&Dopt=r&uid=3838201
+ 284. http://isilinks.com/LINKS.cgi?Func=FullRecord&PID=Nature&AID=35077011&RID=b38
+ 285. http://isilinks.com/LINKS.cgi?Func=FullRecord&PID=Nature&AID=35077011&RID=b39
+ 286. http://www.ncbi.nlm.nih.gov/htbin-post/Entrez/query?db=m&form=6&Dopt=r&uid=8247158
+ 287. http://isilinks.com/LINKS.cgi?Func=FullRecord&PID=Nature&AID=35077011&RID=b40
+ 288. http://isilinks.com/LINKS.cgi?Func=FullRecord&PID=Nature&AID=35077011&RID=b41
+ 289. http://dx.doi.org/10.1107%2FS090744499900846X
+ 290. http://www.ncbi.nlm.nih.gov/htbin-post/Entrez/query?db=m&form=6&Dopt=r&uid=10531519
+ 291. http://isilinks.com/LINKS.cgi?Func=FullRecord&PID=Nature&AID=35077011&RID=b42
+ 292. http://dx.doi.org/10.1107%2FS0907444994003112
+ 293. http://dx.doi.org/10.1107%2FS0907444999000839
+ 294. http://www.ncbi.nlm.nih.gov/htbin-post/Entrez/query?db=m&form=6&Dopt=r&uid=10089316
+ 295. http://isilinks.com/LINKS.cgi?Func=FullRecord&PID=Nature&AID=35077011&RID=b44
+ 296. http://dx.doi.org/10.1107%2FS0108767390010224
+ 297. http://www.ncbi.nlm.nih.gov/htbin-post/Entrez/query?db=m&form=6&Dopt=r&uid=2025413
+ 298. http://isilinks.com/LINKS.cgi?Func=FullRecord&PID=Nature&AID=35077011&RID=b48
+ 299. http://dx.doi.org/10.1107%2FS0907444998003254
+ 300. http://isilinks.com/LINKS.cgi?Func=FullRecord&PID=Nature&AID=35077011&RID=b49
+ 301. http://dx.doi.org/10.1093%2Fnar%2F25.24.4876
+ 302. http://www.ncbi.nlm.nih.gov/htbin-post/Entrez/query?db=m&form=6&Dopt=r&uid=9396791
+ 303. http://isilinks.com/LINKS.cgi?Func=FullRecord&PID=Nature&AID=35077011&RID=b50
+ 304. file://localhost/dev/paper.html#top
+ 305. file://localhost/dev/paper.html#top
+ 306. http://www.nature.com/nature/
+ 307. http://www.nature.com/nature/journal/vaop/ncurrent/index.html
+ 308. http://www.nature.com/authors/author_services/about_aop.html
+ 309. http://www.nature.com/nature/current_issue.html
+ 310. http://www.nature.com/news/
+ 311. http://www.nature.com/nature/archive/index.html
+ 312. http://www.nature.com/nature/supplements/
+ 313. http://www.nature.com/nature/supplements/insights/
+ 314. http://www.nature.com/nature/supplements/outlooks/
+ 315. http://www.nature.com/nature/supplements/collections/
+ 316. http://www.nature.com/nature/focus/
+ 317. http://www.nature.com/nature/focus/index_biologicalsciences.html
+ 318. http://www.nature.com/nature/focus/index_earthandenvironment.html
+ 319. http://www.nature.com/nature/focus/horizons/
+ 320. http://www.nature.com/nature/focus/index_physicalsciences.html
+ 321. http://www.nature.com/nature/focus/index_scienceandpolitics.html
+ 322. http://www.nature.com/nature/focus/index_scicult.html
+ 323. http://www.nature.com/nature/podcast/
+ 324. http://www.nature.com/nature/videoarchive/
+ 325. http://www.nature.com/news/specials/
+ 326. http://www.nature.com/nature/about/
+ 327. http://www.nature.com/nature/about/contact/
+ 328. http://www.nature.com/nature/about/editors/
+ 329. http://www.nature.com/nature/about/family/
+ 330. http://www.nature.com/nature/history/
+ 331. http://npg.nature.com/media/nature/index.html
+ 332. http://www.nature.com/libraries/
+ 333. http://www.nature.com/nature/authors/
+ 334. http://www.nature.com/nature/authors/gta/
+ 335. http://www.nature.com/nature/authors/policy/
+ 336. http://www.nature.com/nature/authors/referees/
+ 337. http://www.nature.com/nature/authors/submissions/
+ 338. http://www.nature.com/nature/awards/
+ 339. http://www.nature.com/nature/multimedia/googleearth
+ 340. http://www.nature.com/nature/history/index.html
+ 341. http://npg.nature.com/media/nature/index.html
+ 342. http://www.nature.com/npg_/work/index.html
+ 343. http://www.nature.com/reprints/
+ 344. http://www.nature.com/libraries/
+ 345. http://www.nature.com/authors/index.html
+ 346. http://www.nature.com/databases/index.html
+ 347. http://www.nature.com/reports/index.html
+ 348. http://network.nature.com/
+ 349. http://www.nature.com/blogs/index.html
+ 350. http://www.nature.com/natureconferences/
+ 351. http://www.nature.com/scitable/topics
+ 352. http://www.nature.com/chemistry/index.html
+ 353. http://www.nature.com/drugdisc/index.html
+ 354. http://www.nature.com/biotech/index.html
+ 355. http://www.nature.com/materials/index.html
+ 356. http://www.nature.com/protometh/index.html
+ 357. http://www.nature.com/cancer/index.html
+ 358. http://www.nature.com/cardio/index.html
+ 359. http://www.nature.com/dentistry/index.html
+ 360. http://www.nature.com/endocrinology/index.html
+ 361. http://www.nature.com/gastrohep/index.html
+ 362. http://www.nature.com/protometh/index.html
+ 363. http://www.nature.com/pathology/index.html
+ 364. http://www.nature.com/urology/index.html
+ 365. http://www.nature.com/earthsciences/index.html
+ 366. http://www.nature.com/evoeco/index.html
+ 367. http://www.nature.com/biotech/index.html
+ 368. http://www.nature.com/cancer/index.html
+ 369. http://www.nature.com/development/index.html
+ 370. http://www.nature.com/drugdisc/index.html
+ 371. http://www.nature.com/evoeco/index.html
+ 372. http://www.nature.com/genetics/index.html
+ 373. http://www.nature.com/immuno/index.html
+ 374. http://www.nature.com/medicalresearch/index.html
+ 375. http://www.nature.com/protometh/index.html
+ 376. http://www.nature.com/micro/index.html
+ 377. http://www.nature.com/molcellbio/index.html
+ 378. http://www.nature.com/neurosci/index.html
+ 379. http://www.nature.com/pharma/index.html
+ 380. http://www.nature.com/sysbio/index.html
+ 381. http://www.nature.com/physics/index.html
+ 382. http://www.nature.com/materials/index.html
+ 383. http://www.nature.com/siteindex/index.html
+ 384. https://secure.nature.com/store/svc/campaign?prod=NATURE&text=NA1001EF000
+ 385. http://www.nature.com/nature/journal/v411/n6835/full/411261a0.html
+ 386. http://www.nature.com/nature/journal/v411/n6835/full/411277a0.html
+ 387. http://www.nature.com/nature/journal/v411/n6835
+ 388. http://www.nature.com/nature/journal/v411/n6835/pdf/411269a0.pdf
+ 389. http://www.nature.com/nature/foxtrot/svc/mailform?doi=10.1038/35077011&file=/nature/journal/v411/n6835/full/411269a0.html
+ 390. http://www.nature.com/cited/cited.html?doi=10.1038/35077011
+ 391. http://www.scopus.com/inward/record.url?eid=2-s2.0-0035902009&partnerID=65
+ 392. http://www.nature.com/nature/journal/v411/n6835/ris/411269a0.ris
+ 393. http://www.nature.com/nature/journal/v411/n6835/ris/411269a0refs.ris
+ 394. https://s100.copyright.com/AppDispatchServlet?publisherName=NPG&publication=Nature&title=Crystal%20structure%20of%20an%20ACh-binding%20protein%20reveals%20the%20ligand-binding%20domain%20of%20nicotinic%20receptors&author=KatjuSa%20Brejc,%20Willem%20J.%20van%20Dijk,%20Remco%20V.%20Klaassen,%20Mascha%20Schuurmans,%20John%20van%20der%20Oost%20et%20al.&contentID=10.1038/35077011&publicationDate=//&volumeNum=411&issueNum=6835&numPages=8&pageNumbers=pp269-276
+ 395. https://s100.copyright.com/AppDispatchServlet?publisherName=NPGR&publication=Nature&title=Crystal%20structure%20of%20an%20ACh-binding%20protein%20reveals%20the%20ligand-binding%20domain%20of%20nicotinic%20receptors&author=KatjuSa%20Brejc,%20Willem%20J.%20van%20Dijk,%20Remco%20V.%20Klaassen,%20Mascha%20Schuurmans,%20John%20van%20der%20Oost%20et%20al.%20&contentID=10.1038/35077011&publicationDate=//&volumeNum=411&issueNum=6835&numPages=8&pageNumbers=pp269-276&orderBeanReset=true
+ 396. http://www.connotea.org/add?uri=http://www.nature.com/nature/journal/v411/n6835/full/411269a0.html
+ 397. file://localhost/dev/paper.html#abs
+ 398. file://localhost/dev/paper.html#Acetylcholinebinding-protein
+ 399. file://localhost/dev/paper.html#Structure-determination
+ 400. file://localhost/dev/paper.html#The-AChBP-pentamer
+ 401. file://localhost/dev/paper.html#The-AChBP-protomer
+ 402. file://localhost/dev/paper.html#Positioning-of-functional-regions
+ 403. file://localhost/dev/paper.html#The-ligandbinding-site
+ 404. file://localhost/dev/paper.html#Ligand-binding
+ 405. file://localhost/dev/paper.html#Pentamer-interface
+ 406. file://localhost/dev/paper.html#Ligandgated-ion-channels
+ 407. file://localhost/dev/paper.html#Activation-mechanism
+ 408. file://localhost/dev/paper.html#Conclusions
+ 409. file://localhost/dev/paper.html#Methods
+ 410. file://localhost/dev/paper.html#References
+ 411. file://localhost/dev/paper.html#acknowledgements
+ 412. http://www.nature.com/nature/journal/v411/n6835/fig_tab/411269a0_ft.html
+ 413. http://www.nature.com/nature/journal/v411/n6835/full/35077192.html
+ 414. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=search&term=Brejc+K
+ 415. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=search&term=van%20Dijk+W
+ 416. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=search&term=Klaassen+R
+ 417. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=search&term=Schuurmans+M
+ 418. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=search&term=van%20der%20Oost+J
+ 419. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=search&term=Smit+A
+ 420. http://www.nature.com/nature/journal/v411/n6835/pubmed/411269a0.html
+ 421. http://www.nature.com/openinnovation?moreChallenges=true
+ 422. http://www.nature.com/openinnovation?challengeId=9595411
+ 423. http://www.nature.com/openinnovation?challengeId=9451318
+ 424. http://www.nature.com/openinnovation?moreChallenges=true
+ 425. http://www.innocentive.com/
+ 426. http://www.nature.com/naturejobs/
+ 427. http://www.nature.com/naturejobs/science/jobs/155954-Head-of-Safety-Publishing
+ 428. http://www.nature.com/naturejobs/science/jobs/161415-Chief-Research-Manager-Dy-General-Manager-Biotechnology
+ 429. http://www.nature.com/naturejobs/science/jobs
+ 430. http://www.nature.com/naturejobs/science/jobs/new
+ 431. http://ad.doubleclick.net/jump/nature.com/article;type=af;artid=411269a0;pos=right;issue=6835;webfo=;prod=;natco=;natcl=;subco=;chaco=;keywd=;abr=!NN2;sz=160x600;ord=07893195?
+ 432. file://localhost/dev/paper.html#top
+ 433. http://www.nature.com/npg/
+ 434. http://www.nature.com/npg_/contact/
+ 435. http://www.nature.com/webfeeds/
+ 436. http://www.nature.com/help/
+ 437. http://www.nature.com/info/privacy.html
+ 438. http://www.nature.com/info/legal_notice.html
+ 439. http://www.nature.com/info/accessibility_statement.html
+ 440. http://www.nature.com/info/tandc.html
+ 441. http://www.nature.com/news/
+ 442. http://www.nature.com/naturejobs/
+ 443. http://www.natureasia.com/
+ 444. http://www.nature.com/scitable/
+ 445. http://www.nature.com/info/copyright_statement.html
+ 446. http://www.nature.com/info/partners.html
+
+resources journal navigation
+file://localhost/dev/stdin#resources-journal-nav
+
+services journal navigation
+file://localhost/dev/stdin#services-journal-nav
+
+supplementary journal navigation
+file://localhost/dev/stdin#supplementary-journal-nav
+
+main journal navigation
+file://localhost/dev/stdin#main-journal-nav

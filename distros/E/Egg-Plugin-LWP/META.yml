@@ -1,0 +1,25 @@
+---
+name: Egg-Plugin-LWP
+version: 3.00
+author:
+  - 'Masatoshi Mizuno E<lt>mizunoE<64>bomcity.comE<gt>'
+abstract: LWP for Egg Plugin.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Egg::Release: 3
+  Test::More: 0
+  Test::Perl::Critic: 0
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+provides:
+  Egg::Plugin::LWP:
+    file: lib/Egg/Plugin/LWP.pm
+    version: 3.00
+  Egg::Plugin::LWP::handler:
+    file: lib/Egg/Plugin/LWP.pm
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

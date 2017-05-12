@@ -1,0 +1,50 @@
+---
+abstract: 'Asynchronous redis client using hiredis and EV'
+author:
+  - 'Daisuke Murase <typester@cpan.org>'
+build_requires:
+  Devel::Refcount: '0'
+  Test::Deep: '0'
+  Test::More: '0.98'
+  Test::RedisServer: '0.12'
+  Test::TCP: '1.18'
+configure_requires:
+  EV::MakeMaker: '0'
+  File::Which: '0'
+  Module::Build: '0.4005'
+  Module::Build::XSUtil: '0.02'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: EV-Hiredis
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+    - deps
+provides:
+  EV::Hiredis:
+    file: lib/EV/Hiredis.pm
+    version: '0.04'
+requires:
+  EV: '4.11'
+  XSLoader: '0.02'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/typester/EV-Hiredis/issues
+  homepage: https://github.com/typester/EV-Hiredis
+  repository: git://github.com/typester/EV-Hiredis.git
+version: '0.04'
+x_contributors:
+  - 'taniwaki-makoto <taniwaki-makoto@kayac.com>'
+  - 'Ichinose Shogo <shogo82148@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

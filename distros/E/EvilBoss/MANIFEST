@@ -1,0 +1,10 @@
+AUTHORS				Who made this
+COPYING				License
+MANIFEST			This file
+Makefile.PL			Makefile generator
+lib/EvilBoss/Config.pm		Configuration file parser
+lib/EvilBoss/Database.pm	Database i/o routines
+lib/EvilBoss/Check.pm		Check routines
+lib/EvilBoss/Address.pm		Address routines
+lib/EvilBoss/Link.pm		Link routines
+META.yml                                 Module meta-data (added by MakeMaker)

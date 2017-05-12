@@ -1,0 +1,20 @@
+                             Profit/Loss
+Period 2011-01-01 through 2011-12-31
+EekBoek Sample Administration                      EekBoek, 2011-12-31
+
+AccNr   Group/Account                                 Debet     Credit
+----------------------------------------------------------------------
+6       Costs
+68       Depreciation                                808.08
+69       General costs                               812.11
+6       Total Costs                                 1620.19
+
+8       Revenues
+81       Revenue Consultancy                                   1200.00
+83       Revenue Editing                                       1000.00
+84       Revenue Courses                                       6500.00
+8       Total Revenues                                         8700.00
+
+        << Profit >>                                7079.81
+----------------------------------------------------------------------
+        TOTAL Results                               8700.00    8700.00

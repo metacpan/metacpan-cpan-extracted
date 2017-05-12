@@ -1,0 +1,65 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with EntityModel::Test::Cache
+at lib/EntityModel/Test/Cache.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+EntityModel::Test::Cache - tests for L<EntityModel::Cache> and subclasses
+
+=head1 VERSION
+
+version 0.102
+
+=head1 SYNOPSIS
+
+ use EntityModel::Test::Cache;
+ cache_ok('EntityModel::Cache::Perl', '::Perl subclass works');
+
+=head1 DESCRIPTION
+
+Provides functions for testing L<EntityModel::Cache> subclasses.
+
+=head1 EXPORTS
+
+Since this is a test class, functions are exported automatically
+to match behaviour of other test modules such as L<Test::More>.
+To disable this, pass an empty list on the C<use> line or
+use C<require> instead:
+
+ use EntityModel::Test::Cache ();
+ EntityModel::Test::Cache::cache_ok(...);
+
+=head1 FUNCTIONS
+
+=head2 cache_ok
+
+Runs all available tests (including attempting to load the module) and returns the usual
+L<Test::Builder> ok/fail response.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Exporter>
+
+L<as_heavy|Exporter/as_heavy>, L<export|Exporter/export>, L<export_fail|Exporter/export_fail>, L<export_ok_tags|Exporter/export_ok_tags>, L<export_tags|Exporter/export_tags>, L<export_to_level|Exporter/export_to_level>, L<import|Exporter/import>, L<require_version|Exporter/require_version>
+
+=item L<EntityModel::BaseClass>
+
+L<clone|EntityModel::BaseClass/clone>, L<dump|EntityModel::BaseClass/dump>, L<new|EntityModel::BaseClass/new>, L<sap|EntityModel::BaseClass/sap>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <cpan@entitymodel.com>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2008-2011. Licensed under the same terms as Perl itself.

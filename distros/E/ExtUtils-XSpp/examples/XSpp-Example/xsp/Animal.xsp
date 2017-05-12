@@ -1,0 +1,15 @@
+#include "Animal.h"
+
+%module{XSpp::Example};
+
+class Animal
+{
+  %name{new} Animal(std::string& name);
+  ~Animal();
+
+  void MakeSound();
+  void SetName(std::string& newName);
+  std::string GetName();
+};
+
+

@@ -1,0 +1,9 @@
+CHANGES
+EasyMail.pm
+INSTALL
+LICENSE
+Makefile.PL
+MANIFEST
+README
+t/EasyMail.t
+META.yml                                 Module meta-data (added by MakeMaker)

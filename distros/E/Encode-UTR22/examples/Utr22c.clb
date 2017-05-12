@@ -1,0 +1,218 @@
+= V5 MultiLine NoSorting TabWidth=30
+
+H=";About this library"
+This is a support library for complex UTR22 mapping descripions.
+
+It assumes that you have access to the following resources in a single directory:
+	testutr22.exe
+	utr22tec.exe
+	characterMapping.dtd
+	utr_display.xsl
+
+
+
+H=";"
+
+
+H=";Editing"
+
+
+H="New file"
+^!Clip InitDir
+^!Set %new%=^?{Insert Mapping into New or Current document==_New|Current}; %id%=^?{Mapping Id}
+^!If "^%new%"="Current" Skip
+^!ToolBar New Document
+<?xml version="1.0" encoding="UTF-8"?>^%NL%
+^!IfFileExist "^%MyAppDir%utr_display.xsl" add_xsl ELSE miss_xsl
+:add_xsl
+<?xml-stylesheet type="text/xsl" href="^$FileToUrl("^%MyAppDir%utr_display.xsl")$"?>^%NL%
+:miss_xsl
+^!IfFileExist "^%MyAppDir%CharacterMapping.dtd" add_dtype ELSE miss_dtype
+:add_dtype
+<!DOCTYPE characterMapping SYSTEM "^$FileToUrl("^%MyAppDir%CharacterMapping.dtd")$">^%NL%
+:miss_dtype
+^%NL%<characterMapping
+  id="^%id%"
+  version="1"
+  description=""
+  contact=""
+  registrationAuthority=""
+  registrationName=""
+  byte-font=""
+  normalization="">
+
+<history>
+    <modified version="1" date="^$GetDate(yyyy-mm-dd)$">
+        Original
+    </modified>
+</history>
+
+<assignments sub="3F">
+
+</assignments>
+
+<contexts>
+
+</contexts>
+</characterMapping>
+
+
+
+H="Element"
+^!SetWizardTitle "Insert Mapping Element"
+^!Set %Indent%=^$Calc(^$GetCol$-1)$
+^!Set %Element%=^?{Element=_a|fbu|fub|range|group|class-ref|context-ref|eos|class|class-include}
+^!SetWizardTitle "Insert ^%Element%"
+<^%Element%
+^!Goto ^%Element%
+:a
+^!Set %B%=^?{Bytes (required)}; %U%=^?{Unicodes (required)}; %bbctxt%=^?{bytes before context}; %bactxt%=^?{bytes after context}; %ubctxt%=^?{unicode before context}; %uactxt%=^?{unicode after context}
+ b="^%B%" u="^%U%"
+^!IfTrue ^$IsEmpty(^%bbctxt%)$ Skip
+ bbctxt="^%bbctxt%"
+^!IfTrue ^$IsEmpty(^%bactxt%)$ Skip
+ bactxt="^%bactxt%"
+^!IfTrue ^$IsEmpty(^%ubctxt%)$ Skip
+ ubctxt="^%ubctxt%"
+^!IfTrue ^$IsEmpty(^%uactxt%)$ Skip
+ uactxt="^%uactxt%"
+^!Clip "endxml" "/"
+^!Goto End
+:fbu
+^!Set %B%=^?{Bytes (required)}; %U%=^?{Unicodes (required)}; %bbctxt%=^?{bytes before context}; %bactxt%=^?{bytes after context};
+ b="^%B%" u="^%U%"
+^!IfTrue ^$IsEmpty(^%bbctxt%)$ Skip
+ bbctxt="^%bbctxt%"
+^!IfTrue ^$IsEmpty(^%bactxt%)$ Skip
+ bactxt="^%bactxt%"
+^!Clip "endxml" "/"
+^!Goto End
+:fub
+^!Set %B%=^?{Bytes (required)}; %U%=^?{Unicodes (required)}; %ubctxt%=^?{unicode before context}; %uactxt%=^?{unicode after context}
+ b="^%B%" u="^%U%"
+^!IfTrue ^$IsEmpty(^%ubctxt%)$ Skip
+ ubctxt="^%ubctxt%"
+^!IfTrue ^$IsEmpty(^%uactxt%)$ Skip
+ uactxt="^%uactxt%"
+^!Clip "endxml" "/"
+^!Goto End
+:range
+^!Set %bfirst%=^?{First Byte}; %blast%=^?{Last Byte}; %ufirst%=^?{First Unicode}; %ulast%=^?{Last Unicode}
+ bFirst="^%bfirst%" bLast="^%blast%" uFirst="^%ufirst%" uLast="^%ulast%"
+^!Clip "endxml" "/"
+^!Goto End
+:group
+^!Set %id%=^?{ID}; %alt%=^?{Alt}; %min%=^?{Minimum}; %max=^?{Maximum}
+^!IfTrue ^$IsEmpty(^%id%)$ Skip
+ id="^%id%"
+^!IfTrue ^$IsEmpty(^%alt%)$ Skip
+ alt="1"
+^!IfTrue ^$IsEmpty(^%min%)$ Skip
+ min="^%min%"
+^!IfTrue ^$IsEmpty(^%max%)$ Skip
+ max="^%max%"
+^!Clip endxml
+^!Goto End
+:class-ref
+^!Set %name%=^?{Class Name}; %id%=^?{ID}; %neg%=^?{Neg}; %min%=^?{Minimum}; %max=^?{Maximum}
+ name="^%name%"
+^!IfTrue ^$IsEmpty(^%neg%)$ Skip
+ neg="1"
+^!IfTrue ^$IsEmpty(^%min%)$ Skip
+ min="^%min%"
+^!IfTrue ^$IsEmpty(^%max%)$ Skip
+ max="^%max%"
+^!IfTrue ^$IsEmpty(^%id%)$ Skip
+ id="^%id%"
+^!Clip "endxml" "/"
+^!Goto End
+:context-ref
+^!Set %name%=^?{Context Name}; %id%=^?{ID}; %min%=^?{Minimum}; %max=^?{Maximum}
+ name="^%name%"
+^!IfTrue ^$IsEmpty(^%min%)$ Skip
+ min="^%min%"
+^!IfTrue ^$IsEmpty(^%max%)$ Skip
+ max="^%max%"
+^!IfTrue ^$IsEmpty(^%id%)$ Skip
+ id="^%id%"
+^!Clip "endxml" "/"
+^!Goto End
+:eos
+^!InsertText "/>^P"
+!^Goto End
+:class
+^!Set %name%=^?{Class Name}; %size%=^?{Size=_|bytes}
+ name="^%name%"
+^!IfTrue ^$IsEmpty(^%size%)$ Skip
+ size="bytes"
+^!Clip endxml
+^!Goto End
+:class-include
+^!Set %name%=^?{Class Name}; %size%=^?{Size=_|bytes}; %first%=^?{First}; %last%=^?{Last}
+ name="^%name%" first="^%first%" last="^%last%"
+^!IfTrue ^$IsEmpty(^%size%)$ Skip
+ size="bytes"
+^!Clip "endxml" "/"
+^!Goto End
+
+
+H=" "
+
+
+H=";Testing"
+
+
+H="testutr22"
+^!Clip InitDir
+^!Set %testseq%=^?{Test Sequence=^%testseq%}
+^!Menu File/Save
+; ^!Prompt "^%MyAppDir%testutr22.exe -o "^%MyAppDir%testutr22.lst" -bu "^$GetDocName$" "^%testseq%""
+^!Set %testresult%=^$GetOutput("^%MyAppDir%testutr22.exe -o "^%MyAppDir%testutr22.lst" -bu "^$GetDocName$" "^%testseq%"")$
+^!IfFileExist "^%MyAppDir%testutr22.lst" NEXT ELSE failed
+^!Open "^%MyAppDir%testutr22.lst" /R
+^!Goto END
+:failed
+^!IfFileExist "^$GetAppPath$StdError.txt" NEXT ELSE END
+^!Open "^$GetAppPath$StdError.txt"
+
+
+
+H="Web page"
+^!Clip InitDir
+^!Menu File/Save
+^!Url ^$FileToUrl(^$GetDocName$)$
+
+
+H="Compile TEC"
+^!Clip InitDir
+^!Set %fname%=^$ChangeFileExt(^$GetDocName$;"tec")$
+^!Set %outfile%=^?{(T=S;F="TEC Files(*.tec)|*.tec")Save As=^%fname%}
+^!Menu File/Save
+;^!Prompt ^%MyAppDir%utr22tec.exe "^$GetDocName$" "^%outfile%"
+^!Set %output%=^$GetOutput(^%MyAppDir%utr22tec.exe "^$GetDocName$" "^%outfile%")$
+^!If ^%output% = "" quiet
+^!Toolbar New Document
+^%output%
+:quiet
+^!IfFileExist "^$GetAppPath$StdError.txt" NEXT ELSE END
+^!Open "^$GetAppPath$StdError.txt"
+
+
+
+H="_InitDir"
+^!Set %MyAppDir%=^$GetValue(UTR22:AppDir)$
+^!IfFileExist "^%MyAppDir%\testutr22.exe" finish
+^!Set %MyAppDir%=^?{(T=D)UTR22 Support Files=^%MyAppDir%}
+^!SaveValue UTR22:AppDir=^%MyAppDir%
+:finish
+
+
+H="_endxml"
+^!If ^&="/" oneline
+^!InsertText >^P^P^$StrFill(" ";^%Indent%)$</^%Element%>
+^!Keyboard UP
+^!InsertText ^$StrFill(" ";^$Calc(^%Indent%+2)$)$
+^!Keyboard END
+^!Goto End
+:oneline
+^!InsertText />^P^$StrFill(" ";^%Indent%)$

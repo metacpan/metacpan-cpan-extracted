@@ -1,0 +1,73 @@
+
+
+optDisableHtmlScan is now: [+ $optDisableHtmlScan +] <BR>
+optDisableHtmlScan is set now to: [+ $optDisableHtmlScan = 1 +] <BR>
+optDisableHtmlScan is now: [+ $optDisableHtmlScan +] <BR>
+
+
+[+ $fdat{feld2} = 'blabla2' ; +]
+[+ $fdat{feld6} = 'blabla6' ; +]
+
+    <input type="text" name="feld1" value="Wert1">
+    <input type="text" name="feld2">
+    <input type="text" size=10 name="feld3">
+    <input type="text" name="feld4" size=10>
+    
+	<input type="text" name="feld5" value="Wert5">
+    <input type="text" name="feld6">
+    <input type="text" size=10 name="feld7">
+    <input type="text" name="feld8" size=10>
+	[- @ks = sort keys %idat -]
+
+	<table>
+		<tr>
+			<td>[+ $ks[$i=$row] +]</td><td>[+ $idat{$ks[$i]} || '<undef>' +]</td>
+		</tr>
+	</table>
+
+	[- @ks = sort keys %fdat -]
+
+<table>
+	<tr>
+		<td>[+ $ks[$i=$row] +]</td><td>[+ $fdat{$ks[$i]} || '<undef>' +]</td>
+	</tr>
+</table>
+
+optDisableHtmlScan is now: [+ $optDisableHtmlScan +] <BR>
+optDisableHtmlScan is set now to: [+ $optDisableHtmlScan = 0 +] <BR>
+optDisableHtmlScan is now: [+ $optDisableHtmlScan +] <BR>
+
+	[- @ks = sort keys %fdat -]
+
+<table>
+	<tr>
+		<td>[+ $ks[$i=$row] +]</td><td>[+ $fdat{$ks[$i]} || '<undef>' +]</td>
+	</tr>
+</table>
+
+    <input type="text" name="feld1" value="Wert1">
+    <input type="text" name="feld2">
+    <input type="text" size=10 name="feld3">
+    <input type="text" name="feld4" size=10>
+    
+	<input type="text" name="feld5" value="Wert5">
+    <input type="text" name="feld6">
+    <input type="text" size=10 name="feld7">
+    <input type="text" name="feld8" size=10>
+
+	[- @ks = sort keys %idat -]
+
+	<table>
+		<tr>
+			<td>[+ $ks[$i=$row] +]</td><td>[+ $idat{$ks[$i]} || '<undef>' +]</td>
+		</tr>
+	</table>
+
+	[- @ks = sort keys %fdat -]
+
+	<table>
+		<tr>
+			<td>[+ $ks[$i=$row] +]</td><td>[+ $fdat{$ks[$i]} || '<undef>' +]</td>
+		</tr>
+	</table>
+

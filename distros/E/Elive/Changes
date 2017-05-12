@@ -1,0 +1,455 @@
+Revision history for Elive
+
+1.37   3rd November 2015
+       [Elive::DAO]
+       - preserve argument order on soap calls.
+         This is work around restrictions with Bb::Collaborate::Multimedia
+         (and Presentation). uploads Seems that arguments needs to supplied
+	 in a particular order (size following upload content).
+
+1.36   1st November 2015
+       [Elive::DAO]
+       - added support for class level invocation of Elive::DAO update and delete methods.
+       Note: that all primary keys and mandatory fields need to be supplied.
+       [distribution]
+       - moved source repository to https://github.com/dwarring/p5-Bb-Collaborate.git
+
+1.35   7th June 2015
+       Support for new module Bb::Collaborate::V3.
+       [Elive::DAO]
+       - added list() params options
+       [Elive::Util::Type]
+       - removed Elive:: namespace dependency.
+       [scripts/elive_query]
+       - added --adapter=v3 option (Bb::Collaborate::V3). removed deprecated v2 adapter
+
+1.34   4th April 2015
+       - Update copyright notices
+       [Elive::DAO]
+       - tweaks for latest (SAS compatibile) Elive::StandardV3
+       [kwalitee]
+       - Use consistant version number in sub-classes
+
+1.33   22nd January 2015
+       [bug-fixes]
+       - RT#101018 "Mouse 2.4.1 when Test::Script::Run is installed"
+         Removed fragile 'stderr empty' tests from t/script-elive_query.t
+         and t/script-elive_raise_meeting.t.
+       - fixed a taint issue in Elive::Entity::Preload.
+
+1.32   1st March 2014
+       [testing]
+       - raised max tested ELM version 11.1.2 => 12.5.4
+       - fixed soap-session-connect.t test plan
+       [distribution]
+       - removed Elive::Array
+       - relocated sourceforge repository
+
+1.31   28th March 2013
+       [testing]
+       - added Test::More 0.98 dependency. Older versions don't understand
+         $t->is_passing
+
+1.30   4th January 2013
+       [bug fixes]
+       Elive::DAO
+       - Relax HiResDate constraints to allow negative timestamps; downgrade
+         to a warning
+
+1.29   25th October 2012
+       [enhancements]
+
+       Elive::Entity::Meeting, Elive::Entity::Session, Elive::View::Meeting
+       - buildJNLP() method: Tidy up of POD and argument handling.
+         -- removed `version' argument; not used.
+         -- added 'sessionRole' parameter.
+         -- accept any one of 'userId', 'userName' or 'displayName'. In
+            particular, don't default 'userId' when 'displayName' given.
+
+       Elive::Entity::Role - added some constants:
+       - ${Elive::Entity::Role::PARTICIPANT}       (3)
+       - ${Elive::Entity::Role::MODERATOR}         (2)
+       - ${Elive::Entity::Role::APPLICATION_ADMIN} (1)
+       - ${Elive::Entity::Role::SYSTEM_ADMIN}      (0)
+
+       Elive::Entity::Participant - added some constants:
+       - ${Elive::Entity::Participant::TYPE_USER}  (0)
+       - ${Elive::Entity::Participant::TYPE_GROUP} (1)
+       - ${Elive::Entity::Participant::TYPE_GUEST} (2)
+
+       Elive::DAO
+       - revert() method - Silence 'unsaved changes' warnings
+
+1.28   12th October 2012
+       [bug fixes]
+       elive_raise_meeting, script-elive_raise_meeting.t
+       - fixed -moderators option. These were being downgraded to regular
+         participants. Added tests (bug introduced in 1.20)
+       Elive::Entity::InvitedGuest, soap-session-participants.t
+       - added BUILDARGS method plus string coercement (it's never had these).
+         The following now works:
+                Elive::Entity::InvitedGuest->new('Robert (bob@example.com)');
+       [enhancements]
+       Elive:
+       - server_details() - Return all server(s) in a list context:
+                my @servers = Elive->server_details;
+
+1.27   14th July 2012
+       [bug fixes]
+       Elive::Entity::Participant
+       - tightened up handling of reference structures (BUILDARGS method)
+       - fixed bug with handling of invited guest objects.
+       Elive::Entity::Group, Elive::Util::Type, dao-construct.t
+       - Fixed element_class declaration and tightened tests to match actual
+         content. Elements may be subgroups (group objects) or user-ids
+         (strings).
+       [testing]
+       - dao-errors.t - now checks content of error messages
+       - script-elive_lint_conf.t - tolerate perl 5.17.x depreciation warnings 
+         (from XML::Simple <= 2.20).
+       - soap-preload.t - cross-check imported preload sizes
+
+1.26   4th May 2012
+       [bug fixes]
+       Elive::Entity::ParticipantList, elive_raise_meeting:
+       - Fixed to align with uid (loginName) case sensitivity policies under
+         LDAP and latest (ELM 11.1.2). The case of the uid is preserved on
+         entry. But comparisons and uniqueness checks are case insensitive.
+         -- E.g. if a user has an LDAP uid of 'johnsmith'.  Attempting to add
+            'JohnSmith' now works.
+         -- Note that after update, the returned participant list entry 
+            contains the response uid, e.g. 'johnsmith'.
+
+1.25   18th April 2012
+       [enhancements]
+       Elive::Connection
+       - Added timeout option. This is passed through to the SOAP::Lite proxy object.
+       [testing]
+       - soap-participants.t, soap-session-participants.t - stress tests now passing.
+
+1.24   28th February 2012
+       [Tested against Blackboard Elive 11.1.2  / ELM 3.5.0.]
+       [testing]
+       - soap-connect.t - raised max_version to 11.1.2
+       - soap-participant-list.t - long participant / stress-tests are hanging
+         under LDAP. I marked these tests as TODO and added an alarm-timeout.
+       [bug fixes]
+       elive_query
+        - removed disused _get_user() function.
+        - direct 'connection error ...' message to STDERR
+
+1.23    26th January 2012
+        [enhancements]
+        Elive::Entity
+        - added quote() method - for quoting list() filter arguments.
+        [bug fixes]
+        - elive_raise_meeting: correctly handle login and group names with
+          embedded single quotes, using Elive::Entity->quote().
+
+1.22    5th January 2012
+        [security]
+        Elive::Util::_tidy_decimal():
+        - Untaint Ints once sanitised - for consistency with Enums and Bools.
+        [testing]
+        - Replaced Test::Builder->new with Test::More->builder
+        00load.t, soap-connect.t:
+        - now bail testing if any sub tests fail
+        soap-session-participants.t, soap-participant-list.t:
+        - reworked long participant list tests
+
+1.21    3rd November 2011
+
+        [error handling]
+        Elive::Entity::Participant:
+        - now produces a warning if an attempt is made to assign a
+          moderator role to an invited guest.
+        Elive::DAO:
+        - Added taintness checks to the is_changed() method; which now dies
+          if any tainted data is detected.
+        - is_changed() now also warns if a primary key has been updated.
+        elive_raise_meeting, elive_query, elive_lint_config:
+        - Changed all scripts to report usage errors to STDERR and exit
+         on usage error with status code 2 [i.e. exit via pod2usage(2)].
+        elive_query:
+        - now dies immediately with status code 2, on command parsing error,
+          when being used non-interactively.
+
+        [testing]
+        - Replaced Test::Exception with Test::Fatal
+
+1.20    15th October 2011
+
+        [upgrades]
+        - regressions from eLive 10.0.2, which is in limited release
+          (tested against ELM 3.3.2 - 3.3.5)
+
+        [security]
+        - Elive::DAO->set() - now dies when passed tainted data
+
+        [refactoring]
+        - elive_raise_meeting: replaced parse_participants() subroutine with
+          Elive::Entity::Participants->new(..., -moderators..., -others...);
+
+1.19    28th September 2011
+        [bug fixes]
+        - Replaced YAML with YAML::Syck. This fixed some puzzling
+          compilation failures under 5.12.x and 5.14.2.
+
+1.18    16th September 2011
+
+        [bug fixes]
+        Elive::Entity::Report
+        - changed ownerId from 'Int' to 'Str' for LDAP compatibility
+        - fixed delete() method to pass tests
+
+        [enhancements]
+        Elive::Entity::Report
+        - insert/update of report body (xml) is still unreliable. Progressed
+          slightly and updated 'Bugs & Limitations' pod.
+        - fixed/updated example in pod
+
+        [pod]
+        - Documented retrieve() method for meeting parameters, server
+          parameters, and participant lists
+        - Documented list() method for preloads
+        
+1.17    9th September 2011
+        [bug fixes]
+        - Elive::Entity::Participant - changed user, group, guest and
+          role properties to strictly hold only objects. For example,
+          user property was "isa => 'Elive::Entity::User|Str'" but is
+          now "isa => 'Elive::Entity::User'".
+
+1.16    27th August 2011
+        [enhancements]
+        - Elive::Entity::Session - The ELM 3.x SessionInsert and SessionUpdate
+          commands often return a null response rather than an error message.
+          This was then leading to messy failures while unpacking. Catch
+          this earlier and return (as far as possible) a more meaningful
+          error message.
+        [refactoring]
+        - elive_query: cleaned up code for succinctness.
+
+1.15    24th August 2011
+        [enhancements]
+        More work on inaccessible server details. This can indicate
+        that either the session manager or license manager are not running
+        and reachable.
+        - Elive::Connection::SDK - error message changed to "Unable to get
+          server details. Are all services running?"
+        [refactoring]
+        Elive is no longer a base class for Elive::DAO. This is largely for
+        Elive::StandardV2's benefit, which can now base itself directly on
+        Elive::DAO rather than Elive.
+         - Created new module Elive::DAO::_Base
+         - Changed parent class for Elive::DAO and Elive::DAO::_Array from
+            Elive to Elive::DAO::_Base
+         - Set $Elive::DAO::VERSION = '0.01'
+
+1.14    21st August 2011
+        [bug fixes]
+        Improved detection and handling of inaccessible server details.
+        This is usually an indication that the Session Server (elive) is
+        not running or is unreachable.
+        - Elive::Connection::SDK - was dieing with 'Can't call method
+          "version" on an undefined value'. Now produces the more meaningful
+          'Unable to get server details is the Session Server (elive) running?'
+        - elive_query: now produces a warning and continues
+        - elive_raise_meeting: now dies with this error (unable to determine
+          version) unless the '-use elm2 or -use elm3' options are present.
+        [testing]
+        General improvements to error messages and handling when the server
+        details are inaccessible - the underlying problem should now be more
+        obvious to the tester.
+
+1.13    19th August 2011
+        Improved support for sites running multiple session servers.
+        [enhancements]
+        - Elive::Connection::SDK - the server_details() method now returns a
+          list of values when used in a list context.
+        - Elive::DAO - avoid attempting to cache weak (keyless) entities. This
+          is for Elive::StandardV2's benefit, e.g. the serverVersions entity.
+        [pod]
+        - Elive::Entity::ServerDetails - documented the list() method. This
+          is useful for sites that are running multiple session servers.
+        [testing]
+        - script-elive_query.t - removed serverDetails singleton test (there
+          can be multiple servers).
+        - soap-session-participants.t - fixed planning
+
+1.12    15th August 2011
+        [bug fixes]
+        Elive::DAO / Elive::Entity::Recording - the 'updateRecording' command
+        can return a null response (observed under ELM 3.3.4). Added code to
+        Elive::DAO to check for empty update responses and defensively refetch
+        the raw data to complete the update and update checks.
+        [documentation]
+        Elive::Entity::Recording - tidied up upload() and insert() pod
+        examples.
+
+1.11    12th August 2011
+        [documentation]
+        Elive::Entity::InvitedGuest - the login name, by convention, should
+        be an email address. Changed pod and some tests to reflect this.
+
+1.10    11th August 2011
+        [bug fixes]
+        - elive_raise_meeting: re-added default for meeting name (left out
+          with Elive 1.09).
+
+1.09    10th August 2011
+        [compatibility]
+        Further support for Elluminate Live version >= 9.0.0 < 9.5.0
+        - elive_raise_meeting: Reintroduced automatic selection of session
+          class based on version (see rev 0.96), but this time against
+          earlier Elluminate Live! versions
+          -- Elive::Entity::Session (-user elm3) is the default for
+             Elluminate Live! >= 9.5.0
+          -- Elive::View::Session (-use elm2) is otherwise the default
+
+        [testing]
+        removed $TEST_AUTHOR check from all script-*.t tests
+        script-elive_raise_meeting.t - skip elm3 tests for Elluminate < 9.5
+
+1.08    9th August 2011
+        [compatibility]
+        I regression tested against Elluminate 9.0 to check results.
+        - Recording and groups had some problems and failing tests
+        - I skipped all tests that involve Elive::Entity::Session. It
+          wasn't usable (as expected).
+        - Elive::View::Session worked pretty well, after one minor bug fix
+          (see below).
+        - I made some modifications to the soap-connect.t to treat 9.0 as the
+          mininum supported version and 9.5+ as the recommended version.
+
+        Under Elive 10.0.1+ the getUser command (Elive::Entity::User retrieve
+        method) matches on both userId and loginName.
+        - I relaxed the _readback() consistency checks to allow this.  Also,
+          added tests to soap-user.t to capture this behaviour.
+
+       [bug fixes]
+       - Elive::Entity::Session - the retrieve() method now returns undef when
+         an attempt is made to access a non-existent meeting. This fix was
+         sufficient to pass all Elive::View::Session tests on Elluminate 9.0.
+
+1.07    7th August 2011
+        [compatibility]
+        Some failures were detected when running soap-user.t and soap-group.t
+        tests against earlier ELM 3.0 / Elive 9.5 servers. These were caused
+        by attempting to parse 'domain' and 'groups' properties that were seen
+        in early 3.0 responses. Some changes were made to silently ignore
+        these properties.
+        - Elive::DAO, Elive::Util - add 'Any' datatype for ignored properties
+        - elive_query - ignore fields of type 'Any'
+        - Elive::Entity::User - declare 'groups' and 'domain' as type 'Any'
+        - Elive::Entity::User - declare 'domain' as type 'Any'
+        Will monitor these properties in new releases.
+        [bug fixes]
+        elive_query - reverted use of Try::Tiny based on perl 5.8.3 regressions
+
+1.06    6th August 2011
+        [enhancements]
+        elive_raise_meeting - added -all_moderators option
+        [refactoring]
+        - renamed class Elive::Array to Elive::DAO::Array. The old class name
+          can still be referenced , but now produces a depreciated warning.
+        [testing]
+        - corrected occasional bogus failures (invalid ID generation) in
+          mock tests.
+
+1.05    1st August 2011
+        [bug fixes]
+        Elive::Entity::Session - corrected handling of invited guests in
+        insert() and update () methods
+        - Corrected SOAP delimiter for invited guests list from ',' to ';'
+        - Disallow promotion of Invited guests to moderator, ie
+          $participant->is_moderator(1) has no effect when the participant
+          is a group ($participant->type == 1).
+
+1.04    28th July 2011
+
+        [security]
+        Essential changes to improve general security and play better with
+        Perl's Taint mode. Elive now dies when any attempt is made to
+        construct a request from tainted strings.
+        - These changes will only have an impact when taint is enabled,
+          e.g. '-T' has been passed as a perl option.
+        - Taint checking is limited to outgoing strings (Str) in SOAP requests.
+        - Neither booleans (Bool) or integers (Int) are checked. However both
+          Int and Bool are sanitised when building SOAP requests.
+        - No attempt is made to apply taint checking to incoming data from
+          SOAP::Lite requests.
+
+        Elive::Util::_freeze() - Any attempts to freeze tainted strings
+          (type Str) while in taint mode now results in an error
+        Elive::DAO::list() - the 'filter' parameter is now frozen to avoid
+          bypassing taintness checks.
+        Elive::Entity::Recording, Elive::Entity::Preload - all SOAP
+          parameters are now frozen and taint checks are applied.
+
+        Dropped dependency on Storable::dclone; replaced with Clone::clone.
+        - Storable::dclone doesn't seem to honor taintness, whereas
+          Clone::clone does.
+
+       [enhancements]
+       Elive::Entity::Recording - added BUILDARGS method. 'size' is now
+       computed and doesn't need to be specified in upload()s.
+       Elive::Entity::ParticipantList - moved update checks to
+       _readback_checks() for the benefit of Elive::Entity::Session.
+
+1.03    24th July 2011
+
+        [enhancements]
+        elive_raise_meeting - added '--dump=yaml' option
+
+        [pod]
+        A few minor corrections to Elive::Entity::Session pod.    
+
+1.02    21st July 2011
+
+        [pod]
+        Noted insert() and update() methods as undergoing depreciation for
+        meetings, meeting parameters, server parameters and participant lists.
+
+        [enhancements]
+        Elive::Entity::Participant
+        - added is_participant() setter/getter
+        Elive::Entity:Role
+        - added BUILDARGS() method and simplified coercements.
+
+        [bug fixes]
+        Elive::Entity::User
+        - corrected ineffective BUILDARGS() method.
+
+1.01    20th July 2011
+        [bug fixes]
+        Elive::Entity::Preload
+        - removed legacy method Elive::Entity::Preload::_freeze(). This was
+          interfering with readback checks.
+        [documentation]
+        README
+        - Amendments to section 'Configuring SDK Access'
+        Elive
+        - Amendments to introductory example POD
+
+1.00    19th July 2011
+        [Regression tested against Elm 3.0 / Elive 9.5 (earliest supported
+         version). Back-ported recently introduced Elive::Entity::Session
+         to  Elm 3.0+. Other minor changes for compatibility.].
+        Elive
+        - amended introductory example POD to create a meeting using
+          Elive::Entity::Session (was using Elive::View::Session).
+        elive_raise_meeting
+        - now unconditionally uses Elive::Entity::Session as the default
+          class for raising meetings (-use elm3).
+        soap-recording.t
+        - skipped some failing download tests for Elm <= 3.0.
+        Elive::Entity::ServerParameters
+        - included some aliases for misspellings present in Elm 3.0 responses
+          (sic) ModertatorTelephonyAddress, ModertatorTelephonyPIN
+        [Minor refactorings]
+        - added _restful_url() method to Elive::DAO. Inherited and
+          overridden by Elive::Entity::Group.
+        [README]
+        - Manual configuration instructions amended - only needed for LDAP
+

@@ -1,0 +1,39 @@
+package ETLp::Manual::ItemPerl;
+
+# ABSTRACT: Manual for ETLp Perl Items
+
+__END__
+
+=pod
+
+=head1 ITERATIVE AND SERIAL PERL ITEMS
+
+The Perl plugin allows packaged Perl subroutines to be called.
+
+=over 4
+
+=item * B<name>. The name of this item.
+
+=item * B<package>. The name of the Perl package. It must be in the library path. If the job is invoked by the e''''tlp command, %app_root%/lib will be in the path.
+
+=item * B<sub>. The subroutine being called.
+
+=item * B<parameters>. Text that will be eval'd as part of the subroutine invocation.
+
+=item * B<on_error>. Override the setting for the job. See See L<ETLp::Manual::Index> for a detailed explanation of this parameter.
+
+=back
+
+=head2 Example
+
+    <item>
+        name     = rename files
+        type     = perl
+        package  = MyApp::ProcesFiles
+        sub      = add_suffix
+        params   = app_root => '%app_root%', \
+                   filename => '%filename%', \
+                   suffix   => '_bak'
+    </item>
+
+Note, only iterative jobs can use iterative placeholders like I<%filename%>.

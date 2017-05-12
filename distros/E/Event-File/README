@@ -1,0 +1,25 @@
+This module tries to mimic the 'tail -f' behaviour
+using Event.
+
+It detects file deletion, rename, rotation providing a simple way to keep 
+track of files like log files.
+
+I wrote this for use with my project cmc/cmcd, however I have seem many 
+people looking for an implementation like this that wouldn't BLOCK.
+
+Note that test.pl is usuless. for a sample code see demo/tail.pl.
+It will read the file read_file until a timeout happens.  You
+can open another shell and "echo text >> demo/read_file" to see it working.
+
+the tail watcher is a fake watcher in terms of Event watchers.  It
+tries to mimics some characteriscs from the real Event watchers, but
+just the ones covered in the Event::File::tail pod file.
+
+Please refer to Event::File::tail and Event::File pod/man pages.
+
+
+Have fun,
+
+
+Raul Dias <raul@dias.com.br>
+

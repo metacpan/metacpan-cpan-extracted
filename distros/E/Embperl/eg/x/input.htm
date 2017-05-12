@@ -1,0 +1,72 @@
+<html>
+<head>
+<title>Embperl Example - Input / Confirmation - Form</title>
+</head>
+<body background="../images/jazzbkgd.gif">
+
+<h1>Embperl Examples - Input / Confirmation - Form</h1>
+
+<b>Please make sure you enter a valid email address in the
+source before testing the mail function</b>
+
+[-
+  $MailTo = 'richter@ecos.de' ;
+
+  @errors = () ;
+  if (defined($fdat{check}) || defined($fdat{send}))
+    {
+    push @errors, "**Please enter your name" if (!$fdat{name}) ;
+    push @errors, "**Please enter your e-mail address" if (!$fdat{email}) ;
+    }
+-]
+
+[$if (defined($fdat{check}) and $#errors == -1)$]
+[- delete $fdat{input} ; delete $fdat{check} ; delete $fdat{send} -]
+
+<hr><h3> You have entered the following data:</h3>
+<table>
+  <tr><td><b>Name</b></td><td>[+$fdat{name}+]</td></tr>
+  <tr><td><b>E-Mail</b></td><td>[+$fdat{email}+]</td></tr>
+  <tr><td><b>Message</b></td><td>[+$fdat{msg}+]</td></tr>
+  <tr><td align="center" colspan="2">
+     <form action="input.htm" method="GET">
+       <input type="submit" name="send" value="Send to [+ $MailTo +]">
+       <input type="submit" name="input" value="Change your data">
+       [$hidden$]
+    </form>
+    </td></tr>
+</table>
+
+[$elsif defined($fdat{send}) and $#errors == -1$]
+
+[- MailFormTo ($MailTo,'Formdata','email') -]
+<hr><h3>Your input has been sent</h3>
+
+[$else$]
+
+<hr><h3>Please enter your data</h3>
+
+<form action="input.htm" method="GET">
+  <table>
+    [$if $#errors != -1 $]
+      <tr><td colspan="2">
+      <table>
+	<tr><td>[+$errors[$row]+]</td></tr>
+      </table>
+      </td></tr>
+    [$endif$]
+    <tr><td><b>Name</b></td> <td><input type="text" name="name"></td></tr>
+    <tr><td><b>E-Mail</b></td> <td><input type="text" name="email"></td></tr>
+    <tr><td><b>Message</b></td> <td><input type="text" name="msg"></td></tr>
+    <tr><td colspan=2><input type="submit" name="check" value="Send"></td></tr>
+  </table>
+</form>
+
+[$endif$]
+
+<p><hr>
+
+<small>HTML::Embperl (c) 1997-1998 G.Richter</small>
+
+</body>
+</html>

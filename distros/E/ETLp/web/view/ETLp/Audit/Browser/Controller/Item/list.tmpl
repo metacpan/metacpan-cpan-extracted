@@ -1,0 +1,58 @@
+[% title = 'Items' %][% USE HTML %][% USE wrap %]
+
+[% PROCESS menu.tmpl %]
+    <div class="form">
+    <form action="[% script %]" method="post">
+        [% IF job_id %]
+        <label for="config_id">Item Name</label>
+        <select name="item_name" id="item_name">
+            <option value="" [% UNLESS item_name %]selected="selected"[% END %] />
+            [% WHILE (item = item_name_list.next) %]
+            <option value="[% item.item_name %]" [% IF item.item_name  == item_name %]selected="selected"[% END%] >[% item.item_name %]</option>
+            [% END %]
+        </select>
+        [% END %]
+        <label for="status_id">Status</label>
+        <select name="status_id">
+            <option value="">All</option>
+            [% WHILE (status = status_list.next) %]
+            <option value="[% status.status_id %]" [% IF status.status_id == status_id %]selected="selected"[% END %]>[% status.status_name %]</option>
+            [% END %]
+        </select>
+        <input type="hidden" name="job_id" value="[% job_id %]" />
+        <input type="submit" value="Go"/>
+    </form>
+    
+    </div>
+    <table>
+        <tr>
+            <th>Job</th>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Phase</th>
+            <th>Status</th>
+            <th>Message</th>
+            <th>File Processes</th>
+            <th>Date Created</th>
+            <th>Date Updated</th>
+        </tr>
+        [% WHILE (item = items.next) %]
+        <tr>
+            <td><a href="[% root_url %]/job?config_id=[% item.job.section.config.config_id %]&section_name=[% item.job.section.section_name %]">[% item.job.section.config.config_name %] / [% item.job.section.section_name %]</a></td>
+            <td>[% item.item_name %]</td>
+            <td>[% item.item_type %]</td>
+            <td>[% item.phase.phase_name %]</td>
+            <td class="[% item.status.status_name %]">[% item.status.status_name %]</td>
+            <td>[% IF item.message %]<pre class=item-message">[% wrap(HTML.escape(item.message),80) %][% END %]</pre></td>
+            <td>[% UNLESS item.etlp_file_processes_rs.count == 0 %]
+                <a href="[% root_url %]/fileprocess/[% item.item_id %]">[% item.etlp_file_processes.filename %]</a>
+                [% END %]
+            </td>
+            <td>[% item.date_created.strftime('%d/%m/%Y %H:%M:%S') %]</td>
+            <td>[% item.date_updated.strftime('%d/%m/%Y %H:%M:%S') %]</td>
+        </tr>
+        [% END %]
+    </table>
+
+[% pager = items.pager %]
+[% PROCESS footer.tmpl %]

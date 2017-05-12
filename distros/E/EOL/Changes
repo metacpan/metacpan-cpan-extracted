@@ -1,0 +1,10 @@
+Revision history for EOL
+
+0.0.2 Tue Oct 31 13:00:41 CST 2006
+      BUG FIX: eol_return_array method was not properly passing back array in
+      certain cases. Now array includes line return characters as separate
+      fields of their own (i.e., not tacked on to the end of proceeding line).
+
+0.0.1  Thu Apr  6 20:37:18 CDT 2006
+       Initial release to CPAN.
+

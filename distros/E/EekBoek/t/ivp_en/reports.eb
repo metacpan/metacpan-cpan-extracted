@@ -1,0 +1,66 @@
+# Verify: balans in varianten.
+balance            --output=out/balans.txt
+balance --detail=0 --output=out/balans0.txt
+balance --detail=1 --output=out/balans1.txt
+balance --detail=2 --output=out/balans2.txt
+#### TODO: --verdicht
+balance --verdicht --output=out/balans2.txt
+balance --opening  --output=out/obalans.txt
+
+# Verify: verlies/winst in varianten.
+result            --output=out/result.txt
+result --detail=0 --output=out/result0.txt
+result --detail=1 --output=out/result1.txt
+#### TODO: --verdicht
+result --verdicht --output=out/result2.txt
+result --period=apr --output=out/result-apr.txt
+#### TODO: mei -> may
+result --period=mei --output=out/result-mei.txt
+
+# Verify: Journaal.
+journal             --output=out/journaal.txt
+# Verify: Journaal van dagboek.
+journal postbank    --output=out/journaal-postbank.txt
+# Verify: Journaal van boekstuk.
+journal postbank:24 --output=out/journaal-postbank24.txt
+
+# Verify: Proef- en Saldibalans in varianten.
+trialbalance            --output=out/proef.txt
+trialbalance --detail=0 --output=out/proef0.txt
+trialbalance --detail=1 --output=out/proef1.txt
+trialbalance --detail=2 --output=out/proef2.txt
+#### TODO: --verdicht
+trialbalance --verdicht --output=out/proef2.txt
+
+# Verify: Grootboek in varianten.
+ledger            --output=out/grootboek.txt
+ledger --detail=0 --output=out/grootboek0.txt
+ledger --detail=1 --output=out/grootboek1.txt
+ledger --detail=2 --output=out/grootboek2.txt
+ledger 2          --output=out/grootboek_2.txt
+ledger 23         --output=out/grootboek_23.txt
+ledger 23 22      --output=out/grootboek_23_22.txt
+ledger 2320       --output=out/grootboek_2320.txt
+
+# Verify: Crediteuren/Debiteuren.
+creditors         --output=out/crdrept.txt
+debtors           --output=out/debrept.txt
+
+# Verify: BTW aangifte.
+#### TODO: j -> y; k2 -> q2
+vatsubmission j  --output=out/btw.txt
+vatsubmission k2 --output=out/btwk2.txt
+vatsubmission 7  --output=out/btw7.txt
+
+# Verify: HTML generatie.
+balance --detail=2 --gen-html             --output=out/balans2.html
+balance --detail=2 --gen-html --style=xxx --output=out/balans2xxx.html
+#### TODO: j -> y
+vatsubmission j --output=out/btw.html
+
+# Verify: CSV generatie.
+balance --detail=2 --gen-csv --output=out/balans2.csv
+
+# Verify: XAF generatie.
+export --xaf=out/export.xaf
+

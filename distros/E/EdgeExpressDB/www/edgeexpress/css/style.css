@@ -1,0 +1,642 @@
+/* CSS Document */
+#contents
+{
+	padding				: 1em 1em 1em 1em;
+}
+
+#contents H1
+{
+	margin				: 0em 0em 0.5em 0em;
+}
+
+#index_contents UL LI
+{
+	margin				: 0em 0em 0em 2em;
+	list-style			: url( ../images/bullet1.gif );
+}
+
+#index_contents H1
+{
+	border-bottom		: 2px solid #ADBBCA;
+}
+
+#index_contents H2
+{
+	padding				: 1em 0em 0em 0em;
+}
+
+#index_contents H3
+{
+	padding				: 1em 0em 0em 0em;
+}
+
+#index_contents FIELDSET
+{
+	padding				: 0.5em 0em 0em 0em;
+}
+
+#index_contents LEGEND
+{
+	font-weight			: bold;
+	color				: #000000;
+}
+
+#HomeHistoryPage_contents 
+{
+	background-position	: right top;
+	background-image	: url( ../images/history.gif );
+	background-repeat	: no-repeat;
+}
+
+#HomeHistoryPage_contents OL LI
+{
+	margin				: 1em 0em 1em 2em;
+	padding				: 0.2em 0em 0em 0em;
+	line-height			: 1.3;
+	font-size			: 0.9em;
+}
+
+#HomeHistoryPage_contents H1
+{
+	border-bottom		: 2px solid #ADBBCA;
+}
+
+#ContactUsPage_contents
+{
+	background-position	: right top;
+	background-image	: url( ../images/contact.gif );
+	background-repeat	: no-repeat;
+}
+
+#ContactUsPage_contents H1
+{
+	border-bottom		: 2px solid #ADBBCA;
+}
+
+#ContactUsPage_contents H2
+{
+	padding				: 1em 0em 0em 0em;
+}
+
+#FAQPage_contents P
+{
+	padding				: 5px 20px 5px 40px;
+	border				: 1px solid #FFB901;
+	background-image	: url( ../images/question.gif );
+	background-repeat	: no-repeat;
+}
+
+#FAQPage_contents H1
+{
+	margin				: 0px 0px 10px 0px;
+	border-bottom		: 2px solid #ADBBCA;
+}
+
+#HomePhotoPage_contents 
+{
+	background-position	: right top;
+	background-image	: url( ../images/photo.gif );
+	background-repeat	: no-repeat;
+}
+
+#HomePhotoPage_contents H1
+{
+	border-bottom		: 2px solid #ADBBCA;
+}
+
+#HomePhotoPage_contents H2
+{
+	padding				: 5px 0px 5px 0px;
+	border-bottom		: 1px solid #ADBBCA;
+}
+
+#HomePhotoPage_contents TABLE 
+{
+	padding				: 1em 0em 0em 0em;
+}
+
+#HomePhotoPage_contents TBODY TR TD
+{
+	padding				: 0px 40px 10px 40px;
+	text-align			: center;
+}
+
+#HomePhotoPage_contents img
+{
+	width				: 150px;
+	height				: 113px;
+}
+
+#InPreparationPage_contents 
+{
+	padding				: 0em 0em 10em 0em;
+	background-position	: right top;
+	background-image	: url( ../images/HAMMER.gif );
+	background-repeat	: no-repeat;
+}
+
+#PublicationPage_contents 
+{
+	background-position	: right top;
+	background-image	: url( ../images/publication.gif );
+	background-repeat	: no-repeat;
+}
+
+#PublicationPage_contents H1
+{
+	border-bottom		: 2px solid #ADBBCA;
+}
+
+#PublicationPage_contents H3
+{
+	padding				: 1em 0em 0em 0em;
+}
+
+#NetworkImageListPage_contents
+{
+	font-size			: 0.9em;
+}
+
+#NetworkImageListPage_contents H1
+{
+	border-bottom		: 2px solid #ADBBCA;
+}
+
+#NetworkImageListPage_contents UL LI
+{
+	margin-left			: 2em;
+	list-style			: url( ../images/bullet1.gif );
+}
+
+#NetworkImagePage_contents
+{
+	font-size			: 0.9em;
+}
+
+#NetworkImagePage_contents H1
+{
+	border-bottom		: 2px solid #ADBBCA;
+}
+
+/*FORCUSE*/
+#detail_top
+{
+	font-size			: 0.9em;
+}
+
+#detail_top H1
+{
+	border-bottom		: 2px solid #ADBBCA;
+}
+
+#detail_top TABLE
+{
+	font-size			: x-small;
+	margin				: 0 auto;
+	border-collapse		: collapse;
+	border				: 4px solid #ADBBCA;
+	background			: #F0F0F0;
+}
+
+#detail_top TH
+{
+	padding				: 1px 5px;
+	background			: #5E7796;
+	color				: #FFFFFF;
+	text-align			: left;
+	border				: 2px solid #FFF;
+	white-space			: nowrap;
+}
+
+#detail_top TD
+{
+	padding				: 1px 5px;
+	text-align			: left;
+	border				: 2px solid #FFF;
+	white-space			: nowrap;
+}
+
+#detail_top TD IMG
+{
+	height				: 17px;
+	vertical-align		: middle;
+}
+
+#detail_top TD IMG.link
+{
+	height				: 1.5em;
+	vertical-align		: middle;
+}
+
+#detail_top TD select
+{
+	width				: 3.3em;
+}
+
+#detail_top TD div
+{
+	white-space			: nowrap;
+}
+
+
+/* GOI Viewer caption */
+#detail_ppi .detail_cap, #detail_left .detail_cap, #detail_right .detail_cap
+{
+	border-bottom		: 1px solid #ADBBCA;
+	color				: #4F6480;
+	font				: bold 80% georgia, serif;
+	margin				: 1em 0em 1em 0em;
+}
+
+
+/*PPI table*/
+#detail_ppi
+{
+	float				: left;
+	margin				: 1em 1em 2em 1em;
+}
+
+#detail_ppi TABLE
+{
+	font-size			: x-small;
+	line-height			: 1.4em;
+	border-collapse		: collapse;
+	border				: 2px solid #ADBBCA;
+}
+
+#detail_ppi TH
+{
+	color				: #fff;
+	background			: #5E7796;
+	text-align			: center;
+	border				: 2px solid #ADBBCA;
+	white-space			: nowrap;
+}
+
+#detail_ppi TH A
+{
+	color				: #fff;
+	text-decoration		: none;
+}
+
+#detail_ppi TD
+{
+	background			: #C4CFDB;
+	text-align			: center;
+	empty-cells			: show;
+	padding				: 2px 2px;
+}
+
+#detail_ppi TD.odd
+{
+	background			: #F0F0F0;
+}
+
+#detail_ppi TD IMG
+{
+	vertical-align		: middle;
+}
+
+#detail_ppi TH.check
+{
+	width				: 2em;
+}
+
+/*
+#detail_ppi TH.Header
+{
+	padding				: 0em 0em 0em 2em;
+}
+*/
+
+#detail_ppi TH IMG
+{
+	height				: 1.5em;
+	vertical-align		: middle;
+	float				: right; 
+/*	padding				: 0em 0em 0em 20em;		*/
+}
+
+
+/*REGULATOR and TARGET*/
+#detail_left
+{
+	float				: left;
+	margin				: 1em 1em 2em 2em;
+}
+
+#detail_right
+{
+	float				: left;
+	margin				: 1em 2em 2em 1em;
+}
+
+#detail_left TABLE, #detail_right TABLE
+{
+	font-size			: x-small;
+	line-height			: 1.4em;
+	border-collapse		: collapse;
+	border				: 2px solid #ADBBCA;
+}
+
+#detail_left TH, #detail_right TH
+{
+	color				: #fff;
+	background			: #5E7796;
+	text-align			: center;
+	border				: 2px solid #ADBBCA;
+}
+
+#detail_left TH.check, #detail_right TH.check
+{
+	width				: 2em;
+}
+
+#detail_left TH A, #detail_right TH A
+{
+	color				: #fff;
+	text-decoration		: none;
+}
+
+#detail_left TD, #detail_right TD
+{
+	background			: #C4CFDB;
+	text-align			: center;
+	empty-cells			: show;
+	padding				: 2px 2px;
+}
+
+#detail_left TD.odd, #detail_right TD.odd
+{
+	background			: #F0F0F0;
+}
+
+#detail_left TD IMG, #detail_right TD IMG
+{
+	vertical-align		: middle;
+}
+
+#detail_left TH IMG, #detail_right TH IMG
+{
+	height				: 1.5em;
+	vertical-align		: middle;
+	float				: right; 
+}
+
+
+/* NETWORK EXPRESSION */
+#expression
+{ 
+	font-size			: 0.9em;
+}
+
+#expression H1
+{
+	border-bottom		: 2px solid #ADBBCA;
+}
+
+#expression TABLE
+{
+	margin				: 0 auto ;
+	border-collapse		: collapse;
+	border				: 2px solid #C0C0C0;
+}
+
+#expression .title
+{
+	padding-left		: 1em;
+	padding-right		: 15em;
+}
+#expression .button
+{
+	padding-left		: 5em;
+	padding-right		: 1em;
+}
+
+#expression SPAN A IMG
+{
+	height				: 1.2em;
+}
+
+#expression TR TD
+{
+	border				: 1px solid #ADBBCA;
+	background			: #FFFFFF;
+	white-space			: nowrap;
+	font-size			: 1.0em;
+	empty-cells			: show;
+	padding				: 2px 2px 2px 2px;
+	vertical-align		: text-top;
+	width				: 18em;
+}
+
+#expression TR TD IMG
+{
+	border				: 0px none #FFFFFF;
+	background-color	: transparent;
+	padding-top			: 0.5em;
+}
+
+#expression .replication
+{
+	padding-bottom		: 1em;
+	text-align			: center;
+}
+
+#expression .replication form
+{
+	white-space			: nowrap;
+}
+
+#expression .replication .refreshbutton
+{
+	color				: #FFFFFF;
+	background-color	: #5E7796;
+	font-weight			: bold;
+}
+
+#expression .legend
+{
+	padding				: 0px 0em 0em 10em;
+}
+
+#expression .graph form
+{
+	float				: right;
+}
+
+#expression .graph .graphbutton
+{
+	height				: 1.5em;
+}
+
+
+#expression_onebyone
+{ 
+	font-size			: 0.9em;
+}
+
+#expression_onebyone H1
+{
+	border-bottom		: 2px solid #ADBBCA;
+}
+
+#expression_onebyone TABLE
+{
+	margin				: 0 auto ;
+	border-collapse		: collapse;
+	border				: 2px solid #C0C0C0;
+}
+
+#expression_onebyone TR TD SPAN IMG
+{
+	height				: 1em;
+	width				: 1.6em;
+}
+
+#expression_onebyone TR TD IMG
+{
+	border				: 0px none #FFFFFF;
+	background-color	: transparent;
+}
+
+#expression_onebyone THEAD TR TD
+{
+	background			: #FFFFFF;
+
+}
+
+#expression_onebyone TBODY TR TD
+{
+	border				: 1px solid #ADBBCA;
+	background			: #FFFFFF;
+	white-space			: nowrap;
+	font-size			: 1.0em;
+	empty-cells			: show;
+	padding				: 2px 2px 2px 2px;
+	vertical-align		: text-top;
+	width				: 18em;
+
+}
+
+#expression_onebyone .replication
+{
+	padding-bottom		: 1em;
+	text-align			: center;
+}
+
+#expression_onebyone .replication form
+{
+	white-space			: nowrap;
+}
+
+#expression_onebyone .legend
+{
+	text-align			: center;
+}
+
+#expression_onebyone .replication .refreshbutton
+{
+	color				: #FFFFFF;
+	background-color	: #5E7796;
+	font-weight			: bold;
+}
+
+#expression_onebyone .backbutton
+{
+	color				: #FFFFFF;
+	background-color	: #5E7796;
+	font-weight			: bold;
+	position			: relative;
+	float				: right;
+	right				: 0em;
+
+}
+
+.nograph
+{
+	text-align			: center;
+	margin				: 5em 0em 5em 0em;
+}
+
+/*search_result.php*/
+#search_result H1
+{
+	border-bottom		: 2px solid #ADBBCA;
+}
+
+#search_result TABLE
+{
+	font-size			: x-small;
+	line-height			: 1.4em;
+	border-collapse		: collapse;
+	border				: 2px solid #ADBBCA;
+}
+
+#search_result THEAD TR
+{
+	background			: #5E7796;
+}
+
+#search_result TH
+{
+	color				: #fff;
+	font-size			: 7pt;
+	text-align			: center;
+	border				: 2px solid #ADBBCA;
+}
+
+#search_result TD
+{
+	text-align			: center;
+	padding				: 2px 20px 2px 20px;
+}
+
+#search_result TBODY TR.odd
+{
+	background-color	: #F0F0F0;
+}
+
+#search_result TBODY TR.even
+{
+	background-color	: #C4CFDB;
+}
+
+
+#sitemap_contents H1
+{
+	border-bottom		: 2px solid #ADBBCA;
+}
+
+#sitemap_contents UL
+{
+	width				: 15em;
+}
+
+#sitemap_contents UL LI
+{
+	background			: url( ../images/bullet1.gif ) 4px 7px no-repeat;
+	font-size			: small;
+	margin				: 0em 0em 0em 2em;
+	padding				: 0em 1em 0em 1em;
+	list-style			: none;
+}
+
+#sitemap_contents UL LI.self A:link
+{
+	color				: #FFFFFF;
+}
+
+#sitemap_contents UL LI.self A:visited
+{
+	color				: #FFFFFF;
+}
+
+#sitemap_contents UL LI.self{
+	font-size			: small;
+	font-weight			: bold;
+/*	background			: #FBF3AF;		*/
+	background			: #5E7796;
+	margin				: 0.5em 0em 0em 1em;
+	padding				: 0em 0em 0.2em 1em;
+}

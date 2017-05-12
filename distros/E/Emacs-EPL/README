@@ -1,0 +1,72 @@
+12 February 2001
+
+This is EPL version 0.7.  EPL (Emacs Perl) lets you control Emacs and
+XEmacs using Perl as an alternative to Emacs Lisp.
+
+EPL is a replacement for Perlmacs that uses pipes instead of
+embedding.  This allows it to work with different Emacs, XEmacs, and
+Perl versions without recompilation.  See
+http://john-edwin-tobey.org/perlmacs/ for news and the latest version.
+
+  This program is distributed in the hope that it will be useful, but
+  WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  General Public License for more details.
+
+EPL requires at least Perl 5.004 and prefers 5.005 or higher.  It is
+known to work with Emacs 19 (partly) and 20 and XEmacs 21, but with
+the caveat that Lisp references to Perl data must be freed explicitly
+or result in a memory leak.  Under GNU Emacs 21.0.x, this restriction
+does not exist.  I expect to get rid of it with XEmacs too someday.
+GNU Emacs 20 probably will always have it.
+
+
+INSTALLATION
+
+If you have XEmacs 21 or newer, you can install EPL as an XEmacs
+package.  Simply create a ~/.xemacs/packages directory and unzip the
+most recent epl-N.NN-pkg.tar.gz file there.  To view the Perl module
+documentation, try:
+
+    perldoc -F ~/.xemacs/packages/etc/perllib/Emacs/Lisp.pm
+    perldoc -F ~/.xemacs/packages/etc/perllib/Emacs.pm
+
+The examples should work without further ado.
+
+If you do not have XEmacs or want to install the Perl modules in
+standard locations, unzip the highest-numbered Emacs-EPL-N.N.tar.gz,
+change directory to Emacs-EPL-N.N, and run these commands:
+
+    perl Makefile.PL
+    make
+    make install
+
+Do not run `make test' unless you have GNU Emacs 20 or higher
+installed.
+
+Then copy the Lisp files from the lisp directory to where Emacs looks
+for libraries.  Byte-compile them if you like.  Load perl.el in Emacs
+with `M-x load-file' or the equivalent.  Refer to the Emacs manual for
+details about loading libraries and byte-compilation.
+
+See the Emacs::Lisp documentation and epl.info for further
+information.
+
+
+COPYING
+
+EPL is copyright (C) 1998-2001 by John Tobey,
+<jtobey@john-edwin-tobey.org>.
+
+You may distribute EPL under the terms of either the Perl Artistic
+License (as distributed with Perl 5.6.0) or the GNU General Public
+License.
+
+  You should have received a copy of the GNU General Public License
+  along with this program; see the file COPYING.  If not, write to the
+  Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+  MA 02111-1307 USA
+
+
+Enjoy!
+-John

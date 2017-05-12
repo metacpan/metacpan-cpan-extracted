@@ -1,0 +1,9 @@
+Build.PL
+MANIFEST
+MANIFEST.SKIP
+t/00compile.t
+t/mailman-test
+t/mailman-test2
+t/pristine.t
+lib/Email/Store/Pristine.pm
+META.yml

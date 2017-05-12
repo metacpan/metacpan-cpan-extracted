@@ -1,0 +1,55 @@
+{
+   "abstract" : "a simple in-process pub/sub mechanism",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4211",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Event-Distributor",
+   "prereqs" : {
+      "runtime" : {
+         "requires" : {
+            "Future" : "0.15"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Fatal" : "0",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "provides" : {
+      "Event::Distributor" : {
+         "file" : "lib/Event/Distributor.pm",
+         "version" : "0.04"
+      },
+      "Event::Distributor::Action" : {
+         "file" : "lib/Event/Distributor/Action.pm",
+         "version" : "0.04"
+      },
+      "Event::Distributor::Query" : {
+         "file" : "lib/Event/Distributor/Query.pm",
+         "version" : "0.04"
+      },
+      "Event::Distributor::Signal" : {
+         "file" : "lib/Event/Distributor/Signal.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "x_IRC" : "irc://irc.perl.org/#io-async"
+   },
+   "version" : "0.04"
+}

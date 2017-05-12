@@ -1,0 +1,11 @@
+Revision history for ExtJS-Generator-DBIC: 0.003
+
+0.003     2016-06-24 14:59:25+02:00 Europe/Vienna
+    - fix failing tests under unsupported Perl versions (< 5.22) (RT#114531)
+    - fix missing Data::Dump::JavaScript dependency (RT#114532)
+
+0.002     2016-05-20 12:02:00+02:00 Europe/Vienna
+    - fix PAUSE indexing because of missing ExtJS::Generator::DBIC module
+
+0.001     2016-05-20 11:45:51+02:00 Europe/Vienna
+    - Initial release

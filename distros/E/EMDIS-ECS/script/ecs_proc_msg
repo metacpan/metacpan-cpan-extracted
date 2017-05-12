@@ -1,0 +1,92 @@
+#!/usr/bin/perl -w
+#
+# Copyright (C) 2002-2016 National Marrow Donor Program. All rights reserved.
+#
+# For a description of this program, please refer to the POD documentation
+# embedded at the bottom of the file (e.g. perldoc ecs_proc_msg).
+
+use strict;
+use vars qw($args $cmd);
+
+# redirect STDERR to STDOUT
+open STDERR, ">&STDOUT" or die "Unable to dup STDOUT: $!\n";
+select STDERR; $| = 1;   # make unbuffered
+select STDOUT; $| = 1;   # make unbuffered
+
+# compose command
+$cmd = $ENV{ADAPTER_CMD};
+if($cmd =~ /\$\@/) {
+    $args = join(' ',@ARGV);
+    $cmd =~ s/\$\@/$args/;
+}
+for my $arg (1..9) {
+    my $i = $arg - 1;
+    $cmd =~ s/\$$arg/$ARGV[$i]/;
+}
+
+# execute command
+if ( $^O =~ /MSWin32/ ) {
+    # EXEC in Windows doesn't seem to react the same as in UNIX
+    `$cmd`;
+} else {
+    exec $cmd;
+    # the following should be unreachable code, never executed
+    die "ecs_proc_msg: unable to execute command ($cmd): $!\n";	
+}
+
+
+
+__END__
+
+# embedded POD documentation
+
+=head1 NAME
+
+ecs_proc_msg - process FML message
+
+=head1 SYNOPSIS
+
+ ecs_proc_msg tmp/20030320_183247_1_0005_FYUh.msg.fml FR 12345
+
+=head1 DESCRIPTION
+
+Process FML file from regular ECS message.
+
+=head1 RETURN VALUE
+
+Returns a non-zero exit code if an error is encountered.
+
+=head1 BUGS
+
+Possibly.
+
+=head1 SEE ALSO
+
+EMDIS::ECS, ecs_scan_mail, ecs_proc_meta
+
+=head1 AUTHOR
+
+Joel Schneider <jschneid@nmdp.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED 
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF 
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+Copyright (C) 2002-2016 National Marrow Donor Program. All rights reserved.
+
+See LICENSE file for license details.
+
+=head1 HISTORY
+
+ECS, the EMDIS Communication System, was originally designed and
+implemented by the ZKRD (http://www.zkrd.de/).  This Perl implementation
+of ECS was developed by the National Marrow Donor Program
+(http://www.marrow.org/).
+
+2004-03-12	
+Canadian Blood Services - Tony Wai
+Added MS Windows support for Windows 2000 and Windows XP
+Added "DIRECTORY" inBox Protocol. This can interface with any mail
+system that can output the new messages to text files.

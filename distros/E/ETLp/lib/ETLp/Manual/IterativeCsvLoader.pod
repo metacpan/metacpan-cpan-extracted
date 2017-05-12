@@ -1,0 +1,56 @@
+package ETLp::Manual::IterativeCsvLoader;
+
+# ABSTRACT: Manual for Iteerative CSV Loader Items
+
+__END__
+
+=pod
+
+=head1 CSV_LOADER
+
+The csv_loader plugin provides functionality to load delimited files into a database table. It relies on a control file to define the fields in the incoming data file. The following parameters must be set in the config section:
+
+=over 4
+
+=item * B<table_name>. The name table that the loader inserts the file data into.
+
+=item * B<controlfile_dir>. The directory that contains the control file.
+
+=item * B<control_file>. The name of the control file
+
+=back
+
+The item parameters are:
+
+=over 4
+
+=item * B<name>. The name of this item.
+
+=item * B<ignore_field_count>. whether to continue if the number fields in the data (CSV) file don't match the number of fields in the control file.
+
+=item * B<skip>. The number of rows to skip in the file before loading begins. This allows header records to be ignored.
+
+=item * B<localize>. A boolean setting that instructs the loader to localize the end-of-line markers for the current file system. Defaults to 0.
+
+=item * B<csv_options>. A section containing additional options for processing. See L<http://search.cpan.org/dist/Text-CSV/lib/Text/CSV.pm#new_%28\%attr%29>.
+
+=item * B<on_error>. Override the setting for the job.
+
+=back
+
+=head2 Table Audit Column
+
+The csv_loader plugin requires the table that stores the data have a column called I<file_id> of type integer. This is used to link the file to its audit record.
+
+=head2 Example 
+
+    <item>
+        name = load customer file
+        type = csv_loader
+        # Skip one line
+        skip = 1
+        <csv_options>
+            allow_whitespace = 1 
+            sep_char         = | # use pipes not commas for delimiting data
+        </csv_options>
+    </item>

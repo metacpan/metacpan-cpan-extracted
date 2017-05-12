@@ -1,0 +1,769 @@
+From plucene-bounces@kasei.com  Tue Jun 15 23:54:12 2004
+Received: from soto.kasei.com ([80.76.206.154])
+	by alibi.simon-cozens.org with esmtp (Exim 3.35 #1 (Debian))
+	id 1BaMoj-0000n5-00
+	for <simon@simon-cozens.org>; Tue, 15 Jun 2004 23:54:09 +0100
+Received: by soto.kasei.com (Postfix, from userid 107)
+	id 063701CC84; Tue, 15 Jun 2004 23:54:06 +0100 (BST)
+Received: from soto.kasei.com (localhost [127.0.0.1])
+	by soto.kasei.com (Postfix) with ESMTP
+	id 212311CD4D; Tue, 15 Jun 2004 23:53:59 +0100 (BST)
+X-Original-To: plucene@localhost
+Delivered-To: plucene@localhost
+Received: by soto.kasei.com (Postfix, from userid 107)
+	id E9BA71CD67; Tue, 15 Jun 2004 23:53:56 +0100 (BST)
+Received: from mail.ohwy.com (mail.ohwy.com [12.154.210.211])
+	by soto.kasei.com (Postfix) with ESMTP id 2E5821CC84
+	for <plucene@kasei.com>; Tue, 15 Jun 2004 23:53:55 +0100 (BST)
+Mime-Version: 1.0 (Apple Message framework v618)
+Content-Transfer-Encoding: 7bit
+Message-Id: <E0D9CA9C-BF1E-11D8-9FC1-003065AC1682@ohwy.com>
+Content-Type: text/plain; charset=US-ASCII; delsp=yes; format=flowed
+To: plucene@kasei.com
+From: Marvin Humphrey <marvin@ohwy.com>
+Date: Tue, 15 Jun 2004 15:53:54 -0700
+X-Mailer: Apple Mail (2.618)
+Subject: [Plucene] Plucene on OS X
+X-BeenThere: plucene@kasei.com
+X-Mailman-Version: 2.1.4
+Precedence: list
+List-Id: plucene.kasei.com
+List-Unsubscribe: <http://www.kasei.com/mailman/listinfo/plucene>,
+	<mailto:plucene-request@kasei.com?subject=unsubscribe>
+List-Archive: <http://www.kasei.com/pipermail/plucene>
+List-Post: <mailto:plucene@kasei.com>
+List-Help: <mailto:plucene-request@kasei.com?subject=help>
+List-Subscribe: <http://www.kasei.com/mailman/listinfo/plucene>,
+	<mailto:plucene-request@kasei.com?subject=subscribe>
+Sender: plucene-bounces@kasei.com
+Errors-To: plucene-bounces@kasei.com
+X-Bogosity: No, tests=bogofilter, spamicity=0.000000, version=0.15.10
+X-Spam-Checker-Version: SpamAssassin 2.70-r6188 (2004-01-17) on 
+	alibi.simon-cozens.org
+X-Spam-Status: No, hits=-4.2 required=5.0 tests=BAYES_00,RATWR8_MESSID 
+	autolearn=no version=2.70-r6188
+X-Spam-Level: 
+Status: RO
+Content-Length: 1332
+Lines: 43
+
+Greetings,
+
+I'm trying to install Plucene via CPAN on a Mac OS X 10.3 (Panther).   
+make test fails, as shown in the transcript below.  Any suggestions?
+
+Cheers,
+
+-- Marvin Humphrey
+
+[...]
+# t/data/book9
+# t/data/preface
+# Closing
+t/stress.............ok 54/0Plucene::Store::InputStream cannot open  
+t/homer_index/2756/_10.f2 for reading: Too many open files at  
+/Users/marvin/.cpan/build/Plucene-1.17/blib/lib/Plucene/Store/ 
+InputStream.pm line 37.
+# Looks like your test died just after 54.
+t/stress.............dubious
+         Test returned status 255 (wstat 65280, 0xff00)
+         after all the subtests completed successfully
+t/terminfostest......ok
+t/testbitvector......ok
+t/testindexwriter....ok
+t/tokenfilter........ok
+t/tokenizer..........ok
+t/utf8...............ok
+Failed Test Stat Wstat Total Fail  Failed  List of Failed
+------------------------------------------------------------------------ 
+-------
+t/stress.t   255 65280    54    0   0.00%  ??
+Failed 1/22 test scripts, 95.45% okay. 0/6009 subtests failed, 100.00%  
+okay.
+make: *** [test_dynamic] Error 2
+   /usr/bin/make test -- NOT OK
+Running make install
+   make test had returned bad status, won't install without force
+
+_______________________________________________
+Plucene mailing list
+Plucene@kasei.com
+http://www.kasei.com/mailman/listinfo/plucene
+
+
+From plucene-bounces@kasei.com  Wed Jun 16 00:00:54 2004
+Received: from soto.kasei.com ([80.76.206.154])
+	by alibi.simon-cozens.org with esmtp (Exim 3.35 #1 (Debian))
+	id 1BaMvD-0000t9-00
+	for <simon@simon-cozens.org>; Wed, 16 Jun 2004 00:00:52 +0100
+Received: by soto.kasei.com (Postfix, from userid 107)
+	id 266CF1CDE0; Wed, 16 Jun 2004 00:00:53 +0100 (BST)
+Received: from soto.kasei.com (localhost [127.0.0.1])
+	by soto.kasei.com (Postfix) with ESMTP
+	id 809C31CD4D; Wed, 16 Jun 2004 00:00:47 +0100 (BST)
+X-Original-To: plucene@localhost
+Delivered-To: plucene@localhost
+Received: by soto.kasei.com (Postfix, from userid 107)
+	id 184111CDCB; Wed, 16 Jun 2004 00:00:45 +0100 (BST)
+Received: from vsmtp1.tin.it (unknown [212.216.176.141])
+	by soto.kasei.com (Postfix) with ESMTP id 6291C1CD4D
+	for <plucene@kasei.com>; Wed, 16 Jun 2004 00:00:43 +0100 (BST)
+Received: from open2b.com (82.51.138.159) by vsmtp1.tin.it (7.0.027)
+	id 40CC2C690010F25B; Wed, 16 Jun 2004 01:00:42 +0200
+Message-ID: <40CF7F98.4020105@open2b.com>
+Date: Wed, 16 Jun 2004 01:00:40 +0200
+From: Marco Gazerro <gazerro@open2b.com>
+Organization: Open2b Software S.r.l.
+User-Agent: Mozilla/5.0 (Windows; U; Windows NT 5.1; it-IT;
+	rv:1.6) Gecko/20040113
+X-Accept-Language: it, en-us, en
+MIME-Version: 1.0
+To: plucene@kasei.com
+Subject: Re: [Plucene] Plucene on OS X
+References: <E0D9CA9C-BF1E-11D8-9FC1-003065AC1682@ohwy.com>
+In-Reply-To: <E0D9CA9C-BF1E-11D8-9FC1-003065AC1682@ohwy.com>
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: Marvin Humphrey <marvin@ohwy.com>
+X-BeenThere: plucene@kasei.com
+X-Mailman-Version: 2.1.4
+Precedence: list
+List-Id: plucene.kasei.com
+List-Unsubscribe: <http://www.kasei.com/mailman/listinfo/plucene>,
+	<mailto:plucene-request@kasei.com?subject=unsubscribe>
+List-Archive: <http://www.kasei.com/pipermail/plucene>
+List-Post: <mailto:plucene@kasei.com>
+List-Help: <mailto:plucene-request@kasei.com?subject=help>
+List-Subscribe: <http://www.kasei.com/mailman/listinfo/plucene>,
+	<mailto:plucene-request@kasei.com?subject=subscribe>
+Sender: plucene-bounces@kasei.com
+Errors-To: plucene-bounces@kasei.com
+X-Bogosity: No, tests=bogofilter, spamicity=0.000000, version=0.15.10
+X-Spam-Checker-Version: SpamAssassin 2.70-r6188 (2004-01-17) on 
+	alibi.simon-cozens.org
+X-Spam-Status: No, hits=-4.5 required=5.0 tests=AWL,BAYES_00,RATWR10_MESSID,
+	RCVD_IN_RFCI autolearn=no version=2.70-r6188
+X-Spam-Level: 
+Status: RO
+Content-Length: 1724
+Lines: 58
+
+You can try to add this patch: 
+http://www.kasei.com/pipermail/plucene/2004-May/000148.html
+
+but I'm not sure that this is the problem.
+
+Marco
+
+Marvin Humphrey ha scritto:
+
+> Greetings,
+> 
+> I'm trying to install Plucene via CPAN on a Mac OS X 10.3 (Panther).   
+> make test fails, as shown in the transcript below.  Any suggestions?
+> 
+> Cheers,
+> 
+> -- Marvin Humphrey
+> 
+> [...]
+> # t/data/book9
+> # t/data/preface
+> # Closing
+> t/stress.............ok 54/0Plucene::Store::InputStream cannot open  
+> t/homer_index/2756/_10.f2 for reading: Too many open files at  
+> /Users/marvin/.cpan/build/Plucene-1.17/blib/lib/Plucene/Store/ 
+> InputStream.pm line 37.
+> # Looks like your test died just after 54.
+> t/stress.............dubious
+>         Test returned status 255 (wstat 65280, 0xff00)
+>         after all the subtests completed successfully
+> t/terminfostest......ok
+> t/testbitvector......ok
+> t/testindexwriter....ok
+> t/tokenfilter........ok
+> t/tokenizer..........ok
+> t/utf8...............ok
+> Failed Test Stat Wstat Total Fail  Failed  List of Failed
+> ------------------------------------------------------------------------ 
+> -------
+> t/stress.t   255 65280    54    0   0.00%  ??
+> Failed 1/22 test scripts, 95.45% okay. 0/6009 subtests failed, 100.00%  
+> okay.
+> make: *** [test_dynamic] Error 2
+>   /usr/bin/make test -- NOT OK
+> Running make install
+>   make test had returned bad status, won't install without force
+> 
+> _______________________________________________
+> Plucene mailing list
+> Plucene@kasei.com
+> http://www.kasei.com/mailman/listinfo/plucene
+> 
+> 
+_______________________________________________
+Plucene mailing list
+Plucene@kasei.com
+http://www.kasei.com/mailman/listinfo/plucene
+
+
+From plucene-bounces@kasei.com  Wed Jun 16 00:12:13 2004
+Received: from soto.kasei.com ([80.76.206.154])
+	by alibi.simon-cozens.org with esmtp (Exim 3.35 #1 (Debian))
+	id 1BaN6A-00014Z-00
+	for <simon@simon-cozens.org>; Wed, 16 Jun 2004 00:12:10 +0100
+Received: by soto.kasei.com (Postfix, from userid 107)
+	id B3C331CD4D; Wed, 16 Jun 2004 00:12:10 +0100 (BST)
+Received: from soto.kasei.com (localhost [127.0.0.1])
+	by soto.kasei.com (Postfix) with ESMTP
+	id 5FE381CD67; Wed, 16 Jun 2004 00:12:02 +0100 (BST)
+X-Original-To: plucene@localhost
+Delivered-To: plucene@localhost
+Received: by soto.kasei.com (Postfix, from userid 107)
+	id 21ABF1CDCB; Wed, 16 Jun 2004 00:12:01 +0100 (BST)
+Received: from mail.angel.net (hola.angel.net [204.141.51.10])
+	by soto.kasei.com (Postfix) with ESMTP id 361AD1CD4D
+	for <plucene@kasei.com>; Wed, 16 Jun 2004 00:11:59 +0100 (BST)
+Received: from [192.168.1.100] (pcp01264238pcs.nhaven01.ct.comcast.net
+	[68.63.116.186])
+	by mail.angel.net (Postfix) with ESMTP id 65D316FB09;
+	Tue, 15 Jun 2004 19:34:07 -0400 (EDT)
+In-Reply-To: <E0D9CA9C-BF1E-11D8-9FC1-003065AC1682@ohwy.com>
+References: <E0D9CA9C-BF1E-11D8-9FC1-003065AC1682@ohwy.com>
+Mime-Version: 1.0 (Apple Message framework v618)
+Content-Type: text/plain; charset=ISO-8859-1; delsp=yes; format=flowed
+Message-Id: <69639EAC-BF21-11D8-B1DA-000393B4C994@angel.net>
+Content-Transfer-Encoding: quoted-printable
+From: Michael Slattery <slattery@angel.net>
+Subject: Re: [Plucene] Plucene on OS X
+Date: Tue, 15 Jun 2004 19:12:03 -0400
+To: Marvin Humphrey <marvin@ohwy.com>
+X-Mailer: Apple Mail (2.618)
+Cc: plucene@kasei.com
+X-BeenThere: plucene@kasei.com
+X-Mailman-Version: 2.1.4
+Precedence: list
+List-Id: plucene.kasei.com
+List-Unsubscribe: <http://www.kasei.com/mailman/listinfo/plucene>,
+	<mailto:plucene-request@kasei.com?subject=unsubscribe>
+List-Archive: <http://www.kasei.com/pipermail/plucene>
+List-Post: <mailto:plucene@kasei.com>
+List-Help: <mailto:plucene-request@kasei.com?subject=help>
+List-Subscribe: <http://www.kasei.com/mailman/listinfo/plucene>,
+	<mailto:plucene-request@kasei.com?subject=subscribe>
+Sender: plucene-bounces@kasei.com
+Errors-To: plucene-bounces@kasei.com
+X-Bogosity: No, tests=bogofilter, spamicity=0.000000, version=0.15.10
+X-Spam-Checker-Version: SpamAssassin 2.70-r6188 (2004-01-17) on 
+	alibi.simon-cozens.org
+X-Spam-Status: No, hits=-4.4 required=5.0 tests=AWL,BAYES_00,RATWR8_MESSID,
+	RCVD_IN_RFCI,RCVD_IN_SORBS autolearn=no version=2.70-r6188
+X-Spam-Level: 
+Status: RO
+Content-Length: 2031
+Lines: 75
+
+Marvin,
+
+I've had the 'too many files open' error in Panther from other apps,=20=20
+like BBedit.
+
+The default is like 256.   See:
+
+http://developer.apple.com/qa/qa2001/qa1005.html
+
+You might try this from
+
+http://www.latext.com/pm/comments/562_0_1_0_C/
+  > Basically you have to add this line to your .bashrc (startup script)=20=
+=20
+located in your root directory.=A0
+  > ulimit -S -n 2048
+
+
+Cheers,
+Mike
+
+On Jun 15, 2004, at 6:53 PM, Marvin Humphrey wrote:
+
+> Greetings,
+>
+> I'm trying to install Plucene via CPAN on a Mac OS X 10.3 (Panther).=20=
+=20=20
+> make test fails, as shown in the transcript below.  Any suggestions?
+>
+> Cheers,
+>
+> -- Marvin Humphrey
+>
+> [...]
+> # t/data/book9
+> # t/data/preface
+> # Closing
+> t/stress.............ok 54/0Plucene::Store::InputStream cannot open=20=20
+> t/homer_index/2756/_10.f2 for reading: Too many open files at=20=20
+> /Users/marvin/.cpan/build/Plucene-1.17/blib/lib/Plucene/Store/=20
+> InputStream.pm line 37.
+> # Looks like your test died just after 54.
+> t/stress.............dubious
+>         Test returned status 255 (wstat 65280, 0xff00)
+>         after all the subtests completed successfully
+> t/terminfostest......ok
+> t/testbitvector......ok
+> t/testindexwriter....ok
+> t/tokenfilter........ok
+> t/tokenizer..........ok
+> t/utf8...............ok
+> Failed Test Stat Wstat Total Fail  Failed  List of Failed
+> -----------------------------------------------------------------------=
+=20
+> --------
+> t/stress.t   255 65280    54    0   0.00%  ??
+> Failed 1/22 test scripts, 95.45% okay. 0/6009 subtests failed, 100.00%=20=
+=20
+> okay.
+> make: *** [test_dynamic] Error 2
+>   /usr/bin/make test -- NOT OK
+> Running make install
+>   make test had returned bad status, won't install without force
+>
+> _______________________________________________
+> Plucene mailing list
+> Plucene@kasei.com
+> http://www.kasei.com/mailman/listinfo/plucene
+>
+
+_______________________________________________
+Plucene mailing list
+Plucene@kasei.com
+http://www.kasei.com/mailman/listinfo/plucene
+
+
+From plucene-bounces@kasei.com  Wed Jun 16 00:46:06 2004
+Received: from soto.kasei.com ([80.76.206.154])
+	by alibi.simon-cozens.org with esmtp (Exim 3.35 #1 (Debian))
+	id 1BaNcy-0001WD-00
+	for <simon@simon-cozens.org>; Wed, 16 Jun 2004 00:46:04 +0100
+Received: by soto.kasei.com (Postfix, from userid 107)
+	id 25C301CDCB; Wed, 16 Jun 2004 00:46:05 +0100 (BST)
+Received: from soto.kasei.com (localhost [127.0.0.1])
+	by soto.kasei.com (Postfix) with ESMTP
+	id 77E3E1CD67; Wed, 16 Jun 2004 00:45:59 +0100 (BST)
+X-Original-To: plucene@localhost
+Delivered-To: plucene@localhost
+Received: by soto.kasei.com (Postfix, from userid 107)
+	id 15B551CD89; Wed, 16 Jun 2004 00:45:57 +0100 (BST)
+Received: from mail.ohwy.com (mail.ohwy.com [12.154.210.211])
+	by soto.kasei.com (Postfix) with ESMTP id 605F51CD4D
+	for <plucene@kasei.com>; Wed, 16 Jun 2004 00:45:55 +0100 (BST)
+Mime-Version: 1.0 (Apple Message framework v618)
+In-Reply-To: <69639EAC-BF21-11D8-B1DA-000393B4C994@angel.net>
+References: <E0D9CA9C-BF1E-11D8-9FC1-003065AC1682@ohwy.com>
+	<69639EAC-BF21-11D8-B1DA-000393B4C994@angel.net>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Message-Id: <2533A539-BF26-11D8-9FC1-003065AC1682@ohwy.com>
+Content-Transfer-Encoding: quoted-printable
+From: Marvin Humphrey <marvin@ohwy.com>
+Subject: Re: [Plucene] Plucene on OS X
+Date: Tue, 15 Jun 2004 16:45:56 -0700
+To: plucene@kasei.com
+X-Mailer: Apple Mail (2.618)
+X-BeenThere: plucene@kasei.com
+X-Mailman-Version: 2.1.4
+Precedence: list
+List-Id: plucene.kasei.com
+List-Unsubscribe: <http://www.kasei.com/mailman/listinfo/plucene>,
+	<mailto:plucene-request@kasei.com?subject=unsubscribe>
+List-Archive: <http://www.kasei.com/pipermail/plucene>
+List-Post: <mailto:plucene@kasei.com>
+List-Help: <mailto:plucene-request@kasei.com?subject=help>
+List-Subscribe: <http://www.kasei.com/mailman/listinfo/plucene>,
+	<mailto:plucene-request@kasei.com?subject=subscribe>
+Sender: plucene-bounces@kasei.com
+Errors-To: plucene-bounces@kasei.com
+X-Bogosity: No, tests=bogofilter, spamicity=0.000000, version=0.15.10
+X-Spam-Checker-Version: SpamAssassin 2.70-r6188 (2004-01-17) on 
+	alibi.simon-cozens.org
+X-Spam-Status: No, hits=-4.2 required=5.0 tests=BAYES_00,RATWR8_MESSID 
+	autolearn=no version=2.70-r6188
+X-Spam-Level: 
+Status: RO
+Content-Length: 1060
+Lines: 31
+
+On Jun 15, 2004, at 4:00 PM, Marco Gazerro wrote:
+
+> You can try to add this patch:=20
+> http://www.kasei.com/pipermail/plucene/2004-May/000148.html
+
+Thank you for the tip Marco, but patching Utils.pm did not solve the=20
+problem.
+
+On Jun 15, 2004, at 4:12 PM, Michael Slattery wrote:
+
+> You might try this from
+>
+> http://www.latext.com/pm/comments/562_0_1_0_C/
+>  > Basically you have to add this line to your .bashrc (startup=20
+> script) located in your root directory.=A0
+>  > ulimit -S -n 2048
+
+Issuing that ulimit command then rerunning make test resulted in=20
+success.  Is there any compelling reason why Plucene needs a lot of=20
+files open?  I've run into the limit myself with an indexer app that=20
+tried to write to 1000 different temp files.  It was possible to mod=20
+the app so that it used 100 temp files instead.  Is the high file open=20
+count a bug or part of Plucene's architecture?
+
+-- Marvin Humphrey
+
+_______________________________________________
+Plucene mailing list
+Plucene@kasei.com
+http://www.kasei.com/mailman/listinfo/plucene
+
+
+From plucene-bounces@kasei.com  Wed Jun 16 03:24:04 2004
+Received: from soto.kasei.com ([80.76.206.154])
+	by alibi.simon-cozens.org with esmtp (Exim 3.35 #1 (Debian))
+	id 1BaQ5m-00041x-00
+	for <simon@simon-cozens.org>; Wed, 16 Jun 2004 03:23:58 +0100
+Received: by soto.kasei.com (Postfix, from userid 107)
+	id 18CD61CEB0; Wed, 16 Jun 2004 03:23:59 +0100 (BST)
+Received: from soto.kasei.com (localhost [127.0.0.1])
+	by soto.kasei.com (Postfix) with ESMTP
+	id 127511CE82; Wed, 16 Jun 2004 03:23:52 +0100 (BST)
+X-Original-To: plucene@localhost
+Delivered-To: plucene@localhost
+Received: by soto.kasei.com (Postfix, from userid 107)
+	id 106E81CEB0; Wed, 16 Jun 2004 03:23:49 +0100 (BST)
+Received: from mail.ohwy.com (mail.ohwy.com [12.154.210.211])
+	by soto.kasei.com (Postfix) with ESMTP id 31B981CE7B
+	for <plucene@kasei.com>; Wed, 16 Jun 2004 03:23:47 +0100 (BST)
+Mime-Version: 1.0 (Apple Message framework v618)
+In-Reply-To: <69639EAC-BF21-11D8-B1DA-000393B4C994@angel.net>
+References: <E0D9CA9C-BF1E-11D8-9FC1-003065AC1682@ohwy.com>
+	<69639EAC-BF21-11D8-B1DA-000393B4C994@angel.net>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Message-Id: <32BF98DC-BF3C-11D8-9FC1-003065AC1682@ohwy.com>
+Content-Transfer-Encoding: quoted-printable
+From: Marvin Humphrey <marvin@ohwy.com>
+Subject: Re: [Plucene] Plucene on OS X
+Date: Tue, 15 Jun 2004 19:23:47 -0700
+To: plucene@kasei.com
+X-Mailer: Apple Mail (2.618)
+X-BeenThere: plucene@kasei.com
+X-Mailman-Version: 2.1.4
+Precedence: list
+List-Id: plucene.kasei.com
+List-Unsubscribe: <http://www.kasei.com/mailman/listinfo/plucene>,
+	<mailto:plucene-request@kasei.com?subject=unsubscribe>
+List-Archive: <http://www.kasei.com/pipermail/plucene>
+List-Post: <mailto:plucene@kasei.com>
+List-Help: <mailto:plucene-request@kasei.com?subject=help>
+List-Subscribe: <http://www.kasei.com/mailman/listinfo/plucene>,
+	<mailto:plucene-request@kasei.com?subject=subscribe>
+Sender: plucene-bounces@kasei.com
+Errors-To: plucene-bounces@kasei.com
+X-Bogosity: No, tests=bogofilter, spamicity=0.000000, version=0.15.10
+X-Spam-Checker-Version: SpamAssassin 2.70-r6188 (2004-01-17) on 
+	alibi.simon-cozens.org
+X-Spam-Status: No, hits=-4.2 required=5.0 tests=BAYES_00,RATWR8_MESSID 
+	autolearn=no version=2.70-r6188
+X-Spam-Level: 
+Status: RO
+Content-Length: 1098
+Lines: 33
+
+resending... (is the listserv down?)
+
+On Jun 15, 2004, at 4:00 PM, Marco Gazerro wrote:
+
+> You can try to add this patch:=20
+> http://www.kasei.com/pipermail/plucene/2004-May/000148.html
+
+Thank you for the tip Marco, but patching Utils.pm did not solve the=20
+problem.
+
+On Jun 15, 2004, at 4:12 PM, Michael Slattery wrote:
+
+> You might try this from
+>
+> http://www.latext.com/pm/comments/562_0_1_0_C/
+>  > Basically you have to add this line to your .bashrc (startup=20
+> script) located in your root directory.=A0
+>  > ulimit -S -n 2048
+
+Issuing that ulimit command then rerunning make test resulted in=20
+success.  Is there any compelling reason why Plucene needs a lot of=20
+files open?  I've run into the limit myself with an indexer app that=20
+tried to write to 1000 different temp files.  It was possible to mod=20
+the app so that it used 100 temp files instead.  Is the high file open=20
+count a bug or part of Plucene's architecture?
+
+-- Marvin Humphrey
+
+_______________________________________________
+Plucene mailing list
+Plucene@kasei.com
+http://www.kasei.com/mailman/listinfo/plucene
+
+
+From plucene-bounces@kasei.com  Wed Jun 16 08:58:33 2004
+Received: from soto.kasei.com ([80.76.206.154])
+	by alibi.simon-cozens.org with esmtp (Exim 3.35 #1 (Debian))
+	id 1BaVJH-0001Gd-00
+	for <simon@simon-cozens.org>; Wed, 16 Jun 2004 08:58:15 +0100
+Received: by soto.kasei.com (Postfix, from userid 107)
+	id DCF791CDF5; Wed, 16 Jun 2004 08:58:14 +0100 (BST)
+Received: from soto.kasei.com (localhost [127.0.0.1])
+	by soto.kasei.com (Postfix) with ESMTP
+	id 3C60D1CE45; Wed, 16 Jun 2004 08:58:09 +0100 (BST)
+X-Original-To: plucene@kasei.com
+Delivered-To: plucene@localhost
+Received: by soto.kasei.com (Postfix, from userid 1011)
+	id 518A51CE45; Wed, 16 Jun 2004 08:58:04 +0100 (BST)
+Date: Wed, 16 Jun 2004 08:58:04 +0100
+From: Tony Bowden <tony@kasei.com>
+To: Marvin Humphrey <marvin@ohwy.com>
+Subject: Re: [Plucene] Plucene on OS X
+Message-ID: <20040616075804.GA20643@soto.kasei.com>
+Mail-Followup-To: Marvin Humphrey <marvin@ohwy.com>,
+	plucene@kasei.com
+References: <E0D9CA9C-BF1E-11D8-9FC1-003065AC1682@ohwy.com>
+	<69639EAC-BF21-11D8-B1DA-000393B4C994@angel.net>
+	<32BF98DC-BF3C-11D8-9FC1-003065AC1682@ohwy.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <32BF98DC-BF3C-11D8-9FC1-003065AC1682@ohwy.com>
+User-Agent: Mutt/1.5.5.1+cvs20040105i
+Cc: plucene@kasei.com
+X-BeenThere: plucene@kasei.com
+X-Mailman-Version: 2.1.4
+Precedence: list
+List-Id: plucene.kasei.com
+List-Unsubscribe: <http://www.kasei.com/mailman/listinfo/plucene>,
+	<mailto:plucene-request@kasei.com?subject=unsubscribe>
+List-Archive: <http://www.kasei.com/pipermail/plucene>
+List-Post: <mailto:plucene@kasei.com>
+List-Help: <mailto:plucene-request@kasei.com?subject=help>
+List-Subscribe: <http://www.kasei.com/mailman/listinfo/plucene>,
+	<mailto:plucene-request@kasei.com?subject=subscribe>
+Sender: plucene-bounces@kasei.com
+Errors-To: plucene-bounces@kasei.com
+X-Bogosity: No, tests=bogofilter, spamicity=0.000000, version=0.15.10
+X-Spam-Checker-Version: SpamAssassin 2.70-r6188 (2004-01-17) on 
+	alibi.simon-cozens.org
+X-Spam-Status: No, hits=-52.5 required=5.0 tests=AWL,BAYES_00 autolearn=ham 
+	version=2.70-r6188
+X-Spam-Level: 
+Status: RO
+Content-Length: 403
+Lines: 17
+
+On Tue, Jun 15, 2004 at 07:23:47PM -0700, Marvin Humphrey wrote:
+> resending... (is the listserv down?)
+
+I got the first message fine ..
+
+> Is the high file open count a bug or part of Plucene's architecture?
+
+I would say a bug.
+
+Patches, as they say, welcome...
+
+Tony
+_______________________________________________
+Plucene mailing list
+Plucene@kasei.com
+http://www.kasei.com/mailman/listinfo/plucene
+
+
+From plucene-bounces@kasei.com  Wed Jun 16 10:11:44 2004
+Received: from soto.kasei.com ([80.76.206.154])
+	by alibi.simon-cozens.org with esmtp (Exim 3.35 #1 (Debian))
+	id 1BaWSM-0002RN-00
+	for <simon@simon-cozens.org>; Wed, 16 Jun 2004 10:11:42 +0100
+Received: by soto.kasei.com (Postfix, from userid 107)
+	id 6320C1CD60; Wed, 16 Jun 2004 10:11:40 +0100 (BST)
+Received: from soto.kasei.com (localhost [127.0.0.1])
+	by soto.kasei.com (Postfix) with ESMTP
+	id 0D3D81CEAE; Wed, 16 Jun 2004 10:11:36 +0100 (BST)
+X-Original-To: plucene@localhost
+Delivered-To: plucene@localhost
+Received: by soto.kasei.com (Postfix, from userid 107)
+	id 06FC71CEAE; Wed, 16 Jun 2004 10:11:34 +0100 (BST)
+Received: from virt3s.secure-wi.com (virt3s.webintellects.com
+	[209.216.203.171])
+	by soto.kasei.com (Postfix) with ESMTP id 16C9E1CD60
+	for <plucene@kasei.com>; Wed, 16 Jun 2004 10:11:27 +0100 (BST)
+Received: from bricelap (voltaire-3-81-57-116-133.fbx.proxad.net
+	[81.57.116.133]) (authenticated bits=0)
+	by virt3s.secure-wi.com (8.12.10/8.12.10) with ESMTP id i5G9BHxU030358
+	for <plucene@kasei.com>; Wed, 16 Jun 2004 02:11:22 -0700
+Message-Id: <200406160911.i5G9BHxU030358@virt3s.secure-wi.com>
+From: "Brice Dunwoodie" <bdunwood@cylogy.com>
+To: <plucene@kasei.com>
+Date: Wed, 16 Jun 2004 11:11:37 +0200
+Organization: Cylogy, Inc.
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Office Outlook, Build 11.0.5510
+X-MimeOLE: Produced By Microsoft MimeOLE V6.00.2800.1106
+Thread-Index: AcRTge1I/v0HO4KNStiTkQRnuRB9LA==
+Subject: [Plucene] Plucene Implemented for Movable Type
+X-BeenThere: plucene@kasei.com
+X-Mailman-Version: 2.1.4
+Precedence: list
+Reply-To: bdunwood@cylogy.com
+List-Id: plucene.kasei.com
+List-Unsubscribe: <http://www.kasei.com/mailman/listinfo/plucene>,
+	<mailto:plucene-request@kasei.com?subject=unsubscribe>
+List-Archive: <http://www.kasei.com/pipermail/plucene>
+List-Post: <mailto:plucene@kasei.com>
+List-Help: <mailto:plucene-request@kasei.com?subject=help>
+List-Subscribe: <http://www.kasei.com/mailman/listinfo/plucene>,
+	<mailto:plucene-request@kasei.com?subject=subscribe>
+Sender: plucene-bounces@kasei.com
+Errors-To: plucene-bounces@kasei.com
+X-Bogosity: No, tests=bogofilter, spamicity=0.000000, version=0.15.10
+X-Spam-Checker-Version: SpamAssassin 2.70-r6188 (2004-01-17) on 
+	alibi.simon-cozens.org
+X-Spam-Status: No, hits=-4.9 required=5.0 tests=BAYES_00 autolearn=ham 
+	version=2.70-r6188
+X-Spam-Level: 
+Status: RO
+Content-Length: 910
+Lines: 34
+
+Hi Folks,
+
+Not sure if this is the appropriate place, but just wanted to thank you the
+community for the work thus far on Plucene.
+
+I have just implemented it as a search tool for Movable Type. It is working
+great.
+
+You will soon see it powering sites like www.gizmodo.com, www.gawker.com,
+www.wonkette.com, and www.cmswire.com.
+
+I did run across an issue with the Index::Writer falling over after about
+350 documents. But if I clear and reinstantiate about every 300, I was able
+to get about 20k blog posts in the the various indicies.
+
+I'll post more on that error once I have time to debug again.
+
+In the meantime thank you all very much and great job with porting Lucene.
+
+Best regards,
+Brice
+---
+Brice Dunwoodie
+Cylogy, Inc.
+bdunwood@cylogy.com
+http://www.cylogy.com
+ 
+
+
+_______________________________________________
+Plucene mailing list
+Plucene@kasei.com
+http://www.kasei.com/mailman/listinfo/plucene
+
+
+From plucene-bounces@kasei.com  Thu Jun 17 15:15:26 2004
+Received: from soto.kasei.com ([80.76.206.154])
+	by alibi.simon-cozens.org with esmtp (Exim 3.35 #1 (Debian))
+	id 1Baxfn-0005ND-00
+	for <simon@simon-cozens.org>; Thu, 17 Jun 2004 15:15:23 +0100
+Received: by soto.kasei.com (Postfix, from userid 107)
+	id 80C8E1CEDC; Thu, 17 Jun 2004 15:15:24 +0100 (BST)
+Received: from soto.kasei.com (localhost [127.0.0.1])
+	by soto.kasei.com (Postfix) with ESMTP
+	id D6B461CEB3; Thu, 17 Jun 2004 15:15:15 +0100 (BST)
+X-Original-To: plucene@localhost
+Delivered-To: plucene@localhost
+Received: by soto.kasei.com (Postfix, from userid 107)
+	id E80091CECB; Thu, 17 Jun 2004 15:15:12 +0100 (BST)
+Received: from mail.michaelchaney.com (mail.michaelchaney.com [207.65.84.68])
+	by soto.kasei.com (Postfix) with ESMTP id 439341CDF5
+	for <plucene@kasei.com>; Thu, 17 Jun 2004 15:15:11 +0100 (BST)
+Received: from pcp08698233pcs.500ash01.tn.comcast.net (fractal.trailer)
+	[69.137.114.17] 
+	by mail.michaelchaney.com with esmtp (Exim 4.20 #1 (FreeBSD))
+	id 1BaxZC-000GOD-0u; Thu, 17 Jun 2004 09:08:34 -0500
+Received: from mdchaney by fractal.trailer with local (Exim 3.35 #1 (Debian))
+	id 1Baxgs-0003Je-00
+	for <plucene@kasei.com>; Thu, 17 Jun 2004 09:16:30 -0500
+Date: Thu, 17 Jun 2004 09:16:30 -0500
+From: Michael Chaney <mdchaney@michaelchaney.com>
+To: plucene@kasei.com
+Message-ID: <20040617141630.GA12735@michaelchaney.com>
+Mail-Followup-To: plucene@kasei.com
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.3.28i
+Organization: Michael Chaney Consulting Corporation
+X-URL: http://www.michaelchaney.com/
+X-MailScanner-Information: Please see
+	http://www.michaelchaney.com/mail/spam.php for more information
+X-MailScanner: Found to be clean
+X-MailScanner-SpamCheck: not spam (whitelisted), SpamAssassin (score=-2.201,
+	required 3.5, BAYES_00 -4.90, RCVD_IN_DYNABLOCK 2.60,
+	RCVD_IN_SORBS 0.10)
+X-MailScanner-From: mdchaney@michaelchaney.com
+Subject: [Plucene] Problem with delete_term
+X-BeenThere: plucene@kasei.com
+X-Mailman-Version: 2.1.4
+Precedence: list
+List-Id: plucene.kasei.com
+List-Unsubscribe: <http://www.kasei.com/mailman/listinfo/plucene>,
+	<mailto:plucene-request@kasei.com?subject=unsubscribe>
+List-Archive: <http://www.kasei.com/pipermail/plucene>
+List-Post: <mailto:plucene@kasei.com>
+List-Help: <mailto:plucene-request@kasei.com?subject=help>
+List-Subscribe: <http://www.kasei.com/mailman/listinfo/plucene>,
+	<mailto:plucene-request@kasei.com?subject=subscribe>
+Sender: plucene-bounces@kasei.com
+Errors-To: plucene-bounces@kasei.com
+X-Bogosity: No, tests=bogofilter, spamicity=0.000000, version=0.15.10
+X-Spam-Checker-Version: SpamAssassin 2.70-r6188 (2004-01-17) on 
+	alibi.simon-cozens.org
+X-Spam-Status: No, hits=-4.8 required=5.0 tests=BAYES_00,RCVD_IN_SORBS 
+	autolearn=no version=2.70-r6188
+X-Spam-Level: 
+Status: RO
+Content-Length: 920
+Lines: 26
+
+For some reason, delete_term isn't working.  It chugs away for a few
+seconds, but ultimately the record still exists.  This is causing me
+problems, as I need to update the index in place without rebuilding it
+(it takes 3 hours to rebuild).  Here's the relevant info:
+
+      $reader->delete_term( Plucene::Index::Term->new({
+		                                 'field'=>'family_id', 'text'=>$fid}));
+
+I know that $fid is correct because it prints right above this line.
+If I run my updater, records that were supposed to be removed then added
+back in just end up in there twice.
+
+Is there something more that I need to do?  Do I have to close the
+reader before the writer starts its job?
+
+Thanks,
+Michael
+-- 
+Michael Darrin Chaney
+mdchaney@michaelchaney.com
+http://www.michaelchaney.com/
+_______________________________________________
+Plucene mailing list
+Plucene@kasei.com
+http://www.kasei.com/mailman/listinfo/plucene
+
+

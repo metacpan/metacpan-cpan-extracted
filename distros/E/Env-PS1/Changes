@@ -1,0 +1,50 @@
+ Revision history for Env-PS1 - prompt string formatter
+========================================================
+
+0.06 Tue Jun 23 2009
+     Minor bug fix release
+
+     - New Maintainer, thanks to Jaap for all the work thus far.
+     - Fix \w and \W when the current directory is $HOME (should show a tilde)
+     - work with the PS1='$(foobar)' style of command substitution
+     - check for existance of the CLICOLOR env var before using it,
+       thanks to Phil Pennock for the patch (RT #13074)
+
+0.05 Mon Nov 22 2004
+	Maintenance release
+
+     Thu Nov 18
+	- Added the interpolation of environment variables
+	- Altered escape removal a little bit
+
+     Mon Aug 30
+        - Env::PS1 is now responding "live" to CLICOLOR
+
+0.04 Tue Aug 03 2004
+	Release due to vital bug fix
+
+     Wed Jul 28
+        - Made all autosplit'ed subroutine names case-insensitive unique
+	appeared a case-insensitive filesystem could cause an infinite loop
+
+0.03 Mon Mar 29 2004
+        - Added support to tie a scalar reference
+
+     Tue Mar 23
+        - Fixed bug for platforms not supporting getpwuid()
+
+     Sat Mar 13
+        - Introduced $ENV{CLICOLOR} to switch colours on/off
+
+0.02 Wed Mar 10
+        - Added Makefile.PL - only Build.PL doesn't seem enough :(
+	- Tweaked the example script a bit
+	- Added \P{format} for proc info
+	- Added carl0s' acpi snippets
+	- Fixed customization
+
+0.01 Mon Mar 08
+        - Finished all initial features
+
+     Sun Mar 07 2004
+	- Initialised the module

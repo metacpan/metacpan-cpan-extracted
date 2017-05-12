@@ -1,0 +1,28 @@
+Env::Path presents an object-oriented interface to "path variables",
+defined as that subclass of environment variables which name an
+ordered list of filesystem elements separated by a platform-standard
+separator (typically ':' on UNIX and ';' on Windows).
+
+Of course, core Perl constructs such
+
+  $ENV{PATH} .= ":/usr/local/bin";
+
+will suffice for most uses. Env::Path is for the others; cases where
+you need to insert or remove interior path entries, strip redundancies,
+operate on a pathvar without having to know whether the current
+platform uses ":" or ";", operate on a pathvar which may have a
+different name on different platforms, etc.
+
+The OO interface is slightly unusual in that the environment variable
+is itself the object, and the constructor is Env::Path->AUTOLOAD; thus
+
+    Env::Path->MANPATH;
+
+will bless $ENV{MANPATH} into its package while leaving it otherwise
+unmodified (with the exception of possible autovivification).  Unlike
+most objects, this is a scalar and thus can have only one attribute;
+its value.
+
+In other words, Env::Path simply defines a set of methods a path
+variable may call on itself without changing the variable's value or
+other semantics.

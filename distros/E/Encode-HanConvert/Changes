@@ -1,0 +1,239 @@
+[Changes for 0.35 - Jan 27, 2009]
+
+* Converted tabs to spaces in programs and modules.
+
+* Updated Module::Install version in inc/ to 0.77.
+
+[Changes for 0.34 - Jul 17, 2007]
+
+* Corrected SIGNATURE for a mismatched META.yml entry.
+
+* Switched from ExtUtils::MakeMaker to Module::Install to better determine
+  the install site's capability to run C compilers.
+
+[Changes for 0.33 - Dec 12, 2006]
+
+* Fix a bug that b2g.pl and g2b.pl with -u flag won't set encoding correct if
+  providing file name in command line.
+
+* Fix lots of questionable pairs in b2g_map.txt.
+
+* Since some mapping in unicode and not in the range of big5/gbk, unicode
+  mappings (trad-simp and simp-trad) are maintained seperately now.
+
+* Preserve unicode character as-is if it is not in the mapping table trad-simp
+  and simp-trad.
+
+* Command line tool b2g.pl and g2b.pl speed up 3.5(-u) to 5(not -u) times.
+
+* Remove symbols and questionable pairs from unicode mapping.
+
+* Document update.
+
+____________________________________________________________________________
+[ 10742] By: autrijus                              on 2004/06/04  07:15:15
+        Log: * This be 0.31.
+             * Mitrophan points out that while b2g.pl is fixed,
+             g2b.pl still got an extra quotemeta().
+	   ! bin/g2b.pl lib/Encode/HanConvert.pm
+____________________________________________________________________________
+[ 10740] By: autrijus                              on 2004/06/03  22:02:31
+        Log: * 0.30, for real.
+             * misplaced the quotemeta(). oops.
+	   ! bin/b2g.pl bin/g2b.pl
+____________________________________________________________________________
+[ 10739] By: autrijus                              on 2004/06/03  21:52:59
+        Log: * This be 0.30.
+             * Add blibdirs and friends to MANIFEST.SKIP.
+             * Mitrophan Chin points out that "g2b.pl -p" without -u
+             breaks because of unescaped "[" in regular expressions.
+             Isn't Big5 great?
+	   ! MANIFEST.SKIP bin/b2g.pl bin/g2b.pl
+	   ! lib/Encode/HanConvert.pm
+____________________________________________________________________________
+[ 10738] By: autrijus                              on 2004/06/03  20:56:41
+        Log: * This be 0.29.
+             * Bump copyright years to 2004.
+             * Mitrophan Chin reported that g2b.pl's "-p" support
+             was backwards.	Oops.
+	   ! AUTHORS Makefile.PL README bin/b2g.pl
+	   ! bin/g2b.pl lib/Encode/HanConvert.pm
+	   ! lib/Encode/HanConvert/Perl.pm-orig
+____________________________________________________________________________
+[  7248] By: autrijus                              on 2003/07/30  03:01:38
+        Log: * This be 0.28.
+             * Tulan H. Wu pointed out that Encode::HanConvert::Perl
+             was emitting more than one chars for unicode g2b
+	     translations.
+	   ! AUTHORS lib/Encode/HanConvert.pm
+	   ! lib/Encode/HanConvert/Perl.pm-orig
+	   ! map/map2pm.pl
+____________________________________________________________________________
+[  6135] By: autrijus                              on 2003/05/27  18:55:04
+        Log: * move "=for encoding big5" further down to avoid tripping
+	       over
+             5.00503's parser. reported by statue.
+	   ! lib/Encode/HanConvert.pm
+____________________________________________________________________________
+[  5966] By: autrijus                              on 2003/05/19  06:18:31
+        Log: * This be 0.26.
+	   ! lib/Encode/HanConvert.pm
+____________________________________________________________________________
+[  5965] By: autrijus                              on 2003/05/19  06:15:34
+        Log: * applying Kogai Device to reduce memory footprint on
+	       compilation.
+	   ! Makefile.PL
+____________________________________________________________________________
+[  5846] By: autrijus                              on 2003/05/14  18:28:36
+        Log: * kcwu spotted a wrong mapping where same-character should
+	       be used.
+	   ! AUTHORS map/b2g_map.txt map/b2g_map.utf8
+____________________________________________________________________________
+[  5594] By: autrijus                              on 2003/05/04  03:56:59
+        Log: * This be 0.25.
+	   ! Makefile.PL
+____________________________________________________________________________
+[  5585] By: autrijus                              on 2003/05/03  11:28:07
+        Log: * inhibit incorrect utf8iciation of filehandles on Perl
+	       5.8.0,
+             as reported by Alan Chen.
+	   ! AUTHORS Makefile.PL lib/Encode/HanConvert.pm
+____________________________________________________________________________
+[  4090] By: autrijus                              on 2003/02/05  04:18:14
+        Log: * some more rt-inspired terminologies.
+	   ! bin/b2g.pl bin/g2b.pl
+____________________________________________________________________________
+[  3948] By: autrijus                              on 2003/01/27  23:57:50
+        Log: * last-minute typo correction.
+	   ! bin/b2g.pl
+____________________________________________________________________________
+[  3947] By: autrijus                              on 2003/01/27  23:51:34
+        Log: * This be 0.24.
+             * avoids costly eval STRING.
+	   ! lib/Encode/HanConvert.pm
+____________________________________________________________________________
+[  3946] By: autrijus                              on 2003/01/27  23:50:51
+        Log: * 5.6.x can now use -u or -p... but still not -pu.
+	   ! bin/b2g.pl bin/g2b.pl
+____________________________________________________________________________
+[  3945] By: autrijus                              on 2003/01/27  23:40:48
+        Log: * fix spotting non-utf8 map.
+	   ! lib/Encode/HanConvert/Perl.pm-orig
+	   ! map/map2pm.pl
+____________________________________________________________________________
+[  3944] By: autrijus                              on 2003/01/27  23:40:39
+        Log: * test both XS and non-XS in tests.
+	   ! t/1-basic.t
+____________________________________________________________________________
+[  3940] By: autrijus                              on 2003/01/27  23:07:06
+        Log: * proper utf8-on stuff.
+	   ! lib/Encode/HanConvert/Perl.pm-orig
+____________________________________________________________________________
+[  3939] By: autrijus                              on 2003/01/27  22:52:26
+        Log: * '/usr/bin/env perl' isn't as intuitive as
+	       '/usr/bin/perl'.
+	   ! map/map2pm.pl map/map2ucm.pl map/ucm2map.pl
+	   ! map/umap2ucm.pl
+____________________________________________________________________________
+[  3938] By: autrijus                              on 2003/01/27  22:48:39
+        Log: * the last two fixes was prompted by jedi lin.
+	   ! AUTHORS
+____________________________________________________________________________
+[  3937] By: autrijus                              on 2003/01/27  22:44:58
+        Log: * fix cases where > 5.8 but no cc available.
+             * new, correct utf8 maps.
+	   ! Makefile.PL lib/Encode/HanConvert.pm
+	   ! map/b2g_map.utf8 map/g2b_map.utf8
+	   ! map/map2pm.pl
+____________________________________________________________________________
+[  3936] By: autrijus                              on 2003/01/27  22:25:48
+        Log: * should be fixed.
+	   ! Makefile.PL
+____________________________________________________________________________
+[  3935] By: autrijus                              on 2003/01/27  22:22:08
+        Log: * add some debug for jedi
+	   ! Makefile.PL
+____________________________________________________________________________
+[  3922] By: autrijus                              on 2003/01/27  20:49:47
+        Log: * 0.23.
+             * oops, g2b.pl was broken.
+	   ! bin/b2g.pl bin/g2b.pl lib/Encode/HanConvert.pm
+____________________________________________________________________________
+[  3835] By: autrijus                              on 2003/01/25  13:43:43
+        Log: * This be 0.22.
+	   ! lib/Encode/HanConvert.pm
+____________________________________________________________________________
+[  3834] By: autrijus                              on 2003/01/25  13:41:45
+        Log: * new round of POD tweaks.
+             * -p was broken; now fixed.
+             * -p now works correctly in conjunction with -u.
+	   ! bin/b2g.pl bin/g2b.pl
+____________________________________________________________________________
+[  3817] By: autrijus                              on 2003/01/25  08:22:24
+        Log: * This be 0.21, the 'b2g.pl -u' edition.
+	   ! lib/Encode/HanConvert.pm
+____________________________________________________________________________
+[  3801] By: autrijus                              on 2003/01/24  21:18:22
+        Log: * the binmode() only makes sense to 5.8 folks.
+	   ! bin/b2g.pl bin/g2b.pl
+____________________________________________________________________________
+[  3800] By: autrijus                              on 2003/01/24  21:17:33
+        Log: * add unicode conversion capability to b2g and g2b.
+	   ! bin/b2g.pl bin/g2b.pl
+____________________________________________________________________________
+[  3665] By: autrijus                              on 2003/01/19  19:46:57
+        Log: * statue points out the perl5.003's podchecker doesn't like
+	       us.
+	   + AUTHORS
+	   ! MANIFEST bin/b2g.pl bin/g2b.pl
+____________________________________________________________________________
+[  3581] By: autrijus                              on 2003/01/16  20:18:57
+        Log: * This be 0.20, the 2003 edition.
+	   ! Makefile.PL README lib/Encode/HanConvert.pm
+	   ! lib/Encode/HanConvert/Perl.pm-orig
+____________________________________________________________________________
+[  3578] By: autrijus                              on 2003/01/16  17:39:16
+        Log: * rudimentary support for phrase-based conversion
+             via the -p switch in b2g.pl/g2b.pl.
+	   ! Makefile.PL bin/b2g.pl bin/g2b.pl
+	   ! lib/Encode/HanConvert.pm
+____________________________________________________________________________
+[  2888] By: autrijus                              on 2002/12/24  10:07:04
+        Log: * oops, missing the signature test.
+	   + t/0-signature.t
+____________________________________________________________________________
+[  2741] By: autrijus                              on 2002/12/17  14:46:39
+        Log: * doggy reported that import list is broken. whoops.
+	   ! lib/Encode/HanConvert.pm
+____________________________________________________________________________
+[  2675] By: autrijus                              on 2002/12/11  16:37:28
+        Log: * Truly 0.10 now, with broken tests temporarily suppressed.
+	   ! lib/Encode/HanConvert.pm t/1-basic.t
+____________________________________________________________________________
+[  2674] By: autrijus                              on 2002/12/11  15:44:35
+        Log: * This be version 0.10.
+             * re-written simp_to_trad and trad_to_simp routines gives
+             much better results (not routing through gbk/big5 anymore).
+	   ! lib/Encode/HanConvert.pm
+____________________________________________________________________________
+[  2673] By: autrijus                              on 2002/12/11  15:43:52
+        Log: * now directly supports 'trad-simp' and 'simp-trad'
+             .ucm files!
+	   ! MANIFEST Makefile.PL
+____________________________________________________________________________
+[  2672] By: autrijus                              on 2002/12/11  15:43:09
+        Log: * new code to directly generate utf8 simp<=>trad maps.
+	   + map/umap2ucm.pl
+____________________________________________________________________________
+[   647] By: autrijus                              on 2002/08/15  15:17:46
+        Log: * module cleanup continues.
+             * unicode map support for 5.6.0-5.7.2 perls
+             * fixed installation on dosish platforms.
+             * new test suites.
+	   + map/b2g_map.utf8 map/g2b_map.utf8 t/daode.b5u
+	   + t/daode.gbku t/daode_g.b5u t/zhengqi.b5u
+	   + t/zhengqi.gbku t/zhengqi_b.gbku
+	   - big5-simp.ucm gbk-trad.ucm
+	   ! MANIFEST Makefile.PL lib/Encode/HanConvert.pm
+	   ! lib/Encode/HanConvert/Perl.pm-orig
+	   ! map/map2pm.pl t/1-basic.t

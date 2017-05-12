@@ -1,0 +1,34 @@
+---
+abstract: 'write emails to a database, fetch them'
+author:
+  - ', 2011 Chris Nehren C<apeiron@cpan.org>.'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Email-Archive
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Carp: 0
+  DBD::SQLite: 0
+  DBI: 0
+  Email::Abstract: 0
+  Email::MIME: 0
+  File::ShareDir: 0
+  File::Slurp: 0
+  Moo: 0
+  SQL::Abstract: 0
+  autodie: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.03

@@ -1,0 +1,10 @@
+Changes
+INSTALL
+lib/Encode/IMAPUTF7.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/0-test.t
+t/1-ampersand.t
+t/ksc5601.utf
+META.yml                                 Module meta-data (added by MakeMaker)

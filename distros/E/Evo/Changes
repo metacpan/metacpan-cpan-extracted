@@ -1,0 +1,26 @@
+Revision history for Evo
+
+0.0403    2017-05-06 22:54:40+03:00 Europe/Kiev
+
+0.0402    2017-05-06 12:22:09+03:00 Europe/Kiev
+add no_method flag for Evo::Class
+Changed a behaviour when new method was generated for every class. Right now every class is a subclass of Evo::Class::Base and inherits it's "new" method
+Change behaviour of Evo::Fs::copy_dir to silentry ignore existing directories
+Improve Test::Mock
+Improve Evo::Lib::strict_opts
+Implemented Evo::Fs copy_file and copy_dir
+Breaking changes in Evo::Fs. Now every path is relative to "root" attribute
+
+0.0200    2017-01-22 07:59:47+02:00 Europe/Kiev
+Added has_dummy for Evo::Class
+Added Evo::Di->mortal
+Added Evo::Test
+Added Evo::Promise::AE
+Switch from Mojo::Promise to Evo::Promise::Mojo
+Improve documantation, make Evo::Class to be able to work with external classes by populating @ISA
+Breaking changes: the syntax of Evo::Class attributes changed (now it's very sexy)
+Improve Evo::Class for working with alien Classes
+Made promise easy to use and integrate
+A lot of code refactoring happened
+Improved Evo::Class with XS code
+Improved Evo::Lib::try with XS code

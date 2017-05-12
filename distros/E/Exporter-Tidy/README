@@ -1,0 +1,142 @@
+Exporter::Tidy
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Or use CPANPLUS to automate the process.
+
+Module documentation:
+NAME
+    Exporter::Tidy - Another way of exporting symbols
+
+SYNOPSIS
+        package MyModule::HTTP;
+        use Exporter::Tidy
+            default => [ qw(get) ],
+            other   => [ qw(post head) ];
+
+        use MyModule::HTTP qw(:all);
+        use MyModule::HTTP qw(:default post);
+        use MyModule::HTTP qw(post);
+        use MyModule::HTTP _prefix => 'http_', qw(get post);
+        use MyModule::HTTP qw(get post), _prefix => 'http_', qw(head);
+        use MyModule::HTTP
+            _prefix => 'foo', qw(get post),
+            _prefix => 'bar', qw(get head);
+
+        package MyModule::Foo;
+        use Exporter::Tidy
+            default => [ qw($foo $bar quux) ],
+            _map    => {
+                '$foo' => \$my_foo,
+                '$bar' => \$my_bar,
+                quux => sub { print "Hello, world!\n" }
+            };
+
+        package MyModule::Constants;
+        use Exporter::Tidy
+            default => [ qw(:all) ],
+            _map => {
+                FOO     => sub () { 1 },
+                BAR     => sub () { 2 },
+                OK      => sub () { 1 },
+                FAILURE => sub () { 0 }
+            };
+
+DESCRIPTION
+    This module serves as an easy, clean alternative to Exporter. Unlike
+    Exporter, it is not subclassed, but it simply exports a custom import()
+    into your namespace.
+
+    With Exporter::Tidy, you don't need to use any package global in your
+    module. Even the subs you export can be lexically scoped.
+
+  use Exporter::Tidy LIST
+    The list supplied to "use Exporter::Tidy" should be a key-value list.
+    Each key serves as a tag, used to group exportable symbols. The values
+    in this key-value list should be array references. There are a few
+    special tags:
+
+    all       If you don't provide an "all" tag yourself, Tidy::Exporter
+              will generate one for you. It will contain all exportable
+              symbols.
+
+    default   The "default" tag will be used if the user supplies no list to
+              the "use" statement.
+
+    _map      With _map you should not use an array reference, but a hash
+              reference. Here, you can rewrite symbols to other names or
+              even define one on the spot by using a reference. You can "foo
+              => 'bar'" to export "bar" if "foo" is requested.
+
+  Exportable symbols
+    Every symbol specified in a tag's array, or used as a key in _map's hash
+    is exportable.
+
+  Symbol types
+    You can export subs, scalars, arrays, hashes and typeglobs. Do not use
+    an ampersand ("&") for subs. All other types must have the proper sigil.
+
+  Importing from a module that uses Exporter::Tidy
+    You can use either a symbol name (without the sigil if it is a sub, or
+    with the appropriate sigil if it is not), or a tag name prefixed with a
+    colon. It is possible to import a symbol twice, but a symbol is never
+    exported twice under the same name, so you can use tags that overlap. If
+    you supply any list to the "use" statement, ":default" is no longer used
+    if not specified explicitly.
+
+    To avoid name clashes, it is possible to have symbols prefixed. Supply
+    "_prefix" followed by the prefix that you want. Multiple can be used.
+
+        use Some::Module qw(foo bar), _prefix => 'some_', qw(quux);
+
+    imports Some::Module::foo as foo, Some::Module::bar as bar, and
+    Some::Module::quux as some_quux. See the SYNOPSIS for more examples.
+
+COMPARISON
+    Exporter::Tidy "versus" Exporter
+
+    These numbers are valid for my Linux system with Perl 5.8.0. Your
+    mileage may vary.
+
+  Speed
+    Exporting two symbols using no import list (@EXPORT and :default) is
+    approximately 10% faster with Exporter. But if you use any tag
+    explicitly, Exporter::Tidy is more than twice as fast (!) as Exporter.
+
+  Memory usage
+     perl -le'require X; print((split " ", `cat /proc/$$/stat`)[22])'
+
+     No module       3022848
+     Exporter::Tidy  3067904
+     Exporter        3084288
+     Exporter::Heavy 3174400
+
+    Exporter loads Exporter::Heavy automatically when needed. It is needed
+    to support exporter tags, amongst other things. Exporter::Tidy has all
+    functionality built into one module.
+
+    Both Exporter(::Heavy) and Exporter::Tidy delay loading Carp until it is
+    needed.
+
+  Usage
+    Exporter is subclassed and gets its information from package global
+    variables like @EXPORT, @EXPORT_OK and %EXPORT_TAGS.
+
+    Exporter::Tidy exports an "import" method and gets its information from
+    the "use" statement.
+
+LICENSE
+    Pick your favourite OSI approved license :)
+
+    http://www.opensource.org/licenses/alphabetical
+
+AUTHOR
+    Juerd Waalboer <juerd@cpan.org> <http://juerd.nl/>
+

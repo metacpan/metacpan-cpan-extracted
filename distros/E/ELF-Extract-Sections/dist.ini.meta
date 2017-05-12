@@ -1,0 +1,52 @@
+; vim: syntax=dosini
+name    = ELF-Extract-Sections
+author  = Kent Fredric <kentnl@cpan.org>
+license = Perl_5
+copyright_holder = Kent Fredric <kentfredric@gmail.com>
+;abstract = Extract Raw Chunks of data from identifiable ELF Sections
+
+[@Author::KENTNL]
+bumpversions     = 1
+normal_form      = numify
+mantissa         = 6
+toolkit          = eumm
+toolkit_hardness = soft
+srcreadme        = mkdn
+
+; version_major = 0
+; version_minor = 2
+; version_rel_year  = 2009
+; version_rel_month = 05
+; version_rel_day   = 03
+; version_rel_hour  = 09
+; version_rel_time_zone = Pacific/Auckland
+twitter_hash_tags = #perl #cpan
+
+[CheckBin]
+command = objdump
+
+[Encoding / BinaryFiles]
+encoding = bytes
+filename = t/test_files/libc.so.6
+filename = t/test_files/libreadline.so.6.0.debug
+filename = t/test_files/libz.so
+filename = t/test_files/libz.so.1.2.3.debug
+
+[Prereqs / RuntimeRequires]
+perl                       = 5.010000
+Log::Log4perl              = 1.21
+Moose                      = 0.76
+;Moose::Role                = 0
+;MooseX::Has::Sugar         = 0.0300
+MooseX::Log::Log4perl      = 0.31
+MooseX::Types              = 0.10
+MooseX::Types::Moose       = 0.10
+;overload                   = 0
+;[PkgSuggests]
+;lib              = 0
+;[TestRequires]
+;FindBin          = 0
+;Test::More       = 0
+;Path::Class      = 0
+;YAML::XS         = 0
+;File::Find::Rule = 0

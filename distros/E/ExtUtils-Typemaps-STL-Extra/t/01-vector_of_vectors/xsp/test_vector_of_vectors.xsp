@@ -1,0 +1,9 @@
+#include "vector_of_vectors.h"
+
+%module{test_vector_of_vectors};
+
+%loadplugin{feature::default_xs_typemap};
+
+%name{test_vector_of_vectors::check_vector_of_vectors} std::vector<std::vector<double> > check_vector_of_vectors(
+	std::vector<std::vector<double> > argument);
+

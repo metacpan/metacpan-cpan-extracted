@@ -1,0 +1,5 @@
+TODO list for Perl module EO
+
+- Make EO::Error be a subclass of EO
+- rewrite the small methods of collections to make them operate directly on
+  the element list rather than using the perl equivalents

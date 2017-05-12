@@ -1,0 +1,102 @@
+commit 7f4908f6a5582160bf581ff1dcbf3f65beafd5a5
+Author: nadim khemir <nkh@cpan.org>
+Date:   Wed Feb 24 15:41:32 2010 +0100
+
+    CHANGED: removed -a from git status command
+
+commit 5ccf79dac10e525c3c3d398a33f2c2e496f97392
+Author: nadim khemir <nkh@cpan.org>
+Date:   Wed Feb 24 12:03:43 2010 +0100
+
+    FIXED: typo in test
+    FIXED: disabled perlcritic rule that does not allow camel case
+
+commit ebaff2a2e20f650d677a2a2bf3477c3734c5d1a8
+Author: nadim khemir <nadim@naquadim.(none)>
+Date:   Sun Dec 28 15:18:20 2008 +0100
+
+    ADDED: asciio diagram instead for dia diagram
+
+commit e029feed004b8c56e7379828168b443168a5476f
+Author: nadim khemir <nadim@naquadim.(none)>
+Date:   Wed Dec 17 22:47:59 2008 +0100
+
+    CHANGED: changes file is automatically generated from git log, previous
+    content was:
+    
+    0.07
+            FIXED: test fails because of unexpectedly existing module XXX,
+    	changed to more improbable name
+    
+    0.06
+            FIXED: test works with Opcode < 1.07
+            FIXED: SHARED variables in Safe more
+    
+    0.05
+            CHANGED: replace POD::Spelling with Perl::Critic policy
+    	FIXED: missing dependency
+    
+    0.04
+            CHANGED: moved start line closer to user code
+            CHANGED: POD so	ARGUMENTS and RETURN would be nicer
+            FIXED: last percents coverage
+    	CHANGED: clarified some points in the documentation
+            CHANGED: documented http://rt.cpan.org/Ticket/Display.html?id=31090
+    
+    0.03
+           COMMENT:	Major changes in this release
+           CHANGED:	default	package based on Eval::Context::Run_xx
+           ADDED: add caller's FILE and NAME to the evaluated code file name
+           ADDED: automatic package cleanup (REMOVE_PACKAGE_AFTER_EVAL)
+           ADDED: added INSTALL_VARIABLES
+           ADDED: CLEAR_PERSISTENT
+           ADDED: eval side persistent variable
+           ADDED: SAFE
+    
+    0.02
+           ADDED: INSTALL_SUBS
+
+commit 56cecfaf012c08eca1139683f020e73766d92d53
+Author: nadim khemir <nadim@naquadim.(none)>
+Date:   Wed Dec 17 22:45:17 2008 +0100
+
+    CHANGED: removed unnecessary test dependencies
+
+commit 2285e98794a066b69946718677aa9850388d1ef2
+Author: nadim khemir <nadim@naquadim.(none)>
+Date:   Wed Dec 17 22:10:46 2008 +0100
+
+    CHANGED: refactored code string to be evaluated
+    CHANGED: tests for the new code string format
+    CHANGED: Carp and die tests in Safe
+
+commit a39a7fc3f5bc2e716d8d3a8bea66758132f9df5b
+Author: nadim khemir <nadim@naquadim.(none)>
+Date:   Tue Dec 16 00:06:15 2008 +0100
+
+    FIXED: RT #41674 t/005_eval.t fails (it assumes an english locale)
+
+commit 02383a58e78aec8d2da389974ee763bfc86bb514
+Author: nadim khemir <nadim@naquadim.(none)>
+Date:   Mon Dec 15 23:56:17 2008 +0100
+
+    FIXED: Perl::Critic errors
+
+commit cc932a1010dc98c054fe50c6dc02df980a9537d2
+Author: nadim khemir <nadim@naquadim.(none)>
+Date:   Mon Dec 15 23:40:37 2008 +0100
+
+    CHANGED: use git
+    CHANGED: moved author tests to xt/author
+
+commit 51fb74a6b92551a4b2e32e9c4e0f0496f58b1f38
+Author: nadim khemir <nadim@naquadim.(none)>
+Date:   Mon Dec 15 23:04:52 2008 +0100
+
+    FIXED: test fails because of unexpectedly existing module XXX, changed to more improbable name
+
+commit aa502882a562217c9eb36319bc3fdc30cd6a6427
+Author: nadim khemir <nadim@naquadim.(none)>
+Date:   Thu Mar 6 17:41:29 2008 +0100
+
+    ADDED: files to version control

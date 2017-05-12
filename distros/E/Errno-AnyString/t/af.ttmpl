@@ -1,0 +1,37 @@
+# Inter-operation with <<< vary!!modname!!autodie,Fatal >>>, <<< modname >>> loaded <<< whenload >>> Errno::AnyString
+
+use strict;
+use warnings;
+
+<<< IF vary!!whenload!!before,after == 'after' ->>>
+BEGIN { require Errno::AnyString; };
+<<< END ->>>
+
+use Test::More;
+use Test::Exception;
+BEGIN {
+    eval 'require <<< modname >>>';
+    plan skip_all => '<<< modname >>> required' if $@;
+
+    plan tests => <<< vary!!taint ? 4 : 3 >>>;
+}
+use Test::NoWarnings;
+
+sub try_but_fail1 {
+    $! = custom_errstr("set with custom errstr");
+    return;
+}
+sub try_but_fail2 {
+    $! = 999_999_999;
+    return;
+}
+use <<< modname >>> qw/try_but_fail1 try_but_fail2/;
+
+use Errno::AnyString qw/custom_errstr register_errstr/;
+register_errstr "set with register errstr", 999_999_999;
+
+<<< IF vary!!local >>>local $!;<<< END >>>
+
+throws_ok { try_but_fail1() } qr/set with custom errstr/,   "custom errstr seen by <<< modname >>>";
+throws_ok { try_but_fail2() } qr/set with register errstr/, "register errstr seen by <<< modname >>>";
+

@@ -1,0 +1,146 @@
+v, 1.14, July 24, 1997
+
+applied patch from Andreas Koenig for 'make test' in case '.' is not
+in your PATH
+
+v, 1.13, July 17, 1997
+
+o added eg/testall script
+
+o added hashref.{c,pl} example
+
+o updated match.c with new version (kept old one as orig-match.c)
+
+o fixed bug in regex.c that showed up on linux
+
+o fixes bugs in power.c (my_argv) and uri-url.c (use "" not NULL)
+
+o we now install into $Config{privlibexp} since we ship with Perl
+
+o fixed genmake bugs introduced in 1.12_02
+
+v, 1.12_02, June 3, 1997
+
+o reworked genmake script to use MakeMaker so it'll work on Win32
+
+o ldopts, ccopts and friends will print if $0 eq '-e' otherwise assume
+  they're being called as a subroutine and return the value instead
+  
+v, 1.12_01
+
+o added alpha module Embed::Persistent
+
+v, 1.12, May 1, 1997  
+
+o added call_anon example
+
+o update examples to use new perl_eval_pv() function.
+
+o sync Embed.pm with perl5.003_94
+
+o fixed broken eg/regex.c spotted by Larry W. Virden
+
+v, 1.11, March 10, 1997  
+
+o extended test suite to test perl_destruct_level=1 with
+  a looping perl_alloc..perl_free, along with a MULTIPLICITY 
+  test. 	
+
+o extra linker args (after `--') may now include -lperl\w+ to
+  override -lperl with -lperlm, -lperld or some such
+
+v, 1.10, January 29, 1997
+
+o updated genmake to use re-worked ccopts/ldopts
+
+o $Config{ccdlflags} is now part of ldopts instead of ccopts
+
+o new scripts for building/cleaning examples
+
+o added new examples from perlembed updates:
+  eg/persistent.*
+  eg/multiplicity.c
+  eg/morethanonce.c
+
+o cleaned up existing examples to reflect recent perlembed changes
+
+o added pointer to INN and ePerl (eg/README)
+
+v, 1.09, November 29, 1996 
+
+o applied patchlet from Andreas Koenig to s/archlib/archlibexp/
+
+o updated eg/README
+
+v, 1.08, November 27, 1996 
+
+o eg/build is now a perl script, not a shell script
+
+o renamed genmake.pl to genmake so it doesn't end up in site_perl
+
+o added new examples to eg/, uri-url.c and regex.c/regex.pl
+
+o 'make clean' now cleans the t/ directory
+
+o applied patch from Sven Verdoolaege <skimo@breughel.ufsia.ac.be>
+  to remove space in perl_inc
+
+v, 1.07, July 21, 1996
+
+o renamed to ExtUtils::Embed (last name change I swear!)
+  ExtUtils::Embed will be part of the standard Perl distribution
+  as of 5.003_01
+
+o fixed typo in @EXPORT
+
+v, 1.06, July 14, 1996
+
+o applied patch from Andreas Koenig <k@anna.in-berlin.de> to fix
+  bug with NeXT systems
+
+v, 1.05, July 2, 1996
+
+o Object for accessing MakeMaker methods now blessed into 'MY' class to avoid warnings
+
+o Updated documentation a bit
+
+v, 1.04, June 17, 1996
+
+o Added perl_inc, ccflags, ccdlflags and ccopts functions
+
+o Added eg/ directory with examples from the perlembed manpage
+
+v, 1.03, June 10, 1996
+
+o Changed name from Devel::embed to ExtUtils::embed
+
+v,1.02, May 6, 1996
+
+o we now use MakeMaker's catdir()
+
+o if $] > 5.002 we add the dXSUB_SYS macro to the body of xs_init
+
+o added a copy of minimod.PL that uses Devel::embed,
+  incase someone else would like to see them share
+
+o added 'extralibs.ld' to ldopts() if found
+
+o dropped extra curlies around newXS()'s
+
+o changed the env pointer in t/embed.c's perl_parse() to NULL
+As Tim Bunce pointed out:
+A NULL means 'use the current environment'.
+
+Passing an explicit env pointer will core dump if it becomes out of date
+before it's used (e.g. a new env var is defined). The perl -d:foo mechanism
+will define a new env var.
+
+o updated documentation a bit
+
+v,1.01, April 3, 1996
+
+o Same as 1.00, but without test build junk on the tape
+
+v,1.00, April 1, 1996
+
+o Initial version

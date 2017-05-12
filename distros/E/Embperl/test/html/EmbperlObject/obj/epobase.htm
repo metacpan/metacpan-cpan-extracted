@@ -1,0 +1,34 @@
+
+[! 
+ 
+ sub new
+	{
+	my $self = shift ;
+
+	$self -> {fontsize} = 1 ;
+	}
+ 
+ sub title 
+	{ 
+	'default' ;
+	} 
+ 
+!]
+
+[- 
+$self = shift ;
+
+$self -> new ;
+-]
+
+
+ <html>
+ <head>
+ <title>Example using Objects: [+ $self -> title +]</title>
+ </head>
+ <body>
+ [- Execute ('epohead.htm') -]
+ [- Execute ('*') -]
+ [- Execute ('epofoot.htm') -]
+ </body>
+ </html>

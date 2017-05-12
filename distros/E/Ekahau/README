@@ -1,0 +1,19 @@
+# Written by Scott Gifford <gifford@umich.edu>
+# Copyright (C) 2005 The Regents of the University of Michigan.
+# See the file LICENSE included with the distribution for license
+# information.
+
+The Ekahau modules provide a Perl interface to the Ekahau Location
+Sensing System.
+
+See the perldoc for Ekahau for an overview, and the files ektest.pl
+and ektest2.pl for some sample code.
+
+For more information about the project at the University of Michigan
+that inspired this work, see:
+
+    http://www.eecs.umich.edu/~wherefid/
+
+For more information about the author, see:
+
+    http://www.suspectclass.com/~sgifford/

@@ -1,0 +1,42 @@
+EBook-FB2
+
+This package contain modules to work with files in FictionBook2 format
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc EBook::FB2
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=EBook-FB2
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/EBook-FB2
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/EBook-FB2
+
+    Search CPAN
+        http://search.cpan.org/dist/EBook-FB2/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2010 Oleksandr Tymoshenko
+
+This module is free software; you can redistribute it and/or modify it 
+under the terms of the BSD license. See the LICENSE file included with 
+this distribution.

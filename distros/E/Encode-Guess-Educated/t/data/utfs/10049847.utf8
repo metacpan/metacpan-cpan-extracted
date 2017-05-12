@@ -1,0 +1,576 @@
+
+Appl Environ Microbiol. 1999 March; 65(3): 951-960.
+PMCID: PMC91128
+Copyright © 1999, American Society for Microbiology
+Molecular Characterization of the Genes pcaG and pcaH, Encoding
+Protocatechuate 3,4-Dioxygenase, Which Are Essential for Vanillin
+Catabolism in Pseudomonas sp. Strain HR199
+Jörg Overhage,1 Andreas U. Kresse,2 Horst Priefert,1* Horst
+Sommer,3 Gerhard Krammer,3 Jürgen Rabenhorst,3 and Alexander
+Steinbüchel1
+Institut für Mikrobiologie der Westfälischen Wilhelms-Universität
+Münster, D-48149 Münster,1 G.B.F. National Research Center for
+Biotechnology, D-38124 Braunschweig,2 and Corporate Research, Haarmann
+& Reimer GmbH, D-37601 Holzminden,3 Germany
+*Corresponding author. Mailing address: Institut für Mikrobiologie,
+Westfälische Wilhelms-Universität Münster, Corrensstrasse 3, D-48149
+Münster, Germany. Phone: 49-251-8339829. Fax: 49-251-8338388. E-mail:
+priefer/at/uni-muenster.de.
+Received April 6, 1998; Accepted December 14, 1998.
+Small right arrow pointing to: This article has been cited by other
+articles in PMC.
+Abstract
+Pseudomonas sp. strain HR199 is able to utilize eugenol
+(4-allyl-2-methoxyphenol), vanillin (4-hydroxy-3-methoxybenzaldehyde),
+or protocatechuate as the sole carbon source for growth. Mutants of
+this strain which were impaired in the catabolism of vanillin but
+retained the ability to utilize eugenol or protocatechuate were
+obtained after nitrosoguanidine mutagenesis. One mutant (SK6169) was
+used as recipient of a Pseudomonas sp. strain HR199 genomic library in
+cosmid pVK100, and phenotypic complementation was achieved with a
+5.8-kbp EcoRI fragment (E58). The amino acid sequences deduced from two
+corresponding open reading frames (ORF) identified on E58 revealed high
+degrees of homology to pcaG and pcaH, encoding the two subunits of
+protocatechuate 3,4-dioxygenase. Three additional ORF most probably
+encoded a 4-hydroxybenzoate 3-hydroxylase (PobA) and two putative
+regulatory proteins, which exhibited homology to PcaQ of Agrobacterium
+tumefaciens and PobR of Pseudomonas aeruginosa, respectively. Since
+mutant SK6169 was also complemented by a subfragment of E58 that
+harbored only pcaH, this mutant was most probably lacking a functional
+β subunit of the protocatechuate 3,4-dioxygenase. Since this mutant was
+still able to grow on protocatechuate and lacked protocatechuate
+4,5-dioxygenase and protocatechuate 2,3-dioxygenase, the degradation
+had to be catalyzed by different enzymes. Two other mutants (SK6184 and
+SK6190), which were also impaired in the catabolism of vanillin, were
+not complemented by fragment E58. Since these mutants accumulated
+3-carboxy muconolactone during cultivation on eugenol, they most
+probably exhibited a defect in a step of the catabolic pathway
+following the ortho cleavage. Moreover, in these mutants cyclization of
+3-carboxymuconic acid seems to occur by a syn absolute stereochemical
+course, which is normally only observed for cis,cis-muconate
+lactonization in pseudomonads. In conclusion, vanillin is degraded
+through the ortho-cleavage pathway in Pseudomonas sp. strain HR199
+whereas protocatechuate could also be metabolized via a different
+pathway in the mutants.
+
+Vanillin (4-hydroxy-3-methoxybenzaldehyde) is an important aromatic
+flavor compound that is frequently used in flavored foods and as a
+fragrance for perfumes. Since vanillin occurs as an intermediate in the
+catabolism of phenolic stilbenes, eugenol (4-allyl-2-methoxyphenol),
+ferulate (4-hydroxy-3-methoxycinnamate), and lignin (4, 38,
+43, 45), there is widespread interest in producing it from
+natural raw materials by biotransformation (for an overview, see
+reference 16).
+We are currently investigating biotransformation processes based on the
+catabolism of eugenol by Pseudomonas sp. strain HR199, which proceeds
+via ferulate, vanillin, and vanillate (4-hydroxy-3-methoxybenzoate)
+(33). In the context of developing a biotechnological process for
+the production of vanillin, the investigation of mutants of Pseudomonas
+sp. strain HR199 which were impaired in the catabolism of vanillin was
+of particular interest. The genes encoding vanillin dehydrogenase (vdh)
+and vanillate-O-demethylase (vanA and vanB) of this strain, which
+complemented one type of vanillin-negative mutants, were characterized
+in a recent study (29). In the present study, we characterized
+additional mutants with defects in the catabolism of vanillin and
+cloned and molecularly characterized genes which are involved in
+vanillin degradation in Pseudomonas sp. strain HR199.
+
+MATERIALS AND METHODS
+
+
+Bacterial strains and plasmids.
+The Pseudomonas sp. and Escherichia coli strains and the plasmids used
+in this study are listed in Table Table1.1.
+Growth of bacteria.
+Cells of E. coli were grown at 37°C in Luria-Bertani medium (34).
+Cells of Pseudomonas sp. were grown at 30°C either in a nutrient broth
+medium (0.8%, wt/vol) or in mineral salts medium (MM) (35)
+supplemented with carbon sources as indicated in the text. Vanillin,
+vanillate, ferulate, and protocatechuate were dissolved in dimethyl
+sulfoxide and added to the medium at final concentrations of 0.1%
+(wt/vol). Eugenol was directly added to the medium at a final
+concentration of 0.1% (vol/vol). Tetracycline and kanamycin were used
+at final concentrations of 12.5 and 50 μg/ml for E. coli or 25 and 300
+μg/ml for Pseudomonas sp., respectively.
+Nitrosoguanidine mutagenesis.
+The nitrosoguanidine mutagenesis of Pseudomonas sp. strain HR199 was
+performed as described previously (29).
+Preparation of the soluble fraction of crude extracts.
+Cells were washed twice with 10 mM sodium phosphate buffer (pH 7.5),
+resuspended in twice the volume of the cell pellet, and disrupted by
+sonication with a Branson sonifier 250 apparatus (amplitude, 16 μm; 1
+min per ml of cell suspension; 20-s bursts). The soluble fraction of
+the crude extract was obtained by a 1-h centrifugation at 100, 000 × g
+and 4°C.
+Enzyme assays.
+Protocatechuate 3,4-dioxygenase activity was measured
+spectrophotometrically by monitoring the decrease of absorbancy at 290
+nm by the method of Fujisawa and Hayaishi (13). Protocatechuate
+4,5-dioxygenase (4,5-PCD) activity was measured spectrophotometrically
+by monitoring either the decrease of absorbancy at 250 nm or the
+increase of absorbancy at 410 nm by the methods described by Ono et al.
+(26). 2,3-PCD activity was measured spectrophotometrically by
+monitoring the increase of absorbancy at 350 nm by the method described
+by Wolgel and Lipscomb (51). One unit of enzyme activity was
+defined as the conversion of 1 μmol of protocatechuate per min. The
+protein concentrations were determined as described by Lowry et al.
+(24) with bovine serum albumin as the standard.
+Qualitative and quantitative determination of catabolic intermediates.
+Culture supernatants were analyzed by high-performance liquid
+chromatography (HPLC) on a Nucleosil-100 C column without prior
+extraction as described previously (29).
+Isolation and identification of 3-carboxy muconolactone.
+From a culture of mutant SK6190 grown in MM with eugenol as the sole
+carbon source, 80 ml of cell-free supernatant was prepared, which
+exhibited only one peak with a retention time of 2 min on HPLC
+analysis. This supernatant was treated by a method described for the
+isolation of β-ketoadipate (5). The pH of the culture supernatant
+was adjusted to 2.8 by addition of 2 M phosphoric acid, and the
+supernatant was then given a 20-min centrifugation at 4°C and 2,772 ×
+g. The supernatant was extracted six times with an equal volume of
+diethyl ether. The ether phases were combined, the solvent was
+evaporated, and 44.2 mg of brownish crystals was obtained.
+A sample of the isolated substance was introduced via a direct inlet
+port into a Finnigan MAT 8200 double-focusing high-resolution mass
+spectrometer. For evaporation, a temperature gradient from 20 to 400°C
+was applied. The spectrometer was operated in scan mode (electron
+impact) over a mass range from 25 to 700. Nuclear magnetic resonance
+(NMR) spectra (1H, 13C, HMQC) were obtained on a Varian VXR 400S
+spectrometer in CDOD with tetramethylsilane TMS as the internal
+standard. Standard pulse sequences supplied by the manufacturer were
+used. The infrared spectrum (KBr pellet) was measured on a Bio-Rad FTS
+40A spectrometer.
+Electrophoretic methods.
+Proteins were separated under denaturating conditions in 11.5% (wt/vol)
+polyacrylamide gels by the method of Laemmli (23) and stained with
+Serva Blue R.
+Isolation and manipulation of DNA.
+Plasmid DNA and DNA restriction fragments were isolated and analyzed by
+standard methods described in references compiled in a previous study
+(30).
+Transfer of DNA.
+Competent cells of E. coli were prepared and transformed by the CaCl
+procedure as described by Hanahan (17). Conjugations of E. coli
+S17-1 (donor) harboring hybrid plasmids and of Pseudomonas sp.
+(recipient) were performed on solidified nutrient broth medium as
+described by Friedrich et al. (12) or by a “minicomplementation
+method” on solidified MM containing 0.5% (wt/vol) gluconate as the
+carbon source and 25 μg of tetracycline per ml or 300 μg of kanamycin
+per ml, as described previously (29).
+DNA sequence determination and analysis.
+The nucleotide sequences were determined with a 4000L DNA sequencer
+(LI-COR Inc., Biotechnology Division, Lincoln, Nebr.) and a Thermo
+Sequenase fluorescence-labelled primer cycle-sequencing kit with
+7-deaza-dGTP (Amersham Life Science, Little Chalfont, United Kingdom)
+as specified by the manufacturers. The DNA sequence of E58 was
+determined by using subcloned fragments as templates and universal and
+reverse primers. Additional sequences were obtained with synthetic
+fluorescence-labelled oligonucleotides as primers, employing the
+primer-hopping strategy (41). Nucleotide and amino acid sequences
+were analyzed with the Genetics Computer Group sequence analysis
+software package (GCG Package, version 6.2, June 1990) as described by
+Devereux et al. (6).
+Chemicals.
+Restriction endonucleases, T4 DNA ligase, lambda DNA, and enzymes or
+substrates used in the enzyme assays were obtained from C. F.
+Boehringer & Soehne (Mannheim, Germany) or from GIBCO/BRL-Bethesda
+Research Laboratories GmbH (Eggenstein, Germany). Agarose type NA was
+purchased from Pharmacia-LKB (Uppsala, Sweden). Radioisotopes were from
+Amersham/Buchler (Braunschweig, Germany). Synthetic oligonucleotides
+were purchased from MWG-Biotech (Ebersberg, Germany). All other
+chemicals were from Haarmann & Reimer (Holzminden, Germany), E. Merck
+AG (Darmstadt, Germany), Fluka Chemie (Buchs, Switzerland), Serva
+Feinbiochemica (Heidelberg, Germany), or Sigma Chemie (Deisenhofen,
+Germany).
+Nucleotide sequence accession number.
+The nucleotide and amino acid sequence data reported in this paper have
+been submitted to the EMBL, GenBank, and DDBJ nucleotide sequence
+databases and are listed under accession no.
+{"type":"entrez-nucleotide","attrs":{"text":"Y18527","term_id":"488
+6551"}}Y18527.
+
+RESULTS
+
+
+Cloning of the genes involved in the vanillin degradation pathway.
+Pseudomonas sp. strain HR199 is able to grow on vanillin as the sole
+carbon source. To identify the genes which are essential for vanillin
+degradation, nitrosoguanidine-induced mutants were isolated and
+screened on solidified mineral medium containing vanillin or
+protocatechuate as the sole carbon source. Three independent mutants
+(SK6169, SK6184, and SK6190) which had lost their ability to grow on
+vanillin but were still able to grow on protocatechuate were
+identified. These mutants were not phenotypically complemented after
+conjugational reception of plasmid pE207 (29), encoding vanillin
+dehydrogenase and vanillate-O-demethylase. Since vanillin is converted
+via vanillate to protocatechuate in the wild type, the phenotype of
+these mutants was obscure.
+One of the mutants (SK6169) was chosen as the recipient for a genomic
+library of Pseudomonas sp. strain HR199 constructed in cosmid pVK100.
+In total, 1,440 transductants of E. coli S17-1 were selected on
+LB-tetracycline agar plates, and the hybrid cosmids of these strains
+were transferred to the “vanillin-negative” mutant SK6169 by
+conjugation. Two transconjugants which were complemented by the
+received hybrid cosmids and which grew again on vanillin were isolated.
+The corresponding hybrid cosmids pV372 and pV801, which occurred in
+these transconjugants, harbored a 5.8-kbp EcoRI fragment (E58) in
+addition to other EcoRI fragments of different sizes.
+Fragment E58 was isolated and ligated to EcoRI-digested pHP1014 DNA.
+After transformation of E. coli S17-1, tetracycline-resistant and
+chloramphenicol-sensitive transformants harboring fragment E58 in
+pHP1014 were used as donors in conjugation experiments with mutant
+SK6169 as the recipient. All obtained transconjugants were able to grow
+again on vanillin. E58 was also cloned in the vector pBluescript SK-,
+resulting in plasmids pSKE58-1 and pSKE58-2, which harbor fragment E58
+in opposite directions. A physical map of this fragment was obtained by
+digestion with different restriction endonucleases (Fig.
+(Fig.1).1).
+FIG. 1
+FIG. 1
+Organization of the pcaH and pcaG genes of Pseudomonas sp. strain
+HR199. (a) Physical map of fragment E58. (b) Subfragments relevant for
+complementation and heterologous expression studies. (c) Identified
+genes and ORFs of a putative 4-hydroxybenzoate (more ...)
+Subcloning of pcaH and pcaG.
+Plasmids pSKE58-1 and pSKE58-2 were digested with KpnI, and the
+resulting 1.9-kbp (EK19), 1.75-kbp (K18), and 2.15-kbp (KE22) KpnI
+fragments were cloned in pMP92. After conjugative transfer of the
+resulting plasmids from corresponding E. coli S17-1 strains to the
+“vanillin-negative” mutant SK6169, complementation was achieved only
+with fragment KE22. By subcloning of the PstI fragments of KE22 in
+pMP92 and subsequent conjugative transfer to the mutant SK6169, the
+complementing region was assigned to a 1.6-kbp KpnI-PstI (KP16)
+subfragment of KE22 (Fig. (Fig.11).
+Nucleotide sequence of fragment E58.
+The nucleotide sequence of the entire E58 fragment was determined (Fig.
+(Fig.2).2). An open reading frame (ORF) of 720 bp (ORF1), whose
+putative translational product exhibited significant homology to β
+subunits of 3,4-PCD from various other bacteria (Fig. (Fig.3)3)
+and which was therefore referred to as pcaH, was identified on fragment
+KP16. Thus, mutant SK6169 most probably lacked a functional β subunit
+of 3,4-PCD. At 12 bp downstream of the translational stop codon of pcaH
+at position 4789 (Fig. (Fig.2),2), the ATG start codon of a second
+ORF of 606 bp (ORF2) was identified, which was referred to as pcaG
+since its putative translational product exhibited significant homology
+to α subunits of 3,4-PCD (Fig. (Fig.3).3). Typical Shine-Dalgarno
+sequences, AGGAG or AGGAGG, preceded the ATG-start codons of pcaH and
+pcaG at distances of 6 or 7 nucleotides, respectively. An inverted
+repeat, which may represent a factor-dependent transcriptional
+terminator, was identified 20 bp downstream from the translational stop
+codon of pcaG (Fig. (Fig.2).2). The free energy of this structure
+is approximately -70.2 kJ/mol according to Tinoco et al. (44).
+FIG. 2
+FIG. 2
+FIG. 2
+Nucleotide sequence of fragment E58. Amino acids deduced from the
+nucleotide sequence are specified by standard one-letter abbreviations.
+The putative ribosome-binding sites are overlined and indicated by S/D.
+The position of the hairpinlike structure (more ...)
+FIG. 3
+FIG. 3
+Relationship of Pseudomonas sp. strain HR199 3,4-PCD and 3,4-PCDs from
+other sources. The dendrogram was constructed with the CLUSTAL program
+from pairwise similarity scores generated by the method of Wilbur and
+Lipman (49) with the following parameters: (more ...)
+The G+C contents of pcaG and pcaH were 62.0 and 63.9 mol%,
+respectively, and the G+C contents for the different codon positions
+corresponded well to the theoretical values calculated by the method of
+Bibb et al. (1). In addition, the codon usages of pcaH and pcaG
+were very similar to the codon usage for the vdh, vanA, and vanB genes
+of this bacterium (29). These data indicated that pcaH and pcaG
+represented coding regions and that both genes constitute an operon in
+Pseudomonas sp. strain HR199. At 117 bp upstream of pcaH, 930-bp ORF
+(ORF3) was identified, whose putative translational product exhibited
+significant homology to different regulatory proteins of the LysR
+family (Fig. (Fig.4).4). The highest homology (40.7% identical
+amino acids) was to the transcriptional activator PcaQ of the pca
+operon from Agrobacterium tumefaciens (27). Also, the putative
+translational start codon (ATG) of ORF3 at position 3010 (Fig.
+(Fig.2)2) was preceded by a putative Shine-Dalgarno sequence, and
+the sequence showed all the features typical of a coding region.
+FIG. 4
+FIG. 4
+Relationship of the amino acid sequence deduced from ORF3 from
+Pseudomonas sp. strain HR199 and four representative transcriptional
+activator proteins of the LysR family from different sources. The
+program and parameters for the construction of the dendrogram (more
+...)
+Deduced properties of the pcaH and pcaG gene products.
+The relative molecular masses of the α and β subunits of 3,4-PCD,
+calculated from the amino acid sequence deduced from pcaG and pcaH,
+were 22,364 and 26,800 Da, respectively. These values corresponded well
+to those reported for other 3,4-PCDs, e.g., 22,300 and 26,600 Da for
+the 3,4-PCD subunits from P. putida (11).
+Putative functions of the pcaH and pcaG gene products.
+The amino acid sequences deduced from pcaG and pcaH were compared with
+those collected in GenBank. The highest homology was achieved to the
+3,4-PCD of P. putida (81 and 88% identical amino acids for the α and β
+subunits, respectively). As reported for other 3,4-PCDs, there was a
+high degree of homology between the α and β subunit of this enzyme from
+Pseudomonas sp. strain HR199 (36.2% identical amino acids), which was
+also obvious at the DNA level, where the identity of the nucleotide
+sequences of pcaG and pcaH was 58%. The relationship of the α and β
+subunit of 3,4-PCD from Pseudomonas sp. strain HR199 to 3,4-PCDs from
+other sources is shown in Fig. Fig.33.
+Expression of pcaHG from Pseudomonas sp. strain HR199 in the
+“vanillin-negative” mutant SK6169, and heterologous expression in E.
+coli.
+The 2.2-kbp KpnI-EcoRI subfragment (KE22) of E58 (Fig. (Fig.1)1)
+was cloned in the vector pMP92, which was then conjugatively
+transferred from corresponding E. coli S17-1 strains to the mutant
+SK6169. This mutant was not able to grow on solidified medium with
+vanillin as the carbon source and lacked 3,4-PCD activity. Plasmid
+pMPKE22 restored the ability to grow on vanillin in the corresponding
+transconjugants. Moreover, these transconjugants exhibited 3,4-PCD
+activities comparable to the wild type (Table (Table2).2).
+The pcaHG genes were also heterologously expressed in E. coli. Fragment
+KE22 was cloned in the vectors pBluescript SK- and pBluescript KS-.
+Hybrid plasmid pKSKE22, which harbors fragment KE22 with the pcaHG
+genes colinear to and downstream of the lacZ promoter of pBluescript
+KS- DNA, conferred 3,4-PCD activity to recombinant strains of E. coli
+XL1-Blue (Table (Table2).2). After growth of this strain in the
+presence of the inducer IPTG, a 3,4-PCD activity of 0.28 U/mg of
+protein was obtained. If KE22 was ligated to pBluescript SK- DNA with
+pcaHG antilinear to the lacZ promoter, the recombinant strains of E.
+coli XL1-Blue exhibited no 3,4-PCD activity (Table (Table2).2).
+This result indicated that transcription of pcaHG in E. coli occurred
+only from the lacZ promoter and not from a promoter upstream of pcaHG,
+which might be used by the RNA polymerase holoenzyme of Pseudomonas sp.
+strain HR199.
+Identification of ORFs exhibiting homology to pobA and pobR.
+Upstream of ORF3, two additional ORFs of 882 and 1,185 bp were
+identified (Fig. (Fig.1),1), which were preceded by putative
+Shine-Dalgarno sequences (Fig. (Fig.2)2) and showed all the
+features typical of coding regions in Pseudomonas sp. strain HR199.
+Comparison of the amino acid sequences deduced from ORF4 and ORF5
+revealed extended homologies to PobR from Pseudomonas aeruginosa (49.3%
+identical amino acids) (Fig. (Fig.5)5) and to 4-hydroxybenzoate
+3-hydroxylases from different sources (Fig. (Fig.6),6),
+respectively.
+FIG. 5
+FIG. 5
+Relationship of the amino acid sequence deduced from ORF4 from
+Pseudomonas sp. strain HR199 and four representative regulatory
+proteins from different sources. The program and parameters for the
+construction of the dendrogram were the same as for Fig. (more ...)
+FIG. 6
+FIG. 6
+Relationship of the amino acid sequence deduced from ORF5 from
+Pseudomonas sp. strain HR199 with 4-hydroxybenzoate 3-hydroxylases
+(PobA) from other sources. The program and parameters for the
+construction of the dendrogram were the same as for Fig. 
+(more ...)
+Analysis of mutant SK6169, which exhibited a defective 3,4-PCD but was
+still able to grow on protocatechuate.
+The results of the genetic analysis of mutant SK6169 revealed a defect
+in the β subunit of 3,4-PCD. In consequence, this mutant lacked 3,4-PCD
+activity (Table (Table2).2). Nevertheless, it was able to grow on
+eugenol, ferulate, vanillate, or protocatechuate as the sole carbon
+source. To investigate this obscure phenotype in more detail, the
+mutant was grown in the presence of vanillin, protocatechuate, or
+vanillin plus gluconate in liquid MM. These investigations revealed
+that mutant SK6169 grew as well as the wild type on vanillin plus
+gluconate and was still able to grow on vanillin without an additional
+carbon source. However, in comparison to the wild type, the mutant grew
+only after a long lag phase of about 20 h. In contrast to the analysis
+on MM agar plates, the growth of the mutant in liquid MM with
+protocatechuate as the sole carbon source was reduced compared to the
+wild type. As revealed by HPLC analysis of culture supernatants,
+vanillin was converted to vanillate and protocatechuate by this mutant,
+which was further metabolized. In comparison to the wild type, the
+occurrence of these intermediates was retarded. To exclude the
+appearance of revertants, aliquots of the cultures were spread on
+vanillin- or protocatechuate-containing MM agar plates, respectively.
+No growth of revertants on vanillin agar plates could be observed, and
+there was no difference in the growth of the wild type and the mutant
+on protocatechuate-containing agar plates.
+Crude extracts obtained from the cells of the aforementioned cultures
+were investigated for 3,4-PCD, 4,5-PCD, and 2,3-PCD activities. None of
+these activities were detectable in the extracts of the mutant, whereas
+extracts of the wild type exhibited 3,4-PCD activity (Table
+(Table2).2). The way in which mutant SK6169 metabolized
+protocatechuate remained unknown.
+Analysis of mutants SK6184 and SK6190, which were also impaired in the
+catabolism of vanillin.
+During the nitrosoguanidine mutagenesis, mutants SK6184 and SK6190,
+which had lost their ability to grow on vanillin, vanillate, and
+ferulate but were still able to grow on eugenol or protocatechuate,
+were isolated. These mutants were not complemented by the hybrid
+cosmids pV372 and pV801 after conjugative reception. When these mutants
+were cultivated in MM with eugenol, vanillin, or protocatechuate as the
+sole carbon source, the substrates were completely converted to an
+unknown substance. To identify this product, we isolated it from the
+culture supernatant of mutant SK6190 grown in MM with eugenol. The
+light brownish crystals we obtained exhibited a blurred melting point
+of 114 to 150°C. The isolated substance was soluble in HO, methanol,
+ethyl acetate, and diethylether. Its mass spectrum showed a molecular
+ion at m/z 186. From these results along with the data obtained from
+1H NMR (four protons) and 13C NMR (seven carbon atoms) spectra and
+the infrared spectrum (OH group[s], three carbonyl bands), the
+molecular formula was found to be CHO. The 1H NMR spectrum of
+the substance showed an ABXZ spin system (J[AB] = 16.6 Hz, J[AX] = 8.0
+Hz, J[BX] = 3.2 Hz) at 2.680, 3.207, and 5.566 ppm, with an allylic
+coupling (2.1 Hz) between the X proton and the olefinic proton at 6.678
+ppm. These findings established the structure fragments shown in Fig.
+Fig.7.7. The 13C NMR spectrum showed seven signals at 173.1,
+172.6, 163.7, 160.1, 127.0 ( [pc-E00C.gif] CH) 80.6 (CH), and 37.9
+(CH) ppm. Correlations between 1H and 13C extracted from the HMQC
+spectrum are shown in Fig. Fig.7.7. Because the protons at C-3
+are diastereotopic, an asymmetrically substituted carbon atom must be
+in the direct neighborhood. C-1 must be part of a double bond with a
+quaternary carbon atom (160.1 ppm) as a partner. H-1 must be in the
+β-position to a carbonyl function because of its high shift value. The
+shift value of 80.6 ppm for C-2 indicates that it must be bonded to an
+oxygen atom. From these data, the chemical structure of the isolated
+substance could be assigned to 3-carboxy muconolactone (Fig.
+(Fig.7).7). Furthermore, the obtained spectral data are in good
+agreement with the values published by Kirby et al. (21).
+FIG. 7
+FIG. 7
+Identification of the substance accumulated by mutants SK6184 and
+SK6190 during growth on eugenol. (A) Structure fragments established by
+NMR spectroscopy: 1H-NMR data (CD3OD), δ [ppm], J [Hz]. 13C NMR shift
+values (more ...)
+Thus, the mutants SK6184 and SK6190 accumulated 3-carboxy muconolactone
+during growth on eugenol, which is most probably due to a lactonization
+of 3-carboxy-cis,cis-muconate by a syn absolute stereochemical course.
+
+DISCUSSION
+
+
+A 5.8-kbp EcoRI fragment cloned from genomic DNA of Pseudomonas sp.
+strain HR199 was found to encode proteins which are essentially
+involved in the degradation of vanillin. A “vanillin-negative” mutant
+which lacked 3,4-PCD activity was phenotypically complemented by the
+structural gene pcaH, encoding the β subunit of 3,4-PCD. The structural
+gene of the corresponding α subunit, pcaG, was localized downstream of
+pcaH. The amino acid sequences deduced from pcaH and pcaG showed
+extended homology to the 3,4-PCD from P. putida (11). pcaHG were
+expressed in E. coli driven by the lac promoter of pBluescript SK-.
+The 3,4-PCD activity was 13-fold higher than that obtained by the
+expression of pcaHG of P. putida in E. coli (11). Since the G+C
+contents and the codon bias of the pcaHG genes of Pseudomonas sp.
+strain HR199 and P. putida were very similar, it is unlikely that the
+weak expression of the P. putida genes in E. coli is due to these
+properties, as concluded by Frazee et al. (11).
+Upstream of pcaHG was an ORF which had the same orientation and whose
+deduced amino acid sequence exhibited strong homology to the
+transcriptional activator protein PcaQ from Agrobacterium tumefaciens
+(27). The region of highest homology was located in the N-terminal
+region as described by Viale et al. (47) for transcriptional
+activator proteins belonging to the LysR family, comprising the
+helix-turn-helix motif (20) for DNA binding.
+In the immediate neighborhood of the pca genes were found two ORF that
+exhibited high homologies to the pob genes responsible for
+p-hydroxybenzoate metabolism. The first ORF exhibited high homology to
+the PobR regulator protein of A. tumefaciens (28), which belongs
+to transcriptional regulator proteins of the XylS/AraC type (14).
+As also observed for the PobR regulator protein of A. tumefaciens
+(28), no homology was obtained with the transcriptional regulator
+proteins of the so-called PobR subfamily (8), which refers to PobR
+of Acinetobacter calcoaceticus. The amino acid sequence of the second
+ORF exhibited 77% identity to PobA from P. aeruginosa and P.
+fluorescens and 61% identity to PobA from Acinetobacter calcoaceticus
+and most probably resembles the typical NADPH-dependent
+4-hydroxybenzoate 3-hydroxylase of the P. aeruginosa type (36).
+In the wild-type Pseudomonas sp. strain HR199, vanillin is catabolized
+by oxidation to vanillate, which is subsequently demethylated to yield
+protocatechuate (29). Since cells grown on these substrates
+exhibited 3,4-PCD activity, the catabolism most probably proceeds via
+the ortho-cleavage pathway in this bacterium. The “vanillin-negative”
+mutant SK6169 exhibited a defect in the β subunit of 3,4-PCD, thus
+lacking the corresponding enzyme activity. Nevertheless, this mutant
+was able to grow on protocatechuate. Since cells grown on this
+substrate exhibited neither 3,4-PCD, 4,5-PCD, nor 2,3-PCD activities,
+mutant SK6169 must have another mechanism for protocatechuate
+catabolism, which might be due to activities of other ring-cleaving
+enzymes which were not covered by the applied spectrophotometric
+assays. Two other “vanillin-negative” mutants accumulated 3-carboxy
+muconolactone in the medium during growth on eugenol. The occurrence of
+this intermediate seems to be due to a lactonization of
+3-carboxy-cis,cis-muconate by a syn absolute stereochemical course.
+This kind of cyclization is observed only in fungi (25), whereas
+in bacteria the lactonization catalyzed by 3-carboxy-cis,cis-muconate
+lactonizing enzyme (CMLE) causes an anti addition (3, 50),
+resulting in 4-carboxy muconolactone as the product. In contrast, the
+lactonization of cis,cis-muconate, catalysed by the cis,cis-muconate
+lactonizing enzyme (MLE) proceeds by a syn addition (19). The
+accumulation of 3-carboxy muconolactone by the aforementioned mutants
+could be a hint that Pseudomonas sp. strain HR199 possesses an unusual
+“syn-CMLE” and that the mutants exhibited a defect in a following step
+of the degradation pathway. Another explanation would be an alteration
+of the CMLE gene by mutation, changing the “anti-CMLE” to a “syn-CMLE”
+in the mutants, resulting in the accumulation of the carboxy
+muconolactone with nonstandard regiochemical properties. Since the
+“vanillin-negative” phenotypes of the investigated mutants were due to
+defects in 3,4-PCD or in enzymes of the protocatechuate branch of the
+ortho-cleavage pathway, vanillin is degraded via this pathway in the
+wild type.
+
+
+TABLE 1
+
+
+Bacterial strains and plasmids used in this study
+Strain or plasmid Relevant characteristics Source or reference
+Pseudomonas sp. strain HR199 Wild type, eugenol positive, ferulate
+positive, vanillin positive, vanillate positive, protocatechuate
+positive DSM 7063 33
+Mutants of Pseudomonas sp. strain HR199
+SK6169 Vanillin negative, eugenol positive, ferulate positive,
+vanillate positive, protocatechuate positive This study
+SK6184 Vanillin negative, ferulate negative, vanillate negative,
+eugenol positive protocatechuate positive This study
+SK6190 Vanillin negative, ferulate negative, vanillate negative,
+eugenol positive, protocatechuate positive This study
+E. coli
+XL1-Blue recA1 endA1 gyrA96 thi hsdR17 (r[K]- m[K]+) supE44relA1,
+λ-, Lac- [F′ proAB lacIqZΔM15, Tn10(Tet)] 2
+S17-1 recA; harboring the tra genes of plasmid RP4 in the chromosome,
+proA thi-1 39
+Plasmids
+pVK100 Tcr Kmr, cosmid, broad host range 22
+pHP1014 Tcr Kmr Cmr, broad host range 31
+pMP92 Tcr, broad host range 40
+pBluescript KS- AprlacPOZ′, T and T promoter Stratagene, San
+Diego, Calif.
+pBluescript SK- AprlacPOZ′, T and T promoter Stratagene, San
+Diego, Calif.
+pE207 pVK100, harboring fragment E230 with the genes vdh, vanA, and
+vanB 29
+
+TABLE 2
+
+
+Expression of the pcaHG gene cluster of Pseudomonas sp. strain HR199 in
+the vanillin-negative mutant SK6169 and in E. colia
+Strain Plasmid (inducer)b Sp act of 3,4-PCD (U/mg)c
+Pseudomonas sp. strain HR199 0.26
+Pseudomonas mutant SK6169 <0.01
+Pseudomonas mutant SK6169 pMPKE22 0.18
+E. coli S17-1 pMP92 <0.01
+E. coli S17-1 pMPKE22 <0.01
+E. coli XL1-Blue pBluescript SK- (+ IPTG) <0.01
+E. coli XL1-Blue pBluescript KS- (+ IPTG) <0.01
+E. coli XL1-Blue pKSKE22 (- IPTG) 0.05
+E. coli XL1-Blue pKSKE22 (+ IPTG) 0.28
+E. coli XL1-Blue pSKKE22 (- IPTG) <0.01
+E. coli XL1-Blue pSKKE22 (+ IPTG) <0.01
+aCells of Pseudomonas strains were grown to the late exponential phase
+at 30°C in MM containing eugenol as a carbon source and harvested.
+Cells of recombinant strains of E. coli were grown for 12 h at 37°C in
+Luria-Bertani medium.
+bTo induce expression from the lacZ promoter, the recombinant strains
+of E. coli harboring pBluescript derivatives were cultivated in the
+presence of 1 mM IPTG.
+cThe 3,4-PCD activities were determined in soluble extracts at 30°C by
+the method of Fujisawa and Hayaishi (13) as described in Materials
+and Methods. Specific activities are given as units per milligram of
+protein.
+
+ACKNOWLEDGMENT
+
+
+H.P. and A.S. are indebted to Haarmann & Reimer GmbH for providing a
+collaborative research grant.
+

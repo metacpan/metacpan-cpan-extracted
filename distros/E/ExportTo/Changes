@@ -1,0 +1,18 @@
+Revision history for ExportTo
+
+0.03  Sun Oct 11 16:46:00 2009
+	- fix bug: 'export_to' exported 'export_to' to caller package.
+          now only 'import' exports 'export_to' to caller package.
+        - fix typo in document
+   	- add document for exporting from another package to another package.
+        - change email address
+          
+0.02  Mon Sep 4 01:03:00 2006
+        - add 'use strict'
+        - add new feature
+        - fix documentation
+        - use Module::Starter 
+
+0.01  Sat Mar 11 19:09:41 2006
+        - original version;
+

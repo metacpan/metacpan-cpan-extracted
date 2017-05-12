@@ -1,0 +1,163 @@
+0.24 2015-09-16T09:50:44+02:00
+ [Common]
+ - Fix author requires.
+
+0.23 2015-09-16T00:53:57+02:00
+ [Common]
+ - Move admin tests to xt/ directory. Thanks Karen Etheridge (#105637).
+ - Rewrite tests after t/ and xt/ split.
+ - Improve SEE ALSO section in doc.
+ - Update Module::Install to 1.16 version.
+ - Update copyright years to 2015.
+ - Update examples/ directory.
+
+0.22 2015-01-08T19:54:52+01:00
+ [Common]
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Remove ignoring of __DIE__ signal. This breaks Error::Pure::Always.
+ - Update copyright years to 2015.
+
+0.21 2014-12-07T22:51:27+01:00
+ [Error::Pure::ErrorList]
+ - Rewrite Perl program in test to $EXECUTABLE_NAME instead 'perl'. Thanks
+   Slaven Rezić (#100765)
+
+ [Error::Pure::Print]
+ - Rewrite Perl program in test to $EXECUTABLE_NAME instead 'perl'. Thanks
+   Slaven Rezić (#100765)
+
+0.20 2014-12-07T09:55:21+01:00
+ [Error::Pure::ErrorList]
+ - Fix tests added in 0.19.
+
+0.19 2014-12-07T01:13:44+01:00
+ [Common]
+ - Improve LICENSE AND COPYRIGHT section in doc.
+
+ [Error::Pure::ErrorList]
+ - Add tests for error to console.
+
+ [Error::Pure::Print]
+ - Add tests for error to console.
+
+0.18 2014-11-21T08:09:02+01:00
+ [Common]
+ - Fix minimal version of Perl.
+ - Update Module::Install to 1.14 version.
+
+ [Error::Pure::AllError]
+ - Clean code across new err_helper().
+
+ [Error::Pure::Die]
+ - Clean code across new err_helper().
+
+ [Error::Pure::Error]
+ - Clean code across new err_helper().
+
+ [Error::Pure::ErrorList]
+ - Clean code across new err_helper().
+
+ [Error::Pure::Print]
+ - Add EXAMPLE3 section to doc.
+ - Clean code across new err_helper().
+ - Code optimalization.
+ - Rewrite to use Error::Pure::Output::Text::err_print() subroutine.
+
+ [Error::Pure::PrintVar]
+ - First version.
+
+ [Error::Pure::Utils]
+ - Improve processing of messages in err_helper(). Improve doc.
+
+0.17 2014-10-09T12:41:59+02:00
+ [Common]
+ - Fix LICENSE file.
+ - Update years in LICENSE file.
+ - Update Module::Install to 1.12 version.
+
+ [Error::Pure::Output::Text]
+ - Move to independent distribution.
+
+0.16 2014-02-03
+ [Error::Pure::Utils]
+ - Rewrite err_msg() to use index value of errors. Default value of index
+   is -1 (last error).
+ - Rewrite err_msg_hr() to use index value of errors. Default value of
+   index is -1 (last_error).
+
+0.15 2013-11-13
+ - Add 'readme_from' directive to Makefile.PL.
+ - Fix die with join.
+ - Improve example in Error::Pure doc to explicit set to default
+   Error::Pure::TYPE.
+ - Rewrite B<> to C<> in doc for code.
+
+0.14 2013-10-24
+ - Add Error::Pure::Utils::err_msg() subroutine.
+ - Add Error::Pure::Utils::err_msg_hr() subroutine.
+ - Add example to Error::Pure doc.
+
+0.13 2013-09-22
+ - Fix deploing in 0.12 version :-(.
+
+0.12 2013-09-21
+ - Add modules to SEE ALSO section in doc.
+ - Fix Error::Pure::Output::Text first example in doc.
+ - Fix years in LICENSE file.
+ - Rewrite Changes file to CPAN::Changes::SPEC format.
+ - Update README.
+
+0.11 2013-06-11
+ - Add LICENSE file.
+ - Add error check for require Error::Pure module.
+ - Fix bug with File::Object in tests (from 0.10 release).
+
+0.10 2013-06-11
+ - Add Error::Pure::HTTP::* modules to SEE ALSO sections.
+ - Add SIGNATURE file.
+ - Add Test::NoWarnings to tests.
+ - Change situation with `err undef` or `err ()`. Returns 'undef' string
+   now.
+ - Fix SEE ALSO section in Error::Pure::ErrorList doc.
+ - Fix Error::Pure::Output::Text::err_bt_pretty() doc.
+ - Fix examples with err_get() in doc.
+ - Improve Error::Pure::Output::Text doc.
+ - Update examples/ directory.
+
+0.09 2012-11-12
+ - Rewrite Error::Pure::Output::Text::err_bt_pretty() to version, which
+   returns array of lines or original text with newlines.
+
+0.08 2012-06-22
+ - Fix Makefile.PL to Module::CPANTS::Analyse conformity.
+
+0.07 2012-05-16
+ - Add examples/ directory.
+
+0.06 2012-04-27
+ - Fix print for AllError output.
+ - Add test for different key=value pair in backtrace.
+ - Rewrite to new version of build system.
+
+0.05 2011-07-28
+ - Test::Pod not usable in Perl lesser then 5.8.0. (again)
+
+0.04 2011-07-19
+ - Fix situation with Test::Pod. It not usable in Perl lesser then 5.8.0.
+ - Fix links in documentation.
+ - Fix email link in documentation.
+ - Better AUTHOR section in doc.
+ - Remove obsolete ';' in code.
+ - Remove "(3pm)" from pod doc.
+
+0.03 2011-07-13
+ - Add file exist check. Fix error in abs_path('(eval)') on Windows.
+
+0.02 2011-07-12
+ - Rename module test directories to better names (':' isn't allowed on
+   window platform). PR#69402
+ - Add ACKNOWLEDGMENTS section to Error::Pure doc.
+ - Rewrite build system to Module::Install.
+
+0.01 2011-07-11
+ - First version.

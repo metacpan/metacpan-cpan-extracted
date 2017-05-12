@@ -1,0 +1,238 @@
+#!/usr/bin/perl
+#use ExtUtils::testlib;
+our $VERSION = '0.32';
+
+use 5.008;
+use strict;
+use Encode;
+use Wx;
+do 'Encode/CNMap/cnmapwx_wdr.pl';
+
+# commandline switches for cnmap and cnmapdir
+our @from_arry = qw( s t u );
+our @to_arry = qw( gb gbk b5 c cgb cb5 );
+
+package MyApp;
+use strict;
+use base qw(Wx::App);
+sub OnInit {1;}
+
+package MyDlg;
+use strict;
+use base qw(Wx::Dialog);
+use Wx qw(wxDefaultSize wxRA_SPECIFY_COLS wxRA_SPECIFY_ROWS wxOPEN wxID_CANCEL);
+use Wx::Event qw(EVT_RADIOBOX EVT_BUTTON EVT_IDLE);
+use POSIX;
+
+sub new {
+	my $this = shift;
+	$this = $this->SUPER::new( @_ );
+	::MyDlgWdr( $this );
+	$this->Center;
+	EVT_RADIOBOX( $this, $main::ID_RD_ENCODE_SRC, \&OnRadio );
+	EVT_RADIOBOX( $this, $main::ID_RD_ENCODE_DST, \&OnRadio );
+	EVT_BUTTON( $this, $main::ID_BUT_FILE_SRC, \&OnFileSrc );
+	EVT_BUTTON( $this, $main::ID_BUT_FILE_DST, \&OnFileDst );
+	EVT_BUTTON( $this, $main::ID_BUT_DIR_SRC, \&OnDirSrc );
+	EVT_BUTTON( $this, $main::ID_BUT_DIR_DST, \&OnDirDst );
+	EVT_BUTTON( $this, $main::ID_BUT_CNMAP, \&OnCNMap );
+	EVT_BUTTON( $this, $main::ID_BUT_CNMAPDIR, \&OnCNMapDir );
+	EVT_BUTTON( $this, $main::ID_BUT_STOP, \&KillMyProcess );
+	EVT_BUTTON( $this, $main::ID_BUT_QUIT, \&OnQuit );
+	EVT_IDLE( $this, \&OnIdle );
+    return $this;
+}
+
+sub DESTROY {
+	my $this = shift;
+	return unless defined $this->{tran_pipe};
+	$this->KillMyProcess;
+}
+
+sub KillMyProcess {
+	my $this = shift;
+	return unless defined $this->{tran_pipe};
+	if( $^O eq "MSWin32" ) {
+		eval { use Win32::Process; };
+		Win32::Process::KillProcess( $this->{tran_pid}, -1 ) unless $@;
+	} else {
+		kill POSIX::SIGINT, $this->{tran_pid};
+	}
+}
+
+sub GetMyChild {
+	my( $this, $key ) = @_;
+	foreach ( $this->GetChildren ) {
+		return $_ if $_->GetId == $key;
+	}
+	return undef;
+}
+
+sub OnRadio {
+	my $this = shift;
+	$this->GetMyChild($main::ID_TEXT_OPTION)->SetLabel( sprintf("option: -%s2%s",
+		$main::from_arry[ $this->GetMyChild($main::ID_RD_ENCODE_SRC)->GetSelection ],
+		$main::to_arry[ $this->GetMyChild($main::ID_RD_ENCODE_DST)->GetSelection ] ));
+}
+
+sub OnFileSrc {
+	my $this = shift;
+	my $dialog = Wx::FileDialog->new
+		( $this, "Select a source file", $this->GetMyChild($main::ID_TC_FILE_SRC)->GetValue,
+		"", "Text files (*.txt)|*.txt|All files (*.*)|*.*", wxOPEN );
+	$this->GetMyChild($main::ID_TC_FILE_SRC)->SetValue( $dialog->GetPath )
+		unless( $dialog->ShowModal == wxID_CANCEL );
+	$dialog->Destroy;
+}
+
+sub OnFileDst {
+	my $this = shift;
+	my $dialog = Wx::FileDialog->new
+		( $this, "Select a dest file", $this->GetMyChild($main::ID_TC_FILE_DST)->GetValue,
+		"", "Text files (*.txt)|*.txt|All files (*.*)|*.*", wxOPEN );
+	$this->GetMyChild($main::ID_TC_FILE_DST)->SetValue( $dialog->GetPath )
+		unless( $dialog->ShowModal == wxID_CANCEL );
+	$dialog->Destroy;
+}
+
+sub OnDirSrc {
+	my $this = shift;
+	my $dialog = Wx::DirDialog->new
+		( $this, "Select a source dir", $this->GetMyChild($main::ID_TC_DIR_SRC)->GetValue );
+	$this->GetMyChild($main::ID_TC_DIR_SRC)->SetValue( $dialog->GetPath )
+		unless( $dialog->ShowModal == wxID_CANCEL );
+	$dialog->Destroy;
+}
+
+sub OnDirDst {
+	my $this = shift;
+	my $dialog = Wx::DirDialog->new
+		( $this, "Select a dest dir", $this->GetMyChild($main::ID_TC_DIR_DST)->GetValue );
+	$this->GetMyChild($main::ID_TC_DIR_DST)->SetValue( $dialog->GetPath )
+		unless( $dialog->ShowModal == wxID_CANCEL );
+	$dialog->Destroy;
+}
+
+sub OnCNMap {
+	my $this = shift;
+
+	# Caculate cnmap parameters
+	my $cmd = sprintf("%s -%s2%s \"%s\" > \"%s\"",
+		$this->GetMyCmd("cnmap"),
+		$main::from_arry[ $this->GetMyChild($main::ID_RD_ENCODE_SRC)->GetSelection ],
+		$main::to_arry[ $this->GetMyChild($main::ID_RD_ENCODE_DST)->GetSelection ],
+		$this->GetMyChild($main::ID_TC_FILE_SRC)->GetValue,
+		$this->GetMyChild($main::ID_TC_FILE_DST)->GetValue );
+
+	# Run cnmap
+	$this->GetMyChild($main::ID_LOG)->AppendText($cmd."\n");
+	system( $this->GetMyLocalStr($cmd) );
+	$this->GetMyChild($main::ID_LOG)->AppendText("[Finish]\n");
+}
+
+sub OnCNMapDir {
+	my $this = shift;
+	if( defined( $this->{tran_pipe} ) ) {
+		$this->GetMyChild($main::ID_LOG)->AppendText("[Err] Another process is running\n");
+		return;
+	}
+
+	# Caculate cnmapdir parameters
+	my $cmd = sprintf("%s -%s2%s \"%s\" \"%s\"",
+		$this->GetMyCmd("cnmapdir"),
+		$main::from_arry[ $this->GetMyChild($main::ID_RD_ENCODE_SRC)->GetSelection ],
+		$main::to_arry[ $this->GetMyChild($main::ID_RD_ENCODE_DST)->GetSelection ],
+		$this->GetMyChild($main::ID_TC_DIR_SRC)->GetValue,
+		$this->GetMyChild($main::ID_TC_DIR_DST)->GetValue );
+
+	# Run cnmapdir
+	$this->GetMyChild($main::ID_LOG)->AppendText($cmd."\n");
+	my $mypipe;
+	$this->{tran_pid} = open($mypipe, $this->GetMyLocalStr($cmd)." |" );
+	$this->{tran_pipe} = $mypipe;
+	$this->GetMyChild($main::ID_BUT_STOP)->Enable(1);
+}
+
+sub OnIdle {
+	my $this = shift;
+	return unless defined $this->{tran_pipe};
+
+	# Read from child stdout;
+	my $mypipe = $this->{tran_pipe};
+	my $buf = "";
+	sysread( $mypipe, $buf, 8192 );
+	$this->GetMyChild($main::ID_LOG)->AppendText( $buf ) if $buf ne "";
+	
+	# Check whether the process is stopped
+	if( waitpid($this->{tran_pid}, POSIX::WNOHANG) == -1 ) {
+		$this->GetMyChild($main::ID_BUT_STOP)->Enable(0);
+		$this->GetMyChild($main::ID_LOG)->AppendText( "\n[Finish]\n" );
+		close $this->{tran_pipe};
+		undef $this->{tran_pipe};
+		undef $this->{tran_pid};
+	}
+}
+
+sub GetMyCmd {
+	my( $this, $cmdname ) = @_;
+	use File::Spec;
+	my ($volume, $dirs, $file) = File::Spec->splitpath( $0 );
+	my $cmd = File::Spec->catpath( $volume, $dirs, $cmdname.".exe" );
+	return "\"$cmd\"" if -f $cmd;
+	$cmd = File::Spec->catpath( $volume, $dirs, $cmdname );
+	return "\"$^X\" \"$cmd\"" if -f $cmd;
+}
+
+sub GetMyLocalStr {
+	my( $this, $str ) = @_;
+	return $str if $^O ne "MSWin32" or not( Encode::is_utf8( $str ) );
+	eval { use Win32::MBCS; };
+	Win32::MBCS::Utf8ToLocal($str) unless $@;
+	return $str;
+}
+
+sub OnQuit { shift->EndModal( 0 ); }
+
+package main;
+my $app = MyApp->new();
+MyDlg->new( undef, -1, "cnmapwx $VERSION" )->ShowModal;
+
+1;
+__END__
+
+=head1 NAME
+
+cnmapwx - GUI interface to cnmap and cnmapdir chinese converter
+
+=head1 SYNOPSIS
+
+cnmapwx
+
+=head1 DESCRIPTION
+
+The B<cnmapwx> utility is a GUI interface to cnmap and cnmapdir.
+
+cnmapwx is written with L<Wx> and require unicode version of WxPerl. In Win32
+platform, cnmapwx also needs L<Win32::Process> and L<Win32::MBCS>.
+
+Binary distribution for Microsoft Windows platform can be down from
+L<http://bookbot.sourceforge.net/>
+
+=head1 BUGS, REQUESTS, COMMENTS
+
+Please report any requests, suggestions or bugs via
+L<http://bookbot.sourceforge.net/>
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Encode-CNMap>
+
+=head1 SEE ALSO
+
+L<Encode::CNMap>, L<cnmap>, L<cnmapdir>, L<Encode::HanConvert>, L<Encode>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2003-2004 Qing-Jie Zhou E<lt>qjzhou@hotmail.comE<gt>
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut

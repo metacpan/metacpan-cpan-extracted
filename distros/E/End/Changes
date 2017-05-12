@@ -1,0 +1,7 @@
+Version 2009110401
++ Modernized Makefile.PL
++ Added POD and Kwalitee tests
+
+Version 2009081101
++ Created Changes.
++ Added README to MANIFEST.

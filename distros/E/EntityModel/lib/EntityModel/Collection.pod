@@ -1,0 +1,62 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with EntityModel::Collection
+at lib/EntityModel/Collection.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+EntityModel::Collection - manage entity model definitions
+
+=head1 VERSION
+
+version 0.102
+
+=head1 SYNOPSIS
+
+=head2 OPERATORS
+
+The coderef operator is overloaded by default, allowing syntax such as C< $self->(event => @data) >.
+
+=head2 each
+
+Execute the given code for each item that matches the current chain.
+
+=head2 done
+
+Supply a coderef which will be called on successful completion of the chain so far, guaranteed
+to be after any items have been processed.
+
+=head2 fail
+
+Supply a coderef which will be called on error. Default behaviour is to die().
+
+=head2 commit
+
+=head2 add_handler
+
+=head2 has_event_handlers_for
+
+Returns how many event handlers are defined for this event.
+
+=head2 has_pending
+
+Returns true if there's anything pending, false otherwise.
+
+=head2 DESTROY
+
+When we go out of scope, we want any pending actions to be applied immediately.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<EntityModel::BaseClass>
+
+L<clone|EntityModel::BaseClass/clone>, L<dump|EntityModel::BaseClass/dump>, L<new|EntityModel::BaseClass/new>, L<sap|EntityModel::BaseClass/sap>
+
+=back

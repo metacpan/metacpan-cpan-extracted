@@ -1,0 +1,38 @@
+Revision history for Email::Sender::Transport::Redirect
+
+0.005  Thu May 26 09:26:44 2016 CEST
+
+    [ENHANCEMENTS]
+
+    * Exclude email addresses from redirection (Marco Pessotto, GH #6, #7).
+
+0.0004 Fri Nov 13 09:38:44 2015 CET
+
+    [BUG FIXES]
+
+    * Fix Moo prerequisite for using scalar defaults
+      (Peter Mottram, GH #4, #5).
+
+0.0003 Wed Nov 11 09:22:16 2015 CET
+
+    [BUG FIXES]
+
+    * Fix POD coverage (Stefan Hornburg / Racke, GH #3).
+    * Run POD coverage test only on RELEASE_TESTING = 1
+      (Stefan Hornburg / Racke, GH #2).
+
+    [ENHANCEMENTS]
+
+    * Add bugtracker and IRC resources to Makefile.PL.
+    * Remove stale bugs and support section.
+
+0.0002 Mon Nov  9 15:25:11 2015 CET
+
+    [ENHANCEMENTS]
+    
+    * Port to Moo and MooX::Types::MooseLike (Peter Mottram, GH #1).
+       
+0.0001 Sat Jul 28 15:33:54 2012 CEST
+
+    * Initial release
+

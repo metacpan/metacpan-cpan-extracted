@@ -1,0 +1,43 @@
+
+[!
+
+sub title   { $epreq -> gettext ('txt:setup_dsl_title') } 
+sub condition {
+    my ($self, $r) = @_ ;
+   if ($r -> {data}{action} ne 'addslave' && $r -> {data}{action} ne 'master')
+        {
+        return 0 ;
+        }
+    $r -> {data}{inetconnect} eq 'dsl'} 
+
+!]
+
+[$ sub show $]
+
+<p>[= txt:setup_dsl1 =]</p>
+
+[#<p>[= txt:setup_dsl2 =]</p>#]
+
+
+
+[-
+$r = shift ;
+$r -> {data}{services_adsl} = 1 ;
+
+$fdat{'dsl_demand'} ||= 0  ;
+
+Embperl::MyForm -> showfields (
+
+	[
+	{ name => 'dsl_user', text => 'Benutzername/Zugangskennung', validate => [ required => 1],},
+	{ name => 'dsl_pass', text => 'Kennwort', type => 'password', validate => [ required => 1],},
+	#{ name => 'dsl_devname',   text => 'Netzwerkinterface', validate => [ required => 1],
+        #                    values => ['eth0', 'eth1', 'eth2'] },
+        #{ name => 'dsl_demand',    text => 'Verbindung bei Leerlauf abbauen',
+        #            type => 'radio', values => [0, 1], options => ['Nein', 'Ja']},
+            ]);
+-]
+
+
+[$endsub$]
+

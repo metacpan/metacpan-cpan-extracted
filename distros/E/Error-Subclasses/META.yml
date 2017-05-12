@@ -1,0 +1,19 @@
+---
+name: Error-Subclasses
+version: 0.05
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+abstract: A collection of utility exception subclasses
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Error: 0.15
+provides:
+  Error::SystemException:
+    file: lib/Error/SystemException.pm
+    version: 0.05
+generated_by: Module::Build version 0.33
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

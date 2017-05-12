@@ -1,0 +1,202 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with EntityModel::Support::Perl::Base
+at lib/EntityModel/Support/Perl/Base.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+EntityModel::Support::Perl::Base - base class for entity instances
+
+=head1 VERSION
+
+version 0.102
+
+=head1 SYNOPSIS
+
+ say $_->name foreach Entity::Thing->find({name=>'test'});
+
+=head1 DESCRIPTION
+
+All entities are derived from this base class by default.
+
+=head1 ASYNCHRONOUS HANDLING
+
+When data has not yet been loaded for an entity, some additional logic is used to allow
+asynchronous requests via chained method accessors.
+
+Given a chain $book->author->address->city, where the first three entries are regular entities
+and the last item in the chain is an accessor for a scalar method:
+
+First, we check $book to see whether it has an author yet. If the author information is loaded
+(to the extent that ->author contains an entity instance), then we can use this existing instance.
+If not, we instantiate a new entity of this type, marked as incomplete and as a pending request, and
+continue.
+
+This means that a chain where some of the elements can be null is still valid. As data is populated,
+entries in this chain will be filled out, and cases where the foreign key value was null will end up
+marked as invalid entities.
+
+In general, unless you know beforehand that all entities in the chain have been populated, all access
+to chained entities should go through the L<EntityModel::Gather> interface to ensure that values are
+consistent.
+
+This also allows the backend storage to apply optimisations if available - if several pending requests
+address related storage areas, it may be possible for the storage engine to combine queries and return
+data faster.
+
+=head1 EVENTS
+
+Two types of events can be defined:
+
+=over 4
+
+=item * task - this is a one-shot event, typically used to call a piece of code after data has been written
+to or read from storage
+
+=item * event - this is an event handler that will be called every time an event occurs.
+
+=back
+
+These are handled by the L</_queue_task> and L</_attach_event> methods respectively.
+
+=head2 new
+
+Instantiate from an ID or a pre-fabricated object (hashref).
+
+=over 4
+
+=item * Create a new, empty object:
+
+ EntityModel::Support::Perl::Base->new(1)
+
+=item * Instantiate from ID:
+
+ EntityModel::Support::Perl::Base->new(1)
+ EntityModel::Support::Perl::Base->new('123-456')
+ EntityModel::Support::Perl::Base->new([123,456])
+
+=item * Create an object and assign initial values:
+
+ EntityModel::Support::Perl::Base->new({ x => 1, y => 2 })
+
+=back
+
+Any remaining options indicate callbacks:
+
+=over 4
+
+=item * before_commit - just before commit
+
+=item * after_commit - after this has been committed to the database
+
+=item * on_load - when the data has been read from storage
+
+=item * on_not_found - when storage reports that this item is not found
+
+=back
+
+The before_XXX callbacks are also aliased to on_XXX for convenience.
+
+=head2 _queue_task
+
+Queues a new one-shot task for the given event type.
+
+Supports the following event types:
+
+=over 4
+
+=item * on_load - data has been read from storage
+
+=item * on_create - initial data has been written to storage
+
+=item * on_update - values have been updated, but not necessarily written to storage
+
+=item * on_remove - this entry has been removed from storage
+
+=item * on_not_found - could not find this entry in backend storage
+
+=back
+
+=head2 _event
+
+Pass the given event through to any defined callbacks.
+
+=head2 _spec_from_hashref
+
+Private method to generate hashref containing spec information suitable for bless to requested class,
+given a hashref which represents the keys/values for the object.
+
+This will flatten any Entity objects down to the required ID key+values.
+
+=head2 create
+
+Create a new object.
+
+Takes a hashref, and sets the flag so that ->commit does the insert.
+
+=head2 _update
+
+Write current values back to storage.
+
+=head2 _select
+
+Populate this instance with values from the database.
+
+=head2 _pending_insert
+
+Returns true if this instance is due to be committed to the database.
+
+=head2 _pending_update
+
+Returns true if this instance is due to be committed to the database.
+
+=head2 _insert
+
+Insert this instance into the db.
+
+=head2 commit
+
+Commit any pending changes to the database.
+
+=head2 revert
+
+Revert any pending changes to the database.
+
+=head2 id
+
+Primary key (id) for this instance.
+
+=head2 fromID
+
+Instantiate from an ID.
+
+=head2 remove
+
+Remove this instance from the database.
+
+=head2 _view
+
+Returns the view corresponding to this object.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<EntityModel::BaseClass>
+
+L<clone|EntityModel::BaseClass/clone>, L<dump|EntityModel::BaseClass/dump>, L<sap|EntityModel::BaseClass/sap>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <cpan@entitymodel.com>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2008-2011. Licensed under the same terms as Perl itself.

@@ -1,0 +1,13 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+bin/eol
+lib/EOL.pm
+t/00.load.t
+t/EOL.t
+t/dracula.DOS.txt
+t/pod.t

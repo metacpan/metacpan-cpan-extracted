@@ -1,0 +1,119 @@
+
+[!
+sub formname { 'myform' }
+sub form_enctype {''}
+sub on_submit { '' }
+!]
+
+[$ sub hidden $]
+    [* my $r = shift ; *]
+    <input type="hidden" name="-page" value="[+ $r -> {page} +]">
+[$ endsub $]
+
+[$ sub abort_button $]
+    [* my $r = shift ; *]
+    [$if $r -> {aborturl} $]<input type="submit" name="-abort" value="[= ctl:cancel =]" class="cStandardButton">&nbsp;&nbsp;&nbsp;[$endif$]
+[$ endsub $]
+
+[$ sub prev_button $]
+    [* my $r = shift ; *]
+    [$if $r -> {page} > 0 $]<input type="submit" name="-prev" value="&lt;&lt;[= ctl:back =]"  id="prev_button" class="cStandardButton">[$endif$]
+[$ endsub $]
+
+[$ sub next_button $]
+    [* my $r = shift ; *]
+    [$if $r -> {page} + 1 < @{$r -> {pages}} $]<input type="submit" name="-next" value="[= ctl:next =]&gt;&gt;" id="next_button" onClick="doValidate = 1" class="cStandardButton">[$endif$]
+[$ endsub $]
+
+[$ sub prevnext $]
+    [* my $r = shift ; *]
+    <p id="wizardbuttons">
+    [- $r -> abort_button -]
+    [- $r -> prev_button -]
+    [- $r -> next_button -]
+    </p>
+[$ endsub $]
+
+[$ sub after_form $]
+[$ endsub $]
+
+
+[$ sub display $]
+    [* my $r = shift ; *]
+
+    [- $formname = $r->{fields_epf_formname} = $r -> formname -]
+    <script LANGUAGE="javascript">
+    var doValidate = 0;
+
+    function setfocus_first()
+       {
+       for (var i = 0; i < document.forms['[+ $formname +]'].elements.length; i++)
+            {
+            var e = document.forms['[+ $formname +]'].elements[i] ;
+            if (e && e.type != 'hidden')
+                {
+                e.focus() ;
+                if (e.type == 'text')
+                    e.select() ;
+                break ;
+                }
+            }
+        }
+
+    function submit_on_enter (e)
+        {
+        var next = document.getElementById('next_button') ;
+        if (!next)
+            return true ;
+        
+        if (!e)
+            e = window.event ;
+        c = e.which ;
+        if (!c)
+            c = e.keyCode ;
+        if (c == 13)
+            {
+            var b = document.getElementById ('wizardbuttons') ;
+            if (b)
+                {
+                next.focus() ;
+                b.style.visibility='hidden';
+                }
+            submitvalue (document.forms['[+ $formname +]'], '-next', '1') ;
+            
+            return false ;    
+            }
+        return true ;    
+        }
+
+    document.onkeydown=submit_on_enter ;
+    window.onload=setfocus_first ;
+
+    </script>
+ 
+    <form method="post" action="[+ $r -> param -> uri +]" name="[+ $formname +]" class="cEmbperlForm" 
+	  onSubmit="v=doValidate; doValidate=0; x =((!v) || (epform_validate_[+ $formname +]() && [+ $r -> on_submit || '1' +])) ; return x "
+          enctype="[+ $r -> form_enctype +]">
+
+        [- $r -> show  -]
+    <center>
+        [- $r -> prevnext -]
+        [- 
+        delete $fdat{-page} ;
+        delete $fdat{-prev} ;
+        delete $fdat{-next} ;
+        -]
+        [- 
+        $r -> hidden ;
+        @ffld = keys %fdat ;
+        -]
+        [$ hidden $]
+    </center>
+    </form>
+
+    [- $r -> after_form -]
+
+
+[$ endsub $]
+
+

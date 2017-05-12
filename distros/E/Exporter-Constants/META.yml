@@ -1,0 +1,29 @@
+---
+abstract: 'Declare constants and export it.'
+author:
+  - 'Tokuhiro Matsuno E<lt>tokuhirom AAJKLFJEF@ GMAIL COME<gt>'
+build_requires:
+  Test::More: 0.98
+  Test::Requires: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Exporter-Constants
+no_index:
+  directory:
+    - inc
+provides:
+  Exporter::Constants:
+    file: lib/Exporter/Constants.pm
+    version: 0.03
+requires:
+  parent: 0
+  perl: 5.010001
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.03

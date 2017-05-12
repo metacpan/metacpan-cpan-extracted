@@ -1,0 +1,68 @@
+<html>
+<head>
+<title>Some tests for Embperl</title>
+</head>
+
+
+<body>
+
+[-
+
+package test::object ;
+
+sub id
+	{
+	my $self = shift ;
+	
+	return "id $self->{n}" ;
+	}
+
+sub name
+	{
+	my $self = shift ;
+	
+	return "name $self->{n}" ;
+	}
+
+sub new
+	{
+	my $class = shift ;
+	my $n     = shift ;
+	my $self  = {n=>$n} ;
+	bless $self, $class ;
+	return $self ;
+	}
+
+-]
+
+
+[-
+test::object->new (0) ;
+-]
+
+[-
+$obj[0] = 1 ;
+-]
+
+[-
+$obj[0] = test::object->new (0) ;
+
+
+
+$obj[1] = test::object->new (1) ;
+$obj[2] = test::object->new (2) ;
+$obj[3] = test::object->new (3) ;
+-]
+
+<TABLE BORDER=0 WIDTH=90%>
+	<TR>
+		[- $o = $obj[$row] -]
+		<TD>
+			<A HREF="index.html?id=[+ $o->id+]">[+$o->name+]</A>
+		</TD>
+	</TR>
+</TABLE>
+
+
+</body>
+</html>

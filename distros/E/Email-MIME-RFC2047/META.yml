@@ -1,0 +1,20 @@
+---
+abstract: 'Correct handling of non-ASCII MIME headers'
+author:
+  - 'Nick Wellnhofer <wellnhofer@aevum.de>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Email-MIME-RFC2047
+requires:
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/nwellnhof/Email-MIME-RFC2047/issues
+  repository: https://github.com/nwellnhof/Email-MIME-RFC2047.git
+version: '0.95'

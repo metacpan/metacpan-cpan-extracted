@@ -1,0 +1,64 @@
+{
+   "abstract" : "Parse and format RFC 2822 email addresses and groups",
+   "author" : [
+      "Pali <pali@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Email-Address-XS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "0",
+            "XSLoader" : "0",
+            "base" : "0",
+            "overload" : "0",
+            "perl" : "5.006000",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/pali/Email-Address-XS/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/pali/Email-Address-XS.git",
+         "web" : "https://github.com/pali/Email-Address-XS"
+      }
+   },
+   "version" : "1.00",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

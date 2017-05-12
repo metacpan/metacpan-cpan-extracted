@@ -1,0 +1,39 @@
+Perl might have started out as a text processing language, but why
+shouldn't it expand into all domains of data processing?
+
+One of the challenges of developing event driven applications is
+tweaking all your libraries to use the same event loop.  This is
+especially difficult when no standand perl event loop exists.
+
+I hereby present the Event extension.
+
+Event has been in development since April 1998.  It is known to build
+correctly on the following architectures. Most unix architectures
+should work with minor tweaking.
+
+             linux 2.2.1 ppc-linux 
+             linux 2.2.5-15 i686-linux 
+             sunos 4.1.4 sun4-sunos 
+             solaris 2.5.1 sun4-solaris
+             solaris 2.6 sun4-solaris
+             solaris 7 i86pc-solaris 
+
+* Perl 5.008 (or better) is required.
+
+* Win32 support should not be too difficult but no volunteer has
+stepped forward to take ownership.
+
+* No real additional support is needed or planned for multiple threads.
+
+Event has been tested with Insure++.
+
+Since there is only really need for a single event loop API, there is
+tentitive demand for including this extension as part of the main
+perl distribution.  Therefore, I would like to encourage everyone to
+try it out and send any feedback to the mailing list at
+perl-loop@perl.org.
+
+Thank you very much!
+
+Joshua N Pritikin
+15 Jul 1999

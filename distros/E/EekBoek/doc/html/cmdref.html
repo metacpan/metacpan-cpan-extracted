@@ -1,0 +1,764 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+ <head>
+  <title>EekBoek</title>
+    <link rel="stylesheet" href="css/site.css" type="text/css">
+      <meta name="keywords" content="boekhouden, mkb, midden- en kleinbedrijf, financi&amp;emul;n,
+                open source, boekhoudsoftware, boekhoud software,
+		boekhoudpakket, boekhoud pakket">
+  <meta name="robots" content="all">
+ </head>
+
+ <body bgcolor="#FFFFFF"
+       text="#000000" link="#0000FF"
+       vlink="#0000FF" alink="#C81900" background="images/bg.gif" >
+  <table width="100%" border="0" cellpadding="0" cellspacing="5">
+
+  <tr valign="top">
+    <td width="161" align="left">
+      <a href="index.html"><img src="images/eb.jpg" alt="EekBoek Boekhouden" border="0" width="149" height="87"></a>
+
+    </td>
+    <td>
+              <h1 class="title">EekBoek</h1>
+<div class="info">
+  Electronisch Boekhouden voor het MKB
+</div>
+
+          </td>
+  </tr>
+
+  <tr>
+    <td>
+      <a href="index.html"><img src="images/ebname.jpg" alt="EekBoek" border="0" width="151" height="22"></a>
+
+    </td>
+    <td>
+      <table width="100%" border="0" cellpadding="0" cellspacing="0">
+  <tr valign="middle">
+    <td align="left">
+      
+
+    </td>
+    <td align="right">
+      
+    </td>
+  </tr>
+</table>
+
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      <hr>
+
+    </td>
+    <td>
+      <hr>
+
+    </td>
+  </tr>
+
+  <tr valign="top">
+    <td>
+      <div class="sidemenu">
+<table border="0" cellpadding="0" cellspacing="0">
+  <tr>
+    <td align="left" class="menutitle">Documentatie
+    </td>
+  </tr>
+  <tr>
+    <td><hr>
+</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">
+      <a href="intro/index.html" class="menu">Inleiding</a>
+<br>
+<a href="install/index.html" class="menu">Installeren</a>
+<br>
+<a href="ebshell/index.html" class="menu">De EekBoek shell</a>
+<br>
+<a href="ebwxshell/index.html" class="menu">De grafische EekBoek shell</a>
+<br>
+<a href="config.html" class="menu">Configuratie</a>
+<br>
+<a href="setup/index.html" class="menu">Opzetten administratie</a>
+<br>
+<a href="bookings/index.html" class="menu">Boekingen</a>
+<br>
+<a href="reports/index.html" class="menu">Overzichten</a>
+<br>
+<a href="yearend.html" class="menu">Jaarafsluiting</a>
+<br>
+<a href="inex.html" class="menu">Import en Export</a>
+<br>
+          </td>
+  </tr>
+</table>
+</div>
+
+    </td>
+    <td>
+      eb> help adm_balans
+Het openen van een administratie kan slechts éénmaal gebeuren, vóór
+het invoeren van de eerste mutatie. Het openen van een nieuw boekjaar
+kan te allen tijde worden uitgevoerd, uiteraard maar één keer per
+boekjaar.
+
+Het openen kan een aantal opdrachten omvatten, en wordt afgesloten met
+de opdracht "adm_open". Zolang deze opdracht niet is gegeven blijft de
+administratie ongewijzigd.
+
+Mogelijke opdrachten voor openen van een boekjaar:
+
+  adm_naam "Naam van de administratie"
+  adm_btwperiode [ jaar | kwartaal | maand ]
+  adm_boekjaarcode <code>
+                Een code van max 4 letters en/of cijfers waarmee het
+		boekjaar kan worden geïdentificeerd.
+		Standaard wordt het jaartal van het boekjaar genomen.
+  adm_open
+		Alle informatie die met de bovenstaande opdrachten is
+		ingevoerd, wordt verwerkt.
+
+Opdrachten voor het openen van een administratie:
+
+  adm_naam "Naam van de administratie"
+  adm_btwperiode [ jaar | kwartaal | maand ]
+  adm_begindatum <jaar>
+		Een administratie loopt altijd van 1 januari tot en
+		met 31 december van een kalenderjaar.
+  adm_boekjaarcode <code>
+                Een code van max 4 letters en/of cijfers waarmee het
+		boekjaar kan worden geïdentificeerd.
+		Standaard wordt het jaartal van het boekjaar genomen.
+		De boekjaarcode is alleen relevant indien er meerdere
+		boekjaren in één administratie worden bijgehouden.
+  adm_balanstotaal <bedrag>
+		Als een balanstotaal is opgegeven, moeten er ook
+		openingsbalansboekingen worden uitgevoerd met een of
+                meer adm_balans opdrachten.
+  adm_balans <balansrekening> <bedrag>
+		De debet en credit boekingen moeten uiteindelijk
+		allebei gelijk zijn aan het opgegeven balanstotaal.
+		Indien er een bedrag is opgegeven voor de balansrekening
+		Crediteuren of Debiteuren, dan moet er voor dit bedrag
+		ook openstaande posten worden ingevoerd met een of
+		meer adm_relatie opdrachten.
+  adm_relatie <datum> "Omschrijving" [ crd | deb ] <code> bedrag
+		Invoeren van een openstaande post uit het voorgaande
+		boekjaar.
+  adm_open
+		Alle informatie die met de bovenstaande opdrachten is
+		ingevoerd, wordt verwerkt.
+eb> help adm_balanstotaal
+Het openen van een administratie kan slechts éénmaal gebeuren, vóór
+het invoeren van de eerste mutatie. Het openen van een nieuw boekjaar
+kan te allen tijde worden uitgevoerd, uiteraard maar één keer per
+boekjaar.
+
+Het openen kan een aantal opdrachten omvatten, en wordt afgesloten met
+de opdracht "adm_open". Zolang deze opdracht niet is gegeven blijft de
+administratie ongewijzigd.
+
+Mogelijke opdrachten voor openen van een boekjaar:
+
+  adm_naam "Naam van de administratie"
+  adm_btwperiode [ jaar | kwartaal | maand ]
+  adm_boekjaarcode <code>
+                Een code van max 4 letters en/of cijfers waarmee het
+		boekjaar kan worden geïdentificeerd.
+		Standaard wordt het jaartal van het boekjaar genomen.
+  adm_open
+		Alle informatie die met de bovenstaande opdrachten is
+		ingevoerd, wordt verwerkt.
+
+Opdrachten voor het openen van een administratie:
+
+  adm_naam "Naam van de administratie"
+  adm_btwperiode [ jaar | kwartaal | maand ]
+  adm_begindatum <jaar>
+		Een administratie loopt altijd van 1 januari tot en
+		met 31 december van een kalenderjaar.
+  adm_boekjaarcode <code>
+                Een code van max 4 letters en/of cijfers waarmee het
+		boekjaar kan worden geïdentificeerd.
+		Standaard wordt het jaartal van het boekjaar genomen.
+		De boekjaarcode is alleen relevant indien er meerdere
+		boekjaren in één administratie worden bijgehouden.
+  adm_balanstotaal <bedrag>
+		Als een balanstotaal is opgegeven, moeten er ook
+		openingsbalansboekingen worden uitgevoerd met een of
+                meer adm_balans opdrachten.
+  adm_balans <balansrekening> <bedrag>
+		De debet en credit boekingen moeten uiteindelijk
+		allebei gelijk zijn aan het opgegeven balanstotaal.
+		Indien er een bedrag is opgegeven voor de balansrekening
+		Crediteuren of Debiteuren, dan moet er voor dit bedrag
+		ook openstaande posten worden ingevoerd met een of
+		meer adm_relatie opdrachten.
+  adm_relatie <datum> "Omschrijving" [ crd | deb ] <code> bedrag
+		Invoeren van een openstaande post uit het voorgaande
+		boekjaar.
+  adm_open
+		Alle informatie die met de bovenstaande opdrachten is
+		ingevoerd, wordt verwerkt.
+eb> help adm_begindatum
+Het openen van een administratie kan slechts éénmaal gebeuren, vóór
+het invoeren van de eerste mutatie. Het openen van een nieuw boekjaar
+kan te allen tijde worden uitgevoerd, uiteraard maar één keer per
+boekjaar.
+
+Het openen kan een aantal opdrachten omvatten, en wordt afgesloten met
+de opdracht "adm_open". Zolang deze opdracht niet is gegeven blijft de
+administratie ongewijzigd.
+
+Mogelijke opdrachten voor openen van een boekjaar:
+
+  adm_naam "Naam van de administratie"
+  adm_btwperiode [ jaar | kwartaal | maand ]
+  adm_boekjaarcode <code>
+                Een code van max 4 letters en/of cijfers waarmee het
+		boekjaar kan worden geïdentificeerd.
+		Standaard wordt het jaartal van het boekjaar genomen.
+  adm_open
+		Alle informatie die met de bovenstaande opdrachten is
+		ingevoerd, wordt verwerkt.
+
+Opdrachten voor het openen van een administratie:
+
+  adm_naam "Naam van de administratie"
+  adm_btwperiode [ jaar | kwartaal | maand ]
+  adm_begindatum <jaar>
+		Een administratie loopt altijd van 1 januari tot en
+		met 31 december van een kalenderjaar.
+  adm_boekjaarcode <code>
+                Een code van max 4 letters en/of cijfers waarmee het
+		boekjaar kan worden geïdentificeerd.
+		Standaard wordt het jaartal van het boekjaar genomen.
+		De boekjaarcode is alleen relevant indien er meerdere
+		boekjaren in één administratie worden bijgehouden.
+  adm_balanstotaal <bedrag>
+		Als een balanstotaal is opgegeven, moeten er ook
+		openingsbalansboekingen worden uitgevoerd met een of
+                meer adm_balans opdrachten.
+  adm_balans <balansrekening> <bedrag>
+		De debet en credit boekingen moeten uiteindelijk
+		allebei gelijk zijn aan het opgegeven balanstotaal.
+		Indien er een bedrag is opgegeven voor de balansrekening
+		Crediteuren of Debiteuren, dan moet er voor dit bedrag
+		ook openstaande posten worden ingevoerd met een of
+		meer adm_relatie opdrachten.
+  adm_relatie <datum> "Omschrijving" [ crd | deb ] <code> bedrag
+		Invoeren van een openstaande post uit het voorgaande
+		boekjaar.
+  adm_open
+		Alle informatie die met de bovenstaande opdrachten is
+		ingevoerd, wordt verwerkt.
+eb> help adm_boekjaarcode
+Het openen van een administratie kan slechts éénmaal gebeuren, vóór
+het invoeren van de eerste mutatie. Het openen van een nieuw boekjaar
+kan te allen tijde worden uitgevoerd, uiteraard maar één keer per
+boekjaar.
+
+Het openen kan een aantal opdrachten omvatten, en wordt afgesloten met
+de opdracht "adm_open". Zolang deze opdracht niet is gegeven blijft de
+administratie ongewijzigd.
+
+Mogelijke opdrachten voor openen van een boekjaar:
+
+  adm_naam "Naam van de administratie"
+  adm_btwperiode [ jaar | kwartaal | maand ]
+  adm_boekjaarcode <code>
+                Een code van max 4 letters en/of cijfers waarmee het
+		boekjaar kan worden geïdentificeerd.
+		Standaard wordt het jaartal van het boekjaar genomen.
+  adm_open
+		Alle informatie die met de bovenstaande opdrachten is
+		ingevoerd, wordt verwerkt.
+
+Opdrachten voor het openen van een administratie:
+
+  adm_naam "Naam van de administratie"
+  adm_btwperiode [ jaar | kwartaal | maand ]
+  adm_begindatum <jaar>
+		Een administratie loopt altijd van 1 januari tot en
+		met 31 december van een kalenderjaar.
+  adm_boekjaarcode <code>
+                Een code van max 4 letters en/of cijfers waarmee het
+		boekjaar kan worden geïdentificeerd.
+		Standaard wordt het jaartal van het boekjaar genomen.
+		De boekjaarcode is alleen relevant indien er meerdere
+		boekjaren in één administratie worden bijgehouden.
+  adm_balanstotaal <bedrag>
+		Als een balanstotaal is opgegeven, moeten er ook
+		openingsbalansboekingen worden uitgevoerd met een of
+                meer adm_balans opdrachten.
+  adm_balans <balansrekening> <bedrag>
+		De debet en credit boekingen moeten uiteindelijk
+		allebei gelijk zijn aan het opgegeven balanstotaal.
+		Indien er een bedrag is opgegeven voor de balansrekening
+		Crediteuren of Debiteuren, dan moet er voor dit bedrag
+		ook openstaande posten worden ingevoerd met een of
+		meer adm_relatie opdrachten.
+  adm_relatie <datum> "Omschrijving" [ crd | deb ] <code> bedrag
+		Invoeren van een openstaande post uit het voorgaande
+		boekjaar.
+  adm_open
+		Alle informatie die met de bovenstaande opdrachten is
+		ingevoerd, wordt verwerkt.
+eb> help adm_btwperiode
+Het openen van een administratie kan slechts éénmaal gebeuren, vóór
+het invoeren van de eerste mutatie. Het openen van een nieuw boekjaar
+kan te allen tijde worden uitgevoerd, uiteraard maar één keer per
+boekjaar.
+
+Het openen kan een aantal opdrachten omvatten, en wordt afgesloten met
+de opdracht "adm_open". Zolang deze opdracht niet is gegeven blijft de
+administratie ongewijzigd.
+
+Mogelijke opdrachten voor openen van een boekjaar:
+
+  adm_naam "Naam van de administratie"
+  adm_btwperiode [ jaar | kwartaal | maand ]
+  adm_boekjaarcode <code>
+                Een code van max 4 letters en/of cijfers waarmee het
+		boekjaar kan worden geïdentificeerd.
+		Standaard wordt het jaartal van het boekjaar genomen.
+  adm_open
+		Alle informatie die met de bovenstaande opdrachten is
+		ingevoerd, wordt verwerkt.
+
+Opdrachten voor het openen van een administratie:
+
+  adm_naam "Naam van de administratie"
+  adm_btwperiode [ jaar | kwartaal | maand ]
+  adm_begindatum <jaar>
+		Een administratie loopt altijd van 1 januari tot en
+		met 31 december van een kalenderjaar.
+  adm_boekjaarcode <code>
+                Een code van max 4 letters en/of cijfers waarmee het
+		boekjaar kan worden geïdentificeerd.
+		Standaard wordt het jaartal van het boekjaar genomen.
+		De boekjaarcode is alleen relevant indien er meerdere
+		boekjaren in één administratie worden bijgehouden.
+  adm_balanstotaal <bedrag>
+		Als een balanstotaal is opgegeven, moeten er ook
+		openingsbalansboekingen worden uitgevoerd met een of
+                meer adm_balans opdrachten.
+  adm_balans <balansrekening> <bedrag>
+		De debet en credit boekingen moeten uiteindelijk
+		allebei gelijk zijn aan het opgegeven balanstotaal.
+		Indien er een bedrag is opgegeven voor de balansrekening
+		Crediteuren of Debiteuren, dan moet er voor dit bedrag
+		ook openstaande posten worden ingevoerd met een of
+		meer adm_relatie opdrachten.
+  adm_relatie <datum> "Omschrijving" [ crd | deb ] <code> bedrag
+		Invoeren van een openstaande post uit het voorgaande
+		boekjaar.
+  adm_open
+		Alle informatie die met de bovenstaande opdrachten is
+		ingevoerd, wordt verwerkt.
+eb> help adm_naam
+Het openen van een administratie kan slechts éénmaal gebeuren, vóór
+het invoeren van de eerste mutatie. Het openen van een nieuw boekjaar
+kan te allen tijde worden uitgevoerd, uiteraard maar één keer per
+boekjaar.
+
+Het openen kan een aantal opdrachten omvatten, en wordt afgesloten met
+de opdracht "adm_open". Zolang deze opdracht niet is gegeven blijft de
+administratie ongewijzigd.
+
+Mogelijke opdrachten voor openen van een boekjaar:
+
+  adm_naam "Naam van de administratie"
+  adm_btwperiode [ jaar | kwartaal | maand ]
+  adm_boekjaarcode <code>
+                Een code van max 4 letters en/of cijfers waarmee het
+		boekjaar kan worden geïdentificeerd.
+		Standaard wordt het jaartal van het boekjaar genomen.
+  adm_open
+		Alle informatie die met de bovenstaande opdrachten is
+		ingevoerd, wordt verwerkt.
+
+Opdrachten voor het openen van een administratie:
+
+  adm_naam "Naam van de administratie"
+  adm_btwperiode [ jaar | kwartaal | maand ]
+  adm_begindatum <jaar>
+		Een administratie loopt altijd van 1 januari tot en
+		met 31 december van een kalenderjaar.
+  adm_boekjaarcode <code>
+                Een code van max 4 letters en/of cijfers waarmee het
+		boekjaar kan worden geïdentificeerd.
+		Standaard wordt het jaartal van het boekjaar genomen.
+		De boekjaarcode is alleen relevant indien er meerdere
+		boekjaren in één administratie worden bijgehouden.
+  adm_balanstotaal <bedrag>
+		Als een balanstotaal is opgegeven, moeten er ook
+		openingsbalansboekingen worden uitgevoerd met een of
+                meer adm_balans opdrachten.
+  adm_balans <balansrekening> <bedrag>
+		De debet en credit boekingen moeten uiteindelijk
+		allebei gelijk zijn aan het opgegeven balanstotaal.
+		Indien er een bedrag is opgegeven voor de balansrekening
+		Crediteuren of Debiteuren, dan moet er voor dit bedrag
+		ook openstaande posten worden ingevoerd met een of
+		meer adm_relatie opdrachten.
+  adm_relatie <datum> "Omschrijving" [ crd | deb ] <code> bedrag
+		Invoeren van een openstaande post uit het voorgaande
+		boekjaar.
+  adm_open
+		Alle informatie die met de bovenstaande opdrachten is
+		ingevoerd, wordt verwerkt.
+eb> help adm_open
+Het openen van een administratie kan slechts éénmaal gebeuren, vóór
+het invoeren van de eerste mutatie. Het openen van een nieuw boekjaar
+kan te allen tijde worden uitgevoerd, uiteraard maar één keer per
+boekjaar.
+
+Het openen kan een aantal opdrachten omvatten, en wordt afgesloten met
+de opdracht "adm_open". Zolang deze opdracht niet is gegeven blijft de
+administratie ongewijzigd.
+
+Mogelijke opdrachten voor openen van een boekjaar:
+
+  adm_naam "Naam van de administratie"
+  adm_btwperiode [ jaar | kwartaal | maand ]
+  adm_boekjaarcode <code>
+                Een code van max 4 letters en/of cijfers waarmee het
+		boekjaar kan worden geïdentificeerd.
+		Standaard wordt het jaartal van het boekjaar genomen.
+  adm_open
+		Alle informatie die met de bovenstaande opdrachten is
+		ingevoerd, wordt verwerkt.
+
+Opdrachten voor het openen van een administratie:
+
+  adm_naam "Naam van de administratie"
+  adm_btwperiode [ jaar | kwartaal | maand ]
+  adm_begindatum <jaar>
+		Een administratie loopt altijd van 1 januari tot en
+		met 31 december van een kalenderjaar.
+  adm_boekjaarcode <code>
+                Een code van max 4 letters en/of cijfers waarmee het
+		boekjaar kan worden geïdentificeerd.
+		Standaard wordt het jaartal van het boekjaar genomen.
+		De boekjaarcode is alleen relevant indien er meerdere
+		boekjaren in één administratie worden bijgehouden.
+  adm_balanstotaal <bedrag>
+		Als een balanstotaal is opgegeven, moeten er ook
+		openingsbalansboekingen worden uitgevoerd met een of
+                meer adm_balans opdrachten.
+  adm_balans <balansrekening> <bedrag>
+		De debet en credit boekingen moeten uiteindelijk
+		allebei gelijk zijn aan het opgegeven balanstotaal.
+		Indien er een bedrag is opgegeven voor de balansrekening
+		Crediteuren of Debiteuren, dan moet er voor dit bedrag
+		ook openstaande posten worden ingevoerd met een of
+		meer adm_relatie opdrachten.
+  adm_relatie <datum> "Omschrijving" [ crd | deb ] <code> bedrag
+		Invoeren van een openstaande post uit het voorgaande
+		boekjaar.
+  adm_open
+		Alle informatie die met de bovenstaande opdrachten is
+		ingevoerd, wordt verwerkt.
+eb> help adm_relatie
+Het openen van een administratie kan slechts éénmaal gebeuren, vóór
+het invoeren van de eerste mutatie. Het openen van een nieuw boekjaar
+kan te allen tijde worden uitgevoerd, uiteraard maar één keer per
+boekjaar.
+
+Het openen kan een aantal opdrachten omvatten, en wordt afgesloten met
+de opdracht "adm_open". Zolang deze opdracht niet is gegeven blijft de
+administratie ongewijzigd.
+
+Mogelijke opdrachten voor openen van een boekjaar:
+
+  adm_naam "Naam van de administratie"
+  adm_btwperiode [ jaar | kwartaal | maand ]
+  adm_boekjaarcode <code>
+                Een code van max 4 letters en/of cijfers waarmee het
+		boekjaar kan worden geïdentificeerd.
+		Standaard wordt het jaartal van het boekjaar genomen.
+  adm_open
+		Alle informatie die met de bovenstaande opdrachten is
+		ingevoerd, wordt verwerkt.
+
+Opdrachten voor het openen van een administratie:
+
+  adm_naam "Naam van de administratie"
+  adm_btwperiode [ jaar | kwartaal | maand ]
+  adm_begindatum <jaar>
+		Een administratie loopt altijd van 1 januari tot en
+		met 31 december van een kalenderjaar.
+  adm_boekjaarcode <code>
+                Een code van max 4 letters en/of cijfers waarmee het
+		boekjaar kan worden geïdentificeerd.
+		Standaard wordt het jaartal van het boekjaar genomen.
+		De boekjaarcode is alleen relevant indien er meerdere
+		boekjaren in één administratie worden bijgehouden.
+  adm_balanstotaal <bedrag>
+		Als een balanstotaal is opgegeven, moeten er ook
+		openingsbalansboekingen worden uitgevoerd met een of
+                meer adm_balans opdrachten.
+  adm_balans <balansrekening> <bedrag>
+		De debet en credit boekingen moeten uiteindelijk
+		allebei gelijk zijn aan het opgegeven balanstotaal.
+		Indien er een bedrag is opgegeven voor de balansrekening
+		Crediteuren of Debiteuren, dan moet er voor dit bedrag
+		ook openstaande posten worden ingevoerd met een of
+		meer adm_relatie opdrachten.
+  adm_relatie <datum> "Omschrijving" [ crd | deb ] <code> bedrag
+		Invoeren van een openstaande post uit het voorgaande
+		boekjaar.
+  adm_open
+		Alle informatie die met de bovenstaande opdrachten is
+		ingevoerd, wordt verwerkt.
+eb> help balans
+Print de balansrekening.
+
+Opties:
+  <geen>          Balans op grootboekrekening
+  --verdicht      Verdicht, gedetailleerd
+  --detail=N      Verdicht, mate van detail N = 0, 1 of 2
+  --per=XXX       Selecteer einddatum
+  --boekjaar=XX   Selecteer boekjaar
+eb> help boekjaar
+Gebruik voor navolgende opdrachten het opgegeven boekjaar.
+
+  boekjaar <code>
+eb> help btwaangifte
+Print de BTW aangifte.
+
+  btwaangifte [ opties ] [ periode ]
+
+Aangifteperiode kan zijn:
+
+  j jaar       het gehele jaar
+  k1 k2 k3 k4  1e/2e/3e/4e kwartaal (ook: q1, ...)
+  1 2 3 ... jan feb ... januari ...  maand
+
+Standaard is de eerstvolgende periode waarover nog geen aangifte is
+gedaan.
+
+Opties:
+
+  --definitief  de BTW periode wordt afgesloten. Er zijn geen boekingen
+                in deze periode meer mogelijk.
+                Uit historische overwegingen kan dit ook door het
+                woord "definitief" achter de opdracht te plaatsen.
+
+Zie verder "help rapporten" voor algemene informatie over aan te maken
+rapporten.
+eb> help dagboeken
+Print een lijstje van beschikbare dagboeken.
+eb> help dump_schema
+Reproduceert het schema van de huidige database en schrijft deze naar
+standaard uitvoer.
+
+  dump_schema
+eb> help fortis
+Toevoegen boekstuk in dagboek Fortis (dagboek 5, type Bank).
+
+  fortis[:nr] [ <datum> ] "Omschrijving"    gevolgd door een of meer:
+    std [ <datum> ] "Omschrijving" <bedrag> <rekening> -- gewone betaling
+    crd [ <datum> ] <code> <bedrag>                    -- betaling van crediteur
+    deb [ <datum> ] <code> <bedrag>                    -- betaling van debiteur
+eb> help grootboek
+Print het Grootboek, of een selectie daaruit.
+
+  grootboek [ <rek> ... ]
+
+Opties:
+
+  --detail=N            -- mate van detail, N=0,1,2 (standaard is 2)
+  --periode=XXX         -- alleen over deze periode
+eb> help inkopen
+Toevoegen boekstuk in dagboek Inkopen (dagboek 1, type Inkoop).
+
+  inkopen[:nr] [ <datum> ] <crediteur> "Omschrijving" <bedrag> [ <rekening> ]
+eb> help jaareinde
+Sluit het boekjaar af. De BTW rekeningen worden afgeboekt, en de
+winst/verlies wordt verrekend met de daartoe aangewezen
+balansrekening.
+
+  jaareinde [ opties ]
+
+Opties:
+
+  --boekjaar=XXX   Sluit het opgegeven boekjaar af
+  --definitief     Sluit het boekjaar definitief af. Er zijn dan geen
+                   boekingen meer mogelijk.
+  --verwijder      Verwijder een tentatieve jaarafsluiting.
+eb> help journaal
+Print journaalposten.
+
+  journaal all           -- alle posten
+  journaal <id>          -- alleen boekstuknummer met dit id
+  journaal <dagboek>     -- alle journaalposten van dit dagboek
+  journaal <dagboek>:<n> -- boekstuk n van dit dagboek
+  journaal               -- journaalposten van de laatste boeking
+
+Opties
+
+  --[no]detail           -- mate van detail, standaard is met details
+  --totaal               -- alleen het totaal (detail = 0)
+  --periode=XXX          -- alleen over deze periode
+
+Zie verder "help rapporten" voor algemene informatie over aan te maken
+rapporten.
+eb> help kas
+Toevoegen boekstuk in dagboek Kas (dagboek 4, type Kas).
+
+  kas[:nr] [ <datum> ] "Omschrijving"    gevolgd door een of meer:
+    std [ <datum> ] "Omschrijving" <bedrag> <rekening> -- gewone betaling
+    crd [ <datum> ] <code> <bedrag>                    -- betaling van crediteur
+    deb [ <datum> ] <code> <bedrag>                    -- betaling van debiteur
+eb> help memoriaal
+Toevoegen boekstuk in dagboek Memoriaal (dagboek 8, type Memoriaal).
+
+  memoriaal[:nr] [ <datum> ] "Omschrijving"    gevolgd door een of meer:
+    std [ <datum> ] "Omschrijving" <bedrag> <rekening> -- gewone betaling
+    crd [ <datum> ] <code> <bedrag>                    -- betaling van crediteur
+    deb [ <datum> ] <code> <bedrag>                    -- betaling van debiteur
+eb> help openstaand
+Toont een overzicht van openstaande posten.
+
+  openstaand [ opties ]
+
+Opties:
+
+  --per XXX      t/m einddatum  ***WERKT NOG NIET***
+
+Zie verder "help rapporten" voor algemene informatie over aan te maken
+rapporten.
+eb> help periodes
+De volgende periode-aanduidingen zijn mogelijk:
+
+   2005-04-01 - 2005-07-31
+   01-04-2005 - 31-07-2005
+   01-04 - 31-07-2005
+   01-04 - 31-07  (vooropgesteld dat het boekjaar 2005 is)
+   1 april 2005 - 31 juli 2005 (en varianten)
+   1 apr 2005 - 31 jul 2005 (en varianten)
+   apr - jul
+   k2  (tweede kwartaal)
+   april 2003 (01-04-2003 - 30-04-2003)
+   april  (01-04 - 30-04 boekjaar)
+   m4  (vierde maand)
+   jaar (gehele boekjaar)
+eb> help postbank
+Toevoegen boekstuk in dagboek Postbank (dagboek 3, type Bank).
+
+  postbank[:nr] [ <datum> ] "Omschrijving"    gevolgd door een of meer:
+    std [ <datum> ] "Omschrijving" <bedrag> <rekening> -- gewone betaling
+    crd [ <datum> ] <code> <bedrag>                    -- betaling van crediteur
+    deb [ <datum> ] <code> <bedrag>                    -- betaling van debiteur
+eb> help proefensaldibalans
+Print de Proef- en Saldibalans.
+
+Opties:
+  <geen>        Proef- en Saldibalans op grootboekrekening
+  --verdicht    verdicht, gedetailleerd
+  --detail=N    verdicht, mate van detail N = 0, 1 of 2
+eb> help rapporten
+Alle rapport-producerende opdrachten kennen de volgende opties:
+
+  --periode=XXX   De periode waarover de rapportage moet plaatsvinden.
+                  (Niet voor elke opdracht relevant.)
+                  Zie "help periodes" voor details.
+  --output=XXX    Produceer het rapport in dit bestand
+                  Uitvoertype is afhankelijk van bestandsextensie, b.v.
+                  xx.html levert HTML, xx.txt een tekstbestand,
+                  xx.csv een CSV, etc.
+  --gen-XXX       Forceer uitvoertype (html, csv, text, ...)
+                  Afhankelijk van de beschikbare uitvoertypes zijn ook
+                  de kortere opties --html, --csv en --text toegestaan.
+		  (Let op: --gen-XXX, niet --gen=XXX)
+  --page=NNN      Paginagrootte voor tekstrapporten.
+eb> help relatie
+Aanmaken een of meer nieuwe relaties.
+
+  relatie [ opties ] { <code> "Omschrijving" <rekening> } ...
+
+Opties:
+
+  --dagboek=XXX  -- selecteer dagboek voor deze relatie
+  --btw=XXX      -- BTW type: normaal, verlegd, intra, extra
+                    *** BTW type 'verlegd' wordt nog niet ondersteund ***
+                    *** BTW type 'intra' wordt nog niet geheel ondersteund ***
+eb> help result
+Print de resultatenrekening.
+
+Opties:
+  <geen>           Resultatenrekening op grootboekrekening
+  --verdicht       Verdicht, gedetailleerd
+  --detail=N       Verdicht, mate van detail N = 0, 1 of 2
+  --periode=XXX    Selecteer periode
+  --boekjaar=XX    Selecteer boekjaar
+eb> help toon
+Toon een boekstuk in tekst- of commando-vorm.
+
+  toon [opties] <boekstuk>
+
+Opties:
+
+  --boekjaar XXX  selekteer boekjaar
+  --verbose       toon in uitgebreide (tekst) vorm
+  --btw           vermeld altijd BTW codes
+  --bsknr         vermeld altijd het boekstuknummer (default)
+eb> help verkopen
+Toevoegen boekstuk in dagboek Verkopen (dagboek 2, type Verkoop).
+
+  verkopen[:nr] [ <datum> ] <debiteur> "Omschrijving" <bedrag> [ <rekening> ]
+eb> help verwijder
+Verwijdert een boekstuk. Het boekstuk mag niet in gebruik zijn.
+
+  verwijder [ <opties> ] <boekstuk>
+
+Opties:
+
+  --boekjaar XXX    selekteer boekjaar
+
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      <hr>
+
+    </td>
+    <td>
+      <hr>
+
+    </td>
+  </tr>
+
+  <tr valign="bottom">
+    <td valign="middle">
+      <a href="http://www.perl.org/"><img src="images/perl_powered.png" alt="Powered by Perl" border="0" width="134" height="48"></a>
+    </td>
+    <td align="center">
+      <p style="float:right;margin-top:0pt">
+      <img src="images/valid-html401.png" alt="[Valid HTML 4.01 Transitional]" border="0" width="88" height="31">
+
+      <img src="images/validcss.png" alt="[Valid CSS]" border="0" width="88" height="31">
+
+      </p>
+      <p class="info">Copyright &copy; 2005-2010 <a href="http://www.squirrel.nl">Squirrel Consultancy</a>. All Rights Reserved.<br />
+Deze site is gemaakt met de 
+<a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
+Site Builder</a>.<br />
+cmdref.html laatste aanpassing 09 december 2005, 18:16:47
+</p>
+
+    </td>
+  </tr>
+
+</table>
+
+ </body>
+</html>

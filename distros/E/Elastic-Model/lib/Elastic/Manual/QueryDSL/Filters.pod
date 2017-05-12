@@ -1,0 +1,518 @@
+package Elastic::Manual::QueryDSL::Filters;
+
+# ABSTRACT: Overview of the filters available in Elasticsearch
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Elastic::Manual::QueryDSL::Filters - Overview of the filters available in Elasticsearch
+
+=head1 VERSION
+
+version 0.52
+
+=head1 INTRODUCTION
+
+Filters are pretty self explanatory. We present some of the most common filters
+below.  To understand more about what filters are available, and how they work,
+you should read the about the Query DSL on
+L<http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl.html> and, optionally,
+the L<ElasticSearch::SearchBuilder> syntax. All examples will be given
+first in the SearchBuilder syntax (with C<filterb()>), then in the native Query DSL.
+
+=head1 USING FILTERS ON ANALYZED TEXT FIELDS
+
+It is important to remember that filters work on exact values.  So
+C<"Foo"> will not match C<"FOO">.
+
+While you can use a filter on an analyzed text field, you need to filter on
+the actual terms that are stored in that field.  For instance, if the
+attribute value is: C<"A quick Brown FOX">, it might be analyzed to the terms
+C<['quick','brown','fox']>.  Filtering on C<"Brown"> will not work. You need
+to use the actual term: C<"brown"> instead.
+
+Alternatively, if you need the analysis phase, you can
+L<use a query as a filter|/Using a query as a filter>.
+
+=head1 COMMONLY USED FILTERS
+
+=head2 Equality
+
+=over
+
+=item SearchBuilder:
+
+    # WHERE status = 'active'
+    $view->filterb( status => 'active' );
+
+    # WHERE count = 5
+    $view->filterb( count  => 5 );
+
+    # WHERE tags IN ('perl','python')
+    $view->filterb( tags  => [ 'perl', 'python' ]);
+
+See L<ElasticSearch::SearchBuilder/EQUALITY (FILTERS)>.
+
+=item QueryDSL:
+
+    # WHERE status = 'active'
+    $view->filter(  term   => { status => 'active' } );
+
+    # WHERE count = 5
+    $view->filter(  term   => { count => 5 );
+
+    # WHERE tags IN ('perl','python')
+    $view->filter(  terms => { tag => ['perl', 'python' ]})
+
+See L<http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-term-filter.html>
+and L<http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-terms-filter.html>.
+
+=back
+
+=head2 Range
+
+=over
+
+=item SearchBuilder:
+
+    # WHERE date BETWEEN '2012-01-01' AND '2013-01-01'
+    $view->filterb(
+        date   => {
+            gte => '2012-01-01',
+            lt  => '2013-01-01'
+        }
+    );
+
+See L<ElasticSearch::SearchBuilder/RANGES>
+
+=item QueryDSL:
+
+    # WHERE date BETWEEN '2012-01-01' AND '2013-01-01'
+    $view->filter(
+        range => {
+            date => {
+                gte => '2012-01-01',
+                lt  => '2013-01-01'
+            }
+        }
+    );
+
+See L<http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-range-filter.html>
+
+=back
+
+=head2 And, Or and Not
+
+=over
+
+=item SearchBuilder:
+
+See L<ElasticSearch::SearchBuilder/ANDE<verbar>OR LOGIC>
+
+=over
+
+=item And
+
+    # WHERE status = 'active' AND count > 5
+    $view->filterb( status => 'active', count  => { gt => 5 } );
+
+=item Or
+
+    # WHERE status = 'active' OR count > 5
+    $view->filterb([ status => 'active', count  => { gt => 5 } ]);
+
+=item Not
+
+    # WHERE status <> 'active'
+    $view->filterb( status => { '!=' => 'active' });
+
+    # WHERE tags NOT IN ('perl','python')
+    $view->filterb( tags   => { '!=' => ['perl', 'python'] });
+
+    # WHERE NOT ( x = 1 AND y = 2 )
+    $view->filterb( -not   => { x => 1, y => 2 });
+
+    # WHERE NOT ( x = 1 OR y = 2 )
+    $view->filterb( -not   => [ x => 1, y => 2 ]);
+
+=back
+
+=item QueryDSL:
+
+=over
+
+=item And
+
+    # WHERE status = 'active' AND count > 5
+    $view->filter(
+        and => [
+            { term => { status => 'active'   }},
+            { range => { count  => { gt => 5 }}}
+        ]
+    );
+
+See L<http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-and-filter.html>
+
+=item Or
+
+    # WHERE status = 'active' OR count > 5
+    $view->filter(
+        or => [
+            { term => { status => 'active'   }},
+            { range => { count  => { gt => 5 }}}
+        ]
+    );
+
+See L<http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-or-filter.html>
+
+=item Not
+
+    # WHERE status <> 'active'
+    $view->filter(  not    => { term => { status => 'active' }});
+
+    # WHERE tags NOT IN ('perl','python')
+    $view->filter(  not  => { terms => { tags => ['perl', 'python'] }});
+
+    # WHERE NOT ( x = 1 AND y = 2 )
+    $view->filter(
+        not => {
+            and => [
+                { term => { x => 1 }},
+                { term => { y => 2 }}
+            ]
+        }
+    );
+
+    # WHERE NOT ( x = 1 OR y = 2 )
+    $view->filter(
+        not => {
+            or => [
+                { term => { x => 1 }},
+                { term => { y => 2 }}
+            ]
+        }
+    );
+
+See L<http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-not-filter.html>
+
+=back
+
+=back
+
+=head2 Exists and  Missing
+
+=over
+
+=item SearchBuilder:
+
+    # WHERE status IS NULL
+    $view->filterb( -missing => 'status' );
+    $view->filterb( status => undef );
+
+    # WHERE status IS NOT NULL
+    $view->filterb( -exists => 'status' );
+
+See L<ElasticSearch::SearchBuilder/MISSING OR NULL VALUES>.
+
+=item QueryDSL:
+
+    # WHERE status IS NULL
+    $view->filter(  missing  => { field => 'status' });
+
+    # WHERE status IS NOT NULL
+    $view->filter(  exists  => { field => 'status' });
+
+See L<http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-missing-filter.html>
+and L<http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-exists-filter.html>.
+
+=back
+
+=head2 Prefix
+
+B<Warning:> The prefix filter does not peform well.  First it has to load all
+terms into memory to find those that begin with the prefix. Then it searches on all
+of those terms.
+
+If you find yourself wanting to use a prefix filter, then you should rather
+use the L<edge_ngram token filter|http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/analysis-edgengram-tokenfilter.html>
+to prepare your field correctly for partial matching (eg C<"ABC"> becomes
+C<"A">, C<"AB">, C<"ABC">), and use simple L</Equality> instead.
+
+=over
+
+=item SearchBuilder
+
+    # WHERE code LIKE 'XYZ_%'
+    $view->filterb( code => { '^'    => 'XYZ_' });
+    $view->filterb( code => { prefix => 'XYZ_' });
+
+See L<ElasticSearch::SearchBuilder/PREFIX (FILTERS)>.
+
+=item Query DSL
+
+    # WHERE code LIKE 'XYZ_%'
+    $view->filter( prefix => { code => 'XYZ_' });
+
+See L<http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-prefix-filter.html>.
+
+=back
+
+=head2 Geolocation
+
+=over
+
+=item SearchBuilder:
+
+    # where "point" is less than 50km from (lat:10, lon:5)
+    $view->filterb(
+        point => {
+            -geo_distance => {
+                location  => { lat => 10, lon => 5 },
+                distance  => '50km'
+            }
+        }
+    );
+
+See:
+
+=over
+
+=item *
+
+Geo-distance:
+L<ElasticSearch::SearchBuilder/-geo_distance E<verbar> -not_geo_distance>
+
+=item *
+
+Geo-distance ranges:
+L<ElasticSearch::SearchBuilder/-geo_distance_range E<verbar> -not_geo_distance_range>.
+
+=item *
+
+Geo-bounding boxes:
+L<ElasticSearch::SearchBuilder/-geo_bounding_box E<verbar> -geo_bbox E<verbar> -not_geo_bounding_box E<verbar> -not_geo_bbox>.
+
+=item *
+
+Geo-polygons:
+L<ElasticSearch::SearchBuilder/-geo_polygon E<verbar> -not_geo_polygon>.
+
+=back
+
+=item QueryDSL:
+
+    $view->filter(
+        geo_distance => {
+            distance => '50km',
+            point    => { lat => 10, lon => 5 }
+        }
+    );
+
+See:
+
+=over
+
+=item *
+
+Geo-distance:
+L<http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-geo-distance-filter.html>
+
+=item *
+
+Geo-distance ranges:
+L<http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-geo-distance-range-filter.html>.
+
+=item *
+
+Geo-bounding boxes:
+L<http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-geo-bounding-box-filter.html>.
+
+=item *
+
+Geo-polygons:
+L<http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-geo-polygon-filter.html>.
+
+=back
+
+=back
+
+=head2 Types, IDs and Elastic::Model::UID
+
+=over
+
+=item SearchBuilder
+
+    # WHERE doc.id = 1
+    $view->filterb( _id => 1 );
+
+    # WHERE doc.id IN (1,2,3)
+    $view->filterb( _id => [1,2,3] );
+
+    # WHERE doc.id in (1,2,3) AND doc.type in ('user','post')
+    $view->filterb( _id => [1,2,3], _type => ['user','post'] );
+
+Assuming that a document has an Elastic::Doc attribute C<user>:
+
+    # WHERE user_id = 1
+    $view->filterb( 'user.uid.id' => 1 );
+
+    # WHERE user_type = 'user'
+    $view->filterb( 'user.uid.type' => 'user' );
+
+=item Query DSL
+
+    # WHERE doc.id = 1
+    $view->filter( term => { _id => 1 } );
+
+    # WHERE doc.id IN (1,2,3)
+    $view->filter( terms => { _id => [1,2,3] });
+
+    # WHERE doc.id in (1,2,3) AND doc.type in ('user','post')
+    $view->filter(
+        and => [
+            { terms => { _id   => [1,2,3] }},
+            { terms => { _type => ['user','post'] }}
+        ]
+    );
+
+Assuming that a document has an Elastic::Doc attribute C<user>:
+
+    # WHERE user_id = 1
+    $view->filter( term => { 'user.uid.id' => 1 });
+
+    # WHERE user_type = 'user'
+    $view->filter( term => { 'user.uid.type' => 'user' });
+
+=back
+
+=head2 Scripts
+
+Script filters can be written in mvel, groovy, javascript, python or java.
+See L<http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/modules-scripting.html>.
+Scripts can be useful, but they do have a performance impact, so consider
+whether you really need a script, or whether you could achieve your
+goals by indexing a field differently.
+
+B<Note:> Mvel is deprecated and will be removed in Elasticsearch 1.4. In
+Elasticsearch 1.2 and above it is disabled by default. The new
+default scripting language is Groovy.
+
+See L<http://www.elasticsearch.org/blog/scripting/> for more.
+
+=over
+
+=item SearchBuilder
+
+    $view->filterb(
+        -script => {
+            script => "doc['foo'].value > minimum",
+            params => { minimum => 5 },
+            lang   => 'groovy'
+        }
+    );
+
+See L<ElasticSearch::SearchBuilder/-script>.
+
+=item QueryDSL
+
+    $view->filter(
+        script => {
+            script => "doc['foo'].value > minimum",
+            params => { minimum => 5 },
+            lang   => 'groovy'
+        }
+    );
+
+See L<http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-script-filter.html>
+
+=back
+
+=head2 Using a query as a filter
+
+If you need to use a query as a filter (ie it can do full text matching, but
+won't be scored), you can embed a query in a filter:
+
+=over
+
+=item SearchBuilder
+
+    # WHERE status = 'active' AND matches(title, 'perl python')
+    $view->filterb(
+        status  => 'active',
+        -query  => { title => 'perl python' }
+    );
+
+See L<ElasticSearch::SearchBuilder/QUERY E<sol> FILTER CONTEXT>.
+
+=item QueryDSL
+
+    # WHERE status = 'active' AND matches(title, 'perl python')
+    $view->filter(
+        and => [
+            { term => { status => 'active' }},
+            { query => {
+                text => {
+                    title => 'perl python'
+                }
+            }}
+        ]
+    );
+
+See L<http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-query-filter.html>.
+
+=back
+
+=head2 Parent-child filters
+
+Parent-child relationships are not yet supported natively in Elastic::Model.
+They will be soon.
+
+In the meantime, see:
+
+=over
+
+=item *
+
+L<ElasticSearch::SearchBuilder/PARENTE<sol>CHILD>
+
+=item *
+
+L<http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-has-child-filter.html>
+
+=back
+
+=head2 Nested filters
+
+See L<Elastic::Manual::QueryDSL::Nested>.
+
+=head1 SEE ALSO
+
+=over
+
+=item *
+
+L<Elastic::Manual::QueryDSL>
+
+=item *
+
+L<Elastic::Manual::QueryDSL::Queries>
+
+=back
+
+=head1 AUTHOR
+
+Clinton Gormley <drtech@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Clinton Gormley.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

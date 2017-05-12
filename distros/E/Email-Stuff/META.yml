@@ -1,0 +1,27 @@
+---
+abstract: 'A more casual approach to creating and sending Email:: emails'
+author:
+  - 'Adam Kennedy <alias@cpan.org>'
+build_requires:
+  Email::Send::Test: 2.04
+  File::Spec: 0.80
+  Test::More: 0.47
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.012, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Email-Stuff
+requires:
+  Carp: 0
+  Email::MIME: 1.901
+  Email::Send: 2.185
+  Email::Simple: 1.998
+  File::Basename: 0
+  File::Type: 0.22
+  Params::Util: 0.23
+  prefork: 1.01
+version: 2.105

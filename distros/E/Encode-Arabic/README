@@ -1,0 +1,39 @@
+Encode Arabic - Encodings of Arabic
+
+Encode Arabic is a wrapper for modules implementing the various encoding
+systems used for the Arabic language and covering even some non-Arabic
+extensions to the Arabic script. The modules fit in the philosophy of
+Encode::Encoding and can be used directly with the Encode module.
+
+
+INSTALLATION
+
+To install this module, run the following from the command line:
+
+    perl Build.PL
+    Build
+    Build test
+    Build install
+
+or use the Perl Package Manager instead and run
+
+    ppm
+
+to enter the interactive interface for module management.
+
+
+DOCUMENTATION
+
+Visit the site http://search.cpan.org/dist/Encode-Arabic/ or run
+
+    perldoc [file|module]
+
+in order to get more information on this and related software.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003-2016 Otakar Smrz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

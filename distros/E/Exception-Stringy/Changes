@@ -1,0 +1,40 @@
+0.20      2014-05-31 18:25:34 Europe/Amsterdam
+  * fix warnings when an exception field is undef
+
+0.19      2014-05-22 10:08:28 Europe/Amsterdam
+
+  * rethrow properly propagate original exception throw point
+  * symbol registration in caller's namespace is more robust
+
+0.18      2014-05-16 00:05:57 Europe/Amsterdam
+
+  * added name_alias, renamed alias into throw_alias
+
+0.17      2014-05-14 07:44:07 Europe/Amsterdam
+
+   * changed API: exceptions are not declared at import time, but with declare_exceptions
+
+0.16      2014-05-13 13:07:23 Europe/Amsterdam
+
+   * rename _package_prefix into _method_prefix
+
+0.15      2014-05-13 12:51:00 Europe/Amsterdam
+
+   * now xisa works on blessed references as well
+
+0.14      2014-04-14 12:25:13 Europe/Amsterdam
+   * implement isa properly, added test
+
+0.13      2014-04-10 17:43:44 Europe/Amsterdam
+
+   * change the syntax again to use ->$x... and the code so that it works with
+     Perl 5.8.9
+
+0.12      2014-03-26 23:15:21 Europe/Amsterdam
+   * more improvements. Now simply uses the x:: package prefix, configurable
+
+0.11      2014-02-25 16:58:55 Europe/Amsterdam
+
+0.10      2014-02-24 20:32:45 Europe/Amsterdam
+   * first implementation
+   

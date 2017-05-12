@@ -1,0 +1,61 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Test::MinimumVersion' => '0.003',
+                                      'Test::More' => '0',
+                                      'Test::Pod' => '1.41'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Carp' => '0',
+                                      'Email::Abstract' => '3.006',
+                                      'Email::Address' => '0',
+                                      'Email::Simple' => '1.998',
+                                      'Fcntl' => '0',
+                                      'File::Basename' => '0',
+                                      'File::Path' => '2.06',
+                                      'File::Spec' => '0',
+                                      'IO::File' => '1.11',
+                                      'IO::Handle' => '0',
+                                      'List::Util' => '1.45',
+                                      'Module::Runtime' => '0',
+                                      'Moo' => '2.000000',
+                                      'Moo::Role' => '0',
+                                      'MooX::Types::MooseLike' => '0.15',
+                                      'MooX::Types::MooseLike::Base' => '0',
+                                      'Net::SMTP' => '3.07',
+                                      'Scalar::Util' => '0',
+                                      'Sub::Exporter' => '0',
+                                      'Sub::Exporter::Util' => '0',
+                                      'Sys::Hostname' => '0',
+                                      'Throwable::Error' => '0.200003',
+                                      'Try::Tiny' => '0',
+                                      'strict' => '0',
+                                      'utf8' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'Capture::Tiny' => '0.08',
+                                   'Cwd' => '0',
+                                   'Exporter' => '0',
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'File::Temp' => '0',
+                                   'Test::More' => '0.96',
+                                   'lib' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

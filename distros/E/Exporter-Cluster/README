@@ -1,0 +1,37 @@
+Exporter::Cluster README
+========================
+
+I have noticed a general trend of Perl packages growing in complexity
+as new technology is developed and Perl modules are made to interface
+with these advances.  Designing and developing an interface to these
+new interfaces can be (and most likely should be) a time consuming and
+thought intensive task.  One of the hardest tasks is to use good coding
+practices of code separation in the Perl modules.  If such practices
+are followed to the extreme, the end user might have to add quite
+large 'use' list at the top of each file.  The goal of Exporter::Cluster
+is to implement a binding package that can reduce the list of closely
+associated modules down to one 'use'.  This is not a general use module
+as its abuse can be considered 'bad programming', but rather it is
+intended for complex libraries or internal company use.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module has no internal dependencies, but it has been designed to
+specifically work with modules that use the Exporter module.
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2002-2003 D. Hageman (Dracken Technologies).
+All rights reserved.
+
+This program is free software; you can redistribute it and/or modify 
+it under the same terms as Perl itself.

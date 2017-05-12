@@ -1,0 +1,171 @@
+NAME
+    Exception::Tiny - too tiny exception interface
+
+SYNOPSIS
+    simple example:
+
+      package MyException;
+      use parent 'Exception::Tiny';
+  
+      package main;
+  
+      # try
+      sub foo {
+          eval {
+              MyException->throw( 'oops!' ); # same MyException->throw( message => 'oops!' );
+          };
+      }
+  
+      # catch
+      if (my $e = $@) {
+          if (MyException->caught($e)) {
+              say $e->message; # show 'oops!'
+              say $e->package; # show 'main'
+              say $e->file; # show 'foo.pl'
+              say $e->line; # show '9'
+              say $e->subroutine; # show 'main:foo'
+              say $e->dump; # dump self
+              say $e; # show 'oops! at foo.pl line 9.'
+              $e->rethrow; # rethrow MyException exception.
+          }
+      }
+
+    can you accessor for exception class:
+
+      package MyExceptionBase;
+      use parent 'Exception::Tiny';
+      use Class::Accessor::Lite (
+          ro => [qw/ status_code /],
+      );
+  
+      package MyException::Validator;
+      use parent -norequire, 'MyExceptionBase';
+      use Class::Accessor::Lite (
+          ro => [qw/ dfv /],
+      );
+  
+      package main;
+  
+      # try
+      eval {
+          MyException::Validator->throw(
+              message     => 'oops',
+              status_code => '500',
+              dfv         => {
+                  missing => 'name field is missing.',
+              },
+          );
+      };
+  
+      # catch
+      if (my $e = $@) {
+          if (MyException->caught($e)) {
+              say $e->message; # show 'oops';
+              say $e->status_code; # show '500';
+              say $e->dfv->{missing}; # show 'name field is missing.'
+              say $e; # show 'oops at bar.pl line 17.'
+          }
+      }
+
+    can you catche nested class:
+
+      package BaseException;
+      use parent 'Exception::Tiny';
+  
+      package MyException::Validator;
+      use parent -norequire, 'BaseException';
+  
+      package main;
+  
+      eval { MyException::Validator->throw }
+  
+      my $e = $@;
+      say $e if BaseException->caught($e); # show 'MyException::Validator at bar.pl line 9.'
+
+DESCRIPTION
+    Exception::Tiny is too simple exception interface. This is the
+    implementation of the minimum required in order to implement exception
+    handling. So anyone can understand the implementation It.
+
+CLASS METHODS
+  throw( ... )
+    throw the exception.
+
+  caught($e)
+    It returns an exception object if the argument is of the current class,
+    or a subclass of that class. it simply returns $e.
+
+INSTANCE METHODS
+  rethrow
+    re-throw the exception object.
+
+  message
+    It return the exception message. default is exception class name.
+
+  package
+    It return the package name that exception has occurred.
+
+  file
+    It return the file name that exception has occurred.
+
+  line
+    It return the line number in file that exception has occurred.
+
+  subroutine
+    It return the subroutine name that exception has occurred.
+
+  as_string
+    It returned in the format the exception contents of a simple string. You
+    can Implementation overridden.
+
+  dump
+    It to dump the contents of the instance. You can Implementation
+    overridden.
+
+HACKING IDEA
+    If you want Exception::Class::Base style object, you can write like code
+    of the under.
+
+      package HackException;
+      use parent 'Exception::Tiny';
+      use Class::Accessor::Lite (
+          ro => [qw/ time pid uid euid gid egid /],
+      );
+  
+      sub new {
+          my($class, %args) = @_;
+          %args = (
+              %args,
+              time => CORE::time,
+              pid  => $$,
+              uid  => $<,
+              euid => $>,
+              gid  => $(,
+              egid => $),
+          );
+          $class->SUPER::new(%args);
+      }
+  
+      eval {
+          HackException->throw;
+      };
+      my $e = $@;
+      say $e->time;
+      say $e->pid;
+      say $e->uid;
+      say $e->euid;
+      say $e->gid;
+      say $e->egid;
+
+AUTHOR
+    Kazuhiro Osawa <yappo {@} shibuya {dot} pl>
+
+SEE ALSO
+    Class::Accessor::Lite
+
+LICENSE
+    Copyright (C) Kazuhiro Osawa
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

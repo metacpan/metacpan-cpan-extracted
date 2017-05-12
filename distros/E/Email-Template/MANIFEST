@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Email/Template.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+t/email-template.t
+t/email-template.tt2
+META.yml                                 Module meta-data (added by MakeMaker)

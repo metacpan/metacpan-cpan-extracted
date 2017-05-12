@@ -1,0 +1,19 @@
+--- #YAML:1.0
+name:                Email-Template
+version:             0.01_02
+abstract:            Send "multipart/alternative" (text & html) email from a Template
+license:             ~
+author:              
+    - Shaun Fryer <pause.cpan.org@sourcery.ca>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Carp:                          0
+    Cwd:                           0
+    HTML::FormatText::WithLinks::AndTables: 0
+    MIME::Lite:                    3.01_04
+    Template:                      0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

@@ -1,0 +1,898 @@
+
+J Mol Biol. Author manuscript; available in PMC 2009 April 3.
+Published in final edited form as:
+J Mol Biol. 2008 August 1; 381(1): 174-188.
+Published online 2008 June 7. doi:  10.1016/j.jmb.2008.05.084
+PMCID: PMC2665032
+NIHMSID: NIHMS97250
+Copyright notice and Disclaimer
+Structural Basis of Transcriptional Regulation of the Proline
+Utilization Regulon by Multifunctional PutA
+Yuzhen Zhou,1† John D. Larson,2† Christopher A. Bottoms,3 Emilia
+C. Arturo,2 Michael T. Henzl,4 Jermaine L. Jenkins,4 Jay C. Nix,5
+Donald F. Becker,1* and John J. Tanner2,4*
+1 Department of Biochemistry, University of Nebraska-Lincoln, Lincoln,
+NE 68588, USA
+2 Department of Chemistry, University of Missouri-Columbia, Columbia,
+MO 65211, USA
+3 Department of Computer Science, University of Missouri-Columbia,
+Columbia, MO 65211, USA
+4 Department of Biochemistry, University of Missouri-Columbia,
+Columbia, MO 65211, USA
+5 Molecular Biology Consortium, Lawrence Berkeley National Laboratory,
+Berkeley, CA 94720
+* Corresponding authors. E-mail addresses: dbecker3/at/unl.edu, Email:
+tannerjj/at/missouri.edu
+†These authors contributed equally to this research.
+Small right arrow pointing to: The publisher's final edited version of
+this article is available at J Mol Biol
+Small right arrow pointing to: See other articles in PMC that cite
+the published article.
+Summary
+The multifunctional Escherichia coli PutA flavoprotein functions as
+both a membrane-associated proline catabolic enzyme and transcriptional
+repressor of the proline utilization genes putA and putP. To better
+understand the mechanism of transcriptional regulation by PutA, we have
+mapped the put regulatory region, determined a crystal structure of the
+PutA ribbon-helix-helix domain (PutA52) complexed with DNA and examined
+the thermodynamics of DNA binding to PutA52. Five operator sites, each
+containing the sequence motif 5′-GTTGCA-3′, were identified using
+gel-shift analysis. Three of the sites are shown to be critical for
+repression of putA, whereas the two other sites are important for
+repression of putP. The 2.25 Å resolution crystal structure of PutA52
+bound to one of the operators (operator 2, 21-bp) shows that the
+protein contacts a 9-bp fragment, corresponding to the GTTGCA consensus
+motif plus three flanking base pairs. Since the operator sequences
+differ in flanking bases, the structure implies that PutA may have
+different affinities for the five operators. This hypothesis was
+explored using isothermal titration calorimetry. The binding of PutA52
+to operator 2 is exothermic with an enthalpy of -1.8 kcal/mol and a
+dissociation constant of 210 nM. Substitution of the flanking bases of
+operator 4 into operator 2 results in an unfavorable enthalpy of 0.2
+kcal/mol and 15-fold lower affinity, which shows that base pairs
+outside of the consensus motif impact binding. The structural and
+thermodynamic data suggest that hydrogen bonds between Lys9 and bases
+adjacent to the GTTGCA motif contribute to transcriptional regulation
+by fine-tuning the affinity of PutA for put control operators.
+Keywords: proline utilization A, X-ray crystallography, isothermal
+titration calorimetry, ribbon-helix-helix, proline catabolism
+Introduction
+Proline is used as a source of carbon, nitrogen and energy through two
+oxidative steps catalyzed by proline dehydrogenase (PRODH) and
+Δ1-pyrroline-5-carboxylate dehydrogenase (P5CDH).1-7 In
+enteric bacteria such as Escherichia coli, proline utilization requires
+the two genes, putP and putA. The former encodes the PutP high-affinity
+Na+-proline transporter and the latter encodes the multifunctional
+flavoprotein PutA (Proline utilization A).8,9 PutA is unique
+in that it functions as both a transcriptional repressor of the put
+genes and a membrane-associated bifunctional proline catabolic
+enzyme.2,10-12 The enzymatic and transport functions
+of the putA and putP genes, respectively, are conserved among different
+Gram-negative bacteria, whereas the genetic organization and regulatory
+mechanisms that control the expression of these genes are highly
+divergent.7,10-18 The focus of this work is to provide
+a molecular and structural understanding of the regulation of put genes
+in E. coli by PutA.
+PutA from E. coli combines PRODH, P5CDH, and transcriptional regulatory
+activities into a single polypeptide of 1320 amino
+acids.2,19 Insights into the organization of the functional
+domains in PutA have been gained from molecular dissection and
+characterization of truncated PutA proteins. The PRODH and P5CDH active
+sites are located within residues 261-612 and 650-1130, respectively,
+with the PRODH active site utilizing an FAD cofactor and P5CDH activity
+requiring NAD+. Structural studies have shown that the PRODH domain
+forms a unique (βα) barrel,20,21 and that reduction by
+dithionite causes dramatic conformational changes in the FAD ribityl
+chain.22 Molecular dissection studies showed that the DNA-binding
+domain is contained in residues 1-47.23 Subsequently, the crystal
+structure of a polypeptide corresponding to E. coli PutA residues 1-52
+(PutA52) was solved, which showed that PutA is a member of the
+ribbon-helix-helix (RHH) family of transcriptional
+regulators.23,24
+While knowledge of PutA structure and function continues to build, a
+considerable gap remains in our understanding of critical PutA-DNA
+interactions in the put control DNA region. To further understand the
+regulation of proline metabolism in E. coli, we have identified the
+PutA binding sites in the put regulatory region, elucidated the roles
+of these operators in repressing expression of putA and putP,
+determined the crystal structure of PutA52 bound to one of the
+identified operators, and investigated the thermodynamics of DNA
+binding to PutA52 using isothermal titration calorimetry.
+Results
+Identification of PutA binding sites
+Initial localization of PutA binding sites in the put control DNA
+region was performed by gel mobility shift assays using different
+fragments of the 419-bp put control DNA. Systematic evaluation of
+different regions of the put control DNA indicated that PutA does not
+bind to the 1-170 bp region immediately downstream of putP (Fig.
+1a, lanes 3-4). However, PutA was observed by gel mobility shift assays
+to bind to regions 183-231 and 342-412 of the put control DNA (data not
+shown). Additional assays indicated that PutA binds to oligonucleotides
+183-210, 342-365 and 388-412 (Fig. 1a, lanes 5-10). Previously, we
+showed by gel mobility shift assays that PutA also binds to
+oligonucleotide 211-231, with apparent binding stoichiometry of one DNA
+duplex per PutA dimer.25
+Figure 1
+Figure 1
+Localization of PutA binding sites in the put control DNA region. (a)
+Gel mobility shift assays of PutA with different regions of put control
+DNA. Separate binding mixtures of PutA (0-1.5 μM) with full-length put
+control DNA 1-419 (more ...)
+Sequence alignment of the four oligonucleotides that bound to PutA
+(183-210, 211-231, 342-365, 388-412) revealed a GTTGCA consensus
+sequence. This motif is present in each of the four oligonucleotides
+(Fig. 1b), and it appears five times in the 183 - 412 bp region of
+the put control DNA (Fig. 1b). Thus, five potential operator sites,
+denoted O1 - O5, were proposed, as shown in Fig. 1c.
+The proposed binding sites were further examined by changing each one
+from GTTGCA to GTCATA by site-directed mutagenesis of the put control
+DNA. Gel mobility shift assays show that simultaneously mutating all
+five sites disrupts PutA binding to the put control DNA (Fig. 2a,
+Δ12345) confirming that PutA specifically recognizes only the five
+binding sites in the put control region. Gel mobility shift assays were
+then used to test PutA binding to the five sites incrementally using
+PutA52 to resolve the different complexes. As shown in Fig. 2b,
+decreasing the number of binding sites in the put control DNA reduces
+the observed mobility shift of the protein-DNA complex. This further
+confirms that the put control DNA contains five PutA binding sites, and
+suggests that PutA52 is able to bind all five sites simultaneously
+Figure 2
+Figure 2
+Gel mobility shift assays of full-length PutA and PutA52 with wild-type
+put control DNA and put control DNA with an increasing number of
+mutated binding sites. (a) Separate binding mixtures of full-length
+PutA (0-0.25 μM) with wild-type (more ...)
+Autorepression of putA
+Cell-based reporter gene assays were performed to test the role of each
+PutA binding site in repressing expression of putA. For these assays,
+E. coli strain JT31 putA- lacZ- was cotransformed with PutA-pUC18 and
+P[putA]:lacZ-pACYC184 constructs (wild-type and single or multiple
+operator site mutations in the put control DNA). Western analysis
+confirmed expression of PutA. Consistent with previous results, PutA
+repressed expression of the lacZ reporter gene by over 75 % relative to
+control cells (pUC18 alone and wild-type P[putA]:lacZ construct)
+(Fig. 3a, WT).22 Mutations of O1 (Δ1) and O2 (ΔO2) singly or
+in combination (ΔO1-2) did not increase β-galactosidase activity.
+Because PutA repression of the lacZ reporter gene (~ 73 %) was not
+diminished by mutating operator sites O1 and O2, PutA binding to these
+sites is not necessary for repressing transcription of putA. Mutating
+O3 (ΔO3) greatly reduced lacZ reporter gene expression in the control
+cells (data not shown) to ~ 10 % of wild-type put control DNA. Because
+of the intrinsically low reporter gene expression of the ΔO3 mutant
+construct, we were not able to directly assess the impact of site O3 on
+PutA repression of putA. O3 is located in the -35 region of the putA
+promoter (see Fig. 1c), thus, the mutation at site O3 most likely
+decreases the binding of the σ subunit of E. coli RNA polymerase to the
+-35 element. We thus consider O3 to be an important operator for
+autorepression of putA despite the fact that we could not test its role
+using the reporter gene assay. Mutating sites O4 (ΔO4) or O5 (ΔO5)
+increased β-galactosidase activity and lowered repression of the lacZ
+reporter gene to about 50 % relative to the control cells (Fig.
+3a). Simultaneously mutating O4 and O5 (ΔO4-5) generated an additive
+effect with a 3-fold increase in β-galactosidase activity relative to
+WT resulting in only 20 % repression of the lacZ reporter gene. Thus
+O3, O4 and O5 are the most critical sites for PutA autorepression of
+putA.
+Figure 3
+Figure 3
+β-galactosidase activity from lacZ reporter constructs containing
+various mutations in the put control DNA. (a) Relative percent
+β-galactosidase activity in E. coli strain JT31 containing PutA-pUC18
+and wild-type (WT) P[putA]:lacZ and various (more ...)
+Regulation of putP by PutA
+The binding sites critical for regulating putP were also identified. In
+these assays, E. coli strain JT31 putA- lacZ- was cotransformed with
+the PutA-pUC18 construct and the P[putP]:lacZ-pACYC184 construct
+(wild-type and single or multiple operator site mutations in the put
+control DNA). These results are shown in Fig. 3b. PutA repressed
+lacZ reporter gene expression by about 47 % relative to control cells
+(Fig. 3b, WT). Apparently PutA represses putP promoter activity
+less than the putA promoter, consistent with previous results
+suggesting PutA is a stronger regulator of putA than
+putP.26,27 Mutation of O1 (ΔO1) increased β-galactosidase
+activity thereby decreasing the repression of the lacZ reporter gene to
+about 30 % relative to control cells. Mutating O2 singly (ΔO2) or in
+combination with O1 (ΔO1-2) resulted in about 20 % repression relative
+to control cells. In contrast to the putA promoter, mutation of O3, O4,
+and O5 individually (ΔO3, ΔO4, ΔO5) (Fig. 3b) or in combination
+(ΔO3-5) (data not shown) did not significantly increase β-galactosidase
+activity or alter the repression of the lacZ reporter gene. Mutating
+all five binding sites (ΔO1-5) resulted in the same repression of lacZ
+expression (20 %) as ΔO1-2 put control DNA (Fig. 3b). Thus, PutA
+binding to O1 and O2 is responsible for repressing the putP promoter.
+Overall structure of PutA52 bound to O2
+The crystal structure of PutA52 bound to O2 was solved in order to
+understand the three-dimensional structural basis of DNA recognition by
+PutA. This structure is the first one of a PutA RHH domain bound to
+DNA, and it is currently the highest resolution structure of a RHH/DNA
+complex. The asymmetric unit contains one PutA52 dimer bound to one O2
+duplex (Fig. 4).
+Figure 4
+Figure 4
+Overall structure of PutA52 bound to O2. PutA52 chains A and B are
+colored green and magenta, respectively. DNA is represented as sticks,
+with strand 1 colored yellow and strand 2 colored white. The electron
+density map is a 2F[o]-F[c] map with F[c] and phases (more ...)
+Each PutA52 chain adopts the RHH fold, which consists of a β-strand
+(β1) followed by two α-helices (αA, αB). The two protein chains
+assemble into a dimer featuring an intermolecular two-stranded
+antiparallel β-sheet (Fig. 4).
+The bound DNA ligand adopts the B conformation, based on analysis of
+projected phosphorus positions (z[P]) using 3DNA.28 Values of z[P]
+< 0.5 are diagnostic of B-form DNA, whereas z[P] > 1.5 Å indicate
+A-form DNA.28,29 All but three of the 17 base pair steps of
+O2 have z[P] < 0.5 Å. The three exceptions have z[P] = 0.52 - 0.58 Å.
+Thus, binding of PutA52 to O2 does not cause significant distortion of
+the DNA from the expected B conformation. Also, the double helix
+displays no discernable curvature (Fig. 4).
+The β-sheet of PutA52 inserts into the DNA major groove (Fig. 4).
+Residues of the sheet contact DNA bases, while residues near the
+N-terminus of αB interact with the DNA backbone. This general mode of
+binding is typical for RHH proteins.30
+Although the five operators that we identified each contain the 6-bp
+consensus sequence of GTTGCA (Fig. 1b), the structure shows that
+PutA52 contacts a larger fragment of DNA. A plot of the surface area
+buried by nucleotides in the protein-DNA interface is shown in Fig.
+5a. The bimodal shape of the plot reflects the two-fold symmetries of
+the protein dimer and the DNA double helix. The surface area
+calculations, along with detailed inspection of the protein-DNA
+interface, show that the footprint of PutA52 encompasses the 9-bp
+fragment from G6:C16 to C14:G8 (see boxed base pairs in Fig. 4).
+Note that this fragment contains the GTTGCA motif. Interactions with
+the 9-bp fragment are summarized schematically in Fig. 5b. and
+shown in detail in Fig. 6.
+Figure 5
+Figure 5
+Footprint of PutA52 on O2 derived from the crystal structure. (a)
+Surface area contributed by DNA nucleotides to the protein-DNA
+interface. (b) Schematic diagram of protein-DNA interactions. Dotted
+lines indicate electrostatic interactions. Thick, solid (more ...)
+Figure 6
+Figure 6
+Detailed stereographic view of the protein-DNA interface. PutA52 chains
+A and B are colored green and magenta, respectively. DNA strands 1 and
+2 are colored yellow and white, respectively. Cyan spheres represent
+water molecules. Dotted lined indicate (more ...)
+Interactions with DNA bases
+Structures of RHH domains bound to DNA show that, typically, two polar
+residues and one Arg/Lys from each β-strand form hydrogen bonds to DNA
+bases. In PutA, this critical triad corresponds to Thr5, Gly7 and Lys9,
+and all three residues interact with DNA bases. We note that these
+residues are identically conserved among PutAs.24
+Lys9 binds to the pair of guanine bases located at the 5′ ends of each
+strand (Fig. 5b). Lys9 of chain A interacts with the guanine bases
+of strand 2, while Lys9 of the B chain interacts with the guanine bases
+of strand 1. The two sets of interactions are nearly identical
+(Fig. 6), which is expected since they involve the palindromic
+ends of the DNA fragment. Each Lys9 forms four hydrogen bonds, two with
+each base of the guanine pair. These interactions are shown for Lys9(B)
+in Fig. 7a. The hydrogen bond distances are 2.5 - 3.1 Å for the
+inner base (G7 of strand1, G9 of strand 2) and 3.2 - 3.5 Å for the
+outer base (G6 of strand 1, G8 of strand 2). We note that only guanine
+has two appropriately placed hydrogen bond acceptors for interaction
+with Lys9, so these interactions appear to enforce a preference for
+binding a 9-bp fragment containing GG at the 5′ ends of both strands.
+Figure 7
+Figure 7
+Close-up views of selected protein-DNA interactions. In all three
+panels, PutA52 chains A and B are colored green and magenta,
+respectively, DNA strands 1 and 2 are colored yellow and white,
+respectively, and black dotted lines indicate electrostatic (more
+...)
+Thr5 forms hydrogen bonds with three different base pairs and both DNA
+strands. In chain A, the hydroxyl of Thr5 donates a hydrogen bond to T8
+of strand 1 (Fig. 7a), while the backbone carbonyl accepts a
+hydrogen bond from C12 of strand 2 (Fig. 7b). Since the hydrogen
+bond with T8 involves the palindromic GGT end of the DNA, one might
+expect Thr5(B) to form an analogous interaction with T10 of strand 2.
+Interestingly, Thr5(B) accepts a hydrogen bond from C11 of strand 1
+(Fig. 7b) rather than hydrogen bonding with T10. The expected
+two-fold symmetry is broken by a conformational change of Thr5(B). The
+χ angle of Thr5(B) is +60°, whereas this angle is -60° for Thr5(A).
+We note that Thr5 has χ = -60° in all chains of ligand-free PutA52
+structures (PDB codes 2AY0, 2GPE). Thus, binding to DNA induced a
+conformational change in Thr5(B), which introduces asymmetry in PutA52.
+Gly7 helps confer sequence specificity despite lacking a side chain. In
+chain A, Gly7 donates a hydrogen bond (2.9 Å) to the N7 atom of G11
+(Fig. 7b). In chain B, Gly7 forms van der Waals interactions with
+the C5 methyl of T9 (Fig. 7c). Note also the close contacts
+between DNA bases and Thr5(A) in this region of the structure
+(Fig. 7c). The tight packing of the T9:A13 base pair against Gly7
+and Thr5 could contribute to sequence specificity.
+Finally, there are no water molecules bridging the protein with DNA
+bases. There is, however, one water molecule (Wat6) strategically
+located in the protein-DNA interface on the pseudo two-fold axis that
+relates the two chains (Fig. 6). It is equidistant from the two
+Gly7 residues of the β-sheet, and forms hydrogen bonds with G10 of DNA
+strand 1 and G11 of strand 2 (Fig. 7B). Wat6 appears to fill the
+void created by the lack of a side chain at residue 7. Indeed, mutation
+of Gly7 in silico to any other residue causes steric clash with this
+water molecule as well as with DNA bases.
+Interactions with the DNA backbone
+Thr28, Pro29 and His30 bind the DNA backbone. Thr28 is the N[cap] of
+αB, while Pro29 and His30 are the first two residues of αB. The
+interactions display nearly perfect two-fold symmetry (Fig. 6), so
+just one set of interactions will be described. The side chains of
+Thr28 and His30 form electrostatic interactions with the phosphate
+group connecting the two G nucleotides at the 5′ end of the 9-bp
+fragment (Fig. 7a). In addition, the backbone of His30 donates a
+hydrogen bond to the phosphate group of the T nucleotide at the 5′ end
+of the 9-bp fragment (T8 of strand 1, T10 of strand 2, see Fig.
+7a). Finally, the C[δ] atom of Pro29 forms close contacts (3.4 Å) with
+oxygen atoms of the phosphate backbone (Fig. 7a).
+Isothermal titration calorimetry
+The binding of O2 to PutA52 at pH 8.0 was studied using ITC to gain
+insights into the thermodynamic basis of DNA recognition. In Tris
+buffer, the association reaction was evidently endothermic (Fig.
+8a), whereas, in phosphate buffer at the same pH, the reaction was
+weakly exothermic (Fig. 8b). Since the enthalpy of ionization of
+Tris (11 kcal/mol) differs substantially from that of dihydrogen
+phosphate (1 kcal/mol), these results suggest that the DNA-binding
+event is coupled to the ionization reaction of the buffer at pH 8.0.
+Moreover, the fact that the titration in Tris yielded the more
+endothermic result implies proton uptake by the protein-DNA complex
+during association.
+Figure 8
+Figure 8
+ITC-based analysis of the interaction between PutA52 and the O2 and
+O2bf4 duplexes. (a) Raw data for the titration of 12 μM PutA52 with
+0.15 mM O2 (10 μL additions) in NaCl, Tris, pH 8.0. (b) Raw data for
+the titration of 21 μM (more ...)
+The data from the four titrations with O2 were fit simultaneously as
+described in Materials and Methods to estimate the intrinsic binding
+enthalpy, association equilibrium constant and number of protons
+transferred (Fig. 8c). This analysis shows that the binding of O2
+to PutA52 is intrinsically exothermic, with ΔH = -1.8 kcal/mol
+(Table 2), and K = 4.8 × 106 M-1, which corresponds to K[d] =
+210 nM (Table 2). The latter value agrees favorably with the
+estimate from gel-shift analysis of K[d] < 200 nM for O2 binding to
+full-length PutA.25 The estimated number of protons transferred
+to the protein/DNA complex is 0.7.
+Table 2
+Table 2
+Isothermal titration calorimetry data for DNA binding to PutA52 at 298K
+A second set of titrations was performed using oligonucleotide O2fb4,
+which is identical to O2 except that the bases flanking the GTTGCA
+motif are those of O4. These measurements were performed to assess the
+impact of bases outside of the consensus motif on affinity. As with O2,
+the apparent enthalpy of binding of O2fb4 to PutA52 at pH 8.0 is
+dependent on buffer choice. In Tris buffer, the association appears to
+be strongly endothermic (Fig. 8d), but in phosphate buffer the
+reaction is nearly isenthalpic (Fig. 8e).
+Global analysis of the data from the two O2fb4 titrations (Fig.
+8f) shows that binding of this oligonucleotide to PutA52 is marginally
+endothermic, with intrinsic enthalpy change of only 0.18 kcal/mol
+(Table 2). The association constant from global fitting is K = 3.2
+× 105 M-1, which corresponds to K[d] = 3100 nM. As with the O2
+titrations, there is an uptake of 0.7 protons during binding, which
+suggests that the binding mechanisms of the two ligands are
+qualitatively similar. Notice, however, that the association constant
+for O2 is fifteen times higher than that of O2fb4. These results show
+that bases outside of the consensus motif impact the affinity of
+PutA52, and presumably PutA, for put control sites.
+The binding of PutA52 is entropy-driven for both ligands. This result,
+combined with the observation that the protein-DNA interface is nearly
+devoid of bound water molecules, suggests that desolvation of
+macromolecular surfaces is important for DNA binding. We note that the
+free energy of the RHH protein MetJ binding to a metbox operator also
+includes a substantial favorable entropic component at 25 °C,
+particularly in the absence of the corepressor
+S-adenosylmethionine.31
+Discussion
+Transcriptional regulation of the put regulon
+Based on the arrangement of the five PutA-DNA binding sites, PutA most
+likely represses the put genes by hindering the σ70-dependent binding
+of E. coli RNA polymerase to the putA and putP promoter
+regions.32 We did not find additional PutA consensus binding
+sites in the coding regions of putA and putP, indicating that PutA
+binds only to the put intergenic region. Previous reports suggested
+that proline, via PutA, regulates expression of putA more tightly than
+putP.26,27 Here we have shown that PutA is a stronger
+repressor of the putA promoter than the putP promoter. Therefore, putP
+expression appears to be regulated relatively weakly by PutA, which
+would allow proline uptake under a variety of environmental conditions
+leading to subsequent activation of putA expression. In addition to
+proline-specific regulation by PutA, the put genes are also responsive
+to global regulators. The cAMP receptor protein has been proposed to
+function as an activator by increasing putA and putP promoter activity
+in nutrient-poor environments.26
+We evaluated put control DNA sequences from other bacteria in which
+PutA contains the conserved RHH domain and is predicted to function as
+an autogenous transcriptional repressor. The GTTGCA sequence was found
+in every putA promoter region of the 39 genome sequences analyzed.
+We also examined put control DNA sequences in bacteria that share the
+same genetic organization of putA and putP as found in E. coli.
+Fig. S1 (supplemental material) shows an alignment of put control
+DNA sequences from E. coli, Shigella boydii, Salmonella typhimurium,
+Klebsiella aerogenes, Yersinia pestis and Pseudomonas putida. The
+length of the intergenic region ranges from 361 base pairs in P. putida
+to 577 base pairs in Y. pestis. Each sequence has at least three exact
+repeats of the GTTGCA motif. Operators O1, O3 and O4 are present in all
+six sequences. O2 is present in all six organisms, except P. putida. O5
+is the least conserved site. Y. pestis and P. putida have additional
+exact repeats of the motif that do not align with the E. coli sites.
+These results suggest that the GTTGCA motif is the fundamental
+transcriptional control element of the PutA autogenous repression
+system. Therefore, the biochemical and structural results reported here
+for E. coli are likely applicable to other organisms in which PutA
+serves as a transcriptional repressor.
+Importance of the GTTGCA motif for PutA - operator binding
+Mutation of the consensus GTTGCA motif to GTcatA was found to severely
+impact binding to PutA, based on gel shift analysis. In fact, mutation
+of all five operators eliminated binding. Moreover, this mutation was
+found to affect gene transcription as monitored by cell-based reporter
+assays. These results show that recognition of the middle of the
+consensus motif is essential for PutA binding and proper
+transcriptional control.
+The basis for these results is evident from the crystal structure. The
+mutated triplet corresponds to base pairs T9:A13, G10:C12, and C11:G11
+of the structure. As shown in Fig. 5B, the protein directly
+contacts T9, C12, C11 and G11. Mutation of T9 to C eliminates van der
+Waals interactions between the thymine C5 methyl and Gly7(B) (Fig.
+7c). Replacement of C12 with T eliminates the hydrogen bond with the
+backbone carbonyl of Thr5(A) (Fig. 7b). In fact, this mutation
+would position two hydrogen bond acceptors - carbonyl of Thr5(A) and O4
+carbonyl of thymine - close to each other, which is unfavorable.
+Moreover, the C5 methyl of the thymine would clash with Thr4(A).
+Interestingly, changing C11:G11 to T:A is predicted to have little
+effect on the protein-DNA interaction surface. Mutation of G11 to A
+would preserve the hydrogen bond donated by Gly7(A) (Fig. 7b),
+since both adenine and guanine have the hydrogen bond donor, N7.
+Likewise, one can imagine the thymine O4 carbonyl engaging Thr5(B) in a
+hydrogen bond analogous to the one formed with the C11 in Fig. 7B.
+Thus, the observed deleterious effect on binding due to the GTcatA
+triple mutation appears to be primarily due to the change of TG to CA.
+Whereas E. coli has five exact repeats of the GTTGCA motif, Y. pestis
+has single nucleotide substitutions in O1 (GTTaCA) and O2 (GTTGtA)
+(Fig. S1). As described in the preceding paragraph, the G-to-A
+variation in O1 is predicted to disrupt the protein-DNA interface. On
+the other hand, the GTTGtA variation is likely to be accommodated by
+the protein without significant structural penalty. Hence, the Y.
+pestis O1 site may have a limited role in transcriptional control. We
+note that Y. pestis has an additional GTTGCA sequence motif upstream of
+O1, and that this site could substitute for a nonfunctional O1.
+Importance of bases flanking the GTTGCA motif
+Given the conservation of the GTTGCA motif in put intergenic regions,
+it is not surprising that interactions with these bases are essential
+for binding. Interestingly, the structure reveals that the footprint of
+PutA52 extends beyond the GTTGCA motif, indicating that bases flanking
+the consensus sequence may be important for operator recognition.
+The structure shows that PutA52 contacts a 9-bp fragment, which we
+denote XGTTGCAYZ. Lys9 interacts with XG and the complementary bases of
+Y and Z. Based on the structure, it appears that G is preferred for X
+and CC is preferred for YZ, because this sequence maximizes the number
+of hydrogen bonds formed by Lys9 (eight total, four with each DNA
+strand).
+Operators 1-3 of E. coli have G for base X while operators 4 and 5 have
+A (Fig. 1b). Substitution of A in place of G at position X can be
+simulated by imagining adenine in place of G6 in Fig. 7a. This
+change would eliminate one of the hydrogen bonds formed by Lys9. All
+five operators have C for position Y except O4, which has A. The effect
+of this variation can be seen by changing G7 in Fig. 7A to
+thymine. Elimination of one hydrogen bond is again predicted. Operators
+1 and 3 have T and A, respectively, at position Z, which requires Lys9
+to interact with A and T, respectively. Both variations would eliminate
+one hydrogen bond with Lys9, relative to optimal case of O2. This
+simple hydrogen bond inventory analysis implies that PutA exhibits
+different affinities for the five operator sites, with O2 predicted to
+have the highest affinity (eight hydrogen bonds to Lys9) and O4 having
+the lowest affinity (six hydrogen bonds).
+This hypothesis was tested with ITC experiments that compared the
+binding of PutA52 to two ligands differing only in the bases flanking
+the consensus motif: O2 and O2fb4. The former ligand is the one used in
+crystal structure determination. The latter is identical to O2 except
+that it has the flanking bases of O4 (X,Y = A). These two ligands thus
+mimic the two extremes of the predicted affinity spectrum of the PutA
+operator sites.
+The ITC analysis showed that PutA52 binds to O2 with fifteen times
+higher affinity than O2fb4 (Table 2), in agreement with our
+structure-based predictions. The binding enthalpy accounts almost
+entirely for the difference in affinity (Table 2); ΔH for O2 is
+more exothermic than that of O2fb4 by about 2 kcal/mol. That the
+difference in affinity is enthalpic in origin is consistent with our
+prediction that Lys9 forms more hydrogen bonds with the flanking bases
+of O2 than O4. These results suggest that the five operator sites are
+nonequivalent in terms of binding affinity, which is potentially
+significant because differential binding could be important for proper
+transcriptional regulation.
+In light of these results, it is interesting that PutA is a weaker
+repressor of the putP promoter than the putA promoter, yet the highest
+affinity operator (O2) is involved in repression of putP whereas the
+lowest affinity operator (O4) is involved in repression of putA. We
+suggest that PutA-DNA binding affinity is only one of several factors
+to consider when assessing the potential impact of the operators on
+transcriptional repression. Other key factors include the number of
+transcription start sites and the location of the operators relative to
+the promoter regions. The putP gene was previously shown to have
+multiple transcription start sites and three functional
+promoters.26 The three putP promoters are positioned 14, 26, and
+58 base pairs upstream of the O1 site. Thus, PutA binding at O1 and O2
+is not predicted to directly interfere with RNA polymerase at each of
+the putP promoters resulting in weaker repression of the putP gene by
+PutA. On the other hand, the putA gene has only one promoter and a
+single transcriptional start site with O3 and O4 located within the
+putA promoter region. Thus, these sites are positioned optimally for
+PutA to interfere with RNA polymerase, which could explain why PutA is
+a stronger repressor of putA expression.
+Parenthetically, this ITC analysis underscores the value of examining
+binding reactions in buffers having distinct ionization enthalpies.
+Besides revealing the involvement of protonation in protein-ligand
+associations, inclusion of the buffer ionization enthalpy can, in
+select cases, significantly improve the quality of the titration data.
+For example, the intrinsic binding enthalpy for the interaction between
+PutA52 and the O2fb4 oligo (0.18 kcal/mol) is effectively zero. Absent
+the contribution of phosphate or Tris ionization, this binding reaction
+would be invisible by ITC. Although the intrinsic enthalpy for the
+PutA52-O2 association is somewhat larger (-1.79 kcal/mol), the
+interaction would nonetheless be difficult to characterize in phosphate
+buffer alone because the heat of buffer ionization reduces the observed
+enthalpy to just -0.8 kcal/mol. In striking contrast, the highly
+endothermic Tris ionization event renders the reaction much more
+amenable to analysis and facilitates, via a global fitting strategy,
+treatment of the data collected in phosphate buffer.
+Possible roles of PutA-specific residues
+PutA is a unique member of the RHH family of transcription factors.
+With a polypeptide chain in excess of 1300 residues, PutA is the
+largest protein known to contain an RHH domain. Furthermore, to our
+knowledge, PutA is the only protein to have a flavin redox regulatory
+domain coupled to an RHH domain.
+PutA is also distinguished from other RHH proteins at the primary
+sequence level.24 In particular, Gly7 and Pro29 are absolutely
+conserved among PutAs, yet rarely found in other RHH domains.
+We suggest three possible roles for Pro29. First, proline may
+facilitate initiation of αB and thus help position Thr28 and His30 for
+interaction with the DNA backbone. Second, Pro29 may provide a steric
+“backstop” for the DNA backbone and thereby contribute to recognition
+of a 9-nucleotide fragment of B-form DNA. A third possibility is that
+Pro29 may be donating C-H…O hydrogen bonds to the DNA backbone. This
+suggestion is based on the observation Pro29 C[δ] forms close contacts
+with oxygen atoms of the phosphate backbone (Fig. 7a).
+There is precedent for proline C[δ] donating hydrogen bonds. For
+example, when proline is located in the middle or C-terminus of an
+α-helix, C[δ] donates hydrogen bonds to the backbone carbonyl 3-5
+residues preceding the proline.33 These unconventional hydrogen
+bonds enable proline to appear in α-helices despite lacking a free N-H
+group for classic i to i+4 hydrogen bonding. We note that the CH…O
+distance of 3.4 Å observed in the PutA52/O2 complex is identical to the
+average distance for proline intrahelix C-H…O hydrogen bonds.33
+The unique location of Pro29 at the beginning of αB, juxtaposed to the
+DNA backbone, also supports a hydrogen bonding role. Analysis of
+RHH/DNA structures shows that there are two conserved hydrogen bonds
+donated by the backbone of residues at the N-terminus of αB to the DNA
+backbone.30 We observe only one of these conserved hydrogen
+bonds, and it involves the backbone N-H of His30 (Fig. 7a). Since
+proline does not have a free N-H group, the second conserved hydrogen
+bond is missing. We suggest that the unconventional C-H…O hydrogen
+bonds substitute for the missing conserved hydrogen bond.
+Gly7 represents an interesting sequence variation for the RHH family.
+Typically, this position of the β-sheet is occupied by a polar residue,
+such as Thr or Asn, which forms hydrogen bonds with DNA bases. The
+PutA52/O2 structure shows that Gly7 participates in base recognition,
+despite lacking a side chain. It donates a hydrogen bond to a guanine
+base and forms van der Waals contacts with the C5 methyl group of
+thymine.
+Gly7 may underlie a more global structural aspect of DNA recognition by
+PutA: deep penetration into the major groove. Absence of a side chain
+at this position allows the β-sheet to penetrate further into the major
+groove, compared to other RHH proteins. As a measure of depth of
+penetration, we calculated the distance of closest approach between the
+DNA axis and each of the C[α] atoms of the three canonical β-sheet
+residues responsible for base recognition (Thr5, Gly7, Lys9 in PutA).
+The values for PutA52/O2 are 5.0 Å, 5.1 Å, and 8.2 Å for chain A and
+7.3 Å, 6.0 Å, and 7.4 Å for chain B. The corresponding values for
+Arc,34 MetJ,35 CopG,36 NikR,37 omega38
+and FitA39 bound to DNA span the ranges 8.0 - 11.9 Å, 5.8 - 8.1
+Å, and 8.2 - 11.7 Å, respectively, for these three residue positions.
+Thus, PutA52 penetrates deeper into the major groove than the other RHH
+proteins. The role of this close encounter in transcriptional
+regulation of the put regulon is unknown, but the universal
+conservation of Gly7 in PutAs, and its absence in the rest of the RHH
+family, suggests functional significance.
+Materials and Methods
+Materials
+Chemicals and buffers were purchased from Fisher Scientific and
+Sigma-Aldrich, Inc. unless otherwise stated. Restriction endonucleases
+and T4 DNA ligase were purchased from Fermentas and Invitrogen,
+respectively. BCA reagents used for protein quantitation were obtained
+from Pierce. Goat anti-rabbit secondary antibody was purchased from
+Amersham Inc. E. coli strains XL-blue and BL21 DE3 pLysS were purchased
+from Stratagene. E. coli strain JT31 putA- lacZ- was a generous gift
+from J. Wood (University of Guelph, Guelph, ON, Canada). Synthetic
+oligonucleotides for site-directed mutagenesis, cloning, DNA-binding
+assays and co-crystallization were purchased from Integrated DNA
+Technologies. All experiments used Nano-pure water. LB medium and
+Terrific broth were used for general culture growth and protein
+production, respectively, while M9 minimal medium was used for
+cell-based transcription assays.
+Gel-shift assays
+Full-length PutA and PutA52 were expressed as C-terminally His-tagged
+proteins from vector pET23b (Novagen) and purified as described
+previously.23,24,40 The C-terminal His tags were
+retained after purification. Purified full-length PutA was dialyzed
+into 50 mM Tris (pH 7.5) containing 10 % glycerol and stored at -70 °C.
+PutA52 was dialyzed into 50 mM phosphate buffer (pH 7.3) containing 200
+mM NaCl and stored at -70 °C. The concentrations of the PutA proteins
+were determined using the BCA method (Pierce) with bovine serum albumin
+as the standard and spectrophotometrically using molar extinction
+coefficients of 12,700 M-1 cm-1 at 451 nm for PutA and 6970 M-1
+cm-1 at 280 nm for PutA52.24,41
+Nondenaturing gel electrophoretic mobility shift assays were used to
+test the binding of the PutA proteins to the put control intergenic DNA
+as previously described.23,41 Different regions of the put
+control DNA (putC) were PCR amplified (non-labeled) using synthetic
+primers and purified. The purified products were incubated with
+full-length PutA (0, 0.6, and 1.5 μM) for 20 min at 20 °C in 50 mM Tris
+buffer (pH 7.5, 100 mM NaCl). The protein-DNA complexes were separated
+using a native polyacrylamide gel (4 %) at 4 °C. The gel was then
+stained with ethidium bromide and visualized by Bio-Rad Quantity One.
+Binding assays with synthetic oligonucleotides corresponding to base
+pairs 183-210 (O1), 342-365 (O3/4), and 388-412 (O5) of putC were
+performed similarly. The concentration of oligonucleotide for these
+assays was 100 nM. Duplex DNA of each oligonucleotide was prepared by
+annealing the complementary oligonucleotides in buffer (10 mM Tris, pH
+8.0, 50 mM NaCl, 1 mM EDTA) by first heating at 95 °C for 5 min and
+then gradually cooling down the sample to room temperature.
+Gel-shift assays utilizing fluorescently labeled put intergenic DNA
+were also performed. The synthetic oligonucleotide (M13 forward primer)
+was 5′ end-labeled with IRdye-700 (LI-COR, Inc.) and used as one of the
+primers in a PCR reaction to amplify wild-type put intergenic DNA or
+mutant put intergenic DNA containing different combinations of PutA
+binding site mutations. The resulting IRdye-700 labeled put intergenic
+DNA was purified and quantitated by measuring the nucleic acid
+concentration at 260 nm and the absorbance of the IRdye-700 at 685 nm
+using an extinction coefficient of 170 mM-1 cm-1 according to the
+recommendations of the manufacturer. PutA (0-900 nM) or PutA52 (0-200
+nM) was incubated with 2 nM put intergenic DNA in a total volume of 25
+μl in 50 mM Tris, 50-250 mM NaCl, pH 7.5, containing 10 % glycerol for
+20 min (20 °C) before electrophoresis. Calf thymus competitor DNA (100
+μg/ml) was also added to the binding mixtures to prevent nonspecific
+protein-DNA interactions. The PutA-DNA and PutA52-DNA complexes were
+separated using a native polyacrylamide gel electrophoresis at 4 °C.
+The gels were visualized using a LI-COR Odyssey Imager.
+LacZ reporter assays
+E. coli strain JT31 putA- lacZ- was cotransformed with PutA-pUC18 and
+the reporter construct P[putA]:lacZ-pACYC184 or P[putP]:lacZ-pACYC184.
+Details about the cloning procedures and the primers used for
+generating the above constructs are provided in the supplemental
+material and Table S1. To test which PutA binding sites are critical
+for repressing put gene expression, E. coli strain JT31 putA- lacZ-
+containing different combinations of the PutA-pUC18 construct and the
+P[putA]:lacZ or P[putP]:lacZ reporter constructs were grown at 37 °C in
+M9 minimal medium supplemented with ampicillin (50 μg/ml), kanamycin
+(40 μg/ml) and chloramphenicol (34 μg/ml) to OD ~ 1.0. PutA
+expression from the lac promoter on pUC18 was not induced as no
+isopropyl-β-D-thiogalactopyranoside was added to the culture medium.
+Cells from the various cultures were pelleted, resuspended in Tris-HCl
+buffer (20 mM, pH 7.5) and broken using the B-PER II bacterial protein
+extraction reagent from Pierce (20 mM Tris-HCl, pH 7.5).23
+β-galactosidase activity assays were performed in a 1-ml volume of 100
+mM sodium phosphate, pH 7.3, containing 1 mM MgCl, 50 mM
+β-mercaptoethanol, and 2 mM o-nitrophenyl-β-D-galactopyranoside. The
+initial velocity was determined by measuring the increase in absorbance
+at 420 nm. The reported β-galactosidase activities are averaged values
+from four independent experiments.
+Expression of PutA was confirmed by Western blot analysis using an
+antibody directed against a polypeptide containing PutA residues 1-47
+(PutA47). PutA47 was purified without a 6xHis tag as described
+previously.23 Antiserum directed against purified PutA47 was
+prepared by Proteintech Inc. For Western blot analysis, cell pellets
+from 5 ml culture grown in minimal medium (OD ~ 1.0) were resuspended
+in 100 μL of SDS sample buffer and boiled for 10 min. After SDS
+denaturing electrophoresis the protein bands were transferred onto a
+sequi-blot polyvinylidene difluoride (PVDF) membrane (Bio-Rad, 0.2 μm
+pore size) using an EBU-4000 semi-dry electrophoretic blotting system.
+Immunoreactive bands were detected using Enhanced chemiluminescence
+Western blotting reagents (Amersham Inc.).
+Crystallization
+Exhaustive crystallization experiments were conducted using two
+different RHH domain constructs paired with several different DNA
+fragments, as described in Supplemental Material. Successful
+co-crystallization required the use of an RHH domain construct
+consisting of E. coli PutA residues 1-52 (PutA52) fused to a cleavable
+N-terminal histidine tag. Expression and purification protocols for
+this protein have been described.24 The N-terminal tag was
+removed by proteolysis prior to crystallization trials as
+described.24 The purified, tag-free protein was concentrated
+using an Amicon Ultra centrifugal filtration device (MWCO 5,000) to
+10.8 mg/mL in a buffer of 20 mM Tris pH 8.0, 500 mM NaCl, 20 mM
+imidazole. The protein concentration was estimated with the BCA method.
+The oligonucleotide used for co-crystallization with PutA52 corresponds
+to nucleotides 211-231 of the put control region, which contains the
+second of five operator sites for PutA (denoted O2 in Fig. 1):
+
+5′-TTTGCGGTTGCACCTTTCAAA-3′(strand 1)
+
+3′-AAACGCCAACGTGGAAAGTTT-5′(strand 2)
+
+Each DNA strand was dissolved in 10 mM Tris, 50 mM NaCl, 1 mM EDTA, pH
+8.0 to a concentration of 6 mM. The two strands were annealed as
+follows. Equal volumes of the oligonucleotide solutions were combined,
+and the mixture was placed in a water bath at room temperature. The
+temperature of the bath was then set to 94 °C, and once the target
+temperature was reached, the power to the bath was turned off to slowly
+cool the sample back to room temperature.
+The PutA52 and dsDNA stock solutions were mixed so that the molar ratio
+of PutA52 dimer to dsDNA was approximately 1:3. The mixture was
+injected onto a Sephacryl S-100 HiPrep 16/60 gel filtration column
+equilibrated with 10 mM Tris, 50 mM NaCl, 0.5 mM EDTA, 0.5 mM DTT, pH
+8.0. Fractions were pooled and concentrated to 11.6 mg/mL (BCA assay)
+using an Amicon Ultra centrifugal filtration device (MWCO 10,000).
+The PutA52/DNA mixture was input to several crystal screens to identify
+initial crystallization conditions. The crystals used for data
+collection were obtained directly from Index Screen reagent 54, which
+consists of 30 % PEG-MME 550, 50 mM CaCl, and 100 mM Bis-Tris pH
+6.5.
+The crystals were prepared for low temperature data collection by
+soaking them in a solution of 32 % PEG-MME 550, 50 mM CaCl, 100 mM
+Bis-Tris pH 6.5, 15 % PEG 200. The crystals were then picked up with
+Hampton loops and plunged into liquid nitrogen.
+X-ray diffraction data collection, phasing and refinement
+Several crystals were analyzed at Advanced Light Source beamline 4.2.2
+using a NOIR-1 CCD detector. The data were integrated with
+MOSFLM42 and scaled with SCALA.43 The crystals have space
+group C2 with unit cell parameters of a = 90.9 Å, b = 44.1 Å, c = 55.2
+Å, and β = 101.5°. The asymmetric unit contains one PutA52 dimer and
+one DNA duplex, which corresponds to 50 % solvent and V[M] = 2.3
+Å3/Da.44,45 The best data set had a high resolution limit
+of 2.25 Å, and consisted of 180 frames collected with oscillation angle
+of 1°/frame, exposure time of 7 s/frame and detector distance of 120
+mm. Data collection and processing statistics are listed in Table
+1.
+Table 1
+Table 1
+Data Collection and Refinement Statisticsa
+The structure was solved using molecular replacement with a PutA52
+dimer serving as the search model. CNS was used for molecular
+replacement calculations.46 The fast-direct method was used for
+cross-rotation function calculations. Prior to translation function
+calculations, the orientations from the cross-rotation function
+calculation were optimized with Patterson correlation refinement using
+two groups corresponding to the two protein chains of the dimer. The
+top solution from the translation function calculation had correlation
+coefficient of 0.257. Rigid body refinement resulted in a model with
+R[cryst] = 0.488 and R[free] = 0.493 for data to 3.0 Å resolution.
+Simulated annealing refinement in CNS lowered the R-factors to R[cryst]
+= 0.450 and R[free] = 0.467 for all reflections.
+The model from simulated annealing was used as the starting point for
+iterative cycles of model building in COOT47 and refinement with
+TLS in REFMAC5.48 After a few cycles, the R-factors for a
+protein-only model were R[cryst] = 0.416 and R[free] = 0.427. At this
+point, electron density representing DNA base pairs was evident. The
+DNA part of the model was gradually built up over about two dozen
+cycles of model building and refinement. Solvent was added during the
+latter stages of model building.
+The final model consists of one PutA52 dimer, one dsDNA molecule and 27
+water molecules. The modeled protein chains include residues 3 - 46 for
+chain A and 4 - 48 for chain B. The DNA strands include nucleotides 4 -
+21 for strand 1 and 1 - 19 for strand 2. Electron density near the end
+of the DNA duplex containing nucleotides 1-3 of strand 1 and 19 - 21
+for strand 2 was rather weak, and indicated fraying of the base pairs
+and possibly more than one conformation. But, the density was not of
+sufficient quality to allow reliable modeling of this end of the DNA
+ligand. We note that this end of the oligonucleotide is far from the
+protein-DNA interface. Refinement statistics are listed in Table
+1.
+Structure analysis
+Structures were analyzed graphically using COOT and PyMOL.49 CNS
+was used to calculate buried surface area.46 DNA conformation was
+analyzed with 3DNA.28 The depth of penetration of the β-sheet
+into the DNA major groove was analyzed for RHH proteins. An operational
+definition of penetration depth was adopted for this purpose as the
+shortest distance between selected Cα atoms of the β-sheet and the DNA
+helical axis. DNA helical axes were calculated using 3DNA.28 The
+9 - 10 base pairs corresponding to the region contacted by the protein
+were used for the axis calculation. Distances between C[α] atoms and
+DNA axes were calculated using a program written by Damian Coventry,
+which implements theory by Paul Bourke.
+Isothermal titration calorimetry (ITC)
+ITC experiments were conducted at 25 °C in a VP-ITC calorimeter
+(MicroCal, LLC). Prior to analysis, the protein and oligonucleotide
+were dialyzed extensively against the appropriate reaction buffer,
+which was either 50 mM Tris, 100 mM NaCl, 1 mM EDTA, pH 8.0, or 50 mM
+sodium phosphate, 100 mM NaCl, 1 mM EDTA, pH 8.0. The dimeric
+quaternary structure of PutA52 was confirmed by equilibrium analytical
+ultracentrifugation under conditions similar to those used in ITC
+experiments (20 μM PutA52 in 50 mM Tris, 50 mM NaCl, pH 8.0). The data
+could be fit very well to a single-species model with apparent
+molecular weight corresponding to that of the homodimer (~13.5 kDa). No
+evidence of a monomeric species was present at 20 μM. Sample and
+titrant were degassed under vacuum immediately before being loaded into
+the sample cell and buret, respectively. Following thermal
+equilibration, aliquots (7 or 10 μL) of titrant were added to the 1.41
+mL sample at 240-second intervals. A 2 μL pre-injection was included at
+the start of each titration. The heat associated with this addition -
+invariably inaccurate due to diffusion of titrant from the buret during
+the equilibration period - was neglected during the fitting process.
+Samples of PutA52 were titrated with two oligonucleotides, designated
+O2 and O2fb4 (O2 with flanking bases of O4). O2 is the oligonucleotide
+used for co-crystallization. O2fb4 is identical to O2 except that the
+base pairs flanking the consensus motif are those of operator 4
+(Fig. 1B):
+
+5′-TTTGCAGTTGCAACTTTCAAA-3′(strand 1)
+
+3′-AAACGTCAACGTTGAAAGTTT-5′(strand 2)
+
+Experiments were conducted in both phosphate and Tris, two buffers with
+distinct ionization enthalpies. The raw data were integrated with
+software supplied with the instrument. Blank titrations, injection of
+titrant into buffer, were performed for each oligonucleotide-buffer
+combination. The average injection heats associated with these
+experiments were used to correct the corresponding protein titrations
+for the nonspecific heat of mixing/dilution.
+The apparent protein-DNA binding enthalpies differed profoundly in Tris
+and phosphate, indicating that the PutA52-DNA interaction is
+accompanied by protonation. Accordingly, the data from the two buffer
+systems were subjected to simultaneous least-squares analysis,
+employing a model that explicitly includes the heat of buffer
+ionization. The following equation describes the cumulative heat after
+the ith titrant addition:
+equation M1
+(1)
+where V is the sample cell volume, [M][t] is the total protein
+concentration, ΔH is the intrinsic binding enthalpy, ΔH[buf] is the
+heat of buffer ionization, n is the number of protons taken up by the
+protein-DNA complex during the binding reaction, K[ap] is the apparent
+association constant, and [DNA] is the concentration of free DNA.
+Because protein-DNA binding is linked to protonation, the apparent free
+energy change for the reaction (ΔG[ap]) includes a contribution from
+buffer ionization (ΔG[buf]):
+equation M2
+(2)
+Thus,
+equation M3
+(3)
+or
+equation M4
+(4)
+where K is the intrinsic binding constant for the protein-DNA
+association, and K[buf] is equal to
+equation M5
+(5)
+In equation 5, [BH+] and [B] represent the concentrations of the
+conjugate acid and base forms of the reaction buffer, and pK[a] is the
+appropriate value for the particular buffer under consideration. K, ΔH,
+and n were global fitting parameters; pH was a fixed global parameter;
+and ΔH[buf] and pK[a] were fixed titration-specific parameters obtained
+from the literature.50
+The ith injection heat (q[i]) was modeled as the difference in the
+cumulative heats associated with the ith and (i+1)th additions:
+equation M6
+(6)
+The second term in equation 6 is a correction for the heat
+associated with the volume of solution displaced from the sample cell
+by the ith titrant addition, where dV[i] is the volume of the ith
+injection. Fitting was performed in Origin (v. 7.5, OriginLab),
+employing a LabTalk script generated in-house.
+PDB accession code
+Atomic coordinates and structure factor amplitudes have been deposited
+in the PDB51 as entry 2RBF.
+Supplementary Material
+supplementary
+Click here to view.(566K, pdf)
+Acknowledgments
+This research was supported by NIH grants GM065546 (JJT) and GM061068
+(DFB), and NSF grant MCB0091664 (DFB). CAB was supported by a
+postdoctoral fellowship from the National Library of Medicine
+(2-T15-LM07089-14). We thank Damian Coventry and Paul Bourke for
+providing computer code that was used in penetration depth
+calculations. Part of this research was performed at the Advanced Light
+Source, which is supported by the Director, Office of Science, Office
+of Basic Energy Sciences, Materials Sciences Division, of the U.S.
+Department of Energy under Contract No. DE-AC03-76SF00098 at Lawrence
+Berkeley National Laboratory. This work is a contribution of the
+University of Nebraska Agricultural Research Division, supported in
+part by funds provided through the Hatch Act. This publication was also
+made possible by NIH Grant Number P20 RR-017675-02 from the National
+Center for Research Resources. Its contents are solely the
+responsibility of the authors and do not necessarily represent the
+official views of the NIH.
+Abbreviations used
+PRODH  proline dehydrogenase
+P5CDH  Δ1-pyrroline-5-carboxylate dehydrogenase
+PutA   Proline utilization A
+PutA52 polypeptide corresponding to residues 1-52 of E. coli PutA
+RHH    ribbon-helix-helix
+PutA47 polypeptide corresponding to residues 1-47 of E. coli PutA
+bp     base pair
+ITC    isothermal titration calorimetry

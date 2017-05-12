@@ -1,0 +1,102 @@
+{
+   "abstract" : "A NoSQL document store with full text search for Moose objects using Elasticsearch as a backend.",
+   "author" : [
+      "Clinton Gormley <drtech@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.041, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Elastic-Model",
+   "no_index" : {
+      "directory" : [
+         "bench",
+         "examples",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Strict" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::EOL" : "0",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::Load" : "0",
+            "Class::MOP" : "0",
+            "Data::Dump" : "0",
+            "Data::Dumper" : "0",
+            "Devel::GlobalDestruction" : "0",
+            "ElasticSearch::SearchBuilder" : "0.18",
+            "JSON" : "0",
+            "List::MoreUtils" : "0",
+            "List::Util" : "0",
+            "MIME::Base64" : "0",
+            "Moose" : "2.06",
+            "Moose::Exporter" : "0",
+            "Moose::Role" : "0",
+            "Moose::Util" : "0",
+            "Moose::Util::TypeConstraints" : "0",
+            "MooseX::Types" : "0",
+            "MooseX::Types::Moose" : "0",
+            "MooseX::Types::Structured" : "0",
+            "Scalar::Util" : "0",
+            "Search::Elasticsearch" : "1.20",
+            "Sub::Exporter" : "0",
+            "Time::HiRes" : "0",
+            "Try::Tiny" : "0",
+            "Variable::Magic" : "0.51",
+            "namespace::autoclean" : "0",
+            "parent" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "CHI" : "0",
+            "DateTime" : "0",
+            "Test::Deep" : "0",
+            "Test::Exception" : "0",
+            "Test::Moose" : "0",
+            "Test::More" : "0.96",
+            "lib" : "0",
+            "utf8" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/clintongormley/Elastic-Model/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/clintongormley/Elastic-Model.git",
+         "web" : "https://github.com/clintongormley/Elastic-Model"
+      }
+   },
+   "version" : "0.52"
+}
+

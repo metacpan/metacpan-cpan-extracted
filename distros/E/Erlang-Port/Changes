@@ -1,0 +1,9 @@
+Revision history for Erlang-Port
+
+0.04    Tue May 22 20:17:05 JST 2007
+        support for HASH encode/decode.
+        added: example/perleval.erl
+
+0.01    Sat May 19 23:38:59 JST 2007
+        First version.
+

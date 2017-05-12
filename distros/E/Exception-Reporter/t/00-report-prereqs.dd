@@ -1,0 +1,50 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Test::More' => '0',
+                                      'Test::Pod' => '1.41'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Carp' => '0',
+                                      'Data::GUID' => '0',
+                                      'Digest::MD5' => '0',
+                                      'Email::Address' => '0',
+                                      'Email::MIME::Creator' => '0',
+                                      'Email::MessageID' => '0',
+                                      'Email::Sender::Simple' => '0',
+                                      'Encode' => '0',
+                                      'Exception::Class' => '1.30',
+                                      'File::Basename' => '0',
+                                      'JSON' => '0',
+                                      'Path::Tiny' => '0',
+                                      'Scalar::Util' => '0',
+                                      'String::Truncate' => '0',
+                                      'Try::Tiny' => '0',
+                                      'YAML::XS' => '0',
+                                      'parent' => '0',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'Email::MIME::ContentType' => '0',
+                                   'Exception::Class::Base' => '0',
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'Test::More' => '0.96'
+                                 }
+                 }
+     };
+  $x;
+ }

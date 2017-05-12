@@ -1,0 +1,22 @@
+
+[- $subs = Execute ({'object' => 'eposubs2.htm'}) -]
+
+
+txt1: [+ $subs -> txt1 +] <br>
+
+txt2: [+ $subs -> txt2 +] <br>
+
+eposub1: [- $subs -> eposub1 -] <br>
+
+eposub2: [- $subs -> eposub2 -] <br>
+
+
+[-
+$src1 = "eposub1: \[- \$subs -> eposub1 -\] \<br>" ;
+
+$src2 = "eposub2: \[- \$subs -> eposub2 -\] \<br>" ;
+
+Execute ({inputfile => "eposrc1", package => __PACKAGE__, input => \$src1}) ;
+
+Execute ({inputfile => "eposrc2", package => __PACKAGE__, input => \$src2}) ;
+-]

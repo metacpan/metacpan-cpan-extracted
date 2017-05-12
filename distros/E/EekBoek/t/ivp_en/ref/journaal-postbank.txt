@@ -1,0 +1,87 @@
+                                                                 Journal
+Period 2011-01-01 through 2011-12-31
+EekBoek Sample Administration                                                                                          EekBoek, 2011-12-31
+
+Date        Booking/Account                   Acc      Debet     Credit      BTW %  Tarief      Posting/line                    Relation
+------------------------------------------------------------------------------------------------------------------------------------------
+2011-01-31  Postbank:1                                                                          Afschrift 1
+2011-01-31    Creditors                      4100     104.65                                      *ADSL + Telefoon              KPN
+2011-01-19    Creditors                      4100      22.80                                      *Internet                     XS4ALL
+2011-01-06    Bank costs                     6980       2.70                  0.00  Nul           Girotel
+2011-01-31    Bank                           2320                130.15                           Afschrift 1
+
+2011-02-28  Postbank:2                                                                          Afschrift 2
+2011-02-23    Creditors                      4100      22.80                                      *Internet                     XS4ALL
+2011-02-10    Bank costs                     6980       2.70                  0.00  Nul           Girotel
+2011-02-28    Bank                           2320                 25.50                           Afschrift 2
+
+2011-03-31  Postbank:3                                                                          Afschrift 3
+2011-03-31    Bank                           2320    3442.98                                      Afschrift 3
+2011-03-31    Creditors                      4100     101.52                                      *Telefoonkosten               KPN
+2011-03-31    Creditors                      4100      22.80                                      *Internet                     XS4ALL
+2011-03-09    Bank costs                     6980       2.70                  0.00  Nul           Girotel
+2011-03-18    Debtors                        2200               3570.00                           *Perl Cursus                  ACME
+
+2011-04-30  Postbank:4                                                                          Afschrift 4
+2011-04-30    Bank                           2320    3544.50                                      Afschrift 4
+2011-04-06    Creditors                      4100      22.80                                      *Internet                     XS4ALL
+2011-04-06    Bank costs                     6980       2.70                  0.00  Nul           Girotel
+2011-04-12    Debtors                        2200               3570.00                           *Perl Cursus                  ACME
+
+2011-05-31  Postbank:5                                                                          Afschrift 5
+2011-05-31    Bank                           2320     467.28                                      Afschrift 5
+2011-05-31    Creditors                      4100     102.22                                      *Telefoonkosten               KPN
+2011-05-31    Creditors                      4100      22.80                                      *Internet                     XS4ALL
+2011-05-11    Bank costs                     6980       2.70                  0.00  Nul           Girotel
+2011-05-31    Debtors                        2200                595.00                           *Perl Cursus                  ACME
+
+2011-06-30  Postbank:6                                                                          Afschrift 6
+2011-06-30    Bank                           2320     688.50                                      Afschrift 6
+2011-06-21    Creditors                      4100      22.80                                      *Internet                     XS4ALL
+2011-06-08    Bank costs                     6980       2.70                  0.00  Nul           Girotel
+2011-06-08    Debtors                        2200                714.00                           *Ondersteuning                ACME
+
+2011-07-31  Postbank:7                                                                          Afschrift 7
+2011-07-31    Creditors                      4100     104.66                                      *Telefoonkosten               KPN
+2011-07-30    Creditors                      4100      22.80                                      *Internet                     XS4ALL
+2011-07-06    Bank costs                     6980       2.70                  0.00  Nul           Girotel
+2011-07-31    Bank                           2320                130.16                           Afschrift 7
+
+2011-08-31  Postbank:8                                                                          Afschrift 8
+2011-08-31    Bank                           2320    1688.50                                      Afschrift 8
+2011-08-10    Creditors                      4100      22.80                                      *Internet                     XS4ALL
+2011-08-10    Bank costs                     6980       2.70                  0.00  Nul           Girotel
+2011-08-10    Debtors                        2200                714.00                           *Ondersteuning                ACME
+2011-08-19    Debtors                        2200               1000.00                           *Pocket Reference             ORA
+
+2011-09-30  Postbank:9                                                                          Afschrift 9
+2011-09-30    Creditors                      4100     108.72                                      *Telefoonkosten               KPN
+2011-09-30    Creditors                      4100      22.80                                      *Internet                     XS4ALL
+2011-09-17    Bank costs                     6980       2.70                  0.00  Nul           Girotel
+2011-09-30    Bank                           2320                134.22                           Afschrift 9
+
+2011-10-31  Postbank:10                                                                         Afschrift 10
+2011-10-13    Creditors                      4100      22.80                                      *Internet                     XS4ALL
+2011-10-12    Bank costs                     6980       2.70                  0.00  Nul           Girotel
+2011-10-31    Bank                           2320                 25.50                           Afschrift 10
+
+2011-11-30  Postbank:11                                                                         Afschrift 11
+2011-11-30    Creditors                      4100     109.67                                      *Telefoonkosten               KPN
+2011-11-30    Creditors                      4100      22.80                                      *Internet                     XS4ALL
+2011-11-08    Bank costs                     6980       2.70                  0.00  Nul           Girotel
+2011-11-30    Bank                           2320                135.17                           Afschrift 11
+
+2011-12-07  Postbank:12                                                                         Afschrift 12
+2011-12-07    Creditors                      4100      22.80                                      *Internet                     XS4ALL
+2011-12-06    Bank costs                     6980       2.70                  0.00  Nul           Girotel
+2011-12-07    Bank                           2320                 25.50                           Afschrift 12
+
+2011-12-09  Postbank:13                                                                         Eerste deel ADSL
+2011-12-09    Creditors                      4100      10.00                                      *Internet                     XS4ALL
+2011-12-09    Bank                           2320                 10.00                           Eerste deel ADSL
+
+2011-12-10  Postbank:14                                                                         Tweede deel ADSL
+2011-12-10    Creditors                      4100      12.80                                      *Internet                     XS4ALL
+2011-12-10    Bank                           2320                 12.80                           Tweede deel ADSL
+------------------------------------------------------------------------------------------------------------------------------------------
+            Total Daybook Postbank                  10792.00   10792.00

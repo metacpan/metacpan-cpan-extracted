@@ -1,0 +1,26 @@
+NAME
+    "Error::Subclasses" - A collection of utility exception subclasses
+
+SYNOPSIS
+     use Error qw(:try);
+     use Error::SystemException;
+
+     my $path = "/somewhere";
+
+     try {
+        mkdir( $path ) or throw Error::SystemException( "Cannot mkdir( '$path' )" );
+     }
+     catch Error::SystemException with {
+        my $E = shift;
+        print STDERR "An IO exception occured - $E\n";
+     };
+
+DESCRIPTION
+    This distribution provides a subclass of "Error" exception objects.
+
+SEE ALSO
+    *   Error - Error/exception handling in an OO-ish way
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
+

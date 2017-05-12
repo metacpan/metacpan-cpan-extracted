@@ -1,0 +1,12 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Env.pm
+t/array.t
+t/env.t
+t/release-pod-syntax.t

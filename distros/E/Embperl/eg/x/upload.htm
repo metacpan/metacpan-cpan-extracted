@@ -1,0 +1,42 @@
+
+<html>
+<head>
+<title>Embperl Examples - File-Upload</title>
+</head>
+<body background="../images/jazzbkgd.gif">
+
+<h1>Embperl Examples - File-Upload</h1>
+
+<hr><h3>The file you enter in the following text box will be uploaded to the /tmp directory if you hit the "upload file" button</h3>
+
+
+[$ if !defined $fdat{ImageName} $]
+
+    <FORM METHOD="POST" ENCTYPE="multipart/form-data">
+      <INPUT TYPE="FILE" NAME="ImageName">
+	  <INPUT TYPE="SUBMIT" NAME="Submit" VALUE="Upload file">
+    </FORM>
+
+[$else$]
+
+[- 
+	open FILE, "> /tmp/file.$$";
+	print FILE $buffer while read($fdat{ImageName}, $buffer, 32768);
+    close FILE;
+-]
+
+Your file has been saved to [+ "/tmp/file.$$" +]<br>
+
+<FORM METHOD="GET">
+  <INPUT TYPE="SUBMIT" NAME="Submit" VALUE="Upload new file">
+</FORM>
+
+
+[$endif$]
+
+<p><hr>
+
+<small>HTML::Embperl (c) 1997-1998 G.Richter</small>
+
+</body>
+</html>

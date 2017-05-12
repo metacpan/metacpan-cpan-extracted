@@ -1,0 +1,157 @@
+------------------------------------------------------------------------
+0.11 | Piotr Roszatycki <dexter@debian.org> | 2008-12-05
+
+Changes:
+
+* Requires Exception::Base >= 0.20.
+
+------------------------------------------------------------------------
+0.1001 | Piotr Roszatycki <dexter@debian.org> | 2008-10-13
+
+Changes:
+
+* Requires Exception::Base >= 0.19.
+
+* Build requires Test::Unit::Lite >= 0.10.
+
+* Minor POD changes.
+
+------------------------------------------------------------------------
+0.10 | Piotr Roszatycki <dexter@debian.org> | 2008-10-07
+
+Changes:
+
+* "strno" attribute represents numeric value of object.
+
+  eval { open my $f, "/file" or Exception::System->throw };
+  if ($@ and $@ == &Errno::ENOENT) { warn "file not found" }
+
+* Uses "numeric_attribute" and "stringify_attributes" attributes.
+
+* Requires Exception::Base >= 0.18.
+
+------------------------------------------------------------------------
+0.0902 | Piotr Roszatycki <dexter@debian.org> | 2008-05-29
+
+Changes:
+
+* Fixed POD coverage.
+
+------------------------------------------------------------------------
+0.0901 | Piotr Roszatycki <dexter@debian.org> | 2008-05-08
+
+Changes:
+
+* Fixed MANIFEST.
+
+------------------------------------------------------------------------
+0.09 | Piotr Roszatycki <dexter@debian.org> | 2008-05-08
+
+Changes:
+------------------------------------------------------------------------
+0.09 | Piotr Roszatycki <dexter@debian.org> | 2008-05-08
+
+Changes:
+
+* Requires Exception::Base >= 0.16.
+* Build requires Test::Unit::Lite >= 0.07.
+* The FIELD constant renamed to ATTRS as far as every OO language calls it
+  attributes.
+* See Exception::Base for incompatibilities list.
+
+------------------------------------------------------------------------
+0.0802 | Piotr Roszatycki <dexter@debian.org> | 2008-04-19
+
+Changes:
+
+* Requires Exception::Base >= 0.15.
+* Drop indirect notation is POD and code.
+
+------------------------------------------------------------------------
+0.0801 | Piotr Roszatycki <dexter@debian.org> | 2008-04-13
+
+Changes:
+
+* Prerequisites Exception::Base >= 0.14.
+* Updated bundled Test::Unit::Lite to 0.0903.
+
+------------------------------------------------------------------------
+0.08 | Piotr Roszatycki <dexter@debian.org> | 2007-11-05
+
+Changes:
+
+* Get shorter errname string for the same errno number.  It should give the
+  same errname strings on Unix and Windows.
+* Updated bundled Test::Unit::Lite to 0.0701.
+
+------------------------------------------------------------------------
+0.0702 | Piotr Roszatycki <dexter@debian.org> | 2007-10-29
+
+Changes:
+
+* Updated bundled Test::Unit::Lite to 0.07.
+* More strict test units.
+
+------------------------------------------------------------------------
+0.0701 | Piotr Roszatycki <dexter@debian.org> | 2007-10-09
+
+Changes:
+
+* Do not test POD errors unless $ENV{PERL_TEST_POD} is true.
+
+------------------------------------------------------------------------
+0.07 | Piotr Roszatycki <dexter@debian.org> | 2007-10-08
+
+New:
+
+* Defined accessors.
+
+Changes:
+
+* Switched to Module::Build.
+* Updated bundled Test::Unit::Lite to 0.05.
+* Prerequisites Exception::Base >= 0.09
+* The err* fields are reset after calling _collect_system_data().
+* Returns errstr only if message is empty.
+
+------------------------------------------------------------------------
+0.0601 | Piotr Roszatycki <dexter@debian.org> | 2007-05-18
+
+* Prerequisites Exception::Base >= 0.06
+
+------------------------------------------------------------------------
+0.06 | Piotr Roszatycki <dexter@debian.org> | 2007-05-18
+
+* Bundle Test::Unit::Lite 0.02 to fix compilation on Perl 5.006 and 5.009.
+* Change default message to 'Unknown system exception'.
+
+------------------------------------------------------------------------
+0.05 | Piotr Roszatycki <dexter@debian.org> | 2007-05-11
+
+* Added bundled Test/Unit/Lite.pm to MANIFEST.
+
+------------------------------------------------------------------------
+0.04 | Piotr Roszatycki <dexter@debian.org> | 2007-05-09
+
+* use 5.006
+* Test with bundled Unit::Test::Lite, so there is no dependency on
+  Unit::Test.
+* META.yml is generated with Makefile.PL.
+
+------------------------------------------------------------------------
+0.03 | Piotr Roszatycki <dexter@debian.org> | 2007-04-24
+
+* require 5.006
+* META.yml created by hand.
+
+------------------------------------------------------------------------
+0.02 | Piotr Roszatycki <dexter@debian.org> | 2007-04-22
+
+* First CPAN release.
+
+------------------------------------------------------------------------
+0.01 | Piotr Roszatycki <dexter@debian.org> | 2007-04-20
+
+* Development release.
+
+------------------------------------------------------------------------

@@ -1,0 +1,203 @@
+#!/usr/bin/perl
+package Elive::script::elive_lint_config;
+use warnings; use strict;
+
+use Getopt::Long;
+use XML::Simple;
+use Elive::Connection::SDK;
+use Pod::Usage;
+
+=head1 NAME
+
+elive_lint_config - Elluminate Live! Manager (ELM) configuration file checker
+
+=head1 SYNOPSIS
+
+    % cd /opt/ElluminateLive/manager/tomcat/webapps/mysite
+    % elive_lint_config WEB-INF/resources/configuration.xml
+
+=head1 DESCRIPTION
+
+This script can be run on Elluminate Live server site configuration files
+to perform some rough checks on the basic setup.
+
+In particular, some command adapter definitions may be missing. This seems to
+depend on the sites vintage, manual edits, and the general upgrade history.
+
+It may be useful to rerun this script after upgrading either Elluminate Live,
+or creating new site instances.
+
+=head1 BUGS AND LIMITATIONS
+
+Missing commands seemed to be more of a problem on older versions of Elluminate
+Live! up to about 9.5 (ELM 3.0). So this script is more likely to be of benefit
+for older versions of Elluminate Live!.
+
+=head1 SEE ALSO
+
+    perldoc Elive
+    http://search.cpan.org/dist/Elive
+
+=cut
+
+main(@ARGV) unless caller;
+
+sub main {
+
+    local(@ARGV) = @_;
+
+    my $help;
+
+    (GetOptions(
+	 'help|?' => \$help,
+	)
+	&& (($help && pod2usage(0)) || (my $config_file = shift @ARGV))
+	&& (!@ARGV))
+	|| pod2usage(2);
+
+    print "Elive ${Elive::VERSION} - Elluminate Live! configuration checker\n";
+
+    print "Checking: $config_file\n";
+
+    my %required_commands = %{ Elive::Connection::SDK->known_commands };
+    my %found;
+
+    my $config = XMLin($config_file,
+		       KeepRoot => 1,
+		       ForceArray => 1,
+	);
+
+    my @errors;
+
+    *STDERR->autoflush();
+    #
+    # check and report on ldap status
+    #
+    if (my @daos = _get_elems($config, qw/elm daofactory dao/)) {
+
+	my ($ldap_dao) = grep {
+	    my ($class) =_get_elems($_, 'class');
+	    $class =~ m{ldapdao}i;
+	    } @daos;
+
+	if ($ldap_dao) {
+	    print "Note: using LDAP for user management:\n\n";
+
+	    my @arguments = _get_elems($ldap_dao, 'argument');
+
+	    foreach my $argument (sort {$a->{name}[0] cmp $b->{name}[0]} @arguments) {
+		    my $name = $argument->{name}[0];
+		    my $value = $argument->{value}[0];
+		    $value =~ s{.}{*}gx
+			if $name eq 'password';
+
+		    printf("  %-14.14s: %s\n", $name, $value)
+			if (defined $name && defined $value);
+	    }
+
+	    print "\n";
+	}
+    }
+
+    my @adapters = _get_elems($config, qw/elm adapters adapter/);
+
+    print "Adapter Commands: ";
+
+    if (my @default = map {_get_elems($_, 'default')} @adapters) {
+	#
+	# elluminate 9.5+
+	#
+	@adapters = @default;
+
+	my ($command_adapter)
+	    = (grep {my ($class) = _get_elems($_, 'class');
+		     $class =~ m{CommandAdapter}}
+	       @adapters);
+
+	die "assuming elm 9.5+, but unable to find elements of class =~ /CommandAdapter/\n"
+	    unless $command_adapter;
+
+	my @commands = _get_elems($command_adapter, 'commands');
+
+	die "assuming elm 9.5+, but unable to find 'commands' elements\n"
+	    unless @commands;
+
+	my ($command, @_guff) = map {_get_elems($_, 'command')} @commands;
+
+	die "assuming elm 9.5+, but unable to find 'command' element\n"
+	    unless $command;
+
+	my @command_keys = sort keys %$command;
+	print "[$_]" for @command_keys;
+
+	@found{@command_keys} = undef;
+    }
+    else {
+	#
+	# elluminate v8.0 - 9.1
+	#
+	delete $required_commands{createSession};
+	delete $required_commands{updateSession};
+
+	my ($command_adapter)
+	    = (grep {my ($class) = _get_elems($_, 'class');
+		     $class =~ m{CommandAdapter}}
+	       @adapters);
+
+	die "Unable to locate 'CommandAdapter' section in configuration\n"
+	    unless $command_adapter;
+
+	my @commands = _get_elems($command_adapter, 'argument');
+	
+	foreach (sort {$a->[0] cmp $b->[0]}
+		 map {[$_->{name}[0], $_->{value}[0]]}
+		 @commands) {
+
+	    my ($name, $value) = @$_;
+	    next unless $name =~ s{^command\:}{};
+	    next unless exists $required_commands{$name};
+	    print "[$name]";
+
+	    if (exists $found{$name}) {
+		push(@errors, "Duplicate entries for command: $name");
+		next;
+	    }
+	    else {
+		$found{$name} = undef;
+	    }
+
+	    unless ($value) {
+		push(@errors, "Could not find a value for adapter command: $name");
+		next;
+	    }
+
+	}
+    }
+
+    print "\n";
+
+    my @missing = sort grep {!exists $found{$_}} (keys %required_commands);
+
+    foreach (@missing) {
+	push(@errors, "missing 'default' adapter command: $_\n");
+    }
+
+    die join("\n", '',@errors)
+	if @errors;
+
+    print "No errors found\n";
+    return 0;
+}
+
+sub _get_elems {
+    my ($struct,$tag,@elems) = @_;
+
+    my $elem = $struct->{$tag};
+
+    my @got = ref($elem) eq 'ARRAY' ? @$elem
+	: defined $elem? ($elem) : ();
+
+    return @elems
+	? map {_get_elems($_, @elems)} @got
+	: @got;
+}

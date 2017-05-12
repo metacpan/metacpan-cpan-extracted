@@ -1,0 +1,48 @@
+---
+abstract: 'Tiny exceptions'
+author:
+  - 'Viacheslav Tykhanovskyi, C<vti@cpan.org>.'
+build_requires:
+  Test::Fatal: 0
+  Test::More: 0
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.7.5, CPAN::Meta::Converter version 2.130880'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Error-Tiny
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Error::Tiny:
+    file: lib/Error/Tiny.pm
+    version: 0.03
+  Error::Tiny::Catch:
+    file: lib/Error/Tiny/Catch.pm
+  Error::Tiny::Exception:
+    file: lib/Error/Tiny/Exception.pm
+  Error::Tiny::Then:
+    file: lib/Error/Tiny/Then.pm
+requires:
+  Carp: 0
+  Scalar::Util: 0
+resources:
+  bugtracker: https://github.com/vti/error-tiny/issues
+  homepage: https://github.com/vti/error-tiny
+  repository: git://github.com/vti/error-tiny
+version: 0.03
+x_contributors:
+  - 'vti <viacheslav.t@gmail.com>'

@@ -1,0 +1,62 @@
+{
+   "abstract" : "Really return() from a try/catch-block",
+   "author" : [
+      "Marcel Gruenauer <marcel@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.110440",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Error-Return",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : 0,
+            "Scope::Upper" : 0,
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Carp" : 0,
+            "English" : 0,
+            "File::Find" : 0,
+            "File::Temp" : 0,
+            "Scalar::Util" : 0,
+            "Test::More" : "0.94",
+            "Try::Tiny" : 0
+         }
+      }
+   },
+   "provides" : {
+      "Error::Return" : {
+         "file" : "lib/Error/Return.pm",
+         "version" : "1.110510"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-error-return at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Error-Return"
+      },
+      "homepage" : "http://search.cpan.org/dist/Error-Return/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/hanekomu/Error-Return.git",
+         "web" : "http://github.com/hanekomu/Error-Return"
+      }
+   },
+   "version" : "1.110510"
+}
+

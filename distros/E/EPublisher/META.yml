@@ -1,0 +1,33 @@
+---
+abstract: 'Publish documents in new format'
+author:
+  - 'Renee Baecker <module@renee-baecker.de>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.142060'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: EPublisher
+requires:
+  Carp: '0'
+  Data::Dumper: '0'
+  File::Basename: '0'
+  File::Find::Rule: '0'
+  File::Glob: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::String: '0'
+  List::Util: '0'
+  Module::Info: '0.32'
+  PPI: '1.213'
+  Pod::Text: '3.08'
+  YAML::Tiny: '0'
+resources:
+  bugtracker: http://github.com/reneeb/EPublisher/issues
+  homepage: http://github.com/reneeb/EPublisher
+  repository: http://github.com/reneeb/EPublisher.git
+version: '1.21'

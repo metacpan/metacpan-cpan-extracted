@@ -1,0 +1,76 @@
+
+<html>
+<head>
+<title>Embperl Test - Subs and Tables</title>
+</head>
+
+<body>
+
+
+[###############################################################################################]
+
+[$ sub Kurslink $]<a href="epl_ober.htm?id=[+ $rec->{id} +]&bereich_id=[+ $fdat{bereich_id} +]" onMouseOut='hidePopup()'>[$endsub$]
+
+[###############################################################################################]
+
+[$ sub cell $]
+		[$if !$rec -> {id} $]
+        
+			<td bgcolor="[+ $bgcol +]" align=center>[- Neulink -]<img border=0 src="/images/leer.gif"><img border=0 src="/images/leer.gif"><img border=0 src="/images/leer.gif"></td>
+        
+		[$ elsif $fdat{bereich_id} eq 'f' || !$kurs -> {-gebucht} || $xkurs $]
+		
+			[$if $xkurs $]
+				<td bgcolor="[+ $bgcol +]" align="[+ $fdat{bereich_id} eq 'f'?'center':'left' +]">&nbsp;[- Kurslink -]<img  border=0 src="[+ $mainrec?"/images/leer2_gelb.gif":($xkurs -> {-gebucht}?"/images/leer_rot.gif":"/images/leer_gelb.gif") +]"></td>
+            [$else$]
+				<td bgcolor="[+ $bgcol +]" align="[+ $fdat{bereich_id} eq 'f'?'center':'left' +]">&nbsp;[- Kurslink -]<img  border=0 src="[+ $kurs -> {-gebucht}?"/images/belegt_rot$gifext.gif":"/images/reserv_gelb$gifext.gif" +]"></td>
+			[$endif$]
+		
+		[$ elsif $fdat{bereich_id} eq 'b' $]
+		
+            [- $n = 2 -]
+			<td bgcolor="[+ $bgcol +]" align=left> <table> <tr>
+				<td>[- Kurslink -]<img  border=0 src="[+ $kurs -> {-gebucht}?"/images/belegt_rot$gifext.gif":"/images/reserv_gelb$gifext.gif" +]"></td>
+                [$ while ($n--) $]
+                    [-  
+                    $banzahl = 1 ;
+                    $sanzahl = 5 ;
+					-]
+                    [$ if $banzahl > 0  $]
+						<td bgcolor="[+ $subbgcol = $sanzahl == 0?'#ff0000':($sanzahl < $banzahl?'#ffff00':'#00ff00') +]">[- Kurslink (($sanzahl || 0) . "/$banzahl") -]<small><strong><font face="[+ $fontface +]" color="[+ $xkurs?$subbgcol:($subbgcol eq '#ff0000'?'#ffffff':'#000000') +]">&nbsp;[+ $brec -> {bereichkurz} +]&nbsp;</td>
+					[$endif$]
+                [$endwhile$]
+			</tr> </table> </td>
+        
+		[$ endif $]
+[$endsub $]
+
+[###############################################################################################]
+
+[-
+
+$rec  = { id => 1 } ;
+$kurs = { -gebucht => 1 } ;
+$brec = { id => 2, bereichkurz => 'bu' } ;
+
+$fdat{bereich_id} = 'b' ;
+$bgcol = '#1' ;
+$gifext = 'xxx' ;
+$l = 2 ;
+
+-]
+
+<table>
+	<tr>
+
+    [$ while ($l-- > 0) $]
+        [- cell -]
+    [$endwhile$]
+
+    </tr>
+</table>    			
+
+
+
+</body>
+</html>

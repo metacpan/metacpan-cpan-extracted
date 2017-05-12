@@ -1,0 +1,12 @@
+Revision history for Email-Simple-Test-TraceHeaders
+
+0.091702  2013-08-13 19:02:40 America/New_York
+          skip the env-to part of the header if not applicable
+
+          update bugtracker and repo
+
+0.091701  2011-10-15 18:12:08 Asia/Tokyo
+          repackage to add META.yml
+
+0.091700  2009-06-19
+          first release

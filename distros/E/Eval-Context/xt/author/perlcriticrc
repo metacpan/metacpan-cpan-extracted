@@ -1,0 +1,11 @@
+# perl_critic setup file
+
+[Documentation::RequirePodSections]
+lib_sections    = NAME | SYNOPSIS | DESCRIPTION | SUBROUTINES/METHODS | BUGS AND LIMITATIONS | LICENSE AND COPYRIGHT | SUPPORT | AUTHOR 
+#script_sections = NAME | USAGE | OPTIONS | EXIT STATUS | AUTHOR
+
+[Subroutines::ProhibitExcessComplexity]
+max_mccabe = 21
+
+[Documentation::PodSpelling]
+stop_words = Opcode perl prepended eval regex undef perldoc CPAN's RT AnnoCPAN CPAN perlsec deserialized validator CanonizeName CheckOptionNames CleanupPackage EvalSetup EvalCleanup GetCallContextWrapper GetPackageName GetInstalledVariablesCode GetVariablesSetFromCaller GetPersistentVariablesSetFromCaller GetSharedVariablesSetFromCaller GetPersistantVariables GetPersistentVariableNames RemoveEvalSidePersistenceHandlers RemovePersistent SetEvalSidePersistenceHandlers SetInteractionDefault SetupSafeCompartment VerifyCodeInput VerifyAndCompleteOptions Nadim nadim Khemir khemir

@@ -1,0 +1,6 @@
+name = "EveOnline-SSO"
+# badges = ["travis"]
+authority="cpan:CHIPSOID"
+
+module_maker="ModuleBuildTiny"
+

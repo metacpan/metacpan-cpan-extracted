@@ -1,0 +1,7 @@
+Excel::Template::Element::Cell::AutoSize
+
+This module implements CELLAUTOSIZE, an additional node type for Excel::Template.  CELLAUTOSIZE can be used in Excel::Template templates instead of CELL to generate cells that are approximately the correct size for the inserted text.
+
+Bug reports and feature requests should be directed to tim@fefcful.org.
+
+Excel::Template::Cell::AutoSize is Copyright Tim Howell, 2004, and is released under the same terms as Perl.

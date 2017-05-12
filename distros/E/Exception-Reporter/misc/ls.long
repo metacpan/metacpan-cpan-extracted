@@ -1,0 +1,7 @@
+total 16
+-rw-r--r-- 1 rjbs rjbs   72 Jul  3 13:15 Changes
+-rw-r--r-- 1 rjbs rjbs  154 Jul  3 13:15 dist.ini
+drwxr-xr-x 3 rjbs rjbs  102 Oct 26  2010 lib/
+-rw-r--r-- 1 rjbs rjbs 7021 Oct 26  2010 mason-exception.t
+drwxr-xr-x 3 rjbs rjbs  102 Jul  3 16:45 misc/
+drwxr-xr-x 3 rjbs rjbs  102 Jul  3 16:44 t/

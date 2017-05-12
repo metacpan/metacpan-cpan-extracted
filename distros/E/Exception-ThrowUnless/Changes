@@ -1,0 +1,38 @@
+Revision history for Perl extension Exception::ThrowUnless
+
+1.01:
+	initial revision
+
+1.02:
+	fixed test problem:  expected an EPERM, didn't get it when
+		run as root.
+
+1.03:
+	fixed Makefiles, they were too ambitious
+
+1.04:
+	silly bug in schdir:  it was trying to pass an array to chdir, resulting
+	in chdir("1") system calls.  Made it work.
+
+	Also added some tests, still more to be done!
+
+1.10:
+	added ssocketpair, srmdir, ssuck, and sspit.  ssuck and sspit are more
+	'whole file' kind of things than thin wrappers around normal system calls,
+	but I find it handy to use them in cases where I want to write terse code,
+	so I included them.
+
+	ssuck will, for a list of files, return the contents of the files, or
+	die if it is unable to open them.
+
+	sspit will, for a file name and a list of lines, create the file and
+	put the lines therein.
+
+	added some tests.
+
+1.11:
+	skipping test for ssocketpair, since Linux 2.6.21 seems to have
+	a bug in socketpair.  It can return success, when either of the fd
+	creations fail.  See net/socket.c in the kernel sources, and not that
+	fd1 and fd2 are checked for error, but err is returned on failure.
+

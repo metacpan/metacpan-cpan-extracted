@@ -1,0 +1,11 @@
+Revision history for Etcd3
+
+0.005
+[new]
+  * Add lease support and tests
+
+0.004
+[new]
+  * travis testing added
+[bug]
+  * Fix issue with HTTP::Tiny and support for Perl version where post function was not available.

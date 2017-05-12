@@ -1,0 +1,20 @@
+Revision history for E'Mail-Acme
+
+1555    2013-12-10
+        repackage, update resource links, fix some packaging bugs
+
+1505    2008-12-01
+        unbreak abstract adapter
+
+1349    2007-07-28
+        various fixes required for 5.6 compat (how bizarre they were!)
+        add Email::Abstract adapter, for dealing with stupider mail modules
+        update manifest to include t/send.t, duh
+
+1123    2007-07-16
+        improve tests
+        documentation tweaks
+
+822     2007-07-13
+        first release; CPAN rejoices
+

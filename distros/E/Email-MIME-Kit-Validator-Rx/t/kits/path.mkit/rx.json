@@ -1,0 +1,12 @@
+{
+  "type": "//rec",
+  "required": {
+    "friend": {
+      "type": "/perl/obj",
+      "isa" : "TestFriend"
+    }
+  },
+  "optional": {
+    "how_long": "//any"
+  }
+}

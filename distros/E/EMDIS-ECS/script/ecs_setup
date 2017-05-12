@@ -1,0 +1,770 @@
+#!/usr/bin/perl -w
+#
+# Copyright (C) 2002-2016 National Marrow Donor Program. All rights reserved.
+#
+# For a description of this program, please refer to the POD documentation
+# embedded at the bottom of the file (e.g. perldoc ecs_setup).
+
+use EMDIS::ECS::Config;
+use File::Basename;
+use File::Copy;
+use File::Spec::Functions qw(file_name_is_absolute rel2abs catdir catfile);
+use strict;
+use Term::ReadLine;
+use vars qw(%attr_desc $cfg $CFGFMT $config_dir $opt_config $OUT
+            $script_dir $term $usage);
+
+$CFGFMT = "%-14s | %-14s | %s\n";
+
+# initialize attribute descriptions
+%attr_desc =
+(
+ ACK_THRES => 
+ ['seq_num threshold for deleting outbound msgs',
+  ''
+  ],
+ ADAPTER_CMD =>
+ ['command to be invoked by MSG_PROC',
+  'ADAPTER_CMD specifies the command to be invoked by MSG_PROC.  ECS',
+  'invokes MSG_PROC to process incoming regular messages.  The default',
+  'MSG_PROC script calls ADAPTER_CMD to process the message.  Some',
+  'ADAPTER_CMD examples:',
+  '  __CONFIG_DIR__/adapter/process_emdis.sh __MAILDROP_DIR__ $1',
+  '  process_emdis.sh $1 $2 $3',
+  'Note: $1 = FML file name, $2 = sender, $3 = seq_num.'
+  ],
+ ADM_ADDR =>
+ ['email address of ECS administrator(s)',
+  'When the ECS system encounters a significant processing error, it',
+  'sends email to the ADM_ADDR email address.  Incoming non-ECS email',
+  'also gets forwarded to ADM_ADDR.'
+  ],
+ ALWAYS_ACK =>
+ ['send MSG_ACK for each processed message?',
+  'If ALWAYS_ACK is set to YES or TRUE, the ecs_scan_mail program',
+  'will send a MSG_ACK for each successfully processed message.',
+  'Otherwise, the ecs_chk_com program will periodically send MSG_ACKs,',
+  'as indicated by in_seq and in_seq_ack.'
+  ],
+ BCK_DIR =>
+ ['backup dir for incoming messages (or NONE)',
+  ''
+  ],
+ ECS_BIN_DIR =>
+ ['directory containing ECS executable scripts',
+  ''
+  ],
+ ECS_DAT_DIR =>
+ ['ECS data directory',
+  'The ECS data directory contains several subdirectories required',
+  'by ECS.  It also typically contains the ECS configuration and',
+  'node_tbl files.  To always use the directory containing the ECS',
+  'configuration file as ECS_DAT_DIR, set this to "__CONFIG_DIR__".'
+  ],
+ ECS_TO_DIR =>
+ ['ECS to recipient directories',
+  'This ECS mail directory contains one to_XX directory for each known',
+  'node in the node_tbl. The ecs_scan_mail daemon scans these',
+  'directories every T_SCN sec for outgoing mail.'
+ ],
+ ECS_FROM_DIR =>
+ ['ECS from sender directories',
+  'This ECS mail directory contains one from_XX directory for each',
+  'known node (sender) in the node_tbl. The ecs_scan_mail daemon drops',
+  'the incoming FML-messages in these boxes after decryption.'
+ ],
+ ECS_DEBUG =>
+ ['ECS debug level',
+  ''
+  ],
+ ERR_FILE =>
+ ['full pathname of the ECS error file',
+  ''
+  ],
+ GNU_TAR =>
+ ['location of GNU tar program',
+  'GNU_TAR is required for the ecstool --archive command, but is',
+  'otherwise not used.'
+  ],
+ GPG_HOMEDIR =>
+ ['GnuPG home directory (GNUPGHOME)',
+  'GPG_HOMEDIR specifies the GnuPG home directory.  The GNUPGHOME',
+  'environment variable gets set to this value when running the',
+  'GnuPG encryption program.'
+  ],
+ GPG_KEYID =>
+ ['this node\'s GnuPG key id',
+  'GPG_KEYID specifies the key id of the GnuPG private key for this',
+  'node.  This is needed for making self-decryptable messages.'
+  ],
+ GPG_PASSPHRASE =>
+ ['passphrase for GnuPG private key',
+  'GPG_PASSPHRASE specifies the GnuPG passphrase for this node\'s',
+  'private GnuPG key.  This is needed when using the GnuPG',
+  'encryption program.'
+  ],
+ INBOX_DEBUG =>
+ ['set to 1 for verbose INBOX debug output',
+  ''
+  ],
+ INBOX_FOLDER =>
+ ['inbox folder, used by IMAP only',
+  'INBOX_FOLDER specifies the name of the IMAP folder from which',
+  'incoming email is retrieved.'
+  ],
+ INBOX_HOST =>
+ ['POP3/IMAP server name',
+  'INBOX_HOST specifies the host name of the POP3 or IMAP server',
+  'from which incoming ECS email is retrieved.'
+  ],
+ INBOX_DATABASE =>
+ ['Lotus Notes Mail database',
+  'The location of the Lotus Notes Mail database',
+  'Example: "mail\username.nsf " '
+  ],
+ INBOX_MAX_MSG_SIZE =>
+ ['size limit for incoming messages',
+  ''
+  ],
+ INBOX_PASSWORD =>
+ ['password',
+  'INBOX_PASSWORD specifies the password for connecting to the POP3',
+  'or IMAP email server.'
+  ],
+ INBOX_PORT =>
+ ['POP3/IMAP server port (e.g. 110/143, or 995/993 if using SSL)',
+  ''
+  ],
+ INBOX_PROTOCOL =>
+ ['inbox protocol: DIRECTORY, POP3 or IMAP',
+  'INBOX_PROTOCOL specifies the protocol used by the ecs_scan_mail',
+  'daemon to retrieve email messages.  "DIRECTORY", "POP3" and "IMAP" are',
+  'currently supported.'
+  ],
+ INBOX_TIMEOUT =>
+ ['seconds',
+  ''
+  ],
+ INBOX_USERNAME =>
+ ['user name',
+  'INBOX_USERNAME specifies the user name for connecting to the POP3',
+  'or IMAP email server.'
+  ],
+ INBOX_USE_SSL =>
+ ['Use SSL encryption when retrieving mail from inbox?',
+  'If INBOX_USE_SSL is set to YES or TRUE, the ecs_scan_mail program will',
+  'use SSL when retrieving mail via POP3 or IMAP.'
+  ],
+ INBOX_DIRECTORY  =>
+ ['Inbox Directory',
+  'INBOX_DIRECTORY specifies the directory to find the mail files'
+  ],
+ LOG_FILE =>
+ ['full pathname of the ECS log file',
+  ''
+  ],
+ MAIL_MRK =>
+ ['ECS mark in subject header of incoming mail',
+  'MAIL_MRK is inserted into the subject header of each ECS email',
+  'messages, to identify it as an ECS message.  The subject header',
+  'of each incoming email message is also scanned for this mark.',
+  'All ECS partners must agree to use the same string;  for EMDIS,',
+  'set MAIL_MRK to "EMDIS".'
+  ],
+ MSG_PART_SIZE_DFLT =>
+ ['default message part size limit',
+  'MSG_PART_SIZE_DFLT specifies the (default) maximum number of data',
+  'bytes sent in a single outbound email message.  If a node-specfic',
+  'msg_part_size value is defined in the node_tbl, that value takes',
+  'precedence over MSG_PART_SIZE_DFLT for the specified node.',
+  ],
+ MSG_PROC =>
+ ['command executed to process FML message',
+  ''
+  ],
+ M_MSG_PROC =>
+ ['command executed to process ECS meta-message',
+  ''
+  ],
+ NODE_TBL =>
+ ['node table filename',
+  ''
+  ],
+ NODE_TBL_LCK =>
+ ['node table lockfile (avoid NFS)',
+  ''
+  ],
+ OPENPGP_CMD_DECRYPT =>
+ ['template for GnuPG decrypt command',
+  ''
+  ],
+ OPENPGP_CMD_ENCRYPT =>
+ ['template for GnuPG encrypt command',
+  ''
+  ],
+ PGP2_CMD_DECRYPT =>
+ ['template for PGP decrypt command',
+  ''
+  ],
+ PGP2_CMD_ENCRYPT =>
+ ['template for PGP encrypt command',
+  ''
+  ],
+ PGP_HOMEDIR =>
+ ['home directory for PGP (PGPPATH)',
+  'PGP_HOMEDIR specifies the PGP home directory.  The PGPPATH',
+  'environment variable gets set to this value when running the',
+  'PGP encryption program.'
+  ],
+ PGP_KEYID =>
+ ['this node\'s PGP key id',
+  'PGP_KEYID specifies the key id of the PGP private key for this',
+  'node.  This is needed for making self-decryptable messages.'
+  ],
+ PGP_PASSPHRASE =>
+ ['passphrase for PGP private key (PGPPASS)',
+  'PGP_PASSPHRASE specifies the PGP passphrase for this node\'s',
+  'private PGP key.  This is needed when using the PGP encryption',
+  'program.'
+  ],
+ SMTP_DEBUG =>
+ ['set to 1 for verbose SMTP debug output',
+  ''
+  ],
+ SMTP_DOMAIN =>
+ ['mail domain',
+  'SMTP_DOMAIN specifies the domain for outbound email.'
+  ],
+ SMTP_FROM =>
+ ['email "From" address',
+  'SMTP_FROM specifies the "From" address for outbound email.'
+  ],
+ SMTP_HOST =>
+ ['name of SMTP server',
+  'SMTP_HOST specifies the mail server host name for outbound email.'
+  ],
+ SMTP_PASSWORD =>
+ ['password',
+  'SMTP_PASSWORD specifies the password for connecting to the SMTP',
+  'server.'
+  ],
+ SMTP_PORT =>
+ ['SMTP server port (e.g. 25, or 465/587 if using SSL)',
+  ''
+  ],
+ SMTP_TIMEOUT =>
+ ['seconds',
+  ''
+  ],
+ SMTP_USE_SSL =>
+ ['Use SSL encryption when sending mail?',
+  'If SMTP_USE_SSL is set to YES or TRUE, the ecs_scan_mail program',
+  'will use SSL when sending mail via SMTP.'
+  ],
+ SMTP_USERNAME =>
+ ['user name',
+  'SMTP_USERNAME specifies the user name for connecting to the SMTP',
+  'server via SSL (using SASL).'
+  ],
+ THIS_NODE =>
+ ['ECS node name for this node',
+  'Node name for this ECS node, identifies the node within the ECS',
+  'network.  All participants in an ECS network must have different',
+  'node names.  To avoid problems with EMDIS, the node name should',
+  'be exactly two characters long and should only contain letters',
+  '(no numeric characters).'
+  ],
+ T_ADM_DELAY =>
+ ['seconds to delay comm loss notification',
+  ''
+  ],
+ T_ADM_REMIND =>
+ ['seconds to wait before comm loss reminder',
+  ''
+  ],
+ T_CHK =>
+ ['seconds between connection checks',
+  'The ecs_chk_com daemon checks the connection status with each',
+  'other ECS node every T_CHK seconds.  While checking status, the',
+  'daemon may also send a READY (heartbeat) meta-message to the other',
+  'node.  The recommended T_CHK value for EMDIS is 7200.'
+  ],
+ T_MSG_PROC =>
+ ['time limit (seconds) for message processing',
+  ''
+  ],
+ T_RESEND_DELAY =>
+ ['seconds to delay before sending RE_SEND requests',
+  'RE_SEND requests may be sent by the ecs_scan_mail program when the',
+  'incoming message queue contains an "early" message (i.e. there is a',
+  'gap in the sequence numbers of received messages), and the status of',
+  'the message queue does not appear to be improving.  T_RESEND_DELAY',
+  'is the minimum number of seconds elapsed before any RE_SEND requests',
+  'are sent.'
+  ],
+ T_SCN =>
+ ['seconds between scans of email inbox',
+  'The ecs_scan_mail daemon scans the ECS email inbox every T_SCN',
+  'seconds.  The recommend T_SCN value for EMDIS is 3600.'
+  ],
+  LOG_LEVEL =>
+  ['Level for writing a log entry',
+   'If the error level is beyond this log level, the error will be',
+   'written to the LOG_FILE. Valid log levels are:',
+   '1=info | 2=warning | 3=error | 4=fatal'
+  ],
+  MAIL_LEVEL =>
+  ['Level for sending an admin email',
+   'If the error level is beyond this email level, the error will be',
+   'send to the admin email address (ADM_ADDR). Valid log levels are:',
+   '1=info | 2=warning | 3=error | 4=fatal'
+  ],
+);
+
+# process command line
+$usage = "Usage:  $0 [ecs_cfg]\n" .
+         "For details, refer to documentation:  perldoc $0\n";
+$opt_config = $ARGV[0]
+    if($#ARGV == 0);
+die "Error: too many command line parameters.\n$usage"
+    if($#ARGV > 0);
+
+# initialize terminal
+$term = new Term::ReadLine("ECS Setup Wizard")
+    or die "Error: unable to initialize Term::ReadLine.\n";
+$term->ornaments(0);
+$OUT = $term->OUT || *STDOUT;
+
+# initialize EMDIS::ECS::Config
+if(not defined $opt_config)
+{
+    $opt_config = 'ecs.cfg';
+    print $OUT "ECS config file not specified; using default: $opt_config\n";
+}
+if(-e $opt_config)
+{
+    die "Error: unable to access file: $opt_config"
+        unless -r $opt_config and -w $opt_config;
+    print $OUT "Loading ECS configuration from file: $opt_config\n";
+    $cfg = new EMDIS::ECS::Config($opt_config, 1);
+    die "Error: unable to load ECS configuration: $cfg\n"
+        unless ref $cfg;
+}
+else
+{
+    $cfg = new EMDIS::ECS::Config('');
+    $cfg->{CFG_FILE} = $opt_config;
+}
+
+# compute script_dir and config_dir
+$script_dir = dirname($0);
+$script_dir = rel2abs($script_dir)
+    unless file_name_is_absolute($script_dir);
+$config_dir = dirname($cfg->{CFG_FILE});
+$config_dir = rel2abs($config_dir)
+    unless file_name_is_absolute($config_dir);
+
+# start interrogating user
+print $OUT "\nAt each input prompt, enter a value if needed or leave the\n";
+print $OUT "answer blank to accept the default setting.\n\n";
+print $OUT "__SCRIPT_DIR__ = $script_dir\n";
+print $OUT "__CONFIG_DIR__ = $config_dir\n";
+
+ask('THIS_NODE');
+ask('ECS_DAT_DIR');
+ask('ADM_ADDR');
+ask('MAIL_MRK');
+ask('T_CHK');
+ask('T_SCN');
+$cfg->{T_MSG_PROC} = $cfg->{T_SCN}
+    unless $cfg->{T_MSG_PROC} and $cfg->{T_MSG_PROC} < $cfg->{T_SCN};
+ask('ADAPTER_CMD');
+ask('ALWAYS_ACK');
+ask('GNU_TAR');
+ask('T_RESEND_DELAY');
+ask('MSG_PART_SIZE_DFLT');
+
+ask('SMTP_DOMAIN');
+ask('SMTP_HOST');
+ask('SMTP_FROM');
+ask('SMTP_USE_SSL');
+if($cfg->{SMTP_USE_SSL} =~ /^yes$/i or $cfg->{SMTP_USE_SSL} =~ /^true$/i) {
+    ask('SMTP_USERNAME');
+    ask('SMTP_PASSWORD');
+}
+
+ask('INBOX_PROTOCOL');
+
+$cfg->{INBOX_USERNAME} = 'username'
+    unless $cfg->{INBOX_USERNAME};
+$cfg->{INBOX_PASSWORD} = 'password'
+    unless $cfg->{INBOX_PASSWORD};       
+    
+if($cfg->{INBOX_PROTOCOL} !~ /directory/i )
+{
+    ask('INBOX_HOST');
+    ask('INBOX_USERNAME');
+    ask('INBOX_PASSWORD');
+    ask('INBOX_MAX_MSG_SIZE');
+}					 
+ask('INBOX_FOLDER')
+    if $cfg->{INBOX_PROTOCOL} =~ /imap/i;
+ask('INBOX_DIRECTORY')
+    if $cfg->{INBOX_PROTOCOL} =~ /directory/i;
+
+if($cfg->{INBOX_PROTOCOL} =~ /pop3/i or $cfg->{INBOX_PROTOCOL} =~ /imap/i) {
+    ask('INBOX_USE_SSL');
+}
+
+$cfg->{GPG_HOMEDIR} = '/home/username/gpg'
+    unless $cfg->{GPG_HOMEDIR};
+$cfg->{GPG_KEYID} = '0x00000000'
+    unless $cfg->{GPG_KEYID};
+$cfg->{GPG_PASSPHRASE} = 'gpgpg'
+    unless $cfg->{GPG_PASSPHRASE};
+if(yes($term->readline("\nConfigure GnuPG encryption [Y/n]? ")))
+{
+    ask('GPG_HOMEDIR');
+    ask('GPG_KEYID');
+    ask('GPG_PASSPHRASE');
+}
+
+$cfg->{PGP_HOMEDIR} = '/home/username/pgp'
+    unless $cfg->{PGP_HOMEDIR};
+$cfg->{PGP_KEYID} = '0x00000000'
+    unless $cfg->{PGP_KEYID};
+$cfg->{PGP_PASSPHRASE} = 'pgpgp'
+    unless $cfg->{PGP_PASSPHRASE};
+if(yes($term->readline("\nConfigure PGP encryption [Y/n]? ")))
+{
+    ask('PGP_HOMEDIR');
+    ask('PGP_KEYID');
+    ask('PGP_PASSPHRASE');
+}
+
+print $OUT "\nOutbound mail storage options are:";
+print $OUT "\nm = maildrop";
+print $OUT "\nt = 'to_XX' and 'from_XX' directories";
+my $send_option = ($term->readline("\nOutbound mail storage option [t]: "));
+
+if( $send_option !~ /m/i ){
+   $send_option = 't';
+   $cfg->{ECS_TO_DIR} = 'mboxes/to_dir' unless $cfg->{ECS_TO_DIR};
+   $cfg->{ECS_FROM_DIR} = 'mboxes/from_dir' unless $cfg->{ECS_FROM_DIR};
+   ask('ECS_TO_DIR');
+   ask('ECS_FROM_DIR');
+}
+
+ask('LOG_LEVEL');
+ask('MAIL_LEVEL');
+
+# save config file
+print "\nOutput file: $cfg->{CFG_FILE}\n";
+if(yes($term->readline("Save to file [Y/n]? ")))
+{
+    save_config();
+    print $OUT "\nECS configuration saved to file: $opt_config\n";
+    print $OUT "Edit this file to fine tune the ECS configuration.\n";
+    print $OUT "Don't forget to set the environment variable ECS_CONFIG_FILE\n"
+             . "(e.g., in /etc/profile, export ECS_CONFIG_FILE=$opt_config).\n";
+}
+
+$cfg->_massage_config();
+
+# create subdirectories
+if(yes($term->readline("\nCreate ECS_DAT_DIR subdirectories [Y/n]? ")))
+{
+    print "\n";
+    if(chk_mkdir('ECS_DAT_DIR'))
+    {
+        chk_mkdir('ECS_TMP_DIR');
+        if(chk_mkdir('ECS_MBX_DIR'))
+        {
+            chk_mkdir('ECS_MBX_IN_DIR');
+            chk_mkdir('ECS_MBX_IN_FML_DIR');
+            chk_mkdir('ECS_MBX_OUT_DIR');
+            chk_mkdir('ECS_MBX_TRASH_DIR');
+            chk_mkdir('ECS_MBX_STORE_DIR');
+        }
+        if ( $send_option eq 't' ) {
+           chk_mkdir('ECS_TO_DIR');
+           chk_mkdir('ECS_FROM_DIR');
+        }
+        chk_mkdir('ECS_DRP_DIR');
+    }
+}
+
+# validate configuration
+if(yes($term->readline("\nValidate configuration [Y/n]? ")))
+{
+    my $err = $cfg->_validate_config();
+    if($err)
+    {
+        print "$err\n";
+    }
+    else
+    {
+        print "\nConfiguration looks good.\n\n";
+    }
+}
+
+exit 0;
+
+# ----------------------------------------------------------------------
+sub ask
+{
+    my $key = shift;
+    my $desc = $attr_desc{$key};
+    my ($desc_short, $desc_long) = ('huh?', 'what?');
+    if('ARRAY' eq ref $desc)
+    {
+        my @temp = @$desc;
+        $desc_short = shift @temp;
+        $desc_long = join("\n", @temp);
+    }
+    print $OUT "\n", $desc_long, "\n";
+    my $default = $cfg->{$key};
+    $default = ''
+        unless defined $default;
+    my $input = $term->readline("$key [$default]: ");
+    $cfg->{$key} = $input
+        if defined $input and $input !~ /^\s*$/;
+}
+
+# ----------------------------------------------------------------------
+sub yes
+{
+    my $ans = shift;
+    return 1 if not defined $ans or $ans =~ /^(y|yes|\s*)$/i;
+    return 0;
+}
+
+# ----------------------------------------------------------------------
+sub cfgline
+{
+    my $key = shift;
+    my $value = (exists $cfg->{$key} ? $cfg->{$key} : '');
+    my $desc = $attr_desc{$key};
+    my $desc_short = 'huh?';
+    $desc_short = $desc->[0]
+        if 'ARRAY' eq ref $desc;
+    return sprintf $CFGFMT, $key, $value, $desc_short;
+}
+
+# ----------------------------------------------------------------------
+sub chk_mkdir
+{
+    my $key = shift;
+    my $dir = $cfg->{$key};
+    my $result = 1;
+    print $OUT "$key: ";
+    if(-d $dir)
+    {
+        print $OUT "already exists\n";
+    }
+    elsif(-e $dir)
+    {
+        print $OUT "already exists, NOT a directory!!\n";
+        $result = 0;
+    }
+    else
+    {
+        if(mkdir $dir)
+        {
+            print $OUT "created\n";
+        }
+        else
+        {
+            print $OUT "unable to create ($dir):\n$!\n";
+            $result = 0;
+        }
+    }
+    return $result;
+}
+
+# ----------------------------------------------------------------------
+sub save_config
+{
+    open CFG, ">$opt_config"
+        or die "Error: unable to open file $opt_config: $!\n";
+    my $localtime = localtime;
+    print CFG <<EOF;
+# ECS Configuration File
+# Written by ecs_setup, $localtime
+#
+# Format is similar to that described in the ECS specification, with
+# some modifications and additions.  The general format is:
+#
+#     <cfg_item> | <cfg_value> { | comments }
+#
+# Notes:
+#
+#   - lines beginning with '#' are comments
+#   - non-absolute data/log file names are relative to ECS_DAT_DIR
+#   - non-absolute executable file names are relative to ECS_BIN_DIR
+#   - special token __SCRIPT_DIR__ is replaced with the name of the
+#     directory that contains the script currently being run
+#     (i.e. using the dirname(\$0) subroutine from File::Basename)
+#   - special token __CONFIG_DIR__ is replaced with the name of the
+#     directory that contains the ecs.cfg file (i.e. the current
+#     directory, or the location specified with the --config command
+#     line option)
+#   - special token __MAILDROP_DIR__ is replaced with the name of the
+#     maildrop directory (e.g. ECS_DAT_DIR/maildrop)
+
+# standard ECS configuration parameters
+EOF
+    print CFG cfgline('MSG_PROC');
+    print CFG cfgline('MAIL_MRK');
+    print CFG cfgline('THIS_NODE');
+    print CFG cfgline('T_CHK');
+    print CFG cfgline('T_SCN');
+    print CFG '#', sprintf($CFGFMT, 'ERR_FILE', 'ecs.err', 'ECS error file');
+    print CFG '#', sprintf($CFGFMT, 'LOG_FILE', 'ecs.log', 'ECS log file');
+    print CFG cfgline('ADM_ADDR');
+    print CFG cfgline('M_MSG_PROC');
+    print CFG cfgline('BCK_DIR');
+    print CFG cfgline('ACK_THRES');
+    
+    print CFG "\n# additional ECS configuration parameters\n";
+    print CFG cfgline('ECS_BIN_DIR');
+    print CFG cfgline('ECS_DAT_DIR');
+    if (  $send_option eq 't' ) {
+       print CFG cfgline('ECS_TO_DIR');
+       print CFG cfgline('ECS_FROM_DIR');
+    }
+    print CFG cfgline('ECS_DEBUG');
+    print CFG cfgline('NODE_TBL');
+    print CFG cfgline('NODE_TBL_LCK');
+    print CFG cfgline('T_ADM_DELAY');
+    print CFG cfgline('T_ADM_REMIND');
+    print CFG cfgline('T_MSG_PROC');
+    print CFG cfgline('ADAPTER_CMD');
+    print CFG cfgline('ALWAYS_ACK');
+    print CFG cfgline('GNU_TAR');
+    print CFG cfgline('T_RESEND_DELAY');
+    print CFG cfgline('LOG_LEVEL');
+    print CFG cfgline('MAIL_LEVEL');
+    print CFG cfgline('MSG_PART_SIZE_DFLT');
+    
+    print CFG "\n# SMTP email configuration parameters\n";
+    print CFG cfgline('SMTP_HOST');
+    print CFG '#', sprintf($CFGFMT, 'SMTP_PORT', 25,
+                           'SMTP server port (e.g. 25, or 465/587)');
+    print CFG cfgline('SMTP_DOMAIN');
+    print CFG cfgline('SMTP_TIMEOUT');
+    print CFG cfgline('SMTP_DEBUG');
+    print CFG cfgline('SMTP_FROM');
+    print CFG '#' if $cfg->{SMTP_USE_SSL} !~ /yes/i and $cfg->{SMTP_USE_SSL} !~ /true/i;
+    print CFG cfgline('SMTP_USE_SSL');
+    print CFG '#' if $cfg->{SMTP_USE_SSL} !~ /yes/i and $cfg->{SMTP_USE_SSL} !~ /true/i;
+    print CFG cfgline('SMTP_USERNAME');
+    print CFG '#' if $cfg->{SMTP_USE_SSL} !~ /yes/i and $cfg->{SMTP_USE_SSL} !~ /true/i;
+    print CFG cfgline('SMTP_PASSWORD');
+
+    print CFG "\n# POP3/IMAP email inbox configuration parameters\n";
+    print CFG cfgline('INBOX_PROTOCOL');
+    print CFG '#' if  $cfg->{INBOX_PROTOCOL} =~ /DIRECTORY/i;    
+    print CFG cfgline('INBOX_HOST');
+    print CFG '#', sprintf($CFGFMT, 'INBOX_PORT', 143,
+                           'POP3/IMAP server port (e.g. 110/143, or 995/993)');
+    print CFG cfgline('INBOX_TIMEOUT');
+    print CFG cfgline('INBOX_DEBUG');
+    print CFG '#' if $cfg->{INBOX_PROTOCOL} !~ /imap/i;
+    print CFG cfgline('INBOX_FOLDER');
+    print CFG '#' if $cfg->{INBOX_USE_SSL} !~ /yes/i and $cfg->{INBOX_USE_SSL} !~ /true/i;
+    print CFG cfgline('INBOX_USE_SSL');
+   
+    print CFG '#' if $cfg->{INBOX_PROTOCOL} =~ /DIRECTORY/i;    
+    print CFG cfgline('INBOX_USERNAME');
+    print CFG '#' if $cfg->{INBOX_PROTOCOL} =~ /DIRECTORY/i;       
+    print CFG cfgline('INBOX_PASSWORD');
+    print CFG '#' if $cfg->{INBOX_PROTOCOL} !~ /DIRECTORY/i;    
+    print CFG cfgline('INBOX_DIRECTORY');    
+
+    print CFG cfgline('INBOX_MAX_MSG_SIZE');
+
+    print CFG "\n# GnuPG cryptography configuration parameters\n";
+    print CFG cfgline('GPG_HOMEDIR');
+    print CFG cfgline('GPG_KEYID');
+    print CFG cfgline('GPG_PASSPHRASE');
+    print CFG '#', cfgline('OPENPGP_CMD_ENCRYPT');
+    print CFG '#', cfgline('OPENPGP_CMD_DECRYPT');
+
+    print CFG "\n# PGP cryptography configuration parameters\n";
+    print CFG cfgline('PGP_HOMEDIR');
+    print CFG cfgline('PGP_KEYID');
+    print CFG cfgline('PGP_PASSPHRASE');
+    print CFG '#', cfgline('PGP2_CMD_ENCRYPT');
+    print CFG '#', cfgline('PGP2_CMD_DECRYPT');
+
+    close CFG;
+
+    chmod $EMDIS::ECS::FILEMODE, $opt_config;
+}
+
+
+__END__
+
+# embedded POD documentation
+
+=head1 NAME
+
+ecs_setup - ECS setup wizard
+
+=head1 SYNOPSIS
+
+ ecs_setup
+
+ ecs_setup test.cfg
+
+=head1 DESCRIPTION
+
+Prompts the user for answers to a series of questions and creates a
+basic ECS configuration file.
+
+=head1 BUGS
+
+Possibly.
+
+=head1 NOTES
+
+TBD.
+
+=head1 SEE ALSO
+
+ECS, ecs_chk_com, ecs_scan_mail, ecstool
+
+=head1 AUTHOR
+
+Joel Schneider <jschneid@nmdp.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED 
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF 
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+Copyright (C) 2002-2016 National Marrow Donor Program. All rights reserved.
+
+See LICENSE file for license details.
+
+=head1 HISTORY
+
+ECS, the EMDIS Communication System, was originally designed and
+implemented by the ZKRD (http://www.zkrd.de/).  This Perl implementation
+of ECS was developed by the National Marrow Donor Program
+(http://www.marrow.org/).
+
+2004-03-12	
+Canadian Blood Services - Tony Wai
+Added MS Windows support for Windows 2000 and Windows XP
+Added "DIRECTORY" inBox Protocol. This can interface with any mail
+system that can output the new messages to text files.
+
+2007-08-01
+ZKRD - emdisadm@zkrd.de
+Added new variables (MAIL_LEVEL | ECS_TO_DIR | ECS_FROM_DIR).
+Added to_XX and from_XX directory support.
+Added hint to implement the environment variable ECS_CONFIG_FILE to 
+the .profile and the httpd.conf (apache) config files.

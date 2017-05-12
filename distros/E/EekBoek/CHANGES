@@ -1,0 +1,1892 @@
+2.02.05.5
+
+	* Verwijder internationalisatie.
+
+	* Emergency fix voor CPAN issues 112777 and 120013.
+	  (Failures met de ontwikkelversie van Perl 5.24.)
+
+2.02.04	2013-07-05 08:45
+
+	* Fix issue #38, crash bij rapport 'save' knop.
+
+2.02.02	2013-05-15 21:45
+
+	* Emergency bugfix release.
+
+	* Fix probleem dat maart 2013 loopt van 2013-03-01 t/m 2013-03-30.
+          Oorzaak is de zomertijd die op 30 maart 2013 inging.
+
+2.02.00	2012-09-18 14:37
+
+	* Update documentation, site, help documents.
+
+	* Update relnotes-2.02 document.
+
+	* Update README.201210 document.
+	
+	* Aanpassen spec file t.b.v. rpm bouwers.
+
+2.01.06	2012-08-31 22:24
+
+	* Eerste beta voor 2.02.
+
+	* Openen van een nieuw boekjaar is nu mogelijk vanaf juli.
+
+	* Kleine bugfixes in de nieuwe BTW tariefcodes en afhandeling
+          daarvan.
+
+2.01.05	2012-08-30 11:30
+
+	* Voeg de README.201210 toe aan de kit :)
+
+2.01.04	2012-08-29 21:50
+
+	* Verschillende wijzigingen in het definiëren en gebruiken van
+          BTW tariefcodes in verband met de invoering van een nieuw
+          BTW tarief per 1 oktober 2012.
+
+	  Zie het bestand README.201210 voor alle details.
+
+	* Er is nu ook een engelstalige IVP (installatie-verificatie
+          procedure) 
+
+	* Config setting voor errexit waarmee het effect van de
+          command line optie --errexit permanent kan worden
+          afgedwongen voor alle niet-interactieve EekBoek
+          verwerkingen.
+
+	  [shell]
+	  errexit = 1
+
+	* Elimineer de undefined warning als er geen LANG environment
+          variabele is gezet.
+
+	* Script om het EekBoek versienummer uit de git repo te halen.
+
+2.01.03	2012-08-01 20:55
+
+	* (Bootstrap) Seriële make afdwingen.
+
+	* Voor het afletteren wordt de boekingsdatum gebruikt, en niet
+          langer de boekingsvolgorde.
+
+	* Term::ReadLine: Fallback naar T::R::Perl (meegeleverd) met
+	  command history en completion.
+
+	* Er wordt een waarschuwing gegeven wanneer in een boeking
+          '@H' en/of '@L' wordt gebruikt en er meerdere BTW tarieven
+          corresponderen met '@H' of '@L'.
+
+	* In het grootboek commando kunnen nu ook (hoofd)verdichtingen
+          worden opgegeven.
+
+	* Voer een rollback uit wanneer een mislukte opdracht dat
+          vergeet te doen. Dit is een tijdelijke stoplap totdat alle
+          opdrachten zich keurig aan de regels voor database
+          transacties houden.
+
+    	* Deprecieer het plaatsen van een D of C na het rekeningnummer
+	  bij de specificatie van relaties.
+
+	* Fix bug 3510006.
+
+	* Fix bug 3499522.
+
+    	* Many translation / localisation changes for the on-going
+	  translatability project.
+
+	* Several small updates to work with wxWidgets 2.9.x.
+
+	* Eliminated using Wx :allclasses and :everything. This solves
+          some problems with Cava packager and Wx 2.9.x.
+
+	* Fix typo in messages (Issue #3477452).
+
+    	* Fix --help handling.
+
+	* Fix bug #2624283
+	  Dagboeken met whitespace erin worden intern van een
+	  underscore voorzien.
+	  Dus de opdrachten "Post Bank" "post bank" en post_bank en
+	  POST_bank zijn gelijkwaardig.
+	  Voor de export wordt de lowercase met underscores naam
+	  gehanteerd (zoals al het geval was).
+
+	* Fix bug #2209529
+	  Dagboeknamen die overlappen met ingebouwde commando's worden
+	  niet meer toegestaan.
+
+2.01.02 2011-07-28 21:31
+
+	* (ebshell, ebwxshell) Forceer locale naar nl_NL totdat de
+          engelse vertaling klaar is.
+
+	* (ebshell) Verwijder de Term::ReadLine::Gnu fallback hack zodat de
+	  workaround met PERL_RL weer bruikbaar is.
+
+	* (ebshell) Accepteer commando's weer case-insenstive.
+
+2.01.01	2011-07-25 08:11
+
+	* Alle programmacomponenten zijn nu in het Nederlands. Er is
+          nog één enkele vertaling, namelijk die van Nederlands naar
+          Engels. 
+
+2.01.00	2011-07-21 22:04
+
+	>>> Nieuwe database versie; auto-migratie beschikbaar <<<
+
+	* Interne cleanups en rework voor de EekBoek API.
+
+	* Localisatie cleanup. Alle componenten gedragen zich nu
+          gelocaliseerd. De locale instelling wordt initieel
+          overgenomen van de omgeving. De wizards nemen de locale op
+          in de gegenereerde config file. Locale switching op run time
+          is mogelijk.
+
+	* Verbetering wizards om aan bestaande databases (op server)
+	  te kunnen connecten.
+
+	* Introductie resource- en user-dir. Resources en user info
+          kunnen locale-dependent zijn.
+
+	* Packaging met Cava Packager en Windows installer met
+          InnoSetup.
+
+	* Fix bug #3374176.
+	  BELANGRIJK: Administraties die last hebben van deze bug
+	  moeten opnieuw worden aangemaakt.
+
+2.00.03	2011-03-22 20:42
+
+	* (schema) Fix probleem dat het gebruik van een
+	  ongedefinieerde BTW tariefgroep onopgemerkt bleef wanneer er
+	  wel een groep was gedefinieerd met een afwijkende
+	  exclusiviteit.
+
+2.00.02	2010-05-06
+
+	* (ebwxshell, linux) Workaround voor het HTML rendering
+          probleem met wxPerl versies 0.95 en 0.95.
+	  Dit probleem treft met name Ubuntu 10.4 LTS.
+
+	* (ebshell) Meer flexibele invoer.
+	  Accepteer newlines en returns als regeleinde.
+	  Negeer trailing whitespace. Dit elimineert het probleem van
+	  spaties achter de laatste backslash.
+
+	* (eekboek-mode.el) Kleine, niet strict noodzakelijke
+	  verbetering. 
+
+	* (ebshell, errexit) Invoerverwerking afbreken indien er een
+	  foutboodschap is gegeven.
+
+	* INSTALL: Refereer naar de wiki.
+
+2.00.01.01
+
+	* Packaging for Windows: (build_common.pl) use PL_files to
+          avoid .pl files to be processed.
+
+2.00.01	2010-03-28 20:42
+
+	* Fix probleem met Term::ReadLine::Perl. Gebruik in plaats
+          daarvan Term::ReadLine::Gnu.
+	  Meest relevant voor Windows en MacOSX.
+
+	* Elimineer File::HomeDir.
+	  Relevant voor MacOSX, omdat de benodigde Mac::Files daar
+	  problematisch is en enkel in 32bit beschikbaar.
+
+	* Nieuwe packaging. Default is cli, gui is optioneel, contrib
+          verhuist naar de wiki.
+
+2.00.00	2010-03-23 20:59
+
+	* Release 2.00.00
+
+2.00.00.RC03	2010-03-22 14:04
+
+	* Fix probleem dat een overbodige dialoog vraagt om een
+          eekboek.conf.
+
+2.00.00.RC02	2010-03-17 13:40
+
+	* Tweede release candidate 2.00.
+
+	* Diverse fixes voor Windows.
+
+	* Fix probleem met niet eenduidige interpretatie van getallen.
+	  In expressies als "5*0.005" werd 0.005 als 5 gezien i.p.v.
+	  0,005. 
+
+	* Kleine verbeteringen in de wizards. 
+
+2.00.RC01	2010-03-12 23:13
+
+	* Eerste release candidate 2.00.
+
+	* (iniwiz) Fix dubbele foutmelding.
+	
+	* Kleine, maar belangrijke aanpassingen t.b.v. Microsoft
+	  Windows.
+
+	* Onderhoud vertalingen toegevoegd aan de kit.
+
+1.05.20	2010-02-19 23:26
+
+	* Documentatie aanpassingen.
+
+	* (iniwiz) Fix probleem met crash na db selectie.
+
+	* Fix probleem met \ op laatste regel.
+
+	(wbwxshell) Fix probleem met de result rapporten.
+
+1.05.19	2010-01-27 10:25
+
+	* (ebshell) Fix unicode probleem in help strings.
+
+	* (ebshell) Fix unicode probleem in wizard waardoor
+          administratie namen/codes geen non-ascii tekens konden
+          bevatten.
+
+1.05.18	2010-01-26 10:56
+
+	* (ebwxshell) Fix unicode issues.
+
+	* (ebwxshell) Filter duplicaten uit de history en beperk het
+          aantal teruggeschreven regels tot een instelbaar maximum
+          (default 200).
+
+	* Upgrade Wx::Perl::ProcessStream to 0.24.
+
+1.05.17	2010-01-22 13:10
+
+	* Nieuw command: schema. Hiermee kunnen interactief
+          (vooralsnog alleen) grootboekrekeningen worden aangemaakt.
+
+	  Onderhoud van het schema. Deze opdracht kent sub-opdrachten:
+
+	    schema <opdracht> [ <opties> ] <argumenten>
+
+	  Aanmaken grootboekrekening
+
+	    schema gbk <rekening> [ <type> <omschrijving> <verdichting> ]
+
+	       <rekening>      de gewenste grootboekrekening
+	       <type>          D/C voor Debet / Credit
+			       K/O/N voor Kosten / Omzet / Neutraal
+			       Eventueel gevolgd door ! als deze 
+			       balansrekening vast staat aan één kant
+	       <omschrijving>  De omschrijving van deze grootboekrekening
+	       <verdichting>   De verdichting waaronder deze rekening valt
+
+	       Wanneer enkel een nummer wordt opgegeven dan worden de gegevens
+	       van de betreffende grootboekrekening getoond.
+
+	* Fix probleem met completion van rekeningnummers.
+
+	* Upgrade Module::Build to 0.32 to have decent prereq support.
+
+1.05.16 2010-01-17 00:14
+
+	* (ebshell) Non-zero exit status indien fouten zijn
+          opgetreden. Dit kan consequenties hebben als ebshell wordt
+          toegepast in makefiles.
+
+	* (ebshell) Verwijderen opties --createsampleconfig en
+          --createsampledb (vervangen door de wizard).
+
+	* (ebshell, wizard) Gebruik eigen code (recursief) om --init
+	  uit te voeren.
+
+	* (ebshell, shell) Grote opruiming.
+
+	* (migration) Fix: DB automigratie van SQLite zat PostgreSQL
+          in de weg.
+
+1.05.15 2010-01-16 16:32
+
+	* Small changes for the packaging.
+
+1.05.14 2010-01-13 11:12
+
+	* (ebwxshell) Icon buttons i.p.v. [Edit] en [Send].
+	  Conform to Gnome Human Interface Guide.
+
+	* (ebwxshell, editdialoog) Resizable, onthoudt size/pos.
+
+	* (ebwxshell) Meer rapporten in het menu.
+
+	* (ebwxshell) EditDialog meeleveren :)
+
+	* Eerste herziening van de documentatie.
+
+	* Fix test probleem op een virgo install.
+
+	* Fix probleem met het verwerken van het schema (privé werd
+          niet herkend).
+
+	* Kleine aanpassingen om het opstartgedrag van ebshell en
+          ebwxshell consistent te maken.
+
+1.05.13 2010-01-06 21:21
+1.05.12 2010-01-06 20:09
+
+	=== EXPERIMENTAL ===
+
+	* De configuratie file mag nu ook "eekboek.conf" heten.
+
+	  Sterker nog, "eekboek.conf" wordt geprefereerd boven
+	  ".eekboek.conf". Dus wanneer beide er zijn wordt alleen
+	  "eekboek.conf" gebruikt. Wanneer nieuwe files worden
+	  aangemaakt wordt alleen "eekboek.conf" aangemaakt.
+
+	  Wanneer er alleen ".eekboek.conf" bestanden zijn moet het
+	  gedrag ongewijzigd zijn gebleven.
+
+1.05.11	2010-01-06 13:56
+
+	* (ebwxshell, wizard) Verplicht unieke administratie naam en code.
+
+	* (ebshell) Wizard om administraties aan te maken.
+
+	* (ebwxshell) Mogelijkheid om de input regel uitgebreid te
+	  editen, inclusief multi-line support.
+
+1.05.10	2009-12-23 22:32
+
+	* (ebwxshell) Persistent window size/positions.
+
+	* (MS-Windows) Consequent gebruik van de registry.
+
+	  HKCU\Software\Squirrel Consultancy\EekBoek\ebwxshell
+
+	* (Config) Gebruik HOMEDRIVE/HOMEPATH voor Windows.
+
+1.05.09	2009-12-23 13:18
+
+	* (ebwxshell) Drill-down. In de rapportage windows kun je
+          klikken op (de meeste) grootboeknummers, journaalposten en
+          relatiecodes om daarmee het bijbehorende overzicht op te
+          roepen.
+
+	  Voor het beste resultaat verdient het aanbeveling de
+	  preference "Rapporten in hetzelfde venster" uit te zetten.
+
+1.05.08	2009-12-22 23:00
+
+	* Configuratie files:
+
+	  [locale] lang werkt nu (weer).
+
+	  [database]
+	  - fullname is vervallen.
+	  - name prefix "eekboek_" wordt niet langer gestript. 
+	  - driver = sqlite is nu default.
+
+	* (ebwxshell) Fix preferences save/restore.
+
+	* examples/eekboek.conf bijgewerkt.
+
+	* Meer vertaald.
+
+1.05.07	2009-12-22 14:00
+
+	* (ebwxshell) Preferences voor error/warning/info popup windows.
+
+	* (ebwxshell) Icon.
+
+	* (ebwxshell) Altijd wizard/sel opstarten, ook als er een
+          .eekboek.conf is.
+
+1.05.06	2009-12-20 13:18
+
+	* Fix probleem dat ebshell niet langer
+          create{database|sampleconfig} kon doen.
+
+	* Missend icon toevoegen.
+
+	* ebwxshell installeren ipv. ebgui.
+
+	* Nieuwe settings toegevoegd aan examples/eekboek.conf.
+
+1.05.05	2009-12-19 15:23
+
+	* Integratie met EB WxShell.
+
+	* Verwijder (tijdelijk) GUI voor ombouw tot browser.
+
+	* (Wizard) Config 'admdir' in sectie '[general]' kan worden
+          gebruikt om te bepalen waar de administraties (moeten komen
+          te) staan.
+
+	* (Wizard) Voorkom dat de verkeerde ebshell wordt opgestart.
+
+	* (Wizard) Gebruik de voorbeeldadministratie als default.
+
+	* Bugfix (regressie) BTW werd niet afgeboekt in de volgjaren
+	  van een meerjarige boekhouding.
+
+	* Bugfix: meervoudige definitie van 'min' in
+          EB/Tools/Einde.pm.
+
+	* Bugfix: ebgui kende --[no]wizard niet.
+
+	* (Wizard): Defaults voor adm code en database naam.
+
+1.05.04	2009-10-28 23:47
+
+	* Many internal changes for GUI integration.
+
+	* Consistent gedrag gui/wizard.
+
+1.05.03	2009-10-27 16:15
+
+	* !!! SNAPSHOT !!! SNAPSHOT !!! SNAPSHOT !!!
+
+	* (GUI) Bugfix: Dagboeken -> Inkoop/Verkoop hadden geen title.
+
+	* (Wizard) Toon alle beschkbare database drivers.
+
+	* (Wizard) Fix vertaling <Prev and Next> buttons.
+
+	* (Wizard) Ingave database folder.
+
+	* (Wizard) Automatisch vormen van database naam uit de
+          naam van de administratie.
+
+	* (GUI) Aanmaken van en kiezen uit administraties die in een
+          folder zijn ondergebracht. --admdir command line optie.
+	  
+1.05.02	2009-10-19 11:47
+
+	* !!! SNAPSHOT !!! SNAPSHOT !!! SNAPSHOT !!!
+
+	* (GUI) Verhelpen probleem van opstarten GUI vanuit Wizard.
+
+	* Verhelpen probleem met de voorbeeldadmin (mutaties waren nog niet
+	  omgezet naar UTF-8).
+
+1.05.01	2009-10-18 22:46
+
+	* !!! SNAPSHOT !!! SNAPSHOT !!! SNAPSHOT !!!
+
+	* (GUI) Templates voor de setup wizard.
+
+	* Discontinueer ondersteuning voor latin1 bestanden. Alles is
+          nu UTF-8.
+
+	* Export ondersteunt --titel (omschrijving van de export kit).
+	  Vooralsnog alleen relevant voor export naar ebz file.
+
+	* (GUI) Export/EekBoek: Omschrijving kan worden opgegeven.
+
+	* (GUI) IniWiz: Gebruik omschrijving in de templates lijst.
+
+	* (SQLite) Config database::path bepaalt waar de databases
+          worden neergezet.
+
+	* Andere processing van de configuratiefiles. Mag geen
+          zichtbare gevolgen hebben.
+
+	* Andere processing van numerieke expressies in bedragen. Mag
+          geen zichtbare gevolgen hebben.
+
+	* Bedragen mogen nu ook worden ingegeven met
+          duizendtalscheidingstekens, dus b.v. 1.234,56 of 1,234.56 .
+
+	* (IVP) Verbetering opzet en afhandeling.
+
+	* (Config) format:amount vervangt locale:decimalpt,
+          locale:thousandsep en text:numwidth.
+
+	  1234.56      -> dpt = "."
+	  1234,56      -> dpt = ","
+	  1.234,56     -> dpt = ",", sep = "."
+	  1,234.56     -> dpt = ".", sep = ","
+	  1.234.567,89 -> dpt = ",", sep = ".", width = 12
+
+	  De width wordt alleen aangepast als het format breder is dan
+	  9 tekens.
+
+1.05.00	2009-10-09 17:50
+
+	* !!! SNAPSHOT !!! SNAPSHOT !!! SNAPSHOT !!!
+
+	* (GUI) Admin setup wizard.
+
+	* Strafbankje voor balansrekeningen.
+
+	* Fix problem dat 'privé' niet wordt gematched als
+	  content-type = utf8 en $cfg->unicode.
+
+1.04.04	2009-06-10 12:13
+
+	* Bugfix voor --createsampleconfig .
+
+	* Bugfix voor --createsampledb .
+
+1.04.03	2009-04-03 12:18
+
+	* Consolidatie. Geen wijzigingen.
+
+1.04.02	2009-01-25 21:20
+
+	* Nieuwe voorbeeldmodule voor userdefs: examples/Kasveroop.pm .
+
+	* bkm_multi: Fix probleem dat de intern aangemaakte boekingen
+          worden geformatteerd volgens thousandsep, wat ongeldige
+          invoer kan opleveren.
+
+	* Fix bug 2172095.
+
+1.04.01	2008-09-04
+
+	* Fix probleem met Windows Vista.
+
+1.04	2008-08-30 10:53
+
+	* Versienummer aangepast.
+
+1.03.93 2008-08-24 18:52
+
+	* Revisie en actualisatie on-line documentatie.
+
+1.03.92 2008-08-10 21:18
+
+	* Kleine verbeteringen XAF export.
+	  Fix --boekjaar voor --xaf export.
+
+	* Verwijder --boekjaar optie voor gewone export.
+
+1.03.91	2008-08-02 15:06 (CPAN only)
+
+	* Bugfix headerinderdrukking van de BTW-aangifte.
+
+1.03.90 2008-07-19 18:58
+
+	* Alle rapporten in HTML kunnen een expliciete titel
+          meekrijgen:
+
+	    balans --title="Voorlopige balans 2009" --out=x.html
+
+	* Bugfix: Meer dan één -D / --define op de command line
+          mogelijk.
+
+	* Kleine wijzigingen in het verwerken van de config files. De
+          ".eekboek.conf" in de huidige directory wordt niet langer
+          meegenomen indien ebshell wordt opgestart met een "-f" optie.
+
+1.03.13 2008-04-13 16:09
+
+	* Voorkom warnings indien bij de BTWaangifte er geen
+          voorheffingen hebben plaatsgevonden in de periode waarover
+          aangifte wordt gedaan.
+
+	* (EB::Report::Genbase) Geen backends laden indien
+          AUTOMATED_TESTING. Hiermee worden test failures vermeden
+          indien er achterhaalde EekBoek installaties rondzwerven.
+
+	* Oplossen installatieprobleem met RPM.
+
+	* Uitbreidingen contrib/afschr.pl .
+
+1.03.12	10-04-2008 13:47
+
+	* BKM deb/crd boeking gebruikt altijd de standaardrekeningen
+          voor deb/crd i.p.v. de aan het dagboek gekoppelde rekening.
+
+	* Kleine wijzigingen in de BTW rapportage.
+
+	* Debian kit is now also 'unstable'.
+
+1.03.11	22-032008 17:07
+
+	* BTW tariefgroepen Privé en Anders.
+
+	  In schema:
+
+	     5  BTW Privé    :tariefgroep=privé :perc=12,00 :exclusief
+	     6  BTW Anders   :tariefgroep=anders :perc=14,50 :exclusief
+
+	  Als deze taeriefgroepen worden opgevoerd dan moeten de
+	  betreffende koppelingen ook worden opgegeven:
+
+             4240  D   BTW Inkoop Anders    :koppeling=btw_ia
+             4250  C   BTW Verkoop Anders   :koppeling=btw_va
+
+	  Etc.
+
+	  BTW 'Privé' komt in de BTW aangifte in groep 1d, BTW
+	  'Anders' komt in groep 1e. Deze groepen worden niet op het
+	  aangifteformulier vermeld als de betreffende tariefgroep
+	  ontbreekt.
+
+	* BTW Aangifte: Uitgebreidere signalering discrepanties in BTW
+          posten.
+
+	* Kleine wijzigingen in de BTW rapportage.
+
+	* EekBoek shell opdrachten zijn nu case-insensitive.
+
+	* contrib/afschr.pl: tooltje om afschrijvingen te berekenen.
+
+	* Fix regressie in debiteuren/crediteuren overzichten.
+
+	* CPAN testing: Skip silently if perl < 5.8.3.
+
+1.03.10	27-02-2008 11:55
+
+	* CPAN testing: Skip PostgreSQL tests if no database access.
+
+	* CPAN testing: Encode reference data to UTF-8 if running in
+          an Unicode environment.
+
+	* Fix issue 1901436.
+
+1.03.09	25-02-2008 13:01
+
+	* Update PPD met 5.10 info.
+
+	* --config (-f) accepteert nu ook de naam van een directory,
+	  en probeert dan eekboek.conf en .eekboek.conf.
+
+	* Commando's 'journal', 'trace' en 'confirm' kennen nu
+          een'--quiet' optie, waardoor de opdrachten stil worden
+          uitgevoerd.
+
+	* Journaalposten worden niet meer gerapporteerd tijdens import
+          en init.
+
+	* Nieuw, actueel, eenvoudiger en beter schema voor de example
+          database.
+
+	* Verified to work with Perl 5.10.0 and DBD::Pg 2.0.0.
+
+	* CPAN testing: Fix problems that cause the wrong perl to be
+          used.
+
+	* CPAN testing:Fix problems that cause the wrong sample files
+          to be used.
+
+	* Elimineer warnings bij export van administraties die niet
+          alle standaardkoppelingen hebben.
+
+	* Fix issue 1871576.
+
+1.03.08	15-02-2008 21:08
+
+	* Boekingen in een periode waarover BTW aangifte is gedaan
+          kunnen toch worden gewijzigd als deze boeken geen betrekking
+          heeft op de BTW (m.a.w., BTW type Neutraal).
+
+	* Fix problem met #! in ebshell script bij CPAN build.
+
+	* Kleine aanpassingen t.b.v. de GUI.
+
+1.03.07	06-02-2008 18:12
+
+	* Fix bug waardoor een adm_relatie met datum 31-12 niet werd
+          geaccepteerd wanneer er al eerdere boekingen in dat jaar
+          waren.
+
+	* Fix bug waardoor openstaande posten uit voorgaande jaren
+	  XXXX leidden tot de melding "Boekjaar XXXX nog niet
+	  afgesloten".
+	
+	* Fix auto-migratie bug.
+
+1.03.06	05-02-2008 11:57
+
+	* Enkele aanpassingen in het strategy:bkm_multi gebeuren. Omdat
+	  het zoekproces enige tijd in beslag kan nemen (enkele minuten
+	  bij 25 openstaande posten) is een begrenzing ingebouwd. 
+	  Config: strategy:bkm_multi_max (default = 15).
+
+	* Bij een inkoop/verkoop boeking kun je een willekeurige (moet
+	  tenminste één niet-cijfer bevatten) string opgeven als
+	  referentie:
+
+	     inkoop 25-12 CREDITEUR "Diversen" --ref="P24XyzBla!" 100
+
+	  Een geschikte kandidaat is b.v. het faktuurnummer van de
+	  klant, of een ordernummer.
+
+	  Deze referentie kun je later gebruiken bij de betaling:
+
+	     postbank 25-12 Afschrijving \
+		crd 25-12 "CREDITEUR:P24XyzBla!" -100
+
+	  Dus net zoals:
+
+	     postbank 25-12 Afschrijving \
+		crd 25-12 inkoop:54 -100
+
+	  Overigens met dezelfde functionaliteit: er wordt niet gekeken
+	  of de boeking open staat. Je kunt dus op deze manier ook op
+	  voorhand boeken.
+
+	  De combinatie relatiecode - referentie moet per boekjaar uniek zijn.
+
+	* De journaal-rapporten laten nu ook de relatiecodes zien bij
+          inkoop- en verkoopboekingen.
+
+	* Bij de rapportage openstaande posten kan nu ook worden
+          geselecteerd dat alleen de debiteuren, crediteuren, of een
+	  enkele relatie wordt weergegeven.
+
+	* Bij de crediteuren/debiteurenrapportages kan nu ook worden
+          aangegeven dat alleen de openstaande posten moeten worden
+          weergegeven.
+
+	  Let op: Openstaande posten van voorgaande boekjaren worden
+	  NIET vernmeld.
+
+	* Fix enkele problemen met SQLite en Unicode.
+
+	* Makefile.PL toegevoegd.
+
+	* Nieuwe configuratie setting:
+
+	  [preferences]
+	  journal = 1
+
+	  Hiermee wordt na elke boeking automatisch de betreffende
+	  journaalpost getoond. Deze preference setting vervangt de
+	  command line optie "--journaal".
+
+	* Command line optie "--init". Hiermee wordt een nieuwe
+          administratie opgezet in de huidige directory.
+
+	  Equivalent met "--import --dir=.".
+
+	* Command line opties "--database" (en de verkorte vorm,
+          "--db") en "--journaal" komen binnenkort te vervallen.
+
+	* LET OP: EekBoek met SQLite ondersteunt niet de opdracht
+          "import". Importeren uitsluitend met de command line versie
+          
+	    ebshell --import ...
+
+	* Database structuur is gewijzigd, auto-migratie is beschikbaar.
+	  Let op: automigratie voor SQLite geeft een foutmelding:
+
+	    !De database wordt aangepast aan de nieuwere versie
+	    DBD::SQLite::st execute failed: database schema has changed(1) ...
+	    DBD::SQLite::st execute failed: database schema has changed(1) ...
+
+	  De migratie is echter ok. Daarna kun je opnieuw opstarten.
+
+1.03.05	28-10-2007 20:57
+
+	IV Boekingen:  Config optie strategy:iv_vc.
+        Bij het boeken in een Inkoop- of Verkoopdagboek wordt BTW
+	berekend per boekstukregel. Sommige leveranciers berekenen
+	echter de BTW over het totaal van de boekstukregels. Daardoor
+	kunnen afrondingsverschillen ontstaan met als gevolg een
+	boekstuktotaal dat niet klopt met de opgegeven waarde. De
+	boeking zal dan worden geweigerd.
+	EekBoek zal proberen zo'n boeking te corrigeren door de BTW
+	te herberekenen over het totaal. Er wordt dan een melding
+	gegeven, en een correctieboekstukregel aangemaakt.
+	Dit gedrag kan worden afgezet door de strategy
+	optie iv_vc de waarde 0 te geven.
+
+1.03.04	18-07-2007 19:15
+
+	WAARSCHUWING: Hoewel de database niet is gewijzigd moeten
+	bestaande administraties worden geëxporteerd en weer
+	geïmporteerd. Dit kan met de nieuwe versie van EekBoek, dus na
+	de upgrade.
+
+	BTW Aangifte: Toon ook het onafgeronde totaal en de afronding.
+
+	BTW Aangifte: Optie --noround voor een onafgerond rapport.
+
+	BTW Aangifte: Fix probleem met relaties die zowel debiteur als
+	crediteur zijn.
+
+	BKM Boekingen: Config optie strategy:bkm_multi. Indien gezet
+	en niet nul (kortom, true) dan wordt in geval een boeking niet
+	kan worden gematched tegen een openstaande post geprobeerd of
+	deze boeking wellicht voor meerdere openstaande posten
+	tegelijk bedoeld is.
+
+	Klant-specifieke wijzigingen in de (niet ondersteunde)
+	DaviAccount import module.
+
+1.03.03	27-06-2007 12:39
+
+	BKM Boekingen: Toon bedrag en relatie indien geen openstaande
+	post kan worden gevonden.
+
+	Shell: Optie --errexit: Verwerking van invoer breekt direct af
+	na geconstateerde fouten.
+
+	Shell: Optie --[no]interactive om interactief gedrag te
+	forceren ook al komt de invoer niet van een terminal. Niet
+	bedoeld voor uitwendig gebruik.
+
+	Redesign en implementatie van de reporter backends.
+
+	eekboek-mode.el: Emacs major mode voor EekBoek data.
+
+	Kleine bugfixes.
+
+1.03.02	04-02-2007 21:29
+
+	Fix probleem met foutieve export van adm_btwperiode in
+	multi-jaar admin (issue 1628783).
+
+	HTML reports: Use normal comments /* */ instead of <!-- -->
+	for included styles.
+
+	Voorbeeldschema's verplaatst van lib/EB/schema naar
+	lib/EB/example. 
+
+	Voorbeelden verplaatst van lib/EB/example naar
+	lib/EB/examples.
+
+	Nieuw voorbeeldschema voor een vereniging, met dank aan Edwin
+	Hakkennes.
+
+	Fix probleem met UTF-8 data in Latin1 files in export zip.
+
+1.03.01	27-12-2006 15:48
+
+	*** DATABASE STRUCTUUR IS GEWIJZIGD ***
+	Export de data voor de upgrade! Database migratie werkt alleen
+	met PostgreSQL.
+
+	Optie: --createsampledb. Geen gezeur meer over de plaats van
+	de demo data, of gecompresste data files.
+
+	Debiteuren en crediteuren kunnen nu per dagboek verschillend
+	worden opgegeven.
+
+	Fix probleem met jaareinde van BTW-loze administratie.
+
+	Fix probleem met rapportbreedte jaareinde.
+
+	Fix probleem met SQLite en opdrachten die direct na een
+	createdb/schema worden uitgevoerd, zoals b.v.:
+
+	  $ cat relaties.eb opening.eb | ebshell --createdb --schema=schema
+
+	Fix probleem met het opruimen van de directories na (rpm) uninstall.
+
+1.03.00	13-12-2006 21:55
+
+	Expliciete controle of een nieuw boekstuknummer nog vrij is,
+	ter voorkoming van een onvriendelijke "dup key" melding.
+
+	Fix bug met strings in de export die " en \ bevatten.
+
+	Expliciete(re) sorteervolgorde voor alle uitvoer.
+
+	Afronding mogelijk via 'bankers rounding'.
+
+1.02.01
+
+	Config::IniFiles is nu onderdeel van EekBoek en hoeft niet
+	langer apart te worden geïnstalleerd.
+
+	Fix migratieprobleem 1.0.9 -> 1.0.10 voor PostgreSQL 7.x of zo.
+
+1.02.00	2006-10-23 12:15
+
+	Release 1.02.00.
+
+1.01.03 -> 1.02.00
+
+	Elimineer setting van environment variabelen in de lees-loop.
+	Foute opdrachten als "foo=bar" werden daardoor niet gezien.
+
+1.01.02 2006-10-16 22:36
+
+	Fix bug in export van :dc property voor dagboeken.
+
+	Foutmelding "geen schema" is nu "geen database schema" om
+	onderscheid te maken met het rekening schema.
+
+	Kleine workarounds i.v.m. het INIT block probleem van PAR.
+
+	Multi-user implementatie van sequences voor SQLite. Deze
+	database zou daarom nu ook volledig multi-user moeten kunnen
+	worden gebruikt.
+
+1.01.01	2006-10-13 15:59
+
+	Fix migratieprobleem 1.0.9 -> 1.0.10.
+
+1.01.00	2006-10-13 14:34
+
+	Retrofit: Hernoem de rpm's naar EekBoek-unstable.
+
+1.01.00	2006-10-11 15:15
+
+	Support voor SQLite database. Inclusief IVP test.
+
+	Eliminatie PostgreSQL afhankelijkheden.
+
+	Stabiele sorteervolgorde voor Journaal.
+
+	IVP voor een database wordt overgeslagen wanneer geen driver
+	voor die database beschikbaar is.
+
+	IVP gebruikt nu de bestanden uit de example directory.
+
+	Database versie 1.0.10; migratie beschikbaar.
+
+	WAARSCHUWING: Bij teruggaan naar 1.0.9 moet de database eerst
+	fysiek worden verwijderd!
+
+1.00.04	2006-10-11 14:59
+
+	Trace messages voor SET/GET SEQUENCE.
+
+	Update EekBoek.spec[.in] met goede URLs en zo.
+
+1.00.03	2006-10-06 15:05
+
+	Fix bug met TAccounts tabel bij interactief commando import.
+
+	Fix bug in --ident display.
+
+1.00.02	2006-09-30 13:54
+
+	Forceer UNICODE onder Windows, tenzij locale:unicode dit
+	overruled.
+
+	Fix een bug in de inputafhandeling waar regels die met
+	whitespace geheel worden genegeerd.
+
+	Fix bug in het opstarten van het (ongedocumenteerde) sql
+	commando.
+
+1.00.01	2006-09-28 15:43
+
+	Fix een bug waardoor de TAccounts tabel niet werd aangemaakt
+	in geval van --import. Over het algemeen onschadelijk, tenzij
+	de mutaties.eb een opdracht bevat die TAccounts nodig heeft,
+	zoals een jaareinde.
+
+	Fix detectie van Windows.
+
+1.00	2006-08-27 21:15
+
+	Op de kop af 18 maanden nadat ik de eerste regels intoetste tot wat nu
+	EekBoek geworden is is het zover: de stabiliteit, functionaliteit,
+	degelijkheid, veelzijdigheid en gebruiksgemak zijn naar tevredenheid
+	van de gebruikers (en van mij!).
+
+	Hier is hij dan: Versie 1.00! 
+
+	* http://www.eekboek.nl/dl/EekBoek-1.00-1.noarch.rpm
+	* http://www.eekboek.nl/dl/EekBoek-1.00-1.src.rpm
+	* http://www.eekboek.nl/dl/EekBoek-1.00.tar.gz
+	* http://www.eekboek.nl/dl/EekBoek.ppd
+
+	Alle kits zijn voorzien van een aparte digitale handtekening. De key
+	ervan vind je op http://www.eekboek.nl/fedora/RPM-PGP-KEY-EekBoek.
+
+	YUM liefhebbers kunnen een (experimentele) repository toevoegen door
+	het installeren van
+	http://www.eekboek.nl/fedora/EekBoek-yum-1.0-1.noarch.rpm.
+	Zie voor meer informatie http://www.eekboek.nl/fedora/repodata .
+
+	De aanbevolen manier van installeren is door middel van de RPM.
+
+	Belangrijkste wijzigingen:
+
+	* Deze versie is identiek aan 0.93, met alleen het versienummer
+	  aangepast. 
+
+1.0RC3	2006-08-05 14:45
+
+	EekBoek heeft nu een eigen web site: http://www.eekboek.nl .
+
+	EekBoek 1.0 Release Candidate 3 is daar nu beschikbaar:
+
+	* http://www.eekboek.nl/dl/EekBoek-0.93-1.noarch.rpm
+	* http://www.eekboek.nl/dl/EekBoek-0.93-1.src.rpm
+	* http://www.eekboek.nl/dl/EekBoek-0.93.tar.gz
+	* http://www.eekboek.nl/dl/EekBoek.ppd
+
+	Alle kits zijn voorzien van een aparte digitale handtekening. De key
+	ervan vind je op http://www.eekboek.nl/fedora/RPM-PGP-KEY-EekBoek.
+
+	YUM liefhebbers kunnen een (experimentele) repository toevoegen door
+	het installeren van
+	http://www.eekboek.nl/fedora/EekBoek-yum-1.0-1.noarch.rpm.
+	Zie voor meer informatie http://www.eekboek.nl/fedora/repodata .
+
+	De aanbevolen manier van installeren is door middel van de RPM.
+
+	Belangrijkste wijzigingen:
+
+	* Deze versie is identiek aan 0.92, met uitsluitend de gewijzigde web
+	  site in sources en documentatie.
+
+1.0RC2	2006-07-20 15:11
+
+	* Deze versie is identiek aan 0.63.
+
+0.63	2006-07-12 19:02
+
+	* Herstel ernstige fout in het hernieuwde saldoberekeningsmechanisme.
+
+	  VERSIE 0.62 NIET GEBRUIKEN. RESTORE DE PRE-0.62 DATABASE!
+
+	* Controleer bij het verwijderen van een boeking of het boekjaar of de
+	  BTW periode niet is afgesloten.
+
+0.62	XXXXXXXXXXXXXXXX
+
+	* Bank- en kasboekingen kunnen ook een --beginsaldo meekrijgen.
+
+	  Saldobepaling gaat op volgorde van boekstuknummer (was:
+	  invoervolgorde).
+
+	  Het beginsaldo moet overeenkoment met het eindsaldo van het eraan
+	  voorafgaande boekstuk (indien aanwezig).
+
+	  Het eindsaldo moet overeenkoment met het beginsaldo van het erop
+	  volgende boekstuk (indien aanwezig).
+
+	  Dit lost tevens een im/exportprobleem op met boekstukken die worden
+	  verwijderd en later opnieuw ingevoerd.
+
+	* Export van boekstukken gaat nu per dagboek, op volgorde van
+	  boekstuknummer.
+
+	* Database structuur is gewijzigd -- automigratie is beschikbaar.
+
+	* Boekingen laten geen informatie meer zien tenzij de optie --verbose
+	  wordt meegegeven.
+	  (Is dit een goed idee?)
+
+0.91	2006-07-03 14:37
+
+	1.0 Release Candidate 1
+
+	* UNICODE is nu default, de ebshell 'banner' toont nu in voorkomende
+	  gevallen (Latin1) in plaats van (UNICODE).
+
+	* De tekensetaanduiding in bestanden is gewijzigd van
+
+	   # Content-Type: text; charset = ...
+	  in
+	   # Content-Type: text/plain; charset = ...
+
+	  De oude vorm blijft vooralsnog herkend.
+
+	* De automigratie-bestanden zijn verwijderd.
+
+0.61	2006-06-20 22:04
+
+	* Import naar en Export van files.
+
+	    $ ebshell --export --file data.ebx
+	    $ ebshell --import --file data.ebx
+
+	  Dit vereist het beschikbaar zijn van de module Archive::Zip.
+
+	* Voor inkoop- en verkoopboekingen mag de boekstukomschrijving of de
+	  boekstukregelomschrijving (maar niet beide) leeg zijn. De waarde van
+	  de andere omschrijving wordt dan overgenomen.
+
+	  Dit is met name handig voor simpele inkoop-/verkoopboekingen waarbij
+	  normaalgesproken beide beschrijvingen toch hetzelfde zouden zijn:
+
+	    inkopen 10-10 "Internetkosten" XS4ALL "" 10,00
+
+	* Fix een (overigens onschuldige) "undefined" warning bij verwijderen
+	  van een partiële boeking.
+
+0.60	2006-06-09 15:08
+
+	* Lokatie van de 'example' directory:
+
+	  - In geval van Build install: <site_perl>/EB/example
+	  - In geval van RPM   install: <share_doc>/EekBoek-x.xx/example
+	  - In geval van PPM   install: <site_perl>/EB/example
+
+	* Het sample database script is vervallen. Met de nieuwe import
+	  functionaliteit kan de sample database eenvoudig worden opgezet met
+
+	  $ ebshell --db=sample --import --dir=<example>
+
+	  waarin <example> de 'example' directory is.
+
+0.59	2006-06-05 21:48
+
+	* Het main programma ebshell is nu een triviale wrapper rondom
+	  module EB::Shell.
+
+	  (Dat is nu zo'n wijziging waar niemand iets van zou moeten kunnen
+	  merken, maar je weet maar nooit.)
+
+	* Er is nu een command line import en export commando.
+
+	  $ ebshell --export --dir=foo
+
+	  Equivalent met: $ ebshell -c export --dir=foo
+
+	  $ ebshell --import --dir=foo
+
+	  Equivalent met: $ ebshell --createdb -c import --dir=foo
+
+	* Bijkomende wijzigingen voor CSS handling (zie 0.58).
+
+	* Fix probleem met verwijderen script dir van geïnstalleerde rpm.
+
+	* Fix 1 januari-probleem met openingsbalans.
+
+0.58	2006-06-01 18:04
+
+	* CSS stylesheet afhandeling in HTML rapporten
+
+	  Er is nu een config setting `cssdir' in sectie `html' waar de
+	  directory kan worden opgegeven waar de CSS stylesheets zijn te
+	  vinden.
+
+	  Het uiteindelijke resultaat hangt af van deze `cssdir', en de voor
+	  het rapport opgegeven `style' optie.
+
+	    Style         Cssdir   Resultaat
+	    --------------------------------
+	    -             -        De EekBoek standaard style voor dit type
+				   rapport wordt opgenomen in het rapport.
+
+	    naam          -        De EekBoek standaard style `naam' wordt
+				   opgenomen in het rapport.
+
+	    -             dir      Stylesheet link naar dir/std.css, waarin std
+				   de naam is van de EekBoek standaard style
+				   voor dit type rapport.
+
+	    naam          dir      Stylesheet link naar dir/naam.css
+
+	    bestandsnaam  n.v.t.   Stylesheet link naar bestandsnaam
+
+	  Zonder wijzigingen betekent het dat de standaard stylesheet nu in de
+	  rapporten wordt opgenomen, zodat deze direct toonbaar zijn.
+
+	  Om hetzelfde resultaat te bereiken als tot nu toe het geval is, moet
+	  de config setting
+
+	    [html]
+	    cssdir = css
+
+	  worden opgegeven.
+
+0.57	25-05-2006 20:54
+
+	* Probeerdatabase
+
+	  Na afloop van de installatieverificatietests is er een
+	  probeerdatabase "sample" beschikbaar. Deze wordt nu ook in
+	  de vorm van een SQL file in de example directory
+	  meegeleverd.
+
+	  Dit is met name van belang indien er wordt geïnstalleerd
+	  vanuit een RPM, want dan is de probeerdatabase niet
+	  aangemaakt.
+
+	  De probeerdatabase kan te allen tijde worden (her)aangemaakt
+	  met:
+
+	   $ dropdb eekboek_sample
+	   $ psql template1 < example/sampledb.sql
+
+	  Na een RPM installatie is de example directory te vinden in
+	  de zogenaamde 'doc' dir, meestal /usr/share/doc/eekboek-X.XX'.
+
+	* Controle op numeriek zijn van het boekstuknummer.
+
+	* "--opening" optie voor "balans". Hiermee wordt de openingsbalans
+	  opnieuw getoond.
+	  In geval van meervoudige boekjaren dienen de voorgaande
+	  boekjaren te zijn afgesloten, anders is deze openingsbalans
+	  gelijk aan de eindbalans van het voorgaande boekjaar.
+
+0.56	05-05-2006 21:53
+
+	* (Enigszins experimenteel) Betere Unicode transparantie.
+
+	  Alle door EekBoek te verwerken bestanden kunnen middels een
+	  Content-Type aanduiding aangeven of de inhoud Latin1 dan wel
+	  UTF-8 is. Dit geldt voor:
+
+	  - schema
+	  - invoer via redirectie en de 'include' opdracht.
+
+	  Bij het schrijven van export-bestanden wordt standaard een
+	  Content-Type toegevoegd.
+
+	  De Content-Type aanduiding is:
+
+	    # Content-Type: text; charset = XXX
+
+	  XXX = Latin1, Latin9, ISO-8859.1 of ISO-8859.15 (voor Latin1 invoer)
+	  XXX = UTF-8 (voor Unicode UTF-8 invoer)
+
+	  Zonder Content-Type aanduiding worden de invoerbestanden
+	  verondersteld overeen te komen met de omgeving, dus UTF-8 in
+	  een Unicode omgeving, en anders Latin1.
+
+	  De meegeleverde bestanden (schema's) zijn nu in UTF-8, en
+	  hebben een overeenkomstige Content-Type aanduiding.
+
+	  De restrictie dat in een Unicode omgeving een database ook
+	  Unicode moet zijn is (voorlopig) (weer) vervallen.
+
+	* Onder MS Windows wordt default een Unicode omgeving verondersteld.
+
+	* Keuze uit afrondingsalgoritmen. In de config file:
+
+	  [strategy]
+	  round = XXX
+
+	  Op dit moment zijn er twee mogelijkheden: "ieee", de huidige
+	  methode, en "posix", een over het algemeen iets betere
+	  afrondingsmethode.
+
+	  Suggesties (plus implementatie, zie EB::Format) voor meer
+	  afrondingsalgoritmen zijn welkom.
+
+	* Fix probleem met trailing backslash in non-file invoer.
+
+0.55	04-04-2006 15:22
+
+	* Instelbaar datumformaat.
+
+	  In de config file:
+
+	     [format]
+	     date = yyyy-mm-dd
+
+	  Mogelijke formaten zijn: YYYY-MM-DD (default), DD-MM-YYY en
+	  DD-MM. In het laatste geval wordt, waar nodig, het formaat
+	  aangevuld tot DD-MM-YYYY.
+
+0.54	  04-04-2006 12:01
+
+	* Aanvullende fixes voor UNICODE.
+
+	  Bestanden worden gecontroleerd op valide UNICODE tekens.
+
+	  Non-UNICODE databases worden geweigerd indien UNICODE is
+	  geactiveerd. Een database kan gemakkelijk worden
+          geconverteerd met:
+
+	   $ pg_dump eekboek_XXX > xx
+	   $ dropdb eekboek_XXX
+	   $ createdb -E unicode eekboek_XXX
+	   $ psql eekboek_XXX < xx
+
+	  Let op: De standaardbestanden (schema's en zo) zijn nog steeds
+	  Latin1.
+
+	* De HTML uitvoer kan gebruik maken van de module HTML::Entities,
+	  indien deze is geïnstalleerd.
+
+0.53	29-03-2005 20:35
+
+	* UNICODE support.  ****EXPERIMENTEEL****
+
+	  Aanzetten met de EekBoek locale in de config file:
+
+	    [locale]
+	    unicode = 1
+
+	  of
+
+	    [locale]
+	    lang = nl_NL.utf8
+
+	  Elke suffix anders dan utf8 (of utf-8) wordt als latin1
+	  geïnterpreteerd.
+
+	  ("unicode" heeft prioriteit over "lang").
+
+	  Semantiek:
+
+	  - Alle geproduceerde uitvoer (scherm, maar ook rapporten, exports,
+	    etc) wordt in UTF-8 weggeschreven.
+	  - Alle invoerbestanden (schema, opening.eb, imports, etc) moeten
+	    UTF-8 zijn.
+
+	  Geen databasewijzigingen. Echter, alle met 0,53 aangemaakte
+	  databases zijn niet te verwerken met pre-0.53 versies.
+
+	  Zonder het aanzetten van UNICODE moet alles zijn zoals het was.
+
+	  Zoals gezegd, is e.e.a. nog een beetje experimenteel. Testresultaten
+	  en feedback wordt op prijs gesteld.
+
+	  Let op: De standaardbestanden (schema's en zo) zijn nog steeds
+	  Latin1.
+
+0.52	27-03-2006 15:21
+
+	* Wijzigingen in packaging t.b.v. RPM-build en CPAN.
+
+	* Database-tests kunnen worden uitgevoerd met een RPM-build:
+
+	   $ rpmbuild ... --with dbtests ...
+
+	* De source-RPM is getekend met mijn GPG key. Om de source-RPM te
+	  verifiëren moet je mijn GPG key in het rpm systeem importeren,
+	  bijvoorbeeld:
+
+	   $ wget http://www.squirrel.nl/people/jvromans/pubkey.asc
+	   $ sudo rpm --import pubkey.asc
+
+	* Fix probleem met aanmaken database op remote database server.
+	  Hierdoor faalt de IVP indien de database nog niet bestaat.
+
+0.51	24-02-2006 15:03
+
+	* Bouwen en installeren gaat nu middels het Module::Build framework.
+
+	  $ perl Build.PL
+	  $ ./Build
+	  $ ./Build test
+	  $ su
+	  # ./Build install
+
+	* Het Module::Build framework wordt (vooralsnog) meegeleverd.
+
+	* Een compatibility-mode Makefile.PL is meegeleverd.
+
+	* De installatie-verificatieprocedure is nu geïntegreerd in de build
+	  tests. 
+
+	* De build, test en installatie kan nu ook onder ActiveState Perl
+	  onder Windows.
+
+	* Fix probleem met ophalen database naam op remote database server.
+
+0.50	17-03-2006 19:34
+
+	* Bugfixes m.b.t. de boekhoudkundige/rekenkundige berekening van
+	  balanstotaal.
+
+0.49	16-03-2006
+
+	* De oorspronkelijke, boekhoudkundige berekening van het
+	  balanstotaal voor de openingsbalans wordt nu ook weer
+	  geaccepteerd, evenals de in de vorige versie geïntroduceerde
+	  rekenkundige berekening. Zie de documentatie.
+
+	* Kleine bugfixes.
+
+0.48	13-03-2006 20:54
+
+	* Negatieve getallen in de openingsbalans blijven gehandhaafd.
+          In vorige versies werd (foutief!) de D/C status gewisseld.
+
+	  B.v., oude situatie:
+
+		adm_balans <debetrek>  100
+		adm_balans <debetrek>  -10
+
+		adm_balans <creditrek>  90
+
+		adm_balanstotaal       100
+
+	  Nieuwe situatie:
+
+		adm_balans <debetrek>  100
+		adm_balans <debetrek>  -10
+
+		adm_balans <creditrek>  90
+
+		adm_balanstotaal        90
+
+	  Dit is een incompatibele wijziging, doch enkel indien er
+	  negatieve bedragen in de openingsbalans voorkomen (wat
+	  doorgaans niet het geval zal zijn). In dat geval moet het
+	  balanstotaal even worden aangepast.
+
+	* Fix BTW afsluiting na export/import indien BTW periode != jaar.
+
+0.47	10-03-2006 13:54
+
+	* Additionele fixes voor duizendpuntjes in jaarafsluiting.
+
+	* Fix BTW afsluiting na export/import indien BTW periode != jaar.
+
+0.46	07-03-2006 10:06
+
+	* Duizendpuntjes worden niet worden toegepast in geëporteerde gegevens
+	  omdat die anders niet meer kunnen worden ingelezen.
+
+0.45	06-03-2006 17:23
+
+	* Kolombreedte van bedragen in tekstuele rapportages is instelbaar.
+
+	  Configuratievariabele 'numwidth' in sectie 'text' kan hiervoor
+	  worden gebruikt:
+
+	      [text]
+	      numwidth = 10
+	      numwidth = +1
+	      numwidth = 111%
+
+	  Elk van deze settings vergroot de standaardwaarde van 9 naar 10.
+
+	* Duizendpuntjes.
+
+	  Configuratievariabele 'thousandsep' in sectie 'locale' kan hiervoor
+	  worden gebruikt:
+
+	      [locale]
+	      decimalpt = ,
+	      thousandsep = .
+
+	  De kolombreedte in tekstuele rapportages wordt automatisch vergroot
+	  bij het gebruik van duizendpuntjes.
+
+	* Windows install kit voor de ActiveState Perl Package Manager.
+	  Zie README.WINDOWS.
+
+0.44	05-03-2006 22:26
+
+	* Inkoop/Verkoopdagboeken mogen ook een :rekening specificatie krijgen
+	  in het schema. Indien deze ontbreekt wordt de koppeling "crd" resp
+	  "deb" gebruikt.
+
+	* Koppelingen voor "deb" en "crd" mogen ontbreken in het schema mits
+	  er geen dagboeken zijn die er gebruik van maken.
+
+	* De BTW tabel mag ontbreken in het schema. Er wordt dan geen BTW
+	  toegepast. Bijvoorbeeld voor organisaties die niet BTW-plichtig
+	  zijn. (Experimenteel)
+
+	* Alle koppelingen voor BTW (btw_ih, btw_vl, etc...) mogen ontbreken
+	  in een BTW-vrije administratie.
+
+	* Configuratie-setting "userdefs" in sectie "shell" om een userdefs
+	  module te selecteren. Pas op: als de module niet succesvol laadt is
+	  dit een fatale fout.
+
+0.43	03-03-2006 23:01
+
+	* Nieuw aangemaakte administraties (aangemaakt met 0.43 of later)
+	  kunnen bedragen groter dan 21.474.836,47 aan. De huidige limiet ligt
+	  op 92.233.720.368.547.758,07.
+	  Bestaande databases worden ge-automigreerd.
+
+	* Diverse aanpassingen in de toepassing van BTW voor minder-triviale
+	  boekingen.
+
+	* Export/import verbeteringen, waarondr behoud van BTW aangifteperiode.
+
+	* Mogelijkheid tot draaien zonder Term::ReadLine::Gnu. Niet dat je het
+	  leuk zult vinden...
+
+0.42	20-02-2006 22:59
+
+	* Toepassen van BTW is nu volledig gedreven door de kosten/omzet
+	  classificatie van de grootboekrekeningen.
+
+	* Meer flexibele BTW codering in schema: naast hoog/laag kan ook
+	  kosten/omzet en incl/excl worden opgegeven.
+
+	* BTW koppeling met balansrekening in schema is weer mogelijk, daarbij
+	  moet dan een kosten/omzet classificatie worden opgegeven.
+
+	* Naast kosten (code K) en omzet (code O) kan een grootboekrekening in
+	  het schema ook als neutraal (code N) worden opgegeven. Op een
+	  neutrale rekening kan nooit BTW worden geboekt.
+
+	* Meer flexibele BTW codering in boekingsbedragen: naast H/L is ook
+	  K/O mogelijk (en soms verplicht). BTW exclusief kan worden opgegeven
+	  met een "-".
+
+	* Herziene en aanvullende documentatie inzake het toepassen van BTW.
+
+0.41	09-02-2006 18:47
+
+	* BTW koppeling met balansrekening in schema niet langer toegestaan.
+
+	* Config variabelen op command line:
+
+	  --define database:name=foo
+
+0.40	07-02-2006 12:55
+
+	* Opdrachten "import" en "include" (experimenteel).
+
+	  Met "import" kan een eerder geëxporteerde administratie in één klap
+	  weer worden gereconstrueerd. De huidige inhoud van de database wordt
+	  daarbij volledig overschreven.
+
+	  Opdracht "include" neemt een bestandsnaam en voert alle opdrachten
+	  uit dit bestand uit.
+
+	* Schema-naam (ebshell --schema=naam) mag nu ook een bestand zijn in
+	  plaats van een naam (alleen letters, cijfers en _). In het geval van
+	  een bestand wordt geen zoekstrategie toegepast.
+
+0.39	06-02-2006 19:22
+
+	* Kleine bugfixjes.
+
+0.38	04-02-2006 20:41
+
+	* BTW Aangifteformulier aangepast aan de moderne tijd.
+	  Kleineondernemenrsregeling verwerkt in formulier.
+
+	* Betere foutdetectie op verkeerde commando-invoer.
+
+	* Herziening alle hulpteksten.
+
+	* Bug fix: RPM bouwprobleem met Config::IniFiles.
+
+0.37	02-02-2006 15:08
+
+	In batch mode wordt backslash-continuering ook beëindigd door
+	een lege regel.
+
+0.36	24-01-2006 18:16
+
+	Wijzigen rapportopmaak d.m.v. de configuratiefiles (Experimenteel).
+	Fix periode-einde balans/resultaat.
+	Fix enkele warnings voor "missing configs".
+	Eerste aanzet afscheiden database-specifieke code.
+
+0.35	23-01-2006 11:31
+
+	Better checks on user input for bookings.
+	Fix problem with null object if no configs.
+
+0.34	22-01-2006 21:38
+
+	Config files.
+	Uitfasering environment variabelen.
+	Fix .eb generatie door jaareinde.
+	Export jaareinde.
+	Kleine fixes.
+
+0.33	20-01-2006 09:38
+
+	Emergency fix. Please do not use 0.32.
+
+0.32	18-01-2006 22:47
+
+	INCOMPATIBELE WIJZIGING
+	=======================
+	Openstaande posten ingevoerd bij het openen van het boekjaar
+	door middel van de vorm "adm_relatie <boekstuknummer> ..."
+	hebben de omschrijving en relatiecode omgewisseld.
+
+	Dat betekent dat de opdracht ter invoering van de openstaande
+	boeking nu identiek is aan de oorspronkelijke
+	boekingsopdracht, voorafgegaan door het woord "adm_relatie".
+	=======================
+
+	Database structuur is gewijzigd, auto-migratie is beschikbaar.
+
+0.31	17-01-2006 22:19
+
+	Export functionaliteit.
+	Tegenrekening voor Memoriaal.
+	Verbetering PostgreSQL tests.
+
+0.30	14-01-2006 22:37
+
+	Afronden documentatie.
+	Extra build test op database.
+	IVP: Verificatie Crediteuren/Debiteurenoverzicht.
+	IVP: Verificatie HTML en CSV generatie.
+	Issue 1404053: Grootboekrekeningen als '0005' toestaan.
+	Openstaande posten: FQbsknr voor openstaande posten vorig boekjaar.
+	Aparte style / kleurtje voor openstaande posten vorig boekjaar.
+	Fix Issue 1404051: Fout bij TABs in Schema.
+
+0.29	12-01-2006 22:44
+
+	Issue 1395916. Openstaande posten ondersteunt --per en --boekjaar.
+	Debiteuren/Crediteurenboekingen ondersteunen --boekjaar.
+	Issue 1403886. Debiteuren/Crediteurenboekingen tonen
+	openstaande betalingen nu correct.
+	Geen waarschuwing meer als de einddatum van een periode in de
+	toekomst ligt.
+	Fix HTML generatiefout (stylesheet spec ontbrak tenzij
+	expliciet meegegeven).
+
+0.28	11-01-2006 23:03
+
+	:btw=<code> in schema.
+	Lay-out fix Balans/Resultaatrekening.
+	Fix openstaande posten rapportage bij jaareinde.
+	Documentatie-updates.
+
+0.27	09-01-2005 18:48
+
+	Uitgebreider rapport over Openstaande posten.
+	Jaareinde kan nu ook de openingsopdrachten voor het komende
+	boekjaar aanmaken.
+	Stylesheet fixes voor Proef- en Saldibalans.
+
+0.26	08-01-2005 19:56
+
+	Aanpassingen voor BTW aangifte met --periode en --boekjaar.
+	Alle rapporten kennen nu ook een CSV variant.
+	Debiteuren: Fix voor openstaande inkoopfacturen.
+	adm_naam niet langer toegestaan bij openen boekjaar.
+	CSS Style sheet voor openstaande posten.
+
+0.25	05-01-2006 10:24
+
+	Toepassen regeling Kleine Ondernemers.
+	Nieuwe reporter backend. Alle rapporten kennen nu ook een
+	HTML variant.
+	Kleine bugfixes.
+	Enkele documentatie updates.
+
+0.24	28-12-2005 23:26
+
+	Overzichten voor Debiteuren en Crediteuren.
+	Environment variabelen EB_DB_USER, EB_DB_PASSWORD, EB_DB_HOST
+	en EB_DB_PORT voor database access.
+
+0.23	23-12-2005 11:41
+
+	Kleine bugfixes.
+	Enkele documentatie updates.
+	Boekstuknummers in Grootboek overzicht nu ook in
+	Dagboek:Volgnummer vorm.
+
+0.22	14-12-2005 17:25
+
+	Packaging t.b.v. CPAN.
+
+0.21	13-12-2005 20:20
+
+	*** EERSTE PUBLIEKE BETA RELEASE ***
+	Meer dan 9 hoofdverdichtingen en meer dan 89 verdichtingen
+	mogelijk.
+	Twee voorbeeld-schema's: eenmanszaak en bvnv.
+	adm_relatie neemt nu een fully-qualified boekstuknummer:
+	adm_relatie inkopen:1998:1245 1998-12-31 "Consultancy" SCS 1877.09
+
+0.20	12-12-2005 11:55
+
+	Aanzet documentatie op web site.
+	Opdracht "relaties" kan meerdere relaties tegelijk aanmaken.
+	BTW intracomm. in aangifte.
+	Bugfixes jaareinde.
+	ebshell command line opties --boekjaar, --db (alias voor
+	--dataset) en --journaal (preferred voor --journal).
+	Waarschuwing voor relaties met BTW intra en BTW verlegd (nog
+	niet (geheel)) ondersteund.
+	Dagboek-ids kunnen nu alfanumeriek (max. 4 tekens) zijn.
+	Invoeren syntax Dagboek:BoekjaarCode:VolgNummer voor boekstukken.
+	*** INCOMPATIBLE DATABASE CHANGES *** GEEN MIGRATIE ***
+
+0.19	30-11-2005 21:45
+
+	sample renamed naar ivp.
+	example aangemaakt.
+	spec file generatie in tarball.
+	Uitfasering van dubbele vlaggetjes in schema.
+	Temporary disable Build.PL building.
+
+0.18	21-11-2005 17:04
+
+	Emergency fix voor PostgreSQL temp tables probleem.
+	PATH fix in sample/setup.csh.
+
+0.17	19-11-2005 23:18
+
+	HTML uitvoer-plugins voor Balans en Resultaat.
+	HTML uitvoer-plugin voor Journaal.
+	HTML uitvoer-plugin voor Grootboek.
+
+0.16	16-11-2005 15:25
+
+	Aanvang invoering universele uitvoer-plugins voor rapporten.
+	Meer help: "help periodes" en "help rapporten".
+	btwaangifte heeft nu een --definitief optie. Is netter.
+	Openstaande posten worden gegroepeerd per dagboek.
+	Openstaande posten per einddatum.
+	Relatiecodes worden nu case-insensitive herkend.
+
+	Meerdere boekjaren per administratie (experimenteel).
+
+0.15	08-10-2005 18:20
+
+	BTW aangifte nu ook naar bestand (optie --output=...) en in
+	HTML formaat (optie --html).
+	Lange boekstukomschrijvingen worden in het journaal en
+	grootboek over meerdere regels afgedrukt.
+	Wijziging boekstuknummer in numeriek.
+	Bugfix: BTW aangifte gebruikte harde nummers voor BTW
+	rekeningen.
+
+0.14	03-10-2005 23:09
+
+	Automatische migratie van database naar een nieuwe versie.
+	(EB::Tools::SQLEngine): Afvangen transactionele commandos.
+	(Shell) Correct completions after "help".
+	(EB::Booking::*) Partiële boekingen.
+
+0.13	30-09-2005 18:40
+
+	(EB::Report::Open) Overzicht openstaande posten.
+	(Shell) Niewe opdracht: "openstaand".
+	(Utils) Meer ISO-achtige periodeformaten:
+	YYYY-MM-DD/YYY-MM-DD, YYYY-MM-DD/MM-DD en YYYY-MM-DD/DD.
+	(Shell) Experimentele invoer-completion op
+	debiteur/crediteurcodes en grootboekrekeningen.
+
+0.12	29-09-2005 22:05
+
+	(Shell) Periode-selectie (--periode=XXX) voor (sommige) commando's.
+	(Grootboek) Periode-selectie.
+	(Journaal) Periode-selectie.
+	(Relatie) Dagboek-selectie met --dagboek.
+
+	Periode-aanduidingen zijn erg flexibel. B.v. als 2003 het
+	huidige boekjaar is, dan zijn de volgende aanduidingen equivalent:
+
+	  2003-01-01 - 2003-03-31
+	  01-01-2003 - 31-03-2003
+	  01-01 - 31-03
+	  januari - maart
+	  jan - mrt (korte namen)
+	  m1 - m3 (maandnummers)
+	  k1 (eerste kwartaal)
+
+	Eveneens:
+
+	  2003-02-01 - 2003-02-28
+	  01-02-2003 - 28-02-2003
+	  01-02 - 28-02
+	  februari
+	  feb
+	  m2
+
+	Verder is toegestaan:
+
+	  jaar       (01-01 - 31-12)
+
+	Een subset hiervan is ook bruikbaar voor b.v. btw aangifte.
+
+0.11	28-09-2005 22:59
+
+	(BKM.IV) Datumcontrole op boekingen. Boekingen moeten in het
+	huidige boekjaar vallen. 
+	(BTWAangfite) Als er definitief BTW aangifte is gedaan kan
+	er niet meer worden geboekt in die periode. Een BTW aangifte
+	wordt definitief door toevoeging van het woord "definitief"
+	aan de opdracht, b.v.:
+
+	  btwaangifte augustus definitief
+
+	Introductie database migratie. Om te migreren van database
+	versie 1.0.0 (EekBoek 0.10) naar 1.0.1 (EekBoek 0.11) kan het
+	script migrate/1_0_0_to_1_0_1.sql worden gebruikt:
+
+	  pg_dump -c $EB_DB_NAME > backup.sql
+	  psql $EB_DB_NAME < migrate/1_0_0_to_1_0_1.sql
+
+	(Wordt later wsl. geautomatiseerd)
+
+	(EB::Tools::Schema,EB::Tools::SQLEngine) Afsplitsen SQL
+	engine. 
+
+0.10	27-09-2005 23:09
+
+	(IV, BKM) Her-invoering van de mogelijkheid om BTW te boeken
+	op 'std' boekingen. Zie de beschrijving in
+	samples/mutaties.eb. BTW tariefcodewijzigingen kunnen nu ook
+	zijn "@H" en "@L" voor hoog resp. laagtarief.
+
+	Correctie van de dependencies in Makefile.PL.
+
+0.09	26-09-2005 22:34
+
+	Belangrijkste wijziging: Uitfaseren van de rol van de D/C
+	setting van grootboekrekeningen tijdens het boekingsproces.
+
+	Tot nu toe werd de richting van een boeking bepaald door het
+	dagboek en de Debet/Credit setting van de betreffende
+	grootboekrekening. Dit werd door enkele testers als
+	contra-intuïtief ervaren en daarom heb ik in overleg een
+	nieuwe manier geïmplementeerd.
+
+	Consequenties voor bestaande mutatie-bestanden:
+
+	- Inkoop / Verkoop boekingen: geen consequenties.
+
+	- Bank / Kas / Memoriaal:
+	  - 'deb' boekingen: geen
+	  - 'crd' boekingen: het bedrag moet nu negatief worden
+	    opgegeven (het saldo vermindert immers)
+	  - 'std' boekingen: Boekingen met BTW zijn niet langer
+	    toegestaan. Deze zijn boekhoudtechnisch nl. vrijwel altijd
+	    incorrect, en doorgaans illegaal. Als je perse een 'std'
+	    boeking met BTW wilt, dan kun je die met de hand
+	    uitsplitsen.
+
+	Zie de beschrijving in samples/mutaties.eb.
+
+0.08	22-09-2005 15:45
+
+	(BKM) BKM boekingen kunnen nu een datum per boekstukregel krijgen.
+	(Grootboek) Opdracht 'grootboek' kan selectief worden uitgevoerd op een of
+	meer rekeningen.
+	(EB::Utils) Nieuw: Utility functies.
+
+0.07	21-09-2005 12:25
+
+	(IV,BKM) Datum ook als DD-MM-JJJJ en DD-MM.
+	(IV,BKM) --totaal optie.
+	(IV,BKM) Melding over balansrekening vervalt.
+	(IV,BKM) Melding over D/C conflict niet langer fataal.
+	(EB::Locale) Alles onder I18n (gettext).
+	Alle tools printen een banner.
+	(EB): Nieuwe, algemene module. Handelt Globals en Locale af.
+	(EB::Booking::Delete) Verwijderen boekstukken.
+	(EB::Booking::Decode) Decoderen boekstukken.
+	(EB::Shell) Nieuwe opdracht: "verwijder".
+	(EB::Shell) Nieuwe opdracht: "toon".
+
+0.06	02-09-2005 19:15
+
+	(EB::Tools::Schema) Schema handling.
+	(ebshell) Schema initialisatie.
+	(Makefile.PL, build_common.inc) Installer
+	Introductie EB library (@INC/EB).
+
+0.05	30-08-2005 10:50
+
+	(Shell) Alle shell spul van Shell:: -> EB::Shell::
+	(EB::Shell::Base) Opvangen ontbreken van Term::Size.
+	(Term::Size): Verwijderd.
+	(opening, schema) tools -> EB::Tools
+	(ebshell.pl) Integratie nieuwe stijl opening
+	(dvimport, newdb, ...) Nieuwe stijl opening
+
+0.04	28-08-2005 16:34
+
+	(Schema) Tabel BTWTariefgroepen afgeschaft.
+	(Database) Geen pgplsql (CREATE LANGUAGE) meer nodig.
+	(Schema) CHECK constraints toegevoegd.
+	(sample/setup.sh) Opvangen ontbreken van PERL5LIB
+	(sample/setup.csh) Opvangen ontbreken van PERL5LIB
+	(sample/newdb.sh) Creëer database met Latin1 encoding.
+	(Term::Size) Stub voor mogelijk ontbrekende module.
+
+0.03	15-08-2005 22:42
+
+	(schema) Volledige database setup uitgaande van schema.dat.
+

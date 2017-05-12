@@ -1,0 +1,7 @@
+AC_PREREQ(2.50)
+AC_INIT
+AC_CONFIG_HEADER([config.h])
+
+AC_MSG_ERROR([error])
+
+AC_OUTPUT

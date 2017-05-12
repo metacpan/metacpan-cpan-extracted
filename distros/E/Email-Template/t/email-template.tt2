@@ -1,0 +1,21 @@
+<HTML><BODY>
+<P>Let’s use some extended chars here, like accepting £GBP.</P>
+<TABLE>
+    <TR>
+        <TD ALIGN="right">Name:</TD>
+        <TD>[% key0 %] [% key1 %]</TD>
+    </TR>
+    <TR>
+        <TD ALIGN="right">Address:</TD>
+        <TD>
+            #1-276 Quux Lane,     <BR/>
+            Schenectady, NY, USA, <BR/>
+            12345
+        </TD>
+    </TR>
+    <TR>
+        <TD ALIGN="right">Email:</TD>
+        <TD><a href="mailto:foo@bar.baz">foo@bar.baz</a></TD>
+    </TR>
+</TABLE>
+</BODY></HTML>

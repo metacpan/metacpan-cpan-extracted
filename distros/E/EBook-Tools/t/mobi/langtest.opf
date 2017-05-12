@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE package PUBLIC "+//ISBN 0-9673008-1-9//DTD OEB 1.2 Package//EN" "http://openebook.org/dtds/oeb-1.2/oebpkg12.dtd">
+
+<package xmlns="http://openebook.org/namespaces/oeb-package/1.0/" unique-identifier="UID">
+  <metadata>
+    <dc-metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
+      <dc:Identifier id="UID" scheme="GUID">{28D17050-173C-11D5-9303-0010DA63A409}</dc:Identifier>
+      <dc:Title>A Noncompliant OPF Test Sample</dc:Title>
+      <dc:Creator file-as="Pobre, Zed 1" role="author">Zed 1 Pobre</dc:Creator>
+      <dc:Language>zu</dc:Language>
+    </dc-metadata>
+    <x-metadata>
+      <output encoding="utf-8" content-type="text/x-oeb1-document">
+      </output>
+    </x-metadata>
+  </metadata>
+  <manifest>
+    <item media-type="application/xhtml+xml" href="test.html" id="item-text"/>
+  </manifest>
+  <spine>
+    <itemref idref="item-text"/>
+  </spine>
+</package>

@@ -1,0 +1,108 @@
+Intro
+=====
+
+ExtUtils::nvcc is a CUDA compiler and linker wrapper for Perl's toolchain.
+
+Modern compilers take a lot of options. Perl has learned to use many of these 
+options. The problem is that nvcc, nVidia's compiler wrapper---which must be 
+used to compile CUDA code---doesn't like most of those extra flags and options.
+It has a special set of command-line arguments that allow you to pass compiler 
+and linker flags on to the actual compiler and linker, but it does not send 
+those options along by default. That makes life harder than it ought to be.
+
+Hence ExtUtils::nvcc. The main goal of this project is to provide a compiler and 
+linker acceptable to the common Perl build tools, Inline::C, ExtUtils::MakeMaker,
+and Module::Build, which allows for the compilation of CUDA code without having
+to modify the myriad of compiler and linker flags. It also provides some super-
+simple functions for configuring the common build tools to use nvcc in their
+build chain.
+
+
+Installation
+============
+
+Thorough installation instructions can be found on the github wiki:
+
+http://github.com/run4flat/perl_nvcc/wiki/Installing
+
+
+Windows Restrictions
+====================
+
+First off, ExtUtils::nvcc doesn't yet work for Windows. However, if it ever
+does (and I hope it does, actually), it will likely on work with Visual
+Studio's C++ compiler.
+
+The people at nVidia decided to only support gcc on Linux machines, and cl.exe
+(MS Visual Studio's compiler) on Windows machines. In practice, this means that
+ExtUtils::nvcc will not work properly on Strawberry Perl or Cygwin's perl. I'm
+afraid you'll have to get a version of Perl compiled with Visual Studio, and
+you'll need a copy of Visual Studio to compile nVidia code. The good news is
+that Microsoft allows you to download a free copy of any single componenet of
+the Visual Studio suite: you can download Visual C/C++ for free. You will likely
+need to compile your own perl, but once that's in place, you'll have a fully
+operating CPAN and ExtUtils::nvcc will (some day) work correctly.
+
+
+Dependencies
+============
+
+Although you can use ExtUtils::nvcc for whatever purposes you may have, the 
+underlying motivation for this work is for integration with the Perl toolchain.
+You can use this module outside of the Perl toolchain (by wrapping the awkward
+command-line invocation, perhaps), but it's really meant to operate with
+ExtUtils::MakeMaker, Inline::C, and Module::Build.
+
+Although not necessary for use, the installation requires Module::Build.
+
+
+Test Reports
+============
+
+In the few months that ExtUtils::nvcc has been quietly sitting on CPAN, it
+has received zero test reports. That's because there isn't a single automated
+tester that has nvcc installed. If you try to install this module, please
+report your success or failure at cpantesters. The process to set everything
+up is a bit involved, but once in place it should be pretty easy to use and
+your test reports will help to turn this piddly little thing into a useful
+tool! You can read more here: L<http://wiki.cpantesters.org/wiki/QuickStart>.
+
+
+Usage
+=====
+
+See InlineCUDA.pl for an example script, as well as the synopsis in
+ExtUtils::nvcc
+
+
+Bugs
+====
+
+I used to have an issue on Ubuntu with segmentation faults (hence the END block
+in the example Inline script) but that seems to have gone.
+
+The only outstanding bug at the moment is that Windows is not yet supported,
+not even with cl.exe, in spite of great efforst. I am working on it and help
+here would be appreciated.
+
+
+Feedback Welcome
+================
+
+For ideas, suggestions, or anything else, feel free to write me. I've mangled
+my email address, so remove the language that would seem inappropriate for a
+perl developer:
+
+David Mertens <dcmertens.perl.csharp@gmail.com>
+
+I'll be happy to move discussion of this project onto an appropriate list, such 
+as PDL, Inline, Module::Build, or something else. I am open to suggestions.
+
+
+Copyright
+=========
+
+All of this material is copyright David Mertens, 2010-2011, and is distributed
+under the Artistic License. For more information, see 
+http://dev.perl.org/licenses/artistic.html
+

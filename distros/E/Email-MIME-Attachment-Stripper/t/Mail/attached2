@@ -1,0 +1,54 @@
+From tony@kasei.com Sun Oct 26 13:14:34 2003
+Return-Path: <tony@kasei.com>
+X-Original-To: tony@tmtm.com
+Delivered-To: tony+tmtm-tony@soto.kasei.com
+Received: by soto.kasei.com (Postfix, from userid 1011)
+	id EB6491C336; Sun, 26 Oct 2003 13:14:34 +0000 (GMT)
+Date: Sun, 26 Oct 2003 13:14:34 +0000
+From: Tony Bowden <tony@kasei.com>
+To: tony@tmtm.com
+Subject: [tony@kasei.com: Test Message]
+Message-ID: <20031026131434.GB11674@soto.kasei.com>
+Mime-Version: 1.0
+Content-Type: multipart/mixed; boundary="bg08WKrSYDhXBjb5"
+Content-Disposition: inline
+User-Agent: Mutt/1.5.4i
+Status: RO
+Content-Length: 744
+
+
+--bg08WKrSYDhXBjb5
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+
+Message from me to me, forwarded to me...
+
+Tony
+
+
+--bg08WKrSYDhXBjb5
+Content-Type: message/rfc822
+Content-Disposition: inline
+
+Return-Path: <tony@kasei.com>
+X-Original-To: tony@kasei.com
+Delivered-To: tony@soto.kasei.com
+Received: by soto.kasei.com (Postfix, from userid 1011)
+	id 2D7381C336; Sun, 26 Oct 2003 13:14:09 +0000 (GMT)
+Date: Sun, 26 Oct 2003 13:14:09 +0000
+From: Tony Bowden <tony@kasei.com>
+To: tony@kasei.com
+Subject: Test Message
+Message-ID: <20031026131409.GA11674@soto.kasei.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.5.4i
+
+
+This is a test.
+
+
+--bg08WKrSYDhXBjb5--
+

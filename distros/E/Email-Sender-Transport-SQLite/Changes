@@ -1,0 +1,23 @@
+Revision history for Email-Sender-Transport-SQLite
+
+0.092003  2016-08-10 11:15:47-04:00 America/New_York
+          add retrieve_deliveries method to get deliveries back out of db
+
+0.092002  2013-08-22 17:20:14 America/New_York
+          update repo and bugtracker
+
+0.092001  2013-03-02 15:43:49 America/New_York
+          convert to Moo
+
+0.092000  2011-10-15 18:09:14 Asia/Tokyo
+          repackage to get META.yml
+
+0.091660  2009-06-15
+          refactor for interop with Email::Sender 0.091661
+
+0.002     2009-03-24
+          require latest Sender for moosification
+
+0.001     2008-12-10
+          split out of Email-Sender
+

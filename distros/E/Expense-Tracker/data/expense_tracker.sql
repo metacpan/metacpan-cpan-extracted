@@ -1,0 +1,5 @@
+CREATE TABLE "categories" ("id" INTEGER PRIMARY KEY  AUTOINCREMENT  NOT NULL  UNIQUE ,"parent_id" INTEGER,"name" VARCHAR NOT NULL ,"description" TEXT,"created_at" DATETIME,"user_id" INTEGER);
+CREATE TABLE "currencies" ("id" INTEGER PRIMARY KEY  AUTOINCREMENT  NOT NULL  UNIQUE , "name" VARCHAR NOT NULL  UNIQUE , "created_at" DATETIME NOT NULL );
+CREATE TABLE "operations" ("id" INTEGER PRIMARY KEY  AUTOINCREMENT  NOT NULL  UNIQUE , "name" varchar, "description" varchar, "amount" REAL NOT NULL , "currency_id" INTEGER NOT NULL  DEFAULT 1, "created_at" datetime NOT NULL , "updated_at" datetime NOT NULL  DEFAULT CURRENT_TIMESTAMP, "user_id" INTEGER NOT NULL );
+CREATE TABLE "operations_categories" ("id" integer PRIMARY KEY  AUTOINCREMENT  NOT NULL  UNIQUE , "operation_id" integer NOT NULL , "category_id" integer NOT NULL , "created_at" datetime NOT NULL  DEFAULT CURRENT_TIMESTAMP);
+CREATE TABLE "users" ("id" INTEGER PRIMARY KEY  AUTOINCREMENT  NOT NULL  UNIQUE , "username" VARCHAR NOT NULL  UNIQUE , "password" CHAR NOT NULL , "email" VARCHAR NOT NULL  UNIQUE , "first_name" VARCHAR, "last_name" VARCHAR, "birth_date" DATETIME, "created_at" DATETIME);

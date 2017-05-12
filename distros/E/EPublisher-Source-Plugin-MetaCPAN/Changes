@@ -1,0 +1,55 @@
+Changes for EPublisher::Source::Plugin::MetaCPAN
+================================================
+
+0.24 2014-12-02
+    - added contributors section in documentation
+    - fix 03_bin_dir.t: Title of starman documentation
+    - added info about resources: links to github account
+
+0.23 2013-01-03
+    - added more debugging stuff
+    - use eval {} to catch errors
+    - do not include files in inc/
+
+0.22 2012-11-30
+    - added POD encoding due to testfail on CpanTesters
+
+0.20 2012-06-14
+    - corrected small typo
+
+0.19 2012-06-14
+    - added test for inexistant module names
+    - handling of inexistant module names
+    - more details in error output
+
+0.18 2012-06-13
+    - removing regex which made problems (github issue 18)
+
+0.17 2012-05-10
+    - add possibility to just return one single module
+
+0.16 2012-05-03
+    - MetaCPAN encodes the response in utf-8, within EPublisher everything should
+      be in Perl's internal format, so we have to decode the Pod source
+
+0.15 2012-04-26
+    - MetaCPAN does not handle ".pm" in release names, so we have to remove it
+
+0.14 2012-04-14
+    - do not croak on errors, skip the files instead
+
+0.13 2012-04-14
+    - add more debugging code
+
+0.12 2012-04-12
+    - some modules have different versions in main module and dist name
+      so we have to use an other field from MetaCPAN API
+
+0.11 2012-04-02
+    - fixed a bug in POD detection. (POD without "=head" is ignored)
+    - take possible comments in MANIFEST into account
+    - tweaked Regex for finding POD (looking everywhere but example/ and t/)
+
+0.1  2012-03-19
+    - initial release
+

@@ -1,0 +1,228 @@
+# Bookings for administration EekBoek Sample Administration
+# Created by EekBoek 2.01.03 on 2012-01-16
+# Content-Type: text/plain; charset = UTF-8
+
+# Date notation is dd-mm-yyyy
+# When no year is specified, the current year is assumed.
+
+# Purchases (Daybook: Inkoop)
+
+# General syntax for the purchase commands:
+#
+#  daybook [ date ] arguments
+#
+#  Arguments purchase: "Description" creditorcode bookingline
+#  Booking line: "Description" amount [ ledger account ]
+#
+# By default the ledger account associated with this creditor is used 
+# (see relaties.eb).
+#
+# By default the VAT tariff associated with the ledger account is used.
+# This can be changed by adding one of the following to the amount:
+#     @0         do not apply VAT
+#     @H         apply the upper VAT tariff
+#     @L         apply the lower VAT tariff
+#     @n         apply VAT code n (this is not recommended)
+#
+# A credit booking can be specified when the amount is negative.
+
+# Singular booking all on one line.
+purchase 05-01 "Internet" XS4ALL "ADSL" 22,80
+
+# Multiple bookings; the ledger account is mandatory in this case.
+# The total is optional, but strongly recommended to prevent mistakes.
+purchase 15-01 "ADSL + Telephone" KPN --total=104,65 \
+        "ADSL"                        24,20  6905  \
+        "Telephone"                   80,45  6900
+
+purchase 09-02 "Internet" XS4ALL "ADSL" 22,80
+
+purchase 08-03 "Internet" XS4ALL "ADSL" 22,80
+purchase 18-03 "Telephone" KPN "ADSL + Telephone" 101,52
+
+purchase 05-04 "Internet" XS4ALL "ADSL" 22,80
+
+purchase 10-05 "Internet" XS4ALL "ADSL" 22,80
+purchase 20-05 "Telephone" KPN "ADSL + Telephone" 102,22
+
+purchase 07-06 "Internet" XS4ALL "ADSL" 22,80
+
+purchase 05-07 "Internet" XS4ALL "ADSL" 22,80
+purchase 15-07 "Telephone" KPN "ADSL + Telephone" 104,66
+
+purchase 09-08 "Internet" XS4ALL "ADSL" 22,80
+
+purchase 06-09 "Internet" XS4ALL "ADSL" 22,80
+purchase 16-09 "Telephone" KPN "ADSL + Telephone" 108,72
+
+purchase 11-10 "Internet" XS4ALL "ADSL" 22,80
+
+purchase 07-11 "Internet" XS4ALL "ADSL" 2*11+0,80
+purchase 17-11 "Telephone" KPN "ADSL + Telephone" 109,67
+
+purchase 06-12 "Internet" XS4ALL "ÁDSL" 22,80
+
+# Explicit booking number:
+purchase:20 07-12 "Internet" XS4ALL "ADSL" 22,80
+
+# Adding VAT tariffs:
+purchase:22 31-08 KPN --total=131,68 \ 
+        "Telephone VAT high" 110,73-0,48@H- 6900 \ 
+        "Telephone VAT exempt" 0,48@0 6900
+
+# Removal of booking:
+purchase:23 07-12 "Internet" XS4ALL "ADSL" 22,80
+remove purchase:23
+
+# Sales (Daybook: Verkoop)
+#
+#  Arguments verkoop: "Description" debitorcode bookingline
+#  Boekstukregel: "Description" amount [ generalledgeraccount ]
+#
+# By default the ledger account associated with this debtor is used 
+# (see relaties.eb).
+#
+# See the description at Purchases for the sample bookings when 
+# specifying the applicable VAT tariff.
+#
+# Multiple booking lines are possible too: the general ledger account
+# is mandatory in that case. See with Purchases for an example.
+#
+# A debit-booking can be specified when the amount is negative.
+
+sales 18-02 "Perl Course" ACME "Perl Course first installment" 3570.00 8400
+
+sales 18-03 "Perl Course" ACME "Perl Course second installment" 3570.00 8400
+
+sales 18-04 "Perl Course" ACME "Perl Course remainder" 600.00 8400
+
+sales 12-04 "Perl Course" ACME "Perl Course remainder" -5.00 8400
+
+sales 14-05 "Support" ACME "Consultancy" 714.00 8100
+
+sales 16-07 "Support" ACME "Consultancy" 714.00 8100
+
+sales 19-08 "Pocket Reference" ORA "Preparation book" 1000.00 8300
+
+# Bank (Dagboek: Postbank)
+#
+#  Arguments bankbooking: "Description" bookingline
+#  Bookingline:
+#    std "Description" amount generalledgeraccount
+#    crd "Description" creditorcode amount (negative!)
+#    deb "Description" debtorcode amount
+#
+# By default the first applicable open booking, which is either purchase 
+# or sales, associated with the creditor or debtor is used to deduct
+# the specified amount.
+# Standaard wordt het eerste met deze crediteur/debiteur geassocieerde
+# open inkoop/verkoop-boekstuk afgeboekt.
+#
+# For these bookings a negative amount deducts from the banking balance
+# and a positive amounts adds to the banking balance.
+#
+# 'std' bookings with VAT are uncommon.
+# Therefore, in applicable cases, the VAT tariff must be explicitly
+# specified with the "@" addition:
+#     @0         do not apply VAT
+#     @H         apply the upper VAT tariff
+#     @L         apply the lower VAT tariff
+#     @n         apply VAT code n (this is not recommended)
+#
+# VAT is booked on the VAT sales account for positive amounts,
+# and on the VAT purchase account for negative amounts. 
+# ####CHECK#### This can be changed by adding a code "I" (Purchase) or "V" (Sales).
+#
+# By supplying the ending balance this can be verified.
+
+postbank 31-01 "Notice 1" --init-balance=1131.92 --balance=1001.77 \
+        std 06-01 "Girotel"                -2.70 6980 \
+        crd 19-01 XS4ALL                  -22.80 \
+        crd 31-01 KPN                    -104.65
+
+postbank 28-02 "Notice 2" --balance=976.27 \
+        std 10-02 "Girotel"                -2.70 6980 \
+        crd 23-02 XS4ALL                  -22.80
+
+postbank 31-03 "Notice 3" --balance=4419.25 \
+        std 09-03 "Girotel"                -2.70 6980 \
+        deb 18-03 ACME                   3570.00 \
+        crd XS4ALL                        -22.80 \
+        crd 31-03 KPN                    -101.52
+
+postbank 30-04 "Notice 4" --balance=7963.75 \
+        std 06-04 "Girotel"                -2.70 6980 \
+        crd 06-04 XS4ALL                  -22.80 \
+        deb 12-04 ACME                   3570.00
+
+postbank 31-05 "Notice 5" --balance=8436.03 \
+        std 11-05 "Girotel"                -2.70 6980 \
+        crd 31-05 XS4ALL                  -22.80 \
+        deb 31-05 ACME                    600.00 \
+        crd 31-05 KPN                    -102.22
+
+postbank 30-06 "Notice 6" --balance=9119.53 \
+        std 08-06 "Girotel"                -2.70 6980 \
+        deb 08-06 ACME                    714.00 \
+        deb 12-06 ACME                     -5.00 \
+        crd 21-06 XS4ALL                  -22.80
+
+postbank 31-07 "Notice 7" --balance=8989.37 \
+        std 06-07 "Girotel"                -2.70 6980 \
+        crd 30-07 XS4ALL                  -22.80 \
+        crd 31-07 KPN                    -104.66
+
+postbank 31-08 "Notice 8" --balance=10677.87 \
+        std 10-08 "Girotel"                -2.70 6980 \
+        deb 10-08 ACME                    714.00 \
+        crd 10-08 XS4ALL                  -22.80 \
+        deb 19-08 ORA                    1000.00
+
+postbank 30-09 "Notice 9" --balance=10543.65 \
+        std 17-09 "Girotel"                -2.70 6980 \
+        crd 30-09 XS4ALL                  -22.80 \
+        crd 30-09 KPN                    -108.72
+
+postbank 31-10 "Notice 10" --balance=10518.15 \
+        std 12-10 "Girotel"                -2.70 6980 \
+        crd 13-10 XS4ALL                  -22.80
+
+postbank 30-11 "Notice 11" --balance=10382.98 \
+        std 08-11 "Girotel"                -2.70 6980 \
+        crd XS4ALL                        -22.80 \
+        crd 30-11 KPN                    -109.67
+
+# With explicit booking number.
+postbank:12 07-12 "Notice 12" --balance=10357.48 \
+        std 06-12 "Girotel"                -2.70 6980 \
+        crd 07-12 XS4ALL                  -22.80
+
+# Partial payments by supplying the booking number instead of the 
+# debtor/creditor:
+postbank 09-12 "First installment ADSL" --balance=10,347.48 \
+         crd 09-12 Purchase:20            -10.00
+
+# The remainder of the payment can be done by supplying the booking
+# number, but also the easy way by supplying the relation code.
+postbank 10-12 "Second installment ADSL" --balance=10334,68 \
+         crd 10-12 XS4ALL                 -12.80
+
+# Depreciation
+#
+# Memorial is like a bank booking, but without an implicit general
+# ledger account from which the total is booked. The booking must 
+# therefore be exactly balanced.
+# Also here, a positive amount credits the associated account (adds to) 
+# and a negative amount debits the account (deducts).
+# Also equally applicable are the 'std' bookings with VAT, equivalent 
+# to the section on Bank bookings.
+
+memorial 31-12 "Depreciation inventory" \
+          std "Depreciation"          -411,26 6800 \
+          std "Depreciation"           411,26 1101 
+
+memorial 31-12 "Depreciation computers" \
+          std "Depreciation"          -396,82 6810 \
+          std "Depreciation"           396,82 1111
+
+# End of Bookings

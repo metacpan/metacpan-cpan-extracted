@@ -1,0 +1,29 @@
+Revision history for Perl extension EPUB-Parser
+
+0.06 2017-02-09T09:20:32Z
+
+    - Fixbug: remove MYMETA.json (thanks chorny)
+
+0.05 2013-08-05T13:43:20Z
+
+    - Fixbug: It failed to get xmlns:dc
+
+0.04 2013-07-15T07:30:54Z
+
+    - add shortcut method to EPUB::Parser
+    - $self->navi->toc->list have wantarray context
+    - add epub-parser script file
+
+0.03 2013-06-21T06:30:08Z
+
+    - Document fix
+
+0.02 2013-06-16T15:40:38Z
+
+    - Fix File::Slurp dependency
+    - Document fix
+
+0.01 2013-06-13T11:59:07Z
+
+    - initial release
+

@@ -1,0 +1,24 @@
+Revision history for Perl extension .
+
+0.06  2008/04/20
+	- fixed for Egg::View::Mail::Plugin::Signature.
+	- fixed for Egg::View::Mail::Plugin::EmbAgent.
+
+0.05  2008/04/20
+	- fixed for Egg::View::Mail::Plugin::Signature.
+	- fixed for Egg::View::Mail::Plugin::EmbAgent.
+
+0.04  2008/04/17
+	- Build.PL is abolished.
+	- fixed for Egg::View::Mail::Plugin::Signature.
+	- fixed for Egg::View::Mail::Plugin::EmbAgent.
+
+0.03  2008/04/16
+	- fixed for Build.PL and Makefile.PL.
+
+0.02  2008/03/19
+	- fixed for Egg::View::Mail::Plugin::EmbAgent.
+
+0.01  Sun Feb 24 08:28:29 2008
+	- original version; created by Egg::Helper::Build::Module v3.00
+	   with module name Egg::Release::Mail

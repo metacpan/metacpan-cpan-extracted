@@ -1,0 +1,9 @@
+
+As usuall:
+
+perl Makefile.PL
+make
+make install
+
+This module needs Event >= 0.80 and IO::File.
+

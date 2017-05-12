@@ -1,0 +1,26 @@
+
+<html>
+<head>
+<title>While Metacommand in Embperl</title>
+</head>
+<body background="../images/jazzbkgd.gif">
+
+This is a example of using the while metacommand in embperl to show the environment<P>
+
+[- $i = 0; @k = keys %ENV -]
+[$ while ($i &lt; $#k) $]
+[+ $k[$i] +] = [+ $ENV{$k[$i]} +]<BR>
+[- $i++ -]
+[$ endwhile $]
+
+<P>
+This is a example of using the while metacommand in embperl to show the loaded modules<P>
+
+[- $i = 0; @k = keys %INC -]
+[$ while ($i &lt; $#k) $]
+[+ $k[$i] +] = [+ $INC{$k[$i]} +]<BR>
+[- $i++ -]
+[$ endwhile $]
+
+</body>
+</html>

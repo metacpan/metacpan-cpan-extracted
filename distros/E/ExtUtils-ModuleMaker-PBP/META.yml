@@ -1,0 +1,15 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         ExtUtils-ModuleMaker-PBP
+version:      0.09
+version_from: lib/ExtUtils/ModuleMaker/PBP.pm
+installdirs:  site
+requires:
+    ExtUtils::ModuleMaker:         0.4304
+    File::Basename:                0
+    File::Path:                    0
+    Getopt::Std:                   0
+    Test::More:                    0.44
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

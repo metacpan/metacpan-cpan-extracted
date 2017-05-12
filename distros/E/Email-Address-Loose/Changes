@@ -1,0 +1,8 @@
+Revision history for Perl extension Email::Address::Loose
+
+0.10  Sun Feb 27 21:02:09 JST 2011
+        - support $email->user() etc..
+        - update pod
+
+0.01  Tue Jul  8 21:08:23 JST 2008
+        - first release

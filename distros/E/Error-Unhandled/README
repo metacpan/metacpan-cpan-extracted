@@ -1,0 +1,61 @@
+NAME
+    Error::Unhandled - a Module for letting Errors do their own
+    handling
+
+SYNOPSIS
+      use Error qw(:try);
+      use Error::Unhandled;
+
+      try {
+        &foo;
+      } otherwise {
+        my $E = shift;
+        print "I caught:\n".$E->stringify."\n\n";
+      };
+
+      &foo;
+
+      sub foo {
+        throw Error::Unhandled(unhandled => sub {print "No one handled this.\n"; exit});
+      }
+
+DESCRIPTION
+    While doing ASP programming, I wanted to use an object oriented
+    exception handling system. Graham Barr pointed me at `Error.pm',
+    which handled almost everything I needed. It was missing,
+    however, a way for exceptions to define their own default error
+    handling behavior. This can be very useful when ASP programming
+    - someone using your object can decide to implement their own
+    error handling routines, but if they don't the user will at
+    least get a semi-informative message in their browser. After
+    trying several different approaches, I ended up with a subclass
+    of `Error' titled `Error::Unhandled'.
+
+    The only difference in behavior between `Error::Unhandled' and
+    `Error' is what happens when `throw' is called. The
+    implementation of `throw' in `Error::Unhandled' uses `caller' to
+    search the call stack, looking for `Error::subs::try'. If it
+    finds one, it throws the exception as per normal behavior. If it
+    doesn't find one, it calls `$self->unhandled'. Before doing
+    that, however, it checks to see if the element `unhandled' is
+    defined in its hash. If it is and it is a reference to a
+    subroutine, it calls that instead. Note that if the element
+    `unhandled' is present and is not a reference to a subroutine,
+    `throw' will not call `$self->unhandled'. Finally, after all of
+    that returns, `throw' will throw the exception as per normal
+    behavior. If you don't want it to throw the exception, call
+    `exit' or `die' within your `unhandled' subroutine.
+
+    It is, of course, also possible (and recommended in many
+    situations) to sub class `Error::Unhandled' and provide a class-
+    defined implementation of `unhandled'. Also note that both the
+    instance-defined and class-defined `unhandled' methods receive
+    `$self' as their first parameter.
+
+  Installation instructions
+
+    This module requires `Error', available from CPAN.
+
+AUTHOR
+    Toby Everett, teverett@alascom.att.com
+

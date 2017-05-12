@@ -1,0 +1,256 @@
+﻿<?xml version="1.0"?>
+
+
+<!DOCTYPE rdf:RDF [
+    <!ENTITY efo "http://www.ebi.ac.uk/efo/" >
+    <!ENTITY UO "http://purl.org/obo/owl/UO#" >
+    <!ENTITY CL "http://purl.org/obo/owl/CL#" >
+    <!ENTITY GO "http://purl.org/obo/owl/GO#" >
+    <!ENTITY PATO "http://purl.org/obo/owl/PATO#" >
+    <!ENTITY owl "http://www.w3.org/2002/07/owl#" >
+    <!ENTITY obo "http://purl.obolibrary.org/obo/" >
+    <!ENTITY obo2 "http://purl.obolibrary.org/obo#" >
+    <!ENTITY OBO_REL "http://purl.org/obo/owl/OBO_REL#" >
+    <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
+    <!ENTITY NCBITaxon "http://purl.org/obo/owl/NCBITaxon#" >
+    <!ENTITY owl2xml "http://www.w3.org/2006/12/owl2-xml#" >
+    <!ENTITY snap "http://www.ifomis.org/bfo/1.1/snap#" >
+    <!ENTITY span "http://www.ifomis.org/bfo/1.1/span#" >
+    <!ENTITY ro "http://www.obofoundry.org/ro/ro.owl#" >
+    <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
+    <!ENTITY PO "http://purl.bioontology.org/ontology/PO/" >
+    <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
+    <!ENTITY oboInOwl "http://www.geneontology.org/formats/oboInOwl#" >
+    <!ENTITY chebiId "http://www.ebi.ac.uk/chebi/searchId.do;?chebiId=" >
+]>
+
+
+<rdf:RDF xmlns="http://www.ebi.ac.uk/efo/"
+     xml:base="http://www.ebi.ac.uk/efo/"
+     xmlns:PATO="http://purl.org/obo/owl/PATO#"
+     xmlns:ro="http://www.obofoundry.org/ro/ro.owl#"
+     xmlns:UO="http://purl.org/obo/owl/UO#"
+     xmlns:efo="http://www.ebi.ac.uk/efo/"
+     xmlns:snap="http://www.ifomis.org/bfo/1.1/snap#"
+     xmlns:NCBITaxon="http://purl.org/obo/owl/NCBITaxon#"
+     xmlns:obo="http://purl.obolibrary.org/obo/"
+     xmlns:obo2="http://purl.obolibrary.org/obo#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:chebiId="http://www.ebi.ac.uk/chebi/searchId.do;?chebiId="
+     xmlns:owl2xml="http://www.w3.org/2006/12/owl2-xml#"
+     xmlns:PO="http://purl.bioontology.org/ontology/PO/"
+     xmlns:GO="http://purl.org/obo/owl/GO#"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:OBO_REL="http://purl.org/obo/owl/OBO_REL#"
+     xmlns:oboInOwl="http://www.geneontology.org/formats/oboInOwl#"
+     xmlns:CL="http://purl.org/obo/owl/CL#"
+     xmlns:span="http://www.ifomis.org/bfo/1.1/span#">
+    <owl:Ontology rdf:about="http://www.ebi.ac.uk/efo/">
+        <owl:versionInfo rdf:datatype="&xsd;string">2.23</owl:versionInfo>
+        <rdfs:comment rdf:datatype="&xsd;string">Bioportal mappings to BRENDA tissue / enzyme source (BTO) verunknown</rdfs:comment>
+        <rdfs:comment rdf:datatype="&xsd;string">Bioportal mappings to Cell type (CL) verunknown</rdfs:comment>
+        <rdfs:comment rdf:datatype="&xsd;string">Bioportal mappings to Chemical entities of biological interest (CHEBI) verunknown</rdfs:comment>
+        <rdfs:comment rdf:datatype="&xsd;string">Bioportal mappings to Drosophila gross anatomy (FBbt) ver2011-02-10</rdfs:comment>
+        <rdfs:comment rdf:datatype="&xsd;string">Bioportal mappings to Foundational Model of Anatomy (FMA) ver3.1</rdfs:comment>
+        <rdfs:comment rdf:datatype="&xsd;string">Bioportal mappings to Gene Ontology (GO) ver1.886</rdfs:comment>
+        <rdfs:comment rdf:datatype="&xsd;string">Bioportal mappings to Human disease (DOID) ver</rdfs:comment>
+        <rdfs:comment rdf:datatype="&xsd;string">Bioportal mappings to International Classification of Diseases (ICD-9) ver9</rdfs:comment>
+        <rdfs:comment rdf:datatype="&xsd;string">Bioportal mappings to MGED Ontology (MO) ver1.3.1.1</rdfs:comment>
+        <rdfs:comment rdf:datatype="&xsd;string">Bioportal mappings to Malaria Ontology (IDOMAL) ver1.22</rdfs:comment>
+        <rdfs:comment rdf:datatype="&xsd;string">Bioportal mappings to Mammalian phenotype (MP) vernull</rdfs:comment>
+        <rdfs:comment rdf:datatype="&xsd;string">Bioportal mappings to Medical Subject Headings (MSH) ver2011_2010_08_30</rdfs:comment>
+        <rdfs:comment rdf:datatype="&xsd;string">Bioportal mappings to Microarray experimental conditions (MO) ver1.3.1.1</rdfs:comment>
+        <rdfs:comment rdf:datatype="&xsd;string">Bioportal mappings to Minimal anatomical terminology (MAT) ver1.1</rdfs:comment>
+        <rdfs:comment rdf:datatype="&xsd;string">Bioportal mappings to Mosquito gross anatomy (TGMA) verunknown</rdfs:comment>
+        <rdfs:comment rdf:datatype="&xsd;string">Bioportal mappings to NCBI organismal classification (NCBITaxon) ver1.2</rdfs:comment>
+        <rdfs:comment rdf:datatype="&xsd;string">Bioportal mappings to NCI Thesaurus (NCIt) ver11.01e</rdfs:comment>
+        <rdfs:comment rdf:datatype="&xsd;string">Bioportal mappings to NIFSTD (nif) ver2.2 - December 20, 2010</rdfs:comment>
+        <rdfs:comment rdf:datatype="&xsd;string">Bioportal mappings to Ontology for Biomedical Investigations (OBI) ver2010-10-26 Vancouver 2010 release, RC2</rdfs:comment>
+        <rdfs:comment rdf:datatype="&xsd;string">Bioportal mappings to Phenotypic quality (PATO) vernull</rdfs:comment>
+        <rdfs:comment rdf:datatype="&xsd;string">Bioportal mappings to SNOMED Clinical Terms (SNOMEDCT) ver2010_07_31</rdfs:comment>
+        <rdfs:comment rdf:datatype="&xsd;string">Bioportal mappings to Teleost Anatomy Ontology (TAO) vernull</rdfs:comment>
+        <rdfs:comment rdf:datatype="&xsd;string">Bioportal mappings to Teleost anatomy and development (TAO) ver1.158</rdfs:comment>
+        <rdfs:comment rdf:datatype="&xsd;string">Bioportal mappings to Units of measurement (UO) vernull</rdfs:comment>
+        <rdfs:comment rdf:datatype="&xsd;string">Bioportal mappings to Zebrafish anatomy and development (ZFA) verunknown</rdfs:comment>
+        <rdfs:comment rdf:datatype="&xsd;string">Date: 16th April 2012</rdfs:comment>
+        <creator rdf:datatype="&xsd;string">Ele Holloway</creator>
+        <creator rdf:datatype="&xsd;string">Helen Parkinson</creator>
+        <creator rdf:datatype="&xsd;string">James Malone</creator>
+        <rdfs:comment rdf:datatype="&xsd;string">Mappings to Plant structure (PO)</rdfs:comment>
+        <rdfs:comment rdf:datatype="&xsd;string">Mappings: CRISP Thesaurus Version 2.5.2.0</rdfs:comment>
+        <rdfs:comment rdf:datatype="&xsd;string">Mappings: The Jackson Lab</rdfs:comment>
+        <rdfs:comment rdf:datatype="&xsd;string">Mappings:The Arabidopsis Information Resource (TAIR)</rdfs:comment>
+        <creator rdf:datatype="&xsd;string">Tomasz Adamusiak</creator>
+        <creator>Dani Welter</creator>
+        <creator>Natalja Kurbatova</creator>
+    </owl:Ontology>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Annotation properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    <owl:AnnotationProperty rdf:about="&efo;SRA_label">
+        <rdfs:subPropertyOf rdf:resource="&efo;alternative_term"/>
+    </owl:AnnotationProperty>
+    <owl:AnnotationProperty rdf:about="&obo2;InChI"/>
+    <owl:AnnotationProperty rdf:about="&obo2;xref"/>
+    <owl:AnnotationProperty rdf:about="&obo;def"/>
+    <owl:AnnotationProperty rdf:about="&efo;reason_for_obsolescence"/>
+    <owl:AnnotationProperty rdf:about="&efo;source_definition"/>
+    <owl:AnnotationProperty rdf:about="&efo;definition_editor"/>
+    <owl:AnnotationProperty rdf:about="&efo;gwas_trait"/>
+    <owl:AnnotationProperty rdf:about="&efo;bioportal_provenance"/>
+    <owl:AnnotationProperty rdf:about="&efo;branch_class"/>
+    <owl:AnnotationProperty rdf:about="&efo;creator"/>
+    <owl:AnnotationProperty rdf:about="&efo;example_of_usage"/>
+    <owl:AnnotationProperty rdf:about="&obo2;SMILES"/>
+    <owl:AnnotationProperty rdf:about="&efo;alternative_term"/>
+    <owl:AnnotationProperty rdf:about="&obo2;InChIKey"/>
+    <owl:AnnotationProperty rdf:about="&efo;definition"/>
+    <owl:AnnotationProperty rdf:about="&efo;organizational_class"/>
+    <owl:AnnotationProperty rdf:about="&efo;primary_source"/>
+    <owl:AnnotationProperty rdf:about="&efo;ArrayExpress_label"/>
+    <owl:AnnotationProperty rdf:about="&efo;definition_citation">
+        <definition>A definition citation is a document, ontology class, person or organization from which the definition of the class is derived. It is used in the same sense as a citation in literature, in that the definition may have been derived from these sources or that this definition is related to these source.</definition>
+    </owl:AnnotationProperty>
+    <owl:AnnotationProperty rdf:about="&rdfs;label"/>
+    <owl:AnnotationProperty rdf:about="&owl;deprecated"/>
+    <owl:AnnotationProperty rdf:about="&rdfs;comment"/>
+    <owl:AnnotationProperty rdf:about="&obo;alt_id"/>
+    <owl:AnnotationProperty rdf:about="&owl;versionInfo"/>
+    <owl:AnnotationProperty rdf:about="&obo;namespace"/>
+    <owl:AnnotationProperty rdf:about="&obo;xref"/>
+    <owl:AnnotationProperty rdf:about="&efo;EFO_URI"/>
+    <owl:AnnotationProperty rdf:about="&efo;obsoleted_in_version"/>
+    <owl:AnnotationProperty rdf:about="&efo;description"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Datatypes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+    <!-- http://purl.org/obo/owl/NCBITaxon#NCBITaxon_10088 -->
+
+    <owl:Class rdf:about="&NCBITaxon;NCBITaxon_10088">
+        <rdfs:label rdf:datatype="&xsd;string">Mus</rdfs:label>
+        <rdfs:subClassOf rdf:resource="&NCBITaxon;NCBITaxon_2759"/>
+        <definition_editor rdf:datatype="&xsd;string">James Malone</definition_editor>
+        <definition rdf:datatype="&xsd;string">Mus (commonly mice) is a small mammal belonging to the order of rodents.</definition>
+        <EFO_URI rdf:datatype="&xsd;string">http://www.ebi.ac.uk/efo/EFO_0002644</EFO_URI>
+        <alternative_term rdf:datatype="&xsd;string">mice</alternative_term>
+        <alternative_term rdf:datatype="&xsd;string">mouse</alternative_term>
+    </owl:Class>
+    
+
+
+    <!-- http://purl.org/obo/owl/NCBITaxon#NCBITaxon_10089 -->
+
+    <owl:Class rdf:about="&NCBITaxon;NCBITaxon_10089">
+        <rdfs:label rdf:datatype="&xsd;string">Mus caroli</rdfs:label>
+        <rdfs:subClassOf rdf:resource="&NCBITaxon;NCBITaxon_10088"/>
+        <definition_editor rdf:datatype="&xsd;string">James Malone</definition_editor>
+        <alternative_term rdf:datatype="&xsd;string">Ryukyu mouse</alternative_term>
+        <EFO_URI rdf:datatype="&xsd;string">http://www.ebi.ac.uk/efo/EFO_0002645</EFO_URI>
+    </owl:Class>
+    
+
+
+    <!-- http://purl.org/obo/owl/NCBITaxon#NCBITaxon_10090 -->
+
+    <owl:Class rdf:about="&NCBITaxon;NCBITaxon_10090">
+        <rdfs:label rdf:datatype="&xsd;string">Mus musculus</rdfs:label>
+        <rdfs:subClassOf rdf:resource="&NCBITaxon;NCBITaxon_10088"/>
+        <definition_editor rdf:datatype="&xsd;string">James Malone</definition_editor>
+        <alternative_term rdf:datatype="&xsd;string">house mouse</alternative_term>
+        <EFO_URI rdf:datatype="&xsd;string">http://www.ebi.ac.uk/efo/EFO_0001993</EFO_URI>
+    </owl:Class>
+    
+
+
+    <!-- http://purl.org/obo/owl/NCBITaxon#NCBITaxon_10091 -->
+
+    <owl:Class rdf:about="&NCBITaxon;NCBITaxon_10091">
+        <rdfs:label rdf:datatype="&xsd;string">Mus musculus castaneus</rdfs:label>
+        <rdfs:subClassOf rdf:resource="&efo;EFO_0003013"/>
+        <definition_editor rdf:datatype="&xsd;string">James Malone</definition_editor>
+        <alternative_term rdf:datatype="&xsd;string">Mus castaneus</alternative_term>
+        <alternative_term rdf:datatype="&xsd;string">Mus casteneus</alternative_term>
+        <alternative_term rdf:datatype="&xsd;string">Mus musculus castenus</alternative_term>
+        <EFO_URI rdf:datatype="&xsd;string">http://www.ebi.ac.uk/efo/EFO_0002646</EFO_URI>
+        <alternative_term rdf:datatype="&xsd;string">southeast Asian house mouse</alternative_term>
+        <alternative_term rdf:datatype="&xsd;string">southeastern Asian house mouse</alternative_term>
+    </owl:Class>
+    
+
+
+    <!-- http://purl.org/obo/owl/NCBITaxon#NCBITaxon_10092 -->
+
+    <owl:Class rdf:about="&NCBITaxon;NCBITaxon_10092">
+        <rdfs:label rdf:datatype="&xsd;string">Mus musculus domesticus</rdfs:label>
+        <rdfs:subClassOf rdf:resource="&efo;EFO_0003013"/>
+        <definition_editor rdf:datatype="&xsd;string">James Malone</definition_editor>
+        <alternative_term rdf:datatype="&xsd;string">Mus domesticus</alternative_term>
+        <EFO_URI rdf:datatype="&xsd;string">http://www.ebi.ac.uk/efo/EFO_0002647</EFO_URI>
+        <alternative_term rdf:datatype="&xsd;string">western European house mouse</alternative_term>
+    </owl:Class>
+    
+
+
+    <!-- http://purl.org/obo/owl/NCBITaxon#NCBITaxon_10096 -->
+
+    <owl:Class rdf:about="&NCBITaxon;NCBITaxon_10096">
+        <rdfs:label rdf:datatype="&xsd;string">Mus spretus</rdfs:label>
+        <rdfs:subClassOf rdf:resource="&efo;EFO_0003013"/>
+        <alternative_term rdf:datatype="&xsd;string">Algerian Mouse</alternative_term>
+        <definition_editor rdf:datatype="&xsd;string">James Malone</definition_editor>
+        <EFO_URI rdf:datatype="&xsd;string">http://www.ebi.ac.uk/efo/EFO_0002649</EFO_URI>
+    </owl:Class>
+    
+	
+<!-- http://purl.org/obo/owl/NCBITaxon#NCBITaxon_39442 -->
+
+    <owl:Class rdf:about="&NCBITaxon;NCBITaxon_39442">
+        <rdfs:label rdf:datatype="&xsd;string">Mus musculus musculus</rdfs:label>
+        <rdfs:subClassOf rdf:resource="&efo;EFO_0003013"/>
+        <definition_editor rdf:datatype="&xsd;string">James Malone</definition_editor>
+        <alternative_term rdf:datatype="&xsd;string">Mus musculus hortulanus</alternative_term>
+        <alternative_term rdf:datatype="&xsd;string">eastern European house mouse</alternative_term>
+        <EFO_URI rdf:datatype="&xsd;string">http://www.ebi.ac.uk/efo/EFO_0002648</EFO_URI>
+    </owl:Class>
+    
+    
+    
+    
+    
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Annotations
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    <rdf:Description rdf:about="&owl;Thing">
+        <organizational_class>true</organizational_class>
+    </rdf:Description>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 3.2.3.1824) http://owlapi.sourceforge.net -->
+

@@ -1,0 +1,16 @@
+#container
+{
+	height				: 100%;
+	margin-top			: -2em;
+	margin-bottom		: -2em;
+}
+
+#detail_right
+{
+	margin				:1em 1em 2em 1em;
+}
+
+#detail_left
+{
+	margin				:1em 1em 2em 1em;
+}

@@ -1,0 +1,39 @@
+#!/usr/bin/env perl -w
+
+# This script checks the symmetry of pack/unpack templates.
+
+sub xray {
+    my ($s) = @_;
+    $s =~ s/([\200-\377])/sprintf("M-%c",ord($1)&0177)/eg;
+    $s =~ s/([\0-\11\13-\37\177])/sprintf("^%c",ord($1)^64)/eg;
+    $s
+}
+
+sub check_symmetry {
+    my $fmt = shift;
+    my $packed = pack $fmt, @_;
+    my @got = unpack $fmt, $packed;
+
+    my $no;
+    if (@got != @_) {
+	$no=1;
+    } else {
+	for (my $x=0; $x < @_; $x++) {
+	    if ($_[$x] ne $got[$x]) {
+		$no=1; last;
+	    }
+	}
+    }
+    print "packed as: |".xray($packed)."|\n";
+    if ($no) {
+	my $max = @_ > @got? @_ : @got;
+	for (my $x=0; $x < $max; $x++) {
+	    printf("%02d %30s %30s\n", $x,
+		   xray($_[$x] || ''), xray($got[$x] || ''));
+	}
+    } else {
+	print "ok\n";
+    }
+}
+
+check_symmetry($ARGV[0], 1..5);

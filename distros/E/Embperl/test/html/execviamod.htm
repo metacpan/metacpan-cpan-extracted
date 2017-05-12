@@ -1,0 +1,28 @@
+<html>  
+<head>
+<title>Tests for Embperl - Execute via an intermediate module</title>
+</head>
+
+
+<body>
+
+<h1>Tests for Embperl - Execute via an intermediate module</h1>
+
+
+[-
+my $dir = $_[0] -> component -> cwd ;
+require "$dir/execviamod.pm" ;
+
+execviamod() ;
+-]
+
+Now without output
+ 
+[-
+execviamod2() ;
+-]
+
+And done!
+
+</body>
+</html>

@@ -1,0 +1,18 @@
+Changes
+lib/Email/Postman.pm
+lib/Email/Postman/Report.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-basics.t
+t/02-multiple.t
+t/boilerplate.t
+t/emails/multiple.email
+t/emails/simple.email
+t/emails/wrongrecpt.email
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

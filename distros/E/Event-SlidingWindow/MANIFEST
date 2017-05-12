@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+SlidingWindow.pm
+t/1.t
+t/2.t

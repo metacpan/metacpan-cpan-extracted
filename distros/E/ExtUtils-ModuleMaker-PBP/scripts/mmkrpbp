@@ -1,0 +1,211 @@
+#!/usr/local/bin/perl
+# mmkrpbp:  command-line utility implementing ExtUtils::ModuleMaker::PBP
+eval 'exec /usr/local/bin/perl  -S $0 ${1+"$@"}'
+  if 0;    # not running under some shell
+use strict;
+local $^W = 1;
+# use Getopt::Std;
+use ExtUtils::ModuleMaker::PBP::Interactive;
+use ExtUtils::ModuleMaker::Opts;
+# use ExtUtils::ModuleMaker::Interactive;
+# use Carp;
+use vars qw ( $VERSION );
+$VERSION = '0.09';
+# use Data::Dumper;
+
+
+my $opt = ExtUtils::ModuleMaker::Opts->new(
+    q{ExtUtils::ModuleMaker::PBP},
+    q{mmkrpbp},
+);
+
+my $mod = ExtUtils::ModuleMaker::PBP::Interactive->new(
+    $opt->get_standard_options()
+);
+
+$mod->run_interactive() if $mod->{INTERACTIVE};
+
+$mod->complete_build();
+
+$mod->closing_message();
+
+###### Index of Variables (Aug 18 2005) #####
+## %opts
+## $MOD
+#
+###### Index of Subroutines (Aug 18 2005) #####
+## USAGE()
+#
+###### Sources of Methods (Aug 18 2005) #####
+###### ExtUtils::ModuleMaker
+## new
+## complete_build
+#
+###### ExtUtils::ModuleMaker::Interactive
+## run_interactive()
+## closing_message()
+#
+###### START LIVE CODE #####
+#
+#my %opts;
+#getopts( "bhqsCIPVcn:a:v:l:u:p:o:w:e:t:r:d:", \%opts );
+#croak Usage() if ( $opts{h} );
+#
+## print Dumper(\%opts);
+#
+#my %standard_options = (
+#    ( ( $opts{c} ) ? ( COMPACT               => $opts{c} ) : () ),
+#    ( ( $opts{V} ) ? ( VERBOSE               => $opts{V} ) : () ),
+#    ( ( $opts{C} ) ? ( CHANGES_IN_POD        => $opts{C} ) : () ),
+#    ( ( $opts{P} ) ? ( NEED_POD              => 0        ) : () ),
+#    ( ( $opts{q} ) ? ( NEED_NEW_METHOD       => 0        ) : () ),
+##    ( ( $opts{I} ) ? ( INTERACTIVE           => 0        ) : 1  ),
+#    INTERACTIVE      => ( ( $opts{I} ) ? 0 : 1 ),
+#    ( ( $opts{s} ) ? ( SAVE_AS_DEFAULTS      => $opts{s} ) : () ),
+#    
+#    ( ( $opts{n} ) ? ( NAME                  => $opts{n} ) : () ),
+#    ( ( $opts{a} ) ? ( ABSTRACT              => $opts{a} ) : () ),
+#    ( ( $opts{b} ) ? ( BUILD_SYSTEM          => $opts{b} ) : () ),
+#    ( ( $opts{v} ) ? ( VERSION               => $opts{v} ) : () ),
+#    ( ( $opts{l} ) ? ( LICENSE               => $opts{l} ) : () ),
+#    ( ( $opts{u} ) ? ( AUTHOR                => $opts{u} ) : () ),
+#    ( ( $opts{p} ) ? ( CPANID                => $opts{p} ) : () ),
+#    ( ( $opts{o} ) ? ( ORGANIZATION          => $opts{o} ) : () ),
+#    ( ( $opts{w} ) ? ( WEBSITE               => $opts{w} ) : () ),
+#    ( ( $opts{e} ) ? ( EMAIL                 => $opts{e} ) : () ),
+#    ( ( $opts{r} ) ? ( PERMISSIONS           => $opts{r} ) : () ),
+#    ( ( $opts{d} ) ? ( ALT_BUILD             => $opts{d} ) : () ),
+#    USAGE_MESSAGE => Usage(),
+#);
+## not working:  we need to set EU::MM::Interactive to inherit from EU::MM::PBP
+#my $mod = ExtUtils::ModuleMaker::PBP::Interactive->new( %standard_options);
+#
+#$mod->run_interactive() if $mod->{INTERACTIVE};
+#
+#$mod->complete_build();
+#
+#$mod->closing_message();
+#
+########### END LIVE CODE ##########
+#
+########### BEGIN SUBROUTINES ##########
+#
+#sub Usage {
+#    my $message = <<ENDOFUSAGE;
+#mmkrpbp [-CIPVch] [-v version] [-n module_name] [-a abstract]
+#        [-u author_name] [-p author_CPAN_ID] [-o organization]
+#        [-w author_website] [-e author_e-mail]
+#        [-l license_name] [-b build_system] [-s save_selections_as_defaults ]
+#
+#Currently Supported Features
+#    -a   Specify (in quotes) an abstract for this extension
+#    -b   Specify a build system for this extension
+#    -c   Flag for compact base directory name
+#    -C   Omit creating the Changes file, add HISTORY heading to stub POD
+#    -d   Call methods which override default methods from this module
+#    -e   Specify author's e-mail address
+#    -h   Display this help message
+#    -I   Disable INTERACTIVE mode, the command line arguments better be complete
+#    -l   Specify a license for this extension
+#    -n   Specify a name to use for the extension (required)
+#    -o   Specify (in quotes) author's organization
+#    -p   Specify author's CPAN ID
+#    -P   Omit the stub POD section
+#    -q   Flag to omit a constructor from module
+#    -r   Specify permissions
+#    -s   Flag to save selections as new personal default values
+#    -u   Specify (in quotes) author's name
+#    -v   Specify a version number for this extension
+#    -V   Flag for verbose messages during module creation
+#    -w   Specify author's web site
+#
+#mmkrpbp version: $VERSION
+#ExtUtils::ModuleMaker::PBP version: $ExtUtils::ModuleMaker::PBP::VERSION
+#ENDOFUSAGE
+#
+#    return ($message);
+#}
+##'
+
+################### DOCUMENTATION ################### 
+
+=head1 NAME
+
+mmkrpbp - interactive interface to ExtUtils::ModuleMaker::PBP
+
+=head1 VERSION
+
+This document references version 0.09 of mmkrpbp, released
+to CPAN on April 5, 2006.
+
+=head1 DESCRIPTION
+
+F<mmkrpbp> replaces the most typical use of the F<h2xs> utility distributed
+with F<perl>:
+
+    h2xs -AXn [module_name]
+
+It creates a directory and file structure suitable for installation with
+F<make> and uploading to CPAN.  The directory and file structure so created
+reflects the recommendations made by Damian Conway in his book I<Perl 
+Best Practices> (O'Reilly, 2005) L<http://www.oreilly.com/catalog/perlbp/>.
+
+<mmkrpbp> is closely patterned after F<modulemaker>, the command-line utility
+associated with F<ExtUtils::ModuleMaker>.
+
+=head1 USAGE::Simple
+
+=head2 Easy
+
+At the command-prompt, simply call:
+
+    % mmkrpbp
+
+... and answer each question.
+
+=head2 Not So Easy, But More Geeky
+
+At the command-prompt, call C<mmkrpbp> with as many options as you can type correctly:
+
+    mmkrpbp [-CIPVchqs] [-v version] [-n module_name] [-a abstract]
+        [-u author_name] [-p author_CPAN_ID] [-o organization]
+        [-w author_website] [-e author_e-mail]
+        [-l license_name] [-b build_system]
+
+=head2 Mix and Match
+
+You can specify some of the arguments on the command-line and then -- assuming
+you don't include the C<-I> option -- F<mmkrpbp> will then switch to
+interactive mode so that you can finish entering arguments at the prompts.
+
+=head1 USAGE::More
+
+=head2 Menus
+
+F<mmkrpbp> is, for all practical purposes, a clone of F<modulemaker>, the
+command-line utility associated with F<ExtUtils::ModuleMaker>.  For
+description of F<mmkrpbp> menus and features currently supported by
+command-line options, please see the documentation for F<modulemaker>.
+
+=head1 AUTHOR
+
+James E. Keenan (jkeenan [at] cpan [dot]
+org), adapting the F<modulemaker> utility originally written in 2001-02 by R.
+Geoffrey Avery and F<Module::Starter::PBP> written in 2005 by Damian Conway.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2005 James E. Keenan.  All rights reserved.
+This program is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.
+
+The full text of the license can be found in the
+LICENSE file included with this module.
+
+=head1 SEE ALSO
+
+F<modulemaker>, F<ExtUtils::ModuleMaker::PBP>,
+F<ExtUtils::ModuleMaker::PBP::Interactive>, F<h2xs>.
+
+=cut
+

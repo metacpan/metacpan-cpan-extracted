@@ -1,0 +1,68 @@
+SYNOPSIS
+      use Email::Folder::Exchange;
+
+      my $folder = Email::Folder::Exchange->new('http://owa.myorg.com/user/Inbox', 'user', 'password');
+
+      for my $message ($folder->messages) {
+        print "subject: " . $subject->header('Subject');
+      }
+
+      for my $folder ($folder->folders) {
+        print "folder uri: " . $folder->uri->as_string;
+        print " contains " . scalar($folder->messages) . " messages";
+        print " contains " . scalar($folder->folders) . " folders";
+      }
+
+DESCRIPTION
+    Add access to Microsoft Exchange to Email::Folder. Contains API
+    enhancements to allow folder browsing.
+
+    Utilizes FBA (forms-based authentication) to login. Therefore, OWA
+    (Outlook Web Access) must be installed and enabled on target server.
+
+  new($url, [$username, $password])
+    Create Email::Folder::Exchange object and login to OWA site.
+
+    url URL of the target folder, usually in the form of server/user/Inbox.
+        May contain authentication information, I.E.
+        'http://domain\user:password@owa.myorg.com/user/Inbox'.
+
+    username
+        Username to authenticate as. Generally in the form of
+        'domain\username'. Overrides URL-supplied username if given.
+
+    password
+        Password to authenticate with. Overrides URL-supplied password.
+
+  messages()
+    Return a list containing all of the messages in the folder. Can only be
+    called once as it drains the iterator.
+
+  next_message()
+    Return next message as Email::Simple object from folder. Acts as
+    iterator. Returns undef at end of folder contents.
+
+  folders()
+    Return a list of Email::Folder::Exchange objects contained within base
+    folder. Can only be called once as it drains the iterator.
+
+  next_folder()
+    Return next folder under base folder as Email::Folder::Exchange object.
+    Acts as iterator. Returns undef at end of list.
+
+  uri()
+    Return URI locator object for current folder.
+
+SEE ALSO
+    Email::Folder, URI, Email::Simple
+
+AUTHOR
+    Warren Smith <lt>wsmith@cpan.org<gt>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2007 by Warren Smith
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.4 or, at
+    your option, any later version of Perl 5 you may have available.
+

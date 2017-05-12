@@ -1,0 +1,17 @@
+#include "Dog.h"
+
+%module{XSpp::Example};
+
+class Dog : public Animal
+{
+  %name{new} Dog(std::string& name);
+  ~Dog();
+
+  void MakeSound();
+  void Bark();
+  Dog* Clone();
+
+  static void MakeDogBark(Dog& d);
+};
+
+

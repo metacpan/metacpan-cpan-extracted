@@ -1,0 +1,35 @@
+Revision history for Email-MIME-Kit-Assembler-Markdown
+
+0.100005  2016-08-03 09:47:33-04:00 America/New_York
+        - Bool options now accept any value, meaning that JSON booleans work
+          even from weirdo versions that don't work with Bool
+
+          It also means that you can pass [1,2,3] to the option, so pay
+          attention and don't screw up. :)
+
+0.100004  2016-08-01 22:57:35-04:00 America/New_York
+        - add the `render_wrapper` option to treat the wrapper as a
+          text to be rendered rather than a thing with a single token in it
+          (thanks, Rob Norris!)
+
+0.100003  2015-02-19 13:23:21-05:00 America/New_York
+        - immutabilize class after construction
+
+0.100002  2015-01-23 15:17:20-05:00 America/New_York
+        - make more sensibly compatible with Email::MIME::Kit v3's
+          decoded-text expectations
+
+0.100001  2013-08-12 21:36:07 America/New_York
+          update bugtracker and repo
+
+0.100000  2011-12-07 12:52:23 America/New_York
+          add the munge_signature option
+
+0.093071  2011-10-15 18:06:18 Asia/Tokyo
+          repackage to add META.yml
+
+0.093070  2009-11-03
+          improve handling of header encoding
+
+0.091560  2009-06-05 21:14:31 UTC
+          add text_wrapper to parallel html_wrapper (APEIRON)

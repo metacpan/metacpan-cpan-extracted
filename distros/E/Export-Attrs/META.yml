@@ -1,0 +1,37 @@
+---
+abstract: "The Perl 6 'is export(...)' trait as a Perl 5 attribute"
+author:
+  - 'Alex Efros <powerman@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Export-Attrs
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Export::Attrs:
+    file: lib/Export/Attrs.pm
+    version: v0.1.0
+requires:
+  PadWalker: '0'
+resources:
+  bugtracker: https://github.com/powerman/perl-Export-Attrs/issues
+  homepage: https://github.com/powerman/perl-Export-Attrs
+  repository: https://github.com/powerman/perl-Export-Attrs.git
+version: v0.1.0
+x_contributors:
+  - 'Damian Conway <damian@conway.org>'
+  - 'Niko Tyni <ntyni@debian.org>'

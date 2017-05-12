@@ -1,0 +1,76 @@
+# This is auto-generated.  Do not edit by hand!
+package Encode::InCharset::adobeSymbol;
+our $VERSION = do {my @r = (q$Revision: 0.1 $ =~ /\d+/g); sprintf "%d."."%02d"x$#r, @r};
+sub InAdobeSymbol{
+	return <<'END';
+0	21
+23
+25	26
+28	29
+2B	2C
+2E	3F
+5B
+5D
+5F
+7B	7D
+A0
+AC
+B0	B1
+B5
+D7
+F7
+192
+391	3A1
+3A3	3A9
+3B1	3C9
+3D1	3D2
+3D5	3D6
+2022
+2026
+2032	2033
+2044
+20AC
+2111
+2118
+211C
+2126
+2135
+2190	2194
+21B5
+21D0	21D4
+2200
+2202	2203
+2205	2209
+220B
+220F
+2211	2212
+2215
+2217
+221A
+221D	221E
+2220
+2227	222B
+2234
+223C
+2245
+2248
+2260	2261
+2264	2265
+2282	2284
+2286	2287
+2295
+2297
+22A5
+22C5
+2320	2321
+2329	232A
+25CA
+2660
+2663
+2665	2666
+F6D9	F6DB
+F8E5	F8FE
+END
+}
+1;
+__END__

@@ -1,0 +1,251 @@
+body {
+    font: normal 11px "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif;
+    color: #4f6b72;
+    background: #E6EAE9;
+}
+
+label {
+    font-weight: bold;
+}   
+
+a {
+    color: #c75f3e;
+}
+
+.message {
+    color: red;
+    font-size: 1.5em;
+    font-weight: bold;
+    background: #E6EAE9;
+}
+
+#mytable {
+    width: 700px;
+    padding: 0;
+    margin: 0;
+}
+
+caption {
+    padding: 0 0 5px 0;
+    width: 700px;	 
+    font: italic 11px "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif;
+    text-align: right;
+}
+
+th {
+    font: bold 11px "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif;
+    color: #4f6b72;
+    border-right: 1px solid #C1DAD7;
+    border-bottom: 1px solid #C1DAD7;
+    border-top: 1px solid #C1DAD7;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-align: left;
+    padding: 6px 6px 6px 12px;
+    background: #CAE8EA url(images/bg_header.jpg) no-repeat;
+}
+
+td {
+    border-right: 1px solid #C1DAD7;
+    border-bottom: 1px solid #C1DAD7;
+    background: #fff;
+    padding: 6px 6px 6px 12px;
+    color: #4f6b72;
+    vertical-align : top;
+    font-size: 11px;
+}
+
+.succeeded {
+    background-color: #CCFF99;
+}
+
+.failed {
+    background-color: #FF9999;
+}
+
+.warning {
+    background-color: #FFCC99;
+}
+
+.running {
+    background-color: #FFFFCC;
+}
+
+label {
+    font-weight: bold;
+}
+
+.form {
+    padding-top : 10px;
+    padding-bottom : 10px;
+    padding-left: 5px;
+}
+
+pre {
+    font-size: 11px;
+    background-color: white;
+    /* padding: 10px; */
+}
+
+.dependencies {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+pre.item-message {
+    font-size: 10px;
+}
+
+/* This is the autocomplete stuff */
+div.auto_complete {
+    width: 350px;
+    background: #fff;
+}
+div.auto_complete ul {
+    border:1px solid #888;
+    margin:0;
+    padding:0;
+    width:100%;
+    list-style-type:none;
+}
+div.auto_complete ul li {
+    margin:0;
+    padding:3px;
+}
+div.auto_complete ul li.selected {
+    background-color: #ffb;
+}
+div.auto_complete ul strong.highlight {
+    color: #800;
+    margin:0;
+    padding:0;
+}
+
+/* begin css tabs
+
+Tab CSS By Joshua Kaufman - http://unraveled.com/publications/assets/css_tabs/
+License: http://creativecommons.org/licenses/by/3.0/
+
+*/
+
+ul#tabnav { /* general settings */
+    text-align: left; /* set to left, right or center */
+    margin: 1em 0 0 0; /* set margins as desired */
+    font: bold 13px verdana, arial, sans-serif;/*set font as desired */
+    border-bottom: 1px solid #C1DAD7; /* set border COLOR as desired */
+    list-style-type: none;
+    padding: 3px 10px 3px 2px; /* THIRD number must change with respect to padding-top (X) below */
+}
+
+ul#tabnav li { /* do not change */
+    display: inline;
+}
+
+
+
+body#tab1 li.tab1 a, body#tab2 li.tab2 a, body#tab3 li.tab3 a, body#tab4 li.tab4 a { /* settings for selected tab link */
+    background-color: #fff; /* set selected tab background color as desired */
+    color: #000; /* set selected tab link color as desired */
+    position: relative;
+    top: 1px;
+    padding-top: 4px; /* must change with respect to padding (X) above and below */
+}
+
+ul#tabnav li a { /* settings for all tab links */
+    padding: 3px 4px; /* set padding (tab size) as desired; FIRST number must change with respect to padding-top (X) above */
+    border: 1px solid #C1DAD7; /* set border COLOR as desired; usually matches border color specified in #tabnav */
+    background-color: #CAE8EA; /* set unselected tab background color as desired */
+    color: #666; /* set unselected tab link color as desired */
+    margin-right: 0px; /* set additional spacing between tabs as desired */
+    text-decoration: none;
+    border-bottom: none;
+}
+
+ul#tabnav a:hover { /* settings for hover effect */
+    background: #fff; /* set desired hover color */
+}
+
+/* end css tabs */
+
+/* begin forms */
+
+label.edit {
+    width: 10em;
+    float: left;
+    text-align: right;
+    margin-right: 0.5em;
+    display: block;
+}
+
+.day-label {
+    display: block;
+    float: left;
+}
+
+
+textarea, input {
+    border: 2px solid #C1DAD7;
+}
+
+.submit input {
+    color: #000;
+    background: #CAE8EA;
+    /*border: 2px outset #d7b9c9;*/
+    margin-left: 10em;
+}
+
+input.delete {
+    margin-left: 2em;
+}
+
+fieldset {
+    border: 2px solid #C1DAD7;
+    width: 70em;
+    vertical-align: middle;
+}
+
+legend {
+    /*color: #fff;
+    background: #CAE8EA;*/
+    /*border: 1px solid #C1DAD7;*/
+    padding: 2px 6px;
+    font-weight: bold;
+    font-size: 13px;
+}
+
+.fieldset {
+    padding-bottom: 2em;
+}
+
+textarea {
+    width: 40em;
+    height: 6em;
+}
+
+div.schedule-search {
+    width: 60%;
+    float: left;
+    padding-top: 2em;
+    padding-bottom: 1em;
+    vertical-align: middle;
+}
+
+div.edit-new {
+    padding-top: 2em;
+    padding-bottom: 1em;
+}
+
+div.schedule-new {
+    width: 22%;
+    float: left;
+    padding-top: 2em;
+    padding-bottom: 1em;
+    vertical-align: middle;
+}
+
+.days {
+    vertical-align: middle;
+}
+/* end forms */
+
+

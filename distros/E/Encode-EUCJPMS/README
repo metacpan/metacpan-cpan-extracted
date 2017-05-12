@@ -1,0 +1,64 @@
+NAME
+    Encode::EUCJPMS - Microsoft Compatible Encodings for Japanese
+
+SYNOPSIS
+      use Encode::EUCJPMS;
+      use Encode qw/encode decode/;
+      $eucJP_ms = encode("eucJP-ms", $utf8);
+      $utf8   = decode("eucJP-ms", $euc_jp);
+
+ABSTRACT
+    This module implements Microsoft compatible encodings for Japanese.
+    Encodings supported are as follows.
+
+      Canonical     Alias                                      Description
+      --------------------------------------------------------------------
+      eucJP-ms      qr/\beuc-?jp-?ms$/i                           eucJP-ms
+                    qr/\beuc-?jp-?win$/i
+      cp51932       qr/\bcp51932$/i                 Windows Codepage 51932
+      cp50220                                       Windows Codepage 50220
+      cp50221                                       Windows Codepage 50221
+      --------------------------------------------------------------------
+
+DESCRIPTION
+    To find out how to use this module in detail, see Encode.
+
+INSTALLATION
+    To install this module type the following:
+
+       perl Makefile.PL
+       make
+       make test
+       make install
+
+    If you want to add eucJP-ms to Encode's demand-loading list (so you
+    don't have to "use Encode::EUCJPMS"), run
+
+      enc2xs -C
+
+    to update Encode::ConfigLocal, a module that controls local settings.
+    After that, "use Encode;" is enough to load eucJP-ms on demand.
+
+DEPENDENCIES
+    This module requires perl version 5.7.3 or later.
+
+AUTHOR
+    NARUSE, Yui <naruse@airemix.com>
+
+COPYRIGHT
+    Copyright (C) 2005-2006 NARUSE, Yui <naruse@airemix.com>
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See <http://www.perl.com/perl/misc/Artistic.html>
+
+SEE ALSO
+    Encode, Encode::JP
+
+    Problems and Solutions for Unicode and User/Vendor Defined Characters
+    <http://www.opengroup.or.jp/jvc/cde/ucs-conv-e.html>
+
+    Windows Codepage 932
+    <http://www.microsoft.com/globaldev/reference/dbcs/932.mspx>
+

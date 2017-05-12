@@ -1,0 +1,9 @@
+CHANGELOG
+LICENSE
+MANIFEST
+Makefile.PL
+Modulecmd.pm
+README
+filter
+test.pl
+testmod

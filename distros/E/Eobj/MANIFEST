@@ -1,0 +1,15 @@
+Changes
+Eobj.pm
+Eobj/PLerror.pm
+Eobj/PLerrsys.pm
+Eobj/PLglobal.pl
+Eobj/PLroot.pl
+Eobj/site_init.pl
+MANIFEST
+Makefile.PL
+README
+license.txt
+test.pl
+testclass.pl
+eobj.pdf
+

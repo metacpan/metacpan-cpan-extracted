@@ -1,0 +1,17 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/Echo/StreamServer/Account.pm
+lib/Echo/StreamServer/Client.pm
+lib/Echo/StreamServer/Core.pm
+lib/Echo/StreamServer/EQLShell.pm
+lib/Echo/StreamServer/Feeds.pm
+lib/Echo/StreamServer/Items.pm
+lib/Echo/StreamServer/KVS.pm
+lib/Echo/StreamServer/MuxRequest.pm
+lib/Echo/StreamServer/Settings.pm
+lib/Echo/StreamServer/Users.pm
+eql_shell.pl
+t/client.t
+META.yml                                 Module meta-data (added by MakeMaker)

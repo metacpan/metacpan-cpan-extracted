@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 77ad7eb822d8229415228e6ef7dcf4bf22ef2102 Changes
+SHA1 44df68c49de8a2c6ab81568336cbd10f6adf21ff MANIFEST
+SHA1 627d86aa2c3d411f2c44b1957b09b3725d484369 MANIFEST.SKIP
+SHA1 61d6625335b3b93bcac430f2f1151aa20d8f6af0 META.yml
+SHA1 a698b9277d28ecc619f60a2f48f177ea68ea45e5 Makefile.PL
+SHA1 69ba464ef2c7c0bc0bbe46ee6ad70c0c21e30594 README
+SHA1 7a02e9ae3a8e6b941652f9651a59c71b49401c42 TODO
+SHA1 e4e2fbc95912a17e9ecc47f4fa76d67093cdd779 examples/on_vacation
+SHA1 7e2cfa1b9efe0d502ee57717649c90ba4bd28ba9 inc/Module/Install.pm
+SHA1 6e1392d80a0f239eecd5664f7f21f922cedb9329 inc/Module/Install/Base.pm
+SHA1 f69417fe831d9cc22a78f00a617afadceade4d81 inc/Module/Install/Can.pm
+SHA1 c61d02895330310048bf388881b5e2e064031561 inc/Module/Install/Fetch.pm
+SHA1 4933b00c3a646da8d223c6957f94552bbd62f8c6 inc/Module/Install/Include.pm
+SHA1 54fcbed19232ec959bb17cfb4410599afc7f0779 inc/Module/Install/Makefile.pm
+SHA1 7d3be9b158e37b2b2c22084740099955623b1d56 inc/Module/Install/Metadata.pm
+SHA1 0a8b66180229ba2f9deaea1fedd0aacf7a7ace6b inc/Module/Install/Win32.pm
+SHA1 d3352eb33fe43a5f3ead513f645224fe34d73bc9 inc/Module/Install/WriteAll.pm
+SHA1 d85f09dbf091031fecdde8500dfd53d9466411ec lib/Email/AutoReply.pm
+SHA1 0e98cbb40149cbb7c1eec8c091e43db7b2d96cd3 lib/Email/AutoReply/DB.pm
+SHA1 e9bc77bbb8e9502c1d28ae94de6a3461414e1e8f lib/Email/AutoReply/DB/BerkeleyDB.pm
+SHA1 c92a460b6a5c27cd946d7021843c89920ff9fccb lib/Email/AutoReply/Recipient.pm
+SHA1 8ada6deb4dc8c0933f4e9e22abc10d82611800d1 lib/Email/Filter/AutoReply.pm
+SHA1 7ea05e2a94497bf23abd9cb3b97bcaa0ea0b8480 t/Email-AutoReply.t
+SHA1 020b10bdbf6692d33ec00a5e575de7bcd494c093 t/Email-Filter-AutoReply.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.6 (GNU/Linux)
+
+iD8DBQFITaiHI/2Fnd3kXZIRAprMAKDHG9utemh445ij8ZcZrtM0pK7QYgCdEz8Y
+tUIHe4d4twQ+2bldvGmgyAg=
+=jrHB
+-----END PGP SIGNATURE-----

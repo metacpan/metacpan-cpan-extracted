@@ -1,0 +1,115 @@
+[-
+$r = shift ;
+$http_headers_out{'content-type'} = 'text/html' ;
+-]
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+        <title>Embperl 
+	    [$if @{$r -> {menuitems}} > 1 || $r -> {menuitems}[0]{menu} ne 'Home' $]
+                [- $i = 0 -]
+		[$foreach $item (@{$r -> {menuitems}}) $]
+		    - [+ $r -> gettext($item -> {menu}) +]
+		[$endforeach$] 
+            [$endif$]
+        </title>
+        <style type="text/css">
+            [-
+            $font = 'font-family: Geneva,Arial,Helvetica;' ;
+            $base = $font ; 
+            $base10 = $base . ' font-size: 10px;' ; 
+            $base12 = $base . ' font-size: 12px;' ; 
+            $base14 = $base . ' font-size: 14px;' ; 
+            $base18 = $base . ' font-size: 18px;' ; 
+            -]
+
+           .cInput              {[+ $base12 +] background: #DDDDDD; }
+           .cText               {[+ $base12 +] background: #AFBDCA; }
+           .cSectionInput       {[+ $base12 +] background: #ddaaaa; }
+           .cSectionText        {[+ $base12 +] background: #ddaaaa; }
+           .cTabsOn             {[+ $base14 +] background: #ddaaaa; }
+           .cTabsOff            {[+ $base14 +] background: #DDDDDD; }
+           .cMenu               {[+ $base10 +] color: #000000 ; text-align: left ;}
+           .cMenuInfo           {[+ $base10 +] color: #000000 ; text-align: left ; background: #D2E9F5 }
+           .cNews               {[+ $base10 +]}
+           .cContent            {[+ $base12 +] border-left: 1px black solid ; padding-left: 7px; padding-right: 7px; }
+           .cContentNews        {[+ $base12 +] border-left: 1px black solid ; margin-left: 7px; padding-left: 7px; }
+
+           .cPodHeaderNavLink   {[+ $base12 +]}
+           .cPodH1ContentLink   {[+ $base12 +] font-weight: bold;}
+           .cPodH2ContentLink   {[+ $base10 +]}
+
+           .cPodH1              {[+ $base18 +] padding-left: 15px; padding-right: 15px; background: #fefcad; color: #000000; font-weight: bold; }
+           .cPodH1Link          {[+ $base12 +] padding-left: 15px; padding-right: 15px; background: #fefcad; color: #000000; text-align: right ;}
+           .cPodH2              {[+ $base14 +] padding-left: 15px; padding-right: 15px; background: #D2E9F5; color: #000000; font-weight: bold; }
+           .cPodH2Link          {[+ $base10 +] padding-left: 15px; padding-right: 15px; background: #D2E9F5; color: #000000; font-weight: bold; }
+           .cTopLink            {[+ $base10 +] }
+
+           .cListOnlyText       {[+ $base12 +]  }
+           .cItemText           {[+ $base14 +] font-weight: bold;  }
+           .cPodVerbatim        {font-family: monospace; font-size: 12px; background: #eeeeee; 
+				   border: solid 1px black; padding: 13px; margin: 20px 40px 20px 40px}
+           .cFoot               {[+ $base10 +]}
+
+           body                 {[+ $base12 +]}
+           table                {[+ $base12 +]}
+           .cHeadline           {[+ $base14 +]  font-weight: bold;}
+           a:hover              { color: red ;}
+
+
+            .diff-added, .diff-removed, .diff-unmodified, .diff-changed {
+                font-family: monospace;
+            }
+            .diff-added {
+                background: #cfc;
+                color: #000;
+            }
+            .diff-removed {
+                background: #fcc;
+                color: #000;
+            }
+            .diff-unmodified {
+                background: inherit;
+                color: #000;
+            }
+            .diff-changed {
+                background: #ffc;
+                color: #000;
+            }
+
+            table.diff {
+                border: 1px solid #666;
+            }
+
+            table th {
+                border-bottom: 1px solid #666;
+            }
+
+            th.lhs, td.lhs {
+                padding-right: 1em;
+            }
+            th.rhs, td.rhs {
+                padding-left: 1em;
+                border-left: 1px solid #666;
+            }
+
+            h1 small {
+                color: #f00;
+            }
+
+
+
+        </style>
+    </head>
+    <body bgcolor="#ffffff" style="position: relative; width: 1020px; margin-left: auto; margin-right: auto; border: 1px solid black; padding: 5px; margin-top: 10px">
+        [- Execute ('header.epl') -]
+        <table width="100%" cellspacing="0" cellpadding="0" border="0">
+            <tr>
+                <td valign="top">[- Execute ('menuleft.epl') -]</td>
+                <td valign="top" width="90%" class="cContent">[- Execute ('content.epl') -]</td>
+            </tr>
+        </table>
+        [- Execute ('footer.htm') -]
+    </body>
+</html>

@@ -1,0 +1,298 @@
+ MALLOC=svinc:$dest = ($type)SvREFCNT_inc($src)
+ FREE=svinc:SvREFCNT_dec($src)
+
+ <tTokenTable>
+!   pCompilerInfo | compiler_info
+   sName | name
+!   sRootNode | root_node
+!   cStartChars | start_chars
+!   cAllChars | all_chars
+!   pTokens | tokens
+!   numTokens | tokens
+!   bLSearch | lsearch
+!   nDefNodeType | def_node_type
+!   pContainsToken | contains_token
+!   new
+!   private
+ </tTokenTable>
+
+
+ MALLOC=strdup:$dest = ($type)ep_pstrdup(obj->pPool,$src)
+
+ <tReq>
+!   _perlsv
+!   pPerlTHX | perl_thx
+!   pPool | pool
+!   pApacheReq | apache_req
+   pApacheReqSV | apache_req
+   Config | config
+   Param | param
+   Component | component
+   pApp | app
+   pThread | thread
+   nRequestCount | request_count
+   nRequestTime | request_time
+   nIOType | iotype
+   nSessionMgnt | session_mgnt
+   sSessionID | session_id
+   sSessionStateID | session_state_id
+   sSessionUserID  | session_user_id
+   sCookieExpires | cookie_expires
+   bExit | had_exit
+   nLogFileStartPos | log_file_start_pos
+   bError | error
+   pErrArray | errors
+   errdat1[ERRDATLEN] | errdat1
+   errdat2[ERRDATLEN] | errdat2
+   lastwarn[ERRDATLEN] | lastwarn
+   pErrSV | errobj
+!   pDomTreeAV | dom_tree_av
+   pCleanupAV | cleanup_vars
+   pCleanupPackagesHV | cleanup_packages
+   sInitialCWD | initial_cwd
+   pMessages | messages
+   pDefaultMessages | default_messages
+   startclock
+   stsv_count
+!   MemCheckpoint | mem_checkpoint
+!   pApacheConfig | apache_config
+   new
+!   private
+ </tReq>
+
+
+ <tApp>
+!   _perlsv
+!   pPerlTHX    | perl_thx
+!   pPool       | pool
+   pThread      | thread
+   pCurrReq     | curr_req
+   Config       | config
+   lfd
+   pUserObj     | user_session
+   pStateObj    | state_session
+   pAppObj      | app_session
+   pUserHash    | udat
+   pStateHash   | sdat
+   pAppHash     | mdat
+   bDebug       | debug
+   nErrorsCount | errors_count
+   nErrorsLastTime | errors_last_time 
+   nErrorsLastSendTime | errors_last_send_time
+
+   new
+!   private
+ </tApp>
+
+
+ <tAppConfig>
+!   _perlsv
+   sAppName | app_name
+   sAppHandlerClass | app_handler_class
+   pSessionArgs | session_args
+   pSessionClasses | session_classes
+   sSessionConfig | session_config
+   sSessionHandlerClass | session_handler_class
+   sCookieName | cookie_name
+   sCookieDomain | cookie_domain
+   sCookiePath | cookie_path
+   sCookieExpires | cookie_expires
+   bCookieSecure | cookie_secure
+   sLog | log
+   bDebug | debug
+   sMailhost | mailhost
+   sMailhelo | mailhelo
+   sMailfrom | mailfrom
+   bMaildebug | maildebug
+   sMailErrorsTo | mail_errors_to
+   nMailErrorsLimit | mail_errors_limit
+   nMailErrorsResetTime | mail_errors_reset_time
+   nMailErrorsResendTime | mail_errors_resend_time
+   sObjectBase | object_base
+   sObjectApp | object_app
+   pObjectAddpathAV | object_addpath
+   pObjectReqpathAV | object_reqpath
+   sObjectStopdir | object_stopdir
+   sObjectFallback | object_fallback
+   sObjectHandlerClass | object_handler_class
+   new
+!   private
+ </tAppConfig>
+
+
+ <tComponent>
+!   _perlsv
+!   pPool | pool
+   Config | config
+   Param | param
+   bReqRunning | req_running
+   bSubReq | sub_req
+   nInsideSub | inside_sub
+   bExit | had_exit
+   nPathNdx | path_ndx
+   sCWD | cwd
+   bEP1Compat | ep1_compat
+   nPhase | phase
+   sSourcefile | sourcefile
+   pBuf | buf
+   pEndPos | end_pos
+   pCurrPos | curr_pos
+   nSourceline | sourceline
+   pSourcelinePos | sourceline_pos
+   pLineNoCurrPos | line_no_curr_pos
+   xDocument | document
+   xCurrNode | curr_node
+   nCurrRepeatLevel | curr_repeat_level
+   nCurrCheckpoint | curr_checkpoint
+   xCurrDomTree | curr_dom_tree
+   xSourceDomTree | source_dom_tree
+!   pOutputCache | output_cache
+!   pOutputSV | output_sv
+   pTokenTable | syntax
+!   pCurrEscape | curr_escape
+!   pNextEscape | next_escape
+   nCurrEscMode | curr_esc_mode
+!   bEscModeSet | esc_mode_set
+!   bEscInUrl | esc_in_url
+   ifd
+   ifdobj
+   bAppendToMainReq | append_to_main_req
+   pPrev | prev
+   bStrict | strict
+!   op_mask_buf[MAXO + 100] | 
+   pImportStash | import_stash
+   pExportHash | exports
+   sCurrPackage | curr_package
+   sEvalPackage | eval_package
+   sMainSub | main_sub
+   pProg | prog
+   pProgRun | prog_run
+   pProgDef | prog_def
+   pCodeSV | code
+   new
+!   private
+ </tComponent>
+
+
+ <tComponentConfig>
+!   _perlsv
+   sPackage | package
+   bDebug | debug
+   bOptions | options
+   nEscMode | escmode
+   nInputEscMode | input_escmode
+   sInputCharset | input_charset
+   bEP1Compat | ep1compat
+   sCacheKey | cache_key
+   bCacheKeyOptions | cache_key_options
+   pExpiredFunc | expires_func
+   pCacheKeyFunc | cache_key_func
+   nExpiresIn | expires_in
+   sExpiresFilename | expires_filename
+   sSyntax | syntax
+   pRecipe | recipe
+   sXsltstylesheet | xsltstylesheet
+   sXsltproc | xsltproc
+   sCompartment | compartment
+!   pOpcodeMask | opcode_mask
+   nCleanup | cleanup
+   sTopInclude | top_include
+   new
+!   private
+ </tComponentConfig>
+
+
+ <tComponentParam>
+!   _perlsv
+   sInputfile   | inputfile
+   sOutputfile  | outputfile
+
+   sSubreq      | subreq
+   pInput       | input
+   pOutput      | output
+   sSub         | sub
+   nImport      | import
+   nFirstLine   | firstline
+   nMtime       | mtime
+   pParam       | param
+   pFormHash    | fdat
+   pFormArray   | ffld
+   sObject      | object
+   sISA         | isa
+   pErrArray    | errors
+   pXsltParam   | xsltparam 
+   new
+!   private
+ </tComponentParam>
+
+
+ <tReqConfig>
+!   _perlsv
+   pAllow | allow
+   pUriMatch | urimatch
+   sDecline | decline
+   cMultFieldSep | mult_field_sep
+   pPathAV | path
+   bDebug | debug
+   bOptions | options
+   nSessionMode | session_mode
+   nOutputMode | output_mode
+   nOutputEscCharset | output_esc_charset
+   new
+!   private
+ </tReqConfig>
+
+
+ <tReqParam>
+!   _perlsv
+   sFilename | filename
+   sUnparsedUri | unparsed_uri
+   sUri | uri
+   sServerAddr | server_addr
+   sPathInfo | path_info
+   sQueryInfo | query_info
+   sLanguage | language
+   pCookies | cookies
+   pCGISV | cgi
+   new
+!   private
+ </tReqParam>
+ 
+
+ <tThreadData>
+!   _perlsv
+!   pPerlTHX | perl_thx
+!   pPool | pool
+!   pMainPool | main_pool
+   pApplications | applications
+   pCurrReq | curr_req
+   nPid | pid
+   pEnvHash | env_hash
+   pFormHash | form_hash
+   pFormSplitHash | form_split_hash
+   pInputHash | input_hash
+   pFormArray | form_array
+   pHeaderHash | header_hash
+   new
+!   private
+ </tThreadData>
+
+ <tComponentOutput>
+!   _perlsv
+!   pPool | pool
+   bDisableOutput | disable_output
+!   pFirstBuf | first_buf
+!   pLastBuf | last_buf
+!   pFreeBuf | free_buf
+!   pLastFreeBuf | last_free_buf
+!   pMemBuf | mem_buf
+!   pMemBufPtr | mem_buf_ptr
+!   nMemBufSize | mem_buf_size
+!   nMemBufSizeFree | mem_buf_size_free
+!   nMarker | marker
+!   ofd
+   ofdobj
+!   new
+!   private
+ </tComponentOutput>
+

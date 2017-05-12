@@ -1,0 +1,5 @@
+lib/Exporter/Dispatch.pm
+MANIFEST
+Makefile.PL
+README
+t/test.t

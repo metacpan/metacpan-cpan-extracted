@@ -1,0 +1,13 @@
+=head1 Test
+
+Das ist ein Test mit B<mehreren> Ebenen:
+
+=over 4
+
+=item * Test
+
+=item * Hallo
+
+Mehr zum Punkt I<Hallo>. Äußerst schön ist es, wenn die Umlaute funktionieren.
+
+=back

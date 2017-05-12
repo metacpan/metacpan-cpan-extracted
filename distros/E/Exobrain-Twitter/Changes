@@ -1,0 +1,24 @@
+1.04      2014-03-03 22:13:46PST-0800 America/Los_Angeles
+
+    * SETUP: `exobrain setup Twitter` now works!
+    * TEST: Added perlcritic.rc file.
+    * COMPAT: Perl 5.10 compatibility fixes.
+
+1.03      2014-02-28 23:23:37EST-0500 America/Montreal
+
+    * DOCS: Note that you *must* have DM access for your twitter app.
+    * BUILD: Simplify dist.ini. Fix missing files.
+
+1.02      2014-02-28 12:48:26EST-0500 America/Montreal
+
+    * DISTRIBUTED: De-crufted distributed tarball.
+                   See pjf/exobrain#37 , thanks to @tsibley.
+
+1.01      2014-02-28 02:34:35EST-0500 America/Montreal
+
+    * FEATURE: exobrain-twitter-auth will not write the config file
+               for you, rather than requiring you to copy/paste.
+
+1.00      2014-02-26 03:51:06EST-0500 America/Montreal
+
+    * Initial release to CPAN

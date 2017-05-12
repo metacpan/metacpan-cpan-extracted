@@ -1,0 +1,38 @@
+Revision history for Email-Assets
+
+0.10	22/01/2015
+	- strip trailing whitespace & all newlines from output 
+        - additional pod fixes
+
+0.09    22/01/2015
+	- add attachments method
+        - add missing test requirement for Test::Differences
+        - set mime part content disposition as attachment, and allow option to specify
+        - more pod
+
+0.08    20/01/2015
+	- fix handling base64 added assets
+
+0.07    19/01/2015
+        -fix missing pre-req on Data::UUID
+
+0.06    15/01/2015
+	- include missing image for tests
+
+0.05    15/01/2015
+        - fixed chdir causing issues with paths
+        - added option to use base64 urlsafe decode when adding base64 encoded assets
+
+0.04   - fixed error when calling to_mime_parts
+       - fixed pod for include_base64
+
+0.03    09/01/2015
+        - improved mime handling
+
+0.02    08/01/2015
+        - added new include_base64 method
+        - fixed missing MIME::Lite pre-req
+
+0.01    02/01/2015 
+        First version, released on an unsuspecting world.
+

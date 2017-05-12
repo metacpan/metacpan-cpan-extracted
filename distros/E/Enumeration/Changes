@@ -1,0 +1,8 @@
+Revision history for Perl extension Enumeration.
+
+0.01  16 March 2008
+        - First version
+
+0.02  24 March 2008
+        - Changed Makefile.PL to require a newer ExtUtils::MakeMaker.
+        - Added gpg signatures.

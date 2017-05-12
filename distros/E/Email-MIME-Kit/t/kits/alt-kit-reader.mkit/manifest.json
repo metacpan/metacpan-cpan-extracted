@@ -1,0 +1,17 @@
+{
+  "kit_reader": "=Email::MIME::Kit::ConstKit",
+  "header": [
+    { "Subject": "Hello"                       },
+    { "From"   : "Test Sender <test@test.com>" }
+  ],
+  "alternatives": [
+    {
+      "type": "text/plain",
+      "path": "first/text/alternative.txt"
+    },
+    {
+      "type": "text/plain",
+      "path": "second/text/alternative.txt"
+    }
+  ]
+}

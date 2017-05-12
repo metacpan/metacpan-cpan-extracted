@@ -1,0 +1,102 @@
+                                              Ledger
+Period 2011-01-01 through 2011-12-31
+EekBoek Sample Administration                                                   EekBoek, 2011-12-31
+
+  Acc  Ledger/Posting                  Date            Debet     Credit  PostingNr       Relation
+---------------------------------------------------------------------------------------------------
+ 1100  Supplies
+        Initial balance                              1344.37       0.00
+        Mutations total                                 0.00
+ 1100  Total Supplies                                1344.37
+
+ 1101  Depreciation supplies
+        Initial balance                                 0.00    1304.81
+        Mutations total                                          411.26
+ 1101  Total Depreciation supplies                              1716.07
+
+ 1110  Computers
+        Initial balance                             13378.48       0.00
+        Mutations total                                 0.00
+ 1110  Total Computers                              13378.48
+
+ 1111  Depreciation computers
+        Initial balance                                 0.00   12106.78
+        Mutations total                                          396.82
+ 1111  Total Depreciation computers                            12503.60
+
+ 2200  Debtors
+        Initial balance                                 0.00       0.00
+        Mutations total                                 0.00
+ 2200  Total Debtors                                    0.00
+
+ 2320  Bank
+        Initial balance                              1131.92       0.00
+        Mutations total                              9202.76
+ 2320  Total Bank                                   10334.68
+
+ 3100  Capital
+        Initial balance                                 0.00    2443.18
+        Mutations total                                 0.00
+ 3100  Total Capital                                            2443.18
+
+ 4100  Creditors
+        Initial balance                                 0.00       0.00
+        Mutations total                                 0.00
+ 4100  Total Creditors                                  0.00
+
+ 4200  VAT Revenue high
+        Initial balance                                 0.00       0.00
+        Mutations total                                         1463.00
+ 4200  Total VAT Revenue high                                   1463.00
+
+ 4220  VAT Procurement high
+        Initial balance                                 0.00       0.00
+        Mutations total                               148.13
+ 4220  Total VAT Procurement high                     148.13
+
+ 6800  Depreciation costs inventory
+        Initial balance                                 0.00       0.00
+        Mutations total                               411.26
+ 6800  Total Depreciation costs                       411.26
+       inventory
+
+ 6810  Depreciation costs computers
+        Initial balance                                 0.00       0.00
+        Mutations total                               396.82
+ 6810  Total Depreciation costs                       396.82
+       computers
+
+ 6900  Phone costs and fax costs
+        Initial balance                                 0.00       0.00
+        Mutations total                               510.29
+ 6900  Total Phone costs and fax                      510.29
+       costs
+
+ 6905  Internet costs
+        Initial balance                                 0.00       0.00
+        Mutations total                               269.42
+ 6905  Total Internet costs                           269.42
+
+ 6980  Bank costs
+        Initial balance                                 0.00       0.00
+        Mutations total                                32.40
+ 6980  Total Bank costs                                32.40
+
+ 8100  Revenue consultancy
+        Initial balance                                 0.00       0.00
+        Mutations total                                         1200.00
+ 8100  Total Revenue consultancy                                1200.00
+
+ 8300  Revenue editing
+        Initial balance                                 0.00       0.00
+        Mutations total                                         1000.00
+ 8300  Total Revenue editing                                    1000.00
+
+ 8400  Revenue courses
+        Initial balance                                 0.00       0.00
+        Mutations total                                         6500.00
+ 8400  Total Revenue courses                                    6500.00
+
+       Mutations total                              10971.08   10971.08
+---------------------------------------------------------------------------------------------------
+       Total                                        26825.85   26825.85

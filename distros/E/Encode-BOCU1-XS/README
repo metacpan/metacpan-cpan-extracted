@@ -1,0 +1,53 @@
+Encode-BOCU1-XS
+===============
+
+   Version 0.02 - 03 July 2006
+
+   Encode::BOCU1::XS is a Perl extension for encoding / decoding BOCU-1 string.
+   Works as part of Encode.pm.
+
+   It uses a lot less CPU than Encode-BOCU1, the original pure-perl module.
+
+
+INSTALLATION
+
+ (1) Install ICU(4C) Unicode library:
+   http://www-306.ibm.com/software/globalization/icu/downloads.jsp
+
+ (2) Type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   sudo make install
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    The International Component for Unicode (ICU)
+      http://www-306.ibm.com/software/globalization/icu/
+
+
+COPYRIGHT AND LICENCE
+
+Source files found under IBM_CODES/ directory
+ * bocu1.h (constants and macros)
+ * bocu1.c (encoder and decoder functions)
+ * bocu1tst.c (test code with main() function)
+from "Sample C Code" on http://www.unicode.org/notes/tn6/ are
+
+Copyright (C) 2002, International Business Machines Corporation and others.
+All Rights Reserved.
+
+The "Sample C Code" is under the X license (ICU version).
+ICU License : http://dev.icu-project.org/cgi-bin/viewcvs.cgi/*checkout*/icu/license.html
+
+BOCU "Binary-Ordered Compression For Unicode" is a patent-protected technology of IBM.
+(US Patent 6737994)
+
+The XS glue code is written by Naoya Tozuka and 
+Copyright (C) 2006, Naoya Tozuka <naoyat@naochan.com>.
+As with the original C code, this port is licensed under the X license (ICU version).
+also distributed under the ICU License.

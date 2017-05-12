@@ -1,0 +1,5 @@
+Revision history for Perl extension ESPPlus::Storage.
+
+0.01  Wed May  7 14:51:05 2003
+	- original version; created by h2xs 1.5 with options
+		-X -n ESPPlus::Storage

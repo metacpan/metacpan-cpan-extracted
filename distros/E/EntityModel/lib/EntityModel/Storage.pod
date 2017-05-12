@@ -1,0 +1,227 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with EntityModel::Storage
+at lib/EntityModel/Storage.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+EntityModel::Storage - backend storage interface for L<EntityModel>
+
+=head1 VERSION
+
+version 0.102
+
+=head1 SYNOPSIS
+
+See L<EntityModel>.
+
+=head1 DESCRIPTION
+
+See L<EntityModel> for more details.
+
+=head1 METHODS
+
+=head2 register
+
+Register with L<EntityModel> so that callbacks trigger when further definitions are loaded/processed.
+
+The base storage engine doesn't provide any callbacks - but we define the method anyway so that we don't
+need to check for ->can.
+
+=head2 apply_model
+
+Apply the given model.
+
+=head2 apply_model_and_schema
+
+Apply the given model to the storage layer.
+
+This delegates most of the work to L</apply_entity>.
+
+=head2 read
+
+Reads the data for the given entity and returns hashref with the appropriate data.
+
+Parameters:
+
+=over 4
+
+=item * entity - L<EntityModel::Entity>
+
+=item * id - ID to read data from
+
+=back
+
+=head2 create
+
+Creates new entry for the given L<EntityModel::Entity>.
+
+Parameters:
+
+=over 4
+
+=item * entity - L<EntityModel::Entity>
+
+=item * data - actual data values
+
+=back
+
+=head2 store
+
+Stores data to the given entity and ID.
+
+Parameters:
+
+=over 4
+
+=item * entity - L<EntityModel::Entity>
+
+=item * id - ID to store data to
+
+=item * data - actual data values
+
+=back
+
+=head2 remove
+
+Removes given ID from storage.
+
+Parameters:
+
+=over 4
+
+=item * entity - L<EntityModel::Entity>
+
+=item * id - ID to store data to
+
+=back
+
+=head2 find
+
+Find some entities that match the spec.
+
+=head2 adjacent
+
+Returns the previous and next element for the given ID.
+
+=head2 prev
+
+Returns previous element for the given ID.
+
+=head2 next
+
+Returns next element for the given ID.
+
+=head2 outer
+
+Returns first and last IDs for the given entity.
+
+=head2 first
+
+Returns first active ID for the given entity.
+
+=head2 last
+
+Returns last active ID for the given entity.
+
+=head2 transaction_start
+
+Mark the start of a transaction.
+
+=head2 transaction_rollback
+
+Roll back a transaction.
+
+=head2 transaction_commit
+
+Commit this transaction to storage - makes everything done within the transaction permanent
+(or at least to the level the storage class supports permanence).
+
+=head2 transaction_end
+
+Release the transaction on completion.
+
+=head1 SUBCLASSING
+
+This module provides the abstract base class for all storage modules. Here's how to build
+your own.
+
+=head2 INITIAL SETUP
+
+L</setup> will be called when this storage class is attached to the model via
+L<EntityModel/add_storage>, and this will receive the $model as the first parameter along
+with any additional options. Typically this will include storage-specific connection
+information.
+
+Each entity added to the model will be applied to the storage engine through L</apply_entity>.
+It is the responsibility of the storage engine to verify that it is able to handle the given
+entities and fields, either creating the underlying storage structure (database tables, etc.)
+or raising an error if this isn't appropriate.
+
+=head2 USAGE
+
+Most of the work is handled by the following methods:
+
+=over 4
+
+=item * L</read> - retrieves data from the backend storage engine for the given entity and ID
+
+=item * L</create> - writes new data to storage for given entity, data and optional ID
+
+=item * L</store> - updates an existing entry in storage for the given entity, data and ID
+
+=item * L</remove> - deletes an existing entry from storage, takes entity and ID
+
+=back
+
+Each of these applies to a single entity instance only. Since they operate on a callback
+basis, multiple operations can be aggregated if desired:
+
+ select * from storage where id in (x,y,z)
+
+Two callbacks are required for each of the above operations:
+
+=over 4
+
+=item * on_complete - the operation completed successfully and the data is guaranteed to
+have been written to storage. The strength of this guarantee depends on the storage engine
+but it should be safe for calling code to assume that any further operations will not result
+in losing the data - for example, a database engine would commit the data before sending this
+event.
+
+=item * on_fail - the operation was not successful and storage has been rolled back to
+the previous state. This could be the case when trying to create an item with a pre-existing
+ID or possibly transaction deadlock, although in the latter case it would be preferable to
+attempt retry some reasonable number of times before signalling a failure.
+
+=back
+
+Neither callback is mandatory - default behaviour if there is no C<on_fail> is to die() on failure,
+and no-op if C<on_complete> is not specified.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Mixin::Event::Dispatch>
+
+L<add_handler_for_event|Mixin::Event::Dispatch/add_handler_for_event>, L<clear_event_handlers|Mixin::Event::Dispatch/clear_event_handlers>, L<event_handlers|Mixin::Event::Dispatch/event_handlers>, L<invoke_event|Mixin::Event::Dispatch/invoke_event>, L<subscribe_to_event|Mixin::Event::Dispatch/subscribe_to_event>, L<unsubscribe_from_event|Mixin::Event::Dispatch/unsubscribe_from_event>
+
+=item L<EntityModel::BaseClass>
+
+L<clone|EntityModel::BaseClass/clone>, L<dump|EntityModel::BaseClass/dump>, L<new|EntityModel::BaseClass/new>, L<sap|EntityModel::BaseClass/sap>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <cpan@entitymodel.com>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2008-2011. Licensed under the same terms as Perl itself.

@@ -1,0 +1,665 @@
+1.26 2015-06-13
+  - fix doc typos (Lucas Kanashiro)
+
+1.25 2015-06-06
+  - Fix Event::PRIO_NORMAL call in Watcher.pm (Lucas Kanashiro)
+  - update Changes
+
+1.24 2015-02-27
+  - Don't distribute MANIFEST.SKIP
+  - Update docs & code to require perl 5.008
+  - Define MIN_PERL_VERSION to pass Kwalitee checks in Makefile.PL
+    (Doran L. Barton)
+  - Added =encoding utf8 to pass Test::Pod/Kwalitee tests. Added t/pod.t
+    (Doran L. Barton)
+
+1.23 2014-07-09
+  - Add git repo
+  - Rely on Inline "with" hook error message
+  - use "our" not "use vars"
+
+1.22 2014-06-30
+  - Use updated Inline "with" hook API
+
+1.21 2012-12-14
+  - http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2012-12/msg00424.html
+    (C warnings avoidance)
+
+1.20 2011-07-27
+  - Repair test again
+
+1.19 2011-07-24
+  - Really skip the bad fd test on platforms that don't support it
+    Considering how much trouble this test has caused, I question whether
+    it is worth keeping it.
+
+1.18 2011-06-25
+  - Repair test to use a truly read-only variable
+    Fix suggested by Father Chrysostomos <sprout@cpan.org>
+
+1.17 2011-05-18
+  - Skip bogus fd test for GNU Hurd
+    A test report from Nigel Horne suggested that GNU Hurd either does not
+    support detection of bogus fds or supports it differently than Linux.
+    I do not have Hurd available for testing so I will simply skip the test.
+  - On windows, skip tests correctly
+    APOCAL@cpan.org wrote:
+    The module failed to pass the tests because it emitted incorrect TAP
+    plan. After consulting with some people on IRC and looking at the TAP
+    manual, I found the solution. It seems you were using the "old-style"
+    TAP printouts and with the latest Test::Harness, it complains!
+    The fix is to change those 4 tests: hup, io, reenter, and signal. You
+    need to print one line for the skip, not two! The TAP doc can be found
+    here: http://search.cpan.org/~petdance/TAP-1.00/TAP.pm#Skipping_tests
+
+1.15 2011-05-03
+  - Clarify conditions for skipping test
+    Spotted by George Hartzell <hartzell@alerce.com>
+
+1.14 2011-05-03
+  - change skip condition
+
+1.13 2009-09-30
+  - Freshen MANIFEST
+  - Note new GIT repo location: http://gitorious.org/perl-event/mainline
+  - Add errata for tutorial
+
+1.12 2009-08-26
+  - Point people to Marc Lehmann's stuff
+  - Skip bogus fd test for armv5tejl
+
+1.11 2008-05-17
+  - s/double/NV/g to support uselongdouble
+  - Make debug code compile again
+  - Increase minimum version of perl to 5.006_003
+  - This test is too sensitive to load on the machine causing
+    random failures. Better to remove it from the regression test
+    battery.
+
+1.10 2008-01-15
+  - min perl 5.006
+  - Skip bogus_fd test on darwin. Reported by schwern@pobox.com.
+  - Jerry D. Hedden <jdhedden@cpan.org> and Ævar Arnfjörð
+    Bjarmason <avarab@gmail.com> correctly diagnosed that a recent
+    change in perl (#31130, FETCH/STORE/LENGTH callbacks for numbered capture
+    variables) caused $1 to loose its read-only-ness hence breaking test 6.
+    Zefram <zefram@fysh.org> suggested using $$ instead. I have not tested
+    this patch but it seems trivial enough.
+
+1.09 2007-05-22
+  - doc git location git://nirmalvihar.info/home/joshua/event.git
+
+1.08 2006-11-01
+  - Add casts to quell warnings as suggested by JDHEDDEN@cpan.org.
+
+1.07 2006-10-10
+  - Marc Lehmann <schmorp@schmorp.de> suggests using mg_ptr instead
+    of mg_obj. Sounds good to me.
+
+1.06 2005-05-14
+  - Fix 64 bit issue.  Encouraged by Eric Rybski <rybskej@yahoo.com>.
+
+1.05 2005-04-24
+  - Fix ancient memory leak in loop() noticed by Nikita Savin
+    <nik@asdfgroup.com>.
+
+1.04 2005-03-29
+  - Preliminary /dev/poll support from Michael Pergament
+    <ESeifert@t-online.de>.  As of yet, there is no config test to
+    turn on this code.  Patches welcome.
+
+1.03 2005-01-31
+  - Apply Win32 patch from Graciliano M. P. <gmpowers@terra.com.br>.
+
+1.02 2004-12-08
+  - Generic watchers: implementation, documentation, and tests.
+  - Documentation refinements.
+
+1.01 2004-11-29
+  - Event.xs: Due to popular demand, queue_pending() is now a public
+    API, for better or worse.  Beware of race conditions.
+  - A var watcher can currently be created with no variable to
+    watch, provided of course that it is parked.  However, once a
+    variable has been set, the watcher cannot be returned to the
+    no-variable state.  The variable to watch can be changed, but the
+    watcher rejects any attempt to set the reference to undef.
+    Applied a patch to allow the variable reference of a var watcher
+    to be set to undef.
+  - Applied patch to clarify the documentation (with tweaks from
+    Joshua).
+
+1.00 2004-05-14
+  - c/watcher.c (pe_watcher_now): Check for a missing callback, not
+    only a missing perl callback.  Marc A. Lehmann <pcg@goof.com>
+  - lib/Event.pm (import): Make NO_TIME_HIRES actually work. Jerry
+    D. Hedden <jerry@hedden.us>
+  - c/signal.c (pe_signal_stop): When a signal watcher stops, the
+    signal counter is cleared.  Otherwise the signal watcher can
+    generate one last event after being stopped, which is a
+    bug. (Pointed out by Zefram <zefram@fysh.org>)
+
+0.88 2004-04-21
+  - lib/Event.pm: Simplify hooking into Time::HiRes.  Add a
+    NO_HIRES_TIME export_ok symbol to turn off the probing.
+  - Event.xs: Remove U2time. Remove install_time_api().
+  - lib/Event.pod: More refinement from Zefram <zefram@fysh.org>.
+  - lib/Event.pod: ($watcher->pending & signal watchers): More
+    specific description by Zefram <zefram@fysh.org>.
+  - c/watcher.c (pe_watcher_now): Fix SEGV reported by Zefram
+    <zefram@fysh.org>.  Add test.
+  - lib/Event.pod (timer): Correction by Randal L. Schwartz
+    <merlyn@stonehenge.com>.
+  - lib/Event.pod (timer): Doc clarification (jdhedden@1979.usna.com).
+
+0.87 2003-02-18
+  - c/var.c (tracevar_r, tracevar_w): Fix declaration for recent
+    versions of perl (patch from Nick Eggleston <nick@dccinc.com>).
+
+0.86 2002-05-25
+  - c/unix.c: Solaris works better without POLLWRBAND (Clemens
+    Schrimpe <csch@Kiez.NET>).
+
+0.85 2002-02-01
+  - Apply patch from Allen Smith <easmith@beatrice.rutgers.edu>
+    to avoid infinite polling loop on some select implementations.
+    Also reported by Marc Lehmann <pcg@goof.com>.
+
+0.84 2002-01-23
+  - Doc StarvePrio (Allen Smith <easmith@beatrice.rutgers.edu>).
+  - Remove IRIX special casing.  Reports indicate that new versions
+    of IRIX don't need any hacks. (Allen Smith <easmith@beatrice.rutgers.edu>)
+
+0.83 2001-06-22
+  - Waste less time in timeable.c. (Peter Lombard <lombard@seismo.berkeley.edu>)
+
+0.82 2001-06-21
+  - Stop watcher if $w->cb(undef) (Damien Neil <neild@misago.org>)
+
+0.81 2001-01-31
+  - Fix callback.t fail without Time::HiRes.
+  - Fix typo in EventAPI.h.
+
+0.80 2000-12-07
+  - Update Tutorial.pdf to Jochen's latest.
+  - Remove silly warning on $io->poll(T).
+  - Fix $DIED doc. (paul@miraclefish.com)
+  - Change C callback prototype to (void(*)(pe_event*))
+    at request of Jochen.
+  - Warn if loop without active watchers.
+  - Slightly more reliable default_exception_handler.
+  - Inline 0.30 integration (briani@activestate.com)
+
+0.79 2000-11-17
+  - Removed Event/inactivity.pm
+  - #undef HAS_POLL for sgi (treygraves@yahoo.com)
+  - Moved REENTRANT & HARD flags to EventAPI.h. (Jochen)
+  - Removed obsolete CBTIME flag. (Jochen)
+  - EventAPI += sv_2interval. (Jochen)
+  - Applied patch for IRIS poll() from R.de.Vries@fokkerspace.nl
+  - EventAPI += unloop_all.
+
+0.78 2000-05-24
+  - Invoke Carp::carp for internal warnings.
+  - Fix SEGV triggered when Event-Stats is enabled while loop is
+    nested.
+
+0.77 2000-05-12
+  - Fixed an obscure SEGV discovered by uri@sysarch.com.
+  - EventAPI += NVtime.
+
+0.76 2000-04-26
+  - Fixed a horribly subtle bug in the handling of reentrant
+    INVOKE1-style watchers (e.g. a timer) in nested loops.  Added
+    test.  This change also removes at least one conditional from a
+    hot code path.
+  - EventAPI += unloop.
+
+0.75 2000-04-24
+  - Attributes called in "set" mode now return the new value.
+  - Renamed data() to private() and added back the old data().
+    Added tests & updated the pod.
+
+0.74 2000-04-19
+  - Resolved data() quandary.  Added test.
+  - Updated perlqt.t example.
+  - Spell checked pod.
+
+0.73 2000-03-24
+  - Fix for 5.6.0 with implicit context enabled.
+  - Rename unix_io.c -> unix.c in anticipation of Win32 support.
+  - Offer assurance about future compatibility (docs).
+
+0.72 2000-03-10
+  - Rename NetServer::ProcessTop -> NetServer::Portal.
+  - Removed unused QUEUED & RUNNING flags.
+  - Made pending() aware of context.  Added tests.
+
+0.71 2000-03-03
+  - Moved LoopLevel & ExitLevel from Perl to C, squeezing out some
+    potential bugs.
+  - Fixed SEGV triggered if $DebugLevel >= 4.
+  - Warn on unmatched unloop.
+  - Added Tutorial.pdf (by Jochen).
+  - Moved semaphore & msg into demo directory.  No one has ever
+    asked for them to be finished, so they aren't.
+
+0.70 2000-02-25
+  - Fix bug in select() engine spotted by perl@jochen-stenzel.de
+  - Prune demo directory.
+  - Add repeat.t demo. (perl@jochen-stenzel.de)
+  - Add perlqt.t demo.
+
+0.69 2000-02-18
+  - Tweak documentation.
+
+0.68 2000-02-15
+  - More careful checking of
+    intervals. (suggested by perl@jochen-stenzel.de)
+  - Fix yet another typemap bug. (perl@jochen-stenzel.de)
+  - Make io default to poll=r; more stringent start test;
+    fix demo/stdin.t (suggested by perl@jochen-stenzel.de)
+
+0.67 2000-02-09
+  - Fix bomb in group watchers. (perl@jochen-stenzel.de)
+  - Fixed another bug introduced in 0.61.  (Insure++)
+  - Tighten typemap.
+  - Warn about non-existant methods.
+
+0.66 2000-02-08
+  - Fix horrendously subtle bug uncovered by Event-tcp.
+  - Eliminate (hopefully all) silent failures.
+  - Restrict var watchers to
+    scalars. (perl@jochen-stenzel.de is too creative)
+
+0.65 2000-02-07
+  - Group watchers for watching watchers.  See demo/group.t
+  - Fix got() documentation, spotted by
+    perl@jochen-stenzel.de
+  - Make callback a prerequisite for starting watchers.
+  - Add test checking FIFO dispatch of equal priority events.
+
+0.64 2000-02-04
+  - Applied patch from gbarr@pobox.com that allows one to obtain the
+    number of events a watcher has pending in the event queue.  Also,
+    included was a cosmetic fix for the typemap.
+  - Load the basic watcher types by default.
+  - Adjust hup.t test (conrad@fringehead.org).
+
+0.63 2000-02-03
+  - Allow var watchers to watch the same variable.
+  - Deprecated AUTOLOAD of Event->$type.  (Nick & Graham)
+  - Reworked priority documentation based on comments from
+    perl@jochen-stenzel.de.
+
+0.62 2000-02-01
+  - Allow implied stop() if required attributes are explicitly unset.
+
+0.61 2000-01-31
+  - is_cancelled() method (requested by
+    perl@jochen-stenzel.de)
+  - Doc updates.
+  - Prevent starting unconfigured or badly configured
+    watchers. Added tests. (perl@jochen-stenzel.de)
+    XXX DANGER! THIS CHANGE CAN BREAK EXISTING CODE !DANGER XXX
+  - Refuse to start cancelled watchers.  Added test & updated doc.
+    (perl@jochen-stenzel.de).
+  - If parked=>1 then the constructor will not invoke
+    $watcher->start().  (uri@sysarch.com)
+
+0.60 2000-01-26
+  - Added $watcher->data() attribute. (This is Uri Guttman
+    <uri@sysarch.com>'s fault.)
+  - Fixed refcnt problem caused by extra invocations of cancel()
+    (Discovered by uri@sysarch.com.)  Added test.
+
+0.59 2000-01-20
+  - Fixed serious memory leak (isolated by
+    perl@jochen-stenzel.de). Added t/leak2.t.
+  - Doc for timeout_cb (demanded by uri@sysarch.com :-).
+  - Added demo/variable_timer.t along with minor doc
+    update. (jsalmon@gw.thesalmons.org)
+
+0.58 1999-11-22
+  - timeout_cb for io watchers.  Added test.  (suggested by Uri
+    Guttman <uri@sysarch.com>)
+  - Copy the callback specification from watcher to event for
+    flexibility.
+  - Removed support for clump.  The performance trade-off for this
+    feature was probably unmeasurable.  Now it's definitely
+    unmeasurable.  :-)
+  - Rename Ev* macros to Wa* to make room for new Ev macros.
+  - Remove EvNOW macro.
+  - Added demo/readline.t. (perl@jochen-stenzel.de)
+
+0.57 1999-10-06
+  - Memory leak fixed: ioevents were being retired to the wrong
+    freelist. (thospel@mail.dma.be)
+  - Document is_active/is_suspended. (perl@jochen-stenzel.de)
+  - Skip hup.t on Win32. (Paul.Moore@uk.origin-it.com)
+
+0.56 1999-09-22
+  - Fixed detection of EOF.  Added test. (Gisle Aas)
+  - Figured out the strange pipe symantics on AIX and modified the
+    io.t test to cope. (dfavor@austin.ibm.com)
+
+0.55 1999-09-13
+  - Changes for clean threaded build against 5.5.61.  Unfortunately,
+    this breaks threaded 5.5.3.  If this is a problem for you then
+    send patches.  The threading variations in the devel track are
+    driving me crazy. (dfavor@austin.ibm.com)
+  - Fixed coredump trigger by attach_to test (cpan-testers@perl.org).
+
+0.54 1999-09-10
+  - Improved cb(...) diagnostics.  Added tests.
+  - Devel-PPPort (schinder@pobox.com of cpan-testers@perl.org).
+  - If a file is unexpectedly closed, the io watcher is no longer
+    stopped.  Instead the file handle is reset.  This symantic allows
+    io timeouts to continue to trigger and should make recovery
+    simpler.  Added tests.
+  - Prohibit attach_to blessed refs.  Added test.
+  - Minor doc updates.
+
+0.53 1999-09-09
+  - Fix Event::MakeMaker to pick the correct install directory.
+  - This release is NOT binary compatible with 0.52!
+  - Obscure potential typemap bugs fixed.
+  - Reworked the typemap to avoid the exotic 5.6 self-tied hash
+    mechanism.  It should now be fairly easy to backport Event to
+    older versions of perl.
+  - In the tradition of adding innovative (or at least strange)
+    features to Event, constructors now accept (attach_to=>$ref).
+    This will cause the watcher to attach its information to the given
+    $ref instead of to a fresh anonymous hash ref.  For backwards
+    compatibility the default is still an anonymous hash.
+  - Removed a bunch of deprecated features.
+  - Reformatted the source to be more consistent (if not beautiful).
+
+0.52 1999-08-18
+  - Moved t/inactivity.t to demo/ because it fails occationally and
+    I don't have time to figure it out.  You might say that it takes
+    too much time to write a good test of inactivity.
+  - Make mention of Time::Warp.
+  - Don't complain about Time::HiRes (uri@sysarch.com)
+  - Skip t/idle2.t if Time::HiRes is unavailable (lukka@iki.fi &
+    gbarr@pobox.com).
+
+0.51 1999-07-23
+  - Notice bogus fds in both poll & select.  Added test.
+  - Make mention of the mailing list archive.
+  - Don't request benchmark results (artur@vogon.se).
+
+0.50 1999-07-15
+  - A few Win32 tweaks to get working tests to pass (jan.dubois).
+  - Minor cleanup in preparation for 0.50.
+
+0.44 1999-06-30
+  - Release 0.44 (thanks: jan.dubois@ibm.net).
+  - Renamed abort() to scrub() to avoid clashing with Perl's abort.
+  - Removed remaining dependency on gettimeofday.
+  - C++ clean.
+
+0.43 1999-06-22
+  - Tweaks for threaded compile (dfavor@austin.ibm.com).
+
+0.42 1999-06-19
+  - Rename event.c -> ev.c (Jan Dubois).
+  - Split flags into individual methods: is_running, is_active,
+    is_suspended, is_queued.
+  - Repaired default_exception_handler.
+
+0.41 1999-05-19
+  - Added attributes() and configure() methods.
+  - When using eval {} inside a callback, $@ could fool Event into
+    thinking that an exception is being thrown.
+  - Moved attributes from hash entries to methods.
+  - Fix unloop('').
+  - Regularize event constructors.
+  - Doc fixes catalyzed by perl@jochen-stenzel.de.
+  - Fix broken t/eval.t.
+  - More conservative refcnt policy for watchers.
+  - Rename 'mom' to 'w'.
+  - Deprecate the accessing of watcher attributes via events.
+  - Fix PL_ macros again.  (*Argh!*)
+  - Redesign typemap.
+  - Make 'e_cbtime' available from perl.  Added test.
+  - Return unloop_all($arg) from loop().
+  - Make compile with threaded perl.
+  - Documentation updates and reorganization.
+  - Switch inactivity from e_interval to e_timeout.
+  - Plug typemap holes.  Implementation still needs improvement.
+  - Make io timeout respect e_repeat. (gisle@aas.no).
+
+0.33 1999-03-30
+  - Store 'e_max_cb_tm' and hand-off to stats engine.
+  - Morph events into watchers when they go out of scope.
+  - Refine typemap fix.
+
+0.32 1999-03-15
+  - Apply typemap fix as per gsar@activestate.com.
+
+0.31 1999-03-09
+  - Simplified typemap in an attempt to squash bugs.
+  - Search @INC in Event::MakeMaker.
+  - Make io timers non-repeating.
+  - Relax io watchers more.  Now they can be started with either e_fd
+    or e_timeout or both or neither.
+  - Allow creation of io watchers without a valid e_fd.  Should
+    probably do the same with the rest of the watcher types.
+  - Added e_suspend.  Do we keep the 'suspend' and 'resume' methods?
+  - Fixed refcnt problem triggered by deleting hash entries.  Added test.
+  - Avoid qr// in keys.t.
+  - Reroute C-API croak through Carp::croak. Added test.
+  - Removed backward compatibility up to 0.24 (inclusive).
+  - Factored event init/dtor code.
+  - Added 'callback' hooks.  Updated docs.
+
+0.30 1999-02-04
+  - Constructors now populate the watcher hash with any extra
+    unrecognized key-value pairs.
+  - Better typemap diagnostics.  There seem to be bugs lurking but I
+    can't construct a short test case...
+  - Arrange for events to have the same careful typemap treatment as
+    do watchers.  Added test.
+  - Unplugged Time::Virtual (suggested mainly by Sarathy, Nick and
+    Graham).  See patches/time-hires.
+  - Added AllWatchers & typemap functions to the public API.
+  - Moved Event::Stats to a separate tarball.  I wonder if the stats
+    API is too restrictive?
+  - Split Event::Watcher code into a separate file for intuitive
+    importing via 'use' (suggested by artur@vogon-solutions.com).
+  - Fix SEGV in keys %$event (ophir@internap.com &
+    artur@vogon-solutions.com).  Added test.
+  - Tweaks to diagnostics.
+  - Event destruction now must be managed explicitly.  Use the
+    'stop' method to disable a watcher and use 'cancel' to destroy a
+    watcher.  This change is an unfortunate necessity because of
+    optimizations in perl's reference counting.
+  - Suspend & cancel now abort any pending events.  In previous
+    releases, the callback could be called after cancel in some cases.
+  - Replaced newHVhv.  Some versions of perl have a buggy implementation.
+  - Fixed a few minor problems detected by Insure++.
+  - Fixed typos in croak messages.
+  - Generous updates to Event.pod.
+  - Renamed (lots of) keys.
+  - Added 'use_keys' method.  Comments?
+  - (Try to) remove support for leading dashes (any left?).
+  - Factor out code to Time::Virtual (& Time::HiRes).
+  - Moved process.pm to demo directory.
+  - Added discussion of event loops vs. threads (kudos to Mark.Mielke.markm@nt.com & fellow loop'ers).
+
+0.25 1998-11-20
+  - Move SAVETMPS/FREETMPS up to Event::_loop.
+  - Split ACTIVE flag into two separate flags, ACTIVE & POLLING, to
+    more accurately track watcher state.
+  - Tweaks to io 'events' mask handling.
+  - Move @EXPORT_OK list for qw(R W E T) to Event::Watcher.
+  - Fix SEGV in all_watchers/all_idle if zero watchers present.
+  - Nuke obsolete backward support code in io.c.  (Poll constants to
+    set event mask.)
+  - Rename event_vtbl->watcher.
+
+0.24 1998-11-01
+  - Reengineered hash-object implementation to use HVs.
+  - Removed tailpoll support from io watchers.  File::Tail can just
+    hook up with timers & a generic "block on read" API can be built
+    on top of that if need arises.  Nick, this okay?
+  - Split watchers & events into separate C structures.
+  - Fixed misbehaving autoload code.
+  - END hook to cancel all events before global destruction.  Still
+    needs more work to be sure the memory is freed.
+  - Fixed bad arithmetic in io timeout code.  Renamed interval
+    epsilon and added better diagnostics (see Event::_timeout_too_early).
+  - Timers cancelled within their callback weren't!  Fixed.
+  - Fix typo in c/queue.c (thanks again Jan!).
+
+0.23 1998-10-18
+  - Unified Perl & C API for hooks.
+  - Niggles for Win32 (thanks Jan!).
+
+0.22 1998-10-17
+  - Include copy of self-tie patch with dist.
+  - Documentation for Event::MakeMaker.
+  - tailpoll revamped.
+  - MIN_PERL_DEFINE clean.
+  - Improve sv_2interval typemap.
+
+0.21 1998-10-08
+  - Try to normalize benchmark.
+  - 'now' was broken for inactive events.  Fixed & added test.
+  - Fixed infinite loop triggered by botched exception recovery.
+
+0.20 1998-10-06
+  - Rename inactive to inactivity.
+  - Use new self-tie to wrap watcher objects.  Leak test now passes
+    for almost all watcher types.
+  - Slight improvements to gettimeofday.c.
+  - Merged c_callback & perl_callback into one pointer slot.
+  - Added timeable methods to the public API.
+  - Var watchers weren't working very well.  Set up events/got mask
+    stuff mirroring io watchers.  Added tests.  Does anyone really
+    want timeouts?
+
+0.19 1998-10-03
+  - Put in code for tailpoll, but I can't tell if it works because
+    the tail-f behavior seems to already happen automatically.
+    Comments?  See demo/tail.t.
+  - Added inactive watchers (& tests).
+  - timeable API changes to allow multiple timers per watcher.
+  - Fixed non-ANSI function declaration in c/signal.c
+  - Reduced C API.
+  - Renamed queueEvent to queue.
+  - Fixed refcnt problem in DELETE.
+  - Dashes depreciated.
+  - Added -timeout to process watchers.  Might be useful.
+  - Fixed typo induced polling in one_event.
+  - Moved R/W/E/T flags to Event from Event::io.
+  - Changed the arguments to $Event::DIED in order to cope with
+    $Event::DIED dieing.  Fixed sweep exception handling.  Added test.
+  - Watchers created with the C API now should require their perl
+    support code automatically.  Moved idle support to an autoloaded
+    pm.
+  - Added sweep & loop($timeout).  Fixed sleep.
+
+0.18 1998-10-02
+  - Added non-working export_fail prototype.  Suggestions welcome.
+  - Re-factored start & stop better (the preCB method is gone).
+  - Finished up sleep().  Added tests.
+  - Tied watchers are now based on pe_tmevent.
+  - Applied patch from Gisle for pe_sys_sleep/select.
+  - Renamed 'watchvar' to 'var'.
+  - Added tests for 'now' (it was completely broken!).
+  - Tweaked debug levels.  Someone needs to inventory debug warnings
+    are decide what is reasonable.
+
+0.17 1998-10-01
+  - Added tests.
+  - Added sleep().  Truly a tortuous experience.
+  - Added min/max interval to idle watchers.
+  - c_callback no longer prevents watcher destruction.  Use refcnt!
+  - Renamed various C APIs for accuracy (unix_io.c).
+  - Reentrant flag added.
+  - loop() now terminates when there are no active watchers left.
+  - Depreciated async.  Moved -priority to -nice & added warning.
+  - Fixed minor stuff.
+  - Make io timeouts work for real.  (Thanks Gisle :-)
+
+0.15 1998-09-29
+  - Improved the EventAPI.h version check.
+  - Added -timeout for io watchers.  Untested.
+  - Fix io watcher bugs (unix_io.c) pointed out by Gisle Aas.
+
+0.14 1998-09-28
+  - Gutted the internals to make events reentrant.
+  - The $Now cache was not being refreshed and that was causing
+    timers to be queued, well, never.
+  - Fixed whitespace in Event.pod.  (Gisle Aas again.)
+  - Optimized priority queue (hopefully).  I probably should have
+    benchmarked it first.  :-P
+
+0.13 1998-09-27
+  - Moved and renamed lots of methods.  Yet, added code to ease backward compatibility.  (perl-loop suggested)
+  - Integrated rewritten documentation contributed by Gisle Aas. Thanks!
+
+0.12 1998-09-22
+  - Event::MakeMaker & event_api.h.
+  - Add 'total' stat.  Moved stat methods to Event::Loop package.
+
+0.11 1998-09-11
+  - Regularized exception handling.  $Event::DIED is now called if an event dies.
+  - Allow timer interval to be a scalar ref.
+  - Tweaked queue scheduling.  Events with priorities <= 5 now starve if higher priority events are available.
+  - Changing the event priority of a queued event will now reque the event into the appropriate queue.
+  - Split NetServer::ProcessTop into it's own tarball.
+
+0.10 1998-09-03
+  - Fixed serious bug in the event destructor.
+  - Accept file descriptor numbers in addition to filehandles, etc.
+    Maybe non-portable, but nice for unixen.
+  - Fixed repeating timer logic.  Tweaks for idle events.
+  - Completed re-write of almost everything in C.
+  - NetServer::ProcessTop implements a top-style control panel
+    available via telnet ($$ % 7000).  See util/top.pl.
+  - Proxy "tied" event type that allows completely perl-side
+    implementation of new event handlers.
+  - Event::process is working again (implementation is entirely in perl).
+  - Eliminated race conditions in signal handling.
+  - Zombie events are still not being collected due to mysterious
+    refcnt problems.  It is possible that this cannot be resolved
+    until perl implements tied hashes properly (through a VTBL!).
+  - Removed $Event::*::Count since it is superceded by
+    NetServer::ProcessTop.
+
+0.08 1998-08-14
+  - C rewrite
+
+0.07 1998-08-05
+  - test callbacks
+  - doc queuing
+  - remove debugging
+
+0.06 1998-07-24
+  - parameterise register method so 'check' not fixed method but callback
+  - doc priorities
+  - doc callbacks
+
+0.05 1998-07-20
+  - queuing, waiting
+  - Status method
+
+0.04 1998-07-20
+  - registering forces class to be child of Event
+  - add waitForEvents
+
+0.03 1998-07-18
+  - Event::watchvar now passes $ref to callback
+  - added use attrs qw(locked method) to all subs, and code to
+    ensure this will work on pre-threaded perl
+  - Event.xs Fixed so will compile with threaded perl
+  - Event::timer Added -hard option
+  - Tweaks to keys dispatchAsyncEvents()
+  - added Time::HiRes
+  - moved idle events into sub-module
+  - Makefile.PL removed INSTALLDIRS => 'perl'
+
+0.01 1998-01-26
+  - Initial

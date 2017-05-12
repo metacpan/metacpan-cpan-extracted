@@ -1,0 +1,54 @@
+package Elastic::Manual::QueryDSL::Nested;
+
+# ABSTRACT: Queries and filters for nested fields
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Elastic::Manual::QueryDSL::Nested - Queries and filters for nested fields
+
+=head1 VERSION
+
+version 0.52
+
+=head1 TODO
+
+Need to explain how nested fields work, when to use them and how to query them
+
+For the moment, see L<ElasticSearch::SearchBuilder/NESTED QUERIESE<sol>FILTERS>,
+L<http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-nested-query.html>
+and L<http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-nested-filter.html>
+
+=over
+
+=item *
+
+L<Elastic::Manual::QueryDSL>
+
+=item *
+
+L<Elastic::Manual::QueryDSL::Queries>
+
+=item *
+
+L<Elastic::Manual::QueryDSL::Filters>
+
+=back
+
+=head1 AUTHOR
+
+Clinton Gormley <drtech@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Clinton Gormley.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

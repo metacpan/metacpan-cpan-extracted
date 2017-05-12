@@ -1,0 +1,30 @@
+About this distro
+-----------------
+
+This collection of modules provides interfaces to data in the MAB2
+format. The MAB2 format ("Maschinelle Austauschformat fuer
+Bibliotheken") is used by German libraries to store and exchange data
+about books, authors, institutions and key words.
+
+The modules work on three levels: strings, records, and collections of
+records. The modules build upon each other. Please read the
+documentations that comes with each of the modules for further info.
+
+Support
+-------
+
+Questions, bug reports, useful code bits, and suggestions for these
+modules should just be sent to me at <andk@cpan.org>.
+
+Thanks
+------
+
+The development of the modules has been sponsored by the
+Universitaetsbibliothek of the Universitaet Dortmund.
+
+Copyright
+---------
+
+Code and data are copyright (C) 2002,2003,2016 Andreas Koenig
+<andk@cpan.org>. They can be used, modified, and
+redistributed under the same terms as Perl itself.

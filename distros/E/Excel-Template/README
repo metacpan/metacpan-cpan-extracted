@@ -1,0 +1,6 @@
+Excel::Template is a layout system to use the data structure from HTML::Template
+and create a Microsoft Excel file.
+
+CAVEAT: All limitations stated in Spreadsheet::WriteExcel are in force, as that
+is the module used for rendering. If the XLS file is corrupted, I would first
+make sure you aren't doing anything that it says is bad.

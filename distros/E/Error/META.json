@@ -1,0 +1,62 @@
+{
+   "abstract" : "Error/exception handling in an OO-ish way",
+   "author" : [
+      "Shlomi Fish ( http://www.shlomifish.org/ )"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "keywords" : [
+      "deprecated",
+      "exceptions",
+      "oop"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Error",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.280801"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Scalar::Util" : "0",
+            "perl" : "v5.6.0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Error" : {
+         "file" : "lib/Error.pm",
+         "version" : "0.17024"
+      },
+      "Error::Simple" : {
+         "file" : "lib/Error.pm",
+         "version" : "0.17024"
+      },
+      "Error::WarnDie" : {
+         "file" : "lib/Error.pm"
+      },
+      "Error::subs" : {
+         "file" : "lib/Error.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://bitbucket.org/shlomif/perl-error.pm"
+      }
+   },
+   "version" : "0.17024"
+}

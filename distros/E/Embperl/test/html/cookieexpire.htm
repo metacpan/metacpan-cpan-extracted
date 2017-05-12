@@ -1,0 +1,8 @@
+
+[- $r = shift -]
+
+app_name:           [+ $r -> app -> config -> app_name +]
+cookie_expires cfg: [+ $r -> app -> config -> cookie_expires +]
+cookie_expires req: [+ $r -> cookie_expires +]
+output_mode:	    [+ $r -> config -> output_mode +]
+

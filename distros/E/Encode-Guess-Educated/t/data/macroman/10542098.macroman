@@ -1,0 +1,969 @@
+
+   [1]nature.com homepage
+
+   Full text access provided to University of Colorado System
+   by c/o Denison Library
+     __________________________________________________________________
+
+   [2]Nature Structural & Molecular Biology homepage
+     * [3]My account
+     * [4]E-alert sign up
+
+     * [5]Register
+     * [6]Subscribe
+     __________________________________________________________________
+
+     * [7]Publications A-Z index
+     * [8]Browse by subject
+     __________________________________________________________________
+
+   Search [This journal_____] ____________________ go [9]Advanced search
+   [10]Advertisement
+
+     [11]Journal home > [12]Archive > [13]Table of Contents > [14]Letter >
+   Full text
+   [15]Journal home
+   [16]Advance online publication
+   [17]Current issue
+   [18]Archive
+   [19]Press releases
+   [20]Supplements
+   [21]Focus
+   [22]Guide to authors
+   Online submission [23]Online submission
+   [24]Permissions
+   [25]For referees
+   [26]Free online issue
+   [27]Contact the journal
+   [28]Subscribe
+   [29]Advertising
+   [30]work@npg
+   [31]naturereprints
+   [32]About this site
+   [33]For librarians
+
+   NPG Resources
+   [34]Nature
+   [35]Nature Cell Biology
+   [36]Nature Reviews Molecular Cell Biology
+   [37]The EMBO Journal
+   [38]Nature Reports Avian Flu
+   [39]NPG Subject areas
+   [40]Biotechnology
+   [41]Cancer
+   [42]Chemistry
+   [43]Clinical Medicine
+   [44]Dentistry
+   [45]Development
+   [46]Drug Discovery
+   [47]Earth Sciences
+   [48]Evolution & Ecology
+   [49]Genetics
+   [50]Immunology
+   [51]Materials Science
+   [52]Medical Research
+   [53]Microbiology
+   [54]Molecular Cell Biology
+   [55]Neuroscience
+   [56]Pharmacology
+   [57]Physics
+   [58]Browse all publications
+   Letter
+   Nature Structural Biology  6, 1048 - 1053 (1999)
+   doi:10.1038/14935
+
+ §2§ Structure of the TRAIL&#x2212;DR5 complex reveals mechanisms conferring
+specificity in apoptotic initiation §2§
+
+   Juthathip Mongkolsapaya^1, Jonathan M. Grimes^2, Nan Chen^1, Xiao-Ning
+   Xu^1, David I. Stuart^2, ^3, E.Yvonne Jones^2, ^3 & Gavin R.
+   Screaton^1, ^4
+
+   ^1 MRC Human Immunology Unit, Institute of Molecular Medicine, John
+   Radcliffe Hospital, Oxford OX3 9DS, UK.
+
+   ^2 Structural Biology, Wellcome Trust Centre for Human Genetics,
+   Roosevelt Drive, Headington, Oxford, OX3 7BN, UK.
+
+   ^3 Oxford Centre for Molecular Sciences, New Chemistry Building, South
+   Parks Road, Oxford, OX1 3QT, UK.
+
+   ^4 Nuffield Department of Medicine, John Radcliffe Hospital, Oxford,
+   OX3 9DU, UK.
+   Correspondence should be addressed to E.Yvonne Jones
+   [59]Yvonne.Jones@strubi.ox.ac.uk
+   TRAIL, an apoptosis inducing ligand, has at least four cell surface
+   receptors including the death receptor DR5. Here we report the crystal
+   structure at 2.2 Å resolution of a complex between TRAIL and the
+   extracellular region of DR5. TRAIL forms a central homotrimer around
+   which three DR5 molecules bind. Radical differences in the surface
+   charge of the ligand, together with variation in the alignment of the
+   two receptor domains confer specificity between members of these ligand
+   and receptor families. The existence of a switch mechanism allowing
+   variation in receptor domain alignment may mean that it is possible to
+   engineer receptors with multiple specificities by exploiting contact
+   positions unique to individual receptor&#x2212;ligand pairs.
+   EST database searching has led to the cloning and characterization of a
+   number of proteins belonging to the tumor necrosis factor (TNF) and TNF
+   receptor (TNF&#x2212;R) families. Although structurally related, members of
+   the TNF&#x2212;R family subserve a number of different functions such as
+   activation, cell growth and differentiation in addition to apoptosis. A
+   subset of the receptors (TNF-R1, Fas, DR3, DR4, DR5 and DR6) possess an
+   intracellular death domain that can initiate a series of
+   protein&#x2212;protein interactions leading to cell death^[60]1, ^[61]2.
+   TNF related apoptosis inducing ligand (TRAIL) was identified by
+   database searching and shown to kill a variety of tumor cell lines
+   while showing little activity against normal cells^[62]3. The
+   widespread expression of TRAIL (shown by Northern blotting)^[63]3, and
+   the lack of sensitivity of most cell types to its effects, initially
+   suggested that the expression of the TRAIL receptors would be tightly
+   controlled. However when the two TRAIL receptors DR4 and DR5
+   (TRICK2/TRAIL-R2/Killer) were cloned they were also found to be widely
+   expressed on many cell types, most of which were insensitive to the
+   effects of TRAIL^[64]2. Two further TRAIL receptors have been
+   identified: decoy receptor 1 (DcR1) (LIT/TRAIL-R3/TRID) and DcR2
+   (TRAIL-R4/TRUNDD)^[65]2. The four TRAIL receptors possess two cysteine
+   rich repeats, in contrast to TNF-R1 and TNF-R2, which each have four,
+   and Fas, which has three. DR4 and DR5 have death domains, while DcR1
+   lacks a cytoplasmic domain and DcR2 contains an incomplete
+   non-functional death domain. DcR1 and DcR2 are therefore thought to act
+   as decoys, protecting cells that coexpress either DR4 or DR5 from
+   apoptosis induced by TRAIL. Thus, following activation, peripheral
+   blood lymphocytes that are initially insensitive to TRAIL lose
+   expression of DcR1 and subsequently become sensitive to TRAIL^[66]4.
+   The differential sensitivity of tumors compared to normal cells
+   suggested that TRAIL may have greater utility as an anti-tumor agent
+   than TNF, which has limited use because of its side effects. In a
+   murine model, TRAIL has been shown to be effective against xenogenic
+   tumor transplantation without harming the host^[67]5.
+   The emerging complexity of the TNF and TNF-R families raises questions
+   at the molecular level, such as what is the basis of specificity and
+   more particularly for the TRAIL&#x2212;TRAIL receptor system, what are the
+   conserved features that confer the ability to initiate apoptotic
+   signaling. We have determined the crystal structure of the TRAIL&#x2212;DR5
+   complex, which throws light on these questions, revealing an unusual
+   mechanism for controlling specificity.
+   Structure determination
+   The complex between soluble forms of recombinant human TRAIL (residues
+   91&#x2212;281, all numbering starts from the initiation codon) and DR5
+   (residues 58&#x2212;184) crystallized with an asymmetric unit consisting of
+   one subunit of TRAIL and one copy of DR5, forming the full trimeric
+   complex through crystallographic three-fold symmetry. The crystals
+   diffracted to 2.2 Å using synchrotron radiation and the structure was
+   phased by a combination of molecular replacement and heavy atom
+   derivatives. With the exception of some mobile loop regions, all of
+   TRAIL C-terminal to residue 119 and the cysteine rich repeat region of
+   DR5 (starting at residue 69) are well ordered in the final crystal
+   structure (crystallographic R factor 22.1% and R[free] 27.0%; see
+   Methods and [68]Table 1). The overall structure of the TRAIL&#x2212;DR5
+   complex, including representative electron density, is shown in
+   [69]Fig. 1.
+   [70]Figure 1. The structure of TRAIL, DR5 and the TRAIL&#x2212;DR5 complex.
+   [71]Figure 1 thumbnail
+
+   a, Stereo view of the complex. The three crystallographically
+   equivalent copies of the TRAIL subunit (yellow, cyan, pink) and DR5
+   (blue, green, red) are depicted schematically and the TRAIL trimer is
+   enclosed in a transparent molecular envelope. This orientation defines
+   a standard view. b, The complex as depicted in (a) but viewed down the
+   three-fold axis. The orientation is such that the cell surface
+   presenting DR5 is above the page and that for TRAIL is below the page.
+   c, Superposition of TRAIL (pink) with TNF beta (blue). The secondary
+   structure elements for TRAIL are also marked on the sequence alignment
+   in [72]Fig. 2a. The r.m.s. deviation is 0.9 Å for 120 structurally
+   equivalent C alpha atoms. The major extension of the AA" loop in TRAIL
+   is highlighted by yellow stripes. The cell surface position is not to
+   scale. d, Comparison of DR5 and TNF-R1. DR5 and TNF-R1 (from the TNF
+   beta &#x2212;TNF-R1 complex) are depicted schematically in the left and right
+   panels respectively with equivalent regions in identical colors. The
+   central panel is based on superposition of DR5 D1 and TNF-R1 D2. The
+   schematic representation of TNF-R1 is shown in gray while that of DR5
+   is in green. Disulfide bonds are depicted in yellow as ball-and-stick
+   representation. e, Portion of the final 2F[o] - F[c] electron density
+   map contoured at 1 sigma , showing a portion of the TRAIL structure in
+   the BC loop.
+   [73]Full Figure [74]Full Figure and legend (68K)
+   [75]Table 1. Crystallographic Statistics
+   [76]Table 1 thumbnail
+   [77]Full Table [78]Full Table
+   The TRAIL trimer
+   The TRAIL subunits consist of beta -sandwiches conforming, as expected,
+   to the jellyroll topology^[79]6. Each TRAIL monomer contains one
+   cysteine at position 230. Crystallization was performed under
+   non-reducing conditions and in the crystal a disulfide bond was seen
+   between two of the three cysteine residues in each trimer. The
+   formation of this disulfide bridge did not affect receptor binding, as
+   both TRAIL that had been refolded in iodoacetamide and a TRAIL mutant
+   (C230S) immunoprecipitated DR5 in a manner similar to that of wild type
+   TRAIL (data not shown). The trimeric interface is extensive with a
+   large population of aromatic residues conferring a highly hydrophobic
+   character (66% of the 2,250 Å^2 buried surface per subunit is apolar
+   ([80]Fig. 2a). Comparison with the other known structures for members
+   of the TNF superfamily (TNF alpha , TNF beta /LT alpha and
+   CD40L)^[81]6, ^[82]7, ^[83]8 highlights a high level of structural
+   conservation within the beta -strands and at the trimeric interface
+   ([84]Figs 1c, [85]2a), despite the relatively low sequence identity
+   between the family members (23&#x2212;36% for the sequences in [86]Fig. 2a).
+   Of particular interest are strands D and E, which have highly divergent
+   sequences, yet are almost completely superimposed in structural
+   alignments. Structural variation in the family is concentrated in the
+   loop regions, with the most dramatic differences seen in the AA", CD
+   and EF loops. The TRAIL structure is unique within the TNF family in
+   displaying a major extension of the AA" loop that is 16 amino acids
+   longer than in TNF beta ([87]Fig. 1c). In the final stages of preparing
+   this manuscript the 2.8 Å resolution crystal structure of uncomplexed
+   TRAIL was reported^[88]9. In the absence of coordinate deposition we
+   have not been able to make a detailed comparison of the liganded and
+   unliganded structures of TRAIL, however inspection of the figures
+   suggests that the N-terminal portion of the AA" loop has a markedly
+   different conformation in the two structures.
+   [89]Figure 2. Comparison of the TRAIL&#x2212;DR5 and TNF beta &#x2212;TNF-R1
+   complexes.
+   [90]Figure 2 thumbnail
+
+   a, Sequence alignments for the TNF and TNF-R1 families. Residues in
+   TRAIL, TNF beta , DR5 and TNF-R1 are color coded according to their
+   contribution to the interaction patches in (b). Sequence alignments to
+   TRAIL are based on pairwise structural superpositions for TNF beta ,
+   TNF alpha and CD40L and on manual sequence comparison for FasL.
+   Secondary structure assignments and dots at every tenth residue above
+   the sequences are for TRAIL. Triangles below the sequences indicate
+   TRAIL residues buried in the isolated molecule (less than 20% relative
+   side chain solvent accessible area^[91]27), circles indicate surface
+   exposed residues mutated in TNF alpha and/or TNF beta (reviewed in ref.
+   [92]30). Sequence alignments to DR5 are based on pairwise structural
+   superposition for TNF-R1 and on manual sequence comparison for the
+   remaining molecules. Dots above the sequences mark every tenth DR5
+   residue. Symbols in rows 1 and 2 below the sequences indicate the
+   nature of interactions involving DR5 and TNF-R1, respectively. Circles
+   in row 3 indicate candidate residues for TRAIL binding specificity in
+   DR5, DR4, DcR1 and DcR2. b, Surface representations of TRAIL, DR5, TNF
+   beta and TNF-R1. The relative orientation of the two complexes is
+   defined by pairwise superposition of the TRAIL and TNF beta subunits.
+   The view of the TRAIL and TNF beta surfaces corresponds to that of
+   [93]Fig. 1a while the matching DR5 and TNF-R1 surfaces are revealed by
+   a 180° rotation as in the opening of a book. The solvent accessible
+   surfaces (calculated in isolation) of each component are shown in gray
+   with areas contributed by residues implicated in the interaction
+   surface of the complex highlighted in colored patches. Colors for
+   interaction patches are matched between ligand and receptor for each
+   complex. Conservation of the color scheme is used to highlight broadly
+   equivalent regions of interaction in the two complexes.
+   [94]Full Figure [95]Full Figure and legend (83K)
+   The DR5 receptor
+   Members of the TNF-R family are characterized by extracellular repeats
+   containing three disulfide bridges with a cysteine knot topology^[96]7,
+   ^[97]10. The number of repeats ranges from six in CD30 through four in
+   TNF-R1 and TNF-R2 to three in Fas and only two in the four TRAIL
+   receptors. The crystallographically well-ordered portion of the DR5
+   molecule includes these two repeats (D1 and D2), which form the ligand
+   binding region in the complex. DR5 starts with an N-terminal cap
+   containing a partial cysteine knot with a single non-canonical
+   disulfide ([98]Fig. 1d). This N-terminal cap corresponds to the
+   C-terminal half of the first repeat (D1) in TNF-R1, while DR5 D1 and D2
+   correspond to the central two repeats, D2 and D3, of TNF-R1 which form
+   the binding interface in the TNF beta &#x2212;TNF-R1 complex. The sequences of
+   DR5 D1 and D2 differ considerably, with only 25% amino acid identity
+   compared to 42% between TNF-R1 D2 and D3. This difference is borne out
+   at the structural level: the root mean square (r.m.s.) deviation is 1.0
+   Å between 30 equivalent C alpha atoms in DR5 D1 and D2 compared to 0.8
+   Å between 29 equivalent C alpha atoms in TNF-R1 D2 and D3. The two
+   ligand binding repeats in these and other TNF-receptor like molecules
+   are joined by a CXC motif (CQC in all the TRAIL receptors and CGC in
+   TNF-R1) which acts as a flexible articulation point in the isolated
+   TNF-R1 structure^[99]10. The complexed structures of DR5 and
+   TNF-R1^[100]7 show a clear difference in the relative orientation of
+   the two repeats forming their respective ligand binding regions
+   ([101]Fig. 1d). Thus, a tilt and rotation totaling 36° about the CXC
+   pivot point would be required to place DR5 D2 in an orientation similar
+   to that of TNF-R1 D3.
+   The TRAIL&#x2212;DR5 complex
+   The TRAIL&#x2212;DR5 complex reflects the trimeric nature of TRAIL, binding
+   one copy of DR5 in each of the clefts between subunits ([102]Fig. 1).
+   The surface area of 1,420 Å^2 buried on TRAIL by each DR5 is relatively
+   equally divided between the two subunits. Likewise, the 1,540 Å^2 of
+   surface buried on the DR5 is shared equally between its two repeats
+   ([103]Fig. 2a,b). This contrasts with the TNF beta &#x2212;TNF-R1
+   complex^[104]7, where although the receptor makes approximately equal
+   contacts with the two TNF subunits, there is a major difference in the
+   contributions of TNF-R1 D2 and D3, with some two thirds of the contact
+   area residing on D2.
+   Superposition of the two complexes shows the position of DR5 D1 and its
+   equivalent in TNF-R1 to be highly conserved, while a change in tilt
+   between D1 and D2 of DR5 allows the second domain to more closely
+   follow the TRAIL surface, introducing a number of novel contacts.
+   A detailed analysis of the receptor&#x2212;ligand contacts is shown in
+   [105]Fig. 2b, where areas of contact are related by color and mapped
+   back to the sequence alignments ([106]Fig. 2a). There are four main
+   contact patches on TNF beta (apical subunit 1: A1 (blue), basal subunit
+   1: B1 (cyan), apical subunit 2: A2 (orange), basal subunit 2: B2 (red);
+   [107]Fig. 2). The contacts on TRAIL duplicate these areas while
+   containing additional points of contact in the apical portion of
+   subunit 1 created by the repositioning of D2 (yellow and green). This
+   repositioning also alters which regions of the receptors are involved
+   in the conserved patches (A1-blue and A2-orange) on the apical regions
+   of the ligands. In the most extreme cases (orange and purple patches)
+   the residue usage shifts from one cysteine repeat to the other with the
+   A2 (orange) interaction mediated primarily by residues 107&#x2212;109 in the
+   N-terminal binding repeat of TNF-R1 but by residues 153&#x2212;155 in the C
+   terminal repeat of DR5. The more topographically conservative elements
+   of the interaction involve DR5 D1, which makes contact with the B1
+   (cyan) and B2 (red) patches. Although similarly located, the nature of
+   the interacting residues in the B2 (red) patches from the two complexes
+   is highly divergent. The hydrophobic interactions of the B1 patch
+   (cyan), mediated by the surface exposed Tyr 216 in TRAIL (to Leu 114 in
+   DR5) and Tyr 142 in TNF beta (to Leu 100 in TNF-R1), are the only truly
+   conserved portions of the interface ([108]Fig. 3a). Mutagenesis of this
+   Tyr residue in TNF alpha , TNF beta and FasL abolishes receptor
+   binding^[109]11, ^[110]12, ^[111]13. Much of the remainder of the
+   interface in both complexes is made up of polar or charged
+   interactions. The details of these electrostatic interactions differ
+   completely between the two complexes ([112]Fig. 3b).
+   [113]Figure 3. Elements of conservation and specificity in
+   ligand&#x2212;receptor binding.
+   [114]Figure 3 thumbnail
+
+   a, Conservation in ligand-receptor interactions. Close up of the
+   interaction involving the B1 (cyan) surfaces in the TRAIL&#x2212;DR5 and TNF
+   beta &#x2212;TNF-R1 complexes centered on the key tyrosine residue (Tyr 216 in
+   TRAIL). In this and in (c), the polypeptide chains are represented
+   schematically as in [115]Fig. 1a and the solvent-accessible surfaces of
+   the receptors (calculated in isolation) are shown as semi-transparent
+   envelopes. b, Comparison of surface charge between TRAIL, TNF alpha ,
+   TNF beta and their receptors. Blue denotes positive, and red negative;
+   electrostatic potential is contoured at plusminus 8.0 kT in program
+   GRASP^[116]31. The views of ligand and receptor are as in [117]Fig. 2b.
+   c, Interaction of Arg 149 in the AA" loop of TRAIL with Glu 147 in DR5.
+   d, BIAcore analysis showing binding of DR5 to wild type TRAIL or the
+   mutant lacking the AA" loop. e, Immunoprecipitation with DR5-Fc in the
+   presence of wild type (W) or the slightly smaller AA" TRAIL mutant (M).
+   Lanes 1 and 2 immunoprecipitated material (IP), lanes 3 and 4 material
+   left in supernatant (SN) following immunoprecipitation.
+   [118]Full Figure [119]Full Figure and legend (83K)
+   Features conferring specificity
+   Inspection of the four TRAIL binding receptor sequences shows 45&#x2212;81%
+   identity in D1 and 59&#x2212;80% identity in D2. Most of the residues involved
+   in the TRAIL&#x2212;DR5 interface show conserved characteristics, underscoring
+   the role played by these residues in receptor&#x2212;ligand specificity
+   ([120]Fig. 2a). D2 is implicated as a major focus for TRAIL-binding
+   specificity, with conservation in this receptor subgroup of residues
+   such as Glu 147, Glu 151, Arg 154 and Asp 175 (DR5 numbering) that
+   mediate complimentary electrostatic interactions. One of these
+   distinctive TRAIL-binding residues (Glu 147) makes a salt bridge to Arg
+   149 on the extended AA" loop of TRAIL ([121]Fig. 3c); the shorter AA"
+   loop in TNF beta precludes any such interaction in the TNF beta &#x2212;TNF-R1
+   complex. This electrostatic interaction may help establish the correct
+   docking orientation for DR5 D2 to TRAIL, stabilizing the appropriate
+   tilt between D1 and D2. The importance of this contact was demonstrated
+   by mutagenesis where the 19 amino acid sequence in TRAIL
+   (^135TLSSPNSKNEKALGRKINS^153) was replaced with three amino acids
+   (^76SSL^78) present in the much shorter AA" loop of TNF beta . Binding
+   of the mutant TRAIL assessed by BIAcore was reduced by over 95%
+   ([122]Fig. 3d). In a separate experiment, DR5-Fc was used to
+   immunoprecipitate either the wild type or the AA" loop mutant of TRAIL.
+   In agreement with the BIAcore analysis, DR5 binding to the mutant TRAIL
+   was completely abolished ([123]Fig. 3e). The modeling study of Cha et
+   al.^[124]9 does not appear to replicate the major differences in
+   receptor docking observed between the crystal structures of TRAIL&#x2212;DR5
+   and TNF beta &#x2212;TNF-R1. However, the findings of the accompanying
+   mutagenesis study of the AA" loop are in accordance with those reported
+   here.
+   Discussion
+   The TRAIL&#x2212;DR5 complex highlights the tight interplay between structure
+   and function for this receptor&#x2212;ligand family. Both ligand and receptor
+   are constructed from robust structural motifs with signaling mediated
+   by the interaction of receptor with the stable trimeric scaffold of the
+   ligand. This rigid framework allows free variation of the surface
+   residues in both ligand and receptor conferring the biological
+   specificity of particular ligand&#x2212;receptor pairs through numerous
+   changes in the interacting pairs of residues. In the ligand, this amino
+   acid diversity is perhaps most extreme in the surface-exposed D and E
+   strands and flanking loops where very little sequence homology can be
+   discerned ([125]Fig. 2a). The surface variation is also clearly
+   illustrated in [126]Fig. 3b where it can be seen that although the
+   overall surface topology remains intact, the distributions of charge on
+   the surfaces of TNF alpha , TNF beta , and TRAIL are very different. In
+   the receptors, the orientation selected at the flexible CXC junction
+   determines which areas of the C-terminal ligand binding repeat are
+   involved in the complex. This switch mechanism may mean that it is
+   possible to engineer receptors, with multiple specificities by
+   exploiting contact positions unique to individual receptor&#x2212;ligand
+   pairs.
+   Members of the TRAIL binding subgroup of receptors have, like the
+   chicken death receptor CAR1 (ref. [127]14), been cut down to a minimal
+   configuration of only two cysteine-rich repeats, with the second (D2)
+   tightly abutting the three-fold axis in the TRAIL&#x2212;DR5 complex.
+   Superposition of the complete, four repeat, TNF-R1 structure^[128]10
+   onto the TNF beta &#x2212;TNF-R1 complex^[129]7 reveals the C-terminus of the
+   TNF-R1 cysteine rich region at a distance from the three-fold axis that
+   is similar to that reached more directly by the DR5 C-terminus. The
+   length of the tether between the cell membrane and second repeat of the
+   TRAIL receptors varies from two amino acids in the shorter of two
+   alternatively spliced variants of DR5 (ref. [130]15) to 92 in DcR1. The
+   functional consequences of this heterogeneity have not been explored
+   and it is not known whether a single TRAIL trimer can form a complex
+   composed of receptors with greatly differing tethers. Residue 184 of
+   DR5, which is visible in the complex structure, is at the start of the
+   transmembrane helix, meaning that the apex of TRAIL will be positioned
+   only ~6 Å from the surface of its target cell. The complex structure
+   indicates that the DR5 transmembrane helices are arrayed 54 Å apart.
+   This is strikingly similar to the 52 Å spacing of binding sites for the
+   cytosolic domain of TNF-R2 on the trimeric TRAF2 molecule that
+   initiates intracellular signaling^[131]16. The extracellular
+   ligand&#x2212;receptor complex may thus trigger the apoptotic signal by
+   dictating a precise positioning of the three transmembrane helices and
+   hence the cytosolic domains.
+    [132]Top
+   Methods
+   Protein expression, refolding, purification and mutagenesis.
+   An N-terminally truncated version of TRAIL (amino acids 91&#x2212;281) was
+   produced in Escherichia coli strain BL21 DE3 pLys S using the T7 driven
+   vector pET-9C (Novagen). Inclusion bodies were prepared and solubilized
+   in 8 M urea and refolded using standard conditions^[133]17. Trimeric
+   TRAIL was then isolated by gel filtration. The extracellular domain of
+   DR5 (amino acids 58&#x2212;184) was produced as an immunoglobulin fusion
+   protein. The cleavage site for type 14 rhino virus 3C protease^[134]18
+   was introduced between DR5 and the constant region of IgG1. Fusion
+   protein (produced by transient calcium phosphate transfection of 293T
+   cells) was isolated using protein A sepharose and DR5 was cleaved from
+   the beads using a 3C-GST fusion protein (subsequently removed using
+   glutathione agarose).
+   PCR mutagenesis was used to replace the AA" loop of TRAIL
+   (^135TLSSPNSKNEKALGRKINS^153) with three amino acids (^76SLL^78)
+   present in the much shorter loop of TNF beta . These changes did not
+   disrupt the folding of TRAIL, which was shown to be trimeric by gel
+   filtration and also to have similar secondary and tertiary structure by
+   circular dichroism. Binding of TRAIL was assessed by surface plasmon
+   resonance on a BIAcore 2000 machine. Briefly, DR5-Fc (or TNF-R1 Fc as a
+   negative control) was immobilized onto CM5 sensor chips covalently
+   coated with a murine anti-human Fc specific monoclonal antibody. A 20
+   mu M solution of wild type or mutant TRAIL (in 50 mmTRIS pH 8, 150 mM
+   NaCl) was injected for 60 s.
+   Crystallization.
+   Purified DR5 and TRAIL trimer (each at 7 mg ml^-1 suspended in 20
+   mMTris pH8 and 50 mM NaCl) were mixed at 4:1 stoichiometry. Crystals
+   were grown by vapour diffusion at room temperature using microbridges
+   from sitting drops containing 1 mu l of protein solution plus 1 mu l of
+   reservoir solution (25% ethylene glycol, 0.1% n-octyl- beta
+   -glucoside). The plate-like crystals (typically 0.5 mm x 0.3 mm x 0.1
+   mm) were shown to contain both TRAIL and DR5 by polyacrylamide gel
+   electrophoresis. Crystals were flash-cooled to 100 K in gaseous N[2]
+   (Oxford Cryosystems).
+   Structure determination.
+   Statistics are given in [135]Table 1. All X-ray diffraction data were
+   collected using synchrotron radiation, auto-indexed and integrated and
+   scaled with the HKL program package^[136]19. The initial 2.4 Å
+   resolution X-ray diffraction data set was collected using a Mar345
+   imaging plate detector (18 cm diameter setting) on beamline ID2 (
+   lambda = 0.997 Å, collimation 0.2 mm x 0.2 mm) of the European
+   Synchrotron Radiation Facility (ESRF). The crystals belong to space
+   group P321 with unit cell dimensions a = b = 95.2 Å, c = 69.81 Å,
+   consistent with the crystallographic asymmetric unit containing a
+   single copy of DR5 and one subunit of TRAIL. Molecular replacement was
+   carried out using the complete trimeric TNF beta &#x2212;TNF-R1 complex
+   (Protein Data Bank accession code 1TNR) with 15&#x2212;3.5Å resolution data in
+   program AmoRe^[137]20. An unambiguous solution positioned the trimeric
+   DR5&#x2212;TRAIL complex on the crystallographic three-fold axis (correlation
+   coefficient for the top solution 0.324, next highest solution 0.290;
+   correlation coefficients as defined in ref. [138]20). For refinement
+   TNF-R1 was cut to comprise only D2 and D3. Initially rigid body
+   refinement was performed (with the ligand and receptor as separate
+   bodies), followed by positional and B-factor refinement. These
+   refinements were stable in XPLOR, using a correlation coefficient
+   target function^[139]21, although not in CNS^[140]22. The final
+   R[cryst]was 57.4% (R[free] = 57.8%) on data from 20 Å to 4 Å. Despite
+   the disappointing statistics maps calculated using the maximum
+   likelihood algorithm encoded in CNS showed good, bias free, electron
+   density in the region of the ligand. Although the electron density for
+   the receptor was of poor quality there was clear evidence for a change
+   in the relative orientation of the two domains.
+   A high resolution native data set (2.2 Å resolution) and two heavy atom
+   derivative sets (5 mM lead acetate soaked for 24 h at room temperature
+   and 4 mM K[2]HgI[4] in 20 mM KI soaked for 24 h at room temperature)
+   were collected at 100 K on beamline 9.6 at the CLRC Synchrotron
+   Radiation Source, Daresbury Laboratory (ADSC Quantum 4 CCD detector,
+   lambda = 0.87 Å, collimation 0.25 mm times 0.25 mm). Native and
+   derivative data were scaled using program SCALEIT^[141]23 and the
+   derivatives were solved by difference Fourier syntheses. Heavy-atom
+   parameters were refined and combined MIR and phi [calc] phases were
+   produced using program SHARP^[142]24. Solvent flattened maximum
+   likelihood 2F[o] - F[c] and F[o] - F[c] electron density maps
+   calculated on the basis of these combined phases and the high
+   resolution native data showed good quality electron density for both
+   ligand and receptor. The DR5 and TRAIL sequences were fitted to the
+   electron density using the interactive graphics program O^[143]25.
+   Further refinement (program CNS), alternated with manual rebuilding,
+   resulted in the current model ([144]Table 1).
+   Structural analysis.
+   For residues 133&#x2212;143 and 195&#x2212;201 in the AA" and CD loops of TRAIL the
+   quality of the electron density is poor but sufficient to define the
+   course of the polypeptide main chain. Cys 230 and Trp 231 show
+   statistical disorder in the crystal arising from the formation of a
+   disulfide between two of the three copies of Cys 230 at the TRAIL
+   three-fold.
+   Structural superpositions were performed using the program SHP^[145]26
+   and a 1.4 Å probe was used to evaluate surface accessibility with the
+   program NaccesS^[146]27. Molecular contacts were evaluated in program
+   CONTACTS (R. Esnouf, pers. comm.) using a 4 Å cutoff for inter-atomic
+   distance and the implicated residues mapped as contact patches on the
+   ligand and receptor surfaces using program VOLUMES (R. Esnouf, pers.
+   comm.). Figures were produced using Bobscript^[147]28 and were rendered
+   with Raster3D^[148]29.
+   Coordinates.
+   Coordinates for the TRAIL&#x2212;DR5 complex have been deposited with the
+   Protein Data Bank (accession number [149]1D4V).
+    [150]Top
+   Received 1 October 1999; Accepted 6 October 1999
+   REFERENCES
+    1. Nagata, S. Cell 88, 355&#x2212;365
+       (1997). | [151]Article | [152]PubMed | [153]ISI | [154]ChemPort |
+    2. Golstein, P. Curr-Biol 7, R750&#x2212;R753
+       (1997). | [155]PubMed | [156]ISI | [157]ChemPort |
+    3. Wiley, S. R., et al. Immunity 3, 673&#x2212;682
+       (1995). | [158]Article | [159]PubMed | [160]ISI | [161]ChemPort |
+    4. Mongkolsapaya, J. et al. J-Immunol 160, 3&#x2212;6
+       (1998). | [162]PubMed | [163]ISI | [164]ChemPort |
+    5. Walczak, H. et al. Nature Med. 5, 157&#x2212;163 (1999). | [165]ChemPort |
+    6. Jones, E. Y., Stuart, D. I. & Walker, N. P. Nature 338, 225&#x2212;228
+       (1989). | [166]Article | [167]PubMed | [168]ISI | [169]ChemPort |
+    7. Banner, D. W. et al. Cell 73, 431&#x2212;445
+       (1993). | [170]Article | [171]PubMed | [172]ISI | [173]ChemPort |
+    8. Karpusas, M. et al. Structure 3, 1031&#x2212;1039
+       (1995). | [174]Article | [175]PubMed | [176]ISI | [177]ChemPort |
+    9. Cha, S. S. et al. Immunity 11, 253&#x2212;261 (1999). | [178]ChemPort |
+   10. Naismith, J. H., Devine, T. Q., Kohno, T. & Sprang, S. R. Structure
+       4, 1251&#x2212;1262.
+       (1996). | [179]Article | [180]PubMed | [181]ISI | [182]ChemPort |
+   11. Yamagishi, J. et al. Protein Eng. 3, 713&#x2212;719
+       (1990). | [183]PubMed | [184]ISI | [185]ChemPort |
+   12. Goh, C. R., Loh, C. S. & Porter, A. G. Protein Eng. 4, 785&#x2212;791
+       (1991). | [186]PubMed | [187]ISI | [188]ChemPort |
+   13. Schneider, P. et al. J. Biol. Chem. 272, 18827&#x2212;12833
+       (1997). | [189]Article | [190]PubMed | [191]ISI | [192]ChemPort |
+   14. Brojatsch, J., Naughton, J., Rolls, M. M., Zingler, K. & Young, J.
+       A. Cell 87, 845&#x2212;855
+       (1996). | [193]Article | [194]PubMed | [195]ISI | [196]ChemPort |
+   15. Screaton, G. R., Mongkolsapaya, J., Xu, X. N., Cowper, A. E.,
+       McMichael, A. J. & Bell, J. I. Curr. Biol. 7, 693&#x2212;696
+       (1997). | [197]Article | [198]PubMed | [199]ISI | [200]ChemPort |
+   16. Park, Y. C., Burkitt, V., Villa, A. R., Tong, L. & Wu, H Nature
+       398, 533&#x2212;538
+       (1999). | [201]Article | [202]PubMed | [203]ISI | [204]ChemPort |
+   17. Gao, G. F. et al. Protein Sci. 7, 1245&#x2212;1249
+       (1998). | [205]PubMed | [206]ISI | [207]ChemPort |
+   18. Cordingley, M. G., Callahan, P. L., Sardana, V. V., Garsky, V. M. &
+       Colonno, R. J. J. Biol. Chem. 265, 9062&#x2212;9065
+       (1990). | [208]PubMed | [209]ISI | [210]ChemPort |
+   19. Otwinowski, Z. O. & Minor, W. Methods Enzymol. 276, 307&#x2212;326
+       (1997). | [211]Article | [212]PubMed | [213]ISI | [214]ChemPort |
+   20. Navaza, J. Acta. Crystallogr. A 50, 157&#x2212;163
+       (1994). | [215]Article | [216]ISI |
+   21. Brünger, A. T. XPLOR Version 3.1: A system for X-ray
+       Crystallography and NMR. (Yale University Press New Haven,
+       Connecticut; 1992).
+   22. Brunger, A. T. et al. Acta. Crystallogr. D 54, 905&#x2212;921
+       (1998). | [217]Article | [218]PubMed | [219]ISI |
+   23. Collaborative Computational Project, No. 4 Acta Crystallogr D 50:
+       760&#x2212;763 (1994). | [220]Article | [221]ISI |
+   24. De La Fortelle, E. & Bricogne, G. Meth. Enzymol. 276, 442&#x2212;494
+       (1997).
+   25. Jones, T. A., Zou, J. Y., Cowan, S. W. & Kjeldgaard, M. Acta.
+       Crystallogr. A 47, 110&#x2212;119
+       (1991). | [222]Article | [223]PubMed | [224]ISI |
+   26. Stuart, D. I., Levine, M., Muirhead, H. & Stammers, D.K. J. Mol.
+       Biol 134, 109&#x2212;142
+       (1979). | [225]Article | [226]PubMed | [227]ISI | [228]ChemPort |
+   27. Hubbard, S. J. & Thornton, J. M. Naccess, computer program.
+       (University College, London; 1993).
+   28. Esnouf, R. M. Acta. Crystallogr. D 55, 938&#x2212;940
+       (1999). | [229]Article | [230]PubMed | [231]ISI |
+   29. Merritt, E. A. & Bacon, D. J. Methods Enzymol. 277, 505&#x2212;524
+       (1997). | [232]Article | [233]ISI | [234]ChemPort |
+   30. Van Ostade, X., Tavernier, J. & Fiers, W. Protein Eng. 7, 5&#x2212;22
+       (1994). | [235]PubMed | [236]ChemPort |
+   31. Nicholls, A., Sharp, K. A. & Honig, B. Proteins 11, 281&#x2212;296
+       (1991). | [237]PubMed | [238]ISI | [239]ChemPort |
+
+    [240]Top
+   Acknowledgments
+   We thank R. Esnouf, P. Gouet and R. Bryan for computing facilities and
+   programs, K. Harlos for help with heavy atom soaks, G. Gao for advice
+   on refolding protocols and crystallisation trials, K. Hudson and J.
+   Heath for the rhinovirus 3c protease methodology, M. Gross for circular
+   dichroism analysis, A. van der Merwe and A. McMichael for discussion.
+   We also thank the staff at the European Molecular Biology Laboratory
+   outstation, ID2 (ESRF, Grenoble) and at 9.6 (SRS, Daresbury). JM is
+   funded by Siriraj Hospital Mahidol University Thailand, EYJ is funded
+   by the Royal Society and the Cancer Research Campaign, GRS and DIS are
+   funded by the MRC.
+   FULL TEXT
+   [241]Previous[242] | Next
+   [243]Table of contents
+     Download PDF   [244]Download PDF
+   Send to a friend [245]Send to a friend
+    Save this link  [246]Save this link
+   [247]Abstract
+   [248]Discussion
+   [249]Methods
+   [250]Figures & Tables
+   [251]Acknowledgments
+   [252]References
+   [253]Export citation
+   [254]Export references
+
+ §2§ [255]Open Innovation Challenges §2§
+
+     *  §3§ [256]New Innovative Prophylaxis Approaches to Protect Against
+       OP Pesticide Poisoning §3§
+          + Deadline: Dec 01 2010
+          + Reward: $15,000 USD
+       The Seeker is looking for an innovative approach or several
+       simultaneous approaches to identify comp…
+     *  §3§ [257]Statistical Analysis of Genomic Variants §3§
+          + Deadline: Dec 01 2010
+          + Reward: $25,000 USD
+       The Seeker is searching for the best method of associating genetic
+       variants and clinical variables w…
+
+     * [258]More Challenges
+     * Powered by:[259] InnoCentive
+
+ §2§ [260]nature jobs §2§
+
+     *  §3§ [261]Faculty Position §3§
+          + Stanford School of Medicine
+          + Stanford, CA United States
+     *  §3§ [262]Faculty Position in Gene Regulation and Genomics §3§
+          + University of Texas Southwestern Medical Center
+          + Dallas United States
+
+   [263]More science jobs
+   [264]Post a job for free
+
+ §2§ [265]nature events §2§
+
+     *  §3§ [266]Personalized and Translational Medicine 2010 §3§
+          + 20 September 2010 — 21 September 2010
+          + 200 Stuart Street, Boston, MA, 02116, United States
+     *  §3§ [267]Inflammatory Diseases and Immune Response: Basic Aspects,
+       Novel Approaches and Experimental Models §3§
+          + 28 September 2010 — 01 October 2010
+          + Vienna, Austria
+
+   [268]More science events
+   natureproducts
+
+   Search buyers guide:
+   __________ [go.gif]-Submit
+
+      ADVERTISEMENT
+   [269]advertisement
+
+
+   [270]Nature Structural & Molecular Biology
+   ISSN: 1545-9993
+   EISSN: 1545-9985 [271]Journal home | [272]Advance online publication |
+   [273]Current issue | [274]Archive | [275]Press releases |
+   [276]Supplements | [277]For authors | [278]Online submission |
+   [279]Permissions | [280]For referees | [281]Free online issue |
+   [282]About the journal | [283]Contact the journal | [284]Subscribe |
+   [285]Advertising | [286]work@npg | [287]naturereprints | [288]About
+   this site | [289]For librarians
+   [290]Nature Publishing Group, publisher of Nature, and other science
+   journals and reference works [291]©1999 Nature Publishing Group |
+   [292]Privacy policy
+
+References
+
+   1. http://www.nature.com/
+   2. http://www.nature.com/nsmb
+   3. http://www.nature.com/myaccount/
+   4. http://www.nature.com/nams/svc/myaccount/save/ealert?list_id=8
+   5. http://www.nature.com/register/
+   6. https://secure.nature.com/subscribe/nsmb
+   7. http://www.nature.com/siteindex/
+   8. http://www.nature.com/browse/
+   9. http://www.nature.com/search/adv_search?sp-a=sp1001702d&sp-x-1=ujournal&sp-q-1=Nature%20Structural%20%26%20Molecular%20Biology
+  10. http://ad.doubleclick.net/jump/structmolbio.nature.com/;abr=!NN2;tile=1;type=le;artid=nsb1199_1048;issue=11;pos=top;dcopt=ist;mesh=Amino%20Acid%20Sequence;mesh=Apoptosis;mesh=Apoptosis%20Regulatory%20Proteins;mesh=Crystallography,%20X-Ray;mesh=Humans;mesh=Ligands;mesh=Membrane%20Glycoproteins;mesh=Models,%20Molecular;mesh=Molecular%20Sequence%20Data;mesh=Protein%20Binding;mesh=Protein%20Conformation;mesh=Receptors,%20TNF-Related%20Apoptosis-Inducing%20Ligand;mesh=Receptors,%20Tumor%20Necrosis%20Factor;mesh=Sequence%20Alignment;mesh=Structure-Activity%20Relationship;mesh=Substrate%20Specificity;mesh=TNF-Related%20Apoptosis-Inducing%20Ligand;mesh=Tumor%20Necrosis%20Factor-alpha;fidid=0;posid=0;plaid=0;sz=728x90;ptile=1;ord=123456789?
+  11. http://www.nature.com/nsmb/index.html
+  12. http://www.nature.com/nsmb/archive/index.html
+  13. http://www.nature.com/nsmb/journal/v6/n11/index.html
+  14. http://www.nature.com/nsmb/journal/v6/n11/index.html#le
+  15. http://www.nature.com/nsmb/index.html
+  16. http://www.nature.com/nsmb/journal/vaop/ncurrent/index.html
+  17. http://www.nature.com/nsmb/journal/v14/n11/index.html
+  18. http://www.nature.com/nsmb/archive/index.html
+  19. http://www.nature.com/nsmb/press_release/index.html
+  20. http://www.nature.com/nsmb/focsup_index.html
+  21. http://www.nature.com/nsmb/focsup_index.html
+  22. http://www.nature.com/nsmb/authors/index.html
+  23. http://www.mts-nsmb.nature.com/
+  24. http://www.nature.com/reprints/index.html
+  25. http://www.nature.com/authors/editorial_policies/peer_review.html
+  26. http://www.nature.com/nsmb/journal/v11/n11/index.html
+  27. http://www.nature.com/nsmb/contact/index.html
+  28. https://secure.nature.com/subscribe/nsmb
+  29. http://advertising.nature.com/
+  30. http://npg.nature.com/npg/forms/03_current.jsp
+  31. http://www.naturereprints.com/
+  32. http://www.nature.com/nsmb/site/index.html
+  33. http://npg.nature.com/npg/servlet/Content?data=xml/07_home.xml&style=xml/07_home.xsl
+  34. http://www.nature.com/nature/
+  35. http://www.nature.com/ncb/
+  36. http://www.nature.com/nrm/
+  37. http://www.nature.com/emboj/
+  38. http://www.nature.com/avianflu/
+  39. file://localhost/
+  40. http://www.nature.com/biotech/
+  41. http://www.nature.com/cancer/
+  42. http://www.nature.com/chemistry/
+  43. http://www.nature.com/clinicalmedicine/
+  44. http://www.nature.com/dentistry/
+  45. http://www.nature.com/development/
+  46. http://www.nature.com/drugdisc/
+  47. http://www.nature.com/earthsciences/
+  48. http://www.nature.com/evoeco/
+  49. http://www.nature.com/genetics/
+  50. http://www.nature.com/immuno/
+  51. http://www.nature.com/materials/
+  52. http://www.nature.com/medicalresearch/
+  53. http://www.nature.com/micro/
+  54. http://www.nature.com/molcellbio/
+  55. http://www.nature.com/neurosci/
+  56. http://www.nature.com/pharma/
+  57. http://www.nature.com/physics/
+  58. http://npg.nature.com/npg/forms/04_cat.jsp
+  59. mailto:Yvonne.Jones@strubi.ox.ac.uk
+  60. file://localhost/dev/paper.html#B1
+  61. file://localhost/dev/paper.html#B2
+  62. file://localhost/dev/paper.html#B3
+  63. file://localhost/dev/paper.html#B3
+  64. file://localhost/dev/paper.html#B2
+  65. file://localhost/dev/paper.html#B2
+  66. file://localhost/dev/paper.html#B4
+  67. file://localhost/dev/paper.html#B5
+  68. file://localhost/dev/paper.html#t1
+  69. file://localhost/dev/paper.html#f1
+  70. http://www.nature.com/nsmb/journal/v6/n11/fig_tab/nsb1199_1048_F1.html
+  71. http://www.nature.com/nsmb/journal/v6/n11/fig_tab/nsb1199_1048_F1.html
+  72. file://localhost/dev/paper.html#f2
+  73. http://www.nature.com/nsmb/journal/v6/n11/fig_tab/nsb1199_1048_F1.html
+  74. http://www.nature.com/nsmb/journal/v6/n11/fig_tab/nsb1199_1048_F1.html
+  75. http://www.nature.com/nsmb/journal/v6/n11/fig_tab/nsb1199_1048_T1.html
+  76. http://www.nature.com/nsmb/journal/v6/n11/fig_tab/nsb1199_1048_T1.html
+  77. http://www.nature.com/nsmb/journal/v6/n11/fig_tab/nsb1199_1048_T1.html
+  78. http://www.nature.com/nsmb/journal/v6/n11/fig_tab/nsb1199_1048_T1.html
+  79. file://localhost/dev/paper.html#B6
+  80. file://localhost/dev/paper.html#f2
+  81. file://localhost/dev/paper.html#B6
+  82. file://localhost/dev/paper.html#B7
+  83. file://localhost/dev/paper.html#B8
+  84. file://localhost/dev/paper.html#f1
+  85. file://localhost/dev/paper.html#f2
+  86. file://localhost/dev/paper.html#f2
+  87. file://localhost/dev/paper.html#f1
+  88. file://localhost/dev/paper.html#B9
+  89. http://www.nature.com/nsmb/journal/v6/n11/fig_tab/nsb1199_1048_F2.html
+  90. http://www.nature.com/nsmb/journal/v6/n11/fig_tab/nsb1199_1048_F2.html
+  91. file://localhost/dev/paper.html#B27
+  92. file://localhost/dev/paper.html#B30
+  93. file://localhost/dev/paper.html#f1
+  94. http://www.nature.com/nsmb/journal/v6/n11/fig_tab/nsb1199_1048_F2.html
+  95. http://www.nature.com/nsmb/journal/v6/n11/fig_tab/nsb1199_1048_F2.html
+  96. file://localhost/dev/paper.html#B7
+  97. file://localhost/dev/paper.html#B10
+  98. file://localhost/dev/paper.html#f1
+  99. file://localhost/dev/paper.html#B10
+ 100. file://localhost/dev/paper.html#B7
+ 101. file://localhost/dev/paper.html#f1
+ 102. file://localhost/dev/paper.html#f1
+ 103. file://localhost/dev/paper.html#f2
+ 104. file://localhost/dev/paper.html#B7
+ 105. file://localhost/dev/paper.html#f2
+ 106. file://localhost/dev/paper.html#f2
+ 107. file://localhost/dev/paper.html#f2
+ 108. file://localhost/dev/paper.html#f3
+ 109. file://localhost/dev/paper.html#B11
+ 110. file://localhost/dev/paper.html#B12
+ 111. file://localhost/dev/paper.html#B13
+ 112. file://localhost/dev/paper.html#f3
+ 113. http://www.nature.com/nsmb/journal/v6/n11/fig_tab/nsb1199_1048_F3.html
+ 114. http://www.nature.com/nsmb/journal/v6/n11/fig_tab/nsb1199_1048_F3.html
+ 115. file://localhost/dev/paper.html#f1
+ 116. file://localhost/dev/paper.html#B31
+ 117. file://localhost/dev/paper.html#f2
+ 118. http://www.nature.com/nsmb/journal/v6/n11/fig_tab/nsb1199_1048_F3.html
+ 119. http://www.nature.com/nsmb/journal/v6/n11/fig_tab/nsb1199_1048_F3.html
+ 120. file://localhost/dev/paper.html#f2
+ 121. file://localhost/dev/paper.html#f3
+ 122. file://localhost/dev/paper.html#f3
+ 123. file://localhost/dev/paper.html#f3
+ 124. file://localhost/dev/paper.html#B9
+ 125. file://localhost/dev/paper.html#f2
+ 126. file://localhost/dev/paper.html#f3
+ 127. file://localhost/dev/paper.html#B14
+ 128. file://localhost/dev/paper.html#B10
+ 129. file://localhost/dev/paper.html#B7
+ 130. file://localhost/dev/paper.html#B15
+ 131. file://localhost/dev/paper.html#B16
+ 132. file://localhost/dev/paper.html#top
+ 133. file://localhost/dev/paper.html#B17
+ 134. file://localhost/dev/paper.html#B18
+ 135. file://localhost/dev/paper.html#t1
+ 136. file://localhost/dev/paper.html#B19
+ 137. file://localhost/dev/paper.html#B20
+ 138. file://localhost/dev/paper.html#B20
+ 139. file://localhost/dev/paper.html#B21
+ 140. file://localhost/dev/paper.html#B22
+ 141. file://localhost/dev/paper.html#B23
+ 142. file://localhost/dev/paper.html#B24
+ 143. file://localhost/dev/paper.html#B25
+ 144. file://localhost/dev/paper.html#t1
+ 145. file://localhost/dev/paper.html#B26
+ 146. file://localhost/dev/paper.html#B27
+ 147. file://localhost/dev/paper.html#B28
+ 148. file://localhost/dev/paper.html#B29
+ 149. http://www.rcsb.org/pdb/cgi/explore.cgi?pdbId=1D4V
+ 150. file://localhost/dev/paper.html#top
+ 151. http://dx.doi.org/10.1016%2FS0092-8674%2800%2981874-7
+ 152. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?holding=npg&cmd=Retrieve&db=PubMed&list_uids=9039262&dopt=Abstract
+ 153. http://links.isiglobalnet2.com/gateway/Gateway.cgi?&GWVersion=2&SrcAuth=Nature&SrcApp=Nature&DestLinkType=FullRecord&KeyUT=A1997WG47900008&DestApp=WOS_CPL
+ 154. http://chemport.cas.org/cgi-bin/sdcgi?APP=ftslink&action=reflink&origin=npg&version=1.0&coi=1:CAS:528:DyaK2sXhtFahtbg%3D&pissn=1545-9993&pyear=1999&md5=af3f53e595eed8fd74fcb34444d273b5
+ 155. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?holding=npg&cmd=Retrieve&db=PubMed&list_uids=9382834&dopt=Abstract
+ 156. http://links.isiglobalnet2.com/gateway/Gateway.cgi?&GWVersion=2&SrcAuth=Nature&SrcApp=Nature&DestLinkType=FullRecord&KeyUT=A1997YL44000008&DestApp=WOS_CPL
+ 157. http://chemport.cas.org/cgi-bin/sdcgi?APP=ftslink&action=reflink&origin=npg&version=1.0&coi=1:CAS:528:DyaK2sXotFSnurw%3D&pissn=1545-9993&pyear=1999&md5=72f2a66e0b859f3ac9d6ea136b673407
+ 158. http://dx.doi.org/10.1016%2F1074-7613%2895%2990057-8
+ 159. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?holding=npg&cmd=Retrieve&db=PubMed&list_uids=8777713&dopt=Abstract
+ 160. http://links.isiglobalnet2.com/gateway/Gateway.cgi?&GWVersion=2&SrcAuth=Nature&SrcApp=Nature&DestLinkType=FullRecord&KeyUT=A1995TM02300002&DestApp=WOS_CPL
+ 161. http://chemport.cas.org/cgi-bin/sdcgi?APP=ftslink&action=reflink&origin=npg&version=1.0&coi=1:CAS:528:DyaK28XhtF2iug%3D%3D&pissn=1545-9993&pyear=1999&md5=b7177cb68729fbc48198208c74f73f3a
+ 162. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?holding=npg&cmd=Retrieve&db=PubMed&list_uids=9551946&dopt=Abstract
+ 163. http://links.isiglobalnet2.com/gateway/Gateway.cgi?&GWVersion=2&SrcAuth=Nature&SrcApp=Nature&DestLinkType=FullRecord&KeyUT=000071915100001&DestApp=WOS_CPL
+ 164. http://chemport.cas.org/cgi-bin/sdcgi?APP=ftslink&action=reflink&origin=npg&version=1.0&coi=1:CAS:528:DyaK1cXhtFSnsw%3D%3D&pissn=1545-9993&pyear=1999&md5=d71d3d6dc7e51afd2e95e1f6eeba63dd
+ 165. http://chemport.cas.org/cgi-bin/sdcgi?APP=ftslink&action=reflink&origin=npg&version=1.0&coi=1:CAS:528:DyaK1MXntlSrug%3D%3D&pissn=1545-9993&pyear=1999&md5=49e15a6fc1a33d3057cee3a9a7cea557
+ 166. http://www.nature.com/doifinder/10.1038%2F338225a0
+ 167. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?holding=npg&cmd=Retrieve&db=PubMed&list_uids=2922050&dopt=Abstract
+ 168. http://links.isiglobalnet2.com/gateway/Gateway.cgi?&GWVersion=2&SrcAuth=Nature&SrcApp=Nature&DestLinkType=FullRecord&KeyUT=A1989T690600049&DestApp=WOS_CPL
+ 169. http://chemport.cas.org/cgi-bin/sdcgi?APP=ftslink&action=reflink&origin=npg&version=1.0&coi=1:CAS:528:DyaL1MXhslWms7w%3D&pissn=1545-9993&pyear=1999&md5=6b6a8fe22c22dcf2bc8e7bbe3055ca29
+ 170. http://dx.doi.org/10.1016%2F0092-8674%2893%2990132-A
+ 171. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?holding=npg&cmd=Retrieve&db=PubMed&list_uids=8387891&dopt=Abstract
+ 172. http://links.isiglobalnet2.com/gateway/Gateway.cgi?&GWVersion=2&SrcAuth=Nature&SrcApp=Nature&DestLinkType=FullRecord&KeyUT=A1993LA74300006&DestApp=WOS_CPL
+ 173. http://chemport.cas.org/cgi-bin/sdcgi?APP=ftslink&action=reflink&origin=npg&version=1.0&coi=1:CAS:528:DyaK3sXkt1KnsLc%3D&pissn=1545-9993&pyear=1999&md5=3e5aa15c845aabbee7b3bb74e94ff586
+ 174. http://dx.doi.org/10.1016%2FS0969-2126%2801%2900239-8
+ 175. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?holding=npg&cmd=Retrieve&db=PubMed&list_uids=8589998&dopt=Abstract
+ 176. http://links.isiglobalnet2.com/gateway/Gateway.cgi?&GWVersion=2&SrcAuth=Nature&SrcApp=Nature&DestLinkType=FullRecord&KeyUT=A1995TB71000008&DestApp=WOS_CPL
+ 177. http://chemport.cas.org/cgi-bin/sdcgi?APP=ftslink&action=reflink&origin=npg&version=1.0&coi=1:CAS:528:DyaK2MXptVagtr4%3D&pissn=1545-9993&pyear=1999&md5=512e56f9842e1aae14a8001d23a26321
+ 178. http://chemport.cas.org/cgi-bin/sdcgi?APP=ftslink&action=reflink&origin=npg&version=1.0&coi=1:CAS:528:DyaK1MXlvVSgtLk%3D&pissn=1545-9993&pyear=1999&md5=03ce5eacaa9e93df8ad9de2945b1fd9d
+ 179. http://dx.doi.org/10.1016%2FS0969-2126%2896%2900134-7
+ 180. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?holding=npg&cmd=Retrieve&db=PubMed&list_uids=8939750&dopt=Abstract
+ 181. http://links.isiglobalnet2.com/gateway/Gateway.cgi?&GWVersion=2&SrcAuth=Nature&SrcApp=Nature&DestLinkType=FullRecord&KeyUT=A1996VT99100004&DestApp=WOS_CPL
+ 182. http://chemport.cas.org/cgi-bin/sdcgi?APP=ftslink&action=reflink&origin=npg&version=1.0&coi=1:STN:280:ByiD1MvpvVY%3D&pissn=1545-9993&pyear=1999&md5=f7ce77f891e116f05c4b4935373b2619
+ 183. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?holding=npg&cmd=Retrieve&db=PubMed&list_uids=2217144&dopt=Abstract
+ 184. http://links.isiglobalnet2.com/gateway/Gateway.cgi?&GWVersion=2&SrcAuth=Nature&SrcApp=Nature&DestLinkType=FullRecord&KeyUT=A1990DU71200009&DestApp=WOS_CPL
+ 185. http://chemport.cas.org/cgi-bin/sdcgi?APP=ftslink&action=reflink&origin=npg&version=1.0&coi=1:CAS:528:DyaK3cXltlSnsb0%3D&pissn=1545-9993&pyear=1999&md5=df82355f251292b12802d8af0f9ed4d2
+ 186. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?holding=npg&cmd=Retrieve&db=PubMed&list_uids=1665907&dopt=Abstract
+ 187. http://links.isiglobalnet2.com/gateway/Gateway.cgi?&GWVersion=2&SrcAuth=Nature&SrcApp=Nature&DestLinkType=FullRecord&KeyUT=A1991GL17500010&DestApp=WOS_CPL
+ 188. http://chemport.cas.org/cgi-bin/sdcgi?APP=ftslink&action=reflink&origin=npg&version=1.0&coi=1:CAS:528:DyaK3MXmsFeqt7Y%3D&pissn=1545-9993&pyear=1999&md5=9b51d98f1d92c1b87668d6935bb93ffc
+ 189. http://dx.doi.org/10.1074%2Fjbc.272.30.18827
+ 190. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?holding=npg&cmd=Retrieve&db=PubMed&list_uids=9228058&dopt=Abstract
+ 191. http://links.isiglobalnet2.com/gateway/Gateway.cgi?&GWVersion=2&SrcAuth=Nature&SrcApp=Nature&DestLinkType=FullRecord&KeyUT=A1997XM34200049&DestApp=WOS_CPL
+ 192. http://chemport.cas.org/cgi-bin/sdcgi?APP=ftslink&action=reflink&origin=npg&version=1.0&coi=1:CAS:528:DyaK2sXltVSgsbw%3D&pissn=1545-9993&pyear=1999&md5=93286f34753b4452242df55cee061fec
+ 193. http://dx.doi.org/10.1016%2FS0092-8674%2800%2981992-3
+ 194. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?holding=npg&cmd=Retrieve&db=PubMed&list_uids=8945512&dopt=Abstract
+ 195. http://links.isiglobalnet2.com/gateway/Gateway.cgi?&GWVersion=2&SrcAuth=Nature&SrcApp=Nature&DestLinkType=FullRecord&KeyUT=A1996VV77400011&DestApp=WOS_CPL
+ 196. http://chemport.cas.org/cgi-bin/sdcgi?APP=ftslink&action=reflink&origin=npg&version=1.0&coi=1:CAS:528:DyaK28Xntlymtrc%3D&pissn=1545-9993&pyear=1999&md5=ac5d3b94cba2f0858f10d582eb106c1e
+ 197. http://dx.doi.org/10.1016%2FS0960-9822%2806%2900297-1
+ 198. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?holding=npg&cmd=Retrieve&db=PubMed&list_uids=9285725&dopt=Abstract
+ 199. http://links.isiglobalnet2.com/gateway/Gateway.cgi?&GWVersion=2&SrcAuth=Nature&SrcApp=Nature&DestLinkType=FullRecord&KeyUT=A1997XW88900032&DestApp=WOS_CPL
+ 200. http://chemport.cas.org/cgi-bin/sdcgi?APP=ftslink&action=reflink&origin=npg&version=1.0&coi=1:CAS:528:DyaK2sXmsVSis7c%3D&pissn=1545-9993&pyear=1999&md5=37a9efed9a28b6ad90e015288377d530
+ 201. http://www.nature.com/doifinder/10.1038%2F19110
+ 202. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?holding=npg&cmd=Retrieve&db=PubMed&list_uids=10206649&dopt=Abstract
+ 203. http://links.isiglobalnet2.com/gateway/Gateway.cgi?&GWVersion=2&SrcAuth=Nature&SrcApp=Nature&DestLinkType=FullRecord&KeyUT=000079662800053&DestApp=WOS_CPL
+ 204. http://chemport.cas.org/cgi-bin/sdcgi?APP=ftslink&action=reflink&origin=npg&version=1.0&coi=1:CAS:528:DyaK1MXisFGqtbs%3D&pissn=1545-9993&pyear=1999&md5=69f847a32ce38d4ace2ad3a69ebce4c3
+ 205. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?holding=npg&cmd=Retrieve&db=PubMed&list_uids=9605330&dopt=Abstract
+ 206. http://links.isiglobalnet2.com/gateway/Gateway.cgi?&GWVersion=2&SrcAuth=Nature&SrcApp=Nature&DestLinkType=FullRecord&KeyUT=000073445800020&DestApp=WOS_CPL
+ 207. http://chemport.cas.org/cgi-bin/sdcgi?APP=ftslink&action=reflink&origin=npg&version=1.0&coi=1:CAS:528:DyaK1cXivFKktbY%3D&pissn=1545-9993&pyear=1999&md5=fc955a861f4bd11fa1252124a12bf6dc
+ 208. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?holding=npg&cmd=Retrieve&db=PubMed&list_uids=2160953&dopt=Abstract
+ 209. http://links.isiglobalnet2.com/gateway/Gateway.cgi?&GWVersion=2&SrcAuth=Nature&SrcApp=Nature&DestLinkType=FullRecord&KeyUT=A1990DF14200017&DestApp=WOS_CPL
+ 210. http://chemport.cas.org/cgi-bin/sdcgi?APP=ftslink&action=reflink&origin=npg&version=1.0&coi=1:CAS:528:DyaK3cXksFCqsro%3D&pissn=1545-9993&pyear=1999&md5=d9223a4a938eef229c52f5cdff5f248e
+ 211. http://dx.doi.org/10.1016%2FS0962-8924%2898%2901382-8
+ 212. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?holding=npg&cmd=Retrieve&db=PubMed&list_uids=10087614&dopt=Abstract
+ 213. http://links.isiglobalnet2.com/gateway/Gateway.cgi?&GWVersion=2&SrcAuth=Nature&SrcApp=Nature&DestLinkType=FullRecord&KeyUT=A1997BH42P00020&DestApp=WOS_CPL
+ 214. http://chemport.cas.org/cgi-bin/sdcgi?APP=ftslink&action=reflink&origin=npg&version=1.0&coi=1:CAS:528:DyaK2sXivFehsbw%3D&pissn=1545-9993&pyear=1999&md5=2b0d8a802da1c17b3d565d3598110d34
+ 215. http://dx.doi.org/10.1107%2FS0108767393007597
+ 216. http://links.isiglobalnet2.com/gateway/Gateway.cgi?&GWVersion=2&SrcAuth=Nature&SrcApp=Nature&DestLinkType=FullRecord&KeyUT=A1994NG58500001&DestApp=WOS_CPL
+ 217. http://dx.doi.org/10.1107%2FS0907444998003254
+ 218. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?holding=npg&cmd=Retrieve&db=PubMed&list_uids=9757107&dopt=Abstract
+ 219. http://links.isiglobalnet2.com/gateway/Gateway.cgi?&GWVersion=2&SrcAuth=Nature&SrcApp=Nature&DestLinkType=FullRecord&KeyUT=000075952200023&DestApp=WOS_CPL
+ 220. http://dx.doi.org/10.1107%2FS0907444994003112
+ 221. http://links.isiglobalnet2.com/gateway/Gateway.cgi?&GWVersion=2&SrcAuth=Nature&SrcApp=Nature&DestLinkType=FullRecord&KeyUT=A1994PK56800011&DestApp=WOS_CPL
+ 222. http://dx.doi.org/10.1107%2FS0108767390010224
+ 223. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?holding=npg&cmd=Retrieve&db=PubMed&list_uids=2025413&dopt=Abstract
+ 224. http://links.isiglobalnet2.com/gateway/Gateway.cgi?&GWVersion=2&SrcAuth=Nature&SrcApp=Nature&DestLinkType=FullRecord&KeyUT=A1991FC21500008&DestApp=WOS_CPL
+ 225. http://dx.doi.org/10.1016%2F0022-2836%2879%2990416-9
+ 226. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?holding=npg&cmd=Retrieve&db=PubMed&list_uids=537059&dopt=Abstract
+ 227. http://links.isiglobalnet2.com/gateway/Gateway.cgi?&GWVersion=2&SrcAuth=Nature&SrcApp=Nature&DestLinkType=FullRecord&KeyUT=A1979HT19000006&DestApp=WOS_CPL
+ 228. http://chemport.cas.org/cgi-bin/sdcgi?APP=ftslink&action=reflink&origin=npg&version=1.0&coi=1:CAS:528:DyaL3cXjs1yjsQ%3D%3D&pissn=1545-9993&pyear=1999&md5=20f73c3c4a1150c22319b99cbc454ef5
+ 229. http://dx.doi.org/10.1107%2FS0907444998017363
+ 230. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?holding=npg&cmd=Retrieve&db=PubMed&list_uids=10089341&dopt=Abstract
+ 231. http://links.isiglobalnet2.com/gateway/Gateway.cgi?&GWVersion=2&SrcAuth=Nature&SrcApp=Nature&DestLinkType=FullRecord&KeyUT=000079855200042&DestApp=WOS_CPL
+ 232. http://dx.doi.org/10.1016%2FS0076-6879%2897%2977028-9
+ 233. http://links.isiglobalnet2.com/gateway/Gateway.cgi?&GWVersion=2&SrcAuth=Nature&SrcApp=Nature&DestLinkType=FullRecord&KeyUT=A1997BJ57S00026&DestApp=WOS_CPL
+ 234. http://chemport.cas.org/cgi-bin/sdcgi?APP=ftslink&action=reflink&origin=npg&version=1.0&coi=1:CAS:528:DyaK2sXntFals7s%3D&pissn=1545-9993&pyear=1999&md5=e07d0f9ea7f56f3bc89712c3cdd5e31e
+ 235. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?holding=npg&cmd=Retrieve&db=PubMed&list_uids=8140094&dopt=Abstract
+ 236. http://chemport.cas.org/cgi-bin/sdcgi?APP=ftslink&action=reflink&origin=npg&version=1.0&coi=1:CAS:528:DyaK2cXnsV2hsA%3D%3D&pissn=1545-9993&pyear=1999&md5=719ab645a74515885cbf913e356d0aae
+ 237. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?holding=npg&cmd=Retrieve&db=PubMed&list_uids=1758883&dopt=Abstract
+ 238. http://links.isiglobalnet2.com/gateway/Gateway.cgi?&GWVersion=2&SrcAuth=Nature&SrcApp=Nature&DestLinkType=FullRecord&KeyUT=A1991GV03200006&DestApp=WOS_CPL
+ 239. http://chemport.cas.org/cgi-bin/sdcgi?APP=ftslink&action=reflink&origin=npg&version=1.0&coi=1:CAS:528:DyaK38XhtVWgur4%3D&pissn=1545-9993&pyear=1999&md5=5208234392a2526bf24268c4f81e83ae
+ 240. file://localhost/dev/paper.html#top
+ 241. http://www.nature.com/nsmb/journal/v6/n11/full/nsb1199_1043.html
+ 242. http://www.nature.com/nsmb/journal/v6/n11/full/nsb1199_1055.html
+ 243. http://www.nature.com/nsmb/journal/v6/n11/index.html
+ 244. http://www.nature.com/nsmb/journal/v6/n11/pdf/nsb1199_1048.pdf
+ 245. javascript:void(0)
+ 246. http://www.connotea.org/add?uri=http://www.nature.com/nsmb/journal/v6/n11/full/nsb1199_1048.html
+ 247. file://localhost/dev/paper.html#abstract
+ 248. file://localhost/dev/paper.html#Discussion
+ 249. file://localhost/dev/paper.html#Methods
+ 250. javascript:void(0)
+ 251. file://localhost/dev/paper.html#Ack
+ 252. file://localhost/dev/paper.html#References
+ 253. http://www.nature.com/nsmb/journal/v6/n11/ris/nsb1199_1048.ris
+ 254. http://www.nature.com/nsmb/journal/v6/n11/ris/nsb1199_1048refs.ris
+ 255. http://www.nature.com/openinnovation?moreChallenges=true
+ 256. http://www.nature.com/openinnovation?challengeId=9668668
+ 257. http://www.nature.com/openinnovation?challengeId=9658599
+ 258. http://www.nature.com/openinnovation?moreChallenges=true
+ 259. http://www.innocentive.com/
+ 260. http://www.nature.com/naturejobs/
+ 261. http://www.nature.com/naturejobs/science/jobs/160177-Faculty-Position
+ 262. http://www.nature.com/naturejobs/science/jobs/161059-Faculty-Position-in-Gene-Regulation-and-Genomics
+ 263. http://www.nature.com/naturejobs/science/jobs
+ 264. http://www.nature.com/naturejobs/science/jobs/new
+ 265. http://www.nature.com/nature-events/index.html
+ 266. http://www.nature.com/natureevents/science/events/8685-Personalized_and_Translational_Medicine_2010
+ 267. http://www.nature.com/natureevents/science/events/9046-Inflammatory_Diseases_and_Immune_Response_Basic_Aspects_Novel_Approaches_and_Experimental_Models
+ 268. http://www.nature.com/nature-events/index.html
+ 269. http://ad.doubleclick.net/jump/structmolbio.nature.com/curr_back;pos=right;issue=$!issue;abr=!NN2;sz=120x600;ord=07893195?
+ 270. http://www.nature.com/nsmb/
+ 271. http://www.nature.com/nsmb/index.html
+ 272. http://www.nature.com/nsmb/journal/vaop/ncurrent/index.html
+ 273. http://www.nature.com/nsmb/journal/v14/n11/index.html
+ 274. http://www.nature.com/nsmb/archive/index.html
+ 275. http://www.nature.com/nsmb/press_release/index.html
+ 276. http://www.nature.com/nsmb/supplements/index.html
+ 277. http://www.nature.com/nsmb/authors/index.html
+ 278. http://www.mts-nsmb.nature.com/
+ 279. http://npg.nature.com/npg/servlet/Content?data=xml/01_reprints.xml&style=xml/01_reprints.xsl
+ 280. http://www.nature.com/nsmb/referees/index.html
+ 281. http://www.nature.com/nsmb/journal/v11/n11/index.html
+ 282. http://www.nature.com/nsmb/about/index.html
+ 283. http://www.nature.com/nsmb/contact/index.html
+ 284. https://secure.nature.com/subscribe/nsmb
+ 285. http://advertising.nature.com/
+ 286. http://npg.nature.com/npg/forms/03_current.jsp
+ 287. http://www.naturereprints.com/
+ 288. http://www.nature.com/nsmb/site/index.html
+ 289. http://npg.nature.com/npg/servlet/Content?data=xml/07_home.xml&style=xml/07_home.xsl
+ 290. http://npg.nature.com/npg/servlet/Content?data=xml/02_welcome.xml&style=xml/02_welcome.xsl
+ 291. http://www.nature.com/copyright/copyright_nsmb.html
+ 292. http://npg.nature.com/npg/servlet/Content?data=xml/08_privacy.xml&style=xml/08_privacy.xsl

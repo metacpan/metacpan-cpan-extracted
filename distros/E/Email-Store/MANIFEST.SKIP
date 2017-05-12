@@ -1,0 +1,7 @@
+Build
+_build
+blib
+.svn
+Makefile
+t/test.db
+emailstore-index

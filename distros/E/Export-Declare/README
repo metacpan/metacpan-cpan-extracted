@@ -1,0 +1,198 @@
+NAME
+    Export::Declare - Declarative Exporting, successor of Exporter-Declare.
+
+DESCRIPTION
+    Declare exports instead of using package vars. Successor to
+    Exporter::Declare which was over complicated. Fully compatible with
+    Importer and Exporter.
+
+SYNOPSYS
+  DECLARING EXPORTS
+        package My::Exporter;
+        use Importer 'Export::Declare' => (qw/export exports export_tag export_meta/);
+
+        # You should do one of these, if you do not then 'vars' will be selected
+        # automatically.
+        export_meta->inject_menu; # Define IMPORTER_MENU
+        # and/or
+        export_meta->inject_vars; # Define @EXPORT and friends
+
+        # Export an anonymous sub
+        export foo => sub { 'foo' };
+
+        # Export package subs
+        exports qw/bar baz/;
+
+        # Default export
+        export_tag DEFAULT => qw/bat/;
+
+        # Define the subs you are exporting
+        sub bar { 'bar' }
+        sub baz { 'baz' }
+        sub bat { 'bat' }
+
+  CONSUMING EXPORTS
+        use Importer 'My::Exporter' => qw/foo bar baz bat/;
+
+    if the exporter imported "import()" from Export::Declare then you can
+    use it directly, but this is discouraged.
+
+        use My::Exporter qw/foo bar baz bat/;
+
+  USE + IMPORT
+    You can use Export::Declare directly to bring in the tools. You can
+    specify "-menu" and/or "-vars" to inject "IMPORTER_MENU()" and/or
+    @EXPORT and friends.
+
+        use Export::Declare => qw/-vars -menu export exports/;
+
+EXPORTS
+    All exports are optinal, none are exported by default.
+
+    my $meta = export_meta()
+        Get the meta-object for the current package.
+
+        This is litterally:
+
+            sub export_meta { Export::Declare::Meta->new(scalar caller) }
+
+    export $NAME
+    export $NAME => $REF
+        Export the specified symbol. if $REF is specified then it will be
+        used as the export. If $REF is not specified then the ref will be
+        pulled from the symbol table for the current package.
+
+        $NAME can be a function name, or a symbol name such as '$FOO'. $REF
+        if provided must be the same type as the sigil in $NAME. if $NAME
+        has no sigil then "&" is assumed.
+
+    exports @NAMES
+        @NAMES is a list of symbol names. A symbol name can be a function
+        name without a sigil, or it can be any type of veriable with a
+        sigil.
+
+    export_tag $TAG => @NAMES
+        $TAG can be any valid tag name (same as any variable name, must
+        start with a word character, and contain only word characters and
+        numbers.
+
+        @NAMES is a list of symbol names. A symbol name can be a function
+        name without a sigil, or it can be any type of veriable with a
+        sigil.
+
+        The ":DEFAULT" tag is linked to @EXPORT when the meta-data is linked
+        with package vars.
+
+        The ":FAIL" tag is linked to @EXPORT_FAIL when the meta-data is
+        linked with package vars.
+
+        The ":ALL" tag is linked to @EXPORT_OK when the meta-data is linked
+        with package vars. All exports are added to this tag automatically.
+
+    export_gen $NAME => \&GENERATOR
+    export_gen $NAME => $GENERATOR
+        Specify that $NAME should be exported, and that the $REF should be
+        generated dynamically using the specified sub. This sub will be used
+        every time something imports $NAME.
+
+        $NAME can be a function name, or a symbol name such as '$FOO'. $REF
+        if provided must be the same type as the sigil in $NAME. if $NAME
+        has no sigil then "&" is assumed.
+
+        The second argument can be a reference to a subroutine, or it can be
+        the name of a sub to call on the current package.
+
+        The sub gets several arguments:
+
+            export_gen foo => sub {
+                my ($from_package, $into_package, $symbol_name) = @_;
+                ...
+                return $REF;
+            };
+
+            export_gen bar => '_gen_bar''
+            sub _gen_bar {
+                my ($from_package, $into_package, $symbol_name) = @_;
+                ...
+                return $REF;
+            }
+
+    export_magic $NAME => sub { ... }
+        This allows you to define custom actions to run AFTER an export has
+        been injected into the consumers namespace. This is a good place to
+        enable parser hooks like with Devel::Declare.
+
+            export_magic foo => sub {
+                my $from = shift;    # Should be the package doing the exporting
+                my %args = @_;
+
+                my $into      = $args{into};         # Package symbol was exported into
+                my $orig_name = $args{orig_name};    # Original name of the export (in the exporter)
+                my $new_name  = $args{new_name};     # Name the symbol was imported as
+                my $ref       = $args{ref};          # The reference to the symbol
+
+                ...;                                 # whatever you want, return is ignored.
+            };
+
+    $CLASS->import(@NAMES)
+        This is an optinal "import()" method you can pull into your exporter
+        so that people can consume your exports by directly using your
+        module.
+
+            package My::Exporter;
+
+            use Importer 'Export::Declare' => qw/export import/;
+
+            export foo => sub { 'foo' };
+
+        ...
+
+            package My::Consumer;
+
+            use My::Exporter qw/foo/;
+
+        This is discouraged! it is better if you omit "import()" and have
+        people do this to get your exports:
+
+            package My::Consumer;
+
+            use Importer 'My::Exporter' => qw/foo/;
+
+DETAILS
+    This package tracks exports in a meta class. The meta-class is
+    Export::Declare::Meta. All the exports act on the meta-object for the
+    package that calls them. Having this meta-data on its own does not
+    actually make your module an exporter, for that to happen you need to
+    expose the meta-data in a way that Exporter or Importer know how to find
+    it.
+
+        export_meta->inject_vars;
+        export_meta->inject_menu;
+
+    "inject_vars" will inject @EXPORT, @EXPORT_OK and other related vars.
+    These vars will be directly linked to the meta-object.
+
+    "inject_menu" injects the "IMPORTER_MENU()" function that exposes the
+    meta-data.
+
+    If you do not specify one, then "vars" will be selected for you
+    automatically the first time you use an export function.
+
+SOURCE
+    The source code repository for Export-Declare can be found at
+    http://github.com/exodist/Export-Declare/.
+
+MAINTAINERS
+    Chad Granum <exodist@cpan.org>
+
+AUTHORS
+    Chad Granum <exodist@cpan.org>
+
+COPYRIGHT
+    Copyright 2015 Chad Granum <exodist7@gmail.com>.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See http://dev.perl.org/licenses/
+

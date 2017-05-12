@@ -1,0 +1,3086 @@
+#######################################################
+# Embedix Component Description file for: busybox
+#
+# Copyright 2000, Lineo Inc.
+#
+# Notes on binaries in busybox
+#
+# /bin/busybox
+# /bin/cat y
+# /bin/chgrp y
+# /bin/chmod y
+# /bin/chown y
+# /bin/cp y
+# /bin/date y
+# /bin/dd y
+# /bin/df y
+# /bin/dmesg y
+# /bin/du y
+# /bin/dumpkmap N
+# /bin/echo y
+# /bin/false y
+# /bin/fdflush y
+# /bin/grep y
+# /bin/gunzip y
+# /bin/gzip y
+# /bin/head
+# /bin/hostname y
+# /bin/kill y
+# /bin/ln y
+# /bin/ls y
+# /bin/mkdir y
+# /bin/mknod y
+# /bin/mktemp y
+# /bin/more y
+# /bin/mount y
+# /bin/mt y
+# /bin/mv y
+# /bin/ping y
+# /bin/ps y
+# /bin/pwd y
+# /bin/rm y
+# /bin/rmdir y
+# /bin/sed y
+# /bin/sh --- Provided by busybox-0.45.tar.gz but not in the Embedix SDK
+# /bin/sleep y
+# /bin/sort
+# /bin/sync y
+# /bin/tar y
+# /bin/tee
+# /bin/true y
+# /bin/umount y
+# /bin/uname y
+# /bin/usleep y
+# /bin/zcat y
+# /sbin/chroot
+# /sbin/freeramdisk y
+# /sbin/fsck.minix y
+# /sbin/halt y
+# /sbin/init y
+# /sbin/insmod N
+# /sbin/loadkmap y
+# /sbin/lsmod y
+# /sbin/makedevs y
+# /sbin/mkfs.minix y
+# /sbin/mkswap y
+# /sbin/poweroff y
+# /sbin/reboot y
+# /sbin/rmmod y
+# /sbin/swapoff y
+# /sbin/swapon y
+# /sbin/syslogd y
+### /sbin/update (Removed as functionality is in 2.x kernel)
+# /usr/bin/[ --- Provided by busybox-0.45.tar.gz but not in the Embedix SDK
+# /usr/bin/ar
+# /usr/bin/basename y
+# /usr/bin/chvt y
+# /usr/bin/clear y
+# /usr/bin/cut y
+# /usr/bin/dc y
+# /usr/bin/deallocvt
+# /usr/bin/dirname y
+# /usr/bin/find y
+# /usr/bin/free y
+# /usr/bin/hostid y
+# /usr/bin/id y
+# /usr/bin/killall y
+# /usr/bin/length y
+# /usr/bin/loadacm y
+# /usr/bin/loadfont y
+# /usr/bin/logger y
+# /usr/bin/logname
+# /usr/bin/md5sum y
+# /usr/bin/mkfifo y
+# /usr/bin/nc y
+# /usr/bin/nslookup y
+# /usr/bin/printf y
+# /usr/bin/setkeycodes N
+# /usr/bin/tail N
+# /usr/bin/telnet N
+# /usr/bin/test --- Provided by busybox-0.45.tar.gz but not in the Embedix SDK
+# /usr/bin/touch y
+# /usr/bin/tr y
+# /usr/bin/tty y
+# /usr/bin/uniq y
+# /usr/bin/uptime y
+# /usr/bin/uuencode y
+# /usr/bin/uudecode y
+# /usr/bin/wc
+# /usr/bin/which y
+# /usr/bin/whoami y
+# /usr/bin/yes
+# /usr/sbin/dutmp N
+# /usr/sbin/fbset y
+
+<GROUP System>
+<GROUP Utilities>
+<COMPONENT busybox>
+	TYPE=bool
+	VALUE=0
+	SRPM=busybox
+	<SPECPATCH>busybox.specpatch</SPECPATCH>
+	<HELP>
+	BusyBox is a suite of "tiny" Unix utilities in a multi-call binary. It
+	provides a pretty complete POSIX environment in a very small package.
+	Just add a kernel, "ash" (Keith Almquists tiny Bourne shell clone), and
+	an editor such as "elvis-tiny" or "ae", and you have a full system. This
+	is makes an excellent environment for a "rescue" disk or any small or
+	embedded system.
+	Since all of the functions in busybox are standard linux commands, the
+	help section does not explain each command. Please refer to the man
+	pages or a Linux guide for an explaination of the commands included
+	with this package. Be aware that since is a "tiny" Unix utility some
+	of the standard command line options associated with a command may
+	not be available.
+	</HELP>
+	STATIC_SIZE=3006
+	MIN_DYNAMIC_SIZE=0
+	STORAGE_SIZE=4408
+	STARTUP_TIME=0
+	<BUILD_VARS>
+	BB_BUSYBOX=BB_BUSYBOX
+	</BUILD_VARS>
+	KEEPLIST=/bin/busybox
+	##############################################################
+	### Require at least one option to have been selected      ###
+	### -but- don't count "compile-time-features" as an option ###
+	##############################################################
+	<REQUIRESEXPR>
+		(libc.so.6 == "y") &&
+		(ld-linux.so.2 == "y") &&
+		(skellinux == "y") &&
+		(  (Misc-utilities == "y")
+		|| (File-compression-utilities == "y")
+		|| (Network-utilities == "y")
+		|| (Process-utilities == "y")
+		|| (Directory-utilities == "y")
+		|| (User-info-utilities == "y")
+		|| (Disk-info-utilities == "y")
+		|| (Screen-utilities == "y")
+		|| (System-utilities == "y")
+		|| (File-manipulation-utilities == "y") )
+	</REQUIRESEXPR>
+
+### features ###
+<GROUP compile-time-features>
+	PROMPT=Enable/Disable compile options?
+	DEFAULT_VALUE=1
+	<HELP>
+	Some of the busybox utilities have features that can be enabled
+	or disabled by selecting options in this group.
+	</HELP>
+	<REQUIRESEXPR>
+		(compile-time-features == "CHILDREN_ENABLED")
+	</REQUIRESEXPR>
+
+	### See also BB_FEATURE_USE_TERMIOS
+	### ls.c, more.c, ps.c
+	<OPTION enable-bb-feature-autowidth>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Enable BB_FEATURE_AUTOWIDTH?
+		<HELP>
+		This feature enables the calculation of terminal and
+		column widths (for more and ls).
+		</HELP>
+		STATIC_SIZE=0
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=0
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_FEATURE_AUTOWIDTH=BB_FEATURE_AUTOWIDTH
+		</BUILD_VARS>
+	</OPTION>
+
+	### init.c
+	<OPTION enable-bb-feature-extra-quiet>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Enable BB_FEATURE_EXTRA_QUIET?
+		<HELP>
+		This feature makes sure nothing is printed
+		to the console on boot.
+		</HELP>
+		STATIC_SIZE=0
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=0
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_FEATURE_EXTRA_QUIET=BB_FEATURE_EXTRA_QUIET
+		</BUILD_VARS>
+	</OPTION>
+
+	### fbset.c
+	<OPTION enable-bb-feature-fbset-fancy>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Enable BB_FEATURE_FBSET_FANCY?
+		<HELP>
+		This feature turns on extra fbset options.
+		</HELP>
+		STATIC_SIZE=0
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=0
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_FEATURE_FBSET_FANCY=BB_FEATURE_FBSET_FANCY
+		</BUILD_VARS>
+	</OPTION>
+
+	### fbset.c
+	<OPTION enable-bb-feature-fbset-readmode>
+		TYPE=bool
+		DEFAULT_VALUE=0
+		PROMPT=Enable BB_FEATURE_FBSET_READMODE?
+		<HELP>
+		This feature turns on fbset readmode support.
+		</HELP>
+		STATIC_SIZE=0
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=0
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_FEATURE_FBSET_READMODE=BB_FEATURE_FBSET_READMODE
+		</BUILD_VARS>
+	</OPTION>
+
+	### See also BB_REGEXP
+	### utility.c - with (BB_GREP || BB_SED)
+	<OPTION enable-bb-feature-full-regular-expressions>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Enable BB_FEATURE_FULL_REGULAR_EXPRESSIONS?
+		<HELP>
+		This feature enables full regular expressions. This adds about
+		4k. When this is off, things that would normally use regualar
+		expressions (like grep and sed) will just use normal strings.
+		</HELP>
+		STATIC_SIZE=0
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=0
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_FEATURE_FULL_REGULAR_EXPRESSIONS=BB_FEATURE_FULL_REGULAR_EXPRESSIONS
+		</BUILD_VARS>
+	</OPTION>
+
+	### init.c
+	<OPTION enable-bb-feature-init-chroot>
+		TYPE=bool
+		DEFAULT_VALUE=0
+		PROMPT=Enable BB_FEATURE_INIT_CHROOT?
+		<HELP>
+		This feature allows init to permenently chroot, and umount the
+		old root fs just like an initrd does. Requires a kernel patch
+		by Werner Almesberger.
+		ftp://icaftp.epfl.ch/pub/people/almesber/misc/umount-root-*.tar.gz
+		</HELP>
+		STATIC_SIZE=0
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=0
+		STARTUP_TIME=0
+		<REQUIRES>
+		enable-bb-feature-use-procfs
+		</REQUIRES>
+		<BUILD_VARS>
+		BB_FEATURE_INIT_CHROOT=BB_FEATURE_INIT_CHROOT
+		</BUILD_VARS>
+	</OPTION>
+
+#
+# Debug Only
+#
+#	### init.c
+#	<OPTION enable-bb-feature-init-coredumps>
+#		TYPE=bool
+#		DEFAULT_VALUE=0
+#		PROMPT=Enable BB_FEATURE_INIT_COREDUMPS?
+#		<HELP>
+#		This feature has init enable core dumping for child processes
+#		(for debugging only).
+#		</HELP>
+#		STATIC_SIZE=0
+#		MIN_DYNAMIC_SIZE=0
+#		STORAGE_SIZE=0
+#		STARTUP_TIME=0
+#		<BUILD_VARS>
+#		BB_FEATURE_INIT_COREDUMPS=BB_FEATURE_INIT_COREDUMPS
+#		</BUILD_VARS>
+#	</OPTION>
+
+#
+# Always selected (we assume we have a new kernel) if INSMOD is selected
+# (See keep-bb-insmod)
+#
+#	### insmod.c
+#	<OPTION enable-bb-feature-insmod-new-kernel>
+#		TYPE=bool
+#		DEFAULT_VALUE=1
+#		PROMPT=Enable BB_FEATURE_INSMOD_NEW_KERNEL?
+#		<HELP>
+#		This feature enables support of installation of modules
+#		from post 2.1.18 kernels.
+#		</HELP>
+#		STATIC_SIZE=0
+#		MIN_DYNAMIC_SIZE=0
+#		STORAGE_SIZE=0
+#		STARTUP_TIME=0
+#		<BUILD_VARS>
+#		BB_FEATURE_INSMOD_NEW_KERNEL=BB_FEATURE_INSMOD_NEW_KERNEL
+#		</BUILD_VARS>
+#	</OPTION>
+
+#
+# Never selected (we assume we have a new kernel)!
+#
+#	### insmod.c
+#	<OPTION enable-bb-feature-insmod-old-kernel>
+#		TYPE=bool
+#		DEFAULT_VALUE=0
+#		PROMPT=Enable BB_FEATURE_INSMOD_OLD_KERNEL?
+#		<HELP>
+#		This feature enables support of installation of modules
+#		from pre 2.1 kernels.
+#		</HELP>
+#		STATIC_SIZE=0
+#		MIN_DYNAMIC_SIZE=0
+#		STORAGE_SIZE=0
+#		STARTUP_TIME=0
+#		<BUILD_VARS>
+#		BB_FEATURE_INSMOD_OLD_KERNEL=BB_FEATURE_INSMOD_OLD_KERNEL
+#		</BUILD_VARS>
+#	</OPTION>
+
+	### insmod.c
+	<OPTION enable-bb-feature-insmod-version-checking>
+		TYPE=bool
+		DEFAULT_VALUE=0
+		PROMPT=Enable BB_FEATURE_INSMOD_VERSION_CHECKING?
+		<HELP>
+		This feature enables support of module version checking.
+		</HELP>
+		STATIC_SIZE=0
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=0
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_FEATURE_INSMOD_VERSION_CHECKING=BB_FEATURE_INSMOD_VERSION_CHECKING
+		</BUILD_VARS>
+	</OPTION>
+
+#
+# Not offered in SDK (yet!).
+#
+#	### busybox.c
+#	<OPTION enable-bb-feature-installer>
+#		TYPE=bool
+#		DEFAULT_VALUE=0
+#		PROMPT=Enable BB_FEATURE_INSTALLER?
+#		<HELP>
+#		This feature enables "busybox --install [-s]" to create links
+#		(or symlinks) for all the commands that are compiled into the
+#		binary. (Needs /proc filesystem.)
+#		</HELP>
+#		STATIC_SIZE=1129
+#		MIN_DYNAMIC_SIZE=0
+#		STORAGE_SIZE=1112
+#		STARTUP_TIME=0
+#		<BUILD_VARS>
+#		BB_FEATURE_INSTALLER=BB_FEATURE_INSTALLER
+#		</BUILD_VARS>
+#	</OPTION>
+
+	### syslogd.c
+	<OPTION enable-bb-feature-klogd>
+		TYPE=bool
+		DEFAULT_VALUE=0
+		PROMPT=Enable BB_FEATURE_KLOGD?
+		<HELP>
+		This feature enables syslogd to also provide klogd support.
+		</HELP>
+		STATIC_SIZE=0
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=0
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_FEATURE_KLOGD=BB_FEATURE_KLOGD
+		</BUILD_VARS>
+	</OPTION>
+
+	### halt.c, init.c, poweroff.c, reboot.c, utility.c
+	<OPTION enable-bb-feature-linuxrc>
+		TYPE=bool
+		DEFAULT_VALUE=0
+		PROMPT=Enable BB_FEATURE_LINUXRC?
+		<HELP>
+		This feature enables init to be called as /linuxrc.
+		</HELP>
+		STATIC_SIZE=8008
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=8028
+		STARTUP_TIME=0
+		<REQUIRES>
+		enable-bb-feature-use-procfs
+		</REQUIRES>
+		<BUILD_VARS>
+		BB_FEATURE_LINUXRC=BB_FEATURE_LINUXRC
+		</BUILD_VARS>
+	</OPTION>
+
+	### ls.c
+	<OPTION enable-bb-feature-ls-filetypes>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Enable BB_FEATURE_LS_FILETYPES?
+		<HELP>
+		This feature enables ls -p and -F.
+		</HELP>
+		STATIC_SIZE=0
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=0
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_FEATURE_LS_FILETYPES=BB_FEATURE_LS_FILETYPES
+		</BUILD_VARS>
+	</OPTION>
+
+	### ls.c
+	<OPTION enable-bb-feature-ls-recursive>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Enable BB_FEATURE_LS_RECURSIVE?
+		<HELP>
+		This feature enables ls to recursively descend into
+		sub-directories.
+		</HELP>
+		STATIC_SIZE=0
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=0
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_FEATURE_LS_RECURSIVE=BB_FEATURE_LS_RECURSIVE
+		</BUILD_VARS>
+	</OPTION>
+
+	### ls.c
+	<OPTION enable-bb-feature-ls-timestamps>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Enable BB_FEATURE_LS_TIMESTAMPS?
+		<HELP>
+		This feature enables the display of timestamps in ls.
+		</HELP>
+		STATIC_SIZE=0
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=0
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_FEATURE_LS_TIMESTAMPS=BB_FEATURE_LS_TIMESTAMPS
+		</BUILD_VARS>
+	</OPTION>
+
+	### ls.c
+	<OPTION enable-bb-feature-ls-username>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Enable BB_FEATURE_LS_USERNAME?
+		<HELP>
+		This feature shows username/groupnames for ls
+		(bypassing libc6 NSS).
+		</HELP>
+		STATIC_SIZE=0
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=0
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_FEATURE_LS_USERNAME=BB_FEATURE_LS_USERNAME
+		</BUILD_VARS>
+	</OPTION>
+
+	### umount.c
+	<OPTION enable-bb-feature-mount-force>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Enable BB_FEATURE_MOUNT_FORCE?
+		<HELP>
+		This feature enables forced filesystem unmounting 
+		(i.e. in case of an unreachable NFS system).
+		</HELP>
+		STATIC_SIZE=0
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=0
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_FEATURE_MOUNT_FORCE=BB_FEATURE_MOUNT_FORCE
+		</BUILD_VARS>
+	</OPTION>
+
+	### internal.h, mount.c, umount.c, utility.c
+	<OPTION enable-bb-feature-mount-loop>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Enable BB_FEATURE_MOUNT_LOOP?
+		<HELP>
+		This feature enables one to mount loop devices.
+		</HELP>
+		STATIC_SIZE=1306
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=1292
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_FEATURE_MOUNT_LOOP=BB_FEATURE_MOUNT_LOOP
+		</BUILD_VARS>
+	</OPTION>
+
+#
+# skellinux in the Embedix SDK currently only provides an /etc/mtab
+# which is a link to /proc/mounts and not a real /etc/mtab file.
+# If skellinux is ever changed to offer this option so can we...
+#
+#	### See also BB_MTAB
+#	### mount.c, umount.c, utility.c
+#	<OPTION enable-bb-feature-mount-mtab-support>
+#		TYPE=bool
+#		DEFAULT_VALUE=1
+#		PROMPT=Enable BB_FEATURE_MOUNT_MTAB_SUPPORT?
+#		<HELP>
+#		This feature enables support for a real /etc/mtab file
+#		instead of /proc/mounts.
+#		</HELP>
+#		STATIC_SIZE=1383
+#		MIN_DYNAMIC_SIZE=0
+#		STORAGE_SIZE=1376
+#		STARTUP_TIME=0
+#		<BUILD_VARS>
+#		BB_FEATURE_MOUNT_MTAB_SUPPORT=BB_FEATURE_MOUNT_MTAB_SUPPORT
+#		</BUILD_VARS>
+#	</OPTION>
+
+	### See also BB_NFSMOUNT
+	### utility.c
+	<OPTION enable-bb-feature-nfsmount>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Enable BB_FEATURE_NFSMOUNT?
+		<HELP>
+		This feature enables support for mounting NFS volumes.
+		Busybox mount needs to be selected for this to be effective.
+		</HELP>
+		STATIC_SIZE=295
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=308
+		STARTUP_TIME=0
+		<REQUIRES>
+		keep-bb-mount
+		CONFIG_NFS_FS
+		keep-rpc.portmap
+		</REQUIRES>
+		<BUILD_VARS>
+		BB_FEATURE_NFSMOUNT=BB_FEATURE_NFSMOUNT
+		</BUILD_VARS>
+	</OPTION>
+
+#
+# See /bin/sh --- Provided by busybox-0.45.tar.gz but not in the Embedix SDK
+#
+#	### See also BB_CMDEDIT
+#	### See also BB_FEATURE_USE_TERMIOS
+#	### cmdedit.c, sh.c
+#	<OPTION enable-bb-feature-sh-command-editing>
+#		TYPE=bool
+#		DEFAULT_VALUE=1
+#		PROMPT=Enable BB_FEATURE_SH_COMMAND_EDITING?
+#		<HELP>
+#		This feature enables command line editing in the shell.
+#		</HELP>
+#		STATIC_SIZE=0
+#		MIN_DYNAMIC_SIZE=0
+#		STORAGE_SIZE=0
+#		STARTUP_TIME=0
+#		<BUILD_VARS>
+#		BB_FEATURE_SH_COMMAND_EDITING=BB_FEATURE_SH_COMMAND_EDITING
+#		</BUILD_VARS>
+#	</OPTION>
+
+#
+# See /bin/sh --- Provided by busybox-0.45.tar.gz but not in the Embedix SDK
+#
+#	### sh.c
+#	<OPTION enable-bb-feature-sh-standalone-shell>
+#		TYPE=bool
+#		DEFAULT_VALUE=1
+#		PROMPT=Enable BB_FEATURE_SH_STANDALONE_SHELL?
+#		<HELP>
+#		This feature allows the shell to invoke all the compiled in
+#		BusyBox commands as if they were shell builtins. Nice for
+#		staticly linking an emergency rescue shell among other thing.
+#		</HELP>
+#		STATIC_SIZE=0
+#		MIN_DYNAMIC_SIZE=0
+#		STORAGE_SIZE=0
+#		STARTUP_TIME=0
+#		<BUILD_VARS>
+#		BB_FEATURE_SH_STANDALONE_SHELL=BB_FEATURE_SH_STANDALONE_SHELL
+#		</BUILD_VARS>
+#	</OPTION>
+
+#
+# Broken as of Busybox 0.45
+#
+#	### cmdedit.c
+#	<OPTION enable-bb-feature-sh-tab-completion>
+#		TYPE=bool
+#		DEFAULT_VALUE=1
+#		PROMPT=Enable BB_FEATURE_SH_TAB_COMPLETION?
+#		<HELP>
+#		This feature enables tab completion in the shell
+#		(not yet working very well -- so don't turn this on).
+#		</HELP>
+#		STATIC_SIZE=0
+#		MIN_DYNAMIC_SIZE=0
+#		STORAGE_SIZE=0
+#		STARTUP_TIME=0
+#		<BUILD_VARS>
+#		BB_FEATURE_SH_TAB_COMPLETION=BB_FEATURE_SH_TAB_COMPLETION
+#		</BUILD_VARS>
+#	</OPTION>
+
+	### ping.c
+	<OPTION enable-bb-feature-simple-ping>
+		TYPE=bool
+		DEFAULT_VALUE=0
+		PROMPT=Enable BB_FEATURE_SIMPLE_PING?
+		<HELP>
+		This feature changes the ping installation to where it is
+		simplified and featureless, but really small.
+		</HELP>
+		STATIC_SIZE=0
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=0
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_FEATURE_SIMPLE_PING=BB_FEATURE_SIMPLE_PING
+		</BUILD_VARS>
+	</OPTION>
+
+	### tail.c
+	<OPTION enable-bb-feature-simple-tail>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Enable BB_FEATURE_SIMPLE_TAIL?
+		<HELP>
+		This feature enables a simple tail implementation
+		(2k vs 6k for the full one). It still provides 'tail -f' support
+		-- but for only one file at a time.
+		</HELP>
+		STATIC_SIZE=0
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=0
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_FEATURE_SIMPLE_TAIL=BB_FEATURE_SIMPLE_TAIL
+		</BUILD_VARS>
+	</OPTION>
+
+	### sort.c
+	<OPTION enable-bb-feature-sort-reverse>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Enable BB_FEATURE_SORT_REVERSE?
+		<HELP>
+		This feature enables reverse sorting.
+		</HELP>
+		STATIC_SIZE=0
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=0
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_FEATURE_SORT_REVERSE=BB_FEATURE_SORT_REVERSE
+		</BUILD_VARS>
+	</OPTION>
+
+	### tar.c
+	<OPTION enable-bb-feature-tar-create>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Enable BB_FEATURE_TAR_CREATE?
+		<HELP>
+		This feature enables tar to create tar archives.
+		Otherwise, it will only be able to extract. With this
+		option enabled you can create a tar file.
+		</HELP>
+		STATIC_SIZE=0
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=0
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_FEATURE_TAR_CREATE=BB_FEATURE_TAR_CREATE
+		BB_FIND=BB_FIND
+		</BUILD_VARS>
+	</OPTION>
+
+	### tar.c
+	<OPTION enable-bb-feature-tar-exclude>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Enable BB_FEATURE_TAR_EXCLUDE?
+		<HELP>
+		This feature enables support of "--exclude" for excluding files.
+		</HELP>
+		STATIC_SIZE=0
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=0
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_FEATURE_TAR_EXCLUDE=BB_FEATURE_TAR_EXCLUDE
+		BB_FIND=BB_FIND
+		</BUILD_VARS>
+	</OPTION>
+
+	### ...ALL...
+	<OPTION enable-bb-feature-trivial-help>
+		TYPE=bool
+		DEFAULT_VALUE=0
+		PROMPT=Enable BB_FEATURE_TRIVIAL_HELP?
+		<HELP>
+		This feature compiles out everything but the most trivial
+		"--help" usage information (i.e. reduces binary size).
+		</HELP>
+		STATIC_SIZE=0
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=0
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_FEATURE_TRIVIAL_HELP=BB_FEATURE_TRIVIAL_HELP
+		</BUILD_VARS>
+	</OPTION>
+
+#
+# Requires a Kernel Patch (not yet available in SDK Kernel)
+#
+#	### lsmod.c, mount.c, ps.c, utility.c
+#	<OPTION enable-bb-feature-use-devps-patch>
+#		TYPE=bool
+#		DEFAULT_VALUE=0
+#		PROMPT=Enable BB_FEATURE_USE_DEVPS_PATCH?
+#		<HELP>
+#		This feature enables Erik's very cool devps, devmtab, etc
+#		kernel drivers, thereby eliminating the need for the /proc
+#		filesystem and thereby saving lots and lots memory for more
+#		important things. You can not use this and use PROCFS at the
+#		same time...
+#		
+#		NOTE: If you enable this feature, you _MUST_ have patched
+#		the kernel to include the devps patch that is included in
+#		the busybox/kernel-patches directory. You will also need
+#		to create some device special /dev files on your system:
+#			mknod /dev/modules c 10 23
+#			mknod /dev/mtab c 10 22
+#			mknod /dev/ps c 10 21
+#		</HELP>
+#		STATIC_SIZE=0
+#		MIN_DYNAMIC_SIZE=0
+#		STORAGE_SIZE=0
+#		STARTUP_TIME=0
+#		<REQUIRESEXPR>
+#		( enable-bb-feature-use-procfs == "n" )
+#		</REQUIRESEXPR>
+#		<BUILD_VARS>
+#		BB_FEATURE_USE_DEVPS_PATCH=BB_FEATURE_USE_DEVPS_PATCH
+#		</BUILD_VARS>
+#	</OPTION>
+
+	### init.c
+	<OPTION enable-bb-feature-use-inittab>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Enable BB_FEATURE_USE_INITTAB?
+		<HELP>
+		If this busybox compile option "BB_FEATURE_USE_INITTAB" is
+		enabled (recommended), the file /etc/inittab is parsed by the
+		busybox init utility to determine system process initialization
+		actions to be taken. If the /etc/inittab file is not found,
+		default actions of attempting to run the script /etc/rc.d/rcS
+		as well as starting a pair of "askfirst" shells will be taken.
+		
+		The format for the /etc/inittab file that this busybox init
+		uses is different from the inittab format that the standard
+		Linux init uses. Generally speaking, the new format is fairly
+		similar but less featureful than the standard format.
+		</HELP>
+		STATIC_SIZE=0
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=0
+		STARTUP_TIME=0
+		<REQUIRES>
+			keep-bb-init
+			inittab
+		</REQUIRES>
+		<BUILD_VARS>
+		BB_FEATURE_USE_INITTAB=BB_FEATURE_USE_INITTAB
+		</BUILD_VARS>
+	</OPTION>
+
+	### init.c, lsmod.c, mount.c, mtab.c, ps.c, utility.c
+	<OPTION enable-bb-feature-use-procfs>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Enable BB_FEATURE_USE_PROCFS?
+		<HELP>
+		Some commands rely on Linux's /proc filesystem
+		to get information. They will not compile unless
+		this feature is enabled. Any commands requiring
+		this option will direct you to select it before
+		they can be fulfilled.
+		</HELP>
+		STATIC_SIZE=0
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=0
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_FEATURE_USE_PROCFS=BB_FEATURE_USE_PROCFS
+		</BUILD_VARS>
+		<REQUIRES>
+		CONFIG_PROC_FS
+		</REQUIRES>
+	</OPTION>
+
+	### cmdedit.c, more.c
+	<OPTION enable-bb-feature-use-termios>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Enable BB_FEATURE_USE_TERMIOS?
+		<HELP>
+		Use termios to manipulate the screen ('more' requires
+		this to be selected).
+		</HELP>
+		STATIC_SIZE=0
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=0
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_FEATURE_USE_TERMIOS=BB_FEATURE_USE_TERMIOS
+		</BUILD_VARS>
+	</OPTION>
+
+</GROUP>
+### functions ###
+
+<GROUP Misc-utilities>
+	PROMPT=Misc. utilities.
+	DEFAULT_VALUE=1
+	<HELP>
+	Misc. Linux utilities.
+	</HELP>
+	<REQUIRESEXPR>
+		(Misc-utilities == "CHILDREN_ENABLED")
+	</REQUIRESEXPR>
+
+	<OPTION keep-bb-echo>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /bin/echo?
+		<HELP>
+		Echo writes each given string to the standard output,
+		with a space between them and a newline after the last one.
+		</HELP>
+		STATIC_SIZE=1160
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=1156
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_ECHO=BB_ECHO
+		</BUILD_VARS>
+		KEEPLIST=/bin/echo
+		<PROVIDES>
+		echo
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-cut>
+		TYPE=bool
+		DEFAULT_VALUE=0
+		PROMPT=Include /usr/bin/cut?
+		<HELP>
+		Prints selected fields from each input FILE to standard output.
+		</HELP>
+		STATIC_SIZE=11631
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=3128
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_CUT=BB_CUT
+		</BUILD_VARS>
+		KEEPLIST=/usr/bin/cut
+		<PROVIDES>
+		cut
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-dc>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /usr/bin/dc?
+		<HELP>
+		A tiny RPN calculator that understands the following operations:
+		+, -, /, *, and, or, not, eor.
+		</HELP>
+		STATIC_SIZE=2769
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=1944
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_DC=BB_DC
+		</BUILD_VARS>
+		KEEPLIST=/usr/bin/dc
+		<PROVIDES>
+		dc
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-printf>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /usr/bin/printf?
+		<HELP>
+		Format and print data.
+		</HELP>
+		STATIC_SIZE=2644
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=2628
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_PRINTF=BB_PRINTF
+		</BUILD_VARS>
+		KEEPLIST=/usr/bin/printf
+		<PROVIDES>
+		printf
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-sed>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /bin/sed?
+		<HELP>
+		A stream editor for editing an input string.
+		Although it has a rather complete regex engine that has
+		been derived from elvis (the vi-clone), it only supports
+		the s/// command.
+		</HELP>
+		STATIC_SIZE=5703
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=5692
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_SED=BB_SED
+		</BUILD_VARS>
+		KEEPLIST=/bin/sed
+		<PROVIDES>
+		sed
+		</PROVIDES>
+	</OPTION>
+
+#
+# /bin/sh --- Provided by busybox-0.45.tar.gz but not in the Embedix SDK
+#
+#	<OPTION keep-bb-sh>
+#		TYPE=bool
+#		DEFAULT_VALUE=0
+#		PROMPT=Include /bin/sh?
+#		<HELP>
+#		The BusyBox command interpreter (shell).
+####		lash: The BusyBox LAme SHell (command interpreter).
+#		</HELP>
+#		STATIC_SIZE=10420
+#		MIN_DYNAMIC_SIZE=0
+#		STORAGE_SIZE=10396
+#		STARTUP_TIME=0
+#		<BUILD_VARS>
+#		BB_SH=BB_SH
+#		</BUILD_VARS>
+#		<KEEPLIST>
+#		/bin/sh
+#		</KEEPLIST>
+#		<PROVIDES>
+#		sh
+#		</PROVIDES>
+#	</OPTION>
+
+	<OPTION keep-bb-tee>
+		TYPE=bool
+		DEFAULT_VALUE=0
+		PROMPT=Include /bin/tee?
+		<HELP>
+		Read from standard input and write to standard output and/or
+		specified file.
+		</HELP>
+		STATIC_SIZE=1203
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=1184
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_TEE=BB_TEE
+		</BUILD_VARS>
+		KEEPLIST=/bin/tee
+		<PROVIDES>
+		tee
+		</PROVIDES>
+	</OPTION>
+
+#
+# /usr/bin/test --- Provided by busybox-0.45.tar.gz but not in the Embedix SDK
+# /usr/bin/[ --- Provided by busybox-0.45.tar.gz but not in the Embedix SDK
+#
+#	<OPTION keep-bb-test>
+#		TYPE=bool
+#		DEFAULT_VALUE=0
+#		PROMPT=Include /usr/bin/test and /usr/bin/[?
+#		<HELP>
+#		Checks file types and compares values returning an exit
+#		code determined by the value of EXPRESSION.
+#		</HELP>
+#		STATIC_SIZE=4359
+#		MIN_DYNAMIC_SIZE=0
+#		STORAGE_SIZE=4328
+#		STARTUP_TIME=0
+#		<BUILD_VARS>
+#		BB_TEST=BB_TEST
+#		</BUILD_VARS>
+#		<KEEPLIST>
+#		/usr/bin/test
+#		/usr/bin/[
+#		</KEEPLIST>
+#		<PROVIDES>
+#		test
+#		[
+#		</PROVIDES>
+#	</OPTION>
+
+	<OPTION keep-bb-true-false>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /bin/true and /bin/false?
+		<HELP>
+		True -- do nothing, successfully.
+		False -- do nothing, successfully.
+		</HELP>
+		STATIC_SIZE=48
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=32
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_TRUE_FALSE=BB_TRUE_FALSE
+		</BUILD_VARS>
+		<KEEPLIST>
+		/bin/true
+		/bin/false
+		</KEEPLIST>
+		<PROVIDES>
+		true
+		false
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-fbset>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /usr/sbin/fbset?
+		<HELP>
+		Show and modify the frame buffer device settings.
+		</HELP>
+		STATIC_SIZE=2568
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=2580
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_FBSET=BB_FBSET
+		</BUILD_VARS>
+		KEEPLIST=/usr/sbin/fbset
+		<PROVIDES>
+		fbset
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-length>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /usr/bin/length?
+		<HELP>
+		Prints the length of the string given as the first argument.
+		</HELP>
+		STATIC_SIZE=321
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=324
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_LENGTH=BB_LENGTH
+		</BUILD_VARS>
+		KEEPLIST=/usr/bin/length
+		<PROVIDES>
+		length
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-tr>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /usr/bin/tr?
+		<HELP>
+		"tr" copies the standard input to the standard output while performing
+		character translation.
+		</HELP>
+		STATIC_SIZE=19156
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=1976
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_TR=BB_TR
+		</BUILD_VARS>
+		KEEPLIST=/usr/bin/tr
+		<PROVIDES>
+		tr
+		</PROVIDES>
+	</OPTION>
+
+</GROUP>
+
+<GROUP File-compression-utilities>
+	PROMPT=File compression utilities.
+	DEFAULT_VALUE=1
+	<HELP>
+	These utilities can be used for file compression and
+	decompression.
+	</HELP>
+	<REQUIRESEXPR>
+		(File-compression-utilities == "CHILDREN_ENABLED")
+	</REQUIRESEXPR>
+
+	<OPTION keep-bb-gunzip>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /bin/gunzip and /bin/zcat?
+		<HELP>
+		Uncompress files using the gnu compression utility.
+		</HELP>
+		STATIC_SIZE=11860
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=11672
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_GUNZIP=BB_GUNZIP
+		</BUILD_VARS>
+		<KEEPLIST>
+		/bin/gunzip
+		/bin/zcat
+		</KEEPLIST>
+		<PROVIDES>
+		gunzip
+		zcat
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-gzip>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /bin/gzip?
+		<HELP>
+		Compress files using the gnu compression utility.
+		</HELP>
+		STATIC_SIZE=33661
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=22232
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_GZIP=BB_GZIP
+		BB_GUNZIP=BB_GUNZIP
+		</BUILD_VARS>
+		KEEPLIST=/bin/gzip
+		<PROVIDES>
+		gzip
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-tar>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /bin/tar?
+		<HELP>
+		The tar archiving utility.
+		</HELP>
+		STATIC_SIZE=9119
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=9060
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_TAR=BB_TAR
+		</BUILD_VARS>
+		KEEPLIST=/bin/tar
+		<PROVIDES>
+		tar
+		</PROVIDES>
+	</OPTION>
+
+</GROUP>
+
+<GROUP Network-utilities>
+	PROMPT=Network utilities.
+	DEFAULT_VALUE=1
+	<HELP>
+	These utilities can be used to determine the state
+	of the network.
+	</HELP>
+	<REQUIRESEXPR>
+		(Network-utilities == "CHILDREN_ENABLED")
+	</REQUIRESEXPR>
+
+	<OPTION keep-bb-hostname>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /bin/hostname?
+		<HELP>
+		show or set the system's host name
+		</HELP>
+		STATIC_SIZE=1925
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=1936
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_HOSTNAME=BB_HOSTNAME
+		</BUILD_VARS>
+		KEEPLIST=/bin/hostname
+		<PROVIDES>
+		hostname
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-ping>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /bin/ping?
+		<HELP>
+		Send ICMP ECHO_REQUEST packets to the specified
+		network hosts.
+		</HELP>
+		STATIC_SIZE=7677
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=4536
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_PING=BB_PING
+		</BUILD_VARS>
+		KEEPLIST=/bin/ping
+		<PROVIDES>
+		ping
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-nc>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /usr/bin/nc?
+		<HELP>
+		Netcat opens a pipe to IP:port.
+		</HELP>
+		STATIC_SIZE=1388
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=1384
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_NC=BB_NC
+		</BUILD_VARS>
+		KEEPLIST=/usr/bin/nc
+		<PROVIDES>
+		nc
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-nslookup>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /usr/bin/nslookup?
+		<HELP>
+		Query Internet name servers. Unlike the real nslookup,
+		this one does not have the optional interactive mode.
+		</HELP>
+		STATIC_SIZE=1197
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=1196
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_NSLOOKUP=BB_NSLOOKUP
+		</BUILD_VARS>
+		KEEPLIST=/usr/bin/nslookup
+		<PROVIDES>
+		nslookup
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-telnet>
+		TYPE=bool
+		DEFAULT_VALUE=0
+		PROMPT=Include /usr/bin/telnet?
+		<HELP>
+		Telnet is used to establish interactive communication with
+		another computer over a network using the TELNET protocol.
+		</HELP>
+		STATIC_SIZE=4021
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=3896
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_TELNET=BB_TELNET
+		</BUILD_VARS>
+		<KEEPLIST>
+		/usr/bin/telnet
+		</KEEPLIST>
+		<PROVIDES>
+		telnet
+		</PROVIDES>
+	</OPTION>
+
+</GROUP>
+
+<GROUP Process-utilities>
+	PROMPT=Process status utilities?
+	DEFAULT_VALUE=1
+	<HELP>
+	These utilities can be used to start and stop processes and
+	determine the current state.
+	</HELP>
+	<REQUIRESEXPR>
+		(Process-utilities == "CHILDREN_ENABLED")
+	</REQUIRESEXPR>
+
+	<OPTION keep-bb-kill>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /bin/kill?
+		<HELP>
+		kill sends the specified signal to the specified process.
+		If no signal name is specified, SIGTERM is sent.
+		</HELP>
+		STATIC_SIZE=1610
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=1596
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_KILL=BB_KILL
+		</BUILD_VARS>
+		KEEPLIST=/bin/kill
+		<PROVIDES>
+		kill
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-killall>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /usr/bin/killall?
+		<HELP>
+		Killall sends a signal to all processes running any of
+		the specified commands. If no signal name is specified,
+		SIGTERM is sent.
+		</HELP>
+		STATIC_SIZE=2989
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=2988
+		STARTUP_TIME=0
+		<REQUIRES>
+		enable-bb-feature-use-procfs
+		</REQUIRES>
+		<BUILD_VARS>
+		BB_KILLALL=BB_KILLALL
+		BB_KILL=BB_KILL
+		</BUILD_VARS>
+		KEEPLIST=/usr/bin/killall
+		<PROVIDES>
+		killall
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-lsmod>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /sbin/lsmod?
+		<HELP>
+		List loaded modules.
+		</HELP>
+		STATIC_SIZE=826
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=820
+		STARTUP_TIME=0
+		<REQUIRES>
+		enable-bb-feature-use-procfs
+		</REQUIRES>
+		<BUILD_VARS>
+		BB_LSMOD=BB_LSMOD
+		BB_CAT=BB_CAT
+		</BUILD_VARS>
+		KEEPLIST=/sbin/lsmod
+		<PROVIDES>
+		lsmod
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-ps>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /bin/ps?
+		<HELP>
+		Report process status. This ps implementation does not
+		support any command-line options.
+		</HELP>
+		STATIC_SIZE=3035
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=3040
+		STARTUP_TIME=0
+		<REQUIRES>
+		enable-bb-feature-use-procfs
+		</REQUIRES>
+		<BUILD_VARS>
+		BB_PS=BB_PS
+		</BUILD_VARS>
+		KEEPLIST=/bin/ps
+		<PROVIDES>
+		ps
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-rmmod>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /sbin/rmmod?
+		<HELP>
+		Remove loaded modules.
+		</HELP>
+		STATIC_SIZE=600
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=584
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_RMMOD=BB_RMMOD
+		</BUILD_VARS>
+		KEEPLIST=/sbin/rmmod
+		<PROVIDES>
+		rmmod
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-sleep>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /bin/sleep?
+		<HELP>
+		Delay a process for a specified amount of time.
+		</HELP>
+		STATIC_SIZE=400
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=396
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_SLEEP=BB_SLEEP
+		</BUILD_VARS>
+		KEEPLIST=/bin/sleep
+		<PROVIDES>
+		sleep
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-usleep>
+		TYPE=bool
+		DEFAULT_VALUE=0
+		PROMPT=Include /bin/usleep?
+		<HELP>
+		Usleep delays a process for a specified number of
+		microseconds. The default is 1000 (1 millisecond).
+		</HELP>
+		STATIC_SIZE=328
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=328
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_USLEEP=BB_USLEEP
+		</BUILD_VARS>
+		KEEPLIST=/bin/usleep
+		<PROVIDES>
+		usleep
+		</PROVIDES>
+	</OPTION>
+
+</GROUP>
+
+<GROUP Directory-utilities>
+	PROMPT=Directory utilities?
+	DEFAULT_VALUE=1
+	<HELP>
+	These utilities are useful for disk management.
+	</HELP>
+	<REQUIRESEXPR>
+		(Directory-utilities == "CHILDREN_ENABLED")
+	</REQUIRESEXPR>
+
+	<OPTION keep-bb-mkdir>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /bin/mkdir?
+		<HELP>
+		Make directories.
+		</HELP>
+		STATIC_SIZE=2118
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=2124
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_MKDIR=BB_MKDIR
+		</BUILD_VARS>
+		KEEPLIST=/bin/mkdir
+		<PROVIDES>
+		mkdir
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-rmdir>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /bin/rmdir?
+		<HELP>
+		Remove empty directories.
+		</HELP>
+		STATIC_SIZE=478
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=460
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_RMDIR=BB_RMDIR
+		</BUILD_VARS>
+		KEEPLIST=/bin/rmdir
+		<PROVIDES>
+		rmdir
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-basename>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /usr/bin/basename?
+		<HELP>
+		Basename removes any leading directory components
+		from a slash-delimited filename.
+		</HELP>
+		STATIC_SIZE=601
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=592
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_BASENAME=BB_BASENAME
+		</BUILD_VARS>
+		KEEPLIST=/usr/bin/basename
+		<PROVIDES>
+		basename
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-dirname>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /usr/bin/dirname?
+		<HELP>
+		Dirname prints all but the final slash-delimited component
+		of filename. If filename is a single component, dirname
+		prints `.' (meaning the current directory).
+		</HELP>
+		STATIC_SIZE=427
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=424
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_DIRNAME=BB_DIRNAME
+		</BUILD_VARS>
+		KEEPLIST=/usr/bin/dirname
+		<PROVIDES>
+		dirname
+		</PROVIDES>
+	</OPTION>
+
+</GROUP>
+
+<GROUP User-info-utilities>
+	PROMPT=User information utilities?
+	DEFAULT_VALUE=1
+	<HELP>
+	Determine the current user using these utilities.
+	</HELP>
+	<REQUIRESEXPR>
+		(User-info-utilities == "CHILDREN_ENABLED")
+	</REQUIRESEXPR>
+
+	<OPTION keep-bb-id>
+		TYPE=bool
+		DEFAULT_VALUE=0
+		PROMPT=Include /usr/bin/id?
+		<HELP>
+		Print information for USERNAME or the current user.
+		</HELP>
+		STATIC_SIZE=1822
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=1828
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_ID=BB_ID
+		</BUILD_VARS>
+		KEEPLIST=/usr/bin/id
+		<PROVIDES>
+		id
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-logname>
+		TYPE=bool
+		DEFAULT_VALUE=0
+		PROMPT=Include /usr/bin/logname?
+		<HELP>
+		Print user's login name
+		</HELP>
+		STATIC_SIZE=1248
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=1240
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_LOGNAME=BB_LOGNAME
+		</BUILD_VARS>
+		KEEPLIST=/usr/bin/logname
+		<PROVIDES>
+		logname
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-whoami>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /usr/bin/whoami?
+		<HELP>
+		Print the userid of the current window.
+		</HELP>
+		STATIC_SIZE=1376
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=1368
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_WHOAMI=BB_WHOAMI
+		</BUILD_VARS>
+		KEEPLIST=/usr/bin/whoami
+		<PROVIDES>
+		whoami
+		</PROVIDES>
+	</OPTION>
+
+</GROUP>
+
+<GROUP Disk-info-utilities>
+	PROMPT=Disk information utilities?
+	DEFAULT_VALUE=1
+	<HELP>
+	Determine the current state of disks and disk usage
+	using these utilities.
+	</HELP>
+	<REQUIRESEXPR>
+		(Disk-info-utilities == "CHILDREN_ENABLED")
+	</REQUIRESEXPR>
+
+	<OPTION keep-bb-df>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /bin/df?
+		<HELP>
+		Report mounted filesystems.
+		</HELP>
+		STATIC_SIZE=2228
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=2216
+		STARTUP_TIME=0
+		<REQUIRES>
+		enable-bb-feature-use-procfs
+		</REQUIRES>
+		<BUILD_VARS>
+		BB_DF=BB_DF
+		</BUILD_VARS>
+		KEEPLIST=/bin/df
+		<PROVIDES>
+		df
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-du>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /bin/du?
+		<HELP>
+		Estimate the file space usage.
+		</HELP>
+		STATIC_SIZE=3617
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=2328
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_DU=BB_DU
+		BB_TAIL=BB_TAIL
+		</BUILD_VARS>
+		KEEPLIST=/bin/du
+		<PROVIDES>
+		du
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-fdflush>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /bin/fdflush?
+		<HELP>
+		force floppy disk drive to detect disk change
+		</HELP>
+		STATIC_SIZE=432
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=428
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_FDFLUSH=BB_FDFLUSH
+		</BUILD_VARS>
+		KEEPLIST=/bin/fdflush
+		<PROVIDES>
+		fdflush
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-find>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /usr/bin/find?
+		<HELP>
+		Search for a specified file/files in a directory hierarchy.
+		This supports only the -name, -follow, and -print options.
+		</HELP>
+		STATIC_SIZE=2481
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=2488
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_FIND=BB_FIND
+		</BUILD_VARS>
+		KEEPLIST=/usr/bin/find
+		<PROVIDES>
+		find
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-mkfifo>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /usr/bin/mkfifo?
+		<HELP>
+		Make FIFOs (named pipes).
+		</HELP>
+		STATIC_SIZE=1087
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=1068
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_MKFIFO=BB_MKFIFO
+		</BUILD_VARS>
+		KEEPLIST=/usr/bin/mkfifo
+		<PROVIDES>
+		mkfifo
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-mknod>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /bin/mknod?
+		<HELP>
+		Make block or character special file, especially a
+		device file for a device driver.
+		</HELP>
+		STATIC_SIZE=1653
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=1656
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_MKNOD=BB_MKNOD
+		</BUILD_VARS>
+		KEEPLIST=/bin/mknod
+		<PROVIDES>
+		mknod
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-mount>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /bin/mount?
+		<HELP>
+		Mount a specified file system.
+		</HELP>
+		STATIC_SIZE=5156
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=5164
+		STARTUP_TIME=0
+		<REQUIRES>
+		enable-bb-feature-use-procfs
+		</REQUIRES>
+		<BUILD_VARS>
+		BB_MOUNT=BB_MOUNT
+		</BUILD_VARS>
+		KEEPLIST=/bin/mount
+		<PROVIDES>
+		mount
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-pwd>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /bin/pwd?
+		<HELP>
+		Print the name of the current working directory.
+		</HELP>
+		STATIC_SIZE=408
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=400
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_PWD=BB_PWD
+		</BUILD_VARS>
+		KEEPLIST=/bin/pwd
+		<PROVIDES>
+		pwd
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-sync>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /bin/sync?
+		<HELP>
+		Flush filesystem buffers.
+		</HELP>
+		STATIC_SIZE=255
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=260
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_SYNC=BB_SYNC
+		</BUILD_VARS>
+		KEEPLIST=/bin/sync
+		<PROVIDES>
+		sync
+		</PROVIDES>
+	</OPTION>
+
+###
+### /sbin/update (Removed as functionality is in 2.x kernel)
+###
+
+	<OPTION keep-bb-umount>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /bin/umount?
+		<HELP>
+		Unmount the specified file system.
+		</HELP>
+		STATIC_SIZE=2754
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=2756
+		STARTUP_TIME=0
+		<REQUIRES>
+		enable-bb-feature-use-procfs
+		</REQUIRES>
+		<BUILD_VARS>
+		BB_UMOUNT=BB_UMOUNT
+		</BUILD_VARS>
+		KEEPLIST=/bin/umount
+		<PROVIDES>
+		umount
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-which>
+		TYPE=bool
+		DEFAULT_VALUE=0
+		PROMPT=Include /usr/bin/which?
+		<HELP>
+		Locates a COMMAND.
+		</HELP>
+		STATIC_SIZE=1007
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=1016
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_WHICH=BB_WHICH
+		</BUILD_VARS>
+		KEEPLIST=/usr/bin/which
+		<PROVIDES>
+		which
+		</PROVIDES>
+	</OPTION>
+
+</GROUP>
+
+<GROUP Screen-utilities>
+	PROMPT=Console and screen utilities?
+	DEFAULT_VALUE=1
+	<HELP>
+	Screen manipulation utilities are include in this group.
+	</HELP>
+	<REQUIRESEXPR>
+		(Screen-utilities == "CHILDREN_ENABLED")
+	</REQUIRESEXPR>
+
+	<OPTION keep-bb-chvt>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /usr/bin/chvt?
+		<HELP>
+		Change foreground virtual terminal.
+		</HELP>
+		STATIC_SIZE=1122
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=1112
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_CHVT=BB_CHVT
+		</BUILD_VARS>
+		KEEPLIST=/usr/bin/chvt
+		<PROVIDES>
+		chvt
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-clear>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /usr/bin/clear?
+		<HELP>
+		Clear the terminal screen.
+		</HELP>
+		STATIC_SIZE=161
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=164
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_CLEAR=BB_CLEAR
+		</BUILD_VARS>
+		KEEPLIST=/usr/bin/clear
+		<PROVIDES>
+		clear
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-deallocvt>
+		TYPE=bool
+		DEFAULT_VALUE=0
+		PROMPT=Include /usr/bin/deallocvt?
+		<HELP>
+		Deallocate unused virtual consoles.
+		</HELP>
+		STATIC_SIZE=1302
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=1304
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_DEALLOCVT=BB_DEALLOCVT
+		</BUILD_VARS>
+		KEEPLIST=/usr/bin/deallocvt
+		<PROVIDES>
+		deallocvt
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-dumpkmap>
+		TYPE=bool
+		DEFAULT_VALUE=0
+		PROMPT=Include /bin/dumpkmap?
+		<HELP>
+		Dumps/Prints out a binary keyboard translation table to stdout.
+		</HELP>
+		STATIC_SIZE=1013
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=1016
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_DUMPKMAP=BB_DUMPKMAP
+		</BUILD_VARS>
+		KEEPLIST=/bin/dumpkmap
+		<PROVIDES>
+		dumpkmap
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-loadacm>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /usr/bin/loadacm?
+		<HELP>
+		Load ascii character map.
+		</HELP>
+		STATIC_SIZE=4690
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=4668
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_LOADACM=BB_LOADACM
+		</BUILD_VARS>
+		KEEPLIST=/usr/bin/loadacm
+		<PROVIDES>
+		loadacm
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-loadfont>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /usr/bin/loadfont?
+		<HELP>
+		Load console screen font.
+		This is similar to setfont(1) and consolechars(1).
+		</HELP>
+		STATIC_SIZE=2103
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=2084
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_LOADFONT=BB_LOADFONT
+		</BUILD_VARS>
+		KEEPLIST=/usr/bin/loadfont
+		<PROVIDES>
+		loadfont
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-loadkmap>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /sbin/loadkmap?
+		<HELP>
+		Load a binary keyboard translation map from stdin.
+		</HELP>
+		STATIC_SIZE=1206
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=1208
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_LOADKMAP=BB_LOADKMAP
+		</BUILD_VARS>
+		KEEPLIST=/sbin/loadkmap
+		<PROVIDES>
+		loadkmap
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-tty>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /usr/bin/tty?
+		<HELP>
+		Print the file name of the terminal connected to
+		standard input
+		</HELP>
+		STATIC_SIZE=514
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=524
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_TTY=BB_TTY
+		</BUILD_VARS>
+		KEEPLIST=/usr/bin/tty
+		<PROVIDES>
+		tty
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-yes>
+		TYPE=bool
+		DEFAULT_VALUE=0
+		PROMPT=Include /usr/bin/yes?
+		<HELP>
+		Output a string repeatedly until killed.
+		</HELP>
+		STATIC_SIZE=618
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=624
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_YES=BB_YES
+		</BUILD_VARS>
+		KEEPLIST=/usr/bin/yes
+		<PROVIDES>
+		yes
+		</PROVIDES>
+	</OPTION>
+
+</GROUP>
+
+<GROUP System-utilities>
+	PROMPT=System utilities?
+	DEFAULT_VALUE=1
+	<HELP>
+	Many of the system commands are found in this group.
+	</HELP>
+	<REQUIRESEXPR>
+		(System-utilities == "CHILDREN_ENABLED")
+	</REQUIRESEXPR>
+
+	<OPTION keep-bb-chroot>
+		TYPE=bool
+		DEFAULT_VALUE=0
+		PROMPT=Include /sbin/chroot?
+		<HELP>
+		Run command or interactive shell with special root directory.
+		</HELP>
+		STATIC_SIZE=882
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=892
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_CHROOT=BB_CHROOT
+		</BUILD_VARS>
+		KEEPLIST=/sbin/chroot
+		<PROVIDES>
+		chroot
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-date>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /bin/date?
+		<HELP>
+		Print or set the system date and time.
+		</HELP>
+		STATIC_SIZE=2549
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=2536
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_DATE=BB_DATE
+		</BUILD_VARS>
+		KEEPLIST=/bin/date
+		<PROVIDES>
+		date
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-dmesg>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /bin/dmesg?
+		<HELP>
+		Print or control the kernel ring buffer.
+		</HELP>
+		STATIC_SIZE=972
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=976
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_DMESG=BB_DMESG
+		</BUILD_VARS>
+		KEEPLIST=/bin/dmesg
+		<PROVIDES>
+		dmesg
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-dutmp>
+		TYPE=bool
+		DEFAULT_VALUE=0
+		PROMPT=Include /usr/sbin/dutmp?
+		<HELP>
+		Take utmp formatted input from stdin or a file and return
+		human-readable output on stdout
+		</HELP>
+		STATIC_SIZE=918
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=924
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_DUTMP=BB_DUTMP
+		</BUILD_VARS>
+		KEEPLIST=/usr/sbin/dutmp
+		<PROVIDES>
+		dutmp
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-free>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /usr/bin/free?
+		<HELP>
+		Display amount of free and used memory in the system.
+		</HELP>
+		STATIC_SIZE=818
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=808
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_FREE=BB_FREE
+		BB_CAT=BB_CAT
+		</BUILD_VARS>
+		KEEPLIST=/usr/bin/free
+		<PROVIDES>
+		free
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-freeramdisk>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /sbin/freeramdisk?
+		<HELP>
+		Frees all memory used by the specified ramdisk.
+		</HELP>
+		STATIC_SIZE=693
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=688
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_FREERAMDISK=BB_FREERAMDISK
+		</BUILD_VARS>
+		KEEPLIST=/sbin/freeramdisk
+		<PROVIDES>
+		freeramdisk
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-fsck.minix>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /sbin/fsck.minix?
+		<HELP>
+		A file system consistency checker for Minux.
+		</HELP>
+		STATIC_SIZE=23205
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=14904
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_FSCK_MINIX=BB_FSCK_MINIX
+		</BUILD_VARS>
+		KEEPLIST=/sbin/fsck.minix
+		<PROVIDES>
+		fsck.minix
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-halt>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /sbin/halt?
+		<HELP>
+		Stop the system.
+		</HELP>
+		STATIC_SIZE=159
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=164
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_HALT=BB_HALT
+		</BUILD_VARS>
+		KEEPLIST=/sbin/halt
+		<PROVIDES>
+		halt
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-hostid>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /usr/bin/hostid?
+		<HELP>
+		Print the numeric identifier for the current host.
+		</HELP>
+		STATIC_SIZE=237
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=232
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_HOSTID=BB_HOSTID
+		</BUILD_VARS>
+		KEEPLIST=/usr/bin/hostid
+		<PROVIDES>
+		hostid
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-init>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /sbin/init?
+		<HELP>
+		The /sbin/init utility controls system process initialization.
+		If this is selected (recommended) and the busybox compile
+		option "BB_FEATURE_USE_INITTAB" is enabled (recommended), the
+		file /etc/inittab is parsed to determine any actions to be
+		taken.  If the option "BB_FEATURE_USE_INITTAB" is not enabled,
+		then default actions include attempting to run the script
+		/etc/rc.d/rcS as well as starting a pair of "askfirst" shells.
+		If the option "BB_FEATURE_USE_INITTAB" is enabled and the
+		/etc/inittab file is not found, busybox init will act as if
+		the "BB_FEATURE_USE_INITTAB" was not enabled.
+
+		The format for the /etc/inittab file that this busybox init
+		uses is different from the inittab format that the standard
+		Linux init uses. Generally speaking, the new format is fairly
+		similar but less featureful than the standard format.
+		</HELP>
+		STATIC_SIZE=7919
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=7928
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_INIT=BB_INIT
+		</BUILD_VARS>
+		<KEEPLIST>
+			/sbin/init
+			%attr(644,root,utmp) /var/run/utmp
+			%attr(644,root,utmp) /var/log/wtmp
+		</KEEPLIST>
+		<PROVIDES>
+			init
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-insmod>
+		TYPE=bool
+		DEFAULT_VALUE=0
+		PROMPT=Include /sbin/insmod?
+		<HELP>
+		Loads the specified kernel modules into the kernel.
+		</HELP>
+		STATIC_SIZE=32622
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=32624
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_INSMOD=BB_INSMOD
+		BB_FEATURE_INSMOD_NEW_KERNEL=BB_FEATURE_INSMOD_NEW_KERNEL
+		</BUILD_VARS>
+		<KEEPLIST>
+		/sbin/insmod
+		</KEEPLIST>
+		<PROVIDES>
+		insmod
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-logger>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /usr/bin/logger?
+		<HELP>
+		Process control initialization.
+		</HELP>
+		STATIC_SIZE=3034
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=3020
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_LOGGER=BB_LOGGER
+		</BUILD_VARS>
+		KEEPLIST=/usr/bin/logger
+		<PROVIDES>
+		logger
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-makedevs>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /sbin/makedevs?
+		<HELP>
+		Make a range of device files quickly.
+		</HELP>
+		STATIC_SIZE=1487
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=1496
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_MAKEDEVS=BB_MAKEDEVS
+		</BUILD_VARS>
+		KEEPLIST=/sbin/makedevs
+		<PROVIDES>
+		makedevs
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-mkfs.minix>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /sbin/mkfs.minix?
+		<HELP>
+		Make a Linux MINIX filesystem.
+		</HELP>
+		STATIC_SIZE=29247
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=10296
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_MKFS_MINIX=BB_MKFS_MINIX
+		</BUILD_VARS>
+		KEEPLIST=/sbin/mkfs.minix
+		<PROVIDES>
+		mkfs.minix
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-mkswap>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /sbin/mkswap?
+		<HELP>
+		Set up a Linux swap area.
+		</HELP>
+		STATIC_SIZE=4341
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=4320
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_MKSWAP=BB_MKSWAP
+		</BUILD_VARS>
+		KEEPLIST=/sbin/mkswap
+		<PROVIDES>
+		mkswap
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-mt>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /bin/mt?
+		<HELP>
+		Control magnetic tape drive operation.
+		</HELP>
+		STATIC_SIZE=1255
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=1264
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_MT=BB_MT
+		</BUILD_VARS>
+		KEEPLIST=/bin/mt
+		<PROVIDES>
+		mt
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-poweroff>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /sbin/poweroff?
+		<HELP>
+		Stop the system.
+		</HELP>
+		STATIC_SIZE=159
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=164
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_POWEROFF=BB_POWEROFF
+		BB_INIT=BB_INIT
+		</BUILD_VARS>
+		KEEPLIST=/sbin/poweroff
+		<PROVIDES>
+		poweroff
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-reboot>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /sbin/reboot?
+		<HELP>
+		Stop all process and reboot the system.
+		</HELP>
+		STATIC_SIZE=159
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=164
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_REBOOT=BB_REBOOT
+		</BUILD_VARS>
+		KEEPLIST=/sbin/reboot
+		<PROVIDES>
+		reboot
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-setkeycodes>
+		TYPE=bool
+		DEFAULT_VALUE=0
+		PROMPT=Include /usr/bin/setkeycodes?
+		<HELP>
+		Set entries into the kernel's scancode-to-keycode map,
+		allowing unusual keyboards to generate usable keycodes.
+		</HELP>
+		STATIC_SIZE=1595
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=1596
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_SETKEYCODES=BB_SETKEYCODES
+		</BUILD_VARS>
+		KEEPLIST=/usr/bin/setkeycodes
+		<PROVIDES>
+		setkeycodes
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-swaponoff>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /sbin/swapon and /sbin/swapoff?
+		<HELP>
+		Enable/disable devices and files for paging and swapping.
+		</HELP>
+		STATIC_SIZE=1349
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=1336
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_SWAPONOFF=BB_SWAPONOFF
+		</BUILD_VARS>
+		<KEEPLIST>
+		/sbin/swapon
+		/sbin/swapoff
+		</KEEPLIST>
+		<PROVIDES>
+		swapon
+		swapoff
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-syslogd>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /sbin/syslogd?
+		<HELP>
+		Linux system logging utilities. This facility is usually
+		invoked via an init script. Unlike the full syslogd, this
+		does not support remote logging.
+		</HELP>
+		STATIC_SIZE=13558
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=13528
+		STARTUP_TIME=0
+		<REQUIRES>
+		sh
+		uname
+		echo
+		sleep
+		killall
+		basename
+		CONFIG_UNIX
+		</REQUIRES>
+		<BUILD_VARS>
+		BB_SYSLOGD=BB_SYSLOGD
+		</BUILD_VARS>
+		<KEEPLIST>
+		/sbin/syslogd
+		/etc/rc.d/init.d/S05syslog
+		</KEEPLIST>
+		<PROVIDES>
+		syslog
+		syslogd
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-uname>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /bin/uname?
+		<HELP>
+		Print system information.
+		</HELP>
+		STATIC_SIZE=1335
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=1328
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_UNAME=BB_UNAME
+		</BUILD_VARS>
+		KEEPLIST=/bin/uname
+		<PROVIDES>
+		uname
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-uptime>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /usr/bin/uptime?
+		<HELP>
+		Uptime gives a one line display of the current time,
+		how long the system has been running, how many users
+		are currently logged on, and the system load
+		averages for the past 1, 5, and 15 minutes.
+		</HELP>
+		STATIC_SIZE=1093
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=1104
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_UPTIME=BB_UPTIME
+		</BUILD_VARS>
+		KEEPLIST=/usr/bin/uptime
+		<PROVIDES>
+		uptime
+		</PROVIDES>
+	</OPTION>
+
+</GROUP>
+
+<GROUP File-manipulation-utilities>
+	PROMPT=File utilities?
+	DEFAULT_VALUE=1
+	<HELP>
+	The different file manipulation utilities are
+	found in this group.
+	</HELP>
+	<REQUIRESEXPR>
+		(File-manipulation-utilities == "CHILDREN_ENABLED")
+	</REQUIRESEXPR>
+
+	<OPTION keep-bb-ar>
+		TYPE=bool
+		DEFAULT_VALUE=0
+		PROMPT=Include /usr/bin/ar?
+		<HELP>
+		Extract or list files from an ar archive.
+		</HELP>
+		STATIC_SIZE=4192
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=4164
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_AR=BB_AR
+		</BUILD_VARS>
+		KEEPLIST=/usr/bin/ar
+		<PROVIDES>
+		ar
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-cat>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /bin/cat?
+		<HELP>
+		Concatenate files and print on the standard output.
+		</HELP>
+		STATIC_SIZE=750
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=680
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_CAT=BB_CAT
+		</BUILD_VARS>
+		KEEPLIST=/bin/cat
+		<PROVIDES>
+		cat
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-chmod-chown-chrgrp>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /bin/chmod, /bin/chown, /bin/chgrp?
+		<HELP>
+		chmod -- change file access permissions.
+		chown -- change file ownership.
+		chgrp -- change file group ownership.
+		</HELP>
+		STATIC_SIZE=4401
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=4376
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_CHMOD_CHOWN_CHGRP=BB_CHMOD_CHOWN_CHGRP
+		</BUILD_VARS>
+		<KEEPLIST>
+		/bin/chmod
+		/bin/chown
+		/bin/chgrp
+		</KEEPLIST>
+		<PROVIDES>
+		chmod
+		chown
+		chgrp
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-cp-mv>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /bin/cp and /bin/mv?
+		<HELP>
+		cp -- copy files and directories
+		mv -- move files and directories
+		</HELP>
+		STATIC_SIZE=6811
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=6784
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_CP_MV=BB_CP_MV
+		BB_TAIL=BB_TAIL
+		</BUILD_VARS>
+		<KEEPLIST>
+		/bin/cp
+		/bin/mv
+		</KEEPLIST>
+		<PROVIDES>
+		cp
+		mv
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-dd>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /bin/dd?
+		<HELP>
+		convert and copy a file
+		</HELP>
+		STATIC_SIZE=3996
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=4004
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_DD=BB_DD
+		</BUILD_VARS>
+		KEEPLIST=/bin/dd
+		<PROVIDES>
+		dd
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-grep>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /bin/grep?
+		<HELP>
+		This prints lines matching a pattern. This only supports
+		the -n (print line numbers), -i (ignore case), and -q (quiet)
+		options.
+		</HELP>
+		STATIC_SIZE=2949
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=2904
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_GREP=BB_GREP
+		</BUILD_VARS>
+		KEEPLIST=/bin/grep
+		<PROVIDES>
+		grep
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-head>
+		TYPE=bool
+		DEFAULT_VALUE=0
+		PROMPT=Include /bin/head?
+		<HELP>
+		output the first part of files
+		</HELP>
+		STATIC_SIZE=1390
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=1372
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_HEAD=BB_HEAD
+		</BUILD_VARS>
+		KEEPLIST=/bin/head
+		<PROVIDES>
+		head
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-ln>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /bin/ln?
+		<HELP>
+		make links between files
+		</HELP>
+		STATIC_SIZE=1858
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=1848
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_LN=BB_LN
+		BB_TAIL=BB_TAIL
+		</BUILD_VARS>
+		KEEPLIST=/bin/ln
+		<PROVIDES>
+		ln
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-ls>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /bin/ls?
+		<HELP>
+		This lists directory contents. It is much slimmer
+		than GNU/ls, yet it supports quite a few options.
+		It behaves more like a BSD/ls.
+		</HELP>
+		STATIC_SIZE=4333
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=4324
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_LS=BB_LS
+		</BUILD_VARS>
+		KEEPLIST=/bin/ls
+		<PROVIDES>
+		ls
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-md5sum>
+		TYPE=bool
+		DEFAULT_VALUE=0
+		PROMPT=Include /usr/bin/md5sum?
+		<HELP>
+		Print or check MD5 checksums.
+		</HELP>
+		STATIC_SIZE=7620
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=7588
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_MD5SUM=BB_MD5SUM
+		</BUILD_VARS>
+		KEEPLIST=/usr/bin/md5sum
+		<PROVIDES>
+		md5sum
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-mktemp>
+		TYPE=bool
+		DEFAULT_VALUE=0
+		PROMPT=Include /bin/mktemp?
+		<HELP>
+		Creates a temporary file with its name based on TEMPLATE.
+		</HELP>
+		STATIC_SIZE=505
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=488
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_MKTEMP=BB_MKTEMP
+		</BUILD_VARS>
+		KEEPLIST=/bin/mktemp
+		<PROVIDES>
+		mktemp
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-more>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /bin/more?
+		<HELP>
+		File display utility for crt viewing.
+		</HELP>
+		STATIC_SIZE=1294
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=1288
+		STARTUP_TIME=0
+		<REQUIRES>
+		enable-bb-feature-use-termios
+		</REQUIRES>
+		<BUILD_VARS>
+		BB_MORE=BB_MORE
+		</BUILD_VARS>
+		KEEPLIST=/bin/more
+		<PROVIDES>
+		more
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-rm>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /bin/rm?
+		<HELP>
+		Remove files or directories.
+		</HELP>
+		STATIC_SIZE=2159
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=2144
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_RM=BB_RM
+		BB_FIND=BB_FIND
+		</BUILD_VARS>
+		KEEPLIST=/bin/rm
+		<PROVIDES>
+		rm
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-sort>
+		TYPE=bool
+		DEFAULT_VALUE=0
+		PROMPT=Include /bin/sort?
+		<HELP>
+		Sort lines of text files. It can sort by ascii-order
+		or numeric and it can reverse either criteria. One
+		major difference between this and GNU/sort is that one
+		cannot pick an arbitrary column to sort on -- it can
+		only see lines in their entirety.
+		</HELP>
+		STATIC_SIZE=1300
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=1300
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_SORT=BB_SORT
+		</BUILD_VARS>
+		KEEPLIST=/bin/sort
+		<PROVIDES>
+		sort
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-tail>
+		TYPE=bool
+		DEFAULT_VALUE=0
+		PROMPT=Include /usr/bin/tail?
+		<HELP>
+		Output the last part of a file.
+		</HELP>
+		STATIC_SIZE=6800
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=6750
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_TAIL=BB_TAIL
+		</BUILD_VARS>
+		KEEPLIST=/usr/bin/tail
+		<PROVIDES>
+		tail
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-touch>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /usr/bin/touch?
+		<HELP>
+		Change file timestamps or create a file if it doesn't
+		exist.
+		</HELP>
+		STATIC_SIZE=765
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=756
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_TOUCH=BB_TOUCH
+		</BUILD_VARS>
+		KEEPLIST=/usr/bin/touch
+		<PROVIDES>
+		touch
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-uniq>
+		TYPE=bool
+		DEFAULT_VALUE=1
+		PROMPT=Include /usr/bin/uniq?
+		<HELP>
+		Remove duplicate lines from a sorted file.
+		</HELP>
+		STATIC_SIZE=9432
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=1208
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_UNIQ=BB_UNIQ
+		</BUILD_VARS>
+		KEEPLIST=/usr/bin/uniq
+		<PROVIDES>
+		uniq
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-uuencode>
+		TYPE=bool
+		DEFAULT_VALUE=0
+		PROMPT=Include /usr/bin/uuencode?
+		<HELP>
+		Uuencode a file.
+		</HELP>
+		STATIC_SIZE=2222
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=2220
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_UUENCODE=BB_UUENCODE
+		</BUILD_VARS>
+		KEEPLIST=/usr/bin/uuencode
+		<PROVIDES>
+		uuencode
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-uudecode>
+		TYPE=bool
+		DEFAULT_VALUE=0
+		PROMPT=Include /usr/bin/uudecode?
+		<HELP>
+		Uudecode a file that is uuencoded.
+		</HELP>
+		STATIC_SIZE=3284
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=3276
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_UUDECODE=BB_UUDECODE
+		</BUILD_VARS>
+		KEEPLIST=/usr/bin/uudecode
+		<PROVIDES>
+		uudecode
+		</PROVIDES>
+	</OPTION>
+
+	<OPTION keep-bb-wc>
+		TYPE=bool
+		DEFAULT_VALUE=0
+		PROMPT=Include /usr/bin/wc?
+		<HELP>
+		Print the number of bytes, words, and lines in files.
+		</HELP>
+		STATIC_SIZE=1954
+		MIN_DYNAMIC_SIZE=0
+		STORAGE_SIZE=1912
+		STARTUP_TIME=0
+		<BUILD_VARS>
+		BB_WC=BB_WC
+		</BUILD_VARS>
+		KEEPLIST=/usr/bin/wc
+		<PROVIDES>
+		wc
+		</PROVIDES>
+	</OPTION>
+
+</GROUP>
+
+</COMPONENT>
+</GROUP>
+</GROUP>
+

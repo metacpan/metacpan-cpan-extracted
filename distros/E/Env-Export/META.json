@@ -1,0 +1,55 @@
+{
+   "abstract" : "Automatically export environment variables as constant-subs",
+   "author" : [
+      "Randy J. Ray <rjray@blackperl.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110930001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Env-Export",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Spec" : "3.0",
+            "Module::Build" : "0.28",
+            "Test::More" : "0.80"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.006001"
+         }
+      }
+   },
+   "provides" : {
+      "Env::Export" : {
+         "file" : "lib/Env/Export.pm",
+         "version" : "0.22"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Env-Export"
+      },
+      "homepage" : "http://search.cpan.org/dist/Env-Export",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/rjray/env-export"
+      }
+   },
+   "version" : "0.22"
+}

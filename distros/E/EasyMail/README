@@ -1,0 +1,26 @@
+OVERVIEW
+
+The EasyMail.pm module aims to provide a easy to use perl Send Mail Interface
+
+All of these feature is in a easy way.
+
+INSTALLATION
+
+To install this module type the following in the distribution
+directory:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+or simply copy EasyMail.pm to your lib path
+
+To uninstall this module type the following:
+
+rm -rdf `cat /usr/lib/perl5/site_perl/5.8.5/i386-linux-thread-multi/auto/EasyMail/.packlist` /usr/lib/perl5/site_perl/5.8.5/i386-linux-thread-multi/auto/EasyMail
+
+
+Author
+	QIAN YU / foolfish@cpan.org
+	Kylin Huang / huang.shuai@adways.net

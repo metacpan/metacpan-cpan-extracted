@@ -1,0 +1,8 @@
+Build.PL
+Changes
+lib/Encode/Repair.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+t/01-fix-double.t
+t/02-learn.t

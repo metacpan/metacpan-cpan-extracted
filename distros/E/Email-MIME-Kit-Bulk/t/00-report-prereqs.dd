@@ -1,0 +1,54 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Test::More' => '0.96',
+                                      'Test::Vars' => '0'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Email::MIME' => '0',
+                                      'Email::MIME::Kit' => '3.000005',
+                                      'Email::MIME::Kit::ManifestReader::JSON' => '0',
+                                      'Email::MIME::Kit::Renderer::TT' => '0',
+                                      'Email::Sender::Simple' => '0',
+                                      'JSON' => '0',
+                                      'List::AllUtils' => '0',
+                                      'MCE::Map' => '0',
+                                      'Moose' => '0',
+                                      'MooseX::App::Simple' => '0',
+                                      'MooseX::Types::Email' => '0',
+                                      'MooseX::Types::Path::Tiny' => '0',
+                                      'PerlX::Maybe' => '0',
+                                      'Try::Tiny' => '0',
+                                      'namespace::autoclean' => '0',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'Email::Sender::Transport::Maildir' => '0',
+                                   'Exporter' => '0',
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'Path::Tiny' => '0',
+                                   'Test::More' => '0',
+                                   'lib' => '0',
+                                   'parent' => '0',
+                                   'perl' => '5.006'
+                                 }
+                 }
+     };
+  $x;
+ }

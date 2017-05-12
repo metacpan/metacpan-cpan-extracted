@@ -1,0 +1,33 @@
+NAME
+    Encode::Base32::Crockford - encode/decode numbers using Douglas Crockford's Base32 Encoding
+
+INSTALLATION
+    To install this module, run the following commands:
+    
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+DESCRIPTION
+    Douglas Crockford describes a *Base32 Encoding* at
+    <http://www.crockford.com/wrmg/base32.html>. He says: "[Base32 Encoding
+    is] a 32-symbol notation for expressing numbers in a form that can be
+    conveniently and accurately transmitted between humans and computer
+    systems."
+
+    This module provides methods to convert numbers to and from that
+    notation.
+
+METHODS
+    See module perldoc.
+
+AUTHOR
+    Graham Barr <gbarr@cpan.org>
+
+CREDITS
+    The original module was written by Earle Martin <hex@cpan.org>
+
+COPYRIGHT
+   This code is free software; you can redistribute it and/or modify it under
+   the same terms as Perl itself.

@@ -1,0 +1,45 @@
+
+[###### first sub #####]
+[$sub tfirst$]
+*1*
+*1*<h2>1.) Here goes some normal html text <h2>
+*1*
+[$endsub$]
+[###### second sub #####]
+[$sub tsecond $]
+*2*
+*2*2.) Here comes some perl:
+*2*
+*2*[- $foo = 'Hello world' -]
+*2*
+*2*foo = [+ $foo +]<br>
+*2*testdata = [+ $testdata +]<br>
+*2*
+[$endsub$]
+[###### table header #####]
+[$sub tabheader $]
+
+<txable>
+<txr><th>1</th><th>2></th></txr>
+<txr>
+
+[$endsub$]
+[###### table cell #####]
+[$sub tabcell $]
+*4*
+*4*<td>[+ $_[0] -> [$row][$col] +]<td>
+*4*
+[$endsub$]
+[###### table footer #####]
+[$sub tabfooter $]
+
+</txr>
+</txable>
+
+[$endsub$]
+[###### req_rec #####]
+[$sub trr$]
+*6*
+*6*<h2>$req_rec = [+ $req_rec +] $$req_rec = [+ $$req_rec +]<h2>
+*6*
+[$endsub$]

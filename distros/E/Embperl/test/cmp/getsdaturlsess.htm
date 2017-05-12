@@ -1,0 +1,30 @@
+<html>
+<head>
+<title>Tests for Embperl - Get State Session Data</title>
+</head>
+
+
+<body>
+
+
+	fdat:<br>
+	<table></table>
+
+	sdat:<br> 
+	<table>
+		<tr>
+			<td>sdat</td><td>99</td>
+		</tr>
+	</table>
+
+	ok (num=1)<p>
+
+^ 	<a href=\"cont\.htm\?EMBPERL_UID=[a-f0-9]+\">continue</a>
+^	<a href=\"cont.htm\?q=1&EMBPERL_UID=[a-f0-9]+\">continue</a>
+^	<a href=\"cont.htm\?q=1&b=2&EMBPERL_UID=[a-f0-9]+\">continue</a>
+^	<form action="cont.htm"><input type=\"hidden\" name=\"EMBPERL_UID\" value=\"[a-f0-9]+\">
+    </form>
+
+</body>
+</html>
+

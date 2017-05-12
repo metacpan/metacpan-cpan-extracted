@@ -1,0 +1,20 @@
+#!/usr/bin/perl
+use EMC::WideSky::symmaskdb;
+
+$db=new EMC::WideSky::symmaskdb();
+
+if ($ARGV[0] eq "-h" || $ARGV[0] eq "--help") { print "Usage: $0 [fa faregexp] [dev devregexp] [host hostregexp] [hba hbaregexp] [file inputfile]\n"; exit; }
+if ($#ARGV>=1 && ($#ARGV+1) % 2 == 0 ) { $db->parse_symmaskdb(@ARGV); }
+  else {$db->parse_symmaskdb();}
+
+for $dev (sort keys %{$db}) {
+  print "$dev:";
+  for $fa (keys %{$db->{$dev}}) {
+    for $host (keys %{$db->{$dev}->{$fa}}) {
+      for $hba (keys %{$db->{$dev}->{$fa}->{$host}}) {
+        print " $fa/$host/$hba";
+      }
+    }
+  }
+  print "\n";
+}

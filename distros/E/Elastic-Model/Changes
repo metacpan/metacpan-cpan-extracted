@@ -1,0 +1,251 @@
+0.52    2015-11-19
+        Adjusted to work with Search::Elasticsearch v2.00
+
+        Elastic::Model is not compatible with Elasticsearch 2.x.
+        Search::Elasticsearch, however, defaults to using a 2.x compatible
+        client: 2_0::Direct.  You should specify
+        the client version explicitly when creating a Search::Elasticsearch instance:
+
+            use Search::Elasticsearch;
+            use MyApp;
+
+            my $es = Search::Elasticsearch->new(
+                client => '1_0::Direct', #### explicit client ####
+                nodes  => [ "192.168.1.100:9200", "192.168.1.101:9200"]
+            );
+
+            my $model = MyApp->new( es => $es )
+
+
+0.51    2015-05-25
+
+        Require Search::Elasticsearch v1.20
+
+0.50    2014-08-17
+        ********************************
+        BREAKING BACKWARDS COMPATIBILITY
+        ********************************
+        This is the first version of Elastic::Model with support for
+        Elasticsearch 1.x and above.  It uses Search::Elasticsearch
+        instead of Search::Elasticsearch::Compat.
+
+        See Elastic::Manual::Delta for info about the compatibility
+        mode which allows connecting to 0.90.x and 1.x nodes using
+        the same code.
+
+        Added:
+          * support for aggregations  in 1.x
+          * on_success added to Bulk
+
+        Removed:
+          * omit_norms
+          * omit_term_freq_and_positions
+
+        Deprecated field attributes:
+          * field-level boost
+          * index_name
+          * path
+          * precision_step
+
+0.29_2  2014-07-01
+        Also accept 0_90 clients
+
+0.29_1  2014-06-01
+        Migrated to Search::Elasticsearch and made it run
+        on Elasticsearch 1.x. No doc updates yet, no new features
+        exposed yet.
+
+        Breaking changes:
+         * omit_norms and omit_term_freq_positions no longer supported
+         * ignore_missing should be replaced by ignore => 404
+         * get mapping responses have changed
+
+0.28    2013-03-06
+        Elastic::Model now requires Search::Elasticsearch::Compat
+        See http://github.com/elasticsearch/elasticsearch-perl/issues/20
+
+        Updated links to the elasticsearch.org website.
+
+0.27    2013-10-24
+        Elastic::Model now requires Elasticsearch::Compat instead of
+        ElasticSearch.
+
+0.26    2013-05-08
+        Upgraded ElasticSearch.pm to v0.65
+        Calls to non-existent indices/aliases throws a 404 in v0.90
+
+0.25    2013-02-26
+        Made Test::Strict an author only test
+
+0.24    2013-01-04
+        BUG FIX
+         - has_changed was failing when comparing attributes that contained
+           references.
+         - Fixed tests for SearchBuilder that were failing with the new
+           hash changes in perl 5.17
+
+         ENHANCEMENT
+          - update_mapping and delete_mapping now accept optional \%args
+            which get passed on to ElasticSearch.pm
+
+0.23    2012-11-23
+        Doc corrections
+
+0.22    2012-11-22
+        ENHANCEMENT
+         - Add specific mapping for Maybe[Bool] which treats undef values
+           as NULL / missing, while Bool fields still treat undef as false.
+
+0.21    2012-11-17
+        BUG FIX
+         - Model metaclass attributes were being initialized from the same
+           hashrefs, meaning that data (eg types in a namespace) were shared
+           between independent models.
+           Thanks to AMIRI for reporting
+
+0.20    2012-11-16
+        BREAKING CHANGE
+         - has_changed() and old_values() was implemented with triggers on
+           every doc class attribute.  This was buggy because
+           1) it wasn't applied to attributes from roles
+           2) it didn't check arrays/hashes correctly
+           3) it was slow
+           We now handle all of the above correctly, by comparing canonical
+           versions of the deflated object with the data loaded from ES.
+
+           has_changed() was called by save() to prevent saving if the
+           object hadn't actually changed.  We no longer do this - if you
+           call save(), your object will be saved. If you want to run this
+           check yourself, you can do:
+
+               $doc->save if $doc->has_changed;
+
+           old_value() has been removed because it requires old_values() to
+           build a comparison of all attributes that have changed, so it
+           is more efficient to just call old_values() once, eg:
+
+                $old = $doc->old_values;
+                if (exists $old->{foo}) {...}
+                if (exists $old->{bar}) {...}
+
+        ENHANCEMENT
+         - added apply_field_settings() to Elastic::Doc to make it easier
+           to configure attributes applied from roles, when you may not
+           have edit access to the role itself.
+
+0.19    2012-11-15
+        ENHANCEMENT
+         - Inflators and deflators are now inlined whenever possible, resulting
+           in  a big performance boost
+
+0.18    2012-11-14
+        ENHANCEMENT
+         - Optimized UID and stub object creation - big performance improvement
+           when retrieving docs from elasticsearch
+
+0.17    2012-11-09
+        ENHANCMENT
+         - handle empty queryb/fiterb/post_filterb clauses gracefully
+
+0.16    2012-11-06
+        BREAKING CHANGE:
+         - removed the to_cache() method that was added in v0.15
+
+        ENHANCEMENT:
+         - added integration with a CHI-compatible cache for bounded searches
+
+0.15    2012-11-02
+        BUG FIX:
+         - the default values for wrapper/multi_wrapper in Iterator were
+           not being returned as code refs
+
+        ENHANCEMENT:
+         - added to_cache() to Elastic::Model::Results to return a cacheable
+           data structure which can later be reinflated to the full result set
+
+0.14    2012-11-01
+        BREAKING CHANGE:
+         - upgraded minimum ES version to 0.19.11 to take advantage of the
+           new match queries
+
+        ENHANCEMENT:
+         - Added Elastic::Model::Bulk for bulk indexing of documents.
+
+0.13    2012-10-10
+        BUG FIXES:
+         - UIDs from search results were missing the routing value
+         - use Elastic::Doc on 'extend'ed classes didn't work as expected
+         - Minimum version of Moose set to 2.06
+
+0.12    2012-09-22
+        ENHANCEMENT:
+         - Added support for retrieving partial objects (thanks to DIEGOK
+           for suggesting)
+         - Improved documentation (thanks to TIMB)
+
+0.11    2012-08-18
+        ENHANCEMENT:
+         - Variable::Magic v 0.51 allows us to remove the magic after inflating
+           a stub object - thanks to VPIT for the new version
+
+0.10    2012-08-15
+        BUG FIX:
+         - Declare a minimum version for ElasticSearch::SearchBuilder
+
+0.09    2012-08-14
+        ENHANCEMENT:
+         - Added terms_indexed_for_field() to Elastic::Model::Role::Doc to aid
+           debugging.
+         - Added id() and type() convenience methods on Elastic::Model::Role::Doc
+           which call the equivalent method on the doc's UID
+
+        BUG FIX:
+         - Changed the mapping for UIDs to use the full path name, not
+           'just_name'.  * REQUIRES REINDEXING *
+            This fixes a major bug where all Doc class attributes in an object
+            were being indexed in the same fields, so it was impossible to
+            distinguish a search for (mother => $user) from (father => $user).
+            Unfortunately, this means it is no longer possible to search for just
+            any UID using queryb($uid), as it now needs the full path name for
+            the attribute, eg queryb( 'user.partner' => $user ).
+            Consequently, I've also had to change the Index->repoint_uids
+            to search in all possible UID attributes.
+
+0.08    2012-08-09
+        ENHANCEMENT:
+         - added a transform() parameter to reindex() to allow the user to
+           change the data structure while reindexing
+        BUG FIX:
+         - don't try to destroy scopes during global shutdown
+         - reindex() was loading all docs into memory, rather than processing
+           them in blocks
+0.07    2012-08-02
+        ENHANCEMENT:
+         - Added Elastic::Model::SearchBuilder to automatically serialize
+           queries/filters like ->filterb( user => $user_doc )
+           or ->filterb( $uid )
+0.06    2012-08-02
+        BUG:
+         - The unique key was using the attribute name, rather than
+           the unique key name.
+0.05    2012-08-01
+        ENHANCMENTS:
+         - Added support for unique_keys via ElasticSearchX::UniqueKey
+         - Added a Keyword type to be used for not_analyzed string fields
+         - Handle stub doc inflation using Variable::Magic instead of
+           wrapping _inline_instance_* in Moose
+        BUG FIXES:
+         - Lazy attributes weren't being built properly during deflation
+0.04    2012-07-25
+        overwrite() should work for new docs as well as docs loaded from ES
+        on_conflict() called with $doc->create doesn't get a version number,
+        so just load the existing doc
+
+0.03    2012-07-08
+        Skip parts of the test suite which require a live cluster to run
+
+0.02    2012-07-07
+        Removed the 'trial' flag.  First public release.
+
+0.01    2012-07-07
+        First release

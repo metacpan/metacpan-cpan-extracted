@@ -1,0 +1,27 @@
+Revision history for Perl extension .
+
+3.05  2008/04/17
+	- Build.PL is abolished.
+
+3.04  2008/03/23
+	- bugfix for Egg::Model::Session::Manager::TieHash.
+	- bugfix for Egg::Model::Session::Plugin::AgreeAgent.
+	- bugfix for Egg::Model::Session::Plugin::CclassIP.
+	- bugfix for Egg::Model::Session::Plugin::AbsoluteIP.
+
+3,03  2008/03/05
+	- fixed for Egg::Helper::Model::Session.
+	- bugfix for Egg::Model::Session.
+	- bugfix for Egg::Plugin::Session.
+	- fixed for Egg::Model::Session::Base::DBI.
+	- bugfix for Egg::Model::Session::Manager::TieHash.
+
+3,02  2008/02/22
+	- fixed for Egg::Model::Session::Plugin::Ticket.
+
+3.01  2008/02/15
+	- It was made not to fail because of the package test.
+
+3.00  Thu Feb  7 15:35:31 2008
+	- original version; created by Egg::Helper::Build::Module v3.00
+	   with module name Egg::Plugin::SessionKit

@@ -1,0 +1,9 @@
+AddressParser.xs
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/Email-AddressParser.t
+lib/Email/AddressParser.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,100 @@
+Revision history for Emacs-Rep
+
+0.01    Sun May 30 12:23:55 2010
+        First version.
+        Limitation: all of perl's substitutions syntax is
+        not supported, in particular substitutions with embedded
+        semicolons may behave oddly.
+
+0.02    Sun Jun  6 17:36:22 2010
+        Using a PPI-based solution now.  The full range of perl's
+        substitution syntax is now supported.
+        Have support for multi-line substitutions.
+        Window management is more careful (no crashes
+        from the current window being too small).
+        User set-up is more flexible (easy to use an alternative key prefix).
+
+0.03    Fri Jun 11 04:31:04 2010
+        Implemented an entirely new system of managing change
+        metadata, which now supports an indefinite series of
+        individual undos of cascading, overlapping substitution
+        changes.
+        The modified buffer is now made read-only until changes
+        are accepted.
+        User set-up with rep-standard-setup is still more flexible.
+
+0.04    Sat Jun 12 22:34:28 2010
+
+        Cleaner handling of zero-width end results (i.e.  when a
+        s///g is used to delete a string entirely, now you can
+        still tab to that location and undo the deletion).
+        Also made modifications to backtab behavior to work better
+        with these "zero width" regions.
+
+0.05    Tue Jun 15 11:44:04 2010
+
+        Cleaner implementation of tab/backtab functions in
+        rep-modififed-mode:
+        These:
+          rep-modified-skip-to-next-change and rep-modified-skip-to-prev-change
+        now use the primitives:
+           rep-at-start-of-changed-region
+           rep-at-end-of-changed-region
+        which are built on top of the (successful) experiment:
+           rep-rising-or-falling-edge
+
+0.08    Sat Jun  9 19:44:03 2012
+
+        Completely re-worked how the changes are managed in
+        emacs, so that undos of multiple, overlapping changes
+        work correctly:
+
+        Now overlays are used to indicate changed regions
+        (because they support zero-width regions), and a buffer
+        local data structure is used to save metadata for each
+        change, including a list of shadowed changes with
+        locations measured relative to the change, so that and
+        "undo" command can properly re-set the extent of any
+        affected overlays.
+
+        The perl side no longer tries to use the "revise_locations"
+        code to fix-up the recorded locations: instead the change
+        metadata is used on the emacs side in inverse order so that
+        the original, unrevised numbering is always correct when
+        a change is applied.
+
+        The metadata returned from the perl routine do_find_and_reps
+        is restricted to just what's currently in use by rep.el:
+        there's less redundancy, with the 'end' field elimated
+        (since you can always get it by adding a string length to
+        'beg').  Similarly, the old context string features
+        'pre' and 'post' have been dropped.
+
+        The TAB and BACKTAB features now behave in a consistent
+        way, skipping forward or back to the nearest *top level*
+        change (meaning a whole change unshadowed by any later
+        one).  This implementation is completely different from
+        the one mentioned above for version 0.05.
+
+0.09  Tue Jun 26 09:47:31 2012
+
+      Fixed TAB and BACKTAB features to find deletions (zero-width
+      regions), now handles multiple adjacent deltions sensible
+      (regards them all as in the same place, and the last one
+      made is "on top" and visible to the rep-undo command).
+
+      Added TODO file to the distribution.
+
+1.00  Wed Jul  4 12:34:38 2012
+
+      Further improvements to TAB/BACKTAB to handle corner cases
+      (nested, overlapping changes to changes, etc).
+
+      Cleaned-up rep.el code somewhat, removing some redundant
+      features, explicitly checking for nil values (rather than
+      letting the emacs code crash with myserious overlayp errors).
+
+      This application now has no known bugs (though it is
+      not yet tested with the new GNU emacs 24 release),
+      hence the jump to 1.0.
+

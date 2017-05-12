@@ -1,0 +1,21 @@
+0.04 2015-09-16T21:14:20+02:00
+ - Add 'readme_from' directive to Makefile.PL.
+ - Fix LICENSE file.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SEE ALSO section in doc.
+ - Move author tests to xt/ directory.
+ - Remove diacritics from author name.
+ - Update Module::Install to 1.16 version.
+ - Update copyright years.
+
+0.03 2013-09-21
+ - Rewrite Changes file to CPAN::Changes::SPEC format.
+
+0.02 2013-08-19
+ - Add Error::Pure::Always to SEE ALSO section in doc.
+ - Add LICENSE file.
+ - Fix test bug, when test use Test::Output::is_stdout (and Capture::Tiny)
+   for capture err via eval.
+
+0.01 2013-06-11
+ - First version.

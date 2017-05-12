@@ -1,0 +1,33 @@
+<html>
+<head>
+<title>Tests for Embperl - Set Session Data</title>
+</head>
+
+
+<body>
+
+
+	fdat:<br>
+	<table>
+		<tr>
+			<td>a</td><td>1</td>
+		</tr>
+	</table>
+
+	udat:<br> 
+	<table></table>
+
+	ok (num=1)<p>
+
+	sessions:
+	<table></table>
+
+^ 	<a href=\"cont\.htm\?EMBPERL_UID=[a-f0-9]*?:[a-f0-9]+\">continue</a>
+^	<a href=\"cont.htm\?q=1&EMBPERL_UID=[a-f0-9]*?:[a-f0-9]+\">continue</a>
+^	<a href=\"cont.htm\?q=1&b=2&EMBPERL_UID=[a-f0-9]*?:[a-f0-9]+\">continue</a>
+^	<form action="cont.htm"><input type=\"hidden\" name=\"EMBPERL_UID\" value=\"[a-f0-9]*?:[a-f0-9]+\">
+        </form>
+
+</body>
+</html>
+

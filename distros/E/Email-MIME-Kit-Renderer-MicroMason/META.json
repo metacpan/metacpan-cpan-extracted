@@ -1,0 +1,59 @@
+{
+   "abstract" : "Render parts of your mail with Text::MicroMason",
+   "author" : [
+      "Mark Grimes, E<lt>mgrimes@cpan.orgE<gt>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Email-MIME-Kit-Renderer-MicroMason",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.36"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Email::MIME::Kit" : "2",
+            "Text::MicroMason" : "2",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "provides" : {
+      "Email::MIME::Kit::Renderer::MicroMason" : {
+         "file" : "lib/Email/MIME/Kit/Renderer/MicroMason.pm",
+         "version" : "1.21"
+      },
+      "Text::MicroMason::MKit" : {
+         "file" : "lib/Email/MIME/Kit/Renderer/MicroMason.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Email-Mime-Kit-Renderer-MicroMason"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/mvgrimes/email-mime-kit-renderer-micromason/tree/master"
+      }
+   },
+   "version" : "1.21"
+}

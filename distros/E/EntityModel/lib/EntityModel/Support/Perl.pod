@@ -1,0 +1,134 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with EntityModel::Support::Perl
+at lib/EntityModel/Support/Perl.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+EntityModel::Support::Perl - language support for L<EntityModel>
+
+=head1 VERSION
+
+version 0.102
+
+=head1 SYNOPSIS
+
+See L<EntityModel>.
+
+=head1 DESCRIPTION
+
+Generate Perl packages and methods based on an entity model definition.
+See L<EntityModel>.
+
+=head1 ASYNCHRONOUS MODE
+
+See L<EntityModel::Support::PerlAsync>.
+
+=head1 METHODS
+
+=head2 setup
+
+=head2 apply_entity
+
+=head2 ensure_loaded
+
+=head2 package_name
+
+Generate the package name string from the given entity.
+
+=head2 entity_name
+
+Generate the entity name string from the given package name.
+
+=head2 create_field
+
+Create new field for the given entity.
+
+=head2 recurse_packages
+
+EntityModel::ObjectBase::Test -> test
+EntityModel::ObjectBase::Test::One -> test_one
+EntityModel::ObjectBase::Test::Two -> test_two
+
+=head2 load_package
+
+=head2 default_accessor
+
+Regular accessor.
+
+=over 4
+
+=item * $entity - L<EntityModel::Entity>
+
+=item * $field - L<EntityModel::Field>
+
+=back
+
+Returns a coderef which can act as an accessor, e.g. $ref->($self, $value).
+
+=head2 timestamp_accessor
+
+Accessor for timestamp values.
+
+=over 4
+
+=item * $entity - L<EntityModel::Entity>
+
+=item * $field - L<EntityModel::Field>
+
+=back
+
+Returns a coderef which can act as an accessor, e.g. $ref->($self, $value).
+
+Accessor accepts the following input formats:
+
+=over 4
+
+=item * DateTime - a L<DateTime> object (or subclassed variant)
+
+=item * Epoch time - numeric value containing seconds since epoch
+
+=item * String - standard date/time string in ISO8601 format.
+
+=back
+
+=head2 ref_accessor
+
+Accessor for reference fields.
+
+=over 4
+
+=item * $entity - L<EntityModel::Entity>
+
+=item * $field - L<EntityModel::Field>
+
+=back
+
+Returns a coderef which can act as an accessor, e.g. $ref->($self, $value).
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<EntityModel::Support>
+
+L<register|EntityModel::Support/register>
+
+=item L<EntityModel::BaseClass>
+
+L<clone|EntityModel::BaseClass/clone>, L<dump|EntityModel::BaseClass/dump>, L<new|EntityModel::BaseClass/new>, L<sap|EntityModel::BaseClass/sap>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <cpan@entitymodel.com>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2008-2011. Licensed under the same terms as Perl itself.

@@ -1,0 +1,52 @@
+Revision history for Perl extension EAFDSS.
+
+Version 0.80	18/04/2009 - More examples on how to use it
+
+  + Some bug fixes + enhancements (thanks to P. Christeas)
+  + Added the Type A example
+
+Version 0.70	08/04/2009 - The documented version
+
+  + Added more documentation
+
+Version 0.60	08/04/2009 - Still beta version
+
+  + Added lots of tests
+  + Bug Fixes
+  + Still beta version 
+
+
+Version 0.40	02/04/2009 - Beta version
+
+  + More windows friendly version
+  + Many  Bug Fixes
+  + This is a beta version 
+
+
+Version 0.20	23/03/2009 - API complete version
+
+  + Added support for the serial micrelec devices
+  + First fully functional version and API complete
+  + Still alpha status
+
+
+Version 0.13	16/01/2009 - Bug fix
+
+  + Undeclared dependencies on Class::Base bug fix [rt.cpan.org #42460]
+
+
+Version 0.12	08/01/2009 - Added Functionality
+
+  + Support for the query function
+  + Now detects invalid characters in a file before attempting to sing them
+
+
+Version 0.11	25/11/2008 - Fixed small distribution errors
+
+  + Fixing basic errors
+
+
+Version 0.10	22/11/2008 - First version
+
+  + First Version, Getting familiar with PAUSE, CPAN etc.
+

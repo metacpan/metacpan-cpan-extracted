@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Encoding-FixLatin,
+version 1.04:
+
+  takes mixed encoding input and produces UTF-8 output
+
+This software is copyright (c) 2009 by Grant McLean.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

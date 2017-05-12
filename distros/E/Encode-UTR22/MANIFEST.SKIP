@@ -1,0 +1,17 @@
+blib/
+\.\$\$\$
+\.tmp
+\.bak
+CVS/
+\.tar
+\.zip
+\.tgz
+misc/
+Build/
+exes/
+\.cvsignore
+dev/
+release/
+^#
+\.svn/
+\~$

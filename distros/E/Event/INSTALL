@@ -1,0 +1,8 @@
+To get high-precision time you'll need to install and use Time::HiRes
+01.20.
+
+---
+
+The design and implementation of this extension is discussed on the
+perl-loop mailing list.  Please send email to majordomo@perl.org to
+subscribe!

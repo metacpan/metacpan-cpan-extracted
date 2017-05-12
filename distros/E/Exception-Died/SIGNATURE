@@ -1,0 +1,59 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 30c29a8d6f17648a4bd895f5400dc7bc5d5b422c Build.PL
+SHA1 6025c4a86a8072dff9c39f3f90b9afaf80d6e632 Changes
+SHA1 74b1c398020b9c1e8849b7982751cb70ecc5de8d LICENSE
+SHA1 abb54fd232de820f24339a4aea5113b5ed5a56f6 MANIFEST
+SHA1 7d9037725a8f8c9c65eff1e091819c215f55c650 MANIFEST.SKIP
+SHA1 2070cd37c0295f2203e7c3fd6ec15bfead5c2933 META.yml
+SHA1 4e3750e016d0f061a774e83a4ba1605d5de0368c Makefile.PL
+SHA1 06ca65b110c3b8a5c1700332680515af540efd28 README
+SHA1 91bcf9f20afa31c5ab4f52e4d13851e54bab9dd8 eg/eval_catch.pl
+SHA1 4b1d17b318f2b205c51ae5163c38fb9e13ad5fbb eg/eval_catch2.pl
+SHA1 bd26e01df88fbb6d6d0610b3fd076abff4255abb eg/eval_throw.pl
+SHA1 87e536efe7814b85da4b2de3f24867d9164837eb eg/eval_throw2.pl
+SHA1 96ea97810af6dae2c5ca1ea0154ba1f18c8e9a12 eg/exception_died.pl
+SHA1 bfcd924ebe4488c3779653d5d65ccaaf6d0a5b6f lib/Exception/Died.pm
+SHA1 e304ce1233661b5eb23c33876f97c696609173c9 t/all_tests.t
+SHA1 7da401ada41e6cf883a5ed8bb616557ee5830558 t/all_tests_sig_hooked.t
+SHA1 b40d9304b010c15c1ffb40c2d22cce7cecda3acd t/test.pl
+SHA1 0ed2f13f8ee4d1710ba7a1b93497c8a8ff0c73fe t/test_sig_hooked.pl
+SHA1 0a7b6fdd3647d7285cac61ce7cd98c46a6e96d80 t/tlib/Exception/DiedTest.pm
+SHA1 084739c4020fa62591432c0f2272d371ca9552cb xt/benchmark_fail.pl
+SHA1 084739c4020fa62591432c0f2272d371ca9552cb xt/benchmark_ok.pl
+SHA1 90353a99ac0f719b6f3e58029804d8556cedc2ab xt/check_changes.t
+SHA1 a56d0c02b6c992e04a77d13a6ee89504bd718572 xt/consistent_version_numbers.t
+SHA1 67bb4c141ea95809f3db2d526ce91d9e6d894756 xt/copyright.t
+SHA1 650dccfa9b6f5a98cf731c89041bea8935dbc623 xt/cover.pl
+SHA1 f5aac658ae1888964274e68d179413782082b7ad xt/distribution.t
+SHA1 44147122d52fef90ab3a2c65ebba4f89342174f8 xt/kwalitee.t
+SHA1 6e7f9dde7560793bcb40acc41561e07d163ad6d1 xt/minimumversion.t
+SHA1 e8daa0c73cfc304c240fad2d2c2b1b628175a89d xt/perlcritic.t
+SHA1 50d2e6ac16b2fe3b79e6b1b9336e5e9348a37f49 xt/perlcriticrc
+SHA1 2c579b58def8daec94f41b628ac81c256faaa2b1 xt/pod.t
+SHA1 775b3ac02805b6d703614f42608732fb43af2a41 xt/pod_coverage.t
+SHA1 bef7d46eb5cbc3e67956d4e823ec199f41ab9268 xt/pod_spell.t
+SHA1 46ef94f1e61b5312a6127ba60a6d0cf76830c729 xt/pod_spellrc
+SHA1 2c579b58def8daec94f41b628ac81c256faaa2b1 xt/pod_syntax.t
+SHA1 3da1114237cd31b48aeb8ca6848132b01bd9d8de xt/profile_eval.pl
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iEYEARECAAYFAknVCiAACgkQhMHHe8CxCluW3gCfdYcvZdyuV8iEihwEK/HZNmg3
+gmwAoJ20v0ira4N+2a7F2TGwjCMD1e1q
+=ZWxZ
+-----END PGP SIGNATURE-----

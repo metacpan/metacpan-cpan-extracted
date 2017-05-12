@@ -1,0 +1,7 @@
+Revision history for EnsEMBL-Web-Record
+
+1.00    11th January, 2007
+        First version released to CPAN.
+
+1.01    12th January, 2007
+        Added additional documentation, and an example database adaptor file.

@@ -1,0 +1,22 @@
+0.05 2015-09-22T11:18:27+02:00
+ - Add 'readme_from' directive to Makefile.PL.
+ - Fix LICENSE file.
+ - Improve SEE ALSO section in doc.
+ - Move author tests to xt/ directory.
+ - Update LICENSE AND COPYRIGHT section in doc.
+ - Update Module::Install to 1.16 version.
+ - Update copyright years.
+
+0.04 2013-11-07
+ - Add minimal Perl version.
+
+0.03 2013-11-06
+ - Fix dependency for Test::Output. Test::Output qw(1.01) is bad.
+
+0.02 2013-10-30
+ - Add README file.
+ - Add examples/ directory.
+ - Fix test dependencies.
+
+0.01 2013-10-29
+ - First version.

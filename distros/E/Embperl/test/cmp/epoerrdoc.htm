@@ -1,0 +1,23 @@
+<html>
+<head>
+<title>Tests for Embperl - ErrorDocument</title>
+</head>
+
+<body>
+
+This page is shown due to an ErrorDocument redirection<p>
+
+
+main: 
+^prev: Apache.*?=SCALAR
+next: 
+^There are (1|2) errormessages:
+
+<table border=1>
+^-        <tr><td>\[\d+\]ERR:  32:  Warning in Perl code: Use of uninitialized value.+at .+epoerrdoc.htm line 6.+</td></tr>
+^	<tr><td>\[\d+\]ERR:  24:  Error in Perl code: Can't locate object method &quot;is&quot; via package &quot;here&quot;.+at .+epoerrdoc.htm line 6.+</td></tr>
+</table>
+
+</body>
+</html>
+

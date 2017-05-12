@@ -1,0 +1,93 @@
+---
+abstract: 'EPUB Parser class'
+author:
+  - 'tokubass <tokubass {at} cpan.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.9, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: EPUB-Parser
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  EPUB::Parser:
+    file: lib/EPUB/Parser.pm
+    version: '0.06'
+  EPUB::Parser::File::Container:
+    file: lib/EPUB/Parser/File/Container.pm
+  EPUB::Parser::File::Document:
+    file: lib/EPUB/Parser/File/Document.pm
+  EPUB::Parser::File::Navi:
+    file: lib/EPUB/Parser/File/Navi.pm
+  EPUB::Parser::File::Navi::Context:
+    file: lib/EPUB/Parser/File/Navi/Context.pm
+  EPUB::Parser::File::Navi::Context::Toc:
+    file: lib/EPUB/Parser/File/Navi/Context/Toc.pm
+  EPUB::Parser::File::OPF:
+    file: lib/EPUB/Parser/File/OPF.pm
+  EPUB::Parser::File::OPF::Context:
+    file: lib/EPUB/Parser/File/OPF/Context.pm
+  EPUB::Parser::File::OPF::Context::Guide:
+    file: lib/EPUB/Parser/File/OPF/Context/Guide.pm
+  EPUB::Parser::File::OPF::Context::Manifest:
+    file: lib/EPUB/Parser/File/OPF/Context/Manifest.pm
+  EPUB::Parser::File::OPF::Context::Metadata:
+    file: lib/EPUB/Parser/File/OPF/Context/Metadata.pm
+  EPUB::Parser::File::OPF::Context::Spine:
+    file: lib/EPUB/Parser/File/OPF/Context/Spine.pm
+  EPUB::Parser::File::Parser:
+    file: lib/EPUB/Parser/File/Parser.pm
+  EPUB::Parser::File::Parser::Container:
+    file: lib/EPUB/Parser/File/Parser/Container.pm
+  EPUB::Parser::File::Parser::Document:
+    file: lib/EPUB/Parser/File/Parser/Document.pm
+  EPUB::Parser::File::Parser::Navi:
+    file: lib/EPUB/Parser/File/Parser/Navi.pm
+  EPUB::Parser::File::Parser::OPF:
+    file: lib/EPUB/Parser/File/Parser/OPF.pm
+  EPUB::Parser::Manager::Pages:
+    file: lib/EPUB/Parser/Manager/Pages.pm
+  EPUB::Parser::Util::Archive:
+    file: lib/EPUB/Parser/Util/Archive.pm
+  EPUB::Parser::Util::Archive::Iterator:
+    file: lib/EPUB/Parser/Util/Archive.pm
+  EPUB::Parser::Util::AttributePacker:
+    file: lib/EPUB/Parser/Util/AttributePacker.pm
+  EPUB::Parser::Util::Context:
+    file: lib/EPUB/Parser/Util/Context.pm
+  EPUB::Parser::Util::EpubLoad:
+    file: lib/EPUB/Parser/Util/EpubLoad.pm
+  EPUB::Parser::Util::ShortcutMethod:
+    file: lib/EPUB/Parser/Util/ShortcutMethod.pm
+requires:
+  Archive::Zip: '0'
+  Carp: '0'
+  File::Slurp: '0'
+  IO::String: '0'
+  Smart::Args: '0'
+  URI: '0'
+  XML::LibXML: '0'
+  XML::LibXML::XPathContext: '0'
+  parent: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/tokubass/p5-EPUB-Parser/issues
+  homepage: https://github.com/tokubass/p5-EPUB-Parser
+  repository: git://github.com/tokubass/p5-EPUB-Parser.git
+version: '0.06'
+x_contributors:
+  - 'tokubass <tokubass@cpan.org>'

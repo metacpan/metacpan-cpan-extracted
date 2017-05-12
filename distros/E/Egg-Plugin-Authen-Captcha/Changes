@@ -1,0 +1,8 @@
+Revision history for Perl extension .
+
+0.03  2008/04/17
+	- Build.PL is abolished.
+
+0.01  Sat Oct 27 02:46:11 2007
+	- original version; created by Egg::Helper::Plugin::Maker v2.00
+	   with module name Egg::Plugin::Authen::Captcha

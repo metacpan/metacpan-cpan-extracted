@@ -1,0 +1,478 @@
+
+
+Characteristic structural features of schistosome cercarial N -glycans: expression of Lewis X and core xylosylation
+
+Kay-Hooi Khoo 1 ,
+
+Hung-Hsiang Huang and
+
+Kin-Mu Lee 2
+
+
+
+
+
+Institute of Biological Chemistry, Academia Sinica, Institute of Biochemical Sciences, National Taiwan University, and the 2 Department and Institute of Parasitology, National Yang-Ming University, Taipei, Taiwan R.O.C.
+
+
+
+
+
+Received on July 18, 2000; revised on September 18, 2000; accepted on September 21, 2000. 
+
+
+
+Abstract
+
+Schistosomal egg N -glycans are the only examples in nature that have been structurally shown to contain ﬂ2-xylosylation, 6-fucosylation, and 3-fucosylation on the N,N '-diacetyl chitobiose core. We present evidence that core difucosylated and xylosylated N -glycans are characteristics of Schistosoma japonicum eggs but not of the cercariae and adults, for which neither core xylosylation nor 3-fucosylation could be readily detected. In contrast, a majority of the N -glycans from Schistosoma mansoni cercariae but not the adults are core xylosylated. Tandem mass spectrometry analysis coupled with chromatographic mapping, sequential exoglycosidase digestion, and methylation analysis were employed to unambiguously define the structures of core ﬂ2-xylosylated, 6-fucosylated N -glycans from S. mansoni cercariae. Unexpectedly, a majority of these N -glycans were found to carry Lewis X determinant, Galﬂ1 4(Fuc 1 3)GlcNAcﬂ1, on the nonreducing termini of mono- and biantennary structures. The Lewis Xñcontaining glycoproteins were found to be distinct from those carrying the complex, multifucosylated glycocalyx O -glycans reported previously. The corresponding N -glycans from S.japonicum cercariae are likewise dominated by Lewis X termini but without the core xylosylation. We concluded that the invading cercariae present an important and abundant source of Lewis X antigens, which may contribute to the induced humoral response upon infection. Following transformation and development into the adults, the N -glycans synthesized comprise a significantly larger amount of high mannose and fucosylated pauci-mannose structures in comparison with the cercarial N -glycans. A portion of the mono- and biantennary complex types were identified to carry Lewis X and fucosylated LacdiNAc termini, which could also be detected by mass spectrometry analysis on larger, complex-type structures. 
+
+
+
+Key words: Schistosoma mansoni / Schistosoma japonicum / N -glycosylation/mass spectrometry/structural analysis
+
+
+
+Introduction
+
+Schistosomiasis is the second most prevalent tropical disease after malaria, with over 200 million people infected globally. Like most other parasites, the two major schistosome species causing human intestinal symptoms and disease, namely, Schistosoma mansoni and S. japonicum, appear to modulate their glycosylation profiles as they develop and adapt in turn to mammalian and molluscan hosts in their multistage life cycles. 
+
+
+
+Previous work based primarily on S. mansoni (reviewed in Cummings and Nyame, 1996
+
+Core ﬂ2-xylosylation and/or 3-fucosylation of N -glycans is largely confined to plants (Lerouge et al., 1998 ; Wilson et al., 1998
+
+Results
+
+The major N -glycan profile of S. mansoni cercariae
+
+The total glycoprotein extracts from S. mansoni cercariae were de- N -glycosylated with N -glycosidase F to release the N -glycans. Initial probing indicated that subsequent N -glycosidase A digestion on the N -glycosidase Fñtreated samples did not release any new component that could be attributed to N -glycosidase Fñresistant 3-coreñfucosylated N -glycans. The 6-coreñfucosylated components were readily defucosylated by bovine kidney -fucosidase, which was largely ineffective against core 3-linked Fuc or other 3/4-linked Fuc attached to internal residues on the antenna, as found in Le x/a structures. The latter could, however, be removed by an 3,4-specific fucosidase from Xanthomonas manihotis, which also rendered an otherwise resistant Le x/a structure susceptible to ﬂ-galactosidase digestions. The sequential use of these enzymes therefore allowed the major components detected by FAB-MS analysis of the permethyl derivatives to be tentatively assigned (Figures 1 and 2, Table I ). 
+
+
+
+View larger version (32K):
+
+[in this window]
+
+[in a new window]
+
+Figure 1. FAB-mass spectrometry analysis of the permethyl derivatives of total N -glycans from S. mansoni cercariae. (A) Low mass region showing the predominant nonreducing terminal A-type fragment ions as described in the text. (B) Molecular ion region, with additional signals detected above m/z 2950 shown as inset. Additional oxonium fragment ions at m/z 872, 1032, and 1655 resulted from cleavage at the reducing-end chitobiose HexNAc-(Fuc)HexNAc core of the most abundant species; signals at m/z 228, 432, 840, and 1000 arise from elimination of a ROH moiety from m/z 260, 464, 872, and 1032, respectively, where R = Me or glycosyl substituent at the C3-position of the HexNAc at cleavage site. The molecular ions were assigned as in Table I, except for the weak signals at m/z 3418 and 3592, which were, respectively, one HexNAc and one Fuc 1 HexNAc 1 higher than the signal at m/z 3172. Only major or assigned peaks were annotated. Peak denoted as "x" corresponds to frequently observed matrix ion.
+
+
+
+View larger version (37K):
+
+[in this window]
+
+[in a new window]
+
+Figure 2. FAB-mass spectrometry analysis of the permethyl derivatives of total N -glycans from S. mansoni cercariae after sequential enzyme digestions. The enzymes used were bovine kidney -fucosidase (A), followed by ﬂ-galactosidase (B), and then 3,4-specific fucosidase (C), without prior removal of the previous enzymes used. Major signals were assigned as in Table I. Additional signals at m/z 2025, 2620, and 2650 in (A) may be assigned as xylosylated trimannosyl core with Hex 1 HexNAc 2, (Fuc 1 Hex 1 HexNAc 1 )(Fuc 1 HexNAc 2 ), and (Fuc 1 Hex 1 HexNAc 1 )(Hex 1 HexNAc 2 ), respectively. Accordingly, m/z 2025 and 2650 shifted to m/z 1821 and 2446, respectively, after ﬂ-galactosidase digestion, whereas m/z 2620 remained resistant (B). Two other signals detected in (C) corresponded to xylosylated trimannosyl core + HexNAc 4 ( m/z 2311) and a Man 9 GlcNAc 2 ( m/z 2395) structure. The former would have resulted from the digestion of higher mass signals (Figure 1, m/z 3418 and 3592); the latter was also found in (B) and was made more apparent by removal of other components in the same mass region by the -fucosidase used. Signals at m/z 1277, 1481, 1522, 1900, and 2104 corresponded to A-type oxonium fragment ions resulting from cleavage at the reducing-end chitobiose core of some of the more abundant components.
+
+
+
+View larger version (57K):
+
+[in this window]
+
+[in a new window]
+
+Table I. Major components detected in the FAB-mass spectra of permethylated S. mansoni cercarial N -glycans before and after sequential enzyme digestions. Fractionation on normal phase HPLC allowed further CID-MS/MS and linkage analysis to support deduced structures.
+
+
+
+a The m/z values tabulated correspond to [M+Na] + of the components detected after each enzyme treatments as shown in Figure 2. The m/z values were given as monoisotopic nominal mass, which equates the labeled values in the mass spectra (Figures 1 and 2) for signals below m/z 2400 after the decimal place digits were dropped. For signals at higher m/z, the labeled peak top values (average accurate mass) for the nonresolved peaks correspond to 2 (or 3, for above m/z 3400) mass units higher than the monoisotopic nominal masses. 6-Fuc, ﬂ-Gal, and 3,4-Fuc refer to bovine kidney -fucosidase, ﬂ-galactosidase, and 3,4-specific fucosidase, respectively. nc denotes no change in m/z value after treatment with the enzymes, that is, signals with the same m/z values were still observed. Removal of 3Fuc by 3,4-specific fucosidase would allow the ﬂ-galactosidase present within the reaction mixture to further trim off otherwise resistant Gal residue(s) and therefore resulted in mass change corresponding to Fuc+Gal (378 u) in most cases.
+
+
+
+b The normal phase HPLC fraction numbers containing the respective PA-tagged structures (Figure 5 ) were named according to their elution position on a Glc unit scale as calibrated against PA-isomaltooligomer standards. The corresponding components were identified after FAB-MS screening.
+
+
+
+c CID-MS/MS data were obtained on permethyl derivatives of both the total N -glycans as well as HPLC purified-PA-tagged glycans. The parent molecular ions between the tagged and nontagged glycans differ by 92 u, but the characteristic nonreducing terminal daugther ions were similar. Full CID-MS/MS data are shown for N8.5, N11.4, N11.7, and N12.8 in Figure 3 ; only the most abundant ions useful in assigning sequence were tabulated here.
+
+
+
+d Linkage analyses were performed only for selected HPLC-purified components.
+
+
+
+e All deduced structures as tabulated here were shown to be trimmed down to respective core or xylosylated core by use of specific exoglycosidases; the composite structure for the antenna can be represented as Galﬂ1-(±Fuc 1-3)4GlcNAcﬂ1-2Man, except for N11.7 and N12.8. Open triangles, Fuc; filled ovals, Xyl; open circles, Gal; filled circles, Man; open squares, GlcNAc.
+
+
+
+f The expected molecular ion at m/z 2417 was hardly detectable in Figure 1 but after treatment with -fucosidase, the signal at m/z 2243 was clearly present. This component was also evidently recovered in the HPLC fraction N9.8 when the PA-derivatives were screened by MS.
+
+
+
+Further supportive evidence was afforded by the detection of characteristic nonreducing terminal fragment ions, referred to as the A-type oxonium ions, resulting from cleavage at HexNAc of the permethyl derivatives (Dell, 1987
+
+View larger version (29K):
+
+[in this window]
+
+[in a new window]
+
+Figure 3. Representative CID-MS/MS spectra on the [M+H] + parent ions of non-PA-tagged N8.5 (A) and N11.4 (B) and PA- tagged N11.7 (C) and N12.8 (D). The daughter ions afforded by MS-MS analysis of the permethyl derivatives of non-PA-tagged and PA-tagged species were identical except for the additional presence of m/z 544 corresponding to (OH)FucHexNAc-PA in the latter. N11.7 and N12.8 were not further fractionated on reverse phase column. Mass region between m/z 750 and the parent ions were magnified to show minor fragment ions. Diagnostic and sequence informative ions were as listed in Table I. Other ions were mainly derived from secondary cleavage, e.g., further loss of terminal Fuc, Xyl, and Gal, or a CH 3 OH moiety. Notable signals include: m/z 196 (from HexNAc +, after eliminating both Fuc and Hex substituents), 450 (Hex-(OH)HexNAc + ), 810 (Hex-(Fuc)HexNAc- Hex + ), 1018, and 1641 (loss of a terminal Le X from 1655 and 2279, respectively).
+
+
+
+View larger version (28K):
+
+[in this window]
+
+[in a new window]
+
+Figure 4. GC-MS linkage analysis of the total N -glycans from S. mansoni cercariae. Major peaks were identified by retention time as compared against standard and the EI-mass spectrum of the partially methylated alditol acetates. Minor HexNAc residues were further identified by plotting the selected ion traces of m/z 117+159 (inset). Peaks denoted as "x" are contaminant peaks with EI-mass spectra not corresponding to any of the partially methylated alditol acetates.
+
+
+
+To confirm the fine structural details of the major components identified, as well as to provide a quantitative representation of the major peaks detected, the total N -glycans were pyridylaminated (PA) at the reducing end and fractionated on normal phase HPLC column (Figure 5 ), followed by subfractionation on reverse phase HPLC column. The fluorescence-detected peaks were collected, screened by FAB-MS, and, where sample materials were sufficient, further subjected to CID-MS/MS and linkage analysis (compiled in Table I ). Although the m/z values of the PA-tagged molecular ions were shifted to higher masses, the daughter ions corresponding to nonreducing terminal A-type oxonium ions remained the same as those from nontagged samples (Figure 3 ). Additionally, some reducing terminal fragment ions were observed. Notably, all PA-tagged components analyzed gave an ion at m/z 544 corresponding to (OH) 1 Fuc 1 HexNAc-PA, which, together with A-type ion resulting from cleavage between the two GlcNAcs of the chitobiose core, unambiguously defined the reducing end GlcNAc as fucosylated. 
+
+
+
+View larger version (23K):
+
+[in this window]
+
+[in a new window]
+
+Figure 5. Normal phase HPLC profile of PA-tagged total N -glycans from S. mansoni cercariae. Fractions were manually collected and major components detected within each fractions were named according to their elution position on a Glc unit (GU) scale, as compiled in Table I. Other nontabulated components include: N6.1, HexNAc 1 -Core; N6.9, Hex 5 HexNAc 2, HexNAc 2 -Core; N7.8, Hex 6 HexNAc 2 ; N8.7, Hex 7 HexNAc 2 ; N10.7, Hex 9 HexNAc 2. Hex 5 ñ 9 HexNAc 2 corresponded to high mannose-type structures and were not further characterized. These were found to be more prominent after a second N -glycosidase F treatment. Based on the components characterized, Xyl was found to contribute to 0.5 Glc unit, whereas both 3-Fuc (on Le x ) and terminal Gal residue contributed to one Glc unit on normal phase HPLC.
+
+
+
+Core 6-fucosylation on the PA-tagged N -glycans was further corroborated by the shift to much earlier retention time on RP-HPLC on its removal by -fucosidase. As exemplified by analysis of peaks corresponding to N8.5 and N11.4 (Table II ), a shift of more than 4 Glc units earlier was observed for both. In contrast, the removal of an 3-Fuc residue from the antenna resulted in the shift of about 2.6 Glc units later. These effects of -fucosylation on the elution behavior of PA-tagged glycans on RP HPLC column have previously been reported (Kubelka et al., 1993 ; Tomiya and Takahashi, 1998
+
+View this table:
+
+[in this window]
+
+[in a new window]
+
+Table II
+
+Sequential exo-glycosidase digestion on the two major N -glycans of S. mansoni cercariae. The PA-tagged, HPLC-purified N8.5 and N11.5 were analyzed by reverse phase HPLC a and FAB-MS b after each round of enzyme treatment
+
+In summary, the total N -glycan profile of S. mansoni cercariae suggested that the major components are pairs of xylosylated and nonxylosylated truncated-, hybrid-, and complex-type core 6-fucosylated structures, with Le x being the dominant terminal sequence on the mono- and biantenna. The most abundant species are the xylosylated and 6-fucosylated core structure carrying one and two Le x units, eluted as N8.5 and N11.4 on normal phase HPLC, respectively. Most other components detected, from N5.3 to N11.4, could be considered as related to these two major ones by virtue of incomplete xylosylation, galactosylation, and/or fucosylation. 
+
+
+
+The Le x structure could also be indirectly conjugated to the core via another GlcNAc residue, which could itself be fucosylated as found in N11.7 and N12.8. The strong fragment ion signals at m/z 1057 and 638 but not 434, as afforded by CID-MS/MS analysis of N12.8 (Figure 3 D) indicated that one antennae was Hex-(Fuc)HexNAc-(Fuc)HexNAc, whereas the other was Hex-(Fuc)HexNAc. Any one of the three fucoses could be missing in N11.7, giving rise to all possible combination of fragment ion signals observed (Figure 3 C). Only 3,4-linked GlcNAc and 4-linked GlcNAc and no GalNAc were detected by linkage analysis of both components (Table I ). On 3,4-fucosidase digestion, two Fuc residues were removed from N12.8, which rendered the product susceptible to further ﬂ4-specific galactosidase digestion. The final product obtained was shown by MS analysis to correspond to Fuc 2 Xyl 1 HexNAc 5 Hex 3. In comparison with the linkage analysis data prior to glycosidase digestions, terminal GlcNAc was detected concomitant with a reduction in intensity of the 3,4-linked GlcNAc peak. It was thus concluded that the initial 3,4-fucosidase digestion resulted only in the removal of the Fuc on the Le x structure, whereas the inner Fuc was not affected. Two very minor components eluting later than 13 Glc units on normal phase HPLC were detected to have additional HexNAc and Fuc 1 HexNAc 1, respectively, as compared to N12.8, which suggested that the biantennary core structure could have both antenna extended by this unusual Gal-(Fuc)GlcNAc-(Fuc)GlcNAc sequence although further confirmatory analysis was prevented by the sample amount available. 
+
+
+
+Other minor components in S. mansoni cercarial N -glycans
+
+Other minor structures were evidently present (Figure 1 ), some made more apparent after enzymatic treatments (Figure 2 ) or HPLC fractionation (Figure 5 ). Notably, the presence of LacdiNAc and fucosylated LacdiNAc type of structures were implicated by the fragment ions at m/z 260 (HexNAc + ), 505 (HexNAc 2 + ), and 679 (Fuc 1 HexNAc 2 + ). The presence of m/z 434 (Fuc 1 HexNAc + ) and 679 but not 853 (Fuc 2 HexNAc 2 + ) indicated that the HexNAc-HexNAc- terminus can be mono-fucosylated at either HexNAc residue but not both. Alternatively, an incompletely extended terminal HexNAc residue may be directly fucosylated to yield the observed Fuc 1 HexNAc + fragment ion. In support of these other minor forms is the presence of terminal GlcNAc, terminal GalNAc, and 3-linked GalNAc in the linkage analysis (Figure 4, inset) along with the three most abundant HexNAc residues, namely, 4-linked GlcNAc, 3,4-linked GlcNAc, and 4,6-linked GlcNAc. After sequential enzyme treatment of the total N -glycans with a combination of -fucosidases and ﬂ-galactosidase, the major resistant core structures could be assigned as ±Xyl (Man 3 GlcNAc 2 ) with one, two, three, four, or no additional HexNAcs attached (Figure 2 C). CID-MS/MS analysis on [M+H] + of HexNAc 2 (Xyl 1 Man 3 GlcNAc 2 ) at m/z 1799 and HexNAc 3 (Xyl 1 Man 3 GlcNAc 2 ) at m/z 2044 showed the presence of HexNAc-HexNAc + sequence ( m/z 505) in both. The absence of a HexNAc 3 + ion in the latter indicated that one single HexNAc and one HexNAc 2 element were extending from the two antenna of a biantennary structure. It remains possible that additional triantennary structure was present but not a monoantennary one with a stretch of three HexNAcs. 
+
+
+
+The major N -glycan profile of S. japonicum cercariae
+
+The lack of sample material prevented a full characterization of the S. japonicum cercarial N -glycans. However, FAB-MS analysis of the permethyl derivatives revealed some interesting features in comparison with those of S. mansoni. As shown in Figure 6, none of the major components detected appeared to carry xylosylation. Apart from high mannose-type structures, the other major [M+Na] + molecular ions afforded could be assigned as (i) core fucosylated Hex 2 - 5 HexNAc 2 ( m/z 1141, 1345, 1549, and 1753), likely to be truncated pauci mannose-type; and (ii) fucosylated trimannosyl core extended with a single HexNAc ( m/z 1590), a single Hex-HexNAc ( m/z 1794), a single Fuc 1 Hex 1 HexNAc ( m/z 1968), two Hex 1 HexNAc 1 units ( m/z 2244), and two Fuc 1 Hex 1 HexNAc 1 units ( m/z 2592). Assignment of core 6-fucosylation was supported by susceptibility to N -glycosidase F and bovine kidney -fucosidase. Digestion with the latter enzyme resulted in a shift of the molecular ion signals to m/z values corresponding to loss of a Fuc residue (data not shown). A-type oxonium fragment ions at m/z 1495 and 2118, which were derived from cleavage at the chitobiose core of [Fuc 1 Hex 1 HexNAc 1 ] 1 [Hex 3 HexNAc 2 Fuc] ([M+Na] + at m/z 1968) and [Fuc 1 Hex 1 HexNAc 1 ] 2 [Hex 3 Hex-NAc 2 Fuc] ([M+Na] + at m/z 2592), further indicated that one Fuc was attached to the reducing end HexNAc of these two species. CID-MS/MS analysis on the [M+H] + parent ion of the former yielded major daughter ions at m/z 196, 432, 450, 638, 810, and 1495, which, except for the last ion, were identical to those afforded by the Le x containing structures from S. mansoni described above (Figure 3 AñB). On treatment with 3/4-specific fucosidase, one Fuc was removed from this species. The CID-MS/MS analysis of the digestion product unambiguously showed that daughter ions at m/z 638, 810, and 1495 were replaced by new signals at m/z 464, 636, and 1321, as would be expected from removal of the Fuc 3-linked to GlcNAc in Le x. Our data therefore strongly suggested that the major N -glycans of S. japonicum cercariae resembled those of S. mansoni by carrying core 6-fucosylation and terminal Le x epitopes but were not core xylosylated. 
+
+
+
+View larger version (27K):
+
+[in this window]
+
+[in a new window]
+
+Figure 6. FAB-mass spectrum of the permethyl derivatives of total N -glycans from S. japonicum cercariae. Mass region above m/z 2100 was magnified as inset. Signals at m/z 1451 and 2074 were thioglycerol adducts of the major molecular ions at m/z 1345 and 1968, respectively. [M+Na] + molecular ion signals at m/z 1579, 2191 and 2396 corresponded to Hex 5 HexNAc 2, Hex 8 HexNAc 2 and Hex 9 HexNAc 2, respectively. The signal at m/z 2418 corresponded to species with one Fuc less than that at m/z 2592. Other signals were described in the text.
+
+
+
+The major N- glycan profiles of the adult worms
+
+In contrast to the N -glycans from the cercariae, similar FAB-MS and HPLC analyses showed that the total N -glycans from the adult worms of both S. mansoni and S. japonicum comprised a range of typical high and pauci-mannose types, hybrid type, and complex type of structures without any significant level of Le x or xylosylation (Figure 7, Tables III and IV ). The truncated pauci-mannose structures (Man 2,3 GlcNAc 2 ) were found to be mostly core fucosylated, yielding signals assigned as Fuc 1 Hex 2,3 HexNAc 2, whereas Man 4 ñ 9 GlcNAc 2 were not fucosylated. All these signals disappeared on treatment with both -mannosidase and -fucosidase (Figure 7 C), which trimmed these components down to the expected core Manﬂ-GlcNAc 2 structure, giving the [M+Na] + signal at m/z 763. In a separate experiment in which only -mannosidase was used, both fucosylated and nonfucosylated core Manﬂ-GlcNAc 2 were produced. 
+
+
+
+View larger version (35K):
+
+[in this window]
+
+[in a new window]
+
+Figure 7. FAB-MS analysis of the permethyl derivatives of N -glycans from S. japonicum adult worms. (A) Low mass region showing the major fragment ions and (B) molecular ion regions of the total N -glycans. (C) FAB-spectrum obtained on sample treated with a combination of -fucosidase from bovine kidney and -mannosidase; and (D) after further digestion with ﬂ-galactosidase. Major molecular ion signals were assigned as compiled in Table III and described in the text. Signals at m/z 1362, 1566, 1770, and 1811 in (C) were fragment ions resulting from cleavage at the chitobiose core of the major components. The corresponding FAB-mass spectrum of the S. mansoni adult worm N -glycans were virtually identical to (A) and (B) except for an additional peak at m/z 2325, corresponding to fucosylated core with possibly two LacdiNAc units on a biantennary structure.
+
+
+
+View larger version (34K):
+
+[in this window]
+
+[in a new window]
+
+Table III. Major components detected in the FAB-mass spectra of the permethylated N -glycans of S. japonicum adult worms before and after sequential enzyme digestions
+
+
+
+a The products after a combination of bovine kidney -fucosidase and -mannosidase digestions (Figure 7 C) were further converted by ﬂ-galactosidase digestion to the final products (Figure 7 D), as indicated by an arrow.
+
+
+
+b Only major structures were presented. In many instances, other structural isomers are possible. Symbols used: open triangles, Fuc; open circles, Gal; filled circles, Man; open squares, HexNAc.
+
+
+
+View this table:
+
+[in this window]
+
+[in a new window]
+
+Table IV MS analysis and assignment of the major pyridylaminated N -glycans from S. mansoni adult fractionated on normal phase HPLC (Figure 8)
+
+In addition to the high and pauci-mannose-type structures, the fucosylated trimannosyl core structures were found to be extended by a combination of single HexNAc residues, Hex-HexNAc units, and HexNAc-HexNAc units to yield a range of hybrid- and complex-type structures, as deduced from sequential exo-glycosidase digestions (Figure 7 C and 7 D, Table III ). Thus, the most common fragment ions detected were m/z 260 (HexNAc + ), 464 (Hex-HexNAc + ), 505 (HexNAc-HexNAc + ), and 913 (Hex 2 HexNAc 2 + ) at the low mass range of the FAB-spectrum of the permethylated N -glycans (Figure 7 A). Unlike the cercarial N -glycans, a signal that would correspond to Le x ( m/z 638) could not be detected at this level, whereas m/z 679 could, albeit weakly. The latter ion suggested that, in addition to LacdiNAc, a fucosylated LacdiNAc type of epitope might also be present and was relatively more abundant than Le x, if present at all. The fragment ion at m/z 709 (Hex 1 HexNAc 2 + ) indicated that a HexNAc-Hex-HexNAc- or a Hex-HexNAc-HexNAc- terminal sequence was also present. Other two fragment ions at m/z 668 (Hex 2 HexNAc + ) and 872 (Hex 3 HexNAc + ) were most likely derived from cleavage at the chitobiose cores of the pauci-mannose structures. 
+
+
+
+To further ascertain if Le x could be found among the complex- and hybrid-type structures, the N -glycans from S.mansoni adults were pyridylaminated and fractionated on normal phase HPLC (Figure 8 ). The fluorescence-detected peaks were collected, screened by MS, and, where sample materials were sufficient, sequentially digested with exo-glycosidase and/or subjected to CID-MS/MS to confirm their terminal structures, as summarized in Table IV. The assignment of high mannose structures in N6.7, N7.7, N8.7, N9.6, and N10.4, pauci mannose and other truncated cores, and monoantennary structures in N6.9 and N7.7 were supported by their respective susceptibility to -mannosidase trimming. The presence of additional Fuc, which may constitute Le x and fucosylated LacdiNAc in the monoantennary and complex-type structures, were indicated by their molecular composition. Treatment with bovine kidney -fucosidase in general only removed one Fuc corresponding to the core 6-Fuc, whereas additional Fuc on the antenna were only susceptible to 3,4-fucosidase. CID-MS/MS on the parent ions at m/z 2038 and 2079 in N7.7 yielded the characteristic sets of daughter ions attributable to terminal Hex-4(Fuc-3)HexNAc ( m/z 432, 638) and terminal HexNAc-4(Fuc-3)HexNAc (m/z 260, 473, 679) structures, respectively. For N6.9, which was of higher abundance, further reverse phase HPLC on the -fucosidase treated sample yielded four major peaks (data not shown). An -mannosidase resistant peak was digested by ﬂ-GlcNAcase to give the trimannosyl core, indicating a GlcNAcﬂ1 6(GlcNAc-ﬂ1 3)Man 3 GlcNAc 2 structure consistent with its defined composition. The remaining three peaks were shown to be monoantennary by their susceptibility to -mannosidase, which removed one Man residue from each. Based on their molecular composition, reverse phase elution order and Glc unit difference (Tomiya and Takahashi, 1998 ), the earliest eluting peak was deduced to be a mixture carrying either a LacNAc or LacdiNAc on the 3-arm, whereas the other two later eluting peaks carried a LacNAc and a LacdiNAc on the 6-arm, respectively. The LacNAc containing components were converted to the expected core by sequential treatment with ﬂ-galactosidase and then ﬂ-GlcNAcase, whereas the LacdiNAc components were only susceptible to the nonspecific ﬂ-HexNAcase and not the specific ﬂ-GlcNAcase. Based on these analyses, other larger N -glycan components from the adult worms were likewise implicated as complex types extended with LacNAc and/or LacdiNAc units, some of which were fucosylated. The smallest N -glycans with a Le x determinant as shown here were the monoantennary type with a single Le x unit on an 6-fucosylated but not xylosylated trimannosyl N,N '-diacetylchitobiose core. 
+
+
+
+View larger version (23K):
+
+[in this window]
+
+[in a new window]
+
+Figure 8. Normal phase HPLC profile of PA-tagged total N -glycans from S. mansoni adults. Fractions were manually collected and named according to their elution position on a Glc unit (GU) scale, as compiled in Table IV. Fractions N7.7, N8.7, N9.6, and N10.4 were pools of nonresolved peaks, each containing a high mannose structure and numerous complex-type structures.
+
+
+
+Discussion
+
+Despite the fact that schistosome is the best studied system of helminthic glycosylation, there remain many gaps in our understanding of how the expression of various glyco-epitopes characterized to date are developmentally modulated. A frequently encountered difficulty is the limitation in sample amount available for each of the developmental stages. Immunodetection based on monoclonal antibodies (mAb) of known specificities is the most sensitive methods in probing the expression of a particular glyco-epitope. Yet, due to many potential cross-reactivities among structurally related epitopes, a chemical evidence for the implicated structures is needed to substantiate its existence. We presented detailed structural characterization of the S. mansoni cercarial N -glycans and sought to unambiguously pin down the two most prominent features, namely, core ﬂ2-xylosylation and Le x using a variety of complementary approaches. To our knowledge, all core 6-fucosylated, ﬂ2-xylosylated hybrid and complex-type N -glycans characterized here represent novel structures. We also provided a quantitative profile of the vaious N -glycans detected and examined, for the first time, the N -glycans of the cercariae and adults of S. japonicum for comparison. 
+
+
+
+The schistosomal egg glycans represent the first and only example in animal glycoproteins where both core 3-fucosylation and ﬂ2-xylosylation were chemically shown to occur on the N -glycans (Khoo et al., 1997b ). Unlike plant glycoproteins, these modifications almost invariably occur on an 6-fucosylated core. As characterized previously (Khoo et al., 1997b ), either core 3-fucosylation or xylosylation can occur on the egg N -glycans of both schistosome species, but coexistence of both core modifications appeared to be restricted to S.japonicum. The detection of core difucosylated and xylosylated N -glycans is therefore diagnostic of S. japonicum and possibly is also developmental stageñspecific, restricted to the eggs and miracidia. We have not been able to detect such core modification on the N -glycans from any other S. japonicum developmental stages examined, including the cercariae, schistosomula, and adults. In contrast, ﬂ2-xylosylation is a prominent structural feature of S. mansoni cercarial N -glycans but down-regulated as the parasite develops into adult. A recent study based on Western blot analysis with core 3Fuc- and ﬂ2Xyl-specific antibodies (van Die et al., 1999 ) has indicated that ﬂ2-core xylosylation can be found on the adult extracts of S.mansoni but not S. japonicum. Although we failed to detect core xylosylation in the adults of either species, we did provide chemical evidence that core xylosylation is characteristic of S.mansoni cercariae. It is possible that residual level of expression on the adults may still be detectable by antibodies. On the other hand, the implicated presence of 3-core fucosylation on the adults (van Die et al., 1999 ) could not be substantiated by our mass spectrometry analysis of N -glycosidase Añreleased N -glycan samples. 
+
+
+
+Apart from N -glycan core fucosylation, at least two other antigenic fucosylated epitopes feature prominently on schistosomal glycans. The first is the unique multifucosylated HexNAc termini with internal Fuc residue, ±Fuc 2Fuc 3GalNAcﬂ(±Fuc 2Fuc 2Fuc 3)4GlcNAc-, as found on the complex O -glycans of S. mansoni cercarial glycocalyx (Khoo et al., 1995 ), which probably constitute the epitope recognized by a mAb raised against cercarial glycoproteins (Dalton et al., 1987
+
+Another fucosylated epitope as defined by mAb raised against S. mansoni egg glycoproteins has been characterized to recognize Le x structure (Ko et al., 1990
+
+First, the same mAb that failed to bind to the surface of the cercariae has actually been shown to bind to the cercarial and egg extracts more readily than to the adult extracts (Weiss and Strand, 1985
+
+Sera from humans and rodents infected with S. mansoni and S. japonicum have been shown to contain antibodies reactive with Le x (Nyame et al., 1996
+
+Materials and methods
+
+Parasite materials
+
+Biomphalaria glabrata albino snails infected with a Puerto Rican strain of S. mansoni were obtained from Dr. Fred Lewis of the Bethesda Biomedical Research Institute. Cercariae were shed by exposing the snails to light for 2 h and collected by centrifugation. S. japonicum cercariae, adult worms, and eggs were obtained from Dr. Yuan Hong Chang of Shanghai Medical University. Infected Oncomelania hupensis snails were obtained in Anhui province. Additional S. japonicum life cycles were also maintained locally in the laboratory of Department of Parasitology (NYMU), where Oncomelania hupensis snails were collected from the field. C57BL/6 mice (from National Science Council, Taiwan) were infected with 50 S. japonicum cercariae percutaneously from the belly or 150 S. mansoni cercariae via tail immersion. For the recovery of adult worms, infected mice were sacrificed at 8 weeks postinfection, and the worms were perfused out from the portal vein of the liver (Duvall and Dewitt, 1967
+
+Extraction of glycoprotein and preparation of N -glycans
+
+Collected schistosomal cercariae, schistosomula, and adult worm samples were homogenated by sonic treatment at 4∞C, and lipids were removed by sequential extraction with 5:10:3 CHCl 3 :CH 3 OH:H 2 O and 30:60:8 CHCl 3 :CH 3 OH:0.4M sodium acetate (v/v/v). Delipidated homogenates were vortexed in 6 M guanidine hydrochloride, and the supernatants were dialyzed against running water at 4∞C. Alternatively, cercarial glycoproteins were extracted by phenol/water partition method as described (Xu et al., 1994
+
+The crude glycoprotein extracts obtained were first digested with nonñTPCK-treated trypsin (Roche) (1:50 enzyme: protein ratio, w/w; 37∞C for 4 h in 50 mM ammonium hydrogen carbonate buffer, pH 8.4) followed by nonñTLCK-treated chymotrypsin in the same conditions. The digested glycopeptides were loaded onto C18 Sep-pak Æ cartridge (Waters). Glucan polymer and other hydrophilic contaminants were washed off with 5% aqueous acetic acid, and the bound peptides were eluted with a step gradient of 20, 40, and 60% 1-propanol in water. All the eluted fractions were pooled, dried down, and then incubated with N -glycosidase F (5 units, Roche) overnight at 37∞C in 50 mM ammonium bicarbonate buffer, pH 8.4. Released N -glycans were separated from peptides/glycopeptides using the same C18 Sep-pak procedure. The pooled peptides/glycopeptides fractions were then digested with N -glycosidase A from almond (0.5 mU, Calbiochem) in 50mM ammonium acetate buffer, pH 5, at 37∞C overnight. N -glycans released by N -glycosidase A were likewise separated from the de- N -glycosylated peptides/glycopeptides by the same C18 Sep-pak procedures. 
+
+
+
+Fluorescent labeling and HPLC purification of N -linked glycans
+
+The N -glycosidase Fñreleased N -glycans were reductively aminated with 2-aminopyridine at the reducing end exactly as described (Hase, 1994
+
+HPLC analysis was performed on a Hewlett Packard 1100 series LC equipped with a thermostatted column compartment and fluorescence detector. The PA-labeled glycans were size fractionated on a PalPak type N column (Takara, 4.6 x 250 mm) at a flow rate of 1 ml/min, 30∞C, and detected by fluorescence with excitation and emission wavelengths set at 310 and 380 nm, respectively. Buffers A and B contain 25:75 and 50:50 stock buffer: acetonitrile (v/v), respectively, where stock buffer was aqueous solution containing 10% acetonitrile and 3% acetic acid, titrated to pH 7.3 with triethylamine. The column was equilibrated and maintained at 10% B for 5 min, then linearly increased to 100% B in 40 min and kept at 100% B for another 15 min. For second dimension separation or desalting after enzyme digestion, reverse phase HPLC was carried out on a Hypersil ODS column (5 µ, 4.0 x 125 mm, Hypersil), at a flow rate of 0.5 ml/min, 40∞C, and detected by fluorescence at 320/400 nm excitation/emission wavelengths. Buffer A was 0.1 M ammonium acetate, pH 4.0; buffer B was 15% methanol in buffer A. Gradient used: 5% to 20% B at 15min, to 35% B at 50 min, to 80% B at 60 min. In both modes, PA-labeled isomalto-oligomers prepared from partially hydrolyzed dextran were used to calibrate the elution positions as Glc units. Additional PA-tagged N -glycan standards were purchased from Seikagaku (Japan). 
+
+
+
+Sequential exoglycosidase digestions
+
+Total or HPLC-purified PA-tagged glycans were digested with exo-glycosidases using the following conditions: -mannosidase (from jack bean, Boehringer Mannheim): 0.5 U in 100µl of 50 mM ammonium acetate buffer containing 1 mM ZnCl 2, pH 5.0; ﬂ-galactosidase (from bovine testes, Roche): 27mU in 100 µl of 50 mM sodium citrate phosphate buffer, pH 4.6; -L-fucosidase (from bovine kidney, Roche): 0.1 U in 100 µl of 100 mM ammonium acetate buffer, pH 4.5; 1-3,4 fucosidase (from Xanthomonas manihotis, New England Biolabs): 5 U in 55 µl of 50 mM sodium citrate buffer, pH 6.0; ﬂ1-4 galactosidase (from Diplococcus pneumoniae, Roche): 5mU in 50 µl of 50 mM sodium acetate buffer, pH 6.0; 1-2,3 mannosidase (from X. manihotis, New England Biolabs): 5 U in 55 µl of 50 mM sodium citrate, pH 6.0; N -acetyl-ﬂ-D-glucosaminidase (from D. pneumoniae, Roche): 5 mU in 50 µl of 50mM sodium acetate buffer, pH 6.0; ﬂ- N -acetylhexosaminidase (from jack bean, Calbiochem): 500 mU in 50 µl of 100 mM sodium citrate phosphate buffer, pH 5.0. All digestions were carried out at 37∞C for 24 h. For digestion of total N -glycans, an aliquot was withdrawn from the reaction mixtures and permethylated for MS analysis of the products. The next enzyme was added without further purification. For PA-tagged samples, each digestion was additionally followed by reverse phase HPLC mapping/purification before the next digestion. 
+
+
+
+Chemical derivatization and FAB-MS analysis
+
+Samples were permethylated using the NaOH/dimethyl sulfoxide slurry method as described by Dell et al. (1994)
+
+Monosaccharide composition and linkage analysis
+
+For GC-MS linkage analysis, partially methylated alditol acetates were prepared from permethyl derivatives by hydrolysis (2 M trifluoroacetic acid, 121∞C, 2 h), reduction (10 mg/ml NaBH 4, 25∞C, 2 h), and acetylation (acetic anhydride, 100∞C, 1 h). GC-MS was carried out using a Hewlett-Packard Gas Chromatograph 6890 connected to a HP 5973 Mass Selective Detector. Sample was dissolved in hexane prior to splitless injection into a HP-5MS fused silica capillary column (30 m x 0.25 mm I.D., HP). The column head pressure was maintained at around 8.2 psi to give a constant flow rate of 1 ml/min using helium as carrier gas. Initial oven temperature was held at 60∞C for 1 min, increased to 90∞C in 1 min, and then to 290∞C in 25 min. For monosaccharide composition analysis, released N -glycans were methanolyzed with 0.5 M methanolic-HCl (Supelco) at 80∞C for 16 h; re- N -acetylated with 500 ml of methanol, 10 ml of pyridine, and 50 ml of acetic anhydride; and then treated with the Sylon HTP Æ trimethylsilylating reagent (Supelco) for 20min at room temperature, dried down, and redissolved in hexane. GC-MS analysis of the trimethylsilylated derivatives was performed on the same HP system using a temperature gradient of 60∞C to 140∞C at 25∞C/min, increased to 250∞C at 5∞C/min, and then increased to 300∞C at 10∞C/min. 
+
+
+
+Acknowledgments
+
+We gratefully acknowledge Dr. John P. Caulfield (Roche Bioscience, Palo Alto, CA, USA) for his support and advice on this work and provision of the bulk of the S. mansoni cercariae sample, and Dr. Delphi Chatterjee (Department of Microbiology, Colorado State University, CO, USA) for her initial involvement in the preparation of cercarial glycoprotein extracts. This work was supported by the Academia Sinica and National Science Council (Taiwan, R.O.C.) Grants NSC 87ñ2311-B-001ñ091 and NSC 88ñ2311-B-001ñ117 to KHK. 
+
+
+
+Abbreviations
+
+LacdiNAc, N,N '-diacetyl lactosamine; LacNAc, N -acetyllactosamine; Le x, Lewis X; mAb, monoclonal antibody; FAB, fast atom bombardment; GC, gas chromatography; EI, electron impact; MS, mass spectrometry; CID, collision-induced dissociation; PA, pyridylaminated or 2-aminopyridine. 
+
+
+
+
+
+
+
+Footnotes
+
+1 To whom correspondence should be addressed at: Institute of Biological Chemistry, Academia Sinica, Nankang, Taipei 115, Taiwan, R.O.C.
+
+References
+
+Altmann, F., Staudacher, E., Wilson, I.B., and Marz, L. (1999) Insect cells as hosts for the expression of recombinant glycoproteins. Glycoconj. J., 16, 109ñ123. [ISI] [Medline] 
+
+
+
+Cummings, R.D. and Nyame, A.K. (1996) Glycobiology of schistosomiasis. FASEB J., 10, 838ñ848. 
+
+
+
+Cummings, R.D. and Nyame, A.K. (1999) Schistosome glysoconjugates. Biochim. Biophys. Acta, 1455, 363ñ374. [ISI] [Medline] 
+
+
+
+Dalton, J.P., Lewis, S.A., Aronstein, W.S., and Strand, M. (1987) Schistosoma mansoni : immunogenic glycoproteins of the cercarial glycocalyx. Exp Parasitol, 63, 215ñ226. 
+
+
+
+Dell, A. (1987) F.A.B.-mass spectrometry of carbohydrates. Adv. Carbohydr. Chem. Biochem., 45, 19ñ72. [ISI] [Medline] 
+
+
+
+Dell, A., Reason, A.J., Khoo, K.H., Panico, M., McDowell, R.A., and Morris,H.R. (1994) Mass spectrometry of carbohydrate-containing biopolymers. Meth. Enzymol., 230, 108ñ132. [ISI] [Medline] 
+
+
+
+Duvall, R.H. and Dewitt, W.B. (1967) An improved perfusion technique for recovering adult schistosomes from laboratory animals. Am. J. Trop. Med. Hyg., 16, 483ñ486. [ISI] [Medline] 
+
+
+
+Garcia-Casado, G., Sanchezmonge, R., Chrispeels, M.J., Armentia, A., Salcedo, G., and Gomez, L. (1996) Role of complex asparagine-linked glycans in the allergenicity of plant glycoproteins. Glycobiology, 6, 471ñ477. [Abstract] 
+
+
+
+Hase, S. (1994) High-performance liquid chromatography of pyridylaminated saccharides. Meth. Enzymol., 230, 225ñ237. [ISI] [Medline] 
+
+
+
+Haslam, S.M., Coles, G.C., Munn, E.A., Smith, T.S., Smith, H.F., Morris, H.R., and Dell, A. (1996) Haemonchus contortus glycoproteins contain N-linked oligosaccharides with novel highly fucosylated core structures. J. Biol. Chem., 271, 30561ñ30570. [Abstract/ Free FullText] 
+
+
+
+Kamerling, J.P. and Vliegenthart, J.F.G. (1997) Hemocyanins. In Montreuil, J., Vliegenthart, J.F.G. and Schachter, H. (eds), Glycoproteins II. Elsevier, Amsterdam, pp. 123ñ142. 
+
+
+
+Khoo, K.-H., Chatterjee, D., Caulfield, J.P., Morris, H.R., and Dell, A. (1997a) Structural characterization of glycophingolipids from the eggs of Schistosoma mansoni and Schistosoma japonicum. Glycobiology, 7, 653ñ661. [Abstract] 
+
+
+
+Khoo, K.-H., Chatterjee, D., Caulfield, J.P., Morris, H.R., and Dell, A. (1997b) Structural mapping of the glycans from the egg glycoproteins of Schistosoma mansoni and Schistosoma japonicum : identification of novel core structures and terminal sequences. Glycobiology, 7, 663ñ677. [Abstract] 
+
+
+
+Khoo, K.-H., Sarda, S., Xu, X., Caulfield, J.P., McNeil, M.R., Homans, S.W., Morris, H.R., and Dell, A. (1995) A unique multifucosylated 3GalNAcﬂ1 4GlcNAcﬂ1 3Gal 1- motif constitutes the repeating unit of the complex O-glycans derived from the cercarial glycocalyx of Schistosoma mansoni. J. Biol. Chem., 270, 17114ñ17123. [Abstract/ Free FullText] 
+
+
+
+Ko, A.I., Drager, U.C., and Harn, D.A. (1990) A Schistosoma mansoni epitope recognized by a protective monoclonal antibody is identical to the stage-specific embryonic antigen 1. Proc. Natl Acad. Sci. USA, 87, 4159ñ4163. [Abstract] 
+
+
+
+Kˆster, B. and Strand, M. (1994) Schistosoma mansoni : immunolocalization of two different fucose- containing carbohydrate epitopes. Parasitology, 108, 433ñ446. [ISI] [Medline] 
+
+
+
+Kubelka, V., Altmann, F., Kornfeld, G., and Marz, L. (1994) Structures of the N-linked oligosaccharides of the membrane glycoproteins from three lepidopteran cell lines (Sf-21, IZD-Mb-0503, Bm-N). Arch. Biochem. Biophys., 308, 148ñ157. [ISI] [Medline] 
+
+
+
+Kubelka, V., Altmann, F., Staudacher, E., Tretter, V., Marz, L., Hard, K., Kamerling, J.P., and Vliegenthart, J.F. (1993) Primary structures of the N-linked carbohydrate chains from honeybee venom phospholipase A2. Eur. J. Biochem., 213, 1193ñ1204. [Abstract] 
+
+
+
+Lerouge, P., Cabanes-Macheteau, M., Rayon, C., Fischette-LainÈ, A.-C., Gomord, V., and Faye, L. (1998) N-Glycoprotein biosynthesis in plants: recent developments and future trends. Plant Mol. Biol., 38, 31ñ48. [ISI] [Medline] 
+
+
+
+Levery, S.B., Weiss, J.B., Salyan, M.E., Roberts, C.E., Hakomori, S., Magnani, J.L., and Strand, M. (1992) Characterization of a series of novel fucose-containing glycosphingolipid immunogens from eggs of Schistosoma mansoni. J. Biol. Chem., 267, 5542ñ5551. [Abstract/ Free FullText] 
+
+
+
+Nyame, A.K., Debose-Boyd, R., Long, T.D., Tsang, V.C., and Cummings, R.D. (1998) Expression of Lex antigen in Schistosoma japonicum and S. haematobium and immune responses to Lex in infected animals: lack of Lex expression in other trematodes and nematodes. Glycobiology, 8, 615ñ624. [Abstract/ Free FullText] 
+
+
+
+Nyame, A.K., Pilcher, J.B., Tsang, V.C., and Cummings, R.D. (1996) Schistosoma mansoni infection in humans and primates induces cytolytic antibodies to surface Le(x) determinants on myeloid cells. Exp. Parasitol., 82, 191ñ200. [ISI] [Medline] 
+
+
+
+Nyame, A.K., Pilcher, J.B., Tsang, V.C., and Cummings, R.D. (1997) Rodents infected with Schistosoma mansoni produce cytolytic IgG and IgM antibodies to the Lewis x antigen. Glycobiology, 7, 207ñ215. [Abstract] 
+
+
+
+Richter, D., Incani, R.N., and Harn, D.A. (1996) Lacto-N-fucopentaose III (Lewis x), a target of the antibody response in mice vaccinated with irradiated cercariae of Schistosoma mansoni. Infect. Immun., 64, 1826ñ1831. [Abstract] 
+
+
+
+Srivatsan, J., Smith, D.F., and Cummings, R.D. (1992a) The human blood fluke Schistosoma mansoni synthesizes glycoproteins containing the Lewis X antigen. J. Biol. Chem., 267, 20196ñ20203. [Abstract/ Free FullText] 
+
+
+
+Srivatsan, J., Smith, D.F., and Cummings, R.D. (1992b) Schistosoma mansoni synthesizes novel biantennary Asn-linked oligosaccharides containing terminal b-linked N-acetylgalactosamine. Glycobiology, 2, 445ñ452. [Abstract] 
+
+
+
+Tomiya, N. and Takahashi, N. (1998) Contribution of component monosaccharides to the coordinates of neutral and sialyl pyridylaminated N-glycans on a two-dimensional sugar map. Anal. Biochem., 264, 204ñ210. [ISI] [Medline] 
+
+
+
+Tretter, V., Altmann, F., Kubelka, V., Marz, L., and Becker, W.M. (1993) Fucose a1,3-linked to the core region of glycoprotein N-glycans creates an important epitope for IgE from honeybee venom allergic individuals. Int.Arch. Allergy Immunol., 102, 259ñ266. 
+
+
+
+van Dam, G.J., Bergwerff, A.A., Thomas-Oates, J.E., Rotmans, J.P., Kamerling, J.P., Vliegenthart, J.F., and Deelder, A.M. (1994) The immunologically reactive O-linked polysaccharide chains derived from circulating cathodic antigen isolated from the human blood fluke Schistosoma mansoni have Lewis x as repeating unit. Eur. J. Biochem., 225, 467ñ482. [Abstract] 
+
+
+
+van Die, I., Gomord, V., Kooyman, F.N., van den Berg, T.K., Cummings, R.D., and Vervelde, L. (1999) Core a1 3-fucose is a common modification of N-glycans in parasitic helminths and constitutes an important epitope for IgE from Haemonchus contortus infected sheep. FEBS Lett., 463, 189ñ193. [ISI] [Medline] 
+
+
+
+van Ree, R., Cabanes-Macheteau, M., Akkerdaas, J., Milazzo, J.P., Loutelier-Bourhis, C., Rayon, C., Villalba, M., Koppelman, S., Aalberse, R., Rodriguez, R., and others. (2000) ﬂ(1,2)-xylose and (1,3)-fucose residues have a strong contribution in IgE binding to plant glycoallergens. J. Biol. Chem., 275, 11451ñ11458. [Abstract/ Free FullText] 
+
+
+
+van Remoortere, A., Hokke, C.H., van Dam, G.J., van Die, I., Deelder, A.M. and van den Eijnden, D.H. (2000) Various stages of Schistosoma express Lewisx, LacdiNAc, GalNAcﬂ1ñ4(Fuc 1ñ3)GlcNAc and GalNAcﬂ1ñ4(Fuc 1ñ2Fuc 1ñ3)GlcNAc carbohydrate epitopes: detection with monoclonal antibodies that are characterized by enzymatically synthesized neoglycoproteins. Glycobiology, 10, 601ñ609. [Abstract/ Free FullText] 
+
+
+
+Velupillai, P. and Harn, D.A. (1994) Oligosaccharide-specific induction of interleukin 10 production by B220+ cells from schistosome-infected mice: a mechanism for regulation of CD4+ T-cell subsets. Proc. Natl. Acad. Sci. USA., 91, 18ñ22. [Abstract] 
+
+
+
+Weiss, J.B., Magnani, J.L., and Strand, M. (1986) Identification of Schistosoma mansoni glycolipids that share immunogenic carbohydrate epitopes with glycoproteins. J. Immunol., 136, 4275ñ4282. [Abstract/ Free FullText] 
+
+
+
+Weiss, J.B. and Strand, M. (1985) Characterization of developmentally regulated epitopes of Schistosoma mansoni egg glycoprotein antigens. J. Immunol., 135, 1421ñ1429. [Abstract/ Free FullText] 
+
+
+
+Wilson, I.B., Harthill, J.E., Mullin, N.P., Ashford, D.A., and Altmann, F. (1998) Core 1,3-fucose is a key part of the epitope recognized by antibodies reacting against plant N-linked oligosaccharides and is present in a wide variety of plant extracts. Glycobiology, 8, 651ñ661. [Abstract/ Free FullText] 
+
+
+
+Wuhrer, M., Dennis, R.D., Doenhoff, M.J., Lochnit, G., and Geyer, R. (2000) Schistosoma mansoni cercarial glycolipids are dominated by lewis X and pseudo-lewis Y structures. Glycobiology, 10, 89ñ101. [Abstract/ Free FullText] 
+
+
+
+Xu, X., Stack, R.J., Rao, N., and Caulfield, J.P. (1994) Schistosoma mansoni : fractionation and characterization of the glycocalyx and glycogen-like material from cercariae. Exp. Parasitol., 79, 399ñ409. [ISI] [Medline] 
+
+
+
+
+
+
+

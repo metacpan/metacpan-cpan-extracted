@@ -1,0 +1,488 @@
+Revision history for Perl extension EV
+
+Changes marked with (libev) are changes in libev, and have more
+documentation in the libev Changes file.
+
+4.22 Sun Dec 20 02:34:39 CET 2015
+        - (libev) when epoll detects unremovable fds in the fd set, rebuild
+          only the epoll descriptor, not the signal pipe, to avoid
+          SIGPIPE in ev_async_send. This doesn't solve it on fork,
+          so document what needs to be done in ev_loop_fork
+          (analyzed by Benjamin Mahler).
+        - (libev) remove superfluous sys/timeb.h include on win32
+          (analyzed by Jason Madden).
+        - updated libecb.
+
+4.21 Mon Jul 13 21:47:33 CEST 2015
+	- allow argument in timer->again.
+        - document timer->remaining.
+        - document default repeat value for timer->set.
+
+4.20 Sat Jun 20 13:07:34 CEST 2015
+        - added stability canary support.
+	- truly rely on automatic configuration for clock_gettime and others.
+          unfortunately, this doesn't help with activeperl and similar perls,
+          which define _POSIX_TIMERS without actually implementing any of it.
+        - (libev, ecb) make it compile as C++ again.
+        - (libev) fix a potential aliasing issue when accessing watcher cbs.
+
+4.18 Sat Sep  6 20:37:23 CEST 2014
+	- use slightly better weay to find includes, to support multiarch
+          on newer perls.
+
+4.17 Fri Apr 11 06:22:38 CEST 2014
+	- perl5porters broke Async::Interrupt, BDB, EV, IO::AIO, OpenCL
+          without warning by switching the meaning of USE_SOCKETS_AS_HANDLES
+          in 5.18. What's so attractive about giving a shit about backwards
+          compatibility - I will never understand.
+
+4.16 Sat Mar  8 16:49:05 CET 2014
+	- make sure EV::CHECK is available at all times.
+        - avoid a spurious warning when perl -w overrides "no warnings".
+        - use perl's signal implementation on WIN32.
+        - ensure extern "C" function pointers are used for externally-visible
+          pointers.
+	- (libev) mark event pipe fd as cloexec after a fork (analyzed by Sami Farin).
+        - (ecb) support m68k, m88k and sh (patch by Miod Vallat).
+        - (libev) in the absence of autoconf, do not use the clock syscall
+          on glibc >= 2.17 (avoids the syscall AND -lrt on systems
+          doing clock_gettime in userspace).
+        - (ecb) work around memory barriers and volatile apparently both being
+          broken in visual studio 2008 and later (analysed and patch by Nicolas Noble).
+
+4.15 Fri Mar  1 12:15:53 CET 2013
+	- (libev) upgrade to 4.15 - too many changes to list.
+	- EV::run now returns a boolean.
+        - API version 5:1.
+        - document that cleanup watchers are not available via perl.
+        - cast I32 to int in error message printf.
+        - remove dependencies on librt and libpthreads on GNU/Linux.
+
+4.11 Sat Feb  4 19:56:26 CET 2012
+	- (libev) implement memory fences for (obsolete) llvm-gcc.
+
+4.10 Thu Jan 19 18:54:23 CET 2012
+        - (libev) fix a race where the workaround against the epoll fork
+          bugs caused signals to not be handled anymore.
+        - (libev) correct backend_fudge for most backends, and implement
+          a windows specific workaround to avoid looping because we call
+          both select and Sleep, both with different time resolutions.
+	- e_new wasn't declared static (causing very minor .so bloat).
+        - replace more old api names by new ones.
+
+4.03 Tue Jan 11 14:51:05 CET 2011
+	- do not avoid the clock_gettime call on GNU/Linux anymore, as EV
+          links against -lpthread anyways - as a result, EV might now take
+          advantage of fast userspace clock_gettime implementations,
+          but also links against -lrt.
+        - (libev) lots of event port bug workarounds.
+        - (libev) officially support files in I/O watchers.
+        - (libev) new function ev_feed_signal.
+        - fix documentation parts still refering to the 3.x API.
+
+4.02 Thu Dec 30 08:27:41 CET 2010
+        - the revents argument did not stringify correctly, as only the
+          numeric value was updated, while the string value was kept from
+          previous invocations.
+
+4.01 Sun Dec  5 12:42:13 CET 2010
+	- fully support EV_COMPAT3=0.
+        - default_fork was stupidly defined as inline.
+        - ask cpan to upgrade AnyEvent if < 5.29.
+        - support EV_EXTRA_DEFS during configuration.
+        - support -DEV_NO_LOOPS for snakker build.
+
+4.00 Mon Oct 25 13:30:09 CEST 2010
+	- many API changes, see the manual.
+        - (libev) lots and lots of bugfixes, see the ev documentation.
+	- fix a bug where inotify usage would parse the same event
+          multiple times, causing various forms of breakage.
+	- greatly reduce stack usage for inotify (8kb to <0.5kb).
+        - expose ev_depth and ev_verify via the XS API.
+        - implement ev_cleanup watchers.
+        - (libev) ev_embed_stop did not correctly stop the watcher.
+        - (libev) disable poll backend on AIX.
+        - (libev) rename EV_TIMEOUT to EV_TIMER.
+        - (libev) add section on accept() problems to the manpage.
+        - (libev) no child watchers on win32.
+        - make code more aliasing compliant, in case perl is ever
+          translated to C.
+        - document the EV::CHECK runtime unavailability.
+        - ported to minix 3.1.7.
+
+3.9  Thu Dec 31 07:59:59 CET 2009
+	- disable t/07* under automatic testing.
+        - increase t/09* timeouts as netbsd has *horribly* broken
+          select/kevent that *usually* sleep >>0.6s instead of 0.3.
+        - add constants EV::FLAG_NOSIGFD, EV::FLAG_NOINOTIFY and
+          EV::BACKEND_ALL.
+        - (libev) signalfd is no longer used by default.
+	- (libev) backport inotify code to C89.
+        - (libev) inotify file descriptors could leak into child processes.
+        - (libev) ev_stat watchers could keep an errornous extra ref on the loop.
+        - (libev) take advantage of inotify_init1, if available.
+        - (libev) the signal handling pipe wasn't always initialised under windows.
+        - changed minimum glibc requirement from glibc 2.9 to 2.7, for signalfd.
+        - (libev) only replace ev_stat.prev when we detect an actual difference.
+
+3.8  Sun Aug  9 15:30:10 CEST 2009
+	- implement $loop->signal/signal_ns.
+        - (libev) incompatible change: do not necessarily reset signal
+          handler to SIG_DFL when a sighandler is stopped.
+        - (libev) ev_default_destroy did not properly free or zero some
+          members, potentially causing crashes and memory corruption on
+          repated ev_default_destroy/ev_default_loop calls.
+	- (libev) take advantage of signalfd on GNU/Linux systems.
+        - (libev) document that the signal mask might be in an unspecified
+          state when using libev's signal handling.
+        - (libev) take advantage of some GNU/Linux calls to set
+          cloexec/nonblock on fd creation, to avoid race conditions.
+        - implement internal glue code to interface more efficiently
+          with AnyEvent.
+
+3.7  Fri Jul 17 16:49:16 CEST 2009
+	- add EV::loop_verify and EV::loop_depth.
+        - use output filehandle for i/o watchers waiting
+          for EV_WRITE, otherwise input filehandle.
+        - use common schmorp.h header.
+        - add EV::Timer->remaining.
+        - allow for subclassing of EV::Loop (see the exciting
+          EV::Loop::Async module for an example).
+        - added EV::invoke_pending and EV::pending_count.
+
+        - (libev) ev_unloop and ev_loop wrongly used a global variable to
+          exit loops, instead of using a per-loop variable.
+	- (libev) the ev_set_io_collect_interval interpretation has changed.
+        - add new functionality: EV::invoke_pending, EV::pending_count.
+        - add $timer->remaining.
+        - add EV::loop_depth.
+        - (libev) calling unloop in fork/prepare watchers will no longer poll
+          for new events.
+        - (libev) use GetSystemTimeAsFileTime instead of _timeb on windows,
+          for slightly higher accuracy.
+        - (libev) actually 0-initialise struct sigaction when installing
+          signals.
+
+3.6  Tue Apr 28 02:50:37 CEST 2009
+	- keepalive(0) could decrease the refcount of the loop
+          permanently.
+        - add ev_suspend/ev_resume, also make ev_now_update
+          accessible via the XS API.
+        - most EV::<eventtype> constants were missing and have been
+          added :/.
+        - add EV::VERSION_MAJOR/VERSION_MINOR constants.
+        - (libev) multiple timers becoming ready within an event loop
+          iteration will be invoked in the "correct" order now.
+        - (libev) do not leave the event loop early just because we have
+          no active watchers, fixing a problem when embedding a kqueue
+          loop that has active kernel events but no registered watchers
+          (reported by blacksand blacksand).
+        - (libev) correctly zero the idx values for arrays, so destroying
+          and reinitialising the default loop actually works (patch by
+          Malek Hadj-Ali).
+        - (libev) new EV::CUSTOM revents flag for use by applications.
+        - (libev) add documentation section about priorites.
+        - (libev) add a glossary to the dcoumentation.
+        - (libev) extend the ev_fork description slightly.
+        - (libev) optimize a jump out of call_pending.
+        - t/03_keepalive could fail when there was no actual error.
+
+3.53 Sun Feb 15 02:38:20 CET 2009
+	- (libev) on win32, the event loop creation could randomly fail
+          due to an initialised variable having the wrong value.
+        - (libev) probe for CLOCK_REALTIME support at runtime as well and
+          fall back to gettimeofday if there is an error, to support older
+          operating systems with newer header files/libraries.
+        - prefer gettimeofday over clock_gettime by default.
+
+3.52 Wed Jan  7 21:46:14 CET 2009
+	- (libev) fix some issues in the select backend when in fd_set mode.
+        - (libev) due to a thinko, instead of disabling everything but
+          select on the borked OS X platform, everything but select was
+          allowed (reported by Emanuele Giaquinta).
+        - (libev) actually verify that local and remote port are matching in
+          libev's socketpair emulation, which makes denial-of-service
+          attacks harder (but not impossible - it's windows). Make sure
+          it even works under vista, which thinks that getpeer/sockname
+          should return fantasy port numbers.
+
+3.51 Wed Dec 24 23:01:59 CET 2008
+        - do not cache the arguments passed to callbacks if the refcount
+          indicates that the callback has stolen them.
+	- (libev) try to avoid librt on GNU/Linux.
+        - (libev) check port_getn return value dfferently, might potentially
+          avoid problems.
+        - (libev) fix a bug with stat watchers possibly causing freezes.
+        - (libev) work around OS X 10.5 breaking poll, now select is the
+          only viable choice left on that pile of garbage.
+	- play tester whore: disable some tests that typically fail only
+          on cpan tester machines.
+
+3.49 Wed Nov 19 11:26:53 CET 2008
+        - fix typos in manpage (Alex Efros).
+	- increase timing even further, for the ever-overloaded cpan-tester
+          machines, and to the detriment of everybody else who wants a fast
+          make test.
+        - possible 5.6 compatibility.
+        - (libev) use inotify even on buggy kernels, but don't rely on it.
+        - (libev) use inotify only as an added hint on network filesystems.
+
+3.48 Thu Oct 30 09:09:48 CET 2008
+	- (libev) use a generation counter to detect spurious epoll events
+          and recreate the kernel in such a case (sorry, it's slow, but
+          I didn't design epoll...).
+	- (libev) optimise away an EPOLL_CTL_ADD/MOD combo in the epoll
+          backend in some cases.
+        - (libev) use memset to initialise most arrays now and do away
+          with the init functions.
+        - speed up event callback invocation further (~15%), by
+          not creating the object reference each time.
+        - EV::sleep was documented, but not implemented. fun.
+
+3.45 Tue Oct 21 22:20:39 CEST 2008
+	- (libev) disable inotify usage on linux <2.6.25 (kernel bug).
+	- (libev) ev_embed will now automatically follow fork.
+        - (libev) ev_once will now pass both io and timeout events to
+          the callback when both happen concurrently, instead of giving
+          one precedence.
+	- install C library documentation as EV::libev manpage (sorry, oesi).
+        - (libev) fix a minor performance bug in ev_stat handling.
+
+3.44 Mon Sep 29 05:16:31 CEST 2008
+	- (libev) add EV::now_update and $loop->now_update.
+
+3.431 Sun Jul 13 00:19:02 CEST 2008
+	- made the EV::embed callback optional again. reported by
+          Vladimir Timofeev.
+
+3.43 Tue Jul  8 20:56:31 CEST 2008
+	- disabled warnings in EV.pm, the CHECK issue is now understood
+          and harmless.
+
+3.42 Mon May 26 07:36:46 CEST 2008
+	- (libev) work around another bug in windows perls and
+           windows itself: failed connects do NOT set read or write
+           flags in select, but this version of libev will.
+
+3.41 Thu May 22 01:39:40 CEST 2008
+	- (libev) fix many heap-related bugs (timers, periodics).
+        - (libev) improve timing stability of timers and periodics.
+        - expose ev_loop_verify to perl code.
+        - clarify documentation for periodic reschedule callbacks.
+        - verify that the passed callback argument is indeed a code
+          reference, for earlier error reporting and a nice calling
+          speed increase (as well as saving memory).
+
+3.4  Tue May 20 21:51:55 CEST 2008
+        - (libev) work around both a windows bug and a bug in perl's
+          select on windows when not waiting for any file descriptors.
+	- bundle ev.pod into the tarball, just to increase its size
+          (and for the poor internetless person).
+          
+3.33 Sun May 18 12:43:04 CEST 2008
+	- (libev) use numerous enhancements such as a more
+          cache-friendly 4-heap and heap index caching for timers.
+        - remove undocumented ev_timer->at accessor.
+
+3.31 Wed Apr 16 20:48:59 CEST 2008
+	- (libev) post-last-minute fix for ev_poll.c problem.
+
+3.3  Wed Apr 16 19:04:47 CEST 2008
+	- (libev) linux eventfd support.
+        - (libev) inline more with C99 compilers.
+        - (libev) work around a number of bugs in valgrind.
+        - (libev) work around broken realloc on openbsd and darwin.
+        - added example to EV::MakeMaker manpage.
+        - add async_pending method.
+
+3.2  Wed Apr  2 17:08:16 CEST 2008
+	- "ported" again to the Microsoft "C" language.
+        - relax testsuite timing for the benefit of freebsd users once more.
+        - fix EVAPI's ev_time and ev_sleep macros.
+        - (libev) fix select backend on 64 bit architetcures.
+        - (libev) ev_loop flags are now local to each invocation.
+
+3.1  Sat Mar  8 11:41:14 CET 2008
+	- add ev_sync_* and ev_fork_* to EVAPI.h.
+	- provide EV::Embed->sweep method.
+	- new watcher type: async (not very useful in perl).
+
+3.0  Mon Jan 28 13:23:11 CET 2008
+	- upgrade to libev-3.0.
+        - change child handler to incorporate tracing flag.
+
+2.01 Mon Dec 31 01:59:19 CET 2007
+	- found a minor problem in the testsuite that is only
+          caught by new Test::Harness versions (reported by Andreas
+          König).
+
+2.0  Sat Dec 22 17:47:03 CET 2007
+	- no longer force kqueue when enabled, enable it
+          on more systems (as its now by default not used on most).
+	- expose fork watchers.
+        - switch to libev's MULTIPLICITY API.
+        - use a slightly different include file name strategy.
+        - get rid of (unused) libevent emulation.
+        - 5% watcher management speedup due to callback optimisation
+          when inline closures are used, 5% slowdown due to multiplicity.
+        - very minimal support for dynamic event loops and embed watchers.
+        - fix name of prepare start/stop methods.
+        - create and export EV::sleep and EV::set_*_collect_interval.
+        - fix typos in manpage (Alex Efros).
+
+1.86 Tue Dec 18 02:36:57 CET 2007
+        - add periodic->at methods.
+
+1.85 Fri Dec 14 20:32:40 CET 2007
+        - further optimise epoll backend by adding a heuristic that
+          avoids EPOLL_CTL_DEL calls if possible.
+	- EV::signal->start was not async-signal safe.
+        - optimise start/stop when the fd hasn't changed.
+
+1.8  Tue Dec 11 22:17:46 CET 2007
+	- API version 3:0.
+	- reduced fudge factor to zero for select, poll, epoll
+          and kqueue: your system better be posix-compliant
+          even in its extensions :->
+        - improve long-term numerical stability in periodic watchers
+          by introducing a separate offset value instead of reusing at.
+        - recalculate real/monotonic clocks before blocking fully
+          to avoid blocking for longer than necessary.
+        - fix bugs in the heap functions. this rarely lead to illegal
+          heap orderings.
+
+1.72 Sat Dec  8 15:31:26 CET 2007
+	- add dummy loop arguments to some EVAPI functions
+          so that clients can use EV_A and EV_DEFAULT.
+        - expose ev_clear_pending.
+        - renamed trigger to invoke.
+
+1.71 Fri Dec  7 19:10:24 CET 2007
+	- changed/implemented idle watcher priority.
+	- allow out-of-range priorities to be set.
+        - fix ->priority to actually work on started watchers.
+        - improved testsuite.
+
+1.6  Wed Dec  5 15:06:20 CET 2007
+	- add a missing SPAGAIN.
+        - ripped out EV::DNS, use EV::ADNS for a better backend.
+        - make ev_time callable from EVAPI.h.
+        - add EV::loop_count.
+        - some space optimisations.
+
+1.5  Wed Nov 28 20:19:09 CET 2007
+	- add inotify backend.
+        - make testsuite even less sensible to timing issues,
+          add more stat tests.
+        - add ->attr, ->prev, ->stat calls to stat watcher.
+
+1.4  Tue Nov 27 17:35:27 CET 2007
+	- work around a linux 2.4 kernel bug in child handlers.
+        - implement stat watcher interface.
+        - implement fork watcher interface.
+        - io->set did not keep the fh alive.
+        - actively check signal numbers/names to be valid.
+        - cleanups, minor fixes, new bugs.
+        - work around windows bugs in the testsuite.
+
+1.3  Sun Nov 25 10:46:57 CET 2007
+	- stopping idle/check/prepare watchers could cause data corruption.
+	- implement and document EV::once.
+        - improved documentation, verify that netbsd indeed has the only
+          working kqueue implementation (out of darwin, freebsd, netbsd and
+          openbsd). Praise them!
+        - fix the data method so it might work.
+        - expose ev_ref/ev_unref to the C API.
+        - expose ref/unref in form of the ->keepalive method to perl.
+        - minor bugfixes and portability fixes.
+
+1.2  Thu Nov 22 05:44:09 CET 2007
+        - disable kqueue by default on !netbsd, as its broken on freebsd,
+          darwin and openbsd and thus almost everywhere.
+        - add some allowance in t/01_timer.t for the uneven monotonic
+          vs. realtime clock tick on at least freebsd.
+        - add -lsocket -lnsl on solaris in case the perl guy forgot to
+          configure them.
+
+1.1  Wed Nov 21 06:08:48 CET 2007
+	- improved timer test to include periodics and
+          withstand small timing variations.
+        - many minor tweaks to libev.
+
+1.0  Fri Nov 16 14:51:59 CET 2007
+	- require AnyEvent update if AnyEvent is installed.
+	- add solaris 10 port-based backend.
+        - add child_ns and fix check_ns.
+        - treat yes/no as enforcement, not as hint, when configuring,
+          documentation update (reported by Andy Grundman).
+
+0.9  Wed Nov 14 22:24:49 CET 2007
+	- changed LIBEV_METHODS to LIBEV_FLAGS and the
+          way this is used inside libev.
+        - many, many bugfixes.
+        - add unloop constants.
+        - add timer test.
+        - ev_loop will now terminate immediately when no watchers are active.
+
+0.8  Mon Nov 12 02:28:46 CET 2007
+	- fix "testsuite" again :().
+        - fix check/idle/prepare/child watcher stop.
+        - enourmously many fixes.
+        - rewritten select backend (mostly for win32).
+        - cache socket handles on win32.
+        - provide considerably finer control over configuration.
+
+0.7  Fri Nov  9 20:37:58 CET 2007
+	- move AnyEvent adaptor into the AnyEvent module.
+        - use private copy of evdns.[ch].
+        - many minor fixes.
+
+0.6  Thu Nov  8 18:23:43 CET 2007
+	- (libev) better native win32 support.
+        - fix idle watchers.
+        - implement and document periodic reschedule callbacks.
+        - do not run dns test on !linux platforms (actually to exclude win32).
+        - fix (unused in EV :) poll backend.
+
+0.51 Tue Nov  6 19:50:22 CET 2007
+	- fix kqueue/poll compilation issue.
+        - work around design issues in kqueue.
+        - enable kqueue by default, seems to work.
+
+0.5  Tue Nov  6 17:37:44 CET 2007
+	- add signal and pid mutators.
+        - add rstatus/rpid accessors.
+        - updated libev (lower cost for clock monotonic).
+        - support event priorities.
+        - try to find SIG_SIZE on perls that don't have it (Slaven Rezic).
+        - improved signal handling, fixed child watchers.
+        - experimentally add kqueue backend, completely untested.
+        - ported to cygwin and native win32.
+
+0.1   Thu Nov  1 18:29:22 CET 2007
+	- replaced libevent by libev (total rewrite).
+        - many bugfixes w.r.t. libevent.
+        - new watcher types: periodic, check, prepare, child, idle.
+	- performance optimisations.
+        - added interactive configuration.
+        - added fork support.
+
+0.03  Mon Oct 29 20:52:50 CET 2007
+        - add timed_io convenience constructors.
+        - improve documentation.
+        - support signal names in addition to signal numbers.
+        - support signal anyevent watchers.
+        - vastly improved testsuite (its all relative :).
+        - add EV::MakeMaker, beginning of C-level API.
+        - force strings to byte form.
+
+0.02  Sun Oct 28 07:40:21 CET 2007
+	- call $EV::DIED in case a callback throws an exception.
+        - add const char * to typemap for possible 5.6 compatibility.
+
+0.01  Sat Oct 27 19:10:18 CEST 2007
+	- initial release.
+
+0.00  Fri Oct 26 11:12:57 CEST 2007
+	- original version; cloned from JSON::XS
+

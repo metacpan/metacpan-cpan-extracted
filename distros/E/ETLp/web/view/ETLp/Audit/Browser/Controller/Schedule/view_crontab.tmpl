@@ -1,0 +1,7 @@
+[% title = 'View Crontab' %]
+[%INCLUDE menu.tmpl %]
+    <p>Note: The crontab below is derived from the job database. It may not be
+    the one that is actually installed.<p>
+    
+    <pre>[% crontab %]</pre>
+[% PROCESS footer.tmpl %]

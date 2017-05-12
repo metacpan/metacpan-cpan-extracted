@@ -1,0 +1,249 @@
+Revision history and release notes for Event::RPC:
+
+1.08 Sun Sep 26, 2015, joern
+    Notes:
+    - Just a stable release without changes. I thought
+      CPAN testers would pick up developer releases
+      too, but was wrong ;)
+
+1.08_01 Sat Sep 26, 2015, joern
+    Features:
+    - Support for multiple serialisers: Sereal, CBOR::XS,
+      JSON::XS and Storable. That's because Storable is
+      known to be insecure, so this module should not
+      rely on it.
+
+      Great care has been taken to make these changes
+      up- and downwards compatible, so old clients still
+      can connect to new servers and vice versa.
+
+      Check documentation chapters MESSAGE FORMAT OPTIONS
+      in Event::RPC, Event::RPC::Server and Event::RPC::Client
+      manpages for details.
+
+      Thanks to mala <mala AT ma.la> for his hint about the
+      security issues of Storable. You find more details in
+      this article:
+
+      http://www.masteringperl.org/2012/12/the-storable-security-problem/
+
+    Bugfixes:
+    - Proper handling of exceptions which occur at the
+      server before a remote method is really executed,
+      e.g. when lookup of the class failed due to
+      incorrect @INC path.
+    - Fixed encoding of source files and corrected
+      the year of all Copyright notices.
+
+1.07 Mon Sep 21, 2015, joern
+    Features:
+    - New method return type '_singleton'. Objects
+      created this way are never destroyed on the
+      server.
+
+1.06 Sun Sep 20, 2015, joern
+    Features:
+    - New 'ssl_opts' attribute for Server and Client to
+      give more control over the SSL connection.
+
+    Bugfixes:
+    - Some tests failed due to stronger hostname verifcation
+      in IO::Socket:SSL >= 2.017. Fixed that by adding
+      proper certificates with cn 'localhost' and a test
+      which verifies the failing connection with wrong
+      hostname. Thanks to ppisar[...]redhat.com. This
+      fixes rt #106874.
+
+1.05 Tue Feb 28, 2014, joern
+    Features:
+    - New Method set_max_packet_size (Client and Server)
+      to change the default value of 2 GB up to 4 GB
+      (or less).
+
+    Bugfixes
+    - Increased default maximum packet size from 4 MB
+      to 2 GB.
+    - Fixed test suite for parallel execution by using
+      different port numbers for the test server.
+      Thanks for the report to Andreas König.
+    - Applied a patch from Salvatore Bonaccorso which
+      fixes missing encoding declarations in POD. Thanks!
+    - Fixed some POD typos. Thanks for the report to
+      Xavier Guimard.
+
+1.04 Fri Feb 24, 2014, joern
+    Bugfixes
+    - Under certain infrequently conditions it could
+      happen that the server process blocked when
+      sending a response packet to a client.
+    - Event::RPC::Client failed loading when no
+      IO::Socket::SSL is installed.
+
+1.03 Sat Feb  2, 2013, joern
+    Features:
+    - Added options 'ssl_ca_file and 'ssl_ca_path' options
+      to Event::RPC::Client, which enable SSL peer verifcation
+      on the client. Thanks for the report about a security
+      warning of IO::Socket::SSL to Moritz Bunkus.
+
+1.02 Tue Mar  8, 2011, joern
+    Features:
+    - Added AnyEvent mainloop implementation.
+
+1.01 Sat Oct 25, 2008, joern
+    Bugfixes:
+    - Even objects returned by methods not declared as
+      an "object returner" where turned into Event::RPC
+      object handles instead of copying the complete
+      data structure to the client. Thanks for the report
+      to Alex <alex AT lokku.com>.
+
+1.00 Sat Jun 21, 2008, joern
+    Notes:
+    - Time for version 1.00 ;)
+
+    Features:
+    - load_modules option added to Event::RPC::Server.
+    - timeout option added to Event::RPC::Client. Patch
+      by Strzelecki Lukasz <strzelec AT rswsystems.pl>.
+
+0.90 Sun Apr 23, 2006, joern
+    Notes:
+    - Just a change to the license, switched from LGPL
+      to Perl Artistic + GPL. Thanks for the hint about
+      the bad wording in the old license text to
+      Gregor Herrmann.
+
+0.89 Mon Mar 27, 2006, joern
+    Features:
+    - New class_map attribute for Event::RPC::Client to be
+      able to use classes locally which are imported from the
+      server as well, by giving the server classes a different
+      name on the client.
+    - Turn execptions of unregistered object access into
+      warnings, which makes client / server communication
+      more robust and debugging easier.
+
+    Bugfixes:
+    - Fixed crashing when a method declared as an object
+      returner returned undef, which should be absolutely
+      legal.
+    - Fixed client side exceptions if server connection is
+      unexpectedly interrupted during a remote method call.
+    - Exceptions are now stringified before send to the
+      client, otherwise Storable may complain on exception
+      objects which can't be freezed e.g. due to embedded
+      code refs.
+
+0.88 Sat Dec 24, 2005, joern
+    Bugfixes:
+    - Use Storable::nfreeze() to pack network messages, so
+      Event::RPC works with mixed endian architectures
+      as well. Patch by Rolf Grossmann <rg AT PROGTECH.net>.
+
+0.87 Sun Dec 18, 2005, joern
+    Features:
+    - Delegation of authentication resp. user/password check
+      to an external module via Event::RPC::Server attribute
+      "auth_module". Old passwd hash based model is implemented
+      in Event::RPC::AuthPasswdHash.
+    - Fixed a typo in Event::RPC::Looger manpage. Thanks to
+      Sean <soso AT kol.co.nz> for the report.
+    - Cleaned up examples/: server.pl and client.pl now both
+      accept -h option for binding/connecting to a specific
+      host, not just localhost.
+    - Makefile.PL tuning: add detected optional modules to
+      PREREQ_PM to get their version numbers added to CPAN
+      Testers reports.
+
+    Bugfixes:
+    - ChangeLog entry 0.86 was wrong regarding the SSL stuff.
+
+0.86 Sat Dec 17, 2005, joern
+    Features:
+    - added Event::RPC::Server->get_active_connection
+    - documented Event::RPC::Connection->get_client_oids
+    - added Event::RPC::Connection->get_client_object
+
+    Bugfixes:
+    - Added missing documentation for Event::RPC::Client's
+      error_cb attribute, which was just mentioned in
+      the SYNPOSIS.
+    - Fixed an incompatability with IO::Socket::SSL 0.97,
+      which doesn't return different sysread() states for
+      error and eof anymore which confused Event::RPC.
+
+0.85 Sun Aug 28, 2005, joern
+    Bugfixes:
+    - Make server more bullet proof: handle log connections
+      even if no logger is set, but a log listener was started.
+    - Event::RPC::Server->new didn't recognize the
+      'connection_hook' parameter.
+    - Try making the testsuite more stable with Win32.
+
+0.84 Mon Jul 25, 2005, joern
+    Bugfixes:
+    - Buffering for big incoming RPC requests (> 64KB) didn't
+      work properly
+
+0.83 Fri Apr 15, 2005, joern
+    Features:
+    - Made more parts of the API public by documenting them.
+    - New server option "connection_hook" for accessing
+      Event::RPC::Connection objects during connecting and
+      disconnecting.
+    - New server option "auto_reload_modules" to control the
+      server's auto reloading facility, which was activated
+      by default up to now.
+    - New server option "host" to bind the listener to a
+      specific address. Default is to bind to all addresses.
+    - Increased connect performance by reducing the number
+      of messages exchanged between client and server.
+    - Client may request a subset of exported server classes.
+      Default is still to import all classes exported by the
+      server.
+    - Client checks Event::RPC version and used protocol version
+      on connect and warns different software versions but dies
+      on incompatible protocol versions. Naturally it's
+      recommended to use the same Event::RPC version on server
+      and client.
+    - Methods for getting client and server (after connecting)
+      software and protocol version numbers.
+
+    Bugfixes:
+    - Missed ReuseAddr on listener sockets.
+    - Made testsuite more robust
+    - Network logging clients could block the server by
+      sending data to it.
+    - Renamed client option 'server' to 'host', which is more
+      adequate. 'server' is still allowed but deprecated and
+      using it triggers a warning.
+
+0.82 Sun Apr 10, 2005, joern
+    Notes:
+    - First public release. API is fairly stable.
+
+    Features:
+    - User/password based authentication added.
+    - Full documentation added.
+    - Test suite added which covers all connection
+      types and the most important features.
+
+0.81 Sun Mar 13, 2005, joern
+    Notes:
+    - Still an internal release, incomplete documentation, no
+      test suite.
+
+    Features:
+    - Support for SSL encryption added using IO::Socket::SSL.
+    - Event loop abstraction. Event::RPC now works with Event
+      and Glib and can be easily extended for other event loop
+      frameworks. Thanks to Rocco Caputo for the suggestion.
+
+0.80 Sun Mar 13, 2005, joern
+    Notes:
+    - A non public release. Only announced on the perl-loop mailing
+      list for the namespace request and to get comments. Module
+      is fully working but API isn't documented yet very well.
+      Security stuff (SSL encryption, some password authentication)
+      is missing also a complete test suite.

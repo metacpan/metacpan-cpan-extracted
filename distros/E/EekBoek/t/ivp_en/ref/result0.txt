@@ -1,0 +1,11 @@
+                             Profit/Loss
+Period 2011-01-01 through 2011-12-31
+EekBoek Sample Administration                      EekBoek, 2011-12-31
+
+AccNr   Group/Account                                 Debet     Credit
+----------------------------------------------------------------------
+6       Costs                                       1620.19
+8       Revenues                                               8700.00
+        << Profit >>                                7079.81
+----------------------------------------------------------------------
+        TOTAL Results                               8700.00    8700.00

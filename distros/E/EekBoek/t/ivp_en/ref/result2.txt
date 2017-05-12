@@ -1,0 +1,38 @@
+                             Profit/Loss
+Period 2011-01-01 through 2011-12-31
+EekBoek Sample Administration                      EekBoek, 2011-12-31
+
+AccNr   Group/Account                                 Debet     Credit
+----------------------------------------------------------------------
+6       Costs
+68       Depreciation
+6800      Depreciation costs inventory               411.26
+6810      Depreciation costs computers               396.82
+68       Total Depreciation                          808.08
+
+69       General costs
+6900      Phone costs and fax costs                  510.29
+6905      Internet costs                             269.42
+6980      Bank costs                                  32.40
+69       Total General costs                         812.11
+
+6       Total Costs                                 1620.19
+
+8       Revenues
+81       Revenue Consultancy
+8100      Revenue consultancy                                  1200.00
+81       Total Revenue Consultancy                             1200.00
+
+83       Revenue Editing
+8300      Revenue editing                                      1000.00
+83       Total Revenue Editing                                 1000.00
+
+84       Revenue Courses
+8400      Revenue courses                                      6500.00
+84       Total Revenue Courses                                 6500.00
+
+8       Total Revenues                                         8700.00
+
+        << Profit >>                                7079.81
+----------------------------------------------------------------------
+        TOTAL Results                               8700.00    8700.00

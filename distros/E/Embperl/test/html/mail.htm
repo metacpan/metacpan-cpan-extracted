@@ -1,0 +1,36 @@
+<html>
+
+<head>
+<title>Embperl Tests - use Mail taglib</title>
+</head>
+
+<body>
+  [-
+  $fdat{Email} = 'richter at embperl dot org' ;
+  -]
+
+
+  [$ syntax + Mail $]
+
+  <mail:send to="richter@ecos.de" 
+     [$ if $fdat{Email} $] reply-to="[+ $fdat{Email} +]" [$endif$]
+     subject="Testmail">
+    Hi,
+    this is a test for a new mail tag
+    it is send at [+ scalar(localtime) +]
+    from Embperl's Mail taglib.
+  </mail:send>
+
+  [+ "tagend" +]<br>
+
+  $? = [+ $? +]<br>
+
+  [$ if $? $]
+		<h2>Sorry, there was an error, your mail couldn't be send</h2>
+  [$else$]
+		<h2>Your mail was successfully delivered</h2>
+  [$endif$]
+
+</body>
+</html>
+

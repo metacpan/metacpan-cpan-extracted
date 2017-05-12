@@ -1,0 +1,11 @@
+Revision history for Perl extension .
+
+1.01  2008/04/17
+	- Build.PL is abolished.
+
+1.00  2008/03/07
+	- Corresponded to Egg::Release v3.00.
+
+0.01  Wed Aug  8 03:29:13 2007
+	- original version; created by Egg::Helper::Plugin::Maker v2.00
+	   with module name Egg::Plugin::Cache::UA

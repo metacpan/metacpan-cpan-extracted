@@ -1,0 +1,16 @@
+<node node_id="11111" createtime="1999-08-27 21:39:54" type_nodetype="116" xsi:schemaLocation="http://www.everything2.com/?node_id=1259759">
+	<type>usergroup</type>
+	<title>test</title>
+	<author user_id="99999">root</author>
+	<description>This is a group</description>
+	<weblog>
+		<e2link node_id="22222">weblog 1</e2link>
+		<e2link node_id="33333">weblog 2</e2link>
+		<e2link node_id="44444">weblog 3</e2link>
+	</weblog>
+	<usergroup>
+		<e2link node_id="55555">user 1</e2link>
+		<e2link node_id="66666">user 2</e2link>
+		<e2link node_id="77777">user 3</e2link>
+	</usergroup>
+</node>

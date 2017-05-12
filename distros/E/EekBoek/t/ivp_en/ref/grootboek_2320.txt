@@ -1,0 +1,28 @@
+                                              Ledger
+Period 2011-01-01 through 2011-12-31
+EekBoek Sample Administration                                                   EekBoek, 2011-12-31
+
+  Acc  Ledger/Posting                  Date            Debet     Credit  PostingNr       Relation
+---------------------------------------------------------------------------------------------------
+ 2320  Bank
+        Initial balance                              1131.92       0.00
+         Afschrift 1                   2011-01-31       0.00     130.15  Postbank:1
+         Afschrift 2                   2011-02-28       0.00      25.50  Postbank:2
+         Afschrift 3                   2011-03-31    3442.98       0.00  Postbank:3
+         Afschrift 4                   2011-04-30    3544.50       0.00  Postbank:4
+         Afschrift 5                   2011-05-31     467.28       0.00  Postbank:5
+         Afschrift 6                   2011-06-30     688.50       0.00  Postbank:6
+         Afschrift 7                   2011-07-31       0.00     130.16  Postbank:7
+         Afschrift 8                   2011-08-31    1688.50       0.00  Postbank:8
+         Afschrift 9                   2011-09-30       0.00     134.22  Postbank:9
+         Afschrift 10                  2011-10-31       0.00      25.50  Postbank:10
+         Afschrift 11                  2011-11-30       0.00     135.17  Postbank:11
+         Afschrift 12                  2011-12-07       0.00      25.50  Postbank:12
+         Eerste deel ADSL              2011-12-09       0.00      10.00  Postbank:13
+         Tweede deel ADSL              2011-12-10       0.00      12.80  Postbank:14
+        Mutations total                              9202.76
+ 2320  Total Bank                                   10334.68
+
+       Mutations total                               9202.76       0.00
+---------------------------------------------------------------------------------------------------
+       Total                                        10334.68       0.00

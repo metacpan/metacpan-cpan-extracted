@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Email-Store-Thread
+version:      1.2
+version_from: lib/Email/Store/Thread.pm
+installdirs:  site
+requires:
+    Email::Folder:                 0
+    Email::Store:                  0
+    Mail::Thread:                  2.5
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.25

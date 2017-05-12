@@ -1,0 +1,14 @@
+
+
+This archive contains the distribution Exception-Stringy,
+version 0.20:
+
+  a Perl Exceptions module where exceptions are not objects but simple strings.
+
+This software is Copyright (c) 2014 by Damien Krotkine.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+

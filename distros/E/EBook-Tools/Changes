@@ -1,0 +1,221 @@
+Release Notes
+=============
+
+0.5.4:
+ Bug fixes:
+  * Handle where a HOME environment variable has been set that doesn't
+    actually point to a directory.
+
+0.5.3:
+ Bug fixes:
+  * Automatically fix more duplicate subject codes
+  * Prevent some frequently breaking tests under automatic smoketesters
+
+0.5.2
+ Bug fixes:
+  * Minor POD display fixes
+
+0.5.1
+ Bug fixes:
+  * Fixes so perl as old as 5.10 really does still work
+  * Document dependencies properly in Build.PL (thanks to Syohei YOSHIDA)
+
+0.5.0
+ New Features:
+  * 'ebook convert' now provides one-shot conversion from any format
+    to epub with an optional fixup step in between.
+  * 'ebook fix' now provides subject and type normalization.  Library
+     of Congress normalization is still highly incomplete and is
+     expected to incrementally improve over time.
+  * 'ebook setmeta' now available to edit metadata fields.
+  * 'ebook setcover' now available to add/change cover images.
+  * 'ebook bisac' now available to search for or convert BISAC codes
+  * OPF files in subdirectories are now supported
+  * New class EBook::Tools::BISG to download BISAC information.
+  * New helper procedures 'system_result' and 'hashvalue_key_self'
+  * fix_guide() normalizes reference types
+  * Some advertisements are deleted from metadata automatically
+
+ Bug fixes:
+  * Lots of bugs in epub generation fixed, including automatic
+    generation of NCX files
+  * fix_links() no longer breaks when encountering mailto: news: or
+    backwards directory traversal links.
+  * fix_links() should no longer sometimes attempt to add the same
+    href multiple times.
+  * hrefs are decoded to give actual filesystem filenames
+  * XHTML 1.1 source files are no longer backwards-converted to XHTML
+    1.0
+  * Mobipocket UTF-8 HTML generation bugs fixed
+  * Fixed bugs that could cause Mobipocket filepos anchors to have
+    wrong ids
+  * 'ebook genepub' options now match the documentation
+  * OPF encoding is now autodetected instead of assumed as UTF-8
+  * Compatible with Perl 5.20
+
+ Behavior changes:
+  * Unpacking books other than .lit now causes the OPF filename to
+    default to 'content.opf' instead of a name based on the original
+    packed filename.
+  * fix_creators() is no longer automatically called from fix_misc()
+    as it may still get some exotic names wrong.
+  * The first argument in 'ebook genepub <arg>' now sets the output
+    file, not the input OPF.
+
+0.4.9
+ New Features:
+  * 'ebook unpack' now automatically handles ePub files (or to be more
+    specific, any zip file)
+
+0.4.8
+
+ Bug fixes:
+  * Fix extra data size calculation when multiple flag bits are
+    present
+  * Properly handle extra data in uncompressed text records
+
+0.4.7
+
+ Bug fixes:
+  * Mobipocket unpacks now correctly account for the extra data that
+    can be appended to PalmDoc-compressed text records that should not
+    be made part of the decompression process.
+
+0.4.6
+
+ Bug fixes:
+  * EReader HTML conversion now creates (semi-valid) XHTML output and
+    better handles paragraphs
+  * EReader font marker handling improved
+  * Missing config file options are properly handled
+  * Documentation fixes
+
+0.4.5
+
+ Bug Fixes:
+  * user script tests avoid smoke tests that tend to break on
+    non-libraries
+
+0.4.4
+
+ Bug Fixes:
+  * split_metadata now writes split components into the directory where
+    the source file is located instead of the current working
+    directory.  The old behaviour could cause failure when running as
+    CGI.
+
+0.4.3
+
+ New Features:
+  * gen_opf() now accepts a 'mediatype' argument to override
+    autodetection of the mime type of the 'textfile' argument.
+
+ Bug Fixes:
+  * The opffile argument in gen_opf() was not being set correctly
+  * unpack_ereader now forces the appropriate mime type instead of
+    letting it be autodetected.  Fixes incorrect setting of text/plain
+    on HTML output on Windows systems.
+
+0.4.1 - 0.4.2: minor bugfixes only
+
+0.4.0
+
+New Features:
+ * IMP support!
+   * It is now possible to unpack unencrypted IMP files both into .RES
+     directories and into HTML files.  Encrypted IMP files can still
+     be unpacked into .RES directories.
+   * .RES directories can be repacked into IMP files.
+   * IMP metadata can be edited in-place
+   * LZSS compression and decompression is now available as a general
+     library component, though this may be split out into a separate
+     module in the future.
+   * Thanks go to Nick Rapallo for assistance with this feature set,
+     and Jeffrey Kraus-yao for most of the original
+     reverse-engineering work.
+
+Bug Fixes:
+ * Mobipocket files with EXTH headers but no EXTH records now unpack
+   correctly.
+
+Library and Syntax Changes:
+ * Some of the input and output options in the 'ebook' command-line
+   tool have been standardized to '--input' or '-i' and '--output' or
+   '-o'.  Check the documentation for exact syntax.
+ * EBook::Tools::Unpack::usedir() has been moved into EBook::Tools as
+   a procedure, not a method.
+ * The known uid check in EBook::Tools::search_knownuids() has been
+   factored out into the twigelt_is_knownuid() twig search procedure.
+   This causes a lot of 'undefined value' warning spew from XML::Twig
+   to be bypassed and has the added advantage of removing a loop
+
+   It does, however, slightly change the search behaviour --
+   previously, the highest priority known UID in the array was
+   selected if multiple known UID identifiers were found.  Now, the
+   first dc:identifier matching any known good UID is used instead.
+   It's possible to reclaim the old behaviour by sorting the returned
+   array, but on afterthought, it is probably better to let the user
+   file order determine the package id by default.
+
+----------
+
+0.3.3
+ * Fixed bugs relating to find_in_path() on MSWin32 systems and Data::UUID
+
+0.3.2
+ * EBook::Tools should now in theory no longer require Perl 5.10
+   (minimum requirement is now Perl 5.8.8)
+
+0.3.0
+
+New Features:
+ * Configuration file and directory support
+ * Mobipocket HUFF/CDIC support
+ * Unpacking DRM-protected Mobipocket files now just skips the
+   encrypted text, but still extracts the unencrypted images
+ * EBook::Tools now takes advantage of several external helper files,
+   if they are made available:
+   * Mobipocket generation possible if mobigen is available
+   * Unpacking interface supports MS Reader (.lit) if convertlit is available
+   * Downconverting interface supports MS Reader and Mobipocket if
+     convertlit and MobiDeDRM are available, respectively.
+   * See README.Helpers.txt for more information
+ * excerpt_line() procedure available to show just the beginning and
+   end of a paragraph or other long line of text
+ * ':all' export tag is available for all modules to export all
+   procedures at once.
+
+Library Changes:
+ * EReader.pm: write_* methods now return the filename(s) written
+   instead of just returning 1
+ * Unpack.pm: gen_metadata() no longer calls split_metadata() if the
+   raw option is specified
+ * Tools.pm: fix_languages() now creates a <dc:language> if none
+   exists (this isn't mandated by the standard, but mobigen requires
+   it)
+
+Bug Fixes:
+ * Unpacking an eReader book now correctly adds the text to the OPF
+   manifest
+
+----------
+
+0.2.0
+
+New Features:
+ * eReader unpacking support
+ * New unpacking option --htmlconvert
+ * ebook stripscript command to remove <script> and <noscript> blocks
+   from HTML
+
+Library Changes:
+ * parse_mobi_header() hash keys relating to language have been
+   changed
+ * format-specific code is now in separate modules
+
+Bug Fixes:
+ * ISBN is no longer added twice in unpacked OPF files
+
+----------
+
+0.1.0 - Original release

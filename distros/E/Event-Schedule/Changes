@@ -1,0 +1,7 @@
+Revision history for Event-Schedule
+
+0.01    2010-01-30
+        Initial version.
+
+0.02	2010-01-30
+	Forgot a print() debug statement.  Oops.

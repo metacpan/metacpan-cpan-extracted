@@ -1,0 +1,24 @@
+--- #YAML:1.0
+name:               Encode-JP-Emoji-FB_EMOJI_TYPECAST
+version:            0.05
+abstract:           ~
+author:  []
+license:            gpl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Encode:             2.12
+    Encode::JP::Emoji:  0.05
+    Test::Harness:      3.04
+    Test::More:         0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.52
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

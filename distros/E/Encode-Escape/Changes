@@ -1,0 +1,22 @@
+Revision history for Perl extension Encode::Escape.
+
+0.14 2007/12/05 13:28:03 you 
+   - second upload to CPAN.
+   - Doucmentation
+   - Add more test
+
+0.10 2007/12/05 06:20:08 you 
+   - first upload to CPAN.
+
+   Encode::Escape::ASCII
+	- implemented basic functions.
+
+   Encode::Escape::Unicode 
+	- implemented basic functions
+	- implemented mode system
+		- python(or java) mode enable to use "\uxxxx" unicode escape seqs.
+
+0.01  Sun Dec  2 21:45:59 2007
+	- original version; created by h2xs 1.23 with options
+		-X -n Encode::Escape
+

@@ -1,0 +1,51 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Email::Fingerprint::Cache;
+
+die_usage() unless @ARGV;
+
+for my $file (@ARGV)
+{
+    my $cache = Email::Fingerprint::Cache->new({ file => $file });
+
+    $cache->open or die "Couldn't open cache\n";
+    $cache->dump;
+    $cache->close;
+}
+
+sub die_usage
+{
+    print STDERR "usage: fpdump FILE1 [FILE2 ...]\n";
+}
+
+__END__
+=head1 NAME
+
+fpdump - dump the contents of an Email::Fingerprint::Cache cache.
+
+=head1 SYNOPSIS
+
+  fpdump CACHE1 [CACHE2 ...]
+
+=head1 DESCRIPTION
+
+This example script dumps the contents of one or more caches listed
+by name on the command line.
+
+=head1 LICENSE
+
+Copyright (C) 2008-2011 Len Budney
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Len Budney, C<< <lbudney at pobox.com> >>
+
+=head1 SEE ALSO
+
+eliminate_dups

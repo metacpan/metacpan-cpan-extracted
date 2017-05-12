@@ -1,0 +1,21 @@
+From travis@localhost  Mon Nov 14 01:28:01 2016
+Return-Path: <travis@localhost>
+X-Original-To: test@test.com
+Delivered-To: travis@localhost
+Received: from localhost (localhost [127.0.0.1])
+	by localhost (Postfix) with ESMTPS id 01D80243AA
+	for <test@test.com>; Mon, 14 Nov 2016 01:28:01 +0000 (UTC)
+To: test@test.com
+From: travis@localhost
+Subject: test mail sender
+Date: Mon, 14 Nov 2016 01:28:01 +0000
+X-Mailer: Perl script "email.t"
+	using Mail::Sender 0.8.23 by Jenda Krynicky, Czechlands
+	running on localhost (127.0.0.1)
+	under account "travis"
+Message-ID: <20161114_012801_004974.travis>
+MIME-Version: 1.0
+Content-Type: text/html; charset=UTF-8
+
+hello, this is just for test
+

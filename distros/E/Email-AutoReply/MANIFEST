@@ -1,0 +1,25 @@
+Changes
+examples/on_vacation
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Email/AutoReply.pm
+lib/Email/AutoReply/DB.pm
+lib/Email/AutoReply/DB/BerkeleyDB.pm
+lib/Email/AutoReply/Recipient.pm
+lib/Email/Filter/AutoReply.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+SIGNATURE
+t/Email-AutoReply.t
+t/Email-Filter-AutoReply.t
+TODO

@@ -1,0 +1,373 @@
+
+=head1 INSTALLATION
+
+
+=head2 UNIX
+
+To install on unix perform the following steps:
+
+=over
+
+=item B<Unpack the archive>
+
+=item B<perl Makefile.PL>
+
+You will be asked if you want to compile in support for Apache mod_perl. If
+you say yes, the source of Apache is searched (for headerfiles). If 
+it can't found, please specify the basepath. Please make sure 
+mod_perl is already installed. If you have installed mod_perl-0.96 or
+higher, Makefile.PL automatically suggests the same source path as was 
+used to build mod_perl.
+
+=item B<make>
+
+=item B<make test>
+
+=item  B<make install>
+
+=back
+
+
+B<NOTE 1:> For using session handling you need
+Apache::Session 1.53 and Apache::SessionX 2.00b3 or higher. 
+
+B<NOTE 2:> I<Embperl> runs without additional Perl modules, but the C<make test>
+needs the following modules to work:
+
+=over 4
+
+=item * URI
+
+=item * MIME::Base64 
+
+=item * HTML::Parser 
+
+=item * HTML::HeadParser 
+
+=item * Digest::MD5 
+
+=item * libnet 
+
+=item * libwww 
+
+=item * libwin32 (only Win32) 
+
+=back
+
+B<NOTE 3:> I<EmbperlObject> needs the following modules to work:
+
+=over 4
+
+=item * File::Spec 0.8 or higher
+
+=back
+
+If you have already successfully build and tested C<mod_perl> all modules
+will already be there.
+
+=head2 Options for make test
+
+C<make test> can take several options, which can be given with the C<TESTARGS>
+parameter:
+
+  make test TESTARGS="--help"
+
+will show you a list of available option. Most of them you will never need,
+they are mainly nesseccary for debugging I<Embperl> itself.
+
+=head2 XML and XSLT support
+
+Starting with Embperl 2.0b4 it has a build in XSLT support. You can
+use Gnome libxml and libxslt.
+Embperl is currently tested with libxslt 1.0.4 and newer.
+
+To use libxml/libxslt, download them from http://xmlsoft.org/ and install
+them on your system. Makefile.PL will automatically detect the installed
+libraries and linked them into Embperl. (you have to make sure
+that xml2-config and xslt-config can be found and run by Makefile.PL)
+
+
+=head2 Debian packages
+
+The Debian packages "libhtml-embperl-perl" and "libembperl-perl" are
+are available from the usual Debian
+mirrors.
+
+To compile Embperl you need to install apache2-dev and libapache2-mod-perl2-dev.
+
+=head2 UNIX (without Apache Source)
+
+If you have an UNIX with preinstalled Apache and mod_perl (e.g. a Linux 
+distribution), you need to locate the following files on your disk:
+
+=over
+
+=item httpd.h
+
+=item httpd
+
+=item mod_env.so
+
+=back
+
+For example in SuSE Linux 7.1 they could be found at
+
+=over
+
+=item /usr/include/apache/httpd.h
+
+=item /usr/sbin/httpd
+
+=item /usr/lib/apache/mod_env.so
+
+=back
+
+In most cases it is sufficent to have to apache-dev and mod_perl-dev packages
+from your favourite Linux distribution installed.
+
+
+Now go to the Embperl directory and start 
+
+=over
+
+=item perl Makefile.PL
+
+When get asked for the Apache sources, enter the directory where you
+found C<httpd.h> (e.g. C</usr/include/apache>). For the Apache executable
+enter the path to C<httpd>. If the Apache modules are loaded dynamicly,
+the you will get ask for C<mod_env.so>, enter it's directory. Now you can
+continue as normal with
+
+=item make test
+
+=item make install
+
+=back
+
+
+=head2 Win32 (non ActiveState Perl)
+
+
+B<NOTE:> You need mod_perl >= 1.12 on win32
+
+
+On Windows 95/NT you have to do the following:
+
+=over
+
+=item B<perl Makefile.PL>
+
+=item B<nmake> 
+
+(you must have the c compiler in your path)
+if you get an error about compiling Embperl.c. Edit Embperl.c and change
+
+-#line  "Embperl.xs"
+
+to
+
++#line  1 "Embperl.xs"
+
+now re-run nmake and it should compile.
+
+=item B<nmake test>
+
+B<NOTE:> nmake test needs libwin32, libwww and HTML::Parser installed to work
+
+=item B<nmake install>
+
+=back
+
+
+B<NOTE 1:> For using session handling you need
+Apache::Session 1.53 and Apache::SessionX 2.00b3 or higher. 
+
+B<NOTE 2:> I<Embperl> runs without additional Perl modules, but the C<make test>
+needs the following modules to work:
+
+=over 4
+
+=item * URI
+
+=item * MIME::Base64 
+
+=item * HTML::Parser 
+
+=item * HTML::HeadParser 
+
+=item * Digest::MD5 
+
+=item * libnet 
+
+=item * libwww 
+
+=item * libwin32 (only Win32) 
+
+=back
+
+B<NOTE 3:> I<EmbperlObject> needs the following modules to work:
+
+=over 4
+
+=item * File::Spec 0.8 or higher
+
+=back
+
+If you have already successfully build and tested C<mod_perl> all modules
+will already be there.
+
+
+=head2 Win32 with ActiveState Perl and Apache 1.3.x
+
+First get and install ActiveState Perl from http://www.activestate.com/
+
+You can skip the installation of Apache and mod_perl, if you only want
+to use Embperl offline or as CGI.
+
+Next get the Apache binary (including the source e.g.
+apache_1.3.31-win32-x86-src.msi) from
+http://www.apache.org/dist/httpd/binaries/win32/ or a mirror. (You may
+need to install the windows MSI installer from the same page too, and
+be sure to read the README at the end of the file list for further
+requirements of some windows versions, especially Windows 95 and
+XP). Now run the installation.
+
+Then install mod_perl. How to do this is described very detailed at
+http://perl.apache.org/docs/1.0/os/win32/install.html#PPM_Packages
+
+In this file, you'll find a short summary of that page.
+
+There are two ways to install mod_perl:
+
++ Easy version:
+
+  Download the perl script
+  http://perl.apache.org/docs/1.0/os/win32/mpinstall and execute it
+  with "perl mpinstall". It will interactively install you the right
+  mod_perl version.
+
++ Manual installation:
+
+  Run the ppm program to install mod_perl
+
+  - If you have Perl 5.8.x:
+
+    ppm install http://theoryx5.uwinnipeg.ca/ppms/mod_perl-1.ppd
+
+  - If you have Perl 5.6.x:
+
+    ppm install http://theoryx5.uwinnipeg.ca/ppmpackages/mod_perl.ppd
+
+
+  If you get asked for the Apache directory, enter the C<modules>
+  subdirectory under the path where you have installed your Apache,
+  e.g.
+
+    \Program Files\Apache Group\Apache\modules
+
+As last step you can install the Embperl ppd:
+
++ If you have Perl 5.8.x:
+
+    ppm install http://theoryx5.uwinnipeg.ca/ppms/Embperl-1.ppd
+
+  This is an Embperl 2 ppd, the "-1" at the end of the package name
+  denotes that this ppd is for mod_perl 1.x. There is no Embperl 1 ppd
+  for Perl 5.8.x (yet).
+
++ If you have Perl 5.6.x:
+
+  - Embperl 1:
+
+    ppm install http://theoryx5.uwinnipeg.ca/ppmpackages/HTML-Embperl.ppd
+
+  - Embperl 2:
+
+    ppm install http://theoryx5.uwinnipeg.ca/ppmpackages/Embperl.ppd
+
+
+
+=head2 Compile Embperl from the sources on Win32 with ActiveState Perl
+
+First install ActiveState Perl, Apache and mod_perl as described above. Make sure
+you have an Apache version which includes the sources. (Of course when you want to use
+Embperl only offline or as CGI you don't have to install Apache and mod_perl)
+
+Then extract the Embperl distribution and go to the directory where you have extracted
+Embperl. Start
+
+  perl Makefile.PL
+
+Enter y or hit enter when you get ask "Build with support for Apache mod_perl?(y/n) [y]"
+When get asked for the Apache source enter the Apache directory you have installed above.
+e.g. \Program Files\Apache Group.
+
+Now you can continue by running 
+
+  nmake test
+  nmake install  
+
+
+=head2 Win32: Install Apache and non Apache version on the same system
+
+Unlike Unix, Windows loads any needed DLL (dynamic libraries) at startup. This 
+causes trouble when Embperl is compiled for use with Apache and mod_perl, but 
+is used outside of Apache, because Windows tries to load F<ApacheCore.dll>.
+To solve this problem Embperl 1.3.4+ can install a Apache and a non Apache
+version. To do this first install the Apache version as decribed above 
+(includeing the C<nmake install>) . 
+Afterwards rerun Makefile.PL, when ask for mod_perl support answer no, now
+Makefile.PL detects that a mod_perl version was already compiled and asks
+if you what a separte non Apache version. Just say yes here and compile
+and install this version too. When Embperl is loaded it detects if runs in-
+or outside of Apache and loads the correct library.
+
+=head2 Win32: Apache 2.0
+
+Embperl currently does not support Apache 2.0 on Windows (on UNIX is does). 
+This is due to the fact the Embperl is not fully thread safe yet. 
+Makeing Embperl thread safe and support for Apache 2.0 on Windows, is
+currently under development.
+
+=head2 How to continue
+
+
+B<IMPORTANT:> Before using Embperl 2.0, make sure you have read the
+README.v2. The documentation is only partially updated to 2.0 yet!!
+
+You can view the documentation at any time from the Embperl source directory,
+by using the following commands metioned below. After the installation you can
+also view documention by specifying the full module name: e.g.
+
+perldoc Embperl, perldoc Embperl::Intro etc.
+
+To get familiar how Embperl works, read the L<"Intro"|"Intro.pod"> and
+L<"IntroEmbperlObject"|"IntroEmbperlObject.pod"> documents. 
+To learn how to use and configure Embperl, read the L<"Embperl documentation"|"Embperl.pod">.
+
+
+=head2 Further Documentation
+
+
+See L<"perldoc Features"|"Features.pod"> for list of Embperls features 
+
+See L<"perldoc Intro"|"Intro.pod"> for an step by step 
+introduction to Embperl.
+
+See L<"perldoc IntroEmbperlObject"|"IntroEmbperlObject.pod"> for an step by step 
+introduction to the OO features of Embperl.
+
+See L<"perldoc IntroEmbperl2.pod"|"IntroEmbperl2.pod"> for Introduction to Embperl 2 
+advanced features.
+
+See L<"perldoc Config"|"Config.pod"> for configuration and calling Embperl.
+
+See L<"perldoc Embperl"|"Embperl.pod"> for complete documentation.
+
+See L<"perldoc TipsAndTricks"|"TipsAndTricks.pod"> for Tips and Tricks 
+around Embperl.
+
+or you can view it online on http://perl.apache.org/embperl/
+and http://www.ecos.de/embperl/
+
+

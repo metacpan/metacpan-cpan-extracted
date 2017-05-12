@@ -1,0 +1,8 @@
+<workbook>
+  <worksheet name="heightwidth">
+    <row height="30">
+      <cell width="10" text="1" />
+      <cell width="0.5" text="1" />
+    </row>
+  </worksheet>
+</workbook>

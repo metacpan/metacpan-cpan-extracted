@@ -1,0 +1,55 @@
+Excel-Table Build V1.022
+===========
+
+Many spreadsheets are used to store semi-structured lists, such as
+catalogues, manifests, etc. in a table-like structure. These files
+typically evolve over time, and come to resemble databases,
+particularly in the case of Excel workbooks, where multiple
+worksheets are used in unison.
+
+Whilst DBD::Excel can be used to provide an SQL-like interface to
+such sheets, it may not be practical to do so, and certainly for
+programmers not familiar or comfortable with SQL. This is
+particularly true for spreadsheets which have evolved over time and
+may not exhibit good database design, such as normalisation or
+consistent "column" naming.
+
+This module allows sheet data (assumed to be similarly structured
+to tables) to be processed as arrays (or hashes if desired) of rows
+with the ability to retrieve meta-data such as maximum value length,
+titles, etc. It also allows for duplicate column naming which often
+occur in such sheets which don't lend themselves well to handling
+via DBD.
+
+It leverages existing Excel parsing modules and as such caters to
+older and newer Excel formats.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL INSTALLDIRS=site install_base=/your/site/prefix
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Data::Dumper
+  Spreadsheet::ParseExcel
+  Spreadsheet::XLSX
+  File::Basename
+  Carp
+  Log::Log4perl
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012 by Tom McMeekin
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

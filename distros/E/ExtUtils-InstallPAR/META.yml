@@ -1,0 +1,20 @@
+--- #YAML:1.0
+name:               ExtUtils-InstallPAR
+version:            0.03
+abstract:           Install .par's into any installed perl
+author:
+    - Steffen Mueller <smueller@cpan.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    PAR::Dist:  0.40
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.48
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

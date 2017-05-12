@@ -1,0 +1,126 @@
+NAME
+    Email::Address::List - RFC close address list parsing
+
+SYNOPSIS
+        use Email::Address::List;
+
+        my $header = <<'END';
+        Foo Bar <simple@example.com>, (an obsolete comment),,,
+         a group:
+          a . weird . address @
+          for-real .biz
+         ; invalid thingy, <
+         more@example.com
+         >
+        END
+
+        my @list = Email::Address::List->parse($header);
+        foreach my $e ( @list ) {
+            if ($e->{'type'} eq 'mailbox') {
+                print "an address: ", $e->{'value'}->format ,"\n";
+            }
+            else {
+                print $e->{'type'}, "\n"
+            }
+        }
+
+        # prints:
+        # an address: "Foo Bar" <simple@example.com>
+        # comment
+        # group start
+        # an address: a.weird.address@forreal.biz
+        # group end
+        # unknown
+        # an address: more@example.com
+
+DESCRIPTION
+    Parser for From, To, Cc, Bcc, Reply-To, Sender and previous prefixed
+    with Resent- (eg Resent-From) headers.
+
+REASONING
+    Email::Address is good at parsing addresses out of any text even
+    mentioned headers and this module is derived work from Email::Address.
+
+    However, mentioned headers are structured and contain lists of
+    addresses. Most of the time you want to parse such field from start to
+    end keeping everything even if it's an invalid input.
+
+METHODS
+  parse
+    A class method that takes a header value (w/o name and :) and a set of
+    named options, for example:
+
+        my @list = Email::Address::List->parse( $line, option => 1 );
+
+    Returns list of hashes. Each hash at least has 'type' key that describes
+    the entry. Types:
+
+    mailbox
+        A mailbox entry with Email::Address object under value key.
+
+        If mailbox has obsolete parts then 'obsolete' is true.
+
+        If address (not display-name/phrase or comments, but
+        local-part@domain) contains not ASCII chars then 'not_ascii' is set
+        to true. According to RFC 5322 not ASCII chars are not allowed
+        within mailbox. However, there are no big problems if those are used
+        and actually RFC 6532 extends a few rules from 5322 with
+        UTF8-non-ascii. Either use the feature or just skip such addresses
+        with skip_not_ascii option.
+
+    group start
+        Some headers with mailboxes may contain groupped addresses. This
+        element is returned for position where group starts. Under value key
+        you find name of the group. NOTE that value is not post processed at
+        the moment, so it may contain spaces, comments, quoted strings and
+        other noise. Author willing to take patches and warns that this will
+        be changed at some point without additional notifications, so if you
+        need groups info then you better send a patch :)
+
+        Groups can not be nested, but one field may have multiple groups or
+        mix of addresses that are in a group and not in any.
+
+        See skip_groups option.
+
+    group end
+        Returned when a group ends.
+
+    comment
+        Obsolete syntax allows one to use standalone comments between
+        mailboxes that can not be addressed to any mailbox. In such
+        situations a comment returned as an entry of this type. Comment
+        itself is under value.
+
+    unknown
+        Returned if parser met something that shouldn't be there. Parser
+        tries to recover by jumping over to next comma (or semicolon if
+        inside group) that is out quoted string or comment, so "foo, bar,
+        baz" string results in three unknown entries. Jumping over comments
+        and quoted strings means that parser is very sensitive to unbalanced
+        quotes and parens, but it's on purpose.
+
+    It can be controlled which elements are skipped, for example:
+
+        Email::Address::List->parse($line, skip_unknown => 1, ...);
+
+    skip_comments
+        Skips comments between mailboxes. Comments inside and next to a
+        mailbox are not skipped, but returned as part of mailbox entry.
+
+    skip_not_ascii
+        Skips mailboxes where address part has not ASCII characters.
+
+    skip_groups
+        Skips group starts and end elements, however emails within groups
+        are still returned.
+
+    skip_unknown
+        Skip anything that is not recognizable. It still tries to recover as
+        described earlier.
+
+AUTHOR
+    Ruslan Zakirov <ruz@bestpractical.com>
+
+LICENSE
+    Under the same terms as Perl itself.
+

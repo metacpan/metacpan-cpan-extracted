@@ -1,0 +1,20 @@
+#!/usr/local/bin/perperl
+use strict;
+use FindBin qw($Bin);
+use ETLp::Audit::Browser::Controller::Job;
+use CGI::Carp qw(fatalsToBrowser);
+
+my $webapp = ETLp::Audit::Browser::Controller::Job->new(
+    PARAMS => {
+        config_file   => "$Bin/../conf/etl.conf",
+        template_path => "$Bin/../view",
+        'table'       => [
+            'list'            => {rm => 'list'},
+            'update_sections' => {rm => 'update_sections'},
+            'update_configs'  => {rm => 'update_configs'},
+            'section'         => {rm => 'section'},
+        ]
+    }
+);
+
+$webapp->run;

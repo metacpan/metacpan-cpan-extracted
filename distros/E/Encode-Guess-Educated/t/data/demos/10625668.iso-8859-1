@@ -1,0 +1,1162 @@
+
+
+Requirement of Calmodulin Binding by HIV-1 gp160 for EnhancedFAS-mediated Apoptosis *
+
+Keith J.
+
+Micoli ,
+
+George
+
+Pan ,
+
+Yong
+
+Wu ,
+
+John P.
+
+Williams ,
+
+William J.
+
+Cook , and
+
+Jay M.
+
+McDonald § ¶
+
+
+
+From the Department of Pathology, University ofAlabama at Birmingham, Birmingham, Alabama 35294and the
+
+§ Veterans Administration Medical Center,Birmingham, Alabama 35233
+
+
+
+ABSTRACT
+
+TOP
+
+ABSTRACT
+
+INTRODUCTION
+
+EXPERIMENTAL PROCEDURES
+
+RESULTS
+
+DISCUSSION
+
+REFERENCES
+
+
+
+Accelerated apoptosis is one mechanism proposedfor the loss of CD4+ T-lymphocytes in human immunodeficiency virus type1 (HIV-1 ) infection. The HIV-1 envelope glycoprotein, gp160, contains two C-terminal calmodulin-binding domains. Expression ofgp160 in Jurkat T-cells results in increased sensitivity to FAS-and ceramide-mediated apoptosis. The pro-apoptotic effect of gp160 expression is blocked by two calmodulin antagonists, tamoxifen and trifluoperazine. This enhanced apoptosis in response to FAS antibody or C 2 -ceramide is associated with activationof caspase 3,a critical mediator of apoptosis. A point mutation in theC-terminal calmodulin-binding domain of gp160 (alanine 835totryptophan, A835W) eliminates gp160-dependent enhancedFAS-mediated apoptosis in transiently transfected cells, as well as
+
+in vitro calmodulin binding to a peptide corresponding tothe C-terminal calmodulin-binding domain of gp160. Stable Tet-offJurkat cell lines were developed that inducibly express wild type gp160or gp160A835W. Increasing expression of wild type gp160, but notgp160A835W, correlates with increased calmodulin levels, increasedapoptosis, and caspase 3activation in response to anti-FAS treatment.The data indicate that gp160-enhanced apoptosis is dependent uponcalmodulin up-regulation, involves the activation of caspase 3,andrequires calmodulin binding to the C-terminal binding domain of gp160.
+
+INTRODUCTION
+
+TOP
+
+ABSTRACT
+
+INTRODUCTION
+
+EXPERIMENTAL PROCEDURES
+
+RESULTS
+
+DISCUSSION
+
+REFERENCES
+
+
+
+HIV-1 1 infection ischaracterized by immune system hyperactivation and dysfunction thatincreases with disease progression until immune function is lost.During the long asymptomatic phase, a state of equilibrium appearsto be achieved, consisting of a rapid turnover of lymphocytesconcomitant with rapid viral production and clearance ( 1-3 ). Thisequilibrium eventually shifts with a loss of the ability of the immunesystem to replace CD4+ cells and a gradual increase in viral load.Since HIV-1 primarily infects CD4+ T-lymphocytes, and the decline inthese cells along with the rise in viral load is a hallmark of diseaseprogression, understanding the relationship between these phenomena iscritical in understanding HIV-1 pathogenesis.
+
+
+
+One proposed mechanism for the accelerated loss of CD4+ cells is anincreased rate of apoptosis ( 4 ). Apoptosis, or programmed cell death,differs from necrosis in that dying cells participate actively in theirown death and generally do not induce an inflammatory response ( 5 ).Physiologically, apoptosis functions in maintaining tissue homeostasisand is important in removal of lymphocytes after an immune response.The latter function prevents accumulation of lymphocytes in the bloodand is mediated by interaction of the apoptotic receptor, FAS, with FASligand. Upon binding FAS ligand, FAS recruits signaling molecules tothe death-inducing signaling complex ( 6-8 ). Induction of this pathwayleads to activation of caspase 3,subsequent activation of caspase 6,and eventually activation of DNA fragmentation factor and aCa 2+ /Mg 2+ -dependent endonucleaseresponsible for cleavage of DNA resulting in the typical ladderingpattern seen in most forms of apoptosis ( 9-11 ).
+
+
+
+The importance of apoptosis in AIDS is controversial although there isabundant in vitro evidence supporting a role for apoptosis in the pathogenesis of HIV-1 ( 12 ), and although mechanisms regulating this apoptosis in vivo are not clear, current evidenceimplicates the FAS pathway. Evidence supporting this hypothesisincludes reports that lymphocytes from HIV-1-infected individualsexpress elevated levels of FAS and are more sensitive to FAS-mediated apoptosis in vitro compared with non-infected individuals( 13-15 ). The chronically activated immune state in HIV infection maylead to an improperly elevated rate of apoptosis in vivo.Additionally, the level of spontaneous apoptosis in lymphocytes fromHIV+ individuals is elevated and positively correlates with increasingdisease severity ( 12, 16 ).
+
+
+
+The coat glycoprotein of HIV-1, gp160, is post-translationally cleavedto an extracellular subunit, gp120, and a transmembrane subunit, gp41.The subunits are non-covalently associated, and both are required forviral entry into the cell. Two calmodulin-binding sites have beenidentified near the C terminus of gp160 ( 17 ). Purified gp160 orpeptides corresponding to the gp160 calmodulin-binding sites bindcalmodulin in vitro and inhibitcalmodulin-dependent enzymes ( 18 ). Expression of gp160 inMolt4 cells, a FAS-resistant human T-cell line, rendered these cellssensitive to FAS-induced apoptosis ( 19 ), whereas this effect wasdiminished in Molt4 cells expressing gp160 147, a truncatedglycoprotein that lacks both calmodulin-binding domains ( 19 ). Furtherevidence implicating calmodulin in the cytopathic effect of gp160 isthat two calmodulin antagonists, tamoxifen and trifluoperazine, blockFAS-mediated apoptosis in gp160-expressing cells ( 19 ). In addition,tamoxifen and trifluoperazine have been reported to reduce spontaneousapoptosis in cultured peripheral blood mononuclear cells fromHIV-1-infected individuals ( 16 ).
+
+
+
+We demonstrate here that gp160 expression enhances FAS-mediatedapoptosis in Jurkat cells by increasing calmodulin expression andaccelerating caspase 3activation and that these effects that requirecalmodulin binding to gp160 are blocked by a single point mutation inthe C-terminal calmodulin-binding domain.
+
+EXPERIMENTAL PROCEDURES
+
+TOP
+
+ABSTRACT
+
+INTRODUCTION
+
+EXPERIMENTAL PROCEDURES
+
+RESULTS
+
+DISCUSSION
+
+REFERENCES
+
+
+
+ Cells and Cell Culture--
+
+Jurkat cells were purchased from theATCC (Mannasas, VA) and grown at 37°C in 5% CO 2 inRPMI 1640medium supplemented with 10% heat-inactivated fetal bovineserum, 100units/ml penicillin, 100µg/ml streptomycin, and 2m M L -glutamine.
+
+
+
+ Plasmids--
+
+Plasmid pSRHS containing the HIV-1 envelope gene,gp160, and the truncated forms of gp160, 147, which lacks theC-terminal 147amino acids of gp41, and 67, which lacks theC-terminal 67 amino acids of gp41, as well as the plasmid pKS8,containing the cDNA for -galactosidase under control of thehuman -actin promoter, were kindly provided by Eric Hunter,Department of Microbiology, University of Alabama at Birmingham, andwere used in all transfection experiments.
+
+
+
+ Transfections--
+
+All transient transfections were performedusing the cationic lipid, DMRIE-C (Life Technologies, Inc.). Briefly,lipid-DNA complexes were allowed to form for 45min at room temperature in serum-free medium. Cells were added to the complex in serum-free medium and incubated for 5h at 37°C in 5% CO 2.RPMI 1640medium (Life Technologies, Inc.) was added, and cells werecultured an additional 48h. Transfection efficiency is monitoredby simultaneous transfection of the -galactosidase expressionvector, pKS8. Efficiencies ranged from 50to 90% in Jurkat cells.
+
+
+
+ Antibodies and Reagents--
+
+Monoclonal antibody to calmodulinwas developed as described previously ( 20 ) and is available fromUpstate Biotechnology Inc. Lake Placid, NY. Mouse anti-human FASmonoclonal antibody (Upstate Biotechnology Inc.) was used to induceapoptosis. Mouse anti-human caspase 3monoclonal antibody was fromTransduction Laboratories (San Diego, CA), caspase 3polyclonalantibody was from PharMingen (San Diego, CA); C 2 -ceramideand C 2 -dihydroceramide was from Avanti Polar Lipids(Birmingham, AL).
+
+
+
+ Site-directed Mutagenesis--
+
+Stratagene's (La Jolla, CA)Quikchange Site-directed Mutagenesis Kit was used to make pointmutations of gp160 according to manufacturer's instructions. Primersfor the mutagenesis were purchased from Life Technologies, Inc., andcorrespond to the desired mutation of alanine 835to tryptophan flankedby 10-15 base pairs of correct sequence, using the sequence of HIV-1
+
+strain HXB2 as a template.
+
+
+
+ Creation of gp160- and gp160A835W-expressing CellLines--
+
+Tet-Off Jurkat cells (, PaloAlto, CA) were transfected with the pTRE expression vector containinggp160 or gp160A835W cDNA by electroporation. Selection of stablecell lines was initiated 48h after transfection using 100µg/mlgeneticin, 300µg/ml hygromycin, and 2µg/ml tetracycline in RPMI1640complete medium changed every 4days. After 5-7 days, livingcells were separated from dead cells and plated at a lower density.After serial dilution, isolated single cell clones were cultured in96-well plates and then transferred into 12-well and 6-well plates anda 25-cm 2 T flask.
+
+
+
+ Northern Blot of gp160 and gp160A835W in Tet-off Jurkat ClonesInduced by Removal of Tetracycline--
+
+Jurkat clones expressing HIV-1
+
+gp160 and mutant gp160A835W were incubated with decreasing doses oftetracycline for 48h. Total RNA was isolated by the guanidiniumthiocyanate/phenol/chloroform method and separated by formaldehyde gelelectrophoresis. RNA was blotted onto Hybond N membranes andprehybridized for 45min at 68°C and then hybridized for 1husing Quikhyb (Stratagene). The hybridization probe was generated byrandom labeling with Prime-a-Gene Labeling System (Promega, Madison,WI) with [ - 32 P]dCTP and HIV-1 HXB2 envelope cDNA template.
+
+
+
+ Peptide Synthesis--
+
+Peptides corresponding to the C-terminalcalmodulin-binding site of gp160 (residues 826-843) weresynthesized at the University of Alabama at Birmingham ComprehensiveCancer Center Peptide Synthesis and Analysis Shared Facility andpurified by high pressure liquid chromatography. Wild type gp160peptide sequence is 826-DRVIEVVQG A CRAIRHIP-843, andgp160A835W sequence is 826-DRVIEVVQG W CRAIRHIP-843, with the residue corresponding to 835 underlined.
+
+
+
+ TdT Apoptosis Staining--
+
+In situ apoptosisstaining was performed using terminal deoxynucleotide transferase(Roche Molecular Biochemicals). Briefly, cells were collected aftertreatments and cytospun onto microscope slides and fixed in 10%formalin in PBS. Slides were then rinsed and treated with 20µg/mlProteinase K (Fisher) for 15min at room temperature. Slides werewashed several times with water and incubated with at 37°C TdT (0.3units/ml), digoxigenin-labeled dUTP, and buffer (30m M Trisbase, pH 7.2,140m M sodium cacodylate, 1m M
+
+cobalt chloride). After a brief wash, slides were blocked in 1% bovineserum albumin, 0.1% gelatin in PBS for 15min at room temperature.Slides were incubated with alkaline phosphatase-conjugated anti-digoxigenin antibody for 1h at room temperature, washed inPBS, and developed with nitro bluetetrazolium/5-bromo-4-chloro-3-indolyl phosphate (Sigma) at roomtemperature for 30min. Slides were coverslipped and at least 400cellsper slide were counted to determine the percentage of apoptotic cells.
+
+
+
+ Western Blot for Caspase 3and Calmodulin--
+
+Jurkat cells weretreated as indicated and lysed in buffer containing 50m M
+
+HEPES, pH 7.4,150m M NaCl, 10% glycerol, 1% Triton X-100, 1m M sodium orthovanadate, 10m M EDTA,10m M EGTA, 1m M ammonium molybdate, 50m M NaF, 0.5µ M okadaic acid, 5m M
+
+benzamidine, and 50µg/ml pepstatin. Equivalent amounts of protein(100µg) were separated on 12.5% SDS-PAGE and transferred toImmobilon P membrane (Millipore, Bedford, MA). Membranes were fixed in0.2% glutaraldehyde in Tris-buffered saline (TBS ) for calmodulin only, blocked in TBS containing 2% bovine serum albumin and 0.2% gelatin, and then incubated with a monoclonal caspase 3antibody diluted 1:1000,a polyclonal caspase 3antibody (1:3000), or a monoclonal calmodulinantibody (1:3000) in TBS/Tween 20(TTBS) and anti-mouse or anti-rabbithorseradish peroxidase-conjugated antibody (Amersham PharmaciaBiotech), 1:5000 in TTBS followed by development with enhancedchemiluminescence (Amersham Pharmacia Biotech).
+
+
+
+ Dansyl-Calmodulin Binding--
+
+The binding of calmodulin topeptides corresponding to the C-terminal calmodulin-binding domain ofgp160 or the A835W mutant was determined fluorimetrically withdansyl-calmodulin (Ocean Biologics, Corvalis, OR) as reportedpreviously ( 21 ). Briefly, fluorescence emission of dansyl-calmodulinwas scanned from 400 to 600nm after excitation at 340nm with theindicated concentrations of peptide. All assays were performed inbuffer containing 50 m M MOPS, pH 7.3,200m M
+
+KCl, and 1m M CaCl 2 with or without 5 m M EGTA. Emission spectra were obtained with concentrationsof peptides ranging from 0to 1µ M, and mellitin was usedas a positive control for binding.
+
+RESULTS
+
+TOP
+
+ABSTRACT
+
+INTRODUCTION
+
+EXPERIMENTAL PROCEDURES
+
+RESULTS
+
+DISCUSSION
+
+REFERENCES
+
+
+
+ Enhancement of Ceramide- and FAS-mediated Apoptosis bygp160--
+
+Jurkat cells were transfected with gp160 ormock-transfected with empty vector and treated with a monoclonal FASantibody (clone CH11), and apoptosis was determined as described under "Experimental Procedures." Similar levels of apoptosis (11% in mock-transfected and 13% in gp160 transfected) were observed in cellsnot treated with FAS antibody (Fig.
+
+A ). Cells transfected withgp160 undergo significantly more apoptosis (35±3%) than vector-transfected cells (25±1%) after treatment with FASantibody ( n =8, p <0.01). There wasno difference in basal or FAS-mediated apoptosis betweenvector-transfected cells and untransfected Jurkat cells (data notshown).
+
+
+
+
+
+View larger version (19K):
+
+[in this window]
+
+[in a new window]
+
+Fig. 1.
+
+Apoptosis in control Jurkat cells andgp160-transfected Jurkat cells treated with anti-FAS orC 2 -ceramide. Jurkat cells were transfected usingDMRIE-C with empty vector, pSRHS, or pSHRSgp160. Forty-eight hourspost-transfection, cells were treated with 500ng/ml anti-FAS antibody( A ) or 50µ M C 2 -ceramide ordihydroceramide ( B ) for 3h. Cells were then collectedfor TdT staining and counting. Data shown are the mean percentageapoptotic cells of eight separate experiments, ±S.E. FAS-mediatedapoptosis in gp160-transfected cells was significantly higher than invector-transfected cells ( p <0.01) as wasceramide-mediated apoptosis ( p <0.001).
+
+
+
+Previous studies have shown that ceramide levels increase inHIV-1-infected cells in vitro ( 22 ) and that treatment oflatently infected cells with ceramide induces viral production ( 23 ). Furthermore, ceramide is a reported second messenger in FAS-mediated apoptosis. To delineate the site of action of gp160 further, we testedthe effect of gp160 on ceramide-mediated apoptosis in Jurkat cells. Thespecificity of ceramide action was demonstrated using dihydroceramideas a negative control (Fig. B ). Dihydroceramide is abiologically inactive molecule, which differs from ceramide by onedouble bond ( 24 ). The ability of gp160 to enhance ceramide-mediated apoptosis is virtually identical to the effect of gp160 on FAS-mediated apoptosis (Fig. A ). Ceramide treatment inducedapoptosis in 32 ±3% of gp160-transfected cells compared with22±3% in vector-transfected cells ( n =8, p <0.001). Basal levels of apoptosis (13±2% in gp160-transfected cells and 11±2% in vector alonetransfected cells) did not change in response to dihydroceramide.
+
+
+
+ Effect of Calmodulin Antagonists on gp160-enhanced Ceramide-and FAS-mediated Apoptosis--
+
+Jurkat cells were transfected withgp160 as described above and pretreated with 10µ M
+
+tamoxifen (TMX ) or trifluoperazine (TFP ) for 30min prior to additionof FAS antibody (Fig. ). Although TMX iswidely used as an anti-estrogen, it is as potent a calmodulin antagonist as TFP in the range of 1-10 µ M ( 25 ). TMX
+
+( n =3) and TFP ( n =5) inhibited theFAS-mediated apoptosis in gp160-transfected cells by 75±10and90±2%, respectively (Fig. A ).
+
+
+
+
+
+View larger version (25K):
+
+[in this window]
+
+[in a new window]
+
+Fig. 2.
+
+Inhibition of gp160 enhancement of FAS- andceramide-mediated apoptosis by calmodulin antagonists in Jurkatcells. Jurkat cells were transfected with pSHRSgp160 andpretreated with 10µ M TMX of TFP for 30min beforeaddition of 500ng/ml FAS antibody ( A ) or 50µ M C 2 -ceramide ( B ). Cells werethen TdT-stained and apoptosis was quantified by counting at least400cells/slide. Percent inhibition of apoptosis was calculated bysetting the amount of apoptosis in the absence of inhibitor as 100andapoptosis in the presence of the calmodulin antagonist as percent ofthis number±S.E. Data shown represent the mean±S.E. ofthree ( TMX ) or five ( TFP ) separateexperiments.
+
+
+
+The effects of TMX and TFP on gp160 enhanced ceramide-induced apoptosiswere also tested to determine whether gp160-enhanced ceramide-mediatedapoptosis is affected by calmodulin antagonists in a way that issimilar to FAS-mediated apoptosis. Both TMX ( n =3) andTFP ( n =8) inhibited gp160-enhanced ceramide-mediated apoptosis by 65±10and 90±5%, respectively (Fig.
+
+B ). The data clearly indicate that the percent inhibitionobserved in these experiments is similar to the effect of TFP and TMX
+
+on FAS-mediated apoptosis in gp160-transfected cells.
+
+
+
+ Effect of gp160 Expression on Caspase 3Activation by FAS andCeramide--
+
+Since gp160 enhanced both FAS- and ceramide-mediatedapoptosis, we investigated potential downstream mechanisms regulating this effect. Caspase 3is recognized as an important effector moleculein the apoptotic pathway, and we hypothesized that gp160 expression mayalter the activity of this protease. Caspase 3, like all knowncaspases, is synthesized as a zymogen and undergoes proteolyticactivation in two steps. Cleavage by an upstream caspase followed by asecond autocatalytic cleavage forms the fully active dimer ofapproximately 17and 12kDa. Enzyme activation in these studies ismonitored by Western analysis for the 32-kDa proform (CPP32), whichdecreases upon enzyme activation. Cells treated with either FASantibody or C 2 -ceramide for the indicated times demonstratethat the rate of caspase 3activation is increased in cells transfectedwith gp160 as determined by Western blot analysis of Jurkat celllysates from cells transfected with empty vector or vector containinggp160 (Fig. ). The accelerated rate ofdecrease in the amount of the 32-kDa proform of the enzyme in responseto both FAS antibody (Fig. A ) and C 2 -ceramide(Fig. B ) is evident. Thus, gp160 enhances both FAS- andceramide-mediated apoptosis by a common mechanism involving activationof caspase 3.
+
+
+
+
+
+View larger version (20K):
+
+[in this window]
+
+[in a new window]
+
+Fig. 3.
+
+Western blot for caspase 3from Jurkat cellstreated with anti-FAS or C 2 -ceramide. Jurkat cellswere transfected with empty vector or gp160 and treated with anti-FASantibody ( A ) or C 2 -ceramide ( B ) forthe times indicated. After lysis, equivalent amounts of protein weresubjected to SDS-PAGE and transferred to Immobilon P membrane andimmunoblotted for caspase 3using a monoclonal antibody to caspase 3.Shown are representative examples from at least two independentexperiments for each treatment with the inactive proform of caspase 3,CPP32, labeled.
+
+
+
+ Determination of the Amino Acid Residues of gp160 Critical toCalmodulin Binding and Enhanced Apoptosis--
+
+To test further thehypothesis that gp160-enhanced apoptosis requires calmodulin binding,we computer-modeled the three-dimensional structure of calmodulin boundto a peptide corresponding to the native C-terminal calmodulin-bindingdomain. The C-terminal rather than the N-terminal calmodulin-bindingdomain was selected because FAS-mediated apoptosis was not enhanced incells transfected with gp160 67 (a deletion of the C-terminalcalmodulin-binding domain) compared with cells transfected with wildtype gp160 (data not shown). Previous studies with this mutantdetermined that it also eliminated viral production in vitro
+
+( 26 ). Computer modeling aligning the calmodulin-binding domain ofmyosin light chain kinase (MLCK ) with the C terminus of gp160identified five amino acids in the C-terminal calmodulin-binding domainof gp160 likely to be important for calmodulin binding (Fig.
+
+A, in bold ).Calcium-bound calmodulin (Fig. B ) has two globular domains,each containing two calcium-binding sites, separated by a highlyflexible amphipathic helical region. It is this helical region thatundergoes a major conformational change when calmodulin binds to targetproteins by wrapping around the amphipathic helix of the target protein and bringing the two globular domains into close approximation.
+
+
+
+
+
+View larger version (127K):
+
+[in this window]
+
+[in a new window]
+
+Fig. 4.
+
+Comparison of the calmodulin-binding domainof smooth muscle myosin light chain kinase and the C-terminalcalmodulin-binding domain of HIV-1 . A, the 17-aminoacid peptide representing the calmodulin-binding domain of smoothmuscle MLCK was compared with the amino acid sequence of the C-terminalCaM-binding domain of gp160. The region of best fit between the tworegions is shown, with exact or near-matches in bold.B, model of calcium-bound calmodulin ( green )alone and ( C ) complexed with gp160 peptide( blue ). Wild type gp160 with Ala at position 835( purple ) is shown with the helix coming out of the paper andcalmodulin wrapping around it. Note that the N terminus of calmodulinis in the same position in both ( B and C ) andthat upon binding gp160 ( C ), the C terminus of calmodulinmoves down and the central helix region becomes a loop. The model isbased on the crystal structure of calmodulin ( 51 ) and the CaM-smoothmuscle MLCK peptide complex ( 39 ). The four Ca 2+ atoms fromthe CaM-MLCK complex are shown as spheres. Ala-835 is predicted to makea total of six van der Waals contacts with Leu-18 and Phe-19, withdistances ranging from 3.22and 3.99Å. The five hydrophobic aminoacids of calmodulin that would form unacceptable van der Waals contacts(<2.0 Å) with the A835W mutant are colored orange (Leu-18,Phe-19, Val-35, Leu-39, and Leu-112). These figures were prepared usingRIBBONS ( 52 ).
+
+
+
+An alanine 835mutation to tryptophan in the gp160 peptide is predictedto be a substitution that will maximally affect binding to calmodulinbecause three-dimensional computer modeling predicts that this alaninefits in a tight hydrophobic pocket of calmodulin. Substitution oftryptophan for alanine is not predicted to change the overallconformation of gp160 but is predicted to disrupt binding tocalmodulin, because the large side chain would be within 2Åof fivehydrophobic residues on calmodulin, too close to allow binding. Theribbon structure of calmodulin (calcium saturated) is illustrated inthe absence of peptide (Fig. B ) and in its predictedconformation when bound to wild type gp160 peptide (Fig. C ). Ala-835 of gp160 is shown in purple and thefive residues of calmodulin (Leu-18, Phe-19, Val-35, Leu-39, andLeu-112) predicted to be within 2Åof the Trp residue of the mutantgp160 peptide are in orange.
+
+
+
+ Calmodulin Binding by gp160 Peptides--
+
+The effect of the A835Wmutation of gp160 on calmodulin binding was tested directly usingdansyl-calmodulin (dansyl-CaM) (Fig. ).Dansyl-CaM is a fluorescently tagged calmodulin that binds targetproteins with high affinity and has characteristic fluorescence emission spectra when excited at 340nm, which increases upon bindingto either calcium or peptides. Dansyl-calmodulin has previously beenshown to activate calmodulin-dependent processesnormally, indicating that the labeling has no effect on the biologicalactivity of calmodulin ( 21 ). By titrating dansyl-CaM with increasing concentrations of peptide, dissociation constants for thedansyl-CaMpeptide complex may be obtained ( 21 ). Peptidescorresponding to the C-terminal calmodulin-binding domain (wild type orA835W) were tested for their ability to bind dansyl-CaM, both in thepresence and absence of calcium. Dansyl-CaM (100n M ) wastitrated with increasing concentrations of either the wild type gp160(Fig. A ) or A835W (Fig. B ) peptides. Studieswere performed in the presence of 1m M CaCl 2,and binding was shown to be calcium-dependent by chelatingCa 2+ upon addition of 5m M EGTA, whicheliminated binding (data not shown). Emission spectra were obtainedusing dansyl-CaM alone or dansyl-CaM plus 5µ M wild typepeptide (Fig. A ) or 5µ M A835W mutant peptide(Fig. B ). Only the wild type peptide significantly increased the fluorescence intensity of dansyl-CaM over the wavelengths scanned. The lack of increased emission intensity with the A835W peptide indicates that it does not bind to dansyl-calmodulin. A bindingcurve was generated by subtracting the fluorescence intensity ofdansyl-CaM at 485nm from the fluorescence intensity of dansyl-CaM pluspeptide for each concentration of peptide as described previously ( 21 ).A representative curve shows saturable binding of gp160 peptide todansyl-CaM (Fig. C ).
+
+
+
+
+
+View larger version (21K):
+
+[in this window]
+
+[in a new window]
+
+Fig. 5.
+
+Calmodulin binding to gp160 peptide and A835Wmutant peptides of gp160. Dansyl-CaM (100n M ) wasincubated with increasing concentrations of wild type gp160 peptide,DRVIEVVQGACRAIRHIP ( A ), or the A835W mutant peptide,DRVIEVVQGWCRAIRHIP ( B ). After excitation at 340nm, emissionwas monitored at 400-600 nm. Fluorescence spectra of dansyl-CaM alone( empty squares ) or 5µ M peptide ( filledsquares ). The concentration-dependent binding of wildtype peptide to calmodulin ( C ) was determined by measuringthe fluorescence change at 485nm for each concentration of wild typepeptide. Data shown are representative of three independentmeasurements for each peptide.
+
+
+
+ Effect of gp160A835W on FAS-mediated Apoptosis--
+
+The effect ofthe A835W mutation on gp160-enhanced FAS-mediated apoptosis wasdetermined by TdT staining of Jurkat cells treated with FAS antibodyfor 3h. Transfection of the gp160 mutant, A835W, eliminated theenhancement of FAS-mediated apoptosis observed with wild type gp160(Fig. ). Apoptosis levels ingp160A835W-transfected cells were significantly reduced from wild typegp160-transfected cells ( p =0.009) and were nearlyidentical to levels of apoptosis measured in vector-transfectedcells.
+
+
+
+
+
+View larger version (20K):
+
+[in this window]
+
+[in a new window]
+
+Fig. 6.
+
+Apoptosis in Jurkat cells transientlytransfected with wild type gp160 and the A835W point mutant ofgp160. Jurkat cells were transfected with empty vector, pSRHS, orvector containing wild type gp160, or the mutant gp160A835W. Cells weretreated with 500ng/ml anti-FAS antibody for 3h and thenTdT-stained. Results show the mean percentage apoptotic cells±S.E. of four separate experiments. Cells transfected with gp160underwent significantly more apoptosis in response to anti-FAS than dideither vector-transfected ( p =0.002) orgp160A835W-transfected cells ( p =0.009).
+
+
+
+ Tet-off Jurkat Cells Expressing gp160 or gp160A835W--
+
+Todetermine more precisely the effect of the A835W mutation of gp160 onFAS-mediated apoptosis, Jurkat Tet-off cell lines were created (asdescribed under "Experimental Procedures") that stably expresseither wild type gp160 or gp160A835W under tetracycline control. Thetetracycline concentration-dependent expression of bothglycoproteins was measured at the mRNA level after 48-h incubation with the indicated concentrations of tetracycline (Fig.). Representative Northern blots forwild type gp160 and gp160A835W demonstrate an increase in mRNAexpression for both genes in response to decreasing tetracyclineconcentrations (Fig. A ). Similar patterns of protein expression were also observed following removal of tetracycline andimmunoprecipitating with HIV-infected human serum indicating that bothglycoproteins were expressed at similar concentrations (data notshown).
+
+
+
+
+
+View larger version (29K):
+
+[in this window]
+
+[in a new window]
+
+Fig. 7.
+
+Expression of gp160, gp160A835W, andcalmodulin in Tet-off Jurkat cells. Tet-off Jurkat cellstransfected with gp160 or gp160A835W were incubated for 48h indecreasing concentrations of tetracycline (2to 0µg/ml), andexpression of gp160 or gp160A835W mRNA was measured by Northernblot ( A ) as described under "Experimental Procedures,"or equivalent amounts of cell lysate were separated by SDS-PAGE andWestern-blotted for calmodulin ( B ). Data are representativeWestern blots from each cell line with calmodulin indicated asCaM.
+
+
+
+Since earlier studies had shown an increase in calmodulin levels incells transfected with gp160 but not a truncated form of gp160 ( 27 ), wetested whether a single point mutation affecting only onecalmodulin-binding domain would be sufficient to eliminate increasedexpression of calmodulin. Tet-off Jurkat cells transfected with gp160or gp160A835W were incubated with decreasing concentrations oftetracycline for 48h. Cells were washed and lysed, and equivalent amounts of protein were separated by SDS-PAGE and Western-blotted forcalmodulin (Fig. B ). Calmodulin expression inverselycorrelates with tetracycline concentration in wild type gp160 cells butnot in cells expressing gp160A835W. The pattern of calmodulinexpression mirrors expression of wild type gp160 seen in Fig.
+
+A, with an approximate 2-3-fold increase in calmodulinexpression in cells with the highest expression of gp160 (no tetracycline).
+
+
+
+ FAS-mediated Apoptosis and Caspase Activation in Tet-off gp160 andA835W Cells--
+
+FAS-mediated apoptosis was tested in the Tet-off celllines, both in the presence of tetracycline and 48h after removalof tetracycline from the culture medium (Fig.). In the presence of tetracycline, whenglycoprotein expression is repressed, both wild type gp160 andgp160A835W-transfected lines respond to FAS identically, withapproximately 20-30% of total cells being apoptotic (Fig.
+
+A ). This level of apoptosis is consistent with the effect of anti-FAS treatment on mock-transfected Jurkat cells (Fig.
+
+A ). In cells treated with anti-FAS for 3h followingremoval of tetracycline, 70% of wild type gp160-expressing cellsundergo apoptosis, an increase of 2.5-fold over uninduced cells,whereas the gp160A835W-expressing cells show no significant increase inapoptosis above levels seen in uninduced cells.
+
+
+
+
+
+View larger version (30K):
+
+[in this window]
+
+[in a new window]
+
+Fig. 8.
+
+Apoptosis and caspase 3activation in Tet-offJurkat cells expressing gp160 or gp160A835W. A, Tet-offJurkat cells transfected with either gp160 or gp160A835W were treatedwith anti-FAS for 3h following 48h incubation in thepresence or absence of 2µg/ml tetracycline. Apoptosis was determinedby TdT staining and manually counting 400cells/slide. B,
+
+Tet-off Jurkat cells transfected with gp160 or gp160A835W oruntransfected Jurkat cells were incubated for 48h in the absenceof tetracycline to induce expression of glycoprotein and then treatedwith 500ng/ml anti-FAS for the times indicated and lysed. Lysates wereseparated by SDS-PAGE and Western-blotted for caspase 3using apolyclonal antibody that recognizes the active subunits of caspase 3(indicated by arrow ).
+
+
+
+Parallel effects on caspase 3activation were observed. Tet-off Jurkatcells expressing gp160 or gp160A835W were treated with anti-FAS for theindicated times, washed, and lysed, and equivalent protein was resolvedby SDS-PAGE and Western-blotted for caspase 3using an antibody thatrecognizes the active subunits of the enzyme (Fig. B ). Inthese experiments, an increase in the active subunits on Western blotindicates activation of caspase 3.As expected, there is a substantialincrease in the amount of active subunits of caspase 3in cellsexpressing wild type gp160. The presence of active caspase 3isdramatically reduced in lysates from gp160A835W-expressing cellscompared with lysates from wild type gp160-expressing cells. Activecaspase 3can be detected as little as 1h following anti-FAStreatment of wild type-expressing cells, whereas very little activecaspase 3is seen in the gp160A835W-expressing cells even after 4h of anti-FAS treatment.
+
+DISCUSSION
+
+TOP
+
+ABSTRACT
+
+INTRODUCTION
+
+EXPERIMENTAL PROCEDURES
+
+RESULTS
+
+DISCUSSION
+
+REFERENCES
+
+
+
+Research on HIV-1 and AIDS has recently led to development oftreatments that have significantly decreased mortality in the UnitedStates. However, the current highly active anti-retroviral treatmentdoes not eliminate the virus from the body ( 28 ) and is far tooexpensive and complicated to be useful in developing nations where HIVinfection is most prevalent. Therefore, understanding the interactionsbetween a virus and its host remains essential for developing newtherapeutic modalities. The molecular mechanisms responsible for thedecline of CD4+ lymphocytes are unknown, although there is evidencethat both FAS and FAS ligand expression are increased in AIDS patients( 13, 29, 30 ), implicating FAS-mediated apoptosis as a potentiallyimportant mechanism.
+
+
+
+
+
+
+
+Earlier work has shown that expression of HIV-1 envelope glycoprotein,gp160, overcomes a block in the FAS pathway in Molt4 cells ( 19 ), aFAS-resistant human T-cell line deficient in hematopoietic stem cellphosphatase. The results presented here support these earlier data andshow that the effects of gp160 are not cell line-specific. These newdata further support the hypothesis that calmodulin binding by gp160 isbiologically relevant. Truncation mutants have suggested this, both inthe work by Pan et al. ( 19 ) and by others ( 26 ) who showedthat progressive reductions in the length of the cytoplasmic tail ofgp160 had increasingly large effects on viral production invitro.
+
+
+
+
+
+
+
+The long cytoplasmic tail of gp160 is a feature conserved among HIV-1,HIV-2, and simian immunodeficiency virus. No specific function has beenattributed to the cytoplasmic region, and despite considerablevariability in the overall sequence, all known sequence variants ofHIV-1 maintain the calmodulin-binding function ( 31 ). Cells transfectedwith gp160 are more sensitive to FAS-mediated apoptosis thanmock-transfected cells, and this enhancement can be blocked bypretreatment with calmodulin antagonists (Fig. ). The enhancedapoptosis is reduced in cells transfected with truncations of gp160that remove most of the cytoplasmic tail of gp160, including theC-terminal calmodulin-binding domain ( 19 ).
+
+
+
+
+
+
+
+To determine whether the mechanism of gp160-dependentenhanced apoptosis occurs at the level of the FAS receptor, weinvestigated whether transfection of gp160 enhancedceramide-mediated apoptosis. Ceramide is a proposed mediator ofapoptosis produced by cleavage of sphingomyelin by a cytosolicsphingomyelinase downstream of FADD in the FAS pathway ( 32 ). Whetherceramide generation is necessary for FAS-mediated apoptosis remainscontroversial ( 33-35 ), and we show that expression of gp160 enhancesapoptosis induced by addition of a cell-permeable, synthetic ceramidecompared with mock-transfected Jurkat cells. Calmodulin antagonistsblock gp160-enhanced ceramide-mediated apoptosis, suggesting that theyfunction downstream of ceramide.
+
+
+
+
+
+
+
+Caspase 3,or caspase 3-like proteases, are critical effectors thatplay an important role in most types of apoptosis ( 8 ). Duringactivation, caspase 3is first cleaved by an upstream caspase (caspase8in the FAS pathway) and then undergoes a second autocatalytic cleavage to form the fully active protease. Cells transfected withgp160 and treated with FAS antibody or ceramide activate caspase 3morerapidly than mock-transfected Jurkat cells. The data suggest that theeffects of gp160 are upstream of caspase 3activation. This supports aprevious report demonstrating that HIV infection-induced apoptosiscould be blocked by caspase inhibition ( 36 ). Similarly, TMX and TFP
+
+block gp160-enhanced FAS- and ceramide-induced apoptosis,suggesting a calmodulin-dependent mechanism. The molecular site of action of calmodulin antagonists in gp160-enhanced apoptosis iscurrently under investigation. However, the data presented hereindicate that calmodulin binding to gp160 is an early and required stepin gp160-enhanced FAS- and ceramide-mediated apoptosis.
+
+
+
+
+
+
+
+To confirm the effect of calmodulin binding by gp160 on FAS-mediatedapoptosis, we created a point mutation in the C-terminal CaM-bindingdomain based on comparisons with the calmodulin-binding domain of MLCK
+
+( 37-38 ). The sequence of the calmodulin-binding domains of both smoothmuscle and skeletal muscle MLCK were compared with the gp160calmodulin-binding sequence. However, the smooth muscle MLCK was usedfor computer modeling because its complex with calmodulin has beendetermined by crystal structure analysis ( 39 ). An alanine to tryptophanmutation at amino acid 835of the gp160 peptide was created that waspredicted not to change the overall amphipathic helical structure ofthe region but would replace a small hydrophobic amino acid with a muchlarger hydrophobic amino acid. The A835W mutant of gp160 failed toenhance FAS-mediated apoptosis above control levels (Fig. ),indicating that this residue is critical to gp160 function and furthersupports the hypothesis that the interaction between gp160 andcalmodulin is necessary to enhance apoptosis. Peptides corresponding tothe C-terminal binding domain of the wild type gp160 and the A835W mutant were used in binding experiments with dansyl-calmodulin anddemonstrated that only the wild type gp160 peptide bounddansyl-calmodulin. Binding of calmodulin by the wild type peptide wasCa 2+ -dependent (data not shown), and theaffinity was identical to reported values for larger peptides thatencompassed the peptide used here ( 31 ). This is the first reportidentifying a single amino acid being critical in the binding of gp160to calmodulin, although several groups have published studies on theeffects of mutating the C terminus of gp160. Tencza et al.
+
+( 18 ) reported that changing several basic residues to negativelycharged glutamic acid residues and single hydrophobic residues changedto polar residues all reduced calmodulin binding and the lytic function of these peptides. Other reports have shown that gp160 binds to calmodulin and that C-terminal truncations of gp160 do not ( 40 ), butthese mutations are more likely to involve changes in tertiary structure and thus are probably less specific than the single point mutation.
+
+
+
+
+
+
+
+Although the mechanism by which gp160 up-regulates calmodulin is notknown, the simplest explanation is that gp160 may be acting as acalmodulin sink, binding available calmodulin, and that cellscompensate by increasing expression of calmodulin. Calmodulinexpression correlates with increased expression of wild type gp160 butis unchanged with expression of gp160A835W, clearly suggesting thatcalmodulin is a critical signaling molecule in gp160-enhanced apoptosis.
+
+
+
+
+
+
+
+Expression of gp160 has been reported to induce apoptosis withoutstimulation by FAS antibody ( 40 ). Induction of apoptosis wasdependent on calmodulin binding to gp160, as cells expressing C-terminal truncations of as few as five amino acids did not bind calmodulin and did not show increased apoptosis. This supports thebasic findings of our earlier studies ( 19 ) except that we did notobserve differences in basal apoptosis between gp160 and mock-transfected cells. There are, however, significant differences between the two studies (ranging from cell lines used to methods oftransfection and measurements of apoptosis) that make direct comparisons impossible.
+
+
+
+
+
+
+
+There are also reports of HIV-1 and simian immunodeficiency virusproteins other than gp160 that increase apoptosis, including Vpu ( 41 ),Nef ( 42 ), and Tat ( 43 ). Whereas the proposed mechanisms that theseproteins use to enhance apoptosis vary, they include FAS ligandup-regulation (Nef), caspase 8up-regulation (Tat), and all converge onFAS-mediated apoptosis. These reports, coupled with the data presentedin this report, leave open the possibility that calmodulin plays acentral role in mediating the effects of each of these proteins.
+
+
+
+
+
+
+
+Currently, there are no known calmodulin-dependent enzymesdirectly involved in the FAS pathway, but data presented here suggest that at a minimum, calmodulin binding is required to mediategp160-enhanced apoptosis. It remains to be determined whethercalmodulin-dependent enzyme activity is also essential inthis process. Calmodulin-dependent processes have beenimplicated in glutamate- ( 44 ), glucocorticoid- ( 45 ), tumor necrosisfactor-, and UV light ( 46 )-dependent apoptosis.Furthermore, there are important potential sites for Ca 2+ /calmodulin action downstream of caspase 3activation,such as death-associated protein kinase ( 47-49 ). Expression of gp160has also been reported to increase [Ca 2+ ] i ( 50 )which would promote calmodulin binding to target proteins andpotentially increase the activity of theCa 2+ /Mg 2+ -dependent endonucleaseresponsible for DNA cleavage in apoptosis ( 10 ). We hypothesize thatgp160 binds to calmodulin and increases calmodulin expression,resulting in recruitment of specific proteins to a membrane complexthat enhances the apoptotic potential of the cell. Interestingly, thereis considerable sequence homology between the death domains of manyapoptosis-inducing proteins and gp41 ( 19 ), providing an additionalpotential mechanism for the recruitment of apoptotic mediating proteinsto the membrane.
+
+
+
+
+
+
+
+In conclusion, these investigations provide strong evidence that gp160expression enhances the cellular response to anti-FAS and increasescaspase 3activity and that these events require calmodulin binding togp160. The possibility that it is the increase in calmodulin expressionthat is mediating the effects of gp160 on apoptosis opens a new avenuein the study of HIV interaction with an infected cell. The use ofcalmodulin antagonists and/or caspase inhibitors may provide usefultools in future studies of viral replication and infectivity,ultimately leading to improved therapies for AIDS and/or effectivevaccine development.
+
+FOOTNOTES
+
+
+
+ *
+
+This work was supported by NCI Grant CA/72823 (toJ.M.M.) from the National Institutes of Health and a VeteransAdministration Merit Review (to J.M.M.).The costs of publication of thisarticle were defrayed in part by thepayment of page charges. The article must therefore be hereby marked" advertisement " inaccordance with 18U.S.C. Section1734solely to indicate this fact.
+
+
+
+
+
+ ¶
+
+To whom correspondence should be addressed: Dept. ofPathology, University of Alabama at Birmingham, 70119th St. S., LHRB 509,Birmingham, AL 35294-0007.Tel.: 205-934-6666; Fax:205-975-9927.
+
+
+
+
+
+ABBREVIATIONS
+
+
+
+The abbreviations used are:
+
+HIV-1, humanimmunodeficiency virus type 1;
+
+gp, glycoprotein;
+
+PAGE, polyacrylamidegel electrophoresis;
+
+TBS, Tris-buffered saline;
+
+TdT, terminaldeoxynucleotidyltransferase;
+
+MOPS, 4-morpholinepropanesulfonic acid;
+
+TMX, tamoxifen;
+
+TFP, trifluoperazine;
+
+dansyl, 5-dimethylaminonaphthalene-1-sulfonyl;
+
+MLCK, myosin light chain kinase;
+
+CaM, calmodulin.
+
+
+
+
+
+REFERENCES
+
+TOP
+
+ABSTRACT
+
+INTRODUCTION
+
+EXPERIMENTAL PROCEDURES
+
+RESULTS
+
+DISCUSSION
+
+REFERENCES
+
+Perelson, A. S.,Neumann, A. U.,Markowitz, M.,Leonard, J. M.,
+
+and Ho, D. D.
+
+(1996)
+
+Science
+
+271,1582-1586 [Abstract]
+
+Wei, X.,Ghosh, S. K.,Taylor, M. E.,Johnson, V. A.,Emini, E. A.,Deutsch, P.,Lifson, J. D.,Bonhoeffer, S.,Nowak, M. A.,Hahn, B. H.,Saag, M. S.,
+
+and Shaw, G. S.
+
+(1995)
+
+Nature
+
+373,117-122 [CrossRef] [Medline]
+
+[OrderarticleviaInfotrieve]
+
+Ho, D. D.,Neumann, A. U.,Perelson, A. S.,Chen, W.,Leonard, J. M.,
+
+and Markowitz, M.
+
+(1995)
+
+Nature
+
+373,123-126 [CrossRef] [Medline]
+
+[OrderarticleviaInfotrieve]
+
+Zhang, Y. J.,Fadeel, B.,Hodara, V.,
+
+and Fenyo, E. M.
+
+(1997)
+
+AIDS
+
+11,1219-1225 [Medline]
+
+[OrderarticleviaInfotrieve]
+
+Staunton, M. J.,
+
+and Gaffney, E. F.
+
+(1998)
+
+Arch. Pathol. Lab. Med.
+
+122,310-319 [Medline]
+
+[OrderarticleviaInfotrieve]
+
+Ashkenazi, A.,
+
+and Dixit, V. M.
+
+(1998)
+
+Science
+
+281,1305-1308 [Abstract/ Free FullText]
+
+Muzio, M.,Chinnaiyan, A. M.,Kischkel, F. C.,O'Rourke, K.,Shevchenko, A.,Ni, J.,Scaffidi, C.,Bretz, J. D.,Zhang, M.,Gentz, R.,Mann, M.,Krammer, P. H.,Peter, M. E.,
+
+and Dixit, V. M.
+
+(1996)
+
+Cell
+
+85,817-827 [Medline]
+
+[OrderarticleviaInfotrieve]
+
+Nicholson, D. W.,
+
+and Thornberry, N. A.
+
+(1997)
+
+Trends Biochem. Sci.
+
+22,299-306 [CrossRef] [Medline]
+
+[OrderarticleviaInfotrieve]
+
+Granville, D. J.,Jiang, H.,An, M. T.,Levy, J. G.,McManus, B. M.,
+
+and Hunt, D. W.
+
+(1998)
+
+FEBS Lett.
+
+422,151-154 [CrossRef] [Medline]
+
+[OrderarticleviaInfotrieve]
+
+Khodarev, N. N.,
+
+and Ashwell, J. D.
+
+(1996)
+
+J. Immunol.
+
+156,922-931 [Abstract]
+
+Liu, X.,Zou, H.,Slaughter, C.,
+
+and Wang, X.
+
+(1997)
+
+Cell
+
+89,175-184 [Medline]
+
+[OrderarticleviaInfotrieve]
+
+Prati, E.,Gorla, R.,Malacarne, F.,Airo, P.,Brugnoni, D.,Gargiulo, F.,Tebaldi, A.,Castelli, F.,Carosi, G.,
+
+and Cattaneo, R.
+
+(1997)
+
+AIDS Res. Hum. Retroviruses
+
+13,1501-1508 [Medline]
+
+[OrderarticleviaInfotrieve]
+
+Gehri, R.,Hahn, S.,Rothen, M.,Steuerwald, M.,Nuesch, R.,
+
+and Erb, P.
+
+(1996)
+
+AIDS
+
+10,9-16 [Medline]
+
+[OrderarticleviaInfotrieve]
+
+Katsikis, P. D.,Wunderlich, E. S.,Smith, C. A.,
+
+and Herzenberg, L. A.
+
+(1995)
+
+J. Exp. Med.
+
+181,2029-2036 [Abstract]
+
+Silvestris, F.,Cafforio, P.,Frassanito, M. A.,Tucci, M.,Romito, A.,Nagata, S.,
+
+and Dammacco, F.
+
+(1996)
+
+AIDS
+
+10,131-141 [Medline]
+
+[OrderarticleviaInfotrieve]
+
+Pan, G.,Zhou, T.,Radding, W.,Saag, M. S.,Mountz, J. D.,
+
+and McDonald, J. M.
+
+(1998)
+
+Immunopharmacology
+
+40,91-103 [CrossRef] [Medline]
+
+[OrderarticleviaInfotrieve]
+
+Srinivas, S. K.,Srinivas, R. V.,Anantharamaiah, G. M.,Compans, R. W.,
+
+and Segrest, J. P.
+
+(1993)
+
+J. Biol. Chem.
+
+268,22895-22899 [Abstract/ Free FullText]
+
+Tencza, S. B.,Miller, M. A.,Islam, K.,Mietzner, T. A.,
+
+and Montelaro, R. C.
+
+(1995)
+
+J. Virol.
+
+69,5199-5202 [Abstract]
+
+Pan, Z.,Radding, W.,Zhou, T.,Hunter, E.,Mountz, J.,
+
+and McDonald, J. M.
+
+(1996)
+
+Am. J.Pathol.
+
+149,903-910 [Abstract]
+
+Sacks, D. B.,Porter, S. E.,Ladenson, J. H.,
+
+and McDonald, J. M.
+
+(1991)
+
+Anal. Biochem.
+
+194,369-377 [Medline]
+
+[OrderarticleviaInfotrieve]
+
+Anderson, S. R.,
+
+and Malencik, D. A.
+
+(1986)
+
+in
+
+Calcium and Cell Function
+
+(Cheung, W. Y., ed), Vol. VI, pp. 2-42, Academic Press, London
+
+Van Veldhoven, P. P.,Matthews, T. J.,Bolognesi, D. P.,
+
+and Bell, R. M.
+
+(1992)
+
+Biochem. Biophys. Res. Commun.
+
+187,209-216 [Medline]
+
+[OrderarticleviaInfotrieve]
+
+Papp, B.,Zhang, D.,Groopman, J. E.,
+
+and Byrn, R. A.
+
+(1994)
+
+AIDS Res. Hum. Retroviruses
+
+10,775-780 [Medline]
+
+[OrderarticleviaInfotrieve]
+
+Mathias, S.,Pena, L. A.,
+
+and Kolesnick, R. N.
+
+(1998)
+
+Biochem. J.
+
+335,465-480 [Medline]
+
+[OrderarticleviaInfotrieve]
+
+Williams, J. P.,Blair, H. C.,McKenna, M. A.,Jordan, S. E.,
+
+and McDonald, J. M.
+
+(1996)
+
+J. Biol. Chem.
+
+271,12488-12495 [Abstract/ Free FullText]
+
+Dubay, J. W.,Roberts, S. J.,Hahn, B. H.,
+
+and Hunter, E.
+
+(1992)
+
+J. Virol.
+
+66,6616-6625 [Abstract]
+
+Radding, W.,Pan, Z. Q.,Hunter, E.,Johnston, P.,Williams, J. P.,
+
+and McDonald, J. M.
+
+(1996)
+
+Biochem. Biophys. Res. Commun.
+
+218,192-197 [CrossRef] [Medline]
+
+[OrderarticleviaInfotrieve]
+
+Finzi, D.,Hermankova, M.,Pierson, T.,Carruth, L. M.,Buck, C.,Chaisson, R. E.,Quinn, T. C.,Chadwick, K.,Margolick, J.,Brookmeyer, R.,Gallant, J.,Markowitz, M.,Ho, D. D.,Richman, D. D.,
+
+and Siliciano, R. F.
+
+(1997)
+
+Science
+
+278,1295-1300 [Abstract/ Free FullText]
+
+Badley, A. D.,McElhinny, J. A.,Leibson, P. J.,Lynch, D. H.,Alderson, M. R.,
+
+and Paya, C. V.
+
+(1996)
+
+J. Virol.
+
+70,199-206 [Abstract]
+
+Dockrell, D. H.,Badley, A. D.,Villacian, J. S.,Heppelmann, C. J.,Algeciras, A.,Ziesmer, S.,Yagita, H.,Lynch, D. H.,Roche, P. C.,Leibson, P. J.,
+
+and Paya, C. V.
+
+(1998)
+
+J. Clin. Invest.
+
+101,2394-2405 [Abstract/ Free FullText]
+
+Tencza, S. B.,Mietzner, T. A.,
+
+and Montelaro, R. C.
+
+(1997)
+
+AIDS Res. Hum. Retroviruses
+
+13,263-269 [Medline]
+
+[OrderarticleviaInfotrieve]
+
+Schwandner, R.,Wiegmann, K.,Bernardo, K.,Kreder, D.,
+
+and Kronke, M.
+
+(1998)
+
+J. Biol. Chem.
+
+273,5916-5922 [Abstract/ Free FullText]
+
+Boesen-de Cock, J. G.R.,Tepper, A. D.,de Vries, E.,van Blitterswijk, W. J.,
+
+and Borst, J.
+
+(1998)
+
+J. Biol. Chem.
+
+273,7560-7565 [Abstract/ Free FullText]
+
+De Maria, R.,Rippo, M. R.,Schuchman, E. H.,
+
+and Testi, R.
+
+(1998)
+
+J. Exp. Med.
+
+187,897-902 [Abstract/ Free FullText]
+
+Hofmann, K.,
+
+and Dixit, V. M.
+
+(1998)
+
+Trends Biochem. Sci.
+
+23,374-377 [CrossRef] [Medline]
+
+[OrderarticleviaInfotrieve]
+
+Glynn, J. M.,McElligott, D. L.,
+
+and Mosier, D. E.
+
+(1996)
+
+J. Immunol.
+
+157,2754-2758 [Abstract]
+
+Blumenthal, D. K.,Takio, K.,Edelman, A. M.,Charbonneau, H.,Titani, K.,Walsh, K. A.,
+
+and Krebs, E. G.
+
+(1985)
+
+Proc. Natl. Acad. Sci. U.S.A.
+
+82,3187-3191 [Abstract]
+
+Lukas, T. J.,Burgess, W. H.,Prendergast, F. G.,Lau, W.,
+
+and Watterson, D. M.
+
+(1986)
+
+Biochemistry
+
+25,1458-1464 [Medline]
+
+[OrderarticleviaInfotrieve]
+
+Meador, W. E.,Means, A. R.,
+
+and Quiocho, F. A.
+
+(1992)
+
+Science
+
+257,1251-1255 [Medline]
+
+[OrderarticleviaInfotrieve]
+
+Ishikawa, H.,Sasaki, M.,Noda, S.,
+
+and Koga, Y.
+
+(1998)
+
+J. Virol.
+
+72,6574-6580 [Abstract/ Free FullText]
+
+Casella, C. R.,Rapaport, E. L.,
+
+and Finkel, T. H.
+
+(1999)
+
+J. Virol.
+
+73,92-100 [Abstract/ Free FullText]
+
+Xu, X. N.,Screaton, G. R.,Gotch, F. M.,Dong, T.,Tan, R.,Almond, N.,Walker, B.,Stebbings, R.,Kent, K.,Nagata, S.,Stott, J. E.,
+
+and McMichael, A. J.
+
+(1997)
+
+J. Exp. Med.
+
+186,7-16 [Abstract/ Free FullText]
+
+Bartz, S. R.,
+
+and Emerman, M.
+
+(1999)
+
+J. Virol.
+
+73,1956-1963 [Abstract/ Free FullText]
+
+Ankarcrona, M.,Dypbukt, J. M.,Orrenius, S.,
+
+and Nicotera, P.
+
+(1996)
+
+FEBS Lett.
+
+394,321-324 [CrossRef] [Medline]
+
+[OrderarticleviaInfotrieve]
+
+Asada, A.,Zhao, Y.,Kondo, S.,
+
+and Iwata, M.
+
+(1998)
+
+J. Biol. Chem.
+
+273,28392-28398 [Abstract/ Free FullText]
+
+Wright, S. C.,Schellenberger, U.,Ji, L.,Wang, H.,
+
+and Larrick, J. W.
+
+(1997)
+
+FASEB J.
+
+11,843-849 [Abstract/ Free FullText]
+
+Cohen, O.,Feinstein, E.,
+
+and Kimchi, A.
+
+(1997)
+
+EMBO J.
+
+16,998-1008 [Abstract/ Free FullText]
+
+Cohen, O.,Inbal, B.,Kissil, J. L.,Raveh, T.,Berissi, H.,Spivak-Kroizaman, T.,Feinstein, E.,
+
+and Kimchi, A.
+
+(1999)
+
+J. Cell Biol.
+
+146,141-148 [Abstract/ Free FullText]
+
+Kawai, T.,Nomura, F.,Hoshino, K.,Copeland, N. G.,Gilbert, D. J.,Jenkins, N. A.,
+
+and Akira, S.
+
+(1999)
+
+Oncogene
+
+18,3471-3480 [CrossRef] [Medline]
+
+[OrderarticleviaInfotrieve]
+
+Sasaki, M.,Uchiyama, J.,Ishikawa, H.,Matsushita, S.,Kimura, G.,Nomoto, K.,
+
+and Koga, Y.
+
+(1996)
+
+Virology
+
+224,18-24 [CrossRef] [Medline]
+
+[OrderarticleviaInfotrieve]
+
+Babu, Y. S.,Bugg, C. E.,
+
+and Cook, W. J.
+
+(1988)
+
+J. Mol. Biol.
+
+204,191-204 [Medline]
+
+[OrderarticleviaInfotrieve]
+
+Carson, M.
+
+(1987)
+
+J. Mol. Graphics
+
+5,103-106 [CrossRef]
+
+
+
+
+
+Copyright © 2000 by The American Society for Biochemistry and Molecular Biology, Inc.
+
+
+
+
+
+
+

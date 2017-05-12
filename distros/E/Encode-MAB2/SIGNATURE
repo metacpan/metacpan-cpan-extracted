@@ -1,0 +1,65 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 7874453b766c67f831906b41b6b4de0aefd7b94d Changes
+SHA1 e026a8e2260232ff1a110ee02e864b47eb3d5fc6 LICENCE
+SHA1 de066339f09e46f531a125ab8058de4098c6aa20 MANIFEST
+SHA1 582f6e16d88c903b66774264c6476c0e1a3a12f4 MANIFEST.SKIP
+SHA1 0b5c1d76197e16f2eafff07c437c6c89812baaeb META.json
+SHA1 009e31efcbd4716b392c4bf6fde68e0499a79b14 META.yml
+SHA1 a48901f998d4e09f6a38564e80224fe96bd3dbce Makefile.PL
+SHA1 b33636af32922522394b210735242e900768fd2d README
+SHA1 2bff645108414a8694f45deec717b3fe2bad8a05 lib/Encode/MAB2.pm
+SHA1 56818c3819faffd1109769f9f93821fe8073fc58 lib/Encode/MAB2table.pm
+SHA1 3bfdfe4a3e6342aefa31fee71ec8789cb14e5775 lib/Encode/MAB2table.ucm
+SHA1 3e8e00da1e4d8a69a8db7258992e87a007d9c9f3 lib/MAB2/Record/Base.pm
+SHA1 a806834bc2bb0bcc5eacc37e256065d5cde6bb62 lib/MAB2/Record/adressmab.txt
+SHA1 62774cbc8b57164a7bbccb7b9bf0054bad48999e lib/MAB2/Record/gkd.pm
+SHA1 552b4ae3ec30ddcf2e4d0ce96304cf885a1c3b11 lib/MAB2/Record/gkdmab.txt
+SHA1 17c406df75e8c8af5d13d25501ea88adb8ff1bc3 lib/MAB2/Record/lokal.pm
+SHA1 b95d0725cccad8303b5dc42f995599a98e6b455c lib/MAB2/Record/lokalmab.txt
+SHA1 7f925b4b21932a9008ebd8ac874acda3eb5fd68a lib/MAB2/Record/notatmab.txt
+SHA1 46a89ab0dd0d4f845e315e5fb724de798e114dee lib/MAB2/Record/pnd.pm
+SHA1 1f1d98ffcda06ec54c23a21063df8528496b7f05 lib/MAB2/Record/pndmab.txt
+SHA1 4960dbff483c8826d2c789006191db219f64f2e8 lib/MAB2/Record/segm000.txt
+SHA1 80bf0f17b972ed596ac46a46ca9688341e7f4d5e lib/MAB2/Record/swd.pm
+SHA1 fee7585958300cdde8fe58c40735019ae55c3e92 lib/MAB2/Record/swdmab.txt
+SHA1 6ce4d92ec8b9f2a0fa2ae19b95108584b5220197 lib/MAB2/Record/titel.pm
+SHA1 ac7af0923c93eff0e82156f3728f2bb4147eb1b9 lib/MAB2/Record/titelmab.txt
+SHA1 ecb4c4b15a649a327f0f935664237d82c2e0d5f2 lib/MAB2/Record/uptodate.pl
+SHA1 0b8777db4651520a65a7c0266a34dbed1eb0bb3c lib/Tie/MAB2/Dualdb.pm
+SHA1 3af893d4c378b8becdf7d098a7dad0587cbbcb9e lib/Tie/MAB2/Dualdb/Id.pm
+SHA1 5ae7b9069282ffeac631e94605ec80786111eb52 lib/Tie/MAB2/Dualdb/Recno.pm
+SHA1 81c1963878fb776e2b3f2193aea2fe2d4e469689 lib/Tie/MAB2/Id.pm
+SHA1 1dddf7183496da0a90f80206feffb584048d184f lib/Tie/MAB2/Recno.pm
+SHA1 6e8a5dcd4f3e2ad59a37cd7a7ecc42f69c1c98df lib/Tie/MAB2/RecnoViaId.pm
+SHA1 b65c1fb7097e7070dab85d0db5effe65e9f4b67a t/00module_versions_report.t
+SHA1 e7dad883eaa2f8b63625300b39e8c49ce89db583 t/00signature.t
+SHA1 dbbacc9525dd40126983a1f782879281dd0119e2 t/MAB2.t
+SHA1 37353df8c61f43069207cab8ce8ae89c18b80f34 t/MAB2table.t
+SHA1 22fa7b0191703bc9981db16b4cfe9e0a5b2942a0 t/dualdb.t
+SHA1 569b3e93400ac35ef199914bf684995aa6017205 t/hegedus.mab
+SHA1 002914da075118a528e3eb5a77dbcc7abd0fa4a2 t/hegedus.t
+SHA1 e6bd0ffd53176181493be9343eebf56f0f0d80d2 t/kafka.mab
+SHA1 c69140cb72e243ef5f823ff6cbdffccadb7fb8c1 t/rvi.t
+SHA1 0702f5449f7bed5b20f0233adee71bb926d7a1b2 t/segmentname.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlbCkmIACgkQ7IA58KMXwV2j6wCgqmyRDH59Y11WvSY5bAhQl6y5
+oHsAn1SfjfhzFxJe5L5qdpasdaSzKgGF
+=iyLr
+-----END PGP SIGNATURE-----

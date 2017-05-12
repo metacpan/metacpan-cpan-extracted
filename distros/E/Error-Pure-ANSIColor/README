@@ -1,0 +1,46 @@
+NAME
+    Error::Pure::ANSIColor - Error::Pure modules with Term::ANSIColor
+    support.
+
+DESCRIPTION
+    List of modules:
+
+    "Error::Pure::ANSIColor::AllError"
+            Print full backtrace with Term::ANSIColor support.
+
+    "Error::Pure::ANSIColor::Die"
+            Die with Term::ANSIColor support.
+
+    "Error::Pure::ANSIColor::Error"
+            Print error on one line with Term::ANSIColor support.
+
+    "Error::Pure::ANSIColor::ErrorList"
+            Print list of errors with ANSIColor support. Each error on one
+            line.
+
+    "Error::Pure::ANSIColor::Print"
+            Print error as simple string with ANSIColor support
+
+    "Error::Pure::ANSIColor::PrintVar"
+            Print error with all variables as simple string with ANSIColor
+            support
+
+SEE ALSO
+    Task::Error::Pure
+        Install the Error::Pure modules.
+
+REPOSITORY
+    <https://github.com/tupinek/Error-Pure-ANSIColor>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © 2013-2017 Michal Špaček
+     BSD 2-Clause License
+
+VERSION
+    0.01
+

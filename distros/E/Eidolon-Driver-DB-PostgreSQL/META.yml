@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Eidolon-Driver-DB-PostgreSQL
+version:             0.01
+abstract:            PostgreSQL database driver.
+license:             ~
+author:              
+    - Anton Belousov <abel@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    DBD::Pg:                       0
+    DBI:                           0
+    Eidolon:                       0.02
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

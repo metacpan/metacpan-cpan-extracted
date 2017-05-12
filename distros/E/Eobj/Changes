@@ -1,0 +1,19 @@
+Revision history for Perl extension Eobj.
+
+0.20  Mon Apr 21 13:54:00 2003
+	- First version extracted from Perlilog
+
+0.21  Mon May 5 14:10:00 2003
+	- Added autonaming in root's new() method.
+	- Added inheritdir()
+	- Added destructors and the mechanism around it
+	- Improved doc based on Guy Keren's suggestions
+
+0.22  Tue Aug 12 15:47:17  2003
+        - Fixed bug in const, get, set and alike so they
+          don't think that every reference is a property
+          path (only arrays)
+
+0.23  Tue Oct 21 18:44:53 2003
+        - Fixed a bug in Eobj::linebreak, so if the input
+          ends with a newline, so does the output

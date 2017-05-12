@@ -1,0 +1,111 @@
+1.200001  2015-06-14
+
+  * Fix typo in POD (T. Hubbard)
+  * Fix error when no results are retrieved (due to failed connection)
+
+1.200000  2015-06-14
+
+  * Nothing to report.
+
+1.143070  2014-11-03 21:06:51 Europe/London
+
+  * [#5] ExpandDL support for expanding distribution lists (FunkyShu)
+
+1.141040  2014-04-14 21:05:15 Europe/London
+
+  * Retrieve other user calendar items (retupmoca)
+
+1.131710_001 2013-06-20 23:07:20 Europe/London
+
+  * Retrieval of mailbox folder entries and their sizes (G. Shaw)
+  * Calendar invitees will show name and routing in addition to email address (G. Shaw)
+
+1.130570  2013-02-26 20:15:48 Europe/London
+
+  * Next stable release.
+
+1.130540_002 2013-02-23 16:47:07 Europe/London
+
+  * Docs for new properties.
+
+1.130540_001 2013-02-23 16:05:31 Europe/London
+
+  * Add JobTitle, CompanyName, BusinessHomePage, EmailAddresses, and PhysicalAddresses
+    (Ron Tomassini)
+
+1.113000  2011-10-27 19:47:48 Europe/London
+
+  * No longer attempt naive interpretation of Phone Numbers (M. Redinger)
+
+1.111982  2011-07-17 16:48:37 Europe/London
+
+  * Need to re-release to fix botched deps
+
+1.111981  2011-07-17 13:18:50 Europe/London
+
+  * Add dependencies for HTTPS and NTLM support, always
+  * Added example script
+
+1.111970  2011-07-16 17:19:24 Europe/London
+
+  * Use different Dist::Zilla author bundle
+
+1.111940  2011-07-13 19:59:27 Europe/London
+
+  * Fixes for NTLM Authentication (code and docs)
+
+1.110911  2011-04-01 15:04:00 Europe/London
+
+  * Apply the patch correctly this time.
+
+1.110910  2011-04-01 14:27:58 Europe/London
+
+  * Fixed a couple of doc typos (jaybuff via github)
+
+1.103620  2010-12-28 00:15:12 Europe/London
+
+  * Fix misspelt CalendarType (rt.cpan #56188)
+  * Add note about possible Exchange 2010 issues (rt.cpan #55890)
+  * Add server_version attribute (rt.cpan #61914)
+  * Add support for NTLM Authentication (rt.cpan #56189 - Greg Shaw)
+  * Add support for Impersonation (rt.cpan #56189 - Greg Shaw)
+
+1.103610  2010-12-27 18:29:05 Europe/London
+
+  * Port to Dist::Zilla
+
+libews-client-perl (0.06) UNRELEASED; urgency=low
+
+  * Add check for no items returned from server - thanks Mike M. 
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Mon, 22 Mar 2010 21:25:58 +0000
+
+libews-client-perl (0.05) UNRELEASED; urgency=low
+
+  * Added POD note about HTTP BasicAuth - thanks to Darren W. 
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Tue, 16 Mar 2010 19:48:47 +0000
+
+libews-client-perl (0.04) UNRELEASED; urgency=low
+
+  * Add Contacts retrieval.
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Sun, 14 Mar 2010 22:59:03 +0000
+
+libews-client-perl (0.03) UNRELEASED; urgency=low
+
+  * Result set is an iterator, add MooseX::Iterator.
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Tue, 23 Feb 2010 10:48:57 +0000
+
+libews-client-perl (0.02) UNRELEASED; urgency=low
+
+  * Add File::ShareDir dependency.
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Mon, 22 Feb 2010 21:43:19 +0000
+
+libews-client-perl (0.01) UNRELEASED; urgency=low
+
+  * Initial release on an unsuspecting world.
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Mon, 22 Feb 2010 19:01:46 +0000

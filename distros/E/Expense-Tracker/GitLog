@@ -1,0 +1,891 @@
+==================================================
+Changes from 2011-09-03 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.008 at 2012-09-02 16:54:34 +0000
+------------------------------------------
+
+  Change: 00f9b9767aacfae452846220a8d28840804e38a5
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-09-02 13:29:23 +0000
+
+    Update README.md
+
+    added reference to the wiki 
+
+------------------------------------------
+version 0.007 at 2012-09-01 21:01:14 +0000
+------------------------------------------
+
+  Change: 84a45b63e4473e7a00d6a1d3994a794254a01930
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-09-01 14:01:14 +0000
+
+    Merge pull request #12 from tudorconstantin/backend_tests
+
+    Backend tests - BDD users and login 
+
+  Change: 2860dd10dcdec12601453d058e632a3dcec6a140
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-09-01 23:59:05 +0000
+
+    deploy a new schema when testing 
+
+  Change: e546e9bc39c7982aa48ac9f46e8856d549091e62
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-09-01 23:58:16 +0000
+
+    override the create() method to insert the md5_hex() value for user
+    password 
+
+  Change: be027ebe6f3da7eb5e502fa893711920d4a1c5bc
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-09-01 22:15:24 +0000
+
+    added the test DB 
+
+  Change: b1f9fcdbcfab51d4172f237ba4b6613b2f7de2b5
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-09-01 22:14:20 +0000
+
+    made the app environment (production/development/test) aware 
+
+  Change: 090a1c395f9858312e29a1c934f556ef100da04e
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-09-01 11:53:33 +0000
+
+    Merge pull request #11 from tudorconstantin/master
+
+    add the _before_create and _before_update methods to Base controller 
+
+  Change: a8e198c000cf8ec8ed580926280fe54ca224ef4c
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-09-01 21:41:33 +0000
+
+    added tests for show() and delete() operations 
+
+  Change: cbf1b4b75cde6e1260540e52d6563488ab4d6fe4
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-09-01 20:50:46 +0000
+
+    fixed bug related to generic check for found resource in show()
+    method 
+
+  Change: 6480388b31bf4c250963f76bb87aec8e504d7dc3
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-09-01 20:47:27 +0000
+
+    return a single object when call "show" instead of an array 
+
+  Change: 6ed6a09a3478e0c15f93d7f096de26d50bca1aaa
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-09-01 19:38:32 +0000
+
+    added _before_create and _before_update to the base controller and
+    set created_at and updated_at in them if the model has those columns 
+
+  Change: b6c31f7ce02c2a245006163c80d0fa216b52c817
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-09-01 04:28:20 +0000
+
+    Merge pull request #9 from tudorconstantin/backend_tests
+
+    Backend tests - BDD currencies 
+
+  Change: fd56c0ad14632f006fc6ce0f6777a69e7f28c201
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-09-01 14:26:44 +0000
+
+    added BDD tests for create/retrieve of currencies 
+
+  Change: 32d05fdeb822cff2377e704a9dcfb468994e108e
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-09-01 14:14:35 +0000
+
+    override the create method to add value for created_at 
+
+  Change: f135766479f585d62235a899518e6da5ae21f154
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-09-01 14:13:51 +0000
+
+    added DateTime as a dependency 
+
+  Change: ad00a66fb25af8fdbcc96e672dcab64804fc01ee
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-09-01 13:16:52 +0000
+
+    added Lingua::EN::Inflect::Phrase as a dependency - used for tests to
+    singularize resource names 
+
+  Change: 919f964773f35fe528696f1c3ac8d6620bec0055
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-09-01 13:16:20 +0000
+
+    changed the url name for authenticate 
+
+  Change: cf212b13c9b7d9bb33f0f6882008ac08d2fe5fbd
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-09-01 11:23:15 +0000
+
+    pretty print for mojo.feature 
+
+  Change: 956a321365dcf5867b3b37a68ac35c35f07ec003
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-09-01 10:37:36 +0000
+
+    all tests are passing now 
+
+  Change: 7e2da67bc56ac3aaf4e7ac65e7c913b1edbe30ac
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-09-01 08:47:21 +0000
+
+    fixed the 'when i go to ...' scenarios 
+
+  Change: 3de9d2204214b30e93c286abdce5ce9fec134a5a
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-09-01 08:26:23 +0000
+
+    added Lingua::EN::Inflect to the dependencies 
+
+  Change: 7504f8cbeb2f32358d8325f81482f7e9688f2fb4
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-09-01 08:21:39 +0000
+
+    added a sanity check in basic.t 
+
+  Change: 8f6f9db546258427107632db3e9669e683d8b3d0
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-09-01 08:19:31 +0000
+
+    fixed the basic.t test 
+
+  Change: af8abcde2b06075c7f1027bb629c78e7a7001550
+  Author: Andrei Ursan <ursan.andrei@gmail.com>
+  Date : 2012-08-30 22:56:23 +0000
+
+    removed some commit logs 
+
+  Change: 1607141425b0b37204fa527498d8922c239f8048
+  Author: Andrei Ursan <ursan.andrei@gmail.com>
+  Date : 2012-08-30 22:53:24 +0000
+
+    added the POC data, and solved some flow issues 
+
+  Change: 254e8bc7f758942a529be57a7dbd9570fbcc0746
+  Author: Andrei Ursan <ursan.andrei@gmail.com>
+  Date : 2012-08-30 21:49:55 +0000
+
+    fixed the router error 
+
+  Change: cd8c4a5022b0381d7249c3a2d2ea74ca0e53d8c5
+  Author: Andrei Ursan <ursan.andrei@gmail.com>
+  Date : 2012-08-30 21:44:29 +0000
+
+    just some edits 
+
+  Change: 389b1a4781df452db019fb25ee170ec93e561be1
+  Author: Andrei Ursan <ursan.andrei@gmail.com>
+  Date : 2012-08-30 21:43:38 +0000
+
+    fixed some bugs 
+
+  Change: 36f4e467a90b6e401bb8fb9f1620b67a51b11416
+  Author: Andrei Ursan <ursan.andrei@gmail.com>
+  Date : 2012-08-30 18:18:06 +0000
+
+    solved collection bug - returned wrong scope object 
+
+  Change: 9a8ac848e98937cc37e71916806b41a63535885f
+  Author: Andrei Ursan <ursan.andrei@gmail.com>
+  Date : 2012-08-30 18:14:59 +0000
+
+    added require.js 2.0.6 
+
+  Change: 172d35a1ac92cbc0e5162805c68bcd14452d4f35
+  Author: Andrei Ursan <ursan.andrei@gmail.com>
+  Date : 2012-08-30 07:56:15 +0000
+
+    removed unused plugin 
+
+  Change: ca64ce2248ce7435f9b4a625a688006e2a6f067f
+  Author: Andrei Ursan <ursan.andrei@gmail.com>
+  Date : 2012-08-29 22:55:54 +0000
+
+    Merge branch 'master' of github.com:tudorconstantin/expense-tracker 
+
+  Change: ceec8c36c06130d29ddc918c7eb2a510fdab1ef1
+  Author: Andrei Ursan <ursan.andrei@gmail.com>
+  Date : 2012-08-29 22:20:09 +0000
+
+    fixed the dependency issue 
+
+  Change: 902efdfb013399cf61696da2834ba6ede774d095
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-08-29 11:33:15 +0000
+
+    Merge pull request #6 from tudorconstantin/tudor
+
+    proper pluralization in names for routes 
+
+  Change: fffc33adf37562dd9dc0491e698e3b219e0a2c63
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-08-29 21:04:12 +0000
+
+    proper pluralization in names for routes 
+
+  Change: 6770efa6c792dbb9b0be2a5eb65ff99260c3d19b
+  Author: Andrei Ursan <ursan.andrei@gmail.com>
+  Date : 2012-08-28 21:55:58 +0000
+
+    added expense entity on backbone -- needs more work 
+
+  Change: 13ceab281732777a31ca422287c3595fb58d9a34
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-08-13 13:15:32 +0000
+
+    Merge pull request #5 from tudorconstantin/tudor
+
+    Tudor - added some categories into DB modified the Category resource
+    to return data according to [Backbone
+    Treeview](https://github.com/minism/backbone-treeview) interface 
+
+  Change: c3a0d34a15f9992e1ffd7f2a277a4d7e7c6d41d8
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-08-13 23:08:00 +0000
+
+    added the show and update method for category 
+
+  Change: 673b62df8ae8b561daed8b8900cab82ee20c05c8
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-08-13 21:19:55 +0000
+
+    made the Category model to work with DBIx::Class::Tree::AdjacencyList 
+
+------------------------------------------
+version 0.006 at 2012-08-05 15:40:34 +0000
+------------------------------------------
+
+  Change: 5ff711593104ba569a61ef03af6ae3d962f41dec
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-08-05 08:40:34 +0000
+
+    Merge pull request #4 from tudorconstantin/tudor
+
+    Tudor overridable payload data sample of default action overriding 
+
+  Change: ad4282662a5e9a6be754df4154c12d6bc48fd6c3
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-08-05 18:23:20 +0000
+
+    sample of default behavior override 
+
+  Change: ac14b1b5ef9baf2fe4b156d53ca37087ba3c3bb9
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-08-05 17:54:00 +0000
+
+    generic overridable acces to request body 
+
+  Change: 7da293364cc2ebbd81b98c953a37f91c29eea147
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-08-04 11:09:12 +0000
+
+    added doc skeleton 
+
+  Change: 88644232bbd62d3415105f7aa8b5b94a53ebae9c
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-08-04 10:35:11 +0000
+
+    bugfix - login/logout functionality 
+
+  Change: 315ae9f538a524e48b459111852626cf115c38fc
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-08-04 10:04:13 +0000
+
+    changed the url from the ribbon to point correctly to the present
+    repository 
+
+  Change: 8d477985cf77ab47fae3c74104d6606061981045
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-08-04 10:02:39 +0000
+
+    bugfix - correctly access the exposed resource names from config 
+
+  Change: f80254694b2840626b4c914b4c1104710018b516
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-08-04 10:01:39 +0000
+
+    moved require.js to layouts/default.html.ep - this is the generic
+    layout, used by all the views 
+
+  Change: 93aa549665c82ad5e413a61f4ca1ce8c2385781d
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-08-04 09:50:20 +0000
+
+    moved exposed resource names into config 
+
+------------------------------------------
+version 0.005 at 2012-07-31 20:19:10 +0000
+------------------------------------------
+
+  Change: 232f8e23b3afd69503819ace5e1d03058e5f84d6
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-07-31 13:19:10 +0000
+
+    Merge pull request #3 from tudorconstantin/tudor
+
+    Tudor - working generic base controller for RESTful actions 
+
+  Change: e6c73b30db40e9cec16a5f52612073f7f23e7dd2
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-07-31 23:15:42 +0000
+
+    some db modifications during development 
+
+  Change: 50e14fba2fb580bdc84f7ead864407bcd6a1b3fe
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-07-31 23:15:15 +0000
+
+    implemented the update method 
+
+  Change: 21688e7840455966c248cfa88015693ce6ea25b4
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-07-31 22:49:01 +0000
+
+    implemented the logic for DELETE requests 
+
+  Change: fcba17d40cbcf1171a49c468acb0ddb234d05f5b
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-07-31 22:48:24 +0000
+
+    put into configuration file the base_url for api - /api in our case 
+
+  Change: 0843e9e7e3bc0f5ed24edb7c428ab6b3c11049cc
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-07-31 21:47:04 +0000
+
+    implemented generic list method 
+
+------------------------------------------
+version 0.004 at 2012-07-30 22:13:15 +0000
+------------------------------------------
+
+  Change: 231ae8fff782443c15a0dde9beb5e94d0db179d1
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-07-30 15:13:15 +0000
+
+    Merge pull request #2 from tudorconstantin/tudor
+
+    Tudor - Login functionality 
+
+  Change: 97128c1091c1d371d667a3522208d05d040ef3e2
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-07-31 00:59:28 +0000
+
+    the User controller 
+
+  Change: 6b35ee1b2661cf41450ef608dc1fecff0d0717cd
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-07-31 00:58:55 +0000
+
+    added user tudor/123 in sqlite, got the login functionality and the
+    User resource 
+
+  Change: 75823239df1ea102894df02b2168d17d6b01aba9
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-07-31 00:15:19 +0000
+
+    login functionality: Controller, template 
+
+  Change: 56c565155dfc8a0b463508fd3062110f5aadaa34
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-07-30 20:37:48 +0000
+
+    added support for authenticated users 
+
+------------------------------------------
+version 0.003 at 2012-07-29 14:00:27 +0000
+------------------------------------------
+
+  Change: a4831048547048403d47c79abbecbade7dd44ecb
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-07-29 17:00:27 +0000
+
+    unhack - let Dist::Zilla to automatically bump versions 
+
+------------------------------------------
+version 0.002 at 2012-07-29 13:59:21 +0000
+------------------------------------------
+
+  Change: a539882a61592e8d1b77465c091de6731cc64940
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-07-29 16:59:21 +0000
+
+    hack to update version to 0.002 
+
+  Change: cb9fe645334dec157d955f4bb154b6fe45d882f3
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-07-29 16:52:10 +0000
+
+    Dist::Zilla::Plugin::ChangelogFromGit log into GitLog 
+
+  Change: d6eafef291e17dc5ba495b72f8477b5429631cc8
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-07-29 16:51:11 +0000
+
+    configured dist.ini to use Dist::Zilla::Plugin::ChangelogFromGit 
+
+  Change: 4d2d094ef852be24b70860e298e4ca46cf97afee
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-07-29 16:42:19 +0000
+
+    emptied Changes and changelog file 
+
+  Change: 92368f379158a12dfd5ac00219282c9fbc62ea5e
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-07-29 16:36:25 +0000
+
+    removed first_version from dist.ini 
+
+  Change: e1986b53b377f1519069a2b452c86b7046321fe9
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-07-29 16:34:19 +0000
+
+    added Dist::Zilla::Plugin::ChangelogFromGit plugin for Dist::Zilla 
+
+  Change: cc8a30b6bd413c88fe270cae6488fea92bc0f4a9
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-07-29 16:21:36 +0000
+
+    modified version to 0.001 
+
+  Change: e21d10205318d524f776158a42047df8d1abb27c
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-07-29 16:16:14 +0000
+
+    modified version to 0.001 
+
+  Change: caecad777c65b891120ef7275db0a4850a076e6a
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-07-29 16:15:07 +0000
+
+    v0.3 
+
+  Change: 980831d6c7cf84bfcd6cc69480fe4d0f75e7f292
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-07-29 16:05:24 +0000
+
+    added Dist::Zilla::Plugin::Git::NextVersion 
+
+  Change: f8992dcfe00c4020bf7e2ceea8a2652cf18f1e5f
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-07-29 16:01:53 +0000
+
+    removed version no from dist.ini 
+
+  Change: 6f1517dab223e043bd06cc55d64a430b807960e1
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-07-29 16:00:09 +0000
+
+    added some boilerplate documentation 
+
+  Change: efba1cf2b79cec69d2b01043a048128af4cd9813
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-07-29 15:55:48 +0000
+
+    added [NextRelease] plugin to Dist::Zilla 
+
+  Change: 7f7911baec366eeb98f7c986323feb1b351f4c9d
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-07-29 15:48:12 +0000
+
+    updated README.md 
+
+  Change: f583d805ce4869493eb2dff5f31fd7ecc34243c0
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-07-29 11:54:32 +0000
+
+    exclude .build/ from git tracking 
+
+  Change: ff38bf18c4beabc28cbc722de243d0f1b5b8bdf1
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-07-29 11:48:36 +0000
+
+    deleted Makefile.PL - it will be generated by Dist::Zilla 
+
+  Change: 54252925e153d16d12cc87811a1da9a0061f2d27
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-07-29 11:46:16 +0000
+
+    added abstract to lib/ExpenseTracker.pm 
+
+  Change: 3051ab1cfcd793389e23cc3c0f7a9c3c9fb0fe7a
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-07-29 11:44:30 +0000
+
+    added support for Dist::Zilla 
+
+  Change: 87d596715407f9f3445c75da8ee4ee334ffb073a
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-07-25 22:44:50 +0000
+
+    Merge pull request #1 from tudorconstantin/backbone-js
+
+    From andrei ursan: Added Require.js, Backbone.js and a little bit of
+    change to index.html. This is going to be the basis for the backbone
+    app. 
+
+  Change: 35aa54d69bb8a57796853c4b1ed6669e18ec2d1a
+  Author: Andrei Ursan <ursan.andrei@gmail.com>
+  Date : 2012-07-25 23:38:54 +0000
+
+    updated bootstrap css and removed alert from index.html 
+
+  Change: 44f1eb626a0ecd878987e5c4bc842b23243b822c
+  Author: Andrei Ursan <ursan.andrei@gmail.com>
+  Date : 2012-07-25 23:20:00 +0000
+
+    added twitter bootstrap layout to index.html 
+
+  Change: b26ab3927287e20d5d3597a1de6ce03021ad4c91
+  Author: Andrei Ursan <ursan.andrei@gmail.com>
+  Date : 2012-07-25 23:04:55 +0000
+
+    added basic require.js + backbone.js structure: 
+
+  Change: 86c8330faf61bbc65cc5cb73701b12a907c24866
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-07-18 19:43:36 +0000
+
+    implemented the generic create method 
+
+  Change: 2bd0e72d1149b033b8ad9d42151630fb6d42afa9
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-07-09 00:39:58 +0000
+
+    generic method for getting a resource 
+
+  Change: 274137bfe1e2b49a199b4f6a2be69019aa323535
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-07-09 00:28:23 +0000
+
+    basic infrastructure created for API endpoints 
+
+  Change: e6eb43b478630acea753e8d72dc93c6c2a933181
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-07-08 21:49:07 +0000
+
+    added generic routes to resources 
+
+  Change: d027d4e4b0ceb541b8cbfc0377f71484817cdc5f
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-07-08 19:58:47 +0000
+
+    updated Makefile.PL took out all module version restrictions 
+
+  Change: c920bd75e789e5cf6e1e7919b7d87ae0e7da60b8
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-07-08 19:57:12 +0000
+
+    updated Makefile.PL took out some module version restrictions 
+
+  Change: 77b3b9a89f33f8e0010553f8d768773df347accd
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-07-08 19:40:50 +0000
+
+    updated Makefile.PL 
+
+  Change: b967c62fba8664687d1aca4b74007587dbf804ce
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-07-08 19:39:35 +0000
+
+    updated Makefile.PL with latest dependencies 
+
+  Change: 04f09348600b8cabb33279c04999ec11cffa6460
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-07-08 19:22:17 +0000
+
+    modified the app menu 
+
+  Change: 9bd530b96844a33b9881e47906e8de3269c88071
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-07-08 13:16:27 +0000
+
+    namespaced controllers under ExpenseTracker::Controllers 
+
+  Change: 3c6de3096a40d4a450f0b16d73b08277acc15667
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-07-08 13:15:27 +0000
+
+    added first route to the welcome page 
+
+  Change: 5e628c2387ad7495d3f3f92d9cf1560fec0d3df2
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-07-08 12:50:13 +0000
+
+    added relations between models 
+
+  Change: cf16c3726bb34be0b9beb375f3a069b02feaec46
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-07-08 11:28:27 +0000
+
+    generated dbic "models" based on the db structure 
+
+  Change: 1a5b4340b9394df08cece9bcb0d969aab761e55d
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-07-08 11:22:29 +0000
+
+    make the app db aware - first try 
+
+  Change: d972f506ecab7c32e60f20ed14d60d06f369fb47
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-07-08 11:11:15 +0000
+
+    added configuration for db connection 
+
+  Change: 4bbe04138e7ea098f5c3bf50b7d338b744a91a02
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-07-08 11:04:07 +0000
+
+    added sqlite db - production/dev 
+
+  Change: 3a35f5f3578c250df08417f4ea8012c4e5083d21
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-07-08 10:19:37 +0000
+
+    updated Makefile.PL 
+
+  Change: 53ce341b824392d2104ea5b909e4bd35ae9e0617
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-07-08 09:12:09 +0000
+
+    further clean up 
+
+  Change: 101c8ff6cc0b0d5488df303cf3eaaba45179e020
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-07-07 21:54:35 +0000
+
+    re-added renamed files 
+
+  Change: 77a8c3152aa248b4f9baab87c42673ed47273594
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-07-07 21:53:46 +0000
+
+    deleted boilerplate templates 
+
+  Change: 8da9cfd358b0a176ac7268a7ed79fa25c806c6c5
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-07-07 21:49:32 +0000
+
+    first phase to convert from Boilerplate to ExpenseTracker 
+
+  Change: baa6ea4c4e253ed09bd5a81556353d4559547b62
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-07-07 21:45:25 +0000
+
+    cleaned up config.yaml 
+
+  Change: 044eaa793715735de1d454aea97f715bfa909f64
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-06-30 11:15:43 +0000
+
+    removed cluj.pm images 
+
+  Change: 37ea79a24fd64c22a288b89613cb08efdb32f153
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-06-30 10:56:33 +0000
+
+    Merge branch 'master' of
+    github.com:tudorconstantin/Mojolicious-Boilerplate 
+
+  Change: 3bf04bf6bfe2e73629336bc7d51a5c0f5c5c1452
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-06-30 00:39:15 +0000
+
+    Initial commit 
+
+  Change: 798258e61a0a0d918df2b446e14e298a4e447c24
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-04-14 09:58:40 +0000
+
+    Added configurable google analytics to the starter layout 
+
+  Change: 9aba810c0ac21a3568795eefc5c08f8dc7a0453b
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-04-13 15:29:04 +0000
+
+    Added contributors section 
+
+  Change: a1d77038f4f6dd9c52e12542d3fcd3f0f6978a13
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-04-13 04:02:19 +0000
+
+    Merge pull request #3 from reezer/patch-1
+
+    always return a true value 
+
+  Change: 3327e38821dfe5be9880b6ea5e13e987767b711a
+  Author: Christian Sturm <kind@gmx.at>
+  Date : 2012-04-12 21:37:20 +0000
+
+    always return a true value 
+
+  Change: ebda8de5882f998b6c6ac74ad7b5ed7ec4dabad9
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-04-11 04:43:35 +0000
+
+    Merge pull request #1 from 2dorr/master
+
+    make the BDD tests pass 
+
+  Change: a40fec2b22ae4c9c53cdddbb265349f814e8f0f6
+  Author: root <root@tudor-desktop.(none)>
+  Date : 2012-04-11 11:36:58 +0000
+
+    behaviors.t test fix 
+
+  Change: fc8d7a385843d127dcd335c75275c96358692eee
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-04-07 14:36:49 +0000
+
+    Added instructions to install YAML::XS and Test::BDD::Cucumber 
+
+  Change: e355c88eeaf7a68981965ca7fb8223e307e475e7
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-03-26 22:14:35 +0000
+
+    Added some BDD tests - not all of them are working yet 
+
+  Change: fc3627122bb8478951de6f15b03309aaf68c892e
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-03-17 09:28:58 +0000
+
+    corrected the bug added by modifying the menu definition in
+    config.yaml 
+
+  Change: 3aeeb6377f293b0b4a48e5fa2483807488ce0e06
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-03-17 09:26:10 +0000
+
+    added the github ribbon to the starter layout 
+
+  Change: 89be64698ce7203238759191c28d591bc47f3312
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-03-17 09:09:17 +0000
+
+    took out use Data::Printer; 
+
+  Change: 958951c236cf815d98a9e3605886ea1cf03d67d5
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-03-17 09:03:56 +0000
+
+    Merge branch 'master' of
+    git://github.com/tudorconstantin/Mojolicious-Boilerplate 
+
+  Change: 3e88782c0e7391ac5edd473ada48b905e876da26
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-03-17 09:01:41 +0000
+
+    Added 2 photo gallery examples with pictures from the first Cluj.PM
+    event - slide and grid. Added Makefile.PL to be able to deploy on
+    dotCloud 
+
+  Change: 0da2f513f0854e92860e1fdf84abac1f49bb013f
+  Author: Tudor Constantin <tudorconstantin@gmail.com>
+  Date : 2012-03-14 21:41:29 +0000
+
+    Deleted a temp file and added "about" section in menu to admins 
+
+  Change: d0869570a0eb0a7d3fc35c2082c628fd8318286a
+  Author: Tudor Constantin <tudorconstantin@github.com>
+  Date : 2012-02-26 00:53:52 +0000
+
+    added image to doc (?) 
+
+  Change: 5dff38ae81e972120882775f2e6ee82fde365419
+  Author: Tudor Constantin <tudorconstantin@github.com>
+  Date : 2012-02-26 00:47:03 +0000
+
+    worked on documentation 
+
+  Change: 9b288bc6014aef8990f68cb9bc66ac71f0498d69
+  Author: Tudor Constantin <tudorconstantin@github.com>
+  Date : 2012-02-25 16:10:30 +0000
+
+    corrected a syntax error in _get_a_user 
+
+  Change: 4beea942b68e6da486ab9515b3d0390b2dffa594
+  Author: Tudor Constantin <tudorconstantin+github@gmail.com>
+  Date : 2012-02-19 11:36:28 +0000
+
+    removed development.log 
+
+  Change: 3e775d168a3a832ded4057282bc0b2d054a6424f
+  Author: Tudor Constantin <tudorconstantin+github@gmail.com>
+  Date : 2012-02-19 11:34:18 +0000
+
+    first commit for sources 
+
+  Change: 634d3cd069017e071bc89fca21f36cecd419ff94
+  Author: Tudor Constantin <tudorconstantin+github@gmail.com>
+  Date : 2012-02-19 11:31:44 +0000
+
+    reformatted README 
+
+  Change: b36bc7485495c518b7bab92b54f19061cf94137e
+  Author: Tudor Constantin <tudorconstantin+github@gmail.com>
+  Date : 2012-02-19 11:28:27 +0000
+
+    added About Bootstrap section 
+
+  Change: 9a522e8eb75baff3fc004b53fa9ab4b23a79a588
+  Author: Tudor Constantin <tudorconstantin+github@gmail.com>
+  Date : 2012-02-19 11:07:57 +0000
+
+    added About Mojolicious section 
+
+  Change: ee495d1d13ec8103ec34d0166349027b3ecdd87c
+  Author: Tudor Constantin <tudorconstantin+github@gmail.com>
+  Date : 2012-02-19 10:49:54 +0000
+
+    added Getting Started section 
+
+  Change: b7f1bcce38e0cac02799fe47822b64df7a69edda
+  Author: Tudor Constantin <tudorconstantin+github@gmail.com>
+  Date : 2012-02-19 10:02:24 +0000
+
+    removed README file 
+
+  Change: 4e1c6d7edf32491e1729d76b7ff70c96e3d4b8e3
+  Author: Tudor Constantin <tudorconstantin+github@gmail.com>
+  Date : 2012-02-19 10:01:00 +0000
+
+    added .md extension to README 
+
+  Change: 68b40b249886b3adcea03172cd3857ae9310808b
+  Author: Tudor Constantin <tudorconstantin+github@gmail.com>
+  Date : 2012-02-19 09:40:27 +0000
+
+    switched to github markup 
+
+  Change: d6ec45d4b8b16a77c4c2ba41314350112b81d381
+  Author: Tudor Constantin <tudorconstantin+github@gmail.com>
+  Date : 2012-02-19 09:35:40 +0000
+
+    added feature list to README 
+
+  Change: c7bcccbafc2ab0ca9b00c480df66217386f7c6c3
+  Author: Tudor Constantin <tudorconstantin+github@gmail.com>
+  Date : 2012-02-19 09:30:06 +0000
+
+    added README skeleton 
+
+  Change: f50ad670cbaf7c4439019936392ecd559db8dca8
+  Author: Tudor Constantin <tudorconstantin+github@gmail.com>
+  Date : 2012-02-19 08:11:04 +0000
+
+    first commit 
+
+================
+End of releases.
+================

@@ -1,0 +1,16 @@
+This is a list of bugs in the Everything2.com xml output:
+
+xmltrue displaytype for user nodetype:
+	The number of C!s used is reported incorrectly.
+	Bookmark titles are not escaped.
+
+bestusers XML ticker:
+	ebu_noadmins parameter is ignored in favor of whatever the user last
+	set the "don't show monkeys" checkbox to in "Everything's Best Users"
+
+coolnodes XML ticker:
+	Username should be escaped (try loading the ticker with 
+	cooledby=halcyon%26on).
+	Node title should be escaped (try loading the ticker with
+	cooledby=).stupidfawn.( -- this chokes on &hearts;).
+

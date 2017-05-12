@@ -1,0 +1,251 @@
+#######################################################
+# Component Description File for: tinylogin
+#
+# Copyright 2000, Lineo Inc.
+#
+# Notes on binaries in tinylogin
+#
+# /bin/addgroup 
+# /bin/adduser 
+# /bin/delgroup 
+# /bin/deluser 
+# /bin/login 
+# /bin/tinylogin 
+# /etc/issue 
+# /sbin/getty 
+# /sbin/sulogin 
+# /usr/bin/passwd 
+
+
+<GROUP System>
+<GROUP Utilities>
+<COMPONENT tinylogin>
+	SRPM=tinylogin
+	<SPECPATCH>tinylogin.specpatch</SPECPATCH>
+	<HELP>
+	TinyLogin is a suite of tiny utilities in a multi-call binary, which
+	enables your system to handle user authentication, and setting of
+	passwords. It is a drop-in to works nicely with BusyBox (another
+	multi-call binary), and makes an excellent addition to any small or
+	embedded system.
+
+	You should probably review the /etc/securetty file to ensure all ttys
+	are listed that you might want to use as root.
+	</HELP>
+	<REQUIRESEXPR>
+		(Default_passwd == "y") &&
+		(tinylogin == "CHILDREN_ENABLED")
+	</REQUIRESEXPR>
+	<BUILD_REQUIRES>
+	  glibc
+	</BUILD_REQUIRES>
+
+<OPTION keep-tinylogin>
+	TYPE=bool
+	VALUE=1
+	<HELP>
+	tinylogin is the multi-call binary
+	</HELP>
+	STATIC_SIZE=0
+	MIN_DYNAMIC_SIZE=0
+	STORAGE_SIZE=0
+	STARTUP_TIME=0
+	<REQUIRES>
+	libcrypt.so.1
+	libc.so.6
+	ld-linux.so.2
+	nsswitch.conf
+	libnss_compat.so.2
+	libnsl.so.1
+	</REQUIRES>
+	<BUILD_VARS>
+	TLG_TINYLOGIN=TLG_TINYLOGIN
+	</BUILD_VARS>
+	KEEPLIST=%attr (4755,root,root) /bin/tinylogin
+</OPTION>
+
+### features ###
+
+<OPTION tinylogin-enable-shadow-passwds>
+	TYPE=bool
+	DEFAULT_VALUE=1
+	PROMPT=Enable shadow passwords?
+	<HELP> Choose whether to include /etc/shadow support or not.
+	</HELP>
+	STATIC_SIZE=0
+	MIN_DYNAMIC_SIZE=0
+	STORAGE_SIZE=0
+	STARTUP_TIME=0
+	<REQUIRES>
+	keep-tinylogin
+	</REQUIRES>
+	<BUILD_VARS>
+	TLG_FEATURE_SHADOWPASSWDS=TLG_FEATURE_SHADOWPASSWDS
+	</BUILD_VARS>
+</OPTION>
+
+<OPTION tinylogin-enable-securetty>
+	TYPE=bool
+	DEFAULT_VALUE=1
+	PROMPT=Enable checking of /etc/securetty?
+	<HELP> 
+	/etc/securetty lists the ttys root is allowed to log in or su from.
+	This option allows you to enable/disable this feature of tinylogin.
+	</HELP>
+	STATIC_SIZE=0
+	MIN_DYNAMIC_SIZE=0
+	STORAGE_SIZE=0
+	STARTUP_TIME=0
+	<REQUIRES>
+	keep-tinylogin
+	</REQUIRES>
+	<BUILD_VARS>
+	TLG_FEATURE_SECURETTY=TLG_FEATURE_SECURETTY
+	</BUILD_VARS>
+</OPTION>
+
+### functions ###
+
+<OPTION keep-tinylogin-admin>
+	TYPE=bool
+	DEFAULT_VALUE=1
+	PROMPT=Include user administration utilities?
+	<HELP>
+	These utilities are used for user administration.  On a typical
+	desktop distribution, these commands (with the exception of
+	passwd) would be implemented as perl or shell scripts.  These
+	have been written in C, because they could be implemented in a
+	more size efficient manner, and because in an embedded environment,
+	certain Unix commands that one takes for granted may not be
+	available.
+
+	passwd - change a user's password
+	adduser - add a user to the system
+	addgroup - add a group to the system
+	deluser - delete a user from the system
+	delgroup - delete a group from the system
+	</HELP>
+	STATIC_SIZE=8634
+	MIN_DYNAMIC_SIZE=0
+	STORAGE_SIZE=8634
+	STARTUP_TIME=0
+	<REQUIRES>
+	keep-tinylogin
+	</REQUIRES>
+	PROVIDES=passwd
+	<BUILD_VARS>
+	TLG_PASSWD=TLG_PASSWD
+	TLG_ADDGROUP=TLG_ADDGROUP
+	TLG_DELGROUP=TLG_DELGROUP
+	TLG_ADDUSER=TLG_ADDUSER
+	TLG_DELUSER=TLG_DELUSER
+	</BUILD_VARS>
+	<KEEPLIST>
+	/usr/bin/passwd
+	/bin/addgroup
+	/bin/adduser
+	/bin/delgroup
+	/bin/deluser
+	</KEEPLIST>
+</OPTION>
+
+<OPTION keep-tinylogin-login>
+	TYPE=bool
+	DEFAULT_VALUE=1
+	PROMPT=Include /bin/login?
+	<HELP> 
+	This begins a session on the system.
+	</HELP>
+	STATIC_SIZE=4589
+	MIN_DYNAMIC_SIZE=0
+	STORAGE_SIZE=4588
+	STARTUP_TIME=0
+	<REQUIRES>
+	keep-tinylogin
+	</REQUIRES>
+	<PROVIDES>
+	tinylogin_login
+	login
+	</PROVIDES>
+	<BUILD_VARS>
+	TLG_LOGIN=TLG_LOGIN
+	</BUILD_VARS>
+	KEEPLIST=/bin/login
+</OPTION>
+
+<OPTION keep-tinylogin-getty>
+	TYPE=bool
+	DEFAULT_VALUE=1
+	PROMPT=Include /sbin/getty?
+	<HELP>     
+	Getty opens a tty port, prompts for a login name and
+	invokes the /bin/login command.  getty is normally invoked by init(8).
+	This getty implementation is a slightly modified version of agetty, and
+	is full-featured.
+	</HELP>
+	STATIC_SIZE=14582
+	MIN_DYNAMIC_SIZE=0
+	STORAGE_SIZE=6390
+	STARTUP_TIME=0
+	<REQUIRES>
+	login
+	</REQUIRES>
+	<BUILD_VARS>
+	TLG_GETTY=TLG_GETTY
+	</BUILD_VARS>
+	KEEPLIST=/sbin/getty
+	PROVIDES=getty
+	CONFLICTS=getty
+</OPTION>
+
+#<OPTION keep-tinylogin-sulogin>
+#	TYPE=bool
+#	DEFAULT_VALUE=0
+#	PROMPT=Include /sbin/sulogin?
+#	<HELP> 
+#	This is a single-user login.  It prompts one to enter the root password
+#	for system maintenance or hit ctrl-d to procede with the normal startup
+#	sequence.
+#	</HELP>
+#	STATIC_SIZE=9821
+#	MIN_DYNAMIC_SIZE=0
+#	STORAGE_SIZE=1629
+#	STARTUP_TIME=0
+#	<REQUIRES>
+#	keep-tinylogin
+#	</REQUIRES>
+#	<BUILD_VARS>
+#	TLG_SULOGIN=TLG_SULOGIN
+#	</BUILD_VARS>
+#	KEEPLIST=/sbin/sulogin
+#</OPTION>
+
+<OPTION keep-tinylogin-su>
+	TYPE=bool
+	DEFAULT_VALUE=1
+	PROMPT=Include /bin/su?
+	<HELP> 
+	This allows one to change user id or become root.  It does not yet
+	support the differntiation between login and non-login shells when
+	using the lone "-" option.
+	</HELP>
+	STATIC_SIZE=9821
+	MIN_DYNAMIC_SIZE=0
+	STORAGE_SIZE=1629
+	STARTUP_TIME=0
+	<REQUIRES>
+	keep-tinylogin
+	tinylogin_login
+	</REQUIRES>
+	<PROVIDES>
+	  su
+	</PROVIDES>
+	<BUILD_VARS>
+	TLG_SU=TLG_SU
+	</BUILD_VARS>
+	KEEPLIST=/bin/su
+</OPTION>
+
+</COMPONENT>
+</GROUP>
+</GROUP>

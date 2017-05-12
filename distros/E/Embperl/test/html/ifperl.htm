@@ -1,0 +1,117 @@
+
+<html>
+<head>
+<title>IF Metacommand in Embperl</title>
+</head>
+
+<body>
+
+[- $a = 1; $b = 0; $c = 5; $d = 'txt' -]
+
+a1
+[* if ($a) { *]
+    a <br>
+[* } *]
+
+a2
+[* if ( $a) { *]
+    a <br>
+[* } else { *]
+    not a<br>
+[* } *]
+
+a3
+[* if ( $a<br>) { *]
+    a <br>
+[* } else { <br>*]
+    not a<br>
+[* } <br>*]
+
+a4
+[*<br>if ($a) { *]
+    a <br>
+[* <br> } else { <br>*]
+    not a<br>
+[* <br>} *]
+
+a5
+[* if ($a) {*]
+    a <br>
+    [* if ( $b == 0) {*]
+        b is null <br>
+    [* } else { *]    
+        b is not null <br>
+    [* } *]
+[* } else{*]
+    not a<br>
+[* } *]
+
+
+[* if ($a) {*]
+    a <br>
+    [* if ( $b == 0) {*]
+        b is null <br>
+    [* } else { *]    
+        b is not null <br>
+    [* } *]
+[* } else {*]
+    not a<br>
+    [* if ( $b == 0) {*]
+        b is null <br>
+    [* } else { *]    
+        b is not null <br>
+    [* } *]
+[* } *]
+
+
+[* if (!$a) {*]
+    not a <br>
+    [* if ( $b == 0) {*]
+        b is null <br>
+    [* } else { *]    
+        b is not null <br>
+    [* } *]
+[* } else {*]
+    a<br>
+    [* if ( $b == 0) {*]
+        b is null <br>
+    [* } else { *]    
+        b is not null <br>
+    [* } *]
+[* } *]
+
+
+[* if ($a) {*]
+    a <br>
+    [* if ( $b == 0) {*]
+        b is null <br>
+    [* } elsif ($c == 5) { *]
+        b is not null and c is 5 <br>
+    [* } elsif ($d eq 'txt') {*]
+        b is not null and c is not 5, but d is 'txt' <br>
+    [* } else { *]    
+        b is not null and c is not 5 and d is not 'txt' <br>
+    [* } *]
+[* } else {*]
+    not a<br>
+[* } *]
+
+
+[- $ttrue = 'true'; $tfalse = '' -]
+
+[* if ( $ttrue) { *]
+ttrue = true
+[* } else { *]
+ttrue = false
+[* } *]
+
+[* if ( $tfalse) { *]
+tfalse = true
+[* } else { *]
+tfalse = false
+[* } *]
+
+
+</body>
+</html>
+

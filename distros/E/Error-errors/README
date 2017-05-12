@@ -1,0 +1,315 @@
+NAME
+    errors - Error Handling for Perl
+
+STATUS
+    this module is still under design. Don't use it in production yet. See
+    errors::Design for more information.
+
+    A few things in this documentation are not yet implemented.
+
+    NOTE: If you have suggestions as to how this module should behave, now
+    is a great time to contact the author.
+
+SYNOPSIS
+        use strict;
+        use warnings;
+        use errors;
+
+        use errors -class => 'UncoolError';
+
+        try {
+            $cool = something();
+            throw UncoolError("Something is not cool")
+                if not $cool;
+            assert($ok, "Everything is ok");
+        }
+        catch UncoolError with {
+            my $e = shift;
+            warn "$e";
+        }
+        catch UserError, RuntimeError with {
+            # catch UserError or RuntimeError
+            # $_ is the same as $_[0]
+            warn;
+        }
+        except {
+            # $@ is the same as $_[0]
+            warn "Some other error: $@";
+        }
+        otherwise {
+            warn "No error occurred in the try clause."
+        }
+        finally {
+            cleanup();
+        };
+
+DESCRIPTION
+    The "errors" module adds clean, simple, sane, flexible and usable error
+    handling to Perl. The module does several things:
+
+    First, "errors" exports an error handling syntax that is very similar to
+    Error.pm, but with a few improvements. (See [COMPARISON TO Error.pm])
+
+    Second, all errors that are thrown are first class Perl objects. They
+    all inherit from the "Exception" class, which is provided by default.
+    This allows you to manipulate errors in a consistent and intuitive way.
+
+    Third, The "errors" module makes it trivial to define your own error
+    classes, and encourages you to do so. Simply define a class that
+    inherits from "Exception" (or one of its subclasses).
+
+    Fourth, "errors" turns plain (string based) system errors and other
+    die/croak errors into specific Perl objects. It uses heuristics on the
+    error string to determine which Error class to use, and defaults to the
+    "RuntimeError" class.
+
+    Fifth, "errors" provides dozens of predefined error classes that you can
+    use or that get used automatically by the auto-objectification. These
+    classes are in an inheritance hierarchy that should become standard for
+    Perl.
+
+    Lastly, "errors" is designed to play nice with the modern Perl
+    frameworks (like Moose) and the other popular error handling modules.
+
+SIMPLE TO USE
+    The main goal of "errors" is to encourage the widespread use of error
+    handling in Perl. In other languages like Python, coining your own named
+    error classes and using raise*except is as common as using if*else
+    statements. Here's a Python example.
+
+        class FooError(Exception):
+            pass
+
+        try:
+            something()
+        except FooError as e:
+            handle_error(e)
+
+    Now you can do that in Perl:
+
+        use errors;
+
+        package FooError;
+        use base 'Exception';
+        package MyModule;
+
+        try {
+            something();
+        }
+        catch FooError with {
+            my $e = shift;
+            handle_error($e);
+        };
+
+    As you can see, using "errors" is simple and unobtrusive. Why not start
+    all your programs with:
+
+        use strict;
+        use errors;
+        use warnings;
+
+    Defining your own error classes is also trivial, and "errors" provides
+    an even more concise way to do it:
+
+        use errors -class => 'FooError';
+
+    In the catch/with clause, you can also use $@ (or $_) to access the
+    current error object like this:
+
+          catch FooError with {
+              handle_error($@);
+          };
+
+USAGE
+    there are a few different usages of "errors" that you should be aware
+    of:
+
+    "use errors;"
+        This exports the "errors" syntax, and loads all the "errors"
+        functionality.
+
+    "use errors -class => 'ClassName' [, -isa => 'BaseClass'];"
+        The "-class" directive gives you a way to define an error subclass
+        at compile time, in one simple line of code. You can optionally
+        specify the base class. The default base class is "Exception".
+
+        NOTE: This usage does not export the "errors" (try/catch) syntax.
+
+    "use errors -with_using;"
+        Unfortunately "Moose" and "errors" both export the "with"
+        subroutine. If "errors" sees that "Moose" (or someone else) has
+        already exported "with", it will export the "using" subroutine
+        instead:
+
+            use Moose;
+            use errors;
+            try {...} catch Exception using {...};
+
+        The "-with_using" directive tells "errors" to do this regardless.
+
+SYNTAX
+    The "errors" module introduces a number of keyword constructs that you
+    can use to create and manage error objects.
+
+    "try { ... }"
+        Like an eval block. After the code is evaluated, the appropriate
+        clauses (catch, except, otherwise, finally) are called.
+
+    "catch <error-selector> with { ... }"
+        This clause is invoked when an error happens in the "try" block, and
+        the class of the error object satisfies the ErrorSelector specified.
+        You may specify many "catch" clauses, to deal with different error
+        situations.
+
+        The <error-selector> can be any of the following forms:
+
+            # Class matches a specific error class
+            catch ErrorClass with { ... }
+            # Class matches a specific regexp
+            catch qr/.../ with { ... }
+            # A subroutine returns a true value
+            catch sub { ... } with { ... }
+            # One of a list of error selectors
+            catch selector1, selector2, selector3 with { ... }
+            # All of an array list of selectors
+            catch [ selector1, selector2, selector3 ] with { ... }
+
+    "except { ... }"
+        This clause is invoked when there is an error from the "try" block,
+        but no "catch" clauses were invoked.
+
+    "otherwise { ... }"
+        This clause is invoked if there was no error in the "try" clause.
+
+    "finally { ... }"
+        This clause is always invoked as the final step in the "try"
+        sequence, regardless of what happens.
+
+    "throw("...");"
+        The throw keyword is not actually exported. It is a method call on
+        the Exception object. So you can use it indirectly or directly.
+        These two calls are identical:
+
+            throw MyError("Something is wrong");
+            MyError->throw("Something is wrong");
+
+        You can also use throw to reraise an error in a catch/except block,
+        like this:
+
+            $@->throw();
+
+    "assert($value, "assertion message");"
+        This function will "throw AssertionError($message) error unless
+        "$value` is true.
+
+ERROR OBJECTS
+    All errors are Perl objects. They all have the 'Exception' class as
+    their topmost parent class. They all have the following methods and
+    properties:
+
+    "throw Exception($msg [, %properties]);"
+        This method throws a new instance of the Exception class. It is
+        described more fully above.
+
+    "$@->text()"
+        The "text" method gets or sets the error message for the object.
+
+    Stringification
+        All Exception objects turn into their "text" string value when used
+        in string context.
+
+    Numification
+        All Exception objects turn into a unique number when used in numeric
+        context.
+
+PREDEFINED CLASSES
+    The "errors" module defines a number of error classes that it uses to
+    cast errors into. You can also create error objects yourself using these
+    classes. The classes are defined in a hierarchy:
+
+          + Exception
+            + StandardError
+              + ArithmeticError
+                + DivideByZeroError
+              + AssertionError
+              + IOError
+                + IOFileError
+                  + IOFileOpenError
+              + NotImplementedError
+              + SyntaxError
+              + RuntimeError
+            + UserError
+              + user defined errors should inherit from this
+
+    Some of these are obvious. Some deserve elaboration.
+
+    AssertionError
+        Indicates a failed "assert" call.
+
+    SyntaxError
+        Indicates a bad string eval.
+
+    NotImplementedError
+        You can throw this in a stub subroutine.
+
+    RuntimeError
+        Indicates an unknown error probably caused by a "die" statement..
+
+    NOTE: These error classes are still being determined. This list is not
+    yet complete. The current hierarchy was influenced from these sources:
+
+    *   <http://search.cpan.org/perldoc?autodie#CATEGORIES>
+
+    *   <http://www.python.org/dev/peps/pep-0348/#new-hierarchy>
+
+COMPARISON TO ERROR.PM
+    The try*catch*throw interface of both Errors.pm and errors.pm is very
+    similar. You can use both in the same runtime process (but you can only
+    use one or the other in the same class/package).
+
+    The "errors" module differs from the <Error> module in the following
+    ways:
+
+    "catch Selector with { ... }"
+        The Selector for the catch clause can only be a single class name in
+        Error.pm. In "errors" it is much more flexible. See documentation
+        for details.
+
+    "except { ... }"
+        The except clause in Error.pm has weird semantics. In "errors" it
+        just gets called if there is an error and no catch clause matches.
+
+    "otherwise { ... }"
+        The otherwise clause in Error.pm gets called if no other handler is
+        appropriate. In "errors", it behaves like an 'else' block. It is
+        called when there is no error at all in the try clause.
+
+    Base Class
+        Errors in the "Error" module have a common base class of 'Error'. In
+        "errors", the base class is called 'Exception'.
+
+FAQ
+    Q: What is the difference between 'errors' and 'exceptions'?
+        A: Four letters.
+
+    Q: Is "errors" performant?
+        A: Yes. Very. The module is small, simple, has no dependencies and
+        no string evals.
+
+    Q: Why another error/exception module?
+        A: Because it has the perfect name.
+
+ACKNOWLEDGEMENTS
+    The original code and ideas for this module were taken from Error.pm.
+
+AUTHOR
+    ingy döt Net <ingy@cpan.org>
+
+COPYRIGHT
+    copyright 2009-2014. Ingy döt Net.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See <http://www.perl.com/perl/misc/Artistic.html>
+

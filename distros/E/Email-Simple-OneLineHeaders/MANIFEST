@@ -1,0 +1,6 @@
+MANIFEST
+Makefile.PL
+lib/Email/Simple/OneLineHeaders.pm
+Changes
+README
+INSTALL

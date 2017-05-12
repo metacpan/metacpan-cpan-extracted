@@ -1,0 +1,24 @@
+Revision history for Perl extension EV::Loop::Async.
+
+1.01  Mon Nov  1 23:28:06 CET 2010
+	- improve configure_requires.
+
+1.0   Mon Nov  1 23:26:24 CET 2010
+	- port to EV 4.00 API.
+
+0.04  Wed Mar 31 03:02:24 CEST 2010
+        - suck steve's dick and rename our symbols to avoid colliding
+          with nonstandard identifier spam on the broken os x pseudo-os.
+          affects IO::AIO and BDB.
+
+0.03  Mon Jul 20 05:45:19 CEST 2009
+	- blindly copy over thread context on win32, to not make it crash
+          (at least not instantly). YMMV.
+
+0.02  Fri Jul 17 17:02:24 CEST 2009
+	- first CPAN release, now that EV 3.7 is finally
+          released.
+
+0.01  Tue Jul 14 01:18:55 CEST 2009
+	- original version; cloned from, uhm, other stuff.
+

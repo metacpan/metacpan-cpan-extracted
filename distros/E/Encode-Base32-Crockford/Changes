@@ -1,0 +1,28 @@
+2.112991 -- Wed Oct 26 10:23:57 CDT 2011
+    * simplfy encode/decode logic
+    * new maintainer
+
+version: 1.2
+date:    2006-04-25
+fix!:    The inverse symbol table wasn't consulted for the final value,
+         meaning actual numbers rather than base32 characters were appended.
+         Bug report, patch and tests supplied by David Leadbeater - thanks.
+tests:   New tests for encoding and decoding.
+
+version: 1.12
+date:    2008-04-10
+tests:   Another fix - work on machines with or without Test::POD.
+
+version: 1.11
+date:    2008-04-09
+fix:     Test::Warn was missing from prerequisites.
+
+version: 1.1
+date:    2008-04-09
+new!:    "strict" and "warn" modes for decoding methods.
+tests:   POD tests were failing on some platforms/Perls.
+docs:    Added this CHANGES file.
+
+# First release.
+version: 1
+date:    2008-04-03

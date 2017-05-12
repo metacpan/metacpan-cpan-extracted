@@ -1,0 +1,93 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 acadb7ecc5cd87ccf9367a4cf1b7eec33f7008b0 ANSIColor.pm
+SHA1 4fe7bc1c35ef905e28930a7a08f3a6a9e028edec ANSIColor/AllError.pm
+SHA1 c035576c1db0b67e1d413f02488dc17ec98f47df ANSIColor/Die.pm
+SHA1 608e5ebd2766cc695a1a1cf7b94cc890a525a300 ANSIColor/Error.pm
+SHA1 5947f78d6d8742b4c421223dcf405aabfe607954 ANSIColor/ErrorList.pm
+SHA1 f2562594481b916cc6232f6421023587fc9e5e8a ANSIColor/Print.pm
+SHA1 efcbaf8e4ed86714ea36b9d80e52a0fc57a0f618 ANSIColor/PrintVar.pm
+SHA1 d0b4051682706d50d81a21701ccede0b1f6db921 Changes
+SHA1 7d9986bc37f4cfa2dc2bfb0ee5323b1a046e91ff LICENSE
+SHA1 d6f39541cf83dde6f7c8b994d131b551ebf4cc92 MANIFEST
+SHA1 846e56fc0838aa10b9d373676de4703b10bfd4a5 META.yml
+SHA1 7ab28b152a6e84d2ae21cdb43f2b48c5bf3bb2e4 Makefile.PL
+SHA1 f1c5505c4c19c660cce02f67dd9d1c412082481e README
+SHA1 1354785bc28565ab078bd1c60d95873e7c0a82e0 examples/ex1.pl
+SHA1 5da94f5efd9e360f96f3c5aec5fa6ac180623031 examples/ex10.pl
+SHA1 ef51d5b7bf38526589d7106b1f6838a7f6727739 examples/ex11.pl
+SHA1 ca58a26e60387543c615f59d255cd564e809205e examples/ex12.pl
+SHA1 ee1e6d1a85dac70a23cdcf22601dd84676110789 examples/ex13.pl
+SHA1 53aad6bd2833e9b2096bb56a10cedda645dadd95 examples/ex14.pl
+SHA1 b25b7791d5d56ed4db3d541acd96f8ee990643c8 examples/ex2.pl
+SHA1 730c24884f7e39c0544e62d757bf8638eede9d6a examples/ex3.pl
+SHA1 e0d8924be8613ce5cfb8577e26989ed8ad284cad examples/ex4.pl
+SHA1 359c2102354b4eb7edca52632203012554aa3b55 examples/ex5.pl
+SHA1 6ac4e3652a95b8e624ce2f4e508f17828d262384 examples/ex6.pl
+SHA1 21d1312c4bdcb698cc18e1bb561373ba4fa0afd7 examples/ex7.pl
+SHA1 3c63a75b930ec71cd605d178dbf53b6249306365 examples/ex8.pl
+SHA1 d5d51524593ee9ba1bad299d64bddc7d37f6e726 examples/ex9.pl
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
+SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 9e886864978e9f9b9988e412a75a908070b54fbf inc/Module/Install/ReadmeFromPod.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 bbfc25dddd7e9c1b67ac2ff93aab252b2263cef1 t/Error-Pure-ANSIColor-AllError/01-use.t
+SHA1 d1f555399adf3e6c143e083bc5869e41efb42cbc t/Error-Pure-ANSIColor-AllError/02-version.t
+SHA1 6ec8b477141c1a454a2005ee0fc008a922f7c8b6 t/Error-Pure-ANSIColor-Die/01-use.t
+SHA1 7f7532579d19eebe0a611a9827b5123df1090254 t/Error-Pure-ANSIColor-Die/02-version.t
+SHA1 db3f3e2b4c12a0471c8025144d012e89a35d5f69 t/Error-Pure-ANSIColor-Error/01-use.t
+SHA1 8bc426983fd1c9e4cbe60d19628b039ecb22dc90 t/Error-Pure-ANSIColor-Error/02-version.t
+SHA1 2863b94f603c95b2f21a5fbf016603da97678b0b t/Error-Pure-ANSIColor-ErrorList/01-use.t
+SHA1 c33975c9913632b09cb84bf23ba9fe7f717d8c9e t/Error-Pure-ANSIColor-ErrorList/02-version.t
+SHA1 4fb952d278a11b028212a333a3a0fa4f6938434c t/Error-Pure-ANSIColor-Print/01-use.t
+SHA1 8bcf6814eee1f87afcb5f52ac761dbe49845ee32 t/Error-Pure-ANSIColor-Print/02-version.t
+SHA1 626b024a5ca9f4030dda1a1a99b57f2341092e53 t/Error-Pure-ANSIColor-PrintVar/01-use.t
+SHA1 f4d35574b3dab42557a255d20529a39e672430d4 t/Error-Pure-ANSIColor-PrintVar/02-version.t
+SHA1 2cf90499f17445729bdff4ff67523e16ca58bd40 t/Error-Pure-ANSIColor/01-use.t
+SHA1 1eff25b6dd910de57181f77454375337b9da2fbe t/Error-Pure-ANSIColor/02-version.t
+SHA1 3a47baa3bf7068bcc68be6a7e83264fcb7b93d5f xt/Error-Pure-ANSIColor-AllError/01-pod_coverage.t
+SHA1 66744ae4487a535f01f58145df46085ed28b4b34 xt/Error-Pure-ANSIColor-AllError/02-pod.t
+SHA1 43a9c0174e8a42061be42d1cdb6f3334cd550c9e xt/Error-Pure-ANSIColor-Die/01-pod_coverage.t
+SHA1 bfaa09aff508bb63f84ca188c6b21cad060e5720 xt/Error-Pure-ANSIColor-Die/02-pod.t
+SHA1 b2f6617be3b94673cc5d29eb14fb5ce1d711f823 xt/Error-Pure-ANSIColor-Error/01-pod_coverage.t
+SHA1 8e034416a55b88611405e4577f998da131df035f xt/Error-Pure-ANSIColor-Error/02-pod.t
+SHA1 6f4b85965eb7ff90f3756b467d6ea82d8f80e4f4 xt/Error-Pure-ANSIColor-ErrorList/01-pod_coverage.t
+SHA1 91cc828f2de14bcd9c16532b7b175f6db35b8662 xt/Error-Pure-ANSIColor-ErrorList/02-pod.t
+SHA1 3e73c6ec0bfe83ef335d42b2b88fa0a5ee1db0ba xt/Error-Pure-ANSIColor-Print/01-pod_coverage.t
+SHA1 7dec641f3c80e5ef9214388560c3de27e34b2391 xt/Error-Pure-ANSIColor-Print/02-pod.t
+SHA1 3e853b8d91403f438da48f5ab85a44d1204ede5a xt/Error-Pure-ANSIColor-PrintVar/01-pod_coverage.t
+SHA1 61889e948cea0784628773aae6fd5aca99d8a122 xt/Error-Pure-ANSIColor-PrintVar/02-pod.t
+SHA1 2654b785bf15e85ec9cd6fc7e43bba82166239c2 xt/Error-Pure-ANSIColor/01-pod_coverage.t
+SHA1 b5befc5443d1cec3310dd29a1674169456c84ea9 xt/Error-Pure-ANSIColor/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEAxWqUSy7qDLVZJQKKyiOZjWerHYFAljAF58ACgkQKyiOZjWe
+rHaz0Af/adX1ypQu8WUs9Jkcj7uGqIiqf8WEsHGdR6Qv36h8dRTJyFGlA/wI9XUO
+uYNVqXw4mJJlwm25eZL741E0OTWM0sXlvAoLcV2+imDGa8rX17Lsjj+R3jhnW+9Q
+bGJNDfNRyAnmiIffilx2VdZTGNyAuP3NMxtdaq31tyKbw38UZKF01NC5o9/EFzhS
+GvWDCOc0KZ02sa3wn7RWR3uTlPQvCd0/Qx2eunDLNP2pCtBnjZuOnjr+qrFimAkm
+5ckeaw7J0yh7MOPRZlNifJr/fgrQnL0xb5VwnJVdGf/92Qs06o/UMk6uKYPKRUR5
+t/6dWDgTp5ESyu485627CYEd+uupPg==
+=h4Sz
+-----END PGP SIGNATURE-----

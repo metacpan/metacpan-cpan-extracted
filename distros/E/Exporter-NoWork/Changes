@@ -1,0 +1,15 @@
+Revision history for Perl extension Exporter::NoWork.
+
+0.03    Fri 17 Dec 2010 00:30:13 UTC
+        - Switched to Module::Build
+        - Stripped out test functions into Test::Exports
+
+0.02    Thu 28 Feb 2008  1.58.21 am GMT
+        - Added tests
+        - Don't add E::NW to @ISA more than once
+        - Don't clobber $_ needlessly
+
+0.01  Tue Apr 20 12:26:48 2004
+	- original version; created by h2xs 1.23 with options
+		-PAOXn Exporter::NoWork -b 5.5.0
+

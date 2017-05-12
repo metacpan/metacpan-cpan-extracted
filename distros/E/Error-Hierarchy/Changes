@@ -1,0 +1,61 @@
+Revision history for Perl extension Error-Hierarchy
+
+1.103530  2010-12-19 22:25:32 Europe/Vienna
+
+1.102720  2010-09-29 14:21:00 Europe/Vienna
+    - DBI exceptions now also respect $Error::Depth
+
+1.102500  2010-09-07 18:15:36 Europe/Vienna
+    - added a 'before_push' trigger for items_(set_)push(), based on
+      Class::Trigger
+
+1.101690  2010-06-18 12:26:02 Europe/Vienna
+    - E::H::Container: added delete_duplicate_exceptions()
+
+1.100980  2010-04-08 16:33:33 Europe/Vienna
+    - E::H::Util: added assert_named_args()
+    - removed unused variables
+
+1.100850  2010-03-26 23:52:38 Europe/Vienna
+    - converted the distribution to Dist::Zilla-style
+
+0.09 Thu 2009.11.05 15:54:28 CET (Marcel Gruenauer <marcel@cpan.org>)
+    - performance tuning
+
+0.08 Thu 2009.10.29 16:51:10 CET (Marcel Gruenauer <marcel@cpan.org>)
+    - added assert_enum
+
+0.07 Fri Sep 18 13:54:18 MSZ 2009 (Marcel Gruenauer <marcel@cpan.org>)
+    - E::H::Mixin: our die() replacement calls CORE::die() if we get a blessed
+      exceptionas as well (fix for XML::LibXML)
+    - add documentation and fix synopsis
+
+0.06  Thu Jul 25 15:27:43 CEST 2008 (Marcel Gruenauer <marcel@cpan.org>)
+    - Changed dist style and Changes back to standard. People didn't like it -
+      the nail that sticks out gets hammered down.
+    - Added standard test files; this will also help with CPANTS.
+
+0.05  Thu, 29 May 2008 12:04:44 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+    - Converted Changes file to YAML style
+    - .shipit: added Twitter step
+    - Makefile.PL: added auto_install() and process_templates()
+    - lib/*: converted to template
+    - updated MANIFEST
+    - updated t/perlcriticrc
+    - moved generated documentation of interited methods to after documentation
+      of this class' methods so the manpage is more readable
+    - .shipit: fixed svk.tagpattern
+    - tags: NEWFEATURE
+
+0.04  Sun, 21 Oct 2007 20:01:49 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+    - Error::Hierarchy::Mixin's CORE::GLOBAL::die() now increases $Error::Depth
+      by one level to omit itself from the reported call stack
+
+0.03  Sat, 20 Oct 2007 22:30:19 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+    - simplified accessor declaration
+
+0.02  Thu, 18 Oct 2007 10:09:39 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+    - fixed version requirement of Test::More
+
+0.01  Wed, 17 Oct 2007 14:03:41 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+    - original version

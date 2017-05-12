@@ -1,0 +1,26 @@
+---
+name: Encode-Repair
+version: 0.0.2
+author:
+  - Moritz Lenz
+abstract: Repair wrongly encoded text strings
+license: artistic_2
+resources:
+  license: http://opensource.org/licenses/artistic-license-2.0.php
+requires:
+  Algorithm::Loops: 0
+  Encode: 0
+  Exporter: 0
+  Test::More: 0
+  charnames: 0
+  perl: 5.008001
+  strict: 0
+  warnings: 0
+provides:
+  Encode::Repair:
+    file: lib/Encode/Repair.pm
+    version: 0.0.2
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

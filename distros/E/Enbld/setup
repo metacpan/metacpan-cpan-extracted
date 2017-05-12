@@ -1,0 +1,66 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use 5.010001;
+
+use autodie;
+use File::Spec;
+use File::Fetch;
+
+# At OS X Since Mozilla::CA is not installed, warning message will be displayed.
+$File::Fetch::BLACKLIST = [ qw/lwp/ ];
+
+my $home   = File::Spec->catdir(  $ENV{HOME}, '.enbld'  );
+my $cpanm  = File::Spec->catfile( $home, 'etc', 'cpanm' );
+my $extlib = File::Spec->catdir(  $home, 'extlib'       );
+
+clear_MYMETA();
+download_cpanm() unless ( -e $cpanm );
+
+say "=====> Install Enbld to $home.";
+
+print "\n";
+system( "/usr/bin/perl $cpanm -L $extlib ." );
+print "\n";
+
+if ( $? ) {
+
+    if ( $? == -1 ) {
+        die( "Failed to execute cpanm\n" );
+    } elsif ( $? & 127 ) {
+        die( "Child died with signal\n" );
+    } else {
+        die( "Installation error. Exit code:" . ( $? >> 8 ));
+    }
+
+}
+
+print << 'EOF';
+=====> Finish installation.
+
+Please add following path to PATH.
+
+    $HOME/.enbld/bin
+    $HOME/.enbld/sbin
+    $HOME/.enbld/extlib/bin
+
+Please add following path to MANPATH.
+
+    $HOME/.enbld/share/man
+    $HOME/.enbld/man
+
+EOF
+
+sub download_cpanm {
+    my $ff       = File::Fetch->new( uri => 'http://xrl.us/cpanm' );
+    my $location = File::Spec->catdir( $ENV{HOME}, '.enbld', 'etc' );
+    my $where    = $ff->fetch( to => $location ) or die $ff->error;
+}
+
+sub clear_MYMETA {
+    unlink( 'MYMETA.json' ) if ( -e 'MYMETA.json' );
+    unlink( 'MYMETA.yml'  ) if ( -e 'MYMETA.yml'  );
+
+}

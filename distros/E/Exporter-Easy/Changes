@@ -1,0 +1,63 @@
+Revision history for Perl module Exporter::Easy
+
+0.18 2015-10-12 NEILB
+    - Updated github repo URL after changing my github username
+    - Added [MetaJSON] to dist.ini so META.json is included in releases
+
+0.17 2014-07-03 NEILB
+    - Switched to Dist::Zilla, in the process fixing RT#40987
+    - Added a load of alternative Exporter modules to SEE ALSO
+    - Decided to do a developer release first, given there are 16 dists on
+      CPAN that use this dist.
+    - Added github repo to pods.
+    - Renamed CHANGES to Changes and reformatted as per CPAN::Changes::Spec
+
+0.16_01 2014-06-29 NEILB
+    - All changed in 0.17 were first in this developer release
+
+0.16 2004-08-03 FDALY
+
+    - Fixed Exporter::Easiest so that it automatically does the use vars,
+      the problem was that I was not using the magic goto so the vars were
+      being used in the wrong package.
+    - Factored out some code in the vars tests.
+
+0.15 2003-02-25 FDALY
+
+    - changed the processing order and documented it
+    - FAIL symbols are now added to EXPORT_OK
+    - Fixed bug, ":" now is anchored to start of string for tag detection
+     is Easiest
+    - Optimised expand_tags a little by specialising the add/delete code
+      for the tag and non-tag cases.
+
+0.14 2003-02-13 FDALY
+
+    - some slight optimistaions
+    - no longer subtracting the FAIL from OK
+    - more helpful errors messages
+    - added benchmark
+
+0.13 2003-02-13 FDALY
+
+    - I should have fixed Easiest to work with ALL as weel as VARS and ISA,
+      done now
+    - Doc fixes
+
+0.12 2003-02-13 FDALY
+
+    - Fixed Easiest to handle scalar values for VARS and ISA
+
+0.11 2003-02-13 FDALY
+
+    - No longer need to use TAGS in Easiest
+    - Added ISA control
+    - No longer including EXPORT in EXPORT_OK
+    - Added OK_ONLY, which means only these symbols go in EXPORT_OK
+    - Added VARS control. Now no longer need to explicitly use vars
+      for exportable variables
+
+0.1 2003-02-12 FDALY
+
+    - initial release
+

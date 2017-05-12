@@ -1,0 +1,87 @@
+Revision history for Exobrain
+
+1.08      2014-04-30 00:39:57+08:00 Australia/Perth
+
+    * API: `use Exobrain` automatically enables Method::Signatures.
+    * DISTRO: HabitRPG is now packaged separately as Exobrain::HabitRPG
+    * DISTRO: Foursquare is now packaged separately as Exobrain::Foursquare
+    * API: Exobrain::Agent has better documentation and functionality.
+    * API: Measurement::Geo is now a role, not a class.
+    * API: Added a `can_run` method to Exobrain
+    * API: Exobrain::Agent::Depends allow dependencies to be delcared.
+    * TESTING: Better testing for Exobrain::Agent.
+    * TESTING: Exobrain::Test will load classes from t/lib
+    * AGENTS: Ported `bee-habit` to Exobrain::Agent::Action::SimpleBeeHabit;
+    * AGENTS: Ported `geo-personallog` to Exobrain::Agent::Action::GeoLog;
+    * AGENTS: Ported `sentbox-reward` to Exobrain::Agent::Action::SentmailXP;
+    * DOCS: Much documentation added.
+
+1.07      2014-03-04 22:46:36PST-0800 America/Los_Angeles
+
+    * DEBUG: Added 'inject-done' debugging script to generate
+             Intent::PersonalLog messages.
+    * DISTRO: Turned Idonethis into a separate component
+              (Exobrain::Idonethis)
+
+1.06      2014-03-04 14:28:43PST-0800 America/Los_Angeles
+
+    * BUILD: Added dependency on IPC::System::Simple, which is
+             needed for `exobrain setup`.
+
+1.05      2014-03-03 17:35:59PST-0800 America/Los_Angeles
+
+    * FEATURE: Added a `exobrain debug` command for bus debugging.
+               This obsoletes the old `debug.pl` command.
+    * DOCS: Updated the README.md file with current insall instructions.
+    * INTERNAL: Improved internal agent handling.
+    * API: `use Exobrain` enables strict, warnings, 5.10 features.
+    * TESTS: Added tests for agents and strict, warnings, 5.10 features. :)
+    * DISTRO: Split `Exobrain::Beeminder` into its own separate distro.
+    * FEATURE: 'exobrain setup [Component]` now works!
+               Eg: `exobrain setup Beeminder`.
+
+1.04      2014-02-28 23:18:32EST-0500 America/Montreal
+
+    * FEATURE: Added a `exobrain setup` command to do basic exobrain/ubic setup.
+    * DOCS: Improved documentation in sample .exobrainrc file.
+    * DOCS: Expanded information in Exobrain.pm
+    * BUGFIX: Fixed bug where libraries were not packaged.
+
+1.03      2014-02-28 12:47:07EST-0500 America/Montreal
+
+    * DISTRIBUTION: De-crufted distributed tarball.
+                    See GH #37, thanks to @tsibley for spotting this.
+
+1.02      2014-02-28 03:02:36EST-0500 America/Montreal
+
+    * SERVICE: Removed not-yet-completed Facebook endpoint.
+
+1.01      2014-02-28 02:30:43EST-0500 America/Montreal
+
+    * META: Updated meta-info for distribution.
+    * HRPG: Fixed handling of XP for Sending mail, and XP in general.
+    * FEATURE: Exobrain::Config supports writing of config files.
+    * FEATURE: Exobrain::Config supports ~/.config/exobrain directories.
+
+1.00      2014-02-26 02:44:28EST-0500 America/Montreal
+
+    * BUILD: Re-ordered dist.ini for better release process.
+    * API: Implemented class-based agents.
+    * API: Split Twitter into its own Exobrain plug-in distro
+    * RUN: Updated 'exobrain' CLI to be more awesome.
+    * INTERNAL: Converted many type-specific agents to generalised types.
+    * GENERAL: Made everything seriously more awesome.
+
+0.06      2014-02-11 04:46:19EST+1100 Australia/Melbourne
+
+    * BUILD: Reduced dependencies
+    * BUILD: We now use ZMQ.pm, supporting both ZMQ2 and ZMQ3
+    * TEST: Tests now run without an ~/.exobrainrc file
+    * TEST: Added travis-ci support (thanks to @mmcclimon)
+    * BUGFIX: Compatibility with Perl 5.12
+    * BUGFIX: Removed given/when in Exobrain::Bus.
+              This was making older and newer perls unhappy. :P
+
+0.05    Early Feb 2014
+
+    * Initial release to the CPAN.

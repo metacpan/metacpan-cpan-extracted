@@ -1,0 +1,514 @@
+
+=head1 NAME
+
+Enbugger - Enables the debugger at runtime.
+
+=head1 SYNOPSIS
+
+    my $ok = eval { ...; 1 };
+    if ( not $ok ) {
+        # Oops! there was an error! Enable the debugger now!
+        require Enbugger;
+        Enbugger->stop;
+    }
+
+
+
+
+=head1 DESCRIPTION
+
+Allows the use of the debugger at runtime regardless of whether your
+process was started with debugging. This is useful if you would like
+to add hooks so the debugger is loaded on some kind of event or UNIX
+signal or if for some reason you're having difficulty running your
+program with debugging turned on at compile time.
+
+
+
+
+=head1 INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+=head1 USING THE DEBUGGER
+
+=head2 Loading the debugger
+
+Loading the debugger at process start time works just like normal.
+
+  perl -d ...
+
+You can also load the debugger at runtime:
+
+  use Enbugger;
+  Enbugger->load_debugger;
+
+You can load a specific debugger:
+
+  use Enbugger;
+  Enbugger->load_debugger( 'perl5db' );
+
+You can specific a default debugger:
+
+  $Enbugger::DefaultDebugger = 'perl5db';
+
+Or...
+
+  use Enbugger 'perl5db';
+
+
+
+
+=head2 Unloading the debugger
+
+You wish. There is no implemented way to unload the debugger. Here's
+how you'd do it if you wanted to implement this feature.
+
+=over
+
+=item #
+
+Set the various C pointers set by Perl_init_debugger to NULL
+
+=item #
+
+Clear the DB:: package. Beware of the C<DB> and C<sub> functions. If
+you ever load another debugger again you'll need to ensure you have at
+least stub functions left or you could suffer a fatal, deadly death.
+
+=item #
+
+Change all C<dbstate> B::COP nodes back to be C<nextstate> ops.
+
+=back
+
+
+
+
+
+=head1 GETTING INTO THE DEBUGGER
+
+=head2 Programatically
+
+Call the public class method C<< Enbugger->stop >>. At a minimum, it
+will just request that your current debugger stop execution.
+
+If needed, it'll go as far as loading a debugger.
+
+=head3 An example
+
+  if ( ... ) {
+      # an unlikely occurance I'd like to manually inspect if or when
+      # it happens.
+      Enbugger->stop;
+  }
+
+=head2 On %SIG events
+
+If you load the L<Enbugger::OnError> module, you can use unhandled
+exceptions or UNIX signals as break points. In addition, loading the
+debugger is deferred until your signal or exception is triggered.
+
+I like using this with both die() and SIGUSR1 handled enough that both
+are the default for handling.
+
+  use Enbugger::OnError;
+  use Enbugger::OnError qw( __DIE__ USR1 ); # equivalent
+
+A program using the above line will trigger a break point whenever an
+unhandled die() occurs or whenever the USR1 signal is received. To use
+other signals, just specify them at the use().
+
+  use Enbugger::OnError qw( USR1 USR2 INT HUP );
+
+=head3 An example
+
+Here's a quick example of breaking into a long running program to see
+what it's doing.
+
+At one terminal:
+
+  bash$ perl -MEnbugger::OnError -e 'while(1) {}'
+
+At a separate terminal:
+
+  bash$ ps x | grep perl
+  12850 pts/1    R      0:01 perl -MEnbugger::OnError -le while(1){}
+  12852 pts/1    R+     0:00 grep perl
+  bash$ kill -USR1 12850
+
+Back at the original perl program:
+
+  Loading DB routines from perl5db.pl version 1.3
+  Editor support available.
+
+  Enter h or `h h' for help, or `man perldebug' for more help.
+
+  Received signal USR1 at -e line 1
+          eval {...} called at -e line 1
+
+  Enbugger::OnError::(/home/jbenjore/src/Enbugger/blib/lib/Enbugger/OnError.pm:90):
+  90:
+    DB<1> T
+  $ = Enbugger::OnError::ExceptionHandler('USR1') called from -e line 1
+  $ = eval {...} called from -e line 1
+    DB<1> q
+  bash$
+
+=head2 From gdb
+
+You can attach to a running process and inject a perl debugger even
+when you didn't originally plan for this. This works very much like
+perl's unsafe signals so there's a reasonable chance that your process
+could go pear shaped after doing this.
+
+Have something to connect to:
+
+  bash$ perl -e 'while(1) {}' &
+  [1] 16061
+  bash$ ps x | grep perl
+  16061 s002  R      0:16.91 perl -e while(1) {}
+
+Attach with GDB (L<http://www.gnu.org/software/gdb/>):
+
+  bash$ gdb -p 16061
+  GNU gdb 6.3.50-20050815 (Apple version gdb-768) (Tue Oct  2 04:07:49 UTC 2007)
+  Copyright 2004 Free Software Foundation, Inc.
+  GDB is free software, covered by the GNU General Public License, and you are
+  welcome to change it and/or distribute copies of it under certain conditions.
+  Type "show copying" to see the conditions.
+  There is absolutely no warranty for GDB.  Type "show warranty" for details.
+  This GDB was configured as "i386-apple-darwin".
+  /Users/jbenjore/16061: No such file or directory.
+  Attaching to process 16061.
+  Reading symbols for shared libraries . done
+  Reading symbols for shared libraries ...... done
+  0x001be987 in Perl_pp_unstack ()
+  (gdb)
+
+Detect whether you are attaching to a threaded or unthreaded
+perl. When this function returns zero, omit it from the Perl_eval_pv()
+call:
+
+  (gdb) call (void*)Perl_get_context()
+  $1 = (void *) 0x800000
+
+OR
+
+  (gdb) call (void*)Perl_get_context()
+  $1 = (void *) 0x0
+
+Inject a debugger into a threaded build. Optionally, send a debugger
+to someplace like a remote terminal. Read L<perl5db.pl> for more
+options.
+
+  (gdb) call (void*)Perl_eval_pv((void*)Perl_get_context(),"eval{require Enbugger;warn q(stopping);$ENV{PERLDB_OPTS}='RemotePort=localhost:4000';Enbugger->stop;};print STDERR $@",0)
+
+OR inject a debugger into an unthreaded build:
+
+  (gdb) call (void*)Perl_eval_pv("eval{require Enbugger;warn q(stopping);$ENV{PERLDB_OPTS}='RemotePort=localhost:4000';Enbugger->stop;};print STDERR $@",0)
+
+Receive a perl debugger.
+
+  Reading symbols for shared libraries . done
+  Reading symbols for shared libraries . done
+  Reading symbols for shared libraries . done
+  Reading symbols for shared libraries . done
+  Reading symbols for shared libraries . done
+
+  Loading DB routines from perl5db.pl version 1.32
+  Editor support available.
+
+  Enter h or `h h' for help, or `man perldebug' for more help.
+
+  $2 = (void *) 0x85c000
+  (gdb) 
+  main::((eval 16)[-e:1]:1):eval{warn q(stopping);require Enbugger;Enbugger->stop};print STDERR $@
+    DB<1> p "Hi, I am in perl verson $] now"
+  Hi, I am in perl verson 5.010000 now
+  DB<2> T
+    $ = eval 'eval{warn q(stopping);require Enbugger;Enbugger->stop};print STDERR $@' called from -e line 1
+
+Return control back to gdb:
+
+  DB<3> c
+  (gdb)
+
+Return control back to the program:
+
+  (gdb) detach
+  Detaching from process 16314 thread 0x10b.
+  (gdb) q
+
+=head1 PUBLIC API
+
+Enbugger has a public API where you as the user can trigger the
+debugger from your code or affect which debugger is loaded.
+
+=over
+
+=item CLASS-E<gt>stop
+
+Stops execution and signals your debugger. Loads a debugger with C<<
+CLASS->load_debugger >> if one hasn't been loaded yet.
+
+=item CLASS-E<gt>load_debugger( DEBUGGER )
+
+=item CLASS-E<gt>load_debugger
+
+Loads your requested debugger. Defaults to using
+C<$Enbugger::DefaultDebugger> if you don't specify a debugger.
+
+If a debugger has already been loaded, either returns silently if the
+current debugger is what you requested or throws an exception if you
+requested a different debugger.
+
+=item $Enbugger::DefaultDebugger
+
+The default debugger. This is C<perl5db> unless you change it.
+
+=item CLASS-E<gt>write( TEXT )
+
+Writes some thing to the console or wherever is appropriate for your
+current debugger.
+
+=item CLASS-E<gt>DEBUGGER_CLASS
+
+Returns the class name for the currently loaded debugger class.
+
+If no debugger has been loaded yet, this contrives to load the default
+debugger.
+
+=back
+
+
+
+
+=head1 PLUGGABLE DEBUGGERS
+
+Enbugger supports registering debuggers. Any debugger intended to be
+used must be registered first. The default, proper behavior is to
+register all possible debuggers.
+
+
+
+
+
+=head2 Registered debuggers
+
+The following is a list of all default, registered debuggers. So far
+only the L<perl5db.pl> debugger has received any testing.
+
+=over
+
+=item perl5db
+
+This is the default perl debugger. See also L<Enbugger::perl5db> and L<perl5db.pl>.
+
+=item trepan
+
+This is the L<Devel::Trepan> debugger. See also L<Devel::Trepan> or
+L<https://github.com/rocky/Perl-Devel-Trepan>.
+
+
+=cut
+
+#=item ebug
+#
+#This is the L<Devel::ebug> debugger. See also L<Enbugger::ebug>.
+#
+#=item sdb
+#
+#This is the L<Devel::sdb> debugger. See also L<Enbugger::sdb>.
+#
+#=item ptkdb
+#
+#This is the L<Devel::ptkdb> debugger. See also L<Enbugger::ptkdb>.
+
+=back
+
+
+
+
+
+=head2 Registering your own debugger
+
+While I've attempted to register some debuggers by by default, you may
+need to write your own Enbugger::$foo class to register your own
+debugger. Currently there is no way to use an unknown debugger without
+first writing an Enbugger subclass.
+
+=over
+
+=item CLASS-E<gt>register_debugger( DEBUGGER )
+
+Register a debugger with L<Enbugger>.
+
+=back
+
+
+
+
+
+=head3 Required methods
+
+You must implement the following methods.
+
+=over
+
+=item CLASS-E<gt>_stop
+
+Your debugger must implement a C<_stop> method. This method will be
+called by the Enbugger-E<gt>stop method. When this method is called,
+you should stop the current process and invoke your debugger.
+
+=item CLASS-E<gt>_load_debugger
+
+Your debugger must implement a C<load_debugger> method. It will be
+called when your debugger should be loaded. Your method is responsible
+for loading the debugger.
+
+=item CLASS-E<gt>_write( TEXT )
+
+Your debugger must implement a C<_write> method. This method should
+accept text to log to the console or whatever is appropriate.
+
+=back
+
+
+
+
+
+=head1 UTILITY FUNCTIONS
+
+=over
+
+=item CLASS-E<gt>load_source
+
+Loads the source code for the program.
+
+=item CLASS-E<gt>load_file( FILE )
+
+Loads the source code for a specific file.
+
+=item CLASS-E<gt>instrument_runtime
+
+Sets all available breakpoints to be either breakable or not. This
+avoids making any part of the Enbugger:: or DB:: packages a part of
+something that's visible to the debugger.
+
+=item instrument_op( B::*OP )
+
+A function that modifies L<B::COP> objects.
+
+=back
+
+
+
+
+=head1 PRIVATE METHODS
+
+The followings methods exist but I'm not sure whether they'll continue
+to exist in their current form so they're private for now.
+
+=over
+
+=item CLASS-E<gt>_compile_with_nextstate
+
+=item CLASS-E<gt>_compile_with_dbstate
+
+=item CLASS-E<gt>_instrumented_ppaddr
+
+=item CLASS-E<gt>_uninstrumented_ppaddr
+
+=back
+
+
+
+
+=head1 DEPENDENCIES
+
+A C compiler.
+
+
+
+
+
+=head1 SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Enbugger::Restarts
+
+You can also look for information at:
+
+=over
+
+=item RT, CPAN's request tracker L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Enbugger-Restarts>
+
+=item AnnoCPAN, Annotated CPAN documentation L<http://annocpan.org/dist/Enbugger-Restarts>
+
+=item CPAN Ratings L<http://cpanratings.perl.org/d/Enbugger-Restarts>
+
+=item Search CPAN L<http://search.cpan.org/dist/Enbugger-Restarts>
+
+=back
+
+
+
+
+
+=head1 AUTHOR
+
+Joshua ben Jore E<gt>jjore@cpan.orgE<lt>
+
+
+
+
+=head1 ACKNOWLEDGEMENTS
+
+=over
+
+=item Brock Wilcox (awwaiid)
+
+=item R. Bernstein (rocky)
+
+=item Erkan Yilmaz
+
+=item Robert Messer at IntelliSurvey for sponsoring breakpoints
+
+=back
+
+
+
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright (C) 2007, 2008, 2009 WhitePages.com, Inc. with primary
+development by Joshua ben Jore.
+
+This program is distributed WITHOUT ANY WARRANTY, including but not
+limited to the implied warranties of merchantability or fitness for a
+particular purpose.
+
+The program is free software.  You may distribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation (either version 2 or any later version) and
+the Perl Artistic License as published by O’Reilly Media, Inc.  Please
+open the files named gpl-2.0.txt and Artistic for a copy of these
+licenses.
+
+=begin emacs
+
+## Local Variables:
+## mode: pod
+## mode: auto-fill
+## End:
+
+=end emacs

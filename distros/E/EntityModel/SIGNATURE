@@ -1,0 +1,233 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 5b1c10a3fc50d0a39511d8ef816583f6baf9b9c2 Changes
+SHA1 a4b89291a95aa55231353ba0873fc00fb5d74f0c INSTALL
+SHA1 58403eb3f2c8983c79c530c44104344bd938d051 LICENSE
+SHA1 2fb281a309e5e92193a12d7558cb3c0febd70d63 MANIFEST
+SHA1 eeb28ac63bdc1889cc9932c840dcfbf72de31937 META.json
+SHA1 3b7e821a15a7651810b9875a63da55a28029bea1 META.yml
+SHA1 fa4f4b14861f71d410b9493a7859236eb1d5216f Makefile.PL
+SHA1 264da5b1798434c52903c55b21d8735e7d0b397b README
+SHA1 1eccd47554dfa51980bc31fe4bfc2deb21e8457a benchmark/model-size-time.pl
+SHA1 67a1f5c8fc319f5675a01ac67693f7cb28d00157 bin/entitymodel
+SHA1 b0d868cc6d868badef30e408bf2eef38f8cafe37 cpanfile
+SHA1 615e1afed2736cc949358415beb29359bcb04f23 dist.ini
+SHA1 a9f8c57cc88fae2dbf4783d29904e5fac2901c93 examples/apachelog.pl
+SHA1 1147f172fee2e392ff4ddba63f4bba6e90541913 examples/async.pl
+SHA1 d7ece86869744d6368e715cd0762450234dd78e7 examples/auth.pl
+SHA1 9c1f798996d4cb37a9ac6eec47bb75eb7877a0e2 examples/cpan.pl
+SHA1 5c2adb518caa4157187e495d9ebcb248b60d14b1 examples/cpp/Author.h
+SHA1 3c2ec5c4da14543c7134a96a3934f6fddfc011ab examples/cpp/Book.h
+SHA1 49ec1ca1516248c9a00dad1cd52d00e519bffb82 examples/cpp/Library.h
+SHA1 a3b2a6966531800a4f3525e4cb8d1b0ccf43fca0 examples/cpp/LibraryItem.h
+SHA1 ded735d9cf1a9efeb8cc3b726a5a38e3b58bf805 examples/cpp/Model.h
+SHA1 0b6e354bfa28e57f03048b8e982c48eecacd035b examples/cpp/main
+SHA1 bf7dc93f82fcae3659ec15b9c12a1f4f7e470315 examples/cpp/main.cpp
+SHA1 d8d10c3ce7d8530cad6572b3e33dc2c1d6b7aab4 examples/emt.pl
+SHA1 d9f75fae465a643fc7518ee2d42334a2c0072457 examples/library.js
+SHA1 6b401e0934e5686d5fc314be3a29ae0a62153e9f examples/library.php
+SHA1 9ccd121add886197f7c575752c985ff3d32453bc examples/query.pl
+SHA1 2b835710b37bdb26771f203c22beaa3ff23de199 lib/EntityModel.pm
+SHA1 b52368632f5e1e4cbdc83fd6557788ea8b91ccce lib/EntityModel.pod
+SHA1 00b3bc18eba382dfe42b1b9ef675c76094a6cee6 lib/EntityModel/App.pm
+SHA1 1f98593ff1f030649fd87e424ae2151844efbb14 lib/EntityModel/App.pod
+SHA1 24a37724cd1d8e43e54ebb34b6fcd50e6e1928ef lib/EntityModel/Async.pm
+SHA1 8249b463ce9f5d7c71c9afbbe8c1bbdd4516fa44 lib/EntityModel/Async.pod
+SHA1 ab01e64bfa6d9916457d944dc15e7a013ec0a12f lib/EntityModel/Cache.pm
+SHA1 7ea36a2fd2fd35558d56af6c9e98e70f17d71346 lib/EntityModel/Cache.pod
+SHA1 89b679fbe7d22713de441623821673d002aeff72 lib/EntityModel/Cache/Perl.pm
+SHA1 8b94f0579dfb1d3672eb379bec54055c0a5a7988 lib/EntityModel/Cache/Perl.pod
+SHA1 54986c8143dcde796097cf5a8cc64fa97c6a9a45 lib/EntityModel/Collection.pm
+SHA1 811c5b18ff5e1e2660b2767a214f010f15fd928b lib/EntityModel/Collection.pod
+SHA1 2f5f2b194aff89d0af2cf7e1c0fcdb40f317c26e lib/EntityModel/DB.pm
+SHA1 eca0bcfe456cf43377683d6c16d738cab9e977ae lib/EntityModel/DB.pod
+SHA1 aea737531e658001da45f18f6cc5ce217aaff553 lib/EntityModel/Deferred.pm
+SHA1 4e9e0ea3a694142d8adc052906a94564d452ff4c lib/EntityModel/Deferred.pod
+SHA1 f6a77415d815e1a1c50326a033477b6b3c8c5033 lib/EntityModel/Definition.pm
+SHA1 2341f575805f46165e080bf7c61ac3648f00ba25 lib/EntityModel/Definition.pod
+SHA1 10999f4638113210a76439343b84a658e1b61e7d lib/EntityModel/Definition/JSON.pm
+SHA1 5a06297437a0ba74221317fcfffc8f74f9595cd4 lib/EntityModel/Definition/JSON.pod
+SHA1 cec3b1f79cd9d150119ef4157032204ecc941c61 lib/EntityModel/Definition/Perl.pm
+SHA1 d27fed14e22b4aeb65ec915a6b13468edf2979c9 lib/EntityModel/Definition/Perl.pod
+SHA1 9cc9a2bc289138c262690fbfb61081ec0045ef65 lib/EntityModel/Definition/XML.pm
+SHA1 81bd5d3d515433e8324444161d61891d68a87fcf lib/EntityModel/Definition/XML.pod
+SHA1 f1ba530823e0a3acb457f14acaf7f1ad34e10f0a lib/EntityModel/Entity.pm
+SHA1 80ff45e9827571009f7f37f35272c6b7c7d2f7fe lib/EntityModel/Entity.pod
+SHA1 81434858bbbffcd2b4e83b8fd0db6fa7b01811a8 lib/EntityModel/Entity/Constraint.pm
+SHA1 28cd056f33809df3ed711563dc33d36fcfc85649 lib/EntityModel/Entity/Constraint.pod
+SHA1 19ef6d6f36c590b779df9b2f5be7e6760dd353fd lib/EntityModel/EntityCollection.pm
+SHA1 4a85d702eadeefcab24774d35a1d9b40902e3dbe lib/EntityModel/EntityCollection.pod
+SHA1 474a64e75fb93effc7d73c69fdba2bf3993c7ec4 lib/EntityModel/Field.pm
+SHA1 29da0c913d5368f9d880837db810a4bc41bc3768 lib/EntityModel/Field.pod
+SHA1 daf926854557409581dce867ea2704ce51a03c93 lib/EntityModel/Field/Refer.pm
+SHA1 437aa917a67e2a8d7540c17cc5b478a20e4fc935 lib/EntityModel/Field/Refer.pod
+SHA1 18e6c7447c11715565ac36a9d8778c5f559b741e lib/EntityModel/Gather.pm
+SHA1 9a2138641165338fdc9b0384b03fe717846b5d78 lib/EntityModel/Gather.pod
+SHA1 4d642e6535bb9708a7202e4aeb931eadb249698a lib/EntityModel/Model.pm
+SHA1 119dd4c9e103d6bba6d3da6639388fae4c9bbf97 lib/EntityModel/Model.pod
+SHA1 fcafc37f467516f52385d4ce07876795e643cfad lib/EntityModel/Plugin.pm
+SHA1 f6f821f7a839bcf6f8d68ed4f8191b2f45228118 lib/EntityModel/Plugin.pod
+SHA1 10e483ebfed0f27b367add44b38440d34ce3a7e3 lib/EntityModel/Query.pm
+SHA1 923242727a728eb227e00e4585d0a75381d0791e lib/EntityModel/Query.pod
+SHA1 b4bc2ba8a5fe44031c62e702e4219e469674a613 lib/EntityModel/Query/Base.pm
+SHA1 0e1820ce6f13ee08192e24893f874cdabfc0a332 lib/EntityModel/Query/Base.pod
+SHA1 6b803268ba87c97d0e29b7b2760d3ee63f5d0df4 lib/EntityModel/Query/Condition.pm
+SHA1 63bf916f64a65c456e9a3e5cdafa240f7157f254 lib/EntityModel/Query/Condition.pod
+SHA1 46d58a7df0e26f2e7cf893c481cbf3d4ad6dc6b3 lib/EntityModel/Query/Delete.pm
+SHA1 51a283411202a5207e8617e8100dc8f7c6d0fdea lib/EntityModel/Query/Delete.pod
+SHA1 b3f7e20c9eaedc6b8d2b11ec772647676337860c lib/EntityModel/Query/Except.pm
+SHA1 ad0239b386b0126c54617e99098a15992a2dffb7 lib/EntityModel/Query/Except.pod
+SHA1 36197e3568bd73088ee97dae73ec0ec4dced02e9 lib/EntityModel/Query/Field.pm
+SHA1 84299dda31590151403970857ad687b55665f8dc lib/EntityModel/Query/Field.pod
+SHA1 b862a3cd8bb23f828e5766a407badf597c654a01 lib/EntityModel/Query/FromTable.pm
+SHA1 3db99262c76e023b9c966baf3b735c4843f5d2e8 lib/EntityModel/Query/FromTable.pod
+SHA1 ddebe950915cdf1216c743cceda48e09be69345b lib/EntityModel/Query/GroupField.pm
+SHA1 f10d19d4db87a936ed39c74f380235c61bbb507d lib/EntityModel/Query/GroupField.pod
+SHA1 5a7770533ea1574166a1ff76dc52feaed252edda lib/EntityModel/Query/Insert.pm
+SHA1 76b1a380c274e8ed72b56640d07436be32dec16f lib/EntityModel/Query/Insert.pod
+SHA1 640bfdbc0a623a0e4b07727b97d6cd8286a9337b lib/EntityModel/Query/InsertField.pm
+SHA1 200ef1d62ef53ebf5492c122e7588385ef5c119a lib/EntityModel/Query/InsertField.pod
+SHA1 5aa43c39ae41deeeaf1d3efbd14ba4412fada4d9 lib/EntityModel/Query/Intersect.pm
+SHA1 587bb5429a081a4c8db805f367d3b1510e74830a lib/EntityModel/Query/Intersect.pod
+SHA1 2b0dd8cc1fbafb913cf2f302bea16e14e42367ef lib/EntityModel/Query/Join.pm
+SHA1 5face017a6bbc57c76a089b72036251d7019bcc2 lib/EntityModel/Query/Join.pod
+SHA1 b4179e9b4e88c5e3437586964e31a9d23b5056b4 lib/EntityModel/Query/JoinTable.pm
+SHA1 12fe2e702b4c6402800c826c48e6133227fdd667 lib/EntityModel/Query/JoinTable.pod
+SHA1 1e2970a044fb4b30b5cc467c3f5aa049a6a470fe lib/EntityModel/Query/OrderField.pm
+SHA1 f27011babd9c6149b994de78e6ea517ed4013e3c lib/EntityModel/Query/OrderField.pod
+SHA1 eb2007d453c99eca92bba1aab97886ae3dea0a82 lib/EntityModel/Query/ParseSQL.pm
+SHA1 ffe57eecc7cdecc2d3767d406ae7963e9298f847 lib/EntityModel/Query/ParseSQL.pod
+SHA1 c95120125c0130b293dab7f4d00cecb2c00130c9 lib/EntityModel/Query/ReturningField.pm
+SHA1 cdaca6c175d1256d7c08d06893c83e705823dfde lib/EntityModel/Query/ReturningField.pod
+SHA1 815a28cf14323f53a550e2c2810a3bc50b67845e lib/EntityModel/Query/Select.pm
+SHA1 127935af6bf20ff858a8576218de3cd85ec5271f lib/EntityModel/Query/Select.pod
+SHA1 4c6186c9edbe7c6fdd4c561f0ec8b9b4c43bb534 lib/EntityModel/Query/SubQuery.pm
+SHA1 ec8f05612241a1774c82a10037ef22502876bc76 lib/EntityModel/Query/SubQuery.pod
+SHA1 77fe028477efcba7d76e3938f5f390f1befb1411 lib/EntityModel/Query/Table.pm
+SHA1 c35fd4ccb598bff23f93b7cccd7229fdfedd49b8 lib/EntityModel/Query/Table.pod
+SHA1 869b5c173e23f752fef3751b9f49d17c26627677 lib/EntityModel/Query/Union.pm
+SHA1 d09b5e7d012aff5160d0af8c20169220a096136b lib/EntityModel/Query/Union.pod
+SHA1 07439b770f2127de2937a3faff577a10b2a1888f lib/EntityModel/Query/UnionAll.pm
+SHA1 0a3b52894e515433a793aa1017ba3d5721a16563 lib/EntityModel/Query/UnionAll.pod
+SHA1 13bb66d00a17680aa5331f966eab07f9d8000f79 lib/EntityModel/Query/Update.pm
+SHA1 27cc4394b6db78f9f6bfa1abf061184380308daf lib/EntityModel/Query/Update.pod
+SHA1 84964f1701c7cde762ef5c62d8ec024ea4caf8ce lib/EntityModel/Query/UpdateField.pm
+SHA1 78efbeb660a1905a08802c8cec2b674035a71e65 lib/EntityModel/Query/UpdateField.pod
+SHA1 5789349d4ab1dd29bc5b13f6e6a28dae65bb4899 lib/EntityModel/Resolver.pm
+SHA1 b499576ff47551a7a4d9740c63dd241d65164787 lib/EntityModel/Resolver.pod
+SHA1 d27bff1ae0ac5b06d7654c2b43005ea097fa4f48 lib/EntityModel/Storage.pm
+SHA1 6e259808173f828e550d0c736ef8692bb79e07e8 lib/EntityModel/Storage.pod
+SHA1 ba8c846a3c19c8bb7c538772c63e49f5f87712fd lib/EntityModel/Storage/Perl.pm
+SHA1 f9a2ed116c36d9aa99a598adefe5a2c83922c97c lib/EntityModel/Storage/Perl.pod
+SHA1 5894ce872cf6d0ada8c1df61539fd270e7c98770 lib/EntityModel/Storage/PerlAsync.pm
+SHA1 d97cc7f5d5af02b40690d94abd8949a539a0aaec lib/EntityModel/Storage/PerlAsync.pod
+SHA1 62f70854bf2b790a27a395e38a0dc6d271ee689a lib/EntityModel/StorageClass/KVStore.pm
+SHA1 25a4349a640e5ba5ba1c0cac568e589d746057c2 lib/EntityModel/StorageClass/KVStore/Layer.pm
+SHA1 cf25bb83331a819e8268aa5bf94ca10955620d78 lib/EntityModel/StorageClass/KVStore/Layer/Fake.pm
+SHA1 9d9ddf700864a8fe5b666530c0953f9a2e066695 lib/EntityModel/StorageClass/KVStore/Layer/Fake.pod
+SHA1 23621a7b4c996115ff1efba0b70a46e096ec90e9 lib/EntityModel/StorageClass/KVStore/Layer/LRU.pm
+SHA1 40d910b350479ab862a3605399d72682347534f8 lib/EntityModel/StorageClass/KVStore/Layer/LRU.pod
+SHA1 6419f4bc361f41975b6f6bb4df42735cd4156b1c lib/EntityModel/StorageClass/KVStore/Layer/Memcached.pm
+SHA1 7abc3c6ef1890b4a2681468235b0020bfa45d414 lib/EntityModel/StorageClass/KVStore/Layer/Memcached.pod
+SHA1 982635cb036209863ef1caa29934ff38d338673d lib/EntityModel/StorageClass/KVStore/Layer/PostgreSQL.pm
+SHA1 836dee5c1290a9a98bf261e37bfdcf9410ea81bb lib/EntityModel/StorageClass/KVStore/Layer/PostgreSQL.pod
+SHA1 11c1a40299da15c4206a78ece08505fc35573d14 lib/EntityModel/StorageClass/KVStore/Mixin/Deferred.pm
+SHA1 181289513bef83a64a6406fac82330dad4d2e272 lib/EntityModel/Support.pm
+SHA1 53f7c698c3a4dc7e9fba6f9e941045eeaaa91127 lib/EntityModel/Support.pod
+SHA1 2c95d29835581d9cd7aebe9a2958b31eb9859362 lib/EntityModel/Support/CPP.pm
+SHA1 d663cdf13217ed88082412c43bdfa45ab4eb51cc lib/EntityModel/Support/CPP.pod
+SHA1 496c49da6954116c21613061862f4f98adb7e526 lib/EntityModel/Support/Javascript.pm
+SHA1 77cee5c54bc7071640bb81c012cac3de8e0cf5a8 lib/EntityModel/Support/Javascript.pod
+SHA1 199d4fc2740ee1a5bff6da070304cc3ea0445663 lib/EntityModel/Support/Perl.pm
+SHA1 c9036cfa3a5592b2bfa0a1257d643ddb2de44a92 lib/EntityModel/Support/Perl.pod
+SHA1 7b6fe23d115ec936912896795483426d20d569e4 lib/EntityModel/Support/Perl/Base.pm
+SHA1 3dde004f0110b488044fed4d49d9f149e7c85ae2 lib/EntityModel/Support/Perl/Base.pod
+SHA1 3e740d1a29fdf22e5bbc2c96d1ce76b37eb5d210 lib/EntityModel/Support/Template.pm
+SHA1 01dbfd1d8bcb21722f398e4a86c53c6abfbd6d53 lib/EntityModel/Support/Template.pod
+SHA1 98e3ec5dc02a81df637ee0f40093551b2bab7715 lib/EntityModel/Template.pm
+SHA1 2cc0ac78e206e93f3d5ab646baa5307da6a3f450 lib/EntityModel/Template.pod
+SHA1 59496fe7204049467f5cc137b28081494c30954a lib/EntityModel/Test/Cache.pm
+SHA1 c6efaca38991051cb6d2a8079c2219e0161cf02f lib/EntityModel/Test/Cache.pod
+SHA1 9057d40eb79abc6d1b49a16e9d4d97b7c006d021 lib/EntityModel/Test/Storage.pm
+SHA1 0e439a5c415ea6611d214b73c60ace681690ac5f lib/EntityModel/Test/Storage.pod
+SHA1 60cc7ae6ad58d5461267ffc15d47a616ba06aa87 lib/EntityModel/Transaction.pm
+SHA1 77f759dad38f1c3026b4a454f8d87da8804006e9 lib/EntityModel/Transaction.pod
+SHA1 38a43da29c25b6445c43eb0d2845790e4ef0fc81 lib/EntityModel/Tutorial.pod
+SHA1 251fd03ffb0684536c5253e4ff4b72002d7424dd lib/EntityModel/Util.pm
+SHA1 328c3df02e43dcb4875f94ca6d280114719d631d lib/EntityModel/Util.pod
+SHA1 69686edf5ed10f7649297bdb143838cab3ffd3a9 lib/Test/EntityModel.pm
+SHA1 e134b4d595409876369181be04b609988e61500d lib/Test/EntityModel.pod
+SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 share/template/support/android.tt2
+SHA1 503cd96f977c908cc01a679f2431d8ace33bd97b share/template/support/c.tt2
+SHA1 2fb56aa6a371f16b2545be180c7cfd0684c43ada share/template/support/cpp.tt2
+SHA1 99a29bbb70efc7223bc7355d38239e6090d2d61a share/template/support/django.tt2
+SHA1 e76df361cf09a9da458392c5752f6067d87fe97b share/template/support/java.tt2
+SHA1 c7cc85926102216e20bea43375b22437525b5952 share/template/support/js.tt2
+SHA1 90f75289c4dda63c94bc5e897f4996b15d9e42dd t/00-check-deps.t
+SHA1 9edf0267a56a6fd1fc2ca57e332dda5599e2eb4a t/00-compile.t
+SHA1 0cb40883fa2a55a63607f222e30a3203fffde522 t/00-test-entitymodel.t
+SHA1 3ed2e380c9344c9f17c1f45bff437405c5bce165 t/app.t
+SHA1 bed349f22b71404e09b8675c438b21d679297ce1 t/async-storage-perl.t
+SHA1 6cff07bdc2fe7e45c3191adb7334f629808a2a33 t/async.t
+SHA1 5dcc0b28faa4e36067dd2f96d9cbfd76a6a5a231 t/cache.t
+SHA1 42ead6ff3bdde094d79ed5ae3e36067d080bf2d1 t/collection.t
+SHA1 2f7000ac41bbbe5d6125bf0f007d28f3f48cb223 t/deferred.t
+SHA1 fd3839954e553368fc7e2004f28d37279462c867 t/definition.t
+SHA1 85f69c3cfa80a28903481303ec8deda141331f3c t/entity-collection.t
+SHA1 fd69ee715730e707b8a3d27ab46f40f4dcc449ad t/entity.t
+SHA1 450125b4556df9b86b3d97683968a8586783e277 t/entitymodel.t
+SHA1 0c3650a1cac1985df8ffd5c2497be9fc1b77fe13 t/field.t
+SHA1 45a12cea100e37f38349189695155a67a8087f51 t/general.t
+SHA1 cdc6de59c275de108afcb8cc340bd1526caafb92 t/kvstore.t
+SHA1 25a47bec3dcc4f5b14525ec9e4e74902b3cbbf48 t/large-model.t
+SHA1 929604162e204a235432857f4b886682c3327641 t/new-api.t
+SHA1 f9220d322a5309fc287a5dff630b9f743ab92a8b t/plugin.t
+SHA1 854da3402b1b422866fbe78bb0d44dc031be100d t/query.t
+SHA1 0d2de6814b8909e2ebb451c9fda52324b192f857 t/resolver.t
+SHA1 8ea74090330e1e50e48f1be0fae8a23b546520c7 t/sharedir.t
+SHA1 cc8d82af85d903df0a54ef553f1714a8f77e1490 t/storage-create-entity.t
+SHA1 dbaed61c06c8523636dbad3717725b45c0f862ea t/storage.t
+SHA1 b79be57970af2dfcdd61e8ca10ec09b21a8ad08b t/support/c.t
+SHA1 d68e4f2869874f8a0b775100978d4c65e4826751 t/support/cpp.t
+SHA1 ea28ccbd91e6150fa7698460a510e32bd1c50f4f t/support/django.t
+SHA1 52f57d386b711d4c854658d45a19ff6d7a85d519 t/support/doctrine.t
+SHA1 3739004743e23ee9a8a4298323a3400d997baca6 t/support/java.t
+SHA1 12dcf49419e1c34981edd99dbcf7653dc1feb83f t/support/js.t
+SHA1 cf6d27676ba9960b5f097d952814ece90196f886 t/support/perl.t
+SHA1 52f57d386b711d4c854658d45a19ff6d7a85d519 t/support/propel.t
+SHA1 ea28ccbd91e6150fa7698460a510e32bd1c50f4f t/support/python.t
+SHA1 52f57d386b711d4c854658d45a19ff6d7a85d519 t/support/redbean.t
+SHA1 1963aa0f67da2ee938a960643654dfae2dd409b6 t/template.t
+SHA1 7e1c264a07411dbbf16885b40c8bf52cbcb25264 t/test-cache.t
+SHA1 c30cc97a63fa1055f6753896d393cda12e584b8b t/test-storage.t
+SHA1 124f231670119306f120e8fb59704bf08eea25cb t/transaction.t
+SHA1 6f846f7ede312098a614207bcea6fdb2207b8030 xt/author/test-eol.t
+SHA1 198d1665317c3d91e3bb81f0a3b8dad8d4d66f20 xt/release/common_spelling.t
+SHA1 c6c3c9f7fe12058b4771449dff874b1c450c982c xt/release/mojibake.t
+SHA1 9934d36e45e1143c1a54658bc48872e0591af41b xt/release/pod-syntax.t
+SHA1 bbcd59d081d9940af5d43337ae85458075933829 xt/release/test-version.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQEcBAEBAgAGBQJSLLBWAAoJEFKElMNpjtyDn20H/A3W6mgMferPRYjtOTqj3vhN
+6txC4cY2CKUdWT6VqRcu54NJA0V8grrF7U/ydP0/6kGQSLVraTr7kxzX1F81IUgw
+HvPZXFN8e5Lfs/6PknJn0jM36mfRlFr5y54MRLdPyp1W3JLhB9AfCLy2eIxtp1O9
+yV+Hk8XNOVzlNaNs5CCKaSNcsqUBAt9s6Oz0vYjA4kASWcfSvveaFKLfMBoV/cf3
+xPrVXrzS9VWEqs15hYbENQDkHPTgQxKwYKSSSUEOMoIIGLytNoxI56LNInKSWH71
+a5sCLHTDQZfzETlKFO5KGqLolEL0+OdmGmWY6J+Ty0SXAyKgiWUAo4gbJUwXB0s=
+=TGpy
+-----END PGP SIGNATURE-----

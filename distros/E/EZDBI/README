@@ -1,0 +1,6 @@
+EZDBI provides an easy, simple interface to SQL databases from Perl.
+You are not required to manage the DBI objects yourself,  everything
+is done behind the scenes.  Complex queries are possible. All you do
+is call the functions.  If you're retrieving data,  it comes back as
+a simple array (of arrays);  although additional control is possible.
+See the enclosed sample.pl an example program written with EZDBI.

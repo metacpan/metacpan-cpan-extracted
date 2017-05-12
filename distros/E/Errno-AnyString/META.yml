@@ -1,0 +1,34 @@
+---
+name: Errno-AnyString
+version: 1.03
+author:
+  - 'Dave Taylor <dave.taylor.cpan@gmail.com>'
+abstract: put arbitrary strings in $!
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Carp: 0
+  Exporter: 0
+  Scalar::Util: 0
+  perl: 5.006
+build_requires:
+  Config: 0
+  English: 0
+  Errno: 0
+  ExtUtils::CBuilder: 0
+  File::Slurp: 0
+  Module::Build: 0
+  Scalar::Util: 0
+  Test::Exception: 0
+  Test::More: 0
+  Test::NoWarnings: 0
+  Test::Taint: 0
+provides:
+  Errno::AnyString:
+    file: lib/Errno/AnyString.pm
+    version: 1.03
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,11 @@
+Revision history for ExtUtils-Autoconf
+
+0.02	Thu, 07 Sep 2006 15:05:08 +0200
+		- Better documentation for EU::MM and M::I Makefile.PLs
+		- Deprecated reconf() in favour of autogen(). reconf() still works, but
+		  isn't documented anymore.
+		- Added a Makefile.PL example for EU::MM.
+
+0.01    Sun, 03 Sep 2006 13:59:31 +0200
+        - First version, released on an unsuspecting world.
+

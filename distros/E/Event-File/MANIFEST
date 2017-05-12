@@ -1,0 +1,10 @@
+README
+INSTALL
+Changes
+MANIFEST
+Makefile.PL
+lib/Event/File.pm
+lib/Event/File/tail.pm
+test.pl
+demo/tail.pl
+demo/read_file

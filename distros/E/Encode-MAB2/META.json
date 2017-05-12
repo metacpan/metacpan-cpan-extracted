@@ -1,0 +1,51 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005",
+   "keywords" : [
+      "German library metadata"
+   ],
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Encode-MAB2",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "BerkeleyDB" : "0.20",
+            "Encode" : "1.41"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "git://github.com/andk/Encode-MAB2.git"
+      }
+   },
+   "version" : "0.09",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

@@ -1,0 +1,47 @@
+---
+abstract: 'Exporting done right'
+author:
+  - 'Chad Granum <exodist7@gmail.com>'
+build_requires:
+  Fennec::Lite: '0.004'
+  Test::Exception: '0.29'
+  Test::Simple: '0.88'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4212, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Exporter-Declare
+provides:
+  Exporter::Declare:
+    file: lib/Exporter/Declare.pm
+    version: '0.114'
+  Exporter::Declare::Export:
+    file: lib/Exporter/Declare/Export.pm
+  Exporter::Declare::Export::Alias:
+    file: lib/Exporter/Declare/Export/Alias.pm
+  Exporter::Declare::Export::Generator:
+    file: lib/Exporter/Declare/Export/Generator.pm
+  Exporter::Declare::Export::Sub:
+    file: lib/Exporter/Declare/Export/Sub.pm
+  Exporter::Declare::Export::Variable:
+    file: lib/Exporter/Declare/Export/Variable.pm
+  Exporter::Declare::Meta:
+    file: lib/Exporter/Declare/Meta.pm
+  Exporter::Declare::Specs:
+    file: lib/Exporter/Declare/Specs.pm
+requires:
+  Carp: '0'
+  Meta::Builder: '0.003'
+  Scalar::Util: '0'
+  aliased: '0'
+  perl: v5.8.0
+resources:
+  bugtracker: http://github.com/exodist/Exporter-Declare/issues
+  homepage: http://open-exodus.net/projects/Exporter-Declare
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/exodist/Exporter-Declare
+version: '0.114'

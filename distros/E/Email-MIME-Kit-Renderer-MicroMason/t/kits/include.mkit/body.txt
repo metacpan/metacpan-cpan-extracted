@@ -1,0 +1,11 @@
+<%args>
+$email
+$name
+$cid_for
+</%args>
+
+<& "includes/header.msn", %ARGS &>
+
+Welcome to WY Corp.
+
+<& "includes/footer.msn", %ARGS &>

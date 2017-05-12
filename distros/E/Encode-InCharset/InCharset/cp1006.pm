@@ -1,0 +1,75 @@
+# This is auto-generated.  Do not edit by hand!
+package Encode::InCharset::cp1006;
+our $VERSION = do {my @r = (q$Revision: 0.1 $ =~ /\d+/g); sprintf "%d."."%02d"x$#r, @r};
+sub InCP1006{
+	return <<'END';
+0	A0
+AD
+60C
+61B
+61F
+6F0	6F9
+FB56
+FB58
+FB66
+FB68
+FB7A
+FB7C
+FB84
+FB8A
+FB8C
+FB92
+FB94
+FB9E
+FBA6
+FBA8	FBAA
+FBAE
+FBB0
+FE7C	FE7D
+FE80	FE81
+FE85
+FE89	FE8B
+FE8D	FE8F
+FE91
+FE93
+FE95
+FE97
+FE99
+FE9B
+FE9D
+FE9F
+FEA1
+FEA3
+FEA5
+FEA7
+FEA9
+FEAB
+FEAD
+FEAF
+FEB1
+FEB3
+FEB5
+FEB7
+FEB9
+FEBB
+FEBD
+FEBF
+FEC1
+FEC5
+FEC9	FED1
+FED3
+FED5
+FED7
+FED9
+FEDB
+FEDD
+FEDF	FEE1
+FEE3
+FEE5
+FEE7
+FEED
+FEF1	FEF3
+END
+}
+1;
+__END__

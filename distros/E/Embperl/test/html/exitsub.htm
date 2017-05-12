@@ -1,0 +1,27 @@
+<html>
+<head>
+<title>Tests for Embperl - request exit sub</title>
+</head>
+
+
+<body>
+
+Before Exit
+
+[- 
+if ($param[0])
+    {
+    exit (200) ;
+    }
+else
+    {
+    exit ;
+    }
+        
+    -]
+
+After Exit
+
+[+ "perl after exit" +]
+
+</body>

@@ -1,0 +1,34 @@
+---
+abstract: 'too tiny exception interface'
+author:
+  - 'Kazuhiro Osawa E<lt>yappo {@} shibuya {dot} plE<gt>'
+build_requires:
+  Test::More: 0.98
+  Test::Requires: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Exception-Tiny
+no_index:
+  directory:
+    - inc
+provides:
+  Exception::Tiny:
+    file: lib/Exception/Tiny.pm
+    version: v0.2.1
+requires:
+  Class::Accessor::Lite: 0.05
+  Data::Dumper: 0
+  Scalar::Util: 0
+  parent: 0
+  perl: 5.008005
+resources:
+  homepage: https://github.com/yappo/p5-Exception-Tiny
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/yappo/p5-Exception-Tiny.git
+version: v0.2.1

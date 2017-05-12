@@ -1,0 +1,33 @@
+<html>
+<head>
+<title>Tests for Embperl - ErrorDocument</title>
+</head>
+
+<body>
+
+This page is shown due to an ErrorDocument redirection<p>
+
+
+main: 
+^prev: Apache.*?=SCALAR
+next: 
+^There are (4|9) errormessages:
+
+<table border=1>
+^-	<tr><td>\[\d+\]ERR:  32:  Warning in Perl code: Unquoted string &quot;qqqqqqqqqqqqqq&quot; may clash with future reserved word
+
+^-	<tr><td>\[\d+\]ERR:  32:  Warning in Perl code: Bareword found where operator expected at 
+^-
+^-	<tr><td>\[\d+\]ERR:  32:  Warning in Perl code: 	\(Missing operator before is\?\)</td></tr>
+^-
+^	<tr><td>\[\d+\]ERR:  24:  Error in Perl code: syntax error at 
+^syntax error at 
+^syntax error at 
+^syntax error at 
+^}&quot;
+^-Missing right curly or square bracket at
+</table>
+
+</body>
+</html>
+

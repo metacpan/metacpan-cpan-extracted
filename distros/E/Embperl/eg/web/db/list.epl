@@ -1,0 +1,139 @@
+[-
+$r = shift ;
+$set = $r -> {item_set} ;
+$$set -> Reset ;
+
+$tt = $r->{category_set}{table_type};
+$cy = $r->{category_types};
+$cf = $r->{category_fields};
+$cfnl = $r->{category_fields_nolang};
+$title_type = $r->{category_title_type};
+$fdat{-mode} = $udat{-displaymode} = $fdat{-mode} || $udat{-displaymode} ;
+
+-]
+
+[$ sub show_field $]
+    [* my ($type, $rec) = @_ ; *]        
+            [$ if $r->{category_types}{$type} =~ /url/ $]
+                <A HREF="[+ do { local $escmode = 0; $rec -> {$type} } +]">[+ $rec -> {$type} +]</A>
+            [$ elsif $cy->{$type} =~ /pulldown/ $]
+                [+ $r->app->get_title($r,$type,$rec->{$type}) +]
+            [$ else $]
+                [- $txt = $rec -> {$type}; -]
+                [$ if $fdat{-mode} eq 'shortlist' $][-
+                    $txt =~ s/\s+/ /gom;
+                    if ( length ($txt) > 85 ) {
+                        $txt = substr ($txt, 0, 80) . " ..." ;
+                    }
+                -][+ $txt +]
+                [$ else $][-
+                    @txt = split (/\n/, $txt);
+                -][$ foreach $t (@txt) $][+ $t +]<br>[$ endforeach $]
+                [$ endif $]
+            [$ endif $]
+[$endsub$]
+
+[$ sub show_edit $]
+    [* my ($rec) = @_ ; *]        
+    [[
+
+      [+ $rec->{email} +] | [+ $date +]
+      [$ if ($r->{user_id} && $r->{user_id} == $rec->{user_id}) || $r->{user_admin} $]
+        |
+        [+ $r -> gettext($r->{item_set}{state} ? 'display' : 'hide') +]
+        |
+        <A HREF="show.epl?[+ $tt +]_id=[+ $rec->{$tt.'_id'} +]&-show_item=1&category_id=[+ $rec->{category_id} +]">View</A>
+        |
+        <A HREF="add.epl?[+ $tt +]_id=[+ $rec->{$tt.'_id'} +]&-edit_item=1&category_id=[+ $rec->{category_id} +]">Edit</A>
+      [$ endif $]
+      |
+      <a href="#top">Top</a>
+    ]
+
+[$endsub$]
+
+<p>
+[= displaymode =]:
+&nbsp;[[<a href="list.epl?[+ { %fdat, -mode => 'shortlist' } +]">[= shortlist =]</a>]
+&nbsp;[[<a href="list.epl?[+ { %fdat, -mode => 'longlist' } +]">[= longlist =]</a>]
+&nbsp;[[<a href="list.epl?[+ { %fdat, -mode => 'tab' } +]">[= table =]</a>]
+</p>
+
+<table width="100%" border="0" cellspacing="0" cellpadding="6">
+<tr>
+<td class="cPodH1">[+ $r -> {category_set}{category} +]<br>
+                   ([= items_of =] [+ $r -> {user_email} +][+ $r->{user_admin}?"[admin]":'' +])</td>
+<td class="cPodH1Link"><a href="add.epl?category_id=[+ $fdat{category_id} +]">[= add_item =]</a></td>
+</tr>
+<tr><td colspan="2" height="5"></td></tr>
+</table>
+
+
+<table width="100%" border="0" cellspacing="3" cellpadding="4">
+[$ if $fdat{-mode} eq 'tab' $]
+[# --- tabelle --- #]
+<tr>
+[$ foreach $type ((@$cfnl, @$cf)) $]
+    [$ if $r->{category_types}{$type} !~ /static/ $]
+        <td valign="top" bgcolor="#bbbbdd">
+<a href="list.epl?[+ { %fdat, -order => $type } +]"><b>[+ $r->{category_texts}{$type.'_text'}
++]</b></a></td>
+    [$endif$]
+[$ endforeach $]
+</tr>
+[$else $]
+[# --- liste --- #]
+  <colgroup>
+    <col width="5%">
+    <col width="90%">
+    <col width="5%">
+  </colgroup>
+[$endif$]
+  
+  [- $$set -> Reset -]
+[$ while ($rec = $$set -> Next) $]
+
+[$ if ($r -> {user_id} and (($r -> {user_id} == $rec->{user_id}) or ($r -> {user_admin}))) $]
+[-
+$date = $rec -> {modtime} ;
+$date =~ /^(\d+)-(\d+)-(\d+)/ ;
+$date = $r -> param -> language eq 'de'?"$3.$2.$1":"$1-$2-$3" ;
+-]
+
+[$ if $fdat{-mode} eq 'tab' $]
+[# --- tabelle --- #]
+<tr>
+[$ foreach $type ((@$cfnl, @$cf)) $]
+    [$ if $r->{category_types}{$type} !~ /static/ $]
+        <td valign="top" bgcolor="#eeeeee">[- show_field($type, $rec) -]</td>
+    [$endif$]
+[$ endforeach $]
+        <td valign="top">[- show_edit($rec) -]</td>
+</tr>
+[$else $]
+[# --- liste --- #]
+<tr>
+  <td colspan="2"  class="cPodH2">
+    [$ if $cy->{$title_type} =~ /pulldown/ $]
+     [+ $r->app->get_title($r,$title_type,$rec->{$title_type}) +]
+    [$ else $]
+      [+ $rec -> {$title_type} +]
+    [$ endif $]
+  </td>
+  <td align="right" nowrap class="cPodH2Link">[- show_edit($rec) -]</td>
+</tr>
+
+
+[$ foreach $type (grep { $_ ne $title_type } (@$cfnl, @$cf)) $]
+    [$ if $r->{category_types}{$type} !~ /static/ $]
+        <tr>
+        <td valign="top"><b>[+ $r->{category_texts}{$type.'_text'} +]</b></td>
+        <td colspan="2" valign="top">[- show_field($type, $rec) -]</td>
+        </tr>
+    [$endif$]
+[$ endforeach $]
+[$endif$]
+[$ endif $]
+[$ endwhile $]
+</table>
+

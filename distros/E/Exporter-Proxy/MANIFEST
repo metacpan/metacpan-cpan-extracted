@@ -1,0 +1,12 @@
+MANIFEST
+Makefile.PL
+Changes
+lib/Exporter/Proxy.pm
+t/01-import-symbols.t
+t/04-dispatch.t
+t/02-exports.t
+t/05-dispatch-install.t
+t/00-use.t
+t/03-export-multiple.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

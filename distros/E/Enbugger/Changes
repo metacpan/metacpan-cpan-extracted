@@ -1,0 +1,200 @@
+Revision history for Perl extension Enbugger.
+
+0.01  Wed Jul 11 20:29:41 2007
+  - original version; created by h2xs 1.23 with options -n Enbugger
+
+0.02  Thu Jul 12 2007
+  - Attempt to load @{"_<$file"} arrays
+  - Added caveats
+
+1.00  Christmas, 2007
+  - Removed a pile of XS
+
+1.01  Xmax, 2007
+  - Fixed bugs. Don't bother with 1.00
+
+1.02 Jan 6, 2008
+  - Discovered that this doesn't work on 5.5.
+  - Added B::Utils to the prereq list. It was missing.
+  - Added overridable ->debugger method.
+
+1.03 Jan 15, 2008
+  - Got source handling to work
+  - Added some real tests
+
+1.03_01 Jan 20, 2008
+  - 20expect.t doesn't require PadWalker anymore
+  - .perldb is chmod 0644 to defeat perl5db.pl
+  - Black magic DB::proceed_at
+  - Not released yet
+
+1.06 Feb 24, 2008
+  - Work done as part of "Hack Week" at WhitePages.com.
+  - Separated out Enbugger::Restarts
+
+2.000 Wed Jun 11, 2008
+  - Massive change
+  - Rewrote too much of the API so now it's a new major version
+  - Wrote tests for most of everything
+  - Documented (at least with stubs) most of everything
+  - Clarified licence
+  - etc.
+
+2.001 Wed Jun 11, 2008
+  - Applied copyright & license text to all source files
+  - Enbugger.pm's compilation is more straightforward
+  - Added Emacs formatting declarations to all source files
+  - Added notes to non-default debugger hooks that they aren't implemented yet
+  - Fix 2.000 notes. They used to say they were 2.001 but *this* is 2.001
+
+2.002 Wed Jun 11, 2008
+  - `make clean` deletes Enbugger-*
+
+2.003 Fri Jun 13, 2008
+  - Installing Enbugger while Enbugger is loaded and running works a bit better now.
+
+2.004 Thu Jun 19, 2008
+  - Add breakpoints. Hope it works. Tests come later.
+
+2.005 Thu Nov 13, 2008
+  - Always load @{"_<..."} arrays as PVIV or greater. This prevents assertion failures on debugging perl.
+  - Quieted a warning in t/11load.pl
+
+2.006 Wed Jun  3, 2009
+
+7ee669f2099e03ef15db52c4efe16cf3acd8803d Eliminate some *DATA handles
+687b3f7e83f94841915e7c8f2b7649809209fdbc NYTProf declines to instrument Devel/NYTProf.pm, Devel/NYTProf/Core.pm, Time/HiRes.pm
+8cfb669edcf810e4596ab55432022565f1148662 Silence "only once" warnings
+ddbf1debc744a16f08d7d6f2d2bfd09f1b894dbf instrument_runtime for NYTProf
+c8ca0915ed1aa505b13dbcb48156b46dea92e4d7 TODO: detect INIT for NYTProf
+fe79edf3d327039db9ae03afb3920f91900e8227 Remove warnings
+5cb0bb8750c4bbb5a1e512de3d9295836c180c39 whitespace
+5a1cdb417e1b5d5a6eb1ae89539136142e05f07b Initialize the debugger for NYTProf but let it set $^P
+73e1f62f0c242dd63b0a70067bff3d1d0087c88e Avoid instrumenting NYTProf and Time/HiRes for NYTProf
+3b801043d22edb276fd274921ebb25aa8a513def Initialize the debugger for NYTProf but let it set $^P
+f4c62c6b6d1489ec6d5b2463252799a1a54e87e6 Enbugger::NYTProf uses B::Utils so it should use() it
+593c5f7ce6b4b6e0a76bbc74c4a9eaa88a2a8e45 Enbugger::NYTProf rewrites o->op_ppaddr using PL_ppaddr
+639d2d3e91e5b12edf67f4f9e2cfeabbbfe37c59 Renaming to lib/Enbugger/NYTProf.pm
+bc448b0795003285cc9cb6d82758cb91a8219dbc Renaming lib/Enbugger/nytprof.pm away to fix my mac
+98f33afd12dee727d4475ccb508e50663e7e4ad4 Auto-register NYFProf
+e7747b6bae920b747261316048b93def7e18cf9c _compile_with_{dbstate,nextstate} are methods now for overloading
+206c76c3ee676df29b34daa8d2fc7a7ed408009d Add NYTProf hooks
+
+2.007 Sat Jun  6, 2009
+
+a4568f664795be6d4c31ea482883eab5410bf955 Re-up copyright statement
+bf56bcd89dc5caf1ec835c723c0434aeb874714f Add NYTProf tests
+a8921eb4f03bf4daa55449daa3aeefb651b8d9f7 Add gdb + RemotePort example
+e34668c6328eccf78de2aa358c0c52d2a29c16ae cleaning
+
+2.008 Sat Jun  6, 2009
+
+105058c0a96f4623d57be298a866ce0919ee0fa4 Add empty .perldb to override the user's own file
+
+2.009 Sat Jun  6, 2009
+
+2f6f0979afd7bcd65df44bcd595dc78be837f41e Provide ROWS/COLUMNS for clients that will probably die otherwise when trying to use Term::Readkey. Hope this works
+193a1cfc6a3152dae1870f2015dea79f310293ba Test's own .pl files dump their errors to STDERR
+
+2.011 Sun Mar 20, 2011
+
+0159a66 2.011
+2669705 2.011
+48aa9f6d45fa4d9d8c3d912791046c34b5784564 Declare PERL_CORE for perl-5.13.10+
+d689f2ecff625a76b471f244eb5e1ea33612e791 Only run NYTProf test when NYTProf is available
+3a15287409d9bcf97a0382e85ad5091de426e559 s/Perl_init_debugger/init_debugger/ because of PERL_CORE
+4ce6004f20b7f112c6dff6a98d46d04b2e950341 Declare PERL_CORE to pick up pp_proto.h
+a483f49f13a96f5f7a8bada520837da8dea8acb1 Don't daemonize xterm-server/screen-server/tmux-server by default
+ee46818d439982e9c6cb48dcad8d8ccd3b8e6d97 Oops, add another arg to truncate
+1da611b54840dc9b762cf2979187aab83f1bb026 Move use/require statements to nearby where they're used so child processes aren't bigger than they need to be
+8a0e9b967d1644ca193fcd63c484769117330ad5 Add comment documentation
+7982ecf1a9b0ee9fdb1f90a8ee8fdbb485e50375 Quash "once" warnings for FindBin::Bin
+ca9fc6536aab575cec7bc77b0ea2553ff042f9bd Drop 5.10 requirement
+bdf11b1b6d92505befef8e747f89891c47785394 Sleep until tmux screen writes the tty
+a8d52f83453dcbcd6b894ff828def919e52ef1d6 Annotate kill w/ signal names
+a4919c4f04c630f8fb3d6e9111c346bec2805207 Drop autodie
+a71886f8cfbacae2f3fcdca9a736b07f990007bf Print system() info on --debug
+61182c7db61ff5be8e4de6cdc92799e45091cac4 Print system() info on --debug
+3cd8dc686b6da128ceb4f07fe85fceea9d114805 Load File::Temp only if success is nigh
+f375a880f0dfd3096de634162e598fdb4451ab5b Daemonization is optional
+c0c7809a12b2d7af320ca9d157b8e52dc3922944 Drop SIGCHLD handling because reaping is going parent-first, not the other way around
+05cc719bc1987b3fca4fa2bacc1d733104e75480 Print exec() info on --debug
+ce91ceb6be50b54826ba13e47a7b198487237fa9 Fix --debug flag
+be34f08792dba4cbd807df80b129bb26fad0f64f Oops, avoid 5.10ish //= when I can be 5.005 friendly with "if ! defined"
+91cdc4877e72ba58ecc56d30fce9b6ed3c733059 Load FindBin only if success is nigh
+c7695e193519b9eec43126d3436fad3f39ccbed6 Load Pod::Usage only if needed
+d6c4bf3536af7c60696b28e0a8b692f215b860d0 Load Pod::Usage only if needed
+b23b4440a5badd645be70796df95d88629f58954 Fix --debug flag
+ffc6cef8cea8526d951a2aa942e8c79e6452c492 Remove autodie
+fc40240f3224ed849133f7da36205fb9a719bd77 Print exec() info on --debug
+a787fafb39b0df68aad19ca535691ee2e82cd196 Close the socat log file
+e8393db340698f6aaa7808c9d82c641b137cb0df Unify STDERR to STDOUT so exceptions will be fed *somewhere*
+955b0d4c1066066d15df3349ab5bc5cc25ce2a19 Print exec() info on --debug
+ee9722833f86ae8bb177365694402cf880e64811 Kill with signal names, at least commented
+c5207b9c4f4f1a88bff064b97feded623c499289 Use 5.005 safer regexp capturing
+6edfd35014143d1f897fedcc782e6c739b43f957 Sleep until the top socat has logged something or died
+ca1beacba647a6cb8eeabdc09864718bad2ff528 Ignore SIGCHLD to auto-reap children
+f01526c81970124158d7cbb5150652848a0aeb38 Unindent
+9ecfabb9990a98f8eff638ff6933a9a9e1d13321 Use 5.005 safer control structures
+d9fe91d423f6529fbee22bfa50d7f8cafe6ce6aa Stop ignoring SIGCHLD so system() won't ever throw an error that it's waitpid() has already been handled
+3394bba47e6486606eb34f99e204cdfd5108b421 Load File::Temp only if success is nigh
+49b9feb97df4536af74275ea53915cec71464766 Load Pod::Usage only if needed
+b691286c0e04edffe21324918f357d1b8d0bf958 Use 5.005 safe warning
+017ecc7ceaa18c42e50737f31e82c3844852c56d Load FindBin only if success is nigh
+fe5e029ed8315a755e66a1e7de0085fdcd89962a Load Pod::Usage only if needed
+f8a1800b6119bc7f927aab847ced2823769740c4 Oops, avoid 5.10ish //= when I can be 5.005 friendly with "if ! defined"
+8ceda561fd8581ce9bf944f50d18957e345bfc12 Fix --debug flag
+2153cec0ee7d8455f5bcb704bc1692aaf8eba305 Annotate kill w/ signal names
+d878aef2e4c1357594682e45d8bc0440e5ea6036 Be 5.005 safer
+d72c54e971a422bfa3e601c20d62f28e39d4b4c9 Add --daemonize option to xterm-server-backend
+0e74e994e24f409f8c15e1f28fdcde601ac31ef5 Oops, avoid 5.10ish //= when I can be 5.005 friendly with "if ! defined"
+cd6e1c9eafbebbfc3b83a2ba1f392de00ebd6dea add --debug to help text
+030475697dc6722fae918e5dee153fb383f0d6e2 xterm-server in debug mode prints exec() string
+532f23e655f6ea646d00dd4415ff32ef9c97627b Fix debug flag
+35e6dd8adf055603253e374623f65be4a32fca6b Disable warnings in ignorable places
+fda2b3d8afc7b3efd239692d9ed72c61acda4906 Only syswrite() and close() the tty if the tty is actually opened
+5d0fe29bca4ce88d162df88636f9d6e831452520 Remove autodie
+774d6436c69e09ed50008b33e8322b2ef19c54d9 Check for failure to launch socat
+61fb7f2b278d24ba03da47357eee8790a49e3c30 Check for failure to extract xterm's tty
+f24cabd44d432d53e9f4bc0c5285bd01cfbb2ebc Check for failure to launch xterm
+6357b294da546be971fda614238f6b8eb2af7598 Add TODO for readline
+62348c8a29ec4a61fb6f9afe0c025668c676cf36 Stop ignoring SIGCHLD so system() won't ever throw an error that it's waitpid() has already been handled
+5010c0b7022c7f5e2ea612b3fd24f6cad72abc38 Unify STDERR to STDOUT so exceptions will be fed *somewhere*
+2db7b261fa3353a6b54cc229aa8d899c5cc4d83b Be 5.005-safe
+8e628226bdd1df885d859e0668d65ce8022d429e Be 5.005-safe
+3a5757a874e30909b05efb4761565d52a85d3b32 Avoid loading Pod::Usage unless needed
+c6119a16d7fd2546616aceb075e9c616b2d3fbd9 Add tmux-server
+2f9f9c7f13170fa0d0ad89313030cc293f6cfff3 Add bin/screen-server and bin/xterm-server
+e6455a4dc4b8e6899fb4f94ceafa26bd260e2dd6 Executable flag on for eg/exception2
+
+2.012
+
+3dacadc 2.012
+c2fbeab Fixup MANIFEST
+9e1017f Handle noTTY
+3f89c0a Untabify
+5a23491 Substitute %d for %UVuf in format for U32 parameters
+56363b5 Escape % in format
+
+2.014
+
+Many thanks:
+  Robert Messer @ IntelliSurvey
+  Erkan Yilmaz
+  rocky
+  Brock Wilcox - awwaiid
+
+* Breakpoints seem to work
+* Save eval strings
+* Support trepan debugger
+* Support ebug debugger
+
+2.015
+
+* breakpoints on function names
+  TODO: the r command
+
+2.016
+
+* Un-break Devel::Trepan
+* Depend on B::Utils-0.25+

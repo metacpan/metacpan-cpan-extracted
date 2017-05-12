@@ -1,0 +1,16 @@
+[-
+
+eval {
+$textonly = $epreq -> {textonly} ;
+$title    = $epreq -> gettext ($epreq -> title) ;
+$subtitle = $epreq -> subtitle ;
+$subhead  = $epreq -> subhead ;
+$frames   = $epreq -> frames ;
+} ;
+
+-]
+
+
+    [$if $title $]<h1 class="cHeadH1">[+ $title +]</h1>[$endif$]
+    [$if $subtitle $]<h2 class="cHeadH2">[+ $subtitle +]</h2>[$endif$]
+

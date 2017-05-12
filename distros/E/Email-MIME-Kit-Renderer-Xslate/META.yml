@@ -1,0 +1,23 @@
+---
+abstract: 'render parts of your mail with Text::Xslate'
+author:
+  - 'Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>'
+build_requires:
+  Test::More: '0.94'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.017, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Email-MIME-Kit-Renderer-Xslate
+requires:
+  Email::MIME::Kit: '2'
+  Text::Xslate: v3.2.4
+resources:
+  bugtracker: https://github.com/frioux/Email-MIME-Kit-Renderer-Xslate/issues
+  homepage: https://github.com/frioux/Email-MIME-Kit-Renderer-Xslate
+  repository: https://github.com/frioux/Email-MIME-Kit-Renderer-Xslate.git
+version: '0.001000'

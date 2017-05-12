@@ -1,0 +1,14 @@
+Revision history for Perl extension ExtUtils::MakeMaker::BigHelper.
+
+0.92  Thu Feb 28 09:00:00 2013
+  - fixed -l ordering, so that it reflects what's specified
+    in MYEXTLIB, duplications allowed.
+
+0.91  Tue Feb 26 20:20:00 2013
+  - fixed tabbing problem in generated makefile
+  - added yaml and docs
+
+0.90  Thu Feb 21 13:25:37 2013
+	- original version; created by h2xs 1.23 with options
+		-A -X -n ExtUtils::MakeMaker::BigHelper
+

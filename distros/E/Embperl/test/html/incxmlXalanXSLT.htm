@@ -1,0 +1,23 @@
+
+
+<html><head><title>Include POD via XSLT</title></head>
+
+<body>
+
+<h1>Start pod.xml</h1>
+
+[- Execute ({inputfile => 'xml/pod.xml', recipe => 'EmbperlXalanXSLT', xsltstylesheet =>
+'xml/podold.xsl'}) ; -]
+
+<h1>Start kfdres.xml</h1>
+
+[- Execute ({inputfile => 'xml/kfdres.xml', recipe => 'EmbperlXalanXSLT', xsltstylesheet =>
+'xml/kfd.xsl'}) ; -]
+
+
+<h1>END</h1>
+
+</body>
+</html>
+
+

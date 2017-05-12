@@ -1,0 +1,227 @@
+#!perl
+
+use strict;
+use warnings;
+
+use File::Spec;
+use File::Basename 'dirname';
+
+use lib (
+    File::Spec->catdir( dirname(__FILE__), qw| .. lib perl5| ),
+);
+
+require Enbld::App;
+
+my $app = Enbld::App->new;
+
+$app->parse_options( @ARGV );
+$app->envbuild;
+
+=pod
+
+=head1 NAME
+
+enblder - utility command for Enbld
+
+=head1 SYNOPSIS
+
+ $ enblder intro           # displays the introduction for Enbld
+ $ enblder tutorial        # displays the tutorial for Enbld
+ $ enblder available       # displays all software list supported by Enbld
+ $ enblder available git   # displays all version of target software
+ $ enblder install git     # installs target software
+ $ enblder install git 1.9 # installs the specific version of target software
+ $ enblder list            # displays installed software list
+ $ enblder list git        # displays all installed version of target software
+ $ enblder outdated        # displays all outdated software list
+ $ enblder upgrade git     # installs upgraded target software
+ $ enblder freeze          # displays conditions script reproduce installed software
+ $ enblder deploy ~/path  # deploys all installed software to specific path
+ $ enblder selfupgrade    # upgrade Enbld
+
+=head1 DESCRIPTION
+
+enblder is utility command for Enbld.
+
+=head1 COMMANDS
+
+=over
+
+=item intro
+
+ $ enblder intro
+
+Displays the introduction for Enbld.
+
+This document is equal to C<perldoc lib/Enbld.pm>.
+
+=item tutorial
+
+  $ enblder tutorial
+
+Displays the tutorial for Enbld.
+
+This document is equal to C<perldoc lib/Enbld/Tutorial.pm>.
+
+=item available
+
+  $ enblder available
+
+Displays all software list supported by Enbld.
+
+  $ enblder available [target_software]
+
+If a target software is specified as an argument, displays the list of the versions which can be obtained by the software.
+
+=item install
+
+  $ enblder install [target_software]
+
+Installs target software.
+
+  $ enblder install [target_software] [version]
+
+Installs the specific version of target software.
+
+  $ enblder install [target_software] --force
+
+If a target software is already instlled, It becomes an error.  however, the case where he would like to reinstall compulsorily '--force' option is used. 
+
+  $ enblder install [target_software] --test
+
+The case where a test is performed at the time of installation '--test' option is used. 
+
+However, when a test goes wrong, installation also goes wrong. 
+
+=item list
+
+  $ enblder list
+
+Displays all installed software.
+
+  $ enblder list [target_software]
+
+If a target software is specified as an argument, displays the list of the versions which is installed.
+
+=item outdated
+
+  $ enblder outdated
+
+Displays all outdated software.
+
+=item upgrade
+
+  $ enblder upgrade [target_software]
+
+Installs upgraded target software.
+
+Nothing is done when a high version is not released. 
+
+=item rehash
+
+  $ enblder rehash 
+
+Re-create target software's symbolic link.
+
+When you install an executable file using the module management tool of a programming language ( e.g. CPAN), please restretch a symbolic link using this command. 
+
+=item freeze
+
+  $ enblder freeze
+
+Displays the conditions script reproduce installed software.
+
+  $ enblder freeze --current
+
+If '--current' option is attached, the version installed now will be displayed. 
+
+=item deploy
+
+  $ enblder deploy ~/path/to/deploy
+
+Deploys all installed software to specific path.
+
+=item off
+
+  $ enblder off target_software
+
+Disables target software.
+
+=item use
+
+  $ enblder use target_software installed_version
+
+Enables specfic version of target.
+
+=item selfupgrade
+
+  $ enblder selfupgrade
+
+Upgrade Enbld itself.
+
+=item help
+
+  $ enblder help
+
+Displays the short help message.
+
+=item version
+
+  $ enblder version
+
+Displays the version number.
+
+=back
+
+=head1 OPTIONS
+
+=over
+
+=item -f, --force
+
+See sucommand 'install'.
+
+=item -t, --test
+
+See subcommand 'install'.
+
+=item -c, --current
+
+See subcommand 'freeze'.
+
+=item -h, --help
+
+This option is equal to subcommand 'help'.
+
+=item -v, --version
+
+This option is equal to subcommand 'version'.
+
+=back
+
+=head1 SEE ALSO
+
+L<Enbld>
+
+L<Enbld::Tutorial>
+
+=head1 WEB SITE
+
+L<https://github.com/magnolia-k/Enbld>
+
+L<http://code-stylistics.net/enbld>
+
+=head1 ISSUE REPORT
+
+L<https://github.com/magnolia-k/Enbld/issues>
+
+=head1 COPYRIGHT
+
+copyright 2013- Magnolia C<< <magnolia.k@me.com> >>.
+
+=head1 LICENSE
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,7 @@
+Build.PL
+Changes
+lib/Exporter/NoWork.pm
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/Exporter-NoWork.t

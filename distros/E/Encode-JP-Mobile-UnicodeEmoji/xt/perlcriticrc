@@ -1,0 +1,3 @@
+[-Subroutines::ProhibitSubroutinePrototypes]
+[TestingAndDebugging::ProhibitNoStrict]
+allow=refs

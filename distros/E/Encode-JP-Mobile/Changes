@@ -1,0 +1,154 @@
+Revision history for Perl extension Encode::JP::Mobile
+
+0.30  Mon Oct 22 18:16:57 PDT 2012
+        - Support new charnames.pm in tests where unknown character name throws fatal errors (Karl Williamson) #4
+
+0.29  Tue Oct 16 17:59:29 PDT 2012
+        - Fixses issues with re.pm between on perl 5.14 and 5.16 (tokuhirom)
+
+0.28  Thu Apr 19 19:18:54 PDT 2012
+        - Fixed RT:76373
+
+0.27
+        - Fixed failing tests on perl5.12+ (Tokuhiro Matsuno)
+        - Added MIME-Header-JP-Mobile-* encodings (Naoki Tomita)
+
+0.26
+        - Fixed x-iso-2022-jp-airedge alias (Naoki Tomita)
+
+0.25  Mon May 19 13:58:35 JST 2008
+        - *IMPORTANT* Supports completely mutual pictogram conversion.
+          Added pictogram auto-mapping for x-sjis-softbank(-auto) <=> x-sjis-docomo and x-sjis-kddi-auto.
+          Added x-sjis-(carrier)-raw for no pictogram auto-mapping.
+          Now x-sjis-kddi does not support roundtrip pictogram to docomo, 
+          It's just alias of x-sjis-kddi-cp932-raw.
+        - Added Encode::JP::Mobile::Character feature and refactoring Encode::JP::Mobile::Charnames
+        - Added Encode::JP::Mobile::FB_CHARACTER feature
+        - Fix FULLWIDTH TILDE problem, added U+301C to x-sjis-*.ucm, x-utf8-*.ucm
+        - Support ->mime_name() method
+        - Fix Encode::JP::Mobile::Vodafone's escape sequence related error
+        - Fix garbled "Cafe" in SoftBank pictogram name
+        - More document
+        - More test
+
+0.24  Sun Jan 20 05:37:48 PST 2008
+        - Fixed a bug where U+ED7F was in KDDIAutoPictograms, but it shouldn't be.
+          (Tokuhiro Matsuno)
+
+0.23  Fri Jan 18 14:26:01 PST 2008
+        - Added InKDDICP932Pictograms and InKDDIAutoPictograms (Tokuhiro Matsuno)
+
+0.22  Thu Jan 17 23:22:27 PST 2008
+        - *WARNING* x-sjis-kddi <-> x-sjis-docomo roundtrip will be REMOVED in a future release
+        - Added image URL and character numbers to all table.yaml file for handy
+        - unicode2name, unicode2name_en and vianame is now exportable from E::JP::M::Charnames
+        - Update kddi and softbank table to get English names by mapping characters to DoCoMo
+        - Charnames now supports English names for KDDI/SoftBank characters as well
+        - removed x-utf8-airh because it's completely useless (Tokuhiro Matsuno)
+
+0.21  Thu Jan 17 18:46:17 PST 2008
+        - Added x-utf8-airh as a complete alias of x-utf8-docomo
+        - Documented AirEDGE pictograms PRIVATE AREA mapping
+        - Support KDDI-Auto encoding in Encode::JP::Mobile::Charnames
+        - Added unicode_auto to dat/kddi-table.yaml (Tokuhiro Matsuno)
+        - Added author-ucmlint.t for ucm linting
+
+0.20  Thu Jan 17 11:20:48 PST 2008
+        - Fixed x-utf8-* to handle characters if they have multiple
+          candidates by picking up the first one. Previously they weren't
+          mapped at all. (Naoki Tomita, Tokuhiro Matsuno)
+
+0.19  Thu Jan 17 01:28:36 PST 2008
+        - Added InKDDISoftBankConflicts and documented workaround to
+          handle conflicted characters.
+
+0.18  Thu Jan 17 00:34:32 PST 2008
+        - Rewrote the entire document in Japanese, rather than English
+        - Added x-iso-2022-jp-kddi-auto (Tokuhiro Matsuno)
+        - Make it not warn with perl 5.10 (Tokuhiro Matsuno)
+
+0.17  Wed Jan 16 16:09:15 PST 2008
+        - Bumped up Encode.pm dependency
+
+0.16  Wed Jan 16 12:14:24 PST 2008
+        - Added =encoding to Charnames.pm POD
+        - Merged x-utf8-* encodings to do automatic conversion based
+          on Unicode characters and custom utf-8 based encoding.
+          (Naoki Tomita and Tokuhiro Matsuno)
+
+0.15  Sun Jan  6 01:12:30 PST 2008
+        - Added x-sjis-kddi-auto Unicode codepoints to InKDDIPictograms
+          (Naoki Tomita)
+
+0.14  Sat Jan  5 10:55:39 PST 2008
+        - Added File::ShareDir to prereq
+          (Thanks to ICERIDER)
+
+0.13  Sat Jan  5 10:01:09 PST 2008
+        - Added Encode::JP::Mobile::Charnames to do things like "\N{DoCoMo Beer}"
+          (Tokuhiro Matsuno)
+
+0.12  Mon Nov 19 02:41:36 PST 2007
+        - removed PRIVATE AREA characters from all ucm files. This
+          might be handy if you want to use fallback for those characters in
+          private area but don't have correspondent characters.
+        - removed some (actually 131) cp932 characters that are
+          duplicate with x-sjis-softbank-auto characters. They're not
+          mapped in shift_jis anyway.
+
+0.11  Tue Nov 13 18:41:53 PST 2007
+        - Added regression tests for docomo, kddi and softbank
+        - Added tools/ directory and various extractor tool to create a map
+        - Added dat/ directory to contain YAML tables for SoftBank, KDDI and DoCoMo
+        - Updated POD in Encode::JP::Mobile
+        - Added Encode::JP::KDDIJIS to implement encode/decode x-iso-2022-jp-kddi
+          (Tokuhiro Matsuno)
+        - Fixed the round-trip flag of DoCoMo characters in kddi.ucm
+          and vice verca, so they are used only for Unicode -> encoding
+          translation
+        - Added x-sjis-kddi-auto Unicode to SJIS encoding map to
+          x-sjis-kddi and Vice Verca, so they're round-trip safe between
+          UTF-8 and SJIS handsets.
+        - Added x-sjis-softbank-auto encoding for SoftBank 3GC phones.
+          (Thanks to Masahiro Chiba)
+
+0.10  Mon Nov 12 14:35:56 PST 2007
+        - x-sjis-softbank is now also based on cp932, not Shift_JIS.
+
+0.09  Mon Nov 12 13:11:51 PST 2007
+        - Fixed a major mapping error in x-sjis-airedge.ucm by
+          removing it, because x-sjis-airedge (and x-sjis-imode as well) is just
+          a subset of cp932 (not shift_jis). x-sjis-airedge is now an alias of cp932.
+
+0.08  Mon Nov 12 11:20:42 PST 2007
+        - Fixed a bug where Vodafone (SoftBank) high-bit operation was incorrect
+          (Thanks to Masahiro Chiba, http://www.geminium.com/chiba_blog/2007/06/10/11/)
+
+0.07  Mon Nov 12 04:42:38 PST 2007
+        - Renamed shift_jis-* to x-sjis-*.
+          The old shift_jis-* encoding names are still aliased for backward compatiblity.
+        - Added x-sjis-kddi-auto.ucm, which is based on KDDI/AU
+          handset internal SJIS <=> UTF-8 encoding mapping table.
+          See http://subtech.g.hatena.ne.jp/miyagawa/20071112/1194865208 for details
+          (Thanks to Naoki Tomita and tokuhirom for testing)
+
+0.06  Mon Nov 12 01:45:42 PST 2007
+        - Fixed "hare" mapping in Ezweb
+          (Thanks to Naoki Tomita)
+
+0.05  Mon May 28 20:53:44 PDT 2007
+        - Fixes that fallback flag was ignored in the Vodafone encoding
+          (Thanks to Tokuhiro Matsuno)
+
+0.04  Fri May 25 16:31:03 PDT 2007
+        - Support KDDI/AU <-> NTT DoCoMo mapping
+          (Thanks to Tokuhiro Matsuno)
+
+0.03  Fri Jul 14 15:15:20 JST 2006
+        - Added 'shift_jis-softbank' as an alias of 'shift_jis-vodafone'
+
+0.02  Wed Jun 22 17:30:29 JST 2005
+        - ucm files are based on cp932.ucm, not shiftjis.ucm
+
+0.01  Wed Jun 22 12:01:25 2005
+  Autogenerated by enc2xs version 2.01.

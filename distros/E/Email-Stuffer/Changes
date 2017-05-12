@@ -1,0 +1,60 @@
+Revision history for Perl extension Email::Stuffer
+
+0.014     2016-04-30 19:28:26-04:00 America/New_York
+        - you can now pass (some) properties of the email to the ->new
+          method (thanks, John Napiorkowski)
+        - attachments provided via IO::All get a binmode now
+        - to/from/subject now always return $self, but will die if called
+          with zero arguments
+
+0.013     2016-04-08 20:34:49-04:00 America/New_York
+        - allow mime-type picking by filename to work when the filename
+          extension is not all lowercase (thanks, Chase Whitener)
+        - remove Test::Most; Test::More is enough Test for us
+
+0.012     2015-02-15 20:01:01-05:00 America/New_York
+        - test for ENOENT text based on platform under test, not fixed string
+
+0.011     2015-02-15 11:31:01-05:00 America/New_York
+        - autodetect PDF filetype (thanks, mannih)
+
+0.010     2014-04-25 10:24:49-04:00 America/New_York (TRIAL RELEASE)
+        - in case of failure, throw exceptions rather than returning undef
+
+0.009     2013-11-24 22:40:49 America/New_York
+        - update required version of Email::Stuffer
+
+0.008     2013-09-29 15:47:10 America/New_York
+        - correct the documentation of header-setting methods to match their
+          behavior (since Email::Stuff's first release)
+
+        - add tests to show we can set an empty subject through ->header
+          but not through ->subject
+
+0.007     2013-08-22 17:26:45 America/New_York
+        - allow ->to, ->cc, and ->bcc to take a list of addresses (thanks, Kris
+          Matthews!)
+
+0.006     2013-07-02 10:58:46 America/New_York
+          fix stupid packaging error: $VERSION was wrong!
+
+0.005     2013-07-01 22:54:50 America/New_York
+          fix version of Params::Util required
+
+0.004     2013-06-25 13:43:42 America/New_York
+        - replace File::Type with a much simpler and smaller-scale check
+          (thanks, tokuhirom!)
+
+          with File::Type gone, no need to use prefork anymore (thanks,
+          tokuhirom!)
+
+0.003     2013-06-18 23:36:39 America/New_York
+          correctly implement the send_or_die method (thanks, Ross Attrill!)
+
+          documentation corrections (thanks, Ross Attrill!)
+
+          repackage using Dist::Zilla
+
+0.001     2013-05-30
+
+          first released, forked from Email::Stuff 2.102

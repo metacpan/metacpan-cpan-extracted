@@ -1,0 +1,211 @@
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+enblder - Enbldのユーティリティコマンド
+
+=head1 SYNOPSIS
+
+ $ enblder intro           # Enbldのイントロダクションドキュメントを表示
+ $ enblder tutorial        # Enbldのチュートリアルを表示
+ $ enblder available       # Enbldがサポートするソフトウェアの一覧を表示
+ $ enblder available git   # インストール可能なバージョンの一覧を表示
+ $ enblder install git     # ターゲットのソフトウェアをインストール
+ $ enblder install git 1.9 # 指定したバージョンのターゲットソフトウェアをインストール
+ $ enblder list            # インストール済のソフトウェアの一覧を表示
+ $ enblder list git        # 指定したソフトウェアのインストール済のバージョンの一覧を表示
+ $ enblder outdated        # 旧バージョンのソフトウェアの一覧を表示
+ $ enblder upgrade git     # ターゲットのソフトウェアのアップグレード
+ $ enblder freeze          # インストール済のソフトウェアを再現するコンディションスクリプトを表示
+ $ enblder deploy ~/path   # 指定したパスにソフトウェアをデプロイ
+ $ enblder selfupgrade     # Enbld自身をアップグレード
+
+=head1 説明
+
+enblderは、Enbldのユーティリティコマンドです。
+
+=head1 コマンド
+
+=over
+
+=item intro
+
+  $ enblder intro
+
+Enbldのイントロダクションドキュメントを表示します。
+
+このドキュメントは、C<perldoc lib/Enbld.pm>と同じです。
+
+=item tutorial
+
+  $ enblder tutorial
+
+Enbldのチュートリアルを表示します。
+
+このドキュメントは、C<perldoc lib/Enbld/Tutorial.pm>と同じです。
+
+=item available
+
+  $ enblder available
+
+Enbldがサポートする全てのソフトウェアの一覧を表示します。
+
+  $ enblder available [target_software]
+
+ターゲットのソフトウェアを引数に指定すると、そのソフトウェアでインストール可能なバージョンの一覧を表示します。
+
+=item install
+
+  $ enblder install [target_software]
+
+ターゲットのソフトウェアをインストール
+
+  $ enblder install [target_software] [version]
+
+指定したバージョンのターゲットソフトウェアをインストール
+
+  $ enblder install [target_software] --force
+
+もし、ターゲットのソフトウェアが既にインストール済みの場合、エラーになります。しかし、'--force'オプションを使うことで強制的に再インストールすることができます。
+
+  $ enblder install [target_software] --test
+
+'--test'オプションを使うと、インストール時にテストを実行します。
+
+もし、テストが失敗した時は、インストールも失敗します。
+
+=item list
+
+  $ enblder list
+
+インストール済みのソフトウェアの一覧を表示します。
+
+  $ enblder list [target_software]
+
+もしターゲットソフトウェアを引数に指定した時は、インストール済みの全てのバージョンのリストを表示します。
+
+=item outdated
+
+  $ enblder outdated
+
+旧バージョンになったソフトウェアの一覧を表示します。
+
+=item upgrade
+
+  $ enblder upgrade [target_software]
+
+ターゲットのソフトウェアをアップグレードします。
+
+新しいバージョンがリリースされていない時は、何もしません。
+
+=item rehash
+
+  $ enblder rehash [target_software] 
+
+ターゲットソフトウェアへのシンボリックリンクを作り直します。
+
+プログラミング言語が提供するモジュール管理ツール(例えばCPAN)を使って実行ファイルをインストールした時は、このコマンドを使ってシンボリックリンクを作り直して下さい。
+
+=item freeze
+
+  $ enblder freeze
+
+インストール済みのソフトウェアを再現するコンディションスクリプトを表示します。
+
+  $ enblder freeze --current
+
+もし、'--current'オプションを指定すると、現在インストールされているバージョンが表示されます。
+
+=item deploy
+
+  $ enblder deploy ~/path/to/deploy
+
+指定したパスへ全てのソフトウェアをデプロイします。
+
+=item off
+
+  $ enblder off target_software
+
+指定したソフトウェアを無効にします。
+
+=item use
+
+  $ enblder use target_software installed_version
+
+指定したバージョンを有効にします。
+
+=item selfupgrade
+
+  $ enblder selfupgrade
+
+Enbld自身をアップグレードします。
+
+=item help
+
+  $ enblder help
+
+短いヘルプメッセージを表示します。
+
+=item version
+
+  $ enblder version
+
+バージョンナンバーを表示します。
+
+=back
+
+=head1 オプション
+
+=over
+
+=item -f, --force
+
+'install'の説明を見て下さい。
+
+=item -t, --test
+
+'install'の説明を見て下さい。
+
+=item -c, --current
+
+'freeze'の説明を見て下さい。
+
+=item -h, --help
+
+このオプションは、'help'サブコマンドと同じです。
+
+=item -v, --version
+
+このオプションは、'version'サブコマンドと同じです。
+
+=back
+
+=head1 更なる情報
+
+L<Enbld>
+
+L<Enbld::Tutorial>
+
+=head1 ウェブサイト
+
+L<https://github.com/magnolia-k/Enbld>
+
+L<http://code-stylistics.net/enbld>
+
+=head1 課題のレポート
+
+L<https://github.com/magnolia-k/Enbld/issues>
+
+=head1 コピーライト
+
+copyright 2013- Magnolia C<< <magnolia.k@me.com> >>.
+
+=head1 LICENSE
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+

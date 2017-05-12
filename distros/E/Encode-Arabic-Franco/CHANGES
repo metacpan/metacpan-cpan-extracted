@@ -1,0 +1,131 @@
+==================================================
+Changes from 2015-10-05 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.008 at 2016-10-04 07:34:24 +0000
+------------------------------------------
+
+  Change: 91d93c13f1af81d9dc1e83eef9a8990076c3addf
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2016-10-04 09:26:15 +0000
+
+    Fixed dependency declaration
+
+    See https://github.com/athreef/Encode-Arabic-Franco/issues/1 
+
+------------------------------------------
+version 0.007 at 2016-10-01 23:47:30 +0000
+------------------------------------------
+
+  Change: 934174c1a6ad653716b9e53d571e90fb45bda309
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2016-10-02 01:47:30 +0000
+
+    Now compatible with Lingua::AR::Tashkeel v0.004 
+
+  Change: 45238c17767d0b85f7bf6867041d1de3e17cbfab
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2016-09-30 00:37:30 +0000
+
+    Using prune in order to keep important Tashkeel 
+
+------------------------------------------
+version 0.006 at 2016-09-28 14:58:43 +0000
+------------------------------------------
+
+  Change: e45e8f3ade0452bfc62e90c2b96d4827aa1222c8
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2016-09-28 16:58:43 +0000
+
+    Improved Hamza support 
+
+------------------------------------------
+version 0.005 at 2016-09-27 17:14:19 +0000
+------------------------------------------
+
+  Change: 2ff07ef77119c64bb63e4c9efb24bb741adbdbb1
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2016-09-27 19:14:19 +0000
+
+    Added testcases and marginally better support for Hamza 
+
+  Change: 9ac3ca44ad1f8a1ad5ea5040fe072fa7424d95ac
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2016-09-27 01:25:21 +0000
+
+    Better handling for ee 
+
+  Change: 4c3f839b342f0c9512de249f7d18cc112259c4b4
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2016-09-26 21:16:28 +0000
+
+    Added version variable to package 
+
+------------------------------------------
+version 0.004 at 2016-09-26 07:05:23 +0000
+------------------------------------------
+
+  Change: f21098827b494cba8f7137dc34f4e3fbf6d82ab1
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2016-09-26 09:05:23 +0000
+
+    Made Encode dependency explicit
+
+    Also added Gitub psecific config to dist.ini 
+
+  Change: 09cfd7e42de5125be39677a44e82f9ecbc59a0a7
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2016-09-25 06:02:21 +0000
+
+    s/encode/decode/ in documentation
+
+    We do no encoding at all 
+
+  Change: c91da861d86834340aff9f47d83c7d6eef5d60e4
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2016-09-25 05:15:56 +0000
+
+    Removed Kashida
+
+    Client code should handle it 
+
+  Change: db0755220fb4b368e4e89c492a952153141fabeb
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2016-09-24 11:35:34 +0000
+
+    Added pre-commit hook that generates README.md 
+
+  Change: 54b858d3155f076eccfe158f7fbaed2ac24878a4
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2016-09-24 11:24:39 +0000
+
+    Encode now automatically imported into calling package 
+
+  Change: 7afeb67a1a66b6e0ffe3c10eb46c4864646b94ab
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2016-09-24 11:17:13 +0000
+
+    Better Hamza detection and some more digraphs 
+
+  Change: 36c0bf040dfb1a171e411a11188b1ae10f012a58
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2016-09-20 10:50:15 +0000
+
+    Set POD encoding to UTF8 
+
+  Change: 323235a4ef4b4b218ef8febd037853826b2d5064
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2016-09-20 10:47:38 +0000
+
+    Adjusted .gitignore 
+
+  Change: cf057647a334eea6dd646b24268413e1fd490c20
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2016-09-20 03:57:52 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

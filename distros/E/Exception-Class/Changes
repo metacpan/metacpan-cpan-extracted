@@ -1,0 +1,432 @@
+1.42    2017-01-04
+
+- Generated exception classes are now added to %INC. If you subclass a
+  generated class with "use base" then base.pm will no longer attempt to load
+  the requested class. Patch by Todd Rinaldo. PR #8.
+
+
+1.41    2016-12-07
+
+- Switch to GitHub Issues.
+
+
+1.40    2016-01-29
+
+- Fixed broken metadata. Reported by Slaven Rezić. GitHub #3.
+
+
+1.39    2014-11-01
+
+- Replaced the Exception::Class::Base->NoRefs method with UnsafeRefCapture to
+  match changes in Devel::StackTrace 2.00. The old method is deprecated but
+  will continue to work.
+
+
+1.38    2014-05-05
+
+- An exception without a message will now default to either the associated
+  exception class description or the string "[Generic exception]". Patch by
+  Ricardo Signes. PR #2.
+
+- Added field_hash() and context_hash() methods. Patch by Ricardo Signes. PR
+  #1.
+
+
+1.37    2013-02-24
+
+- I now recommend you use Throwable instead of this module. It has a nicer,
+  more modern interface.
+
+- Fixed various bugs and confusion in the docs.
+
+
+1.36    2012-11-17
+
+- Fixed some stupidity in the tests that appears to have been highlighted by
+  recent changes to Devel::StackTrace. Reported by Dan Horne. RT #81245.
+
+
+1.35    2012-09-17
+
+- Require Class::Data::Inheritable 0.02+.
+
+
+1.34    2012-09-16
+
+- 1.33 did not declare any prereqs. Oops. Reported by Roham McGovern. RT
+  #79677.
+
+
+1.33    2012-09-16
+
+- Fixed warning from basic.t on 5.17.x. RT #79121.
+
+
+1.32    2010-06-28
+
+- Removed Test::Most dependency, which was causing a circular dependency
+  chain. Reported by Burak Gursoy. RT #58889.
+
+
+1.31    2010-06-26
+
+- Made it possible to use Exception::Class::Base without loading
+  Exception::Class. Reported by Alex Peters. RT #57269.
+
+
+1.30    2010-03-20
+
+- Added the ability to create light weight exceptions, which don't record a
+  stack trace or any other context info (time, pid, etc.). This is done by
+  setting $class->NoContextInfo to a true value for the exception class. Based
+  on a patch by Graham Barr. RT #54826.
+
+
+1.29    2009-05-08
+
+- Make sure that there is only one line that the toolchain can pick up
+  when looking for this module's $VERSION.
+
+
+1.28    2009-05-06
+
+* Removed Exception::Class::Base->do_trace and ->NoObjectRefs, both of
+  which have been undocumented for many years.
+
+- Moved Exception::Class::Base to its own file, so it doesn't
+  overwrite the $VERSION in Exception::Class (and for general
+  sanity). Reported by Kirk Baucom.
+
+
+1.27    2009-05-04
+
+* The error message for an exception no longer defaults to $!. This
+  was a bad idea, and has bitten some people. Addresses RT #43600.
+
+* I'm now only supporting Perl 5.8.1+. This module broke on 5.6.2 (and
+  5.8.0) at some point and I don't really care enough to fix
+  it. Non-intrusive patches to make it work on 5.8.0 or less (again)
+  will be accepted.
+
+
+1.26    2008-10-25
+
+- No code changes, just bumped the Devel::StackTrace dependency to
+  1.20.
+
+  The changes in 1.25 exposed a bug in Devel::StackTrace which has now
+  been fixed. This caused HTML::Mason test failures, among other
+  things. Reported by Andreas Koenig.
+
+
+1.25    2008-10-21
+
+- The Exception::Class::Base constructor no longer looks at the
+  associated Devel::StackTrace object's frames. Avoiding looking at
+  the frames should make constructing exception objects much
+  faster. Instead the information based on the stack trace frames -
+  package(), file(), and line() - is only retrieved when it is
+  requested. Patch by Ruslan Zakirov. RT #40221.
+
+
+1.24    2008-03-30
+
+- Added a MaxArgLength class parameter to go along with the new
+  max_arg_length constructor param for Devel::StackTrace
+  objects. Patch by Ian Burrell.
+
+
+1.23    2006-01-14
+
+- Fix code bugs in the SYNOPSIS.
+
+- Exception::Class->caught() now returns $@ if not given an argument.
+
+
+1.22    2005-09-30
+
+- Added Exception::Class::Base->caught() so you can write
+  "My::Error->caught()".  Apparently this is what Damian documented in
+  Perl Best Practices.  Thanks to JD Hedden for pointing this out.
+
+- Require Devel::StackTrace 1.12 to fix a test failure on Win32.
+  Reported by Garrett Goebel.
+
+
+1.21    2005-04-17
+
+- Added Exception::Class->caught() as syntactic sugar for catching
+  exceptions in a "safe" manner.  See the docs for details.  Suggested
+  by Damian Conway.
+
+
+1.20    2005-01-01
+
+- Moved the Classes() method to Exception::Class, now as a function,
+  which is where it really belongs.  Also corrected the docs for this
+  function, as they incorrectly implied that it would return all
+  subclasses, instead of just subclasses which were created when
+  loading Exception::Class.
+
+- Added a Build.PL file, and releases are now signed with
+  Module::Signature.
+
+- Added ignore_class and ignore_package constructor parameters.  Patch
+  by Daisuke Maki.
+
+
+1.19    2004-03-10
+
+- Identical to 1.18 except that it requires Devel::StackTrace 1.10,
+  which fixes a failure in this package's test when run with Perl
+  5.6.1.  Reported by Jesse Erlbaum.
+
+
+1.18    2004-02-21
+
+- Added RespectOverload class method, which can be used to control the
+  respect_overload parameter for Devel::StackTrace objects.
+
+
+1.17    2004-02-20
+
+- Document that new() is always called to create an
+  Exception::Class::Base object.  Suggested by Steve Hay.
+
+- Fix a test that failed with Devel::StackTrace 1.05.  Basically, the
+  test expected output from Devel::StackTrace that reflected a bug
+  that was fixed in 1.05.  Reported by Jesse Vincent.
+
+
+1.16    2003-09-25
+
+- David Wheeler's patch exposed a bug in Devel::StackTrace which could
+  cause exceptions to not have any value set for package, file, or
+  line.  This is fixed by depending on Devel::StackTrace 1.04.  This
+  release is otherwise identical to 1.15.  Reported by Steve Hay.
+
+
+1.15    2003-09-17
+
+- Exceptions thrown from an alias subroutine always had
+  "Exception::Class" as their package name.  Patch by David Wheeler.
+
+
+1.14    2003-07-04
+
+- ** BACKWARDS INCOMPATIBILITY **
+  NoRefs is now true by default.  This means that stacktraces will
+  _not_ store references unless you explicitly set NoRefs to a false
+  value.  This is done because it's too easy to leak memory when
+  references are saved in stack traces.
+
+- Fixed a very odd bug where Exception::Class could mistakenly think
+  that an exception class had been created when it really hadn't.
+  This was only exposed with bleadperl (5.8.1-to-be), and is unlikely
+  to affect anyone using an existing Perl version.
+
+
+1.13    2003-06-21
+
+- Documented the Exception::Class::Base->Fields method, which can be
+  called on subclasses to determine what extra fields they have
+  defined.  Suggested by Chris Winters.
+
+
+1.12    2003-04-03
+
+- Added the Exception::Class::Base->Classes method.  Patch by David
+  Wheeler.
+
+
+1.11    2003-02-20
+
+- A description containing a single quote or backslash would cause a
+  syntax error in the code generated by Exception::Class.  Patch by
+  Luc St-Louis.
+
+
+1.10    2003-01-28
+
+- The alias feature had a bug that showed up when an alias was
+  assigned to a class whose parent had not yet been made.
+
+
+1.09    2003-01-22
+
+- Tweak to Fields method so that it returns empty list for 5.6.1 and
+  5.00503.
+
+- Require Devel::StackTrace 1.03 to fix potential recursion problem
+  between the two classes when stringifying exceptions.
+
+
+1.08    2003-01-21
+
+- Added "alias" feature, which allows you to create a subroutine that
+  throws a specified exception.  This is based on code created by Ken
+  Williams for Mason.
+
+
+1.07    2002-09-19
+
+- Forgot to require Devel::StackTrace 1.01.
+
+
+1.06    2002-09-19
+
+- Use File::Spec when testing file method so that test 7 passes on all
+  platforms.  Reported by Ron Savage.
+
+- Use Test::More for test suite.
+
+- Change NoObjectRefs method to NoRefs, to match change in
+  Devel::StackTrace 1.01.  The old method is deprecated, but will
+  continue to work.  However, it now _means_ the same thing as NoRefs.
+
+
+1.05    2002-08-23
+
+- Add NoObjectRefs class method to prevent Devel::StackTrace from
+  holding onto objects internally, thus delaying destruction.  Based
+  on a discussion with Tatsuhiko Miyagawa.
+
+
+1.04    2002-08-22
+
+- Fix messed up tarball as reported by Tatsuhiko Miyagawa.
+
+
+1.03    2002-08-21
+
+- Some versions of Perl may give an error about "Ambiguous call
+  resolved as CORE::time()".  This should be fixed now.  Reported by
+  Ron Savage.
+
+
+1.02    2002-08-20
+
+- Fields set in a parent class were not actually being inherited by
+  children.  Patch (with tests!) by David Wheeler.
+
+- Allow a single argument (error/message) to the constructor.  Patch
+  by Tatsuhiko Miyagawa.
+
+- General doc cleanup.
+
+
+1.01    2002-05-23
+
+- Make sure that exception objects always test as true in a boolean
+  context.
+
+
+1.00    2002-03-08
+
+- Added a full_message method intended to be overridden when you
+  create a subclass that uses fields that you want included in the
+  stringification of the object.  Suggested by Jon Swartz.
+
+
+0.99    2002-03-06
+
+- The much-requested "arbitrary attributes" feature has been added.
+  Thanks to Jon Swartz for the patch.  You can now do this:
+
+  use Exception::Class ( 'My::Exception' => { fields => [ 'bar', 'baz' ] } );
+
+  ...
+
+  if ( UNIVERSAL::isa( $@, 'My::Exception' ) { print $@->bar, $@->baz; }
+
+
+0.98    2002-02-20
+
+- Subclasses that overrode the ->as_string method had to repeat the
+  stringification overloading for exception objects.  This has been
+  changed so that the stringification overloading is now
+
+  sub { $_[0]->as_string }
+
+  Suggested by Jon Swartz.
+
+
+0.97    2001-11-25
+
+- Incorporated a patch from Ken Williams that works around several
+  Perl 5.6.0 bugs.
+
+- Test 31 was explicitly different for 5.6.0.  Ken said that the
+  difference actually made it fail (whereas in the past for me it
+  succeeded).  Tweak this test a bit more to just be more flexible
+  under 5.6.0.
+
+
+0.96    2001-11-23
+
+- Changes wasn't in MANIFEST.  Oops.
+
+- Doc tweaks and cleanup of README.
+
+- Make do_trace a synonym to Trace for backwards compatibility.
+
+
+0.95    2001-11-22
+
+  ** INCOMPATIBLE CHANGES IN THIS RELEASE **
+
+- Remove do_trace method and replace it with Trace method, which is
+  inherited by subclasses.
+
+- Exception object now always have a Devel::StackTrace object
+  available.  The Trace method only determines whether or not it is
+  included when the exception is stringified.
+
+- A new parameter show_trace for throw which allows you to override
+  the value of Trace on a case by case basis.
+
+- Fix uninit value warning with 5.00503.
+
+
+0.90    2001-10-23
+
+- fix buglet reported by Terrence Brannon that could occur while
+  trying to figure out where the exception was thrown, if the
+  exception was thrown from the package that the exception is an
+  object of.
+
+- doc improvements suggested Nathaniel Smith (related to using
+  Error.pm) and Mark Stosberg.
+  
+
+0.85    Unknown Release Date
+
+- added ability to use message instead of error as hash key to
+  constructor.
+
+
+0.8     2000-09-03
+
+- changed object from psuedo-hash to regular hash
+
+- added package, file, & line methods to exception object.
+
+- added more tests for exception object accessors
+
+
+0.7     2000-09-03
+
+- hack in test.pl to allow tests to pass under 5.6.0.
+
+- README details various Perl bugs this module (along with
+  Devel::StackTrace) can expose and some possible workarounds.
+
+
+0.6     2000-06-27
+
+- renamed to Exception::Class
+
+
+0.5     2000-06-26
+
+- Initial release, as Class::Exceptions.

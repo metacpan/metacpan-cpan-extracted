@@ -1,0 +1,91 @@
+<html>
+<head>
+<title>Embperl Example - Input Form Validation</title>
+
+[-
+
+use Embperl::Form::Validate ;
+
+$epf = Embperl::Form::Validate -> new (
+    [
+        [
+        -key => 'name',
+        -name => 'Name',
+        required => 1,
+        length_min => 4,
+        ],
+        [
+        -key => 'id',
+        -name => 'Id',
+        -type => 'Number',
+        gt   => 0,
+        lt   => 10,
+        ],
+        [
+        -key => 'email',
+        -msg => 'This is not a valid E-Mail address',
+        must_contain_one_of => '@.',
+        matches_regex => '..+@..+\\...+',
+        length_min => 8,
+        ],
+        [
+        -key => 'msg',
+        -name => 'Message',
+        emptyok => 1,
+        length_min => 10,
+        ]
+    ]) ;
+
+if ($fdat{check})
+    {
+    $errors = $epf -> validate_messages ;
+    }
+
+-]
+<script>
+[+ do { local $escmode = 0 ; $epf -> get_script_code } +]
+</script>
+
+
+</head>
+<body>
+
+<h1>Embperl Example - Input Form Validation</h1>
+
+
+This example simply validates the form input when you hit submit.
+If your input is correct, the form is redisplay with your input,
+otherwise the error message is shown. If you turn off JavaScript
+the validation is still done one the server-side. Any validation
+for which no JavaScript validation is defined (like regex matches), 
+only the server-side validation is performed.
+
+
+<hr>
+
+[$if @$errors $]
+    <h3>Please correct the following errors</h3>
+    [$foreach $e (@$errors)$]
+        <font color="red">[+ $e +]</font><br>
+    [$endforeach$]
+[$else$]
+    <h3>Please enter your data</h3>
+[$endif$]
+
+<form action="formvalidation.htm" method="GET" onSubmit="return epform_validate_forms_0_()">
+  <table>
+    <tr><td><b>Name</b></td> <td><input type="text" name="name"></td></tr>
+    <tr><td><b>Id (1-9)</b></td> <td><input type="text" name="id"></td></tr>
+    <tr><td><b>E-Mail</b></td> <td><input type="text" name="email"></td></tr>
+    <tr><td><b>Message</b></td> <td><input type="text" name="msg"></td></tr>
+    <tr><td colspan=2><input type="submit" name="check" value="send"></td></tr>
+  </table>
+</form>
+
+
+<p><hr>
+
+<small>Embperl (c) 1997-2005 G.Richter / ecos gmbh <a href="http://www.ecos.de">www.ecos.de</a></small>
+
+</body>
+</html>

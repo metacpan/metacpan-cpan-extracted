@@ -1,0 +1,78 @@
+{
+   "abstract" : "Simple Observer/Notifier",
+   "author" : [
+      "Copyright (c) 2007 Daisuke Maki <daisuke@endeworks.jp>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.11.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Event-Notify",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Test::MockObject" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Event::Notify" : {
+         "file" : "lib/Event/Notify.pm",
+         "version" : "0.00005"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/lestrrat/p5-Event-Notify/issues"
+      },
+      "homepage" : "https://github.com/lestrrat/p5-Event-Notify",
+      "repository" : {
+         "url" : "git://github.com/lestrrat/p5-Event-Notify.git",
+         "web" : "https://github.com/lestrrat/p5-Event-Notify"
+      }
+   },
+   "version" : "0.00005",
+   "x_contributors" : [
+      "Daisuke Maki <lestrrat+github@gmail.com>"
+   ]
+}

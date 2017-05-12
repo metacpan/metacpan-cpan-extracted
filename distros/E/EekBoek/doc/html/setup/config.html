@@ -1,0 +1,347 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+ <head>
+  <title>EekBoek</title>
+    <link rel="stylesheet" href="../css/site.css" type="text/css">
+      <meta name="keywords" content="boekhouden, mkb, midden- en kleinbedrijf, financi&amp;emul;n,
+                open source, boekhoudsoftware, boekhoud software,
+		boekhoudpakket, boekhoud pakket">
+  <meta name="robots" content="all">
+ </head>
+
+ <body bgcolor="#FFFFFF"
+       text="#000000" link="#0000FF"
+       vlink="#0000FF" alink="#C81900" background="../images/bg.gif" >
+  <table width="100%" border="0" cellpadding="0" cellspacing="5">
+
+  <tr valign="top">
+    <td width="161" align="left">
+      <a href="../index.html"><img src="../images/eb.jpg" alt="EekBoek Boekhouden" border="0" width="149" height="87"></a>
+
+    </td>
+    <td>
+              <h1 class="title">EekBoek</h1>
+<div class="info">
+  Electronisch Boekhouden voor het MKB
+</div>
+
+          </td>
+  </tr>
+
+  <tr>
+    <td>
+      <a href="../index.html"><img src="../images/ebname.jpg" alt="EekBoek" border="0" width="151" height="22"></a>
+
+    </td>
+    <td>
+      <table width="100%" border="0" cellpadding="0" cellspacing="0">
+  <tr valign="middle">
+    <td align="left">
+      <table border="0" cellpadding="0" cellspacing="2">
+  <tr valign="middle">
+
+    <td class="info"></td>
+    <td><a href="../setup/index.html" class="menu">Opzetten administratie</a>
+</td>
+	<td> &#xbb; </td>
+    <td class="info"></td>
+    <td><a href="../setup/config.html" class="menu">Opzetten werkomgeving</a>
+</td>
+	
+  </tr>
+</table>
+
+
+    </td>
+    <td align="right">
+      
+    </td>
+  </tr>
+</table>
+
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      <hr>
+
+    </td>
+    <td>
+      <hr>
+
+    </td>
+  </tr>
+
+  <tr valign="top">
+    <td>
+      <div class="sidemenu">
+<table border="0" cellpadding="0" cellspacing="0">
+  <tr>
+    <td align="left" class="menutitle">Documentatie
+    </td>
+  </tr>
+  <tr>
+    <td><hr>
+</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">
+      <a href="../intro/index.html" class="menu">Inleiding</a>
+<br>
+<a href="../install/index.html" class="menu">Installeren</a>
+<br>
+<a href="../ebshell/index.html" class="menu">De EekBoek shell</a>
+<br>
+<a href="../ebwxshell/index.html" class="menu">De grafische EekBoek shell</a>
+<br>
+<a href="../config.html" class="menu">Configuratie</a>
+<br>
+<a href="../setup/index.html" class="menuselect">Opzetten administratie</a>
+<br>
+&nbsp;-&nbsp;<a href="../setup/config.html" class="menuselect">Opzetten werkomgeving</a>
+<br>
+&nbsp;-&nbsp;<a href="../setup/schema.html" class="menu">Administratiegegevens</a>
+<br>
+&nbsp;-&nbsp;<a href="../setup/relaties.html" class="menu">Relaties</a>
+<br>
+&nbsp;-&nbsp;<a href="../setup/opening.html" class="menu">Opening</a>
+<br>
+&nbsp;-&nbsp;<a href="../setup/mutaties.html" class="menu">Mutaties</a>
+<br>
+&nbsp;-&nbsp;<a href="../setup/init.html" class="menu">Aanmaken administratie</a>
+<br>
+<br>
+<a href="../bookings/index.html" class="menu">Boekingen</a>
+<br>
+<a href="../reports/index.html" class="menu">Overzichten</a>
+<br>
+<a href="../yearend.html" class="menu">Jaarafsluiting</a>
+<br>
+<a href="../inex.html" class="menu">Import en Export</a>
+<br>
+          </td>
+  </tr>
+</table>
+</div>
+
+      <div class="social">
+
+<table border='0' cellpadding='2' cellspacing='0'>
+  <tr>
+    <td><a href="http://www.twitter.com/EekBoek" target='_blank'>
+	<img border="0"
+	     src="../images/twitter-mini.png"
+	     alt="Volg EekBoek op Twitter"
+	     title="Volg EekBoek op Twitter"/></a>
+    </td>
+    <td><a href="http://www.linkedin.com/groups?gid=3649028" target='_blank'>
+	<img border="0"
+	     src="../images/linkedin-mini.png"
+	     alt="EekBoek op LinkedIn"
+	     title="EekBoek op LinkedIn"/></a>
+    </td>
+    <td><a href="http://www.youtube.com/EekBoek" target='_blank'>
+	<img border="0" src="../images/youtube-mini.png"
+	     alt="Bekijk video's op het YouTube kanaal van EekBoek"
+             title="Bekijk video's op het YouTube kanaal van EekBoek"/></a>
+    </td>
+    <td><a href="http://identi.ca/eekboek" target='_blank'>
+	<img border="0" src="../images/identi-ca-mini.png"
+	     alt="EekBoek op Identi.ca"
+             title="EekBoek op Identi.ca"/></a>
+    </td>
+  </tr>
+</table>
+</div>
+
+    </td>
+    <td>
+      <h2>Het opzetten van de werkomgeving</h2>
+
+<p>EekBoek versie 2 werkt met een administratie directory, dit is een
+directory waar alle administratiebestanden worden ondergebracht. De
+standaardplek voor deze directory is afhankelijk van het gebruikte
+platform. Onder Linux systemen is dit de directory
+<code>.eekboek/admdir</code> in de home-directory van de gebruiker.
+Deze directory kan worden gewijzigd in het <a href="../config.html#general_admdir">configuratiebestand</a>.
+
+<p>Elke administratie heeft een naam, en een korte code. Deze laatste
+wordt bij het aanmaken van de administratie afgeleid van de naam. De
+code wordt gebruikt om een subdirectory in de administratie directory
+aan te maken waar de bestanden van deze administratie geplaatst gaan
+worden. Ook wordt de code gebruikt als naam voor de database waarin de
+administratie wordt onderhouden.</p>
+
+<p>Wanneer een van de EekBoek programma's wordt opgestart zal deze
+eerst in de administratie directory kijken welke administraties daar
+zijn aangemaakt. U kunt dan een van deze administraties kiezen om mee
+te gaan werken, of om een nieuwe administratie aan te maken. Als er
+geen administraties beschikbaar zijn wordt automatisch de wizard voor
+het aanmaken van een nieuwe administratie gestart.</p>
+
+<p><strong>Let op:</strong> Uit compatibiliteit met vorige versies zal
+de EekBoek shell <code>ebshell</code> onmiddelijk tot uitvoering
+overgaan wanneer in de huidige directory een configuratiebestand
+aanwezig is. Om in dit geval de administratieselectiewizard te
+activeren dient de command line optie <code>--wizard</code> te worden
+meegegeven.</p>
+
+<h3>Het aanmaken van een nieuwe administratie</h3>
+
+<p>Met de wizard kunt u met het beantwoorden van enkele eenvoudige
+vragen een nieuwe administratie opzetten. U kunt daarbij kiezen uit
+een van de meegeleverde sjabloonadministraties, de EekBoek
+voorbeeldadministratie, of een compleet lege minimale
+administratie.</p>
+
+<p><i>Als u voor het eerst met EekBoek gaat werken is het zeer aan te
+raden om eerst een voorbeeldadministratie aan te maken en daarmee van
+alles uit te proberen. Op deze manier raakt u snel vertrouwd met de
+wijze waarop EekBoek werkt.</i></p>
+
+<p>Een voorbeeld van het aanmaken van een administratie. Op alle
+vragen wordt het standaardantwoord geaccepteerd door het indrukken van
+de Enter toets. Door een vraag met een &lsquo;-&rsquo; teken te
+beantwoorden gaat de wizard terug naar de vorige vraag.</p>
+
+<blockquote class="code">$ ebshell
+EekBoek 2.00.00 -- Copyright 2005-2010 Squirrel Consultancy
+
+Geef een unieke naam voor de nieuwe administratie. Deze wordt
+gebruikt voor rapporten en dergelijke.
+
+Naam [Mijn eerste EekBoek]: 
+
+Geef het boekjaar voor deze administatie. De administatie
+begint op 1 januari van het opgegeven jaar.
+
+Begindatum <1990..2020> [2010]: 
+
+Geef een unieke code voor de administratie. Deze wordt gebruikt
+als interne naam voor de database en administratiefolders.
+De standaardwaarde is afgeleid van de administratienaam en de
+begindatum.
+
+Code [mijn_eerste_eekboek_2010]: 
+
+U kunt een van de meegeleverde sjablonen gebruiken voor uw
+administratie.
+
+  1: Lege administratie
+  2: Eenmanszaak (ZZP)
+  3: BV / NV
+  4: Ondernemer
+  5: EekBoek voorbeeldadministratie
+  6: Vereniging / Stichting
+
+Sjabloon <1..6> [5]: 
+
+Kies het type database dat u wilt gebruiken voor deze
+administratie.
+
+  1: postgres
+  2: sqlite
+
+Database <1..2> [2]: 
+
+Gereed om de administratieve bestanden en de database aan te maken.
+
+Doorgaan [Ja]: 
+EekBoek 2.00.00 -- Copyright 2005-2010 Squirrel Consultancy
+%Lege database mijn_eerste_eekboek_2010 is aangemaakt
+...
+
+De administratie is aangemaakt. U kunt meteen aan de slag.
+</blockquote>
+
+<p>Hierna krijgt u de prompt van de EekBoek shell en kunt u opdrachten
+ingeven.</p>
+
+<p>Het aanmaken van een administratie met de GUI verloopt op eenzelfde
+wijze.</p>
+
+<p>Als de wizard gereed is met het aanmaken van de administratie dan
+vindt u in de administratie directory een subdirectory met de naam
+<code>mijn_eerste_eekboek_2010</code>, met daarin de volgende bestanden:</p>
+
+<ul>
+<li><code>eekboek.conf</code> - het administratie-specifieke
+    configuratiebestand;
+<li><code>schema.dat</code> - de administratiegegevens;
+<li><code>relaties.eb</code> - de relaties (debiteuren en
+    crediteuren);
+<li><code>opening.eb</code> - de openingsbalans;
+<li><code>mutaties.eb</code> - de mutaties (boekingen). Dit bestand
+    zal leeg zijn tenzij u heeft gekozen een voorbeeldadministratie
+    aan te maken.
+</ul>
+<p>De volgende secties van de documentatie beschrijven wat er in deze
+bestanden moet komen.</p>
+
+<a name="sampledb"></a><h4>De voorbeeldadministratie</h4>
+
+<p>De bestanden van de voorbeeldadministratie kunt u hier inzien::</p>
+
+<ul>
+<li><a href="../intro/schema.dat"><code>schema.dat</code></a> - de administratiegegevens;
+<li><a href="../intro/relaties.eb"><code>relaties.eb</code></a> - de relaties (debiteuren en
+    crediteuren);
+<li><a href="../intro/opening.eb"><code>opening.eb</code></a> - de
+    openingsgegevens. Als uw voorbeeldadministratie met de wizard is
+    aangemaakt zal de naam van de administratie en de begindatum zijn
+    aangepast aan de in de wizard opgegeven waarden;
+<li><a href="../intro/mutaties.eb"><code>mutaties.eb</code></a> - de
+    mutaties.
+</ul>
+
+<a name="wizzywiz"></a><h4>Meerdere administratie directories</h4>
+
+<p>Als u een configuratiebestand maakt met daarin de sectie
+&lsquo;general&rsquo; waarin de settings <code>admdir</code> alsmede
+<code>wizard=1</code>, en u start een van de EekBoek programma's op
+waarbij u dit configuratiebestand meegeeft aan de --config command
+line optie, dan zal het programma de selectiewizard opstarten in de
+opgegeven administratie directory. Op deze wijze kunt u meerdere
+groepen van administraties beheren.</p>
+
+
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      <hr>
+
+    </td>
+    <td>
+      <hr>
+
+    </td>
+  </tr>
+
+  <tr valign="bottom">
+    <td valign="middle">
+      <a href="http://www.perl.org/"><img src="../images/perl_powered.png" alt="Powered by Perl" border="0" width="134" height="48"></a>
+    </td>
+    <td align="center">
+      <p style="float:right;margin-top:0pt">
+      <img src="../images/valid-html401.png" alt="[Valid HTML 4.01 Transitional]" border="0" width="88" height="31">
+
+      <img src="../images/validcss.png" alt="[Valid CSS]" border="0" width="88" height="31">
+
+      </p>
+      <p class="info">Copyright &copy; 2005-2010 <a href="http://www.squirrel.nl">Squirrel Consultancy</a>. All Rights Reserved.<br />
+Deze site is gemaakt met de 
+<a href='http://johan.vromans.org/tt2site/'>TT2Site
+Site Builder</a>.<br />
+setup/config.html laatste aanpassing 28 juli 2010, 20:25:51
+</p>
+
+    </td>
+  </tr>
+
+</table>
+
+ </body>
+</html>

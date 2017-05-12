@@ -1,0 +1,12 @@
+Changes
+lib/Encode/compat.pm
+lib/Encode/compat/5006001.pm
+lib/Encode/compat/Alias.pm
+lib/Encode/compat/common.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+SIGNATURE
+t/0-signature.t
+t/1-basic.t
+META.yml                                 Module meta-data (added by MakeMaker)

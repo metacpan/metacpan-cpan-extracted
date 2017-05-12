@@ -1,0 +1,28 @@
+2001-02-12  John Tobey  <jtobey@john-edwin-tobey.org>
+
+	* 0.7 Release.  GNU Emacs 20 runs the test suite except
+	11_cyclic.t.  Low-level support for interactive sessions under
+	Perl control exists.  Texinfo documentation is improving, though
+	still far from complete.  Fixed some bugs.
+
+2001-02-06  John Tobey  <jtobey@john-edwin-tobey.org>
+
+	* MANIFEST: New test suite t/11_cyclic.t.
+
+2001-02-04  John Tobey  <jtobey@john-edwin-tobey.org>
+
+	* lib/Emacs/EPL.pm (escape_symbol): Use a \ on symbols whose names
+	look like a number.
+
+	* Makefile.PL: Perl 5.005 passes the test suite now.  5.004 and
+	possibly older Perls work but do not support setq.
+
+2001-01-31  John Tobey  <jtobey@john-edwin-tobey.org>
+
+	* MANIFEST: Add COPYING so I'm no longer a liar.
+
+2001-01-30  John Tobey  <jtobey@john-edwin-tobey.org>
+
+	* MANIFEST: Add ChangeLog, xemacs/Makefile, and
+	xemacs/package-info.in, required for building an XEmacs package.
+

@@ -1,0 +1,43 @@
+# $Id: relaties.eb,v 1.6 2008/02/20 23:24:53 jv Exp $
+
+# Aanmaken relaties.
+#
+# Syntax:
+#
+#   Relatie <code> "<omschrijving>" standaardrekening
+#
+# Als dagboek wordt het laagstgenummerde inkoop/verkoop dagboek
+# genomen. Het is altijd beter het dagboek expliciet op te geven.
+#
+# Opties:
+#
+#  --dagboek=XXXX            selecteer dagboek
+#  --btw=XXX                 btw type, zie verderop
+#
+
+# Een relatie is crediteur indien het dagboek een inkoopdagboek is.
+
+relatie --dagboek=inkoop \
+        XS4ALL "XS4All Internet B.V." 6905
+#relatie --dagboek=inkoop \
+#        KPN "KPN" 6900
+# Met impiciete dagboekdetectie:
+relatie KPN "KPN" 6900
+
+# Meerdere relaties kunnen ook in een keer:
+#
+# relatie --dagboek=inkoop \
+#       XS4ALL "XS4All Internet B.V." 6905 \
+#       KPN "KPN" 6900
+
+# Een relatie is debiteur indien het dagboek een verkoopdagboek is.
+
+# Relatie <code> "<omschrijving>" standaardrekening
+relatie --dagboek=verkoop \
+        ACME "Acme Corp." 8100
+
+# Relatie van buiten Europa. BTW code is 'extra'.
+# Andere mogelijkheden voor BTW zijn 'normaal',
+# 'verlegd' en 'intra' (intra-communautair, binnen Europa).
+relatie --dagboek=verkoop --btw=extra \
+        ORA "O'Reilly & Associates" 8200

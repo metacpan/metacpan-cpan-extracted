@@ -1,0 +1,26 @@
+[%#
+
+Django support
+
+Looks a bit like this:
+
+from django.db import models
+
+class Thing(models.Model):
+	name = models.TextField(null=True)
+
+-%]
+[% BLOCK Support/Django/Entity;
+  class_name = entity.name;
+-%]
+from django.db import models
+
+class [% class_name %](models.Model):
+[%  FOREACH field IN entity.field.arrayref -%]
+    [% field.name %] = models.TextField(null=True)
+[%  END -%]
+
+    class Meta:
+        app_label = '[% model.name %]'
+[% END -%]
+

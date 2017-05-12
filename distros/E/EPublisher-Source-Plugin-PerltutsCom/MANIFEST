@@ -1,0 +1,15 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/EPublisher/Source/Plugin/PerltutsCom.pm
+t/02_err_modulename.t
+t/03_removed_encoding_line.t
+t/95_pm_have_version.t
+t/96_pod_coverage.t
+t/97_pod.t
+xt/release/pod-coverage.t
+xt/release/pod-syntax.t

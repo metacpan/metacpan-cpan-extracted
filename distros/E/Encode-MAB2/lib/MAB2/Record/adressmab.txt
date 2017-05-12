@@ -1,0 +1,157 @@
+                              MAB2-ADRESS
+                      Online-Kurzreferenz-Version
+                         Stand: November 2001
+
+
+Vorbemerkung:
+
+Das vorliegende MAB-Format fuer Adress- und Bibliotheksdaten
+resultiert aus dem Projekt der Verbundkooperation.
+MAB-ADRESS hat einen vorlaeufigen und provisorischen Status.
+In seiner aktuellen Fassung soll MAB-ADRESS zugleich als
+Ausgangspunkt und Diskussionsgrundlage fuer die Entwicklung
+eines umfassenden Formats fuer Adressdaten dienen.
+
+
+
+          SATZKENNUNG
+
+
+001-088   SEGMENT 0--
+
+001-029   IDENTIFIKATIONSNUMMERN, DATUMS- UND VERSIONSANGABEN
+030-035   ALLGEMEINE VERARBEITUNGSTECHNISCHE ANGABEN
+036-049   ALLGEMEINE CODIERTE ANGABEN
+050-064   VEROEFFENTLICHUNGS- UND MATERIALSPEZIFISCHE ANGABEN
+070-075   ANWENDERSPEZIFISCHE DATEN UND CODES
+076-088   ANWENDERSPEZIFISCHE ANGABEN
+
+
+
+8--       SEGMENT ADRESSDATEN
+
+800       NAME DER INSTITUTION
+
+          Indikator:
+          blank = nicht definiert
+
+
+801       ADRESSE DER INSTITUTION
+
+          Indikator:
+          blank = nicht spezifiziert
+          a     = Lieferadresse, Sitzadresse
+          b     = Rechnungsadresse
+          c     = Postanschrift
+
+          Unterfelder:
+          $a    = Ort(e)
+          $b    = Strasse und Hausnummer
+          $d    = Postfach
+          $e    = Postleitzahl
+          $u    = Nicht spezifizierte Angaben
+          $z    = Bemerkungen zur Adresse
+
+
+802       ANGABEN UEBER ZUGANG UND ERREICHBARKEIT
+
+          Indikator:
+          blank = nicht definiert
+
+          Unterfelder:
+          $a    = Telefonnummer mit Vorwahl
+          $b    = Telefax mit Vorwahl
+          $c    = Telex
+          $d    = E-Mail-Adresse
+          $e    = URL der Homepage der Bibliothek
+          $f    = URL des WEB-OPACs der Bibliothek
+          $g    = Oeffnungszeiten
+          $u    = Nicht spezifizierte Angaben
+          $z    = Bemerkungen zu Zugang und Erreichbarkeit
+
+
+803       LIEFERKONDITIONEN
+
+          Indikator:
+          blank = nicht definiert
+
+          Unterfelder:
+          $a    = Lieferfachgruppen
+          $b    = Lieferzeitraum
+
+
+805       LIEFER- UND MELDERKENNUNGEN DER ZDB
+
+          Indikator:
+          blank = nicht definiert
+
+          Unterfelder:
+          $a    = Melderkennung
+          $b    = Lieferkategorie Verbundsysteme (Replikationskennung)
+          $c    = Liefersystem
+          $d    = Importkennzeichen
+          $e    = Status der Aufnahme in der Bibliotheksdatei
+
+
+806       ZUSAETZLICHE SIGELANGABEN
+
+          Indikator:
+          blank = nicht definiert
+
+          Unterfelder:
+          $a    = Sigel der Leitbibliothek fuer den Leihverkehr
+          $b    = Abrufzeichen Sigelverzeichnis
+          $c    = Leihverkehrsart
+          $d    = Altes Bibliothekssigel
+          $e    = Frueherer Ort
+
+
+808       BEMERKUNGEN
+
+          Indikator:
+          blank = nicht definiert
+
+
+809       UEBERNOMMENE BIBLIOTHEKEN
+
+          Indikator:
+          blank = nicht definiert
+
+          Unterfelder:
+          $a    = Name der uebernommenen Bibliothek
+          $b    = Sigel der uebernommenen Bibliothek
+          $c    = Sitz der uebernommenen Bibliothek
+
+
+811       SAMMELGEBIETE
+
+          Indikator:
+          blank = nicht definiert
+
+          Unterfelder:
+          $a    = Schlagwoerter der Sammelgebiete
+          $b    = Sondersammelgebiete der DFG
+
+
+812       CODES UND KUERZEL FUER DIE DEUTSCHE
+          BIBLIOTHEKSSTATISTIK (DBS)
+
+          Indikator:
+          blank = nicht definiert
+
+          Unterfelder:
+          $a    = Kurzbezeichnung der Bibliothek
+          $b    = Bibliothekstyp
+          $c    = Unterhaltstraeger
+          $d    = Bestandsgroessenklasse
+          $e    = Abrufzeichen für DBS
+          $f    = Statistische Kennzahl des Ortes,
+                  Gemeindekennzeichen
+          $g    = Verteilerstelle fuer DBS (DBS-ID-Nummer)
+          $h    = Uebergeordnete Bibliothek (DBS-ID-Nummer)
+
+
+830       WEITERE NAMENSFORMEN DER INSTITUTION
+
+          Indikator:
+          blank = nicht definiert

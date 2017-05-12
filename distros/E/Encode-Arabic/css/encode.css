@@ -1,0 +1,89 @@
+body {
+    font-family: DejaVu Sans Condensed, DejaVu Sans, Arial Unicode MS, Tahoma, Verdana, Arial, Helvetica, sans-serif;
+    font-weight: normal;
+    font-size: medium;
+    color: black;
+    background-color: white;
+}
+
+td {
+    font-size: medium;
+    font-weight: normal;
+    text-decoration: none;
+}
+
+input {
+    font-size: medium;
+}
+
+h1 {
+    font-size: x-large;
+    font-weight: bold;
+    color: #EEE8AA /*palegoldenrod*/;
+    background-color: #4B0082 /*indigo*/;
+    padding: 3px 6px;
+}
+
+h2 {
+    font-size: large;
+    font-weight: bold;
+    color: #4B0082 /*indigo*/;
+    border: 1px;
+    border-style: solid;
+    border-color: #DAA520 /*goldenrod*/;
+    padding: 2px 5px;
+}
+
+h3 {
+    font-size: medium;
+    font-weight: bold;
+    color: #4B0082 /*indigo*/;
+    background-color: #EEE8AA /*palegoldenrod*/;
+}
+
+p.arabic {
+    direction: rtl;
+}
+
+a:link {
+    color: #4B0082 /*indigo*/;
+    text-decoration: none;
+}
+
+h1 a:link {
+    color: #FFD700 /*gold*/;
+    text-decoration: none;
+}
+
+a:visited {
+    color: #DAA520 /*goldenrod*/;
+    text-decoration: none;
+}
+
+h1 a:visited {
+    color: #FFD700 /*gold*/;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #FFD700 /*gold*/;
+    text-decoration: none;
+}
+
+h1 a:hover {
+    color: #FFD700 /*gold*/;
+    text-decoration: none;
+}
+
+a:active {
+    color: #DAA520 /*goldenrod*/;
+    text-decoration: none;
+}
+
+p.char {
+    font-size: x-small;
+}
+
+p.byte {
+    font-size: x-small;
+}

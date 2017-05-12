@@ -1,0 +1,94 @@
+Revision history for Email-MIME-Kit
+
+3.000005  2016-09-20 11:22:25-04:00 America/New_York
+        - set up kit_reader and manifest_reader with a helper attribute instead
+          of the weird and rarely-seen Moose "initializer" system
+
+3.000004  2016-08-03 22:48:27-04:00 America/New_York
+        - require a newer Email::MIME so we can rely on the header_raw method
+
+3.000003  2016-08-03 09:08:35-04:00 America/New_York
+        - manifest.json is now properly decoded while being read, so
+          UTF-8 strings in the manifest.json are treated the same way as
+          \u.... sequences.  If you had been doubly-UTF-8-encoding your
+          manifest.json to work around this bug, your code is now broken
+          because my code is now fixed.
+
+3.000002  2015-02-19 11:02:14-05:00 America/New_York
+        - immutabilize more classes
+
+3.000001  2014-12-01 14:10:12-05:00 America/New_York
+          [BREAKING CHANGES]
+        - content read from disk (templates, for example) is now decoded
+          as UTF-8 if and only if the content type for which it is being used
+          is text/*
+        - for more information on this change, consult the "ENCODING" section
+          of the documentation for Email::MIME::Kit
+
+          [BUG FIXES]
+        - non-text parts are no longer padded with CRLFs
+
+2.102015  2014-11-02 08:59:04-05:00 America/New_York
+        - read kit entries in binary mode for the sake of Win32 (thanks,
+          Octavian Rasnita!)
+
+2.102014  2014-06-06 08:24:52-04:00 America/New_York
+        - break a circular reference in the assembler (thanks, Charlie
+          Garrison)
+
+2.102013  2013-08-12 21:32:01 America/New_York
+          update bugtracker and repo
+
+          only call _set_attachment_info when it is present
+
+2.102012  2013-04-08 15:29:38 America/New_York
+          make tests for header encoding less specific: the header must be
+          encoded, but we don't mind if it's B or Q
+
+2.102011  2012-07-25 10:58:12 America/New_York
+          stop failing with changed crlf detection
+
+2.102010  2010-07-20 15:00:43 America/Los_Angeles
+          eliminate use of auto_deref on some private attributes
+
+2.101960  2010-07-15 09:04:53 America/New_York
+          improve the chances of correctly bracketing message-ids
+          avoid re-setting already set message-ids
+
+2.093070  2009-11-03
+          improve handling of header and body encoding
+
+2.091920  2009-07-10
+          add missing (test) prereq Test::Deep
+          fix cid_for callbacks to exclude the content-id brackets (RT 47787)
+            (reported by Jason Taylor; thanks!)
+
+2.091410  2009-05-20
+          documentation improvements
+          now packaged by Dist::Zilla
+
+2.004     2009-04-09
+          fix bug in standard assembler that prevented renderer override
+
+2.003     2009-03-12
+          fix bug in subassembly creation; assembler couldn't be parameterized
+          move the TestRenderer out of t/lib to let other dists rely on it
+
+2.002     2009-03-09
+          make it possible to specify an alternate kit_reader in the manifest
+          fix some bugs in core component initialization
+
+2.001     2009-01-28
+          alternatives now get a default charset of utf-8 (needs more work)
+          fix autoencode tests for pre-perl5-8.009's qr{}m
+
+2.000     2009-01-16
+          begin total rewrite
+
+0.010_02  2006-03-22
+          Refactor into ::Component and ::Component::Data
+          Make it possible to change INCLUDE_PATH for Renderer::TT.
+
+0.010     2006-03-06
+          First version, released on an unsuspecting internal network.
+

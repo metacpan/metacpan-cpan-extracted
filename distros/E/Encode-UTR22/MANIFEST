@@ -1,0 +1,14 @@
+doc/utr22c.pdf
+examples/CharacterMapping.dtd
+examples/silipa93.xml
+examples/Utr22c.clb
+examples/utr22c.xsd
+examples/utr_display.xsl
+examples/utrconv
+lib/Encode/UTR22.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+scripts/testutr22
+scripts/utr22tec

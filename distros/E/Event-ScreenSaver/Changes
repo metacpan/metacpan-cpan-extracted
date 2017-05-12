@@ -1,0 +1,55 @@
+Revision history for Event-ScreenSaver
+
+0.0.6   2015-01-26
+        Updating for release of version 0.0.6
+        Updated License (Ivan Wills)
+        fixed license (Ivan Wills)
+        Merge branch 'master' of github.com:ivanwills/Event-ScreenSaver (Ivan Wills)
+
+0.0.5   2014-12-07
+        Updating for release of version 0.0.5 (Ivan Wills)
+        Updated dependencies (Ivan Wills)
+        Updated licence (Ivan Wills)
+        Removed generated files (Ivan Wills)
+        Updated skips (Ivan Wills)
+        Added missing files to test and cleaned up (Ivan Wills)
+        Cleaned up tabs (Ivan Wills)
+        Added bailout for non linux oses (Ivan Wills)
+
+0.0.4   2014-05-22
+        Changes for 0.0.4 release (Ivan Wills)
+        Missing changes fron 0.0.3 (Ivan Wills)
+        Updated files (Ivan Wills)
+
+0.0.3   2014-08-19
+        Added more diagnostics (Ivan Wills)
+        Updated to my current standards (Ivan Wills)
+        Upped version number and added notes to the changes file (Ivan Wills)
+        Stopped spelling and pod coverage tests running by default (Ivan Wills)
+        Made solaris default to using the Unix module (Ivan Wills)
+        Fixed issue with people having Test::Spelling but not the spell command (Ivan Wills)
+        Fixed POD (Ivan Wills)
+        updated the documentation (Ivan Wills)
+        Fixed changed method names (Ivan Wills)
+        Fixed the date of the actual release (Ivan Wills)
+        removed testing code (Ivan Wills)
+        Fixed player logic and removed code causing a bug (Ivan Wills)
+        Added Unix.pm to be tested, removed todo tests (Ivan Wills)
+        Further split out x11 and dbus code to simplify maintanence (Ivan Wills)
+        Updated to include new file (Ivan Wills)
+        Updated the README file (Ivan Wills)
+        Seperated out os specific code to make it easier to implement on other operating systems (Ivan Wills)
+        Fixed changes file for first release (Ivan Wills)
+        Added other standard files (Ivan Wills)
+        example script to pause music players when the screen saver starts (Ivan Wills)
+        Added in code to run the screen saver checking (Ivan Wills)
+        Moosified lib (Ivan Wills)
+
+0.0.2   2009-07-13
+        Fixed failing spelling tests.
+        Made Solaris use the Unix module.
+        Stopped spelling and pod-coverage tests from running by default
+
+0.0.1   2009-07-12
+        First version, released on an unsuspecting world.
+

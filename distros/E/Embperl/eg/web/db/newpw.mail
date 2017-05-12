@@ -1,0 +1,17 @@
+[= mail_greeting =][- $r = shift; -]
+
+[= mail_pw =]
+
+[= mail_your_pw_is =] '[+ $param[0] +]' [= mail_note_quotes =].
+
+[= mail_note_login =]
+http://[+ $ENV{SERVER_NAME} +][#:[+ $ENV{SERVER_PORT} +]#][+ $r->{config}->{baseuri} +]db/login.epl?user_email=[+ do { local $escmode=2; $fdat{user_email}} +]
+
+[#
+DEBUGGING:
+
+[! use Data::Dumper; !]
+[+ Dumper \%fdat,$r->{curritem},$r +]
+#]
+-- 
+[= mail_sig =]

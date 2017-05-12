@@ -1,0 +1,9 @@
+README
+MANIFEST
+COPYING
+Changes
+Makefile.PL
+Glib.pm
+Glib.xs
+t/00_load.t
+META.yml                                 Module meta-data (added by MakeMaker)

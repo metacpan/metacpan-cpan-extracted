@@ -1,0 +1,24 @@
+#
+# $Id: Changes.e2x,v 2.0 2004/05/16 20:55:15 dankogai Exp $
+# Revision history for Perl extension Encode::EUCJPASCII.
+#
+
+0.03  Wed Jun 24 23:16:53 2009
+! EUCJPASCII.pm
+   Imp: x-iso2022jp-ascii: Handle JIS C 6226-1978 sequence.
+! testin/7bit.txt
+   Added tests.
+
+0.02  Mon Jun 15 22:42:00 2009
+! EUCJPASCII.pm
+   Fix: Broken JIS X 0201 handling on 7-bit encoding.
+! t/EUCJPASCII.t
++ testin/7bit.txt
++ testin/eucjp.txt
+   Added 7-bit tests and more.
+! ucm/eucJP-ascii
+! ucm/mkucm.pl
+   Cosmetic: Added character names.
+
+0.01  Sun Jun 14 15:32:08 2009
+! First release.

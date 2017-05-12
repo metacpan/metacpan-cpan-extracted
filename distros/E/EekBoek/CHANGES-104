@@ -1,0 +1,317 @@
+Wijzigingen in EekBoek 1.04
+===========================
+
+Voor een volledige, gedetailleerde lijst van veranderingen zie het
+bestand CHANGES.
+
+BELANGRIJK: Om alle nieuwe features van deze versie te kunnen benutten
+dient de administratie nieuw in 1.04 te worden geïmporteerd. Het is
+daarom sterk aan te raden eerst uw administraties te exporteren
+alvorens tot upgrade over te gaan. Heeft u de upgrade al uitgevoerd?
+Exporteer en importeer dan uw administraties alsnog eenmalig.
+
+LEES VOORAL HET ITEM "MIGRATIE" AAN HET EIND VAN DIT BESTAND.
+
+Schema
+------
+
+* BTW tariefgroepen Privé en Anders.
+
+  In schema:
+
+     5  BTW Privé    :tariefgroep=privé :perc=12,00 :exclusief
+     6  BTW Anders   :tariefgroep=anders :perc=14,50 :exclusief
+
+  Als deze taeriefgroepen worden opgevoerd dan moeten de
+  betreffende koppelingen ook worden opgegeven:
+
+     4240  D   BTW Inkoop Anders    :koppeling=btw_ia
+     4250  C   BTW Verkoop Anders   :koppeling=btw_va
+
+  Etc.
+
+  BTW 'Privé' komt in de BTW aangifte in groep 1d, BTW
+  'Anders' komt in groep 1e. Deze groepen worden niet op het
+  aangifteformulier vermeld als de betreffende tariefgroep
+  ontbreekt.
+
+* Debiteuren en crediteuren kunnen nu per dagboek verschillend worden
+  opgegeven.
+
+Boekingen
+---------
+
+* Bij een inkoop/verkoop boeking kun je een willekeurige (moet
+  tenminste één niet-cijfer bevatten) string opgeven als referentie:
+
+     inkoop 25-12 CREDITEUR "Diversen" --ref="P24XyzBla!" 100
+
+  Een geschikte kandidaat is b.v. het faktuurnummer van de klant, of
+  een ordernummer.
+
+  Deze referentie kun je later gebruiken bij de betaling:
+
+     postbank 25-12 Afschrijving \
+	crd 25-12 "CREDITEUR:P24XyzBla!" -100
+
+  Dus net zoals:
+
+     postbank 25-12 Afschrijving \
+	crd 25-12 inkoop:54 -100
+
+  Overigens met dezelfde functionaliteit: er wordt niet gekeken of de
+  boeking open staat. Je kunt dus op deze manier ook op voorhand
+  boeken.
+
+  De combinatie relatiecode - referentie moet per boekjaar uniek zijn.
+
+* Boekingen in een periode waarover BTW aangifte is gedaan kunnen nog
+  steeds worden gewijzigd als deze boeken geen betrekking heeft op de
+  BTW (m.a.w., BTW type Neutraal).
+
+* Inkoop/Verkoopboekingen
+
+  - Config optie strategy:iv_vc.
+
+    Bij het boeken in een Inkoop- of Verkoopdagboek wordt BTW berekend
+    per boekstukregel. Sommige leveranciers berekenen echter de BTW
+    over het totaal van de boekstukregels. Daardoor kunnen
+    afrondingsverschillen ontstaan met als gevolg een boekstuktotaal
+    dat niet klopt met de opgegeven waarde. De boeking zal dan worden
+    geweigerd.
+
+    EekBoek zal proberen zo'n boeking te corrigeren door de BTW te
+    herberekenen over het totaal. Er wordt dan een melding gegeven, en
+    een correctieboekstukregel aangemaakt. Dit gedrag kan worden
+    afgezet door de strategy optie iv_vc de waarde 0 te geven.
+
+* Bank/Kas/Memoriaalboekingen
+
+  - Config optie strategy:bkm_multi.
+
+    Indien gezet en niet nul (kortom, true) dan wordt in geval een
+    boeking niet kan worden gematched tegen een openstaande post
+    geprobeerd of deze boeking wellicht voor meerdere openstaande
+    posten tegelijk bedoeld is.
+
+  - Toon bedrag en relatie indien geen openstaande post kan worden
+    gevonden.
+
+Rapporten
+---------
+
+* Alle rapporten in HTML kunnen een expliciete titel meekrijgen:
+
+    balans --title="Voorlopige balans 2009" --out=x.html
+
+* Bij de rapportage openstaande posten kan nu ook worden geselecteerd
+  dat alleen de debiteuren, crediteuren, of een enkele relatie wordt
+  weergegeven.
+
+* Bij de crediteuren/debiteurenrapportages kan nu ook worden
+  aangegeven dat alleen de openstaande posten moeten worden
+  weergegeven.
+
+  Let op: Openstaande posten van voorgaande boekjaren worden NIET
+  vernmeld.
+
+* BTW Aangifte
+
+  - Toon ook het onafgeronde totaal en de afronding.
+
+  - Optie --noround voor een onafgerond rapport.
+
+EekBoek Shell
+-------------
+
+* Alle odrachten zijn nu case-insensitive.
+
+* Commando's 'journal', 'trace' en 'confirm' kennen nu een'--quiet'
+  optie, waardoor de opdrachten stil worden uitgevoerd.
+
+* Journaalposten worden niet meer gerapporteerd tijdens import en
+  init.
+
+* Command line optie "--init". Hiermee wordt een nieuwe administratie
+  opgezet in de huidige directory.
+
+  Equivalent met "--import --dir=.".
+
+* Command line opties "--database" (en de verkorte vorm, "--db") en
+  "--journaal" komen binnenkort te vervallen.
+
+* LET OP: EekBoek met SQLite ondersteunt niet de opdracht "import".
+  Importeren uitsluitend met de command line versie
+
+    ebshell --import ...
+
+* Optie --errexit: Verwerking van invoer breekt direct af na
+  geconstateerde fouten.
+
+* Optie --[no]interactive om interactief gedrag te forceren ook al
+  komt de invoer niet van een terminal. Niet bedoeld voor uitwendig
+  gebruik.
+
+* Optie: --createsampledb. Deze creeert de voorbeelddatabase.
+
+Configuratie
+------------
+
+* Kleine wijzigingen in het verwerken van de config files. De
+  ".eekboek.conf" in de huidige directory wordt niet langer meegenomen
+  indien ebshell wordt opgestart met een "-f" optie.
+
+* --config (-f) accepteert nu ook de naam van een directory, en
+  probeert dan eekboek.conf en .eekboek.conf.
+
+* Nieuwe configuratie settings:
+
+  [preferences]
+  journal = 1
+
+    Hiermee wordt na elke boeking automatisch de betreffende
+    journaalpost getoond. Deze preference setting vervangt de
+    command line optie "--journaal".
+
+  [strategy]
+  iv_vc = 1
+
+    Zie bij "Boekingen".
+
+  [strategy]
+  bkm_multi = 1
+
+    Zie bij "Boekingen".
+
+  [strategy]
+  bkm_multi_max = 15
+
+    Omdat het zoekproces enige tijd in beslag kan nemen (enkele
+    minuten bij 25 openstaande posten) is een begrenzing ingebouwd.
+
+  [strategy]
+  round = ieee
+
+    Hiermee kan worden ingesteld op welke wijze EekBoek bij
+    berekeningen bedragen moet afronden.
+
+    De volgende methoden worden ondersteund:
+
+    ieee	Afronding volgens de IEEE standaard.
+                Dit is de standaardinstelling.
+    bankers	Afronding naar even getallen (het zg. Bankers algoritme)
+    posix	Afronding volgens de POSIX standaard.
+
+Bugfixes
+--------
+
+* Meer dan één -D / --define op de command line mogelijk.
+
+* Geen reporter backends laden indien AUTOMATED_TESTING.
+  Hiermee worden test failures vermeden indien er achterhaalde EekBoek
+  installaties rondzwerven.
+
+* BKM deb/crd boeking gebruikt altijd de standaardrekeningen voor
+  deb/crd i.p.v. de aan het dagboek gekoppelde rekening.
+
+* Fix issue 1901436.
+
+* Fix issue 1871576.
+
+* Fix bug waardoor een adm_relatie met datum 31-12 niet werd
+  geaccepteerd wanneer er al eerdere boekingen in dat jaar waren.
+
+* Fix bug waardoor openstaande posten uit voorgaande jaren XXXX
+  leidden tot de melding "Boekjaar XXXX nog niet afgesloten".
+
+* Fix probleem met foutieve export van adm_btwperiode in multi-jaar
+  admin (issue 1628783).
+
+* Fix probleem met jaareinde van BTW-loze administratie.
+
+* Fix probleem met rapportbreedte jaareinde.
+
+* Fix probleem met SQLite en opdrachten die direct na een
+  createdb/schema worden uitgevoerd, zoals b.v.:
+
+   $ cat relaties.eb opening.eb | ebshell --createdb --schema=schema
+
+* Fix probleem met het opruimen van de directories na (rpm) uninstall.
+
+* Fix bug met strings in de export die " en \ bevatten.
+
+Aanvullingen
+------------
+
+* Uitbreidingen contrib/afschr.pl .
+
+* eekboek-mode.el: Emacs major mode voor EekBoek data.
+
+* Nieuw voorbeeldschema voor een vereniging, met dank aan
+  Edwin Hakkennes.
+
+Diversen
+--------
+
+* Verwacht wordt dat EekBoek met Debian GNU/Linux meegeleverd gaat
+  worden, zie http://bugs.debian.org/491113 voor de actuele status.
+  Mensen die 'unstable' (of 'testing') draaien zullen het snel in hun
+  software-lijst zijn verschijnen.
+
+* Voorbeeldschema's verplaatst van lib/EB/schema naar
+  lib/EB/examples. 
+
+* Voorbeelden verplaatst van lib/EB/example naar
+  lib/EB/examples.
+
+* RPM packages zijn gesplitst in een common package, en twee database
+  packages:
+
+    EekBoek-1.04-1.noarch.rpm
+    EekBoek-db-postgres-1.04-1.noarch.rpm
+    EekBoek-db-sqlite-1.04-1.noarch.rpm
+
+  Bij installatie dient naast het common deel tenminste een van beide
+  database kits te worden geïnstalleerd.
+
+  Zie http://www.eekboek.nl/docs/install/linux.html
+
+* DEB packages zijn gesplistst in een basis package, gebaseerd op
+  SQLite, en een add-on package voor PostgreSQL:
+
+    eekboek_1.04-1_all.deb
+    eekboek-db-postgresql_1.04-1_all.deb
+
+  Zie http://www.eekboek.nl/docs/install/linux.html
+
+* PPM package voor Microsoft Windows:
+
+    EekBoek-1_04.ppd
+
+  Zie http://www.eekboek.nl/docs/install/windows.html
+
+Examples
+--------
+
+* Nieuw, actueel, eenvoudiger en beter schema voor de example
+  database.
+
+Migratie
+--------
+
+De database-structuur is gewijzigd. Auto-migratie is beschikbaar.
+Het wordt echter ten sterkste aangeraden VOOR INSTALLATIE VAN 1.04
+eerst een export te doen, en deze na installatie van 1.04 te
+importeren. 
+
+Bij auto-migratie van SQLite databases treedt een fout op:
+
+  !De database wordt aangepast aan de nieuwere versie
+  DBD::SQLite::st execute failed: database schema has changed(1)
+    at dbdimp.c line 421 at /home/jv/src/eekboek/src/lib/EB/DB.pm line 649.
+  DBD::SQLite::st execute failed: database schema has changed(1)
+    at dbdimp.c line 421 at /home/jv/src/eekboek/src/lib/EB/DB.pm line 649.
+
+U dient dan NOG TWEE MAAL de EekBoek shell op te starten, en u krijgt
+nog twee maal deze boodschap. Daarna is de migratie compleet.
+

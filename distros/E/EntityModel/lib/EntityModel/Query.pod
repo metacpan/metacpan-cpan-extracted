@@ -1,0 +1,169 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with EntityModel::Query
+at lib/EntityModel/Query.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+EntityModel::Query - handle SQL queries
+
+=head1 VERSION
+
+version 0.102
+
+=head1 SYNOPSIS
+
+ use EntityModel::Query;
+
+ # Provide a definition on instantiation:
+ my $query = EntityModel::Query->new(
+ 	select	=> [qw(id name)]
+	from	=> 'table',
+	where	=> [ created => { '<' => '2010-01-01' } ],
+	limit	=> 5
+ );
+
+ # or using chained methods:
+ my $query = EntityModel::Query->new
+ ->select( qw(id name) )
+ ->from( 'table' )
+ ->where(
+ 	created => { '<' => '2010-01-01' }
+ )
+ ->limit(5);
+
+ # Extract query as SQL
+ my ($sql, @bind) = $query->sqlAndParameters;
+ my $sth = $dbh->prepare($sql);
+ $sth->execute(@bind);
+
+=head1 DESCRIPTION
+
+Provides an abstraction layer for building SQL queries programmatically.
+
+When generating the query, each of the components is called in turn to get an "inline SQL" arrayref. This is an arrayref consisting of
+SQL string fragments interspersed with refs for items such as L<EntityModel::Entity> names, direct scalar values, or L<EntityModel::Field>
+names.
+
+As an example:
+
+ [ 'select * from ', EntityModel::Entity->new('table'), ' where ', EntityModel::Field->new('something'), ' = ', \3 ]
+
+This can then be used by L<sqlAndParameters> to generate:
+
+ 'select * from "table" where "something" = ?', 3
+
+or as a plain SQL string (perhaps for diagnostic purposes) from L<sqlString> as:
+
+ 'select * from "table" where "something" = 3'
+
+=head1 METHODS
+
+=head2 new
+
+Construct a new L<EntityModel::Query>. Most of the work is passed off to L<parse_spec>.
+
+=head2 type
+
+Returns the type of the current query. The query object will be reblessed into an appropriate
+subclass depending on whether this is an insert, select, delete etc. A query that has not been
+reblessed is invalid.
+
+=head2 parse_spec
+
+Parse the specification we were given.
+
+=head2 parse_base
+
+Base method for parsing.
+
+=head2 reclassify
+
+Virtual method to allow subclass to perform any required updates after reblessing to an alternative class.
+
+=head2 upgradeTo
+
+Upgrade an existing L<EntityModel::Query> object to a subclass.
+
+=head2 parse_limit
+
+Handle a 'limit' directive.
+
+=head2 parse_group
+
+=head2 parse_where
+
+=head2 typeSQL
+
+Proxy method for L<type>, returns the SQL string representation for the current query type (such as 'select' or 'insert into').
+
+=head2 fieldsSQL
+
+Generate the SQL for fields.
+
+=head2 fromSQL
+
+SQL for the 'from' clause.
+
+=head2 limitSQL
+
+=head2 offsetSQL
+
+=head2 orderSQL
+
+=head2 groupSQL
+
+=head2 havingSQL
+
+=head2 whereSQL
+
+=head2 joinSQL
+
+=head2 keyword_order { qw{type fields from join where having group order offset limit};
+
+=head2 inlineSQL
+
+=head2 results
+
+=head2 iterate
+
+Calls the given method for each result returned from the current query.
+
+=head2 dbh
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<SQL::Translator>
+
+=item * L<SQL::Abstract>
+
+=back
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<EntityModel::Query::Base>
+
+L<asString|EntityModel::Query::Base/asString>, L<can_parse|EntityModel::Query::Base/can_parse>, L<decantQuotedValue|EntityModel::Query::Base/decantQuotedValue>, L<decantValue|EntityModel::Query::Base/decantValue>, L<normaliseInlineSQL|EntityModel::Query::Base/normaliseInlineSQL>, L<register|EntityModel::Query::Base/register>, L<sqlAndParameters|EntityModel::Query::Base/sqlAndParameters>, L<sqlString|EntityModel::Query::Base/sqlString>
+
+=item L<EntityModel::BaseClass>
+
+L<clone|EntityModel::BaseClass/clone>, L<dump|EntityModel::BaseClass/dump>, L<sap|EntityModel::BaseClass/sap>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <cpan@entitymodel.com>
+
+=head1 LICENSE
+
+Licensed under the same terms as Perl itself.

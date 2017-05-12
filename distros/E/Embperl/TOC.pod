@@ -1,0 +1,228 @@
+=head1 NAME
+
+Embperl::TOC - Embperl Documenation: Table of Contents
+
+=head1 DESCRIPTION
+
+Embperl can be used in many ways and it's documentation doesn't fit in
+one man pages. The following documentation is available within the
+distribution and the installed system using perldoc(1) or man(1):
+
+=head1 CONTENT
+
+  Installation Documentation
+  Embperl::Features
+  Embperl::Intro
+  Embperl::IntroEmbperl2
+  Embperl::Config
+  Embperl
+  Embperl::Object
+  Embperl::Form
+  Embperl::Form::Validate
+  Embperl::Mail
+  Embperl::Inline
+  Embperl::Recipe
+  Embperl::Syntax
+  Embperl::Syntax::ASP
+  Embperl::Syntax::Embperl
+  Embperl::Syntax::EmbperlBlocks
+  Embperl::Syntax::HTML
+  Embperl::Syntax::EmbperlHTML
+  Embperl::Syntax::Mail
+  Embperl::Syntax::MsgIdExtract
+  Embperl::Syntax::Perl
+  Embperl::Syntax::POD
+  Embperl::Syntax::RTF
+  Embperl::Syntax::SSI
+  Embperl::Syntax::Text
+  Embperl::TipsAndTricks
+  Sourcecode encryption
+  Changes
+
+=head1 INSTALLATION DOCUMENTATION
+
+See perldoc L<INSTALL.pod> in the distribution archive.
+
+
+
+=head1 OVERVIEW DOCUMENTATION
+
+Introductionary texts
+
+
+
+=head1 L<Embperl::Features> (perldoc Features.pod)
+
+List of the main features of Embperl 2.0
+
+
+
+=head1 L<Embperl::Intro> (perldoc Intro.pod)
+
+Embperl basics: What is Embperl? How to embed perl code in HTML
+documents; Flow Control; Dynamic Tables; Form Processing; Maintaining
+persistent (session) data; Breaking up your code in components;
+Debugging; Database Access; Security; Escaping/Unescaping.
+
+
+
+=head1 L<Embperl::IntroEmbperl2> (perldoc IntroEmbperl2.pod)
+
+Introduction to the new features in Embperl 2 considering the Embperl
+homepage as example.
+
+
+
+=head1 L<Embperl::IntroEmbperlObject> (perldoc IntroEmbperlObject.pod)
+
+Introduction to building object-oriented websites and web applications
+with Embperl
+
+
+
+=head1 FULL DOCUMENTATION
+
+Detailed references
+
+
+
+=head1 L<Embperl::Config> (perldoc Config.pod)
+
+Using Embperl with mod_perl, CGI, FastCGI, offline or from
+Perl. Includes documentation for Embperl::Execute() and
+documentation for all Embperl internal objects and
+their methods. You also find here all of Embperl's Apache
+configuration directives.
+
+
+
+=head1 L<Embperl>
+
+Describes syntax, semantic, predefined variables, session handling,
+etc.
+
+
+
+=head1 L<Embperl::Object> 
+
+Building object-oriented websites and web applications with Embperl
+
+
+
+=head1 L<Embperl::Form>
+
+=head1 L<Embperl::Form::Validate>
+
+Automatically creating and verifying forms with Embperl 
+
+
+
+=head1 L<Embperl::Mail>
+
+Sending mails generated with Embperl, e.g. results of submitted forms.
+
+
+
+=head1 L<Embperl::Inline>
+
+Using Embperl syntax in Perl modules.
+
+
+
+=head1 L<Embperl::Recipe>
+
+Defining Embperl recipes and provider
+
+
+
+=head1 L<Embperl::Syntax>
+
+Defining Embperl syntax.
+
+Modules derived from Embperl::Syntax and shipped with Embperl:
+
+
+
+=head2 L<Embperl::Syntax::ASP>
+
+ASP syntax module (<% ... %>)
+
+
+
+=head2 L<Embperl::Syntax::Embperl>
+
+Embperl syntax module: provides the default syntax, includes
+Embperl::Syntax::EmbperlBlocks, Embperl::Syntax::EmbperlHTML and
+Embperl::Syntax::MsgIdExtract..
+
+=head2 L<Embperl::Syntax::EmbperlBlocks>
+
+Syntax module for Embperl blocks
+
+=head2 L<Embperl::Syntax::HTML>
+
+=head2 L<Embperl::Syntax::EmbperlHTML>
+
+Syntax module for dynamic tables, forms, etc.
+
+=head2 L<Embperl::Syntax::Mail>
+
+Taglib providing an HTML like syntax for sending mail
+
+=head2 L<Embperl::Syntax::MsgIdExtract>
+
+Syntax module for internationalisation via Embperl's [= =] blocks.
+
+=head2 L<Embperl::Syntax::Perl>
+
+Perl syntax module, allowing Embperl to execute files with normal Perl
+syntax.
+
+=head2 L<Embperl::Syntax::POD>
+
+POD syntax module, converting Perl Plain Old Documentation files on
+the fly into XML.
+
+=head2 L<Embperl::Syntax::RTF>
+
+Syntax module to define the syntax for Rich Text Format (RTF) files
+
+=head2 L<Embperl::Syntax::SSI>
+
+Syntax module to emulate Apache's mod_include syntax with Embperl.
+
+=head2 L<Embperl::Syntax::Text>
+
+Syntax module to literally include any file without interpretation.
+
+
+
+=head1 TIPS, TRICKS AND EXAMPLES
+
+=head1 L<Embperl::TipsAndTricks> (perldoc TipsAndTricks.pod)
+
+Alternative way to do global variables; Global variables via
+namespaces; Handling queries in DBI; Handling exits; Handling errors;
+Development and production websites.
+
+As an example how Embperl can be used, the sourcecode of the Embperl
+website (see http://perl.apache.org/embperl/) is contained in the
+directory eg/ of the Embperl distribution archive. Read L<eg/README>
+of the Embperl distribution archive for an overview.
+
+
+
+=head1 Sourcecode encryption
+
+See L<crypto/README> of the Embperl distribution archive.
+
+
+
+=head1 CHANGES
+
+See perldoc L<Changes.pod>
+
+
+=head1 AUTHOR
+
+G. Richter (richter at embperl dot org), A. Beckert (beckert@ecos.de)

@@ -1,0 +1,11 @@
+severity  = 5
+
+# for signatures
+[-Subroutines::ProhibitSubroutinePrototypes]
+
+# We use Mojo::Base and Modern::Perl
+[TestingAndDebugging::RequireUseStrict]
+equivalent_modules = Evo
+
+[TestingAndDebugging::RequireUseWarnings]
+equivalent_modules = Evo

@@ -1,0 +1,177 @@
+Identification and phylogenetic analysis of Dictyostelium discoideum kinesin proteins
+
+Abstract
+
+Background
+
+Kinesins constitute a large superfamily of motor proteins in eukaryotic cells. They perform diverse tasks such as vesicle and organelle transport and chromosomal segregation in a microtubule- and ATP-dependent manner. In recent years, the genomes of a number of eukaryotic organisms have been completely sequenced. Subsequent studies revealed and classified the full set of members of the kinesin superfamily expressed by these organisms. For Dictyostelium discoideum, only five kinesin superfamily proteins (Kif's) have already been reported.
+
+Results
+
+Here, we report the identification of thirteen kinesin genes exploiting the information from the raw shotgun reads of the Dictyostelium discoideum genome project. A phylogenetic tree of 390 kinesin motor domain sequences was built, grouping the Dictyostelium kinesins into nine subfamilies. According to known cellular functions or strong homologies to kinesins of other organisms, four of the Dictyostelium kinesins are involved in organelle transport, six are implicated in cell division processes, two are predicted to perform multiple functions, and one kinesin may be the founder of a new subclass.
+
+Conclusion
+
+This analysis of the Dictyostelium genome led to the identification of eight new kinesin motor proteins. According to an exhaustive phylogenetic comparison, Dictyostelium contains the same subset of kinesins that higher eukaryotes need to perform mitosis. Some of the kinesins are implicated in intracellular traffic and a small number have unpredictable functions.
+
+Background
+
+Eukaryotic cells express three types of motor proteins: myosins, kinesins and dyneins [1]. Each constitutes a large superfamily based on the highly conserved motor domain [2-4]. All motors have in common that they use the energy derived by the hydrolysis of ATP to produce mechanical force. While myosins move on actin filaments, kinesins and dyneins are responsible for the retrograde and anterograde transport along microtubule tracks. The first kinesin was isolated from squid giant axons as a protein responsible for fast axonal transport [5,6]. This conventional kinesin (KHC) was shown to be a tetramer including two heavy and two light chains. The heavy chain consists of an N-terminal motor domain with microtubule affinity and ATPase activity followed by an extended coiled-coil region containing the light chain binding site [7] and a C-terminal domain that binds to the cargos. Like KHC, most kinesins have their motor domains at the N-terminus. However, in some kinesins, the motor domain is located in the centre of the molecule and a few others have C-terminal motor domains. In general, the position of the motor domain determines the directionality of transport: N-terminal kinesins move to the plus end and C-terminal kinesins to the minus end of microtubules [8]. Kinesins with central motor domains do not generate movement but function as microtubule depolymerases [9].
+
+Based on phylogenetic analysis, kinesins were grouped into nine [3] or, more recently, thirteen subfamilies [10]. Higher eukaryotes share a common subset of ten subfamilies. Additionally, there are some kingdom specific kinesin subfamilies. Together with the subfamilies, the cellular functions of the kinesins seem to have segregated, although there are some exceptions. Three subfamilies are implicated in organelle transport: KHC, Unc104/Kif1, and Osm3 kinesins. KHC subfamily members have been reported to transport numerous membrane cargoes such as, for example, mitochondria, endoplasmic reticula and lysosomes [11]. Lower eukaryotic Unc104 motors have more general roles in membrane trafficking, while their metazoan orthologs specialize in transporting synaptic vesicle precursors in the nervous system [12]. Osm3 kinesins are heterotrimeric and primarily involved in "intraflagellar transport" [1] but are also involved in other tasks, including the transport of vesicular cargoes in neurons [13].
+
+The six subfamilies solely attributed to mitotic functions are the BimC/Eg5, NCD/Kar3, MKLP1, MCAK/Kif2, Kip3 and CENP-E motors. All BimC motors examined to date have been found to be located on the microtubules between spindle poles [14,15] and to form bipolar tetramers [16]. They are supposed to cross-link antiparallel microtubules in the spindle midzone [16] and to slide them past one another to separate poles. To organise the spindle microtubules, BimC kinesins work together with C-terminal motors of the NCD/Kar3 subfamily [17]. Kar3 and NCD, the most extensively analysed C-kinesins, can both bind microtubules with their N-terminal tails [18] and therefore cross-link and slide microtubules by anchoring their tails to one microtubule, while generating force with their motor domains against adjacent microtubules. MKLP1 kinesins are involved in mitosis associated with the spindle midzone during anaphase and concentrating to a midbody matrix during cytokinesis [19]. MCAK/Kif2 kinesins are reported to destabilize microtubules [20] and associate to mitotic centromers [21]. The attachment of MCAK to the centromer is mediated via non-motor domains [22], while the motor domain is responsible for microtubule depolymerisation [20,23]. Vertebrate members of the CENP-E subfamily have been shown to bind to kinetochores during mitosis [24] and are involved in chromosome segregation. In interphase cells, Kip3 from S. cerevisae localizes to cytoplasmic microtubules, during mitosis it is most concentrated along the nuclear spindle, and late in anaphase it is preferentially found in the spindle midzone [25,26].
+
+Compared to the vast amount of data describing the structures, functions and localisations of Dictyostelium myosins [27,28], there are so far only a few investigations of Dictyostelium kinesins. Already in the early days of kinesin research the first Dictyostelium kinesin was isolated from cell lysates as a 105 kDa protein, based on its nucleotide-dependent binding to microtubules [29]. About ten years later, a PCR-based approach resulted in the full-length sequence of one kinesin (K7) and short fragments of further kinesins (K3, K4, K6, and K8) [30]. K7 was also analysed by immunofluorescence microscopy and shown to localise to a membranous perinuclear structure. Using the video microscopic observation of organelle transport in vitro as an assay, two further kinesins of 170 and 245 kDa were isolated [31]. The 245 kDa kinesin was found to be an Unc104/Kif1A homologue responsible for about 60 % of organelle movement. The third kinesin sequence (K2) revealed a C-terminal type kinesin related to the NCD/Kar3 subfamily. K2 localised as GFP fusion to the nuclei of cells at the interphase and to mitotic spindles during mitosis [32]. Two further sequences were obtained as a result of the assembly of the genomic sequences of chromosome 2 [33].
+
+The genome of Dictyostelium discoideum is covered now with shotgun reads to a depth of 6 to 8 [34]. Here, we have obtained the full set of kinesin superfamily proteins by homology searches for the motor domain. In addition to the five known kinesins, we identified eight new superfamily members. The sequences of the motor domains were aligned with those of 377 kinesins from 50 species found in the databases and phylogenetically analysed. The Dictyostelium kinesins group into nine subfamilies, one of the kinesins constituting the founder of a new class.
+
+Results
+
+Identification and nomenclature
+
+Thirteen kinesins were identified in the Dictyostelium genome, based on the sequence homology of the kinesin motor domain, and their full-length sequences were assembled (Fig. 1, Table 1). Five of the sequences have already been published [30-33] as well as fragments of DdKif3, DdKif4, DdKif6, and DdKif8 [30]. Since genes belonging to the same family should be designated by using the same acronym, we decided to give all the kinesins the acronym Kif followed by a number. Following the Dictyostelium genetic convention, which is intended to be conform with the conventions derived from Demerec et al. [35], the Dictyostelium kinesins are given a locus descriptor consisting of three italic letters, followed by a capital italicised letter to distinguish genes. In an early analysis of Dictyostelium genes [36], the kinesin genes were assigned the acronym ksn. However, this acronym ksn is not used for kinesin proteins of any other organism and it does not appear in the common databases (for example GeneBank or Trembl). We chose Kif because this name is in accordance with the nomenclature of human and mouse kinesins. Other acronyms like Klp (for kinesin-like protein) or Krp (for kinesin related protein) are not as widely used and have misleading implications. The established numbering was retained and the newly discovered kinesins added in random order.
+
+Figure 1
+
+Schematic diagram of the domain structures of Dictyostelium kinesins. The class designation is given in the motor domain of the respective kinesin. A colour key to the domain names and symbols is given on the right. Some of the names are abbreviated: PH, pleckstrin homology; FHA, forkhead homology associated; PDZ, a domain with potential for targeting membrane sites.
+
+Table 1
+
+Members of the kinesin gene superfamily in D. discoideum.
+
+* = chromosome 4 or 5
+
+Phylogenetic analysis and classification
+
+A phylogenetic tree of the motor domains of the Dictyostelium kinesins together with 377 kinesin motor domain sequences from 50 species found in the public databases was created (Fig. 2, supplementary data [see Additional file 1]). The tree is in basic agreement with the phylogenetic results of earlier investigations that, however, only included 146 kinesins in the most extensive analysis [3]. The kinesin superfamily comprises 17 subfamilies of N-terminal motors, two subfamilies of kinesins with central motor domains, and four subfamilies with C-terminal kinesins. Subfamilies were only assigned when kinesins of different organisms contribute. The new subfamilies were designated obeying the more general nomenclature of Miki et al. [10] (N-1 to N-17, M-1 and M-2, C-1 to C-4) as well as following the old convention that new classes should be named after the first member discovered. According to this phylogenetic tree, twelve of the Dictyostelium kinesins group into nine different subfamilies, only DdKif9 might be an orphan or the founder of a new class. Based on the position of their motor domains, two of the kinesins (DdKif6 and DdKif9) are of the middle motor domain type, one (DdKif2) has the motor domain at the C-terminus and the remaining kinesins have N-terminal motor domains.
+
+Figure 2
+
+Phylogenetic analysis of 390 kinesins from 50 species found in the common databases. Amino acid sequences of the motor domains were aligned by using maximum parsimony. Sequences used for alignment are available as supplemental material.
+
+Organelle transporters
+
+Based on the phylogenetic tree, four Dictyostelium kinesins group to the Unc104/Kif1 (DdKif1) and KHC (DdKif3, DdKif5, DdKif7) subfamilies that are implicated in organelle transport (Figs 1, 2). Two of the KHC subfamily members are new.
+
+DdKif3 (KHC subfamily)
+
+This kinesin contains an N-terminal motor domain followed by a 30 aa linker consisting of only glycine and serine residues. The linker is connected to a long ?-helical domain composed of several predicted coiled-coil regions. The C-terminus (aa ~980Ð1193) is extremely rich in asparagine, proline and serine residues. It is predicted not to contain any secondary structural elements, except for loops, and might therefore only fold in the presence of specific interacting proteins or membranes. The small peptide sequence obtained from tryptic digest of a 170 kDa kinesin that is able to reconstitute plus-end directed membrane transport [31] is identical to DdKif3. Interestingly, the sizes from SDS gel electrophoresis and weight calculation (131 kDa) are quite different.
+
+DdKif5 (KHC subfamily)
+
+Based on phylogenetic appearance, protein length and domain organisation, DdKif5 is the most similar Dictyostelium kinesin to human conventional kinesin. Neck and tail domains are composed of long ?-helical stretches, which are predicted to form interrupted coiled-coils. The probability of building dimers or higher oligomers is enhanced by two leucine zippers (at aa ~350 and ~810). The respective tail sections of the Dictyostelium KHC subfamily kinesins do not show a strong homology to the KLC binding site (amino acid residues 770Ð810 [7]) of human KHC. This heptad-repeat region is highly conserved between mammalian and invertebrate species and most likely forms an ?-helical coiled-coil interaction with a corresponding heptad-repeat region of KLC. Nonetheless, DdKif5 is the Dictyostelium kinesin with the highest similarity in this region and therefore the most likely candidate for binding of possible Dictyostelium kinesin light chains.
+
+Mitotic motors
+
+Dictyostelium contains six kinesin motor proteins belonging to subgroups predicted to function exclusively during mitosis (Figs 1, 2). Two of them belong to the CENP-E subfamily (DdKif4, DdKif11) and one each to the BimC/Eg5 (DdKif13), MKLP1 (DdKif12), MCAK/Kif2 (DdKif6) and NCD/Kar3 (DdKif2) subfamilies. The C-terminal kinesin Kif2 has already been described [32].
+
+DdKif4 (CENP-E subfamily)
+
+Phylogenetically, Kif4 groups to the mammalian and metazoan CENP-E kinesins. Those motors belong to the longest of all kinesins and have tails of about 2000 aa forming coiled-coil structures. In a similar way, DdKif4 contains a tail of long, interrupted coiled-coil regions. In contrast to the other CENP-E kinesins, Kif4 has a putative nuclear localisation signal C-terminal to its motor domain.
+
+DdKif11 (CENP-E subfamily)
+
+DdKif11 is the shortest of the Dictyostelium kinesins and groups to the plant branch of the CENP-E subfamily. The primary sequence of the motor domain shows an elongated loop-2 (L2) containing five consecutive LKTP motifs (Fig. 3). The non-motor part of the protein is mostly ?-helical and predicted to form coiled-coils. The protein sequence ends with amino acid residues EVML. This motif is implicated in binding of PDZ domains (the name PDZ derives from the first three proteins in which these domains were identified: PSD-95, DLG, and ZO-1 [37]). PDZ domains play important roles in the transport, localization and assembly of supramolecular signalling complexes [39].
+
+Figure 3
+
+Structure of the motor domain of human Kif5B [78] highlighting loops for which some of the Dictyostelium kinesins have long insertions. The approximate lengths of the insertions are given.
+
+DdKif13 (BimC/Eg5 subfamily)
+
+Overall, Kif13 has a similar domain organisation to other members of this subfamily. As most members of the BimC/Eg5 family, it shares several invariant amino acids surrounding a conserved p34cdc2 kinase consensus phosphorylation site (S/TPxK/R). This conserved sequence has been termed the BimC box motif [40]. Mutation of threonine to alanine in this motif has been shown to prevent their association with the mitotic spindle for both Xenopus and human Eg5 [41,42].
+
+DdKif6 (MCAK/Kif2 subfamily)
+
+At the N-terminus, DdKif6 contains a sterile alpha motif (SAM) domain [43]. This domain is a putative protein-protein interaction module that is present in a wide variety of proteins involved in many biological processes [44]. SAM domains do not form homo-oligomers in solution [45,46], although homodimers of SAM domains of different proteins have been found in crystal structures [47]. Instead, SAM domains hetero-oligomerize either by interacting with SAM domains of other proteins [44] or with other protein modules like the Src homology 2 (SH2) domains [48]. Following the SAM domain, DdKif6 contains long stretches of consecutive asparagine, serine, glutamine and glutamic acid residues. The regions neighbouring the central motor domain are mostly ?-helical and are partly predicted to form coiled-coils.
+
+DdKif12 (MKLP1 subfamily)
+
+DdKif12's motor domain contains a long N-terminal extension (~120 residues) and an extremely long loop-6 (L6) that constitutes the succession of the P-loop helix (Fig. 3). Kinesin motor domains share a close structural homology to myosin motor domains [49]. In myosins, the loop following the P-loop helix (called loop-1) is responsible for nucleotide affinity that decreases with the length and flexibility of this loop [50]. L6 might have a similar function in kinesin. The motor domain additionally contains a very long L12, having five positively charged residues in its sequence. This is similar to the K-loop composition in Kif1 kinesins from mammals. The tail of DdKif12 contains some predicted coiled-coil regions but does not show similarity to any protein in the databases.
+
+Motors with multiple or unknown function
+
+DdKif8 of the Kif4 subfamily and DdKif10 of the Kip3 subfamily belong to subfamilies members of which have been found to be involved in either mitosis or organelle transport, or which participate in both processes depending on the stages of the cell cycle.
+
+DdKif8 (Kif4 subfamily)
+
+The motor domain of DdKif8 contains the longest loop-10 (L10) of all sequenced kinesins, having about 70 extra residues compared to normal L10's (Fig. 3). L10 consists (from the N- to the C-terminus) of a serine/threonine linker, eight lysine residues (five consecutive), another serine linker and a stretch of 14 consecutive aspartic or glutamic acid residues, followed by a final linker. This loop is involved in neither nucleotide binding nor in the direct kinesin-microtubule interface, so its function was not yet analysed. Based on its length, it might be possible that the lysine part interacts with the E hook of tubule molecules in a similar way to the K loop of Unc104/Kif1A (a lysine rich L12) is suggested to function [51,52]. Further possible functions include interactions with other microtubule bound proteins. The stalk domain of DdKif8 is mostly ?-helical, containing extended regions rich in polar residues and a coiled-coil domain. The C-terminus is built of seven WD-40 repeats which contribute to a seven-bladed beta propeller [53]. Blade five and blade six are separated by an unusually long insert of ~100 residues. WD40 domains are known to mediate protein-protein interactions [54] and the function of this domain in DdKif8 might be the binding of a specific protein cargo, either as part of a protein complex or as a receptor attached to an organelle.
+
+DdKif10 (Kip3 subfamily)
+
+Following the motor domain, DdKif10 is predicted to have some coiled-coil structure, interrupted by a negatively charged region mainly consisting of asparagines and aspartic acids. In the middle of the protein, there are two EF-hand binding domains, the first one having only weak homology. EF-hand motifs almost always occur in pairs, packed together in a face-to-face manner [55]. Their functions include the transduction of intracellular Ca2+ signals as well as Ca2+ uptake and buffering. Recent investigations also show that EF-hand domains are responsible for homo- and heterodimerisation [56,57]. Directly behind the second EF-hand motif, DdKif10 contains a stretch of almost 50 consecutive asparagine residues. The C-terminal domain is composed of ?-helical and ?-sheet structure, as well as a short predicted coiled-coil domain.
+
+DdKif9 (not classified)
+
+The motor domain of DdKif9 does not group with any of the other known kinesins and may therefore be the founder of a new class. Its motor domain is located in the centre of the molecule and contains one of the longest loop-5s (L5) of all kinesins (Fig. 3). L5 constitutes the interruption of the long ?-2 helix C-terminal to the P-loop. In myosins, the length and flexibility of the loop following the P-loop helix (named loop-1) has a strong effect on nucleotide affinity [50,58]. Whether L5 has a similar influence on the affinity of kinesins to nucleotides was not yet analysed. The N-terminal domain is rich in amino acids proline, asparagine, serine and threonine, while the C-terminal domain is ?-helical and predicted to form coiled-coils. The C-terminus is concluded with a transmembrane domain that might be the linker to membranous cargos.
+
+Missing motors
+
+Due to the broad diversity of the kinesin family, different evolutionary lineages have evolved different subfamilies with specialised functions. The only major subfamilies for which Dictyostelium does not contribute are the Osm3 (N-4) and Kif15 (N-10) kinesins.
+
+Discussion
+
+The nine subfamilies identified in the Dictyostelium genome are Unc104/Kif1 (DdKif1), Kif4 (DdKif8), NCD/Kar3 (DdKif2), KHC (DdKif3, DdKif5, DdKif7), BimC/Eg5 (DdKif13), CENP-E (DdKif4, DdKif11), MCAK/Kif2 (DdKif6), MKLP1 (DdKif12) and Kip3 (DdKif10). Kif9 could not be grouped to one of the already assigned subfamilies. Structurally, two of the kinesins (DdKif6 and DdKif9) are of the middle motor domain type, one (DdKif2) has the motor domain at the C-terminus and the remaining are N-terminal kinesins. Functionally, Dictyostelium contains some kinesins of the KHC and Unc104/Kif1 subfamily that have been shown to or are implicated to perform intracellular transport. To accomplish mitosis and cytokinesis, kinesins from all essential classes are available: BimC/Eg5, CENP-E, NCD/Kar3, MCAK/Kif2 and MKLP1. Additionally, Dictyostelium has two kinesins of the Kip3 and Kif4 subfamilies, members of which were shown to participate in either or both of the above mentioned processes in other organisms. Like most other species, Dictyostelium also has its unique kinesin (DdKif9) that has an unknown function. The only major subfamilies for which Dictyostelium does not contribute are the Osm3 (N-4) and Kif15(N-10) kinesins. Osm3 kinesins comprise a subfamily of mainly heterotrimeric motors built of two kinesin chains and a tightly associated subunit. They are involved in "intraflagellar transport" [1] and other specialised tasks such as the movement of vesicular cargo in neurons or pigmented melanosomes in melanophore cells. Kif15 kinesins are involved in mitosis by transiently positioning spindle poles, specifically during prometaphase [59] or by maintaining spindle bipolarity [60].
+
+Organelle transporters
+
+The Dictyostelium genome contains four kinesins belonging to subfamilies involved in organelle transport. Their biochemical properties and cellular functions have been discussed elsewhere [61].
+
+Mitotic motors
+
+The BimC/Eg5, CENP-E, NCD/Kar3, MCAK/Kif2 and MKLP1 subfamily members comprise the essential subset of kinesins necessary for mitosis of higher eukaryotes. DdKif13 is phylogenetically one of the most divergent BimC kinesins but has a similar domain organisation and contains the BimC motif. Therefore, it is expected to form a bipolar tetramer and is likely to fulfil the same function as other BimC kinesins. BimC kinesins work in close cooperation with C-terminal motors of the NCD/Kar3 subfamily to organise the spindle microtubules [15,17]. As NCD/Kar3 kinesins move to the minus ends of microtubules, they work in the opposite direction to the BimC kinesins causing contraction of the spindle. The spindle structure is therefore established and maintained by the smooth balance between NCD/Kar3 and BimC action. Dictyostelium also contains a kinesin of the NCD/Kar3 subfamily, namely DdKif2, which has been localised to mitotic spindles being enriched toward the spindle poles, as compared to spindle microtubules [32]. DdKif2 and DdKif13 are therefore the Dictyostelium kinesins responsible for the organisation of the spindle microtubules.
+
+Dictyostelium contains two members of the CENP-E subfamily. Members of this subfamily bind to kinetochores during mitosis [62] and are responsible for the alignment of the chromosomes [63]. The two Dictyostelium members of the CENP-E subfamily, DdKif4 and DdKif11, are very different in all aspects. DdKif4 is phylogenetically more similar to the mammalian homologues, with a similar length and domain organisation, having only coiled-coil regions in its tail. As the nuclear envelope does not break down during mitosis of Dictyostelium cells, the nuclear localisation signal that lack mammalian homologues is obviously important for its destination. DdKif4 therefore likely operates in kinetochore binding and chromosome separation. DdKif11 is by far the shortest of the Dictyostelium kinesins. It groups to the plant members of the CENP-E subfamily that are very diverse in length. None of these plant kinesins has been functionally analysed, so it has yet to be determined whether they have a similar function to their mammalian homologues. DdKif11 also has a PDZ domain-binding motif. These motifs are implicated in transport, localization and assembly of supramolecular signalling complexes [39]. It is therefore unlikely that DdKif4 and DdKif11 have entirely overlapping functions.
+
+Another kinesin with expected function in mitosis is DdKif6, belonging to the MCAK/Kif2 subfamily. MCAK/Kif2 kinesins have been shown to depolymerise microtubules in vitro [20,23]. This is consistent with their observed function in vivo where their inhibition interferes with the poleward movement of chromosomes during anaphase A [22], a process being associated with the shortening of the microtubules that connect the chromosomes to the poles. In addition to the well-conserved motor domain, Kif6 contains a SAM domain at its N-terminus. The phylogenetically closest related metazoan members of the subtree (LemKif4 and MmKif24) also have a SAM domain at their N-terminus. The self-association of SAM domains has been known for some time to play a regulatory role in proteins involved in the regulation of developmental processes among diverse eukaryotes [44]. For example, in Dictyostelium cells, the levels of DPYK1, a SAM-containing protein-tyrosine kinase, increase as the cells initiate their signal-mediated developmental cycle [64]. The SAM domain of DdKif6 might therefore be the reason for its observed developmental regulation [30].
+
+DdKif12 groups to the MKLP1 subfamily. Based on their amino acid sequence, MKLP1 kinesins are characterised by their extremely long L6, the loop following the P-loop helix. The specific function of this loop has not yet been analysed in detail but from the close structural similarity of the kinesin motor domain to the motor domain of myosins [49], this loop might be involved in determining nucleotide affinity. Mammals have three kinesins of this subfamily of different length and domain organisation. CHO1 (Kif23), the most extensively analysed MKLP1 kinesin, is involved in mitosis and has been shown to mediate antiparallel microtubule sliding [65], most probable by cross-linking antiparallel microtubules by its second, nucleotide insensitive microtubule binding site [66]. Rab6-Kif (Kif20A) also functions in cell division during cleavage furrow formation and cytokinesis [67] but additionally localises to the Golgi apparatus and plays a role in the dynamics of this organelle [68]. In addition to their tasks during mitosis, some MKLP1 kinesins might thus perform other functions during interphase and this might also be true for DdKif12.
+
+Motors with multiple or unknown function
+
+DdKif10 belongs to the Kip3 subfamily of kinesin motors. The only member of this subfamily that has been analysed yet is Kip3 from S. cerevisiae [25,26]. In contrast to ScKip3, DdKif10 contains EF-hand motifs in the tail. EF-hand motifs are implicated in the transduction of intracellular Ca2+ signals. DdKif10 might therefore fulfil several different functions during interphase and mitosis.
+
+Another Dictyostelium kinesin potentially performing multiple functions is DdKif8, belonging to the Kif4 subfamily. Kif4 from mammals has been shown to function in the anterograde transport of certain organelles in juvenile neurons and other cells [69]. Furthermore, it colocalized at the mitotic spindle during mitosis, where it is associated with chromosomes [70]. DdKif8 was found to be constitutively expressed [30]. Its tail contains seven WD40 repeats, which are also found in mammalian Kif21 kinesins and other kinesins of this subfamily.
+
+In recent years, the genomes of a number of eukaryotic organisms have been completely sequenced. In subsequent studies the full set of members of the kinesin superfamily were identified and classified from Saccharomyces cerevisiae [71], Saccharomyces pombe, Drosophila melanogaster [72], mouse and human [10], Arabidopsis thaliana [73] and Caenorhabditis elegans [74]. The Arabidopsis genome contains by far the most kinesin genes (61 Kif's; Table 2).
+
+Table 2
+
+Subfamily distribution of kinesins from different organisms and comparison of the number of kinesins to the total number of genes.
+
+* + = organelle transport; ++ mitosis; +++ unclear or unknown function.
+
+Some of the kinesin subfamilies only include members from specific kingdoms. The N-14, N-17, M-2, and C-4 classes are plant specific, the N-13 subfamily exclusively harbours yeast members and only mammals contribute to a special class of C-terminal kinesins (C-2) as well as to the N-15 kinesins. The N-9 and N-11 subfamilies are, as yet, reserved for members of the metazoan subkingdom. This is similar to results of the analysis of the myosin superfamily, which also showed that some classes are restricted to specific kingdoms. Taking into account that the yet to be classified kinesins will appear as members of new classes, the mammalian genomes comprise by far the highest diversity, harbouring kinesins of 19 subfamilies.
+
+Compared to the other completed genomes, Dictyostelium has a similar percentage of kinesin genes. The thirteen kinesins group into nine characterised subfamilies and one new class. This subfamily diversity is comparable to that observed for the Drosophila and C. elegans genomes. While Dictyostelium mostly contributes only one member to the subfamilies, more complex organisms show additional diversity, often having several members per subfamily.
+
+Conclusions
+
+This analysis of the Dictyostelium genome led to the identification of eight new kinesin motor proteins. According to an exhaustive phylogenetic comparison, Dictyostelium contains the same subset of kinesins that higher eukaryotes need to perform mitosis. Some of the kinesins are implicated in intracellular traffic and a few have unpredictable functions.
+
+Methods
+
+Identification of Dictyostelium kinesins
+
+The full-length sequences of DdKif1, DdKif2, DdKif5, DdKif7 and DdKif9 have been reported in the literature. Additionally, for DdKif4 the mRNA sequence is available, differing from the genomic sequence by a gap of about 100 bp that is, however, dubious. The whole dataset generated by the Dictyostelium Sequencing Consortium ; ; ; ; was used to search for kinesin domains. For this purpose, all available raw reads were translated into all six reading frames and subsequently examined for the presence of Interpro domains IPR000857, IPR001752, IPR002151, and IPR008658 . All reads containing at least parts of the domains were sampled and assembled together with adjacent sequence reads. The assembly was performed using the Staden package . To obtain contigs containing the full length genes, reads were added to the contigs until the gene prediction software geneid predicted the same gene structure for the kinesin domain containing genes independently from the contig length. Furthermore, all six reading frames of contigs larger than 1 kb resulting from a phrap based assembly of all sequences were scanned for the presence of these domains. One kinesin domain-containing gene (kif11) could only be detected by the single read examination, indicating that the phrap based assembly failed to produce larger contigs in this particular genomic region. Taking advantage of uneven distributions of reads derived from different chromosome specific libraries, the predicted kinesin domain containing genes were assigned to specific chromosomes. Each predicted gene was checked for matching ESTs from the Japanese cDNA project. Most of the predicted genes could at least partly be covered by EST sequences indicating expression of the genes. Only for kif 5 and kif 9 was no EST available. This may be due to the fact that most of the ESTs were derived from cells entering the sexual or developmental cycle.
+
+Building trees
+
+The motor domain of DdKif1 was used in a BLASTP search using the WU-BLAST2 server at EMBL ; [75]). The sequences obtained were compared with recent compilations of kinesin sequences [3,10,73] and missing sequences were manually added. Altogether 377 kinesin sequences from 50 species were obtained (see supplemental material) and aligned together with the thirteen Dictyostelium kinesins using ClustalW [76] software. The alignment showed that especially the sequences of kinesins from L. major and P. falciparum were misaligned because of the many unusual insertions (extended loops). The crude alignment was extensively manually improved according to the conserved secondary structural elements of the motor domain, which were obtained from a superposition of all crystal structures (Kollmar, unpublished data). An unrooted phylogenetic tree was generated using the Bootstrap (1,000 replicates) method implemented in ClustalW (standard settings) and drawn by using TreeView [77]. The tree did not change considerably when a correction for multiple substitutions was applied, nor did it change when 10,000 replicates were used.
+
+Authors' contributions
+
+MK designed the study, performed data analysis and wrote the manuscript. GG identified and assembled the kinesin sequences, performed data analysis and assisted in writing the manuscript. Both authors have reviewed the manuscript.
+
+Supplementary Material
+
+Additional File 1
+
+Sequence access information for kinesin-like proteins found in the common databases.
+
+Click here for file
+
+Acknowledgements
+
+We would like to thank J.M. Scholey for helpful comments and C. Griesinger for discussions and continuous support. Sequences searched in this study were generated as part of the Dictyostelium Genome Project by A. Kuspa and R. Gibbs (The Baylor Sequencing Center, Houston, Tex.; sequencing supported by the National Institutes of Health); G. Glšckner, M. Platzer, L. Eichinger and A. Noegel (the Institute of Molecular Biotechnology, Jena, Germany together with the Institute of Biochemistry, Cologne, Germany); and M.-A. Rajandream and B. Barrell (the EUDICT consortium, supported by The European Union). Sequence data for D. discoideum was obtained from the Genome Sequencing Centre Jena website at . The German part of the D. discoideum Genome Project is supported by the Deutsche Forschungsgemeinschaft (No 113/10-1, No 113/10-2, and Pl173/5-2). M.K. is supported by a Liebig Stipendium of the Fonds der Chemischen Industrie, which is in part financed by the BMBF.

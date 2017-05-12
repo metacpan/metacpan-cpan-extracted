@@ -1,0 +1,565 @@
+<html>
+<head>
+<title>HTML table tag in Embperl</title>
+</head>
+
+<body>
+
+
+<p> $tabmode = default <p>
+
+<hr><p>Display an two dimensional array with one, two and three columns !<BR>
+Please take a look at the source in your browser to see the difference<BR>
+
+$a[0][0] = '1/1' ;<BR>
+   $a[1][0] = '2/1' ;<BR>
+   $a[1][1] = '2/2' ;<BR>
+   $a[2][0] = '3/1' ;<BR>
+   $a[2][1] = '3/2' ;<BR>
+   $a[2][2] = '3/3' ;<BR>
+
+<P>$tabmode = default <P>
+
+<table>
+    <tr>
+        <td>a1/1</td>
+    </tr> 
+
+    <tr>
+        <td>a2/1</td>
+    </tr> 
+
+    <tr>
+        <td>a3/1</td>
+    </tr> 
+</table>
+<table>
+    <tr>
+        <td>a3/1</td>
+    
+        <td>a3/2</td>
+    
+        <td>a3/3</td>
+    </tr> 
+</table>
+
+
+<table>
+    <tr>
+        <td>beforea1/1</td>
+    </tr> 
+
+    <tr>
+        <td>beforea2/1</td>
+    </tr> 
+
+    <tr>
+        <td>beforea3/1</td>
+    </tr> 
+</table>
+<table>
+    <tr>
+        <td>beforea3/1</td>
+    
+        <td>beforea3/2</td>
+    
+        <td>beforea3/3</td>
+    </tr> 
+</table>
+
+<table>
+    <tr>
+        <td>a1/1after</td>
+    </tr> 
+
+    <tr>
+        <td>a2/1after</td>
+    </tr> 
+
+    <tr>
+        <td>a3/1after</td>
+    </tr> 
+</table>
+<table>
+    <tr>
+        <td>a3/1after</td>
+    
+        <td>a3/2after</td>
+    
+        <td>a3/3after</td>
+    </tr> 
+</table>
+<table>
+    <tr>
+        <td>beforea1/1after</td>
+    </tr> 
+
+    <tr>
+        <td>beforea2/1after</td>
+    </tr> 
+
+    <tr>
+        <td>beforea3/1after</td>
+    </tr> 
+</table>
+<table>
+    <tr>
+        <td>beforea3/1after</td>
+    
+        <td>beforea3/2after</td>
+    
+        <td>beforea3/3after</td>
+    </tr> 
+</table>
+
+<table></table>
+<table>
+    <tr></tr> 
+</table>
+
+
+<table border="1" width="100%">
+    <tr>
+        <td>a1/1 </td>
+    </tr> 
+
+    <tr>
+        <td>a2/1 </td>
+    
+        <td>a2/2 </td>
+    </tr> 
+
+    <tr>
+        <td>a3/1 </td>
+    
+        <td>a3/2 </td>
+    
+        <td>a3/3 </td>
+    </tr> 
+</table>
+
+
+
+<table border="4">
+    <tr>
+        <td>
+            <table>
+    		<tr>
+                    <td>b1/1 </td>
+    		</tr> 
+	    
+    		<tr>
+                    <td>b2/1 </td>
+    		
+                    <td>b2/2 </td>
+    		</tr> 
+	    
+    		<tr>
+                    <td>b3/1 </td>
+    		
+                    <td>b3/2 </td>
+    		
+                    <td>b3/3 </td>
+    		</tr> 
+	    </table>
+
+        a1/1 </td>
+    </tr> 
+
+    <tr>
+        <td>
+            <table>
+    		<tr>
+                    <td>b1/1 </td>
+    		</tr> 
+	    
+    		<tr>
+                    <td>b2/1 </td>
+    		
+                    <td>b2/2 </td>
+    		</tr> 
+	    
+    		<tr>
+                    <td>b3/1 </td>
+    		
+                    <td>b3/2 </td>
+    		
+                    <td>b3/3 </td>
+    		</tr> 
+	    </table>
+
+        a2/1 </td>
+    
+        <td>
+            <table>
+    		<tr>
+                    <td>b1/1 </td>
+    		</tr> 
+	    
+    		<tr>
+                    <td>b2/1 </td>
+    		
+                    <td>b2/2 </td>
+    		</tr> 
+	    
+    		<tr>
+                    <td>b3/1 </td>
+    		
+                    <td>b3/2 </td>
+    		
+                    <td>b3/3 </td>
+    		</tr> 
+	    </table>
+
+        a2/2 </td>
+    </tr> 
+
+    <tr>
+        <td>
+            <table>
+    		<tr>
+                    <td>b1/1 </td>
+    		</tr> 
+	    
+    		<tr>
+                    <td>b2/1 </td>
+    		
+                    <td>b2/2 </td>
+    		</tr> 
+	    
+    		<tr>
+                    <td>b3/1 </td>
+    		
+                    <td>b3/2 </td>
+    		
+                    <td>b3/3 </td>
+    		</tr> 
+	    </table>
+
+        a3/1 </td>
+    
+        <td>
+            <table>
+    		<tr>
+                    <td>b1/1 </td>
+    		</tr> 
+	    
+    		<tr>
+                    <td>b2/1 </td>
+    		
+                    <td>b2/2 </td>
+    		</tr> 
+	    
+    		<tr>
+                    <td>b3/1 </td>
+    		
+                    <td>b3/2 </td>
+    		
+                    <td>b3/3 </td>
+    		</tr> 
+	    </table>
+
+        a3/2 </td>
+    
+        <td>
+            <table>
+    		<tr>
+                    <td>b1/1 </td>
+    		</tr> 
+	    
+    		<tr>
+                    <td>b2/1 </td>
+    		
+                    <td>b2/2 </td>
+    		</tr> 
+	    
+    		<tr>
+                    <td>b3/1 </td>
+    		
+                    <td>b3/2 </td>
+    		
+                    <td>b3/3 </td>
+    		</tr> 
+	    </table>
+
+        a3/3 </td>
+    </tr> 
+</table>
+
+<table border="5" width="100%">
+    <tr>
+        <td>b3/1</td>
+    
+        <td>b3/2</td>
+    
+        <td>b3/3</td>
+    </tr> 
+    <tr>
+        <td>a3/1 </td>
+    
+        <td>a3/2 </td>
+    
+        <td>a3/3 </td>
+    </tr> 
+</table>
+
+<table border="6" width="100%">
+    <tr>
+        <td>a2/1</td>
+    </tr> 
+    <tr>
+        <td>a1/1 </td>
+    </tr> 
+
+    <tr>
+        <td>a3/1</td>
+    </tr> 
+    <tr>
+        <td>a2/1 </td>
+    </tr> 
+</table>
+
+<table border="6.1" width="100%">
+    <tr>
+        <td>a2/1</td>
+    </tr> 
+    <tr>
+        <td>a1/1 </td>
+    </tr> 
+    <tr>
+        <td> </td>
+    </tr> 
+</table>
+
+<table border="7">
+    <tr>
+        <TD BGCOLOR="#F4A460">a1/1 </td>
+    </tr> 
+
+    <tr>
+        <TD BGCOLOR="#A4A4B4">a2/1 </td>
+    
+        <TD BGCOLOR="#7CFC00">a2/2 </td>
+    </tr> 
+
+    <tr>
+        <TD BGCOLOR="#F4A460">a3/1 </td>
+    
+        <TD BGCOLOR="#FFFF00">a3/2 </td>
+    
+        <TD BGCOLOR="#F4A460">a3/3 </td>
+    </tr> 
+</table>
+
+
+<table border="8">
+    <tr>
+        <TD BGCOLOR="#F4A460">a1/1 </td>
+        <TD BGCOLOR="#FFFF00">a1/2 </td>
+    </tr> 
+    <tr>
+        <TD BGCOLOR="#A4A4B4">a2/1 </td>
+        <TD BGCOLOR="#7CFC00">a2/2 </td>
+    </tr> 
+</table>
+
+<table border="9" width="100%">
+        <tr>
+            <td><table border="10">
+                <tr>
+                    <td valign="top">
+                    <a href="inhalt.htm?Region=Pfalz">Pfalz</a></td>
+                </tr>
+            
+                <tr>
+                    <td valign="top">
+                    <a href="inhalt.htm?Region=Rheinhessen">Rheinhessen</a></td>
+                </tr>
+            </table>
+            </td>
+            <td><table border="11">
+                <tr>
+                    <td valign="top"><p align="left">
+                    <a href="inhalt.htm?Kategorie=Kultur">Kultur</a></p>
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td valign="top"><p align="left">
+                    <a href="inhalt.htm?Kategorie=Sport">Sport</a></p>
+                    </td>
+                </tr>
+            </table>
+            </td>
+        </tr>
+    </table>
+
+<table border="12" width="100%">
+        <tr>
+            <td><table border="13">
+                <tr>
+                    <td valign="top">
+                    <a href="inhalt.htm?Region=Pfalz">Pfalz</a></td>
+                    </tr>
+            
+                <tr>
+                    <td valign="top">
+                    <a href="inhalt.htm?Region=Rheinhessen">Rheinhessen</a></td>
+                    </tr>
+            </table>
+            </td>
+            <td><table border="14">
+                <tr>
+                    <td valign="top"><p align="left">
+                    <a href="inhalt.htm?Kategorie=Kultur">Kultur</a></p>
+		    </td>
+                </tr>
+            
+                <tr>
+                    <td valign="top"><p align="left">
+                    <a href="inhalt.htm?Kategorie=Sport">Sport</a></p>
+		    </td>
+                </tr>
+            
+                <tr>
+                    <td valign="top"><p align="left">
+                    <a href="inhalt.htm?Kategorie=Veranstaltungen">Veranstaltungen</a></p>
+		    </td>
+                </tr>
+            
+                <tr>
+                    <td valign="top"><p align="left">
+                    </td>
+                </tr>
+            </table>
+            </td>
+        </tr>
+    </table>
+
+<table>
+   <tr bgcolor="white">
+     <td align="center"><font size="+1">2000</font></td>
+   
+     <td align="center"><font size="+1">2000</font></td>
+   
+     <td align="center"><font size="+1">Hello</font></td>
+   
+     <td align="center"><font size="+1">Hello</font></td>
+   
+     <td align="center"><font size="+1">World</font></td>
+   
+     <td align="center"><font size="+1">World</font></td>
+   </tr>
+
+   <tr bgcolor="gray">
+     <td align="center"><font size="+1">2000</font></td>
+   
+     <td align="center"><font size="+1">2000</font></td>
+   
+     <td align="center"><font size="+1">Hello</font></td>
+   
+     <td align="center"><font size="+1">Hello</font></td>
+   
+     <td align="center"><font size="+1">World</font></td>
+   
+     <td align="center"><font size="+1">World</font></td>
+   </tr>
+
+   <tr bgcolor="white">
+     <td align="center"><font size="+1">2000</font></td>
+   
+     <td align="center"><font size="+1">2000</font></td>
+   
+     <td align="center"><font size="+1">Hello</font></td>
+   
+     <td align="center"><font size="+1">Hello</font></td>
+   
+     <td align="center"><font size="+1">World</font></td>
+   
+     <td align="center"><font size="+1">World</font></td>
+   </tr>
+
+   <tr bgcolor="gray">
+     <td align="center"><font size="+1">2000</font></td>
+   
+     <td align="center"><font size="+1">2000</font></td>
+   
+     <td align="center"><font size="+1">Hello</font></td>
+   
+     <td align="center"><font size="+1">Hello</font></td>
+   
+     <td align="center"><font size="+1">World</font></td>
+   
+     <td align="center"><font size="+1">World</font></td>
+   </tr>
+
+   <tr bgcolor="white">
+     <td align="center"><font size="+1">2000</font></td>
+   
+     <td align="center"><font size="+1">2000</font></td>
+   
+     <td align="center"><font size="+1">Hello</font></td>
+   
+     <td align="center"><font size="+1">Hello</font></td>
+   
+     <td align="center"><font size="+1">World</font></td>
+   
+     <td align="center"><font size="+1">World</font></td>
+   </tr>
+</table>
+
+
+<table border="14"><tr><td>a1/1</td></tr><tr><td>a2/1</td></tr><tr><td>a3/1</td></tr></table>
+<table border="15"><tr><td>a3/1</td><td>a3/2</td><td>a3/3</td></tr></table>
+<table border="16"><tr><td>a1/1</td></tr> <tr><td>a2/1</td><td>a2/2</td></tr> <tr><td>a3/1</td><td>a3/2</td><td>a3/3</td></tr> </table>
+
+<table border="17">
+  <tr>
+	<td>a1/1</td>
+	<td>
+		<img   src="/icons/iiilogo_narrow_else.gif"  WIDTH="5" HEIGHT="0" BORDER="0"   ALT="iii logo" >
+	</td>
+  </tr>
+
+  <tr>
+	<td>a2/1</td>
+	<td>
+		<img   src="/icons/iiilogo_narrow_else.gif"  WIDTH="5" HEIGHT="1" BORDER="0"   ALT="iii logo" >
+	</td>
+  </tr>
+
+  <tr>
+	<td>a3/1</td>
+	<td>
+		<img   src="/icons/iiilogo_narrow_else.gif"  WIDTH="5" HEIGHT="2" BORDER="0"   ALT="iii logo" >
+	</td>
+  </tr>
+</table>
+
+<table>
+    <tr>
+        <td>a1/1</td>
+    </tr> 
+
+    <tr>
+        <td>a2/1</td>
+    </tr> 
+
+    <tr>
+        <td>a3/1</td>
+    </tr> 
+</table>
+<table>
+    <tr>
+        <td>a3/1</td>
+    
+        <td>a3/2</td>
+    
+        <td>a3/3</td>
+    </tr> 
+</table>
+
+
+</body>
+</html>
+

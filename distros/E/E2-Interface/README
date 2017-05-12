@@ -1,0 +1,36 @@
+e2interface/0.34
+================
+
+e2interface is a client library for the everything2.com collaborative database.
+
+For more detailed information, see the manpages for E2::Interface and its
+descendants, as well as these webpages:
+
+	http://joseweeks.com/e2interface
+	http://everything2.com/?node=e2interface
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Perl 5.006
+  System libraries: expat
+  Perl modules:     XML::Twig and LWP
+
+To use this module's built-in threading capabilities, the
+following is required as well:
+
+  Perl 5.8.0
+
+COPYRIGHT AND LICENCE
+
+  This software is public domain.

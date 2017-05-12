@@ -1,0 +1,29 @@
+Revision history for ExtUtils-Config
+
+0.008     2014-06-25 11:37:13-04:00 America/Nassau
+          Remove set, clear, clone methods
+
+0.007     2012-10-17 22:12:15 Europe/Amsterdam
+          Added serialize method
+
+0.006     2011-11-26 01:09:07 Europe/Amsterdam
+          Added a clone method
+
+0.005     2011-10-29 00:34:21 Europe/Amsterdam
+          Sanatize ExtUtils::Config, in particular:
+            * Get rid of class methods
+            * Get rid of push/pop methods
+            * Add a clear method
+
+0.004     2011-10-13 15:28:46 Europe/Amsterdam
+          Fix tests to work on Windows
+
+0.003     2011-09-15 12:33:25 Europe/Amsterdam
+          Add an exists method
+          Let values_set return a copy over the overrides
+
+0.002     2011-03-31 17:44:52 Europe/Amsterdam
+          Made hashref the only argument to contructor, instead of hash containing one hashref.
+
+0.001     2011-03-27 13:42:21 Europe/Amsterdam
+          Renamed Module::Build::Config to ExtUtils::Config, reset $VERSION count

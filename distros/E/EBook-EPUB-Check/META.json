@@ -1,0 +1,85 @@
+{
+   "abstract" : "Perl wrapper for EpubCheck",
+   "author" : [
+      "pawa <pawa@pawafuru.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.11.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "EBook-EPUB-Check",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "File::Which" : "1.09",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "0",
+            "File::ShareDir" : "1.00",
+            "IPC::Run3" : "0.046",
+            "parent" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Probe::Perl" : "0.03",
+            "Test::Fatal" : "0",
+            "Test::More" : "0.99",
+            "Test::Warn" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "EBook::EPUB::Check" : {
+         "file" : "lib/EBook/EPUB/Check.pm",
+         "version" : "0.04"
+      },
+      "EBook::EPUB::Check::Result" : {
+         "file" : "lib/EBook/EPUB/Check/Result.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/pawa-/EBook-EPUB-Check/issues"
+      },
+      "homepage" : "https://github.com/pawa-/EBook-EPUB-Check",
+      "repository" : {
+         "url" : "git://github.com/pawa-/EBook-EPUB-Check",
+         "web" : "https://github.com/pawa-/EBook-EPUB-Check"
+      }
+   },
+   "version" : "0.04"
+}

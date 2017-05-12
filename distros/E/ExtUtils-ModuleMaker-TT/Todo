@@ -1,0 +1,18 @@
+TODO list for Perl module ExtUtils::ModuleMaker::TT
+
+Functionality
+
+	- warnings before overwriting files or a "force=>1" option
+
+Testing
+
+	- Incomplete code coverage (from Devel::Cover)
+	
+	- Test all variations of config variables in templates
+
+	- Test critical failure handling
+	
+		* have a template dir but template not found
+
+		* not in a writeable directory
+	

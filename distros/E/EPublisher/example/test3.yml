@@ -1,0 +1,12 @@
+---
+Test:
+  source:
+    -
+      type: Dir
+      path: D:/Git/EPublisher/Backend/example/
+  target:
+    type: EPub
+    author: Renee Baecker
+    output: ./test.epub
+    title: "Testbuch"
+    encoding: iso-8859-1

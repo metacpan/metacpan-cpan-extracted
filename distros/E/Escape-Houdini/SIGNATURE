@@ -1,0 +1,65 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 c1c2c9bcb2a4b03fa67eed0de488c4684f553b17 AUTHOR_PLEDGE
+SHA1 e1f91ed90ca2a38db8bc21af12bba573e6cddba7 Build.PL
+SHA1 b593011f2206aec7b9db0832351c7cfdf21a9088 CONTRIBUTORS
+SHA1 e7811a06634663a2ed77cd0c9b00a864b8abaa67 Changes
+SHA1 03f93d1b20227df5983627d5541f7fa52591d9e3 INSTALL
+SHA1 769557ae7e699664d9c0bba4a6e3e7f7ac31c0ae LICENSE
+SHA1 7f49dcf4e50c8c30c7900283b1cffff063ed0ecf MANIFEST
+SHA1 e3ce9109b4b3aa465a93d6fd610a46fb38a3ea93 META.json
+SHA1 c26f383ec5a4fc59a7ed106cc37d7164b2bdbf04 META.yml
+SHA1 6cad74ef4d7781481011b2190d31b7ddaca8d092 README.mkdn
+SHA1 eee81835af3c088d21feb69bd96456f104eb8223 contrib/benchmark.pl
+SHA1 d24fdfcf1a2d16e27cc8714388696ec857f156f9 cpanfile
+SHA1 97700cc3a5d0f29b35df8ed44fccd21c39c0a994 doap.xml
+SHA1 a37066e84e1be0c03f923a44b9730cf649b2827a houdini/COPYING
+SHA1 7c0610747d0215d0cf8bbf693dddf55421a21cfe houdini/Makefile
+SHA1 eef00bd0cef44ac5c9193423414b927ac920c7f1 houdini/README.md
+SHA1 9963b455ed267fb22360f24d5d9195cc5cb7011a houdini/buffer.c
+SHA1 10abcf3574ea3598fca739ec0fd91cd35cd6e4f6 houdini/buffer.h
+SHA1 e8da943eeac615427b414a1b44686ada7f006974 houdini/houdini.h
+SHA1 b2e65a91c80f033185b0e44b5d95d95c6088dfaa houdini/houdini_href_e.c
+SHA1 5cbc0230d16fff1eec985c72146e080f759f02fd houdini/houdini_html_e.c
+SHA1 f5d86129774d5e8d41da87b167a9b05c3fe23d27 houdini/houdini_html_u.c
+SHA1 d47f08436ad0a9c510dedfba1c4341265d1abb1c houdini/houdini_js_e.c
+SHA1 72a94f33820b9e80df3daf549c5ab0be433c1328 houdini/houdini_js_u.c
+SHA1 38cb204d8f55373b47b71e23f01295e597678e86 houdini/houdini_uri_e.c
+SHA1 bd6c37ef0bc1ceb77330c6d915cc969d941cf31f houdini/houdini_uri_u.c
+SHA1 34783a33f47668d95dbafafe25f1ef7465774745 houdini/houdini_xml_e.c
+SHA1 26e16bf1e786a6d7518e05a60c07c3a3bf9358f9 houdini/html_unescape.gperf
+SHA1 930f12f14ceb3d13918377eda11f409193310f3e houdini/html_unescape.h
+SHA1 bd71f0cf455aebc808ec875c565c506e52eed82d houdini/tools/build_table.py
+SHA1 9597efe09323ac5634edd83200ef74b53c5ec41e houdini/tools/build_tables.c
+SHA1 c00c861d1ac98baa4124749412bb4192a232783c houdini/tools/wikipedia_table.txt
+SHA1 aad4325edee6273871cd48c16bacf63bb57ce5c8 inc/MyBuild.pm
+SHA1 be2ecb3cf7cf3ac8e468292e121da0a10e8a457f lib/Escape/Houdini.pm
+SHA1 d1e7601004b5b10ad17e6d0053d00b981d1ca7f3 lib/Escape/Houdini.xs
+SHA1 164de602edd808d5e017c4b70ce4157e22e4643f t/00-compile.t
+SHA1 ee9f89850e1cc9a537c412642340b0ef0f331707 t/00-report-prereqs.dd
+SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
+SHA1 a0c2623e0ed2eea7846f5a2d66f985e3e2630069 t/basic.t
+SHA1 1367a9b3d69c467e5898cc0b5a76cdc6c98164ad t/gc.t
+SHA1 1150ca5d7440f976350b74c322eea568200e36c4 t/growth.t
+SHA1 824c754ed58806e2bd84903254afdee984c0e505 t/samples.t
+SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+
+iEYEARECAAYFAljZisMACgkQ34Hwf+GwC4yNRgCg7H+G4Gi7TbUbA+tGYR1b6ZQc
+J2wAni2IbuqXKI/BmL3sn+a2hSpDkEVP
+=RthX
+-----END PGP SIGNATURE-----

@@ -1,0 +1,1243 @@
+   [1]The Journal of Biological Chemistry
+
+   [2]Skip to main page content
+     * [3]Home
+     * [4]Current issue
+     * [5]Archive
+     * [6]Papers in Press
+     * [7]Minireviews
+     * [8]Classics
+     * [9]Reflections
+     * [10]Papers of the Week
+
+   QUICK SEARCHAuthor: _________Keyword: ________________Year: ____Vol:
+   ____Page: ____ GO Go[11][Advanced Search][12][Browse the Archive]
+     * Institution: Univ Colorado - Denison Memorial Library
+     * [13]Sign In
+
+   Advertisement
+   Advertisement
+     * [14]Celebrate 100 Years of ASBMB: ASBMB Histroy Book Now Avaiable!
+
+ §1§ Structure of G[iα1]·GppNHp, Autoinhibition in a G[α] Protein-Substrate
+Complex[15]* §1§
+
+    1. [16]David E. Coleman[17]‡ and
+    2. [18]Stephen R. Sprang[19]‡[20]§[21]¶
+
+    1.
+
+
+    From the ^§Howard Hughes Medical Institute and the ^‡Department of
+    Biochemistry, The University of Texas Southwestern Medical Center,
+    Dallas, Texas 75235-9050
+
+
+   [22]Next Section
+
+ §2§ Abstract §2§
+
+   The structure of the G protein G[iα1] complexed with the
+   nonhydrolyzable GTP analog guanosine-5′-(βγ-imino)triphosphate (GppNHp)
+   has been determined at a resolution of 1.5 Å. In the active site of
+   G[iα1]·GppNHp, a water molecule is hydrogen bonded to the side chain of
+   Glu^43 and to an oxygen atom of the γ-phosphate group. The side chain
+   of the essential catalytic residue Gln^204 assumes a conformation which
+   is distinctly different from that observed in complexes with either
+   guanosine 5′-O-3-thiotriphosphate or the transition state analog
+   GDP·AlF[4] ^−. Hydrogen bonding and steric interactions position
+   Gln^204 such that it interacts with a presumptive nucleophilic water
+   molecule, but cannot interact with the pentacoordinate transition
+   state. Gln^204 must be released from this auto-inhibited state to
+   participate in catalysis. RGS proteins may accelerate the rate of GTP
+   hydrolysis by G protein α subunits, in part, by inserting an amino acid
+   side chain into the site occupied by Gln^204, thereby destabilizing the
+   auto-inhibited state of Gα.
+
+   The G[α] subunits of heterotrimeric G proteins are GTP hydrolyases
+   which, upon receptor activation, bind to GTP and regulate effector
+   molecules ([23]1, [24]2). G[α]-catalyzed hydrolysis of GTP to GDP
+   releases the G[α]·GDP product complex from effector and allows its
+   sequestration by inhibitory G[βγ]subunits. The rate of the hydrolytic
+   reaction thus determines, in part, the length of time during which the
+   effector is regulated by activated G proteins.
+
+   Structures of the G[α] subunits G[tα](transducin), G[iα1], and G[sα]
+   complexed with Mg^2+ and the nonhydrolyzable GTP analog GTPγS^1 have
+   provided views of the active site in the ground state ([25]7-9). In
+   particular, the positions of the presumptive nucleophilic water
+   (W^nuc), Mg^2+, and the side chains of catalytically significant
+   residues have been determined. Structures of G[iα1] and G[tα] complexed
+   with GDP·AlF[4] ^−·W^nuc, a mimic of the pentavalent transition state
+   for GTP hydrolysis, have also been determined ([26]8, [27]10).
+
+   Mutagenesis experiments demonstrate that two residues of G[iα1],
+   Arg^178 and Gln^204, are required for catalysis ([28]11, [29]12). In
+   crystals of G[iα1]·GTPγS, which mimics the ground state E·S complex,
+   the side chains of these residues are partly disordered and do not
+   interact with the substrate analog. In contrast, in complexes of G[iα1]
+   and its homolog G[tα] with GDP·AlF[4] ^−, both residues are well
+   ordered and interact with AlF[4] ^− and its axial water ligand ([30]8,
+   [31]10). It was proposed that Arg^178 and Gln^204stabilize the
+   pentavalent transition state through an analogous set of interactions
+   ([32]8, [33]10). It was also suggested that the low catalytic rate (k
+   [cat] ≈ 2–4 min^−1) exhibited by G[iα1] ([34]14) and its homologs might
+   be attributed to a high activation energy for the conformational
+   rearrangement of Arg^178 and Gln^204 from the ground state to the
+   transition state ([35]2). However, the nature of this rearrangement is
+   not established, in part because the G[iα1]·GTPγS complex may not
+   accurately mimic the true E·S complex. Specifically, the thiol
+   substituent of the γ-phosphate in GTPγS may sterically perturb the
+   catalytic site. The sulfur atom is both more bulky than the
+   corresponding oxygen atom of GTP (van der Waals radii of 1.8 and 1.4 Å,
+   respectively) and has a longer bond length with the γ-phosphate atom
+   (P-S, 1.86 Å; P-O, 1.52 Å). Hence, to obtain a more accurate view of
+   the E·S ground state, we have determined a high resolution x-ray
+   crystal structure of G[iα1] complexed with an alternative
+   nonhydrolyzable GTP analog: GppNHp. In GppNHp all three terminal
+   substituents of the γ-phosphate group are oxygen atoms.
+
+   The active site of the G[iα1]·GppNHp complex differs from that with
+   GTPγS in several respects, but most importantly in the conformation of
+   the catalytic residue Gln^204. In this conformation, Gln^204 interacts
+   with W^nuc, but neither contacts the nucleotide nor is positioned to
+   interact with the pentavalent transition state. Thus, Gln^204 may
+   participate directly in the G[iα1]·GTP ground state but must reorient
+   to stabilize the transition state. RGS4, a member of the RGS family of
+   G protein stimulatory factors ([36]15, [37]16), may accelerate
+   hydrolysis of GTP by G[iα1], in part, by destabilizing the ground-state
+   conformation of Gln^204.
+   [38]Previous Section[39]Next Section
+
+ §2§ MATERIALS AND METHODS §2§
+
+   Non-myristoylated, recombinant rat G[iα1] was synthesized in E. coli
+   and purified as described previously ([40]17). Crystals of G[iα1]
+   complexed with GppNHp and Mg^2+ were grown and prepared for x-ray data
+   collection as described except that GppNHp was substituted for GTPγS
+   ([41]18). Crystals were transferred to a cryoprotection solution
+   containing 15% (v/v) glycerol and frozen in liquid propane as described
+   ([42]19). Two x-ray diffraction data sets were collected at 100 K, each
+   from a single crystal. The first was measured at the Cornell
+   synchrotron source (CHESS) A1 line (λ = 0.91 Å) equipped with an ADSC
+   Quantum 1 CCD detector. The crystal diffracted beyond 1.5 Å, but data
+   were measured only to 1.7 Å. A second data set collected to 1.5 Å was
+   collected at the CHESS F1 line (λ = 0.92 Å) equipped with an ADSC
+   Quantum 4 CCD detector. Data were processed using the DENZO/SCALEPACK
+   programming package ([43]20). After simultaneous determination of the
+   scale factors for both data sets using all observations, data between
+   15–2.24 Å from the first data set and between 2.24–1.50 Å from the
+   second were combined to obtain the final 15.00–1.50-Å data set
+   (Table[44]I).
+   View this table:
+     * [45]In this window
+     * [46]In a new window
+
+   Table I
+
+   Data collection and final refinement statistics
+
+   The structure of the G[iα1]·GppNHp complex was solved by molecular
+   replacement, using the G[iα1]·GTPγS complex (PDB accession code
+   [47]1gia) with the nucleotide, Mg^2+, and with waters removed as the
+   starting model. SigmaA-weighted 2F[o] − F[c] andF[o] − F[c] difference
+   maps ([48]21) indicated strong difference electron density for GppNHp,
+   a previously unobserved active site water molecule, and new side chain
+   positions for Glu^43 and Gln^204. Small changes in the side chain
+   conformations of other residues were also observed. Simulated annealing
+   omit maps ([49]22) were used to confirm that the observed differences
+   were not caused by model bias. The protein model was manually rebuilt
+   and ligands were added using the interactive graphics model building
+   program O ([50]23). Positional and atomic temperature factor refinement
+   was carried out on the rebuilt model using XPLOR ([51]24) followed by
+   additional rounds of model building and refinement. In the final
+   rounds, a bulk solvent correction ([52]25) was applied using XPLOR.
+   Electron density about the active site is shown in Fig. [53]2. The
+   free-R factor, computed using 5% of the data, was used to monitor the
+   refinement ([54]26). The structure exhibits good stereochemistry, with
+   94% of the residues in the most favored regions of the Ramachandran
+   plot as analyzed by PROCHECK ([55]27). Comparisons and superposition of
+   the model with other proteins was carried out using O. Data collection
+   and refinement statistics are given in Table [56]I.
+   [57]Figure 2
+   View larger version:
+     * [58]In this window
+     * [59]In a new window
+
+     * [60]Download as PowerPoint Slide
+
+   Figure 2
+
+   The active site of G[iα1]in the (GTP analog) and (transition state
+   analog·RGS4) bound complexes. Key features are labeled. A,
+   G[iα1]·GppNHp; B, G[iα1]·GTPγS; C, RGS4·G[iα1]·GDP·AlF[4] ^−·H[2]O; and
+   D, hypothetical RGS4·G[iα1]·GppNHp complex. The main chain segments of
+   G[iα1] are coloredgreen (P-loop residues 38–48), blue (Switch I
+   residues 178–184), and yellow (Switch II residues 200–208). The main
+   chain segment of RGS4 in panels C and D is shown in red (residues
+   126–131). The atoms and water molecules are colored as described in
+   Fig. [61]1, except that the phosphorous atoms are in yellow, magnesium
+   is blue, and the sulfur atom of GTPγS isgreen. In panel D, the region
+   of the hypothetical model where Asn^128 of RGS4 and Gln^204 of G[iα1]
+   collide is highlighted in cyan.
+
+   The model of the RGS4·G[iα1]·GppNHp complex was made by superimposing
+   the Cα atoms of residues 34–343 of G[iα1] from the G[iα1]·GppNHp
+   complex onto the corresponding atoms of the RGS4·G[iα1]·GDP·AlF[4]
+   ^−complex (PDB accession code [62]1agr). G[iα1]·GDP·AlF[4] ^− was then
+   replaced by the superimposed G[iα1]·GppNHp complex. Analysis and in
+   silico mutations were then performed on the resulting
+   RGS4·G[iα1]·GppNHp model using O.
+   [63]Previous Section[64]Next Section
+
+ §2§ RESULTS §2§
+
+   The structure of the G[iα1]·GppNHp complex (Fig.[65]2 A) differs from
+   that of G[iα1]·GTPγS (Fig.[66]2 B) in two ways. First, there are small
+   changes in the side-chain positions of several surface residues that
+   are poorly ordered in crystals of G[iα1]·GTPγS. These differences are
+   most likely because of damping of thermal motions in the frozen
+   G[iα1]·GppNHp crystals. In contrast, 2.0 Å data from G[iα1]·GTPγS
+   crystals were collected at 14 °C. Additionally, the G[iα1]·GppNHp data
+   set was measured to 1.5 Å, permitting unambiguous assignment of side
+   chain conformations.
+
+   The second, and more interesting, group of changes relative to
+   G[iα1]·GTPγS are observed in the active site and are most likely
+   attributable to GppNHp (Fig. [67]2 A). For the most part, the active
+   site is similar to that observed in the G[iα1]·GTPγS complex (Fig.
+   [68]2 B). All of the interactions between the guanine nucleotide,
+   Mg^2+, and the protein observed in the latter complex are also present
+   in G[iα1]·GppNHp. The presumptive water nucleophile (W^nuc) is also
+   clearly observed (Fig.[69]1). A new feature of the active site is a
+   highly ordered (B = 21.9Å^2) water molecule (W^600) bound to the O1G
+   oxygen of the γ-phosphate (Fig. [70]1and Fig. [71]2 A). Modeling
+   indicates that this water molecule cannot bind to the G[iα1]·GTPγS
+   complex because it would be sterically excluded by the γ-thiophosphate
+   sulfur atom of GTPγS. The conformation of Glu^43 is altered, and its
+   carboxylate moiety forms a hydrogen bond to W^600 and consequently
+   cannot form the hydrogen bond to Arg^242 that is present in
+   G[iα1]·GTPγS (Fig. [72]2, A and B). In G[iα1]·GppNHp, Glu^43 and
+   Arg^178 form a doubly hydrogen-bonded ion pair (Fig.[73]2 A), in
+   contrast to the less intimate ion pair interaction observed in the
+   G[iα1]·GTPγS complex (Fig.[74]2 B). This enhanced salt-bridge may
+   strengthen binding of GTP in the ground state. Remarkably, the same
+   interaction occurs in crystals of G[iα1]·GDP complexed with G protein
+   βγ subunits ([75]28). The conformations of Arg^178 in G[iα1]·GppNHp and
+   G[iα1]·GTPγS differ slightly, but in neither case does Arg^178 interact
+   with the GTP substrate analog. In contrast, in the G[tα]·GTPγS complex,
+   the corresponding residue, Arg^174, interacts directly with the oxygen
+   bridging the β- and γ-phosphate atoms and the γ-thiophosphate sulfur
+   atom. The bridging NH group of GppNHp would not be capable of this
+   interaction however.
+   [76]Figure 1
+   View larger version:
+     * [77]In this window
+     * [78]In a new window
+
+     * [79]Download as PowerPoint Slide
+
+   Figure 1
+
+   Electron density about the active site of the G[iα1]· GppNHp complex.
+   The 1.5-Å 2F[o] − F[c] electron density map (blue) was calculated using
+   SigmaA-weighted phases derived from the model, contoured at 1.5 ς. The
+   model is shown as aball-and-stick representation. Red, oxygen;yellow,
+   carbon; blue, nitrogen; green, phosphorous; silver, magnesium. The
+   figure was generated using the program BOBSCRIPT ([80]51) and rendered
+   with RASTER3D ([81]52), and POVRAY.
+
+   The orientation of Gln^204 in the GppNHp complex is particularly
+   interesting. In the G[iα1]·GTPγS complex the side chain of this
+   residue, which assumes the favoredgauche + χ1 conformation, is poorly
+   ordered and directed out of the active site, and does not appear to
+   interact with any other residues (Fig. [82]2 B). Similar conformations
+   for the corresponding catalytic glutamine (Gln^cat) are observed in the
+   GTPγS-G[tα], -G[sα], and -G[sα]·adenylyl cyclase complexes ([83]7,
+   [84]9, [85]29). In contrast, Gln^204 exhibits strong density for
+   thegauche − χ1 conformation in the G[iα1]·GppNHp complex and makes
+   several contacts with other moieties (Figs. [86]1 and [87]2 A).
+   Notably, while Gln^204 does not interact directly with the substrate
+   analog, its side chain amino group forms a hydrogen bond to W^nuc. The
+   orientation of the amide group is defined by the functionality of the
+   three other moieties to which W^nuc is hydrogen bonded: the O1G oxygen
+   of the γ-phosphate group, which is proposed to act as a catalytic base
+   ([88]30, [89]31), the main chain carbonyl oxygen of Thr^181, and the
+   main chain NH group of Gln^204 (Fig. [90]2 A). Gln^204 is also anchored
+   by a hydrogen bond between its carboxamide oxygen atom and the hydroxyl
+   moiety of Ser^206.
+
+   The thiophosphate moiety of GTPγS does not prevent Gln^204from adopting
+   the conformation observed in the GppNHp complex; however, it does block
+   entry of W^600 to the active site. W^600, in turn prevents Gln^204 from
+   assuming the conformation that is partly populated in the GTPγS
+   complex. In the GppNHp complex, the hydrogen bond between the phosphate
+   O1G oxygen and W^nuc is shorter than the corresponding interaction in
+   the GTPγS complex (2.82 versus 3.27 Å). The position of W^nuc closer to
+   the γ-phosphate permits a more favorable interaction with the side
+   chain of Gln^204. The well ordered conformation of Gln^204 in the
+   GppNHp complex may be attributed to hydrogen bonds formed with W^nuc
+   and Ser^206 but also to the conformational restriction imposed by W^600
+   as well as the cryogenic data measurement conditions. In other G
+   protein-GppNHp or -GppCp complexes, Gln^cat also interacts with W^nuc
+   ([91]32, [92]33). However, in these cases Gln^cat assumes the gauche +
+   χ1 conformation.
+   [93]Previous Section[94]Next Section
+
+ §2§ DISCUSSION §2§
+
+   The most intriguing feature of the G[iα1]·GppNHp complex is the
+   conformation of the side chain of Gln^204 and its implications for the
+   mechanism of both intrinsic and RGS-stimulated GTP hydrolysis. As
+   established by mutagenesis studies ([95]11), Gln^204, and the
+   corresponding residues in other G proteins ([96]12, [97]34, [98]35), is
+   absolutely required for enzymatic activity. Studies of
+   substrate-assisted catalysis using GTPase-deficient G[sα]have
+   demonstrated that a hydrogen donor group near the γ-phosphate can
+   substitute for Gln^cat ([99]36). However, the function of Gln^cat
+   during GTP hydrolysis by G proteins has been debated. Hydrolysis of GTP
+   in G proteins is believed to occur by a direct, in-line attack on the
+   γ-phosphate atom by a nucleophilic water ([100]37-39). Crystal
+   structures of G[iα1] and other G proteins have identified, near the
+   γ-phosphate group, a well ordered water molecule (W^nuc) that is
+   positioned to carry out a nucleophilic attack ([101]7-9, [102]32,
+   [103]40, [104]41). Although Gln^204 is near W^nuc in G[iα1]·GTPγS, it
+   does not directly contact it. Further, W^nuc is observed in
+   Gln^204 → Leu G[iα1]·GTPγS, and Gln^61 → Leu Ras·GppNHp (Gln^61 is
+   Gln^cat in Ras) ([105]8, [106]42), indicating that Gln^catis not
+   required for binding of W^nuc in the ground state. It has been pointed
+   out that the basicity of glutamine is low, and it is therefore unlikely
+   that Gln^cat acts as the general base that deprotonates W^nuc
+   ([107]43). Rather, an oxygen of the presumably dianionic γ-phosphate is
+   proposed to serve this function in Ras ([108]30, [109]31). Hence,
+   Gln^cat may only polarize W^nuc in the ground state.
+
+   X-ray crystallographic studies have indicated that Gln^catstabilizes
+   the transition state ([110]2), as originally proposed by Priveet al.
+   ([111]43). Structures of G[iα1] and G[tα] complexed with the transition
+   state analog GDP·AlF[4] ^−, reveal Gln^catpositioned within the active
+   site and directly interacting with a fluorine substituent and W^nuc of
+   the GDP·AlF[4] ^−·W^nuc complex. Fig.[112]2 C shows these interactions
+   in the RGS4·G[iα1]·GDP·AlF[4] ^−complex ([113]44). It was proposed that
+   the amino group of Gln^cat stabilizes negative character on the
+   equatorial oxygen of the transition state and its carbamoyl oxygen
+   stabilizes the attacking nucleophilic water. A similar configuration is
+   observed in the Ras-GAP·Ras·GDP·AlF[4] ^− and the
+   Rho-GAP·Cdc42Hs·GDP·AlF4^− complexes ([114]45-47). In addition,
+   mutations that perturb the transition state conformation of Gln^cat
+   abolish GTPase activity ([115]42, [116]48). These observations indicate
+   that Gln^cat stabilizes the transition state for GTP hydrolysis.
+
+   The GppNHp complex provides novel insights into both the mechanism of
+   GTP hydrolysis as well as to the role of both Arg^cat and Gln^cat in
+   the ground state E·S complex. GppNHp, but not GTPγS, permits a water
+   molecule, W^600, to occupy a position in which it could act as the
+   ultimate proton acceptor from W^nuc. Water molecules in similar, but
+   not identical, positions are present in the GppNHp- or GppCp-bound
+   complexes of Ras and Rac1 ([117]32, [118]40). A proton could be relayed
+   from W^nuc to W^600 via O1G of the GTP γ-phosphate. This substituent
+   does not otherwise participate in hydrogen bonds with the protein and
+   corresponds to the thiol of GTPγS. The basicity of W^600may be enhanced
+   by hydrogen bond formation with Glu^43, which is well conserved in Gα
+   proteins with the exception of G[zα] where it is replaced with an
+   asparagine residue. Glu^43 also forms a hydrogen-bonded ion pair with
+   Arg^178. In this conformation, Arg^178 is restrained from interacting
+   with the γ-phosphate of GTP. Transfer of a proton from W^nuc to W^600
+   would tend to weaken this ion pair, releasing Arg^178 to stabilize the
+   incipient pentacoordinate phosphoryl transition state. W^600 also
+   blocks the side chain of Gln^204 from interacting with the
+   pentacoordinate phosphate. Thus, until it diffuses from the active
+   site, W^600 impedes the reorganization of the catalytic site that is
+   required for transition state stabilization.
+
+   Gln^204 is anchored in a noncatalytic conformation by hydrogen bonds to
+   both W^nuc and Ser^206(Ser^206 is substituted by an Asp in G[αs],). In
+   the ground state, Gln^204 could orient and perhaps activate W^nuc;
+   however, to stabilize the transition state as represented by G protein
+   GDP·AlF[4] ^−complexes, Gln^204 must sever its hydrogen bond with
+   Ser^206 and W^nuc and rotate ≈120° about χ[1] and ≈90° about χ[2] and
+   χ[3] (to gauche+ and gauche−, respectively) such that its carbamoyl
+   group donates a hydrogen bond to the equatorial oxygen of the
+   pentacoordinate γ-phosphoryl group and accepts a hydrogen bond from
+   W^nuc. Such would incur a substantial penalty in catalytic efficiency
+   and perhaps account, at least in part, for the low catalytic rate of
+   GTP hydrolysis in G[α] and perhaps in other G proteins.
+
+   We propose that the ground state G[iα1]·GTP complex is “auto-inhibited”
+   with Gln^cat locked into an unproductive conformation. Active site
+   residues in the EF-Tu·GppNHp complex also assumes anti-catalytic
+   positions; in this case His^cat, the residue corresponding to Gln^cat,
+   cannot interact with the substrates because of steric interference by
+   other active site residues ([119]41). In G[iα1], catalysis could occur
+   only if the bonds that hold Gln^cat in this position are broken, and
+   the side chain freed to interact with the pentacoordinate transition
+   state. This model predicts that changes that disrupt the ground state
+   conformation of Gln^204, while not otherwise compromising the active
+   site, would increasek [cat].
+
+   RGS proteins, which accelerate the rate of GTP hydrolysis by G[iα1] by
+   50–100-fold, may act in part by destabilizing the ground state
+   conformation of Gln^cat, as well as stabilizing its productive
+   conformation in the transition state ([120]44). The crystal structure
+   of the RGS4·G[iα1]·GDP·AlF[4] ^−complex demonstrates that RGS4
+   stabilizes the active site of G[iα1] in the conformation corresponding
+   to that of the transition state complex (Fig. [121]2 C) ([122]44). No
+   residues from RGS4 are inserted into the active site except Asn^128,
+   which could enhance catalysis by aiding in binding, orienting, and
+   polarizing W^nuc in the pre-transition state complex ([123]44).
+
+   However, superposition of G[iα1]·GppNHp and G[iα1]·GDP·AlF[4] ^− from
+   the RGS4·G[iα1]·GDP·AlF[4] ^−complex reveals that the carbamoyl groups
+   of Gln^204 and Asn^128 occupy nearly the same positions, although the
+   side chains approach from opposite directions (Fig. [124]2 D). Further,
+   both residues are positioned such that they can bind the nucleophilic
+   water and Ser^206. We suggest that Asn^128 of RGS4 displaces the side
+   chain of Gln^204 from its “anti-catalytic” position in the ground
+   state, freeing it to participate in stabilization of the transition
+   state.
+
+   Mutational analysis of RGS proteins supports this hypothesis. Mutation
+   of Asn^131 in hRGSr (analogous to Asn^128 of RGS4) to either serine or
+   glutamine resulted in a relatively small decrease in the k [cat] of
+   G[tα] ([125]49). In addition, hRGSr in which Asn^131 was mutated to
+   leucine or alanine also retains substantial stimulatory activity, and
+   the loss of activity that was observed could be attributed to weakened
+   binding of these mutants to G[tα]. Similar mutagenic studies have been
+   performed with RGS4 ([126]50). Mutants of Asn^128analogous to those of
+   hRGSr Asn^131 were modeled in the structure of the “RGS4·G[iα1]·GppNHp”
+   complex. In all cases these residues were in steric conflict with
+   Gln^204. These findings indicate that the bulk and binding of the
+   residue at position 128 is important to the stimulatory activity of
+   RGS4 although it is unlikely that it has a direct catalytic role in
+   stimulation of GTPase activity ([127]49).
+
+   The evidence presented is consistent with a self-inhibited or
+   anti-catalytic model of the ground state of G[α] proteins, and a role
+   for RGS proteins in stimulating GTPase activity by releasing G[α]
+   subunits from this ground state while stabilizing the transition state.
+   [128]Previous Section[129]Next Section
+
+ §2§ Footnotes §2§
+
+     * [130]↵* The costs of publication of this article were defrayed in
+       part by the payment of page charges. The article must therefore be
+       hereby marked “advertisement” in accordance with 18 U.S.C. Section
+       1734 solely to indicate this fact.
+       The atomic coordinates and structure factors (code1cip) has been
+       deposited in the Protein Data Bank, Brookhaven National Laboratory,
+       Upton, NY.
+     * [131]↵¶ To whom correspondence should be addressed: Howard Hughes
+       Medical Institute, The University of Texas Southwestern Medical
+       Center at Dallas, 5323 Harry Hines Blvd., Dallas, TX 75235-9050.
+       Tel.: 214-648-5008; Fax: 214-648-6336; E-mail:
+       Sprang{at}howie.swmed.edu.
+     * Abbreviations:
+
+        GTPγS
+                guanosine 5′-O-3-thiotriphosphate
+
+        RGS
+                regulator of G protein signaling
+
+        GppNHp
+                guanosine-5′-(βγ-imino)triphosphate
+
+        GppCHp
+                guanosine-5′-(βγ-methylene)triphosphate
+
+        W^nuc
+                nucleophilic water
+
+        Gln^cat and Arg^cat
+                conserved catalytic residues in Gα subunits
+
+     *
+          + Received March 3, 1999.
+     * The American Society for Biochemistry and Molecular Biology, Inc.
+
+   [132]Previous Section
+
+ §2§ REFERENCES §2§
+
+    1. [133]↵
+         1. Kaziro Y.,
+         2. Itoh H.,
+         3. Kozasa T.,
+         4. Nakafuku M.,
+         5. Satoh T.
+       (1991) Annu. Rev. Biochem. 60:349–400.
+       [134]CrossRef[135]Medline[136]Web of Science
+    2. [137]↵
+         1. Sprang S. R.
+       (1997) Annu. Rev. Biochem. 66:639–678.
+       [138]CrossRef[139]Medline[140]Web of Science
+    3. Deleted in proof.
+    4. Deleted in proof.
+    5. Deleted in proof.
+    6.
+         1. Taussig R.,
+         2. Tang W.-J.,
+         3. Hepler J. R.,
+         4. Gilman A. G.
+       (1994) J. Biol. Chem. 269:6093–6100.
+       [141]Abstract/FREE Full Text
+    7. [142]↵
+         1. Noel J. P.,
+         2. Hamm H. E.,
+         3. Sigler P. B.
+       (1993) Nature 366:654–663.
+       [143]CrossRef[144]Medline
+    8. [145]↵
+         1. Coleman D. E.,
+         2. Berghuis A. M.,
+         3. Lee E.,
+         4. Linder M. E.,
+         5. Gilman A. G.,
+         6. Sprang S. R.
+       (1994) Science 265:1405–1412.
+       [146]Abstract/FREE Full Text
+    9. [147]↵
+         1. Sunahara R. K.,
+         2. Tesmer J. J. G.,
+         3. Gilman A. G.,
+         4. Sprang S. R.
+       (1997) Science 278:1943–1947.
+       [148]Abstract/FREE Full Text
+   10. [149]↵
+         1. Sondek J.,
+         2. Lambright D. G.,
+         3. Noel J. P.,
+         4. Hamm H. E.,
+         5. Sigler P. B.
+       (1994) Nature 372:276–279.
+       [150]CrossRef[151]Medline
+   11. [152]↵
+         1. Freissmuth M.,
+         2. Gilman A. G.
+       (1989) J. Biol. Chem. 264:21907–21914.
+       [153]Abstract/FREE Full Text
+   12. [154]↵
+         1. Graziano M. P.,
+         2. Gilman A. G.
+       (1989) J. Biol. Chem. 264:15475–15482.
+       [155]Abstract/FREE Full Text
+   13. Deleted in proof.
+   14. [156]↵
+         1. Linder M. E.,
+         2. Ewald D. A.,
+         3. Miller R. J.,
+         4. Gilman A. G.
+       (1990) J. Biol. Chem. 265:8243–8251.
+       [157]Abstract/FREE Full Text
+   15. [158]↵
+         1. Dohlman H. G.,
+         2. Thorner J.
+       (1997) J. Biol. Chem. 272:3871–3874.
+       [159]FREE Full Text
+   16. [160]↵
+         1. Berman D. M.,
+         2. Gilman A. G.
+       (1998) J. Biol. Chem. 273:1269–1272.
+       [161]FREE Full Text
+   17. [162]↵
+         1. Lee E.,
+         2. Linder M. E.,
+         3. Gilman A. G.
+       (1994) Methods Enzymol. 237:146–164.
+       [163]Medline[164]Web of Science
+   18. [165]↵
+         1. Coleman D. E.,
+         2. Lee E.,
+         3. Mixon M. B.,
+         4. Linder M. E.,
+         5. Berghuis A.,
+         6. Gilman A. G.,
+         7. Sprang S. R.
+       (1994) J. Mol. Biol. 238:630–634.
+       [166]CrossRef[167]Medline[168]Web of Science
+   19. [169]↵
+         1. Mixon M. B.,
+         2. Lee E.,
+         3. Coleman D. E.,
+         4. Berghuis A. M.,
+         5. Gilman A. G.,
+         6. Sprang S. R.
+       (1995) Science 270:954–960.
+       [170]Abstract/FREE Full Text
+   20. [171]↵
+         1. Otwinowski Z.,
+         2. Minor W.
+       (1997) Methods Enzymol. 276:307–326.
+       [172]CrossRef[173]Web of Science
+   21. [174]↵
+         1. Read R. J.
+       (1986) Acta Crystallogr. Sec. A 42:140–149.
+       [175]CrossRef
+   22. [176]↵
+         1. Hodel A.,
+         2. Kim S-H.,
+         3. Brünger A. T.
+       (1992) Acta Cryst. Sec. A 48:851–858.
+       [177]CrossRef
+   23. [178]↵
+         1. Jones T. A.,
+         2. Kjeldgaard M. O.
+       (1993) O, Version 5.9 (Uppsala University, Uppsala, Sweden).
+   24. [179]↵
+         1. Brünger A. T.
+       (1992) XPLOR, Version 3.1 (Yale University Press, New Haven, CT).
+   25. [180]↵
+         1. Jiang J. S.,
+         2. Brünger A. T.
+       (1994) J. Mol. Biol. 243:100–115.
+       [181]CrossRef[182]Medline[183]Web of Science
+   26. [184]↵
+         1. Brünger A. T.
+       (1992) Nature 355:472–475.
+       [185]CrossRef[186]Medline
+   27. [187]↵
+         1. Laskowski R. A.,
+         2. MacArthur M. W.,
+         3. Moss D. S.,
+         4. Thornton J. M.
+       (1993) J. Appl. Crystallogr. 26:283–291.
+       [188]CrossRef
+   28. [189]↵
+         1. Wall M. A.,
+         2. Coleman D. E.,
+         3. Lee E.,
+         4. Iñiguez-Lluhi J. A.,
+         5. Posner B. A.,
+         6. Gilman A. G.,
+         7. Sprang S. R.
+       (1995) Cell 80:1047–1058.
+   29. [190]↵
+         1. Tesmer J. J. G.,
+         2. Sunahara R. K.,
+         3. Gilman A. G.,
+         4. Sprang S. R.
+       (1997) Science 278:1907–1916.
+       [191]Abstract/FREE Full Text
+   30. [192]↵
+         1. Schweins T.,
+         2. Geyer M.,
+         3. Scheffzek K.,
+         4. Warshel A.,
+         5. Kalbitzer H. R.,
+         6. Wittinghofer A.
+       (1995) Nat. Struct. Biol. 2:36–44.
+       [193]CrossRef[194]Medline[195]Web of Science
+   31. [196]↵
+         1. Schweins T.,
+         2. Geyer M.,
+         3. Kalbitzer H. R.,
+         4. Wittinghofer A.,
+         5. Warshel A.
+       (1996) Biochemistry 35:14225–14231.
+       [197]CrossRef[198]Medline
+   32. [199]↵
+         1. Hirshberg M.,
+         2. Stockley R. W.,
+         3. Dodson G.,
+         4. Webb M. R.
+       (1997) Nat. Struct. Biol. 4:147–152.
+       [200]CrossRef[201]Medline[202]Web of Science
+   33. [203]↵
+         1. Milburn M. V.,
+         2. Tong L.,
+         3. deVos A. M.,
+         4. Brünger A.,
+         5. Yamaizumi Z.,
+         6. Nishimura S.,
+         7. Kim S-H.
+       (1990) Science 247:939–945.
+       [204]Abstract/FREE Full Text
+   34. [205]↵
+         1. Der C. J.,
+         2. Finkel T.,
+         3. Cooper G. M.
+       (1986) Cell 44:167–176.
+       [206]CrossRef[207]Medline[208]Web of Science
+   35. [209]↵
+         1. Landis C. A.,
+         2. Masters S. B.,
+         3. Spada A.,
+         4. Pace A. M.,
+         5. Bourne H. R.,
+         6. Vallar L.
+       (1989) Nature 340:692–696.
+       [210]CrossRef[211]Medline
+   36. [212]↵
+         1. Zor T.,
+         2. Andorn R.,
+         3. Sofer I.,
+         4. Chorev M.,
+         5. Selinger Z.
+       (1998) FEBS Lett. 433:326–330.
+       [213]CrossRef[214]Medline
+   37. [215]↵
+         1. Webb M. R.,
+         2. Eccleston J. F.
+       (1981) J. Biol. Chem. 256:7734–7737.
+       [216]Abstract/FREE Full Text
+   38. [217]↵
+         1. Eccleston J. F.,
+         2. Webb M. R.
+       (1982) J. Biol. Chem. 257:5046–5049.
+       [218]Abstract/FREE Full Text
+   39. [219]↵
+         1. Feuerstein J.,
+         2. Goody R. S.,
+         3. Webb M. R.
+       (1989) J. Biol. Chem. 264:6188–6190.
+       [220]Abstract/FREE Full Text
+   40. [221]↵
+         1. Pai E. F.,
+         2. Krengel U.,
+         3. Petsko G. A.,
+         4. Goody R. S.,
+         5. Kabsch W.,
+         6. Wittinghofer A.
+       (1990) EMBO J. 9:2351–2359.
+       [222]Medline[223]Web of Science
+   41. [224]↵
+         1. Berchtold H.,
+         2. Reshetnikova L.,
+         3. Reiser C. O. A.,
+         4. Schirmer N. K.,
+         5. Sprinzl M.,
+         6. Hilgenfeld R.
+       (1993) Nature 365:126–132.
+       [225]CrossRef[226]Medline
+   42. [227]↵
+         1. Krengel U.,
+         2. Schlichting I.,
+         3. Scherer A.,
+         4. Schumann R.,
+         5. Frech M.,
+         6. John J.,
+         7. Kabsch W.,
+         8. Pai E. F.,
+         9. Wittinghofer A.
+       (1990) Cell 62:539–548.
+       [228]CrossRef[229]Medline[230]Web of Science
+   43. [231]↵
+         1. Privé G. G.,
+         2. Milburn M. V.,
+         3. Tong L.,
+         4. deVos A. M.,
+         5. Yamaizumi Z.,
+         6. Nishimura S.,
+         7. Kim S.-H.
+       (1992) Proc. Natl. Acad. Sci. U. S. A. 89:3649–3653.
+       [232]Abstract/FREE Full Text
+   44. [233]↵
+         1. Tesmer J. J. G.,
+         2. Berman D. M.,
+         3. Gilman A. G.,
+         4. Sprang S. R.
+       (1997) Cell 89:251–261.
+       [234]CrossRef[235]Medline[236]Web of Science
+   45. [237]↵
+         1. Scheffzek K.,
+         2. Ahmadian M. R.,
+         3. Kabsch W.,
+         4. Wiesmuller L.,
+         5. Lautwein A.,
+         6. Schmitz F.,
+         7. Wittinghofer A.
+       (1997) Science 277:333–338.
+       [238]Abstract/FREE Full Text
+   46. [239]↵
+         1. Rittinger K.,
+         2. Walker P. A.,
+         3. Eccleston J. F.,
+         4. Smerdon S. J.,
+         5. Gamblin S. J.
+       (1997) Nature 389:758–762.
+       [240]CrossRef[241]Medline
+   47. [242]↵
+         1. Nassar N.,
+         2. Hoffman G. R.,
+         3. Manor D.,
+         4. Clardy J. C.,
+         5. Cerione R. A.
+       (1998) Nat. Struct. Biol. 5:1047–1052.
+       [243]CrossRef[244]Medline[245]Web of Science
+   48. [246]↵
+         1. Raw A. S.,
+         2. Coleman D. E.,
+         3. Gilman A. G.,
+         4. Sprang S. R.
+       (1997) Biochemistry 36:15660–15669.
+       [247]CrossRef[248]Medline
+   49. [249]↵
+         1. Natochin M.,
+         2. McEntaffer R. L.,
+         3. Artemyev N. O.
+       (1998) J. Biol. Chem. 273:6731–6735.
+       [250]Abstract/FREE Full Text
+   50. [251]↵
+       Posner, B. A., Mukhopadhyay, S., Tesmer, J. J. G., Gilman, A. G.,
+       and Ross, E. M. (1999)Biolchemistry, in press.
+   51. [252]↵
+         1. Esnouf R. M.
+       (1997) J. Mol. Graphics 15:132–134.
+       [253]CrossRef[254]Medline[255]Web of Science
+   52. [256]↵
+         1. Merritt E. A.,
+         2. Murphy M. E. P.
+       (1994) Acta Crystallogr. Sec. D 50:869–873.
+       [257]CrossRef[258]Medline
+
+     * [259]Add to CiteULike CiteULike
+     * [260]Add to Complore Complore
+     * [261]Add to Connotea Connotea
+     * [262]Add to Del.icio.us Del.icio.us
+     * [263]Add to Digg Digg
+
+   [264]What's this?
+   [265]« Previous | [266]Next Article »[267]Table of Contents
+
+ §3§ This Article §3§
+
+    1. doi: 10.1074/jbc.274.24.16669 June 11, 1999 The Journal of
+       Biological Chemistry, 274, 16669-16672.
+
+    1. [268]AbstractFree
+    2. » Full TextFree
+    3. [269]Full Text (PDF)Free
+
+ §4§ Classifications §4§
+
+    1.
+          + [270]COMMUNICATION
+
+ §4§ Services §4§
+
+    1. [271]Email this article to a friend
+    2. [272]Alert me when this article is cited
+    3. [273]Alert me if a correction is posted
+    4. [274]Alert me when eletters are published
+    5. [275]Similar articles in this journal
+    6. [276]Similar articles in Web of Science
+    7. [277]Similar articles in PubMed
+    8. [278]Download to citation manager
+    9. [279]Request Permissions
+
+ §4§ Responses §4§
+
+    1. [280]Submit a Letter to the Editor
+
+ §4§ Citing Articles §4§
+
+    1. [281]Load citing article information
+    2. [282]Citing articles via Web of Science
+    3. [283]Citing articles via Google Scholar
+
+ §4§ Google Scholar §4§
+
+    1. [284]Articles by Coleman, D. E.
+    2. [285]Articles by Sprang, S. R.
+    3. [286]Search for related content
+
+ §4§ PubMed §4§
+
+    1. [287]PubMed citation
+    2. [288]Articles by Coleman, D. E.
+    3. [289]Articles by Sprang, S. R.
+    4.
+
+ §4§ Related Content §4§
+
+    1. [290]Load related web page information
+
+ §4§ Social Bookmarking §4§
+
+    1.
+          + [291]Add to CiteULike CiteULike
+          + [292]Add to Complore Complore
+          + [293]Add to Connotea Connotea
+          + [294]Add to Del.icio.us Del.icio.us
+          + [295]Add to Digg Digg
+       [296]What's this?
+
+ §3§ Navigate This Article §3§
+
+    1. [297]Top
+    2. [298]Abstract
+    3. [299]MATERIALS AND METHODS
+    4. [300]RESULTS
+    5. [301]DISCUSSION
+    6. [302]Footnotes
+    7. [303]REFERENCES
+
+ §3§ This Week's Issue §3§
+
+    1. [304]September 24, 2010, 285 (39)
+
+    1. [305]Current Issue
+
+    1. [306]Alert me to new issues of JBC
+
+     * [307]Authors
+     * [308]Submit
+     * [309]Subscribers
+     * [310]Editorial Board
+     * [311]RSS and Email Alerts
+     * [312]Article Statistics
+     * [313]Teaching Tools
+     * [314]Copyright Permissions
+     * [315]Advertise
+     * [316]Contact JBC
+
+     * Advertisement
+     * Advertisement
+
+   Copyright © 2010 by [317]American Society for Biochemistry and
+   Molecular Biology
+
+   [318]Alternate route to the JBC: http://intl.jbc.org
+
+   [319]Contact JBC | [320]Help Pages
+     * [321]asbmb_today_logo
+     * [322]jlr_logo
+     * [323]mcp_logo
+
+     * Print ISSN 0021-9258
+     * Online ISSN 1083-351X
+
+   Advertisement
+   Advertisement
+     * [324]Celebrate 100 Years of ASBMB: ASBMB Histroy Book Now Avaiable!
+
+References
+
+   Visible links
+   1. http://www.jbc.org/
+   2. file://localhost/dev/paper.html#content-block
+   3. http://www.jbc.org/
+   4. http://www.jbc.org/content/current
+   5. http://www.jbc.org/content/by/year
+   6. http://www.jbc.org/content/early/recent/0
+   7. http://www.jbc.org/content/by/section/Minireviews
+   8. http://www.jbc.org/content/by/section/Classics
+   9. http://www.jbc.org/content/by/section/Reflections
+  10. http://www.jbc.org/potw
+  11. http://www.jbc.org/search
+  12. http://www.jbc.org/content/by/year
+  13. http://www.jbc.org/login?uri=http%3A%2F%2Fwww.jbc.org%2Fcontent%2F274%2F24%2F16669.long
+  14. http://www.jbc.org/cgi/adclick/?ad=21396&adclick=true&url=http%3A%2F%2Fwww.asbmb.org%2FPage.aspx%3Fid%3D3362
+  15. file://localhost/dev/paper.html#fn-1
+  16. http://www.jbc.org/search?author1=David+E.+Coleman&sortspec=date&submit=Submit
+  17. file://localhost/dev/paper.html#target-2
+  18. http://www.jbc.org/search?author1=Stephen+R.+Sprang&sortspec=date&submit=Submit
+  19. file://localhost/dev/paper.html#target-2
+  20. file://localhost/dev/paper.html#target-1
+  21. file://localhost/dev/paper.html#fn-2
+  22. file://localhost/dev/paper.html#sec-1
+  23. file://localhost/dev/paper.html#ref-1
+  24. file://localhost/dev/paper.html#ref-2
+  25. file://localhost/dev/paper.html#ref-7
+  26. file://localhost/dev/paper.html#ref-8
+  27. file://localhost/dev/paper.html#ref-10
+  28. file://localhost/dev/paper.html#ref-11
+  29. file://localhost/dev/paper.html#ref-12
+  30. file://localhost/dev/paper.html#ref-8
+  31. file://localhost/dev/paper.html#ref-10
+  32. file://localhost/dev/paper.html#ref-8
+  33. file://localhost/dev/paper.html#ref-10
+  34. file://localhost/dev/paper.html#ref-14
+  35. file://localhost/dev/paper.html#ref-2
+  36. file://localhost/dev/paper.html#ref-15
+  37. file://localhost/dev/paper.html#ref-16
+  38. file://localhost/dev/paper.html#abstract-1
+  39. file://localhost/dev/paper.html#sec-2
+  40. file://localhost/dev/paper.html#ref-17
+  41. file://localhost/dev/paper.html#ref-18
+  42. file://localhost/dev/paper.html#ref-19
+  43. file://localhost/dev/paper.html#ref-20
+  44. file://localhost/dev/paper.html#T1
+  45. http://www.jbc.org/content/274/24/16669/T1.expansion.html
+  46. http://www.jbc.org/content/274/24/16669/T1.expansion.html
+  47. http://www.jbc.org/external-ref?link_type=PDB&access_num=1gia
+  48. file://localhost/dev/paper.html#ref-21
+  49. file://localhost/dev/paper.html#ref-22
+  50. file://localhost/dev/paper.html#ref-23
+  51. file://localhost/dev/paper.html#ref-24
+  52. file://localhost/dev/paper.html#ref-25
+  53. file://localhost/dev/paper.html#F1
+  54. file://localhost/dev/paper.html#ref-26
+  55. file://localhost/dev/paper.html#ref-27
+  56. file://localhost/dev/paper.html#T1
+  57. http://www.jbc.org/content/274/24/16669/F1.expansion.html
+  58. http://www.jbc.org/content/274/24/16669/F1.expansion.html
+  59. http://www.jbc.org/content/274/24/16669/F1.expansion.html
+  60. http://www.jbc.org/powerpoint/274/24/16669/F1
+  61. file://localhost/dev/paper.html#F2
+  62. http://www.jbc.org/external-ref?link_type=PDB&access_num=1agr
+  63. file://localhost/dev/paper.html#sec-1
+  64. file://localhost/dev/paper.html#sec-3
+  65. file://localhost/dev/paper.html#F1
+  66. file://localhost/dev/paper.html#F1
+  67. file://localhost/dev/paper.html#F1
+  68. file://localhost/dev/paper.html#F1
+  69. file://localhost/dev/paper.html#F2
+  70. file://localhost/dev/paper.html#F2
+  71. file://localhost/dev/paper.html#F1
+  72. file://localhost/dev/paper.html#F1
+  73. file://localhost/dev/paper.html#F1
+  74. file://localhost/dev/paper.html#F1
+  75. file://localhost/dev/paper.html#ref-28
+  76. http://www.jbc.org/content/274/24/16669/F2.expansion.html
+  77. http://www.jbc.org/content/274/24/16669/F2.expansion.html
+  78. http://www.jbc.org/content/274/24/16669/F2.expansion.html
+  79. http://www.jbc.org/powerpoint/274/24/16669/F2
+  80. file://localhost/dev/paper.html#ref-51
+  81. file://localhost/dev/paper.html#ref-52
+  82. file://localhost/dev/paper.html#F1
+  83. file://localhost/dev/paper.html#ref-7
+  84. file://localhost/dev/paper.html#ref-9
+  85. file://localhost/dev/paper.html#ref-29
+  86. file://localhost/dev/paper.html#F2
+  87. file://localhost/dev/paper.html#F1
+  88. file://localhost/dev/paper.html#ref-30
+  89. file://localhost/dev/paper.html#ref-31
+  90. file://localhost/dev/paper.html#F1
+  91. file://localhost/dev/paper.html#ref-32
+  92. file://localhost/dev/paper.html#ref-33
+  93. file://localhost/dev/paper.html#sec-2
+  94. file://localhost/dev/paper.html#fn-group-1
+  95. file://localhost/dev/paper.html#ref-11
+  96. file://localhost/dev/paper.html#ref-12
+  97. file://localhost/dev/paper.html#ref-34
+  98. file://localhost/dev/paper.html#ref-35
+  99. file://localhost/dev/paper.html#ref-36
+ 100. file://localhost/dev/paper.html#ref-37
+ 101. file://localhost/dev/paper.html#ref-7
+ 102. file://localhost/dev/paper.html#ref-32
+ 103. file://localhost/dev/paper.html#ref-40
+ 104. file://localhost/dev/paper.html#ref-41
+ 105. file://localhost/dev/paper.html#ref-8
+ 106. file://localhost/dev/paper.html#ref-42
+ 107. file://localhost/dev/paper.html#ref-43
+ 108. file://localhost/dev/paper.html#ref-30
+ 109. file://localhost/dev/paper.html#ref-31
+ 110. file://localhost/dev/paper.html#ref-2
+ 111. file://localhost/dev/paper.html#ref-43
+ 112. file://localhost/dev/paper.html#F1
+ 113. file://localhost/dev/paper.html#ref-44
+ 114. file://localhost/dev/paper.html#ref-45
+ 115. file://localhost/dev/paper.html#ref-42
+ 116. file://localhost/dev/paper.html#ref-48
+ 117. file://localhost/dev/paper.html#ref-32
+ 118. file://localhost/dev/paper.html#ref-40
+ 119. file://localhost/dev/paper.html#ref-41
+ 120. file://localhost/dev/paper.html#ref-44
+ 121. file://localhost/dev/paper.html#F1
+ 122. file://localhost/dev/paper.html#ref-44
+ 123. file://localhost/dev/paper.html#ref-44
+ 124. file://localhost/dev/paper.html#F1
+ 125. file://localhost/dev/paper.html#ref-49
+ 126. file://localhost/dev/paper.html#ref-50
+ 127. file://localhost/dev/paper.html#ref-49
+ 128. file://localhost/dev/paper.html#sec-3
+ 129. file://localhost/dev/paper.html#ref-list-1
+ 130. file://localhost/dev/paper.html#xref-fn-1-1
+ 131. file://localhost/dev/paper.html#xref-fn-2-1
+ 132. file://localhost/dev/paper.html#fn-group-1
+ 133. file://localhost/dev/paper.html#xref-ref-1-1
+ 134. http://www.jbc.org/external-ref?access_num=10.1146/annurev.bi.60.070191.002025&link_type=DOI
+ 135. http://www.jbc.org/external-ref?access_num=1909108&link_type=MED
+ 136. http://www.jbc.org/external-ref?access_num=A1991FV90900012&link_type=ISI
+ 137. file://localhost/dev/paper.html#xref-ref-2-1
+ 138. http://www.jbc.org/external-ref?access_num=10.1146/annurev.biochem.66.1.639&link_type=DOI
+ 139. http://www.jbc.org/external-ref?access_num=9242920&link_type=MED
+ 140. http://www.jbc.org/external-ref?access_num=A1997XH20100022&link_type=ISI
+ 141. http://www.jbc.org/cgi/ijlink?linkType=ABST&journalCode=jbc&resid=269/8/6093
+ 142. file://localhost/dev/paper.html#xref-ref-7-1
+ 143. http://www.jbc.org/external-ref?access_num=10.1038/366654a0&link_type=DOI
+ 144. http://www.jbc.org/external-ref?access_num=8259210&link_type=MED
+ 145. file://localhost/dev/paper.html#xref-ref-7-1
+ 146. http://www.jbc.org/cgi/ijlink?linkType=ABST&journalCode=sci&resid=265/5177/1405
+ 147. file://localhost/dev/paper.html#xref-ref-7-1
+ 148. http://www.jbc.org/cgi/ijlink?linkType=ABST&journalCode=sci&resid=278/5345/1943
+ 149. file://localhost/dev/paper.html#xref-ref-10-1
+ 150. http://www.jbc.org/external-ref?access_num=10.1038/372276a0&link_type=DOI
+ 151. http://www.jbc.org/external-ref?access_num=7969474&link_type=MED
+ 152. file://localhost/dev/paper.html#xref-ref-11-1
+ 153. http://www.jbc.org/cgi/ijlink?linkType=ABST&journalCode=jbc&resid=264/36/21907
+ 154. file://localhost/dev/paper.html#xref-ref-12-1
+ 155. http://www.jbc.org/cgi/ijlink?linkType=ABST&journalCode=jbc&resid=264/26/15475
+ 156. file://localhost/dev/paper.html#xref-ref-14-1
+ 157. http://www.jbc.org/cgi/ijlink?linkType=ABST&journalCode=jbc&resid=265/14/8243
+ 158. file://localhost/dev/paper.html#xref-ref-15-1
+ 159. http://www.jbc.org/cgi/ijlink?linkType=FULL&journalCode=jbc&resid=272/7/3871
+ 160. file://localhost/dev/paper.html#xref-ref-16-1
+ 161. http://www.jbc.org/cgi/ijlink?linkType=FULL&journalCode=jbc&resid=273/3/1269
+ 162. file://localhost/dev/paper.html#xref-ref-17-1
+ 163. http://www.jbc.org/external-ref?access_num=7934993&link_type=MED
+ 164. http://www.jbc.org/external-ref?access_num=A1994BA88T00012&link_type=ISI
+ 165. file://localhost/dev/paper.html#xref-ref-18-1
+ 166. http://www.jbc.org/external-ref?access_num=10.1006/jmbi.1994.1320&link_type=DOI
+ 167. http://www.jbc.org/external-ref?access_num=8176751&link_type=MED
+ 168. http://www.jbc.org/external-ref?access_num=A1994NM06600013&link_type=ISI
+ 169. file://localhost/dev/paper.html#xref-ref-19-1
+ 170. http://www.jbc.org/cgi/ijlink?linkType=ABST&journalCode=sci&resid=270/5238/954
+ 171. file://localhost/dev/paper.html#xref-ref-20-1
+ 172. http://www.jbc.org/external-ref?access_num=10.1016/S0076-6879(97)76066-X&link_type=DOI
+ 173. http://www.jbc.org/external-ref?access_num=A1997BH42P00020&link_type=ISI
+ 174. file://localhost/dev/paper.html#xref-ref-21-1
+ 175. http://www.jbc.org/external-ref?access_num=10.1107/S0108767386099622&link_type=DOI
+ 176. file://localhost/dev/paper.html#xref-ref-22-1
+ 177. http://www.jbc.org/external-ref?access_num=10.1107/S0108767392006044&link_type=DOI
+ 178. file://localhost/dev/paper.html#xref-ref-23-1
+ 179. file://localhost/dev/paper.html#xref-ref-24-1
+ 180. file://localhost/dev/paper.html#xref-ref-25-1
+ 181. http://www.jbc.org/external-ref?access_num=10.1006/jmbi.1994.1633&link_type=DOI
+ 182. http://www.jbc.org/external-ref?access_num=7932732&link_type=MED
+ 183. http://www.jbc.org/external-ref?access_num=A1994PL85600010&link_type=ISI
+ 184. file://localhost/dev/paper.html#xref-ref-26-1
+ 185. http://www.jbc.org/external-ref?access_num=10.1038/355472a0&link_type=DOI
+ 186. http://www.jbc.org/external-ref?access_num=18481394&link_type=MED
+ 187. file://localhost/dev/paper.html#xref-ref-27-1
+ 188. http://www.jbc.org/external-ref?access_num=10.1107/S0021889892009944&link_type=DOI
+ 189. file://localhost/dev/paper.html#xref-ref-28-1
+ 190. file://localhost/dev/paper.html#xref-ref-29-1
+ 191. http://www.jbc.org/cgi/ijlink?linkType=ABST&journalCode=sci&resid=278/5345/1907
+ 192. file://localhost/dev/paper.html#xref-ref-30-1
+ 193. http://www.jbc.org/external-ref?access_num=10.1038/nsb0195-36&link_type=DOI
+ 194. http://www.jbc.org/external-ref?access_num=7719852&link_type=MED
+ 195. http://www.jbc.org/external-ref?access_num=A1995RF45000011&link_type=ISI
+ 196. file://localhost/dev/paper.html#xref-ref-31-1
+ 197. http://www.jbc.org/external-ref?access_num=10.1021/bi961118o&link_type=DOI
+ 198. http://www.jbc.org/external-ref?access_num=8916907&link_type=MED
+ 199. file://localhost/dev/paper.html#xref-ref-32-1
+ 200. http://www.jbc.org/external-ref?access_num=10.1038/nsb0297-147&link_type=DOI
+ 201. http://www.jbc.org/external-ref?access_num=9033596&link_type=MED
+ 202. http://www.jbc.org/external-ref?access_num=A1997WF96100017&link_type=ISI
+ 203. file://localhost/dev/paper.html#xref-ref-33-1
+ 204. http://www.jbc.org/cgi/ijlink?linkType=ABST&journalCode=sci&resid=247/4945/939
+ 205. file://localhost/dev/paper.html#xref-ref-34-1
+ 206. http://www.jbc.org/external-ref?access_num=10.1016/0092-8674(86)90495-2&link_type=DOI
+ 207. http://www.jbc.org/external-ref?access_num=3510078&link_type=MED
+ 208. http://www.jbc.org/external-ref?access_num=A1986AYV3400018&link_type=ISI
+ 209. file://localhost/dev/paper.html#xref-ref-35-1
+ 210. http://www.jbc.org/external-ref?access_num=10.1038/340692a0&link_type=DOI
+ 211. http://www.jbc.org/external-ref?access_num=2549426&link_type=MED
+ 212. file://localhost/dev/paper.html#xref-ref-36-1
+ 213. http://www.jbc.org/external-ref?access_num=10.1016/S0014-5793(98)00930-2&link_type=DOI
+ 214. http://www.jbc.org/external-ref?access_num=9744820&link_type=MED
+ 215. file://localhost/dev/paper.html#xref-ref-37-1
+ 216. http://www.jbc.org/cgi/ijlink?linkType=ABST&journalCode=jbc&resid=256/15/7734
+ 217. file://localhost/dev/paper.html#xref-ref-37-1
+ 218. http://www.jbc.org/cgi/ijlink?linkType=ABST&journalCode=jbc&resid=257/9/5046
+ 219. file://localhost/dev/paper.html#xref-ref-37-1
+ 220. http://www.jbc.org/cgi/ijlink?linkType=ABST&journalCode=jbc&resid=264/11/6188
+ 221. file://localhost/dev/paper.html#xref-ref-40-1
+ 222. http://www.jbc.org/external-ref?access_num=2196171&link_type=MED
+ 223. http://www.jbc.org/external-ref?access_num=A1990DP59500001&link_type=ISI
+ 224. file://localhost/dev/paper.html#xref-ref-41-1
+ 225. http://www.jbc.org/external-ref?access_num=10.1038/365126a0&link_type=DOI
+ 226. http://www.jbc.org/external-ref?access_num=8371755&link_type=MED
+ 227. file://localhost/dev/paper.html#xref-ref-42-1
+ 228. http://www.jbc.org/external-ref?access_num=10.1016/0092-8674(90)90018-A&link_type=DOI
+ 229. http://www.jbc.org/external-ref?access_num=2199064&link_type=MED
+ 230. http://www.jbc.org/external-ref?access_num=A1990DU44500015&link_type=ISI
+ 231. file://localhost/dev/paper.html#xref-ref-43-1
+ 232. http://www.jbc.org/cgi/ijlink?linkType=ABST&journalCode=pnas&resid=89/8/3649
+ 233. file://localhost/dev/paper.html#xref-ref-44-1
+ 234. http://www.jbc.org/external-ref?access_num=10.1016/S0092-8674(00)80204-4&link_type=DOI
+ 235. http://www.jbc.org/external-ref?access_num=9108480&link_type=MED
+ 236. http://www.jbc.org/external-ref?access_num=A1997WU88800012&link_type=ISI
+ 237. file://localhost/dev/paper.html#xref-ref-45-1
+ 238. http://www.jbc.org/cgi/ijlink?linkType=ABST&journalCode=sci&resid=277/5324/333
+ 239. file://localhost/dev/paper.html#xref-ref-45-1
+ 240. http://www.jbc.org/external-ref?access_num=10.1038/39651&link_type=DOI
+ 241. http://www.jbc.org/external-ref?access_num=9338791&link_type=MED
+ 242. file://localhost/dev/paper.html#xref-ref-45-1
+ 243. http://www.jbc.org/external-ref?access_num=10.1038/4156&link_type=DOI
+ 244. http://www.jbc.org/external-ref?access_num=9846874&link_type=MED
+ 245. http://www.jbc.org/external-ref?access_num=000077284900008&link_type=ISI
+ 246. file://localhost/dev/paper.html#xref-ref-48-1
+ 247. http://www.jbc.org/external-ref?access_num=10.1021/bi971912p&link_type=DOI
+ 248. http://www.jbc.org/external-ref?access_num=9398294&link_type=MED
+ 249. file://localhost/dev/paper.html#xref-ref-49-1
+ 250. http://www.jbc.org/cgi/ijlink?linkType=ABST&journalCode=jbc&resid=273/12/6731
+ 251. file://localhost/dev/paper.html#xref-ref-50-1
+ 252. file://localhost/dev/paper.html#xref-ref-51-1
+ 253. http://www.jbc.org/external-ref?access_num=10.1016/S1093-3263(97)00021-1&link_type=DOI
+ 254. http://www.jbc.org/external-ref?access_num=9385560&link_type=MED
+ 255. http://www.jbc.org/external-ref?access_num=A1997YG00900006&link_type=ISI
+ 256. file://localhost/dev/paper.html#xref-ref-52-1
+ 257. http://www.jbc.org/external-ref?access_num=10.1107/S0907444994006396&link_type=DOI
+ 258. http://www.jbc.org/external-ref?access_num=15299354&link_type=MED
+ 259. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/274/24/16669&title=Structure%20of%20Gi%CE%B11%C2%B7GppNHp%2C%20Autoinhibition%20in%20a%20G%CE%B1%20Protein-Substrate%20Complex+--+Coleman%20and%20Sprang%20274%20%2824%29%3A%2016669+--+JBC&doi=10.1074/jbc.274.24.16669&link_type=CITEULIKE
+ 260. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/274/24/16669&title=Structure%20of%20Gi%CE%B11%C2%B7GppNHp%2C%20Autoinhibition%20in%20a%20G%CE%B1%20Protein-Substrate%20Complex+--+Coleman%20and%20Sprang%20274%20%2824%29%3A%2016669+--+JBC&doi=10.1074/jbc.274.24.16669&link_type=COMPLORE
+ 261. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/274/24/16669&title=Structure%20of%20Gi%CE%B11%C2%B7GppNHp%2C%20Autoinhibition%20in%20a%20G%CE%B1%20Protein-Substrate%20Complex+--+Coleman%20and%20Sprang%20274%20%2824%29%3A%2016669+--+JBC&doi=10.1074/jbc.274.24.16669&link_type=CONNOTEA
+ 262. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/274/24/16669&title=Structure%20of%20Gi%CE%B11%C2%B7GppNHp%2C%20Autoinhibition%20in%20a%20G%CE%B1%20Protein-Substrate%20Complex+--+Coleman%20and%20Sprang%20274%20%2824%29%3A%2016669+--+JBC&doi=10.1074/jbc.274.24.16669&link_type=DEL_ICIO_US
+ 263. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/274/24/16669&title=Structure%20of%20Gi%CE%B11%C2%B7GppNHp%2C%20Autoinhibition%20in%20a%20G%CE%B1%20Protein-Substrate%20Complex+--+Coleman%20and%20Sprang%20274%20%2824%29%3A%2016669+--+JBC&doi=10.1074/jbc.274.24.16669&link_type=DIGG
+ 264. http://www.jbc.org/help/social_bookmarks.dtl
+ 265. http://www.jbc.org/content/274/24/16665.short
+ 266. http://www.jbc.org/content/274/24/16673.short
+ 267. http://www.jbc.org/content/274/24.toc
+ 268. http://www.jbc.org/content/274/24/16669.abstract
+ 269. http://www.jbc.org/content/274/24/16669.full.pdf+html
+ 270. http://www.jbc.org/search?tocsectionid=COMMUNICATION&sortspec=date&submit=Submit
+ 271. http://www.jbc.org/email?gca=jbc;274/24/16669&current-view-path=/content/274/24/16669.long
+ 272. http://www.jbc.org/cgi/alerts/ctalert?alertType=citedby&addAlert=cited_by&cited_by_criteria_resid=jbc;274/24/16669&saveAlert=no&return-type=article&return_url=http://www.jbc.org/content/274/24/16669.long
+ 273. http://www.jbc.org/cgi/alerts/ctalert?alertType=correction&addAlert=correction&correction_criteria_value=274/24/16669&saveAlert=no&return-type=article&return_url=http://www.jbc.org/content/274/24/16669.long
+ 274. http://www.jbc.org/cgi/alerts/ctalert?alertType=eletter&addAlert=eletter&eletter_criteria_value=274/24/16669&saveAlert=no&return-type=article&return_url=http://www.jbc.org/content/274/24/16669.long
+ 275. http://www.jbc.org/search?qbe=jbc;274/24/16669&citation=Coleman%20and%20Sprang%20274%20%2824%29:%2016669&submit=yes
+ 276. http://www.jbc.org/external-ref?access_num=jbc%3B274%2F24%2F16669&link_type=ISI_RELATEDRECORDS
+ 277. http://www.jbc.org/external-ref?access_num=10358003&link_type=MED_NBRS
+ 278. http://www.jbc.org/citmgr?gca=jbc;274/24/16669
+ 279. https://s100.copyright.com/AppDispatchServlet?publisherName=ASBMB&publication=jbc&title=Structure%20of%20Gi%CE%B11%C2%B7GppNHp,%20Autoinhibition%20in%20a%20G%CE%B1%20Protein-Substrate%20Complex&publicationDate=06/11/1999&author=David%20E.%20Coleman,%20Stephen%20R.%20Sprang&startPage=16669&contentID=10.1074/jbc.274.24.16669&orderBeanReset=true&endPage=16672&volumeNum=274&issueNum=24
+ 280. http://www.jbc.org/letters/submit/jbc;274/24/16669
+ 281. http://www.jbc.org/content/274/24/16669.long?cited-by=yes&legid=jbc;274/24/16669#cited-by
+ 282. http://www.jbc.org/external-ref?access_num=jbc%3B274%2F24%2F16669&link_type=ISI_CITING
+ 283. http://www.jbc.org/external-ref?access_num=http://www.jbc.org/cgi/content/abstract/274/24/16669&link_type=GOOGLESCHOLAR
+ 284. http://scholar.google.com/scholar?q=%22author%3AColeman%20author%3AD.E.%22
+ 285. http://scholar.google.com/scholar?q=%22author%3ASprang%20author%3AS.R.%22
+ 286. http://www.jbc.org/external-ref?access_num=http://www.jbc.org/cgi/content/abstract/274/24/16669&link_type=GOOGLESCHOLARRELATED
+ 287. http://www.jbc.org/external-ref?access_num=10358003&link_type=PUBMED
+ 288. http://www.jbc.org/external-ref?access_num=Coleman%20DE&link_type=AUTHORSEARCH
+ 289. http://www.jbc.org/external-ref?access_num=Sprang%20SR&link_type=AUTHORSEARCH
+ 290. http://www.jbc.org/content/274/24/16669.long?related-urls=yes&legid=jbc;274/24/16669#related-urls
+ 291. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/274/24/16669&title=Structure%20of%20Gi%CE%B11%C2%B7GppNHp%2C%20Autoinhibition%20in%20a%20G%CE%B1%20Protein-Substrate%20Complex+--+Coleman%20and%20Sprang%20274%20%2824%29%3A%2016669+--+JBC&doi=10.1074/jbc.274.24.16669&link_type=CITEULIKE
+ 292. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/274/24/16669&title=Structure%20of%20Gi%CE%B11%C2%B7GppNHp%2C%20Autoinhibition%20in%20a%20G%CE%B1%20Protein-Substrate%20Complex+--+Coleman%20and%20Sprang%20274%20%2824%29%3A%2016669+--+JBC&doi=10.1074/jbc.274.24.16669&link_type=COMPLORE
+ 293. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/274/24/16669&title=Structure%20of%20Gi%CE%B11%C2%B7GppNHp%2C%20Autoinhibition%20in%20a%20G%CE%B1%20Protein-Substrate%20Complex+--+Coleman%20and%20Sprang%20274%20%2824%29%3A%2016669+--+JBC&doi=10.1074/jbc.274.24.16669&link_type=CONNOTEA
+ 294. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/274/24/16669&title=Structure%20of%20Gi%CE%B11%C2%B7GppNHp%2C%20Autoinhibition%20in%20a%20G%CE%B1%20Protein-Substrate%20Complex+--+Coleman%20and%20Sprang%20274%20%2824%29%3A%2016669+--+JBC&doi=10.1074/jbc.274.24.16669&link_type=DEL_ICIO_US
+ 295. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/274/24/16669&title=Structure%20of%20Gi%CE%B11%C2%B7GppNHp%2C%20Autoinhibition%20in%20a%20G%CE%B1%20Protein-Substrate%20Complex+--+Coleman%20and%20Sprang%20274%20%2824%29%3A%2016669+--+JBC&doi=10.1074/jbc.274.24.16669&link_type=DIGG
+ 296. http://www.jbc.org/help/social_bookmarks.dtl
+ 297. file://localhost/dev/paper.html#content-block
+ 298. file://localhost/dev/paper.html#abstract-1
+ 299. file://localhost/dev/paper.html#sec-1
+ 300. file://localhost/dev/paper.html#sec-2
+ 301. file://localhost/dev/paper.html#sec-3
+ 302. file://localhost/dev/paper.html#fn-group-1
+ 303. file://localhost/dev/paper.html#ref-list-1
+ 304. http://www.jbc.org/content/current
+ 305. http://www.jbc.org/content/current
+ 306. http://www.jbc.org/cgi/alerts/etoc
+ 307. http://www.jbc.org/misc/itoa.xhtml
+ 308. http://submit.jbc.org/
+ 309. http://www.jbc.org/subscriptions/
+ 310. http://submit.jbc.org/journals/jbc/forms/editors.dtl
+ 311. http://www.jbc.org/site/home/about/rss_alerts.xhtml
+ 312. http://www.jbc.org/site/home/about/article_stats.xhtml
+ 313. http://www.jbc.org/site/home/teaching_tools/
+ 314. http://www.jbc.org/site/misc/Copyright_Permission.xhtml
+ 315. http://www.asbmb.org/uploadedFiles/Publications/2009ASBMBJournalsMediaKit.pdf
+ 316. http://www.jbc.org/cgi/feedback
+ 317. http://www.asbmb.org/
+ 318. http://intl.jbc.org/
+ 319. http://www.jbc.org/cgi/feedback
+ 320. http://www.jbc.org/help/
+ 321. http://www.asbmb.org/page.aspx?id=218
+ 322. http://www.jlr.org/
+ 323. http://mcponline.org/
+ 324. http://www.jbc.org/cgi/adclick/?ad=21396&adclick=true&url=http%3A%2F%2Fwww.asbmb.org%2FPage.aspx%3Fid%3D3362
+
+   Hidden links:
+ 325. http://www.jbc.org/entrez-links/10358003

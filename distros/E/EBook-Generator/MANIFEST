@@ -1,0 +1,19 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/EBook-Generator.t
+t/website2ebook.pl
+t/testsuite.html
+t/Makefile
+lib/EBook/Generator.pm
+lib/EBook/Generator/Analyser.pm
+lib/EBook/Generator/EBook.pm
+lib/EBook/Generator/Exporter.pm
+lib/EBook/Generator/Exporter/PDF.pm
+lib/EBook/Generator/Exporter/Text.pm
+lib/EBook/Generator/Exporter/XHTML.pm
+lib/EBook/Generator/Parser.pm
+lib/EBook/Generator/Reader.pm
+
+META.yml                                 Module meta-data (added by MakeMaker)

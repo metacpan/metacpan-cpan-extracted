@@ -1,0 +1,10 @@
+use strict;
+use warnings;
+use Test::More;
+eval "use Test::Pod::Coverage";
+plan skip_all => "Test::Pod::Coverage required for testing pod coverage" if $@;
+plan tests => 4;
+pod_coverage_ok("Email::Outlook::Message");
+pod_coverage_ok("Email::Outlook::Message::AddressInfo");
+pod_coverage_ok("Email::Outlook::Message::Attachment");
+pod_coverage_ok("Email::Outlook::Message::Base");

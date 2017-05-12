@@ -1,0 +1,36 @@
+
+// This will be used to generate the XS MODULE line
+%module{Object::WithIntAndString};
+
+// Enable default XS typemaps
+%loadplugin{feature::default_xs_typemap};
+
+// Associate a perl class with a C++ class
+%name{Object::WithIntAndString} class IntAndString
+{
+  // can be called in Perl as Object::WithIntAndString->new( ... );
+  IntAndString();
+
+  // Object::WithIntAndString->newIntAndString( ... );
+  // %name can be used to assign methods a different name in Perl
+  %name{newIntAndString} IntAndString( const char* str, int arg );
+
+  // standard DESTROY method
+  ~IntAndString();
+
+  // Will be available from Perl given that the types appear in the typemap
+  int GetInt();
+  const char* GetString ();
+
+  // SetValue is polymorphic. We want separate methods in Perl
+  %name{SetString} void SetValue( const char* arg = NULL );
+  %name{SetInt} void SetValue( int arg );
+
+
+  // Supply a C<CODE:> or C<CLEANUP:> block for the XS
+  int Sum( int a, int b )
+    %code{% RETVAL = a + b; %}
+    %cleanup{% /* do something */ %};
+};
+
+

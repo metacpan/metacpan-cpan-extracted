@@ -1,0 +1,16 @@
+[! use File::Basename ; !]
+[- $r = shift ; -]
+<div align="center">
+<p class="cHeadline">[= login_head =]</p>
+
+[- Execute ('loginform.epl', $r -> app -> posturl('addsel.epl')) ; -]
+</div>
+
+[#
+[! use Data::Dumper; !]
+[- $r = shift -]
+
+<PRE>
+[+ Dumper $r->{config} +]
+</PRE>
+#]

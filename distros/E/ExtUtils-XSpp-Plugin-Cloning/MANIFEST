@@ -1,0 +1,6 @@
+Build.PL
+Changes
+lib/ExtUtils/XSpp/Plugin/Cloning.pm
+MANIFEST
+t/001_load.t
+META.yml

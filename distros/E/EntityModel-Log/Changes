@@ -1,0 +1,42 @@
+0.006     2014-06-27 19:12:10+01:00 Europe/London
+	Features:
+	* Better stacktrace output (also fixes sprintf warnings on 5.21)
+
+	Cleanup:
+	* Removed smartmatch usage
+
+0.005     2013-04-02 02:06:35 Europe/London
+	Fix odd behaviour when setting path without explicitly opening:
+	 EntityModel::Log->instance->path('output.log')->min_level(0);
+	Also ensure that ->handle returns a handle even when we're reopening.
+
+	RTs fixed:
+	* #84342 - disable the new smartmatch warning introduced in perl 5.017.011,
+	untested since perlbrew doesn't have that perl version available (yet! apparently
+	it should pick it up when http://www.cpan.org/src/README.html has it). Thanks
+	to Andreas for finding+reporting.
+
+0.004     2011-09-18 23:37:00 Europe/London
+	API-BREAKING cleanup to method names. If you're using this please note that some camelCase names
+	are renamed, hopefully for the better.
+
+	Stack trace is possibly more useful now, uses a fake format string %S entry.
+
+	Stringify blessed objects in stack trace to avoid massive stack trace
+	output when deeper objects are on the stack.
+
+	OO methods added, not that I've used them much. Synopsis updated accordingly.
+
+	Also provide some sort of primitive Test::Harness integration, and some examples.
+
+0.003     2011-07-26 23:15:24 Europe/London
+	Use STDERR as the default handle, rather than randomly creating entitymodel.log files.
+	Only check handle once in ->close, and move the close-on-fork to a separate
+	method which avoids closing unless we're already open.
+
+0.002     2011-02-07 19:11:25 Europe/London
+	Documentation.
+
+0.001     2011-02-01 04:35:26 Europe/London
+	Initial release to CPAN.
+

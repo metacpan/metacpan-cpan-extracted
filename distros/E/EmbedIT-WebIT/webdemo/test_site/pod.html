@@ -1,0 +1,600 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>WebIT</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body style="background-color: white">
+
+
+<!-- INDEX BEGIN -->
+<div name="index">
+<p><a name="__index__"></a></p>
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">Synopsis</a></li>
+	<li><a href="#description">Description</a></li>
+	<li><a href="#things_to_avoid">Things to avoid</a></li>
+	<li><a href="#configuration">Configuration</a></li>
+	<li><a href="#methods">Methods</a></li>
+	<li><a href="#webit_and_soap__wsdl">WebIT and SOAP::WSDL</a></li>
+	<li><a href="#requirements">Requirements</a></li>
+	<li><a href="#copyright">Copyright</a></li>
+</ul>
+
+<hr name="index" />
+</div>
+<!-- INDEX END -->
+
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Embeded::WebIT - A small yet very effective embeded web server for any perl application</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">Synopsis</a></h1>
+<pre>
+  use Embeded::WebIT;</pre>
+<pre>
+  $server = new Embeded::WebIT( SERVER_NAME     =&gt; 'www.my.org',
+                                SERVER_IP       =&gt; '127.0.0.1',
+                                SERVER_PORT     =&gt; 8080,
+                                SOFTWARE        =&gt; 'MyApp web server',
+                                QUEUE_SIZE      =&gt; 100,
+                                RUN_AS_USER     =&gt; nobody,
+                                RUN_AS_GROUP    =&gt; nogroup,
+                                WAIT_RESPONSE   =&gt; 1,
+                                IMMED_CLOSE     =&gt; 1,
+                                EMBED_PERL      =&gt; 1,
+                                FORK_CONN       =&gt; 0,
+                                SETUP_ENV       =&gt; 1,
+                                SERVER_ADMIN    =&gt; 'info@my.org',
+                                SERVERS         =&gt; 3,
+                                WORKERS         =&gt; 1,
+                                DOCUMENT_ROOT   =&gt; '/opt/my/web',
+                                DOCUMENTS       =&gt; {
+                                                     '/index.html'    =&gt; 'WPages::index',
+                                                     '/error.html'    =&gt; 'WPages::error',
+                                                     '/style.css'     =&gt; 'WPages::style',
+                                                     '/print.css'     =&gt; 'WPages::print',
+                                                     '/404.html'      =&gt; 'WPages::error404',
+                                                     '*'              =&gt; 'WPages::pageHandle',
+                                                   },
+                                ERROR_PAGES     =&gt; { 
+                                                     '404' =&gt; '/404.html',      # embeded subroutine error
+                                                     'ALL' =&gt; '/error.html',    # simple html file error
+                                                   },
+                                EXPIRATIONS     =&gt; { 
+                                                     'image/jpg' =&gt; 86400,
+                                                     'ALL' =&gt; 3600, 
+                                                   },
+                                PROC_PREFIX     =&gt; 'my:',
+                                CHILD_START     =&gt; 'WControl::start_db',
+                                CHILD_END       =&gt; 'WControl::stop_db',
+                                LOG_METHOD      =&gt; 'WControl::logInfo',
+                                DEBLOG_METHOD   =&gt; 'WControl::logDebug',
+                                LOG_HEADERS     =&gt; 0,
+                                LOG_PACKETS     =&gt; 0,
+                                CGI_PATH        =&gt; '/cgi',
+                                ENV_KEEP        =&gt; [ 'PERL5LIB', 'LD_LIBRARY_PATH' ],
+                                NO_LOGGING      =&gt; 0,
+                           );</pre>
+<pre>
+  $server-&gt;execute();</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">Description</a></h1>
+<p>The WebIT embeded web server was created a long time ago to make a pure perl application that will interact 
+directly with <em>Kannel</em>. The need was to relieve <em>Kannel</em> from the need to wait for the web server to run 
+its scripts before going back to serve another SMS message. In this respect WebIT is a hack and can be 
+configured to behave in a manner which is not according to the RFC's for HTTP. Yet, creating Perl applications 
+with WebIT using embeded html pages as perl functions outperforms Apache with mod_perl installations.</p>
+<p>For this reason I was asked by a few to release this code so that they can use it for their applications.</p>
+<p>So even though WebIT is not complete (Workers and SSL not implemented yet) WebIT is already used by 
+14 perl applications that I know of excluding my personal work.</p>
+<p>To work with WebIT all you need to do is to create a new server object by giving to it the parameters
+that you want, and then at any point in time call the execute method to run the server. The execute method 
+returns only when the server has finished execution, and that can only be done by sending a TERM signal to 
+the process.</p>
+<p>Once the server has started it will fork the predefined number of servers and workers. Since workers are not 
+implemented yet you are advised to ask for 0 workers on startup. From then on, WebIT will serve HTTP requests 
+by using external files in a configured directory and/or internal pages served by perl subroutines. The code
+of the cgi pages and subroutines is as you already know by Apache and mod_perl. You can use the CGI module to 
+get the request parameters, print on the standard output to form the response to the caller, and print to 
+standard error to log text to the logger of the server.</p>
+<p>
+</p>
+<hr />
+<h1><a name="things_to_avoid">Things to avoid</a></h1>
+<ul>
+<li>
+<p>Dont use perl threads ! Perl does not really have threads anyway, so dont use them. Threads that do not by 
+default share their data are not threads, they are forks, and in perl threads are isolated. If you are really 
+inclined to use threads move to another language like Java.</p>
+</li>
+<li>
+<p>Dont use IPC. The server already uses IPC, and some things you can do might break the server.</p>
+</li>
+</ul>
+<p>Just use the server for what it is, and that is an embeded web server for applications, not for hacks, thus you 
+should not need any of the above to create you application. Now if for any reason you really have to use some of 
+the above, them WebIT is not for you.</p>
+<p>
+</p>
+<hr />
+<h1><a name="configuration">Configuration</a></h1>
+<p>Now lets take a look at the configuration hash of the server.</p>
+<dl>
+<dt><strong><a name="server_name" class="item">SERVER_NAME</a></strong></dt>
+
+<dd>
+<p>The DNS name of the server (default is localhost)</p>
+</dd>
+<dt><strong><a name="server_ip" class="item">SERVER_IP</a></strong></dt>
+
+<dd>
+<p>The IP address to bind to (default is 127.0.0.1)</p>
+</dd>
+<dt><strong><a name="server_port" class="item">SERVER_PORT</a></strong></dt>
+
+<dd>
+<p>The TCP port to use (default is 80)</p>
+</dd>
+<dt><strong><a name="queue_size" class="item">QUEUE_SIZE</a></strong></dt>
+
+<dd>
+<p>The number of connections to queue per child (default is 5)</p>
+</dd>
+<dt><strong><a name="use_ssl" class="item">USE_SSL</a></strong></dt>
+
+<dd>
+<p>The server will work in SSL mode accepting https connections only. (default is undef) 
+<strong>This feature is not implemented yet</strong></p>
+</dd>
+<dt><strong><a name="ssl_certificate" class="item">SSL_CERTIFICATE</a></strong></dt>
+
+<dd>
+<p>The servers SSL certificate path and file. If not defined no certificate file will be 
+used for the connection. You can pass the actual certificate here as is. The value is 
+first tested to see if it matches an existing file, and if not it will be used as an 
+actual certificate. (default is undef)
+<strong>This feature is not implemented yet</strong></p>
+</dd>
+<dt><strong><a name="ssl_key" class="item">SSL_KEY</a></strong></dt>
+
+<dd>
+<p>The servers SSL key path and file. If not defined no key will be used for the
+connection. You can pass the actual key here as is. The value is first tested 
+to see if it matches an existing file, and if not it will be used as an
+actual key. (default is undef).
+<strong>This feature is not implemented yet</strong></p>
+</dd>
+<dt><strong><a name="wait_response" class="item">WAIT_RESPONSE</a></strong></dt>
+
+<dd>
+<p>Directs the server to wait until a response is generated. If 0 server will 
+close connection before running scripts or getting pages and returns 204  
+(No Content) to client (default is 1 and the server will wait for responses)</p>
+</dd>
+<dt><strong><a name="no_wait_reply" class="item">NO_WAIT_REPLY</a></strong></dt>
+
+<dd>
+<p>The code to send when WAIT_RESPONCE is 0. (default is undef and 204 is returned)</p>
+</dd>
+<dt><strong><a name="immed_close" class="item">IMMED_CLOSE</a></strong></dt>
+
+<dd>
+<p>Close connection immediately after serving request. Ignored if WAIT_RESPONSE is 0. (default is 0)
+If it is set to 0 the server will respect the client's request about the handling of the connection (might be
+immediate close or keep open)</p>
+</dd>
+<dt><strong><a name="run_as_user" class="item">RUN_AS_USER</a></strong></dt>
+
+<dd>
+<p>The user under which the server should run as</p>
+</dd>
+<dt><strong><a name="run_as_group" class="item">RUN_AS_GROUP</a></strong></dt>
+
+<dd>
+<p>The group under which the server should run as</p>
+</dd>
+<dt><strong><a name="setup_env" class="item">SETUP_ENV</a></strong></dt>
+
+<dd>
+<p>Allow the server to setup the children environment. This requires some milliseconds for each request
+served since the server will have to contruct the environment for each call. It you are not using the CGI 
+module and you know what you are doing you can set this to 0-false and save some time for running requests
+(default is 1)</p>
+</dd>
+<dt><strong><a name="env_keep" class="item">ENV_KEEP</a></strong></dt>
+
+<dd>
+<p>List of environment variables to keep for scripts. For normal execution all environment variables are cleared 
+and CGI and embeded pages run in a clean environment. If however you need to preserve some, like database variables
+you can specify their names here in an array, and they will be preserved for your scripts.</p>
+</dd>
+<dt><strong><a name="env_add" class="item">ENV_ADD</a></strong></dt>
+
+<dd>
+<p>Hash with environment variables and values to set for scripts. These environment variables and their values will be 
+added to the environment of your CGI and embeded pages.</p>
+</dd>
+<dt><strong><a name="mime_types" class="item">MIME_TYPES</a></strong></dt>
+
+<dd>
+<p>Path and file where the server can find valid mimetypes. (default is /etc/mime.types)</p>
+</dd>
+<dt><strong><a name="embed_perl" class="item">EMBED_PERL</a></strong></dt>
+
+<dd>
+<p>Run perl CGI scripts inside the server, not in a separate process. Faster than Apache and mod_perl. (default is 0)</p>
+</dd>
+<dt><strong><a name="server_admin" class="item">SERVER_ADMIN</a></strong></dt>
+
+<dd>
+<p>The email of the server administrator. This text will appear in the environment variables of the CGI / embeded pages (default is empty)</p>
+</dd>
+<dt><strong><a name="document_root" class="item">DOCUMENT_ROOT</a></strong></dt>
+
+<dd>
+<p>The path where the site documents and scripts are stored. (default is undef)</p>
+</dd>
+<dt><strong><a name="documents" class="item">DOCUMENTS</a></strong></dt>
+
+<dd>
+<p>A hash of documents and their subroutines to execute within the server. This is 
+used to create fully embeded web servers that respond to specific URL's using 
+specific subroutines. A special page name '*' can be used to direct all unknown 
+page requests to be directed to the subroutine of this special page.
+Can be used in conjunction with and has precedence over DOCUMENT_ROOT (default is undef)</p>
+</dd>
+<dt><strong><a name="error_pages" class="item">ERROR_PAGES</a></strong></dt>
+
+<dd>
+<p>A hash with the site supplied error pages. It contains the error code as a key and
+the page path within DOCUMENT_ROOT or DOCUMENTS of the page for the error. Alternatevly there can
+be an entry with keyword ALL where all errors without a specific entry in the hash
+will find their error pages. Error pages can be cgi's or plain html. (default is undef) 
+For all error pages the server sets 4 extra environment variables. These are:</p>
+<dl>
+<dt><strong><a name="error_code" class="item">ERROR_CODE</a></strong></dt>
+
+<dd>
+<p>This contains the numeric value of the error, eg 404.</p>
+</dd>
+<dt><strong><a name="error_text" class="item">ERROR_TEXT</a></strong></dt>
+
+<dd>
+<p>This contains the text value of the error, eg Page not found.</p>
+</dd>
+<dt><strong><a name="error_uri" class="item">ERROR_URI</a></strong></dt>
+
+<dd>
+<p>This contains the URI that generated the error.</p>
+</dd>
+<dt><strong><a name="error_method" class="item">ERROR_METHOD</a></strong></dt>
+
+<dd>
+<p>This contains the method used to access the URI, eg POST</p>
+</dd>
+</dl>
+<p>Along with all other environment variables used you can track all errors to their fullest detail, and handle 
+them not just for display but for administrator notifications as well.</p>
+</dd>
+<dt><strong><a name="expirations" class="item">EXPIRATIONS</a></strong></dt>
+
+<dd>
+<p>A hash with expiration times. It contains the content type as a key and the expiration
+time in seconds. A special entry called ALL specifies the expiration time of any type NOT 
+already defined in the hash.</p>
+</dd>
+<dt><strong><a name="servers" class="item">SERVERS</a></strong></dt>
+
+<dd>
+<p>Number of servers to prefork. Default is 0 where only the master instance exists</p>
+</dd>
+<dt><strong><a name="workers" class="item">WORKERS</a></strong></dt>
+
+<dd>
+<p>Number of page workers to prefork. Default is 0 where only the master instance exists
+<strong>Wrokers are not implemented yet</strong></p>
+</dd>
+<dt><strong><a name="fork_conn" class="item">FORK_CONN</a></strong></dt>
+
+<dd>
+<p>Create a child everytime a new connection arrives. (default is 0) Usefull for hard headed 
+perl modules like SOAP::WSDL that retain information between calls and confuse the server. Not to be
+used with time sensitive HTTP applications like SMS applications with <em>Kannel</em> because with perl, forking 
+requires quite some time to be performed.</p>
+</dd>
+<dt><strong><a name="startup" class="item">STARTUP</a></strong></dt>
+
+<dd>
+<p>Run this script at startup to load the environment for the pages. Can only be an external perl script.
+Embeded pages startup code can be done in many ways without the need of external scripts.</p>
+</dd>
+<dt><strong><a name="child_start" class="item">CHILD_START</a></strong></dt>
+
+<dd>
+<p>Subroutine to call on every fork for initialization. Returned values of this 
+subroutine are passed to internally called functions (default is undef) Persistant database connections 
+and other paraphenalia that are required for your application should be initialized in the method 
+defined here. All values that are needed by your application should be returned in a hash or an array 
+by your method, so that they can be retrieved later on by your CGI's and embeded pages.</p>
+</dd>
+<dt><strong><a name="child_end" class="item">CHILD_END</a></strong></dt>
+
+<dd>
+<p>Subrouting to call on termination of a forked child. It is passed the return values of the start subroutine 
+(default is undef) All values initialized by the method defined in CHILD_START that require some form 
+of proper termination should be treated by the method defined here. The parameter passed to that method 
+is the pointer returned by the CHILD_START, so you should know how to deal with it.</p>
+</dd>
+<dt><strong><a name="proc_prefix" class="item">PROC_PREFIX</a></strong></dt>
+
+<dd>
+<p>Text line to be used as prefix for the process name of the childs. (default is WebIT) This is 
+just for decorating the ps listing of those OS's that give us the ability to change the name of the process.</p>
+</dd>
+<dt><strong><a name="log_method" class="item">LOG_METHOD</a></strong></dt>
+
+<dd>
+<p>Subroutine to call for logging. It is passed a single string to log. 
+(default is internal logging to stderr)</p>
+</dd>
+<dt><strong><a name="deblog_method" class="item">DEBLOG_METHOD</a></strong></dt>
+
+<dd>
+<p>Subroutine to call for debug logging. It is passed a single string to log. 
+(default is the same with LOG_METHOD)</p>
+</dd>
+<dt><strong><a name="log_headers" class="item">LOG_HEADERS</a></strong></dt>
+
+<dd>
+<p>Log input and output packet headers as those come and go to and from the server (default is 0)</p>
+</dd>
+<dt><strong><a name="log_packets" class="item">LOG_PACKETS</a></strong></dt>
+
+<dd>
+<p>Log input and output packets as those come and go to anf from the server. By turning on packet logging you will
+implicity get header logging. (default is 0)</p>
+</dd>
+<dt><strong><a name="cgi_path" class="item">CGI_PATH</a></strong></dt>
+
+<dd>
+<p>A colon or semicolon separated list of paths under the DOCUMENT_ROOT where
+CGI scripts exist. (default is undef)</p>
+</dd>
+<dt><strong><a name="auth_path" class="item">AUTH_PATH</a></strong></dt>
+
+<dd>
+<p>A colon or semicolon separated list of paths under the DOCUMENT_ROOT where 
+authentication is needed. Works with embeded pages as well. (default is undef)</p>
+</dd>
+<dt><strong><a name="auth_realm" class="item">AUTH_REALM</a></strong></dt>
+
+<dd>
+<p>A string specifying the realm of the authentication for the AUTH_PATH's. There is only one
+realm (default is undef)</p>
+</dd>
+<dt><strong><a name="auth_method" class="item">AUTH_METHOD</a></strong></dt>
+
+<dd>
+<p>Subroutine to call for authenticating remote users. Parameters are the returned values of 
+the child start subroutine preceeded by a username and a password. (default is undef)</p>
+</dd>
+<dt><strong><a name="software" class="item">SOFTWARE</a></strong></dt>
+
+<dd>
+<p>Text with software name and version. This text will appear in the environment variables of the CGI / embeded pages
+(default is WebIT/$VESRION)</p>
+</dd>
+<dt><strong><a name="signature" class="item">SIGNATURE</a></strong></dt>
+
+<dd>
+<p>Text with web server signature. This text will appear in the environment variables of the CGI / embeded pages. (default is &lt;br\&gt;WebIT/$VERSION for Perl&lt;br\&gt;)`</p>
+</dd>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="methods">Methods</a></h1>
+<p>The methods that are available to use are the following:</p>
+<dl>
+<dt><strong><a name="new" class="item"><code>new()</code></a></strong></dt>
+
+<dd>
+<p>This is the constructor of the object. It takes as a parameter a hash with keys and values as described above.</p>
+</dd>
+<dt><strong><a name="execute" class="item"><code>execute()</code></a></strong></dt>
+
+<dd>
+<p>This is the routing to enter the execution loop of the server. This method will never return, so if you need to do 
+anyting more with your application you might want to call this method from a forked process.</p>
+</dd>
+<dt><strong><a name="data" class="item"><code>data()</code></a></strong></dt>
+
+<dd>
+<p>This method returns the server child data as those were returned by the CHILD_START method.</p>
+<p>Lets assume that you have a CHILD_START method as follows:</p>
+<pre>
+  sub start_up {
+    %res = ();
+    $db = DBI-&gt;connect(&quot;DBI:Oracle:sid=pits;host=127.0.0.2;port=3127&quot;, &quot;user&quot;, &quot;pass&quot;);</pre>
+<pre>
+    $res{DATABASE} = $db;</pre>
+<pre>
+    return \%res;
+  }</pre>
+<p>If you want to retrieve that connection from inside a CGI script or an embeded page what you need to do is the 
+following:</p>
+<pre>
+  $res = Embeded::WebIT::data();
+  $db = $res-&gt;{DATABASE};</pre>
+<p>or if you have access to you server object you can do the following:</p>
+<pre>
+  $res = $server-&gt;data();
+  $db = $res-&gt;{DATABASE};</pre>
+</dd>
+<dt><strong><a name="start_time" class="item"><code>start_time()</code></a></strong></dt>
+
+<dd>
+<p>This method returns the timestamp of the server startup time. Usefull for applications that need to know when 
+the server started in order to perform some functions.</p>
+</dd>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="webit_and_soap__wsdl">WebIT and SOAP::WSDL</a></h1>
+<p>One of the main reasons why I use now days WebIT, is to expose soap methods. SOAP::WSDL (and not SOAP::Lite) is the 
+best possible soap package available for perl. If you want to use WebIT as a server for SOAP::WSDL this is what you
+have to do:</p>
+<p>First of all you need to specify FORK_CONN as true (1 for perl) to force the server to fork a new child for each 
+new connection. Then you need to specify the embeded pages that will serve the methods exposed by the WSDL. For
+example, assume you need to expose a method test that takes a string as input and returns another string as output.</p>
+<p>Create you WSDL</p>
+<pre>
+  &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+  &lt;wsdl:definitions xmlns:http=&quot;<a href="http://schemas.xmlsoap.org/wsdl/http/&quot">http://schemas.xmlsoap.org/wsdl/http/&quot</a>;
+                    xmlns:soap=&quot;<a href="http://schemas.xmlsoap.org/wsdl/soap/&quot">http://schemas.xmlsoap.org/wsdl/soap/&quot</a>;
+                    xmlns:xs=&quot;<a href="http://www.w3.org/2001/XMLSchema&quot">http://www.w3.org/2001/XMLSchema&quot</a>;
+                    xmlns:soapenc=&quot;<a href="http://schemas.xmlsoap.org/soap/encoding/&quot">http://schemas.xmlsoap.org/soap/encoding/&quot</a>;
+                    xmlns:tns=&quot;<a href="http://tempuri.org/&quot">http://tempuri.org/&quot</a>;
+                    xmlns:tm=&quot;<a href="http://microsoft.com/wsdl/mime/textMatching/&quot">http://microsoft.com/wsdl/mime/textMatching/&quot</a>;
+                    xmlns:mime=&quot;<a href="http://schemas.xmlsoap.org/wsdl/mime/&quot">http://schemas.xmlsoap.org/wsdl/mime/&quot</a>;
+                    targetNamespace=&quot;<a href="http://tempuri.org/&quot">http://tempuri.org/&quot</a>;
+                    xmlns:wc=&quot;<a href="http://tempuri.org/&quot">http://tempuri.org/&quot</a>;
+                    xmlns:wsdl=&quot;<a href="http://schemas.xmlsoap.org/wsdl/">http://schemas.xmlsoap.org/wsdl/</a>&quot;&gt;
+    &lt;wsdl:types&gt;
+      &lt;xs:schema elementFormDefault=&quot;unqualified&quot; targetNamespace=&quot;<a href="http://tempuri.org/">http://tempuri.org/</a>&quot;&gt;
+        &lt;xs:element name=&quot;InputFlag&quot;&gt;
+          &lt;xs:complexType&gt;
+            &lt;xs:sequence&gt;
+              &lt;xs:element name=&quot;Flag&quot; type=&quot;xs:string&quot; minOccurs=&quot;1&quot;  maxOccurs=&quot;1&quot;/&gt;
+            &lt;/xs:sequence&gt;
+          &lt;/xs:complexType&gt;
+        &lt;/xs:element&gt;
+  
+        &lt;xs:element name=&quot;OutputFlag&quot;&gt;
+          &lt;xs:complexType&gt;
+            &lt;xs:sequence&gt;
+              &lt;xs:element name=&quot;Flag&quot; type=&quot;xs:string&quot; minOccurs=&quot;1&quot; maxOccures=&quot;1&quot;/&gt;
+            &lt;/xs:sequence&gt;
+          &lt;/xs:complexType&gt;
+        &lt;/xs:element&gt;
+      &lt;/xs:schema&gt;
+    &lt;/wsdl:types&gt;
+  
+    &lt;wsdl:message name=&quot;MsgIn&quot;&gt; &lt;wsdl:part element=&quot;tns:InputFLag&quot; name=&quot;MessageIn&quot;/&gt; &lt;/wsdl:message&gt;
+    &lt;wsdl:message name=&quot;MsgOut&quot;&gt; &lt;wsdl:part element=&quot;tns:OutputFlag&quot; name=&quot;MessageOut&quot;/&gt; &lt;/wsdl:message&gt;
+  
+    &lt;wsdl:portType name=&quot;TestPort&quot;&gt;
+      &lt;wsdl:operation name=&quot;Test&quot;&gt;
+        &lt;wsdl:input  message=&quot;tns:MsgIn&quot; /&gt;
+        &lt;wsdl:output message=&quot;tns:MsgOut&quot; /&gt;
+      &lt;/wsdl:operation&gt;
+    &lt;/wsdl:portType&gt;
+  
+    &lt;wsdl:binding name=&quot;TestBind&quot; type=&quot;tns:TestPort&quot;&gt;
+      &lt;soap:binding transport=&quot;<a href="http://schemas.xmlsoap.org/soap/http&quot">http://schemas.xmlsoap.org/soap/http&quot</a>; style=&quot;document&quot; /&gt;
+  
+      &lt;wsdl:operation name=&quot;Test&quot;&gt;
+        &lt;soap:operation soapAction=&quot;urn:Test#Test&quot; style=&quot;document&quot; /&gt;
+  
+        &lt;wsdl:input&gt;  &lt;soap:body use=&quot;literal&quot;/&gt; &lt;/wsdl:input&gt;
+        &lt;wsdl:output&gt; &lt;soap:body use=&quot;literal&quot;/&gt; &lt;/wsdl:output&gt;
+      &lt;/wsdl:operation&gt;
+  
+    &lt;/wsdl:binding&gt;
+  &lt;/wsdl:definitions&gt;</pre>
+<p>and compile it with wsdl2perl</p>
+<p>Then create your handling object (use SOAP::WSDL documentation to see what you need to do) as follows:</p>
+<pre>
+  package WebService</pre>
+<pre>
+  our $VERSION = &quot;1.0&quot;;</pre>
+<pre>
+  sub new {
+    my $self = {};
+    bless $self;
+    return $self;
+  }</pre>
+<pre>
+  sub Test {
+    my ($self,$body,$header) = @_;
+    my %idata = ();
+  
+    $idata{Flag} = $body-&gt;get_Flag() . &quot;&quot;;
+  
+    return Elements::MsgOut-&gt;new(\%idata);
+  }</pre>
+<p>and finally create your embeded page that will handle the HTTP request.</p>
+<pre>
+  sub WebService {
+      eval {
+        unshift @INC, $lib_path;      # add at run time the library path of the generated classes from wsdl2perl
+        require MyServer::Test::Test; # use the server class generated by wsdl2perl
+  
+        my $t = WebService-&gt;new();    # create a WebService handling object
+        my $server = MyServer::Test::Test-&gt;new({ dispatch_to     =&gt; 'WebService',
+                                                 transport_class =&gt; 'SOAP::WSDL::Server::CGI' });
+        $server-&gt;handle();
+     };
+     if ($@) { print &quot;just do something ...the call has failed\n&quot;; }
+  }</pre>
+<p>On your WebIT configuration hash you need to remember to add the above subroutine as the handler 
+for a page like so:</p>
+<pre>
+  $server = new Embeded::WebIT( SERVER_NAME =&gt; 'name.org',
+                                ...
+                                FORK_CONN   =&gt; 1,
+                                ...
+                                DOCUMENTS   =&gt; {
+                                                 'WS/Test' =&gt; 'main::WebService',
+                                               },
+                                ...
+                              );</pre>
+<p>and thats it. You have exposed web services working with WebIT as an embeded web server.</p>
+<p>
+</p>
+<hr />
+<h1><a name="requirements">Requirements</a></h1>
+<p>You need to have installed the following packages for WebIT to work.</p>
+<dl>
+<dt><strong><a name="http_date" class="item">HTTP::Date</a></strong></dt>
+
+<dt><strong><a name="io_socket" class="item">IO::Socket</a></strong></dt>
+
+<dt><strong><a name="io_select" class="item">IO::Select</a></strong></dt>
+
+<dt><strong><a name="lwp_mediatypes" class="item">LWP::MediaTypes</a></strong></dt>
+
+<dt><strong><a name="ipc_open3" class="item">IPC::Open3</a></strong></dt>
+
+<dt><strong><a name="taint_runtime" class="item">Taint::Runtime</a></strong></dt>
+
+<dt><strong><a name="mime_base64" class="item">MIME::Base64</a></strong></dt>
+
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="copyright">Copyright</a></h1>
+<p>Copyright 2008 D. Evmorfopoulos &lt;<a href="mailto:devmorfo@gmail.com">devmorfo@gmail.com</a>&gt;</p>
+<p>Permission is granted to copy, distribute and/or modify this 
+document under the terms of the GNU Free Documentation 
+License, Version 1.2 or any later version published by the 
+Free Software Foundation; with no Invariant Sections, with 
+no Front-Cover Texts, and with no Back-Cover Texts.</p>
+
+</body>
+
+</html>

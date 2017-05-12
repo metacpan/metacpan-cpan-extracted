@@ -1,0 +1,138 @@
+
+<html>
+<head>
+<title>Some tests for Embperl UTF8 escaping</title>
+</head>
+
+<body>
+[- 
+use Encode ;
+$fdat{test} = "abc!'\"$%&()<>=äöüÄÖÜß©" ;
+$fdat{utf8} = decode("iso-8859-1", $fdat{test}) ;
+$escmodestd = $escmode ;
+-]
+
+------------------------------------------------
+$epreq -> config -> output_esc_charset = 1 
+[- $epreq -> config -> output_esc_charset (1) -]
+
+$escmode = $escmodestd ;
+[- $escmode = $escmodestd ; -]
+abc!"$%&()<>=äöüÄÖÜß -> [+ $fdat{test} +]
+<input name="test">
+<textarea name="test"></textarea>
+utf8:
+abc!"$%&()<>=äöüÄÖÜß -> [+ $fdat{utf8} +]
+<input name="utf8">
+<textarea name="utf8"></textarea>
+
+poststd:  <input name="poststd">
+postutf8: <input name="postutf8">
+
+$escmode = 8 ;
+[- $escmode = 8 ; -]
+abc!"$%&()<>=äöüÄÖÜß -> [+ $fdat{test} +]
+<input name="test">
+<textarea name="test"></textarea>
+utf8:
+abc!"$%&()<>=äöüÄÖÜß -> [+ $fdat{utf8} +]
+<input name="utf8">
+<textarea name="utf8"></textarea>
+
+$escmode = 2 ;
+[- $escmode = 2 ; -]
+abc!"$%&()<>=äöüÄÖÜß -> [+ $fdat{test} +]
+<input name="test">
+<textarea name="test"></textarea>
+utf8:
+abc!"$%&()<>=äöüÄÖÜß -> [+ $fdat{utf8} +]
+<input name="utf8">
+<textarea name="utf8"></textarea>
+
+
+------------------------------------------------
+$epreq -> config -> output_esc_charset = 2 
+[- $epreq -> config -> output_esc_charset (2) -]
+
+$escmode = $escmodestd ;
+[- $escmode = $escmodestd ; -]
+abc!"$%&()<>=äöüÄÖÜß -> [+ $fdat{test} +]
+<input name="test">
+<textarea name="test"></textarea>
+utf8:
+abc!"$%&()<>=äöüÄÖÜß -> [+ $fdat{utf8} +]
+<input name="utf8">
+<textarea name="utf8"></textarea>
+
+poststd:  <input name="poststd">
+postutf8: <input name="postutf8">
+
+$escmode = 8 ;
+[- $escmode = 8 ; -]
+abc!"$%&()<>=äöüÄÖÜß -> [+ $fdat{test} +]
+<input name="test">
+<textarea name="test"></textarea>
+utf8:
+abc!"$%&()<>=äöüÄÖÜß -> [+ $fdat{utf8} +]
+<input name="utf8">
+<textarea name="utf8"></textarea>
+
+$escmode = 2 ;
+[- $escmode = 2 ; -]
+abc!"$%&()<>=äöüÄÖÜß -> [+ $fdat{test} +]
+<input name="test">
+<textarea name="test"></textarea>
+utf8:
+abc!"$%&()<>=äöüÄÖÜß -> [+ $fdat{utf8} +]
+<input name="utf8">
+<textarea name="utf8"></textarea>
+
+
+------------------------------------------------
+$epreq -> config -> output_esc_charset = 0 
+[- $epreq -> config -> output_esc_charset (0) -]
+
+$escmode = $escmodestd ;
+[- $escmode = $escmodestd ; -]
+abc!"$%&()<>=äöüÄÖÜß -> [+ $fdat{test} +]
+<input name="test">
+<textarea name="test"></textarea>
+utf8:
+abc!"$%&()<>=äöüÄÖÜß -> [+ $fdat{utf8} +]
+<input name="utf8">
+<textarea name="utf8"></textarea>
+
+poststd:  <input name="poststd">
+postutf8: <input name="postutf8">
+
+$escmode = 8 ;
+[- $escmode = 8 ; -]
+abc!"$%&()<>=äöüÄÖÜß -> [+ $fdat{test} +]
+<input name="test">
+<textarea name="test"></textarea>
+utf8:
+abc!"$%&()<>=äöüÄÖÜß -> [+ $fdat{utf8} +]
+<input name="utf8">
+<textarea name="utf8"></textarea>
+
+$escmode = 2 ;
+[- $escmode = 2 ; -]
+abc!"$%&()<>=äöüÄÖÜß -> [+ $fdat{test} +]
+<input name="test">
+<textarea name="test"></textarea>
+utf8:
+abc!"$%&()<>=äöüÄÖÜß -> [+ $fdat{utf8} +]
+<input name="utf8">
+<textarea name="utf8"></textarea>
+
+------------------------------------------------
+$epreq -> config -> output_esc_charset = 1 
+[- $epreq -> config -> output_esc_charset (1) -]
+
+$escmode = $escmodestd ;
+[- $escmode = $escmodestd ; -]
+
+
+
+</body>
+</html>

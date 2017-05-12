@@ -1,0 +1,81 @@
+Email-IsEmail
+
+To validate an email address according to RFCs 5321, 5322 and others
+
+Copyright © 2008-2011, Dominic Sayers
+Test schema documentation Copyright © 2011, Daniel Marschall
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:
+
+    - Redistributions of source code must retain the above copyright notice,
+      this list of conditions and the following disclaimer.
+    - Redistributions in binary form must reproduce the above copyright notice,
+      this list of conditions and the following disclaimer in the documentation
+      and/or other materials provided with the distribution.
+    - Neither the name of Dominic Sayers nor the names of its contributors may be
+      used to endorse or promote products derived from this software without
+      specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+@package	Email::IsEmail
+@author	Dominic Sayers <dominic@sayers.cc>
+@copyright	2008-2011 Dominic Sayers
+@license	http://www.opensource.org/licenses/bsd-license.php BSD License
+@link	http://www.dominicsayers.com/isemail
+@version	3.04.1 - Changed my link to http://isemail.info throughout
+
+The quality of this code has been improved greatly by using PHPLint
+Copyright (c) 2010 Umberto Salsi
+This is free software; see the license for copying conditions.
+More info: http://www.icosaedro.it/phplint/
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Email::IsEmail
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Email-IsEmail
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Email-IsEmail
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Email-IsEmail
+
+    Search CPAN
+        http://search.cpan.org/dist/Email-IsEmail/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2016 Leandr Khaliullov
+
+This program is released under the following license: BSD
+

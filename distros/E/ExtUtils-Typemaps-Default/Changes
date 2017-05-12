@@ -1,0 +1,41 @@
+Revision history for Perl extension ExtUtils::Typemaps::Default.
+
+1.05   Fri Dec  6 18:43:00 CET 2013
+  - Fix invalid av_extend on zero-length vectors.
+    (James Wright, RT #91213)
+
+1.04   Sun Jun 23 18:11:00 CEST 2013
+  - Fix typoes in stl::list typemaps.
+
+1.03   Wed May 15 07:54:00 CEST 2013
+  - Implement some stl::list typemaps.
+
+1.02   Fri Apr 19 18:38:00 CEST 2013
+  - Require new-enough ExtUtils::Typemaps for template
+    type canonicalization (sort of).
+
+1.01   Sat Oct  6 11:40:00 CEST 2012
+  - POD fix
+
+1.00   Wed Aug  3 19:10:00 CEST 2011
+  - Rename module from ExtUtils::Typemap::Default to
+    ExtUtils::Typemaps::Default.
+
+0.06   Thu Aug 26 20:00:00 CEST 2010
+  - Fix various issues with vector<string> typemaps
+
+0.05   Thu Aug 19 20:00:00 CEST 2010
+  - Fix typemap interpolation problems
+
+0.04   Thu Jul 15 20:00:00 CEST 2010
+  - size_t is of type T_UV, not T_IV
+
+0.03   Thu Jul 15 20:00:00 CEST 2010
+  - Add basic types typemap
+  - Add necessary 'use' statements.
+
+0.02   Mon Jul 12 20:00:00 CEST 2010
+  - Add simple vector typemaps.
+
+0.01   Mon Jun 28 20:00:00 CEST 2010
+  - First release.

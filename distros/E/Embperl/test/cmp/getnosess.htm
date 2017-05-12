@@ -1,0 +1,38 @@
+<html>
+<head>
+<title>Tests for Embperl - Set Session Data</title>
+</head>
+
+
+<body>
+
+
+	fdat:<br>
+	<table>
+		<tr>
+			<td>nocookie</td><td>2</td>
+		</tr>
+	</table>
+
+	udat:<br>
+	<table></table>
+
+	Not a session hash (num=0)<p>
+
+	sessions:
+^	<table>
+^-		<tr>
+^-			<td>.*?<\/td><td>HASH.*?<\/td>
+^-		</tr>
+^-
+^-		<tr>
+^-			<td>.*?<\/td><td>HASH.*?<\/td>
+^-		</tr>
+^-
+^-		<tr>
+^-			<td>.*?<\/td><td>HASH.*?<\/td>
+^-		</tr>
+^-	</table>
+</body>
+</html>
+

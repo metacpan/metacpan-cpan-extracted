@@ -1,0 +1,53 @@
+[% title = 'User Maintenance' %]
+[%INCLUDE menu.tmpl %]
+
+[% IF errs.some_errors && ! message %]
+<p><span class="message" id="message">Error Saving User</span> </p>
+[% END %]
+
+<form action="[% root_url %]/user/save" method="post">
+    <fieldset>
+        <legend>User</legend>
+        <p>
+            <label for="username" class="edit">Username *</label>
+            [% UNLESS user.user_id %]
+                <input id="username" name="username" value=""/> [% errs.username %] [% errs.username_or_user_id %]
+            [% ELSE %]
+                [% user.username %]
+            [% END %]
+        </p>
+        <p>
+            <label for="first_name" class="edit">First Name *</label>
+            <input id="first_name" name="first_name" value="[% user.first_name %]" /> [% errs.first_name %]
+        </p>
+        <p>
+            <label for="last_name" class="edit">Last Name *</label>
+            <input id="last_name" name="last_name" value="[% user.last_name %]" /> [% errs.last_name %]
+        </p>
+        <p>
+            <label for="password" class="edit">Password</label>
+            <input id="password" name="password" value=""  type="password" /> [% errs.password %]
+        </p>
+        <p>
+            <label for="password2" class="edit">Repeat Password</label>
+            <input id="password2" name="password2" value="" type="password" /> [% errs.password2 %]
+        </p>
+        <p>
+            <label for="email_address" class="edit">Email *</label>
+            <input id="email_address" name="email_address" value="[% user.email_address %]" /> [% errs.email_address %]
+        </p>
+        <p>
+            <label for="active" class="edit">Active</label>
+            <input id="active" name="active" type="checkbox" value="1" [% IF user.active %]checked="checked"[% END %] />
+        <p>
+        <p>
+            <label for="admin" class="edit">Administrator</label>
+            <input id="admin" name="admin" type="checkbox" value="1" [% IF user.admin %]checked="checked"[% END %] />
+        <p>
+        <p class="submit">
+            <input type="submit" value="Save" />
+            <input type="hidden" id="user_id" name="user_id" value="[% user.user_id %]">
+        </p>
+    </fieldset>
+</form>
+[% PROCESS footer.tmpl %]

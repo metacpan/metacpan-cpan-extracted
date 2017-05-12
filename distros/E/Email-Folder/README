@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Email-Folder,
+version 0.860:
+
+  read all the messages from a folder as Email::Simple objects
+
+This software is copyright (c) 2006 by Simon Wistow.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

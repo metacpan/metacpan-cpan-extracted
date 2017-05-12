@@ -1,0 +1,12 @@
+Changes
+lib/E/Mail/Acme.pm
+lib/Email/Abstract/EMailAcme.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/abstract.t
+t/send.t
+t/simple.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

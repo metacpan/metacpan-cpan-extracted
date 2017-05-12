@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/Email/Store/Thread.pm
+t/1.t
+t/maypole-200406
+META.yml                                Module meta-data (added by MakeMaker)

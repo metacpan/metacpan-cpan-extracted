@@ -1,0 +1,85 @@
+TYPEMAP
+tConf * T_PTROBJ_CONF
+tReq *  T_PTROBJ_REQ
+tFile * T_PTROBJ_FILE
+tDomNode * T_PTROBJ_DOMNODE
+tTokenTable * T_PTROBJ_SYNTAX
+AV *    T_MYAVREF
+HV *    T_MYHVREF
+Apache::Server T_PTROBJ
+
+
+INPUT
+T_MYAVREF
+    $var = (AV *)SvRV($arg);
+
+T_MYHVREF
+    $var = (HV *)SvRV($arg);
+
+T_PTROBJ_CONF
+    if (sv_derived_from ($arg, \"Embperl::Conf\"))
+        $var = (tConf *)(SvIV((SV *)SvRV($arg))) ;
+    else
+        croak (\"$var is not of type Embperl::Conf\") ;
+
+T_PTROBJ_REQ
+    {
+    MAGIC * mg ;
+    if ((mg = mg_find (SvRV($arg), '~')))
+        $var = *((tReq **)(mg -> mg_ptr)) ;
+    else
+        croak (\"$var is not of type Embperl::Req\") ;
+    }
+
+
+T_PTROBJ_FILE
+    if (sv_derived_from ($arg, \"Embperl::File\"))
+        $var = (tFile *)(SvIV((SV *)SvRV($arg))) ;
+    else
+        croak (\"$var is not of type Embperl::File\") ;
+
+T_PTROBJ_DOMNODE
+    {
+    MAGIC * mg ;
+    if ((mg = mg_find (SvRV($arg), '~')))
+        $var = *((tDomNode **)(mg -> mg_ptr)) ;
+    else
+        croak (\"$var is not of type XML::Embperl::DOM::Node\") ;
+    }
+
+T_PTROBJ_SYNTAX
+    {
+    MAGIC * mg ;
+    if (SvROK ($arg) && (mg = mg_find (SvRV($arg), '~')))
+        $var = *((tTokenTable **)(mg -> mg_ptr)) ;
+    else
+        croak (\"$var is not of type Embperl::Syntax\") ;
+    }
+
+
+
+OUTPUT
+T_PTROBJ_CONF
+    sv_setref_pv ($arg, \"Embperl::Conf\", (void *)$var) ;
+
+T_PTROBJ_REQ
+    {
+    SV * pSV = $var -> pReqSV ;
+    if (pSV == NULL)
+       $arg = &sv_undef ;
+    else
+        $arg = pSV ;
+    }
+ 
+T_PTROBJ_FILE
+    sv_setref_pv ($arg, \"Embperl::File\", (void *)$var) ;
+
+T_PTROBJ_DOMNODE
+    {
+    SV * pSV = $var -> pDomNodeSV ;
+    if (pSV == NULL)
+       $arg = &sv_undef ;
+    else
+        $arg = pSV ;
+    }
+

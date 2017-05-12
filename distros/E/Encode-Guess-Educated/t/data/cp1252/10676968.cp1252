@@ -1,0 +1,1093 @@
+    #[1]home [2]copyright [3]help [4]Nature current issue RSS feed
+   [5]nature.com [6]nature.com
+
+     * [7]Jump to main content
+     * [8]Jump to navigation
+     * [9]nature.com homepage
+     * [10]Publications A-Z index
+     * [11]Browse by subject
+
+     * [12]My account
+     * [13]Submit manuscript
+     * [14]Register
+     * [15]Subscribe
+
+   [16]Advertisement
+
+   Full text access provided to University of Colorado System
+   by c/o Denison Library
+   [17]Nature homepage
+   Search [this journal_____] ____________________ go [18]Advanced search
+
+   [19]Journal home > [20]Archive > [21]Letters to Nature > Full Text
+
+ §1§ Letters to Nature §1§
+
+   Nature 403, 567-571 (3 February 2000) | doi:10.1038/35000617; Received
+   19 October 1999; Accepted 7 December 1999
+
+ §2§ Structure of human guanylate-binding protein 1 representing a unique
+class of GTP-binding proteins §2§
+
+   Balaji Prakash^[22]1, Gerrit J. K. Praefcke^[23]1, Louis Renault,
+   Alfred Wittinghofer & Christian Herrmann
+    1. Max-Planck-Institut für Molekulare Physiologie, Otto-Hahn-Strasse
+       11, 44227 Dortmund, Germany
+    2. These authors contributed equally to this work
+
+   Correspondence to: Alfred WittinghoferChristian Herrmann Correspondence
+   and requests for materials should be addressed to A.W. (e-mail:
+   Email: [24]alfred.wittinghofer@mpi-dortmund.mpg.de) or to C.H. (e-mail:
+   Email: [25]christian.herrmann@mpi-dortmund.mpg.de). Coordinates have
+   been deposited with the Protein Data Bank (accession no. 1DG3).
+
+   [26]Top of page
+
+ §3§ Abstract §3§
+
+   Interferon- gamma is an immunomodulatory substance that induces the
+   expression of many genes to orchestrate a cellular response and
+   establish the antiviral state of the cell. Among the most abundant
+   antiviral proteins induced by interferon- gamma are guanylate-binding
+   proteins such as GBP1 and GBP2 (refs [27]1, [28]2). These are large
+   GTP-binding proteins of relative molecular mass 67,000 with a
+   high-turnover GTPase activity^[29]3 and an antiviral effect^[30]4. Here
+   we have determined the crystal structure of full-length human GBP1 to
+   1.8 Å resolution. The amino-terminal 278 residues constitute a modified
+   G domain with a number of insertions compared to the canonical Ras
+   structure, and the carboxy-terminal part is an extended helical domain
+   with unique features. From the structure and biochemical experiments
+   reported here, GBP1 appears to belong to the group of large GTP-binding
+   proteins that includes Mx and dynamin, the common property of which is
+   the ability to undergo oligomerization with a high
+   concentration-dependent GTPase activity^[31]5.
+
+   Guanylate-binding proteins (GBP1 and 2) were originally identified as
+   proteins from an extract of human fibroblasts treated with interferons,
+   gamma -interferon being the most effective, that bind to agarose-bound
+   GMP, GDP and GTP^[32]1, ^[33]2. Smaller guanylate-binding proteins of
+   relative molecular mass 47,000 (M[r] = 47K)^[34]6 are also induced by
+   gamma -interferon, whereas alpha - and beta -interferon induce
+   antiviral GTP-binding Mx proteins^[35]7. Human (h)GBP1 is expressed to
+   mediate an antiviral effect against vesicular stomatitis virus and
+   encephalomyocarditis virus^[36]4. The biochemical properties of GBPs
+   are clearly different from those of Ras-like and heterotrimeric
+   GTP-binding proteins. They bind guanine nucleotides with low affinity
+   (micromolar range), are stable in their absence and have a high
+   turnover GTPase^[37]3, ^[38]8. In addition to binding GDP/GTP, they
+   have the unique ability to bind GMP with equal affinity and hydrolyse
+   GTP not only to GDP but also to GMP^[39]3. As a first step towards
+   understanding the biochemistry and biology of GBPs, we have determined
+   the three-dimensional structure of hGBP1. Furthermore, we show
+   nucleotide-dependent oligomerization of hGBP1 and concentration
+   dependence of its GTPase reaction rate.
+
+   We determined the structure of full-length, histidine(His[6])-tagged
+   hGBP1 in the absence of nucleotide to 1.8 Å. The final model comprises
+   residues 6–583 and 341 water molecules ([40]Fig. 1a, [41]b), with some
+   poorly defined, probably mobile loops (dashed lines). The
+   crystallographic data are summarized in [42]Table 1. The structure can
+   be divided into a compact, globular alpha , beta -domain (6–278), which
+   we term the LG (Large G) domain, and an elongated, purely alpha
+   -helical domain. The domains are connected by a short intermediate
+   region consisting of one alpha -helix and a short two-stranded beta
+   -sheet. The connecting region is not an independent domain; it is
+   packed, via helix alpha 6, against the beta 1/ alpha 1 region of the LG
+   domain, away from the presumed nucleotide-binding site (see below). It
+   could be involved in stabilizing the relative location of the two
+   domains against each other. The helical domain is composed of seven
+   helices, which extend 90 Å away from the LG domain.
+
+ §5§ [43] Figure 1: Primary, secondary and tertiary structure of hGBP1. §5§
+
+   [44]Figure 1 : Primary, secondary and tertiary structure of hGBP1.
+   Unfortunately we are unable to provide accessible alternative text for
+   this. If you require assistance to access this image, or to obtain a
+   text description, please contact npg@nature.com
+
+   a, A model of the tertiary structure of hGBP1 presented as a ribbon,
+   where the LG domain is in purple, the connecting region in green, the
+   helical domain in yellow and alpha 12/ alpha 13 in cyan. Insertions,
+   marked I2–I5 in b, are in violet. Dashed lines indicate disordered
+   regions in the molecule. The tentative nucleotide-binding area,
+   identified by a Ras–GBP overlay, is indicated by a sphere with radius
+   7 Å. The topology is shown schematically using the same colour code. b,
+   Sequence alignment of hGBP1 (Swissprot accession no. P32455) with Mag-2
+   (EMBL acccession no. M81128) from mouse and chicken GBP1 (EMBL
+   accession no. X92112), with the secondary structure assignment as
+   determined using the programme DSSP^[45]29, with the same colour code
+   as in a, and aligned with the secondary structure of Ras dot
+   GppNHp^[46]30 (light blue lines). Contacts between helix alpha 12 and
+   the rest of the protein are indicated: asterisk, direct; circle,
+   water-mediated polar interactions; hash sign for both. For brevity,
+   sequences with lowest homology have been chosen.
+   [47]High resolution image and legend (233K)
+
+ §5§ [48] Table 1: Crystallographic data statistics §5§
+
+   [49]Table 1 - Crystallographic data statistics
+
+   [50]Full table
+
+   The LG domain of GBPs contains the conserved sequence elements of
+   GTP-binding proteins with modifications. Originally the N/TKxD motif
+   was believed to be absent in the GBPs^[51]2. An Asp-Asn mutation can
+   produce a change in specificity from guanine to xanthine nucleotides in
+   many GTP-binding proteins such as EF-Tu^[52]9. As an Asp-Asn mutation
+   in the ^181TLRD^184 motif of hGBP1 behaves similarly, it is postulated
+   that Asp 184 should bind the guanine base through a bidentate hydrogen
+   bond^[53]8. It was thus expected that GBP1 would contain the Ras G
+   domain or a variation thereof. The structure shows that the 278-residue
+   globular domain largely resembles the canonical architecture of Ras (
+   approx 170 residues), allowing for additions and insertions (labelled
+   I). Superimposing the structures of hGBP1 and Ras-GDP ([54]Fig. 2a)
+   gives a root mean square (r.m.s) deviation of 1.1 Å for 112 common C
+   alpha atoms. The LG domain consists of an eight-stranded beta -sheet
+   with six parallel and two anti-parallel strands surrounded by nine
+   helices, whereas Ras contains six beta -strands and five helices
+   ([55]Fig. 1b). Using the secondary structure elements of Ras as the
+   basis for the comparison and retaining the corresponding numbering, the
+   additional elements are beta 0, alpha 0 and beta -1 on the N-terminal
+   side of the sheet, and helices alpha 3' (I3) and alpha 4' (I4)
+   ([56]Fig. 1b). Apart from a short insertion (I1) in switch I, there are
+   comparatively long loop insertions between the ^97DxxG^100 motif and
+   alpha 2 (I2), and between beta 6 and alpha 5 (I5) of the canonical G
+   domain, respectively ([57]Figs 1 and [58]2). Whereas I1, I2 and I5
+   could be involved in nucleotide binding, I3 and I4, on the opposite
+   side of the protein, apparently mediate contact with the C-terminal
+   helix.
+
+ §5§ [59] Figure 2: Comparison of hGBP1 and Ras structures. §5§
+
+   [60]Figure 2 : Comparison of hGBP1 and Ras structures. Unfortunately we
+   are unable to provide accessible alternative text for this. If you
+   require assistance to access this image, or to obtain a text
+   description, please contact npg@nature.com
+
+   a, Superimposition of the LG domain of hGBP1 with the G domain of Ras
+   in complex with GDP(PDB accession no. 1Q21) as a stereo view.
+   N-terminal residues 1–36 of hGBP1 up to beta 1 have been omitted for
+   clarity. The colour code is as in [61]Fig. 1; Ras is in cyan. b,
+   Putative location of nucleotide-binding site in hGBP1. The regions of
+   hGBP1 potentially involved in binding the guanine nucleotide are shown
+   as obtained from a structural superimposition of RasGDP (in cyan) with
+   the corresponding regions in hGBP1 (purple), highlighting functionally
+   important residues necessary for binding and conformational change as
+   balls or in ball-and-stick. Whereas Gly 60^ras overlays very well with
+   Gly 100^hGBP1, residues D119/D184 and T35/T75 do not.
+   [62]High resolution image and legend (79K)
+
+   As GBP is stable in the absence of nucleotide, whereas Ras-like and G
+   alpha GTP-binding proteins are not, it was of interest to investigate
+   the effect of the absence of nucleotide on the structure. As all
+   P-loop-containing proteins^[63]10 bind the beta / gamma -phosphate of
+   the nucleotide in a similar manner, and as the role of Asp 184 in
+   binding the guanine base is similar to that of the Asp of the canonical
+   N/TKxD motif, we can locate the nucleotide-binding site of hGBP1 using
+   the RasGDP–hGBP1 overlay ([64]Fig. 2b). From this comparison we can
+   also see that, although part of the binding site is more accessible to
+   the solvent than in Ras–nucleotide complexes, part of the polypeptide
+   chain is in a position that interferes with nucleotide binding. Perhaps
+   owing to the absence of nucleotide, the polypeptide chain around the
+   binding site is mobile, as no electron density is visible for residues
+   69–72 (I1) in the region analogous to switch I, residues 190–193 close
+   to the ^181TLRD^184 motif and residues 244–257 in I5, close to the
+   SAK/L motif, which is conserved only in the Ras family and is absent in
+   GBPs.
+
+   The (phosphate-binding) P loop^[65]10, residues 45–52, adopts a
+   structure different from that of the Ras–nucleotide complexes. The
+   invariant lysine residue of the P loop does not interact with the
+   main-chain carbonyls for stabilization. Instead, in hGBP1 the loop is
+   stabilized by interactions with the region analogous to switch II,
+   involving hydrogen bonds between Tyr 47 (backbone N) and Asp 103,
+   Lys 51 and Thr 98. Furthermore, the structure is not suited for
+   nucleotide binding as the phosphates would clash with Tyr 47. The
+   region corresponding to switch I in Ras is disordered in hGBP1. Thr 75
+   appears to be analogous to Thr 35 in Ras, but is 5 Å away in the
+   overlay ([66]Fig. 2b). The ^97DxxG^100 motif of hGBP1 superimposes well
+   with that of switch II in Ras. D184 is 6 Å away from the corresponding
+   D119 of the canonical N/TKxD motif and would have to move accordingly
+   to occupy a similar position in the nucleotide-bound form. In general,
+   it appears that the guanine nucleotide-binding site is partly open
+   ([67]Fig. 2a, [68]b) such that the incoming nucleotide would enter the
+   binding site base first and would then, after a corresponding
+   conformational change, bind into the phosphate-binding area, as
+   suggested for Ras by the structure of the Ras–Sos complex^[69]11.
+
+   Ras proteins have an intrinsic GTPase reaction rate in the order of
+   0-001–0.1 min^-1, whereas hGBP1 (ref. [70]8) has a rate of up to
+   80 min^-1 (see below). The catalytic mechanism for Ras and G alpha
+   proteins involves a glutamine (Gln 61 in Ras) that stabilizes the
+   transition state and is itself stabilized by GAP in the GAP-catalysed
+   mechanism^[71]12. As Gly 60^ras and Gly 100^hgbp1 are very close to
+   each other ([72]Fig. 2b), we would predict that Gln 61 of Ras is
+   structurally homologous to Leu 101 in hGBP1. Considering the importance
+   of Gln 61 in the intrinsic and GAP-catalysed GTPase reaction of Ras, we
+   conclude that the chemical mechanism of hydrolysis of GTP by hGBP1 is
+   different from that of Ras. A similar hydrophobic residue corresponding
+   to Gln 61 of Ras has also been identified in dynamins and Mx proteins.
+   Discounting the influence of oligomerization on the rate of the GTPase
+   reaction, only insertion I2 following Leu 101 appears to be close
+   enough to the phosphate-binding site to be involved in catalysis. This
+   ^103DxEKGD^108 motif is conserved in GBPs and contains charged residues
+   that could have a catalytic role, either similar to that of the Arg in
+   G alpha proteins or GAPs^[73]12 or as a catalytic base.
+
+   The helical domain of hGBP1 can be considered to consist of two
+   three-helix bundles, formed by helices alpha 7, alpha 8, alpha 9
+   (residues 311–403) and helices alpha 9, alpha 10, alpha 11 (404–482),
+   where helix alpha 9 is common to both ([74]Fig. 1a). Adjacent to and
+   covering these two bundles is a very long helix alpha 12 that reaches
+   back to the LG domain. This helix, which is predicted from the sequence
+   to be a coiled-coil structure, is 78 residues long and stretches over
+   118Å. At its C-terminal end there is a helical turn leading into
+   another short helix, alpha 13, which makes a coiled-coil type of
+   interaction with alpha 12. The last eight residues, including the
+   prenylation-recognition Caax motif, not modified owing to recombinant
+   expression in E. coli, are not visible in the structure.
+
+   The two three-helix bundles give the molecule an elongated shape. The
+   core of the helical domains is formed by hydrophobic residues, whereas
+   the charged amino acids are exposed towards but interact only weakly
+   with the residues from the long helix alpha 12. Thus, alpha 12 has
+   almost no contact with the second (more remote) helical bundle (a
+   single hydrogen bond between Glu 490 and Tyr 433, [75]Fig. 1b) whereas
+   it forms seven direct side-chain and nine water-mediated contacts with
+   the first. It is stabilized further by four direct and eight
+   water-mediated contacts with insertions I3 and I4 ([76]Fig. 1) of the
+   LG domain. The electrostatic surface potential ([77]Fig. 3) indicates
+   that alpha 12 may mask some of the charged residues exposed by the two
+   helical bundles. In conclusion, the helical domain appears to actually
+   consist of two subdomains.
+
+ §5§ [78] Figure 3: Interaction of the C-terminal helix motif alpha 12/13
+with the helical and the LG domains. §5§
+
+   [79]Figure 3 : Interaction of the C-terminal helix motif |[alpha]|12/13
+   with the helical and the LG domains. Unfortunately we are unable to
+   provide accessible alternative text for this. If you require assistance
+   to access this image, or to obtain a text description, please contact
+   npg@nature.com
+
+   The electrostatic surface potential shows that the highly charged
+   regions of the helical and LG domains are masked by an alpha 12/13
+   motif, as indicated in the lower panel by showing alpha 12/ alpha 13 in
+   worm representation.
+   [80]High resolution image and legend (40K)
+
+   Mx and dynamins are commonly grouped into a separate class of large
+   GTP-binding proteins^[81]5. Proteins of this family have several
+   variations in their domain structure, but they all possess at least a
+   'GTPase' domain of approx 300 residues, a 'middle' or 'assembly' domain
+   (150–200 residues) and a 'GED' domain (100 residues). These values are
+   close to the sizes of the LG, helical bundle and alpha 12/13 domains of
+   hGBP1, respectively. Biochemically, they share common properties such
+   as relatively low affinity for nucleotides (K[m] 10–500 micro M), the
+   ability to form oligomers and a high intrinsic rate of GTP hydrolysis
+   (k[cat] 2–100 min^-1)^[82]5, ^[83]7. It was thus interesting to find
+   out whether hGBP1 has to undergo multimerization to hydrolyse GTP
+   rapidly, as observed for dynamin. [84]Figure 4a shows that the specific
+   GTPase activity does increase at least eight-fold with increasing
+   concentrations under the conditions employed. This clearly indicates a
+   cooperative mechanism of GTP hydrolysis by hGBP1, similar to that
+   observed for dynamin^[85]13. Note, however, that for technical reasons
+   the data do not allow us to estimate the GTPase reaction rate at lower
+   concentrations.
+
+ §5§ [86] Figure 4: Cooperative GTP hydrolysis and nucleotide-dependent
+multimerization of hGBP1. §5§
+
+   [87]Figure 4 : Cooperative GTP hydrolysis and nucleotide-dependent
+   multimerization of hGBP1. Unfortunately we are unable to provide
+   accessible alternative text for this. If you require assistance to
+   access this image, or to obtain a text description, please contact
+   npg@nature.com
+
+   a, Concentration dependence of the specific GTPase activity of hGBP1.
+   The data were fitted to a model involving dimer formation yielding 0.6
+   micro M for the apparent dimerization constant of hGBP1. b,
+   Size-exclusion chromatography of GDP dot AlF[x]-, GppNHp-, GDP-bound
+   and nucleotide-free hGBP1.
+   [88]High resolution image and legend (20K)
+
+   The homology to the dynamin family is further corroborated by
+   demonstrating nucleotide-dependent oligomerization ([89]Fig. 4b). The
+   elution profiles from standardized analytical size-exclusion
+   chromatography show that hGBP1 is monomeric in the absence and in the
+   presence of GDP, whereas it shows higher molecular mass when bound to
+   the non-hydrolysable GTP analogue GppNHp. The molecular mass is higher
+   again for hGBP1 in complex with GDP and aluminium fluoride which
+   together are believed to mimic the transition state of GTP
+   hydrolysis^[90]8, ^[91]12. It seems that, for efficient GTP hydrolysis
+   to occur, higher order structures have to be formed, as suggested for
+   dynamin^[92]13, ^[93]14, ^[94]15. The dependence of nucleotide
+   hydrolysis on oligomerization has been proposed to be important for
+   dynamin's ability to assemble around the necks of clathrin-coated
+   vesicles and regulate receptor-mediated endocytosis. A role for the
+   oligomerization-dependent hydrolysis of GTP by hGBP1 in
+   interferon-mediated cellular functions remains to be established.
+
+   In addition to the biochemical experiments, structural considerations
+   lead us to propose that hGBP1 belongs to the dynamin family of large
+   GTP-binding proteins. Secondary structure predictions suggest a helical
+   and/or coiled-coil structure for the middle and GTPase effector (GED)
+   domains of Mx and dynamin, just as the secondary structure prediction
+   for alpha 7– alpha 12 of hGBP1 is in tune with the current structure.
+   Limited proteolysis experiments^[95]16 and yeast two-hybrid
+   studies^[96]17 have shown that the C-terminal end of Mx, which is
+   required for fast GTP hydrolysis, contacts the nucleotide-binding
+   domain and the middle domain just as helix alpha 12 folds back onto the
+   LG domain and the helical bundles in the structure of hGBP1. A similar
+   pattern of interactions has also been observed for dynamin where the
+   binding of the GED domain to both the middle and the LG domain has been
+   shown using various techniques^[97]18, ^[98]19. Similarly, the internal
+   GAP-related GED domain of dynamin is implicated not only in GTP
+   hydrolysis but also in the regulation of assembly: two processes that
+   are intimately coupled^[99]14, ^[100]20. With the structure of hGBP1
+   now available, we can design experiments to test the hypothesis of a
+   common structural make-up for these proteins. We would also investigate
+   the mechanism of GTP hydrolysis in GBPs, the unique nature of the
+   resulting products (GMP and GDP) and whether an internal helical GED
+   domain with properties similar to that of dynamin exists in GBPs.
+   Furthermore, the role of the C-terminal end in the biological function
+   of GBPs in the antiviral defence should be investigated, as the
+   functionally related Mx protein requires its C-terminal end to interact
+   with thogoto virus nucleocapsids^[101]21.
+   [102]Top of page
+
+ §3§ Methods §3§
+
+ §4§ Protein preparation §4§
+
+   hGBP1 with an N-terminal His[6] tag was expressed from a pQE9 vector in
+   E. coli strain BL21(DE3) as described^[103]8. The GTPase activity of
+   hGBP1 was measured at 37 °C in a buffer containing 50 mM Tris/HCl,
+   pH 8.0, 5 mM MgCl[2] and 300  micro M GTP. Aliquots were taken at
+   adequate time intervals and the progress of GTP hydrolysis was analysed
+   by reversed phase chromatography (C-18, Hypersil)^[104]8. Rates were
+   derived from a linear fit to the initial reaction (<30% GTP
+   hydrolysed).
+
+   We analysed the states of multimerization of hGBP1 by size-exclusion
+   chromatography (GFC-1300, Supelco). hGBP1 at 20 micro M was
+   preincubated for 15 min with 200  micro M nucleotide and the column was
+   equilibrated with 50 mM Tris/HCl pH 8.0, 5 mM MgCl[2] and 200  micro M
+   of the corresponding nucleotide, or in addition with 300  micro M
+   AlCl[3] and 10 mM NaF. Elution volumes (V[e]/V[0]) were compared to
+   those of standard proteins.
+
+ §4§ Crystallography §4§
+
+   We used full-length his[6]-tagged hGBP1 (40 mg ml^-1) to grow crystals
+   in hanging drops over a reservoir solution of 5% PEG6000 (polyethylene
+   glycol), 100 mM MES-NaOH, pH 6.0 at 20 °C. Owing to a cloning artefact,
+   we used the Q507H mutation of hGBP1, which does not alter the
+   biochemical properties. We collected a high-resolution native data set
+   to 1.8 Å resolution at 100K at BW6 beamline (DESY) and processed with
+   XDS: better completeness and redundancy were achieved by merging this
+   data with a 2.4 Å native data set collected on a rotating anode. The
+   statistics of the native and derivative data used for phasing are shown
+   in [105]Table 1. All crystallographic calculations were performed using
+   the CCP4 suite of programs^[106]20 unless stated otherwise. Heavy atom
+   sites, initially identified by SOLVE^[107]22 and later by
+   difference-Fourier maps, were refined and phase information was
+   generated using MLPHARE. We improved the MIRAS phases by solvent
+   flattening and histogram matching with DM. However, three of the
+   derivatives shared common major sites, as reflected in the high figure
+   of merit shown in [108]Table 1. The map thus obtained posed
+   difficulties in tracing the polypeptide chain. We therefore used
+   wARP^[109]23 to improve the MIRAS phases and extend the map to 1.8 Å
+   resolution. The resulting maps considerably facilitated map
+   interpretation and model building. At this stage, electron-density maps
+   from two multi-wavelength anomalous dispersion (MAD) experiments with
+   Au and Hg derivatives, performed at beamline BM14 (ESRF), aided map
+   interpretation. The poor quality of crystals used for MAD experiments
+   and non-isomorphism between crystals resulted in poorer maps upon
+   combining the MAD and MIRAS phases. we subjected an initial model
+   consisting of 473 residues to iterative processes of building,
+   refinement and phase combination before arriving at a final model
+   containing 548 residues and 341 water molecules. The atomic model was
+   built using program O^24, and all refinement, consisting of
+   bulk-solvent correction, positional, torsion angle simulated annealing
+   and B-factor refinement, was carried out with CNS^[110]25. Composite
+   simulated annealing omit maps were used to correct or build ambiguous
+   regions of the model. The Ramachandran plot (not shown) depicts 96% of
+   the main-chain torsion angles in the most favoured regions, with no
+   amino acids in the disallowed regions. The current model extends from
+   His 6 to Met 583. The loops comprising residues 63–72, 157–166, 190–193
+   and 244–256 cannot be seen in the electron density and are presumably
+   disordered. Figures were generated using Molscript^[111]26 and
+   Raster3D^[112]27. The electrostatic surface potential was generated
+   using GRASP^[113]28.
+
+   [114]Top of page
+
+ §3§ References §3§
+
+    1. Cheng, Y.-S. E. , Colonno, R. J. & Yin, F. H. Interferon induction
+       of fibroblast proteins with guanylate binding activity J. Biol.
+       Chem. 258, 7746–7750
+       (1983). | [115]PubMed | [116]ISI | [117]ChemPort |
+    2. Cheng, Y.-S. E. , Patterson, C. E. & Staeheli, P.
+       Interferon-induced guanylate-binding proteins lack an N(T)KXD
+       consensus motif and bind GMP in addition to GDP and GTP Mol. Cell.
+       Biol. 11, 4717–4725
+       (1991). | [118]PubMed | [119]ISI | [120]ChemPort |
+    3. Schwemmle, M. & Staeheli, P. The interferon-induced 67-kDa
+       guanylate-binding protein (hGBP1) is a GTPase that converts GTP to
+       GMP J. Biol. Chem. 269, 11299–11305
+       (1994). | [121]PubMed | [122]ISI | [123]ChemPort |
+    4. Anderson, S. L. , Carton, J. M. , Lou, J. , Xing, L. & Rubin, B. Y.
+       Interferon-induced guanylate-binding protein-1 (GBP-1) mediates an
+       antiviral effect against vesicular stomatitis virus and
+       encephalomyocarditis virus Virology 256, 8–14
+       (1999). | [124]Article | [125]PubMed | [126]ISI | [127]ChemPort |
+    5. van der Bliek, A. M. Functional diversity in the dynamin family
+       Trends Cell Biol. 9, 96–102
+       (1999). | [128]Article | [129]PubMed | [130]ISI | [131]ChemPort |
+    6. Boehm, U. et al. Two families of GTPases dominate the complex
+       cellular response to IFN- gamma J. Immunol. 161, 6715–6723
+       (1998). | [132]PubMed | [133]ISI | [134]ChemPort |
+    7. Staeheli, P. , Pitossi, F. & Pavlovic, J. Mx proteins: GTPases with
+       antiviral activity Trends Cell Biol. 3, 268–272
+       (1993). | [135]Article | [136]PubMed | [137]ChemPort |
+    8. Praefcke, G. J. K. , Geyer, M. , Schwemmle, M. , Kalbitzer, H. R. &
+       Herrmann, C. Nucleotide-binding characteristics of human
+       guanylate-binding protein 1 and identification of the third
+       canonical GTP-binding motif J. Mol. Biol. 292, 321–332
+       (1999) | [138]Article | [139]PubMed | [140]ISI | [141]ChemPort |
+    9. Weijland, A. & Parmeggiani, A. Towards a model for the interaction
+       between elongation factor Tu and the ribosome Science 259,
+       1311–1314 (1993) | [142]PubMed | [143]ISI | [144]ChemPort |
+   10. Saraste, M. , Sibbald, P. R. & Wittinghofer, A. The P-loop—a common
+       motif in ATP- and GTP-binding proteins Trends. Biochem. Sci. 15,
+       430–434 (1990). | [145]Article | [146]PubMed | [147]ISI |
+   11. Boriack-Sjodin, P. A. , Margarit, S. M. , Barsagi, D. & Kuriyan, J.
+       The structural basis of the activation of Ras by Sos Nature 394,
+       337–343
+       (1998). | [148]Article | [149]PubMed | [150]ISI | [151]ChemPort |
+   12. Scheffzek, K. , Ahmadian, M. R. & Wittinghofer, A. GTPase
+       activating proteins: helping hands to complement an active site
+       Trends Biochem. Sci. 23, 257–262
+       (1998). | [152]Article | [153]PubMed | [154]ISI | [155]ChemPort |
+   13. Warnock, D. E. , Hinshaw, J. E. & Schmid, S. L. Dynamin
+       self-assembly stimulates its GTPase activity J. Biol. Chem. 271,
+       22310–22314
+       (1996) | [156]Article | [157]PubMed | [158]ISI | [159]ChemPort |
+   14. Sever, S. , Muhlberg, A. B. & Schmid, S. L. Impairment of dynamin's
+       GAP domain stimulates receptor-mediated endocytosis. Nature 398,
+       481–486
+       (1999). | [160]Article | [161]PubMed | [162]ISI | [163]ChemPort |
+   15. Stowell, M. H. B. , Marks, B. , Wigge, P. & McMahon, H. T.
+       Nucleotide-dependent conformational changes in dynamin: evidence
+       for a mechanochemical molecular spring Nature Cell Biol. 1, 27–32
+       (1999).
+   16. Schwemmle, M. , Richter, M. F. , Herrmann, C. , Nassar, N. &
+       Staeheli, P. Unexpected structural requirements for GTPase activity
+       of the interferon-induced MxA protein J. Biol. Chem. 270,
+       13518–13523
+       (1995). | [164]Article | [165]PubMed | [166]ISI | [167]ChemPort |
+   17. Schumacher, B. & Staeheli, P. Domains mediating intramolecular
+       folding and oligomerization of MxA GTPase J. Biol. Chem. 273,
+       28365–28370
+       (1998). | [168]Article | [169]PubMed | [170]ISI | [171]ChemPort |
+   18. Smirnova, E. , Shurland, D-L. , Newman-Smith, E. D. , Pishvaee, B.
+       & van der Bliek, A. M. A model for dynamin self–assembly based on
+       binding between three different protein domains J. Biol. Chem. 274,
+       14942–14947
+       (1999) | [172]Article | [173]PubMed | [174]ISI | [175]ChemPort |
+   19. Okamoto, P. M. , Tripet, B. , Litowski, J. , Hodges, R. S. &
+       Vallee, R. B. Multiple distinct coiled-coils are involved in
+       dynamin self-assembly J. Biol. Chem. 274, 10277–10286
+       (1999). | [176]Article | [177]PubMed | [178]ISI | [179]ChemPort |
+   20. Collaborative Computational project, N.4. The CCP4 suite: programs
+       for protein crystallography Acta Crystallogr. D 50, 760–763 (1994).
+   21. Kochs, G. & Haller, O. GTP-bound Human MxA protein interacts with
+       the nucleocapsids of Thogoto virus (Orthomyxoviridae) J. Biol.
+       Chem. 274, 4370–4376
+       (1999) | [180]Article | [181]PubMed | [182]ISI | [183]ChemPort |
+   22. Terwilliger, T. C. & Berendzen, J. Correlated phasing of multiple
+       isomorphous replacement data Acta Crystallogr. D 52, 749–757
+       (1996). | [184]Article | [185]ISI |
+   23. Perrakis, A. , Sixma, T. K. , Wilson, K. S. & Lamzin, V. S.
+       wARP:improvement and extension of crystallographic phases by
+       weighted averaging of multiple refined dummy atomic models Acta
+       Crystallogr. D 53, 448–455 (1997). | [186]Article | [187]ISI |
+   24. Jones, T. A. & Kjeldgaard, M. Electron-density map interpretation
+       Methods Enzymol. 277, 173–208
+       (1997). | [188]Article | [189]ISI | [190]ChemPort |
+   25. Brunger, A. T. et al. Crystallography and NMR system: a new
+       software system for macromolecular structure determination Acta
+       Crystallogr. D 54, 905–921 (1998). | [191]Article | [192]ISI |
+   26. Kraulis, P. J. MOLSCRIPT: a program to produce both detailed and
+       schematic plots of protein structures J. Appl. Crystallogr. 24,
+       946–950 (1991). | [193]Article | [194]ISI |
+   27. Merrit, E. A. & Murphy, M. E. P. Raster3D version 2.0. A program
+       for photorealistic molecular graphics Acta Crystallogr. D 50,
+       869–873 (1994). | [195]Article | [196]PubMed |
+   28. Nicholls, A. , Sharp, K. A. & Honig, B. Protein folding and
+       association: insights from the interfacial and thermodynamic
+       properties of hydrocarbons Proteins 11, 281–296
+       (1991) | [197]Article | [198]PubMed | [199]ISI | [200]ChemPort |
+   29. Kabsch, W. & Sander, C. Dictionary of protein secondary structure:
+       pattern recognition of hydrogen-bonded and geometrical features
+       Biopolymers 22, 2577–2637
+       (1983) | [201]Article | [202]PubMed | [203]ISI | [204]ChemPort |
+   30. Pai, E. F. et al. Refined crystal structure of the triphosphate
+       conformation of H-ras p21 at 1.35Å resolution: implications for the
+       mechanism of GTP hydrolysis EMBO J. 9, 2351–2359
+       (1990). | [205]PubMed | [206]ISI | [207]ChemPort |
+
+   [208]Top of page
+
+ §3§ Acknowledgements §3§
+
+   The work was supported by the Deutsche Forschungsgemeinschaft (C.H.)
+   and by Boehringer Ingelheim Fonds (G.J.K.P). We thank the staff at
+   beamlines BW6, DESY, Hamburg and at BM-14, ESRF, Grenoble for help with
+   data collection. We also thank I. Schlichting, I. Vetter and R. Hillig
+   for discussions and M. Hess for help with figures. A. Beste for help
+   with HPLC and R. Schebaum for secretarial assistance.
+   [209]Top of page
+
+ §1§ Main navigation §1§
+
+ §2§ Journal content §2§
+
+     * [210]Journal home
+     * [211]Advance online publication
+          + [212]About AOP
+     * [213]Current issue
+     * [214]Nature News
+     * [215]Archive
+     * [216]Supplements
+          + [217]Insights
+          + [218]Outlooks
+          + [219]Collections
+     * [220]Web focuses
+          + [221]Biological sciences
+          + [222]Earth and environment
+          + [223]Horizons
+          + [224]Physical sciences
+          + [225]Science and politics
+          + [226]Science, art and culture
+     * [227]Podcasts
+     * [228]Videos
+     * [229]News Specials
+
+ §2§ Journal information §2§
+
+     * [230]About the journal
+          + [231]Contact the journal
+          + [232]About the editors
+          + [233]Nature family of journals
+          + [234]History of the Journal Nature
+          + [235]For advertisers
+          + [236]For librarians
+     * [237]For authors
+          + [238]Formatting guide
+          + [239]Publication policies
+          + [240]For referees
+     * [241]Online submission
+     * [242]Nature Awards
+          + [243]Google Earth
+     * [244]Nature history
+
+ §2§ NPG Services §2§
+
+     * [245]Advertising
+     * [246]work@npg
+     * [247]Reprints & permissions
+     * [248]For librarians
+     * [249]Authors & referees
+
+ §2§ NPG Resources §2§
+
+     * [250]Gateways & databases
+     * [251]Nature Reports
+     * [252]Nature Network
+     * [253]nature.com blogs
+     * [254]Nature Conferences
+     * [255]Scitable Genetics
+
+ §2§ NPG Journals §2§
+
+ §3§ by Subject Area §3§
+
+     *  §4§ Chemistry §4§
+          + [256]Chemistry
+          + [257]Drug discovery
+          + [258]Biotechnology
+          + [259]Materials
+          + [260]Methods & Protocols
+     *  §4§ Clinical Practice & Research §4§
+          + [261]Cancer
+          + [262]Cardiovascular medicine
+          + [263]Dentistry
+          + [264]Endocrinology
+          + [265]Gastroenterology & Hepatology
+          + [266]Methods & Protocols
+          + [267]Pathology & Pathobiology
+          + [268]Urology
+     *  §4§ Earth & Environment §4§
+          + [269]Earth sciences
+          + [270]Evolution & Ecology
+     *  §4§ Life sciences §4§
+          + [271]Biotechnology
+          + [272]Cancer
+          + [273]Development
+          + [274]Drug discovery
+          + [275]Evolution & Ecology
+          + [276]Genetics
+          + [277]Immunology
+          + [278]Medical research
+          + [279]Methods & Protocols
+          + [280]Microbiology
+          + [281]Molecular cell biology
+          + [282]Neuroscience
+          + [283]Pharmacology
+          + [284]Systems biology
+     *  §4§ Physical sciences §4§
+          + [285]Physics
+          + [286]Materials
+
+ §3§ [287]by A - Z Index §3§
+
+ §1§ Extra navigation §1§
+
+   .
+   [288]Subscribe to Nature
+
+ §2§ ARTICLE NAVIGATION -FULL TEXT §2§
+
+   [289]Previous|[290]Next
+     * [291]Table of contents
+     * [292]Download PDF
+     * [293]Send to a friend
+     * [294]Scopus lists 96 articles citing this article
+     * [295]Export citation
+     * [296]Export references
+     * [297]Rights and permissions
+     * [298]Order commercial reprints
+     * [299]Bookmark in Connotea
+     * [300]Abstract
+     * [301]Methods
+     * [302]References
+     * [303]Acknowledgements
+     * [304]Figures and tables
+
+ §2§ SEARCH PUBMED FOR §2§
+
+     * [305]Balaji Prakash
+     * [306]Gerrit J. K. Praefcke
+     * [307]Louis Renault
+     * [308]Alfred Wittinghofer
+     * [309]Christian Herrmann
+
+ §2§ [310]Open Innovation Challenges §2§
+
+     *  §3§ [311]Novel Therapeutic Concepts to Treat Cancer §3§
+          + Deadline: Oct 15 2010
+          + Reward: $10,000 USD
+       The Seeker is looking for novel, breakthrough, therapeutic concepts
+       in the field of oncology. This …
+     *  §3§ [312]Derivatives of Racemic 2-Hydroxy-4-(methylthio)butanoic
+       Acid and 2-Hydroxy-4-(methylthio)butanenitri §3§
+          + Deadline: Nov 15 2010
+          + Reward: $25,000 USD
+       This Challenge seeks commercial applications for chemical
+       derivatives of racemic 2-hydroxy-4-(methyl…
+
+     * [313]More Challenges
+     * Powered by:[314] InnoCentive
+
+ §2§ [315]nature jobs §2§
+
+     *  §3§ [316]Researcher (Marioni Group) §3§
+          + European Bioinformatics Institute (EBI)
+          + Cambridge United Kingdom
+     *  §3§ [317]Manager - SCI §3§
+          + Indegene Life Systems Pvt. Ltd
+          + Bangalore, Karnataka India
+
+   [318]More science jobs
+   [319]Post a job for free
+   ADVERTISEMENT
+   [320]Advertisement
+
+   [321]Top
+     * Nature
+     * ISSN: 0028-0836
+     * EISSN: 1476-4687
+
+     * [322]About NPG
+     * [323]Contact NPG
+     * [324]RSS web feeds
+     * [325]Help
+
+     * [326]Privacy policy
+     * [327]Legal notice
+     * [328]Accessibility statement
+     * [329]Terms
+
+     * [330]Nature News
+     * [331]Nature jobs
+     * [332]Nature Asia
+     * [333]Nature Education
+
+   Search: ____________________ go
+
+     * [334]© 2010 Nature Publishing Group, a division of Macmillan
+       Publishers Limited. All Rights Reserved.
+     * partner of [335]AGORA, HINARI, OARE, INASP, CrossRef and COUNTER
+
+References
+
+   1. http://www.nature.com/nature/
+   2. http://www.nature.com/info/copyright_statement.html
+   3. http://www.nature.com/help/
+   4. http://www.nature.com/nature/current_issue/rss/index.html
+   5. http://www.nature.com/opensearch/opensearch.xml
+   6. http://www.nature.com/opensearch/request
+   7. file://localhost/dev/paper.html#content
+   8. file://localhost/dev/paper.html#journalnav
+   9. http://www.nature.com/
+  10. http://www.nature.com/siteindex/
+  11. http://www.nature.com/browse/
+  12. http://www.nature.com/myaccount/
+  13. http://mts-nature.nature.com/cgi-bin/main.plex
+  14. http://www.nature.com/register/
+  15. https://secure.nature.com/subscribe/nature
+  16. http://ad.doubleclick.net/jump/nature.com/article;abr=!NN2;tile=1;type=lt;artid=403567a0;date=200002;issue=6769;chaco=;keywd=;njdis=;njreg=;crstg=;pos=top;mesh=Amino%20Acid%20Sequence;mesh=Animals;mesh=Crystallography,%20X-Ray;mesh=DNA-Binding%20Proteins;mesh=Dynamins;mesh=Escherichia%20coli;mesh=GTP%20Phosphohydrolases;mesh=GTP-Binding%20Proteins;mesh=Humans;mesh=Models,%20Molecular;mesh=Molecular%20Sequence%20Data;mesh=Protein%20Conformation;mesh=Recombinant%20Proteins;mesh=Sequence%20Homology,%20Amino%20Acid;sz=728x90;ptile=1;ord=123456789?
+  17. http://www.nature.com/nature/
+  18. http://www.nature.com/search/adv_search?sp-a=sp1001702d&sp-x-1=ujournal&sp-q-1=Nature
+  19. http://www.nature.com/nature/index.html
+  20. http://www.nature.com/nature/archive/
+  21. http://www.nature.com/nature/journal/v403/n6769/index.html#lt
+  22. file://localhost/dev/paper.html#a1
+  23. file://localhost/dev/paper.html#a1
+  24. mailto:alfred.wittinghofer|[commat]|mpi-dortmund.mpg.de
+  25. mailto:christian.herrmann|[commat]|mpi-dortmund.mpg.de
+  26. file://localhost/dev/paper.html#top
+  27. file://localhost/dev/paper.html#B1
+  28. file://localhost/dev/paper.html#B2
+  29. file://localhost/dev/paper.html#B3
+  30. file://localhost/dev/paper.html#B4
+  31. file://localhost/dev/paper.html#B5
+  32. file://localhost/dev/paper.html#B1
+  33. file://localhost/dev/paper.html#B2
+  34. file://localhost/dev/paper.html#B6
+  35. file://localhost/dev/paper.html#B7
+  36. file://localhost/dev/paper.html#B4
+  37. file://localhost/dev/paper.html#B3
+  38. file://localhost/dev/paper.html#B8
+  39. file://localhost/dev/paper.html#B3
+  40. file://localhost/dev/paper.html#f1
+  41. file://localhost/dev/paper.html#f1
+  42. file://localhost/dev/paper.html#t1
+  43. http://www.nature.com/nature/journal/v403/n6769/fig_tab/403567a0_F1.html
+  44. http://www.nature.com/nature/journal/v403/n6769/fig_tab/403567a0_F1.html
+  45. file://localhost/dev/paper.html#B29
+  46. file://localhost/dev/paper.html#B30
+  47. http://www.nature.com/nature/journal/v403/n6769/fig_tab/403567a0_F1.html
+  48. http://www.nature.com/nature/journal/v403/n6769/fig_tab/403567a0_T1.html
+  49. http://www.nature.com/nature/journal/v403/n6769/fig_tab/403567a0_T1.html
+  50. http://www.nature.com/nature/journal/v403/n6769/fig_tab/403567a0_T1.html
+  51. file://localhost/dev/paper.html#B2
+  52. file://localhost/dev/paper.html#B9
+  53. file://localhost/dev/paper.html#B8
+  54. file://localhost/dev/paper.html#f2
+  55. file://localhost/dev/paper.html#f1
+  56. file://localhost/dev/paper.html#f1
+  57. file://localhost/dev/paper.html#f1
+  58. file://localhost/dev/paper.html#f2
+  59. http://www.nature.com/nature/journal/v403/n6769/fig_tab/403567a0_F2.html
+  60. http://www.nature.com/nature/journal/v403/n6769/fig_tab/403567a0_F2.html
+  61. file://localhost/dev/paper.html#f1
+  62. http://www.nature.com/nature/journal/v403/n6769/fig_tab/403567a0_F2.html
+  63. file://localhost/dev/paper.html#B10
+  64. file://localhost/dev/paper.html#f2
+  65. file://localhost/dev/paper.html#B10
+  66. file://localhost/dev/paper.html#f2
+  67. file://localhost/dev/paper.html#f2
+  68. file://localhost/dev/paper.html#f2
+  69. file://localhost/dev/paper.html#B11
+  70. file://localhost/dev/paper.html#B8
+  71. file://localhost/dev/paper.html#B12
+  72. file://localhost/dev/paper.html#f2
+  73. file://localhost/dev/paper.html#B12
+  74. file://localhost/dev/paper.html#f1
+  75. file://localhost/dev/paper.html#f1
+  76. file://localhost/dev/paper.html#f1
+  77. file://localhost/dev/paper.html#f3
+  78. http://www.nature.com/nature/journal/v403/n6769/fig_tab/403567a0_F3.html
+  79. http://www.nature.com/nature/journal/v403/n6769/fig_tab/403567a0_F3.html
+  80. http://www.nature.com/nature/journal/v403/n6769/fig_tab/403567a0_F3.html
+  81. file://localhost/dev/paper.html#B5
+  82. file://localhost/dev/paper.html#B5
+  83. file://localhost/dev/paper.html#B7
+  84. file://localhost/dev/paper.html#f4
+  85. file://localhost/dev/paper.html#B13
+  86. http://www.nature.com/nature/journal/v403/n6769/fig_tab/403567a0_F4.html
+  87. http://www.nature.com/nature/journal/v403/n6769/fig_tab/403567a0_F4.html
+  88. http://www.nature.com/nature/journal/v403/n6769/fig_tab/403567a0_F4.html
+  89. file://localhost/dev/paper.html#f4
+  90. file://localhost/dev/paper.html#B8
+  91. file://localhost/dev/paper.html#B12
+  92. file://localhost/dev/paper.html#B13
+  93. file://localhost/dev/paper.html#B14
+  94. file://localhost/dev/paper.html#B15
+  95. file://localhost/dev/paper.html#B16
+  96. file://localhost/dev/paper.html#B17
+  97. file://localhost/dev/paper.html#B18
+  98. file://localhost/dev/paper.html#B19
+  99. file://localhost/dev/paper.html#B14
+ 100. file://localhost/dev/paper.html#B20
+ 101. file://localhost/dev/paper.html#B21
+ 102. file://localhost/dev/paper.html#top
+ 103. file://localhost/dev/paper.html#B8
+ 104. file://localhost/dev/paper.html#B8
+ 105. file://localhost/dev/paper.html#t1
+ 106. file://localhost/dev/paper.html#B20
+ 107. file://localhost/dev/paper.html#B22
+ 108. file://localhost/dev/paper.html#t1
+ 109. file://localhost/dev/paper.html#B23
+ 110. file://localhost/dev/paper.html#B25
+ 111. file://localhost/dev/paper.html#B26
+ 112. file://localhost/dev/paper.html#B27
+ 113. file://localhost/dev/paper.html#B28
+ 114. file://localhost/dev/paper.html#top
+ 115. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?holding=npg&cmd=Retrieve&db=PubMed&list_uids=6305951&dopt=Abstract
+ 116. http://links.isiglobalnet2.com/gateway/Gateway.cgi?&GWVersion=2&SrcAuth=Nature&SrcApp=Nature&DestLinkType=FullRecord&KeyUT=A1983QV92800080&DestApp=WOS_CPL
+ 117. http://chemport.cas.org/cgi-bin/sdcgi?APP=ftslink&action=reflink&origin=npg&version=1.0&coi=1:CAS:528:DyaL3sXktlKqt7g%3D&pissn=0028-0836&pyear=2000&md5=0dd016cb3619e69aec47bed68da6a8d5
+ 118. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?holding=npg&cmd=Retrieve&db=PubMed&list_uids=1715024&dopt=Abstract
+ 119. http://links.isiglobalnet2.com/gateway/Gateway.cgi?&GWVersion=2&SrcAuth=Nature&SrcApp=Nature&DestLinkType=FullRecord&KeyUT=A1991GC39600049&DestApp=WOS_CPL
+ 120. http://chemport.cas.org/cgi-bin/sdcgi?APP=ftslink&action=reflink&origin=npg&version=1.0&coi=1:CAS:528:DyaK38XltV2ksbo%3D&pissn=0028-0836&pyear=2000&md5=8b46c9c6906f03427618a8fdf7587475
+ 121. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?holding=npg&cmd=Retrieve&db=PubMed&list_uids=7512561&dopt=Abstract
+ 122. http://links.isiglobalnet2.com/gateway/Gateway.cgi?&GWVersion=2&SrcAuth=Nature&SrcApp=Nature&DestLinkType=FullRecord&KeyUT=A1994NF96600051&DestApp=WOS_CPL
+ 123. http://chemport.cas.org/cgi-bin/sdcgi?APP=ftslink&action=reflink&origin=npg&version=1.0&coi=1:CAS:528:DyaK2cXktVemtrY%3D&pissn=0028-0836&pyear=2000&md5=cc8f390deaf595c44d6c5c788fc6734e
+ 124. http://dx.doi.org/10.1006/viro.1999.9614
+ 125. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?holding=npg&cmd=Retrieve&db=PubMed&list_uids=10087221&dopt=Abstract
+ 126. http://links.isiglobalnet2.com/gateway/Gateway.cgi?&GWVersion=2&SrcAuth=Nature&SrcApp=Nature&DestLinkType=FullRecord&KeyUT=000079615800002&DestApp=WOS_CPL
+ 127. http://chemport.cas.org/cgi-bin/sdcgi?APP=ftslink&action=reflink&origin=npg&version=1.0&coi=1:CAS:528:DyaK1MXhvFWiu74%3D&pissn=0028-0836&pyear=2000&md5=ace059e1fbe1168b6d63c4d4a904eda9
+ 128. http://dx.doi.org/10.1016/S0962-8924(98)01490-1
+ 129. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?holding=npg&cmd=Retrieve&db=PubMed&list_uids=10201074&dopt=Abstract
+ 130. http://links.isiglobalnet2.com/gateway/Gateway.cgi?&GWVersion=2&SrcAuth=Nature&SrcApp=Nature&DestLinkType=FullRecord&KeyUT=000079416800004&DestApp=WOS_CPL
+ 131. http://chemport.cas.org/cgi-bin/sdcgi?APP=ftslink&action=reflink&origin=npg&version=1.0&coi=1:CAS:528:DyaK1MXhvVKqtbk%3D&pissn=0028-0836&pyear=2000&md5=8073a90deb088b1820393ae7ac0932b2
+ 132. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?holding=npg&cmd=Retrieve&db=PubMed&list_uids=9862701&dopt=Abstract
+ 133. http://links.isiglobalnet2.com/gateway/Gateway.cgi?&GWVersion=2&SrcAuth=Nature&SrcApp=Nature&DestLinkType=FullRecord&KeyUT=000077436400037&DestApp=WOS_CPL
+ 134. http://chemport.cas.org/cgi-bin/sdcgi?APP=ftslink&action=reflink&origin=npg&version=1.0&coi=1:CAS:528:DyaK1cXotFWqt74%3D&pissn=0028-0836&pyear=2000&md5=00e4540ee7d5bcb87b157b179e5e0ded
+ 135. http://dx.doi.org/10.1016/0962-8924(93)90055-6
+ 136. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?holding=npg&cmd=Retrieve&db=PubMed&list_uids=14731745&dopt=Abstract
+ 137. http://chemport.cas.org/cgi-bin/sdcgi?APP=ftslink&action=reflink&origin=npg&version=1.0&coi=1:CAS:528:DyaK3sXlslKgs7w%3D&pissn=0028-0836&pyear=2000&md5=fa3990875f79587a818715240857552f
+ 138. http://dx.doi.org/10.1006/jmbi.1999.3062
+ 139. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?holding=npg&cmd=Retrieve&db=PubMed&list_uids=10493878&dopt=Abstract
+ 140. http://links.isiglobalnet2.com/gateway/Gateway.cgi?&GWVersion=2&SrcAuth=Nature&SrcApp=Nature&DestLinkType=FullRecord&KeyUT=000082597400011&DestApp=WOS_CPL
+ 141. http://chemport.cas.org/cgi-bin/sdcgi?APP=ftslink&action=reflink&origin=npg&version=1.0&coi=1:CAS:528:DyaK1MXlvFyksLw%3D&pissn=0028-0836&pyear=2000&md5=5d7c6d1f715f5016f6b372172e5536f5
+ 142. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?holding=npg&cmd=Retrieve&db=PubMed&list_uids=8446899&dopt=Abstract
+ 143. http://links.isiglobalnet2.com/gateway/Gateway.cgi?&GWVersion=2&SrcAuth=Nature&SrcApp=Nature&DestLinkType=FullRecord&KeyUT=A1993KN88300027&DestApp=WOS_CPL
+ 144. http://chemport.cas.org/cgi-bin/sdcgi?APP=ftslink&action=reflink&origin=npg&version=1.0&coi=1:CAS:528:DyaK3sXhvVGqtrw%3D&pissn=0028-0836&pyear=2000&md5=bf912b55cf47c86ee578dc93761083da
+ 145. http://dx.doi.org/10.1016/0968-0004(90)90281-F
+ 146. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?holding=npg&cmd=Retrieve&db=PubMed&list_uids=2126155&dopt=Abstract
+ 147. http://links.isiglobalnet2.com/gateway/Gateway.cgi?&GWVersion=2&SrcAuth=Nature&SrcApp=Nature&DestLinkType=FullRecord&KeyUT=A1990EK82900010&DestApp=WOS_CPL
+ 148. http://www.nature.com/doifinder/10.1038/28548
+ 149. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?holding=npg&cmd=Retrieve&db=PubMed&list_uids=9690470&dopt=Abstract
+ 150. http://links.isiglobalnet2.com/gateway/Gateway.cgi?&GWVersion=2&SrcAuth=Nature&SrcApp=Nature&DestLinkType=FullRecord&KeyUT=000074968800041&DestApp=WOS_CPL
+ 151. http://chemport.cas.org/cgi-bin/sdcgi?APP=ftslink&action=reflink&origin=npg&version=1.0&coi=1:CAS:528:DyaK1cXkvFKnsLs%3D&pissn=0028-0836&pyear=2000&md5=7f661ab9a8effaa09e543bb100a6707c
+ 152. http://dx.doi.org/10.1016/S0968-0004(98)01224-9
+ 153. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?holding=npg&cmd=Retrieve&db=PubMed&list_uids=9697416&dopt=Abstract
+ 154. http://links.isiglobalnet2.com/gateway/Gateway.cgi?&GWVersion=2&SrcAuth=Nature&SrcApp=Nature&DestLinkType=FullRecord&KeyUT=000075160500011&DestApp=WOS_CPL
+ 155. http://chemport.cas.org/cgi-bin/sdcgi?APP=ftslink&action=reflink&origin=npg&version=1.0&coi=1:CAS:528:DyaK1cXkvFCltbs%3D&pissn=0028-0836&pyear=2000&md5=b072fa94b170fd0fac12604898090c8e
+ 156. http://dx.doi.org/10.1074/JBC.271.37.22310
+ 157. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?holding=npg&cmd=Retrieve&db=PubMed&list_uids=8798389&dopt=Abstract
+ 158. http://links.isiglobalnet2.com/gateway/Gateway.cgi?&GWVersion=2&SrcAuth=Nature&SrcApp=Nature&DestLinkType=FullRecord&KeyUT=A1996VG67200008&DestApp=WOS_CPL
+ 159. http://chemport.cas.org/cgi-bin/sdcgi?APP=ftslink&action=reflink&origin=npg&version=1.0&coi=1:CAS:528:DyaK28XlslaitL4%3D&pissn=0028-0836&pyear=2000&md5=5e8e38fefce813ea2714640bbe4453af
+ 160. http://www.nature.com/doifinder/10.1038/19024
+ 161. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?holding=npg&cmd=Retrieve&db=PubMed&list_uids=10206643&dopt=Abstract
+ 162. http://links.isiglobalnet2.com/gateway/Gateway.cgi?&GWVersion=2&SrcAuth=Nature&SrcApp=Nature&DestLinkType=FullRecord&KeyUT=000079662800039&DestApp=WOS_CPL
+ 163. http://chemport.cas.org/cgi-bin/sdcgi?APP=ftslink&action=reflink&origin=npg&version=1.0&coi=1:CAS:528:DyaK1MXisFGqs74%3D&pissn=0028-0836&pyear=2000&md5=1ac56dd2fbc7222e4210653eb8ce2abc
+ 164. http://dx.doi.org/10.1074/jbc.270.22.13512
+ 165. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?holding=npg&cmd=Retrieve&db=PubMed&list_uids=7539430&dopt=Abstract
+ 166. http://links.isiglobalnet2.com/gateway/Gateway.cgi?&GWVersion=2&SrcAuth=Nature&SrcApp=Nature&DestLinkType=FullRecord&KeyUT=A1995RB43900083&DestApp=WOS_CPL
+ 167. http://chemport.cas.org/cgi-bin/sdcgi?APP=ftslink&action=reflink&origin=npg&version=1.0&coi=1:CAS:528:DyaK2MXmtV2hsLo%3D&pissn=0028-0836&pyear=2000&md5=8b0292377f3a558e7c2fcf15396ce2d6
+ 168. http://dx.doi.org/10.1074/jbc.273.43.28365
+ 169. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?holding=npg&cmd=Retrieve&db=PubMed&list_uids=9774462&dopt=Abstract
+ 170. http://links.isiglobalnet2.com/gateway/Gateway.cgi?&GWVersion=2&SrcAuth=Nature&SrcApp=Nature&DestLinkType=FullRecord&KeyUT=000076549800082&DestApp=WOS_CPL
+ 171. http://chemport.cas.org/cgi-bin/sdcgi?APP=ftslink&action=reflink&origin=npg&version=1.0&coi=1:CAS:528:DyaK1cXntVClsLw%3D&pissn=0028-0836&pyear=2000&md5=83e1d950975b18ca9c3ba474b24cec33
+ 172. http://dx.doi.org/10.1074/jbc.274.21.14942
+ 173. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?holding=npg&cmd=Retrieve&db=PubMed&list_uids=10329695&dopt=Abstract
+ 174. http://links.isiglobalnet2.com/gateway/Gateway.cgi?&GWVersion=2&SrcAuth=Nature&SrcApp=Nature&DestLinkType=FullRecord&KeyUT=000081965200060&DestApp=WOS_CPL
+ 175. http://chemport.cas.org/cgi-bin/sdcgi?APP=ftslink&action=reflink&origin=npg&version=1.0&coi=1:CAS:528:DyaK1MXks1Kqsbg%3D&pissn=0028-0836&pyear=2000&md5=5b3daa371ba5a59500413b07b40518d8
+ 176. http://dx.doi.org/10.1074/jbc.274.15.10277
+ 177. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?holding=npg&cmd=Retrieve&db=PubMed&list_uids=10187814&dopt=Abstract
+ 178. http://links.isiglobalnet2.com/gateway/Gateway.cgi?&GWVersion=2&SrcAuth=Nature&SrcApp=Nature&DestLinkType=FullRecord&KeyUT=000079663500053&DestApp=WOS_CPL
+ 179. http://chemport.cas.org/cgi-bin/sdcgi?APP=ftslink&action=reflink&origin=npg&version=1.0&coi=1:CAS:528:DyaK1MXis1Gjtbw%3D&pissn=0028-0836&pyear=2000&md5=0ba863ff3566ed82a27835c7cd9de28b
+ 180. http://dx.doi.org/10.1074/jbc.274.7.4370
+ 181. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?holding=npg&cmd=Retrieve&db=PubMed&list_uids=9933640&dopt=Abstract
+ 182. http://links.isiglobalnet2.com/gateway/Gateway.cgi?&GWVersion=2&SrcAuth=Nature&SrcApp=Nature&DestLinkType=FullRecord&KeyUT=000078575500064&DestApp=WOS_CPL
+ 183. http://chemport.cas.org/cgi-bin/sdcgi?APP=ftslink&action=reflink&origin=npg&version=1.0&coi=1:CAS:528:DyaK1MXhslagsLo%3D&pissn=0028-0836&pyear=2000&md5=9a2d1f0fc6a3598f316fc59c4b750f28
+ 184. http://dx.doi.org/10.1107/S0907444996000832
+ 185. http://links.isiglobalnet2.com/gateway/Gateway.cgi?&GWVersion=2&SrcAuth=Nature&SrcApp=Nature&DestLinkType=FullRecord&KeyUT=A1996UZ68600016&DestApp=WOS_CPL
+ 186. http://dx.doi.org/10.1107/S0907444997005696
+ 187. http://links.isiglobalnet2.com/gateway/Gateway.cgi?&GWVersion=2&SrcAuth=Nature&SrcApp=Nature&DestLinkType=FullRecord&KeyUT=A1997XL06900012&DestApp=WOS_CPL
+ 188. http://dx.doi.org/10.1016/S0076-6879(97)77012-5
+ 189. http://links.isiglobalnet2.com/gateway/Gateway.cgi?&GWVersion=2&SrcAuth=Nature&SrcApp=Nature&DestLinkType=FullRecord&KeyUT=A1997BJ57S00010&DestApp=WOS_CPL
+ 190. http://chemport.cas.org/cgi-bin/sdcgi?APP=ftslink&action=reflink&origin=npg&version=1.0&coi=1:CAS:528:DyaK2sXntFamtr0%3D&pissn=0028-0836&pyear=2000&md5=f5bce44321969702238d92a5d4efce3d
+ 191. http://dx.doi.org/10.1107/S0108767398011465
+ 192. http://links.isiglobalnet2.com/gateway/Gateway.cgi?&GWVersion=2&SrcAuth=Nature&SrcApp=Nature&DestLinkType=FullRecord&KeyUT=000075952200023&DestApp=WOS_CPL
+ 193. http://dx.doi.org/10.1107/S0021889891004399
+ 194. http://links.isiglobalnet2.com/gateway/Gateway.cgi?&GWVersion=2&SrcAuth=Nature&SrcApp=Nature&DestLinkType=FullRecord&KeyUT=A1991GL62900080&DestApp=WOS_CPL
+ 195. http://dx.doi.org/10.1107/S0907444994006396
+ 196. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?holding=npg&cmd=Retrieve&db=PubMed&list_uids=15299354&dopt=Abstract
+ 197. http://dx.doi.org/10.1002/prot.340110407
+ 198. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?holding=npg&cmd=Retrieve&db=PubMed&list_uids=1758883&dopt=Abstract
+ 199. http://links.isiglobalnet2.com/gateway/Gateway.cgi?&GWVersion=2&SrcAuth=Nature&SrcApp=Nature&DestLinkType=FullRecord&KeyUT=A1991GV03200006&DestApp=WOS_CPL
+ 200. http://chemport.cas.org/cgi-bin/sdcgi?APP=ftslink&action=reflink&origin=npg&version=1.0&coi=1:CAS:528:DyaK38XhtVWgur4%3D&pissn=0028-0836&pyear=2000&md5=25bba3f4c9781b8e6e9b38b8a7dfdcfd
+ 201. http://dx.doi.org/10.1002/bip.360221211
+ 202. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?holding=npg&cmd=Retrieve&db=PubMed&list_uids=6667333&dopt=Abstract
+ 203. http://links.isiglobalnet2.com/gateway/Gateway.cgi?&GWVersion=2&SrcAuth=Nature&SrcApp=Nature&DestLinkType=FullRecord&KeyUT=A1983RV60400010&DestApp=WOS_CPL
+ 204. http://chemport.cas.org/cgi-bin/sdcgi?APP=ftslink&action=reflink&origin=npg&version=1.0&coi=1:CAS:528:DyaL2cXkslegtQ%3D%3D&pissn=0028-0836&pyear=2000&md5=ac8e930d0a9eb4a907b8d40d90b6f6e3
+ 205. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?holding=npg&cmd=Retrieve&db=PubMed&list_uids=2196171&dopt=Abstract
+ 206. http://links.isiglobalnet2.com/gateway/Gateway.cgi?&GWVersion=2&SrcAuth=Nature&SrcApp=Nature&DestLinkType=FullRecord&KeyUT=A1990DP59500001&DestApp=WOS_CPL
+ 207. http://chemport.cas.org/cgi-bin/sdcgi?APP=ftslink&action=reflink&origin=npg&version=1.0&coi=1:CAS:528:DyaK3cXltFWiu7k%3D&pissn=0028-0836&pyear=2000&md5=c69e8eb9dfd0d78df7fff85614780fad
+ 208. file://localhost/dev/paper.html#top
+ 209. file://localhost/dev/paper.html#top
+ 210. http://www.nature.com/nature/
+ 211. http://www.nature.com/nature/journal/vaop/ncurrent/index.html
+ 212. http://www.nature.com/authors/author_services/about_aop.html
+ 213. http://www.nature.com/nature/current_issue.html
+ 214. http://www.nature.com/news/
+ 215. http://www.nature.com/nature/archive/index.html
+ 216. http://www.nature.com/nature/supplements/
+ 217. http://www.nature.com/nature/supplements/insights/
+ 218. http://www.nature.com/nature/supplements/outlooks/
+ 219. http://www.nature.com/nature/supplements/collections/
+ 220. http://www.nature.com/nature/focus/
+ 221. http://www.nature.com/nature/focus/index_biologicalsciences.html
+ 222. http://www.nature.com/nature/focus/index_earthandenvironment.html
+ 223. http://www.nature.com/nature/focus/horizons/
+ 224. http://www.nature.com/nature/focus/index_physicalsciences.html
+ 225. http://www.nature.com/nature/focus/index_scienceandpolitics.html
+ 226. http://www.nature.com/nature/focus/index_scicult.html
+ 227. http://www.nature.com/nature/podcast/
+ 228. http://www.nature.com/nature/videoarchive/
+ 229. http://www.nature.com/news/specials/
+ 230. http://www.nature.com/nature/about/
+ 231. http://www.nature.com/nature/about/contact/
+ 232. http://www.nature.com/nature/about/editors/
+ 233. http://www.nature.com/nature/about/family/
+ 234. http://www.nature.com/nature/history/
+ 235. http://npg.nature.com/media/nature/index.html
+ 236. http://www.nature.com/libraries/
+ 237. http://www.nature.com/nature/authors/
+ 238. http://www.nature.com/nature/authors/gta/
+ 239. http://www.nature.com/nature/authors/policy/
+ 240. http://www.nature.com/nature/authors/referees/
+ 241. http://www.nature.com/nature/authors/submissions/
+ 242. http://www.nature.com/nature/awards/
+ 243. http://www.nature.com/nature/multimedia/googleearth
+ 244. http://www.nature.com/nature/history/index.html
+ 245. http://npg.nature.com/media/nature/index.html
+ 246. http://www.nature.com/npg_/work/index.html
+ 247. http://www.nature.com/reprints/
+ 248. http://www.nature.com/libraries/
+ 249. http://www.nature.com/authors/index.html
+ 250. http://www.nature.com/databases/index.html
+ 251. http://www.nature.com/reports/index.html
+ 252. http://network.nature.com/
+ 253. http://www.nature.com/blogs/index.html
+ 254. http://www.nature.com/natureconferences/
+ 255. http://www.nature.com/scitable/topics
+ 256. http://www.nature.com/chemistry/index.html
+ 257. http://www.nature.com/drugdisc/index.html
+ 258. http://www.nature.com/biotech/index.html
+ 259. http://www.nature.com/materials/index.html
+ 260. http://www.nature.com/protometh/index.html
+ 261. http://www.nature.com/cancer/index.html
+ 262. http://www.nature.com/cardio/index.html
+ 263. http://www.nature.com/dentistry/index.html
+ 264. http://www.nature.com/endocrinology/index.html
+ 265. http://www.nature.com/gastrohep/index.html
+ 266. http://www.nature.com/protometh/index.html
+ 267. http://www.nature.com/pathology/index.html
+ 268. http://www.nature.com/urology/index.html
+ 269. http://www.nature.com/earthsciences/index.html
+ 270. http://www.nature.com/evoeco/index.html
+ 271. http://www.nature.com/biotech/index.html
+ 272. http://www.nature.com/cancer/index.html
+ 273. http://www.nature.com/development/index.html
+ 274. http://www.nature.com/drugdisc/index.html
+ 275. http://www.nature.com/evoeco/index.html
+ 276. http://www.nature.com/genetics/index.html
+ 277. http://www.nature.com/immuno/index.html
+ 278. http://www.nature.com/medicalresearch/index.html
+ 279. http://www.nature.com/protometh/index.html
+ 280. http://www.nature.com/micro/index.html
+ 281. http://www.nature.com/molcellbio/index.html
+ 282. http://www.nature.com/neurosci/index.html
+ 283. http://www.nature.com/pharma/index.html
+ 284. http://www.nature.com/sysbio/index.html
+ 285. http://www.nature.com/physics/index.html
+ 286. http://www.nature.com/materials/index.html
+ 287. http://www.nature.com/siteindex/index.html
+ 288. https://secure.nature.com/store/svc/campaign?prod=NATURE&text=NA1001EF000
+ 289. http://www.nature.com/nature/journal/v403/n6769/full/403564a0.html
+ 290. http://www.nature.com/nature/journal/v403/n6769/full/403571a0.html
+ 291. http://www.nature.com/nature/journal/v403/n6769
+ 292. http://www.nature.com/nature/journal/v403/n6769/pdf/403567a0.pdf
+ 293. http://www.nature.com/nature/foxtrot/svc/mailform?doi=10.1038/35000617&file=/nature/journal/v403/n6769/full/403567a0.html
+ 294. http://www.scopus.com/inward/record.url?eid=2-s2.0-0034598734&partnerID=65
+ 295. http://www.nature.com/nature/journal/v403/n6769/ris/403567a0.ris
+ 296. http://www.nature.com/nature/journal/v403/n6769/ris/403567a0refs.ris
+ 297. https://s100.copyright.com/AppDispatchServlet?publisherName=NPG&publication=Nature&title=Structure%20of%20human%20guanylate-binding%20protein%201%20representing%20a%20unique%20class%20of%20GTP-binding%20proteins&author=Balaji%20Prakash,%20Gerrit%20J.%20K.%20Praefcke,%20Louis%20Renault,%20Alfred%20Wittinghofer%20and%20Christian%20Herrmann&contentID=10.1038/35000617&publicationDate=//&volumeNum=403&issueNum=6769&numPages=5&pageNumbers=pp567-571
+ 298. https://s100.copyright.com/AppDispatchServlet?publisherName=NPGR&publication=Nature&title=Structure%20of%20human%20guanylate-binding%20protein%201%20representing%20a%20unique%20class%20of%20GTP-binding%20proteins&author=Balaji%20Prakash,%20Gerrit%20J.%20K.%20Praefcke,%20Louis%20Renault,%20Alfred%20Wittinghofer%20and%20Christian%20Herrmann%20&contentID=10.1038/35000617&publicationDate=//&volumeNum=403&issueNum=6769&numPages=5&pageNumbers=pp567-571&orderBeanReset=true
+ 299. http://www.connotea.org/add?uri=http://www.nature.com/nature/journal/v403/n6769/full/403567a0.html
+ 300. file://localhost/dev/paper.html#abs
+ 301. file://localhost/dev/paper.html#Methods
+ 302. file://localhost/dev/paper.html#References
+ 303. file://localhost/dev/paper.html#acknowledgements
+ 304. http://www.nature.com/nature/journal/v403/n6769/fig_tab/403567a0_ft.html
+ 305. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=search&term=Prakash+B
+ 306. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=search&term=Praefcke+G
+ 307. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=search&term=Renault+L
+ 308. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=search&term=Wittinghofer+A
+ 309. http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=search&term=Herrmann+C
+ 310. http://www.nature.com/openinnovation?moreChallenges=true
+ 311. http://www.nature.com/openinnovation?challengeId=9701378
+ 312. http://www.nature.com/openinnovation?challengeId=9699787
+ 313. http://www.nature.com/openinnovation?moreChallenges=true
+ 314. http://www.innocentive.com/
+ 315. http://www.nature.com/naturejobs/
+ 316. http://www.nature.com/naturejobs/science/jobs/160994-Researcher-Marioni-Group
+ 317. http://www.nature.com/naturejobs/science/jobs/155943-Manager-SC
+ 318. http://www.nature.com/naturejobs/science/jobs
+ 319. http://www.nature.com/naturejobs/science/jobs/new
+ 320. http://ad.doubleclick.net/jump/nature.com/article;type=lt;artid=403567a0;pos=right;issue=6769;webfo=;prod=;natco=;natcl=;subco=;chaco=;keywd=;abr=!NN2;sz=160x600;ord=07893195?
+ 321. file://localhost/dev/paper.html#top
+ 322. http://www.nature.com/npg/
+ 323. http://www.nature.com/npg_/contact/
+ 324. http://www.nature.com/webfeeds/
+ 325. http://www.nature.com/help/
+ 326. http://www.nature.com/info/privacy.html
+ 327. http://www.nature.com/info/legal_notice.html
+ 328. http://www.nature.com/info/accessibility_statement.html
+ 329. http://www.nature.com/info/tandc.html
+ 330. http://www.nature.com/news/
+ 331. http://www.nature.com/naturejobs/
+ 332. http://www.natureasia.com/
+ 333. http://www.nature.com/scitable/
+ 334. http://www.nature.com/info/copyright_statement.html
+ 335. http://www.nature.com/info/partners.html
+
+resources journal navigation
+file://localhost/dev/stdin#resources-journal-nav
+
+services journal navigation
+file://localhost/dev/stdin#services-journal-nav
+
+supplementary journal navigation
+file://localhost/dev/stdin#supplementary-journal-nav
+
+main journal navigation
+file://localhost/dev/stdin#main-journal-nav

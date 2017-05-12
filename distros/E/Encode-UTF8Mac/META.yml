@@ -1,0 +1,47 @@
+---
+abstract: "\"utf-8-mac\" a variant utf-8 used by OSX filesystem"
+author:
+  - 'Naoki Tomita <tomita@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.11.0, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Encode-UTF8Mac
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Encode::UTF8Mac:
+    file: lib/Encode/UTF8Mac.pm
+    version: 0.04
+  Unicode::Normalize::Mac:
+    file: lib/Unicode/Normalize/Mac.pm
+    version: 0
+requires:
+  Encode: 0
+  Exporter: 0
+  Unicode::Normalize: 0
+  perl: 5.008001
+resources:
+  bugtracker: https://github.com/tomill/Encode-UTF8Mac/issues
+  homepage: https://github.com/tomill/Encode-UTF8Mac
+  repository: git://github.com/tomill/Encode-UTF8Mac.git
+version: 0.04
+x_contributors:
+  - 'nipotan <nipotan@nipotan.org>'

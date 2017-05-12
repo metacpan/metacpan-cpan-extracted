@@ -1,0 +1,28 @@
+<node node_id="33333" createtime="1999-01-13 01:02:03">
+	<type>user</type>
+	<title>Test user</title>
+	<author user_id="33333">Test user</author>
+	<doctext>This is my homenode. There are many like it but this one is mine.</doctext>
+	<useralias><e2link node_id="99999">test</e2link></useralias>
+	<experience>666</experience>
+	<lasttime>1999-01-13 01:02:03</lasttime>
+	<level value="1">1 (Novice)</level>
+	<writeups>9</writeups>
+	<image>/userincoming/test.jpg</image>
+	<lastnoded><e2link node_id="88888">last node</e2link></lastnoded>
+	<cools>3</cools>
+	<userstrings>
+		<mission>I have no mission</mission>
+		<specialties>I have no specialty</specialties>
+		<motto>I have no motto</motto>
+		<employment>I am not employed</employment>
+	</userstrings>
+	<groupmembership>
+		<e2link node_id="77777">gods</e2link>
+		<e2link node_id="66666">edev</e2link>
+	</groupmembership>
+	<bookmarks>
+		<e2link node_id="55555">Bookmark 1</e2link>
+		<e2link node_id="44444">Bookmark 2</e2link>
+	</bookmarks>
+</node>

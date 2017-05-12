@@ -1,0 +1,30 @@
+Changes for EPublisher::Target::Plugin::Mobi
+
+0.6   2013-07-31
+
+    - Move POD and version tests to xt
+
+0.5   2013-07-31
+
+    - Make Changefile valid
+
+0.4   2012-08-27
+
+    - Change method calls because of API change in EBook::MOBI v0.5
+
+0.3   2012-06-12
+
+    - Set correct encoding, due to Change of EBook::MOBI
+
+0.2   2012-02-23
+
+    - Renamed imgcover option to cover due to standard of other plugins
+    - Added some small info to the documentation
+
+0.1   2012-02-17
+
+    - Added README file
+
+0.01  2012-02-16
+
+    - Initial release to CPAN

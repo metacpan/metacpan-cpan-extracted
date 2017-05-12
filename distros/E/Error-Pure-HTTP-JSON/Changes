@@ -1,0 +1,33 @@
+0.05 2015-09-17T23:41:44+02:00
+ [Common]
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SEE ALSO section in doc.
+ - Move author tests to xt/ directory.
+ - Update Module::Install to 1.16 version.
+ - Update copyright years.
+
+0.04 2014-11-11T03:06:48+01:00
+ [Common]
+ - Add 'readme_from' directive to Makefile.PL.
+ - Update Module::Install to 1.14 version.
+
+ [Error::Pure::HTTP::JSON]
+ - Fix warning with chomp on undefined value. Fix to standard Error::Pure
+   style.
+ - Add basic tests.
+
+ [Error::Pure::HTTP::JSON::Advance]
+ - Fix warning with chomp on undefined value. Fix to standard Error::Pure
+   style.
+ - Add basic tests.
+
+0.03 2013-09-21
+ - Add dependency for perl (based on Error::Pure).
+ - Rewrite Changes file to CPAN::Changes::SPEC format.
+
+0.02 2013-08-31
+ - Add README.
+ - Fix dependencies.
+
+0.01 2013-08-30
+ - First version.

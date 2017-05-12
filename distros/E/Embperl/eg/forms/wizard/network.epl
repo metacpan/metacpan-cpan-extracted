@@ -1,0 +1,90 @@
+
+[!
+
+sub title   { $epreq -> gettext ('txt:setup_network_title') } 
+sub condition 
+	{ 
+    my ($self, $r) = @_ ;
+    $r -> {data}{action} eq 'master' || $r -> {data}{action} eq 'addslave'
+    }
+    
+
+!]
+
+[$ sub show $]
+[-
+$sthc   = 0;
+-]
+
+<br>
+[- $escmode = 0 -]
+<p class="cCenter">[= txt:setup_network1 =]</p>
+<p class="cCenter">[= txt:setup_network2 =]</p>
+<p class="cCenter">[= txt:setup_network3 =]</p>
+[$if !$sthc $]
+[$if 1 $]
+<p class="cCenter">[= txt:setup_network4inet =]</p>
+[$else$]
+<p class="cCenter">[= txt:setup_network4 =]</p>
+[$endif$]
+[$else$]
+<p class="cCenter">[= txt:setup_network5 =]</p>
+[$endif$]
+<p class="cCenter">[= txt:setup_network6 =]</p>
+[- $escmode = 7 -]
+<br>
+
+
+[-
+$i = 33 ;
+@values = () ;
+@options = map { $i-- ; push @values, $i ; "/$i ($_)" } (
+    '255.255.255.255',
+    '255.255.255.254',
+    '255.255.255.252',
+    '255.255.255.248',
+    '255.255.255.240',
+    '255.255.255.224',
+    '255.255.255.192',
+    '255.255.255.128',
+    '255.255.255.0',
+    '255.255.254.0',
+    '255.255.252.0',
+    '255.255.248.0',
+    '255.255.240.0',
+    '255.255.224.0',
+    '255.255.192.0',
+    '255.255.128.0',
+    '255.255.0.0',
+    '255.255.0.0',
+    '255.254.0.0',
+    '255.252.0.0',
+    '255.248.0.0',
+    '255.240.0.0',
+    '255.224.0.0',
+    '255.192.0.0',
+    '255.128.0.0',
+    '255.0.0.0',
+    ) ;
+
+Embperl::MyForm -> showfields (
+	[
+	{ name => 'ipaddr',      text => "IP Adresse des $epreq->{data}{-bbname}",        validate => [ required => 1, -type => 'IPAddr', ], },
+	{ name => 'netmask',   	 text => 'Netzmaske',                     validate => [ required => 1, -type => 'Integer', gt => 0, le => 32],
+                        type => 'select', values => \@values, options => \@options,  },
+	{ name => 'defaultgw', 	 text => 'IP Adresse des Default Gateways',validate => [ emptyok => 1,  -type => 'IPAddr', ], },
+	{ name => 'dnsserver', 	 text => 'IP Adresse des DNS-Servers',     validate => [ emptyok => 1,  -type => 'IPAddr', ],  width => 1},
+	($sthc?(
+	{ name => 'trusted-networks', text => 'Netzwerk für Remote-Administration', validate => [ emptyok => 1,  -type => 'IPAddr', ]},
+	{ name => 'trusted-netmask',   	 text => 'Netzmaske',                     validate => [ required => 1, -type => 'Integer', gt => 0, le => 32],
+                        type => 'select', values => \@values, options => \@options },
+	):(
+	{ name => 'localdomain', text => 'Lokale (interne) Domäne', },
+	
+        { name => 'domain', 	 nameprefix => 'internet+', text => 'Internet (externe) Domäne', },
+	)),
+        ]);
+-]
+
+
+[$endsub$]

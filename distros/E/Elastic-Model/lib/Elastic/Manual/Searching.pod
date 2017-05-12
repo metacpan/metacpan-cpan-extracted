@@ -1,0 +1,407 @@
+package Elastic::Manual::Searching;
+
+# ABSTRACT: Which search method to use with a View, and how to use the results.
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Elastic::Manual::Searching - Which search method to use with a View, and how to use the results.
+
+=head1 VERSION
+
+version 0.52
+
+=head1 DESCRIPTION
+
+Once you have configured your L<view|Elastic::Model::View> correctly, you need
+to call a L<method|Elastic::Model::View/METHODS> on it in order to produce
+search results.
+
+The three main methods are L<search()|Elastic::Model::View/search()>,
+L<scroll()|Elastic::Model::View/scroll()>, and
+L<scan()|Elastic::Model::View/scan()>.  All three methods return an iterator,
+but each method has a different purpose. The correct method should be chosen
+to match the situation.
+
+This document discusses how to use the returned iterator, and when to use
+which search method.
+
+=head1 RESULTS ITERATOR
+
+=head2 Iterator basics
+
+All three search methods return an iterator based on
+L<Elastic::Model::Role::Results> and L<Elastic::Model::Role::Iterator>,
+which works pretty much like any iterator, eg:
+
+    $it->first;         # first element
+    $it->next;          # next element
+    $it->prev;          # previous element
+    $it->last;          # last element
+    $it->current;       # current element
+    $it->shift;         # return first element and remove it from $it
+
+    $it->all;           # all elements
+    $it->slice(0,10);   # elements 0..9
+
+    $it->peek_next;     # return next element but don't move the cursor
+    $it->peek_prev;     # return next element but don't move the cursor
+
+    $it->has_next;      # 1 / 0
+    $it->has_prev;      # 1 / 0
+    $it->is_first;      # 1 / 0
+    $it->is_last;       # 1 / 0
+    $it->even;          # 1 / 0
+    $it->odd;           # 1 / 0
+    $it->parity;        # even / odd
+
+    $it->size;          # number of elements in $it
+    $it->total;         # total number of matching docs
+    $it->aggs;          # any aggregations that were requested
+
+=head2 What elements can the iterator return?
+
+What's different about these iterators is the C<elements> that they return.
+There are three options:
+
+=over
+
+=item *
+
+B<Result:> The raw result returned from Elasticsearch is wrapped in an
+L<Elastic::Model::Result> object, which provides methods for
+accessing the L<object|Elastic::Model::Result/object>
+itself, and metadata like L<highlights|Elastic::Model::Result/highlight>,
+L<script_fields|Elastic::Model::Result/script_fields> or the
+L<relevance score|Elastic::Model::Result/score> that the current doc has.
+
+=item *
+
+B<Object:> The object itself (or a stub-object which can auto-inflate) is
+returned. The other search metadata is not accessible.
+
+=item *
+
+B<Element:> The raw result returned by Elasticsearch.
+
+=back
+
+Depending on what you are doing, you may want either one of these three.
+For instance:
+
+=over
+
+=item *
+
+If you are doing a full text query (eg a user does a keyword
+search), you will want to return B<Results>.
+
+=item *
+
+If you're retrieving I<the 20 most recent blog posts>, you want just the B<Objects>.
+
+=item *
+
+If you're reindexing your data from one index to another, you want
+to avoid the inflation/deflation process and just use the raw data
+B<Element>.
+
+=back
+
+=head2 Choosing an element type
+
+From any L<results iterator|Elastic::Model::Role::Result>, you can return any
+of the three element types:
+
+    $it->next_result;       # Result object
+    $it->next_object;       # Object itself
+    $it->next_element;      # Raw data
+
+But that is verbose. By default, C<first()>, C<next()> etc all return Result
+objects, but you can change that:
+
+    $it = $view->search;
+
+    $it->next;              # Result object
+
+    $it->as_objects;
+    $it->next;              # Object itself
+
+    $it->as_elements;
+    $it->next;              # Raw data
+
+    $it->as_results;
+    $it->next;              # Result object
+
+So the typical usage if you want a list of objects back, would be:
+
+    my $results = $view->search->as_objects;
+
+    while ( my $object = $results->next ) {
+        do_something_with($object)
+    }
+
+=head1 WHICH SEARCH METHOD SHOULD I USE WHEN?
+
+=head2 Overview of differences
+
+In summary:
+
+=over
+
+=item *
+
+Use L<search()|Elastic::Model::View/search()> when you want to retrieve
+a finite list of results.  For instance: I<"Give me the 10 best results matching
+this query">.
+
+=item *
+
+Use L<scroll()|Elastic::Model::View/scroll()> when you want an unbound result
+set.  For instance: I<"Give me all the blog posts by user 123">.
+
+=item *
+
+Use L<scan()|Elastic::Model::View/scan()> when you want to retrieve a large
+amount of data, eg when you want to reindex all of your data.  Scanning
+is very efficient, but the B<results cannot be not sorted>.
+
+=back
+
+=head2 Why do I need to choose a method?
+
+When you create an index in Elasticsearch, it is created (by default) with
+5 primary shards. Each of your docs is stored in one of those shards. It is
+these primary shards that allow you to scale your index size. But with the
+flexible scaling comes complexity.
+
+=head3 The query process
+
+Let's consider what happens when you run a query like: I<"Give me the 10 most
+relevant docs that match C<"foo bar">">.
+
+=over
+
+=item *
+
+Your query is sent to one of your Elasticsearch nodes.
+
+=item *
+
+That node forwards your query to all 5 shards in the index.
+
+=item *
+
+Each shard runs the query and finds the 10 most relevant docs, and returns
+them to the requesting node.
+
+=item *
+
+The requesting node sorts these 50 docs by relevance, discards the 40 least
+relevant, and returns the 10 most relevant.
+
+=back
+
+So then, if you ask for page 10,000 (ie results 100,001 - 100,010), each
+shard has to return 100,010 docs, and the requesting node has to sort through
+and discard 500,040 of them!
+
+That approach doesn't scale. More than likely the requesting node will just
+run out of memory and be killed. There is a good reason why search engines
+don't return more than 100 pages of results.
+
+=head2 Why should I scroll? Why can't I just ask for page 2?
+
+More than likely, your data is being updated constantly. In between your
+requests for page 1 and page 2, your data may have changed order, or
+a doc might have been added or deleted.  So you could end up missing results or
+seeing duplicates.
+
+Scrolling gives you consistent results.  It is like paging, where it returns
+L<size|Elastic::Model::View/size> docs on each request, but Elasticsearch keeps
+the original data around until your scroll times out.
+
+Of course, this comes at a cost: extra disk space.  That means that you
+shouldn't make your scroll timeouts longer than they need to be.  The
+default is 1 minute, but you may be able to reduce that considerably depending
+on your use case.
+
+Of course, sometimes consistency won't matter - it may be perfectly reasonable to
+show duplicates in keyword searches, but less reasonable to have duplicate or
+missing items in a list.
+
+=head2 Why can't I just pull all the data in one request?
+
+Nobody has more than 10,000 blog posts, so why not just request all the posts
+in a single C<search()> and specify C<< size => 10_000 >>?
+
+The answer is: memory usage.
+
+Each node needs to return 10,000 docs. The node handling the request
+has to make space for 50,000 docs, then sort through them to find the top 10,000.
+That may be fine as a one-off request, but when you have thousands of those
+happening concurrently, you're going to run out of memory pretty quickly.
+
+=head2 But I need to retrieve all 10 billion docs!
+
+OK, now we're in a different league. You B<can> retrieve all the docs in your
+index, as long as you don't need them to be sorted: use L<scan()|Elastic::Model::View/scan()>.
+Scanning works as follows (we'll assume that L<size|Elastic::Model::View/size>
+is 10, but in practice you can probably make it a lot bigger):
+
+=over
+
+=item *
+
+Your query is sent to one of your Elasticsearch nodes.
+
+=item *
+
+That node forwards your query to all 5 shards in the index.
+
+=item *
+
+Each shard runs the query, finds all matching docs, and returns the first 10
+docs to the requesting node, B<IN ANY ORDER>.
+
+=item *
+
+The requesting node B<RETURNS ALL 50 DOCS IN ANY ORDER>.
+
+=item *
+
+It also returns a C<scroll_id> which:
+
+=over
+
+=item 1
+
+keeps track of what results have already been returned and
+
+=item 2
+
+keeps a consistent view of the index state at the time of the intial query.
+
+=back
+
+=item *
+
+With this C<scroll_id>, we can keep pulling another 50 docs (ie
+number_of_primary_shards * L<size|Elastic::Model::View/size>) until we have
+exhausted all the docs.
+
+=back
+
+=head2 But I really need sorting!
+
+Do you?  Do you really? Why?  No user needs to page through all 5 million
+of your matching results. Google only returns 1,000 results, for good reason.
+
+OK, OK, so there may be situations where need to retrieve large numbers of sorted
+results.  The trick here is to break them up into chunks. For instance, you
+could request all docs created in October, then November etc. How you do it
+really depends on your requirements.
+
+=head1 DIFFERENCES BETWEEN THE METHODS
+
+=head2 search()
+
+    $results = $view->search;
+
+L<search()|Elastic::Model::View/search()> retrieves the best matching
+results up to a maximum of L<size|Elastic::Model::View/size> and returns them
+all in an L<Elastic::Model::Results> object.
+
+The L<Elastic::Model::Results/size> attribute contains the number of results
+that are stored in the iterator. The L<Elastic::Model::Results/total>
+attribute contains the total number of matching docs in Elasticsearch.
+
+=head2 scroll()
+
+    $results = $view->scroll('1m');
+
+L<scroll()|Elastic::Model::View/scroll()> takes a C<timeout> parameter, which
+defaults to C<1m> (one minute).  It retrieves L<size|Elastic::Model::View/size>
+results and wraps them in an L<Elastic::Model::Results::Scrolled> object.
+
+As you iterate through the results, you will eventually request a C<next()> doc
+which isn't available in the buffer. The iterator will request the next tranche
+of results from Elasticsearch.  It is important to make sure that the
+C<timeout> is longer than the time between requests, otherwise it will throw an
+error and you will need to start scrolling again.
+
+The L<Elastic::Model::Results::Scrolled/size> attribute contains the number of
+docs in Elasticsearch that match the query and are available to pull (ie
+initially, it is the same as the L<Elastic::Model::Results::Scrolled/total>
+attribute).
+
+=head2 scan()
+
+    $results = $view->scan('1m');
+
+L<scan()|Elastic::Model::View/scan()> is pretty similar to L</scroll()>. It
+takes a C<timeout> parameter, which defaults to C<1m> (one minute).
+B< However, it retrieves a maximum of C<number_of_primary_shards> *
+L<size|Elastic::Model::View/size>
+results in a single request> and wraps them in
+an L<Elastic::Model::Results::Scrolled> object. So you may want to consider
+reducing the L<size|Elastic::Model::View/size> parameter when scanning.
+
+When scrolling, there is a good chance that you want to load all of the results
+into memory.  However, when scanning through billions of docs, you don't want
+to do that. Instead of using C<next()> you should use C<shift()>:
+
+    while ( my $result = $results->shift ) {
+        do_something_with($result)
+    }
+
+This means, obviously, that C<prev()> won't work - there is no previous doc.
+You've thrown it away.
+
+When using C<shift()>, while the L<Elastic::Model::Results::Scrolled/size>
+attribute starts out the same as the L<Elastic::Model::Results::Scrolled/total>
+attribute, it will decrement by one for each C<shift()> call.
+
+=head1 SEE ALSO
+
+=over
+
+=item *
+
+L<Elastic::Manual>
+
+=item *
+
+L<Elastic::Model::View>
+
+=item *
+
+L<Elastic::Model::Results>
+
+=item *
+
+L<Elastic::Model::Results::Scrolled>
+
+=item *
+
+L<Elastic::Model::Result>
+
+=back
+
+=head1 AUTHOR
+
+Clinton Gormley <drtech@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Clinton Gormley.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

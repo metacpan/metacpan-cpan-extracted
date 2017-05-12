@@ -1,0 +1,399 @@
+=pod
+
+=encoding UTF-8
+
+=head1 名前
+
+Enbld - 開発環境構築のための、もう一つのパッケージマネージャー
+
+=head1 概要
+
+=head2 インストール
+
+  $ curl -L http://goo.gl/MrbDDB | perl
+
+=head2 コンディション(条件)スクリプトの準備
+
+  $ cat conf_for_build.pl
+  #!/usr/bin/perl
+
+  use strict;
+  use warnings;
+
+  use lib "$ENV{HOME}/.enbld/extlib/lib/perl5/";
+
+  use Enbld;
+
+  enbld 'mydevenv' => build {
+
+      # 最新バージョンをインストール
+      target 'git' => define {
+          version 'latest';
+      };
+
+      # 指定バージョンをインストール
+      target 'perl' => define {
+          version '5.18.1';
+      };
+
+  };
+
+=head2 perlのスクリプトとして実行
+
+  $ chmod +x conf_for_build.pl
+  $ ./conf_for_build.pl 
+
+  -> スクリプトに定義された条件に従ってソフトウェアをインストールします。
+
+=head1 説明
+
+B<Enbldは、開発環境構築のための、もう一つのパッケージマネージャーです。>
+
+ソフトウェアインストールの条件(バージョン - 最新か指定のバージョン、テストは実行するか 等)をコンディション(条件)スクリプトに記述し、perlのスクリプトとして実行します。
+
+Enbldはスクリプトの定義された条件に従って、ソフトウェアをインストールします。
+
+=head2 特徴
+
+=over
+
+=item 1. インストール条件は、perlベースのDSLで定義
+
+一度コンディションスクリプトを書けば、同じ環境を簡単に再現できます。
+
+=item 2. 指定したバージョンのインストールが可能
+
+他のパッケージマネジメントシステム(Homebrew, MacPorts, APT, RPM, Yum など)と違い、Enbldはバージョンを固定しません。
+
+インストールするバージョンは自由に指定できます。
+
+また、バージョンを'latest'(最新)と指定することも可能です。この場合、自動的に最新バージョンを特定し、そのバージョンをインストールします。
+
+=item 3. 新しいバージョンのリリースをチェック可能
+
+バージョンを'latest'(最新)と指定したソフトウェアは、より新しいバージョンがリリースされたか、チェックできます。
+
+これにより、頻繁にアップデートされるソフトウェア(vim, git など)でも、常に最新バージョンを使うことができます。
+
+=item 4. 全てのソフトウェアは、ホームディレクトリにインストール
+
+インストールにsudoコマンドは必要ありません。
+
+バックアップや削除は、簡単にできます。
+
+=item 5. 全てのプログラミング言語に同一のインストールインタフェースを提供
+
+他のプログラミング言語のバージョンマネージャーと違い、全てのプログラミング言語に同一のインストールインタフェースを提供します。
+
+プログラミング言語ごとに異なる方法を習得する必要は有りません。
+
+=back
+
+=head2 やらないこと
+
+=over
+
+=item 1. Enbldは完全なパッケージマネージャーは目指しません
+
+Enbldがサポートするソフトウェアの基準は以下の通りです。
+
+=over
+
+=item * 頻繁にアップデートされる開発作業用のソフトウェア
+
+例: vim, git
+
+=item * プロジェクトによって特定のバージョンが指定されるソフトウェア
+
+例:
+
+プログラミング言語(perl, ruby, nodejs, scala 等)
+
+ウェブサーバ (apache, nginx 等)
+
+データベース (MySQL 等)
+
+=item * 開発には必要だけど、OS Xではインストールされていないソフトウェア
+
+例: tmux
+
+=back
+
+上記の基準に該当しないソフトウェアはサポートしません。
+
+=item 2. Enbldは、プログラミング言語が提供するモジュールインストール機能と重複する機能は提供しません。
+
+モジュールのインストールには、CPANや、Rubygemなど、プログラミング言語が提供する機能を使って下さい。
+
+=back
+
+=head1 注意事項
+
+B<Enbldは、全てのバージョンのビルドを保証するわけではありません。>
+
+ビルドが失敗した時にはログファイルが表示されますので、どうか解析してレポートを送って下さい :)
+
+=head1 インストール方法
+
+=head2 サポートするプラットフォーム
+
+B<Enbldは、OS X Mavericksで動作検証を行っています。>
+
+ひょっとすると、Linux (Debian, Ubuntu など)でも動作するかもしれません。動かない時は、レポートをお待ちしております :)
+
+=head2 動作環境
+
+=over
+
+=item * perl 5.10.1以上
+
+注:Enbldは必ずsystem perl (C</usr/bin/perl>)を使います。
+
+=item * GNU Make
+
+=item * コンパイラ (gccか、clang)
+
+=item * その他、ターゲットのソフトウェアごとに必要なもの(例:scalaにはJREが必要)
+
+=back
+
+=head2 インストール
+
+ $ curl -L http://goo.gl/MrbDDB | perl
+
+Enbldは全てのコンポーネントをC<「$HOME/.enbld」>ディレクトリにインストールします。そのため、EnbldがインストールしたソフトウェアのためにPATHを設定する必要があります。
+
+=head2 PATHの設定
+
+C<.bashrc>か、C<.bash_profile>に下記の設定を追加して下さい。
+
+ export PATH=$HOME/.enbld/bin:$HOME/.enbld/extlib/bin:$PATH
+ export MANPATH=$HOME/.enbld/share/man:$HOME/.enbld/man:$MANPATH
+
+=head1 Enbldを始める
+
+=head2 最新バージョンのインストール
+
+=head3 コンディションスクリプトの準備
+
+ $ cat samples/git_install.pl
+ #!/usr/bin/perl
+
+ use strict;
+ use warnings;
+
+ use lib "$ENV{HOME}/.enbld/extlib/lib/perl5/";
+
+ use Enbld;
+
+ enbld 'mydevenv' => build {
+
+     target 'git' => define {
+         version 'latest';
+     };
+ }
+
+=head3 perlスクリプトとして実行
+
+ $ ./samples/git_install.pl
+
+=head3 インストール完了
+
+ $ git --version
+ git version [latest version]
+
+=head3 アップグレード
+
+その後、より新しいバージョンがリリースされたら、もう一度スクリプトを実行して下さい。
+
+ $ ./samples/git_install.pl
+
+最新バージョンがインストールされます。
+
+=head2 指定バージョンのインストール
+
+バージョンの指定は、コンディションスクリプトの中で行います。 -> version '5.18.1';
+
+ $ cat samples/specific_version_install.pl
+ #!/usr/bin/perl
+    
+ use strict;
+ use warnings;
+    
+ use lib "$ENV{HOME}/.enbld/extlib/lib/perl5/";
+    
+ use Enbld;
+    
+ enbld 'mydevenv' => build {
+    
+     target 'perl' => define {
+         version '5.18.1';
+     };
+    
+ };
+
+'perl 5.18.1'がインストールされました。
+
+ $ perl -v
+
+ This is perl 5, version 18, subversion 1 (v5.18.1) built for ...
+
+=head2 引数の追加
+
+'arguments'関数は、'configure'スクリプトに引数を追加します。
+
+ target 'perl' => define {
+     version '5.18.1';
+     arguments '-Dusethreads';
+ };
+
+perl 5.18.1は、スレッド付きでビルドされました。
+
+ $ perl -v
+    
+ This is perl 5, version 18, subversion 1 (v5.18.1) built for darwin-thread-multi-2level
+
+=head2 依存するソフトウェアのインストール
+
+OS XでEnbldを使う場合、ソフトウェア間の依存関係も自動的に解決します。
+
+例えば、wgetにはlibidnライブラリが必要ですが、Enbldはwgetをインストールする際、自動的にlibidnもインストールします。
+
+  $ enblder install wget
+  =====> Start building target 'wget'.
+  =====> Found dependencies.
+  --> Dependency 'libidn'.
+  --> libidn is not installed yet.
+  =====> Start building target 'libidn'.
+
+OS X以外の、Linuxや、BSDといったOSでは依存関係の解決パターンが多いので、必要なソフトウェアは、OSのパッケージ管理マネージャーを使って解決して下さい。
+
+=head2 ユーティリティコマンド'enblder'
+
+'enblder'は、Enbldの使い勝手を良くするためのユーティリティコマンドです。
+
+主なコマンドを以下に示します。
+
+全てのコマンドの解説は、C<perldoc enblder>で表示されます。
+
+=head3 入手可能なソフトウェアの表示
+
+サブコマンド'available'は、Enbldがインストールできるソフトウェアの一覧を表示します。
+
+ $ enblder available
+
+コンディションスクリプトに指定するソフトウェアの名称は、この一覧に表示される名称を使います。
+
+=head3 ソフトウェアのインストール
+
+サブコマンド'install'は、指定したソフトウェアの最新バージョンをインストールします。
+
+ $ enblder install git
+
+コンディションスクリプトを書かずに、ソフトウェアをインストールしたい時に使います。その後で'freeze'サブコマンドを使うと、そのインストールを反映したコンディションスクリプトを表示することができます。
+
+=head3 インストール済みのソフトウェアの表示
+
+サブコマンド'list'は、インストール済みのソフトウェアの一覧と、バージョンを表示します。
+
+ $ enblder list
+
+=head3 コンディションスクリプトの表示
+
+サブコマンド'freeze'は、インストール済みのソフトウェアを再現するコンディションスクリプトを表示します。
+
+ $ enblder freeze
+
+表示された内容をテキストファイルにリダイレクトすれば、そのまま実行可能なperlのスクリプトになります。
+
+ $ enblder freeze > conditions.pl
+ $ chmod +x conditions.pl
+ $ ./conditions.pl
+
+=head3 旧バージョンのソフトウェアの表示
+
+サブコマンド'outdated'は、旧バージョンのソフトウェアの一覧を表示します。
+
+ $ enblder outdated
+
+=head3 旧バージョンのソフトウェアをアップデート
+
+サブコマンド'upgrade'は、旧バージョンになったソフトウェアをアップデートします。
+
+ $ enblder upgrade git
+
+=head1 Enbldのお勧めの使い方
+
+最後に、Enbldのお勧めの使い方を紹介します。
+
+=over
+
+=item 1 Enbldをインストールする。
+
+  $ curl -L http://goo.gl/MrbDDB | perl
+
+=item 2 利用可能なソフトウェアの一覧を表示する。
+
+  $ enblder available
+
+=item 3 常に最新バージョンを使いたいソフトウェアをインストールする。
+
+  $ enblder install git
+
+=item 4 コンディションスクリプトを作成する。
+
+  $ enblder freeze > my_conditions.pl
+  $ chmod +x my_conditions.pl
+
+=item 5 指定したバージョンを使いたいソフトウェアを加える。
+
+  target 'perl' => define {
+      version '5.18.1';
+  }
+
+=item 6 コンディションスクリプトを実行する。
+
+  $ ./conditions.pl
+
+=item 7 時々、より新しいバージョンのリリースをチェックする。
+
+  $ enblder outdated
+
+=item 8 古くなったソフトウェアをアップグレードする。
+
+  $ enblder upgrade git
+
+=item 9 きっとどこかでトラブルに遭遇するので、レポートか、パッチを送る :)
+
+L<https://github.com/magnolia-k/Enbld/issues>
+
+=item 10 7から10を繰り返す
+
+=back
+
+=head1 更なる情報
+
+L<Enbld::Tutorial>
+
+L<enblder>
+
+=head1 ウェブサイト
+
+L<https://github.com/magnolia-k/Enbld>
+
+L<http://code-stylistics.net/enbld>
+
+=head1 問題のレポート
+
+L<https://github.com/magnolia-k/Enbld/issues>
+
+=head1 コピーライト
+
+copyright 2013- Magnolia C<< <magnolia.k@me.com> >>.
+
+=head1 LICENSE
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,235 @@
+<html>
+<head>
+<title>Some tests for Embperl escaping</title>
+</head>
+
+<body>
+
+Here it starts with some HTML Text<P>
+
+First of all assign a value:
+<BR>
+
+Now we have some 'Umlaute':
+
+
+Now lets look what we are getting from this:<BR>
+(this is the value in $a) (this is the value in $a) &auml;&ouml;&uuml;&auml;&ouml;&uuml;???&lt;&amp;+  <BR>
+
+What is the EscMode? 7
+Let's set the EscMode to 3
+What is the EscMode now? 3
+Now a Url: <a href="http://localhost/tests?id=abcdefghijklmnopqrstuvwxyz&text=This%20is%20a%20text%20%3F%20%26%20%2B%20-%20%2521">Here it goes</A>
+A Tag 2:   <a href="http://localhost/tests?id=abcdefghijklmnopqrstuvwxyz&text=This%20is%20a%20text%20%3F%20%26%20%2B%20-%20%2521"  TARGET="http://localhost/tests?id=abcdefghijklmnopqrstuvwxyz&text=This is a text ? &amp; + - %21">a2</A>
+A Tag 3:   <a TARGET="http://localhost/tests?id=abcdefghijklmnopqrstuvwxyz&text=This is a text ? &amp; + - %21" href="http://localhost/tests?id=abcdefghijklmnopqrstuvwxyz&text=This%20is%20a%20text%20%3F%20%26%20%2B%20-%20%2521"  TARGET="http://localhost/tests?id=abcdefghijklmnopqrstuvwxyz&text=This is a text ? &amp; + - %21">a3</A>
+A Tag 4:   <a TARGET="http://localhost/tests?id=abcdefghijklmnopqrstuvwxyz&text=This is a text ? &amp; + - %21" href="http://localhost/tests?id=abcdefghijklmnopqrstuvwxyz&text=This%20is%20a%20text%20%3F%20%26%20%2B%20-%20%2521">a4</A>
+A Tag 5:   <a TARGET="http://localhost/tests?id=abcdefghijklmnopqrstuvwxyz&text=This is a text ? &amp; + - %21">a5</A>
+A Tag 6:   <a>a6</A>
+A Tag 7:   <a href="7">x</A>
+A Tag 8:   <a TARGET=8  href="8">x</A>
+A Tag 9:   <a href="9"  TARGET="9">x</A>
+A Tag 10:  <a TARGET="10" href="10"  TARGET="10">x</A>
+A Tag 11:  <a href="11">x</A>
+A Tag 12:  <a href="12">x</A>
+A Tag 12b: <a href="12b">x</A>
+A Tag 13:  <a href="abcd%20%3E">x</A>
+A Tag 14:  <a href="abcd%20%3E">x</A>
+FRAME:	   <frame src="http://localhost/tests?id=abcdefghijklmnopqrstuvwxyz&text=This%20is%20a%20text%20%3F%20%26%20%2B%20-%20%2521"   name="%20foo">
+IFRAME:    <iframe src="http://localhost/tests?id=abcdefghijklmnopqrstuvwxyz&text=This%20is%20a%20text%20%3F%20%26%20%2B%20-%20%2521"  name="%20foo">
+EMBED:     <embed src="http://localhost/tests?id=abcdefghijklmnopqrstuvwxyz&text=This%20is%20a%20text%20%3F%20%26%20%2B%20-%20%2521"   name="%20foo">
+LAYER:	   <layer src="http://localhost/tests?id=abcdefghijklmnopqrstuvwxyz&text=This%20is%20a%20text%20%3F%20%26%20%2B%20-%20%2521"   name="%20foo">
+IMG:	   <img src="http://localhost/tests?id=abcdefghijklmnopqrstuvwxyz&text=This%20is%20a%20text%20%3F%20%26%20%2B%20-%20%2521"     name="%20foo">
+FORM:	   <form action="http://localhost/tests?id=abcdefghijklmnopqrstuvwxyz&text=This%20is%20a%20text%20%3F%20%26%20%2B%20-%20%2521"     name="%20foo">
+
+^Hash in  A <a href=\"http:\/\/localhost\/tests\?(A=1\&amp;B=2|B=2\&amp;A=1)\">
+^Array in A <a href=\"http:\/\/localhost\/tests\?(X=9|Y=8|Z=7)\&amp;(X=9|Y=8|Z=7)\&amp;(X=9|Y=8|Z=7)\">
+
+^Hash in  H <a href=\"http:\/\/localhost\/tests\?(A=1\&amp;B=2|B=2\&amp;A=1)\">
+^Array in H <a href=\"http\:\/\/localhost\/tests\?(X=9|Y=8|Z=7)\&amp;(X=9|Y=8|Z=7)\&amp;(X=9|Y=8|Z=7)\">
+
+
+^<a href=\"tst.html\?(par1=1|par2=2)&amp;(par1=1|par2=2)\">1<\/a>
+^<a href=\"tst.html\?(par1=1&amp;par2=2&amp;par3=3|par2=2&amp;par1=1&amp;par3=3|par2=2&amp;par3=3&amp;par1=1|par1=1&amp;par3=3&amp;par2=2|par3=3&amp;par2=2&amp;par1=1|par3=3&amp;par1=1&amp;par2=2)\">2<\/a>
+^<a href=\"tst.html\?(par1=1&amp;par2=2|par2=2&amp;par1=1)\">3</a>
+^<a href=\"tst.html\?(par1=1&amp;par2=2&amp;par3=3|par2=2&amp;par1=1&amp;par3=3|par2=2&amp;par3=3&amp;par1=1|par1=1&amp;par3=3&amp;par2=2|par3=3&amp;par2=2&amp;par1=1|par3=3&amp;par1=1&amp;par2=2)\">4</a>
+
+
+		
+1
+Now lets look what we are getting from this:<BR>
+(this is the value in $a) (this is the value in $a) &auml;&ouml;&uuml;&auml;&ouml;&uuml;???&lt;&amp;+  <BR>
+
+What is the EscMode? 1
+Now a Url: <a href="http://localhost/tests?id=abcdefghijklmnopqrstuvwxyz&text=This is a text ? &amp; + - %21">Here it goes</A>
+
+2
+Now lets look what we are getting from this:<BR>
+(this%20is%20the%20value%20in%20%24a) (this%20is%20the%20value%20in%20%24a)%20%E4%F6%FC%E4%F6%FC%3F%3F%3F%3C%26%2B%20%20<BR>
+
+What is the EscMode? 2
+Now a Url: <a href="http://localhost/tests?id=abcdefghijklmnopqrstuvwxyz&text=This%20is%20a%20text%20%3F%20%26%20%2B%20-%20%2521">Here it goes</A>
+
+0
+Now lets look what we are getting from this:<BR>
+(this is the value in $a) (this is the value in $a) הצüהצü???<&+  <BR>
+
+What is the EscMode? 0
+Now a Url: <a href="http://localhost/tests?id=abcdefghijklmnopqrstuvwxyz&text=This is a text ? & + - %21">Here it goes</A>
+
+3
+Now lets look what we are getting from this:<BR>
+(this is the value in $a) (this is the value in $a) &auml;&ouml;&uuml;&auml;&ouml;&uuml;???&lt;&amp;+  <BR>
+
+What is the EscMode? 3
+Now a Url: <a href="http://localhost/tests?id=abcdefghijklmnopqrstuvwxyz&text=This%20is%20a%20text%20%3F%20%26%20%2B%20-%20%2521">Here it goes</A>
+
+What is the EscMode? 3
+15
+Now lets look what we are getting from this:<BR>
+(this is the value in $a) (this is the value in $a) הצüהצü???&lt;&amp;+   &apos;&quot;&lt;&gt;<BR>
+
+What is the EscMode? 15
+Now a Url: <a href="http://localhost/tests?id=abcdefghijklmnopqrstuvwxyz&text=This%20is%20a%20text%20%3F%20%26%20%2B%20-%20%2521 %27%22%3C%3E">Here it goes</A>
+
+What is the EscMode? 15
+file.html?name=abcd&amp;data=xyz
+Now we localy set $escmode:<BR>
+(this is the value in $a) הצüהצü???<&+    \<a><BR>
+(this is the value in $a) &auml;&ouml;&uuml;&auml;&ouml;&uuml;???&lt;&amp;+    <a&gt;<BR>
+(this%20is%20the%20value%20in%20%24a)%20%E4%F6%FC%E4%F6%FC%3F%3F%3F%3C%26%2B%20%20%20%20<a%3E<BR>
+(this is the value in $a) &auml;&ouml;&uuml;&auml;&ouml;&uuml;???&lt;&amp;+    <a&gt;<BR>
+(this is the value in $a) הצüהצü???<&+    \<a><BR>
+(this is the value in $a) &auml;&ouml;&uuml;&auml;&ouml;&uuml;???&lt;&amp;+    \&lt;a&gt;<BR>
+(this%20is%20the%20value%20in%20%24a)%20%E4%F6%FC%E4%F6%FC%3F%3F%3F%3C%26%2B%20%20%20%20%5C%3Ca%3E<BR>
+(this is the value in $a) &auml;&ouml;&uuml;&auml;&ouml;&uuml;???&lt;&amp;+    \&lt;a&gt;<BR>
+
+Same without local:
+(this is the value in $a) הצüהצü???<&+    \<a><BR>
+(this is the value in $a) &auml;&ouml;&uuml;&auml;&ouml;&uuml;???&lt;&amp;+    <a&gt;<BR>
+(this%20is%20the%20value%20in%20%24a)%20%E4%F6%FC%E4%F6%FC%3F%3F%3F%3C%26%2B%20%20%20%20<a%3E<BR>
+(this is the value in $a) &auml;&ouml;&uuml;&auml;&ouml;&uuml;???&lt;&amp;+    <a&gt;<BR>
+(this is the value in $a) הצüהצü???<&+    \<a><BR>
+(this is the value in $a) &auml;&ouml;&uuml;&auml;&ouml;&uuml;???&lt;&amp;+    \&lt;a&gt;<BR>
+(this%20is%20the%20value%20in%20%24a)%20%E4%F6%FC%E4%F6%FC%3F%3F%3F%3C%26%2B%20%20%20%20%5C%3Ca%3E<BR>
+(this is the value in $a) &auml;&ouml;&uuml;&auml;&ouml;&uuml;???&lt;&amp;+    \&lt;a&gt;<BR>
+
+
+Control Chars 0x80-0x9f:
+&#128;&#129;&#130;&#131;&#132;&#133;&#134;&#135;&#136;&#137;&#138;&#139;&#140;&#141;&#142;&#143;&#144;&#145;&#146;&#147;&#148;&#149;&#150;&#151;&#152;&#153;&#154;&#155;&#156;&#157;&#158;&#159;&nbsp;<BR>
+
+Control Chars 129 & 130:
+&amp;#129;&amp;#130;<BR>
+
+0
+<a href='http://host/script?name=My%20Name%20%F6%E4%FC'>
+
+<a href='http://host/script?name=My%20Name%20%F6%E4%FC'>
+
+0
+<a href='http://host/script?name=My%20Name%20%F6%E4%FC'>
+
+<a href='http://host/script?name=My Name צהü'>
+
+<br>
+
+
+We can avoid interpreting [- foo -] with a double [[ <br>
+
+This should also work for [* foo *]  <br>
+
+
+<a href="abcd%20>">x</A>
+
+<table>
+<tr>
+ <TD><a href="1">Link</a></TD>
+</tr>
+
+<tr>
+ <TD><a href="2">Link</a></TD>
+</tr>
+
+<tr>
+ <TD><a href="3">Link</a></TD>
+</tr>
+</table>
+
+<table>
+<tr>
+ <TD><a href="1">Link</a></TD>
+</tr>
+
+<tr>
+ <TD><a href="2">Link</a></TD>
+</tr>
+
+<tr>
+ <TD><a href="3">Link</a></TD>
+</tr>
+</table>
+
+Escape method:
+
+0: (this is the value in $a) הצüהצü???<&+  
+1: (this is the value in $a) &auml;&ouml;&uuml;&auml;&ouml;&uuml;???&lt;&amp;+  
+2: (this%20is%20the%20value%20in%20%24a)%20%E4%F6%FC%E4%F6%FC%3F%3F%3F%3C%26%2B%20%20
+3: (this is the value in $a) &auml;&ouml;&uuml;&auml;&ouml;&uuml;???&lt;&amp;+  
+4: (this is the value in $a) הצüהצü???<&+  
+5: (this is the value in $a) &auml;&ouml;&uuml;&auml;&ouml;&uuml;???&lt;&amp;+  
+6: (this%20is%20the%20value%20in%20%24a)%20%E4%F6%FC%E4%F6%FC%3F%3F%3F%3C%26%2B%20%20
+7: (this is the value in $a) &auml;&ouml;&uuml;&auml;&ouml;&uuml;???&lt;&amp;+  
+print OUT:
+
+7: &eacute;ric
+0: יric
+7: &eacute;ric
+0: יric
+7: &eacute;ric
+0: יric
+7: &eacute;ric
+0: יric
+^<a href=\"0\?(\!Table=interface\,router|\$where=interface\.router_id=router\.id)\&amp;(\!Table=interface\,router|\$where=interface\.router_id=router\.id)\">
+
+^<a href=\"7\?(\!Table=interface%2Crouter|%24where=interface\.router_id%3Drouter\.id)\&amp;(\!Table=interface%2Crouter|%24where=interface\.router_id%3Drouter\.id)\">
+
+escmode = 7
+<input name="esc" value="environment of the &lt;font color=&quot;red&quot;&gt;Sample Company&lt;/font&gt;&lt;&gt;&amp;">
+<input name="null" value="0">
+
+  
+
+--> my
+
+ &lt;b&gt;hello
+&lt;b&gt;hello
+<br><br>reset<br>
+    &lt;b&gt;helloin++
+ &lt;b&gt;hello
+&lt;b&gt;hello
+<br><br>reset<br>
+    &lt;b&gt;hello
+&lt;b&gt;hello
+--> local
+
+ <b>hello
+<b>hello
+<br><br>reset<br>
+    &lt;b&gt;helloin++
+ <b>hello
+<b>hello
+<br><br>reset<br>
+    <b>hello
+<b>hello
+<a href="&amp;">html escaped</a>
+<a href="&amp;">html escaped?</a>
+<a href="%26">url escaped</a>
+
+<textarea name="foobar"  rows="5" cols="80" wrap="off">Don't go there!</textarea>
+This does not work:
+
+<textarea name="foobar"  rows="5" cols="80" wrap="off">Don't go there!</textarea>
+<P>Ok.<P>
+
+
+</body>
+</html>

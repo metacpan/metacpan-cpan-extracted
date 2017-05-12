@@ -1,0 +1,45 @@
+{
+   "abstract" : "Suite of Perl modules to interact with Docker  ",
+   "author" : [
+      "Francisco Maseda <frmadem@gmail.com>",
+      "Javier Gomez <alambike@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.94, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Eixo-Docker",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Eixo::Base" : "1.200",
+            "Eixo::Rest" : "1.020",
+            "JSON" : "2.5",
+            "Net::HTTP" : "6.06"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.210"
+}

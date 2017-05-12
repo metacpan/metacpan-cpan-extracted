@@ -1,0 +1,41 @@
+{
+   "abstract" : "Encode a Unicode string in Perl and decode it in Java",
+   "author" : [
+      "philiprbrenan@gmail.com"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.422",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Encode-Unicode-PerlDecodeJava",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Encode::Unicode::PerlDecodeJava" : {
+         "file" : "lib/Encode/Unicode/PerlDecodeJava.pm",
+         "version" : "2017.302"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "2017.302"
+}

@@ -1,0 +1,48 @@
+Revision history for ExtUtils-CChecker
+
+0.10    2015/05/29 19:14:24
+        [CHANGES]
+         * Added 'config' passthrough constructor argument for EU:CB (RT95368)
+
+0.09    2013/12/12 17:10:39
+        [CHANGES]
+         * Add a 'quiet' option so EU:CB's quiet can be disabled (RT91363)
+         * Fixed some typoes in docs
+
+0.08    CHANGES:
+         * Include PID in test file names to guard against collisions when
+           building concurrently (RT76013)
+
+0.07    CHANGES:
+         * Use Test::Fatal instead of Test::Exception
+         * Advise against calling it "config.h" as that gets confused with
+           core perl's file
+
+0.06    CHANGES:
+         * Added 'defines_to' constructor arg for writing a "config.h" file
+           instead of -DFOO on compiler commandline
+
+0.05    CHANGES:
+         * Added accessors for callers to push more library dirs or compiler
+           or linker flags
+
+        BUGFIXES:
+         * Ensure that ->new_module_build merges its args and internal
+           configuration correctly
+
+0.04    CHANGES:
+         * Provide optional variants of ->find_include_dirs_for and
+           ->find_libs_for with try_... prefix
+
+0.03    CHANGES:
+         * Support defining compiler symbols based on successful test runs,
+           so XS code can be conditional on it
+         * Line-terminate test C code to avoid (harmless) warnings from some
+           C compilers
+
+0.02    CHANGES:
+         * Support automatic construction of a preconfigured Module::Build
+         * Also implement extra_compiler_flags for completeness
+
+0.01    First version, released on an unsuspecting world.
+

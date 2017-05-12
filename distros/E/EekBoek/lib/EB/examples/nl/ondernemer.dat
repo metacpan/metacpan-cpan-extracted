@@ -1,0 +1,493 @@
+# EekBoek Rekeningschema, gebaseerd op een voorbeeld van Johan Vromans.   -*- coding: utf-8 -*-
+# Aangemaakt op 2008-12-18
+# First published: 2009-05-03 (version: 1.0).
+# Versie 1.1, laatst gewijzigd op 2009-05-06
+# Dit schema sluit aan bij de Aangifte inkomstenbelasting 2008 voor ondernemers.
+# Laatste versie: http://yellowmatter.dyndns.org/accounting/eekboek/schema/ondernemers/
+
+# Author: Jaap van Wingerde,
+# e-mail: <1234567890@vanwingerde.net>.
+
+# EekBoek is een electronisch boekhoudprogramma door Johan Vromans
+# <http://www.vromans.org/johan/> bedoeld voor het midden- en
+# kleinbedrijf <http://www.eekboek.nl/>,
+# <http://sourceforge.net/mailarchive/forum.php?forum_name=eekboek-users>.
+#
+# Content-Type: text/plain; charset = UTF-8
+
+# Dit bestand definiëert alle vaste gegevens van een administratie of
+# groep administraties: het rekeningschema (balansrekeningen en
+# resultaatrekeningen), de dagboeken en de BTW tarieven.
+#
+# Algemene syntaxregels:
+#
+# * Lege regels en regels die beginnen met een hekje # worden niet
+#   geïnterpreteerd.
+# * Een niet-ingesprongen tekst introduceert een nieuw onderdeel.
+# * Alle ingesprongen regels zijn gegevens voor dat onderdeel.
+
+# REKENINGSCHEMA
+#
+# Het rekeningschema is hiërarchisch opgezet volgende de beproefde
+# methode Bakker. De hoofdverdichtingen lopen van 1 t/m 9, de
+# verdichtingen t/m 99. De grootboekrekeningen zijn verdeeld in
+# balansrekeningen en resultaatrekeningen.
+#
+# De omschrijving van de grootboekrekeningen wordt voorafgegaan door
+# een vlaggetje, een letter die resp. Debet/Credit (voor
+# balansrekeningen) en Kosten/Omzet/Neutraal (voor resultaatrekeningen)
+# aangeeft. De omschrijving wordt indien nodig gevolgd door extra
+# informatie. Voor grootboekrekeningen kan op deze wijze de BTW
+# tariefstelling worden aangegeven die op deze rekening van toepassing
+# is:
+#
+#   :btw=nul
+#   :btw=hoog
+#   :btw=laag
+#   :btw=privé
+#   :btw=anders
+#
+# Ook is het mogelijk aan te geven dat een rekening een koppeling
+# (speciale betekenis) heeft met :koppeling=xxx. De volgende koppelingen
+# zijn mogelijk:
+#
+#   crd		de standaard tegenrekening (Crediteuren) voor inkoopboekingen
+#   deb		de standaard tegenrekening (Debiteuren) voor verkoopboekingen
+#   btw_ih	de rekening voor BTW boekingen voor inkopen, hoog tarief
+#   btw_il	idem, laag tarief
+#   btw_vh	idem, verkopen, hoog tarief
+#   btw_vl	idem, laag tarief
+#   btw_ph	idem, privé, hoog tarief
+#   btw_pl	idem, laag tarief
+#   btw_ah	idem, anders, hoog tarief
+#   btw_al	idem, laag tarief
+#   btw_ok	rekening voor de betaalde BTW
+#   winst	rekening waarop de winst wordt geboekt
+#
+# De koppeling winst is verplicht en moet altijd in een administratie
+# voorkomen in verband met de jaarafsluiting.
+# De koppelingen voor BTW moeten worden opgegeven indien BTW
+# van toepassing is op de administratie.
+# De koppelingen voor Crediteuren en Debiteuren moeten worden
+# opgegeven indien er inkoop dan wel verkoopdagboeken zijn die gebruik
+# maken van de standaardwaarden (dus zelf geen tegenrekening hebben
+# opgegeven).
+
+# Normaal lopen hoofdverdichtingen van 1 t/m 9, en verdichtingen
+# van 10 t/m 99. Indien daarvan wordt afgeweken kan dit worden opgegeven
+# met de opdracht "Verdichting". De twee getallen geven het hoogste
+# nummer voor hoofdverdichtingen resp. verdichtingen.
+# De nummers van de grootboekrekeningen worden geacht groter te zijn
+# dan de maximale verdichting. Daarvan kan worden afgeweken door
+# middels voorloopnullen de _lengte_ van het nummer groter te maken
+# dan de lengte van de maximale verdichting. Als bijvoorbeeld 99 de
+# maximale verdichting is, dan geeft 001 een grootboekrekening met
+# nummer 1 aan.
+
+Verdichting 99 9999
+
+Balansrekeningen
+
+### Overzicht activa
+01 Immateriële vaste activa
+	0101 Goodwill
+	   010199 D Goodwill
+	0102 Vergunningen, concessies en intellectule eigendommen
+           010299 D Vergunningen, concessies en intellectule eigendommen
+	0103 Kosten van onderzoek en ontwikkeling
+             010399 D Kosten van onderzoek en ontwikkeling
+        0104 Vooruitbetaald op immateriële vaste activa
+           010499 D Vooruitbetaald op immateriële vaste activa
+	0105 Overige immateriële vaste activa
+           010599 D Overige immateriële vaste activa
+02 Materiële vaste activa
+	0201 (Bedrijfs)gebouwen inclusief ondergrond
+            020199 D (Bedrijfs)gebouwen inclusief ondergrond
+	0202 (Bedrijfs)terreinen
+            020299 D (Bedrijfs)terreinen
+	0203 Machines en installaties           
+           020399  D  Machines en installaties
+	0204   Inventaris
+             020400  D   Inrichting                    :kosten
+	     020401  C   Afschrijving inrichting		# zie 280501
+             020402  D   Gereedschappen				
+             020403  C   Afschrijving gereedschappen		# zie 280503
+       	     020498  D   Overige inventaris
+             020499  C   Afschrijving overige inventaris	# zie 280599
+	0205 Auto's en overige transportmiddelen
+           020598 D Auto's en overige transportmiddelen
+           020599 C Afschrijving auto's en overige transportmiddelen
+	0206 Vaste bedrijfsmiddelen in uitvoering en vooruitbetaald op materiële vaste activa
+           020698 D Vaste bedrijfsmiddelen in uitvoering en vooruitbetaald op materiële vaste activa
+           020699 C Afschrijving vaste bedrijfsmiddelen in uitvoering en vooruitbetaald op materiële vaste activa
+        0207  Overige materiële vaste activa
+                020798  D   Overige materiële vaste activa                                  :kosten
+		020799  C   Afschrijving overige materiële vaste activa
+03 Voorraden
+	0301   Grond- en hulpstoffen
+             030199  D   Grond en hulpstoffen
+        0302   Onderhanden werk
+             030299  D   Onderhanden werk
+        0303   Gereed product en handelsgoederen
+             030301   D   Voorraad <1>
+             030302   D   Voorraad <2>
+             030303   D   Voorraad <3>
+             030304   D   Voorraad <4>
+             030399   D   Voorraad <5>
+         0304  Vooruitbetaald op voorraden
+	     030499  D  Vooruitbetaald op voorraden	:kosten
+04 Vorderingen op overlopende activa 
+         0401 Vordering omzetbelasting
+             040108   D  2008
+             040109   D  2009
+             040110   D  2010
+	     040199   D  Overige vordering omzetbelasting
+         0402 Kortlopende vorderingen op gelieerde maatschappijen
+             040299  D  Kortlopende vorderingen op gelieerde maatschappijen
+         0403 Kortlopende vorderingen op participanten
+             040399  D  Kortlopende vorderingen op participanten
+         0404 Vorderingen op handelsdebiteuren
+	    040401     D  Vordering <?>
+            040499     D  Vorderingen op handelsdebiteuren                                 :koppeling=deb
+         0405 Overlopende activa
+            040599   D  Overlopende activa
+         0406 Overige overlopende vorderingen
+            040699     D  Overige overlopende vorderingen
+05 Effecten
+         0501  Effecten
+             050199   D  Effecten
+06 Liquide middelen
+         0601  Banktegoeden
+             060100  D   <bankrekening>
+             060199  D   Overige banktegoeden
+         0602  Overige liquide middelen
+             060200  D  Kas 
+             060201  D  Borg
+	     060290  D  Kruisposten
+             060299  D  Overige liquide middelen
+### Overzicht passiva
+07 Ondernemingsvermogen en privé stortingen en ontrekkingen
+         0701 Eigen vermogen
+            070100  C Eigen vermogen                   :koppeling=winst
+         0702 Egalisatiereserve
+            070299 C Egalisatiereserve
+         0703 Reserve assurantie eigen risico
+            070399  C Reserve assurantie eigen risico
+         0704 Exportreserve
+            070499 C  Exportreserve
+         0705 Herinvesteringsreserve
+            070599 C  Herinvesteringsreserve
+         0706 Oudedagsreserve
+            070699 C  Oudedagsreserve
+08 Privé onttrekkingen en stortingen
+         0801  Privé onttrekkingen
+	 	080100  D   in contanten
+         	080101  D   in natura en goederen
+	 	080102  D   privé gebruik woning
+         	080103  D   privé gebruik auto van onderneming  
+	 	080199  D   overige privé onttrekkingen
+         0802  Privé stortingen
+          	080200  C  betalingen uit privé
+          	080201  C  gebruik privé auto 
+          	080299  C  overige privé stortingen
+	 0803  Kosten privé auto inclusief 19% OB
+		080301	D  onderhoud en reparatie
+		080302	D  onderdelen
+		080303	D  brandstof
+		080399	D  overige gebruikskosten
+09 Terugkeerreserve
+	0901  Terugkeerreserve 
+            090100 C Vorming positieve terugkeerreserve
+            090101 D Vorming negatieve terugkeerreserve  
+10 Voorzieningen
+	1001 Garantievoorziening
+           100199  C  Garantievoorziening
+	1002 Lijfrentevoorziening
+           100299  C Lijfrentevoorziening
+	1003 Pensioenvoorziening
+           100399  C  Pensioenvoorziening
+	1004 VUT-voorziening
+           100499  C VUT-voorziening
+	1005 Milieuvoorziening
+           100599  C  Milieuvoorziening
+	1009 Overige voorzieningen
+           100999  C  Overige voorzieningen
+11 Schulden en overlopende passiva
+         1101  Onderhandse leningen        
+         	110100 C   Lening <1>
+         	110101 C   Lening <2>
+         	110102 C   Lening <3>
+         	110103 C   Lening <4>
+         	110104 C   Lening <5>
+         	110105 C   Lening <6>
+         	110106 C   Lening <7>
+                110199 C   Overige onderhandse leningen
+         1102  Obligaties
+               110299  C  Obligaties
+         1103  Schulden aan kredietinstellingen
+         	110399 C   Schulden aan kredietinstellingen
+         1104   Schulden aan leveranciers en handelskredieten
+         	110401  C   Openstaande creditfactuur
+		110402	C   Openstaande factuur
+		110499  C   Schulden aan leveranciers en handelskredieten   :koppeling=crd
+         1105   Schulden aan gelieerde maatschappijen       
+                110599  C  Schulden aan gelieerde maatschappijen
+ 	 1106   Schulden aan participanten       
+                110699  C  Schulden aan participanten
+         1107   Loonbelasting en premie volksverzekeringen
+                110799  C  Loonbelasting en premie volksverzekeringen
+         1108   Premies werknemersverzekeringen
+                110899  C  Premies werknemersverzekeringen
+  	1109  Omzetbelasting lopend jaar  
+         	110900  C   OB Verkoop Hoog                           :koppeling=btw_vh
+         	110901  C   OB Verkoop Laag                           :koppeling=btw_vl
+		110902  C   OB Verkoop overige tarieven, behalve 0%
+		110903  C   OB verlegd
+		110910	C   OB Leveringen uit landen buiten de EU (invoer)
+		110911  C   OB Verwervingen van goederen uit landen binnen EU 
+         	110920  D   OB Inkoop Hoog                            :koppeling=btw_ih
+         	110921  D   OB Inkoop Laag                            :koppeling=btw_il
+         	110980  C   Kleine ondernemersregeling omzetbelasting
+		110990	C   Afrondingsverschillen Omzetbelasting
+		110999	C   Betaalde omzetbelasting
+         1110	Omzetbelasting andere jaren
+		111006  C   Omzetbelasting 2006                     
+                111007  C   Omzetbelasting 2007
+                111008  C   Omzetbelasting 2008
+                111009  C   Omzetbelasting 2009		:koppeling=btw_ok
+                111010  C   Omzetbelasting 2010
+                111011  C   Omzetbelasting 2011
+                111012  C   Omzetbelasting 2012
+                111013  C   Omzetbelasting 2013
+                111014  C   Omzetbelasting 2014
+         1111  Overlopende passiva
+             111199  C  Overlopende passiva
+         1112  Overige schulden
+             111299  C  Overige schulden
+Resultaatrekeningen
+## Opbrengsten
+12     Netto-omzet
+       1200  Netto omzet
+            120000  O Omzet <1>                           
+            120001  O Omzet <2>				       
+            120002  O Omzet <3>			       
+            120003  O Omzet <4>			       
+ 	    120004  O Omzet <5>			       
+            120005  O Omzet <6>			       
+            120006  O Omzet <7>			       
+            120007  O Omzet <8>	       
+            120091  O Kleine ondernemersregeling omzetbelasting
+	    120092  O Afrondingsverschillen omzetbelasting
+            120099  O Omzet overig				      
+13     Wijzigingen in voorraden gereed product en onderhanden werk   
+	1300  Wijzigingen in onderhanden werk
+	    130000 O <?>   
+            130099 O Overige Wijziging in onderhanden werk
+	1301 Wijziging in voorraden gereed product
+	    130199 O Overige Wijziging in voorraden gereed product  		
+	1400 Geactiveerde productie voor het eigen bedrijf
+	     140099 O Geactiveerde productie voor het eigen bedrijf
+15 Opbrengsten van vorderingen op gelieerde maatschappijen
+	1500 Opbrengsten van vorderingen op gelieerde maatschappijen
+             150099 O Opbrengsten van vorderingen op gelieerde maatschappijen
+16 Boekwinst op activa
+	1600  Boekwinst op activa
+		160099 O Boekwinst op activa
+17 Opbrengst van vorderingen op participanten
+	1700  Opbrengst van vorderingen op participanten
+18 Opbrengst van banktegoeden
+	1800 Opbrengst van banktegoeden
+           180099  O rente
+19 Opbrengsten van overige vorderingen
+	1900 Opbrengsten van overige vorderingen
+		190099 O Opbrengsten van overige vorderingen
+20 Ontvangen divident
+	2000 Ontvangen divident
+		200099 O Ontvangen divident
+21 Waarderingsvermeerdering van vorderingen
+	2100 Waarderingsvermeerdering van vorderingen
+		210099 O Waarderingsvermeerdering van vorderingen
+22 Waarderingsvermeerdering van immateriële en materiële vaste activa
+	2200	Waarderingsvermeerdering van immateriële en materiële vaste activa
+		220099 O Waarderingsvermeerdering van immateriële en materiële vaste activa
+23 Bijzondere waarderingsvermeerdering van vlottende activa
+	2300  Bijzondere waarderingsvermeerdering van vlottende activa
+		230099 O Bijzondere waarderingsvermeerdering van vlottende activa
+24 Waarderingsvermeerdering van effecten
+	2400 Waarderingsvermeerdering van effecten
+		240099 O Waarderingsvermeerdering van effecten
+25  Overige opbrengsten
+     2500  Overige opbrengsten
+           250000  O Subsidies 
+	   250050  O Afrondingsverschillen
+           250099  O Overige opbrengsten
+## Kosten
+26  Inkoopkosten, uitbesteed werk en dergelijke
+         2600  Kosten van grond- en hulpstoffen en inkoopprijs van de verkopen
+               260001  K  Inkoop <1>	
+	       260002  K  Inkoop <2>	
+	       260099  K  Inkoop overige materialen
+         2601 Kosten van uitbesteed werk en andere externe kosten
+		260101  K  <1>	
+		260102  K  <2>		
+		260103	K  <3>		
+		260104	K  <4>		
+                260105  K  <5>		
+                260106  K  <6>  
+		260199	K  Overige kosten van uitbesteed werk en andere externe kosten
+27 Personeelskosten
+         2700  Personeelskosten
+		270001  K  Lonen en salarissen
+		270002  K  Arbeidsbeloning aan fiscale partner
+		270003  K  Sociale lasten
+		270004  K  Pensioenlasten
+		270005  K  Overige personeelskosten
+		270006  O  Ontvangen uitkeringen en subsidies
+28  Afschrijvingen
+	2801 Goodwill, vergunningen, concessies en intellectuele eigendommen
+                280199 K  Goodwill, vergunningen, concessies en intellectuele eigendommen
+	2802 (Bedrijfs)gebouwen
+               280299  K  (Bedrijfs)gebouwen
+        2803 (Bedrijfs)terreinen
+               280399  K  (Bedrijfs)terreinen
+	2804 Machines en installaties
+		280499 K Machines en installaties
+        2805 Inventaris
+		280501  K Inrichting  					
+                280503  K Gereedschappen  				
+		280599  K Overige inventaris  				
+        2806 Auto's en overige transportmiddelen
+		280699 K Auto's en overige transportmiddelen 	
+        2899 Overige afschrijvingen
+		289999  K Overige afschrijvingen
+29  Overige bedrijfskosten
+         2901  Auto- en transportkosten
+		290100  K  Gebruik privé auto  			
+                290101  K  Huren auto
+                290102  K  Overige kosten huurauto
+	        290109  K  Overige autokosten
+                290111  K  Trein
+                290112  K  Bus
+                290113  K  Taxi
+                290114  K  Vliegtuig
+                290119  K  Overig openbaar vervoer
+                290121  K  Bode
+                290199  K  Overige auto- en transportkosten
+39 Huisvestingskosten
+         3901  Huisvestingskosten
+               390100  K  Huur
+               390101  K  Parkeervergunning
+               390199  K  Overige huisvestingskosten
+40 Onderhoudskosten van overige materiële vaste activa
+   4001 Onderhoudskosten van overige materiële vaste activa
+        400100  K  Onderhoudskosten van overige materiële vaste activa
+41 Verkoopkosten
+    4101 Verkoopkosten
+         410100  K  Bemiddelingskosten			
+         410101  K  Reclame				
+         410102  K  <?>				
+         410103  K  Fotografie				
+         410104  K  Drukken en printen			
+         410105  K  <?>		
+         410106  K  Internet				
+         410107  K  Porto				
+         410108  K  Gemengde kosten
+         410109  K  Hotels
+         410110  K  Google Adwords
+         410199  K  Overige verkoopkosten		
+42 Kosten van schulden aan gelieerde maatschappijen
+   4201 Kosten van schulden aan gelieerde maatschappijen
+        420100 K  Kosten van schulden aan gelieerde maatschappijen
+43 Kosten van schulden aan particpanten
+   4301 Kosten van schulden aan particpanten
+        430100 K Kosten van schulden aan particpanten
+44 Kosten van schulden, andere rentelasten en soortgelijke kosten
+   4401 Kosten van schulden, andere rentelasten en soortgelijke kosten
+        440100 K  Rente bank
+        440199 K Overige kosten van schulden, andere rentelasten en soortgelijke kosten
+45 Waarderingsvermindering van vorderingen
+   4501 Waarderingsvermindering van vorderingen
+        450100 K  Waarderingsvermindering van vorderingen
+46 Waarderingsvermindering van immateriële en materiële vaste activa
+   4601 Waarderingsvermindering van immateriële en materiële vaste activa
+        460100 K Waarderingsvermindering van immateriële en materiële vaste activa
+47 Bijzondere waarderingsvermindering van vlottende activa
+    4701 Bijzondere waarderingsvermindering van vlottende activa
+           470100 K Bijzondere waarderingsvermindering van vlottende activa
+48 Waarderingsvermindering van effecten
+    4801 Waarderingsvermindering van effecten
+           480100 K Waarderingsvermindering van effecten
+49 Andere kosten
+    4901 Andere kosten
+          490100  K Telefoon
+          490101  K Internet
+          490102  K Contributies
+          490103  K Verzekeringen
+          490104  K Vakliteratuur
+          490105  K Toegangsbewijzen
+          490106  K Vakbond
+          490107  K Bank
+          490108  K Opleidingen
+          490199  K Overige andere kosten
+50 Buitengewone lasten 
+	5001 Afboeking herinvesteringsreserve op gekochte activa
+              500199 K Afboeking herinvesteringsreserve op gekochte activa
+	5002 Opheffing negatieve terugkeerreserve
+              50029 K Opheffing negatieve terugkeerreserve
+        5003 Overige buitengewone lasten
+		500000	K  <?>         
+		500399  K  Overige buitengewone lasten
+51 Buitengewone baten
+         5101  Overige buitengewone baten
+         	510199  O  Overige buitengewone baten
+# DAGBOEKEN
+#
+# EekBoek ondersteunt vijf soorten dagboeken: Kas, Bank, Inkoop,
+# Verkoop en Memoriaal. Er kunnen een in principe onbeperkt aantal
+# dagboeken worden aangemaakt.
+# In de eerste kolom wordt de korte naam (code) voor het dagboek
+# opgegeven. Verder moet voor elk dagboek worden opgegeven van welk
+# type het is. Voor dagboeken van het type Kas en Bank moet een
+# tegenrekening worden opgegeven, voor de overige dagboeken mag een
+# tegenrekening worden opgegeven.
+# De optie :dc kan worden gebruikt om aan te geven dat het journaal
+# voor dit dagboek de boekstuktotalen in gescheiden debet en credit
+# moet tonen.
+
+Dagboeken
+
+  I     Inkoop                :type=inkoop
+  K     Kas                   :type=kas        :rekening=060200
+  M     Memoriaal             :type=memoriaal
+  B     <bankrekening> 	      :type=bank       :rekening=060100
+  V     Verkoop               :type=verkoop
+
+# BTW TARIEVEN
+#
+# Er zijn vijf tariefgroepen: "hoog", "laag", "nul", "privé" en
+# "anders". De tariefgroep bepaalt het rekeningnummer waarop de
+# betreffende boeking plaatsvindt.
+# Binnen elke tariefgroep zijn meerdere tarieven mogelijk, hoewel dit
+# in de praktijk niet snel zal voorkomen.
+# In de eerste kolom wordt de (numerieke) code voor dit tarief
+# opgegeven. Deze kan o.m. worden gebruikt om expliciet een BTW tarief
+# op te geven bij het boeken. Voor elk gebruikt tarief (behalve die
+# van groep "nul") moet het percentage worden opgegeven. Met de
+# aanduiding :exclusief kan worden opgegeven dat boekingen op
+# rekeningen met deze tariefgroep standaard het bedrag exclusief BTW
+# aangeven.
+#
+# BELANGRIJK: Mutaties die middels de command line shell of de API
+# worden uitgevoerd maken gebruik van het geassocieerde BTW tarief van
+# de grootboekrekeningen. Wijzigingen hierin kunnen dus consequenties
+# hebben voor de reeds in scripts vastgelegde boekingen.
+
+BTW Tarieven
+
+   0  BTW 0%                 :tariefgroep=nul
+   1  BTW 19% incl.          :tariefgroep=hoog :perc=19,00
+   2  BTW 19% excl.          :tariefgroep=hoog :perc=19,00 :exclusief
+   3  BTW 6,0% incl.         :tariefgroep=laag :perc=6,00
+   4  BTW 6,0% excl.         :tariefgroep=laag :perc=6,00 :exclusief
+
+# Einde EekBoek schema

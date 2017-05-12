@@ -1,0 +1,23 @@
+---
+abstract: 'Sugar to let you instrument event listeners at a distance'
+author:
+  - 'Rebecca Turner <becca@referencethis.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300020, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Event-Wrappable
+requires:
+  Scalar::Util: 0
+  Sub::Clone: 0
+  Sub::Exporter: 0
+resources:
+  bugtracker: https://github.com/iarna/Event-Wrappable/issues
+  homepage: https://github.com/iarna/Event-Wrappable
+  repository: https://github.com/iarna/Event-Wrappable.git
+version: 0.1.1

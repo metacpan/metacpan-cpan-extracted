@@ -1,0 +1,673 @@
+#!/usr/bin/perl
+package Elive::script::elive_query;
+use warnings; use strict;
+use YAML::Syck;
+use Carp;
+use Getopt::Long qw{};
+
+use Elive;
+use Elive::Util;
+
+use Term::ReadLine;
+use Pod::Usage;
+use UNIVERSAL;
+
+use IO::Interactive;
+
+use URI;
+use URI::Escape;
+
+=head1 NAME
+
+elive_query - simple query shell for Elluminate Live! Manager (ELM)
+
+=head1 SYNOPSIS
+
+  elive_query   http[s]://myserver.com/my-site[:port]
+
+    --user someuser          # SDK/SOAP username
+    --pass somepass          # SDK/SOAP password
+    --debug=n                # 1=some, 2=verbose, 3=verbose + soap
+    --dump=yaml              # serialise results as YAML
+    --adapter=type-or-class  # E.g. --adapter v3 (Bb::Collaborate::V3)
+    -c 'select ....'         # execute command(s), then exit
+    -? -help                 # obtain help
+    -v -version              # print Elive version
+
+=head1 DESCRIPTION
+
+Simple read-only query shell for Elluminate Live! Manager (ELM).
+
+=head2 Entity Data Queries
+
+This script lets you do simple queries, in a vaguely SQL like manner.
+For example:
+
+    % elive_query -user admin https://myserver.com/mysite
+    Password: ********
+    connecting to https://myserver.com/mysite...ok
+    Elive query ... (Elluminate Live! ...)  (c) ... - type 'help' for help
+
+    elive> select loginName,email,firstName,lastName,role from user where loginName like *m* 
+    loginName   |email                 |firstName|lastName   |role
+    ------------|----------------------|---------|-----------|----
+    mr_miyagi   |mr_miyagi@hotmail.com |Pups     |Miyagi     |3
+    sthrogmorton|sthrogmorton@gmail.com|Sebastion|Throgmorton|2
+
+    elive>
+
+=head2 Describing Entities
+
+You can also use this script to describe Elive entity structures:
+
+    elive> describe
+    usage: describe group|meeting|meetingParameters|participantList|preload|recording|serverDetails|serverParameters|user
+
+    elive> describe meeting
+    meeting: Elive::Entity::Meeting:
+    meetingId         : pkey Int        
+    deleted           : Bool
+    end               : HiResDate    -- meeting end time
+    facilitatorId     : Str          -- userId of facilitator
+    name              : Str          -- meeting name
+    password          : Str          -- meeting password
+    privateMeeting    : Bool         -- don't display meeting in public schedule
+    start             : HiResDate    -- meeting start time
+
+    elive> 
+
+=head1 SEE ALSO
+
+perldoc Elive
+L<http://search.cpan.org/dist/Elive/>
+
+=cut
+
+main(@ARGV) unless caller;
+
+sub main {
+
+    local(@ARGV) = @_;
+
+    our $elive_version = ${Elive::VERSION};
+    our %entity_collections;
+    #
+    # this may barf if /dev/tty can't be opened. E.g. when executing from cron
+    our $interactive = eval { IO::Interactive::is_interactive() };
+
+    our $term;
+    if ($interactive) {
+	$term = eval { Term::ReadLine->new('elive shell') }
+    }
+
+    my $prompt = "elive> ";
+    our $connection;
+    my %options;
+
+    our $adapter_class;
+
+    do {
+	(my $url, %options) = _getopt();
+
+	my $adapter = $options{adapter} || 'default';
+	$adapter_class = {default    => 'Elive::Entity',
+			  v3 => 'Bb::Collaborate::V3',
+	}->{$adapter};
+	$adapter_class ||= $adapter;
+	eval "require $adapter_class";
+	die $@ if $@;
+
+	our $debug = $options{debug};
+	Elive->debug($debug) if defined $debug;
+	# debug may also be set via $ENV{ELIVE_DEBUG}
+	$debug = Elive->debug;
+
+	$connection = _connect($adapter_class => $url, %options)
+	    if $url;
+    };
+
+    warn "adapter class: $adapter_class\n" if Elive->debug;
+
+    our @data_classes = $adapter_class->data_classes;
+    our %entities;
+
+    foreach my $class (@data_classes) {
+	#
+	# Make sure we're dealing with well formed DAO classes
+	#
+	eval "require $class";
+	die $@ if $@;
+
+	unless (eval {$class->entity_name}) {
+	    warn "Omitting non entity class: $class";
+	    next;
+	}
+
+	$entities{ lcfirst $class->entity_name } = $class;
+	#
+	# accept plurals, e.g. 'select * from user' vs 'select * from users'
+	#
+	if (my $collection_name = $class->collection_name) {
+	    $entity_collections{lcfirst($collection_name)} = $class;
+	}
+    }
+
+    my $server_version_str = '';
+
+    if ($connection) {
+	my $server_version =  eval {$connection->version}
+	    or warn ($@ || "unable to get Elluminate version\n");
+
+	$server_version_str  = "(Elluminate Live! $server_version) "
+	    if $server_version;
+    }
+
+    my @command_opts = @{ $options{command} || [] };
+    my $has_command_opts = @command_opts;
+
+    print "Elive query $elive_version (c) 2009 - 2012 ${server_version_str}. Type 'help' for help\n"
+	if $interactive && !$has_command_opts;
+
+    my $cmd;
+    my $keyw;
+    my $args;
+
+    binmode STDOUT, ":encoding(UTF-8)";
+
+    while (($keyw||'') ne 'quit') {
+
+	my $valid = 1;
+
+	if ($has_command_opts) {
+	    $cmd = shift( @command_opts );
+	}
+	else {
+	    $cmd = $interactive && $term? $term->readline($prompt): <STDIN>;
+	}
+
+	last unless defined $cmd;
+
+	$term->addhistory($cmd) if $term && $cmd ne '';
+	#
+	# strip leading white-space & trailing white-space + semicolon
+	#
+	$cmd =~ s{^ \s* (.*?) \s* ;? \s* $}{$1}x;
+
+	if ($cmd =~ m{\S}x) {
+
+	    if (($keyw, $args) = ($cmd =~ m{^ (\w+) \s* (.*)? $}x)) {
+
+		if (lc($keyw) eq substr('help',0, length($keyw))) {
+		    print "Elive query $elive_version help:\n\n";
+		    print "connect url - connect to an Elluminate Live! server\n";
+		    print "describe [entity_name] - list/show entities\n";
+		    print "debug = [0|1|2|3] - set debugging level\n";
+		    print "select <expr> from entity [where exp]\n";
+		    print "    where expr is:\n";
+		    print "      - prop1,prop2,.. - show selected properties\n";
+		    print "      - *              - show all properties\n";
+		    print "      - *?             - show only defined properties\n";
+		    print "      - **             - show extra data (usually slower)\n";
+		    print "quit                   - exit elive_query\n\n";
+		}
+		elsif ($keyw  =~ m{^(connect)$}i) {
+		    my ($url, $user) = split(m{\s+}, $args);
+
+		    $url ||= Elive::Util::prompt("Url ('http[s]://...'): ");
+
+		    my $new_connection
+			= _connect($adapter_class => $url,
+				   username => $user,
+				   %options);
+
+		    if ($new_connection) {
+			$connection->disconnect if $connection;
+			$connection = $new_connection;
+		    }
+		}
+		elsif ($keyw  =~ m{^(debug)$}i) {
+		    my ($level) = ($args =~ m{^\s* = \s* ([0-9])}x);
+
+		    if (defined $level) {
+			warn "Debugging level set to $level\n";
+			$level = $level + 0;
+
+			$SIG{__WARN__} = $level > 1
+			    ? \&Carp::cluck
+			    : undef;
+
+			$SIG{__DIE__} = $level
+			    ? \&Carp::confess
+			    : undef;
+
+			Elive->debug($level);
+		    }
+		    else {
+			print STDERR "usage: debug = 0..9";
+		    }
+		}
+		elsif ($keyw =~ m{^(show|describe)$}ix) {
+
+		    if (my ($entity_name) = ($args =~ m{^ \s* (\w+) \s* $}x)) {
+			$valid = _show({%entities, %entity_collections}, $entity_name);
+		    }
+		    else {
+			print 'usage: describe '.join('|', sort keys %entities)."\n";
+			$valid = 0;
+		    }
+		}
+		elsif (lc($keyw) eq 'select') {
+
+		    warn "args: $args\n"
+			if (Elive->debug);
+
+		    $valid = 0;
+
+		    if ($args =~ m{^
+                          (.+?) \s+
+                          from \s+ (\w+)?
+                          (\s+ where \s+ (.*?))?
+                          $}ix) {
+
+			$valid = 1;
+
+			my $entity = $2;
+			my $filter = $4;
+			my @props = split(m{\s* ,|\| \s*}x, $1);
+			my $hide_undef = 0;
+
+			my $entity_class = ($entities{$entity}
+					    || $entity_collections{$entity});
+
+
+			if (!$entity_class) {
+			    print STDERR "Unknown entity: $entity\n";
+			    $valid = 0;
+			}
+			else {
+
+			    if (@props == 1 && $props[0] =~ m{^(\*)(\*)?(\??)$}x) {
+				#
+				# '*'  select all
+				# '**' select all + derivable
+				# '*?' select all defined
+				#
+				my $include_derivable = $2? 1: 0;
+				$hide_undef = $3? 1: 0;
+				my $property_types = $entity_class->property_types;
+				@props = grep {$property_types->{$_} ne 'Any'} $entity_class->properties;
+				if ($include_derivable) {
+				    my %derivable = $entity_class->derivable;
+				    push (@props, sort keys %derivable);
+				}
+			    }
+			    else {
+				foreach (@props) {
+				    $valid = 0 unless m{^ [a-zA-Z_-]+ $}x;
+				}
+			    }
+			}
+
+			if ($valid) {
+			    warn "entity: $entity, filter: $filter, props: @props\n"
+				if (Elive->debug);
+
+			    unless ($connection) {
+				print STDERR "you'll need to connect first - see help connect\n";
+			    }
+			    else {
+				_select($entity_class, \@props,
+					connection => $connection,
+					filter => $filter,
+					hide_undef => $hide_undef,
+					dump => $options{dump},
+				    ); 
+			    }
+			}
+		    }
+
+		    unless ($valid) {
+			print STDERR  "usage: select props|*|**|*? from ".join('|', sort keys %entities)." [where filter|id=val];\n";
+		    }
+		}
+		elsif ($keyw !~ m{^(quit)$}x) {
+		    print STDERR "unrecognised command: $keyw, type 'help' for help\n";
+		    $valid = 0;
+		}
+	    }
+	    else {
+		print STDERR "unrecognised command  - type 'help' for help\n";
+		$valid = 0;
+	    }
+	}
+	exit 2 if !$valid && (!$interactive || $has_command_opts); 
+    }
+
+    Elive->disconnect;
+
+    if (Elive->debug) {
+	my @living = grep {$Elive::Entity::Elive_Objects->{$_}}
+	(keys %Elive::Entity::Elive_Objects);
+
+	warn "about to shutdown, live objects: @living\n";
+    }
+
+    return 0;
+}
+
+########################################################################
+
+sub _show {
+
+    my ($entities, $entity_name, $nesting, $entity_class, %seen) = @_;
+
+    $nesting ||= 0;
+    my $sp = ' ' x ($nesting * 2);
+
+    $entity_class ||= $entities->{$entity_name}
+        or do {
+	    print STDERR "${sp}Unknown entity: $entity_name\n";
+	    return;
+	};
+
+    return if $seen{$entity_class}++;
+
+    my $property_types = $entity_class->property_types;
+    my $property_doco = $entity_class->property_doco;
+    my ($pkey) = $entity_class->primary_key;
+
+    print "${sp}$entity_name: $entity_class:\n"
+	unless $nesting;
+
+    foreach my $property ($entity_class->properties) {
+
+	my $type = Elive::Util::inspect_type($property_types->{$property});
+	my ($elemental_type, @_other_types) = $type->union;
+
+	my $is_primary = $pkey && $property eq $pkey;
+
+	my $primary_str = $is_primary? 'pkey ': '';
+	my $array_str = $type->is_array? ' []': '';
+
+	my $all_types = join('|', $elemental_type, @_other_types);
+	printf("%-20s : %-16s", "$sp  $property", "${primary_str}${all_types}${array_str}");
+	for ($property_doco->{$property}) {
+	    print "\t-- $_" if $_;
+	}
+	print "\n";
+
+	if ($type->is_struct) {
+	    _show($entities, $property, $nesting + 1, $elemental_type, %seen);
+	}
+    }
+
+    my %derivable = $entity_class->derivable;
+
+    if (my @derivable_cols = sort keys %derivable) {
+	print "${sp}  (also selectable: ".join(', ', sort @derivable_cols).")\n"
+    }
+
+    return 1;
+}
+
+########################################################################
+
+sub _select {
+    my ($entity_class, $props, %opt) = @_;
+
+    my $filter = $opt{filter};
+    my $hide_undef = $opt{hide_undef};
+    my $connection = $opt{connection}
+    or die "not copnnected";
+
+    my $property_types = $entity_class->property_types;
+    my %derivable = $entity_class->derivable;
+    my $entity_name = $entity_class->entity_name;
+    my ($pkey) = $entity_class->primary_key;
+
+    foreach (@$props) {
+	
+	unless (exists $property_types->{$_} || exists $derivable{$_}) {
+
+	    print STDERR "unknown property: $_\n";
+	    print STDERR "$entity_name has properties: ".join(', ', sort keys %$property_types)."\n";
+	    if (keys %derivable) {
+		print STDERR "(also selectable: ".join(', ', sort keys %derivable).")\n";
+	    }
+	    return;
+	}
+    }
+
+    #
+    # See if our filter is in the format: keyprop=val
+    #
+    warn "filter=$filter"
+	if (defined $filter && Elive->debug);
+
+    warn "entity: $entity_name, class: $entity_class\n"
+	if (Elive->debug);
+    warn join(' ', 'properties:',  $entity_class->properties)."\n"
+	if (Elive->debug);
+
+    #
+    # Possible fetch on primary key or alternative key.
+    # Detect and trap this as a simple fetch.
+    #
+    my $id;
+    
+    if (defined $filter) {
+	if (my ($fld, $val) = ($filter =~ m{^ (\w+) \s* = \s* ([\w_\-\@\!\#\$\%\^\&\.\+]+) \s* $}x)) {
+	    my $type = $property_types->{$fld} || '';
+	    
+	    if ($pkey && ($fld eq $pkey || $fld eq 'id')) {
+		$id = $val;
+	    }
+	}
+    }
+
+    my @output;
+    my $rows;
+
+    eval {
+	if ($id) {
+	    $rows =  [grep {$_} $entity_class->retrieve([$id], connection => $connection)];
+	}
+	else {
+	    $rows = $entity_class->list(filter => $filter, connection => $connection);
+	}
+    };
+
+    if ($@) {
+	print "error: $@";
+    }
+    elsif (!@$rows) {
+	print "No results.\n";
+    }
+    elsif ($opt{dump} && $opt{dump} =~ /^(yaml)$/i) {
+	foreach my $row (@$rows) {
+	    print YAML::Syck::Dump({$entity_name => _fetch_row_href($props, \%derivable, $row)});
+	}
+    }
+    else {
+	foreach my $row (@$rows) {
+	    
+	    my $row =  _fetch_row_aref($props, \%derivable, $row);
+	    push(@output, $row);
+	}
+
+	#
+	# pass 1: filter columns
+	#
+
+	my @show;
+
+	foreach my $row (@output) {
+	    
+	    my $col = 0;
+
+	    foreach (@$row) {
+		$show[ $col++ ] ||= !$hide_undef || defined $_
+	    }
+	}
+
+	#
+	# pass 2: compute output widths
+	#
+
+	my @widths;
+
+	foreach  my $row ($props,@output) {
+
+	    my $col = 0;
+
+	    foreach (@$row) {
+
+		my $this_width = length(defined($_)? $_ : '(undef)');
+
+		for ($widths[ $col++ ]) {
+		    $_ = $this_width
+			if (!defined || $this_width > $_);
+		}
+	    }
+	}
+	
+	#
+	# pass 3: output
+	#
+
+	my @hrule = map {'-' x ($_||0)} @widths;
+
+	foreach my $row ($props, \@hrule, @output) {
+
+	    my $col = 0;
+	    my @cols = (
+
+		grep {$_}
+
+		map {
+		    my $v = defined($_) ? $_ : '(undef)';
+		    my $s = $show[ $col ];
+		    my $w = $widths[ $col ];
+		    ++$col;
+		    $s ? sprintf('%-*s', $w, $v)
+			: undef;
+		}
+
+		@$row);
+
+	    print join('|', map{defined($_) ? $_ : '(undef)'} @cols)."\n"; 
+	}
+    }
+
+    return;
+}
+
+########################################################################
+
+sub _fetch_row_aref {
+    my $props = shift;
+    my $derivable = shift;
+    my $row = shift;
+
+    my @vals = (map {Elive::Util::string($_)} 
+		map {$row->$_}
+		map {$derivable->{$_} || $_}
+		@$props);
+
+    s{\n}{\\n}g foreach grep {defined} @vals;
+
+    return \@vals;
+}
+
+########################################################################
+
+sub _fetch_row_href {
+    my $props = shift;
+    my $derivable = shift;
+    my $row = shift;
+
+
+    my %vals = (map {
+	my $meth = $derivable->{$_} || $_;
+	my $val = $row->$meth;
+	$_ => $val
+	} @$props);
+
+    return \%vals;
+}
+
+########################################################################
+
+sub _getopt {
+
+    my %options;
+
+    Getopt::Long::GetOptions(\%options,
+			     'username|user=s',
+			     'password|pass=s',
+			     'command|c=s@',
+                             'dump=s',
+			     'debug=i',
+			     'adapter=s',
+			     'help|?',
+			     'version|v',
+			     'help|?'
+	) or pod2usage(2);
+
+    pod2usage(0) if ($options{help});
+
+    if ($options{version}) {
+	print "Elive v${Elive::VERSION} (c) 2009 - 2012\n";
+	exit 0;
+    }
+
+    if ($options{dump} && $options{dump} !~ /^(yaml)$/i) {
+	pod2usage("unknown dump format: $options{dump}");
+    }
+
+    my $url = shift(@ARGV);
+
+    return ($url, %options);
+}
+
+########################################################################
+
+sub _connect {
+    my ($adapter_class, $url, %options) = @_;
+
+    my $username = $options{username};
+    my $password = $options{password};
+
+    my $uri_obj = URI->new($url);
+    if (my $userinfo = $uri_obj->userinfo) {
+	#
+	# credentials supplied in URI
+
+	my ($uri_user, $uri_pass) = split(':', $userinfo, 2);
+	$username ||= URI::Escape::uri_unescape($uri_user);
+	$password ||= URI::Escape::uri_unescape($uri_pass)
+	    if $uri_pass;
+
+	$url =~ s{\Q${userinfo}\E\@}{};
+    }
+
+    $username ||= Elive::Util::prompt('Username: ');
+    $password ||= Elive::Util::prompt('Password: ', password => 1);
+
+    print STDERR "connecting to $url...";
+    my $connection = eval {
+	$adapter_class->connect($url, $username, $password);
+    };
+
+    if ($@) {
+	print STDERR "\nconnection failed: $@";
+	return;
+    }
+
+    print STDERR "ok\n";
+    return $connection;
+}
+
+########################################################################
+
+1;

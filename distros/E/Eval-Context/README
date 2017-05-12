@@ -1,0 +1,17 @@
+Context
+=======
+
+'Evalute perl code in a context wrapper'
+
+
+INSTALLATION
+------------
+
+To install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+

@@ -1,0 +1,46 @@
+{
+   "abstract" : "the Perl version of the Eve Online API system.",
+   "author" : [
+      "Felipe da Veiga Leprevost <leprevost@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142060",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "EveOnline-Api",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "LWP::UserAgent" : "0",
+            "Moose" : "0",
+            "Test::More" : "0",
+            "Time::Local" : "0",
+            "XML::Simple" : "0",
+            "namespace::autoclean" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.051"
+}

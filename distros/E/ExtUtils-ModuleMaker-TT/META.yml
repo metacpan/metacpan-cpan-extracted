@@ -1,0 +1,52 @@
+---
+abstract: 'Makes skeleton modules with Template Toolkit templates (UNMAINTAINED)'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+  File::Copy: 0
+  File::Spec::Functions: 0
+  File::pushd: 1
+  IPC::Run3: 0.033
+  List::Util: 0
+  Probe::Perl: 0.01
+  Test::Builder: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.17
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: ExtUtils-ModuleMaker-TT
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  ExtUtils::ModuleMaker::TT:
+    file: lib/ExtUtils/ModuleMaker/TT.pm
+    version: 0.94
+requires:
+  Config::Find: 0.22
+  Config::General: 2.29
+  Data::Dumper: 0
+  ExtUtils::ModuleMaker: 0.46
+  Getopt::Long: 0
+  Path::Class: 0.15
+  Template: 2.14
+  perl: 5.006
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/dagolden/ExtUtils-ModuleMaker-TT/issues
+  homepage: https://github.com/dagolden/ExtUtils-ModuleMaker-TT
+  repository: https://github.com/dagolden/ExtUtils-ModuleMaker-TT.git
+version: 0.94
+x_authority: cpan:DAGOLDEN

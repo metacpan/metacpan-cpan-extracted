@@ -1,0 +1,219 @@
+=head1 NAME
+
+Excel::Table - Table processing class for Excel worksheets. 
+
+=head1 SYNOPSIS
+
+  use Excel::Table;
+
+  my $xs = Excel::Table->new('dir' => '/cygdrive/c/Users/self/Desktop');
+
+  for ($xs->list_workbooks) {
+  	print "workbook [$_]\n";
+  }
+
+  $xs->open('mybook.xls');
+
+  my $wb1 = $xs->open_re('foo*bar*');
+
+  for my $worksheet ($wb1->worksheets) {
+  	print "worksheet: " . $worksheet->get_name() . "\n";
+  }
+
+  $xs->null("this is a null value");
+  $xs->force_null(1);	
+
+  $xs->rowid(0);
+
+  $xs->trim(0);
+
+  my @data = $xs->extract('Sheet1');
+
+  for (@data) {
+  	printf "rowid [%s] title [%s] max_width [%d] value [%s]\n",
+  		$_->[0],
+  		$xs->titles->[0],
+  		$xs->widths->[0],
+  		$data{$_}->[0];
+  }
+
+  @data = $xs->extract_hash('Sheet1');
+
+  @data = $xs->select("column1,column2,column3", 'Sheet1');
+
+  @data = $xs->select_hash("column1,column2,column3", 'Sheet1');
+
+  printf "columns %d rows %d title_row %d\n",
+  	$xs->columns, $xs->rows, $xs->title_row;
+
+  printf "regexp [%s] pathname [%s] sheet_name [%s]\n",
+  	$xs->regexp, $xs->pathname, $xs->sheet_name;
+
+  printf "colid2title(0) = [%s]\n", $xs->colid2title(0);
+
+  printf "title2colid('Foo') = %d\n", $xs->title2colid('Foo');
+
+=head1 DESCRIPTION
+
+"Excel::Table" retrieves worksheets as if they are structured
+tables in array-format or optionally in hash-format.
+
+=over 4
+
+=item 1a.  OBJ->dir(EXPR)
+
+Override the directory location in which to look for workbooks.
+Defaults to "." (i.e. the current working directory).
+This location is critical to the B<list_workbooks>, B<open>,
+and B<open_re> methods.
+
+=item 1b.  OBJ->list_workbooks
+
+Returns an array of workbook files in the directory defined by the
+B<dir> property.
+
+=item 2a.  OBJ->open(EXPR)
+
+Parses the filename specified by EXPR.  The B<dir> property 
+will designate the search path.
+Once opened, via this method (or B<open_re>) the
+workbook is available for use by the B<extract> method.
+
+=item 2b.  OBJ->open_re(EXPR)
+
+This will search for a file which has a filename matching the regexp EXPR.  
+A warning will be issued if multiple matches are found, only the first will
+be opened.
+
+=item 3.  OBJ->regexp
+
+Returns the regexp used to search for the workbook on the filesystem.
+
+=item 4.  OBJ->pathname
+
+Returns the pathname of the opened workbook.
+
+=item 5a.  OBJ->extract(EXPR,[TITLE_ROW])
+
+This will extract all data from the worksheet named EXPR.  Data is extracted
+into an array and returned.  Format of data is per below:
+
+  [ value1, value2, value3, ... ],
+  [ value1, value2, value3, ... ],
+  [ value1, value2, value3, ... ],
+  ...
+
+The object OBJ will be populated with various properties to assist you to
+access the data in the array, including column titles and widths.
+
+A worksheet object is temporarily created in order to populate the array.
+Once a worksheet is extracted, the associated worksheet object is destroyed.
+This routine can be called again on any worksheet in the workbook.
+
+If the TITLE_ROW argument is specified, then the B<title_row> property will 
+also be updated prior to extraction.
+
+=item 5b.  OBJ->extract_hash(EXPR,[TITLE_ROW])
+
+Per the B<extract> method, but returns an array of hashes, with the hash 
+keys corresponding to the titles.
+
+=item 5c.  OBJ->select(CLAUSE,EXPR,[TITLE_ROW])
+
+Similar to the B<extract> method, this will extract all rows from the worksheet EXPR, constraining the columns to those specified by the B<clause> argument,
+which is a comma-separated string, e.g. "column1,column2,column3".
+
+As with the B<extract> method, the B<titles> and B<widths> properties will
+be revised.
+
+=item 5d.  OBJ->select_hash(CLAUSE,EXPR,[TITLE_ROW])
+
+Per the B<select> method, but returns an array of hashes.
+
+=item 6.  OBJ->columns or OBJ->rows
+
+Returns the number of columns or rows available in the sheet extracted via the
+B<extract> method.
+
+=item 7a.  OBJ->force_null
+
+Flag which determines if whitespace fields should be
+replaced by specific text (see OBJ->null).
+
+=item 7b.  OBJ->null
+
+String to replace whitespace fields with.  Defaults to "(null)".
+
+=item 8.  OBJ->rowid
+
+Flag which determines whether a pseudo-column "rowid" is included in each
+tuple.  The value will take the form "999999999"  Defaults to FALSE.  
+
+=item 9.  OBJ->sheet_name
+
+Returns the sheet_name against which data was extracted via B<extract>.
+
+=item 10.  OBJ->trim
+
+Flag which determines if trailing whitespace fields should be trimmed.
+
+=item 11a.  OBJ->title_row
+
+Returns the title row of the worksheet (defaults to zero), following extract.
+
+=item 11b.  OBJ->titles
+
+Returns an array of title fields, the title row number having been defined
+as OBJ->title_row.
+
+=item 11c.  OBJ->colid2title(colid)
+
+Converts the column number (colid) to a string column title (i.e. 
+the offset within the title_row array).
+If no match, then returns undef.
+
+=item 11d.  OBJ->title2colid(REGEXP)
+
+Returns the column number of the title identified by REGEXP.
+If no match, then returns undef.
+
+=item 12.  OBJ->widths
+
+Returns an array of maximum lengths of any (non-title) data in each column.
+
+=back
+
+
+=cut
+
+=head1 VERSION
+
+Build V1.022
+
+=head1 AUTHOR
+
+Copyright (C) 2012  Tom McMeekin E<lt>tmcmeeki@cpan.orgE<gt>
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+by the Free Software Foundation; either version 2 of the License,
+or any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+=head1 SEE ALSO
+
+L<perl>, L<Spreadsheet::ParseExcel>, L<Spreadsheet::XLSX>.
+
+
+=cut
+

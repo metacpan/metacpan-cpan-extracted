@@ -1,0 +1,15 @@
+<html>
+<head>
+<title>Tests for Embperl - Set Session Data (unknown cookie)</title>
+</head>
+
+<body>
+	[- 
+	while (($k, $v) = each (%fdat))
+		{
+		$udat{$k} = $fdat{$k} ;
+		}
+	-]
+	[+ $udat{_session_id} +]
+</body>
+</html>

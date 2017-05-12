@@ -1,0 +1,20 @@
+Build.PL
+Changes
+lib/ExtUtils/Typemap/Basic.pm
+lib/ExtUtils/Typemap/Default.pm
+lib/ExtUtils/Typemap/ObjectMap.pm
+lib/ExtUtils/Typemap/STL.pm
+lib/ExtUtils/Typemap/STL/String.pm
+lib/ExtUtils/Typemap/STL/Vector.pm
+lib/ExtUtils/Typemaps/Basic.pm
+lib/ExtUtils/Typemaps/Default.pm
+lib/ExtUtils/Typemaps/ObjectMap.pm
+lib/ExtUtils/Typemaps/STL.pm
+lib/ExtUtils/Typemaps/STL/List.pm
+lib/ExtUtils/Typemaps/STL/String.pm
+lib/ExtUtils/Typemaps/STL/Vector.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.json
+META.yml
+t/001_basic.t

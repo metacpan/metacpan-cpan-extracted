@@ -1,0 +1,13 @@
+Changes
+COPYING
+Eesh.pm
+Eesh.xs
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+test.pl
+eg/grab
+eg/rehome
+eg/synopsis
+README
+INSTALL

@@ -1,0 +1,18 @@
+Revision history for Perl extension Email::Valid::Loose.
+
+0.05  Fri Jun 23 23:58:36 JST 2006
+        - Update the module so it works with recent Email::Valid
+
+0.04  Thu Feb 26 18:25:46 JST 2004
+        - Fixed bug that address(-address => $address) is broken
+
+0.03  Fri Jan 30 17:50:39 JST 2004
+	* Now allows '-foo@example.com' due to quick hack
+	  (Thanks to Takefumi Kimura)
+
+0.02  Tue Jan  8 01:12:00 JST 2002
+	- Added dependency on Email::Valid in Makefile.PL
+	- Added Changes file
+
+0.01  Tue Jan  8 01:11:27 JST 2002
+        - original version

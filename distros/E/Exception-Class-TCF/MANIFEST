@@ -1,0 +1,6 @@
+lib/Exception/Class/TCF.pm
+lib/Exception/Class/TCF/AssertFailure.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml			Module meta-data (added by MakeMaker)
+t/Exception.t

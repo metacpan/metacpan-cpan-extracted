@@ -1,0 +1,12 @@
+Build.PL
+Changes
+lib/Encode/ZapCP1252.pm
+MANIFEST			This list of files
+README
+t/base.t
+t/decoded.t
+t/perl-510.t
+t/pod.t
+Makefile.PL
+META.yml
+META.json

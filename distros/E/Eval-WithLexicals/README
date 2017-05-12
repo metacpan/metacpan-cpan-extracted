@@ -1,0 +1,116 @@
+NAME
+    Eval::WithLexicals - pure perl eval with persistent lexical variables
+
+SYNOPSIS
+      # file: bin/tinyrepl
+
+      #!/usr/bin/env perl
+
+      use strictures 1;
+      use Eval::WithLexicals;
+      use Term::ReadLine;
+      use Data::Dumper;
+      use Getopt::Long;
+
+      GetOptions(
+        "plugin=s" => \my @plugins
+      );
+
+      $SIG{INT} = sub { warn "SIGINT\n" };
+
+      { package Data::Dumper; no strict 'vars';
+        $Terse = $Indent = $Useqq = $Deparse = $Sortkeys = 1;
+        $Quotekeys = 0;
+      }
+
+      my $eval = @plugins
+       ? Eval::WithLexicals->with_plugins(@plugins)->new
+       : Eval::WithLexicals->new;
+
+      my $read = Term::ReadLine->new('Perl REPL');
+      while (1) {
+        my $line = $read->readline('re.pl$ ');
+        exit unless defined $line;
+        my @ret; eval {
+          local $SIG{INT} = sub { die "Caught SIGINT" };
+          @ret = $eval->eval($line); 1;
+        } or @ret = ("Error!", $@);
+        print Dumper @ret;
+      }
+
+      # shell session:
+
+      $ perl -Ilib bin/tinyrepl 
+      re.pl$ my $x = 0;
+      0
+      re.pl$ ++$x;
+      1
+      re.pl$ $x + 3;
+      4
+      re.pl$ ^D
+      $
+
+METHODS
+  new
+      my $eval = Eval::WithLexicals->new(
+        lexicals => { '$x' => \1 },      # default {}
+        in_package => 'PackageToEvalIn', # default Eval::WithLexicals::Scratchpad
+        context => 'scalar',             # default 'list'
+        prelude => 'use warnings',       # default 'use strictures 1'
+      );
+
+  eval
+      my @return_value = $eval->eval($code_to_eval);
+
+  lexicals
+      my $current_lexicals = $eval->lexicals;
+
+      $eval->lexicals(\%new_lexicals);
+
+  in_package
+      my $current_package = $eval->in_package;
+
+      $eval->in_package($new_package);
+
+  context
+      my $current_context = $eval->context;
+
+      $eval->context($new_context); # 'list', 'scalar' or 'void'
+
+  prelude
+    Code to run before evaling code. Loads strictures by default.
+
+      my $current_prelude = $eval->prelude;
+
+      $eval->prelude(q{use warnings}); # only warnings, not strict.
+
+  with_plugins
+      my $eval = Eval::WithLexicals->with_plugins("HintPersistence")->new;
+
+    Construct a class with the given plugins. Plugins are roles located
+    under a package name like "Eval::WithLexicals::With*".
+
+    Current plugins are:
+
+    *   HintPersistence
+
+        When enabled this will persist pragams and other compile hints
+        between evals (for example the strict and warnings flags in effect).
+        See Eval::WithLexicals::WithHintPersistence for further details.
+
+AUTHOR
+    Matt S. Trout <mst@shadowcat.co.uk>
+
+CONTRIBUTORS
+    David Leadbeater <dgl@dgl.cx>
+
+    haarg - Graham Knop (cpan:HAARG) <haarg@cpan.org>
+
+COPYRIGHT
+    Copyright (c) 2010 the Eval::WithLexicals "AUTHOR" and "CONTRIBUTORS" as
+    listed above.
+
+LICENSE
+    This library is free software and may be distributed under the same
+    terms as perl itself.
+

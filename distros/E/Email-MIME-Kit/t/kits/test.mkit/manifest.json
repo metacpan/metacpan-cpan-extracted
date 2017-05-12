@@ -1,0 +1,45 @@
+{
+  "validator": [ "Simplest", { "required_fields": [ "friend" ] } ],
+  "renderer": "TestRenderer",
+  "header": [
+    { "Subject": "Hello [% friend.name() %]"     },
+    { "From":    "Test Sender <test@test.com>" },
+    { "X-Test":  "This is an unrendered [% friend %] test.", ":renderer": null  },
+    { "Band-1": "Queensrÿche" },
+    { "Band-2": "Queensr\u00FFche" }
+  ],
+  "alternatives": [
+    {
+      "type": "text/plain",
+      "body": "We don't support tests."
+    },
+    {
+      "attributes": {
+        "content_type": "text/html",
+        "charset": "utf-8"
+      },
+      "header": [ { "X-Cantata": "[% friend %] canta y no llores" } ],
+      "body": "<p>This is the unrendered [% friend %] HTML part.  Renderer: null</p>",
+      "renderer": null
+    },
+    {
+      "container_type": "multipart/related",
+      "type": "text/html",
+      "path": "better-alternative.html",
+      "attributes": { "charset": "utf-8" },
+      "attachments": [
+        {
+          "type": "image/jpeg",
+          "path": "logo.jpg"
+        }
+      ]
+    }
+  ],
+  "attachments": [
+    {
+      "type": "application/pdf",
+      "path": "bogus-report.pdf",
+      "attributes": { "filename": "report.pdf" }
+    }
+  ]
+}

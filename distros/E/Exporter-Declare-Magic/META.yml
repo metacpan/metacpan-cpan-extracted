@@ -1,0 +1,40 @@
+---
+abstract: 'Enhance Exporter::Declare with some fancy magic.'
+author:
+  - 'Chad Granum <exodist7@gmail.com>'
+build_requires:
+  Fennec::Lite: 0.004
+  Test::Exception: 0.29
+  Test::Simple: 0.88
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Exporter-Declare-Magic
+provides:
+  Exporter::Declare::Magic:
+    file: lib/Exporter/Declare/Magic.pm
+    version: 0.107
+  Exporter::Declare::Magic::Parser:
+    file: lib/Exporter/Declare/Magic/Parser.pm
+    version: 0
+  Exporter::Declare::Magic::Sub:
+    file: lib/Exporter/Declare/Magic/Sub.pm
+    version: 0
+requires:
+  Carp: 0
+  Devel::Declare::Parser: 0.017
+  Exporter::Declare: 0.107
+  Meta::Builder: 0.003
+  Scalar::Util: 0
+  aliased: 0
+  perl: v5.8.0
+resources:
+  bugtracker: http://github.com/exodist/Exporter-Declare-Magic/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/exodist/Exporter-Declare-Magic
+version: 0.107

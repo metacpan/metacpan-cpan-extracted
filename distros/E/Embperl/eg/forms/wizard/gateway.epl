@@ -1,0 +1,43 @@
+
+[!
+
+sub title   { $epreq -> gettext ('txt:setup_gw_title') } 
+sub condition {
+    my ($self, $r) = @_ ;
+    if ($r -> {data}{action} ne 'addslave' && $r -> {data}{action} ne 'master')
+    	{
+    	return 0 ;
+    	}
+    $r -> {data}{inetconnect} eq 'lan' 
+         ;
+    }
+
+   
+
+!]
+
+[$ sub show $]
+[-
+$sthc   = 0 ;
+-]
+<p>[$if !$sthc $][= txt:setup_gw1 =][$else$][= txt:setup_gw_sthc1 =][$endif$]</p>
+
+
+[-
+$sthc   = 0 ;
+
+
+
+Embperl::MyForm -> showfields (
+
+	[
+        ($sthc?():(
+	{ name => 'ipaddr_inet',      text => 'IP Adresse der Internetschnittstelle',        validate => [ required => 1, -type => 'IPAddr', ]},
+	{ name => 'netmask_inet',   	 text => 'Netzmaske der Internetschnittstelle',                     validate => [ required => 1, -type => 'Integer', gt => 0, le => 32],
+                        type => 'select', datasrc => 'netmask' },
+	)),
+	{ name => 'defaultgw', 	 text => 'IP Adresse des Default Gateways',validate => [ emptyok => 1,  -type => 'IPAddr', ]},
+        ]);
+-]
+
+[$endsub$]

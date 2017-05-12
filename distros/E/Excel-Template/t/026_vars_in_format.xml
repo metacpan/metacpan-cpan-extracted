@@ -1,0 +1,13 @@
+<workbook>
+    
+  <worksheet name="loops">
+      
+    <loop name="loopy">
+        <format bg_color='$color'>
+            <cell text="$value" />
+        </format>
+    </loop>
+    
+  </worksheet>
+  
+</workbook>

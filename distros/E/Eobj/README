@@ -1,0 +1,60 @@
+Eobj version 0.22
+=================
+
+Eobj is OO in Perl for the masses. It makes it possible to write complete
+OO scripts with plain Perl syntax (unlike classic OO-Perl). And like plain
+Perl, the syntax usually means what you think it means, as long as things
+are kept plain.
+
+The man page ("man Eobj") gives the basic information to get you going.
+
+Details and advanced issues are documented in eobj.pdf ("The Guide").
+
+SYNOPSIS
+
+  use Eobj;
+
+  inherit('myclass','myclass.pl','root');
+
+  init;
+
+  $object = myclass->new(name => 'MyObject');
+  $object->mymethod('hello');
+
+  $object->set('myscalar', 'The value');
+  $scalar = $object->get('myscalar');
+
+  $object->set('mylist', 'One', 'Two', 'Three');
+  @list = $object->get('mylist');
+
+  %hash = ('Foo' => 'Bar',
+           'Daa' => 'Doo');
+  $object->set('myhash', %hash);
+  %the_hash = $object->get('myhash');
+
+  globalobj->objdump(); # Dump debug info
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+Eobj should run well on any standard distribution of Perl of version
+5.004 or higher, on any platform. Please inform me otherwise.
+
+SEE ALSO
+
+The Perlilog project: http://www.opencores.org/perlilog/
+
+COPYRIGHT AND LICENCE
+
+Released under GPL. Please see license.txt for complete license.
+
+Copyright (C) 2003 Eli Billauer <elib@flextronics.co.il>
+

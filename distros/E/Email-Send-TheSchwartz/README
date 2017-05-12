@@ -1,0 +1,28 @@
+$Id: README 4 2007-05-04 01:55:56Z btrott $
+
+This is Email::Send::TheSchwartz, an Email::Send plugin for sending messages
+via TheSchwartz.
+
+PREREQUISITES
+
+    * Email::Address
+    * Return::Value
+    * TheSchwartz
+
+INSTALLATION
+
+Email::Send::TheSchwartz installation is straightforward. If your CPAN shell
+is set up, you should just be able to do
+
+    % perl -MCPAN -e 'install Email::Send::TheSchwartz'
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+Six Apart / cpan@sixapart.com

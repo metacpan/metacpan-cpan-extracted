@@ -1,0 +1,213 @@
+package Elastic::Manual::QueryDSL;
+
+# ABSTRACT: How to use the Elasticsearch Query DSL
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Elastic::Manual::QueryDSL - How to use the Elasticsearch Query DSL
+
+=head1 VERSION
+
+version 0.52
+
+=head1 INTRODUCTION
+
+Elasticsearch provides a rich query language, known as the
+L<Query DSL|http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl.html> which
+exposes much of the power of Lucene through a simple JSON interface.
+It is tuned for full text search, but is in no way limited just
+to that. It also provides very fast and flexible filters, ranges, geo-location
+and more.
+
+L<ElasticSearch::SearchBuilder> is a more concise, more Perlish version
+of the Query DSL, similar to L<SQL::Abstract>.  Both syntaxes are
+fully supported by Elastic::Model.
+In L<Elastic::Model::View>, L<query|Elastic::Model::View/query>,
+L<filter|Elastic::Model::View/filter> and
+L<post_filter|Elastic::Model::View/post_filter> expect the native
+Query DSL, while L<queryb|Elastic::Model::View/queryb>,
+L<filterb|Elastic::Model::View/filterb> and
+L<post_filterb|Elastic::Model::View/post_filterb> (note the extra "b") expect
+the SearchBuilder syntax.
+
+=head1 FULL TEXT VS EXACT MATCHING
+
+There are two broad ways to match values in ElasticSearch:
+
+=head2 Exact matching
+
+=over
+
+=item *
+
+Documents where C<< status eq 'active' >>
+
+=item *
+
+Documents with any of the tags C<"perl">, C<"python"> or C<"ruby">
+
+=item *
+
+Documents published between 2012-01-01 and 2012-12-31
+
+=item *
+
+Documents within 50km of geo-point Lat,Lon
+
+=item *
+
+Documents that have a value in the C<name> field
+
+=back
+
+=head2 Full text matching
+
+=over
+
+=item *
+
+Documents which are relevant to the search terms "quick brown fox"
+
+=item *
+
+Documents about "Big Mac", but not about "Apple Mac"
+
+=item *
+
+Documents about "flying kites", where the text may include "fly", "flying",
+"kite" or "kites"
+
+=item *
+
+The most relevant auto-complete terms which match the partial phrase
+"arnold schwa"
+
+=back
+
+You can only find what is actually stored in Elasticsearch.  For this reason,
+exact matching is easy.  Full text matching is B<made> easy by the analysis
+process, which you can read more about in L<Elastic::Manual::Analysis>.
+
+=head1 QUERIES VS FILTERS
+
+Every search has a single query, but that query can contain multiple other
+queries and filters.   Choosing the right tool for the job is important:
+
+=over
+
+=item Filters:
+
+=over
+
+=item *
+
+are for L</Exact matching> only
+
+=item *
+
+are boolean: a doc either matches or it doesn't. There is no scoring phase
+
+=item *
+
+are faster
+
+=item *
+
+are cacheable
+
+=back
+
+=item Queries:
+
+=over
+
+=item *
+
+can be used for L</Exact matching> or for L</Full text matching>
+
+=item *
+
+score each document by "relevance" (see L<http://www.lucenetutorial.com/advanced-topics/scoring.html>
+for a summary of how scoring works)
+
+=item *
+
+are slower, because of the scoring phase
+
+=item *
+
+are not cacheable
+
+=back
+
+=back
+
+B<In summary>: you should use filters for any part of the query that does not
+require relevance scoring.
+
+B<Note:> a search for documents which have the exact tags C<"perl"> or C<"python">
+may use a filter or a query.  If all you care about is that each document
+has at least one of those tags, then use a filter.  If a document that has
+BOTH tags should be considered more relevant than a document with only
+one tag, then you need a query.
+
+=head1 USING QUERIES AND FILTERS WITH ELASTIC::MODEL::VIEW
+
+L<Elastic::Model::View> gives you a "view" across your data.  It is the
+class you use to build your searches.
+
+Just a query:
+
+    $view->query(  match  => { title => 'object models'   })->search;
+
+Just a filter:
+
+    $view->filter( terms => { tags => ['perl','python' ] })->search
+
+A query and filter combined:
+
+    $view->query(  match  => { title => 'object models'   })
+         ->filter( terms => { tags => ['perl','python' ] })->search
+
+Or, with the SearchBuilder syntax:
+
+    $view->queryb(  title => 'object models'    )
+         ->filterb( tags  => ['perl','python' ] )->search
+
+B<Note:> Elasticsearch only accepts a C<query> parameter, so the
+L<query|Elastic::Model::View/query> and L<filter|Elastic::Model::View/filter>
+attributes are combined at search time.  This means that you can quite happily
+specify queries with nested filters using just the
+L<query|Elastic::Model::View/query>  attribute.
+
+B<Note:> the L<post_filter|Elastic::Model::View/post_filter> works in exactly
+the same way as L<filter|Elastic::Model::View/filter>, but it only filters
+the results AFTER the L<aggregations|Elastic::Model::View/aggs> (like GROUP BY)
+have been calculated.
+
+=head1 QUERIES
+
+See L<Elastic::Manual::QueryDSL::Queries> for examples of commonly used queries.
+
+=head1 FILTERS
+
+See L<Elastic::Manual::QueryDSL::Filters> for examples of commonly used filters.
+
+=head1 AUTHOR
+
+Clinton Gormley <drtech@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Clinton Gormley.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

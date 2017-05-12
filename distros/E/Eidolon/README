@@ -1,0 +1,44 @@
+Eidolon, version 0.02
+=====================
+
+Eidolon is intended to turn a headache of web user interface development 
+into something easy and full of fun. The main goal of the project is
+to ease the creation of various web-based backends and systems such as project 
+management systems, customer relationship management systems, online payment 
+services and so on. You can use Eidolon for web site creation too, but it
+isn't recommended - try to use another powerful tools, that are intended for 
+this task (for example, Typo3 CMF, Movable Type or, say, Wordpress).
+
+INSTALLATION
+
+To install Eidolon type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+This package requires these other modules and libraries:
+
+    DBI
+    Exporter
+    FindBin
+    Getopt::Long
+    List::Util
+    Class::Accessor::Fast
+
+LICENCE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+AUTHOR
+
+Anton Belousov, <abel@cpan.org>
+
+COPYRIGHT
+
+Copyright (c) 2009, Atma 7, http://www.atma7.com
+

@@ -1,0 +1,8 @@
+{
+  "header": [
+    { "Subject": "hard math tests!" },
+    { "From":    "Professor Difficult <prof@example.asia>" }
+  ],
+  "type": "text/plain",
+  "body": "Our math tests have never been harder!"
+}

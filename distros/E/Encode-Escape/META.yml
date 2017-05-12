@@ -1,0 +1,27 @@
+---
+name: Encode-Escape
+version: 0.14
+author:
+  - You Hyun Jo
+abstract: Perl extension for Encodings of various escape sequences
+license: perl
+requires:
+  perl: 5.008
+build_requires:
+  Test::More: 0
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+provides:
+  Encode::Escape:
+    file: lib/Encode/Escape.pm
+    version: 0.14
+  Encode::Escape::ASCII:
+    file: lib/Encode/Escape/ASCII.pm
+    version: 0.19
+  Encode::Escape::Unicode:
+    file: lib/Encode/Escape/Unicode.pm
+    version: 0.13
+resources:
+  license: http://dev.perl.org/licenses/

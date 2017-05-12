@@ -1,0 +1,54 @@
+NAME
+
+    Email::Outlook::Message
+
+DESCRIPTION
+
+    This module reads e-mail messages stored as .msg files (such as generated
+    by Outlook), and converts them to Email::MIME objects. It also includes a
+    command-line interface in the form of the msgconvert script.
+
+    You do not need Outlook installed to use this module.
+
+VERSION
+
+    0.918
+
+INSTALLATION
+
+    To install this module type the following:
+
+      perl Build.PL
+      ./Build
+      ./Build test
+      ./Build install
+
+    You may have to become root for that final step.
+
+DEPENDENCIES
+
+    This module requires these other modules:
+
+      Carp
+      Encode
+      Getopt::Long
+      IO::String
+      Pod::Usage
+
+      Email::MIME               - 1.923 or later
+      Email::MIME::ContentType  - 1.014 or later
+      Email::Sender             - 1.3 or later
+      Email::Simple             - 2.102 or later
+      OLE::Storage_Lite         - 0.14 or later
+
+    For testing:
+
+      IO::All
+      Test::More
+
+COPYRIGHT AND LICENCE
+
+    Copyright 2002--2014 Matijs van Zuijlen.
+
+    This program is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.

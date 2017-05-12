@@ -1,0 +1,11 @@
+Revision history for Perl extension Encode::BOCU1.
+
+0.01  Mon Jun 29 12:00:00 2006
+	- original version
+
+0.02  Mon Jul  3 04:30:00 2006
+	- optimized version
+
+0.03  Mon Jul 03 22:00:00 2006
+    - changed copyright & license notices
+

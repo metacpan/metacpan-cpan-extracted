@@ -1,0 +1,71 @@
+Revision history for Perl module Exception::Class::TryCatch
+
+1.13      2014-02-26 19:22:39-05:00 America/New_York
+
+    [CHANGED]
+
+    - Updated distribution metadata, repo and bugtracker
+
+    - Distribution now managed with Dist::Zilla
+
+1.12 Mon Nov  3 17:12:19 EST 2008
+
+    - Changed: if no exception was thrown, catch() returns an empty array
+      in list context
+
+1.11 Tue Sep 30 12:21:56 EDT 2008
+
+    - Fixed: Exception::Class objects that stringified to an empty string
+      weren't being caught  (Alessandro Ranellucci)
+
+    - Changed: now licensed under the Apache License, version 2.0; (it's
+      clearer, relicensable, and is explicit about contributions)
+
+1.10 Tue Feb  7 21:26:27 EST 2006
+    - Removed Test::Exception dependency entirely
+    - Downgraded Test::More dependency to 0.45
+
+1.09 Tue Aug 16 10:32:15 EDT 2005
+    - [RT #14025] updated documentation for try to reflect new calling syntax
+    - deprecated "caught()" as Exception::Class 1.21 added "caught()" with 
+      different semantics
+    - updated Test::Exception dependency to 0.21 as 0.20 had build_requires
+      problems of its own
+
+1.08 Mon Aug  1 09:29:00 EDT 2005
+    - moved build_requires to requires for CPANPLUS bug workaround
+
+1.07 Fri Jun 10 11:30:02 EDT 2005
+    - reduced Test::More required version to 0.47
+
+1.06 Wed Jun  8 12:02:24 EDT 2005
+    - removed pod/coverage tests to minimize dependencies for Activestate
+
+1.05 Tue Jun  7 17:34:32 EDT 2005
+    - updated Build.PL to include build dependencies
+
+1.04 Mon May 16 23:20:23 EDT 2005
+    - changed Module::Build makefile support to 'traditional' (Perrin)
+
+1.03 Sat Apr 23 09:03:00 EDT 2005
+    - catch rethrows if optional list of class types isn't matched
+    - added support for both one- and two-arguments forms of catch
+
+1.02 Wed Mar  9 06:47:58 EST 2005
+    - added pod and pod coverage tests
+
+1.01 Mon Jan 24 22:51:43 EST 2005
+    - changed "try" to return whatever eval returns
+    - try in list context dereferences an array_ref allowing eval to
+      be called in list context by wrapping in an anonymous array
+    - updated build configuration
+    
+1.00 Wed Dec  8 16:28:37 EST 2004
+    - renamed to Exception::Class::TryCatch (on advice of Dave Rolsky)
+    - minor pod edits
+    
+0.10 Thu Sep  9 10:20:51 EDT 2004
+    - initial public release as Exception::Class::Sugar
+
+0.01 Fri Sep  3 00:09:17 2004
+	- original version; created by ExtUtils::ModuleMaker::TT

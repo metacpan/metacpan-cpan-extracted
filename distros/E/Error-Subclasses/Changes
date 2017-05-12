@@ -1,0 +1,18 @@
+Revision history for Error-Subclasses
+
+0.05    CHANGES:
+         * Actually declare version in Error/SystemException.pm
+
+0.04    CHANGES:
+         * use strict; use warnings
+         * Various small updates to keep CPANTS happy
+
+0.03    CHANGES:
+         * Create Makefile.PL out of Build.PL
+
+0.02    CHANGES:
+         * Switch to Module::Build
+         * Documentation updates
+
+0.01    First version, released on an unsuspecting world.
+

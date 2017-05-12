@@ -1,0 +1,79 @@
+ETL-Pequel3-PlaceHolder version 0.01
+====================================
+
+INTRODUCTION
+------------
+
+pequel -- Generate Perl programs for data transformation processes.
+
+Pequel is a comprehensive data processing and transformation system. It features a simple, 
+user-friendly event driven interface that transparently generates, builds and executes 
+highly efficient data-processing programs. The Pequel interface is based on a 'Declarative 
+Programming' paradigm. By using Pequel the user can create and maintain complex ETL data 
+transformation and distributed data processes quickly, easily, and accurately. 
+
+Pequel transformation definitions can be prepared using one of these methods: 
+  - a perl program calling the ETL::Pequel3::User module interface; 
+  - an XML script based on the provided 'pequel.xsd' XML-Schema; 
+  - a hash or hash-dump describing the Pequel Object Model (POM). 
+
+Pequel is hosted on sourceforge: 
+
+http://sourceforge.net/projects/pequel/
+
+...please check the site out for new pequel extensions and updates.
+
+
+Test
+----
+
+The tests provided in the Pequel module package are memory and CPU intensive and it is highly 
+recommended that a minimum system configuration af B<512MB> memory is available. In fact, anything 
+less could cause some tests to fail (wait timeouts, etc). On a Pentium 4 2.4GHz system with 512MB 
+on Cygwin, the tests take about 1.5 hours to run. Please note that this does not reflect the 
+efficiency (or lack of) by a stand-alone generated pequel program -- the slowness is caused by 
+the I<evals> going on in the test scripts.
+
+
+
+Installation Instructions
+-------------------------
+
+perl Makefile.PL
+
+-or to specify different perl library path-
+
+perl Makefile.PL PREFIX=/product/perldev/Perl/Modules
+
+make
+
+make test
+
+make install
+
+
+Documentation
+-------------
+The lastest documentation and package may be found at:
+
+http://sourceforge.net/projects/pequel/
+
+
+Copyright Notice
+----------------
+Copyright 1999-2007 Mario Gaffiero.
+
+This file is part of Pequel(TM).
+
+Pequel is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; version 2 of the License.
+
+Pequel is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Pequel; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA

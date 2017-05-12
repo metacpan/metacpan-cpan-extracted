@@ -1,0 +1,6 @@
+Bar: Bar
+Badly-Folded:  This header is badly folded because even though it goes onto the
+second line, it has no indent.
+Foo: Foo
+
+This is the body!

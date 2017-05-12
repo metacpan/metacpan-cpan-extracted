@@ -1,0 +1,52 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 41995e37ac445d4954acdb0436bf07b6d6731f2a Changes
+SHA1 7d9986bc37f4cfa2dc2bfb0ee5323b1a046e91ff LICENSE
+SHA1 848a0bfdb10048b822cf9f991e50bad6ebe8c1d3 MANIFEST
+SHA1 dc65d5427440e009877292c90b2083e1f247d076 META.yml
+SHA1 9cb26101be303110ed36252c01ac8eff2ee7fd9d Makefile.PL
+SHA1 7c236760bd4ddf0717a9a51b2cce6f05c2c9b715 README
+SHA1 426de096d4e6c3b3a40558ab419cde649c62de2a examples/ex1.pl
+SHA1 8d9de5ee12ba026ac784fd0a20adb28bfee1c146 examples/ex2.pl
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
+SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 660eb61c83446431df7e388395989abd759e8bca lib/Error/Pure/Output/JSON.pm
+SHA1 03f28246abacd07dffabf84ac6945489b4b101f4 t/Error-Pure-Output-JSON/01-use.t
+SHA1 52f3b26b9dbdf8ff01af1eb10d59d63ec018c5a7 t/Error-Pure-Output-JSON/02-version.t
+SHA1 6d51748cac0de77365bdced167bc43167a441002 t/Error-Pure-Output-JSON/03-err_json.t
+SHA1 f5a460894fe66b6cfa2c539c4cc42adf8b96d805 xt/Error-Pure-Output-JSON/01-pod_coverage.t
+SHA1 d4af87bc21360e097fbc5341d435d7ebaf3e0f3f xt/Error-Pure-Output-JSON/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJV+Wj7AAoJEJe+XXKaIuTlJmoIAI4ZFAOQNPSoB1pvgv8azSqJ
+I1U0rMAR27rbYUX8omBhjZ6csC+KHL9ftCK6dp9cu8lClFfjQHGGTzZilwKC1UPe
+tqhu82heFkzd5Mo0oCooCAvji8oG+6+HN5ADhvzO1vXlNIi0TlpX6R+TIuocgdyE
+sPe4W/CeyX2lIOemY3NQ3BLgXkMYy593Dl0IWZ60I+JQPrnFQ2fpzHgqXXD7b/pG
+MhScegRUgaAF+phB8A6HxkCjwSK4kWUC8qdN5hHsjsqXtQYKmRCgeizTuh2vmotL
+krmQPoSh2XaYNwHR/GEQ66Pf6p3x7mkIYW5sc4CAawjWN/gg++D30OCWOu+v/To=
+=5ElL
+-----END PGP SIGNATURE-----

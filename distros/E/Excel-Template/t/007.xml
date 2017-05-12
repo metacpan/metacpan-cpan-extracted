@@ -1,0 +1,11 @@
+<workbook>
+  <worksheet name="cell">
+    <cell />
+    <bold>
+      <cell />
+      <italic>
+        <cell />
+      </italic>
+    </bold>
+  </worksheet>
+</workbook>

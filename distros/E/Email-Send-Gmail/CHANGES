@@ -1,0 +1,12 @@
+Revision history for Perl module Email::Send::Gmail:
+
+0.33 Thu Oct 16 20:44:18 BST 2008
+     - add human-readable license to the documentation
+     - add abstract, license to Makefile.PL
+     - add README
+
+0.32 Sun Dec  2 07:32:28 GMT 2007
+     - add Authen::SASL to the dependencies
+
+0.31 Sun Nov  4 18:11:53 GMT 2007
+     - initial release

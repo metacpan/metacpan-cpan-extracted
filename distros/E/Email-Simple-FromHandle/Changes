@@ -1,0 +1,26 @@
+This is the revision history for Email-Simple-FromHandle
+
+0.054     2013-09-24 20:55:08 America/New_York
+          replace busted-on-Win32 test file
+
+0.053     2013-08-24 08:27:27 America/New_York
+          update bugtracker and repository
+
+          use warnings
+
+          use parent.pm instead of base.pm
+
+0.052     2008-06-25
+          fix cross-platform detection of non-seekable handles (HDP)
+
+0.051     2008-06-24
+          allow header_class arg to new(), to match Email::Simple's new (HDP)
+
+0.050     2007-02-06
+          excellent features added by HDP:
+            test for reading from unseekable filehandles
+            add getline() for streaming from an email
+            add stream_to() for convenient streaming to a fh (or anything else)
+
+0.011     2006-06-13
+          added this changelog

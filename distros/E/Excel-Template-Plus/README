@@ -1,0 +1,45 @@
+Excel::Template::Plus version 0.06
+=====================================
+
+See the individual module documentation for more information
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Excel::Template
+    Template
+    IO::String
+    Moose
+    MooseX::Param
+
+The Test::Excel::Template::Plus module also requires:
+
+    Test::Deep
+    Spreadsheet::ParseExcel
+
+And requires these modules for testing:
+
+    Test::More
+    Test::Exception
+    FindBin
+    File::Spec::Functions
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007-2014 Infinity Interactive, Inc.
+
+http://www.iinteractive.com
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

@@ -1,0 +1,23 @@
+Exception-Sink
+==============
+
+Exception::Sink provides compact general purpose exception handling.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+Exception::Sink does not use other libraries, it requires only core perl.
+
+COPYRIGHT AND LICENCE
+
+See `COPYING' file for full GPL license text.
+
+Copyright (C) 2006-2010 Vladi Belperchinov-Shabanski <cade@cpan.org> <cade@bis.bg>

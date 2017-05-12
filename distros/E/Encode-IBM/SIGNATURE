@@ -1,0 +1,39 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 c416004e54ed2390fd7c1b5ab2ebb812e6747047 Changes
+SHA1 35f9605ad840f987fa636c83721178a71adfb920 MANIFEST
+SHA1 2a13d20044585b17ce8e0863b69bbbcf42f5e663 META.yml
+SHA1 39cdd7e0abdd1c24eb97c72a05a60a9f97848a1c Makefile.PL
+SHA1 e725a32a6426db8700e9a714e2dbc66bd6ec18ff README
+SHA1 8c866693c54be323b72d8f15280e3f94a0df5d10 lib/Encode/IBM.pm
+SHA1 d76606621dc02a76a77f8626f61fd587aa17e73e lib/Encode/IBM/835SOSI.pm
+SHA1 184f9d81ed96492397b860160f3e7918b4ef57c1 lib/Encode/IBM/835SOSI/TSGH.pm
+SHA1 44d8607cc5e94a658a664a5f0cedb6ede1685290 lib/Encode/IBM/939SOSI.pm
+SHA1 a7351164afa3b1d4a828933dd1293866d11b911e lib/Encode/IBM/947SOSI.pm
+SHA1 5e1b16e537474ea3288d392e8e4c31804ce1d8af t/IBM.t
+SHA1 1279cf17ba5d2791310545b0d4322f199b41aba3 ucm/ibm-835.ucm
+SHA1 b38f900ad7690b78bd685c895b12ad811c327cf8 ucm/ibm-937.ucm
+SHA1 21aedaa0377831c9c3ce7168e23387b3890f4876 ucm/ibm-939.ucm
+SHA1 fb76c97607070f0955b282d2bfef1e99bad8e4ae ucm/ibm-947.ucm
+SHA1 09aadfc1504b54851e55b3e190af89471e736a1e ucm/ibm-964.ucm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.3 (Darwin)
+
+iD8DBQFHgj7ItLPdNzw1AaARAgOjAJ94wEc8Z75x8TIawJDzcLecChVXjgCfcDhK
+xt8D59c3BGkDKkftcpzHSoE=
+=N/Gn
+-----END PGP SIGNATURE-----

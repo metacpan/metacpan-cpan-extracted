@@ -1,0 +1,23 @@
+Build.PL
+Changes
+examples/list.pl
+lib/Env/Sanctify/Auto.pm
+LICENSE
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+t/00signature.t
+t/01manifest.t
+t/02compile.t
+t/03core.t
+t/03defaults.t
+t/03exceptions.t
+t/97pod.t
+t/98pod-coverage.t
+t/99kwalitee.t
+t/99meta.t
+t/99min-perl.t
+t/99portability.t
+Makefile.PL
+SIGNATURE    Added here by Module::Build

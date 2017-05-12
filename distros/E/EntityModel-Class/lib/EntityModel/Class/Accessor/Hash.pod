@@ -1,0 +1,47 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with EntityModel::Class::Accessor::Hash
+at lib/EntityModel/Class/Accessor/Hash.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=encoding utf8
+
+=cut
+
+=head1 NAME
+
+EntityModel::Class::Accessor::Array - generic class accessor for arrays
+
+=head1 VERSION
+
+Version 0.016
+
+=head1 DESCRIPTION
+
+See L<EntityModel::Class>.
+
+=head1 METHODS
+
+=head2 method_list
+
+Returns a hash of method definitions.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<EntityModel::Class::Accessor>
+
+L<add_to_class|EntityModel::Class::Accessor/add_to_class>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <cpan@entitymodel.com>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2008-2014. Licensed under the same terms as Perl itself.

@@ -1,0 +1,33 @@
+---
+name: Egg-Release-JSON
+version: 0.02
+author:
+  - 'Masatoshi Mizuno E<lt>lusheE<64>cpan.orgE<gt>'
+abstract: JSON module kit for Egg.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Egg::Plugin::LWP: 2.01
+  Egg::Release: 2.2
+  JSON: 1.14
+  Test::More: 0
+  Test::Perl::Critic: 0
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+provides:
+  Egg::Plugin::JSON:
+    file: lib/Egg/Plugin/JSON.pm
+    version: 0.01
+  Egg::Plugin::JSON::Result:
+    file: lib/Egg/Plugin/JSON.pm
+  Egg::Release::JSON:
+    file: lib/Egg/Release/JSON.pm
+    version: 0.02
+  Egg::View::JSON:
+    file: lib/Egg/View/JSON.pm
+    version: 0.01
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

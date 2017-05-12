@@ -1,0 +1,72 @@
+[% title = 'Jobs' %]
+[% PROCESS menu.tmpl %]
+    <div class="form">
+    <form action="[% script %]" method="post">
+        <label for="config_id">Config</label>
+        <select name="config_id" id="config_id">
+            <option value="" />
+            [% WHILE (config = config_list.next) %]
+            <option value="[% config.config_id %]" [% IF config.config_id == config_id %]selected="selected"[% END%] >[% config.config_name %]</option>
+            [% END %]
+        </select>
+        <label for="section">Section</label>
+        <select name="section_name" id="section_name">
+            <option value="" />
+            [% WHILE (section = section_list.next) %]
+            <option value="[% section.section_name %]" [% IF section.section_name == section_name %]selected="selected"[% END %]>[% section.section_name %]</option>
+            [% END %]
+        </select>   
+        <label for="status_id">Status</label>
+        <select name="status_id">
+            <option value="">All</option>
+            [% WHILE (status = status_list.next) %]
+            <option value="[% status.status_id %]" [% IF status.status_id == status_id %]selected="selected"[% END %]>[% status.status_name %]</option>
+            [% END %]
+        </select>
+        <label for="minimum_date">Min Start Date &gt;=</label>
+        <input type="text" name="minimum_date" id="minimum_date" size="10" value="[% minimum_date%]""/>
+        <input type="button" id="but-min-date" value="..." />
+        <label for="maximum_date">Max Start Date &lt;</label>
+        <input type="text" name="maximum_date" id="maximum_date" size="10" value="[% maximum_date%]"/>
+        <input type="button" id="but-max-date" value="..." />
+        <input type="submit" value="Go"/>
+    </form>
+    
+    </div>
+    <table>
+        <tr>
+            <th>Config</th>
+            <th>Section</th>
+            <th>Status</th>
+            <th># Items</th>
+            <th>Session ID</th>
+            <th>OS Process ID</th>
+            <th>Date Created</th>
+            <th>Date Updated</th>
+        </tr>
+        [% WHILE (job = jobs.next) %]
+        <tr>
+            <td>[% job.section.config.config_name %]</td>
+            <td>[% job.section.section_name %]</td>
+            <td class="[% job.status.status_name %]">[% job.status.status_name %]</td>
+            <td>[% IF job.etlp_items_rs.count > 0 %]<a href="[% root_url %]/item/[% job.job_id %]">[% END %][% job.etlp_items_rs.count %][% IF job.etlp_items_rs.count > 0 %]</a>[% END %]</td>
+            <td>
+                [% IF ((db_type == 'oracle') && (job.status.status_name == 'dummy')) %]
+                    <a href="[% root_url %]/oramon/show_sql/[% job.session_id %]">                
+                [% END %]
+                [% job.session_id %]
+                [% IF ((db_type == 'oracle') && (job.etlp_status.status_name == 'dummy')) %]
+                    </a>
+                [% END %]
+            </td>
+            <td>[% job.process_id %]</td>
+            <td>[% job.date_created.strftime('%d/%m/%Y %H:%M:%S') %]</td>
+            <td>[% job.date_updated.strftime('%d/%m/%Y %H:%M:%S') %]</td>
+        </tr>
+        [% END %]
+    </table>
+
+[% c.prototype.observe_field('config_id', {url = root_url _ '/job/update_sections', update='section_name', with   => "'config_id='+value"}) %]
+
+[% pager = jobs.pager %]
+[% PROCESS footer.tmpl %]

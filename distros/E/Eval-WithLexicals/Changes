@@ -1,0 +1,38 @@
+Revision history for Eval-WithLexicals
+
+1.003005 - 2015-07-01
+  - fix hints test failures with some combinations of prerequisites
+
+1.003004 - 2015-06-30
+  - improve diagnostics in hints test
+
+1.003003 - 2015-06-28
+  - fix failures on threaded perl 5.22 (RT#102841)
+
+1.003002 - 2014-12-23
+  - fix test failures on perl 5.21.7 (RT#101086; thanks, Father Chrysostomos!)
+
+1.003001 - 2014-08-16
+  - include minimum perl version in metadata
+  - hide some internal packages from getting indexed
+
+1.003000 - 2014-06-13
+  - Add documentation to tinyrepl script
+  - Convert packaging to use Distar
+  - Minor pod cleanups
+  - Ensure hints testing works correctly, even under abnormal environment
+    variables (RT#81479)
+  - Correct hints test to run under perl 5.8 (RT#72766)
+  - Also preserve active warnings when using HintPersistence plugin
+
+1.2.0 2011-07-04 21:42:30
+  - HintPersistence plugin to persist compile time hints (DGL)
+  - Support plugins (DGL)
+  - Make prelude configurable, so strictures can be optional (DGL)
+
+1.1.0 2011-01-11 21:51:00
+  - Add a #line directive so it's clearer where errors occurred (DGL)
+  - Filter out lexicals called '&' since these are anon subs (MSTROUT)
+
+1.0.0 2010-12-05 17:04:00
+  - Initial release (MSTROUT)

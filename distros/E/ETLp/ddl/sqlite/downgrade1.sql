@@ -1,0 +1,10 @@
+Drop table etlp_user;
+Drop table etlp_file;
+Drop table etlp_file_process;
+Drop table etlp_phase;
+Drop table etlp_item;
+Drop table etlp_job;
+Drop table etlp_status;
+Drop table etlp_section;
+Drop table etlp_configuration;
+drop table sessions;

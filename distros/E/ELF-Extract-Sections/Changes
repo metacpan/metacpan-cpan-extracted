@@ -1,0 +1,146 @@
+Revision history for ELF-Extract-Sections
+
+1.001000 2015-08-14T06:32:18Z 4d78d05
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000000, see misc/*.deps* for details
+ - runtime: +1
+ - test: +2
+
+ [Internals]
+ - Parameter handling delegated to MooseX::Params::Validate
+ - TODO: guard against spurious bless() causing problems, re rt#106192
+
+ [Tests]
+ - Probing for version data to make a better verison check
+
+1.000000 2015-07-30T16:49:16Z 1c37bc4
+ [!Major]
+ - This release includes some respectably significant changes.
+
+ [01 Install Side Tooling change]
+ - Previously, Module::Build was used as the installer.
+ - This is now ExtUtils::MakeMaker
+ - See https://questhub.io/realm/perl/quest/5388cc12bbd0be5b2500011f
+
+ [02 Version Scheme Change]
+ - Previously used a lengthy 0.{'0' x '8'} scheme.
+ - Now uses a 0.{'0' x 6} scheme for clarity.
+ - The 1.x on the box is due in part to this change.
+ - See: https://questhub.io/realm/perl/quest/5388d3a9bbd0be2224000129
+
+ [03 Internals Overhaul]
+ - MooseX::Declare is too pesky to use with perltidy (even sweetened)
+ - So everything has been entirely rewritten in pure Moose with simple type checks.
+ - Class::Load has been replaced with Module::Runtime
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.03000101, see misc/*.deps* for details
+ - build: -1
+ - configure: +3 -1 (recommends: +1)
+ - develop: +55 -4 (recommends: +1 -1, suggests: +1 ↑1)
+ - runtime: +3 -2 (recommends: +1)
+ - test: +4 ↑1 ↓1 -2 (recommends: +4)
+
+0.03000101 2013-05-07T08:56:28Z
+ [!Major Changes]
+ - Path::Class replaced with Path::Tiny
+ - Tests/Utils use Path::Iterator::Rule instead of File::Find::Rule
+ - Packaging toolchain updated
+ - Carp warnings now only Log4Perl warnings so you can hide them if needed.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.02071411, see misc/*.deps* for details
+ - build: ↑1
+ - configure: ↑1
+ - develop: +8 (recommends: ↑1, suggests: ↑1)
+ - runtime: +3 -1
+ - test: +2 ↑1 -3
+
+ [Documentation]
+ - license copyright year update
+ - license reindent
+ - license address update
+ - add README.mkdn
+
+ [Internals]
+ - add $AUTHORITY to all packages
+ - move $VERSION declaration out of BEGIN
+ - __END__ before =pod
+ - Code now tidyied successfully under Perl::Tidy::Sweetened
+
+ [Meta]
+ - add x_authortiy
+ - bug tracker = github issues
+ - git uris to https://
+
+ [Packaging]
+ - use test_requires in Build.PL
+ - leave xt/ tests in xt/
+ - versions via git
+
+0.02071411 2011-04-04T08:40:21Z
+ [BugFix]
+ - Add temporary hack for rt#67210 - methods with return types fail in void context.
+ - Fix some 'invalid' changelog entries.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.02021113, see misc/*.deps* for details
+ - build: ↑1
+ - configure: ↑1
+ - develop: +1 (recommends: +1, suggests: +1)
+ - runtime: +1 -7
+ - test: +9
+
+ [Internals]
+ - Use Class::Load instead of eval for loading extensions.
+
+ [Packaging]
+ - Rework Changelog to CPAN::Changes form.
+ - Move to @Author::KENTNL
+
+ [Tests]
+ - Remove hand written boilerplate/kwalitee/critic tests.
+ - Ship new (generated) tests report-versions-tiny, cpan-changes, eol and kwalitee
+
+0.02021113 2009-11-28T23:43:20Z
+ - Hard Dep on Perl5.10 due to Advanced regex usage ( Thanks CPAN Testers )
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.02020505, see misc/*.deps* for details
+ - build: +1
+ - configure: +1
+ - runtime: +1 ↑1
+
+0.02020505 2009-11-22T02:28:46Z
+ - Added license data for binary .so's used for testing. See LICENSE.tests, and LICENSES/
+
+0.02020308 2009-11-20T05:05:28Z
+ - Fixed t/ by using Compile Tests. ( You can thank JAWNSY for bugging me about this )
+ - Moved To AutoVersion::Relative
+ - Dropped EUMM
+
+0.0105 2009-08-22T15:17:47Z
+ - Tweaked Authortests/Release tests bundling somewhat so they actually work.
+ - Added Perl Critic tests and satisfied criteria.
+ - Documenting the hell out of the Objdump default  scanner, partially to see how CPAN renders this  abuse. With a bit
+   of luck, it will produce mean  as API breakdowns for me :)
+
+0.0104 2009-08-21T17:34:29Z
+ - Fixed Extrac typo which lead to dual indexing.
+ - Dist::Zilla automatic tests now included.
+
+0.0103 2009-07-19T14:59:11Z
+ - Muted warning in tests
+ - Moved to Dist::Zilla instead of MI
+ - Updated to MooseX::Has::Sugar 0.0300
+
+0.0102 2009-05-16T04:19:31Z
+ - Dependancy Fixups, yes, more of them.
+
+0.0101 2009-05-16T03:46:44Z
+ - Re-Release with fixed inc/
+ - using MX::Has::Sugar
+ - dropped Hard dependancy on Perl 5.10
+
+0.01.00 2009-05-11T02:04:58Z
+ - First Version. Mostly working.

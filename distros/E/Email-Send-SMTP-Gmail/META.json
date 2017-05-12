@@ -1,0 +1,49 @@
+{
+   "abstract" : "Sends emails with attachments supporting Auth over TLS or SSL (for example: Google's SMTP).",
+   "author" : [
+      "Juan JosÃ© 'Peco' San MartÃ­n <peco@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Email-Send-SMTP-Gmail",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Email::Date::Format" : "0",
+            "File::Spec" : "0",
+            "LWP::MediaTypes" : "0",
+            "MIME::Base64" : "0",
+            "Net::SMTP" : "0",
+            "Net::SMTPS" : "0",
+            "Net::SMTP_auth" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.06",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

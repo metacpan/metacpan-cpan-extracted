@@ -1,0 +1,96 @@
+NAME
+    Error::Pure::JSON - Error::Pure module for JSON output.
+
+SYNOPSIS
+     use Error::Pure::JSON qw(err);
+     err 'This is a fatal error', 'name', 'value';
+
+SUBROUTINES
+    "err(@messages)"
+             Process error in JSON format with messages @messages.
+             Output affects $Error::Pure::Output::JSON::PRETTY variable.
+
+EXAMPLE1
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Error::Pure::JSON qw(err);
+
+     # Error.
+     err '1';
+
+     # Output like:
+     # [{"msg":["1"],"stack":[{"sub":"err","prog":"example1.pl","args":"(1)","class":"main","line":11}]}]
+
+EXAMPLE2
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Error::Pure::JSON qw(err);
+
+     # Error.
+     err '1', '2', '3';
+
+     # Output like:
+     # [{"msg":["1","2","3"],"stack":[{"sub":"err","prog":"example2.pl","args":"(1, 2, 3)","class":"main","line":11}]}]
+
+EXAMPLE3
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Error::Pure::Output::JSON;
+     use Error::Pure::JSON qw(err);
+
+     # Pretty print.
+     $Error::Pure::Output::JSON::PRETTY = 1;
+
+     # Error.
+     err '1';
+
+     # Output like:
+     # [
+     #    {
+     #       "msg" : [
+     #          "1"
+     #       ],
+     #       "stack" : [
+     #          {
+     #             "sub" : "err",
+     #             "prog" : "example3.pl",
+     #             "args" : "(1)",
+     #             "class" : "main",
+     #             "line" : 15
+     #          }
+     #       ]
+     #    }
+     # ]
+
+DEPENDENCIES
+    Error::Pure::Utils, Error::Pure::Output::JSON, Exporter,
+    List::MoreUtils, Readonly.
+
+SEE ALSO
+    Task::Error::Pure
+        Install the Error::Pure modules.
+
+REPOSITORY
+    <https://github.com/tupinek/Error-Pure-JSON>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © 2013-2015 Michal Špaček
+     BSD 2-Clause License
+
+VERSION
+    0.07
+

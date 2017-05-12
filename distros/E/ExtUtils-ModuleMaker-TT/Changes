@@ -1,0 +1,90 @@
+Revision history for Perl module ExtUtils::ModuleMaker::TT
+
+0.94      2013-11-06 13:48:39 America/New_York
+    - converted to dzil for modern boilerplate and META generation
+    - marked as 'unmaintained'
+
+0.93 Sun Jul 16 09:22:55 EDT 2006
+    - removed dependency on ExtUtils::ModuleMaker::Utility, as that 
+      file went away in EU::MM 0.46
+
+0.92 Wed Feb  8 07:24:52 EST 2006
+    - eliminated Pod::Usage dependency that was causing test failures
+    - fixed broken makeperlmod tests for exit status
+    - fixed broken tests from File::pushd backwards incompatible change
+    - added optional pod/pod_coverage tests (skipped by default)
+
+0.91 Sun Nov 20 07:32:43 EST 2005
+    - fixed broken tests when an ExtUtils::ModuleMaker::Personal::Defaults
+      file is present and conflicts with test expectations; defaults
+      masked in all tests using ExtUtils::ModuleMaker::Auxiliary
+      [caught by Jim Keenan]
+      
+0.90 Sat Nov 19 10:50:36 EST 2005
+    - major changes in config file handling; now using Config::Find
+      for more OS-friendly locations; config files are separate from
+      and extend/override ExtUtils::ModuleMaker::Personal::Defaults
+    - massive expansion and cleanup of makeperlmod testing
+    - eliminating unnecessary dependencies from code and prereqs
+      [thanks to Jim Keenan for spotting several issues]
+    - fixed pod_coverage.t template from overwriting pod.t template
+    - expanded pod_coverage.t template to include a test for Pod::Coverage
+    - fixed default templates to handle author info the new way (without
+      nested data structures)
+    - several minor default template cleanups
+    - expanded and revised documentation to finally reflect changes made
+      for EU::MM compatibility
+
+0.81 Fri Nov 11 12:30:29 EST 2005
+    - fixed pod escapes in templates
+
+0.80 Fri Nov 11 11:08:59 EST 2005
+    - major internal changes for compatibility with EU::MM 0.43
+    - significatly expanded tests for makeperlmod program
+
+0.79 Thu Sep 15 06:47:26 EDT 2005
+    - changed verify_values to validate_values for EU::MM 0.39 compatibility
+
+0.78 Fri Sep  2 07:09:03 EDT 2005
+    - fixed incorrect "create_makefile_pl" option in Build.PL template
+    - switched templates to consistently use spaces instead of mixed
+      spaces and tabs for indentation
+
+0.77 Thu Sep  1 21:02:25 EDT 2005
+    - changed internals to match changes in ExtUtils::ModuleMaker
+    - updated dependencies in Build.PL
+    - updated default templates
+
+0.76 Thu Jun  9 23:02:40 EDT 2005
+    - removed pod/podcoverage tests to minimize dependencies
+
+0.75 Tue Jun  7 18:04:53 EDT 2005
+    - updated Build.PL dependencies
+    - changed Makefile compatibility to traditional
+
+0.74 Sun Mar 13 20:56:06 EST 2005
+    - added pod and pod coverage tests
+    - updated script version from 0.72 to 0.74
+    - overrode Create_Base_Directory to use absolute Base_Dir parameter
+    - changed tests to use temporary directories
+    - cleaned up some testing of single module creation
+    - switched Makefile.PL to passthrough version from Module::Build
+
+0.73 Tue May 11 17:28:57 EDT 2004
+    - removed Test::Distribution from requirements in Build.PL
+    - make distribution test optional depending on presence of 
+      Test::Distribution
+
+0.72 Thu Apr 22 07:07:00 EDT 2004
+    - fixed makeperlmod config file bug
+
+0.71 Thu Apr 22 06:29:21 EDT 2004
+    - fixed up template bugs
+    - "makeperlmod -d" now takes a file argument rather than sending the
+      config to stdout
+
+0.70 Sun Mar  7 18:56:00 EST 2004
+    - initial release version
+    - basic functionality working
+    - makeperlmod script working
+

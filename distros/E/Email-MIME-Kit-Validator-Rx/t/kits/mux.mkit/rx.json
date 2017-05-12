@@ -1,0 +1,7 @@
+{
+  "type": "//rec",
+  "rest": "//any",
+  "optional": {
+    "whyfor": "//any"
+  }
+}

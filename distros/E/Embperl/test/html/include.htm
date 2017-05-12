@@ -1,0 +1,157 @@
+
+<html>
+<head>
+<title>Embperl Tests - Include other Embperl pages via Execute</title>
+</head>
+
+<h1>Embperl Tests - Include other Embperl pages via Execute</h1>
+
+
+[- $optRawInput = 1 -]
+
+[- $tst1 = '<P>Here is some text</P>' ; -]
+
+
+<H1> 1.) Include from memory</H1>
+
+[-		       Execute ({input		=> \$tst1,
+						 mtime      => 1,  
+						 inputfile	=> 'Some text',
+						 }) ;
+-]
+
+<H1> 2.) Include from memory with some Embperl code</H1>
+
+[- Execute ({input		=> \('[- @ar = (a1, b2, c3) -' . ']<table><tr><td>[+$ar[$col]+]</td> </tr> </table> </P>'),
+						 mtime      => 1,  
+						 inputfile	=> 'table',
+						 }) ;
+-]
+
+<H1> 3.) Include from memory with passing of variables</H1>
+
+
+[- $MyPackage::Interface::Var = 'Some Var' ; -]
+
+[- Execute ({input		=> \'<P>Transfer some vars [+ $Var +] !</P>',
+						 inputfile	=> 'Var',
+						 mtime      => 1,
+						 'package'  => 'MyPackage::Interface',
+						 }) ;
+-]
+
+<H1> 4.) Change the variable, but not the code</H1>
+
+[-
+
+$MyPackage::Interface::Var = 'Do it again' ;
+
+# code is the same, so give the same mtime and inputfile to avoid recompile
+# Note you get problems is you change the code, but did not restart the server or
+# change the value in mtime. So make sure if you change something also change mtime!
+
+Execute ({input		=> \'<P>Transfer some vars [+ $Var +] !</P>',
+						 inputfile	=> 'Var2',
+						 mtime      => 1,  
+						 'package'  => 'MyPackage::Interface',
+						 req_rec    => $req_rec}) ;
+-]
+
+<H1> 5.) Use \@param to pass parameters</H1>
+
+
+[-
+Execute ({input		=> \'<P>Use @param to transfer some data ([+ "@param" +]) !</P>',
+						 inputfile	=> 'Param',
+						 param      => [1, 2, 3, 4] }
+						 ) ;
+-]
+
+<H1> 6.) Use \@param to pass parameters and return it</H1>
+
+[- @p = ('vara', 'varb') ; -]
+
+<H3> $p[0] is [+ $p[0] +] and $p[1] is [+ $p[1] +]<H3>
+
+[-
+Execute ({input		=> \('<P>Got data in @param ([+ "@param" +]) !</P>[- $param[0] = "newA" ; $param[1] = "newB" ; -' . ']<P>Change data in @param to ([+ "@param" +]) !</P>'),
+						 inputfile	=> 'Param & Return',
+						 req_rec    => $req_rec,
+						 param      => \@p }
+						 ) ;
+-]
+
+<H3> $p[0] is now [+ $p[0] +] and $p[1] is now [+ $p[1] +] <H3>
+
+<H1> 7.) Presetup \%fdat and \@ffld</H1>
+
+[- %myfdat = ('test' => 'value',
+              'fdat' => 'text') ;
+              
+@myffld = sort keys %myfdat ;             
+
+Execute ({input		=> \'<P><table><tr><td>[+ $ffld[$row] +]</td><td>[+ do { local $^W = 0 ; $fdat{$ffld[$row]} } +]</td></tr></table></P>',
+						 inputfile	=> 'fdat & ffld',
+						 req_rec    => $req_rec,
+						 fdat  => \%myfdat,
+						 ffld  => \@myffld}
+						 ) ;
+
+-]
+
+<H1> 8a.) Include a file</H1>
+
+[- Execute ('inc.htm') -]
+
+<H1> 8b.) Include again the same file </H1>
+
+[- Execute ('inc.htm') -]
+
+<H1> 9.) Include a file and return output in a scalar</H1>
+
+
+
+[- Execute ({inputfile	=> 'inc.htm',
+						 output     => \$out,
+						 req_rec    => $req_rec}) ;
+-]
+
+<H3> [+ $out +] </H3>
+
+
+<H1> 10.) Include inside a table</H1>
+
+[- @a = ('m1', 'm2', 'm3') -]
+
+<table>
+    <tr>
+	<td>
+	    [+ $a[$row] +] : [- Execute ({inputfile => 'incsub.htm', req_rec => $req_rec, param => [$a[$row], 'main']}) -]
+	</td>
+    </tr>
+</table>
+
+
+<H1> 11.) Include a file with parameters</H1>
+
+[- Execute ('incparam.htm', 0, 'B', 'three', 'dddd', '555') -]
+
+<H1> 12.) Include a file and write outputfile</H1>
+
+[# - Execute ({inputfile	=> 'inc.htm',
+			 outputfile     => "../tmp/incout.htm",
+						 }) ;
+- #]
+
+
+<H1> 12.) Done :-)</H1>
+
+<br>
+
+
+<p><hr>
+
+<small>HTML::Embperl (c) 1997-1998 G.Richter</small>
+
+</body>
+</html>

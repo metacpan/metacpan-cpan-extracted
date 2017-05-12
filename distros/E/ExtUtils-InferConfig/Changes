@@ -1,0 +1,21 @@
+Revision history for Perl extension ExtUtils-InferConfig.
+
+1.04  Sun Jul 25 11:26 2008
+        - Fixed problem with last field (Alexandr Ciornii)
+
+1.03  Sat Nov 22 17:48 2008
+        - Always use IPC::Run...
+
+1.02  Fri Nov 14 15:09 2008
+        - Fix strange overzealous code escaping/quoting.
+
+1.01  Sun Oct 26 18:12 2008
+        - Fix tests on stupid OS which set $^X to 'perl'.
+
+1.00  Thu Aug 30 14:59 2007
+	- Add IPC::Cmd as a dependency.
+        - Should now work as far back as perl 5.004.
+
+0.01  Sat Jan 27 12:18 2007
+	- original version
+

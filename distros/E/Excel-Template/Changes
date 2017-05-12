@@ -1,0 +1,179 @@
+Revision history for Perl distribution Excel::Template
+
+0.34 Sun Apr 29 21:21:38 CEST 2012
+    Behavior of merge_range adjusted, now it works: 
+      <merge_range> Content </ merge_range>. (As described in the POD)
+    Merge range formatting tends to collide with non-merged formatting,
+      thanks to Nigel Metheringham.
+    Fixed some documentation errors, thanks to Robert James Clay.
+    Made Spreadsheet::WriteExcel links in format docs more generic (Nigel Metheringham)
+    Added missing cell comment documentation
+
+0.33 Sun Feb 20 20:07:43 CET 2011
+    Implemented the COMMENT argument
+
+0.32 Mon Jul  5 18:58:05 CEST 2010
+    Official release for development release 0.31_1
+
+0.31_1 Mon Jun 28 16:51:44 CEST 2010
+    - Add autofilter to worksheet
+    - Swichting to Module::Install
+
+0.31 Mo Dec 17 13:41:00 2007
+    - Add hide_gridlines to worksheet
+
+0.30 Sa Dec 01 00:00:00 2007
+    - Add write_date_time to write a datetime-value into a cell
+
+0.29 Mon Oct 08 12:00:00 2007
+    - Added merge_range as written by Stevan Little
+
+0.28 Fri Jul 31 22:00:00 2005
+    - Added landscape and portrait orientations for worksheets
+
+0.27 Tue Jul 25 10:00:00 2006
+    - Fixed how widths are whitelisted to allow '.' for fractions
+
+0.26 Fri Jun 02 15:30:00 2006
+    - Fixed how widths are whitelisted to allow '.' for fractions
+    - Fixed how certain formats are copied
+    - Added <image>
+    - Added <freezepanes>
+
+0.25 Thu May 26 11:00:00 2005
+    - Changed how the template file is opened to use 3-arg open() if available
+
+0.24 Thu Mar 10 11:00:00 2005
+    - Implemented the KEEP_LEADING_ZEROS node
+      - This wraps the keep_leading_zeros() worksheet method
+    - Improved code coverage with more and better tests
+      - Am now above 90% coverage.
+      - Fixed bug involving relative values.
+      - Fixed bug involving formats when multiple Excel-Template objects ran in
+        the same process.
+    - Improved POD linking
+      - Every module/node reference in POD should link to the appropriate POD
+
+0.23 Fri Feb 25 15:00:00 2005
+    - Improved code coverage with more and better tests
+    - Fixed POD bug with Devel::Cover results
+    - Fixed bugs found in Factory::register while writing tests
+      - Base class wasn't loaded when class was registered.
+      - If registered class didn't exist, wouldn't die until parse()
+
+0.22 Thu Feb 24 15:00:00 2005
+    - new() now accepts either FILE or FILENAME
+    - parse() now accepts a filehandle or a filename
+
+0.21 Thu Feb 24 12:00:00 2005
+    - Fixed documentation bug in BACKREF (Thanks to Paul Williams)
+    - Added code to Makefile.PL to skip .swp files in the Makefile
+    - Added RENDERER option to new()
+      - Deprecated BIG_FILE
+    - Added pod.t and pod_coverage.t
+    - Tests now run under 5.005_02 without warnings
+
+0.20 Wed Jan 26 12:00:00 2005
+    - Removed PM_FILTER by adding an optional USE_UNICODE runtime parameter.
+    - Added a "type" attribute to CELL to allow printing by the write_*() family
+
+0.19 Wed Dec 08 12:00:00 2004
+    - Fixed META.yml
+    - Added more values to the MANIFEST.SKIP
+    - Fixed PM_FILTER to work on Win32 (Thanks, Corion!)
+    - Improved POD
+
+0.18 Fri Nov 12 14:45:00 2004
+    - Removed 'use warnings' from all tests
+    - All warnings are suppressed unless $^W is true
+    - Added 'height' value for ROW
+    - Added 'width' value for CELL
+    - Fixed PM_FILTER to work on Redhat
+
+0.17 Sat Nov 06 23:30:00 2004
+    - Added worksheet protection
+    - Fixed several bugs found by adding more tests
+        - SCOPE node actually works
+        - CONDITIONAL / IF now handles string values correctly
+
+0.16 Fri Nov 05 13:30:00 2004
+    - Fixed Makefile.PL so that it uses PM_FILTER instead of rolling its own
+        - This means that the Unicode handling is cleaner from a source
+          perspective
+    - Added MANIFEST.SKIP to skip /.svn/ and 'vi' .swp files during distcheck
+    - Finally have a semi-real testing suite!
+        - Added minimal Spreadsheet::WriteExcel mockobject
+    - Fixed several bugs in formats found by building tests
+      - HIDDEN node now actually works
+      - LOCKED node now actually works
+
+0.15 Thu Nov 04 16:15:00 2004
+    - Fixed bugs that were:
+        - preventing a worksheet from using a variable name in a loop
+        - allowing two worksheets to have the same name
+        - preventing a worksheet from being called '0' or '0.0'
+    - Added back-references. This allows for one cell to refer to another
+      cell in an Excel-aware way, especially in formulas.
+    - Added the following nodes:
+        - BACKREF
+        - RANGE
+
+0.14 Thu Nov 04 13:30:00 2004
+    - Added new format support for (nearly) all formats supported by
+      Spreadsheet::WriteExcel
+    - Fixed email address everywhere
+
+0.13 Thu Oct 29 07:30:00 2004
+    - Fixed email address and added GoogleGroup
+
+0.12 Thu Apr 08 07:30:00 2004
+    - Fixed bug regarding empty arrays as loop variables
+
+0.11 Wed Mar 17 16:00:00 2004
+    - Fixed bug introduced in 0.10 (Loops were not case-insensitive)
+
+0.10 Wed Mar 17 16:00:00 2004
+    - Parameters are now case-insensitive
+
+0.09 Mon Feb 02 16:00:00 2004
+    - Fixed bug with multiple worksheets
+
+0.08 Fri Jan 30 14:00:00 2004
+    - Added Base to the params for XML::Parser to allow for entity includes
+
+0.07 Fri Jan 23 08:30:00 2004
+    - Fixed the MANIFEST to account for missing files
+
+0.06 Mon Jan 20 11:00:00 2004
+    - Added formulas (no back-references yet)
+    - Improved POD a little
+
+0.05 Wed Jan 16 12:30:00 2004
+    - Fixed a bug in formats
+
+0.04 Wed Jan 16 12:00:00 2004
+    - Added BIG_FILES as an option, which will use
+      Spreadsheet::WriteExcel::Big as the renderer (yet unimplemented)
+    - Changed the output() method to use a tied IO::Scalar (which is
+      now a requirement.
+    - Firmed up the infrastructure in Excel::Template::Format
+    - Added the following tags
+          - FORMAT
+          - HIDDEN
+          - LOCKED
+          - OUTLINE
+          - SHADOW
+          - STRIKEOUT
+
+0.03 Wed Dec 03 20:30:00 2003
+    - Added XML::Parser as a required pre-requisite module
+    - Added Italic format
+    - Removed $VERSION from Excel::Template::Base (Unneeded)
+    - No documentation or testing changes
+
+0.02 Sun Nov 30 17:00:00 2003
+    - documentation improvements
+    - No actual functional changes
+
+0.01 Tue Nov 18 14:23:42 2003
+    - original version; created by ExtUtils::ModuleMaker 0.32

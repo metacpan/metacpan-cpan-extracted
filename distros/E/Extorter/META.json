@@ -1,0 +1,49 @@
+{
+   "abstract" : "Import Routines By Any Means Necessary",
+   "author" : [
+      "Al Newkirk <anewkirk@ana.io>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Extorter",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Import::Into" : "1.002004",
+            "perl" : "v5.10.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "perl" : "v5.10.0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/alnewkirk/Extorter/issues"
+      },
+      "homepage" : "https://metacpan.org/release/Extorter",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/alnewkirk/Extorter.git",
+         "web" : "https://github.com/alnewkirk/Extorter"
+      }
+   },
+   "version" : "0.10",
+   "x_authority" : "cpan:AWNCORP"
+}
+

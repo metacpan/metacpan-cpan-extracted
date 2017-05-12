@@ -1,0 +1,44 @@
+Revision history for Email-FolderType
+
+0.814     2013-08-05 18:48:55 America/New_York
+          new repo, new bugtracker, same old code
+
+0.813     2007-03-22
+          packaging improvements
+
+0.812     2006-08-28
+          add a README
+
+0.811     2006-08-22
+          use strict
+          pod tests
+
+0.810     2006-08-02
+          don't match //$ as Maildir, to avoid clobbering Ezmlm
+
+0.8       Thursday 6th January, 2005
+          another rewrite because the old module registration system was clunky
+            the new one uses the ever shiny (not that I'm biased)
+            Module::Pluggable
+
+0.7       Tuesday 4th May, 2004
+          rewrote distribution to include type registration so folder types can
+          be added at will by other module authors
+
+0.6       Friday 29th August, 2003
+          added Ezmlm support (//) and rewrote the documentation
+
+0.5       Monday 22nd July 2003
+          update the docs and other minor tweaks
+
+0.4       Sunday 11th May, 2003
+          have Module::Build supply a Makefile.PL for classic CPAN.pm users
+
+0.3       Friday 2nd May, 2003
+          drop tests on file existing
+
+0.2       Thursday 24th April, 2003
+          non-signed distribution (as signing is proving quirky)
+
+0.1       Initial version
+          Based on code by Simon Cozens in Email::LocalDelivery

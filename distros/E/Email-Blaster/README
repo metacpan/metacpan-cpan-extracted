@@ -1,0 +1,133 @@
+NAME
+    Email::Blaster - Scalable Mass Email System
+
+SYNOPSIS
+    Generally, don't use this module from your code. Use the supplied
+    scripts instead.
+
+DESCRIPTION
+    Email::Blaster is the latest in a long, long line of mass-emailer
+    systems I have written since 2002.
+
+    This version has many features.
+
+    *   Clustering Support
+
+        Uses memcached and libevent to do the heavy lifting.
+
+    *   Testing mode.
+
+        Send a few messages to yourself before you turn on the firehose.
+
+    *   Domain-based throttling with hourly limits.
+
+        Never get blacklisted again because of email flooding too quickly
+        from your network.
+
+    *   Configurable (and subclassable) behaviors and components.
+
+        If configuration alone doesn't get you what you want, you can always
+        subclass something (i.e. MailSender or MaillogWatcher) to get the
+        desired behavior.
+
+    *   Scales Out Well (Clustering).
+
+        Designed to spread the work out across many, many, many servers. If
+        your email list has 1Million subscribers, you could *reliably* send
+        your messages to them in a matter of minutes.
+
+        Add more servers, get more capacity and throughput.
+
+    *   Event handlers (in serial).
+
+        Handle server-level events with a simple plugin. Events like server
+        startup and shutdown, the start or end of a transmission, etc.
+
+        More details to follow.
+
+HANDLING EVENTS
+    Email::Blaster offers the following events, which can be handled by one
+    or more subclasses of the appropriate class:
+
+  server_startup
+    Subclass Email::Blaster::ServerStartupHandler and add the following to
+    your config:
+
+      <handlers>
+        ...
+        <server_startup>
+          ...
+          <handler>My::StartupHandler</handler>
+        </server_startup>
+
+  server_shutdown
+    Subclass Email::Blaster::ServerShutdownHandler and add the following to
+    your config:
+
+      <handlers>
+        ...
+        <server_shutdown>
+          ...
+          <handler>My::ShutdownHandler</handler>
+        </server_shutdown>
+
+  init_transmission
+    Subclass Email::Blaster::TransmissionInitHandler and add the following
+    to your config:
+
+      <handlers>
+        ...
+        <init_transmission>
+          ...
+          <handler>My::TransmissionInitHandler</handler>
+        </init_transmission>
+
+  begin_transmission
+    Subclass Email::Blaster::TransmissionBeginHandler and add the following
+    to your config:
+
+      <handlers>
+        ...
+        <begin_transmission>
+          ...
+          <handler>My::TransmissionBeginHandler</handler>
+        </begin_transmission>
+
+  end_transmission
+    Subclass Email::Blaster::TransmissionEndHandler and add the following to
+    your config:
+
+      <handlers>
+        ...
+        <end_transmission>
+          ...
+          <handler>My::TransmissionEndHandler</handler>
+        </end_transmission>
+
+  message_bounced
+    Subclass Email::Blaster::MessageBouncedHandler and add the following to
+    your config:
+
+      <handlers>
+        ...
+        <message_bounced>
+          ...
+          <handler>My::MessageBouncedHandler</handler>
+        </message_bounced>
+
+SUPPORT
+    Visit <http://www.devstack.com/contact/> or email the author at
+    <jdrago_999@yahoo.com>
+
+    Commercial support and installation is available.
+
+AUTHOR
+    John Drago <jdrago_999@yahoo.com>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2008 by John Drago
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.10.0 or, at
+    your option, any later version of Perl 5 you may have available.
+

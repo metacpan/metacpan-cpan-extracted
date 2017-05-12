@@ -1,0 +1,21 @@
+{
+  "renderer": "TestRenderer",
+  "header": [
+    { "Subject": "Test TT Message"  },
+    { "From":    "test@example.com" }
+  ],
+  "alternatives": [
+    {
+      "assembler": [
+        "TextifyHTML",
+        { "html_args": [ "html" ] }
+      ],
+      "type": "text/plain",
+      "body": "Results for [% you %]:\n\n[% html %]Thanks for playing!"
+    },
+    {
+      "type": "text/html",
+      "body": "<p>Results for [% you %]:</p><p>[% html %]</p><p>Thanks for playing!</p>"
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+<html>  
+<head>
+<title>Tests for Embperl - Importing subs</title>
+</head>
+
+
+<body>
+
+<h1>Tests for Embperl - Importing subs</h1>
+
+[! Execute({inputfile => 'subimp.htm', import => 1}) !]
+
+First sub:
+[- tfirst -]
+
+Second sub:
+[- tsecond -]
+
+
+[- @cell = (['a1', 'a2'], ['b1', 'b2']) -]
+
+And now a table splitted into several subs:
+
+<table>
+<tr><th>1</th><th>2></th></tr>
+<tr>
+[- tabcell (\@cell)-]
+</tr>
+</table>
+
+
+req_rec sub:
+<h2>$req_rec = [+ $req_rec +] $$req_rec = [+ $$req_rec +]<h2>
+[- trr -]
+
+And done!
+
+
+
+</body>
+</html>

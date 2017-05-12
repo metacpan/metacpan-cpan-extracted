@@ -1,0 +1,15 @@
+abstract: manipulations between Hanzi and its GBK, UTF8 and UNICODE encodings
+author: "Sal Zhong(\xE4\xBB\xB2\xE4\xBC\x9F\xE7\xA5\xA5) L<zhongxiang721@gmail.com>"
+build_requires: 
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: Encode-CN-Utility
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Encode: 0
+version: 0.3

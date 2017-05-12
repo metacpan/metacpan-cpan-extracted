@@ -1,0 +1,35 @@
+
+[!
+
+sub title   { $epreq -> gettext ('txt:setup_isdn_title')} 
+sub condition {
+    my ($self, $r) = @_ ;
+   if ($r -> {data}{action} ne 'addslave' && $r -> {data}{action} ne 'master')
+        {
+        return 0 ;
+        }
+    $r -> {data}{inetconnect} eq 'isdn' }
+
+
+!]
+
+[$ sub show $]
+
+<p>[= txt:setup_isdn1 =]</p>
+
+
+
+[-
+$r -> {data}{services_isdn} = 1 ;
+Embperl::MyForm -> showfields (
+
+	[
+	{ name => 'isdn_user', text => 'Benutzername/Zugangskennung', validate => [ required => 1],},
+	{ name => 'isdn_pass', text => 'Kennwort', type => 'password', validate => [ required => 1],},
+	{ name => 'isdn_msn',   text => 'Eigene MSN', validate => [ required => 1, -type => 'Integer', ge => 0],},
+	{ name => 'isdn_phone',   text => 'Anzurufende Providernummer', validate => [ required => 1, -type => 'Integer', ge => 0],},
+            ]);
+-]
+
+
+[$endsub$]

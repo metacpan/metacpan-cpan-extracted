@@ -1,0 +1,25 @@
+---
+abstract: 'Email::Sender with L<Net::SMTP::TLS> (Eg. Gmail)'
+author:
+  - 'Fayland Lam <fayland@gmail.com>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Email-Sender-Transport-SMTP-TLS
+requires:
+  Email::Sender: '1.300006'
+  Net::SMTP::TLS::ButMaintained: '0.17'
+resources:
+  repository: git://github.com/fayland/email-sender-transport-smtp-tls.git
+version: '0.16'
+x_serialization_backend: 'YAML::Tiny version 1.70'

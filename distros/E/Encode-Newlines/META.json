@@ -1,0 +1,50 @@
+{
+   "abstract" : "Normalize line ending sequences",
+   "author" : [
+      "唐鳳 <audreyt@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Encode-Newlines",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Encode::Encoding" : "0",
+            "constant" : "0",
+            "parent" : "0",
+            "perl" : "5.007003",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/neilb/Encode-Newlines",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/neilb/Encode-Newlines.git",
+         "web" : "https://github.com/neilb/Encode-Newlines"
+      }
+   },
+   "version" : "0.05"
+}
+

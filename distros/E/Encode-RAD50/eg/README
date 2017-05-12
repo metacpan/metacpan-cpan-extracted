@@ -1,0 +1,19 @@
+This directory contains examples of the use of Encode::RAD50:
+
+cvt
+        This is a re-implementation of the RSX-11 command of the same
+	name. It demonstrates the use of Encode::RAD50 via the
+	encode() and decode() methods of the Encode package.
+
+irad50
+        This is a Unix filter which converts ASCII on STDIN into RAD50
+	on STDOUT. It demonstrates the use of Encode::RAD50 as a PerlIO
+	layer, and requires a PerlIO-enabled Perl. It takes the
+	following options:
+	    -help (guess what);
+	    -quiet (supresses invalid character warnings);
+	    -uppercase (converts input to uppercase before encoding).
+
+r50asc
+	This is a Unix filter which converts RAD50 on STDIN into ASCII
+	on STDOUT. No help is provided.

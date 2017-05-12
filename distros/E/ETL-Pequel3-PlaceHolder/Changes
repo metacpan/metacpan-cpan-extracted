@@ -1,0 +1,6 @@
+Revision history for Perl extension ETL::Pequel3::PlaceHolder.
+
+0.01  Fri May 18 14:00:50 2007
+	- original version; created by h2xs 1.23 with options
+		-X -n ETL::Pequel3::PlaceHolder
+

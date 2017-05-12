@@ -1,0 +1,153 @@
+[
+   {
+      "domain" : "machine.example",
+      "local-part" : "jdoe",
+      "address" : "jdoe@machine.example",
+      "mailbox" : "John Doe <jdoe@machine.example>",
+      "comments" : [],
+      "description" : "Appendix A.1.1. Simple addressing",
+      "display-name" : "John Doe"
+   },
+   {
+      "domain" : "example.net",
+      "local-part" : "mary",
+      "address" : "mary@example.net",
+      "mailbox" : "Mary Smith <mary@example.net>",
+      "comments" : [],
+      "description" : "Appendix A.1.1. Simple addressing",
+      "display-name" : "Mary Smith"
+   },
+   {
+      "domain" : "example.com",
+      "local-part" : "john.q.public",
+      "address" : "john.q.public@example.com",
+      "mailbox" : "\"Joe Q. Public\" <john.q.public@example.com>",
+      "comments" : [],
+      "description" : "Appendix A.1.2.  Different Types of Mailboxes",
+      "display-name" : "Joe Q. Public"
+   },
+   {
+      "domain" : "x.test",
+      "local-part" : "mary",
+      "address" : "mary@x.test",
+      "mailbox" : "Mary Smith <mary@x.test>",
+      "comments" : [],
+      "description" : "Appendix A.1.2.  Different Types of Mailboxes",
+      "display-name" : "Mary Smith"
+   },
+   {
+      "domain" : "example.org",
+      "local-part" : "jdoe",
+      "address" : "jdoe@example.org",
+      "mailbox" : "jdoe@example.org",
+      "comments" : [],
+      "description" : "Appendix A.1.2.  Different Types of Mailboxes",
+      "display-name" : null
+   },
+   {
+      "domain" : "y.test",
+      "local-part" : "one",
+      "address" : "one@y.test",
+      "mailbox" : "Who? <one@y.test>",
+      "comments" : [],
+      "description" : "Appendix A.1.2.  Different Types of Mailboxes",
+      "display-name" : "Who?"
+   },
+   {
+      "domain" : "nil.test",
+      "local-part" : "boss",
+      "address" : "boss@nil.test",
+      "mailbox" : "<boss@nil.test>",
+      "comments" : [],
+      "description" : "Appendix A.1.2.  Different Types of Mailboxes",
+      "display-name" : null
+   },
+   {
+      "domain" : "example.net",
+      "local-part" : "sysservices",
+      "address" : "sysservices@example.net",
+      "mailbox" : "\"Giant; \\\"Big\\\" Box\" <sysservices@example.net>",
+      "comments" : [],
+      "description" : "Appendix A.1.2.  Different Types of Mailboxes",
+      "display-name" : "Giant; \"Big\" Box"
+   },
+   {
+      "domain" : "silly.test",
+      "local-part" : "pete",
+      "address" : "pete@silly.test",
+      "mailbox" : "Pete(A nice \\) chap) <pete(his account)@silly.test(his host)>",
+      "comments" : [
+         "(A nice \\) chap)",
+         "(his account)",
+         "(his host)"
+      ],
+      "description" : "Appendix A.1.2.  Different Types of Mailboxes",
+      "display-name" : "Pete"
+   },
+   {
+      "domain" : "public.example",
+      "local-part" : "c",
+      "address" : "c@public.example",
+      "mailbox" : "Chris Jones <c@(Chris's host.)public.example>",
+      "comments" : [
+         "(Chris's host.)"
+      ],
+      "description" : "Appendix A.1.2.  Different Types of Mailboxes",
+      "display-name" : "Chris Jones"
+   },
+   {
+      "domain" : "one.test",
+      "local-part" : "jdoe",
+      "address" : "jdoe@one.test",
+      "mailbox" : "John <jdoe@one.test> (my dear friend)",
+      "comments" : [
+         "(my dear friend)"
+      ],
+      "description" : "Appendix A.1.2.  Different Types of Mailboxes",
+      "display-name" : "John"
+   },
+   {
+      "domain" : "bar.biz",
+      "local-part" : "foo",
+      "address" : "foo@bar.biz",
+      "mailbox" : "\"()<>[]:;@\\\\,.\\\"\" <foo@bar.biz>",
+      "comments" : [],
+      "description" : "special in display-name with quoting",
+      "display-name" : "()<>[]:;@\\,.\""
+   },
+   {
+      "domain" : "domain.com",
+      "local-part" : "baz",
+      "address" : "baz@domain.com",
+      "mailbox" : " (c1) foo (c2) bar (c3) < (c4) baz (c5) @ (c6) domain.com (c7) >",
+      "comments" : [
+         "(c1)",
+         "(c2)",
+         "(c3)",
+         "(c4)",
+         "(c5)",
+         "(c6)",
+         "(c7)"
+      ],
+      "description" : "comments with spaces in every possible possition",
+      "display-name" : "foo bar"
+   },
+   {
+      "domain" : "bar.info",
+      "local-part" : "foo",
+      "address" : "foo@bar.info",
+      "mailbox" : "foo \"\\\\\" bar <foo@bar.info>",
+      "comments" : [],
+      "description" : "phrase with strange quoting",
+      "display-name" : "foo \"\\\" bar"
+   },
+   {
+      "domain" : "zoo.info",
+      "local-part" : "foo.bar",
+      "address" : "foo.bar@zoo.info",
+      "mailbox" : "\"foo.bar\"@zoo.info",
+      "comments" : [],
+      "description" : "local part with redundant quoting",
+      "display-name" : null
+   }
+]

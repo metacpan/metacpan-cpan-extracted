@@ -1,0 +1,57 @@
+NAME
+    Encode::Newlines - Normalize line ending sequences
+
+VERSION
+    This document describes version 0.05 of Encode::Newlines,
+    released January 11, 2016.
+
+SYNOPSIS
+        use Encode;
+        use Encode::Newlines;
+
+        # Convert to native newlines
+        # Note that decode() and encode() are equivalent here
+        $native = decode(Native => $string);
+        $native = encode(Native => $string);
+
+        {
+            # Allow mixed newlines in $mixed
+            local $Encode::Newlines::AllowMixed = 1;
+            $cr = encode(CR => $mixed);
+        }
+
+DESCRIPTION
+    This module provides the "CR", "LF", "CRLF" and "Native" encodings, to
+    aid in normalizing line endings.
+
+    It converts whatever line endings the source uses to the designated
+    newline sequence, for both "encode" and "decode" operations.
+
+    If you specify two different line endings joined by a "-", it will use
+    the first one for decoding and the second one for encoding. For example,
+    the "LF-CRLF" encoding means that all input should be normalized to
+    "LF", and all output should be normalized to "CRLF".
+
+    If the source has an inconsistent line ending style, then a "Mixed
+    newlines" exception is raised on behalf of the caller. However, if the
+    package variable $Encode::Newlines::AllowMixed is set to a true value,
+    then it will silently convert all three line endings.
+
+CAVEATS
+    This module is not suited for working with PerlIO::encoding, because it
+    cannot guarantee that the chunk bounaries won't happen within a CR/LF
+    sequence. See PerlIO::eol for how to deal with this correctly.
+
+    An optional XS implemenation would be nice.
+
+AUTHORS
+    Audrey Tang <audreyt@audreyt.org>
+
+COPYRIGHT
+    Copyright 2004-2007 by Audrey Tang <audreyt@audreyt.org>.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See <http://www.perl.com/perl/misc/Artistic.html>
+

@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+bin/daemon.fcgi
+dist.ini
+lib/EntityModel/Web/NaFastCGI.pm
+lib/EntityModel/Web/NaFastCGI/Request.pm
+lib/EntityModel/Web/NaFastCGI/Response.pm
+t/00-pod.t
+t/00-use.t

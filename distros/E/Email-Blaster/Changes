@@ -1,0 +1,34 @@
+Revision history for Perl extension Email::Blaster.
+
+1.0001  2008-12-01
+  - Updated some array-mapping logic for Config.
+
+1.0000  2008-11-30
+  - Production-ready release.
+
+0.0001_05 2008-11-29
+  - Updated the transmissions table in the database.
+  - Added clustering support via Cache::Memcached.
+  - Added "Clustered" and StandAlone Email::Blaster subclasses.
+
+0.0001_04 2008-11-28
+  - Updated the SQL.
+
+0.0001_03 2008-11-28
+  - Adjustments to the event-handler semantics.
+  - Updated config format.
+  - Added some POD.
+
+0.01_02 2008-11-25
+  - Explosion of work.
+  - Added config system, based on Apache2::ASP::Config* system.
+  - Initial eventing API.
+  - Started out with DBD::SQLite.
+
+0.0001_01 2008-10-15
+  - Released as a placeholder until further progress could be made.
+
+0.0001_00  Wed Oct 15 17:12:40 2008
+	- original version; created by h2xs 1.23 with options
+		-AXn Email::Blaster
+

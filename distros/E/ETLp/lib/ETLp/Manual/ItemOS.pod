@@ -1,0 +1,46 @@
+package ETLp::Manual::ItemOS;
+
+# ABSTRACT: Manual for ETLp Operating Systems Items
+
+__END__
+
+=pod
+
+=head1 ITERATIVE AND SERIAL OS ITEMS
+
+The OS plugin provides the ability to operating system commands.
+
+The item parameters are:
+
+=over 4
+
+=item * B<name>. The name of this item
+
+=item * B<command>. The OS command being run
+
+=item * B<timeout>. Timeout (in seconds) after which the job is cancelled. Defaults to 0 (No timeout)
+
+=item * B<hide_command>. Record the raw command in the audit records, so that potentially sensitive information is not interpolated. Defaults to 0 (not interpolated).
+
+=item * on_error. Override the setting for the job. See L<ETLp::Manual::Index> for a detailed explanation of this parameter.
+
+=back
+
+=head2 Examples
+
+    <item>
+        name         = get file
+        type         = os
+        command      = %app_root%/bin/ftp_sales.pl 
+        timeout      = 60
+    </item>
+
+Iterative items also have access to iterative placeholders:
+
+
+    <item>
+        name         = move file
+        type         = os
+        command      = mv %filename% %archive_dir%
+        timeout      = 60
+    </item>

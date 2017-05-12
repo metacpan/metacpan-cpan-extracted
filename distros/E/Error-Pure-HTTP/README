@@ -1,0 +1,37 @@
+NAME
+    Error::Pure::HTTP - Error::Pure module over HTTP.
+
+DESCRIPTION
+     List of modules:
+
+    "Error::Pure::HTTP::AllError"
+            Print full backtrace over HTTP.
+
+    "Error::Pure::HTTP::Error"
+            Print error on one line over HTTP.
+
+    "Error::Pure::HTTP::ErrorList"
+            Print list of errors over HTTP. Each error on one line.
+
+    "Error::Pure::HTTP::Print"
+            Print error as simple string over HTTP.
+
+SEE ALSO
+    Task::Error::Pure
+        Install the Error::Pure modules.
+
+REPOSITORY
+    <https://github.com/tupinek/Error-Pure-HTTP>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © 2012-2015 Michal Špaček
+     BSD 2-Clause License
+
+VERSION
+    0.14
+

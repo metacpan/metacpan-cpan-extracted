@@ -1,0 +1,128 @@
+/* $Id */
+
+/* CSS for Debiteuren/Crediteuren reports */
+
+@import eekboek.css;
+
+.title {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 100%;
+    font-weight: bold;
+    margin-top: 0pt;
+    margin-bottom: 0pt;
+}
+
+.subtitle {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 100%;
+    font-weight: bold;
+    margin-top: 0pt;
+}
+
+.footer {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 80%;
+    font-weight: normal;
+}
+
+body {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    line-height: 150%;
+    color: #000000;
+    table-width: 100%;
+}
+
+/* Table and borders */
+table {
+    border: thin solid #000000;
+    border-collapse: collapse;
+}
+table td {
+    border-left:  thin solid #000000;
+    border-right: thin solid #000000;
+}
+table th {
+    border-left:  thin solid #000000;
+    border-right: thin solid #000000;
+    border-bottom: thin solid #000000;
+}
+
+/* By default, align rows at top */
+
+th {
+    vertical-align: top;
+}
+
+tr {
+    vertical-align: top;
+}
+
+/* Row styles */
+
+.r_total {
+    padding-bottom: 10pt;
+    font-weight: bold;
+    border-bottom: thin solid #000000;
+}
+
+.r_bsk, .r_h1, .r_grand {
+    font-weight: bold;
+}
+
+/* Column styles */
+
+.c_debcrd, .h_debcrd {
+    padding-left: 10pt;
+    padding-right: 10pt;
+    text-align: left;
+}
+
+.c_date, .h_date {
+    padding-left: 10pt;
+    padding-right: 10pt;
+    text-align: left;
+}
+
+.c_desc, .h_desc {
+    padding-left: 10pt;
+    padding-right: 10pt;
+    text-align: left;
+}
+
+.c_amount, .h_amount {
+    padding-left: 10pt;
+    padding-right: 10pt;
+    text-align: right;
+}
+
+.c_open, .h_open {
+    padding-left: 10pt;
+    padding-right: 10pt;
+    text-align: right;
+}
+
+.c_paid, .h_paid {
+    padding-left: 10pt;
+    padding-right: 10pt;
+    text-align: right;
+}
+
+.c_bsknr, .h_bsknr {
+    padding-left: 10pt;
+    padding-right: 10pt;
+    text-align: left;
+}
+
+/* Special style */
+
+.r_paid .c_desc {
+    text-indent: 1em;
+}
+
+.r_bskprv .c_date {
+    color: #0000FF;
+}
+
+.r_bskprv .c_bsknr {
+    color: #0000FF;
+}

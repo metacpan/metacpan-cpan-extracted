@@ -1,0 +1,24 @@
+---
+name: Email-ECGListe
+version: 0.07
+author:
+  - 'Gernot Havranek <havi@cpan.org>'
+abstract: a module for alignment emailadresses with ECGListe
+license: perl
+build_requires:
+  Digest::SHA1: 0
+  Test::More: 0
+requires:
+  perl: v5.10.0
+configure_requires:
+  Module::Build: 0.340201
+generated_by: Module::Build version 0.340201
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+provides:
+  Email::ECGListe:
+    file: lib/Email/ECGListe.pm
+    version: 0.07
+resources:
+  license: http://dev.perl.org/licenses/

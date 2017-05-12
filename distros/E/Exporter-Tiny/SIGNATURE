@@ -1,0 +1,52 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 07571ab074fce0b5fbb5ef6ad8079a8dc9c3efe2 COPYRIGHT
+SHA1 e3b0c464bb56d4285fa64e31a70b301692dd825c CREDITS
+SHA1 0c92f59422e28537d283701ebce8180044b12108 Changes
+SHA1 3b20e9835f489bbf71b1deb6aa7c10729482aa77 INSTALL
+SHA1 c4c1e6c578edcfd14d13eadebc8f56dd9ca46821 LICENSE
+SHA1 97bc2eb47523ed9f03f47271b29959b1f3edce24 MANIFEST
+SHA1 d3f0b96c7195c45b23272535e783cb84a955eee5 META.json
+SHA1 45a7cfc1c520fbb9911bf44be565047061c63ae2 META.yml
+SHA1 f5bb8f6d2d450ea47d7af257e8382acc80b653d2 Makefile.PL
+SHA1 bac14b77c5f0340a8c1187cd3d716303f04ceb70 README
+SHA1 a43593d3e3a79c5f455977ba75083d9f191f6af6 dist.ini
+SHA1 8b84c9ddfd507c867e4f137dc286899db9465b3e doap.ttl
+SHA1 3f65666b300ab7e7a1e5e25fb69e4ce6675e0f63 examples/Example/Exporter.pm
+SHA1 76a1673fb0fec51bd6bb330a1c21de4eda9e8fcd lib/Exporter/Shiny.pm
+SHA1 2437b74c9ad193e3ede80543e60c1441914fff89 lib/Exporter/Tiny.pm
+SHA1 f60e815048d121256d3226a2673de533025b6091 lib/Exporter/Tiny/Manual/Etc.pod
+SHA1 0830b5e1b40284508e89ad1331e3ed4cd6ee99d7 lib/Exporter/Tiny/Manual/Exporting.pod
+SHA1 f9369bd757fa3b18b212f98d2c61a4b84a9c8950 lib/Exporter/Tiny/Manual/Importing.pod
+SHA1 60a6ac5d887235af5bcda63f6fb17abbd4162ae0 lib/Exporter/Tiny/Manual/QuickStart.pod
+SHA1 6ba2757140a1c118ae5bac4c10ea8a6275ee15f2 t/01basic.t
+SHA1 8b9c883098fbdaf8999c6f8f909a79297870af86 t/02renaming.t
+SHA1 103845d83b41f8d3c503d50e9d6012790b25f77f t/03generators.t
+SHA1 6a20cb44b8b22885209f6c3f30cbcf5adb80c52c t/04into.t
+SHA1 e50bb7649f42c23b8873dd2e72ef63d85e443b28 t/05shiny.t
+SHA1 8c545aab416cd36ee4fde0cc50cf6b59200a9aac t/06notwant.t
+SHA1 803a876d8e5e5b5af567f7a3a6e7a1071a4a48ed t/07regexp.t
+SHA1 dbce3f55c87fefdfe5abba21afa5a9c9a9a08cf0 t/08tags.t
+SHA1 9cc0bdbc9fd24f98161b4d314bc7c841f2fa8efc t/09warnings.t
+SHA1 2b5c5da82a5c8f2d69d46915b9921d2ceb6ca214 t/10no.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAliPQUoACgkQzr+BKGoqfTloOACeIyCUyJl9TGrC7K6ep1t0o1Vt
+hs0An3Mn2rNphAnknrThLqULeMGLUoux
+=e+O8
+-----END PGP SIGNATURE-----

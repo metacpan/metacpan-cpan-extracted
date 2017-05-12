@@ -1,0 +1,41 @@
+Etsy-StatsD version 1
+========================
+
+This is a perl client module to access Etsy's StatsD service, described at
+http://codeascraft.etsy.com/2011/02/15/measure-anything-measure-everything/
+
+The CPAN copy should be kept in sync with the version distributed with StatsD,
+at https://github.com/etsy/statsd in the exmaples directory,
+so you can it from either location.
+
+The client uses an object-oriented interface, so that some expensive
+operations, i.e. DNS lookups to resolve the host, and other work to prepare
+for the connection, are done by the constructor, to minimize overhead in the
+individual methods.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+     Carp
+     IO::Socket
+     Test::MockModule
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2012 by Steve Sanbeg
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

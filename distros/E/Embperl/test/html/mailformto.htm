@@ -1,0 +1,35 @@
+<html>
+
+<head>
+<title>Embperl Tests - use MailFormTo</title>
+</head>
+
+<body>
+
+[-
+
+$MailTo = 'richter@ecos.de' ;
+
+$fdat{email} = 'test_mailformto' ;
+$fdat{msg}   = 'Embperl tests' ;
+
+@ffld = keys %fdat ;
+
+-]
+
+
+[- MailFormTo ($MailTo,'Embperl TEST Formdata','email') -]
+
+$? = [+ $? +]<br>
+
+[$ if $? $]
+	    <h2>Sorry, there was an error, your mail couldn't be send</h2>
+[$else$]
+	    <h2>Your mail was successfully delivered</h2>
+[$endif$]
+
+
+
+</body>
+</html>
+

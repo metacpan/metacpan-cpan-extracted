@@ -1,0 +1,9 @@
+{
+  "validator": [ "Simplest", { "required_fields": [ "friend" ] } ],
+  "renderer": "TestRenderer",
+  "header": [
+    { "Subject": "Hello [% friend.name() %]" }
+  ],
+  "type": "text/plain",
+  "path": "plain.txt"
+}

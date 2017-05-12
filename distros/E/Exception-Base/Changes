@@ -1,0 +1,397 @@
+0.2501  2015-11-19      Piotr Roszatycki <dexter@cpan.org>
+
+* Fixes "Redundant argument in sprintf" warning on Perl 5.21.2.
+
+0.25    2013-05-25      Piotr Roszatycki <dexter@cpan.org>
+
+* Builds on Perl 5.18.0 with smartmatch operator as an experimental feature.
+
+0.2401  2010-09-30      Piotr Roszatycki <dexter@cpan.org>
+
+Fixes:
+
+* Builds on Perl 5.13.4 with (?^...) regex construct.
+
+0.24    2009-12-13      Piotr Roszatycki <dexter@cpan.org>
+
+New:
+
+* Setting the default value via exception class makes changes only for this
+  class.  It is possible to redefine the default verbosity for i.e.
+  Exception::Died class and it won't change the default verbosity for
+  Exception::Base. 
+
+0.23    2009-10-20      Piotr Roszatycki <dexter@cpan.org>
+
+New:
+
+* Method "catch" has optional argument.  It recovers an exception from this
+  argument or from "$@" variable by default.
+
+0.2202  2009-08-13      Piotr Roszatycki <dexter@cpan.org>
+
+Fixes:
+
+* The smart matching operator "~~" requires second argument to be a scalar for
+  Perl >= 5.10.1.
+
+0.2201  2009-04-02      Piotr Roszatycki <dexter@debian.org>
+
+Fixes:
+
+* Method "match" works correctly if attribute contains ArrayRef.
+
+Changes:
+
+* POD is mixed with rest of code.
+
+0.22    2009-03-24      Piotr Roszatycki <dexter@debian.org>
+
+New:
+
+* sprintf is used if "message" attribute is an array reference.
+
+  Exception::Base->throw( message => ['Failed in %s', __PACKAGE__] );
+
+Changes:
+
+* Build requires Test::Unit::Lite 0.21.
+
+0.21    2008-12-08      Piotr Roszatycki <dexter@debian.org>
+
+Fixes:
+
+* Skip ignored packages for verbosity level 2.
+
+* Verbosity level can not be changed.  Reset internal cache with classes
+  defaults after the default value was changed.
+
+Changes:
+
+* Method "import" was refactored.
+
+0.20    2008-12-05      Piotr Roszatycki <dexter@debian.org>
+
+New:
+
+* Major API changes.
+
+* New methods to_number/to_string replaced numerify/stringify.
+
+* New method get_caller_stacktrace replaced _caller_backtrace.
+
+* New method: to_bool.
+
+* New internal function qualify_to_ref() which uses Symbol module if it is
+  possible.
+
+* Read-only attributes can be defined with pragma interface.
+
+Removed:
+
+* Removed methods: try, with.
+
+* Removed export of try/catch/throw methods and :all tag.
+
+Changes:
+
+* Reference arguments stored as caller_stack are weakened if it is possible.
+
+* catch method takes no arguments.
+
+0.1901  2008-10-13      Piotr Roszatycki <dexter@debian.org>
+
+Fixes:
+
+* Some warnings disabled.
+
+* Added missing test file to manifest.
+
+* Some POD errors fixed.
+
+Changes:
+
+* Updated bundled Test::Unit::Lite to 0.1002.
+
+0.19    2008-10-08      Piotr Roszatycki <dexter@debian.org>
+
+Fixes:
+
+* Don't create package if it is loaded correcly.
+
+Changes:
+
+* Cleaned up "with" method.
+
+* Updated bundled Test::Unit::Lite to 0.1001.
+
+0.18    2008-10-08      Piotr Roszatycki <dexter@debian.org>
+
+New:
+
+* New method "matches" and overloaded operator "~~" are similar to
+  "with" method and can be used with new "given" syntax.
+
+  eval { Exception::Base->throw( message => "foo" ) };
+  if ($@) {
+    my $e = Exception::Base->catch;
+    given ($e) {
+      when ({ message => "foo" }) { warn "has a foo message"; }
+      when ("Exception::Base")    { warn "is an Exception::Base"; }
+    }
+  }
+
+* The exception class can be created with "import" interface in own package.
+
+  package Exception::My;
+  use Exception::Base (__PACKAGE__) =>
+    'has' => 'myattr',
+  };
+
+* New attribute "stringify_attributes" defines attributes which create
+  string returned by stringify method.
+
+  use Exception::Base 'Exception::WithReason' =>
+    'has' => 'reason',
+    stringify_attributes => ['message', 'reason'],
+  };
+  eval { Exception::WithReason->(
+    message => "My message",
+    reason  => "My reason",
+  );
+  print $@->stringify;  # "My message: My reason"
+
+* The default value for new attribute defined with "has" keyword with "import"
+  interface can be set in the same statement.
+
+  use Exception::Base 'Exception::WithDefaultValue' =>
+    'has' => 'value',
+    'value' => 'Default value',
+  };
+
+Changes:
+
+* The "with" and "try" methods return empty string instead "0" as false
+  value.
+
+* Removed private methods "__stringify" and "__numerify". The methods
+  "stringify" and "numerify" overloads "q{""}" and "0+" operators.
+
+* New meta-attribute "numeric_attribute" which contains the name of attribute
+  which represents exception object in numeric context.
+
+* New constant RE_NUM_IN.
+
+* Updated bundled Test::Unit::Lite to 0.10.
+
+0.1702  2008-05-28      Piotr Roszatycki <dexter@debian.org>
+
+Fixed:
+
+* Fix some "undefined value" warning.
+
+0.1701  2008-05-12      Piotr Roszatycki <dexter@debian.org>
+
+* Corrected documentation.
+
+0.17    2008-05-11      Piotr Roszatycki <dexter@debian.org>
+
+Incompatibilities:
+
+* The "catch" method doesn't rethrow a caught exception.  The reference to
+  array is no longer an argument for the method.  The class name means that
+  caught non-exception will be converted to this class.
+
+New:
+
+* The "with" method supports "-isa" and "-has" keyword. Value can be a
+  reference to array which means any value matches.
+
+Changes:
+
+* Show full propagated stack for verbosity = 4.
+* The "with" method matches the default_attribute if one argument is given.
+
+0.16    2008-05-07      Piotr Roszatycki <dexter@debian.org>
+
+Incompatibilites:
+
+* The FIELD constant was renamed to ATTRS as far as every OO language calls it
+  attributes.  All derived classes should use ATTRS constant instead of FIELD
+  constant.
+* An unknown attribute will be ignored instead to be part of properties
+  attribute.  You can create additional exception class which supports these
+  attributes.
+* Removed eval_error attribute.  If the error stack is empty, the catch method
+  recover $@ variable into attribute pointed by eval_attribute.
+* The catch method returns $@ variable if error stack is empty.
+* The _stringify private method renamed to __stringify.  It might be important
+  for derived classes which overloads q{""}.
+
+New:
+
+* New attribute value which can contain numeric value.
+* The exception object can be used in bool, numeric or string context.  The
+  bool value is always true.  The numeric value returns the content of value
+  attribute.
+
+Changes:
+
+* The default verbosity for stringification of exception object is 0.
+* The _stringify private method was renamed to __stringify.
+* The try method clears $@ variable.
+* If throw method is called with one argument, its value is stored in
+  attribute pointed by default_attribute.
+
+Fixes:
+
+* Support for threads module.
+
+0.15    2008-04-19      Piotr Roszatycki <dexter@debian.org>
+
+New:
+
+* throw() method is exported with ":all" tag.  It can break the code which
+  uses indirect notation.
+
+Changes:
+
+* Drop indirect notation is POD and code.
+
+0.14    2008-04-13      Piotr Roszatycki <dexter@debian.org>
+
+New:
+
+* New verbosity level 4. Always dumps full stack trace. The ignore_package and
+  ignore_level has meaning only for first line of the error message.
+* New field ignore_class which filters stack trace.
+* New syntax for import. The default values (verbosity, message, ignore_*,
+  ...) can be replaced or changed based on previous value.
+* Show package in stack trace.
+
+Changes:
+
+* Updated bundled Test::Unit::Lite to 0.0903.
+
+0.13    2007-11-19      Piotr Roszatycki <dexter@debian.org>
+
+Changes:
+
+* If the error stack is empty, the catch method returns undefined value.
+* Updated bundled Test::Unit::Lite to 0.0701.
+
+0.12    2007-10-29      Piotr Roszatycki <dexter@debian.org>
+
+Fixes:
+
+* ignore_level has meaning only for non-skipped levels.
+* Changed $SIG{__DIE__} does not interfere with evals used internally.
+
+Changes:
+
+* ignore_level and ignore_package does not change caller_info. This attributes
+  have meaning only for stringify output.
+* package, file, line, subroutine are now methods, not attributes anymore.
+* The attributes does not override base class methods if are existing.
+* Minor refactoring.
+* Updated bundled Test::Unit::Lite to 0.07.
+
+0.11    2007-10-13      Piotr Roszatycki <dexter@debian.org>
+
+New:
+
+* New field eval_error contains pure eval's error.
+
+Changes:
+
+* Die if can't load existing module.
+* Updated bundled Test::Unit::Lite to 0.0601.
+* Compatibility with Kurila 1.4.
+
+0.10    2007-10-09      Piotr Roszatycki <dexter@debian.org>
+
+Changes:
+
+* Throw new exception if first parameter for Exception::Base->throw($e,
+  @args) is not an Exception::Base object.  It gives the syntax for
+  rethrowing the simple eval's error.
+* Skip derived from Exception::Base on stack dump output.  It is useful if
+  the derived class overwrites throw() method.
+* Do not test POD errors unless $ENV{PERL_TEST_POD} is true.
+
+0.09    2007-10-08      Piotr Roszatycki <dexter@debian.org>
+
+New:
+
+* Defined accessors for class fields.
+* New fields: package, file, line, subroutine.
+
+Changes:
+
+* Exception::Base->new() collects system data.
+* $e->throw() does not overrides existing caller stack.
+* Additional "$e->throw(overriden=>'value')" syntax for rethrowing the
+  exception with overriden some field.
+* Additional "Exception::Base->throw($e, ...)" syntax for rethrowing the
+  exception with changed own class.
+* Use default message if argument or field is an empty string.
+
+0.08    2007-10-06      Piotr Roszatycki <dexter@debian.org>
+
+New:
+
+* use Exception::Base ':all'.
+* Removed " foo at file line 123." string for caught standard die message.
+* Removed also the end of line (LF) for caught standard die message.
+* The system data are not collected with verbosity level lower than 2.
+
+Minor changes:
+
+* Switched to Module::Build.
+* Updated bundled Test::Unit::Lite to 0.05.
+* Replaced some textevals with closures or pure references.
+* Does not use Scalar::Util::blessed() and Carp::croak().
+* Updated benchmark results in documentation.
+
+0.07    2007-05-18      Piotr Roszatycki <dexter@debian.org>
+
+Fixed error:
+
+* Load base class of newly created exception before checking its default
+  properties.
+
+0.06    2007-05-18      Piotr Roszatycki <dexter@debian.org>
+
+* Can define default value for rw properties with "use".
+* Does not undefine other typeglobs than CODE with "unimport".
+
+0.05    2007-05-11      Piotr Roszatycki <dexter@debian.org>
+
+* Added bundled Test/Unit/Lite.pm to MANIFEST.
+
+0.04    2007-05-11      Piotr Roszatycki <dexter@debian.org>
+
+* use 5.006
+* Test with bundled Test::Unit::Lite, so there is no dependency on
+  non-core modules.
+* Fixed unit tests so they work with Test::Unit and with Test::Unit::Lite.
+* META.yml is generated with Makefile.PL.
+
+0.03    2007-04-23      Piotr Roszatycki <dexter@debian.org>
+
+* Added ignore_package (rw) field, contains package names which are ignored
+  from backtrace stack.
+* Added ignore_level (rw) field, contains how many levels skip on backtrace
+  stack.
+* The default version for created exception classes is now 0.01
+* META.yml created by hand.
+
+0.02    2007-04-22      Piotr Roszatycki <dexter@debian.org>
+
+* First CPAN release.
+* Module renamed to Exception::Base.
+
+0.01    2007-04-20      Piotr Roszatycki <dexter@debian.org>
+
+* Development release.
+

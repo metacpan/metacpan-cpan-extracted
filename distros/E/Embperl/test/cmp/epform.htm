@@ -1,0 +1,102 @@
+<html>
+<head>
+<title>Embperl Tests - Embperl::Form::Validate</title>
+</head>
+
+<body>
+
+Fehler:
+Stundenzahl nicht numerisch
+Bitte (sinnvollen) Kommentar eingeben
+<script>
+    
+
+function epform_validate_foo(return_msgs, failed_class, formelem)
+    {
+    var msgs = new Array ;
+    var ids  = new Array ;
+    var fail = 0 ;
+    var i = 0 ;
+    var obj ;
+
+    if (!formelem)
+	formelem = document.foo ;
+    
+    do {
+    
+do {
+
+do {
+obj = formelem['datum'] ; if (obj && !(obj instanceof NodeList?obj[0].value:obj.value)) { ids[i] = 'datum' ; msgs[i++]='Bitte Datum eintragen'; break;}
+obj = formelem['datum'] ; if (obj && !(obj.value.search(/\d+\.\d+\.\d+/) >= 0)) { ids[i] = 'datum' ; msgs[i++]='Datum überprüfen'; break;}
+ 
+} while (0) ; if (fail) break ;
+
+do {
+obj = formelem['stunden'] ; if (obj && !(obj instanceof NodeList?obj[0].value:obj.value)) { ids[i] = 'stunden' ; msgs[i++]='Bitte Stunden eintragen'; break;}
+obj = formelem['stunden'] ; if (obj && !(obj.value.search(/^\s*[0-9+-.,][0-9.,eE]*\s*$/) >= 0)) { ids[i] = 'stunden' ; msgs[i++]='Stundenzahl nicht numerisch'; break;}
+obj = formelem['stunden'] ; if (obj && !(obj.value > 0)) { ids[i] = 'stunden' ; msgs[i++]='Stundenzahl muß >0 sein'; break;}
+ 
+} while (0) ; if (fail) break ;
+
+do {
+obj = formelem['kommentar'] ; if (obj && !(obj instanceof NodeList?obj[0].value:obj.value)) { ids[i] = 'kommentar' ; msgs[i++]='Bitte (sinnvollen) Kommentar eingeben'; break;}
+ 
+} while (0) ; if (fail) break ;
+ 
+} while (0) ; if (fail) break ;
+ ;
+    }
+    while (0) ;
+    if (failed_class)
+        {
+        var key ;
+        var i ;
+        for (key in ids)
+            {
+            var elems = formelem[ids[key]] ;
+            if (elems)
+                {
+                if (!(elems instanceof NodeList))
+                    elems = [elems] ;
+                if (elems[0] instanceof NodeList)
+                    elems = elems[0] ;
+                for (i = 0; i < elems.length ;i++)
+                    {
+                    var elem = elems[i] ;
+                    if (elem.getAttribute('type') == 'radio')
+                        elem = elem.parentElement ;
+                    var eclass = elem.getAttribute('class') ;
+                    elem.setAttribute ('class', eclass + ' ' + failed_class) ;
+                    elem.setAttribute ('title', msgs[key]) ;
+                    }    
+                }
+            }    
+        }
+        
+    if (return_msgs)
+        {
+        var ret = [msgs, ids] ;
+        return ret ;
+        }
+        
+    if (i)
+        alert (msgs.join('\n')) ;
+
+    return !i ;
+    }
+ </script>
+   
+  
+
+    <form name="foo" action="POST"  onSubmit="return epform_validate_foo()">
+        stunden <input type="text" name="stunden" value="x"><br>
+        datum <input type="text" name="datum" value="23.12.2002"><br>
+        kommentar <input type="text" name="kommentar" value=""><br>
+         <input type="submit"><br>
+    </form>
+ 
+
+
+</body>
+</html>

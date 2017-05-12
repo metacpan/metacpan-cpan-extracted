@@ -1,0 +1,16 @@
+Revision history for Perl extension Email::MIME::XPath.
+
+0.005   2007-12-04
+        assume text/plain if content_type is empty
+
+0.004   2007-04-23
+        add xpath_cmp to ::Root -- hdp
+
+0.003   2007-04-21
+        add prereqs to Makefile.PL -- hdp
+
+0.002   2007-04-20
+        bugfix for single-part messages -- hdp
+
+0.001   2007-04-20
+        original version -- hdp

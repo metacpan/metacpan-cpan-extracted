@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+Tidy.pm
+t/1.t
+t/lib/Test/More.pm
+t/lib/Test/Builder.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

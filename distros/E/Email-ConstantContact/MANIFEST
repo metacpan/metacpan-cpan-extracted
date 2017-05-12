@@ -1,0 +1,15 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Email/ConstantContact.pm
+lib/Email/ConstantContact/Activity.pm
+lib/Email/ConstantContact/Campaign.pm
+lib/Email/ConstantContact/CampaignEvent.pm
+lib/Email/ConstantContact/Contact.pm
+lib/Email/ConstantContact/List.pm
+lib/Email/ConstantContact/Resource.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

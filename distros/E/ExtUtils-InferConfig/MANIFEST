@@ -1,0 +1,10 @@
+Changes
+lib/ExtUtils/InferConfig.pm
+Makefile.PL
+MANIFEST
+README
+t/00pod.t
+t/00podcover.t
+t/10same-config.t
+t/20same-inc.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,224 @@
+
+	[- @ks = sort keys %idat -]
+
+	<table>
+		<tr>
+			<td>[+ $ks[$row] +]</td><td>[+ $idat{$ks[$row] || ''} +]</td>
+		</tr>
+	</table>
+
+
+
+
+
+optDisableInputScan is now: [+ $optDisableInputScan +] <BR>
+optDisableInputScan is set now to: [+ $optDisableInputScan = 1 +] <BR>
+optDisableInputScan is now: [+ $optDisableInputScan +] <BR>
+
+    <input type="text" name="feld1" value="Wert1">
+    <input type="text" name="feld2">
+    <input type="text" size=10 name="feld3">
+    <input type="text" name="feld4" size=10>
+    
+	<input type="text" name="feld5" value="Wert5">
+    <input type="text" name="feld6">
+    <input type="text" size=10 name="feld7">
+    <input type="text" name="feld8" size=10>
+    
+	<select name="feld5">
+		<option value="Wert1">Wert1</option>
+		<option value="Wert2">Wert2</option>
+		<option value="Wert3">Wert3</option>
+		<option value="Wert4">Wert4</option>
+		<option value="Wert5">Wert5</option>
+		<option value="Wert6">Wert6</option>
+		<option value="Wert7">Wert7</option>
+		<option value="Wert8">Wert8</option>
+	</select>
+
+	<table>
+		<tr>
+			<td>[+ $ks[$row] +]</td><td>[+ $idat{$ks[$row] || ''} +]</td>
+		</tr>
+	</table>
+
+optDisableInputScan is now: [+ $optDisableInputScan +] <BR>
+optDisableInputScan is set now to: [+ $optDisableInputScan = 0 +] <BR>
+optDisableInputScan is now: [+ $optDisableInputScan +] <BR>
+
+
+    <input type="text" name="feld1" value="Wert1">
+    <input type="text" name="feld2">
+    <input type="text" size=10 name="feld3">
+    <input type="text" name="feld4" size=10>
+    
+	<input type="text" name="feld5" value="Wert5">
+    <input type="text" name="feld6">
+    <input type="text" size=10 name="feld7">
+    <input type="text" name="feld8" size=10>
+    
+	<select name="feld5">
+		<option value="Wert1">Wert1</option>
+		<option value="Wert2">Wert2</option>
+		<option value="Wert3">Wert3</option>
+		<option value="Wert4">Wert4</option>
+		<option value="Wert5">Wert5</option>
+		<option value="Wert6">Wert6</option>
+		<option value="Wert7">Wert7</option>
+		<option value="Wert8">Wert8</option>
+	</select>
+
+	<table>
+		<tr>
+			<td>[+ $ks[$row] +]</td><td>[+ $idat{$ks[$row] || ''} +]</td>
+		</tr>
+	</table>
+
+
+optUndefToEmptyValue is now: [+ $optUndefToEmptyValue +] <BR>
+optUndefToEmptyValue is set now to: [+ $optUndefToEmptyValue = 1 +] <BR>
+optUndefToEmptyValue is now: [+ $optUndefToEmptyValue +] <BR>
+
+    <input type="text" name="qqfeld1" value="Wert1">
+    <input type="text" name="qqfeld2">
+    <input type="text" size=10 name="qqfeld3">
+    <input type="text" name="qqfeld4" size=10>
+    
+    <input type="checkbox" name="qqfeld1" value="Wert1">
+    <input type="checkbox" name="qqfeld2">
+    <input type="checkbox" size=10 name="qqfeld3">
+    <input type="checkbox" name="qqfeld4" size=10>
+
+optUndefToEmptyValue is now: [+ $optUndefToEmptyValue +] <BR>
+optUndefToEmptyValue is set now to: [+ $optUndefToEmptyValue = 0 +] <BR>
+optUndefToEmptyValue is now: [+ $optUndefToEmptyValue +] <BR>
+
+
+[- $fdat{mult2} = "Wert2\tWert5\tWert6" ; -]
+[- $fdat{mult3} = "Wert4" ; -]
+[- $fdat{mult4} = "Wert1\tWert2\tWert7" ; -]
+[- $fdat{mult5} = "Wert3" ; -]
+
+	<input type="checkbox" value="Wert1" name="mult2" checked>
+	<input type="checkbox" value="Wert1" name="mult2">
+	<input type="checkbox" value="Wert2" name="mult2" checked>
+	<input type="checkbox" value="Wert2" name="mult2">
+	<input type="checkbox" value="Wert3" name="mult2" checked>
+	<input type="checkbox" value="Wert3" name="mult2">
+	<input type="checkbox" value="Wert4" name="mult2" checked>
+	<input type="checkbox" value="Wert4" name="mult2">
+	<input type="checkbox" value="Wert5" name="mult2" checked>
+	<input type="checkbox" value="Wert5" name="mult2">
+	<input type="checkbox" value="Wert6" name="mult2" checked>
+	<input type="checkbox" value="Wert6" name="mult2">
+	<input type="checkbox" value="Wert7" name="mult2" checked>
+	<input type="checkbox" value="Wert7" name="mult2">
+
+
+	<input type="checkbox" value="Wert1" name="mult3" checked>
+	<input type="checkbox" value="Wert1" name="mult3">
+	<input type="checkbox" value="Wert2" name="mult3" checked>
+	<input type="checkbox" value="Wert2" name="mult3">
+	<input type="checkbox" value="Wert3" name="mult3" checked>
+	<input type="checkbox" value="Wert3" name="mult3">
+	<input type="checkbox" value="Wert4" name="mult3" checked>
+	<input type="checkbox" value="Wert4" name="mult3">
+	<input type="checkbox" value="Wert5" name="mult3" checked>
+	<input type="checkbox" value="Wert5" name="mult3">
+	<input type="checkbox" value="Wert6" name="mult3" checked>
+	<input type="checkbox" value="Wert6" name="mult3">
+	<input type="checkbox" value="Wert7" name="mult3" checked>
+	<input type="checkbox" value="Wert7" name="mult3">
+
+	<select name="mult2">
+		<option value="Wert1">Wert1</option>
+		<option value="Wert2">Wert2</option>
+		<option value="Wert3">Wert3</option>
+		<option value="Wert4">Wert4</option>
+		<option value="Wert5">Wert5</option>
+		<option value="Wert6">Wert6</option>
+		<option value="Wert7">Wert7</option>
+		<option value="Wert8">Wert8</option>
+	</select>
+
+	<select name="mult3">
+		<option value="Wert1">Wert1</option>
+		<option value="Wert2">Wert2</option>
+		<option value="Wert3">Wert3</option>
+		<option value="Wert4">Wert4</option>
+		<option value="Wert5">Wert5</option>
+		<option value="Wert6">Wert6</option>
+		<option value="Wert7">Wert7</option>
+		<option value="Wert8">Wert8</option>
+	</select>
+
+	<select name="mult4">
+		<option value="Wert1">Wert1</option>
+		<option value="Wert2">Wert2</option>
+		<option value="Wert3">Wert3</option>
+		<option value="Wert4">Wert4</option>
+		<option value="Wert5">Wert5</option>
+		<option value="Wert6">Wert6</option>
+		<option value="Wert7">Wert7</option>
+		<option value="Wert8">Wert8</option>
+	</select>
+
+	<select name="mult5">
+		<option value="Wert1">Wert1</option>
+		<option value="Wert2">Wert2</option>
+		<option value="Wert3">Wert3</option>
+		<option value="Wert4">Wert4</option>
+		<option value="Wert5">Wert5</option>
+		<option value="Wert6">Wert6</option>
+		<option value="Wert7">Wert7</option>
+		<option value="Wert8">Wert8</option>
+	</select>
+
+
+	[- $fdat{mycheck} = 'N' -]
+    <input type=checkbox name=mycheck value=N checked>
+
+	<select name="esc">
+		<option value="Wert1">Wert1</option>
+		<option value="Wert2">Wert2</option>
+		<option value="Wert3">Wert3</option>
+		<option value="Wert4">Wert4</option>
+		<option value="Wert5">Wert5</option>
+		<option value="Wert6">Wert6</option>
+		<option value="Wert7">Wert7</option>
+		<option value="a&lt;b">a&lt;b</option>
+		<option value="a&gt;b">a&lt;b</option>
+		<option value="Wert8">Wert8</option>
+	</select>
+
+	<select name="escmult">
+		<option value="Wert1">Wert1</option>
+		<option value="Wert2">Wert2</option>
+		<option value="Wert3">Wert3</option>
+		<option value="Wert4">Wert4</option>
+		<option value="Wert5">Wert5</option>
+		<option value="Wert6">Wert6</option>
+		<option value="Wert7">Wert7</option>
+		<option value="a&lt;b">a&lt;b</option>
+		<option value="a&gt;b">a&gt;b</option>
+		<option value="Wert8">Wert8</option>
+	</select>
+
+optRawInput is now: [+ $optRawInput +] <BR>
+optRawInput is set now to: [+ $optRawInput = 1 +] <BR>
+optRawInput is now: [+ $optRawInput +] <BR>
+
+    <input type="text" name="feld1" value="Wert1">
+    <input type="text" name="feld2">
+    <input type="text" size=10 name="feld3">
+    <input type="text" name="feld4" size=10>
+    
+    <input type="text" name="feld5" value="Wert5">
+    <input type="text" name="feld6">
+    <input type="text" size=10 name="feld7">
+    <input type="text" name="feld8" size=10>
+
+    <input type="text" name="feld1" value="Wert&lt;1">
+    <input type="text" name="feld5" value="Wert&lt;5">
+
+    <p><input type="submit" name="Search" value="Absenden"></p>

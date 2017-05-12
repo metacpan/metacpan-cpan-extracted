@@ -1,0 +1,26 @@
+                                       Trial balance
+Period: through 2011-12-31
+EekBoek Sample Administration                                            EekBoek, 2011-12-31
+
+AccNr   Account                                       Debet     Credit  Balance Db  Balance Cr
+--------------------------------------------------------------------------------------------
+1100    Supplies                                    1344.37       0.00    1344.37
+1101    Depreciation supplies                          0.00    1716.07               1716.07
+1110    Computers                                  13378.48       0.00   13378.48
+1111    Depreciation computers                         0.00   12503.60              12503.60
+2200    Debtors                                    10163.00   10163.00
+2320    Bank                                       10963.68     629.00   10334.68
+3100    Capital                                        0.00    2443.18               2443.18
+4100    Creditors                                    927.84     927.84
+4200    VAT Revenue high                               0.00    1463.00               1463.00
+4220    VAT Procurement high                         148.13       0.00     148.13
+6800    Depreciation costs inventory                 411.26       0.00     411.26
+6810    Depreciation costs computers                 396.82       0.00     396.82
+6900    Phone costs and fax costs                    510.29       0.00     510.29
+6905    Internet costs                               269.42       0.00     269.42
+6980    Bank costs                                    32.40       0.00      32.40
+8100    Revenue consultancy                            0.00    1200.00               1200.00
+8300    Revenue editing                                0.00    1000.00               1000.00
+8400    Revenue courses                                0.00    6500.00               6500.00
+--------------------------------------------------------------------------------------------
+        TOTAL                                      38545.69   38545.69   26825.85   26825.85

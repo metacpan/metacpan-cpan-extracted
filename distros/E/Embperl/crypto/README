@@ -1,0 +1,63 @@
+
+Embperl - Building dynamic Websites with Perl
+---------------------------------------------
+
+Copyright (c) 1997-2008 Gerald Richter / ecos gmbh  www.ecos.de
+Copyright (c) 2008-2014 Gerald Richter
+
+You may distribute under the terms of either the GNU General Public 
+License or the Artistic License, as specified in the Perl README file.
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED 
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF 
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+$Id: README 1578075 2014-03-16 14:01:14Z richter $
+
+
+Sourcecode encryption
+=====================
+
+Embperl has the possibility to use encrypted sourcefiles. This allows
+to hide your code from curious people or make sure nobody can modify 
+your code.
+
+To enable encrypted sourcefile, go to the crypto directory and edit
+the epcrypto_config.h file. Here you can enable/disable encryption,
+choose which algorithmus to use, the encryption key and whenever
+Embperl should still work with unencrypted files. Make sure to use a
+unique encryption key. Additionally OpenSSL must be already installed
+on your system. Now install Embperl as usual, by running
+
+perl Makefile.PL
+make
+make test
+make install
+
+To encrypt your source files go to the crypto directory and start the
+epcrypto program. It takes a source and a destination filename. If you 
+are using Embperl 2.x, you have to specify the syntax the sourcefile
+uses as third parameter, if it is any other than "Embperl".
+
+IMPORTANT:  Make sure to not distribute any files from the crypto
+            directory, because it contains the key. Anybody who
+            has access to the crypto directory, can decrypt your
+            sourcefiles.
+
+            The encrytion key is compiled into the binary, because
+            Embperl needs it to do the decryption, so anybody who
+            has access to the binary _and_ is able to disassemble
+            the binary code, will be able to retrieve the key.
+            So sourcecode encrytion can hide your source code
+            from most people, because it's hard to disasemble the binary
+            and get the key, but if anybody really wants your code
+            he will get it! To prevent this the key shouldn't be 
+            compiled into the binary, but instead a C function
+            should be given, that could retrieve the key from a
+            save place, e.g. a smart card, even better would
+            be to do the decrytion directly on the smart card.
+
+
+
+
+

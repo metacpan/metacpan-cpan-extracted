@@ -1,0 +1,43 @@
+Revision history for Perl extension Email::MIME::RFC2047
+
+0.95  2016-05-14
+        - Fix distribution abstract.
+        - Documentation fixes.
+        - Improve test suite.
+
+0.94  2016-05-13
+        - Don't add whitespace between quoted strings.
+        - Allow period in phrase.
+        - Optimize regexes.
+        - Support RFC2822 comments.
+        - Rework documentation.
+
+0.93  2015-10-05
+        - Make AddressList->items work.
+          Thanks to klohner for the report.
+
+0.92  2015-04-22
+        - Unicode range extended to 0x10ffff
+          Thanks to Mario Paumann for the pull request
+        - Use warnings
+        - Support new dzil versions
+        - Update meta resources
+
+0.91
+        - Allow some more characters in local parts
+          Thanks to Joel Stevenson for the report
+        - Continue decoding in case of some errors
+
+0.90
+        - Misc bug fixes and cleanups
+        - Documentation fixes
+
+0.89_02
+        - Add modules to parse and format address headers
+        - Make it possible to pass references to decoding methods,
+          use and update m//g search position in this case
+        - Make decode_phrase stop at RFC 822 special chars
+
+0.89_01
+	- Initial version
+

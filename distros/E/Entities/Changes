@@ -1,0 +1,22 @@
+Revision history for Entities
+
+0.5       2013-05-04 16:29:05 Asia/Jerusalem
+	- Fixed bug causing 02-mongodb.t to fail when mongod not available
+
+0.4       2013-05-03 21:07:04 Asia/Jerusalem
+	- Small release bugfix
+
+0.3       2013-05-03 21:03:00 Asia/Jerusalem
+	- Updated to reflect changes introduced in Abilities v0.5
+	- Moved from Moose to Moo
+	- Now using MongoDB::MongoClient instead of MongoDB::Connection
+
+0.2       2010-07-23 19:37:13 Asia/Jerusalem
+	- MongoDB is now a requirement
+	- Fixed bug that cause mongodb test to fail
+	- Moved back to MakeMaker
+	- Fixed wrong link to Entities::Action in Entities pod
+
+0.1       2010-07-21 00:16:59 Asia/Jerusalem
+	- Initial release
+

@@ -1,0 +1,33 @@
+Revision history for Exception-NoException
+
+0.01:
+   - First version, released on an unsuspecting world.
+
+0.02:
+   - Added SIGNATURE
+   - More specific Perl::Critic markings
+   - Rude quote
+   - false() -> _false()
+
+0.03:
+   - Moved implementation out to _obj.pm
+   - More tests
+   - Perl::Critic safe
+
+0.04:
+   - Uh...?
+
+0.05:
+   - Removed SIGNATURE.
+   - Changed Perl::Critic severity to 3 from 1.
+
+0.06:
+   - Use UNIVERSAL::ref to pretend to not be an object.
+
+0.07:
+   - Build with Dist::Zilla
+   - Document the ->ref method
+   - Don't clear $@ in side-effects
+   - Test overloaded conversion and '' equality
+   - Comprehensive overloading RT #57874
+   - Remove stub AUTOLOAD

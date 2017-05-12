@@ -1,0 +1,64 @@
+[! sub frames  { 0} !]
+[! sub subhead { 0} !]
+[! sub title   { 'Setup' } !]
+[! sub extrahelp { undef } !]
+
+[$sub subhead $]
+<center>
+<h2>BB-5000 - Setup&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</h2>
+</center>
+[$endsub$]
+
+[-
+$r = shift ;
+-]
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+          "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>[+ $r -> title +]</title>
+
+
+<link type="text/css" href="/form/css/jquery-ui-1.8.7.custom.css" rel="stylesheet" />       
+<link type="text/css" href="/form/css/jquery.qtip.css" rel="stylesheet" />  
+<link rel="stylesheet" type="text/css" href="/forms/css/EmbperlForm.css">
+
+<script type="text/javascript" src="/forms/js/calendar.js"></script>
+<script type="text/javascript" src="/forms/js/calendar-de.js"></script>
+<script type="text/javascript" src="/forms/js/calendar-setup.js"></script>
+
+<script type="text/javascript" src="/forms/js/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="/forms/js/jquery-ui-1.8.7.custom.min.js"></script>
+<script type="text/javascript" src="/forms/js/jquery.cookie.js"></script>
+<script type="text/javascript" src="/forms/js/jquery.qtip.js"></script>
+<script type="text/javascript" src="/forms/js/jquery.dynatree.js"></script>
+<script type="text/javascript" src="/forms/js/jquery.layout-latest.js"></script>
+
+<script type="text/javascript" src="/forms/js/EmbperlForm.js"></script>
+
+
+
+
+</head>
+<body class="cBody">
+
+[- Execute ('header.epl') -]
+
+<hr>
+<div class="cSetupWizardDiv">
+[$if $fdat{-msg} $]
+<center><span class="cError">[- @msg = split /\n/, $fdat{-msg} -][$foreach $m (@msg)$]<br>[+ $m +][$endforeach$]</span></center>
+[- delete $fdat{-msg} ; -]
+[$endif$]
+[-
+Execute ({isa => 'wizard.epl'}) ;
+$r -> display ;
+-]
+</div>
+
+[- Execute ('footer.epl') -]
+
+</body>
+</html>
+
+

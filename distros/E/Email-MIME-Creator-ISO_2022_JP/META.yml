@@ -1,0 +1,27 @@
+--- #YAML:1.0
+name:               Email-MIME-Creator-ISO_2022_JP
+version:            0.02
+abstract:           Email::MIME mixin to create an iso-2022-jp mail
+author:
+    - Kenichi Ishigaki <ishigaki@cpan.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Email::MIME:          1.900
+    Encode:               0
+    Sub::Install:         0
+    Test::Classy:         0.07
+    Test::More:           0.47
+    Test::UseAllModules:  0.10
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.52
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

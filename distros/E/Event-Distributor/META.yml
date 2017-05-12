@@ -1,0 +1,33 @@
+---
+abstract: 'a simple in-process pub/sub mechanism'
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  Test::Fatal: '0'
+  Test::More: '0.88'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4211, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Event-Distributor
+provides:
+  Event::Distributor:
+    file: lib/Event/Distributor.pm
+    version: '0.04'
+  Event::Distributor::Action:
+    file: lib/Event/Distributor/Action.pm
+    version: '0.04'
+  Event::Distributor::Query:
+    file: lib/Event/Distributor/Query.pm
+    version: '0.04'
+  Event::Distributor::Signal:
+    file: lib/Event/Distributor/Signal.pm
+    version: '0.04'
+requires:
+  Future: '0.15'
+resources:
+  IRC: irc://irc.perl.org/#io-async
+  license: http://dev.perl.org/licenses/
+version: '0.04'

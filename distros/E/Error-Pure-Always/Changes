@@ -1,0 +1,35 @@
+0.06 2015-09-16T14:59:35+02:00
+ - Improve SEE ALSO section in doc.
+ - Move author tests to xt/ directory.
+ - Update Module::Install to 1.16 version.
+
+0.05 2015-01-08T19:56:30+01:00
+ - Add basic tests for die rewrited to err().
+ - Fix minimal version of Perl.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Update Module::Install to 1.14 version.
+ - Update copyright years to 2015.
+
+0.04 2014-09-05T00:49:24+02:00
+ - Add 'readme_from' directive to Makefile.PL.
+ - Fix LICENSE file.
+ - Improve example in Error::Pure::Always doc to explicit set to default
+   Error::Pure::TYPE.
+ - Update Module::Install to 1.12 version.
+
+0.03 2013-09-21
+ - Add LICENSE file.
+ - Add SIGNATURE file.
+ - Add Test::NoWarnings to tests.
+ - Add default error type.
+ - Add dependency for perl (based on Error::Pure).
+ - Add modules to SEE ALSO section in doc.
+ - Rename CHANGES to Changes.
+ - Rewrite Changes file to CPAN::Changes::SPEC format.
+ - Update Error::Pure dependency to last version.
+
+0.02 2012-06-19
+ - Fix required modules.
+
+0.01 2012-06-19
+ - First version.

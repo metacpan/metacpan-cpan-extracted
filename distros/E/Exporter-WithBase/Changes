@@ -1,0 +1,16 @@
+Revision history for Exporter-WithBase.
+
+0.03      2015-04-06 23:28:38+02:00 Europe/Paris
+	Fix metadata:
+	- repository URL
+	- accent in author name
+
+0.02      2014-08-16 23:25:46+02:00 Europe/Paris
+	Fix typo in POD.
+	Fixed Makefile.PL and MYMETA.* for BUILD_REQUIRES to not include core
+	  modules and local modules (in t::lib): nothing changed in code, just
+	  upgraded my Dist::Zilla toolchain (RT#87585).
+	Released on #cpanday.
+
+0.01
+	Initial release.

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package>
+  <dc:Identifier scheme="FWID">this-is-not-a-fwid</dc:Identifier>
+  <dc:title>A Noncompliant OPF Test Sample</dc:title>
+  <dc:creator>Me Myself</dc:creator>
+  <dc:creator opf:role="aut">Zed Pobre</dc:creator>
+  <dc:publisher>CPAN</dc:publisher>
+  <dc:date event="creation">2008-01-01</dc:date>
+  <dc:Date event="publication">03/01/2008</dc:Date>
+  <dc:date opf:event="badfebday">2/31/2004</dc:date>
+  <dc:Date opf:event="YYYY-xx-DD">2009-xx-01</dc:Date>
+  <dc:Type>Text</dc:Type>
+  <dc:format>text/html</dc:format>
+  <dc:identifier scheme="ISBN">X-0000-9999-1</dc:identifier>
+  <dc:identifier id="emptyUID"></dc:identifier>
+  <dc:language>en-us</dc:language>
+  <dc:Language>en-us</dc:Language>
+  <dc:rights>Copyright &copy; 1991 by Zed Pobre</dc:rights>
+  <output encoding="utf-8" content-type="text/x-oeb1-document"/>
+  <item href="part1.html" id="item-text" media-type="application/xhtml+xml" />
+  <item href="missingfile.html" id="file-missing" media-type="application/xhtml+xml" />
+  <item href="cover.jpg"  id="coverimage" media-type="image/jpeg"/>
+  <itemref idref="item-text"/>
+  <itemref idref="file-missing" />
+  <itemref idref="item-missing" />
+</package>

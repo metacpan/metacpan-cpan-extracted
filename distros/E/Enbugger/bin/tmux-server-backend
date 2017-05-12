@@ -1,0 +1,79 @@
+#!perl -w
+
+=head1 NAME
+
+tmux-server-backend - TODO
+
+=head1 SYNOPSIS
+
+tmux-server-backend [options]
+
+    --help
+    --name <socket name>
+
+=head1 DESCRIPTION
+
+TODO
+
+=cut
+
+
+use strict;
+
+use Getopt::Long ();
+Getopt::Long::GetOptions(
+    help  => \&pod2usage,
+    debug => \ my $debug,
+    name  => \ my $socket_name,
+    'daemonize!' => \ my $daemonize,
+)
+    or pod2usage();
+
+if ( $daemonize ) {
+    fork && exit;
+    fork && exit;
+    umask 0;
+    chdir '/';
+}
+
+require File::Temp;
+my ( $log_fh, $log_fn ) = File::Temp::tempfile();
+
+my @cmd = ( 'tmux', 'new-window', "tty > $log_fn; sleep 10000000" );
+if ( $debug ) {
+    print STDERR "system( @cmd )\n";
+}
+system @cmd;
+if ( $? ) {
+    die "system( @cmd ) returned \$?=$?";
+}
+
+require Time::HiRes;
+Time::HiRes::sleep( 0.05 )
+    until    -s $log_fh;
+
+my $tty = <$log_fh>;
+chomp $tty;
+
+@cmd = ( 'socat', '0', "FILE:$tty" );
+if ( $debug ) {
+    print STDERR "system( @cmd )\n";
+}
+system @cmd;
+if ( $? ) {
+    die "system( @cmd ) returned \$?=$?";
+}
+
+$^W = 0;
+open my $tty_fh, '>', $tty;
+syswrite $tty_fh, "Socket closed\n";
+close $tty_fh;
+
+kill -2,  0; # SIGINT
+kill -15, 0; # SIGTERM
+kill -9,  0; # SIGKILL
+
+sub pod2usage {
+    require Pod::Usage;
+    goto &Pod::Usage::pod2usage;
+}

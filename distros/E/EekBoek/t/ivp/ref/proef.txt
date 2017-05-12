@@ -1,0 +1,26 @@
+                                   Proef- en Saldibalans
+Periode: t/m 2007-12-31
+EekBoek Demo Administratie                                               EekBoek, 2007-12-31
+
+RekNr   Grootboekrekening                             Debet     Credit   Saldo Db   Saldo Cr
+--------------------------------------------------------------------------------------------
+1100    Inventaris en inrichting                    1344,37       0,00    1344,37
+1101    Afschrijving inv. & inr.                       0,00    1716,07               1716,07
+1110    Computers                                  13378,48       0,00   13378,48
+1111    Afschrijving computers                         0,00   12503,60              12503,60
+2200    Debiteuren                                 10173,00   10173,00
+2320    Postbank                                   10963,68     629,00   10334,68
+3100    Kapitaal de heer/mevrouw                       0,00    2443,18               2443,18
+4100    Crediteuren                                  927,84     927,84
+4200    BTW Verkoop Hoog                               0,80    1463,80               1463,00
+4220    BTW Inkoop Hoog                              148,13       0,00     148,13
+6800    Afschr. kosten inv. & inr.                   411,26       0,00     411,26
+6810    Afschr. kosten computers                     396,82       0,00     396,82
+6900    Telefoon- en faxkosten                       510,29       0,00     510,29
+6905    Internetkosten                               269,42       0,00     269,42
+6980    Bankkosten                                    32,40       0,00      32,40
+8100    Omzet advisering                               0,00    1200,00               1200,00
+8300    Omzet editing                                  0,00    1000,00               1000,00
+8400    Omzet cursussen                                4,20    6504,20               6500,00
+--------------------------------------------------------------------------------------------
+        TOTAAL                                     38560,69   38560,69   26825,85   26825,85

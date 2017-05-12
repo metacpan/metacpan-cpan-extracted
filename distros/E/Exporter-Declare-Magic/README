@@ -1,0 +1,113 @@
+NAME
+    Exporter::Declare::Magic - Enhance Exporter::Declare with some fancy
+    magic.
+
+DESCRIPTION
+SYNOPSIS
+        package Some::Exporter;
+        use Exporter::Declare::Magic;
+
+        ... #Same as the basic Exporter::Declare synopsis
+
+        #Quoting is not necessary unless you have space or special characters
+        export another_sub;
+        export parsed_sub parser;
+
+        # no 'sub' keyword, not a typo
+        export anonymous_export {
+            ...
+        }
+        #No semicolon, not a typo
+
+        export parsed_anon parser {
+            ...
+        }
+
+        # Same as export
+        default_export name { ... }
+
+        # No quoting required
+        export $VAR;
+        export %VAR;
+
+        my $iterator = 'a';
+        gen_export unique_class_id {
+            my $current = $iterator++;
+            return sub { $current };
+        }
+
+        gen_default_export '$my_letter' {
+            my $letter = $iterator++;
+            return \$letter;
+        }
+
+        parser myparser {
+            ... See Devel::Declare
+        }
+
+        parsed_exports parser => qw/ parsed_sub_a parsed_sub_b /;
+        parsed_default_exports parser_b => qw/ parsed_sub_c /;
+
+API
+    These all work fine in function or method form, however the syntax sugar
+    will only work in function form.
+
+    parsed_exports( $parser, @exports )
+        Add exports that should use a 'Devel::Declare' based parser. The
+        parser should be the name of a registered Devel::Declare::Interface
+        parser, or the name of a parser sub created using the parser()
+        function.
+
+    parsed_default_exports( $parser, @exports )
+        Same as parsed_exports(), except exports are added to the -default
+        tag.
+
+    parser name { ... }
+    parser name => \&code
+        Define a parser. You need to be familiar with Devel::Declare to make
+        use of this.
+
+    export( $name )
+    export( $name, $ref )
+    export( $name, $parser )
+    export( $name, $parser, $ref )
+    export name { ... }
+    export name parser { ... }
+        export is a keyword that lets you export any 1 item at a time. The
+        item can be exported by name, name+ref, or name+parser+ref. You can
+        also use it without parentheses or quotes followed by a codeblock.
+
+    default_export( $name )
+    default_export( $name, $ref )
+    default_export( $name, $parser )
+    default_export( $name, $parser, $ref )
+    default_export name { ... }
+    default_export name parser { ... }
+    gen_export( $name )
+    gen_export( $name, $ref )
+    gen_export( $name, $parser )
+    gen_export( $name, $parser, $ref )
+    gen_export name { ... }
+    gen_export name parser { ... }
+    gen_default_export( $name )
+    gen_default_export( $name, $ref )
+    gen_default_export( $name, $parser )
+    gen_default_export( $name, $parser, $ref )
+    gen_default_export name { ... }
+    gen_default_export name parser { ... }
+        These all act just like export(), except that they add subrefs as
+        generators, and/or add exports to the -default tag.
+
+AUTHORS
+    Chad Granum exodist7@gmail.com
+
+COPYRIGHT
+    Copyright (C) 2010 Chad Granum
+
+    Exporter-Declare is free software; Standard perl licence.
+
+    Exporter-Declare is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the license for
+    more details.
+

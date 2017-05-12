@@ -1,0 +1,43 @@
+{
+   "abstract" : "Low level Linux namespaces' syscalls for Perl",
+   "author" : [
+      "frmadem <frmadem@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Eixo-Zone-Driver",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Devel::AssertOS" : "0",
+            "Devel::CheckLib" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 2.27202"
+}

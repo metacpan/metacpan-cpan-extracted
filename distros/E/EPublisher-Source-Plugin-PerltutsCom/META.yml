@@ -1,0 +1,25 @@
+---
+abstract: 'Get POD from tutorials published on perltuts.com'
+author:
+  - 'Renee Baecker <module@renee-baecker.de>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: EPublisher-Source-Plugin-PerltutsCom
+requires:
+  EPublisher: 0.6
+  Encode: 0
+  File::Basename: 0
+  File::Find: 0
+  File::Spec: 0
+  LWP::Simple: 0.34
+  Test::More: 0
+  Test::Pod: 1.14
+  Test::Pod::Coverage: 1.08
+version: 0.4

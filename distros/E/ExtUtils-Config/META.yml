@@ -1,0 +1,33 @@
+---
+abstract: "A wrapper for perl's configuration"
+author:
+  - 'Ken Williams <kwilliams@cpan.org>'
+  - 'Leon Timmermans <leont@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0.88'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: ExtUtils-Config
+provides:
+  ExtUtils::Config:
+    file: lib/ExtUtils/Config.pm
+    version: '0.008'
+requires:
+  Data::Dumper: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=ExtUtils-Config
+  repository: git://github.com/Leont/extutils-config.git
+version: '0.008'

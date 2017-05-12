@@ -1,0 +1,94 @@
+                     Perl Module Env::Export Change History                 
+
+		A Perl module to facilitate exporting           
+		environment values as run-time constant         
+		subroutines.                                    
+
+0.22	Thursday July  7, 2011, 01:00:00 AM -0700
+
+	* t/00_load.t (deleted)
+	* t/01_pod.t (deleted)
+	* t/02_pod_coverage.t (deleted)
+	* xt/00_load.t
+	* xt/01_pod.t
+	* xt/02_pod_coverage.t
+	Move author-only tests to the xt/ directory.                    
+
+	* t/20_regex.t
+	* t/25_glob.t
+	* t/40_all.t
+	Consider volume when creating path to sub_count.pl.             
+
+	* t/10_basic.t
+	* t/80_split.t
+	Additions to increase code-coverage of tests.                   
+
+	* lib/Env/Export.pm
+	Bug fixes, critic clean-up and some docs clean-up. Some fixes   
+	related to getting better code-coverage in test suites.         
+
+	* lib/Env/Export.pm
+	Removed a left-over debugging line, doc fixes.                  
+
+0.21	Sunday April 25, 2010, 10:10:00 PM -0700
+
+	* lib/Env/Export.pm
+	Code clean-up inspired by perlcritic.                           
+
+0.20	Thursday April  2, 2009, 03:00:00 AM -0700
+
+	* lib/Env/Export.pm
+	* t/15_no_redefine.t (deleted)
+	* t/20_regex.t (added)
+	* t/25_glob.t (added)
+	* t/30_prefix.t (added)
+	* t/40_all.t (added)
+	* t/50_warn.t (added)
+	* t/60_override.t (added)
+	* t/70_link.t (added)
+	* t/80_split.t (added)
+	* t/sub_count.pl (added)
+	Added extensive new features and loads more tests. Better       
+	overall model for how the args list is processed into a series  
+	of newly-defined functions. The keywords ":all",                
+	":prefix"/":noprefix", ":warn"/":nowarn",                       
+	":override"/":nooverride", ":link"/":nolink" and ":split" are   
+	now all implemented. Shell-style globbing patterns are          
+	acceptable as an alternative to regular expressions.            
+	Documentation extensively re-worked to cover all of this, and   
+	tests galore for all of these features.                         
+
+	* t/10_basic.t
+	* t/15_no_redefine.t
+	Bring tests more in line with nature of the module.             
+
+0.12	Tuesday March 24, 2009, 05:25:00 PM -0700
+
+	* lib/Env/Export.pm
+	* t/15_no_redefine.t (added)
+	Check before creating a sub, to avoid clobbering existing subs. 
+
+	* lib/Env/Export.pm
+	Fix for RT ticket #44539, typo in the name of a class.          
+
+0.11	Tuesday March 24, 2009, 04:30:00 AM -0700
+
+	* lib/Env/Export.pm
+	Fixed typo in the documentation.                                
+
+0.10	Tuesday March 24, 2009, 03:45:00 AM -0700
+
+	* lib/Env/Export.pm (added)
+	* t/00_load.t (added)
+	* t/01_pod.t (added)
+	* t/02_pod_coverage.t (added)
+	* t/10_basic.t (added)
+	Initial draft of the very basic functionality.                  
+
+# Generated on Thursday July  7, 2011, 01:04:33 AM -0700
+# Using changelog2x/0.11, App::Changelog2x/0.11, XML::LibXML/1.78,             
+# XML::LibXSLT/1.70, libxml/2.7.7, libxslt/1.1.26 (with exslt)                 
+# XSLT sources:
+#     $Id: changelog2text.xslt 8 2009-01-19 06:46:50Z rjray $
+#     $Id: common-text.xslt 8 2009-01-19 06:46:50Z rjray $
+#     $Id: common.xslt 4 2009-01-07 13:02:06Z rjray $

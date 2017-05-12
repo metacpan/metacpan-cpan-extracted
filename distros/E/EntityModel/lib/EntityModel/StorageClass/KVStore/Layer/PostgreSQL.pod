@@ -1,0 +1,40 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with EntityModel::StorageClass::KVStore::Layer::PostgreSQL
+at lib/EntityModel/StorageClass/KVStore/Layer/PostgreSQL.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head2 store
+
+Store a value in the cache.
+
+Takes the following parameters:
+
+=over 4
+
+=item * $query - query to store under
+
+=item * $value - value to store in key (can be undef)
+
+=back
+
+Returns $self.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<EntityModel::StorageClass::KVStore::Layer>
+
+L<key_mangle|EntityModel::StorageClass::KVStore::Layer/key_mangle>, L<lookup|EntityModel::StorageClass::KVStore::Layer/lookup>, L<retrieval_fallback|EntityModel::StorageClass::KVStore::Layer/retrieval_fallback>, L<shutdown|EntityModel::StorageClass::KVStore::Layer/shutdown>, L<underlayer|EntityModel::StorageClass::KVStore::Layer/underlayer>
+
+=item L<EntityModel::StorageClass::KVStore::Mixin::Deferred>
+
+L<connection_complete|EntityModel::StorageClass::KVStore::Mixin::Deferred/connection_complete>, L<has_pending|EntityModel::StorageClass::KVStore::Mixin::Deferred/has_pending>, L<is_connected|EntityModel::StorageClass::KVStore::Mixin::Deferred/is_connected>, L<queue_task|EntityModel::StorageClass::KVStore::Mixin::Deferred/queue_task>, L<run_pending|EntityModel::StorageClass::KVStore::Mixin::Deferred/run_pending>
+
+=back
+

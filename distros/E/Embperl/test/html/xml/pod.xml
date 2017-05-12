@@ -1,0 +1,32 @@
+<pod>
+<head1>HEAD1</head1>
+some text under HEAD1
+
+<head2>HEAD2</head2>
+some text under HEAD2
+
+<head3>HEAD3</head3>
+some text under HEAD3
+
+format <B>bold</B> <CODE>code</CODE> <I>italic</I> <U>underline</U>
+
+<list>
+<item>first item</item>
+text 1
+
+<item>second item</item>
+text 2
+
+</list>
+
+<list>
+<bulletitem>first item</bulletitem>
+text 1
+
+<bulletitem>second item</bulletitem>
+text 2
+
+</list>
+
+</pod>
+

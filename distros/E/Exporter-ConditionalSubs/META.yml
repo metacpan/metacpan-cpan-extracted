@@ -1,0 +1,28 @@
+---
+abstract: 'Conditionally export subroutines'
+author:
+  - 'Larry Leszczynski <larryl@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.3901, CPAN::Meta::Converter version 2.120921'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Exporter-ConditionalSubs
+provides:
+  Exporter::ConditionalSubs:
+    file: lib/Exporter/ConditionalSubs.pm
+    version: '1.01'
+requires:
+  B: '0'
+  B::CallChecker: '0'
+  B::Generate: '0'
+  Carp: '0'
+  Exporter: '0'
+resources:
+  license: http://opensource.org/licenses/artistic-license-2.0.php
+version: '1.01'

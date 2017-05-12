@@ -1,0 +1,17 @@
+                               Balance
+Period: through 2011-12-31
+EekBoek Sample Administration                      EekBoek, 2011-12-31
+
+AccNr   Account                                       Debet     Credit
+----------------------------------------------------------------------
+1100    Supplies                                    1344.37
+1101    Depreciation supplies                                  1716.07
+1110    Computers                                  13378.48
+1111    Depreciation computers                                12503.60
+2320    Bank                                       10334.68
+3100    Capital                                                2443.18
+4200    VAT Revenue high                                       1463.00
+4220    VAT Procurement high                         148.13
+        << Profit >>                                           7079.81
+----------------------------------------------------------------------
+        TOTAL Balance                              25205.66   25205.66

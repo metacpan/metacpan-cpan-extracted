@@ -1,0 +1,34 @@
+---
+abstract: 'converts Perl XS code into C code'
+author:
+  - 'Ken Williams <ken@mathforum.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.46'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150001'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: ExtUtils-ParseXS
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Cwd: '0'
+  DynaLoader: '0'
+  Exporter: '5.57'
+  ExtUtils::CBuilder: '0'
+  ExtUtils::MakeMaker: '6.46'
+  File::Basename: '0'
+  File::Spec: '0'
+  Symbol: '0'
+  Test::More: '0.47'
+resources:
+  bugtracker: http://rt.perl.org/rt3/
+  repository: git://perl5.git.perl.org/gitroot/perl.git
+version: '3.30'

@@ -1,0 +1,14 @@
+
+
+This archive contains the distribution Encode-Base58-GMP,
+version 1.00:
+
+  High speed Base58 encoding using GMP with BigInt and MD5 support
+
+This software is Copyright (c) 2011 by John Wang.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+

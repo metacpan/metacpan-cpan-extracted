@@ -1,0 +1,11 @@
+Build.PL
+Changes
+lib/Email/Barcode/Decode.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/01_Email-Barcode-Decode.t
+t/tdata/msg01.eml
+t/tdata/msg02.eml
+t/tdata/msg03.eml

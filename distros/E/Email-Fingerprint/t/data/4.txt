@@ -1,0 +1,20 @@
+Return-path: kazhost@omega.main-hosting.com
+X-ClientAddr: 72.29.78.156
+Received: from omega.main-hosting.com (dns2.main-hosting.com [72.29.78.156])
+Received: from kazhost by omega.main-hosting.com with local (Exim 4.51)
+	id 1EKB3l-0007jX-MR
+Subject: Link exchange request
+Content-type: text/plain; charset=iso-8859-1
+From: "Webmaster top1marketing.com" webmaster@top1marketing.com
+Reply-to: webmaster@top1marketing.com
+Message-Id: E1EKB3l-0007jX-MR@omega.main-hosting.com
+Date: Tue, 27 Sep 2005 04:43:33 -0400
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - omega.main-hosting.com
+X-AntiAbuse: Original Domain - latroba.co.uk
+X-AntiAbuse: Originator/Caller UID/GID - [32003 32005] / [47 12]
+X-AntiAbuse: Sender Address Domain - omega.main-hosting.com
+
+Hello,
+I have found your website latroba.co.uk by searching MSN for "tourism marketing". I think our websites has a similar theme, so I have already added your link to my website.
+

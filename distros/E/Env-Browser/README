@@ -1,0 +1,88 @@
+NAME
+    Env::Browser - Process environment variable $BROWSER and run web
+    browser.
+
+SYNOPSIS
+     use Env::Browser qw(run);
+     run($uri);
+
+SUBROUTINES
+    run($uri)
+             Run browser defined by $BROWSER variable.
+
+ENVIRONMENT
+     $BROWSER variable is defined by L<The BROWSER project|http://www.catb.org/~esr/BROWSER/index.html>.
+
+EXAMPLE1
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Env::Browser qw(run);
+
+     # Set $BROWSER variable.
+     $ENV{'BROWSER'} = 'echo';
+
+     # Run.
+     run('http://example.com');
+
+     # Output:
+     # http://example.com
+
+EXAMPLE2
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Env::Browser qw(run);
+
+     # Set $BROWSER variable.
+     $ENV{'BROWSER'} = 'echo %s';
+
+     # Run.
+     run('http://example.com');
+
+     # Output:
+     # http://example.com
+
+EXAMPLE3
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Env::Browser qw(run);
+
+     # Set $BROWSER variable.
+     $ENV{'BROWSER'} = 'foo:echo %s:bar';
+
+     # Run.
+     run('http://example.com');
+
+     # Output:
+     # http://example.com
+
+DEPENDENCIES
+    Readonly.
+
+SEE ALSO
+    urlview
+        URL extractor/launcher
+
+REPOSITORY
+    <https://github.com/tupinek/Env-Browser>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © 2013-2015 Michal Špaček
+     BSD 2-Clause License
+
+VERSION
+    0.05
+

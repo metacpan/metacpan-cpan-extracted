@@ -1,0 +1,21 @@
+=pod
+
+This is an illustration of arbitrary text to be inserted into each of the
+lib/*.pm files created by a particular run of ExtUtils::ModuleMaker.
+
+By default, this code is placed after any constructor and before the main POD
+block.  If you want to put it elsewhere, you should subclass
+ExtUtils::ModuleMaker::StandardText::compose_pm_file().
+
+You may include both POD and code, as illustrated here.
+
+To include this code in the lib/*.pm files in your distribution, pass a 
+key-value pair like the following to ExtUtils::ModuleMaker::new():
+
+    INCLUDE_FILE_IN_PM => qq{/path/to/some/arbitrary.txt};
+
+=cut
+
+sub declare {}
+sub init {}
+sub marine {}

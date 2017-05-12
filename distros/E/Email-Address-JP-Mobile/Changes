@@ -1,0 +1,30 @@
+Revision history for Perl extension Email::Address::JP::Mobile
+
+0.08  Mon Mar 14 18:48:14 JST 2011
+        - I had ignored the willcom.com for a long time. sorry.
+
+0.07  Sun Feb 27 07:08:02 JST 2011
+        - no code chnges
+        - update pod
+        - include Test::More 0.96 in dist
+
+0.06  Thu Dec 23 16:20:25 JST 2010
+        - no code changes
+        - update test_requires Test::More to 0.96
+        - pod update
+
+0.05  Mon Dec 20 14:56:23 JST 2010
+        - move repository to gitHub
+        - add $Email::Address::JP::Mobile::NonMobile::Encoding option
+        - pod fix (thanks tokuhirom)
+
+0.04  Tue May 18 11:19:27 JST 2010
+        - add mime_encoding(), send_encoding(), perse_encoding()
+        - requires Test::More 0.94 for subtest()
+          http://www.cpantesters.org/cpan/report/7141684
+
+0.02  Tue Feb 23 08:41:56 JST 2010
+        - first CPAN release
+
+0.01  Fri Apr 11 19:41:21 JST 2008
+        - original version

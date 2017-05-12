@@ -1,0 +1,15 @@
+Revision history for Perl extension Exception::Tiny
+
+0.2.1 2013-02-18T14:40:27+09:00
+    - use UNIVERSAL::isa
+
+0.2.0 2013-02-13T11:28:30+09:00
+    - add subroutine method
+    - change as_string format
+    - message accsesor has default message
+
+0.1.0 2013-02-13T03:08:08+09:00
+    - fixed pod bug
+
+0.0.1 2013-02-13T02:56:14+09:00
+    - original version

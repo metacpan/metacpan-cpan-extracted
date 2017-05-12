@@ -1,0 +1,71 @@
+[% title = 'Schedules' %]
+[%INCLUDE menu.tmpl %]
+
+    <div class="schedule-search">
+        <form action="[% script %]" method="post">
+        <fieldset class="schedule-list">
+        <label for="task">Job</label>
+            <select id="config_name" name="config_name">
+                <option></option>
+            [% FOREACH config_file IN config_files %]
+                <option value="[% config_file %]" [% IF config_file == config_name %]selected="selected"[% END %]>[% config_file %]</option>
+            [% END %]
+            </select>
+            
+            <select id="section_name" name="section_name">
+                <option></option>
+            [% FOREACH config_section IN sections %]
+                <option value="[% config_section %]" [% IF config_section == section_name %]selected="selected"[% END %]>[% config_section %]</option>
+            [% END %]
+            </select> [% err_config_file %] [% err_section %]
+            <select id="status" name="status">
+                <option value="">All</option>
+                <option value="1" [% IF status == 1 %]selected="selected"[% END %]>Active</option>
+                <option value="0" [% IF status == 0 %]selected="selected"[% END %]>Inactive</option>
+            </select>
+            <input type="submit" value="Go"/>
+            <input type="button" value="New" id="new-schedule" onClick="window.location = '[% script %]/edit'" />
+            <input type="button" value="View Crontab" id="view-crontab" onClick="window.location = '[% script %]/view_crontab'"  />
+            [%IF scheduler_status.value == 'enabled' %]
+                <input type="button" value="Disable Crontab" id="disable-crontab" onClick="window.location = '[% script %]/disable_crontab'"  />
+            [% ELSE %]
+                <input type="button" value="Enable Crontab" id="enable-crontab" onClick="window.location = '[% script %]/enable_crontab'"  />
+                <span class="warning">Crontab is Disabled</span>
+            [% END %]
+        </fieldset>
+        </form>
+    </div>
+    <table>
+        <tr>
+            <th>Job</th>
+            <th>Description</th>
+            <th>Comment</th>'
+            <th>Days</th>
+            <th>Hours</th>
+            <th>Minutes</th>
+            <th>Days of Month</th>
+            <th>Month</th>
+            <th>Active</th>
+        </tr>
+        [% FOREACH schedule IN schedules %]
+        <tr>
+            <td>
+                <a href="[% root_url %]/schedule/edit/[% schedule.schedule_id %]">
+                [% schedule.config_name %] /
+                [% schedule.section_name %]
+                </a>
+            </td>
+            <td>[% schedule.description.replace('\n', '<br/>') %]</td>
+            <td>[% schedule.comment.replace('\n', '<br/>') %]</td>
+            <td>[% IF schedule.days %][% schedule.days %][% ELSE %]All[% END %]</td>
+            <td>[% IF schedule.hours || schedule.hours == 0 %][% schedule.hours %][% ELSE %]All[% END %]</td>
+            <td>[% IF schedule.minutes || schedule.minutes == 0 %][% schedule.minutes %][% ELSE %]All[% END %]</td>
+            <td>[% IF schedule.doms %][% schedule.doms %][% ELSE %]All[% END %]</td>
+            <td>[% IF schedule.month %][% schedule.month %][% ELSE %]All[% END %]</td>
+            <td>[% IF schedule.status %]Y[% ELSE %]N[% END %]</td>
+        </tr>
+        [% END %]
+    </table>
+[% c.prototype.observe_field('config_name', {url = root_url _ '/schedule/update_sections', update='section_name', with   => "'config_file='+value+'&show_blank=1'"}) %]
+[% pager = schedules.pager %]
+[% PROCESS footer.tmpl %]

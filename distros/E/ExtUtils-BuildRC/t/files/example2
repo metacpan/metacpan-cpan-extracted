@@ -1,0 +1,3 @@
+install  --install_base  /home/user/perl5
+ --prefix /home/user
+* --verbose

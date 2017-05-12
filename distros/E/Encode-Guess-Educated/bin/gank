@@ -1,0 +1,147 @@
+#!perl
+
+use 5.010;
+use utf8;
+use strict;
+use warnings;
+use warnings FATAL => "utf8";
+use open qw(:std :utf8);
+
+use Getopt::Long    qw[ GetOptions  ];
+use Pod::Usage      qw[ pod2usage   ];
+use Carp 	    qw[ confess     ];
+
+use Encode::Guess::Educated;
+
+########################################################################
+
+our $Errors = 0;
+our $VERSION = "1.0 (2012-12-28)";
+our %Opt = ();
+
+########################################################################
+
+main();
+exit($Errors == 0 ? 0 : 1);
+
+########################################################################
+
+sub main {
+    set_traps();
+    set_options();
+    process_files();
+} 
+
+sub set_traps { 
+    $| = 1;
+    $SIG{__WARN__} = sub { confess "FATALIZED WARNING @_" };
+    $SIG{__DIE__}  = sub { $^S || confess "UNCAUGHT FATAL @_" };
+}
+
+sub set_options { 
+
+    Getopt::Long::Configure qw[ bundling auto_version ];
+
+    GetOptions(\%Opt, qw[
+
+        help|h|?
+        man|m
+
+        debug|d
+        dump-byte-table|B
+        dump-training-data|D
+
+        training-datafile|t
+        model|m
+        list-models|L
+
+	short|s
+	long|l
+
+    ]) || pod2usage(2);
+
+
+}
+
+########################################################################
+
+sub process_files {
+
+    my $obj = Encode::Guess::Educated->new();
+
+    if ($Opt{"dump-bytes-table"}) {
+	$obj->dump_byte_table();
+    }
+
+    if ($Opt{"dump-training-data"}) {
+	$obj->dump_training_data();
+    }
+
+    if ($Opt{debug}) {
+	$obj->enable_debugging(1);
+    } 
+
+    for my $file (@ARGV) {
+
+	unless (-e $file) {
+	    print STDERR "$0: can't stat $file: $!\n";
+	    $Errors++;
+	    next;
+	} 
+
+	unless (-f _) {
+	    print STDERR "$0: $file isn't a regular file\n";
+	    $Errors++;
+	    next;
+	} 
+
+	unless (-s _) {
+	    print STDERR "$0: $file is empty\n";
+	    $Errors++;
+	    next;
+	} 
+
+	my $found;
+
+	eval { $found = $obj->guess_file_encoding($file) };
+
+	if ($@) {
+	    my $msg = $@;
+	    # $msg =~ s/\s+at \S+ line \d.*$//s;
+	    $Errors++;
+	    print STDERR "$0: $msg\n";
+	    next;
+	} 
+
+	if (! $found) { 
+	    print STDERR "$0: Can't guess encoding of $file: ", $obj->get_errmsg();
+	    $Errors++;
+	    next;
+	} 
+
+	my $enc = $obj->get_guessed_encoding();
+
+	print "$file: " if @ARGV > 1;
+	say $enc;
+
+	next unless $Opt{long} || $Opt{short};
+
+	my $reason;
+	if ($Opt{short}) {
+	    $reason = $obj->get_short_report();
+	} 
+	elsif ($Opt{long}) {
+	    $reason = $obj->get_long_report();
+	}
+	else {
+	    die "not reached";
+	} 
+
+	for ($reason) { 
+	    s/^/\t/gm;
+	    s/\R*\z/\n/;
+	}
+	say $reason;
+    } 
+
+} 

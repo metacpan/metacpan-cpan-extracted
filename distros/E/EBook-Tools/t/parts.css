@@ -1,0 +1,3 @@
+h2.title  { text-align: center }
+div.sect1 { page-break-before: always; margin-top: 1em }
+li	  { page-break-after: always }

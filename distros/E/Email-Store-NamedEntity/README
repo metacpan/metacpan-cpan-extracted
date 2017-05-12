@@ -1,0 +1,56 @@
+NAME
+    Email::Store::NamedEntities - Provides a list of named entities for an
+    email
+
+INSTALL
+   The usual :
+        
+        % perl Build.PL
+        % ./Build 
+        % ./Build test
+        % sudo ./Build install
+
+   or, if you don't have Module::Build
+
+        % perl Makefile.PL
+        % make
+        % make test
+        % sudo make install
+
+
+SYNOPSIS
+    Remember to create the database table:
+
+        % make install
+        % perl -MEmail::Store="..." -e 'Email::Store->setup'
+
+    And now:
+
+        foreach my $e ($mail->named_entities) {
+            print $e->thing," which is a ", $e->description,"(score=",$e->score(),")\n";
+        }
+
+DESCRIPTION
+    This extension for "Email::Store" adds the "named_entity" table, and
+    exports the "named_entities" method to the "Email::Store::Mail" class
+    which returns a list of "Email::Store::NamedEntity" objects.
+
+    A "Email::Store::NamedEntity" object has three fields -
+
+    thing
+        The entity we've extracted e.g "Bob Smith" or "London" w
+
+    description
+        What class of entity it is e.g "person", "organisation" or "place"
+
+    score
+        How likely like it is to be that class.
+
+SEE ALSO
+    Email::Store::Mail, Lingua::EN::NamedEntity.
+
+AUTHOR
+    Simon Wistow, "simon@thegestalt.org"
+
+    This module is distributed under the same terms as Perl itself.
+

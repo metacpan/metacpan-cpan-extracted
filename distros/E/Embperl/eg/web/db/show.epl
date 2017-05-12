@@ -1,0 +1,184 @@
+[-
+$r = shift ;
+-]
+
+<table width="100%">
+    <tr bgcolor="#fefcad">
+        <td><font size="4">
+	  [$ if $fdat{-update_item} $]
+	    [= edit1 =] [+ $r->{category_set}{category} +]
+	  [$ elsif $fdat{-delete_item} $]
+	    [= del1 =]
+	  [$ elsif $fdat{-add_item} $]
+	    [= add1 =] [+ $r->{category_set}{category} +]
+	  [$ else $]
+	    [# [= show1 =] #][+ $r->{category_set}{category} +]
+	  [$ endif $]
+	</font></td>
+    </tr>
+</table>
+
+
+
+[$ if ($item_set = $r->{item_set}) $] [# && (ref ($item_set) ne 'ARRAY' || @$item_set > 0) $]#]
+
+	  [$ if $fdat{-update_item} $]
+	    [= edit2 =]
+	  [$ elsif $fdat{-delete_item} $]
+	    [= del2 =]
+	  [$ elsif $fdat{-add_item} $]
+	    [= add2 =]
+	  [$ else $]
+	    [= show2 =]
+	  [$ endif $]
+
+[$ if $fdat{-delete_item} && !$r->{error} $]
+<P><A HREF="addsel.epl">[= back_to_index =]</A></P>
+[$ endif $]
+
+<br>
+
+[-
+ $ct = $r->{category_texts};
+ $cy = $r->{category_types};
+ $cf = $r->{category_fields};
+ $cfnl = $r->{category_fields_nolang};
+ $rec = $item_set->[0] ;
+ $email = $rec -> {email} ;
+ $date = $item_set -> {modtime} ;
+ $date =~ /^(\d+)-(\d+)-(\d+)/ ;
+ $date = $r -> param -> language eq 'de'?"$3.$2.$1":"$1-$2-$3" ;
+ $status = eval { $r -> gettext ($item_set->{state} ? 'display' : 'hide') } ;
+-]
+[# <pre>[- use Data::Dumper -][+ Dumper ($cfnl, $rec) +]</pre> #]
+
+[$if $cfnl && @$cfnl $]
+<table width="100%">
+    <tr>
+        <td>
+            <table>
+                [$ foreach $type (@$cfnl) $]
+                  [$ if $txt = $ct->{$type . '_text'} $]
+		     [$ if $cy->{$type} =~ /showstatic/ $]
+			     [- @txt = split (/\n/, $txt) -][$ foreach $t (@txt) $][+ $t +]<br>[$ endforeach $]
+		     [$ elsif $cy->{$type} !~ /static/ $]
+                        <tr>
+                           <td valign=top>[+ $txt +]:</td><td>
+			   [$ if $cy->{$type} =~ /pulldown/ $]
+			     [+ $r->app->get_title($r,$type,$rec->{$type}) +]
+			   [$ elsif $cy->{$type} =~ /checkboxrow/ $]
+			     [-
+			       %selected = map { $_ => 1 } split ("\t", $rec->{$type});
+			       #warn "selected checkboxes: ", Data::Dumper->Dumper (\%selected), "\n";
+			       if ($type =~ /^(.*?)_id$/) {
+				   $table = $1 ;
+			       } else {
+				   $table = $type;
+			       }
+			       $table =~ s/^.*__// ;
+			       $poss = $r->app->get_titles($r,$table);
+			       $i = 0;
+			       $moreThanOne = 0;
+			     -]
+			     [$ while $t = ($poss->[$i++]) $]
+			       [# - #warn "checkboxrow[$i] = ", Data::Dumper->Dumper ($t), "\n"; - #]
+			       [+ $selected{$t->{id}} ? ($moreThanOne++ ? ", " : "") . $t->{title} : "" +]
+			     [$ endwhile $]
+			   [$ elsif $cy->{$type} =~ /checkbox/ $]
+			     <!-- Todo: Internationalisierung per Tabelle ... -->
+			     [+ $r -> param -> language eq 'de'?($rec->{$type}?'Ja':'Nein'):($rec->{$type}?'Yes':'No') +]
+			   [$ else $]
+				[- @txt = split (/\n/, $rec -> {$type}) -][$ foreach $t (@txt) $][+ $t +]<br>[$ endforeach $]
+			   [$ endif $]
+			   </td>
+                        </tr>
+                    [$endif$]
+                  [$endif$]
+                [$endforeach$]
+            </table>
+        </td>
+    </tr>
+</table>
+[$endif$]
+[$if $cf && @$cf $]
+<table width="100%">
+    <tr bgcolor="#fefcad">
+        [- $rec = $item_set->[$row] -]
+        <td><font size=3><b>[+ $rec -> {name} +]</b></font></td>
+    </tr>
+    <tr>
+        <td>
+            <table>
+                [$ foreach $type (@$cf) $]
+		  [$ if $cy->{$type} !~ /static/ $]
+                    [$ if $txt = $ct->{$type . '_text'} $]
+                        <tr>
+                           <td valign=top>[+ $txt +]:</td>
+			   <td>
+			     [$ if $cy->{$type} =~ /pulldown/ $]
+			       [+ $r->app->get_title($r,$type,$rec->{$type}) +]
+			     [$ elsif $cy->{$type} =~ /checkboxrow/ $]
+			       [-
+				 %selected = map { $_ => 1 } split ("\t", $rec->{$type});
+				 if ($type =~ /^(.*?)_id$/) {
+				   $table = $1 ;
+			         } else {
+				   $table = $type;
+			         }
+				 $table =~ s/^.*__// ;
+				 $poss = $r->app->get_titles($r,$table);
+			         $i = 0;
+				 $moreThanOne = 0;
+			       -]
+			       [$ while $t = ($poss->[$i++]) $]
+			         [- warn "checkboxrow[$i] = ", Data::Dumper->Dumper ($t), "\n"; -]
+				 [+ $selected{$t->{id}} ? ($moreThanOne++ ? ", " : "") . $t->{title} : "" +]
+			       [$ endwhile $]
+			     [$ elsif $cy->{$type} =~ /checkbox/ $]
+			       <!-- Todo: Internationalisierung per Tabelle ... -->
+			       [$ if $rec->{$type} $]
+				 Ja
+			       [$ else $]
+				 Nein
+			       [$ endif $]
+			     [$ else $]
+			       [- @txt = split (/\n/, $rec-> {$type}) -]
+			       [$ foreach $t (@txt) $]
+				   [+ $t +]<br>
+			       [$ endforeach $]
+			     [$ endif $]
+			   </td>
+                        </tr>
+                    [$endif$]
+                  [$endif$]
+                [$endforeach$]
+            </table>
+        </td>
+    </tr>
+</table>
+[$endif$]
+
+<hr>
+[$ if $udat{user_email} $]
+[- $tt = $r->{category_set}{table_type} -]
+<A HREF="add.epl?category_id=[+ $fdat{category_id} +]">[New]</A>&nbsp;&nbsp;
+<A HREF="add.epl?[+ $tt +]_id=[+ $fdat{"${tt}_id"} +]&amp;-edit_item=1&amp;category_id=[+ $fdat{category_id} +]">[Edit]</A>&nbsp;&nbsp;
+<A HREF="list.epl?category_id=[+ $fdat{category_id} +]">[Overview]</A>
+[$ endif $]
+&nbsp;&nbsp; Owner: [+ $email +]
+&nbsp;&nbsp; Status: [+ $status +]
+&nbsp;&nbsp; [+ $date +]
+<br>
+
+
+[$ endif $]
+
+<br><br>
+
+[#
+[! use Data::Dumper; !]
+[- $DBIx::Recordset::FetchsizeWarn = 0; -]
+<PRE>
+[+ Dumper $r->{error},\%fdat,[keys %$r],[@{$r->{category_fields}}],{%{$r->{category_texts}}},{%{$r->{category_set}}},$r->{item_set} +]
+</PRE>
+#]

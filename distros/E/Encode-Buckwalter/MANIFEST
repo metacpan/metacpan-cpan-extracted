@@ -1,0 +1,8 @@
+Buckwalter.pm
+Changes
+Encode/Buckwalter.ucm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/Buckwalter.t
+META.yml                                 Module meta-data (added by MakeMaker)

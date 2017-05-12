@@ -1,0 +1,67 @@
+<html>
+
+<head>
+<title>Embperl Tests - Switch syntax</title>
+</head>
+
+<body>
+
+
+
+--- syntax Default ---
+
+	embperl 1	<!--#set var="a" value="ssi 1" -->
+	<!--#echo var="a" -->
+
+
+--- syntax SSI ---
+
+[+ $a = 'embperl 1' +]
+
+	
+	ssi 1
+
+
+--- syntax Embperl ---
+
+embperl 1	<!--#set var="a" value="ssi 1" -->
+	<!--#echo var="a" -->
+
+
+--- syntax Embperl SSI ---
+
+embperl 1	
+	ssi 1
+
+--- syntax - SSI = Embperl ---
+
+embperl 1	<!--#set var="a" value="ssi 1" -->
+	<!--#echo var="a" -->
+
+
+--- syntax + SSI =  Embperl SSI ---
+
+embperl 1	
+	ssi 1
+
+
+--- syntax - Embperl = SSI ---
+
+[+ $a = 'embperl 1' +]
+
+	
+	ssi 1
+
+
+--- syntax Text ---
+
+[+ $a = 'embperl 1' +]
+
+	<!--#set var="a" value="ssi 1" -->
+	<!--#echo var="a" -->
+
+
+
+</body>
+</html>
+

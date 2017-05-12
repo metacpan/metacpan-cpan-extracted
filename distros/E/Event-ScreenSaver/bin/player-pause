@@ -1,0 +1,209 @@
+#!/usr/bin/perl
+
+# Created on: 2008-03-27 10:35:12
+# Create by:  ivanw
+# $Id$
+# $Revision$, $HeadURL$, $Date$
+# $Revision$, $Source$, $Date$
+
+use strict;
+use warnings;
+use version;
+use Getopt::Long;
+use Pod::Usage;
+use Data::Dumper qw/Dumper/;
+use English qw/ -no_match_vars /;
+use Event::ScreenSaver;
+
+our $VERSION = version->new('0.0.3');
+my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
+my $ss;
+
+my %option = (
+	player  => $ENV{'PLAYER_PAUSE_PLAYER'},
+	verbose => 0,
+	man     => 0,
+	help    => 0,
+	VERSION => 0,
+);
+
+main();
+exit 0;
+
+sub main {
+
+	Getopt::Long::Configure('bundling');
+	GetOptions(
+		\%option,
+		'player|p=s',
+		'verbose|v+',
+		'man',
+		'help',
+		'VERSION!',
+	) or pod2usage(2);
+
+	if ( $option{'VERSION'} ) {
+		print "$name Version = $VERSION\n";
+		exit 1;
+	}
+	elsif ( $option{'man'} ) {
+		pod2usage( -verbose => 2 );
+	}
+	elsif ( $option{'help'} ) {
+		pod2usage( -verbose => 1 );
+	}
+
+	$option{player} ||= shift @ARGV;
+
+	# Load the appropriate library the the chosen player
+	loader($option{'player'});
+
+	my $was_playing = 0;
+
+	# start monitoring the screen saver
+	Event::ScreenSaver->new(
+		start => sub {
+			my $player = player();
+
+			return if !($was_playing = is_playing($player));
+
+			$player->can('play') ? $player->play() : $player->playPause(0);
+		},
+		stop => sub {
+			my $player = player();
+
+			return if !$was_playing;
+
+			$player->can('pause') ? $player->pause() : $player->playPause(1);
+		}
+	)->run;
+
+	return;
+}
+
+sub player {
+	my $player;
+
+	if ($option{'player'} eq 'mpd') {
+		warn "Pausing MPD\n" if $option{verbose};
+		$player = eval{ Audio::MPD->new() };
+
+		if ($EVAL_ERROR) {
+			die "Please start MPD\n";
+		}
+	}
+	elsif ($option{'player'} eq 'amarok') {
+		warn "Pausing Amarok\n" if $option{verbose};
+		$player = DCOP::Amarok::Player->new();
+	}
+	elsif ($option{'player'} eq 'rhythmbox') {
+		warn "Pausing Rhythmbox\n" if $option{verbose};
+		my $bus = Net::DBus->find;
+		my $rhythmbox = $bus->get_service("org.gnome.Rhythmbox");
+
+		$player = $rhythmbox->get_object("/org/gnome/Rhythmbox/Player", "org.gnome.Rhythmbox.Player");
+	}
+
+	return $player;
+}
+
+sub is_playing {
+	my $player = $_[0];
+
+	if ($option{'player'} eq 'mpd') {
+		my $status = $player->status();
+		return $status->state() eq 'play';
+	}
+	elsif ($option{'player'} eq 'amarok') {
+		return $player->status() == 2;
+	}
+	elsif ($option{'player'} eq 'rhythmbox') {
+		return $player->getPlaying();
+	}
+	else {
+		die "$option{'player'} does not have a method to determine if it is currently playing!\n";
+	}
+
+	return;
+}
+
+sub loader {
+
+	my $load   = shift;
+	my $module =
+		  !defined $load       ? die "Nothing to load!\n"
+		: $load eq 'mpd'       ? 'Audio::MPD'
+		: $load eq 'amarok'    ? 'DCOP::Amarok::Player'
+		: $load eq 'rhythmbox' ? 'Net::DBus'
+		:                        die "Unknown player $load!\n";
+	my $file = $module;
+	$file =~ s{::}{/}xms;
+	$file .= '.pm';
+
+	eval{ require $file };
+	if ($EVAL_ERROR) {
+		die "Please install $module to manage " . ucfirst $load . "\n";
+	}
+
+	return;
+}
+
+__DATA__
+
+=head1 NAME
+
+player-pause - Pauses music players when the screen saver starts.
+
+=head1 VERSION
+
+This documentation refers to player-pause version 0.0.3.
+
+=head1 SYNOPSIS
+
+   player-pause [option] mpd|amarok|rhythmbox
+
+ OPTIONS:
+  -p --player=mpd|amarok|rhythmbox
+               Sets the player to pause when the screen saver starts
+
+  -v --verbose Show more detailed option
+     --version Prints the version information
+     --help    Prints this help information
+     --man     Prints the full documentation for player-pause
+
+=head1 DESCRIPTION
+
+=head1 SUBROUTINES/METHODS
+
+=head1 DIAGNOSTICS
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+=head1 DEPENDENCIES
+
+=head1 INCOMPATIBILITIES
+
+=head1 BUGS AND LIMITATIONS
+
+There are no known bugs in this module.
+
+Please report problems to Ivan Wills (ivan.wills@gmail.com).
+
+Patches are welcome.
+
+=head1 AUTHOR
+
+Ivan Wills - (ivan.wills@gmail.com)
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2009 Ivan Wills (14 Mullion Close, Hornsby Heights, NSW Australia 2077).
+All rights reserved.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. See L<perlartistic>.  This program is
+distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.
+
+=cut

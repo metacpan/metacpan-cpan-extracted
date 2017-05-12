@@ -1,0 +1,16 @@
+0.06 Fri Feb 25 13:30:40 CST 2011
+     - add Test::Exception because we use Test::Exception :)
+
+0.05 Tue Oct 12 22:56:37 CDT 2010
+     - work around new Moose feature
+
+0.04 Wed Feb 10 04:21:57 CST 2010
+     - remove MooseX::AttributeHelpers from the top of the file also...
+
+0.03 Thu Feb  4 02:31:16 CST 2010
+     - remove MooseX::AttributeHelpers dep and use the core moose stuff instead
+
+0.02 Mon Aug 10 01:34:30 CDT 2009
+     - add on_event callback that is called when an event is successfully received
+
+0.01 Initial Release

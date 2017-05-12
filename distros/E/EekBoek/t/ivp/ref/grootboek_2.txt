@@ -1,0 +1,47 @@
+                                             Grootboek
+Periode: 2007-01-01 t/m 2007-12-31
+EekBoek Demo Administratie                                                      EekBoek, 2007-12-31
+
+ GrBk  Grootboek/Boekstuk              Datum           Debet     Credit  BoekstukNr      Relatie
+---------------------------------------------------------------------------------------------------
+ 2200  Debiteuren
+        Beginsaldo                                      0,00       0,00
+         Perl Cursus                   2007-02-18    3570,00       0,00  Verkoop:1
+         Perl Cursus                   2007-03-18    3570,00       0,00  Verkoop:2
+         *Perl Cursus                  2007-03-18       0,00    3570,00  Postbank:3      ACME
+         *Perl Cursus                  2007-04-12       0,00    3570,00  Postbank:4      ACME
+         Perl Cursus                   2007-04-18     600,00       0,00  Verkoop:3
+         Perl Cursus                   2007-05-12       0,00       5,00  Verkoop:4
+         Ondersteuning                 2007-05-14     714,00       0,00  Verkoop:5
+         *Perl Cursus                  2007-05-31       0,00     600,00  Postbank:5      ACME
+         *Ondersteuning                2007-06-08       0,00     714,00  Postbank:6      ACME
+         *Perl Cursus                  2007-06-12       5,00       0,00  Postbank:6      ACME
+         Ondersteuning                 2007-07-16     714,00       0,00  Verkoop:6
+         *Ondersteuning                2007-08-10       0,00     714,00  Postbank:8      ACME
+         Pocket Reference              2007-08-19    1000,00       0,00  Verkoop:7
+         *Pocket Reference             2007-08-19       0,00    1000,00  Postbank:8      ORA
+        Totaal mutaties                                 0,00
+ 2200  Totaal Debiteuren                                0,00
+
+ 2320  Postbank
+        Beginsaldo                                   1131,92       0,00
+         Afschrift 1                   2007-01-31       0,00     130,15  Postbank:1
+         Afschrift 2                   2007-02-28       0,00      25,50  Postbank:2
+         Afschrift 3                   2007-03-31    3442,98       0,00  Postbank:3
+         Afschrift 4                   2007-04-30    3544,50       0,00  Postbank:4
+         Afschrift 5                   2007-05-31     472,28       0,00  Postbank:5
+         Afschrift 6                   2007-06-30     683,50       0,00  Postbank:6
+         Afschrift 7                   2007-07-31       0,00     130,16  Postbank:7
+         Afschrift 8                   2007-08-31    1688,50       0,00  Postbank:8
+         Afschrift 9                   2007-09-30       0,00     134,22  Postbank:9
+         Afschrift 10                  2007-10-31       0,00      25,50  Postbank:10
+         Afschrift 11                  2007-11-30       0,00     135,17  Postbank:11
+         Afschrift 12                  2007-12-07       0,00      25,50  Postbank:12
+         Eerste deel ADSL              2007-12-09       0,00      10,00  Postbank:13
+         Tweede deel ADSL              2007-12-10       0,00      12,80  Postbank:14
+        Totaal mutaties                              9202,76
+ 2320  Totaal Postbank                              10334,68
+
+       Totaal mutaties                               9202,76       0,00
+---------------------------------------------------------------------------------------------------
+       Totaal                                       10334,68       0,00

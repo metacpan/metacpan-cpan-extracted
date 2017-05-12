@@ -1,0 +1,9 @@
+{
+  "renderer": "TT",
+  "header": [
+    { "Subject": "Test TT Message"  },
+    { "From":    "test@example.com" }
+  ],
+  "type": "text/plain",
+  "body": "[% name %] is my name, [% game %] is my game."
+}

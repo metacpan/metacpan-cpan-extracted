@@ -1,0 +1,44 @@
+#!/usr/bin/perl
+use 5.010;
+use Exobrain;
+
+# PODNAME: sms
+# ABSTRACT: Send an exobrain sms intent from the cmdline
+our $VERSION = '1.08'; # VERSION
+
+my $number  = shift;
+my $message = "@ARGV";
+
+($number and $message) or die "Usage: $0 number message\n";
+
+my $exobrain = Exobrain->new;
+
+$exobrain->intent('SMS',
+    to   => $number,
+    text => $message,
+);
+
+__END__
+
+=pod
+
+=head1 NAME
+
+sms - Send an exobrain sms intent from the cmdline
+
+=head1 VERSION
+
+version 1.08
+
+=head1 AUTHOR
+
+Paul Fenwick <pjf@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Paul Fenwick.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

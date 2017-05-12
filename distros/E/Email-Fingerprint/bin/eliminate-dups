@@ -1,0 +1,107 @@
+#!/usr/bin/perl -w
+# qmail duplicate eliminator.
+
+use strict;
+use Email::Fingerprint::App::EliminateDups;
+
+# Make sure group and world permissions are off
+umask oct(77);
+
+# Run the app
+my $app = Email::Fingerprint::App::EliminateDups->new;
+$app->run(@ARGV);
+
+__END__
+=head1 NAME
+
+eliminate-dups
+
+=head1 SYNOPSIS
+
+  eliminate-dups [options] [dbname]
+
+If C<dbname> is not specified, it defaults to C<$HOME/.maildups>.
+
+=head1 DESCRIPTION  
+
+Reads an email message on standard input and calculates a fingerprint
+based on the mail headers. If the fingerprint already exists in the
+hash file, then the message is a duplicate.  If the fingerprint does
+not exist, save the fingerprint in the hash file and deliver the
+message.
+
+=head1 OPTIONS
+
+The following command-line options are supported:
+
+=over
+
+=item --dump
+
+Dump the fingerprint DB human-readably and exit.  Implies C<--no-check>
+and C<--no-purge>.
+
+=item --help
+
+Print a usage message and exit
+
+=item --no-check
+
+Do not compute any message fingerprints (i.e., only purge). The same
+exit status will be returned as if a fingerprint check found no
+match--i.e., any message on standard input will not be flagged as
+a duplicate.
+
+=item --no-purge
+
+Do not purge the fingerprint DB (i.e., only check).  This option
+can be used to reduce load on the mail server.  The script should
+periodically be run with the C<--no-check> option to keep the fingerprint
+database from growing without limit.
+
+=item --strict
+
+Include the message body when calculating fingerprints.
+
+=back
+
+Contradictory options are silently accepted. For example, C<--no-check>
+is inconsistent with C<--strict>, but no error is reported if both
+are used.  Similarly, C<--no-check> and C<--no-purge> together mean
+that the script does nothing (unless C<--dump> or C<--help> is also
+specified), but this doesn't result in an error.
+
+=head1 SETUP
+
+Create a ~/.qmail-maildir file
+
+   ./Maildir/
+
+Then add the following lines to your ~/.qmail file
+
+  | eliminate-dups hashfile
+  &user-maildir
+
+Forwarding to the user-maildir address is I<very important>.  It
+ensures that if delivery to the Maildir is deferred, eliminate-dups
+will not be called a second time (which would result in a lost
+message).
+
+To reduce server load, the following can be used in the ~/.qmail file
+instead:
+
+  | eliminate-dups --no-purge hashfile
+  &user-maildir
+
+If the C<--no-purge> option is used, then a cron job must be set up to
+purge the fingerprint database periodically. The following can be put in
+the user's crontab file:
+
+  23 2 * * *       /path/to/eliminate-dups --no-check $HOME/.maildups
+
+=head1 LICENSE
+
+Copyright (C) 2007-2008 Len Budney
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

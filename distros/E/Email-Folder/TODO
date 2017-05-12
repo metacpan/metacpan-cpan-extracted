@@ -1,0 +1,28 @@
+docuent that ->messages is a one-shot deal
+
+Backends for ...
+
+rmail
+http://quimby.gnus.org/notes/BABYL
+
+mh
+http://www.ics.uci.edu/~mh/book/overall/lin.htm
+
+emaul? (probably not)
+http://search.cpan.org/author/KJOHNSON/MailFolder/Mail/Folder/Emaul.pm
+
+and
+
+mboxo mboxrd mboxcl and mboxcl2
+(only mboxcl2 needs special stuff?)
+
+
+Possibly
+
+Eudora (mbox variant)
+Outlook Express
+Outlook (dbx)
+Outlook2000 (mbx)
+http://mbx2mbox.sourceforge.net/
+
+

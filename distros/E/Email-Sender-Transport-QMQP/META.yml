@@ -1,0 +1,27 @@
+---
+abstract: 'send mail via QMQP'
+author:
+  - 'Michael Alan Dorman <mdorman@ironicdesign.com>'
+build_requires:
+  Email::Sender::Simple: 0
+  Test::Exception: 0
+  Test::More: 0
+  Test::TCP: 0
+  Try::Tiny: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300020, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Email-Sender-Transport-QMQP
+requires:
+  Email::Sender::Transport: 0
+  IO::Socket::INET: 0
+  IO::Socket::UNIX: 0
+  Moose: 0
+version: 0.001

@@ -1,0 +1,1448 @@
+   [1]The Journal of Biological Chemistry
+
+   [2]Skip to main page content
+     * [3]Home
+     * [4]Current issue
+     * [5]Archive
+     * [6]Papers in Press
+     * [7]Minireviews
+     * [8]Classics
+     * [9]Reflections
+     * [10]Papers of the Week
+
+   QUICK SEARCHAuthor: _________Keyword: ________________Year: ____Vol:
+   ____Page: ____ GO Go[11][Advanced Search][12][Browse the Archive]
+     * Institution: Univ Colorado - Denison Memorial Library
+     * [13]Sign In
+
+   Advertisement
+   Advertisement
+     * [14]Celebrate 100 Years of ASBMB: ASBMB Histroy Book Now Avaiable!
+
+ §1§ The Potency and Specificity of the Interaction between the IA[3]
+Inhibitor and Its Target Aspartic Proteinase fromSaccharomyces
+cerevisiae[15]* §1§
+
+    1. [16]Lowri H. Phylip[17]tOa,
+    2. [18]Wendy E. Lees[19]tOa[20]FNb,
+    3. [21]Brian G. Brownsey[22]tOc,
+    4. [23]Daniel Bur[24]tOd,
+    5. [25]Ben M. Dunn[26]tOe,
+    6. [27]Jakob R. Winther[28]tOf,
+    7. [29]Alla Gustchina[30]tOg,
+    8. [31]Mi Li[32]tOg[33]tOh,
+    9. [34]Terry Copeland[35]i,
+   10. [36]Alexander Wlodawer[37]tOg and
+   11. [38]John Kay[39]tOa[40]FNj
+
+    1.
+
+
+    From the ^tOaSchool of Biosciences, Cardiff University, P. O. Box
+    911, Cardiff CF10 3US, Wales, United Kingdom, the^tOcDepartment of
+    Medicine, University of Wales College of Medicine, Cardiff CF14 4XN,
+    Wales, United Kingdom, ^tOdF. Hoffmann La Roche AG, CH-4070 Basel,
+    Switzerland, the ^tOeDepartment of Biochemistry & Molecular Biology,
+    University of Florida College of Medicine, Gainesville, Florida
+    32610, the ^tOfDepartment of Yeast Genetics, Carlsberg Laboratory,
+    DK-2500, Copenhagen Valby, Denmark, the^tOgProtein Structure Section,
+    Macromolecular Crystallography Laboratory, National Cancer Institute,
+    Frederick, Maryland 21702, the^tOhIntramural Research Support
+    Program, SAIC Frederick, National Cancer Institute, Frederick,
+    Maryland 21702, and the ^iProgram Core, DBS, National Cancer
+    Institute, Frederick, Maryland 21702
+
+
+   [41]Next Section
+
+ §2§ Abstract §2§
+
+   The yeast IA[3] polypeptide consists of only 68 residues, and the free
+   inhibitor has little intrinsic secondary structure. IA[3] showed
+   subnanomolar potency toward its target, proteinase A from Saccharomyces
+   cerevisiae, and did not inhibit any of a large number of aspartic
+   proteinases with similar sequences/structures from a wide variety of
+   other species. Systematic truncation and mutagenesis of the IA[3]
+   polypeptide revealed that the inhibitory activity is located in the
+   N-terminal half of the sequence. Crystal structures of different forms
+   of IA[3] complexed with proteinase A showed that residues in the
+   N-terminal half of the IA[3] sequence became ordered and formed an
+   almost perfect &#x3b1;-helix in the active site of the enzyme. This potent,
+   specific interaction was directed primarily by hydrophobic interactions
+   made by three key features in the inhibitory sequence. Whereas IA[3]
+   was cut as a substrate by the nontarget aspartic proteinases, it was
+   not cleaved by proteinase A. The random coil IA[3] polypeptide escapes
+   cleavage by being stabilized in a helical conformation upon interaction
+   with the active site of proteinase A. This results, paradoxically, in
+   potent selective inhibition of the target enzyme.
+
+   Aspartic proteinases participate in a variety of physiological
+   processes, and the onset of pathological conditions such as
+   hypertension, gastric ulcers, and neoplastic diseases may be related to
+   changes in the levels of their activity. Members of this proteinase
+   family, e.g. renin, pepsin, cathepsin D, and human immunodeficiency
+   virus-proteinase are generally type-cast on the basis of their
+   susceptibility to inhibition by naturally occurring, small molecule
+   inhibitors such as the acylated pentapeptides, isovaleryl- and
+   acetyl-pepstatin. However, the two most recently identified human
+   aspartic proteinases, &#x3b2;-site Alzheimer's precursor protein cleavage
+   enzyme and &#x3b2;-site Alzheimer's precursor protein cleavage enzyme 2
+   ([42]1, [43]2), are not inhibited by this classical type of inhibitor
+   of this family of enzymes. Pepstatins are metabolic products produced
+   by various species of actinomycetes and, as such, are not themselves
+   gene-encoded. Protein inhibitors of aspartic proteinases are relatively
+   uncommon and are found in only a few specialized locations ([44]3).
+   Examples include renin-binding protein in mammalian kidneys which
+   intriguingly has now itself been identified to be the
+   enzyme,N-acetyl-d-glucosamine-2-epimerase ([45]4); a 17-kDa inhibitor
+   of pepsin and cathepsin E from the parasite, Ascaris lumbricoides
+   ([46]5); proteins from plants such as potato, tomato, and squash
+   ([47]6, [48]7), and a pluripotent inhibitor from sea anemone of
+   cysteine proteinases as well as cathepsin D ([49]8).
+
+   The IA[3] polypeptide in yeast is an 8-kDa inhibitor of the vacuolar
+   aspartic proteinase (proteinase A or saccharopepsin) that was initially
+   described by Holzer and co-workers ([50]9). The complete sequence of
+   this 68-residue inhibitor has been elucidated ([51]10, [52]11) and the
+   inhibitory activity of IA[3] has been shown to reside within the
+   N-terminal half of the molecule ([53]10, [54]12). We have recently
+   solved the structure of the IA[3]-proteinase A complex ([55]12),
+   demonstrating that whereas free IA[3] has little intrinsic secondary
+   structure, residues 2–32 of the inhibitor, upon contact with proteinase
+   A, become ordered and adopt a near perfect &#x3b1;-helical conformation
+   occupying the active site cleft of the enzyme. This was the first
+   crystal structure to be determined for a gene-encoded aspartic
+   proteinase inhibitor complexed with its target enzyme. It was thus
+   considered important to investigate further the role of the proteinase
+   as a folding template and to attempt to establish the molecular
+   features that enable this unprecedented mode of inhibitor-proteinase
+   interaction to occur.
+   [56]Previous Section[57]Next Section
+
+ §2§ EXPERIMENTAL PROCEDURES §2§
+
+ §5§ Protein Production and Purification §5§
+
+   Proteinase A and other aspartic proteinases were obtained, and peptides
+   were synthesized by solid-phase methods, as described previously
+   ([58]12). Genomic DNA was extracted from S. cerevisiae and the gene
+   encoding IA3 was amplified specifically by polymerase chain reaction
+   (PCR)^1 using 5&#x2032;-GCATATGAATACAGACCAACAAAAAGTG-3&#x2032; and
+   5&#x2032;-GCTCGAGCTCCTTCTTATGCCCCGC-3&#x2032; as forward and reverse primers.
+   Mutations were introduced into the wild type sequence to generate
+   clones encoding the chimera, (Gly)[9] and K7M proteins (Table[59]I) by
+   using the respective forward primers: chimera,
+   5&#x2032;-GGAGATATACATATGGGAGGACACGACGTCCCTTTAACAAACATATTTCAGAGCTCA-3&#x2032;;
+   (Gly)[9], 5&#x2032;-GCATATGGGAGGAGGCGGCGGCGGTGGAGGAGGCATATTTCAGAGCTCA-3&#x2032;; and
+   K7M, 5&#x2032;-GCATATGAATACAGACCAACAAATGGTGAGCGAA-3&#x2032; in conjunction with the
+   wild type reverse primer described above. The constructs encoding the
+   K24M, K31M/K32M, Mix, D22L, and K18M/D22L mutants were each generated
+   in two steps by overlapping PCR mutagenesis ([60]13) using the
+   mutagenic primer sets: K24M, forward,
+   5&#x2032;-GGCGATGCAATGGTAGTGAGTGACGCTTTT-3&#x2032; and reverse,
+   5&#x2032;-ACTCACTACCATTGCATCGCCCTGCAATTT-3&#x2032;; K31M/ K32M: forward,
+   5&#x2032;-TTTATGATGATGGCCAGTCAAGACAAGGACGGC-3&#x2032; and reverse
+   5&#x2032;-ACTGGCCATCATCATAAAAGCGTCACTCACTACCTT-3&#x2032;; Mix: forward,
+   5&#x2032;-AAGGCCGATAAATTTTCAATGGCTAGTCAAGACAAGG-3&#x2032; and reverse,
+   5&#x2032;-TGAAAATTTATCGGCCTTCACTACCTTTGCATCGCC-3&#x2032;; D22L: forward,
+   5&#x2032;-CAGGGGCTGGCCAAGGTAGTGAGTGACGCTTTT-3&#x2032; and reverse,
+   5&#x2032;-TACCTTGGCCAGCCCCTGCAACTTTTCCTTTGA-3&#x2032;; K18M/D22L: forward,
+   5&#x2032;-GAAATGTTGCAGGGGCTGGCCAAGGTAGTGAGTGACGCTTTT-3&#x2032; and reverse,
+   5&#x2032;-ATCCTTGGCCAGCCCCTGCAACATTTCCTTTGAGCTCTGAAA-3&#x2032;. The second set of
+   overlap primers utilized the T7 forward primer and the wild type
+   reverse primer described above.
+   View this table:
+     * [61]In this window
+     * [62]In a new window
+
+   Table I
+
+   Interactions between yeast proteinase A and protein forms of IA[3]
+
+   Wild type and mutant forms of IA3 were subcloned into theNdeI-XhoI
+   sites of pET-22b ([63]Novagen, Cambridge, United Kingdom), thus
+   introducing a C-terminal Leu-Glu-His[6]tag. Escherichia coli strain
+   BL21DE3(pLysS) was transformed with wild type or mutant clones, then
+   grown at 37&#x2009;°C in LB medium to an A [600] of &#x223c;0.6 before induction with
+   1 mmisopropyl-1-thio-&#x3b2;-d-galactopyranoside. Each soluble recombinant
+   protein was loaded onto a nickel-chelate affinity column in 0.05 m
+   sodium phosphate buffer, pH 8.0, containing 0.3 m NaCl, washed with the
+   same buffer adjusted to pH 6.0 containing 10% glycerol and each protein
+   form of IA[3] was eluted with the glycerol containing buffer at pH 4.0.
+   Appropriate fractions containing IA[3] were then heated twice at 100&#x2009;°C
+   for 5 min.
+
+ §5§ Analytical Measurements §5§
+
+   N-terminal sequencing of wild-type and mutant forms of IA[3] was
+   performed by automated Edman degradation on protein bands that were
+   electroblotted onto polyvinylidene difluoride membrane following
+   SDS-polyacrylamide gel electrophoresis on 20% gels. Samples for amino
+   acid analysis were hydrolyzed for 16 h at 105&#x2009;°C in 6 m HCl before
+   being loaded onto a Biochrom 20 amino acid analyzer (Amersham Pharmacia
+   Biotech, Cambridge, UK). MALDI-TOF mass spectrometry was carried out
+   using a PE Biosystems Voyager Elite XL instrument incorporating a UV
+   laser and delayed extraction. Samples at &#x223c;10 pmol/&#x3bc;l were added to a
+   matrix solution consisting of ferulic acid (55 mg/ml in ethanol
+   containing 0.1% trifluoroacetic acid) in a sample/matrix ratio of 3:1.
+
+ §5§ Kinetic Measurements and Peptide Cleavage §5§
+
+   Inhibition assays were conducted at pH 3.1 and 4.7 as described
+   previously ([64]12, [65]14) using Lys-Pro-Ile-Glu-Phe*NitroPhe-Arg-Leu
+   (where the asterisk indicates the scissile peptide bond) as substrate
+   for all enzymes except yapsin 1 ([66]15). For this enzyme, the
+   substrate used was ACTH (residues 1–39). This was incubated at 37&#x2009;°C in
+   50 mm sodium acetate buffer, pH 5.3, with 10 units of purified yapsin 1
+   ([67]15) for 30 min in the absence and presence of peptide 1 at final
+   concentrations up to 20 &#x3bc;m. The proteolytic product from ACTH (residues
+   1–15) was detected and quantified by reverse phase high performance
+   liquid chromatography.
+
+   The susceptibility of peptide/protein forms of IA[3] to proteolytic
+   cleavage was examined by incubation at 37&#x2009;°C for various lengths of
+   time (commonly 16 or 72 h) with the appropriate enzyme in 100 mm sodium
+   formate/acetate buffers at pH 3.1/4.7, respectively, each containing
+   300 mm NaCl. Each synthetic peptide was incubated initially with
+   proteinase A for 16 h at a molar ratio of 40:1 and, if no cleavage was
+   detected under these circumstances, then the incubation was repeated at
+   a peptide:proteinase ratio of 10:1 for 72 h. Peptide 1 was incubated
+   with nontarget proteinases such as human pepsin at both pH 3 and 5 at a
+   molar ratio of 1,000:1 for only 1 h. Each digest was separated by
+   reverse-phase fast protein liquid chromatography using a Pep-RPC column
+   (Amersham Pharmacia Biotech, Bucks, United Kingdom) and the fractions
+   containing any cleavage products were collected and subjected to acid
+   hydrolysis followed by amino acid analysis. Protein samples were frozen
+   for storage prior to subsequent mixing with the matrix solution for
+   application to a stainless steel target and analysis by MALDI-TOF mass
+   spectrometry.
+
+ §5§ Crystallography and Molecular Modeling §5§
+
+   Crystals of a complex of proteinase A with the K24M mutant protein form
+   of IA[3] (Table [68]I) were grown by vapor diffusion under the
+   conditions described previously for other IA[3]-proteinase A complexes
+   ([69]12). The initial solution was prepared at a molar ratio of
+   inhibitor:proteinase of 5:1, and after separation from the excess of
+   inhibitor by gel filtration on Sephadex G-50, was concentrated to 5
+   mg/ml by ultrafiltration. The mother liquor contained 30% PEG1500, 0.14
+   m ammonium sulfate in 0.1 m MES buffer, pH 6.0. Data extending to 1.9 Å
+   were collected at 100 K on beamline X9B at NSLS, Brookhaven National
+   Laboratory, Upton, NY, using an ADSC 4K CCD detector. Data were
+   processed with HKL2000 ([70]16). The initial data set consisted of
+   217,446 reflections that could be scaled withR [sym] of 8.7% (last
+   shell 34.6%) to yield 41,718 unique measurements. The completeness was
+   92.8% for the whole data and 75.5% for the final shell. The structure
+   of proteinase A complexed with peptide 1 ([71]12) was used as the
+   initial model with replacement of Lys^24 by Met. The structure was
+   refined with CNS 1.0 ([72]17) utilizing data extending to 2.0-Å
+   resolution. The first two rounds of refinement included positional and
+   B factor refinements and model adjustment, while solvent molecules were
+   added in the third round. The final model contained the enzyme,
+   residues 2–31 of the inhibitor and 243 water molecules. The final R
+   factor was 19.84% and R [free] was 23.1%. The root mean square
+   deviations for bond lengths and bond angles from ideality was 0.012 and
+   1.59 Å, respectively.
+
+   Modeling calculations were made on a Silicon Graphics Octane with a
+   single R12000 processor using the Moloc modeling package. Individual
+   amino acid side chains (K18M/D22L) in IA[3] were changed with a
+   built-in function in Moloc. Side chain conformations were adapted
+   manually and a subsequent round of optimization, maintaining proteinase
+   A and the remainder of IA[3] fixed, resulted in low energy
+   conformations for the newly introduced side chains. The new
+   protein-inhibitor complex was checked for attractive and repulsive
+   interactions, and allowed conformations, respectively.
+   [73]Previous Section[74]Next Section
+
+ §2§ RESULTS AND DISCUSSION §2§
+
+ §5§ Interaction of Protein/Peptide Forms of IA[3] with Target and Nontarget
+Enzymes  §5§
+
+   The nucleotide sequence encoding all 68 residues of IA[3] was amplified
+   by PCR and introduced into the pET-22b vector for expression in E. coli
+   as described under “Experimental Procedures.” The recombinant protein
+   that accumulated in E. coli was soluble and was purified to homogeneity
+   from cell lysates by taking advantage of the His[6] tag introduced from
+   the pET-22b vector at the C terminus of the IA[3] polypeptide chain
+   (see “Experimental Procedures”). N-terminal analysis of one batch of
+   the homogeneous wild-type inhibitor through 10 cycles of Edman
+   degradation gave the sequence Asn-Thr-Asp-Gln-Gln-Lys-Val-Ser-Glu-Ile,
+   which is exactly coincident with that predicted by the DNA sequence for
+   residues 2–11 (Table [75]I) ([76]11) and indicates that the initiator
+   Met^1 residue had been removed during the accumulation of this batch of
+   recombinant protein in E. coli. Analysis of a separate batch of
+   recombinant wild-type inhibitor by MALDI-TOF mass spectometry gave a
+   mass of 8772 Da, identical with that predicted (8772 Da) for the
+   IA[3]sequence plus the C-terminal extension of
+   &#x223c;Leu-Glu-His[6]introduced from the pET-vector.
+
+   The K [i] value determined at pH 3.1 for the inhibition of yeast
+   proteinase A by this C-terminal tagged, wild-type recombinant protein
+   (wild-type in Table [77]I) was comparable to that reported previously
+   at the same pH for the naturally occurring protein purified from S.
+   cerevisiae ([78]14). It is readily apparent then that the introduction
+   of the extra &#x223c;Leu-Glu-His[6] residues at the C terminus of the
+   recombinant inhibitor did not have any significant detrimental effect
+   on inhibitory potency. Since the target proteinase is unlikely ever to
+   encounter a pH as low as 3.1 in its cellular environment, attempts were
+   also made to determine inhibition constants at higher pH values such as
+   4.7 and 6.0. In both cases, the interaction with proteinase A was so
+   tight that theK [i] values lay at or beyond the limits of accurate
+   determination using the available assay methodology and so were
+   estimated to be <0.1 nm.
+
+   A synthetic peptide which spanned residues 2–34 of the IA[3]sequence
+   (Peptide 1 in Table [79]II) was found to have inhibitory potency
+   against yeast proteinase A at pH 3.1 and 4.7 comparable to those of the
+   naturally occurring and wild-type recombinant protein forms of IA[3],
+   described previously ([80]12,[81]14). In contrast, peptide 1, at a
+   concentration of 2 &#x3bc;m, had no significant ability to inhibit any one of
+   a number of other aspartic proteinases from a wide range of other
+   species (Table[82]III). These have considerable sequence and structural
+   similarities to yeast proteinase A and included yapsin 1 (a
+   membrane-attached aspartic proteinase also from S. cerevisiae ([83]15)
+   and other enzymes of fungal, mammalian, parasite (plasmepsin II from
+   Plasmodium falciparum ([84]18) and plant (cyprosin from Cynara
+   cardunculus ([85]19)) origin. Thus, IA[3] is a potent specific
+   inhibitor directed solely against its target enzyme, yeast proteinase
+   A. Since peptide 1 had no effect on the nontarget enzymes listed in
+   Table [86]III, reciprocally, the effect of a number of these (including
+   e.g. human pepsin, cathepsin D, and cathepsin E) on peptide 1 was
+   examined. With human pepsin, for example, using a molar ratio of
+   peptide 1:pepsin of 1,000:1 at pH 3.1 and pH 5, peptide 1 was cleaved
+   rapidly at the &#x223c;Glu^10* Ile^11&#x223c; and &#x223c;Ala^29*Phe^30&#x223c; bonds, as revealed
+   by amino acid analysis of the collected peptide fragments (data not
+   shown). Identical results were obtained for the other enzymes so it
+   would appear that peptide 1 is unable to inhibit the nontarget aspartic
+   proteinases such as pepsin, cathepsins D and E (and the other enzymes
+   listed in Table [87]III) because these enzymes cut the polypeptide
+   effectively as a substrate. Consequently, the &#x223c;Ala^29*Phe^30&#x223c; and
+   &#x223c;Glu^10*Ile^11&#x223c; sites that were cleaved by the nontarget proteinases
+   were changed singly and in concert to introduce residues at the P[1]
+   position which were known from extensive previous studies (e.g. Refs.
+   [88]20 and [89]21) to be refractory to cleavage by such enzymes as
+   human pepsin and cathepsin D. The resultant peptides (2 and 3, Table
+   [90]II) were just as potent as peptide 1 as inhibitors of proteinase A
+   but still showed no significant ability to inhibit, e.g. human pepsin
+   or cathepsin D at concentrations as high as 5 &#x3bc;m. Although cleavage of
+   peptides 2 and 3 between residues &#x223c;Val^29-Phe^30&#x223c; and &#x223c;Lys^10-Ile^11&#x223c;
+   plus &#x223c;Val^29-Phe^30&#x223c;, respectively, was no longer evident,
+   nevertheless, cleavage at other locations now became apparent. For
+   example, after incubation of peptide 3 with human cathepsin D at pH
+   3.1, the digest was analyzed by MALDI-TOF mass spectrometry and the
+   large product that was detected (3238 Da observed; 3237 Da predicted)
+   indicated that cleavage had occurred between residues &#x223c;Gln^5*Gln^6&#x223c; to
+   generate the fragment spanning residues 6–34. Thus, peptides 1, 2, and
+   3 appeared to be cleaved by the nontarget proteinases including human
+   pepsin and cathepsin D at whatever peptide bonds were accessible and
+   which met the sub-site specificity requirements of each enzyme.
+   View this table:
+     * [91]In this window
+     * [92]In a new window
+
+   Table II
+
+   Interactions between yeast proteinase A and synthetic peptide forms of
+   IA[3]
+   View this table:
+     * [93]In this window
+     * [94]In a new window
+
+   Table III
+
+   Aspartic proteinases unaffected by the IA[3] inhibitor
+
+   In contrast, peptides 1, 2, and 3 were not cleaved by proteinase A (at
+   pH 3.1 or 4.7), even upon prolonged incubation for 3 days at 37&#x2009;°C at
+   molar ratios of peptide:proteinase A as low as 5:1. Similarly, the
+   recombinant, wild-type protein form of IA[3] (Table [95]I) was not
+   cleaved by yeast proteinase A since the mass ion (8772 Da) observed by
+   MALDI-TOF mass spectrometry after prolonged incubation was identical to
+   that of the starting material. However, the wild-type protein was
+   digested by pepsin and cathepsin D, e.g. analysis of the material
+   incubated at pH 3.1 with human cathepsin D indicated that one large
+   product had accumulated which was consistent in size (5575 Da observed;
+   5578 predicted) with that of a fragment spanning residues Phe^30-Glu^68
+   plus the &#x223c;Leu-Glu-(His)[6] tag. Thus the full-length protein form of
+   IA[3] also appears to be degraded by nontarget proteinases with
+   cleavage taking place, at least, at one of the bonds (&#x223c;Ala^29*Phe^30&#x223c;)
+   that was identified earlier for peptide 1 (no attempts were made to
+   detect by mass spectrometry any small products from the N terminus of
+   IA[3] in the cathepsin D digest). This ready susceptibility of IA[3] in
+   both peptide and protein forms to proteolytic cleavage by nontarget
+   enzymes provides further substantiation to our conclusion described
+   previously ([96]12) that the free IA[3] polypeptide has little
+   intrinsic secondary structure.
+
+ §5§ Truncation and Mutagenesis of IA[3] §5§
+
+   Since the inhibitory activity of IA[3] toward proteinase A appeared to
+   be contained within residues 2–34 (compare K [i]values for the
+   wild-type protein form (Table [97]I) and the peptide form (peptide 1,
+   Table [98]II)), the effect on inhibitory potency of further truncation
+   of this sequence was examined using a systematic series of synthetic
+   peptides in which residues were successively deleted from the N and C
+   termini. Removal of Asn^2 had little effect on theK [i] value measured
+   at pH 3.1 (compare peptide 4 with peptide 1, Table [99]II) but the
+   potency was diminished somewhat at pH 4.7, as a K [i] value was readily
+   quantified for peptide 4 at this pH value (Table [100]II). Similarly,
+   deletion of residues 3–6 progressively diminished inhibitory potency
+   (peptides 5 and 6, Table[101]II) and the absence of residues 2–11 (in
+   peptide 7) resulted in almost complete abolition of the inhibitory
+   activity. The activity of IA[3] was totally destroyed when residues
+   2–15 were lacking (peptide 8, Table [102]II). The residues at the
+   N-terminal end of the 2–34 polypeptide sequence would thus appear to
+   contribute substantially to the potency of inhibition.
+
+   To investigate the importance of the individual side chains of these
+   residues, alterations in sequence were introduced into the full-length
+   protein form of IA[3] at its N terminus by PCR mutagenesis as described
+   under “Experimental Procedures.” Initially, residues 2–10 of the
+   wild-type IA[3] sequence were replaced with
+   Gly-Gly-His-Asp-Val-Pro-Leu-Thr-Asn. This is the sequence of residues
+   that is present at the N terminus of the target enzyme, yeast
+   proteinase A itself ([103]22) and, as such, was chosen totally
+   arbitrarily. The recombinant, chimera inhibitor was purified to
+   homogeneity and 10 cycles of Edman degradation yielded the sequence
+   Gly-Gly-His-Asp-Val-Pro-Leu-Thr-Asn-Ile, identical to that predicted by
+   the DNA sequence, and indicating once again that the initiator Met^1
+   residue had been removed by E. coli proteinases. Consistent with this,
+   analysis by MALDI-TOF mass spectrometry gave a mass of 8502 Da,
+   identical to that (8502 Da) predicted for the sequence of residues 2–68
+   plus the &#x223c;Leu-Glu-His[6] tag of the chimeric protein. Remarkably, this
+   chimeric protein with 9/34 (26%) of its residues exchanged was still
+   almost as effective as an inhibitor as the wild-type protein, with its
+   interaction at pH 4.7 still being so tight as to lie at or beyond the
+   limits of accurate determination (Table [104]I). This result, together
+   with the deletion experiments described above with the peptide form of
+   IA[3], suggests that, for effective inhibition, backbone atoms
+   contributed by residues 2–10 are essential but that the (side chain)
+   identity of the individual amino acids in these positions is of lesser
+   importance. On this basis, we replaced residues 2–10 of the natural
+   sequence with nine glycine residues ((Gly)[9]mutant, Table [105]I) and
+   purified the resultant protein to homogeneity. No attempts were made to
+   sequence this protein because of the plethora of glycine residues but
+   MALDI-TOF mass spectrometry gave a mass of 8124 Da, identical to that
+   (8124 Da) predicted by the nucleotide sequence but, once again, lacking
+   the initiator Met^1 residue. The yield of this mutant protein obtained
+   from E. coli was about 5-fold lower than that obtained for the
+   wild-type (and other mutant) sequence(s). This drastic introduction of
+   nine consecutive glycine residues resulted in a poorer inhibitor with a
+   K [i] of 40 nm at pH 3.1 (Table [106]I). However, at pH 4.7, the
+   (Gly)[9] mutant protein was still a very effective inhibitor, with its
+   potency quantified at around 1 nm (Table [107]I). Thus, the main chain
+   atoms at the N terminus of the 2–34 sequence would appear to be the
+   major contributors to inhibitory potency from this region with only
+   minor influences being introduced by the individual residue side
+   chains. This was substantiated further by replacement of individual
+   residues, for example, the Lys^7 residue was replaced with methionine
+   which is quasi-isosteric with lysine but lacks the &#x3b5;-NH[2] group. This
+   K7M mutant inhibitor was just as potent as the wild-type protein (Table
+   [108]I).
+
+   Truncation of the inhibitory sequence of residues 2–34 at its C
+   terminus also resulted in a progressive loss of inhibitory potency
+   (compare peptide 1 and peptides 9, 10, 11, 12, and 13, Table [109]II).
+   Replacement of Lys^24 by Met (K24M mutant) and Lys^31 + Lys^32
+   (together) in the double mutant K31M/K32M again had no significant
+   effect on the inhibitory potency of the resultant inhibitors toward
+   proteinase A (Table [110]I). The structure of the K24M mutant complexed
+   with proteinase A was solved at 2-Å resolution and refined to an R
+   factor of 19.84% (see “Experimental Procedures”). Comparison with the
+   structures reported previously ([111]12) for the K31M/K32M protein form
+   and for the peptide 1 form of IA[3] complexed with proteinase A
+   (Protein Data Bank accession codes [112]1dp5 and [113]1dpj) revealed
+   that, in all three cases, residues 2–32 of the inhibitor had adopted a
+   near-perfect &#x3b1;&#x2212;helical conformation in the active site cleft of the
+   enzyme. Electron density was only observed for these residues in all 3
+   structures and the root mean square deviation between the C&#x3b1;
+   coordinates was 0.224 between the protein and peptide form(s) of the
+   inhibitor. The IA[3]helix is amphipathic with the charged residues
+   including Lys^24 located on one face, protruding into solvent
+   (Fig.[114]1).
+   [115]Figure 1
+   View larger version:
+     * [116]In this window
+     * [117]In a new window
+
+     * [118]Download as PowerPoint Slide
+
+   Figure 1
+
+   The helical conformation adopted by residues 2–32 of IA[3] upon
+   interaction with the active site of proteinase A. The sequence shown is
+   that of the K31M/K32M mutant, depicting the distribution of selected
+   hydrophilic and hydrophobic residues on opposite faces of the
+   amphipathic helix.
+
+   The structures all reveal that the main chain carbonyl and amido
+   moieties of residues 2–10 of the IA[3] polypeptide are involved in
+   H-bond formation with one another within the helix of the inhibitor but
+   the side chains of these residues make no significant contacts with the
+   proteinase, with the exception of Val^8which is involved in hydrophobic
+   interactions (described later). In the sequence of the chimera
+   inhibitor described earlier (Table [119]I), Val^8 was replaced with Leu
+   which may be able to make hydrophobic contacts with the enzyme
+   requiring only minor re-adjustment so that the derived K [i] value was
+   not significantly perturbed. The binding energy of these contacts is
+   clearly lost in the (Gly)[9] mutant protein but since the side chains
+   of all of the other residues in the 2–10 sequence point largely into
+   solvent, the still considerable inhibitory potency of the
+   (Gly)[9]mutant (Table [120]I) can be readily understood. The
+   predominant requirement in this N-terminal region appears to be for the
+   backbone atoms to satisfy the H-bonding arrangement within the
+   inhibitory helix, thereby stabilizing the helix by providing a somewhat
+   lengthy “cap.”
+
+   A comparable extended “capping” arrangement exists at the C-terminal
+   end to stabilize the inhibitory helix. No electron density was observed
+   for the side chains of any residues beyond Lys^32 in the crystal
+   structure of the K24M mutant complex or in the structure of peptide 1
+   complexed with proteinase A described previously ([121]12) and the side
+   chain of residue 32 makes no significant contacts with the enzyme. Yet
+   the most potent inhibition (subnanomolar at pH 4.7) was measured when
+   the IA[3] sequence was extended at its C terminus beyond Lys^32. This
+   was achieved by the inclusion of Nle^33 (a synthetic isostere of the
+   natural Met residue at this location) and Ala^34 in peptide 1 (Table
+   [122]II) or by introducing a C-terminal Lys^32 amide (peptide 9-NH[2],
+   Table [123]II) to stabilize the part of the inhibitor helix necessary
+   for interaction with the proteinase by dissipation of the negative
+   charge from the macromolecular dipole. The contribution of the main
+   chain amido groups in satisfying the H-bonding arrangements at this end
+   of the helix is substantiated by the increased potencies that were
+   measured when each peptide terminated in a C-terminal amide instead of
+   the free COOH group (compare peptides 9-NH[2], 10-NH[2] and 11-NH[2]
+   with 9, 10, and 11, respectively, Table [124]I). A peptide that
+   consisted only of residues 2–28 had lost essentially all of its
+   inhibitory potency (peptide 12, Table[125]II) and residues 2–26
+   (peptide 13) were not active at all as an inhibitor.
+
+ §5§ Hydrophobic Clusters §5§
+
+   Peptide 14 and peptide 8 (Table [126]II) together span the entire
+   sequence of residues 2–34. Neither of these “half-sized” peptides was
+   able to inhibit proteinase A when added singly or in combination with
+   each other at a variety of molar ratios. Thus a contiguous sequence is
+   necessary for IA[3] to inhibit proteinase A by forming the amphipathic
+   helix (Fig. [127]1). The residues located on the hydrophobic face make
+   extensive hydrophobic contacts with cognate residues in proteinase A.
+   Particularly noticeable in this regard (Fig. [128]1) is the “cluster”
+   arrangement of Val^8-X-X-hydrophobic-Phe^12toward the front end of the
+   helix and Val^26-X-X-hydrophobic-Phe^30at the back end of the
+   inhibitory sequence. In the front end cluster, replacement of Val^8 or
+   Ile^11 individually by Ala had minor effects on inhibitory potency
+   (compare peptides 15 and 16 with peptide 9, Table [129]IV). However,
+   deletion of the benzene ring of phenylalanine at position 12 resulted
+   in a considerably larger drop in potency in the resultant
+   Ala-containing peptide (peptide 17, Table [130]IV), emphasizing the
+   importance of van der Waals interactions of this benzene ring with its
+   hydrophobic environment (Fig. [131]2). The peptide carrying the double
+   replacement of V8A together with F12A (peptide 18, Table [132]IV) had
+   lost much of its inhibitory potency and the double mutant peptide
+   containing &#x223c;Ala^11-Ala^12&#x223c; (peptide 19) was virtually ineffective as an
+   inhibitor, even at pH 4.7. The triple mutant in which all three of the
+   front-end cluster residues were changed to &#x223c;Ala^8-X-X-Ala^11-Ala^12&#x223c;
+   (peptide 20, Table [133]IV) was completely inactive as an inhibitor.
+   View this table:
+     * [134]In this window
+     * [135]In a new window
+
+   Table IV
+
+   Interactions between yeast proteinase A and synthetic peptide forms of
+   IA[3]
+   [136]Figure 2
+   View larger version:
+     * [137]In this window
+     * [138]In a new window
+
+     * [139]Download as PowerPoint Slide
+
+   Figure 2
+
+   Stereo representation of the interactions made by the side chains of
+   Val^8 and Phe^12 in the IA[3] polypeptide with cognate hydrophobic
+   residues in proteinase A. Proteinase A residues are green while the
+   Val^8 and Phe^12 side chains and the appropriate segment of the IA[3]
+   helical backbone are inbrown.
+
+   A similar response was quantified when the residues contributing to the
+   &#x223c;Val^26-X-X-hydrophobic-Phe^30&#x223c; cluster at the back end of the helix
+   were replaced. Substitution of Phe^30 by Ala, Gly, or Lys (compare
+   peptides 21 and 22/23 with peptide 10, Table [140]IV) resulted in a
+   significant loss in potency, again emphasizing the contribution to
+   binding by appropriate positioning of the large benzene ring of the
+   side chain of Phe^30. In contrast, replacement of Val^26 by Ala did not
+   diminish inhibitory potency. Rather, it appeared to improve the binding
+   interaction at pH 3.1 marginally (peptide 24, Table [141]IV).
+   Replacement of the -CH[3] side chain of Ala with the -CH[2]-COOH side
+   chain of an Asp at position 26 diminished the inhibitory potency at pH
+   4.7 by about 70-fold (compare peptides 25 and 24, Table [142]IV),
+   commensurate with the introduction of a hydrophilic side chain into a
+   hydrophobic environment. However, theK [i] value measured at pH 3.1 for
+   peptide 25 was tighter than that derived at pH 4.7 (Table [143]IV). Of
+   all the inhibitors listed in Tables [144]I, [145]II, and [146]IV, this
+   was the only occasion when such an effect was observed and most likely
+   is a reflection of the Asp side chain in its protonated and therefore
+   uncharged form being less unfavorable in its contact with the
+   hydrophobic environment offered by the enzyme.
+
+   The double mutant peptide carrying the V26D/F30K substitutions was
+   completely ineffective as an inhibitor (peptide 26, Table [147]IV),
+   indicating that introduction of two hydrophilic, charged residues was
+   highly unfavorable since there are no H-bond partners available in the
+   enzyme to compensate for desolvation of the two side chain functions.
+   However, amphipathic helices are often stabilized by electrostatic
+   interactions between residues at positions i andi + 4 ([148]23) and,
+   indeed exactly such a salt bridge is present between the Lys^24 and
+   Asp^28 residues on the hydrophilic face of the IA[3] helix when
+   complexed with its target proteinase (Fig. [149]1). However, the
+   attempt to encourage Asp^26 and Lys^30 to interact with one another to
+   form an additional salt bridge in the V26D/F30K double mutant peptide
+   was clearly not tolerated on the hydrophobic face of the amphipathic
+   helix in the active site cleft of the enzyme. A further mutant was also
+   constructed in which the sequence of
+   &#x223c;Ser^27-Asp^28-Ala^29-Phe^30-Lys^31-Lys^32&#x223c; was shuffled to
+   &#x223c;Lys^27-Ala^28-Asp^29-Lys^30-Phe^31-Ser^32&#x223c; in the protein form of the
+   IA3 inhibitor (Mix in Table [150]I). In this arrangement, Val^26 was
+   retained but the salt bridge between Lys^24 and Asp^28 on the
+   hydrophilic face of the helix was disrupted and the crucial Phe^30
+   residue was replaced by lysine, as in peptide 23. The resultant mutant
+   protein (Mix, in Table [151]I) was purified to homogeneity from E.
+   coliand found to have a K [i] value at pH 4.7 comparable to that
+   observed for the single F30K mutant peptide (peptide 23, Table[152]IV).
+   This might be interpreted to indicate that the salt bridge interaction
+   between Lys^24 and Asp^28 on the hydrophilic surface of the IA[3] helix
+   is, not unexpectedly, weak.
+
+ §5§ Central Residues in the Inhibitor Helix §5§
+
+   The “centerpiece” of the inhibitory 2–34 residues of IA[3] is the
+   &#x223c;Lys^18-Leu^19-X-X-Asp^22&#x223c; sequence. In the three crystal structures of
+   the K24M and K31M/K32M mutant proteins and peptide 1 forms of IA3
+   complexed with proteinase A, the &#x3b5;-NH[2] group of Lys^18 of the
+   inhibitor hydrogen bonds to one of the carboxyl oxygens of Asp^32 of
+   the enzyme (Fig. [153]3). This is one of the two catalytic Asp residues
+   that operate the catalytic mechanism of all aspartic proteinases
+   ([154]24). The &#x3b5;-NH[2] group of Lys^18 also hydrogen bonds to one of
+   the carboxyl oxygens of the side chain of Asp^22 in the IA[3]
+   inhibitory sequence (Fig. [155]3). The other oxygen of the side chain
+   COOH of Asp^22 hydrogen bonds to the phenolic OH group of Tyr^75 in the
+   enzyme, a residue that is totally conserved in all eukaryotic aspartic
+   proteinases and which is positioned almost at the tip of the &#x3b2;-hairpin
+   loop or flap that overlays the active site cleft in these enzymes. A
+   network of interactions thus cross-links these charged residues of
+   IA[3]with the catalytically essential and structurally conserved
+   residues of the target enzyme (Fig. [156]3). When the charged side
+   chain of Asp^22 in the full-length protein form of IA[3] was replaced
+   with the hydrophobic but otherwise almost isosteric side chain of a
+   leucine residue, the purified D22L mutant protein had a slightly
+   reduced potency both at pH 3.1 and 4.7 (Table [157]I) but nevertheless
+   was still an effective inhibitor.
+   [158]Figure 3
+   View larger version:
+     * [159]In this window
+     * [160]In a new window
+
+     * [161]Download as PowerPoint Slide
+
+   Figure 3
+
+   Stereo representation of the interactions made by the
+   &#x223c;Lys^18-Leu^19-X-X-Asp^22&#x223c; centerpiece residues of IA[3] in the
+   vicinity of the active site of proteinase A. Proteinase A residues are
+   ingreen with the catalytic water molecule depicted as ablue sphere. The
+   side chains of Lys^18, Leu^19, and Asp^22 plus the relevant segment of
+   the IA[3] helix backbone are in brown. Hydrogen bonding distances are
+   shown.
+
+   However, when Lys^18 was changed to Met in concert with the D22L
+   mutation, the resultant inhibitor (K18M/D22L, Table [162]I) was an
+   extremely potent inhibitor. For the first time in all of these studies,
+   it was not possible to derive an accurateK [i] value at pH 3.1 because
+   the protein-protein interaction was so tight. This may be a reflection
+   of the increased propensity of Met and Leu residues to be accommodated
+   within a helical conformation by comparison with their wild-type Lys
+   and Asp counterparts. Alternatively, this may be a further indication
+   of the importance of hydrophobic contributions to binding strength.
+   Modeling studies suggest that the side chain of a methionine at
+   position 18 in the IA[3] sequence is surrounded by the hydrophobic side
+   chains of Ile^30, Tyr^75, Thr^111, Phe^112, Phe^117, and Ile^120 of
+   proteinase A, as well as the newly introduced side chain of Leu^22 in
+   the K18M/D22L double mutant inhibitor. The side chain of Leu^22 can
+   make potential, favorable interactions with C-&#x3b2; of Ser^35 and the side
+   chains of Ile^73 and Tyr^75 from the flap of proteinase A, as well as
+   with the Met^18 and Val^25 residues of the IA[3] inhibitory sequence.
+
+   The importance of hydrophobic interactions was further corroborated
+   when the Leu^19 residue within the &#x223c;Lys^18-Leu^19-X-X-Asp^22&#x223c;
+   centerpiece was changed to Ala in the peptide form of IA[3]. The
+   resultant peptide (peptide 27, Table [163]IV) was no longer an
+   inhibitor at pH 3.1 and an apparent inhibition constant of 700 nm was
+   estimated at pH 4.7. This loss in potency (compare peptides 27 and 9,
+   Table [164]IV) was the largest observed for any single amino acid
+   replacement. However, when peptide 27 was incubated with proteinase A
+   for 16 h at pH 4.7 and 37&#x2009;°C at a molar ratio of 40:1, it was cleaved
+   as a substrate (as monitored by reverse phase fast protein liquid
+   chromatography, not shown). Peptide 27 is thus a good alternative
+   substrate at pH 4.7 and was giving only an apparent inhibition of the
+   activity of proteinase A toward the chromogenic substrate used in the
+   inhibition assays. The deletion of the terminal isopropyl moiety of the
+   leucine side chain thus converted a highly potent polypeptide inhibitor
+   into a regular substrate of proteinase A by decreasing affinity to the
+   target enzyme and possibly by reducing internal helix stability.
+
+   Under the same conditions, peptides 14 and 8 (Table [165]II) which
+   together span the 2–34 sequence of IA[3] were both cleaved by
+   proteinase A (at the &#x223c;Glu^10*Ile^11&#x223c; and &#x223c;Ala^29*Phe^30&#x223c; bonds,
+   respectively) as reported previously ([166]12). Peptide 7, despite
+   having been synthesized deliberately to position a valine in place of
+   the natural Ala^29 residue (Table [167]II) and thus make the
+   potentially vulnerable &#x223c;Ala^29*Phe^30&#x223c; peptide bond resistant to attack
+   (as in peptides 2 and 3, see earlier), was still cleaved albeit very
+   slowly (50% in 16 h) upon incubation at pH 4.7 with proteinase A at a
+   molar ratio of 40:1. Since cleavage at the mutated &#x223c;Val^29–Phe^30&#x223c; bond
+   was no longer an option, it was found by amino acid analysis that
+   processing had taken place at the adjacent &#x223c;Phe^30*Lys^31&#x223c; bond (data
+   not shown). Similarly, peptides 12 and 13 (Table [168]II) were digested
+   after 72 h incubation with proteinase A at a molar ratio of 10:1, as
+   were peptides 18, 19, 20, and 26 of the peptides listed in Table
+   [169]IV. Thus, in addition to the L19A mutant (peptide 27) as described
+   above, the other peptides (7, 8, 12, 13, 14 (Table [170]II), 18, 19,
+   20, and 26 (Table [171]IV)) which were not effective as inhibitors of
+   proteinase A, served instead as substrates for the enzyme.
+
+   From all of these data, it is readily apparent that the inhibitory
+   capacity of IA[3] is located within residues 2–34 of the sequence and
+   that these residues need to be present as a contiguous polypeptide to
+   achieve inhibition. The inhibitory sequence of residues is not cleaved
+   by the target enzyme but only very subtle alterations in sequence are
+   necessary to convert the IA[3] polypeptide into a substrate for
+   proteinase A. In contrast, however, the wild-type polypeptide is
+   readily hydrolyzed as a substrate by nontarget aspartic proteinases
+   such as pepsin and cathepsin D, which have substantial similarity to
+   proteinase A in their primary sequences and three-dimensional
+   structures ([172]25-27). This substantiates our NMR and CD findings
+   reported previously ([173]12) that free IA[3] in its peptide or protein
+   forms is predominantly unstructured. The interaction of IA[3] with its
+   target enzyme appears to depend critically on the insertion of three
+   hydrophobic “pins” (the front-end cluster, Leu^19 and the back end
+   cluster) into the appropriate hydrophobic sockets proferred by the
+   active site cleft of proteinase A. The target enzyme thus plays the
+   role of a helper template, stabilizing the amphipathic helical
+   conformation of IA[3] but, paradoxically, resulting in its own
+   inhibition. In contrast, the random coil IA[3] polypeptide is
+   apparently unable to locate the critical pins sufficiently precisely in
+   its interaction with the nontarget aspartic proteinases. Consequently,
+   since aspartic proteinases generally require only 7 or 8 amino acid
+   residues of a polypeptide to bind in an extended &#x3b2;-strand conformation
+   in their active site to act as a substrate, the nontarget enzymes are
+   readily able to cleave IA[3]. Thus, the “default” setting is cleavage
+   of the random coil IA[3]polypeptide. In contrast, helication requires
+   many more stringent conditions to be fulfilled such as complementary
+   amphipathicity, precision of shape, and the correct juxtaposition of
+   side chains possessing the appropriate properties to fit snugly into
+   the hydrophobic pockets of proteinase A. Only if IA[3] can be sculpted
+   in situ to become the key that matches precisely into the lock that is
+   the active site of proteinase A, can the IA[3] polypeptide escape
+   cleavage and preserve its integrity. Thus, in its interaction with this
+   aspartic proteinase, IA[3]is stabilized in the somewhat abnormal
+   helical conformation, shaped by the proteinase itself but yet at the
+   same time, held clear of the catalytic machinery through formation of
+   the helix. The alternative, as a consequence of any imprecision of fit,
+   is recognition in an extended conformation and cleavage.
+
+   The present study has thus afforded considerable insight into the
+   features that are important in governing the potency and selectivity of
+   inhibition of proteinase A by IA[3]. This presents a fascinating
+   challenge for future investigation to determine whether this
+   unprecedented mode of inhibitor-enzyme interaction can be exploited to
+   generate selective inhibitors re-targeted against other aspartic
+   proteinases including those produced by pathogenic organisms.
+   [174]Previous Section[175]Next Section
+
+ §2§ ACKNOWLEDGEMENTS §2§
+
+   It is a pleasure to acknowledge the valuable contributions made to this
+   project by our colleagues Anette Bruun (Carlsberg Laboratory), Alfred
+   Chung (Protein Chemistry Core, University of Florida), Simon Cater
+   (Cardiff School of Biosciences), and Jerry Alexandratos
+   (NCI-Frederick). We are also very grateful to Professor Pat Sullivan
+   and Drs. Peter Farley and William Laing, New Zealand, for generously
+   providing the proteinase fromGlomerella cingulata; Drs Niamh Cawley and
+   Y. Peng Loh, National Institutes of Health, Bethesda, MD, who very
+   kindly performed the inhibition experiments with peptide 1 on yapsin 1;
+   and Professor Simon Gaskell, Center for Mass Spectrometry, UMIST, UK,
+   for providing ready access to mass spectrometer facilities.
+   [176]Previous Section[177]Next Section
+
+ §2§ Footnotes §2§
+
+     * [178]&#x21b5;* This work was supported in part by a grant from the BBSRC,
+       UK (to J. K.).The costs of publication of this article were
+       defrayed in part by the payment of page charges. The article must
+       therefore be hereby marked “advertisement” in accordance with 18
+       U.S.C. Section 1734 solely to indicate this fact.
+       The atomic coordinates and the structure factors (code ) have been
+       deposited in the Protein Data Bank, Research Collaboratory for
+       Structural Bioinformatics, Rutgers University, New Brunswick, NJ
+       ([179]http://www.rcsb.org/).
+     * [180]&#x21b5;FNb Supported by an award from Actelion, Allschwil,
+       Switzerland.
+     * [181]&#x21b5;FNj To whom correspondence should be addressed. Tel.:
+       44-29-20-87-41-24; Fax: 44-29-20-87-4116; E-mail:
+       KayJ@Cardiff.ac.uk.
+     * Published, JBC Papers in Press, October 19, 2000, DOI
+       10.1074/jbc.M008520200
+     * Abbreviations:
+
+        PCR
+                polymerase chain reaction
+
+        ACTH
+                adrenocorticotropic hormone
+
+        MALDI-TOF
+                matrix-assisted laser desorption-time of flight
+
+        MES
+                4-morpholineethanesulfonic acid
+
+     *
+          + Received September 18, 2000.
+          + Revision received October 6, 2000.
+     * The American Society for Biochemistry and Molecular Biology, Inc.
+
+   [182]Previous Section
+
+ §2§ REFERENCES §2§
+
+    1. [183]&#x21b5;
+         1. Vassar R.,
+         2. Bennett B. D.,
+         3. Babu-Khan S.,
+         4. Kahn S.,
+         5. Mendiaz E. A.,
+         6. Denis P.,
+         7. Teplow D. B.,
+         8. Ross S.,
+         9. Amarante P.,
+        10. Loeloff R.,
+        11. Luo Y.,
+        12. Fisher S.,
+        13. Fuller J.,
+        14. Edenson S.,
+        15. Lile J.,
+        16. Jaronsinski M. A.,
+        17. Biere A. L.,
+        18. Curran E.,
+        19. Burgess T.,
+        20. Louis J-C.,
+        21. Collins F.,
+        22. Treanor J.,
+        23. Rogers G.,
+        24. Citron M.
+       (1999) Science 286:735–741.
+    2. [184]&#x21b5;
+         1. Bennett B. D.,
+         2. Babu-Khan S.,
+         3. Loeloff R.,
+         4. Louis J-C.,
+         5. Curran E.,
+         6. Citron M.,
+         7. Vassar R.
+       (2000) J. Biol. Chem. 275:20647–20651.
+    3. [185]&#x21b5;
+         1. Katunuma N.,
+         2. Umezawa H.,
+         3. Holzer H.
+         1. Kay J.,
+         2. Valler M. J.,
+         3. Dunn B. M.
+       (1983) in Proteinase Inhibitors Medical and Biological Aspects, eds
+       Katunuma N., Umezawa H., Holzer H. (Japan Scientific Societies
+       Press, Tokyo), pp 201–210.
+    4. [186]&#x21b5;
+         1. Takahashi S.,
+         2. Takahashi K.,
+         3. Kaneko T.,
+         4. Ogasawara H.,
+         5. Shindo S.,
+         6. Kobayashi M.
+       (1999) J. Biochem. (Tokyo) 125:348–353.
+    5. [187]&#x21b5;
+         1. Kageyama T.
+       (1998) Eur. J. Biochem. 253:804–809.
+    6. [188]&#x21b5;
+         1. Kreft S.,
+         2. Ravnikar M.,
+         3. Mesko P.,
+         4. Pungercar J.,
+         5. Umek A.,
+         6. Kregar I.,
+         7. Strukelj B.
+       (1997) Phytochemistry 44:1001–1006.
+    7. [189]&#x21b5;
+         1. Christeller J. T.,
+         2. Farley P. C.,
+         3. Ramsey R. J.,
+         4. Sullivan P. A.,
+         5. Laing W. A.
+       (1998) Eur. J. Biochem. 254:160–167.
+    8. [190]&#x21b5;
+         1. Lenarc&#x306;ic&#x306; B.,
+         2. Turk V.
+       (1999) J. Biol. Chem. 274:563–566.
+    9. [191]&#x21b5;
+         1. Saheki T.,
+         2. Matsuda Y.,
+         3. Holzer H.
+       (1974) Eur. J. Biochem. 47:325–327.
+   10. [192]&#x21b5;
+         1. Biedermann K.,
+         2. Montali U.,
+         3. Martin B.,
+         4. Svendsen I. B.,
+         5. Ottesen M.
+       (1980) Carlsberg Res. Commun. 45:225–235.
+   11. [193]&#x21b5;
+         1. Schu P.,
+         2. Wolf D. H.
+       (1991) FEBS Lett. 283:78–84.
+   12. [194]&#x21b5;
+         1. Li M.,
+         2. Phylip L. H.,
+         3. Lees W. E.,
+         4. Winther J. R.,
+         5. Dunn B. M.,
+         6. Wlodawer A.,
+         7. Kay J.,
+         8. Gustchina A.
+       (2000) Nat. Struct. Biol. 7:113–117.
+   13. [195]&#x21b5;
+         1. Tigue N. J.,
+         2. Kay J.
+       (1998) J. Biol. Chem. 273:26441–26446.
+   14. [196]&#x21b5;
+         1. Dreyer T.,
+         2. Valler M. J.,
+         3. Kay J.,
+         4. Charlton P.,
+         5. Dunn B. M.
+       (1985) Biochem. J. 231:777–779.
+   15. [197]&#x21b5;
+         1. Azaryan A. V.,
+         2. Wong M.,
+         3. Friedman T. C.,
+         4. Cawley N. X.,
+         5. Estivariz F. E.,
+         6. Chen H. C.,
+         7. Loh Y. P.
+       (1993) J. Biol. Chem. 268:11968–11971. (1975).
+   16. [198]&#x21b5;
+         1. Otwinowski Z.,
+         2. Minor W.
+       (1997) Methods Enzymol. 276:307–326.
+   17. [199]&#x21b5;
+         1. Brünger A. T.,
+         2. Adams P. D.,
+         3. Clore G. M.,
+         4. DeLano W. L.,
+         5. Gros P.,
+         6. Grosse-Kunstleve R. W.,
+         7. Jiang J. S.,
+         8. Kuszewski J.,
+         9. Nilges M.,
+        10. Pannu N. S.,
+        11. Read R. J.,
+        12. Rice L. M.,
+        13. Simonson T.,
+        14. Warren G. L.
+       (1998) Acta Crystallogr. Sect. D 54:905–921.
+   18. [200]&#x21b5;
+         1. Hill J.,
+         2. Tyas L.,
+         3. Phylip L. H.,
+         4. Kay J.,
+         5. Dunn B. M.,
+         6. Berry C.
+       (1994) FEBS Lett. 352:155–158.
+   19. [201]&#x21b5;
+         1. White P. C.,
+         2. Cordeiro M. C.,
+         3. Arnold D.,
+         4. Brodelius P. E.,
+         5. Kay J.
+       (1999) J. Biol. Chem. 274:16685–16693.
+   20. [202]&#x21b5;
+         1. Shintani T.,
+         2. Nomura K.,
+         3. Ichishima E.
+       (1997) J. Biol. Chem. 272:18855–18861.
+   21. [203]&#x21b5;
+         1. Arnold D.,
+         2. Keilholz W.,
+         3. Schild H.,
+         4. Dumrese T.,
+         5. Stevanovic S.,
+         6. Rammensee H. G.
+       (1997) Eur. J. Biochem. 249:171–179.
+   22. [204]&#x21b5;
+         1. Dreyer T.,
+         2. Halkier B.,
+         3. Svendsen I.,
+         4. Ottesen M.
+       (1986) Carlsberg Res. Commun. 51:27–41.
+   23. [205]&#x21b5;
+         1. Houston M. E.,
+         2. Kondejewski L. H.,
+         3. Karunaratne D. N.,
+         4. Gough M.,
+         5. Fidai S.,
+         6. Hodges R. S.,
+         7. Hancock R. E. W.
+       (1998) J. Peptide Res. 52:81–88.
+   24. [206]&#x21b5;
+         1. Khan A. R.,
+         2. James M. N. G.
+       (1998) Protein Sci. 7:815–836.
+   25. [207]&#x21b5;
+         1. Sielecki A. R.,
+         2. Fedorov A. A.,
+         3. Boodhoo A.,
+         4. Andreva N. S.,
+         5. James M. N. G.
+       (1990) J. Mol. Biol. 214:143–170.
+   26. [208]&#x21b5;
+         1. Baldwin E. T.,
+         2. Bhat T. N.,
+         3. Gulnik S.,
+         4. Hosur M. V.,
+         5. Sowder R. C.,
+         6. Cachau R. E.,
+         7. Collins J.,
+         8. Silva A. M.,
+         9. Erickson J. W.
+       (1993) Proc. Natl. Acad. Sci. U. S. A. 90:6796–6800.
+   27. [209]&#x21b5;
+         1. Aguilar C. F.,
+         2. Cronin N. B.,
+         3. Badasso M.,
+         4. Dreyer T.,
+         5. Newman M. P.,
+         6. Cooper J. B.,
+         7. Hoover D. J.,
+         8. Wood S. P.,
+         9. Johnson M. S.,
+        10. Blundell T. L.
+       (1997) J. Mol. Biol. 267:899–915.
+
+     * [210]Add to CiteULike CiteULike
+     * [211]Add to Complore Complore
+     * [212]Add to Connotea Connotea
+     * [213]Add to Del.icio.us Del.icio.us
+     * [214]Add to Digg Digg
+
+   [215]What's this?
+   [216]« Previous | [217]Next Article »[218]Table of Contents
+
+ §3§ This Article §3§
+
+    1. First Published on October 19, 2000, doi: 10.1074/jbc.M008520200
+       January 19, 2001 The Journal of Biological Chemistry, 276,
+       2023-2030.
+
+    1. [219]AbstractFree
+    2. » Full TextFree
+    3. [220]Full Text (PDF)Free
+    4. All Versions of this Article:
+         1. [221]M008520200v1
+         2. 276/3/2023 most recent
+
+ §4§ Classifications §4§
+
+    1.
+          + [222]PROTEIN STRUCTURE AND FOLDING
+
+ §4§ Services §4§
+
+    1. [223]Email this article to a friend
+    2. [224]Alert me when this article is cited
+    3. [225]Alert me if a correction is posted
+    4. [226]Alert me when eletters are published
+    5. [227]Similar articles in this journal
+    6. [228]Similar articles in Web of Science
+    7. [229]Similar articles in PubMed
+    8. [230]Download to citation manager
+    9. [231]Request Permissions
+
+ §4§ Responses §4§
+
+    1. [232]Submit a Letter to the Editor
+
+ §4§ Citing Articles §4§
+
+    1. [233]Load citing article information
+    2. [234]Citing articles via Web of Science
+    3. [235]Citing articles via Google Scholar
+
+ §4§ Google Scholar §4§
+
+    1. [236]Articles by Phylip, L. H.
+    2. [237]Articles by Kay, J.
+    3. [238]Search for related content
+
+ §4§ PubMed §4§
+
+    1. [239]PubMed citation
+    2. [240]Articles by Phylip, L. H.
+    3. [241]Articles by Kay, J.
+    4.
+
+ §4§ Related Content §4§
+
+    1. [242]Load related web page information
+
+ §4§ Social Bookmarking §4§
+
+    1.
+          + [243]Add to CiteULike CiteULike
+          + [244]Add to Complore Complore
+          + [245]Add to Connotea Connotea
+          + [246]Add to Del.icio.us Del.icio.us
+          + [247]Add to Digg Digg
+       [248]What's this?
+
+ §3§ Navigate This Article §3§
+
+    1. [249]Top
+    2. [250]Abstract
+    3. [251]EXPERIMENTAL PROCEDURES
+    4. [252]RESULTS AND DISCUSSION
+    5. [253]ACKNOWLEDGEMENTS
+    6. [254]Footnotes
+    7. [255]REFERENCES
+
+ §3§ This Week's Issue §3§
+
+    1. [256]September 24, 2010, 285 (39)
+
+    1. [257]Current Issue
+
+    1. [258]Alert me to new issues of JBC
+
+     * [259]Authors
+     * [260]Submit
+     * [261]Subscribers
+     * [262]Editorial Board
+     * [263]RSS and Email Alerts
+     * [264]Article Statistics
+     * [265]Teaching Tools
+     * [266]Copyright Permissions
+     * [267]Advertise
+     * [268]Contact JBC
+
+     * Advertisement
+     * Advertisement
+
+   Copyright © 2010 by [269]American Society for Biochemistry and
+   Molecular Biology
+
+   [270]Alternate route to the JBC: http://intl.jbc.org
+
+   [271]Contact JBC | [272]Help Pages
+     * [273]asbmb_today_logo
+     * [274]jlr_logo
+     * [275]mcp_logo
+
+     * Print ISSN 0021-9258
+     * Online ISSN 1083-351X
+
+   Advertisement
+   Advertisement
+     * [276]Celebrate 100 Years of ASBMB: ASBMB Histroy Book Now Avaiable!
+
+References
+
+   Visible links
+   1. http://www.jbc.org/
+   2. file://localhost/dev/paper.html#content-block
+   3. http://www.jbc.org/
+   4. http://www.jbc.org/content/current
+   5. http://www.jbc.org/content/by/year
+   6. http://www.jbc.org/content/early/recent/0
+   7. http://www.jbc.org/content/by/section/Minireviews
+   8. http://www.jbc.org/content/by/section/Classics
+   9. http://www.jbc.org/content/by/section/Reflections
+  10. http://www.jbc.org/potw
+  11. http://www.jbc.org/search
+  12. http://www.jbc.org/content/by/year
+  13. http://www.jbc.org/login?uri=http%3A%2F%2Fwww.jbc.org%2Fcontent%2F276%2F3%2F2023.long
+  14. http://www.jbc.org/cgi/adclick/?ad=21396&adclick=true&url=http%3A%2F%2Fwww.asbmb.org%2FPage.aspx%3Fid%3D3362
+  15. file://localhost/dev/paper.html#fn-5
+  16. http://www.jbc.org/search?author1=Lowri+H.+Phylip&sortspec=date&submit=Submit
+  17. file://localhost/dev/paper.html#target-1
+  18. http://www.jbc.org/search?author1=Wendy+E.+Lees&sortspec=date&submit=Submit
+  19. file://localhost/dev/paper.html#target-1
+  20. file://localhost/dev/paper.html#fn-6
+  21. http://www.jbc.org/search?author1=Brian+G.+Brownsey&sortspec=date&submit=Submit
+  22. file://localhost/dev/paper.html#target-2
+  23. http://www.jbc.org/search?author1=Daniel+Bur&sortspec=date&submit=Submit
+  24. file://localhost/dev/paper.html#target-3
+  25. http://www.jbc.org/search?author1=Ben+M.+Dunn&sortspec=date&submit=Submit
+  26. file://localhost/dev/paper.html#target-4
+  27. http://www.jbc.org/search?author1=Jakob+R.+Winther&sortspec=date&submit=Submit
+  28. file://localhost/dev/paper.html#target-5
+  29. http://www.jbc.org/search?author1=Alla+Gustchina&sortspec=date&submit=Submit
+  30. file://localhost/dev/paper.html#target-6
+  31. http://www.jbc.org/search?author1=Mi+Li&sortspec=date&submit=Submit
+  32. file://localhost/dev/paper.html#target-6
+  33. file://localhost/dev/paper.html#target-7
+  34. http://www.jbc.org/search?author1=Terry+Copeland&sortspec=date&submit=Submit
+  35. file://localhost/dev/paper.html#target-8
+  36. http://www.jbc.org/search?author1=Alexander+Wlodawer&sortspec=date&submit=Submit
+  37. file://localhost/dev/paper.html#target-6
+  38. http://www.jbc.org/search?author1=John+Kay&sortspec=date&submit=Submit
+  39. file://localhost/dev/paper.html#target-1
+  40. file://localhost/dev/paper.html#fn-7
+  41. file://localhost/dev/paper.html#sec-1
+  42. file://localhost/dev/paper.html#ref-1
+  43. file://localhost/dev/paper.html#ref-2
+  44. file://localhost/dev/paper.html#ref-3
+  45. file://localhost/dev/paper.html#ref-4
+  46. file://localhost/dev/paper.html#ref-5
+  47. file://localhost/dev/paper.html#ref-6
+  48. file://localhost/dev/paper.html#ref-7
+  49. file://localhost/dev/paper.html#ref-8
+  50. file://localhost/dev/paper.html#ref-9
+  51. file://localhost/dev/paper.html#ref-10
+  52. file://localhost/dev/paper.html#ref-11
+  53. file://localhost/dev/paper.html#ref-10
+  54. file://localhost/dev/paper.html#ref-12
+  55. file://localhost/dev/paper.html#ref-12
+  56. file://localhost/dev/paper.html#abstract-1
+  57. file://localhost/dev/paper.html#sec-8
+  58. file://localhost/dev/paper.html#ref-12
+  59. file://localhost/dev/paper.html#T1
+  60. file://localhost/dev/paper.html#ref-13
+  61. http://www.jbc.org/content/276/3/2023/T1.expansion.html
+  62. http://www.jbc.org/content/276/3/2023/T1.expansion.html
+  63. http://www.jbc.org/cgi/redirect-inline?ad=Novagen
+  64. file://localhost/dev/paper.html#ref-12
+  65. file://localhost/dev/paper.html#ref-14
+  66. file://localhost/dev/paper.html#ref-15
+  67. file://localhost/dev/paper.html#ref-15
+  68. file://localhost/dev/paper.html#T1
+  69. file://localhost/dev/paper.html#ref-12
+  70. file://localhost/dev/paper.html#ref-16
+  71. file://localhost/dev/paper.html#ref-12
+  72. file://localhost/dev/paper.html#ref-17
+  73. file://localhost/dev/paper.html#sec-1
+  74. file://localhost/dev/paper.html#ack-1
+  75. file://localhost/dev/paper.html#T1
+  76. file://localhost/dev/paper.html#ref-11
+  77. file://localhost/dev/paper.html#T1
+  78. file://localhost/dev/paper.html#ref-14
+  79. file://localhost/dev/paper.html#T2
+  80. file://localhost/dev/paper.html#ref-12
+  81. file://localhost/dev/paper.html#ref-14
+  82. file://localhost/dev/paper.html#T3
+  83. file://localhost/dev/paper.html#ref-15
+  84. file://localhost/dev/paper.html#ref-18
+  85. file://localhost/dev/paper.html#ref-19
+  86. file://localhost/dev/paper.html#T3
+  87. file://localhost/dev/paper.html#T3
+  88. file://localhost/dev/paper.html#ref-20
+  89. file://localhost/dev/paper.html#ref-21
+  90. file://localhost/dev/paper.html#T2
+  91. http://www.jbc.org/content/276/3/2023/T2.expansion.html
+  92. http://www.jbc.org/content/276/3/2023/T2.expansion.html
+  93. http://www.jbc.org/content/276/3/2023/T3.expansion.html
+  94. http://www.jbc.org/content/276/3/2023/T3.expansion.html
+  95. file://localhost/dev/paper.html#T1
+  96. file://localhost/dev/paper.html#ref-12
+  97. file://localhost/dev/paper.html#T1
+  98. file://localhost/dev/paper.html#T2
+  99. file://localhost/dev/paper.html#T2
+ 100. file://localhost/dev/paper.html#T2
+ 101. file://localhost/dev/paper.html#T2
+ 102. file://localhost/dev/paper.html#T2
+ 103. file://localhost/dev/paper.html#ref-22
+ 104. file://localhost/dev/paper.html#T1
+ 105. file://localhost/dev/paper.html#T1
+ 106. file://localhost/dev/paper.html#T1
+ 107. file://localhost/dev/paper.html#T1
+ 108. file://localhost/dev/paper.html#T1
+ 109. file://localhost/dev/paper.html#T2
+ 110. file://localhost/dev/paper.html#T1
+ 111. file://localhost/dev/paper.html#ref-12
+ 112. http://www.jbc.org/external-ref?link_type=PDB&access_num=1dp5
+ 113. http://www.jbc.org/external-ref?link_type=PDB&access_num=1dpj
+ 114. file://localhost/dev/paper.html#F1
+ 115. http://www.jbc.org/content/276/3/2023/F1.expansion.html
+ 116. http://www.jbc.org/content/276/3/2023/F1.expansion.html
+ 117. http://www.jbc.org/content/276/3/2023/F1.expansion.html
+ 118. http://www.jbc.org/powerpoint/276/3/2023/F1
+ 119. file://localhost/dev/paper.html#T1
+ 120. file://localhost/dev/paper.html#T1
+ 121. file://localhost/dev/paper.html#ref-12
+ 122. file://localhost/dev/paper.html#T2
+ 123. file://localhost/dev/paper.html#T2
+ 124. file://localhost/dev/paper.html#T1
+ 125. file://localhost/dev/paper.html#T2
+ 126. file://localhost/dev/paper.html#T2
+ 127. file://localhost/dev/paper.html#F1
+ 128. file://localhost/dev/paper.html#F1
+ 129. file://localhost/dev/paper.html#T4
+ 130. file://localhost/dev/paper.html#T4
+ 131. file://localhost/dev/paper.html#F2
+ 132. file://localhost/dev/paper.html#T4
+ 133. file://localhost/dev/paper.html#T4
+ 134. http://www.jbc.org/content/276/3/2023/T4.expansion.html
+ 135. http://www.jbc.org/content/276/3/2023/T4.expansion.html
+ 136. http://www.jbc.org/content/276/3/2023/F2.expansion.html
+ 137. http://www.jbc.org/content/276/3/2023/F2.expansion.html
+ 138. http://www.jbc.org/content/276/3/2023/F2.expansion.html
+ 139. http://www.jbc.org/powerpoint/276/3/2023/F2
+ 140. file://localhost/dev/paper.html#T4
+ 141. file://localhost/dev/paper.html#T4
+ 142. file://localhost/dev/paper.html#T4
+ 143. file://localhost/dev/paper.html#T4
+ 144. file://localhost/dev/paper.html#T1
+ 145. file://localhost/dev/paper.html#T2
+ 146. file://localhost/dev/paper.html#T4
+ 147. file://localhost/dev/paper.html#T4
+ 148. file://localhost/dev/paper.html#ref-23
+ 149. file://localhost/dev/paper.html#F1
+ 150. file://localhost/dev/paper.html#T1
+ 151. file://localhost/dev/paper.html#T1
+ 152. file://localhost/dev/paper.html#T4
+ 153. file://localhost/dev/paper.html#F3
+ 154. file://localhost/dev/paper.html#ref-24
+ 155. file://localhost/dev/paper.html#F3
+ 156. file://localhost/dev/paper.html#F3
+ 157. file://localhost/dev/paper.html#T1
+ 158. http://www.jbc.org/content/276/3/2023/F3.expansion.html
+ 159. http://www.jbc.org/content/276/3/2023/F3.expansion.html
+ 160. http://www.jbc.org/content/276/3/2023/F3.expansion.html
+ 161. http://www.jbc.org/powerpoint/276/3/2023/F3
+ 162. file://localhost/dev/paper.html#T1
+ 163. file://localhost/dev/paper.html#T4
+ 164. file://localhost/dev/paper.html#T4
+ 165. file://localhost/dev/paper.html#T2
+ 166. file://localhost/dev/paper.html#ref-12
+ 167. file://localhost/dev/paper.html#T2
+ 168. file://localhost/dev/paper.html#T2
+ 169. file://localhost/dev/paper.html#T4
+ 170. file://localhost/dev/paper.html#T2
+ 171. file://localhost/dev/paper.html#T4
+ 172. file://localhost/dev/paper.html#ref-25
+ 173. file://localhost/dev/paper.html#ref-12
+ 174. file://localhost/dev/paper.html#sec-8
+ 175. file://localhost/dev/paper.html#fn-group-1
+ 176. file://localhost/dev/paper.html#ack-1
+ 177. file://localhost/dev/paper.html#ref-list-1
+ 178. file://localhost/dev/paper.html#xref-fn-5-1
+ 179. http://www.rcsb.org/
+ 180. file://localhost/dev/paper.html#xref-fn-6-1
+ 181. file://localhost/dev/paper.html#xref-fn-7-1
+ 182. file://localhost/dev/paper.html#fn-group-1
+ 183. file://localhost/dev/paper.html#xref-ref-1-1
+ 184. file://localhost/dev/paper.html#xref-ref-2-1
+ 185. file://localhost/dev/paper.html#xref-ref-3-1
+ 186. file://localhost/dev/paper.html#xref-ref-4-1
+ 187. file://localhost/dev/paper.html#xref-ref-5-1
+ 188. file://localhost/dev/paper.html#xref-ref-6-1
+ 189. file://localhost/dev/paper.html#xref-ref-7-1
+ 190. file://localhost/dev/paper.html#xref-ref-8-1
+ 191. file://localhost/dev/paper.html#xref-ref-9-1
+ 192. file://localhost/dev/paper.html#xref-ref-10-1
+ 193. file://localhost/dev/paper.html#xref-ref-11-1
+ 194. file://localhost/dev/paper.html#xref-ref-12-1
+ 195. file://localhost/dev/paper.html#xref-ref-13-1
+ 196. file://localhost/dev/paper.html#xref-ref-14-1
+ 197. file://localhost/dev/paper.html#xref-ref-15-1
+ 198. file://localhost/dev/paper.html#xref-ref-16-1
+ 199. file://localhost/dev/paper.html#xref-ref-17-1
+ 200. file://localhost/dev/paper.html#xref-ref-18-1
+ 201. file://localhost/dev/paper.html#xref-ref-19-1
+ 202. file://localhost/dev/paper.html#xref-ref-20-1
+ 203. file://localhost/dev/paper.html#xref-ref-21-1
+ 204. file://localhost/dev/paper.html#xref-ref-22-1
+ 205. file://localhost/dev/paper.html#xref-ref-23-1
+ 206. file://localhost/dev/paper.html#xref-ref-24-1
+ 207. file://localhost/dev/paper.html#xref-ref-25-1
+ 208. file://localhost/dev/paper.html#xref-ref-25-1
+ 209. file://localhost/dev/paper.html#xref-ref-25-1
+ 210. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/276/3/2023&title=The%20Potency%20and%20Specificity%20of%20the%20Interaction%20between%20the%20IA3%20Inhibitor%20and%20Its%20Target%20Aspartic%20Proteinase%20fromSaccharomyces%20cerevisiae+--+Phylip%20et%20al.%20276%20%283%29%3A%202023+--+JBC&doi=10.1074/jbc.M008520200&link_type=CITEULIKE
+ 211. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/276/3/2023&title=The%20Potency%20and%20Specificity%20of%20the%20Interaction%20between%20the%20IA3%20Inhibitor%20and%20Its%20Target%20Aspartic%20Proteinase%20fromSaccharomyces%20cerevisiae+--+Phylip%20et%20al.%20276%20%283%29%3A%202023+--+JBC&doi=10.1074/jbc.M008520200&link_type=COMPLORE
+ 212. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/276/3/2023&title=The%20Potency%20and%20Specificity%20of%20the%20Interaction%20between%20the%20IA3%20Inhibitor%20and%20Its%20Target%20Aspartic%20Proteinase%20fromSaccharomyces%20cerevisiae+--+Phylip%20et%20al.%20276%20%283%29%3A%202023+--+JBC&doi=10.1074/jbc.M008520200&link_type=CONNOTEA
+ 213. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/276/3/2023&title=The%20Potency%20and%20Specificity%20of%20the%20Interaction%20between%20the%20IA3%20Inhibitor%20and%20Its%20Target%20Aspartic%20Proteinase%20fromSaccharomyces%20cerevisiae+--+Phylip%20et%20al.%20276%20%283%29%3A%202023+--+JBC&doi=10.1074/jbc.M008520200&link_type=DEL_ICIO_US
+ 214. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/276/3/2023&title=The%20Potency%20and%20Specificity%20of%20the%20Interaction%20between%20the%20IA3%20Inhibitor%20and%20Its%20Target%20Aspartic%20Proteinase%20fromSaccharomyces%20cerevisiae+--+Phylip%20et%20al.%20276%20%283%29%3A%202023+--+JBC&doi=10.1074/jbc.M008520200&link_type=DIGG
+ 215. http://www.jbc.org/help/social_bookmarks.dtl
+ 216. http://www.jbc.org/content/276/3/2015.short
+ 217. http://www.jbc.org/content/276/3/2031.short
+ 218. http://www.jbc.org/content/276/3.toc
+ 219. http://www.jbc.org/content/276/3/2023.abstract
+ 220. http://www.jbc.org/content/276/3/2023.full.pdf+html
+ 221. http://www.jbc.org/content/early/2000/10/19/jbc.M008520200
+ 222. http://www.jbc.org/search?tocsectionid=PROTEIN+STRUCTURE+AND+FOLDING&sortspec=date&submit=Submit
+ 223. http://www.jbc.org/email?gca=jbc;276/3/2023&current-view-path=/content/276/3/2023.long
+ 224. http://www.jbc.org/cgi/alerts/ctalert?alertType=citedby&addAlert=cited_by&cited_by_criteria_resid=jbc;276/3/2023&saveAlert=no&return-type=article&return_url=http://www.jbc.org/content/276/3/2023.long
+ 225. http://www.jbc.org/cgi/alerts/ctalert?alertType=correction&addAlert=correction&correction_criteria_value=276/3/2023&saveAlert=no&return-type=article&return_url=http://www.jbc.org/content/276/3/2023.long
+ 226. http://www.jbc.org/cgi/alerts/ctalert?alertType=eletter&addAlert=eletter&eletter_criteria_value=276/3/2023&saveAlert=no&return-type=article&return_url=http://www.jbc.org/content/276/3/2023.long
+ 227. http://www.jbc.org/search?qbe=jbc;M008520200&citation=Phylip%20et%20al.%20276%20%283%29:%202023&submit=yes
+ 228. http://www.jbc.org/external-ref?access_num=jbc%3B276%2F3%2F2023&link_type=ISI_RELATEDRECORDS
+ 229. http://www.jbc.org/external-ref?access_num=11042188&link_type=MED_NBRS
+ 230. http://www.jbc.org/citmgr?gca=jbc;276/3/2023
+ 231. https://s100.copyright.com/AppDispatchServlet?publisherName=ASBMB&publication=jbc&title=The%20Potency%20and%20Specificity%20of%20the%20Interaction%20between%20the%20IA3%20Inhibitor%20and%20Its%20Target%20Aspartic%20Proteinase%20fromSaccharomyces%20cerevisiae&publicationDate=01/19/2001&author=Lowri%20H.%20Phylip,%20Wendy%20E.%20Lees,%20Brian%20G.%20Brownsey,%20Daniel%20Bur,%20Ben%20M.%20Dunn,%20Jakob%20R.%20Winther,%20Alla%20Gustchina,%20Mi%20Li,%20Terry%20Copeland,%20Alexander%20Wlodawer,%20John%20Kay&startPage=2023&contentID=10.1074/jbc.M008520200&orderBeanReset=true&endPage=2030&volumeNum=276&issueNum=3
+ 232. http://www.jbc.org/letters/submit/jbc;276/3/2023
+ 233. http://www.jbc.org/content/276/3/2023.long?cited-by=yes&legid=jbc;276/3/2023#cited-by
+ 234. http://www.jbc.org/external-ref?access_num=jbc%3B276%2F3%2F2023&link_type=ISI_CITING
+ 235. http://www.jbc.org/external-ref?access_num=http://www.jbc.org/cgi/content/abstract/276/3/2023&link_type=GOOGLESCHOLAR
+ 236. http://scholar.google.com/scholar?q=%22author%3APhylip%20author%3AL.H.%22
+ 237. http://scholar.google.com/scholar?q=%22author%3AKay%20author%3AJ.%22
+ 238. http://www.jbc.org/external-ref?access_num=http://www.jbc.org/cgi/content/abstract/276/3/2023&link_type=GOOGLESCHOLARRELATED
+ 239. http://www.jbc.org/external-ref?access_num=11042188&link_type=PUBMED
+ 240. http://www.jbc.org/external-ref?access_num=Phylip%20LH&link_type=AUTHORSEARCH
+ 241. http://www.jbc.org/external-ref?access_num=Kay%20J&link_type=AUTHORSEARCH
+ 242. http://www.jbc.org/content/276/3/2023.long?related-urls=yes&legid=jbc;276/3/2023#related-urls
+ 243. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/276/3/2023&title=The%20Potency%20and%20Specificity%20of%20the%20Interaction%20between%20the%20IA3%20Inhibitor%20and%20Its%20Target%20Aspartic%20Proteinase%20fromSaccharomyces%20cerevisiae+--+Phylip%20et%20al.%20276%20%283%29%3A%202023+--+JBC&doi=10.1074/jbc.M008520200&link_type=CITEULIKE
+ 244. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/276/3/2023&title=The%20Potency%20and%20Specificity%20of%20the%20Interaction%20between%20the%20IA3%20Inhibitor%20and%20Its%20Target%20Aspartic%20Proteinase%20fromSaccharomyces%20cerevisiae+--+Phylip%20et%20al.%20276%20%283%29%3A%202023+--+JBC&doi=10.1074/jbc.M008520200&link_type=COMPLORE
+ 245. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/276/3/2023&title=The%20Potency%20and%20Specificity%20of%20the%20Interaction%20between%20the%20IA3%20Inhibitor%20and%20Its%20Target%20Aspartic%20Proteinase%20fromSaccharomyces%20cerevisiae+--+Phylip%20et%20al.%20276%20%283%29%3A%202023+--+JBC&doi=10.1074/jbc.M008520200&link_type=CONNOTEA
+ 246. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/276/3/2023&title=The%20Potency%20and%20Specificity%20of%20the%20Interaction%20between%20the%20IA3%20Inhibitor%20and%20Its%20Target%20Aspartic%20Proteinase%20fromSaccharomyces%20cerevisiae+--+Phylip%20et%20al.%20276%20%283%29%3A%202023+--+JBC&doi=10.1074/jbc.M008520200&link_type=DEL_ICIO_US
+ 247. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/276/3/2023&title=The%20Potency%20and%20Specificity%20of%20the%20Interaction%20between%20the%20IA3%20Inhibitor%20and%20Its%20Target%20Aspartic%20Proteinase%20fromSaccharomyces%20cerevisiae+--+Phylip%20et%20al.%20276%20%283%29%3A%202023+--+JBC&doi=10.1074/jbc.M008520200&link_type=DIGG
+ 248. http://www.jbc.org/help/social_bookmarks.dtl
+ 249. file://localhost/dev/paper.html#content-block
+ 250. file://localhost/dev/paper.html#abstract-1
+ 251. file://localhost/dev/paper.html#sec-1
+ 252. file://localhost/dev/paper.html#sec-8
+ 253. file://localhost/dev/paper.html#ack-1
+ 254. file://localhost/dev/paper.html#fn-group-1
+ 255. file://localhost/dev/paper.html#ref-list-1
+ 256. http://www.jbc.org/content/current
+ 257. http://www.jbc.org/content/current
+ 258. http://www.jbc.org/cgi/alerts/etoc
+ 259. http://www.jbc.org/misc/itoa.xhtml
+ 260. http://submit.jbc.org/
+ 261. http://www.jbc.org/subscriptions/
+ 262. http://submit.jbc.org/journals/jbc/forms/editors.dtl
+ 263. http://www.jbc.org/site/home/about/rss_alerts.xhtml
+ 264. http://www.jbc.org/site/home/about/article_stats.xhtml
+ 265. http://www.jbc.org/site/home/teaching_tools/
+ 266. http://www.jbc.org/site/misc/Copyright_Permission.xhtml
+ 267. http://www.asbmb.org/uploadedFiles/Publications/2009ASBMBJournalsMediaKit.pdf
+ 268. http://www.jbc.org/cgi/feedback
+ 269. http://www.asbmb.org/
+ 270. http://intl.jbc.org/
+ 271. http://www.jbc.org/cgi/feedback
+ 272. http://www.jbc.org/help/
+ 273. http://www.asbmb.org/page.aspx?id=218
+ 274. http://www.jlr.org/
+ 275. http://mcponline.org/
+ 276. http://www.jbc.org/cgi/adclick/?ad=21396&adclick=true&url=http%3A%2F%2Fwww.asbmb.org%2FPage.aspx%3Fid%3D3362
+
+   Hidden links:
+ 277. http://www.jbc.org/entrez-links/11042188

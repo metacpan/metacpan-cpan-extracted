@@ -1,0 +1,40 @@
+<html>
+<head>
+<title>Tests for Embperl - Nesting of html and meta commands 2</title>
+</head>
+
+
+<body>
+
+<table>
+	<tr>
+		<td>aa</td><td>11</td>
+	</tr>
+
+	<tr>
+		<td>bb</td><td>22</td>
+	</tr>
+
+	<tr>
+		<td>cc</td><td>33</td>
+	</tr>
+
+	<tr>
+		<td>dd</td><td>44</td>
+	</tr>
+</table>
+
+=== dl.1
+
+<dl><dt>aa</dt><dd><ul><li>a</li><li>b</li></ul></dd><dt>bb</dt><dd><ul><li>a</li><li>b</li></ul></dd><dt>cc</dt><dd><ul><li>a</li><li>b</li></ul></dd><dt>dd</dt><dd><ul><li>a</li><li>b</li></ul></dd></dl>
+
+=== dl.2
+
+<dl><dt>aa</dt><dd><ul>ab</ul></dd><dt>bb</dt><dd><ul>ab</ul></dd><dt>cc</dt><dd><ul>ab</ul></dd><dt>dd</dt><dd><ul>ab</ul></dd></dl>
+
+=== foreach.1
+
+1:aa -> a 1:aa -> b 2:bb -> a 2:bb -> b 3:cc -> a 3:cc -> b 4:dd -> a 4:dd -> b .
+=== foreach.2
+
+1:aa -> a 2:aa -> b 3:bb -> a 4:bb -> b 5:cc -> a 6:cc -> b 7:dd -> a 8:dd -> b 

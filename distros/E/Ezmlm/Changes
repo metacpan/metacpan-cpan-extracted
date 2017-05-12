@@ -1,0 +1,64 @@
+Revision history for Perl extension Mail::Ezmlm.
+
+0.01  Sun Oct 31 12:58:16 1999
+   - original version; created by h2xs 1.1.1.1.2.1
+
+0.02  Wed Jan 26 07:59:10 SAST 2000
+   - Added functions to check various options
+      (ismodsub, ismodpost, isremote, isdeny, isallow, isdigest)
+   - Allowed sub, unsub, list, subscribers, issub to work with list subparts
+      (ie, the allow, deny, mod, digest sub directories)
+   - Changed system() calls to safer ones (ie command, switches)
+   - Made error handling better (errmsg() and errno())
+   - Added support for creating MySQL tables via ezmlm-mktab
+
+0.03 Mon Sep 25 11:49:26 SAST 2000
+   - fixed the issub() function
+	- fixed the problem with dashes in hostnames.
+   - hopefully got rid of some of the warnings from sub() and unsub()
+
+0.04 Mon May 26 18:15:38 SAST 2003
+   - fixed return value of Makefile.PL (Andrew Pam <xanni@glasswings.com.au>)
+   - fixed issub() (again) to handle parts properly (bug 602; moguo@servism.com)
+   - converted module global variables to instance variables
+
+0.05 Sat Mar  5 12:47:10 SAST 2005
+   - fixed forced scalar return in subscribers() (Jon Coulter <ledjon@ledjon.com>)
+   - fixed handling of dashes in hostnames (bug 5571; Lars Braeuer <lbraeuer@mpex.net>)
+   - fixed some tainting problems (Scott Beck <sbeck@gossamer-threads.com> and Matt Simerson <matt@tnpi.biz>)
+   - fixed order of control/defaulthost and control/me (bug 1515)
+   - fixed a bug in Makefile.PL (bug 11771).  does not affect most users, so released as 0.05.1
+
+0.06 Mon Dec 26 18:55:12 CET 2005
+   - support for ezmlm-idx-5.0.0 added
+   - fixed version check
+
+0.07 Mon Jan  2 22:12:32 CET 2006
+   - new functions for text management (idx >= 5.0)
+   - new functions for language setting (idx >= 5.0)
+   - new functions for charset setting (idx >= 5.0)
+   - new functions for config directory setting (idx >= 5.0)
+   - look for ezmlm-make at run-time
+   - requires Text::ParseWords
+
+0.07.1 Mon Jan 23 22:30:14 CET 2006
+   - fix misinterpretation of empty settings
+
+0.07.2 Sun May 6 06:20:13 CEST 2006
+   - fix parsing of ezmlm-make options
+
+0.07.2 Tue Jun 20 01:05:56 UTC 2006
+   - fixed 'get_charset' and 'set_charset' for idx < 5.0
+
+0.08 Thu Oct  2 03:23:06 CEST 2008
+   - fixed handling of the 'owner' setting for ezmlm-idx > v5
+   - updated ezmlm-idx version detection
+   - allow "@" in the path of a mailing list
+   - add modules Mail::Ezmlm::GpgKeyRing and Mail::Ezmlm::GpgEzmlm
+
+0.08.1 Thu Oct  12 04:37:06 CEST 2008
+   - fixed issues of Mail::Ezmlm::GpgEzmlm with ezmlm-idx v0.4x lists
+
+0.08.2 Wed Oct 15 23:00:12 CEST 2008
+   - added check for external dependency to the test script
+

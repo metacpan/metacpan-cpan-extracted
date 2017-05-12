@@ -1,0 +1,11 @@
+diff -c ../TestApp-1.0/func.c ./func.c
+*** ../TestApp-1.0/func.c	2013-04-28 07:52:13.000000000 +0900
+--- ./func.c	2013-04-27 23:17:23.000000000 +0900
+***************
+*** 3,6 ****
+--- 3,7 ----
+  
+  void func() {
+  	puts(PACKAGE_STRING);
++ 	puts("patched version");
+  }

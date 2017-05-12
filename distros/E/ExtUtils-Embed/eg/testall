@@ -1,0 +1,50 @@
+
+my(@no_args) = qw{
+   call_anon
+   hashref
+   power
+   persistent
+   match
+   string
+};
+
+
+my(%tests) = (
+   interp => qq( -e 'print "interp ok"'),
+   regex => ' "You see, Perl and C are family"',  
+   (map	{ $_,"" } @no_args),
+);
+
+eval { require URI::URL; };
+unless ($@) {
+    $tests{'uri-url'} = qq( http://www.perl.com/ host);
+}
+
+for (sort keys %tests) {
+    my $l = length $_; 
+    $max = $l  > $max ? $l : $max;
+}
+ 
+for (sort keys %tests) {
+    unless (-e $_) {
+	print "building $_\n";
+	system "$^X build $_";
+    }
+    print "$_...";
+    print "." x ($max - length($_));
+
+    my $test = "$_$tests{$_}";
+    if($_ eq "persistent") {
+	$test = "echo script.pl | persistent";
+    }
+    my $output = `$test`;
+#    system "$test";
+    if(not $output  or -e "core") {
+	print "not ok\n";
+	warn "$output\n";
+	unlink "core";
+    }
+    else {
+	print "ok\n";
+    }
+}

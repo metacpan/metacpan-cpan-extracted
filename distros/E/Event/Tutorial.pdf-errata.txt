@@ -1,0 +1,7 @@
+Date: Wed, 23 Sep 2009 14:41:50 +0200 (CEST)
+From: "Kiss Gabor (Bitman)" <kissg@ssg.ki.iif.hu>
+
+In section 4.3 page 31 (33 according to PDF reader)
+        warn "Event after ", time-startup, " seconds.\n";
+should be changed to
+        warn "Event after ", time-$startup, " seconds.\n";

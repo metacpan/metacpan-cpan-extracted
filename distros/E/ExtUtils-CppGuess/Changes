@@ -1,0 +1,43 @@
+Revision history for Perl extension ExtUtils::CppGuess.
+
+0.11   Thu Sep 10 13:12:17 MDT 2015
+    - Add leading whitespace to $cflags in _get_cflags (bulk88)
+
+0.10   Tue Sep 08 21:15:30 MDT 2015
+    - Config's ccflags must always be used. (bulk88)
+
+0.09   Sat Apr 11 16:05:50 BST 2015
+	- Convert to EUMM
+	- Make tests divulge guessed options for better debugging
+
+
+0.08   Thu Jan 15 03:07:38 GMT 2015
+	- Update metadata
+
+
+0.07   Thu Jul  7 17:00:00 CEST 2011
+	- Fix for unknown enum `vtype' on solaris 2.11 (Tobias Leich)
+          See http://www.cpantesters.org/cpan/report/a0cca9ee-39e3-11e0-83a5-34754e7aadc9
+        - NetBSD fix for: Undefined PLT symbol _Unwind_Resume (Tobias Leich)
+
+
+0.06   Sun Jun  5 21:00:00 CEST 2011
+	- Fix for -D_FILE_OFFSET_BITS (Tobias Leich)
+          See http://www.cpantesters.org/cpan/report/b6e29992-894c-11e0-b6b1-f9d75287cfae
+
+0.05   Tue Feb 15 23:00:00 CEST 2010
+	- Fix test failures on win32 (Shmuel Fomberg)
+
+0.04   Mon Jul 12 18:00:00 CEST 2010
+	- Fix problem with duplicate extra-linker/compiler options
+
+0.03   Thu Jul  1 18:00:00 CEST 2010
+	- Fix tests to use the current perl
+        - Make tests use Capture::Tiny
+        - Very explicit dependencies in Build.PL
+
+0.02   Mon Jun 28 20:00:00 CEST 2010
+	- Just removed debugging code.
+
+0.01   Mon Jun 28 20:00:00 CEST 2010
+	- First release.

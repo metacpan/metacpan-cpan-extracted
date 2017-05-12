@@ -1,0 +1,11 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Email/Sender/Transport/QMQP.pm
+t/basic.t
+t/basic.t~
+t/release-pod-coverage.t
+t/release-pod-syntax.t

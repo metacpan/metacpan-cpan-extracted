@@ -1,0 +1,12 @@
+{
+    "renderer": "TT",
+    "header": [
+        { "Subject": "[% superlative %] greetings" }
+    ],
+    "alternatives": [
+        {
+            "attributes": { "content_type": "text/html" },
+            "path": "index.en.html"
+        }
+    ]
+}

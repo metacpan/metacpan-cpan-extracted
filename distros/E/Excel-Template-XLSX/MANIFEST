@@ -1,0 +1,25 @@
+build.pl
+Changes
+ignore.txt
+lib/Excel/Template/XLSX.pm
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00-load.t
+t/01-object.t
+t/02-workbook.t
+t/03-worksheet.t
+t/04-styles.t
+t/05-shared_strings.t
+t/06-cell.t
+t/07-two_templates.t
+t/08-open_output.t
+t/09-template_callback.t
+t/99-todo.t
+t/boilerplate.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+

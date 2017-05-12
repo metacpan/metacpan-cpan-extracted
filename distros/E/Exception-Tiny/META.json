@@ -1,0 +1,60 @@
+{
+   "abstract" : "too tiny exception interface",
+   "author" : [
+      "Kazuhiro Osawa E<lt>yappo {@} shibuya {dot} plE<gt>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Exception-Tiny",
+   "no_index" : {
+      "directory" : [
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.98",
+            "Test::Requires" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor::Lite" : "0.05",
+            "Data::Dumper" : 0,
+            "Scalar::Util" : 0,
+            "parent" : 0,
+            "perl" : "5.008005"
+         }
+      }
+   },
+   "provides" : {
+      "Exception::Tiny" : {
+         "file" : "lib/Exception/Tiny.pm",
+         "version" : "v0.2.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/yappo/p5-Exception-Tiny",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/yappo/p5-Exception-Tiny.git"
+      }
+   },
+   "version" : "v0.2.1"
+}

@@ -1,0 +1,244 @@
+# EekBoek Accounting scheme for EekBoek Sample Administration
+# Created by EekBoek 2.01.03 on 16-01-2012 16:37:53
+# Content-Type: text/plain; charset = UTF-8
+
+# This file defines all the static data from an administration or
+# group of administrations: the chart of accounts (balance sheet 
+# accounts and income statements), the daybooks and VAT rates.
+#
+# General syntax rules:
+#
+# * Empty lines and lines starting with a hash # are not interpreted.
+# * A non-indented text introduces a new element.
+# * All indented lines are data for that section.
+
+# ACCOUNTING SCHEMA
+#
+# The accounting scheme is a hierarchical chart of accounts and follows
+# the Bakker methodology. The main aggregations run from 1 to 9, the
+# underlying aggregations to 99. The ledger accounts are divided into
+# balance sheet accounts and income accounts.
+#
+# The description of the general ledger accounts is preceded by a flag, 
+# which is a letter that indicates either Debit / Credit (for
+# balance accounts) or Cost / Revenue / Neutral (for income statements).
+# The description is followed - if applicable - by additional
+# information. For general ledger accounts the VAT tariffs can be 
+# specified that is applicable for the account:
+#
+#   :vat=zero
+#   :vat=high
+#   :vat=low
+#   :vat=private
+#   :vat=other
+#
+# It is also possible to specify that an account has a specific meaning 
+# or a mapping through the use of :mapping=xxx. The following mappings
+# are allowed:
+#
+#   crd		the standard contra account (Accounts payable) for purchases
+#   deb		the standard contra account (Accounts receivable) for sales
+#   vat_ph	the account for VAT Bookings for purchases, high tariff
+#   vat_pl	same, low tarif
+#   vat_pp	same, private tariff
+#   vat_pa	same, other tariff
+#   vat_sh	the account for VAT Bookings for sales, high tariff
+#   vat_sl	same, low tariff
+#   vat_sp	same, private tariff
+#   vat_sa	same, other tariff
+#   vat_ok	account for the VAT which has been paid
+#   profit	account to which the profit is booked
+#
+# The mapping to "profit" is mandatory and must be present in an 
+# administration for the year end close.
+# The mappings for VAT must be specified in case VAT is applicable
+# for the administration.
+# The mappings for Accounts payable and Accounts receivable must
+# be specified in case purchase and sales daybooks are used, which
+# use the standard values (in other words, do not have a contra
+# account).
+
+# Normally the master groups run from 1 to 9 and the groupings from 10 
+# to 99. In case an accounting scheme must be used that does not conform 
+# to this setup, the command Grouping can be used to specify the maximum 
+# allowable master group number and maximum allowable grouping number.
+
+Grouping 9 99
+
+# The numbers of the general ledger accounts are normally larger than
+# the maximum number of the grouping account. In case an accounting
+# scheme must be used that does not conform to this setup, then zeroes
+# can be prepended to increase the length of the number, thereby
+# making it longer than the length of the maximum number of the master
+# group account.
+# If for instance 99 is the maximum grouping, then 001 would be the
+# general ledger account with number 1.
+
+Balance Accounts
+
+  1  Non-current Assets
+     11  Material non-current assets
+         1100  D   Supplies                                   :vat=high,expenses
+         1101  C   Depreciation supplies
+         1110  D   Computers                                  :vat=high,expenses
+         1111  C   Depreciation computers
+         1120  D   Fleet                                      :vat=high,expenses
+         1121  C   Depreciation fleet
+
+  2  Current Assets
+     21  Inventory
+         2100  C   Inventory
+     22  Receivables
+         2200  D   Debtors                                    :mapping=deb
+     23  Liquid assets
+         2300  D   Cash
+         2320  D   Bank
+
+  3  Assets
+     31  Capital
+         3100  C   Capital                                    :mapping=profit
+         3110  C   Private deposits
+         3120  D   Private deductions
+
+  4  Liabilities
+     41  Suppliers credits
+         4100  C   Creditors                                  :mapping=crd
+         4150  C   Payables
+     42  Taxes and expenses
+         4200  C   VAT Revenue high                           :mapping=vat_sh
+         4210  C   VAT Revenue low                            :mapping=vat_sl
+         4212  C   VAT Revenue private                        :mapping=vat_sp
+         4220  D   VAT Procurement high                       :mapping=vat_ph
+         4230  D   VAT Procurement low                        :mapping=vat_pl
+         4232  D   VAT Procurement private                    :mapping=vat_pp
+         4240  C   VAT Vehicle cost reimbursement
+         4290  C   Sales tax paid                             :mapping=vat_ok
+
+Result Accounts
+
+  6  Costs
+     61  Sales Costs
+         6100  K   Travel costs                               :vat=high
+         6110  K   Sponsoring
+     62  Office Costs
+         6200  K   Insurance
+     63  Operating expenses
+         6310  K   Chamber of commerce
+         6320  K   Union costs
+         6330  K   Branche organisation costs
+     66  Vehicle costs
+         6600  K   Lease costs vehicle                        :vat=high
+         6610  K   Fuel vehicle                               :vat=high
+         6620  K   Maintenance vehicle                        :vat=high
+         6630  K   Insurance vehicle
+         6640  K   Travel reimbursement
+         6650  K   Rental vehicle                             :vat=high
+         6660  K   Road tax
+         6670  K   Fines
+         6671  K   Fines 0% deductible
+         6680  K   VAT private use vehicle
+         6690  K   Other vehicle costs                        :vat=high
+     67  Contributions & subscriptions
+         6700  K   Contributions & subscriptions              :vat=high
+         6710  K   Contributions & subscriptions VAT 0%
+     68  Depreciation
+         6800  K   Depreciation costs inventory
+         6810  K   Depreciation costs computers
+         6820  K   Depreciation costs fleet
+     69  General costs
+         6900  K   Phone costs and fax costs                  :vat=high
+         6905  K   Internet costs                             :vat=high
+         6920  K   Stationery                                 :vat=high
+         6921  K   Computer accessories                       :vat=high
+         6930  K   Literature                                 :vat=low
+         6940  K   Administration costs                       :vat=high
+         6950  K   Printing and paper                         :vat=high
+         6970  K   Stamps
+         6971  K   Shipping costs
+         6980  K   Bank costs
+         6981  K   Cash differences
+         6982  K   Rounding errors
+         6990  K   Other general costs                        :vat=high
+
+  8  Revenues
+     81  Revenue Consultancy
+         8100  O   Revenue consultancy                        :vat=high
+         8110  O   Revenue consultancy VAT exempt
+     82  Revenue royalties
+         8200  O   Revenue royalties VAT exempt
+     83  Revenue Editing
+         8300  O   Revenue editing                            :vat=high
+     84  Revenue Courses
+         8400  O   Revenue courses                            :vat=high
+         8410  O   Revenue licenses courses                   :vat=high
+     85  Revenue Projects
+         8500  O   Revenue projects                           :vat=high
+     89  Revenue Other
+         8900  O   Revenue other VAT high                     :vat=high
+         8910  O   Revenue other VAT low                      :vat=low
+         8920  O   Revenue other VAT exempt
+
+  9  Financial income and expenses
+     91  Interest income
+         9120  O   Interest received Postbank
+         9130  O   Interest received Postbank Inbedrijf
+         9190  O   Interest received overige
+     92  Interest expenses and other expenses
+         9220  K   Interest paid Postbank
+         9230  K   Interest paid Postbank Inbedrijf
+         9290  K   Interest paid other
+     93  Other income
+         9380  O   Taxation on private use vehicle            :vat=private,excl
+         9390  O   Small office home office tax exemption
+
+# DAYBOOKS
+#
+# EekBoek supports five types of daybooks: Cash, Bank, Purchases,
+# Sales and Memorial. The number of daybooks that can be created 
+# is unlimited.
+# The first column shows the short name (code) for the daybook
+# specified. Furthermore, for each daybook the type must be specified.
+# Daybooks of type Cash or Bank must also be specified with a contra
+# account, for the other daybooks a contra account is optional.
+#
+# The option :dc can be used to indicate that the journals
+# for this daybook have the totals of the debits and credits
+# displayed separately.
+
+Daybooks
+
+  P     Purchase              :type=purchases
+  C     Cash                  :type=cash       :account=2300
+  M     Memorial              :type=memorial
+  B     Postbank              :type=bank       :account=2320
+  S     Sales                 :type=sales
+
+# VAT TARIFFS
+#
+# There are five tariff classes: "high ", "low", "zero", "private"
+# and "other". The tariff group determines the account to which the
+# corresponding booking should take place.
+# Within each class there can be several possible charges, although this
+# in practice not likely to occur.
+# The first column is the (numeric) code for this rate.
+# It can be used to explicitly specify a VAT rate for a booking. 
+# For each tariff used (except class "zero") the percentage must be 
+# specified. 
+# The description :exclusive can be used for bookings on accounts that
+# by default have no VAT.
+#
+# IMPORTANT: Mutations that are executed using the shell command line or
+# API are using the associated VAT tariff of the general ledger 
+# accounts. Changes made to this file will therefore impact already
+# existing bookings.
+
+VAT Tariffs
+
+   0  VAT 0%                 :class=zero
+   1  VAT 19% incl.          :class=high    :perc=19.00
+   2  VAT 19% excl.          :class=high    :perc=19.00 :exclusive
+   3  VAT 6.0% incl.         :class=low     :perc=6.00
+   4  VAT 6.0% excl.         :class=low     :perc=6.00  :exclusive
+   5  VAT Private 12% ex.    :class=private :perc=12.00 :exclusive
+
+# End of EekBoek schema

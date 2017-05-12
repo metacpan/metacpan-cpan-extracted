@@ -1,0 +1,21 @@
+Error::Wait version 0.05
+========================
+
+Error::Wait makes $? (the wait() status variable) as user-friendly as $!.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Steve Grazzini
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

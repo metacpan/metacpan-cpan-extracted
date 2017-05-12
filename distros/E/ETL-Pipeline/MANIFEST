@@ -1,0 +1,62 @@
+inc/Module/AutoInstall.pm
+inc/Module/Install.pm
+inc/Module/Install/AutoInstall.pm
+inc/Module/Install/AutoManifest.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/ETL/Pipeline.pm
+lib/ETL/Pipeline/Input.pm
+lib/ETL/Pipeline/Input/DelimitedText.pm
+lib/ETL/Pipeline/Input/Excel.pm
+lib/ETL/Pipeline/Input/File.pm
+lib/ETL/Pipeline/Input/FileListing.pm
+lib/ETL/Pipeline/Input/Tabular.pm
+lib/ETL/Pipeline/Input/UnitTest.pm
+lib/ETL/Pipeline/Input/Xml.pm
+lib/ETL/Pipeline/Input/XmlFiles.pm
+lib/ETL/Pipeline/Output.pm
+lib/ETL/Pipeline/Output/Memory.pm
+lib/ETL/Pipeline/Output/Perl.pm
+lib/ETL/Pipeline/Output/Storage/Hash.pm
+lib/ETL/Pipeline/Output/UnitTest.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/DataFiles/DelimitedText.txt
+t/DataFiles/Excel2003.xls
+t/DataFiles/Excel2007.xlsx
+'t/DataFiles/FileListing/Skip 1.htm'
+'t/DataFiles/FileListing/Test 1.txt'
+'t/DataFiles/FileListing/Test 2.txt'
+'t/DataFiles/FileListingDepth/Depth/Test 1.txt'
+'t/DataFiles/FileListingDepth/Depth/Test 2.txt'
+'t/DataFiles/FileListingDepth/Depth/Test 3.txt'
+'t/DataFiles/FileListingDepth/Test 1.txt'
+'t/DataFiles/FileListingDepth/Test 2.txt'
+t/DataFiles/FM-Export.XML
+t/DataFiles/XmlFiles/1234.xml
+t/DataFiles/XmlFiles/5678.xml
+t/ETL-Pipeline-Input-DelimitedText.t
+t/ETL-Pipeline-Input-Excel.t
+t/ETL-Pipeline-Input-File.t
+t/ETL-Pipeline-Input-FileListing.t
+t/ETL-Pipeline-Input-Tabular.t
+t/ETL-Pipeline-Input-Xml.t
+t/ETL-Pipeline-Input-XmlFiles.t
+t/ETL-Pipeline-Input.t
+t/ETL-Pipeline-Output-Memory.t
+t/ETL-Pipeline-Output-Perl.t
+t/ETL-Pipeline-Output-Storage-Hash.t
+t/ETL-Pipeline-Output.t
+t/ETL-Pipeline.t
+t/Modules/FileInput.pm
+t/Modules/Output.pm
+t/Modules/TabularInput.pm
+t/pod.t

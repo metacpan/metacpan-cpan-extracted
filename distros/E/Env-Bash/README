@@ -1,0 +1,380 @@
+Env-Bash version 0.04
+========================
+
+NAME
+    Env::Bash - Perl extension for accessing _all_ bash environment
+    variables.
+
+NOTE
+    On systems without bash, this module turns into an expensive
+    implementation of $ENV{...}.
+
+INSTALLATION
+    To install this module type the following:
+
+       perl Makefile.PL
+       make
+       make test
+       make install
+
+DEPENDENCIES
+    This module requires these other modules and libraries:
+
+       Perl        >= 5.8.0.
+       Test::More  >= 0.47 ( in the perl distribution ).
+
+SYNOPSIS
+      use Env::Bash;
+
+    Standard interface:
+
+      my @var = get_env_var( "SORCERER_MIRRORS",
+                             Source => "/etc/sorcery/config", );
+      print "SORCERER_MIRRORS via get_env_var:\n",
+      join( "\n", @var ), "\ncount = ", scalar @var, "\n";
+  
+      @var = Env::Bash::SORCERER_MIRRORS
+          ( Source => "/etc/sorcery/config", );
+      print "SORCERER_MIRRORS via name:\n",
+      join( "\n", @var ), "\ncount = ", scalar @var, "\n";
+  
+      my @keys = get_env_keys( Source => "/etc/sorcery/config",
+                               SourceOnly => 1, );
+      print "first 10 keys:\n", map { " $_\n" } @keys[0..9];
+
+    Object oriented interface:
+
+      my $be = Env::Bash->new( Source => "/etc/sorcery/config",
+                               Keys => 1, );
+      my @var = $be->get( "SORCERER_MIRRORS" );
+      print "SORCERER_MIRRORS via get:\n",
+      join( "\n", @var ), "\ncount = ", scalar @var, "\n";
+      
+      @var = $be->SORCERER_MIRRORS;
+      print "SORCERER_MIRRORS via name:\n",
+      join( "\n", @var ), "\ncount = ", scalar @var, "\n";
+  
+      $be = Env::Bash->new( Keys => 1,);
+      @var = $be->HOSTTYPE;
+      print "HOSTTYPE via name:\n",
+      join( "\n", @var ), "\ncount = ", scalar @var, "\n";
+  
+      if( $be->exists( 'BASH_VERSINFO' ) ) {
+          print "BASH_VERSINFO =>\n ",
+          join( "\n ", $be->BASH_VERSINFO ), "\n";
+      }
+  
+      my %options = $be->options( [], Keys => 1 );
+
+    Tie HASH interface:
+
+      my %env = ();
+      tie %env, "Env::Bash", Source => "/etc/sorcery/config", ForceArray => 1;
+  
+      my $var = $env{SORCERER_MIRRORS};
+      print "SORCERER_MIRRORS via tied hash:\n",
+      join( "\n", @$var ), "\ncount = ", scalar @$var, "\n";
+  
+      $var = $env{HOSTTYPE};
+      print "HOSTTYPE via tied hash:\n",
+      join( "\n", @$var ), "\ncount = ", scalar @$var, "\n";
+  
+      while( my( $key, $value ) = each %env ) {
+          print "$key =>\n ", join( "\n ", @$value ), "\n";
+      } 
+
+DESCRIPTION
+    Env::Bash enables perl access to ALL bash environment variables (
+    including those that may be bash arrays ). But you say: "That doesn't
+    make sense; perl already has the %ENV hash. Why not use that?". Well,
+    please run:
+
+      $ perl -e 'print "$_ = $ENV{$_}\n" for sort keys %ENV;'
+
+    and:
+
+      $ set | grep "^[A-Z]"
+
+    Now compare the outputs. See, perl's list is much shorter than the bash
+    list. This is because the environment passed to perl contains only
+    variables that have been exported( I think ). There is no pure-perl way
+    to get all the variables in the running shell; also, forget about
+    getting all the elements of variables that are bash arrays!
+
+    In the following discussion and examples, I show how I use this module
+    with Linux Sorcerer. For my fellow Sorcererites, this is fine, for
+    others, please see "A SHAMELESS PLUG FOR LINUX SORCERER" below.
+
+    NOTE: on systems without bash, this module turns into an expensive
+    implementation of $ENV{...}.
+
+  Options
+    The following options, specified as func( ..., key1 => value1, ..., )
+    are provided.
+
+    Debug
+        Prints debugging information to STDERR.
+
+        Values 0 or 1, default 0.
+
+    ForceArray or []
+        Defines how environment variable data are returned. Especially
+        useful if you expect to handle bash array variables. For example, an
+        array variable, 'BASH_VERSINFO', returns data as follows:
+
+                               scalar context      list context
+                               --------------      ------------
+          ForceArray => 0            3             ( 3,
+                                                     00,
+                                                     0,
+                                                     1.
+                                                     'release',
+                                                     'i686-pc-linux-gnu' )
+          ForceArray => 1         reference        ( 3,
+                                  to array           00,
+                                  returned in        0,
+                                  list context.      1.
+                                                     'release',
+                                                     'i686-pc-linux-gnu' )
+
+        As a shortcut, ForceArray may be specified by placing the empty
+        array reference token '[]' as the first, and only first, argument of
+        the option arguments.
+
+        Values 0 or 1, default 0.
+
+    SelectRegex
+        The regular expression to select which environment variables to
+        read. It may be any valid perl regular expression.
+
+        Values valid perl regex, default: none.
+
+    Keys
+        Whether or not to load an array of environment variable names.
+
+        Values 0 or 1, default 0.
+
+    Source
+        The path name of one or more executable bash scripts with which to
+        'source' ( execute with a leading dot ) before extracting
+        environment. Any variables set in these scripts is then available
+        for this module. The leading dot is prepended if not supplied.
+
+        More than one source file may be specified as a scalar of semicolon
+        separated source file names:
+
+          Source => '/etc/bebe/configure.sh;/etc/sorcery/config',
+
+        or an array reference:
+
+          Source => [ qw( /etc/bebe/configure.sh /etc/sorcery/config ) ],
+
+        Values: any list of executable bash scripts, Default none.
+
+    SourceOnly
+        Returns only the environment variables defined by the Source
+        script(s). Some bash-generated environment variables may 'sneak'
+        through, notably, 'PIPESTATUS'.
+
+        Values 0 or 1, default 0.
+
+    WARNING
+        SourceOnly is handled by reading all the current environment
+        variables ( without sourcing the entries in Source ), then reading
+        all the variable ( including Source ), and removing any variable
+        that does not appear in both lists. If you have exported a variable
+        that you are sourcing in the shell where your script will run, it
+        will NOT appear in the returned list. SourceOnly is of limited value
+        and should only be used when you really want only the keys from your
+        sourced scripts. 'get', 'get_env_var', and tie access to variables
+        are not affected by SourceOnly.
+
+  Standard interface
+    The non-object oriented interface.
+
+   get_env_var
+    prototype
+        get_env_var( options...);
+
+    options used
+        Debug, ForceArray, SelectRegex, Source, SourceOnly.
+
+    operation
+        Returns the contents of the specified environment variable in scalar
+        or list context as described above. If the requested variable is not
+        present, a false value ( not 'undef' ) is returned.
+
+   Env::Bash::VARIABLE_NAME
+    prototype
+        Env::Bash::VARIABLE_NAME( options...);
+
+    note
+        This is the AUTOLOAD version of 'get_env_var'.
+
+   get_env_keys
+    prototype
+        get_env_keys( options...);
+
+    options used
+        Debug, ForceArray, SelectRegex, Source, SourceOnly.
+
+    operation
+        Returns a sorted array ( list context ) or an array reference (
+        scalar context ) of the keys in the current bash environment.
+
+  Object oriented interface
+   new
+    prototype
+        Env::Bash->new( options... );
+
+    options used
+        Debug, ForceArray, SelectRegex, Keys, Source, SourceOnly.
+
+    operation
+        Returns a Env::Bash object with the specified options saved in the
+        object so they do not have to be repeated in subsequent method
+        calls.
+
+   get
+    prototype
+        $env_bash_obj->get( options... );
+
+    options used
+        Debug, ForceArray, SelectRegex, Source, SourceOnly.
+
+    operation
+        Returns the contents of the specified environment variable in scalar
+        or list context as described above. If the requested variable is not
+        present, a false value ( not 'undef' ) is returned.
+
+   VARIABLE_NAME
+    prototype
+        $env_bash_obj->VARIABLE_NAME( options... );
+
+    options used
+        Debug, ForceArray, SelectRegex, Source, SourceOnly.
+
+    operation
+        This is the AUTOLOAD version of 'get'.
+
+   exists
+    prototype
+        $env_bash_obj->exists( 'VARIABLE_NAME' );
+
+    options used
+        None.
+
+    operation
+        Returns true or false to indicate whether or not the environment
+        exists.
+
+   keys
+    prototype
+        $env_bash_obj->keys( options... );
+
+    options used
+        Debug, ForceArray, SelectRegex, Source, SourceOnly.
+
+    operation
+        Returns a sorted array ( list context ) or an array reference (
+        scalar context ) of the keys in the current bash environment.
+
+   reload_keys
+    prototype
+        $env_bash_obj->reload_keys( options... );
+
+    options used
+        Debug, ForceArray, SelectRegex, Source, SourceOnly.
+
+    operation
+        Reloads the environment key array and returns a sorted array ( list
+        context ) or an array reference ( scalar context ) of the keys in
+        the current bash environment.
+
+   options
+    prototype
+        $env_bash_obj->options( options... );
+
+    options used
+        ANY.
+
+    operation
+        Returns a the current options hash after setting any options
+        specified.
+
+  Tie HASH interface
+   tie
+    prototype
+          my %env = ();
+          tie %env, "Env::Bash", options...;
+
+    options used
+        Debug, ForceArray, SelectRegex, Keys, Source, SourceOnly.
+
+    operation
+        Ties a hash variable to Env::Bash. The resulting hash may be used
+        like a normal hash, except it is read-only. Note: if ForceArray is
+        specified, the resulting hash is a hash of array references.
+
+   hash operations
+    allowed
+        access ( $var = $env{SOME_VARIABLE_NAME} ), exists, each, keys,
+        values,
+
+    not allowed
+        assign ( $env{SOME_VARIABLE_NAME} = $var ), delete, clear ( as %env
+        = (); ).
+
+    note
+        Unlike normal hashes, the keys are maintained in sorted order,
+        therefore there is no need tor use the '... sort keys ...' construct
+        unless you wish to process in some non-standard order.
+
+  Export
+    get_env_var and get_env_keys are unconditionally exported.
+
+A SHAMELESS PLUG FOR LINUX SORCERER
+    Linux Sorcerer, by Kyle Sallee, is a great Linux distribution. It gives
+    you one of the most up-to-date and fastest Linux systems available.
+    Sorcerer is based upon package 'source', not pre-compiled rpm's. You (
+    with the bash scripts supplied by Sorcerer ) compile and install the
+    packages optimized to your machine. You configure your own kernel for
+    the best, leanest kernel matching your environment. Current packages are
+    made available as soon as they are stable; you do not have to wait six
+    months for the next release of your distribution.
+
+    With the gain there is always the pain:
+
+    Installing updated packages is slower.
+    The documentation is wanting.
+    No fancy 'x' windows installer; the command line rules!
+    Not for the beginner.
+
+    All and all, I love it! Check it out at <http://sorcerer.wox.org>
+
+BUGS
+    December 23, 2004
+        Minor bug in AUTOLOAD in version 0.01. Resolved in 0.02.
+
+    December 24, 2004
+        On systems without a bash executable, revert to using $ENV{...} and
+        skip tests using source scripts ( as on MSWin32 ). Resolved in 0.03.
+
+    December 24 2004
+        Again, on systems without a bash executable, some tests fail. In
+        addition, those systems are bombarded with error messages '...bash
+        not found...'. Resolved in 0.04.
+
+SEE ALSO
+    The 'Advanced Bash-Scripting Guide' at
+    <http://www.tldp.org/LDP/abs/html/>.
+
+AUTHOR
+    Beau E. Cox, <beaucox@hawaii.rr.com>.
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2004 by Beau E. Cox.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.6 or, at
+    your option, any later version of Perl 5 you may have available.

@@ -1,0 +1,85 @@
+[Changes for 0.23 - 2007-11-10]
+
+* Split .ucm files into several object files, so enc2xs will no longer
+  take absurd amount of memory.
+  Reported by: David Cantrell
+
+[Changes for 0.22 - 2007-11-08]
+
+* Add Big5-2003, the newest incarnation of Big5 and a Taiwanese national
+  standard (as an appendix to CNS11643).
+
+[Changes for 0.21 - 2007-08-22]
+
+* Oops, the CCCII map was broken.  So sowwy. :-/
+  Reported by: CPAN Testers.
+
+[Changes for 0.20 - 2007-08-21]
+
+* LICENSING CHANGE: This compilation and all individual files in it
+  are now under the permissive "MIT" license.  See the COPYRIGHT
+  section in README for the new terms.
+
+* CCCII: Revised, using table supplied by the Koha Taiwan project.
+
+* GB18030: Removed invalid Unicode codepoints.
+
+* Build system upgraded from ExtUtils::MakeMaker to Module::Install.
+ 
+[Changes for 0.10 - 2004-11-29]
+
+* Probe "enc2xs.bat" by default, in addition to "enc2xs".
+
+* Work around heap size problems with Visual C++.
+
+[Changes for 0.09 - 2004-11-19]
+
+* Added the "big5-1984" encoding, supplied by imacat.
+
+* Imported a cleaned-up "cccii" encoding table from http://www.cccii.org.tw/.
+
+* t/1-basic.t now tests encoding as well as decoding.
+
+* Put under SVK version control; reorganized directories into lib/ and ucm/.
+
+* All ucm files now passes ucmlint; large numbers of '|3' were added.
+
+[Changes for 0.08 - 2003-05-18]
+
+* Previous versions were using too much memory; applied
+  a patch from Dan Kogai to alleviate it.
+
+* Correct CMEX's URL and name in the documentations.
+
+* Added two Unisys SOSI encodings, courtesy of S-Team inc.
+
+[Changes for 0.06 - 2002-06-03]
+
+* Added CNS11643-* from UniHan.
+
+* Added proper aliases to satisfy Li18nux conformance.
+
+[Changes for 0.05 - 2002-04-21]
+
+* Made the ucm files round-trip safe.
+
+* Added the "big5ext" encoding.
+
+[Changes for 0.04 - 2002-04-18]
+
+* Updated tests.
+
+* Added the "CCCII" encoding from Unihan.
+
+* Changed alias scheme to agree with Encode 1.41+.
+
+* Got rid of compile/encode.h and use enc2xs instead.
+
+[Changes for 0.03 - 2002-03-20]
+
+* Include 2-alias.t to manifest.
+
+[Changes for 0.02 - 2002-03-20]
+
+* First CPAN release.
+

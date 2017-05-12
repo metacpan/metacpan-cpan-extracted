@@ -1,0 +1,53 @@
+{
+   "abstract" : "render parts of your mail with Text::Xslate",
+   "author" : [
+      "Arthur Axel \"fREW\" Schmidt <frioux+cpan@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.017, CPAN::Meta::Converter version 2.141170",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Email-MIME-Kit-Renderer-Xslate",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Email::MIME::Kit" : "2",
+            "Text::Xslate" : "v3.2.4"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.94"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/frioux/Email-MIME-Kit-Renderer-Xslate/issues"
+      },
+      "homepage" : "https://github.com/frioux/Email-MIME-Kit-Renderer-Xslate",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/frioux/Email-MIME-Kit-Renderer-Xslate.git",
+         "web" : "https://github.com/frioux/Email-MIME-Kit-Renderer-Xslate"
+      }
+   },
+   "version" : "0.001000"
+}
+

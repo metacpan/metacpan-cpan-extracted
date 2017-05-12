@@ -1,0 +1,76 @@
+<head>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Gene to Gene Overflow</title>
+<script src="../jscript/SpryAssets/xpath.js" type="text/javascript"></script>
+<script src="../jscript/SpryAssets/SpryData.js" type="text/javascript"></script>
+<script src="./tooltip.js" type="text/javascript"></script>
+<script language="javascript">
+
+var dataURL = "../cgi/edgeexpress.fcgi";
+var g2g_to = new Spry.Data.XMLDataSet(null, "EEDB/gene2gene_edges/link_to");
+var feature  = new Spry.Data.XMLDataSet(null, "EEDB/feature");
+var dsObserver = new Object;
+dsObserver.onPostUpdate = endParsing;
+Spry.Data.Region.addObserver('results', dsObserver)
+var isdrag=false;
+function f(id)
+{
+	window.opener.clearResults();
+	window.opener.getFeatureData(id);
+	window.close();
+}
+
+function loadData()
+{  
+    	url = window.location.href;
+	id = url.substring(url.indexOf("id="));
+        url = dataURL+"?"+id;
+  	g2g_to.setURL(url);
+	g2g_to.loadData();
+	feature.setURL(url);
+	feature.loadData();
+}
+
+function endParsing()
+{
+	document.getElementById("loading").style.display="none";
+	document.getElementById("loaded").style.display="block";
+}
+
+</script>
+<link href="../css/f4_style.css" rel="stylesheet" type="text/css">
+<link href="../css/edgeXpress.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+<!--
+.style1 {
+	font-size: 18px
+}
+-->
+</style>
+</head>
+
+<body onLoad="loadData();">
+<div id="toolTipLayer" style="position:absolute; visibility: hidden"></div>
+<script language="JavaScript">initToolTips();</script>
+<span id="dataTable"/>
+
+
+<div align="center" id="loading" class="style1">
+<br><br><br><br><br><img src="../images/loading.gif">
+</div>
+
+<div id="loaded" style="display:none">
+<span spry:region="feature">
+Gene to Gene Overflow Window for <strong>{@desc}</strong></span>
+
+<br />
+<br />
+<div spry:region="g2g_to" id="results" class="linkStyle">
+<span spry:repeat="g2g_to" onMouseOver="ttip('g2g_to','{g2g_to::ds_RowNumber}')" onMouseOut="toolTip()">
+              <a href="#" id="{g2g_to::@feature_id}" onClick="f(this.id);">{g2g_to::@name}</a>
+</span>
+</div>
+</div>
+</body>
+</html>

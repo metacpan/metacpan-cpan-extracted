@@ -1,0 +1,224 @@
+package Elastic::Manual;
+
+# ABSTRACT: What is Elastic::Model and how do I use it?
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Elastic::Manual - What is Elastic::Model and how do I use it?
+
+=head1 VERSION
+
+version 0.52
+
+=head1 WHAT IS ELASTIC::MODEL?
+
+Elastic::Model is a framework to store your Moose objects, which uses
+Elasticsearch as a NoSQL document store and flexible search engine.
+
+It is designed to make it easy to start using Elasticsearch with minimal extra
+code, but allows you full access to the rich feature set available in
+Elasticsearch as soon as you are ready to use it.
+
+For a brief example of how Elastic::Model works, you should start by reading
+L<Elastic::Manual::Intro>.
+
+=head1 WHAT IS ELASTICSEARCH?
+
+L<Elasticsearch|http://www.Elasticsearch.org> is an open-source
+L<Lucene|http://lucene.apache.org/core/>-based full-text search engine,
+and a NoSQL document store / database.
+
+=head2 Schema-free and document oriented
+
+Elasticsearch stores your objects as JSON documents. Most Perl objects
+can be mapped easily to their JSON equivalent.
+
+It is schema free, in that you don't need to define your
+field/properties/attributes ahead of time; you can just toss it a JSON
+document and it'll try to autodetect data types and index your doc. That
+said, the power of full text search comes from the ability to configure
+your search to suit your data and requirements. Sophisticated options
+exist to give you complete control over how your data is indexed.
+
+=head2 Real-time
+
+Elasticsearch is a real-time data store (as soon as your document is indexed, it
+can be retrieved from any node in the cluster) and has near-real-time search.
+By default, docs become visible to search within 1 second of being indexed.
+
+=head2 Distributed
+
+Elasticsearch is built to scale out of the box.  It is easy to start with a
+single node, and to add new nodes as required, giving you high availability
+and huge scale. A cluster can scale to hundreds of nodes and terrabytes of
+data. If a node goes down, the cluster will automatically redistribute and
+just keep on working.
+
+=head1 TABLE OF CONTENTS
+
+=head2 L<Elastic::Manual::Intro>
+
+Start by reading L<Elastic::Manual::Intro> for a gentle introduction to
+L<Elastic::Model>.
+
+=head2 L<Elastic::Manual::Delta>
+
+Contains important information about changes to Elastic::Model and migration
+paths.
+
+=head2 L<Elastic::Manual::Terminology>
+
+A brief definition of some of the terms used by Elasticsearch and Elastic::Model.
+
+=head2 L<Elastic::Manual::NoSQL>
+
+Some things you need to think about when moving from a relational DB to a
+NoSQL document store like Elasticsearch.
+
+=head2 L<Elastic::Manual::Attributes>
+
+Fine-tuning how the attributes in your Elastic::Doc classes are indexed.
+
+=head2 L<Elastic::Manual::Attributes::Unique>
+
+Making attributes in your Elastic::Doc classes unique.
+
+=head2 L<Elastic::Manual::Reindex>
+
+How to reindex your data when you make changes to your attributes.
+
+=head2 L<Elastic::Manual::QueryDSL>
+
+Using the Elasticsearch Query DSL (and the L<ElasticSearch::SearchBuilder>
+syntax) to query your documents efficiently.
+
+=head3 L<Elastic::Manual::QueryDSL::Queries>
+
+Commonly used queries
+
+=head3 L<Elastic::Manual::QueryDSL::Filters>
+
+Commonly used filters
+
+=head3 L<Elastic::Manual::QueryDSL::Nested>
+
+Queries and filters for C<"nested"> fields.
+
+=head2 L<Elastic::Manual::Searching>
+
+Which search method to use with a View, and how to iterate through the results.
+
+=head2 L<Elastic::Manual::Analysis>
+
+Controlling how your attributes are indexed so that they can be queried
+as you need.
+
+=head2 L<Elastic::Manual::Scaling>
+
+How to use Elastic::Model to go from a small development environment to
+massive scale.
+
+=head2 L<Elastic::Manual::Scoping>
+
+When and how to use L<Scopes|Elastic::Model::Scope>, an optional in-memory
+cache (but required if you use weak refs).
+
+=head1 BUGS
+
+This is a new module, so there will probably be bugs, and the API may change
+in the future.
+
+If you have any suggestions for improvements, or find any bugs, please
+report them to http://github.com/clintongormley/Elastic-Model/issues. I
+will be notified, and then you'll automatically be notified of progress on
+your bug as I make changes.
+
+=head1 TEST SUITE
+
+The full test suite requires a live Elasticsearch cluster to run.  CPAN
+testers doesn't support this.  You can see full test results here:
+L<http://travis-ci.org/#!/clintongormley/Elastic-Model/builds>.
+
+To run the full test suite locally, run it as:
+
+    perl Makefile.PL
+    ES_HOME=/path/to/Elasticsearch make test
+
+Or, if you are happy for any index starting with C<"myapp"> to be deleted,
+you can start your Elasticsearch server and run it as:
+
+    perl Makefile.PL
+    ES='localhost:9200' make test
+
+This is much faster as it doesn't have to restart the server multiple times,
+but you will lose any indices matching C</^myapp.*/>.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Elastic::Manual
+
+You can also look for information at:
+
+=over
+
+=item * IRC
+
+The L<#Elasticsearch|irc://irc.perl.org/Elasticsearch> channel on
+C<irc.perl.org> is a Perl-specific channel for L<Elastic::Model> and
+L<Elasticsearch>.
+
+The main Elasticsearch channel:
+L<#Elasticsearch|irc://irc.freenode.net/Elasticsearch> on C<irc.freenode.net>.
+
+=item * Mailing list
+
+The Elastic::Model mailing list is available on:
+L<https://groups.google.com/forum/#!forum/elastic-model>.
+
+The main Elasticsearch mailing list can be found on
+L<http://www.Elasticsearch.org/community/forum/>.
+
+=item * GitHub
+
+L<http://github.com/clintongormley/Elastic-Model>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Elastic-Model>
+
+=item * Search MetaCPAN
+
+L<https://metacpan.org/module/Elastic::Model>
+
+=back
+
+=head1 ACKNOWLEDGEMENTS
+
+Thanks to Shay Banon, the Elasticsearch author, for producing an amazingly
+easy to use search engine, to L<PERLER|https://metacpan.org/author/PERLER>
+for writing L<ElasticSearchX::Model>, which was the original inspiration,
+to L<FLORA|https://metacpan.org/author/FLORA> and
+L<MSTROUT|https://metacpan.org/author/MSTROUT> for encouraging me to do
+better, and to L<DOY|https://metacpan.org/author/DOY> for guiding me
+through Moose internals.
+
+=head1 AUTHOR
+
+Clinton Gormley <drtech@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Clinton Gormley.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

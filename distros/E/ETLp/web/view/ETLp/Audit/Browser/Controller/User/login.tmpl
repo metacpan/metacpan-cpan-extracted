@@ -1,0 +1,25 @@
+[% title = 'Login' %]
+[%INCLUDE header.tmpl %]
+
+[% IF errs.some_errors && ! message %]
+<p><span class="message" id="message">Login Error</span> </p>
+[% END %]
+
+<form action="[% root_url %]/user/validate_login" method="post">
+    <fieldset>
+        <legend>Login</legend>
+        <p>
+            <label for="username" class="edit">Username *</label>
+            <input id="username" name="username" /> [% errs.username %]
+        </p>
+        <p>
+            <label for="password" class="edit">Password *</label>
+            <input id="password" name="password" type="password" /> [% errs.password %]
+        </p>
+        <p class="submit">
+            <input type="submit" value="Login" />
+            <input type="hidden" id="next" name="next" value="[% next %]">
+        </p>
+    </fieldset>
+</form>
+[% PROCESS footer.tmpl %]

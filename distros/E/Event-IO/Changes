@@ -1,0 +1,7 @@
+Revision history for Perl extension Event::IO:
+
+0.01  Mon Mar 15 11:42:30 2004
+	- original version; contains Event::IO::Record and Event::IO::Server,
+          formerly Event::IO::Linear and Event::IO::Listener
+
+

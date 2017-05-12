@@ -1,0 +1,7 @@
+Revision history for Email-Enkoder
+
+1.120831  2012-03-23 13:39:09 Europe/Berlin
+	- made the link text argument optional
+
+1.120830  2012-03-23 01:53:39 Europe/Berlin
+	- initial implementation

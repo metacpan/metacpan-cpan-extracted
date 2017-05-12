@@ -1,0 +1,58 @@
+Date: Sat, 21 Feb 2009 09:07:14 +0100
+From: Marc Lehmann <schmorp@schmorp.de>
+To: Joshua N Pritikin <jpritikin@pobox.com>
+Subject: Re: EV
+
+On Fri, Feb 20, 2009 at 06:32:57AM -0800, Joshua N Pritikin <jpritikin@pobox.com> wrote:
+> I just noticed EV:
+> 
+> http://search.cpan.org/~mlehmann/EV-3.53/libev/ev.pod
+> 
+> It looks like you have based your work on the Event interface and 
+> extended it to be much more flexible. Wonderful work!
+
+Actually, the API is much less flexible :-) It is heavily influences by
+libev, which in turn is influenced by libevent.
+
+However, I was using Event for more than a decade, and I think it is correct
+to say that it was influencing me most when writing libev and EV. I of course
+surveyed many event toolkits, but Event was the most well-thought-out one.
+
+The only "bugs" I identified were:
+
+- watcher lifetime != perl object lifetime (it sounds like a nuisance at
+  first, but it is really non-perlish and hard to manage).
+- the event queue (it is quite possible to get Event into a state where
+  it queues events faster than it can remove it, especially as it
+  becoems less efficient with more events).
+- the interaction of priorities, queueing and event handling
+  is undocumented, but crucial (starve prio etc.) - EV/libev has no
+  such priority system at all, as priorities only determine
+  order of callback invocation.
+- Event isn't reentrant (almost no event libs are), which is a non-issue for
+  most uses, but a big issue for me (Coro).
+
+So EV/libev is basically Event + some "fixes", as opposed to some new
+invention, or some other event loop, even though the API is drastically
+different.
+
+It took me some 15 years of gathering experience it write it, too. Event
+was crucial to my learning :) (And, yeah, once the API is set in stone,
+the only way to "fix" it is makign a new module - see object lifetimes for
+example, which you would probably do differently if you would write Event
+from scratch).
+
+And, oh, yeah, the XS interface to Event also inspired me a lot in EV and
+other modules that offer such an XS interface. Without Event, EV (or Coro)
+would not have an XS-level interface.
+
+So thanks a lot for Event :)
+
+-- 
+                The choice of a       Deliantra, the free code+content MORPG
+      -----==-     _GNU_              http://www.deliantra.net
+      ----==-- _       generation
+      ---==---(_)__  __ ____  __      Marc Lehmann
+      --==---/ / _ \/ // /\ \/ /      pcg@goof.com
+      -=====/_/_//_/\_,_/ /_/\_\
+

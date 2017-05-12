@@ -1,0 +1,42 @@
+Error-Base version v1.0.2
+
+J'avais cru plus difficile de mourir. 
+        -- Louis XIV
+
+Die early, die often. Make frequent sanity checks and die when a check fails. 
+See neat dumps of the caller stack with each error. Construct a group of 
+error messages in one object or write error text ad hoc. Trap an error 
+object and examine the contents; or let it tell its sad tale and end it. 
+
+Error::Base usage can be simple or complex. For quick sanity checks, 
+construct and throw a simple fatal error in one line. At the other extreme, 
+you can override methods in your own error subclasses. 
+
+Error::Base is lightweight. It defines no global variables, uses no non-core 
+modules (and few of those), exports no symbols, and is purely object-oriented.
+I hope you will be able to use it commonly instead of a simple die(). 
+You are not required to subclass it. 
+
+INSTALLATION
+
+To install this module with Module::Build, run the following commands:
+
+    perl Build.PL
+    Build
+    Build test
+    Build install
+
+DEPENDENCIES
+
+perl 5.8.8 or better. 
+For Perl module dependencies, please see Build.PL.
+This module has no non-core dependencies; however you may need to upgrade 
+some core modules if your perl is old. 
+
+LICENSE
+
+Copyright (C) 2011, 2013 Xiong Changnian <xiong@cpan.org>
+
+This library and its contents are released under Artistic License 2.0:
+
+(http://www.opensource.org/licenses/artistic-license-2.0.php)

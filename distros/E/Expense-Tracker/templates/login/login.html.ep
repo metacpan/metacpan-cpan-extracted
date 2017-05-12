@@ -1,0 +1,18 @@
+% layout 'starter';
+% title 'Welcome';
+
+<form action=<%= url_for "authenticate" %> id="form184" method="post" name="form184">
+  <fieldset class="main_fieldset">
+    <div>
+      <label class="label" for="username">Username:</label> <input type="text" name="username" id="username" size="20" value="">
+    </div>
+
+    <div>
+      <label class="label" for="password">Password:</label> <input type="password" name="password" id="password" size="20" value="">
+    </div>
+
+    <div>
+      <input type="submit" name="login" id="login" value="Sign In">
+    </div>
+  </fieldset>
+</form>

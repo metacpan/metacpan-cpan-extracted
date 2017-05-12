@@ -1,0 +1,24 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Test::EntityModel
+at lib/Test/EntityModel.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<EntityModel::BaseClass>
+
+L<clone|EntityModel::BaseClass/clone>, L<dump|EntityModel::BaseClass/dump>, L<new|EntityModel::BaseClass/new>, L<sap|EntityModel::BaseClass/sap>
+
+=item L<Exporter>
+
+L<as_heavy|Exporter/as_heavy>, L<export|Exporter/export>, L<export_fail|Exporter/export_fail>, L<export_ok_tags|Exporter/export_ok_tags>, L<export_tags|Exporter/export_tags>, L<export_to_level|Exporter/export_to_level>, L<import|Exporter/import>, L<require_version|Exporter/require_version>
+
+=back
+

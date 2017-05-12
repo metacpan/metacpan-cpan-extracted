@@ -1,0 +1,131 @@
+package ETLp::Manual::Intro;
+
+# ABSTRACT: Intro manual for ETLp
+
+__END__
+=pod
+
+=head1 WELCOME TO ETLp 
+
+=over 4
+
+=item * When did my job run?
+
+=item * Which scripts were we using? How often are they called? They worked last month didn't they?
+
+=item * I'm trawling though the log files, but I can't see where things went wrong.
+
+=item * I'm so sick of putting boilerplate alerting and checks in my ETL code. Can't it just happen...
+
+=item * Not another script to dump CSVs in a database! Can't we make this easier? Surely we can automate basic tasks.
+
+=back
+   
+Is your ETL out of control? ETLp can help!
+
+ETLp is an application framework for supporting ETL tasks by arranging them in a pipeline. It is designed to provide a standardised way for ETL developers to implement their processing, while also removing the burden of capturing and logging audit information. It provides utilities that perform common tasks such as loading and validating data, and emailing errors. This allows developers to spend more time focusing on business logic and less time on application housekeeping.
+
+This manual, together with screenshots, can be viewed at L<http://trac.assembla.com/etlp/wikip>
+
+=head1 WHAT IS AN ETLp PIPELINE?
+
+A pipeline is simply a series of processing instructions that can be divided into three distinct phases:
+
+=over 4
+
+=item * B<pre-processing>: tasks that must be performed before the main processing begins
+
+=item * B<processing>: the main tasks 
+
+=item * B<post-processing>: tasks that should be run after the main event - e.g. stats generation, cleanup tasks.
+
+=back
+
+Note: These phases are simply conceptual. There is no change to the processing if a task is moved from the pre-processing to the processing phase, but the phases help to organise the design of the processing.
+
+A completed pipeline may then invoke another pipeline
+
+=head1 CONFIGURATION-DRIVEN DEVELOPMENT
+
+The functionality of ETLp is driven by simple configuration files. ETLp provides a set of basic functionality, including:
+
+=over 4
+
+=item * unzip and zip files
+
+=item * validate records and generate a report with errors
+
+=item * load csv files into the database
+
+=item * invoke Oracle stored procedures and packages
+
+=item * call OS commands
+
+=item * Watch directories for files to appear - and then process them.
+
+=back
+
+A runtime audit engine keeps track of all processing, including error messages, execution time and rows loaded.
+
+The purpose for using configuration to drive the ETL is to give structure and auditability to the environment.
+
+=head1 RUNTIME AUDITING
+
+All activity is recorded in a runtime auditing database, and is viewable from the L<Audit Browser|ETLp::Manual::AuditBrowser>. This allows developers to drill down into jobs and see their execution history and associated messages.
+
+=head1 EXTENSIBLE
+
+ETLp provides all the features most people need, but what if you have a specific requirement that's not met in the core functionality? You can extend the framework by writing your own plugins. The API is simple and you need never be limited by the core functionality.
+
+=head1 WHERE TO FROM HERE?
+
+Give ETLp a go!
+
+=over 4
+
+=item * Read the documentation L<ETLp::Manual::Index>
+
+=item * Find out how to use the Runtime Audit Browser L<ETLp::Manual::AuditBrowser>
+
+=item * Check out an Example example application L<ETLp::Manual::Example>
+
+=item * Instructions for installing and configuring ETLp L<ETLp::Manual::Install>
+
+=back
+
+=head1 REQUIREMENTS
+
+ETLp is written in Perl, and has been tested with Oracle 11g, PostgreSQL 8 and MySQL 5 on Linux (CentOS 5). We're keen to hear from people who have or would like to use it in other environments.
+
+=head1 FUTURE ENHANCEMENTS
+
+Upcoming features:
+
+=over 4
+
+=item * Support for MySQL's loader.
+
+=item * Support for MySQL stored procedures.
+
+=item * Support for the Infobright loader.
+
+=item * Web interface for scheduling jobs.
+
+=back 
+
+Want to help? We'd love it! Register and get in touch
+  
+=head1 ETLp IS OPEN SOURCE
+
+ETLp is an open source rewrite of a proprietary system. We would like to acknowledge its roots, while at the same time building on the past experience to recreate a more extensible solution for the community.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2010 Redbone Systems Ltd
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+The terms are in the LICENSE file that accompanies this application
+

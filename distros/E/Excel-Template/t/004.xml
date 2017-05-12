@@ -1,0 +1,7 @@
+<workbook>
+  <worksheet name="cell">
+    <cell>Test1</cell>
+    <cell text="Test2" />
+    <cell />
+  </worksheet>
+</workbook>

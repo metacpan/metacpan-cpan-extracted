@@ -1,0 +1,61 @@
+NAME
+    Exception::Died - Convert simple die into real exception object
+
+SYNOPSIS
+      use Exception::Died;
+
+      use warnings FATAL => 'all';
+      eval { open $f, "x", "bad_open_mode" };
+      Exception::Died->throw( message=>"cannot open" ) if $@;
+
+      eval { die "Bum!\n" };
+      if ($@) {
+        my $e = Exception::Died->catch;
+        $e->throw;
+      };
+
+      # Can replace die hook globally
+      use Exception::Died '%SIG' => 'die';
+      eval { die "Boom!\n" };
+      print ref $@;           # "Exception::Died"
+      print $@->eval_error;   # "Boom!"
+
+      # Can be used in local scope only
+      use Exception::Died;
+      {
+          local $SIG{__DIE__};
+          Exception::Fatal->import('%SIG');
+          eval { die "Boom!" };
+          print ref $@;           # "Exception::Died"
+          print $@->eval_error;   # "Boom!"
+      };
+      eval { die "Boom" };
+      print ref $@;       # ""
+
+      # Debugging with increased verbosity
+      $ perl -MException::Died=:debug script.pl
+
+      # Debugging one-liner script
+      $ perl -MException::Died=:debug -ale '\
+      use File::Temp; $tmp = File::Temp->new( DIR => "/notfound" )'
+
+DESCRIPTION
+    This class extends standard Exception::Base and converts eval's error
+    into real exception object. The eval's error message is stored in
+    *eval_error* attribute.
+
+    This class can be also used for debugging scripts with use simple
+    perlfunc or Carp. You can raise verbosity level and print stack trace if
+    script doesn't use Exception::Base and has stopped with perlfunc.
+
+AUTHOR
+    Piotr Roszatycki <dexter@cpan.org>
+
+LICENSE
+    Copyright (c) 2008, 2009 by Piotr Roszatycki <dexter@cpan.org>.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See http://www.perl.com/perl/misc/Artistic.html
+

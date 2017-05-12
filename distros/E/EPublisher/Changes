@@ -1,0 +1,39 @@
+Revision history for Perl EPublisher.
+=====================================
+
+1.21 2015-01-14
+
+  [MISC]
+  + add metaresources, now EPublisher can be picked for the CPAN PullRequest Challenge
+
+1.0  2013-07-11
+        + exclude directories
+
+0.9  2013-07-11
+        + add extract_package to get namespace of package
+        + use namespace as title
+
+0.8  2013-07-11
+        + check if a PPI object was created
+        + handle lists of directories in Dir plugin (source)
+        + improved tests for Dir plugin
+
+0.7  2012-05-03
+        + improve utf-8 handling
+
+0.6  2012-02-17
+        + constructor accepts a hashreference as config, too.
+
+0.5  2012-02-09
+        + allow arbitrary titles (defined in YAML config)
+
+0.41 2012-01-29
+        - minor documentation improvements
+        - fixed prerequesits
+
+0.4  2012-01-26
+        - changed return values of source plugins
+        - changed format of parameters accepted by target plugins
+
+0.3  2010-11-12
+	- original version

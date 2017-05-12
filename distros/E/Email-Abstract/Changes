@@ -1,0 +1,107 @@
+Revision history for Email-Abstract.
+
+3.008     2014-12-27 18:36:19-05:00 America/New_York
+        - make results of get_body be the same on Email::{Simple,MIME}
+        - ...but this method is a mess, so maybe avoid using Abstract for body
+          work
+
+3.007     2013-12-31 10:39:14 America/New_York
+          fix skip count when MIME::Entity is not present
+
+3.006     2013-09-01 08:41:48 America/New_York
+          require Email::Simple 1.998 to allow ->new(\$string)
+
+3.005     2013-07-30 09:57:36 America/New_York
+          repackage, update bug tracker, etc.
+
+          provide raw body on multipart Email::MIME messages (thanks,
+          bailey@upenn)
+          [rt.cpan.org #77624]
+
+3.004     2011-02-18
+
+          If present, MIME::Entity must be v5.501; v5.500 had a regression (or
+          a bug fix, depending how you look at it) that broke header-reading.
+          While technically older versions that are not 5.500 would work, it is
+          much simpler to just require the newest version, rather than to
+          support a version range with a hole in it.
+
+3.003     2010-11-08
+          replace Class::ISA with mro (MRO::Compat)
+
+3.002     2010-06-11
+          avoid a warning in MailInternet with zero headers found
+
+3.001     2008-12-11
+          declare our prereq on Scalar::Util
+
+3.000     2008-12-09
+          accept scalar references for more efficient msg-from-string
+
+2.134     2007-11-16
+          (no code changes from previous dev release)
+
+2.133_05  2007-11-11
+          [BUG FIXES]
+          added is_available method to MIMEEntity plugin
+
+2.133_04  2007-09-24
+          [ENHANCEMENTS]
+          created Email::Abstract::Plugin base class; please use it!
+          added is_available method to plugins
+
+          [BUG FIXES]
+          is_available in the Mail::Internet adapter should solve header
+            folding issues (by preventing you from using it when it can't work)
+
+2.133_03  2007-08-??
+          diagnostics in output to indicate what version of a module we used
+
+2.133_02  2007-07-??
+          fix test planning
+
+2.133_01  2007-07-??
+          add test to ensure that "can't handle" exception is thrown ASAP
+          remove unexplained requirement for perl 5.6
+          fix Mail::Internet header fetching to unfold headers
+          fix Mail::Message body setter, which hosed newlines
+          fix body handling for Mail::Internet
+          improved consistency of method used to find adapter class
+          improved tests and test coverage
+
+2.132     2007-03-22
+          packaging improvements
+
+2.131     2006-08-22
+          pod tests
+
+2.13      2006-07-24
+          test for and permit passing Email::Abstract objects to Email::Abstract
+          class methods
+
+2.12      2006-07-24
+          don't use MIME::Entity in test if it's not available
+
+2.11      2006-07-22
+          better test planning
+
+2.10      2006-07-21
+          add a new method to create wrapper objects
+          handle subclasses /properly/ (correct ISA order)
+          improved tests and test coverage
+          miscellaneous refactoring
+          update PEP URL
+          update documentation
+
+2.01      2004-11-04
+          Minor Documentation Fix
+          Author Change
+          PEP Contact Added
+
+2.0       2004-08-25 12:12:37 BST
+          Handle subclasses
+
+0.01      2004-05-26 16:47 20
+          original version; created by h2xs 1.22 with options
+            -AX -b 5.6.0 -n Email::Abstract
+

@@ -1,0 +1,22 @@
+---
+abstract: 'Wrapper around an IO::Async::Loop instance'
+author:
+  - 'Tom Molesworth <tom@entitymodel.com>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300009, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: EntityModel-EventLoop-IO-Async
+requires:
+  EntityModel::EventLoop: 0.001
+  IO::Async: 0.45
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=EntityModel-EventLoop-IO-Async
+  homepage: http://search.cpan.org/dist/EntityModel-EventLoop-IO-Async/
+version: 0.001

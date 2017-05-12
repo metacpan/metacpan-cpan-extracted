@@ -1,0 +1,56 @@
+[#
+<hr>
+<center><font color="red" size=3>[= under_construction =]</font><br></center>
+#]
+[! use File::Basename ; !]
+
+[- $r = shift -]
+
+
+[$ if $r->{error} $]
+  <p align="center"><font color="#ff0000" size="3"><b>
+    [= error =]: [+ $r->gettext($r->{error}) +]
+    [$ if $r->{error_details} $]
+      [= error_reason =]:<BR>
+      [- @err = split("\n", $r->{error_details}); -]
+      [$ foreach $err_line (@err) $]
+        [+ $err_line +]<BR>
+      [$ endforeach $]
+    [$ endif $]
+  </b></font></p>
+[$ endif $]
+
+[$ if @{$warning = $r->{warning}} $]
+  <p align="center">
+    [= warning =]:
+  </p>
+  <div align="center">
+    <table border="0" cellspacing="0" cellpadding="0"><tr><td align="left">
+      <ul>
+	<li>[- $abbrev = $warning->[$row] -][+ $r->gettext($abbrev) +]
+      </ul>
+    </td></tr></table>
+  </div>
+[$ endif $]
+
+[$ if $r->{success} $]
+  <p align="center">
+    [+ $r->gettext($r->{success}) +]
+  </p>
+[$ endif $]
+
+[$ if $r -> {need_login} $]
+    <div align="center">
+    [$ if $fdat{-logintext} $]
+  	<p>[+ $fdat{-logintext} +]</p>
+    [$else$]
+        <p>[= need_login =]</p>
+    [$endif$]	
+    
+    [- Execute ('loginform.epl', $r -> app -> posturl) ; -]
+    </div>
+[$ else $]
+    [$if $r -> param -> uri !~ /html?$|epl$|cgi$/ $]<pre>[$endif$]
+    [- $x = Execute ({inputfile => '*'}) -] 
+    [$if $r -> param -> uri !~ /html?$|epl$|cgi$/ $]</pre>[$endif$]
+[$ endif $]

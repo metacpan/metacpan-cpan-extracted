@@ -1,0 +1,12 @@
+Changes
+lib/EVDB/API.pm
+lib/EVDB/API/JSON.pm
+lib/EVDB/API/REST.pm
+lib/EVDB/API/YAML.pm
+Makefile.PL
+MANIFEST
+README
+t/01use.t
+t/02basic.t
+t/03flavor.t
+META.yml                                 Module meta-data (added by MakeMaker)

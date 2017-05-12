@@ -1,0 +1,9 @@
+Changes
+lib/Eidolon/Driver/Template/HTML.pm
+Makefile.PL
+MANIFEST
+README
+t/main.t
+t/pod.t
+t/pod_coverage.t
+META.yml                                 Module meta-data (added by MakeMaker)

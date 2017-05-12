@@ -1,0 +1,24 @@
+Release history for Email-FolderType-Net
+
+1.043     2013-08-08 20:35:28 America/New_York
+          avoid spewing warnings from (lc undef)
+
+1.042     2013-08-05 18:56:10 America/New_York
+          update bugtracker and repo
+
+1.04      2005-05-03
+
+          Fixed distribution broken by metadata-aware tar on Mac OS X 10.4.
+
+1.03      2005-05-02
+
+          Updated to work with Pluggable Email::FolderType
+
+1.02      2004-08-14
+
+          Spell check
+          Prereq list was broken.
+
+1.01      2004-08-07
+
+          Initial version

@@ -1,0 +1,17 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+README.md
+XS.xs
+dist.ini
+lib/Encoding/FixLatin/XS.pm
+ppport.h
+t/00-basics.t
+t/10-fix_latin.t
+t/20-bytes_only.t
+t/release-pod-syntax.t
+xt/01-leak.t

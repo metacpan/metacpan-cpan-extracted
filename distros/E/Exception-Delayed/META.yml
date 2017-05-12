@@ -1,0 +1,26 @@
+---
+abstract: 'Execute code and throw exceptions later'
+author:
+  - 'David Zurborg <zurborg@cpan.org>'
+build_requires:
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.143240'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Exception-Delayed
+requires:
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/zurborg/libexception-delayed-perl/issues
+  homepage: https://github.com/zurborg/libexception-delayed-perl
+  repository: https://github.com/zurborg/libexception-delayed-perl.git
+version: '0.002'

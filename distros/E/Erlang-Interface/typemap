@@ -1,0 +1,4 @@
+TYPEMAP
+ETERM*	T_PTR
+ErlMessage*	T_PTR
+ErlConnect* T_PTR

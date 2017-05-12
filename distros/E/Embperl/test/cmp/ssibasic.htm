@@ -1,0 +1,92 @@
+<html>
+
+<head>
+<title>Embperl Tests - SSI Tags</title>
+</head>
+
+<body>
+
+<!-- Normal Comment -->
+
+
+
+EPSSITEST 1: 1
+
+
+
+EPSSITEST 2: 1+1
+
+
+
+EPSSITEST 3: 1+1+1
+
+
+
+EPSSITEST 4: 1+1+1 + 1
+
+
+
+EPSSITEST 5: 1+1+1 + 1 + 1
+
+
+
+EPSSITEST 6: 1+1+1 + 1 + 1 + 1
+
+
+^DATE_GMT:		 ... ... \d+ \d+:\d+:\d+ 2\d+
+^DATE_LOCAL:		 ... ... \d+ \d+:\d+:\d+ 2\d+
+^DOCUMENT_NAME:	 ssibasic.htm
+^DOCUMENT_URI:	 
+^LAST_MODIFIED:	 ... ... \d+ \d+:\d+:\d+ 2\d+
+
+
+sizefmt=bytes
+
+
+^fsize self: (2232|2121)
+^fsize file ssiinc.htm (22|21)
+^fsize virtual ssiinc.htm (22|21)
+
+^flastmod self: ... ... \d+ \d+:\d+:\d+ 2\d+
+^flastmod file ssiinc.htm ... ... \d+ \d+:\d+:\d+ 2\d+
+^flastmod virtual ssiinc.htm ... ... \d+ \d+:\d+:\d+ 2\d+
+
+sizefmt=abbrev
+
+
+
+fsize self:    2k
+fsize file ssiinc.htm    1k
+fsize virtual ssiinc.htm    1k
+^flastmod self: \d+:\d+:\d+ 2\d+
+^flastmod file ssiinc.htm \d+:\d+:\d+ 2\d+
+^flastmod virtual ssiinc.htm \d+:\d+:\d+ 2\d+
+
+--INCLUDE-->
+
+< Some inc for SSI >
+
+
+<--INCLUDE--
+
+
+if 1
+1
+if 2
+EPSSITEST
+if 3
+! NOT EPSSITEST
+if 4
+1
+Some Embperl command that should _not_ executed here:
+
+[- hallo -] [+ foo +]
+
+
+</body>
+</html>
+
+
+
+
+

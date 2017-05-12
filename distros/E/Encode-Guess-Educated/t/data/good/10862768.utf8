@@ -1,0 +1,1370 @@
+   [1]The Journal of Biological Chemistry
+
+   [2]Skip to main page content
+     * [3]Home
+     * [4]Current issue
+     * [5]Archive
+     * [6]Papers in Press
+     * [7]Minireviews
+     * [8]Classics
+     * [9]Reflections
+     * [10]Papers of the Week
+
+   QUICK SEARCHAuthor: _________Keyword: ________________Year: ____Vol:
+   ____Page: ____ GO Go[11][Advanced Search][12][Browse the Archive]
+     * Institution: Univ Colorado - Denison Memorial Library
+     * [13]Sign In
+
+   Advertisement
+   Advertisement
+     * [14]2009 ASBMB Annual Meeting Lectures: Watch Video!
+
+ §1§ Structural Basis for the Feedback Regulation of Escherichia coli
+Pantothenate Kinase by Coenzyme A[15]* §1§
+
+    1. [16]Mikyung Yun[17]‡,
+    2. [18]Cheon-Gil Park[19]‡,
+    3. [20]Ji-Yeon Kim[21]‡,
+    4. [22]Charles O. Rock[23]§[24]¶,
+    5. [25]Suzanne Jackowski[26]§[27]¶ and
+    6. [28]Hee-Won Park[29]‡[30]‖
+
+    1.
+
+
+    From the Departments of ^‡Structural Biology and ^§Biochemistry, St.
+    Jude Children's Research Hospital, Memphis, Tennessee 38105 and the
+    ^¶Department of Biochemistry, University of Tennessee, Memphis,
+    Tennessee 38163
+
+
+   [31]Next Section
+
+ §2§ Abstract §2§
+
+   Pantothenate kinase (PanK) is a key regulatory enzyme in the coenzyme A
+   (CoA) biosynthetic pathway and catalyzes the phosphorylation of
+   pantothenic acid to form phosphopantothenate. CoA is a feedback
+   inhibitor of PanK activity by competitive binding to the ATP site. The
+   structures of the Escherichia coli enzyme, in complex with a
+   nonhydrolyzable analogue of ATP, 5′-adenylimido-diphosphate (AMPPNP),
+   or with CoA, were determined at 2.6 and 2.5 Å, respectively. Both
+   structures show that two dimers occupy an asymmetric unit; each subunit
+   has a α/β mononucleotide-binding fold with an extensive antiparallel
+   coiled coil formed by two long helices along the dimerization
+   interface. The two ligands, AMPPNP and CoA, associate with PanK in very
+   different ways, but their phosphate binding sites overlap, explaining
+   the kinetic competition between CoA and ATP. Residues Asp^127, His^177,
+   and Arg^243 are proposed to be involved in catalysis, based on modeling
+   of the pentacoordinate transition state. The more potent inhibition by
+   CoA, compared with the CoA thioesters, is explained by a tight
+   interaction of the CoA thiol group with the side chains of aromatic
+   residues, which is predicted to discriminate against the CoA
+   thioesters. The PanK structure provides the framework for a more
+   detailed understanding of the mechanism of catalysis and feedback
+   regulation of PanK.
+
+   CoA is the predominant acyl group carrier in biology and participates
+   in a wide variety of biochemical reactions including pyruvate
+   dehydrogenase, citrate synthase, α-ketoglutarate dehydrogenase, and the
+   synthesis and β-oxidation of fatty acids. The universal CoA
+   biosynthetic pathway consists of five enzymatic steps ([32]1,[33]2).
+   The first step produces 4′-phosphopantothenic acid by phosphorylation
+   of pantothenic acid. The subsequent formation of 4′-phosphopantetheine
+   is a two-step process in which 4′-phosphopantothenate and cysteine are
+   converted to 4′-phosphopantothenoyl-cysteine by formation of a peptide
+   linkage followed by decarboxylation of the cysteine. In the final two
+   steps, 4′-phosphopantetheine is adenylated to form dephospho-CoA, which
+   in turn is phosphorylated at the 3′ position of ribose to form CoA.
+
+   The first step of CoA biosynthesis catalyzed by pantothenate kinase
+   (PanK)^1 is a key regulatory point in CoA biosynthesis ([34]3-9).
+   Escherichia coli PanK (bPanK) is a homodimer of 36-kDa subunits, and
+   the amino acid sequence contains an A-type ATP-binding consensus
+   sequence, GXXXXGKS ([35]10, [36]11). bPanK exhibits highly positive
+   cooperative ATP binding and mediates a sequential ordered mechanism
+   with ATP as the leading substrate ([37]11). PanK activity is inhibited
+   by nonesterified CoA and to a lesser extent by its thioesters, which
+   competitively interfere with ATP binding ([38]4, [39]12). A detailed
+   mechanism of PanK inhibition by CoA is not known at the molecular
+   level. Interestingly, nonesterified CoA is the most potent inhibitor of
+   theE. coli enzyme ([40]4), whereas acetyl-CoA is a more effective
+   inhibitor of eukaryotic enzymes ([41]8, [42]9, [43]12).
+
+   Eukaryotic PanK cDNAs have recently been cloned, one fromAspergillus
+   ([44]12) and two from mouse ([45]13). ADrosophila PanK has been
+   identified as encoded by thefumble gene and may play a role in cell
+   division (GenBank^TM accession number [46]AF221546). Comparison of the
+   protein sequences predicted from these cDNAs with the bPanK amino acid
+   sequence points out strong dissimilarity between prokaryotic and
+   eukaryotic PanKs, although significant homology is found among the PanK
+   sequences within each class ([47]12). This observation suggests that
+   targeting the bacterial enzyme would be an effective therapeutic
+   strategy for development of new anti-infective agents. We investigated
+   the molecular basis for bPanK catalysis and regulation by determining
+   the structures of binary complexes of bPanK and AMPPNP, a
+   nonhydrolyzable analogue of ATP, and CoA.
+   [48]Previous Section[49]Next Section
+
+ §2§ EXPERIMENTAL PROCEDURES §2§
+
+ §5§ Protein Preparation §5§
+
+   The CoaA gene encoding bPanK ([50]10) was subcloned into pET21a
+   ([51]Novagen, Inc.) and transformed intoE. coli B834(DE3)pLysS
+   ([52]Novagen, Inc.). The E. coli cells harboring the pET21-bPanK
+   plasmid were grown in 4 liters of M9 minimal medium (6 g/liter
+   Na[2]HPO[4], 3 g/liter KH[2] PO[4], 0.5 g/liter NaCl, and 1 g/liter
+   NH[4] Cl) containing 0.4% glucose, 1 mm MgSO[4], 0.1 mmCaCl[2], 0.0005%
+   thiamine, amino acid mixture (0.5 g/liter of each amino acid), 50 μg/ml
+   of ampicillin, 34 μg/ml of chloramphenicol, and 0.1 g/liter of
+   methionine at 37 °C. When the culture reached an absorbance of 0.7–0.8
+   at 600 nm, the cells were harvested and washed with the M9 minimal
+   medium twice. The cells were resuspended in the M9 minimal medium
+   containing 40 mg/l of seleno-l -methionine (Sigma). After induction
+   with 0.4 mmisopropyl-1-thio-β-d-galactopyranoside, the cells were
+   allowed to grow for another 3 h to be harvested. The harvested cell
+   pellet was resuspended in 400 ml of disruption buffer (20 mm Tris-HCl,
+   pH 8.0, 1 mm dithiothreitol, 1 mm EDTA, and 1 mm phenylmethylsufonyl
+   fluoride) and lysed with sonication. The cell lysate was centrifuged at
+   14,000 × g for 30 min. The supernatant was purified by Q-Sepharose
+   anion exchange chromatography in which bPanK was eluted with an
+   increasing NaCl gradient. Eluted factions containing bPanK were pooled
+   and concentrated. The concentrated sample was then purified with a
+   S-200 Superdex gel filtration column for the fast protein liquid
+   chromatography system (Amersham Pharmacia Biotech). The elution buffer
+   was 20 mm Tris-HCl, pH 7.6, 200 mm NaCl, 1 mm dithiothreitol, and 1 mm
+   EDTA, and the flow rate was 60 ml/h. Fractions containing bPanK were
+   pooled and dialyzed at 4 °C for 15 h against dialysis buffer (20
+   mmTris-HCl, pH 8.0, 1 mm dithiothreitol, and 1 mmEDTA). The dialyzed
+   sample was concentrated to 20 mg/ml for crystallization trials.
+
+ §5§ Crystallization §5§
+
+   Co-crystals of selenomethionine bPanK and AMPPNP were grown by the
+   hanging drop vapor diffusion method. Before crystallization, AMPPNP was
+   added to the protein to a final concentration of 2 mm, and the mixture
+   was incubated overnight at 4 °C. The hanging drops containing the equal
+   volume of the protein and the reservoir solution were equilibrated at
+   4 °C against the reservoir solution (11% polyethylene glycol 8,000 and
+   0.1m HEPES, pH 7.5). The trigonal crystals appeared after several days,
+   which grew further for about 1 more week. These crystals were
+   transferred to a cryoprotectant solution containing 40% glycerol, 15%
+   polyethylene glycol 8,000, 2 mm dithiothreitol, 0.5 mm AMPPNP, 2.5 mm
+   MgCl[2], and 0.1m HEPES at pH 7.5 for cryo-data collection.
+
+   Crystals of bPanK in complex with CoA were grown at room temperature by
+   the hanging drop vapor diffusion method. To achieve the full occupancy
+   of bound CoA, bPanK was mixed with CoA at the final concentration of 2
+   mm, and the mixture was incubated for 24 h at 4 °C. Equal volumes of
+   protein solution and reservoir solution were combined. The reservoir
+   solution consisted of 10% polyethylene glycol 4,000, 50 mm Li[2]SO[4,]
+   2% isopropanol, and 0.1m N-[2-acetamido]-2-iminodiacetic acid at pH
+   6.5. Rod-like crystals appeared after 1 week and grew for another 2–3
+   weeks. These crystals were frozen using a cryoprotectant solution
+   containing 40% glycerol, 12% polyethylene glycol 4,000, 2.5 mm
+   dithiothreitol, 0.1 mm CoA, 2 mmMgCl[2], 50 mm Li[2]SO[4], and 0.1 m
+   N-[2-acetamido]-2-iminodiacetic acid at pH 6.5 for cryo-data
+   collection.
+
+ §5§ Data Collection and Structure Determination of AMPPNP-bound bPanK §5§
+
+   Multiwavelength anomalous dispersion data were measured from a single
+   crystal of the AMPPNP-bound bPanK at beamline X12C at the National
+   Synchrotron Light Source, equipped with a Q4 CCD detector (Brandeis)
+   operating at 100 K. Three wavelengths near the selenium absorption
+   edge, 0.95 Å (the remote), 0.9791 Å (the peak), and 0.9794 Å (the
+   inflection point), were chosen by measuring the x-ray absorption
+   spectrum of the protein crystal. The data set from each wavelength was
+   integrated, reduced, and scaled by the programs DENZO and SCAPEPACK
+   ([53]14). The crystals of the AMPPNP-bound enzyme belong to space group
+   P3[2]21 with unit cell dimensions ofa = 130.1 Å and c = 281.8 Å.
+
+   The program SOLVE ([54]15) was used to scale three wavelength data sets
+   together, to locate selenium positions and to calculate the
+   multiwavelength anomalous dispersion phases. The statistics of data
+   collection and phasing are summarized in Table[55]I. The initial
+   electron density map calculated at 3.0 Å resolution was improved by the
+   noncrystallographic symmetry averaging method using the program DM (the
+   CCP4 suite) ([56]16). The atomic model was built using the graphics
+   programs O ([57]17) and XtalView ([58]18), followed by crystallographic
+   refinement in the program XPLOR ([59]19). The refinement steps included
+   rigid body, simulated annealing, conjugate gradient minimization, and
+   individual B-factor refinement. A solvent mask was calculated with the
+   bulk solvent correction routine in XPLOR ([60]19). During refinement,
+   NCS restraints were imposed on the main chain atoms. The final
+   structure contains four subunits of bPanK (6–316 residues in one
+   subunit and 8–316 residues in the other three subunits). The refinement
+   statistics are shown in Table[61]II.
+   View this table:
+     * [62]In this window
+     * [63]In a new window
+
+   Table I
+
+   Data collection and phasing statistics
+   View this table:
+     * [64]In this window
+     * [65]In a new window
+
+   Table II
+
+   Refinement statistics
+
+ §5§ Data Collection and Structure Determination of CoA-bound bPanK §5§
+
+   Complete diffraction data from a single crystal of the CoA-bound bPanK
+   were also measured at beamline X12C at the National Synchrotron Light
+   Source. The programs DENZO and SCALEPACK ([66]14) were used to
+   integrate and scale the data set. The crystals of the CoA-bound enzyme
+   belong to space group P1 with unit cell dimensions ofa = 62.0 Å, b =
+   71.2 Å,c = 87.7 Å, α = 102.4°, β = 89.5°, and γ = 93.2°. The data
+   collection statistics are summarized in Table [67]I.
+
+   The structure of the CoA-bound bPanK was determined by the molecular
+   replacement method using one subunit of the AMPPNP-bound enzyme as a
+   search model. The cross-rotation and translation functions and
+   Patterson correlation refinement were calculated using the program
+   XPLOR ([68]19). Using the data between 15.0 and 4.0 Å, the rotation
+   function, followed by Patterson correlation refinement, gave four
+   outstanding solutions that correspond to four subunits of bPanK.
+   Because any point can be taken as an origin in space group P1, rotation
+   of the initial search model according to one of the four rotation
+   function solutions determined the orientation and position of the first
+   subunit. With fixing this orientation and position of the first
+   subunit, the orientations of the other three subunits were determined
+   by applying the corresponding noncrystallographic symmetry operations
+   to the first subunit. The positions of the other three subunits were
+   then determined by finding the relative x, y, andz translations of each
+   of the three subunits with respect to the first subunit. The model
+   including all four subunits was subjected to rigid body refinement at a
+   resolution between 6. 0 and 4. 0 Å in the program XPLOR ([69]19). The
+   high resolution limit, which restricted the maximum shift of structure
+   in the refinement, was set to 4. 0 Å resolution to provide a possible
+   large shift of the structure up to 4.0 Å. The low resolution limit was
+   set to 6.0 Å resolution below which the intensities of reflections were
+   severely affected by the diffraction of solvent molecules in the
+   crystal. The Rfactor at this stage was high (51.0%), suggesting that
+   the conformation of the CoA-bound structure was different from that of
+   the search model, the AMPPNP-bound structure. To consider the solvent
+   contribution to the intensities of reflections at low resolution, the
+   structure factor amplitudes of solvent molecules in the crystal were
+   calculated using the bulk solvent correction routine in XPLOR ([70]19),
+   and thus the low resolution limit could be extended to 50.0 Å
+   resolution. Crystallographic refinement including simulated annealing,
+   conjugate gradient minimization, and individual B-factor refinement was
+   then performed at the resolution between 50.0 and 2.5 Å. After the
+   first round of refinement, the quality of the structure was
+   dramatically improved with a working R factor of 27.4% and a freeR
+   factor of 30.1%. The F [o] −F [c] difference map showed continuous
+   density for CoA, verifying the correct molecular replacement solution.
+   Several iterations of model building in the program O ([71]17) and the
+   refinement in the program XPLOR ([72]19) further dropped both R
+   factors. The final refinement statistics are shown in Table [73]II.
+   Because of the slight difference between four subunits,
+   noncrystallographic symmetry restraints were applied to only 89% of
+   total residues of each subunit. In the final model, residues 1–5 in
+   subunit 1; residues 1–7 and 211–212 in subunit 2; residues 1–5 and
+   210–213 in subunit 3; and residues 1–7, 83–85, and 212–214 in subunit 4
+   are excluded because they are disordered in the crystal.
+   [74]Previous Section[75]Next Section
+
+ §2§ RESULTS §2§
+
+ §5§ Monomer Structure §5§
+
+   In the structures of the AMPPNP-bound and the CoA-bound bPanKs, four
+   identical subunits are found in an asymmetric unit. When the four
+   subunits occupying an asymmetric unit of each structure are compared,
+   the average RMSD of Cα atoms for the AMPPNP-bound and the CoA-bound
+   enzymes are 0.46 and 0.34 Å, respectively. These values are consistent
+   with estimated errors in their atomic coordinates. A subunit of bPanK
+   adopts a mononucleotide-binding fold ([76]20): a seven-stranded β-sheet
+   (strands, 2, 3, and 8–11) is flanked by α-helices (D and E on one side
+   and G and J on the other side) (Fig.[77]1). An intervening loop between
+   strand 2 and helix E, known as the P-loop, contains most of the
+   residues that interact with phosphate oxygens of the AMPPNP. There are
+   four small antiparallel β-strands (strands 4–7) that are not part of
+   the main β-sheet (Fig. [78]1 a). Residues from helices H and I
+   including their intervening loop are involved in binding CoA (Fig.[79]1
+   a). The N-terminal region including strand 1, helices A and D, and a
+   loop between helices A and B forms the major part of the dimer
+   interface (Fig. [80]1 a).
+   [81]Figure 1
+   View larger version:
+     * [82]In this window
+     * [83]In a new window
+
+     * [84]Download as PowerPoint Slide
+
+   Figure 1
+
+   A subunit structure of the AMPPNP-bound bPanK. a, schematic
+   representation. Helices are shown in red, strands are in yellow, and
+   other secondary structural elements are in green. The N-terminal region
+   involved in dimerization is shown in blue. AMPPNP (ball-and-stick
+   representation) is shown in yellow. Figs.[85]1 a, [86]2, [87]3 b, [88]4
+   b, and [89]5 were prepared using InsightII (Molecular Simulations). b,
+   topology representation. Cylinders and arrows represent α-helices and
+   β-strands, respectively. c, the sequence alignment of bPanK with
+   prokaryotic PanKs fromStreptococcus pyogenes, Enterococcus
+   faecalis,Pasturella multocida, Hemeophilus influlenzae,Actinobacillus
+   actinomycetemocomitans, Salmonella typhi, Klebsiella pneumoniae,
+   Yersinia pestis, Vibrio cholerae, Mycobacterium tuberculosis,
+   Corynebacterium diptheriae, andStreptomyces coelicolor. The sequence
+   numbering and secondary structure assignment is according to the bPanK
+   sequence. Amino acid residues identical in 12 of 13 sequences are shown
+   inred. Residues implicated in catalysis are marked withasterisks, and
+   Lys^101 involved in binding of ATP and CoA is marked with a triangle.
+
+   The Dali server ([90]21) was used to search for known proteins
+   structurally similar to bPanK. Applied to one subunit of bPanK, the
+   best matches occurred with proteins containing a mononucleotide binding
+   fold,i.e. phosphoribulokinase from Rhodobacter sphaeroides (Protein
+   Data Bank code [91]1a7j, RMSD 1.9 Å, 185 residues),
+   6-phosphofructo-2-kinase/fructose-2,6-bisphosphatase from rat (Protein
+   Data Bank code [92]1bif, RMSD 1.7 Å, 96 residues), and adenylate kinase
+   from Bacillus stearothermophilus (Protein Data Bank code [93]1zin, RMSD
+   2.1 Å, 110 residues). In light of the wide distribution of the
+   mononucleotide binding fold, these findings are not surprising.
+   However, the remarkable similarity of bPanK to R. sphaeroides
+   phosphoribulokinase is unexpected because their sequence homology is
+   limited to the P loop. Phosphoribulokinase catalyzes the ATP-dependent
+   phosphorylation of ribulose 5-phosphate to ribulose 1,5-bisphosphate in
+   the Calvin cycle ([94]22).
+
+ §5§ Dimer Structure §5§
+
+   Four subunits found in an asymmetric unit of the AMPPNP-bound enzyme
+   are assembled to form two dimers, consistent with the fact that bPanK
+   functions as a dimer in solution ([95]11). The dimerization interface
+   occurs between two long α-helices from each of the subunits that form
+   an extensive antiparallel coiled coil (Fig.[96]2 a). The interface
+   contact including this coiled coil buries 4118 Å^2 of accessible
+   surface area of each subunit. The physical makeup of the interface
+   contact is slightly hydrophobic: 57% of nonpolar and 43% of
+   polar/charged residues. By comparison, the dimer-dimer interface is not
+   extensive. About 1790 Å^2 of the accessible surface area of each dimer
+   is buried. Most of the residues involved in this contact are
+   predominantly hydrophilic: 27% nonpolar and 73% polar/charged residues.
+   [97]Figure 2
+   View larger version:
+     * [98]In this window
+     * [99]In a new window
+
+     * [100]Download as PowerPoint Slide
+
+   Figure 2
+
+   A comparison of the dimer structures of the AMPPNP-bound bPanK (a) and
+   of the CoA-bound bPanK (b). The dimer is viewed down the
+   noncrystallographic two-fold axis. AMPPNP and CoA (ball-and-stick
+   representation) are shown in yellow and cyan, respectively. c, a
+   space-filling diagram showing the superposition of one subunit of the
+   CoA-bound enzyme onto that of the AMPPNP-bound enzyme. Both subunits of
+   the AMPPNP-bound enzyme including helix D are shown in gray. The
+   superimposed subunit of the CoA-bound enzyme is not shown, whereas the
+   other subunit is shown inblue and its helix D is shown in red. Helical
+   axes are indicated by solid lines.
+
+   There are also two dimers in the asymmetric unit of the CoA-bound
+   bPanK. However, the dimerization interface of the CoA-bound enzyme is
+   not identical to that of the AMPPNP-bound enzyme resulting in a
+   conformational change. The dimerization interface, depicted parallel to
+   helix D of both subunits, shows a helical break where a couple of turns
+   of helix D of one subunit, involving residues 68–73, are unwound (Fig.
+   [101]2 b). This helical break is observed in both dimers. Consequently,
+   the last two turns of helix D of the first subunit are shifted closer
+   to helix D of the second subunit. This shift disturbs the dimerization
+   interface to bring about an 18° rotation of the second subunit with
+   respect to the first subunit, resulting in movement of the second
+   subunit of as much as 15 Å (Fig.[102]2 c). The altered interface
+   contact buries 3004 Å^2 of accessible surface area of each subunit. The
+   two dimers also interact by burying of 2174 Å^2 of each dimer surface.
+
+ §5§ ATP-binding Site §5§
+
+   The electron density of AMPPNP is clearly defined in both dimers
+   occupying an asymmetric unit of the AMPPNP-bound bPanK (Fig. [103]3 a).
+   AMPPNP is bound in a groove formed by residues from the P-loop, the
+   connecting loop of helices B and C, and the connecting loop of strands
+   10 and 11. AMPPNP with residues lining the binding site are shown in
+   Fig.[104]3 b. The adenine base is sandwiched by the side chains of
+   Asn^43 and His^307, the latter side chain further interacting with the
+   side chain of Trp^239. The N6 nitrogen of the adenine base interacts
+   via water-mediated hydrogen bonds with the hydroxyl groups of Tyr^55
+   and Thr^104 and the amino group of Lys^303, whereas its N1 nitrogen
+   forms a water-mediated hydrogen bond to the amide nitrogen of Ser^47.
+   The ribose is hydrogen-bonded to the carboxyl group of Asp^45. The
+   α-phosphate interacts with the hydroxyl group and the amide nitrogen of
+   Thr^103. The β- and γ-phosphates interact with the amino group of
+   Lys^101 and the β-phosphate interacts with the amide nitrogens of
+   Gly^100, Lys^101, and Ser^102, whereas the γ-phosphate interacts with
+   the amide nitrogen of Ala^98 and the guanidinium group of Arg^243. A
+   magnesium ion is coordinated by β- and γ-phosphates on one side and the
+   carboxyl group of Glu^199 and the hydroxyl group of Ser^102 on the
+   other side.
+   [105]Figure 3
+   View larger version:
+     * [106]In this window
+     * [107]In a new window
+
+     * [108]Download as PowerPoint Slide
+
+   Figure 3
+
+   Stereoview of AMPPNP binding. a, the F [o] −F [c] simulated annealing
+   omit map of the ATP binding site of one subunit showing the bound
+   AMPPNP. The map was calculated from 50.0 to 2.6 Å resolution and
+   contoured at 3.0 ς. Figs. [109]3 A and [110]4 A were prepared using
+   XtalView ([111]18). b, hydrogen bonds are indicated by solid lines.
+   Carbons are shown in yellow for AMPPNP andgray for bPanK. Nitrogens are
+   shown in blue, oxygens are in red, phosphorus is in green, and Mg^2+ is
+   in cyan. Asn^43 involved in ATP recognition by stacking interaction
+   with the adenine base of AMPPNP is not labeled for clarity.
+
+ §5§ CoA-binding Site §5§
+
+   The well defined electron density for CoA is seen in both dimers
+   occupying the asymmetric unit of the CoA-bound bPanK (Fig. [112]4 a).
+   CoA is bound in the enzyme in a bent conformation in a deep pocket
+   lined by residues from helix H, the P loop, the connecting loop of
+   strands 5 and 6 and the connecting loop of helices H and I (Fig. [113]4
+   b). Because CoA is a competitive inhibitor with respect to ATP and
+   these two ligands share the ADP moiety, it was suggested that both
+   ligands bind to the same site ([114]4, [115]11). Unexpectedly, the
+   adenine base of CoA is inserted between the side chains of His^177 and
+   Phe^247, whereas the adenine-interacting residues in the AMPPNP-bound
+   enzyme are Asn^43 and His^307 (Fig.[116]4 b). The α-phosphate of CoA is
+   salt bridged to the guanidinium group of Arg^243 and the amino group of
+   Lys^101 that also interacts with the β-phosphate of CoA (Fig. [117]4
+   b). The 3′-phosphate of CoA is hydrogen-bonded to the amide nitrogen of
+   Ile^42 and the hydroxyl group of Ser^102 and salt bridged to the
+   guanidinium group of Arg^106 (Fig. [118]4 b). These interactions of the
+   3′-phosphate group may be essential for the inhibitory effect of CoA
+   because dephospho-CoA is a significantly less potent inhibitor of bPanK
+   activity ([119]4). By comparison, the same 3′-phosphate group in
+   several CoA-binding proteins shows no interaction with the protein and
+   is exposed to solvent (for review see Ref. [120]23). The exceptions are
+   acyl-CoA binding protein ([121]24) and the surfactin synthetase
+   activating enzyme Sfp ([122]25), in which the 3′-phosphate interacts
+   with the protein residues such as His and Lys.
+   [123]Figure 4
+   View larger version:
+     * [124]In this window
+     * [125]In a new window
+
+     * [126]Download as PowerPoint Slide
+
+   Figure 4
+
+   Stereoview of coenzyme A binding. a, the F [o] −F [c] simulated
+   annealing omit map of the CoA binding site of one subunit showing the
+   bound CoA. The map was calculated from 50.0 to 2.5 Å resolution and
+   contoured at 3.0 ς.b, hydrogen bonds are indicated by solid lines. The
+   thiol group of coenzyme A is shown in light green, and other atom
+   colors are as described in the legend to Fig.[127]3 b. His^177 involved
+   in CoA recognition by stacking interaction with the adenine base and
+   Asn^282forming a hydrogen-bond with the β-mercaptoethylamine moiety are
+   not labeled for clarity.
+
+   Hydrophobic atoms of the pantothenate moiety of CoA form van der Waals'
+   contacts with residues Leu^130, Tyr^175, and Ile^281 (Fig. [128]4 b).
+   The carbonyl oxygen of the pantothenate moiety near the
+   β-mercaptoethylamine moiety is hydrogen bonded to the hydroxyl group of
+   Tyr^240 and to the amide group of Asn^282 (Fig. [129]4 b). The amide
+   nitrogen of the β-mercaptoethylamine moiety is hydrogen-bonded to the
+   hydroxyl group of Tyr^180 (Fig. [130]4 b). Strikingly, the thiol group
+   of the β-mercaptoethylamine moiety is tightly sealed from water
+   molecules by interacting with four aromatic residues, Phe^244, Phe^252,
+   Phe^259, and Tyr^262 and also by intra-molecular hydrogen bonding to
+   the amino group of the adenine base (Fig. [131]4 b). The thiol group
+   approaches the face of Phe^259 at the distance of 3.8 Å between the
+   sulfur atom and the ring centroid. The thiol group also approaches the
+   edges of Phe^244, Phe^252, and Tyr^262, and the distances between the
+   sulfur atom and the ring carbons of Phe^244, Phe^252, and Tyr^262 are
+   3.8, 3.5, and 4.1 Å, respectively. These sulfur-aromatic interactions
+   are weakly polar interactions ([132]26-30) that are stronger than van
+   der Waals' interactions between nonpolar atoms ([133]31). These types
+   of sulfur-aromatic interactions are involved in protein stability and
+   function ([134]31, [135]32). The structure of another regulatory enzyme
+   in the CoA biosynthetic pathway, phosphopantetheine
+   adenylyltransferase, exhibits a dinucleotide-binding fold ([136]33).
+   The C-terminal loops of five parallel β-strands bind the product
+   dephospho-CoA. As in the CoA-bound bPanK, the thiol group of
+   dephospho-CoA in phosphopantetheine adenylyltransferase is shielded
+   from water molecules by interacting with the side chains of hydrophobic
+   residues.
+
+ §5§ The Specific Binding of Coenzyme A Compared with AMPPNP §5§
+
+   Structural analysis of the AMPPNP-bound and the CoA-bound bPanKs
+   provides the basis for understanding the CoA inhibition compared with
+   the substrate ATP. Superimposed structures of the AMPPNP-bound and the
+   CoA-bound enzymes (an average RMSD of 1.48 Å) shows that both the α-
+   and β-phosphates of CoA and the β- and γ-phosphates of AMPPNP occupy
+   the same space and interact with the residue Lys^101 (Fig. [137]5).
+   This suggests that inhibition by CoA and its thioesters is achieved by
+   occluding ATP binding to Lys^101. Mutation of this residue abolishes
+   the binding of ATPγS, a nonhydrolyzable ATP analogue, as well as CoA to
+   bPanK ([138]11), supporting the involvement of Lys^101 in binding of
+   both ligands.
+   [139]Figure 5
+   View larger version:
+     * [140]In this window
+     * [141]In a new window
+
+     * [142]Download as PowerPoint Slide
+
+   Figure 5
+
+   Close-up stereoview of the overlapping site of two ligands, AMPPNP and
+   CoA. The binding pockets of AMPPNP and CoA are shown in yellow and
+   cyan, respectively. CoA (magenta) and AMPPNP (black) are shown inlines.
+   a, residues of the AMPPNP-bound enzyme are shown in brown, and residues
+   of the CoA-bound enzyme are not shown for clarity. Note that the
+   carboxyl group of Glu^249of the AMPPNP-bound enzyme coincides with the
+   pantetheine moiety of CoA. b, residues of the CoA-bound enzyme are
+   shown ingreen, and residues of the AMPPNP-bound enzyme are not shown
+   for clarity. Note that the carboxyl group of Glu^44 of the CoA-bound
+   enzyme coincides with the adenine base of AMPPNP.
+
+   A significant difference between the two structures is found at the
+   structural motif containing helix B and its flanking loops (Fig.
+   [143]5). Residues from this structural motif interact with the adenine
+   base of ATP in the AMPPNP-bound enzyme (Figs. [144]3 b and [145]5 a).
+   In the CoA-bound enzyme, the C-terminal flanking loop of helix B
+   including the residues 41–44 moves toward the binding pocket for the
+   adenine base of ATP, which is vacant because there is no bound ATP
+   (Fig. [146]5 b). This movement orients the carboxyl group of Glu^44
+   into the empty adenine-binding pocket (Fig.[147]5 b). Consequently, the
+   carboxyl group of Glu^44forms a salt bridge with the amino group of
+   Lys^303 and a hydrogen bond to the imidazole group of His^307
+   (Fig.[148]5 b). In the AMPPNP-bound enzyme, these two interacting
+   residues define part of the boundary of the adenine-binding pocket
+   (Fig. [149]3 b). The movement of the C-terminal flanking loop of helix
+   B also brings the amide nitrogen of Ile^42 within a hydrogen bonding
+   distance of the 3′-phosphate of CoA (Fig.[150]4 b).
+
+   Other differences between the two structures are found at the binding
+   pocket for the pantetheine moiety of CoA (Fig. [151]5). In the
+   AMPPNP-bound enzyme, Glu^249 is not a part of helix H, and its carboxyl
+   group occupies the pantetheine-binding pocket (Fig.[152]5 a). Upon
+   binding of CoA, the main chain of Glu^249 moves by 12.3 Å to become a
+   part of helix H (Fig.[153]5 b). Because of this movement, its carboxyl
+   group no longer occupies the pantetheine-binding pocket and is exposed
+   to solvent. Instead, the aromatic side chain of Phe^252 moves closer to
+   the pantetheine-binding pocket to interact with the thiol group of CoA
+   (Fig. [154]5 b).
+   [155]Previous Section[156]Next Section
+
+ §2§ DISCUSSION §2§
+
+   The structure of AMPPNP-bound bPanK illustrates the ATP binding site in
+   the enzyme and the specific interactions between the enzyme and ATP. We
+   predict that the reaction proceeds through deprotonation of the
+   hydroxyl group of pantothenate followed by its nucleophilic attack on
+   the γ-phosphate of ATP to produce the pentacoordinate transition state,
+   that breaks down to phosphopantothenate and ADP. This mechanism
+   requires a general base to activate the hydroxyl group of pantothenate.
+   There are two residues near the γ-phosphate of ATP that could
+   potentially act as the general base. ADP:vanadate mimics the
+   pentacoordinate transition state in ATP hydrolysis byDictyostelium
+   myosin ([157]34). We therefore superimposed the coordinates of
+   ADP-vanadate (Protein Data Bank code [158]1vom) onto the γ-phosphate
+   binding pocket of the AMPPNP-bound enzyme to gain insight into the
+   potential mechanism. The carboxyl side chain of Asp^127 is located 3.3
+   Å from the apical oxygen of the modeled vanadate. Because the position
+   of the apical oxygen approximates the hydroxyl group of the substrate
+   pantothenate during catalysis, this observation supports the
+   involvement of Asp^127 in the nucleophilic activation of the substrate
+   hydroxyl group. A mutagenesis study of the equivalent aspartate in
+   phosphoribulokinase, a structurally homologous protein ofR.
+   sphaeroides, demonstrates the importance of this aspartate residue in
+   catalysis ([159]35). The imidazole side chain of His^177 is located 5.0
+   Å from the apical oxygen of the modeled vanadate and is an alternative
+   choice as a general base. The average B-factor of the loop containing
+   H177 is 52.8 Å^ 2, whereas that of the entire protein is 43.4 Å^2,
+   indicating the flexibility of this loop and opening the possibility
+   that His^177 could move closer when pantothenate is bound to the
+   enzyme. Both candidate residues are completely conserved among the
+   known prokaryotic PanKs (Fig. [160]1 c).
+
+   Positively charged residues are important to stabilize the
+   pentacoordinate transition state of γ-phosphate in nucleotide
+   monophosphate kinases ([161]36-38), phosphosugar kinases ([162]39-41),
+   and G-proteins ([163]42). In the AMPPNP-bound bPanK, the side chain of
+   R243 neutralizes the negative charge on the γ-phosphate oxygen via a
+   salt bridge. The superposition of ADP:vanadate and the γ-phosphate
+   binding pocket of AMPPNP-bound enzyme illustrates that the guanidinium
+   group of Arg^243 could form a hydrogen bond with one of the equatorial
+   oxygens in the trigonal bipyramid of vanadate, suggesting that Arg^243
+   stabilizes the transition state of the γ-phosphate. The involvement of
+   Arg^243 in catalysis is further supported from a mutagenesis study that
+   changed the equivalent arginine in R. sphaeroides phosphoribulokinase,
+   resulting in a reduction of the enzymatic activity ([164]43). Arg^243
+   is also completely conserved among the known prokaryotic PanKs
+   (Fig.[165]1 c).
+
+   Our structures provide the framework for understanding the detailed
+   mechanism for the competitive inhibition of bPanK by CoA with respect
+   to ATP ([166]11). A surprising finding in this study is that ATP and
+   CoA bind to bPanK in very different orientations and that the adenine
+   moieties bind via a nonoverlapping set of residues. However, both
+   molecules do occupy a portion of the same space in the active site by
+   utilizing Lys^101 to neutralize the charge on their respective
+   phosphodiesters. This interaction explains the finding that the
+   bPanK[K101M] mutant is catalytically inactive and fails to bind both
+   ATP and CoA ([167]11). A comparison of the AMPPNP- and CoA-bPanK
+   structures identifies His^177, Phe^247, and Arg^106 as residues
+   involved in CoA recognition that are not required for ATP binding.
+   His^177 and Phe^247 are implicated in stacking interactions with the
+   adenine base of CoA, and Arg^106 forms a salt bridge with the
+   3′-phosphate of CoA (Fig. [168]4 b).
+
+   bPanK is more potently inhibited by nonesterified CoA than by its
+   thioesters including acetyl-, succinyl-, malonyl-, acetoacetyl-, and
+   palmitoyl-CoA ([169]4), suggesting that the enzyme distinguishes
+   various CoAs by the length of the acyl chain. In the CoA-bound enzyme,
+   the binding of the thiol group is associated with the side chains of
+   several aromatic residues by the weak electrostatic interactions that
+   block access of the thiol to solvent. More importantly, the tight fit
+   of the thiol group with surrounding aromatic residues allows only
+   nonesterified CoA to optimally bind. If acetyl-CoA is docked at the CoA
+   binding site, the sulfur atom of acetyl-CoA would still interact with
+   Phe^244, Phe^259, and Tyr^262. However, the interaction with Phe^252
+   would be no longer possible because of a bulky acetyl group. A
+   conformational change involving a rearrangement of the side chain of
+   Phe^252and/or a movement of the Phe^252-containing loop between helices
+   H and I would be required to accommodate the acetyl group. The same
+   steric hindrance principle can be applied to explain why the
+   inhibitions of other CoA thioesters containing even longer acyl groups
+   than acetyl-CoA are less effective than that of nonesterified CoA.
+
+   The complex of bPanK with AMPPNP provides a first look into the
+   structure and catalytic residues of bPanK, the first step in the CoA
+   biosynthetic pathway. Additionally, the specific complex with CoA
+   provides a structural model for feedback regulation that describes the
+   unique mechanism for the competitive inhibition of ATP binding by CoA.
+   Furthermore, these two structures will be valuable tools in the search
+   for novel anti-bactericides because PanK is an essential protein in
+   bacteria ([170]44) and bears no resemblance in primary sequence to the
+   mammalian enzyme ([171]13).
+   [172]Previous Section[173]Next Section
+
+ §2§ ACKNOWLEDGEMENTS §2§
+
+   We thank Drs. Robert Sweet and Anard Saxena for help and advice with
+   multiwavelength anomalous dispersion diffraction data collection on
+   beamline X12C. We also thank Drs. Stephen White and Allen Price for
+   help with data collection. We thank Brent Calder for excellent
+   technical assistance.
+   [174]Previous Section[175]Next Section
+
+ §2§ Footnotes §2§
+
+     * [176]↵* This work was supported in part by National Institutes of
+       Health Grants GM 45737 (to S. J.) and GM 34496 (to C. O. R.),
+       Cancer Center Support Grant P30 CA21765, and the American Lebanese
+       Syrian Associated Charities. Research was carried out in part at
+       the National Synchrotron Light Source, Brookhaven National
+       Laboratory, which is supported by the United States Department of
+       Energy, Division of Materials Sciences and Division of Chemical
+       Sciences.The costs of publication of this article were defrayed in
+       part by the payment of page charges. The article must therefore be
+       hereby marked “advertisement” in accordance with 18 U.S.C. Section
+       1734 solely to indicate this fact.
+       The atomic coordinates and the structure factors (code and ) have
+       been deposited in the Protein Data Bank, Research Collaboratory for
+       Structural Bioinformatics, Rutgers University, New Brunswick, NJ
+       ([177]http://www.rcsb.org/).
+     * [178]↵‖ To whom correspondence should be addressed: Dept. of
+       Structural Biology, St. Jude Children's Research Hospital, 332 N.
+       Lauderdale, Memphis, TN 38105. Tel.: 901-495-3838; Fax:
+       901-495-3032; E-mail: hee-won.park@stjude.org.
+     * Published, JBC Papers in Press, June 21, 2000, DOI
+       10.1074/jbc.M003190200
+     * Abbreviations:
+
+        PanK
+                pantothenate kinase
+
+        bPanK
+                E. coli PanK
+
+        AMPPNP
+                5′-adenylimido-diphosphate, lithium salt
+
+        RMSD
+                root mean square deviation
+
+        ATPγS
+                adenosine 5′-O-(thiotriphosphate)
+
+     *
+          + Received April 13, 2000.
+          + Revision received June 15, 2000.
+     * The American Society for Biochemistry and Molecular Biology, Inc.
+
+   [179]Previous Section
+
+ §2§ REFERENCES §2§
+
+    1. [180]↵
+         1. Abiko Y.
+       (1967) J. Biochem. ( Tokyo ) 61:290–299.
+    2. [181]↵
+         1. Neidhardt F. C.,
+         2. Curtiss R.,
+         3. Gross C. A.,
+         4. Ingraham J. L.,
+         5. Lin E. C. C.,
+         6. Low K. B.,
+         7. Mgasanik B.,
+         8. Reznikoff W.,
+         9. Riley M.,
+        10. Schaechter M.,
+        11. Umbarger H. E.
+         1. Jackowski S.
+       (1996) in Escherichia coli and Salmonella typhimurium: Cellular and
+       Molecular Biology, eds Neidhardt F. C., Curtiss R., Gross C. A.,
+       Ingraham J. L., Lin E. C. C., Low K. B., Mgasanik B., Reznikoff W.,
+       Riley M., Schaechter M., Umbarger H. E. (American Society of
+       Microbiology, Washington, D.C.) pp 687–694.
+    3. [182]↵
+         1. Jackowski S.,
+         2. Rock C. O.
+       (1981) J. Bacteriol. 148:926–932.
+    4. [183]↵
+         1. Vallari D. S.,
+         2. Jackowski S.,
+         3. Rock C. O.
+       (1987) J. Biol. Chem. 262:2468–2471.
+    5. [184]↵
+         1. Karasawa T.,
+         2. Yoshida K.,
+         3. Furukawa K.,
+         4. Hosoki K.
+       (1972) J. Biochem. ( Tokyo ) 71:1065–1067.
+    6. [185]↵
+         1. Robishaw J. D.,
+         2. Neely J. R.
+       (1984) Am. J. Physiol. 246:H532–H541.
+    7. [186]↵
+         1. Fisher M. N.,
+         2. Neely J. R.
+       (1985) FEBS Lett. 190:293–296.
+    8. [187]↵
+         1. Fisher M. N.,
+         2. Robishaw J. D.,
+         3. Neely J. R.
+       (1985) J. Biol. Chem. 260:15745–15751.
+    9. [188]↵
+         1. Halvorsen O.,
+         2. Skrede S.
+       (1982) Eur. J. Biochem. 124:211–215.
+   10. [189]↵
+         1. Song W. J.,
+         2. Jackowski S.
+       (1992) J. Bacteriol. 174:6411–6417.
+   11. [190]↵
+         1. Song W. J.,
+         2. Jackowski S.
+       (1994) J. Biol. Chem. 269:27051–27058.
+   12. [191]↵
+         1. Calder R. B.,
+         2. Williams R. S.,
+         3. Ramaswamy G.,
+         4. Rock C. O.,
+         5. Campbell E.,
+         6. Unkles S. E.,
+         7. Kinghorn J. R.,
+         8. Jackowski S.
+       (1999) J. Biol. Chem. 274:2014–2020.
+   13. [192]↵
+         1. Rock C. O.,
+         2. Calder R. B.,
+         3. Karim M. A.,
+         4. Jackowski S.
+       (2000) J. Biol. Chem. 275:1377–1383.
+   14. [193]↵
+         1. Otwinowski Z.,
+         2. Minor W.
+       (1997) Methods Enzymol. 276A:307–326.
+   15. [194]↵
+         1. Terwilliger T.,
+         2. Berendzen J.
+       (1999) Acta Crystallogr. Sect. D Biol. Crystallogr. 55:501–505.
+   16. [195]↵
+         1. Collaborative Computational Project Number 4
+       (1994) Acta Crystallogr. Sect. D Biol. Crystallogr. 50:760–763.
+   17. [196]↵
+         1. Jones T. A.,
+         2. Zou J. Y.,
+         3. Cowan S. W.,
+         4. Kjeldgaard M.
+       (1991) Acta Crystallogr. Sect. A 47:110–119.
+   18. [197]↵
+         1. McRee D. E.
+       (1998) XtalView (3.2.1) (The Scripps Research Institute, La Jolla,
+       CA).
+   19. [198]↵
+         1. Brünger A. T.
+       (1992) X-PLOR , , version 3.1 (Yale University Press, New Haven,
+       CT).
+   20. [199]↵
+         1. Schulz G. E.
+       (1992) Curr. Biol. 2:61–67.
+   21. [200]↵
+         1. Holm L.,
+         2. Sander C.
+       (1997) Nucleic Acids Res. 25:231–234.
+   22. [201]↵
+         1. Wolosiuk R. A.,
+         2. Ballicora M. A.,
+         3. Hagelin K.
+       (1993) FASEB J. 7:622–637.
+   23. [202]↵
+         1. Engel C.,
+         2. Wierenga R.
+       (1996) Curr. Opin. Struct. Biol. 6:790–797.
+   24. [203]↵
+         1. Kragelund B. B.,
+         2. Andersen K. V.,
+         3. Madsen J. C.,
+         4. Knudsen J.,
+         5. Poulsen F. M.
+       (1993) J. Mol. Biol. 230:1260–1277.
+   25. [204]↵
+         1. Reuter K.,
+         2. Mofid M. R.,
+         3. Marahiel M. A.,
+         4. Ficner R.
+       (1999) EMBO J. 18:6823–6831.
+   26. [205]↵
+         1. Pal D.,
+         2. Chakrabarti P.
+       (1998) J. Biomol. Struct. Dyn. 15:1059–1072.
+   27. [206]↵
+         1. Blundell T.,
+         2. Lindley P.,
+         3. Miller L.,
+         4. Moss D.,
+         5. Slingsby C.,
+         6. Tickle I.,
+         7. Turnell,
+         8. Wistow G.
+       (1981) Nature 289:771–777.
+   28. [207]↵
+         1. Morgan R. S.,
+         2. McAdon J. M.
+       (1980) Int. J. Pept. Protein Res. 15:177–180.
+   29. [208]↵
+         1. Morgan R. S.,
+         2. Tatsch C. E.,
+         3. Gushard R. H.,
+         4. McAdon J.,
+         5. Warme P. K.
+       (1978) Int. J. Pept. Protein Res. 11:209–217.
+   30. [209]↵
+         1. Reid K. S. C.,
+         2. Lindley P. F.,
+         3. Thornton J. M.
+       (1985) FEBS Lett. 190:209–213.
+   31. [210]↵
+         1. Burley S. K.,
+         2. Petsko G. A.
+       (1988) Adv. Protein Chem. 39:125–189.
+   32. [211]↵
+         1. Summers L.,
+         2. Wistow G.,
+         3. Narebor M.,
+         4. Moss D.,
+         5. Lindley P.,
+         6. Slingsby C.,
+         7. Blundell T.,
+         8. Bartunik H.,
+         9. Bartels K.
+       (1984) Pept. Protein Rev. 3:147–168.
+   33. [212]↵
+         1. Izard T.,
+         2. Geerlof A.
+       (1999) EMBO J. 18:2021–2030.
+   34. [213]↵
+         1. Smith C. A.,
+         2. Rayment I.
+       (1996) Biochemistry 35:5404–5417.
+   35. [214]↵
+         1. Charlier H. A. J.,
+         2. Runquist J. A.,
+         3. Miziorko H. M.
+       (1994) Biochemistry 33:9343–9350.
+   36. [215]↵
+         1. Muller-Dieckmann H. J.,
+         2. Schulz G. E.
+       (1995) J. Mol. Biol. 246:522–530.
+   37. [216]↵
+         1. Schlauderer G. J.,
+         2. Schulz G. E.
+       (1996) Protein Sci. 5:434–441.
+   38. [217]↵
+         1. Stehle T.,
+         2. Schulz G. E.
+       (1992) J. Mol. Biol. 224:1127–1141.
+   39. [218]↵
+         1. Hasemann C. A.,
+         2. Istvan E. S.,
+         3. Uyeda K.,
+         4. Deisenhofer J.
+       (1996) Structure 4:1017–1029.
+   40. [219]↵
+         1. Harrison D. H.,
+         2. Runquist J. A.,
+         3. Holub A.,
+         4. Miziorko H. M.
+       (1998) Biochemistry 37:5074–5085.
+   41. [220]↵
+         1. Hellinga H. W.,
+         2. Evans P. R.
+       (1987) Nature 327:437–439.
+   42. [221]↵
+         1. Coleman D. E.,
+         2. Berghuis A. M.,
+         3. Lee E.,
+         4. Linder M. E.,
+         5. Gilman A. G.,
+         6. Sprang S. R.
+       (1994) Science 265:1405–1412.
+   43. [222]↵
+         1. Runquist J. A.,
+         2. Harrison D. H.,
+         3. Miziorko H. M.
+       (1998) Biochemistry 37:1221–1226.
+   44. [223]↵
+         1. Vallari D. S.,
+         2. Rock C. O.
+       (1987) J. Bacteriol. 169:5795–5800.
+
+     * [224]Add to CiteULike CiteULike
+     * [225]Add to Complore Complore
+     * [226]Add to Connotea Connotea
+     * [227]Add to Del.icio.us Del.icio.us
+     * [228]Add to Digg Digg
+
+   [229]What's this?
+   [230]« Previous | [231]Next Article »[232]Table of Contents
+
+ §3§ This Article §3§
+
+    1. First Published on June 21, 2000, doi: 10.1074/jbc.M003190200
+       September 8, 2000 The Journal of Biological Chemistry, 275,
+       28093-28099.
+
+    1. [233]AbstractFree
+    2. » Full TextFree
+    3. [234]Full Text (PDF)Free
+    4. All Versions of this Article:
+         1. [235]M003190200v1
+         2. 275/36/28093 most recent
+
+ §4§ Classifications §4§
+
+    1.
+          + [236]ENZYME CATALYSIS AND REGULATION
+
+ §4§ Services §4§
+
+    1. [237]Email this article to a friend
+    2. [238]Alert me when this article is cited
+    3. [239]Alert me if a correction is posted
+    4. [240]Alert me when eletters are published
+    5. [241]Similar articles in this journal
+    6. [242]Similar articles in Web of Science
+    7. [243]Similar articles in PubMed
+    8. [244]Download to citation manager
+    9. [245]Request Permissions
+
+ §4§ Responses §4§
+
+    1. [246]Submit a Letter to the Editor
+
+ §4§ Citing Articles §4§
+
+    1. [247]Load citing article information
+    2. [248]Citing articles via Web of Science
+    3. [249]Citing articles via Google Scholar
+
+ §4§ Google Scholar §4§
+
+    1. [250]Articles by Yun, M.
+    2. [251]Articles by Park, H.
+    3. [252]Search for related content
+
+ §4§ PubMed §4§
+
+    1. [253]PubMed citation
+    2. [254]Articles by Yun, M.
+    3. [255]Articles by Park, H.
+    4.
+
+ §4§ Related Content §4§
+
+    1. [256]Load related web page information
+
+ §4§ Social Bookmarking §4§
+
+    1.
+          + [257]Add to CiteULike CiteULike
+          + [258]Add to Complore Complore
+          + [259]Add to Connotea Connotea
+          + [260]Add to Del.icio.us Del.icio.us
+          + [261]Add to Digg Digg
+       [262]What's this?
+
+ §3§ Navigate This Article §3§
+
+    1. [263]Top
+    2. [264]Abstract
+    3. [265]EXPERIMENTAL PROCEDURES
+    4. [266]RESULTS
+    5. [267]DISCUSSION
+    6. [268]ACKNOWLEDGEMENTS
+    7. [269]Footnotes
+    8. [270]REFERENCES
+
+ §3§ This Week's Issue §3§
+
+    1. [271]September 24, 2010, 285 (39)
+
+    1. [272]Current Issue
+
+    1. [273]Alert me to new issues of JBC
+
+     * [274]Authors
+     * [275]Submit
+     * [276]Subscribers
+     * [277]Editorial Board
+     * [278]RSS and Email Alerts
+     * [279]Article Statistics
+     * [280]Teaching Tools
+     * [281]Copyright Permissions
+     * [282]Advertise
+     * [283]Contact JBC
+
+     * Advertisement
+     * Advertisement
+
+   Copyright © 2010 by [284]American Society for Biochemistry and
+   Molecular Biology
+
+   [285]Alternate route to the JBC: http://intl.jbc.org
+
+   [286]Contact JBC | [287]Help Pages
+     * [288]asbmb_today_logo
+     * [289]jlr_logo
+     * [290]mcp_logo
+
+     * Print ISSN 0021-9258
+     * Online ISSN 1083-351X
+
+   Advertisement
+   Advertisement
+     * [291]2009 ASBMB Annual Meeting Lectures: Watch Video!
+
+References
+
+   Visible links
+   1. http://www.jbc.org/
+   2. file://localhost/dev/paper.html#content-block
+   3. http://www.jbc.org/
+   4. http://www.jbc.org/content/current
+   5. http://www.jbc.org/content/by/year
+   6. http://www.jbc.org/content/early/recent/0
+   7. http://www.jbc.org/content/by/section/Minireviews
+   8. http://www.jbc.org/content/by/section/Classics
+   9. http://www.jbc.org/content/by/section/Reflections
+  10. http://www.jbc.org/potw
+  11. http://www.jbc.org/search
+  12. http://www.jbc.org/content/by/year
+  13. http://www.jbc.org/login?uri=http%3A%2F%2Fwww.jbc.org%2Fcontent%2F275%2F36%2F28093.long
+  14. http://www.jbc.org/cgi/adclick/?ad=21399&adclick=true&url=http%3A%2F%2Fwww.asbmb.org%2FPage.aspx%3Fid%3D2690
+  15. file://localhost/dev/paper.html#fn-5
+  16. http://www.jbc.org/search?author1=Mikyung+Yun&sortspec=date&submit=Submit
+  17. file://localhost/dev/paper.html#target-1
+  18. http://www.jbc.org/search?author1=Cheon-Gil+Park&sortspec=date&submit=Submit
+  19. file://localhost/dev/paper.html#target-1
+  20. http://www.jbc.org/search?author1=Ji-Yeon+Kim&sortspec=date&submit=Submit
+  21. file://localhost/dev/paper.html#target-1
+  22. http://www.jbc.org/search?author1=Charles+O.+Rock&sortspec=date&submit=Submit
+  23. file://localhost/dev/paper.html#target-2
+  24. file://localhost/dev/paper.html#target-3
+  25. http://www.jbc.org/search?author1=Suzanne+Jackowski&sortspec=date&submit=Submit
+  26. file://localhost/dev/paper.html#target-2
+  27. file://localhost/dev/paper.html#target-3
+  28. http://www.jbc.org/search?author1=Hee-Won+Park&sortspec=date&submit=Submit
+  29. file://localhost/dev/paper.html#target-1
+  30. file://localhost/dev/paper.html#fn-6
+  31. file://localhost/dev/paper.html#sec-1
+  32. file://localhost/dev/paper.html#ref-1
+  33. file://localhost/dev/paper.html#ref-2
+  34. file://localhost/dev/paper.html#ref-3
+  35. file://localhost/dev/paper.html#ref-10
+  36. file://localhost/dev/paper.html#ref-11
+  37. file://localhost/dev/paper.html#ref-11
+  38. file://localhost/dev/paper.html#ref-4
+  39. file://localhost/dev/paper.html#ref-12
+  40. file://localhost/dev/paper.html#ref-4
+  41. file://localhost/dev/paper.html#ref-8
+  42. file://localhost/dev/paper.html#ref-9
+  43. file://localhost/dev/paper.html#ref-12
+  44. file://localhost/dev/paper.html#ref-12
+  45. file://localhost/dev/paper.html#ref-13
+  46. http://www.jbc.org/external-ref?link_type=GEN&access_num=AF221546
+  47. file://localhost/dev/paper.html#ref-12
+  48. file://localhost/dev/paper.html#abstract-1
+  49. file://localhost/dev/paper.html#sec-8
+  50. file://localhost/dev/paper.html#ref-10
+  51. http://www.jbc.org/cgi/redirect-inline?ad=Novagen
+  52. http://www.jbc.org/cgi/redirect-inline?ad=Novagen
+  53. file://localhost/dev/paper.html#ref-14
+  54. file://localhost/dev/paper.html#ref-15
+  55. file://localhost/dev/paper.html#T1
+  56. file://localhost/dev/paper.html#ref-16
+  57. file://localhost/dev/paper.html#ref-17
+  58. file://localhost/dev/paper.html#ref-18
+  59. file://localhost/dev/paper.html#ref-19
+  60. file://localhost/dev/paper.html#ref-19
+  61. file://localhost/dev/paper.html#T2
+  62. http://www.jbc.org/content/275/36/28093/T1.expansion.html
+  63. http://www.jbc.org/content/275/36/28093/T1.expansion.html
+  64. http://www.jbc.org/content/275/36/28093/T2.expansion.html
+  65. http://www.jbc.org/content/275/36/28093/T2.expansion.html
+  66. file://localhost/dev/paper.html#ref-14
+  67. file://localhost/dev/paper.html#T1
+  68. file://localhost/dev/paper.html#ref-19
+  69. file://localhost/dev/paper.html#ref-19
+  70. file://localhost/dev/paper.html#ref-19
+  71. file://localhost/dev/paper.html#ref-17
+  72. file://localhost/dev/paper.html#ref-19
+  73. file://localhost/dev/paper.html#T2
+  74. file://localhost/dev/paper.html#sec-1
+  75. file://localhost/dev/paper.html#sec-16
+  76. file://localhost/dev/paper.html#ref-20
+  77. file://localhost/dev/paper.html#F1
+  78. file://localhost/dev/paper.html#F1
+  79. file://localhost/dev/paper.html#F1
+  80. file://localhost/dev/paper.html#F1
+  81. http://www.jbc.org/content/275/36/28093/F1.expansion.html
+  82. http://www.jbc.org/content/275/36/28093/F1.expansion.html
+  83. http://www.jbc.org/content/275/36/28093/F1.expansion.html
+  84. http://www.jbc.org/powerpoint/275/36/28093/F1
+  85. file://localhost/dev/paper.html#F1
+  86. file://localhost/dev/paper.html#F2
+  87. file://localhost/dev/paper.html#F3
+  88. file://localhost/dev/paper.html#F4
+  89. file://localhost/dev/paper.html#F5
+  90. file://localhost/dev/paper.html#ref-21
+  91. http://www.jbc.org/external-ref?link_type=PDB&access_num=1a7j
+  92. http://www.jbc.org/external-ref?link_type=PDB&access_num=1bif
+  93. http://www.jbc.org/external-ref?link_type=PDB&access_num=1zin
+  94. file://localhost/dev/paper.html#ref-22
+  95. file://localhost/dev/paper.html#ref-11
+  96. file://localhost/dev/paper.html#F2
+  97. http://www.jbc.org/content/275/36/28093/F2.expansion.html
+  98. http://www.jbc.org/content/275/36/28093/F2.expansion.html
+  99. http://www.jbc.org/content/275/36/28093/F2.expansion.html
+ 100. http://www.jbc.org/powerpoint/275/36/28093/F2
+ 101. file://localhost/dev/paper.html#F2
+ 102. file://localhost/dev/paper.html#F2
+ 103. file://localhost/dev/paper.html#F3
+ 104. file://localhost/dev/paper.html#F3
+ 105. http://www.jbc.org/content/275/36/28093/F3.expansion.html
+ 106. http://www.jbc.org/content/275/36/28093/F3.expansion.html
+ 107. http://www.jbc.org/content/275/36/28093/F3.expansion.html
+ 108. http://www.jbc.org/powerpoint/275/36/28093/F3
+ 109. file://localhost/dev/paper.html#F3
+ 110. file://localhost/dev/paper.html#F4
+ 111. file://localhost/dev/paper.html#ref-18
+ 112. file://localhost/dev/paper.html#F4
+ 113. file://localhost/dev/paper.html#F4
+ 114. file://localhost/dev/paper.html#ref-4
+ 115. file://localhost/dev/paper.html#ref-11
+ 116. file://localhost/dev/paper.html#F4
+ 117. file://localhost/dev/paper.html#F4
+ 118. file://localhost/dev/paper.html#F4
+ 119. file://localhost/dev/paper.html#ref-4
+ 120. file://localhost/dev/paper.html#ref-23
+ 121. file://localhost/dev/paper.html#ref-24
+ 122. file://localhost/dev/paper.html#ref-25
+ 123. http://www.jbc.org/content/275/36/28093/F4.expansion.html
+ 124. http://www.jbc.org/content/275/36/28093/F4.expansion.html
+ 125. http://www.jbc.org/content/275/36/28093/F4.expansion.html
+ 126. http://www.jbc.org/powerpoint/275/36/28093/F4
+ 127. file://localhost/dev/paper.html#F3
+ 128. file://localhost/dev/paper.html#F4
+ 129. file://localhost/dev/paper.html#F4
+ 130. file://localhost/dev/paper.html#F4
+ 131. file://localhost/dev/paper.html#F4
+ 132. file://localhost/dev/paper.html#ref-26
+ 133. file://localhost/dev/paper.html#ref-31
+ 134. file://localhost/dev/paper.html#ref-31
+ 135. file://localhost/dev/paper.html#ref-32
+ 136. file://localhost/dev/paper.html#ref-33
+ 137. file://localhost/dev/paper.html#F5
+ 138. file://localhost/dev/paper.html#ref-11
+ 139. http://www.jbc.org/content/275/36/28093/F5.expansion.html
+ 140. http://www.jbc.org/content/275/36/28093/F5.expansion.html
+ 141. http://www.jbc.org/content/275/36/28093/F5.expansion.html
+ 142. http://www.jbc.org/powerpoint/275/36/28093/F5
+ 143. file://localhost/dev/paper.html#F5
+ 144. file://localhost/dev/paper.html#F3
+ 145. file://localhost/dev/paper.html#F5
+ 146. file://localhost/dev/paper.html#F5
+ 147. file://localhost/dev/paper.html#F5
+ 148. file://localhost/dev/paper.html#F5
+ 149. file://localhost/dev/paper.html#F3
+ 150. file://localhost/dev/paper.html#F4
+ 151. file://localhost/dev/paper.html#F5
+ 152. file://localhost/dev/paper.html#F5
+ 153. file://localhost/dev/paper.html#F5
+ 154. file://localhost/dev/paper.html#F5
+ 155. file://localhost/dev/paper.html#sec-8
+ 156. file://localhost/dev/paper.html#ack-1
+ 157. file://localhost/dev/paper.html#ref-34
+ 158. http://www.jbc.org/external-ref?link_type=PDB&access_num=1vom
+ 159. file://localhost/dev/paper.html#ref-35
+ 160. file://localhost/dev/paper.html#F1
+ 161. file://localhost/dev/paper.html#ref-36
+ 162. file://localhost/dev/paper.html#ref-39
+ 163. file://localhost/dev/paper.html#ref-42
+ 164. file://localhost/dev/paper.html#ref-43
+ 165. file://localhost/dev/paper.html#F1
+ 166. file://localhost/dev/paper.html#ref-11
+ 167. file://localhost/dev/paper.html#ref-11
+ 168. file://localhost/dev/paper.html#F4
+ 169. file://localhost/dev/paper.html#ref-4
+ 170. file://localhost/dev/paper.html#ref-44
+ 171. file://localhost/dev/paper.html#ref-13
+ 172. file://localhost/dev/paper.html#sec-16
+ 173. file://localhost/dev/paper.html#fn-group-1
+ 174. file://localhost/dev/paper.html#ack-1
+ 175. file://localhost/dev/paper.html#ref-list-1
+ 176. file://localhost/dev/paper.html#xref-fn-5-1
+ 177. http://www.rcsb.org/
+ 178. file://localhost/dev/paper.html#xref-fn-6-1
+ 179. file://localhost/dev/paper.html#fn-group-1
+ 180. file://localhost/dev/paper.html#xref-ref-1-1
+ 181. file://localhost/dev/paper.html#xref-ref-2-1
+ 182. file://localhost/dev/paper.html#xref-ref-3-1
+ 183. file://localhost/dev/paper.html#xref-ref-3-1
+ 184. file://localhost/dev/paper.html#xref-ref-3-1
+ 185. file://localhost/dev/paper.html#xref-ref-3-1
+ 186. file://localhost/dev/paper.html#xref-ref-3-1
+ 187. file://localhost/dev/paper.html#xref-ref-3-1
+ 188. file://localhost/dev/paper.html#xref-ref-3-1
+ 189. file://localhost/dev/paper.html#xref-ref-10-1
+ 190. file://localhost/dev/paper.html#xref-ref-11-1
+ 191. file://localhost/dev/paper.html#xref-ref-12-1
+ 192. file://localhost/dev/paper.html#xref-ref-13-1
+ 193. file://localhost/dev/paper.html#xref-ref-14-1
+ 194. file://localhost/dev/paper.html#xref-ref-15-1
+ 195. file://localhost/dev/paper.html#xref-ref-16-1
+ 196. file://localhost/dev/paper.html#xref-ref-17-1
+ 197. file://localhost/dev/paper.html#xref-ref-18-1
+ 198. file://localhost/dev/paper.html#xref-ref-19-1
+ 199. file://localhost/dev/paper.html#xref-ref-20-1
+ 200. file://localhost/dev/paper.html#xref-ref-21-1
+ 201. file://localhost/dev/paper.html#xref-ref-22-1
+ 202. file://localhost/dev/paper.html#xref-ref-23-1
+ 203. file://localhost/dev/paper.html#xref-ref-24-1
+ 204. file://localhost/dev/paper.html#xref-ref-25-1
+ 205. file://localhost/dev/paper.html#xref-ref-26-1
+ 206. file://localhost/dev/paper.html#xref-ref-26-1
+ 207. file://localhost/dev/paper.html#xref-ref-26-1
+ 208. file://localhost/dev/paper.html#xref-ref-26-1
+ 209. file://localhost/dev/paper.html#xref-ref-26-1
+ 210. file://localhost/dev/paper.html#xref-ref-31-1
+ 211. file://localhost/dev/paper.html#xref-ref-32-1
+ 212. file://localhost/dev/paper.html#xref-ref-33-1
+ 213. file://localhost/dev/paper.html#xref-ref-34-1
+ 214. file://localhost/dev/paper.html#xref-ref-35-1
+ 215. file://localhost/dev/paper.html#xref-ref-36-1
+ 216. file://localhost/dev/paper.html#xref-ref-36-1
+ 217. file://localhost/dev/paper.html#xref-ref-36-1
+ 218. file://localhost/dev/paper.html#xref-ref-39-1
+ 219. file://localhost/dev/paper.html#xref-ref-39-1
+ 220. file://localhost/dev/paper.html#xref-ref-39-1
+ 221. file://localhost/dev/paper.html#xref-ref-42-1
+ 222. file://localhost/dev/paper.html#xref-ref-43-1
+ 223. file://localhost/dev/paper.html#xref-ref-44-1
+ 224. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/275/36/28093&title=Structural%20Basis%20for%20the%20Feedback%20Regulation%20of%20Escherichia%20coli%20Pantothenate%20Kinase%20by%20Coenzyme%20A+--+Yun%20et%20al.%20275%20%2836%29%3A%2028093+--+JBC&doi=10.1074/jbc.M003190200&link_type=CITEULIKE
+ 225. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/275/36/28093&title=Structural%20Basis%20for%20the%20Feedback%20Regulation%20of%20Escherichia%20coli%20Pantothenate%20Kinase%20by%20Coenzyme%20A+--+Yun%20et%20al.%20275%20%2836%29%3A%2028093+--+JBC&doi=10.1074/jbc.M003190200&link_type=COMPLORE
+ 226. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/275/36/28093&title=Structural%20Basis%20for%20the%20Feedback%20Regulation%20of%20Escherichia%20coli%20Pantothenate%20Kinase%20by%20Coenzyme%20A+--+Yun%20et%20al.%20275%20%2836%29%3A%2028093+--+JBC&doi=10.1074/jbc.M003190200&link_type=CONNOTEA
+ 227. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/275/36/28093&title=Structural%20Basis%20for%20the%20Feedback%20Regulation%20of%20Escherichia%20coli%20Pantothenate%20Kinase%20by%20Coenzyme%20A+--+Yun%20et%20al.%20275%20%2836%29%3A%2028093+--+JBC&doi=10.1074/jbc.M003190200&link_type=DEL_ICIO_US
+ 228. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/275/36/28093&title=Structural%20Basis%20for%20the%20Feedback%20Regulation%20of%20Escherichia%20coli%20Pantothenate%20Kinase%20by%20Coenzyme%20A+--+Yun%20et%20al.%20275%20%2836%29%3A%2028093+--+JBC&doi=10.1074/jbc.M003190200&link_type=DIGG
+ 229. http://www.jbc.org/help/social_bookmarks.dtl
+ 230. http://www.jbc.org/content/275/36/28083.short
+ 231. http://www.jbc.org/content/275/36/28100.short
+ 232. http://www.jbc.org/content/275/36.toc
+ 233. http://www.jbc.org/content/275/36/28093.abstract
+ 234. http://www.jbc.org/content/275/36/28093.full.pdf+html
+ 235. http://www.jbc.org/content/early/2000/06/21/jbc.M003190200
+ 236. http://www.jbc.org/search?tocsectionid=ENZYME+CATALYSIS+AND+REGULATION&sortspec=date&submit=Submit
+ 237. http://www.jbc.org/email?gca=jbc;275/36/28093&current-view-path=/content/275/36/28093.long
+ 238. http://www.jbc.org/cgi/alerts/ctalert?alertType=citedby&addAlert=cited_by&cited_by_criteria_resid=jbc;275/36/28093&saveAlert=no&return-type=article&return_url=http://www.jbc.org/content/275/36/28093.long
+ 239. http://www.jbc.org/cgi/alerts/ctalert?alertType=correction&addAlert=correction&correction_criteria_value=275/36/28093&saveAlert=no&return-type=article&return_url=http://www.jbc.org/content/275/36/28093.long
+ 240. http://www.jbc.org/cgi/alerts/ctalert?alertType=eletter&addAlert=eletter&eletter_criteria_value=275/36/28093&saveAlert=no&return-type=article&return_url=http://www.jbc.org/content/275/36/28093.long
+ 241. http://www.jbc.org/search?qbe=jbc;M003190200&citation=Yun%20et%20al.%20275%20%2836%29:%2028093&submit=yes
+ 242. http://www.jbc.org/external-ref?access_num=jbc%3B275%2F36%2F28093&link_type=ISI_RELATEDRECORDS
+ 243. http://www.jbc.org/external-ref?access_num=10862768&link_type=MED_NBRS
+ 244. http://www.jbc.org/citmgr?gca=jbc;275/36/28093
+ 245. https://s100.copyright.com/AppDispatchServlet?publisherName=ASBMB&publication=jbc&title=Structural%20Basis%20for%20the%20Feedback%20Regulation%20of%20Escherichia%20coli%20Pantothenate%20Kinase%20by%20Coenzyme%20A&publicationDate=09/08/2000&author=Mikyung%20Yun,%20Cheon-Gil%20Park,%20Ji-Yeon%20Kim,%20Charles%20O.%20Rock,%20Suzanne%20Jackowski,%20Hee-Won%20Park&startPage=28093&contentID=10.1074/jbc.M003190200&orderBeanReset=true&endPage=28099&volumeNum=275&issueNum=36
+ 246. http://www.jbc.org/letters/submit/jbc;275/36/28093
+ 247. http://www.jbc.org/content/275/36/28093.long?cited-by=yes&legid=jbc;275/36/28093#cited-by
+ 248. http://www.jbc.org/external-ref?access_num=jbc%3B275%2F36%2F28093&link_type=ISI_CITING
+ 249. http://www.jbc.org/external-ref?access_num=http://www.jbc.org/cgi/content/abstract/275/36/28093&link_type=GOOGLESCHOLAR
+ 250. http://scholar.google.com/scholar?q=%22author%3AYun%20author%3AM.%22
+ 251. http://scholar.google.com/scholar?q=%22author%3APark%20author%3AH.%22
+ 252. http://www.jbc.org/external-ref?access_num=http://www.jbc.org/cgi/content/abstract/275/36/28093&link_type=GOOGLESCHOLARRELATED
+ 253. http://www.jbc.org/external-ref?access_num=10862768&link_type=PUBMED
+ 254. http://www.jbc.org/external-ref?access_num=Yun%20M&link_type=AUTHORSEARCH
+ 255. http://www.jbc.org/external-ref?access_num=Park%20H&link_type=AUTHORSEARCH
+ 256. http://www.jbc.org/content/275/36/28093.long?related-urls=yes&legid=jbc;275/36/28093#related-urls
+ 257. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/275/36/28093&title=Structural%20Basis%20for%20the%20Feedback%20Regulation%20of%20Escherichia%20coli%20Pantothenate%20Kinase%20by%20Coenzyme%20A+--+Yun%20et%20al.%20275%20%2836%29%3A%2028093+--+JBC&doi=10.1074/jbc.M003190200&link_type=CITEULIKE
+ 258. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/275/36/28093&title=Structural%20Basis%20for%20the%20Feedback%20Regulation%20of%20Escherichia%20coli%20Pantothenate%20Kinase%20by%20Coenzyme%20A+--+Yun%20et%20al.%20275%20%2836%29%3A%2028093+--+JBC&doi=10.1074/jbc.M003190200&link_type=COMPLORE
+ 259. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/275/36/28093&title=Structural%20Basis%20for%20the%20Feedback%20Regulation%20of%20Escherichia%20coli%20Pantothenate%20Kinase%20by%20Coenzyme%20A+--+Yun%20et%20al.%20275%20%2836%29%3A%2028093+--+JBC&doi=10.1074/jbc.M003190200&link_type=CONNOTEA
+ 260. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/275/36/28093&title=Structural%20Basis%20for%20the%20Feedback%20Regulation%20of%20Escherichia%20coli%20Pantothenate%20Kinase%20by%20Coenzyme%20A+--+Yun%20et%20al.%20275%20%2836%29%3A%2028093+--+JBC&doi=10.1074/jbc.M003190200&link_type=DEL_ICIO_US
+ 261. http://www.jbc.org/external-ref?tag_url=http://www.jbc.org/cgi/content/long/275/36/28093&title=Structural%20Basis%20for%20the%20Feedback%20Regulation%20of%20Escherichia%20coli%20Pantothenate%20Kinase%20by%20Coenzyme%20A+--+Yun%20et%20al.%20275%20%2836%29%3A%2028093+--+JBC&doi=10.1074/jbc.M003190200&link_type=DIGG
+ 262. http://www.jbc.org/help/social_bookmarks.dtl
+ 263. file://localhost/dev/paper.html#content-block
+ 264. file://localhost/dev/paper.html#abstract-1
+ 265. file://localhost/dev/paper.html#sec-1
+ 266. file://localhost/dev/paper.html#sec-8
+ 267. file://localhost/dev/paper.html#sec-16
+ 268. file://localhost/dev/paper.html#ack-1
+ 269. file://localhost/dev/paper.html#fn-group-1
+ 270. file://localhost/dev/paper.html#ref-list-1
+ 271. http://www.jbc.org/content/current
+ 272. http://www.jbc.org/content/current
+ 273. http://www.jbc.org/cgi/alerts/etoc
+ 274. http://www.jbc.org/misc/itoa.xhtml
+ 275. http://submit.jbc.org/
+ 276. http://www.jbc.org/subscriptions/
+ 277. http://submit.jbc.org/journals/jbc/forms/editors.dtl
+ 278. http://www.jbc.org/site/home/about/rss_alerts.xhtml
+ 279. http://www.jbc.org/site/home/about/article_stats.xhtml
+ 280. http://www.jbc.org/site/home/teaching_tools/
+ 281. http://www.jbc.org/site/misc/Copyright_Permission.xhtml
+ 282. http://www.asbmb.org/uploadedFiles/Publications/2009ASBMBJournalsMediaKit.pdf
+ 283. http://www.jbc.org/cgi/feedback
+ 284. http://www.asbmb.org/
+ 285. http://intl.jbc.org/
+ 286. http://www.jbc.org/cgi/feedback
+ 287. http://www.jbc.org/help/
+ 288. http://www.asbmb.org/page.aspx?id=218
+ 289. http://www.jlr.org/
+ 290. http://mcponline.org/
+ 291. http://www.jbc.org/cgi/adclick/?ad=21399&adclick=true&url=http%3A%2F%2Fwww.asbmb.org%2FPage.aspx%3Fid%3D2690
+
+   Hidden links:
+ 292. http://www.jbc.org/entrez-links/10862768

@@ -1,0 +1,31 @@
+---
+abstract: 'fire events on objects'
+author:
+  - 'Mitchell Cooper <cooper@cpan.org>'
+build_requires: {}
+dynamic_config: 0
+generated_by: 'Module::Build version 0.4212, CPAN::Meta::Converter version 2.150001'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Evented-Object
+provides:
+  Evented::Object:
+    file: lib/Evented/Object.pm
+    version: '5.62'
+  Evented::Object::Collection:
+    file: lib/Evented/Object/Collection.pm
+    version: '5.62'
+  Evented::Object::EventFire:
+    file: lib/Evented/Object/EventFire.pm
+    version: '5.62'
+  Evented::Object::Hax:
+    file: lib/Evented/Object/Hax.pm
+    version: '5.62'
+requires:
+  perl: '5.010'
+resources:
+  license: http://opensource.org/licenses/bsd-license.php
+  repository: https://github.com/cooper/evented-object
+version: '5.62'

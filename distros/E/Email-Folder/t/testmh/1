@@ -1,0 +1,37 @@
+Return-Path: <nobody@pause.perl.org>
+Delivered-To: anonymous-cpan@example.org
+Received: (qmail 31554 invoked from network); 29 Feb 2004 13:11:18 -0000
+Received: from unknown (HELO pause.perl.org) (195.149.117.110)
+  by cheshirecat.example.org with SMTP; 29 Feb 2004 13:11:18 -0000
+Received: from pause.perl.org (localhost [127.0.0.1])
+	by pause.perl.org (8.12.3/8.12.3/Debian-6.6) with ESMTP id i1TDBHcj014491
+	for <anonymous-cpan@example.org>; Sun, 29 Feb 2004 14:11:17 +0100
+Received: (from nobody@localhost)
+	by pause.perl.org (8.12.3/8.12.3/Debian-6.6) id i1TDBHEj014489;
+	Sun, 29 Feb 2004 14:11:17 +0100
+Date: Sun, 29 Feb 2004 14:11:17 +0100
+Message-Id: <200402291311.i1TDBHEj014489@pause.perl.org>
+Subject: Alfa bravo charlie delta
+Reply-To: modules@perl.org
+To: anonymous-cpan@example.org
+From: "Perl Authors Upload Server" <upload@pause.perl.org>
+X-Spam-Checker-Version: SpamAssassin 2.63 (2004-01-11) on 
+	cheshirecat.example.org
+X-Spam-Level: 
+X-Spam-Status: No, hits=0.0 required=4.0 tests=none autolearn=no version=2.63
+Status: RO
+Content-Length: 299
+Lines: 12
+
+Record update in the PAUSE uploads database:
+
+       uriid: [R/RJ/RJBS/Math-TotalBuilder-002targz/Math-TotalBuilder-0.02.tar.gz]
+         uri: [fixedMathTB2.tar.gz] was [Math-TotalBuilder-0.02.tar.gz]
+
+Data entered by Ricardo SIGNES (RJBS).
+Please check if they are correct.
+
+Thanks,
+-- 
+The PAUSE
+

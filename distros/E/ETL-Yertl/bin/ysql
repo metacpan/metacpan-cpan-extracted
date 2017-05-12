@@ -1,0 +1,288 @@
+#!/usr/bin/env perl
+package ysql;
+our $VERSION = '0.028';
+# ABSTRACT: Query SQL databases in a Yertl workflow
+
+use ETL::Yertl;
+use Pod::Usage::Return qw( pod2usage );
+use Getopt::Long qw( GetOptionsFromArray :config pass_through );
+use ETL::Yertl::Command::ysql;
+
+$|++; # no buffering
+
+sub main {
+    my ( $class, @argv ) = @_;
+    my %opt;
+    GetOptionsFromArray( \@argv, \%opt,
+        'help|h',
+        'version',
+        'dsn=s',
+    );
+    return pod2usage(0) if $opt{help};
+    if ( $opt{version} ) {
+        print "ysql version $ysql::VERSION (Perl $^V)\n";
+        return 0;
+    }
+
+    eval {
+        ETL::Yertl::Command::ysql->main( @argv, \%opt );
+    };
+    if ( $@ ) {
+        # SQL errors do not need usage information
+        # XXX: We need to have some kind of error return message
+        if ( $@ =~ /^SQL error/ || $@ =~ /^Could not connect/ ) {
+            print STDERR "ERROR: $@";
+            return 1;
+        }
+        return pod2usage( "ERROR: $@" );
+    }
+    return 0;
+}
+
+exit __PACKAGE__->main( @ARGV ) unless caller(0);
+
+__END__
+
+=pod
+
+=head1 NAME
+
+ysql - Query SQL databases in a Yertl workflow
+
+=head1 VERSION
+
+version 0.028
+
+=head1 SYNOPSIS
+
+    ysql [<db_name> | --dsn <dsn>] [<query> | <query_name>] [<value>...]
+
+    ysql <db_name> --select <table> [--where <clause>] [--order-by <clause>]
+    ysql <db_name> --insert <table>
+    ysql <db_name> --delete <table> [--where <clause>]
+
+    ysql <db_name> --save <query_name> <query>
+    ysql <db_name> --edit <query_name>
+
+    ysql --config <db_name> [--driver <driver>] [--database <database] [--host <host>]
+        [--port <port>] [--user <user>] [--password <password>]
+    ysql --config <db_name> [--dsn] <dsn> [--user <user>] [--password <password>]
+    ysql --config [<db_name>]
+
+    ysql -h|--help|--version
+
+=head1 DESCRIPTION
+
+This program queries a SQL database and prints the result as YAML.
+
+=head2 Reading
+
+Run a query to read data from the database. C<query> is either the name of a saved
+query, or SQL (usually a C<SELECT>). C<value> is used to fill in C<?> placeholders.
+
+    $ ysql db_name 'SELECT * FROM person'
+    ---
+    name: Hazel "Hank" Murphy
+    email: captain@example.com
+    dept: Captain
+    ---
+    name: Quinn Quinlan
+    email: dr.quinn@example.com
+    dept: Science
+
+    $ ysql db_name 'SELECT * FROM person WHERE dept = ?' Science
+    ---
+    name: Quinn Quinlan
+    email: dr.quinn@example.com
+    dept: Science
+
+=head2 Writing
+
+If there are documents to read on STDIN, the C<query> will be executed once for
+each document read. In order to map keys in the YAML document to fields in the
+SQL query, C<ysql> supports named placeholders, which begin with C<$.>. For
+example:
+
+    # input.yml
+    ---
+    name: Stormy Waters
+    email: stormy@example.com
+    profile:
+        dept: Pilot
+    ---
+    name: Debbie Dupree
+    email: debbie@example.com
+    profile:
+        dept: Wildlife
+
+    $ ysql db_name 'INSERT INTO person ( name, email, dept ) \
+                    VALUES ( $.name, $.email, $.profile.dept )' \
+                    < input.yml
+
+=head2 Query Helpers
+
+For common, simple SQL queries, there are some helper options that will
+help generate the SQL for you.
+
+Instead of C<SELECT * FROM person>, we can use the C<--select> helper:
+
+    $ ysql db_name --select person
+
+And we can combine it with the C<--where> and C<--order-by> helpers:
+
+    $ ysql db_name --select person --where 'dept = "Science"' --order-by name
+
+And for simple inserts, we can use the C<--insert> helper:
+
+    # input.yml
+    ---
+    name: Hesh Hipplewhite
+    email: hesh@example.com
+    dept: Engineering
+    ---
+    name: Jodene Sparks
+    email: overlord@example.com
+    dept: Communication
+
+    $ ysql db_name --insert person < input.yml
+
+There is a C<--delete> helper as well, which accepts the C<--where> option:
+
+    $ ysql db_name --delete person --where 'dept = "Wildlife"'
+
+=head1 ARGUMENTS
+
+=head2 db_name
+
+The saved database name to use. Add and edit databases using the C<--config> option.
+
+=head2 query
+
+The SQL query to run against the database.
+
+=head2 query_name
+
+The name of a saved query. Add and edit saved queries using the C<--save> option.
+
+=head1 OPTIONS
+
+=head2 --select <table>
+
+Generate a C<SELECT * FROM table> query for the given C<table>. Also accepts
+the C<--where> and C<--order-by> options.
+
+=head2 --insert <table>
+
+Generate an C<INSERT INTO table ( fields ) VALUES ( values )> query for the
+given C<table>. For each document read on STDIN, the correct fields and values
+will be used.
+
+=head2 --delete <table>
+
+Generate a C<DELETE FROM table> query for the given C<table>. Also accepts
+the C<--where> option.
+
+=head2 --where <clause>
+
+Add a C<WHERE> clause to a C<--select> query.
+
+=head2 --order-by <clause> | --sort <clause>
+
+Add an C<ORDER BY> clause to a C<--select> query.
+
+=head2 --config
+
+View, add, and edit database configuration.
+
+=head2 --save <query_name>
+
+Save a query to run later.
+
+=head2 --edit <query_name>
+
+Edit the named query in your text editor (taken from the C<EDITOR> environment
+variable).
+
+=head2 --driver <driver>
+
+The database driver to use, corresponding to a DBD::* module. Some examples: C<SQLite>,
+C<mysql>, C<Pg>.
+
+=head2 --database <database>
+
+The name of the database. For SQLite, the name of the database file.
+
+=head2 --host <host>
+
+The hostname to connect to. Optional.
+
+=head2 --port <port>
+
+The port to connect to. Optional.
+
+=head2 --user <user>
+
+The user to connect as. Optional.
+
+=head2 --password <password>
+
+The password to connect with. Optional. This is stored in plain text, so beware.
+
+=head2 --dsn <dsn>
+
+The L<DBI> Data Source Name. A string that DBI uses to connect to the database.
+
+Some examples:
+
+    # A SQLite database in "test.db"
+    dbi:SQLite:test.db
+
+    # A MySQL database named "example"
+    dbi:mysql:example
+
+    # A Postgres database named "foo"
+    dbi:Pg:foo
+
+=head2 --drivers
+
+List the available drivers
+
+=head2 -h | --help
+
+Show this help document.
+
+=head2 --version
+
+Print the current ysql and Perl versions.
+
+=head1 ENVIRONMENT VARIABLES
+
+=over 4
+
+=item YERTL_FORMAT
+
+Specify the default format Yertl uses between commands. Defaults to C<yaml>. Can be
+set to C<json> for interoperability with other programs.
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<ETL::Yertl::Help::ysql> - Using ysql to work with SQL databases
+
+=back
+
+=head1 AUTHOR
+
+Doug Bell <preaction@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Doug Bell.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

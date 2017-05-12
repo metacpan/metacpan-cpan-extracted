@@ -1,0 +1,51 @@
+=head1 NAME
+
+backend_api - The API that Embedix::DB::* backends should implement
+
+=head1 DESCRIPTION
+
+=head2 Methods
+
+=head2 Constructor
+
+=over 4
+
+=item new
+
+=back
+
+=head2 Defining Distributions
+
+=over 4
+
+=item addDistro
+
+=item cloneDistro
+
+=item updateDistro
+
+=back
+
+=head2 Getting Information on Distributions
+
+=over 4
+
+=item getComponentList
+
+=item n ???
+
+This is for getting nodes by path.
+Perhaps this is a job for AUTOLOAD.
+
+=item getAllProvides
+
+=item getAllRequires
+
+=item getAllConditionals
+
+I'm still not sure how I should go about doing all this.
+Embedix::Config is still very blurry.
+
+=back
+
+=cut

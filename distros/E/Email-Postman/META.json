@@ -1,0 +1,50 @@
+{
+   "abstract" : "Send multirecipient emails to the world.",
+   "author" : [
+      "Jerome Eteve <jerome.eteve@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.96, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Email-Postman",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "MIME::Parser" : "5.502",
+            "Test::MockModule" : "0.05",
+            "Test::MockObject" : "1.2",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime" : "0.7",
+            "Email::Abstract" : "3.004",
+            "Email::Address" : "1.892",
+            "Log::Log4perl" : "1.29",
+            "Moose" : "2.0401",
+            "Net::DNS" : "0.66",
+            "Net::SMTP" : "2.31"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.03"
+}

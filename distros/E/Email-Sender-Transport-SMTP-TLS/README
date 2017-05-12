@@ -1,0 +1,64 @@
+SYNOPSIS
+
+        use Email::Sender::Simple qw(sendmail);
+        use Email::Sender::Transport::SMTP::TLS;
+        use Try::Tiny;
+    
+        my $transport = Email::Sender::Transport::SMTP::TLS->new(
+            host => 'smtp.gmail.com',
+            port => 587,
+            username => 'username@gmail.com',
+            password => 'password',
+            helo => 'fayland.org',
+        );
+    
+        # my $message = Mail::Message->read($rfc822)
+        #         || Email::Simple->new($rfc822)
+        #         || Mail::Internet->new([split /\n/, $rfc822])
+        #         || ...
+        #         || $rfc822;
+        # read L<Email::Abstract> for more details
+    
+        use Email::Simple::Creator; # or other Email::
+        my $message = Email::Simple->create(
+            header => [
+                From    => 'username@gmail.com',
+                To      => 'to@mail.com',
+                Subject => 'Subject title',
+            ],
+            body => 'Content.',
+        );
+    
+        try {
+            sendmail($message, { transport => $transport });
+        } catch {
+            die "Error sending email: $_";
+        };
+
+DESCRIPTION
+
+    DEPRECATED! Please use Email::Sender::Transport::SMTP instead.
+
+ ATTRIBUTES
+
+    The following attributes may be passed to the constructor:
+
+    host - the name of the host to connect to; defaults to localhost
+
+    port - port to connect to; defaults to 587
+
+    username - the username to use for auth; required
+
+    password - the password to use for auth; required
+
+    helo - what to say when saying HELO; no default
+
+    allow_partial_success - if true, will send data even if some recipients
+    were rejected
+
+ PARTIAL SUCCESS
+
+    If allow_partial_success was set when creating the transport, the
+    transport may return Email::Sender::Success::Partial objects. Consult
+    that module's documentation.
+

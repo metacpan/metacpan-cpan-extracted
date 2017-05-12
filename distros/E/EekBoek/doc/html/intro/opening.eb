@@ -1,0 +1,39 @@
+# Voorbeeld opening.eb
+
+# Administratiegegevens.
+
+# Naam van de administratie.
+adm_naam "EekBoek Demo Administratie"
+
+# Periode waarover BTW aangifte moet worden gedaan.
+adm_btwperiode jaar
+
+# Begindatum van deze administratie.
+adm_begindatum 2007
+
+# Standaard wordt voor als boekjaarcode het jaartal gebruikt. U kunt
+# ook iets anders opgeven.
+adm_boekjaarcode "2007"
+
+# Data voor openingsbalans:
+
+# Het balanstotaal is het totaal van alle debet posten, dat uiteraard
+# overeenkomt met het totaal van alle credit posten.
+adm_balanstotaal 15854,77
+
+# De openingsposten.
+adm_balans 1100  1344,37        # Inventaris en inrichting
+adm_balans 1101  1304,81        # Afschr. Inv. en inr.
+adm_balans 1110 13378,48        # Computers
+adm_balans 1111 12106,78        # Afscr. computers
+adm_balans 2320  1131,92        # Saldo Postbank
+adm_balans 3100  2443,18        # Kapitaal
+
+# Openstaande posten uit voorgaande boekjaren als volgt:
+# Eerst, indien nodig, de betreffende relatie toevoegen:
+#relatie KESTER "Repro van Kesteren" 6950
+# Dan het openstaande boekstuk:
+#adm_relatie inkoop:2006:67 2006-12-11 "KESTER" "Printwerk" 48,79
+
+# Open de administratie.
+adm_open

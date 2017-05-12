@@ -1,0 +1,8 @@
+Changes
+=======
+
+0.00002 - 15 Apr 2008
+  - Use Term::Encoding if nothing was specified
+
+0.00001 - 01 Apr 2008
+  - Initial release

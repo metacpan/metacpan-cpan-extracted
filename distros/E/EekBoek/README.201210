@@ -1,0 +1,87 @@
+BTW migratie
+
+Ter gelegenheid van het invoeren van een verhoogd BTW tarief op 1 oktober a.s.
+
+Nieuwe features in EekBoek 2.02
+
+BTW codes mogen nu alfanumeriek zijn
+
+Bijvoorbeeld:
+
+BTW Tarieven
+    ...
+    Hoog19   BTW 19% incl.          :tariefgroep=hoog :perc=19,00
+    Laag     BTW 6,0% incl.         :tariefgroep=laag :perc=6,00
+
+De codes worden hoofdletterongevoelig toegepast.
+
+Numerieke BTW codes voor grootboekrekeningen worden uitgefaseerd.
+
+Deze dienen te worden vervangen door de corresponderende tariefgroep.
+
+BTW codes kunnen worden gebruikt in boekingen
+
+Dit kon al voor numerieke codes, en aanduidingen als H, L, en zo.
+Postfix + en - zijn nu toegestaan op alle BTW codes. Het verdient aanbeveling het gebruik van de numerieke codes uit te faseren.
+
+    inkopen 02-01 "Telefoon + ADSL" XS4ALL \
+        "Mail"                            18,30@Hoog19-  6905  \
+        "ADSL"                            33,61@Hoog19-  6905
+
+
+Het toegepaste BTW tarief wordt getoond in het journaal
+
+Hiermee kan snel visueel worden vastgesteld of de juiste BTW code is opgegeven bij een boekstukregel.
+
+Datum       Boekstuk/Grootboek                Rek      Debet     Credit      BTW %  Tarief      Boekstuk/regel                  Relatie
+------------------------------------------------------------------------------------------------------------------------------------------
+2012-01-11  Inkopen:27                                                                          Contributie 2012                FNVZZP
+2012-01-11    BTW Inkoop Hoog                4220      31,13                                      BTW Contributie 2012
+2012-01-11    Vakbond                        6320     163,87                 19,00  Hoog          Contributie 2012
+2012-01-11    Crediteuren                    4100                195,00                           Contributie 2012
+------------------------------------------------------------------------------------------------------------------------------------------
+            Totaal Boekstuk 46                        195,00     195,00
+
+
+BTW codes kunnen een begin- en/of einddatum toegekend krijgen
+
+Een waarschuwing wordt gegeven wanneer een boeking een btw code heeft die nog niet, of niet meer, geldig is.
+
+   Hoog19   BTW 19% incl.          :tariefgroep=hoog :perc=19,00 :tot=2012-10-01
+   Hoog21   BTW 21% incl.          :tariefgroep=hoog :perc=21,00 :vanaf=2012-10-01
+
+Let op: de 'tot' datum is tot, en niet tot en met.
+
+Het is mogelijk in boekingen om de btw code automatisch te laten corrigeren. Daarbij moet rekening worden gehouden met het feit dat wettelijk de leverdatum van het product of dienst bepalend is, niet de boekingsdatum of de factuurdatum. Als dat geen probleem is, dan kan de volgende setting in de EekBoek config worden aangebracht:
+
+[strategy]
+btw_adapt = 1
+
+EekBoek zal nu voor boekingen waarvoor de btw code niet geldig is proberen de juiste, wel geldige, btw code toe te passen. Uiteraard wordt daarvan melding gemaakt.
+
+Niet-eenduidig gebruik van @H en @L codes geeft een melding
+
+Een melding wordt gegenereerd wanneer in een boeking een BTW aanduiding wordt gebruikt als @H of @L, terwijl in het schema meerdere BTW tarieven zijn gedefinieerd met tariefgroep 'hoog' resp. 'laag'. In deze gevallen wordt het tarief met de laagste code gebruikt.
+
+Auto-migratie
+
+De auto-migratie faciliteit van EekBoek voert automatisch de volgende wijzigingen door in uw administratie:
+
+1. De BTW en Journaal tabellen worden bijgewerkt met nieuwe attributen.
+2. Bestaande BTW tarieven van 19% en tariefgroep Hoog worden gemarkeerd als geldig tot 1-10-2012.
+3. Twee nieuwe BTW tarieven met naam 'H21' (inclusief) en 'H21-' (exclusief) worden aangemaakt en gemarkeerd als geldig vanaf 1-10-2012.
+
+Na de migratie
+
+De veronderstelling is dat in het schema alle koppelingen tussen grootboekrekeningen en BTW tariefcodes zijn gemaakt op basis van het nu nog huidige 19% tarief.
+Indien niet gebruik gemaakt wordt van de btw_adapt strategie dan moeten alle boekingen met levering na 1 oktober expliciet worden voorzien van @h21 of @h21+ (inclusief) dan wel @h21- (exclusief).
+
+De verwachting is dat de periode september-november de boekingen soms handmatig zullen moeten voorzien van een code, en dat daarna de btw_adapt strategie het werk betrouwbaar overneemt. Hou niettemin altijd het journaal in de gaten of het juiste tarief is toegepast!
+
+Hint: Neem in de EekBoek config op:
+
+[preferences]
+journal = 1
+
+Hiermee wordt na elke boeking automatisch de betreffende journaalrapportage getoond.
+

@@ -1,0 +1,46 @@
+[$ sub yyyy $]
+
+   [- ($self) = @_; -]
+
+[$ endsub $]
+
+[$ sub xxxx $]
+
+   [- ($self) = @_; -]
+
+   <TABLE>
+
+   <TR>
+      <TD>
+<TABLE>
+    <TR>
+       <TD>
+  [- $x = 1; -]
+  [$ while $x < 10 $]
+    [+ $x +]
+    [- $x += 1; -]
+  [$ endwhile $]
+       </TD>
+    </TR>
+</TABLE>
+      </TD>
+
+      <TD>
+<TABLE>
+    <TR>
+       <TD>
+           <TABLE>
+[- $self->yyyy(); -]
+   </TABLE>
+       </TD>
+    </TR>
+         </TABLE>
+      </TD>
+
+   </TR>
+   </TABLE>
+
+[$ endsub $]
+
+
+[- xxxx (__PACKAGE__) -]

@@ -1,0 +1,60 @@
+Revision history for Perl module Etherpad::API
+
+1.2.12.1 Sat Jul 18 18:16 2014
+    - Deprecated. Now inherits all from Etherpad module
+
+1.2.12.0 Tue May 05 23:00:42 2015
+    - Update to API version 1.2.12 (1.5.6 version of Etherpad)
+
+1.2.10.3 Tue Mar 10 00:16:38 2015
+    - Change URI::Escape fo URL::Encode and uri_encode padIDs
+    - uri_encode some parameters which needed it
+
+1.2.10.2 Mon Mar 09 23:17:42 2015
+    - Remove uri_escape for padIDs
+
+1.2.10.1 Tue Fed 24 11:14:17 2015
+    - Add option for specifying http and https proxy
+
+1.2.10.0 Sun Fed 22 22:39:17 2015
+    - Change version numbering method
+    - Update to API version 1.2.10 (1.5.1 version of Etherpad)
+    - Fix #101909 (https://rt.cpan.org/Public/Bug/Display.html?id=101909)
+
+0.11 Mon Oct 21 00:45:17 2013
+    - Return undef if failed
+
+0.10 Sun Oct 20 01:21:32 2013
+    - Add some uri_escape() I forgot
+
+0.09 Sun Oct 20 00:45:03 2013
+    - Use URI::Escape since there was problem with some characters
+
+0.08 Tue Sep 10 01:20:20 2013
+    - Use carp instead of die
+    - Add github informations
+
+0.07 Tue Mar 12 23:16:15 2013
+    - Add new etherpad API functions
+
+0.06 Tue Feb 19 13:19:00 2013
+    - Bugfix
+
+0.05 Tue Feb 19 11:30:00 2013
+    - Add possibility to use epl authentication
+    - Some results are not documented in the official doc (http://etherpad.org/doc/v1.2.7)
+	  I introduced some workarounds, allowing to use differents version of epl
+
+0.04 Mon Feb 18 20:24:12 2013
+    - BugFix due to incorrect documentation
+
+0.03 Mon Feb 18 14:00:45 2013
+    - BugFix
+
+0.02 Mon Feb 18 08:59:36 2013
+    - Fix typo in function name
+
+0.01 Sun Jan 27 11:59:37 2013
+    - original version; created by ExtUtils::ModuleMaker 0.51
+
+

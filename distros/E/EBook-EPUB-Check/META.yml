@@ -1,0 +1,49 @@
+---
+abstract: 'Perl wrapper for EpubCheck'
+author:
+  - 'pawa <pawa@pawafuru.com>'
+build_requires:
+  Probe::Perl: 0.03
+  Test::Fatal: 0
+  Test::More: 0.99
+  Test::Warn: 0
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  File::Which: 1.09
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.11.0, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: EBook-EPUB-Check
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  EBook::EPUB::Check:
+    file: lib/EBook/EPUB/Check.pm
+    version: 0.04
+  EBook::EPUB::Check::Result:
+    file: lib/EBook/EPUB/Check/Result.pm
+requires:
+  Carp: 0
+  Exporter: 0
+  File::ShareDir: 1.00
+  IPC::Run3: 0.046
+  parent: 0
+  perl: 5.008001
+resources:
+  bugtracker: https://github.com/pawa-/EBook-EPUB-Check/issues
+  homepage: https://github.com/pawa-/EBook-EPUB-Check
+  repository: git://github.com/pawa-/EBook-EPUB-Check
+version: 0.04

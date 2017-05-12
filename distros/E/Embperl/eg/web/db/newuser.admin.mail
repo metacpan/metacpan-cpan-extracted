@@ -1,0 +1,23 @@
+Hi!
+
+Some requested a new account '[+ $fdat{user_email} +]' on your Embperl Website.
+
+[$ if $r->{error} $]
+There occured the following errors during user creation:
+[+ $r->{error} +]
+[$ if $r->{error_details} $]
+[+ $r->{error_details} +]
+[$ endif $]
+[$ else $]
+The user creation was succesful.
+[$ endif $]
+
+[#
+DEBUGGING:
+
+[! use Data::Dumper; !]
+[- $r = shift; -]
+[+ Dumper $r->{error},\%fdat,$r +]
+#]
+-- 
+Regards, Your Embperl Website

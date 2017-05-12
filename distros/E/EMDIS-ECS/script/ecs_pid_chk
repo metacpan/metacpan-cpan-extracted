@@ -1,0 +1,268 @@
+#!/usr/bin/perl -w
+#
+# Copyright (C) 2002-2016 National Marrow Donor Program. All rights reserved.
+#
+# For a description of this program, please refer to the POD documentation
+# embedded at the bottom of the file (e.g. perldoc ecs_pid_chk).
+
+use Getopt::Long;
+use Sys::Hostname;
+use strict;
+
+my $user = '';
+
+if ( ! &GetOptions ( "user=s"  => \$user)) {
+	print "\n$ARGV[0]: wrong parameter, use user=... !!!";
+	exit 1;
+}
+
+# load OS specific modules at compile time, in BEGIN block
+BEGIN
+{
+    if( $^O =~ /MSWin32/ )
+    {
+        # modules used only under Win32
+        eval "require File::Spec::Functions qw(catfile)";
+        eval "require Win32";
+        eval "require Win32::PerfLib";
+        eval "require EMDIS::ECS::Config";
+    }
+    else
+    {
+        # define subroutines referenced below
+        # (to avoid compile errors when not running under Win32)
+        package Win32::PerfLib;
+        eval "sub GetCounterNames { return undef; }";
+        eval "sub new { return undef; }";
+        package main;
+    }
+}
+
+
+# program now behaves differently under UNIX vs. Win32 ...
+
+if( $^O =~ /MSWin32/ )
+{
+    # Load ecs.cfg
+    my $cfg_file = 'ecs.cfg';
+    my $cfg = new EMDIS::ECS::Config($cfg_file);
+    print "Unable to load ECS configuration ($cfg_file): $cfg"
+        unless ref $cfg;
+   
+    # Fill hash with current process list
+    my $tasks = get_remote_process_list(hostname());
+
+    # Check Process        
+    check_PIDs_win32($cfg, $tasks, 'ecs_scan_mail');
+    check_PIDs_win32($cfg, $tasks, 'ecs_chk_com');
+
+    exit;
+}
+else
+{
+    # Script is intended to be executed by a cron job.
+    # Accordingly, no output is generated if dameons are running.
+    # If daemons not running, cron sends email containing program output.
+
+    # check whether ECS daemons are running
+    my $errmsg = '';
+    $errmsg .= check_PIDs('ecs_chk_com');
+    $errmsg .= check_PIDs('ecs_scan_mail');
+
+    if($errmsg)
+    {
+        # print error message if daemon(s) not currently running
+        print STDERR "$errmsg\n";
+        exit -1;
+    }
+
+    exit 0;
+}
+
+exit 0;
+
+
+# retrieve array of PID numbers for specified program
+sub get_PIDs
+{
+    my $progname = shift;
+    my $PS;
+
+    if ( $^O =~ /linux/i ) {
+	    if ( $user eq '') { 
+          $PS = '/bin/ps -fA';         # this works under Linux
+		 }
+		 else {
+		    $PS = "/bin/ps -f -U $user";
+		 }	 
+    }
+    else {
+       $PS = '/usr/bin/ps -fA';     # this works under Solaris
+       if($user ne '')
+       {
+           $PS = "/usr/bin/ps -fU $user";
+       }
+    }
+
+    # magical mystical one-liner to get PIDs
+    return map { /\s+(\d+)\s+/ ? $1 : () } grep /(\S+|^)$progname/, qx($PS);
+}
+
+# return error message unless specified program is running
+sub check_PIDs
+{
+    my $progname = shift;
+    my @pids = get_PIDs($progname);
+    if($#pids < 0)
+    {
+        return "\nERROR:  $progname is currently not running on " .
+            hostname() . ".\n";
+    }
+    elsif ( $#pids > 0 )
+    {
+        return "\nERROR:  more than one $progname is still running on "
+    	    . hostname() . ".\n";
+    }
+    return '';
+}
+
+# print error message unless specified program is running
+sub check_PIDs_win32
+{
+    my $cfg = shift;
+    my $tasks = shift;
+    my $progname = shift;
+
+    if(open PIDFILE,catfile($cfg->ECS_DAT_DIR, $progname . ".pid"))
+    {
+        my $pid = <PIDFILE>;
+        $pid =~ s/\s+//g;
+        
+        if (defined $tasks->{$pid} and $tasks->{$pid} =~ /perl/ )
+	{
+            print "$progname is already running (pid $pid).\n";
+        }
+        else
+        {
+            print "$progname is NOT running\n";
+        }			
+        close PIDFILE;
+        if (defined ($ARGV[0]) and $ARGV[0] == $pid )
+        {
+            unlink catfile($cfg->ECS_DAT_DIR, $progname . ".pid");
+            print "Killing $progname " . $ARGV[0] . "\n";
+            kill 9, $ARGV[0];
+        }
+    }
+    else
+    {
+        print "$progname is NOT running\n";
+    }	
+}
+
+#Get Win32 process list (only for Windows 2000 or newer)
+sub get_remote_process_list{
+   
+    my $server = $_[0];
+    
+    my %rtasks;
+    my %counter;
+    
+    Win32::PerfLib::GetCounterNames($server, \%counter);
+    my %r_counter = map { $counter{$_} => $_ } keys %counter;
+    # retrieve the id for process object
+    my $process_obj = $r_counter{Process};
+    # retrieve the id for the process ID counter
+    my $process_id = $r_counter{'ID Process'};
+    
+    # create connection to $server
+    my $perflib = new Win32::PerfLib($server);
+    if (! defined($perflib)) {die "$server error"};
+    my $proc_ref = {};
+    # get the performance data for the process object
+    $perflib->GetObjectList($process_obj, $proc_ref);
+    $perflib->Close();
+    my $instance_ref = $proc_ref->{Objects}->{$process_obj}->{Instances};
+    foreach my $p (sort keys %{$instance_ref})
+    {
+        my $counter_ref = $instance_ref->{$p}->{Counters};
+        foreach my $i (keys %{$counter_ref})
+        {
+            if($counter_ref->{$i}->{CounterNameTitleIndex} == $process_id)
+            {
+                $rtasks{$counter_ref->{$i}->{Counter}} =
+                    $instance_ref->{$p}->{Name};
+            }
+        }
+    }
+    return \%rtasks;
+}
+
+
+
+
+__END__
+
+# embedded POD documentation
+# for more info:  man perlpod
+
+=head1 NAME
+
+ecs_pid_chk - check whether ECS daemons are running
+
+=head1 SYNOPSIS
+
+ ecs_pid_chk
+
+=head1 DESCRIPTION
+
+This program checks whether the ECS daemons are still running.
+It is intended to be run periodically via a scheduling system such
+as cron.
+
+=head1 RETURN VALUE
+
+Returns a non-zero exit code if a problem with the ECS daemons is detected.
+
+=head1 BUGS
+
+Possibly.
+
+=head1 SEE ALSO
+
+ecs_chk_com, ecs_scan_mail
+
+=head1 AUTHOR
+
+Joel Schneider <jschneid@nmdp.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED 
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF 
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+Copyright (C) 2002-2016 National Marrow Donor Program. All rights reserved.
+
+See LICENSE file for license details.
+
+=head1 HISTORY
+
+ECS, the EMDIS Communication System, was originally designed and
+implemented by the ZKRD (http://www.zkrd.de/).  This Perl implementation
+of ECS was developed by the National Marrow Donor Program
+(http://www.marrow.org/).
+
+2004-03-12	
+Canadian Blood Services - Tony Wai
+Rewritten to support MS Windows support for Windows 2000 and Windows XP
+
+2007-08-01
+ZKRD - emdisadm@zkrd.de
+Added optional path for the ps command on linux systems.
+Added optional parameter to select a user. This fixes the problem of a wrong
+positive result in case of more than one running instance of perl ECS.
+Modified the regular expressions in a way, that only the running daemons will
+be detected. Otherwise you get an ERROR if you try to stop the daemons e.g.
+while you work on the daemons source with an editor.
+Added an additional exit code if there is more than one instance of a daemon.

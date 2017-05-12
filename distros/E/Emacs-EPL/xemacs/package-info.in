@@ -1,0 +1,19 @@
+(epl
+  (standards-version 1.1
+   version VERSION
+   author-version AUTHOR_VERSION
+   date DATE
+   build-date BUILD_DATE
+   maintainer MAINTAINER
+   distribution epl
+   priority medium
+   category CATEGORY
+   dump nil
+   description "Control XEmacs using Perl."
+   filename FILENAME
+   md5sum MD5SUM
+   size SIZE
+   provides (perl epl-server)
+   requires (REQUIRES)
+   type regular
+))

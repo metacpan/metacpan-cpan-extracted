@@ -1,0 +1,58 @@
+NAME
+
+    Encode::Arabic::Franco - Turns Franco-/Chat-Arabic into actual Arabic
+    letters
+
+SYNOPSIS
+
+        use Encode::Arabic::Franco;
+    
+        while ($line = <>) {
+            print decode 'franco-arabic', $line;   # 'Franco-Arabic' alias 'Arabizy'
+        }
+    
+        # oneliner
+        $ perl -CS -MEncode::Arabic::Franco -pe '$_ = decode "arabizy", $_'
+
+DESCRIPTION
+
+    Franco-Arabic, aka Chat Arabic, Arabizy, is a transliteration of
+    Arabic, commonly used on the internet. It restricts itself to the ASCII
+    charset and substitutes numbers for the Arabic characters which have no
+    equivalent in Latin.
+
+    Franco-Arabic is not standardized. This module is far from complete.
+
+IMPLEMENTATION
+
+    Currently nothing more than a chain of tricks à la:
+
+        $str =~ s/3'/غ/g;
+        $str =~ s/7'/خ/g;
+
+GIT REPOSITORY
+
+    http://github.com/athreef/Encode-Arabic-Franco
+
+SEE ALSO
+
+    Encode, Encode::Encoding, Encode::Arabic,
+
+    Wikipedia article on Franco Arabic
+    https://en.wikipedia.org/wiki/Arabic_chat_alphabet
+
+    Buckwalter Arabic Morphological Analyzer
+    http://www.ldc.upenn.edu/Catalog/CatalogEntry.jsp?catalogId=LDC2002L49
+    (Might be employed in future)
+
+AUTHOR
+
+    Ahmad Fatoum <athreef@cpan.org>, http://a3f.at
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2016 Ahmad Fatoum
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

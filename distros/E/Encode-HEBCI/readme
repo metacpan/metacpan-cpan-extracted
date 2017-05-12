@@ -1,0 +1,28 @@
+This is the README file for HEBCI, a system to infer the encoding used
+for an HTML form submission.
+
+* Installation
+
+perl Makefile.PL
+make
+make install
+
+
+* Copyright
+
+Copyright (c) 2005,2006 Josh Myer <josh@joshisanerd.com>
+
+All rights reserved.  This file is released under either the Artistic
+License or the LGPL (version 2.1).  For more information, see
+- <http://www.perl.com/perl/misc/Artistic.html> (Artistic License)
+and
+- <http://www.gnu.org/licenses/lgpl.html> (LGPL v2.1)
+
+
+* Thank yous
+A really big thank-you to Tercent, Inc., whose financial support was
+instrumental in creating the more complete data tables.
+
+- The iconv people: without them, I would have no data to stand on
+- A veritable horde of encoding-related websites for references
+

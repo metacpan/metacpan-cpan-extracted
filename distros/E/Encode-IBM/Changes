@@ -1,0 +1,47 @@
+[Changes for 0.11 - 2008-01-07]
+
+* Bumped version of Encode::IBM::* to avoid CPAN.pm's "r" command
+  showing a back version. (No user-visible changes.)
+
+[Changes for 0.10 - 2008-01-07]
+
+* Added ibm-964 encoding for EUC-TW.
+
+* Upgraded Makfile.PL to latest enc2xs. (No user-visible changes.)
+
+* Split each encoding into a separate object file to reduce memory
+  consumption during compilation.
+
+[Changes for 0.07 - 2007-11-09]
+
+* Fix Win32 building problems caused by XSLoader not functioning.
+  Reported by: Sam Chen
+
+* Fix Makefile.PL's issue with earlier MakeMaker without SIGN=>1 support.
+  Reported by: Sam Chen
+
+[Changes for 0.06 - 2007-09-25]
+
+* LICENSING CHANGE: This compilation and all individual files in it
+  are now under the permissive "MIT" license.  See the COPYRIGHT
+  section in README for the new terms.
+
+* Added ibm-939 and ibm-939-sosi encoding.
+
+* Added ibm-835-sosi-tsgh, a variant of ibm-835-sosi with 
+  0x28/0x29 instead of 0x0E/0x0F as shift codes, plus a few
+  control codes for font sizing.
+
+[Changes for 0.05 - 2006-09-28]
+
+* Add ibm-835-sosi encoding.
+
+* Run "enc2xs -C" on "make install" by default.
+
+[Changes for 0.04 - 2006-09-15]
+
+* Add ibm-937 and ibm-947-sosi encodings.
+
+[Changes for 0.02 - 2004-12-30]
+
+* First really working CPAN release.

@@ -1,0 +1,29 @@
+---
+abstract: 'Determine the locale encoding'
+author:
+  - 'Gisle Aas <gisle@activestate.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Encode-Locale
+no_index:
+  directory:
+    - t
+    - inc
+recommends:
+  I18N::Langinfo: '0'
+requires:
+  Encode: '2'
+  Encode::Alias: '0'
+  perl: '5.008'
+resources:
+  repository: http://github.com/gisle/encode-locale
+version: '1.05'

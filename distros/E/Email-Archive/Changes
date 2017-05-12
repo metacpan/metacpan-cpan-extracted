@@ -1,0 +1,9 @@
+0.03 2012-08-24
+  * DBIC and MongoDB support long-overdue for release (thanks, Mugen Kenichi!)
+  * fix tests
+0.02 2011-07-27
+  * Add DBD::SQLite to Makefile.PL. Sorry, testers!
+  * Use Email::MIME, not Email::Simple.
+  * Use Moo, not Moose, since we're not doing anything to necessitate Moose.
+0.01  2011-07-25
+  * Initial release

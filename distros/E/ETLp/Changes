@@ -1,0 +1,14 @@
+Revision history for ETLp
+
+0.01    12 October 2010
+        First version, released on an unsuspecting world.
+0.02    15 October 2010
+        - Added log dir creation and removal to 01 and 02 tests
+        - Added autodie as a prereq as some Perls don't seem to have it
+          installed by default
+0.03    16 November 2010
+        - Modules now include package line so that they can be indexed by CPAN
+0.94    01 December 2012
+        - Fix RT #69222. Thanks to Joerg Meltzer
+        - Fix RT #69223. Links are now to the newer project site
+

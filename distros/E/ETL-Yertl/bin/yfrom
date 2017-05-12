@@ -1,0 +1,110 @@
+#!/usr/bin/env perl
+package yfrom;
+our $VERSION = '0.028';
+# ABSTRACT: Build YAML from another format (like JSON or CSV)
+
+use ETL::Yertl;
+use Pod::Usage::Return qw( pod2usage );
+use Getopt::Long qw( GetOptionsFromArray );
+use ETL::Yertl::Command::yfrom;
+
+$|++; # no buffering
+
+sub main {
+    my ( $class, @argv ) = @_;
+    my %opt;
+    GetOptionsFromArray( \@argv, \%opt,
+        'help|h',
+        'version',
+        'delimiter|d=s',
+    );
+    return pod2usage(0) if $opt{help};
+    if ( $opt{version} ) {
+        print "yfrom version $yfrom::VERSION (Perl $^V)\n";
+        return 0;
+    }
+
+    eval {
+        ETL::Yertl::Command::yfrom->main( @argv, \%opt );
+    };
+    if ( $@ ) {
+        return pod2usage( "ERROR: $@" );
+    }
+    return 0;
+}
+
+exit __PACKAGE__->main( @ARGV ) unless caller(0);
+
+__END__
+
+=pod
+
+=head1 NAME
+
+yfrom - Build YAML from another format (like JSON or CSV)
+
+=head1 VERSION
+
+version 0.028
+
+=head1 SYNOPSIS
+
+    yfrom <format> [<file>...]
+
+    yfrom csv [-d <delimiter>] [<file>...]
+
+    yfrom -h|--help|--version
+
+=head1 DESCRIPTION
+
+This program takes a stream of documents in the given format (on STDIN or file arguments),
+and prints them as YAML.
+
+=head1 ARGUMENTS
+
+=head2 format
+
+The format to read. Currently supported formats: JSON, CSV
+
+=head2 <file>
+
+A file to read. The special file "-" refers to STDIN. If no files are
+specified, read STDIN.
+
+=head1 OPTIONS
+
+=head2 -d | --delimiter
+
+The delimiter to use for the C<csv> format. Defaults to C<,>.
+
+=head2 -h | --help
+
+Show this help document.
+
+=head2 --version
+
+Print the current yfrom and Perl versions.
+
+=head1 ENVIRONMENT VARIABLES
+
+=over 4
+
+=item YERTL_FORMAT
+
+Specify the default format Yertl uses between commands. Defaults to C<yaml>. Can be
+set to C<json> for interoperability with other programs.
+
+=back
+
+=head1 AUTHOR
+
+Doug Bell <preaction@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Doug Bell.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,19 @@
+---
+name: Enumeration
+version: 0.03
+author:
+  - 'Eric J. Roode <roode@cpan.org>'
+abstract: Yet Another enumeration class implementation.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Test::More: 0.10
+provides:
+  Enumeration:
+    file: lib/Enumeration.pm
+    version: 0.03
+generated_by: Module::Build version 0.2807
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,64 @@
+{
+   "abstract" : "set Heroku add-on specific environment variables",
+   "author" : [
+      "Panu Ervamaa <pnu@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Env-Heroku",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta" : "0",
+            "Test::CPAN::Meta::JSON" : "0.16",
+            "Test::EOL" : "0",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Synopsis" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "URI" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "blib" : "1.01",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/pnu/env-heroku.git",
+         "web" : "http://github.com/pnu/env-heroku"
+      }
+   },
+   "version" : "0.003",
+   "x_authority" : "cpan:PNU"
+}
+

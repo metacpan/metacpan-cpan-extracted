@@ -1,0 +1,6 @@
+Revision history for Perl extension EBook::Generator.
+
+0.01  Mon Oct  4 14:38:19 2010
+	- original version; created by h2xs 1.23 with options
+		-AX -n EBook::Generator
+

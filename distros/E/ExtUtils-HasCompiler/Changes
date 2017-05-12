@@ -1,0 +1,70 @@
+Revision history for ExtUtils-HasCompiler
+
+0.017     2017-02-08 23:00:22+01:00 Europe/Amsterdam
+          - Don't pass the compiler's optimization flags to the ld command. On
+            systems where these two commands are different (AIX and some
+            version of HPUX among them), the ld command may not accept these
+            optimization flags. (Dave Rolsky, GH #9)
+
+0.016     2016-07-05 10:06:29+02:00 Europe/Amsterdam
+          - Stable release without modifications since 0.015
+
+0.015     2016-06-19 01:17:56+02:00 Europe/Amsterdam (TRIAL RELEASE)
+          - Fix eucb test to check result object [#113686]
+          - Use $Config{ld} on unix too
+
+0.014     2016-05-02 10:13:47+02:00 Europe/Amsterdam
+          - Create temporary directory under local directory
+          - Use better temp template names
+
+0.013     2016-04-10 14:28:36+02:00 Europe/Amsterdam
+          Only add perllibs on platforms that really need it
+          Add support for Android
+
+0.012     2015-07-15 16:55:46+02:00 Europe/Amsterdam
+          Fixes for VMS
+          Only load mksymlists if needed
+
+0.011     2015-07-08 22:54:00+02:00 Europe/Amsterdam
+          Always define IMPORTS argument to Mksymlists
+
+0.010     2015-07-07 16:28:40+02:00 Europe/Amsterdam
+          Add /c to MSVC compiles
+
+0.009     2015-07-05 17:45:27+02:00 Europe/Amsterdam
+          Don't forget the dot on the loadable object
+          Handle DynaLoaders without unload
+          Added VMS support
+
+0.008     2015-07-03 14:13:30+02:00 Europe/Amsterdam
+          Handle ancient perls without PERL_UNUSED_VAR
+          Improve diagnostics
+
+0.007     2015-07-02 07:41:29+02:00 Europe/Amsterdam
+          Use carp and return instead of croak
+          Explicitly handle import lib for cygwin
+          Use separate compiling and linking stages
+
+0.006     2015-06-27 15:40:31+02:00 Europe/Amsterdam
+          Correctly pass linking argument on Win32 and cygwin
+
+0.005     2015-06-27 14:30:04+02:00 Europe/Amsterdam
+          Return false early on static perls
+          Get rid of can_compile_executable
+          Link to libperl on Win32
+
+0.004     2015-06-26 03:13:56+02:00 Europe/Amsterdam
+          Fix MSVC regression
+          Only use env-vars when no config is passed
+          Rely on config to be overriden instead of adding yet another way to override
+          Give clearer errors on compilation failure
+
+0.003     2015-05-30 19:33:33+02:00 Europe/Amsterdam
+          Prefer environmental variables over configuration (experimental)
+          Get rid of Perl::OSType dependency
+
+0.002     2015-04-19 19:18:10+02:00 Europe/Amsterdam
+          Switch to ExtUtils::MakeMaker
+
+0.001     2015-04-19 16:54:07+02:00 Europe/Amsterdam
+          Initial release to an unsuspecting world

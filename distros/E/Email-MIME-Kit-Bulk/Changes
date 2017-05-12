@@ -1,0 +1,22 @@
+Revision history for Email-MIME-Kit-Bulk
+
+0.0.3 2017-03-28
+  [ BUG FIXES ]
+    - Changes in the latest Email::MIME::Kit were breaking our code. (GH#2)
+
+  [ STATISTICS ]
+    - code churn: 4 files changed, 12 insertions(+), 4 deletions(-)
+
+0.0.2 2015-03-20
+  [ BUG FIXES ]
+    - Skip test if temp directory not created.
+
+  [ STATISTICS ]
+    - code churn: 3 files changed, 25 insertions(+), 4 deletions(-)
+
+0.0.1 2015-03-18
+  - Move the parallelization engine to MCE.
+  - Initial release unleashed on an unsuspecting world.
+
+  [ STATISTICS ]
+    - code churn: 9 files changed, 226 insertions(+), 79 deletions(-)

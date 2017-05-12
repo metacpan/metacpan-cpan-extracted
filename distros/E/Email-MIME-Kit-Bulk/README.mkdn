@@ -1,0 +1,142 @@
+# NAME
+
+Email::MIME::Kit::Bulk - Email::MIME::Kit-based bulk mailer
+
+# VERSION
+
+version 0.0.3
+
+# SYNOPSIS
+
+```perl
+use Email::MIME::Kit::Bulk;
+use Email::MIME::Kit::Bulk::Target;
+
+my @targets = (
+    Email::MIME::Kit::Bulk::Target->new(
+        to => 'someone@somewhere.com',
+    ),
+    Email::MIME::Kit::Bulk::Target->new(
+        to => 'someone.else@somewhere.com',
+        cc => 'copied@somewhere.com',
+        language => 'en',
+    ),
+);
+
+my $bulk = Email::MIME::Kit::Bulk->new(
+    kit => '/path/to/mime/kit',
+    processes => 5,
+    targets => \@targets,
+);
+
+$bulk->send;
+```
+
+# DESCRIPTION
+
+`Email::MIME::Kit::Bulk` is an extension of [Email::MIME::Kit](https://metacpan.org/pod/Email::MIME::Kit) for sending
+bulk emails. The module can be used directly, or via the 
+companion script `emk_bulk`.
+
+If a language is specified for a target, `Email::MIME::Kit` will use
+`manifest._language_.json` to generate its associated email. If no language 
+is given, the regular `manifest.json` will be used instead.
+
+If `emk_bulk` is used, it'll look in the _kit_ directory for a
+`targets.json` file, which it'll use to create the email targets.
+The format of the `targets.json` file is a simple serialization of
+the [Email::MIME::Kit::Bulk::Target](https://metacpan.org/pod/Email::MIME::Kit::Bulk::Target) constructor arguments:
+
+```
+[
+{
+    "to" : "someone@somewhere.com"
+    "cc" : [
+        "someone+cc@somewhere.com"
+    ],
+    "language" : "en",
+    "template_params" : {
+        "superlative" : "Fantastic"
+    },
+},
+{
+    "to" : "someone+french@somewhere.com"
+    "cc" : [
+        "someone+frenchcc@somewhere.com"
+    ],
+    "language" : "fr",
+    "template_params" : {
+        "superlative" : "Extraordinaire"
+    },
+}
+]
+```
+
+`Email::MIME::Kit::Bulk` uses [MCE](https://metacpan.org/pod/MCE) to parallize the sending of the emails.
+The number of processes used can be set via the `processes` constructor 
+argument.  By default [MCE](https://metacpan.org/pod/MCE) will select the number of processes based on
+the number of available
+processors. If the number of processes is set to be `1`, [MCE](https://metacpan.org/pod/MCE) is bypassed 
+altogether.
+
+# METHODS
+
+## new( %args ) 
+
+Constructor.
+
+### Arguments
+
+- targets => \\@targets
+
+    Takes in an array of [Email::MIME::Kit::Bulk::Target](https://metacpan.org/pod/Email::MIME::Kit::Bulk::Target) objects,
+    which are the email would-be recipients.
+
+    Either the argument `targets` or `to` must be passed to the constructor.
+
+- to => $email\_address
+
+    Email address of the '`To:`' recipient. Ignored if `targets` is given as well.
+
+- cc => $email\_address
+
+    Email address of the '`Cc:`' recipient. Ignored if `targets` is given as well.
+
+- bcc => $email\_address
+
+    Email address of the '`Bcc:`' recipient. Ignored if `targets` is given as well.
+
+- kit => $path
+
+    Path of the directory holding the files used by [Email::MIME::Kit](https://metacpan.org/pod/Email::MIME::Kit).
+    Can be a string or a [Path::Tiny](https://metacpan.org/pod/Path::Tiny) object.
+
+- from => $email\_address
+
+    '`From`' address for the email .
+
+- processes => $nbr
+
+    Maximal number of parallel processes used to send the emails.
+
+    If not specified, will be chosen by [MCE](https://metacpan.org/pod/MCE).
+    If set to 1, the parallel processing will be skipped
+    altogether.
+
+    Not specified by default.
+
+## send()
+
+Send the emails.
+
+# AUTHORS
+
+- Jesse Luehrs    <doy@cpan.org>
+- Yanick Champoux <yanick.champoux@iinteractive.com> [![endorse](http://api.coderwall.com/yanick/endorsecount.png)](http://coderwall.com/yanick)
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Infinity Interactive <contact@iinteractive.com>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,9 @@
+std::string   T_STD_STRING
+
+INPUT
+T_STD_STRING
+    $var = std::string( SvPV_nolen( $arg ), SvCUR( $arg ) );
+
+OUTPUT
+T_STD_STRING
+    $arg = newSVpvn( $var.c_str(), $var.length() );

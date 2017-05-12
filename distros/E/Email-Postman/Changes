@@ -1,0 +1,13 @@
+Revision history for Perl module Email::Postman
+
+0.03 2014-04-26
+
+    - Compatibility with perl 5.8
+    - DNS independent tests
+
+0.02 2013-09-20
+    - Added missing build dependency
+
+0.01 2013-07-06
+    - First version, released on an unsuspecting world. Basic features.
+

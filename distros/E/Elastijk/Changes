@@ -1,0 +1,55 @@
+0.12 2016-07-04T13:08:16Z
+
+  - Elastijk::oo - passthru more useful parameters down to Hijk.
+    Specifically these ones: socket_cache, on_connect,
+    connect_timeout, read_timeout
+
+
+0.11 2016-06-28T12:45:58Z
+
+  - Elastijk::oo - passthru "head" parameter.
+
+0.10 2016-05-01T16:59:08Z
+
+  - Documentation updates, no feature change.
+
+0.09 2015-10-23T23:40:47Z
+
+  - Documentation updates, no feature change.
+
+0.08 2014-05-30T15:19:09Z
+
+  - add "scan_scroll" method to make scanning a bit easier.
+  - store Hijk errors in the response body.
+
+0.07 2014-05-15T10:54:56Z
+
+  - make an exception and do not uri_escape() the "command" part.
+    see 434c01c20fe513e1e13d258cd85d74c3839c28a4
+
+0.06 2014-05-15T08:12:04Z
+
+  - Elastijk::request now expect all scalars in the input to contain wide
+    characters, and it does encode_utf8 / uri_escape_utf8 internally.
+
+0.05 2014-05-12T06:03:23Z
+
+  - Change the parameter spec for almost all methods in Elastijk::oo
+
+0.04 2014-05-09T06:30:43Z
+
+  - Add "request" and "request_raw" method to Elastijk::oo
+
+0.03 2014-03-16T22:35:57Z
+
+  - Add "search" and "uri_search" method.
+
+0.02 2013-12-04T21:37:32Z
+
+  - Adding some simple oo interface.
+  - oo: create/delete index, get document..
+
+0.01 2013-12-01T16:15:22Z
+
+  - Initial release
+

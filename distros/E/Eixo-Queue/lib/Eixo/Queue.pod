@@ -1,0 +1,68 @@
+=encoding utf8
+
+=head1 NAME
+
+Eixo::Queue - Suite of Perl modules to work with task queues
+
+=head1 SYNOPSIS
+
+
+=head1 DESCRIPTION
+
+
+=head1 DEPENDENCIES
+
+Currently this module has the following dependencies:
+
+
+=over
+
+=item *
+
+Eixo::Base >= 1.200,
+
+=item *
+
+JSON >= 2.50,
+
+=item *
+
+Data::UUID >= 1,
+
+=item *
+
+MongoDB >= 0.708,
+
+=back
+
+
+
+=head1 CAVEATS
+
+
+=head1 AUTHORS
+
+Francisco Maseda, <frmadem@gmail.com>
+
+Javier Gomez, <alambike@gmail.com>
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2014, Francisco Maseda
+
+Copyright (C) 2014, Javier Gómez
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+L<http://www.apache.org/licenses/LICENSE-2.0>
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+=cut

@@ -1,0 +1,33 @@
+#!env perl
+
+use strict;
+use warnings;
+use IO::Socket::INET;
+use Test::More;
+use Test::TCP;
+
+test_tcp (client => sub {
+              my $port = shift;
+          },
+          server => sub {
+              my $port = shift;
+              my $socket = IO::Socket::UNIX->new (Host => 'localhost', Port => $port, Listen => 1);
+              while (my $client = $socket->accept) {
+                  my ($buffer, $length, $message, $response);
+                  sysread ($client, $buffer, 1024) or die "Couldn't read: $!";
+                  ($length, $message) = split ':', $buffer, 2;
+                  my $remainder = $length + 1 - length $message;
+                  while ($remainder and sysread $client, $buffer, $remainder) {
+                      $message .= $buffer;
+                      $remainder -= length $buffer;
+                  }
+                  if ($remainder) {
+                      $response = 'DIncomplete';
+                  } elsif ($message =~ m/\015/) {
+                      $response = 'DMessage contains CR';
+                  } else {
+                      $response = 'KOK';
+                  }
+                  $client->printf ("%d:%s,", length $response, $response);
+                  $client->flush;
+              }

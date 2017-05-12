@@ -1,0 +1,14 @@
+Changes
+lib/ExtUtils/Constant.pm
+lib/ExtUtils/Constant/Aaargh56Hash.pm
+lib/ExtUtils/Constant/Base.pm
+lib/ExtUtils/Constant/ProxySubs.pm
+lib/ExtUtils/Constant/Utils.pm
+lib/ExtUtils/Constant/XS.pm
+MANIFEST
+Makefile.PL
+README
+t/Constant.t
+examples/perl_keyword.pl
+examples/perl_regcomp_posix_keyword.pl
+META.yml                                 Module meta-data (added by MakeMaker)

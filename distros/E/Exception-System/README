@@ -1,0 +1,50 @@
+NAME
+    Exception::System - The exception class for system or library calls
+
+SYNOPSIS
+      # The simplest usage
+      use Exception::Base 'Exception::System';
+      open my $file, "/notfound"
+        or Exception::System->throw(message=>"Can not open file");
+
+      # The Exception::System class can be a base class for others
+      #
+      # Loaded automatically if used as Exception::Base's argument
+      use Exception::Base,
+        'Exception::System',
+        'Exception::File' => {
+            isa => 'Exception::System',
+            has => 'filename',
+            string_attributes => [ 'message', 'errstr', 'filename' ],
+        };
+
+      eval {
+        my $filename = "/notfound";
+        open my $fh, $filename
+            or Exception::File->throw(
+                   message=>"Can not open file",
+                   filename=>$filename,
+               );
+      };
+      if ($@) {
+        my $e = Exception::Base->catch;
+        if ($e->isa('Exception::File')) { warn "File error:".$e->errstr; }
+        if ($e->matches({errname=>'ENOENT'})) { warn "Caught not found error"; }
+      }
+
+DESCRIPTION
+    This class extends standard Exception::Base with handling system or
+    library errors. The additional attributes of the exception object are
+    filled on throw and contain the error message and error codes.
+
+AUTHOR
+    Piotr Roszatycki <dexter@debian.org>
+
+LICENSE
+    Copyright (C) 2007, 2008 by Piotr Roszatycki <dexter@debian.org>.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See http://www.perl.com/perl/misc/Artistic.html
+

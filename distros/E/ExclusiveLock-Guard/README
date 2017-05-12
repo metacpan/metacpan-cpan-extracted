@@ -1,0 +1,43 @@
+NAME
+    ExclusiveLock::Guard - lexically-scoped lock management
+
+SYNOPSIS
+        use ExclusiveLock::Guard;
+
+        sub blocking_transaction {
+            my $lock = ExclusiveLock::Guard->new('/tmp/foo.lock')
+                or die 'lock error: ' . ExclusiveLock::Guard->errstr;
+            # inner of lock
+        }
+        blocking_transaction();
+        # outer of lock
+
+    for non-blocking
+
+        sub nonblocking_transaction {
+            my $lock = ExclusiveLock::Guard->new('/tmp/foo.lock', nonblocking => 1 )
+                or die 'lock error: ' . ExclusiveLock::Guard->errstr;
+            unless ($lock->is_locked) {
+                warn 'is locked';
+                return;
+            }
+
+            # inner of lock
+        }
+        nonblocking_transaction();
+        # outer of lock
+
+DESCRIPTION
+    ExclusiveLock::Guard is very simple lock maneger. To automatically
+    create and remove the lock file.
+
+AUTHOR
+    Kazuhiro Osawa <yappo {at} shibuya {dot} pl>
+
+COPYRIGHT
+    Copyright 2012- Kazuhiro Osawa
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

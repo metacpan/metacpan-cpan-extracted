@@ -1,0 +1,13 @@
+Revision history for Perl extension Email::Store::Summary.
+
+1.2
+    - have the test exclude plugins other than Mail and Summary, so that
+      we're not afflicted by other peoples mungings --richardc
+
+1.1   Thu Jul 15 13:13:01 BST 2004
+    - Return UTF8
+
+0.01  Wed Jun 16 12:10:27 2004
+	- original version; created by h2xs 1.22 with options
+		-AX -b 5.6.0 -n Email::Store::Summary
+

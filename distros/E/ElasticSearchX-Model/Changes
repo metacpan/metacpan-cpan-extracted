@@ -1,0 +1,90 @@
+1.0.2     2016-04-23 13:52:29+01:00 Europe/London
+  - Move from JSON.pm to JSON::MaybeXS
+
+1.0.1     2016-04-21 16:22:35+01:00 Europe/London
+  - fix DEMOLISH ElasticSearchX::Model::Bulk (Matt Trout)
+
+1.0.0     2016-04-13 09:55:00-04:00 America/Toronto
+  - Adapted module & test suite for Elasticsearch 2.x (Mickey Nasriachi)
+
+0.2.2     2015-05-02 12:21:38-04:00 America/Toronto
+  - Update test suite to keep up with Elasticsearch 1.x behaviour (Olaf Alders)
+
+0.2.1     2015-04-23 21:47:01-04:00 America/Toronto
+  - Added doc_values to all not_analyzed fields and prevented loading of fielddata on analyzed string fields (Clinton Gormley)
+  - Added ignore_above to the not_analyzed string mappings to avoid processing very large strings (Clinton Gormley)
+
+0.2.0     2015-04-18 11:52:23+02:00 Europe/Berlin
+  - Bulk now only commits if there's something in the stash
+
+0.1.9     2015-04-17 14:52:16+02:00 Europe/Berlin
+  - Adds ElasticSearchX::Model::Document::EmbeddedRole (Clinton Gormley)
+
+0.1.8     2015-04-17 11:28:49+02:00 Europe/Berlin
+  - Removes source compression (no longer needed) (Clinton Gormley)
+  - Adds support for source() filtering to Document::Set (Clinton Gormley)
+  - The ES host will now default to ENV{ES} if present (Clinton Gormley)
+
+0.1.8-TRIAL - 2014-04-26
+  - Elasticsearch with version less than 0.90 are no longer officially supported and tested
+  - Switch to Search::Elasticsearch from ElasticSearch
+
+0.1.7 - 2013-11-25
+  - use Class::Load::load_class instead of MOP::Class (Kent Fredric)
+  - Fix issue with id property not being detected correctly
+
+0.1.6 - 2013-05-08
+  - ignore_missing 1 for aliases
+
+0.1.5 - 2013-04-02
+  - The latest Moose release (2.08) broke this module.
+
+0.1.4 - 2012-11-22
+  - Add missing prereq
+
+0.1.3 - 2012-11-11
+  - bump version of ElasticSearch.pm prereq
+  - tested with ES 0.20.0RC1
+  - added $model->es_version, returns a version object
+  - use JSON instead of Cpanel::JSON::XS as JSON will delegate to Cpanel::JSON::XS automatically if installed
+
+0.1.2 - 2012-08-24
+  - requires at least ES 0.19.2 which has a much more stable API
+  - supporting _timestamp and _ttl
+  - pluggable interface for loading special fields (ESX::Model::Document::Trait::Field)
+  - $document->update() will now fail if the document is only
+    partially loaded (i.e. using fields())
+
+0.1.1 - 2012-03-30
+  - $type->refresh sets the refresh qs to a true value
+  - query_type attribute
+
+0.1.0 - 2012-01-14
+  - BREAKING CHANGE:
+    attributes on the Set class will now clone the Set instance.
+    This might break your code if you rely on the fact, that an attribute
+    from a previous call changes the underlying Set instance.
+    Example:
+    my @documents = $type->inflate(0)->all;
+    # this won't set the inflate attribute to 0 on the $type instance
+    # instead a clone of $type is created with inflate set to 0
+
+0.0.5 - 2012-01-11
+  - documentation
+  - pass-through query parameters for most methods (e.g. get, put, all)
+  - delete method on a Set which will issue a delete_by_query
+  - default to fetch the _version on search
+  - introduce create and update methods on a document
+  - bulk actions accept raw hashrefs for better performance
+
+0.0.4 - 2011-12-12
+  - deflate boolean values to Cpanel::JSON::XS::true/false
+
+0.0.3 - 2011-11-11
+  - fall back to the _id property in sub get_id_property
+
+0.0.2 - 2011-08-19
+  - documentation fixes
+
+0.0.1 - 2011-08-18
+  - initial release

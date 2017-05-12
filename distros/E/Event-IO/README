@@ -1,0 +1,29 @@
+Event::IO
+=========
+
+The Event::IO modules are some modules that simplify use of the excellent
+Event module.
+
+Event::IO::Record provides buffered I/O.
+
+Event::IO::Server provides a simple server framework.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+DEPENDENCIES
+
+This module requires the Event module.
+
+COPYRIGHT AND LICENCE
+
+This module may be used under the same terms as Perl itself.
+
+Copyright (C) 2004 David B. Robins.
+

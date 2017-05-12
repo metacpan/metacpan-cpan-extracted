@@ -1,0 +1,36 @@
+* {
+	margin				: 0px;
+	padding				: 0px;
+	font-family			: 'Tahoma', 'Verdana', 'arial', sans-serif;
+/*	font-size			: medium;*/
+	white-space			: normal;
+	z-index				: 0;
+/*	color				: #000000;*/
+}
+
+html, body {
+	height				: 100%;
+	background-color	: #F6F6F6;
+}
+img {
+	border				: 0px none #FFFFFF;
+	background-color	: transparent;
+}
+
+/*** main contents block ***/
+#container {
+	min-height			: 100%;
+	margin-top			: -2em;
+	margin-bottom		: -2em;
+}
+
+/*** dummy block ***/
+#clearheader	{
+	height				: 6em;
+	width				: 100px;	/* dummy */
+}
+#clearfooter {
+	clear				: both;
+	height				: 2em;
+	width				: 100px;	/* dummy */
+}

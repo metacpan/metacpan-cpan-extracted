@@ -1,0 +1,59 @@
+Emacs-Run
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+DEPENDENCIES
+
+This module depends on having GNU/Emacs installed on the system
+(it is unlikely to work with xemacs).
+
+This module requires these other modules and libraries:
+   Class::Base
+   List::MoreUtils
+   File::Temp
+
+The tests require:
+   Test::Differences
+   Test::More
+
+Note: dependecy on IPC::Capture has been dropped as of version 0.13.
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Emacs::Run
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Emacs-Run
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Emacs-Run
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Emacs-Run
+
+    Search CPAN
+        http://search.cpan.org/dist/Emacs-Run/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008, 2009 Joseph Brenner
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

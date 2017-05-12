@@ -1,0 +1,5 @@
+- Request for a specific version instead of the latest.
+- A cleaner self-boostrap block.
+- Default autoconf-like test utilities.
+- Module::Build integration.
+

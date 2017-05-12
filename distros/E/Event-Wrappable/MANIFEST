@@ -1,0 +1,16 @@
+ChangeLog
+INSTALL
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+SIGNATURE
+lib/Event/Wrappable.pm
+t/method.t
+t/pod-coverage.t
+t/pod.t
+t/release-no-tabs.t
+t/release-portability.t
+t/scope_based.t
+t/threads.t

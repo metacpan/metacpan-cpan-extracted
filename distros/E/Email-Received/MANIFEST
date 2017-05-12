@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Email-Received.t
+t/rcvd_parser.t
+lib/Email/Received.pm
+lib/Email/Received/Constants.pm
+META.yml                                 Module meta-data (added by MakeMaker)

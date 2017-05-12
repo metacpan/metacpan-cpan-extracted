@@ -1,0 +1,311 @@
+package ETLp::Manual::Install;
+
+# ABSTRACT: Install manual for ETLp
+
+__END__
+
+=pod
+
+=head1 PRE-REQUISITE PERL MODULES
+
+1. Check the code out of the source code repository:
+
+   svn co http://subversion.assembla.com/svn/etlp/ etlp
+
+
+
+2. Set up your test environment. B<Do not use a production account, as any existing ETLp structures will be removed when the test suite is run>.
+
+Oracle (make sure ORACLE_HOME and ORACLE_SID are set - either explicitly or by using ''oraenv''):
+
+   . oraenv
+   #ORACLE_SID = [db] ?<Test DB Name>
+   export ORA_USER=<test_user>
+   export ORA_PASS=<test_password>
+   export ORA_DSN=DBI:Oracle:<test tnsname>
+
+MySQL:
+
+   export MYSQL_USER=<test_user>
+   export MYSQL_PASS=<test_password>
+   export MYSQL_DSN=DBI:mysql:<test db specification>
+
+PostgreSQL:
+
+   export PG_USER=<test_user>
+   export PG_PASS=<test_password>
+   export PG_DSN=DBI:Pg:<test db specification>
+
+3. Run the standard build process:
+
+   cd etlp
+   perl Makefile.PL
+
+This step will create a makefile. If any pre-requisite Perl modules are missing then they should be installed using the "cpan" shell as the B<root> user.
+
+   cpan
+   # Your are now in the cpan shell
+   cpan> install <module name>
+
+=head2 DB Specific modules
+
+These modules are not specified as mandatory in Makefile.PL as they are only required if you use these databases
+
+Oracle:
+
+=over 4
+
+=item * DBD::Oracle
+
+=item * DateTime::Format::Oracle
+
+=item * CGI::Session::Driver::oracle
+
+=back
+   
+MySQL:
+
+=over 4
+
+=item * DBD::mysql
+
+=item * DateTime::Format::MySQL
+
+=back
+
+Postgres:
+
+=over 4
+
+=item * DBD::Pg
+
+=item * DateTime::Format::Pg
+
+=back
+
+4. Begin the build:
+
+   make
+
+5. Run the test suite:
+
+   make test
+
+6. If all tests pass, install the software:
+
+As a general user:
+
+   sudo make install
+
+Or, as root:
+
+   make install
+
+7. Install the framework tables. You should use a different schema or database from the ones used for testing above:
+
+Oracle:
+
+   migrate_schema --user=<oracle_user> --pass=<oracle_pass> --dsn=<oracle_dsn> \
+   --ddl_dir=ddl/oracle --separator="/"
+
+MySQL:
+
+   migrate_schema --user=<mysql_user> --pass=<mysql_pass> \
+   --dsn=<mysql_dsn> --ddl_dir=ddl/mysql 
+
+PostgreSQL:
+
+   migrate_schema --user=<postgresql_user> --pass=<postgresql_pass> \
+   --dsn=<postgresql_dsn> --ddl_dir=ddl/postgresql 
+
+=head1 Creating Your Application Structure
+
+1. ETLp assumes a standardised directory structure. Create the following directories below your application root:
+
+    + <app_root>
+       |
+       +--/bin
+       |
+       +--/conf
+       |  |
+       |  +--/control
+       |
+       +--/data
+       |  |
+       |  +--/<source 1>
+       |  |  |
+       |  |  +--/archive
+       |  |     |
+       |  |     /fail
+       |  |     |
+       |  |     /incoming
+       |  |
+       |  +--/<source 2>
+       |     |
+       |     +--/archive
+       |        |
+       |        /fail
+       |        |
+       |        /incoming
+       |
+       +--/locks
+       |
+       +--/log
+
+The data source sub-directories will typically be symbolic links to locations outside of the application tree.
+
+2. Link to B<etlp> to the bin directory. The B<etlp> script to link to will usually be  in either /usr/bin or /usr/local/bin depending on whether your perl is in /usr/bin or /usr/local/bin
+
+   cd bin
+   ln -s /usr/local/bin/etlp . # or /usr/bin/etlp
+
+3. Create a basic configuration file, env.conf, and save it to the conf dircetory
+
+   user         = <db user>
+   password     = <db password>
+   dsn          = <DBI DSN>
+   admin_email  = <email address for errors and warnings>
+   email_sender = <email address of the sender>
+   logger_level = <Log4perl Logging level>
+   environment  = <environment name?
+
+=over 4
+
+=item * The admin email will be the global mailbox for all processing errors
+=item * The email sender is the address that appears in the the from field - typically something like noreply@domain.com
+=item * The logging level should be one of DEBUG, INFO, WARN, ERROR, FATAL. This provides a decreasing level of information. E.g. if the level is set to INFO, no debug messages will appear in the logs. All messages with a threshold of WARN and above will be emailed.
+=item * The name of the environment will appear in the subject line of email alerts
+
+=back
+
+ETLp is now installed
+
+=head1 Installing the Runtime Audit Browser
+
+The Runtime Audit Browser allows support staff to view the status of jobs and to drill down and view details at the individual item and/or file level.
+
+=head2 Prerequisite: Persistent Perl
+
+Unless code is run in a persistent environment, each page request must undergo an expensive process of
+
+=over 4
+
+   1. Launching the Perl interpreter
+   2. Compiling the code - including all dependent Perl libraries
+   3. Initiate a connection to the database
+   4. Perform the user request
+   5. Exit
+   
+=back
+
+With small applications on a non-busy site, this shouldn't cause any issues. However, it doesn't scale very well. Although ETLp Runtime Audit Browser isn't especially busy, it does requite many dependent classes.  In order to mitigate the issues above, we use Persistent Perl:
+
+=over 4
+
+   1. When the first request is received, the Persistent Perl interpreter is launched.
+   2. The code is compiled and a connection is made to the database.
+   3. The user's request is performed
+   4. Wait around for the next request
+ 
+=back
+
+Other alternatives exist: FastCGI is commonly used, and supports not only Perl, but PHP, Ruby and any language that respects the CGI protocol. mod_perl installs a persistent interpreter and a complete version of the application in each Apache process. However, both of these solutions require changes to Apache. Persistent Perl simply requires that you replace the interpreter in the first line of the script - and hence supports Perl outside of a web-specific environment.
+
+ETLp includes a patched version of Persistent Perl that works with Perl 5.10 running on Linux. It is located in the "util" directory. The installation process is fairly simple:
+
+    cd util
+    tar zxf PersistentPerl-2.22-5.10-patched.tar.gz
+    cd PersistentPerl-2.22
+    perl Makefile.PL
+    make
+    make test
+    sudo make install
+
+=head2 Configuring the Browser
+
+=over 4
+
+=item 1. Choose a root directory for the browser application that is accessible to your Apache server
+=item 1. Copy the code under the web directory to that location
+=item 1. Edit the application configuration file
+=item 1. Edit the Apache configuration file
+=item 1. (Re)start Apache
+
+=back
+
+As B<root>, from the ETLp home directory:
+
+    mkdir   /var/www/etlp/
+    cp web/*  /var/www/etlp/
+
+Create the browser config file, /var/www/etlp/conf/etl.conf, and enter the appropriate settings
+
+    user     = <etl user>
+    password = <etl password>
+    dsn      = <Perl DBI connection string>
+    root_url = /etlp
+    pagesize = 20
+
+=over 4
+
+=item * user. The username to connect to. This is usually etl.
+
+=item * password. The user's password
+
+=item * dsn. The Perl DBI connection string.
+
+=item * root_url. The portion of the URL after the server name (absolute path). For example (!https://<!MyHost>/etlp would be /etlp)The directory where the main application is configured. It must be readable by the web server user (typically ''apache'' or ''nobody''), and the etl user
+
+=item * How many items to show on a page. Pagination links will be displayed as appropriate
+
+=back
+
+Create the Apache configuration: /etc/httpd/conf.d/etlp.conf
+
+    Alias /etlp/stylesheets/  "/var/www/etlp/stylesheets/"
+    Alias /etlp/javascript/  "/var/www/etlp/javascript/"
+
+    ScriptAlias /etlp/ "/var/www/etlp/cgi-bin/"
+    <Directory /var/www/etlp/cgi-bin>
+       AllowOverride None
+       Options +ExecCGI
+       Order allow,deny
+       Allow from all
+
+       # This line is only required of Oracle is used:
+       SetEnv ORACLE_HOME <ORACLE_HOME>
+    </Directory>
+
+Make sure the web files are owned by the apache user (typically ''apache'' or ''nobody''):
+
+    chown -R apache:apache /var/www/etlp
+
+Restart apache:
+
+    service httpd restart
+
+B<Note>: These instructions assume that you are installing against the standard Redhat Enterprise Linux Apache distribution. If you have installed from source on on another operating system flavour, then the locations will be slightly different, e.g.
+
+    /usr/local/apache/bin/apachectl restart
+
+or 
+
+    /etc/init.d/httpd restart
+
+Refer to your system administrator for the details, if required.
+
+=head3 Extra Steps for Oracle
+
+If the ETLp Runtime Browser runs against an Oracle database, it provides functionality to drill down to the running SQL and to also generate an explain plan. However, this feature requires additional privileges, specifically the ability to SELECT from the following views:
+
+=over 4
+
+=item * v$session
+
+=item * v$sqlarea
+
+=item * v$process
+
+=back
+
+These should be granted to the main ETL user. In order to generate an explain plan, the ETL user must have select privileges on the underlying tables. In addition, further synonyms may need to be provided if the SQL in question does not have fully qualified object names (i.e. <schema>.<table>)

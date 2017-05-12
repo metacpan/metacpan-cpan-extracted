@@ -1,0 +1,36 @@
+---
+abstract: 'install files from here to there'
+author:
+  - 'demerphq <yves@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: ExtUtils-Install
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Cwd: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Basename: '0'
+  File::Compare: '0'
+  File::Copy: '0'
+  File::Find: '0'
+  File::Path: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+resources:
+  bugtracker: https://rt.cpan.org/NoAuth/Bugs.html?Dist=ExtUtils-Install
+  homepage: https://metacpan.org/release/ExtUtils-Install
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/Perl-Toolchain-Gang/ExtUtils-Install
+version: '2.04'

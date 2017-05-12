@@ -1,0 +1,67 @@
+0.016     2014-08-17 09:52:52+01:00 Europe/London
+	No new features.
+
+	Internal changes:
+	* Disabled fatal warnings
+
+0.015     2014-01-28 04:53:28+00:00 Europe/London
+	No new features.
+
+	API changes:
+	* No longer exports Try::Tiny (https://github.com/doy/try-tiny/issues/14)
+	* Helper functions dropped - these aren't used often enough to be useful
+
+0.014     2013-05-28 21:04:34 Europe/London
+	* Add Class::ISA dep
+
+0.013     2013-05-21 02:44:22 Europe/London
+	* Drop smartmatch. It seems to be going away in 5.18+.
+	* Drop trim and restring helper functions.
+	* Provide splice method for arrays
+
+0.012     2012-09-22 12:13:02 Europe/London
+	Fix leak due to $self in closure on array watchers.
+
+0.011     2012-06-10 16:17:36 Europe/London
+	Use Module::Load instead of require when attempting to load dependencies.
+	Bug fixed: make sure we load ISA modules
+
+0.010     2012-01-28 18:19:23 Europe/London
+	Attempt to clear and reapply overloading state after setting smart match operator.
+
+0.009     2011-09-18 23:40:36 Europe/London
+	Fix EntityModel::Error handling to work with latest EntityModel::Log.
+	Added extract_by implementation as one of the array helpers.
+
+0.008     2011-06-21 21:12:44 Europe/London
+	Make the EntityModel::Array handling work in a more asynchronous-friendly manner. Changes
+	 ->grep, ->first, ->last etc.
+	Switch back to Check::UnitCheck 0.13 since the patch was accepted upstream (thanks AJGOUGH)
+
+0.007     2011-03-06 02:37:07 Europe/London
+	Don't set EntityModel::Class as parent for everything that uses it.
+
+0.006     2011-03-04 17:12:57 Europe/London
+	Return $self from plain value accessor when changing value.
+	Don't warn about undefined values when retrieving from hash.
+	Minor performance improvements on standard accessors and for instantiating the base class.
+	Hash accessor allows non-ref single parameter to return the value for that key.
+
+0.005     2011-02-26 18:16:15 Europe/London
+	Allow watchers for EntityModel::Class::Array, raise an error if setting an array rather than going through the EntityModel::Array methods,
+	 and a minor optimisation for cases where there's no pre callback.
+	Array and hash entries now preserve the EntityModel::Array / EntityModel::Hash wrapper so that watchers can be added.
+
+0.004     2011-02-09 06:34:15 Europe/London
+	Add missing Test::Deep prerequisite to test requirements, no other code changes.
+
+0.003     2011-02-07 04:39:34 Europe/London
+	Tidy up documentation and rename camelCase methods to fit_with_perl_conventions.
+
+0.002     2011-02-06 05:45:33 Europe/London
+	Import modified version of the Check::UnitCheck unitcheckify() handling to
+	 allow running without usemultiplicity defined
+
+0.001     2011-02-01 04:37:04 Europe/London
+	Initial upload to CPAN.
+

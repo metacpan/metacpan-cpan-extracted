@@ -1,0 +1,53 @@
+NAME
+    Env::Modify - modify calling environment from a subshell after
+    executing system commands
+
+SYNOPSIS
+      use Env::Modify ':system';
+
+      $ENV{FOO} = "123";
+      $status = system("export FOO=456");
+      print $ENV{FOO};     #  "456"
+
+DESCRIPTION
+    New Perl programmers are often confused about how the  system  command
+    interacts with the environment, and they wonder why this code
+
+        system('export foo=bar; echo $foo');
+
+    outputs "bar" but this code
+
+        system('export foo=bar');
+        system('echo $foo');
+
+    does not.
+
+    Env::Modify  uses the clever mechanism from Diab Jerius's  Shell::GetEnv
+    distribution to execute a system command, preserve the environment
+    from the subshell, and copy the subshell environment back to the
+    calling environment. In this way,  system  and  readpipe/qx/backticks
+    calls can have an effect on Perl's environment and in the environment
+    of subsequent system calls.
+
+EXPORT
+    This module can export the 'system' function into the calling 
+    package. This module can export the equivalent 'readpipe', 'qx', 
+    and 'backticks' functions into the calling package.
+    There are also options to install functions to the CORE::GLOBAL
+    namespace and make the environment-modifying behavior applicable
+    from all system/readpipe/qx/backticks calls from all packages.
+
+DEPENDENCIES
+    Shell::GetEnv provides the mechanism for copying a subshell's
+    environment back into the calling environment.
+
+AUTHOR
+    Marty O'Brien <mob@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    Copyright (c) 2016, Marty O'Brien
+
+    This library is free software; you can redistribute it and/or modify
+    it under the same terms as Perl itself, either Perl version 5.8.8 or,
+    at your option, any later version of Perl 5 you may have available.

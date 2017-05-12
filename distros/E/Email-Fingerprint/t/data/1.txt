@@ -1,0 +1,68 @@
+Return-Path: <foo@example.com>
+Delivered-To: bar@example.com
+Received: (qmail 32688 invoked by uid 500); 11 Feb 2007 16:37:19 -0000
+Delivered-To: bar@example.com
+Received: (qmail 32665 invoked from network); 11 Feb 2007 16:37:16 -0000
+Received: from cobalt.pobox.com (208.58.1.196)
+  by example.com with SMTP; 11 Feb 2007 16:37:16 -0000
+Received: from localhost.localdomain (localhost [127.0.0.1])
+	by cobalt.pobox.com (Postfix) with ESMTP id E999B4000D7
+	for <bar@example.com>; Sun, 11 Feb 2007 11:37:15 -0500 (EST)
+Delivered-To: bar@example.com
+Received: from n24c.bullet.scd.yahoo.com (n24c.bullet.scd.yahoo.com
+ [66.218.67.214]) by cobalt.pobox.com (Postfix) with SMTP id 424034000B7 for
+ <bar@example.com>; Sun, 11 Feb 2007 11:37:14 -0500 (EST)
+Comment: DomainKeys? See http://antispam.yahoo.com/domainkeys
+DomainKey-Signature: a=rsa-sha1; q=dns; c=nofws; s=lima; d=yahoogroups.com;
+ b=uktxGyFUpDh2mM4J+Xq8FjLsJnxWI33QjBsjvVPLYuwndnAbLItmL8uAXg1iyoJ1UsMb1rkXIk3MqHOmYKDjNOC3g3pnKf6YFo5eNNsD/bMFlgLfbNWCy8mlm7aWHxnb;
+Received: from [209.73.164.83] by n24.bullet.scd.yahoo.com with NNFMP; 11 Feb
+ 2007 16:37:14 -0000
+Received: from [66.218.67.114] by t7.bullet.scd.yahoo.com with NNFMP; 11 Feb
+ 2007 16:37:14 -0000
+X-Yahoo-Newman-Id: 17994799-m10640
+X-Sender: foo@example.com
+X-Apparently-To: preserving-food@example.com
+Received: (qmail 92895 invoked from network); 11 Feb 2007 16:37:13 -0000
+Received: from unknown (66.218.67.36) by m46.grp.scd.yahoo.com with QMQP; 11
+ Feb 2007 16:37:13 -0000
+Received: from unknown (HELO wx-out-0506.google.com) (66.249.82.230) by
+ mta10.grp.scd.yahoo.com with SMTP; 11 Feb 2007 16:37:12 -0000
+Received: by wx-out-0506.google.com with SMTP id h31so1536907wxd for
+ <preserving-food@example.com>; Sun, 11 Feb 2007 08:37:12 -0800 (PST)
+Received: by 10.90.63.16 with SMTP id l16mr15799774aga.1171211832690; Sun, 11
+ Feb 2007 08:37:12 -0800 (PST)
+Received: from VIDMASTER ( [69.128.190.38]) by mx.google.com with ESMTP id
+ 66sm11886421wra.2007.02.11.08.37.11; Sun, 11 Feb 2007 08:37:12 -0800 (PST)
+To: <preserving-food@example.com>
+Message-ID: <145901c74dfb$0d964370$c901a8c0@VIDMASTER>
+X-Mailer: Microsoft Office Outlook 11
+Thread-Index: AcdNbZRoeoTzXyhIRBiMCWclimFqlAAjTe7Q
+X-MimeOLE: Produced By Microsoft MimeOLE V6.00.2900.3028
+In-Reply-To: <baz@example.com>
+X-Originating-IP: 66.249.82.230
+X-eGroups-Msg-Info: 1:0:0:0
+From: "Fooster" <foo@example.com>
+X-Yahoo-Profile: fooster
+Sender: preserving-food@example.com
+MIME-Version: 1.0
+Mailing-List: list preserving-food@example.com; contact
+ preserving-food-owner@example.com
+Delivered-To: mailing list preserving-food@example.com
+List-Id: <preserving-food.example.com>
+Precedence: bulk
+List-Unsubscribe: <mailto:preserving-food-unsubscribe@example.com>
+Date: Sun, 11 Feb 2007 11:38:24 -0500
+Subject: RE: [preserving-food] Re: Grilled peppers?
+Reply-To: preserving-food@example.com
+X-Yahoo-Newman-Property: groups-email-trad
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+
+> I did notice that Hidden Valley has a new ad campaign going on...
+> "Ranch the way that Ranch should taste"...  I guess alot of 
+> people must be making their own ranch mixes!
+
+Or because so many restaurants have their own ranch style dressings -
+Jalapeno and Cilantro and even Blue Cheese are used in the ones here
+(and I'm sure there are other popular variations).
+

@@ -1,0 +1,25 @@
+#!/usr/local/bin/perperl
+use strict;
+use FindBin qw($Bin);
+use ETLp::Audit::Browser::Controller::Schedule;
+use CGI::Carp qw(fatalsToBrowser);
+use CGI;
+
+my $webapp = ETLp::Audit::Browser::Controller::Schedule->new(
+    PARAMS => {
+        config_file   => "$Bin/../conf/etl.conf",
+        template_path => "$Bin/../view",
+        'table'       => [
+            'list'                => {rm => 'list'},
+            'edit/:schedule_id?'  => {rm => 'edit'},
+            'save'                => {rm => 'save'},
+            'update_sections'     => {rm => 'update_sections'},
+            'view_crontab'        => {rm => 'view_crontab'},
+            'update_dependencies' => {rm => 'update_dependencies'},
+            'disable_crontab'     => {rm => 'disable_crontab'},
+            'enable_crontab'      => {rm => 'enable_crontab'},
+        ]
+    }
+);
+
+$webapp->run;

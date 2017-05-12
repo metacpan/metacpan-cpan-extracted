@@ -1,0 +1,43 @@
+Ecma48-Util
+
+Ecma48::Util contains a selection of subroutines which allow the
+handling of Ecma-48 based markup sequences - better known as
+ANSI escape sequences.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Ecma48::Util
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Ecma48-Util
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Ecma48-Util
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Ecma48-Util
+
+    Search CPAN
+        http://search.cpan.org/dist/Ecma48-Util/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (c) 2012 Josef. All rights reserved.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

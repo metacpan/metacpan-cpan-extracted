@@ -1,0 +1,38 @@
+---
+abstract: 'Provides the ability to hook functions to the starting'
+author:
+  - 'Ivan Wills <ivan.wills@gmail.com>'
+build_requires:
+  Test::More: '0'
+  Test::Warnings: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Event-ScreenSaver
+provides:
+  Event::ScreenSaver:
+    file: lib/Event/ScreenSaver.pm
+    version: v0.0.6
+  Event::ScreenSaver::Unix:
+    file: lib/Event/ScreenSaver/Unix.pm
+    version: v0.0.6
+requires:
+  List::MoreUtils: '0'
+  Module::Build: '0'
+  Moose: '0'
+  Pod::Usage: '0'
+  Test::More: '0'
+  Test::NoWarnings: '0'
+  perl: '5.006'
+  version: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Event-ScreenSaver
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/ivanwills/Event-ScreenSaver
+version: v0.0.6

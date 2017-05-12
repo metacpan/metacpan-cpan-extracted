@@ -1,0 +1,62 @@
+#!perl
+
+use strict;
+use warnings;
+
+use FindBin;
+use File::Basename 'dirname';
+
+use lib (
+    File::Spec->catdir( dirname(__FILE__), qw| .. lib perl5| ),
+);
+
+my $target  = shift @ARGV;
+my $version = shift @ARGV;
+
+unless ( $target ) {
+    die "you must set target's name parameter";
+}
+
+if ( $target =~ /[^a-z0-9]/ ) {
+    die( Enbld::Error->new( "invalid target name '$target'" ));
+}
+
+require Enbld::Definition;
+my $attributes = Enbld::Definition->new( $target )->parse;
+
+if ( $version ) {
+    $attributes->add( 'VersionCondition', $version );
+} else {
+    $attributes->add( 'VersionCondition' );
+}
+
+require Enbld::Message;
+Enbld::Message->set_verbose;
+Enbld::HTTP->download( $attributes->URL, $attributes->Filename );
+
+=pod
+
+=head1 NAME
+
+getenbld - utility command for fetching archive file
+
+=head1 SYNOPSIS
+
+ $ getenbld git           # fetch latest archive file
+ $ getenbld git 1.8.4     # fetch arbitrary archive file
+
+=head1 DESCRIPTION
+
+getenbld small utility command for fetching archive file.
+
+=head1 COPYRIGHT
+
+copyright 2013- Magnolia C<< <magnolia.k@me.com> >>.
+
+
+=head1 LICENSE
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

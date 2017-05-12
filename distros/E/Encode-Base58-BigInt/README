@@ -1,0 +1,26 @@
+NAME
+    Encode::Base58::BigInt - Base58 encodings with BigInt
+
+SYNOPSIS
+      use Encode::Base58::BigInt;
+      my $bigint  = '9235113611380768826';
+      my $encoded = encode_base58($bigint);
+      my $decoded = decode_base58($short); # decoded is bigint string
+
+DESCRIPTION
+    Encode::Base58::BigInt is a base58 encoder/decoder implementation in
+    Perl.
+
+    Generated strings excludes confusing characters, "0" and "O" is treated
+    as "D", "l" and "I" is treated as "1".
+
+AUTHOR
+    cho45 <cho45@lowreal.net>
+
+SEE ALSO
+    Encode::Base58
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

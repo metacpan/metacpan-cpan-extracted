@@ -1,0 +1,51 @@
+This directory contains files to provide a web based status display for
+Perl ECS.  The scripts provided here are designed to work with a web
+server, such as Apache, that supports the common gateway interface (CGI).
+
+The ecs_status.pl Perl script contains code to generate the ECS status
+web page, and the ecs_status wrapper shell script contains environment
+variable settings to configure ecs_status.pl.  The images directory and
+subdirectories contain graphical images used by the web based status
+display.
+
+The following example illustrates one possible method for installing and
+configuring these scripts.
+
+1. Copy script files to web server cgi-bin subdirectory.
+
+   > mkdir /www/dev/cgi-bin/ecs
+   > cp web_status/ecs_status* /www/dev/cgi-bin/ecs
+   > chmod 755 /www/dev/cgi-bin/ecs/ecs_status*
+
+2. Copy image files to web server html subcirectory.  Modify file
+   permissions and group ownership as needed.
+
+   > mkdir /www/dev/html/ecs/images
+   > mkdir /www/dev/html/ecs/images/22px
+   > mkdir /www/dev/html/ecs/images/60px
+   > cp web_status/images/*.ico /www/dev/html/ecs/images
+   > cp web_status/images/*.png /www/dev/html/ecs/images
+   > cp web_status/images/22px/*.png /www/dev/html/ecs/images/22px
+   > cp web_status/images/60px/*.png /www/dev/html/ecs/images/60px
+   > find /www/dev/html/ecs/images -type f -exec chmgrp web '{}' \;
+   > find /www/dev/html/ecs/images -type f -exec chmod 664 '{}' \;
+
+3. If needed (depending on how system and web server permissions are
+   configured), create node_tbl files and set file permissions so the
+   files are writable by web server user.
+
+   > touch /www/dev/cgi-bin/ecs/node_tbl.dat.dir
+   > touch /www/dev/cgi-bin/ecs/node_tbl.dat.pag
+   > touch /www/dev/cgi-bin/ecs/node_tbl.lock
+   > chmod 666 /www/dev/cgi-bin/ecs/node_tbl*
+
+4. Edit ecs_status environment variable values to further customize
+   setup.
+
+   > vi /www/dev/cgi-bin/ecs/ecs_status
+   ...
+
+5. Use web browser to view ECS status page.
+
+   > firefox http://myserver/ecs/ecs_status
+

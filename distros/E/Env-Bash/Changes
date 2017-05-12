@@ -1,0 +1,31 @@
+
+Revision history for Perl extension Env::Bash.
+
+0.00_01  Sun Dec 19 01:55:05 2004
+	- original version; created by h2xs 1.23 with options
+		-A -B -X -b 5.8.0 Env::Bash
+
+0.00_02  Tue Dec 21 03:01:57 UTC 2004
+        - minor bug fixed in _get_env_var.
+
+0.00_05  Tue Dec 21 15:55:56 UTC 2004
+        - validate bash is present.
+        - changed process to load environment keys.
+        - changed option GrepRegex to SelectRegex and
+          made it a perl regex.
+        - added option SourceOnly which returns the
+          only the variables defined in the Source scripts.
+
+0.01     Wed Dec 22 04:31:52 UTC 2004
+        - changed version from beta to normal.
+
+0.02     Thu Dec 23 10:23:51 UTC 2004
+        - minor bug fixed in AUTOLOAD.
+
+0.03     Fri Dec 24 03:51:04 UTC 2004
+        - handle systems w/o bash ( like MSWin32 ).
+
+0.04     Fri Dec 24 12:38:49 UTC 2004
+        - fixed tests to not fail on MSWin32
+        - fixed caching state of 'have_bash' so as not to
+          repeat the 'bash not found' error on systems w/o bash.

@@ -1,0 +1,9 @@
+;; This is a template for a special .emacs file that only sets the load-path
+;; Some other code will read this in and substitute actual locations for
+;; the strings XXX and YYY, and write the new value out to a mock home location.
+
+;; Begin with a fairly minimal load path
+(setq load-path (list "/tmp" "XXX"))
+
+(defvar emacs-run-testorama-unused-lib-1 "YYY")
+

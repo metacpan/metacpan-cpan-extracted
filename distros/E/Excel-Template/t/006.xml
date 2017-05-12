@@ -1,0 +1,7 @@
+<workbook>
+  <worksheet name="cell">
+    <cell><var name="test1" /></cell>
+    <cell text="$test2" />
+    <cell>PRE <var name="test1" /> POST</cell>
+  </worksheet>
+</workbook>

@@ -1,0 +1,10 @@
+Revision history for Exporter-Rinci
+
+0.02    2016-01-19 (PERLANCAR)
+
+	- Avoid 5.10-ism (defined-or) to pass on 5.8 [CT].
+
+
+0.01     2015-10-23 (PERLANCAR)
+
+         - First release.

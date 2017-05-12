@@ -1,0 +1,9 @@
+Revision history for Email-Fetch
+NEXT
+        add header 'From'
+        update pod
+        update Email::Folder
+        return Email::MIME obj
+0.011
+0.01     2016-11-14
+         Init version

@@ -1,0 +1,15 @@
+Encode-ISO2022 package.
+
+Copyright (C) 2013 by Hatuka*nezumi - IKEDA Soji
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+                                   ***
+
+One main module and some optional modules are contained.  For more
+details read following POD documentation at first:
+
+    Encode::ISO2022 - ISO/IEC 2022 character encoding scheme
+
+$$

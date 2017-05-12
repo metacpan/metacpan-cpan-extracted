@@ -1,0 +1,73 @@
+/* Top_menu */
+#top_menu_container {
+	position			: relative;
+	top					: 4em;
+	height				: 2em;
+}
+#top_menu {
+	width				: 100%;
+	padding-top			: 4px;
+	background-image	: url( ../images/tab_base_graph2.gif );
+	background-repeat	: repeat-x;
+}
+#top_menu a{
+	line-height			: 2em;
+	padding				: 5px 10px 6px 10px;
+	border-right		: 2px solid #BBE6E4;
+	text-decoration		: none;
+	font-size			: small;
+	color				: #FFFFFF;
+	font-weight			: bold;
+}
+#top_menu a:hover {
+	background-color	: #C0C0C0;
+	border-width		: 2px 2px 0px 2px;
+	border-color		: #BBE6E4;
+	border-style		: inset;
+	margin-left			: -2px;
+}
+#top_menu .selected {
+	color				: #000000;
+	background-color	: #EEEEEE;
+	border-width		: 2px 2px 0px 3px;
+	border-color		: #BBE6E4;
+	border-style		: outset;
+	margin-left			: -3px;
+}
+
+
+/* NAVIGATION */
+#navigation{
+/*	background			: url( ../images/nav.gif ) 0em 0em repeat-y;		*/
+	display				: block;
+}
+
+#navigation H2{
+	background			: #DEF0FF;
+	border-top			: 5px solid #039;
+	border-bottom		: 1px solid #C8DAE9;
+	border-right		: 1px solid #C8DAE9;
+	border-left			: 1px solid #C8DAE9;
+	font-size			: small;
+	padding				: 0em 0em 0em 1em;
+}
+
+#navigation A{
+	font-size			: small;
+}
+
+#navigation UL LI{
+	background			: url( ../images/bullet1.gif ) 4px 7px no-repeat;
+	font-size			: small;
+	margin				: 0em 0em 0em 1em;
+	padding				: 0em 1em 0.3em 1em;
+	list-style			: none;
+}
+
+#navigation UL LI.self{
+	font-size			: small;
+	font-weight			: bold;
+	background			: #FBF3AF;
+	margin				: 0em 0em 0em 0.5em;
+	padding				: 0em 1em 0em 1em;
+}

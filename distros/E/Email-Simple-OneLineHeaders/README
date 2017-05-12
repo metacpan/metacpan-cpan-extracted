@@ -1,0 +1,11 @@
+This module is a subclass of Email::Simple which does not fold the
+headers according to RFC2822 but instead outputs every header
+as one single line. 
+
+This is necessary when using the append_string method of Mail::IMAPClient 
+to add messages to an IMAP mailbox, because when the Received: header
+is folded the folded lines trigger some newline business and I find
+that the rest of the headers are now part of the message.
+
+I consider the bug to be in the IMAP server I'm using (CommuniGate Pro), because it 
+should be able to handle the correctly formatted message. 

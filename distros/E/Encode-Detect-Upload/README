@@ -1,0 +1,52 @@
+Encode-Detect-Upload
+
+Users who can upload text files will usually have no idea what charset they are in.
+In fact, the majority probably don't even know what a charset is, and telling them
+to only upload files in UTF-8 can lead to much confusion. This module does it's
+best to make an accurate guess at what charset the file is in, so that it may be
+parsed correctly. It takes into account the users IP and browser environment
+variables, along with Mozilla's charset detection library.
+
+We've been using this module in production for over a year and it's saved us a lot
+of support headaches.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Encode::Detect::Upload
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/cosmicnet/Bugs.html?Dist=Encode-Detect-Upload
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Encode-Detect-Upload
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Encode-Detect-Upload
+
+    Search CPAN
+        http://search.cpan.org/dist/Encode-Detect-Upload/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2013 Lyle Hopkins
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.

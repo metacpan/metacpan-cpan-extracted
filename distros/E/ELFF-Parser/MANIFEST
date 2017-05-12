@@ -1,0 +1,11 @@
+MANIFEST
+Changes
+LICENSE
+README
+Makefile.PL
+lib/ELFF/Parser.pm
+Parser.xs
+t/00_version.t
+t/01_tokenize.t
+t/02_parse_line.t
+META.yml                                 Module meta-data (added by MakeMaker)

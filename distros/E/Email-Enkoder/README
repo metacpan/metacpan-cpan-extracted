@@ -1,0 +1,51 @@
+NAME
+    Email::Enkoder - obfuscate email or html with randomized javascript
+
+VERSION
+    version 1.120831
+
+FUNCTIONS
+  enkode_mail
+    Generates an obfuscated email link.
+
+  enkode
+    Generates obfuscated html out of arbitrary html.
+
+HELPERS
+  enkoders
+    Returns the default enkoders used to obfuscate html.
+
+  js_wrap_quote
+    Takes a javascript string definition and wraps it to fit in a defined
+    number of columns.
+
+  js_dbl_quote
+    Takes a piece of javascript and quotes and escapes it for use as a
+    string definition.
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=Email-Enkoder>. You
+    will be notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/wchristian/email-enkoder>
+
+      git clone https://github.com/wchristian/email-enkoder.git
+
+AUTHOR
+    Christian Walde <walde.christian@googlemail.com>
+
+COPYRIGHT AND LICENSE
+    Christian Walde has dedicated the work to the Commons by waiving all of
+    his or her rights to the work worldwide under copyright law and all
+    related or neighboring legal rights he or she had in the work, to the
+    extent allowable by law.
+
+    Works under CC0 do not require attribution. When citing the work, you
+    should not imply endorsement by the author.
+

@@ -1,0 +1,54 @@
+{
+   "abstract" : "Lexically scoped sanctification of %ENV",
+   "author" : [
+      "Chris Williams <chris@bingosnet.co.uk>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Env-Sanctify-Moosified",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59",
+            "Test::More" : "0.47"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moo" : "0",
+            "MooX::late" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/bingos/env-sanctify-moosified",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/bingos/env-sanctify-moosified.git",
+         "web" : "https://github.com/bingos/env-sanctify-moosified"
+      }
+   },
+   "version" : "1.06"
+}
+

@@ -1,0 +1,953 @@
+package Elastic::Manual::QueryDSL::Queries;
+
+# ABSTRACT: Overview of the queries available in Elasticsearch
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Elastic::Manual::QueryDSL::Queries - Overview of the queries available in Elasticsearch
+
+=head1 VERSION
+
+version 0.52
+
+=head1 INTRODUCTION
+
+Queries should be used instead of filters where "relevance scoring" is
+appropriate.
+
+While a filter can be used for:
+
+    Give me docs that include the tag "perl" or "python"
+
+... a query can do:
+
+    Give me docs that include the tag "perl" or "python", sorted by relevance
+
+This is particularly useful for full text search, where there isn't
+a simple binary Yes/No answer.  Instead, we're looking for the most relevant
+results which match a complex phrase like C<"perl unicode cookbook">.
+
+=head1 QUERY TYPES
+
+There are 5 main query types:
+
+=over
+
+=item L<Analyzed queries|/ANALYZED QUERIES>
+
+These are used for L<full text search|Elastic::Manual::QueryDSL/Full text matching>
+on unstructured text.  The search keywords are L<analyzed|Elastic::Manual::Analysis>
+into terms before being searched on. For instance:
+C<WHERE matches(content, 'perl unicode')>
+
+=item L<Exact queries|/EXACT QUERIES>
+
+These are used for L<exact matching|Elastic::Manual::QueryDSL/Exact matching>.
+For instance: C<WHERE tags IN ('perl','python')>.
+
+=item L<Combining queries|/COMBINING QUERIES>
+
+These combine multiple queries together, eg C<and> or C<or>.
+
+=item L<Scoring queries|/SCORING QUERIES>
+
+These can be used to alter how the relevance score is calculated.
+
+=item L<Joining queries|/JOINING QUERIES>
+
+These work on parent-child relationships, or on "nested" docs.
+
+=back
+
+=head1 BOOST
+
+"Boost" is a way of increasing the relevance of part of a query.
+For instance, if I'm searching for the words "perl unicode" in either the
+C<title> or C<content> field of a post, I could do:
+
+    $view->queryb([
+        content => 'perl unicode',
+        title   => 'perl unicode',
+    ]);
+
+But it is likely that documents with those words in the C<title>  are
+more relevant than if those words appear only in the C<content>, so we
+can C<boost> the C<title> field:
+
+    $view->queryb([
+        content => 'perl unicode',
+        title   => {
+            '=' => {
+                query => 'perl unicode',
+                boost => 2
+            }
+        },
+    ]);
+
+Or in the native Query DSL:
+
+    $view->queryb(
+        bool => {
+            should => [
+                { match => { content => 'perl unicode' } },
+                { match => {
+                    title => {
+                        query => 'perl unicode',
+                        boost => 2
+                    }
+                }}
+            ]
+        }
+    );
+
+The C<boost> is multiplied with the C<_score>, so a C<boost> less than 1 will
+decrease relevance.  Also see L<Elastic::Model::Result/explain> for help
+when debugging relevance scoring.
+
+=head1 ANALYZED QUERIES
+
+The search keywords are L<analyzed|Elastic::Manual::Analysis> before being
+searched on. The analyzer is chosen from the first item in this list which is
+set:
+
+=over
+
+=item *
+
+The C<analyzer> specified in the query
+
+=item *
+
+The L<search_analyzer|Elastic::Manual::Attributes/search_analyzer> specified
+on the field being searched
+
+=item *
+
+The L<analyzer|Elastic::Manual::Attributes/analyzer> specified
+on the field being searched
+
+=item *
+
+The default analyzer for the C<type> being searched on
+
+=back
+
+=head2 Simple text queries
+
+=over
+
+=item SearchBuilder
+
+    # where title matches "perl unicode"
+    $view->queryb( title => 'perl unicode' );
+    $view->queryb( title => { '=' => 'perl unicode' });
+
+    # where the _all field matches "perl unicode"
+    $view->queryb( 'perl unicode' );
+    $view->queryb( _all => 'perl unicode');
+
+See L<< ElasticSearch::SearchBuilder/= E<verbar> -text E<verbar> != E<verbar> <> E<verbar> -not_text >>.
+
+=item QueryDSL
+
+    # where title matches "perl unicode"
+    $view->query( match => { title => 'perl unicode' } );
+
+    # where the _all field matches "perl unicode"
+    $view->query( match => { _all => 'perl unicode' });
+
+See L<http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-match-query.html>
+
+=back
+
+=head2 Phrase queries
+
+Phrase queries match all words in the phrase, in the same order.
+
+=over
+
+=item SearchBuilder
+
+    # where title matches the phrase "perl unicode"
+    $view->queryb( title => { '==' => 'perl unicode });
+
+    # where 'unicode' precedes 'perl' within 5 words of each other
+    $view->queryb(
+        title => {
+            '==' => {
+                query => 'perl unicode',
+                slop  => 5
+            }
+        }
+    );
+
+    # where title contains a phrase starting with "perl unic"
+    $view->queryb( title => { '^' => 'perl unic' });
+
+See L<ElasticSearch::SearchBuilder/== E<verbar> -phrase E<verbar> -not_phrase>
+and L<ElasticSearch::SearchBuilder/^ E<verbar> -phrase_prefix E<verbar> -not_phrase_prefix>.
+
+=item QueryDSL
+
+    # where title matches the phrase "perl unicode"
+    $view->query(
+        match_phrase => {
+            title   => 'perl unicode'
+        }
+    );
+
+    # where 'unicode' precedes 'perl' within 5 words of each other
+    $view->query(
+        match_phrase => {
+            title   => {
+                query => 'perl unicode',
+                slop  => 5
+            }
+        }
+    );
+
+    # where title contains a phrase starting with "perl unic"
+    $view->query(
+        match_phrase_prefix => {
+            title => 'perl unic'
+        }
+    );
+
+See L<http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-match-query.html#_match_phrase_prefix>.
+
+=back
+
+=head2 Lucene query parser syntax
+
+The C<query_string> and C<field> queries use the
+L<Lucene query parser syntax|http://lucene.apache.org/core/3_6_0/queryparsersyntax.html>
+allowing complex queries like (amongst other features):
+
+=over
+
+=item Logic
+
+C<'mac AND big NOT apple'> or C<'+mac +big -apple'>
+
+=item Phrases
+
+C<'these words and "exactly this phrase"'>
+
+=item Wildcards
+
+C<'test?ng wild*rd'>
+
+=item Fields
+
+C<'title:(big mac) content:"this exact phrase"'>
+
+=item Boosting
+
+C<'title:(perl unicode)^2 content:(perl unicode)'>
+
+=item Proximity
+
+C<(quick brown dog)~10> (within 10 words of each other)
+
+=back
+
+The C<query_string> query can also be used for searching across multiple fields.
+
+There are two downsides to this query:
+
+=over
+
+=item *
+
+The syntax must be correct, otherwise your query will fail.
+
+=item *
+
+Users can search any field using the C<"field:"> syntax.
+
+=back
+
+You can use L<ElasticSearch::Util/filter_keywords()> for a simple filter,
+or L<ElasticSearch::QueryParser> for a more flexible solution.
+
+=over
+
+=item SearchBuilder
+
+    # where the title field matches '+big +mac -apple'
+    $view->queryb( title => { -qs => '+big +mac -apple' });
+
+    # where the _all field matches '+big +mac -apple'
+    $view->queryb( _all => { -qs => '+big +mac -apple' });
+
+    # where the title or content fields match '+big +mac -apple'
+    $view->queryb(
+        -qs =>{
+            query   => '+big +mac -apple',
+            fields  => ['title^2','content']  # boost the title field
+        }
+    );
+
+See L<ElasticSearch::SearchBuilder/-qs E<verbar> -query_string E<verbar> -not_qs E<verbar> -not_query_string>.
+
+=item QueryDSL
+
+    # where the title field matches '+big +mac -apple'
+    $view->query(
+        query_string => {
+            query => '+big +mac -apple',
+            fields => ['title'],
+        }
+    );
+
+    # where the _all field matches '+big +mac -apple'
+    $view->query( query_string => { query => '+big +mac -apple' });
+    $view->query(
+        query_string => {
+            query => '+big +mac -apple',
+        }
+    );
+
+    # where the title or content fields match '+big +mac -apple'
+    $view->query(
+        query_string =>{
+            query   => '+big +mac -apple',
+            fields  => ['title^2','content']  # boost the title field
+        }
+    );
+
+See L<http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html>.
+
+=back
+
+=head2 More-like-this and Fuzzy-like-this
+
+The more-like-this query tries to find documents similar to the search keywords,
+across multiple fields. It is useful for clustering related documents.
+
+See L<ElasticSearch::SearchBuilder/-mlt E<verbar> -not_mlt>,
+L<http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-mlt-query.html>.
+
+The fuzzy-like-this query is similar to more-like-this, but additionally
+"fuzzifies" all the search terms (finds all terms within a certain
+Levenshtein edit distance).
+
+See L<ElasticSearch::SearchBuilder/-flt E<verbar> -not_flt>,
+L<http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-flt-query.html>.
+
+=head1 EXACT QUERIES
+
+These queries do not have an L<analysis|Elastic::Manual::Analysis> phase.
+They try to match the actual terms stored in Elasticsearch. But unlike filters,
+the result of these queries is included in the relevance scoring.
+
+=head2 Match all
+
+Matches all docs.
+
+=over
+
+=item SearchBuilder
+
+    # All docs
+    $view->queryb();
+    $view->queryb( -all => 1 )
+
+See L<ElasticSearch::SearchBuilder/MATCH ALL>
+
+=item QueryDSL
+
+    # All docs
+    $view->query();
+    $view->query( match_all => {} )
+
+See L<http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-match-all-query.html>
+
+=back
+
+=head2 Equality
+
+=over
+
+=item SearchBuilder:
+
+    # WHERE status = 'active'
+    $view->queryb( status => 'active' );
+
+    # WHERE count = 5
+    $view->queryb( count  => 5 );
+
+    # WHERE tags IN ('perl','python')
+    $view->queryb( tags  => [ 'perl', 'python' ]);
+
+See L<ElasticSearch::SearchBuilder/EQUALITY (QUERIES)>.
+
+=item QueryDSL:
+
+    # WHERE status = 'active'
+    $view->query(  term   => { status => 'active' } );
+
+    # WHERE count = 5
+    $view->query(  term   => { count => 5 );
+
+    # WHERE tags IN ('perl','python')
+    $view->query(  terms => { tag => ['perl', 'python' ]})
+
+See L<http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-term-query.html>
+and L<http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-terms-query.html>.
+
+=back
+
+=head2 Range
+
+=over
+
+=item SearchBuilder:
+
+    # WHERE date BETWEEN '2012-01-01' AND '2013-01-01'
+    $view->queryb(
+        date   => {
+            gte => '2012-01-01',
+            lt  => '2013-01-01'
+        }
+    );
+
+See L<ElasticSearch::SearchBuilder/RANGES>
+
+=item QueryDSL:
+
+    # WHERE date BETWEEN '2012-01-01' AND '2013-01-01'
+    $view->query(
+        range => {
+            date => {
+                gte => '2012-01-01',
+                lt  => '2013-01-01'
+            }
+        }
+    );
+
+See L<http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-range-query.html>
+
+=back
+
+=head2 Prefix, wildcard and fuzzy
+
+A "fuzzy" query matches terms within a certain Levenshtein edit instance of the
+search terms.
+
+B<Warning:> These queries do not peform well.  First they have to load all
+terms into memory to find those that match the prefix/wildcard/fuzzy conditions.
+Then they query all matching terms.
+
+If you find yourself wanting to use any of these, then you should rather
+analyze your fields in a way that you can use a L<simple query|/Simple text queries>
+on them instead, for instance, using the
+L<edge_ngram token filter|http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/analysis-edgengram-tokenfilter.html>
+or one of the
+L<phonetic token filters|http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/analysis-phonetic-tokenfilter.html>.
+
+=over
+
+=item SearchBuilder
+
+    # WHERE code LIKE 'abc%'
+    $view->queryb( code => { '^' => 'abc' });
+
+    # WHERE code LIKE 'ab?c%'
+    $view->queryb( code => { '*' => 'ab?c*' })
+
+    # where code contains terms similar to "purl unikode"
+    $view->queryb( code => { fuzzy => 'purl unikode' })
+
+See L<ElasticSearch::SearchBuilder/PREFIX (FILTERS)> and
+L<ElasticSearch::SearchBuilder/WILDCARD AND FUZZY QUERIES>.
+
+=item QueryDSL
+
+    # WHERE code LIKE 'abc%'
+    $view->query( prefix => { code => 'abc' });
+
+    # WHERE code LIKE 'ab?c%'
+    $view->query( wildcard => { code => 'ab?c*' })
+
+    # where code contains terms similar to "purl unikode"
+    $view->query( fuzzy => { code => 'purl unikode' })
+
+See L<http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-prefix-query.html>,
+L<http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-wildcard-query.html>
+and L<http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-fuzzy-query.html>.
+
+=back
+
+=head1 COMBINING QUERIES
+
+These queries allow you to combine multiple queries together.
+
+=head2 Filtered query
+
+By default, queries are run on all documents.  You can use a filtered
+query to reduce which documents are queried.  This is the same
+query that is used to combine the L<query|Elastic::Model::View/query> and
+L<filter|Elastic::Model::View/filter> attributes of L<Elastic::Model::View>.
+
+For instance, if you only want to query documents where C<status = 'active'>,
+then you can filter your documents with that restriction.  A filter does not
+affect the relevance score.
+
+=over
+
+=item SearchBuilder
+
+    # document where status = 'active', and title matches 'perl unicode'
+    $view->queryb(
+        title   => 'perl unicode',
+        -filter => { status => 'active' }
+    );
+
+See L<ElasticSearch::SearchBuilder/QUERY E<sol> FILTER CONTEXT>
+
+=item QueryDSL
+
+    # document where status = 'active', and title matches 'perl unicode'
+    $view->queryb(
+        filtered => {
+            query => {
+                match => { title => 'perl unicode'}
+            },
+            filter => {
+                term => { status => 'active' }
+            }
+        }
+    );
+
+See L<http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-filtered-query.html>.
+
+=back
+
+=head2 Bool queries
+
+C<bool> queries are the equivalent of C<and>, C<or> and C<not> except instead
+they use C<must>, C<should> and C<must_not>.  The difference is that you can
+specify the minimum number of C<should> clauses that have to match (default 1).
+
+In the SearchBuilder syntax, these use the same syntax as C<and>, C<or> and
+C<not> but you can also use the C<-bool> operator directly if you want
+to use C<minimum_number_should_match>.
+
+B<Note:> the scores of all matching clauses are combined together.
+
+=over
+
+=item SearchBuilder:
+
+See L<ElasticSearch::SearchBuilder/ANDE<verbar>OR LOGIC> and
+L<ElasticSearch::SearchBuilder/-bool>
+
+=over
+
+=item And
+
+    # WHERE title matches 'perl unicode' AND status = 'active'
+    $view->queryb( title => 'perl unicode', status => 'active' );
+
+=item Or
+
+    # WHERE title matches 'perl unicode' OR status = 'active'
+    $view->queryb([ status => 'active', status => 'active' ]);
+
+=item Not
+
+    # WHERE status <> 'active'
+    $view->queryb( status => { '!=' => 'active' });
+
+    # WHERE tags NOT IN ('perl','python')
+    $view->queryb( tags   => { '!=' => ['perl', 'python'] });
+
+    # WHERE NOT ( x = 1 AND y = 2 )
+    $view->queryb( -not   => { x => 1, y => 2 });
+
+    # WHERE NOT ( x = 1 OR y = 2 )
+    $view->queryb( -not   => [ x => 1, y => 2 ]);
+
+=item minimum_number_should_match
+
+    # where title matches 'object oriented'
+    # and status <> 'inactive'
+    # and tags contain 2 or more of 'perl','python','ruby'
+
+    $view->queryb(
+       -bool => {
+           must          => [{ title => 'object oriented' }],
+           must_not      => [{ status => 'inactive' }],
+           should        => [
+                { tag    => 'perl'   },
+                { tag    => 'python' },
+                { tag    => 'ruby' },
+           ],
+           minimum_number_should_match => 2,
+       }
+    )
+
+=back
+
+=item QueryDSL:
+
+See L<http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-bool-query.html>
+
+=over
+
+=item And
+
+    # WHERE title matches 'perl unicode' AND status = 'active'
+    $view->query(
+        bool => {
+            must => [
+                { match => { title  => 'perl unicode' }},
+                { term => { status => 'active' }}
+            ]
+        }
+    );
+
+=item Or
+
+    # WHERE title matches 'perl unicode' OR status = 'active'
+    $view->query(
+        bool => {
+            should => [
+                { match => { title  => 'perl unicode' }},
+                { term => { status => 'active' }}
+            ]
+        }
+    );
+
+=item Not
+
+    # WHERE status <> 'active'
+    $view->query(
+        bool => {
+            must_not => [
+                { term => { status => 'active' }}
+            ]
+        }
+    );
+
+    # WHERE tags NOT IN ('perl','python')
+    $view->query(
+        bool => {
+            must_not => [
+                { terms => { tag => [ 'perl','python' ] }}
+            ]
+        }
+    );
+
+
+    # WHERE NOT ( x = 1 AND y = 2 )
+    $view->query(
+        bool => {
+            must_not => [
+                { term => { x => 1 }},
+                { term => { y => 2 }}
+            ]
+        }
+    );
+
+    # WHERE NOT ( x = 1 OR y = 2 )
+    $view->query(
+        bool => {
+            must_not => [
+                {
+                    bool => {
+                        should => [
+                            { term => { x => 1 }},
+                            { term => { y => 2 }}
+                        ]
+                    }
+                }
+            ]
+        }
+    );
+
+=item minimum_number_should_match
+
+    # where title matches 'object oriented'
+    # and status <> 'inactive'
+    # and tags contain 2 or more of 'perl','python','ruby'
+
+    $view->query(
+       bool => {
+           must          => [{ match => { title => 'object oriented' }}],
+           must_not      => [{ term => { status => 'inactive' }}],
+           should        => [
+                { term   => { tag    => 'perl'   }},
+                { term   => { tag    => 'python' }},
+                { term   => { tag    => 'ruby'   }},
+           ],
+           minimum_number_should_match => 2,
+       }
+    )
+
+=back
+
+=back
+
+=head2 Dis_max / Disjunction max query
+
+While the L</Bool queries> combine the scores of each matching clause, the
+C<dis_max> query uses the highest score of any matching clause. For instance,
+if we want to search for "perl unicode" in the C<title> and C<content> fields,
+we could do:
+
+    $view->queryb(
+        title   => 'perl unicode',
+        content => 'perl unicode'
+    );
+
+But we could have a doc which matches C<'perl'> in both fields, and C<'unicode'>
+in neither.  As a boolean query, these two matches for C<'perl'> would be
+added together.  As a dis_max query, the higher score of the
+C<title> or the C<content> clause match would be used.
+
+The C<tie_breaker> can be used to give a slight advantage to docs where
+both clauses match with the same score.
+
+=over
+
+=item SearchBuilder
+
+    # without tie_breaker:
+    $view->queryb(
+        -dis_max => [
+            { title   => 'perl unicode' },
+            { content => 'perl unicode' }
+        ]
+    );
+
+    # with tie_breaker:
+    $view->queryb(
+        -dis_max => {
+            tie_breaker => 0.7,
+            queries     => [
+                { title   => 'perl unicode' },
+                { content => 'perl unicode' }
+            ]
+        }
+    );
+
+See L<ElasticSearch::SearchBuilder/-dis_max E<verbar> -dismax>.
+
+=item QueryDSL
+
+    $view->query(
+        dis_max => {
+            tie_breaker => 0.7,
+            queries     => [
+                { title   => 'perl unicode' },
+                { content => 'perl unicode' }
+            ]
+        }
+    );
+
+See L<http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-dis-max-query.html>.
+
+=back
+
+=head2 Indices
+
+The C<indices> query can be used to execute different queries on different
+indices.
+
+=over
+
+=item SearchBuilder
+
+    # On index_one or index_two, only allow status = 'active'
+    # On any other index, allow status IN ('active','pending')
+    $view->queryb(
+        -indices  => {
+            indices       => [ 'index_one','index_two' ],
+            query          => { status => 'active' },
+            no_match_query => { status => [ 'active','pending' ]}
+        }
+    );
+
+See L<ElasticSearch::SearchBuilder/-indices>.
+
+=item QueryDSL
+
+    # On index_one or index_two, only allow status = 'active'
+    # On any other index, allow status IN ('active','pending')
+    $view->queryb(
+        indices  => {
+            indices       => [ 'index_one','index_two' ],
+            query          => { term  => { status => 'active' }},
+            no_match_query => { terms => { status => [ 'active','pending' ] }}
+        }
+    );
+
+See L<http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-indices-query.html>.
+
+=back
+
+=head1 SCORING QUERIES
+
+These queries allow you to tweak the relevance C<_score>, making certain
+docs more or less relevant.
+
+B<IMPORTANT>: The C<custom_score>, C<custom_filters_score> and C<custom_boost_factor>
+queries have been removed in Elasticsearch 1.0 and replaced with the
+L<function_score query|http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-function-score-query.html#query-dsl-function-score-query>.
+
+Support for this has not yet been added to the SearchBuilder.
+
+=head2 Scoring with filters
+
+The C<custom_filters_score> query allows you to boost documents that match
+a filter, either with a boost parameter, or with a custom script.
+
+This is a very powerful and efficient way to boost results which depend on
+matching unanalyzed fields, eg a tag or a date. Because the filters
+can be cached, it performs very well.
+
+=over
+
+=item SearchBuilder
+
+    # include recency in the relevance score
+    $view->queryb(
+        -custom_filters_score => {
+            query       => { title => 'perl unicode' },
+            score_mode  => 'first',
+            filters     => [
+                {
+                    filter => { date => { gte => '2012-01-01' }},
+                    boost  => 5
+                },
+                {
+                    filter => { date => { gte => '2011-01-01' }},
+                    boost  => 3
+                },
+            ]
+        }
+    );
+
+See L<ElasticSearch::SearchBuilder/-custom_filters_score>.
+
+=item QueryDSL
+
+    # include recency in the relevance score
+    $view->query(
+        custom_filters_score => {
+            query       => { match => { title => 'perl unicode' }},
+            score_mode  => 'first',
+            filters     => [
+                {
+                    filter => { range => { date => { gte => '2012-01-01' }}},
+                    boost  => 5
+                },
+                {
+                    filter => { range => { date => { gte => '2011-01-01' }}},
+                    boost  => 3
+                },
+            ]
+        }
+    );
+
+See L<http://www.elasticsearch.org/guide/en/elasticsearch/reference/0.90/query-dsl-custom-filters-score-query.html>.
+
+=back
+
+=head2 Other scoring queries
+
+=head3 Boosting
+
+Documents which match a query (eg C<"apple pear">)can be "demoted"
+(made less relevant) if they also match a second query (eg C<"computer">).
+
+See L<ElasticSearch::SearchBuilder/-boosting> or
+L<http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-boosting-query.html>
+
+=head3 Custom score
+
+A C<custom_score> query uses a script to calculate the C<_score> for each
+matching doc.
+
+See L<ElasticSearch::SearchBuilder/-custom_score> or
+L<http://www.elasticsearch.org/guide/en/elasticsearch/reference/0.90/query-dsl-custom-score-query.html>
+
+=head3 Custom boost factor
+
+The C<custom_boost> query allows you to multiply the scores of another
+query by the specified C<boost> factor. This is a bit different from a
+standard C<boost> parameter, which is normalized.
+
+See L<ElasticSearch::SearchBuilder/-custom_boost> or
+L<http://www.elasticsearch.org/guide/en/elasticsearch/reference/0.90/query-dsl-custom-boost-factor-query.html>
+
+=head3 Constant score
+
+The C<constant_score> query does no relevance calculation - all docs are
+returned with the same score.
+
+See L<http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-constant-score-query.html>.
+
+=head1 JOINING QUERIES
+
+=head2 Parent-child queries
+
+Parent-child relationships are not yet supported natively in Elastic::Model.
+They will be soon.
+
+In the meantime, see
+
+=over
+
+=item *
+
+L<ElasticSearch::SearchBuilder/PARENTE<sol>CHILD>
+
+=item *
+
+L<http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-has-child-query.html>
+
+=item *
+
+L<http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-has-parent-query.html>
+
+=back
+
+=head2 Nested queries
+
+See L<Elastic::Manual::QueryDSL::Nested>.
+
+=head1 SEE ALSO
+
+=over
+
+=item *
+
+L<Elastic::Manual::QueryDSL>
+
+=item *
+
+L<Elastic::Manual::QueryDSL::Filters>
+
+=back
+
+=head1 AUTHOR
+
+Clinton Gormley <drtech@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Clinton Gormley.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,19 @@
+Revision history for Perl module Encode::Newlines
+
+0.05 2015-01-11 NEILB
+    - Updated format of this file to follow CPAN::Changes::Spec
+    - Switched to Dist::Zilla
+    - Added "use warnings"
+
+0.04 2007-09-03 AUDREYT
+    - Minor tidying up for Perl 5.9 compatibility.
+
+0.03 2004-10-07 AUTRIJUS
+    - Declare ourselves as unsuited for PerlIO::encoding use.
+
+0.02 2004-10-06 AUTRIJUS
+    - Added I/O-specific encodings like "LF-Native", which means decoding to LF
+      and encoding to Native; this what "svn:eol-style = native" means.
+
+0.01 2004-10-06 AUTRIJUS
+    - Initial release to CPAN.

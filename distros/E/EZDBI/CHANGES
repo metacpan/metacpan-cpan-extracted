@@ -1,0 +1,117 @@
+0.16	Tue Mar  1 19:46:39 EST 2016
+
+	Fix INI file comment bug that caused some DSNs to be misparsed.
+
+	Document case-sensitivity of INI files.
+
+	Add SQL statement debugging option.
+
+0.14	Fri Jan 29 04:07:40 EST 2016
+
+	Add ability to bind columns/parameters.
+
+	Long overdue promototion beyond alpha status.
+
+0.13    Mon Jul 21 23:53:12 UTC 2003
+
+        Added DBD::XBase support to test suite.
+
+	Minor tweakage to pass -w under 5.8.0 and avoid
+	  Using a hash as a reference is deprecated
+        Also resulting ins a small bug fix.
+
+0.121	Sun Mar  9 01:25:08 UTC 2003
+
+	Reworked DESCRIPTION in documentation.
+
+	Fixed Insert support for subqueries.
+
+	Fixed Update hashref form.
+
+0.120	Sat Mar  8 03:53:41 UTC 2003
+
+	Added new convenience forms of Insert and Update,
+	per suggestion by Coruscate.
+
+	Reworked DESCRIPTION in documentation.
+
+	Cleaned up caching, added more aggressive cache cleaning.
+
+	Fixed use EZDBI maxQuery=>
+
+	Bigger badder tests.
+
+0.111	Thu Jun 13 19:19:32 UTC 2002
+
+	Stupid stupid stupid, forgot to update $VERSION
+
+0.11	Thu Jun 13 04:05:40 UTC 2002
+
+	Some documentation clarifications.
+
+	Fixed a bug that slides through in 5.6+ but breaks in earlier versions.
+
+0.1	Thu May  2 02:32:38 UTC 2002
+
+	Renamed and documented the previously undocumented DBCommand.
+	It is now Sql, it may be used for executing arbitrary SQL.
+
+	Changed Select behavior in scalar context. It no longer returns
+	the number of rows, use SQL Count() for that. Select in scalar
+	context can now be used to retrieve arrayrefs or hashrefs one
+	row at a time, consult the man page for details.
+
+	Removed the auto-Connect form of use-ing the module.
+
+	Exposed the query cache system, the max number of queries to cache
+	(per database handle) is settable by use EZDBI maxQuery=>8.
+
+	Added Use, to allow management of multiple database handles.
+
+	Added Disconnect, to destroy a database handle. Otherwise
+	the connection persists until the program exits.
+
+	Some documentation cleanup and restructuring.
+
+0.071	Tue Apr 23 19:51:52 UTC 2002
+
+	Corrected failed test (prior version is fine, just ignore the error)
+
+0.07    Tue Apr 23 00:35:05 UTC 2002
+
+        Added Connect {} syntax which provides DBIx::Connect compatibility
+        mode i.e. you can store connection information in an AppConfig file.
+
+        Some documentation cleanup and restructuring.
+
+0.06	Thu Nov 01 14:21        2001
+
+	Minor maintenance release
+
+	Small bug fixes
+
+	Slightly better support for Postgres
+
+0.05	
+
+	Minor bug and doc fixes
+
+	Trivial test suite
+
+
+0.03	
+
+	Minor bug and doc fixes
+
+	"INSERT INTO t (field1, ...)" syntax now supported
+
+	Support for %d and %s escapes withdrawn.  Use ? instead.
+
+	'%L' escape replaced with '??L'.
+
+	Support for deferring connection to run time,
+	including 'Connect' function
+
+0.02	
+
+	This was the initial release

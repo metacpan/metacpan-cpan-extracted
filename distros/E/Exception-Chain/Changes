@@ -1,0 +1,41 @@
+Revision history for Perl extension Exception-Chain
+
+0.11 2014-09-24T14:13:49Z
+    - delete dependent module
+    - change delivery logic (losing backward compatibility)
+
+0.10 2014-07-01T12:49:11Z
+    - add method [add_message]
+    - bugfix [instance decision logic]
+    - bugfix [overload string conversion]
+
+0.09 2014-06-27T10:34:21Z
+    - overload string conversion
+    - fix pod (thanks addsict)
+
+0.08 2014-06-05T12:25:00Z
+    - change name $Exception::Chain::SkipLevel to $Exception::Chain::SkipDepth
+
+0.07 2014-06-05T12:05:29Z
+    - add variable $Exception::Chain::SkipLevel
+
+0.06 2014-05-23T11:03:32Z
+    - fix using s///gc to s///g ...
+
+0.05 2014-05-23T11:00:21Z
+    - fix bug to remove new line character
+
+0.04 2014-05-12T03:22:08Z
+    - auto dumper in message params
+
+0.03 2014-05-09T10:15:21Z
+    - add depend modules
+    - fix bug (initialize process)
+
+0.02 2014-04-15T11:12:10Z
+    - add depend modules
+
+0.01 2014-04-08T04:53:11Z
+
+    - original version
+

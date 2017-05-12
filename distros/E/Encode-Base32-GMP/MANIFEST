@@ -1,0 +1,12 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Encode/Base32/GMP.pm
+t/00_compile.t
+t/01_encode-decode.t
+t/01_encode-decode.tb
+t/02_md5-base32.t
+t/02_md5-base32.tb

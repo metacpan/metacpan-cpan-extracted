@@ -1,0 +1,50 @@
+---
+abstract: "Interface to ExactTarget's API."
+author:
+  - 'Guillaume Aubert <aubertg@cpan.org>'
+build_requires:
+  Test::Deep: '0'
+  Test::Exception: '0'
+  Test::FailWarnings: '0'
+  Test::More: '0.94'
+  Test::Type: '0'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.140640'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Email-ExactTarget
+no_index:
+  package:
+    - ExactTargetConfig
+provides:
+  Email::ExactTarget:
+    file: lib/Email/ExactTarget.pm
+    version: v1.6.2
+  Email::ExactTarget::Subscriber:
+    file: lib/Email/ExactTarget/Subscriber.pm
+    version: v1.6.2
+  Email::ExactTarget::SubscriberOperations:
+    file: lib/Email/ExactTarget/SubscriberOperations.pm
+    version: v1.6.2
+requires:
+  Carp: '0'
+  Data::Dumper: '0'
+  Data::Validate::Type: '0'
+  HTML::Entities: '0'
+  HTTP::Request: '0'
+  LWP::UserAgent: '0'
+  SOAP::Lite: '0.71'
+  Text::Unaccent: '0'
+  Try::Tiny: '0'
+  URI::Escape: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/guillaumeaubert/Email-ExactTarget/issues
+  homepage: https://metacpan.org/release/Email-ExactTarget
+  license: http://www.gnu.org/licenses/gpl-3.0.txt
+  repository: https://github.com/guillaumeaubert/Email-ExactTarget
+version: v1.6.2

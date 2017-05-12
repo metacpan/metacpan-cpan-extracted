@@ -1,0 +1,21 @@
+Revision history for Perl extension Encoding-FixLatin
+
+1.04      2014-05-22 22:25:14 Pacific/Auckland
+      - add --use-xs option to command-line script
+      - fix -v alias for --version option
+
+1.03      2014-05-21 22:25:07 Pacific/Auckland
+      - add support for loading/using XS implementation layer
+      - repackage using dzil
+
+1.02  2010-04-30
+      - shrink over-long UTF-8 sequences to shortest form
+      - add overlong_fatal option for trapping overlong sequences
+      - add ascii_hex option for undefined bytes - enabled by default
+
+1.01  2009-07-15
+      - add handling for input which already has utf8 flag set
+
+1.00  2009-04-05
+      - Initial public release
+

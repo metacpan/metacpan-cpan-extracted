@@ -1,0 +1,12 @@
+Changes
+EUCJPASCII.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/EUCJPASCII.t
+t/pod.t
+testin/7bit.txt
+testin/eucjp.txt
+ucm/eucJP-ascii.ucm
+ucm/mkucm.pl

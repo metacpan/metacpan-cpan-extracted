@@ -1,0 +1,35 @@
+
+o  A new project under development (not yet out on CPAN)
+   Substitution::Tracking might superceed the Rep.pm
+   module inside the Emacs::Rep distribution.  Consider
+   re-writing rep.pl and rep.el to use it, if there's any
+   advantage.
+
+o  The emacs side of Emacs::Rep (rep.el) has no tests.
+   Find or write an elisp test framework and fix that.
+   Q: did the nxhtml work get included in Emacs 24?  It
+   has a test framework of sorts (though it does not
+   conform to the TAP standard).
+
+o  Feature: a rep-redo command to undo the effect of a rep-undo.
+
+o  Investigate and document potential confusions between
+   the emacs standard undo system and the rep-undo system.
+
+o  After applying a set of changes to a buffer, it let's
+   you apply the changes again (or a different set of
+   change) even before changes have been accepted.  At
+   present, rep-undos "work" afterwards, but in a very
+   peculiar way that would have to be called buggy.
+   Reverts can still be done back to the original state,
+   though.
+
+   "apply" should check the other windows minor-mode-list
+   for the presence of rep-modified-mode, and refuse to
+   act, warning the user that they need to accept changes
+   before doing an apply again.
+
+o  rep.el: write a debugging routine that tells you
+   the state of the rep overlays at a particular point
+   (a beefed up version of "what", perhaps).
+

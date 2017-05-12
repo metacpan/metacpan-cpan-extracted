@@ -1,0 +1,9 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+OF-Connect-WebServices.pdf
+README
+dist.ini
+lib/Enterasys/NetSight.pm
+t/Enterasys-NetSight.t

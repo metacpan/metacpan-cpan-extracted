@@ -1,0 +1,685 @@
+#!/usr/bin/perl
+package Elive::script::elive_raise_meeting;
+use warnings; use strict;
+use version;
+
+use Getopt::Long;
+use Date::Parse qw{};
+use Pod::Usage;
+use File::Basename qw{};
+
+use Carp;
+
+use Elive;
+use Elive::Util;
+use Elive::Entity::User;
+use Elive::Entity::Group;
+use Elive::Entity::Participant;
+use Elive::Entity::Preload;
+use Elive::Entity::Role;
+use Elive::Entity::Session;
+use Elive::View::Session;
+
+use URI;
+use URI::Escape;
+
+use YAML::Syck;
+
+=head1 NAME
+
+elive_raise_meeting - Elluminate Live! Manager (ELM) meeting creation
+
+=head1 SYNOPSIS
+
+  elive_raise_meeting [url] [options] [participants]
+
+=head2 Authentication
+
+ [url]                        # web address and site instance path,
+                              # E.g.: https://myserver.com/mysite 
+ -user <username>             # SDK/SOAP username
+ -pass <password>             # SDK/SOAP password
+
+=head2 Basic Options
+
+ -name         <meeting name> # set meeting name
+ -facilitator  <userId>
+ -meeting_pass <password>     # set meeting password
+ -start  '[YYYY-MM-DD ]HH:MM' # start time
+ -end    '[YYYY-MM-DD ]HH:MM' # end time
+ -occurs {days|weeks}=<n>     # repeat over n days/weeks (elm2)
+
+=head2 Moderators and Participants
+
+ -moderators user|*group ...
+ -participants user|*group|Display Name(loginName) ...
+
+ Where each participant or moderator can be:
+
+    'user'        - a single Elluminate user. This can be either the
+                    user's username or user-id.
+
+    '*group'      - a group of users. This can be either the group-name
+                    or group-id. (elm3)
+
+    'Display Name(loginName)'
+                  - a guest login, e.g. "Robert(bob@example.com)" (elm3)
+
+=head2 Meeting Setup
+
+ -boundary     0|15|30|..     # minutes participants can arrive before or
+                              # leave after the scheduled meeting times.
+ -max_talkers  <n>            # max no. of simultaneous talkers
+ -max_cameras  <n>            # max no. of simultaneous cameras (elm3)
+ -seats        <n>            # number of seats to reserve on server
+ -profile_display      none|mod|all       # profiles to display (elm3)
+                              # none, mod (moderators only), or all
+ -recording_status     off|on|manual      # set recording status
+                              #  - off:    recording disabled
+                              #  - on:     starts automatically
+                              #  - manual: recording started by moderator
+ -recording_resolution cg|cc|mg|mc|fg|fc  # recording resolution (elm3)
+                              #  - cg:course gray  - cc:course color
+                              #  - mg:medium gray  - mc:medium color
+                              #  - fg:fine gray    - fc:fine color
+ -[no]invites                 # allow in-session invitations
+ -[no]follow                  # lock whiteboard to moderator view (elm3)
+ -[no]private                 # hide from public schedule
+ -[no]restricted              # restrict entry to registered users (elm3)
+ -[no]permissions             # let participants perform activities
+ -[no]raise_hands             # automatically raise hands on entry
+ -[no]supervised              # moderator can see private messages
+ -[no]all_moderators          # all participants can moderate (elm3)
+
+ -user_notes      <text>      # Set general user notes
+ -moderator_notes <text>      # Set general moderator notes
+ -cost_center     <code>      # Set a cost center code
+ -exit_url        <address>   # URL to visit on meeting exit (elm3)
+
+=head2 Preloads
+
+ -upload             <local_file>     # upload a file from the client
+ -import_from_server <remote_file>    # import a file from the server
+ -add_preload        <preload_id>,... # reuse previous preloads
+
+ Where preload files can include:
+
+    *.wbd *.wbp                   - Elluminate Live! whiteboard files
+    *.elp *.elpx                  - Elluminate Plan! files
+    *.mpg, *.mov, *.qt, *.swf ... - Multimedia content
+
+=head2 Compatibility Options
+
+ -use elm2                  # ELM 2.x compat (via Elive::View::Session)
+ -use elm3                  # ELM 3.x compat (via Elive::Entity::Session)
+ -use Some::Custom::Class   # create session via a custom session class
+
+=head2 Information
+
+ -? --help                  # print this help
+ -v --version               # print version and exit
+ --dump=yaml                # output created sessions as YAML
+ --debug=n                  # set debug level
+
+=head1 DESCRIPTION
+
+Creates meetings on an Elluminate I<Live!> Manager (ELM) server.
+
+=head1 SEE ALSO
+
+perldoc Elive
+
+http://search.cpan.org/dist/Elive
+
+=cut
+
+my $class;
+
+my $username;
+my $password;
+my $debug;
+my $start_str;
+my $end_str;
+my $import;
+my $upload;
+my $preload_opt;
+my $url;
+my $help;
+my @moderators;
+my @participants;
+my $dump;
+
+my %occurs;
+my $version;
+
+main(@ARGV) unless caller;
+
+sub bail {
+    Elive->disconnect;
+    die @_;
+}
+
+sub main {
+
+    local(@ARGV) = @_;
+
+    my %session_data = (
+	name => 'elive test meeting',
+	boundaryMinutes => 15,
+	);
+
+    GetOptions(
+	'username|user=s' => \$username,
+	'password|pass=s' => \$password,
+	'start=s' => \$start_str,
+	'end=s' => \$end_str,
+
+	'moderators|moderator=s{,}' => \@moderators,
+	'participants|participant|others|other=s{,}' => \@participants,
+	'upload=s' => \$upload,
+	'import_from_server|import=s' => \$import,
+	'add_preload|use_preload=i' => \$preload_opt,
+        'occurs=i%' => \%occurs,
+	'use=s' => \$class,
+
+	'all_moderators!' => \$session_data{allModerators},
+	'boundary=i' => \$session_data{boundaryMinutes},
+	'cost_center|cost_centre=s' => \$session_data{costCenter},
+	'exit_url|redirect_url=s' => \$session_data{redirectURL},
+	'facilitator=s' => \$session_data{facilitatorId},
+	'follow|follow_moderator!' => \$session_data{followModerator},
+	'invites|invitations!' => \$session_data{inSessionInvitation},
+	'meeting_password|meeting_pass|session_password|session_pass=s' => \$session_data{password},
+	'max_cameras|cameras|video_window=i' => \$session_data{videoWindow},
+	'max_talkers|talkers=i' => \$session_data{maxTalkers},
+	'moderator_notes=s' => \$session_data{moderatorNotes},
+	'name|meeting_name=s' => \$session_data{name},
+	'private!' => \$session_data{privateMeeting},
+	'permissions!' => \$session_data{fullPermissions},
+	'profile|profile_display=s' => \$session_data{profile},
+	'raise_hands!' => \$session_data{raiseHandOnEnter},
+	'restricted!' => \$session_data{restrictedMeeting},
+	'recording_resolution=s' => \$session_data{recordingResolution},
+	'recording|recording_status=s' => \$session_data{recordingStatus},
+	'seats=i' => \ $session_data{seats},
+	'supervised!' => \$session_data{supervised},
+	'user_notes=s' => \$session_data{userNotes},
+
+	'v|version' => \$version,
+	'debug=i' => \$debug,
+	'help|?' => \$help,
+	'dump=s' => \$dump,
+    )
+	or pod2usage(2);
+
+    pod2usage(0) if $help;
+
+    if ($version) {
+	print "Elive v${Elive::VERSION} (c) 2009 - 2012\n";
+	exit(0);
+    };
+
+    ($url = shift @ARGV)
+	or pod2usage("missing url argument");
+
+    Elive->debug($debug) if defined $debug;
+    # debug may also be set via $ENV{ELIVE_DEBUG}
+    $debug = Elive->debug;
+
+    if ($debug) {
+	$SIG{__WARN__} = \&Carp::cluck if $debug > 1;
+	$SIG{__DIE__} = \&Carp::confess;
+    }
+
+    $url ||= Elive::Util::prompt("Url ('http[s]://...'): ");
+
+    unless ($username && $password) {
+	#
+	# look for credentials encoded in the uri
+	#
+	my $uri_obj = URI->new($url);
+	my $userinfo = $uri_obj->userinfo; # credentials supplied in URI
+
+	if ($userinfo) {
+	    my ($uri_user, $uri_pass) = split(':', $userinfo, 2);
+	    $username ||= URI::Escape::uri_unescape($uri_user);
+	    $password ||= URI::Escape::uri_unescape($uri_pass)
+		if $uri_pass;
+	}
+    }
+
+    $username ||= Elive::Util::prompt('Username: ');
+    $password ||= Elive::Util::prompt('Password: ', password => 1);
+
+    our $connection; 
+    $connection = Elive->connect($url, $username, $password);
+
+    $class ||= do {
+	#
+	# use hasn't specified elluminate compatibility, or which session
+	# class to use. Guess it from their Elluminate server version.
+	#
+	my $server_version = eval {$connection->version}
+	or bail ($@ || "unable to get server details version\n");
+
+	my $server_version_num = version->new($server_version)->numify;
+	my $elm3_min_version_num = version->declare( '9.5.0' )->numify;
+
+	warn "Elluminate Live! version: $server_version_num (elm3 min: $elm3_min_version_num)\n" if $debug;
+	$server_version_num >= $elm3_min_version_num
+	    ? 'elm3'
+	    : 'elm2'
+    };
+
+    $class = {elm2 => 'Elive::View::Session',
+	      elm3 => 'Elive::Entity::Session'}->{$class} || $class;
+
+    warn "Session class: $class\n" if $debug;
+
+    eval "use $class";
+    bail("unable to load class $class: $@") if $@;
+
+    bail("class $class: does not implement the 'insert' method")
+	unless eval{ $class->can('insert') };
+
+    for ($session_data{recordingStatus}) {
+	next unless defined;
+	$_ = lc $_;
+	#
+	# accept some of the other synonyms for the various modes as
+	# seen in documentation and Elluminate's web interface.
+	#
+	s{^none|disabled$}{off}x;
+	s{^manual$}{remote}x;
+	s{^auto(matic)?$}{on}x;
+
+	pod2usage("-recording_status must be: on/auto, off/none/disabled or manual/remote\n")
+	    unless m{^on|off|remote$}x;
+    }
+
+    for ($session_data{recordingResolution}) {
+	next unless defined;
+	$_ = uc $_;
+	bail("-recording_resolution must be one of: 'cg', 'cc', 'mg', 'mc', 'fg' or 'fc'\n")
+	    unless m{^[CMF][GC]$}x;
+    }
+
+    for ($session_data{profile}) {
+	next unless defined;
+	$_ = lc $_;
+
+	bail("-profile_display must be one of: 'none', 'mod' or 'all'\n")
+	    unless m{^(none|mod|all)$}x;
+    }
+
+    my ($recurrence_count, $recurrence_days) = _get_occurrences(\%occurs);
+
+    my $start = $start_str
+	? Date::Parse::str2time($start_str)
+	: time() + 15 * 60;
+
+    my $end = $end_str
+	? Date::Parse::str2time($end_str)
+	: $start + 30 * 60;
+
+    bail("end time ($end_str) is not later than start time ($start_str)\n")
+	unless ($end > $start);
+
+    my $upload_data;
+
+    $session_data{facilitatorId} ||= Elive->login;
+    $session_data{start} = $start . '000',
+    $session_data{end} = $end . '000';
+
+    if ($recurrence_count > 1) {
+	$session_data{recurrenceCount} = $recurrence_count;
+	$session_data{recurrenceDays} = $recurrence_days || 1;
+    }
+
+    if (@moderators || @participants || @ARGV) {
+	$session_data{participants} = build_participants(\@moderators, \@participants, \@ARGV);
+    }
+
+    my $uploaded_preload;
+    $uploaded_preload = Elive::Entity::Preload->upload($upload)
+	if $upload;
+
+    my $existing_preload;
+
+    if ($preload_opt) {
+
+	pod2usage("non numeric preload id")
+	    unless $preload_opt =~ m{^\d+$}x;
+
+	$existing_preload = Elive::Entity::Preload->retrieve( $preload_opt );
+	
+	bail("no existing preload: $preload_opt\n")
+	    unless $existing_preload;
+    }
+
+    my $imported_preload;
+    if ($import) {
+
+	print "importing server-side preload: $import\n";
+
+	$imported_preload = Elive::Entity::Preload->import_from_server({
+	    fileName => $import,
+	    ownerId => $session_data{facilitatorId} || Elive->login,
+	});
+
+	printf("imported '%s' preload: %s (%s)\n",
+	       $imported_preload->type, $imported_preload->name, $imported_preload->mimeType);
+    }
+
+    my @preloads = grep {$_} ($existing_preload, $uploaded_preload, $imported_preload);
+    $session_data{add_preload} = \@preloads if @preloads;
+
+    foreach (grep {! defined $session_data{$_} } keys %session_data) {
+	delete $session_data{$_};
+    }
+
+    warn YAML::Syck::Dump {session_data => \%session_data} if Elive->debug;
+
+    my @sessions = $class->insert(\%session_data);
+
+    if ($dump && $dump =~ m{yaml}i) {
+	_yaml_dump_sessions( 'Elive::View::Session' => @sessions );
+    }
+    else {
+	warn "ignoring option: -dump=$dump" if $dump;
+	_echo_sessions( @sessions );
+    }
+
+    Elive->disconnect;
+
+    return @sessions;
+}
+
+########################################################################
+
+sub build_participants {
+    my ($moderators, $others, $args) = @_;
+
+    my @participants_spec = (
+	@$args,
+	-moderators => @$moderators,
+	-others => @$others
+	);
+
+    my $p = Elive::Entity::Participants->new( \@participants_spec );
+
+    #
+    # collate by role && type
+    #
+    my @users  = grep {$_->user} @$p;
+    my @groups = grep {$_->group} @$p;
+    my @guests = grep {$_->guest} @$p;
+
+    #
+    # Vet participants
+    #
+    my @attendees;
+    push (@attendees, _get_users( @users ))
+	if @users;
+
+    push (@attendees, _get_groups( @groups ))
+	if @groups;
+
+    push (@attendees, @guests)
+	if @guests;
+
+    return \@attendees;
+}
+
+########################################################################
+
+sub show_participants {
+    my ($session) = @_;
+
+    my $participants = $session->participants;
+
+    my @moderators = (map { _display_participant($_) }
+		      grep {$_->is_moderator} 
+		      @$participants);
+
+    my @others = (map { _display_participant($_) }
+		      grep { ! $_->is_moderator} 
+		      @$participants);
+
+    print "moderators: ".join(', ', @moderators)."\n"
+	if @moderators;
+
+    print "participants: ".join(', ', @others)."\n"
+	if @others;
+
+    return;
+}
+
+########################################################################
+
+sub _display_participant {
+    my $participant = shift;
+
+    my $type = $participant->type;
+    my $str;
+
+    if (! $type)  {        # single participant
+	my $user_obj = $participant->user;
+	my $loginName = $user_obj->loginName;
+	my $email = $user_obj->email;
+
+	$str = ($loginName || $user_obj->userId);
+	$str .= ' <'.$email.'>'
+	    if $email;
+    }
+    elsif ($type == 1) {   # group of participants
+	my $group_obj = $participant->group;
+	my $id = $group_obj->groupId;
+	my $name = $group_obj->name;
+
+	$str = '*'.$id;
+	$str .= ' <group:'.$name.'>'
+	    if $name;
+    }
+    elsif ($type == 2) {   # invited guest
+	my $guest_obj = $participant->guest;
+	my $loginName = $guest_obj->loginName;
+	my $displayName = $guest_obj->displayName;
+
+	$str = $displayName;
+	$str .= ' ('.$loginName.')'
+	    if $loginName;
+    }
+    else {
+	warn "unknown participant type $type: ignored";
+	$str = ''
+    }
+
+    return $str;
+}
+
+########################################################################
+
+sub _get_users {
+    my @participants = grep {! $_->is_moderator} @_;
+    my @moderators = grep {$_->is_moderator} @_;
+
+    my @users;
+
+    push (@users, map {{user => $_, role => ${Elive::Entity::Role::PARTICIPANT}}} _lookup_users(@participants))
+	if @participants;
+
+    push (@users, map {{user => $_, role => ${Elive::Entity::Role::MODERATOR}}} _lookup_users(@moderators))
+	if @moderators;
+
+    return @users;
+}
+
+sub _lookup_users {
+    my @users_in = @_;
+
+    my %users;
+
+    foreach (@users_in) {
+	my $user = Elive::Entity::User->stringify($_->user);
+	$users{$user} = $_;
+    }
+
+    my $filter = join(' OR ',
+		      map {sprintf("loginName=%s OR userId=%s",
+				   $_, $_)}
+		      map {Elive::Entity::User->quote($_)}
+		      (keys %users)
+	);
+
+    my $db_users = Elive::Entity::User->list(filter => $filter);
+    my @users;
+    my %ids_seen;
+    my %uids_seen;
+
+    foreach my $user (@$db_users) {
+        $ids_seen{lc $user->userId}++;
+        $uids_seen{lc $user->loginName}++;
+    }
+
+    foreach (keys %users) {
+	delete $users{$_}
+	    if $ids_seen{lc $_} or $uids_seen{lc $_};
+    }
+
+    my @users_not_found = sort keys %users;
+    bail("unknown user(s): @users_not_found\n")
+	if @users_not_found;
+
+    return @$db_users;
+}
+
+########################################################################
+
+sub _get_groups {
+    my @participants = grep {!$_->is_moderator > 2} @_;
+    my @moderators = grep {$_->is_moderator} @_;
+
+    my @groups;
+
+    push (@groups, map {{user => $_, role => ${Elive::Entity::Role::PARTICIPANT}}} _lookup_groups(@participants))
+	if @participants;
+
+    push (@groups, map {{user => $_, role => ${Elive::Entity::Role::MODERATOR}}} _lookup_groups(@moderators))
+	if @moderators;
+
+    return @groups;
+}
+
+sub _lookup_groups {
+    my @groups_in = @_;
+
+    my %groups;
+
+    foreach (@groups_in) {
+
+	my $group_spec = Elive::Entity::Group->stringify($_->group);
+	$group_spec =~ s{^\*}{};
+
+	$groups{$group_spec} = $_;
+    }
+
+    my $filter = join(' OR ',
+		      map {sprintf("groupId=%s OR groupName=%s",
+				   $_, $_)}
+		      map {Elive::Entity::Group->quote($_)}
+		      (keys %groups)
+	);
+
+    my $db_groups = Elive::Entity::Group->list(filter => $filter);
+
+    my %gids_seen;
+    my %names_seen;
+
+    foreach my $group (@$db_groups) {
+	$gids_seen{ lc $group->groupId}++;
+	$names_seen{ lc $group->groupName}++;
+    }
+
+    foreach (keys %groups) {
+	delete $groups{$_}
+	    if $gids_seen{lc $_} || $names_seen{lc $_};
+     }
+
+    my @groups_not_found = sort keys %groups;
+
+    bail("unknown group(s): @groups_not_found\n")
+	if @groups_not_found;
+
+    return @$db_groups;
+}
+
+########################################################################
+
+sub _get_occurrences {
+    my $occurs = shift;
+
+    my $recurrence_count = 1;
+    my $recurrence_days = 1;
+
+    foreach (keys %$occurs) {
+
+	$recurrence_count = $occurs{$_};
+
+	$recurrence_days =
+	    m{^.*day(s?).*$}i       ? 1
+	  : m{^.*week(s?).*$}i      ? 7
+          : m{^.*fortnight(s?).*$}i ? 14
+          : bail("occurs usage: --occurs days=n  or --occurs weeks=n\n");
+
+    }
+
+    return ($recurrence_count, $recurrence_days);
+}
+
+########################################################################
+
+sub _echo_sessions {
+    my @sessions = @_;
+
+    foreach my $session (@sessions) {
+	print "created meeting: ".$session->name." with id ".$session->sessionId."\n";
+
+	if (@{ $session->participants }) {
+
+	    show_participants($session);
+
+	}
+	else {
+	    print "no participants\n";
+	}
+
+	print "session address: ".$session->web_url."\n";
+    }
+
+}
+
+########################################################################
+
+sub _yaml_dump_sessions {
+    my $class = shift;
+    my @sessions = @_;
+
+    my @props = $class->properties;
+    my %derivable = $class->derivable;
+    my $entity_name = $class->entity_name;
+
+    foreach my $session (@sessions) {
+	
+	my %vals = (
+	    map {
+		my $meth = $derivable{$_} || $_;
+		my $val = $session->$meth;
+		$_ => $val,
+	    } (sort (@props, keys %derivable)));
+
+	print YAML::Syck::Dump {$entity_name => \%vals};
+
+    }
+
+}

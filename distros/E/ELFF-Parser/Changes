@@ -1,0 +1,15 @@
+Revision history for Perl extension ELFF::Parser.
+
+* 2010-03-21 Mark M. Warren <mwarren42@gmail.com>
+- Some vendors put whitespace between ^# and the directive name,
+  now handling that case
+- Substantially improved performance (14% on my machine)
+- Release 0.92
+
+* 2010-03-20 Mark M. Warren <mwarren42@gmail.com>
+- Fixed a memory leak
+- Fixed a compiler warning
+- Release 0.91
+
+* 2007-04-01 Mark M. Warren <mwarren42@gmail.com>
+- Initial release

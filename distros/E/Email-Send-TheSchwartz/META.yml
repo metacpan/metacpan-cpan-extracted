@@ -1,0 +1,19 @@
+abstract: Send Messages using TheSchwartz
+author: Six Apart, cpan@sixapart.com. All rights reserved.
+build_requires: 
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.61
+license: perl
+name: Email-Send-TheSchwartz
+no_index: 
+  directory: 
+    - inc
+    - t
+recommends: 
+  TheSchwartz::Worker::SendEmail: 0
+requires: 
+  Email::Address: 0
+  Return::Value: 0
+  TheSchwartz: 0
+version: 0.01

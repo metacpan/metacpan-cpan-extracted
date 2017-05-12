@@ -1,0 +1,36 @@
+                                       Trial balance
+Period: through 2011-12-31
+EekBoek Sample Administration                                            EekBoek, 2011-12-31
+
+AccNr   Group/Account                                 Debet     Credit  Balance Db  Balance Cr
+--------------------------------------------------------------------------------------------
+1       Non-current Assets
+11       Total Material non-current assets         14722.85   14219.67     503.18
+1       Total Non-current Assets                   14722.85   14219.67     503.18
+
+2       Current Assets
+22       Total Receivables                         10163.00   10163.00
+23       Total Liquid assets                       10963.68     629.00   10334.68
+2       Total Current Assets                       21126.68   10792.00   10334.68
+
+3       Assets
+31       Total Capital                                         2443.18               2443.18
+3       Total Assets                                           2443.18               2443.18
+
+4       Liabilities
+41       Total Suppliers credits                     927.84     927.84
+42       Total Taxes and expenses                    148.13    1463.00               1314.87
+4       Total Liabilities                           1075.97    2390.84               1314.87
+
+6       Costs
+68       Total Depreciation                          808.08                808.08
+69       Total General costs                         812.11                812.11
+6       Total Costs                                 1620.19               1620.19
+
+8       Revenues
+81       Total Revenue Consultancy                             1200.00               1200.00
+83       Total Revenue Editing                                 1000.00               1000.00
+84       Total Revenue Courses                                 6500.00               6500.00
+8       Total Revenues                                         8700.00               8700.00
+--------------------------------------------------------------------------------------------
+        TOTAL                                      38545.69   38545.69   12458.05   12458.05

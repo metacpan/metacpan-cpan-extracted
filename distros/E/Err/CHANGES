@@ -1,0 +1,5 @@
+0.02  Backwards compatibility release to allow to function on Perl 5.12 and
+      below.
+
+0.01  Initial Release
+      

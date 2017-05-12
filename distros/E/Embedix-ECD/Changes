@@ -1,0 +1,204 @@
+Revision history for Perl extension Embedix::ECD.
+
++ means it still needs to be done
+- means it's done
+
+beyond 1.00
+    + allow for negative indentation? (probably not)
+    + grammar capable of detecting unknown attributes
+
+1.00  TARGET
+    - be able to create an object tree from a file
+    - be able to render an object tree
+    - grammar capable of detecting imbalanced tags
+    + freeze the API after having discussed it w/ others who care
+      (but I'm the only one who seems to care)
+    + documentation should be complete
+    + the subclasses of Embedix::ECD should begin to take on individual
+      characteristics (because they can't all be the same).  It annoys
+      me that they are all clones of eachother.  Allowed attributes should
+      vary among different node classes for one thing.
+    - submit to CPAN -- when is my PAUSE id coming in? (on my bday of course!)
+    + split the constructors that rely on the parser out into
+      a factory class.  (maybe)
+    + make an Embedix::ECD::Node class that the other node classes
+      inherit from.  The parts of Embedix::ECD that are not factory
+      methods will be moved there.  Also make a node class called 
+      Embedix::ECD::Root.
+    + Make a Parse::Yapp-based parser?  Parse::Yapp let's me provide
+      my own lexer, so it should be significantly faster than
+      Parse::RecDescent, and it'll be easier to do magic to get around
+      the weird things.
+    + need to allow "<" inside rawtext to be compatible w/ the
+      evil version.  argh!  In toXML(), be sure to turn "<" and ">"
+      bounded within tags to the entities &lt; and &gt;  This sucks.
+      If I can't get around this bug, at least make the Parse::RecDescent
+      parser die when it encounters it instead of failing silently.
+    + portmap.ecd has a mystery attribute:  BUILD_REQUIRES.
+      I think it's the same as REQUIRES.
+    + kbd.ecd has what appears to be tags inside a multi-line
+      help section.
+    + newFromXML()!!!  expat is really fast and kicks the shit out
+      of this Parse::RecDescent based parser on large ECDs.
+
+0.09
+    - in the grammar, made it so that single-lined attributes
+      have their whitespace trimmed on both the left and right sides.
+    - added a license attribute and a get/set method for it, too.
+      this is my first significant fork away from target wizard ECDs.
+    - added license to the ecd_v1.dtd and the @default_order
+      array in Embedix::ECD::Util and documented the change.
+    - use Carp;
+    - moved unindent_and_aggregate out of the grammar and into
+      Embedix::ECD::Util.
+    - using the production from chipmunk@perlmonks (w/ minor
+      modifications, I can now have '<' inside rawtext!
+    - make unindent_and_aggregate() remove comments
+    - added hasChildren()
+    - added delChild()
+    - system/base/$arch/MAKEDEV.ecd
+      spaces are allowed in node names so I adjusted for that
+    - CONFLICTS attribute added.
+    - applied
+      yy}}po<ESC>V:s/=item /    /<ENTER>{{kV:s/\$ecd->\|()//g<ENTER>
+      to the documentation
+    - in the *_size attributes, it's able to evaluate mathematical
+      expressions, and deal w/ pairs of numbers.  The first number is
+      the base size, and the second number is the give-or-take amount.
+      make_evaluating_getter_method() makes it possible.
+
+0.08  Sun Dec 31 23:50:20 MST 2000
+    - added POD for bin/ecd2xml
+    - fixed a spacing bug and overzealous lc() bug in toXML()
+    - enforced existence of name attribute to new constructor
+    - changed getNodeType() to getNodeClass() to make the naming
+      consistent with the schema used by Embedix::DB::Pg.
+    - rename XMLWriter.pm to XMLv1.pm.  There will hopefully be an
+      XMLv2.pm in the near future w/ nicer semantics.  There may
+      even be an XMLv3.pm if I stick around long enough...  or not...  
+      who knows?
+    - fixed some bugs in bin/ecd2xml.  This is the first time that
+      my own documentation helped me find a bug.  ecd2xml had still
+      been using the obsoleted XMLWriter.pm, and I was wondering why
+      my changes in XMLv1.pm weren't taking effect.  I read my own
+      man page for ecd2xml, and sure enough, I had documented that
+      Embedix::ECD::XMLWriter was one of my requirements.  hehe.
+
+0.07  Wed Dec  6 23:11:29 MST 2000
+    - The grammar was simplified and also made capable of detecting
+      imbalanced tags.  This means that the parser will die when
+      an error is detected so be sure to wrap calls to the constructors
+      around an eval block.
+    - wrote documentation regarding these new error messages.
+    - added n() which is an alias for getChild().  I think they should
+      have disallowed "-" from node names.
+    - added Embedix::ECD::XMLWriter -- much work needs to be done.
+    - write tests for rendering
+    - newFromCons() and grammar changed such that nodes are
+      returned as a pair in an arrayref.  Everything still works
+      the same.
+    - added bin/ecd2xml
+    - discovered Pod::Usage(3pm) -- perl module of the week!
+    - added ecd_v1.dtd which is a straight port of the ECD format
+      to XML
+    - added function xml_from_cons() which takes an arrayref 
+      (NOT an Embedix::ECD object) and turns it into XML.  It even
+      preserves comments!
+    - added getNodeType() method to Embedix::ECD
+    - fleshed out toXML().  It now takes a "dtd" parameter which can
+      be "yes", "embed", or "no".  This determines how the 
+      document type declaration is mentioned in the XML.
+    - "&" in CDATA gets turned into an &amp; entity.
+    - ecd_v1.dtd adjusted to have element order coincide w/ the way
+      Embedix::ECD usually orders them.  Otherwise, it's invalid.  :(
+      The dtd was also changed to allow the nesting of group, component,
+      option, and autovar nodes.  (I forgot about that).
+      Everything should be well-formed now, and the stuff toXML() spits
+      out should even be valid.  The stuff xml_from_cons() spits out will
+      probably not be valid, though -- I don't have control over the order
+      of attributes when I get a cons.
+    - this is the first version to be put into CPAN.
+      Getting my PAUSE id today was the best birthday present I've
+      ever gotten.
+
+0.06  Mon Nov 20 08:33:24 MST 2000
+    - implemented mergeWith()
+    - refactor subclasses of Embedix::ECD to minimize duplication of code
+    - wrote more documentation about what an ECD actually is and
+      reorganized some of the sections to (hopefully) make it easier
+      to understand.
+    - added getFormatOptions(@opt) method to further reduce duplication
+      of code in the subclasses.
+
+0.05  Wed Nov 15 00:56:39 MST 2000
+    - overloaded the "" operator like CGI::Cookie
+    - create methods for accessing known attributes
+    - added newFromCons() which takes a big arrayref and turns it
+      into a bigger Embedix::ECD object.
+    - added setAttribute($name, $value) and getAttribute($name) to
+      make newFromCons() much easier to implement w/o violating
+      abstraction or having to eval.
+    - updated POD for methods such that each method is preceded by
+      Embedix::ECD (if it is a class method) or $ecd (if it is an
+      instance method).
+    - added getDepth() to find one's depth in the tree.
+      Unfortunately, overloading "" seemed to conflict with reference
+      comparisons and really screwed things up, so I may end up disabling
+      overloading.
+    - re-enabled the overloaded "" operator.  Instead of checking to
+      see if $parent eq undef, I just do ref($parent) which seems
+      to not make the "" kick in (which is a good thing).
+    - the grammar now has a way to turn the attributes that are supposed
+      to be aggregates into aggregates via __unindent_and_aggregate()
+    - added module Embdix::ECD::Util and in it, indent()
+      more utility functions will be added there as necessary.
+    - overloading "" is pissing me off -- it kicks in when I least expect it.
+      No more overloading for me.
+    - subclasses need to implement their own toString()
+      ...but it got messy
+    - added %default and @attribute_order to Embedix::ECD::Util
+      They're probably going to get moved somewhere else.
+    - I decided that ALL attributes that get delimited by tags
+      are aggregates.  There is no longer a distinction between
+      singular and aggregate attributes.
+    - added accessor method for default_value (which was accidentally
+      omitted).
+
+0.04  Mon Nov 13 02:05:29 MST 2000
+    - made the parser collect consecutive comments into one big comment.
+      Removed join_comments method, because of this.
+    - removed debugging noise from the parser
+    - wrote great quantities of POD
+    - added Embedix/ECD/Autovar.pm
+    - provided an intervening layer in the grammar so that one could
+      get a nested arrayref form of the syntax tree instead of an object
+    - API changes for accessing child nodes.  AUTOLOAD will no longer be
+      able to add children.  addChild() will have to be used for that
+      task.  getChild() was added for those times it would be inconvenient
+      to let AUTOLOAD return a child node.  Finally children() was renamed
+      to getChildren().  This was the result of my desire to let the methods
+      for accessing attribute names be nouns.  I also want all other methods
+      to have a verb in them.  Thus children() became getChildren().
+    - enhanced the basic constructor, new()
+
+0.03  Fri Nov 10 12:16:27 MST 2000
+    - more additions to the grammar
+    - added a stub for merge().
+    - added a stub for join_comments().
+    - added t/data/node.ecd which is an ECD file that only
+      contains nodes.
+    - this is the first time a grammar has been able to load an ECD file
+      in its entirety into a simple perl data structure.
+
+0.02  Tue Aug 29 16:38:47 MDT 2000
+    - implemented AUTOLOAD method
+    - added a test for building object hierarchies
+    - implemented new_from_file() constructor
+    - preliminary (very wrong) ECD parser
+    - added children() method for returning all children of a node.
+    - switched to Java-styled method names for pre-defined methods.
+      newFromFile() and newFromString() were changed.
+
+0.01  Thu Aug 24 14:56:50 2000
+    - original version; created by h2xs 1.19
+

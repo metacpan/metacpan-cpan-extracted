@@ -1,0 +1,77 @@
+<?xml version="1.0" ?>
+<configuration>
+
+  <system>
+    <post_processors>
+<!--
+      <class>My::ConfigPostProcessor</class>
+-->
+    </post_processors>
+    <libs>
+      <lib>@ServerRoot@/lib</lib>
+    </libs>
+    <load_modules>
+      <module>DBI</module>
+      <module>Class::DBI::Lite</module>
+    </load_modules>
+    <env_vars>
+      <var>
+        <name>myvar</name>
+        <value>value</value>
+      </var>
+      <var>
+        <name>myvar2</name>
+        <value>value</value>
+      </var>
+    </env_vars>
+    <settings>
+      <setting>
+        <name>a_setting</name>
+        <value>a_setting_value</value>
+      </setting>
+    </settings>
+  </system>
+
+  <errors>
+    <error_handler>Apache2::ASP::ErrorHandler</error_handler>
+    <mail_errors_to>jdrago_999@yahoo.com</mail_errors_to>
+    <mail_errors_from>root@localhost</mail_errors_from>
+    <smtp_server>localhost</smtp_server>
+  </errors>
+
+  <web>
+    <application_name>DefaultApp</application_name>
+    <application_root>@ServerRoot@</application_root>
+    <handler_root>@ServerRoot@/handlers</handler_root>
+    <www_root>@ServerRoot@/htdocs</www_root>
+    <page_cache_root>/tmp/PAGE_CACHE</page_cache_root>
+    <media_manager_upload_root>@ServerRoot@/MEDIA</media_manager_upload_root>
+    <request_filters>
+    </request_filters>
+  </web>
+
+  <data_connections>
+    <session>
+      <manager>Apache2::ASP::SessionStateManager::MySQL</manager>
+      <cookie_domain>localhost</cookie_domain>
+      <cookie_name>session-id</cookie_name>
+      <dsn>DBI:mysql:email_blaster:localhost</dsn>
+      <username>root</username>
+      <password>j@p@n</password>
+      <session_timeout>30</session_timeout>
+    </session>
+    <application>
+      <manager>Apache2::ASP::ApplicationStateManager::MySQL</manager>
+      <dsn>DBI:mysql:email_blaster:localhost</dsn>
+      <username>root</username>
+      <password>j@p@n</password>
+    </application>
+    <main>
+      <dsn>DBI:mysql:email_blaster:localhost</dsn>
+      <username>root</username>
+      <password>j@p@n</password>
+    </main>
+  </data_connections>
+
+</configuration>
+

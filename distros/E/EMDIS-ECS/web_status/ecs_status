@@ -1,0 +1,63 @@
+#!/bin/sh
+#
+# $Id: ecs_status,v 1.11 2008/03/20 17:37:47 jschneid Exp $
+#
+##########################################################################
+# SCRIPT NAME:   ecs_status
+# DESCRIPTION:   shell script wrapper for ecs_status.pl web status script
+# PARAMETERS:    None.  Edit this file to configure environment variable
+#                settings passed to ecs_status.pl
+# OUTPUT:        ECS status, as reported by ecs_status.pl
+#
+# DATE WRITTEN:  2008-03-19
+# WRITTEN BY:    Joel Schneider
+#
+# REVISION HISTORY:  please refer to CVS
+#
+# Copyright (C) 2008 National Marrow Donor Program.  All rights reserved.
+##########################################################################
+
+
+# location of executable Perl ECS scripts
+ECS_BIN_DIR=/usr/bin
+
+# display status of ECS daemons?
+ECS_DAEMON_CHECK=YES
+
+# username who runs ECS daemons
+ECS_DAEMON_USER=
+
+# location of image files (root = webroot)
+ECS_IMAGE_DIR=/ecs/images
+
+# display green/yellow/red background colors in table cells?
+ECS_STATUS_CELLBG=NO
+
+# threshold for yellow and red background colors in table cells
+ECS_STATUS_RED=50
+ECS_STATUS_YELLOW=1
+
+# location of NODE_TBL files
+NODE_TBL=/var/ecs/data/node_tbl.dat
+NODE_TBL_LOCK=/var/ecs/data/node_tbl.lock
+
+# location for Perl to find additional (e.g. ECS) library files
+PERL5LIB=/usr/local/share/perl/5.8.7
+
+# node_id for this node
+THIS_NODE=ZZ
+
+# temporary files directory, to hold writable copies of node_tbl files
+TMPDIR=.
+
+export ECS_BIN_DIR ECS_DAEMON_CHECK ECS_DAEMON_USER ECS_IMAGE_DIR \
+  ECS_STATUS_CELLBG ECS_STATUS_RED ECS_STATUS_YELLOW \
+  NODE_TBL NODE_TBL_LOCK PERL5LIB THIS_NODE TMPDIR
+
+
+# uncomment the following for a quick little CGI test
+#echo 'Content-type: text/html; charset=utf-8'
+#echo ''
+#echo '<html><head></head><body>Hello world!</body></html>'
+
+exec $ECS_BIN_DIR/ecs_status.pl

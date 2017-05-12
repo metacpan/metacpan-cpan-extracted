@@ -1,0 +1,21 @@
+---
+abstract: 'Make sure that pictures cope with the MOBI standards.'
+author:
+  - 'Boris Däppen <boris_daeppen@bluewin.ch>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.012, CPAN::Meta::Converter version 2.133380'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: EBook-MOBI-Image
+requires:
+  File::Temp: 0
+  Image::Imlib2: 0
+  strict: 0
+  warnings: 0
+version: 0.16

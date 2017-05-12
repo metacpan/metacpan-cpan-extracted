@@ -1,0 +1,23 @@
+---
+abstract: 'Provides an abstraction layer between SOAP::Lite and the Netsight Device WebService.'
+author:
+  - 'Chris Handwerker <chandwer@enterasys.com>'
+build_requires:
+  Test::More: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Enterasys-NetSight
+requires:
+  Carp: 0
+  SOAP::Lite: 0
+  Socket: 0
+resources:
+  repository: https://github.com/chandwer/Enterasys-NetSight.git
+version: 1.2

@@ -1,0 +1,16 @@
+Revision history for Perl extension Email::Forward::Dispatch
+
+0.04 2015-04-20T11:51:32Z
+    - upload to cpan!!
+
+0.03 2015-04-20T11:08:12Z
+    - fixed innter method
+    - change Mremora to Email::Forward::Dispatch
+
+0.02 2013-11-19T12:03:48Z
+    - version 2
+
+0.01 2013-11-19T12:03:08Z
+
+    - original version
+

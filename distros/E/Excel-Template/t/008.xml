@@ -1,0 +1,7 @@
+<workbook>
+  <worksheet name="formula">
+    <formula>Test1</formula>
+    <formula text="Test2" />
+    <formula />
+  </worksheet>
+</workbook>

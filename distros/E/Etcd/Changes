@@ -1,0 +1,14 @@
+0.004     2015-06-10 08:08:08+10:00 Australia/Melbourne
+ - use namespace::autoclean instead of namespace::sweep (#5)
+
+0.003     2014-10-21 08:17:12+11:00 Australia/Melbourne
+ - handle JSON::XS booleans when creating response objects
+ - explicitly require HTTP::Tiny >= 0.014
+
+0.002     2014-10-14 10:00:41+11:00 Australia/Melbourne
+ - Minor doc fixes
+ - Handle all redirects to leader nodes
+ - More tests
+
+0.001     2014-06-17 22:54:50+10:00 Australia/Melbourne
+ - First release

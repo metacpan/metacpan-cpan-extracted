@@ -1,0 +1,51 @@
+---
+name: Encode-Korean
+version: 0.09
+author:
+  - You Hyun Jo
+abstract: Perl extension for Encodings of Korean Language
+license: perl
+requires:
+  perl: 5.008
+build_requires:
+  Test::More: 0
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+provides:
+  Encode::Korean:
+    file: lib/Encode/Korean.pm
+    version: 0.09
+  Encode::Korean::HSR:
+    file: lib/Encode/Korean/HSR.pm
+    version: 0.07
+  Encode::Korean::ISO_TS_11941:
+    file: lib/Encode/Korean/ISO_TS_11941.pm
+    version: 0.06
+  Encode::Korean::MRR:
+    file: lib/Encode/Korean/MRR.pm
+    version: 0.05
+  Encode::Korean::NKR_1992:
+    file: lib/Encode/Korean/NKR_1992.pm
+    version: 0.07
+  Encode::Korean::SKATS:
+    file: lib/Encode/Korean/SKATS.pm
+    version: 0.07
+  Encode::Korean::SKR_1959:
+    file: lib/Encode/Korean/SKR_1959.pm
+    version: 0.05
+  Encode::Korean::SKR_1984:
+    file: lib/Encode/Korean/SKR_1984.pm
+    version: 0.04
+  Encode::Korean::SKR_2000:
+    file: lib/Encode/Korean/SKR_2000.pm
+    version: 0.05
+  Encode::Korean::TransliteratorGenerator:
+    file: lib/Encode/Korean/TransliteratorGenerator.pm
+    version: 0.07
+  Encode::Korean::Yale:
+    file: lib/Encode/Korean/Yale.pm
+    version: 0.06
+resources:
+  license: http://dev.perl.org/licenses/

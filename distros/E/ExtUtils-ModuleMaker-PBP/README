@@ -1,0 +1,25 @@
+README for Perl extension ExtUtils::ModuleMaker::PBP
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+If you are on a windows box you should use 'nmake' rather than 'make'.
+
+DEPENDENCIES
+
+ExtUtils-ModuleMaker, version 0.39 or later.  For testing, Test-Simple, 
+version 0.44 or later.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005, James E Keenan
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

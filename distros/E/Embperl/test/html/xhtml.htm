@@ -1,0 +1,78 @@
+[- 
+$r = shift ; 
+$r -> config -> output_mode (1) ;
+$escmode = 12 ;
+-]
+
+<html>
+<head>
+<title>Embperl Tests - XHTML output</title>
+</head>
+
+<body>
+
+[- $a = 1 -]
+
+[$if $a$]
+    a <br>
+[$ endif$]
+
+[-
+
+@c = ([1,"'2'"],['"3"',4]) ;
+-]
+
+
+<table>
+    <tr>
+        <td>[+ $c[$row][$col] +] </td>
+    </tr> 
+</table>
+
+[-
+%fdat = ( a => 1, b => "'2'", c => '"3"') ;
+@ffld = sort keys %fdat ;
+-]
+
+[$hidden$]
+
+--- NO slashes in the source ---
+
+
+<input type="text" name="b">
+<input type="text" name="c">
+
+<a href="bla.htm">bla</a>
+
+<select name="a">
+    <option>xxx</option>
+</select>
+
+--- slashes in the source ---
+
+<input type="text" name="b" />
+<input type="text" name="c"/>
+
+<input type="checkbox" name="a" value="1" />
+<input type="checkbox" name="a" value="2" />
+<input type="checkbox" name="a" value="3" checked="checked" />
+<input type="checkbox" name="b" />
+<input type="checkbox" name="c"/>
+
+<a href="bla.htm">bla</a>
+
+<select name="a">
+    <option>xxx</option>
+</select>
+
+
+<blabla />
+<blabla/>
+
+
+
+
+
+
+</body>
+</html>

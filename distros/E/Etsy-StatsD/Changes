@@ -1,0 +1,6 @@
+Revision history for Perl extension Etsy::StatsD.
+
+0.01  Tue Oct 23 16:00:28 2012
+	- original version; created by h2xs 1.23 with options
+		-X Etsy::StatsD -b 5.5.0
+

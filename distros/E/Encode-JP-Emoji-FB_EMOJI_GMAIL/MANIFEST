@@ -1,0 +1,14 @@
+COPYING
+Changes
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/Encode/JP/Emoji/FB_EMOJI_GMAIL.pm
+t/00-load.t
+t/01-pod.t
+t/10-synopsis.t
+t/20-utf8.t
+t/21-sjis.t
+t/42-fallback-text.t
+t/EncodeUpdate.pm

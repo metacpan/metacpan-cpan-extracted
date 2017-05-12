@@ -1,0 +1,533 @@
+
+<head>
+<link rel="stylesheet" href="cheat.css">
+<head>
+<body>
+<a name="adm_balans"><span class="h3">adm_balans</span></a>
+<pre>Specificeer een balanspost voor de openingsbalans.
+
+  adm_balans <var>balansrekening</var> <var>bedrag</var>
+
+De debet en credit boekingen moeten uiteindelijk allebei gelijk zijn
+aan het opgegeven balanstotaal.
+
+Indien er een bedrag is opgegeven voor de balansrekening Crediteuren
+of voor Debiteuren, dan moeten er ook openstaande posten voor in
+totaal dit bedrag worden ingevoerd met een of meer adm_relatie
+opdrachten. Zie ook <a href="#adm_relatie">adm_relatie</a>.
+
+Deze opdracht kan alleen worden gebruikt bij het openen van een nieuwe
+administratie. Zie <a href="#adm_open">adm_open</a> voor meer informatie.
+</pre>
+<hr/>
+<a name="adm_balanstotaal"><span class="h3">adm_balanstotaal</span></a>
+<pre>Specificeer het balanstotaal voor de in te voeren openingbalans.
+
+  adm_balanstotaal <var>bedrag</var>
+
+Het balanstotaal is de zowel de som van alle debet-posten als de som
+van alle credit-posten van de openingsbalans. Als een balanstotaal is
+opgegeven, moeten er ook openingsbalansboekingen worden uitgevoerd met
+een of meer adm_balans opdrachten. Zie ook <a href="#adm_balans">adm_balans</a>.
+
+Deze opdracht kan alleen worden gebruikt bij het openen van een nieuwe
+administratie. Zie <a href="#adm_open">adm_open</a> voor meer informatie.
+</pre>
+<hr/>
+<a name="adm_begindatum"><span class="h3">adm_begindatum</span></a>
+<pre>Specificeer de begindatum van de administratie.
+Een administratie loopt altijd van 1 januari tot en met 31 december
+van een kalenderjaar. Daarom moet als begindatum een jaartal worden
+opgegeven.
+
+  adm_begindatum <var>jaar</var>
+
+Deze opdracht kan alleen worden gebruikt bij het openen van een nieuwe
+administratie. Zie <a href="#adm_open">adm_open</a> voor meer informatie.
+</pre>
+<hr/>
+<a name="adm_boekjaarcode"><span class="h3">adm_boekjaarcode</span></a>
+<pre>Specificeer de boekjaarcode voor het nieuw te openen jaar.
+
+  adm_boekjaarcode <var>code</var>
+
+De boekjaarcode telt maximaal 4 letters en/of cijfers.
+Standaard wordt het jaartal van het te openen boekjaar genomen.
+De boekjaarcode is alleen belangrijk indien er meerdere boekjaren in &eacute;&eacute;n
+administratie worden bijgehouden.
+
+Deze opdracht kan worden gebruikt bij het openen van een boekjaar.
+Zie <a href="#adm_open">adm_open</a> voor meer informatie.
+</pre>
+<hr/>
+<a name="adm_btwperiode"><span class="h3">adm_btwperiode</span></a>
+<pre>Specifeer de BTW aangifteperiode voor het nieuw te openen jaar.
+
+  adm_btwperiode [ jaar | kwartaal | maand ]
+
+Deze opdracht kan worden gebruikt bij het openen van een boekjaar.
+Zie <a href="#adm_open">adm_open</a> voor meer informatie.
+</pre>
+<hr/>
+<a name="adm_naam"><span class="h3">adm_naam</span></a>
+<pre>Specificeer de naam van de administatie, te gebruiken voor rapportages.
+
+  adm_naam "Naam van de administratie"
+
+Deze opdracht kan alleen worden gebruikt bij het openen van een nieuwe
+administratie. Zie <a href="#adm_open">adm_open</a> voor meer informatie.
+</pre>
+<hr/>
+<a name="adm_open"><span class="h3">adm_open</span></a>
+<pre>Het openen van een administratie kan slechts &eacute;&eacute;nmaal gebeuren, v&oacute;&oacute;r
+het invoeren van de eerste mutatie. Het openen van een nieuw boekjaar
+kan te allen tijde worden uitgevoerd, uiteraard maar &eacute;&eacute;n keer per
+boekjaar.
+
+Het openen kan een aantal opdrachten omvatten, en wordt afgesloten met
+de opdracht "adm_open". Zolang deze laatste opdracht niet is gegeven
+blijft de administratie ongewijzigd. Alle benodigde opdrachten moeten
+dan ook in &eacute;&eacute;n enkele EekBoek shell sessie worden afgehandeld.
+
+Mogelijke opdrachten voor openen van een boekjaar:
+
+  adm_btwperiode [ jaar | kwartaal | maand ]
+  adm_boekjaarcode <var>code</var>
+                Een code van max 4 letters en/of cijfers waarmee het
+		boekjaar kan worden ge&iuml;dentificeerd.
+		Standaard wordt het jaartal van het boekjaar genomen.
+  adm_open
+		Alle informatie die met de bovenstaande opdrachten is
+		ingevoerd, wordt verwerkt.
+
+Opdrachten voor het openen van een administratie:
+
+  adm_naam "Naam van de administratie"
+  adm_btwperiode [ jaar | kwartaal | maand ]
+  adm_begindatum <var>jaar</var>
+		Een administratie loopt altijd van 1 januari tot en
+		met 31 december van een kalenderjaar.
+  adm_boekjaarcode <var>code</var>
+                Een code van max 4 letters en/of cijfers waarmee het
+		boekjaar kan worden ge&iuml;dentificeerd.
+		Standaard wordt het jaartal van het boekjaar genomen.
+		De boekjaarcode is alleen relevant indien er meerdere
+		boekjaren in &eacute;&eacute;n administratie worden bijgehouden.
+  adm_balanstotaal <var>bedrag</var>
+		Als een balanstotaal is opgegeven, moeten er ook
+		openingsbalansboekingen worden uitgevoerd met een of
+                meer adm_balans opdrachten.
+  adm_balans <var>balansrekening</var> <var>bedrag</var>
+		De debet en credit boekingen moeten uiteindelijk
+		allebei gelijk zijn aan het opgegeven balanstotaal.
+		Indien er een bedrag is opgegeven voor de balansrekening
+		Crediteuren of Debiteuren, dan moet er voor dit bedrag
+		ook openstaande posten worden ingevoerd met een of
+		meer adm_relatie opdrachten.
+  adm_relatie <var>boekstuk</var> <var>datum</var> <var>code</var> <var>omschrijving</var> <var>bedrag</var>
+		Invoeren van een openstaande post uit het voorgaande
+		boekjaar. Het <var>boekstuk</var> moet volledig zijn, dus
+                <var>dagboek</var>:<var>boekjaar</var>:<var>nummer</var>.
+  adm_open
+		Alle informatie die met de bovenstaande opdrachten is
+		ingevoerd, wordt verwerkt.
+</pre>
+<hr/>
+<a name="adm_relatie"><span class="h3">adm_relatie</span></a>
+<pre>Specificeer een openstaande post uit een voorgaand boekjaar.
+
+  adm_relatie <var>boekstuk</var> <var>datum</var> <var>code</var> <var>omschrijving</var> <var>bedrag</var>
+
+Het <var>boekstuk</var> moet volledig zijn, dus <var>dagboek</var>:<var>boekjaar</var>:<var>nummer</var>.
+
+Indien er voor de openingsbalans een bedrag is opgegeven voor de
+balansrekening Crediteuren of voor Debiteuren, dan moeten er ook
+openstaande posten voor in totaal dit bedrag worden ingevoerd. Zie ook
+<a href="#adm_balans">adm_balans</a>.
+
+Deze opdracht kan alleen worden gebruikt bij het openen van een nieuwe
+administratie. Zie <a href="#adm_open">adm_open</a> voor meer informatie.
+</pre>
+<hr/>
+<a name="balans"><span class="h3">balans</span></a>
+<pre>Toon de balansrekening.
+
+Opties:
+  <var>geen</var>                        Balans op grootboekrekening
+  --verdicht                  Verdicht, gedetailleerd
+  --detail=<var>n</var>                  Verdicht, mate van detail <var>n</var> = 0, 1 of 2
+  --per=<var>datum</var>                 Selecteer einddatum
+  --boekjaar=<var>code</var>             Selecteer boekjaar
+
+Zie verder <a href="#rapporten">rapporten</a> voor algemene informatie over aan te maken
+rapporten.
+</pre>
+<hr/>
+<a name="boekjaar"><span class="h3">boekjaar</span></a>
+<pre>Gebruik voor navolgende opdrachten het opgegeven boekjaar.
+
+  boekjaar <var>code</var>
+</pre>
+<hr/>
+<a name="btwaangifte"><span class="h3">btwaangifte</span></a>
+<pre>Toon de BTW aangifte.
+
+  btwaangifte [ <var>opties</var> ] [ <var>aangifteperiode</var> ]
+
+Aangifteperiode kan zijn:
+
+  j jaar                      Het gehele jaar
+  k1 k2 k3 k4                 1e/2e/3e/4e kwartaal (ook: q1, ...)
+  1 2 3 ...                   Maand (op nummer)
+  jan feb ...                 Maand (korte naam)
+  januari ...                 Maand (lange naam)
+
+Standaard is de eerstvolgende periode waarover nog geen aangifte is
+gedaan.
+
+Opties:
+
+  --definitief                De BTW periode wordt afgesloten. Er zijn geen
+                              boekingen in deze periode meer mogelijk.
+  --periode=<var>periode</var>           Selecteer aangifteperiode. Dit kan niet samen
+                              met --boekjaar, en evenmin met de bovenvermelde
+                              methode van periode-specificatie.
+  --boekjaar=<var>code</var>             Selecteer boekjaar
+
+Zie verder <a href="#rapporten">rapporten</a> voor algemene informatie over aan te maken
+rapporten.
+</pre>
+<hr/>
+<a name="crediteuren"><span class="h3">crediteuren</span></a>
+<pre>Toont een overzicht van boekingen op crediteuren.
+
+  crediteuren [ <var>opties</var> ] [ <var>relatiecode</var> ... ]
+
+Opties:
+
+  --periode=<var>periode</var>           Periode
+  --boekjaar=<var>code</var>             Selecteer boekjaar
+
+Zie verder <a href="#rapporten">rapporten</a> voor algemene informatie over aan te maken
+rapporten.
+</pre>
+<hr/>
+<a name="dagboeken"><span class="h3">dagboeken</span></a>
+<pre>Toon een lijstje van beschikbare dagboeken.
+
+  dagboeken
+</pre>
+<hr/>
+<a name="database"><span class="h3">database</span></a>
+<pre>Toon de naam van de huidige database.
+
+  database
+</pre>
+<hr/>
+<a name="debiteuren"><span class="h3">debiteuren</span></a>
+<pre>Toont een overzicht van boekingen op debiteuren.
+
+  debiteuren [ <var>opties</var> ] [ <var>relatiecodes</var> ... ]
+
+Opties:
+
+  --periode <var>periode</var>           Periode
+  --boekjaar=<var>code</var>             Selecteer boekjaar
+
+Zie verder <a href="#rapporten">rapporten</a> voor algemene informatie over aan te maken
+rapporten.
+</pre>
+<hr/>
+<a name="dump_schema"><span class="h3">dump_schema</span></a>
+<pre>Reproduceert het schema van de huidige database en schrijft deze naar
+standaard uitvoer.
+
+  dump_schema                 Reproduceert het schema van de huidige database
+                              en schrijft deze naar standaard uitvoer.
+
+  dump_schema --sql <var>naam</var>      Cre&euml;ert losse SQL bestandjes om het genoemde
+                              schema aan te kunnen maken.
+
+Zie ook <a href="#export">export</a>.
+</pre>
+<hr/>
+<a name="export"><span class="h3">export</span></a>
+<pre>Exporteert de complete administratie.
+
+  export [ <var>opties</var> ]
+
+Opties:
+
+  --output=<var>bestand</var>            Selecteer uitvoerbestand
+  --dir=<var>directory</var>             Selecteer uitvoerdirectory
+  --boekjaar=<var>code</var>             Selecteer boekjaar
+
+Er moet of een --output of een --dir optie worden opgegeven.
+Zonder --boekjaar selectie wordt de gehele administratie ge&euml;xporteerd.
+</pre>
+<hr/>
+<a name="grootboek"><span class="h3">grootboek</span></a>
+<pre>Toon het Grootboek, of een selectie daaruit.
+
+  grootboek [ <var>rek</var> ... ]
+
+Opties:
+
+  --detail=<var>n</var>                  Mate van detail, <var>n</var>=0,1,2 (standaard is 2)
+  --periode=<var>periode</var>           Alleen over deze periode
+
+Zie verder <a href="#rapporten">rapporten</a> voor algemene informatie over aan te maken
+rapporten.
+</pre>
+<hr/>
+<a name="inkoop"><span class="h3">inkoop</span></a>
+<pre>Toevoegen boekstuk in dagboek Inkoop (type Inkoop).
+
+  inkoop[:nr] [ <var>datum</var> ] <var>boekstukomschrijving</var> <var>crediteur</var>
+
+gevolgd door een of meer:
+
+  <var>boekstukregelomschrijving</var> <var>bedrag</var> <var>rekening</var>
+
+Controle van het totale boekstukbedrag kan met de optie --totaal=<var>bedrag</var>.
+De laatste <var>rekening</var> mag worden weggelaten.
+</pre>
+<hr/>
+<a name="jaareinde"><span class="h3">jaareinde</span></a>
+<pre>Sluit het boekjaar af. De BTW rekeningen worden afgeboekt, en de
+winst of het verlies wordt verrekend met de daartoe aangewezen
+balansrekening.
+
+Deze opdracht genereert twee rapporten: een journaal van de
+afboekingen en een overzicht van eventuele openstaande posten. Indien
+gewenst kan een bestand worden aangemaakt met openingsopdrachten voor
+het volgende boekjaar.
+
+  jaareinde [ <var>opties</var> ]
+
+Opties:
+
+  --boekjaar=<var>code</var>             Sluit het opgegeven boekjaar af.
+  --definitief                Sluit het boekjaar definitief af. Er zijn
+                              dan geen boekingen meer mogelijk.
+  --verwijder                 Verwijder een niet-definitieve jaarafsluiting.
+  --eb=<var>bestand</var>                Schrijf openingsopdrachten in dit bestand.
+</pre>
+<hr/>
+<a name="journaal"><span class="h3">journaal</span></a>
+<pre>Overzicht journaalposten.
+
+  journaal all                Alle posten
+  journaal <var>id</var>                 Alleen boekstuknummer met dit id
+  journaal <var>dagboek</var>            Alle journaalposten van dit dagboek
+  journaal <var>dagboek</var>:<var>n</var>          Boekstuk <var>n</var> van dit dagboek
+  journaal                    Journaalposten van de laatste boeking
+
+Opties
+
+  --[no]detail                Mate van detail, standaard is met details
+  --totaal                    Alleen het totaal (detail = 0)
+  --periode=XXX               Alleen over deze periode
+
+Zie verder <a href="#rapporten">rapporten</a> voor algemene informatie over aan te maken
+rapporten.
+</pre>
+<hr/>
+<a name="kas"><span class="h3">kas</span></a>
+<pre>Toevoegen boekstuk in dagboek Kas (type Kas).
+
+  kas[:nr] [ <var>datum</var> ] <var>boekstukomschrijving</var>
+
+gevolgd door een of meer:
+
+  crd [ <var>datum</var> ] <var>code</var> <var>bedrag</var>                             (betaling van crediteur)
+  deb [ <var>datum</var> ] <var>code</var> <var>bedrag</var>                             (betaling van debiteur)
+  std [ <var>datum</var> ] <var>omschrijving</var> <var>bedrag</var> <var>rekening</var>            (vrije boeking)
+
+Controle van het eindsaldo kan met de optie --saldo=<var>bedrag</var>.
+Controle van het totale boekstukbedrag kan met de optie --totaal=<var>bedrag</var>.
+Voor deelbetalingen of betalingen met afwijkend bedrag kan in plaats van de
+<var>code</var> het boekstuknummer worden opgegeven.
+</pre>
+<hr/>
+<a name="memoriaal"><span class="h3">memoriaal</span></a>
+<pre>Toevoegen boekstuk in dagboek Memoriaal (type Memoriaal).
+
+  memoriaal[:nr] [ <var>datum</var> ] <var>boekstukomschrijving</var>
+
+gevolgd door een of meer:
+
+  crd [ <var>datum</var> ] <var>code</var> <var>bedrag</var>                             (betaling van crediteur)
+  deb [ <var>datum</var> ] <var>code</var> <var>bedrag</var>                             (betaling van debiteur)
+  std [ <var>datum</var> ] <var>omschrijving</var> <var>bedrag</var> <var>rekening</var>            (vrije boeking)
+
+Controle van het eindsaldo kan met de optie --saldo=<var>bedrag</var>.
+Controle van het totale boekstukbedrag kan met de optie --totaal=<var>bedrag</var>.
+Voor deelbetalingen of betalingen met afwijkend bedrag kan in plaats van de
+<var>code</var> het boekstuknummer worden opgegeven.
+</pre>
+<hr/>
+<a name="openstaand"><span class="h3">openstaand</span></a>
+<pre>Toont een overzicht van openstaande posten.
+
+  openstaand [ <var>opties</var> ]
+
+Opties:
+
+  --per=<var>datum</var>                 Einddatum
+  --boekjaar=<var>code</var>             Selecteer boekjaar
+
+Zie verder <a href="#rapporten">rapporten</a> voor algemene informatie over aan te maken
+rapporten.
+</pre>
+<hr/>
+<a name="periodes"><span class="h3">periodes</span></a>
+<pre>De volgende periode-aanduidingen zijn mogelijk. Indien het jaartal ontbreekt,
+wordt het huidige boekjaar verondersteld.
+
+  2005-04-01 - 2005-07-31
+  01-04-2005 - 31-07-2005
+  01-04 - 31-07-2005
+  01-04 - 31-07
+  1 april 2005 - 31 juli 2005 (en varianten)
+  1 apr 2005 - 31 jul 2005 (en varianten)
+  apr - jul
+  k2  (tweede kwartaal)
+  april 2003 (01-04-2003 - 30-04-2003)
+  april  (01-04 - 30-04 boekjaar)
+  m4  (vierde maand)
+  jaar (gehele boekjaar)
+</pre>
+<hr/>
+<a name="postbank"><span class="h3">postbank</span></a>
+<pre>Toevoegen boekstuk in dagboek Postbank (type Bank).
+
+  postbank[:nr] [ <var>datum</var> ] <var>boekstukomschrijving</var>
+
+gevolgd door een of meer:
+
+  crd [ <var>datum</var> ] <var>code</var> <var>bedrag</var>                             (betaling van crediteur)
+  deb [ <var>datum</var> ] <var>code</var> <var>bedrag</var>                             (betaling van debiteur)
+  std [ <var>datum</var> ] <var>omschrijving</var> <var>bedrag</var> <var>rekening</var>            (vrije boeking)
+
+Controle van het eindsaldo kan met de optie --saldo=<var>bedrag</var>.
+Controle van het totale boekstukbedrag kan met de optie --totaal=<var>bedrag</var>.
+Voor deelbetalingen of betalingen met afwijkend bedrag kan in plaats van de
+<var>code</var> het boekstuknummer worden opgegeven.
+</pre>
+<hr/>
+<a name="proefensaldibalans"><span class="h3">proefensaldibalans</span></a>
+<pre>Toon de Proef- en Saldibalans.
+
+Opties:
+  <var>geen</var>                        Proef- en Saldibalans op grootboekrekening
+  --verdicht                  Verdicht, gedetailleerd (zelfde als --detail=2)
+  --detail=<var>n</var>                  Verdicht, mate van detail <var>n</var> = 0,1,2
+  --per=<var>datum</var>                 Selecteer einddatum
+  --boekjaar=<var>code</var>             Selecteer boekjaar
+
+Zie verder <a href="#rapporten">rapporten</a> voor algemene informatie over aan te maken
+rapporten.
+</pre>
+<hr/>
+<a name="rapporten"><span class="h3">rapporten</span></a>
+<pre>Alle rapport-producerende opdrachten kennen de volgende opties:
+
+  --per=<var>datum</var>                 De einddatum voor de rapportage.
+                              (Niet voor elke opdracht relevant.)
+                              Zie <a href="#periodes">periodes</a> voor details.
+  --periode=<var>periode</var>           De periode waarover de rapportage moet
+                              plaatsvinden. (Niet voor elke opdracht relevant.)
+                              Zie <a href="#periodes">periodes</a> voor details.
+  --output=<var>bestand</var>            Produceer het rapport in dit bestand
+                              Uitvoertype is afhankelijk van bestandsextensie,
+                              bv. xx.html levert HTML, xx.txt een tekstbestand,
+                              xx.csv een CSV, etc.
+  --gen-<var>type</var>                  Forceer uitvoertype (html, csv, text, ...)
+                              Afhankelijk van de beschikbare uitvoertypes zijn
+                              ook de kortere opties --html, --csv en --text
+                              mogelijk.
+		              (Let op: --gen-XXX, niet --gen=XXX)
+  --page=<var>size</var>                 Paginagrootte voor tekstrapporten.
+</pre>
+<hr/>
+<a name="relatie"><span class="h3">relatie</span></a>
+<pre>Aanmaken een of meer nieuwe relaties.
+
+  relatie [ <var>opties</var> ] { <var>code</var> <var>omschrijving</var> <var>rekening</var> } ...
+
+Opties:
+
+  --dagboek=<var>dagboek</var>           Selecteer dagboek voor deze relatie
+  --btw=<var>type</var>                  BTW type: normaal, verlegd, intra, extra
+
+*** BTW type 'verlegd' wordt nog niet ondersteund ***
+*** BTW type 'intra' wordt nog niet geheel ondersteund ***
+</pre>
+<hr/>
+<a name="result"><span class="h3">result</span></a>
+<pre>Toon de resultatenrekening.
+
+Opties:
+  <var>geen</var>                        Overzicth op grootboekrekening
+  --verdicht                  Verdicht, gedetailleerd
+  --detail=<var>n</var>                  Verdicht, mate van detail <var>n</var> = 0,1,2
+  --periode=<var>periode</var>           Selecteer periode
+  --boekjaar=<var>code</var>             Selecteer boekjaar
+
+Zie verder <a href="#rapporten">rapporten</a> voor algemene informatie over aan te maken
+rapporten.
+</pre>
+<hr/>
+<a name="sql"><span class="h3">sql</span></a>
+<pre>Voer een SQL opdracht uit via de database driver. Met het gebruik
+hiervan vervalt alle garantie op correcte resultaten.
+
+  sql [ <var>opdracht</var> ]
+</pre>
+<hr/>
+<a name="toon"><span class="h3">toon</span></a>
+<pre>Toon een boekstuk in tekst- of commando-vorm.
+
+  toon [ <var>opties</var> ] <var>boekstuk</var>
+
+Opties:
+
+  --boekjaar=<var>code</var>             Selekteer boekjaar
+  --verbose                   Toon in uitgebreide (tekst) vorm
+  --btw                       Vermeld altijd BTW codes
+  --bsknr                     Vermeld altijd het boekstuknummer (default)
+
+Het getoonde boekstuk wordt in de commando-historie geplaatst.
+Met een pijltje-omhoog kan dit worden teruggehaald en na eventuele
+wijziging opnieuw ingevoerd.
+</pre>
+<hr/>
+<a name="verkoop"><span class="h3">verkoop</span></a>
+<pre>Toevoegen boekstuk in dagboek Verkoop (type Verkoop).
+
+  verkoop[:nr] [ <var>datum</var> ] <var>boekstukomschrijving</var> <var>debiteur</var>
+
+gevolgd door een of meer
+
+  <var>boekstukregelomschrijving</var> <var>bedrag</var> <var>rekening</var>
+
+Controle van het totale boekstukbedrag kan met de optie --totaal=<var>bedrag</var>.
+De laatste <var>rekening</var> mag worden weggelaten.
+</pre>
+<hr/>
+<a name="verwijder"><span class="h3">verwijder</span></a>
+<pre>Verwijdert een boekstuk. Het boekstuk mag niet in gebruik zijn.
+
+  verwijder [ <var>opties</var> ] <var>boekstuk</var>
+
+Opties:
+
+  --boekjaar=<var>code</var>             Selekteer boekjaar
+
+Het verwijderde boekstuk wordt in de commando-historie geplaatst.
+Met een pijltje-omhoog kan dit worden teruggehaald en na eventuele
+wijziging opnieuw ingevoerd.
+</pre>
+<hr/>
+</body>

@@ -1,0 +1,290 @@
+package ETLp::Manual::Index;
+
+# ABSTRACT: Intro manual for ETLp
+
+__END__
+=pod
+
+=head1 ABOUT ETLp
+
+ETLp is a framework that is configuration driven. Processing is defined within the context of a pipeline job, and a job may in turn call another job. All processing is logged and is viewable from the Runtime Audit Browser. Any errors or warnings are automatically emailed, so basic housekeeping tasks do not need to be performed by the developers.
+
+There are two kinds of ETLp jobs:
+
+=over 4
+
+=item * A serial job performs all of its defined tasks in order just once
+
+=item * An iterative job performs all of its tasks once for each file that is processed
+
+=back
+
+For example of a serial job might be
+
+=over 4
+
+=item * FTP a tarball from  a remote site.
+
+=item * Untar the retrieved file.
+
+=item * Call an iterative job to process the files.
+
+=back
+
+The called iterative job might be to loop through each file:
+
+=over 4
+
+=item * Loop through each file and validate its content.
+
+=item * Load the file into a database.
+
+=item * Compress the processed file.
+   
+=back
+
+=head1 DEFINING ETLp JOBS
+
+=over 4
+
+=item * A job is defined in a section within an ''application'' configuration file. A jobs are specified using Apache-style configuration syntax.
+
+=item * Each job consists of three phases: pre_process, process and post_process although all are optional. Each phase consists of one of more task items that perform the work. The phases are conceptual, and they make no physical difference to the way that the pipeline functions - they simply help organise or structure the processing. 
+
+=item * An item is the unit that defines the actual work. All items have a type which informs ETLp of the plugin that should be used to perform the task.
+
+=back
+
+ETLp comes with a number of plugins that perform common tasks. Additional functionality can be added through custom plugins if required.
+
+
+=head2 Control Files
+
+L<Control files|ETLp::Manual::ControlFiles> are used to define the format of data files. These definitions are used to validate files and also by the csv loader to map file fields to database columns.
+
+=head2 Configuring the environment
+
+ETLp expects a standard application directory setup. All environment variables are defined in the env.conf file. Further information can be found in the section L<ETLp::Manual::Install/"Creating Your Application Structure">.
+
+=head2 Executing Jobs
+
+A job is started by calling etlp <configuration file name> <section>. The configuration file should have an extension of "conf", but the extension does not need to be specified when invoking etlp, as the extension is assumed. For examples:
+
+    etlp sales load_files
+
+=head2 Defining Jobs
+
+All jobs are defined using the  Apache configuration syntax.
+
+=head3 Iterative Jobs
+
+All iterative jobs must contain some or all of the following settings within the config section
+
+=over 4
+
+=item * B<filename_format>. A regular expression that will identify the data files to be processed 
+
+=item * B<incoming_dir>.    The directory where the job will find files to process                 
+
+=item * B<archive_dir>.     Where successfully processed files will be written to                  
+
+=item * B<fail_dir>.        Where files that fail processing will be moved to                      
+
+=item * B<table_name>.      The name of the table that the data will be loaded into                
+
+=item * B<controlile_dir>.  The directory that hosts the control file                              
+
+=item * B<controlfile>.     The name of the file that defines the data file format                 
+
+=item * B<on_error>.        What to do when an error occurs                                        
+
+=back
+
+B<Note> The on_error value can be one of the following:
+
+=over 4
+
+=item * B<die>. Raise an error and then exit.
+
+=item * B<skip>. Raise an error, stop processing the current file, and move to the next file.
+
+=item * B<ignore>. Report the error, but carry an processing.
+
+=back 
+
+If no value for on_error is specified, the default is die. In addition, the on_error parameter can be set within an item, and the item-level setting will over-ride the job-level setting for that item.
+
+These config parameters may be used by the plugins, but any number of configuration settings can be made and then referred to in the item sections
+
+An example iterative job might be:
+
+<process_customers>
+    type               = iterative
+
+    <config>
+        filename_format    = (customer\d.csv)(?:\.gz)?$
+        incoming_dir       = data/incoming
+        archive_dir        = data/archive
+        fail_dir           = data/fail		
+        table_name         = stg_customer
+        controlfile_dir    = conf/control
+        controlfile        = customer.ctl
+        on_error           = die
+    </config>
+
+    <pre_process>
+        <item>
+            name     = decompress customer file
+            type     = gunzip
+            </item>
+        <item>
+            name        = validate customer file
+            type        = validate
+            file_type   = csv
+            skip        = 1
+            <csv_options>
+                allow_whitespace = 1
+                sep_char         = |
+            </csv_options>
+        </item>
+    </pre_process>
+    <process>
+        <item>
+            name = load customer file
+            type = csv_loader
+            skip = 1
+            <csv_options>
+                allow_whitespace = 1
+                sep_char         = |
+            </csv_options>
+        </item>
+    </process>
+    <post_process>
+        <item>
+            name = compress customer file
+            type = gzip
+        </item>
+    </post_process>
+</process_customers>
+
+=head3 Iterative Plugins
+
+The standard plugins or iterative processing are:
+
+=over 4
+
+=item * L<csv_loader|ETLp::Manual::IterativeCsvLoader>. Loads delimited files.  
+
+=item * L<gunzip|ETLp::Manual::IterativeGunzip>. Gunzips files.
+
+=item * L<gzip|ETLp::Manual::IterativeGzip>. Gzips files.
+
+=item * L<sql_loader|ETLp::Manual::IterativeSqlLoader>. Load files using Oracle SQL*Loader.
+
+=item * L<os|ETLp::Manual::ItemOS>. Run an Operating System Command.
+
+=item * L<perl|ETLp::Manual::ItemPerl>. Call a perl subroutine.
+
+=item * L<plsql|ETLp::Manual::ItemPlSql> Invoke an Oracle stored procedure or packaged procedure.
+
+=item * L<steady_state_check|ETLp::Manual::IterativeSteadyState>. Wait for a file's size to stop changing.
+
+=item * L<validate|ETLp::Manual::IterativeValidate>. Validate a delimited file against the control file definition.
+
+=back
+
+Additional plugins can be added. See L<Writing Custom Plugins|ETLp::Manual::CustomPlugins>
+
+=head3 Serial Jobs
+
+Typically, serial jobs don't require a config section but may include one if there is a need to share settings or parameter values across mutiple items. Below is an example serial job:
+
+    <get_customer_file>
+        type = serial
+
+        <config>
+            next = customer load_files
+        </config>
+
+        <process>
+            <item>
+                name    = get customer files
+                type    = os
+                command = %app_root%/bin/ftp_customer_file.pl
+            </item>
+            <item>
+                name    = Untar customer files
+                type    = os
+                command = tar zxf %app_root%/data/incoming/customer.tar.gz
+            </item>
+        </process>
+    </get_customer_file>
+
+
+B<Note> The on_error value can be set in the config section:
+
+=over 4
+
+=item * B<die>. Raise an error and then exit.
+
+=item * B<ignore>. Report the error, but carry an processing.
+
+=back
+
+Unlike iterative jobs, serial jobs have no concept of "skip," since it does not make sense within this context. The default is ''die''.
+
+=head3 Serial Plugins
+
+The standard plugins or iterative processing are:
+
+=over 4
+
+=item * L<os|ETLp::Manual::ItemOS>. Run an Operating System Command
+
+=item * L<perl|ETLp::Manual::ItemPerl>. Call a perl subroutine
+
+=item * L<plsql|ETLp::Manual::ItemPlSql>. Invoke an Oracle stored procedure or packaged procedure
+
+=item * L<watch|ETLp::Manual::SerialWatch>. File watcher. Watch a directory, waiting for the appearance of one or more files that match the specified pattern
+
+=back
+
+Additional plugins can be added. See L<Writing Custom Plugins|ETLp::Manual::CustomPlugins>
+
+=head1 USING CONFIGURATION PARAMETERS
+
+The value of any parameters specified in the config section can be referenced be specifying the parameter within percentage signs. For example:
+
+    mv %basename(filename)% %archive_dir%
+
+=head2 Default parameters
+
+The following parameters are maintained by the ETLp framework itself
+
+=over 4
+
+=item * B<app_root>. The application root directory.
+
+=item * B<filename>. The current file being processed. Applicable to iterative jobs only.
+
+=item * B<basename(filename)> || The current file being processed, stripped of the path information. Applicable to iterative jobs only.
+
+=back
+
+=head3 Environment Configuration Settings
+
+If ''allow_env_vars'' is set in the environment configuration file (env.conf), then values in env.conf can be referred to by their parameter names. This can be useful if there is sensitive information that should not be placed in the application configuration files - for instance, the application configuration files are committed to a source control system, but you need passwords to connect to other systems as part of the ETL processing.
+
+However, allowing applications to access environment parameters means that all settings are accessible to all plugins, including custom ones. This may be considered a security issue, which is why these parameters are not accessible by default.
+
+=head1 CHAINING JOBS
+
+Use the ''next'' config parameter to call another job upon completion of the current job:
+
+  <my_current_job>
+     <config>
+        next = <<config name>> <<section name>>
+     <config>
+  </my_current_job>
+
+Note that the next job will run even if the current job dies with errors.

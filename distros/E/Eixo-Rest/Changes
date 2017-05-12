@@ -1,0 +1,56 @@
+v0.01 
+  - Initial commit, whith Eixo::Rest modules and test from Eixo::Docker
+
+v1.003
+  - Base module to load dependencies and set version
+  - Update README.md
+  - Change base module location
+  - Base tests
+  - Added tests to client and request_async
+
+v1.006
+  - Added MANIFEST Update README.md
+  - Update MANIFEST
+  - New gitignore skipping MYMETA, including META
+  - Corrected Makefile.PL
+  - Require Eixo::Base v1.0
+  - Update doc
+
+v1.010
+  - Skip async test if no thread support
+  - Added debug info
+  - Exclude tar.gz files in repo
+  - Avoiding failing tests in perl compiled with no threads support Bump version to 1.008
+  - Corregidos problemas en ApiFakeServer
+  - Small changes for better mockup test
+  - put methods analyze request too
+  - POST_DATA y put methods
+
+v1.020
+  - https support, initial implementation and tests
+  - Propagate options in Api constructor Fixed bug in Eixo::Rest::Client, the options wasn't propagated to LWP because in every request was creating new ua objects New test to check https functionality
+  - Avoid smartmatch
+
+v.1031
+  - Adaptations to changes in object initialization in Eixo::Base > 1.200 Bump to 1.025
+  - Alternative content serialization to x-www-form-urlencode
+  - Avoid recursive inheritance
+  - Change all remaining 'use parent' by 'Eixo::Base::Clase'
+
+v1.032
+  - Update dependencies
+  - Added depencies
+  - Use random port to avoid failed tests
+
+v1.035
+  - Api module calls parent's initialize
+  - Added cpanfile
+
+v1.036
+  - Pass response content to onSucess callback
+
+v1.037
+  - Corrections to support utf8 All data goes out in utf8, all data cames in codified with utf8
+
+v1.100 
+  - Added support for complex uris

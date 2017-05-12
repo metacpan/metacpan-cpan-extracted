@@ -1,0 +1,129 @@
+<table width="100%">
+    <tr bgcolor="#fefcad">
+        <td><font size="4">Hinzuf&uuml;gen eines neuen Eintrages zu News</font></td>
+    </tr>
+</table>
+
+
+
+<form action="show.epl"  method="POST">
+
+Bitte geben Sie die Beschreibung in so vielen Sprachen wie Ihnen m&ouml;glich ein.<br>Falls Sie die &Uuml;bersetzung nicht wissen, lassen Sie das entsprechende Eingabefeld leer.<br><br>
+
+<table>
+    <tr>
+        <td>URL:</td><td><input type="text" name="url" size=80 value=""></td>
+    </tr>
+</table>
+
+<table width="100%">
+    <tr bgcolor="#fefcad"><font size="3">
+        <td>Deutsch</td>
+    </tr>
+    <tr>
+        <td>
+            <table>
+                <tr>
+                    <td>&Uuml;berschrift:</td><td><input type="text" name="heading_de" size=80 value=""></td>
+                </tr>
+                <tr>
+                    <td>URL:</td><td><input type="text" name="url_de" size=80 value=""></td>
+                </tr>
+                <tr>
+                    <td>description:</td><td><textarea name="description_de" cols=60 rows=10></textarea></td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+
+    <tr bgcolor="#fefcad"><font size="3">
+        <td>English</td>
+    </tr>
+    <tr>
+        <td>
+            <table>
+                <tr>
+                    <td>&Uuml;berschrift:</td><td><input type="text" name="heading_en" size=80 value=""></td>
+                </tr>
+                <tr>
+                    <td>URL:</td><td><input type="text" name="url_en" size=80 value=""></td>
+                </tr>
+                <tr>
+                    <td>description:</td><td><textarea name="description_en" cols=60 rows=10></textarea></td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+<br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<input type="submit" name="-add_item" value="Add to News">
+
+<input type="hidden" name="category_id" value="">
+
+Use gettext:
+
+description = description
+heading =     &Uuml;berschrift
+add3 =        Add to
+</form>
+
+addsel1 = Klicken Sie auf die Kategorie zu der Sie etwas hinzuf&uuml;gen m&ouml;chten:<br>
+
+    next<br>
+
+    addsel1 (2) = Klicken Sie auf die Kategorie zu der Sie etwas hinzuf&uuml;gen m&ouml;chten:<br>
+
+addsel2 = oder f&uuml;gen Sie eine neue Kategorie hinzu. Bitte geben Sie die Beschreibung in so vielen Sprachen wie Ihnen m&ouml;glich ein.<br>
+
+    next<br>
+
+    addsel2 (2) = oder f&uuml;gen Sie eine neue Kategorie hinzu. Bitte geben Sie die Beschreibung in so vielen Sprachen wie Ihnen m&ouml;glich ein.<br>
+
+addsel3 = Falls Sie die &Uuml;bersetzung nicht wissen, lassen Sie das entsprechende Eingabefeld leer.<br>
+
+    next<br>
+
+    addsel3 (2) = Falls Sie die &Uuml;bersetzung nicht wissen, lassen Sie das entsprechende Eingabefeld leer.<br>
+
+addsel4 = Kategorie hinzuf&uuml;gen<br>
+
+    next<br>
+
+    addsel4 (2) = Kategorie hinzuf&uuml;gen<br>
+
+addsel1 = Klicken Sie auf die Kategorie zu der Sie etwas hinzuf&uuml;gen m&ouml;chten:<br>
+
+    last: last zwischen [= =]<br>
+
+addsel2 = oder f&uuml;gen Sie eine neue Kategorie hinzu. Bitte geben Sie die Beschreibung in so vielen Sprachen wie Ihnen m&ouml;glich ein.<br>
+
+    last: last zwischen [= =]<br>
+
+addsel3 = Falls Sie die &Uuml;bersetzung nicht wissen, lassen Sie das entsprechende Eingabefeld leer.<br>
+
+    last: last zwischen [= =]<br>
+
+addsel4 = Kategorie hinzuf&uuml;gen<br>
+
+    last: last zwischen [= =]<br>
+
+addsel1 = Klicken Sie auf die Kategorie zu der Sie etwas hinzuf&uuml;gen m&ouml;chten:<br>
+
+    last zwischen [= =]<br>
+
+addsel2 = oder f&uuml;gen Sie eine neue Kategorie hinzu. Bitte geben Sie die Beschreibung in so vielen Sprachen wie Ihnen m&ouml;glich ein.<br>
+
+    last zwischen [= =]<br>
+
+addsel3 = Falls Sie die &Uuml;bersetzung nicht wissen, lassen Sie das entsprechende Eingabefeld leer.<br>
+
+    last zwischen [= =]<br>
+
+addsel4 = Kategorie hinzuf&uuml;gen<br>
+
+    last zwischen [= =]<br>
+
+this is text with spaces
+&Auml;&Uuml;&Ouml;
+test undef 

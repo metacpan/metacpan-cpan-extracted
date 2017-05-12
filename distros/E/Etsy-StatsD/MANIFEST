@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+LICENSE
+t/Etsy-StatsD.t
+t/send.t
+lib/Etsy/StatsD.pm
+META.yml                                 Module meta-data (added by MakeMaker)

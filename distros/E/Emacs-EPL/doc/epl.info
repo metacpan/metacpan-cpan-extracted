@@ -1,0 +1,1247 @@
+This is doc/epl.info, produced by makeinfo version 4.0 from
+doc/epl.texi.
+
+INFO-DIR-SECTION Emacs
+START-INFO-DIR-ENTRY
+* EPL: (epl).           Script Emacs with Perl.
+END-INFO-DIR-ENTRY
+
+   This Info file documents EPL, an Emacs extension that supports the
+use of Perl to write other Emacs extensions.
+
+   Copyright (C) 2001 John Tobey <jtobey@john-edwin-tobey.org>
+
+   This edition is for EPL version 0.7, 13 January 2001.
+
+   Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.1 or
+any later version published by the Free Software Foundation; with no
+Invariant Sections, no Front-Cover texts, and no Back-Cover Texts.  A
+copy of the license is included in the section entitled "GNU Free
+Documentation License".
+
+
+File: epl.info,  Node: Top,  Next: Preface,  Up: (dir)
+
+EPL
+***
+
+   This is edition 0.2 of the EPL Reference Manual, corresponding to
+EPL version 0.7.
+
+   EPL (Emacs Perl) is a library of Lisp functions and Perl modules that
+let you write Emacs extensions in Perl.
+
+* Menu:
+
+* Preface::                     Why I'm here.
+* Introduction::                Beginning with an example.
+* Features::                    How Perl looks to Lisp, how Lisp looks to Perl.
+* Configuration::               Changing the defaults.
+* Internals::                   What happens under the hood.
+
+Appendices
+
+* Copying Conditions::          The GNU Free Documentation License.
+* Index::                       Index to this manual.
+
+
+ --- The Detailed Node Listing ---
+
+Introduction to EPL
+
+* Perl Example::                An example: Find files containing regex.
+* History::                     EPL uses IPC, not translation or embedding.
+* Emacs Lisp::                  You need the Emacs Lisp Reference Manual.
+* Coding Conventions::          Why the Perl examples use `&FUNCTION()'.
+
+How Language Features Correspond
+
+* Data Conversion::             Working with each other's data types.
+* Functions::                   Transfering program control.
+* Control Structures::          Exceptions; `throw', `signal', `die'.
+* Input/Output::                Perl's primitives are redefined in Emacs.
+* Caveats::                     It's not always a happy marriage.
+
+Configuration
+
+* Installation::                Lisp files, Perl modules, documentation.
+* The Easy Way::                We like the defaults.
+* Starting a Perl Process in Emacs::   `make-perl-interpreter'.
+* Starting an Emacs Process in Perl::  `use Emacs;'.
+
+Internals
+
+* Debugging Options::           Dumping traffic to stderr or a buffer.
+* Transport Layer::             Media of interprocess communication.
+* Message Types::               What interpreters can say to each other.
+* State Transitions::           The message stream grammar.
+* Protocol::                    Current EPL protocol (*subject to change*).
+
+
+File: epl.info,  Node: Preface,  Next: Introduction,  Prev: Top,  Up: Top
+
+Preface
+*******
+
+   Like a lot of people, I learned Perl because of the Web.  I came to
+GNU from a Microsoft background early in 1996, when Microsoft had only
+begun to realize that the Internet was hot.  I was deeply infused with
+Web hype, willing to try something different, and aware that the Web
+ran on Unix and Perl.
+
+   I came to Emacs because of genetic predisposition.  A tightly
+integrated, yet versatile, complex system with endless opportunities
+for learning and automation helps reduce my cholesterol and, I think,
+aids respiration and digestion.  It had all the good features of
+Microsoft Office, without all the headaches and nausea.
+
+   Well, it had _almost_ all the good features.
+
+   Emacs is an oasis of integration in the chaotic and disparate realm
+of Linux and Unix.  (I later learned that the Unix kernel is a thing of
+some elegance, but at the level of `/etc/resolv.conf', X11R6, and
+`~/.fvwmrc', there was little cohesion.)  As I entered this realm, it
+irked me that I had to learn _two_ scripting languages to do what I
+wanted, whereas Visual Basic, clunky as it is, does everything on
+Windows.
+
+   Speaking of that other--umm--language, Visual Basic shares an
+important feature with Perl: It is for ordinary people.
+
+   Now, I am very glad that Emacs lets you do just about anything with
+Elisp (such as write EPL).  But my conceptual mapping from Windows onto
+Unix paired Visual Basic with Perl, not Lisp, as the general workhorse
+get-it-done tool.  It seemed to me not right that the standard,
+full-featured editor on my new system could not understand the
+standard, full-featured scripting language.  With EPL--Emacs PerL, or
+Emacs-Perl-Lisp--I hope to rectify the situation.
+
+
+File: epl.info,  Node: Introduction,  Next: Features,  Prev: Preface,  Up: Top
+
+Introduction
+************
+
+   EPL is an extension for GNU Emacs
+(http://www.gnu.org/software/emacs/) and XEmacs (http://www.xemacs.org)
+that lets you write commands in Perl.  It is also a programming
+interface for Elisp (*note Emacs Lisp::) programs to use Perl features
+and an interface for Perl to use Emacs.
+
+   This document assumes knowledge of Emacs terms such as "the
+minibuffer" and "`M-x'" (*note Running Commands by Name: (emacs)Top.).
+It assumes knowledge of Perl references and nested data structures
+(perlref(1)), and packages and modules (perlmod(1)).
+
+* Menu:
+
+* Perl Example::                An example: Find files containing regex.
+* History::                     EPL uses IPC, not translation or embedding.
+* Emacs Lisp::                  You need the Emacs Lisp Reference Manual.
+* Coding Conventions::          Why the Perl examples use `&FUNCTION()'.
+
+
+File: epl.info,  Node: Perl Example,  Next: History,  Up: Introduction
+
+Perl Example
+============
+
+   Let's illustrate EPL with an example.  Suppose you often want to edit
+many files in the same directory based on some text that they contain.
+You want a command that will look for a specified regular expression in
+each file, and if found, open the file in a buffer.  You prefer Perl
+regular expressions to Emacs ones, and you are not interested in files
+that Perl considers to be binary.
+
+   Here is some Emacs Perl code that will do it:
+
+     use IO::Dir;
+     use IO::File;
+     
+     sub find_my_files ($$) {
+         my ($dirname, $regex) = @_;
+     
+         # Convert "~" to home dir.
+         $dirname = &expand_file_name ($dirname);
+     
+         my $dh = IO::Dir->new ($dirname)
+             or die "$dirname: $!";
+     
+         my $count = 0;
+         while (defined ($filename = $dh->read)) {
+             $filename = "$dirname/$filename";
+     
+             # Skip directories and binary files.
+             next unless -f($filename) && -T($filename);
+     
+             my $fh = IO::File->new ($filename);
+             if (!$fh) {
+                 warn ("$filename: $!");
+                 next;
+             }
+             while (defined ($_ = <$fh>)) {
+                 if (/$regex/) {
+                     &find_file($filename);
+                     $count++;
+                     last;
+                 }
+             }
+         }
+         &message ("Found $regex in $count file(s)");
+     }
+     
+     defun (\*find_files_containing_regex,
+            "Open all files whose contents match a Perl regular expression.",
+            interactive("DLook in directory: \nsPerl regex: "),
+            \&find_my_files);
+
+   You would save this in a file, load it with `M-x perl-load-file'
+(*note Evaluation::) or from `~/.emacs', and use it as `M-x
+find-files-containing-regex'.
+
+   The command prompts for a directory name (with <TAB>-completion and
+history) and an arbitrary string (regex).  It signals an error if it
+can't read the directory, and otherwise summarizes the results in the
+minibuffer.  You can access its documentation just like that of any
+Emacs command, using `C-h f find-files-containing-regex'.
+
+
+File: epl.info,  Node: History,  Next: Emacs Lisp,  Prev: Perl Example,  Up: Introduction
+
+History
+=======
+
+   EPL works by starting a subprocess the first time a Perl interpreter
+is needed to carry out some function.  Emacs and Perl use interprocess
+communication (IPC) to invoke functions and send each other data until
+the parent process terminates.  Variations on this theme may involve
+Perl as the parent process or more than one child per parent.
+
+   This is not the only possible implementation.  In principle, the same
+functionality could be achieved by translating Perl to Lisp.  That has
+been a goal of the GNU project since 1994, except that RMS wants to
+replace Elisp with Scheme first.  For details, see *Note Lisp History:
+(elisp)Lisp History, and `http://www.vanderburg.org/Tcl/war/'.
+
+   Another possibility, which has been realized by a program called
+Perlmacs (http://john-edwin-tobey.org/perlmacs/), is to embed the Perl
+interpreter in Emacs and let it operate directly at the C level the way
+the Elisp interpreter does.  This probably results in faster execution,
+but it ties an executable to specific versions of Perl and Emacs.
+Perlmacs does not support XEmacs.
+
+
+File: epl.info,  Node: Emacs Lisp,  Next: Coding Conventions,  Prev: History,  Up: Introduction
+
+Emacs Lisp
+==========
+
+   Whether you write EPL programs or Elisp programs, you are writing
+Emacs programs.  The GNU and XEmacs projects maintain comprehensive and
+thorough documentation of the functions available to Emacs extensions.
+
+   Of course, those documents assume that extensions use Lisp.  Still,
+they are an invaluable resource, and any programmer with a general
+understanding of functions and variables can make good use of them.
+This manual makes frequent reference to the *Note GNU Emacs Lisp
+Reference Manual: (elisp)Top.  If you don't have it, go get it!  It
+should be available wherever you got Emacs or from the Free Software
+Foundation (http://www.gnu.org/doc/doc.html).
+
+   Who knows?  You may fall in love with Lisp.
+
+
+File: epl.info,  Node: Coding Conventions,  Prev: Emacs Lisp,  Up: Introduction
+
+Coding Conventions
+==================
+
+
+File: epl.info,  Node: Features,  Next: Configuration,  Prev: Introduction,  Up: Top
+
+Features
+********
+
+   This chapter describes EPL's mapping between Perl's language features
+and Emacs Lisp's.  Perl and Lisp are quite different, so some features
+favored by one language are imperfectly or awkwardly reproduced in the
+other.  EPL follows Perl's philosophy of making simple things easy and
+hard things possible.
+
+* Menu:
+
+* Data Conversion::             Working with each other's data types.
+* Functions::                   Calling each other's functions, `defun'.
+* Control Structures::          Exceptions; `throw', `signal', `die'.
+* Input/Output::                Perl's primitives are redefined in Emacs.
+* Caveats::                     It's not always a happy marriage.
+
+
+File: epl.info,  Node: Data Conversion,  Next: Functions,  Up: Features
+
+Data Conversion
+===============
+
+   EPL provides essentially two mechanisms to transfer data between
+languages--as function arguments and return values.  In both cases,
+data may be passed either by value or by reference.  The default is by
+value, since references incur overhead (*note References Incur
+Overhead::).
+
+   In EPL, "by value" means recursively (or "deeply") copied.  That is,
+containers in the originating language are converted to analogous
+containers in the destination language, and any contained elements not
+explicitly marked as pass-by-reference are likewise converted.  This
+allows the recipient to examine a structure using its built-in
+accessors, but changes will not apply to the original.  Also, language
+peculiarities result in information loss during some conversions, so
+pass-by-value is not completely reversible (*note Conversion Is
+Imperfect::).
+
+   This section describes the conversions that apply to each language's
+scalar and container types.  For a complete description of Lisp types,
+see *Note Lisp Data Types: (elisp)Lisp Data Types.
+
+* Menu:
+
+* Scalars::                     Lisp has three scalar types.
+* The Null Value::              `undef' and `()' are `nil'.
+* Symbols and Globrefs::        `\*::sym' is `'sym'.
+* Lists and Arrayrefs::         `["fnord"]' is `'("fnord")'.
+* Vectors::                     `\[42]' is `[42]'.
+* Conses::                      The `Emacs::Lisp::Cons' type.
+* Scalar References::           The `perl-ref' type.
+* Code References::             `\&frob' is a lambda expression.
+* Hash Tables::                 Not yet implemented.
+* Blessed References::          Not yet implemented.
+* Emacs Types::                 Not yet implemented.
+
+
+File: epl.info,  Node: Scalars,  Next: The Null Value,  Up: Data Conversion
+
+Scalars
+-------
+
+   Lisp integers, floats, and strings all become Perl scalars.  A simple
+Perl scalar becomes either an integer, a float, or a string.
+
+   Unfortunately, it is hard to be certain which type will be chosen.
+It depends on the value.  Perl 5.005 and later can distinguish among the
+literal constants `1', `"1"', and `1.0', and EPL uses this information.
+However, not all Perl integers fit into an Emacs integer (which is 28
+bits, *note Integer Type: (elisp)Integer Type.).  Integers that would
+overflow are upgraded to floats when converted.
+
+   You _may_ be able to specify string conversion by wrapping a
+variable in double quotes (`"$var"'), float by adding zero (`$var +
+0'), and integer using (`int($var)').  Perhaps a future version of EPL
+will provide an explicit means of specification.
+
+   Interesting character encodings such as UTF-8 are not currently
+supported.  All strings are considered unibyte.  *Note Text
+Representations: (elisp)Text Representations.
+
+
+File: epl.info,  Node: The Null Value,  Next: Symbols and Globrefs,  Prev: Scalars,  Up: Data Conversion
+
+The Null Value
+--------------
+
+   As an exception to the rule for symbols (*note Symbols and
+Globrefs::), `nil' in Lisp corresponds to `undef' in Perl.
+
+   In Lisp, `nil' is really a symbol.  However, it is typically used as
+the boolean value FALSE.  Perl symbols (glob references) evaluate to
+TRUE in boolean context.  It is very natural to convert `nil' to
+`undef'.
+
+
+File: epl.info,  Node: Symbols and Globrefs,  Next: Lists and Arrayrefs,  Prev: The Null Value,  Up: Data Conversion
+
+Symbols and Globrefs
+--------------------
+
+   Glob references become symbols in Lisp.  Underscores are swapped with
+hyphens in the name, since Perl prefers underscores and Lisp prefers
+hyphens.
+
+
+File: epl.info,  Node: Lists and Arrayrefs,  Next: Vectors,  Prev: Symbols and Globrefs,  Up: Data Conversion
+
+Lists and Arrayrefs
+-------------------
+
+   Lists are a central data structure in Lisp.  To make it as easy as
+possible to pass lists to Lisp functions that require them, Perl array
+references are converted Lisp lists.  For example, the Perl expression
+
+     ["x", ["y", 1]]
+   is converted to
+     '("x" ("y" 1))
+
+   in Lisp.  Note, however, that the empty list in Lisp is
+indistinguishable from `nil', so it becomes the undefined value, not an
+arrayref.  *Note The Null Value::.
+
+
+File: epl.info,  Node: Vectors,  Next: Conses,  Prev: Lists and Arrayrefs,  Up: Data Conversion
+
+Vectors
+-------
+
+   Adding `\' to an arrayref makes it an arrayref ref, which EPL treats
+as a vector in Lisp.  For example, Perl `\[1, 2, []]' becomes Lisp `[1
+2 nil]'.
+
+
+File: epl.info,  Node: Conses,  Next: Scalar References,  Prev: Vectors,  Up: Data Conversion
+
+Conses
+------
+
+   Conses that are not lists become Emacs::Lisp::Cons objects.
+
+   *Compatibility note:*  In Perlmacs, such conses become opaque
+objects (*note Pass-by-Reference::).
+
+     $x = &cons("left", "right");
+     print ref($x);                # "Emacs::Lisp::Cons"
+     print $x->car;                # "left"
+     print $x->cdr;                # "right"
+   But:
+     $x = &cons ("top", undef);    # a Lisp list
+     print ref($x);                # "ARRAY"
+     print $x->[0];                # "top"
+
+
+File: epl.info,  Node: Scalar References,  Next: Code References,  Prev: Conses,  Up: Data Conversion
+
+Scalar References
+-----------------
+
+
+File: epl.info,  Node: Code References,  Next: Hash Tables,  Prev: Scalar References,  Up: Data Conversion
+
+Code References
+---------------
+
+
+File: epl.info,  Node: Hash Tables,  Next: Blessed References,  Prev: Code References,  Up: Data Conversion
+
+Hash Tables
+-----------
+
+   The issue with hash tables is that Perl's built-in ones permit only
+string keys.  Right now, hash tables are passed by reference (*note
+Pass-by-Reference::).
+
+
+File: epl.info,  Node: Blessed References,  Next: Emacs Types,  Prev: Hash Tables,  Up: Data Conversion
+
+Blessed References
+------------------
+
+
+File: epl.info,  Node: Emacs Types,  Prev: Blessed References,  Up: Data Conversion
+
+Emacs Types
+-----------
+
+
+File: epl.info,  Node: Functions,  Next: Control Structures,  Prev: Data Conversion,  Up: Features
+
+Functions
+=========
+
+* Menu:
+
+* Evaluation::                  `perl-eval'.
+* Ordinary Functions::          `perl-call', `use Emacs::Lisp;'.
+* Pass-by-Reference::           How to inhibit data conversion.
+* Commands::                    Extending Emacs without Lisp, `defun'.
+
+
+File: epl.info,  Node: Evaluation,  Next: Ordinary Functions,  Up: Functions
+
+Evaluation
+----------
+
+ - Function: perl-eval string &optional context
+     This function parses and executes STRING as Perl code and returns
+     its converted value (*note Data Conversion::).
+
+     CONTEXT can specify an evaluation context (see perlsub
+     documentation (http://www.perldoc.org)) and affects how the
+     results are returned.  It may be:
+
+    `scalar-context'
+          Evaluate in scalar context and return the result as a Lisp
+          object.  This is the default if CONTEXT is not given.
+
+    `list-context'
+          Evaluate in list context and return the result as a list.
+
+    `void-context'
+          Evaluate in void context and return `nil'.
+
+ - Function: perl-eval-raw string &optional context
+     This function executes STRING like `perl-eval' but does not
+     convert its value.  Instead, it returns a `perl-value' object that
+     keeps a reference to a value in Perl.
+
+
+File: epl.info,  Node: Ordinary Functions,  Next: Pass-by-Reference,  Prev: Evaluation,  Up: Functions
+
+Ordinary Functions
+------------------
+
+ - Function: perl-call sub &rest arguments
+     This function calls the Perl subroutine named SUB with ARGUMENTS
+     and returns its value.  If the first argument is `scalar-context',
+     `list-context', or `void-context', it is not passed to the sub but
+     affects the calling context as in `perl-eval'.  *Note Evaluation::.
+
+
+File: epl.info,  Node: Pass-by-Reference,  Next: Commands,  Prev: Ordinary Functions,  Up: Functions
+
+Pass-by-Reference
+-----------------
+
+   XXX Rewrite.
+
+   A "shallow copy" simply wraps a Perl scalar in a Lisp object or vice
+versa.  Wrapped Perl values appear as a Lisp objects of type
+`perl-value'.  Wrapped Lisp values appear in Perl as objects of class
+`Emacs::Lisp::Object'.  *Note References Incur Overhead::, for issues
+relating to wrapped data.
+
+   In Perl, the `wrap' function wraps its argument in a Lisp object.
+This allows Perl data such as arrays to be passed by reference to Lisp
+functions.  Another way Lisp can obtain references to Perl data is by
+using `perl-eval-raw' or `perl-call-raw'.  Lisp can tell whether an
+object refers to Perl data by using the `perl-value-p' function.
+
+   Of course, `wrap' is a Perl function, so the value it returns is
+really its argument wrapped in a Lisp object wrapped in a Perl object.
+But when you pass this object to Lisp as an argument or function return
+value, Lisp gets a reference to the original object, and no automatic
+conversion occurs.  Lisp may explicitly convert it at any time using
+the `perl-to-lisp' function, and any changes made by Perl will be
+visible at the time of conversion.
+
+   The Lisp function `perl-wrap' is the counterpart of Perl's `wrap'
+function, and the `Emacs::Lisp::Object' package provides the equivalent
+of `perl-call-raw'.  The functions of package `Emacs::Lisp' return deep
+copies of Lisp function return values (see *note Functions::).
+However, the corresponding `Emacs::Lisp::Object' functions return
+references to live Lisp objects.
+
+   Since a wrapped Lisp object appears in Perl as an
+`Emacs::Lisp::Object' blessed reference, if follows that it can be used
+with method syntax to invoke a function and pass itself as the first
+argument.  Thus, supposing `v' is a vector of conses and `$v' is its
+wrapper, this Perl code
+
+     $v->aref(3)->setcdr(t);
+   has the effect of the following Lisp:
+     (setcdr (aref v 3) t)
+
+   An Emacs::Lisp::Object's `to_perl' method performs a deep copy and
+is the counterpart of `perl-to-lisp'.
+
+   Lisp functions called through package Emacs::Lisp convert their
+return values using deep copying.  The same functions are accessible
+through Emacs::Lisp::Object, which does shallow conversion and always
+returns an Emacs::Lisp::Object object.
+
+   These examples show how the data wrapping functions work in Perl:
+
+     $x = wrap [1, 2, 3];
+     print ref($x);           # "Emacs::Lisp::Object"
+     print ref($x->to_perl);  # "ARRAY"
+     print @{&list(2, 3)};    # "23"
+     
+     $x = Emacs::Lisp::Object::list(2, 3);
+     print ref($x);           # "Emacs::Lisp::Object"
+     print @{$x->to_perl};    # "23"
+
+   And in Lisp:
+
+     XXX
+
+
+File: epl.info,  Node: Commands,  Prev: Pass-by-Reference,  Up: Functions
+
+Commands
+--------
+
+
+File: epl.info,  Node: Control Structures,  Next: Input/Output,  Prev: Functions,  Up: Features
+
+Control Structures
+==================
+
+
+File: epl.info,  Node: Input/Output,  Next: Caveats,  Prev: Control Structures,  Up: Features
+
+Input/Output
+============
+
+
+File: epl.info,  Node: Caveats,  Prev: Input/Output,  Up: Features
+
+Caveats
+=======
+
+* Menu:
+
+* References Incur Overhead::   Memory management hurdles.
+* Conversion Is Imperfect::     Natural mappings are not always 1-to-1.
+
+
+File: epl.info,  Node: References Incur Overhead,  Next: Conversion Is Imperfect,  Up: Caveats
+
+References Incur Overhead
+-------------------------
+
+
+File: epl.info,  Node: Conversion Is Imperfect,  Prev: References Incur Overhead,  Up: Caveats
+
+Conversion Is Imperfect
+-----------------------
+
+
+File: epl.info,  Node: Configuration,  Next: Internals,  Prev: Features,  Up: Top
+
+Configuration
+*************
+
+* Menu:
+
+* Installation::                Lisp files, Perl modules, documentation.
+* The Easy Way::                We like the defaults.
+* Starting a Perl Process in Emacs::   `make-perl-interpreter'.
+* Starting an Emacs Process in Perl::  `use Emacs::Lisp;'.
+
+
+File: epl.info,  Node: Installation,  Next: The Easy Way,  Up: Configuration
+
+Installation
+============
+
+
+File: epl.info,  Node: The Easy Way,  Next: Starting a Perl Process in Emacs,  Prev: Installation,  Up: Configuration
+
+The Easy Way
+============
+
+
+File: epl.info,  Node: Starting a Perl Process in Emacs,  Next: Starting an Emacs Process in Perl,  Prev: The Easy Way,  Up: Configuration
+
+Starting a Perl Process in Emacs
+================================
+
+
+File: epl.info,  Node: Starting an Emacs Process in Perl,  Prev: Starting a Perl Process in Emacs,  Up: Configuration
+
+Starting an Emacs Process in Perl
+=================================
+
+
+File: epl.info,  Node: Internals,  Next: Copying Conditions,  Prev: Configuration,  Up: Top
+
+Internals
+*********
+
+   This chapter introduces the concepts involved in supporting
+single-threaded distributed exception handling and garbage collection
+for languages like Perl and Emacs Lisp.  These languages have a lot
+more in common underneath than meets the eye.
+
+   The chapter ends with a more concrete description of EPL's protocol.
+This information changes with great frequency and may be completely
+outdated by the time you read this.
+
+* Menu:
+
+* Debugging Options::           Dumping traffic to stderr or a buffer.
+* Transport Layer::             Media of interprocess communication.
+* Message Types::               What interpreters can say to each other.
+* State Transitions::           The message stream grammar.
+* Protocol::                    Current EPL protocol (*subject to change*).
+
+
+File: epl.info,  Node: Debugging Options,  Next: Transport Layer,  Up: Internals
+
+Debugging Options
+=================
+
+   You can make either or both processes log the messages sent between
+them.
+
+ - Perl Variable: $Emacs::EPL::debugging
+     When this variable holds a true value, the Perl side of EPL logs
+     messages to and from Emacs.  Possible values are:
+
+    `"stderr"'
+          Send debugging output to `STDERR'.  This works only when Perl
+          is the parent process.
+
+    a string
+          Append debugging output to the file named by the string.
+
+    a scalar reference
+          Append debugging output to the scalar.  This requires the
+          IO::Scalar module.
+
+    a filehandle
+          Print debugging output to the handle.
+
+ - Perl Function: Emacs::EPL::debug string...
+     This is the function used internally to send debugging output to
+     the destination specified by `$Emacs::EPL::debugging'.
+
+ - Variable: epl-debugging
+     When this variable's value is non-`nil', the Emacs side of EPL
+     logs messages to and from Perl.  If it is the symbol `stderr', the
+     output goes to the standard error stream.  Otherwise, it goes to a
+     buffer named `*epl-debug*'.
+
+     The log messages include the exact text sent to Perl, but the
+     replies are printed as Lisp forms using `prin1'.  However, EPL
+     always uses a buffer named `*perl*' to receive text from Perl.
+     Normally, it erases this buffer after every message, but when
+     `epl-debugging' is true, it does not.
+
+ - Function: epl-debug &rest objects
+     This is the function used internally to send output to the location
+     specified by `epl-debugging'.
+
+
+File: epl.info,  Node: Transport Layer,  Next: Message Types,  Prev: Debugging Options,  Up: Internals
+
+Transport Layer
+===============
+
+
+File: epl.info,  Node: Message Types,  Next: State Transitions,  Prev: Transport Layer,  Up: Internals
+
+Message Types
+=============
+
+
+File: epl.info,  Node: State Transitions,  Next: Protocol,  Prev: Message Types,  Up: Internals
+
+State Transitions
+=================
+
+
+File: epl.info,  Node: Protocol,  Prev: State Transitions,  Up: Internals
+
+Protocol
+========
+
+
+File: epl.info,  Node: Copying Conditions,  Next: Index,  Prev: Internals,  Up: Top
+
+Copying Conditions
+******************
+
+   You are welcome to distribute EPL under the terms of either the Perl
+Artistic License (as distributed with Perl 5.6.0) or the GNU General
+Public License.
+
+     This library is free software; you can redistribute it and/or
+     modify it under the terms of the GNU General Public License as
+     published by the Free Software Foundation; either version 2, or
+     (at your option) any later version.
+
+     This software is distributed in the hope that it will be useful,
+     but WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+     General Public License for more details.
+
+     You should have received a copy of the GNU General Public License
+     along with this library; see the file COPYING.  If not, write to
+     the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+     Boston, MA 02111-1307, USA.
+
+   You may distribute copies of this documentation in accordance with
+the *Note GNU Free Documentation License::, Version 1.1 or any later
+version published by the Free Software Foundation; with no required
+Invariant Sections, Front-Cover texts, or Back-Cover Texts.
+
+* Menu:
+
+* GNU Free Documentation License::    The GNU FDL.
+
+
+File: epl.info,  Node: GNU Free Documentation License,  Up: Copying Conditions
+
+GNU Free Documentation License
+==============================
+
+                        Version 1.1, March 2000
+
+     Copyright (C) 2000 Free Software Foundation, Inc.
+     59 Temple Place, Suite 330, Boston, MA  02111-1307, USA
+     
+     Everyone is permitted to copy and distribute verbatim copies
+     of this license document, but changing it is not allowed.
+
+  0. PREAMBLE
+
+     The purpose of this License is to make a manual, textbook, or other
+     written document "free" in the sense of freedom: to assure everyone
+     the effective freedom to copy and redistribute it, with or without
+     modifying it, either commercially or noncommercially.  Secondarily,
+     this License preserves for the author and publisher a way to get
+     credit for their work, while not being considered responsible for
+     modifications made by others.
+
+     This License is a kind of "copyleft", which means that derivative
+     works of the document must themselves be free in the same sense.
+     It complements the GNU General Public License, which is a copyleft
+     license designed for free software.
+
+     We have designed this License in order to use it for manuals for
+     free software, because free software needs free documentation: a
+     free program should come with manuals providing the same freedoms
+     that the software does.  But this License is not limited to
+     software manuals; it can be used for any textual work, regardless
+     of subject matter or whether it is published as a printed book.
+     We recommend this License principally for works whose purpose is
+     instruction or reference.
+
+  1. APPLICABILITY AND DEFINITIONS
+
+     This License applies to any manual or other work that contains a
+     notice placed by the copyright holder saying it can be distributed
+     under the terms of this License.  The "Document", below, refers to
+     any such manual or work.  Any member of the public is a licensee,
+     and is addressed as "you".
+
+     A "Modified Version" of the Document means any work containing the
+     Document or a portion of it, either copied verbatim, or with
+     modifications and/or translated into another language.
+
+     A "Secondary Section" is a named appendix or a front-matter
+     section of the Document that deals exclusively with the
+     relationship of the publishers or authors of the Document to the
+     Document's overall subject (or to related matters) and contains
+     nothing that could fall directly within that overall subject.
+     (For example, if the Document is in part a textbook of
+     mathematics, a Secondary Section may not explain any mathematics.)
+     The relationship could be a matter of historical connection with
+     the subject or with related matters, or of legal, commercial,
+     philosophical, ethical or political position regarding them.
+
+     The "Invariant Sections" are certain Secondary Sections whose
+     titles are designated, as being those of Invariant Sections, in
+     the notice that says that the Document is released under this
+     License.
+
+     The "Cover Texts" are certain short passages of text that are
+     listed, as Front-Cover Texts or Back-Cover Texts, in the notice
+     that says that the Document is released under this License.
+
+     A "Transparent" copy of the Document means a machine-readable copy,
+     represented in a format whose specification is available to the
+     general public, whose contents can be viewed and edited directly
+     and straightforwardly with generic text editors or (for images
+     composed of pixels) generic paint programs or (for drawings) some
+     widely available drawing editor, and that is suitable for input to
+     text formatters or for automatic translation to a variety of
+     formats suitable for input to text formatters.  A copy made in an
+     otherwise Transparent file format whose markup has been designed
+     to thwart or discourage subsequent modification by readers is not
+     Transparent.  A copy that is not "Transparent" is called "Opaque".
+
+     Examples of suitable formats for Transparent copies include plain
+     ASCII without markup, Texinfo input format, LaTeX input format,
+     SGML or XML using a publicly available DTD, and
+     standard-conforming simple HTML designed for human modification.
+     Opaque formats include PostScript, PDF, proprietary formats that
+     can be read and edited only by proprietary word processors, SGML
+     or XML for which the DTD and/or processing tools are not generally
+     available, and the machine-generated HTML produced by some word
+     processors for output purposes only.
+
+     The "Title Page" means, for a printed book, the title page itself,
+     plus such following pages as are needed to hold, legibly, the
+     material this License requires to appear in the title page.  For
+     works in formats which do not have any title page as such, "Title
+     Page" means the text near the most prominent appearance of the
+     work's title, preceding the beginning of the body of the text.
+
+  2. VERBATIM COPYING
+
+     You may copy and distribute the Document in any medium, either
+     commercially or noncommercially, provided that this License, the
+     copyright notices, and the license notice saying this License
+     applies to the Document are reproduced in all copies, and that you
+     add no other conditions whatsoever to those of this License.  You
+     may not use technical measures to obstruct or control the reading
+     or further copying of the copies you make or distribute.  However,
+     you may accept compensation in exchange for copies.  If you
+     distribute a large enough number of copies you must also follow
+     the conditions in section 3.
+
+     You may also lend copies, under the same conditions stated above,
+     and you may publicly display copies.
+
+  3. COPYING IN QUANTITY
+
+     If you publish printed copies of the Document numbering more than
+     100, and the Document's license notice requires Cover Texts, you
+     must enclose the copies in covers that carry, clearly and legibly,
+     all these Cover Texts: Front-Cover Texts on the front cover, and
+     Back-Cover Texts on the back cover.  Both covers must also clearly
+     and legibly identify you as the publisher of these copies.  The
+     front cover must present the full title with all words of the
+     title equally prominent and visible.  You may add other material
+     on the covers in addition.  Copying with changes limited to the
+     covers, as long as they preserve the title of the Document and
+     satisfy these conditions, can be treated as verbatim copying in
+     other respects.
+
+     If the required texts for either cover are too voluminous to fit
+     legibly, you should put the first ones listed (as many as fit
+     reasonably) on the actual cover, and continue the rest onto
+     adjacent pages.
+
+     If you publish or distribute Opaque copies of the Document
+     numbering more than 100, you must either include a
+     machine-readable Transparent copy along with each Opaque copy, or
+     state in or with each Opaque copy a publicly-accessible
+     computer-network location containing a complete Transparent copy
+     of the Document, free of added material, which the general
+     network-using public has access to download anonymously at no
+     charge using public-standard network protocols.  If you use the
+     latter option, you must take reasonably prudent steps, when you
+     begin distribution of Opaque copies in quantity, to ensure that
+     this Transparent copy will remain thus accessible at the stated
+     location until at least one year after the last time you
+     distribute an Opaque copy (directly or through your agents or
+     retailers) of that edition to the public.
+
+     It is requested, but not required, that you contact the authors of
+     the Document well before redistributing any large number of
+     copies, to give them a chance to provide you with an updated
+     version of the Document.
+
+  4. MODIFICATIONS
+
+     You may copy and distribute a Modified Version of the Document
+     under the conditions of sections 2 and 3 above, provided that you
+     release the Modified Version under precisely this License, with
+     the Modified Version filling the role of the Document, thus
+     licensing distribution and modification of the Modified Version to
+     whoever possesses a copy of it.  In addition, you must do these
+     things in the Modified Version:
+
+       A. Use in the Title Page (and on the covers, if any) a title
+          distinct from that of the Document, and from those of
+          previous versions (which should, if there were any, be listed
+          in the History section of the Document).  You may use the
+          same title as a previous version if the original publisher of
+          that version gives permission.
+
+       B. List on the Title Page, as authors, one or more persons or
+          entities responsible for authorship of the modifications in
+          the Modified Version, together with at least five of the
+          principal authors of the Document (all of its principal
+          authors, if it has less than five).
+
+       C. State on the Title page the name of the publisher of the
+          Modified Version, as the publisher.
+
+       D. Preserve all the copyright notices of the Document.
+
+       E. Add an appropriate copyright notice for your modifications
+          adjacent to the other copyright notices.
+
+       F. Include, immediately after the copyright notices, a license
+          notice giving the public permission to use the Modified
+          Version under the terms of this License, in the form shown in
+          the Addendum below.
+
+       G. Preserve in that license notice the full lists of Invariant
+          Sections and required Cover Texts given in the Document's
+          license notice.
+
+       H. Include an unaltered copy of this License.
+
+       I. Preserve the section entitled "History", and its title, and
+          add to it an item stating at least the title, year, new
+          authors, and publisher of the Modified Version as given on
+          the Title Page.  If there is no section entitled "History" in
+          the Document, create one stating the title, year, authors,
+          and publisher of the Document as given on its Title Page,
+          then add an item describing the Modified Version as stated in
+          the previous sentence.
+
+       J. Preserve the network location, if any, given in the Document
+          for public access to a Transparent copy of the Document, and
+          likewise the network locations given in the Document for
+          previous versions it was based on.  These may be placed in
+          the "History" section.  You may omit a network location for a
+          work that was published at least four years before the
+          Document itself, or if the original publisher of the version
+          it refers to gives permission.
+
+       K. In any section entitled "Acknowledgments" or "Dedications",
+          preserve the section's title, and preserve in the section all
+          the substance and tone of each of the contributor
+          acknowledgments and/or dedications given therein.
+
+       L. Preserve all the Invariant Sections of the Document,
+          unaltered in their text and in their titles.  Section numbers
+          or the equivalent are not considered part of the section
+          titles.
+
+       M. Delete any section entitled "Endorsements".  Such a section
+          may not be included in the Modified Version.
+
+       N. Do not retitle any existing section as "Endorsements" or to
+          conflict in title with any Invariant Section.
+
+     If the Modified Version includes new front-matter sections or
+     appendices that qualify as Secondary Sections and contain no
+     material copied from the Document, you may at your option
+     designate some or all of these sections as invariant.  To do this,
+     add their titles to the list of Invariant Sections in the Modified
+     Version's license notice.  These titles must be distinct from any
+     other section titles.
+
+     You may add a section entitled "Endorsements", provided it contains
+     nothing but endorsements of your Modified Version by various
+     parties--for example, statements of peer review or that the text
+     has been approved by an organization as the authoritative
+     definition of a standard.
+
+     You may add a passage of up to five words as a Front-Cover Text,
+     and a passage of up to 25 words as a Back-Cover Text, to the end
+     of the list of Cover Texts in the Modified Version.  Only one
+     passage of Front-Cover Text and one of Back-Cover Text may be
+     added by (or through arrangements made by) any one entity.  If the
+     Document already includes a cover text for the same cover,
+     previously added by you or by arrangement made by the same entity
+     you are acting on behalf of, you may not add another; but you may
+     replace the old one, on explicit permission from the previous
+     publisher that added the old one.
+
+     The author(s) and publisher(s) of the Document do not by this
+     License give permission to use their names for publicity for or to
+     assert or imply endorsement of any Modified Version.
+
+  5. COMBINING DOCUMENTS
+
+     You may combine the Document with other documents released under
+     this License, under the terms defined in section 4 above for
+     modified versions, provided that you include in the combination
+     all of the Invariant Sections of all of the original documents,
+     unmodified, and list them all as Invariant Sections of your
+     combined work in its license notice.
+
+     The combined work need only contain one copy of this License, and
+     multiple identical Invariant Sections may be replaced with a single
+     copy.  If there are multiple Invariant Sections with the same name
+     but different contents, make the title of each such section unique
+     by adding at the end of it, in parentheses, the name of the
+     original author or publisher of that section if known, or else a
+     unique number.  Make the same adjustment to the section titles in
+     the list of Invariant Sections in the license notice of the
+     combined work.
+
+     In the combination, you must combine any sections entitled
+     "History" in the various original documents, forming one section
+     entitled "History"; likewise combine any sections entitled
+     "Acknowledgments", and any sections entitled "Dedications".  You
+     must delete all sections entitled "Endorsements."
+
+  6. COLLECTIONS OF DOCUMENTS
+
+     You may make a collection consisting of the Document and other
+     documents released under this License, and replace the individual
+     copies of this License in the various documents with a single copy
+     that is included in the collection, provided that you follow the
+     rules of this License for verbatim copying of each of the
+     documents in all other respects.
+
+     You may extract a single document from such a collection, and
+     distribute it individually under this License, provided you insert
+     a copy of this License into the extracted document, and follow
+     this License in all other respects regarding verbatim copying of
+     that document.
+
+  7. AGGREGATION WITH INDEPENDENT WORKS
+
+     A compilation of the Document or its derivatives with other
+     separate and independent documents or works, in or on a volume of
+     a storage or distribution medium, does not as a whole count as a
+     Modified Version of the Document, provided no compilation
+     copyright is claimed for the compilation.  Such a compilation is
+     called an "aggregate", and this License does not apply to the
+     other self-contained works thus compiled with the Document, on
+     account of their being thus compiled, if they are not themselves
+     derivative works of the Document.
+
+     If the Cover Text requirement of section 3 is applicable to these
+     copies of the Document, then if the Document is less than one
+     quarter of the entire aggregate, the Document's Cover Texts may be
+     placed on covers that surround only the Document within the
+     aggregate.  Otherwise they must appear on covers around the whole
+     aggregate.
+
+  8. TRANSLATION
+
+     Translation is considered a kind of modification, so you may
+     distribute translations of the Document under the terms of section
+     4.  Replacing Invariant Sections with translations requires special
+     permission from their copyright holders, but you may include
+     translations of some or all Invariant Sections in addition to the
+     original versions of these Invariant Sections.  You may include a
+     translation of this License provided that you also include the
+     original English version of this License.  In case of a
+     disagreement between the translation and the original English
+     version of this License, the original English version will prevail.
+
+  9. TERMINATION
+
+     You may not copy, modify, sublicense, or distribute the Document
+     except as expressly provided for under this License.  Any other
+     attempt to copy, modify, sublicense or distribute the Document is
+     void, and will automatically terminate your rights under this
+     License.  However, parties who have received copies, or rights,
+     from you under this License will not have their licenses
+     terminated so long as such parties remain in full compliance.
+
+ 10. FUTURE REVISIONS OF THIS LICENSE
+
+     The Free Software Foundation may publish new, revised versions of
+     the GNU Free Documentation License from time to time.  Such new
+     versions will be similar in spirit to the present version, but may
+     differ in detail to address new problems or concerns.  See
+     `http://www.gnu.org/copyleft/'.
+
+     Each version of the License is given a distinguishing version
+     number.  If the Document specifies that a particular numbered
+     version of this License "or any later version" applies to it, you
+     have the option of following the terms and conditions either of
+     that specified version or of any later version that has been
+     published (not as a draft) by the Free Software Foundation.  If
+     the Document does not specify a version number of this License,
+     you may choose any version ever published (not as a draft) by the
+     Free Software Foundation.
+
+ADDENDUM: How to use this License for your documents
+----------------------------------------------------
+
+   To use this License in a document you have written, include a copy of
+the License in the document and put the following copyright and license
+notices just after the title page:
+
+       Copyright (C)  YEAR  YOUR NAME.
+       Permission is granted to copy, distribute and/or modify this document
+       under the terms of the GNU Free Documentation License, Version 1.1
+       or any later version published by the Free Software Foundation;
+       with the Invariant Sections being LIST THEIR TITLES, with the
+       Front-Cover Texts being LIST, and with the Back-Cover Texts being LIST.
+       A copy of the license is included in the section entitled ``GNU
+       Free Documentation License''.
+
+   If you have no Invariant Sections, write "with no Invariant Sections"
+instead of saying which ones are invariant.  If you have no Front-Cover
+Texts, write "no Front-Cover Texts" instead of "Front-Cover Texts being
+LIST"; likewise for Back-Cover Texts.
+
+   If your document contains nontrivial examples of program code, we
+recommend releasing these examples in parallel under your choice of
+free software license, such as the GNU General Public License, to
+permit their use in free software.
+
+
+File: epl.info,  Node: Index,  Prev: Copying Conditions,  Up: Top
+
+Index
+*****
+
+* Menu:
+
+* $Emacs::EPL::debugging:                Debugging Options.
+* connection types:                      Transport Layer.
+* debugging EPL:                         Debugging Options.
+* dumping message traffic:               Debugging Options.
+* Emacs::EPL::debug:                     Debugging Options.
+* epl-debug:                             Debugging Options.
+* epl-debugging:                         Debugging Options.
+* FDL, GNU Free Documentation License:   GNU Free Documentation License.
+* Internals:                             Internals.
+* interprocess communication:            Transport Layer.
+* IPC:                                   Transport Layer.
+* Message Types:                         Message Types.
+* messages:                              Internals.
+* perl-call:                             Ordinary Functions.
+* perl-eval:                             Evaluation.
+* perl-eval-raw:                         Evaluation.
+* pipe between Emacs and Perl:           Transport Layer.
+* protocol:                              Internals.
+* protocol states:                       State Transitions.
+* standard error stream:                 Debugging Options.
+* state diagram:                         State Transitions.
+* State Transitions:                     State Transitions.
+* stderr:                                Debugging Options.
+* Transport Layer:                       Transport Layer.
+* wire protocol:                         Protocol.
+
+
+
+Tag Table:
+Node: Top798
+Node: Preface2864
+Node: Introduction4645
+Node: Perl Example5600
+Node: History7831
+Node: Emacs Lisp9018
+Node: Coding Conventions9856
+Node: Features9978
+Node: Data Conversion10757
+Node: Scalars12539
+Node: The Null Value13601
+Node: Symbols and Globrefs14078
+Node: Lists and Arrayrefs14393
+Node: Vectors14988
+Node: Conses15257
+Node: Scalar References15862
+Node: Code References16004
+Node: Hash Tables16147
+Node: Blessed References16445
+Node: Emacs Types16591
+Node: Functions16703
+Node: Evaluation17081
+Node: Ordinary Functions18070
+Node: Pass-by-Reference18546
+Node: Commands21312
+Node: Control Structures21408
+Node: Input/Output21546
+Node: Caveats21670
+Node: References Incur Overhead21898
+Node: Conversion Is Imperfect22049
+Node: Configuration22196
+Node: Installation22570
+Node: The Easy Way22677
+Node: Starting a Perl Process in Emacs22825
+Node: Starting an Emacs Process in Perl23034
+Node: Internals23224
+Node: Debugging Options24124
+Node: Transport Layer25789
+Node: Message Types25928
+Node: State Transitions26063
+Node: Protocol26199
+Node: Copying Conditions26295
+Node: GNU Free Documentation License27655
+Node: Index47518
+
+End Tag Table

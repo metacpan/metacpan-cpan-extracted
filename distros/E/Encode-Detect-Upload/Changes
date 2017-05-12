@@ -1,0 +1,15 @@
+Revision history for Encode-Detect-Upload
+
+0.01    2013/11/05
+        First version, released on an unsuspecting world.
+
+0.02    2013/11/05
+        Fixed test failures generated on newer Perls and availability
+        of Mozzila lib.
+        Added Peter Haworth to Authors as thanks for his code review.
+
+0.03    2013/11/07
+        Added Test:: module dependencies.
+
+0.04    2013/11/23
+        Added Encode module dependency for early Perl 5.6 versions.

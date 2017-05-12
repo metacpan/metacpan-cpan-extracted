@@ -1,0 +1,44 @@
+Revision history for Email-MessageID
+
+1.406     2015-08-10 12:08:52-04:00 America/New_York
+        - when Sys::Hostname::Long is available, use hostname_long, not
+          hostname()
+
+1.405     2014-05-09 22:28:43-04:00 America/New_York
+          minor tweaks to how message-id local part is generated
+
+1.404     2014-01-13 23:04:43-05:00 America/New_York
+          no changes since previous release
+
+1.403     2013-08-13 09:11:47 America/New_York
+          [This might break your code]
+          no longer a subclass of Email::Address!
+
+1.402     2010-07-14
+          improve documentation of in_brackets
+
+1.401     2009-01-22
+          add repo location to metadata
+
+1.400     2008-10-02
+          return MessageID objects, not Email::Address objects
+          this lets us add in_brackets
+          use Sys::Hostname::Long if available
+
+1.351     2007-03-22
+          packaging improvements
+
+1.35      2006-07-11
+          Fixed version required for Sys::Hostname (thanks BARBIE)
+          plan tests (for compat with older harnesses)
+          keep a unique per pid part to fend of encroaching collisions (rjbs)
+          remove ineffective caching mechanism (rjbs)
+
+1.31      2004-12-22
+          Stopped using Time::HiRes. Instead, generate a pseudo-random string.
+          Cache user portions of the address to ensure uniqueness.
+          Add purge_users() method, undocumented currently. Experimental.
+
+1.2       2004-09-27
+          INCOMPATIBLE: Removed trigger code, just subclass to override
+          behaviour.

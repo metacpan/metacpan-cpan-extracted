@@ -1,0 +1,66 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 b321a069a5dc3ca37f092f4c6d147b4f9d449c6d Changes
+SHA1 6d65475ea881f48473818cd63935d1fe0b0638c3 JSON.pm
+SHA1 65af39f122d647eb10dd2746d80504ae699d3733 JSON/Advance.pm
+SHA1 7d9986bc37f4cfa2dc2bfb0ee5323b1a046e91ff LICENSE
+SHA1 729f7d12220223a3018ee18ce01a77cfbdd2998d MANIFEST
+SHA1 4ebaeddd61234c0b6f525f5b5768c614a9d04e75 META.yml
+SHA1 54473ade8fd1bec08e79d57bb81150887edca573 Makefile.PL
+SHA1 2f8e7c90d78d9404b662ac3de2a603ea886d7860 README
+SHA1 ee9ddfdeabdbb030e2d1b10a960d3a9f7dda82fb examples/ex1.pl
+SHA1 1972a98d05f54b9accee196483b2997d0abd475d examples/ex2.pl
+SHA1 6a2c19c43819bbadc4467e0df22cde4b47b19ee8 examples/ex3.pl
+SHA1 7fd639051a5ec3e4bbbc1be331e456307b743a06 examples/ex4.pl
+SHA1 64c7b819a776e0a12d79adbc41bfa969c2a425f7 examples/ex5.pl
+SHA1 4cd810d317b69f1810c01f3ed63c1343f131099c examples/ex6.pl
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
+SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 596fd141467b496c8226ded713720b7efce82b89 t/Error-Pure-JSON-Advance/01-use.t
+SHA1 03ddb40bad06510d0ecfba833d44f507ba7aeabe t/Error-Pure-JSON-Advance/02-version.t
+SHA1 45ab00c6b1aa46b46c2ae11cdf5cd3f6889c2a43 t/Error-Pure-JSON-Advance/03-err.t
+SHA1 29e22ea542bdcdf905b05470dac7ce50011377c4 t/Error-Pure-JSON/01-use.t
+SHA1 77ca3540fdbf51dcdb538f5237505d254e7f9058 t/Error-Pure-JSON/02-version.t
+SHA1 e1b3f9d0255ef797d089f4b2514dd2d92752b9cf t/Error-Pure-JSON/03-err.t
+SHA1 96e51175c4207473190fa2544802f11889f4a9cb t/data/ex1.pl
+SHA1 30fc175e755f0800d5aed389e2003810535b7f71 t/data/ex2.pl
+SHA1 3bdf1ee0e10f6205fd9fe39f2e2c46d4db6602a5 t/data/ex3.pl
+SHA1 5faca7b8544f599ac8f11ae58d6bdd5bfda470e8 t/data/ex4.pl
+SHA1 e27771041d35c5e684bd73f4d7ec6f436d233c8e xt/Error-Pure-JSON-Advance/01-pod_coverage.t
+SHA1 b13b0c13c5723d3e4f73fbfc0b75de9a8a8ab644 xt/Error-Pure-JSON-Advance/02-pod.t
+SHA1 fabfa6fd3e42a6615141461a83288bf6ecfe7691 xt/Error-Pure-JSON/01-pod_coverage.t
+SHA1 1b4dbdcadec7bf4b9173fc8d0dfd43f89cc4e562 xt/Error-Pure-JSON/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJWB6TbAAoJEJe+XXKaIuTlFp8H/1ez6VrLh7y1g9Swr2a/0z3a
+C4g+rZP33zJfrECfrA2/YMhsriWhaIFKZMrhlrMM0YkOW0fp9C60PuHp2yPI1brS
+G2GRO3MJI8/jZSov7MPtWGWED16vHXCYlXb+NdhmmyS+dlaMgjZu6iJsnh+/MmhU
+HJNEpM8lxwIXZpih4eroivVAJiDqwl8/qfAStXq64DYQ0ktwpX+t+b2DZcd3LlGF
+hvMiLV0hWTml1Va62ACMtDxcrE9PJM9vHU6+lGZxWzVuJPu0Fb5BxrmTyf6ye03o
+L8L5IsK+qL/6Pg5/unmaW2anicw4/Znnv+4y217E5B5hXdrge2JKhkVpXqYOP+w=
+=3BXh
+-----END PGP SIGNATURE-----

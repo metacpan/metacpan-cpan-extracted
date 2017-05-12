@@ -1,0 +1,164 @@
+{
+   "abstract" : "ETL with a Shell",
+   "author" : [
+      "Doug Bell <preaction@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "ETL-Yertl",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "DBD::SQLite" : "0",
+            "DBI" : "0",
+            "JSON::PP" : "0",
+            "JSON::XS" : "0",
+            "Text::CSV" : "0",
+            "Text::CSV_XS" : "0",
+            "YAML::Syck" : "0",
+            "YAML::XS" : "0"
+         },
+         "requires" : {
+            "Data::Partial::Google" : "0",
+            "File::HomeDir" : "0",
+            "File::Spec" : "0",
+            "Getopt::Long" : "2.36",
+            "Hash::Merge::Simple" : "0",
+            "Import::Base" : "0.010",
+            "List::Util" : "1.29",
+            "Module::Runtime" : "0",
+            "Moo" : "2",
+            "Parse::RecDescent" : "0",
+            "Path::Tiny" : "0.072",
+            "Pod::Usage::Return" : "0",
+            "Regexp::Common" : "2013031301",
+            "SQL::Abstract" : "0",
+            "Text::Trim" : "0",
+            "Type::Tiny" : "0",
+            "Types::Standard" : "0",
+            "YAML" : "0",
+            "boolean" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Dir::Self" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "JSON::PP" : "0",
+            "Test::Deep" : "0",
+            "Test::Differences" : "0",
+            "Test::Exception" : "0",
+            "Test::Lib" : "0",
+            "Test::More" : "1.001005"
+         }
+      }
+   },
+   "provides" : {
+      "ETL::Yertl" : {
+         "file" : "lib/ETL/Yertl.pm",
+         "version" : "0.028"
+      },
+      "ETL::Yertl::Command::yfrom" : {
+         "file" : "lib/ETL/Yertl/Command/yfrom.pm",
+         "version" : "0.028"
+      },
+      "ETL::Yertl::Command::ygrok" : {
+         "file" : "lib/ETL/Yertl/Command/ygrok.pm",
+         "version" : "0.028"
+      },
+      "ETL::Yertl::Command::ymask" : {
+         "file" : "lib/ETL/Yertl/Command/ymask.pm",
+         "version" : "0.028"
+      },
+      "ETL::Yertl::Command::yq" : {
+         "file" : "lib/ETL/Yertl/Command/yq.pm",
+         "version" : "0.028"
+      },
+      "ETL::Yertl::Command::yq::RecDescent" : {
+         "file" : "lib/ETL/Yertl/Command/yq/RecDescent.pm",
+         "version" : "0.028"
+      },
+      "ETL::Yertl::Command::yq::RecDescentTree" : {
+         "file" : "lib/ETL/Yertl/Command/yq/RecDescentTree.pm",
+         "version" : "0.028"
+      },
+      "ETL::Yertl::Command::yq::Regex" : {
+         "file" : "lib/ETL/Yertl/Command/yq/Regex.pm",
+         "version" : "0.028"
+      },
+      "ETL::Yertl::Command::ysql" : {
+         "file" : "lib/ETL/Yertl/Command/ysql.pm",
+         "version" : "0.028"
+      },
+      "ETL::Yertl::Command::yto" : {
+         "file" : "lib/ETL/Yertl/Command/yto.pm",
+         "version" : "0.028"
+      },
+      "ETL::Yertl::Format::csv" : {
+         "file" : "lib/ETL/Yertl/Format/csv.pm",
+         "version" : "0.028"
+      },
+      "ETL::Yertl::Format::default" : {
+         "file" : "lib/ETL/Yertl/Format/default.pm",
+         "version" : "0.028"
+      },
+      "ETL::Yertl::Format::json" : {
+         "file" : "lib/ETL/Yertl/Format/json.pm",
+         "version" : "0.028"
+      },
+      "ETL::Yertl::Format::yaml" : {
+         "file" : "lib/ETL/Yertl/Format/yaml.pm",
+         "version" : "0.028"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/preaction/ETL-Yertl/issues"
+      },
+      "homepage" : "https://github.com/preaction/ETL-Yertl",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/preaction/ETL-Yertl.git",
+         "web" : "https://github.com/preaction/ETL-Yertl"
+      },
+      "x_IRC" : "irc://irc.perl.org/#yertl"
+   },
+   "version" : "0.028",
+   "x_authority" : "cpan:PREACTION",
+   "x_contributors" : [
+      "Doug Bell <doug@preaction.me>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0216"
+}
+

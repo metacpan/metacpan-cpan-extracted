@@ -1,0 +1,49 @@
+Exception::Handler version 1.00_3
+=================================
+
+DESCRIPTION
+Report exceptions with formatted text call-stack
+
+
+CHANGES IN LAST FEW RELEASES
+(listed in reverse cronological order by date and subversion)
+
+   1.00_3
+      Fri Sep 19 00:37:33 CDT 2003
+      Corrected slight grammatical/spelling error in stack dumps produced
+      by method Exception::Handler::trace()
+
+   1.00_2
+      12/23/02, 1:44 am
+      Initial release of Exception::Handler.pm
+
+
+INSTALLATION
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+On windows machines use nmake rather than make; those running cygwin don't have
+to worry about this.  If you don't know what cygwin is, use nmake and check out
+<URL: http://cygwin.com/> after you're done installing this module if you want
+to find out.
+
+
+DEPENDENCIES
+None.
+
+
+AUTHOR
+   Tommy Butler <cpan@atrixnet.com>
+
+
+COPYRIGHT
+   Copyright (C) Tommy Butler 2001-2003, all rights reserved.
+
+
+LICENCE
+   This library is free software, you may redistribute it and/or modify it
+   under the same terms as Perl itself.

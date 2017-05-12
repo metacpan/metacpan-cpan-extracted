@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/ETL-Pequel3-PlaceHolder.t
+lib/ETL/Pequel3/PlaceHolder.pm
+META.yml                                 Module meta-data (added by MakeMaker)

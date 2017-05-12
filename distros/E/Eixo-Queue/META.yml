@@ -1,0 +1,31 @@
+---
+abstract: 'Suite of Perl modules to work with task queues'
+author:
+  - 'Francisco Maseda <frmadem@gmail.com>'
+  - 'Javier Gomez <alambike@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150001'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Eixo-Queue
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Crypt::JWT: '0.018'
+  Data::UUID: '1'
+  Eixo::Base: '1.400'
+  JSON: '2.5'
+  MongoDB: '0.708'
+  Net::AMQP::RabbitMQ: '2.3'
+  perl: '5.012'
+resources:
+  repository: git://github.com/frmadem/eixo_queue.git
+version: v0.5.5

@@ -1,0 +1,97 @@
+[% title = 'Edit Schedule' %]
+[%INCLUDE menu.tmpl %]
+
+[% IF errs.some_errors && ! message %]
+<p><span class="message" id="message">Error Saving Schedule</span> </p>
+[% END %]
+
+<form action="[% root_url %]/schedule/save" method="post">
+    <div class="fieldset">
+    <fieldset>
+        <legend>Basic Settings</legend>
+        <p><label for="task" class="edit">Job *</label>
+            <select id="config_file" name="config_file">
+            [% FOREACH config_file IN config_files %]
+                <option value="[% config_file %]" [% IF config_file == config %]selected="selected"[% END %]>[% config_file %]</option>
+            [% END %]
+            </select>
+            
+            <select id="section" name="section">
+            [% FOREACH config_section IN sections %]
+                <option value="[% config _ '-' _ config_section %]" [% IF config_section == section %]selected="selected"[% END %]>[% config_section %]</option>
+            [% END %]
+            </select> [% err_config_file %] [% err_section %]
+        </p>
+        <p><label for="schedule_description" class="edit">Description *
+            [% IF errs.schedule_description %]<br/>[% errs.schedule_description %][% END %]</label>
+            <textarea id="schedule_description" name="schedule_description">[% schedule.schedule_description %]</textarea>
+        </p>
+        <p><label for="schedule_comment" class="edit">Comment</label>
+            <textarea id="schedule_comment" name="schedule_comment">[% schedule.schedule_comment %]</textarea>
+        </p>
+        <p><label for="dow_id" class="edit">Day</label>
+            <div class="days">
+            [% WHILE (day = dows.next) %]
+                [% day.day_name %]
+                [% dow_id = day.dow_id %]
+                <input type="checkbox" name="dow_id" value="[% day.dow_id %]" [% IF schedule_dows.$dow_id == 1 %]checked="checked"[% END %]/>
+            [% END %]
+            </div>
+        </p>
+        <p><label for="schedule_hours" class="edit">Hours</label>
+            <input type="text" name="schedule_hours" id="schedule_hours" value="[% schedule_hours %]" />
+            [% errs.schedule_hours %] (Leave blank for all)
+        </p>
+        <p><label for="schedule_minutes" class="edit">Minutes</label>
+            <input type="text" name="schedule_minutes" id="schedule_minutes" value="[% schedule_minutes %]" />
+            [% errs.schedule_minutes %] (Leave blank for all)
+        </p>
+        <p><label for="status" class="edit" class="edit">Active</label>
+            <input id="status" name="status" type="checkbox" value="1" [% IF schedule.status %]checked="checked"[% END %]s/>
+    </fieldset>
+    </div>
+    <div class="fieldset">
+    <fieldset>
+        <legend>Advanced Settings</legend>
+        <p><label for="schedule_doms" class="edit">Day of Month</label>
+            <input type="text" name="schedule_doms" id="schedule_doms" value="[% schedule_doms %]" />
+            [% errs.schedule_doms %] (Leave blank for all)
+        </p>
+        <p><label for="schedule_month_id" class="edit">Month</label>
+            <select id="month_id" name="month_id">
+            [% FOREACH month IN months %]
+                <option value="[% month.month_id %]" [% IF month.month_id == schedule_month.month_id %]selected="selected"[% END %]>[% month.month_name %]</option>
+            [% END %]
+            </select>  [% errs.schedule_month %] (Leave blank for all)<br/>
+        </p>
+        <p class="submit">
+            <input type="submit" value="Save" />
+            [% IF schedule.schedule_id %]
+            <input type="submit" value="Delete" class="delete" onclick="return confirmDelete();" name="delete"/>
+            [% END %]
+        <input type="hidden" id="schedule_id" name="schedule_id" value="[% schedule.schedule_id %]"></p>
+    </fieldset>
+    </div>
+    <div class="fieldset">
+    <fieldset>
+        <legend>Dependencies</legend>
+        <div id="dependencies" class="dependencies">[% dependencies %]</div>
+    </fieldset>
+    </div>
+</form>
+[%# c.prototype.observe_field('config_file', {url = root_url _ '/schedule/update_sections', update='section', with   => "'config_file='+value"}) %]
+<script type="text/javascript">
+<!--
+new Form.Element.EventObserver( 'config_file',
+    function( element, value ) {
+         new Ajax.Updater( 'section',  '/etlp/schedule/update_sections',
+                          { parameters: 'config_file='+value,asynchronous: 0} ) ;
+         
+        fireEvent($('section'), 'change');
+    }
+);
+//-->
+</script>
+[% c.prototype.observe_field('section', {url = root_url _ '/schedule/update_dependencies', update='dependencies', with   => "'section='+value+'&config='+\$F(\'config_file\')"}) %]
+
+[% PROCESS footer.tmpl %]

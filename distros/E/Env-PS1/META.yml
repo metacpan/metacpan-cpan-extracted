@@ -1,0 +1,23 @@
+---
+name: Env-PS1
+version: 0.06
+author:
+  - 'Jaap Karssenberg <pardus@cpan.org>'
+abstract: prompt string formatter
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  AutoLoader: 0
+  POSIX: 0
+  Sys::Hostname: 0
+build_requires:
+  AutoSplit: 0
+provides:
+  Env::PS1:
+    file: lib/Env/PS1.pm
+    version: 0.06
+generated_by: Module::Build version 0.33
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

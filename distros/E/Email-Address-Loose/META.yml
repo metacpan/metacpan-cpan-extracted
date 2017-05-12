@@ -1,0 +1,26 @@
+---
+abstract: 'Make Email::Address->parse() loose'
+author:
+  - 'Naoki Tomita <tomita@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Email-Address-Loose
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Email::Address: 1.889
+resources:
+  bugtracker: http://github.com/tomi-ru/Email-Address-Loose/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/tomi-ru/Email-Address-Loose
+version: 0.10

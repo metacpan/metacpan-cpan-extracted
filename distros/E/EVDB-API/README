@@ -1,0 +1,5 @@
+The EVDB API allows you to build tools and applications that interact with EVDB, the Events & Venues Database.  This module provides a Perl interface to that  API, including the digest-based authentication infrastructure.  
+
+See http://api.evdb.com/ for details.
+
+Copyright 2005 EVDB, Inc.  All rights reserved.  This module may be redistributed under the same terms as Perl itself.

@@ -1,0 +1,24 @@
+---
+abstract: 'Declarative Exporting, successor of Exporter-Declare.'
+author:
+  - 'Chad Granum <exodist@cpan.org>'
+build_requires:
+  Test2::Suite: '0.000018'
+  Test::Fatal: '0.012'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Export-Declare
+requires:
+  Carp: '0'
+  Importer: '0.010'
+  perl: '5.008001'
+resources:
+  bugtracker: http://github.com/exodist/Export-Declare/issues
+  repository: http://github.com/exodist/Export-Declare/
+version: '0.002'

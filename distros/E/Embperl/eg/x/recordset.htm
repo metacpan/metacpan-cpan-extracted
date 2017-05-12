@@ -1,0 +1,48 @@
+
+<html>
+<head>
+<title>Embperl Examples - DBIx::Recordset</title>
+</head>
+<body background="../images/jazzbkgd.gif">
+
+<h1>Embperl Examples - DBIx::Recordset</h1>
+<hr><b>NOTE:</b><br>
+You must set the database and table to something which exists on your system. 
+Also this example presumes that the table contains the fields <b>id</b> and
+<b>name</b>. If not you have to change the field-names in the table below<br>
+Maybe it's necessary to insert a PerlModule DBIx::Recordset into your srm.conf
+to get this working<br>
+<br>
+You may specify search parameters: For example request this document with<br>
+<b>recordset.htm?id=5</b><br>
+to get all records where the id = 5
+
+<hr>
+
+[-
+
+$DSN   = 'dbi:mysql:test' ;
+$table = 'dbixrs1' ;
+
+use DBIx::Recordset ;
+
+*set = DBIx::Recordset -> Search ({%fdat, 
+                                   ('!DataSource'   => $DSN,
+									'!Table' => $table,
+									'$max'   => 5,)}) ; -]
+<table border=1>
+ <tr><th>ID</th><th>NAME</th></tr>
+  <tr>
+    <td>[+ $set[$row]{id} +]</td>
+    <td>[+ $set[$row]{name} +]</td>
+  </tr>
+</table>
+[+ $set -> PrevNextForm ('Previous Records', 'Next Records', \%fdat) +]
+
+<p><hr>
+
+<small>HTML::Embperl (c) 1997-1998 G.Richter</small>
+
+
+</body>
+</html>

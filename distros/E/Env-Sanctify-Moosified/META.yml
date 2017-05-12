@@ -1,0 +1,24 @@
+---
+abstract: 'Lexically scoped sanctification of %ENV'
+author:
+  - 'Chris Williams <chris@bingosnet.co.uk>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0.47
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Env-Sanctify-Moosified
+requires:
+  Moo: 0
+  MooX::late: 0
+  perl: 5.006
+resources:
+  homepage: https://github.com/bingos/env-sanctify-moosified
+  repository: https://github.com/bingos/env-sanctify-moosified.git
+version: 1.06

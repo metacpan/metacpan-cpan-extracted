@@ -1,0 +1,15 @@
+Revision history for Email-Send-SMTP-TLS
+
+0.04    2011.04.09
+        use Net::SMTP::TLS::ButMaintained instead of Net::SMTP::TLS to fix gmail issue
+
+0.03    2009.02.09
+        fix broken CPAN tests by add Email::Address in build_requires
+        (http://www.nntp.perl.org/group/perl.cpan.testers/2009/02/msg3233525.html)
+
+0.02    2007.12.3/12:02:00
+        better document
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

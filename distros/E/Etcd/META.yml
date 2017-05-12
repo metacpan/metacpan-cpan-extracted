@@ -1,0 +1,31 @@
+---
+abstract: 'Client library for etcd'
+author:
+  - 'Robert Norris <rob@eatenbyagrue.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.036, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Etcd
+requires:
+  Carp: '0'
+  HTTP::Tiny: '0.014'
+  JSON: '0'
+  Moo: '0'
+  Scalar::Util: '0'
+  Try::Tiny: '0'
+  Type::Tiny: '0'
+  Type::Utils: '0'
+  Types::Standard: '0'
+  URI::Escape: '0'
+  namespace::autoclean: '0'
+resources:
+  bugtracker: https://github.com/robn/p5-etcd/issues
+  repository: git://github.com/robn/p5-etcd.git
+version: '0.004'

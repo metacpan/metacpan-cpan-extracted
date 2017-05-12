@@ -1,0 +1,135 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with EntityModel::Array
+at lib/EntityModel/Array.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=encoding utf8
+
+=cut
+
+=head1 NAME
+
+EntityModel::Array - wrapper object for dealing with arrayrefs
+
+=head1 VERSION
+
+Version 0.016
+
+=head1 DESCRIPTION
+
+Primarily intended as an abstract interface for use with L<EntityModel> backend storage.
+
+=head1 METHODS
+
+=head2 new
+
+Instantiates with the given arrayref
+
+=head2 count
+
+Returns the number of items in the arrayref if called
+without parameters. This is the recommended usage.
+
+If passed a coderef, will call that coderef with the count,
+and return $self instead.
+
+=head2 list
+
+Returns all items from the arrayref.
+
+=head2 push
+
+Push the requested value onto the end of the arrayref.
+
+=head2 splice
+
+Support for the L<perlfunc/splice> operation.
+
+Takes an offset, length and zero or more items, splices those into the array,
+invokes the C< splice > event, then returns $self.
+
+=head2 add_watch
+
+Add a coderef to be called when the array changes.
+
+=head2 remove_watch : method
+
+Removes a watch from this array.
+
+Returns $self.
+
+=head2 shift
+
+Shift the first value out of the arrayref.
+
+=head2 pop
+
+Pops the last value from the arrayref.
+
+=head2 unshift
+
+Unshifts a value onto the start of the arrayref.
+
+=head2 join
+
+Joins the entries in the arrayref using the given value and returns as a scalar.
+
+=head2 each
+
+Perform coderef on each entry in the arrayref.
+
+=head2 first
+
+Returns the first entry in the arrayref.
+
+=head2 last
+
+Returns the last entry in the arrayref.
+
+=head2 grep
+
+Calls the coderef on each entry in the arrayref and returns the entries for which it returns true.
+
+=head2 remove
+
+Remove entries from the array.
+
+Avoid rebuilding the array in case we have weak refs, just splice out the values
+indicated.
+
+=head2 clear
+
+Empty the arrayref.
+
+=head2 arrayref
+
+Returns the arrayref directly.
+
+=head2 is_empty
+
+Returns true if there's nothing in the arrayref.
+
+=head1 SEE ALSO
+
+Use L<autobox> instead.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Mixin::Event::Dispatch>
+
+L<add_handler_for_event|Mixin::Event::Dispatch/add_handler_for_event>, L<clear_event_handlers|Mixin::Event::Dispatch/clear_event_handlers>, L<event_handlers|Mixin::Event::Dispatch/event_handlers>, L<invoke_event|Mixin::Event::Dispatch/invoke_event>, L<subscribe_to_event|Mixin::Event::Dispatch/subscribe_to_event>, L<unsubscribe_from_event|Mixin::Event::Dispatch/unsubscribe_from_event>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <cpan@entitymodel.com>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2008-2014. Licensed under the same terms as Perl itself.

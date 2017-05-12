@@ -1,0 +1,43 @@
+# Version control files and dirs.
+\bRCS\b
+\bCVS\b
+\bSCCS\b
+,v$
+\B\.svn\b
+\B\.git\b
+\B\.gitignore\b
+\b_darcs\b
+
+# Module::Build generated files and dirs.
+^Build$
+^Build\.bat$
+^_build/
+
+# Module::Install included files.
+^inc/Module/Install
+
+# Makemaker generated files and dirs.
+\bMANIFEST\.bak
+\bMakefile$
+\bblib/
+\bMakeMaker-\d
+\bpm_to_blib\.ts$
+\bpm_to_blib$
+\bblibdirs\.ts$         # 6.18 through 6.25 generated this
+
+# Temp, old and emacs backup files.
+~$
+\.old$
+\#$
+\b\.#
+\.bak$
+\.tmp$
+
+# Devel::Cover files.
+\bcover_db\b
+
+# Test::Kwalitee cache files.
+^Debian_CPANTS\.txt
+
+# Debian package control files
+^debian/

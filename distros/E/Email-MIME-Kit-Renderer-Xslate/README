@@ -1,0 +1,51 @@
+NAME
+    Email::MIME::Kit::Renderer::Xslate - render parts of your mail with
+    Text::Xslate
+
+VERSION
+    version 0.001000
+
+DESCRIPTION
+    This is a renderer plugin for Email::MIME::Kit, and renders message
+    parts using Text::Xslate. When specifying a renderer in manifest.json,
+    you might write something like this:
+
+      { ..., "renderer": "Xslate" }
+
+    Or, to supply options:
+
+      {
+        ...,
+        "renderer": [
+          "Xslate", {
+             "options": {
+                "syntax": "Kolon"
+                // etc etc
+             },
+             "encoding": "UTF-16"
+          }
+        ]
+      }
+
+    "options" are passed verbatim to "Text::Xslate->new".
+
+    "encoding" will handle convertion the generated template from characters
+    to bytes. The default is "UTF-8".
+
+    For plaintext emails a good default is
+
+        "renderer": [
+          "Xslate", {
+             "options": { "type":"text" }
+          }
+        ]
+
+AUTHOR
+    Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Arthur Axel "fREW" Schmidt.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

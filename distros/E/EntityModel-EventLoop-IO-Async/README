@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution EntityModel-EventLoop-IO-Async,
+version 0.001:
+
+  Wrapper around an IO::Async::Loop instance
+
+This software is copyright (c) 2012 by Tom Molesworth.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

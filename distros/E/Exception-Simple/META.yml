@@ -1,0 +1,32 @@
+---
+abstract: 'simple exception class'
+author:
+  - 'Mark Ellis <markellis@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::Exception: 0
+  Test::More: 0
+  parent: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.08'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Exception::Simple
+name: Exception-Simple
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  overload: 0
+  perl: 5.8.0
+resources:
+  bugtracker: https://github.com/markwellis/exception-simple/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/markwellis/exception-simple.git
+version: '1.000001'

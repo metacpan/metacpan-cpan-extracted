@@ -1,0 +1,116 @@
+=head1 NAME
+
+Event::generic - generic event handling
+
+=head1 SYNOPSIS
+
+ use Event::generic;
+
+ $source = Event::generic::Source->new;
+
+ $w = Event->generic(source => $source, ...);
+ $w = $source->watch(...);
+
+ $source = $w->source;
+ $w->source($source);
+
+ $source->event;
+ $source->event($data);
+
+ $data = $event->data;
+
+=head1 DESCRIPTION
+
+This module provides a watcher type within the C<Event> framework.
+You must understand the architecture of the C<Event> system in order to
+understand this document.
+
+This module provides a system of reified event sources and watchers
+watching those sources.  Events are generated solely by a method on the
+event source object.  The events may carry arbitrary data to the event
+handler callbacks.  This module is intended for situations where the
+events of interest are best determined by Perl code.
+
+=head1 CLASSES
+
+=over
+
+=item Event::generic::Source
+
+A reified event source.
+
+=item Event::generic
+
+A watcher that can watch C<Event::generic::Source> event sources.
+
+=item Event::Event::Dataful
+
+A (target) event that can carry arbitrary data.
+
+=back
+
+=head1 EVENT SOURCE CLASS
+
+=head2 Constructor
+
+=over
+
+=item Event::generic::Source->new
+
+Creates and returns a new event source.
+
+=back
+
+=head2 Methods
+
+=over
+
+=item $source->event
+
+=item $source->event(DATA)
+
+The invocation of this method is a source event for watchers of the
+event source.  When this method is called, each active watcher of the
+event source generates a target event.  The I<DATA>, if supplied, is
+copied into the target event objects, from which it can be retrieved
+using the C<data()> method.
+
+=item $source->watch(ATTR => VALUE, ...)
+
+Generates and returns a new watcher, configured to watch this event
+source.  The standard watcher attributes may be specified as arguments.
+The watcher returned is an ordinary C<Event::generic>, and may be
+reconfigured to watch a different event source.
+
+=back
+
+=head1 WATCHER CLASS
+
+=head2 Type-specific attributes
+
+=over
+
+=item source => $source
+
+The event source to watch.  This must be either an
+C<Event::generic::Source> object or C<undef>.  When set to C<undef>,
+no source is being watched, and the watcher cannot be started.
+
+=back
+
+=head1 EVENT CLASS
+
+=head2 Type-specific methods
+
+=over
+
+=item $event->data
+
+Returns the data associated with the event, which may be any scalar.
+This is read-only, and is set by the event source.
+
+=back
+
+=head1 SEE ALSO
+
+L<Event>

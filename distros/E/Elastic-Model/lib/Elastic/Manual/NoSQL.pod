@@ -1,0 +1,149 @@
+package Elastic::Manual::NoSQL;
+
+# ABSTRACT: Differences between relational DBs and NoSQL document stores
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Elastic::Manual::NoSQL - Differences between relational DBs and NoSQL document stores
+
+=head1 VERSION
+
+version 0.52
+
+=head1 THINK DIFFERENT
+
+Elasticsearch (and any NoSQL document store) is quite different from a
+relational database, so you need to think about information storage and
+retrieval in a different way.  Some differences are:
+
+=head2 It is not relational
+
+Elasticsearch stores individual documents/objects.  All queries look at
+each document in isolation to decide if that document matches the query, and
+is either included or excluded.  There is no way of doing real JOINs like:
+
+    SELECT * FROM post, user
+    WHERE user.name = 'John'
+      AND user.id   = post.user_id
+
+Instead you could collect all the IDs of users whose name is "John", then
+search for posts who have a matching user_id.  This approach works for some
+things, but in this case, probably wouldn't scale.
+
+(There is a pseudo relationship available in Elasticsearch, called
+"parent-child", which allows you to return parent documents based on the
+content of child documents.  This can be useful in certain circumstances.)
+
+=head2 Denormalize your data
+
+In relational databases, you try to normalize your data, so that data is not
+repeated.  But because NoSQL is not relational, you HAVE to repeat your data.
+For instance, to run a query like the above (ie
+I<Give me posts by an author whose name is "John">, you could store
+the author's name with every post object. With this data structure, you
+can just look at post objects to find the ones you are after. No joins
+necessary.
+
+This also means that if the user changes their name, you would need to update
+all of their posts with the embedded information.
+
+=head2 No transactions or locking
+
+Elasticsearch is a distributed system, which makes it very scalable. But
+introducing pessimistic concurrency control (locking) into a distributed system
+adds a single point of failure and concurrency issues.
+
+Instead, it uses optimistic concurrency control: every document has a current
+version number, which gets updated on every change.  If you try to make a change
+to an older version of a doc, you get a conflict error, and you can use the
+strategy appropriate to your context to resolve the conflict.
+
+There are no transactions either. While creating, updating or deleting a
+single document is atomic, you can't change multiple documents in one
+transaction which can be rolled back if any of the changes fails.  Your
+application logic needs to take this into account.
+
+=head2 Near real time search
+
+While CRUD (create, retrieve, update, delete) actions are real time (eg as soon
+as you have created a document, you can retrieve it again), search is NEAR
+real time.  By default, document changes become visible to search within one
+second.
+
+For example, consider a website allowing a user to create blogs posts:
+
+=over
+
+=item 1
+
+The user submits a new post
+
+=item 2
+
+We create the post in Elasticsearch, and return a list of all the user's
+posts, sorted by date.
+
+=item 3
+
+The new post is missing!
+
+=back
+
+Again, you need to design your application accordingly.  You could:
+
+=over
+
+=item *
+
+Retrieve the list of the user's posts asynchronously from the browser, and
+build in a one second delay, to ensure that the new post will be included.
+
+=item *
+
+Don't refresh the list of posts.  Instead, just add the new post to the existing
+list using Javascript
+
+=item *
+
+When querying for all posts, deliberately exclude the new post ID, then add
+it manually to the front of the list
+
+=back
+
+=head1 DON'T FEAR THE UNKNOWN
+
+These differences may sound a bit daunting, but really they are quite easy to
+manage.  It takes a little time to understand the practicalities, but once
+you do, it will all seem quite natural.
+
+The benefits that Elasticsearch brings (eg amazing full text search and
+easy scaling) makes this all worthwhile.
+
+=head1 SEE ALSO
+
+=over
+
+=item *
+
+L<Elastic::Manual>
+
+=back
+
+=head1 AUTHOR
+
+Clinton Gormley <drtech@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Clinton Gormley.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

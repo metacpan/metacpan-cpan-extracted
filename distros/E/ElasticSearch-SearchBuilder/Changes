@@ -1,0 +1,94 @@
+Revision history for ElasticSearch::SearchBuilder
+
+0.19    2013-12-14
+        Support for score_type in has_child/has_parent,
+        and constant_score query - thanks to jegade
+
+        Removed docs/ folder which made installation on Windows fail.
+
+
+0.18    2012-11-25
+        BREAKING CHANGE:
+        The and/or/not logic in queries was being merged incorrectly into
+        single bool queries with top-level "must" and "should" clauses,
+        which changed the logic slightly, eg:
+        A && B && (C||D) was interpreted as A && BB && (C || D || 1)
+
+        Changed to using Test::Deep to fix the test errors caused by the
+        change in hash randomization in perl 5.17.6
+
+0.17    2012-11-09
+        Minor correction - _top_recurse on an empty clause should return
+        undef, not an empty list, as it is called in scalar context
+
+0.16    2012-10-31
+
+        BREAKING CHANGE:
+        The 'text' queries have been renamed 'match' queries in
+        elasticsearch 0.19.9.
+
+        Added 'indices' filter
+        Added 'match' multi-field query
+        Added 'has_parent' filter/query
+        Renamed 'minimum_number_should_match' to 'minimum_should_match' in -qs
+
+0.15    2012-10-03
+        SearchBuilder was destroying the original hashrefs and arrayrefs for
+        certain clauses. Now makes copies
+
+0.14    2012-06-30
+        Added 'null_value' and 'existence' to the -missing filter and op
+        Added 'max_boost' to -custom_filters_score
+        Added 'rewrite' to -fuzzy
+        Added 'fuzzy_rewrite', 'fuzzy_max_expansions', 'lenient',
+              'quote_analyzer','quote_field_prefix' to -qs and -field
+        Added 'fuzzy_rewrite' and 'minimum_should_match' to text queries
+
+0.13    2012-03-17
+        Added support for 'execution' param to -terms filter
+
+0.12    2012-02-15
+        Fix version reported in POD
+
+0.11    2012-02-15
+        Filter/queries now accept raw query DSL as a HASH-ref-ref
+        Added -indices
+        Added -cache_key
+        Added -custom_boost
+        Added the 'type' parameter to geo_bounding_box
+        Added 'minimum_number_should_match' to query_strings
+        -type now correctly supports multiple types
+        Switched from Module::Build to EUMM
+
+0.10    2011-10-17
+        Fixed a bug in _hash_params which was disallowing a parameter of "0"
+
+0.09    2011-08-28
+        Documented geo filters
+        Aliased geo_bbox to geo_bounding_box
+        Added "normalize" and "optimize_bbox" parameters to geo filters
+        Made -cache work with and|or filters
+        Added "rewrite" parameter to query_string, prefix and wildcard queries
+        Converted to Dist::Zilla
+
+0.08    2011-08-12
+        Fixed Test::More dependency - thanks to AVAR
+
+0.07    2011-08-10
+        Added support for custom_filters_score query
+
+0.06    2011-07-19
+        Added support for nested queries and filters
+
+0.05    2011-07-03
+        Added support for named filters
+
+0.04    2011-07-02
+        Added the -all operator
+        Changed the -not filter to work with ES < 0.17
+        Added the 'analyzer' param to flt and mlt
+        Added the 'boost' param to has_child queries
+
+0.03    2011-06-30
+
+        First public release for ElasticSearch::SearchBuilder

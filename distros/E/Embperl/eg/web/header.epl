@@ -1,0 +1,68 @@
+[- 
+$r = shift ;
+$parm = join ('-.-', map { "$_-$fdat{$_}" } keys %fdat) ;
+$parm = ".-$parm-" if ($parm) ;
+-]
+<table width="100%" cellspacing="0" cellpadding="0" border="0">
+    <tr>
+        <td valign="top" rowspan=2><img src="[+ $r -> {imageuri} +]kopf-links.gif" width="206" height="97" usemap="#Map" border="0"> 
+	    <map name="Map"> 
+		<area shape="rect" coords="90,56,151,69" href="[+ do { $u = $r -> app -> languri($r, $r -> param -> uri, 'de') ; $u =~ s/(\.\w+?)$/$parm$1/; $u } +]" target="_top">
+		<area shape="rect" coords="90,70,151,82" href="[+ do { $u = $r -> app -> languri($r, $r -> param -> uri, 'en') ; $u =~ s/(\.\w+?)$/$parm$1/; $u } +]" target="_top">
+	    </map>
+        </td>
+        <td valign="top" width="30%"><img src="[+ $r -> {imageuri} +]kopf-mitte.jpg" width="100%" height="46" vspace=0></td>
+        <td valign="top"><img src="[+ $r -> {imageuri} +]kopf-rechts-[+ $r -> param -> language eq 'de'?'deutsch':'engl' +].jpg" width="568" height="46" vspace=0></td>
+    </tr>
+    <tr>
+        <td colspan=2 valign="top" align=left>
+            <table  width="100%" cellspacing="0" cellpadding="0" border="0">
+		<tr>
+                    <td align="left" valign="middle">
+                    <font size=2><b>
+			[$if @{$r -> {menuitems}} > 1 || $r -> {menuitems}[0]{menu} ne 'Home' $]
+                            <a href="[+ $r -> {baseuri} +]">Home</a>
+                            [- $i = 0 -]
+			    [$foreach $item (@{$r -> {menuitems}}) $]
+			        : <a href="[+ !$item -> {url}?$r -> {baseuri} . $item -> {relurl}:$item -> {url} +]">[+ $r -> gettext($item -> {menu}) +]</a>
+			    [$endforeach$] 
+                        [$endif$]
+                    </td>
+		    <td align="right" valign="middle">
+
+[- 
+$site = 'www.embperl.org' ;
+$site = $1 if ($ENV{HTTP_USER_AGENT} =~ /^search:(.*?)$/) ;
+-]
+
+<!-- SiteSearch Google -->
+<form method="get" action="http://www.google.de/custom" target="_top">
+<table border="0" bgcolor="#ffffff">
+<tr><td nowrap="nowrap" valign="top" align="left" height="32">
+<a href="http://www.google.com/">
+<img src="http://www.google.com/logos/Logo_25wht.gif" border="0" alt="Google" align="middle"></img></a>
+</td>
+<td nowrap="nowrap">
+<input type="hidden" name="domains" value="[+ $site +]"></input>
+<input type="text" name="q" size="31" maxlength="255" value=""></input>
+<input type="radio" name="sitesearch" value=""></input>
+<font size="-1" color="#000000">Web</font>
+<input type="radio" name="sitesearch" value="[+ $site +]" checked="checked"></input>
+<font size="-1" color="#000000">[+ $site +]</font>
+<input type="hidden" name="client" value="pub-6848064800813254"></input>
+<input type="hidden" name="forid" value="1"></input>
+<input type="hidden" name="ie" value="ISO-8859-1"></input>
+<input type="hidden" name="oe" value="ISO-8859-1"></input>
+<input type="hidden" name="cof" value="GALT:#008000;GL:1;DIV:#336699;VLC:663399;AH:center;BGC:FFFFFF;LBGC:336699;ALC:0000FF;LC:0000FF;T:000000;GFNT:0000FF;GIMP:0000FF;LH:74;LW:74;L:http://www.ecos.de/embperl/images/EmbperlLogo.gif;S:http://www.ecos.de/embperl;LP:1;FORID:1;"></input>
+<input type="hidden" name="hl" value="[+ $r -> param -> language +]"></input>
+<input type="submit" name="sa" value="[+ $r -> param -> language eq 'de'?'Suchen':'Search' +]"></input>
+</td></tr></table>
+</form>
+<!-- SiteSearch Google -->
+                   
+                    </td>
+		</tr>
+	    </table>
+        </td>
+    </tr>
+</table>

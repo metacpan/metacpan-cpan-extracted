@@ -1,0 +1,94 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with EntityModel::Query::Base
+at lib/EntityModel/Query/Base.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+EntityModel::Query::Base - base class for L<EntityModel::Query>-derived components
+
+=head1 VERSION
+
+version 0.102
+
+=head1 SYNOPSIS
+
+See L<Entitymodel::Query>.
+
+=head1 DESCRIPTION
+
+See L<Entitymodel::Query>.
+
+=head2 register
+
+Register a parse handler for the given key(s).
+
+Called from subclass ->import methods to hook into the configuration parser:
+
+ EntityModel::Query->new(
+ 	x => [ ],
+	y => [ ]
+ )
+
+will call the registered parse_x and parse_y methods to handle the two directives, unless those methods are already available on the class.
+
+=head2 can_parse
+
+If this class supports the parse_X method, or the given configuration key was registered by
+one of the subclasses, returns the appropriate parse handler.
+
+Returns undef if no handler was available.
+
+=head2 inlineSQL
+
+=head2 normaliseInlineSQL
+
+Merge adjacent plaintext sections in an inline SQL expression.
+
+This would for example convert the following:
+
+ 'select', ' ', Entity::Field, ' ', 'from', ' ', Entity::Table
+
+into:
+
+ 'select ', Entity::Field, ' from ', Entity::Table
+
+=head2 decantValue
+
+Extract a value.
+
+=head2 decantQuotedValue
+
+Extract a quoted value suitable for use in direct SQL strings.
+
+The plain-string form of SQL query is only intended for debugging and tracing; regular queries should always use the prepared statement form
+provided by L<sqlAndParameters>.
+
+=head2 sqlString
+
+=head2 sqlAndParameters
+
+=head2 asString
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<EntityModel::BaseClass>
+
+L<clone|EntityModel::BaseClass/clone>, L<dump|EntityModel::BaseClass/dump>, L<new|EntityModel::BaseClass/new>, L<sap|EntityModel::BaseClass/sap>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <cpan@entitymodel.com>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2008-2011. Licensed under the same terms as Perl itself.

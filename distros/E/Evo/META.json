@@ -1,0 +1,53 @@
+{
+   "abstract" : "Evo - the next generation development framework",
+   "author" : [
+      "alexbyk.com"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Evo",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Perl::Critic" : "1.02",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "7.24",
+            "perl" : "v5.22.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/alexbyk/perl-evo/issues"
+      },
+      "repository" : {
+         "web" : "http://github.com/alexbyk/perl-evo"
+      }
+   },
+   "version" : "0.0403",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+}
+

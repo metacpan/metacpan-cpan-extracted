@@ -1,0 +1,8 @@
+Makefile.PL
+MANIFEST
+README
+t/Email-Envelope.t
+t/mail/josey-nofold
+t/mail/josey-fold
+lib/Email/Envelope.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,33 @@
+#!/usr/bin/perl -w
+#
+# Copyright (C) 2002-2008 National Marrow Donor Program. All rights reserved.
+
+use File::Spec::Functions qw(catdir catfile);
+
+# ----------------------------------------------------------------------
+# Do nothing if specified directory already exists.
+# Otherwise, create specified directory.
+sub dirmk
+{
+    my $dirname = shift;
+    return 1 if -d $dirname;  # already exists
+    return mkdir $dirname;    # attempt to create
+}
+
+# create temporary ecs directory structure
+die "missing subdirectory 't' (is script being run from Makefile directory?)"
+    unless -d 't';
+$tmpdir = catdir('t', 'tmp');
+dirmk $tmpdir or die 'setup failed';
+dirmk catdir($tmpdir, 'tmp') or die 'setup failed';
+dirmk catdir($tmpdir, 'maildrop') or die 'setup failed';
+dirmk catdir($tmpdir, 'gnupg') or die 'setup failed';
+dirmk catdir($tmpdir, 'pgp') or die 'setup failed';
+$mboxdir = catdir($tmpdir, 'mboxes');
+dirmk $mboxdir or die 'setup failed';
+dirmk catdir($mboxdir, 'in') or die 'setup failed';
+dirmk catdir($mboxdir, 'in_fml') or die 'setup failed';
+dirmk catdir($mboxdir, 'out') or die 'setup failed';
+dirmk catdir($mboxdir, 'trash') or die 'setup failed';
+dirmk catdir($mboxdir, 'store') or die 'setup failed';
+$tmpcfg = catfile($tmpdir, 'ecs.cfg');

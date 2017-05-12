@@ -1,0 +1,27 @@
+                                        Debtors administration
+Period 2011-01-01 through 2011-12-31
+EekBoek Sample Administration                                                      EekBoek, 2011-12-31
+
+Debtor      Date        Description                   Amount       Open       Paid  Posting
+------------------------------------------------------------------------------------------------------
+ACME
+            2011-02-18  Perl Cursus                  3570.00       0.00             Sales:1
+            2011-03-18    *Perl Cursus                                     3570.00  Postbank:3
+            2011-03-18  Perl Cursus                  3570.00       0.00             Sales:2
+            2011-04-12    *Perl Cursus                                     3570.00  Postbank:4
+            2011-04-18  Perl Cursus                   595.00       0.00             Sales:3
+            2011-05-31    *Perl Cursus                                      595.00  Postbank:5
+            2011-05-14  Ondersteuning                 714.00       0.00             Sales:4
+            2011-06-08    *Ondersteuning                                    714.00  Postbank:6
+            2011-07-16  Ondersteuning                 714.00       0.00             Sales:5
+            2011-08-10    *Ondersteuning                                    714.00  Postbank:8
+                                                   ---------  ---------
+ACME                    Total                        9163.00       0.00
+
+ORA
+            2011-08-19  Pocket Reference             1000.00       0.00             Sales:6
+            2011-08-19    *Pocket Reference                                1000.00  Postbank:8
+                                                   ---------  ---------
+ORA                     Total                        1000.00       0.00
+------------------------------------------------------------------------------------------------------
+Total                                               10163.00       0.00

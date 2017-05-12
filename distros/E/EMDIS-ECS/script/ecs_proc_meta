@@ -1,0 +1,277 @@
+#!/usr/bin/perl -w
+#
+# Copyright (C) 2002-2016 National Marrow Donor Program. All rights reserved.
+#
+# For a description of this program, please refer to the POD documentation
+# embedded at the bottom of the file (e.g. perldoc ecs_proc_meta).
+
+use EMDIS::ECS qw($ECS_CFG $ECS_NODE_TBL load_ecs_config log_info
+           move_to_dir format_msg_filename send_ecsmsg_email send_admin_email);
+use EMDIS::ECS::FileBackedMessage;
+use EMDIS::ECS::Message;
+use Getopt::Long;
+use strict;
+use vars qw($err $filename $message_content $msg $msg_type $node $sender);
+use Pod::Usage;
+use File::Basename;
+
+# redirect STDERR to STDOUT
+open STDERR, ">&STDOUT" or die "Unable to dup STDOUT: $!\n";
+select STDERR; $| = 1;   # make unbuffered
+select STDOUT; $| = 1;   # make unbuffered
+
+# process command line arguments
+my $prg = basename $0;
+my $usage = "Usage:  $prg [--config ecs_cfg] <filename> <sender>\n" .
+            "For help, start $prg with the option -help\n";
+my $opt_config = 'ecs.cfg';
+my $opt_help = 0;
+
+GetOptions('config=s' => \$opt_config, 'help' => \$opt_help)
+    or die "Error:  unrecognized command line option.\n$usage";
+
+pod2usage(-verbose=>2) if $opt_help;
+
+die "Invalid number of command line arguments.\n$usage"
+    if $#ARGV != 1;
+
+($filename,$sender) = @ARGV;
+print "filename: $filename\nsender:   $sender\n";
+
+# initialize
+$err = load_ecs_config($opt_config);
+die "ecs_proc_meta: $err\nUnable to initialize ECS.\n" if $err;
+
+# read node info from node_tbl
+$ECS_NODE_TBL->lock()     # lock node_tbl
+    or die "ecs_proc_meta: unable to lock node_tbl: " .
+    $ECS_NODE_TBL->ERROR . "\n";
+$node = $ECS_NODE_TBL->read($sender);
+$err = $ECS_NODE_TBL->ERROR;
+$ECS_NODE_TBL->unlock();  # unlock node_tbl
+if($err or not $node) {
+    my $err2 = move_to_dir($filename, $ECS_CFG->ECS_MBX_TRASH_DIR);
+    warn "ecs_proc_meta: $err\n" if $err2;
+    die "ecs_proc_meta: unable to read node $sender from node_tbl: $err\n"
+        if $err;
+    die "ecs_proc_meta: node not found: $sender\n";
+}
+
+# read message from file
+if($node->{encr_meta} !~ /true/i) {
+    # non-encrypted message expected
+    $msg = EMDIS::ECS::Message::read_from_file($filename);
+    $message_content = $msg->body if ref $msg;
+}
+else {
+    # encrypted message expected
+    $msg = EMDIS::ECS::Message::read_from_encrypted_file($filename);
+    $message_content = $msg->cleartext if ref $msg;
+}
+die "ecs_proc_meta: $msg\n"
+    unless ref $msg;
+die "ecs_proc_meta: file does not contain a meta-message: $filename\n"
+    unless $msg->is_meta_message;
+
+# parse msg_type from message body
+$msg_type = '';
+if($message_content =~ /msg_type\s*=\s*(\S+)/i) {
+    $msg_type = $1;
+}
+
+# READY
+if($msg_type =~ /READY/i)
+{
+    $ECS_NODE_TBL->lock()     # lock node_tbl
+        or die "ecs_proc_meta: unable to lock node_tbl: " .
+            $ECS_NODE_TBL->ERROR . "\n";
+    $node = $ECS_NODE_TBL->read($sender);
+    if($node)
+    {
+        $node->{last_in} = time;
+        $ECS_NODE_TBL->write($sender, $node);
+    }
+    $ECS_NODE_TBL->unlock();  # unlock node_tbl
+    if(not $node)
+    {
+        $err = move_to_dir($filename, $ECS_CFG->ECS_MBX_TRASH_DIR);
+        warn "ecs_proc_meta: $err\n" if $err;
+        die "ecs_proc_meta: node not found: $sender\n";
+    }
+    unlink $filename;   # remove input file after successful processing
+    exit 0;  # successful
+}
+
+# RE_SEND
+if($msg_type =~ /RE_SEND/i)
+{
+    # get seq_num (and part_num, if specified)
+    my $seq_num = '';
+    my $part_num = '';
+    if($message_content =~ /seq_num\s*=\s*(\d+):(\d+)/i)
+    {
+        $seq_num = $1;
+        $part_num = $2;
+    }
+    if($message_content =~ /seq_num\s*=\s*(\d+)/i)
+    {
+        $seq_num = $1;
+    }
+    else
+    {
+        die "ecs_proc_meta: seq_num not specified in RE_SEND message: " .
+            "$filename\n";
+    }
+    # look up email address of sender
+    $ECS_NODE_TBL->lock()     # lock node_tbl
+        or die "ecs_proc_meta: unable to lock node_tbl: " .
+            $ECS_NODE_TBL->ERROR . "\n";
+    $node = $ECS_NODE_TBL->read($sender);
+    if($node)
+    {
+        $node->{last_in} = time;
+        $ECS_NODE_TBL->write($sender, $node);
+    }
+    $ECS_NODE_TBL->unlock();  # unlock node_tbl
+    if(not $node)
+    {
+        $err = move_to_dir($filename, $ECS_CFG->ECS_MBX_TRASH_DIR);
+        warn "ecs_proc_meta: $err\n" if $err;
+        die "ecs_proc_meta: node not found: $sender\n";
+    }
+    # check whether $seq_num > $node->{out_seq}
+    if($seq_num > $node->{out_seq})
+    {
+        die "ecs_proc_meta: node requested RE_SEND of unsent message " .
+            "($sender,$seq_num)\n";
+    }
+    # look in out_box for requested message
+    my $msg_filename = format_msg_filename($sender,$seq_num);
+    die "ecs_proc_meta: requested FML message file not found: $msg_filename\n"
+        unless -e $msg_filename;
+    # resend the message
+    my $msg = new EMDIS::ECS::FileBackedMessage($msg_filename);
+    die "ecs_proc_meta: unable to load FML message from file $msg_filename: " .
+        "$msg\n"
+        unless ref $msg;
+    die "ecs_proc_meta: found unexpected seq_num " . $msg->seq_num .
+        ", expected $seq_num\n"
+        unless $msg->seq_num == $seq_num;
+    $err = $msg->send_via_email($sender, 1, $part_num);
+
+    if ($err){
+      send_admin_email("An error occurred while trying to resend ecs msg!" , 
+                       " Email from $sender with sequence number $seq_num " ,
+                       ($part_num ? "(part_num $part_num) " : '') .
+                       "could not be resend." );
+      die "ecs_proc_meta: error sending email: $err\n"
+    }
+    unlink $filename;   # remove input file after successful processing
+    log_info("\nFinished processing $sender RE_SEND request $seq_num" .
+             ($part_num ? ":$part_num" : '') . "\n");
+    exit 0;  # successful
+}
+
+# MSG_ACK
+if($msg_type =~ /MSG_ACK/i)
+{
+    my $ack_seq = '';
+    if($message_content =~ /seq_num\s*=\s*(\d+)/i)
+    {
+        $ack_seq = $1;
+    }
+    else
+    {
+        die "ecs_proc_meta: seq_num not specified in MSG_ACK message: " .
+            "$filename\n";
+    }
+    $ECS_NODE_TBL->lock()     # lock node_tbl
+        or die "ecs_proc_meta: unable to lock node_tbl: " .
+            $ECS_NODE_TBL->ERROR . "\n";
+    $node = $ECS_NODE_TBL->read($sender);
+    if($node)
+    {
+        if($node->{ack_seq} < $ack_seq and $ack_seq <= $node->{out_seq})
+        {
+            $node->{ack_seq} = $ack_seq;
+        }
+        $node->{last_in} = time;
+        $ECS_NODE_TBL->write($sender, $node);
+    }
+    $ECS_NODE_TBL->unlock();  # unlock node_tbl
+    if(not $node)
+    {
+        $err = move_to_dir($filename, $ECS_CFG->ECS_MBX_TRASH_DIR);
+        warn "ecs_proc_meta: $err\n" if $err;
+        die "ecs_proc_meta: node not found: $sender\n";
+    }
+    if($ack_seq > $node->{out_seq})
+    {
+        die "ecs_proc_meta: node acknowledged unsent message " .
+            "($sender,$ack_seq)\n";
+    }
+    unlink $filename;   # remove input file after successful processing
+    exit 0;  # successful
+}
+
+die "ecs_proc_meta: unrecognized msg_type: '$msg_type'\n";
+
+__END__
+
+# embedded POD documentation
+# for more info:  man perlpod
+
+=head1 NAME
+
+ecs_proc_meta - process ECS meta-message
+
+=head1 SYNOPSIS
+
+ ecs_proc_meta tmp/20030320_183247_1_0005_FYUh.msg FR
+
+=head1 DESCRIPTION
+
+Process file containing ECS meta-message;  delete input file after
+successful processing.
+
+=head1 RETURN VALUE
+
+Returns a non-zero exit code if an error is encountered.
+
+=head1 BUGS
+
+Possibly.
+
+=head1 SEE ALSO
+
+EMDIS::ECS, ecs_scan_mail, ecs_proc_msg
+
+=head1 AUTHOR
+
+Joel Schneider <jschneid@nmdp.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED 
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF 
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+Copyright (C) 2002-2016 National Marrow Donor Program. All rights reserved.
+
+See LICENSE file for license details.
+
+=head1 HISTORY
+
+ECS, the EMDIS Communication System, was originally designed and
+implemented by the ZKRD (http://www.zkrd.de/).  This Perl implementation
+of ECS was developed by the National Marrow Donor Program
+(http://www.marrow.org/).
+
+Added MS Windows support for Windows 2000 and Windows XP
+Added "DIRECTORY" inBox Protocol. This can interface with any mail
+system that can output the new messages to text files.
+
+2007-08-01
+ZKRD - emdisadm@zkrd.de
+Added new error report management. All 'email to admin' statements are removed.
+In relation to the error code ECS.pm will send an email to admin or not.

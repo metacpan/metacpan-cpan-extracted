@@ -1,0 +1,417 @@
+<html>
+<head>
+<title>IF Metacommand in Embperl</title>
+</head>
+
+<body>
+
+[- $a = 1; $b = 0; $c = 5; $d = 'txt' -]
+
+a1
+[$if $a$]
+    a <br>
+[$ endif$]
+
+a2
+[$if $a $]
+    a <br>
+[$else$]
+    not a<br>
+[$ endif $]
+
+a3
+[$if $a<br> $]
+    a <br>
+[$else<br>$]
+    not a<br>
+[$ endif <br>$]
+
+a4
+[#
+[$<br>if $a $]
+    a <br>
+[$ <br> else<br>$]
+    not a<br>
+[$ <br>endif $]
+#]
+a5
+[$ if $a$]
+    a <br>
+    [$if $b == 0$]
+        b is null <br>
+    [$else$]    
+        b is not null <br>
+    [$endif$]
+[$ else$]
+    not a<br>
+[$ endif $]
+
+
+[$ if $a$]
+    a <br>
+    [$if $b == 0$]
+        b is null <br>
+    [$else$]    
+        b is not null <br>
+    [$endif$]
+[$ else$]
+    not a<br>
+    [$if $b == 0$]
+        b is null <br>
+    [$else$]    
+        b is not null <br>
+    [$endif$]
+[$ endif $]
+
+
+[$ if !$a$]
+    not a <br>
+    [$if $b == 0$]
+        b is null <br>
+    [$else$]    
+        b is not null <br>
+    [$endif$]
+[$ else$]
+    a<br>
+    [$if $b == 0$]
+        b is null <br>
+    [$else$]    
+        b is not null <br>
+    [$endif$]
+[$ endif $]
+
+
+[$ if $a$]
+    a <br>
+    [$if $b == 0$]
+        b is null <br>
+    [$elsif $c == 5 $]
+        b is not null and c is 5 <br>
+    [$elsif $d eq 'txt'$]
+        b is not null and c is not 5, but d is 'txt' <br>
+    [$else$]    
+        b is not null and c is not 5 and d is not 'txt' <br>
+    [$endif$]
+[$ else$]
+    not a<br>
+[$ endif $]
+
+
+[$ if $a$]
+    a <br>
+    [$if $b == 0$]
+        b is null <br>
+    [$elsif $c == 5 $]
+        b is not null and c is 5 <br>
+    [$elsif $d eq 'txt'$]
+        b is not null and c is not 5, but d is 'txt' <br>
+    [$else$]    
+        b is not null and c is not 5 and d is not 'txt' <br>
+    [$endif$]
+[$ else$]
+    not a<br>
+    [$if $b == 0$]
+        b is null <br>
+    [$elsif $c == 5 $]
+        b is not null and c is 5 <br>
+    [$elsif $d eq 'txt'$]
+        b is not null and c is not 5, but d is 'txt' <br>
+    [$else$]    
+        b is not null and c is not 5 and d is not 'txt' <br>
+    [$endif$]
+[$ endif $]
+
+
+[$ if $a == 0 $]
+    a is null <br>
+    [$if $b != 0$]
+        b not is null <br>
+    [$elsif $c == 5 $]
+        b is null and c is 5 <br>
+    [$elsif $d eq 'txt'$]
+        b is null and c is not 5, but d is 'txt' <br>
+    [$else$]    
+        b is null and c is not 5 and d is not 'txt' <br>
+    [$endif$]
+[$ else$]
+    a is not null <br>
+    [$if $b != 0$]
+        b is not null <br>
+    [$elsif $c == 5 $]
+        b is null and c is 5 <br>
+    [$elsif $d eq 'txt'$]
+        b is null and c is not 5, but d is 'txt' <br>
+    [$else$]    
+        b is null and c is not 5 and d is not 'txt' <br>
+    [$endif$]
+[$ endif $]
+
+
+[$ if $a == 0 $]
+    a is null <br>
+    [$if $b != 0$]
+        b not is null <br>
+    [$elsif $c == 5 $]
+        b is null and c is 5 <br>
+    [$elsif $d eq 'txt'$]
+        b is null and c is not 5, but d is 'txt' <br>
+    [$else$]    
+        b is null and c is not 5 and d is not 'txt' <br>
+    [$endif$]
+[$ else$]
+    a is not null <br>
+    [$if $b != 0$]
+        b is not null <br>
+    [$elsif $c != 5 $]
+        b is null and c is not 5 <br>
+    [$elsif $d ne 'txt'$]
+        b is null and c is not 5, but d is not 'txt' <br>
+    [$else$]    
+        b is null and c is 5 and d is 'txt' <br>
+    [$endif$]
+[$ endif $]
+
+
+
+[$ if $a == 0 $]
+    a is null <br>
+    [$if $b != 0$]
+        b not is null <br>
+    [$elsif $c == 5 $]
+        b is null and c is 5 <br>
+    [$elsif $d eq 'txt'$]
+        b is null and c is not 5, but d is 'txt' <br>
+    [$else$]    
+        b is null and c is not 5 and d is not 'txt' <br>
+    [$endif$]
+[$ else$]
+    a is not null <br>
+    [$if $b != 0$]
+        b is not null <br>
+    [$elsif $c != 5 $]
+        b is null and c is not 5 <br>
+    [$elsif $d ne 'txt'$]
+        b is null and c is not 5, but d is not 'txt' <br>
+    [$else$]    
+        b is null and c is 5 and d is 'txt' <br>
+        [$if $b != 0$]
+            b is not null <br>
+        [$elsif $c != 5 $]
+            b is null and c is not 5 <br>
+        [$elsif $d eq 'txt'$]
+            b is null and c is not 5, but d is 'txt' <br>
+            [$if $d eq 'txt'$]
+                If we get to here it looks good with the tests <br>
+            [$else$]
+                No not go to here, something is wrong! <br>
+            [$endif$]
+            
+        [$else$]    
+            b is null and c is 5 and d is 'txt' <br>
+        [$endif$]
+    [$endif$]
+[$ endif $]
+
+
+
+
+[$ if $a == 0 $]
+    a is null <br>
+    [$if $b != 0$]
+        b not is null <br>
+    [$elsif $c == 5 $]
+        b is null and c is 5 <br>
+    [$elsif $d eq 'txt'$]
+        b is null and c is not 5, but d is 'txt' <br>
+    [$else$]    
+        b is null and c is not 5 and d is not 'txt' <br>
+    [$endif$]
+[$ else$]
+    a is not null <br>
+    [$if $b != 0$]
+        b is not null <br>
+        [$if $d eq 'txt'$]
+            No not go to here, something is wrong! (a) <br>
+        [$else$]
+            No not go to here, something is wrong! (b) <br>
+        [$endif$]
+    [$elsif $c != 5 $]
+        b is null and c is not 5 <br>
+        [$if $d eq 'txt'$]
+            No not go to here, something is wrong! (a) <br>
+        [$else$]
+            No not go to here, something is wrong! (b) <br>
+        [$endif$]
+    [$elsif $d ne 'txt'$]
+        b is null and c is not 5, but d is not 'txt' <br>
+        [$if $d eq 'txt'$]
+            No not go to here, something is wrong! (a) <br>
+        [$else$]
+            No not go to here, something is wrong! (b) <br>
+        [$endif$]
+    [$else$]    
+        b is null and c is 5 and d is 'txt' <br>
+        [$if $b != 0$]
+            b is not null <br>
+            [$if $d eq 'txt'$]
+                No not go to here, something is wrong! (a) <br>
+            [$else$]
+                No not go to here, something is wrong! (b) <br>
+            [$endif$]
+        [$elsif $c != 5 $]
+            b is null and c is not 5 <br>
+            [$if $d eq 'txt'$]
+                No not go to here, something is wrong! (a) <br>
+            [$else$]
+                No not go to here, something is wrong! (b) <br>
+            [$endif$]
+        [$elsif $d eq 'txt'$]
+            b is null and c is not 5, but d is 'txt' <br>
+            [$if $d eq 'txt'$]
+                If we get to here it looks good with the tests <br>
+            [$else$]
+                No not go to here, something is wrong! <br>
+            [$endif$]
+            
+        [$else$]    
+            b is null and c is 5 and d is 'txt' <br>
+            [$if $d eq 'txt'$]
+                No not go to here, something is wrong! (a) <br>
+            [$else$]
+                No not go to here, something is wrong! (b) <br>
+            [$endif$]
+        [$endif$]
+    [$endif$]
+[$ endif $]
+
+
+
+[- $ttrue = 'true'; $tfalse = '' -]
+
+[$if $ttrue $]
+ttrue = true
+[$else$]
+ttrue = false
+[$endif$]
+
+[$if $tfalse $]
+tfalse = true
+[$else$]
+tfalse = false
+[$endif$]
+
+The following HTML tags schould be ignored by Embperl
+
+<if 0>
+
+Ignored, ok!
+
+<else>
+
+Not ignored, ERROR!
+
+<endif> 
+
+
+
+<TABLE WIDTH="530" BORDER="0">
+ <TR>
+  <TD ALIGN="LEFT">
+   [$ if ($badge eq "iit") $]
+	<A HREF="/iit/">
+   [$ else $]
+	<A HREF="/">
+   [$ endif $]
+  <IMG SRC="[$ if (($server_type eq "iii.co.uk")) $]/i/www.[+ $server_type +]/[+ $badge || "iiilogo_narrow" +].gif[$ else $]/icons/[+ $badge || "iiilogo_narrow" +].gif[$ endif $]"
+  WIDTH="[+ $icon_width +]" HEIGHT="[+ $icon_height +]" BORDER="0" 
+   [$ if ($badge eq "iit") $]
+	ALT="iit logo"
+   [$ else $]
+	ALT="iii logo"
+   [$ endif $]
+   [$ if (($badge eq "iit") && ($badge ne $cookie_badge) && !$cookie_to) $]
+        onload="window.open('/iit/welcometoiit.epl','dis','status=no,scrollbars=no,resizable=yes,width=390,height=410,screenX=50,screenY=50,top=50,left=50'); return false"
+   [$ elsif (($badge eq "") && ($cookie_badge eq "iit") && !$cookie_from) $]
+        onload="window.open('/iit/leavingiit.epl','dis','status=no,scrollbars=no,resizable=yes,width=370,height=320,screenX=100,screenY=100,top=100,left=100'); return false"
+   [$ endif $] qqq >
+
+  </TD>
+</TR>
+</TABLE>
+
+[- $cookie_badge = "iit" ; 
+   $server_type = "iii.co.uk" ; 
+   $icon_width = 1 ; 
+   $icon_height=2; -]
+<TABLE WIDTH="530" BORDER="0">
+ <TR>
+  <TD ALIGN="LEFT">
+   [$ if ($badge eq "iit") $]
+	<A HREF="/iit/">
+   [$ else $]
+	<A HREF="/">
+   [$ endif $]
+  <IMG SRC="[$ if (($server_type eq "iii.co.uk")) $]/i/www.[+ $server_type +]/[+ $badge || "iiilogo_narrow" +].gif[$ else $]/icons/[+ $badge || "iiilogo_narrow" +].gif[$ endif $]"
+  WIDTH="[+ $icon_width +]" HEIGHT="[+ $icon_height +]" BORDER="0" 
+   [$ if ($badge eq "iit") $]
+	ALT="iit logo"
+   [$ else $]
+	ALT="iii logo"
+   [$ endif $]
+   [$ if (($badge eq "iit") && ($badge ne $cookie_badge) && !$cookie_to) $]
+        onload="window.open('/iit/welcometoiit.epl','dis','status=no,scrollbars=no,resizable=yes,width=390,height=410,screenX=50,screenY=50,top=50,left=50'); return false"
+   [$ elsif (($badge eq "") && ($cookie_badge eq "iit") && !$cookie_from) $]
+        onload="window.open('/iit/leavingiit.epl','dis','status=no,scrollbars=no,resizable=yes,width=370,height=320,screenX=100,screenY=100,top=100,left=100'); return false"
+   [$ endif $]>
+
+  </TD>
+</TR>
+</TABLE>
+
+
+[- $icon_width = 5 ; $icon_height=10; -]
+
+<IMG 
+[$ if (($server_type eq "iii")) $]
+SRC="/i/www.[+ $server_type +]/[+ $badge || "iiilogo_narrow_if" +].gif" WIDTH="[+ $icon_width +]" HEIGHT="[+ $icon_height +]" BORDER="0"
+[$ else $]
+SRC="/icons/[+ $badge || "iiilogo_narrow_else" +].gif" WIDTH="[+ $icon_width +]" HEIGHT="[+ $icon_height +]" BORDER="0" 
+[$ endif $]
+[$ if ($badge eq "iit") $]
+	ALT="iit logo"
+[$ else $]
+	ALT="iii logo"
+[$ endif $]>
+
+[- $icon_width = 6 ; $icon_height=11; $server_type="iii" ; $badge = "iit" -]
+
+<IMG 
+[$ if (($server_type eq "iii")) $]
+SRC="/i/www.[+ $server_type +]/[+ $badge || "iiilogo_narrow_if" +].gif" WIDTH="[+ $icon_width +]" HEIGHT="[+ $icon_height +]" BORDER="0"
+[$ else $]
+SRC="/icons/[+ $badge || "iiilogo_narrow_else" +].gif" WIDTH="[+ $icon_width +]" HEIGHT="[+ $icon_height +]" BORDER="0" 
+[$ endif $]
+[$ if ($badge eq "iit") $]
+	ALT="iit logo"
+[$ else $]
+	ALT="iii logo"
+[$ endif $]>
+
+<IMG 
+[$ if (($server_type eq "iii")) $]
+SRC="/i/www.[+ $server_type +]/[+ $badge || "iiilogo_narrow_if" +].gif" WIDTH="[+ $icon_width +]" HEIGHT="[+ $icon_height +]" BORDER="0"
+[$ else $]
+SRC="/icons/[+ $badge || "iiilogo_narrow_else" +].gif" WIDTH="[+ $icon_width +]" HEIGHT="[+ $icon_height +]" BORDER="0" 
+[$ endif $]
+[$ if ($badge eq "iit") $]
+	ALT="iit logo"
+[$ else $]
+	ALT="iii logo"
+[$ endif $]
+qqq>
+
+
+
+</body>
+</html>
+

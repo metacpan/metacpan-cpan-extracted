@@ -1,0 +1,13 @@
+---
+Testproject:
+  source   :
+    type         : ReneePC
+    path         : C:\Documents and Settings\C5104339\My Documents\Perl\dev\deploy_pro
+  target   :
+    type         : CPAN
+    user         : web_user
+    password     : secret_pass
+    test         : t/*.t
+    on_fail      : warn
+    unlink_distro: 1
+    upload       : 1

@@ -1,0 +1,6 @@
+Revision history for Perl extension Event::SlidingWindow.
+
+0.01  Fri Feb 13 11:03:36 2004
+	- original version; created by h2xs 1.22 with options
+		-AX Event::SlidingWindow
+

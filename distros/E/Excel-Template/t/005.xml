@@ -1,0 +1,39 @@
+<workbook>
+  <bold />
+  <hidden />
+  <italic />
+  <locked />
+  <outline />
+  <shadow />
+  <strikeout />
+
+  <format font_outline="1" />
+  <format shrink="1" />
+  <format text_wrap="1" />
+  <format text_justlast="1" />
+  <format size="3" />
+  <format num_format="3" />
+  <format underline="3" />
+  <format rotation="3" />
+  <format indent="3" />
+  <format pattern="3" />
+  <format border="3" />
+  <format bottom="3" />
+  <format top="3" />
+  <format left="3" />
+  <format right="3" />
+  <format font="3" />
+  <format color="3" />
+  <format align="3" />
+  <format valign="3" />
+  <format bg_color="3" />
+  <format fg_color="3" />
+  <format border_color="3" />
+  <format bottom_color="3" />
+  <format top_color="3" />
+  <format left_color="3" />
+  <format right_color="3" />
+
+
+  <bold><italic><hidden /></italic></bold>
+</workbook>

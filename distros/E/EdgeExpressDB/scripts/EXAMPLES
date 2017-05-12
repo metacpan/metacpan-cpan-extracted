@@ -1,0 +1,3 @@
+eedb_mirror_source.pl -url "mysql://read:read@osc-mysql.gsc.riken.jp/eeDB_core" -url2 "mysql://severin:<pass>@osc-mysql.gsc.riken.jp/eeDB_fantom3" -fsrc mm9_cytobands -store
+
+

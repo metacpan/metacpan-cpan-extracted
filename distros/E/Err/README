@@ -1,0 +1,252 @@
+NAME
+    Err - Easily declare, throw and match exception objects
+
+SYNOPSIS
+      use Err qw(declare_err throw_err is_err);
+
+      ### create a bunch of exception classes ###
+
+      # this makes Err::Exception::Starship, subclass of Err::Exception
+      # (which itself is a subclass of Exception::Class::Basee)
+      declare_err ".Starship"
+        description => "The space ship is broken.";
+
+      # this makes Err::Exception::Starship::WarpDrive
+      # subclass of Err::Exception::Starship
+      declare_err ".Starship.WarpDrive"
+        description => "The warp drive is broken.  We can't go FTL.";
+
+      ### throw and catch errors ###
+
+      use Try::Tiny;
+      try {
+        throw_err ".Starship.WarpDrive", "Have ejected warp core!"
+          if $have_ejected_the_warp_core;
+        go_to_warp_speed();
+      } catch {
+        if (is_err ".Starship") {
+          call_scotty(); return
+        }
+        die $_;
+      }
+
+DESCRIPTION
+    WARNING: This is an alpha release and the interface and functionailty
+    may change without notice in future releases. A non-alpha 1.0 release
+    will be released to the CPAN on or before August 1st, 2012.
+
+    The module allows you to easily declare, throw and match exceptions.
+    It's further syntatic sugar for Exception::Class. It doesn't provide a
+    try/catch syntax but instead is designed to work well with plain old
+    evals, Try::Tiny, TryCatch, etc.
+
+  Functions
+    These module exports functions on demand, or you can call them fully
+    qualified.
+
+    declare_err EXCEPTION_CODE, @optinal_args
+        Easy declarative syntax for defining exception class. EXCEPTION_CODE
+        must be a literal quoted string. See "Declaring Exceptions" below
+        for more details.
+
+    throw_err EXCEPTION_CODE, $message, @optional_args
+        Throws the exception with the attached message. EXCEPTION_CODE must
+        be a literal quoted string. See "Throwing Exceptions" below for more
+        details.
+
+    is_err EXCEPTION_CODE
+    ex_is_err EXCEPTION_CODE
+        Functions to examine $_ and $@ respectively for exception objects.
+        EXCEPTION_CODE must be a literal quoted string. See "Matching
+        Exceptions" below for more details.
+
+  Understanding Exception Codes
+    An exception code is a brief form of the exception classname. They're
+    provided as a way to visually distinguish exception classes from your
+    normal class hierarchy.
+
+    The rules to compute a class name from an exception code are blindingly
+    simple:
+
+    Replace any leading dot with "Err::Exception::"
+    Replace any other dot with "::"
+
+    For example, the code ".Starship" refers to the
+    "Err::Exception::Starship" class. The "Err::Exception::Aliens::Klingons"
+    class has the code "Aliens.Klingons". The "Something.Else" code (no
+    leading dot) refers to the "Something::Else".
+
+    As a special case the code "" refers to anything that is a subclass of
+    "Exception::Class::Base" itself, and "." refers to anything that is a
+    subclass of "Err::Exception".
+
+    If you don't like the exception code syntax you should note that under
+    the above rules any valid class name will function as a valid exception
+    code. (so for example the exception code "Foo::Bar" is the identical
+    class name "Foo::Bar".)
+
+  Declaring Exceptions
+    Exceptions are declared with the "declare_err" syntax.
+
+    In the simpliest form
+
+    isa => $exception_code
+        Explicitly set the superclass of the exception by passing in the
+        exception code of the parent class. This isn't often needed, since
+        by default "declare_err" will simply set the class to be the natural
+        parent of the class (the class that's derived from removing the last
+        ::Whatever from the classname or, if the exception's classname is
+        singular, Err::Exception.)
+
+    description => $description
+        Set the description of this class to give a human readable
+        description of this error that is applicable to all exceptions
+        thrown of this class.
+
+    anything_else => $some_value
+        This becomes a new field in your exception object and provides a
+        *default value* that "throw_err" will populate the exception with
+        when exceptions are thrown.
+
+    So, writing:
+
+       declare_err ".Foo.Bar.Baz";
+
+    Is the same as writing
+
+       use Exception::Class {
+          "Err::Exception::Foo::Bar::Baz" => {
+             isa => "Err::Exception::Foo::Bar",
+          },
+       }
+
+    And
+
+       declare_err ".Foo.Bar.Buzz";
+          isa => ".Onomatopoeia",
+          description => "*Bzzz* that's wrong",
+          volume => 11;
+
+    Is almost the same as writing
+
+       use Exception::Class {
+          "Err::Exception::Foo::Bar::Buzz" => {
+             isa => "Err::Exception::Onomatopoeia",
+             fields => ["volume"]
+          },
+       }
+
+    And then remembering always to do
+
+       Err::Exception::Foo::Bar::Buzz->throw( volume => 11 );
+
+    When you throw it if you don't have an alternative volume to pass in.
+
+  Throwing Exceptions
+    Exceptions can be thrown with the "throw_err" keyword. This keyword
+    takes the code for the exception followed by an error message as it's
+    arguments, and essentially constructs a new instance of the exception
+    and then throws it. In other words:
+
+      throw_err ".Starship", "Self destruct sequence activated!";
+
+    Is the the same as:
+
+      Err::Exception::Starship->throw(
+        message => "Self destruct sequence activated "
+      );
+
+    You can also pass other name value pairs after the message, that will be
+    passed through to the
+
+      throw_err ".Foo.Bar.Buzz", "Time's up", volume => 4;
+
+    These will be passed to Exception::Class::Base's throw method, meaning
+    the above is the same as:
+
+      Err::Exception::Foo::Bar::Buzz->throw(
+        message => "Time's up",
+        volume => 4,
+      );
+
+  Match Exceptions
+    The "is_err" and "ex_is_err" can be used to check if $_ or $@ contain
+    exceptions.
+
+    With plain old eval:
+
+      eval {
+        throw ".Starship.Holodeck", "Morarity has become sentient!";
+      };
+      if (ex_is_err(".Starship.Holodeck")) {
+        get_picard_to_reason_with_him();
+      } elsif ($@) { die }
+
+    With Try::Tiny
+
+      try {
+        throw ".Starship.Holodeck", "Morarity has become sentient!";
+      } catch {
+          if (is_err(".Starship.Holodeck")) {
+            get_picard_to_reason_with_him();
+            return;
+          }
+          die $_;
+      };
+
+    With TryCatch
+
+      try {
+        throw ".Starship.Holodeck", "Morarity has become sentient!";
+      } catch ($e where { is_err(".StarShip.Holodeck") }) {
+        get_picard_to_reason_with_him();
+      }
+
+  Enforced Declaring of Exceptions Before Use
+    If you have the B::CallChecker module installed (and I highly recommend
+    you do) this module will check at compile time that the exceptions you
+    throw and match with "throw_err", "is_err" and "ex_is_err" have been
+    declared first. If you have not declared your exception class in at the
+    point in your code where it's used Perl will not compile your class.
+
+    For those of you that are interested, this is achieved by hooking the
+    CHECK routine for these functions (and, for that matter "declare_err"
+    too) and interspecing the OP tree to extract the first argument to them
+    so we can check if it's been declared first. But you don't need to know
+    that to use this module - it's all magic.
+
+    If you don't have B::CallChecker installed you lose this checking
+    functionality but your exception classes will otherwise remain fully
+    functional.
+
+AUTHOR
+    Written by Mark Fowler <mark@twoshortplanks.com>
+
+COPYRIGHT
+    Copyright OmniTI 2012. All Rights Rerserved.
+
+    Copyright Mark Fowler 2012. All Rights Rerserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+BUGS
+    None known. This module has a 100% test coverage (branch, statement and
+    pod.)
+
+    Bugs (or feature requests) should be reported via this distribution's
+    CPAN RT queue. This can be found at
+    <https://rt.cpan.org/Dist/Display.html?Err>
+
+    You can also address issues by forking this distribution on github and
+    sending pull requests. It can be found at
+    <http://github.com/2shortplanks/Err>
+
+SEE ALSO
+    Exception::Class - syntax for declaring, throwing and matching
+    Err::Exception objects.
+
+    Try::Tiny - simple improved try/catch syntax with little dependancies
+
+    TryCatch - powerful dependancy heavy improved try/catch syntax
+

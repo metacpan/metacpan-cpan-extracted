@@ -1,0 +1,35 @@
+ExportAbove version 0.02
+========================
+
+ExportAbove is a helper module for Exporter.
+
+ExportAbove sets your module's subroutine or variable (scalar, array or hash) 
+names into @EXPORT, @EXPORT_OK or %EXPORT_TAGS automatically. You do not have 
+to write '@EXPORT = qw(...);' and so on. Instead write 'use ExportAbove;' 
+below the subroutine or variable definitions you want to export. 
+
+You do not have to write same subroutine or variable names twice at 
+'@EXPORT = qw(...);' and its definition. It makes module maintenance easy. 
+If you want to change an exported names, you simply change only its 
+definitions. If you want to move an exported subroutine or variable to 
+another related module, simply do it.
+
+
+INSTALLATION
+
+To install this module type as following.
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+
+COPYRIGHT AND LICENCE
+
+ This program is free software; you can redistribute it
+ and/or modify it under the same terms as Perl itself.
+
+ See http://www.perl.com/perl/misc/Artistic.html
+
+ Copyright 2003 Sey Nakajima <nakajima@netstock.co.jp>

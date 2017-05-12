@@ -1,0 +1,36 @@
+Eidolon::Driver::Template::HTML, version 0.01
+=============================================
+
+The Eidolon::Driver::Template::HTML is a template driver for Eidolon.
+It is based on famous HTML::Template package, that provides a lot of tasty 
+functions for separating code and markup.
+
+INSTALLATION
+
+To install the driver type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+To use this driver you must have the following packages installed:
+
+    HTML::Template
+    Eidolon
+
+LICENCE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+AUTHOR
+
+Anton Belousov, <abel@cpan.org>
+
+COPYRIGHT
+
+Copyright (c) 2009, Atma 7, http://www.atma7.com
+

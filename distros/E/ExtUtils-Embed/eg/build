@@ -1,0 +1,7 @@
+use Config;
+
+($f = $ARGV[0]) =~ s/\.c$//;
+
+system "$Config{cc} -g -o $f $f.c `$^X -MExtUtils::Embed -e ccopts -e ldopts`"; 
+
+#gcc -o $1 $1.c `perl -MExtUtils::Embed -e ccopts -e ldopts` 

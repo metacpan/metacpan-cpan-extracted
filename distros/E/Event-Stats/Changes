@@ -1,0 +1,47 @@
+1.02 2016-06-08
+  - make test less fragile
+
+1.01 2016-06-05
+  - bring Changes up to date again
+
+1.00 2016-06-05
+  - add github repo metadata
+  - bring Changes up to date
+  - express prereqs more accurately - RT-109732
+  - move to version 1.00 as 0.9 > 0.10 - RT-109731
+  - move to XSMULTI layout
+
+0.10 2012-12-23
+  - Devel::AssertOS to not support windows
+  - add gitorious repo URL
+
+0.9 2011-05-21
+  - test approx not equality
+
+0.8 2011-05-18
+  - test split in two
+
+0.7 2000-03-10
+  - collect() now returns post-change value
+
+0.6 1999-11-23
+  - Sync with Event 0.58
+
+0.56 1999-09-14
+  - add Time::HiRes to prereq
+
+0.55 1999-09-14
+  - fix test
+
+0.54 1999-09-09
+  - Sync with Event 0.53
+
+0.53 1999-06-19
+  - Sync with Event 0.41
+
+0.52 1999-05-07
+  - Move all alarm(0) under if(EnforceMaxCBTime)
+  - Sync with Event 0.40
+
+0.5 1999-03-30
+  - CPAN Release

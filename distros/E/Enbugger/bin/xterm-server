@@ -1,0 +1,84 @@
+#!perl -w
+
+=head1 NAME
+
+xterm-server - Internet server for xterm
+
+=head1 SYNOPSIS
+
+  screen-server [options]
+
+      --help
+      --debug
+      --port <port>      Listens on <port> [TCP service] and accepts a
+                         TCP/IP connection. The IP version is 4 or
+                         environment variable
+                         SOCAT_DEFAULT_LISTEN_IP.
+
+                         Default is 53505.
+      --bind <sockname>  Binds the socket to the given socket address
+                         using the bind() system call.
+
+                         [hostname|hostaddress][:(service|port)]
+
+                         Default is (*).
+      --daemonize        (Default)
+      --no-daemonize
+
+=head1 DESCRIPTION
+
+TODO
+
+=cut
+
+use strict;
+use Getopt::Long ();
+
+# Option handling
+#
+use Getopt::Long ();
+Getopt::Long::GetOptions(
+    help         => \ &pod2usage,
+    debug        => \ my $debug,
+    name         => \ my $screen_name,
+    bind         => \ my $bind_address,
+    port         => \ my $tcp_port,
+    'daemonize!' => \ my $daemonize,
+)
+    or pod2usage();
+$daemonize = 0     if ! defined $daemonize;
+$tcp_port  = 53505 if ! defined $tcp_port;
+
+# Daemonization by default
+#
+if ( $daemonize ) {
+    close *STDIN;
+    close *STDOUT;
+    close *STDERR;
+
+    fork && exit;
+    fork && exit;
+    umask 0;
+    chdir '/';
+}
+
+# Launch socat to listen to TCP and launch xterm-server-backend
+#
+require FindBin;
+my $listen_spec = "TCP-LISTEN:${tcp_port},fork,reuseaddr";
+if ( $bind_address ) {
+    $listen_spec .= ",bind=$bind_address";
+}
+my $bindir = $FindBin::Bin;
+   $bindir = $FindBin::Bin;
+my $backend_spec = "EXEC:$bindir/xterm-server-backend,setsid,nofork";
+my @cmd = ( 'socat', $listen_spec, $backend_spec );
+if ( $debug ) {
+    print STDERR "exec( @cmd )\n";
+}
+exec @cmd;
+
+sub pod2usage {
+    require Pod::Usage;
+    goto &Pod::Usage::pod2usage;
+}

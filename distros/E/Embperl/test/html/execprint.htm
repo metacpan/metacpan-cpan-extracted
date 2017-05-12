@@ -1,0 +1,45 @@
+[- 
+print OUT "*" ;
+Execute ('EmbperlObject/epohead.htm') ;
+print OUT "*" ;
+-]
+
+without print...
+
+[$foreach $i (1..3) $]
+[- 
+Execute ('EmbperlObject/epohead.htm') ;
+-]
+[$endforeach$]
+
+without print...
+
+[$foreach $i (1..3) $]
+### [+ $i +] 
+[- 
+Execute ('EmbperlObject/epohead.htm') ;
+-]
+###
+[$endforeach$]
+
+
+
+with print in different blocks ...
+
+[$foreach $i (1..3) $]
+[- print OUT "* $i *" ; -]
+[- Execute ('EmbperlObject/epohead.htm') ; -]
+[- print OUT "*" ; -]
+[$endforeach$]
+
+
+with print...
+
+[$foreach $i (1..3) $]
+[- 
+print OUT "* $i *" ;
+Execute ('EmbperlObject/epohead.htm') ;
+print OUT "*" ;
+-]
+[$endforeach$]
+

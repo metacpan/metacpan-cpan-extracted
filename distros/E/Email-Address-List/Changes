@@ -1,0 +1,21 @@
+0.05 2014-02-16
+
+ - Correct typos in documentation; no functionality changes
+
+0.04 2014-02-03
+
+ - Update minimum perl version to 5.10, because of use of ++ quantifier
+
+0.03 2014-01-22
+
+ - Include documentation updates present in the released version of
+   0.01, but never checked into the repository
+
+0.02 2014-01-15
+
+ - Prevent a quadratic-time check when the provided string did not
+   contain a valid address
+
+0.01 2012-11-17
+
+ - Initial release

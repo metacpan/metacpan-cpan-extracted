@@ -1,0 +1,32 @@
+---
+abstract: 'Demo app for showing the synergy between perl and javascript'
+author:
+  - 'Tudor Constantin <tconst@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300020, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Expense-Tracker
+requires:
+  DBD::SQLite: 0
+  DBI: 0
+  DBIx::Class: 0
+  DBIx::Class::Tree::AdjacencyList: 0
+  DateTime: 0
+  Digest::MD5: 0
+  File::Find: 0
+  FindBin::libs: 0
+  Lingua::EN::Inflect: 0
+  Lingua::EN::Inflect::Phrase: 0
+  Mojolicious: 0
+  Mojolicious::Plugin::Authentication: 0
+  Mojolicious::Plugin::YamlConfig: 0
+  Test::BDD::Cucumber: 0
+  YAML: 0
+  YAML::XS: 0
+version: 0.008

@@ -1,0 +1,43 @@
+---
+abstract: 'obfuscate email or html with randomized javascript'
+author:
+  - 'Christian Walde <walde.christian@googlemail.com>'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  Test::InDistDir: 0
+  Test::More: 0
+  open: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300006, CPAN::Meta::Converter version 2.113640'
+license: unrestricted
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Email-Enkoder
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  Email::Enkoder:
+    file: lib/Email/Enkoder.pm
+    version: 1.120831
+requires:
+  Sub::Exporter::Simple: 0
+  perl: 5.010
+  strictures: 0
+  utf8: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Email-Enkoder
+  homepage: https://github.com/wchristian/email-enkoder
+  repository: https://github.com/wchristian/email-enkoder.git
+version: 1.120831

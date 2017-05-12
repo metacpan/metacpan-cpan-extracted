@@ -1,0 +1,29 @@
+# Opening data for administration EekBoek Sample Administration
+# Created by EekBoek 2.01.03 on 2012-01-16
+# Content-Type: text/plain; charset = UTF-8
+
+adm_name         "EekBoek Sample Administration"
+adm_startdate   2011
+adm_finyear     "2011"
+adm_vatperiod   quarter
+
+# Opening balance
+
+# Debet
+adm_balance 1100     1344.37   # Supplies
+adm_balance 1110    13378.48   # Computers
+adm_balance 2320     1131.92   # Bank
+
+# Credit
+adm_balance 1101     1304.81   # Depreciation supplies
+adm_balance 1111    12106.78   # Depreciation computers
+adm_balance 3100     2443.18   # Capital
+
+# Total
+adm_balancetotal 15854.77
+
+# Entering administration
+
+adm_open
+
+# End of Opening data

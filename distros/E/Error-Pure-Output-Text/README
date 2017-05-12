@@ -1,0 +1,447 @@
+NAME
+    Error::Pure::Output::Text - Output subroutines for Error::Pure.
+
+SYNOPSIS
+     use Error::Pure::Output::Text qw(err_bt_pretty err_bt_pretty_rev err_line
+             err_line_all err_print err_print_var);
+     my $ret = err_bt_pretty(@errors);
+     my @ret = err_bt_pretty(@errors);
+     my $ret = err_bt_pretty_rev(@errors);
+     my @ret = err_bt_pretty_rev(@errors);
+     my $ret = err_line(@errors);
+     my $ret = err_line_all(@errors);
+     my $ret = err_print(@errors);
+     my $ret = err_print_var(@errors);
+     my @ret = err_print_var(@errors);
+
+SUBROUTINES
+    "err_bt_pretty(@errors)"
+             Returns string with full backtrace in scalar context.
+             Returns array of full backtrace lines in array context.
+             Format of error is:
+                     ERROR: %s
+                     %s: %s
+                     ...
+                     %s %s %s %s
+                     ...
+             Values of error are:
+                     message
+                     message as key, $message as value
+                     ...
+                     sub, caller, program, line
+
+    "err_bt_pretty_rev(@errors)"
+             Reverse version of print for err_bt_pretty().
+             Returns string with full backtrace in scalar context.
+             Returns array of full backtrace lines in array context.
+             Format of error is:
+                     ERROR: %s
+                     %s: %s
+                     ...
+                     %s %s %s %s
+                     ...
+             Values of error are:
+                     message
+                     message as key, $message as value
+                     ...
+                     sub, caller, program, line
+
+    "err_line(@errors)"
+             Returns string with error on one line.
+             Use last error in @errors structure..
+             Format of error is: "#Error [%s:%s] %s\n"
+             Values of error are: $program, $line, $message
+
+    "err_line_all(@errors)"
+             Returns string with errors each on one line.
+             Use all errors in @errors structure.
+             Format of error line is: "#Error [%s:%s] %s\n"
+             Values of error line are: $program, $line, $message
+
+    "err_print(@errors)"
+             Print first error.
+             If error comes from class, print class name before error.
+             Returns string with error.
+
+    "err_print_var(@errors)"
+             Print first error with all variables.
+             Returns error string in scalar mode.
+             Returns lines of error in array mode.
+
+EXAMPLE1
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Error::Pure::Output::Text qw(err_bt_pretty);
+
+     # Fictional error structure.
+     my $err_hr = {
+             'msg' => [
+                     'FOO',
+                     'KEY',
+                     'VALUE',
+             ],
+             'stack' => [
+                     {
+                             'args' => '(2)',
+                             'class' => 'main',
+                             'line' => 1,
+                             'prog' => 'script.pl',
+                             'sub' => 'err',
+                     }, {
+                             'args' => '',
+                             'class' => 'main',
+                             'line' => 20,
+                             'prog' => 'script.pl',
+                             'sub' => 'eval {...}',
+                     }
+             ],
+     };
+
+     # Print out.
+     print scalar err_bt_pretty($err_hr);
+
+     # Output:
+     # ERROR: FOO
+     # KEY: VALUE
+     # main  err         script.pl  1
+     # main  eval {...}  script.pl  20
+
+EXAMPLE2
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Error::Pure::Output::Text qw(err_line_all);
+
+     # Fictional error structure.
+     my @err = (
+             {
+                     'msg' => [
+                             'FOO',
+                             'BAR',
+                     ],
+                     'stack' => [
+                             {
+                                     'args' => '(2)',
+                                     'class' => 'main',
+                                     'line' => 1,
+                                     'prog' => 'script.pl',
+                                     'sub' => 'err',
+                             }, {
+                                     'args' => '',
+                                     'class' => 'main',
+                                     'line' => 20,
+                                     'prog' => 'script.pl',
+                                     'sub' => 'eval {...}',
+                             }
+                     ],
+             }, {
+                     'msg' => ['XXX'],
+                     'stack' => [
+                             {
+                                     'args' => '',
+                                     'class' => 'main',
+                                     'line' => 2,
+                                     'prog' => 'script.pl',
+                                     'sub' => 'err',
+                             },
+                     ],
+             }
+     );
+
+     # Print out.
+     print err_line_all(@err);
+
+     # Output:
+     # #Error [script.pl:1] FOO
+     # #Error [script.pl:2] XXX
+
+EXAMPLE3
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Error::Pure::Output::Text qw(err_line);
+
+     # Fictional error structure.
+     my $err_hr = {
+             'msg' => [
+                     'FOO',
+                     'BAR',
+             ],
+             'stack' => [
+                     {
+                             'args' => '(2)',
+                             'class' => 'main',
+                             'line' => 1,
+                             'prog' => 'script.pl',
+                             'sub' => 'err',
+                     }, {
+                             'args' => '',
+                             'class' => 'main',
+                             'line' => 20,
+                             'prog' => 'script.pl',
+                             'sub' => 'eval {...}',
+                     }
+             ],
+     };
+
+     # Print out.
+     print err_line($err_hr);
+
+     # Output:
+     # #Error [script.pl:1] FOO
+
+EXAMPLE4
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Error::Pure::Output::Text qw(err_bt_pretty);
+
+     # Fictional error structure.
+     my @err = (
+             {
+                     'msg' => [
+                             'FOO',
+                             'BAR',
+                     ],
+                     'stack' => [
+                             {
+                                     'args' => '(2)',
+                                     'class' => 'main',
+                                     'line' => 1,
+                                     'prog' => 'script.pl',
+                                     'sub' => 'err',
+                             }, {
+                                     'args' => '',
+                                     'class' => 'main',
+                                     'line' => 20,
+                                     'prog' => 'script.pl',
+                                     'sub' => 'eval {...}',
+                             }
+                     ],
+             }, {
+                     'msg' => ['XXX'],
+                     'stack' => [
+                             {
+                                     'args' => '',
+                                     'class' => 'main',
+                                     'line' => 2,
+                                     'prog' => 'script.pl',
+                                     'sub' => 'err',
+                             },
+                     ],
+             }
+     );
+
+     # Print out.
+     print scalar err_bt_pretty(@err);
+
+     # Output:
+     # ERROR: FOO
+     # BAR
+     # main  err         script.pl  1
+     # main  eval {...}  script.pl  20
+     # ERROR: XXX
+     # main  err         script.pl  2
+
+EXAMPLE5
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Error::Pure::Output::Text qw(err_bt_pretty_rev);
+
+     # Fictional error structure.
+     my @err = (
+             {
+                     'msg' => [
+                             'FOO',
+                             'BAR',
+                     ],
+                     'stack' => [
+                             {
+                                     'args' => '(2)',
+                                     'class' => 'main',
+                                     'line' => 1,
+                                     'prog' => 'script.pl',
+                                     'sub' => 'err',
+                             }, {
+                                     'args' => '',
+                                     'class' => 'main',
+                                     'line' => 20,
+                                     'prog' => 'script.pl',
+                                     'sub' => 'eval {...}',
+                             }
+                     ],
+             }, {
+                     'msg' => ['XXX'],
+                     'stack' => [
+                             {
+                                     'args' => '',
+                                     'class' => 'main',
+                                     'line' => 2,
+                                     'prog' => 'script.pl',
+                                     'sub' => 'err',
+                             },
+                     ],
+             }
+     );
+
+     # Print out.
+     print scalar err_bt_pretty_rev(@err);
+
+     # Output:
+     # ERROR: XXX
+     # main  err         script.pl  2
+     # ERROR: FOO
+     # BAR
+     # main  err         script.pl  1
+     # main  eval {...}  script.pl  20
+
+EXAMPLE6
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Error::Pure::Output::Text qw(err_print);
+
+     # Fictional error structure.
+     my $err_hr = {
+             'msg' => [
+                     'FOO',
+                     'BAR',
+             ],
+             'stack' => [
+                     {
+                             'args' => '(2)',
+                             'class' => 'main',
+                             'line' => 1,
+                             'prog' => 'script.pl',
+                             'sub' => 'err',
+                     }, {
+                             'args' => '',
+                             'class' => 'main',
+                             'line' => 20,
+                             'prog' => 'script.pl',
+                             'sub' => 'eval {...}',
+                     }
+             ],
+     };
+
+     # Print out.
+     print err_print($err_hr)."\n";
+
+     # Output:
+     # FOO
+
+EXAMPLE7
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Error::Pure::Output::Text qw(err_print);
+
+     # Fictional error structure.
+     my $err_hr = {
+             'msg' => [
+                     'FOO',
+                     'BAR',
+             ],
+             'stack' => [
+                     {
+                             'args' => '(2)',
+                             'class' => 'Class',
+                             'line' => 1,
+                             'prog' => 'script.pl',
+                             'sub' => 'err',
+                     }, {
+                             'args' => '',
+                             'class' => 'mains',
+                             'line' => 20,
+                             'prog' => 'script.pl',
+                             'sub' => 'eval {...}',
+                     }
+             ],
+     };
+
+     # Print out.
+     print err_print($err_hr)."\n";
+
+     # Output:
+     # Class: FOO
+
+EXAMPLE8
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Error::Pure::Output::Text qw(err_print_var);
+
+     # Fictional error structure.
+     my $err_hr = {
+             'msg' => [
+                     'FOO',
+                     'KEY1',
+                     'VALUE1',
+                     'KEY2',
+                     'VALUE2',
+             ],
+             'stack' => [
+                     {
+                             'args' => '(2)',
+                             'class' => 'main',
+                             'line' => 1,
+                             'prog' => 'script.pl',
+                             'sub' => 'err',
+                     }, {
+                             'args' => '',
+                             'class' => 'main',
+                             'line' => 20,
+                             'prog' => 'script.pl',
+                             'sub' => 'eval {...}',
+                     }
+             ],
+     };
+
+     # Print out.
+     print scalar err_print_var($err_hr);
+
+     # Output:
+     # ERROR: FOO
+     # KEY1: VALUE1
+     # KEY2: VALUE2
+
+DEPENDENCIES
+    Exporter, Readonly.
+
+SEE ALSO
+    Task::Error::Pure
+        Install the Error::Pure modules.
+
+REPOSITORY
+    <https://github.com/tupinek/Error-Pure-Output-Text>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © 2008-2015 Michal Špaček
+     BSD 2-Clause License
+
+VERSION
+    0.22
+

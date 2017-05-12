@@ -1,0 +1,46 @@
+ExtUtils/configPL version 0.01
+==============================
+
+ExtUtils::configPL - Perl extension to automagiclly configure perl scripts
+
+This module is used to add configuration information to a perl script, and
+is meant to be used with the C<ExtUtils::MakeMaker> module.
+
+C<ExtUtils::configPL> is not a "normal" Perl extension. It does add or
+encapsulate functionality to your script, but it filters the script,
+replacing I<tags> with items from the C<Config> module, writing the resulting
+script to a new file.
+
+The normal use for this module is to add the "shebang" line as the first line
+of a script.
+
+    use ExtUtils::ConfigPL;
+    <<--startperl-->> -w
+
+would be replaced with:
+
+    #/usr/local/bin/perl -w
+
+(or where ever your perl executable is located.)
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Filter::Util::Call Config File::Basename Cwd Carp
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2001 Mark Pease <peasem@home.com>
+

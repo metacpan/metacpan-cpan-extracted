@@ -1,0 +1,27 @@
+Changes
+lib/EBook/EPUB/Lite.pm
+lib/EBook/EPUB/Lite/Container.pm
+lib/EBook/EPUB/Lite/Container/Zip.pm
+lib/EBook/EPUB/Lite/Guide.pm
+lib/EBook/EPUB/Lite/Guide/Reference.pm
+lib/EBook/EPUB/Lite/Manifest.pm
+lib/EBook/EPUB/Lite/Manifest/Item.pm
+lib/EBook/EPUB/Lite/Metadata.pm
+lib/EBook/EPUB/Lite/Metadata/DCItem.pm
+lib/EBook/EPUB/Lite/Metadata/Item.pm
+lib/EBook/EPUB/Lite/NCX.pm
+lib/EBook/EPUB/Lite/NCX/NavPoint.pm
+lib/EBook/EPUB/Lite/Spine.pm
+lib/EBook/EPUB/Lite/Spine/Itemref.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/compat.t
+t/epub.t
+t/manifest.t
+t/pod.t
+t/temp-dir-cleanup.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,55 @@
+ESplit.pm
+
+  This Perl module provides one function, e_split(), for splitting strings
+  at arbitrary character(sequence)s (the delimiter). Delimiter may be given
+  as regex.
+
+USAGE
+
+      my @tokens    = e_split ('::', $source_string, 5);
+
+  returns the first four tokens, delimited by '::', plus the remainder of
+  $source_string ($tokens[-1]).
+
+      my $token_ref = e_split ('::', $source_string, -7);
+
+  returns the last six tokens, delimited by '::', plus the remainder
+  (beginning) $source_string ($token_ref->[0]), plus the delimiters matched.
+  Result is returned as a reference to the token-array.
+
+- delimiters contained in quoted tokens will be ignored, as are backslash-
+  escaped delims.
+- delimiters given in () are returned as n + 1st elements of
+  the resulting array (CORE::split()-like).
+- the maximum number of tokens to be returned can be passed, counted from
+  beginning (CORE::split()-like) or from the end of $source_string.
+
+
+DISCUSSION
+
+  e_split() vs. Text::QuoteWords::parse_line():
+
+  e_split is 2-5 times faster than als Text::ParseWords::parse_line.
+  e_split deals well with quotes within unquoted tokens.
+  e_split is more robust at mixed-quotes tokens.
+
+VERSION
+
+  1.00 vom 07.06.2000
+
+CONTENTS OF THE ARCHIVE FILE
+
+  FILE_ID.DIZ  - module description (in German (yet))
+  ESplit.pm    - The Module
+  ESplit.htm   - documentation in HTML format
+
+AUTHOR
+
+  Hartmut Camphausen Kirchstraﬂe 8 35043 Marburg Fon: 06424/923826 Fax:
+  06424/923827 Emil: h.camp@creagen.de WWW: http://www.creagen.de
+
+LICENSE
+
+  Copyright (c) 1995 Hartmut Camphausen. All rights reserved. This program
+  is free software; you can redistribute it and/or modify it under the same
+  terms as Perl itself.

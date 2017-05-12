@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- :tabSize=2:indentSize=2:wrap=hard: -->
+<changelog xmlns="http://www.blackperl.com/2009/01/ChangeLogML"
+    xmlns:sc="http://www.blackperl.com/2009/01/ChangeLogML/source-control"
+    xmlns:git="http://www.blackperl.com/2009/01/ChangeLogML/source-control/git"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xsi:schemaLocation="http://www.blackperl.com/XML/ChangeLog etc/ChangeLogML.xsd">
+  <project>Env::Export</project>
+  <title>Perl Module Env::Export Change History</title>
+  <description>
+    A Perl module to facilitate exporting environment values as run-time
+    constant subroutines.
+  </description>
+  <release version="0.22" sc:tag="0.22" date="2011-07-07T01:00:00-07:00">
+    <change git:commit="50002b4e37a4b6d8eef6803657329f41d3a5723c">
+      <fileset>
+        <file path="t/00_load.t" action="DELETE" />
+        <file path="t/01_pod.t" action="DELETE" />
+        <file path="t/02_pod_coverage.t" action="DELETE" />
+        <file path="xt/00_load.t" />
+        <file path="xt/01_pod.t" />
+        <file path="xt/02_pod_coverage.t" />
+      </fileset>
+      <description>
+        Move author-only tests to the xt/ directory.
+      </description>
+    </change>
+    <change git:commit="e0c207e5d25388694e5d602eca27a9faff8ff3aa">
+      <fileset>
+        <file path="t/20_regex.t" />
+        <file path="t/25_glob.t" />
+        <file path="t/40_all.t" />
+      </fileset>
+      <description>
+        Consider volume when creating path to sub_count.pl.
+      </description>
+    </change>
+    <change git:commit="80dbe93eaa7b48ab2c09d42deb3e9e4c4588cd51">
+      <fileset>
+        <file path="t/10_basic.t" />
+        <file path="t/80_split.t" />
+      </fileset>
+      <description>
+        Additions to increase code-coverage of tests.
+      </description>
+    </change>
+    <change git:commit="2130fbb24b48a95a46891c042b90708e1fe7ce77">
+      <file path="lib/Env/Export.pm" />
+      <description>
+        Bug fixes, critic clean-up and some docs clean-up.
+        Some fixes related to getting better code-coverage in test suites.
+      </description>
+    </change>
+    <change git:commit="51c06ab12c3ff0b5e0d4f2f253f512a186192dcd">
+      <file path="lib/Env/Export.pm" />
+      <description>
+        Removed a left-over debugging line, doc fixes.
+      </description>
+    </change>
+  </release>
+  <release version="0.21" sc:tag="0.21" date="2010-04-25T22:10:00-07:00">
+    <change git:commit="64f45f47560b7e0e5227b780e3015577091d0f52">
+      <file path="lib/Env/Export.pm" />
+      <description>
+        Code clean-up inspired by perlcritic.
+      </description>
+    </change>
+  </release>
+  <release version="0.20" sc:tag="0.20" date="2009-04-02T03:00:00-07:00">
+    <change git:commit="45f3c6a13d7f461a35ac64a6bc2a6aeba4ac51d1">
+      <fileset>
+        <file path="lib/Env/Export.pm" />
+        <file path="t/15_no_redefine.t" action="DELETE" />
+        <file path="t/20_regex.t" action="ADD" />
+        <file path="t/25_glob.t" action="ADD" />
+        <file path="t/30_prefix.t" action="ADD" />
+        <file path="t/40_all.t" action="ADD" />
+        <file path="t/50_warn.t" action="ADD" />
+        <file path="t/60_override.t" action="ADD" />
+        <file path="t/70_link.t" action="ADD" />
+        <file path="t/80_split.t" action="ADD" />
+        <file path="t/sub_count.pl" action="ADD" />
+      </fileset>
+      <description>
+        Added extensive new features and loads more tests. Better overall
+        model for how the args list is processed into a series of newly-defined
+        functions. The keywords ":all", ":prefix"/":noprefix",
+        ":warn"/":nowarn", ":override"/":nooverride", ":link"/":nolink" and
+        ":split" are now all implemented. Shell-style globbing patterns are
+        acceptable as an alternative to regular expressions. Documentation
+        extensively re-worked to cover all of this, and tests galore for all
+        of these features.
+      </description>
+    </change>
+    <change git:commit="391ff4411a8b54ce8b896f869409fbfb4b2326d0">
+      <fileset>
+        <file path="t/10_basic.t" />
+        <file path="t/15_no_redefine.t" />
+      </fileset>
+      <description>
+        Bring tests more in line with nature of the module.
+      </description>
+    </change>
+  </release>
+  <release version="0.12" sc:tag="0.12" date="2009-03-24T17:25:00-07:00">
+    <change git:commit="c8fa9c279917cd77e4f6aec4fbd24f844f2491db">
+      <fileset>
+        <file path="lib/Env/Export.pm" />
+        <file path="t/15_no_redefine.t" action="ADD" />
+      </fileset>
+      <description>
+        Check before creating a sub, to avoid clobbering existing subs.
+      </description>
+    </change>
+    <change git:commit="9a57a7bbdc5bd5f53918acd20df5ca2f03b352d8">
+      <file path="lib/Env/Export.pm" />
+      <description>
+        Fix for
+        <xhtml:a href="http://rt.cpan.org/Ticket/Display.html?id=44539">RT
+        ticket #44539</xhtml:a>, typo in the name of a class.
+      </description>
+    </change>
+  </release>
+  <release version="0.11" sc:tag="0.11" date="2009-03-24T04:30:00-07:00">
+    <change git:commit="c37f1474e4f0f0289417fb99cfd689a4faf36b3c">
+      <file path="lib/Env/Export.pm" />
+      <description>
+        Fixed typo in the documentation.
+      </description>
+    </change>
+  </release>
+  <release version="0.10" sc:tag="0.10" date="2009-03-24T03:45:00-07:00">
+    <change git:commit="c5fef0302ba06a669eb41b6eb31c52333ca6cea8">
+      <fileset>
+        <file path="lib/Env/Export.pm" action="ADD" />
+        <file path="t/00_load.t" action="ADD" />
+        <file path="t/01_pod.t" action="ADD" />
+        <file path="t/02_pod_coverage.t" action="ADD" />
+        <file path="t/10_basic.t" action="ADD" />
+      </fileset>
+      <description>
+        Initial draft of the very basic functionality.
+      </description>
+    </change>
+  </release>
+</changelog>

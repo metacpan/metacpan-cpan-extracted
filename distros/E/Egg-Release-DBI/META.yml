@@ -1,0 +1,57 @@
+---
+name: Egg-Release-DBI
+version: 0.03
+author:
+  - 'Masatoshi Mizuno E<lt>lusheE<64>cpan.orgE<gt>'
+abstract: lib/Egg/Release/DBI.pm
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  DBI: 1.60
+  Egg::Release: 3.00
+  Ima::DBI: 0.35
+  SQL::Abstract: 1.22
+  Test::More: 0
+  Test::Perl::Critic: 0
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+  UNIVERSAL::require: 0.11
+provides:
+  Egg::Helper::Model::DBI:
+    file: lib/Egg/Helper/Model/DBI.pm
+    version: 0.01
+  Egg::Mod::EasyDBI:
+    file: lib/Egg/Mod/EasyDBI.pm
+    version: 3.00
+  Egg::Mod::EasyDBI::args:
+    file: lib/Egg/Mod/EasyDBI.pm
+  Egg::Mod::EasyDBI::db:
+    file: lib/Egg/Mod/EasyDBI.pm
+  Egg::Mod::EasyDBI::joindb:
+    file: lib/Egg/Mod/EasyDBI.pm
+  Egg::Mod::EasyDBI::table:
+    file: lib/Egg/Mod/EasyDBI.pm
+  Egg::Model::DBI:
+    file: lib/Egg/Model/DBI.pm
+    version: 3.01
+  Egg::Model::DBI::Base:
+    file: lib/Egg/Model/DBI/Base.pm
+    version: 0.02
+  Egg::Model::DBI::dbh:
+    file: lib/Egg/Model/DBI/dbh.pm
+    version: 0.01
+  Egg::Model::DBI::handler:
+    file: lib/Egg/Model/DBI.pm
+  Egg::Plugin::EasyDBI:
+    file: lib/Egg/Plugin/EasyDBI.pm
+    version: 3.01
+  Egg::Plugin::EasyDBI::handler:
+    file: lib/Egg/Plugin/EasyDBI.pm
+  Egg::Release::DBI:
+    file: lib/Egg/Release/DBI.pm
+    version: 0.03
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

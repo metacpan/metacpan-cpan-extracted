@@ -1,0 +1,56 @@
+{
+   "abstract" : "ECS - EMDIS Communication System",
+   "author" : [
+      "Joel Schneider <jschneid@nmdp.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.02, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "EMDIS-ECS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CPAN::Version" : "5.4",
+            "Data::Dumper" : "2.101",
+            "Fcntl" : "1.03",
+            "File::Basename" : "2.6",
+            "File::Copy" : "2.03",
+            "File::Spec" : "0.82",
+            "File::Temp" : "0.12",
+            "Getopt::Long" : "2.25",
+            "IO::File" : "1.08",
+            "IO::Handle" : "1.21",
+            "IPC::Open2" : "1.01",
+            "MIME::QuotedPrint" : "3.07",
+            "Net::POP3" : "2.16",
+            "Net::SMTP" : "2.13",
+            "SDBM_File" : "1.03",
+            "Text::ParseWords" : "3.2"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.39"
+}

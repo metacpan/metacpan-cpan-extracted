@@ -1,0 +1,9 @@
+#%Module
+
+# $Id: testmod,v 5.1 2014/08/18 16:56:17 ronisaac Exp $
+
+# Copyright (c) 2001-2014, Morgan Stanley.
+# Distributed under the terms of the GNU General Public License.
+# Please see the copyright notice in Modulecmd.pm for more information.
+
+setenv TESTMOD_LOADED yes

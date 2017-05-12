@@ -1,0 +1,15 @@
+Changes
+Email-Folder-Exchange-undef.tar.gz
+lib/Email/Folder/.Exchange.pm.swp
+lib/Email/Folder/Exchange.pm
+lib/Email/Folder/Exchange/.EWS.pm.swp
+lib/Email/Folder/Exchange/.WebDAV.pm.swp
+lib/Email/Folder/Exchange/EWS.pm
+lib/Email/Folder/Exchange/WebDAV.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00-use.t
+t/99-live_tests.t
+test.config

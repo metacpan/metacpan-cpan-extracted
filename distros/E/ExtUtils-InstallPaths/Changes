@@ -1,0 +1,40 @@
+Revision history for ExtUtils-InstallPaths
+
+0.011     2015-02-16 00:47:54+01:00 Europe/Amsterdam
+          Make EU::IP compatible with perl 5.6
+          Declare dependency on File::Spec 0.83 for case_sensitive
+
+0.010     2013-10-29 12:17:18 Europe/Amsterdam
+          Deprecated usage of legacy configuration variables
+          Generate default paths more dynamically
+
+0.009     2012-12-07 00:04:52 Europe/Amsterdam
+          Add relative path checkers to relpaths arguments
+          Rewrote merging algorithm
+
+0.008     2012-11-29 21:13:50 Europe/Amsterdam
+          Don't require ExtUtils::Config object
+          Fix portability issues in test paths
+
+0.007     2012-11-22 21:00:18 Europe/Amsterdam
+          Refactor everything into sanity
+
+0.006     2012-08-05 20:28:27 Europe/Bucharest
+          Add original_prefix and install_sets
+          Various documentation improvements
+
+0.005     2012-01-09 23:34:16 Europe/Amsterdam
+          Don't return references to internal state
+
+0.004     2011-10-29 00:49:21 Europe/Amsterdam
+          Sanatized the config method
+
+0.003     2011-08-22 16:23:30 Europe/Amsterdam
+          Reinstated the module_name parameter
+
+0.002     2011-05-08 11:59:59 Europe/Amsterdam
+          Fixed case insensitive file matching in test
+          Fixed attribution
+
+0.001     2011-04-04 15:32:56 Europe/Amsterdam
+    -     Initial version

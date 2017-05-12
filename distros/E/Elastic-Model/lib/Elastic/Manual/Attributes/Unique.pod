@@ -1,0 +1,195 @@
+package Elastic::Manual::Attributes::Unique;
+
+1;
+
+# ABSTRACT: Making attributes unique
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Elastic::Manual::Attributes::Unique - Making attributes unique
+
+=head1 VERSION
+
+version 0.52
+
+=head1 INTRODUCTION
+
+The only unique constraint available in Elasticsearch is the document ID.
+Typically, if you want a document to be unique, you use the unique value as
+the ID.
+
+However, sometimes you don't want to do this. For instance, you may want to
+use the email address as a unique constraint for your user accounts, but
+you also want to be able to link to a user account without exposing their
+email address, and let the user change their email address without having
+to update the ID of their user account wherever it is used.
+
+In this case, we want the ID of the user document to be auto-generated, but
+we also want the value of the C<email> attribute to be unique.
+
+=head1 STORING UNIQUE KEYS
+
+L<Elastic::Model> adds support for unique constraints other than the ID.
+Your unique attributes are tracked in a special index which defaults to
+C<"unique_key">, but which can be specified in your Model class:
+
+    package MyApp;
+
+    use Elastic::Model;
+
+    has_namespace 'foo' .....;
+
+    has_unique_index 'myapp_uniques';
+
+The index will be created automatically.
+
+=head1 APPLYING UNIQUE CONSTRAINTS
+
+Any attribute whose value is a string (including numeric attributes) can
+have a unique constraint applied:
+
+    has 'email' => (
+        is          => 'rw',
+        isa         => 'Str',
+        unique_key  => 'myapp_email'
+    );
+
+The C<unique_key> value will be used as the C<type> in the unique keys index.
+For instance, if the C<email> is C<john@foo.com>, then the unique entry for
+this document will be stored in C<index:myapp_uniques>,
+under C<type:myapp_email> with C<id:john@foo.com>.
+
+The C<unique_key> can only be used once in a doc class.  You can't have (eg)
+the attributes C<email_1> and C<email_2> both using a C<unique_key> of
+C<myapp_email>.
+
+=head1 COMPOUND KEYS
+
+It is easy to make a compound key a unique constraint. For instance, to combine
+the attributes C<account_type> and C<account_name> you could do:
+
+    has 'account_type' => (
+        is         => 'rw',
+        isa        => 'Str',
+        required   => 1,
+        trigger    => sub { shift->clear_account_key }
+    );
+
+    has 'account_name' => (
+        is         => 'rw',
+        isa        => 'Str',
+        required   => 1,
+        trigger    => sub { shift->clear_account_key }
+    );
+
+    has 'account_key' => (
+        is         => 'ro',
+        isa        => 'Str',
+        init_arg   => undef,
+        lazy       => 1,
+        unique_key => 'account_key',
+        builder    => '_build_account_key',
+        clearer    => 'clear_account_key',
+    );
+
+    sub _build_account_key {
+        my $self = shift;
+        return $self->account_type . ':' .$self->account_name
+    }
+
+When the doc is saved after either the C<account_type> or C<account_name> is
+changed, the C<account_key> will be checked for uniqueness.
+
+=head1 HANDLING CONFLICTS
+
+When you L<save|Elastic::Model::Role::Doc/save()> a doc, any unique keys will
+be checked for uniqueness, and an error will be thrown if there is a conflict.
+
+You can handle these error gracefully using the
+L<on_unique|Elastic::Model::Role::Doc/on_unique> parameter:
+
+    $doc->save(
+        on_unique => sub {
+            my ($doc,$failed) = @_;
+            # do something
+        }
+    )
+
+The C<$failed> hashref will contain a hashref whose keys are the name
+of the L<unique_keys|Elastic::Manual::Attributes/unique_key> that have
+conflicts, and whose values are the values of those keys which already exist,
+and so cannot be overwritten. For instance:
+
+    {
+        account_key => 'facebook:joe_bloggs'
+    }
+
+=head1 INCOMPATIBILITIES
+
+=head2 $doc->overwrite()
+
+You can't L<overwrite|Elastic::Model::Role::Doc/overwrite()> a doc
+with unique keys that hasn't already been loaded from Elasticsearch. For
+instance, you can do:
+
+    $user = $domain->get( user => 1 );
+    $user->email('jack@foo.com');
+    $user->overwrite;
+
+But not:
+
+    $user = $domain->new_doc( user => { id => 1, email => 'jack@foo.com' });
+    $user->overwrite;
+
+The reason for this is that, if that user already exists, then overwriting
+that doc will leave any old unique keys in place.
+L<Elastic::Model::Role::Doc/save()> will handle the old unique values
+correctly.
+
+=head2 $view->delete
+
+If you use L<Elastic::Model::View/delete()> then you are responsible for
+removing the related keys yourself.
+
+=head2 Changing unique key names and reindexing
+
+The unique keys index will not be updated if you change the C<unique_key>
+name, and reindexing does not take unique keys into account at all.  It
+is up to you to manage any changes.
+
+=head1 SEE ALSO
+
+=over
+
+=item *
+
+L<Elastic::Manual::Attributes>
+
+=item *
+
+L<Elastic::Model>
+
+=item *
+
+L<Elastic::Manual>
+
+=back
+
+=head1 AUTHOR
+
+Clinton Gormley <drtech@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Clinton Gormley.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

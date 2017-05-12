@@ -1,0 +1,533 @@
+          .nojs { display: none; }                                         Athens/Institution Login        Not Registered?             UserName:     Password:               Remembermeonthiscomputer     Forgottenpassword?                         Home   Browse   Search - selected   My Settings   Alerts     Help                     Quick Search  Title,abstract,keywords   Author          Journal/booktitle   Volume   Issue   Page    Advanced Search                           Developmental Biology    Volume 273, Issue 2,   15 September 2004,   Pages 373-389               Font Size:                    Article    Article - selected     //-->   Figures/Tables    Figures/Tables - selected    //-->   References    References - selected     PDF (1320 K)      Thumbnails - selected | Full-Size Images             E-mail Article     Cited By        Save as Citation Alert     Citation Feed       Export Citation     Add to my Quick Links   Cited By in Scopus (23)               Related Articles in ScienceDirect The bHLH Protein NEUROGENIN 2 Is a Determination Factor... Neuron The bHLH Protein NEUROGENIN 2 Is a Determination Factor for Epibranchial Placode–Derived Sensory Neurons Neuron, Volume 20, Issue 3, March 1998, Pages 483-494 Carol Fode, Gérard Gradwohl, Xavier Morin, Andrée Dierich, Marianne LeMeur, Christo Goridis, François Guillemot Abstract neurogenin2 encodes a neural-specific basic helix–loop–helix (bHLH) transcription factor related to the Drosophila proneural factor atonal. We show here that the murine ngn2 gene is essential for development of the epibranchial placode–derived cranial sensory ganglia. An ngn2 null mutation blocks the delamination of neuronal precursors from the placodes, the first morphological sign of differentiation in these lineages. Mutant placodal cells fail to express downstream bHLH differentiation factors and the Notch ligand Delta-like 1. These data suggest that ngn2 functions like the Drosophila proneural genes in the determination of neuronal fate in distal cranial ganglia. Interestingly, the homeobox gene Phox2a is activated independently of ngn2 in epibranchial placodes, suggesting that neuronal fate and neuronal subtype identity may be specified independently in cranial sensory ganglia. PDF (543 K)  Neural bHLH Genes Control the Neuronal versus Glial Fat... Neuron Neural bHLH Genes Control the Neuronal versus Glial Fate Decision in Cortical Progenitors Neuron, Volume 29, Issue 2, February 2001, Pages 401-413 Marta Nieto, Carol Schuurmans, Olivier Britz, François Guillemot Abstract We have addressed the role of the proneural bHLH genes Neurogenin2 ( Ngn2 ) and Mash1 in the selection of neuronal and glial fates by neural stem cells. We show that mice mutant for both genes present severe defects in development of the cerebral cortex, including a reduction of neurogenesis and a premature and excessive generation of astrocytic precursors. An analysis of wild-type and mutant cortical progenitors in culture showed that a large fraction of Ngn2 ; Mash1 double-mutant progenitors failed to adopt a neuronal fate, instead remaining pluripotent or entering an astrocytic differentiation pathway. Together, these results demonstrate that proneural genes are involved in lineage restriction of cortical progenitors, promoting the acquisition of the neuronal fate and inhibiting the astrocytic fate. PDF (1503 K)  Crossregulation between Neurogenin2 and Pathways Specif... Neuron Crossregulation between Neurogenin2 and Pathways Specifying Neuronal Identity in the Spinal Cord Neuron, Volume 31, Issue 2, 2 August 2001, Pages 203-217 Raffaella Scardigli, Carol Schuurmans, Gérard Gradwohl, François Guillemot Abstract We have examined how genetic pathways that specify neuronal identity and regulate neurogenesis interface in the vertebrate neural tube. Here, we demonstrate that expression of the proneural gene Neurogenin2 ( Ngn2 ) in the ventral spinal cord results from the modular activity of three enhancers active in distinct progenitor domains, suggesting that Ngn2 expression is controlled by dorsoventral patterning signals. Consistent with this hypothesis, Ngn2 enhancer activity is dependent on the function of Pax6, a homeodomain factor involved in specifying the identity of ventral spinal cord progenitors. Moreover, we show that Ngn2 is required for the correct expression of Pax6 and several homeodomain proteins expressed in defined neuronal populations. Thus, neuronal differentiation involves crossregulatory interactions between a bHLH-driven program of neurogenesis and genetic pathways specifying progenitor and neuronal identity in the spinal cord. PDF (1054 K)  View More Related Articles      View Record in Scopus      doi:10.1016/j.ydbio.2004.06.013       Copyright © 2004 Elsevier Inc. All rights reserved.                 
+
+ A screen for downstream effectors of Neurogenin2 in the embryonic neocortex 
+
+   
+
+Pierre Mattar a, Olivier Britz b, Christine Johannes a, Marta Nieto c, Lin Ma a, Angela Rebeyka a, Natalia Klenin a, Franck Polleux d, François Guillemot b and Carol Schuurmans a,, 
+
+   
+
+ a University of Calgary, Calgary, Alberta, Canada T2N 4N1
+
+
+
+ b Division of Molecular Neurobiology, National Institute for Medical Research, The Ridgeway, Mill Hill, London NW7 1AA, UK
+
+
+
+ c Beth Israel Deaconess Medical Center, Howard Hughes Medical Institute, Harvard Medical School, Boston, MA 02115, USA
+
+
+
+ d Department of Pharmacology, University of North Carolina, Neuroscience Research Building, Chapel Hill, NC 27599-7250, USA
+
+   Received 14 April 2004; revised 18 June 2004; accepted 22 June 2004. Available online 27 July 2004.    Abstract 
+
+ Neurogenin ( Ngn ) 1 and Ngn2 encode basic-helix-loop-helix transcription factors expressed in the developing neocortex. Like other proneural genes, Ngns participate in the specification of neural fates and neuronal identities, but downstream effectors remain poorly defined. We set out to identify Ngn2 effectors in the cortex using a subtractive hybridization screen and identified several regionally expressed genes that were misregulated in Ngn2 and Ngn1;Ngn2 mutants. Included were genes down-regulated in germinal zone progenitors (e.g., Nlgn1, Unc5H4, and Dcc ) and in postmitotic neurons in the cortical plate (e.g., Bhlhb5 and NFIB ) and subplate (e.g., Mef2c, srGAP3, and protocadherin 9 ). Further analysis revealed that Ngn2 mutant subplate neurons were misspecified and that thalamocortical afferents (TCAs) that normally target this layer instead inappropriately projected towards the germinal zone. Strikingly, EphA5 and Sema3c, which encode repulsive guidance cues, were down-regulated in the Ngn2 and Ngn1;Ngn2 mutant germinal zones, providing a possible molecular basis for axonal targeting defects. Thus, we identified several new components of the differentiation cascade(s) activated downstream of Ngn1 and Ngn2 and provided novel insights into a new developmental process controlled by these proneural genes. Further analysis of the genes isolated in our screen should provide a fertile basis for understanding the molecular mechanisms underlying corticogenesis.
+
+   
+
+ Keywords: neocortex development; Neurogenin ; downstream effectors; thalamocortical; subplate; neuronal specification; axonal targeting
+
+   
+
+ Abbreviations: CP, cortical plate; dig, digoxygenin; E, embryonic day; gz, germinal zone; IZ, intermediate zone; Ngn, Neurogenin; P, postnatal day; pp, preplate; sp, subplate; SVZ, subventricular zone; TCA, thalamocortical afferent; VZ, ventricular zone
+
+    Article Outline Introduction Materials and methods Maintenance and genotyping of Ngn2 lacZ and Ngn1 mutant mice beta-galactosidase detection and cell sorting RNA extraction, cDNA synthesis, and subtraction Identification and isolation of full-length cDNAs RNA in situ hybridization Immunohistochemistry, histology, and birthdating Results Construction of a subtracted cDNA library enriched for neocortical genes dependent on Ngn2 function Sequence and expression analyses of telencephalic library clones Expression analysis of pan-neuronal markers in Ngn2 and Ngn1;Ngn2 mutants Expression analysis of regionalized markers in Ngn2 and Ngn1;Ngn2 mutants Defects in the differentiation of Ngn2 mutant cortical plate and subplate neurons Aberrant thalamocortical and corticothalamic axonal trajectories in Ngn1/2 mutants Discussion Identification of differentiation cascades activated downstream of Ngn2 Identification of a new biological function for Ngn2 in guiding TCAs trajectories in the neocortex Acknowledgements Appendix A. Supplementary data References    Introduction 
+
+The neocortex is subdivided into more than 40 tangential areas and six radial layers, each characterized by unique neuronal morphologies, axonal projections, molecular identities, and functions ( Job and Tan, 2003 ). The striking degree of neuronal diversity in the neocortex is generated during development via progressive changes in the cellular output of an initially multipotent pool of cortical precursors, but the molecular mechanisms responsible for changes in precursor cell competence remain poorly understood ( Desai and McConnell, 2000, Frantz and McConnell, 1996 and McConnell and Kaznowski, 1991 ).
+
+
+
+ Ngn1 and Ngn2, which encode basic-helix-loop-helix (bHLH) transcription factors with proneural activity ( Fode et al., 1998, Fode et al., 2000 and Ma et al., 1998 ), contribute to the specification of a neuronal versus glial identity in cortical progenitors ( Nieto et al., 2001 and Sun et al., 2001 ) and at the same time influence the type of neuron that is generated ( Fode et al., 2000 and Parras et al., 2002 ). In particular, Ngn1 and Ngn2 are together required to specify several characteristics of early born (i.e., deep layer) cortical neurons, including their regional identity, glutamatergic neurotransmission phenotype, and laminar-specific properties ( Schuurmans et al., 2004 ). In addition to their role in activating cortical gene transcription, Ngn1/2 are also required to repress expression of Mash1, a more distantly related bHLH factor, that specifies a GABAergic rather than glutamatergic neurotransmission phenotype when misexpressed in Ngn2 and Ngn1;Ngn2 mutant cortical progenitors ( Fode et al., 2000 and Parras et al., 2002 ). However, with the exception of Mash1, the expression of all other markers analyzed to date appears unaltered in Ngn2 mutant cortical progenitors. This suggests either that proneural genes can act alone to redirect neuronal differentiation at a relatively late stage in neural lineage progression, or that key participants in this process remain to be identified. Moreover, despite the dramatic conversion in phenotype of cortical neurons in Ngn2 and Ngn1;Ngn2 mutants, from glutamatergic to GABAergic, only a handful of genes are known to be down-regulated in these mutant neurons, including a few cortical-specific transcription factors (e.g., Math2, Nscl2, Tbr1/2, and Id2 ), the signaling molecules Slit1 and Robo1, and two vesicular glutamate transporters (i.e., VGLUT1 and VGLUT2 ; Schuurmans et al., 2004 ), suggesting that additional components of the Ngn2- dependent differentiation cascade remain to be identified.
+
+
+
+The changes in cell-fate exhibited following ectopic expression of Mash1 in Ngn1/2 expression domains are analogous to those obtained when the Drosophila proneural achaete-scute genes are ectopically expressed in precursors that normally express atonal, and vice versa ( Jarman et al., 1993 ). In these experiments, ectopic expression of achaete-scute genes generates external sensory organs where atonal would normally generate chordotonal organs. Thus, proneural genes in both Drosophila and vertebrates specify neural lineage identities and influence the differentiation of mature cell types in the resultant lineage ( Bertrand et al., 2002 ). Yet even for the well-characterized Drosophila proneural genes, extensive surveys for downstream effectors have not been reported. Consequently, we have an excellent understanding of the functional roles of proneural genes but know very little about the molecular mechanisms that mediate these functions.
+
+
+
+In order to understand better the genetic program(s) executed by the proneural gene Ngn2 in the neocortex, we performed a subtractive hybridization screen between wild-type and Ngn2 mutant telencephalons. We identified 46 genes expressed in the embryonic neocortex, including a group of 19 that displayed highly regionalized patterns of expression. Expression analysis of the regionalized genes revealed that the vast majority (16/19) were misregulated in Ngn2 single mutant and more strikingly in Ngn1;Ngn2 double mutant cortices. These genes included transcription factors, but surprisingly also included genes involved in migration and axonal pathfinding. Further expression analyses of three of the identified genes ( Mef2c, srGAP3, and protocadherin 9 ) revealed previously uncharacterized defects in the Ngn2 mutant cortical subplate, a transient neuronal population with important pioneering roles for guiding afferent and efferent axonal projections in cortical development ( McConnell et al., 1989, McConnell et al., 1994 and Super et al., 1998 ). Accordingly, thalamocortical afferent (TCA) axons followed aberrant trajectories in the Ngn2 and Ngn1;Ngn2 mutant cortices, forming disorganized axon bundles that disrupted the cortical germinal zone. Interestingly, several receptors and ligands that have previously been shown to provide repressive cues for axons at different locations along their migration pathway (e.g., Sema3c and EphA5 ) were down-regulated in the Ngn2 mutant germinal zone, suggesting that the loss of these molecules may contribute to the observed axonal targeting defects ( Bagnard et al., 2001, Dufour et al., 2003, Gao et al., 1998, Knoll and Drescher, 2002, Steup et al., 2000 and Takahashi et al., 1998 ).
+
+ Materials and methods Maintenance and genotyping of Ngn2 lacZ and Ngn1 mutant mice 
+
+ Ngn2 lacZ +/-;Ngn1+/- single and double heterozygous intercrosses were set up to obtain heterozygous and homozygous single and double mutant embryos. Embryos were staged using the day of the vaginal plug as E0.5 and genotyping was performed by PCR as described ( Fode et al., 2000 and Ma et al., 1998 ).
+
+ beta-galactosidase detection and cell sorting 
+
+E12.5 dorsal telencephalons were dissected from embryos obtained from Ngn2 lacZ +/- heterozygous intercrosses. Cortical cells were dissociated and stained with fluorescein digalactopyranoside (FDG; Sigma) and sorted by fluorescence-activated cell sorting (FACS) as described previously ( Nieto et al., 2001 ).
+
+ RNA extraction, cDNA synthesis, and subtraction 
+
+Cells (8000–10,000 lacZ+) were collected from each embryo and sorted directly into 200 muL of 4 M guanidinium isothiocyanate (EM Science). Approximately 1 mug of total RNA was extracted from the dorsal telencephalon of each embryo using a scaled-down Chomczynski method ( Chomczynski and Sacchi, 1987 ). RNA was reversed transcribed using the SMART system (Clontech) and two rounds of subtraction for wild-type minus mutant and mutant minus wild-type were carried out with the PCR-Select cDNA subtraction kit (Clontech). Resultant cDNA were cloned into pBluescript and rescreened by gridding colonies on plates. Two colony lifts were made per plate, and paired lifts were hybridized with wild-type or Ngn2 mutant cDNA. Only clones with a significant difference in signal intensity from the two probes were pursued. The efficiency of the subtraction was assessed by Southern blot analysis. Briefly, equal amounts of plasmid DNA were digested to release Pax6, Math2, Tbr1, Nscl2, and Dlx1 inserts that were separated on a 0.8% gel, transferred to a nylon membrane, and hybridized with random-primed, radiolabeled probes from unsubtracted Ngn2 lacZ +/- cDNA, WT-mutant subtracted cDNA, and mutant-WT subtracted cDNA.
+
+ Identification and isolation of full-length cDNAs 
+
+We sequenced 200 clones that came through our second round of subtractive screening of the wild-type minus Ngn2 mutant telencephalon library. Sequenced clones were identified using the BLAST algorithm (NCBI) to screen nucleotide and EST databanks. Through our sequencing, we identified 132 unique sequences, of which 46 were analyzed further. GenBank accession numbers for cDNAs matching isolated clones are presented in Supplementary Table 1.
+
+ RNA in situ hybridization 
+
+RNA in situ hybridization was carried out on 10 mum cryostat sections as previously described ( Cau et al., 1997 ). Digoxygenin (dig)-labeled RNA probes were generated using T3, T7, or SP6 RNA polymerases and a dig-RNA-labeling mix (Roche). In addition to antisense probes, we generated 44 sense probes, and in no case did we observe specific staining in the telencephalon (data not shown). Templates for dig-probes were as follows (accession numbers listed in parentheses): Akt3 ( AF124142 ), Bhlhb5 ( AF504925 ), Dcc ( X85788 ), EphA5 ( NM_007937 ), Mef2c ( L13171 ), Neurotractin ( AJ487032 ), Sema3c ( X85992 ). We also obtained full-length I.M.A.G.E. Consortium [LLNL] cDNA clones ( Lennon et al., 1996 ) for selected genes from Open Biosystems (Huntsville, AL) as follows (GenBank accession numbers in parentheses): Axotrophin ( BC025029 ), IMAGE:4935124; Cml66 ( BC031583 ), IMAGE:4952090; CugBP2 ( BC026856 ), IMAGE:4503295; EDG-1 ( BC049094 ), IMAGE:6415920; ELAVl4 ( BC048159 ), IMAGE:5703005; Myotrophin ( BC043084 ), IMAGE:6417343; Neuroligin1 ( BC005523 ), IMAGE:3494913; Pegasus-like ( BC048183 ), IMAGE:6826723; PHD6-like ( BC043127 ), IMAGE:6410361; Ptbp2 ( BC010255 ), IMAGE:3709255; srGAP3 ( BC030457 ), IMAGE:5401611; and WWP2 ( BC048184 ), IMAGE:6827381.
+
+ Immunohistochemistry, histology, and birthdating 
+
+For histology, P0 brains were fixed in Bouin's fixative for 3 days, dehydrated in an ethanol–xylene series, embedded in paraffin, and 7 mum sections were cut and stained with hematoxylin–eosin as described previously ( Rhinn et al., 1998 ). For birthdating, pregnant females were injected intraperitoneally with 100 mug/g bromodeoxyuridine (BrdU; Sigma) on E11.5, sacrificed at P0, processed for wax sectioning as above, and immunostained with anti-BrdU (Boehringer Mannheim) as described ( Gradwohl et al., 1996 ). Antisomatostatin (Dako), MAP2 (Sigma), calretinin (Swant), TUJ1 (Neuronal class III beta-tubulin; Covance), and L1 (Roche) immunostaining were performed on 10 mum cryostat sections as described ( Nieto et al., 2001 ). Anterograde tracing using DiI (Molecular Probes) was performed as described ( Seibt et al., 2003 ).
+
+ Results Construction of a subtracted cDNA library enriched for neocortical genes dependent on Ngn2 function 
+
+Early born preplate and deep-layer cortical plate neurons are misspecified in Ngn2 mutants, acquiring a GABAergic rather than glutamatergic identity ( Fode et al., 2000 and Schuurmans et al., 2004 ). To identify downstream components of the Ngn1/2 -dependent differentiation cascade(s) that may underlie this change in neuronal phenotype, we devised a subtractive screen between the dorsal telencephalon of wild-type and Ngn2 mutant embryos. For this purpose, cortical cells were isolated from individual E12.5 preplate-stage embryos that were heterozygous (i.e., ”wild type”) or homozygous (i.e., ”mutant”) for an Ngn2 lacZ replacement allele ( Fode et al., 2000 ), taking advantage of beta-galactosidase (betagal) to label expressing cells with FDG, a vital fluorescent substrate ( Fig. 1 B). At preplate stages, Ngn2 transcripts were detected in cortical progenitors in the ventricular zone ( Fig. 1 A), whereas betagal was detected in both progenitor cells and postmitotic neurons of Ngn2 lacZ embyros, with staining significantly more intense in Ngn2 lacZ homozygous versus heterozygous cortices due to an additional copy of the gene ( Fig. 1 B). While Ngn2 was not expressed in postmitotic neurons ( Fig. 1 A), betagal protein expressed from the Ngn2 locus persisted in differentiated neurons due to its slow turnover ( Fig. 1 B). Thus, the sorting procedure employed isolated both cells that normally express Ngn2, as well as the neurons generated from these progenitors.
+
+ Full-size image (163K) 
+
+Fig. 1.Experimental design for subtracting expressed genes in Ngn2 lacZ +/- (”wild-type”) and Ngn2 lacZ -/- (”mutant”) cortical cells. (A) Frontal section of E13.5 telencephalon hybridized with a probe for Ngn2. (B) X-gal staining of frontal sections through the telencephalon of E12.5 Ngn2 lacZ +/- and Ngn2 lacZ -/- embryos revealed betagal activity in the cortical preplate and cortical progenitor cells, which were significantly higher in mutants due to two copies of the lacZ gene. betagal+ cells were FACS sorted, using the lateral ganglionic eminence (LGE) as negative tissue to set gates. mRNA extracted from betagal+ cells was reverse transcribed and PCR amplified and used in subtractions between WT-mutant and mutant-WT. (C) For quality control, unsubtracted wild-type and subtracted cDNA pools were radiolabeled and used to probe Southern blots on which equivalent quantities of known plasmids had been blotted. In the wild-type minus mutant subtraction, Math2, Tbr1, and Nscl2 transcripts were enriched, and in mutant minus wild-type subtraction, Pax6 was enriched and Dlx1 was ectopically expressed. D. Tel, dorsal telencephalon; FACS, fluorescence-activated cell sorting; FDG, fluorescein digalactopyranoside; LGE, lateral ganglionic eminence; and WT, wild type.
+
+ View Within Article 
+
+For each embryo, betagal (+) cortical cells were separated from betagal (-) cells by flow cytometry (FACS), yielding 8000–10,000 cells. RNA was extracted from betagal (+) cells and cDNA was synthesized and amplified by PCR. Two rounds of subtraction in both directions were then performed between cDNA derived from betagal (+) cells isolated from Ngn2 lacZ +/- and Ngn2 lacZ -/- cortices, producing pools of genes enriched either in the wild-type or Ngn2 mutant telencephalon.
+
+
+
+To assess the efficiency of subtraction, pools of subtracted cDNA were radiolabeled by random priming and hybridized to Southern blots on which equivalent quantities of known genes had been transferred ( Fig. 1 C). The wild-type minus Ngn2 mutant subtraction yielded an expected increase in hybridization signal to Math2, Tbr1, and Nscl2, markers of a dorsal, cortical identity that had previously been shown to be down-regulated in Ngn2 mutants ( Fode et al., 2000 ). In contrast, in the Ngn2 mutant minus wild-type subtraction, Math2, Tbr1, and Nscl2 transcripts were depleted from the library, whereas ectopic Dlx1 transcripts were detected and Pax6 message was enriched ( Fig. 1 C). Both Pax6 and Dlx1 are ectopically expressed in misspecified cortical neurons in Ngn2 mutants ( Fode et al., 2000 ; C.S., F.G., unpublished observation], confirming that the subtraction was successful and did enrich for the expected genes.
+
+ Sequence and expression analyses of telencephalic library clones 
+
+We hypothesized that the wild-type minus Ngn2 mutant subtraction would yield genes important for the specification of a cortical, glutamatergic identity and thus focused on analyzing these clones. Subtracted cDNAs were cloned to generate a library; and as a further enrichment, the library was rescreened by hybridizing individual colonies with wild-type and Ngn2 mutant cDNA probes, with only those clones that differentially hybridized pursued further (data not shown). To increase our chances of identifying novel regulators of cortical development, we used a random sequence approach, in the end sequencing a total of 132 clones (data not shown).
+
+
+
+To identify cDNA sequences, BLAST searches were performed. The majority (76%) of the genes identified were represented only once in the library, whereas 24% appeared more than once. Fifty-eight percent of the unique genes had been previously characterized in mouse, 30% were putative orthologues of known genes from other species, and 12% matched ESTs whose encoded products were unknown. Four clones mapped to genomic regions with no matching ESTs and were not analyzed further. The identified genes were assigned into groups according to their reported biological roles and/or the presence of characteristic functional domains ( Supplementary Table 1 ). We used our sequencing data to select 46 of the independent genes identified for further study, focusing primarily on transcription factors, receptor/signal transduction proteins, and a few miscellaneous and unknown genes ( Supplementary Table 1 ).
+
+
+
+Expression patterns of the 46 genes presented in Supplementary Table 1 were examined by RNA in situ hybridization on sections of E13.5 telencephalon, and all were shown to be expressed in the dorsal telencephalon, their patterns overlapping at least in part with X-gal stained Ngn2 lacZ cortices (data not shown; Fig. 2 and Fig. 3 ). We chose E13.5 as the stage of analysis to survey gene expression in several cortical compartments at the same time. This was possible due to the lateral-to-medial gradient of neurogenesis, which results in a developmentally more advanced cortex in lateral versus medial regions. Specifically, in the medial aspect of E13.5 frontal sections, the cortex consists of a ventricular zone (VZ) and a preplate layer of postmitotic neurons, which are the first cortical neurons to differentiate ( Figs. 2 A and D; insets). In contrast, in more developmentally advanced lateral regions, progenitors are located in a VZ and subventricular zone (SVZ), and a cortical plate composed of a second wave of differentiating neurons has started to form.
+
+ Full-size image (197K) 
+
+Fig. 2.Expression analysis of pan-neuronal markers in E13.5 Ngn2 and Ngn1;Ngn2 mutant cortices. Frontal sections of E13.5 wild-type (wt) telencephalon were hybridized in situ with dig-labeled RNA probes. Insets in A'–C' and D'–F' show higher magnifications of the dorsomedial neocortex. (A–C and A'–C') Dcx expression in wild-type (A and A'), Ngn2 mutant (B and B'), and Ngn1;Ngn2 mutant (C and C') telencephalon. (D–F and D'–F') Zfp10-like expression in expression in wild-type (D and D'), Ngn2 mutant (E and E'), and Ngn1;Ngn2 mutant (F and F') telencephalon. (G–I) TUJ1 expression in the preplate of E12.5 wild-type (G), Ngn2 mutant (H), and Ngn1;Ngn2 mutant (I) cortices. For Dcx, Zfp10-like, and TUJ1, expression was down-regulated in the PP (arrowheads) and dorsomedial SVZ (arrows) of Ngn2 mutants. In Ngn1;Ngn2 double mutants, expression was down-regulated in the medial and lateral SVZ (arrows) but up-regulated in the PP (arrowheads). Arrows and arrowheads are color-coded as follows: red, high expression; orange, medium expression; clear, low expression; all in relative, qualitative terms. VZ, ventricular zone; PP, preplate; SVZ, subventricular zone; IZ, intermediate zone; CP, cortical plate; and wt, wild type.
+
+ View Within Article Full-size image (281K) 
+
+Fig. 3.Expression analysis of regionalized clones in E13.5 Ngn2 and Ngn1;Ngn2 mutant cortices. Frontal sections of E13.5 wild-type (A, D, G, J, M, P, S, V, and Y), Ngn2 mutant (B, E, H, K, N, Q, T, W, and Z), and Ngn1;Ngn2 mutant (C, F, I, L, O, R, U, X, and A') telencephalon hybridized in situ with dig-labeled RNA probes for regionalized genes isolated in our subtractive screen (A–C) Neuroligin 1 ; (D–F) srGAP3 ; (G–I) Bhlhb5 ; (J–L) Mef2c ; (M–O) Unc5H4 ; (P–R) Dcc ; (S–U) EphA5 ; (V–X) Sema3c ; and (Y–A') protocadherin 9. Insets show higher magnification of medial neocortex. Arrowheads indicate preplate; arrows indicate SVZ; brackets indicate VZ. Differences in gene expression are highlighted by changes in the color of the arrows, arrowheads, and brackets as follows: red, high expression; orange, medium expression; clear, strongly reduced expression; all in relative, qualitative terms. VZ, ventricular zone; SVZ, subventricular zone; PP, preplate; and wt, wild-type.
+
+ View Within Article 
+
+Analysis of our subtracted clones revealed several expression patterns, including genes that were expressed in progenitors throughout the neural tube [i.e., pan-progenitor; e.g., G-protein coupled receptor EDG1, transcription factor Pegasus-like (data not shown)]. In contrast, other genes displayed pan-neuronal expression profiles, with transcripts detected in postmitotic neurons right through the embryonic neural tube [e.g., doublecortin ( Dcx ), a microtubule-associated protein ( LoTurco, 2004 ), and Zfp10-like, a putative transcription factor ( Figs. 2 A, A', D, and D')]. In the cortex, pan-neuronal genes were expressed at high level in postmitotic neurons in the preplate medially and in the cortical plate laterally, as well as displaying weaker expression in the SVZ and intermediate zone ( Figs. 2 A, A', D, and D'). Finally, several genes displayed complex regionalized patterns, including those predominantly (e.g., nuclear factor Dach1 and Fut9, which synthesizes the LewisX epitope; Nishihara et al., 2003 ; data not shown) or more abundantly (e.g., transcription factors Id4 and Zac1 ; data not shown) expressed in dorsal versus ventral telencephalic progenitors. Regionalized neuronal markers were also identified, including those that were expressed at higher levels in dorsal versus ventral telencephalic neurons (e.g., transcription factor NFIB ; data not shown). Finally, several genes had complex, regionalized patterns and were expressed in subpopulations of dorsal and ventral telencephalic progenitors and neurons, including the netrin receptor Unc5H4 ( Fig. 3 M; Engelkamp, 2002 ); neuroligin-1 ( Nlgn1 ), which plays an important role in synaptogenesis ( Fig. 3 A; Scheiffele et al., 2000 ), and the guidance molecule Sema3c ( Fig. 3 V; Bagnard et al., 2000 ).
+
+ Expression analysis of pan-neuronal markers in Ngn2 and Ngn1;Ngn2 mutants 
+
+We next set out to determine whether the genes we identified were misregulated in the Ngn2 single mutant cortex, as anticipated from the design of our screen. We first focused our analysis on the pan-neuronal genes, predicting that these genes would be down-regulated in dorsal and not ventral telencephalic neurons in Ngn2 mutants. Indeed, transcript levels for both Dcx and Zfp10-like were reduced, albeit not completely lost, in the medial preplate of E13.5 Ngn2 single mutants ( Figs. 2 B, B', E, E'), a region where Ngn1 is not expressed and cannot compensate for the loss of Ngn2 ( Fode et al., 2000 ). In addition, expression of Dcx and Zfp10-like was greatly reduced in the dorsomedial SVZ of Ngn2 mutants ( Figs. 2 B, B', E, and E'). To confirm that the reduced expression of Dcx and Zfp10-like reflected a true decrease in neurogenesis in the preplate of Ngn2 mutants, we examined expression of neuronal beta-tubulin (TUJ1), a bona fide pan-neuronal marker. In dorsomedial sections, TUJ1 expression was reduced in the Ngn2 mutant preplate ( Fig. 2 H) as compared to wild-type ( Fig. 2 G), confirming that overall numbers of postmitotic neurons were reduced as a consequence of the loss of Ngn2 expression.
+
+
+
+We also examined Zfp10-like and Dcx expression in E13.5 Ngn1;Ngn2 double mutants. In striking contrast to the reduced expression of Zfp10-like and Dcx in Ngn2 single mutants, the pan-neuronal genes were up-regulated in the preplate of Ngn1;Ngn2 double mutants ( Figs. 2 C, C', F, and F'). This result was not completely unexpected given that we had previously reported an up-regulation of the pan-neuronal marker SCG10 in the preplate of E12.5 Ngn1;Ngn2 mutants that was suggestive of an early, ectopic burst of neurogenesis in this mutant background ( Fode et al., 2000 ). Indeed, our analysis of TUJ1 expression confirmed the expansion of the neuronal layer in E13.5 double mutants ( Fig. 2 I). Finally, it should be noted that in contrast to the expression of Zfp10-like and Dcx in the preplate, these genes were both down-regulated in the SVZ of Ngn1;Ngn2 double mutants, as observed in Ngn2 single mutants, suggesting a different mechanism of gene regulation in these two territories ( Figs. 2 C, C', F, and F').
+
+ Expression analysis of regionalized markers in Ngn2 and Ngn1;Ngn2 mutants 
+
+Early born preplate and deep-layer cortical plate neurons are misspecified in Ngn2 mutants, acquiring a GABAergic rather than a glutamatergic identity ( Fode et al., 2000 and Schuurmans et al., 2004 ). One of the goals of our subtractive screen was to identify new components of the specification and/or differentiation programs underlying these cell fate decisions. We speculated that the genes that regulate cell-type-specific processes in some neural populations and not others would be expressed in a regionalized manner in the neural tube, prompting us to focus on the regionalized genes isolated in our screen for the rest of the study.
+
+
+
+We compared the expression profiles of our regionalized genes in E13.5 wild-type, Ngn2 single and Ngn1 ; Ngn2 double mutant cortices. As summarized in Table 1, 16/19 regionalized genes tested were clearly misregulated in Ngn2 and Ngn1;Ngn2 mutants by RNA in situ hybridization. As previously demonstrated, gene expression defects in Ngn2 mutants were restricted to the dorsomedial cortex, where Ngn1 is not expressed and cannot compensate for the loss of Ngn2 ( Fode et al., 2000 ), whereas defects extended throughout the cortex in Ngn1;Ngn2 double mutants ( Fig. 3 ). Before this study, extensive analyses revealed no defects in neuronal specification in Ngn1 single mutants and they were therefore not examined ( Fode et al., 2000 and Schuurmans et al., 2004 ).
+
+ Table 1. 
+
+Alterations in expression patterns of regionalized genes isolated from subtractive screen in Ngn2 and Ngn1;Ngn2 mutants
+
+      Gene name(s) Category Expression ( Ngn2 and Ngn1;Ngn2 mutants versus wild type)     Zac1 (Plagl1/LOT1) Transcription factor darr VZ, PP neurons   Id4 (IDB4) Transcription factor No change   Dach1 Transcription factor No change   Nuclear Factor IB Transcription factor darr PP neurons   Bhlhb5 (Beta3) Transcription factor darr SVZ, PP neurons   Mef2c Transcription factor darr PP neurons   Dcc Receptor or signal transduction darr SVZ, PP neurons   Unc5H4 Receptor or signal transduction darr SVZ, PP neurons   Sema3c (SemE) Receptor or signal transduction darr SVZ, PP neurons   EphA5 (Bsk) Receptor or signal transduction darr SVZ, PP neurons   Neurotractin (KILON) Receptor or signal transduction uarr PP neurons   srGAP3 (Fnbp2) Receptor or signal transduction darr VZ, uarr PP neurons   AKT3 (PKB gamma) Receptor or signal transduction darr PP neurons   Ptbp2 Splicing or RNA binding darr VZ   ELAV-like 4 (HuD) Splicing or RNA binding darr VZ, SVZ   Neuroligin 1 (Nlgn1) Neurotransmission darr VZ, PP neurons   fucosyltransferase 9 Adhesion related No change   protocadherin 9 Adhesion related darr PP neurons   NAP-22 (Basp1) Miscellaneous darr PP neurons    Full-size table 
+
+Summary of genes that displayed regionalized patterns of expression in the E13.5 neural tube. Description of changes in the expression patterns of these regionalized genes in Ngn2 and Ngn1;Ngn2 mutants at E13.5 is noted. VZ, ventricular zone; SVZ, subventricular zone; and PP, preplate.
+
+ View Within Article 
+
+Of the regionalized genes expressed in cortical progenitors, Nlgn1, which is a postsynaptically localized protein in neurons ( Scheiffele et al., 2000 ), and srGAP3, an intracellular mediator of slit / robo signaling ( Wong et al., 2001 ), were clearly down-regulated in cortical progenitors in the VZ of Ngn2 and Ngn1;Ngn2 mutants ( Figs. 3 A–F). To date, srGAP3 and Nlgn1 are the only two genes known to be down-regulated in Ngn2 and Ngn1;Ngn2 mutant cortical VZ progenitors, raising the possibility that they may contribute to the misspecification of progenitor cells. Finally, as further evidence of misregulated expression, srGAP3, which is also normally expressed in ventral telencephalic neurons, was ectopically expressed in preplate neurons in Ngn2 and Ngn1;Ngn2 mutants ( Figs. 3 E and F), as are several other genes normally expressed in the ventral telencephalon at this stage, including Dlx1 and GAD1 ( Fode et al., 2000 ). 
+
+
+
+The largest group of misregulated genes included those whose expression was disrupted in cortical preplate neurons. Included in this category were Bhlhb5 ( Figs. 3 G–I), which encodes a bHLH transcription factor; Mef2c ( Figs. 3 J–L), which encodes a MADS-box transcription factor; and NFIB (data not shown), a member of the Nuclear Factor I family of transcription factors. In addition, transcript levels of the signal transduction molecules Unc5H4 ( Figs. 3 M–O), Dcc ( Figs. 3 P–R), EphA5 ( Figs. 3 S–U), and Sema3c ( Figs. 3 V–X) and for miscellaneous molecules such as protocadherin 9 ( Figs. 3 Y–A') and NAP–22 (data not shown; Table 1 ) were clearly down-regulated in the preplate of Ngn2 and Ngn1;Ngn2 mutants. Given that these genes were all down-regulated in preplate neurons in Ngn2 single and Ngn1;Ngn2 double mutants, even though neuronal numbers were increased in the double mutant preplate, suggested to us that their down-regulation was likely linked to neuronal specification defects observed in both mutant genotypes, and not the neurogenesis deficits that were only apparent in Ngn2 single mutants at E13.5 (see above).
+
+
+
+Finally, we observed that several of our misregulated genes were aberrantly expressed in the SVZ. Genes disrupted in the Ngn1;Ngn2 mutant SVZ included Bhlhb5 ( Figs. 3 G–I), Unc5H4 ( Figs. 3 M–O), Dcc ( Figs. 3 P–R), EphA5 ( Figs. 3 S–U), and Sema3c ( Figs. 3 V–X). Defects in the SVZ were most evident in Ngn1;Ngn2 double mutants as the SVZ had only developed in the very lateral cortex by E13.5, and lateral domains were not severely affected in Ngn2 mutants due to compensation by Ngn1 ( Fode et al., 2000 ). The disruption of gene expression in the SVZ may reflect a change in gene expression in SVZ progenitors, or in differentiating neurons that are migrating through the SVZ into the cortical plate.
+
+ Defects in the differentiation of Ngn2 mutant cortical plate and subplate neurons 
+
+To investigate further Ngn1/2 -dependent defects in regionalized gene expression in postmitotic neurons, we analyzed Ngn2 single mutants at E15.5, a stage when deep-layer cortical plate neurons, which display aberrant molecular identities in Ngn2 and Ngn1;Ngn2 mutants, have differentiated ( Schuurmans et al., 2004 ). At E15.5, Ngn2 continued to be expressed in cortical progenitor cells in the germinal zone, and not in postmitotic neurons ( Figs. 4 A and B). In our analysis, we noted that Bhlhb5 ( Figs. 4 C and D), srGAP3 ( Figs. 4 E and F), Mef2c ( Figs. 4 G and H), and Nlgn1 ( Figs. 4 I and J), which were all expressed in neurons in the wild-type cortical plate, displayed a disorganized and characteristic patchy pattern of expression in the lower cortical plate/intermediate zone in Ngn2 mutants. Notably, the patchy expression pattern of these genes was reminiscent of that previously observed for Math2, Id2, GluR2, Robo1, and Slit1 in Ngn2 mutants ( Schuurmans et al., 2004 ), and in this previous study it was shown that cortical neurons not expressing these genes instead acquired an aberrant GABAergic phenotype ( Schuurmans et al., 2004 ). We therefore suggest that the loss of Bhlhb5, srGAP3, Mef2c, and Nlgn1 suggests that these genes are components of the normal cortical differentiation program, a process that is deregulated as a consequence of the loss of Ngn1/2 function.
+
+ Full-size image (152K) 
+
+Fig. 4.Defects in gene expression in subplate and early born cortical plate neurons in E15.5 Ngn2 mutants. Expression analysis of sagittally sectioned E15.5 wild-type and Ngn2 mutant telencephalon. (A) Expression of Ngn2 in wild-type telencephalon. (B) Higher magnification of boxed region in (A). (C, C', D, and D') Bhlhb5 expression in wild-type (C and C') and Ngn2 mutants (D and D'). Large gaps in CP expression were observed in Ngn2 mutants, along with ectopic expression in the IZ (D'; arrowheads). (E, E', F, and F') srGAP3 expression in wild-type (E and E') and Ngn2 mutants (F and F'). Gaps in expression were observed in CP neurons in Ngn2 mutants (F'; arrowheads). (G, G', H, and H') Mef2c expression in wild-type (G and G') and Ngn2 mutants (H and H'). Expression was reduced in the CP and lost in the SP (asterisk) in Ngn2 mutants (H'). (I, I', J, and J') Nlgn1 expression in wild-type (I and I') and Ngn2 mutants (J and J'). While caudal expression was similar between wild-type and Ngn2 mutants (compare left brackets; I' and J'), rostral expression levels were reduced in the Ngn2 CP (compare right brackets; I' and J'). GZ, germinal zone; IZ, intermediate zone; SP, subplate; CP, cortical plate; and wt, wild-type.
+
+ View Within Article 
+
+As differentiation proceeds, cortical plate neurons migrate into the middle of the preplate, splitting this layer into an overlying marginal zone and underlying subplate layer. At E15.5, we noted that Mef2c was expressed in the subplate of wild-type embryos and that this expression was absent in Ngn2 mutants ( Figs. 4 G, G', H, and H'). Mef2c has been reported to be expressed in mature cortical neurons, including subplate neurons, where it acts as a differentiation or survival factor ( Leifer et al., 1997, Lyons et al., 1995 and Mao et al., 1999 ), and the loss of Mef2c expression in the Ngn2 mutant subplate suggested that these neurons were either missing or misspecified. To distinguish between these possibilities, we further characterized subplate defects at P0, when this layer is more clearly discernable. At P0, Ngn2 continued to be expressed in germinal zone progenitors but was not detected in postmitotic neuronal populations ( Figs. 5 A and B). Of our subtracted clones, Mef2c ( Figs. 5 C and D), protocadherin 9 ( Figs. 5 E and F), and srGAP3 ( Figs. 5 G and H) all clearly demarcated the subplate in P0 wild-type cortices, but not in Ngn2 mutants. To determine whether subplate neurons were present but misspecified in Ngn2 mutants, we labeled P0 cortices with the neuronal marker SCG10 ( Figs. 5 I and J), -MAP2 ( Figs. 5 K and L), and -somatostatin ( Figs. 5 M and N), all of which delineated a clearly visible row of subplate cells in wild-type cortices, and instead labeled unorganized, ectopic neuronal clusters within the intermediate zone of Ngn2 mutants. Similarly, in histological sections of P0 cortices, the subplate appeared as a clearly visible row of cells beneath the cortical plate in wild-type cortices ( Figs. 5 Q and R), but a distinct subplate layer was not discernable in the rostromedial cortex of Ngn2 mutants, and instead, ectopic cellular aggregates formed in the intermediate zone ( Figs. 5 S and T). Finally, to show definitively that early born subplate neurons were generated but failed to segregate to their normal positions in Ngn2 mutants, we used birthdating. BrdU was injected into pregnant dams at E11.5, when subplate neurons are generated ( Smart and Smart, 1977 ), followed by immunohistochemical labeling at P0. In P0 Ngn2 mutants, neurons born at E11.5 migrated correctly beneath the cortical plate in the vicinity of the subplate but were also found in ectopic sites within and beneath the intermediate zone ( Figs. 5 O and P). Thus, subplate neurons are generated but are misspecified and disorganized in Ngn2 mutants.
+
+ Full-size image (274K) 
+
+Fig. 5.Subplate neurons are generated but misspecified in Ngn2 mutants. (A) Expression of Ngn2 in sagittally sectioned perinatal (E18.5) wild-type telencephalon. (B) Higher magnification of germinal zone from (A). (C–F) P0 expression analysis revealed Mef2c (C and D), protocadherin 9 (E and F), and srGAP3 (G and H) were expressed in the CP and SP in wild-type cortices (C, E, and G) and a lack of SP staining in Ngn2 mutants (D, F, and H; *). (I–N) Neuronal markers SCG10 (I and J), anti-MAP2 (K and L), and antisomatostatin (M and N) revealed a clear SP in wild-type cortices (I, K, and M) and a disrupted SP layer in Ngn2 mutants (J, L, and N; *), with ectopic neurons in the IZ (L; **). (O and P) BrdU birthdating at E11.5 followed by immunostaining at P0 revealed that neurons born at E11.5 were located in the correct region beneath the CP (bracket) in wild-type (O) and Ngn2 mutant (P) cortices, and ectopic BrdU+ cells were also within the Ngn2 mutant IZ (P; *). Histological analysis of P0 wild-type (Q and R) and Ngn2 mutant (S and T) cortices revealed a disorganization of the subplate in Ngn2 mutants (T; arrow), which was instead replaced by neuronal aggregates (S; *). cp, cortical plate; gz, germinal zone; sp, subplate; iz, intermediate zone; and wt, wild-type.
+
+ View Within Article Aberrant thalamocortical and corticothalamic axonal trajectories in Ngn1/2 mutants 
+
+Previous studies have demonstrated that the subplate is critical for TCA axonal pathfinding ( Ghosh and Shatz, 1993, McConnell et al., 1989, McConnell et al., 1994 and Super et al., 1998 ), suggesting that disruption and misspecification of this layer in Ngn2 and Ngn1;Ngn2 mutants may interrupt axonal guidance in the cortex. Moreover, we were struck by the observation that several of the Ngn1/2 -regulated genes identified in our screen had been implicated in axon guidance ( Bagnard et al., 2001, Braisted et al., 2000, Dufour et al., 2003, Gao et al., 1998, Skaliora et al., 1998 and Yun et al., 2003 ). In particular, we noted that EphA5, which provides guidance cues for afferent (i.e., TCA) and/or efferent (e.g., corticothalamic afferent) connections in the cortex ( Dufour et al., 2003 and Gao et al., 1998 ), was expressed at reduced levels in the SVZ of Ngn2 and Ngn1;Ngn2 mutants. As well, Sema3c, which can act as an axonal chemorepellent ( Mark et al., 1997 and Steup et al., 2000 ), was down-regulated in the SVZ, raising the possibility that loss of these cues might also disrupt TCA pathfinding. Although defects in TCAs in Ngn2 mutants have been previously documented, they were attributed to intrinsic defects in the dorsal thalamus ( Seibt et al., 2003 ), and the underlying molecular defects had not been identified. We thus set out to determine whether defects intrinsic to the cortex may also interfere with TCA pathfinding in the Ngn2 and Ngn1;Ngn2 mutant neocortices.
+
+
+
+We examined the distribution of TCAs first by immunostaining with an anti-L1 antibody ( Figs. 6 A–F), which revealed an aberrant organization and fasciculation of thalamic axonal tracts that disrupted the cortical germinal zone in E18.5 Ngn2 mutants. We also examined the distribution of TCAs in E18.5 cortices with an antibody to calretinin, a calcium binding protein expressed by thalamic neurons that innervate the cortex ( Frassoni et al., 1998 ). In Ngn2 single and Ngn1;Ngn2 double mutants, a reduced number of calretinin+ fibers exited the internal capsule and entered the neocortex (data not shown), as expected from the previous demonstration of defects intrinsic to the dorsal thalamus ( Seibt et al., 2003 ). However, of the thalamic fibers that did enter, many took abnormally deep trajectories instead projecting beneath the intermediate zone, towards the ventricular surface ( Figs. 6 G–I). To confirm the abnormal targeting of TCAs, thalamic projections were traced by implanting a DiI crystal into the dorsal thalamus, with anterograde transport of DiI labeling a trajectory along the subplate layer ( Figs. 6 J). In Ngn2 single and Ngn1;Ngn2 double mutants, the majority of DiI-labeled thalamic axons that reached the cortex inappropriately targeted the germinal layers beneath the white matter ( Figs. 6 K and L). We suggest that the aberrant trajectory of TCAs in the neocortex is due to the loss of attractive cues from subplate neurons, and possibly the loss of inhibitory cues in the SVZ.
+
+ Full-size image (181K) 
+
+Fig. 6.Thalamocortical and corticofugal projections are perturbed in Ngn2 and Ngn1;Ngn2 mutants. (A–F) L1 immunostaining of E18.5 wild-type (A–C) and Ngn2 mutant (D–F) sagittal sections through the cortex revealed aberrant axonal bundles (arrowheads) that projected into the germinal zone (germinal zone identified histologically with DAPI), causing it to be superficially displaced (arrows) in the Ngn2 mutant cortex. (G–I) Calretinin immunostaining of frontal sections through the cortex labeling cortical afferent and efferent projections revealed normal trajectories above the intermediate zone (arrows) in wild-type cortices (G), partial misrouting to the ventricular surface (arrowheads) in Ngn2 mutants (H), and complete misrouting in Ngn1;Ngn2 mutants (I). (J–L) E18.5 anterograde-labeled, frontally sectioned TCA projections targeted the subplate layer in wild-type cortices (J; arrow), but only a few axons correctly targeted the subplate layer (K; *) in Ngn2 mutants (arrow), with the majority instead projecting towards the ventricular surface (arrowheads). In Ngn1;Ngn2 mutants, all TCAs projected to the ventricular surface (L; arrowheads). cp, cortical plate; gz, germinal zone; sp, subplate; iz, intermediate zone; TCA, thalamocortical afferent; and wt, wild-type.
+
+ View Within Article Discussion 
+
+The primary objective of this study was to gain new insights into the transcriptional program(s) executed downstream of the proneural transcription factor Ngn2. In this regard, our subtractive screen was successful; leading to the identification of two pan-neuronal and 16 regionalized genes whose expression had not previously been known to be misregulated in Ngn2 mutants. Moreover, through expression analyses of our subtracted clones, we identified the cortical subplate as an additional population of neurons displaying specification defects in the Ngn2 and Ngn1;Ngn2 mutant cortices. This led to the demonstration that Ngn1/2 function is required for pathfinding by thalamocortical axons that reach the neocortex, a cohort of axons that normally pathfind by targeting the subplate layer.
+
+ Identification of differentiation cascades activated downstream of Ngn2 
+
+Before this screen, we knew that Ngn1 and Ngn2 activities were absolutely required to induce a dorsal, glutamatergic-specific differentiation program in early born cortical neurons, but known components of the downstream pathway included only HLH (i.e., Math2, Nscl1, NeuroD, NeuroD2, and Id2 ) and T-box ( Tbr1 and Tbr2 ) transcription factors, Robo1 and Slit1 signaling molecules, and VGLUT1/2 transporters ( Schuurmans et al., 2004 ). In this study, we have identified an additional 16 regionalized genes that are misregulated in Ngn2 and Ngn1;Ngn2 mutant neocortices. Strikingly, among these genes are those that are regulated in the VZ, SVZ, preplate, and cortical plate, suggesting that Ngn1/2 are required to activate a downstream genetic cascade that initiates in the VZ. However, at the same time, it is important to note that the genes isolated in our screen may not be direct targets of Ngn1/2, but rather the genes we isolated may be deregulated in Ngn2 and Ngn1;Ngn2 mutant cortices as a consequence of the loss of neurons or the loss of a cortical glutamatergic identity. Regardless, the identification of these 16 Ngn2 -regulated genes greatly expands our knowledge of the genetic cascade that composes the cortical differentiation program. It is also important to note that to date, our screen is only the second survey designed to identify downstream effectors of proneural bHLH transcription factors; and in the first study, gene profiling was performed on transformed neuroendocrine cells, which may not accurately reflect gene expression in vivo ( Hu et al., 2004 ), making our screen the first to search for bona fide, in vivo components of the regulatory cascade(s) activated downstream of a proneural gene.
+
+
+
+Although genomic analyses for proneural-regulated genes have not been conducted in most neural lineages, analyses of expression profiles of candidate target genes in proneural mutants have led to the identification of several downstream genes that typically fall into four categories. Firstly, bHLH transcription factors are known to act in regulatory cascades, activating bHLH and other types of transcription factors. For example, the bHLH genes Math2 and NeuroD are known to be activated downstream of Ngn1 and Ngn2 in the cortex ( Fode et al., 2000 ). In other systems, achaete-scute and atonal genes in Drosophila have been shown to be upstream of transcription factors that include hunchback, prospero, and cut ( Cabrera and Alonso, 1991 and zur Lage et al., 2003 ), and Brn3, Ebf-1, Gfi-1, Hox11L2, Islet-1, Islet-2, Krox24, Lhx2, MyT1, and Phox2 have been identified as proneural-dependent genes in vertebrates ( Cau et al., 2002, Hirsch et al., 1998, Kury et al., 2002, Lo et al., 2002, Perron et al., 1999 and Yang et al., 2003 ). These studies thus suggest that proneural genes mediate their functions to a great extent by activating transcription factor regulatory cascades. Here, we have identified three new transcription factors, namely, Mef2c, Bhlhb5, and NFIB, that are activated downstream of Ngn2 in differentiated cortical neurons ( Fig. 7 ). The expression of the transcription factor Zac1 in progenitors also appears to be partly regulated by Ngn2.
+
+
+
+A second broad category of proneural-regulated genes includes markers of a mature neuronal phenotype, such as NCAM, neurofilament, and the ELAVL4 homologs ELAV and HuC/HuD ( Ferreiro et al., 1994, Park et al., 2003 and zur Lage et al., 2003 ). Here we have shown that Ngn2 regulates the expression of two pan-neuronal markers, Zfp10-like and Dcx. The demonstration that the expression of pan-neuronal markers, and hence neurogenesis, is regulated by proneural genes is not surprising given the known requirement for proneural genes to function as neural determination genes ( Bertrand et al., 2002 and Schuurmans and Guillemot, 2002 ). At the same time, several neuronal subtype markers, including beta3-AChR, L7, mGluR6, VGLUT1/2, GluR2, GAD1/2, and Xomp2, have been shown to be regulated by proneural activity in different systems ( Burns and Vetter, 2002, Fode et al., 2000, Lo et al., 1998, Matter-Sadzinski et al., 2001, Schuurmans et al., 2004 and Tomita et al., 2000 ). This is consistent with the known role of proneural genes in specifying neuronal subtype identities in both fly and mammals ( Fode et al., 2000, Jarman et al., 1993, Lo et al., 2002 and Parras et al., 2002 ). Interestingly, two Ngn1/2 -regulated genes isolated in our screen may also participate in neuronal subtype specification, including Nlgn1 and the glutamate receptor gene GluR6.
+
+
+
+Proneural transcription factors are known to be required to activate genes involved in cell–cell communication, such as rhomboid, scabrous, delta, c-RET, and the neuropeptide receptor NKD ( Heitzler et al., 1996, Lo et al., 1998, Okabe and Okano, 1997, Rosay et al., 1995 and Singson et al., 1994 ), as well as genes involved in migration or pathfinding, including Slit1, the slit receptors Robo1 and Robo3, and CXCR4 ( Kury et al., 2002, Schuurmans et al., 2004 and Zlatic et al., 2003 ). This suggests that proneural genes control more diverse cellular processes than previously anticipated, possibly including cell adhesion, neuronal migration, and axonal pathfinding. Consistent with this idea, several of the Ngn2 -regulated genes we identified in this screen could potentially be involved in cell–cell signalling and adhesion (i.e., Dcc, Unc5H4, Sema3c, EphA5, protocadherin 9, and srGAP3 ; Fig. 7 ). Further analyses of these molecules may provide a molecular basis for the neuronal migration defects ( Schuurmans et al., 2004 ) and axonal guidance defects (see below) that we have observed in Ngn2 and Ngn1;Ngn2 mutant cortices. Finally, in our screen we also identified several genes involved in RNA processing and ubiquitination, suggesting that proneural genes may regulate an even more varied range of processes, including alternative splicing and ubiquitin-mediated turnover. Indeed, a role for proneural genes in RNA processing is supported by studies in Drosophila Kovalick and Beckingham, 1992 and Parkhurst et al., 1993, as well as the genes isolated in this screen involved in RNA dynamics.
+
+ Full-size image (39K) 
+
+Fig. 7.Model depicting Ngn2 -dependent genetic cascades in the cortex. Pax6 directly regulates Ngn2 (solid arrow; Scardigli et al., 2003 ), but whether Ngn2 directly regulates any of the targets identified in our screen remains to be determined (broken lines). For example, we showed that Sema3c is deregulated in Ngn2 mutants and others demonstrated that Sema3c is dependent on Pax6 ( Jones et al., 2002 ). Given that Pax6 directly regulates Ngn2, Pax6 may regulate Sema3c indirectly via Ngn2. It also remains to be determined whether Ngn2 activates a single or multiple genetic cascades as depicted in the diagram. For example, Ngn2 may activate different pathways that separately influence events such as neuronal specification, differentiation, migration, survival, and axonal guidance.
+
+ View Within Article 
+
+In summary, the wide range of Ngn1 - and Ngn2 -regulated genes uncovered in our screen suggests that these proneural transcription factors regulate a multitude of cellular processes ( Fig. 7 ). This is highly analogous to myogenic bHLH transcription factors, which induce both transcriptional cascades and the expression of differentiated muscle-specific genes, including myosin and muscle creatine kinase ( Edmondson and Olson, 1989 and Molkentin and Olson, 1996 ). We can now begin to decipher whether these genes fall into a single linear differentiation program, or if Ngn1/2 activate several downstream programs in parallel. For example, although we know that Ngn1 and Ngn2 cooperate to specify a cortical regional identity, a glutamatergic neurotransmitter phenotype, and deep-layer phenotypes in early born cortical neurons ( Schuurmans et al., 2004 ), the extent to which these pathways are independent or overlap remains to be determined.
+
+ Identification of a new biological function for Ngn2 in guiding TCAs trajectories in the neocortex 
+
+We have shown here that subplate neurons, which normally provide attractive cues for TCAs, are disorganized in Ngn2 and Ngn1;Ngn2 mutants. Moreover, Ngn2 mutant subplate neurons are misspecified and fail to express genes like Mef2c, protocadherin 9, and srGAP3, while still expressing the pan-neuronal markers MAP-2 and SCG10. Previously, we had shown that cortical preplate neurons were misspecified in Ngn2 and Ngn1;Ngn2 mutants ( Fode et al., 2000 ), but we had not examined which of the two populations derived from this structure, namely, the cortical subplate and marginal zone, were affected.
+
+
+
+The abnormal differentiation of the subplate layer in Ngn2 and Ngn1;Ngn2 mutants initially prompted us to examine the projection patterns of TCAs in mutant cortices given the known role of the subplate in guiding these axons. Indeed, we found that TCAs that did reach the cortex in Ngn2 and Ngn1;Ngn2 mutants projected aberrantly towards the germinal zone. Moreover, L1-immunostaining revealed that the Ngn2 mutant TCAs formed abnormal axonal bundles that disrupted the germinal zone of the cortex. Before this study, it was known that defects intrinsic to the Ngn2 mutant dorsal thalamus result in a shift in the areas of the cortex invaded by TCAs ( Seibt et al., 2003 ). We suspect that the abnormal subplate also contributes to area shifts in TCA trajectories in Ngn2 and Ngn1;Ngn2 mutants ( Seibt et al., 2003 ). In particular, it was shown previously that when the subplate was chemically ablated, TCAs were able to enter the cortex, as we observed in Ngn2 and Ngn1;Ngn2 mutants, but grew past their targets and were unable to invade the cortical plate ( Ghosh and Shatz, 1993 and Ghosh et al., 1990 ). Thus, Ngn2 and Ngn1;Ngn2 mutant thalamic defects may not completely account for abnormal TCA trajectories in these mutant backgrounds.
+
+
+
+Another abnormal aspect of the TCA trajectories in Ngn2 and Ngn1;Ngn2 mutants was that the thalamic axons aberrantly projected towards and disrupted the cortical germinal zone. This phenotype is likely independent of the subplate defects given that chemical ablation of the subplate only rarely results in TCAs projecting to the germinal zone ( Ghosh and Shatz, 1993 ). Moreover, although a reduced number of corticofugal axons exit the cortex in Ngn2 mutants ( Schuurmans et al., 2004 ), and these axon tracts are known to provide important guidance cues for TCAs, we suggest that corticofugal defects cannot entirely explain TCA defects in Ngn2 mutants. For example, Tbr1 mutants do not have a subplate and display defects in corticofugal projections, but the end result is arrest of TCAs in the ventral telencephalon, and not aberrant projections within the cortex itself ( Hevner et al., 2001 ). We thus suggest that the abnormal trajectory of TCAs towards the germinal zone in Ngn2 and Ngn1;Ngn2 mutants may be due to the loss of repulsive cues in this layer. In this regard, the reduced expression of EphA5 and Sema3c in the SVZ of Ngn2 and Ngn1;Ngn2 mutants is interesting. EphA receptors are known to act as pathfinding cues for vomeronasal axons ( Knoll and Drescher, 2002 ). Furthermore, interactions between EphA5 and ephrin-A5 can mediate repulsive interactions that exclude limbic thalamic afferents from innervating the somatosensory cortex ( Dufour et al., 2003 and Gao et al., 1998 ). Similarly, semaphorins can operate as chemorepellants ( Mark et al., 1997 and Steup et al., 2000 ) and have been suggested to prevent the extension of TCA axons to the ventricular surface of the cortex ( Skaliora et al., 1998 ), and Neuropilin 2, a high affinity receptor for Sema3c, is expressed in the thalamus ( Chen et al., 1997 and Giger et al., 1998 ). Similar defects in thalamocortical axon pathfinding and fasciculation have been previously observed in Pax6 -/- mutants, and these defects were suggested to be in part attributable to a loss of Sema3c expression ( Jones et al., 2002 ). Indeed, since Pax6 has been shown to directly, transcriptionally regulate the expression of Ngn2 ( Scardigli et al., 2003 ), it is possible that Pax6 regulates Sema3c indirectly through Ngn2 ( Fig. 7 ). We thus propose that the normal targeting of TCAs to the subplate is negatively regulated by chemorepulsive factors in the germinal zone (e.g., EphA5 and Sema3c ) that may be under the transcriptional control of Ngn2. Future investigations will test this possibility directly.
+
+
+
+In summary, through the expression analysis of our subtractive clones, we have identified a number of genes that are regulated by Ngn1 and Ngn2 in the developing neocortex, including not only transcription factors, but also genes potentially involved in cell–cell communication, adhesion, migration, and other functions. We also describe a novel biological role for Ngn2 in the specification of subplate neurons and in providing appropriate guidance cues for TCAs in the neocortex. It is anticipated that further analysis of the genes isolated in our screen will reveal additional roles for the Ngn1/2 in cortical development.
+
+    Acknowledgment 
+
+We are very grateful to Helen Cooper, Isabel Hanson, Brian Hemmings, Hisashi Narimatsu, Eric Olson, Andreas Püschel, Albert Reynolds, Fritz Rathjens, Iljona Skerjanc, Marc Tessier-Lavigne, Pierre Vanderhaeghen, and Zheng-Ping Xu for kindly providing cDNAs. We also thank Raffaella Scardigli for advice on cDNA subtraction, and Sarah McFarlane for helpful s on the manuscript. This work was supported by Canadian Institutes of Health Research (CIHR) operating grant MOP44094 to C.S. P.M. is supported by a CIHR Institute of Genetics Doctoral Research Award and L.M. is supported by a CIHR training grant studentship. C.J. was supported by AHFMR and CIHR training grant summer studentships.
+
+    References 
+
+ Bagnard et al., 2000 D. Bagnard, N. Thomasset, M. Lohrum, A.W. Puschel and J. Bolz, Spatial distributions of guidance molecules regulate chemorepulsion and chemoattraction of growth cones, J. Neurosci. 20 (2000), pp. 1030–1035. View Record in Scopus | Cited By in Scopus (33) 
+
+
+
+ Bagnard et al., 2001 D. Bagnard, N. Chounlamountri, A.W. Puschel and J. Bolz, Axonal surface molecules act in combination with semaphorin 3a during the establishment of corticothalamic projections, Cereb. Cortex 11 (2001), pp. 278–285. Full Text via CrossRef | View Record in Scopus | Cited By in Scopus (17) 
+
+
+
+ Bertrand et al., 2002 N. Bertrand, D.S. Castro and F. Guillemot, Proneural genes and the specification of neural cell types, Nat. Rev., Neurosci. 3 (2002), pp. 517–630. 
+
+
+
+ Braisted et al., 2000 J.E. Braisted, S.M. Catalano, R. Stimac, T.E. Kennedy, M. Tessier-Lavigne, C.J. Shatz and D.D. O'Leary, Netrin-1 promotes thalamic axon growth and is required for proper development of the thalamocortical projection, J. Neurosci. 20 (2000), pp. 5792–5801. View Record in Scopus | Cited By in Scopus (80) 
+
+
+
+ Burns and Vetter, 2002 C.J. Burns and M.L. Vetter, Xath5 regulates neurogenesis in the Xenopus olfactory placode, Dev. Dyn. 225 (2002), pp. 536–543. Full Text via CrossRef | View Record in Scopus | Cited By in Scopus (7) 
+
+
+
+ Cabrera and Alonso, 1991 C.V. Cabrera and M.C. Alonso, Transcriptional activation by heterodimers of the achaete-scute and daughterless gene products of Drosophila, EMBO J. 10 (1991), pp. 2965–2973. 
+
+
+
+ Cau et al., 1997 E. Cau, G. Gradwohl, C. Fode and F. Guillemot, Mash1 activates a cascade of bHLH regulators in olfactory neuron progenitors, Development 124 (1997), pp. 1611–1621. View Record in Scopus | Cited By in Scopus (191) 
+
+
+
+ Cau et al., 2002 E. Cau, S. Casarosa and S. Guillemot, Mash1 and Ngn1 control distinct steps of determination and differentiation in the olfactory sensory neuron lineage, Development 129 (2002), pp. 1871–1880. View Record in Scopus | Cited By in Scopus (77) 
+
+
+
+ Chen et al., 1997 H. Chen, A. Chedotal, Z. He, C.S. Goodman and M. Tessier-Lavigne, Neuropilin-2, a novel member of the neuropilin family, is a high affinity receptor for the semaphorins Sema E and Sema IV but not Sema III, Neuron 19 (1997), pp. 547–559. Article | PDF (1822 K)   | View Record in Scopus | Cited By in Scopus (308) 
+
+
+
+ Chomczynski and Sacchi, 1987 P. Chomczynski and N. Sacchi, Single-step method of RNA isolation by acid guanidinium thiocyanate–phenol–chloroform extraction, Anal. Biochem. 162 (1987), pp. 156–159. Article | PDF (413 K)   | View Record in Scopus | Cited By in Scopus (39905) 
+
+
+
+ Desai and McConnell, 2000 A.R. Desai and S.K. McConnell, Progressive restriction in fate potential by neural progenitors during cerebral cortical development, Development 127 (2000), pp. 2863–2872. View Record in Scopus | Cited By in Scopus (101) 
+
+
+
+ Dufour et al., 2003 A. Dufour, J. Seibt, L. Passante, V. Depaepe, T. Ciossek, J. Frisen, K. Kullander, J.G. Flanagan, F. Polleux and P. Vanderhaeghen, Area specificity and topography of thalamocortical projections are controlled by ephrin/ Eph genes, Neuron 39 (2003), pp. 453–465. Article | PDF (1974 K)   | View Record in Scopus | Cited By in Scopus (70) 
+
+
+
+ Edmondson and Olson, 1989 D.G. Edmondson and E.N. Olson, A gene with homology to the myc similarity region of MyoD1 is expressed during myogenesis and is sufficient to activate the muscle differentiation program, Genes Dev. 3 (1989), pp. 628–640. Full Text via CrossRef | View Record in Scopus | Cited By in Scopus (251) 
+
+
+
+ Engelkamp, 2002 D. Engelkamp, Cloning of three mouse Unc5 genes and their expression patterns at mid-gestation, Mech. Dev. 118 (2002), pp. 191–197. Article | PDF (584 K)   | View Record in Scopus | Cited By in Scopus (40) 
+
+
+
+ Ferreiro et al., 1994 B. Ferreiro, C. Kintner, K. Zimmerman, D. Anderson and W.A. Harris, XASH genes promote neurogenesis in Xenopus embryos, Development 120 (1994), pp. 3649–3655. View Record in Scopus | Cited By in Scopus (87) 
+
+
+
+ Fode et al., 1998 C. Fode, G. Gradwohl, X. Morin, A. Dierich, M. LeMeur, C. Goridis and F. Guillemot, The bHLH protein NEUROGENIN 2 is a determination factor for epibranchial placode-derived sensory neurons, Neuron 20 (1998), pp. 483–494. Article | PDF (543 K)   | View Record in Scopus | Cited By in Scopus (230) 
+
+
+
+ Fode et al., 2000 C. Fode, Q. Ma, S. Casarosa, S.L. Ang, D.J. Anderson and F. Guillemot, A role for neural determination genes in specifying the dorsoventral identity of telencephalic neurons, Genes Dev. 14 (2000), pp. 67–80. View Record in Scopus | Cited By in Scopus (207) 
+
+
+
+ Frantz and McConnell, 1996 G.D. Frantz and S.K. McConnell, Restriction of late cerebral cortical progenitors to an upper-layer fate, Neuron 17 (1996), pp. 55–61. Article | PDF (463 K)   | View Record in Scopus | Cited By in Scopus (124) 
+
+
+
+ Frassoni et al., 1998 C. Frassoni, P. Arcelli, M. Selvaggio and R. Spreafico, Calretinin immunoreactivity in the developing thalamus of the rat: a marker of early generated thalamic cells, Neuroscience 83 (1998), pp. 1203–1214. Abstract | PDF (2617 K)   | View Record in Scopus | Cited By in Scopus (21) 
+
+
+
+ Gao et al., 1998 P.P. Gao, Y. Yue, J.H. Zhang, D.P. Cerretti, P. Levitt and R. Zhou, Regulation of thalamic neurite outgrowth by the Eph ligand ephrin-A5: implications in the development of thalamocortical projections, Proc. Natl. Acad. Sci. U. S. A. 95 (1998), pp. 5329–5334. Full Text via CrossRef | View Record in Scopus | Cited By in Scopus (97) 
+
+
+
+ Ghosh and Shatz, 1993 A. Ghosh and C.J. Shatz, A role for subplate neurons in the patterning of connections from thalamus to neocortex, Development 117 (1993), pp. 1031–1047. View Record in Scopus | Cited By in Scopus (111) 
+
+
+
+ Ghosh et al., 1990 A. Ghosh, A. Antonini, S.K. McConnell and C.J. Shatz, Requirement for subplate neurons in the formation of thalamocortical connections, Nature 347 (1990), pp. 179–181. Full Text via CrossRef | View Record in Scopus | Cited By in Scopus (162) 
+
+
+
+ Giger et al., 1998 R.J. Giger, E.R. Urquhart, S.K. Gillespie, D.V. Levengood, D.D. Ginty and A.L. Kolodkin, Neuropilin-2 is a receptor for semaphorin IV: insight into the structural basis of receptor function and specificity, Neuron 21 (1998), pp. 1079–1092. Article | PDF (417 K)   | View Record in Scopus | Cited By in Scopus (187) 
+
+
+
+ Gradwohl et al., 1996 G. Gradwohl, C. Fode and F. Guillemot, Restricted expression of a novel murine atonal -related bHLH protein in undifferentiated neural precursors, Dev. Biol. 180 (1996), pp. 227–241. Abstract | PDF (3016 K)   | View Record in Scopus | Cited By in Scopus (132) 
+
+
+
+ Heitzler et al., 1996 P. Heitzler, M. Bourouis, L. Ruel, C. Carteret and P. Simpson, Genes of the Enhancer of split and achaete-scute complexes are required for a regulatory loop between Notch and Delta during lateral signalling in Drosophila, Development 122 (1996), pp. 161–171. View Record in Scopus | Cited By in Scopus (207) 
+
+
+
+ Hevner et al., 2001 R.F. Hevner, L. Shi, N. Justice, Y. Hsueh, M. Sheng, S. Smiga, A. Bulfone, A.M. Goffinet, A.T. Campagnoni and J.L. Rubenstein, Tbr1 regulates differentiation of the preplate and layer 6, Neuron 29 (2001), pp. 353–366. Article | PDF (2296 K)   | View Record in Scopus | Cited By in Scopus (170) 
+
+
+
+ Hirsch et al., 1998 M.R. Hirsch, M.C. Tiveron, F. Guillemot, J.F. Brunet and C. Goridis, Control of noradrenergic differentiation and Phox2a expression by MASH1 in the central and peripheral nervous system, Development 125 (1998), pp. 599–608. View Record in Scopus | Cited By in Scopus (158) 
+
+
+
+ Hu et al., 2004 Y. Hu, T. Wang, G.D. Stormo and J.I. Gordon, RNA interference of achaete-scute homolog 1 in mouse prostate neuroendocrine cells reveals its gene targets and DNA binding sites, Proc. Natl. Acad. Sci. U. S. A. 101 (2004), pp. 5559–5564. Full Text via CrossRef | View Record in Scopus | Cited By in Scopus (21) 
+
+
+
+ Jarman et al., 1993 A.P. Jarman, Y. Grau, L.Y. Jan and Y.N. Jan, atonal is a proneural gene that directs chordotonal organ formation in the Drosophila peripheral nervous system, Cell 73 (1993), pp. 1307–1321. Article | PDF (2179 K)   | View Record in Scopus | Cited By in Scopus (248) 
+
+
+
+ Job and Tan, 2003 C. Job and S.S. Tan, Constructing the mammalian neocortex: the role of intrinsic factors, Dev. Biol. 257 (2003), pp. 221–232. Article | PDF (515 K)   | View Record in Scopus | Cited By in Scopus (16) 
+
+
+
+ Jones et al., 2002 L. Jones, G. Lopez-Bendito, P. Gruss, A. Stoykova and Z. Molnar, Pax6 is required for the normal development of the forebrain axonal connections, Development 129 (2002), pp. 5041–5052. View Record in Scopus | Cited By in Scopus (47) 
+
+
+
+ Knoll and Drescher, 2002 B. Knoll and U. Drescher, Ephrin-As as receptors in topographic projections, Trends Neurosci. 25 (2002), pp. 145–149. Article | PDF (119 K)   | View Record in Scopus | Cited By in Scopus (102) 
+
+
+
+ Kury et al., 2002 P. Kury, R. Greiner-Petter, C. Cornely, T. Jurgens and H.W. Muller, Mammalian achaete-scute homolog 2 is expressed in the adult sciatic nerve and regulates the expression of Krox24, Mob-1, CXCR4, and p57kip2 in Schwann cells, J. Neurosci. 22 (2002), pp. 7586–7595. View Record in Scopus | Cited By in Scopus (14) 
+
+
+
+ Kovalick and Beckingham, 1992 G.E. Kovalick and K. Beckingham, Calmodulin transcription is limited to the nervous system during Drosophila embryogenesis, Dev. Biol. 150 (1992), pp. 33–46. Article | PDF (12836 K)   | View Record in Scopus | Cited By in Scopus (14) 
+
+
+
+ Leifer et al., 1997 D. Leifer, Y.L. Li and K. Wehr, Myocyte-specific enhancer binding factor 2C expression in fetal mouse brain development, J. Mol. Neurosci. 8 (1997), pp. 131–143. Full Text via CrossRef | View Record in Scopus | Cited By in Scopus (5) 
+
+
+
+ Lennon et al., 1996 G. Lennon, C. Auffray, M. Polymeropoulos and M.B. Soares, The I.M.A.G.E. Consortium: an integrated molecular analysis of genomes and their expression, Genomics 33 (1996), pp. 151–152. Abstract | PDF (36 K)   | View Record in Scopus | Cited By in Scopus (952) 
+
+
+
+ Lo et al., 1998 L. Lo, M.C. Tiveron and D.J. Anderson, MASH1 activates expression of the paired homeodomain transcription factor Phox2a, and couples pan-neuronal and subtype-specific components of autonomic neuronal identity, Development 125 (1998), pp. 609–620. View Record in Scopus | Cited By in Scopus (159) 
+
+
+
+ Lo et al., 2002 L. Lo, E. Dormand, A. Greenwood and D.J. Anderson, Comparison of the generic neuronal differentiation and neuron subtype specification functions of mammalian achaete-scute and atonal homologs in cultured neural progenitor cells, Development 129 (2002), pp. 1553–1567. View Record in Scopus | Cited By in Scopus (60) 
+
+
+
+ LoTurco, 2004 J. LoTurco, Doublecortin and a tale of two serines, Neuron 41 (2004), pp. 175–177. Article | PDF (77 K)   | View Record in Scopus | Cited By in Scopus (17) 
+
+
+
+ Lyons et al., 1995 G.E. Lyons, B.K. Micales, J. Schwarz, J.F. Martin and E.N. Olson, Expression of mef2 genes in the mouse central nervous system suggests a role in neuronal maturation, J. Neurosci. 15 (1995), pp. 5727–5738. View Record in Scopus | Cited By in Scopus (110) 
+
+
+
+ Ma et al., 1998 Q. Ma, Z. Chen, I. del Barco Barrantes, J.L. de la Pompa and D.J. Anderson, Neurogenin1 is essential for the determination of neuronal precursors for proximal cranial sensory ganglia, Neuron 20 (1998), pp. 469–482. Article | PDF (488 K)   | View Record in Scopus | Cited By in Scopus (307) 
+
+
+
+ Mao et al., 1999 Z. Mao, A. Bonni, F. Xia, M. Nadal-Vicens and M.E. Greenberg, Neuronal activity-dependent cell survival mediated by transcription factor MEF2, Science 286 (1999), pp. 785–790. Full Text via CrossRef | View Record in Scopus | Cited By in Scopus (215) 
+
+
+
+ Mark et al., 1997 M.D. Mark, M. Lohrum and A.W. Puschel, Patterning neuronal connections by chemorepulsion: the semaphorins, Cell Tissue Res. 290 (1997), pp. 299–306. Full Text via CrossRef | View Record in Scopus | Cited By in Scopus (71) 
+
+
+
+ Matter-Sadzinski et al., 2001 L. Matter-Sadzinski, J.M. Matter, M.T. Ong, J. Hernandez and M. Ballivet, Specification of neurotransmitter receptor identity in developing retina: the chick ATH5 promoter integrates the positive and negative effects of several bHLH proteins, Development 128 (2001), pp. 217–231. View Record in Scopus | Cited By in Scopus (34) 
+
+
+
+ McConnell and Kaznowski, 1991 S.K. McConnell and C.E. Kaznowski, Cell cycle dependence of laminar determination in developing neocortex, Science 254 (1991), pp. 282–285. View Record in Scopus | Cited By in Scopus (296) 
+
+
+
+ McConnell et al., 1989 S.K. McConnell, A. Ghosh and C.J. Shatz, Subplate neurons pioneer the first axon pathway from the cerebral cortex, Science 245 (1989), pp. 978–982. View Record in Scopus | Cited By in Scopus (189) 
+
+
+
+ McConnell et al., 1994 S.K. McConnell, A. Ghosh and C.J. Shatz, Subplate pioneers and the formation of descending connections from cerebral cortex, J. Neurosci. 14 (1994), pp. 1892–1907. View Record in Scopus | Cited By in Scopus (90) 
+
+
+
+ Molkentin and Olson, 1996 J.D. Molkentin and E.N. Olson, Defining the regulatory networks for muscle development, Curr. Opin. Genet. Dev. 6 (1996), pp. 445–453. Abstract | PDF (955 K)   | View Record in Scopus | Cited By in Scopus (255) 
+
+
+
+ Nieto et al., 2001 M. Nieto, C. Schuurmans, O. Britz and F. Guillemot, Neural bHLH genes control the neuronal versus glial fate decision in cortical progenitors, Neuron 29 (2001), pp. 401–413. Article | PDF (1503 K)   | View Record in Scopus | Cited By in Scopus (195) 
+
+
+
+ Nishihara et al., 2003 S. Nishihara, H. Iwasaki, K. Nakajima, A. Togayachi, Y. Ikehara, T. Kudo, Y. Kushi, A. Furuya, K. Shitara and H. Narimatsu, Alpha1,3-fucosyltransferase IX (Fut9) determines Lewis X expression in brain, Glycobiology 13 (2003), pp. 445–455. Full Text via CrossRef | View Record in Scopus | Cited By in Scopus (12) 
+
+
+
+ Okabe and Okano, 1997 M. Okabe and H. Okano, Two-step induction of chordotonal organ precursors in Drosophila embryogenesis, Development 124 (1997), pp. 1045–1053. 
+
+
+
+ Park et al., 2003 S.H. Park, S.Y. Yeo, K.W. Yoo, S.K. Hong, S. Lee, M. Rhee, A.B. Chitnis and C.H. Kim, Zath3, a neural basic helix-loop-helix gene, regulates early neurogenesis in the zebrafish, Biochem. Biophys. Res. Commun. 308 (2003), pp. 184–190. Article | PDF (378 K)   | View Record in Scopus | Cited By in Scopus (7) 
+
+
+
+ Parkhurst et al., 1993 S.M. Parkhurst, H.D. Lipshitz and D. Ish-Horowicz, achaete-scute feminizing activities and Drosophila sex determination, Development 117 (1993), pp. 737–749. View Record in Scopus | Cited By in Scopus (15) 
+
+
+
+ Parras et al., 2002 C.M. Parras, C. Schuurmans, R. Scardigli, J. Kim, D.J. Anderson and F. Guillemot, Divergent functions of the proneural genes Mash1 and Ngn2 in the specification of neuronal subtype identity, Genes Dev. 16 (2002), pp. 324–338. Full Text via CrossRef | View Record in Scopus | Cited By in Scopus (105) 
+
+
+
+ Perron et al., 1999 M. Perron, K. Opdecamp, K. Butler, W.A. Harris and E.J. Bellefroid, X-ngnr-1 and Xath3 promote ectopic expression of sensory neuron markers in the neurula ectoderm and have distinct inducing properties in the retina, Proc. Natl. Acad. Sci. U. S. A. 96 (1999), pp. 14996–15001. Full Text via CrossRef | View Record in Scopus | Cited By in Scopus (76) 
+
+
+
+ Rhinn et al., 1998 M. Rhinn, A. Dierich, W. Shawlot, R.R. Behringer, M. Le Meur and S.L. Ang, Sequential roles for Otx2 in visceral endoderm and neuroectoderm for forebrain and midbrain induction and specification, Development 125 (1998), pp. 845–856. View Record in Scopus | Cited By in Scopus (167) 
+
+
+
+ Rosay et al., 1995 P. Rosay, J.F. Colas and L. Maroteaux, Dual organisation of the Drosophila neuropeptide receptor NKD gene promoter, Mech. Dev. 51 (1995), pp. 329–339. Article | PDF (11459 K)   | View Record in Scopus | Cited By in Scopus (18) 
+
+
+
+ Scardigli et al., 2003 R. Scardigli, N. Baumer, P. Gruss, F. Guillemot and I. Le Roux, Direct and concentration-dependent regulation of the proneural gene Neurogenin2 by Pax6, Development 130 (2003), pp. 3269–3281. Full Text via CrossRef | View Record in Scopus | Cited By in Scopus (51) 
+
+
+
+ Scheiffele et al., 2000 P. Scheiffele, J. Fan, J. Choih, R. Fetter and T. Serafini, Neuroligin expressed in nonneuronal cells triggers presynaptic development in contacting axons, Cell 101 (2000), pp. 657–669. Article | PDF (867 K)   | View Record in Scopus | Cited By in Scopus (313) 
+
+
+
+ Schuurmans and Guillemot, 2002 C. Schuurmans and F. Guillemot, Molecular mechanisms underlying cell fate specification in the developing telencephalon, Curr. Opin. Neurobiol. 12 (2002), pp. 26–34. Article | PDF (702 K)   | View Record in Scopus | Cited By in Scopus (116) 
+
+
+
+ Schuurmans et al., 2004 C.A.O. Schuurmans, M. Nieto, J.M. Stenman, O. Britz, N. Klenin, J. Seibt, C. Brown, H. Tang, J.M. Cunningham, R. Dyck, C. Walsh, K. Campbell, F. Polleux and F. Guillemot, Sequential Phases of Neocortical Fate Specification Involve Neurogenin-Dependent and -Independent Pathways, Embo. J. (2004) online publication, July 1, 2004. 
+
+
+
+ Seibt et al., 2003 J. Seibt, C. Schuurmans, G. Gradwhol, C. Dehay, P. Vanderhaeghen, F. Guillemot and F. Polleux, Neurogenin2 specifies the connectivity of thalamic neurons by controlling axon responsiveness to intermediate target cues, Neuron 39 (2003), pp. 439–452. Article | PDF (2364 K)   | View Record in Scopus | Cited By in Scopus (36) 
+
+
+
+ Singson et al., 1994 A. Singson, M.W. Leviten, A.G. Bang, X.H. Hua and J.W. Posakony, Direct downstream targets of proneural activators in the imaginal disc include genes involved in lateral inhibitory signaling, Genes Dev. 8 (1994), pp. 2058–2071. Full Text via CrossRef | View Record in Scopus | Cited By in Scopus (70) 
+
+
+
+ Skaliora et al., 1998 I. Skaliora, W. Singer, H. Betz and A.W. Puschel, Differential patterns of semaphorin expression in the developing rat brain, Eur. J. Neurosci. 10 (1998), pp. 1215–1229. Full Text via CrossRef | View Record in Scopus | Cited By in Scopus (68) 
+
+
+
+ Smart and Smart, 1977 I.H. Smart and M. Smart, The location of nuclei of different labelling intensities in autoradiographs of the anterior forebrain of postnatial mice injected with [3H]thymidine on the eleventh and twelfth days postconception, J. Anat. 123 (1977), pp. 515–525. View Record in Scopus | Cited By in Scopus (12) 
+
+
+
+ Steup et al., 2000 A. Steup, M. Lohrum, N. Hamscho, N.E. Savaskan, O. Ninnemann, R. Nitsch, H. Fujisawa, A.W. Puschel and T. Skutella, Sema3c and netrin-1 differentially affect axon growth in the hippocampal formation, Mol. Cell. Neurosci. 15 (2000), pp. 141–155. Article | PDF (5416 K)   | View Record in Scopus | Cited By in Scopus (30) 
+
+
+
+ Sun et al., 2001 Y. Sun, M. Nadal-Vicens, S. Misono, M.Z. Lin, A. Zubiaga, X. Hua, G. Fan and M.E. Greenberg, Neurogenin promotes neurogenesis and inhibits glial differentiation by independent mechanisms, Cell 104 (2001), pp. 365–376. Article | PDF (989 K)   | View Record in Scopus | Cited By in Scopus (268) 
+
+
+
+ Super et al., 1998 H. Super, E. Soriano and H.B. Uylings, The functions of the preplate in development and evolution of the neocortex and hippocampus, Brain Res. Brain Res. Rev. 27 (1998), pp. 40–64. Article | PDF (1217 K)   | View Record in Scopus | Cited By in Scopus (97) 
+
+
+
+ Takahashi et al., 1998 T. Takahashi, F. Nakamura, Z. Jin, R.G. Kalb and S.M. Strittmatter, Semaphorins A and E act as antagonists of neuropilin-1 and agonists of neuropilin-2 receptors, Nat. Neurosci. 1 (1998), pp. 487–493. Full Text via CrossRef | View Record in Scopus | Cited By in Scopus (133) 
+
+
+
+ Tomita et al., 2000 K. Tomita, K. Moriyoshi, S. Nakanishi, F. Guillemot and R. Kageyama, Mammalian achaete-scute and atonal homologs regulate neuronal versus glial fate determination in the central nervous system, EMBO J. 19 (2000), pp. 5460–5472. Full Text via CrossRef | View Record in Scopus | Cited By in Scopus (113) 
+
+
+
+ Wong et al., 2001 K. Wong, X.R. Ren, Y.Z. Huang, Y. Xie, G. Liu, H. Saito, H. Tang, L. Wen, S.M. Brady-Kalnay, L. Mei, J.Y. Wu, W.C. Xiong and Y. Rao, Signal transduction in neuronal migration: roles of GTPase activating proteins and the small GTPase Cdc42 in the Slit-Robo pathway, Cell 107 (2001), pp. 209–221. Article | PDF (844 K)   | View Record in Scopus | Cited By in Scopus (154) 
+
+
+
+ Yang et al., 2003 Z. Yang, K. Ding, L. Pan, M. Deng and L. Gan, Math5 determines the competence state of retinal ganglion cell progenitors, Dev. Biol. 264 (2003), pp. 240–254. Article | PDF (1275 K)   | View Record in Scopus | Cited By in Scopus (46) 
+
+
+
+ Yun et al., 2003 K. Yun, S. Garel, S. Fischman and J.L. Rubenstein, Patterning of the lateral ganglionic eminence by the Gsh1 and Gsh2 homeobox genes regulates striatal and olfactory bulb histogenesis and the growth of axons through the basal ganglia, J. Comp. Neurol. 461 (2003), pp. 151–165. Full Text via CrossRef | View Record in Scopus | Cited By in Scopus (28) 
+
+
+
+ Zlatic et al., 2003 M. Zlatic, M. Landgraf and M. Bate, Genetic specification of axonal arbors: atonal regulates robo3 to position terminal branches in the Drosophila nervous system, Neuron 37 (2003), pp. 41–51. Article | PDF (564 K)   | View Record in Scopus | Cited By in Scopus (23) 
+
+
+
+ zur Lage et al., 2003 P.I. zur Lage, D.R. Prentice, E.E. Holohan and A.P. Jarman, The Drosophila proneural gene amos promotes olfactory sensillum formation and suppresses bristle formation, Development 130 (2003), pp. 4683–4693. View Record in Scopus | Cited By in Scopus (13) 
+
+    Appendix A. Supplementary data 
+
+ Supplementary Table 1.Genes isolated in subtractive hybridization screen
+
+ (96 K) Supplementary_Table.doc Microsoft Word file 1. View Within Article    Corresponding author. 2277 HSC, University of Calgary, 3330 Hospital Drive NW, Calgary, AB, Canada T2N 4N1. Fax: +1 403 270 0737.                Developmental Biology      Volume 273, Issue 2,   15 September 2004,   Pages 373-389                   Home   Browse   Search - selected   My Settings   Alerts     Help                       About ScienceDirect |    Contact Us   |      Terms & Conditions    |    Privacy Policy        Copyright © 2008 Elsevier B.V. All rights reserved. ScienceDirect® is a registered trademark of Elsevier B.V.                 

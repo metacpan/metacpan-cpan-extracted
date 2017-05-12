@@ -1,0 +1,51 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 f8fe103579a022499f03fae0a222909097e29c1f Changes
+SHA1 c5309e27cfa57a21a740e76a16da56ec07f0e06f HTMLCustomPage.pm
+SHA1 507a10efa92555ddddfbe72be27964d9e3eef80f LICENSE
+SHA1 e23e2aef461bfeeb5d67bfc135c388478ba7006f MANIFEST
+SHA1 138ef8bb2e669b03ce0a3b5562cf2f0e16969eed META.yml
+SHA1 04ad35caa8bd4f15f5c4ea125a6c7ead4440c176 Makefile.PL
+SHA1 f5ed28861ff9c5fe64e5ac1385d6de2f54a498e6 README
+SHA1 440c1b8e400e83c12a1e2103ee5682f0b76015f5 examples/ex1.pl
+SHA1 49b0e5e62495f1b536d2c9db33583a9e8f5841ea examples/ex2.pl
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
+SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 94c9c496f8868f5892134719a6361bf6035caef7 t/Error-Pure-Output-Tags-HTMLCustomPage/01-use.t
+SHA1 149f9c7843c09690b7919be5050a910ad909892c t/Error-Pure-Output-Tags-HTMLCustomPage/02-version.t
+SHA1 446742abdb2cb734cc2029415a7d51773362284b xt/Error-Pure-Output-Tags-HTMLCustomPage/01-pod_coverage.t
+SHA1 497f5b32e05db58cb1f2814e54a14d6f5eab0357 xt/Error-Pure-Output-Tags-HTMLCustomPage/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJV+8YbAAoJEJe+XXKaIuTlqb0H/i3KZXD7bY9aGP5TMpHhyh4L
+DP4uwyuBeJQH4vdcPHszC9H4P51TDSbzgHV7ZHCyfzfoAsOYpuYuhcvcZLNoh3s8
+zzVcca5onJunu5gg+AFNiSLJliPbkUr06U5I5Sha2oNNw2uXsSYZlOAnMsPYGfXS
+h933RqyLlDz9jNPMYYXcemyst0hhUx3OpEKLrv1HhkKH7wJnXQgva2QXko17aFdB
+ScLLKA/2Nm9bVQ201FAcMvucPolcjIsldHImTNjsQ3eL/mjFAvnv9q93MzRznd9B
+ENGpsZ6Qm3StQkQ2vaDzUG9ggElkLOXdMqtcaUtfPrhNSz2bQnnbO6Czz18XTJs=
+=UjFy
+-----END PGP SIGNATURE-----

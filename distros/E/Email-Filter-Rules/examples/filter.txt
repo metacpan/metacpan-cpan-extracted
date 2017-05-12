@@ -1,0 +1,29 @@
+# Linux - FLUX
+lists/linux/flux/linux        to:cc linux@flux.org
+lists/linux/flux/talk         to:cc talk@flux.org
+lists/linux/flux/website      to:cc website@flux.org
+lists/linux/flux/announce     to    flux-announce@flux.org
+
+# Linux - Fluxbox
+lists/linux/fluxbox/users     to:cc fluxbox-users@lists.sourceforge.net
+lists/linux/fluxbox/devel     to:cc fluxbox-devel@lists.sourceforge.net
+lists/linux/fluxbox/announce  to:cc fluxbox-announce@lists.sourceforge.net
+
+# Linux - Debian
+lists/linux/debian/news       to    debian-news@lists.debian.org
+lists/linux/debian/announce   to    debian-announce@lists.debian.org
+lists/linux/debian/mirrors    to    debian-mirrors@lists.debian.org
+lists/linux/debian/bugs       to:cc bugs.debian.org
+
+# Linux - Mozilla
+lists/linux/mozilla-bugs      to    mozilla-bugs
+
+# Perl
+lists/perl/useperl            to:cc use-perl
+
+# Perl - PM
+lists/perl/pm_groups          to:cc pm_groups@pm.org
+lists/perl/pm/southflorida    to:cc southflorida-pm@mail.pm.org
+
+# Word of the Day
+lists/word-of-the-day from word@m-w.com

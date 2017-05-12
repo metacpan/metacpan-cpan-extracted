@@ -1,0 +1,8 @@
+--- #YAML:1.0
+name: Event-IO
+version: 0.01
+author:
+  - 
+abstract: 
+license: perl
+generated_by: Module::Build version 0.24, without YAML.pm

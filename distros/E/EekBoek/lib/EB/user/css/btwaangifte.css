@@ -1,0 +1,79 @@
+/* btwaangifte.css -- stylesheet for BTW aangifte report
+ * Author          : Johan Vromans
+ * Created On      : Sat Oct 8 14:45:33 2005
+ * Last Modified By: Johan Vromans
+ * Last Modified On: Mon Jun 14 22:06:06 2010
+ * Update Count    : 12
+ * Status          : Unknown, Use with caution!
+ */
+
+@import eekboek.css;
+
+.title {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 100%;
+    font-weight: bold;
+    margin-top: 0pt;
+    margin-bottom: 0pt;
+}
+.subtitle {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 100%;
+    font-weight: bold;
+    margin-top: 0pt;
+}
+.footer {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 80%;
+    font-weight: normal;
+}
+
+body {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    line-height: 150%;
+    color: #000000;
+    table-width: 100%;
+}
+
+table {
+     border-collapse: collapse;
+}
+
+th { vertical-align: top }
+tr { vertical-align: top }
+
+.heading {
+    font-size: 120%;
+    font-weight: bold;    
+}
+
+.subheading {
+    font-weight: bold;    
+}
+
+.c_num {
+    padding-left: 10pt;
+    padding-right: 6pt;
+}
+
+.c_desc {
+    padding-right: 10pt;
+}
+
+.c_col1 {
+    padding-left: 10pt;
+    padding-right: 10pt;
+    text-align: right;
+}
+
+.c_col2 {
+    padding-left: 10pt;
+    padding-right: 10pt;
+    text-align: right;
+}
+
+.notice {
+    font-size: 100%;
+    font-weight: bold;
+    color: #ff0000;
+}

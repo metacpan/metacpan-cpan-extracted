@@ -1,0 +1,89 @@
+
+[!
+
+use Embperl::MyForm ;
+
+sub title   { $epreq -> gettext ('txt:setup_import_title') } 
+sub condition { 
+    my ($self, $r) = @_ ;
+    if ($r -> {data}{action} ne 'importslave')
+    	{
+    	return 0 ;
+    	}
+    $r -> {data}{inetconnect} = '' ;
+    return 1 ;    	
+    }
+
+!]
+
+[$ sub show $]
+
+[- $escmode = 0 -]
+<p>[= txt:setup_import1 =]</p>
+<p>[= txt:setup_im_export2 =]</p>
+<p>[= txt:setup_im_export4 =]</p>
+<p>[= txt:setup_import5 =]</p>
+[- $escmode = 7 -]
+
+<br>
+
+
+[-
+$suffix = '';
+$fdat{hostou} ||= $suffix ;
+	
+Embperl::MyForm -> showfields (	[
+        Embperl::Form -> add_sublines({width => 1, section => 1,
+                name => 'import-what', text=> 'Importieren'},
+                [
+                {
+                value => 'bb5000',
+                text => 'BB-5000',
+                fields =>
+                    [
+                    { name => 'hostcn', text => 'Name des neuen BB-5000',width=> 1,
+                        validate => [ -key => 'import-what-bb5000',  -break => 1, checked => 1, -break => 0,
+                                      -key => 'hostcn', required => 1, must_not_contain => ',+"/<>#', ],
+                        },
+                    { name => 'hostou', text => 'Container in den der neue BB-5000 importiert werden soll',width=> 1,
+                        xvalidate => [ -key => 'import-what-bb5000',  -break => 1, checked => 1, -break => 0,
+                                      -key => 'hostou', -type => 'Select', required => 1,  ],
+                        
+                        type => 'select', xdatasrc => 'hostconfig_container',
+                        addtop => [[$suffix, $suffix]]},
+                    ]
+                },
+                {
+                value => 'obj',
+                text => 'Objekte',
+                fields =>
+                    [
+                    { name => 'importdn', text => 'DN des Objekts das importiert werden soll',width=> 1,
+                        validate => [ -key => 'import-what-obj',  -break => 1, checked => 1, -break => 0,
+                                      -key => 'importdn', required => 1,  ]
+                        },
+                    { name => 'importcn', text => 'Name des neuen Objekts',width=> 1,
+                        validate => [ -key => 'import-what-obj',  -break => 1, checked => 1, -break => 0,
+                                      -key => 'importcn', required => 1, must_not_contain => ',+"/<>#',  ],
+                        },
+                    { name => 'importou', text => 'Container in den das neue Objekts importiert werden soll',width=> 1,
+                        type => 'select', xdatasrc => 'container',
+                        validate => [ -key => 'import-what-obj',  -break => 1, checked => 1, -break => 0,
+                                      -key => 'importou', required => 1,  ],
+                        },
+                    { name => 'import_nobak', type => 'checkbox', value => 1, width => 1},
+                    ]
+                },
+                ], 'radio'),
+        { name => 'adminuser', text => 'Name des Administratorbenutzers', 
+                        validate => [ required => 1 ], type => 'input'},
+	{ name => 'adminpass', type => 'password', text => 'Kennwort',
+			validate => [ required => 1, ]},
+	{ name => 'slaveaddr', text => 'IP Adresse des zu importierenden BB-5000', width=> 1,
+			validate => [ required => 1, ]},
+        ]);
+-]
+
+[$endsub$]
+
+

@@ -1,0 +1,25 @@
+# $File: //member/autrijus/Encode-HanDetect/README $ $Author: autrijus $
+# $Revision: #1 $ $Change: 4051 $ $DateTime: 2003/01/30 22:34:14 $
+
+This is the README file for Encode::HanDetect, a cross-encoding,
+cross-variant Chinese decoder.
+
+* Installation
+
+Encode::HanDetect uses the standard perl module install process:
+
+cpansign -v		# see SIGNATURE for details
+perl Makefile.PL
+make
+make test
+make install
+enc2xs -C		# optional; updates Encode.pm's on-demand loading DB
+
+* Copyright
+
+Copyright 2003 by Autrijus Tang <autrijus@autrijus.org>.
+
+All rights reserved.  You can redistribute and/or modify
+this bundle under the same terms as Perl itself.
+
+See <http://www.perl.com/perl/misc/Artistic.html>.

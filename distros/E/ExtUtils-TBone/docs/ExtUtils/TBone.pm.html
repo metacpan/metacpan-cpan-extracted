@@ -1,0 +1,454 @@
+<HTML>
+<HEAD>
+  <TITLE>ExtUtils::TBone 1.124</TITLE>
+</HEAD>
+<BODY 
+       bgcolor="#FFFFFF" link="#CC3366" vlink="#993366" alink="#FF6666">
+<FONT FACE="sans-serif" SIZE=-1><A HREF="http://www.zeegee.com" TARGET="_top"><IMG SRC="icons/zeegee.gif" ALT="ZeeGee Software" ALIGN="RIGHT" BORDER="0"></A><A NAME="__TOP__"><H1>ExtUtils::TBone 1.124</H1>
+</A><UL>
+<LI> <A NAME="menu:NAME"><A HREF="#NAME">NAME</A></A>
+<LI> <A NAME="menu:SYNOPSIS"><A HREF="#SYNOPSIS">SYNOPSIS</A></A>
+<LI> <A NAME="menu:DESCRIPTION"><A HREF="#DESCRIPTION">DESCRIPTION</A></A>
+<LI> <A NAME="menu:OUTPUT"><A HREF="#OUTPUT">OUTPUT</A></A>
+<UL>
+<LI> <A NAME="menu:Standard_output"><A HREF="#Standard_output">Standard output</A></A>
+</UL>
+<LI> <A NAME="menu:Log_file"><A HREF="#Log_file">Log file</A></A>
+<LI> <A NAME="menu:PUBLIC_INTERFACE"><A HREF="#PUBLIC_INTERFACE">PUBLIC INTERFACE</A></A>
+<UL>
+<LI> <A NAME="menu:Construction"><A HREF="#Construction">Construction</A></A>
+<UL>
+<LI> <A NAME="menu:item:new_ARGS"><A HREF="#item:new_ARGS">new [ARGS...]</A></A>
+<LI> <A NAME="menu:item:typical"><A HREF="#item:typical">typical</A></A>
+</UL>
+<LI> <A NAME="menu:Doing_tests"><A HREF="#Doing_tests">Doing tests</A></A>
+<UL>
+<LI> <A NAME="menu:item:begin_NUMTESTS"><A HREF="#item:begin_NUMTESTS">begin NUMTESTS</A></A>
+<LI> <A NAME="menu:item:end"><A HREF="#item:end">end</A></A>
+<LI> <A NAME="menu:item:ok_BOOL_TESTNAME_PARAMHASH"><A HREF="#item:ok_BOOL_TESTNAME_PARAMHASH">ok BOOL, [TESTNAME], [PARAMHASH...]</A></A>
+<LI> <A NAME="menu:item:ok_eq_ASTRING_BSTRING_TESTNAME_PARAMHASH"><A HREF="#item:ok_eq_ASTRING_BSTRING_TESTNAME_PARAMHASH">ok_eq ASTRING, BSTRING, [TESTNAME], [PARAMHASH...]</A></A>
+<LI> <A NAME="menu:item:ok_eqnum_ANUM_BNUM_TESTNAME_PARAMHASH"><A HREF="#item:ok_eqnum_ANUM_BNUM_TESTNAME_PARAMHASH">ok_eqnum ANUM, BNUM, [TESTNAME], [PARAMHASH...]</A></A>
+</UL>
+<LI> <A NAME="menu:Logging_messages"><A HREF="#Logging_messages">Logging messages</A></A>
+<UL>
+<LI> <A NAME="menu:item:log_open_PATH"><A HREF="#item:log_open_PATH">log_open PATH</A></A>
+<LI> <A NAME="menu:item:log_close"><A HREF="#item:log_close">log_close</A></A>
+<LI> <A NAME="menu:item:log_warnings"><A HREF="#item:log_warnings">log_warnings</A></A>
+<LI> <A NAME="menu:item:log_MESSAGE"><A HREF="#item:log_MESSAGE">log MESSAGE...</A></A>
+<LI> <A NAME="menu:item:msg_MESSAGE"><A HREF="#item:msg_MESSAGE">msg MESSAGE...</A></A>
+</UL>
+<LI> <A NAME="menu:Utilities"><A HREF="#Utilities">Utilities</A></A>
+<UL>
+<LI> <A NAME="menu:item:catdir_DIR_DIR"><A HREF="#item:catdir_DIR_DIR">catdir DIR, ..., DIR</A></A>
+<LI> <A NAME="menu:item:catfile_DIR_DIR_FILE"><A HREF="#item:catfile_DIR_DIR_FILE">catfile DIR, ..., DIR, FILE</A></A>
+</UL>
+</UL>
+<LI> <A NAME="menu:VERSION"><A HREF="#VERSION">VERSION</A></A>
+<LI> <A NAME="menu:CHANGE_LOG"><A HREF="#CHANGE_LOG">CHANGE LOG</A></A>
+<UL>
+<LI> <A NAME="menu:item:Version_1_124_2001_08_20"><A HREF="#item:Version_1_124_2001_08_20">Version 1.124   (2001/08/20)</A></A>
+<LI> <A NAME="menu:item:Version_1_122_2001_08_20"><A HREF="#item:Version_1_122_2001_08_20">Version 1.122   (2001/08/20)</A></A>
+<LI> <A NAME="menu:item:Version_1_120_2001_08_17"><A HREF="#item:Version_1_120_2001_08_17">Version 1.120   (2001/08/17)</A></A>
+<LI> <A NAME="menu:item:Version_1_116_2000_03_23"><A HREF="#item:Version_1_116_2000_03_23">Version 1.116   (2000/03/23)</A></A>
+<LI> <A NAME="menu:item:Version_1_112_1999_05_12"><A HREF="#item:Version_1_112_1999_05_12">Version 1.112   (1999/05/12)</A></A>
+<LI> <A NAME="menu:item:Version_1_111_1999_04_18"><A HREF="#item:Version_1_111_1999_04_18">Version 1.111   (1999/04/18)</A></A>
+<LI> <A NAME="menu:item:Version_1_110_1999_04_17"><A HREF="#item:Version_1_110_1999_04_17">Version 1.110   (1999/04/17)</A></A>
+</UL>
+<LI> <A NAME="menu:AUTHOR"><A HREF="#AUTHOR">AUTHOR</A></A>
+</UL>
+
+
+<P><HR>
+<A NAME="NAME"><H2><A HREF="#__TOP__"><IMG SRC="icons/h1bullet.gif" ALT="Top" BORDER="0"></A> NAME</H2></A>
+
+
+<P>ExtUtils::TBone - a &quot;skeleton&quot; for writing &quot;t/*.t&quot; test files.
+
+
+
+<P><HR>
+<A NAME="SYNOPSIS"><H2><A HREF="#__TOP__"><IMG SRC="icons/h1bullet.gif" ALT="Top" BORDER="0"></A> SYNOPSIS</H2></A>
+
+
+<P>Include a copy of this module in your t directory (as t/ExtUtils/TBone.pm),
+and then write your t/*.t files like this:
+
+<FONT SIZE=3 FACE="courier"><PRE>
+    use lib &quot;./t&quot;;             # to pick up a ExtUtils::TBone
+    use ExtUtils::TBone;
+</PRE></FONT>
+<FONT SIZE=3 FACE="courier"><PRE>
+    # Make a tester... here are 3 different alternatives:
+    my $T = typical ExtUtils::TBone;                 # standard log
+    my $T = new ExtUtils::TBone;                     # no log 
+    my $T = new ExtUtils::TBone &quot;testout/Foo.tlog&quot;;  # explicit log
+    
+    # Begin testing, and expect 3 tests in all:
+    $T-&gt;begin(3);                           # expect 3 tests
+    $T-&gt;msg(&quot;Something for the log file&quot;);  # message for the log
+    
+    # Run some tests:    
+    $T-&gt;ok($this);                  # test 1: no real info logged
+    $T-&gt;ok($that,                   # test 2: logs a comment
+	   &quot;Is that ok, or isn't it?&quot;); 
+    $T-&gt;ok(($this eq $that),        # test 3: logs comment + vars 
+	   &quot;Do they match?&quot;,
+	   This =&gt; $this,
+	   That =&gt; $that);
+     
+    # That last one could have also been written... 
+    $T-&gt;ok_eq($this, $that);            # does 'eq' and logs operands
+    $T-&gt;ok_eqnum($this, $that);         # does '==' and logs operands 
+     
+    # End testing:
+    $T-&gt;end;   
+</PRE></FONT>
+
+
+<P><HR>
+<A NAME="DESCRIPTION"><H2><A HREF="#__TOP__"><IMG SRC="icons/h1bullet.gif" ALT="Top" BORDER="0"></A> DESCRIPTION</H2></A>
+
+
+<P>This module is intended for folks who release CPAN modules with 
+&quot;t/*.t&quot; tests.  It makes it easy for you to output syntactically
+correct test-output while at the same time logging all test
+activity to a log file.  Hopefully, bug reports which include
+the contents of this file will be easier for you to investigate.
+
+
+
+<P><HR>
+<A NAME="OUTPUT"><H2><A HREF="#__TOP__"><IMG SRC="icons/h1bullet.gif" ALT="Top" BORDER="0"></A> OUTPUT</H2></A>
+
+
+
+<P><HR>
+<A NAME="Standard_output"><H3><A HREF="#__TOP__"><IMG SRC="icons/h2bullet.gif" ALT="Top" BORDER="0"></A> Standard output</H3></A>
+
+
+<P>Pretty much as described by <CODE>Test::Harness</CODE>, with a special
+&quot;# END&quot; comment placed at the very end:
+
+<FONT SIZE=3 FACE="courier"><PRE>
+    1..3
+    ok 1
+    not ok 2
+    ok 3
+    # END
+</PRE></FONT>
+
+
+<P><HR>
+<A NAME="Log_file"><H2><A HREF="#__TOP__"><IMG SRC="icons/h1bullet.gif" ALT="Top" BORDER="0"></A> Log file</H2></A>
+
+
+<P>A typical log file output by this module looks like this:
+
+<FONT SIZE=3 FACE="courier"><PRE>
+    1..3
+     
+    ** A message logged with msg().
+    ** Another one.
+    1: My first test, using test(): how'd I do?
+    1: ok 1
+    
+    ** Yet another message.
+    2: My second test, using test_eq()...
+    2: A: The first string
+    2: B: The second string
+    2: not ok 2
+    
+    3: My third test.
+    3: ok 3
+    
+    # END
+</PRE></FONT>
+
+<P>Each test() is logged with the test name and results, and
+the test-number prefixes each line.
+This allows you to scan a large file easily with &quot;grep&quot; (or, ahem, &quot;perl&quot;).
+A blank line follows each test's record, for clarity.
+
+
+
+<P><HR>
+<A NAME="PUBLIC_INTERFACE"><H2><A HREF="#__TOP__"><IMG SRC="icons/h1bullet.gif" ALT="Top" BORDER="0"></A> PUBLIC INTERFACE</H2></A>
+
+
+
+<P><HR>
+<A NAME="Construction"><H3><A HREF="#__TOP__"><IMG SRC="icons/h2bullet.gif" ALT="Top" BORDER="0"></A> Construction</H3></A>
+
+
+
+<DL>
+<P><DT><B><A HREF="#__TOP__"><IMG SRC="icons/itembullet.gif" ALT="Top" BORDER="0"></A> <A NAME="item:new"><A NAME="item:new_ARGS">new [ARGS...]</A></A></B></DT>
+<DD>
+<I>Class method, constructor.</I>
+Create a new tester.  Any arguments are sent to log_open().
+
+<P><DT><B><A HREF="#__TOP__"><IMG SRC="icons/itembullet.gif" ALT="Top" BORDER="0"></A> <A NAME="item:typical">typical</A></B></DT>
+<DD>
+<I>Class method, constructor.</I>
+Create a typical tester.  
+Use this instead of new() for most applicaitons.
+The directory &quot;testout&quot; is created for you automatically, to hold
+the output log file, and log_warnings() is invoked.
+
+</DL>
+
+
+
+<P><HR>
+<A NAME="Doing_tests"><H3><A HREF="#__TOP__"><IMG SRC="icons/h2bullet.gif" ALT="Top" BORDER="0"></A> Doing tests</H3></A>
+
+
+
+<DL>
+<P><DT><B><A HREF="#__TOP__"><IMG SRC="icons/itembullet.gif" ALT="Top" BORDER="0"></A> <A NAME="item:begin"><A NAME="item:begin_NUMTESTS">begin NUMTESTS</A></A></B></DT>
+<DD>
+<I>Instance method.</I>
+Start testing.  
+This outputs the 1..NUMTESTS line to the standard output.
+
+<P><DT><B><A HREF="#__TOP__"><IMG SRC="icons/itembullet.gif" ALT="Top" BORDER="0"></A> <A NAME="item:end">end</A></B></DT>
+<DD>
+<I>Instance method.</I>
+Indicate the end of testing.
+This outputs a &quot;# END&quot; line to the standard output.
+
+<P><DT><B><A HREF="#__TOP__"><IMG SRC="icons/itembullet.gif" ALT="Top" BORDER="0"></A> <A NAME="item:ok"><A NAME="item:ok_BOOL_TESTNAME_PARAMHASH">ok BOOL, [TESTNAME], [PARAMHASH...]</A></A></B></DT>
+<DD>
+<I>Instance method.</I>
+Do a test, and log some information connected with it.
+This outputs the test result lines to the standard output:
+
+<FONT SIZE=3 FACE="courier"><PRE>
+    ok 12
+    not ok 13
+</PRE></FONT>
+
+<P>Use it like this:
+
+<FONT SIZE=3 FACE="courier"><PRE>
+    $T-&gt;ok(-e $dotforward);
+</PRE></FONT>
+
+<P>Or better yet, like this:
+
+<FONT SIZE=3 FACE="courier"><PRE>
+    $T-&gt;ok((-e $dotforward), 
+	   &quot;Does the user have a .forward file?&quot;);
+</PRE></FONT>
+
+<P>Or even better, like this:
+
+<FONT SIZE=3 FACE="courier"><PRE>
+    $T-&gt;ok((-e $dotforward), 
+	   &quot;Does the user have a .forward file?&quot;,
+	   User =&gt; $ENV{USER},
+	   Path =&gt; $dotforward,
+	   Fwd  =&gt; $ENV{FWD});
+</PRE></FONT>
+
+<P>That last one, if it were test #3, would be logged as:
+
+<FONT SIZE=3 FACE="courier"><PRE>
+    3: Does the user have a .forward file?
+    3:   User: &quot;alice&quot;
+    3:   Path: &quot;/home/alice/.forward&quot;
+    3:   Fwd: undef
+    3: ok
+</PRE></FONT>
+
+<P>You get the idea.  Note that defined quantities are logged with delimiters 
+and with all nongraphical characters suitably escaped, so you can see 
+evidence of unexpected whitespace and other badnasties.  
+Had &quot;Fwd&quot; been the string &quot;this\nand\nthat&quot;, you'd have seen:
+
+<FONT SIZE=3 FACE="courier"><PRE>
+    3:   Fwd: &quot;this\nand\nthat&quot;
+</PRE></FONT>
+
+<P>And unblessed array refs like [&quot;this&quot;, &quot;and&quot;, &quot;that&quot;] are 
+treated as multiple values:
+
+<FONT SIZE=3 FACE="courier"><PRE>
+    3:   Fwd: &quot;this&quot;
+    3:   Fwd: &quot;and&quot;
+    3:   Fwd: &quot;that&quot;
+</PRE></FONT>
+<P><DT><B><A HREF="#__TOP__"><IMG SRC="icons/itembullet.gif" ALT="Top" BORDER="0"></A> <A NAME="item:ok_eq"><A NAME="item:ok_eq_ASTRING_BSTRING_TESTNAME_PARAMHASH">ok_eq ASTRING, BSTRING, [TESTNAME], [PARAMHASH...]</A></A></B></DT>
+<DD>
+<I>Instance method.</I>  
+Convenience front end to ok(): test whether <CODE>ASTRING eq BSTRING</CODE>, and
+logs the operands as 'A' and 'B'.
+
+<P><DT><B><A HREF="#__TOP__"><IMG SRC="icons/itembullet.gif" ALT="Top" BORDER="0"></A> <A NAME="item:ok_eqnum"><A NAME="item:ok_eqnum_ANUM_BNUM_TESTNAME_PARAMHASH">ok_eqnum ANUM, BNUM, [TESTNAME], [PARAMHASH...]</A></A></B></DT>
+<DD>
+<I>Instance method.</I>  
+Convenience front end to ok(): test whether <CODE>ANUM == BNUM</CODE>, and
+logs the operands as 'A' and 'B'.  
+
+</DL>
+
+
+
+<P><HR>
+<A NAME="Logging_messages"><H3><A HREF="#__TOP__"><IMG SRC="icons/h2bullet.gif" ALT="Top" BORDER="0"></A> Logging messages</H3></A>
+
+
+
+<DL>
+<P><DT><B><A HREF="#__TOP__"><IMG SRC="icons/itembullet.gif" ALT="Top" BORDER="0"></A> <A NAME="item:log_open"><A NAME="item:log_open_PATH">log_open PATH</A></A></B></DT>
+<DD>
+<I>Instance method.</I>
+Open a log file for messages to be output to.  This is invoked
+for you automatically by <CODE>new(PATH)</CODE> and <CODE>typical()</CODE>.
+
+<P><DT><B><A HREF="#__TOP__"><IMG SRC="icons/itembullet.gif" ALT="Top" BORDER="0"></A> <A NAME="item:log_close">log_close</A></B></DT>
+<DD>
+<I>Instance method.</I>
+Close the log file and stop logging.  
+You shouldn't need to invoke this directly; the destructor does it.
+
+<P><DT><B><A HREF="#__TOP__"><IMG SRC="icons/itembullet.gif" ALT="Top" BORDER="0"></A> <A NAME="item:log_warnings">log_warnings</A></B></DT>
+<DD>
+<I>Instance method.</I>
+Invoking this redefines $SIG{__WARN__} to log to STDERR and 
+to the tester's log.  This is automatically invoked when
+using the <CODE>typical</CODE> constructor.
+
+<P><DT><B><A HREF="#__TOP__"><IMG SRC="icons/itembullet.gif" ALT="Top" BORDER="0"></A> <A NAME="item:log"><A NAME="item:log_MESSAGE">log MESSAGE...</A></A></B></DT>
+<DD>
+<I>Instance method.</I>
+Log a message to the log file.  No alterations are made on the
+text of the message.  See msg() for an alternative.
+
+<P><DT><B><A HREF="#__TOP__"><IMG SRC="icons/itembullet.gif" ALT="Top" BORDER="0"></A> <A NAME="item:msg"><A NAME="item:msg_MESSAGE">msg MESSAGE...</A></A></B></DT>
+<DD>
+<I>Instance method.</I>
+Log a message to the log file.  Lines are prefixed with &quot;** &quot; for clarity,
+and a terminating newline is forced.
+
+</DL>
+
+
+
+<P><HR>
+<A NAME="Utilities"><H3><A HREF="#__TOP__"><IMG SRC="icons/h2bullet.gif" ALT="Top" BORDER="0"></A> Utilities</H3></A>
+
+
+
+<DL>
+<P><DT><B><A HREF="#__TOP__"><IMG SRC="icons/itembullet.gif" ALT="Top" BORDER="0"></A> <A NAME="item:catdir"><A NAME="item:catdir_DIR_DIR">catdir DIR, ..., DIR</A></A></B></DT>
+<DD>
+<I>Class/instance method.</I>
+Concatenate several directories into a path ending in a directory.
+Lightweight version of the one in <CODE>File::Spec</CODE>; this method
+dates back to a more-innocent time when File::Spec was younger
+and less ubiquitous.
+
+
+<P>Paths are assumed to be absolute.
+To signify a relative path, the first DIR must be &quot;.&quot;,
+which is processed specially.
+
+
+<P>On Mac, the path <I>does</I> end in a ':'.
+On Unix, the path <I>does not</I> end in a '/'.
+
+<P><DT><B><A HREF="#__TOP__"><IMG SRC="icons/itembullet.gif" ALT="Top" BORDER="0"></A> <A NAME="item:catfile"><A NAME="item:catfile_DIR_DIR_FILE">catfile DIR, ..., DIR, FILE</A></A></B></DT>
+<DD>
+<I>Class/instance method.</I>
+Like catdir(), but last element is assumed to be a file.
+Note that, at a minimum, you must supply at least a single DIR. 
+
+</DL>
+
+
+
+<P><HR>
+<A NAME="VERSION"><H2><A HREF="#__TOP__"><IMG SRC="icons/h1bullet.gif" ALT="Top" BORDER="0"></A> VERSION</H2></A>
+
+
+<P>$Id: TBone.pm,v 1.124 2001/08/20 20:30:07 eryq Exp $
+
+
+
+<P><HR>
+<A NAME="CHANGE_LOG"><H2><A HREF="#__TOP__"><IMG SRC="icons/h1bullet.gif" ALT="Top" BORDER="0"></A> CHANGE LOG</H2></A>
+
+
+
+<DL>
+<P><DT><B><A HREF="#__TOP__"><IMG SRC="icons/itembullet.gif" ALT="Top" BORDER="0"></A> <A NAME="item:Version"><A NAME="item:Version_1_124_2001_08_20">Version 1.124   (2001/08/20)</A></A></B></DT>
+<DD>
+The terms-of-use have been placed in the distribution file &quot;COPYING&quot;.  
+Also, small documentation tweaks were made.
+
+<P><DT><B><A HREF="#__TOP__"><IMG SRC="icons/itembullet.gif" ALT="Top" BORDER="0"></A> <A NAME="item:Version"><A NAME="item:Version_1_122_2001_08_20">Version 1.122   (2001/08/20)</A></A></B></DT>
+<DD>
+Changed output of <CODE>&quot;END&quot;</CODE> to <CODE>&quot;# END&quot;</CODE>; apparently, &quot;END&quot; is
+not a directive.  Maybe it never was.
+<I>Thanks to Michael G. Schwern for the bug report.</I>
+
+<FONT SIZE=3 FACE="courier"><PRE>
+    The storyteller
+       need not say &quot;the end&quot; aloud;
+    Silence is enough.
+</PRE></FONT>
+
+<P>Automatically invoke <CODE>log_warnings()</CODE> when constructing
+via <CODE>typical()</CODE>.
+
+<P><DT><B><A HREF="#__TOP__"><IMG SRC="icons/itembullet.gif" ALT="Top" BORDER="0"></A> <A NAME="item:Version"><A NAME="item:Version_1_120_2001_08_17">Version 1.120   (2001/08/17)</A></A></B></DT>
+<DD>
+Added log_warnings() to support the logging of SIG{__WARN__}
+messages to the log file (if any).
+
+<P><DT><B><A HREF="#__TOP__"><IMG SRC="icons/itembullet.gif" ALT="Top" BORDER="0"></A> <A NAME="item:Version"><A NAME="item:Version_1_116_2000_03_23">Version 1.116   (2000/03/23)</A></A></B></DT>
+<DD>
+Cosmetic improvements only.
+
+<P><DT><B><A HREF="#__TOP__"><IMG SRC="icons/itembullet.gif" ALT="Top" BORDER="0"></A> <A NAME="item:Version"><A NAME="item:Version_1_112_1999_05_12">Version 1.112   (1999/05/12)</A></A></B></DT>
+<DD>
+Added lightweight catdir() and catfile() (a la File::Spec)
+to enhance portability to Mac environment.
+
+<P><DT><B><A HREF="#__TOP__"><IMG SRC="icons/itembullet.gif" ALT="Top" BORDER="0"></A> <A NAME="item:Version"><A NAME="item:Version_1_111_1999_04_18">Version 1.111   (1999/04/18)</A></A></B></DT>
+<DD>
+Now uses File::Basename to create &quot;typical&quot; logfile name,
+for portability.
+
+<P><DT><B><A HREF="#__TOP__"><IMG SRC="icons/itembullet.gif" ALT="Top" BORDER="0"></A> <A NAME="item:Version"><A NAME="item:Version_1_110_1999_04_17">Version 1.110   (1999/04/17)</A></A></B></DT>
+<DD>
+Fixed bug in constructor that surfaced if no log was being used. 
+
+</DL>
+
+
+<P>Created: Friday-the-13th of February, 1998.
+
+
+
+<P><HR>
+<A NAME="AUTHOR"><H2><A HREF="#__TOP__"><IMG SRC="icons/h1bullet.gif" ALT="Top" BORDER="0"></A> AUTHOR</H2></A>
+
+
+<P>Eryq (<I><FILE><A HREF="mailto:eryq@zeegee.com">eryq@zeegee.com</A></FILE></I>).
+President, ZeeGee Software Inc. (<I><FILE><A HREF="http://www.zeegee.com">http://www.zeegee.com</A></FILE></I>).
+
+
+<P>Go to <I><FILE><A HREF="http://www.zeegee.com">http://www.zeegee.com</A></FILE></I> for the latest downloads
+and on-line documentation for this module.  
+
+
+<P>Enjoy.  Yell if it breaks.
+
+<P><HR>
+<ADDRESS><FONT SIZE=-1>
+Generated Mon Aug 20 16:30:20 2001 by cvu_pod2html
+</FONT></ADDRESS>
+</FONT></BODY>
+</HTML>

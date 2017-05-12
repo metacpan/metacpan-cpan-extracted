@@ -1,0 +1,75 @@
+Emacs-Rep
+
+A tool for interactive finds and replaces from inside of emacs,
+but using perl5 substitution commands.
+
+INSTALLATION
+
+To install this module, download the latest release from here:
+
+    http://search.cpan.org/search?query=Emacs%3A%3ARep&mode=all
+
+Run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+Additionally, you need to make sure that this file has
+been added to a location in your emacs load-path:
+
+        elisp/rep.el
+
+And as explained at the top of that file:
+
+   Add the following into your ~/.emacs (or equivalent):
+     (require 'rep)
+     (global-set-key "C-c.S" 'rep-open-substitutions)
+
+SUPPORT AND DOCUMENTATION
+
+User documentation can be found in the comments at the
+top of:
+
+   elisp/rep.el
+
+Web pages related to this can be found at:
+  http://obsidianrook.com/rep
+
+After installing, you can find documentation for this module with
+the perldoc command.
+
+    perldoc Emacs::Rep
+
+A good discussion forum for perl/emacs lash-ups like this:
+  http://groups.google.com/group/emacs-perl-intersection
+
+The code is available on github:
+  http://github.com/doomvox/rep
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Emacs-Rep
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Emacs-Rep
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Emacs-Rep
+
+    Search CPAN
+        http://search.cpan.org/dist/Emacs-Rep/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 Joseph Brenner
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

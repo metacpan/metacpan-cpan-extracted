@@ -1,0 +1,85 @@
+NAME
+    "Encode::Float" - Encode/decode float as a string for sorting.
+
+SYNOPSIS
+      use Encode::Float;
+      my $encoder = Encode::Float->new();
+      my @list;
+      for (my $i = 0 ; $i < 10 ; $i++)
+      {
+        my $float = (.5 - rand) * 10**int(10 - 20 * rand);
+        $float = 0 if $i == 0;
+        my $encoded = $encoder->encode($float);
+        my $decoded = $encoder->decode($encoded);
+        my $error   = $encoder->getRelativeDifference($float, $decoded);
+        push @list, [ $encoded, $float, $decoded, $error ];
+      }
+      @list = sort { $a->[0] cmp $b->[0] } @list;
+      foreach (@list)
+      {
+        print join(',', @$_) . "\n";
+      }
+
+DESCRIPTION
+    "Encode::Float" encodes and decodes floating point numbers as fixed
+    length positive decimal integers that preserve their order (less
+    rounding errors), that is, sorting the encoded integers also sorts the
+    floating point numbers.
+
+CONSTRUCTOR
+  "new"
+    The method "new" creates an instance of the "Encode::Float" class with
+    the following parameter:
+
+    "digitsOfAccuracy"
+         digitsOfAccuracy => 16
+
+        "digitsOfAccuracy" is an optional parameter that sets the number of
+        decimal digits to preserve in the floating point number; the default
+        is 16.
+
+METHODS
+  "encode"
+    The method "encode" takes a floating point number as its only parameter
+    and returns its integer encoding.
+
+  "decode"
+    The method "decode" takes an encoded floating point number (a positive
+    integer) and returns its floating point number.
+
+  "getRelativeDifference"
+    The method "getRelativeDifference (floatA, floatB)" computes the
+    relative difference between the floating point numbers "floatA" and
+    "floatB", which is "abs(floatA - floatB)/max(abs(floatA), abs(floatB))"
+    or zero if both numbers are zero.
+
+INSTALLATION
+    Use CPAN to install the module and all its prerequisites:
+
+      perl -MCPAN -e shell
+      >install Encode::Float
+
+BUGS
+    Please email bugs reports or feature requests to
+    "bug-encode-float@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Encode-Float>. The
+    author will be notified and you can be automatically notified of
+    progress on the bug fix or feature request.
+
+AUTHOR
+     Jeff Kubina<jeff.kubina@gmail.com>
+
+COPYRIGHT
+    Copyright (c) 2013 Jeff Kubina. All rights reserved. This program is
+    free software; you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+KEYWORDS
+    decoding, double, encoding, float
+
+SEE ALSO
+    CPAN, Sort::External
+

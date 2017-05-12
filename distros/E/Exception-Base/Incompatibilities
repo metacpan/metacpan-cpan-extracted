@@ -1,0 +1,261 @@
+0.19 -> 0.20
+
+* New methods to_number/to_string replaced numerify/stringify.
+
+  Was:
+
+  my $e = Exception::Base->catch;
+  print $e->stringify(4);
+  print $e->numerify;
+
+  Should be:
+
+  my $e = Exception::Base->catch;
+  $e->verbosity = 4;  # or: local $e->{verbosity} = 4;
+  print $e->to_string;
+  print $e->to_number;
+
+* New attribute string_attributes replaced stringify_attributes.
+
+  Was:
+
+  use Exception::Base 'Exception::My' => {
+    has => 'myattr',
+    myattr => 'default',
+    stringify_attributes => ['message', 'myattr'],
+  };
+
+  Should be:
+
+  use Exception::Base 'Exception::My' => {
+    has => 'myattr',
+    myattr => 'default',
+    string_attributes => ['message', 'myattr'],
+  };
+
+* Removed export of try/catch/throw methods and :all tag.
+
+  Was:
+
+  use Exception::Base ':all';
+  try eval { do_something };
+  if (catch my $e) {
+    print $e->message;
+  }
+
+  Should be:
+
+  use Exception::Base;
+  eval { do_something };
+  if ($@ and my $e = Exception::Base->catch) {
+    print $e->message;
+  }
+
+* Removed method with.
+
+  Was:
+
+  my $e = Exception::Base->catch;
+  if ($e->with( 'message' )) { warn "default attribute" }
+  elsif ($e->with( -isa => ['Exception::Foo'] )) { warn "isa" }
+  elsif ($e->with( value => 9 )) { warn "value" }
+  elsif ($e->with( qr/^Error/ )) { warn "regexp" }
+
+  Should be:
+
+  my $e = Exception::Base->catch;
+  if ($e->matches( 'message' ) { warn "default attribute" }
+  elsif ($e->matches( ['Exception::Foo'] )) { warn "isa" }
+  elsif ($e->matches( { value => 9 } )) { warn "value" }
+  elsif ($e->matches( qr/^Error/ )) { warn "regexp" }
+
+* Method catch takes no arguments.
+
+  Was:
+
+  my $status = Exception::Base->catch( my $e );
+
+  Should be:
+
+  my status = !!(my $e = Exception::Base->catch);
+
+  or:
+
+  Was:
+
+  if (catch my $e) {
+    ...
+  };
+
+  Should be:
+
+  if ($@) {
+    my $e = Exception::Base->catch;
+    ...
+  }
+
+------------------------------------------------------------------------
+0.16 -> 0.17
+
+* The catch method doesn't rethrow a caught exception.  The class name of static
+  method has no meaning and reference to array is no longer an argument for
+  the method.
+
+  Was:
+
+  eval { throw Exception::Base };
+  if ($@) {
+      my $e = Exception::System->catch;
+      # retrow anything else than Exception::System automatically
+      (...)
+  }
+
+  Should be:
+
+  eval { throw Exception::Base };
+  if ($@) {
+      my $e = Exception::Base->catch;
+      if ($e->isa('Exception::System') {
+          (...)
+      }
+      else {
+          $e->throw;
+      }
+  }
+
+  or:
+
+  Was:
+
+  try eval { throw Exception::Base };
+  if (catch my $e, ['Exception::System', 'Exception::Died']) {
+      # retrow anything else than Exception::System automatically
+      (...)
+  }
+
+  Should be:
+
+  eval { throw Exception::Base };
+  if ($@) {
+      my $e = Exception::Base->catch;
+      if ($e->with(-isa => ['Exception::System', 'Exception::Died'])) {
+          (...)
+      }
+      else {
+          $e->throw;
+      }
+  }
+
+------------------------------------------------------------------------
+0.15 -> 0.16
+
+* The FIELD constant was renamed to ATTRS as far as every OO language calls it
+  attributes.  All derived classes should use ATTRS constant instead of FIELD
+  constant.
+
+  Was:
+
+  use constant FIELDS => {
+    %{ Exception::Base->FIELDS },
+    message  => { is => 'rw', default => 'Extended exception' },
+    myattr   => { is => 'rw' },
+  };
+
+  Should be:
+
+  use constant ATTRS => {
+    %{ Exception::Base->ATTRS },
+    message  => { is => 'rw', default => 'Extended exception' },
+    myattr   => { is => 'rw' },
+  };
+
+* An unknown attribute will be ignored instead to be part of properties
+  attribute.  You can create additional exception class which supports these
+  attributes.
+
+  Was:
+
+  Exception::Base->throw(tag => 1, myattr => 2);
+  $@->with(tag => 1);
+
+  Should be:
+
+  use Exception::Base 'Exception::My' => { has => [ 'tag', 'myattr' ] };
+  Exception::My->throw(tag => 1, myattr => 2);
+  $@->with(tag => 1);
+
+* Removed eval_error attribute.  If the error stack is empty, the catch method
+  recover $@ variable into attribute pointed by eval_attribute.
+
+  Was:
+
+  try eval { die "Message" };
+  if (catch my $e) {
+      print $e->eval_error;
+  }
+
+  Should be:
+
+  try eval { die "Message" };
+  if (catch my $e) {
+      print $e->message;
+  }
+
+* The catch method returns $@ variable if error stack is empty.
+
+  Was:
+
+  try eval { -f "/etc/shadow"  or Exception::Base->throw() };
+  try eval { -f "/etc/passwd"  or Exception::Base->throw() };
+  try eval { -f "/etc/passwd-" or Exception::Base->throw() };
+  while (catch my $e) {
+    do_something();
+  }
+
+  Should be:
+
+  try eval {
+       -f "/etc/shadow"  or Exception::Base->throw();
+       -f "/etc/passwd"  or Exception::Base->throw();
+       -f "/etc/passwd-" or Exception::Base->throw();
+  };
+  if (catch my $e) {
+      do_something();
+  }
+
+* The _stringify private method renamed to __stringify.  It might be important
+  for derived classes which overloads q{""}.
+
+  Was:
+
+  package Exception::My;
+  use base 'Exception::Base';
+  use overload 'q{""}' => '_stringify';
+  sub _stringify { return $_[0]->stringify; }
+
+  Should be:
+
+  use Exception::My;
+  use base 'Exception::Base';
+  use overload 'q{""}' => '__stringify';
+  sub __stringify { return $_[0]->stringify; }
+
+------------------------------------------------------------------------
+0.14 -> 0.15
+
+* throw() method is exported with ":all" tag.  It can break the code which
+  uses indirect notation.
+
+  Was:
+
+  throw Exception::Base message => 'Something happened';
+
+  Should be:
+
+  Exception::Base->throw( message => 'Something happened' );
+
+  or:
+
+  throw 'Exception::Base' => message => 'Something happened';
+
+------------------------------------------------------------------------

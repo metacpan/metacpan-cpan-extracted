@@ -1,0 +1,42 @@
+#!/bin/sh
+
+APP=ebcore
+PODIR=.
+SRCROOT=../
+MODIR=${SRCROOT}lib/EB/res/locale
+GTF="-LPerl -j -k -k__x -k_T -kN__ -k__xt -k__XN --from-code=utf-8"
+
+test -d ${PODIR} || {
+     echo "Wrong dir! Cannot find ${PODIR}";
+     exit 1;
+}
+test -d ${MODIR} || {
+     echo "Wrong dir! Cannot find ${MODIR}";
+     exit 1;
+}
+
+cp /dev/null ${PODIR}/${APP}.pot
+xgettext ${GTF} -o ${PODIR}/${APP}.pot ${SRCROOT}script/ebshell
+find ${SRCROOT}lib/EekBoek.pm ${SRCROOT}lib/EB.pm ${SRCROOT}lib/EB ${SRCROOT}lib/EB/Wx/IniWiz.pm ${SRCROOT}lib/EB/Wx/IniWiz ${SRCROOT}lib/EB/Wx/Shell \( -name CVS -prune \) -o \( -name Wx -prune \) -o \( -name DeLuxe.pm -prune \) -o \( -name '*.pm' -a -print -exec xgettext ${GTF} -o ${PODIR}/${APP}.pot {} \; \)
+
+for locale in en
+do
+  if [ -f ${PODIR}/${APP}-${locale}.po ]
+  then
+      mkdir -p ${MODIR}/${locale}/LC_MESSAGES/
+      # Update current .po:
+      msgmerge -U ${PODIR}/${APP}-${locale}.po ${PODIR}/${APP}.pot
+      # Compile it:
+      #msgfmt -c -v -o ${LIB}/EB/locale/${locale}/LC_MESSAGES/${APP}.mo $DIR/${APP}-${locale}.po
+      msgfmt -c -v -o ${MODIR}/${locale}/LC_MESSAGES/${APP}.mo ${PODIR}/${APP}-${locale}.po
+  else
+      # Create a .po for translation:
+      if [ $locale = "en" ]
+      then
+	  cat ${PODIR}/${APP}-${locale}.pox ${PODIR}/${APP}.pot > ${PODIR}/${APP}-${locale}.po 
+      else
+	  msginit -i ${PODIR}/${APP}.pot -o ${PODIR}/${APP}-${locale}.po -l $locale --no-translator
+      fi
+  fi
+done
+

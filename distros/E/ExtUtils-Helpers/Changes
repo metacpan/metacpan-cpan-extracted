@@ -1,0 +1,91 @@
+Revision history for ExtUtils-Helpers
+
+0.026     2016-09-09 19:26:57+02:00 Europe/Amsterdam
+          - Fix Win32 dependency
+
+0.025     2016-09-02 09:48:38+02:00 Europe/Amsterdam
+          - Remove unconditional dependency on ExtUtils::PL2Bat
+
+0.024     2016-08-16 22:02:31+02:00 Europe/Amsterdam (TRIAL RELEASE)
+          - Move pl2bat code to ExtUtils::PL2Bat
+
+0.023     2016-08-06 20:52:34+02:00 Europe/Amsterdam (TRIAL RELEASE)
+          - Make split_like_shell always unixy
+          - Remove Module::Load dependency
+          - Remove done_testing, it requires Test::More 0.88
+
+0.022     2014-03-07 13:27:09CET+0100 Europe/Amsterdam
+          Cleaned up remains of former functions
+          Skip IO layers on <5.8 for 5.6 compatability
+          Don't swallow pl2bat exceptions
+
+0.021     2013-05-06 14:57:29 Europe/Amsterdam
+          Always use the right environmental variable
+          Use configuration provided manpage extension
+
+0.020     2013-04-29 14:14:20 Europe/Amsterdam
+          Fix man3_pagename for top level domains
+
+0.019     2013-04-24 13:24:50 Europe/Amsterdam
+          Fix make_executable for '#!/usr/bin/perl'
+
+0.018     2013-04-16 13:51:42 Europe/Amsterdam
+          Don't load Pod::Man
+
+0.017     2013-04-15 14:57:34 Europe/Amsterdam
+          Fix man3_pagename to properly split dirs
+
+0.016     2013-04-12 15:39:01 Europe/London
+          Add some fixes to batch file generation [Christian Walde]
+
+0.015     2013-04-09 15:01:04 Europe/Amsterdam
+          Made man3_pagename more flexible with paths
+          Reverted pl2bat to a more original state
+          Rewrote fixin code
+          Re-added detildefy
+
+0.014     2012-02-22 21:42:35 Europe/Amsterdam
+          Remove detildefication, defer to File::HomeDir to do it better
+
+0.013     2012-02-13 00:35:33 Europe/Amsterdam
+          Do tilde expansion more sensibly on Windows
+
+0.012     2012-02-07 14:04:33 Europe/Amsterdam
+          Added detildefy
+          Fix up loading on VMS
+
+0.011     2012-01-09 22:42:01 Europe/Amsterdam
+          Move manify to Module::Build::Tiny
+          Refactored VMS support
+          Make EU::H easier to embed in inc/
+
+0.010     2011-09-21 20:08:58 Europe/Amsterdam
+          Fixed make_executable on Windows
+
+0.009     2011-08-24 17:30:00 Europe/Amsterdam
+          Fixed failing test on Windows
+
+0.008     2011-08-23 17:09:37 Europe/Amsterdam
+          Split out Windows and Unix specific parts
+          Use $Config{path_sep} in tests
+
+0.007     2011-05-07 10:59:15 Europe/Amsterdam
+          Fixes for make_executable.t and make_executable
+
+0.006     2011-05-05 09:30:59 Europe/Amsterdam
+          Made split_like_shell handle newlines and tabs on Windows
+
+0.005     2011-04-20 00:05:13 Europe/Amsterdam
+          Fixed definedness issue in manify
+
+0.004     2011-04-19 23:04:53 Europe/Amsterdam
+          Added manify
+
+0.003     2011-04-16 15:52:51 Europe/Amsterdam
+          Added man1_pagename and man3_pagename
+
+0.002     2011-04-14 14:45:27 Europe/Amsterdam
+          Fixed compilation and other issues on Windows
+
+0.001     2011-03-28 14:59:00 Europe/Amsterdam
+    -     First version

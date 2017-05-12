@@ -1,0 +1,88 @@
+<html>
+<head>
+<title>Tests for Embperl - Embperl sub Metacommand 2</title>
+</head>
+
+
+<body>
+
+[###### sub 1 #####]
+[$sub txt1$]
+*txt* 
+*txt* <h2>[+ "h2" +]<h2>
+*txt* 
+[$endsub$]
+
+[###### sub 2 #####]
+[$sub txt2$]
+*txt2* 
+*txt2* <h2>Here goes some normal html text <h2>
+*txt2* 
+[- txt1 -]
+*txt2* after txt1
+[$endsub$]
+
+[###### sub 3 #####]
+[$sub txt3$]
+[- txt2 -]
+*txt3* after txt3
+[$endsub$]
+
+[###### sub 4 #####]
+[$sub txt4$]
+[- txt1 -]
+[$endsub$]
+
+[###### sub 5 #####]
+[$sub txt5$]
+[+ "sub 5" +]
+[$endsub$]
+
+
+[###### sub 6 #####]
+[$sub txt6$]
+[- print OUT "sub 6\n" -]
+[$endsub$]
+
+
+[###### sub 7 #####]
+[$sub txt7$]
+[- txt5 -]
+[+ "sub 7" +]
+[$endsub$]
+
+
+[###### sub 8 #####]
+[$sub txt8$]
+[- txt6 -]
+[- print OUT "sub 8\n" -]
+[$endsub$]
+
+
+
+<h1>Tests for Embperl - Embperl sub Metacommand output</h1>
+
+*1
+[- txt1 -]
+*2
+[- txt2 -]
+*3
+[- txt1 -]
+[- txt2 -]
+*1+2
+[- txt1 ; txt2 -]
+[- txt1 ; txt2 -]
+----> txt3
+[- txt3 -]
+*4
+[- txt4 -]
+*5
+[- txt5 -]
+*6
+[- txt6 -]
+*7
+[- txt7 -]
+*8
+[- txt8 -]
+
+

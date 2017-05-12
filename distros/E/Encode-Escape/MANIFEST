@@ -1,0 +1,13 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+Build.PL
+INSTALL
+t/Encode-Escape.t
+t/Encode-Escape-ASCII.t
+t/Encode-Escape-Unicode.t
+lib/Encode/Escape.pm
+lib/Encode/Escape/ASCII.pm
+lib/Encode/Escape/Unicode.pm
+META.yml

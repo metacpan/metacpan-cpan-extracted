@@ -1,0 +1,20 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with EntityModel::StorageClass::KVStore::Layer::Fake
+at lib/EntityModel/StorageClass/KVStore/Layer/Fake.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<EntityModel::StorageClass::KVStore::Layer>
+
+L<key_mangle|EntityModel::StorageClass::KVStore::Layer/key_mangle>, L<lookup|EntityModel::StorageClass::KVStore::Layer/lookup>, L<new|EntityModel::StorageClass::KVStore::Layer/new>, L<retrieval_fallback|EntityModel::StorageClass::KVStore::Layer/retrieval_fallback>, L<shutdown|EntityModel::StorageClass::KVStore::Layer/shutdown>, L<underlayer|EntityModel::StorageClass::KVStore::Layer/underlayer>
+
+=back
+

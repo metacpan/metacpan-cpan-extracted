@@ -1,0 +1,12 @@
+Changes
+lib/Exporter.pm
+lib/Exporter/Heavy.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/Exporter.t
+t/pod.t
+t/use.t
+t/warn.t
+META.json                                Module JSON meta-data (added by MakeMaker)

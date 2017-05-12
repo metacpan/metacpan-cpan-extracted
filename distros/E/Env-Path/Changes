@@ -1,0 +1,64 @@
+Revision history for Perl extension Env::Path.
+
+0.01  Fri Jun  2 13:53:39 2000
+	- original alpha version.
+
+0.02 Fri Jun 30 13:23:49 EDT 2000
+	- fixed bug in Insert*() methods
+	- added ->Has method.
+
+0.04 Mon Aug 14 13:56:33 EDT 2000
+	- added interface to ->Whence in envpath script
+	- fixed a bug with -L and -S in envpath script
+
+0.05 Mon Sep 11 13:31:25 EDT 2000
+	- doc fixes only
+
+0.06 Thu Sep 14 13:51:55 EDT 2000
+	- fixed typo in InsertAfter that doubled up the insert
+	- quoting bugfix for "envpath -S" on Windows
+	- envpath allows comma-separated insert list, eg
+	  "envpath -I /usr/sbin,-/tmp,/var/tmp"
+
+0.07 Wed Sep 27 22:14:30 EDT 2000
+	- Added import method allowing "use Env::Path qw(:all)"
+	  to bless all EV's at BEGIN time and so on.
+	- Added -Change feature to envpath script.
+	- envpath -S does automatic export
+
+0.08 Tue Dec 12 20:21:43 EST 2000
+	- Added ->Replace method.
+
+0.09 Thu Feb 15 14:20:26 EST 2001
+	- Added Shell method to allow same functionality inline
+	  as "envpath -S".
+
+0.10 Thu Sep  6 14:46:30 EDT 2001
+	- Fixed a warning when the path EV is null
+	- Added ListNonexistent method.
+	- Fixed glob bug in ->Whence on Windows by using bsd_glob()
+
+0.11 Thu Sep 20 11:24:41 EDT 2001
+	- Fixed ->Whence on Windows to work with UNC paths.
+
+0.12 Tue Oct 16 00:28:52 EDT 2001
+	- Added a README.
+
+0.14 Tue Feb  5 20:27:54 EST 2002
+	- Worked around a spurious warning with empty import list.
+
+0.15 Mon Dec  2 18:43:05 EST 2002
+	- Renamed ->Has() to ->Contains(), leaving ->Has() as a
+	  deprecated alias (because Has() sounds too much like
+	  something from UNIVERSAL).
+
+0.17 Fri Oct 24 11:10:34 EDT 2003
+	- Windows portability work (case issues and /-vs-\ stuff)
+	- Fixed ->Whence on Windows to always look in cwd first (boo!)
+
+0.18 Thu Nov  9 09:19:04 EST 2006
+	- Now looks explicitly at PATHEXT on Windows when testing -x.
+
+0.19 Tue May 14 19:05:20 EDT 2013
+	- Fix for Cygwin as suggested by Brendan Byrd via
+	  https://rt.cpan.org/Ticket/Display.html?id=85120

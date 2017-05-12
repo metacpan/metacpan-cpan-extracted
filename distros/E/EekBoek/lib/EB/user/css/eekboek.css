@@ -1,0 +1,28 @@
+/* eekboek.css -- common stylesheet for reports
+ * Author          : Johan Vromans
+ * Created On      : Sat Oct 8 14:45:33 2005
+ * Last Modified By: Johan Vromans
+ * Last Modified On: Sat Mar 19 22:24:43 2011
+ * Update Count    : 12
+ * Status          : Unknown, Use with caution!
+ */
+
+body {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 12px;
+}
+
+th { vertical-align: top }
+tr { vertical-align: top }
+tr:nth-child(2n) { background-color: #ddd; }
+
+.i_row {
+}
+
+.i_cell {
+    padding-left: 10pt;
+    padding-right: 10pt;
+    text-align: left;
+    padding-top: 6px;
+    padding-bottom: 6px;
+}

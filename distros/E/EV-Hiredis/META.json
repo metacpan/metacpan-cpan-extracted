@@ -1,0 +1,87 @@
+{
+   "abstract" : "Asynchronous redis client using hiredis and EV",
+   "author" : [
+      "Daisuke Murase <typester@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.10",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "EV-Hiredis",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder",
+         "deps"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Devel::Refcount" : "0",
+            "Test::Deep" : "0",
+            "Test::More" : "0.98",
+            "Test::RedisServer" : "0.12",
+            "Test::TCP" : "1.18"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "EV::MakeMaker" : "0",
+            "File::Which" : "0",
+            "Module::Build" : "0.4005",
+            "Module::Build::XSUtil" : "0.02"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "EV" : "4.11",
+            "XSLoader" : "0.02",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "provides" : {
+      "EV::Hiredis" : {
+         "file" : "lib/EV/Hiredis.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/typester/EV-Hiredis/issues"
+      },
+      "homepage" : "https://github.com/typester/EV-Hiredis",
+      "repository" : {
+         "url" : "git://github.com/typester/EV-Hiredis.git",
+         "web" : "https://github.com/typester/EV-Hiredis"
+      }
+   },
+   "version" : "0.04",
+   "x_contributors" : [
+      "taniwaki-makoto <taniwaki-makoto@kayac.com>",
+      "Ichinose Shogo <shogo82148@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

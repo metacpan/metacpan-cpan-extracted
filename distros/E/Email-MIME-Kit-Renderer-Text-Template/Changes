@@ -1,0 +1,22 @@
+Revision history for Email-MIME-Kit-Renderer-Text-Template
+
+1.101302  2013-08-12 21:51:10 America/New_York
+          update repo and bugtracker
+
+1.101301  2012-10-01 14:20:34 America/New_York
+          allow the user to pick a Text::Template subclass
+
+          add some docs.  but only some.
+
+1.101300  2010-05-10 15:13:46 America/New_York
+          slightly improved handling of exceptions thrown in template parts
+
+1.093160  2009-11-12
+          use fill_this_in instead of fill_in_string to avoid package error
+
+1.092921  2009-10-19
+          catch another class of error
+
+1.092920  2009-10-19
+          throw an exception when the template results in an error
+

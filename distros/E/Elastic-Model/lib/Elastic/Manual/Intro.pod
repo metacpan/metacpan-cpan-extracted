@@ -1,0 +1,349 @@
+package Elastic::Manual::Intro;
+
+# ABSTRACT: An introduction to Elastic::Model
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Elastic::Manual::Intro - An introduction to Elastic::Model
+
+=head1 VERSION
+
+version 0.52
+
+=head1 FUTURE OF ELASTIC::MODEL - PLEASE READ AND COMMENT
+
+Hi all users of Elastic::Model
+
+Elasticsearch 2.0.0 is out, and Elastic::Model doesn't support it.
+In fact, Elastic::Model doesn't support a number of things from
+Elasticsearch 1.x either. I apologise for neglecting this module.
+
+My feeling is that Elastic::Model tries to do way too much.
+Like many frameworks, it ties you into doing things in a
+particular way, which may or may not make sense for your use
+case. Most people who use Elastic::Model seem to use a
+subset of the functionality, and then talk to Elasticsearch
+directly the rest of the time.
+
+I don't think it makes sense to just update the code for
+2.x, it needs a complete rethink.
+
+=head2 TELL ME HOW YOU USE IT
+
+Please could you add comments to
+L<this issue|https://github.com/clintongormley/Elastic-Model/issues/42>
+explaining what bits you find useful, what bits you never use,
+and what bits you find annoying. Perhaps the code can be split
+out into smaller more useful chunks.
+
+=head1 INSTALLING REQUIREMENTS
+
+=head2 Install Elasticsearch
+
+You need a recent version of Java installed, then download the current
+stable release of Elasticsearch from L<http://www.Elasticsearch.org/download/>.
+For instance:
+
+    curl -L -O https://github.com/downloads/elasticsearch/elasticsearch/elasticsearch-1.6.0.tar.gz
+    tar -xzf elasticsearch-1.7.3.tar.gz
+
+B<< Note: This version of Elastic::Model is intended for Elasticsearch 1.x
+. However, it can be used with Elasticsearch 0.90.x in "compatibility mode".
+See L<Elastic::Manual::Delta> for instructions. >>
+
+=head2 Install Elastic::Model
+
+Use your favourite CPAN installer:
+
+    cpanm Elastic::Model
+
+See L<Elastic::Manual/TEST SUITE> for how to run the full test suite
+against a local Elasticsearch cluster.
+
+=head2 Start Elasticsearch
+
+    cd elasticsearch-1.6.0/
+    ./bin/elasticsearch       # -d starts the server in the background
+
+You now have a running Elasticsearch cluster with one node. You can test that
+it is running with:
+
+    curl http://localhost:9200/?pretty=true
+
+See L<http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/setup.html>
+for more information about installing and configuring Elasticsearch.
+
+=head1 SETUP YOUR APPLICATION
+
+=head2 Create a Model
+
+First set up a simple L<model|Elastic::Manual::Terminology/Model>.  The model
+handles the relationship between your classes and Elasticsearch.
+
+    package MyApp;
+
+    use Elastic::Model;
+
+    has_namespace 'myapp' => {
+        user    => 'MyApp::User'
+    };
+
+    no Elastic::Model;
+
+    1;
+
+Your model must define at least one L<namespace|Elastic::Manual::Terminology/Namespace>,
+which tells Elastic::Model which
+L<type|Elastic::Manual::Terminology/Type> (like a table in a DB) should be
+handled by which of your classes.  So the above declaration says:
+
+I<"For all L<indices|Elastic::Model::Terminology/Index> which belong to namespace
+C<myapp>, objects of class C<MyApp::User> will be stored under the
+L<type|Elastic::Model::Terminology/Type> C<user> in Elasticsearch.">
+
+=head2 Create your User class
+
+    package MyApp::User;
+
+    use Elastic::Doc;
+
+    use DateTime();
+
+    has 'name' => (
+        is  => 'rw',
+        isa => 'Str',
+    );
+
+    has 'email' => (
+        is  => 'rw',
+        isa => 'Str',
+    );
+
+    has 'created' => (
+        is      => 'ro',
+        isa     => 'DateTime',
+        default => sub { DateTime->now }
+    );
+
+    no Elastic::Doc;
+
+    1;
+
+This simple Moose class only changes "C<use Moose;>" to "C<use Elastic::Doc;>".
+At the moment we're not configuring anything else. Thanks to Moose's
+introspection, we have enough information to setup everything we need.
+
+=head1 PREPARING TO USE YOUR APPLICATION
+
+=head2 Connect your Model to an Elasticsearch cluster
+
+    #!/bin/env perl
+
+    use strict;
+    use warnings;
+    use MyApp();
+
+    my $model  = MyApp->new();
+
+This creates an instance of your model, with a connection to a local
+Elasticsearch cluster.  The last line is the equivalent of:
+
+    use Search::Elasticsearch();
+    my $es     = Search::Elasticsearch->new(
+        client => '1_0::Direct',
+        nodes => 'localhost:9200'
+    );
+    my $model  = MyApp->new( es => $es );
+
+=head2 Create an index
+
+Before we get started, we need to create an
+L<index|Elastic::Manual::Terminology/Index> (like a database in a relational DB)
+in Elasticsearch.
+
+    $model->namespace('myapp')->index->create();
+
+This has created index C<myapp>, which contains
+L<type|Elastic::Manual::Terminology/Type> C<user> (where a type is like a
+table in a database). It has also configured the type's
+L<mapping|Elastic::Manual::Terminology/Mapping> (which is like the schema
+or column definition).
+
+Our index is now ready to use.
+
+=head1 STORING AND RETRIEVING OBJECTS
+
+=head2 Preparation for object access
+
+Before we can save or retrieve objects/documents from Elasticsearch, we need
+a C<domain>:
+
+=head3 Get a domain
+
+A L<domain|Elastic::Manual::Terminology/Domain> is like a database handle. It
+allows us to talk to a particular index or
+L<alias|Elastic::Manual::Terminology/Alias>.  (An alias is like a shortcut
+which points at one or more indices.)
+
+    $domain = $model->domain('myapp');
+
+See L<Elastic::Manual::Scaling> for more about how to use aliases.
+
+=head2 Create an object
+
+Normally, you would create an object with:
+
+    my $user = MyApp::User->new(...)
+
+but to use all of the magic of Elastic::Model, you must create your object
+via the C<$domain> object:
+
+    my $user    = $domain->new_doc(
+        user => {                           # $type => \%args_to_new
+            id    => 1,                     # auto-generated if not provided
+            name  => 'Clinton',
+            email => 'clint@domain.com',
+        }
+    );
+
+    $user->save;                            # save to Elasticsearch
+
+=head2 Retrieve an object by ID
+
+Now, we can retrieve the user object from Elasticsearch, using the
+C<type> and C<id>:
+
+    $user = $domain->get( user => 1 );
+
+    say $user->name;
+    # Clinton
+
+=head2 Update your object
+
+    $user->email( 'clinton@domain.com' );
+
+Elastic::Model keeps track of what attributes have been changed, plus their
+original value:
+
+    say $user->has_changed;
+    # 1
+
+    say $user->has_changed('email');
+    # 1
+
+    dump $user->old_values;
+    # { email => 'clint@domain.com' };
+
+The L<UID|Elastic::Model::UID> (unique ID) of the object tracks (amongst other
+things) the current version number. Elasticsearch uses this version
+number to avoid overwriting changes that have been made by another process
+(see L<Optimistic Currency Control|http://en.wikipedia.org/wiki/Optimistic_concurrency_control>).
+
+    say $user->uid->version;
+    # 1
+
+The version number is incremented each time a changed object is saved.
+
+    $user->save;
+
+    say $user->uid->version;
+    # 2
+
+    say $user->has_changed;
+    # 0
+
+=head1 QUERYING Elasticsearch
+
+By default, everything in Elasticsearch is indexed and searchable. You can
+search across one index or many indices, one type or many types.
+
+In order to query the objects stored in Elasticsearch, you need a
+L<view|Elastic::Model::View>. Views are reusable, so you might create views
+like C<$recent_users>, C<$approved_comments> etc.
+
+=head2 Creating a view
+
+You can create a C<view> from your C<$domain> object, in which case the view
+will be limited to just that domain:
+
+    $view = $domain->view;              # limited to index 'myapp';
+
+To create a view which queries multiple domains, you could do:
+
+    $view = $model->view->domain(['index_1', 'alias_2']);
+
+Or to query all domains known to your model:
+
+    $view = $model->view;
+
+=head2 Configuring a view
+
+When setting an attribute on a view, a cloned instance of the old view is
+returned, meaning that you can use one view to derive another:
+
+    $all   = $domain->view;                         # all types in $domain
+    $users = $all->type('user');                    # type 'user' in index $domain
+    $clint = $users->queryb({name => 'clinton'});   # users whose name is 'clinton'
+
+=head2 Query syntax
+
+Queries can be specified using the standard
+L<Elasticsearch query DSL|http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl.html>
+or with the more Perlish more compact L<ElasticSearch::SearchBuilder> syntax.
+
+Standard query DSL:
+
+    $search = $view->query( { text =>  { name    => 'clinton' }})
+                   ->filter({ range => { created => { gt => '2012-01-01' }}});
+
+SearchBuilder syntax:
+
+    $search = $view->queryb(  { name    => 'clinton'             })
+                   ->filterb( { created => { gt => '2012-01-01' }});
+
+=head2 Getting search results
+
+Once you have defined your view, you call a search method (eg
+L<search()|Elastic::Model::View/"search()">) which performs
+the search and returns a L<Results|Elastic::Model::Results> object.
+
+    my $results = $search->search;
+    say "Total results found: ".$results->total;
+
+    while (my $doc = $results->next_doc) {
+        say $doc->name
+    }
+
+Views can also be used to return highlighted results, and
+L<aggregations|http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-aggregations.html>,
+which provide aggregated results, much like GROUP-BY functions in SQL, for
+instance, the most popular terms, or the number of posting per day.
+
+=head1 SEE ALSO
+
+=over
+
+=item *
+
+L<Elastic::Manual>
+
+=back
+
+=head1 AUTHOR
+
+Clinton Gormley <drtech@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Clinton Gormley.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

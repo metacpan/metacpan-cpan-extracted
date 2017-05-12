@@ -1,0 +1,31 @@
+[%#
+
+C support
+
+Looks a bit like this:
+
+struct {
+	char *name_;
+} Thing;
+
+Thing *thing_set_name(Thing *this, char *name) {
+	if(this->name_) free(this->name_);
+	this->name_ = strndup(name, 255);
+	return this;
+}
+
+char *thing_get_name(Thing *this) {
+	return this->name_;
+}
+
+Has the following mappings:
+* int => int
+* text => string
+* float => float
+
+-%]
+[% BLOCK Support/C/Entity;
+  struct_name = entity.name;
+-%]
+[% END -%]
+

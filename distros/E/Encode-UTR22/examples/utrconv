@@ -1,0 +1,13 @@
+#!/usr/bin/perl
+use Encode::UTR22;
+use Getopt::Std;
+
+getopts('x:');
+
+$e = Encode::UTR22->new($opt_x);
+binmode STDOUT, ":utf8";
+
+while (<>)
+{
+    print $e->decode($_);
+}

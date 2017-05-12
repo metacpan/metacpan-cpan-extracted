@@ -1,0 +1,46 @@
+{
+   "abstract" : "takes mixed encoding input and produces UTF-8 output",
+   "author" : [
+      "Grant McLean <grantm@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300023, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Encoding-FixLatin",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Encoding::FixLatin::XS" : "1.00"
+         },
+         "requires" : {
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.90"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/grantm/encoding-fixlatin.git",
+         "web" : "http://github.com/grantm/encoding-fixlatin"
+      }
+   },
+   "version" : "1.04"
+}
+

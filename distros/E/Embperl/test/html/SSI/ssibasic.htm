@@ -1,0 +1,111 @@
+<html>
+
+<head>
+<title>Embperl Tests - SSI Tags</title>
+</head>
+
+<body>
+
+<!-- Normal Comment -->
+
+<!--#set var="EPSSITEST" value="1" -->
+
+EPSSITEST 1: <!--#echo  var="EPSSITEST" -->
+
+<!--#set var="EPSSITEST" value="$EPSSITEST+1" -->
+
+EPSSITEST 2: <!-- #echo  var="EPSSITEST" -->
+
+<!--#set var="EPSSITEST" value="${EPSSITEST}+1" -->
+
+EPSSITEST 3: <!-- #echo  var="EPSSITEST"-->
+
+<!--#set var="EPSSITEST" value="$EPSSITEST + 1" -->
+
+EPSSITEST 4: <!-- #echo  var=EPSSITEST-->
+
+<!--#set var="EPSSITEST" value="${EPSSITEST} + 1" -->
+
+EPSSITEST 5: <!-- #echo  var=EPSSITEST -->
+
+<!--#set var="EPSSITEST" value="${EPSSITEST} + 1" -->
+
+EPSSITEST 6: <!-- #echo  var='EPSSITEST' -->
+
+
+DATE_GMT:		 <!-- #echo  var='DATE_GMT' -->
+DATE_LOCAL:		 <!-- #echo  var='DATE_LOCAL' --> 
+DOCUMENT_NAME:	 <!-- #echo  var='DOCUMENT_NAME' -->
+DOCUMENT_URI:	 <!-- #echo  var='DOCUMENT_URI' -->
+LAST_MODIFIED:	 <!-- #echo  var='LAST_MODIFIED' -->
+
+
+sizefmt=bytes
+<!--#config sizefmt=bytes -->
+
+fsize self: <!--#fsize -->
+fsize file ssiinc.htm <!--#fsize file="ssiinc.htm" -->
+fsize virtual ssiinc.htm <!--#fsize file="ssiinc.htm" -->
+
+flastmod self: <!--#flastmod -->
+flastmod file ssiinc.htm <!--#flastmod file="ssiinc.htm" -->
+flastmod virtual ssiinc.htm <!--#flastmod file="ssiinc.htm" -->
+
+sizefmt=abbrev
+<!--#config sizefmt=abbrev -->
+<!--#config timefmt="%H:%M:%S %Y" -->
+
+fsize self: <!--#fsize -->
+fsize file ssiinc.htm <!--#fsize file="ssiinc.htm" -->
+fsize virtual ssiinc.htm <!--#fsize file="ssiinc.htm" -->
+flastmod self: <!--#flastmod -->
+flastmod file ssiinc.htm <!--#flastmod file="ssiinc.htm" -->
+flastmod virtual ssiinc.htm <!--#flastmod file="ssiinc.htm" -->
+
+--INCLUDE-->
+
+<!-- #include file="ssiinc.htm" -->
+
+<--INCLUDE--
+
+
+if 1
+<!--#if expr="1" -->
+1
+<!--#endif-->
+
+if 2
+<!--#if expr="$EPSSITEST" -->
+EPSSITEST
+<!--#else-->
+NOT EPSSITEST
+<!--#endif-->
+
+if 3
+<!--#if expr="! $EPSSITEST" -->
+! EPSSITEST
+<!--#else-->
+! NOT EPSSITEST
+<!--#endif-->
+
+if 4
+<!--#if expr="0" -->
+0
+<!--#elif expr="1"-->
+1
+<!--#else-->
+2
+<!--#endif-->
+
+
+Some Embperl command that should _not_ executed here:
+
+[- hallo -] [+ foo +]
+
+
+</body>
+</html>
+
+
+
+

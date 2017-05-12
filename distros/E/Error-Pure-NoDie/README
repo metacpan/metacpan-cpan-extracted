@@ -1,0 +1,120 @@
+NAME
+    Error::Pure::NoDie - Error::Pure module for simple print instead die.
+
+SYNOPSIS
+     use Error::Pure::NoDie qw(err);
+     err 'This is a fatal error', 'name', 'value';
+
+SUBROUTINES
+    err(@messages)
+             Process error with messages @messages.
+
+EXAMPLE1
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Error::Pure::NoDie qw(err);
+
+     # Error.
+     err '1';
+
+     # Output:
+     # 1
+
+EXAMPLE2
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Error::Pure::NoDie qw(err);
+
+     # Error.
+     err '1';
+     err '2';
+
+     # Output:
+     # 1
+     # 2
+
+EXAMPLE3
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Error::Pure::NoDie qw(err);
+
+     # Error.
+     err '1', '2', '3';
+
+     # Output:
+     # 1
+
+EXAMPLE4
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Dumpvalue;
+     use Error::Pure::NoDie qw(err);
+     use Error::Pure::Utils qw(err_get);
+
+     # Error in eval.
+     eval { err '1', '2', '3'; };
+
+     # Error structure.
+     my @err = err_get();
+
+     # Dump.
+     my $dump = Dumpvalue->new;
+     $dump->dumpValues(\@err);
+
+     # In \@err:
+     # [
+     #         {
+     #                 'msg' => [
+     #                         '1',
+     #                         '2',
+     #                         '3',
+     #                 ],
+     #                 'stack' => [
+     #                         {
+     #                                 'args' => '(1)',
+     #                                 'class' => 'main',
+     #                                 'line' => '9',
+     #                                 'prog' => 'script.pl',
+     #                                 'sub' => 'err',
+     #                         },
+     #                         {
+     #                                 'args' => '',
+     #                                 'class' => 'main',
+     #                                 'line' => '9',
+     #                                 'prog' => 'script.pl',
+     #                                 'sub' => 'eval {...}',
+     #                         },
+     #                 ],
+     #         },
+     # ],
+
+DEPENDENCIES
+    Exporter, List::MoreUtils, Readonly.
+
+SEE ALSO
+    Task::Error::Pure
+        Install the Error::Pure modules.
+
+AUTHOR
+     Michal Špaček L<skim@cpan.org>
+     http://skim.cz
+
+LICENSE AND COPYRIGHT
+     © 2011-2015 Michal Špaček
+     BSD 2-Clause License
+
+VERSION
+    0.04
+

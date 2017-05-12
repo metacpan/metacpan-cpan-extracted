@@ -1,0 +1,76 @@
+{
+   "abstract" : "A set of modules that compares a supplied term to an ontology and suggests the best match \nbased on some similarity metric (n-grams).",
+   "author" : [
+      "Emma Hastings <ehastings@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "EBI-FGPT-FuzzyRecogniser",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Temp" : 0,
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Benchmark" : 0,
+            "Getopt::Long" : 0,
+            "IO::File" : 0,
+            "IO::Handle" : 0
+         },
+         "requires" : {
+            "Bio::Phenotype::OMIM::OMIMparser" : 0,
+            "GO::Parser" : 0,
+            "List::Util" : 0,
+            "Log::Log4perl" : 0,
+            "MeSH::Parser::ASCII" : "0.02",
+            "Moose" : "0.89",
+            "OWL::Simple::Parser" : "1.00",
+            "XML::Parser" : "2.34"
+         }
+      }
+   },
+   "provides" : {
+      "EBI::FGPT::FuzzyRecogniser" : {
+         "file" : "lib/EBI/FGPT/FuzzyRecogniser.pm",
+         "version" : "0.09"
+      },
+      "EBI::FGPT::FuzzyRecogniser::OntologyTerm" : {
+         "file" : "lib/EBI/FGPT/FuzzyRecogniser/OntologyTerm.pm",
+         "version" : "0.09"
+      },
+      "EBI::FGPT::FuzzyRecogniser::OntologyTerm::Annotation" : {
+         "file" : "lib/EBI/FGPT/FuzzyRecogniser/OntologyTerm/Annotation.pm",
+         "version" : "0.09"
+      },
+      "EBI::FGPT::FuzzyRecogniser::OntologyTerm::Label" : {
+         "file" : "lib/EBI/FGPT/FuzzyRecogniser/OntologyTerm/Label.pm",
+         "version" : "0.09"
+      },
+      "EBI::FGPT::FuzzyRecogniser::OntologyTerm::Synonym" : {
+         "file" : "lib/EBI/FGPT/FuzzyRecogniser/OntologyTerm/Synonym.pm",
+         "version" : "0.09"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/gpl-license.php"
+      ]
+   },
+   "version" : "0.09"
+}

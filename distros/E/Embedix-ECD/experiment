@@ -1,0 +1,93 @@
+#!/usr/bin/perl -w
+
+use strict;
+use lib qw(lib);
+require "ECD.pm";
+#require "lib/Embedix/ECD/XMLv1.pm";
+use Getopt::Long;
+use Data::Dumper;
+
+my $ecd;
+my $exit_code = 0;
+
+my %opt;
+GetOptions(\%opt, 'indent|i=i', 'shiftwidth|sw|s=i', 'dtd|d=s');
+
+$opt{indent}     ||= 0;
+$opt{shiftwidth} ||= 2;
+$opt{dtd}        ||= "no";
+
+if (@ARGV) {
+    foreach (@ARGV) {
+        # eval { $ecd = Embedix::ECD->consFromFile($_) };
+        # eval { $ecd = Embedix::ECD->newFromFile($_) };
+        eval { $ecd = Embedix::ECD->consFromXMLFile($_) };
+        if ($@) {
+            $exit_code++;
+            print "$_: $@";
+        } else {
+            print Data::Dumper::Dumper($ecd);
+            # print $ecd;
+            # print $ecd->toString (
+            #     shiftwidth => $opt{shiftwidth}, 
+            #     indent     => $opt{indent},
+            # );
+        }
+    }
+} else {
+    eval { $ecd = Embedix::ECD->newFromString(join('', <STDIN>)) }; 
+    $ecd->hasChildren() || warn("empty ecd");
+    if ($@) {
+        $exit_code++;
+        print $@;
+    } else {
+        print $ecd->toString;
+    }
+}
+
+exit $exit_code;
+
+=head1 NAME
+
+checkecd.pl - performs syntax checking of .ecd files
+
+=head1 SYNOPSIS
+
+    checkecd.pl [OPTION]... [FILE]...
+    checkecd.pl [OPTION]... < STDIN > STDOUT
+
+It returns meaningful exit codes so you can do things like:
+
+    checkecd.pl FILE && echo "kosher";
+
+=head1 DESCRIPTION
+
+This checks the syntax of .ecd files for validity.
+
+=head1 OPTIONS
+
+None, yet.
+
+=head1 DIAGNOSTICS
+
+error messages
+
+=head1 REQUIRES
+
+=over 4
+
+=item Embedix::ECD
+
+=back
+
+=head1 SEE ALSO
+
+Embedix::ECD(3pm)
+
+=head1 AUTHOR
+
+John BEPPU <beppu@lineo.com>
+
+=cut
+
+# $Id: experiment,v 1.2 2001/01/19 19:26:26 beppu Exp $

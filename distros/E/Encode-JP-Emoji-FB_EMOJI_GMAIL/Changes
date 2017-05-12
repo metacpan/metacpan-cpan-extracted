@@ -1,0 +1,9 @@
+---
+
+Encode-JP-Emoji-FB_EMOJI_GMAIL-0.05 (2009-07-06):
+  - alt="..." added.
+  - re-fallback to FB_EMOJI_TEXT.
+
+Encode-JP-Emoji-FB_EMOJI_GMAIL-0.04 (2009-07-05):
+  - first release
+  - http://emoji4unicode-ll.googlecode.com/svn/trunk/lang/perl/Encode-JP-Emoji-FB_EMOJI_GMAIL/trunk/

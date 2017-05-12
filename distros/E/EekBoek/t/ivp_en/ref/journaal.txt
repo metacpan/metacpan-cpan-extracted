@@ -1,0 +1,221 @@
+                                                                 Journal
+Period 2011-01-01 through 2011-12-31
+EekBoek Sample Administration                                                                                          EekBoek, 2011-12-31
+
+Date        Booking/Account                   Acc      Debet     Credit      BTW %  Tarief      Posting/line                    Relation
+------------------------------------------------------------------------------------------------------------------------------------------
+2011-01-05  Purchase:1                                                                          Internet                        XS4ALL
+2011-01-05    VAT Procurement high           4220       3.64                                      BTW ADSL
+2011-01-05    Internet costs                 6905      19.16                 19.00  Hoog          ADSL
+2011-01-05    Creditors                      4100                 22.80                           Internet
+
+2011-01-15  Purchase:2                                                                          ADSL + Telefoon                 KPN
+2011-01-15    VAT Procurement high           4220      12.84                                      BTW Telefoonkosten
+2011-01-15    VAT Procurement high           4220       3.86                                      BTW ADSL
+2011-01-15    Phone costs and fax costs      6900      67.61                 19.00  Hoog          Telefoonkosten
+2011-01-15    Internet costs                 6905      20.34                 19.00  Hoog          ADSL
+2011-01-15    Creditors                      4100                104.65                           ADSL + Telefoon
+
+2011-01-31  Postbank:1                                                                          Afschrift 1
+2011-01-31    Creditors                      4100     104.65                                      *ADSL + Telefoon              KPN
+2011-01-19    Creditors                      4100      22.80                                      *Internet                     XS4ALL
+2011-01-06    Bank costs                     6980       2.70                  0.00  Nul           Girotel
+2011-01-31    Bank                           2320                130.15                           Afschrift 1
+
+2011-02-09  Purchase:3                                                                          Internet                        XS4ALL
+2011-02-09    VAT Procurement high           4220       3.64                                      BTW ADSL
+2011-02-09    Internet costs                 6905      19.16                 19.00  Hoog          ADSL
+2011-02-09    Creditors                      4100                 22.80                           Internet
+
+2011-02-18  Sales:1                                                                             Perl Cursus                     ACME
+2011-02-18    Debtors                        2200    3570.00                                      Perl Cursus
+2011-02-18    VAT Revenue high               4200                570.00                           BTW Perl Cursus 1e bet.
+2011-02-18    Revenue courses                8400               3000.00      19.00  Hoog          Perl Cursus 1e bet.
+
+2011-02-28  Postbank:2                                                                          Afschrift 2
+2011-02-23    Creditors                      4100      22.80                                      *Internet                     XS4ALL
+2011-02-10    Bank costs                     6980       2.70                  0.00  Nul           Girotel
+2011-02-28    Bank                           2320                 25.50                           Afschrift 2
+
+2011-03-08  Purchase:4                                                                          Internet                        XS4ALL
+2011-03-08    VAT Procurement high           4220       3.64                                      BTW ADSL
+2011-03-08    Internet costs                 6905      19.16                 19.00  Hoog          ADSL
+2011-03-08    Creditors                      4100                 22.80                           Internet
+
+2011-03-18  Purchase:5                                                                          Telefoonkosten                  KPN
+2011-03-18    VAT Procurement high           4220      16.21                                      BTW ADSL + Telefoon
+2011-03-18    Phone costs and fax costs      6900      85.31                 19.00  Hoog          ADSL + Telefoon
+2011-03-18    Creditors                      4100                101.52                           Telefoonkosten
+
+2011-03-18  Sales:2                                                                             Perl Cursus                     ACME
+2011-03-18    Debtors                        2200    3570.00                                      Perl Cursus
+2011-03-18    VAT Revenue high               4200                570.00                           BTW Perl Cursus 2e bet.
+2011-03-18    Revenue courses                8400               3000.00      19.00  Hoog          Perl Cursus 2e bet.
+
+2011-03-31  Postbank:3                                                                          Afschrift 3
+2011-03-31    Bank                           2320    3442.98                                      Afschrift 3
+2011-03-31    Creditors                      4100     101.52                                      *Telefoonkosten               KPN
+2011-03-31    Creditors                      4100      22.80                                      *Internet                     XS4ALL
+2011-03-09    Bank costs                     6980       2.70                  0.00  Nul           Girotel
+2011-03-18    Debtors                        2200               3570.00                           *Perl Cursus                  ACME
+
+2011-04-05  Purchase:6                                                                          Internet                        XS4ALL
+2011-04-05    VAT Procurement high           4220       3.64                                      BTW ADSL
+2011-04-05    Internet costs                 6905      19.16                 19.00  Hoog          ADSL
+2011-04-05    Creditors                      4100                 22.80                           Internet
+
+2011-04-18  Sales:3                                                                             Perl Cursus                     ACME
+2011-04-18    Debtors                        2200     595.00                                      Perl Cursus
+2011-04-18    VAT Revenue high               4200                 95.00                           BTW Perl Cursus rest
+2011-04-18    Revenue courses                8400                500.00      19.00  Hoog          Perl Cursus rest
+
+2011-04-30  Postbank:4                                                                          Afschrift 4
+2011-04-30    Bank                           2320    3544.50                                      Afschrift 4
+2011-04-06    Creditors                      4100      22.80                                      *Internet                     XS4ALL
+2011-04-06    Bank costs                     6980       2.70                  0.00  Nul           Girotel
+2011-04-12    Debtors                        2200               3570.00                           *Perl Cursus                  ACME
+
+2011-05-10  Purchase:7                                                                          Internet                        XS4ALL
+2011-05-10    VAT Procurement high           4220       3.64                                      BTW ADSL
+2011-05-10    Internet costs                 6905      19.16                 19.00  Hoog          ADSL
+2011-05-10    Creditors                      4100                 22.80                           Internet
+
+2011-05-14  Sales:4                                                                             Ondersteuning                   ACME
+2011-05-14    Debtors                        2200     714.00                                      Ondersteuning
+2011-05-14    VAT Revenue high               4200                114.00                           BTW Consultancy
+2011-05-14    Revenue consultancy            8100                600.00      19.00  Hoog          Consultancy
+
+2011-05-20  Purchase:8                                                                          Telefoonkosten                  KPN
+2011-05-20    VAT Procurement high           4220      16.32                                      BTW ADSL + Telefoon
+2011-05-20    Phone costs and fax costs      6900      85.90                 19.00  Hoog          ADSL + Telefoon
+2011-05-20    Creditors                      4100                102.22                           Telefoonkosten
+
+2011-05-31  Postbank:5                                                                          Afschrift 5
+2011-05-31    Bank                           2320     467.28                                      Afschrift 5
+2011-05-31    Creditors                      4100     102.22                                      *Telefoonkosten               KPN
+2011-05-31    Creditors                      4100      22.80                                      *Internet                     XS4ALL
+2011-05-11    Bank costs                     6980       2.70                  0.00  Nul           Girotel
+2011-05-31    Debtors                        2200                595.00                           *Perl Cursus                  ACME
+
+2011-06-07  Purchase:9                                                                          Internet                        XS4ALL
+2011-06-07    VAT Procurement high           4220       3.64                                      BTW ADSL
+2011-06-07    Internet costs                 6905      19.16                 19.00  Hoog          ADSL
+2011-06-07    Creditors                      4100                 22.80                           Internet
+
+2011-06-30  Postbank:6                                                                          Afschrift 6
+2011-06-30    Bank                           2320     688.50                                      Afschrift 6
+2011-06-21    Creditors                      4100      22.80                                      *Internet                     XS4ALL
+2011-06-08    Bank costs                     6980       2.70                  0.00  Nul           Girotel
+2011-06-08    Debtors                        2200                714.00                           *Ondersteuning                ACME
+
+2011-07-05  Purchase:10                                                                         Internet                        XS4ALL
+2011-07-05    VAT Procurement high           4220       3.64                                      BTW ADSL
+2011-07-05    Internet costs                 6905      19.16                 19.00  Hoog          ADSL
+2011-07-05    Creditors                      4100                 22.80                           Internet
+
+2011-07-15  Purchase:11                                                                         Telefoonkosten                  KPN
+2011-07-15    VAT Procurement high           4220      16.71                                      BTW ADSL + Telefoon
+2011-07-15    Phone costs and fax costs      6900      87.95                 19.00  Hoog          ADSL + Telefoon
+2011-07-15    Creditors                      4100                104.66                           Telefoonkosten
+
+2011-07-16  Sales:5                                                                             Ondersteuning                   ACME
+2011-07-16    Debtors                        2200     714.00                                      Ondersteuning
+2011-07-16    VAT Revenue high               4200                114.00                           BTW Consultancy
+2011-07-16    Revenue consultancy            8100                600.00      19.00  Hoog          Consultancy
+
+2011-07-31  Postbank:7                                                                          Afschrift 7
+2011-07-31    Creditors                      4100     104.66                                      *Telefoonkosten               KPN
+2011-07-30    Creditors                      4100      22.80                                      *Internet                     XS4ALL
+2011-07-06    Bank costs                     6980       2.70                  0.00  Nul           Girotel
+2011-07-31    Bank                           2320                130.16                           Afschrift 7
+
+2011-08-09  Purchase:12                                                                         Internet                        XS4ALL
+2011-08-09    VAT Procurement high           4220       3.64                                      BTW ADSL
+2011-08-09    Internet costs                 6905      19.16                 19.00  Hoog          ADSL
+2011-08-09    Creditors                      4100                 22.80                           Internet
+
+2011-08-19  Sales:6                                                                             Pocket Reference                ORA
+2011-08-19    Debtors                        2200    1000.00                                      Pocket Reference
+2011-08-19    Revenue editing                8300               1000.00      19.00  Hoog          Produktie boek
+
+2011-08-31  Postbank:8                                                                          Afschrift 8
+2011-08-31    Bank                           2320    1688.50                                      Afschrift 8
+2011-08-10    Creditors                      4100      22.80                                      *Internet                     XS4ALL
+2011-08-10    Bank costs                     6980       2.70                  0.00  Nul           Girotel
+2011-08-10    Debtors                        2200                714.00                           *Ondersteuning                ACME
+2011-08-19    Debtors                        2200               1000.00                           *Pocket Reference             ORA
+
+2011-09-06  Purchase:13                                                                         Internet                        XS4ALL
+2011-09-06    VAT Procurement high           4220       3.64                                      BTW ADSL
+2011-09-06    Internet costs                 6905      19.16                 19.00  Hoog          ADSL
+2011-09-06    Creditors                      4100                 22.80                           Internet
+
+2011-09-16  Purchase:14                                                                         Telefoonkosten                  KPN
+2011-09-16    VAT Procurement high           4220      17.36                                      BTW ADSL + Telefoon
+2011-09-16    Phone costs and fax costs      6900      91.36                 19.00  Hoog          ADSL + Telefoon
+2011-09-16    Creditors                      4100                108.72                           Telefoonkosten
+
+2011-09-30  Postbank:9                                                                          Afschrift 9
+2011-09-30    Creditors                      4100     108.72                                      *Telefoonkosten               KPN
+2011-09-30    Creditors                      4100      22.80                                      *Internet                     XS4ALL
+2011-09-17    Bank costs                     6980       2.70                  0.00  Nul           Girotel
+2011-09-30    Bank                           2320                134.22                           Afschrift 9
+
+2011-10-11  Purchase:15                                                                         Internet                        XS4ALL
+2011-10-11    VAT Procurement high           4220       3.64                                      BTW ADSL
+2011-10-11    Internet costs                 6905      19.16                 19.00  Hoog          ADSL
+2011-10-11    Creditors                      4100                 22.80                           Internet
+
+2011-10-31  Postbank:10                                                                         Afschrift 10
+2011-10-13    Creditors                      4100      22.80                                      *Internet                     XS4ALL
+2011-10-12    Bank costs                     6980       2.70                  0.00  Nul           Girotel
+2011-10-31    Bank                           2320                 25.50                           Afschrift 10
+
+2011-11-07  Purchase:16                                                                         Internet                        XS4ALL
+2011-11-07    VAT Procurement high           4220       3.64                                      BTW ADSL
+2011-11-07    Internet costs                 6905      19.16                 19.00  Hoog          ADSL
+2011-11-07    Creditors                      4100                 22.80                           Internet
+
+2011-11-17  Purchase:17                                                                         Telefoonkosten                  KPN
+2011-11-17    VAT Procurement high           4220      17.51                                      BTW ADSL + Telefoon
+2011-11-17    Phone costs and fax costs      6900      92.16                 19.00  Hoog          ADSL + Telefoon
+2011-11-17    Creditors                      4100                109.67                           Telefoonkosten
+
+2011-11-30  Postbank:11                                                                         Afschrift 11
+2011-11-30    Creditors                      4100     109.67                                      *Telefoonkosten               KPN
+2011-11-30    Creditors                      4100      22.80                                      *Internet                     XS4ALL
+2011-11-08    Bank costs                     6980       2.70                  0.00  Nul           Girotel
+2011-11-30    Bank                           2320                135.17                           Afschrift 11
+
+2011-12-06  Purchase:18                                                                         Internet                        XS4ALL
+2011-12-06    VAT Procurement high           4220       3.64                                      BTW ÁDSL
+2011-12-06    Internet costs                 6905      19.16                 19.00  Hoog          ÁDSL
+2011-12-06    Creditors                      4100                 22.80                           Internet
+
+2011-12-07  Postbank:12                                                                         Afschrift 12
+2011-12-07    Creditors                      4100      22.80                                      *Internet                     XS4ALL
+2011-12-06    Bank costs                     6980       2.70                  0.00  Nul           Girotel
+2011-12-07    Bank                           2320                 25.50                           Afschrift 12
+
+2011-12-07  Purchase:20                                                                         Internet                        XS4ALL
+2011-12-07    VAT Procurement high           4220       3.64                                      BTW ADSL
+2011-12-07    Internet costs                 6905      19.16                 19.00  Hoog          ADSL
+2011-12-07    Creditors                      4100                 22.80                           Internet
+
+2011-12-09  Postbank:13                                                                         Eerste deel ADSL
+2011-12-09    Creditors                      4100      10.00                                      *Internet                     XS4ALL
+2011-12-09    Bank                           2320                 10.00                           Eerste deel ADSL
+
+2011-12-10  Postbank:14                                                                         Tweede deel ADSL
+2011-12-10    Creditors                      4100      12.80                                      *Internet                     XS4ALL
+2011-12-10    Bank                           2320                 12.80                           Tweede deel ADSL
+
+2011-12-31  Memorial:1                                                                          Afschrijving inventaris
+2011-12-31    Depreciation costs inventory   6800     411.26                  0.00  Nul           Afschrijving
+2011-12-31    Depreciation supplies          1101                411.26                           Afschrijving
+
+2011-12-31  Memorial:2                                                                          Afschrijving computers
+2011-12-31    Depreciation costs computers   6810     396.82                  0.00  Nul           Afschrijving
+2011-12-31    Depreciation computers         1111                396.82                           Afschrijving
+------------------------------------------------------------------------------------------------------------------------------------------
+            Total                                   22690.92   22690.92

@@ -1,0 +1,9 @@
+0.03 2017-04-02T19:38:25+02:00
+ - Fix #120864 - Makefile.PL fails with no '.' in @INC.
+
+0.02 2017-03-20T10:57:42+01:00
+ - Fix output for err_print_var().
+ - Remove obsolete code.
+
+0.01 2017-03-08T15:25:31+01:00
+ - First version.

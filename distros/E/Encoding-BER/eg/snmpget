@@ -1,0 +1,128 @@
+#!/usr/local/bin/perl
+# -*- perl -*-
+
+# Copyright (c) 2007 by Jeff Weisberg
+# Author: Jeff Weisberg <jaw+pause @ tcp4me.com>
+# Created: 2007-Feb-10 15:31 (EST)
+# Function: snmpget - contrived Encoding::BER example
+#
+# $Id: snmpget,v 1.2 2007/02/10 22:23:24 jaw Exp $
+
+use lib 'lib';
+use Encoding::BER::SNMP;
+use Socket;
+use strict;
+
+# usage: snmpget community hostname oid
+
+my $comm = shift @ARGV;
+my $host = shift @ARGV;
+my $oid  = shift @ARGV;
+
+# see: RFC 1905
+my $PORT = 161;
+my %ERRSTAT =
+(
+ 1 => 'too big',
+ 2 => 'invalid OID',
+ 3 => 'bad value',
+ 4 => 'read only',
+ 5 => 'general error',
+ 6 => 'access denied',
+ );
+
+# open udp socket
+my $ip  = gethostbyname($host);
+die "cannot resolve hostname: $host\n" unless $ip;
+my $sin = sockaddr_in($PORT, $ip);
+
+socket(SNMP, PF_INET, SOCK_DGRAM, 0) || die "socket failed: $!\n";
+
+
+my $enc  = Encoding::BER::SNMP->new(
+               decoded_callback => sub { bless $_[1], 'MyBER::Result' },
+               );
+
+# build SNMPv1 pkt
+my $snmp = $enc->encode( [ 0, # versn
+			   { type => 'string', value => $comm },
+			   { type  => 'get_request',
+			     value => [ 1, # reqid
+					0, # errst
+					0, # erridx
+					[ [ { type => 'oid', value => $oid }, undef ]]] }]);
+
+# send request
+send(SNMP, $snmp, 0, $sin) || die "udp send failed: $!\n";
+
+# get response
+$SIG{ALRM} = sub{ die "no response from host\n" };
+alarm(5);
+my $buffer = '';
+recv(SNMP, $buffer, 8192, 0) || die "udp receive failed: $!\n";
+alarm(0);
+
+# decode
+my $dat = $enc->decode($buffer);
+# lets map the result values into a simpler hash.
+# note: we blessed the results in the callback, above.
+# it makes a better example this way.
+$dat->value_map(my $resm = {}, [ 'version', 'community', [ 'reqid', 'errorstat', 'erroridx', 'varbind' ]]);
+
+if( my $err = $resm->{errorstat} ){
+    die "ERROR: $ERRSTAT{$err}\n";
+}
+
+# the request above will only return 1 result,
+# but other requests can return multiple results.
+# lets pretend. iterate and display all results.
+my $ress = $resm->{varbind};
+foreach my $r ( @$ress ){
+    next unless ref $r->{value};
+    
+    my $oid = $r->{value}[0]{value};
+    my $val = $r->{value}[1];
+    
+    if( $val->{identval} == 0x80 ){
+	$val = '#<noSuchObject>';
+    }elsif( $val->{identval} == 0x81 ){
+	$val = '#<noSuchInstance>';
+    }elsif( $val->{identval} == 0x82 ){
+	$val = '#<endOfMibView>';
+    }else{
+	$val = $val->{value};
+    }
+
+    print "$oid\t$val\n";
+}
+exit;
+
+# (recursively) map the decoded results onto a flat hash
+sub MyBER::Result::value_map {
+    my $me  = shift;
+    my $res = shift;
+    my $tpl = shift;
+
+    unless( ref $tpl ){
+	$res->{$tpl} = $me;
+	return $res;
+    }
+    unless( ref $me->{value} ){
+	return $res;
+    }
+
+    my @v = @{$me->{value}};
+    for my $t (@$tpl){
+	my $v = shift @v;
+	if( ref $t eq 'ARRAY' ){
+	    $v->value_map($res, $t);
+	}elsif(ref $t){
+	    $res->{$$t} = $v;
+	}elsif(defined $t){
+	    $res->{$t} = $v->{value};
+	}else{
+	    # skip
+	}
+    }
+    $res;
+}

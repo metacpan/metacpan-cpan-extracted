@@ -1,0 +1,14 @@
+---
+Class-Superclasses:
+  dist     : Class::Superclasses
+  source   :
+    type         : ReneePC
+    path         : testmodule
+  target   :
+    type         : CPAN
+    user         : web_user
+    password     : secret_pass
+    test         : t/*.t
+    on_fail      : warn
+    unlink_distro: 1
+    upload       : 1

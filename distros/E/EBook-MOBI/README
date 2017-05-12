@@ -1,0 +1,8 @@
+Source for EBook::MOBI on CPAN
+==============================
+
+This is the source  code of the Perl module `EBook::MOBI`.
+
+It allows to create ebooks in the MOBI format which is for example used by the Kindle Reader. This is no official code and no support or guarantee can be given.
+
+Please see the documentation for more information and the license. You might visit it at https://metacpan.org/module/EBook::MOBI

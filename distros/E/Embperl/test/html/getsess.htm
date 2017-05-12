@@ -1,0 +1,78 @@
+<html>
+<head>
+<title>Tests for Embperl - Set Session Data</title>
+</head>
+
+
+<body>
+	
+	[#
+	[- $s = $Apache::Session::Win32::sessions  || $Apache::Session::MemoryStore::store  -]
+	[- @ks = sort keys %$s -]
+	sessions:
+	<table>
+		<tr>
+			<td>[+ $ks[$row] +]</td><td>[+ $sh = $s -> {$ks[$row] || ''} +]</td><td>[$if ref($sh) eq 'HASH' $][+ do { my @tmp = map { "$_ = $sh->{$_}" } keys (%$sh) ; join (', ', @tmp) } +][$endif$]</td>
+		</tr>
+	</table>
+
+		tied (%mdat) [+ $m = tied (%mdat) +]  <br>
+		ref          [+ ref ($m) +]  <br>
+		content      [+ do { my @tmp = map { "$_ = $mdat{$_}" } keys (%mdat) ; join (', ', @tmp) } +]  <br>
+		tied (%udat) [+ $u = tied (%udat) +]  <br>
+		ref          [+ ref ($u) +]  <br>
+		content      [+ do { my @tmp = map { "$_ = $udat{$_}" } keys (%udat) ; join (', ', @tmp) } +]  <br>
+
+	a=[+ scalar (do {$udat{'a'}}) +][+ $aa +]
+	#]
+
+	fdat:<br>
+	[- @ks = sort keys %fdat -]
+
+	<table>
+		<tr>
+			<td>[+ $ks[$row] +]</td><td>[+ $fdat{$ks[$row] || ''} +]</td>
+		</tr>
+	</table>
+
+	udat:<br>
+	[- $id = tied (%udat) -> getid -]
+	[- @ks = grep (!/^_/, sort (keys %udat)) ; $num = keys (%udat) - @ks - ($id?0:1) -]
+
+	<table>
+		<tr>
+			<td>[+ $ks[$row] +]</td><td>[+ $udat{$ks[$row] || ''} +]</td>
+		</tr>
+	</table>
+
+	[+ $id?"ok (num=$num)":"Not a session hash (num=$num)" +]<p>
+
+	[- 
+	while (($k, $v) = each (%fdat))
+		{
+		$udat{$k} = $fdat{$k} ;
+		}
+	-]
+
+
+        $mdat{cnt} = -[+ $mdat{cnt}  +]- <br>
+        $udat{cnt} = -[+ $udat{cnt}  +]- <br>
+
+
+	[- $s = $Apache::Session::Win32::sessions  || $Apache::Session::MemoryStore::store  -]
+	[- @ks = sort keys %$s -]
+	sessions:
+	<table>
+		<tr>
+			<td>[+ $ks[$row] +]</td><td>[+ $sh = $s -> {$ks[$row] || ''} +]</td><td>[$if ref($sh) eq 'HASH' $][+ do { my @tmp = map { "$_ = $sh->{$_}" } keys (%$sh) ; join (', ', @tmp) } +][$endif$]</td>
+		</tr>
+	</table>
+
+	<a href="cont.htm">continue</a>
+	<a href="cont.htm?q=1">continue</a>
+	<a href="cont.htm?q=1&b=2">continue</a>
+	<form action="cont.htm">
+	</form>
+
+</body>
+</html>

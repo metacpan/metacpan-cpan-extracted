@@ -1,0 +1,83 @@
+NAME
+    Exporter::Simple - Easier set-up of module exports
+
+SYNOPSIS
+      package MyExport;
+      use base 'Exporter::Simple';
+
+      our @bar : Exportable(vars) = (2, 3, 5, 7);
+      our $foo : Exported(vars)   = 42;
+      our %baz : Exported         = (a => 65, b => 66);
+
+      sub hello : Exported(greet,uk)   { "hello there" }
+      sub askme : Exportable           { "what you will" }
+      sub hi    : Exportable(greet,us) { "hi there" }
+
+      # meanwhile, in a module far, far away
+      use MyExport qw(:greet);
+      print hello();
+      $baz{c} = 67;
+
+DESCRIPTION
+    This module, when subclassed by a package, allows that package to define
+    exports in a more concise way than using "Exporter". Instead of having
+    to worry what goes in @EXPORT, @EXPORT_OK and %EXPORT_TAGS, you can use
+    two attributes to define exporter behavior. This has two advantages: It
+    frees you from the implementation details of "Exporter", and it keeps
+    the export definitions where they belong, with the subroutines and
+    variables.
+
+    The attributes provided by this module are:
+
+    "Exported"
+        Indicates that the associated subroutine or global variable should
+        be automatically exported. It will also go into the ":all" tag (per
+        the rules of %EXPORT_TAGS), as well as any tags you specify as
+        options of this attribute.
+
+        For example, the following declaration
+
+          sub hello : Exported(greet,uk)   { ... }
+
+        will cause "hello()" to be exported, but also be available in the
+        tags ":all", ":greet" and ":uk".
+
+    "Exportable"
+        Is like "Exported", except that the associated subroutine or global
+        variable won't be automatically exported. It will still go to the
+        ":all" tag in any case and all other tags specified as attribute
+        options.
+
+BUGS
+    If you find any bugs or oddities, please do inform the author.
+
+INSTALLATION
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+AVAILABILITY
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you. Or see
+    <http://www.perl.com/CPAN/authors/id/M/MA/MARCEL/>.
+
+VERSION
+    This document describes version 1.10 of "Exporter::Simple".
+
+AUTHOR
+    Marcel Grünauer <marcel@cpan.org>
+
+CONTRIBUTORS
+    Damian Conway <damian@conway.org>
+
+    Richard Clamp <richardc@unixbeard.net>
+
+COPYRIGHT
+    Copyright 2001-2002 Marcel Grünauer. All rights reserved.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    perl(1), Attribute::Handlers(3pm), Exporter(3pm).
+

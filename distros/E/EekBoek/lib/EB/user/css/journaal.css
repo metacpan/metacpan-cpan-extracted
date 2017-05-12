@@ -1,0 +1,124 @@
+/* $Id */
+
+@import eekboek.css;
+
+.title {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 100%;
+    font-weight: bold;
+    margin-top: 0pt;
+    margin-bottom: 0pt;
+}
+.subtitle {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 100%;
+    font-weight: bold;
+    margin-top: 0pt;
+}
+.footer {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 80%;
+    font-weight: normal;
+}
+
+body {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    line-height: 150%;
+    color: #000000;
+    table-width: 100%;
+}
+
+table {
+    border: thin solid #000000;
+    border-collapse: collapse;
+}
+table td {
+    border-left:  thin solid #000000;
+    border-right: thin solid #000000;
+}
+table th {
+    border-left:  thin solid #000000;
+    border-right: thin solid #000000;
+    border-bottom: thin solid #000000;
+}
+
+th { vertical-align: top }
+tr { vertical-align: top }
+
+.r_head {
+    color: #0000FF;
+    border-top: thin solid #000000;
+}
+.r_chead {
+    color: #0000FF;
+    border-top: thin solid #000000;
+}
+.r_dhead {
+    color: #0000FF;
+    border-top: thin solid #000000;
+}
+.r_total {
+    color: #FF0000;
+    border-top: thin solid #000000;
+}
+
+.c_acct, .h_acct {
+    padding-left: 10pt;
+    padding-right: 10pt;
+    text-align: left;
+}
+
+.c_date, .h_date {
+    padding-left: 10pt;
+    padding-right: 10pt;
+    text-align: left;
+}
+
+.c_bsk, .h_bsk {
+    padding-left: 10pt;
+    padding-right: 10pt;
+    text-align: left;
+}
+
+.c_desc, .h_desc {
+    padding-left: 10pt;
+    padding-right: 10pt;
+    text-align: left;
+}
+
+.r_data .c_desc, .r_data .c_bsk {
+    padding-left: 20pt;
+}
+
+.r_cdata .c_desc, .r_cdata .c_bsk {
+    padding-left: 20pt;
+}
+
+.r_ddata .c_desc, .r_ddata .c_bsk {
+    padding-left: 20pt;
+}
+
+.c_bsk, .h_bsk {
+    padding-left: 10pt;
+    padding-right: 10pt;
+    text-align: left;
+}
+
+.c_rel, .h_rel {
+    padding-left: 10pt;
+    padding-right: 10pt;
+    text-align: left;
+}
+
+.c_deb, .h_deb {
+    padding-left: 10pt;
+    padding-right: 10pt;
+    text-align: right;
+}
+
+.c_crd, .h_crd {
+    padding-left: 10pt;
+    padding-right: 10pt;
+    text-align: right;
+}
+

@@ -1,0 +1,10 @@
+Email::LocalDelivery::Store - Email::LocalDelivery wrapper for Email::Store
+
+perl Makefile.PL
+make
+make test
+make install
+
+see the pod for details
+
+Bowen Dwelle <bowen@dwelle.org> http://www.dwelle.org/

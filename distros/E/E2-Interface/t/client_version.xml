@@ -1,0 +1,13 @@
+<clientregistry>
+<client client_id="1262679" client_class="jchatter">
+<version></version>
+<homepage>http://sourceforge.net/projects/jchatter/</homepage>
+<download>http://sourceforge.net/project/showfiles.php?group_id=4370</download>
+<maintainer node_id="9740">N-Wing</maintainer></client>
+<client client_id="1262284" client_class="e2client.kde">
+<version>0.03alpha</version>
+<homepage>http://sourceforge.net/projects/e2client/</homepage>
+<download></download>
+<maintainer node_id="1167948">fuzzie</maintainer>
+</client>
+</clientregistry>

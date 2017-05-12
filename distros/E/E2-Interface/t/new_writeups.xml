@@ -1,0 +1,12 @@
+<newwriteups>
+	<wu wrtype="idea">
+		<e2link node_id="11111">idea1 (idea)</e2link>
+		<author><e2link node_id="22222">user</e2link></author>
+		<parent><e2link node_id="33333">idea1</e2link></parent>
+	</wu>
+	<wu wrtype="thing">
+		<e2link node_id="44444">thing1 (thing)</e2link>
+		<author><e2link node_id="55555">user2</e2link></author>
+		<parent><e2link node_id="66666">thing1</e2link></parent>
+	</wu>
+</newwriteups>

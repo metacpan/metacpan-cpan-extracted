@@ -1,0 +1,33 @@
+Revision history for Perl extension Egg::View::TT.
+
+3.01  2008/04/17
+	- Build.PL is abolished.
+
+3.00  2008/02/15
+    - Corresponded to Egg::Release v3.00.
+
+2.00  2007/05/02
+	- Corresponded to Egg::Release v2.00.
+
+0.06  2007/03/25
+	- Maintenance for Pod coverage.
+
+0.05  2007/02/25
+	- Correction of document.
+	- The access to stash is added.
+
+0.04  2007/02/24
+	- Upload to CPAN.
+
+0.03  2007/02/02
+	- It was made to correspond to Egg::Release-1.00.
+	  It doesn't operate in this correction and former version.
+
+0.02  2007/01/14
+	- It was made to pass to response->body after the value received with
+	  'render' had been put in the variable once.
+
+0.01  Sat Dec  9 22:05:28 2006
+	- original version; created by h2xs 1.23 with options
+		-AX -n Egg::View::TT
+

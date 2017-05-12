@@ -1,0 +1,199 @@
+NAME
+    Encode::Escape - Perl extension for Encodings of various escape
+    sequences
+
+SYNOPSIS
+      use Encode::Escape;
+
+      $escaped_ascii = "Perl\\tPathologically Eclectic Rubbish Lister\\n";
+      $ascii = decode 'ascii-escape', $escaped_ascii;
+  
+      # Now, $ascii is equivalent to 
+      # double quote string "Perl\tPathologically Eclectic Rubbish Lister\n"
+
+      $escaped_unicode = "Perl \\x{041F}\\x{0435}\\x{0440}\\x{043B} \\x{D384}" 
+      $string = decode 'unicode-escape', $escaped_unicode;
+
+      # Now, $string is equvialent to 
+      # double quote string "Perl \x{041F}\x{0435}\x{0440}\x{043B} \x{D384}" 
+
+    It may looks non-sense. Here's another case.
+
+    If you have a text data file 'ascii-escape.txt'. It contains a line:
+
+      Perl\tPathologically Eclectic Rubbish Lister\n
+
+    And you want to use it as if it were a normal double quote string in
+    source code. Try this:
+
+      open(FILE, 'ascii-escape.txt');
+      while(<FILE>) {
+        chomp;
+        print decode 'ascii-escape', $_;
+      }
+
+DESCRIPTION
+    Encode::Escape module is a wrapper class for encodings of escape
+    sequences.
+
+    It is NOT for an escape-based encoding (eg. ISO-2022-JP). It is for
+    encoding/decoding escape sequences, generally used in source codes.
+
+    Many programming languages, markup languages, and typesetting languages
+    provide methods for encoding special (or functional) characters and
+    non-keyboard symbols in the form of escape sequence. That's what I
+    concern.
+
+    Yes, you're right. There already exist many modules. See String::Escape,
+    Unicode::Escape, TeX::Encode, HTML::Mason::Escape,
+    Template::Plugin::XML::Escape, URI::Escape, etc.
+
+    But for some reason I need to do it in a different way. There is more
+    than one way to do it! After that, I asked myself if this module is
+    useful. May be not except for me. At this time, Zhuangzi reminds me,
+    ""The useless has its use"".
+
+  ASCII
+    See Encode::Escape::ASCII
+
+  Unicode
+    See Encode::Escape::Unicode
+
+ESCAPE SEQUENCES
+  Character Escape Codes
+    ASCII defines 128 characters: 33 non-printing control characters (0x00
+    -- 0x1f, 0x7f) and 95 printable characters (0x20 -- 0x7e).
+
+    Character Escape Codes in C programming language provide a method to
+    express control characters, using only printable ones. These are
+    accepted by Perl and many other languages.
+
+     CEC    HEX     Description
+     ---    ----    --------------
+     \0     00      Null character
+     \a     07      Bell
+     \b     08      Backspace
+     \t     09      Horizontal Tab
+     \n     0a      Line feed
+     \v     0b      Vertical Tab
+     \f     0c      Form feed
+     \r     0d      Carriage return
+
+    Programming languages provide escape sequences for printable characters,
+    which have significant meaning in that language. Otherwise, it would be
+    harder to print them literally.
+
+     ESC    HEX     Description
+     ---    ----    ---------------
+     \"     22      double quote 
+    \\     52      backslash
+
+    Refer to ASCII, Escape character, Escape sequence at
+    <http://en.wikipedia.org>, for more details.
+
+  Perl Escape Sequences
+    Perl use backslash as an escape character.
+
+    These work in normal strings and regular expressions except \b.
+
+     ESC       Description
+     ---       --------------------------
+     \a        Alarm (beep)
+     \b        Backspace
+     \e        Escape
+     \f        Formfeed
+     \n        Newline
+     \r        Carriage return
+     \t        Tab
+     \037      Any octal ASCII value
+     \x7f      Any hexadecimal ASCII value
+     \x{263a}  A wide hexadecimal value
+     \cx       Control-x
+     \N{name}  name is a name for the Unicode character (use charnames)
+ 
+    The following escape sequences are available in constructs that
+    interpolate.
+
+     \l        Lowercase next character
+     \u        Titlecase next character
+     \L        Lowercase until \E
+     \U        Uppercase until \E
+     \E        End case modification
+ 
+    In regular expresssions:
+
+     \b        An assetion, not backspace, except in a character class
+     \Q        Disable pattern metacharacters until \E
+
+    Unlike C and other languages, Perl has no \v escape sequence for the
+    vertical tab (VT - ASCII 11).
+
+    For constructs that do interpolate, variable begining with "$" or "@"
+    are interpolated.
+
+     \$        Dollar Sign
+     \@        Ampersand
+     \"        Print double quotes
+     \         Escape next character if know otherwise print
+
+    See perlreref, perlop
+
+  Python Escape Sequences
+     \newline   Ignored
+     \\         Backslash (\)
+     \'         Single quote (')
+     \"         Double quote (")
+     \a         ASCII Bell (BEL)
+     \b         ASCII Backspace (BA)
+     \f         ASCII Formfeed (FF)
+     \n         ASCII Linefeed (LF)
+     \N{name}   Character named 'name' in the Unicode database
+     \r         ASCII Carriage Return (CR)
+     \t         ASCII Horizontal Tab (TAB)
+     \uxxxx     Character with 16-bit hex value xxxx (Unicode only)
+     \Uxxxxxxxx Character with 32-bit hex value xxxxxxxx (Unicode only)
+     \v         ASCII Vertical Tab (VT)
+     \ooo       Character with octal value ooo
+     \xhh       Character with hex value hh
+
+    See <http://docs.python.org/ref/strings.html>
+
+    Unicode escape sequences in the form of "\u"*xxxx* are used in Java,
+    Python, C#, JavaScript. Unicode::Escape module implements it.
+
+  LaTeX Escapes
+    TeX::Encode implements encodings of LaTeX escapes. It converts (encodes)
+    utf8 string to LaTeX escapes.
+
+  HTML Escapes
+    See HTML::Mason::Escapes
+
+SEE ALSO
+The useless has its use
+    Hui Tzu said to Chuang Tzu, "Your words are useless!"
+
+    Chuang Tzu said, "A man has to understand the useless before you can
+    talk to him about the useful. The earth is certainly vast and broad,
+    though a man uses no more of it than the area he puts his feet on. If,
+    however, you were to dig away all the earth from around his feet until
+    you reached the Yellow Springs, then would the man still be able to make
+    use of it?"
+
+    "No, it would be useless," said Hui Tzu.
+
+    "It is obvious, then," said Chuang Tzu, "that the useless has its use."
+
+AUTHOR
+    You Hyun Jo, <you at cpan dot org>
+
+ACKNOWLEDGEMENTS
+    Matthew Simon Cavlletto for String::Escape. It worked as good reference
+    when writing the first working version of Encode::Escape::ASCII.
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2007 by You Hyun Jo
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.8 or, at
+    your option, any later version of Perl 5 you may have available.
+

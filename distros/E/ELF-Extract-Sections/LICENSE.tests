@@ -1,0 +1,21 @@
+This distrubition bundles a smattering of files produced by other entities for the sake of testing.
+
+While these libraries are not used for their author-created exectuble content,
+and are never loaded into memory, ( they're only used for structure purposes ),
+they are, still, nonetheless, bundled and distributed code.
+
+The respective copies of the various terms of licensing can be found in LICENSES
+
+Files: t/test_files/libz.so, t/test_files/libz.so.1.2.3.debug
+Copyright: 1995-2005, Jean-loup Gailly <jloup@gzip.org>
+ 1995-2005, Mark Adler <madler@alumni.caltech.edu>
+License: zlib
+
+Files: t/test_files/libreadline.so.6.0.debug
+Copyright: 1987-2009, Free Software Foundation, Inc.
+License: GPL-3
+
+Files: t/test_files/libc.so.6
+Copyright: 1991-2008, Free Software Foundation, Inc.
+License: LGPL-2.1+
+

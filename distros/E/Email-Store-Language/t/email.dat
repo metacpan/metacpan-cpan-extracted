@@ -1,0 +1,91 @@
+From templates-admin@template-toolkit.org Tue Nov 28 21:17:30 2000
+Envelope-to: mstevens@firedrake.org
+Received: from trinity.fluff.org [194.153.168.225] (mail)
+	by dayspring.firedrake.org with esmtp (Exim 3.12 #1 (Debian))
+	id 140s82-0007x1-00; Tue, 28 Nov 2000 21:17:30 +0000
+Received: from www.ourshack.com (dog.ourshack.com) [212.74.28.146] 
+	by trinity.fluff.org helo dog.ourshack.com with esmtp (Exim 3.12)
+	id 140s81-0003hh-00 for michael@etla.org
+	; Tue, 28 Nov 2000 21:17:29 +0000
+Received: from localhost.ourshack.com ([127.0.0.1] helo=dog.ourshack.com)
+	by dog.ourshack.com with esmtp (Exim 3.16 #1)
+	id 140t7Y-000KE6-00; Tue, 28 Nov 2000 22:21:04 +0000
+Received: from dayspring.firedrake.org ([195.82.105.251] ident=mail)
+	by dog.ourshack.com with esmtp (Exim 3.16 #1)
+	id 140t6i-000KDq-00
+	for templates@template-toolkit.org; Tue, 28 Nov 2000 22:20:12 +0000
+Received: from mstevens by dayspring.firedrake.org with local (Exim 3.12 #1 (Debian))
+	id 140s6M-0007sK-00; Tue, 28 Nov 2000 21:15:46 +0000
+From: Michael Stevens <michael@etla.org>
+To: templates@template-toolkit.org
+Message-ID: <20001128211546.A29664@firedrake.org>
+Mail-Followup-To: templates@template-toolkit.org
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.2.5i
+Subject: [Templates] ttree problems - the sequel
+Sender: templates-admin@template-toolkit.org
+Errors-To: templates-admin@template-toolkit.org
+X-BeenThere: templates@template-toolkit.org
+X-Mailman-Version: 2.0rc1
+Precedence: bulk
+List-Help: <mailto:templates-request@template-toolkit.org?subject=help>
+List-Post: <mailto:templates@template-toolkit.org>
+List-Subscribe: <http://www.template-toolkit.org/mailman/listinfo/templates>,
+	<mailto:templates-request@template-toolkit.org?subject=subscribe>
+List-Id: Template Toolkit mailing list <templates.template-toolkit.org>
+List-Unsubscribe: <http://www.template-toolkit.org/mailman/listinfo/templates>,
+	<mailto:templates-request@template-toolkit.org?subject=unsubscribe>
+List-Archive: <http://www.template-toolkit.org/pipermail/templates/>
+Date: Tue, 28 Nov 2000 21:15:46 +0000
+Status: RO
+
+Hi.
+  I finally had time to debug my problems with pre_process and ttree
+in more detail.
+
+It turned out that ttree thinks PRE_PROCESS and POST_PROCESS are
+multiple value fields, so it returns the values supplied for them as arrays,
+eg
+
+  pre_process = foo:bar
+
+is sent to Template as PRE_PROCESS => [ 'foo:bar' ]. The delimiter splitting
+routines in Template::Service only split up if values are scalars rather
+than array references, so it wasn't getting split, and therefore it tried
+to pre_process the file 'foo:bar'.
+
+ttree learnt that those two fields were arrays sometime between beta5 and
+rc2, I'm not sure why.
+
+One fix, as far as I can tell, is to apply this patch:
+
+--cut here for patch--
+diff -urN Template-Toolkit-2.00-rc2.orig/bin/ttree Template-Toolkit-2.00-rc2/bin/ttree
+--- Template-Toolkit-2.00-rc2.orig/bin/ttree	Tue Nov 28 20:56:28 2000
++++ Template-Toolkit-2.00-rc2/bin/ttree	Tue Nov 28 20:57:18 2000
+@@ -324,8 +324,8 @@
+ 	'template_pre_chomp|pre_chomp|prechomp',
+ 	'template_post_chomp|post_chomp|postchomp',
+ 	'template_trim|trim',
+-        'template_pre_process|pre_process|preprocess=s@',
+-        'template_post_process|post_process|postprocess=s@',
++        'template_pre_process|pre_process|preprocess=s',
++        'template_post_process|post_process|postprocess=s',
+         'template_process|process=s',
+         'template_default|default=s',
+         'template_error|error=s',
+--cut here for patch--
+
+Which reverts this change. However, if this was originally done for a good
+reason, it's not the end of the story. The modified version passes all tests
+still, but I can't see that they actually exercise ttree.
+
+Michael
+
+_______________________________________________
+templates mailing list
+templates@template-toolkit.org
+http://www.template-toolkit.org/mailman/listinfo/templates
+

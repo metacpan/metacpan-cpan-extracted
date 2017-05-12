@@ -1,0 +1,50 @@
+package ETLp::Manual::ItemPlSql;
+
+# ABSTRACT: Manual for ETLp PL/SQL Items
+
+__END__
+
+=pod
+
+=head1 PL/SQL ITEMS
+
+The PL/SQL plugin allows stored procedures to be called
+
+=over 4
+
+=item * name. The name of this item.
+
+=item * call. The name of the stored procedure.
+
+=item * sub. The subroutine being called.
+
+=item * parameters. Name/Value pairs.
+
+=item * on_error. Override the setting for the job.
+
+=back
+
+=head2 Example
+
+    <item>
+        name     = record_file
+        call     = record_file
+        type     = plsql
+        on_error = die
+        <parameters>
+                name = filename
+                value = %basename(filename)%
+        </parameters>
+        <parameters>
+                name = message
+                value = %message%
+        </parameters>
+        <parameters>
+                name = archive_dir
+                value = %archive_dir%
+        </parameters>
+    </item>
+
+1. Only iterative jobs can use iterative placeholders like I<%filename%>.
+
+2. If the item parameter value is %message%, the plugin requires that the PL/SQL parameter is an IN/OUT type. The message will be logged in the runtime audit history. This provides a mechanism to pass messages back to ETLp from  the PL/SQL code.

@@ -1,0 +1,58 @@
+#
+# Example for using Embperl::Execute
+#
+# run this under mod_perl / Apache::Registry
+#
+
+
+use Embperl ;
+
+my($r) = @_;
+
+# workaround for broken $r -> chdir_file in Apache::Registry on ActiveState perl
+use Cwd ;
+use File::Basename ;
+
+my $fn = $r -> filename ;
+chdir(dirname ($fn)) ;
+
+$Embperl::DebugDefault = 811005 ;
+
+
+
+$r -> status (200) ;
+$r -> send_http_header () ;
+
+print "<HTML><TITLE>Test for Embperl::Execute and errors</TITLE><BODY>\n" ;
+
+my $out ;
+
+print "<H1> 1.) The next one produces an error page</H1>\n" ;
+
+
+Embperl::Execute ({inputfile	=> '../error.htm',
+						 output     => \$out,
+						 req_rec    => $r}) ;
+
+
+print "<H3>$out</H3>\n" ;
+
+undef $out ;
+
+print "<H1> 2.) The next one produces an errors, but error page is disabled</H1>\n" ;
+
+
+Embperl::Execute ({inputfile	=> '../error.htm',
+						 output     => \$out,
+						 options    => Embperl::optDisableEmbperlErrorPage,
+                                                 req_rec    => $r}) ;
+
+
+print "<H3>$out</H3>\n" ;
+
+undef $out ;
+
+print "<H1> 3.) Done :-)</H1>\n" ;
+
+
+print "</body></html>\n";

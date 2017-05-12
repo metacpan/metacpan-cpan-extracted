@@ -1,0 +1,62 @@
+{
+   "abstract" : "install files from here to there",
+   "author" : [
+      "demerphq <yves@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142060",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "ExtUtils-Install",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Cwd" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Basename" : "0",
+            "File::Compare" : "0",
+            "File::Copy" : "0",
+            "File::Find" : "0",
+            "File::Path" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/NoAuth/Bugs.html?Dist=ExtUtils-Install"
+      },
+      "homepage" : "https://metacpan.org/release/ExtUtils-Install",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/Perl-Toolchain-Gang/ExtUtils-Install"
+      }
+   },
+   "version" : "2.04"
+}

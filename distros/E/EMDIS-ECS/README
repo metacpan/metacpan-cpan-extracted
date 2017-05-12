@@ -1,0 +1,124 @@
+
+EMDIS Communication System (ECS)
+================================
+
+This is a Perl implementation of ECS, the EMDIS Communication System.
+Details regarding ECS and EMDIS are available from the ZKRD web site
+(http://www.zkrd.de/).
+
+
+INSTALLATION
+
+To install this package type the following:
+
+   perl Makefile.PL
+   make
+   make test
+(sudo)   make install
+   (make clean)
+
+After the ECS package is installed, run the ecs_setup program to help
+create the ECS configuration file:
+
+   mkdir ecs
+   ecs_setup ecs/ecs.cfg
+
+The ECS configuration file can also be edited manually, using a text
+editor.
+
+Here's an example showing how to set up and install Perl ECS.
+
+$ mkdir ecshome
+$ cd ecshome
+(ecshome)$ tar xzf ~/EMDIS-ECS-0.36.tar.gz
+(ecshome)$ cd EMDIS-ECS-0.36
+(ECS-0.35)$ perl Makefile.PL
+(ECS-0.35)$ make
+(ECS-0.35)$ make test
+(ECS-0.35)$ sudo make install
+(ECS-0.35)$ cd ..
+(ecshome)$ ecs_setup
+
+Alternatively, because "make install" typically requires root
+privileges, it may be more convenient to install Perl ECS and related
+modules into a local directory, e.g. using cpanminus.
+
+$ mkdir locallib
+$ cpanm --local-lib locallib Net::SMTP~3.05
+$ cpanm --local-lib locallib Mail::IMAPClient~3.18
+$ cpanm --local-lib locallib Net::POP3~3.06
+$ cpanm --local-lib locallib IO::Socket::SSL~2.007
+$ cpanm --local-lib locallib EMDIS-ECS-0.36.tar.gz
+
+The ecs_setup script asks a series of questions and creates an ecs.cfg
+file based on the answers given.  If needed, it can also create the
+required ECS_DAT_DIR subdirectories.  The directory structure and script
+names are similar to those described in the EMDIS ECS specification.
+Of course, Perl ECS can also run under Windows, using Strawberry Perl
+or ActivePerl.
+
+Note:  For Strawberry Perl (on MS Windows), the sequence of commands
+to extract, build, and install the Perl ECS code is slightly different
+from that shown above.  Here's a brief example which uses the ptar and
+dmake commands provided by Strawberry Perl:
+
+  ptar xzf EMDIS-ECS-0.36.tar.gz
+  cd EMDIS-ECS-0.36
+  perl Makefile.PL
+  dmake
+  dmake test
+  dmake install
+
+
+DEPENDENCIES
+
+ECS requires the following modules and libraries.  Most of these are
+included with Perl 5.8:
+
+  CPAN::Version
+  Data::Dumper
+  Fcntl
+  File::Basename
+  File::Copy
+  File::Spec
+  File::Temp
+  Getopt::Long
+  IO::File
+  IO::Handle
+  IPC::Open2
+  Mail::IMAPClient (optional)
+  Net::POP3
+  Net::SMTP
+  SDBM_File
+  Text::ParseWords
+
+In addition to the above, ECS requires the use of an encryption
+program such as PGP (http://www.pgp.com/, http://www.pgpi.org/) or
+GnuPG (http://www.gnupg.org/) to send and receive encrypted data.
+
+Effort was made to avoid dependency on modules not part of the
+standard Perl distribution.  This software was originally developed
+and tested using Perl 5.6.1 (ActivePerl build 632) on Solaris.
+
+
+SEE ALSO
+
+Further information regarding this ECS implementation is available from
+the POD documentation and/or man pages (e.g. "perldoc ECS", "man ECS").
+The original EMDIS Communication System specification is available
+from ZKRD (http://www.zkrd.de/).
+
+
+COPYRIGHT AND LICENSE
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED 
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF 
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+Copyright (C) 2002-2016 National Marrow Donor Program. All rights reserved.
+
+See LICENSE file for license details.
+
+Note:  The ECS logo is used with permission.  Flag images included in this
+package were copied from Wikipedia, and are in the public domain.  Other
+images are based on public domain content obtained from openclipart.org.

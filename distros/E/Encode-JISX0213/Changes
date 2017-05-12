@@ -1,0 +1,49 @@
+Revision history for Perl extension Encode-JISX0213.
+
+0.04  Sat Jun 27 2015
+
+	* Fix: CPAN RT #105503: "Replacement list is longer than search list"
+	  warning.  See also Perl RT #125493.
+	* Moved source repo to GitHub.
+
+0.03  Web Sep 25 2013
+
+	* t/JISX0213.t: RT tests had always succeeded.
+	* ShiftJIS2004.pm: Deprecated PERLQQ feature of econde(),
+	  and added multibyte-aware error handling to decode().
+	* ucm/jis-x-0213-annex1.ucm: added fallback mappings for alternative
+	  names (per Annex 5) of two characters: reverse solidus and tilde.
+
+0.02  Mon Sep 23 2013
+
+	* First stable (hopefully) release.
+
+0.01_05  Sun Sep 22 2013
+
+	* Supported enc2xs.bat for MSWin32
+	* Fixed broken encoding by shift_jis-2004: Now it is provied by
+	  separate package Encode::ShiftJIS2004.
+
+0.01_02  Wed Sep 18 2013
+
+	* jis-x-0208.ucm: removed fallback maps for CP932, except U+2015 which
+	  is defined by jis0208-raw encoding of Encode core module.
+	* JISX0213.pm:
+	  - Introduced shortest encoding strategy for secondary CCS of
+	    iso-2022-* encodings.
+	  - Canonical name of "iso-2022-jp-2004-compatible" was renamed to
+	    "x-iso-2022-jp-2004-compatible".
+	  - Added "x-iso-2022-jp-2004-strict" encoding.
+
+0.01_00  Tue Sep 17 2013
+
+	* First beta.
+
+0.000_07  Sun Sep 15 2013
+
+	* Second CPAN upload.
+
+0.000_06  Sun Sep 15 2013
+
+	* First CPAN upload.
+

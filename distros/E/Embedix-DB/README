@@ -1,0 +1,68 @@
+NAME
+    Embedix::DB - factory for ECD database implementations
+
+SYNOPSIS
+    instantiation
+
+        my $edb = Embedix::DB->new (
+            backend => 'Pg',
+            source  => [ 
+                'dbi:Pg:dbname=embedix',
+                'user', 'password',
+                { AutoCommit => 0 },
+            ],
+        );
+
+        # $edb should be an instance of Embedix::DB::Pg
+
+    adding components to the database
+
+        my $apache_ecd = Embedix::ECD->newFromFile('apache.ecd');
+        $edb->addECD($apache_ecd);
+        $edb->updateDistro(ecd => $apache_ecd);
+
+    dependency resolution
+
+        # I'm not sure how I should do this.
+
+    conflict resolution
+
+        # I'm not sure how I should do this.
+
+REQUIRES
+    Embedix::ECD
+        This is needed to get data from ECD files into perl objects that can
+        then be inserted into a database.
+
+DESCRIPTION
+    Embedix::DB is a factory class that creates objects that implement the
+    Embedix::DB::Backend API. These objects will most likely be located in
+    the Embedix::DB::* namespace.
+
+    Note, however, that these objects are not subclasses of Embedix::DB.
+    Embedix::DB is a factory class, and that's it.
+
+  The Embedix::DB::Backend API
+
+    new()
+    addDistro()
+    workOnDistro()
+    updateDistro()
+DIAGNOSTICS
+    error messages
+
+COPYRIGHT
+    Copyright (c) 2000 John BEPPU. All rights reserved. This program is free
+    software; you can redistribute it and/or modify it under the same terms
+    as Perl itself.
+
+AUTHOR
+    John BEPPU <beppu@lineo.com>
+
+SEE ALSO
+    related perl modules
+        Embedix::DB::Pg, Embedix::DB::ECD, Embedix::DB::CML2, Embedix::ECD
+
+    the latest version
+            http://opensource.lineo.com/cgi-bin/cvsweb/pm/Embedix/DB/
+

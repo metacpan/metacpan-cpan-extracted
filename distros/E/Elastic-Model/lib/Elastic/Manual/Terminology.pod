@@ -1,0 +1,353 @@
+package Elastic::Manual::Terminology;
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Elastic::Manual::Terminology - Explanation of terminology and concepts
+
+=head1 VERSION
+
+version 0.52
+
+=head1 MAIN ELASTICSEARCH TERMS
+
+=head2 Index
+
+An "Index" is the equivalent of a "database" in a relational DB (not to be
+confused with an "index" in a relational DB). It has a L</Mapping>,
+which defines multiple L<Types|/Type>.
+
+Internally, an Index is a logical namespace which points to one or more
+L<primary shards|/Shard>, each of which may have zero or more
+replica shards.  You can change the number of replica shards on an
+existing index, but the number of primary shards is fixed at index
+creation time.
+
+Searches can be performed across multiple indices.
+
+B<Note:> an index name must be a lower case string, without any spaces.
+
+See also L</Alias>, L</Domain>, L<Elastic::Model::Index> and
+L<Elastic::Manual::Scaling>.
+
+=head2 Alias
+
+An "Alias" is like a shortcut to one or more L<Indices|/Index>. For instance, you
+could have Alias C<myapp> which points to Index C<myapp_v1>. Your code can
+talk just to the Alias.
+
+When you want to change the structure of your index, you could reindex all your
+docs to the new Index C<myapp_v2> and, when ready, switch the C<myapp> Alias to point to
+C<myapp_v2> instead.
+
+An Alias may also point to multiple indices. For example you might have
+indices C<logs_jan_2012>, C<logs_feb_2012>, ... C<logs_dec_2012>, and an alias
+C<logs_2012> which points to all 12 indices.  This allows you to use a single
+alias name to search multiple indices.
+
+B<Note:> you can't index new docs to an alias that points to multiple indices.
+An alias used by a L</Domain> must point to a single index only, but an alias
+used by a L</View> can point to multiple indices.
+
+Also see L</Domain>, L<Elastic::Model::Alias> and L<Elastic::Manual::Scaling>.
+
+=head2 Type
+
+A "Type" is like a "table" in a relational DB.  For instance, you may have
+a C<user> type, a C<comment> type etc. An L</Index> can have multiple
+types (just like a database can have multiple tables). In Elastic::Model,
+objects (L<Documents|/Document>) of each type are handled by a single
+class, eg C<MyApp::User>, C<MyApp::Comment>. (See L</Namespace>).
+
+Each Type has a L</Mapping>, which defines the list of L<Fields|/Field>
+in that type. Searches can be performed across multiple types.
+
+Also see L</Namespace>, L</Mapping>, L</Document> and L</Field>.
+
+=head2 Mapping
+
+Each L</Type> has a "Mapping" which is like a "schema definition" in
+a relational DB. It defines various type-wide settings, plus the field-type
+(eg C<integer>, C<object>, C<string>) for each L</Field> (attribute) in the type,
+and specifics about how each field should be L<analyzed|/Analysis>.
+
+New fields can be added to a mapping, but generally existing fields may not
+be changed. Instead, you have to create a new index with the new mapping and
+L<reindex|Elastic::Manual::Reindex> your data.
+
+Elastic::Model generates the mapping for you using Moose's introspection.
+L<Attribute keywords|Elastic::Model::Attributes> are provided to give you
+control over the mapping process.
+
+=head2 Document
+
+A "Document" is like a "row" in a relational DB table.  Elastic::Model
+converts your objects into a JSON object (essentially a hashref), which
+is the Document that is stored in Elasticsearch.  We use the terms
+"Object" and "Document" interchangably.
+
+Each Document is stored in a single L<primary shard|/Shard> in an L</Index>,
+has a single L</Type>, an L</ID> and zero or more L<Fields|/Field>.
+
+The original JSON object is stored in the special C<_source> field, which
+is returned by default when you retrieve a document by ID, or when you
+perform a search.
+
+=head2 Field
+
+A "Field" is like a "column" in a table in a relational DB. Each field has
+a field-type, eg C<integer>, C<string>, C<datetime> etc.  The attributes
+of your Moose classes are stored as fields.
+
+Multi-level hashes can be stored, but internally these get flattened.
+For instance:
+
+    {
+        husband => {
+            firstname => 'Joe',
+            surname   => 'Bloggs'
+        },
+        wife => {
+            firstname => 'Alice',
+            surname   => 'Bloggs'
+        }
+    }
+
+... is flattened to:
+
+    {
+        'husband.firstname' => 'Joe',
+        'husband.surname'   => 'Bloggs',
+        'wife.firstname'    => 'Alice',
+        'wife.surname'      => 'Bloggs',
+    }
+
+You could search on the C<firstname> field, which would search the firstname
+for both the husband and the wife, or by specifying the fieldname
+in full, you could search on just the C<husband.firstname> field.
+
+=head2 ID
+
+The "ID" of a document identifies a document uniquely in an L</Index>.
+If no ID is provided, then it will be auto-generated.
+
+See also L</UID> and L</Routing>.
+
+=head1 ELASTIC::MODEL TERMS
+
+=head2 Model
+
+A "Model" is the Boss Object, which ties an instance of your application to
+a particular Elasticsearch L</Cluster>. You can have multiple instances of your
+Model class which connect to different clusters.
+
+See L<Elastic::Model> and L<Elastic::Model::Role::Model> for more.
+
+=head2 Namespace
+
+A L</Model> can contain multiple "Namespaces". A Namespace has one or more
+L<Domains|/Domain> and, for those Domains, defines which of
+your classes should be used for a L</Document> of a particular
+L</Type>.
+
+For instance: in Domain C<myapp_current>, which belongs to Namespace C<myapp>,
+objects of class C<MyApp::User> should be stored in Elasticsearch as documents
+of Type C<user>.
+
+A namespace is also used for administering (creating, deleting, updating)
+L<Indices|/Index> or L<Aliases|/Alias> in Elasticsearch.
+
+See L<Elastic::Model::Namespace> and L</Domain>.
+
+=head2 Domain
+
+A "Domain" is like a database handle used for creating, updating or deleting
+individual objects or L<Documents|/Document>. The C<< $domain->name >> can be
+the name of an L</Index> or an L<Index Alias|/Alias> (which points to a single
+index) in Elasticsearch. A domain can only belong to a single
+L<namespace|/Namespace>.
+
+See L<Elastic::Model::Domain>.
+
+=head2 View
+
+A "View" is used for querying documents/objects in Elasticsearch.  A View
+can query single or multiple L<Domains|/Domain> (belonging to different
+L<Namespaces|/Namespace>) and single or multiple L<Types|/Type>.
+
+See L<Elastic::Model::View>, L</Query> and L</Filter>.
+
+=head2 UID
+
+A "UID" is the unique identifier of a L</Document>. It is handled by
+L<Elastic::Model::UID>. The L</Namespace> / L</Type> / L</ID> combination of
+a document must be unique. While Elasticsearch will check for "uniqueness" in
+a single L</Index> it is the reponsbility of the user to ensure uniqueness across
+all of the L<Domains|/Domain> in a L</Namespace>.
+
+Also see L</Routing>.
+
+=head1 SEARCH TERMS
+
+=head2 Analysis
+
+"Analysis" is the process of converting L<Full Text|/Text> to L<Terms|/Term>.
+For instance the C<english> analyzer will convert this phrase:
+
+    The QUICK brown Fox has been noted to JUMP over lazy dogs.
+
+... into these terms/tokens:
+
+    quick, brown, fox, ha, been, note, jump, over, lazi, dog
+
+... which is what is actually stored in the index.
+
+A full text query (not a term query) for C<"brown FOXES and a Lazy dog"> will
+also be analyzed to the terms C<"brown, fox, lazi, dog">, and will thus
+match the terms stored in the index.
+
+It is this process of analysis (both at index time and at search time) that
+allows Elasticsearch to perform full text queries.
+
+See also L</Text> and L</Term> and L</Query>.
+
+=head2 Term
+
+A term is an exact value that is indexed in Elasticsearch. The terms
+C<foo>, C<Foo>, C<FOO> are NOT equivalent. Terms (ie exact values) can be
+searched for using "term" queries.
+
+See also L</Text>, L</Analysis> and L</Query>.
+
+=head2 Text
+
+Text (or full text) is ordinary unstructured text, such as this paragraph.
+By default, text will by L<analyzed|/Analysis> into L<terms|/Term>, which is
+what is actually stored in the index.
+
+Text fields need to be analyzed at index time in order to be searchable as
+full text, and keywords in full text queries must be analyzed at search time
+to produce (and search for) the same terms that were generated at index time.
+
+See also L</Term>, L</Analysis> and L</Query>.
+
+=head2 Query
+
+A "Query" is used to search for L<Documents|/Document> in Elasticsearch, using
+L<Views|/View>.  It can be expressed either in the native
+L<Elasticsearch Query DSL|http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl.html>
+or using the more Perlish L<ElasticSearch::SearchBuilder> syntax.
+
+By default, a Query sorts the results by relevance (C<_score>).
+
+There are two broad groups of queries: L</Full Text Query> and L</Term Query>.
+
+=head3 Term Query
+
+A "Term Query" searches for exactly the L<Terms|/Term> provided.  For instance,
+a search for C<"FOO"> will not match the term C<"foo">.
+
+This is useful for values that are not full text, eg enums, dates, numbers,
+canonicalized post codes, etc.
+
+=head3 Full Text Query
+
+A "Full Text Query" is useful for searching text like this paragraph.  The
+search keywords are first L<Analyzed|/Analysis> into L<Terms|/Term> so that they
+correspond to the actual values that are stored in Elasticsearch. Then the query
+itself is built up out of multiple L<Term Queries|/Term Query>.
+
+It is important to use the same analyzer on both (1) the values in the field(s) you
+are searching (index analyzer) and (2) the search keywords in the query
+(search analyzer), so that the both processes produce the same terms. Otherwise,
+they won't match.
+
+Also see L</Filter> and L</View>.
+
+=head2 Filter
+
+A "Filter" is similar to a L</Term Query> except that there is no
+"relevance scoring" phase.  A Filter says: "Yes this document should be included",
+or "No this document should be excluded".
+
+For instance, you may want to run a L</Full Text Query> on your BlogPost
+documents, searching for the keywords C<"perl moose">, but only for
+BlogPosts that have been published this year.  This could be achieved
+by using a Range filter within a query.
+
+Filters can be expressed either in the native
+L<Elasticsearch Query DSL|http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl.html>
+or using the more Perlish L<ElasticSearch::SearchBuilder> syntax.
+
+Also see L</Query> and L</View>.
+
+=head1 OTHER ELASTICSEARCH TERMS
+
+=head2 Cluster
+
+A "Cluster" is a collection of L<Nodes|/Node> which function together - they
+all share the same
+L<cluster.name|http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/setup-configuration.html#system>.
+The cluster elects a single "master node" which controls the cluster.
+If the master node fails, another node is automatically elected.
+
+=head2 Node
+
+A "Node" is a running instance of Elasticsearch. Normally, you would only run
+one instance of Elasticsearch on one server, so a Node is roughly equivalent
+to a server. When a Node starts, it tries to join a L</Cluster>
+which shares the same cluster name.  If it fails to find an existing cluster,
+it will form a new one.
+
+=head2 Shard
+
+A "Shard" is a single instance of Lucene (what Elasticsearch uses internally
+to provide its search function).  Shards are the building blocks
+of L<Indices|/Index> - each index consists of at least one shard.
+
+A shard can be a "primary shard" or a "replica shard".  A primary shard
+is responsible for storing a newly indexed doc first.  Once it has been
+indexed by the primary shard, the new doc is indexed on all of the replica
+shards (if there are any) in parallel to ensure that there are multiple
+copies of each document in the cluster.
+
+If a primary shard fails, then a replica shard will be promoted to be
+a primary shard, and a new replica will be allocated on a different
+L</Node>, if there is one available.
+
+A replica shard will never run on the same node as its primary shard, otherwise
+if that node were to go down, it would take both the primary and replica shard
+with it.
+
+=head2 Routing
+
+When you index a document, it is stored on a single L<primary shard|/Shard>.
+That shard is chosen by hashing the "Routing" value. By default, the Routing
+value is derived from the L</ID> of the document or, if the document has a
+specified parent document, from the ID of the parent document
+(to ensure that child and parent documents are stored on the same shard).
+
+This value can be overridden by specifying a C<routing> value at index time,
+a routing field in the L<mapping|/Mapping> or by using an L</Alias> with
+a built-in routing.  See L<Elastic::Manual::Scaling> for more.
+
+=head1 AUTHOR
+
+Clinton Gormley <drtech@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Clinton Gormley.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+
+__END__
+
+# ABSTRACT: Explanation of terminology and concepts
+

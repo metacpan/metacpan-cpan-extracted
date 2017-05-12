@@ -1,0 +1,46 @@
+# Appendix A.1.1. Simple addressing
+John Doe <jdoe@machine.example>
+
+# Appendix A.1.1. Simple addressing
+Mary Smith <mary@example.net>
+
+# Appendix A.1.2.  Different Types of Mailboxes
+"Joe Q. Public" <john.q.public@example.com>
+
+# Appendix A.1.2.  Different Types of Mailboxes
+Mary Smith <mary@x.test>
+
+# Appendix A.1.2.  Different Types of Mailboxes
+jdoe@example.org
+
+# Appendix A.1.2.  Different Types of Mailboxes
+Who? <one@y.test>
+
+# Appendix A.1.2.  Different Types of Mailboxes
+<boss@nil.test>
+
+# Appendix A.1.2.  Different Types of Mailboxes
+"Giant; \"Big\" Box" <sysservices@example.net>
+
+# Appendix A.1.2.  Different Types of Mailboxes
+Pete(A nice \) chap) <pete(his account)@silly.test(his host)>
+
+# Appendix A.1.2.  Different Types of Mailboxes
+Chris Jones <c@(Chris's host.)public.example>
+
+# Appendix A.1.2.  Different Types of Mailboxes
+John <jdoe@one.test> (my dear friend)
+
+# special in display-name with quoting
+"()<>[]:;@\\,.\"" <foo@bar.biz>
+
+# comments with spaces in every possible possition
+ (c1) foo (c2) bar (c3) < (c4) baz (c5) @ (c6) domain.com (c7) >
+
+# phrase with strange quoting
+foo "\\" bar <foo@bar.info>
+
+# local part with redundant quoting
+"foo.bar"@zoo.info
+
+

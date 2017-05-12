@@ -1,0 +1,162 @@
+<!-- root node -->
+<!ELEMENT ecd (group*, component*, option*, autovar*)>
+
+<!-- attributes -->
+<!ELEMENT help              (#PCDATA)>
+<!ELEMENT prompt            (#PCDATA)>
+<!ELEMENT license           (#PCDATA)>
+<!ELEMENT specpatch         (#PCDATA)>
+<!ELEMENT srpm              (#PCDATA)>
+<!ELEMENT build_vars        (#PCDATA)>
+<!ELEMENT type              (#PCDATA)>
+<!ELEMENT default_value     (#PCDATA)>
+<!ELEMENT value             (#PCDATA)>
+<!ELEMENT range             (#PCDATA)>
+<!ELEMENT choicelist        (#PCDATA)>
+<!ELEMENT if                (#PCDATA)>
+<!ELEMENT static_size       (#PCDATA)>
+<!ELEMENT min_dynamic_size  (#PCDATA)>
+<!ELEMENT storage_size      (#PCDATA)>
+<!ELEMENT startup_time      (#PCDATA)>
+<!ELEMENT conflicts         (#PCDATA)>
+<!ELEMENT provides          (#PCDATA)>
+<!ELEMENT requires          (#PCDATA)>
+<!ELEMENT requiresexpr      (#PCDATA)>
+<!ELEMENT keeplist          (#PCDATA)>
+<!ELEMENT trideps           (#PCDATA)>
+
+<!-- group node -->
+<!ELEMENT group
+  (
+    help?,
+    prompt?,
+    license?,
+    specpatch?,
+    srpm?,
+    build_vars?,
+    type?,
+    default_value?,
+    value?,
+    range?,
+    choicelist?,
+    if?,
+    static_size?,
+    min_dynamic_size?,
+    storage_size?,
+    startup_time?,
+    conflicts?,
+    provides?,
+    ( requires | requiresexpr )?,
+    keeplist?,
+    trideps?,
+    group*,
+    component*,
+    option*,
+    autovar*
+  )
+>
+<!ATTLIST group
+  name CDATA #REQUIRED
+>
+
+<!-- component node -->
+<!ELEMENT component
+  (
+    help?,
+    prompt?,
+    license?,
+    specpatch?,
+    srpm?,
+    build_vars?,
+    type?,
+    default_value?,
+    value?,
+    range?,
+    choicelist?,
+    if?,
+    static_size?,
+    min_dynamic_size?,
+    storage_size?,
+    startup_time?,
+    conflicts?,
+    provides?,
+    ( requires | requiresexpr )?,
+    keeplist?,
+    trideps?,
+    group*,
+    component*,
+    option*,
+    autovar*
+  )
+>
+<!ATTLIST component
+  name CDATA #REQUIRED
+>
+
+<!-- option node -->
+<!ELEMENT option
+  (
+    help?,
+    prompt?,
+    license?,
+    specpatch?,
+    srpm?,
+    build_vars?,
+    type?,
+    default_value?,
+    value?,
+    range?,
+    choicelist?,
+    if?,
+    static_size?,
+    min_dynamic_size?,
+    storage_size?,
+    startup_time?,
+    conflicts?,
+    provides?,
+    ( requires | requiresexpr )?,
+    keeplist?,
+    trideps?,
+    group*,
+    component*,
+    option*,
+    autovar*
+  )
+>
+<!ATTLIST option
+  name CDATA #REQUIRED
+>
+
+<!-- autovar node -->
+<!ELEMENT autovar
+  (
+    help?,
+    prompt?,
+    license?,
+    specpatch?,
+    srpm?,
+    build_vars?,
+    type?,
+    default_value?,
+    value?,
+    range?,
+    choicelist?,
+    if?,
+    static_size?,
+    min_dynamic_size?,
+    storage_size?,
+    startup_time?,
+    conflicts?,
+    provides?,
+    ( requires | requiresexpr )?,
+    keeplist?,
+    trideps?,
+    group*,
+    component*,
+    option*,
+    autovar*
+  )
+>
+<!ATTLIST autovar
+  name CDATA #REQUIRED
+>

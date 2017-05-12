@@ -1,0 +1,10 @@
+Revision history for Email-Send-YYClouds
+
+0.01    2016-8-3
+        First version, released on linux Ubuntu 9.10
+
+0.02    2016-8-3
+        Fix character set to utf8
+
+0.03    2016-8-4
+        Update PREREQ_PM in Makefile

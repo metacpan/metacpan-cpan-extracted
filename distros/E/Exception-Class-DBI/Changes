@@ -1,0 +1,81 @@
+Revision history for Perl extension Exception::Class::DBI.
+
+1.01  2011-06-20T04:27:43
+        - Fixed a warning in `t/sth.t`.
+        - Moved repostitory to
+          [GitHub](https://github.com/theory/exception-class-dbi/).
+        - Switched to a "traditional" `Makefile.PL`.
+
+1.00  2008-05-22T03:28:50
+        - Fixed a test failure on Perl 5.5. Reported by Slaven Rezic.
+
+0.99  2008-05-15T03:31:30
+        - Fixed another Perl 5.6.2 test error. Reported by Slaven Rezic.
+
+0.98  2008-05-06T17:53:25
+        - Fixed strange test failures on Perl 5.6.2. Somehow tests are getting
+          run more than once, resulting in strange failures. I got 'round this
+          issue by putting an explicit `exit;` at the end of each test script.
+          Reported by David Cantrell.
+
+0.97  2008-05-05T19:10:05
+        - Updated copyright.
+        - Added a link to the Subversion repository.
+        - Fixed test failures on Perl 5.6.2.
+
+0.96  2007-10-26T19:01:36
+        - Fixed test failure due to the change in value of $dbh->err in DBI
+          1.601. First reported by Andreas J. König; fix suggested by Tim
+          Bunce.
+        - Added the "configure_requires", and "recommends" parameters to
+          Build.PL.
+        - Updated the POD test to properly make use of Test::POD 1.20 or
+          newer.
+
+0.95  2006-07-18T22:14:41
+        - Fixed test failure for localized error messages. Reported by Jens
+          Maier with a fix from Daniel Brook.
+        - Updated tests to use is($foo, $bar) instead of ok($foo == $bar)
+          Spotted by Andy Lester.
+
+0.94  2006-06-30T00:04:32
+        - The handler() method now always returns the same code referernce
+          each time it's called for a given subclass. This behavior prevents
+          the DBI connect_cached() method from caching a new database handle
+          every time it's called, which could otherwise be pretty annoying.
+
+0.93  2006-06-10T02:09:14
+        - Reformatted some of the code and documentation so that it's
+          easier to read.
+        - Added 'handle' attribute to store the DBI handle for which the
+          exception was thrown.
+        - Switched to explicit accessors that reach in to the cached database
+          handle stored. Suggested by Tim Bunce ages ago!
+        - Added support for subclassing Exception::Class::DBI and its
+          subclasses.
+
+0.92  2004-06-17T17:42:37
+        - Fixed test that was breaking with newer versions of DBI.
+
+0.91  Tue Aug 26 02:25:56 2003
+        - Switched to Module::Build.
+        - Throwing exceptions with the "throw()" method, rather than
+          die'ing with the construction of exceptions with the "new()"
+          constructor.
+        - Added POD tests.
+
+0.90  Thu Dec 12 20:16:14 2002
+        - Updated tests for Changes in DBI 1.30. Connection failures
+          can now throw exceptions!
+        - Removed TODO tests in sth.t. Tim has said that DBI attributes
+          that return ARRAYs or HASHes will return undef when they're
+          empty, rather than return emtpy ARRAYs or HASHes.
+        - Incremented version to 0.90 to indicate high level of stability.
+
+0.02  Tue Sep 17 03:33:56 2002
+        - Documentation tweaks.
+        - Fixed test to pass with Perl 5.6.1 and earlier.
+
+0.01  Fri Aug 23 19:50:45 2002
+	- Initial Release to the CPAN.
+

@@ -1,0 +1,7 @@
+Revision history for Perl extension Encode::Korean.
+
+
+0.01  Thu Nov 22 01:40:24 2007
+	- original version; created by h2xs 1.23 with options
+		-AXc -n Encode::Korean
+

@@ -1,0 +1,87 @@
+version 0.953  Monday May 18,2009
+
+This initial release is unfortunately with minimal documentation.
+Future releases will be better documented.
+
+The EdgeExpressDB (eeDB) system is a perl/mysql/web cgi system
+with AJAX javascript clients.  
+We recommend installing on linux, FreeBSD, or OpenBSD systems.
+In order to have the full system installed one will need the following.
+
+1) install Mysql 4.x or 5.0.x database server(s)
+
+2) install http server(s) (apache2 recommended)
+   with both CGI and FastCGI enabled
+   the CGI and FastCGI must be configued so that it works
+   with scripts ending in .cgi and .fcgi since the eeDB system
+   automatically creates new web-service directories for each
+   new eeDB instance.
+
+3) install the EEDB perl module system.  best to use
+   either  
+   cpan EEDB
+   or
+   perl Makefile.PL
+   since there are dependancies on other cpan packages
+
+4) install a copy of Bioperl. This was not included in 
+   the CPAN dependencies. It is used by some subsystems
+
+5) run the install.sh script.  this will create
+   /usr/local/EdgeExpressDB and populate it with required
+   support files and scripts.
+   One should then add /usr/local/EdgeExpressDB/bin to
+   the PATH environment variable.
+
+6) configure the following environment variables for the super-user 
+who will be creating new eeDB instances
+declare -x EEDB_REGISTRY="mysql://<user>@mysql-host.local.domain/eeDB_registry"
+declare -x EEDB_WEBDIR="/var/www/html/eeDB"  #or where your webserver keeps the htdoc files
+declare -x EEDB_WEBROOT="http://my-webserver.local.domain/eeDB/"
+
+
+This will provide you with the base install of the system.
+One then needs to create "instances" of eeDB database.
+One uses the eedb_create_instance.pl script to do this.
+
+First one should create the eeDB_registry instance
+
+eedb_create_instance.pl -url "mysql://<user>:<pass>@mysql-host.local.domain:3308/eeDB_registry"
+
+and then create as many instances for data as needed
+eedb_create_instance.pl -url "mysql://<user>:<pass>@mysql-host.local.domain:3308/eeDB_instance1"
+eedb_create_instance.pl -url "mysql://<user>:<pass>@mysql-host.local.domain:3308/eeDB_brain_study"
+eedb_create_instance.pl -url "mysql://<user>:<pass>@mysql-host.local.domain:3308/eeDB_public_data"
+
+
+THEN one needs to load data.  There are several loader scripts already made and
+available in /usr/local/EdgeExpressDB/scripts.  If one needs custom scripts
+please one these as a template and modify for your custom file formats.
+There is some test data available in /testdata.  One can also easily download
+bed files from the UCSC table browser.
+
+EXAMPLE loading
+eedb_load_bed.pl -url "mysql://<user>:<pass>@mysql-host.local.domain/eeDB_public_data" -assembly hg18 -fsrc "gene::UCSC_hg18_refgene_test" -file testdata/hg18_refgene_2009jan15.bed.gz  -block -store
+
+If everything was installed properly one should now be able to use a web browser to 
+access any of these instances
+  http://my-webserver.local.domain/eeDB/eeDB_public_data/contents
+and see the new source UCSC_hg18_refgene_test listed
+One should also be able to go to 
+  http://my-webserver.local.domain/eeDB/eeDB_public_data/view
+and search for  NM_001002294
+and then see the gene appear in the search and be able to select it.
+
+Other useful loader scripts include eedb_load_gff3.pl and eedb_load_expression_table.pl
+
+===
+this is the first public release of the system, please understand and contact the author.
+For this first release we are primarily releasing for collaborators who we can work
+more closely with to train on the system.  We hope this collaboration process will help
+us refine the system and documentation.
+
+--- 
+Jessica Severin, RIKEN OSC
+jessica.severin@gmail.com
+
+

@@ -1,0 +1,28 @@
+Return-Path: corrales@choice1.com
+X-ClientAddr: 206.107.186.3
+Received: from mail.tramark.net (mail.tramark.net [206.107.186.3])
+Received: from [206.107.186.15] by mail.tramark.net [206.107.186.3] with SmartMax MailMax for betsy@antibes.co.uk; Fri, 23 Sep 2005 08:18:15 -0600
+X-SmartMax-AuthUser:
+Received: from mail pickup service by www13.corp.tramark.net with Microsoft SMTPSVC;
+     Fri, 23 Sep 2005 07:18:15 -0700
+thread-index: AcXASaM31FWkW4HwTmCKlJw1alKQAQ==
+Thread-Topic: Your Vacation Rental
+Reply-To:
+From: "Brian Corrales" corrales@choice1.com
+Subject: {Bad Spam?} Your Vacation Rental
+Date: Fri, 23 Sep 2005 07:18:15 -0700
+Message-ID: 54df01c5c049$a339b1a0$0fba6bce@corp.tramark.net
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+     boundary="----=_NextPart_000_54E0_01C5C00E.F6DAD9A0"
+X-Mailer: Microsoft CDO for Windows 2000
+Content-Class: urn:content-classes:message
+Importance: normal
+Priority: normal
+X-MimeOLE: Produced By Microsoft MimeOLE V6.00.3790.1830
+X-OriginalArrivalTime: 23 Sep 2005 14:18:15.0354 (UTC) FILETIME=[A339B1A0:01C5C049]
+X-www.antespam.co.uk-SpamCheck: spam, SpamAssassin (score=347, required 8,)
+X-www.antespam.co.uk-SpamScore: ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss
+
+
+Attention Vacation Home Owner, At 1st Choice Vacation Rentals, we have one mission - help vacationers enjoy the benefits of staying in a vacation home during their treasured holidays. Since we started over 11 years ago, we've connected well over 10 million consumers to properties. We have continued to refine our process to ensure that our property owner/manager customers see their subscription to our services as the highest payback marketing investment they make. We're gratified that we've been recognized year after year as the Best of the Web by Forbes Magazine. See the review our site received: http://www.forbes.com/bow/b2c/category.jhtml?id=172.

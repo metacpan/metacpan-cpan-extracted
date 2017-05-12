@@ -1,0 +1,24 @@
+--- #YAML:1.0
+name:               Etsy-StatsD
+version:            1.002002
+abstract:           Object-Oriented Client for Etsy's StatsD Server
+author:
+    - Steve Sanbeg <sanbeg@cpan.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    Test::MockModule:  0
+requires:
+    perl:  5.006
+resources:
+    repository:  https://github.com/sanbeg/Etsy-Statsd
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

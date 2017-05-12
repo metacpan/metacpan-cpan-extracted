@@ -1,0 +1,71 @@
+#!/usr/bin/perl
+use 5.010;
+use strict;
+use warnings;
+use utf8::all;
+use autodie qw(:all);
+
+# PODNAME: inject
+# ABSTRACT: Inject packets directly into the exobrain bus
+
+use Exobrain::Bus;
+use Exobrain::Message;
+use JSON::Any;
+use Config::Tiny;
+use Try::Tiny;
+
+my $bus  = Exobrain::Bus->new( type => 'PUB' );
+
+my $namespace = shift @ARGV;
+my $summary   = "@ARGV";
+my $epoch_time = time();
+
+my $j = JSON::Any->new;
+
+if (my $data = try { $j->decode($summary) } ) {
+
+    my $msg = Exobrain::Message::Raw->new(
+        namespace => $namespace,
+        timestamp => $epoch_time,
+        source    => 'CMDLINE',
+        data      => $data,
+        raw       => $data,
+        summary   => $data->{summary} || $summary,
+    )->send_msg( $bus->_socket );
+}
+
+else {
+    my $msg = Exobrain::Message::Raw->new(
+        namespace => $namespace,
+        timestamp => $epoch_time,
+        source    => 'CMDLINE',
+        data      => { text => $summary },
+        raw       => { text => $summary },
+        summary   => $summary,
+    )->send_msg( $bus->_socket );
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+inject - Inject packets directly into the exobrain bus
+
+=head1 VERSION
+
+version 1.08
+
+=head1 AUTHOR
+
+Paul Fenwick <pjf@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Paul Fenwick.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

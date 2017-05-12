@@ -1,0 +1,17 @@
+Revision history for Email-ConstantContact
+
+0.01    2009-06-29
+        First version, released on an unsuspecting world.
+0.02	2009-07-02
+	Fixed package gzip permissions issue, added dependencies
+0.03	2009-07-04
+	Fixed bug causing errors to return "1"
+	Fixed documentation typos
+0.04	2010-11-21
+	Fixed bug during Contact List save.
+	Added code to handle multiple-page ContactList results.
+	Added ability to retrieve bounced address list.
+0.05	2011-01-10
+	Added ability to pull full Campaign details.
+
+

@@ -1,0 +1,67 @@
+{
+   "abstract" : "Read Outlook .msg files",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Email-Outlook-Message",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Email::MIME" : "1.923",
+            "Email::MIME::ContentType" : "1.014",
+            "Email::Sender" : "1.3",
+            "Email::Simple" : "2.102",
+            "Encode" : "0",
+            "File::Basename" : "0",
+            "Getopt::Long" : "0",
+            "IO::All" : "0",
+            "IO::String" : "0",
+            "OLE::Storage_Lite" : "0.14",
+            "POSIX" : "0",
+            "Pod::Usage" : "0",
+            "Test::More" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Email::Outlook::Message" : {
+         "file" : "lib/Email/Outlook/Message.pm",
+         "version" : "0.918"
+      },
+      "Email::Outlook::Message::AddressInfo" : {
+         "file" : "lib/Email/Outlook/Message/AddressInfo.pm"
+      },
+      "Email::Outlook::Message::Attachment" : {
+         "file" : "lib/Email/Outlook/Message/Attachment.pm"
+      },
+      "Email::Outlook::Message::Base" : {
+         "file" : "lib/Email/Outlook/Message/Base.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/mvz/email-outlook-message-perl"
+      }
+   },
+   "version" : "0.918"
+}

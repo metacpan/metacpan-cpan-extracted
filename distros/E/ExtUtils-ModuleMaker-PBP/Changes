@@ -1,0 +1,30 @@
+Revision history for Perl module ExtUtils::ModuleMaker::PBP
+
+0.09    Apr 05 2006
+
+Changes in Makefile.PL:  Included code to check for Win32 module if on Win32.
+Deleted File::Temp, which is required only in test suite.  Adapted t/01_load.t
+to use subroutines from CPAN module File::Save::Home.
+
+In response to bug report from Gabriel Fortuna for ExtUtils::ModuleMaker, 
+corrected bug in t/01_load.t.
+
+
+0.08 Thu Sep 29 19:38:09 EDT 2005
+Corrected error in test suite.  All files had incorrect number of skipped tests.
+
+
+0.07     Sep 28 2005
+
+
+0.06 Mon Sep 19 18:31:53 EDT 2005
+Only change:  In Makefile.PL, changed required version of ExtUtils::ModuleMaker from 0.40 to 0.41 (due to bug fix in ExtUtils::ModuleMaker).
+
+
+0.05 Sun Sep 19          2005
+First CPAN upload, tied to ExtUtils::ModuleMaker version 0.40.
+
+
+0.01 Mon Sep  5 19:39:49 2005
+original version; created by ExtUtils::ModuleMaker 0.39
+

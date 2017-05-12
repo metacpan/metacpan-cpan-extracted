@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name: Email-LocalDelivery-Ezmlm
+version: 0.10
+license: perl
+distribution_type: module
+requires:
+  Email::FolderType: 0.6
+  Email::LocalDelivery: 0
+recommends: {}
+build_requires:
+  Test::More: 0
+conflicts: {}
+provides:
+  Email::LocalDelivery::Ezmlm:
+    file: lib/Email/LocalDelivery/Ezmlm.pm
+    version: 0.10
+generated_by: Module::Build version 0.20

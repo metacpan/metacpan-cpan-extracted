@@ -1,0 +1,13 @@
+Revision history for Perl extension Exporter::Constants
+
+0.03
+
+    - support multiple export variables at once.
+
+0.02
+
+    [INCOMPATIBLE CHANGES]
+    - revert interface
+
+0.01    Fri Nov  2 17:37:33 2012
+    - original version

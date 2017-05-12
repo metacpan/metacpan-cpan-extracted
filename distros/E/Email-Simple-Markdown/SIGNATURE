@@ -1,0 +1,45 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 ac55a3f8ba5a8ba505df03e63e4fd336f554b609 AUTHOR_PLEDGE
+SHA1 508c5c1e78cca49fa50871be6a664815fd0d7ed7 CONTRIBUTORS
+SHA1 cb9999b9654305f652b5ecf885dd6845cf5e8a1a Changes
+SHA1 ce7300efddb2b7fadd266b7a72fd3100478519e5 INSTALL
+SHA1 4635555632db4eb10b992acc94a499271d2044ef LICENSE
+SHA1 bd712598241c2b1be3cc21cefcd4b052eb339de4 MANIFEST
+SHA1 a16db8a4985e01372363cb4f534478e605066ce4 META.json
+SHA1 40f5065fa0a0ec5bc3fd3a67a88615ab41e7dee7 META.yml
+SHA1 d3f14d6736196ae33f2daea56f3c35ad48d6c33b Makefile.PL
+SHA1 15036e1e8aa80df8498e05fb874d697b78439705 README.mkdn
+SHA1 ae867fb8f5d0f5b2738a900692303e040f26be9f cpanfile
+SHA1 ca7d2459b05280dfb68509dbfc4e5bcde6257c14 doap.xml
+SHA1 a5071646f6cf57ab9b247286701757971d072eab lib/Email/Simple/Markdown.pm
+SHA1 c680e3292bd43ea7e34a23c04069417b40152408 lib/Email/Simple/Markdown/Stuffer.pm
+SHA1 4e34a2094f56d626ec12f2f47ec6efb8bb72bce3 t/00-compile.t
+SHA1 c9d287dd8e97b04e6e953b4f6f214569d6e2f997 t/00-report-prereqs.dd
+SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
+SHA1 0d2675e80489c1fc0e024dc558a5279a7a69d76b t/basic.t
+SHA1 614e490a97bf09d9f322fb5853527618bf45ff16 t/charset.t
+SHA1 6c8132399e1cbfe7d3eff414f376863384babc03 t/css.t
+SHA1 5ff1e2af17cd9beac488eddbc05778e4f4919472 t/engine.t
+SHA1 dca79201b97699de79daa8b406718c426dcb02df t/filter.t
+SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+
+iEYEARECAAYFAljDUXwACgkQ34Hwf+GwC4yNBgCfdgUr3WcngQTYC/qN/je8NcBq
+kcsAoNUi2gHwap0sp4qVPaJmRw8OdTGY
+=eHrl
+-----END PGP SIGNATURE-----

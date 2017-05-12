@@ -1,0 +1,45 @@
+Revision history for Errno::AnyString
+
+1.03    2009-08-23
+        Fixed failing test with old versions of threads.pm
+
+1.02    2009-08-21
+        Fixed test failure under strawberry perl
+
+1.01    2009-08-20
+        Fixed failure on pre-5.7 threaded Perls (gotta love those cpan testers)
+        Added a "local $!" variation to some of the quicker tests
+
+1.00    2009-08-18
+        No-longer alpha (meaning I won't lightly change the interface)
+        A little more testage
+
+0.51    2009-08-16
+        Fixed failing tests under 5.10.1-RC1
+        Dealt with tainted error strings.
+        Auto-generate test files at packaging time, rather than build time.
+        Fixed a couple of POD typos.
+
+0.50    2009-08-14
+        Added a way to permanently tie new strings to error numbers.
+        Replaced the underlying mechanism with a better one.
+
+0.05    2009-08-08
+        Some POD improvements.
+        Better handle the case where the string part of a saved $! value is lost.
+        A few more tests.
+
+0.04    2009-08-07
+        Added documentation of the internals.
+        Added an inter-operation interface.
+
+0.03    2009-08-06
+        A better interface for setting the custom error string, not backwards compatible.
+
+0.02    2009-08-06
+        Building with Makefile.PL was broken, fixed.
+        More tests.
+
+0.01    2009-08-05
+        Initial release.
+

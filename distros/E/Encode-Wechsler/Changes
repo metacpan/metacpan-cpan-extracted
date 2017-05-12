@@ -1,0 +1,10 @@
+Revision history for Encode-Wechsler
+
+0.03
+
+0.02
+    - pad parameter now determines amount of padding to apply
+    - results are trimmed of blank rows/cols on the edges
+
+0.01
+    - First version, released on an unsuspecting world.

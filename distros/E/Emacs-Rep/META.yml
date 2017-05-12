@@ -1,0 +1,33 @@
+---
+abstract: 'a find & replace engine for rep.pl and rep.el'
+author:
+  - 'Joseph Brenner <doom@kzsu.stanford.edu>'
+build_requires:
+  FindBin: 0
+  Test::Differences: 0
+  Test::More: 0
+  Test::Trap: 0
+  lib: 0
+configure_requires:
+  Module::Build: 0.4
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4, CPAN::Meta::Converter version 2.113640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Emacs-Rep
+provides:
+  Emacs::Rep:
+    file: lib/Emacs/Rep.pm
+    version: 1.00
+requires:
+  Carp: 0
+  Data::Dumper: 0
+  Exporter: 0
+  PPI: 0
+  strict: 0
+  warnings: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.00

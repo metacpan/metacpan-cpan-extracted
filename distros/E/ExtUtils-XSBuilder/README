@@ -1,0 +1,56 @@
+
+
+ExtUtils::XSBuilder - Automatic XS glue code generation
+-------------------------------------------------------
+
+Copyright (c) 2000-2001 Doug MacEachern
+Copyright (c) 2001-2004 Gerald Richter / ecos gmbh (www.ecos.de)
+
+You may distribute under the terms of either the GNU General Public 
+License or the Artistic License, as specified in the Perl README file.
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED 
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF 
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+$Id: README,v 1.4 2004/03/29 03:49:31 richter Exp $
+
+
+OVERVIEW
+========
+
+ExtUtils::XSBuilder is a set modules to parse C header files and create XS
+glue code and documentation out of it. Idealy this allows to "write" an
+interface to a C library without coding a line. Since no C-API is ideal,
+some adjuments are necessary most of the time. So to use this module you
+must still be familar with C and XS programming, but it removes a lot of
+stupid work and copy&paste from you. Also when the C API changes, most
+of the time you only have to rerun XSBuilder to get your new Perl API.
+
+
+INSTALLATION
+============
+
+
+perl Makefile.PL
+make install
+
+
+DOCUMENTATION
+=============
+
+XSBuilder.pod          contains the documentation
+xsbuilder.osc2002.pod  contains my slides from the O'Reilly
+                       OpenSource Convention 2002
+
+AUTHOR
+======
+
+Doug MacEachern has written most of the code for mod_perl 2.0.
+G. Richter has genarlized the code to make it useable outside
+mod_perl.
+
+
+
+
+

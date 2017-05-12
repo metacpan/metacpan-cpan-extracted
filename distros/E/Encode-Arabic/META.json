@@ -1,0 +1,86 @@
+{
+   "abstract" : "Encodings of Arabic",
+   "author" : [
+      "Otakar Smrz <otakar-smrz users.sf.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Encode-Arabic",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008"
+         }
+      }
+   },
+   "provides" : {
+      "Encode::Arabic" : {
+         "file" : "lib/Encode/Arabic.pm",
+         "version" : "14.2"
+      },
+      "Encode::Arabic::ArabTeX" : {
+         "file" : "lib/Encode/Arabic/ArabTeX.pm",
+         "version" : "14.1"
+      },
+      "Encode::Arabic::ArabTeX::RE" : {
+         "file" : "lib/Encode/Arabic/ArabTeX/RE.pm",
+         "version" : "14.1"
+      },
+      "Encode::Arabic::ArabTeX::Verbatim" : {
+         "file" : "lib/Encode/Arabic/ArabTeX/Verbatim.pm",
+         "version" : "14.1"
+      },
+      "Encode::Arabic::ArabTeX::ZDMG" : {
+         "file" : "lib/Encode/Arabic/ArabTeX/ZDMG.pm",
+         "version" : "14.1"
+      },
+      "Encode::Arabic::ArabTeX::ZDMG::RE" : {
+         "file" : "lib/Encode/Arabic/ArabTeX/ZDMG/RE.pm",
+         "version" : "14.1"
+      },
+      "Encode::Arabic::Buckwalter" : {
+         "file" : "lib/Encode/Arabic/Buckwalter.pm",
+         "version" : "14.1"
+      },
+      "Encode::Arabic::CGI" : {
+         "file" : "lib/Encode/Arabic/CGI.pm",
+         "version" : "14.1"
+      },
+      "Encode::Arabic::Habash" : {
+         "file" : "lib/Encode/Arabic/Habash.pm",
+         "version" : "14.1"
+      },
+      "Encode::Arabic::Parkinson" : {
+         "file" : "lib/Encode/Arabic/Parkinson.pm",
+         "version" : "14.1"
+      },
+      "Encode::Mapper" : {
+         "file" : "lib/Encode/Mapper.pm",
+         "version" : "14.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "14.2"
+}

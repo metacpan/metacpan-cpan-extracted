@@ -1,0 +1,50 @@
+<workbook>
+  <worksheet name="conditional">
+    <loop name="loopy">
+      <row>
+        <if name="int">
+          <cell text="bool true" />
+        </if>
+        <if name="int" is="FALSE">
+          <cell text="bool false" />
+        </if>
+        <if name="int" op="==" value="0">
+          <cell text="num == passes" />
+        </if>
+        <if name="int" op="!=" value="0">
+          <cell text="num != passes" />
+        </if>
+        <if name="int" op=">" value="0">
+          <cell text="num > passes" />
+        </if>
+        <if name="int" op=">=" value="0">
+            <cell text="num >= passes" />
+        </if>
+        <if name="int" op='&lt;' value="0">
+          <cell text="num &lt; passes" />
+        </if>
+        <if name="int" op="&lt;=" value="0">
+          <cell text="num &lt;= passes" />
+        </if>
+        <if name="char" op="eq" value="y">
+          <cell text="char eq passes" />
+        </if>
+        <if name="char" op="ne" value="y">
+          <cell text="char ne passes" />
+        </if>
+        <if name="char" op="gt" value="y">
+          <cell text="char gt passes" />
+        </if>
+        <if name="char" op="ge" value="y">
+          <cell text="char ge passes" />
+        </if>
+        <if name="char" op="lt" value="y">
+          <cell text="char lt passes" />
+        </if>
+        <if name="char" op="le" value="y">
+          <cell text="char le passes" />
+        </if>
+      </row>
+    </loop>
+  </worksheet>
+</workbook>

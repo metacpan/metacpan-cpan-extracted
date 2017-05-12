@@ -1,0 +1,30 @@
+---
+name: Email-Store-Language
+version: 0.03
+author:
+  - Brian Cassidy <bricas@cpan.org>
+abstract: Add language identification to emails and lists
+license: perl
+requires:
+  Email::Store: 0
+  Lingua::Identify: 0
+build_requires:
+  DBD::SQLite2: 0
+  Test::More: 0
+provides:
+  Email::Store::Language:
+    file: lib/Email/Store/Language.pm
+    version: 0.03
+  Email::Store::List:
+    file: lib/Email/Store/Language.pm
+    version: 0.03
+  Email::Store::List::Language:
+    file: lib/Email/Store/Language.pm
+    version: 0.03
+  Email::Store::Mail:
+    file: lib/Email/Store/Language.pm
+    version: 0.03
+  Email::Store::Mail::Language:
+    file: lib/Email/Store/Language.pm
+    version: 0.03
+generated_by: Module::Build version 0.2611

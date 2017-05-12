@@ -1,0 +1,85 @@
+Revision history for Perl extension Email::Store.
+
+0.24 Mon Feb  7 12:02:32 GMT 2005
+    - There were various problems with attachments which seem to be todo with 
+      Email::MIME therefore switch (hopefully temporarily) to MIME::Parser
+    - Rejigged tests to make the root dir cleaner
+    - Fix for TZ issues in tests (thanks to Scott McWhirter)
+    - Make SQLite check work with SQLite2
+    
+
+0.23 Thu Feb  3 16:20:11 GMT 2005
+    - gah. fix fuckwittedness
+
+0.22 Thu Feb  3 16:11:14 GMT 2005
+    - various fixes to make it work under boxen which are not my own.
+      many many thanks to Richard Clamp and Scott McWhirter.
+  
+0.21 Thu Jan 27 16:33:32 GMT 2005
+    - fixed a permission problem on PAUSE
+
+0.20 Thu Jan 27 15:16:48 GMT 2005
+    - The indexer seems unhappy with 0.16, attempt to froce a rebuild
+    - made setup() to be quieter unless you tell it not to be
+
+0.16 Sun Dec 26 12:14:57 GMT 2004
+    - Some changes to Date
+    - Require certain versions of Email::Simple and Email::MIME
+    - Update contact information
+    - Happy Boxing day
+
+0.15 Thu Jul 15 15:04:54 BST 2004
+    - After list order so that it gets does before summary gets to the
+      mail
+
+0.14 Thu Jul 15 13:57:44 BST 2004
+    - Store addressings in UTF-8.
+
+0.13  Thu Jul 15 10:14:37 BST 2004
+    - List now removes list name in subject
+
+0.12  Sun Jul 11 12:36:29 BST 2004
+    - Allow optional parameters in use call.
+
+0.11  Sun Jul  4 14:31:38 BST 2004
+    - Fix to list correlator
+
+0.10  Sun Jul  4 11:58:40 BST 2004
+    - Use Email::MIME::Attachment::Stripper.
+    - Depend on SQL::Translator, since Class::DBI::DATA::Schema doesn't.
+
+0.09  Sat Jul  3 15:46:53 BST 2004
+    - Try harder to find a date field
+    - Use Email::Address.
+
+0.08  Thu Jul  1 00:15:28 BST 2004
+    - Fix another entity correlation bug
+    - Put the correlator in the MANIFEST, oh my
+    - Introduce a list address correlator
+
+0.07  Wed Jun 30 18:17:10 BST 2004
+    - More addressings-entitys-names-addresses connections
+
+0.06  Tue Jun 29 08:50:30 BST 2004
+    - Fix some dependencies
+    - Timezone handling in tests
+    - Fix correlator
+    - Correct data type for attachments table
+
+0.05  Mon Jun 21 20:50:29 BST 2004
+    - Credits are important...
+
+0.04  Mon Jun 21 18:28:09 BST 2004
+    - Connect addressings to mail the other way...
+
+0.03  Sat Jun 19 17:03:12 BST 2004
+    - Add Date module contributed by Simon W
+
+0.02  Wed Jun 16 15:36:41 BST 2004
+    - Always load up plugins
+    - Connect addressings to mail
+
+0.01  Tue May 18 13:26:10 2004
+    - original version; created by h2xs 1.22 with options
+        -AX -b 5.6.0 -n Email::Store
+

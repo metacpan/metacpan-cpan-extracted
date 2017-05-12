@@ -1,0 +1,20 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Ekahau
+version:      0.001
+version_from: Ekahau.pm
+installdirs:  site
+requires:
+    bytes:                         0
+    constant:                      0
+    Digest::MD5:                   0
+    IO::Select:                    0
+    IO::Socket::INET:              0
+    Socket:                        0
+    strict:                        0
+    Symbol:                        0
+    warnings:                      0
+    XML::Simple:                   0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

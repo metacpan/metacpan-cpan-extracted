@@ -1,0 +1,69 @@
+---
+name: Egg-Release-Mail
+version: 0.01
+author:
+  - 'Masatoshi Mizuno E<lt>lusheE<64>cpan.orgE<gt>'
+abstract: lib/Egg/Release/Mail.pm
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Digest::SHA1: 2.11
+  Egg::Model::FsaveDate: 0.01
+  Egg::Plugin::Net::Scan: 3.00
+  Egg::Release: 3.03
+  Jcode: 2.06
+  MIME::tools: 5.42
+  Test::More: 0
+  Test::Perl::Critic: 0
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+provides:
+  Egg::Helper::View::Mail:
+    file: lib/Egg/Helper/View/Mail.pm
+    version: 0.01
+  Egg::Release::Mail:
+    file: lib/Egg/Release/Mail.pm
+    version: 0.01
+  Egg::View::Mail:
+    file: lib/Egg/View/Mail.pm
+    version: 0.01
+  Egg::View::Mail::Base:
+    file: lib/Egg/View/Mail/Base.pm
+    version: 0.01
+  Egg::View::Mail::Encode::ISO2022JP:
+    file: lib/Egg/View/Mail/Encode/ISO2022JP.pm
+    version: 0.01
+  Egg::View::Mail::MIME::Entity:
+    file: lib/Egg/View/Mail/MIME/Entity.pm
+    version: 0.01
+  Egg::View::Mail::Mailer::CMD:
+    file: lib/Egg/View/Mail/Mailer/CMD.pm
+    version: 0.01
+  Egg::View::Mail::Mailer::SMTP:
+    file: lib/Egg/View/Mail/Mailer/SMTP.pm
+    version: 0.01
+  Egg::View::Mail::Plugin::EmbAgent:
+    file: lib/Egg/View/Mail/Plugin/EmbAgent.pm
+    version: 0.01
+  Egg::View::Mail::Plugin::Jfold:
+    file: lib/Egg/View/Mail/Plugin/Jfold.pm
+    version: 0.01
+  Egg::View::Mail::Plugin::Lot:
+    file: lib/Egg/View/Mail/Plugin/Lot.pm
+    version: 0.01
+  Egg::View::Mail::Plugin::PortCheck:
+    file: lib/Egg/View/Mail/Plugin/PortCheck.pm
+    version: 0.01
+  Egg::View::Mail::Plugin::SaveBody:
+    file: lib/Egg/View/Mail/Plugin/SaveBody.pm
+    version: 0.01
+  Egg::View::Mail::Plugin::Signature:
+    file: lib/Egg/View/Mail/Plugin/Signature.pm
+    version: 0.01
+  Egg::View::Mail::handler:
+    file: lib/Egg/View/Mail.pm
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

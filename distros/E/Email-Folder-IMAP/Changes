@@ -1,0 +1,24 @@
+1.105     2014-04-04 22:27:01-04:00 America/New_York
+        - require URI::imap
+
+1.104     2014-01-03 19:41:26 America/New_York
+          fix VERSION mismatch error
+
+1.103     2013-08-05 18:18:20 America/New_York
+          repackage to update repo, bugtracker
+
+1.102     2007-04-01
+          avoid use of package variables for configuration; seriously, guys
+
+1.101     2007-03-22
+          fix major documentation gaffe
+          packaging improvements
+
+1.10      2006-07-11
+          require newer Net::IMAP::Simple to allow port numbers
+
+1.02      2004-08-17
+          Synopsis screwup.
+
+1.01      2004-08-07
+          Initial version.

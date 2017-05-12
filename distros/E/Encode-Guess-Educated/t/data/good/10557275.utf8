@@ -1,0 +1,1242 @@
+   [1]PNAS
+   [2]Proceedings of the National Academy of Sciences of the United States
+   of America
+
+   [3]Skip to main page content
+     * [4]Info for Authors
+     * [5]Editorial Board
+     * [6]About
+     * [7]Subscribe
+     * [8]Advertise
+     * [9]Contact
+     * [10]Feedback
+     * [11]Site Map
+
+     * [12]Click here for more information
+     * [13]Sign up for PNAS eTOCs
+     * [14]Science Sessions: PNAS Podcast Program
+
+     * Institution: UNIV COLORADO HLTH SCI CTR
+     * [15]Sign In as Member / Individual
+
+ §1§ Crystal structure of Bacillus subtilis YabJ, a purine regulatory protein
+and member of the highly conserved YjgF family  §1§
+
+    1. [16]Sangita Sinha [17]*,
+    2. [18]Pekka Rappu [19]†,
+    3. [20]S. C. Lange [21]*,
+    4. [22]Pekka Mäntsälä [23]†,
+    5. [24]Howard Zalkin [25]‡, and
+    6. [26]Janet L. Smith [27]* , [28]§
+
+    1.
+
+
+    Departments of ^*Biological Sciences and ^‡Biochemistry, Purdue
+    University, West Lafayette, IN 47907; and ^†Department of
+    Biochemistry and Food Chemistry, University of Turku, Vatselankatu 2,
+    FIN-20014 Turku, Finland
+
+    1. Communicated by Michael G. Rossmann, Purdue University, West
+       Lafayette, IN (received for review July 15, 1999)
+
+
+   [29]Next Section
+
+ §2§ Abstract §2§
+
+   The yabJ gene in Bacillus subtilis is required for adenine-mediated
+   repression of purine biosynthetic genes in vivo and codes for an
+   acid-soluble, 14-kDa protein. The molecular mechanism of YabJ is
+   unknown. YabJ is a member of a large, widely distributed family of
+   proteins of unknown biochemical function. The 1.7-Å crystal structure
+   of YabJ reveals a trimeric organization with extensive buried
+   hydrophobic surface and an internal water-filled cavity. The most
+   important finding in the structure is a deep, narrow cleft between
+   subunits lined with nine side chains that are invariant among the 25
+   most similar homologs. This conserved site is proposed to be a binding
+   or catalytic site for a ligand or substrate that is common to YabJ and
+   other members of the YER057c/YjgF/UK114 family of proteins.
+
+   Purine biosynthesis in Bacillus subtilis is regulated by the purine
+   operon repressor gene, purR. The purR operon consists of purR and yabJ,
+   an ORF of unknown function. The repressor PurR binds to control regions
+   upstream of the transcription start sites and regulates transcription
+   of purEKBC(orf)QLFMNHD in the pur operon, of purR and yabJ in the purR
+   operon, and of purA ([30]1). PurR binding to control-site DNA is
+   blocked by 5-phosphoribosyl-1-pyrophosphate (PRPP), a central
+   nucleotide metabolite that acts as an inducer of pur operon and purA
+   transcription. 5-phosphoribosyl-1-pyrophosphate is the starting
+   material for purine biosynthesis. No other metabolite, nucleotide,
+   nucleoside, or nucleotide base is known to affect PurR DNA binding in
+   vitro ([31]2).
+
+   Recently, yabJ, the distal coding sequence in the purR operon, was
+   shown to affect PurR function in vivo ([32]3). Regulation of
+   transcription of purine biosynthetic genes is sensitive to levels of
+   some nutrients and depends on the interrelated pools of
+   5-phosphoribosyl-1-pyrophosphate, nucleotides, nucleosides, and
+   nucleotide bases. Adenine uptake by B. subtilis indirectly increases
+   PurR repression of pur operon and purA transcription through changes to
+   the 5-phosphoribosyl-1-pyrophosphate pool. YabJ is also required for
+   adenine-mediated repression of purA in vivo ([33]3). The mechanism by
+   which YabJ stimulates adenine-mediated repression of purA by PurR is
+   unknown. However, YabJ and PurR may be cotranslated and produced in
+   stoichiometric quantities in vivo because the last codon of purR
+   overlaps the initiation codon of yabJ.
+
+   YabJ belongs to a widely distributed family of proteins of unknown
+   function. Members of the YER057c/YjgF/UK114 family of proteins are
+   identified by sequence similarity, having 20–98% pairwise identity. The
+   family is named for genes or proteins in yeast (YER057c), Escherichia
+   coli (yjgF), and goat (UK114). All are ≈14-kDa proteins and do not
+   occur as domains of larger proteins. Many YjgF proteins are
+   acid-soluble. A variety of biological processes have been reported to
+   be influenced by YjgF proteins, in addition to the YabJ function in
+   purine regulation. Homologs occur in bacteria, animals, and fungi but
+   are absent from the genomes of most archaea and of several parasitic
+   prokaryotes that also lack many biosynthetic pathways. No YjgF homolog
+   has yet been detected in a plant, although its presence in a
+   cyanobacterium ([34]4) suggests that it may also occur in plants. No
+   three-dimensional structures of YjgF proteins have been published,
+   although crystallization of a rat homolog has been reported ([35]5).
+   Here we present the 1.7-Å crystal structure of B. subtilis YabJ. The
+   structure reveals a conserved cleft on the protein surface that will
+   aid in elucidation of a function for this family of proteins.
+   [36]Previous Section[37]Next Section
+
+ §2§ Materials and Methods §2§
+
+ §3§ Cloning and Overexpression of yabJ.  §3§
+
+   The yabJ gene was amplified by PCR from chromosomal DNA of a wild-type
+   B. subtilis strain. The 446-bp PCR product was confirmed by sequencing
+   and was cloned into a T7 expression vector to produce plasmid pDR1. E.
+   coli strain BL21(DE3)/pLysS was transformed with pDR1. Strain
+   BL21(DE3)/pLysS/pDR1 was grown at 37°C in LB medium supplemented with
+   100 μg/ml ampicillin to an OD[600] of 0.6, was induced with 0.4 mM
+   isopropyl β-d-thiogalactoside, and was grown for 10 hr at 30°C. Cells
+   were harvested by centrifugation and were resuspended in 50 mM Tris⋅HCl
+   (pH 8.0), 2 mM EDTA, 10 mM MgCl[2], and 10 μg/ml DNase I (5 ml of
+   buffer per gram of wet cells). The cell pellet was frozen at −20°C.
+
+ §3§ Purification of YabJ. §3§
+
+   Frozen BL21(DE3)/pLysS/pDR1 cells were thawed and incubated at room
+   temperature for 15 min. The lysate was clarified by centrifugation at
+   20,000 × g for 30 min. All purification steps were performed at room
+   temperature. The lysate soluble fraction was stirred during addition of
+   70% perchloric acid to a final concentration of 5%. Precipitated
+   proteins were removed by centrifugation at 12,000 × g for 15 min. The
+   perchloric acid extract was neutralized with 1.5 volumes of 1 M
+   Tris⋅HCl (pH 8.0), and the extract was dialyzed against Buffer A (40 mM
+   sodium phosphate buffer, pH 7.4). The ≈95% pure YabJ sample was
+   chromatographed by using the resin Poros HQ/M (PerSeptive Biosystems,
+   Framingham, MA). The column was washed with 5 volumes of Buffer A. YabJ
+   was eluted with 0.2 M NaCl, was dialyzed against Buffer A, and was
+   concentrated by ultrafiltration. N-terminal sequence analysis showed
+   that Met1 was not present in the purified protein. The protein was
+   stored at 4°C or was frozen in small aliquots for long-term storage at
+   −70°C. The overall yield was 120 mg of purified YabJ per liter of E.
+   coli culture.
+
+ §3§ Crystallization and Data Collection. §3§
+
+   YabJ was crystallized by hanging-drop vapor diffusion from a 1:1
+   mixture of protein (6.3 mg/ml YabJ in Buffer A) and reservoir (20%
+   polyethylene glycol 4,000/0.45 M ammonium acetate/0.1 M sodium acetate,
+   pH 4.6) solutions. Crystals grew to a maximum size of ≈0.1 × 0.1 × 0.6
+   mm in 4–5 days and were stabilized in reservoir solution. A Hg
+   derivative was prepared by soaking for 3 hr in 0.5 mM ethyl Hg
+   phosphate in reservoir solution, followed by back soaking for 0.5 hr.
+
+   Crystals were cryoprotected by a 3-min soak in 15% polyethylene glycol
+   400 in reservoir solution and were flash-frozen in a N[2] cold stream
+   at 100 K. Unit cell parameters in space group P6[5] are a = b = 53.3 Å
+   and c = 204.9 Å, which is consistent with either two (V [m] = 3.1
+   Å^3/Da, ≈60% solvent) or three (V [m] = 2.0 Å^3/Da, ≈40% solvent)
+   copies of the YabJ polypeptide per asymmetric unit. All data used for
+   structure determination and refinement were collected from a single,
+   Hg-derivatized, frozen crystal. Multiwavelength anomalous diffraction
+   (MAD) data were collected at BioCARS beam line BM14D at the Advanced
+   Photon Source (Argonne National Laboratory). MAD data (λ[1], λ[2],
+   λ[3]; Table [38]1) were recorded on an Q1 CCD detector (Area Detector
+   Systems, Poway, Ca) as two 80° sweeps of data at each wavelength.
+   Resolution was limited by detector size and the 205-Å c axis, resulting
+   in incomplete coverage of reciprocal space at the detector edge.
+   Several weeks later, complete, high resolution, 1.7-Å data (λ[4], Table
+   [39]1) were collected from the same crystal by using BioCARS beam line
+   BM14C at the Advanced Photon Source. The data were recorded on a Mar
+   345 imaging plate detector (X-ray Research GmbH, Hamburg, Germany) as a
+   single, 80° sweep of data. Data integration and reduction were done by
+   using the hkl package ([40]6). The MAD data set used for phasing was
+   produced by scaling the λ[1], λ[2], and λ[4] data sets to the merged
+   data for λ[3], using scaleit from the CCP4 suite ([41]7). For phase and
+   model refinement, a complete high-resolution data set (λ[3] + λ[4],
+   Table [42]1) was generated by merging data at λ[3] (30–2.5 Å) and λ[4]
+   (3–1.7 Å).
+   View this table:
+     * [43]In this window
+     * [44]In a new window
+
+   Table 1
+
+   Crystallographic summary
+
+ §3§ Structure Determination and Refinement. §3§
+
+   Positions of three Hg atoms were determined by inspection of a Bijvoet
+   difference Patterson map using the λ[2] data set. Refinement of the Hg
+   partial structure and MAD phasing were performed by the
+   pseudo-isomorphous replacement approach using mlphare ([45]8).
+   Noncrystallographic 3-fold symmetry was clearly visible in the
+   unmodified MAD map at 2.7-Å resolution. A C3 noncrystallographic
+   symmetry operator was located and refined by using ncs6d ([46]9).
+   Phases were refined and extended to 2.0 Å by 3-fold averaging,
+   histogram matching, and solvent flattening with a 32% solvent mask
+   using dm ([47]10) and the λ[3] + λ[4] data set. The overall figure of
+   merit for all reflections to 2.0 Å was 0.63.
+
+   All model building was done in the program o ([48]11). The model was
+   refined against the λ[3] + λ[4] data set using maximum likelihood
+   amplitude and phase probability targets using cns ([49]12). The initial
+   model had R [work] = 0.355 and R [free] = 0.351 for all data between
+   30.0 and 2.0 Å. During the initial cycles of refinement, the model was
+   restrained by 3-fold noncrystallographic symmetry. The last iteration
+   of refinement and model building was followed by one round of atomic
+   occupancy refinement for residues in dual positions and for the ethyl
+   Hg ions. Final R [work] = 0.166 and R [free] = 0.197 for all data
+   between 30.0 and 1.7 Å. The model, including 124 residues in each of
+   three YabJ monomers, one ethyl Hg ion covalently linked to Cys104 in
+   each of two monomers, two partially occupied Hg sites in the third
+   monomer, six acetate ions, and 474 water molecules, has been deposited
+   in the Protein Data Bank and is available with ID code [50]1qd9. A
+   crystallographic summary is presented in Table [51]1.
+   [52]Previous Section[53]Next Section
+
+ §2§ Results and Discussion §2§
+
+ §3§ Protein Production and Structure Determination. §3§
+
+   B. subtilis YabJ was readily produced in E. coli from an inducible
+   plasmid. Purification was simplified by the acid extraction step. We
+   tried this approach because several YabJ homologs were reported to be
+   acid stable ([54]13, [55]14), and acid solubility was exploited in the
+   purification of the rat homolog ([56]15), which is 45% identical to
+   YabJ. The crystal structure was determined by Hg MAD, based on
+   modification of the single cysteine residue in YabJ. A complete,
+   high-quality model of YabJ resulted from refinement against complete
+   1.7-Å data. Electron density is clear for all parts of the protein. The
+   model agrees well with the diffraction data and with stereochemical
+   criteria (Table [57]1). No residues are in forbidden regions of the
+   Ramachandran plot ([58]16). The estimated coordinate error of the final
+   model is 0.19 Å ([59]17).
+
+ §3§ Protein Structure. §3§
+
+   The YabJ monomer is a 124-residue polypeptide folded into a single
+   domain. The YabJ fold is a six-stranded, mostly antiparallel β-sheet
+   with one parallel connection (Fig. [60]1). Two α-helices pack against
+   one face of the β-sheet. The core of each monomer includes no ionizable
+   groups or polar side-chain interactions. This structural feature may
+   contribute to the acid stability of YabJ. Preliminary refinement of the
+   YabJ model against data from Hg-free crystals at pH 6.5 indicates no
+   significant structural change from the Hg complex at pH 4.6 apart from
+   rotation of the Cys104 side chain from χ[1] = 180° to χ[1] = −60°.
+   [61]Figure 1
+   View larger version:
+     * [62]In this window
+     * [63]In a new window
+
+     * [64]Download as PowerPoint Slide
+
+   Figure 1
+
+   Stereo view of the YabJ monomer. The ribbon diagram is rendered in
+   rainbow colors from blue at the N terminus to red at the C-terminus.
+   The figure was produced with molscript ([65]31) and raster3d ([66]32).
+
+   YabJ is a symmetric trimer in crystals (Fig. [67]2). The three β-sheets
+   of the trimer form a triangular barrel, with the β-strands
+   approximately parallel to the barrel 3-fold axis. The six α-helices of
+   the trimer pack on the outside of the barrel. Residues in strands β3–β6
+   of each monomer participate in the trimer interface, which is
+   constructed of alternating hydrophobic and polar regions. At the top of
+   the barrel, the three backbones form a ring of nine intersubunit
+   hydrogen bonds involving residues 106, 108, and 109. Below this polar
+   region is an extensive hydrophobic interface including six residues
+   from each monomer (Phe77, Met81, Val105, Val107, Leu110, Pro111). In
+   the center of the trimer is a polar cavity filled with 21 ordered water
+   molecules and ringed with six intersubunit polar contacts, consisting
+   of a salt bridge from Lys73 (β4) and a hydrogen bond from Ser103 (β5)
+   in each monomer to Glu119 (β6) in an adjacent monomer. Each water
+   molecule in the cavity forms at least three hydrogen bonds to other
+   waters or to protein atoms (Tyr28, Ser29, Lys73, Thr75, Glu119,
+   Val120), and the constellation of 21 waters has ≈3-fold symmetry.
+   Another 12 intersubunit hydrogen bonds are formed by nearby residues
+   (Ser18, Ser30, and Gly31 with Lys99, Pro100, and Arg102). The floor of
+   the polar cavity is formed by three Tyr28 (β3) side chains, which are
+   hydrogen-bonded to a cavity water molecule. The cavity waters would be
+   accessible to external bulk solvent by slight conformational breathing
+   of the Tyr28 side chains. The Tyr28 residues are the beginning of
+   another hydrophobic interface, which includes eight residues from each
+   monomer (Ile21, Val23, Met26, Tyr28, Val72, Ala101, Ile121, Leu123). At
+   the bottom of the barrel is a ring of six hydrogen bonds between the
+   amides of Asn24 and Asn25 in adjacent subunits.
+   [68]Figure 2
+   View larger version:
+     * [69]In this window
+     * [70]In a new window
+
+     * [71]Download as PowerPoint Slide
+
+   Figure 2
+
+   YabJ Trimer. Subunits are rendered in different colors in this ribbon
+   diagram viewed along the molecular threefold axis. The position of the
+   Hg ion used to solve the structure and bound to Cys104 is indicated
+   with a sphere.
+
+   The YabJ quaternary structure has not been established in solution.
+   Several features of the crystalline trimer, including the extent and
+   character of buried monomer surface and the dehydration of subunit
+   interfaces, are consistent with a YabJ trimer in solution. The total
+   monomer-accessible surface buried in the trimer is very large, a total
+   of 1,850 Å^2, ≈28% of the total ([72]18). Two extensive hydrophobic
+   contact regions are part of the trimeric aggregate. Apart from the
+   central cavity described above, the subunit interfaces do not bury any
+   water molecules. Thus, the subunit interfaces of the crystalline trimer
+   are much more like biological aggregates than like crystal contacts,
+   which are extensively hydrated, rather small and very polar. Some YabJ
+   homologs have been reported to be dimeric ([73]13, [74]19, [75]20,
+   [76]29). However, residues forming the polar and hydrophobic zones of
+   the subunit interface are very well conserved among the YabJ homologs,
+   suggesting that all are trimers.
+
+   Neighboring subunits of the trimer create three clefts on the outer
+   surface of YabJ. The clefts are narrow (8–9 Å) and deep (12–13 Å).
+   Glu117 forms the innermost surface of each cleft, and several
+   hydrophobic side chains ring the outermost surface.
+
+ §3§ YabJ in the purR operon of B. subtilis.  §3§
+
+   Transcription of purA is repressed ≈10-fold in vivo by addition of
+   adenine to cells ([77]3). This repression is mediated by PurR. However,
+   disruption of YabJ results in the loss of adenine-mediated PurR
+   repression by an unknown mechanism. The predominance of acidic residues
+   on the surface of YabJ (calculated pI = 5.3) suggests that it does not
+   interact directly with DNA. Preliminary soaking experiments with YabJ
+   crystals and various purine-containing molecules and calcium ions,
+   which are reported to bind a YabJ homolog ([78]20), have not resulted
+   in binding in the cleft or anywhere else on YabJ. Further experiments
+   are underway to identify a ligand or substrate.
+
+ §3§ Stuctural Homolog. §3§
+
+   YabJ has no detectable sequence similarity to any other protein in the
+   structure database ([79]21). Unexpectedly, it has a fold ([80]22) and
+   aggregation state in common with chorismate mutase from B. subtilis
+   ([81]23). The core fold, β3–β6 and α1, is present in both structures.
+   The second α-helix of YabJ is replaced by a shorter 3[10]-helix in
+   chorismate mutase. Strands β1 and β2 of YabJ and a fifth, C-terminal
+   strand of chorismate mutase lie on the same end of the core β-sheet but
+   are not superimposable. Based on the structure alignment, the sequences
+   of YabJ and chorismate mutase are only 8% identical. The rmsd for the
+   83 superimposable C[α] atoms per monomer is 2.6 Å (Fig. [82]3 A). YabJ
+   and chorismate mutase also form very similar trimers with an rmsd of
+   3.3 Å for 249 C[α] atoms. However, the trimer interface of chorismate
+   mutase is entirely hydrophobic and lacks the polar central cavity of
+   YabJ.
+   [83]Figure 3
+   View larger version:
+     * [84]In this window
+     * [85]In a new window
+
+     * [86]Download as PowerPoint Slide
+
+   Figure 3
+
+   Comparison of YabJ and B. subtilis chorismate mutase. (A) Superposition
+   of subunits. C[α] traces of YabJ (thick lines) and chorismate mutase
+   (thin lines) are overlaid. Orientation is similar to Fig. [87]1. (B)
+   Ribbon diagram of the chorismate mutase trimer. The reaction product
+   prephenate is shown in the active site cleft. Orientation is as in Fig.
+   [88]2.
+
+   Chorismate mutase catalyses the unimolecular, pericyclic rearrangement
+   of chorismate to prephenate, a reaction at the branch point of the
+   biosynthetic pathway for aromatic amino acids. The three active sites
+   of the chorismate mutase trimer are located in clefts between subunits,
+   analogous to the clefts at the subunit interfaces of the YabJ trimer
+   (Fig. [89]3 B). Eleven residues in the active site of chorismate mutase
+   have been implicated in substrate binding and transition state
+   stabilization ([90]23). Two of these side chains, Phe 57 and Cys 75,
+   have chemical and topological equivalents, Phe 84 and Cys 104, in YabJ.
+   However, elsewhere in the cleft, YabJ and chorismate mutase do not have
+   common functional groups. We conclude that YabJ and chorismate mutase
+   probably have a common ancestor but have evolved to perform different
+   functions.
+
+ §3§ Sequence Homologs. §3§
+
+   YabJ belongs to the YER057c/YjgF/UK114 family of small proteins
+   (ProSite accession nos. PS01094 and UPF0076). We identified a total of
+   37 homologs having 20–53% sequence identity with YabJ in the sequence
+   database ([91]21). This level of identity indicates a common ancestor,
+   a common fold, and possibly a common function for the proteins.
+
+   No invariant residues result from multiple alignment ([92]24) of the 38
+   sequences of YabJ and its homologs. However, if the homologs have
+   evolved to more than one function, invariance would not be expected. To
+   probe the sequence data for clues to biochemical function, we looked
+   for a subset of more closely related sequences. Based on the multiple
+   sequence alignment, the homologs were divided into two groups—a “high
+   identity” group of 25 more closely related sequences, each having at
+   least 43% identity with another sequence in the group, and a “low
+   identity” group of 13 more divergent sequences, each having generally
+   <30% identity to any member of either group. The high-identity group,
+   including YabJ, has nine invariant residues (Fig. [93]4). Although they
+   are spread throughout the primary sequence, all of these residues map
+   to the narrow, deep cleft between subunits of the YabJ trimer (Fig.
+   [94]5). This site is structurally analogous to the active site of
+   chorismate mutase. The clustering of invariant residues in the cleft
+   strongly suggests a common molecular function of catalysis or binding
+   for members of the high-identity group.
+   [95]Figure 4
+   View larger version:
+     * [96]In this window
+     * [97]In a new window
+
+     * [98]Download as PowerPoint Slide
+
+   Figure 4
+
+   Comparison of sequences of YabJ and 24 homologs in the high-identity
+   group. Residues in red boxes are invariant; in yellow boxes are sites
+   of conservative substitution. Secondary structures are indicated above
+   the alignment. Residues in the subunit interface are indicated by
+   triangles below the alignment, and those with main-chain interactions
+   by circles. Multiple sequence alignment was done with clustalw
+   ([99]24). The figure was produced with alscript ([100]33).
+   [101]Figure 5
+   View larger version:
+     * [102]In this window
+     * [103]In a new window
+
+     * [104]Download as PowerPoint Slide
+
+   Figure 5
+
+   Stereo view of the intersubunit cleft of YabJ. The translucent
+   molecular surface is in gray, with surfaces of invariant residues from
+   the two subunits in rust and cyan. C[α] wire diagrams for two subunits
+   are yellow and white, as are the side chains of invariant residues
+   (Phe84, Asn88, and Arg102 in the yellow subunit, and Pro11, Tyr17,
+   Gly31, Asn56, Pro111, and Glu117 in the white subunit). The figure was
+   produced with dino (ref. [105]34;
+   [106]http://www.bioz.unibas.ch/∼x-ray/dino).
+
+   Two structural databases were queried for similar residue
+   constellations in YabJ and any protein of known structure and function.
+   procat ([107]25) is a database of functional groups in enzyme active
+   sites. None of these active site templates matches any constellation of
+   residues in the YabJ structure. Conversely, the nine YabJ side chains
+   that are invariant in the high-identity group do not have an analog
+   among protein structures deposited in the Protein Data Bank, as probed
+   with the program spasm ([108]26). Thus, it appears that the arrangement
+   of residues in the conserved cleft of YabJ does not exist in any
+   reported protein structure.
+
+   Biological functions attributed to YabJ homologs do not point to a
+   common biochemical activity. Most of the homologs are hypothetical
+   proteins of unknown function. The genetic context of yabJ (purR operon)
+   correlates with the observed phenotype of yabJ ^− (loss of purA
+   repression by adenine). Similarly, Lactococcus lactis aldR has been
+   implicated in regulation of isoleucine biosynthesis ([109]27).
+   Salmonella typhimurium yjgF may have a role in regulation of the
+   isoleucine and thiamine biosynthetic pathways ([110]28). In cases in
+   which protein products have been studied, no certain biochemical
+   activity has been identified, and a wide variety of biological
+   functions has been proposed. The rat and human homologs are putative
+   translation inhibitors ([111]14, [112]29), goat UK114 is implicated in
+   tumor antigenicity ([113]30), mouse Hrp12 is thought to be a heat
+   response protein ([114]19), and the bovine and rat homologs are
+   proposed to affect activation of the calcium-dependent protease calpain
+   ([115]20). Sequences for all of these homologs are in the high-identity
+   group. The strong conservation of side chains in the YabJ cleft implies
+   that the homologs of the high-identity group achieve their variety of
+   biological functions by a common biochemical mechanism.
+
+   Any common biochemical mechanism for the broadly distributed YabJ
+   homologs would necessarily involve ligand or substrate binding to the
+   12-Å deep, 8-Å wide conserved cleft at the subunit interface (Fig.
+   [116]5). We screened broadly for a small-molecule ligand by soaking
+   crystals at neutral pH in a stabilizing solution augmented with B.
+   subtilis cell extract. No electron density for a ligand was identified
+   in difference electron density maps computed by using diffraction data
+   from the soaked crystals. This negative result does not distract us
+   from investigation of the conserved cleft. Studies are underway to
+   identify a ligand or substrate in solution and in vivo.
+
+   We propose that YabJ and the high-identity homologs use the conserved,
+   deep, narrow cleft for catalysis or binding of a common chemical
+   entity. Molecular mechanisms by which these proteins could use a common
+   biochemistry to influence a variety of biological processes include,
+   among others, binding a regulatory macromolecule, altering the
+   concentration of a key small-molecule metabolite through catalysis, and
+   binding another macromolecule after a ligand-induced conformational
+   change. Use of the conserved, deep, narrow cleft for binding implies
+   recognition of an appropriately shaped small-molecule ligand or a
+   single amino acid residue in a protein ligand. The structure of YabJ
+   should be an important guide for identification of this molecule. This
+   work also illustrates the challenges of deducing protein function from
+   sequence and three-dimensional structure.
+   [117]Previous Section[118]Next Section
+
+ §2§ Acknowledgments §2§
+
+   The authors thank the staff of BioCARS at the Advanced Photon Source,
+   Argonne National Laboratory, for their advice during the data
+   collection and Carol Greski for expert preparation of the manuscript.
+   This work was supported by National Institutes of Health Grants
+   DK-42303 to J.L.S. and GM-24658 to H.Z. and by the Finnish Ministry of
+   Education (P.M.).
+   [119]Previous Section[120]Next Section
+
+ §2§ Note §2§
+
+   After completion of this manuscript, a structure of E. coli YjgF, a
+   YabJ homolog, was presented at the annual meeting of the American
+   Crystallographic Association ([121]35). The function of E. coli YjgF is
+   unknown. In E. coli, yjgF is not linked to purR, and E. coli purR is
+   unrelated to B. subtilis purR.
+   [122]Previous Section[123]Next Section
+
+ §2§ Footnotes §2§
+
+     * [124]↵ § To whom reprint requests should be addressed. E-mail:
+       smithj{at}purdue.edu.
+     * Data deposition: The atomic coordinate has been deposited in the
+       Protein Data Bank, [125]www.rcsb.org (PDB ID code [126]1qd9).
+     * Abbreviation:
+
+        rmsd,
+                rms deviation
+
+     * Copyright © 1999, The National Academy of Sciences
+
+   [127]Previous Section
+
+ §2§ References §2§
+
+    1. [128]↵
+         1. Weng I ,
+         2. Nagy P ,
+         3. Zalkin H
+       (1995) Proc Natl Acad Sci USA 92:7455–7459, pmid:7638212.
+       [129]Abstract/FREE Full Text
+    2. [130]↵
+         1. Shin B S ,
+         2. Stein A ,
+         3. Zalkin H
+       (1997) J Bacteriol 179:7394–7402, pmid:9393704.
+       [131]Abstract/FREE Full Text
+    3. [132]↵
+         1. Rappu P ,
+         2. Shin B S ,
+         3. Zalkin H ,
+         4. Mäntsälä P
+       (1999) J Bacteriol 181:3810–3815, pmid:10368157.
+       [133]Abstract/FREE Full Text
+    4. [134]↵
+         1. Chavez S ,
+         2. Reyes J C ,
+         3. Chauvat F ,
+         4. Florencio F J ,
+         5. Candau P
+       (1995) Plant Mol Biol 28:173–188, pmid:7787182.
+       [135]CrossRef[136]Medline
+    5. [137]↵
+         1. Djinovíc Carugo K ,
+         2. Saraste M ,
+         3. Oka T
+       (1999) Acta Crystallogr D 55:667–668, pmid:10089464.
+       [138]Medline
+    6. [139]↵
+         1. Otwinowski Z ,
+         2. Minor W
+       (1997) Methods Enzymol 276:307–326.
+       [140]Web of Science
+    7. [141]↵
+         1. Collaborative Computational Project Number 4
+       (1994) Acta Crystallogr D 50:760–763, pmid:15299374.
+       [142]CrossRef[143]Medline
+    8. [144]↵
+         1. Otwinowski Z
+         1. Wolf W ,
+         2. Evans P R ,
+         3. Leslie A G W
+       (1991) in Isomorphous Replacement and Anomalous Scattering, eds
+       Wolf W , Evans P R , Leslie A G W (Science and Engineering Research
+       Council, Daresbury, U.K.) pp 80–86.
+    9. [145]↵
+         1. Kleywegt G J ,
+         2. Jones T A
+       (1997) Acta Crystallogr D 53:179–185, pmid:15299952.
+       [146]CrossRef[147]Medline
+   10. [148]↵
+         1. Cowtan K D
+       (1994) Joint CCP4 and ESF-EACBM Newsletter on Protein
+       Crystallography 31:34–38.
+   11. [149]↵
+         1. Jones T A ,
+         2. Zou J-Y ,
+         3. Cowan S W ,
+         4. Kjeldgaard M
+       (1991) Acta Crystallogr A 47:110–119, pmid:2025413.
+   12. [150]↵
+         1. Brünger A T ,
+         2. Adams P D ,
+         3. Clore G M ,
+         4. DeLano W L ,
+         5. Gros P ,
+         6. Grosse-Kunstleve R W ,
+         7. Jiang J-S ,
+         8. Kuszewski J ,
+         9. Nilges M ,
+        10. Pannu N S ,
+        11. et al.
+       (1998) Acta Crystallogr D 54:905–921, pmid:9757107.
+       [151]CrossRef[152]Medline
+   13. [153]↵
+         1. Levy-Favatier F ,
+         2. Cuisset L ,
+         3. Nedelec B ,
+         4. Tichonichy L ,
+         5. Kruh J ,
+         6. Delpech M
+       (1993) Eur J Biochem 212:665–673, pmid:8385007.
+       [154]Medline
+   14. [155]↵
+         1. Schmiedeknecht G ,
+         2. Kerkhoff C ,
+         3. Orso E ,
+         4. Stohr J ,
+         5. Aslanidis C ,
+         6. Nagy G M ,
+         7. Knuechel R ,
+         8. Schmitz G
+       (1996) Eur J Biochem 242:339–351, pmid:8973653.
+       [156]Medline
+   15. [157]↵
+         1. Oka T ,
+         2. Nishimoto Y ,
+         3. Sasagawa T ,
+         4. Kanouchi H ,
+         5. Kawasaki Y ,
+         6. Natori Y
+       (1999) Cell Mol Life Sci 55:131–134, pmid:10065159.
+       [158]CrossRef[159]Medline
+   16. [160]↵
+         1. Laskowski R A ,
+         2. MacArthur M W ,
+         3. Moss D S ,
+         4. Thornton J M
+       (1993) J Appl Crystallogr 26:283–291.
+       [161]CrossRef
+   17. [162]↵
+         1. Read R J
+       (1986) Acta Crystallogr A 42:140–149.
+       [163]CrossRef
+   18. [164]↵
+         1. Nicholls A ,
+         2. Sharp K ,
+         3. Honig B
+       (1991) Proteins 11:281–296, pmid:1758883.
+       [165]CrossRef[166]Medline[167]Web of Science
+   19. [168]↵
+         1. Samuel S J ,
+         2. Tzung S P ,
+         3. Cohen S A
+       (1997) Hepatology 25:1213–1222, pmid:9141440.
+       [169]CrossRef[170]Medline[171]Web of Science
+   20. [172]↵
+         1. Melloni E ,
+         2. Michetti M ,
+         3. Salamino F ,
+         4. Pontremoli S
+       (1998) J Biol Chem 273:12827–12831, pmid:9582310.
+       [173]Abstract/FREE Full Text
+   21. [174]↵
+         1. Altschul S F ,
+         2. Gish W ,
+         3. Miller W ,
+         4. Myers E W ,
+         5. Lipman D J
+       (1990) J Mol Biol 215:403–410, pmid:2231712.
+       [175]CrossRef[176]Medline[177]Web of Science
+   22. [178]↵
+         1. Holm L ,
+         2. Sander C
+       (1993) J Mol Biol 233:123–138, pmid:8377180.
+       [179]CrossRef[180]Medline[181]Web of Science
+   23. [182]↵
+         1. Chook Y M ,
+         2. Gray J V ,
+         3. Ke H ,
+         4. Lipscomb W N
+       (1994) J Mol Biol 240:476–500, pmid:8046752.
+       [183]CrossRef[184]Medline[185]Web of Science
+   24. [186]↵
+         1. Thompson J D ,
+         2. Higgins D G ,
+         3. Gibson T J
+       (1994) Nucleic Acids Res 22:4673–4680, pmid:7984417.
+       [187]Abstract/FREE Full Text
+   25. [188]↵
+         1. Wallace A C ,
+         2. Borkakoti N ,
+         3. Thornton J M
+       (1997) Protein Sci 6:2308–2323, pmid:9385633.
+       [189]Abstract
+   26. [190]↵
+         1. Kleywegt G J
+       (1999) J Mol Biol 285:1887–1897, pmid:9917419.
+       [191]CrossRef[192]Medline[193]Web of Science
+   27. [194]↵
+         1. Goupil-Feuillerat N ,
+         2. Cocaign-Bousquet M ,
+         3. Godon J J ,
+         4. Ehrlich S D ,
+         5. Renault P
+       (1997) J Bacteriol 179:6285–6293, pmid:9335274.
+       [195]Abstract/FREE Full Text
+   28. [196]↵
+         1. Enos-Berlage J L ,
+         2. Langendorf M J ,
+         3. Downs D M
+       (1998) J Bacteriol 180:6519–6528, pmid:9851994.
+       [197]Abstract/FREE Full Text
+   29. [198]↵
+         1. Oka T ,
+         2. Tsuji H ,
+         3. Noda C ,
+         4. Sakai K ,
+         5. Hong Y ,
+         6. Suzuki I ,
+         7. Muñoz S ,
+         8. Natori Y
+       (1995) J Biol Chem 270:30060–30067, pmid:8530410.
+       [199]Abstract/FREE Full Text
+   30. [200]↵
+         1. Ceciliani F ,
+         2. Faotto L ,
+         3. Negri A ,
+         4. Colombo I ,
+         5. Berra B ,
+         6. Bartorelli A ,
+         7. Ronchi S
+       (1996) FEBS Lett 393:147–150, pmid:8814279.
+       [201]CrossRef[202]Medline
+   31. [203]↵
+         1. Kraulis P J
+       (1991) J Appl Crystallogr 24:946–950.
+       [204]CrossRef
+   32. [205]↵
+         1. Merritt E A ,
+         2. Bacon D J
+       (1997) Methods Enzymol 277:505–524.
+       [206]Web of Science
+   33. [207]↵
+         1. Barton G L
+       (1993) Protein Eng 6:37–40, pmid:8433969.
+       [208]FREE Full Text
+   34. [209]↵
+         1. Sanner M F ,
+         2. Olson A J ,
+         3. Spehner J
+       (1995) Proc. 11th Assoc. Comput. Machinery Symp. Comput. Geom. ,
+       C6–C7..
+   35. [210]↵
+       Volz, K. (1999) Protein Sci., in press.
+
+     * [211]Add to CiteULike CiteULike
+     * [212]Add to Complore Complore
+     * [213]Add to Connotea Connotea
+     * [214]Add to Del.icio.us Del.icio.us
+     * [215]Add to Digg Digg
+     * [216]Add to Facebook Facebook
+     * [217]Add to Twitter Twitter
+
+   [218]What's this?
+   [219]« Previous | [220]Next Article »[221]Table of Contents
+
+ §3§ This Article §3§
+
+    1. PNAS November 9, 1999 vol. 96 no. 23 13074-13079
+
+    1. [222]AbstractFree
+    2. [223]Figures Only
+    3. » Full Text
+    4. [224]Full Text (PDF)
+
+ §4§ Classifications §4§
+
+    1.
+          + Biological Sciences
+               o [225]Biochemistry
+
+ §4§ Services §4§
+
+    1. [226]Email this article to a colleague
+    2. [227]Alert me when this article is cited
+    3. [228]Alert me if a correction is posted
+    4. [229]Similar articles in this journal
+    5. [230]Similar articles in ISI
+    6. [231]Similar articles in PubMed
+    7. [232]Add to My File Cabinet
+    8. [233]Download to citation manager
+    9. [234]Request copyright permission
+
+ §4§ Citing Articles §4§
+
+    1. [235]Load citing article information
+    2. [236]Citing articles via CrossRef
+    3. [237]Citing articles via Web of Science
+    4. [238]Articles citing this article
+
+ §4§ Google Scholar §4§
+
+    1. [239]Articles by Sinha, S.
+    2. [240]Articles by Smith, J. L.
+    3. [241]Search for related content
+
+ §4§ PubMed §4§
+
+    1. [242]PubMed citation
+    2. [243]Articles by Sinha, S.
+    3. [244]Articles by Smith, J. L.
+    4.
+
+ §4§ Related Content §4§
+
+    1. [245]Load related web page information
+
+ §4§ Social Bookmarking §4§
+
+    1.
+          + [246]Add to CiteULike CiteULike
+          + [247]Add to Complore Complore
+          + [248]Add to Connotea Connotea
+          + [249]Add to Del.icio.us Del.icio.us
+          + [250]Add to Digg Digg
+          + [251]Add to Facebook Facebook
+          + [252]Add to Twitter Twitter
+       [253]What's this?
+
+ §3§ Navigate This Article §3§
+
+    1. [254]Top
+    2. [255]Abstract
+    3. [256]Materials and Methods
+    4. [257]Results and Discussion
+    5. [258]Acknowledgments
+    6. [259]Note
+    7. [260]Footnotes
+    8. [261]References
+
+   Search PNAS ____________________ GO
+   [262]Link: Advanced Search
+
+ §3§ This Week's Issue §3§
+
+    1. [263]September 14, 2010, 107 (37)
+
+    1. [264]Current Issue
+
+ §4§ From the Cover §4§
+
+     * [265]Eyeing neural circuits in Drosophila
+     * [266]Optimizing live cell imaging
+     * [267]Public perceptions of energy use
+     * [268]Activating DNA mismatch repair
+     * [269]Evolution of collective migration
+
+    1. [270]Alert me to new issues of PNAS
+
+     * [271]Early Edition
+     * [272]Archives
+     * [273]Online Submission
+
+     * [274]Feature Articles
+       (Expanded research articles of exceptional breadth)
+     * [275]Commentaries
+       (Expert commentary on leading research)
+     * [276]Letters
+       (Online-only letters to the editor)
+     * [277]Inaugural Articles
+       (Articles by recently elected NAS members)
+     * [278]PNAS Profiles
+       (Biographical profiles of Academy members)
+     * [279]Sustainability Science
+       (Interactions of human and environmental systems)
+     * [280]Collected Papers
+       (Editorials, Perspectives, Reviews, Colloquia, etc.)
+     * [281]Special Features
+       (Solicited articles on exceptional research topics)
+     * [282]Sackler Colloquia
+       (Scientific reports held under NAS auspices)
+     * [283]Podcasts
+       Brief podcasts with leading scientists
+
+ §3§ Most §3§
+
+     *  §4§ Read §4§
+         1. [284]Molecular origins of fluorocarbon hydrophobicity
+         2. [285]Public perceptions of energy consumption and savings
+         3. [286]Detection of MLV-related virus gene sequences in blood of
+            patients with chronic fatigue syndrome and healthy blood
+            donors
+         4. [287]Inaugural Article: The Lucretian swerve: The biological
+            basis of human behavior and the criminal justice system
+         5. [288]The most influential journals: Impact Factor and
+            Eigenfactor
+       [289]» View all Most Read articles
+     *  §4§ Cited §4§
+         1. [290]DNA Sequencing with Chain-Terminating Inhibitors
+         2. [291]Electrophoretic Transfer of Proteins from Polyacrylamide
+            Gels to Nitrocellulose Sheets: Procedure and Some Applications
+         3. [292]Cluster analysis and display of genome-wide expression
+            patterns
+         4. [293]Significance analysis of microarrays applied to the
+            ionizing radiation response
+         5. [294]One-step inactivation of chromosomal genes in Escherichia
+            coli K-12 using PCR products
+       [295]» View all Most Cited articles
+
+     * [296]Current Issue
+     * [297]Archives
+     * [298]Online Submission
+     * [299]Info for Authors
+     * [300]Editorial Board
+     * [301]About
+
+     * [302]Subscribe
+     * [303]Advertise
+     * [304]Contact
+     * [305]Site Map
+
+   [306]Copyright ©2010 by the National Academy of Sciences
+
+References
+
+   Visible links
+   1. http://www.pnas.org/
+   2. http://www.pnas.org/
+   3. file://localhost/dev/paper.html#content-block
+   4. http://www.pnas.org/misc/iforc.shtml
+   5. http://www.pnas.org/misc/masthead.shtml
+   6. http://www.pnas.org/misc/about.shtml
+   7. http://www.pnas.org/subscriptions
+   8. http://www.pnas.org/misc/about.shtml#advertising
+   9. http://www.pnas.org/site/misc/contact.shtml
+  10. http://www.pnas.org/cgi/feedback
+  11. http://www.pnas.org/misc/sitemap.shtml
+  12. http://www.pnas.org/cgi/adclick/?ad=21711&adclick=true&url=http%3A%2F%2Fwws.princeton.edu%2Fgrad%2Fmpp%2F
+  13. http://www.pnas.org/cgi/adclick/?ad=21636&adclick=true&url=http%3A%2F%2Fwww.pnas.org%2Fcgi%2Falerts%2Fetoc
+  14. http://www.pnas.org/cgi/adclick/?ad=19262&adclick=true&url=http%3A%2F%2Fwww.pnas.org%2Fmisc%2Fpodcasts.shtml
+  15. http://www.pnas.org/login?uri=http%3A%2F%2Fwww.pnas.org%2Fcontent%2F96%2F23%2F13074.long
+  16. http://www.pnas.org/search?author1=Sangita+Sinha&sortspec=date&submit=Submit
+  17. file://localhost/dev/paper.html#aff-1
+  18. http://www.pnas.org/search?author1=Pekka+Rappu&sortspec=date&submit=Submit
+  19. file://localhost/dev/paper.html#aff-1
+  20. http://www.pnas.org/search?author1=S.+C.+Lange&sortspec=date&submit=Submit
+  21. file://localhost/dev/paper.html#aff-1
+  22. http://www.pnas.org/search?author1=Pekka+M%C3%A4nts%C3%A4l%C3%A4&sortspec=date&submit=Submit
+  23. file://localhost/dev/paper.html#aff-1
+  24. http://www.pnas.org/search?author1=Howard+Zalkin&sortspec=date&submit=Submit
+  25. file://localhost/dev/paper.html#aff-1
+  26. http://www.pnas.org/search?author1=Janet+L.+Smith&sortspec=date&submit=Submit
+  27. file://localhost/dev/paper.html#aff-1
+  28. file://localhost/dev/paper.html#fn-1
+  29. file://localhost/dev/paper.html#sec-1
+  30. file://localhost/dev/paper.html#ref-1
+  31. file://localhost/dev/paper.html#ref-2
+  32. file://localhost/dev/paper.html#ref-3
+  33. file://localhost/dev/paper.html#ref-3
+  34. file://localhost/dev/paper.html#ref-4
+  35. file://localhost/dev/paper.html#ref-5
+  36. file://localhost/dev/paper.html#abstract-1
+  37. file://localhost/dev/paper.html#sec-6
+  38. file://localhost/dev/paper.html#T1
+  39. file://localhost/dev/paper.html#T1
+  40. file://localhost/dev/paper.html#ref-6
+  41. file://localhost/dev/paper.html#ref-7
+  42. file://localhost/dev/paper.html#T1
+  43. http://www.pnas.org/content/96/23/13074/T1.expansion.html
+  44. http://www.pnas.org/content/96/23/13074/T1.expansion.html
+  45. file://localhost/dev/paper.html#ref-8
+  46. file://localhost/dev/paper.html#ref-9
+  47. file://localhost/dev/paper.html#ref-10
+  48. file://localhost/dev/paper.html#ref-11
+  49. file://localhost/dev/paper.html#ref-12
+  50. http://www.pnas.org/external-ref?link_type=PDB&access_num=1qd9
+  51. file://localhost/dev/paper.html#T1
+  52. file://localhost/dev/paper.html#sec-1
+  53. file://localhost/dev/paper.html#ack-1
+  54. file://localhost/dev/paper.html#ref-13
+  55. file://localhost/dev/paper.html#ref-14
+  56. file://localhost/dev/paper.html#ref-15
+  57. file://localhost/dev/paper.html#T1
+  58. file://localhost/dev/paper.html#ref-16
+  59. file://localhost/dev/paper.html#ref-17
+  60. file://localhost/dev/paper.html#F1
+  61. http://www.pnas.org/content/96/23/13074/F1.expansion.html
+  62. http://www.pnas.org/content/96/23/13074/F1.expansion.html
+  63. http://www.pnas.org/content/96/23/13074/F1.expansion.html
+  64. http://www.pnas.org/powerpoint/96/23/13074/F1
+  65. file://localhost/dev/paper.html#ref-31
+  66. file://localhost/dev/paper.html#ref-32
+  67. file://localhost/dev/paper.html#F2
+  68. http://www.pnas.org/content/96/23/13074/F2.expansion.html
+  69. http://www.pnas.org/content/96/23/13074/F2.expansion.html
+  70. http://www.pnas.org/content/96/23/13074/F2.expansion.html
+  71. http://www.pnas.org/powerpoint/96/23/13074/F2
+  72. file://localhost/dev/paper.html#ref-18
+  73. file://localhost/dev/paper.html#ref-13
+  74. file://localhost/dev/paper.html#ref-19
+  75. file://localhost/dev/paper.html#ref-20
+  76. file://localhost/dev/paper.html#ref-29
+  77. file://localhost/dev/paper.html#ref-3
+  78. file://localhost/dev/paper.html#ref-20
+  79. file://localhost/dev/paper.html#ref-21
+  80. file://localhost/dev/paper.html#ref-22
+  81. file://localhost/dev/paper.html#ref-23
+  82. file://localhost/dev/paper.html#F3
+  83. http://www.pnas.org/content/96/23/13074/F3.expansion.html
+  84. http://www.pnas.org/content/96/23/13074/F3.expansion.html
+  85. http://www.pnas.org/content/96/23/13074/F3.expansion.html
+  86. http://www.pnas.org/powerpoint/96/23/13074/F3
+  87. file://localhost/dev/paper.html#F1
+  88. file://localhost/dev/paper.html#F2
+  89. file://localhost/dev/paper.html#F3
+  90. file://localhost/dev/paper.html#ref-23
+  91. file://localhost/dev/paper.html#ref-21
+  92. file://localhost/dev/paper.html#ref-24
+  93. file://localhost/dev/paper.html#F4
+  94. file://localhost/dev/paper.html#F5
+  95. http://www.pnas.org/content/96/23/13074/F4.expansion.html
+  96. http://www.pnas.org/content/96/23/13074/F4.expansion.html
+  97. http://www.pnas.org/content/96/23/13074/F4.expansion.html
+  98. http://www.pnas.org/powerpoint/96/23/13074/F4
+  99. file://localhost/dev/paper.html#ref-24
+ 100. file://localhost/dev/paper.html#ref-33
+ 101. http://www.pnas.org/content/96/23/13074/F5.expansion.html
+ 102. http://www.pnas.org/content/96/23/13074/F5.expansion.html
+ 103. http://www.pnas.org/content/96/23/13074/F5.expansion.html
+ 104. http://www.pnas.org/powerpoint/96/23/13074/F5
+ 105. file://localhost/dev/paper.html#ref-34
+ 106. http://www.bioz.unibas.ch/~x-ray/dino
+ 107. file://localhost/dev/paper.html#ref-25
+ 108. file://localhost/dev/paper.html#ref-26
+ 109. file://localhost/dev/paper.html#ref-27
+ 110. file://localhost/dev/paper.html#ref-28
+ 111. file://localhost/dev/paper.html#ref-14
+ 112. file://localhost/dev/paper.html#ref-29
+ 113. file://localhost/dev/paper.html#ref-30
+ 114. file://localhost/dev/paper.html#ref-19
+ 115. file://localhost/dev/paper.html#ref-20
+ 116. file://localhost/dev/paper.html#F5
+ 117. file://localhost/dev/paper.html#sec-6
+ 118. file://localhost/dev/paper.html#notes-1
+ 119. file://localhost/dev/paper.html#ack-1
+ 120. file://localhost/dev/paper.html#fn-group-1
+ 121. file://localhost/dev/paper.html#ref-35
+ 122. file://localhost/dev/paper.html#notes-1
+ 123. file://localhost/dev/paper.html#ref-list-1
+ 124. file://localhost/dev/paper.html#xref-fn-1-1
+ 125. http://www.rcsb.org/
+ 126. http://www.pnas.org/external-ref?link_type=PDB&access_num=1qd9
+ 127. file://localhost/dev/paper.html#fn-group-1
+ 128. file://localhost/dev/paper.html#xref-ref-1-1
+ 129. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=pnas&resid=92/16/7455
+ 130. file://localhost/dev/paper.html#xref-ref-2-1
+ 131. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=jb&resid=179/23/7394
+ 132. file://localhost/dev/paper.html#xref-ref-3-1
+ 133. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=jb&resid=181/12/3810
+ 134. file://localhost/dev/paper.html#xref-ref-4-1
+ 135. http://www.pnas.org/external-ref?access_num=10.1007/BF00042048&link_type=DOI
+ 136. http://www.pnas.org/external-ref?access_num=7787182&link_type=MED
+ 137. file://localhost/dev/paper.html#xref-ref-5-1
+ 138. http://www.pnas.org/external-ref?access_num=10089464&link_type=MED
+ 139. file://localhost/dev/paper.html#xref-ref-6-1
+ 140. http://www.pnas.org/external-ref?access_num=A1997BH42P00020&link_type=ISI
+ 141. file://localhost/dev/paper.html#xref-ref-7-1
+ 142. http://www.pnas.org/external-ref?access_num=10.1107/S0907444994003112&link_type=DOI
+ 143. http://www.pnas.org/external-ref?access_num=15299374&link_type=MED
+ 144. file://localhost/dev/paper.html#xref-ref-8-1
+ 145. file://localhost/dev/paper.html#xref-ref-9-1
+ 146. http://www.pnas.org/external-ref?access_num=10.1107/S0907444996012279&link_type=DOI
+ 147. http://www.pnas.org/external-ref?access_num=15299952&link_type=MED
+ 148. file://localhost/dev/paper.html#xref-ref-10-1
+ 149. file://localhost/dev/paper.html#xref-ref-11-1
+ 150. file://localhost/dev/paper.html#xref-ref-12-1
+ 151. http://www.pnas.org/external-ref?access_num=10.1107/S0907444998003254&link_type=DOI
+ 152. http://www.pnas.org/external-ref?access_num=9757107&link_type=MED
+ 153. file://localhost/dev/paper.html#xref-ref-13-1
+ 154. http://www.pnas.org/external-ref?access_num=8385007&link_type=MED
+ 155. file://localhost/dev/paper.html#xref-ref-14-1
+ 156. http://www.pnas.org/external-ref?access_num=8973653&link_type=MED
+ 157. file://localhost/dev/paper.html#xref-ref-15-1
+ 158. http://www.pnas.org/external-ref?access_num=10.1007/s000180050277&link_type=DOI
+ 159. http://www.pnas.org/external-ref?access_num=10065159&link_type=MED
+ 160. file://localhost/dev/paper.html#xref-ref-16-1
+ 161. http://www.pnas.org/external-ref?access_num=10.1107/S0021889892009944&link_type=DOI
+ 162. file://localhost/dev/paper.html#xref-ref-17-1
+ 163. http://www.pnas.org/external-ref?access_num=10.1107/S0108767386099622&link_type=DOI
+ 164. file://localhost/dev/paper.html#xref-ref-18-1
+ 165. http://www.pnas.org/external-ref?access_num=10.1002/prot.340110407&link_type=DOI
+ 166. http://www.pnas.org/external-ref?access_num=1758883&link_type=MED
+ 167. http://www.pnas.org/external-ref?access_num=A1991GV03200006&link_type=ISI
+ 168. file://localhost/dev/paper.html#xref-ref-19-1
+ 169. http://www.pnas.org/external-ref?access_num=10.1002/hep.510250525&link_type=DOI
+ 170. http://www.pnas.org/external-ref?access_num=9141440&link_type=MED
+ 171. http://www.pnas.org/external-ref?access_num=A1997WX60400026&link_type=ISI
+ 172. file://localhost/dev/paper.html#xref-ref-20-1
+ 173. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=jbc&resid=273/21/12827
+ 174. file://localhost/dev/paper.html#xref-ref-21-1
+ 175. http://www.pnas.org/external-ref?access_num=10.1006/jmbi.1990.9999&link_type=DOI
+ 176. http://www.pnas.org/external-ref?access_num=2231712&link_type=MED
+ 177. http://www.pnas.org/external-ref?access_num=A1990ED16700008&link_type=ISI
+ 178. file://localhost/dev/paper.html#xref-ref-22-1
+ 179. http://www.pnas.org/external-ref?access_num=10.1006/jmbi.1993.1489&link_type=DOI
+ 180. http://www.pnas.org/external-ref?access_num=8377180&link_type=MED
+ 181. http://www.pnas.org/external-ref?access_num=A1993LX40100011&link_type=ISI
+ 182. file://localhost/dev/paper.html#xref-ref-23-1
+ 183. http://www.pnas.org/external-ref?access_num=10.1006/jmbi.1994.1462&link_type=DOI
+ 184. http://www.pnas.org/external-ref?access_num=8046752&link_type=MED
+ 185. http://www.pnas.org/external-ref?access_num=A1994NZ23000007&link_type=ISI
+ 186. file://localhost/dev/paper.html#xref-ref-24-1
+ 187. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=nar&resid=22/22/4673
+ 188. file://localhost/dev/paper.html#xref-ref-25-1
+ 189. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=protsci&resid=6/11/2308
+ 190. file://localhost/dev/paper.html#xref-ref-26-1
+ 191. http://www.pnas.org/external-ref?access_num=10.1006/jmbi.1998.2393&link_type=DOI
+ 192. http://www.pnas.org/external-ref?access_num=9917419&link_type=MED
+ 193. http://www.pnas.org/external-ref?access_num=000078447300043&link_type=ISI
+ 194. file://localhost/dev/paper.html#xref-ref-27-1
+ 195. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=jb&resid=179/20/6285
+ 196. file://localhost/dev/paper.html#xref-ref-28-1
+ 197. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=jb&resid=180/24/6519
+ 198. file://localhost/dev/paper.html#xref-ref-29-1
+ 199. http://www.pnas.org/cgi/ijlink?linkType=ABST&journalCode=jbc&resid=270/50/30060
+ 200. file://localhost/dev/paper.html#xref-ref-30-1
+ 201. http://www.pnas.org/external-ref?access_num=10.1016/0014-5793(96)00850-2&link_type=DOI
+ 202. http://www.pnas.org/external-ref?access_num=8814279&link_type=MED
+ 203. file://localhost/dev/paper.html#xref-ref-31-1
+ 204. http://www.pnas.org/external-ref?access_num=10.1107/S0021889891004399&link_type=DOI
+ 205. file://localhost/dev/paper.html#xref-ref-32-1
+ 206. http://www.pnas.org/external-ref?access_num=A1997BJ57S00026&link_type=ISI
+ 207. file://localhost/dev/paper.html#xref-ref-33-1
+ 208. http://www.pnas.org/cgi/ijlink?linkType=PDF&journalCode=proeng&resid=6/1/37
+ 209. file://localhost/dev/paper.html#xref-ref-34-1
+ 210. file://localhost/dev/paper.html#xref-ref-35-1
+ 211. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/96/23/13074&title=Crystal%20structure%20of%20Bacillus%20subtilis%20YabJ%2C%20a%20purine%20regulatory%20protein%20and%20member%20of%20the%20highly%20conserved%20YjgF%20family+--+Sinha%20et%20al.%2096%20%2823%29%3A%2013074+--+PNAS&doi=&link_type=CITEULIKE
+ 212. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/96/23/13074&title=Crystal%20structure%20of%20Bacillus%20subtilis%20YabJ%2C%20a%20purine%20regulatory%20protein%20and%20member%20of%20the%20highly%20conserved%20YjgF%20family+--+Sinha%20et%20al.%2096%20%2823%29%3A%2013074+--+PNAS&doi=&link_type=COMPLORE
+ 213. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/96/23/13074&title=Crystal%20structure%20of%20Bacillus%20subtilis%20YabJ%2C%20a%20purine%20regulatory%20protein%20and%20member%20of%20the%20highly%20conserved%20YjgF%20family+--+Sinha%20et%20al.%2096%20%2823%29%3A%2013074+--+PNAS&doi=&link_type=CONNOTEA
+ 214. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/96/23/13074&title=Crystal%20structure%20of%20Bacillus%20subtilis%20YabJ%2C%20a%20purine%20regulatory%20protein%20and%20member%20of%20the%20highly%20conserved%20YjgF%20family+--+Sinha%20et%20al.%2096%20%2823%29%3A%2013074+--+PNAS&doi=&link_type=DEL_ICIO_US
+ 215. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/96/23/13074&title=Crystal%20structure%20of%20Bacillus%20subtilis%20YabJ%2C%20a%20purine%20regulatory%20protein%20and%20member%20of%20the%20highly%20conserved%20YjgF%20family+--+Sinha%20et%20al.%2096%20%2823%29%3A%2013074+--+PNAS&doi=&link_type=DIGG
+ 216. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/short/96/23/13074&title=Crystal%20structure%20of%20Bacillus%20subtilis%20YabJ%2C%20a%20purine%20regulatory%20protein%20and%20member%20of%20the%20highly%20conserved%20YjgF%20family+--+Sinha%20et%20al.%2096%20%2823%29%3A%2013074+--+PNAS&doi=&link_type=FACEBOOK
+ 217. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/96/23/13074&title=Crystal%20structure%20of%20Bacillus%20subtilis%20YabJ%2C%20a%20purine%20regulatory%20protein%20and%20member%20of%20the%20highly%20conserved%20YjgF%20family+--+Sinha%20et%20al.%2096%20%2823%29%3A%2013074+--+PNAS&doi=&link_type=TWITTER
+ 218. http://www.pnas.org/help/social_bookmarks.dtl
+ 219. http://www.pnas.org/content/96/23/13068.short
+ 220. http://www.pnas.org/content/96/23/13080.short
+ 221. http://www.pnas.org/content/96/23.toc
+ 222. http://www.pnas.org/content/96/23/13074.abstract
+ 223. http://www.pnas.org/content/96/23/13074.figures-only
+ 224. http://www.pnas.org/content/96/23/13074.full.pdf+html
+ 225. http://www.pnas.org/search?tocsectionid=Biochemistry&sortspec=date&submit=Submit
+ 226. http://www.pnas.org/email?gca=pnas;96/23/13074&current-view-path=/content/96/23/13074.long
+ 227. http://www.pnas.org/cgi/alerts/ctalert?alertType=citedby&addAlert=cited_by&cited_by_criteria_resid=pnas;96/23/13074&saveAlert=no&return-type=article&return_url=http://www.pnas.org/content/96/23/13074.long
+ 228. http://www.pnas.org/cgi/alerts/ctalert?alertType=correction&addAlert=correction&correction_criteria_value=96/23/13074&saveAlert=no&return-type=article&return_url=http://www.pnas.org/content/96/23/13074.long
+ 229. http://www.pnas.org/search?qbe=pnas;96/23/13074&citation=Sinha%20et%20al.%2096%20%2823%29:%2013074&submit=yes
+ 230. http://www.pnas.org/external-ref?access_num=pnas%3B96%2F23%2F13074&link_type=ISI_RELATEDRECORDS
+ 231. http://www.pnas.org/external-ref?access_num=10557275&link_type=MED_NBRS
+ 232. http://www.pnas.org/cgi/folders?action=addtofolder&wherefrom=JOURNALS&wrapped_id=pnas;96/23/13074
+ 233. http://www.pnas.org/citmgr?gca=pnas;96/23/13074
+ 234. http://www.pnas.org/misc/rightperm.shtml
+ 235. http://www.pnas.org/content/96/23/13074.long?cited-by=yes&legid=pnas;96/23/13074#cited-by
+ 236. http://www.pnas.org/cgi/crossref-forward-links/96/23/13074
+ 237. http://www.pnas.org/external-ref?access_num=pnas%3B96%2F23%2F13074&link_type=ISI_CITING
+ 238. http://www.pnas.org/external-ref?access_num=http://www.pnas.org/cgi/content/abstract/96/23/13074&link_type=GOOGLESCHOLAR
+ 239. http://scholar.google.com/scholar?q=%22author%3ASinha%20author%3AS.%22
+ 240. http://scholar.google.com/scholar?q=%22author%3ASmith%20author%3AJ.L.%22
+ 241. http://www.pnas.org/external-ref?access_num=http://www.pnas.org/cgi/content/abstract/96/23/13074&link_type=GOOGLESCHOLARRELATED
+ 242. http://www.pnas.org/external-ref?access_num=10557275&link_type=PUBMED
+ 243. http://www.pnas.org/external-ref?access_num=Sinha%20S&link_type=AUTHORSEARCH
+ 244. http://www.pnas.org/external-ref?access_num=Smith%20JL&link_type=AUTHORSEARCH
+ 245. http://www.pnas.org/content/96/23/13074.long?related-urls=yes&legid=pnas;96/23/13074#related-urls
+ 246. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/96/23/13074&title=Crystal%20structure%20of%20Bacillus%20subtilis%20YabJ%2C%20a%20purine%20regulatory%20protein%20and%20member%20of%20the%20highly%20conserved%20YjgF%20family+--+Sinha%20et%20al.%2096%20%2823%29%3A%2013074+--+PNAS&doi=&link_type=CITEULIKE
+ 247. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/96/23/13074&title=Crystal%20structure%20of%20Bacillus%20subtilis%20YabJ%2C%20a%20purine%20regulatory%20protein%20and%20member%20of%20the%20highly%20conserved%20YjgF%20family+--+Sinha%20et%20al.%2096%20%2823%29%3A%2013074+--+PNAS&doi=&link_type=COMPLORE
+ 248. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/96/23/13074&title=Crystal%20structure%20of%20Bacillus%20subtilis%20YabJ%2C%20a%20purine%20regulatory%20protein%20and%20member%20of%20the%20highly%20conserved%20YjgF%20family+--+Sinha%20et%20al.%2096%20%2823%29%3A%2013074+--+PNAS&doi=&link_type=CONNOTEA
+ 249. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/96/23/13074&title=Crystal%20structure%20of%20Bacillus%20subtilis%20YabJ%2C%20a%20purine%20regulatory%20protein%20and%20member%20of%20the%20highly%20conserved%20YjgF%20family+--+Sinha%20et%20al.%2096%20%2823%29%3A%2013074+--+PNAS&doi=&link_type=DEL_ICIO_US
+ 250. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/96/23/13074&title=Crystal%20structure%20of%20Bacillus%20subtilis%20YabJ%2C%20a%20purine%20regulatory%20protein%20and%20member%20of%20the%20highly%20conserved%20YjgF%20family+--+Sinha%20et%20al.%2096%20%2823%29%3A%2013074+--+PNAS&doi=&link_type=DIGG
+ 251. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/short/96/23/13074&title=Crystal%20structure%20of%20Bacillus%20subtilis%20YabJ%2C%20a%20purine%20regulatory%20protein%20and%20member%20of%20the%20highly%20conserved%20YjgF%20family+--+Sinha%20et%20al.%2096%20%2823%29%3A%2013074+--+PNAS&doi=&link_type=FACEBOOK
+ 252. http://www.pnas.org/external-ref?tag_url=http://www.pnas.org/cgi/content/long/96/23/13074&title=Crystal%20structure%20of%20Bacillus%20subtilis%20YabJ%2C%20a%20purine%20regulatory%20protein%20and%20member%20of%20the%20highly%20conserved%20YjgF%20family+--+Sinha%20et%20al.%2096%20%2823%29%3A%2013074+--+PNAS&doi=&link_type=TWITTER
+ 253. http://www.pnas.org/help/social_bookmarks.dtl
+ 254. file://localhost/dev/paper.html#content-block
+ 255. file://localhost/dev/paper.html#abstract-1
+ 256. file://localhost/dev/paper.html#sec-1
+ 257. file://localhost/dev/paper.html#sec-6
+ 258. file://localhost/dev/paper.html#ack-1
+ 259. file://localhost/dev/paper.html#notes-1
+ 260. file://localhost/dev/paper.html#fn-group-1
+ 261. file://localhost/dev/paper.html#ref-list-1
+ 262. http://www.pnas.org/search
+ 263. http://www.pnas.org/content/current
+ 264. http://www.pnas.org/content/current
+ 265. http://www.pnas.org/content/107/37/16378
+ 266. http://www.pnas.org/content/107/37/16016
+ 267. http://www.pnas.org/content/107/37/16054
+ 268. http://www.pnas.org/content/107/37/16066
+ 269. http://www.pnas.org/content/107/37/16172
+ 270. http://www.pnas.org/cgi/alerts/etoc
+ 271. http://www.pnas.org/content/early/recent
+ 272. http://www.pnas.org/content
+ 273. http://www.pnas.org/site/misc/onlinesubmission.shtml
+ 274. http://www.pnas.org/cgi/collection/feature_articles
+ 275. http://www.pnas.org/content/by/section/Commentaries
+ 276. http://www.pnas.org/cgi/collection/letters
+ 277. http://www.pnas.org/cgi/collection/inaugurals
+ 278. http://www.pnas.org/cgi/collection/profiles
+ 279. http://www.pnas.org/site/misc/sustainability.shtml
+ 280. http://www.pnas.org/site/misc/collectedpapers.shtml
+ 281. http://www.pnas.org/site/misc/special.shtml
+ 282. http://www.pnas.org/site/misc/colloquia.shtml
+ 283. http://www.pnas.org/site/misc/podcasts.shtml
+ 284. http://www.pnas.org/cgi/content/short/107/31/13603?rss=1&ssource=mfc
+ 285. http://www.pnas.org/cgi/content/short/1001509107v1?rss=1&ssource=mfc
+ 286. http://www.pnas.org/cgi/content/short/1006901107v1?rss=1&ssource=mfc
+ 287. http://www.pnas.org/cgi/content/short/107/10/4499?rss=1&ssource=mfc
+ 288. http://www.pnas.org/cgi/content/short/106/17/6883?rss=1&ssource=mfc
+ 289. http://www.pnas.org/reports/mfr1.dtl
+ 290. http://www.pnas.org/cgi/content/short/74/12/5463?rss=1&ssource=mfc
+ 291. http://www.pnas.org/cgi/content/short/76/9/4350?rss=1&ssource=mfc
+ 292. http://www.pnas.org/cgi/content/short/95/25/14863?rss=1&ssource=mfc
+ 293. http://www.pnas.org/cgi/content/short/98/9/5116?rss=1&ssource=mfc
+ 294. http://www.pnas.org/cgi/content/short/97/12/6640?rss=1&ssource=mfc
+ 295. http://www.pnas.org/reports/mfc1.dtl
+ 296. http://www.pnas.org/content/current
+ 297. http://www.pnas.org/content
+ 298. http://www.pnas.org/misc/onlinesubmission.shtml
+ 299. http://www.pnas.org/misc/iforc.shtml
+ 300. http://www.pnas.org/misc/masthead.shtml
+ 301. http://www.pnas.org/misc/about.shtml
+ 302. http://www.pnas.org/subscriptions
+ 303. http://www.pnas.org/misc/about.shtml#advertising
+ 304. http://www.pnas.org/cgi/feedback
+ 305. http://www.pnas.org/misc/sitemap.shtml
+ 306. http://www.pnas.org/misc/terms.shtml
+
+   Hidden links:
+ 307. http://www.pnas.org/entrez-links/10557275

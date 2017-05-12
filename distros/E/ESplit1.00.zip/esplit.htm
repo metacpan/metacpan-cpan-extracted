@@ -1,0 +1,319 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<title>CREAGEN Computerkram - ESplit.pm</title>
+    <meta name="description" content="Dokumentation zum Perl-Modul ESplit.pm">
+    <meta name="author" content="Hartmut Camphausen">
+    <meta name="reply-to" content="h.camp@creagen.de">
+    <meta name="date" content="2000-07-06">    	
+</head>
+
+<body bgcolor="#FFFFFF" link="#800000" vlink="#000080" alink="#FF0000">
+
+<table width="100%" align="center" cellspacing="0" cellpadding="0" border="0">
+<tr align="center">
+	<td><font face="Courier New" size="-1">Hartmut Camphausen</font></td>
+	<td><font face="Courier New" size="-1">Kirchstr. 8</font></td>
+	<td><font face="Courier New" size="-1">35043 Marburg</font></td>
+	<td><font face="Courier New" size="-1">Fon: 06424/923826</font></td>
+	<td><font face="Courier New" size="-1">Fax: 06424/923827</font></td>
+	<td><font face="Courier New" size="-1">Emil: <a href="mailto:h.camp@creagen.de?subject=[CG]:">h.camp@creagen.de</a></font></td>
+</tr>
+</table>
+
+<p>&nbsp;</p>
+
+<table width="100%" cellspacing="0" cellpadding="8" border="0">
+<tr>
+
+<td width="10%">&nbsp;</td>
+<td width="80%" valign="top">
+	
+	<h2><font face="Courier New">ESplit.pm -<br>
+	Perl-Modul zum Auftrennen von Strings an frei w&auml;hlbaren Zeichen(-ketten)</font></h2>
+	
+    <table width="100%" align="center" cellspacing="2" cellpadding="2" border="0">
+    <tr>
+        <td align="center">[<a href="#desc">Beschreibung</a>]</td>
+        <td align="center">[<a href="#verw">Verwendung</a>]</td>
+    	<td align="center">[<a href="#inst">Installation</a>]</td>
+        <td align="center">[<a href="#fein">Feinheiten</a>]</td>
+        <td align="center">[<a href="#version">Version</a>]</td>
+        <td align="center">[<a href="#copy">Copyright</a>]</td>
+        <td align="center">[<a href="#autor">Autor</a>]</td></tr>
+    </table>
+    <br>
+    <h2><a name="desc">Beschreibung</a></h2>
+    <p>ESplit.pm stellt die Funktion <code>e_split()</code> bereit, mit der man Skalare (<i>Quellstrings</i>) an beliebigen Zeichen(-ketten) (<i>Trennern</i>) in Teilstrings (<i>Tokens</i>) zerlegen kann. Der Trenner kann auch als regul&auml;rer Ausdruck gegeben werden (<i>ohne</i> <code>/../</code> bzw. <code>m#..#</code>!)<br>
+	
+	
+ 	</td>
+	<td width="10%">&nbsp;</td>
+</tr>
+</table>
+<table width="100%">
+<tr>
+    <td width="10%">&nbsp;</td>
+    <td width="80%">Teilstrings, die in einfachen oder doppelten Anf&uuml;hrungszeichen stehen, werden nicht auf Trenner untersucht.<br>
+	Weiters werden Trenner, denen ein Backslash (<code>\</code>) vorangestellt wurde, ignoriert.<br>
+	Bei Bedarf liefert <code>e_split()</code> maximal <i>n</i> Elemente zur&uuml;ck, vom Anfang des Quellstrings (mit <i>n</i> &gt; 0) oder vom Ende des Quellstrings (<i>n</i> &lt; 0) her betrachtet.<br>
+<br>
+
+    
+	<pre>	   @tokens     = e_split (parameter)</pre>
+	<pre>	   $tokens_ref = e_split (parameter)</pre>
+
+	<br>parst den Quellstring und liefert einen Array der gefundenen Teilstrings. <br>
+    - Parameter: <code>[$separator] [, $quellstring] [, [-]$num_of_elems_to_return] [, $flags]</code><br>
+	<dl>
+	    <dt>- Ausgabe:</dt><br>
+		<dd>Array mit gefundenen Tokens (Arraykontext)</dd><br>
+		<dd>Referenz auf Array mit gefundenen Tokens (Skalarkontext)	</dd><br>
+	</dl>
+   
+    <p>Hier in eckigen Klammern notierte Parameter sind optional.</p>
+	<p>
+<ul>
+	<li>	Wird <code>e_split()</code> ohne Parameter aufgerufen, zerlegt es <code>$_</code> an beliebigen Leerzeichen (<code>\s+</code>).<br></li>
+	<li>	Wird <code>$separator</code> als <code>undef</code> gegeben, wird ditto an Whitespaces (<code>\s+</code>) zerlegt.<br></li>
+	<li>	Als <code>$quellstring</code> akzeptiert <code>e_split</code> auch eine Referenz auf einen Skalar.<br></li>
+	<li>	<code>$num_of_elements_to_return</code> gibt an, wieviele Elemente (falls in <code>$quellstring</code> vorhanden) zur&uuml;ckgeliefert werden sollen. <code>$tokens[-1]</code> enth&auml;lt gegebenenfalls den nichtzerlegten Reststring.<br></li>
+	<li>	Ist <code>$num_of_elements_to_retur</code>n kleiner 0, wird <code>$quellstring</code> von hinten her durchsucht (naja, jedenfalls sieht es f&uuml;r den User so aus :-). Ein unzerlegter Reststring findet sich dann in <code>$tokens[0]</code>.<br></li>
+	<li></li>
+</ul>
+
+   <p>&nbsp;</p><hr>
+   
+    Trenner-RE:<br>
+	. liefert leeren Array (wie split)												<br>
+    '' (Leerstring) liefert jedes Zeichen (wie split)								<br>
+    (H&auml;kchen sind normale Zeichen)												<br>
+    '()' (Leerstring in Klammern) liefert jedes Zeichen, plus dieses als Trenner	<br>
+    (H&auml;kchen sind normale Zeichen)												<br>
+    undef trennt an Leerzeichen (\s+) (wie split)									<br>
+    (H&auml;kchen werden als Stringumschlie&szlig;er\Escaper interpretiert)					<br>
+    <br>
+	CAVE: Evaluiert die Trenner-RE zu einem Leerstring (bspw. '.*'), l&auml;uft e_split <i>ziemlich</i> lange :-(															<br>
+	<br>
+    Wird e_split ohne alles aufgerufen, trennt es $_ an \s+ auf. Bei gegebenem			<br>
+    Parameter #2 wirkt RE = undef wie RE = &quot;\s+&quot;.											<br>
+    <br>
+    Soll e_split eine bestimmte Anzahl von Feldern extrahieren (Parameter #3),			<br>
+    werden diese in aufsteigender Folge geliefert. $Ergebnisarray[-1] enth&auml;lt				<br>
+    gegebenenfalls den Reststring.														<br>
+    Bei negativem Parm #3 wird der Ergebnisarray *nicht* auf den Kopf gestellt 			<br>
+    (das &uuml;berlassen wir dem geneigten User). Der Reststring findet sich gegebenenfalls	<br>
+    in $Ergebnisarray[0].																	<br>
+    <br>
+    Standardm&auml;&szlig;ig werden feldumschlie&szlig;ende H&auml;kchen entfernt, ditto werden escapete		<br>
+    Trenner in *nicht* gequoteten Feldern unescaped.										<br>
+    Enth&auml;lt ein gequotetes Feld escapete H&auml;kchen, wie sie zum Quoten verwendet wurden, 	<br>
+    werden diese unescaped.																<br>
+    Setzt man Bit 0 von Parameter #4 (Parm #4 & 1 == 1), werden H&auml;kchen nicht entfernt,	<br>
+    und es wird nichts unescapet.															<br>
+    - Wird Parameter 3 auf einen Wert &lt;&gt; 0 gesetzt, enth&auml;lt das letzte (bzw. erste)		<br>
+      Feld des Ergebnisarrays den *unbehandelten* Rest-String. Dies gilt auch dann, wenn	<br>
+    der Quellstring zuf&auml;llig genau so viele Elemente enthielt, wie angefordert wurden!	<br>
+    <br>
+    Ist Bit 1 von Parameter #4 gesetzt (Parm #4 & 2 == 2), wird vor der Extraktion 		<br>
+    ein study() &uuml;ber den Quellstring ausgef&uuml;hrt.											<br>
+    <br>
+    Escapen:																				<br>
+    Trenner oder f&uuml;hrende/folgende H&auml;kchen k&ouml;nnen \-escaped werden, um sie au&szlig;er Funktion	<br>
+    zu setzen.																			<br>
+    Sollen Escapezeichen vor Trennern oder f/f-H&auml;kchen nicht auf diese wirken, sollten	<br>
+    sie ihrerseits \-escaped werden.														<br>
+    <br>
+    Trennverhalten mit H&auml;kchen:															<br>
+    Als umschlie&szlig;end werden nur gleichartige (&quot; oder ') H&auml;kchen akzeptiert.				<br>
+    (Mischformen sind f&uuml;r parse_line &uuml;brigens t&ouml;dlich. Wamm.)								<br>
+    Gequotete Felder erkennt e_split an der Folge (^|trenner)&quot;'....&quot;'(trenner|$).			<br>
+    D.h., ein &ouml;ffnendes H&auml;kchen wird *nicht* als Feldumschlie&szlig;er behandelt, wenn zwischen <br>
+    dem 'schlie&szlig;enden' H&auml;kchen und dem folgenden Trenner noch etwas steht.				<br>
+    Die Sequenz																			<br>
+    <br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...TRENNER&quot;Feld&quot;datenTRENNER...													<br>
+    <br>
+    wird als 																				<br>
+    <br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&quot;Feld&quot;daten																		<br>
+    <br>
+    geliefert. (anders als bei parse_line wird das mittige H&auml;kchen nicht als				<br>
+    Trennersurrogat bzw. beginnendes Quoting *innerhalb* des Tokens akzeptiert.)			<br>
+    <br>
+    Seltsame Feldbildungen k&ouml;nnen resultieren, wenn nicht gequotete Quelldaten			<br>
+    in der Folge																			<br>
+    <br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...TRENNER&quot;Daten von Feld1TRENNERDaten von Feld2&quot;TRENNER...						<br>
+    <br>
+    vorliegen. Das f&uuml;hrende H&auml;kchen von Feld1 wird identifiziert, e_split sucht den 		<br>
+    String auf die schlie&szlig;ende Sequenz (&quot;TRENNER) ab - und wird am Ende von Feld2 f&uuml;ndig.	<br>
+    Hmmm.																					<br>
+    <br>
+    Abhilfe																				<br>
+    &nbsp;&nbsp;&nbsp;#	mu&szlig; bei der Datenerzeugung stattfinden. Man escape alle f&uuml;hrenden oder folgenden	<br>
+    &nbsp;&nbsp;&nbsp;#	H&auml;kchen, oder man quote alle (verd&auml;chtigen?) Felder.								<br>
+    <br>
+    Schwierig wird's, wenn die Felddaten selber die &ouml;ffnende/schlie&szlig;ende Sequenz enthalten<br>
+    k&ouml;nnen. W&auml;hrend das Quoten normalerweise die Funktion des Trenner-Escapens &uuml;bernimmt	<br>
+    (was man nat&uuml;rlich alternativ auch machen kann), kann man hier sich behelfen,			<br>
+    indem man in den Felddaten enthaltene Trenner \-escaped.								<br>
+    <br>
+    Diskussion:																			<br>
+    e_split vs. Text::quote_words															<br>
+    <br>
+    Text::quote_words() bedient sich der Routine parse_line() zum Stringzerlegen.			<br>
+    Die folgenden Anmerkungen beziehen sich auf parse_line als Kernfunktion.				<br>
+    <br>
+    1. e_split ist zwischen 2,5 (kurze Strings) und f&uuml;nf mal (lange Strings) schneller	<br>
+    &nbsp;&nbsp;als parse_line																	<br>
+    2. e_split verh&auml;lt sich hinsichtlich der Behandlung von Quotingzeichen plausibler	<br>
+    &nbsp;&nbsp;#		als parse_line (siehe &quot;Trennverhalten mit H&auml;kchen&quot; weiter oben)					<br>
+    3. e_split vertr&auml;gt Mischformen (bspw. doppelte H&auml;kchen vorne, einfaches hinten).	<br>
+    &nbsp;&nbsp;parse_line liefert beim Auftreten solcher Kombis einen leeren Array<br>
+    <br>
+    TODO:
+	<ul>
+		<li>	eine effizientere Methode (RE), um n Elemente vom Ende des Strings zu liefern</li>
+		<li>    single/double quotes der Trenner (-RE) unterscheiden?</li>
+		<li>    usf.?</li>
+		<li> </li>
+	</ul>
+	
+	<p>&nbsp;</p><hr>
+    <table width="100%" cellpadding="5" border="0">
+    	<tr>
+    	<td width="80%"><h2><a name="verw">Verwendung</a></h2></td>
+    	<td width="20%" align="right">[<a href="#top">zur&uuml;ck</a>]&nbsp;<br>[<a href="#inst">weiter</a>]&nbsp;</td>
+    	</tr>
+    </table>
+    
+    	<p><b>Hinweis:</b> In den Anwendungsbeispielen heben wir ESplit.pm-spezifisches <b>fett</b> hervor.</p>
+    <font size="-1">
+    [<a href="#besp1">Anwendungsbeispiel 1</a>]<br>
+    [<a href="#besp2">Anwendungsbeispiel 2</a>]<br>
+    </font>
+    
+    <pre>
+		[$ex_1]
+    </pre>
+
+     <table width="100%" cellpadding="5" border="0">
+    	<tr>
+    	<td width="80%">&nbsp;
+    	</td>
+    	<td width="20%" align="right">[<a href="#besp1">zur&uuml;ck</a>]&nbsp;</td>
+    	</tr>
+    </table>   
+    
+    <hr>
+    <table width="100%" cellpadding="5" border="0">
+    	<tr>
+    	<td width="80%"><a name="besp2"><b>Anwendungsbeispiel 2:</b></a><br>
+    	</td>
+    	<td width="20%" align="right">[<a href="#besp1">zur&uuml;ck</a>]&nbsp;<br>[<a href="#inst">weiter</a>]&nbsp;</td>
+    	</tr>
+    </table>
+    
+    <pre>
+		[$ex_2]
+    </pre>
+	
+     <table width="100%" cellpadding="5" border="0">
+    	<tr>
+    	<td width="80%">&nbsp;
+    	</td>
+    	<td width="20%" align="right">[<a href="#besp1">zur&uuml;ck</a>]&nbsp;</td>
+    	</tr>
+    </table>  
+    
+    <p>&nbsp;</p>    <hr>
+    <table width="100%" cellpadding="5" border="0">
+    	<tr>
+    	<td width="80%"><h2><a name="inst">Installation</a></h2></td>
+    	<td width="20%" align="right">[<a href="#verw">zur&uuml;ck</a>]&nbsp;<br>[<a href="#fein">weiter</a>]&nbsp;</td>
+    	</tr>
+    </table>
+    <ol type="1">
+    	<li>Variante: ESplit.pm ins <code>../Perl5/lib</code> oder <code>../perl5/lib/site</code>-Verzeichnis kopieren.<br>
+        <li>Variante: ESplitc.pm in ein beliebiges Verzeichnis kopieren; dann sollte man im aufrufenden Skript die Zeile:<br>
+    	<code>BEGIN {push (@INC, 'Verzeichnis_wo_ESplit.pm_liegt');}</code><br>
+        notieren.
+    </ol>
+    
+    <p>&nbsp;</p><hr>
+    <table width="100%" cellpadding="5" border="0">
+    	<tr>
+    	<td width="80%"><h2><a name="fein">Feinheiten</a></h2></td>
+    	<td width="20%" align="right">[<a href="#inst">zur&uuml;ck</a>]&nbsp;<br>[<a href="#version">weiter</a>]&nbsp;</td>
+    	</tr>
+    </table>
+    
+    <table width="100%" border="0" cellpadding="5">
+        <tr bgcolor="#E6E6E6">
+            <td><b>&nbsp;<a name="[$item_anchor">[$item]</a></b></td>
+            <td align="right">[<a href="#fein">zur&uuml;ck</a>]&nbsp;<br>[<a href="#[$next_item_anchor]">weiter</a>]&nbsp;</td>
+        </tr>
+        <tr bgcolor="#F5F5F5"><td>
+        	<p>
+			[$item_description]
+			</p>
+        	</td>
+        <td >&nbsp;</td>
+    	</tr>
+    </table>
+
+    <p>&nbsp;</p><hr>
+    <table width="100%" border="0" cellpadding="5">
+    	<tr>
+    	<td width="80%"><h2><a name="version">Version</a></h2></td>
+    	<td width="20%" align="right">[<a href="#fein">zur&uuml;ck</a>]</td>
+    	</tr>
+    </table>
+    1.00 vom 07.06.2000
+    
+    <p>&nbsp;</p><hr>
+    <table width="100%" border="0" cellpadding="5">
+    	<tr>
+    	<td width="80%"><h2><a name="copy">Copyright</a></h2></td>
+    	<td width="20%" align="right">[<a href="#fein">zur&uuml;ck</a>]</td>
+    	</tr>
+    </table>
+    Copyright &copy; 2000 by Hartmut Camphausen. Alle Rechte vorbehalten. Dies ist freie Software. Sie kann unter denselben Bedingungen wie Perl selbst  ver&auml;ndert und/oder weitergegeben werden.
+    
+    <p>&nbsp;</p><hr>
+    <table width="100%" border="0" cellpadding="5">
+    	<tr>
+    	<td width="80%"><h2><a name="autor">Autor</a></h2></td>
+    	<td width="20%" align="right">[<a href="#fein">zur&uuml;ck</a>]</td>
+    	</tr>
+    </table>
+    Hartmut Camphausen &lt;<a href="mailto:h.camp@creagen.de">h.camp@creagen.de</a>&gt;
+    <p>&nbsp;</p>
+    </td>
+    <td width="10%">&nbsp;</td>
+</tr>
+</table>
+
+
+<p>&nbsp;</p>
+<table width="100%" cellspacing="0" cellpadding="0" border="0">
+<tr bgcolor="#CCCCCC"><td colspan="2"><font size="-2">&nbsp;</font></td></tr>
+<tr>
+	<td valign="top" align="left">
+	<font face="Courier New" size="-1">
+		zum <a href="#top" name="bop">Seitenanfang</a>
+	</font>
+	</td>
+	<td valign="top" align="right">
+	<font face="Courier New" size="-1">
+		Letzte &Auml;nderung am: 07.06.2000<br>
+		&copy; 1999 by H. Camphausen &lt;<a href="mailto:h.camp@creagen.de?subject=[CG]:">h.camp@creagen.de</a>&gt;
+	</font>	
+	</td>
+</tr>
+</table>
+
+</body>
+</html>

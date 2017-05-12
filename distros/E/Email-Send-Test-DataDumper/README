@@ -1,0 +1,27 @@
+This is Perl module Email::Send::Test::DataDumper.
+
+INSTALLATION
+
+Email::Send::Test::DataDumper installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan Email::Send::Test::DataDumper
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+DOCUMENTATION
+
+Email::Send::Test::DataDumper documentation is available as in POD. So you can do:
+
+    % perldoc Email::Send::Test::DataDumper
+
+to read the documentation online with your favorite pager.
+
+Nobuo Danjou

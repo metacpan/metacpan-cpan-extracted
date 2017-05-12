@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:http="http://schemas.xmlsoap.org/wsdl/http/"
+                  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+                  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                  xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/"
+                  xmlns:tns="http://tempuri.org/"
+                  xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/"
+                  xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/"
+                  targetNamespace="http://tempuri.org/"
+                  xmlns:wc="http://tempuri.org/"
+                  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xs:schema elementFormDefault="unqualified" targetNamespace="http://tempuri.org/">
+      <xs:element name="InputFlag">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Flag" type="xs:string" minOccurs="1"  maxOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="OutputFlag">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Flag" type="xs:string" minOccurs="1" maxOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:schema>
+  </wsdl:types>
+
+  <wsdl:message name="MsgIn"> <wsdl:part element="tns:InputFlag" name="MessageIn"/> </wsdl:message>
+  <wsdl:message name="MsgOut"> <wsdl:part element="tns:OutputFlag" name="MessageOut"/> </wsdl:message>
+
+  <wsdl:portType name="TestPort">
+    <wsdl:operation name="Test">
+      <wsdl:input  message="tns:MsgIn" />
+      <wsdl:output message="tns:MsgOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  
+  <wsdl:binding name="TestBind" type="tns:TestPort">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document" />
+
+    <wsdl:operation name="Test">
+      <soap:operation soapAction="urn:Test#Test" style="document" />
+ 
+      <wsdl:input>  <soap:body use="literal"/> </wsdl:input>
+      <wsdl:output> <soap:body use="literal"/> </wsdl:output>
+    </wsdl:operation>
+
+  </wsdl:binding>
+
+  <wsdl:service name="Test">
+    <wsdl:port name="Test" binding="tns:TestBind">
+      <soap:address location="http://127.0.0.1:8089/WS/Test" />
+    </wsdl:port>
+
+  </wsdl:service>
+
+</wsdl:definitions>

@@ -1,0 +1,102 @@
+
+[!
+
+sub title   { $epreq -> gettext ('txt:setup_name_title') } 
+sub condition 
+	{ 
+    my ($self, $r) = @_ ;
+    $r -> {data}{action} eq 'master' || $r -> {data}{action} eq 'addslave'
+    }
+    
+
+!]
+
+[$ sub show $]
+[-
+$sthc   = 0 ;
+$Jeder = $sthc?'Jeder':'Jede' ;
+$des = $sthc?'des':'der' ;
+$der = $sthc?'der':'die' ;
+$addslave = $epreq -> {data}{action} eq 'addslave' ;
+
+
+
+-]
+
+<br>
+[- $escmode = 0 -]
+<p class="cCenter">[= txt:setup_name1 =]</p>
+[$if $addslave $]
+<p class="cCenter">[= txt:setup_name2 =]</p>
+<p class="cCenter">[= txt:setup_name3 =]</p>
+<p class="cCenter">[= txt:setup_name4 =]</p>
+<p class="cCenter">[= txt:setup_name5 =]</p>
+[$endif$]
+[- $escmode = 7 -]
+<br>
+
+
+
+
+[-
+
+Embperl::MyForm -> showfields (
+	[
+	{ name => 'hostcn', text => "Name des neuen BB-5000 Gerätes",
+		validate => [required => 1, -msg => 'Name darf nur Buchstaben, Zahlen, Bindestrich und Leerzeichen enthalten',
+                matches_regex => '^[-a-zA-Z0-9 ]*$'  ],
+		class => 'cNoWidth', width => 1},
+        ($addslave?(
+ 	  { name => 'bbtype', text => 'Typ',width=> 1,
+        	type => 'select', class => 'cNoWidth', values => \@typevals, options => \@typenames},
+ 	  { name => 'hostcontainer', text => 'Anlegen in',width=> 1,
+        	type => 'select', xdatasrc => 'hostconfig_container', class => 'cNoWidth'},
+ 	  { name => 'hostbasedon', text => 'Basiert auf',width=> 1,
+        	type => 'select', xdatasrc => 'virtual_bb5000', class => 'cNoWidth'},
+ 	  { name => 'localadmin', text => 'Lokaler Admin Benutzer',width=> 1,
+        	type => 'select', xdatasrc => 'admin_user', validate => [ required => 1, ], class => 'cNoWidth'},
+        ):()),
+
+
+            ]);
+-]
+
+
+
+[$endsub$]
+
+[!
+
+
+
+sub verify
+
+    {
+    my ($self, $r) = @_ ;    
+
+    return 1 if (!$fdat{-next} || $r -> {data}{action} eq 'master') ;
+
+=pod
+
+# verification code goes here, return 1 on success
+
+    my $ldap = $r->{ldap};    
+
+    my $escaped  = $ldap->is_dn_safely_escaped($fdat{hostcn});
+    my $hostcn = ($escaped ? $fdat{hostcn} : $ldap->dn_element_escape($fdat{hostcn}));
+    my $host = eval { $ldap -> search ('=hostConfig', "(cn=$hostcn)", 'sub') } ;
+    $fdat{-msg} = $@ and return 0 ;
+
+    if ($host && keys %$host)
+        {
+        $fdat{-msg} = _t('err:setup_name_exists', $fdat{hostcn}) ;
+        return 0 ;    
+        }
+=cut
+
+    return 1 ;    
+    }
+
+
+!]
+

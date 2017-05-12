@@ -1,0 +1,24 @@
+PREREQUISITES
+
+In order to install and use this package you will need:
+
+XML::Parser >=2.31
+Symmetrix box with VCM enabled *)
+WideSky 5.1 or higher with "Device masking" option licensed via symlmf
+/opt/emc/WideSky/*/bin in your $PATH
+
+
+
+INSTALLATION
+
+Just follow the usual procedure:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+-------------------------------
+*) Be sure that you can see VCM device - verify with vcmfind command.
+   If vcmfind failed, try execute "symcfg discover" and try execute "vcmfind" again.

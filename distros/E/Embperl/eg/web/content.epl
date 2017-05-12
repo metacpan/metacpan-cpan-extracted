@@ -1,0 +1,16 @@
+[- $r = shift -]
+<table width="100%" cellspacing="0" cellpadding="0" border="0">
+    <tr>
+        <td valign="top">
+        [# 
+        <img src="/eg/images/aim/h_leer.gif/Annotate?text=ABOUT&gravity=NorthWest&pointsize=16&antialias=true&y=-6&x=3&font=/usr/msrc/fonts/ocraext.ttf" width="152" height="19"> 
+        <br>
+        #]
+        <br>
+	[- Execute ({inputfile => '*', syntax => 'Text'}) -]</td>
+        <td valign="top" align="left" width="152" class="cContentNews">
+        [- Execute ('news.epl') -] 
+        </td>
+    </tr>
+</table>
+

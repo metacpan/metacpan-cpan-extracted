@@ -1,0 +1,27 @@
+package --pack_name--;
+
+require ExtUtils::FakeConfig;
+
+my $values = <<'EOT';
+--spec--
+EOT
+
+# should these be overridable by the user?
+my $cc_p = ( ExtUtils::FakeConfig::find_program( '--cc--' ) )[0];
+$cc_p || warn "Unable to find compiler '--cc--'";
+$cc_p =~ s/[\\\/]bin[\\\/]?$//;
+my $nmake = ( ExtUtils::FakeConfig::find_program( 'nmake' ) )[1];
+my $dmake = ( ExtUtils::FakeConfig::find_program( 'dmake' ) )[1];
+
+my %values = ( CC   => $cc_p,
+               PERL => $Config::Config{prefix},
+               MAKE => $nmake || $dmake,
+               );
+
+$values =~ s/\((\w+)\)/$values{$1}/ge;
+
+my @arr = $values =~ m/^(\w+)\=[\'\"](.+)[\'\"]$/mg;
+
+eval 'use ExtUtils::FakeConfig @arr';
+
+1;

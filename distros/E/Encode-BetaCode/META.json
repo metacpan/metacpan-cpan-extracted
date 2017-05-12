@@ -1,0 +1,49 @@
+{
+   "abstract" : "Perl module for converting to and from Beta Code",
+   "author" : [
+      "Dimitrios - Georgios Kontopoulos <dgkontopoulos@member.fsf.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0514, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Encode-BetaCode",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Unicode::Normalize" : "1.17",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "https://github.com/dgkontopoulos/Encode-BetaCode"
+      }
+   },
+   "version" : "0.09",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}
+

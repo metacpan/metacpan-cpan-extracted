@@ -1,0 +1,24 @@
+Revision history for Perl extension Exporter::Renaming.
+
+0.01  Fri Sep  5 20:50:30 2003
+	- original version; created by h2xs 1.22 with options
+		-AX -n Exporter::Renaming
+
+
+1.16  Mon Sep  8 19:36:57 CEST 2003
+         - first release
+
+1.17  Sun Jul 13 23:59:30 CEST 2008
+         - fixed bug in test file t/1.t
+
+1.18  Mon Jul 14 17:03:09 CEST 2008
+         - A perl buglet (if new Exporter runs with old Carp) leads
+           to two failed tests.
+           fixed, released
+
+1.19  Fr 23 Apr 2010 23:54:37 CEST
+        - [rt.cpan.org #56367] renaming on export_to_import() too
+        fixed by also overriding export_to_level
+        - [rt.cpan.org #56368] modules capturing import vs "no Exporter::Renaming"
+        fixed by adding a dedicated variable $renaming_on
+        

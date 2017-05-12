@@ -1,0 +1,187 @@
+#!C:\Perl\bin\perl.exe 
+###################################################################################
+#
+#   Embperl - Copyright (c) 1997-2008 Gerald Richter / ecos gmbh  www.ecos.de
+#   Embperl - Copyright (c) 2008-2014 Gerald Richter
+#
+#   You may distribute under the terms of either the GNU General Public
+#   License or the Artistic License, as specified in the Perl README file.
+#   For use with Apache httpd and mod_perl, see also Apache copyright.
+#
+#   THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
+#   IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+#   WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+#
+#   $Id: embpmsgid.pl.templ 1578075 2014-03-16 14:01:14Z richter $
+#
+###################################################################################
+
+
+BEGIN 
+    {
+    %Embperl::initparam = (use_env => 1, use_redirect_env => 1) ;
+    $ENV{EMBPERL_SESSION_HANDLER_CLASS} = 'no' ;
+    }	
+
+use Embperl;
+use Data::Dumper ;
+use Getopt::Long ;
+
+
+if (!@ARGV)
+    {
+    print qq{
+Extract message ids from Embperl files
+
+usage: $0 [options] [files]
+
+options:
+    --datadumper (-d) <file>    Use the given file to read and 
+                                store message ids. Must be valid 
+                                Perl code which defines $msgids
+    --dbm (-b) <file>           Use the given file to read and
+                                store message ids. Must be a dbm 
+                                file.
+    --languages (-l) <code>     Specify language code to generate
+                                Can be given multiple times
+} ;    
+    exit (1) ;
+    } ;
+
+
+my $ret = GetOptions ("datadumper|d=s", "dbm|b=s", 'languages|l=s@') ; 
+
+exit (1) if (!$ret) ;
+
+if ($opt_datadumper && -f $opt_datadumper)
+    {
+    $msgids = do $opt_datadumper ;
+    die $@ if ($@) ;
+
+    if (!ref $msgid eq 'HASH')
+        {
+        print SDTERR "File $opt_datadumper doesn't defines a hashref of message ids\n" ;
+        exit (1) ;
+        }
+
+    }
+elsif ($opt_dbm)
+    {
+    tie %msghash,  'DB_File', $opt_dbm, O_CREAT|O_RDWR or die "Cannot open $opt_dbm ($!)" ;
+    
+    $msgids = \%msghash ;
+    }
+
+if (keys %$msgids)
+    {
+    print "Found languages: " ;
+    foreach (sort keys %$msgids)
+        {
+        print $_, ' ' ;
+        }
+    print "\n" ;
+    }
+
+if (@opt_languages)
+    {
+    print "Add languages: " ;
+    foreach (sort @opt_languages)
+        {
+        print $_, ' ' ;
+        $msgids -> {$_} ||= {} ;
+        }
+    print "\n" ;
+    }
+elsif (!keys %$msgids)
+    {
+    $msgids -> {'en'} = {} ;
+    }
+
+
+foreach my $fn (@ARGV)
+    {
+    my $out ;
+    my @errors ;
+    Embperl::Execute ({use_env => 1, use_redirect_env => 1, syntax => 'MsgIdExtract', 
+                inputfile => $fn, 
+                output => \$out,
+                errors => \@errors}) ;
+    if (@errors)
+        {
+        print join ("\n", @errors) ;
+        last ;
+        }
+    }
+
+
+$Data::Dumper::Sortkeys  = \&{ sub {[ sort { $a cmp $b } keys %{$_[0]} ]} } ;
+
+print Data::Dumper -> Dump ([\%Embperl::Syntax::MsgIdExtract::Ids], ['msgids']) ;
+
+if ($opt_datadumper || $opt_dbm)
+    {
+    if (keys %$msgids)
+        {
+        foreach my $lang (sort keys %$msgids)
+            {
+            foreach my $k (keys %Embperl::Syntax::MsgIdExtract::Ids)
+                {
+                $msgids -> {$lang}{$k} = '' if (!exists $msgids -> {$lang}{$k}) ;
+                }
+            }
+        }
+
+    if ($opt_datadumper)
+        {
+        rename $opt_datadumper, "$opt_datadumper.bak" ;
+        open FH, ">$opt_datadumper" or die "Cannot open $opt_datadumper ($!)" ;
+        $Data::Dumper::Indent = 1 ;
+        #$Data::Dumper::Useqq  = 1 ;
+        print FH Data::Dumper -> Dump  ([$msgids], ['msgids']) ;
+        close FH ;
+        }
+    }
+
+
+__END__
+ 
+=head1 NAME
+ 
+embpmsgid.pl - Extract message ids from Embperl files
+ 
+=head1 SYNOPSIS
+ 
+embpmsgid.pl [I<options>] [I<files>]
+ 
+=head1 DESCRIPTION
+
+Extract message ids (C<[= ... =]> blocks) from Embperl files given on 
+command line.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--datadumper>=I<file>, B<-d>
+
+Use the given file to read and store message ids. Must be valid Perl 
+code which defines $msgids.
+
+=item B<--dbm>=I<file>, B<-b>
+
+Use the given file to read and store message ids. Must be a dbm file.
+
+=item B<--languages>=I<code>, B<-l>
+
+Specify language code to generate. Can be given multiple times.
+
+=back
+
+=head1 SEE ALSO
+
+L<Embperl>
+
+=head1 AUTHOR
+
+G. Richter (richter at embperl dot org)
+

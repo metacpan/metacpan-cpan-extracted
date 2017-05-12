@@ -1,0 +1,81 @@
+#!/usr/bin/perl -w
+
+use strict ;
+use vars qw( $VERSION ) ;
+use Eesh qw( :all ) ;
+
+$VERSION = '1.1' ;
+
+=head1 NAME
+
+grab - Deiconify, deshade, raise, focus windows by title fragment or regex
+
+=head1 SYNOPSIS
+
+Fragment of title:
+
+   grab Terminal
+
+A regular expression:
+
+   grab "/^ab.*c$/"
+
+If you have Regexp::Shellish, you can rephrase that last one as:
+   
+   grab "ab*c"
+
+=head1 DESCRIPTION
+
+When a window is iconified, shaded, or lowered, grab it.
+
+Takes title fragments regular expressions and (if you have installed
+Regexp::Shellish) shell-like wildcards.  Remember to quote the
+wildcards.
+
+=head1 AUTHOR
+
+Barrie Slaymaker <barries@slaysys.com>
+
+=cut
+
+my $debug = 1 ;
+
+eval {
+   use Regexp::Shellish 0.92 qw( compile_shellish ) ;
+   1 ;
+} ;
+my $got_shellish = ! $@ ;
+
+print "Regexp::Shellish detected\n" if $debug && $got_shellish ;
+
+my $re = join(
+   '|',
+   map {
+      $_ =~ m{^/(.*)/$}
+         ? $1
+	 : $got_shellish
+	    ? compile_shellish( $_, { anchors => 0 } )
+	    : quotemeta $_
+   } @ARGV
+) ;
+
+print "Regexp: $re\n" if $debug ;
+
+e_open() ;
+
+for ( split( /^/m, e_recv( 'window_list' ) ) ) {
+   chomp ;
+   my ( $id, $title ) = m{^\s*(\S*).*?:\s*(.*)} ;
+
+   next unless $title =~ $re ;
+
+   my $is_iconified = e_recv( "win_op $id iconify ?" ) =~ /yes/ ;
+   my $is_shaded    = e_recv( "win_op $id shade ?"   ) =~ /yes/ ;
+
+   print "Grabbing $title\n" ;
+   e_send( "win_op $id shade"   ) if     $is_shaded ;
+   e_send( "win_op $id iconify" ) if     $is_iconified ;
+   e_send( "win_op $id raise"   ) unless $is_iconified ;
+   e_send( "win_op $id focus"   ) ;
+}
+

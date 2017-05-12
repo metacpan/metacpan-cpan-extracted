@@ -1,0 +1,1758 @@
+NAME
+    ElasticSearch::SearchBuilder - A Perlish compact query language for
+    ElasticSearch
+
+VERSION
+    Version 0.16
+
+    Compatible with ElasticSearch version 0.19.11
+
+BREAKING CHANGE
+    The 'text' queries have been renamed 'match' queries in elasticsearch
+    0.19.9. If you need support for an older version of elasticsearch,
+    please use
+    <https://metacpan.org/release/DRTECH/ElasticSearch-SearchBuilder-0.15/>.
+
+DESCRIPTION
+    The Query DSL for ElasticSearch (see Query DSL
+    <http://www.elasticsearch.org/guide/reference/query-dsl>), which is used
+    to write queries and filters, is simple but verbose, which can make it
+    difficult to write and understand large queries.
+
+    ElasticSearch::SearchBuilder is an SQL::Abstract-like query language
+    which exposes the full power of the query DSL, but in a more compact,
+    Perlish way.
+
+    This module is considered stable. If you have suggestions for
+    improvements to the API or the documenation, please contact me.
+
+SYNOPSIS
+        my $sb = ElasticSearch::SearchBuilder->new();
+        my $query = $sb->query({
+            body    => 'interesting keywords',
+            -filter => {
+                status  => 'active',
+                tags    => ['perl','python','ruby'],
+                created => {
+                    '>=' => '2010-01-01',
+                    '<'  => '2011-01-01'
+                },
+            }
+        })
+
+    NOTE: "ElasticSearch::SearchBuilder" is fully integrated with the
+    ElasticSearch API. Wherever you can specify "query", "filter" or
+    "facet_filter" in ElasticSearch, you can automatically use SearchBuilder
+    by specifying "queryb", "filterb", "facet_filterb" instead.
+
+        $es->search( queryb  => { body => 'interesting keywords' } )
+
+METHODS
+  new()
+        my $sb = ElasticSearch::SearchBuilder->new()
+
+    Creates a new instance of the SearchBuilder - takes no parameters.
+
+  query()
+        my $es_query = $sb->query($compact_query)
+
+    Returns a query in the ElasticSearch query DSL.
+
+    $compact_query can be a scalar, a hash ref or an array ref.
+
+        $sb->query('foo')
+        # { "query" : { "match" : { "_all" : "foo" }}}
+
+        $sb->query({ ... }) or $sb->query([ ... ])
+        # { "query" : { ... }}
+
+  filter()
+        my $es_filter = $sb->filter($compact_filter)
+
+    Returns a filter in the ElasticSearch query DSL.
+
+    $compact_filter can be a scalar, a hash ref or an array ref.
+
+        $sb->filter('foo')
+        # { "filter" : { "term" : { "_all" : "foo" }}}
+
+        $sb->filter({ ... }) or $sb->filter([ ... ])
+        # { "filter" : { ... }}
+
+INTRODUCTION
+    IMPORTANT: If you are not familiar with ElasticSearch then you should
+    read "ELASTICSEARCH CONCEPTS" before continuing.
+
+    This module was inspired by SQL::Abstract but they are not compatible
+    with each other.
+
+    The easiest way to explain how the syntax works is to give examples:
+
+  QUERY / FILTER CONTEXT
+    There are two contexts:
+
+    *   "filter" context
+
+        Filter are fast and cacheable. They should be used to
+        include/exclude docs, based on simple term values. For instance,
+        exclude all docs that have neither tag "perl" nor "python".
+
+        Typically, most of your clauses should be filters, which reduce the
+        number of docs that need to be passed to the query.
+
+    *   "query" context
+
+        Queries are smarter than filters, but more expensive, as they have
+        to calculate search relevance (ie "_score").
+
+        They should be used where:
+
+        *   relevance is important, eg: in a search for tags "perl" or
+            "python", a doc that has BOTH tags is more relevant than a doc
+            that has only one
+
+        *   where search terms need to be analyzed as full text, eg: find me
+            all docs where the "content" field includes the words "Perl is
+            GREAT", no matter how those words are capitalized.
+
+    The available operators (and the query/filter clauses that are
+    generated) differ according to which context you are in.
+
+    The initial context depends upon which method you use: "query()" puts
+    you into "query" context, and "filter()" into "filter" context.
+
+    However, you can switch from one context to another as follows:
+
+        $sb->query({
+
+            # query context
+            foo     => 1,
+            bar     => 2,
+
+            -filter => {
+                # filter context
+                foo     => 1,
+                bar     => 2,
+
+                -query  => {
+                    # query context
+                    foo => 1
+                }
+            }
+        })
+
+   -filter | -not_filter
+    Switch from query context to filter context:
+
+        # query field content for 'brown cow', and filter documents
+        # where status is 'active' and tags contains the term 'perl'
+        {
+            content => 'brown cow',
+            -filter => {
+                status => 'active',
+                tags   => 'perl'
+            }
+        }
+
+
+        # no query, just a filter:
+        { -filter => { status => 'active' }}
+
+    See Filtered Query
+    <http://www.elasticsearch.org/guide/reference/query-dsl/filtered-query.h
+    tml> and Constant Score Query
+    <http://www.elasticsearch.org/guide/reference/query-dsl/constant-score-q
+    uery.html>
+
+   -query | -not_query
+    Use a query as a filter:
+
+        # query field content for 'brown cow', and filter documents
+        # where status is 'active', tags contains the term 'perl'
+        # and a match query on field title contains 'important'
+        {
+            content => 'brown cow',
+            -filter => {
+                status => 'active',
+                tags   => 'perl',
+                -query => {
+                    title => 'important'
+                }
+            }
+        }
+
+    See Query Filter
+    <http://www.elasticsearch.org/guide/reference/query-dsl/query-filter.htm
+    l>
+
+  KEY-VALUE PAIRS
+    Key-value pairs are equivalent to the "=" operator, discussed below.
+    They are converted to "match" queries or "term" filters:
+
+        # Field 'foo' contains term 'bar'
+        # equiv: { foo => { '=' => 'bar' }}
+        { foo => 'bar' }
+
+
+
+        # Field 'foo' contains 'bar' or 'baz'
+        # equiv: { foo => { '=' => ['bar','baz'] }}
+        { foo => ['bar','baz']}
+
+
+        # Field 'foo' contains terms 'bar' AND 'baz'
+        # equiv: { foo => { '-and' => [ {'=' => 'bar'}, {'=' => 'baz'}] }}
+        { foo => ['-and','bar','baz']}
+
+
+        ### FILTER ONLY ###
+
+        # Field 'foo' is missing ie has no value
+        # equiv: { -missing => 'foo' }
+        { foo => undef }
+
+  AND|OR LOGIC
+    Arrays are OR'ed, hashes are AND'ed:
+
+        # tags = 'perl' AND status = 'active:
+        {
+            tags   => 'perl',
+            status => 'active'
+        }
+
+        # tags = 'perl' OR status = 'active:
+        [
+            tags   => 'perl',
+            status => 'active'
+        ]
+
+        # tags = 'perl' or tags = 'python':
+        { tags => [ 'perl','python' ]}
+        { tags => { '=' => [ 'perl','python' ] }}
+
+        # tags begins with prefix 'p' or 'r'
+        { tags => { '^' => [ 'p','r' ] }}
+
+    The logic in an array can changed from "OR" to "AND" by making the first
+    element of the array ref "-and":
+
+        # tags has term 'perl' AND 'python'
+
+        { tags => ['-and','perl','python']}
+
+        {
+            tags => [
+                -and => { '=' => 'perl'},
+                        { '=' => 'python'}
+            ]
+        }
+
+    However, the first element in an array ref which is used as the value
+    for a field operator (see "FIELD OPERATORS") is not special:
+
+        # WRONG
+        { tags => { '=' => [ '-and','perl','python' ] }}
+
+        # RIGHT
+        { tags => ['-and' => [ {'=' => 'perl'}, {'=' => 'python'} ] ]}
+
+    ...otherwise you would never be able to search for the term "-and". So
+    if you might possibly have the terms "-and" or "-or" in your data, use:
+
+        { foo => {'=' => [....] }}
+
+    instead of:
+
+        { foo => [....]}
+
+   -and | -or | -not
+    These unary operators allow you apply "and", "or" and "not" logic to
+    nested queries or filters.
+
+        # Field foo has both terms 'bar' and 'baz'
+        { -and => [
+                foo => 'bar',
+                foo => 'baz'
+        ]}
+
+        # Field 'name' contains 'john smith', or the name field is missing
+        # and the 'desc' field contains 'john smith'
+
+        { -or => [
+            { name => 'John Smith' },
+            {
+                desc     => 'John Smith'
+                -filter  => { -missing => 'name' },
+            }
+        ]}
+
+    The "-and", "-or" and "-not" constructs emit "bool" queries when in
+    query context, and "and", "or" and "not" clauses when in filter context.
+
+    See also: "NAMED FILTERS", Bool Query
+    <http://www.elasticsearch.org/guide/reference/query-dsl/bool-query.html>
+    , And Filter
+    <http://www.elasticsearch.org/guide/reference/query-dsl/and-filter.html>
+    , Or Filter
+    <http://www.elasticsearch.org/guide/reference/query-dsl/or-filter.html>
+    and Not Filter
+    <http://www.elasticsearch.org/guide/reference/query-dsl/not-filter.html>
+
+  FIELD OPERATORS
+    Most operators (eg "=", "gt", "geo_distance" etc) are applied to a
+    particular field. These are known as "Field Operators". For example:
+
+        # Field foo contains the term 'bar'
+        { foo => 'bar' }
+        { foo => {'=' => 'bar' }}
+
+        # Field created is between Jan 1 and Dec 31 2010
+        { created => {
+            '>='  => '2010-01-01',
+            '<'   => '2011-01-01'
+        }}
+
+        # Field foo contains terms which begin with prefix 'a' or 'b' or 'c'
+        { foo => { '^' => ['a','b','c' ]}}
+
+    Some field operators are available as symbols (eg "=", "*", "^", "gt")
+    and others as words (eg "geo_distance" or "-geo_distance" - the dash is
+    optional).
+
+    Multiple field operators can be applied to a single field. Use "{}" to
+    imply "this AND that":
+
+        # Field foo has any value from 100 to 200
+        { foo => { gte => 100, lte => 200 }}
+
+        # Field foo begins with 'p' but is not python
+        { foo => {
+            '^'  => 'p',
+            '!=' => 'python'
+        }}
+
+    Or "[]" to imply "this OR that"
+
+        # foo is 5 or foo greater than 10
+        { foo => [
+            { '='  => 5  },
+            { 'gt' => 10 }
+        ]}
+
+    All word operators may be negated by adding "not_" to the beginning, eg:
+
+        # Field foo does NOT contain a term beginning with 'bar' or 'baz'
+        { foo => { not_prefix => ['bar','baz'] }}
+
+  UNARY OPERATORS
+    There are other operators which don't fit this "{ field => { op => value
+    }}" model.
+
+    For instance:
+
+    *   An operator might apply to multiple fields:
+
+            # Search fields 'title' and 'content' for text 'brown cow'
+            {
+                -match => {
+                    query   => 'brown cow',
+                    fields  => ['title','content']
+                }
+            }
+
+    *   The field might BE the value:
+
+            # Find documents where the field 'foo' is blank or undefined
+            { -missing => 'foo' }
+
+            # Find documents where the field 'foo' exists and has a value
+            { -exists => 'foo' }
+
+    *   For combining other queries or filters:
+
+            # Field foo has terms 'bar' and 'baz' but not 'balloo'
+            {
+                -and => [
+                    foo => 'bar',
+                    foo => 'baz',
+                    -not => { foo => 'balloo' }
+                ]
+            }
+
+    *   Other:
+
+            # Script query
+            { -script => "doc['num1'].value > 1" }
+
+    These operators are called "unary operators" and ALWAYS begin with a
+    dash "-" to distinguish them from field names.
+
+    Unary operators may also be prefixed with "not_" to negate their
+    meaning.
+
+MATCH ALL
+  -all
+    The "-all" operator matches all documents:
+
+        # match all
+        { -all => 1  }
+        { -all => 0  }
+        { -all => {} }
+
+    In query context, the "match_all" query usually scores all docs as 1 (ie
+    having the same relevance). By specifying a "norms_field", the relevance
+    can be read from that field (at the cost of a slower execution time):
+
+        # Query context only
+        { -all =>{
+            boost       => 1,
+            norms_field => 'doc_boost'
+        }}
+
+EQUALITY
+    These operators answer the question: "Does this field contain this
+    term?"
+
+    Filter equality operators work only with exact terms, while query
+    equality operators (the "match" family of queries) will "do the right
+    thing", ie work with terms for "not_analyzed" fields and with analyzed
+    text for "analyzed" fields.
+
+  EQUALITY (QUERIES)
+   = | -match | != | <> | -not_match
+    These operators all generate "match" queries:
+
+        # Analyzed field 'title' contains the terms 'Perl is GREAT'
+        # (which is analyzed to the terms 'perl','great')
+        { title => 'Perl is GREAT' }
+        { title => { '='  => 'Perl is GREAT' }}
+        { title => { match => 'Perl is GREAT' }}
+
+        # Not_analyzed field 'status' contains the EXACT term 'ACTIVE'
+        { status => 'ACTIVE' }
+        { status => { '='  => 'ACTIVE' }}
+        { status => { match => 'ACTIVE' }}
+
+        # Same as above but with extra parameters:
+        { title => {
+            match => {
+                query                => 'Perl is GREAT',
+                boost                => 2.0,
+                operator             => 'and',
+                analyzer             => 'default',
+                fuzziness            => 0.5,
+                fuzzy_rewrite        => 'constant_score_default',
+                lenient              => 1,
+                max_expansions       => 100,
+                minimum_should_match => 2,
+                prefix_length        => 2,
+            }
+        }}
+
+    Operators "<>", "!=" and "not_match" are synonyms for each other and
+    just wrap the operator in a "not" clause.
+
+    See Match Query
+    <http://www.elasticsearch.org/guide/reference/query-dsl/match-query.html
+    >
+
+   == | -phrase | -not_phrase
+    These operators look for a complete phrase.
+
+    For instance, given the text
+
+        The quick brown fox jumped over the lazy dog.
+
+        # matches
+        { content => { '==' => 'Quick Brown' }}
+
+        # doesn't match
+        { content => { '==' => 'Brown Quick' }}
+        { content => { '==' => 'Quick Fox'   }}
+
+    The "slop" parameter can be used to allow the phrase to match words in
+    the same order, but further apart:
+
+        # with other parameters
+        { content => {
+            phrase => {
+                query    => 'Quick Fox',
+                slop     => 3,
+                analyzer => 'default'
+                boost    => 1,
+                lenient  => 1,
+        }}
+
+    See Match Query
+    <http://www.elasticsearch.org/guide/reference/query-dsl/match-query.html
+    >
+
+   Multi-field -match | -not_match
+    To run a "match" | "=", "phrase" or "phrase_prefix" query against
+    multiple fields, you can use the "-match" unary operator:
+
+        {
+            -match => {
+                query                => "Quick Fox",
+                type                 => 'boolean',
+                fields               => ['content','title'],
+
+                use_dis_max          => 1,
+                tie_breaker          => 0.7,
+
+                boost                => 2.0,
+                operator             => 'and',
+                analyzer             => 'default',
+                fuzziness            => 0.5,
+                fuzzy_rewrite        => 'constant_score_default',
+                lenient              => 1,
+                max_expansions       => 100,
+                minimum_should_match => 2,
+                prefix_length        => 2,
+            }
+        }
+
+    The "type" parameter can be "boolean" (equivalent of "match" | "=")
+    which is the default, "phrase" or "phrase_prefix".
+
+    See Multi-match Query
+    <http://www.elasticsearch.org/guide/reference/query-dsl/multi-match-quer
+    y.html>.
+
+   -term | -terms | -not_term | -not_terms
+    The "term"/"terms" operators are provided for completeness. You should
+    almost always use the "match"/"=" operator instead.
+
+    There are only two use cases:
+
+    *   To find the exact (ie not analyzed) term 'foo' in an analyzed field:
+
+            { title => { term => 'foo' }}
+
+    *   To match a list of possible terms, where more than 1 value must
+        match:
+
+            # match 2 or more of these tags
+            { tags => {
+                terms => {
+                    value         => ['perl','python','php'],
+                    minimum_match => 2,
+                    boost         => 1,
+                }
+            }}
+
+        The above can also be achieved with the "-bool" operator.
+
+    "term" and "terms" are synonyms, as are "not_term" and "not_terms".
+
+  EQUALITY (FILTERS)
+   = | -term | -terms | <> | != | -not_term | -not_terms
+    These operators result in "term" or "terms" filters, which look for
+    fields which contain exactly the terms specified:
+
+        # Field foo has the term 'bar':
+        { foo => 'bar' }
+        { foo => { '='    => 'bar' }}
+        { foo => { 'term' => 'bar' }}
+
+        # Field foo has the term 'bar' or 'baz'
+        { foo => ['bar','baz'] }
+        { foo => { '='     => ['bar','baz'] }}
+        { foo => { 'term'  => ['bar','baz'] }}
+
+    "<>" and "!=" are synonyms:
+
+        # Field foo does not contain the term 'bar':
+        { foo => { '!=' => 'bar' }}
+        { foo => { '<>' => 'bar' }}
+
+        # Field foo contains neither 'bar' nor 'baz'
+        { foo => { '!=' => ['bar','baz'] }}
+        { foo => { '<>' => ['bar','baz'] }}
+
+    The "terms" filter can take an "execution" parameter which affects how
+    the filter of multiple terms is executed and cached.
+
+    For instance:
+
+        { foo => {
+            -terms => {
+                value       => ['foo','bar'],
+                execution   => 'bool'
+            }
+        }}
+
+    See Term Filter
+    <http://www.elasticsearch.org/guide/reference/query-dsl/term-filter.html
+    > and Terms Filter
+    <http://www.elasticsearch.org/guide/reference/query-dsl/terms-filter.htm
+    l>
+
+RANGES
+  lt | gt | lte | gte | < | <= | >= | > | -range | -not_range
+    These operators imply a range query or filter, which can be numeric or
+    alphabetical.
+
+        # Field foo contains terms between 'alpha' and 'beta'
+        { foo => {
+            'gte'   => 'alpha',
+            'lte'   => 'beta'
+        }}
+
+        # Field foo contains numbers between 10 and 20
+        { foo => {
+            'gte'   => '10',
+            'lte'   => '20'
+        }}
+
+        # boost a range  *** query only ***
+        { foo => {
+            range => {
+                gt      => 5,
+                gte     => 5,
+                lt      => 10,
+                lte     => 10,
+                boost   => 2.0
+            }
+        }}
+
+    For queries, "<" is a synonym for "lt", ">" for "gt" etc.
+
+    See Range Query
+    <http://www.elasticsearch.org/guide/reference/query-dsl/range-query.html
+    >
+
+    Note: for filter clauses, the "gt","gte","lt" and "lte" operators imply
+    a "range" filter, while the "<", "<=", ">" and ">=" operators imply a
+    "numeric_range" filter.
+
+    This does not mean that you should use the "numeric_range" version for
+    any field which contains numbers!
+
+    The "numeric_range" filter should be used for numbers/datetimes which
+    have many distinct values, eg "ID" or "last_modified". If you have a
+    numeric field with few distinct values, eg "number_of_fingers" then it
+    is better to use a "range" filter.
+
+    See Range Filter
+    <http://www.elasticsearch.org/guide/reference/query-dsl/range-filter.htm
+    l> and Numeric Range Filter
+    <http://www.elasticsearch.org/guide/reference/query-dsl/numeric-range-fi
+    lter.html>.
+
+MISSING OR NULL VALUES
+    *** Filter context only ***
+
+  -missing | -exists
+    You can use a "missing" or "exists" filter to select only docs where a
+    particular field exists and has a value, or is undefined or has no
+    value:
+
+        # Field 'foo' has a value:
+        { foo     => { exists  => 1 }}
+        { foo     => { missing => 0 }}
+        { -exists => 'foo'           }
+
+        # Field 'foo' is undefined or has no value:
+        { foo      => { missing => 1 }}
+        { foo      => { exists  => 0 }}
+        { -missing => 'foo'           }
+        { foo      => undef           }
+
+    The "missing" filter also supports the "null_value" and "existence"
+    parameters:
+
+        {
+            foo     => {
+                missing => {
+                    null_value => 1,
+                    existence  => 1,
+                }
+            }
+        }
+
+    OR
+
+        { -missing => {
+            field      => 'foo',
+            null_value => 1,
+            existence  => 1,
+        }}
+
+    See Missing Filter
+    <http://www.elasticsearch.org/guide/reference/query-dsl/missing-filter.h
+    tml> and Exists Filter
+    <http://www.elasticsearch.org/guide/reference/query-dsl/exists-filter.ht
+    ml>
+
+FULL TEXT SEARCH
+    *** Query context only ***
+
+    For most full text search queries, the "match" queries are what you
+    want. These analyze the search terms, and look for documents that
+    contain one or more of those terms. (See "EQUALITY (QUERIES)").
+
+  -qs | -query_string | -not_qs | -not_query_string
+    However, there is a more advanced query string syntax (see Lucene Query
+    Parser Syntax
+    <http://lucene.apache.org/core/old_versioned_docs/versions/3_5_0/querypa
+    rsersyntax.html>) which understands search terms like:
+
+       perl AND python tag:recent "this exact phrase" -apple
+
+    It is useful for "power" users, but has the disadvantage that, if the
+    syntax is incorrect, ES throws an error. You can use
+    ElasticSearch::QueryParser to fix any syntax errors.
+
+        # find docs whose 'title' field matches 'this AND that'
+        { title => { qs           => 'this AND that' }}
+        { title => { query_string => 'this AND that' }}
+
+        # With other parameters
+        { title => {
+            field => {
+                query                        => 'this that ',
+                default_operator             => 'AND',
+                analyzer                     => 'default',
+                allow_leading_wildcard       => 0,
+                lowercase_expanded_terms     => 1,
+                enable_position_increments   => 1,
+                fuzzy_min_sim                => 0.5,
+                fuzzy_prefix_length          => 2,
+                fuzzy_rewrite                => 'constant_score_default',
+                fuzzy_max_expansions         => 1024,
+                lenient                      => 1,
+                phrase_slop                  => 10,
+                boost                        => 2,
+                analyze_wildcard             => 1,
+                auto_generate_phrase_queries => 0,
+                rewrite                      => 'constant_score_default',
+                minimum_should_match         => 3,
+                quote_analyzer               => 'standard',
+                quote_field_suffix           => '.unstemmed'
+            }
+        }}
+
+    The unary form "-qs" or "-query_string" can be used when matching
+    against multiple fields:
+
+        { -qs => {
+                query                        => 'this AND that ',
+                fields                       => ['title','content'],
+                default_operator             => 'AND',
+                analyzer                     => 'default',
+                allow_leading_wildcard       => 0,
+                lowercase_expanded_terms     => 1,
+                enable_position_increments   => 1,
+                fuzzy_min_sim                => 0.5,
+                fuzzy_prefix_length          => 2,
+                fuzzy_rewrite                => 'constant_score_default',
+                fuzzy_max_expansions         => 1024,
+                lenient                      => 1,
+                phrase_slop                  => 10,
+                boost                        => 2,
+                analyze_wildcard             => 1,
+                auto_generate_phrase_queries => 0,
+                use_dis_max                  => 1,
+                tie_breaker                  => 0.7,
+                minimum_should_match         => 3,
+                quote_analyzer               => 'standard',
+                quote_field_suffix           => '.unstemmed'
+        }}
+
+    See Query-string Query
+    <http://www.elasticsearch.org/guide/reference/query-dsl/query-string-que
+    ry.html>
+
+  -mlt | -not_mlt
+    An "mlt" or "more_like_this" query finds documents that are "like" the
+    specified text, where "like" means that it contains some or all of the
+    specified terms.
+
+        # Field foo is like "brown cow"
+        { foo => { mlt => "brown cow" }}
+
+        # With other paramters:
+        { foo => {
+            mlt => {
+                like_text               => 'brown cow',
+                percent_terms_to_match  => 0.3,
+                min_term_freq           => 2,
+                max_query_terms         => 25,
+                stop_words              => ['the','and'],
+                min_doc_freq            => 5,
+                max_doc_freq            => 1000,
+                min_word_len            => 0,
+                max_word_len            => 20,
+                boost_terms             => 2,
+                boost                   => 2.0,
+                analyzer                => 'default'
+            }
+        }}
+
+        # multi fields
+        { -mlt => {
+            like_text               => 'brown cow',
+            fields                  => ['title','content']
+            percent_terms_to_match  => 0.3,
+            min_term_freq           => 2,
+            max_query_terms         => 25,
+            stop_words              => ['the','and'],
+            min_doc_freq            => 5,
+            max_doc_freq            => 1000,
+            min_word_len            => 0,
+            max_word_len            => 20,
+            boost_terms             => 2,
+            boost                   => 2.0,
+            analyzer                => 'default'
+        }}
+
+    See MLT Field Query
+    <http://www.elasticsearch.org/guide/reference/query-dsl/mlt-field-query.
+    html> and MLT Query
+    <http://www.elasticsearch.org/guide/reference/query-dsl/mlt-query.html>
+
+  -flt | -not_flt
+    An "flt" or "fuzzy_like_this" query fuzzifies all specified terms, then
+    picks the best "max_query_terms" differentiating terms. It is a
+    combination of "fuzzy" with "more_like_this".
+
+        # Field foo is fuzzily similar to "brown cow"
+        { foo => { flt => 'brown cow }}
+
+        # With other parameters:
+        { foo => {
+            flt => {
+                like_text       => 'brown cow',
+                ignore_tf       => 0,
+                max_query_terms => 10,
+                min_similarity  => 0.5,
+                prefix_length   => 3,
+                boost           => 2.0,
+                analyzer        => 'default'
+            }
+        }}
+
+        # Multi-field
+        flt => {
+            like_text       => 'brown cow',
+            fields          => ['title','content'],
+            ignore_tf       => 0,
+            max_query_terms => 10,
+            min_similarity  => 0.5,
+            prefix_length   => 3,
+            boost           => 2.0,
+            analyzer        => 'default'
+        }}
+
+    See FLT Field Query
+    <http://www.elasticsearch.org/guide/reference/query-dsl/flt-field-query.
+    html> and FLT Query
+    <http://www.elasticsearch.org/guide/reference/query-dsl/flt-query.html>
+
+PREFIX
+  PREFIX (QUERIES)
+   ^ | -phrase_prefix | -not_phrase_prefix
+    These operators use the "match_phrase_prefix" query.
+
+    For "analyzed" fields, it analyzes the search terms, and does a
+    "match_phrase" query, with a "prefix" query on the last term. Think
+    "auto-complete".
+
+    For "not_analyzed" fields, this behaves the same as the term-based
+    "prefix" query.
+
+    For instance, given the phrase "The quick brown fox jumped over the lazy
+    dog":
+
+        # matches
+        { content => { '^'             => 'qui'}}
+        { content => { '^'             => 'quick br'}}
+        { content => { 'phrase_prefix' => 'quick brown f'}}
+
+        # doesn't match
+        { content => { '^'             => 'quick fo' }}
+        { content => { 'phrase_prefix' => 'fox brow'}}
+
+    With extra options
+
+        { content => {
+            phrase_prefix => {
+                query          => "Brown Fo",
+                slop           => 3,
+                analyzer       => 'default',
+                boost          => 3.0,
+                max_expansions => 100,
+            }
+        }}
+
+    See
+    http://www.elasticsearch.org/guide/reference/query-dsl/match-query.html
+
+   -prefix | -not_prefix
+    The "prefix" query is a term-based query - no analysis takes place, even
+    on analyzed fields. Generally you should use "^" instead.
+
+        # Field 'lang' contains terms beginning with 'p'
+        { lang => { prefix => 'p' }}
+
+        # With extra options
+        { lang => {
+            'prefix' => {
+                value   => 'p',
+                boost   => 2,
+                rewrite => 'constant_score_default',
+
+            }
+        }}
+
+    See Prefix Query
+    <http://www.elasticsearch.org/guide/reference/query-dsl/prefix-query.htm
+    l>.
+
+  PREFIX (FILTERS)
+   ^ | -prefix | -not_prefix
+        # Field foo contains a term which begins with 'bar'
+        { foo => { '^'      => 'bar' }}
+        { foo => { 'prefix' => 'bar' }}
+
+        # Field foo contains a term which begins with 'bar' or 'baz'
+        { foo => { '^'      => ['bar','baz'] }}
+        { foo => { 'prefix' => ['bar','baz'] }}
+
+        # Field foo contains a term which begins with neither 'bar' nor 'baz'
+        { foo => { 'not_prefix' => ['bar','baz'] }}
+
+    See Prefix Filter
+    <http://www.elasticsearch.org/guide/reference/query-dsl/prefix-filter.ht
+    ml>
+
+WILDCARD AND FUZZY QUERIES
+    *** Query context only ***
+
+  * | -wildcard | -not_wildcard
+    A "wildcard" is a term-based query (no analysis is applied), which does
+    shell globbing to find matching terms. In other words "?" represents any
+    single character, while "*" represents zero or more characters.
+
+        # Field foo matches 'f?ob*'
+        { foo => { '*'        => 'f?ob*' }}
+        { foo => { 'wildcard' => 'f?ob*' }}
+
+        # with a boost:
+        { foo => {
+            '*' => { value => 'f?ob*', boost => 2.0 }
+        }}
+        { foo => {
+            'wildcard' => {
+                value   => 'f?ob*',
+                boost   => 2.0,
+                rewrite => 'constant_score_default',
+            }
+        }}
+
+    See Wildcard Query
+    <http://www.elasticsearch.org/guide/reference/query-dsl/wildcard-query.h
+    tml>
+
+  -fuzzy | -not_fuzzy
+    A "fuzzy" query is a term-based query (ie no analysis is done) which
+    looks for terms that are similar to the the provided terms, where
+    similarity is based on the Levenshtein (edit distance) algorithm:
+
+        # Field foo is similar to 'fonbaz'
+        { foo => { fuzzy => 'fonbaz' }}
+
+        # With other parameters:
+        { foo => {
+            fuzzy => {
+                value           => 'fonbaz',
+                boost           => 2.0,
+                min_similarity  => 0.2,
+                max_expansions  => 10,
+                rewrite         => 'constant_score_default',
+            }
+        }}
+
+    Normally, you should rather use either the "EQUALITY" queries with the
+    "fuzziness" parameter, or the -flt queries.
+
+    See Fuzzy Query
+    <http://www.elasticsearch.org/guide/reference/query-dsl/fuzzy-query.html
+    >.
+
+COMBINING QUERIES
+    *** Query context only ***
+
+    These constructs allow you to combine multiple queries.
+
+  -dis_max | -dismax
+    While a "bool" query adds together the scores of the nested queries, a
+    "dis_max" query uses the highest score of any matching queries.
+
+        # Run the two queries and use the best score
+        { -dismax => [
+            { foo => 'bar' },
+            { foo => 'baz' }
+        ] }
+
+        # With other parameters
+        { -dismax => {
+            queries => [
+                { foo => 'bar' },
+                { foo => 'baz' }
+            ],
+            tie_breaker => 0.5,
+            boost => 2.0
+        ] }
+
+    See DisMax Query
+    <http://www.elasticsearch.org/guide/reference/query-dsl/dis-max-query.ht
+    ml>
+
+  -bool
+    Normally, there should be no need to use a "bool" query directly, as
+    these are autogenerated from eg "-and", "-or" and "-not" constructs.
+    However, if you need to pass any of the other parameters to a "bool"
+    query, then you can do the following:
+
+        {
+           -bool => {
+               must          => [{ foo => 'bar' }],
+               must_not      => { status => 'inactive' },
+               should        => [
+                    { tag    => 'perl'   },
+                    { tag    => 'python' },
+                    { tag    => 'ruby' },
+               ],
+               minimum_number_should_match => 2,
+               disable_coord => 1,
+               boost         => 2
+           }
+        }
+
+    See Bool Query
+    <http://www.elasticsearch.org/guide/reference/query-dsl/bool-query.html>
+
+  -boosting
+    The "boosting" query can be used to "demote" results that match a given
+    query. Unlike the "must_not" clause of a "bool" query, the query still
+    matches, but the results are "less relevant".
+
+        { -boosting => {
+            positive       => { title => 'apple pear'     },
+            negative       => { title => 'apple computer' },
+            negative_boost => 0.2
+        }}
+
+    See Boosting Query
+    <http://www.elasticsearch.org/guide/reference/query-dsl/boosting-query.h
+    tml>
+
+  -custom_boost
+    The "custom_boost" query allows you to multiply the scores of another
+    query by the specified boost factor. This is a bit different from a
+    standard "boost", which is normalized.
+
+        {
+            -custom_boost => {
+                query           => { title => 'foo' },
+                boost_factor    => 3
+            }
+        }
+
+    See Custom Boost Factor Query
+    <http://www.elasticsearch.org/guide/reference/query-dsl/custom-boost-fac
+    tor-query.html>.
+
+NESTED QUERIES/FILTERS
+    Nested queries/filters allow you to run queries/filters on nested docs.
+
+    Normally, a doc like this would not allow you to associate the name
+    "perl" with the number 5
+
+       {
+           title:  "my title",
+           tags: [
+            { name: "perl",   num: 5},
+            { name: "python", num: 2}
+           ]
+       }
+
+    However, if "tags" is mapped as a "nested" field, then you can run
+    queries or filters on each sub-doc individually.
+
+    See Nested Type
+    <http://www.elasticsearch.org/guide/reference/mapping/nested-type.html>,
+    Nested Query
+    <http://www.elasticsearch.org/guide/reference/query-dsl/nested-query.htm
+    l> and Nested Filter
+    <http://www.elasticsearch.org/guide/reference/query-dsl/nested-filter.ht
+    ml>
+
+  -nested (QUERY)
+        {
+            -nested => {
+                path        => 'tags',
+                score_mode  => 'avg',
+                _scope      => 'my_tags',
+                query       => {
+                    "tags.name"  => 'perl',
+                    "tags.num"   => { gt => 2 },
+                }
+            }
+        }
+
+    See Nested Query
+    <http://www.elasticsearch.org/guide/reference/query-dsl/nested-query.htm
+    l>
+
+  -nested (FILTER)
+        {
+            -nested => {
+                path        => 'tags',
+                score_mode  => 'avg',
+                _cache      => 1,
+                _name       => 'my_filter',
+                filter      => {
+                    tags.name    => 'perl',
+                    tags.num     => { gt => 2},
+                }
+            }
+        }
+
+    See Nested Filter
+    <http://www.elasticsearch.org/guide/reference/query-dsl/nested-filter.ht
+    ml>
+
+SCRIPTING
+    ElasticSearch supports the use of scripts to customise query or filter
+    behaviour. By default the query language is "mvel" but javascript,
+    groovy, python and native java scripts are also supported.
+
+    See Scripting
+    <http://www.elasticsearch.org/guide/reference/modules/scripting.html>
+    for more on scripting.
+
+  -custom_score
+    *** Query context only ***
+
+    The "-custom_score" query allows you to customise the "_score" or
+    relevance (and thus the order) of docs returned from a query.
+
+        {
+            -custom_score => {
+                query  => { foo => 'bar' },
+                lang    => 'mvel',
+                script => "_score * doc['my_numeric_field'].value / pow(param1, param2)"
+                params => {
+                    param1 => 2,
+                    param2 => 3.1
+                },
+            }
+        }
+
+    See Custom Score Query
+    <http://www.elasticsearch.org/guide/reference/query-dsl/custom-score-que
+    ry.html>
+
+  -custom_filters_score
+    *** Query context only ***
+
+    The "-custom_filters_score" query allows you to boost documents that
+    match a filter, either with a "boost" parameter, or with a custom
+    "script".
+
+    This is a very powerful and efficient way to boost results which depend
+    on matching unanalyzed fields, eg a "tag" or a "date". Also, these
+    filters can be cached.
+
+        {
+            -custom_filters_score => {
+                query       => { foo => 'bar' },
+                score_mode  => 'first|max|total|avg|min|multiply', # default 'first'
+                max_boost   => 10,
+                filters     => [
+                    {
+                        filter => { tag => 'perl' },
+                        boost  => 2,
+                    },
+                    {
+                        filter => { tag => 'python' },
+                        script => '_score * my_boost',
+                        params => { my_boost => 2},
+                        lang   => 'mvel'
+                    },
+                ]
+            }
+        }
+
+    See Custom Filters Score Query
+    <http://www.elasticsearch.org/guide/reference/query-dsl/custom-filters-s
+    core-query.html>
+
+  -script
+    *** Filter context only ***
+
+    The "-script" filter allows you to use a script as a filter. Return a
+    true value to indicate that the filter matches.
+
+        # Filter docs whose field 'foo' is greater than 5
+        { -script => "doc['foo'].value > 5 " }
+
+        # With other params
+        {
+            -script => {
+                script => "doc['foo'].value > minimum ",
+                params => { minimum => 5 },
+                lang   => 'mvel'
+            }
+        }
+
+    See Script Filter
+    <http://www.elasticsearch.org/guide/reference/query-dsl/script-filter.ht
+    ml>
+
+PARENT/CHILD
+    Documents stored in ElasticSearch can be configured to have parent/child
+    relationships.
+
+    See Parent Field
+    <http://www.elasticsearch.org/guide/reference/mapping/parent-field.html>
+    for more.
+
+  -has_parent | -not_has_parent
+    Find child documents that have a parent document which matches a query.
+
+        # Find parent docs whose children of type 'comment' have the tag 'perl'
+        {
+            -has_parent => {
+                type   => 'comment',
+                query  => { tag => 'perl' },
+                _scope => 'my_scope',
+                boost  => 1,                    # Query context only
+                score_type => 'max'             # Query context only
+            }
+        }
+
+    See Has Parent Query
+    <http://www.elasticsearch.org/guide/reference/query-dsl/has-parent-query
+    .html> and See Has Parent Filter
+    <http://www.elasticsearch.org/guide/reference/query-dsl/has-parent-filte
+    r.html>.
+
+  -has_child | -not_has_child
+    Find parent documents that have child documents which match a query.
+
+        # Find parent docs whose children of type 'comment' have the tag 'perl'
+        {
+            -has_child => {
+                type   => 'comment',
+                query  => { tag => 'perl' },
+                _scope => 'my_scope',
+                boost  => 1,                    # Query context only
+                score_type => 'max'             # Query context only
+             }
+        }
+
+    See Has Child Query
+    <http://www.elasticsearch.org/guide/reference/query-dsl/has-child-query.
+    html> and See Has Child Filter
+    <http://www.elasticsearch.org/guide/reference/query-dsl/has-child-filter
+    .html>.
+
+  -top_children
+    *** Query context only ***
+
+    The "top_children" query runs a query against the child docs, and
+    aggregates the scores to find the parent docs whose children best match.
+
+        {
+            -top_children => {
+                type                => 'blog_tag',
+                query               => { tag => 'perl' },
+                score               => 'max',
+                factor              => 5,
+                incremental_factor  => 2,
+                _scope              => 'my_scope'
+            }
+        }
+
+    See Top Children Query
+    <http://www.elasticsearch.org/guide/reference/query-dsl/top-children-que
+    ry.html>
+
+GEO FILTERS
+    For all the geo filters, the "normalize" parameter defaults to "true",
+    meaning that the longitude value will be normalized to -180 to 180 and
+    the latitude value to -90 to 90.
+
+  -geo_distance | -not_geo_distance
+    *** Filter context only ***
+
+    The "geo_distance" filter will find locations within a certain distance
+    of a given point:
+
+        {
+            my_location => {
+                -geo_distance     => {
+                    location      => { lat => 10, lon => 5 },
+                    distance      => '5km',
+                    normalize     => 1 | 0,
+                    optimize_bbox => memory | indexed | none,
+                }
+            }
+        }
+
+    See Geo Distance Filter
+    <http://www.elasticsearch.org/guide/reference/query-dsl/geo-distance-fil
+    ter.html>
+
+  -geo_distance_range | -not_geo_distance_range
+    *** Filter context only ***
+
+    The "geo_distance_range" filter is similar to the -geo_distance filter,
+    but expressed as a range:
+
+        {
+            my_location => {
+                -geo_distance       => {
+                    location        => { lat => 10, lon => 5 },
+                    from            => '5km',
+                    to              => '10km',
+                    include_lower   => 1 | 0,
+                    include_upper   => 0 | 1
+                    normalize       => 1 | 0,
+                    optimize_bbox   => memory | indexed | none,
+                }
+            }
+        }
+
+    or instead of "from", "to", "include_lower" and "include_upper" you can
+    use "gt", "gte", "lt", "lte".
+
+    See Geo Distance Range Filter
+    <http://www.elasticsearch.org/guide/reference/query-dsl/geo-distance-ran
+    ge-filter.html>
+
+  -geo_bounding_box | -geo_bbox | -not_geo_bounding_box | -not_geo_bbox
+    *** Filter context only ***
+
+    The "geo_bounding_box" filter finds points which lie within the given
+    rectangle:
+
+        {
+            my_location => {
+                -geo_bbox => {
+                    top_left     => { lat => 9, lon => 4  },
+                    bottom_right => { lat => 10, lon => 5 },
+                    normalize    => 1 | 0,
+                    type         => memory | indexed
+                }
+            }
+        }
+
+    See Geo Bounding Box Filter
+    <http://www.elasticsearch.org/guide/reference/query-dsl/geo-bounding-box
+    -filter.html>
+
+  -geo_polygon | -not_geo_polygon
+    *** Filter context only ***
+
+    The "geo_polygon" filter is similar to the -geo_bounding_box filter,
+    except that it allows you to specify a polygon instead of a rectangle:
+
+        {
+            my_location => {
+                -geo_polygon => [
+                    { lat => 40, lon => -70 },
+                    { lat => 30, lon => -80 },
+                    { lat => 20, lon => -90 },
+                ]
+            }
+        }
+
+    or:
+
+        {
+            my_location => {
+                -geo_polygon => {
+                    points  => [
+                        { lat => 40, lon => -70 },
+                        { lat => 30, lon => -80 },
+                        { lat => 20, lon => -90 },
+                    ],
+                    normalize => 1 | 0,
+                }
+            }
+        }
+
+    See Geo Polygon Filter
+    <http://www.elasticsearch.org/guide/reference/query-dsl/geo-polygon-filt
+    er.html>
+
+INDEX/TYPE/ID
+  -indices
+    *** Query context only ***
+
+    To run a different query depending on the index name, you can use the
+    "-indices" query:
+
+        {
+            -indices => {
+                indices         => 'one' | ['one','two],
+                query           => { status => 'active' },
+                no_match_query  => 'all' | 'none' | { another => query }
+            }
+        }
+
+    The `no_match_query` will be run on any indices which don't appear in
+    the specified list. It defaults to "all", but can be set to "none" or to
+    a full query.
+
+    See Indices Query
+    <http://www.elasticsearch.org/guide/reference/query-dsl/indices-query.ht
+    ml>.
+
+    *** Filter context only ***
+
+    To run a different filter depending on the index name, you can use the
+    "-indices" filter:
+
+        {
+            -indices => {
+                indices         => 'one' | ['one','two],
+                filter          => { status => 'active' },
+                no_match_filter => 'all' | 'none' | { another => filter }
+            }
+        }
+
+    The `no_match_filter` will be run on any indices which don't appear in
+    the specified list. It defaults to "all", but can be set to "none" or to
+    a full filter.
+
+    See Indices Filter
+    <https://github.com/elasticsearch/elasticsearch/issues/1787>.
+
+  -ids
+    The "_id" field is not indexed by default, and thus isn't available for
+    normal queries or filters
+
+    Returns docs with the matching "_id" or "_type"/"_id" combination:
+
+        # doc with ID 123
+        { -ids => 123 }
+
+        # docs with IDs 123 or 124
+        { -ids => [123,124] }
+
+        # docs of types 'blog' or 'comment' with IDs 123 or 124
+        {
+            -ids => {
+                type    => ['blog','comment'],
+                values  => [123,124]
+
+            }
+        }
+
+    See IDs Query
+    <http://www.elasticsearch.org/guide/reference/query-dsl/ids-query.html>
+    abd IDs Filter
+    <http://www.elasticsearch.org/guide/reference/query-dsl/ids-filter.html>
+
+  -type
+    *** Filter context only ***
+
+    Filters docs with matching "_type" fields.
+
+    While the "_type" field is indexed by default, ElasticSearch provides
+    the "type" filter which will work even if indexing of the "_type" field
+    is disabled.
+
+        # Filter docs of type 'comment'
+        { -type => 'comment' }
+
+        # Filter docs of type 'comment' or 'blog'
+        { -type => ['blog','comment' ]}
+
+    See Type Filter
+    <http://www.elasticsearch.org/guide/reference/query-dsl/type-filter.html
+    >
+
+LIMIT
+    *** Filter context only ***
+
+    The "limit" filter limits the number of documents (per shard) to execute
+    on:
+
+        {
+            name    => "Joe Bloggs",
+            -filter => { -limit => 100       }
+        }
+
+    See Limit Filter
+    <http://www.elasticsearch.org/guide/reference/query-dsl/limit-filter.htm
+    l>
+
+NAMED FILTERS
+    ElasticSearch allows you to name filters, in which each search result
+    will include a "matched_filters" array containing the names of all
+    filters that matched.
+
+  -name | -not_name
+    *** Filter context only ***
+
+        { -name => {
+            popular   => { user_rank => { 'gte' => 10 }},
+            unpopular => { user_rank => { 'lt'  => 10 }},
+        }}
+
+    Multiple filters are joined with an "or" filter (as it doesn't make
+    sense to join them with "and").
+
+    See Named Filters
+    <http://www.elasticsearch.org/guide/reference/api/search/named-filters.h
+    tml> and "-and | -or | -not".
+
+CACHING FILTERS
+    Part of the performance boost that you get when using filters comes from
+    the ability to cache the results of those filters. However, it doesn't
+    make sense to cache all filters by default.
+
+  -cache | -nocache
+    *** Filter context only ***
+
+    If you would like to override the default caching, then you can use
+    "-cache" or "-nocache":
+
+        # Don't cache the term filter for 'status'
+        {
+            content => 'interesting post',
+            -filter => {
+                -nocache => { status => 'active' }
+            }
+        }
+
+        # Do cache the numeric range filter:
+        {
+            content => 'interesting post',
+            -filter => {
+                -cache => { created => {'>' => '2010-01-01' } }
+            }
+        }
+
+    See Query DSL <http://www.elasticsearch.org/guide/reference/query-dsl/>
+    for more details about what is cached by default and what is not.
+
+  -cache_key
+    It is also possible to use a name to identify a cached filter. For
+    instance:
+
+        {
+            -cache_key => {
+                friends => { person_id => [1,2,3] },
+                enemies => { person_id => [4,5,6] },
+            }
+        }
+
+    In the above example, the two filters will be joined by an "and" filter.
+    The following example will have the two filters joined by an "or"
+    filter:
+
+        {
+            -cache_key => [
+                friends => { person_id => [1,2,3] },
+                enemies => { person_id => [4,5,6] },
+            ]
+        }
+
+    See _cache_key
+    <http://www.elasticsearch.org/guide/reference/query-dsl/index.html> for
+    more details.
+
+RAW ELASTICSEARCH QUERY DSL
+    Sometimes, instead of using the SearchBuilder syntax, you may want to
+    revert to the raw Query DSL that ElasticSearch uses.
+
+    You can do this by passing a reference to a HASH ref, for instance:
+
+        $sb->query({
+            foo => 1,
+            -filter => \{ term => { bar => 2 }}
+        })
+
+    Would result in:
+
+        {
+            query => {
+                filtered => {
+                    query => {
+                        match => { foo => 1 }
+                    },
+                    filter => {
+                        term => { bar => 2 }
+                    }
+                }
+            }
+        }
+
+    An example with OR'ed filters:
+
+        $sb->filter([
+            foo => 1,
+            \{ term => { bar => 2 }}
+        ])
+
+    Would result in:
+
+        {
+            filter => {
+                or => [
+                    { term => { foo => 1 }},
+                    { term => { bar => 2 }}
+                ]
+            }
+        }
+
+    An example with AND'ed filters:
+
+        $sb->filter({
+            -and => [
+                foo => 1 ,
+                \{ term => { bar => 2 }}
+            ]
+        })
+
+    Would result in:
+
+        {
+            filter => {
+                and => [
+                    { term => { foo => 1 }},
+                    { term => { bar => 2 }}
+                ]
+            }
+        }
+
+    Wherever a filter or query is expected, passing a reference to a
+    HASH-ref is accepted.
+
+ELASTICSEARCH CONCEPTS
+  FILTERS VS QUERIES
+    ElasticSearch supports filters and queries:
+
+    *   A filter just answers the question: "Does this field match? Yes/No",
+        eg:
+
+        *   Does this document have the tag "beta"?
+
+        *   Was this document published in 2011?
+
+    *   A query is used to calculate relevance ( known in ElasticSearch as
+        "_score"):
+
+        *   Give me all documents that include the keywords "Foo" and "Bar"
+            and rank them in order of relevance.
+
+        *   Give me all documents whose "tag" field contains "perl" or
+            "ruby" and rank documents that contain BOTH tags more highly.
+
+    Filters are lighter and faster, and the results can often be cached, but
+    they don't contribute to the "_score" in any way.
+
+    Typically, most of your clauses will be filters, and just a few will be
+    queries.
+
+  TERMS VS TEXT
+    All data is stored in ElasticSearch as a "term", which is an exact
+    value. The term "Foo" is not the same as "foo".
+
+    While this is useful for fields that have discreet values (eg "active",
+    "inactive"), it is not sufficient to support full text search.
+
+    ElasticSearch has to *analyze* text to convert it into terms. This
+    applies both to the text that the stored document contains, and to the
+    text that the user tries to search on.
+
+    The default analyzer will:
+
+    *   split the text on (most) punctuation and remove that punctuation
+
+    *   lowercase each word
+
+    *   remove English stopwords
+
+    For instance, "The 2 GREATEST widgets are foo-bar and fizz_buzz" would
+    result in the terms " [2,'greatest','widgets','foo','bar','fizz_buzz']".
+
+    It is important that the same analyzer is used both for the stored text
+    and for the search terms, otherwise the resulting terms may be
+    different, and the query won't succeed.
+
+    For instance, a "term" query for "GREATEST" wouldn't work, but
+    "greatest" would work. However, a "match" query for "GREATEST" would
+    work, because the search text would be analyzed to produce the same
+    terms that are stored in the index.
+
+    See Analysis
+    <http://www.elasticsearch.org/guide/reference/index-modules/analysis/>
+    for the list of supported analyzers.
+
+  "match" QUERIES
+    ElasticSearch has a family of DWIM queries called "match" queries.
+
+    Their action depends upon how the field has been defined. If a field is
+    "analyzed" (the default for string fields) then the "match" queries
+    analyze the search terms before doing the search:
+
+        # Convert "Perl is GREAT" to the terms 'perl','great' and search
+        # the 'content' field for those terms
+
+        { match: { content: "Perl is GREAT" }}
+
+    If a field is "not_analyzed", then it treats the search terms as a
+    single term:
+
+        # Find all docs where the 'status' field contains EXACTLY the term 'ACTIVE'
+        { match: { status: "ACTIVE" }}
+
+    Filters, on the other hand, don't have full text queries - filters
+    operate on simple terms instead.
+
+    See Match Query
+    <http://www.elasticsearch.org/guide/reference/query-dsl/match-query.html
+    > for more about match queries.
+
+AUTHOR
+    Clinton Gormley, "<drtech at cpan.org>"
+
+BUGS
+    If you have any suggestions for improvements, or find any bugs, please
+    report them to
+    <https://github.com/clintongormley/ElasticSearch-SearchBuilder/issues>.
+    I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+TODO
+    Add support for "span" queries.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc ElasticSearch::SearchBuilder
+
+    You can also look for information at: <http://www.elasticsearch.org>
+
+ACKNOWLEDGEMENTS
+    Thanks to SQL::Abstract for providing the inspiration and some of the
+    internals.
+
+LICENSE AND COPYRIGHT
+    Copyright 2011 Clinton Gormley.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See <http://dev.perl.org/licenses/> for more information.
+

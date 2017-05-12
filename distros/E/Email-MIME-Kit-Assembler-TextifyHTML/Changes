@@ -1,0 +1,14 @@
+Revision history for Email-MIME-Kit-Assembler-TextifyHTML
+
+1.003     2015-02-07 23:04:30-05:00 America/New_York
+        - update tests to deal with correct line endings
+        - require 3.x Email::MIME::Kit
+
+1.002     2013-08-12 21:40:34 America/New_York
+          update repo and bug tracker
+
+1.001     2009-04-09
+          remove some noise from debugging routines
+
+1.000     2009-03-12
+          first release

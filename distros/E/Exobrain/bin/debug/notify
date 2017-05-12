@@ -1,0 +1,41 @@
+#!/usr/bin/perl
+use 5.010;
+use strict;
+use warnings;
+use autodie;
+use Exobrain;
+
+# PODNAME: notify
+# ABSTRACT: Send an exobrain notify intent from the cmdline
+our $VERSION = '1.08'; # VERSION
+
+@ARGV or die "Usage: $0 message\n";
+
+my $exobrain = Exobrain->new;
+
+$exobrain->notify("@ARGV");
+
+__END__
+
+=pod
+
+=head1 NAME
+
+notify - Send an exobrain notify intent from the cmdline
+
+=head1 VERSION
+
+version 1.08
+
+=head1 AUTHOR
+
+Paul Fenwick <pjf@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Paul Fenwick.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

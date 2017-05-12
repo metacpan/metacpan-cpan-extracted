@@ -1,0 +1,13 @@
+                               Balance
+Period: through 2011-12-31
+EekBoek Sample Administration                      EekBoek, 2011-12-31
+
+AccNr   Group/Account                                 Debet     Credit
+----------------------------------------------------------------------
+1       Non-current Assets                           503.18
+2       Current Assets                             10334.68
+3       Assets                                                 2443.18
+4       Liabilities                                            1314.87
+        << Profit >>                                           7079.81
+----------------------------------------------------------------------
+        TOTAL Balance                              10837.86   10837.86

@@ -1,0 +1,37 @@
+                         VAT submission
+Period: 2011
+EekBoek Sample Administration                 EekBoek, 2011-12-31
+
+-----------------------------------------------------------------
+
+Binnenland
+
+1. Door mij verrichte leveringen/diensten
+
+1a   Belast met hoog tarief                        7700      1463
+1b   Belast met laag tarief                           0         0
+1e   Belast met 0% / verlegd                          0
+
+Buitenland
+
+3. Door mij verrichte leveringen
+
+3a   Buiten de EU                                  1000
+3b   Binnen de EU                                     0
+
+4. Aan mij verrichte leveringen
+
+4a   Van buiten de EU                                 0         0
+4b   Verwervingen van goederen uit de EU              0         0
+
+Berekening
+
+5. Berekening totaal
+
+5a   Subtotaal                                               1463
+5b   Voorbelasting                                            149
+5c   Subtotaal                                               1314
+5d   Vermindering kleineondernemersregeling                  1314
+5g   Totaal te betalen                                          0
+     Totaal te betalen (onafgerond)             1314.87
+     Afrondingsverschil                            0.87

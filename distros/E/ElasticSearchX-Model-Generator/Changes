@@ -1,0 +1,106 @@
+﻿Release history for ElasticSearchX-Model-Generator
+
+0.1.8 2013-11-25T04:35:49Z
+ [Dependencies::Noteworthy]
+ - new Module::Build
+ - new Test::More
+
+ [Dependencies::Stats]
+ - Dependencies changed, see Changes.deps{,.all,.dev} for details
+ - build: ↑1
+ - configure: ↑1
+ - develop: +45 -3
+ - test: ↑1 -2
+
+ [Maintenance]
+ - Changes file retroactively tidied.
+
+ [Tests]
+ - Switch to Test::Compile::PerFile
+ - Regen ReportVersions::Tiny to not report develop things.
+
+0.1.7 2013-05-17T04:26:09Z
+ - bugfix for test failures.
+
+ [Dependencies::Noteworthy]
+ - now requires ElasticSearchX::Model::Document v0.1.5
+
+ [Dependencies::Stats]
+ - Dependencies changed, see Changes.deps{,.all,.dev} for details
+ - test: ↑1
+
+ [Internals]
+ - Generated Models now depen On ESX::M::D 0.1.5 as earlier versions give
+   weird errors, `` Can't use string ("file") as a HASH ref while "strict
+   refs" in use at .../Moose/Meta/Attribute.pm line 106``
+
+0.1.6 2013-05-16T20:51:57Z
+ [!Noteworthy Changes]
+ - Split attribute generation further to make overriding generation easier
+
+ [Dependencies::Noteworthy]
+ - requires newer Module::Build 0.4005
+
+ [Dependencies::Stats]
+ - Dependencies changed, see Changes.deps{,.all,.dev} for details
+ - build: ↑1
+ - configure: ↑1
+ - develop: +1 ↑1
+
+ [Packaging]
+ - use test_requires in MB 0.4004
+
+0.1.5 2013-03-13T09:54:53Z
+ [!Noteworthy Changes]
+ - Refactored templating parts to be easier to override
+
+0.1.4 2013-03-12T13:32:18Z
+ [!Noteworthy Changes]
+ - strict/warnings before package declaration.
+
+0.1.3 2013-03-10T09:25:43Z
+ [!Noteworthy Changes]
+ - Moved from Path::Class to Path::Tiny
+ - Emit generated attributes with single-quote keys.
+ - Add a #ABSTRACT declaration to all generated files
+
+ [Dependencies::Noteworthy]
+ - uses Path::Tiny
+ - no longer uses Path::Class
+
+ [Dependencies::Stats]
+ - Dependencies changed, see Changes.deps{,.all,.dev} for details
+ - runtime: +1 -1
+
+0.1.2 2013-03-10T00:14:03Z
+ [Bugs]
+ - support `transfer-encoding=chunked`
+
+ [Dependencies::Noteworthy]
+ - requires Module::Build 0.4003
+
+ [Dependencies::Stats]
+ - Dependencies changed, see Changes.deps{,.all,.dev} for details
+ - build: ↑1
+ - configure: ↑1
+ - develop: +5 ↑1
+
+ [Documentation]
+ - Copyright dates updated.
+ - Added README.mkdn
+
+0.1.1 2012-08-12T05:06:03Z
+ [Bugs]
+ - add test requires to let tests work
+
+ [Dependencies::Noteworthy]
+ - requires ElasticSearchX::Model::Document for tests
+ - requires Moose for tests
+
+ [Dependencies::Stats]
+ - Dependencies changed, see Changes.deps{,.all,.dev} for details
+ - test: +2
+
+0.1.0 2012-08-10T07:47:45Z
+ - First version.
+

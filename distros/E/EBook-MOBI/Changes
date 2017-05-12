@@ -1,0 +1,176 @@
+Changes for EBook::MOBI
+
+0.72  2015-09-26
+
+    - added link to github from metacpan and travis config (szabgab)
+    - updatet contributor list and copyright year (borisd)
+
+0.7  2014-07-22
+
+    - handle default values correct in EBook::MOBI::Converter (#31)
+
+0.69 2014-04-02
+
+    - Patch (#27) from abbypan dealing with chinese font stuff
+    - removed switch feature for backwards compatibility with perl 5.8
+    - added some hints in docs for TOC and adding images
+
+0.68 2014-03-28
+
+    - Hack-Patch (#28) from Rupert Lane (rupertl) making GD optional
+
+0.67 2013-10-15
+
+    - Added keyword "perl programming language" to the docs
+
+0.66 2013-07-30
+
+    - Add xt test for Changes-file
+    - Move POD tests and version test to xt
+
+0.65 2013-07-17
+
+    - Patch (#26) from Rupert Lane (rupertl) fixing problems with utf8 by
+      introducing codepages
+    - small fix on path in examples
+
+0.64 2013-06-11
+
+    - Add a test for creating a book
+
+0.63 2013-06-11
+
+    - Merge all the git-confusing trouble with v0.61 and v0.62
+      Please be sure to use this version now... releasing is really a mess
+
+0.62 2013-06-10
+
+    - Detect prereqs automatically
+
+0.61 2013-04-15
+
+    - Add File::Slurp to prereqs in dist.ini (thx CpanTesters once again)
+    - Update email address of author in POD
+
+0.60 2013-04-10
+
+    - Fix messed up build with dzil
+
+0.59 2013-04-10
+
+    - Remove all POD and VERSION tests from release packaging.
+    - Allow special chars (regex) in TOC (thx RENEEB)
+    - Minor POD stuff (update license year)
+    - Change directory ./example to ./examples
+
+0.58 2013-01-16
+
+    - Fixed bug in checking for POD. Excluded POD checking from shipping.
+      Thanks CPAN-Testers for detecting this issue.
+
+0.57 2013-01-14
+
+    - Corrected minor issues brought with v0.56
+        Remove Image::Imlib2 from dist.ini
+        Add year 2013 to Copyright
+    - Exclude older releases from packaging (dzil)
+
+0.56 2013-01-14
+
+    - Excluded image code from EBook::MOBI::Picture to seperate CPAN module
+      EBook::MOBI::Image
+    - Changing image processing from GD to Image::Imlib2
+    - Exclude *.mobi from dzil packaging
+
+0.55 2012-11-30
+
+    - Marked inofficial POD command '=image' as deprecated
+    - Introduced POD command '=for image' (github issue #9)
+    - Added documentation for '=begin html' support (github issue #16)
+
+0.53 2012-09-25
+
+    - Support for "=begin html" blocks in POD
+    - Minor code fixes
+
+0.52 2012-09-13
+
+    - Equal versioning among modules (Dist::Zilla Plugin)
+    - Copy and paste example in SYNOPSIS
+
+0.51 2012-08-29
+
+    - Fix issues with pod tests (thx to cpantesters.org)
+    - Fix typo
+
+0.5  2012-08-27
+
+    - new API with plugin system
+    - API not compatible to previous releases!
+    - new Hhlper module 'Converter'
+    - heavy update on docs
+    - diverse small fixes and typos 
+
+0.49  2012-08-13
+
+    - remove images in example dir from release package (dzil)
+
+0.48  2012-07-18
+
+    - added naming of TOC: patch from GARU (from rt.cpan.org ticket 77430)
+    - added tests for the feature of GARU
+    - POD documentation update for TOC generation concerning h1 tag
+    - fix bug in reset() method
+    - removed unneeded variable
+
+0.47  2012-07-12
+
+    - removed unwanted message from stderr
+    - updated POD documentation
+    - fixed typos
+    - updated encoding syntax in examples
+
+0.46  2012-06-20
+
+    - Some unknowm problems with CPAN... let's count up the number
+
+0.45  2012-06-20
+
+    - remove test-bug in version check in 0.44
+
+0.44  2012-06-20
+
+    - better support for the L<> in POD
+
+0.43  2012-05-29
+
+    - encoding is now binmode syntax
+
+0.42  2012-05-03
+
+    - we get decoded pod, so we have to ensure to write the file with
+      correct encoding (thx to reneeb)
+
+0.41  2012-04-18
+
+    - stop spamming /tmp
+    - don't die in list-error
+
+0.4   2012-02-23
+
+    - Croaks nicely if images are missing
+
+0.3   2012-02-16
+
+    - Fixed Prereqs
+    - Polished some POD
+
+0.2   2012-02-15
+
+    - Fixed error on test for POD coverage
+    - Moved Palm code into MobiPerl namespace
+    - Fixed minor issues
+
+0.1   2012-02-11
+
+    - Initial release to CPAN

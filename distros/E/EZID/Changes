@@ -1,0 +1,9 @@
+Revision history for Perl extension EZID.
+
+0.02  Tue Oct 07 09:11:10 2014
+	- add dependencies to Makefile.PL
+
+0.01  Mon Sep 29 15:50:15 2014
+	- original version; created by h2xs 1.23 with options
+		-AX -n EZID
+

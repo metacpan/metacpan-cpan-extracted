@@ -1,0 +1,92 @@
+Revision history for Perl extension Email::Stuff
+
+2.10      2014-02-05
+        - update repo and and bugtracker links
+
+2.104     2013-08-16
+          Documentation improvements (kd).
+
+2.103     2013-05-30
+          note deprecation in favor of Email::Stuffer
+
+2.102     2010-02-14
+          minor documentation improvements
+          do not break chaining on $stuff->FOO_text(undef);
+
+2.101     2009-11-12
+          accept character (unicode) strings for bodies and headers
+          ucfirst header names
+          (above changes by Aristotle Pagaltzis)
+
+2.100     2009-08-11
+          Allows attach_file to accept attribute arguments ie (content_type)
+          just like attach does (twek)
+
+2.09  Sat 16 May 2009
+	- documentation tweaks for SMTP hostname; thanks Kieren Kiment
+
+2.08  Sun 08 March 2009
+	- Removed debugging prints accidentally left in from last update
+
+2.07  Fri 17 Feb 2009
+	- Fixed bug http://rt.cpan.org/Public/Bug/Display.html?id=27320
+	  Removed unused Clone dependency
+	  Update by Lyle Hopkins
+
+2.06  Fri 28 Dec 2007
+	- Removed unreliable File::Slurp dependency
+
+2.05  Mon  9 Jul 2007
+	- Updated to Module::Install 0.65
+	- Adding support for ->using(mailer)
+
+2.04  Wed 21 Feb 2007
+	- Updated to Module::Install 0.64
+	- Updating various dependencies
+	- Using Params::Util to check for IO::All::File
+	- Removing the use of deprecated Email::Headers
+
+2.03  Thu 13 Jul 2006
+	- Incremental release in preparation for handover to RJBS
+	- Updated to Module::Install 0.63
+
+2.02  Sun Jan 29 2006
+	- Updated to ensure that Email::Send is correctly updated
+	- Updated to Module::Install 0.55
+
+2.01  skipped
+
+2.00  Fri Dec 23 2005
+	- Things to handle the big incompatible Email::Send changes
+	- Synced version number to Email::Send for clarity
+
+0.08  Fri Oct 14 2005
+	- Refactoring based on advice from Jesse Vincent
+	- Moved all the cased method names to lower case
+	  (left cased aliases for legacy code).
+	- Added additional "Why not just use Email::MIME" doc section
+
+0.07  Fri Oct 14 2005
+	- Adding more unit tests
+	- Added dependency on Email::Send::Test
+	- POD cleanup
+	- Renamed ->Email to ->email
+	- Added dependency on Email::Simple::Headers
+
+0.06  Sun Nov  6 2004
+	- Adding prefork pragma for File::Type and File::Slurp
+
+0.05  Sun Oct  2 2004
+	- Added support for coercion to an Email::MIME object
+
+0.04  Sun Sep 26 2004
+	- First working version, although not thoroughly tested.
+
+0.03  Fri Sep 24 2004
+	- Bigger chunk of the work completed
+
+0.02  Sun Sep 19 2004
+	- Renamed from Email::Assemble to Email::Stuff
+
+0.01  Tue Sep 14 2004
+	- Created the initial implementation

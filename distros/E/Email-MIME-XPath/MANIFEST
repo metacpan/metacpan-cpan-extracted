@@ -1,0 +1,10 @@
+t/lib/Test/EMX.pm
+t/messages/mixed-alternative
+t/messages/plain
+t/00-load.t
+t/basic.t
+lib/Email/MIME/XPath.pm
+Makefile.PL
+MANIFEST
+Changes
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,26 @@
+---
+abstract: 'An encoding for safe filenames.'
+author:
+  - 'Bert Vanderbauwhede <batlock666@gmail.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.120351'
+license: lgpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Encode-Safename
+provides:
+  Encode::Safename:
+    file: lib/Encode/Safename.pm
+    version: 0.05
+requires:
+  Encode::Encoding: 0
+  Getopt::Long::Descriptive: 0
+  Parse::Lex: 0
+resources:
+  license: http://www.gnu.org/licenses/lgpl-3.0.txt
+version: 0.05

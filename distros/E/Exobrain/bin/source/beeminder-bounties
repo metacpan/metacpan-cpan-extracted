@@ -1,0 +1,93 @@
+#!/usr/bin/perl -w
+use 5.010;
+use strict;
+use warnings;
+use autodie;
+use Exobrain;
+use JSON::Any;
+use Try::Tiny;
+use WWW::Mechanize;
+use Method::Signatures;
+
+# PODNAME: beeminder-bounties
+# ABSTRACT: Spot when beeminder are about to fail a meta-goal
+
+# See http://blog.beeminder.com/blogdog/ for how this make me money. :)
+
+# This code is intended to be run from cron, or another scheduler.
+# It does not remain a persistent agent (as do other exobrain components)
+
+# TODO: Split this into standard exobrain format (a measurement
+# provider, and a classifier).
+
+my $LOSE_RE = qr{Red\.};
+my $WIN_RE  = qr{(?:Green|Yellow|Blue|Orange)\.};
+
+my $exobrain = Exobrain->new;
+
+my $agent = WWW::Mechanize->new(
+    autocheck => 1,
+);
+
+my $json = JSON::Any->new;
+
+my @bounty_goals = qw(
+    http://beeminder.com/meta/uvi
+    http://beeminder.com/meta/blog
+    http://beeminder.com/b/meta
+    http://beeminder.com/d/meta
+);
+
+foreach my $goal (@bounty_goals) {
+    try {
+        my $json_url = "$goal.json";
+        my $json     = $json->decode( $agent->get($json_url)->content );
+        check_goal_info( $goal, $json );
+    };
+}
+
+func check_goal_info( $url, $json ) {
+    my $title = $json->{titlesum};
+
+    if ($title =~ /^$LOSE_RE/) {
+        $exobrain->notify(
+            "Bounty goal $url is about to lose!",
+            priority => 1,      # High priority
+        ),
+    }
+    elsif ($title =~ /^$WIN_RE/) {
+        # Goal isn't losing. Return.
+        return;
+    }
+    else {
+        $exobrain->notify(
+            "Bounty goal $url unexpected returned titlesum of $title",
+            priority => -1,     # Debug priority
+        ),
+    }
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+beeminder-bounties - Spot when beeminder are about to fail a meta-goal
+
+=head1 VERSION
+
+version 1.08
+
+=head1 AUTHOR
+
+Paul Fenwick <pjf@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Paul Fenwick.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

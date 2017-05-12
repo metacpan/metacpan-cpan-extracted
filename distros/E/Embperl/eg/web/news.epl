@@ -1,0 +1,128 @@
+[-
+$r = shift ;
+$config = $r -> {config} ;
+$dberr = '' ;
+
+eval { require DBIx::Recordset ; } ;
+
+$dberr = "DBI and DBIx::Recordset must be installed: $@" if ($@) ;
+
+if (!$dberr)
+    {
+    eval {
+    *set = DBIx::Recordset -> Search ({'!DataSource'    => $config -> {dbdsn},
+                                       '!Username'      => $config -> {dbuser},
+                                       '!Password'      => $config -> {dbpassword},
+                                       '!DBIAttr'       => { RaiseError => 1, PrintError => 1, LongReadLen => 32765, LongTruncOk => 0, },
+                                       '!Table'         => 'item, itemtext', 
+                                       '!TabRelation'   => 'item_id = item.id',
+                                       '!Order'         => 'creationtime desc',
+                                       'language_id'    => $r -> param -> language,
+                                       'category_id'    => 1,
+				       'state'          => 1,
+                                       '$max'           => 8}) ;
+    } ;
+    $dberr = "Error accessing $config->{dbdsn}: " . DBIx::Recordset -> LastError . $@ if (DBIx::Recordset -> LastError || $@) ;
+    }
+
+
+
+-]
+
+    <table width="252" border="0" cellspacing="0" cellpadding="0">
+      <tr>
+        <td><img src="[+ $r -> {imageuri} +]h_news.gif" width="152" height="19"/></td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+      </tr>
+      <tr>
+        <td>
+
+            [$if !$dberr $]
+                [$while ($rec = $set -> Next)$]
+                    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                        <tr> 
+                          <td bgcolor="#327EA7"><font size="1" face="Verdana, Arial, Helvetica, sans-serif"><b>
+                            <font color="#FFFFFF">&nbsp;
+                                [- 
+                                $date = $rec -> {modtime} ; 
+                                $date =~ /^(\d+)-(\d+)-(\d+)/ ;
+                                $date = $r -> param -> language eq 'de'?"$3.$2.$1":"$2/$3/$1" ;
+                                -]
+                                [+ $date +]
+                            </font></b></font></td>
+                        </tr>
+                        <tr> 
+                          <td bgcolor="#C2D9E5"><img src="[+ $r -> {imageuri} +]linie-news.gif" width="152" height="4"/></td>
+                        </tr>
+                        <tr> 
+                          <td bgcolor="#D2E9F5">
+                            <table width="100%" border="0" cellspacing="0" cellpadding="3">
+                              <tr>
+                                <td><font size="1" face="Verdana, Arial, Helvetica, sans-serif">
+                                    [-
+                                    $txt = $rec -> {description} ;
+                                    $txt =~ s#<#&lt;#g ;
+                                    $txt =~ s#>#&gt;#g ;
+                                    $txt =~ s#B&lt;(.*?)&gt;#<B>$1</B>#g ;
+                                    $txt =~ s#(http://[-a-zA-Z./0-9]+)#<A HREF="$1">$1</A>#g if (!($txt =~ s#L&lt;\"(.*?)\"\|(.*?)&gt;#<A HREF="$2">$1</A>#g)) ;
+                                    -]
+                                    [+ do { local $escmode = 0 ; $txt } +]
+                                </font></td>
+                              </tr>
+                            </table>
+                          </td>
+                        </tr>
+                      </table>
+                [$endwhile $]
+                    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                        <tr> 
+                          <td bgcolor="#327EA7"><font size="1" face="Verdana, Arial, Helvetica, sans-serif">
+                            <a href="db/news/news.htm"><b><font color="#FFFFFF">&nbsp;[= more_news =]</font></b></a></font>
+                            </td>
+                        </tr>
+                        <tr> 
+                          <td bgcolor="#C2D9E5"><img src="[+ $r -> {imageuri} +]linie-news.gif" width="152" height="4"/></td>
+                        </tr>
+                        <tr> 
+                          <td bgcolor="#327EA7"><font size="1" face="Verdana, Arial, Helvetica, sans-serif">
+                            <a href="db/add.-category_id-1-.epl"><b><font color="#FFFFFF">&nbsp;[= add_news =]</font></b></a></font>
+                            </td>
+                        </tr>
+                        <tr> 
+                          <td bgcolor="#C2D9E5"><img src="[+ $r -> {imageuri} +]linie-news.gif" width="152" height="4"/></td>
+                        </tr>
+                      </table>
+            [$else$]
+                    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                        <tr> 
+                          <td bgcolor="#327EA7" align=center><font size="1" face="Verdana, Arial, Helvetica, sans-serif"><b>
+                            <font color="#FFFFFF">&nbsp;
+                                News not available because database is not correctly set up
+                            </font></b></font></td>
+                        </tr>
+                        <tr> 
+                          <td bgcolor="#C2D9E5"><img src="[+ $r -> {imageuri} +]linie-news.gif" width="152" height="4"/></td>
+                        </tr>
+                        <tr> 
+                          <td bgcolor="#D2E9F5">
+                            <table width="100%" border="0" cellspacing="0" cellpadding="3">
+                              <tr>
+                                <td><font size="1" face="Verdana, Arial, Helvetica, sans-serif">
+                                    [+ $dberr +]<br>
+                                    <b>To get the database related parts working, install
+                                    DBI and DBIx::Recordset, setup a database for Embperl, create tables by
+                                    running eg/webutil/setupdb.pl (make sure to edit the DSN inside the
+                                    script first) and enter the correct DSN in eg/web/config.pl.</b>
+                                </font></td>
+                              </tr>
+                            </table>
+                          </td>
+                        </tr>
+                      </table>
+                
+            [$endif$]
+        </td>
+      </tr>
+    </table>

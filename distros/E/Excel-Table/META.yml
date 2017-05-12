@@ -1,0 +1,28 @@
+---
+abstract: 'Table processing class for Excel worksheets. '
+author:
+  - 'tmcmeeki <tmcmeeki@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Excel-Table
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: 0
+  Data::Dumper: 0
+  File::Basename: 0
+  Log::Log4perl: 0
+  Spreadsheet::ParseExcel: 0.57
+  Spreadsheet::XLSX: 0
+  perl: 5.006004
+version: 1.022

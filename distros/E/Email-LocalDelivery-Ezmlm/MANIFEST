@@ -1,0 +1,8 @@
+Makefile.PL
+Build.PL
+META.yml
+Changes
+MANIFEST
+README
+lib/Email/LocalDelivery/Ezmlm.pm
+t/ezmlm.t

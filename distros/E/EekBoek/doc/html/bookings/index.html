@@ -1,0 +1,243 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+ <head>
+  <title>EekBoek</title>
+    <link rel="stylesheet" href="../css/site.css" type="text/css">
+      <meta name="keywords" content="boekhouden, mkb, midden- en kleinbedrijf, financi&amp;emul;n,
+                open source, boekhoudsoftware, boekhoud software,
+		boekhoudpakket, boekhoud pakket">
+  <meta name="robots" content="all">
+ </head>
+
+ <body bgcolor="#FFFFFF"
+       text="#000000" link="#0000FF"
+       vlink="#0000FF" alink="#C81900" background="../images/bg.gif" >
+  <table width="100%" border="0" cellpadding="0" cellspacing="5">
+
+  <tr valign="top">
+    <td width="161" align="left">
+      <a href="../index.html"><img src="../images/eb.jpg" alt="EekBoek Boekhouden" border="0" width="149" height="87"></a>
+
+    </td>
+    <td>
+              <h1 class="title">EekBoek</h1>
+<div class="info">
+  Electronisch Boekhouden voor het MKB
+</div>
+
+          </td>
+  </tr>
+
+  <tr>
+    <td>
+      <a href="../index.html"><img src="../images/ebname.jpg" alt="EekBoek" border="0" width="151" height="22"></a>
+
+    </td>
+    <td>
+      <table width="100%" border="0" cellpadding="0" cellspacing="0">
+  <tr valign="middle">
+    <td align="left">
+      <table border="0" cellpadding="0" cellspacing="2">
+  <tr valign="middle">
+
+    <td class="info"></td>
+    <td><a href="../bookings/index.html" class="menu">Boekingen</a>
+</td>
+	
+  </tr>
+</table>
+
+
+    </td>
+    <td align="right">
+      
+    </td>
+  </tr>
+</table>
+
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      <hr>
+
+    </td>
+    <td>
+      <hr>
+
+    </td>
+  </tr>
+
+  <tr valign="top">
+    <td>
+      <div class="sidemenu">
+<table border="0" cellpadding="0" cellspacing="0">
+  <tr>
+    <td align="left" class="menutitle">Documentatie
+    </td>
+  </tr>
+  <tr>
+    <td><hr>
+</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">
+      <a href="../intro/index.html" class="menu">Inleiding</a>
+<br>
+<a href="../install/index.html" class="menu">Installeren</a>
+<br>
+<a href="../ebshell/index.html" class="menu">De EekBoek shell</a>
+<br>
+<a href="../ebwxshell/index.html" class="menu">De grafische EekBoek shell</a>
+<br>
+<a href="../config.html" class="menu">Configuratie</a>
+<br>
+<a href="../setup/index.html" class="menu">Opzetten administratie</a>
+<br>
+<a href="../bookings/index.html" class="menuselect">Boekingen</a>
+<br>
+&nbsp;-&nbsp;<a href="../bookings/payable.html" class="menu">Inkoopfakturen</a>
+<br>
+&nbsp;-&nbsp;<a href="../bookings/receivable.html" class="menu">Verkoopfakturen</a>
+<br>
+&nbsp;-&nbsp;<a href="../bookings/bank.html" class="menu">Bankafschriften</a>
+<br>
+&nbsp;-&nbsp;<a href="../bookings/cash.html" class="menu">Kas</a>
+<br>
+&nbsp;-&nbsp;<a href="../bookings/memorial.html" class="menu">Memoriaal</a>
+<br>
+<br>
+<a href="../reports/index.html" class="menu">Overzichten</a>
+<br>
+<a href="../yearend.html" class="menu">Jaarafsluiting</a>
+<br>
+<a href="../inex.html" class="menu">Import en Export</a>
+<br>
+          </td>
+  </tr>
+</table>
+</div>
+
+    </td>
+    <td>
+      <h2>Boekingen</h2>
+
+<p>Alle wijzigingen in de boekhouding worden uitgevoerd door middel
+van boekingen. Voorbeelden van boekingen zijn inkoopfakturen,
+verkoopfakturen, giro- en bankafschriften, en afschrijvingen.</p>
+
+<p>Boekingen vinden plaats in z.g. dagboeken. Een administratie kan
+een willekeurig aantal dagboeken omvatten, vari&euml;rend van een stuk
+of vijf tot vele tientallen, zelfs honderden. In elk van de dagboeken
+vinden verwante boekingen plaats.</p>
+
+<p>EekBoek ondersteunt vijf soorten dagboeken:</p>
+<ul>
+  <li>Inkoop, voor het boeken van inkoopfakturen;</li>
+  <li>Verkoop, voor het boeken van verkoopfakturen;</li>
+  <li>Bank, voor het boeken van giro- en bankafschriften;</li>
+  <li>Kas, voor het boeken van kastransacties;</li>
+  <li>Memoriaal, voor overige boekingen.</li>
+</ul>
+
+<p>Aan elk dagboek, behalve de memoriaals, is een grootboekrekening
+gekoppeld (zie <a href="../stdacc.html">Koppelingen</a>).
+Boekhoudtechnisch moet elke boeking in evenwicht zijn, dus evenveel
+debet als credit. Dit wordt bereikt door het totale bedrag van de
+boeking tegen te boeken op de gekoppelde grootboekrekening.</p>
+
+<p>Elke boeking resulteert in een journaalpost. In de EekBoek shell
+kan deze journaalpost worden getoond door direct na de
+boekingsopdracht de opdracht <code>journaal</code> in te geven. Ook is
+het mogelijk de EekBoek shell op te starten met de command line optie
+<code>--journaal</code>, waardoor de journaalposten automatisch worden
+getoond na elke boeking.
+
+<h3>Identificatie van boekingen: boekstuknummers</h3>
+
+<p>Elke boeking in het systeem is uniek identificeerbaar middels het
+boekstuknummer.</p>
+
+<p>Het boekstuknummer wordt gevormd door de naam van het dagboek, een
+dubbele punt '<code>:</code>', en het volgnummer. Dit laatste nummer
+is bij het boeken vrij te kiezen maar het verdient aanbeveling (en het
+is wettelijk verplicht) om aaneengesloten nummers te gebruiken.</p>
+
+<p>Indien een administratie meerdere boekjaren omvat kunnen de
+boekstukken uit een ander boekjaar worden ge&iuml;dentificeerd door de
+boekjaarcode ook op te nemen in het boekstuknummer, b.v.
+<code>inkopen:2006:57</code>.</p>
+
+<h3>Verwijderen van boekingen</h3>
+
+<p>De EekBoek shell opdracht <code>verwijder</code> verwijdert een
+boeking.</p>
+
+<p>De verwijderde boeking wordt teruggeplaatst in de invoer van de
+EekBoek shell en kan met de Pijltje-Omhoog toets worden klaargezet
+voor verdere verwerking.</p>
+
+<p>De opdracht verwijdert standaard de laatst uitgevoerde boeking,
+maar er kan ook een boekstuk worden geselecteerd door dit als argument
+mee te geven, bijvoorbeeld:</p>
+
+<blockquote class="code">verwijder inkopen:12</blockquote>
+
+<p><strong>Let op:</strong> Een boeking kan alleen worden verwijderd
+wanneer deze niet wordt gebruikt, bijvoorbeeld in een ander
+boekstuk.</p>
+
+<p>De opdracht <code>toon</code> toont een boeking in een vorm waarin
+deze opnieuw (of gewijzigd) kan worden uitgevoerd.</p>
+
+<p>De getoonde boeking wordt tevens teruggeplaatst in de invoer van de
+EekBoek shell en kan met de Pijltje-Omhoog toets worden klaargezet
+voor verdere verwerking.</p>
+
+<p>De opdracht toont standaard de laatst uitgevoerde boeking, maar er
+kan ook een boekstuk worden geselecteerd door dit als argument mee te
+geven, bijvoorbeeld:</p>
+
+<blockquote class="code">toon inkopen:12</blockquote>
+
+
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      <hr>
+
+    </td>
+    <td>
+      <hr>
+
+    </td>
+  </tr>
+
+  <tr valign="bottom">
+    <td valign="middle">
+      <a href="http://www.perl.org/"><img src="../images/perl_powered.png" alt="Powered by Perl" border="0" width="134" height="48"></a>
+    </td>
+    <td align="center">
+      <p style="float:right;margin-top:0pt">
+      <img src="../images/valid-html401.png" alt="[Valid HTML 4.01 Transitional]" border="0" width="88" height="31">
+
+      <img src="../images/validcss.png" alt="[Valid CSS]" border="0" width="88" height="31">
+
+      </p>
+      <p class="info">Copyright &copy; 2005-2010 <a href="http://www.squirrel.nl">Squirrel Consultancy</a>. All Rights Reserved.<br />
+Deze site is gemaakt met de 
+<a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
+Site Builder</a>.<br />
+bookings/index.html laatste aanpassing 24 augustus 2008, 16:42:10
+</p>
+
+    </td>
+  </tr>
+
+</table>
+
+ </body>
+</html>

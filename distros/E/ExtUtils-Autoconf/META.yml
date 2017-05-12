@@ -1,0 +1,22 @@
+abstract: Perl interface to GNU autoconf
+author: Florian Ragwitz <rafl@debian.org>
+build_requires: 
+  Test::Exception: 0
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: ExtUtils-Autoconf
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Carp: 0
+  Config: 0
+  Cwd: 0
+  File::Path: 0
+  File::Spec: 0
+  File::Which: 0
+  Test::More: 0
+  perl: 5.6.0
+version: 0.02

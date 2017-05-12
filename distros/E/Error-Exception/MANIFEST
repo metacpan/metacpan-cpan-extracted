@@ -1,0 +1,19 @@
+Build.PL
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/Error/Exception.pm
+lib/Error/Exception/Class.pm
+t/ErrorException.t
+t/ErrorExceptionClass.t
+t/00-load.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+t/tlib/Error/Exception/Test/Class.pm
+t/tlib/Error/Exception/Test/Exception.pm
+t/tlib/Error/Exception/Test/Helper/TestExceptions.pm
+t/tlib/Error/Exception/Test/Helper/UncaughtTest.pm
+t/tlib/Error/Exception/Test/data/uncaught_test.pl

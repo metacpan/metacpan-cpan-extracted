@@ -1,0 +1,391 @@
+# Copyright 2011-2012 Yuki Izumi. ( anneli AT cpan DOT org )
+# This is free software; you can redistribute it and/or modify it under the
+# same terms as Perl itself.
+
+%nonassoc KW_CATCH
+
+# ???
+%nonassoc LARROW LDARROW
+
+%right MATCH SEND
+%left KW_ORELSE
+%left KW_ANDALSO
+%nonassoc EQUAL NOT_EQUAL LTE GTE LT GT STRICTLY_EQUAL STRICTLY_NOT_EQUAL
+%right LISTADD LISTSUBTRACT
+%left ADD SUBTRACT KW_BOR KW_BXOR KW_BSL KW_BSR KW_OR KW_XOR
+%left DIVIDE MULTIPLY KW_DIV KW_REM KW_AND KW_BAND
+%left NEG POS KW_BNOT KW_NOT
+%nonassoc OPENRECORD
+%nonassoc COLON
+
+%{
+    use strict;
+    use warnings;
+
+    use Erlang::Parser::Node::Directive;
+    use Erlang::Parser::Node::DefList;
+    use Erlang::Parser::Node::Def;
+    use Erlang::Parser::Node::WhenList;
+    use Erlang::Parser::Node::Atom;
+    use Erlang::Parser::Node::Integer;
+    use Erlang::Parser::Node::BinOp;
+    use Erlang::Parser::Node::List;
+    use Erlang::Parser::Node::Variable;
+    use Erlang::Parser::Node::Tuple;
+    use Erlang::Parser::Node::Macro;
+    use Erlang::Parser::Node::String;
+    use Erlang::Parser::Node::Call;
+    use Erlang::Parser::Node::Alt;
+    use Erlang::Parser::Node::Try;
+    use Erlang::Parser::Node::Literal;
+    use Erlang::Parser::Node::FunRef;
+    use Erlang::Parser::Node::FunLocal;
+    use Erlang::Parser::Node::FunLocalCase;
+    use Erlang::Parser::Node::Case;
+    use Erlang::Parser::Node::RecordNew;
+    use Erlang::Parser::Node::VariableRecordAccess;
+    use Erlang::Parser::Node::VariableRecordUpdate;
+    use Erlang::Parser::Node::Float;
+    use Erlang::Parser::Node::BaseInteger;
+    use Erlang::Parser::Node::BinaryExpr;
+    use Erlang::Parser::Node::Binary;
+    use Erlang::Parser::Node::UnOp;
+    use Erlang::Parser::Node::Begin;
+    use Erlang::Parser::Node::Comprehension;
+    use Erlang::Parser::Node::If;
+    use Erlang::Parser::Node::IfExpr;
+    use Erlang::Parser::Node::Receive;
+    use Erlang::Parser::Node::ReceiveAfter;
+
+    sub new_node {
+        my ($kind, %args) = @_;
+        "Erlang::Parser::Node::$kind"->new(%args);
+    }
+%}
+
+%%
+
+# TODO: A few of these lists are flawed in that their optional type isn't done correctly
+# (they allow constructs like [, 1, 2]). Fix this.
+
+root:
+                                { [] }
+    | root rootstmt             { [@{$_[1]}, $_[2]] }
+    ;
+
+rootstmt:
+      SUBTRACT ATOM LPAREN exprlist RPAREN PERIOD       { new_node 'Directive', directive => $_[2], args => $_[4] }
+    | deflist PERIOD                                    { $_[1] }
+    ;
+
+deflist:
+      def                       { new_node('DefList')->_append($_[1]) }
+    | deflist SEMICOLON def     { $_[1]->_append($_[3]) }
+    ;
+
+def:
+      ATOM LPAREN exprlist RPAREN whenlist RARROW stmtlist      { new_node 'Def', def => $_[1], args => $_[3], whens => $_[5]->_group, stmts => $_[7] }
+    ;
+
+whenlist:
+                                { new_node 'WhenList' }
+    | KW_WHEN expr              { new_node('WhenList')->_append($_[2]) }
+    # TODO differentiate these. (a;b,c (A)||(B&&C))
+    | whenlist COMMA expr       { $_[1]->_append($_[3]) }
+    | whenlist SEMICOLON expr   { $_[1]->_group->_append($_[3]) }
+    ;
+
+# somehow this is an idiom. exprlist = 0 or more. stmtlist = 1 or more.
+exprlist:
+                                { [] }
+    | stmtlist                  { $_[1] }
+    ;
+
+stmtlist:
+      expr                      { [$_[1]] }
+    | stmtlist COMMA expr       { [@{$_[1]}, $_[3]] }
+    ;
+
+unparenexpr:
+      immexpr
+    | case
+    | fun
+    | binary
+    | receive
+    | comprehension
+    | try
+    | if
+    | KW_BEGIN exprlist KW_END          { new_node 'Begin', exprs => $_[2] }
+    | expr SEND expr                    { new_node 'BinOp', op => '!',       a => $_[1], b => $_[3] }
+    | expr LT expr                      { new_node 'BinOp', op => '<',       a => $_[1], b => $_[3] }
+    | expr LTE expr                     { new_node 'BinOp', op => '=<',      a => $_[1], b => $_[3] }
+    | expr GT expr                      { new_node 'BinOp', op => '>',       a => $_[1], b => $_[3] }
+    | expr GTE expr                     { new_node 'BinOp', op => '>=',      a => $_[1], b => $_[3] }
+    | expr DIVIDE expr                  { new_node 'BinOp', op => '/',       a => $_[1], b => $_[3] }
+    | expr KW_DIV expr                  { new_node 'BinOp', op => 'div',     a => $_[1], b => $_[3] }
+    | expr MULTIPLY expr                { new_node 'BinOp', op => '*',       a => $_[1], b => $_[3] }
+    | expr ADD expr                     { new_node 'BinOp', op => '+',       a => $_[1], b => $_[3] }
+    | expr SUBTRACT expr                { new_node 'BinOp', op => '-',       a => $_[1], b => $_[3] }
+    | expr MATCH expr                   { new_node 'BinOp', op => '=',       a => $_[1], b => $_[3] }
+    | expr LISTADD expr                 { new_node 'BinOp', op => '++',      a => $_[1], b => $_[3] }
+    | expr LISTSUBTRACT expr            { new_node 'BinOp', op => '--',      a => $_[1], b => $_[3] }
+    | expr EQUAL expr                   { new_node 'BinOp', op => '==',      a => $_[1], b => $_[3] }
+    | expr STRICTLY_EQUAL expr          { new_node 'BinOp', op => '=:=',     a => $_[1], b => $_[3] }
+    | expr STRICTLY_NOT_EQUAL expr      { new_node 'BinOp', op => '=/=',     a => $_[1], b => $_[3] }
+    | expr NOT_EQUAL expr               { new_node 'BinOp', op => '/=',      a => $_[1], b => $_[3] }
+    | expr KW_BSL expr                  { new_node 'BinOp', op => 'bsl',     a => $_[1], b => $_[3] }
+    | expr KW_BSR expr                  { new_node 'BinOp', op => 'bsr',     a => $_[1], b => $_[3] }
+    | expr KW_BOR expr                  { new_node 'BinOp', op => 'bor',     a => $_[1], b => $_[3] }
+    | expr KW_BAND expr                 { new_node 'BinOp', op => 'band',    a => $_[1], b => $_[3] }
+    | expr KW_BXOR expr                 { new_node 'BinOp', op => 'bxor',    a => $_[1], b => $_[3] }
+    | expr KW_XOR expr                  { new_node 'BinOp', op => 'xor',     a => $_[1], b => $_[3] }
+    | expr KW_REM expr                  { new_node 'BinOp', op => 'rem',     a => $_[1], b => $_[3] }
+    | expr KW_ANDALSO expr              { new_node 'BinOp', op => 'andalso', a => $_[1], b => $_[3] }
+    | expr KW_ORELSE expr               { new_node 'BinOp', op => 'orelse',  a => $_[1], b => $_[3] }
+    | expr KW_AND expr                  { new_node 'BinOp', op => 'and',     a => $_[1], b => $_[3] }
+    | expr KW_OR expr                   { new_node 'BinOp', op => 'or',      a => $_[1], b => $_[3] }
+    | SUBTRACT expr %prec NEG           { new_node 'UnOp',  op => '-',       a => $_[2] }
+    | ADD expr %prec POS                { new_node 'UnOp',  op => '+',       a => $_[2] }
+    | KW_BNOT expr                      { new_node 'UnOp',  op => 'bnot',    a => $_[2] }
+    | KW_NOT expr                       { new_node 'UnOp',  op => 'not',     a => $_[2] }
+    | KW_CATCH expr                     { new_node 'UnOp',  op => 'catch',   a => $_[2] }
+
+    # TODO: unhack this.
+    | expr LARROW expr          { new_node 'BinOp', op => '<-', a => $_[1], b => $_[3] }
+    | expr LDARROW expr         { new_node 'BinOp', op => '<=', a => $_[1], b => $_[3] }
+
+    | call
+    ;
+
+parenexpr:
+      LPAREN expr RPAREN                { $_[2] }
+    ;
+
+expr:
+      unparenexpr
+    | parenexpr
+    ;
+
+parenorimm:
+      parenexpr
+    | immexpr
+    ;
+
+immexpr:
+      FLOAT                     { new_node 'Float', float => $_[1] }
+    | BASE_INTEGER              { new_node 'BaseInteger', baseinteger => $_[1] }
+    | INTEGER                   { new_node 'Integer', int => $_[1] }
+    | string
+    | variable OPENRECORD atom  { new_node 'VariableRecordAccess', variable => $_[1], record => $_[3] }
+    | variable newrecord        { new_node 'VariableRecordUpdate', variable => $_[1], update => $_[2] }
+    | LITERAL                   { new_node 'Literal', literal => substr($_[1], 1) }
+    | list
+    | tuple
+    | newrecord
+    | macro
+    | variable
+    | atom
+    ;
+
+atom:
+      ATOM                      { new_node 'Atom', atom => $_[1] }
+    ;
+
+macro:
+      MACRO                     { new_node 'Macro', macro => substr($_[1], 1) }
+    ;
+
+variable:
+      VARIABLE                  { new_node 'Variable', variable => $_[1] }
+    ;
+
+string:
+      STRING                    { new_node 'String', string => $_[1] }
+    | string STRING             { $_[1]->_append($_[2]) }
+    ;
+
+call:
+      intcall
+    | extcall
+    ;
+
+intcall:
+      parenorimm LPAREN exprlist RPAREN         { new_node 'Call', function => $_[1], args => $_[3] }
+    ;
+
+extcall:
+      parenorimm COLON intcall                  { $_[3]->module($_[1]); $_[3] }
+    ;
+
+list:
+      LISTOPEN exprlist listcdr LISTCLOSE       { new_node 'List', elems => $_[2], cdr => $_[3] }
+    ;
+
+# This is not a full node.
+listcdr:
+                                                { undef }
+    | PIPE expr                                 { $_[2] }
+    ;
+
+comprehension:
+      LISTOPEN expr COMPREHENSION exprlist LISTCLOSE            { new_node 'Comprehension', output => $_[2], generators => $_[4] }
+    | OPENBINARY binary COMPREHENSION exprlist CLOSEBINARY      { new_node 'Comprehension', output => $_[2], generators => $_[4], binary => 1 }
+    ;
+
+tuple:
+      TUPLEOPEN exprlist TUPLECLOSE     { new_node 'Tuple', elems => $_[2] }
+    ;
+
+case:
+      KW_CASE expr KW_OF altlist KW_END { new_node 'Case', of => $_[2], alts => $_[4] }
+    ;
+
+altlist:
+      alt                       { [$_[1]] }
+    | altlist SEMICOLON alt     { [@{$_[1]}, $_[3]] }
+    ;
+
+alt:
+      expr whenlist RARROW stmtlist     { new_node 'Alt', expr => $_[1], whens => $_[2]->_group, stmts => $_[4] }
+    ;
+
+fun:
+      funlocal
+    | KW_FUN atom COLON ATOM DIVIDE INTEGER     { new_node 'FunRef', module => $_[2], function => $_[4], arity => $_[6] }
+    | KW_FUN macro COLON ATOM DIVIDE INTEGER    { new_node 'FunRef', module => $_[2], function => $_[4], arity => $_[6] }
+    | KW_FUN variable COLON ATOM DIVIDE INTEGER { new_node 'FunRef', module => $_[2], function => $_[4], arity => $_[6] }
+    | KW_FUN ATOM DIVIDE INTEGER                { new_node 'FunRef', function => $_[2], arity => $_[4] }
+    ;
+
+funlocal:
+      KW_FUN funlocallist KW_END                { new_node 'FunLocal', cases => $_[2] }
+    ;
+    
+# These are not full nodes.
+funlocallist:
+      funlocalcase                              { [$_[1]] }
+    | funlocallist SEMICOLON funlocalcase       { [@{$_[1]}, $_[3]] }
+    ;
+
+funlocalcase:
+      LPAREN exprlist RPAREN whenlist RARROW stmtlist           { new_node 'FunLocalCase', args => $_[2], whens => $_[4]->_group, stmts => $_[6] }
+    ;
+
+newrecord:
+      OPENRECORD atom TUPLEOPEN exprlist TUPLECLOSE             { new_node 'RecordNew', record => $_[2], exprs => $_[4] }
+    ;
+
+binary:
+      OPENBINARY optbinarylist CLOSEBINARY                      { new_node 'Binary', bexprs => $_[2] }
+    ;
+
+# These are not full nodes.
+optbinarylist:
+                                                                { [] }
+    | binarylist
+    ;
+
+binarylist:
+      binaryexpr                                                { [$_[1]] }
+    | binarylist COMMA binaryexpr                               { [@{$_[1]}, $_[3]] }
+    ;
+
+binaryexpr:
+      parenorimm optbinarysize optbinaryqualifier               { new_node 'BinaryExpr', output => $_[1], size => $_[2], qualifier => $_[3] }
+    ;
+
+# These are not full nodes.
+optbinarysize:
+                                                                { undef }
+    | COLON immexpr                                             { $_[2] }
+    ;
+
+optbinaryqualifier:
+                                                                { undef }
+    | DIVIDE binaryqualifier                                    { $_[2] }
+    ;
+
+binaryqualifier:
+      ATOM
+    | binaryqualifier SUBTRACT ATOM                             { "$_[1]-$_[3]" }
+    ;
+
+receive:
+      KW_RECEIVE altlist after KW_END                           { new_node 'Receive', alts => $_[2], aft => $_[3] }
+    ;
+
+# This is not a full node.
+after:
+                                                                { undef }
+    | KW_AFTER expr RARROW stmtlist                             { new_node 'ReceiveAfter', time => $_[2], stmts => $_[4] }
+    ;
+
+try:
+      KW_TRY exprlist opttryof opttrycatch opttryafter KW_END   { new_node 'Try', exprs => $_[2], of => $_[3], catch => $_[4], aft => $_[5] }
+    ;
+
+# These are not full nodes.
+opttryof:
+                                                                { undef }
+    | KW_OF altlist                                             { $_[2] }
+    ;
+
+opttrycatch:
+                                                                { undef }
+    | KW_CATCH catchaltlist                                     { $_[2] }
+    ;
+
+opttryafter:
+                                                                { undef }
+    | KW_AFTER exprlist                                         { $_[2] }
+    ;
+
+catchaltlist:
+      catchalt                          { [$_[1]] }
+    | catchaltlist SEMICOLON catchalt   { [@{$_[1]}, $_[3]] }
+    ;
+
+catchalt:
+      ATOM COLON expr whenlist RARROW stmtlist          { new_node 'Alt', catch => 1, class => $_[1], expr => $_[3], whens => $_[4]->_group, stmts => $_[6] }
+    | VARIABLE COLON expr whenlist RARROW stmtlist      { new_node 'Alt', catch => 1, class => $_[1], expr => $_[3], whens => $_[4]->_group, stmts => $_[6] }
+    | expr whenlist RARROW stmtlist                     { new_node 'Alt', catch => 1, expr => $_[1], whens => $_[2]->_group, stmts => $_[4] }
+    ;
+
+if:
+      KW_IF iflist KW_END                       { new_node 'If', cases => $_[2] }
+    ;
+
+iflist:
+      ifexpr                    { [$_[1]] }
+    | iflist SEMICOLON ifexpr   { [@{$_[1]}, $_[3]] }
+    ;
+
+ifexpr:
+      ifseq RARROW stmtlist     { new_node 'IfExpr', seq => $_[1], stmts => $_[3] }
+    ;
+
+ifseq:
+      expr              { [$_[1]] }
+    | ifseq COMMA expr  { [@{$_[1]}, $_[3]] }
+    ;
+%%
+
+=over 4
+
+=item C<new>
+
+Creates a new parser object. See L<Parse::Yapp> for more information.
+
+=item C<new_node>
+
+Helper function used to create new nodes.
+
+    # These are identical.
+    my $n1 = new_node('X', @y);
+    my $n2 = Erlang::Parser::Node::X->new(@y);
+
+=cut
+
+1;
+
+# vim: set sw=4 ts=4 et filetype=perl:

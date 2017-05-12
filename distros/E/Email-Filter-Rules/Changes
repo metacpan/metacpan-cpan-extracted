@@ -1,0 +1,45 @@
+Revision history for Perl module Email::Filter::Rules
+
+1.2     6/30/2008
+        - update README
+        - perlcritic updates
+            - moved pod after __END__ block
+            - remove 'return undef'
+            - 
+        - cleaned up tests
+
+1.121   11/5/2006
+        - No need to update, cpants META.yml fix, needed to update to
+          ExtUtils::MakeMaker 6.31 for META.yml update
+
+1.12    11/1/2006
+        - No need to update, cpants META.yml fix
+
+1.11    5/9/2006
+        - No need to update, just pod, and test coverage updates
+        - Added lots and lots of tests, as close to 100% as I'm going to get.
+        - Pod coverage now at 100%
+        - Regenerated README to replace out of date README
+
+1.1     5/7/2006
+        - Added Email::Filter as a prereq so tests will pass.
+        - Regenerated README to replace out of date README
+
+1.0     5/6/2005
+	- Removed Mail::Audit references in favor or Email::Filter only
+	- Added some better testing
+	- Cleaned up the code/pod a bit
+
+0.4     4/5/2004 (Cinco de Mayo - It's Margarita time!!)
+	- pod2text lib/Email/Filter/Rules.pm > README
+
+0.3     4/5/2004 (Cinco de Mayo - It's Corona time!!)
+	- Changed references to 'REGEX' to 'SUBSTRING' because as Rocco 
+	  Caputo pointed out, its not actually a regular expression.
+	  
+0.2     9/20/2003
+	- fixed an issue were we make sure that the Email::Filter object
+	  can do a method before we call it next unless $ma->can($method);
+
+0.01    9/6/2003
+	- original version

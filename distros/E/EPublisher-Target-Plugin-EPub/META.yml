@@ -1,0 +1,27 @@
+---
+abstract: 'Use EPub as a target for EPublisher'
+author:
+  - 'Renee Bäcker <reneeb@cpan.org>, Boris Däppen <boris_daeppen@bluewin.ch>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.142060'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: EPublisher-Target-Plugin-EPub
+requires:
+  Data::UUID: '1.217'
+  EBook::EPUB: '0.6'
+  EPublisher: '0.6'
+  File::Basename: '2'
+  File::Path: '2.08'
+  File::Temp: '0'
+  Pod::Simple::XHTML: '3.14'
+resources:
+  bugtracker: http://github.com/reneeb/EPublisher-Target-Plugin-EPub/issues
+  homepage: http://github.com/reneeb/EPublisher-Target-Plugin-EPub
+  repository: http://github.com/reneeb/EPublisher-Target-Plugin-EPub.git
+version: '0.6'

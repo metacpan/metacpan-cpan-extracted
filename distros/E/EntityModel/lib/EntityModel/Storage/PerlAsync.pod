@@ -1,0 +1,180 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with EntityModel::Storage::PerlAsync
+at lib/EntityModel/Storage/PerlAsync.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+EntityModel::Storage::PerlAsync - backend storage interface for L<EntityModel>
+
+=head1 VERSION
+
+version 0.102
+
+=head1 SYNOPSIS
+
+See L<EntityModel>.
+
+=head1 DESCRIPTION
+
+Wrapper around the Perl storage module to defer responses until idle point in an L<IO::Async> loop.
+
+=head1 METHODS
+
+=head2 new
+
+Subclassed instantiation, requires an L<IO::Async::Loop> passed as the C<loop> named parameter.
+
+=head2 read
+
+Reads the data for the given entity and returns hashref with the appropriate data.
+
+Parameters:
+
+=over 4
+
+=item * entity - L<EntityModel::Entity>
+
+=item * id - ID to read data from
+
+=back
+
+Callbacks (included in parameter list above):
+
+=over 4
+
+=item * on_complete - called when the value has been read, includes the value
+
+=item * on_not_found - called if entry not found
+
+=back
+
+Returns $self.
+
+=head2 create
+
+Creates new entry for the given L<EntityModel::Entity>.
+
+Parameters:
+
+=over 4
+
+=item * entity - L<EntityModel::Entity>
+
+=item * data - actual data values
+
+=back
+
+Callbacks (included in parameter list above):
+
+=over 4
+
+=item * on_complete - called when the value has been created, will be passed the assigned ID
+
+=back
+
+Returns $self.
+
+=head2 store
+
+Stores data to the given entity and ID.
+
+Parameters:
+
+=over 4
+
+=item * entity - L<EntityModel::Entity>
+
+=item * id - ID to store data to
+
+=item * data - actual data values
+
+=back
+
+Callbacks (included in parameter list above):
+
+=over 4
+
+=item * on_complete - called when the value has been stored, will be passed the assigned ID
+
+=back
+
+Returns $self.
+
+=head2 remove
+
+Removes given ID from storage.
+
+Parameters:
+
+=over 4
+
+=item * entity - L<EntityModel::Entity>
+
+=item * id - ID to store data to
+
+=back
+
+Callbacks (included in parameter list above):
+
+=over 4
+
+=item * on_complete - called when the value has been removed
+
+=back
+
+Returns $self.
+
+=head2 find
+
+Callbacks (included in parameter list above):
+
+=over 4
+
+=item * on_item - called for each item
+
+=item * on_not_found - called once if no items were found
+
+=item * on_complete - called when no more items are forthcoming (regardless of whether any
+were found or not)
+
+=item * on_fail - called if there was an error
+
+=back
+
+Returns $self.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<EntityModel::Storage::Perl>
+
+L<adjacent|EntityModel::Storage::Perl/adjacent>, L<apply_entity|EntityModel::Storage::Perl/apply_entity>, L<dump|EntityModel::Storage::Perl/dump>, L<field_list|EntityModel::Storage::Perl/field_list>, L<outer|EntityModel::Storage::Perl/outer>, L<read_fields|EntityModel::Storage::Perl/read_fields>, L<read_primary|EntityModel::Storage::Perl/read_primary>, L<table_list|EntityModel::Storage::Perl/table_list>
+
+=item L<EntityModel::Storage>
+
+L<apply_model|EntityModel::Storage/apply_model>, L<apply_model_and_schema|EntityModel::Storage/apply_model_and_schema>, L<backend_ready|EntityModel::Storage/backend_ready>, L<first|EntityModel::Storage/first>, L<last|EntityModel::Storage/last>, L<next|EntityModel::Storage/next>, L<prev|EntityModel::Storage/prev>, L<register|EntityModel::Storage/register>, L<transaction_commit|EntityModel::Storage/transaction_commit>, L<transaction_end|EntityModel::Storage/transaction_end>, L<transaction_rollback|EntityModel::Storage/transaction_rollback>, L<transaction_start|EntityModel::Storage/transaction_start>, L<wait_for_backend|EntityModel::Storage/wait_for_backend>
+
+=item L<Mixin::Event::Dispatch>
+
+L<add_handler_for_event|Mixin::Event::Dispatch/add_handler_for_event>, L<clear_event_handlers|Mixin::Event::Dispatch/clear_event_handlers>, L<event_handlers|Mixin::Event::Dispatch/event_handlers>, L<invoke_event|Mixin::Event::Dispatch/invoke_event>, L<subscribe_to_event|Mixin::Event::Dispatch/subscribe_to_event>, L<unsubscribe_from_event|Mixin::Event::Dispatch/unsubscribe_from_event>
+
+=item L<EntityModel::BaseClass>
+
+L<clone|EntityModel::BaseClass/clone>, L<new|EntityModel::BaseClass/new>, L<sap|EntityModel::BaseClass/sap>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <cpan@entitymodel.com>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2008-2011. Licensed under the same terms as Perl itself.

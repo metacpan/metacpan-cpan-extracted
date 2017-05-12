@@ -1,0 +1,23 @@
+Changes		Change log
+JIS2K.pm	Encode::JIS2K
+MANIFEST	This list of files
+Makefile.PL	MM file
+README		README
+lib/Encode/JIS2K/2022JP3.pm	Encode::JIS2K::2022JP3
+t/JIS2K.t	test script
+t/jisx0201.enc	test data
+t/jisx0201.utf	test data
+t/jisx0208.enc	test data
+t/jisx0208.utf	test data
+t/jisx0212.enc	test data
+t/jisx0212.utf	test data
+t/x0213-1.enc	test data
+t/x0213-1.utf	test data
+t/x0213-2.enc	test data
+t/x0213-2.utf	test data
+ucm/euc-jp2k.ucm     UCM
+ucm/sjis-2k.ucm	UCM
+ucm/x0213-1.ucm	UCM
+ucm/x0213-2.ucm	UCM
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

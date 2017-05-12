@@ -1,0 +1,41 @@
+Revision history for EV::ADNS
+
+3.0  Sat Oct 17 00:57:43 CEST 2015
+	- support new flags, bigaddr, manyaf and ipv6.
+	- implement EV::ADNS::reinit (The White Team).
+        - use libev 4 API.
+        - submit now croaks on error instead of returning undef.
+        - fully implement r_ns.
+        - bugfixes.
+
+2.3  Tue Jun 30 22:39:39 CEST 2015
+	— newer versions of ExtUtils::MakeMaker break meta dependencies handling,
+          work around this.
+        - added stability canary support.
+
+2.2  Fri May  7 23:40:40 CEST 2010
+        - avoid accumulating temporaries, which can "leak" memory
+          in certain cases (testcase by Nikita Savin).
+
+2.1  2008-05-17
+	- support r_addr result type.
+
+2.0  Sat Dec 22 17:49:53 CET 2007
+	- upgrade to EV version 2.0 API.
+        - add message about adns-1.4 being the minimum supported version.
+
+1.0  Thu Dec 13 00:44:24 CET 2007
+	- only run the prepare watcher if there actually is work to do
+          (this also made the code simpler and faster).
+	- possible future multiplicity support.
+
+0.3  Mon Dec  3 20:02:40 CET 2007
+	- properly call adns_processtimeouts in the timer callback.
+
+0.2  Mon Dec  3 12:53:55 CET 2007
+	- use an idle watcher to ensure that our prepare callback
+          is called even when we submit requests late in the event loop.
+        - doc fixes.
+
+0.1  Sat Dec  1 23:35:27 CET 2007
+	- original version, a Glib::EV clone.

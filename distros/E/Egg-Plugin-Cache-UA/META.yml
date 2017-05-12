@@ -1,0 +1,27 @@
+---
+name: Egg-Plugin-Cache-UA
+version: 1.00
+author:
+  - 'Masatoshi Mizuno E<lt>lusheE<64>cpan.orgE<gt>'
+abstract: lib/Egg/Plugin/Cache/UA.pm
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Egg::Model::Cache: 0.01
+  Egg::Plugin::LWP: 3
+  Egg::Release: 3.06
+  Test::More: 0
+  Test::Perl::Critic: 0
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+provides:
+  Egg::Plugin::Cache::UA:
+    file: lib/Egg/Plugin/Cache/UA.pm
+    version: 1.00
+  Egg::Plugin::Cache::UA::handler:
+    file: lib/Egg/Plugin/Cache/UA.pm
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

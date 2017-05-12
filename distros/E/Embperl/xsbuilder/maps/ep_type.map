@@ -1,0 +1,56 @@
+
+
+struct tThreadData	| Embperl::Thread              | T_MAGICHASH_SV
+struct tApp	        | Embperl::App                 | T_MAGICHASH_SV
+struct tAppConfig	| Embperl::App::Config         | T_MAGICHASH_SV
+struct tReq	        | Embperl::Req                 | T_MAGICHASH_SV
+struct tReqConfig	| Embperl::Req::Config         | T_MAGICHASH_SV
+struct tReqParam	| Embperl::Req::Param          | T_MAGICHASH_SV
+struct tComponent	| Embperl::Component           | T_MAGICHASH_SV
+struct tComponentConfig	| Embperl::Component::Config   | T_MAGICHASH_SV
+struct tComponentParam	| Embperl::Component::Param    | T_MAGICHASH_SV
+struct tComponentOutput	| Embperl::Component::Output   | T_MAGICHASH_SV
+
+struct tCacheItem	| Embperl::CacheItem           | T_MAGICHASH_SV
+struct tTokenTable      | Embperl::Syntax              | T_MAGICHASH_SV
+
+
+struct tBuf	        |
+
+struct tCharTrans	|
+
+struct request_rec	| Apache::
+
+struct server_rec	| Apache::Server
+
+
+
+tPerlInterpreter	|
+
+AV * 	| AVREF  | T_AVREF | | svinc
+HV *	| HVREF  | T_HVREF | | svinc
+SV *	| SVPTR  | T_SVPTR | | svinc
+CV *	| SVPTR  | T_SVPTR | | svinc
+CV	|
+FILEIO	|
+HV	| 
+SV	| SV
+I32	| IV
+STRLEN	| IV
+bool	| IV
+clock_t	| IV
+tIndex	| IV
+tNode	| IV
+tPhase	| IV
+tRepeatLevel	| IV
+struct tMemPool	|
+
+AV	|
+
+struct tToken	|
+
+tApacheDirConfig	|
+
+tCharMap	|
+
+

@@ -1,0 +1,18 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+SIGNATURE
+example/MyTest.pm
+example/make.pl
+lib/ExtUtils/MY_Metafile.mlpod
+lib/ExtUtils/MY_Metafile.pm
+t/00-load.t
+t/01_basic.t
+t/01_import.t
+t/01_inc_import.t
+t/01_mm_metafile_target.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t

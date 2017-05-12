@@ -1,0 +1,47 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with EntityModel::StorageClass::KVStore::Layer::LRU
+at lib/EntityModel/StorageClass/KVStore/Layer/LRU.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head2 lookup
+
+Returns the cached value if we have it. Intended to be a low-overhead method for
+interacting with local, nonblocking caches.
+
+Takes a single $query parameter which will be the query we're trying to find.
+
+Returns an empty list if we don't have an answer in the cache, undef if we
+have an answer and that answer is "no value", otherwise returns whatever
+value we have on file.
+
+=head2 store
+
+Store a value in the cache.
+
+Takes the following parameters:
+
+=over 4
+
+=item * $query - query to store under
+
+=item * $value - value to store in key (can be undef)
+
+=back
+
+Returns $self.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<EntityModel::StorageClass::KVStore::Layer>
+
+L<key_mangle|EntityModel::StorageClass::KVStore::Layer/key_mangle>, L<retrieval_fallback|EntityModel::StorageClass::KVStore::Layer/retrieval_fallback>, L<retrieve|EntityModel::StorageClass::KVStore::Layer/retrieve>, L<shutdown|EntityModel::StorageClass::KVStore::Layer/shutdown>, L<underlayer|EntityModel::StorageClass::KVStore::Layer/underlayer>
+
+=back
+

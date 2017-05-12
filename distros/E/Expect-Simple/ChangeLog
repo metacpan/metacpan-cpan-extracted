@@ -1,0 +1,142 @@
+2008-05-06 19:17 -0400  djerius  <djerius@cfa.harvard.edu>  (e7ce8260d2e9 [tip])
+
+	* lib/Expect/Simple.pm:
+	don't expose exitstatus routine
+
+2008-05-06 19:14 -0400  djerius  <djerius@cfa.harvard.edu>  (427807ef1d7e)
+
+	* lib/Expect/Simple.pm:
+	propagate error from failed spawn
+
+2008-05-06 19:12 -0400  djerius  <djerius@cfa.harvard.edu>  (a05c30ff584e)
+
+	* lib/Expect/Simple.pm:
+	switch internal croaks to dies. clean up exception string new lines
+
+2008-05-06 17:51 -0400  djerius  <djerius@cfa.harvard.edu>  (385aee63462b)
+
+	* lib/Expect/Simple.pm:
+	no longer attempt to disconnect on failed spawn. don't try to
+	disconnect if the spawned process has already exited.
+
+	the connection object was stashed in the Expect::Simple object
+	before a connection was attempted, leading _disconnect to try and
+	disconnect if the spawn failed when the object was getting
+	automatically destroyed.
+
+2007-08-16 17:30 -0400  djerius  <djerius@cfa.harvard.edu>  (509bddd42cfd)
+
+	* .hgtags:
+	Added tag 0.03 for changeset 597143fc8e7b
+
+2007-08-16 17:30 -0400  djerius  <djerius@cfa.harvard.edu>  (597143fc8e7b [0.03])
+
+	* ChangeLog, Changes, MANIFEST, lib/Expect/Simple.pm:
+	update for release
+
+2007-08-16 17:27 -0400  djerius  <djerius@cfa.harvard.edu>  (762f5212fa09)
+
+	* Makefile.PL:
+	fix typo
+
+2007-08-07 18:07 -0400  djerius  <djerius@cfa.harvard.edu>  (c783a36b3863)
+
+	* .hgtags:
+	Added tag 0.03_02 for changeset 5fadc78bc572
+
+2007-08-07 18:07 -0400  djerius  <djerius@cfa.harvard.edu>  (5fadc78bc572 [0.03_02])
+
+	* ChangeLog, Changes:
+	update for release
+
+2007-08-07 18:06 -0400  djerius  <djerius@cfa.harvard.edu>  (8d96ed7a5297)
+
+	* lib/Expect/Simple.pm:
+	update version for release
+
+2007-08-07 18:05 -0400  djerius  <djerius@cfa.harvard.edu>  (406422c879e7)
+
+	* Makefile.PL:
+	added LICENSE to Makefile.PL
+
+2007-07-31 18:15 -0400  djerius  <djerius@cfa.harvard.edu>  (a2d0a3a6de39)
+
+	* .hgtags:
+	Added tag 0.03_01 for changeset 9a57ce45c4e5
+
+2007-07-31 18:15 -0400  djerius  <djerius@cfa.harvard.edu>  (9a57ce45c4e5 [0.03_01])
+
+	* ChangeLog:
+	update for release
+
+2007-07-31 18:04 -0400  djerius  <djerius@cfa.harvard.edu>  (d5b8c528e728)
+
+	* lib/Expect/Simple.pm:
+	minor code cleanup
+
+2007-07-31 18:00 -0400  djerius  <djerius@cfa.harvard.edu>  (b3256c687aee)
+
+	* Changes, lib/Expect/Simple.pm, t/Expect-Simple.t, t/testprog: new
+	file.
+	* GNUmakefile, INSTALL, Simple.pm: deleted file.
+	* Changes, GNUmakefile, INSTALL, MANIFEST, Makefile.PL, README,
+	Simple.pm, lib/Expect/Simple.pm, t/Expect-Simple.t, t/testprog:
+	Modernized layout, new tests, Cmd takes arrays, new RawPty attribute
+
+	- Modernized layout
+	- Cmd attribute can now take arrays [Adriano Ferreira
+	<a.r.ferreira@gmail.com>]
+	- Added RawPty attribute
+	- tests!
+
+2007-07-31 13:54 -0400  djerius  <djerius@cfa.harvard.edu>  (138b0db0cd1d)
+
+	* ChangeLog, MANIFEST, README:
+	update for release
+
+2007-07-31 13:53 -0400  djerius  <djerius@cfa.harvard.edu>  (72ff04de2b51)
+
+	* Simple.pm:
+	use __PACKAGE__ instad of constant CLASS
+
+2007-07-31 17:33 +0000  dj  <dj>  (43e15f71bf82)
+
+	* ChangeLog: new file.
+	* ChangeLog:
+	2007-07-31 17:33:58 by dj added ChangeLog
+
+2007-07-31 13:34 -0400  djerius  <djerius@cfa.harvard.edu>  (4c6ebb75d8fe)
+
+	* .hgtags:
+	Added tag V0_01 for changeset 19960ade3b9a
+
+2002-04-12 21:04 +0000  dj  <dj>  (19960ade3b9a [V0_01])
+
+	* LICENSE, README: new file.
+	* LICENSE, README, Simple.pm:
+	2002-04-12 21:04:33 by dj added license info
+
+2007-07-31 13:34 -0400  djerius  <djerius@cfa.harvard.edu>  (b82227a5764b)
+
+	* .hgtags: new file.
+	* .hgtags:
+	Added tag initial for changeset 8ade7f132b43
+
+2000-08-31 18:23 +0000  dj  <dj>  (8ade7f132b43 [initial])
+
+	* GNUmakefile, INSTALL, MANIFEST: new file.
+	* GNUmakefile, INSTALL, MANIFEST:
+	2000-08-31 18:23:47 by dj
+
+2000-08-31 18:23 +0000  dj  <dj>  (0c0b74076926)
+
+	* Makefile.PL, Simple.pm: new file.
+	* Makefile.PL, Simple.pm:
+	2000-08-31 18:23:46 by dj Initial revision
+
+2007-07-31 13:34 -0400  djerius  <djerius@cfa.harvard.edu>  (22a363e7238c)
+
+	* .hgignore: new file.
+	* .hgignore:
+	Tailor preparing to convert repo by adding .hgignore
+

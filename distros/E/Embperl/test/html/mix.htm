@@ -1,0 +1,64 @@
+
+<html>
+<head>
+<title>Embperl Tests - Mix top level perl, with subroutines and metacommands</title>
+</head>
+
+<body>
+
+Here it starts with some HTML Text<P>
+
+All values should be undefined:
+
+[* $a = 'global value' ; *] <BR>
+
+global value: $a = [+ $a || ''  +] <BR>
+
+[* { local $a ; *]
+
+$a = [+ $a || ''  +] <BR>
+
+[* $a = 'lokal value' ; *] <BR>
+
+lokal value: $a = [+ $a || ''  +] <BR>
+
+[* } *]
+
+again global value: $a = [+ $a || ''  +] <BR>
+
+[* @x = (1, 4 ,8, 17) ; *]
+
+[- $i = 0 -]
+[$ while $i &lt;= $#x $]
+    [+ $i +] = [+ $x[$i] +] <br>
+    [* $j = 0 ; *]
+    [$ while $j &lt;= $i $]
+        [+ $j++ +] 
+    [$ endwhile $]
+    <BR>
+    [* $i++ ; *]
+[$ endwhile $]
+
+
+[-
+   undef @b ;
+
+   $b[0][0] = 'b1/1' ;
+   $b[1][0] = 'b2/1' ;
+   $b[1][1] = 'b2/2' ;
+   $b[2][0] = 'b3/1' ;
+   $b[2][1] = 'b3/2' ;
+   $b[2][2] = 'b3/3' ;
+
+-]
+
+<table>
+    <tr>
+        <td>[* $i = $row ; *][+ $i +]</td><td>[+ $b[$row][$col] +] </td>
+    </tr> 
+</table>
+
+
+
+</body>
+</html>

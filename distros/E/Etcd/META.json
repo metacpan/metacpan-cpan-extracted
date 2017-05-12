@@ -1,0 +1,56 @@
+{
+   "abstract" : "Client library for etcd",
+   "author" : [
+      "Robert Norris <rob@eatenbyagrue.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.036, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Etcd",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "HTTP::Tiny" : "0.014",
+            "JSON" : "0",
+            "Moo" : "0",
+            "Scalar::Util" : "0",
+            "Try::Tiny" : "0",
+            "Type::Tiny" : "0",
+            "Type::Utils" : "0",
+            "Types::Standard" : "0",
+            "URI::Escape" : "0",
+            "namespace::autoclean" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/robn/p5-etcd/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/robn/p5-etcd.git",
+         "web" : "http://github.com/robn/p5-etcd"
+      }
+   },
+   "version" : "0.004"
+}
+

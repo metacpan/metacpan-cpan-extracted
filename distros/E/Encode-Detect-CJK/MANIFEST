@@ -1,0 +1,8 @@
+CHANGES
+lib/Encode/Detect/CJK.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README
+t/test.t
+META.yml                                 Module meta-data (added by MakeMaker)

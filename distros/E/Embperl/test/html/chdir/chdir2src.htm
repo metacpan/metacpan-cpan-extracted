@@ -1,0 +1,52 @@
+<html>
+<head>
+<title>Some tests for Embperl</title>
+</head>
+
+
+<body>
+
+Compile:
+[! 
+use Cwd  ;
+use lib qw{.} ;
+
+BEGIN { $begin = getcwd }
+$compile = getcwd ;
+
+!]
+
+[-
+use chdir2src ;
+$test = chdir2src::test () ;
+-]
+
+Run:
+Begin   CWD: [+ $begin +] <BR>
+Compile CWD: [+ $compile +] <BR>
+Script  CWD: [+ $script = getcwd +] <BR>
+Embperl CWD: [+ $ep =     $FindBin::Bin || $ENV{EMBPERL_SRC} +] <BR>
+$0: [+ $abs = $0 +]
+Use Test: [+ $test +]
+
+[- $abs = $ep . '/' . $0  if (!($0 =~ /^\//)) ; -]
+$0 (absolut): [+ $abs +]
+
+Equal: [+ $script eq $ep?'Yes':'No' +]<BR>
+Compile Equal: [+ $script eq $compile?'yes':'no' +]
+Diff CWD: [+ do { $script =~ /$ep/ ; ">$'<" } +]<BR>
+Diff $0: [+ do { $abs =~ /$ep/ ; ">$'<" } +]<BR>
+Test/html: [+ $script =~ /test(?:\/|\\)html(?:\/|\\)chdir$/?'yes':'no' +]
+
+[- @ks = sort keys %fdat -]
+
+	<table>
+		<tr>
+			<td>[+ $ks[$row] +]</td><td>[+ $fdat{$ks[$row] || ''} +]</td>
+		</tr>
+	</table>
+
+
+
+</body>
+</html>
